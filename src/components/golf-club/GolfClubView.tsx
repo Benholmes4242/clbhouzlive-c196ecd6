@@ -541,11 +541,6 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
         <div
           className="inline-flex items-center self-end shrink-0"
           style={{
-            background: 'rgba(15,23,42,0.5)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            borderRadius: 8,
-            padding: '4px 8px',
             gap: 8,
           }}
         >
@@ -555,7 +550,6 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
             usaRank={standing?.usaRank ?? null}
             country={course.country}
             positioning="inline"
-            bare
           />
         </div>
       )}

@@ -7,15 +7,14 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Play } from 'lucide-react';
 import { formatNumber } from '@/i18n/format';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection from '../about/AboutSection';
+import { MomentMediaStrip } from '../AboutMediaStrip';
 
 interface Props {
   courseId: string;
@@ -71,8 +70,6 @@ const YourMomentsSection: React.FC<Props> = ({ courseId, courseName, onOpen }) =
 
   if (!moments || moments.length === 0) return null;
 
-  const tiles = moments.slice(0, 3);
-
   return (
     <AboutSection
       heading={t('courseDetail.you.moments')}
@@ -81,49 +78,14 @@ const YourMomentsSection: React.FC<Props> = ({ courseId, courseName, onOpen }) =
         moments: formatNumber(moments.length),
       })}
     >
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
-        {tiles.map((moment, index) => (
-          <button
-            key={moment.id}
-            type="button"
-            onClick={() => {
-              onOpen?.(moment.id);
-              if (posts.length > 0) useFullscreenFeedStore.getState().open(posts, index, { readOnly: true });
-            }}
-            style={{
-              position: 'relative',
-              height: 84,
-              borderRadius: 12,
-              overflow: 'hidden',
-              border: 0,
-              padding: 0,
-              background: A.PANEL,
-              cursor: 'pointer',
-            }}
-          >
-            <img
-              src={moment.posterUrl ?? moment.mediaUrl}
-              alt=""
-              loading="lazy"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            />
-            {moment.mediaType === 'video' ? (
-              <span
-                style={{
-                  position: 'absolute',
-                  right: 6,
-                  bottom: 6,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Play size={14} color={A.INK} fill={A.INK} />
-              </span>
-            ) : null}
-          </button>
-        ))}
-      </div>
+      <MomentMediaStrip
+        items={moments}
+        onOpen={(index) => {
+          const moment = moments[index];
+          if (moment) onOpen?.(moment.id);
+          if (posts.length > 0) useFullscreenFeedStore.getState().open(posts, index, { readOnly: true });
+        }}
+      />
     </AboutSection>
   );
 };

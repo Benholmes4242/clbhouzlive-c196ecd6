@@ -6,6 +6,67 @@ import { Play, Plus } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
 import { useCourseMediaCounts } from '@/hooks/useCourseMediaCounts';
+
+export interface MomentStripItem {
+  id: string;
+  mediaType: 'image' | 'video';
+  mediaUrl: string;
+  posterUrl?: string | null;
+}
+
+/** Additive thumbnail mode for viewer-scoped media; canonical defaults stay unchanged. */
+export const MomentMediaStrip: React.FC<{
+  items: MomentStripItem[];
+  onOpen: (index: number) => void;
+}> = ({ items, onOpen }) => (
+  <div
+    style={{
+      display: 'flex',
+      gap: 8,
+      overflowX: 'auto',
+      paddingBottom: 4,
+      scrollbarWidth: 'none',
+      WebkitOverflowScrolling: 'touch',
+      willChange: 'transform',
+    }}
+  >
+    {items.map((item, index) => (
+      <button
+        key={item.id}
+        type="button"
+        onClick={() => onOpen(index)}
+        style={{
+          position: 'relative',
+          flex: '0 0 84px',
+          width: 84,
+          height: 84,
+          overflow: 'hidden',
+          border: 0,
+          borderRadius: 8,
+          padding: 0,
+          background: A.PANEL,
+          cursor: 'pointer',
+        }}
+      >
+        <img
+          src={item.posterUrl ?? item.mediaUrl}
+          alt=""
+          loading="lazy"
+          style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+        {item.mediaType === 'video' ? (
+          <Play
+            aria-hidden="true"
+            size={14}
+            color={A.INK}
+            fill={A.INK}
+            style={{ position: 'absolute', right: 6, bottom: 6 }}
+          />
+        ) : null}
+      </button>
+    ))}
+  </div>
+);
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 // groupMultiMedia intentionally not imported: posts are built one-per-parent-id already grouped.
