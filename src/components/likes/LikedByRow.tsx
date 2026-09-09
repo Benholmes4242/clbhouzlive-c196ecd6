@@ -1,15 +1,21 @@
 /**
  * LikedByRow — the single entry point to "who liked this".
  *
- * A tappable row directly under a card's like/comment actions row: up to three
- * 22px avatars overlapping by 7px, then a muted line of copy. The whole row is
- * one tap target and opens LikesSheet.
+ * ONE LINE OF TEXT, PRESENT IMMEDIATELY (BRIEF_FEED_CARD_REBUILD section B).
+ * The avatar cluster is gone: three 22px squircles arrived a beat after the
+ * card, so the footer moved under the thumb. The row is now a single tappable
+ * text line that renders the moment the card does, and swaps to names when
+ * they resolve. No layout change either way.
  *
  * COPY, by count:
  *   0    — nothing renders at all (no empty state, no gap)
  *   1    — "Liked by Thomas"
  *   2    — "Liked by Thomas and Amy"
  *   3+   — "Liked by Thomas, Amy and 10 others"
+ *
+ * NEUTRAL FALLBACK while names are in flight: "1 like" / "12 likes". It states
+ * the count the surface already knows, so nothing can disagree and nothing
+ * reflows when the names land.
  *
  * FIRST NAMES ONLY so the line cannot wrap, and they are the FIRST entries of
  * the SAME ordered array the sheet renders (followed first, then everyone else,
@@ -22,19 +28,19 @@
  * Read and presentation only. No like write path, and no long-press gesture.
  */
 import { useState } from 'react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { usePostLikers, likerFirstNames } from '@/hooks/usePostLikers';
 import { LikesSheet } from './LikesSheet';
-
-const AVATAR = 22;
-const OVERLAP = 7;
 
 export interface LikedByRowProps {
   postId: string | null;
   /** The surface's own like count. Zero renders nothing. */
   count: number;
-  /** Card surface colour — the avatar borders take it so they read as separate. */
+  /**
+   * DEAD PROP (section B). The avatar borders took the card surface colour so
+   * they read as separate; there are no avatars now. Retained so every caller
+   * renders unchanged and recorded on the dead-code list.
+   */
   surfaceColor?: string;
   source?: 'post' | 'editorial';
   style?: React.CSSProperties;
@@ -43,21 +49,20 @@ export interface LikedByRowProps {
 export function LikedByRow({
   postId,
   count,
-  surfaceColor = A.CANVAS,
+  surfaceColor,
   source = 'post',
   style,
 }: LikedByRowProps) {
   const [open, setOpen] = useState(false);
-  // Preview needs the names, so the list is fetched for the row itself. It is
-  // the same query key the sheet uses, so opening the sheet costs nothing.
+  // The names are the same query key the sheet uses, so opening it costs
+  // nothing. The line does not wait on it.
   const { likers } = usePostLikers(postId, !!postId && count > 0, source);
 
   if (!postId || count <= 0) return null;
 
-  const shown = likers.slice(0, 3);
   const names = likerFirstNames(likers, 2);
 
-  let copy: string | null = null;
+  let copy: string;
   if (names.length >= 2 && count > 2) {
     const others = Math.max(count - 2, 1);
     copy = `Liked by ${names[0]}, ${names[1]} and ${others.toLocaleString()} other${others === 1 ? '' : 's'}`;
@@ -67,10 +72,10 @@ export function LikedByRow({
     copy = count > 1
       ? `Liked by ${names[0]} and ${(count - 1).toLocaleString()} other${count - 1 === 1 ? '' : 's'}`
       : `Liked by ${names[0]}`;
+  } else {
+    // Names not resolved yet — state the count rather than hold the row.
+    copy = `${count.toLocaleString()} like${count === 1 ? '' : 's'}`;
   }
-
-  // Names not resolved yet — hold the row rather than show a wrong preview.
-  if (!copy) return null;
 
   return (
     <>
@@ -78,9 +83,7 @@ export function LikedByRow({
         type="button"
         onClick={() => setOpen(true)}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
+          display: 'block',
           width: '100%',
           padding: 0,
           background: 'transparent',
@@ -89,30 +92,6 @@ export function LikedByRow({
           ...style,
         }}
       >
-        {shown.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-            {shown.map((l, i) => (
-              <div
-                key={`${l.actorType ?? 'personal'}:${l.actorId ?? l.userId}`}
-                style={{
-                  marginLeft: i === 0 ? 0 : -OVERLAP,
-                  borderRadius: '34%',
-                  border: `1.5px solid ${surfaceColor}`,
-                  lineHeight: 0,
-                  zIndex: shown.length - i,
-                }}
-              >
-                <SquircleAvatar
-                  size={AVATAR}
-                  src={l.avatarUrl}
-                  alt={l.displayName}
-                  userId={l.actorType === 'business' ? null : l.actorId ?? l.userId}
-                  hideRing
-                />
-              </div>
-            ))}
-          </div>
-        )}
         <span
           style={{
             fontSize: 12.5,
@@ -121,6 +100,9 @@ export function LikedByRow({
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            display: 'block',
+            fontVariantNumeric: 'tabular-nums lining-nums',
+            letterSpacing: '-0.04em',
           }}
         >
           {copy}
@@ -137,5 +119,6 @@ export function LikedByRow({
     </>
   );
 }
+
 
 export default LikedByRow;
