@@ -148,3 +148,12 @@
 - [ ] Audit WHS score-history identity/upsert behavior for repeated or stale records.
 - [ ] Align calculation explanations and all affected locales with the verified model.
 - [ ] Validate against a reproducible fixture and report data/deployment limitations.
+
+## Your 18 holes sheet (9 Sep 2026)
+
+- [x] Separate the You-tab hole sheet from the course All 18 holes sheet URL state.
+- [x] Build the 85dvh shared BottomSheet shell with fixed head and scrolling body.
+- [x] Render member distribution, all 18 BEST rows, personal par tracks, and thirds analysis.
+- [x] Preserve the 5-round entry gate and hide sort controls below 10 rounds.
+- [x] Retire duplicated legacy callouts while keeping form and Within reach summary on the You tab.
+- [ ] Verify populated personal data, sorting, generated opening-six copy, and dead-file candidates.

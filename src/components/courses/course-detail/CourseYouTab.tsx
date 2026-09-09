@@ -285,10 +285,9 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         field={fieldHoles}
         onAllHoles={() => {
           analyticsEvents.track('course_you_all_18_holes', { course_id: courseId, holes: mine.length });
-          navigate(`/courses/${courseId}?tab=you&sheet=holes`);
+          navigate(`/courses/${courseId}?tab=you&sheet=your-holes`);
         }}
       />
-
       <YourFormHere rounds={rounds} total={roundTotal} />
 
       {/* §3.5 — ONCE. It used to render inside the shots block and again as its
