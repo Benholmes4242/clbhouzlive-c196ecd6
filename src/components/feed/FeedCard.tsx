@@ -890,15 +890,19 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         return (
           <div
             style={{
-              borderTop: `0.5px solid ${LINE}`,
+              /* 1px, matching PostCourseBand's rules and the card's own top
+                 rule. The app gets ONE hairline weight on this surface. */
+              borderTop: `1px solid ${LINE}`,
               background: hasRoundBackdrop ? CARD : undefined,
             }}
           >
+            {/* Order and rhythm: picker, 22, heart group, 22, comment group,
+                then share pushed to the right edge by auto margin. */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
+                gap: 22,
                 padding: showLikedBy ? '10px 20px 6px' : '10px 20px 12px',
               }}
             >
@@ -916,7 +920,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 label={commentCount > 0 ? formatCount(commentCount) : undefined}
                 onClick={() => onComment(post, effectiveActor)}
               />
-              <FooterButton icon={Share} onClick={() => onShare(post)} />
+              <div style={{ marginLeft: 'auto' }}>
+                <FooterButton icon={Share} onClick={() => onShare(post)} />
+              </div>
+            </div>
+
             </div>
             {showLikedBy && (
               <LikedByRow
