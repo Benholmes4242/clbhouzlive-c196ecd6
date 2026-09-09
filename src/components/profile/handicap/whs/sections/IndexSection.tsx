@@ -215,17 +215,17 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   return (
     <HcpSection kicker={t('common:handicap.index.kicker')} first>
       {/* Figure + deltas */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ fontSize: 52, fontWeight: 700, color: CHART.INK, lineHeight: 1, ...FIG }}>
-          {handicap != null ? formatIndex(handicap) : '—'}
+          {handicap != null ? formatIndex(handicap) : '\u2014'}
         </div>
         {withheld ? null : show90 || show12 ? (
-          <div style={{ display: 'flex', gap: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 28 }}>
             {show90 && deltaCell(model.delta90 as number, t('common:handicap.index.delta90'))}
             {show12 && deltaCell(model.delta12 as number, t('common:handicap.index.delta12m'))}
           </div>
         ) : (
-          <div style={{ fontSize: 12, color: CHART.DIM, paddingBottom: 4, ...FIG }}>
+          <div style={{ fontSize: 12, color: CHART.DIM, ...FIG }}>
             {t('common:handicap.index.fromRounds', { count: model.total })}
           </div>
         )}
