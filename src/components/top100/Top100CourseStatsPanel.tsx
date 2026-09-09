@@ -60,8 +60,11 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
 
   const rating = data?.rating ?? null;
   const ratingCount = data?.ratingCount ?? 0;
-  const avgOverPar = data?.avgOverPar ?? null;
-  const harderPct = data?.harderThanPct ?? null;
+  const hasTrackedRounds = (data?.roundsTracked ?? 0) > 0;
+  // Round-derived figures are invalid without a tracked round, even if an
+  // older RPC payload happens to carry a stale percentile or average.
+  const avgOverPar = hasTrackedRounds ? data?.avgOverPar ?? null : null;
+  const harderPct = hasTrackedRounds ? data?.harderThanPct ?? null : null;
 
   const hasRating = rating != null && ratingCount > 0;
 

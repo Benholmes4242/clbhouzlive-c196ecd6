@@ -446,6 +446,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                       <RateNudge
                         userId={user.id}
                         onEmptyFallback={() => setRateSheetOpen(true)}
+                        variant="flat"
                       />
                     ) : null
                   }

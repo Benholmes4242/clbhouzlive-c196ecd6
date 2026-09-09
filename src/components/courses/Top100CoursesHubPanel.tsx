@@ -1,593 +1,184 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-
-import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
-import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
-import type { CourseListMembership } from '@/hooks/useGolfCoursesSearch';
-import { useTop100Lists } from '@/hooks/useTop100Lists';
-import { Search, Award, ChevronDown, Globe2, X } from 'lucide-react';
-
-import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
-import VirtualizedCourseList from './VirtualizedCourseList';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
-import { COURSE_BROWSE_DESCRIPTION, COURSE_BROWSE_KICKER } from './courseBrowseTypography';
-import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Award } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useTop100Config } from '@/hooks/top100/useTop100Config';
-import { useTop100Enrichment } from '@/hooks/top100/useTop100Enrichment';
-import { useTop100Movers, type MoverRange } from '@/hooks/top100/useTop100Movers';
 
-import { computeVerdict, type Verdict } from '@/components/top100/verdict';
-import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
+import BrowseCourseCard from './BrowseCourseCard';
+import type { StatBrowseRow } from './useStatBrowse';
+import { RailChips } from '@/components/ui/RailChips';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
+import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
+import { useTop100Enrichment, type Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
+import type { CourseListMembership } from '@/hooks/useGolfCoursesSearch';
+import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { COURSE_BROWSE_DESCRIPTION } from './courseBrowseTypography';
 
-import { Top100MoversSection } from '@/components/top100/Top100MoversSection';
-import { Top100MoversSheet } from '@/components/top100/sheets/Top100MoversSheet';
-import { Top100VerdictExplainerSheet } from '@/components/top100/sheets/Top100VerdictExplainerSheet';
+const LISTS = [
+  { id: 'global', label: 'Global' },
+  { id: 'gb-i', label: 'GB&I' },
+  { id: 'europe', label: 'Europe' },
+  { id: 'usa', label: 'USA' },
+] as const;
 
-/** Known Top 100 list slugs for validation. */
-const KNOWN_LIST_SLUGS = ['global', 'gb-i', 'usa', 'europe'];
+const LIST_NAMES: Record<string, string> = {
+  global: 'Global Top 100',
+  'gb-i': 'GB&I Top 100',
+  europe: 'Europe Top 100',
+  usa: 'USA Top 100',
+};
 
-/** Read saved Top 100 filters from sessionStorage (parsed once, shared by initialisers). */
-function readSavedFilters(): { list?: string; searchTerm?: string } | null {
+function savedList(): string {
   try {
-    const raw = sessionStorage.getItem('top100-last-filters');
-    return raw ? JSON.parse(raw) : null;
+    const value = JSON.parse(sessionStorage.getItem('top100-last-filters') ?? '{}')?.list;
+    return LISTS.some((list) => list.id === value) ? value : 'global';
   } catch {
-    return null;
+    return 'global';
   }
 }
 
-interface Top100CoursesHubPanelProps {
+function rankFor(course: SearchedCourseWithRating, list: string): number | null {
+  const match = (course.list_memberships ?? []).find((membership: CourseListMembership) => membership.list_slug === list);
+  return match?.rank ?? null;
+}
+
+function toBrowseRow(
+  course: SearchedCourseWithRating,
+  data: Top100Enrichment | undefined,
+  list: string,
+): StatBrowseRow {
+  const hasRounds = (data?.roundsTracked ?? 0) > 0;
+  return {
+    course_id: course.id,
+    name: course.name,
+    region: course.region ?? null,
+    sub_country: course.sub_country ?? null,
+    country: course.country,
+    image_url: course.thumbnail_image ?? null,
+    community_rating: data?.rating ?? null,
+    review_count: data?.ratingCount ?? 0,
+    global_rank: course.global_rank ?? null,
+    regional_rank: course.regional_rank ?? null,
+    rounds: data?.roundsTracked ?? 0,
+    members: 0,
+    avg_to_par: hasRounds ? data?.avgOverPar ?? null : null,
+    total_yards: null,
+    tee_label: null,
+    course_record: null,
+    open_crowns: 0,
+    total_count: 0,
+    design_score: hasRounds ? data?.subScores.design ?? null : null,
+    condition_score: hasRounds ? data?.subScores.condition ?? null : null,
+    clubhouse_score: hasRounds ? data?.subScores.clubhouse ?? null : null,
+    facilities_score: hasRounds ? data?.subScores.facilities ?? null : null,
+    difficulty_percentile: hasRounds ? data?.harderThanPct ?? null : null,
+    memberships: rankFor(course, list) == null ? [] : [{ list_slug: list, rank: rankFor(course, list) as number }],
+  };
+}
+
+interface Props {
   shellTabs?: React.ReactNode;
   rateNudge?: React.ReactNode;
 }
 
-const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs, rateNudge }) => {
-  const { t } = useTranslation('courses');
+const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const [selectedList, setSelectedList] = useState(savedList);
+  const restored = useRef(false);
+  const { data: summaries = [] } = useTop100ListSummaries(user?.id);
+  const { data, isLoading, isError, refetch } = useGolfCoursesInfinite({ listSlug: selectedList });
 
-  // State — initialised from sessionStorage when available
-  const [selectedList, setSelectedList] = useState(() => {
-    const saved = readSavedFilters();
-    if (saved?.list && KNOWN_LIST_SLUGS.includes(saved.list)) return saved.list;
-    return 'global';
-  });
-  const [searchTerm, setSearchTerm] = useState(() => {
-    const saved = readSavedFilters();
-    return saved?.searchTerm || '';
-  });
-  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
-
-  // Scroll restoration ref
-  const hasRestoredScroll = useRef(false);
-
-  // Fetch data
-  const { data: listSummaries = [] } = useTop100ListSummaries(user?.id);
-  const { data: lists = [] } = useTop100Lists();
-
-  // Debounce search
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+    sessionStorage.setItem('top100-last-filters', JSON.stringify({ list: selectedList }));
+  }, [selectedList]);
 
-  // Persist filters to sessionStorage
+  const courses = useMemo(() => {
+    const rows = data?.pages.flat() ?? [];
+    return [...rows].sort((a, b) => (rankFor(a, selectedList) ?? 999) - (rankFor(b, selectedList) ?? 999));
+  }, [data, selectedList]);
+  const ids = useMemo(() => courses.map((course) => course.id), [courses]);
+  const enrichment = useTop100Enrichment(ids, user?.id, selectedList);
+  const ratedCount = courses.filter((course) => {
+    const item = enrichment.get(course.id);
+    return item?.rating != null && item.ratingCount > 0;
+  }).length;
+  const playedCount = courses.filter((course) => (enrichment.get(course.id)?.roundsTracked ?? 0) > 0).length;
+  const total = summaries.find((summary) => summary.slug === selectedList)?.total_courses ?? courses.length;
+  const heading = LIST_NAMES[selectedList] ?? 'Top 100';
+  const ratingSentence = `${ratedCount} of the ${total} ${total === 1 ? 'course' : 'courses'} ${ratedCount === 1 ? 'carries' : 'carry'} a rating.`;
+  const roundSentence = `${playedCount} ${playedCount === 1 ? 'has' : 'have'} a tracked round.`;
+
   useEffect(() => {
-    try {
-      sessionStorage.setItem('top100-last-filters', JSON.stringify({
-        list: selectedList,
-        searchTerm,
-      }));
-    } catch { /* ignore */ }
-  }, [selectedList, searchTerm]);
+    if (restored.current || courses.length === 0) return;
+    const value = sessionStorage.getItem('top100-scroll');
+    restored.current = true;
+    if (!value) return;
+    requestAnimationFrame(() => scrollPageTo(Number(value), 'instant'));
+    sessionStorage.removeItem('top100-scroll');
+  }, [courses.length]);
 
-  // Fetch courses
-  const {
-    data: coursesData,
-    isLoading,
-    isError,
-    refetch,
-  } = useGolfCoursesInfinite({
-    searchQuery: debouncedSearch,
-    listSlug: selectedList,
-  });
-
-  // Flatten and sort courses (official ranking only) — attach displayRank reflecting list position
-  const allCourses: (SearchedCourseWithRating & { displayRank?: number })[] = React.useMemo(() => {
-    const courses = coursesData?.pages.flat() ?? [];
-
-    // Determine the rank-matching slug fragment ONCE, based on selectedList,
-    // instead of running 4× .includes + .find() inside every comparator call.
-    const matcher =
-      selectedList.includes('global') ? 'global' :
-      selectedList.includes('usa') ? 'usa' :
-      selectedList.includes('gb-i') ? 'gb-i' :
-      selectedList.includes('europe') ? 'europe' :
-      null;
-
-    const getRankForSelectedList = (course: SearchedCourseWithRating): number => {
-      const memberships = course.list_memberships ?? [];
-      if (matcher) {
-        const m = memberships.find((x: CourseListMembership) => x.list_slug.includes(matcher));
-        return m?.rank ?? 999;
-      }
-      return memberships[0]?.rank ?? 999;
-    };
-
-    // Official ranking — pre-extract rank keys so the comparator is O(1)
-    const withRankKey = courses.map((c) => ({
-      course: c,
-      rankKey: getRankForSelectedList(c),
-    }));
-
-    withRankKey.sort((a, b) => a.rankKey - b.rankKey);
-
-    return withRankKey.map((x, idx) => ({ ...x.course, displayRank: idx + 1 }));
-  }, [coursesData, selectedList]);
-
-  // Scroll restoration on mount (after courses load)
-  useEffect(() => {
-    if (hasRestoredScroll.current || allCourses.length === 0) return;
-    const savedScroll = sessionStorage.getItem('top100-scroll');
-    if (savedScroll) {
-      hasRestoredScroll.current = true;
-      requestAnimationFrame(() => {
-        const scrollTarget = parseInt(savedScroll);
-        scrollPageTo(scrollTarget, 'instant');
-        sessionStorage.removeItem('top100-scroll');
-      });
-    }
-  }, [allCourses.length]);
-
-  // Save scroll position before navigating to a course detail
-  const handleCourseClick = () => {
-    const scrollY = getPageScrollTop();
-    sessionStorage.setItem('top100-scroll', scrollY.toString());
+  const openCourse = (courseId: string) => {
+    sessionStorage.setItem('top100-scroll', String(getPageScrollTop()));
+    navigate(`/courses/${courseId}`);
   };
-
-  // List options
-  const listOptions = lists.length > 0 
-    ? (() => {
-        const transformed = lists.map(list => ({
-          value: list.slug,
-          label: list.short_label.includes('Top 100') ? list.short_label : `${list.short_label} Top 100`
-        }));
-        const desiredOrder = ['global', 'gb-i', 'usa', 'europe'];
-        return transformed.sort((a, b) => {
-          const indexA = desiredOrder.indexOf(a.value);
-          const indexB = desiredOrder.indexOf(b.value);
-          if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-          if (indexA !== -1) return -1;
-          if (indexB !== -1) return 1;
-          return 0;
-        });
-      })()
-    : [
-        { value: 'global', label: 'Global Top 100' },
-        { value: 'gb-i', label: 'GB&I Top 100' },
-        { value: 'usa', label: 'USA Top 100' },
-        { value: 'europe', label: 'Europe Top 100' },
-      ];
-
-  const handleResetFilters = () => {
-    setSelectedList('global');
-    setSearchTerm('');
-  };
-
-  // Active list short label (used for placeholder + meta row)
-  const activeListShortLabel = (() => {
-    const opt = listOptions.find(o => o.value === selectedList);
-    if (!opt) return 'Top 100';
-    return opt.label.replace(/\s*Top 100\s*$/, '').trim();
-  })();
-  // ── Enrichment ────────────────────────────────────────────────────────────
-  // One batched fetch for the whole loaded page set — never per card.
-  const verdictConfig = useTop100Config();
-  const courseIds = React.useMemo(() => allCourses.map((c) => c.id), [allCourses]);
-  const enrichment = useTop100Enrichment(
-    courseIds,
-    user?.id,
-    // Stable scope, never a hash of the id set: list slug + active search.
-    `${selectedList}|${searchTerm.trim().toLowerCase()}`,
-  );
-  const [moverRange, setMoverRange] = useState<MoverRange>('this_month');
-  const { data: movers = [] } = useTop100Movers(moverRange);
-
-  const [moversSheetOpen, setMoversSheetOpen] = useState(false);
-  const [verdictSheet, setVerdictSheet] = useState<
-    {
-      courseId: string;
-      courseName: string;
-      verdict: Verdict;
-      canRate: boolean;
-      listCount: number;
-      ratingRank: number | null;
-      ratingPoolSize: number | null;
-    } | null
-  >(null);
-
-  // Rank within the list currently on screen, keyed for O(1) lookup.
-  const rankMap = React.useMemo(() => {
-    const map = new Map<string, number>();
-    for (const course of allCourses) {
-      const memberships = (course.list_memberships ?? []) as CourseListMembership[];
-      const match = memberships.find((m) => m.list_slug.includes(selectedList));
-      const rank = match?.rank ?? course.displayRank ?? null;
-      if (rank != null) map.set(course.id, rank);
-    }
-    return map;
-  }, [allCourses, selectedList]);
-
-  const courseNameById = React.useMemo(() => {
-    const map = new Map<string, string>();
-    for (const course of allCourses) map.set(course.id, course.name);
-    return map;
-  }, [allCourses]);
-
-  const verdictFor = React.useCallback(
-    (courseId: string): Verdict | null => {
-      const data = enrichment.get(courseId);
-      if (!data) return null;
-      return computeVerdict({
-        rank: rankMap.get(courseId) ?? null,
-        rating: data.rating,
-        ratingCount: data.ratingCount,
-        config: verdictConfig,
-      });
-    },
-    [enrichment, rankMap, verdictConfig],
-  );
-
-  const viewerStatusFor = React.useCallback(
-    (courseId: string): 'rated' | 'played' | null => {
-      const data = enrichment.get(courseId);
-      if (!data) return null;
-      if (data.ratedByYou) return 'rated';
-      return data.yourRounds > 0 ? 'played' : null;
-    },
-    [enrichment],
-  );
-
-  /**
-   * Standing on member ratings WITHIN the selected list, restricted to the
-   * same minRatings pool the verdict band itself uses so the number can never
-   * contradict the sentence above it. Computed from allCourses, never from the
-   * rendered or paginated subset. Tiebreak is ratingCount DESC: on equal
-   * ratings the more widely rated course goes above.
-   */
-  const ratingRankMap = React.useMemo(() => {
-    const pool: { id: string; rating: number; count: number }[] = [];
-    for (const course of allCourses) {
-      const memberships = (course.list_memberships ?? []) as CourseListMembership[];
-      const inList = memberships.some((m) => m.list_slug.includes(selectedList));
-      if (!inList && memberships.length > 0) continue;
-      const data = enrichment.get(course.id);
-      if (!data || data.rating == null) continue;
-      if (data.ratingCount < verdictConfig.minRatings) continue;
-      pool.push({ id: course.id, rating: data.rating, count: data.ratingCount });
-    }
-    /* Final id tiebreak mirrors get_course_rating_standing so the Courses tab
-       and this tab can never disagree on a position. */
-    pool.sort((a, b) => b.rating - a.rating || b.count - a.count || a.id.localeCompare(b.id));
-    const map = new Map<string, { position: number; poolSize: number }>();
-    pool.forEach((entry, index) => {
-      map.set(entry.id, { position: index + 1, poolSize: pool.length });
-    });
-    return map;
-  }, [allCourses, selectedList, enrichment, verdictConfig.minRatings]);
-
-  const renderEnrichment = React.useCallback(
-    (courseId: string) => {
-      const data = enrichment.get(courseId);
-      const verdict = verdictFor(courseId);
-      const courseName = courseNameById.get(courseId) ?? null;
-      return (
-        <Top100EnrichmentBlock
-          courseId={courseId}
-          courseName={courseName}
-          rank={rankMap.get(courseId) ?? null}
-          list={selectedList}
-          data={data}
-          verdict={verdict}
-          ratingRank={ratingRankMap.get(courseId) ?? null}
-          listLabel={activeListShortLabel}
-          onOpenVerdict={() => {
-            if (!verdict || !courseName) return;
-            const standing = ratingRankMap.get(courseId) ?? null;
-            const course = allCourses.find((c) => c.id === courseId);
-            const memberships = (course?.list_memberships ?? []) as CourseListMembership[];
-            setVerdictSheet({
-              courseId,
-              courseName,
-              verdict,
-              canRate: !!data && !data.ratedByYou,
-              listCount: memberships.length,
-              ratingRank: standing?.position ?? null,
-              ratingPoolSize: standing?.poolSize ?? null,
-            });
-          }}
-          onRate={() => navigate(`/courses/${courseId}/rate`)}
-        />
-      );
-    },
-    [enrichment, verdictFor, courseNameById, rankMap, ratingRankMap, selectedList, activeListShortLabel, navigate, allCourses],
-  );
-
-
-  // Total courses in the active list — pulled from the per-list summaries
-  const totalCoursesInActiveList =
-    listSummaries.find(l => l.slug === selectedList)?.total_courses ?? allCourses.length;
-
 
   return (
     <div>
-      {/* SCOPE 1 — non-sticky: shell tabs + editorial header */}
-      <div style={{ paddingBottom: 8 }}>
-        {shellTabs}
-        <div className="px-4 pt-2">
-          {rateNudge}
-          {/* Eyebrow sits directly above the provenance line — the h2 title
-              was removed, so the kicker owns the heading role here. */}
-          <div style={{ ...COURSE_BROWSE_KICKER, marginBottom: 5 }}>TOP 100</div>
-          {/* Provenance subhead — masthead-line mock */}
-          <p
-            style={{
-              ...COURSE_BROWSE_DESCRIPTION,
-              marginTop: 0,
-              marginBottom: 12,
-            }}
-          >
-            {t('top100.provenance', { defaultValue: "The top 100 courses in the world and in every region, as ranked by golf's leading publications." })}
-          </p>
-
-
+      {shellTabs}
+      <section style={{ padding: '22px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
+          <h2 style={{ margin: 0, color: A.INK, fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em' }}>{heading}</h2>
+          <span style={{ color: A.MUTE, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{ratedCount} rated</span>
         </div>
-      </div>
-
-      {/* SCOPE 2 — sticky pills row + rest */}
-      <div>
-        {/* Sticky list filter + search row — the same compact bordered well as
-            Discover's Everywhere control, rather than a second pill-navigation
-            grammar. */}
-        <div
-          className="sticky"
-          style={{
-            top: 'var(--sat, 0px)',
-            zIndex: 10,
-            // Solid page canvas — the bar is part of the page, not a floating
-            // darker banner. Matches StatBrowse and the post-wizard/course-detail
-            // surface.
-            background: SLATE_50,
-            padding: '6px 0 8px',
-            marginTop: -1,
-          }}
-        >
-          <div className="px-4" style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            <Select value={selectedList} onValueChange={setSelectedList}>
-              <SelectTrigger
-                aria-label={t('top100.listsA11y')}
-                className="inline-flex h-auto w-auto justify-start whitespace-nowrap border-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
-                style={{
-                  flex: 'none',
-                  background: 'rgba(255,255,255,0.14)',
-                  border: `1px solid ${A.BORDER}`,
-                  borderRadius: 8,
-                  height: 44,
-                  padding: '0 12px',
-                  color: A.INK,
-                }}
-              >
-                <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
-                  <Globe2 size={12} strokeWidth={2.4} aria-hidden />
-                  <span style={{ fontSize: 12.5, fontWeight: 700 }}>
-                    {activeListShortLabel}
-                  </span>
-                  <ChevronDown size={13} strokeWidth={2.4} style={{ color: A.MUTE, flex: 'none' }} aria-hidden />
-                </span>
-              </SelectTrigger>
-              <SelectContent
-                className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg"
-                style={{ background: A.PANEL, borderColor: A.BORDER, color: A.INK }}
-              >
-                {listOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value} style={{ color: A.INK }}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <div className="relative" style={{ flex: '1 1 auto', minWidth: 0 }}>
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={t('top100.searchPlaceholder', { listLabel: activeListShortLabel })}
-                aria-label={t('top100.searchA11y')}
-                /* No inline style and no paint classes: the Input primitive owns
-                   rest fill, focus fill, border and transition. Inline styles
-                   beat the primitive's focus-visible classes, which is why this
-                   field previously had no focus behaviour at all. h-11 (44) is
-                   the canonical search-bar height and deliberately overrides the
-                   primitive's h-10 form-field height. */
-                className="pl-10 pr-10 h-11 focus-visible:outline-none"
-              />
-              {searchTerm && (
-                <button
-                  type="button"
-                  onClick={() => setSearchTerm('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground active:scale-[0.9] active:opacity-70 transition-all"
-                  aria-label={t('top100.clearSearch')}
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="px-4 space-y-4 pt-2">
-          {/* Meta row */}
-          {!isError && (isLoading || allCourses.length > 0) && (
-            <div className="flex items-center justify-between gap-3">
-              {isLoading ? (
-                <Skeleton className="h-4 w-44 rounded" />
-              ) : (
-                <span style={{
-                  fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
-                  fontWeight: 500,
-                }}>
-                  {searchTerm ? (
-                    <Trans
-                      i18nKey={allCourses.length === 1 ? 'top100.metaResults_one' : 'top100.metaResults_other'}
-                      ns="courses"
-                      values={{ count: allCourses.length }}
-                      components={{ 1: <strong style={{ color: INK, fontWeight: 700 }} /> }}
-                    />
-                  ) : (
-                    <Trans
-                      i18nKey={totalCoursesInActiveList === 1 ? 'top100.metaCourses_one' : 'top100.metaCourses_other'}
-                      ns="courses"
-                      values={{ count: totalCoursesInActiveList, listLabel: activeListShortLabel }}
-                      components={{ 1: <strong style={{ color: INK, fontWeight: 700 }} /> }}
-                    />
-                  )}
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Member context — where opinion moved */}
-          {!searchTerm && !isLoading && !isError && (
-            <div className="flex flex-col gap-3">
-              <Top100MoversSection movers={movers} onViewAll={() => setMoversSheetOpen(true)} />
-            </div>
-          )}
-
-          {/* Rankings List */}
-          <div>
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: SLATE_50, border: `1px solid ${HAIRLINE_INK_7}` }}>
-                  <Skeleton className="w-full aspect-[16/9.5] rounded-xl" />
-                  <div className="space-y-2 px-4 pb-4">
-                    <Skeleton className="h-5 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                    <div className="flex gap-2 pt-1">
-                      <Skeleton className="h-5 w-14 rounded-lg" />
-                      <Skeleton className="h-5 w-14 rounded-lg" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : isError ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
-              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto">
-                <Award className="w-5 h-5 text-muted-foreground" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">{t('top100.errorTitle', { defaultValue: "Couldn't load this list" })}</h3>
-                <p className="text-sm text-muted-foreground max-w-xs">{t('top100.errorBody', { defaultValue: 'Check your connection and try again.' })}</p>
-              </div>
-              <button
-                onClick={() => refetch()}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-[0.10em] active:scale-[0.97] transition-transform"
-                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
-              >
-                {t('top100.retry', { defaultValue: 'Retry' })}
-              </button>
-            </div>
-          ) : allCourses.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
-              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto">
-                {searchTerm ? (
-                  <Search className="w-5 h-5 text-muted-foreground" />
-                ) : (
-                  <Award className="w-5 h-5 text-muted-foreground" />
-                )}
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">
-                  {searchTerm ? 'No courses found' : 'No courses match your filters'}
-                </h3>
-                <p className="text-sm text-muted-foreground max-w-xs">
-                  {searchTerm
-                    ? `No courses matching "${searchTerm}" in this Top 100 list.`
-                    : 'Try choosing a different Top 100 list.'}
-                </p>
-              </div>
-              {searchTerm ? (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-[0.10em] active:scale-[0.97] transition-transform"
-                  style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
-                >
-                  <X className="h-3.5 w-3.5" />
-                  {t('top100.clearSearch')}
-                </button>
-              ) : (
-                <button
-                  onClick={handleResetFilters}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-[0.10em] active:scale-[0.97] transition-transform"
-                  style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
-                >
-                  {t('top100.resetFilters')}
-                </button>
-              )}
-            </div>
-          ) : (
-            <VirtualizedCourseList
-              courses={allCourses}
-              onCourseClick={handleCourseClick}
-              activeListSlug={selectedList}
-              showGhostRank={true}
-              viewerStatusFor={viewerStatusFor}
-              renderEnrichment={renderEnrichment}
-            />
-          )}
-          </div>
-        </div>
-
-        {/* Clears the floating bottom nav; 0px where it hides. */}
-        <div
-          aria-hidden="true"
-          style={{ height: 'calc(var(--bottom-nav-height, 96px) + 16px)' }}
+        <p style={{ ...COURSE_BROWSE_DESCRIPTION, margin: '10px 0 16px' }}>
+          {ratingSentence} {roundSentence}
+        </p>
+        <RailChips
+          options={LISTS}
+          value={selectedList}
+          onChange={(next) => { restored.current = true; setSelectedList(next); }}
+          ariaLabel="Top 100 region"
+          ground="outline"
+          align="center-when-fit"
         />
+        {rateNudge ? <div style={{ marginTop: 24 }}>{rateNudge}</div> : null}
+      </section>
+
+      <div style={{ padding: '24px 20px 0' }}>
+        {isLoading ? (
+          <div style={{ display: 'grid', gap: 32 }}>
+            {[1, 2, 3].map((key) => <Skeleton key={key} style={{ height: 178, borderRadius: 0 }} />)}
+          </div>
+        ) : isError ? (
+          <div style={{ padding: '48px 0', textAlign: 'center', color: A.MUTE }}>
+            <Award size={20} aria-hidden />
+            <p>Could not load this list.</p>
+            <button type="button" onClick={() => refetch()} style={{ color: A.INK, fontWeight: 700 }}>Retry</button>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gap: 32 }}>
+            {courses.map((course) => {
+              const item = enrichment.get(course.id);
+              const row = toBrowseRow(course, item, selectedList);
+              return (
+                <BrowseCourseCard
+                  key={course.id}
+                  row={row}
+                  variant="top100"
+                  rank={rankFor(course, selectedList)}
+                  viewerRounds={item?.yourRounds ?? 0}
+                  difficultyPercentile={row.rounds > 0 ? row.difficulty_percentile : null}
+                  ratedWithoutRoundsNote="Rated, but nobody has tracked a round here yet."
+                  onClick={() => openCourse(course.id)}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
-
-
-      <Top100MoversSheet
-        open={moversSheetOpen}
-        onClose={() => setMoversSheetOpen(false)}
-        movers={movers}
-        range={moverRange}
-        onRangeChange={setMoverRange}
-      />
-
-      {verdictSheet && (
-        <Top100VerdictExplainerSheet
-          open
-          onClose={() => setVerdictSheet(null)}
-          courseId={verdictSheet.courseId}
-          courseName={verdictSheet.courseName}
-          listLabel={activeListShortLabel}
-          rank={verdictSheet.verdict.rank}
-          rating={verdictSheet.verdict.rating}
-          ratingCount={verdictSheet.verdict.ratingCount}
-          listCount={verdictSheet.listCount}
-          ratingRank={verdictSheet.ratingRank}
-          ratingPoolSize={verdictSheet.ratingPoolSize}
-          canRate={verdictSheet.canRate}
-          onRate={() => navigate(`/courses/${verdictSheet.courseId}/rate`)}
-        />
-      )}
+      <div aria-hidden style={{ height: 'calc(var(--bottom-nav-height, 96px) + 16px)' }} />
     </div>
   );
 };
