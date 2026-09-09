@@ -8,6 +8,7 @@ import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const CourseDetailPage = () => {
   const params = useParams();
@@ -48,7 +49,12 @@ const CourseDetailPage = () => {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-background" style={{ overscrollBehaviorY: 'none' }} immersiveStatusBar immersive>
+    <PageRoot
+      className="min-h-screen"
+      style={{ overscrollBehaviorY: 'none', background: A.CANVAS }}
+      immersiveStatusBar
+      immersive
+    >
       <FadeInContent>
         <GolfClubView courseId={courseId} isInModal={false} />
       </FadeInContent>

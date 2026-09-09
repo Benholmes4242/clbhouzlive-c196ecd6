@@ -31,7 +31,6 @@ import ClaimCourseSheet from './ClaimCourseSheet';
 import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 
-import { SLATE_50 } from '@/features/courses/_shared/tokens';
 /**
  * BRIEF_COURSE_TAB_REBUILD §3.10 — THE LADDER HAS MOVED, NOT GONE.
  *
@@ -133,7 +132,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   return (
     <div
       className="animate-in fade-in duration-200"
-      style={{ paddingBottom: 8, background: SLATE_50 }}
+      style={{ paddingBottom: 8 }}
     >
       {/* ══ BLOCK 1 — THE CARD (what the course is) ══
           The location pills are NOT rendered here: the mock puts the place in
@@ -202,6 +201,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <KeepExploring
           course={course}
           onWebsiteClick={course.website_url ? handleWebsiteClick : undefined}
+          onClaimClick={
+            course.club_id && claimStatus?.state === 'unclaimed'
+              ? () => setShowClaimSheet(true)
+              : undefined
+          }
         />
 
         {/* RULED: only CLAIMED stays in the flow — "managed by X" is a fact
@@ -217,11 +221,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <div style={{ height: 20 }} />
       <NearbySection lat={coords?.lat ?? course.latitude} lng={coords?.lng ?? course.longitude} />
 
-      {/* THE FOOTER — the unclaimed offer, or "your claim is under review".
-          One audience, one place, last thing above the bottom clearance. */}
-      {course.club_id && claimStatus?.state === 'unclaimed' && (
-        <ClaimFooterRow onClaimClick={() => setShowClaimSheet(true)} />
-      )}
+      {/* Pending remains a personal status notice at the foot. The unclaimed
+          offer now shares KeepExploring's row primitive above. */}
       {course.club_id && claimStatus?.state === 'pending' && (
         <ClaimFooterRow mode="pending" onClaimClick={() => setShowClaimSheet(true)}>
           <ClaimUnderReviewNotice />

@@ -12,6 +12,7 @@ import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
 import { useHeroCourseImage } from '@/features/amateur/useHeroCourseImage';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 
 /**
  * AMATEUR HERO (BRIEF_AMATEUR_PAGE, block 0).
@@ -28,7 +29,7 @@ import { SCRIM_STANDOUT } from '@/styles/photoScrim';
  * why the band is short and the meta row is off.
  */
 
-export const AMATEUR_HERO_H = 340;
+export const AMATEUR_HERO_H = EXPLORE_COURSE_HERO_HEIGHT;
 /** The trace band. Short on purpose: it is a shape, not a chart. */
 export const AMATEUR_HERO_SHAPE_H = 34;
 

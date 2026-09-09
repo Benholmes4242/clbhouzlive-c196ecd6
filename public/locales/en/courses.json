@@ -139,6 +139,8 @@
     "subline": "Everything members have filmed and photographed"
   },
   "courseDetail": {
+    "whoPlaysHereMeta_one": "1 golfer",
+    "whoPlaysHereMeta_other": "{{count}} golfers",
     "a11y": {
       "openMediaTab": "Open Media tab",
       "sections": "Course Detail Sections"

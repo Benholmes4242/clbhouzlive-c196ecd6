@@ -33,8 +33,11 @@ import { AboutSection, GUTTER, ABOUT_KICKER, aboutFig } from './AboutSection';
 const STANDARD_SLOPE = 113;
 
 const FactCell: React.FC<{ kicker: string; value: string }> = ({ kicker, value }) => (
-  <div style={{ flex: 1, minWidth: 0 }}>
-    <div className="tabular-nums lining-nums" style={aboutFig(21)}>
+  <div style={{ minWidth: 0, textAlign: 'center' }}>
+    <div
+      className="tabular-nums lining-nums"
+      style={{ ...aboutFig(21), fontVariantNumeric: 'tabular-nums lining-nums', letterSpacing: '-0.04em' }}
+    >
       {value}
     </div>
     <div style={{ ...ABOUT_KICKER, marginTop: 5 }}>{kicker}</div>
@@ -118,8 +121,8 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
       {facts.length > 0 && (
         <div
           style={{
-            display: 'flex',
-            gap: 14,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
             marginTop: 22,
             padding: `0 ${GUTTER}px`,
             fontFamily: SANS,
