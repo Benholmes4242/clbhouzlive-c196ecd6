@@ -44,6 +44,8 @@ import { setIslandEdgeScrolled } from '@/features/chrome-v2/islandEdge';
 import { WireFeedSlide } from '@/features/tourhub/news/WireFeedSlide';
 import type { ClubhouseFeedItem } from './injectWireStories';
 import { CANVAS, SLAB } from './feedSurfaces';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
@@ -81,6 +83,79 @@ const FeedItemGate: React.FC<{
   const earlyMotion = !fsOpen && index === earlyIdx && index !== playingIdx;
   return <>{children({ isActive, mountVideo: isNear, earlyMotion })}</>;
 };
+
+/**
+ * SECTION E — THE "UP TO DATE" DIVIDER.
+ *
+ * The feed is NOT chronological: get_suggested_feed_v3 orders by orbit score
+ * with a positional run cap, so a 90-day post can legitimately sit above a
+ * 6-day one. The divider therefore marks the point after which NOTHING IN THE
+ * LOADED LIST IS NEWER THAN 30 DAYS — walk the loaded posts from the END
+ * backwards and place it immediately before the start of the final unbroken run
+ * of old posts. Derived state, recomputed from the loaded array on every render,
+ * never an item spliced into the array (splicing would also break Virtuoso's
+ * postIndex-keyed video/carousel bookkeeping).
+ *
+ * Renders at most once. Nothing when every loaded post is old (there is no "up
+ * to date" to report) and nothing when none is.
+ */
+const OLD_POST_MS = 30 * 24 * 60 * 60 * 1000;
+
+function upToDateDividerIndex(posts: FeedPost[]): number | null {
+  if (posts.length < 2) return null;
+  const cutoff = Date.now() - OLD_POST_MS;
+  const isOld = (p: FeedPost) => {
+    const t = new Date(p.createdAt as unknown as string).getTime();
+    return Number.isFinite(t) && t < cutoff;
+  };
+  let i = posts.length - 1;
+  // The list must END in an old run for there to be a boundary at all.
+  if (!isOld(posts[i])) return null;
+  while (i - 1 >= 0 && isOld(posts[i - 1])) i -= 1;
+  // Every loaded post is old — no "up to date" to report.
+  if (i === 0) return null;
+  return i;
+}
+
+/**
+ * Divider chrome. Tones are FeedCard's own T100 / T40 values (no new tone
+ * constant introduced) and the copy claims no order — the posts below are
+ * score-ordered, not chronological.
+ */
+const UpToDateDivider: React.FC<{ index: number; loadedCount: number }> = ({ index, loadedCount }) => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const firedRef = useRef(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || firedRef.current) return;
+    const obs = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting && !firedRef.current) {
+          firedRef.current = true;
+          analyticsEvents.track('feed_up_to_date_divider_view', {
+            index,
+            loaded_count: loadedCount,
+          });
+          obs.disconnect();
+        }
+      }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [index, loadedCount]);
+
+  return (
+    <div ref={ref} style={{ background: SLAB, padding: '18px 20px' }}>
+      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(248,250,252,1)' }}>
+        You're up to date
+      </div>
+      <div style={{ marginTop: 4, fontSize: 12, lineHeight: 1.5, color: 'rgba(248,250,252,0.45)' }}>
+        Everything below was posted more than a month ago.
+      </div>
+    </div>
+  );
+};
+
 
 export interface CardFeedProps {
   posts: FeedPost[];
@@ -179,6 +254,12 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // ONE comments_v2 read per loaded page for the inline comment preview.
   const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
   const commentPreview = useFeedCommentPreview(feedPostIds, 'clubhouse:cards');
+
+  /* SECTION E: derived, never spliced. Recomputed whenever the loaded array
+     changes, so a later page containing a recent post moves the divider down
+     on its own. */
+  const dividerIndex = useMemo(() => upToDateDividerIndex(posts), [posts]);
+
 
   // Snapshot Virtuoso state per-tab. Keep `onSnapshot` in a ref so the
   // imperative capture never depends on identity churn.
@@ -707,7 +788,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
       const initialSlide = carouselPositions.get(index) ?? 0;
       return (
+        <>
+        {/* Rendered ABOVE this card rather than as a list item, so the divider
+            never occupies an index the video/carousel bookkeeping counts. */}
+        {dividerIndex === index && (
+          <UpToDateDivider index={index} loadedCount={postsRef.current.length} />
+        )}
         <div
+
           data-card-index={index}
           ref={(el) => {
             const obs = observerRef.current;
@@ -776,7 +864,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           {/* Inter-slab gap — the dark canvas showing through, never a painted strip */}
           <div aria-hidden style={{ height: 8, background: 'transparent' }} />
         </div>
+        </>
       );
+
     },
     [
       activeIdx,
@@ -803,6 +893,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       postRoundsSettled,
       onRoundTap,
       commentPreview.map,
+      dividerIndex,
+
     ],
   );
 

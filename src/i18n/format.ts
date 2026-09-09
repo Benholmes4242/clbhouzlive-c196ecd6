@@ -684,7 +684,11 @@ export function formatRelativeWithSeconds(
     const m = Math.floor(s / 60);
     const h = Math.floor(m / 60);
     const d = Math.floor(h / 24);
-    if (locale === 'en' && s < 60) return `${s}s`;
+    /* Under a minute reads "Now", not a seconds count: nothing re-renders this
+       card every second, so "12s" is true for one second and quietly wrong for
+       the rest of the time it is on screen. "Now" stays true the whole minute. */
+    if (locale === 'en' && s < 60) return 'Now';
+
     if (d < options.absoluteAfterDays) {
       if (locale === 'en') {
         if (m < 60) return `${m}m`;
