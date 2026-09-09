@@ -51,7 +51,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
 
   if (!hasBothTypes) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 16px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 20px 12px' }}>
         {/* ONE KIND, NO CHIPS (§3) — so this must not read as a lone chip
             pretending not to be a filter. A quiet 11px DIM line, sentence
             case, beside the add control. */}
@@ -87,7 +87,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
     <div
       role="tablist"
       aria-label={t('courses:media.filterA11y')}
-      style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 16px 12px' }}
+      style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 20px 12px' }}
     >
       {FILTER_KEYS.map(({ key, i18nKey }) => {
         const isActive = activeFilter === key;

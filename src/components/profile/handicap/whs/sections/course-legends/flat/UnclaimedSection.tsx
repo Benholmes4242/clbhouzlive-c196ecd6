@@ -59,8 +59,8 @@ export const WhatCounts: React.FC = () => (
 
 /** §5 state A — nobody has posted a round here. Two sections and the footnote. */
 export const NobodyHasPlayed: React.FC<{ totalBoards?: number }> = ({ totalBoards = 7 }) => (
-  <div style={{ paddingTop: 18 }}>
-    <AboutSection heading="Champions">
+  <div>
+    <AboutSection heading="Champions" first>
       <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: A.MUTE, lineHeight: 1.5 }}>
         Nobody has posted a round here yet. Post the first and you top every board — gross,
         stableford, birdies — until someone beats you.

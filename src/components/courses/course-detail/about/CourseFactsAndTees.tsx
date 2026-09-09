@@ -27,7 +27,7 @@ import {
   storageKey,
 } from '@/features/courses/components/holes/teePreference';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { AboutSection, GUTTER, ABOUT_KICKER, aboutFig, TAB_LEAD_IN } from './AboutSection';
+import { AboutSection, GUTTER, ABOUT_KICKER, aboutFig } from './AboutSection';
 import CenteredStatStrip from './CenteredStatStrip';
 
 /** WHS standard slope. A course of exactly 113 plays to average difficulty. */
@@ -110,7 +110,6 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
       {facts.length > 0 && (
         <div
           style={{
-            marginTop: TAB_LEAD_IN,
             padding: `0 ${GUTTER}px`,
             fontFamily: SANS,
           }}

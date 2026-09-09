@@ -422,7 +422,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   if (isLoading) {
     return (
-      <div style={{ background: SLATE_50, minHeight: '100%', padding: `18px ${GUTTER}px` }}>
+      <div style={{ background: SLATE_50, minHeight: '100%', padding: `0 ${GUTTER}px` }}>
         <Skeleton className="h-[40px] w-[140px]" />
         <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-[16px] w-full" />)}
@@ -459,7 +459,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* §6A — no reviews: no figure, no tier, no zero. One section. */}
         {!hasRatings ? (
           <AboutSection heading="Reviews" first space={0}>
-            <div style={{ paddingTop: 18 }}>
+            <div>
               <p style={{ fontSize: 13, color: A.MUTE, lineHeight: 1.6, margin: 0 }}>
                 Nobody has reviewed this course yet.
               </p>

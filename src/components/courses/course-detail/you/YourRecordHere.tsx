@@ -11,7 +11,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import AboutSection, { TAB_LEAD_IN } from '../about/AboutSection';
+import AboutSection from '../about/AboutSection';
 import CenteredStatStrip from '../about/CenteredStatStrip';
 import { YouCaption } from './youBits';
 
@@ -39,7 +39,7 @@ const YourRecordHere: React.FC<Props> = ({ rounds, best, average, field }) => {
       : t('courseDetail.youTab.basisManyNoField', { count: rounds, rounds });
 
   return (
-    <AboutSection first space={TAB_LEAD_IN}>
+    <AboutSection first>
       <CenteredStatStrip
         items={[
           { label: t('courseDetail.youTab.rounds'), value: String(rounds) },

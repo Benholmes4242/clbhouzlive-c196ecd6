@@ -27,7 +27,7 @@ export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount }) => {
   const count = `${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'}`;
 
   return (
-    <section style={{ padding: `18px ${GUTTER}px 0`, fontFamily: SANS }}>
+    <section style={{ padding: `0 ${GUTTER}px`, fontFamily: SANS }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
         <span style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: A.INK, ...FIGS }}>
           {score.toFixed(1)}
