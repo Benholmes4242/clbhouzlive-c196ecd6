@@ -601,6 +601,18 @@
       "indexedPlays": "indexed {{index}}, plays {{plays}}",
       "explainer": "A hole is marked when it sits at least four places out and at least 0.07 of a shot from what its index should return, scaled to this course's own spread."
     },
+    "yourRoundsSheet": {
+      "title": "Your rounds",
+      "best": "Best",
+      "average": "Average",
+      "field": "Field",
+      "mostRecent": "Most recent",
+      "lowestFirst": "Lowest first",
+      "sortA11y": "Sort your rounds",
+      "loading": "Loading your rounds...",
+      "error": "Your rounds could not be loaded.",
+      "empty": "No rounds are available here yet."
+    },
     "whoPlaysHereMeta_one": "1 golfer",
     "whoPlaysHereMeta_other": "{{count}} golfers",
     "legends": {
