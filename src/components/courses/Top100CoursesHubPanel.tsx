@@ -146,10 +146,12 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
         {rateNudge ? <div style={{ marginTop: 24 }}>{rateNudge}</div> : null}
       </section>
 
-      <div style={{ padding: '24px 20px 0' }}>
+      <div style={{ paddingTop: 24 }}>
         {isLoading ? (
           <div style={{ display: 'grid', gap: 32 }}>
-            {[1, 2, 3].map((key) => <Skeleton key={key} style={{ height: 178, borderRadius: 0 }} />)}
+            {[1, 2, 3].map((key) => (
+              <Skeleton key={key} className="w-full aspect-[16/9.5]" style={{ borderRadius: 0 }} />
+            ))}
           </div>
         ) : isError ? (
           <div style={{ padding: '48px 0', textAlign: 'center', color: A.MUTE }}>
@@ -158,21 +160,22 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
             <button type="button" onClick={() => refetch()} style={{ color: A.INK, fontWeight: 700 }}>Retry</button>
           </div>
         ) : (
-          <div style={{ display: 'grid', gap: 32 }}>
-            {courses.map((course) => {
+          <div>
+            {courses.map((course, index) => {
               const item = enrichment.get(course.id);
               const row = toBrowseRow(course, item, selectedList);
               return (
-                <BrowseCourseCard
-                  key={course.id}
-                  row={row}
-                  variant="top100"
-                  rank={rankFor(course, selectedList)}
-                  viewerRounds={item?.yourRounds ?? 0}
-                  difficultyPercentile={row.rounds > 0 ? row.difficulty_percentile : null}
-                  ratedWithoutRoundsNote="Rated, but nobody has tracked a round here yet."
-                  onClick={() => openCourse(course.id)}
-                />
+                <div key={course.id} style={{ marginBottom: index < courses.length - 1 ? 32 : 0 }}>
+                  <BrowseCourseCard
+                    row={row}
+                    variant="top100"
+                    rank={rankFor(course, selectedList)}
+                    viewerRounds={item?.yourRounds ?? 0}
+                    difficultyPercentile={row.rounds > 0 ? row.difficulty_percentile : null}
+                    ratedWithoutRoundsNote="Rated, but nobody has tracked a round here yet."
+                    onClick={() => openCourse(course.id)}
+                  />
+                </div>
               );
             })}
           </div>
