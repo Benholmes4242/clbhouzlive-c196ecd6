@@ -38,9 +38,9 @@ const CourseHolesPage: React.FC = () => {
 
   const viewFired = React.useRef(false);
   React.useEffect(() => {
-    if (!courseId || viewFired.current) return;
+    if (!personal || !courseId || viewFired.current) return;
     viewFired.current = true;
-    analyticsEvents.track('course_holes_page_viewed', { course_id: courseId, scope: personal ? 'you' : 'course' });
+    analyticsEvents.track('course_holes_page_viewed', { course_id: courseId, scope: 'you' });
   }, [courseId, personal]);
 
   if (!personal && courseId) {

@@ -8,7 +8,7 @@ import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/use
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { buildSiLadder, type SiLadder as SiLadderData, type SiLadderRow } from '@/features/courses/_shared/siLadder';
-import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { A, BAR_RADIUS, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { BUCKETS, courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { buildParTypeRows, type ParTypeRow } from '@/features/courses/components/holes/analytical/parTypeRows';
 import AboutSection, { ABOUT_KICKER, AboutHairline } from './AboutSection';
@@ -326,7 +326,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
           </div>
         ) : (
           <>
-            <AboutSection first heading={t('courseDetail.allHolesSheet.holes')}>
+            <AboutSection heading={t('courseDetail.allHolesSheet.holes')}>
               {shares ? <DistributionSummary shares={shares} /> : null}
               <div style={{ marginTop: shares ? 16 : 0 }}>
                 {holes.map((hole, index) => (
