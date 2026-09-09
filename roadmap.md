@@ -107,3 +107,10 @@
 - [x] Apply the approved I1/I2 fixes: semantic form deltas and no repeated unranked area.
 - [x] Complete source, type, anonymous 390px overflow, and console checks.
 - [ ] Verify populated/authenticated You, moments, course hero, and browse-card states (external unmanaged auth).
+
+## Top 100 tab rebuild (9 Sep 2026)
+- [x] Suppress every round-derived figure when tracked rounds are zero.
+- [x] Extend the shared browse card with the ranked Top 100 treatment.
+- [x] Replace the region dropdown/search with outline board chips and live regional counts.
+- [x] Flatten the Top 100 rate nudge without changing its default treatment.
+- [ ] Verify named course states, 32px rhythm, and 390px fit.

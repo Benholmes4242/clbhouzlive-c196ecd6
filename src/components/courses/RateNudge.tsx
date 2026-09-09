@@ -11,9 +11,10 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 interface Props {
   userId: string;
   onEmptyFallback: () => void;
+  variant?: 'card' | 'flat';
 }
 
-const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
+const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback, variant = 'card' }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { course, loading } = useRateNudgeCourse(userId);
@@ -26,7 +27,7 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
           width: '100%',
           height: 76,
           marginBottom: 12,
-          borderRadius: 14,
+          borderRadius: variant === 'flat' ? 0 : 14,
         }}
       />
     );
@@ -43,9 +44,9 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
           justifyContent: 'space-between',
           padding: '10px 14px',
           marginBottom: 12,
-           background: 'rgba(247,147,30,0.10)',
-           border: '1px solid rgba(247,147,30,0.42)',
-          borderRadius: 12,
+          ...(variant === 'flat'
+            ? { background: 'transparent', border: 'none', borderBottom: `0.5px solid ${HAIRLINE_INK_10}`, borderRadius: 0 }
+            : { background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.42)', borderRadius: 12 }),
           cursor: 'pointer',
         }}
         className="active:scale-[0.97] transition-all"
@@ -78,9 +79,9 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
         gap: 12,
         padding: 10,
         marginBottom: 12,
-        background: SURFACE,
-        border: `1px solid ${HAIRLINE_INK_10}`,
-        borderRadius: 14,
+        ...(variant === 'flat'
+          ? { background: 'transparent', border: 'none', borderBottom: `0.5px solid ${HAIRLINE_INK_10}`, borderRadius: 0 }
+          : { background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, borderRadius: 14 }),
         cursor: 'pointer',
         textAlign: 'left',
       }}

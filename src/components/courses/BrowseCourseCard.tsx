@@ -87,9 +87,22 @@ interface BrowseCourseCardProps {
   row: StatBrowseRow;
   difficultyPercentile?: number | null;
   onClick: () => void;
+  variant?: 'browse' | 'top100';
+  rank?: number | null;
+  viewerRounds?: number;
+  ratedWithoutRoundsNote?: string;
 }
 
-export function BrowseCourseCard({ row, difficultyPercentile, onClick }: BrowseCourseCardProps) {
+export function BrowseCourseCard({
+  row,
+  difficultyPercentile,
+  onClick,
+  variant = 'browse',
+  rank = null,
+  viewerRounds = 0,
+  ratedWithoutRoundsNote,
+}: BrowseCourseCardProps) {
+  const top100 = variant === 'top100';
   const hasRoundFacts = row.rounds > 0 && row.avg_to_par != null;
   const avg = row.avg_to_par == null
     ? null
@@ -106,7 +119,7 @@ export function BrowseCourseCard({ row, difficultyPercentile, onClick }: BrowseC
       aria-label={`View ${row.name}`}
       style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', fontFamily: SANS }}
     >
-      <div style={{ position: 'relative', height: PHOTO_H, overflow: 'hidden' }}>
+      <div style={{ position: 'relative', height: top100 ? 178 : PHOTO_H, overflow: 'hidden' }}>
         {row.image_url ? (
           <img
             src={getOptimizedImageUrl(row.image_url, { width: 640 })}
@@ -129,19 +142,41 @@ export function BrowseCourseCard({ row, difficultyPercentile, onClick }: BrowseC
             background: 'linear-gradient(0deg, rgba(10,14,20,0.68) 0%, rgba(10,14,20,0.40) 48%, rgba(10,14,20,0) 100%)',
           }}
         />
-        <RankBadge memberships={row.memberships} />
+        {!top100 ? <RankBadge memberships={row.memberships} /> : null}
+        {top100 && viewerRounds > 0 ? (
+          <div
+            style={{
+              position: 'absolute', top: 14, left: 20, padding: '5px 10px', borderRadius: 999,
+              background: RANK_GLASS, backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+              color: A.AMBER, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
+              fontVariantNumeric: 'tabular-nums lining-nums', whiteSpace: 'nowrap',
+            }}
+          >
+            PLAYED <span style={{ letterSpacing: 0 }}>{viewerRounds}</span>
+          </div>
+        ) : null}
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14, display: 'flex', alignItems: 'flex-end', gap: 16 }}>
+          {top100 && rank != null ? (
+            <div
+              className="tabular-nums lining-nums"
+              style={{ flexShrink: 0, color: PHOTO_DIM, fontSize: 30, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1 }}
+            >
+              {rank}
+            </div>
+          ) : null}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ color: A.INK, fontSize: 18, fontWeight: 700, letterSpacing: '-0.028em', lineHeight: 1.12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {row.name}
             </div>
-            <div style={{ marginTop: 3, color: PHOTO_MUTE, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {location}
-            </div>
+            {!top100 ? (
+              <div style={{ marginTop: 3, color: PHOTO_MUTE, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {location}
+              </div>
+            ) : null}
           </div>
           {row.community_rating != null ? (
             <div style={{ flexShrink: 0, textAlign: 'right' }}>
-              <div style={{ ...FIGS, color: A.INK, fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1 }}>
+              <div style={{ ...FIGS, color: A.INK, fontSize: top100 ? 24 : 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1 }}>
                 {row.community_rating.toFixed(1)}
               </div>
               <div style={{ marginTop: 4, color: PHOTO_DIM, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
@@ -164,6 +199,11 @@ export function BrowseCourseCard({ row, difficultyPercentile, onClick }: BrowseC
                 <span style={{ color: A.DIM, fontSize: 11 }}>harder than</span>
               </div>
             ) : null}
+          </div>
+        ) : null}
+        {top100 && row.community_rating != null && row.rounds === 0 && ratedWithoutRoundsNote ? (
+          <div style={{ marginTop: 11, color: A.DIM, fontSize: 11, lineHeight: 1.5 }}>
+            {ratedWithoutRoundsNote}
           </div>
         ) : null}
         <CategoryBreakdown row={row} />
