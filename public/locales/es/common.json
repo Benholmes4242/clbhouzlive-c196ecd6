@@ -282,7 +282,10 @@
       "scaleShoot": "Resultado",
       "scaleBecomes": "El handicap pasa a",
       "noChange": "sin cambio",
-      "yourBest": "tu mejor"
+      "yourBest": "tu mejor",
+      "withheldHeading": "Every round still counts.",
+      "withheldBody": "With {{count}} rounds on record every one of them counts toward your index, so there's no target to beat yet. This starts telling you something once you have twenty.",
+      "shootBeat": "Beat {{value}}"
     },
     "pulse": {
       "findPlayer": "Find any player's handicap",

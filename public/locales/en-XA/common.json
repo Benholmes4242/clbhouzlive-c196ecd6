@@ -522,7 +522,10 @@
       "scaleShoot": "[~~Šĥőőţ~~]",
       "scaleBecomes": "[~~Ĥáñđíĉáƥ ƀéĉőɱéš~~]",
       "noChange": "[~~ñő ĉĥáñĝé~~]",
-      "yourBest": "[~~ýőúř ƀéšţ~~]"
+      "yourBest": "[~~ýőúř ƀéšţ~~]",
+      "withheldHeading": "Every round still counts.",
+      "withheldBody": "With {{count}} rounds on record every one of them counts toward your index, so there's no target to beat yet. This starts telling you something once you have twenty.",
+      "shootBeat": "Beat {{value}}"
     },
     "achievements": {
       "trophyRoom": "[~~Ţřőƥĥý řőőɱ~~]",
