@@ -113,4 +113,4 @@
 - [x] Extend the shared browse card with the ranked Top 100 treatment.
 - [x] Replace the region dropdown/search with outline board chips and live regional counts.
 - [x] Flatten the Top 100 rate nudge without changing its default treatment.
-- [ ] Verify named course states, 32px rhythm, and 390px fit.
+- [x] Verify named course states, 32px rhythm, and 390px fit.

@@ -107,6 +107,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   const playedCount = courses.filter((course) => (enrichment.get(course.id)?.roundsTracked ?? 0) > 0).length;
   const total = summaries.find((summary) => summary.slug === selectedList)?.total_courses ?? courses.length;
   const heading = LIST_NAMES[selectedList] ?? 'Top 100';
+  const ratingSentence = `${ratedCount} of the ${total} ${total === 1 ? 'course' : 'courses'} ${ratedCount === 1 ? 'carries' : 'carry'} a rating.`;
+  const roundSentence = `${playedCount} ${playedCount === 1 ? 'has' : 'have'} a tracked round.`;
 
   useEffect(() => {
     if (restored.current || courses.length === 0) return;
@@ -131,7 +133,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
           <span style={{ color: A.MUTE, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{ratedCount} rated</span>
         </div>
         <p style={{ ...COURSE_BROWSE_DESCRIPTION, margin: '10px 0 16px' }}>
-          {ratedCount} of the {total} courses carry a rating. {playedCount} have a tracked round.
+          {ratingSentence} {roundSentence}
         </p>
         <RailChips
           options={LISTS}
