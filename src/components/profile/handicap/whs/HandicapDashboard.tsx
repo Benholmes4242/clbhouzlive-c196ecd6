@@ -1,27 +1,59 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useHandicapTrend, useCounters } from '@/lib/whs/hooks';
+import { AlertTriangle } from 'lucide-react';
+import { useHandicapTrend, useCounters, useAllScores } from '@/lib/whs/hooks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { WhsConnection } from '@/lib/whs/types';
 import { getSyncHealth } from '@/lib/whs/syncHealth';
 
-import TodayView from './views/TodayView';
-import TrendsView from './views/TrendsView';
-import CircleView from './views/CircleView';
+// ── SECTION A (Sep 2026): ONE SCROLLING PAGE, TEN SECTIONS ────────────────
+// The Today / Form / Circle tabs are gone. The three view components
+// (TodayView / TrendsView / CircleView) are no longer rendered — their inner
+// blocks mount here directly, in the fixed page order:
+//
+//   1 Index · 2 Next round · 3 Last round · 4 Rounds that count ·
+//   5 How you're scoring · 6 Which holes cost you · 7 Personal bests ·
+//   8 Your circle · 9 Friends' rounds · 10 Footer
+//
+// SECTION A IS THE SHELL ONLY. Each block below still renders its existing
+// pre-rebuild UI; sections B–K replace them one at a time with the flat
+// HcpSection grammar. Blocks the brief removes entirely (greeting/weather,
+// achievements tile, streaks, pulse, compare entry, invite, posted-history
+// panel, your-courses rail, thirds panel) stay mounted until their lettered
+// section takes them off — nothing disappears before its replacement exists.
+//
+// `./views/*` and `./types` (HandicapSubtab, LEGACY_SUBTAB_ALIAS,
+// resolveHandicapSubtab) are now unreferenced here — dead list, not deleted.
 
+import HeroHandicapCardDark from './sections/HeroHandicapCardDark';
+import NextRoundWatch from './sections/NextRoundWatch';
+import LastRoundCard from './sections/LastRoundCard';
+import RoundsThatCountCard from './sections/RoundsThatCountCard';
+import StablefordCard from './sections/trends/StablefordCard';
+import GameEverywhereCard from './sections/trends/GameEverywhereCard';
+import RoundShapePanel from './sections/trends/RoundShapePanel';
+import PersonalBests from './sections/records/PersonalBests';
+import AchievementsPanel from './sections/AchievementsPanel';
+import StreaksCard from '../gam/streaks/StreaksCard';
+import PulseSection from './sections/PulseSection';
+import FriendsLeaderboardSection from './sections/friends-leaderboard-v2/FriendsLeaderboardSection';
+import CompareEntryPanel from './sections/compare/CompareEntryPanel';
+import CircleInviteAction from './sections/invite-to-clbhouz/CircleInviteAction';
+import RecentlyPlayedFeed from './sections/recently-played/RecentlyPlayedFeed';
+import RoundsArchivePanel from './sections/trends/RoundsArchivePanel';
+import YourCoursesRail from './sections/trends/YourCoursesRail';
 import WhsConnectionCaption from './sections/WhsConnectionCaption';
-// `./types` (HandicapSubtab, LEGACY_SUBTAB_ALIAS, resolveHandicapSubtab) is no
-// longer read here — see the dead list. Nothing is deleted.
+import { LaunchSheetMount } from '../gam/launch/LaunchSheetMount';
 
 interface Props {
   connection: WhsConnection;
   userId: string;
   /**
    * Read-only mode — when true, hides Sync now, Disconnect, the re-auth/stale
-   * banners, and the invite affordances on the Friends tab. Used when
-   * viewing a friend's handicap via /handicap/:userId.
+   * banners, and the invite affordances. Used when viewing a friend's
+   * handicap via /handicap/:userId.
    */
   readOnly?: boolean;
-  /** First name of the profile owner — threaded to TodayView for name-prefixed friend-view copy. */
+  /** First name of the profile owner — threaded through for name-prefixed friend-view copy. */
   ownerFirstName?: string | null;
 }
 
@@ -30,13 +62,14 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   const [syncHealth] = useState(() => getSyncHealth(connection));
   const reauthRequired = syncHealth.kind === 'reauth_auth';
 
-  // ── ONE PAGE, NO SUBTABS (Sep 2026) ─────────────────────────────────────
-  // The three views now stack in reading order on a single scrolling page.
-  // `?subtab=` is stripped by HandicapPage and is not read here any more.
-
-  // ── Trend (used by hero + passed to views as currentHandicap) ───────────
+  // ── Trend (used by hero + passed to sections as currentHandicap) ───────
   const { data: trend } = useHandicapTrend(connection.id);
   const currentHandicap = trend?.current ?? null;
+
+  // ── Stableford scores (section 5) — same query TrendsView ran ──────────
+  const { data: scores, isLoading: scoresLoading } = useAllScores(connection.id);
+
+  const viewMode: 'owner' | 'friend' = readOnly ? 'friend' : 'owner';
 
   // ── handicap_viewed: one emit per (page, read_only) view. Fire-and-forget.
   // `tab` is retained as a property with the constant value 'page' so the
@@ -60,43 +93,104 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   const showReauthBanner = !readOnly && reauthRequired;
 
   return (
-    <div className="pb-10">
-      <div>
-        <TodayView
-          connection={connection}
-          connectionId={connection.id}
+    <div className="pb-10" style={{ paddingTop: 32 }}>
+      {showReauthBanner && (
+        <div
+          className="mx-4 mt-0 mb-3 p-3 rounded-xl flex gap-2.5 text-[13px]"
+          style={{ background: 'rgba(239,68,68,0.06)', color: '#EF4444' }}
+        >
+          <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+          <p className="leading-snug">
+            Your stored handicap-provider credentials no longer work. We can't refresh your data. Please
+            disconnect and reconnect.
+          </p>
+        </div>
+      )}
+
+      {/*
+        THE GREETING AND WEATHER LINE IS REMOVED (Section A). TodayGreeting is
+        no longer rendered anywhere — dead list, not deleted.
+      */}
+
+      {/* 1 — INDEX (rebuilt flat in Section B) */}
+      <HeroHandicapCardDark connection={connection} />
+
+      {/* 2 — NEXT ROUND (Section C) */}
+      <NextRoundWatch connectionId={connection.id} currentHandicap={currentHandicap} />
+
+      {/* 3 — LAST ROUND (Section D) */}
+      <LastRoundCard
+        connectionId={connection.id}
+        userId={userId}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
+
+      {/* 4 — ROUNDS THAT COUNT (Section E) */}
+      <RoundsThatCountCard
+        connectionId={connection.id}
+        userId={userId}
+        currentHandicap={currentHandicap}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
+
+      {/* 5 — HOW YOU'RE SCORING (Section F) */}
+      <section style={{ padding: '0 16px', marginTop: 32 }}>
+        {scoresLoading ? null : (
+          <StablefordCard scores={scores ?? []} userId={userId} connectionId={connection.id} />
+        )}
+      </section>
+
+      {/* 6 — WHICH HOLES COST YOU (Section G; RoundShapePanel pending the
+          "no weak stretch" census the brief requires before it is touched) */}
+      <GameEverywhereCard readOnly={readOnly} />
+      <RoundShapePanel readOnly={readOnly} />
+
+      {/* 7 — PERSONAL BESTS (Section H; the achievements tile + streaks come
+          off here, replaced by the TROPHY ROOM › terminal row per the
+          amendment — GamMount itself stays at page level regardless) */}
+      <PersonalBests
+        connectionId={connection.id}
+        currentHandicap={currentHandicap}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
+      <AchievementsPanel userId={userId} viewMode={viewMode} ownerFirstName={ownerFirstName} />
+      {!readOnly && <StreaksCard userId={userId} readOnly={readOnly} />}
+
+      {/* 8 — YOUR CIRCLE (Section I; compare entry, pulse search and invite
+          come off here — compare moves onto the person row tap) */}
+      {!readOnly && (
+        <FriendsLeaderboardSection
           userId={userId}
-          currentHandicap={currentHandicap}
-          connectionCreatedAt={connection.created_at}
-          readOnly={readOnly}
-          showReauthBanner={showReauthBanner}
+          viewMode="owner"
           ownerFirstName={ownerFirstName}
         />
-        <TrendsView
-          connectionId={connection.id}
-          userId={userId}
-          currentHandicap={currentHandicap}
-          readOnly={readOnly}
-          ownerFirstName={ownerFirstName}
-        />
-        <CircleView userId={userId} readOnly={readOnly} ownerFirstName={ownerFirstName} />
-      </div>
+      )}
+      <CompareEntryPanel viewerUserId={userId} readOnly={readOnly} />
+      {!readOnly && <PulseSection userId={userId} />}
+      {!readOnly && <CircleInviteAction ownerUserId={userId} />}
+
+      {/* 9 — FRIENDS' ROUNDS (Section J) */}
+      {!readOnly && <RecentlyPlayedFeed ownerUserId={userId} />}
+
+      {/* 10 — FOOTER (Section K; the posted-history panel becomes the
+          "All rounds" footer link, the caption and your-courses rail come off) */}
+      <RoundsArchivePanel
+        connectionId={connection.id}
+        userId={userId}
+        viewMode={viewMode}
+        ownerFirstName={ownerFirstName}
+      />
+      <YourCoursesRail readOnly={readOnly} />
 
       {!readOnly && (
         <WhsConnectionCaption membershipNumber={connection.membership_number} />
       )}
 
-      
-
-      <style>{`
-        @keyframes handicapViewFadeSlide {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .anim-fadeSlide {
-          animation: handicapViewFadeSlide 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
-        }
-      `}</style>
+      {/* Sheet mounts that lived inside the old views must survive them. */}
+      <LaunchSheetMount userId={userId} />
     </div>
   );
 };
