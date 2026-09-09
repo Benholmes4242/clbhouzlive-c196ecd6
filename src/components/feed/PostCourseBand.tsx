@@ -180,8 +180,14 @@ interface Props {
   ctx?: PostCourseContext | null;
   /** Opens the course stats sheet. Not wired when there is no figure. */
   onOpenStats?: () => void;
-  /** The existing actions row, attached to the same container. */
-  actions: React.ReactNode;
+  /**
+   * DEAD SLOT (BRIEF_FEED_CARD_REBUILD section A). The actions row is now one
+   * always-present footer owned by FeedCard, rendered AFTER this band, so no
+   * caller passes `actions` any more. The branch below is retained verbatim
+   * and recorded on the dead-code list; it is swept with the rest.
+   */
+  actions?: React.ReactNode;
+
   /** Extra content (C3 you-vs-them row) rendered under row one. */
   extra?: React.ReactNode;
   /** 'glass' when the card carries a photo backdrop. Default 'solid'. */
