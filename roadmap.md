@@ -99,10 +99,11 @@
 - [x] Audit visible slogan-style kickers and report any additional candidates without changing unrelated surfaces.
 - [x] Verify both Courses tabs at mobile width.
 ## Course detail snags 03 (9 Sep 2026)
-- [ ] Align all five course-detail tab lead-ins and centre the You stat strip.
-- [ ] Resolve the Your Form marker and reuse the canonical media strip for Your Moments.
-- [ ] Remove the duplicate hero rank-badge ground.
-- [ ] Correct Courses sort-chip containment and browse-card scrim.
-- [ ] Unify all three hero heights and straight bottom edges.
-- [ ] Report I1/I2 findings for a ruling; do not build them.
-- [ ] Complete responsive, visual, interaction, locale, and type checks.
+- [x] Align all five course-detail tab lead-ins and centre the You stat strip.
+- [x] Resolve the Your Form marker and reuse the canonical media strip for Your Moments.
+- [x] Remove the duplicate hero rank-badge ground.
+- [x] Correct Courses sort-chip containment and browse-card scrim.
+- [x] Unify all three hero heights and straight bottom edges.
+- [x] Apply the approved I1/I2 fixes: semantic form deltas and no repeated unranked area.
+- [x] Complete source, type, anonymous 390px overflow, and console checks.
+- [ ] Verify populated/authenticated You, moments, course hero, and browse-card states (external unmanaged auth).
