@@ -119,7 +119,7 @@
 - [x] Replace the region dropdown/search with outline board chips and live regional counts.
 - [x] Flatten the Top 100 rate nudge without changing its default treatment.
 - [x] Verify named course states, 32px rhythm, and 390px fit.
-- [ ] Match the Top 100 card list and loading media to the Courses tab's full-bleed geometry.
+- [x] Match the Top 100 card list and loading media to the Courses tab's full-bleed geometry.
 
 ## Immersive sticky safe-area scrim (9 Sep 2026)
 - [x] Extract the course-detail notch scrim into one opt-in shared component.
