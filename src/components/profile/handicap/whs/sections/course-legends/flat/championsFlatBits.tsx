@@ -14,6 +14,7 @@ import { A, NUM, SANS } from '@/features/courses/components/holes/analytical/tok
 import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
 import { BoardAvatar, formatChampionsWhen, formatToPar, toParColor, hasToPar } from '../drilldown/_shared/boardParts';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
+import type { TFunction } from 'i18next';
 
 export const MINUS = '\u2212';
 
@@ -23,30 +24,41 @@ export function lowerIsBetter(cat: string): boolean {
 }
 
 /** The board's own unit, pluralised for the gap sentence. */
-export function unitWord(cat: string, n: number): string {
+export function unitKey(cat: string): string {
   const base = String(cat).replace(/_(90d|all_time)$/, '');
-  const one = n === 1;
   switch (base) {
     case 'lowest_gross':
     case 'lowest_gross_women':
-      return one ? 'shot' : 'shots';
+      return 'shot';
     case 'best_stableford':
-      return one ? 'point' : 'points';
+      return 'point';
     case 'most_birdies':
-      return one ? 'birdie' : 'birdies';
+      return 'birdie';
     case 'most_eagles':
-      return one ? 'eagle' : 'eagles';
+      return 'eagle';
     case 'most_aces':
-      return one ? 'ace' : 'aces';
+      return 'ace';
     case 'most_albatrosses':
-      return one ? 'albatross' : 'albatrosses';
+      return 'albatross';
     case 'most_rounds':
-      return one ? 'round' : 'rounds';
+      return 'round';
     case 'best_score_diff':
-      return one ? 'shot against handicap' : 'shots against handicap';
+      return 'differentialShot';
     default:
-      return one ? 'point' : 'points';
+      return 'point';
   }
+}
+
+export function unitWord(cat: string, n: number, t?: TFunction<'courses'>): string {
+  const key = unitKey(cat);
+  if (t) return t(`courseDetail.legends.units.${key}`, { count: n });
+  const fallback: Record<string, [string, string]> = {
+    shot: ['shot', 'shots'], point: ['point', 'points'], birdie: ['birdie', 'birdies'],
+    eagle: ['eagle', 'eagles'], ace: ['ace', 'aces'], albatross: ['albatross', 'albatrosses'],
+    round: ['round', 'rounds'], differentialShot: ['shot against handicap', 'shots against handicap'],
+  };
+  const words = fallback[key] ?? fallback.point;
+  return n === 1 ? words[0] : words[1];
 }
 
 const WORDS = [
@@ -335,10 +347,13 @@ export const FlatBoardRow: React.FC<{
 };
 
 /** The sheet's per-row deficit, in the board's unit. Champion gets none. */
-export function deficitFor(category: LegendCategory, row: FlatRow, champion: FlatRow): string | null {
+export function deficitFor(category: LegendCategory, row: FlatRow, champion: FlatRow, t?: TFunction<'courses'>): string | null {
   const diff = Math.abs(Math.round(champion.value - row.value));
   if (diff === 0) return null;
-  return `${MINUS}${diff} ${unitWord(category, diff)} from champion`;
+  const unit = unitWord(category, diff, t);
+  return t
+    ? t('courseDetail.legends.fromChampion', { count: diff, unit })
+    : `${diff} ${unit} from champion`;
 }
 
 /** Chevron action, matching the Course and You tabs. */
@@ -371,7 +386,12 @@ export const FlatAction: React.FC<{ label: string; onPress: () => void }> = ({ l
 );
 
 /** The board's window, stated in the meta so figure and basis travel together. */
-export function windowMeta(count: number, legendWindow: LegendWindow): string {
-  const members = `${count} ${count === 1 ? 'member' : 'members'}`;
-  return `${members} · ${legendWindow === '90d' ? 'last 90 days' : 'all time'}`;
+export function windowMeta(count: number, legendWindow: LegendWindow, t?: TFunction<'courses'>): string {
+  const golfers = t
+    ? t('courseDetail.whoPlaysHereMeta', { count })
+    : `${count} ${count === 1 ? 'golfer' : 'golfers'}`;
+  const period = t
+    ? t(legendWindow === '90d' ? 'courseDetail.legends.last90Days' : 'courseDetail.legends.allTime')
+    : legendWindow === '90d' ? 'last 90 days' : 'all time';
+  return `${golfers} · ${period}`;
 }

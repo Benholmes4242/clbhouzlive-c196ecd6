@@ -550,10 +550,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
           <UnclaimedSection
             names={unclaimedNames}
-            onAllBoards={() => {
-              analyticsEvents.track('champions_all_boards', { course_id: ctx.courseId });
-              setFullLeaderboardCategory(activeBoardKey);
-            }}
           />
 
           <WhatCounts />

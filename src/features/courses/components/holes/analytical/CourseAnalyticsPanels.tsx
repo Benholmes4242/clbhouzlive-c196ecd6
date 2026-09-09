@@ -846,7 +846,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
           maxHeight: '85dvh',
           display: 'flex',
           flexDirection: 'column',
-          background: A.PANEL,
+          background: A.CANVAS,
         }}
       >
         <div style={{ padding: '0 16px 10px' }}>

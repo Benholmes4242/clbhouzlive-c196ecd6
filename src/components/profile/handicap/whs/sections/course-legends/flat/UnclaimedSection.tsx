@@ -8,7 +8,7 @@
 import React from 'react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { AboutSection } from '@/components/courses/course-detail/about/AboutSection';
-import { FlatAction, numberWord } from './championsFlatBits';
+import { numberWord } from './championsFlatBits';
 
 function list(names: string[]): string {
   if (names.length <= 1) return names[0] ?? '';
@@ -18,33 +18,31 @@ function list(names: string[]): string {
 export const UnclaimedSection: React.FC<{
   /** Lower-case board names with no holder, e.g. ['ace', 'albatross', 'eagle']. */
   names: string[];
-  onAllBoards: () => void;
   /** State A copy — nothing has been posted here at all. */
   allUnclaimed?: boolean;
   totalBoards?: number;
-}> = ({ names, onAllBoards, allUnclaimed = false, totalBoards = 7 }) => {
+}> = ({ names, allUnclaimed = false, totalBoards = 7 }) => {
   if (names.length === 0) return null;
   const n = names.length;
   const sentence = allUnclaimed
     ? `All ${numberWord(totalBoards, false)} boards are there for the taking.`
-    : `${n} ${n === 1 ? 'board' : 'boards'} here ${n === 1 ? 'has' : 'have'} never been claimed — ${list(names)}.`;
+    : `${n} ${n === 1 ? 'board' : 'boards'} here ${n === 1 ? 'has' : 'have'} never been claimed, ${list(names)}.`;
 
   return (
     <AboutSection heading="Unclaimed">
       <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: A.MUTE, lineHeight: 1.5 }}>
         {sentence}
       </div>
-      {!allUnclaimed ? <FlatAction label="All boards" onPress={onAllBoards} /> : null}
     </AboutSection>
   );
 };
 
 export const WhatCounts: React.FC = () => (
-  <div style={{ marginTop: 34, padding: '0 20px' }}>
+  <div style={{ marginTop: 16, padding: '0 20px' }}>
     <div style={{ height: 1, background: A.HAIRLINE }} aria-hidden="true" />
     <div
       style={{
-        marginTop: 12,
+        marginTop: 16,
         fontFamily: SANS,
         fontSize: 11,
         fontWeight: 500,
@@ -66,7 +64,7 @@ export const NobodyHasPlayed: React.FC<{ totalBoards?: number }> = ({ totalBoard
         stableford, birdies — until someone beats you.
       </div>
     </AboutSection>
-    <UnclaimedSection names={['all']} onAllBoards={() => {}} allUnclaimed totalBoards={totalBoards} />
+    <UnclaimedSection names={['all']} allUnclaimed totalBoards={totalBoards} />
     <WhatCounts />
   </div>
 );
