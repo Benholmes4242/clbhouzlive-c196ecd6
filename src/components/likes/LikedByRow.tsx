@@ -13,9 +13,11 @@
  *   2    — "Liked by Thomas and Amy"
  *   3+   — "Liked by Thomas, Amy and 10 others"
  *
- * NEUTRAL FALLBACK while names are in flight: "1 like" / "12 likes". It states
- * the count the surface already knows, so nothing can disagree and nothing
- * reflows when the names land.
+ * NEUTRAL FALLBACK while names are in flight: "Liked by 12 golfers" / "Liked by
+ * 1 golfer". It is the same sentence the resolved line is, with a figure where
+ * the names will sit, so the swap reads as names arriving rather than a
+ * different statement — and it does not render the like count a second time.
+
  *
  * FIRST NAMES ONLY so the line cannot wrap, and they are the FIRST entries of
  * the SAME ordered array the sheet renders (followed first, then everyone else,
@@ -73,9 +75,14 @@ export function LikedByRow({
       ? `Liked by ${names[0]} and ${(count - 1).toLocaleString()} other${count - 1 === 1 ? '' : 's'}`
       : `Liked by ${names[0]}`;
   } else {
-    // Names not resolved yet — state the count rather than hold the row.
-    copy = `${count.toLocaleString()} like${count === 1 ? '' : 's'}`;
+    // Names not resolved yet — the SAME SENTENCE with a figure in place of the
+    // names, never a second rendering of the like count. "12 likes" would
+    // repeat the number already beside the heart glyph nine pixels above, and
+    // would read as one statement being swapped for a different one rather
+    // than names arriving inside a sentence that was already there.
+    copy = `Liked by ${count.toLocaleString()} golfer${count === 1 ? '' : 's'}`;
   }
+
 
   return (
     <>

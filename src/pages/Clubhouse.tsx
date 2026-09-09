@@ -581,7 +581,7 @@ const ClubhouseContent = () => {
               fetchNextPage={activeFeed.fetchNextPage}
               isFetchingNextPage={activeFeed.isFetchingNextPage ?? false}
               onLike={(post) => handleLike(post)}
-              onComment={(post) => openComments(post)}
+              onComment={(post, _actor, source) => openComments(post, source)}
               onShare={(post) => handleShare(post)}
               onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId), { state: post.actorType === 'business' ? { source: 'feed' } : undefined })}
               onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}

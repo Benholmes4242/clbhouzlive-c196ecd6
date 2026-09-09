@@ -21,6 +21,13 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { batchDigest, feedKeys, viewerId } from '@/lib/queryKeys';
 import { useMergedBatch } from '@/lib/batchQuery';
 
+export interface FeedCommentLine {
+  comment_id: string;
+  content: string | null;
+  created_at: string;
+  display_name: string;
+}
+
 export interface FeedCommentPreview {
   post_id: string;
   comment_id: string;
@@ -33,6 +40,13 @@ export interface FeedCommentPreview {
   verified: boolean;
   /** Parent comments counted in THIS page's read — used only for "view all n". */
   thread_count: number;
+  /**
+   * SECTION C: up to TWO comments, MOST RECENT FIRST — the same order the
+   * comments sheet uses (useCommentsV2 orders created_at descending), so the
+   * two lines on the card are the two lines at the top of the sheet. Entry [0]
+   * is the same comment the legacy single-preview fields describe.
+   */
+  recent?: FeedCommentLine[];
 }
 
 export type FeedCommentPreviewMap = Map<string, FeedCommentPreview>;
@@ -40,6 +54,7 @@ export type FeedCommentPreviewMap = Map<string, FeedCommentPreview>;
 const EMPTY_MAP: FeedCommentPreviewMap = new Map();
 /** Ceiling on rows pulled for a page. Busiest post in the data has ten. */
 const ROW_CAP = 300;
+
 
 type Row = {
   id: string;
@@ -81,14 +96,20 @@ export function useFeedCommentPreview(postIds: string[], scope: string) {
 
       const rows = (data ?? []) as Row[];
       // Newest per post (rows already sorted newest-first) + per-post tally.
-      const newest = new Map<string, Row>();
+      // SECTION C keeps the top TWO rows per post — same descending order the
+      // sheet reads, so the card's two lines are the sheet's first two.
+      const topTwo = new Map<string, Row[]>();
       const counts = new Map<string, number>();
       for (const row of rows) {
         counts.set(row.target_id, (counts.get(row.target_id) ?? 0) + 1);
-        if (!newest.has(row.target_id)) newest.set(row.target_id, row);
+        const bucket = topTwo.get(row.target_id);
+        if (!bucket) topTwo.set(row.target_id, [row]);
+        else if (bucket.length < 2) bucket.push(row);
       }
 
-      const picked = Array.from(newest.values());
+      // Actor resolution covers BOTH lines, not just the newest — a second
+      // line with no name is a blank author.
+      const picked = Array.from(topTwo.values()).flat();
       const personalIds = Array.from(new Set(
         picked.filter(r => (r.actor_type ?? 'personal') !== 'business')
           .map(r => r.actor_id ?? r.user_id).filter(Boolean) as string[],
@@ -111,41 +132,65 @@ export function useFeedCommentPreview(postIds: string[], scope: string) {
       const profileMap = new Map((profilesRes.data ?? []).map(p => [(p as ProfileRow).id, p as ProfileRow]));
       const businessMap = new Map((businessRes.data ?? []).map(b => [(b as BusinessRow).id, b as BusinessRow]));
 
-      const map: FeedCommentPreviewMap = new Map();
-      for (const row of picked) {
+      const resolve = (row: Row) => {
         const at = (row.actor_type ?? 'personal') === 'business' ? 'business' : 'personal';
-        const aId = (row.actor_id ?? row.user_id) as string;
-        if (!aId) continue;
+        const aId = (row.actor_id ?? row.user_id) ?? null;
+        if (!aId) return null;
         if (at === 'business') {
           const b = businessMap.get(aId);
-          map.set(row.target_id, {
-            post_id: row.target_id,
-            comment_id: row.id,
-            content: row.content,
-            created_at: row.created_at,
-            actor_type: 'business',
-            actor_id: aId,
-            display_name: b?.name ?? 'Business',
-            avatar_url: b?.logo_url ?? null,
+          return {
+            actorType: 'business' as const,
+            actorId: aId,
+            displayName: b?.name ?? 'Business',
+            avatarUrl: b?.logo_url ?? null,
             verified: !!b?.is_verified,
-            thread_count: counts.get(row.target_id) ?? 1,
-          });
-        } else {
-          const p = profileMap.get(aId);
-          map.set(row.target_id, {
-            post_id: row.target_id,
-            comment_id: row.id,
-            content: row.content,
-            created_at: row.created_at,
-            actor_type: 'personal',
-            actor_id: aId,
-            display_name: p?.display_name ?? p?.username ?? 'Deleted user',
-            avatar_url: p?.profile_photo_url ?? null,
-            verified: false,
-            thread_count: counts.get(row.target_id) ?? 1,
-          });
+          };
         }
+        const p = profileMap.get(aId);
+        return {
+          actorType: 'personal' as const,
+          actorId: aId,
+          displayName: p?.display_name ?? p?.username ?? 'Deleted user',
+          avatarUrl: p?.profile_photo_url ?? null,
+          verified: false,
+        };
+      };
+
+      const map: FeedCommentPreviewMap = new Map();
+      for (const [postId, bucket] of topTwo) {
+        const lines = bucket
+          .map(row => {
+            const actor = resolve(row);
+            if (!actor) return null;
+            return {
+              row,
+              actor,
+              line: {
+                comment_id: row.id,
+                content: row.content,
+                created_at: row.created_at,
+                display_name: actor.displayName,
+              },
+            };
+          })
+          .filter(Boolean) as Array<{ row: Row; actor: NonNullable<ReturnType<typeof resolve>>; line: FeedCommentLine }>;
+        if (!lines.length) continue;
+        const head = lines[0];
+        map.set(postId, {
+          post_id: postId,
+          comment_id: head.row.id,
+          content: head.row.content,
+          created_at: head.row.created_at,
+          actor_type: head.actor.actorType,
+          actor_id: head.actor.actorId,
+          display_name: head.actor.displayName,
+          avatar_url: head.actor.avatarUrl,
+          verified: head.actor.verified,
+          thread_count: counts.get(postId) ?? 1,
+          recent: lines.map(l => l.line),
+        });
       }
+
       // Merge over previous so pagination never drops a resolved preview, but
       // record which posts this read covered so "has no comment" stays a real
       // answer rather than an absence of data.

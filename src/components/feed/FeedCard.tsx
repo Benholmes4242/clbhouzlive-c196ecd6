@@ -32,6 +32,7 @@ import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/Revi
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
+import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
@@ -98,7 +99,7 @@ export interface FeedCardProps {
   likeCount: number;
   commentCount: number;
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
-  onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
+  onComment: (post: FeedPost, actor?: ActiveActor | null, source?: CommentOpenSource) => void;
   onShare: (post: FeedPost) => void;
   onOpenMedia: (
     post: FeedPost,
@@ -887,6 +888,24 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
            no gap. */
         const showLikedBy = likeCount > 0;
 
+        /* SECTION C — comments live INSIDE the footer, under the liked-by line,
+           and only when there are comments to show. Rendered from the COMMENT,
+           never from the count: comment_count can claim a comment this page's
+           read did not return. */
+        const previewLines = commentPreview?.recent?.length
+          ? commentPreview.recent
+          : commentPreview ? [commentPreview] : [];
+        const showComments =
+          commentPreviewEnabled &&
+          commentCount > 0 &&
+          previewLines.some(l => (l.content ?? '').trim().length > 0);
+
+        /* ONE OWNER PER SEAM. Whatever is last in the footer carries the 12px
+           bottom padding; everything above it carries none, so the gap above
+           the first comment is the comment block's own 10px. */
+        const actionsBottom = showLikedBy || showComments ? 0 : 12;
+        const likedByBottom = showComments ? 0 : 12;
+
         return (
           <div
             style={{
@@ -903,7 +922,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 22,
-                padding: showLikedBy ? '10px 20px 6px' : '10px 20px 12px',
+                padding: `10px 20px ${actionsBottom}px`,
               }}
             >
               <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
@@ -918,7 +937,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               <FooterButton
                 icon={MessageCircle}
                 label={commentCount > 0 ? formatCount(commentCount) : undefined}
-                onClick={() => onComment(post, effectiveActor)}
+                onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
               />
               <div style={{ marginLeft: 'auto' }}>
                 <FooterButton icon={Share} onClick={() => onShare(post)} />
@@ -930,27 +949,26 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 postId={post.id}
                 count={likeCount}
                 surfaceColor={CARD}
-                style={{ padding: '0 20px 12px' }}
+                style={{ padding: `0 20px ${likedByBottom}px` }}
+              />
+            )}
+
+            {showComments && (
+              <FeedCommentPreview
+                preview={commentPreview ?? null}
+                commentCount={commentCount}
+                onOpenComments={() => onComment(post, effectiveActor, 'preview_row')}
+                viewerAvatarUrl={effectiveActor?.avatarUrl ?? null}
+                viewerName={effectiveActor?.name ?? null}
+                viewerId={effectiveActor?.id ?? null}
+                topRule={false}
+                padding="10px 20px 12px"
               />
             )}
           </div>
         );
       })()}
 
-
-      {/* Comment preview + add-a-comment prompt. Sits BETWEEN the action row
-          and nothing else: one comment with an invitation beneath it reads as
-          an OPEN conversation. Ships as one block — never half of it. */}
-      {commentPreviewEnabled && (
-        <FeedCommentPreview
-          preview={commentPreview ?? null}
-          commentCount={commentCount}
-          onOpenComments={() => onComment(post, effectiveActor)}
-          viewerAvatarUrl={effectiveActor?.avatarUrl ?? null}
-          viewerName={effectiveActor?.name ?? null}
-          viewerId={effectiveActor?.id ?? null}
-        />
-      )}
       </div>
     </article>
   );

@@ -22,6 +22,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 import { Virtuoso } from 'react-virtuoso';
+import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
@@ -72,7 +73,7 @@ const LightItemGate: React.FC<{
 export interface LightCardFeedProps {
   posts: FeedPost[];
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
-  onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
+  onComment: (post: FeedPost, actor?: ActiveActor | null, source?: CommentOpenSource) => void;
   onShare: (post: FeedPost) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;
