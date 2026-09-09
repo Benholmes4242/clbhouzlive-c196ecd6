@@ -6,7 +6,8 @@
 - [x] Change the Who plays here meta to golfer/golfers in all six locales.
 - [x] Make the Course route root the single bottom-canvas owner.
 - [x] Fold the unclaimed offer into the existing row group without deleting its old component.
-- [ ] Verify hero states, long/short canvas states, null fact fallbacks, and both mounts at runtime.
+- [x] Verify the public populated 340px hero, equal facts, root canvas, claim sheet, and 390px fit.
+- [ ] Verify image-error/no-round, short-page overscroll, null fact fallbacks, and modal mount with authenticated fixtures.
 
 ## Tour match-the-mock (8 Sep 2026)
 - [x] Restore `/tourhub` overview full-bleed notch hero with picker and controls islands; align hero event/location type with `/tour`.

@@ -204,6 +204,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         height: EXPLORE_COURSE_HERO_HEIGHT,
         marginTop: 0,
         background: heroImageBackground,
+        backgroundColor: A.CANVAS,
       }}
     >
       <div
