@@ -133,6 +133,14 @@
 - [x] Preserve the 20-round gate and retain the routed fallback because the You tab also links here.
 - [ ] Capture populated viewer/unplayed 390px states when authenticated preview data is available.
 
+## Your rounds sheet (9 Sep 2026)
+- [x] Replace the pushed rounds page with the same 85dvh BottomSheet shell as All 18 holes.
+- [x] Add the fixed course/figures/sort head and compact fixed-column rows.
+- [x] Load the complete round history with an exact total and preserve scorecard navigation and analytics.
+- [x] Keep the routed fallback and move the sole in-app caller to sheet URL state.
+- [ ] Verify the populated 390px state when authenticated preview data is available.
+- [ ] Complete static checks and the final course-detail dead-file report.
+
 ## WHS handicap index reconciliation (9 Sep 2026)
 - [ ] Identify every current Handicap Index calculation and hardcoded model reference.
 - [ ] Prove or correct the 40-score eligibility pool, latest-20 window, best-8 selection, differential formula, 9-hole normalization, and three-differential minimum.

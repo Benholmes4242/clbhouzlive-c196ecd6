@@ -30,6 +30,7 @@ import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 import { Z } from '@/config/zIndex';
 import { TAB_LEAD_IN } from '@/components/courses/course-detail/about/AboutSection';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
+import YourRoundsSheet from '@/components/courses/course-detail/you/YourRoundsSheet';
 
 
 interface GolfClubViewProps {
@@ -131,6 +132,17 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
   const communityRating = ratingAggregate?.avg_overall_score ?? null;
   const [statsSheetOpen, setStatsSheetOpen] = useState(false);
+  const roundsSheetOpen = searchParams.get('sheet') === 'rounds';
+  const closeRoundsSheet = useCallback(() => {
+    if (!roundsSheetOpen) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete('sheet');
+    setSearchParams(next, { replace: true });
+  }, [roundsSheetOpen, searchParams, setSearchParams]);
+  const fieldGross =
+    courseMeta?.course_par != null && courseStats?.avg_over_par != null
+      ? courseMeta.course_par + courseStats.avg_over_par
+      : null;
 
   // Fire once on first mount with the initial tab.
   const initialTabFired = useRef(false);
@@ -345,6 +357,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         courseLocation={formatCourseLocation(course)}
         courseRating={communityRating}
       />
+      <YourRoundsSheet
+        open={roundsSheetOpen}
+        onClose={closeRoundsSheet}
+        courseId={course.id}
+        courseName={course.name}
+        fieldAverage={fieldGross}
+      />
       </div>
     );
   }
@@ -366,6 +385,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         courseName={course.name}
         courseLocation={formatCourseLocation(course)}
         courseRating={communityRating}
+      />
+      <YourRoundsSheet
+        open={roundsSheetOpen}
+        onClose={closeRoundsSheet}
+        courseId={course.id}
+        courseName={course.name}
+        fieldAverage={fieldGross}
       />
     </>
   );

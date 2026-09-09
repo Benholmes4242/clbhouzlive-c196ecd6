@@ -81,7 +81,7 @@ export function useAllMyRoundsAtCourse(courseId?: string | null, enabled = true)
         course_par: number | null;
         tee_marker: string | null;
       }> = [];
-      let total = 0;
+      let exactTotal: number | null = null;
 
       for (let from = 0; ; from += pageSize) {
         const query = supabase
@@ -95,13 +95,13 @@ export function useAllMyRoundsAtCourse(courseId?: string | null, enabled = true)
           .range(from, from + pageSize - 1);
         const { data, error, count } = await query;
         if (error) throw error;
-        if (from === 0) total = count ?? 0;
+        if (from === 0) exactTotal = count;
         rows.push(...((data ?? []) as typeof rows));
-        if ((data?.length ?? 0) < pageSize || rows.length >= total) break;
+        if ((data?.length ?? 0) < pageSize || (exactTotal != null && rows.length >= exactTotal)) break;
       }
 
       return {
-        total,
+        total: exactTotal ?? rows.length,
         rounds: rows.map((r) => ({
           whsScoreId: r.whs_score_id,
           playDate: r.play_date,
