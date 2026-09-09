@@ -531,7 +531,6 @@ const HandicapPage: React.FC = () => {
           displayName={displayName}
           readOnly={isFriendView}
           friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
-          friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
           friendUsername={isFriendView ? profile?.username : null}
           viewerUserId={user.id}
         />
