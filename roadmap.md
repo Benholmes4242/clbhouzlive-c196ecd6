@@ -132,3 +132,11 @@
 - [x] Render one-track par comparisons and the full flat stroke-index ladder without its colour legend.
 - [x] Preserve the 20-round gate and retain the routed fallback because the You tab also links here.
 - [ ] Capture populated viewer/unplayed 390px states when authenticated preview data is available.
+
+## WHS handicap index reconciliation (9 Sep 2026)
+- [ ] Identify every current Handicap Index calculation and hardcoded model reference.
+- [ ] Prove or correct the 40-score eligibility pool, latest-20 window, best-8 selection, differential formula, 9-hole normalization, and three-differential minimum.
+- [ ] Diagnose the timeline spike and reconstruct historical points from score history where possible.
+- [ ] Audit WHS score-history identity/upsert behavior for repeated or stale records.
+- [ ] Align calculation explanations and all affected locales with the verified model.
+- [ ] Validate against a reproducible fixture and report data/deployment limitations.
