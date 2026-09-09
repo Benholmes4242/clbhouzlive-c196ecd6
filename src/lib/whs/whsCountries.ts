@@ -7,6 +7,8 @@ export interface WhsCountry {
   iso: string;
   /** Governing body name shown in the picker and pill. */
   body: string;
+  /** Supported product names shown only on the country-picker row. */
+  pickerBody?: string;
   /** Short marketing line for the connect form header. */
   bodyShort?: string;
   /** True when the user can actually log in via this body today. */
@@ -21,6 +23,7 @@ export const WHS_COUNTRIES: WhsCountry[] = [
     name: 'England',
     iso: 'GB-ENG',
     body: 'England Golf',
+    pickerBody: 'England Golf / iPlay / iGolf',
     bodyShort: 'MyEG',
     supported: true,
   },

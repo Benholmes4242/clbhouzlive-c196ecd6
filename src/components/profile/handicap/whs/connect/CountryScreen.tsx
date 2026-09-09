@@ -23,7 +23,10 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
   const { live, notYet, empty } = useMemo(() => {
     const q = query.trim().toLowerCase();
     const match = (c: WhsCountry) =>
-      !q || c.name.toLowerCase().includes(q) || c.body.toLowerCase().includes(q);
+      !q ||
+      c.name.toLowerCase().includes(q) ||
+      c.body.toLowerCase().includes(q) ||
+      c.pickerBody?.toLowerCase().includes(q);
     const filtered = WHS_COUNTRIES.filter(match);
     const unsupported = filtered.filter((c) => !c.supported);
     return {
@@ -106,7 +109,9 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
                 <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: INK }}>
                   {c.name}
                 </div>
-                <div style={{ ...LABEL_LG, color: MUTE, marginTop: 8 }}>{c.body}</div>
+                <div style={{ ...LABEL_LG, color: MUTE, marginTop: 8, whiteSpace: 'nowrap' }}>
+                  {c.pickerBody ?? c.body}
+                </div>
               </div>
               <ChevronRight size={18} color={DIM} strokeWidth={2.2} />
             </button>
