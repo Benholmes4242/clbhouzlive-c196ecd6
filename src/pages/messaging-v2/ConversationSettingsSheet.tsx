@@ -373,7 +373,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const goCompare = useCallback(() => {
     if (!rivalUserId) return;
     onClose();
-    navigate(`/handicap?subtab=circle&compare=${encodeURIComponent(rivalUserId)}`);
+    navigate(`/handicap?compare=${encodeURIComponent(rivalUserId)}`);
   }, [rivalUserId, navigate, onClose]);
 
   const handleBlock = useCallback(async () => {

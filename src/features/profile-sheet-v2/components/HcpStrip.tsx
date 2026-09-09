@@ -432,7 +432,7 @@ const TrendCard: React.FC<{
           </div>
           <button
             type="button"
-            onClick={() => onNavigate('/handicap?subtab=today')}
+            onClick={() => onNavigate('/handicap')}
             style={{
               border: 'none',
               background: 'transparent',

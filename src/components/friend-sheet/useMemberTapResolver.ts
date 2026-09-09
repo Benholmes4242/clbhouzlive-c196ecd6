@@ -53,7 +53,7 @@ export interface MemberTapArgs {
 
 /** The compare destination. One string, one place. */
 export function compareRouteFor(userId: string): string {
-  return `/handicap?subtab=circle&compare=${encodeURIComponent(userId)}`;
+  return `/handicap?compare=${encodeURIComponent(userId)}`;
 }
 
 export function useMemberTapResolver() {

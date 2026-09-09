@@ -47,7 +47,9 @@ const firstName = (n: string | null | undefined): string =>
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { resolveHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
+// TABS REMOVED (Sep 2026). resolveHandicapSubtab / HandicapSubtab are no longer
+// read here: the handicap area is ONE scrolling page. `whs/types.ts` keeps the
+// alias table (dead list) so nothing that still imports it breaks.
 import { useTranslation } from 'react-i18next';
 
 
@@ -75,10 +77,6 @@ interface HeaderProps {
   displayName: string | null;
   /** When true, hides the sync pill + more menu. */
   readOnly: boolean;
-  activeTab: HandicapSubtab;
-  onTabChange: (tab: HandicapSubtab) => void;
-  /** When false (own mode + no WHS connection), hide tab strip / trophy / subhead. */
-  hasConnection: boolean;
   /** Friend mode: avatar URL for the tappable title row. */
   friendAvatarUrl?: string | null;
   /** Friend mode: username for /profile/:username navigation. */
@@ -196,36 +194,13 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   ownerUserId,
   displayName,
   readOnly,
-  activeTab,
-  onTabChange,
-  hasConnection,
   friendAvatarUrl,
   friendUsername,
   viewerUserId,
 }) => {
-  const greeting = useMemo(() => getGreeting(), []);
-  const { t } = useTranslation('common');
-
-  const subheadOwn = useMemo(() => {
-    const dateStr = formatWeekdayDayMonthShortGB(new Date());
-    return displayName
-      ? `${greeting}, ${displayName} · ${dateStr}`
-      : `${greeting} · ${dateStr}`;
-  }, [greeting, displayName]);
-
-  // Three tabs. Circle remains available in friend view; its owner-only
-  // sections (invite, personal leaderboard affordances) are suppressed by
-  // `readOnly` inside the sections themselves.
-  const tabs = useMemo(
-    () => [
-      { id: 'today', label: t('handicap.tab.today', 'Today') },
-      { id: 'form', label: t('handicap.tab.form', 'Form') },
-      { id: 'circle', label: t('handicap.tab.circle', 'Circle') },
-    ],
-    [t]
-  );
-
-
+  // THE TAB STRIP IS GONE. Today / Form / Circle are one scrolling page, so
+  // there is no sub-navigation on this surface at all. What survives here is
+  // the friend-view title row and its compare CTA.
   return (
     <>
       {readOnly ? (
@@ -245,58 +220,6 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           ownerUserId={ownerUserId}
           ownerFirstName={firstName(displayName)}
         />
-      )}
-
-      {(readOnly || hasConnection) && (
-        <div
-          style={{
-            fontFamily: FONT_SF,
-            background: 'var(--hcp-bg-0)',
-          }}
-        >
-          <div
-            role="tablist"
-            style={{
-              display: 'flex',
-              justifyContent: 'space-evenly',
-              padding: '0 16px',
-            }}
-          >
-            {tabs.map(tab => {
-              const active = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => onTabChange(tab.id as HandicapSubtab)}
-                  role="tab"
-                  aria-selected={active}
-                  style={{
-                    flex: '0 0 auto',
-                    height: 48,
-                    padding: '0 4px',
-                    borderRadius: 0,
-                    border: 'none',
-                    background: 'transparent',
-                    color: active ? '#FFFFFF' : 'rgba(255,255,255,0.40)',
-                    fontFamily: 'inherit',
-                    fontSize: 17,
-                    fontWeight: active ? 700 : 600,
-                    letterSpacing: '-0.01em',
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    position: 'relative',
-                    transition: 'color 0.15s',
-                  }}
-                >
-                  <span style={{ display: 'inline-block' }}>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
       )}
     </>
   );
@@ -365,25 +288,21 @@ const HandicapPage: React.FC = () => {
   const isFriendView = !!friendId && !!user?.id && friendId !== user.id;
   const ownerUserId = isFriendView ? friendId! : user?.id ?? null;
 
-  const rawSubtab = searchParams.get('subtab');
-  // Legacy five-tab deep links (overview / trends / records / friends /
-  // legends) are aliased to the three live tabs before validation, then the
-  // URL is REPLACED so the address bar shows the new value.
-  const { subtab: activeTab, migrated } = resolveHandicapSubtab(rawSubtab);
-
+  /**
+   * ?subtab= IS A STALE PARAM, NOT A CONTROL ANY MORE.
+   * Bookmarks, delivered pushes and stored notification routes still carry
+   * today / form / circle AND the five legacy values (overview / trends /
+   * records / friends / legends). All of them must load this page without
+   * error and without a blank render, so the value is simply IGNORED and the
+   * param is stripped with replace — exactly as the migration effect used to
+   * rewrite it. `?compare=` and every other param are preserved untouched.
+   */
   useEffect(() => {
-    if (!migrated) return;
+    if (!searchParams.has('subtab')) return;
     const next = new URLSearchParams(searchParams);
-    next.set('subtab', activeTab);
+    next.delete('subtab');
     setSearchParams(next, { replace: true });
-  }, [migrated, activeTab, searchParams, setSearchParams]);
-
-  const handleTabChange = useCallback((next: HandicapSubtab) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('subtab', next);
-    setSearchParams(params, { replace: true });
-    analyticsEvents.track('handicap_tab_changed', { from: activeTab, to: next });
-  }, [searchParams, setSearchParams, activeTab]);
+  }, [searchParams, setSearchParams]);
 
 
   // Deep-link: ?score=<whs score id> opens the canonical scorecard sheet over
@@ -544,7 +463,7 @@ const HandicapPage: React.FC = () => {
   if (friendId) {
     return (
       <Navigate
-        to={`/handicap?subtab=circle&compare=${encodeURIComponent(friendId)}`}
+        to={`/handicap?compare=${encodeURIComponent(friendId)}`}
         replace
       />
     );
@@ -611,9 +530,6 @@ const HandicapPage: React.FC = () => {
           ownerUserId={ownerUserId}
           displayName={displayName}
           readOnly={isFriendView}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          hasConnection={hasConnection}
           friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
           friendUsername={isFriendView ? profile?.username : null}
           viewerUserId={user.id}
