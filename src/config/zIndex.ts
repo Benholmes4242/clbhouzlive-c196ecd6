@@ -11,6 +11,9 @@ export const Z = {
   // Base UI layers
   header: 1000,
   nav: 999,
+  // Sticky content chrome: the inset scrim sits directly below its row.
+  stickyTabs: 30,
+  stickySafeArea: 29,
   
   // Toast notifications (highest priority)
   toast: 12000,
@@ -57,6 +60,8 @@ export const Z = {
     header: { zIndex: 1000 },
     searchOverlay: { zIndex: 10100 },
     nav: { zIndex: 999 },
+    stickyTabs: { zIndex: 30 },
+    stickySafeArea: { zIndex: 29 },
     toast: { zIndex: 12000 },
     hub: { zIndex: 12000 },
     sheetBackdrop: { zIndex: 12002 },

@@ -1,5 +1,11 @@
 # Roadmap
 
+## Course detail snags 02 (9 Sep 2026)
+- [x] Detect the Course tab row's true sticky boundary with a safe-area-aware sentinel observer.
+- [x] Paint only the safe-area strip with the exact tab-row canvas while stuck.
+- [x] Register adjacent sticky-row and inset-scrim z-layers.
+- [ ] Verify transparent/restuck/return states with simulated insets and attach the 3x stuck screenshot.
+
 ## Course detail snags 01 (9 Sep 2026)
 - [x] Share Explore's 340px hero height with both Course detail mounts and remove only the canvas fade.
 - [x] Centre the four Course facts in equal grid columns with canonical figure treatment.
