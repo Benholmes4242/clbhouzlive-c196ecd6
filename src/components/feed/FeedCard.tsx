@@ -383,9 +383,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const subLine = useMemo(() => {
     const parts: string[] = [];
     if (post.creatorRelation === 'system') parts.push('clbhouz');
-    parts.push(timeAgo(post.createdAt));
+    /* SECTION D: past 30 days the header states the date instead of softening
+       it to "4mo". Opt-in flag — every other caller of this formatter is
+       unchanged. */
+    parts.push(timeAgo(post.createdAt, { absoluteAfterDays: 30 }));
     return parts.filter(Boolean).join(' · ');
   }, [post]);
+
 
 
   const mediaUrl = media?.imageUrl || media?.thumbnailUrl || '';
