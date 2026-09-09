@@ -44,6 +44,8 @@ import { setIslandEdgeScrolled } from '@/features/chrome-v2/islandEdge';
 import { WireFeedSlide } from '@/features/tourhub/news/WireFeedSlide';
 import type { ClubhouseFeedItem } from './injectWireStories';
 import { CANVAS, SLAB } from './feedSurfaces';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
