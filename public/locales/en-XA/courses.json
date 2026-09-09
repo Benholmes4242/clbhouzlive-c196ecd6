@@ -298,9 +298,18 @@
       "yourGapVsField": "[~~Ýőúř ĝáƥ ṽš ƒíéļđ~~]"
     },
     "legends": {
+      "allTime": "all time",
       "closestDuel": "[~~Ýőúř ĉļőšéšţ đúéļ~~]",
       "closestDuelBody": "[~~Ţĥé ĉřőŵñ ýőú'řé ĉļőšéšţ ţő ţáǩíñĝ áţ ţĥíš ĉļúƀ.~~]",
-      "errorLoading": "[~~Ĉőúļđñ'ţ ļőáđ ĉőúřšé ĉřőŵñš~~]"
+      "errorLoading": "[~~Ĉőúļđñ'ţ ļőáđ ĉőúřšé ĉřőŵñš~~]",
+      "fromChampion": "{{count}} {{unit}} from champion",
+      "last90Days": "last 90 days",
+      "units": {
+        "ace_one": "ace", "ace_other": "aces", "albatross_one": "albatross", "albatross_other": "albatrosses",
+        "birdie_one": "birdie", "birdie_other": "birdies", "differentialShot_one": "shot against handicap", "differentialShot_other": "shots against handicap",
+        "eagle_one": "eagle", "eagle_other": "eagles", "point_one": "point", "point_other": "points",
+        "round_one": "round", "round_other": "rounds", "shot_one": "shot", "shot_other": "shots"
+      }
     },
     "locationPills": {
       "separator": "[~~›~~]"
