@@ -116,9 +116,17 @@ export const FeedCommentPreview: React.FC<Props> = ({
 
   if (!lines.length) return null;
 
-  // The tally, not the list length: comment_count is the stored column.
-  const total = Math.max(commentCount, preview?.thread_count ?? 0, lines.length);
-  const showSeeAll = total > 2;
+  /**
+   * THE SEE-ALL IS THE STORED COLUMN, NEVER A LIVE RECOUNT — the glyph beside
+   * it reads posts.comment_count and the two must not disagree. But the lines
+   * above are real comments_v2 rows, and on the handful of posts where the
+   * stored count lags the rows, a see-all would print a total SMALLER than
+   * what is already on screen. In that case say nothing about a total: show
+   * the comments, suppress the see-all entirely.
+   */
+  const total = commentCount;
+  const showSeeAll = total > lines.length;
+
 
   return (
     <div
