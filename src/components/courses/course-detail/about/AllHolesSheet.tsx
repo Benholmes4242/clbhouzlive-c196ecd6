@@ -10,9 +10,8 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { buildSiLadder, type SiLadder as SiLadderData, type SiLadderRow } from '@/features/courses/_shared/siLadder';
 import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { BUCKETS, courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
-import { buildParTypeRows, type ParTypeRow } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
+import { buildParTypeRows, type ParTypeRow } from '@/features/courses/components/holes/analytical/parTypeRows';
 import AboutSection, { ABOUT_KICKER, AboutHairline } from './AboutSection';
-import { CourseDistributionSummary } from './HowItPlays';
 
 const MIN_ROUNDS = 20;
 const ROW_KICKER: React.CSSProperties = {
@@ -44,6 +43,23 @@ const SheetFigure: React.FC<{ label: string; value: string; amber?: boolean }> =
     <div style={{ ...ABOUT_KICKER, marginTop: 5, whiteSpace: 'nowrap' }}>{label}</div>
   </div>
 );
+
+const DistributionSummary: React.FC<{ shares: BucketShares }> = ({ shares }) => {
+  const { t } = useTranslation('courses');
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8 }}>
+      {BUCKETS.map((bucket) => (
+        <div key={bucket.key} style={{ minWidth: 0 }}>
+          <div style={{ height: 4, borderRadius: BAR_RADIUS, background: bucket.bg }} />
+          <div style={{ ...FIGURE, marginTop: 7, fontSize: 13, fontWeight: 700, color: A.INK }}>
+            {Math.round(shares[bucket.key] * 100)}%
+          </div>
+          <div style={{ ...ABOUT_KICKER, marginTop: 3 }}>{t(bucket.labelKey.replace('courses:', ''))}</div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const HoleDistribution: React.FC<{ hole: CourseHole }> = ({ hole }) => {
   const values = bucketValues(hole);
@@ -162,7 +178,7 @@ const ParTracks: React.FC<{ rows: ParTypeRow[]; hasYou: boolean }> = ({ rows, ha
   );
 };
 
-const ladderTone = (row: SiLadderRow) => row.direction === 'harder' ? A.RED : row.direction === 'easier' ? A.GREEN : `color-mix(in srgb, ${A.INK} 14%, transparent)`;
+const ladderTone = (row: SiLadderRow) => row.direction === 'harder' ? A.RED : row.direction === 'easier' ? A.GREEN : A.INK;
 
 const FlatSiLadder: React.FC<{ ladder: SiLadderData }> = ({ ladder }) => {
   const { t } = useTranslation('courses');
@@ -185,7 +201,7 @@ const FlatSiLadder: React.FC<{ ladder: SiLadderData }> = ({ ladder }) => {
         </span>
         <svg viewBox={`0 0 100 ${height}`} preserveAspectRatio="none" width="100%" height={height} style={{ display: 'block', overflow: 'visible' }} aria-hidden="true">
           {rows.map((row) => (
-            <line key={row.holeNo} x1={1} y1={y(row.strokeIndex)} x2={99} y2={y(row.measuredRank)} stroke={ladderTone(row)} strokeWidth={row.flagged ? 2 : 1} vectorEffect="non-scaling-stroke" />
+            <line key={row.holeNo} x1={1} y1={y(row.strokeIndex)} x2={99} y2={y(row.measuredRank)} stroke={ladderTone(row)} strokeOpacity={row.flagged ? 1 : 0.14} strokeWidth={row.flagged ? 2 : 1} vectorEffect="non-scaling-stroke" />
           ))}
         </svg>
         <span>
@@ -217,7 +233,7 @@ const FlatSiLadder: React.FC<{ ladder: SiLadderData }> = ({ ladder }) => {
       ) : null}
 
       <p style={{ margin: '14px 0 0', fontFamily: SANS, fontSize: 11, lineHeight: 1.55, color: A.DIM }}>
-        {t('courseDetail.allHolesSheet.explainer', { floor: ladder.shotsFloor.toFixed(2) })}
+        {t('courseDetail.allHolesSheet.explainer')}
       </p>
     </>
   );
@@ -311,7 +327,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
         ) : (
           <>
             <AboutSection first heading={t('courseDetail.allHolesSheet.holes')}>
-              {shares ? <CourseDistributionSummary shares={shares} /> : null}
+              {shares ? <DistributionSummary shares={shares} /> : null}
               <div style={{ marginTop: shares ? 16 : 0 }}>
                 {holes.map((hole, index) => (
                   <CompactHoleRow key={hole.hole_no} hole={hole} mine={myByHole.get(hole.hole_no) ?? null} hasYou={hasYou} last={index === holes.length - 1} />

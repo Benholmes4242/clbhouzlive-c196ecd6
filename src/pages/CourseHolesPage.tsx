@@ -10,7 +10,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -42,6 +42,10 @@ const CourseHolesPage: React.FC = () => {
     viewFired.current = true;
     analyticsEvents.track('course_holes_page_viewed', { course_id: courseId, scope: personal ? 'you' : 'course' });
   }, [courseId, personal]);
+
+  if (!personal && courseId) {
+    return <Navigate to={`/courses/${courseId}?sheet=holes`} replace />;
+  }
 
   return (
     <div

@@ -17,6 +17,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
@@ -210,6 +211,7 @@ interface HowItPlaysProps {
 
 const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
   const { t } = useTranslation('courses');
+  const [searchParams, setSearchParams] = useSearchParams();
   const [allHolesOpen, setAllHolesOpen] = React.useState(false);
   const { user } = useSupabaseSession();
   const viewerId = user?.id;
@@ -259,6 +261,18 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
   const openDrillDown = () => {
     analyticsEvents.track('course_all_18_holes', { course_id: courseId, holes: holes.length });
     setAllHolesOpen(true);
+  };
+
+  React.useEffect(() => {
+    if (searchParams.get('sheet') === 'holes') setAllHolesOpen(true);
+  }, [searchParams]);
+
+  const closeDrillDown = () => {
+    setAllHolesOpen(false);
+    if (searchParams.get('sheet') !== 'holes') return;
+    const next = new URLSearchParams(searchParams);
+    next.delete('sheet');
+    setSearchParams(next, { replace: true });
   };
 
   /* ── STATE C — nothing has been played here. The reader decides the second
@@ -350,7 +364,7 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
       <DrillDownRow holes={holes.length} onPress={openDrillDown} />
       <AllHolesSheet
         open={allHolesOpen}
-        onClose={() => setAllHolesOpen(false)}
+        onClose={closeDrillDown}
         courseId={courseId}
         courseName={courseName ?? ''}
       />
