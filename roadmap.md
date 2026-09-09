@@ -126,8 +126,8 @@
 - [x] Audit every immersive route and verify top/restuck/no-notch/landscape states.
 
 ## All 18 holes sheet (9 Sep 2026)
-- [ ] Replace the pushed all-holes page with an 85dvh analytical bottom sheet.
-- [ ] Move course context and field/viewer figures into a fixed sheet head without repeating the 18-bar chart.
-- [ ] Render the distribution summary and all 18 compact hole rows without truncation or see-all.
-- [ ] Render one-track par comparisons and the full flat stroke-index ladder without its colour legend.
+- [x] Replace the pushed all-holes page with an 85dvh analytical bottom sheet.
+- [x] Move course context and field/viewer figures into a fixed sheet head without repeating the 18-bar chart.
+- [x] Render the distribution summary and all 18 compact hole rows without truncation or see-all.
+- [x] Render one-track par comparisons and the full flat stroke-index ladder without its colour legend.
 - [ ] Preserve the 20-round gate, audit routed fallback needs, and verify no-viewer/390px states.

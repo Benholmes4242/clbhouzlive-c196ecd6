@@ -23,9 +23,7 @@
  *
  * MOVED, NOT DELETED: how each par plays for you, how your round unfolds by
  * thirds, the hole-ranked list with its advice line and the donut split all
- * render on /courses/:courseId/holes?scope=you — the SAME destination as the
- * Course tab's drill-down with a personal scope, because it is the same
- * eighteen holes seen from one side.
+ * The All 18 action opens the same analytical sheet as the Course tab.
  *
  * ASCII only.
  */
@@ -287,7 +285,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         field={fieldHoles}
         onAllHoles={() => {
           analyticsEvents.track('course_you_all_18_holes', { course_id: courseId, holes: mine.length });
-          navigate(`/courses/${courseId}/holes?scope=you`);
+          navigate(`/courses/${courseId}?tab=you&sheet=holes`);
         }}
       />
 

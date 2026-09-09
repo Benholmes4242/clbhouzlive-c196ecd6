@@ -264,7 +264,7 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
   };
 
   React.useEffect(() => {
-    if (searchParams.get('sheet') === 'holes') setAllHolesOpen(true);
+    setAllHolesOpen(searchParams.get('sheet') === 'holes');
   }, [searchParams]);
 
   const closeDrillDown = () => {
