@@ -653,7 +653,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
   const countryTriggerLabel = country ?? t('statBrowse.allAreas');
   const browseBoards = COURSE_BROWSE_LENSES.map((value) => ({
-    value,
+    id: value,
     label: value === 'rated'
       ? 'Best rated'
       : value === 'played'
@@ -661,7 +661,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         : value === 'toughest'
           ? 'Hardest'
           : 'Easiest',
-    disabled: !!lensUnavailableReason(value),
   }));
 
   /**
@@ -879,7 +878,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         </div>
         <div className="mt-2.5 -mx-4">
           <RailChips
-            items={browseBoards}
+            options={browseBoards}
             value={lens}
             onChange={(value) => onLensChange(value as StatLens)}
             ariaLabel="Choose course board"
