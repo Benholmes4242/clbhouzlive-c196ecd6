@@ -831,68 +831,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
 
 
-      {/* Course band: identity + figures + actions in ONE container. */}
+      {/* Course band: identity + figures. The actions row is NO LONGER passed
+          in — section A moved it into one always-present footer below, so a
+          post with a course and a post without one end on the same object. */}
       {(() => {
         const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
           .filter(Boolean)
           .join(', ');
         const hasCourse = Boolean(post.courseName || courseContext);
 
-        /* SHOW WHO LIKED A POST — the avatar row is the SINGLE entry point on a
-           card. The like count in the actions row stays untappable: two targets
-           six pixels apart is a mis-tap. Zero likes renders no row and no gap. */
-        const showLikedBy = likeCount > 0;
-
-        const actionsRow = (
-          <div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: showLikedBy ? '10px 14px 6px' : '10px 14px 12px',
-              }}
-            >
-              <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
-              <FooterButton
-                icon={Heart}
-                label={formatCount(likeCount)}
-                active={liked}
-                onClick={() => onLike(post, effectiveActor)}
-                activeColor={AMBER}
-                haptic={!liked ? 'selection' : 'none'}
-              />
-              <FooterButton
-                icon={MessageCircle}
-                label={formatCount(commentCount)}
-                onClick={() => onComment(post, effectiveActor)}
-              />
-              <FooterButton icon={Share} onClick={() => onShare(post)} />
-            </div>
-            {showLikedBy && (
-              <LikedByRow
-                postId={post.id}
-                count={likeCount}
-                surfaceColor={CARD}
-                style={{ padding: '0 14px 12px' }}
-              />
-            )}
-          </div>
-        );
-
-
-        if (!hasCourse) {
-          return (
-            <div
-              style={{
-                borderTop: `0.5px solid ${LINE}`,
-                background: hasRoundBackdrop ? CARD : undefined,
-              }}
-            >
-              {actionsRow}
-            </div>
-          );
-        }
+        if (!hasCourse) return null;
 
         return (
           <>
@@ -911,7 +859,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               courseRating={post.courseRating ?? null}
               ctx={courseContext ?? null}
               onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
-              actions={actionsRow}
               surface={hasRoundBackdrop ? 'glass' : 'solid'}
             />
             {post.courseId && statsOpen && (
@@ -927,6 +874,62 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           </>
         );
       })()}
+
+      {/* THE FOOTER (section A). ONE always-present object, last on every card,
+          whatever the card carries: header, body, media, course band, footer.
+          The hairline runs the full width of the slab; the content is inset to
+          the 20px gutter. Counts are glyph-only at zero — a "0" beside a heart
+          reads as a state, and there is no state to report. */}
+      {(() => {
+        /* SHOW WHO LIKED A POST — the liked-by line is the SINGLE entry point on
+           a card. The like count in the actions row stays untappable: two
+           targets six pixels apart is a mis-tap. Zero likes renders no line and
+           no gap. */
+        const showLikedBy = likeCount > 0;
+
+        return (
+          <div
+            style={{
+              borderTop: `0.5px solid ${LINE}`,
+              background: hasRoundBackdrop ? CARD : undefined,
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: showLikedBy ? '10px 20px 6px' : '10px 20px 12px',
+              }}
+            >
+              <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
+              <FooterButton
+                icon={Heart}
+                label={likeCount > 0 ? formatCount(likeCount) : undefined}
+                active={liked}
+                onClick={() => onLike(post, effectiveActor)}
+                activeColor={AMBER}
+                haptic={!liked ? 'selection' : 'none'}
+              />
+              <FooterButton
+                icon={MessageCircle}
+                label={commentCount > 0 ? formatCount(commentCount) : undefined}
+                onClick={() => onComment(post, effectiveActor)}
+              />
+              <FooterButton icon={Share} onClick={() => onShare(post)} />
+            </div>
+            {showLikedBy && (
+              <LikedByRow
+                postId={post.id}
+                count={likeCount}
+                surfaceColor={CARD}
+                style={{ padding: '0 20px 12px' }}
+              />
+            )}
+          </div>
+        );
+      })()}
+
 
       {/* Comment preview + add-a-comment prompt. Sits BETWEEN the action row
           and nothing else: one comment with an invitation beneath it reads as
