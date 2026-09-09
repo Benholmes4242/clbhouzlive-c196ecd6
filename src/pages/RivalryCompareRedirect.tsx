@@ -32,8 +32,8 @@ const RivalryCompareRedirect: React.FC = () => {
    */
   void friendUserId;
   const to = rivalUserId
-    ? `/handicap?subtab=circle&compare=${encodeURIComponent(rivalUserId)}`
-    : '/handicap?subtab=circle';
+    ? `/handicap?compare=${encodeURIComponent(rivalUserId)}`
+    : '/handicap';
 
   return <Navigate to={to} replace />;
 };

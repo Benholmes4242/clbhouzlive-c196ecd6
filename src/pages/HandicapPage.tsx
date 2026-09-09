@@ -463,7 +463,7 @@ const HandicapPage: React.FC = () => {
   if (friendId) {
     return (
       <Navigate
-        to={`/handicap?subtab=circle&compare=${encodeURIComponent(friendId)}`}
+        to={`/handicap?compare=${encodeURIComponent(friendId)}`}
         replace
       />
     );
