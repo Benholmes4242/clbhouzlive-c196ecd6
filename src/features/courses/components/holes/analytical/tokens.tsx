@@ -180,6 +180,7 @@ export function difficultyRampColor(t: number): string {
   return difficultyRampStop(Math.round(k * (DIFFICULTY_RAMP.length - 1)));
 }
 
+
 function relLuminance(colour: string): number | null {
   let rgb: number[] | null = null;
   const hex = colour.trim().replace('#', '');

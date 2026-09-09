@@ -17,7 +17,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
@@ -28,6 +28,7 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
+import AllHolesSheet from './AllHolesSheet';
 
 const CHART_HEIGHT = 82;
 
@@ -115,7 +116,7 @@ const LocalHoleChart: React.FC<{
   );
 };
 
-const LocalDistribution: React.FC<{ shares: BucketShares }> = ({ shares }) => {
+export const CourseDistributionSummary: React.FC<{ shares: BucketShares }> = ({ shares }) => {
   const { t } = useTranslation('courses');
   const columns = [
     { key: 'birdie' as const, color: RAMP_TOPAR.birdie, label: t('holes.preview.legendBirdie') },
@@ -210,7 +211,8 @@ interface HowItPlaysProps {
 
 const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
   const { t } = useTranslation('courses');
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [allHolesOpen, setAllHolesOpen] = React.useState(false);
   const { user } = useSupabaseSession();
   const viewerId = user?.id;
   const { data: connection } = useWhsConnection(viewerId);
@@ -258,8 +260,31 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
 
   const openDrillDown = () => {
     analyticsEvents.track('course_all_18_holes', { course_id: courseId, holes: holes.length });
-    navigate(`/courses/${courseId}/holes`);
+    const next = new URLSearchParams(searchParams);
+    next.set('sheet', 'holes');
+    setSearchParams(next, { replace: true });
   };
+
+  React.useEffect(() => {
+    setAllHolesOpen(searchParams.get('sheet') === 'holes');
+  }, [searchParams]);
+
+  const closeDrillDown = () => {
+    setAllHolesOpen(false);
+    if (searchParams.get('sheet') !== 'holes') return;
+    const next = new URLSearchParams(searchParams);
+    next.delete('sheet');
+    setSearchParams(next, { replace: true });
+  };
+
+  const allHolesSheet = (
+    <AllHolesSheet
+      open={allHolesOpen}
+      onClose={closeDrillDown}
+      courseId={courseId}
+      courseName={courseName ?? ''}
+    />
+  );
 
   /* ── STATE C — nothing has been played here. The reader decides the second
         line, not the course; both sentences are PORTED, not rewritten. ── */
@@ -267,18 +292,21 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
     /* Still resolving — say nothing rather than the wrong thing. */
     if (courseStats == null && data == null) return null;
     return (
-      <AboutSection heading={heading}>
-        <Sentence>
-          {t('discover.scores.noOnePlayed', { course: courseName ?? '\u2014' })}
-        </Sentence>
-        <div style={{ marginTop: 6 }}>
-          <Sentence quiet>
-            {connection
-              ? t('discover.scores.beTheFirst')
-              : t('discover.scores.connectToAppear')}
+      <>
+        <AboutSection heading={heading}>
+          <Sentence>
+            {t('discover.scores.noOnePlayed', { course: courseName ?? '\u2014' })}
           </Sentence>
-        </div>
-      </AboutSection>
+          <div style={{ marginTop: 6 }}>
+            <Sentence quiet>
+              {connection
+                ? t('discover.scores.beTheFirst')
+                : t('discover.scores.connectToAppear')}
+            </Sentence>
+          </div>
+        </AboutSection>
+        {allHolesSheet}
+      </>
     );
   }
 
@@ -289,14 +317,17 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
   if (!drawable) {
     if (awaitingMine) return null;
     return (
-      <AboutSection heading={heading} meta={meta}>
-        <Sentence quiet>
-          {t('courseDetail.plays.notEnoughRounds', {
-            count: courseRounds,
-            rounds: formatNumber(courseRounds),
-          })}
-        </Sentence>
-      </AboutSection>
+      <>
+        <AboutSection heading={heading} meta={meta}>
+          <Sentence quiet>
+            {t('courseDetail.plays.notEnoughRounds', {
+              count: courseRounds,
+              rounds: formatNumber(courseRounds),
+            })}
+          </Sentence>
+        </AboutSection>
+        {allHolesSheet}
+      </>
     );
   }
 
@@ -344,10 +375,11 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
       </div>
 
       {/* c) the course-wide spread, in the four scoring tones the rows use. */}
-      {shares ? <LocalDistribution shares={shares} /> : null}
+      {shares ? <CourseDistributionSummary shares={shares} /> : null}
 
       {/* d) the hairline and the one drill-down. */}
       <DrillDownRow holes={holes.length} onPress={openDrillDown} />
+      {allHolesSheet}
     </AboutSection>
   );
 };

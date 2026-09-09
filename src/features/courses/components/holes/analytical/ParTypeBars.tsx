@@ -17,7 +17,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { A, BAR_RADIUS, FIGS, toParParts } from './tokens';
-import type { ParTypeRow } from './CourseAnalyticsPanels';
+import type { ParTypeRow } from './parTypeRows';
 
 export interface SignedParScale {
   /** Symmetric bound: the domain runs from -bound to +bound. */

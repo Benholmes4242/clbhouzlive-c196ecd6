@@ -26,6 +26,8 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
 import { monotonePath, roundedCourseBarPath } from './chartGeometry';
 import { ParTypeBars } from './ParTypeBars';
+import { buildParTypeRows, type ParTypeRow } from './parTypeRows';
+export { buildParTypeRows, type ParTypeRow } from './parTypeRows';
 import {
   DistributionStrip,
   HoleRowV2,
@@ -350,39 +352,6 @@ export const ShapeChart: React.FC<{
  * A member with no rounds here sees the field alone - the course's own shape is
  * worth showing to someone who has never played it.
  */
-export interface ParTypeRow {
-  par: number;
-  holes: number;
-  field: number;
-  you: number | null;
-}
-
-export function buildParTypeRows(
-  holes: CourseHole[],
-  myByHole: Map<number, MyHolePerformanceRow>,
-): ParTypeRow[] {
-  const byPar = new Map<number, CourseHole[]>();
-  holes.forEach((h) => {
-    if (h.par == null || !Number.isFinite(h.avg_to_par)) return;
-    const list = byPar.get(h.par) ?? [];
-    list.push(h);
-    byPar.set(h.par, list);
-  });
-  return [...byPar.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .map(([par, list]) => {
-      const field = list.reduce((s, h) => s + h.avg_to_par, 0) / list.length;
-      const mine = list.map((h) => myByHole.get(h.hole_no)?.avg_to_par ?? null);
-      const complete = mine.every((v) => v != null && Number.isFinite(v));
-      return {
-        par,
-        holes: list.length,
-        field,
-        you: complete ? (mine as number[]).reduce((s, v) => s + v, 0) / mine.length : null,
-      };
-    });
-}
-
 const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number; fieldIsOnlyYou: boolean }> = ({ rows, fieldIsOnlyYou }) => {
   const { t } = useTranslation(['courses']);
   if (rows.length === 0) return null;

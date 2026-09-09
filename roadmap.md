@@ -124,3 +124,11 @@
 - [x] Extract the course-detail notch scrim into one opt-in shared component.
 - [x] Replace the Courses page scroll threshold with a safe-area-aware sentinel observer.
 - [x] Audit every immersive route and verify top/restuck/no-notch/landscape states.
+
+## All 18 holes sheet (9 Sep 2026)
+- [x] Replace the pushed all-holes page with an 85dvh analytical bottom sheet.
+- [x] Move course context and field/viewer figures into a fixed sheet head without repeating the 18-bar chart.
+- [x] Render the distribution summary and all 18 compact hole rows without truncation or see-all.
+- [x] Render one-track par comparisons and the full flat stroke-index ladder without its colour legend.
+- [x] Preserve the 20-round gate and retain the routed fallback because the You tab also links here.
+- [ ] Capture populated viewer/unplayed 390px states when authenticated preview data is available.

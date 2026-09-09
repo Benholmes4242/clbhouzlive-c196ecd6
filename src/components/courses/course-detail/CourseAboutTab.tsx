@@ -35,7 +35,7 @@ import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
  * BRIEF_COURSE_TAB_REBUILD §3.10 — THE LADDER HAS MOVED, NOT GONE.
  *
  * The SI ladder (with its explainer paragraph), the par-type bars and the
- * hole-by-hole rows now render on the drill-down at /courses/:courseId/holes.
+ * hole-by-hole rows now render in the All 18 holes analytical sheet.
  * SiLadder, buildSiLadder and CourseAnalyticsPanels are all untouched; only the
  * surface that calls them changed, so this tab no longer imports them.
  */
@@ -153,7 +153,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
         {/* §3.4 — HOW IT PLAYS, flat. The chart, four figures and the course-wide
             distribution stay here; hole by hole, how each par plays and the SI
-            ladder move behind the one drill-down (§3.10, /courses/:id/holes).
+            ladder move behind the one All 18 holes sheet (§3.10).
             Nothing is deleted — those components render on that page instead. */}
         <HowItPlays courseId={course.id} courseName={course.name} />
 
