@@ -47,7 +47,9 @@ const firstName = (n: string | null | undefined): string =>
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { resolveHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
+// TABS REMOVED (Sep 2026). resolveHandicapSubtab / HandicapSubtab are no longer
+// read here: the handicap area is ONE scrolling page. `whs/types.ts` keeps the
+// alias table (dead list) so nothing that still imports it breaks.
 import { useTranslation } from 'react-i18next';
 
 
@@ -75,10 +77,6 @@ interface HeaderProps {
   displayName: string | null;
   /** When true, hides the sync pill + more menu. */
   readOnly: boolean;
-  activeTab: HandicapSubtab;
-  onTabChange: (tab: HandicapSubtab) => void;
-  /** When false (own mode + no WHS connection), hide tab strip / trophy / subhead. */
-  hasConnection: boolean;
   /** Friend mode: avatar URL for the tappable title row. */
   friendAvatarUrl?: string | null;
   /** Friend mode: username for /profile/:username navigation. */
