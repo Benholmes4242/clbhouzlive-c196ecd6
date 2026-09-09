@@ -584,6 +584,8 @@
     }
   },
   "courseDetail": {
+    "whoPlaysHereMeta_one": "1 golfer",
+    "whoPlaysHereMeta_other": "{{count}} golfers",
     "claim": {
       "cta": {
         "title": "Own or manage this course?",
