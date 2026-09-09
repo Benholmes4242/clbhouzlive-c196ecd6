@@ -11,6 +11,7 @@
  * sense when every row is visible, and it arrives as a prop on that same row.
  */
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { positionsFor } from '../drilldown/_shared/boardParts';
@@ -50,6 +51,7 @@ export const FlatBoardSheet: React.FC<Props> = ({
   onCategoryChange,
   onRowPress,
 }) => {
+  const { t } = useTranslation('courses');
   const [activeKey, setActiveKey] = useState<LegendCategory>(initialCategory);
 
   useEffect(() => {
@@ -78,8 +80,8 @@ export const FlatBoardSheet: React.FC<Props> = ({
   if (!active) return null;
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light" maxHeight="88dvh">
-      <div style={{ padding: '4px 20px 8px', fontFamily: SANS }}>
+    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={A.CANVAS} maxHeight="88dvh">
+      <div style={{ padding: '4px 20px 8px', fontFamily: SANS, background: A.CANVAS }}>
         <div
           style={{
             fontSize: 9,
@@ -103,7 +105,7 @@ export const FlatBoardSheet: React.FC<Props> = ({
           {active.label}
         </div>
         <div style={{ marginTop: 4, fontSize: 11, fontWeight: 700, color: A.MUTE }}>
-          {windowMeta(total, legendWindow)}
+          {windowMeta(total, legendWindow, t)}
         </div>
 
         <div style={{ marginTop: 16 }}>
@@ -133,7 +135,7 @@ export const FlatBoardSheet: React.FC<Props> = ({
               category={active.key}
               coursePar={coursePar}
               rule={i > 0}
-              deficit={champion ? deficitFor(active.key, row, champion) : null}
+              deficit={champion ? deficitFor(active.key, row, champion, t) : null}
               onPress={onRowPress && row.username ? () => onRowPress(row) : undefined}
             />
           ))}

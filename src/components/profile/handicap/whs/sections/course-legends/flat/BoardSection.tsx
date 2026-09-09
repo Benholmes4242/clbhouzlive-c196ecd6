@@ -14,6 +14,7 @@
  * immediately beneath it, right-aligned on the same block.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { AboutSection, AboutHairline } from '@/components/courses/course-detail/about/AboutSection';
 import { positionsFor } from '../drilldown/_shared/boardParts';
@@ -62,6 +63,7 @@ export const BoardSection: React.FC<Props> = ({
   onOpenFull,
   onRowPress,
 }) => {
+  const { t } = useTranslation('courses');
   const chips: FlatChip[] = useMemo(
     () =>
       categories
@@ -86,7 +88,7 @@ export const BoardSection: React.FC<Props> = ({
   const viewerValue = rows.find((r) => r.isSelf)?.value ?? null;
 
   return (
-    <AboutSection heading={active.label} meta={windowMeta(total, legendWindow)} space={30}>
+    <AboutSection heading={active.label} meta={windowMeta(total, legendWindow, t)} space={30}>
       {canSwitchWindow ? (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 14, marginBottom: 12, fontFamily: SANS }}>
           {(['all_time', '90d'] as LegendWindow[]).map((w) => {
