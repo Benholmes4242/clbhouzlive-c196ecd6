@@ -86,7 +86,9 @@ describe('FeedCommentPreview mention integration', () => {
     const { container } = wrap(
       <FeedCommentPreview preview={{ ...preview, content: long }} commentCount={1} onOpenComments={() => {}} />,
     );
-    const clamp = container.querySelector('span[style*="white-space: nowrap"]');
+    // Section C: the clamp moved from an inner span onto the comment row itself.
+    const clamp = container.querySelector('div[style*="white-space: nowrap"]');
+
     expect(clamp).toHaveStyle({
       whiteSpace: 'nowrap',
       overflow: 'hidden',
