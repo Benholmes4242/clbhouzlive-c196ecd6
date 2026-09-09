@@ -120,3 +120,5 @@ export function LikedByRow({
   );
 }
 
+
+export default LikedByRow;
