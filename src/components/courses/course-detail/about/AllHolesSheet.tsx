@@ -8,7 +8,7 @@ import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/use
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { buildSiLadder, type SiLadder as SiLadderData, type SiLadderRow } from '@/features/courses/_shared/siLadder';
-import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts, toParTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { BUCKETS, courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { buildParTypeRows, type ParTypeRow } from '@/features/courses/components/holes/analytical/parTypeRows';
 import AboutSection, { ABOUT_KICKER, AboutHairline } from './AboutSection';
@@ -28,6 +28,12 @@ const FIGURE: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining-nums',
   letterSpacing: '-0.04em',
 };
+
+function toParTone(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return A.MUTE;
+  const rounded = Math.round(value * 10) / 10;
+  return rounded < 0 ? A.RED : rounded > 0 ? A.INK : A.MUTE;
+}
 
 function bucketValues(hole: CourseHole): number[] {
   return BUCKETS.map((bucket) =>
