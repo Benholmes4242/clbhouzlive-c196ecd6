@@ -20,6 +20,7 @@
  */
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Virtuoso, type VirtuosoHandle, type StateSnapshot } from 'react-virtuoso';
+import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
@@ -85,7 +86,7 @@ export interface CardFeedProps {
   posts: FeedPost[];
   feedItems?: ClubhouseFeedItem[];
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
-  onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
+  onComment: (post: FeedPost, actor?: ActiveActor | null, source?: CommentOpenSource) => void;
   onShare: (post: FeedPost) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;

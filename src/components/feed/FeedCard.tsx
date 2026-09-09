@@ -32,6 +32,7 @@ import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/Revi
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
+import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
@@ -98,7 +99,7 @@ export interface FeedCardProps {
   likeCount: number;
   commentCount: number;
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
-  onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
+  onComment: (post: FeedPost, actor?: ActiveActor | null, source?: CommentOpenSource) => void;
   onShare: (post: FeedPost) => void;
   onOpenMedia: (
     post: FeedPost,
