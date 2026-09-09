@@ -194,36 +194,13 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   ownerUserId,
   displayName,
   readOnly,
-  activeTab,
-  onTabChange,
-  hasConnection,
   friendAvatarUrl,
   friendUsername,
   viewerUserId,
 }) => {
-  const greeting = useMemo(() => getGreeting(), []);
-  const { t } = useTranslation('common');
-
-  const subheadOwn = useMemo(() => {
-    const dateStr = formatWeekdayDayMonthShortGB(new Date());
-    return displayName
-      ? `${greeting}, ${displayName} · ${dateStr}`
-      : `${greeting} · ${dateStr}`;
-  }, [greeting, displayName]);
-
-  // Three tabs. Circle remains available in friend view; its owner-only
-  // sections (invite, personal leaderboard affordances) are suppressed by
-  // `readOnly` inside the sections themselves.
-  const tabs = useMemo(
-    () => [
-      { id: 'today', label: t('handicap.tab.today', 'Today') },
-      { id: 'form', label: t('handicap.tab.form', 'Form') },
-      { id: 'circle', label: t('handicap.tab.circle', 'Circle') },
-    ],
-    [t]
-  );
-
-
+  // THE TAB STRIP IS GONE. Today / Form / Circle are one scrolling page, so
+  // there is no sub-navigation on this surface at all. What survives here is
+  // the friend-view title row and its compare CTA.
   return (
     <>
       {readOnly ? (
@@ -243,58 +220,6 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           ownerUserId={ownerUserId}
           ownerFirstName={firstName(displayName)}
         />
-      )}
-
-      {(readOnly || hasConnection) && (
-        <div
-          style={{
-            fontFamily: FONT_SF,
-            background: 'var(--hcp-bg-0)',
-          }}
-        >
-          <div
-            role="tablist"
-            style={{
-              display: 'flex',
-              justifyContent: 'space-evenly',
-              padding: '0 16px',
-            }}
-          >
-            {tabs.map(tab => {
-              const active = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => onTabChange(tab.id as HandicapSubtab)}
-                  role="tab"
-                  aria-selected={active}
-                  style={{
-                    flex: '0 0 auto',
-                    height: 48,
-                    padding: '0 4px',
-                    borderRadius: 0,
-                    border: 'none',
-                    background: 'transparent',
-                    color: active ? '#FFFFFF' : 'rgba(255,255,255,0.40)',
-                    fontFamily: 'inherit',
-                    fontSize: 17,
-                    fontWeight: active ? 700 : 600,
-                    letterSpacing: '-0.01em',
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    position: 'relative',
-                    transition: 'color 0.15s',
-                  }}
-                >
-                  <span style={{ display: 'inline-block' }}>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
       )}
     </>
   );
