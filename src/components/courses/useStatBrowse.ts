@@ -25,6 +25,9 @@ export const STAT_LENSES = [
   'chase',
 ] as const;
 
+/** The four boards exposed by the rebuilt Courses browse rail. */
+export const COURSE_BROWSE_LENSES = ['rated', 'played', 'toughest', 'scoreable'] as const;
+
 export type StatLens = (typeof STAT_LENSES)[number];
 
 export function isStatLens(v: string | null | undefined): v is StatLens {
@@ -50,6 +53,12 @@ export interface StatBrowseRow {
   course_record: number | null;
   open_crowns: number;
   total_count: number;
+  design_score: number | null;
+  condition_score: number | null;
+  clubhouse_score: number | null;
+  facilities_score: number | null;
+  difficulty_percentile: number | null;
+  memberships: Array<{ list_slug: string; rank: number }>;
 }
 
 /** Qualifying-course count per lens for one scope. */
@@ -100,7 +109,71 @@ function normaliseRow(raw: Record<string, unknown>): StatBrowseRow {
     course_record: num(raw.course_record),
     open_crowns: num(raw.open_crowns) ?? 0,
     total_count: num(raw.total_count) ?? 0,
+    design_score: null,
+    condition_score: null,
+    clubhouse_score: null,
+    facilities_score: null,
+    difficulty_percentile: null,
+    memberships: [],
   };
+}
+
+/**
+ * COUNT CONTRACT — these are deliberately different populations.
+ * ratedTotal: courses carrying a non-mock aggregate community rating.
+ * allPlayedTotal: distinct mapped course ids appearing in gam_round_stats,
+ * regardless of score/par/hole completeness.
+ * stat_browse_facets.played_total: analytics-ready 18-hole scored courses only.
+ */
+export function useCourseBrowseTruth() {
+  return useQuery({
+    queryKey: ['course-browse-truth'],
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const playedCourseIds = new Set<string>();
+      const PAGE_SIZE = 1000;
+      for (let from = 0; ; from += PAGE_SIZE) {
+        const { data, error } = await supabase
+          .from('gam_round_stats')
+          .select('course_id')
+          .not('course_id', 'is', null)
+          .range(from, from + PAGE_SIZE - 1);
+        if (error) throw error;
+        (data ?? []).forEach((row) => {
+          if (row.course_id) playedCourseIds.add(row.course_id);
+        });
+        if ((data?.length ?? 0) < PAGE_SIZE) break;
+      }
+
+      const [ratingsResult, difficultyResult] = await Promise.all([
+        supabase.from('course_rating_aggregates').select('course_id').not('avg_overall_score', 'is', null),
+        supabase.from('stat_browse_base' as never).select('course_id, avg_to_par').not('avg_to_par', 'is', null).range(0, 9999),
+      ]);
+      if (ratingsResult.error) throw ratingsResult.error;
+      if (difficultyResult.error) throw difficultyResult.error;
+
+      const allPlayedTotal = playedCourseIds.size;
+      const ratedTotal = new Set(
+        (ratingsResult.data ?? []).map((row) => row.course_id).filter(Boolean),
+      ).size;
+      const difficultyRows = (difficultyResult.data ?? []) as unknown as Array<{
+        course_id: string;
+        avg_to_par: number | string;
+      }>;
+      const sorted = difficultyRows
+        .map((row) => Number(row.avg_to_par))
+        .filter(Number.isFinite)
+        .sort((a, b) => a - b);
+      const difficultyPercentiles = new Map<string, number>();
+      difficultyRows.forEach((row) => {
+        const value = Number(row.avg_to_par);
+        if (!Number.isFinite(value) || sorted.length === 0) return;
+        const easier = sorted.filter((candidate) => candidate < value).length;
+        difficultyPercentiles.set(row.course_id, Math.round((easier / sorted.length) * 100));
+      });
+      return { allPlayedTotal, ratedTotal, difficultyPercentiles };
+    },
+  });
 }
 
 /**
@@ -190,7 +263,55 @@ export function useStatBrowseList({ lens, country, region }: UseStatBrowseListAr
         setError(rpcError.message);
         if (offset === 0) setRows([]);
       } else {
-        const next = ((data ?? []) as Record<string, unknown>[]).map(normaliseRow);
+        const baseRows = ((data ?? []) as Record<string, unknown>[]).map(normaliseRow);
+        const ids = baseRows.map((row) => row.course_id);
+        const [ratingsResult, membershipsResult] = ids.length
+          ? await Promise.all([
+              supabase
+                .from('course_rating_aggregates')
+                .select('course_id, avg_design_score, avg_condition_score, avg_clubhouse_score, avg_facilities_score')
+                .in('course_id', ids),
+              supabase
+                .from('course_top100_memberships')
+                .select('course_id, rank, top100_lists!inner(slug, is_active)')
+                .in('course_id', ids),
+            ])
+          : [{ data: [], error: null }, { data: [], error: null }];
+        if (ratingsResult.error) throw ratingsResult.error;
+        if (membershipsResult.error) throw membershipsResult.error;
+
+        const ratingByCourse = new Map(
+          ((ratingsResult.data ?? []) as Array<Record<string, unknown>>).map((rating) => [
+            String(rating.course_id),
+            rating,
+          ]),
+        );
+        const membershipsByCourse = new Map<string, Array<{ list_slug: string; rank: number }>>();
+        ((membershipsResult.data ?? []) as unknown as Array<{
+          course_id: string;
+          rank: number;
+          top100_lists: { slug?: string; is_active?: boolean } | Array<{ slug?: string; is_active?: boolean }> | null;
+        }>).forEach((membership) => {
+          const list = Array.isArray(membership.top100_lists)
+            ? membership.top100_lists[0]
+            : membership.top100_lists;
+          const slug = list?.slug;
+          if (!slug || list?.is_active === false) return;
+          const current = membershipsByCourse.get(membership.course_id) ?? [];
+          current.push({ list_slug: slug, rank: Number(membership.rank) });
+          membershipsByCourse.set(membership.course_id, current);
+        });
+        const next = baseRows.map((row) => {
+          const rating = ratingByCourse.get(row.course_id);
+          return {
+            ...row,
+            design_score: num(rating?.avg_design_score),
+            condition_score: num(rating?.avg_condition_score),
+            clubhouse_score: num(rating?.avg_clubhouse_score),
+            facilities_score: num(rating?.avg_facilities_score),
+            memberships: membershipsByCourse.get(row.course_id) ?? [],
+          };
+        });
         setError(null);
         setTotalCount(next[0]?.total_count ?? (offset === 0 ? 0 : totalCount));
         setRows((prev) => (offset === 0 ? next : [...prev, ...next]));

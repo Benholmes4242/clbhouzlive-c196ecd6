@@ -46,16 +46,20 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import {
   chipForLens,
+  COURSE_BROWSE_LENSES,
   isStatLens,
   STAT_BROWSE_PAGE_SIZE,
   STAT_LENSES,
   useStatBrowseFacets,
   useStatBrowseList,
+  useCourseBrowseTruth,
   type StatBrowseRow,
   type StatLens,
   type LensCounts,
 
 } from './useStatBrowse';
+import { RailChips } from '@/components/ui/RailChips';
+import { BrowseCourseCard } from './BrowseCourseCard';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { COURSE_BROWSE_DESCRIPTION, COURSE_BROWSE_KICKER } from './courseBrowseTypography';
 import { ReviewRailSlot } from './ReviewRailSlot';
@@ -226,6 +230,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const viewedRef = useRef(false);
 
   const { data: facets } = useStatBrowseFacets();
+  const { data: browseTruth } = useCourseBrowseTruth();
 
   /* ── URL state: read + validate against the facets ─────────────── */
   /**
@@ -647,6 +652,16 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
 
   const countryTriggerLabel = country ?? t('statBrowse.allAreas');
+  const browseBoards = COURSE_BROWSE_LENSES.map((value) => ({
+    id: value,
+    label: value === 'rated'
+      ? 'Best rated'
+      : value === 'played'
+        ? 'Most played'
+        : value === 'toughest'
+          ? 'Hardest'
+          : 'Easiest',
+  }));
 
   /**
    * Area items grouped by macro-region (facets.countries[].country). Groups are
@@ -838,9 +853,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       {/* Sentinel: once this leaves the top, the sticky bar condenses. */}
       <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
 
-      {/* ── Pickers (sticky) ────────────────────────────────────── */}
+      {/* ── Applied filters + board order ───────────────────────── */}
       <div
-        className="-mx-4 px-4 pt-1.5 pb-2 sticky"
+        className="-mx-4 px-4 pt-2 pb-3 sticky"
         style={{
           top: 'calc(var(--sat, 0px))',
           zIndex: 20,
@@ -850,31 +865,25 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           background: SLATE_50,
         }}
       >
-        {condensed ? (
-          <div className="flex items-center gap-2">
-            <div className="min-w-0 flex-1">
-              {region ? regionSelect(true) : countrySelect(true)}
-            </div>
-            <div className="min-w-0 flex-1">{lensSelect(true)}</div>
-            {directorySearchButton(true)}
-          </div>
-        ) : (
-          <>
-            {/* Row 1: country and region are a genuine 50/50 pair. */}
-            <div className="flex items-center gap-2">
-              <div className="flex-1 min-w-0">{countrySelect(false)}</div>
-              <div className="flex-1 min-w-0">{regionSelect(false)}</div>
-            </div>
-
-            {/* Row 2: toolbar — lens at its natural width, search at the end. */}
-            <div className="mt-2.5 flex items-center justify-between gap-2">
-              <div className="min-w-0">{lensSelect(false)}</div>
-              {directorySearchButton(false)}
-            </div>
-
-
-          </>
-        )}
+        <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1">{countrySelect(condensed)}</div>
+          <div className="min-w-0 flex-1">{regionSelect(condensed)}</div>
+          <button
+            type="button"
+            onClick={() => openDirectory(country, 'filter_bar')}
+            style={{ flexShrink: 0, border: 0, background: 'transparent', color: INK_MUTE, fontSize: 12, fontWeight: 700 }}
+          >
+            Edit
+          </button>
+        </div>
+        <div className="mt-2.5 -mx-4">
+          <RailChips
+            options={browseBoards}
+            value={lens}
+            onChange={(value) => onLensChange(value as StatLens)}
+            ariaLabel="Choose course board"
+          />
+        </div>
       </div>
 
       {/* ── Headline ────────────────────────────────────────────── */}
@@ -884,11 +893,12 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             ...COURSE_BROWSE_KICKER,
           }}
         >
-          {t(`statBrowse.lens.${lens}.kicker`)}
+          Courses played
         </div>
         <p style={{ ...COURSE_BROWSE_DESCRIPTION, marginTop: 5 }}>
-          {description}
-          {countSentence ? emphasiseFigures(countSentence) : null}
+          {browseTruth
+            ? emphasiseFigures(`${browseTruth.ratedTotal} of the ${browseTruth.allPlayedTotal} courses members have played here carry a rating.`)
+            : null}
         </p>
       </div>
 
@@ -1018,36 +1028,11 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       ) : (
         <div className="mt-4 -mx-4">
           {rows.map((row, i) => {
-            const model = fromStatBrowseRow(row);
-            const rank = row.global_rank ?? row.regional_rank ?? null;
-            const listSlug =
-              row.global_rank != null ? 'global' : getRegionalBadgeSlug(model) ?? 'regional';
-            const data = rank != null ? enrichment.get(row.course_id) : undefined;
-            /* No ratingRank here by decision: a course can sit in two lists at
-               once and this surface has no single list loaded, so "Nth of N on
-               this list" has no correct answer. First line only. */
-            const verdict =
-              rank != null && data
-                ? computeVerdict({
-                    rank,
-                    rating: data.rating,
-                    ratingCount: data.ratingCount,
-                    config: verdictConfig,
-                  })
-                : null;
-
             return (
-              <div key={row.course_id}>
-                <UnifiedCourseCard
-                  course={model}
-                  variant="vertical"
-                  showRankBadges
-                  showRating
-                  viewerStatus={viewerStatusFor(row.course_id)}
-                  /* The lens chip renders unless it would duplicate a figure
-                     already on the card — 'rated' repeats the community rating. */
-                  statChip={lens === 'rated' ? null : chipForLens(lens, row, unitLabel)}
-                  statLine={sampleLine(row)}
+              <div key={row.course_id} style={{ marginBottom: i < rows.length - 1 ? 32 : 0 }}>
+                <BrowseCourseCard
+                  row={row}
+                  difficultyPercentile={browseTruth?.difficultyPercentiles.get(row.course_id)}
                   onClick={() => {
                     analyticsEvents.track('stat_browse_course_opened', {
                       course_id: row.course_id,
@@ -1057,50 +1042,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                     navigate(`/courses/${row.course_id}`);
                   }}
                 />
-                {rank != null && (
-                  <RankedEnrichment
-                    hasVerdict={!!verdict}
-                    courseId={row.course_id}
-                    courseName={row.name}
-                    rank={rank}
-                    list={listSlug}
-                    data={data}
-                    verdict={verdict}
-                    onOpenVerdict={() => {
-                      if (!verdict) return;
-                      setVerdictSheet({
-                        courseId: row.course_id,
-                        courseName: row.name,
-                        verdict,
-                        canRate: !!data && !data.ratedByYou,
-                        listLabel: LIST_LABEL[listSlug] ?? '',
-                        listCount:
-                          (row.global_rank != null ? 1 : 0) +
-                          (row.regional_rank != null ? 1 : 0),
-                      });
-                    }}
-                    onRate={() => navigate(`/courses/${row.course_id}/rate`)}
-                  />
-                )}
-                {/*
-                  BETWEEN items only — index against length, never :last-child,
-                  because this list appends pages and a trailing band would
-                  flash during load. Single stack at every width, so it is
-                  unconditional.
-                */}
-                {i < rows.length - 1 && (
-                  <div aria-hidden style={{ height: 5, background: CARD_BAND }} />
-                )}
-
-                {/*
-                  REVIEW SLOT (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL §3).
-                  Full-bleed between two 5px bands: the band above is the one
-                  the card just drew, the band below is drawn here, so the
-                  list's rhythm is unbroken. Only rendered when a card follows,
-                  for the same reason the band is.
-                */}
                 {i < rows.length - 1 && reviewSlots.get(i + 1) ? (
-                  <>
+                  <div style={{ marginTop: 32 }}>
                     {reviewSlots.get(i + 1)!.kind === 'rail' ? (
                       <ReviewRailSlot
                         reviews={reviewSlots.get(i + 1)!.reviews}
@@ -1112,9 +1055,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                         onReviewPress={handleReviewTile}
                       />
                     )}
-
-                    <div aria-hidden style={{ height: 5, background: CARD_BAND }} />
-                  </>
+                  </div>
                 ) : null}
               </div>
             );

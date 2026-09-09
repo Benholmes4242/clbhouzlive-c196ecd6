@@ -12,7 +12,6 @@ import { formatNumber } from '@/i18n/format';
 import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHeroCourseFact';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { heroCanonBackground } from '@/features/tourhub/_shared/heroGradient';
-import { TOUR_HERO_PHOTO_H } from '@/features/tourhub/_shared/tokens';
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { KICKER } from '@/lib/tokens/type';
 
@@ -189,16 +188,37 @@ function CoursesPageHeroInner() {
 
 
 
+  const openHeroCourse = () => {
+    if (!hero) return;
+    analyticsEvents.track('hero_view_course', {
+      course_id: hero.course_id,
+      mood,
+      had_blurb: !!blurb,
+    });
+    navigate(`/courses/${hero.course_id}`);
+  };
+
   return (
     <div
+      role={hero ? 'link' : undefined}
+      tabIndex={hero ? 0 : undefined}
+      aria-label={hero ? `View ${hero.course_name}` : undefined}
+      onClick={hero ? openHeroCourse : undefined}
+      onKeyDown={hero ? (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openHeroCourse();
+        }
+      } : undefined}
       className="relative overflow-hidden"
       style={{
         width: '100%',
-        height: TOUR_HERO_PHOTO_H,
+        height: 260,
         background,
         backgroundColor: SLATE_50,
         display: 'flex',
         flexDirection: 'column',
+        cursor: hero ? 'pointer' : 'default',
       }}
     >
       {/* Bottom-anchored identity + CTA — absolute so copy never expands the
@@ -345,36 +365,6 @@ function CoursesPageHeroInner() {
               </div>
             )}
 
-            <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-              <button
-                type="button"
-                onClick={() => {
-                  analyticsEvents.track('hero_view_course', {
-                    course_id: hero.course_id,
-                    mood,
-                    had_blurb: !!blurb,
-                  });
-                  navigate(`/courses/${hero.course_id}`);
-                }}
-
-                className="active:scale-[0.98] transition-transform"
-                style={{
-                  background: '#fff',
-                  color: '#15171F',
-                  /* CAPS ACTION (§5) — two points down, height unchanged. */
-                  fontSize: 11,
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.10em',
-                  padding: '9px 15px',
-                  borderRadius: 999,
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                {t('hero.viewCourse')}
-              </button>
-            </div>
           </>
         )}
       </div>

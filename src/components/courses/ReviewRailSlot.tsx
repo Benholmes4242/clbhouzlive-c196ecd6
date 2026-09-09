@@ -25,6 +25,7 @@ import {
 } from '@/features/courses/_shared/tokens';
 import { LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
+import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 
 const CARD_W = 244;
 
@@ -93,9 +94,9 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
   if (reviews.length === 0) return null;
 
   return (
-    <section style={{ background: SLATE_50, padding: '14px 0 16px' }}>
-      <div style={{ padding: '0 16px 10px' }}>
-        <div style={LABEL}>{t('statBrowse.reviews.heading')}</div>
+    <section>
+      <div style={{ padding: '0 20px 10px' }}>
+        <DiscoverSectionHeading title={t('statBrowse.reviews.heading')} />
       </div>
 
 
@@ -104,7 +105,7 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
           display: 'flex',
           gap: 10,
           overflowX: 'auto',
-          padding: '0 16px',
+          padding: '0 20px',
           scrollbarWidth: 'none',
         }}
       >

@@ -26,6 +26,7 @@ import {
 } from '@/features/courses/_shared/tokens';
 import { LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
+import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 
 const FIGS: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums',
@@ -43,8 +44,8 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
   const name = r.reviewerName || t('discover.reviews.member', 'A member');
 
   return (
-    <section style={{ background: SURFACE, padding: '16px 16px 18px' }}>
-      <div style={LABEL}>{t('statBrowse.reviews.heading')}</div>
+    <section style={{ padding: '0 20px' }}>
+      <DiscoverSectionHeading title={t('statBrowse.reviews.heading')} />
 
 
       <button
@@ -57,7 +58,7 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
           background: 'none',
           border: 0,
           padding: 0,
-          marginTop: 12,
+          marginTop: 10,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
