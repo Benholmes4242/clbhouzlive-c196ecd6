@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { useHandicapTrend, useCounters } from '@/lib/whs/hooks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { WhsConnection } from '@/lib/whs/types';
@@ -10,7 +9,8 @@ import TrendsView from './views/TrendsView';
 import CircleView from './views/CircleView';
 
 import WhsConnectionCaption from './sections/WhsConnectionCaption';
-import { resolveHandicapSubtab, type HandicapSubtab } from './types';
+// `./types` (HandicapSubtab, LEGACY_SUBTAB_ALIAS, resolveHandicapSubtab) is no
+// longer read here — see the dead list. Nothing is deleted.
 
 interface Props {
   connection: WhsConnection;
