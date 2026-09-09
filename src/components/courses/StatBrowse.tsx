@@ -774,12 +774,13 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             Edit
           </button>
         </div>
-        <div className="mt-2.5 -mx-4">
+        <div className="mt-2.5">
           <RailChips
             options={browseBoards}
             value={lens}
             onChange={(value) => onLensChange(value as StatLens)}
             ariaLabel="Choose course board"
+            align="center-when-fit"
           />
         </div>
       </div>

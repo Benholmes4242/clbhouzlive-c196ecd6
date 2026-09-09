@@ -11,9 +11,9 @@ import { formatRatingValue } from '@/utils/formatters';
 import { formatNumber } from '@/i18n/format';
 import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHeroCourseFact';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
-import { heroCanonBackground } from '@/features/tourhub/_shared/heroGradient';
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { KICKER } from '@/lib/tokens/type';
+import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 
 /**
  * CoursesPageHero
@@ -133,12 +133,12 @@ function CoursesPageHeroInner() {
   const { mood } = useExploreMood();
   const { data: hero, isLoading } = useExploreHero(user?.id, mood);
 
-  const background = useMemo(() => {
-    if (hero?.hero_image_url) {
-      return heroCanonBackground(hero.hero_image_url);
-    }
-    return heroCanonBackground(null, COURSE_GRADIENT);
-  }, [hero?.hero_image_url]);
+  const background = useMemo(
+    () => hero?.hero_image_url
+      ? `url("${hero.hero_image_url}") center 40% / cover no-repeat`
+      : COURSE_GRADIENT,
+    [hero?.hero_image_url],
+  );
 
   const locationText = hero
     ? [hero.location_primary, hero.location_secondary].filter(Boolean).join(' · ')
@@ -183,7 +183,7 @@ function CoursesPageHeroInner() {
         : null;
 
   const eyebrowParts = hero
-    ? [hero.list_label, hero.location_primary, eyebrowTail].filter(Boolean)
+    ? [hero.list_label, hero.list_label ? hero.location_primary : null, eyebrowTail].filter(Boolean)
     : [];
 
 
@@ -213,7 +213,7 @@ function CoursesPageHeroInner() {
       className="relative overflow-hidden"
       style={{
         width: '100%',
-        height: 260,
+        height: EXPLORE_COURSE_HERO_HEIGHT,
         background,
         backgroundColor: SLATE_50,
         display: 'flex',
@@ -221,6 +221,14 @@ function CoursesPageHeroInner() {
         cursor: hero ? 'pointer' : 'default',
       }}
     >
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.10) 42%, rgba(0,0,0,0.40) 72%, rgba(0,0,0,0.78) 100%)',
+        }}
+      />
       {/* Bottom-anchored identity + CTA — absolute so copy never expands the
           fixed 340px hero. Matches GolfClubView's CourseTitleOverlay. */}
       <div

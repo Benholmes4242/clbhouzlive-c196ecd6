@@ -28,6 +28,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 import { Z } from '@/config/zIndex';
+import { TAB_LEAD_IN } from '@/components/courses/course-detail/about/AboutSection';
 
 
 interface GolfClubViewProps {
@@ -253,7 +254,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   );
 
   const tabContent = (
-    <div className="course-hero-wrapper">
+    <div className="course-hero-wrapper" style={{ paddingTop: TAB_LEAD_IN }}>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsContent
           value="course"
@@ -540,11 +541,6 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
         <div
           className="inline-flex items-center self-end shrink-0"
           style={{
-            background: 'rgba(15,23,42,0.5)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            borderRadius: 8,
-            padding: '4px 8px',
             gap: 8,
           }}
         >

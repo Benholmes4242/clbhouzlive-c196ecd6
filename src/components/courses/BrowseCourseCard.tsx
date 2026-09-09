@@ -120,7 +120,14 @@ export function BrowseCourseCard({ row, difficultyPercentile, onClick }: BrowseC
         ) : <div style={{ width: '100%', height: '100%', background: A.PANEL }} />}
         <div
           aria-hidden
-          style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(0,0,0,0.04) 22%, rgba(10,14,20,0.14) 50%, ${A.CANVAS} 100%)` }}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: '58%',
+            background: 'linear-gradient(0deg, rgba(10,14,20,0.68) 0%, rgba(10,14,20,0.40) 48%, rgba(10,14,20,0) 100%)',
+          }}
         />
         <RankBadge memberships={row.memberships} />
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14, display: 'flex', alignItems: 'flex-end', gap: 16 }}>

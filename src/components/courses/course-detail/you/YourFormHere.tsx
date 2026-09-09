@@ -31,10 +31,6 @@ const TrendLine: React.FC<{ values: number[] }> = ({ values }) => {
     y: ((v - min) / span) * (LINE_HEIGHT - 4) + 2,
   }));
   const points = coords.map((c) => `${c.x},${c.y}`).join(' ');
-  /* The member's best round here carries the one amber mark. */
-  const bestIndex = values.indexOf(min);
-  const best = coords[bestIndex] ?? null;
-
   return (
     <svg
       aria-hidden="true"
@@ -52,7 +48,6 @@ const TrendLine: React.FC<{ values: number[] }> = ({ values }) => {
         strokeLinejoin="round"
         strokeLinecap="round"
       />
-      {best ? <circle cx={best.x} cy={best.y} r={4} fill={A.AMBER} vectorEffect="non-scaling-stroke" /> : null}
     </svg>
   );
 };
@@ -106,7 +101,7 @@ const YourFormHere: React.FC<Props> = ({ rounds, total }) => {
               fontFamily: SANS,
               /* A lower gross is an improvement; the direction, not the sign,
                  carries the colour. */
-              color: better ? A.RED : A.INK,
+              color: better ? A.GREEN : A.RED,
               ...FIGS,
             }}
           >

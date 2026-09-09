@@ -490,7 +490,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {/* BRIEF_CHAMPIONS_TAB_REBUILD §3.1 + §3.2 — a statement, then the board. */}
       {!isLoading && !isError && (data ?? []).length > 0 && (
-        <div style={{ paddingTop: 18 }}>
+        <div>
           <YourCrowns
             signedOut={!activeActor?.id}
             noHandicap={Boolean(activeActor?.id) && whsFetched && !whsConnection}
