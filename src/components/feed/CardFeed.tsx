@@ -864,7 +864,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           {/* Inter-slab gap — the dark canvas showing through, never a painted strip */}
           <div aria-hidden style={{ height: 8, background: 'transparent' }} />
         </div>
+        </>
       );
+
     },
     [
       activeIdx,
