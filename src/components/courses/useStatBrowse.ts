@@ -130,18 +130,29 @@ export function useCourseBrowseTruth() {
     queryKey: ['course-browse-truth'],
     staleTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const [playedResult, ratingsResult, difficultyResult] = await Promise.all([
-        supabase.from('gam_round_stats').select('course_id').not('course_id', 'is', null).range(0, 9999),
+      const playedCourseIds = new Set<string>();
+      const PAGE_SIZE = 1000;
+      for (let from = 0; ; from += PAGE_SIZE) {
+        const { data, error } = await supabase
+          .from('gam_round_stats')
+          .select('course_id')
+          .not('course_id', 'is', null)
+          .range(from, from + PAGE_SIZE - 1);
+        if (error) throw error;
+        (data ?? []).forEach((row) => {
+          if (row.course_id) playedCourseIds.add(row.course_id);
+        });
+        if ((data?.length ?? 0) < PAGE_SIZE) break;
+      }
+
+      const [ratingsResult, difficultyResult] = await Promise.all([
         supabase.from('course_rating_aggregates').select('course_id').not('avg_overall_score', 'is', null),
         supabase.from('stat_browse_base' as never).select('course_id, avg_to_par').not('avg_to_par', 'is', null).range(0, 9999),
       ]);
-      if (playedResult.error) throw playedResult.error;
       if (ratingsResult.error) throw ratingsResult.error;
       if (difficultyResult.error) throw difficultyResult.error;
 
-      const allPlayedTotal = new Set(
-        (playedResult.data ?? []).map((row) => row.course_id).filter(Boolean),
-      ).size;
+      const allPlayedTotal = playedCourseIds.size;
       const ratedTotal = new Set(
         (ratingsResult.data ?? []).map((row) => row.course_id).filter(Boolean),
       ).size;
