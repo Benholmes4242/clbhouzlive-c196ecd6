@@ -25,7 +25,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 // resolveHandicapSubtab) are now unreferenced here — dead list, not deleted.
 
 import IndexSection from './sections/IndexSection';
-import NextRoundWatch from './sections/NextRoundWatch';
+import NextRoundSection from './sections/NextRoundSection';
 import LastRoundCard from './sections/LastRoundCard';
 import RoundsThatCountCard from './sections/RoundsThatCountCard';
 import StablefordCard from './sections/trends/StablefordCard';
@@ -116,7 +116,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       <IndexSection connection={connection} />
 
       {/* 2 — NEXT ROUND (Section C) */}
-      <NextRoundWatch connectionId={connection.id} currentHandicap={currentHandicap} />
+      <NextRoundSection connectionId={connection.id} currentHandicap={currentHandicap} />
 
       {/* 3 — LAST ROUND (Section D) */}
       <LastRoundCard

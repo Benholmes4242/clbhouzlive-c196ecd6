@@ -281,7 +281,10 @@
       "scaleShoot": "スコア",
       "scaleBecomes": "ハンディキャップ",
       "noChange": "変化なし",
-      "yourBest": "自己最高"
+      "yourBest": "自己最高",
+      "withheldHeading": "Every round still counts.",
+      "withheldBody": "With {{count}} rounds on record every one of them counts toward your index, so there's no target to beat yet. This starts telling you something once you have twenty.",
+      "shootBeat": "Beat {{value}}"
     },
     "pulse": {
       "findPlayer": "Find any player's handicap",

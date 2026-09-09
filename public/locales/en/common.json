@@ -525,7 +525,10 @@
       "yourBest": "your best",
       "beatCaption": "Beat {{cut}}",
       "staysAt": "Stays {{value}}",
-      "downTo": "Down to {{value}}"
+      "downTo": "Down to {{value}}",
+      "withheldHeading": "Every round still counts.",
+      "withheldBody": "With {{count}} rounds on record every one of them counts toward your index, so there's no target to beat yet. This starts telling you something once you have twenty.",
+      "shootBeat": "Beat {{value}}"
     },
     "achievements": {
       "trophyRoom": "Trophy room",
