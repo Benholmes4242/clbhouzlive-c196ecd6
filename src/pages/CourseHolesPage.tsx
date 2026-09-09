@@ -6,7 +6,7 @@ const CourseHolesPage: React.FC = () => {
   const [params] = useSearchParams();
   const personal = params.get('scope') === 'you';
   if (!courseId) return <Navigate to="/courses" replace />;
-  const query = new URLSearchParams({ sheet: 'holes' });
+  const query = new URLSearchParams({ sheet: personal ? 'your-holes' : 'holes' });
   if (personal) query.set('tab', 'you');
   return <Navigate to={`/courses/${courseId}?${query.toString()}`} replace />;
 };

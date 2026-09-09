@@ -31,6 +31,7 @@ import { Z } from '@/config/zIndex';
 import { TAB_LEAD_IN } from '@/components/courses/course-detail/about/AboutSection';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import YourRoundsSheet from '@/components/courses/course-detail/you/YourRoundsSheet';
+import YourHolesSheet from '@/components/courses/course-detail/you/YourHolesSheet';
 
 
 interface GolfClubViewProps {
@@ -133,12 +134,19 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const communityRating = ratingAggregate?.avg_overall_score ?? null;
   const [statsSheetOpen, setStatsSheetOpen] = useState(false);
   const roundsSheetOpen = searchParams.get('sheet') === 'rounds';
+  const yourHolesSheetOpen = searchParams.get('sheet') === 'your-holes';
   const closeRoundsSheet = useCallback(() => {
     if (!roundsSheetOpen) return;
     const next = new URLSearchParams(searchParams);
     next.delete('sheet');
     setSearchParams(next, { replace: true });
   }, [roundsSheetOpen, searchParams, setSearchParams]);
+  const closeYourHolesSheet = useCallback(() => {
+    if (!yourHolesSheetOpen) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete('sheet');
+    setSearchParams(next, { replace: true });
+  }, [yourHolesSheetOpen, searchParams, setSearchParams]);
   const fieldGross =
     courseMeta?.course_par != null && courseStats?.avg_over_par != null
       ? courseMeta.course_par + courseStats.avg_over_par
@@ -364,6 +372,12 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         courseName={course.name}
         fieldAverage={fieldGross}
       />
+      <YourHolesSheet
+        open={yourHolesSheetOpen}
+        onClose={closeYourHolesSheet}
+        courseId={course.id}
+        courseName={course.name}
+      />
       </div>
     );
   }
@@ -392,6 +406,12 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         courseId={course.id}
         courseName={course.name}
         fieldAverage={fieldGross}
+      />
+      <YourHolesSheet
+        open={yourHolesSheetOpen}
+        onClose={closeYourHolesSheet}
+        courseId={course.id}
+        courseName={course.name}
       />
     </>
   );
