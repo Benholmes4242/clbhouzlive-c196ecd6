@@ -288,25 +288,21 @@ const HandicapPage: React.FC = () => {
   const isFriendView = !!friendId && !!user?.id && friendId !== user.id;
   const ownerUserId = isFriendView ? friendId! : user?.id ?? null;
 
-  const rawSubtab = searchParams.get('subtab');
-  // Legacy five-tab deep links (overview / trends / records / friends /
-  // legends) are aliased to the three live tabs before validation, then the
-  // URL is REPLACED so the address bar shows the new value.
-  const { subtab: activeTab, migrated } = resolveHandicapSubtab(rawSubtab);
-
+  /**
+   * ?subtab= IS A STALE PARAM, NOT A CONTROL ANY MORE.
+   * Bookmarks, delivered pushes and stored notification routes still carry
+   * today / form / circle AND the five legacy values (overview / trends /
+   * records / friends / legends). All of them must load this page without
+   * error and without a blank render, so the value is simply IGNORED and the
+   * param is stripped with replace — exactly as the migration effect used to
+   * rewrite it. `?compare=` and every other param are preserved untouched.
+   */
   useEffect(() => {
-    if (!migrated) return;
+    if (!searchParams.has('subtab')) return;
     const next = new URLSearchParams(searchParams);
-    next.set('subtab', activeTab);
+    next.delete('subtab');
     setSearchParams(next, { replace: true });
-  }, [migrated, activeTab, searchParams, setSearchParams]);
-
-  const handleTabChange = useCallback((next: HandicapSubtab) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('subtab', next);
-    setSearchParams(params, { replace: true });
-    analyticsEvents.track('handicap_tab_changed', { from: activeTab, to: next });
-  }, [searchParams, setSearchParams, activeTab]);
+  }, [searchParams, setSearchParams]);
 
 
   // Deep-link: ?score=<whs score id> opens the canonical scorecard sheet over
@@ -534,9 +530,7 @@ const HandicapPage: React.FC = () => {
           ownerUserId={ownerUserId}
           displayName={displayName}
           readOnly={isFriendView}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          hasConnection={hasConnection}
+          friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
           friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
           friendUsername={isFriendView ? profile?.username : null}
           viewerUserId={user.id}
