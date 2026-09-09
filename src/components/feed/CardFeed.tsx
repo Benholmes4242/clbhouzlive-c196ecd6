@@ -255,6 +255,12 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
   const commentPreview = useFeedCommentPreview(feedPostIds, 'clubhouse:cards');
 
+  /* SECTION E: derived, never spliced. Recomputed whenever the loaded array
+     changes, so a later page containing a recent post moves the divider down
+     on its own. */
+  const dividerIndex = useMemo(() => upToDateDividerIndex(posts), [posts]);
+
+
   // Snapshot Virtuoso state per-tab. Keep `onSnapshot` in a ref so the
   // imperative capture never depends on identity churn.
   const onSnapshotRef = useRef(onSnapshot);
