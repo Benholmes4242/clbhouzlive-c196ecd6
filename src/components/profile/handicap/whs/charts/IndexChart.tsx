@@ -194,6 +194,21 @@ export const IndexChart: React.FC<Props> = ({
             vectorEffect="non-scaling-stroke"
           />
 
+          {/* Every revision as a visible point — additive, off by default. */}
+          {showPoints &&
+            pts.map((p, i) => (
+              <circle
+                key={`pt${i}`}
+                cx={p.x}
+                cy={p.y}
+                r={2.4}
+                fill={zoneColor(values[i], min, max)}
+                stroke={halo}
+                strokeWidth={1.2}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+
           {/* Extreme markers — omitted when the extreme IS the last revision. */}
           {callouts.map(
             (c) =>
