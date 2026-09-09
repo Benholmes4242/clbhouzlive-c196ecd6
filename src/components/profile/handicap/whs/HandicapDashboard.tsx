@@ -24,7 +24,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 // `./views/*` and `./types` (HandicapSubtab, LEGACY_SUBTAB_ALIAS,
 // resolveHandicapSubtab) are now unreferenced here — dead list, not deleted.
 
-import HeroHandicapCardDark from './sections/HeroHandicapCardDark';
+import IndexSection from './sections/IndexSection';
 import NextRoundWatch from './sections/NextRoundWatch';
 import LastRoundCard from './sections/LastRoundCard';
 import RoundsThatCountCard from './sections/RoundsThatCountCard';
@@ -112,8 +112,8 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         no longer rendered anywhere — dead list, not deleted.
       */}
 
-      {/* 1 — INDEX (rebuilt flat in Section B) */}
-      <HeroHandicapCardDark connection={connection} />
+      {/* 1 — INDEX */}
+      <IndexSection connection={connection} />
 
       {/* 2 — NEXT ROUND (Section C) */}
       <NextRoundWatch connectionId={connection.id} currentHandicap={currentHandicap} />
