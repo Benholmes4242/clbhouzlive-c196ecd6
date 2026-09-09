@@ -21,6 +21,13 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { batchDigest, feedKeys, viewerId } from '@/lib/queryKeys';
 import { useMergedBatch } from '@/lib/batchQuery';
 
+export interface FeedCommentLine {
+  comment_id: string;
+  content: string | null;
+  created_at: string;
+  display_name: string;
+}
+
 export interface FeedCommentPreview {
   post_id: string;
   comment_id: string;
@@ -33,6 +40,13 @@ export interface FeedCommentPreview {
   verified: boolean;
   /** Parent comments counted in THIS page's read — used only for "view all n". */
   thread_count: number;
+  /**
+   * SECTION C: up to TWO comments, MOST RECENT FIRST — the same order the
+   * comments sheet uses (useCommentsV2 orders created_at descending), so the
+   * two lines on the card are the two lines at the top of the sheet. Entry [0]
+   * is the same comment the legacy single-preview fields describe.
+   */
+  recent: FeedCommentLine[];
 }
 
 export type FeedCommentPreviewMap = Map<string, FeedCommentPreview>;
@@ -40,6 +54,7 @@ export type FeedCommentPreviewMap = Map<string, FeedCommentPreview>;
 const EMPTY_MAP: FeedCommentPreviewMap = new Map();
 /** Ceiling on rows pulled for a page. Busiest post in the data has ten. */
 const ROW_CAP = 300;
+
 
 type Row = {
   id: string;
