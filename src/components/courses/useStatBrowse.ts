@@ -81,6 +81,10 @@ export interface StatBrowseFacets {
     lens_counts: LensCounts | null;
   }>;
   played_total: number;
+  /** Distinct mapped course ids in every round state; not browse eligibility. */
+  all_played_total: number;
+  /** Distinct courses carrying an aggregate community rating. */
+  rated_total: number;
   directory_total: number;
   lens_counts_all: LensCounts | null;
 }
@@ -130,32 +134,16 @@ export function useCourseBrowseTruth() {
     queryKey: ['course-browse-truth'],
     staleTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const playedCourseIds = new Set<string>();
-      const PAGE_SIZE = 1000;
-      for (let from = 0; ; from += PAGE_SIZE) {
-        const { data, error } = await supabase
-          .from('gam_round_stats')
-          .select('course_id')
-          .not('course_id', 'is', null)
-          .range(from, from + PAGE_SIZE - 1);
-        if (error) throw error;
-        (data ?? []).forEach((row) => {
-          if (row.course_id) playedCourseIds.add(row.course_id);
-        });
-        if ((data?.length ?? 0) < PAGE_SIZE) break;
-      }
-
-      const [ratingsResult, difficultyResult] = await Promise.all([
-        supabase.from('course_rating_aggregates').select('course_id').not('avg_overall_score', 'is', null),
+      const [facetsResult, difficultyResult] = await Promise.all([
+        supabase.rpc('get_stat_browse_facets' as never),
         supabase.from('stat_browse_base' as never).select('course_id, avg_to_par').not('avg_to_par', 'is', null).range(0, 9999),
       ]);
-      if (ratingsResult.error) throw ratingsResult.error;
+      if (facetsResult.error) throw facetsResult.error;
       if (difficultyResult.error) throw difficultyResult.error;
 
-      const allPlayedTotal = playedCourseIds.size;
-      const ratedTotal = new Set(
-        (ratingsResult.data ?? []).map((row) => row.course_id).filter(Boolean),
-      ).size;
+      const facetData = (facetsResult.data ?? {}) as Record<string, unknown>;
+      const allPlayedTotal = Number(facetData.all_played_total ?? 0);
+      const ratedTotal = Number(facetData.rated_total ?? 0);
       const difficultyRows = (difficultyResult.data ?? []) as unknown as Array<{
         course_id: string;
         avg_to_par: number | string;
@@ -220,6 +208,8 @@ export function useStatBrowseFacets() {
           lens_counts: normaliseLensCounts(r.lens_counts),
         })),
         played_total: Number(d.played_total ?? 0),
+        all_played_total: Number(d.all_played_total ?? 0),
+        rated_total: Number(d.rated_total ?? 0),
         directory_total: Number(d.directory_total ?? 0),
         lens_counts_all: normaliseLensCounts(d.lens_counts_all),
       };
