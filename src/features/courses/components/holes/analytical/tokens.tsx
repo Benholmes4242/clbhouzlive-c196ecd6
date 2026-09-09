@@ -180,6 +180,13 @@ export function difficultyRampColor(t: number): string {
   return difficultyRampStop(Math.round(k * (DIFFICULTY_RAMP.length - 1)));
 }
 
+/** One analytical to-par value: under red, over ink, level muted. */
+export function toParTone(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return A.MUTE;
+  const rounded = Math.round(value * 10) / 10;
+  return rounded < 0 ? A.RED : rounded > 0 ? A.INK : A.MUTE;
+}
+
 function relLuminance(colour: string): number | null {
   let rgb: number[] | null = null;
   const hex = colour.trim().replace('#', '');

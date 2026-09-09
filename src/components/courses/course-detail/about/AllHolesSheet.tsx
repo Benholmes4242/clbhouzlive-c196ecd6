@@ -8,7 +8,7 @@ import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/use
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { buildSiLadder, type SiLadder as SiLadderData, type SiLadderRow } from '@/features/courses/_shared/siLadder';
-import { A, BAR_RADIUS, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts, toParTone } from '@/features/courses/components/holes/analytical/tokens';
 import { BUCKETS, courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { buildParTypeRows, type ParTypeRow } from '@/features/courses/components/holes/analytical/parTypeRows';
 import AboutSection, { ABOUT_KICKER, AboutHairline } from './AboutSection';
@@ -73,7 +73,7 @@ const HoleDistribution: React.FC<{ hole: CourseHole }> = ({ hole }) => {
             width: total > 0 && value > 0 ? `${(value / total) * 100}%` : 2,
             flexShrink: 0,
             borderRadius: BAR_RADIUS,
-            background: BUCKETS[index].bg,
+             background: [RAMP_TOPAR.birdie, RAMP_TOPAR.par, RAMP_TOPAR.bogey, RAMP_TOPAR.double][index],
             opacity: value > 0 ? 1 : 0.28,
           }}
         />
@@ -117,7 +117,7 @@ const CompactHoleRow: React.FC<{
       </span>
       <HoleDistribution hole={hole} />
       <span style={{ textAlign: 'right', minWidth: 0 }}>
-        <span style={{ ...FIGURE, display: 'block', fontSize: 13, fontWeight: 700, color: A.INK }}>{field?.text ?? ''}</span>
+         <span style={{ ...FIGURE, display: 'block', fontSize: 13, fontWeight: 700, color: toParTone(hole.avg_to_par) }}>{field?.text ?? ''}</span>
         <span style={{ ...ROW_KICKER, display: 'block', marginTop: 2 }}>{t('courseDetail.plays.legendField')}</span>
       </span>
       {hasYou ? (
@@ -162,12 +162,12 @@ const ParTracks: React.FC<{ rows: ParTypeRow[]; hasYou: boolean }> = ({ rows, ha
               {t('courseDetail.parTypes.parNPlural', { n: row.par })}
             </span>
             <span style={{ position: 'relative', height: 4, borderRadius: BAR_RADIUS, background: A.TRACK }}>
-              <i style={{ position: 'absolute', left: `${left}%`, width: `${width}%`, insetBlock: 0, borderRadius: BAR_RADIUS, background: A.RED }} />
+               <i style={{ position: 'absolute', left: `${left}%`, width: `${width}%`, insetBlock: 0, borderRadius: BAR_RADIUS, background: toParTone(row.field) }} />
               {hasYou && row.you != null ? (
                 <i style={{ position: 'absolute', left: `${signedPosition(row.you, min, max)}%`, top: -3, width: 2, height: 10, borderRadius: 1, background: A.AMBER }} />
               ) : null}
             </span>
-            <span style={{ ...FIGURE, fontSize: 13, fontWeight: 700, color: A.INK, textAlign: 'right' }}>{field?.text ?? ''}</span>
+             <span style={{ ...FIGURE, fontSize: 13, fontWeight: 700, color: toParTone(row.field), textAlign: 'right' }}>{field?.text ?? ''}</span>
             {hasYou ? (
               <span style={{ ...FIGURE, fontSize: 13, fontWeight: 700, color: A.AMBER, textAlign: 'right' }}>{you?.text ?? ''}</span>
             ) : null}

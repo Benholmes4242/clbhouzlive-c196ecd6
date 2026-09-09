@@ -260,7 +260,9 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
 
   const openDrillDown = () => {
     analyticsEvents.track('course_all_18_holes', { course_id: courseId, holes: holes.length });
-    setAllHolesOpen(true);
+    const next = new URLSearchParams(searchParams);
+    next.set('sheet', 'holes');
+    setSearchParams(next, { replace: true });
   };
 
   React.useEffect(() => {
