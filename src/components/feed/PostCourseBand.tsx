@@ -180,8 +180,14 @@ interface Props {
   ctx?: PostCourseContext | null;
   /** Opens the course stats sheet. Not wired when there is no figure. */
   onOpenStats?: () => void;
-  /** The existing actions row, attached to the same container. */
-  actions: React.ReactNode;
+  /**
+   * DEAD SLOT (BRIEF_FEED_CARD_REBUILD section A). The actions row is now one
+   * always-present footer owned by FeedCard, rendered AFTER this band, so no
+   * caller passes `actions` any more. The branch below is retained verbatim
+   * and recorded on the dead-code list; it is swept with the rest.
+   */
+  actions?: React.ReactNode;
+
   /** Extra content (C3 you-vs-them row) rendered under row one. */
   extra?: React.ReactNode;
   /** 'glass' when the card carries a photo backdrop. Default 'solid'. */
@@ -402,16 +408,19 @@ export const PostCourseBand: React.FC<Props> = ({
 
       {extra ? <div style={{ padding: '0 14px 8px' }}>{extra}</div> : null}
 
-      {/* In glass mode the actions row is the ONE opaque block: the photo
-          backdrop stops here. */}
-      <div
-        style={{
-          borderTop: `1px solid ${C.hairline}`,
-          background: glass ? OPAQUE_SURFACE : undefined,
-        }}
-      >
-        {actions}
-      </div>
+      {/* DEAD BRANCH (section A). In glass mode the actions row was the ONE
+          opaque block: the photo backdrop stopped here. No caller passes
+          `actions`, so nothing renders and no empty bordered block is left. */}
+      {actions ? (
+        <div
+          style={{
+            borderTop: `1px solid ${C.hairline}`,
+            background: glass ? OPAQUE_SURFACE : undefined,
+          }}
+        >
+          {actions}
+        </div>
+      ) : null}
     </div>
   );
 };
