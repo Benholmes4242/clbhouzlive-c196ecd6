@@ -55,12 +55,14 @@ export interface RailChipsProps {
    * always has. 'filled' is the applied-state ground described above.
    */
   ground?: 'outline' | 'filled';
+  /** ADDITIVE: centre a fitting choice group; overflow still starts at the leading edge. */
+  align?: 'start' | 'center-when-fit';
 }
 
 /** The applied-state ground: 6% white, stated once. */
 const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline' }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start' }: RailChipsProps) {
   const filled = ground === 'filled';
   return (
     <div
@@ -75,6 +77,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
         overflowX: 'auto',
         scrollbarWidth: 'none',
         WebkitOverflowScrolling: 'touch',
+        ...(align === 'center-when-fit' ? { justifyContent: 'safe center' } : null),
         ...(locked ? { opacity: 0.45, pointerEvents: 'none' as const } : null),
         ...style,
       }}

@@ -26,23 +26,12 @@ import {
   resolveDefaultTee,
   storageKey,
 } from '@/features/courses/components/holes/teePreference';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { AboutSection, GUTTER, ABOUT_KICKER, aboutFig } from './AboutSection';
+import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { AboutSection, GUTTER, ABOUT_KICKER, aboutFig, TAB_LEAD_IN } from './AboutSection';
+import CenteredStatStrip from './CenteredStatStrip';
 
 /** WHS standard slope. A course of exactly 113 plays to average difficulty. */
 const STANDARD_SLOPE = 113;
-
-const FactCell: React.FC<{ kicker: string; value: string }> = ({ kicker, value }) => (
-  <div style={{ minWidth: 0, textAlign: 'center' }}>
-    <div
-      className="tabular-nums lining-nums"
-      style={{ ...aboutFig(21), fontVariantNumeric: 'tabular-nums lining-nums', letterSpacing: '-0.04em' }}
-    >
-      {value}
-    </div>
-    <div style={{ ...ABOUT_KICKER, marginTop: 5 }}>{kicker}</div>
-  </div>
-);
 
 interface Props {
   courseId: string | undefined;
@@ -121,17 +110,12 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
       {facts.length > 0 && (
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-            marginTop: 22,
+            marginTop: TAB_LEAD_IN,
             padding: `0 ${GUTTER}px`,
             fontFamily: SANS,
-            ...FIGS,
           }}
         >
-          {facts.map((f) => (
-            <FactCell key={f.kicker} kicker={f.kicker} value={f.value} />
-          ))}
+          <CenteredStatStrip items={facts.map((f) => ({ label: f.kicker, value: f.value }))} />
         </div>
       )}
 

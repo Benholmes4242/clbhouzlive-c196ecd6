@@ -11,8 +11,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import AboutSection from '../about/AboutSection';
-import { YouCaption, YouFigure } from './youBits';
+import AboutSection, { TAB_LEAD_IN } from '../about/AboutSection';
+import CenteredStatStrip from '../about/CenteredStatStrip';
+import { YouCaption } from './youBits';
 
 interface Props {
   /** Every tracked 18-hole round the member has here. */
@@ -38,21 +39,18 @@ const YourRecordHere: React.FC<Props> = ({ rounds, best, average, field }) => {
       : t('courseDetail.youTab.basisManyNoField', { count: rounds, rounds });
 
   return (
-    <AboutSection first>
-      <div style={{ display: 'flex', gap: 14 }}>
-        <YouFigure label={t('courseDetail.youTab.rounds')} value={String(rounds)} />
-        <YouFigure
-          label={t('courseDetail.youTab.best')}
-          value={best != null ? String(best) : '\u2014'}
-          tone={A.AMBER_DEEP}
-        />
-        <YouFigure
-          /* §3.1 — one round is not an average. */
-          label={single ? t('courseDetail.youTab.yourRound') : t('courseDetail.youTab.yourAverage')}
-          value={average != null ? (single ? String(Math.round(average)) : average.toFixed(1)) : '\u2014'}
-        />
-        <YouFigure label={t('courseDetail.youTab.field')} value={field ?? '\u2014'} />
-      </div>
+    <AboutSection first space={TAB_LEAD_IN}>
+      <CenteredStatStrip
+        items={[
+          { label: t('courseDetail.youTab.rounds'), value: String(rounds) },
+          { label: t('courseDetail.youTab.best'), value: best != null ? String(best) : '\u2014', tone: A.AMBER_DEEP },
+          {
+            label: single ? t('courseDetail.youTab.yourRound') : t('courseDetail.youTab.yourAverage'),
+            value: average != null ? (single ? String(Math.round(average)) : average.toFixed(1)) : '\u2014',
+          },
+          { label: t('courseDetail.youTab.field'), value: field ?? '\u2014' },
+        ]}
+      />
       <YouCaption>{caption}</YouCaption>
     </AboutSection>
   );

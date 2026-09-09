@@ -31,6 +31,9 @@ export const SECTION_SPACE = 34;
 /** Discover's 10px heading-to-content gap, so the two pages match. */
 export const HEADING_GAP = 10;
 
+/** The shared gap from the sticky tab row to every tab's first content. */
+export const TAB_LEAD_IN = 22;
+
 /** The tab's only rule: a row divider inside a list, or a drill-down seam. */
 export const AboutHairline: React.FC<{ style?: React.CSSProperties }> = ({ style }) => (
   <div style={{ height: 1, background: A.HAIRLINE, ...style }} aria-hidden="true" />
@@ -87,7 +90,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
 }) => (
   <section
     style={{
-      marginTop: first ? 0 : space ?? SECTION_SPACE,
+      marginTop: first ? space ?? 0 : space ?? SECTION_SPACE,
       fontFamily: SANS,
     }}
   >
