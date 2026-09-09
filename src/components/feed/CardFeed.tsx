@@ -788,7 +788,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
       const initialSlide = carouselPositions.get(index) ?? 0;
       return (
+        <>
+        {/* Rendered ABOVE this card rather than as a list item, so the divider
+            never occupies an index the video/carousel bookkeeping counts. */}
+        {dividerIndex === index && (
+          <UpToDateDivider index={index} loadedCount={postsRef.current.length} />
+        )}
         <div
+
           data-card-index={index}
           ref={(el) => {
             const obs = observerRef.current;
