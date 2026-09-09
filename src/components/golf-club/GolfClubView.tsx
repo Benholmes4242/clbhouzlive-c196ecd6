@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,6 +27,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
+import { Z } from '@/config/zIndex';
 
 
 interface GolfClubViewProps {
@@ -582,32 +582,65 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
-    setTabsStuck(window.scrollY > 200);
-    const io = new IntersectionObserver(
-      ([entry]) => setTabsStuck(!entry.isIntersecting),
-      { threshold: 0 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
+
+    let io: IntersectionObserver | null = null;
+    const observe = () => {
+      io?.disconnect();
+      const satValue = getComputedStyle(document.documentElement).getPropertyValue('--sat');
+      const sat = Number.parseFloat(satValue) || 0;
+      setTabsStuck(el.getBoundingClientRect().top <= sat);
+      io = new IntersectionObserver(
+        ([entry]) => setTabsStuck(!entry.isIntersecting),
+        {
+          threshold: 0,
+          // The sticky row stops at var(--sat), so shrink the observer's top
+          // edge by that live inset. Rebuilt on resize for rotation/notch changes.
+          rootMargin: `-${sat}px 0px 0px 0px`,
+        },
+      );
+      io.observe(el);
+    };
+
+    observe();
+    window.addEventListener('resize', observe);
+    return () => {
+      window.removeEventListener('resize', observe);
+      io?.disconnect();
+    };
   }, []);
   return (
     <div className="min-h-screen w-full">
       {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
-      <GlassHeaderPlate visible={tabsStuck} />
       {cinematicHero}
-      <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
+      <div ref={sentinelRef} style={{ height: 0 }} aria-hidden />
       {/* The sticky tab band follows the page canvas. It was a light glass
           (rgba(248,250,252,0.72)) — that band, not FilterChips, is why the
           course tabs read light. Solid canvas per the mobile-performance rule
           (no static backdrop-filters). */}
       <div
         className="sticky"
+        data-stuck={tabsStuck ? 'true' : 'false'}
         style={{
           top: 'var(--sat, 0px)',
-          zIndex: 30,
+          zIndex: Z.stickyTabs,
           background: A.CANVAS,
         }}
       >
+        {tabsStuck && (
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 'var(--sat, env(safe-area-inset-top, 0px))',
+              background: A.CANVAS,
+              pointerEvents: 'none',
+              zIndex: Z.stickySafeArea,
+            }}
+          />
+        )}
 
         <CourseDetailShellTabs
           activeTab={activeTab}
