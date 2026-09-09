@@ -40,6 +40,13 @@ interface Props {
   halo?: string;
   /** Hide the off best / mid / near best legend. */
   hideLegend?: boolean;
+  /**
+   * ADDITIVE (one-page handicap brief, Section B): draw a visible marker on
+   * EVERY point. Used by the withheld state (< 8 rounds), where the sparse
+   * series must read as individual rounds, not a shape. Default false, so
+   * every existing consumer renders byte-identically.
+   */
+  showPoints?: boolean;
 }
 
 const VIEW_W = 320;
@@ -64,6 +71,7 @@ export const IndexChart: React.FC<Props> = ({
   formatLabel,
   halo = CHART.PANEL,
   hideLegend = false,
+  showPoints = false,
 }) => {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
 
@@ -185,6 +193,21 @@ export const IndexChart: React.FC<Props> = ({
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
+
+          {/* Every revision as a visible point — additive, off by default. */}
+          {showPoints &&
+            pts.map((p, i) => (
+              <circle
+                key={`pt${i}`}
+                cx={p.x}
+                cy={p.y}
+                r={2.4}
+                fill={zoneColor(values[i], min, max)}
+                stroke={halo}
+                strokeWidth={1.2}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
 
           {/* Extreme markers — omitted when the extreme IS the last revision. */}
           {callouts.map(
