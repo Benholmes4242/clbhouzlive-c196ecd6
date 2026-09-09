@@ -130,4 +130,5 @@
 - [x] Move course context and field/viewer figures into a fixed sheet head without repeating the 18-bar chart.
 - [x] Render the distribution summary and all 18 compact hole rows without truncation or see-all.
 - [x] Render one-track par comparisons and the full flat stroke-index ladder without its colour legend.
-- [ ] Preserve the 20-round gate, audit routed fallback needs, and verify no-viewer/390px states.
+- [x] Preserve the 20-round gate and retain the routed fallback because the You tab also links here.
+- [ ] Capture populated viewer/unplayed 390px states when authenticated preview data is available.
