@@ -655,12 +655,51 @@ export function formatRelativeAgo(
  *   < 12mo → "{mo}mo"
  *   else   → "{y}y"
  */
-export function formatRelativeWithSeconds(iso: string | null | undefined): string {
+export function formatRelativeWithSeconds(
+  iso: string | null | undefined,
+  options: { absoluteAfterDays?: number } = {},
+): string {
   if (!iso) return '';
   const t = new Date(iso).getTime();
   if (!isFinite(t)) return '';
   const s = Math.max(1, Math.floor((Date.now() - t) / 1000));
   const locale = getActiveLocale();
+
+  /**
+   * SECTION D — DATES GO ABSOLUTE PAST 30 DAYS (opt-in).
+   *
+   * Passing absoluteAfterDays switches the ladder to m / h / d and then to a
+   * real date once the post is that old, computed in the VIEWER'S local
+   * timezone (toLocaleDateString on a local Date, never UTC parts):
+   *
+   *   >= n days, same calendar year    -> "12 April"
+   *   >= n days, earlier calendar year -> "12 April 2025"
+   *
+   * Default is undefined, so every existing caller renders byte-identically.
+   * Under a minute still reads "{s}s" — the brief's ladder starts at minutes
+   * and this keeps the live-feel of a just-posted card.
+   */
+  if (options.absoluteAfterDays != null) {
+    const date = new Date(t);
+    const m = Math.floor(s / 60);
+    const h = Math.floor(m / 60);
+    const d = Math.floor(h / 24);
+    if (locale === 'en' && s < 60) return `${s}s`;
+    if (d < options.absoluteAfterDays) {
+      if (locale === 'en') {
+        if (m < 60) return `${m}m`;
+        if (h < 24) return `${h}h`;
+        return `${d}d`;
+      }
+      return formatRelative(t);
+    }
+    const sameYear = date.getFullYear() === new Date().getFullYear();
+    const tag = locale === 'en' ? 'en-GB' : locale;
+    return date.toLocaleDateString(tag, sameYear
+      ? { day: 'numeric', month: 'long' }
+      : { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
   if (locale === 'en') {
     if (s < 60) return `${s}s`;
     const m = Math.floor(s / 60);
@@ -677,6 +716,7 @@ export function formatRelativeWithSeconds(iso: string | null | undefined): strin
   }
   return formatRelative(t);
 }
+
 
 /**
  * Month-only compact relative time. Matches `src/utils/relativeTime.ts` —
