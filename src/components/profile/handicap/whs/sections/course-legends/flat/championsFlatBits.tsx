@@ -267,7 +267,7 @@ export const FlatBoardRow: React.FC<{
   category: LegendCategory;
   coursePar?: number | null;
   rule?: boolean;
-  /** SHEET ONLY — "−5 from champion" in the board's unit. */
+  /** SHEET ONLY - "5 from champion" in the board's unit. */
   deficit?: string | null;
   onPress?: () => void;
 }> = ({ row, pos, category, coursePar = null, rule = true, deficit = null, onPress }) => {
