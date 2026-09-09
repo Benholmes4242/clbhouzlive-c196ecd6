@@ -71,6 +71,7 @@ export const IndexChart: React.FC<Props> = ({
   formatLabel,
   halo = CHART.PANEL,
   hideLegend = false,
+  showPoints = false,
 }) => {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
 
