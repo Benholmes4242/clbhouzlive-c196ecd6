@@ -1,5 +1,10 @@
 # Roadmap
 
+## England federation picker label (9 Sep 2026)
+- [x] Trace the picker label to its constants-file source and audit every other England Golf reference.
+- [x] Name all three supported England products on the picker only, without changing connection-specific copy.
+- [x] Verify the England card remains one line and unchanged in height at 320px.
+
 ## Courses browse rebuild (9 Sep 2026)
 - [x] Diagnose 217 vs 256 and audit the facet RPC callers before UI changes.
 - [x] Rebuild browse cards as flat 196px photo-led rows with unique figures and 6-10 category bars.

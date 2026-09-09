@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, ChevronRight } from 'lucide-react';
 import { WHS_COUNTRIES, type WhsCountry } from '@/lib/whs/whsCountries';
+import { KICKER } from '@/lib/tokens/type';
 import { INK, MUTE, DIM, BORDER, PANEL, FONT, LABEL_LG, CAPTION } from './designTokens';
 import { Collapsible, Stage, StageHead } from './Primitives';
 
@@ -23,7 +24,10 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
   const { live, notYet, empty } = useMemo(() => {
     const q = query.trim().toLowerCase();
     const match = (c: WhsCountry) =>
-      !q || c.name.toLowerCase().includes(q) || c.body.toLowerCase().includes(q);
+      !q ||
+      c.name.toLowerCase().includes(q) ||
+      c.body.toLowerCase().includes(q) ||
+      c.pickerBody?.toLowerCase().includes(q);
     const filtered = WHS_COUNTRIES.filter(match);
     const unsupported = filtered.filter((c) => !c.supported);
     return {
@@ -96,6 +100,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
                 border: `1px solid ${BORDER}`,
                 borderRadius: 16,
                 padding: '20px 18px',
+                 minHeight: 88,
                 marginBottom: 10,
                 cursor: 'pointer',
                 textAlign: 'left',
@@ -106,7 +111,9 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
                 <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: INK }}>
                   {c.name}
                 </div>
-                <div style={{ ...LABEL_LG, color: MUTE, marginTop: 8 }}>{c.body}</div>
+                <div style={{ ...KICKER, color: MUTE, marginTop: 8, whiteSpace: 'nowrap' }}>
+                  {c.pickerBody ?? c.body}
+                </div>
               </div>
               <ChevronRight size={18} color={DIM} strokeWidth={2.2} />
             </button>
