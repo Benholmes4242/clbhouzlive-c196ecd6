@@ -131,9 +131,9 @@ export function useCourseBrowseTruth() {
     staleTime: 10 * 60 * 1000,
     queryFn: async () => {
       const [playedResult, ratingsResult, difficultyResult] = await Promise.all([
-        supabase.from('gam_round_stats').select('course_id').not('course_id', 'is', null),
+        supabase.from('gam_round_stats').select('course_id').not('course_id', 'is', null).range(0, 9999),
         supabase.from('course_rating_aggregates').select('course_id').not('avg_overall_score', 'is', null),
-        supabase.from('stat_browse_base' as never).select('course_id, avg_to_par').not('avg_to_par', 'is', null),
+        supabase.from('stat_browse_base' as never).select('course_id, avg_to_par').not('avg_to_par', 'is', null).range(0, 9999),
       ]);
       if (playedResult.error) throw playedResult.error;
       if (ratingsResult.error) throw ratingsResult.error;
@@ -262,7 +262,7 @@ export function useStatBrowseList({ lens, country, region }: UseStatBrowseListAr
                 .in('course_id', ids),
               supabase
                 .from('course_top100_memberships')
-                .select('course_id, rank, top100_lists(slug)')
+                .select('course_id, rank, top100_lists!inner(slug, is_active)')
                 .in('course_id', ids),
             ])
           : [{ data: [], error: null }, { data: [], error: null }];
@@ -279,13 +279,13 @@ export function useStatBrowseList({ lens, country, region }: UseStatBrowseListAr
         ((membershipsResult.data ?? []) as unknown as Array<{
           course_id: string;
           rank: number;
-          top100_lists: { slug?: string } | Array<{ slug?: string }> | null;
+          top100_lists: { slug?: string; is_active?: boolean } | Array<{ slug?: string; is_active?: boolean }> | null;
         }>).forEach((membership) => {
           const list = Array.isArray(membership.top100_lists)
             ? membership.top100_lists[0]
             : membership.top100_lists;
           const slug = list?.slug;
-          if (!slug) return;
+          if (!slug || list?.is_active === false) return;
           const current = membershipsByCourse.get(membership.course_id) ?? [];
           current.push({ list_slug: slug, rank: Number(membership.rank) });
           membershipsByCourse.set(membership.course_id, current);
