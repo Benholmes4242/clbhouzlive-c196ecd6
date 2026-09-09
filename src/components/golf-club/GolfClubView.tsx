@@ -13,8 +13,6 @@ import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
-import { heroCanonBackground } from '@/features/tourhub/_shared/heroGradient';
-import { HERO_MIN_H } from '@/features/tourhub/_shared/tokens';
 import { safeGoBack } from '@/utils/navigation';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
@@ -29,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
+import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 
 
 interface GolfClubViewProps {
@@ -189,29 +188,27 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   }
 
 
-  // Modal-mode hero (legacy boxed image, 306px).
+  // Both mounts share Explore's fixed hero height. The scrim ends transparent,
+  // not on canvas, so the image keeps a straight lower edge.
+  const heroImageBackground = course.thumbnail_image
+    ? `url("${course.thumbnail_image}") center 40% / cover no-repeat`
+    : A.CANVAS;
+  const heroLegibilityScrim =
+    'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.10) 42%, rgba(0,0,0,0.40) 72%, rgba(0,0,0,0.78) 100%)';
+
+  // Modal-mode hero.
   const modalHeroBlock = (
     <div
-      className="relative overflow-hidden bg-background"
+      className="relative overflow-hidden"
       style={{
-        height: HERO_MIN_H,
+        height: EXPLORE_COURSE_HERO_HEIGHT,
         marginTop: 0,
+        background: heroImageBackground,
       }}
     >
-      <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
-      {course.thumbnail_image && (
-        <img
-          src={course.thumbnail_image}
-          alt={course.name}
-          className="absolute inset-0 h-full w-full object-cover"
-          onError={(e) => { e.currentTarget.style.display = 'none'; }}
-        />
-      )}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.20) 42%, rgba(0,0,0,0.62) 74%, ${A.CANVAS} 100%)`,
-        }}
+        style={{ background: heroLegibilityScrim }}
       />
       {/* Modal-path back chevron deleted (BRIEF_COURSES_CHROME_DARK): no caller
           passes onClose — the sole caller is CourseDetailPage.tsx:53 with
@@ -228,24 +225,23 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   );
 
   // Standalone (non-modal) full-bleed cinematic hero — bleeds into the notch.
-  // Pattern mirrors Tour hero: image as container `background` + paddingTop env(sat).
-  // ONE canon scrim ending on the canvas — heroCanonBackground in
-  // _shared/heroGradient (BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON).
-  const heroBackground = heroCanonBackground(course.thumbnail_image ?? null, A.CANVAS);
-
   const cinematicHero = (
     <div
       className="relative overflow-hidden"
       style={{
         width: '100%',
-        minHeight: HERO_MIN_H,
-        background: heroBackground,
+        height: EXPLORE_COURSE_HERO_HEIGHT,
+        background: heroImageBackground,
         backgroundColor: A.CANVAS,
         display: 'flex',
         flexDirection: 'column',
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: heroLegibilityScrim }}
+      />
       <CourseTitleOverlay
         course={course}
         courseStats={courseStats ?? null}
@@ -256,7 +252,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   );
 
   const tabContent = (
-    <div className="course-hero-wrapper bg-background">
+    <div className="course-hero-wrapper">
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsContent
           value="course"
@@ -594,7 +590,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
     return () => io.disconnect();
   }, []);
   return (
-    <div className="min-h-screen w-full bg-background">
+    <div className="min-h-screen w-full">
       {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
       <GlassHeaderPlate visible={tabsStuck} />
       {cinematicHero}
@@ -608,7 +604,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
         style={{
           top: 'var(--sat, 0px)',
           zIndex: 30,
-          background: '#15171F',
+          background: A.CANVAS,
         }}
       >
 

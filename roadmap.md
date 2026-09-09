@@ -1,5 +1,13 @@
 # Roadmap
 
+## Course detail snags 01 (9 Sep 2026)
+- [x] Share Explore's 340px hero height with both Course detail mounts and remove only the canvas fade.
+- [x] Centre the four Course facts in equal grid columns with canonical figure treatment.
+- [ ] Change the Who plays here meta to golfer/golfers in all six locales.
+- [x] Make the Course route root the single bottom-canvas owner.
+- [x] Fold the unclaimed offer into the existing row group without deleting its old component.
+- [ ] Verify hero states, long/short canvas states, null fact fallbacks, and both mounts at runtime.
+
 ## Tour match-the-mock (8 Sep 2026)
 - [x] Restore `/tourhub` overview full-bleed notch hero with picker and controls islands; align hero event/location type with `/tour`.
 - [x] Match the app canvas, 20px gutter, hero states, and single tour selector sheet.

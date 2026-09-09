@@ -7,13 +7,8 @@
  * own standing, which lives in the hero), and the official website behind the
  * external-link sheet.
  *
- * Every row here navigates, so every row carries a right chevron. The website
- * row opens a confirmation sheet before leaving the app, which is still going
- * somewhere, so it keeps the chevron too.
- *
- * THE CLAIM ROW IS NOT HERE. It is not a place to explore, it is an offer to a
- * course owner, and it is awaiting a ruling on where it belongs — so it stays
- * rendering exactly where it does today, unmoved and unremoved.
+ * Navigation rows carry a right chevron. The website opens a confirmation
+ * sheet, so it carries a down chevron; the claim sheet carries none.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -63,7 +58,9 @@ const Row: React.FC<{
   label: string;
   meta?: string;
   onClick: () => void;
-}> = ({ label, meta, onClick }) => (
+  muted?: boolean;
+  indicator?: 'right' | 'down' | 'none';
+}> = ({ label, meta, onClick, muted = false, indicator = 'right' }) => (
   <button
     type="button"
     onClick={onClick}
@@ -82,14 +79,15 @@ const Row: React.FC<{
       fontFamily: SANS,
     }}
   >
-    <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, color: A.INK }}>
+    <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, color: muted ? A.MUTE : A.INK }}>
       {label}
     </span>
-    {meta && <span style={{ fontSize: 13, color: A.DIM }}>{meta}</span>}
-    {/* Navigation, so a right chevron is correct here. */}
-    <span style={{ fontSize: 13, color: A.DIM }} aria-hidden="true">
-      {'\u203A'}
-    </span>
+    {meta && <span style={{ fontSize: 13, color: muted ? A.MUTE : A.DIM }}>{meta}</span>}
+    {indicator !== 'none' && (
+      <span style={{ fontSize: 13, color: A.DIM }} aria-hidden="true">
+        {indicator === 'down' ? '\u2304' : '\u203A'}
+      </span>
+    )}
   </button>
 );
 
@@ -97,9 +95,11 @@ interface Props {
   course: Course;
   /** Opens the external-link confirmation sheet for the official website. */
   onWebsiteClick?: () => void;
+  /** Opens the existing claim sheet; omitted for claimed or pending courses. */
+  onClaimClick?: () => void;
 }
 
-const KeepExploring: React.FC<Props> = ({ course, onWebsiteClick }) => {
+const KeepExploring: React.FC<Props> = ({ course, onWebsiteClick, onClaimClick }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
 
@@ -114,7 +114,13 @@ const KeepExploring: React.FC<Props> = ({ course, onWebsiteClick }) => {
   const primaryListSlug = membership?.top100_lists?.slug ?? 'global-top-100';
   const shortListLabel = SHORT_LIST_LABELS[normalizeListSlug(primaryListSlug)] ?? 'World';
 
-  const rows: { key: string; label: string; meta?: string; onClick: () => void }[] = [];
+  const rows: {
+    key: string;
+    label: string;
+    meta?: string;
+    onClick: () => void;
+    indicator?: 'right' | 'down' | 'none';
+  }[] = [];
 
   if (subCountryLabel) {
     rows.push({
@@ -150,6 +156,17 @@ const KeepExploring: React.FC<Props> = ({ course, onWebsiteClick }) => {
       key: 'website',
       label: t('courseDetail.about.officialWebsite'),
       onClick: onWebsiteClick,
+      indicator: 'down',
+    });
+  }
+
+  if (onClaimClick) {
+    rows.push({
+      key: 'claim',
+      label: t('courseDetail.claim.cta.title'),
+      meta: t('courseDetail.claim.cta.action'),
+      onClick: onClaimClick,
+      indicator: 'none',
     });
   }
 
@@ -161,7 +178,14 @@ const KeepExploring: React.FC<Props> = ({ course, onWebsiteClick }) => {
     <AboutSection>
       <div style={{ display: 'grid', borderTop: `1px solid ${A.HAIRLINE}`, paddingTop: 4 }}>
         {rows.map((r) => (
-          <Row key={r.key} label={r.label} meta={r.meta} onClick={r.onClick} />
+          <Row
+            key={r.key}
+            label={r.label}
+            meta={r.meta}
+            onClick={r.onClick}
+            muted={r.key === 'claim'}
+            indicator={r.indicator}
+          />
         ))}
       </div>
     </AboutSection>

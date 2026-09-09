@@ -73,7 +73,7 @@ const WhoPlaysHere: React.FC<WhoPlaysHereProps> = ({ courseId }) => {
   return (
     <AboutSection
       heading={t('courseDetail.sections.whoPlaysHere')}
-      meta={t('courseDetail.members.meta', { count: total })}
+      meta={t('courseDetail.whoPlaysHereMeta', { count: total })}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {faces.length > 0 && (
