@@ -114,3 +114,8 @@
 - [x] Replace the region dropdown/search with outline board chips and live regional counts.
 - [x] Flatten the Top 100 rate nudge without changing its default treatment.
 - [x] Verify named course states, 32px rhythm, and 390px fit.
+
+## Immersive sticky safe-area scrim (9 Sep 2026)
+- [x] Extract the course-detail notch scrim into one opt-in shared component.
+- [x] Replace the Courses page scroll threshold with a safe-area-aware sentinel observer.
+- [ ] Audit every immersive route and verify top/restuck/no-notch/landscape states.

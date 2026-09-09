@@ -29,6 +29,7 @@ import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 import { Z } from '@/config/zIndex';
 import { TAB_LEAD_IN } from '@/components/courses/course-detail/about/AboutSection';
+import StickySafeAreaScrim from '@/components/chrome/StickySafeAreaScrim';
 
 
 interface GolfClubViewProps {
@@ -609,6 +610,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
       {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
       {cinematicHero}
       <div ref={sentinelRef} style={{ height: 0 }} aria-hidden />
+      <StickySafeAreaScrim visible={tabsStuck} background={A.CANVAS} />
       {/* The sticky tab band follows the page canvas. It was a light glass
           (rgba(248,250,252,0.72)) — that band, not FilterChips, is why the
           course tabs read light. Solid canvas per the mobile-performance rule
@@ -622,22 +624,6 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
           background: A.CANVAS,
         }}
       >
-        {tabsStuck && (
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 'var(--sat, env(safe-area-inset-top, 0px))',
-              background: A.CANVAS,
-              pointerEvents: 'none',
-              zIndex: Z.stickySafeArea,
-            }}
-          />
-        )}
-
         <CourseDetailShellTabs
           activeTab={activeTab}
           onTabChange={handleTabChange}

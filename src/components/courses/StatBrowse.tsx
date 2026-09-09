@@ -43,6 +43,8 @@ import {
 
 } from './useStatBrowse';
 import { RailChips } from '@/components/ui/RailChips';
+import StickySafeAreaScrim from '@/components/chrome/StickySafeAreaScrim';
+import { Z } from '@/config/zIndex';
 import { BrowseCourseCard } from './BrowseCourseCard';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { COURSE_BROWSE_DESCRIPTION, COURSE_BROWSE_KICKER } from './courseBrowseTypography';
@@ -307,12 +309,24 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || typeof IntersectionObserver === 'undefined') return;
-    const io = new IntersectionObserver(
-      ([entry]) => setCondensed(!entry.isIntersecting),
-      { threshold: 0, rootMargin: '0px 0px 0px 0px' },
-    );
-    io.observe(el);
-    return () => io.disconnect();
+    let io: IntersectionObserver | null = null;
+    const observe = () => {
+      io?.disconnect();
+      const satValue = getComputedStyle(document.documentElement).getPropertyValue('--sat');
+      const sat = Number.parseFloat(satValue) || 0;
+      setCondensed(el.getBoundingClientRect().top <= sat);
+      io = new IntersectionObserver(
+        ([entry]) => setCondensed(!entry.isIntersecting),
+        { threshold: 0, rootMargin: `-${sat}px 0px 0px 0px` },
+      );
+      io.observe(el);
+    };
+    observe();
+    window.addEventListener('resize', observe);
+    return () => {
+      window.removeEventListener('resize', observe);
+      io?.disconnect();
+    };
   }, []);
 
   /* Continuous scroll: sentinel below the last card pulls the next page. */
@@ -749,14 +763,15 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   return (
     <div className="w-full">
       {/* Sentinel: once this leaves the top, the sticky bar condenses. */}
-      <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
+      <div ref={sentinelRef} style={{ height: 0 }} aria-hidden="true" />
+      <StickySafeAreaScrim visible={condensed} background={SLATE_50} />
 
       {/* ── Applied filters + board order ───────────────────────── */}
       <div
         className="-mx-4 px-4 pt-2 pb-3 sticky"
         style={{
           top: 'calc(var(--sat, 0px))',
-          zIndex: 20,
+          zIndex: Z.stickyTabs,
           // The bar sits on the same page canvas as the hero and the post
           // wizard step 1 surface. No glass treatment — a solid band reads as
           // part of the page, not a floating darker banner.
