@@ -27,6 +27,7 @@ import { A, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParPart
 import { monotonePath, roundedCourseBarPath } from './chartGeometry';
 import { ParTypeBars } from './ParTypeBars';
 import { buildParTypeRows, type ParTypeRow } from './parTypeRows';
+export { buildParTypeRows, type ParTypeRow } from './parTypeRows';
 import {
   DistributionStrip,
   HoleRowV2,

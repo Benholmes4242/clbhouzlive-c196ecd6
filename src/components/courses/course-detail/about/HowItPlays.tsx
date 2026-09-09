@@ -275,24 +275,36 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
     setSearchParams(next, { replace: true });
   };
 
+  const allHolesSheet = (
+    <AllHolesSheet
+      open={allHolesOpen}
+      onClose={closeDrillDown}
+      courseId={courseId}
+      courseName={courseName ?? ''}
+    />
+  );
+
   /* ── STATE C — nothing has been played here. The reader decides the second
         line, not the course; both sentences are PORTED, not rewritten. ── */
   if (courseRounds === 0) {
     /* Still resolving — say nothing rather than the wrong thing. */
     if (courseStats == null && data == null) return null;
     return (
-      <AboutSection heading={heading}>
-        <Sentence>
-          {t('discover.scores.noOnePlayed', { course: courseName ?? '\u2014' })}
-        </Sentence>
-        <div style={{ marginTop: 6 }}>
-          <Sentence quiet>
-            {connection
-              ? t('discover.scores.beTheFirst')
-              : t('discover.scores.connectToAppear')}
+      <>
+        <AboutSection heading={heading}>
+          <Sentence>
+            {t('discover.scores.noOnePlayed', { course: courseName ?? '\u2014' })}
           </Sentence>
-        </div>
-      </AboutSection>
+          <div style={{ marginTop: 6 }}>
+            <Sentence quiet>
+              {connection
+                ? t('discover.scores.beTheFirst')
+                : t('discover.scores.connectToAppear')}
+            </Sentence>
+          </div>
+        </AboutSection>
+        {allHolesSheet}
+      </>
     );
   }
 
@@ -303,14 +315,17 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
   if (!drawable) {
     if (awaitingMine) return null;
     return (
-      <AboutSection heading={heading} meta={meta}>
-        <Sentence quiet>
-          {t('courseDetail.plays.notEnoughRounds', {
-            count: courseRounds,
-            rounds: formatNumber(courseRounds),
-          })}
-        </Sentence>
-      </AboutSection>
+      <>
+        <AboutSection heading={heading} meta={meta}>
+          <Sentence quiet>
+            {t('courseDetail.plays.notEnoughRounds', {
+              count: courseRounds,
+              rounds: formatNumber(courseRounds),
+            })}
+          </Sentence>
+        </AboutSection>
+        {allHolesSheet}
+      </>
     );
   }
 
@@ -362,12 +377,7 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
 
       {/* d) the hairline and the one drill-down. */}
       <DrillDownRow holes={holes.length} onPress={openDrillDown} />
-      <AllHolesSheet
-        open={allHolesOpen}
-        onClose={closeDrillDown}
-        courseId={courseId}
-        courseName={courseName ?? ''}
-      />
+      {allHolesSheet}
     </AboutSection>
   );
 };
