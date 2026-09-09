@@ -43,7 +43,7 @@ import {
 
 } from './useStatBrowse';
 import { RailChips } from '@/components/ui/RailChips';
-import StickySafeAreaScrim from '@/components/chrome/StickySafeAreaScrim';
+import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
 import { BrowseCourseCard } from './BrowseCourseCard';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
@@ -162,9 +162,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const [searchParams, setSearchParams] = useSearchParams();
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const { sentinelRef, stuck: condensed } = useStickySafeAreaState();
   const loadSentinelRef = useRef<HTMLDivElement | null>(null);
-  const [condensed, setCondensed] = useState(false);
   const viewedRef = useRef(false);
 
   const { data: facets } = useStatBrowseFacets();
@@ -306,29 +305,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   );
 
   /* Condense on scroll: sentinel above the bar leaves the viewport top. */
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') return;
-    let io: IntersectionObserver | null = null;
-    const observe = () => {
-      io?.disconnect();
-      const satValue = getComputedStyle(document.documentElement).getPropertyValue('--sat');
-      const sat = Number.parseFloat(satValue) || 0;
-      setCondensed(el.getBoundingClientRect().top <= sat);
-      io = new IntersectionObserver(
-        ([entry]) => setCondensed(!entry.isIntersecting),
-        { threshold: 0, rootMargin: `-${sat}px 0px 0px 0px` },
-      );
-      io.observe(el);
-    };
-    observe();
-    window.addEventListener('resize', observe);
-    return () => {
-      window.removeEventListener('resize', observe);
-      io?.disconnect();
-    };
-  }, []);
-
   /* Continuous scroll: sentinel below the last card pulls the next page. */
   useEffect(() => {
     const el = loadSentinelRef.current;
@@ -769,6 +745,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       {/* ── Applied filters + board order ───────────────────────── */}
       <div
         className="-mx-4 px-4 pt-2 pb-3 sticky"
+        data-stuck={condensed ? 'true' : 'false'}
         style={{
           top: 'calc(var(--sat, 0px))',
           zIndex: Z.stickyTabs,

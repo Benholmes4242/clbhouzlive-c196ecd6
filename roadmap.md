@@ -118,4 +118,4 @@
 ## Immersive sticky safe-area scrim (9 Sep 2026)
 - [x] Extract the course-detail notch scrim into one opt-in shared component.
 - [x] Replace the Courses page scroll threshold with a safe-area-aware sentinel observer.
-- [ ] Audit every immersive route and verify top/restuck/no-notch/landscape states.
+- [x] Audit every immersive route and verify top/restuck/no-notch/landscape states.

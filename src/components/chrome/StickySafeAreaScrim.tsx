@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 
 import { Z } from '@/config/zIndex';
 
@@ -8,6 +8,39 @@ interface StickySafeAreaScrimProps {
   background: CSSProperties['background'];
   /** Match the host's own background transition. Opaque hosts use `none`. */
   transition?: CSSProperties['transition'];
+}
+
+/** Shared safe-area-aware stuck detection for every scrim consumer. */
+export function useStickySafeAreaState() {
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [stuck, setStuck] = useState(false);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === 'undefined') return;
+
+    let observer: IntersectionObserver | null = null;
+    const observe = () => {
+      observer?.disconnect();
+      const satValue = getComputedStyle(document.documentElement).getPropertyValue('--sat');
+      const sat = Number.parseFloat(satValue) || 0;
+      setStuck(sentinel.getBoundingClientRect().top <= sat);
+      observer = new IntersectionObserver(
+        ([entry]) => setStuck(!entry.isIntersecting),
+        { threshold: 0, rootMargin: `-${sat}px 0px 0px 0px` },
+      );
+      observer.observe(sentinel);
+    };
+
+    observe();
+    window.addEventListener('resize', observe);
+    return () => {
+      window.removeEventListener('resize', observe);
+      observer?.disconnect();
+    };
+  }, []);
+
+  return { sentinelRef, stuck };
 }
 
 /**

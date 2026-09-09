@@ -29,7 +29,7 @@ import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 import { Z } from '@/config/zIndex';
 import { TAB_LEAD_IN } from '@/components/courses/course-detail/about/AboutSection';
-import StickySafeAreaScrim from '@/components/chrome/StickySafeAreaScrim';
+import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 
 
 interface GolfClubViewProps {
@@ -574,37 +574,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
   tabContent,
 }) => {
   const navigate = useNavigate();
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const [tabsStuck, setTabsStuck] = useState(false);
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-
-    let io: IntersectionObserver | null = null;
-    const observe = () => {
-      io?.disconnect();
-      const satValue = getComputedStyle(document.documentElement).getPropertyValue('--sat');
-      const sat = Number.parseFloat(satValue) || 0;
-      setTabsStuck(el.getBoundingClientRect().top <= sat);
-      io = new IntersectionObserver(
-        ([entry]) => setTabsStuck(!entry.isIntersecting),
-        {
-          threshold: 0,
-          // The sticky row stops at var(--sat), so shrink the observer's top
-          // edge by that live inset. Rebuilt on resize for rotation/notch changes.
-          rootMargin: `-${sat}px 0px 0px 0px`,
-        },
-      );
-      io.observe(el);
-    };
-
-    observe();
-    window.addEventListener('resize', observe);
-    return () => {
-      window.removeEventListener('resize', observe);
-      io?.disconnect();
-    };
-  }, []);
+  const { sentinelRef, stuck: tabsStuck } = useStickySafeAreaState();
   return (
     <div className="min-h-screen w-full">
       {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
