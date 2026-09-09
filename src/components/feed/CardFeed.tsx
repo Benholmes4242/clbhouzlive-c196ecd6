@@ -893,6 +893,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       postRoundsSettled,
       onRoundTap,
       commentPreview.map,
+      dividerIndex,
+
     ],
   );
 
