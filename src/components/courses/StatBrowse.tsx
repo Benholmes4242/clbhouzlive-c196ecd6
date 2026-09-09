@@ -11,6 +11,8 @@ import { useTranslation } from 'react-i18next';
 import {
   ChevronDown,
   Globe,
+  Search,
+  Star,
 } from 'lucide-react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -35,6 +37,7 @@ import {
   useStatBrowseFacets,
   useStatBrowseList,
   useCourseBrowseTruth,
+  type StatBrowseRow,
   type StatLens,
   type LensCounts,
 
@@ -91,6 +94,10 @@ interface StatBrowseProps {
 
 /** Dropdown icon geometry — mirrors Discover's quiet Everywhere control. */
 const DD_ICON = { size: 12, strokeWidth: 2.4, 'aria-hidden': true } as const;
+
+function LensIcon({ lens: _lens }: { lens: StatLens }) {
+  return <Star {...DD_ICON} />;
+}
 
 /**
  * SelectTrigger's base carries `[&>span]:line-clamp-1`, which sets
