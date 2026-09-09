@@ -17,7 +17,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import CoursesErrorBoundary from './CoursesErrorBoundary';
@@ -209,23 +208,6 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const [directoryCountry, setDirectoryCountry] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const [tabsStuck, setTabsStuck] = useState(false);
-
-  useEffect(() => {
-    // Cold-load / restored-scroll guard: seed tabsStuck from scroll position
-    // before the observer takes over, so a permanently-absent plate can't
-    // happen if the sentinel ref hasn't mounted yet on back-navigation.
-    setTabsStuck(window.scrollY > 200);
-    const el = sentinelRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setTabsStuck(!entry.isIntersecting),
-      { threshold: 0 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
 
   
   
@@ -432,10 +414,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           );
           return (
             <div>
-              <GlassHeaderPlate visible={tabsStuck} />
               <CoursesPageHero />
-
-              <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
 
               {activeTab === 'top100' ? (
 
