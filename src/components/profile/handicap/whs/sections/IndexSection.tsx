@@ -179,17 +179,26 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
 
   const CHIP_LABEL: Record<WindowKey, string> = { '30d': '30D', '90d': '90D', '12m': '12M' };
 
+  /* The delta FIGURE sits on the index figure's baseline and its kicker hangs
+     BELOW that line (absolute, out of flow) — one row of figures with labels
+     beneath, the same grammar as Last round and Friends' rounds. Aligning the
+     block instead would put the kickers on the baseline and lift the figures
+     off it. */
   const deltaCell = (delta: number, label: string) => {
     const pts = label === t('common:handicap.index.delta90') ? model.slices['90d'] : model.slices['12m'];
     const color = toneColor(indexTone(pts[0].v, pts[pts.length - 1].v));
     return (
-      <div key={label}>
+      <div key={label} style={{ position: 'relative' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color, lineHeight: 1.1, ...FIG }}>
           {formatDelta(delta)}
         </div>
         <div
           style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
             marginTop: 3,
+            whiteSpace: 'nowrap',
             fontSize: 9,
             fontWeight: 700,
             letterSpacing: '0.12em',
