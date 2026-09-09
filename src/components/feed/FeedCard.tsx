@@ -925,7 +925,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               </div>
             </div>
 
-            </div>
             {showLikedBy && (
               <LikedByRow
                 postId={post.id}
