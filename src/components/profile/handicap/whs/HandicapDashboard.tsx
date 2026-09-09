@@ -25,10 +25,7 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-const DEFAULT_SUBTAB: HandicapSubtab = 'today';
-
 export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false, ownerFirstName = null }) => {
-  const [searchParams] = useSearchParams();
   // Single source of truth - see src/lib/whs/syncHealth.ts. Status only.
   const [syncHealth] = useState(() => getSyncHealth(connection));
   const reauthRequired = syncHealth.kind === 'reauth_auth';
