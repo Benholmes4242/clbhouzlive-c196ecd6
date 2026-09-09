@@ -75,16 +75,6 @@ const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName,
   const spansYears = new Set(rounds.map(yearOf)).size > 1;
   const showYearDividers = sort === 'recent' && (total >= 10 || (total >= 5 && spansYears));
 
-  const trackedOpen = React.useRef(false);
-  React.useEffect(() => {
-    if (!open || trackedOpen.current || !data) return;
-    trackedOpen.current = true;
-    analyticsEvents.track('course_rounds_page_viewed', { course_id: courseId, rounds: total, surface: 'sheet' });
-  }, [open, data, courseId, total]);
-  React.useEffect(() => {
-    if (!open) trackedOpen.current = false;
-  }, [open]);
-
   return (
     <>
       <BottomSheet

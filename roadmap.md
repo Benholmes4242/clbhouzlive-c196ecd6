@@ -139,7 +139,7 @@
 - [x] Load the complete round history with an exact total and preserve scorecard navigation and analytics.
 - [x] Keep the routed fallback and move the sole in-app caller to sheet URL state.
 - [ ] Verify the populated 390px state when authenticated preview data is available.
-- [ ] Complete static checks and the final course-detail dead-file report.
+- [x] Complete static checks and the final course-detail dead-file report.
 
 ## WHS handicap index reconciliation (9 Sep 2026)
 - [ ] Identify every current Handicap Index calculation and hardcoded model reference.
