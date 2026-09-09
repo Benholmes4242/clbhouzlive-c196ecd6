@@ -18,6 +18,7 @@ import { useProfilePosts } from './hooks/useProfilePosts';
 import { PostsFeedSkeleton } from './PostsFeedSkeleton';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
+import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { LightCardFeed } from './LightCardFeed';
 import { useClubhouseStore } from '@/store/clubhouseStore';
@@ -162,9 +163,9 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   // immediately close the sheet. Deferring the mount until the open state has
   // committed prevents that click-through while keeping the exit animation.
   const [commentsMounted, setCommentsMounted] = useState(false);
-  const openCommentsForPost = useCallback((post: FeedPost) => {
+  const openCommentsForPost = useCallback((post: FeedPost, _actor?: unknown, source?: CommentOpenSource) => {
     setSelectedCommentPost(post);
-    openComments(post);
+    openComments(post, source);
   }, [openComments]);
   useEffect(() => {
     if (commentsOpen) {
