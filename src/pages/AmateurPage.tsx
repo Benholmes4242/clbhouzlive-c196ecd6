@@ -91,7 +91,21 @@ export default function AmateurPage() {
           analyticsEvents.track('amateur_hero_round_opened', { has_score: true });
           opener.openByScore(scoreId, null, roundUserId);
         }}
+        /* §8 AN AGGREGATE CARD IS ANSWERED ON THIS PAGE. The board state lives
+           here, so the hero hands up the metric, window and pool it named and
+           this page sets the board and brings it into view. The member reads the
+           same figure in its standing, with themselves in the list, without a
+           navigation. `touched` inside the board state is set by changeFilters,
+           so a card-driven pool will not be widened out from under the member by
+           the quiet-circle rule. */
+        onOpenBoard={(board, window, scope) => {
+          analyticsEvents.track('amateur_hero_board_driven', { board, window, scope });
+          state.changeBoard(board);
+          state.changeFilters({ ...state.filters, window, scope });
+          boardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }}
       />
+
 
       {/* THE SHARED CLEARANCE, never a page-local number: the floating pill's
           measured height + its 20px gap + 16px breathing + the home indicator.
