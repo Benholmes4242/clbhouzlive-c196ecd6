@@ -7,7 +7,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 
 // ── SECTION A (Sep 2026): ONE SCROLLING PAGE, TEN SECTIONS ────────────────
 // The Today / Form / Circle tabs are gone. The three view components
-// (TodayView / TrendsView / CircleView) are no longer rendered — their inner
+// (TodayView / TrendsView / CircleView) were deleted 10 Sep 2026 — their inner
 // blocks mount here directly, in the fixed page order:
 //
 //   1 Index · 2 Next round · 3 Last round · 4 Rounds that count ·
@@ -22,7 +22,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 // section takes them off — nothing disappears before its replacement exists.
 //
 // `./views/*` and `./types` (HandicapSubtab, LEGACY_SUBTAB_ALIAS,
-// resolveHandicapSubtab) are now unreferenced here — dead list, not deleted.
+// resolveHandicapSubtab) were deleted 10 Sep 2026.
 
 import IndexSection from './sections/IndexSection';
 import NextRoundSection from './sections/NextRoundSection';

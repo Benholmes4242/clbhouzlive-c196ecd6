@@ -48,8 +48,8 @@ import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 // TABS REMOVED (Sep 2026). resolveHandicapSubtab / HandicapSubtab are no longer
-// read here: the handicap area is ONE scrolling page. `whs/types.ts` keeps the
-// alias table (dead list) so nothing that still imports it breaks.
+// read here: the handicap area is ONE scrolling page. `whs/types.ts`, which
+// held the subtab alias table, was deleted 10 Sep 2026 with the tab views.
 import { useTranslation } from 'react-i18next';
 
 
