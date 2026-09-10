@@ -118,15 +118,25 @@ const fmtMonth = (iso: string): string => {
   }
 };
 
-type FilterKey = 'all' | 'counters' | string;
+/**
+ * The filter is TWO states plus one course, never a scroller of courses.
+ * A course is held by ID: two WHS course records can share a name, and
+ * grouping on the name merged them into one chip and one count.
+ */
+type Filter =
+  | { kind: 'all' }
+  | { kind: 'counters' }
+  | { kind: 'course'; id: string; name: string };
 
 export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null, viewMode = 'owner', ownerFirstName = null, variant = 'section' }) => {
   const { t } = useTranslation('common');
   const { data: allRounds, isLoading } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
   const [openScoreId, setOpenScoreId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<FilterKey>('all');
+  const [filter, setFilter] = useState<Filter>({ kind: 'all' });
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [displayedCount, setDisplayedCount] = useState<number>(INITIAL_COUNT);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const rowLabels = useMemo(
     () => ({
