@@ -134,10 +134,12 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           is dead-listed, not deleted; SCORE STATS is still reported, not moved. */}
       {scoresLoading ? null : <ScoringSection scores={scores ?? []} />}
 
-      {/* 6 — WHICH HOLES COST YOU (Section G; RoundShapePanel pending the
-          "no weak stretch" census the brief requires before it is touched) */}
-      <GameEverywhereCard readOnly={readOnly} />
-      <RoundShapePanel readOnly={readOnly} />
+      {/* 6 — HOW YOU SCORE A HOLE (Section G). The outcome distribution moves
+          here from StablefordCard's SCORE STATS and the par-type rings from
+          GameEverywhereCard, which is dead-listed rather than deleted.
+          RoundShapePanel is off the page: 22 of 22 eligible members get the
+          "no weak stretch" verdict, so the block says nothing. */}
+      <HolesSection userId={userId} connectionId={connection.id} readOnly={readOnly} />
 
       {/* 7 — PERSONAL BESTS (Section H; the achievements tile + streaks come
           off here, replaced by the TROPHY ROOM › terminal row per the
