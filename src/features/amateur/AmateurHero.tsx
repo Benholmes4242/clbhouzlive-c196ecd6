@@ -294,7 +294,7 @@ export function AmateurHero({
             border: 0,
             background: 'transparent',
             textAlign: 'left',
-            cursor: row.course_id ? 'pointer' : 'default',
+            cursor: row?.course_id || isAggregateCard ? 'pointer' : 'default',
           }}
         >
           {/* WHO, on the photograph. Name and kicker form one column so the
@@ -303,10 +303,10 @@ export function AmateurHero({
           <span style={{ display: 'flex', alignItems: 'center', gap: isCard ? 14 : 9 }}>
             <SquircleAvatar
               size={isCard ? 44 : 30}
-              src={row.profile_photo_url ?? undefined}
-              alt={row.display_name}
-              userId={row.user_id}
-              fallback={row.display_name?.slice(0, 2).toUpperCase()}
+              src={subject.profile_photo_url ?? undefined}
+              alt={subject.display_name}
+              userId={subject.user_id}
+              fallback={subject.display_name?.slice(0, 2).toUpperCase()}
               hairlineRing
             />
             <span
