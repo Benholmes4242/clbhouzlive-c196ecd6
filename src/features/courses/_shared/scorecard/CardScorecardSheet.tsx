@@ -1011,7 +1011,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               <div style={{ flex: 'none', textAlign: 'right' }}>
                 <div
                   style={{
-                    ...NUM, fontSize: 38, fontWeight: 800, lineHeight: 0.9,
+                    /* §B — 34, not 38. The course name went to 20 and the gross
+                       no longer competes with a second copy of itself in the
+                       totals block, so it can give back four points. */
+                    ...NUM, fontSize: 34, fontWeight: 800, lineHeight: 0.9,
                     letterSpacing: '-0.05em',
                     color: heroMuted ? EVEN_GRAY : A.INK,
                   }}
