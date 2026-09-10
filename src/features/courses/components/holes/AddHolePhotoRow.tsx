@@ -1,4 +1,19 @@
 /**
+ * RETAINED DELIBERATELY - DO NOT SWEEP ON REACHABILITY.
+ *
+ * Unreferenced since the course Holes tab was retired on 10 Sep 2026: the
+ * member submission surface (HoleDataSheet) no longer exists, so nothing
+ * currently mounts this file.
+ *
+ * The admin side is STILL LIVE and reviewing a closed stream:
+ * useHolePhotoQueue, HolePhotoReviewSheet and the InboxPage triage counts all
+ * continue to work and can never receive another submission.
+ *
+ * Kept pending the hole-photography decision (schema, contribution and
+ * moderation stages all exist). Deleting it would remove a product capability
+ * as a side effect of a tidy-up.
+ */
+/**
  * H2 - contribution affordance for a single hole.
  *
  * Surfaces: the hole detail sheet ('hole_sheet') and the hardest/easiest holes
