@@ -579,6 +579,18 @@
       },
       "nudge": {
         "draft": "[~~Ĥí {{name}} - ĉőññéĉţ ýőúř ĥáñđíĉáƥ őñ ĉļƀĥőúž áñđ ŵé ĉáñ ĉőɱƥářé řőúñđš áñđ šéé ŵĥő'š áĉţúáļļý ƥļáýíñĝ ƀéţţéř.~~]"
+      },
+      "section": {
+        "kicker": "Your circle",
+        "heading": "You're {{rank}} of {{total}}",
+        "meta": "By index",
+        "behind": "{{gap}} behind {{name}}.",
+        "clear": "{{gap}} clear of {{name}}.",
+        "seeAll": "See all {{count}}",
+        "you": "You",
+        "emptyHeading": "No one here yet",
+        "emptyBody": "Your circle is the golfers you've played with who are also on clbhouz. Connect with a few and this becomes a live table.",
+        "findGolfers": "Find golfers"
       }
     },
     "hero": {
@@ -750,7 +762,14 @@
       "bestVsHcp": "Best against handicap",
       "trophyRoom": "Trophy room",
       "missing": "{{count}} more appear once you've posted a stableford and a round off your handicap.",
-      "missingAll": "Your records appear here once you've posted a round."
+      "missingAll": "Your records appear here once you've posted a round.",
+      "lower": {
+        "diff": "best differential",
+        "gross": "best gross",
+        "stableford": "best stableford",
+        "vsHcp": "best against handicap"
+      },
+      "stillToSet": "Still to set: {{list}}."
     }
   },
   "comments": {
