@@ -50,5 +50,8 @@
       "headlineRounds": "{{rounds}} rounds, all here.",
       "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
     }
+  },
+  "career": {
+    "seasonBestScoped": "BESTE {{year}}"
   }
 }

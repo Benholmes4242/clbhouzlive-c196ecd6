@@ -27,7 +27,7 @@ export const SeasonCutPanel: React.FC<Props> = ({ rounds }) => {
   const cells: Array<{ label: string; value: string | number }> = [
     { label: t('career.seasonRounds'), value: cut.rounds },
     { label: t('career.seasonBirdies'), value: cut.birdies },
-    ...(cut.best !== null ? [{ label: t('career.seasonBest'), value: cut.best }] : []),
+    ...(cut.best !== null ? [{ label: t('career.seasonBestScoped', { year }), value: cut.best }] : []),
   ];
 
   return (

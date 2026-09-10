@@ -18,7 +18,8 @@
     "seasonBirdies": "BIRDIES",
     "seasonBest": "BEST",
     "sparseFootnote": "Post a few more rounds and crowns, Top 100 progress and longer streaks appear here.",
-    "bestRoundLine": "{{date}} · {{gross}} gross"
+    "bestRoundLine": "{{date}} · {{gross}} gross",
+    "seasonBestScoped": "BEST {{year}}"
   },
   "stableford": {
     "kicker": "STABLEFORD POINTS",
