@@ -193,7 +193,10 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
       hairline
       kicker={t('common:handicap.holes.eyebrow')}
       heading={t('common:handicap.holes.heading')}
-      meta={t('common:handicap.holes.meta', { count: rounds })}
+      /* NO META. Two round populations live in this section — every hole with a
+         card for the distribution, mapped eighteen-hole rounds for the rings —
+         and one figure in the meta slot could only describe one of them. Each
+         pool states its own basis beneath itself instead. */
     >
       {/* THE OUTCOME DISTRIBUTION — four counts, equal columns, no ring */}
       <div style={{ display: 'flex', gap: 12 }}>
