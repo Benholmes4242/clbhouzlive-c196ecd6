@@ -224,6 +224,8 @@ export function useCircleLatestRounds(
       //    friendship for anyone on handicap_visibility 'friends'. A followed
       //    member who restricted themselves drops out on their own terms.
       const circleIds = await fetchCircleIds(userId);
+      /* Membership test for the everyone scope's "suggested" flag - same set. */
+      const circleSet = new Set<string>(circleIds);
 
       type Round = {
         user_id: string;
