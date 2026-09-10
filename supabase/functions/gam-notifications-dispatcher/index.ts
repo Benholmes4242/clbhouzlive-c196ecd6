@@ -276,7 +276,7 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
       return {
         title: b ? `🏆 Badge unlocked: ${b.title}` : "🏆 New badge unlocked",
         body: b?.description ?? "Open the app to see what you've earned.",
-        data: { route: "/handicap?sheet=achievements", badge_id: p.badge_id },
+        data: { route: "/handicap?gam=trophies", badge_id: p.badge_id },
       };
     }
     case "legend_lost": {
@@ -306,7 +306,7 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
       return {
         title: s ? `🔥 Your ${s} streak is at risk` : `🔥 Your streak is at risk`,
         body: "Play one round to keep it alive.",
-        data: { route: "/handicap?sheet=streaks", streak_type: p.streak_type },
+        data: { route: "/handicap?gam=streaks", streak_type: p.streak_type },
       };
     }
     case "streak_broken": {
@@ -314,7 +314,7 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
       return {
         title: `Streak broken at ${p.count}`,
         body: s ? `Start a new ${s} streak today.` : `Start a new streak today.`,
-        data: { route: "/handicap?sheet=streaks", streak_type: p.streak_type },
+        data: { route: "/handicap?gam=streaks", streak_type: p.streak_type },
       };
     }
     case "streak_freeze_applied": {
@@ -324,7 +324,7 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
         body: s
           ? `Your ${s} streak (${p.count}) is preserved.`
           : `Your streak (${p.count}) is preserved.`,
-        data: { route: "/handicap?sheet=streaks", streak_type: p.streak_type },
+        data: { route: "/handicap?gam=streaks", streak_type: p.streak_type },
       };
     }
     case "rival_played": {
@@ -350,7 +350,7 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
       return {
         title: `⚠️ ${name} at risk`,
         body: `You're at ${p.index}, cut-off ${p.cutoff}. Time to play.`,
-        data: { route: "/handicap?sheet=achievements", badge_id: p.badge_id },
+        data: { route: "/handicap?gam=trophies", badge_id: p.badge_id },
       };
     }
     case "status_reclaimed": {
@@ -359,7 +359,7 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
       return {
         title: `🎉 ${name} reclaimed`,
         body: `Back to ${p.index}. Welcome back.`,
-        data: { route: "/handicap?sheet=achievements", badge_id: p.badge_id },
+        data: { route: "/handicap?gam=trophies", badge_id: p.badge_id },
       };
     }
     case "level_up":
