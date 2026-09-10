@@ -1,193 +1,138 @@
-/**
- * FriendRoundRow - a friend's posted round as a HOUSE ROW, in TWO LINES.
- *
- * LINE 1: identity (name + date) | GROSS | STBL | DIFF | chevron.
- * LINE 2: the COURSE, spanning the full row width.
- *
- * The course used to live in a ~140px column and needed ~150, which is why
- * every club read as "SUND...". It now has the whole row.
- *
- * ALL THREE FIGURE COLUMNS RENDER ON EVERY VARIANT. Where a value is absent
- * the cell is EMPTY - the label still renders and the column keeps its width,
- * so GROSS never moves between variants. No em dashes.
- *
- * THE ACTION USES THE DEAD COLUMNS. On an unconnected friend STBL and DIFF
- * carry no figures, so the action occupies exactly that span (100px): a LABEL
- * in INK with a chevron, plus a 7px DIM sub-label naming the state. Never
- * amber.
- *
- * THE ENGLAND GOLF BADGE IS DELETED. The sub-label states the same fact, in
- * the place where it explains the empty columns beside it.
- *
- * RHYTHM: a label belongs to its figure and a date belongs to its name.
- * Tightening those pairs is what separates the blocks.
- */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
+import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 import { displayName } from '@/lib/whs/utils/initials';
 import { fmtAbsoluteDate } from '@/lib/whs/utils/nameFormat';
 import { CHART, CHART_FONT } from '../../charts';
-import { DARK_ROW_TITLE } from '../_shared/darkAtoms';
-import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 export type FriendRoundVariant = 'clbhouz-synced' | 'clbhouz-not-synced' | 'eg-only';
 
 interface Props {
   activity: WhsFriendActivityWithImage;
   variant: FriendRoundVariant;
-  onClick: () => void;
+  onOpenRound: (activity: WhsFriendActivityWithImage) => void;
+  onInvite: (activity: WhsFriendActivityWithImage) => void;
+  inviting?: boolean;
 }
 
-/** Fixed column widths - the figures must line up row to row. */
 const COL_GROSS = 44;
 const COL_STBL = 40;
 const COL_DIFF = 48;
-const GAP = 12;
-
-/** Rhythm, named so it cannot drift. Pairs are tight; blocks separate. */
+const FIGURE_GAP = 3;
 const GAP_NAME_TO_DATE = 3;
-const GAP_DATE_TO_CLUB = 3;
-const GAP_FIGURE_TO_LABEL = 3;
+const GAP_FIGURES_TO_COURSE = 8;
 
-/** Dark LABEL, this surface: READ 11 / 700 / 0.16em. */
-const LABEL: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
-  color: CHART.MUTE,
-  lineHeight: 1.4,
+const KICKER: React.CSSProperties = {
   margin: 0,
+  fontFamily: CHART_FONT,
+  fontSize: 9,
+  lineHeight: '11px',
+  fontWeight: 700,
+  letterSpacing: 0,
+  textTransform: 'uppercase',
+  color: CHART.DIM,
 };
 
-/** ONE treatment for the date and the course. Defined once, used twice. */
-const SECONDARY: React.CSSProperties = {
-  fontSize: 11.5,
-  fontWeight: 400,
-  lineHeight: 1.35,
-  color: 'var(--hcp-t-60)',
-  overflowWrap: 'anywhere',
+const FIGURE: React.CSSProperties = {
+  margin: `${FIGURE_GAP}px 0 0`,
+  minHeight: 19,
+  fontFamily: CHART_FONT,
+  fontSize: 16,
+  lineHeight: '19px',
+  fontWeight: 700,
+  letterSpacing: '-0.04em',
+  fontVariantNumeric: 'tabular-nums lining-nums',
+  color: CHART.INK,
 };
 
-const Cell: React.FC<{ label: string; width: number; children?: React.ReactNode }> = ({
-  label,
-  width,
-  children,
-}) => (
+function formatDifferential(value: number | null): string | null {
+  if (value == null) return null;
+  if (value < 0) return `−${Math.abs(value).toFixed(1)}`;
+  return value > 0 ? `+${value.toFixed(1)}` : '0.0';
+}
+
+const FigureCell: React.FC<{ label: string; width: number; value: React.ReactNode }> = ({ label, width, value }) => (
   <div style={{ width, flexShrink: 0, textAlign: 'right' }}>
-    {/* Fixed slot: an absent value must not collapse the cell. */}
-    <div
-      style={{
-        height: 15,
-        fontSize: 15,
-        fontWeight: 700,
-        color: CHART.INK,
-        letterSpacing: '-0.03em',
-        lineHeight: '15px',
-        fontVariantNumeric: 'tabular-nums lining-nums',
-      }}
-    >
-      {children}
-    </div>
-    <div style={{ ...LABEL, marginTop: GAP_FIGURE_TO_LABEL }}>{label}</div>
+    <p style={KICKER}>{value == null ? '' : label}</p>
+    <p style={FIGURE}>{value ?? ''}</p>
   </div>
 );
 
-export const FriendRoundRow: React.FC<Props> = ({ activity, variant, onClick }) => {
+export const FriendRoundRow: React.FC<Props> = ({
+  activity,
+  variant,
+  onOpenRound,
+  onInvite,
+  inviting = false,
+}) => {
   const { t } = useTranslation('common');
-  const gross = activity.last_round_adjusted_gross;
-  const stableford = activity.last_round_stableford;
-  const diff = activity.last_round_differential;
-  const course = activity.last_round_course_name ?? t('handicap.circle.round.unknownCourse');
+  const canOpen = variant === 'clbhouz-synced' && !!activity.last_round_score_id;
+  const canInvite = variant === 'eg-only' && activity.friend_passport_id != null;
   const played = fmtAbsoluteDate(activity.last_round_played_at);
-  const unconnected = variant !== 'clbhouz-synced';
+  const dateMeta = activity.is_nine_hole || activity.total_holes === 9
+    ? `${played} - ${t('handicap.friendsRounds.nineHoles')}`
+    : played;
+  const course = activity.last_round_course_name ?? t('handicap.friendsRounds.unknownCourse');
+  const diff = activity.last_round_differential;
+
+  const main = (
+    <>
+      <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+        <p style={{ margin: 0, fontFamily: CHART_FONT, fontSize: 13, lineHeight: '16px', fontWeight: 700, color: CHART.INK, overflowWrap: 'anywhere' }}>
+          {displayName(activity.friend_name)}
+        </p>
+        <p style={{ ...KICKER, marginTop: GAP_NAME_TO_DATE }}>{dateMeta}</p>
+      </div>
+      <div style={{ display: 'flex', gap: FIGURE_GAP, flexShrink: 0 }}>
+        <FigureCell label={t('handicap.friendsRounds.gross')} width={COL_GROSS} value={activity.last_round_adjusted_gross} />
+        <FigureCell label={t('handicap.friendsRounds.stbl')} width={COL_STBL} value={activity.last_round_stableford} />
+        <FigureCell label={t('handicap.friendsRounds.diff')} width={COL_DIFF} value={formatDifferential(diff)} />
+      </div>
+      {canInvite && (
+        <button
+          type="button"
+          disabled={inviting}
+          onClick={() => onInvite(activity)}
+          style={{ border: 0, padding: '8px 0 8px 8px', background: 'transparent', color: CHART.AMBER, fontFamily: CHART_FONT, fontSize: 11, lineHeight: '13px', fontWeight: 700, letterSpacing: 0, textTransform: 'uppercase', opacity: inviting ? 0.5 : 1 }}
+        >
+          {t('handicap.friendsRounds.invite')}
+        </button>
+      )}
+    </>
+  );
+
+  const rowStyle: React.CSSProperties = {
+    width: '100%',
+    minHeight: 64,
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 10,
+    padding: 0,
+    border: 0,
+    background: 'transparent',
+    textAlign: 'left',
+  };
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      style={{
-        padding: '13px 16px',
-        fontFamily: CHART_FONT,
-        cursor: 'pointer',
-      }}
-    >
-      {/* LINE 1 - flex-start so a wrapped name cannot drag the figures down. */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: GAP }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ ...DARK_ROW_TITLE, overflowWrap: 'anywhere' }}>
-            {displayName(activity.friend_name)}
-          </div>
-          <div style={{ ...SECONDARY, marginTop: GAP_NAME_TO_DATE }}>{played}</div>
-        </div>
-
-        <Cell label={t('handicap.circle.round.gross')} width={COL_GROSS}>
-          {gross ?? null}
-        </Cell>
-
-        {unconnected ? (
-          // The dead columns, used: STBL + DIFF + the gap between them.
-          <div
-            style={{
-              width: COL_STBL + COL_DIFF + GAP,
-              flexShrink: 0,
-              textAlign: 'right',
-            }}
-          >
-            <div
-              style={{
-                height: 15,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                gap: 3,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '-0.01em',
-                color: 'var(--hcp-t-100)',
-              }}
-            >
-              {variant === 'eg-only'
-                ? t('handicap.circle.round.invite')
-                : t('handicap.circle.round.askToSync')}
-              <ChevronRight size={10} strokeWidth={2.6} />
-            </div>
-            <div style={{ ...LABEL, color: CHART.DIM, marginTop: GAP_FIGURE_TO_LABEL }}>
-              {variant === 'eg-only'
-                ? t('handicap.circle.round.notOnClbhouz')
-                : t('handicap.circle.round.noHandicap')}
-            </div>
-          </div>
-        ) : (
-          <>
-            <Cell label={t('handicap.circle.round.stbl')} width={COL_STBL}>
-              {stableford ?? null}
-            </Cell>
-            <Cell label={t('handicap.circle.round.diff')} width={COL_DIFF}>
-              {diff != null ? `${diff > 0 ? '+' : ''}${diff.toFixed(1)}` : null}
-            </Cell>
-          </>
-        )}
-
-        <ChevronRight
-          size={15}
-          strokeWidth={2.2}
-          color={CHART.DIM}
-          style={{ flexShrink: 0, marginTop: 1 }}
-        />
+    canOpen ? (
+      <button
+        type="button"
+        onClick={() => onOpenRound(activity)}
+        style={{ width: '100%', padding: '12px 0', border: 0, borderBottom: `1px solid ${CHART.BORDER}`, background: 'transparent', textAlign: 'left' }}
+      >
+        <span style={rowStyle}>{main}</span>
+        <span style={{ display: 'block', marginTop: GAP_FIGURES_TO_COURSE, fontFamily: CHART_FONT, fontSize: 12, lineHeight: '16px', fontWeight: 500, color: CHART.MUTE, overflowWrap: 'anywhere' }}>
+          {course}
+        </span>
+      </button>
+    ) : (
+      <div style={{ padding: '12px 0', borderBottom: `1px solid ${CHART.BORDER}` }}>
+        <div style={rowStyle}>{main}</div>
+        <p style={{ margin: `${GAP_FIGURES_TO_COURSE}px 0 0`, fontFamily: CHART_FONT, fontSize: 12, lineHeight: '16px', fontWeight: 500, color: CHART.MUTE, overflowWrap: 'anywhere' }}>
+          {course}
+        </p>
       </div>
-
-      {/* LINE 2 - the course, full row width, same treatment as the date. */}
-      <div style={{ ...SECONDARY, marginTop: GAP_DATE_TO_CLUB }}>{course}</div>
-    </div>
+    )
   );
 };
 

@@ -156,10 +156,10 @@ export function useFriendWindowRankings(ownerUserId: string | undefined) {
   });
 }
 
-export function useFriendsActivity(ownerUserId: string | undefined) {
+export function useFriendsActivity(ownerUserId: string | undefined, limit = 20) {
   return useQuery({
-    queryKey: whsKeys.friendsActivity(ownerUserId ?? ''),
-    queryFn: () => fetchFriendsActivity(ownerUserId as string, 20),
+    queryKey: [...whsKeys.friendsActivity(ownerUserId ?? ''), limit],
+    queryFn: () => fetchFriendsActivity(ownerUserId as string, limit),
     enabled: !!ownerUserId,
     staleTime: 30_000,
   });
