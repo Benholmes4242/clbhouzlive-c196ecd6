@@ -166,7 +166,6 @@ export function AllTeeTimesSheet({
     <BottomSheet
       open={open}
       onClose={onClose}
-      variant="light"
       ariaLabelledBy="tournament-tee-times-sheet-title"
       style={{ height: 'auto', maxHeight: '85dvh' }}
     >

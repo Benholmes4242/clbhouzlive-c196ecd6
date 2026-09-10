@@ -499,7 +499,6 @@ const CoursePickerSheet: React.FC<{
   <BottomSheet
     open={open}
     onClose={onClose}
-    variant="dark"
     className="hcp-dark"
     zIndexBase={1500}
     style={{

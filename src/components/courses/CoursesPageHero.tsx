@@ -1,4 +1,5 @@
 import { memo, useEffect, useMemo } from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Crown, Flag, Minus, TrendingDown, TrendingUp } from 'lucide-react';
@@ -11,7 +12,7 @@ import { formatRatingValue } from '@/utils/formatters';
 import { formatNumber } from '@/i18n/format';
 import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHeroCourseFact';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
-import { SLATE_50 } from '@/features/courses/_shared/tokens';
+
 import { KICKER } from '@/lib/tokens/type';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 
@@ -215,7 +216,7 @@ function CoursesPageHeroInner() {
         width: '100%',
         height: EXPLORE_COURSE_HERO_HEIGHT,
         background,
-        backgroundColor: SLATE_50,
+        backgroundColor: A.CANVAS,
         display: 'flex',
         flexDirection: 'column',
         cursor: hero ? 'pointer' : 'default',

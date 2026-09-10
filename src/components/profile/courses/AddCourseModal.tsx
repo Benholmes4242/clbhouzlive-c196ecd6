@@ -602,7 +602,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       onClose={onClose}
       zIndexBase={1400}
       ariaLabelledBy="add-course-title"
-      variant="light"
       maxHeight="85dvh"
       style={{
         height: 'auto',

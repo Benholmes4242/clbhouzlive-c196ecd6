@@ -342,7 +342,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
 
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="dark">
+    <BottomSheet open={open} onClose={onClose}>
       <div style={{ padding: '20px 20px 28px' }}>
         {renderHeader()}
         {renderBody()}

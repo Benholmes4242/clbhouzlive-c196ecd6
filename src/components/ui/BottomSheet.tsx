@@ -26,21 +26,15 @@ interface BottomSheetProps {
   className?: string;
   style?: React.CSSProperties;
   ariaLabelledBy?: string;
-  /**
-   * DEAD, KEPT FOR COMPILE COMPATIBILITY (BRIEF_SHEET_BACKGROUND_CANON).
-   * Neither variant selects a surface any more: there is ONE sheet
-   * background, `SHEET_SURFACE` below, and this component owns it. The prop
-   * is ignored. Do not reintroduce a per-variant surface.
+  /*
+   * BRIEF_SHEET_BACKGROUND_CANON_02 §1 — `variant` AND `surfaceColor` ARE GONE
+   * FROM THE TYPE, not merely ignored. A silent no-op reports as a working
+   * feature: the next reader passes a background, sees nothing change, and
+   * hunts a CSS conflict that does not exist. Passing either is now a COMPILE
+   * ERROR. If a sheet ever genuinely needs a different surface, that is a new
+   * NAMED variant on this component, not a free-form colour prop.
    */
-  variant?: 'light' | 'dark';
 
-  /**
-   * DEAD, IGNORED (BRIEF_SHEET_BACKGROUND_CANON). Four sheets had drifted to
-   * four different fills through this prop, each correct on the day it was
-   * written. Passing it now does nothing on purpose: an override that agrees
-   * with the canon today is an override that will disagree later.
-   */
-  surfaceColor?: string;
   /** Optional max-height override (default '85dvh'). Use e.g. '75dvh' for dvh-aware caps. */
   maxHeight?: string;
   /** Optional analytical-sheet corner radius. Defaults to the existing 20px. */
@@ -59,8 +53,6 @@ export function BottomSheet({
   className = '',
   style,
   ariaLabelledBy,
-  variant = 'light',
-  surfaceColor,
   maxHeight = '85dvh',
   topRadius = 20,
   grabberColor = 'rgba(255,255,255,0.18)',

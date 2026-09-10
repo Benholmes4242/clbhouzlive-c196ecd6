@@ -94,7 +94,6 @@ export function InviteFriendsSheet({ open, onClose, source }: Props) {
     <BottomSheet
       open={open}
       onClose={onClose}
-      variant="light"
       ariaLabelledBy="invite-friends-title"
       // Stacks OVER the profile sheet, which sits at 9998/9999.
       zIndexBase={10000}

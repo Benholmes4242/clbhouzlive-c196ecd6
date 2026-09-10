@@ -62,7 +62,6 @@ export function CoursesPlayedSeeAllSheet({
     <BottomSheet
       open={open}
       onClose={onClose}
-      variant="dark"
       maxHeight="85dvh"
       ariaLabelledBy="courses-see-all-title"
       style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}

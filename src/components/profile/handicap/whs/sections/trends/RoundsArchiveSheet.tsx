@@ -47,7 +47,6 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
       open={open}
       onClose={onClose}
       ariaLabelledBy="rounds-archive-sheet-title"
-      variant="dark"
       className="hcp-dark"
 
       style={{

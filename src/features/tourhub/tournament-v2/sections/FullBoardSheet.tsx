@@ -74,7 +74,6 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
     <BottomSheet
       open={open}
       onClose={onClose}
-      variant="light"
       ariaLabelledBy="tournament-full-board-sheet-title"
       style={{ height: 'auto', maxHeight: '85dvh' }}
     >

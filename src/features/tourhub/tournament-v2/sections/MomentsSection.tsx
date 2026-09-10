@@ -103,7 +103,6 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
       <BottomSheet
         open={open}
         onClose={() => setOpen(false)}
-        variant="light"
         ariaLabelledBy="tournament-moments-sheet-title"
         style={{ height: 'auto', maxHeight: '85dvh' }}
       >

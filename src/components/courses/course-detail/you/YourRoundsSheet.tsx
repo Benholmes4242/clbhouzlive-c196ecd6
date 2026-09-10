@@ -80,7 +80,6 @@ const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName,
       <BottomSheet
         open={open}
         onClose={onClose}
-        variant="light"
         maxHeight="85dvh"
         topRadius={22}
         grabberColor="rgba(248,250,252,0.22)"

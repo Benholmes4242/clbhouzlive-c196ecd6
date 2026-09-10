@@ -131,7 +131,6 @@ export function CourseNewsSheet({
       open={open}
       onClose={onClose}
       ariaLabelledBy="courseled-news-title"
-      variant="light"
       style={{
         height: 'auto',
         maxHeight: '85dvh',

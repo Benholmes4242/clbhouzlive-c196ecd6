@@ -479,7 +479,6 @@ export function FindGolfersSheet({ open, onClose }: Props) {
       open={open}
       onClose={onClose}
       ariaLabelledBy="find-golfers-title"
-      variant="light"
       style={{
         height: 'auto',
         maxHeight: '85dvh',

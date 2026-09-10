@@ -44,7 +44,7 @@ import { CourseStatusToggle } from '@/components/courses/phase5';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SLATE_50 } from '@/features/courses/_shared/tokens';
+
 import { A, EmptyState } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import AboutSection from './about/AboutSection';
@@ -159,7 +159,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   );
 
   const wrap = (children: React.ReactNode) => (
-    <div className="animate-in fade-in duration-200" style={{ background: SLATE_50, paddingBottom: 8 }}>
+    <div className="animate-in fade-in duration-200" style={{ background: A.CANVAS, paddingBottom: 8 }}>
       {children}
     </div>
   );
