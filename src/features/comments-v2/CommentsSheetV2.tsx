@@ -245,7 +245,7 @@ function CommentsSheetV2Inner({
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[12002] bg-black/40"
-            onClick={onClose}
+            onClick={requestClose}
           />
           <motion.div
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
