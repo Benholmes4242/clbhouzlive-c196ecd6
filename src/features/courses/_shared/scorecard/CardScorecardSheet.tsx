@@ -1205,7 +1205,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         <div
           style={{
             flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
-            background: A.CANVAS,
+            /* No fill — the sheet surface shows through
+               (BRIEF_SHEET_BACKGROUND_CANON). */
             padding: '12px 14px calc(env(safe-area-inset-bottom, 0px) + 24px)',
             display: 'flex', flexDirection: 'column', gap: 12,
           }}
