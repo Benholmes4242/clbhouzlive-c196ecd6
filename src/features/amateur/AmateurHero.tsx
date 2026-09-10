@@ -258,14 +258,18 @@ export function AmateurHero({
 
       </CourseImageFallback>
 
-      {row && (
+      {subject && (
         <button
           type="button"
           onClick={() => {
             /* §5 THE ROUND FIRST. The hero names a feat, so the tap must land on
                the scorecard that carries it. The course page is the FALLBACK for
                a row with no score id (a suggested round with no card), never the
-               primary destination. */
+               primary destination.
+
+               AN AGGREGATE CARD HAS NO SCORECARD TO OPEN, so its door is the
+               member whose fortnight the figure describes — the one place the
+               rounds behind it are all listed. */
             if (card) {
               analyticsEvents.track('amateur_hero_card_tapped', {
                 card_id: card.id,
@@ -274,8 +278,9 @@ export function AmateurHero({
                 pool: card.pool,
               });
             }
-            if (row.score_id && onOpenRound) onOpenRound(row.score_id, row.user_id);
-            else if (row.course_id) navigate(`/courses/${row.course_id}`);
+            if (row?.score_id && onOpenRound) onOpenRound(row.score_id, row.user_id);
+            else if (row?.course_id) navigate(`/courses/${row.course_id}`);
+            else if (isAggregateCard) navigate(`/profile/${subject.user_id}`);
           }}
           style={{
             position: 'absolute',
