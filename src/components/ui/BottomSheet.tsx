@@ -2,6 +2,22 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
+/**
+ * BRIEF_SHEET_BACKGROUND_CANON — THE SHEET SURFACE.
+ *
+ * One value for every bottom sheet in the app: #15171F, the background the
+ * Your-circle leaderboard sits on (CSS `--background`, and the same value as
+ * the existing feature tokens `A.CANVAS` and tourhub `SLATE_50`). It is
+ * redeclared here rather than imported because a shared ui primitive must not
+ * depend on a feature token file; the three names must stay in step.
+ *
+ * Sheets do NOT paint their own body or chrome. If a sheet needs a raised
+ * band, it uses a hairline or a PANEL panel INSIDE the body — never a second
+ * full-width fill, which is what produced the seams this brief removed.
+ */
+export const SHEET_SURFACE = '#15171F';
+
+
 interface BottomSheetProps {
   open: boolean;
   onClose: () => void;
