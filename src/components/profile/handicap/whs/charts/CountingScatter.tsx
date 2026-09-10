@@ -97,6 +97,20 @@ export const CountingScatter: React.FC<Props> = ({
             : undefined
         }
       >
+        {cutLine != null && cutLine >= min && cutLine <= max && (
+          /* THE LINE THE SENTENCE NAMES. Drawn under the trace so a point
+             never disappears behind it. */
+          <line
+            x1={0}
+            x2={VIEW_W}
+            y1={y(cutLine)}
+            y2={y(cutLine)}
+            stroke="rgba(255,255,255,0.28)"
+            strokeWidth={1}
+            strokeDasharray="3 3"
+            vectorEffect="non-scaling-stroke"
+          />
+        )}
         <path
           d={path}
           fill="none"
