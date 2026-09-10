@@ -252,6 +252,13 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
         })}
       </div>
 
+      {/* BASIS for the rings: both restrictions are real and neither is visible
+          from the hole counts alone. The RPC excludes nine-hole rounds and
+          requires a mapped course; it is deployed, so this states it. */}
+      <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
+        {t('common:handicap.holes.basisRings')}
+      </div>
+
       {(ringSentence || missingSentence) && (
         <p style={{ margin: '14px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
           {[ringSentence, missingSentence].filter(Boolean).join(' ')}
