@@ -53,8 +53,28 @@ interface DraftShape {
   reviewText: string;
   shareToFeed: boolean;
   teeLabel: string | null;
+  /* THE COUNT, NOT THE FILES (BRIEF_SHEET_BACK_BEHAVIOUR_05 §1).
+   *
+   * Attached media is local File/blob data at guard time and is not
+   * serialisable, so it cannot be restored. Two numbers can be, and they are
+   * what turns a silent loss into a stated one: on restore the notice names how
+   * many photos and videos were attached and could not be kept, so the member
+   * re-attaches before publishing instead of discovering it afterwards.
+   *
+   * Counted from LOCAL items only. Existing media on an edited review lives in
+   * course_review_media and is never at risk, so counting it would warn about
+   * something that is still there. Optional for drafts written before this. */
+  photoCount?: number;
+  videoCount?: number;
   savedAt: number;
 }
+
+/** Attached-media counts at save time, local (unuploaded) items only. */
+export interface DraftMediaCounts {
+  photos: number;
+  videos: number;
+}
+
 
 
 function readDraft(
