@@ -33,10 +33,7 @@ import HolesSection from './sections/HolesSection';
 import PersonalBestsSection from './sections/PersonalBestsSection';
 import AchievementsPanel from './sections/AchievementsPanel';
 import StreaksCard from '../gam/streaks/StreaksCard';
-import PulseSection from './sections/PulseSection';
-import FriendsLeaderboardSection from './sections/friends-leaderboard-v2/FriendsLeaderboardSection';
-import CompareEntryPanel from './sections/compare/CompareEntryPanel';
-import CircleInviteAction from './sections/invite-to-clbhouz/CircleInviteAction';
+import CircleSection from './sections/CircleSection';
 import RecentlyPlayedFeed from './sections/recently-played/RecentlyPlayedFeed';
 import RoundsArchivePanel from './sections/trends/RoundsArchivePanel';
 import YourCoursesRail from './sections/trends/YourCoursesRail';
@@ -153,18 +150,12 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       <AchievementsPanel userId={userId} viewMode={viewMode} ownerFirstName={ownerFirstName} />
       {!readOnly && <StreaksCard userId={userId} readOnly={readOnly} />}
 
-      {/* 8 — YOUR CIRCLE (Section I; compare entry, pulse search and invite
-          come off here — compare moves onto the person row tap) */}
-      {!readOnly && (
-        <FriendsLeaderboardSection
-          userId={userId}
-          viewMode="owner"
-          ownerFirstName={ownerFirstName}
-        />
-      )}
-      <CompareEntryPanel viewerUserId={userId} readOnly={readOnly} />
-      {!readOnly && <PulseSection userId={userId} />}
-      {!readOnly && <CircleInviteAction ownerUserId={userId} />}
+      {/* 8 — YOUR CIRCLE (Section I). FriendsLeaderboardSection, StandingFigures,
+          CompareEntryPanel, PulseSection and CircleInviteAction are all
+          dead-listed, not deleted: the rank is the heading, the gap is the
+          sub-line, the percentile is gone, and compare is reached by tapping a
+          person through the existing resolver. */
+      {!readOnly && <CircleSection userId={userId} />}
 
       {/* 9 — FRIENDS' ROUNDS (Section J) */}
       {!readOnly && <RecentlyPlayedFeed ownerUserId={userId} />}
