@@ -700,3 +700,65 @@ hardware back, stacked sheets, refresh with a sheet open, cold URL capture and
 open, and background/restore have NOT been run — no authenticated device
 runtime is available here. Typecheck and full production build pass; the eight
 runtime/history tests remain blocking on sign-off.
+
+## FOLLOW TABLES: ONE CIRCLE, THREE TABLES, ONE WRITER (report, 10 Sep 2026)
+
+Measured on the live database. `public.follows` is NOT a legacy table and NOT a
+second live writer. It is the actor-generic table, and it is the ONE the app
+writes; `user_follows` and `business_follows` are mirrors maintained BY TRIGGER
+in both directions.
+
+  follows        554 rows   96 distinct followers   latest 2026-09-09 07:19:00Z
+  user_follows   460 rows   48 distinct followers   latest 2026-09-09 07:19:00Z
+  user_friends   163 rows (100 accepted)  27 distinct users (23 accepted)
+                                          latest 2026-09-08 11:56:20Z
+
+follows splits personal->personal 460 / personal->business 94. There are ZERO
+personal->personal rows in follows without a matching user_follows row, and ZERO
+user_follows rows without a matching follows row. Same for business_follows: 94
+rows, 94 mirrored. Triggers: trg_mirror_follows_to_legacy_ins/_del on follows,
+trg_mirror_user_follows_ins/_del and trg_mirror_business_follows_ins/_del back
+the other way, plus fill_follower_actor_id. So they are kept in step by the
+database, not by convention, and they do not disagree for a single member today.
+
+AUTHORITATIVE: follows. Writers: useToggleFollow.ts and lib/auth/followClbhouz.ts
+insert into follows; delete-account deletes from follows; useFollow.ts still
+writes user_follows (mirrored back). Nothing writes only one side.
+
+THE DEFECT IS NOT DIVERGENCE, IT IS THE FILTER. useCircleSize.ts counts
+follows for the member with NO following_actor_type filter, so following a golf
+club counts as having a circle. 48 of 101 members appear in follows but not in
+user_follows -- every one of them follows only BUSINESSES. Those 48 are told
+they have a circle and then shown an empty circle board with the wrong
+explanation (C1 quiet fortnight instead of C2 cold start). Cross-check: 0
+members are in user_follows without being in follows, 0 have accepted friends
+without a user_follows row, and only 5 members have nothing in any of the three.
+
+THE 52-OF-99 FIGURE STANDS. Measured from user_follows, which is exactly the
+personal->personal slice of follows: 48 of 101 members follow at least one
+person, so 53 follow nobody. user_friends adds nobody new. The three design
+decisions taken on that figure are safe.
+
+THE POOL LADDER IS ALREADY RIGHT. useCircleLatestRounds builds the circle from
+accepted user_friends plus user_follows -- the people-only definition -- so the
+pool never contained a business. Only the head-count question is wrong.
+
+OPEN (not fixed, awaiting ruling): point useCircleSize at the same people-only
+definition the pool uses, or filter follows to following_actor_type='personal'.
+Either makes "do you have a circle" and "who is in it" the same question. No
+reconciliation sweep is needed -- the tables agree.
+
+## AGGREGATE HERO FAMILY (built, 10 Sep 2026)
+
+Rotation now offers all eight metrics. Aggregate cards: no round, so no shape
+band and no course name -- the spread line ("Across 6 rounds, 4 courses") takes
+that slot, the subject is the card's own member (never the fallback round's), the
+backdrop is the flat tone rather than a borrowed course photograph, and the tap
+opens /profile/<user_id>. Depth test held at 3 members per Ben's ruling.
+Also tightened: a busiest-line card on the everyone pool from a TRUNCATED read is
+now rejected, matching every other place a fetch cap must not print as a count.
+
+OPEN (recorded, not urgent): useRoundNetScores returns an empty map without
+complaint if gam_round_net is unreadable -- the two net cards would silently
+leave the rotation with only a console line as evidence. Same silent-failure
+shape as the cron jobs.
