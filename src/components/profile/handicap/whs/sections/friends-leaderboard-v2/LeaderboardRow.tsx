@@ -1,3 +1,16 @@
+/**
+ * DEAD LIST — UNREFERENCED since 10 Sep 2026. Nothing imports this file.
+ *
+ * The circle leaderboard now renders ONE shared row, CircleRow, on both the
+ * handicap page and the see-all sheet. This was the sheet's second copy of that
+ * row: it carried the amber wash with bleed margins, the 26px rank-movement
+ * slot and the raw England Golf club string — the three faults the shared row
+ * fixes once.
+ *
+ * RankDeltaChip below is declared here and imported by nothing else in the app,
+ * so it dies with this file. Retained pending the deletion pass; not to be
+ * revived as a second row.
+ */
 import React from 'react';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';

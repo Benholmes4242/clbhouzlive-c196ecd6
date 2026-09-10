@@ -34,15 +34,10 @@
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 
-import { supabase } from '@/integrations/supabase/client';
-import { useFriendLeaderboard, useFriendLeaderboardRankDeltas } from '@/lib/whs/hooks';
+import { useFriendLeaderboard } from '@/lib/whs/hooks';
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
-import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
-import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
-import { fmtHcp } from '@/lib/whs/format';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
@@ -52,36 +47,11 @@ import { SeeAllRow } from './SeeAllRow';
 import { HcpSection } from './HcpSection';
 import { CHART } from '../charts/tokens';
 import FullLeaderboardSheet from './friends-leaderboard-v2/FullLeaderboardSheet';
-
-const FIG: React.CSSProperties = {
-  fontVariantNumeric: 'tabular-nums lining-nums',
-  letterSpacing: '-0.04em',
-};
+import { CircleRow, CircleFlameLegend, hasFlame } from './friends-leaderboard-v2/CircleRow';
+import { useCircleClubs } from './friends-leaderboard-v2/useCircleClubs';
 
 interface Props {
   userId: string;
-}
-
-/** One read for every clbhouz account in the circle. No per-row fetch. */
-function useCircleClubs(userIds: string[]) {
-  const key = Array.from(new Set(userIds)).sort();
-  return useQuery({
-    queryKey: ['circle-home-clubs', key],
-    enabled: key.length > 0,
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('id, home_club')
-        .in('id', key);
-      if (error) throw error;
-      const map = new Map<string, string | null>();
-      for (const row of (data as { id: string; home_club: string | null }[]) ?? []) {
-        map.set(row.id, row.home_club ?? null);
-      }
-      return map;
-    },
-  });
 }
 
 /** A row only responds where the resolver has somewhere to go. */
@@ -94,26 +64,14 @@ function isResolvable(e: FriendLeaderboardEntry): boolean {
 export const CircleSection: React.FC<Props> = ({ userId }) => {
   const { t } = useTranslation(['common']);
   const { data, isFetched } = useFriendLeaderboard(userId);
-  const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 30);
   const { resolve } = useMemberTapResolver();
   const [seeAllOpen, setSeeAllOpen] = useState(false);
 
   const cohorts = useMemo(() => buildLeaderboardCohorts(data), [data]);
 
-  const clbhouzIds = useMemo(
-    () =>
-      cohorts.active
-        .concat(cohorts.inactive)
-        .map((e) => e.friend_user_id)
-        .filter((v): v is string => !!v),
-    [cohorts],
-  );
-  const { data: clubs } = useCircleClubs(clbhouzIds);
-
-  const clubFor = (e: FriendLeaderboardEntry): string | null => {
-    const viaClbhouz = e.friend_user_id ? clubs?.get(e.friend_user_id) ?? null : null;
-    return viaClbhouz ?? e.friend_home_club ?? null;
-  };
+  /* ONE club source, resolved in the shared hook so the sheet cannot disagree. */
+  const circleEntries = useMemo(() => cohorts.active.concat(cohorts.inactive), [cohorts]);
+  const clubFor = useCircleClubs(circleEntries);
 
   const rank = cohorts.selfActiveRank;
   const total = cohorts.totalActive;
@@ -213,102 +171,25 @@ export const CircleSection: React.FC<Props> = ({ userId }) => {
         {cohorts.topFive.map((entry, i) => {
           const activeIdx = cohorts.active.findIndex((e) => e === entry);
           const position = activeIdx >= 0 ? activeIdx + 1 : null;
-          const isYou = entry.is_self;
           const tappable = isResolvable(entry);
-          const name = isYou
-            ? t('common:handicap.circle.section.you')
-            : reformatFriendName(entry.friend_name);
-          const club = clubFor(entry);
-          const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
-          const Tag: React.ElementType = tappable ? 'button' : 'div';
           return (
-            <Tag
-              key={isYou ? 'self' : `${entry.friend_user_id ?? entry.friend_row_id ?? entry.friend_name}`}
-              type={tappable ? 'button' : undefined}
-              onClick={tappable ? () => void handleRowTap(entry) : undefined}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                width: '100%',
-                padding: '11px 0',
-                background: 'none',
-                border: 'none',
-                borderTop: i === 0 ? 'none' : `1px solid ${CHART.BORDER}`,
-                textAlign: 'left',
-                font: 'inherit',
-                color: 'inherit',
-                cursor: tappable ? 'pointer' : 'default',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <span
-                style={{
-                  width: 16,
-                  flexShrink: 0,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: isYou ? CHART.AMBER : CHART.DIM,
-                  ...FIG,
-                }}
-              >
-                {position ?? ''}
-              </span>
-
-              {/* 30px avatar, radius 9. A broken source used to leave an empty
-                  square because the initials only render when the source is
-                  absent; onError drops back to the initials instead. */}
-              <Avatar
-                src={avatarSrc}
-                name={entry.friend_name}
-                seed={entry.friend_user_id ?? entry.friend_row_id ?? entry.friend_name}
-              />
-
-              <span style={{ minWidth: 0, flex: 1 }}>
-                <span
-                  style={{
-                    display: 'block',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    letterSpacing: '-0.01em',
-                    color: isYou ? CHART.AMBER : CHART.INK,
-                    overflowWrap: 'anywhere',
-                  }}
-                >
-                  {name}
-                </span>
-                {club && (
-                  <span
-                    style={{
-                      display: 'block',
-                      marginTop: 2,
-                      fontSize: 11,
-                      color: CHART.DIM,
-                      lineHeight: 1.35,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {club}
-                  </span>
-                )}
-              </span>
-
-              <span
-                style={{
-                  flexShrink: 0,
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: isYou ? CHART.AMBER : CHART.INK,
-                  ...FIG,
-                }}
-              >
-                {fmtHcp(entry.friend_handicap_index)}
-              </span>
-            </Tag>
+            <CircleRow
+              key={entry.is_self ? 'self' : `${entry.friend_user_id ?? entry.friend_row_id ?? entry.friend_name}`}
+              entry={entry}
+              position={position}
+              club={clubFor(entry)}
+              selfLabel={t('common:handicap.circle.section.you')}
+              isFirst={i === 0}
+              onPress={tappable ? () => void handleRowTap(entry) : undefined}
+            />
           );
         })}
+
+        {/* The flame is the only form figure on a standing list, so it is
+            labelled — and only when one is on screen. */}
+        {cohorts.topFive.some((e) => hasFlame(e)) && (
+          <CircleFlameLegend label={t('common:handicap.circle.section.flameLegend')} />
+        )}
 
         {/* SNAGS_02 §2: the ONE extracted see-all row. Rule above only. */}
         <SeeAllRow
@@ -321,7 +202,6 @@ export const CircleSection: React.FC<Props> = ({ userId }) => {
         open={seeAllOpen}
         onClose={() => setSeeAllOpen(false)}
         cohorts={cohorts}
-        deltasData={deltasData}
         onRowClick={(entry) => void handleRowTap(entry)}
         viewMode="owner"
       />
@@ -329,50 +209,6 @@ export const CircleSection: React.FC<Props> = ({ userId }) => {
   );
 };
 
-/** Initials are the fallback for BOTH an absent source and a failed load. */
-const Avatar: React.FC<{ src: string | null; name: string; seed: string }> = ({ src, name, seed }) => {
-  const [failed, setFailed] = useState(false);
-  const showImg = !!src && !failed;
-  return (
-    <span
-      style={{
-        position: 'relative',
-        width: 30,
-        height: 30,
-        borderRadius: 9,
-        overflow: 'hidden',
-        flexShrink: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: showImg ? CHART.PANEL_2 : getAvatarFallbackGradient(seed),
-        color: CHART.INK,
-        fontSize: 12,
-        fontWeight: 700,
-      }}
-    >
-      {showImg ? (
-        <img
-          src={src as string}
-          alt=""
-          onError={() => setFailed(true)}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-      ) : (
-        <span>{getInitialsFromName(name) || '?'}</span>
-      )}
-      <span
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: 9,
-          border: '1px solid rgba(255,255,255,0.22)',
-          pointerEvents: 'none',
-        }}
-      />
-    </span>
-  );
-};
+/* The avatar moved into CircleRow with the rest of the row markup. */
 
 export default CircleSection;
