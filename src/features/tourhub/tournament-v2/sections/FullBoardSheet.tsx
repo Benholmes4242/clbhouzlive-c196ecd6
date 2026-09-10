@@ -80,7 +80,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
     >
       <div
         style={{
-          background: A.PANEL, fontFamily: FONT,
+          fontFamily: FONT,
           height: 'auto', maxHeight: '85dvh',
           display: 'flex', flexDirection: 'column',
         }}

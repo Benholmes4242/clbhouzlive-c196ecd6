@@ -170,7 +170,7 @@ export function AllTeeTimesSheet({
       ariaLabelledBy="tournament-tee-times-sheet-title"
       style={{ height: 'auto', maxHeight: '85dvh' }}
     >
-      <div style={{ background: A.PANEL, fontFamily: FONT, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ fontFamily: FONT, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '0 16px 10px' }}>
           <div style={KICKER}>{t('tournament.allTeeTimes.title')}</div>
           {tournamentName && (

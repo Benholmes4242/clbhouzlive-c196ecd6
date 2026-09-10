@@ -398,7 +398,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
     >
       <SheetHeader title={t('messaging:sheet.detailsTitle')} onClose={onClose} dark />
 
-      <div style={{ background: SHEET, paddingBottom: 28 }}>
+      <div style={{ /* canon: sheet surface */ paddingBottom: 28 }}>
         {isLoading || !detail ? (
           <div style={{ padding: '20px 16px' }}>
             <div
@@ -983,7 +983,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
       variant="dark"
     >
       <SheetHeader title={t('messaging:action.addPeople')} onClose={handleClose} dark />
-      <div style={{ background: SHEET, paddingBottom: 16 }}>
+      <div style={{ /* canon: sheet surface */ paddingBottom: 16 }}>
         {selected.length > 0 ? (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '10px 16px 4px' }}>
             {selected.map((s) => (
