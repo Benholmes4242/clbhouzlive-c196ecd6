@@ -324,6 +324,9 @@ export function useReviewComposer(
     setStep,
     restoredFromDraft,
     discardRestoredDraft,
+    restoredMediaCounts,
+    acknowledgeRestoredMedia,
+
 
     setVerdict,
     setOverall,
