@@ -347,7 +347,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation, ground }) => {
         variant="dark"
       >
         <SheetHeader title={identity.name} onClose={() => setMenuOpen(false)} dark />
-        <div style={{ background: SHEET_SURFACE, paddingBottom: 32 }}>
+        <div style={{ paddingBottom: 32 }}>
           <ActionRow
             icon={muted ? <BellOff size={20} color={SHEET_INK} /> : <Bell size={20} color={SHEET_INK} />}
             label={muted ? 'Unmute' : 'Mute notifications'}
