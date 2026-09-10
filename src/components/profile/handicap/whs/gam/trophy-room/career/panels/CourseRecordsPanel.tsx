@@ -25,6 +25,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChevronRight } from 'lucide-react';
 import { REC, LABEL } from '../tokens';
 import { Panel, RowButton, Figure, Collapsible, MetaLabel } from '../Primitives';
 import { FIELD_MIN_PLAYERS, hasField } from '@/lib/gam/fieldGate';
@@ -137,7 +138,12 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
       </div>
 
       <Collapsible
-        showAllLabel={t('career.recordsSeeAll', { n: groups.length })}
+        showAllLabel={
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            {t('career.recordsSeeAll', { n: groups.length })}
+            <ChevronRight size={13} strokeWidth={2.4} />
+          </span>
+        }
         showFewerLabel={t('career.showFewer')}
       >
         {ordered.map(({ group, contest }, i) => {

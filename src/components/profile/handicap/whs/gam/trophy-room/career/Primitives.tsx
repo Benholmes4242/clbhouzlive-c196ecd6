@@ -210,8 +210,9 @@ export const Collapsible: React.FC<{
   children: React.ReactNode;
   threshold?: number;
   collapsedCount?: number;
-  showAllLabel: string;
-  showFewerLabel: string;
+  /** ReactNode, not string, so a terminal row can carry its chevron. */
+  showAllLabel: React.ReactNode;
+  showFewerLabel: React.ReactNode;
 }> = ({ children, threshold = 5, collapsedCount = 3, showAllLabel, showFewerLabel }) => {
   const [open, setOpen] = useState(false);
   const rows = React.Children.toArray(children);
