@@ -25,6 +25,7 @@ import { useTop100Distribution } from '@/hooks/gam/useTop100Distribution';
 import { useGamRecordConfig, RECORD_CONFIG_DEFAULTS } from '@/hooks/gam/useGamRecordConfig';
 import { useCareerRounds } from '@/hooks/gam/useCareerRounds';
 import { useCourseFieldSizes } from '@/hooks/gam/useCourseFieldSizes';
+import { useCourseFieldPlayers } from '@/hooks/gam/useCourseFieldPlayers';
 import { Skeleton } from '@/components/ui/skeleton';
 import { normalizeBadge, normalizeLegend } from '../_shared/normalizeTrophyItem';
 import { isTop100Achievement } from '../_shared/showpieces';
@@ -34,7 +35,8 @@ import { CareerHeader } from './CareerHeader';
 import { CountingStatsPanel } from './panels/CountingStatsPanel';
 import { SeasonCutPanel } from './panels/SeasonCutPanel';
 import { Top100Panel } from './panels/Top100Panel';
-import { CrownsPanel, groupCrowns } from './panels/CrownsPanel';
+import { groupCrowns } from './panels/CrownsPanel';
+import { CourseRecordsPanel } from './panels/CourseRecordsPanel';
 import { StreaksPanel } from './panels/StreaksPanel';
 import { MilestonesPanel } from './panels/MilestonesPanel';
 import { CountingStatDetail } from './details/CountingStatDetail';
@@ -103,6 +105,16 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
   const { data: fieldSizes } = useCourseFieldSizes(
     open ? crownGroups.map((g) => g.courseId) : [],
   );
+  /**
+   * The contest split reads ONE batched field count, holder excluded, so the
+   * trophy room and the scorecard sheet cannot disagree about what a field is.
+   * Unavailable comes back as available:false and the section then states
+   * record counts only -- see useCourseFieldPlayers.
+   */
+  const { data: fieldPlayers } = useCourseFieldPlayers(
+    open ? crownGroups.map((g) => g.courseId) : [],
+    userId,
+  );
 
   const onOpen = useCallback((next: CareerView) => {
     setView(next);
@@ -126,6 +138,8 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
       shares: shares ?? new Map(),
       distribution,
       fieldSizes: fieldSizes ?? new Map(),
+      fieldPlayers: fieldPlayers?.sizes,
+      fieldPlayersAvailable: fieldPlayers?.available ?? false,
       config: config ?? RECORD_CONFIG_DEFAULTS,
       onOpen,
     }),
@@ -141,6 +155,7 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
       shares,
       distribution,
       fieldSizes,
+      fieldPlayers,
       config,
       onOpen,
     ],
@@ -261,7 +276,7 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
                 <SeasonCutPanel rounds={rounds} />
                 <CountingStatsPanel data={data} items={counting} sparse={sparse} />
                 <Top100Panel data={data} items={top100} />
-                <CrownsPanel data={data} groups={crownGroups} />
+                <CourseRecordsPanel data={data} groups={crownGroups} />
                 <StreaksPanel streaks={streaks} />
                 <MilestonesPanel data={data} items={milestones} />
               </>
