@@ -133,6 +133,13 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
         })
       : t('common:handicap.roundsThatCount.bodyNoFall', { count: counterCount });
 
+  /* THE COUNTS-BELOW LINE. The sentence has always named it; the chart never
+     drew it. It rules across at the WORST differential that still counts, so
+     every counter sits on or below it and every non-counter above. Null when
+     the counter set is empty — nothing to rule. */
+  const counterDiffs = window20.filter((r) => r.is_counter && r.diff != null).map((r) => r.diff as number);
+  const cutLine = counterDiffs.length ? Math.max(...counterDiffs) : null;
+
   const selected = selIdx != null ? window20[selIdx] : null;
 
   const onSelect = (i: number) => {
@@ -219,6 +226,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
           showLegend={false}
           selectedIndex={selIdx}
           onSelectIndex={onSelect}
+          cutLine={cutLine}
         />
 
         <p style={{ margin: '14px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>

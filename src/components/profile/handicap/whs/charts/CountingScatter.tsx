@@ -26,6 +26,13 @@ interface Props {
   showLegend?: boolean;
   selectedIndex?: number | null;
   onSelectIndex?: (index: number) => void;
+  /**
+   * ADDITIVE, default null = no line and every existing call site unchanged.
+   * A differential value to rule across the plot: the worst differential that
+   * still counts. Everything on or below it is a counter, which is the thing
+   * the section's sentence names ("the 8 below the line").
+   */
+  cutLine?: number | null;
 }
 
 const VIEW_W = 320;
@@ -44,6 +51,7 @@ export const CountingScatter: React.FC<Props> = ({
   showLegend = true,
   selectedIndex = null,
   onSelectIndex,
+  cutLine = null,
 }) => {
   if (!rounds || rounds.length === 0) return null;
 
@@ -89,6 +97,20 @@ export const CountingScatter: React.FC<Props> = ({
             : undefined
         }
       >
+        {cutLine != null && cutLine >= min && cutLine <= max && (
+          /* THE LINE THE SENTENCE NAMES. Drawn under the trace so a point
+             never disappears behind it. */
+          <line
+            x1={0}
+            x2={VIEW_W}
+            y1={y(cutLine)}
+            y2={y(cutLine)}
+            stroke="rgba(255,255,255,0.28)"
+            strokeWidth={1}
+            strokeDasharray="3 3"
+            vectorEffect="non-scaling-stroke"
+          />
+        )}
         <path
           d={path}
           fill="none"

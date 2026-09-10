@@ -124,12 +124,30 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
     );
   }
 
-  // ── The four outcome bands, in the established palette ──────────────────
-  const birdiePlus =
-    (hs.aces_count_window ?? 0) +
-    (hs.albatross_count_window ?? 0) +
-    (hs.eagles_count_window ?? 0) +
-    (hs.birdies_count_window ?? 0);
+  /**
+   * ── The four outcome bands, in the established palette ──────────────────
+   *
+   * DEFINITION, and why it is a subtraction rather than a sum.
+   *
+   * The four bands must partition total_holes_in_window exactly: every hole
+   * with a card falls in one of them and in only one. Summing the RPC's
+   * ace/albatross/eagle/birdie window counts does NOT partition it, because
+   * those four counts overlap — an ace on a par 3 is both `gross = 1` and
+   * `gross = par - 2`, and an ace on a par 4 is both `gross = 1` and
+   * `gross = par - 3`, so every ace is counted twice. That is the whole of the
+   * 4034-vs-4032 gap on the live record: two aces, counted twice each,
+   * against a true 4032 holes. The RPC is correct and is not edited; it simply
+   * answers "how many aces" and "how many eagles" separately, for the trophy
+   * catalogue, and those answers were never meant to be added together.
+   *
+   * BIRDIE OR BETTER is therefore everything that is not a par, a bogey or a
+   * double-plus. total_holes_in_window is the denominator and the arbiter, so
+   * the four figures now always add to the basis line beneath them.
+   */
+  const birdiePlus = Math.max(
+    0,
+    totalHoles - (hs.pars_count ?? 0) - (hs.bogey_count ?? 0) - (hs.double_plus_count ?? 0),
+  );
 
   const bands = [
     { key: 'birdiePlus', count: birdiePlus, label: t('common:handicap.holes.birdiePlus'), color: SC_BIRDIE_DARK },

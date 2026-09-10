@@ -363,7 +363,7 @@
       "heading": "Recently played",
       "meta": "Last fortnight",
       "sheetTitle": "Friends' rounds",
-      "seeAll": "See all",
+      "seeAll": "See all {{count}}",
       "empty": "No friends have posted a round in the last fortnight.",
       "gross": "Gross",
       "stbl": "Stbl",

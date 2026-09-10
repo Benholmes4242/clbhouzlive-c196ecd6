@@ -101,12 +101,17 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
               />
             ))}
             {rounds.length > INLINE_ROUNDS && (
+              /* Terminal row, same treatment as the circle's SEE ALL 24 ›:
+                 uppercase 9/0.19em, the count, and the chevron on the right. */
               <button
                 type="button"
                 onClick={() => setAllOpen(true)}
-                style={{ width: '100%', border: 0, borderBottom: `1px solid ${CHART.BORDER}`, padding: '14px 0', background: 'transparent', color: CHART.INK, textAlign: 'left', fontFamily: CHART_FONT, fontSize: 11, lineHeight: '13px', fontWeight: 700, letterSpacing: 0, textTransform: 'uppercase' }}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, border: 0, borderBottom: `1px solid ${CHART.BORDER}`, padding: '14px 0', background: 'transparent', color: CHART.MUTE, textAlign: 'left', fontFamily: CHART_FONT }}
               >
-                {t('handicap.friendsRounds.seeAll')}
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase' }}>
+                  {t('handicap.friendsRounds.seeAll', { count: rounds.length })}
+                </span>
+                <span style={{ fontSize: 11 }}>&rsaquo;</span>
               </button>
             )}
           </>
