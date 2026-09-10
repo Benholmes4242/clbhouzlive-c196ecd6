@@ -80,9 +80,8 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   return (
     <>
       <HcpSection
-        id="friends-rounds-section"
-        eyebrow={t('handicap.friendsRounds.kicker')}
-        title={t('handicap.friendsRounds.heading')}
+        kicker={t('handicap.friendsRounds.kicker')}
+        heading={t('handicap.friendsRounds.heading')}
         meta={t('handicap.friendsRounds.meta')}
       >
         {rounds.length === 0 ? (
