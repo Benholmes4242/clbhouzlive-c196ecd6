@@ -29,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 /* Figures use a TRUE MINUS (U+2212), never a hyphen. */
 import { fmtDiff } from '@/lib/whs/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useAllScores, useCounters } from '@/lib/whs/hooks';
+import { useAllScores } from '@/lib/whs/hooks';
 import { formatDayMonthShortGB } from '@/i18n/format';
 
 import { HcpSection } from './HcpSection';
