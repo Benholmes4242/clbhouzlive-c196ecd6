@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,6 +10,10 @@ import { toParFor } from '@/components/explore-tab-new/friendRoundParts';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
 import { useHeroCourseImage } from '@/features/amateur/useHeroCourseImage';
+import { SINGLE_ROUND_METRICS } from '@/features/amateur/hero/heroCards';
+import { heroContextLine, heroKicker, heroUnit } from '@/features/amateur/hero/heroCopy';
+import { useAmateurHeroCards } from '@/features/amateur/hero/useAmateurHeroCards';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
@@ -22,6 +26,18 @@ import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
  * first, then a suggested round from the wider platform when the circle is
  * quiet — so a member with no friends and no rounds still gets a hero. The
  * course supplies the frame; the round supplies everything on top of it.
+ *
+ * THE ROTATING CARD SITS IN FRONT OF THAT (BRIEF_EXPLORE_ROTATING_HERO §2.1).
+ * When a single-round card qualifies, the hero states A NOTABLE ROUND instead of
+ * the latest one: the same anatomy, but the kicker names the metric and window,
+ * the name goes up to 22px, and the figure is the metric's own figure at 34px.
+ * The latest-circle-round hero below is now the §5 FALLBACK and is unchanged --
+ * it renders when nothing qualifies, which after the pool ladder means only a
+ * platform with almost no rounds in 90 days.
+ *
+ * THE CAPTION WAITS FOR THE DECISION. Rendering the latest round first and
+ * swapping it for a card a moment later is the flash §5 forbids, so nothing is
+ * drawn over the photograph until the card question has an answer.
  *
  * THE ROUND SHAPE RIDES OVER THE SCRIM AT 34px. RoundShape's fills were mixed
  * on WHITE for the light Discover tiles, so over a photograph they read as pale
@@ -99,11 +115,21 @@ export function AmateurHero({
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
 
-  const { data: rounds } = useCircleLatestRounds(userId, {
+  /* §2.1 THE CARD FIRST. Single-round family only for now; the aggregate family
+     joins the same rotation by widening this list. */
+  const hero = useAmateurHeroCards(userId, SINGLE_ROUND_METRICS);
+  const card = hero.card;
+
+  const { data: rounds, isFetched: fallbackFetched } = useCircleLatestRounds(userId, {
     limit: 1,
     includeSuggested: true,
   });
-  const row = rounds?.[0] ?? null;
+  /* THE SUBJECT. A qualifying card names its own round; otherwise the fallback's
+     latest round. NULL until both questions are answered, so the photograph and
+     the caption arrive together. */
+  const fallbackRow = rounds?.[0] ?? null;
+  const resolved = hero.ready && (fallbackFetched || !!card);
+  const row = !resolved ? null : (card?.round ?? fallbackRow);
   const scoreIds = useMemo(() => [row?.score_id ?? null], [row?.score_id]);
   const shapes = useRoundHoleShapes(scoreIds);
   const shape = shapes?.get(row?.score_id ?? '') ?? null;
@@ -114,7 +140,35 @@ export function AmateurHero({
   /* §2 THE SCORE. toParFor is the SHARED rule the Discover friend round row
      uses: true minus U+2212, under par red, over par ink, level muted. */
   const par = row ? toParFor(row) : null;
-  const kicker = featKicker(shape);
+  /* §3 THE KICKER. A card names its metric and window; the fallback keeps the
+     feat ladder it has always used. */
+  const kicker = card ? heroKicker(t, card.metric, card.window) : featKicker(shape);
+  /* §3 THE FIGURE. The card's own metric figure, with the to-par kept as the unit
+     for a gross card because that is the pair every round row already prints. */
+  const figure = card ? card.figure : row?.gross ?? null;
+  const figureUnit = card ? heroUnit(t, card.metric) : null;
+  const contextLine = card ? heroContextLine(t, card) : null;
+  const isCard = !!card;
+
+  /* §10 ONE VIEW PER CARD, so the rotation can be judged later: which cards
+     actually reach members, and how many were competing when one was chosen. */
+  const viewedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!card || viewedRef.current === card.id) return;
+    viewedRef.current = card.id;
+    analyticsEvents.track('amateur_hero_card_viewed', {
+      card_id: card.id,
+      metric: card.metric,
+      window: card.window,
+      pool: card.pool,
+      figure: card.figure,
+      context_rule: card.context.rule,
+      pool_rounds: card.context.poolRounds,
+      pool_members: card.context.poolMembers,
+      qualifying_count: hero.qualifyingCount,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [card?.id]);
   /* THE HERO SHAPE OWNS THE WHOLE CONTENT COLUMN. RoundShape's numeric width is
      also TrajectoryLine's viewBox width, and the svg meets its box, so a stale
      320 drew the trace centred with dead margins either side. The band mounts
@@ -188,6 +242,14 @@ export function AmateurHero({
                the scorecard that carries it. The course page is the FALLBACK for
                a row with no score id (a suggested round with no card), never the
                primary destination. */
+            if (card) {
+              analyticsEvents.track('amateur_hero_card_tapped', {
+                card_id: card.id,
+                metric: card.metric,
+                window: card.window,
+                pool: card.pool,
+              });
+            }
             if (row.score_id && onOpenRound) onOpenRound(row.score_id, row.user_id);
             else if (row.course_id) navigate(`/courses/${row.course_id}`);
           }}
@@ -209,9 +271,9 @@ export function AmateurHero({
           {/* WHO, on the photograph. Name and kicker form one column so the
               avatar centres against the pair, not against the first line. The
               score sits on the same row and shares the same vertical axis. */}
-          <span style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: isCard ? 14 : 9 }}>
             <SquircleAvatar
-              size={30}
+              size={isCard ? 44 : 30}
               src={row.profile_photo_url ?? undefined}
               alt={row.display_name}
               userId={row.user_id}
@@ -230,8 +292,11 @@ export function AmateurHero({
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
-                  fontSize: 14,
+                  fontSize: isCard ? 22 : 14,
                   fontWeight: 700,
+                  /* §3 the card's name is the headline, so it takes the tight
+                     display tracking; the fallback row keeps its own. */
+                  letterSpacing: isCard ? '-0.034em' : undefined,
                   color: DISCOVER_FACT,
                   textShadow: '0 1px 2px rgba(0,0,0,0.72)',
                 }}
@@ -262,7 +327,7 @@ export function AmateurHero({
                 the hero states the score the way every round row already does
                 instead of inventing a size. GROSS ALWAYS EXISTS, so this block
                 survives a round with no hole detail (§4). */}
-            {row.gross != null && (
+            {figure != null && (
               <span
                 style={{
                   marginLeft: 'auto',
@@ -275,7 +340,7 @@ export function AmateurHero({
                 <span
                   className="tabular-nums"
                   style={{
-                    fontSize: 21,
+                    fontSize: isCard ? 34 : 21,
                     fontWeight: 700,
                     lineHeight: 1,
                     /* §7 — the tabular treatment is uniform at -0.04em. */
@@ -283,22 +348,39 @@ export function AmateurHero({
                     color: A.INK,
                   }}
                 >
-                  {row.gross}
+                  {figure}
                 </span>
-                {par && (
+                {/* THE UNIT. A word for a countable figure; the round's own
+                    to-par for gross, in the true-minus red the shared rule
+                    returns — the hero never colours a to-par itself. */}
+                {figureUnit != null ? (
                   <span
-                    className="tabular-nums"
                     style={{
-                      marginTop: 2,
+                      marginTop: 3,
                       fontSize: 13,
-                      fontWeight: 700,
+                      fontWeight: 600,
                       lineHeight: 1,
-                      letterSpacing: '-0.02em',
-                      color: par.tone,
+                      color: 'rgba(255,255,255,0.60)',
                     }}
                   >
-                    {par.text}
+                    {figureUnit}
                   </span>
+                ) : (
+                  par && (
+                    <span
+                      className="tabular-nums"
+                      style={{
+                        marginTop: isCard ? 3 : 2,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        lineHeight: 1,
+                        letterSpacing: '-0.02em',
+                        color: par.tone,
+                      }}
+                    >
+                      {par.text}
+                    </span>
+                  )
                 )}
               </span>
             )}
@@ -340,6 +422,28 @@ export function AmateurHero({
           >
             {row.course_name ?? t('discover.coursesPlayed.course', 'Course')}
           </span>
+
+          {/* §4 THE CONTEXT LINE, AND IT IS NOT OPTIONAL. It says why this round
+              is the one being shown AND which pool it beat, so a card about a
+              member the reader does not follow explains itself. */}
+          {contextLine && (
+            <span
+              style={{
+                display: 'block',
+                marginTop: 6,
+                fontSize: 11,
+                fontWeight: 500,
+                lineHeight: 1.3,
+                color: 'rgba(255,255,255,0.50)',
+                textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {contextLine}
+            </span>
+          )}
         </button>
       )}
     </section>

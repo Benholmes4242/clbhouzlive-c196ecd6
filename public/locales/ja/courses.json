@@ -1468,5 +1468,53 @@
       "university": "University",
       "international": "International"
     }
+  },
+  "amateur": {
+    "hero": {
+      "metric": {
+        "lowestGross": "ベストグロス",
+        "lowestNet": "ベストネット",
+        "bestStableford": "ベストステーブルフォード",
+        "vsHandicap": "ハンディキャップ超え",
+        "mostBirdies": "バーディー最多",
+        "mostEagles": "イーグル最多",
+        "mostRounds": "ラウンド最多",
+        "mostCourses": "コース最多"
+      },
+      "window": {
+        "d14": "14日",
+        "d30": "30日",
+        "d90": "90日"
+      },
+      "span": {
+        "d14": "この2週間",
+        "d30": "今月",
+        "d90": "この四半期"
+      },
+      "spanNoun": {
+        "d14": "2週間",
+        "d30": "月",
+        "d90": "四半期"
+      },
+      "unit": {
+        "net": "ネット",
+        "points": "ポイント",
+        "underPar": "アンダーパー",
+        "birdies": "バーディー",
+        "eagles": "イーグル",
+        "rounds": "ラウンド",
+        "courses": "コース"
+      },
+      "context": {
+        "clear": "2位に{{margin}}差。",
+        "offGross": "ハンディ{{hcp}}、グロス{{gross}}。",
+        "nobody": "他は{{runnerUp}}が最高。",
+        "busiestCircle": "サークルで最も活発な{{span}}。",
+        "poolCircleLong": "{{span}}のサークル{{rounds}}ラウンド中のベスト。",
+        "poolCircleShort": "サークル{{rounds}}ラウンド中のベスト。",
+        "poolEveryoneLong": "{{span}}のclbhouz全体{{rounds}}ラウンド中のベスト。",
+        "poolEveryoneShort": "clbhouz全体{{rounds}}ラウンド中のベスト。"
+      }
+    }
   }
 }

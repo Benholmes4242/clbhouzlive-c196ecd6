@@ -589,3 +589,25 @@ CONFIDENT ZEROES REMOVED (same three-state rule as §A):
   1. `ChromeIsland.tsx:230-246` — documented in its own comments.
   2. `ProfilePageV2` social counters — was `isLoading`, now `isFetched`.
   Every new counter gate in this pass reads `isFetched`.
+
+## Explore rotating hero — pool ladder and net source (10 Sep 2026)
+
+- Pool ladder is three steps and runs PER WINDOW: circle if it clears 5 rounds / 3
+  members in that window, everyone otherwise, no-cards only if everyone fails too.
+  With 271 rounds from 22 members over 90 days, step 3 is unreachable in practice,
+  so the latest-round hero is a genuine emergency fallback and not a normal state.
+- Every card names its own pool in its context line, because a member can be shown
+  a circle card at 90 days and an everyone card at 14 in the same session.
+- `hasCircle` is taken from the circle rounds read itself, NOT `useCircleSize`.
+  OPEN CONTRADICTION: `useCircleSize` counts `follows` (`follower_user_id`) while
+  the circle pool is `user_friends` (accepted, either direction) UNION outbound
+  `user_follows`. Two live follow tables; not resolved here.
+- `gam_round_net` is a VIEW, not a table: it selects from `gam_round_stats` where
+  `holes_played = 18` and computes `net_score` as `gross_score -
+  whs_course_handicap(hcp_at_time, slope_rating, course_rating, course_par)`. So it
+  is derived on read, is nine-hole-free by definition, and 3,376 of its 3,524 rows
+  carry a net (the 148 without are missing a handicap or rating input). No app-side
+  net formula exists; missing net rows simply do not qualify.
+- `useRoundNetScores` SILENTLY RETURNS AN EMPTY MAP if the read fails or the view is
+  missing. The hero degrades to "no net cards" with no error surfaced — worth an
+  instrumented failure later.

@@ -80,9 +80,19 @@ export interface HeroContext {
   runnerUp?: number;
   hcp?: number;
   gross?: number;
+  /**
+   * THE REAL NUMBER OF ROUNDS IN THE WINDOW, not the number fetched and not an
+   * array length after a client-side filter. It is the length of the window
+   * slice of the pool read, which is only the same thing while the read is not
+   * truncated — hence `poolTruncated`, which takes the card out rather than
+   * letting a cap masquerade as a count.
+   */
   poolRounds: number;
   poolMembers: number;
+  /** Which pool the ladder settled on. The context line MUST say it. */
+  pool: HeroPool;
 }
+
 
 export interface HeroCard {
   /** `${metric}-${window}` — the rotation's exclusion key (§6). */
@@ -112,15 +122,37 @@ function inWindow(rows: readonly CircleRoundRow[], window: HeroWindow, now: numb
   return rows.filter((r) => !!r.play_date && r.play_date >= from);
 }
 
-/** §5c — the pool behind EVERY card in this window. */
-function poolShape(rows: readonly CircleRoundRow[]) {
+/**
+ * §5c — the pool behind EVERY card in this window, and which pool it was.
+ *
+ * `truncated` is TRUE when the read that produced these rows came back at its
+ * own limit, because then `poolRounds` is a floor, not a count. A card whose
+ * only honest context line is the pool line does not qualify in that state
+ * (§4) — a fetch cap must never be printed as "best of N rounds".
+ */
+interface PoolShape {
+  poolRounds: number;
+  poolMembers: number;
+  pool: HeroPool;
+  truncated: boolean;
+}
+
+function poolShape(rows: readonly CircleRoundRow[], pool: HeroPool, truncated: boolean): PoolShape {
   const members = new Set<string>();
   for (const r of rows) members.add(r.user_id);
-  return { poolRounds: rows.length, poolMembers: members.size };
+  return { poolRounds: rows.length, poolMembers: members.size, pool, truncated };
 }
 
 const poolIsReal = (p: { poolRounds: number; poolMembers: number }) =>
   p.poolRounds >= POOL_MIN_ROUNDS && p.poolMembers >= POOL_MIN_MEMBERS;
+
+/** The context line the card will carry; `truncated` never reaches the card. */
+const contextShape = (s: PoolShape) => ({
+  poolRounds: s.poolRounds,
+  poolMembers: s.poolMembers,
+  pool: s.pool,
+});
+
 
 /** The value a single-round metric ranks on, or null when the round cannot carry it. */
 function singleValue(
@@ -154,8 +186,7 @@ function buildSingleRoundCard(
   window: HeroWindow,
   rows: readonly CircleRoundRow[],
   netByScore: ReadonlyMap<string, { net: number }>,
-  pool: HeroPool,
-  shape: { poolRounds: number; poolMembers: number },
+  shape: PoolShape,
 ): HeroCard | null {
   const scored: Array<{ row: CircleRoundRow; value: number }> = [];
   for (const row of rows) {
@@ -179,19 +210,23 @@ function buildSingleRoundCard(
       rule: 'offGross',
       hcp: best.row.hcp_at_time,
       gross: best.row.gross,
-      ...shape,
+      ...contextShape(shape),
     };
   } else if (margin != null && margin > 0) {
-    context = { rule: 'clear', margin, runnerUp, ...shape };
+    context = { rule: 'clear', margin, runnerUp, ...contextShape(shape) };
   } else {
-    context = { rule: 'pool', ...shape };
+    /* The pool line is the only one left, so a truncated read takes the card
+       out rather than printing a fetch cap as a count. */
+    if (shape.truncated) return null;
+    context = { rule: 'pool', ...contextShape(shape) };
   }
 
   return {
     id: `${metric}-${window}`,
     metric,
     window,
-    pool,
+    pool: shape.pool,
+
     figure: best.value,
     member: {
       user_id: best.row.user_id,
@@ -208,9 +243,9 @@ function buildAggregateCard(
   metric: HeroMetric,
   window: HeroWindow,
   rows: readonly CircleRoundRow[],
-  pool: HeroPool,
-  shape: { poolRounds: number; poolMembers: number },
+  shape: PoolShape,
 ): HeroCard | null {
+
   interface Tally {
     row: CircleRoundRow;
     figure: number;
@@ -251,18 +286,23 @@ function buildAggregateCard(
   if (floor != null && best.figure < floor) return null;
 
   const runnerUp = ranked[1]?.figure ?? null;
-  const context: HeroContext =
+  const context: HeroContext | null =
     runnerUp != null && runnerUp > 0
-      ? { rule: 'nobody', runnerUp, margin: best.figure - runnerUp, ...shape }
+      ? { rule: 'nobody', runnerUp, margin: best.figure - runnerUp, ...contextShape(shape) }
       : metric === 'rounds' || metric === 'courses'
-        ? { rule: 'busiest', ...shape }
-        : { rule: 'pool', ...shape };
+        ? { rule: 'busiest', ...contextShape(shape) }
+        : /* Pool line only — a truncated read cannot honestly carry it. */
+          shape.truncated
+          ? null
+          : { rule: 'pool', ...contextShape(shape) };
+  if (!context) return null;
 
   return {
     id: `${metric}-${window}`,
     metric,
     window,
-    pool,
+    pool: shape.pool,
+
     figure: best.figure,
     member: {
       user_id: best.row.user_id,
@@ -279,34 +319,83 @@ function buildAggregateCard(
  * EVERY QUALIFYING CARD, in a stable order (metric family then window). The
  * caller picks one; the COUNT is instrumented (§10) because it is the only way
  * to learn later whether the rotation was genuinely varied.
+ *
+ * THE POOL LADDER IS THREE STEPS, AND IT RUNS PER WINDOW (ruling, 10 Sep 2026).
+ *
+ *   1. THE CIRCLE, if the member has one AND it clears the depth test FOR THIS
+ *      WINDOW.
+ *   2. EVERYONE, if it does not.
+ *   3. The §5 fallback only if everyone fails too — which, with 271 rounds from
+ *      22 members over 90 days, never happens.
+ *
+ * WHY PER WINDOW AND NOT PER MEMBER: a circle of three clears the depth test at
+ * 90 days and fails it at 14 the moment one of the three stops playing. Measured
+ * 10 Sep 2026 — of the 18 members whose circle holds 1-3 people, THIRTEEN have a
+ * circle that can never reach three members, so their circle fails every window
+ * outright. Without step 2 those thirteen would be the only members who never
+ * saw the new hero, and the emergency fallback would be their normal state.
+ *
+ * A member therefore CAN get a circle card at 90 days and an everyone card at
+ * 14 in the same session. Each card states its own pool in its own context line,
+ * which is the whole reason that line carries `pool`.
  */
 export function buildHeroCards({
-  rows,
+  circleRows,
+  everyoneRows,
   netByScore,
-  pool,
+  hasCircle,
+  circleTruncated = false,
+  everyoneTruncated = false,
+  families,
   now = Date.now(),
 }: {
-  rows: readonly CircleRoundRow[];
+  /** The member's circle. Empty when they have none. */
+  circleRows: readonly CircleRoundRow[];
+  /** Every visible round in the window. Step 2 of the ladder. */
+  everyoneRows: readonly CircleRoundRow[];
   netByScore: ReadonlyMap<string, { net: number }>;
-  pool: HeroPool;
+  hasCircle: boolean;
+  circleTruncated?: boolean;
+  everyoneTruncated?: boolean;
+  /** Which card families may enter the rotation. Both, unless narrowed. */
+  families?: readonly HeroMetric[];
   now?: number;
 }): HeroCard[] {
+  const allowed = families ?? [...SINGLE_ROUND_METRICS, ...AGGREGATE_METRICS];
   const out: HeroCard[] = [];
+
   for (const window of HERO_WINDOWS) {
-    const windowRows = inWindow(rows, window, now);
-    const shape = poolShape(windowRows);
-    if (!poolIsReal(shape)) continue;
+    const circleWindow = hasCircle ? inWindow(circleRows, window, now) : [];
+    const circleShape = poolShape(circleWindow, 'circle', circleTruncated);
+
+    let rowsForWindow: readonly CircleRoundRow[];
+    let shape: PoolShape;
+    if (hasCircle && poolIsReal(circleShape)) {
+      rowsForWindow = circleWindow;
+      shape = circleShape;
+    } else {
+      const everyoneWindow = inWindow(everyoneRows, window, now);
+      const everyoneShape = poolShape(everyoneWindow, 'everyone', everyoneTruncated);
+      /* STEP 3. Nothing to widen to, so this window contributes no cards. */
+      if (!poolIsReal(everyoneShape)) continue;
+      rowsForWindow = everyoneWindow;
+      shape = everyoneShape;
+    }
+
     for (const metric of SINGLE_ROUND_METRICS) {
-      const card = buildSingleRoundCard(metric, window, windowRows, netByScore, pool, shape);
+      if (!allowed.includes(metric)) continue;
+      const card = buildSingleRoundCard(metric, window, rowsForWindow, netByScore, shape);
       if (card) out.push(card);
     }
     for (const metric of AGGREGATE_METRICS) {
-      const card = buildAggregateCard(metric, window, windowRows, pool, shape);
+      if (!allowed.includes(metric)) continue;
+      const card = buildAggregateCard(metric, window, rowsForWindow, shape);
       if (card) out.push(card);
     }
   }
   return out;
 }
+
 
 /* ------------------------------------------------------------------ §6 ----
  * ROTATION IS PER SESSION, NOT PER MOUNT. A member who taps a card into the

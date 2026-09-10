@@ -7,6 +7,52 @@
       "seeEveryone": "See everyone",
       "thinCircle": "Only {{count}} rounds in your circle this fortnight.",
       "widenedToEveryone": "Nobody in your circle has posted a round in the last fortnight, so this is everyone."
+    },
+    "hero": {
+      "metric": {
+        "lowestGross": "LOWEST GROSS",
+        "lowestNet": "LOWEST NET",
+        "bestStableford": "BEST STABLEFORD",
+        "vsHandicap": "BEST VS HANDICAP",
+        "mostBirdies": "MOST BIRDIES",
+        "mostEagles": "MOST EAGLES",
+        "mostRounds": "MOST ROUNDS",
+        "mostCourses": "MOST COURSES"
+      },
+      "window": {
+        "d14": "14 DAYS",
+        "d30": "30 DAYS",
+        "d90": "90 DAYS"
+      },
+      "span": {
+        "d14": "this fortnight",
+        "d30": "this month",
+        "d90": "this quarter"
+      },
+      "spanNoun": {
+        "d14": "fortnight",
+        "d30": "month",
+        "d90": "quarter"
+      },
+      "unit": {
+        "net": "net",
+        "points": "points",
+        "underPar": "under par",
+        "birdies": "birdies",
+        "eagles": "eagles",
+        "rounds": "rounds",
+        "courses": "courses"
+      },
+      "context": {
+        "clear": "{{margin}} clear of the next best.",
+        "offGross": "Off {{hcp}}, gross {{gross}}.",
+        "nobody": "Nobody else made more than {{runnerUp}}.",
+        "busiestCircle": "The busiest {{span}} in your circle.",
+        "poolCircleLong": "Best of {{rounds}} rounds in your circle {{span}}.",
+        "poolCircleShort": "Best of {{rounds}} in your circle.",
+        "poolEveryoneLong": "Best of {{rounds}} rounds across clbhouz {{span}}.",
+        "poolEveryoneShort": "Best of {{rounds}} across clbhouz."
+      }
     }
   },
   "amateurNews": {
