@@ -289,8 +289,12 @@ function buildAggregateCard(
   const context: HeroContext | null =
     runnerUp != null && runnerUp > 0
       ? { rule: 'nobody', runnerUp, margin: best.figure - runnerUp, ...contextShape(shape) }
-      : metric === 'rounds' || metric === 'courses'
-        ? { rule: 'busiest', ...contextShape(shape) }
+      : (metric === 'rounds' || metric === 'courses') && (shape.pool === 'circle' || !shape.truncated)
+        ? /* "The busiest fortnight in your circle" is a rule of its own; on the
+             everyone pool that sentence does not exist, so the line falls back to
+             the pool clause and a truncated read must take the card out for the
+             same reason it does everywhere else. */
+          { rule: 'busiest', ...contextShape(shape) }
         : /* Pool line only — a truncated read cannot honestly carry it. */
           shape.truncated
           ? null

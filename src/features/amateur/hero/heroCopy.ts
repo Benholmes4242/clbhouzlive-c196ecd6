@@ -143,3 +143,27 @@ export function heroContextLine(t: TFunction, card: HeroCard): string {
   const pool = poolClause(t, ctx, card.window, rule == null);
   return rule == null ? pool : `${rule} ${pool}`;
 }
+
+/**
+ * §2.2 THE SPREAD, AGGREGATE CARDS ONLY. An aggregate figure is made of many
+ * rounds, so the line under the name says how many rounds and how many courses
+ * it took — the shape band cannot stand in for it, because there is no single
+ * scorecard to draw.
+ *
+ * A COUNT OF ONE IS STILL SAID PROPERLY: i18next plurals do the singular, so the
+ * line never reads "1 rounds". Returns null when there is no spread to state,
+ * which only happens on a single-round card.
+ */
+export function heroSpreadLine(t: TFunction, card: HeroCard): string | null {
+  if (!card.spread) return null;
+  const rounds = t('amateur.hero.spread.rounds', '{{count}} rounds', { count: card.spread.rounds });
+  /* A ROUND WITH NEITHER A COURSE ID NOR A NAME COUNTS TOWARDS NO COURSE, so the
+     course clause is dropped rather than printed as a zero. */
+  if (card.spread.courses <= 0) {
+    return t('amateur.hero.spread.roundsOnly', 'Across {{rounds}}.', { rounds });
+  }
+  const courses = t('amateur.hero.spread.courses', '{{count}} courses', {
+    count: card.spread.courses,
+  });
+  return t('amateur.hero.spread.both', 'Across {{rounds}}, {{courses}}.', { rounds, courses });
+}
