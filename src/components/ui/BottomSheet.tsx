@@ -142,7 +142,6 @@ export function BottomSheet({
         ref={sheetRef}
         className={cn(
           "fixed bottom-0 left-0 right-0 transition-transform duration-300 ease-out",
-          variant === 'light' && 'bg-background',
           isAnimating ? "translate-y-0" : "translate-y-full",
           className
         )}
