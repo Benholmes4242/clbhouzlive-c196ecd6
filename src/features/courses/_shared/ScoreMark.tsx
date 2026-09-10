@@ -225,6 +225,14 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
     );
   }
 
+  /* ---------------------------------------------------------------------------
+     DEAD LIST (BRIEF_ROUND_SCORECARD_REBUILD §A) — THE LEGACY LIGHT BRANCH.
+     Everything from here to the end of the component is the older light
+     outline/tint vocabulary. It has NO product caller as of 10 Sep 2026; the
+     last one (RoundCardHoleStrip) moved to the dark grammar in §A. Retained on
+     disk deliberately (nothing is deleted) and still covered by
+     ScoreMark.test.tsx. Do not add callers, and do not treat it as a theme.
+     --------------------------------------------------------------------------- */
   return (
     <span
       style={{
