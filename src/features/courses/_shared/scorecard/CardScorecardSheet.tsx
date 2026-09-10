@@ -427,6 +427,15 @@ const Legend: React.FC<{ holes: CardScorecardHole[]; hasUnplayed?: boolean }> = 
   // RARER one once (albatross) rather than two identical entries.
   if (rarities.alba) keys.push({ strokes: 1, label: t('courses:scorecard.legendAlbatross') });
   else if (rarities.ace) keys.push({ strokes: 1, label: t('courses:scorecard.legendAce') });
+  /**
+   * §D5 — PAR IS NAMED. It is the most common cell on the card and was the only
+   * unexplained one on a completed round: a reader who sees a numeral with no
+   * mark had nothing telling them that absence of a mark IS the statement. The
+   * entry is a bare numeral (strokes === par), which is exactly what the card
+   * draws — the key stays generated from ScoreMark, never hand-drawn. It sits
+   * between the under-par marks and the over-par marks, in scoring order.
+   */
+  keys.push({ strokes: 4, label: t('courses:scorecard.legendPar'), showStroke: true });
   keys.push({ strokes: 5, label: t('courses:scorecard.legendBogey') });
   keys.push({ strokes: 6, label: t('courses:scorecard.legendDouble') });
   /**
