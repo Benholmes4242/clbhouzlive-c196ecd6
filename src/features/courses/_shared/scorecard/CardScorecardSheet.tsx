@@ -733,14 +733,34 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     ? fieldHoles.filter((h) => (h.strokes as number) <= (h.fieldAvg as number)).length
     : null;
 
+  /**
+   * §G — WHY THERE IS NO CARD, AS A MEASURED FACT.
+   *
+   * 568 of 3,554 rounds (16%) cannot draw a card, and they fail for THREE
+   * different reasons that the sheet previously collapsed into one: 148 have no
+   * hole rows at all, 420 have rows with every gross null, and 195 have some
+   * holes scored and some not. `holes.length > 0` was true for the middle group,
+   * so those rounds drew an eighteen-column grid of empty cells.
+   *
+   * The cause is derived once, here, and used both by the render gate and by the
+   * event, so what a member saw and what we recorded cannot disagree.
+   */
+  const cardCause: 'ok' | 'partial' | 'unscored' | 'norows' = useMemo(() => {
+    if (holes.length === 0) return 'norows';
+    if (played.length === 0) return 'unscored';
+    return played.length === holes.length ? 'ok' : 'partial';
+  }, [holes.length, played.length]);
+
   // scorecard_opened — has_field_data is the evidence for whether the
-  // enrichment is reaching members at all.
+  // enrichment is reaching members at all; card_cause is the evidence for how
+  // often the sheet opens on a round it cannot draw, split by reason.
   useEffect(() => {
     if (!open) return;
     analyticsEvents.track('scorecard_opened', {
       surface,
       holes: played.length,
       has_field_data: withField,
+      card_cause: cardCause,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
