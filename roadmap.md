@@ -221,3 +221,24 @@
 - NotConnectedSection: "What's shared" button removed (promised an answer /privacy cannot give). One CTA: Connect handicap -> /manage/handicap. handicap_not_connected_cta kept with action:'connect' only.
 - whatsShared locale keys dropped from all six locales.
 - Redirect dependency audit: nothing depended on the old /handicap -> /manage/handicap redirect. Gam push routes (/handicap, /handicap?sheet=...) fire only for members with gam activity; an unconnected recipient now lands on the not-connected page instead of the connect flow - neither old nor new behaviour opened the sheet. In-app links to /handicap (ProfilePageV2, ManageProfile, RoundPage fallback, resolver, rivalry redirect, HandoffPage) assume the page, not the connect screen.
+
+## Handicap page — device check (sections 0-K follow-up)
+
+DEAD LIST ADDITION
+- src/components/profile/handicap/gam/streaks/StreaksCard.tsx — the ON THE LINE
+  - {n} ACTIVE rail. Unmounted from HandicapDashboard, retained on disk.
+  Streak material lives in the trophy room (StreaksPanel via CareerRecordSheet);
+  StreaksSheetMount stays at page level so ?gam=streaks still resolves.
+
+OPEN ITEMS
+- Circle club names: linked accounts resolve to the clbhouz club value, England
+  Golf-only rows keep theirs, so "Sundridge Park Golf Club" and "Sundridge Park"
+  now appear in one list (3 rows vs 2 on the live record). Data is correct and the
+  batch resolve is working as specified. NO NORMALISER by ruling — awaiting a
+  decision on which value is canonical for display.
+- AchievementsPanel stays mounted until both the streaks unmount and the
+  Personal bests TROPHY ROOM row are confirmed on device.
+- Holes basis definition: birdie-or-better is now derived as
+  total_holes_in_window minus pars minus bogey minus double_plus. The RPC's
+  aces/albatross/eagles/birdies window counts overlap (an ace on a par 3 is also
+  gross = par - 2), which is the 4034-vs-4032 gap. 4032 is right. RPC unchanged.
