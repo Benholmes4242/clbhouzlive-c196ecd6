@@ -159,7 +159,13 @@
 - [x] Retire duplicated legacy callouts while keeping form and Within reach summary on the You tab.
 - [ ] Verify populated personal data, sorting, generated opening-six copy, and dead-file candidates.
 
-## Handicap one-page brief — dead list (nothing deleted)
+## Dead-file sweep — DONE 10 Sep 2026
+- 56 files deleted in one pass: Cluster 1 (old TodayView tree, 17), Cluster 2 (old TrendsView tree, 10), Cluster 3 (old CircleView tree, 5), 6 CLEAN files, and the 28 secondary orphans they held alive. Stale comments updated in the same pass. Typecheck and full production build clean.
+- Region-only entries below are branches inside files that STAY, not deletions.
+- Still open: census the Champions drilldown folder as its own report (unreferenced but never dead-listed).
+- Tour hub and the round scorecard sheet contributed no whole-file entries: both were rebuilt in place rather than replaced.
+
+## Handicap one-page brief — dead list (files below are now DELETED)
 - src/components/profile/handicap/whs/sections/LastRoundCard.tsx (whole file, off the page at Section D)
 - src/components/profile/handicap/whs/sections/last-round-card/CinemaCardMedia.tsx (whole file)
 - src/components/profile/handicap/whs/sections/last-round-card/LastRoundHeroCard.tsx:60-120 (scrim + masked blur layers)
