@@ -115,6 +115,14 @@ function CommentsSheetV2Inner({
     composerDirty || (editing != null && editText.trim() !== (editing.content ?? '').trim());
   const { requestClose, confirmOpen, discard, keepEditing } = useDraftDismissGuard(draftDirty, onClose);
 
+  /* PERSISTED, NOT JUST GUARDED (BRIEF_SHEET_BACK_BEHAVIOUR_05 §2). The guard
+     above only asks; it cannot survive a hardware back, which this sheet does
+     not own an entry for. The words are therefore written to sessionStorage
+     under a per-thread key and restored silently on reopen — same mechanism,
+     same 24h window, same 400ms debounce as the review draft. */
+  const commentsDraftKey = commentDraftKey(targetType, targetId);
+
+
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
