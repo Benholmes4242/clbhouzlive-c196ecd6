@@ -211,50 +211,6 @@ export const CircleSection: React.FC<Props> = ({ userId }) => {
   );
 };
 
-/** Initials are the fallback for BOTH an absent source and a failed load. */
-const Avatar: React.FC<{ src: string | null; name: string; seed: string }> = ({ src, name, seed }) => {
-  const [failed, setFailed] = useState(false);
-  const showImg = !!src && !failed;
-  return (
-    <span
-      style={{
-        position: 'relative',
-        width: 30,
-        height: 30,
-        borderRadius: 9,
-        overflow: 'hidden',
-        flexShrink: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: showImg ? CHART.PANEL_2 : getAvatarFallbackGradient(seed),
-        color: CHART.INK,
-        fontSize: 12,
-        fontWeight: 700,
-      }}
-    >
-      {showImg ? (
-        <img
-          src={src as string}
-          alt=""
-          onError={() => setFailed(true)}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-      ) : (
-        <span>{getInitialsFromName(name) || '?'}</span>
-      )}
-      <span
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: 9,
-          border: '1px solid rgba(255,255,255,0.22)',
-          pointerEvents: 'none',
-        }}
-      />
-    </span>
-  );
-};
+/* The avatar moved into CircleRow with the rest of the row markup. */
 
 export default CircleSection;
