@@ -321,6 +321,18 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
       )}
       </div>
 
+      <CoursePickerSheet
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        courses={courses}
+        selectedId={filter.kind === 'course' ? filter.id : null}
+        onSelect={(c) => {
+          handleSetFilter({ kind: 'course', id: c.id, name: c.name });
+          setPickerOpen(false);
+        }}
+        title={t('handicap.form.archive.pickCourse')}
+      />
+
       <RoundDetailSheet
         scoreId={openScoreId}
         open={!!openScoreId}
