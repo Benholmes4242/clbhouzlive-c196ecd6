@@ -399,6 +399,34 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   }, [media.items]);
   const composer = useReviewComposer(existing, course.id, draftMediaCounts);
 
+  /* The one sentence that names the loss (_05 §1). Built from separate singular
+     and plural keys rather than an interpolated count, because the six locales
+     do not share one plural rule; the joiner is a key too, for the same reason.
+     Null when the restored draft recorded no attached media. */
+  const restoredMediaLine = useMemo(() => {
+    const c = composer.restoredMediaCounts;
+    if (!c) return null;
+    const parts: string[] = [];
+    if (c.photos > 0) {
+      parts.push(
+        c.photos === 1
+          ? t('review.wizard.draftRestored.mediaPhoto', { count: 1 })
+          : t('review.wizard.draftRestored.mediaPhotos', { count: c.photos }),
+      );
+    }
+    if (c.videos > 0) {
+      parts.push(
+        c.videos === 1
+          ? t('review.wizard.draftRestored.mediaVideo', { count: 1 })
+          : t('review.wizard.draftRestored.mediaVideos', { count: c.videos }),
+      );
+    }
+    if (!parts.length) return null;
+    const subject = parts.join(t('review.wizard.draftRestored.mediaJoin'));
+    return t('review.wizard.draftRestored.mediaLost', { subject });
+  }, [composer.restoredMediaCounts, t]);
+
+
   const submit = useReviewSubmit();
 
   // ONE fetch of the member's own overall ratings (this course excluded, so an
