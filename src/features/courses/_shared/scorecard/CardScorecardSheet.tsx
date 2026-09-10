@@ -983,8 +983,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   >
                     {playerName}
                   </span>
+                   {/* §B — THE ENGAGEMENT PAIR IS PUSHED TO THE RIGHT EDGE of the
+                       member row instead of hanging one gap off the end of the
+                       name. A short name no longer leaves the heart floating in
+                       the middle of the row. */}
                    {engagement && (
-                     <span style={{ marginLeft: STAT_RAIL_ITEM_GAP, flexShrink: 0 }}>
+                     <span style={{ marginLeft: 'auto', paddingLeft: 12, flexShrink: 0 }}>
                     <RoundEngagementActions
                       comment={engagement.comment ?? null}
                       like={{
