@@ -118,10 +118,18 @@ export default function AmateurPage() {
           rail, which has no heading, pads itself to the same figure. */}
       <main style={{ padding: `18px 0 ${NAV_CLEARANCE}` }}>
 
-        <div style={{ padding: '0 20px' }}>
-          <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
+        {/* §8 THE SCROLL TARGET IS THE RAIL, NOT THE FIRST ROW. A card that sets
+            the board and window must land the member on the chips that now read
+            those values — arriving mid-list with a silently changed filter is the
+            undeclared widening this page exists to avoid. scrollMarginTop pays
+            for the floating glass island the rail would otherwise sit under. */}
+        <div ref={boardRef} style={{ scrollMarginTop: 84 }}>
+          <div style={{ padding: '0 20px' }}>
+            <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
+          </div>
+          <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
         </div>
-        <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
+
         <AmateurCoursesBlock userId={user?.id} state={state} onCoursePress={handleCourse} />
         <AmateurNewsBlock />
         <AmateurMediaBlock
