@@ -3,10 +3,10 @@ import { StreaksSheet } from './StreaksSheet';
 import { allStreaksBus } from '../../whs/gam/events';
 
 /**
- * Subscribes to the global `allStreaksBus` (fired by `StreaksCard` SEE ALL
+ * Subscribes to the global `allStreaksBus` (formerly fired by `StreaksCard` SEE ALL, deleted 10 Sep 2026
  * and by the page header).
  * Mount once at PAGE level in HandicapPage, beside GamMount. It was in
- * TodayView, which only renders on the 'today' subtab and is keyed on the
+ * the deleted TodayView, which only rendered on the 'today' subtab and was keyed on the
  * subtab - so the ?gam=streaks deep link could fire before any subscriber
  * existed. A bus subscriber that only exists on one tab cannot serve a
  * deep link.

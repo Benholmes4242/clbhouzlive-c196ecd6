@@ -8,7 +8,7 @@ import { A, FIGS, SANS } from './tokens';
  *
  * Reuses the app's canonical like affordance — the lucide `Heart` glyph with an
  * AMBER active state, exactly as the feed footer button uses it (see
- * FooterButton in src/components/posts-tab/LightFeedCard.tsx) — so members
+ * FooterButton in the light feed card, deleted 10 Sep 2026) — so members
  * learn one vocabulary, not two.
  *
  *   not reacted   outline glyph, MUTE on light / white at 72% on photography

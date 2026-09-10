@@ -8,7 +8,7 @@
  * no placeholders holding a slot for a record nobody has set. When rows are
  * missing, one sentence says which and why, and it counts them.
  *
- * MOST ROUNDS IN A MONTH IS GONE, dead-listed not deleted. Volume is not a
+ * MOST ROUNDS IN A MONTH IS GONE (a removed row, not a removed file). Volume is not a
  * personal best: it rewards playing more rather than playing better, and in a
  * list of scoring records it reads as one of them.
  *

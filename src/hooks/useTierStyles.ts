@@ -2,7 +2,7 @@ import { rampForRating } from '@/lib/ratingTier';
 
 /**
  * Score ring color helpers — derived from canonical RATING_RAMPS to prevent
- * hex drift. Consumers: CommunityScoreCard, PersonalReviewCard.
+ * hex drift. Consumers: PersonalReviewCard (CommunityScoreCard was deleted 10 Sep 2026).
  *
  * History: previously read hand-copied hexes from course-detail-tokens.ts
  * scoreRing (e.g. #FFC23D vs canon #FFCB45). Now single-sourced from

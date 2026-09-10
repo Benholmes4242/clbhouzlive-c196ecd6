@@ -891,7 +891,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
      * so it cannot sit beside self-history figures with no basis stated. It is
      * now a sentence under the trajectory with its sample beneath it, gated on
      * the same `fieldGateOpen` as the card's FIELD row. `figBeatField` is
-     * dead-listed, not deleted.
+     * deleted 10 Sep 2026.
      */
     /**
      * The tour position keeps the rail — a pro has no history section to move

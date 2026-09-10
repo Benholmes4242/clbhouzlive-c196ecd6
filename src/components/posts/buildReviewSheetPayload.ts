@@ -5,7 +5,7 @@ import type { ReviewSheetPayload, ReviewSheetReviewerStats } from '@/stores/revi
  * Shared builder for the ReviewBottomSheet payload.
  *
  * Single source of truth used by BOTH entry points:
- *   1. Card "Read review ›" tap (FeedCard / LightFeedCard)
+ *   1. Card "Read review ›" tap (FeedCard; the light feed card was deleted 10 Sep 2026)
  *   2. Fullscreen viewer chrome tap (FullscreenFeedOverlay)
  *
  * Returns null when the post is not a review or lacks the minimum

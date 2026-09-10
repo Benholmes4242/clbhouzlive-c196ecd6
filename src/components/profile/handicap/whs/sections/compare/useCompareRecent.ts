@@ -6,7 +6,7 @@
  * order. Two implementations of this would drift, and this project has already
  * had two surfaces disagree about a leaderboard rank on device.
  *
- * SOURCE: useFriendLeaderboard - the same hook FriendsLeaderboardSection
+ * SOURCE: useFriendLeaderboard - the same hook the deleted FriendsLeaderboardSection
  * calls with the same argument, so React Query serves it from cache.
  * Self excluded, clbhouz members only, sorted by last_round_played_at.
  *

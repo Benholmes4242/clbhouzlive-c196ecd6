@@ -7,7 +7,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 
 // ── SECTION A (Sep 2026): ONE SCROLLING PAGE, TEN SECTIONS ────────────────
 // The Today / Form / Circle tabs are gone. The three view components
-// (TodayView / TrendsView / CircleView) are no longer rendered — their inner
+// (TodayView / TrendsView / CircleView) were deleted 10 Sep 2026 — their inner
 // blocks mount here directly, in the fixed page order:
 //
 //   1 Index · 2 Next round · 3 Last round · 4 Rounds that count ·
@@ -22,7 +22,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 // section takes them off — nothing disappears before its replacement exists.
 //
 // `./views/*` and `./types` (HandicapSubtab, LEGACY_SUBTAB_ALIAS,
-// resolveHandicapSubtab) are now unreferenced here — dead list, not deleted.
+// resolveHandicapSubtab) were deleted 10 Sep 2026.
 
 import IndexSection from './sections/IndexSection';
 import NextRoundSection from './sections/NextRoundSection';
@@ -58,7 +58,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   const { data: trend } = useHandicapTrend(connection.id);
   const currentHandicap = trend?.current ?? null;
 
-  // ── Stableford scores (section 5) — same query TrendsView ran ──────────
+  // ── Stableford scores (section 5) — same query the deleted TrendsView ran ──────────
   const { data: scores, isLoading: scoresLoading } = useAllScores(connection.id);
 
   const viewMode: 'owner' | 'friend' = readOnly ? 'friend' : 'owner';
@@ -105,8 +105,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       )}
 
       {/*
-        THE GREETING AND WEATHER LINE IS REMOVED (Section A). TodayGreeting is
-        no longer rendered anywhere — dead list, not deleted.
+        THE GREETING AND WEATHER LINE IS REMOVED (Section A). TodayGreeting was deleted 10 Sep 2026.
       */}
 
       {/* 1 — INDEX */}
@@ -123,23 +122,21 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 4 — ROUNDS THAT COUNT (Section E). RoundsThatCountCard is dead-listed,
-          not deleted: the flat section carries this slot now. */}
+      {/* 4 — ROUNDS THAT COUNT (Section E). RoundsThatCountCard was deleted 10 Sep 2026: the flat section carries this slot now. */}
       <RoundsThatCountSection connectionId={connection.id} userId={userId} />
 
       {/* 5 — HOW YOU'RE SCORING (Section F). The points half of StablefordCard
-          is dead-listed, not deleted; SCORE STATS is still reported, not moved. */}
+          is deleted 10 Sep 2026; SCORE STATS is still reported, not moved. */}
       {scoresLoading ? null : <ScoringSection scores={scores ?? []} />}
 
       {/* 6 — HOW YOU SCORE A HOLE (Section G). The outcome distribution moves
           here from StablefordCard's SCORE STATS and the par-type rings from
-          GameEverywhereCard, which is dead-listed rather than deleted.
+          GameEverywhereCard, which is deleted 10 Sep 2026.
           RoundShapePanel is off the page: 22 of 22 eligible members get the
           "no weak stretch" verdict, so the block says nothing. */}
       <HolesSection userId={userId} connectionId={connection.id} readOnly={readOnly} />
 
-      {/* 7 — PERSONAL BESTS (Section H). records/PersonalBests is dead-listed,
-          not deleted. AchievementsPanel is now OFF this page and dead-listed
+      {/* 7 — PERSONAL BESTS (Section H). records/PersonalBests was deleted 10 Sep 2026. AchievementsPanel is now OFF this page and deleted 10 Sep 2026
           too: the terminal TROPHY ROOM › row at the foot of Personal bests is
           verified opening the room, so the tile's only reason to exist is gone.
           GamMount stays at page level, so ?gam=trophies (with &section= and
@@ -152,14 +149,14 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       />
 
       {/* StreaksCard (the ON THE LINE - {n} ACTIVE rail) is OFF this page and
-          dead-listed, not deleted. It went with the trophies layer: the streak
+          deleted 10 Sep 2026. It went with the trophies layer: the streak
           material lives in the trophy room's StreaksPanel, whose door is the
           terminal TROPHY ROOM row at the foot of Personal bests, and
           StreaksSheetMount stays at page level so ?gam=streaks still opens. */}
 
       {/* 8 — YOUR CIRCLE (Section I). FriendsLeaderboardSection, StandingFigures,
           CompareEntryPanel, PulseSection and CircleInviteAction are all
-          dead-listed, not deleted: the rank is the heading, the gap is the
+          deleted 10 Sep 2026: the rank is the heading, the gap is the
           sub-line, the percentile is gone, and compare is reached by tapping a
           person through the existing resolver. */}
       {!readOnly && <CircleSection userId={userId} />}
@@ -168,7 +165,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       {!readOnly && <RecentlyPlayedFeed ownerUserId={userId} />}
 
       {/* 10 — FOOTER (Section K1). RoundsArchivePanel, YourCoursesRail and
-          WhsConnectionCaption are dead-listed, not deleted: the rounds total is
+          WhsConnectionCaption are deleted 10 Sep 2026: the rounds total is
           the footer link into the SAME RoundsArchiveSheet, the counters figure
           is Section E's meta, the 90-day count is Section F's meta, and the
           provenance line moves into the footer row. No second terminal link —

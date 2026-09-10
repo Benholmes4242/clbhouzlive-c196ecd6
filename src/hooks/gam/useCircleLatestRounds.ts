@@ -13,7 +13,7 @@ import { deriveRoundFeats, type RoundFeat } from '@/lib/gam/roundFeats';
  * one per member, feats first — so the section is never empty for a new member.
  * Circle rounds always come first and are never displaced.
  * A single hook, one round-trip per data source, grouped client-side. Read
- * usePulseFriends.ts for the friend-resolution reference — this hook does
+ * the former usePulseFriends.ts (deleted 10 Sep 2026) for the friend-resolution reference — this hook does
  * not modify or share cache with it.
  *
  * NET DECISION (brief 1.2)

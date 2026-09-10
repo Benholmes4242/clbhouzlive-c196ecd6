@@ -2,7 +2,7 @@
  * TrophyRoomEntryRow - a single quiet row that states the trophy count and
  * opens the trophy room.
  *
- * On the handicap surface the achievements entry point is AchievementsPanel
+ * On the handicap surface the achievements entry point was AchievementsPanel (deleted 10 Sep 2026)
  * (figures + recent unlocks). This row survives for the LIGHT profile card,
  * where there is no room for a panel and only the count plus the way in is
  * wanted.

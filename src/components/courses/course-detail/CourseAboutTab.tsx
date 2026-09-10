@@ -197,7 +197,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
         {/* §3.11 — KEEP EXPLORING, flat. Nearby, the Top 100 list and the
             official website; the same rows and the same routing, no Panel.
-            CourseActionRows.tsx is untouched and joins the dead-file list. */}
+            CourseActionRows.tsx is untouched and was deleted 10 Sep 2026. */}
         <KeepExploring
           course={course}
           onWebsiteClick={course.website_url ? handleWebsiteClick : undefined}

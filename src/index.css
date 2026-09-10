@@ -110,7 +110,7 @@ body.lightbox-open {
 }
 
 /* The LIGHT-SURFACE gold shimmer variant was retired with the neutral review
-   ghost: its only consumer was LightFeedCard, which now uses the shared
+   ghost: its only consumer was the light feed card (deleted), which used the shared
    ReviewGhostScore component. The keyframes above stay for the -bar variant. */
 
 

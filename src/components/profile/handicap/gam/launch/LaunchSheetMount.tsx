@@ -13,7 +13,7 @@ interface LaunchSheetMountProps {
  *   - We have a payload back from `get_gam_launch_payload`
  *   - `launch_seen_at` is NULL (never dismissed)
  *
- * Caller (TodayView) is responsible for the friend-view guard
+ * Caller (formerly TodayView, deleted 10 Sep 2026) is responsible for the friend-view guard
  * (`!readOnly`) — if this component never mounts, it never fires.
  *
  * Dismissal writes `gam_launch_seen_at = now()` to `user_profiles`
