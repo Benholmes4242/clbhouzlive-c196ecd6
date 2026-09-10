@@ -49,6 +49,12 @@ interface Props {
     actor: ActiveActor;
   }) => Promise<void>;
   isSubmitting: boolean;
+  /* BRIEF_SHEET_BACK_BEHAVIOUR_02 §3 — the draft lives here, the dismiss lives
+     in the sheet above. This reports typed text or an attached image upward so
+     the sheet can ask before throwing it away. Reporting rather than lifting
+     the state keeps the composer the only owner of its own fields. */
+  onDirtyChange?: (dirty: boolean) => void;
+
 }
 
 export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting }: Props) {
