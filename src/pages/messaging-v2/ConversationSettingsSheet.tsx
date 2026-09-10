@@ -389,13 +389,29 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
     }
   }, [blockUser, dmOther, rivalUserId, navigate, onClose]);
 
+  /* BRIEF_SHEET_BACK_BEHAVIOUR_02 §3 — DRAFT-HOLDING SHEET (one field).
+     Everything else here commits on tap; the group-name editor is the single
+     piece of member-authored text that a dismissal would lose. Dirty only when
+     the editor is open AND the text differs from the saved title — opening the
+     editor and changing nothing is not a draft. Both dismiss controls (header
+     close, backdrop/Escape/history back) go through `requestClose`. */
+  const titleDirty = titleEdit != null && titleEdit.trim() !== (detail?.title ?? '').trim();
+  const { requestClose, confirmOpen, discard, keepEditing } = useDraftDismissGuard(titleDirty, onClose);
+
   return (
     <BottomSheet
       open={open}
-      onClose={onClose}
+      onClose={requestClose}
       zIndexBase={1500}
     >
-      <SheetHeader title={t('messaging:sheet.detailsTitle')} onClose={onClose} dark />
+      <DiscardDraftDialog
+        open={confirmOpen}
+        onKeepEditing={keepEditing}
+        onDiscard={discard}
+        zIndex={1600}
+      />
+      <SheetHeader title={t('messaging:sheet.detailsTitle')} onClose={requestClose} dark />
+
 
       <div style={{ /* canon: sheet surface */ paddingBottom: 28 }}>
         {isLoading || !detail ? (
