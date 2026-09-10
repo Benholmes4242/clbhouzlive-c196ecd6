@@ -68,8 +68,26 @@ export const CountingScatter: React.FC<Props> = ({
       <svg
         viewBox={`0 0 ${VIEW_W} ${height}`}
         preserveAspectRatio="none"
-        style={{ display: 'block', width: '100%', height }}
+        style={{
+          display: 'block',
+          width: '100%',
+          height,
+          touchAction: onSelectIndex ? 'pan-y' : undefined,
+        }}
         aria-hidden
+        onPointerDown={
+          onSelectIndex
+            ? (e) => {
+                // The viewBox is stretched (preserveAspectRatio none), so the
+                // nearest index is resolved from the horizontal fraction, not
+                // from circle geometry.
+                const rect = e.currentTarget.getBoundingClientRect();
+                if (rect.width === 0) return;
+                const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+                onSelectIndex(Math.round(frac * (rounds.length - 1)));
+              }
+            : undefined
+        }
       >
         <path
           d={path}
@@ -87,6 +105,17 @@ export const CountingScatter: React.FC<Props> = ({
             fill={fillFor(r.state)}
           />
         ))}
+        {selectedIndex != null && rounds[selectedIndex] && (
+          <circle
+            cx={x(selectedIndex)}
+            cy={y(rounds[selectedIndex].diff)}
+            r={9}
+            fill="none"
+            stroke={fillFor(rounds[selectedIndex].state)}
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
+        )}
       </svg>
 
       <div
