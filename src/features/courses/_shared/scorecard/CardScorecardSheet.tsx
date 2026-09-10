@@ -1248,10 +1248,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 against an invisible field. Renders only when a figure resolves,
                 and never on the tour surface.
               */}
+              {/* The kicker states the sample when we know it. With no round
+                  count (INDEX THEN can resolve on its own) it falls back to the
+                  bare title rather than claiming "your 0 rounds here". */}
               {courseSection.length > 0 && (
-                {/* The kicker states the sample when we know it. With no round
-                    count (INDEX THEN can resolve on its own) it falls back to the
-                    bare title rather than claiming "your 0 rounds here". */}
                 <Panel
                   kicker={(courseContext?.roundsHere ?? 0) > 0
                     ? t('courses:scorecard.atThisCourse', { count: courseContext?.roundsHere as number })
