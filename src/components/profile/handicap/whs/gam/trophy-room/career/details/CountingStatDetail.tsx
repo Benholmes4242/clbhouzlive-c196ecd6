@@ -10,6 +10,7 @@ import { REC } from '../tokens';
 import { Panel, BackLink, Kicker, Caption, Figure, Bar, MetaLabel, RowButton } from '../Primitives';
 import { measuredShare } from '../shareModel';
 import { dayMonthYear, monthYear, plural } from '../format';
+import { attainedAt } from '@/lib/gam/badgeBackfill';
 import {
   courseSplitFor,
   bestRoundFor,

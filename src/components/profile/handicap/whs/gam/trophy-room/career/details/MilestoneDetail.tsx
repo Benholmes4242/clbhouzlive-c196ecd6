@@ -11,6 +11,7 @@ import { REC } from '../tokens';
 import { Panel, BackLink, Kicker, Caption, Figure, RowButton, MetaLabel } from '../Primitives';
 import { measuredShare } from '../shareModel';
 import { dayMonthYear, monthYear } from '../format';
+import { attainedAt } from '@/lib/gam/badgeBackfill';
 import { milestoneRoundFor } from '@/hooks/gam/useCareerRounds';
 import RoundDetailSheet from '../../../../sections/round-detail/RoundDetailSheet';
 import type { Achievement, CareerData } from '../types';
