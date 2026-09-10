@@ -113,6 +113,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         coursesPlayed={totalCoursesPlayed}
         countriesPlayed={countriesPlayed}
         avgRating={avgRating || null}
+        ratedCount={ratingSummary?.n ?? null}
         top100Played={top100Progress?.total_played_top100 ?? null}
         isOwnProfile={isOwnProfile}
         displayName={displayName}
