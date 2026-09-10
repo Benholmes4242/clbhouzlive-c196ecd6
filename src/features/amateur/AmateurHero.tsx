@@ -102,17 +102,54 @@ function featKicker(shape: HoleShape | null): string {
   return 'JUST PLAYED';
 }
 
+/**
+ * §2.2 THE GOLD MARKS. Feat gold at 85%, the same gold as the shape's event dot,
+ * so the two families share one accent and the marks read as the same species of
+ * fact as the dot. 18x4 at radius 2 is a tick, not a bar: it has no length to
+ * compare, only presence to count.
+ */
+const MARK_GOLD = 'rgba(255,210,0,0.85)';
+/** §2.2 — above this the marks stop being countable and become texture. */
+const MARK_CAP = 24;
+
+/**
+ * §8 — WHICH BOARD ANSWERS THIS CARD, or null when none does.
+ *
+ * A card opens the board beneath it switched to its own metric and window, but
+ * only where the board ACTUALLY RANKS THAT FIGURE. Of the four aggregate
+ * metrics, one does:
+ *
+ *   birdies  -> the 'birdies' RANKING board, which ranks members on birdies in
+ *               the window. Same question, same figure.
+ *   eagles   -> NO. 'eagle' is a FEAT board: it LISTS eagle events in date
+ *               order and ranks nobody, so it cannot show a count of 2 in its
+ *               standing. Sending a "most eagles" card there would answer "when
+ *               were the eagles" instead of "who else, and by how much".
+ *   rounds   -> NO BOARD EXISTS. Nothing ranks members on rounds played.
+ *   courses  -> NO BOARD EXISTS. Nothing ranks members on courses visited.
+ *
+ * The three that cannot be driven keep the profile, which is the least-wrong
+ * door and is recorded as a CONSTRAINT of the board's board list, not a choice.
+ */
+function boardForMetric(metric: string): BoardKey | null {
+  return metric === 'birdies' ? 'birdies' : null;
+}
+
 export function AmateurHero({
   userId,
   onOpenRound,
+  onOpenBoard,
 }: {
   userId: string | undefined;
   /** §5 THE HERO IS A DOOR TO THE ROUND, not to the course: the feat the kicker
    *  names must be visible on the scorecard one tap away. */
   onOpenRound?: (scoreId: string, roundUserId: string) => void;
+  /** §8 An aggregate card drives the board beneath it and scrolls to it. */
+  onOpenBoard?: (board: BoardKey, window: WindowKey, scope: 'circle' | 'everyone') => void;
 }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
+
 
   /* §2.1 AND §2.2 THE CARD FIRST, BOTH FAMILIES. The rotation now holds every
      metric the library builds: four single-round and four aggregate. The families
