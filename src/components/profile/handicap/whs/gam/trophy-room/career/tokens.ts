@@ -38,27 +38,35 @@ export const REC = {
   },
 } as const;
 
+/**
+ * TYPE SCALE, and it is the whole scale: section headline 21, head figure 24,
+ * row figures 16, small 11-13. Kicker 9/700/0.19em. Row kicker 9/700/0.12em.
+ * A call site that wants a size not on this list is a signal the treatment is
+ * wrong, not that the scale is short.
+ */
 export const KICKER = {
-  fontSize: 11,
+  fontSize: 9,
   fontWeight: 700,
-  letterSpacing: '0.16em',
+  letterSpacing: '0.19em',
   textTransform: 'uppercase' as const,
-  color: 'rgba(255,255,255,0.62)',
+  color: REC.DIM,
 };
 
+/** Row kicker: same size, tighter tracking, so it sits under a name not over it. */
 export const LABEL = {
-  fontSize: 11,
+  fontSize: 9,
   fontWeight: 700,
-  letterSpacing: '0.13em',
+  letterSpacing: '0.12em',
   textTransform: 'uppercase' as const,
   color: REC.DIM,
 };
 
 export const CAPTION = {
-  fontSize: 12.5,
-  lineHeight: 1.5,
+  fontSize: 13,
+  lineHeight: 1.55,
   color: REC.MUTE,
 };
+
 
 export const FIGURE = {
   fontWeight: 700,
