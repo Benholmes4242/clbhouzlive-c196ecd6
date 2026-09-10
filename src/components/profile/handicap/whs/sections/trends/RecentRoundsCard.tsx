@@ -143,6 +143,9 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
     () => ({
       gross: t('handicap.form.archive.gross'),
       playedTo: t('handicap.form.archive.playedTo'),
+      counts: t('handicap.form.archive.counts'),
+      hcpHeld: t('handicap.form.archive.hcpHeld'),
+      nineHoles: t('handicap.form.archive.nineHoles'),
     }),
     [t],
   );
