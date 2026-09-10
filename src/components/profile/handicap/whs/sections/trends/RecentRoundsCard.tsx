@@ -631,6 +631,18 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
   const courseName = round.course?.name ?? 'Unknown course';
   const deltaInfo = fmtHcpDelta(round.handicap_delta);
   const diffText = fmtDiff(round.handicap_differential);
+  /**
+   * THREE STATES, THREE RENDERINGS. Only a counter can move the index, so only
+   * a counter carries a mark: COUNTS alone, COUNTS + HCP arrow when the index
+   * moved, COUNTS + "HCP held" when it stayed inside the 0.05 dead band. A
+   * non-counter carries nothing at all, so the blank is explained rather than
+   * left to be interpreted.
+   */
+  const isCounter = !!round.is_counter;
+  const heldFlat = isCounter && !deltaInfo && round.handicap_delta !== null;
+  // Nine holes carries a mark on the DATE, not on a figure: gross scores stack
+  // directly on one another here. PLAYED TO is already normalised to 18.
+  const isNine = round.is_nine_hole === true || round.total_holes === 9;
 
   const d = new Date(round.play_date);
   const dayOfMonth = d.getDate();
