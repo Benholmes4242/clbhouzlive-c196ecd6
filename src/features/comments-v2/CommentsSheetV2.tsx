@@ -11,6 +11,9 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { createPortal } from 'react-dom';
+import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
+import { useDraftDismissGuard } from '@/components/ui/useDraftDismissGuard';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/lib/toast';
