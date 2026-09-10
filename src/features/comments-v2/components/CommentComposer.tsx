@@ -64,11 +64,14 @@ interface Props {
 }
 
 
-export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting, onDirtyChange }: Props) {
+export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting, onDirtyChange, draftKey }: Props) {
   const { user } = useSupabaseSession();
   const { t } = useTranslation('common');
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
-  const [text, setText] = useState('');
+  /* RESTORED SILENTLY (_05 §2). The stored draft seeds the field on mount, with
+     no notice: a comment box is not a document, and announcing three recovered
+     words costs more attention than losing them. */
+  const [text, setText] = useState(() => (draftKey ? readCommentDraft(draftKey) : ''));
   const [uploading, setUploading] = useState(false);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -86,12 +89,28 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
     if (replyingTo) requestAnimationFrame(() => inputRef.current?.focus());
   }, [replyingTo]);
 
+  /* Debounced write, 400ms, same figure as the review composer. The key is the
+     thread, so words typed on one post cannot appear on another. */
+  const draftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!draftKey) return;
+    if (draftTimer.current) clearTimeout(draftTimer.current);
+    draftTimer.current = setTimeout(() => {
+      writeCommentDraft(draftKey, text);
+    }, COMMENT_DRAFT_DEBOUNCE_MS);
+    return () => {
+      if (draftTimer.current) clearTimeout(draftTimer.current);
+    };
+  }, [draftKey, text]);
+
   /* Typed text or an uploaded-but-unsent image is a draft. An open actor
      picker or a focused empty field is not. Reported on every change so the
      owning sheet's dismiss guard is never a frame behind. */
   useEffect(() => {
     onDirtyChange?.(hasText || hasImage);
   }, [hasText, hasImage, onDirtyChange]);
+  useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
+
   useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
 
 
