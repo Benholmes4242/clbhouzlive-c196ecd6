@@ -245,7 +245,6 @@ export const PersonalBestsSection: React.FC<Props> = ({
             gap: 12,
             padding: '14px 0 0',
             marginTop: 12,
-            borderTop: `1px solid ${CHART.BORDER}`,
             background: 'none',
             border: 'none',
             borderTopStyle: 'solid',
