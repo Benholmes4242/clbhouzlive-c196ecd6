@@ -417,26 +417,39 @@ export function AmateurHero({
 
 
 
-          {/* THE ROUND SHAPE, over the scrim, 34px.
+          {/* THE ROUND SHAPE, over the scrim, 34px. SINGLE-ROUND ONLY.
               §3 TWO QUIET ADDITIONS, BOTH DEPENDENT ON THE HOLE SERIES: the
               level-par rule at 14% white and the hole number under the bead.
               showBaseline stays FALSE so the three-point fallback (no hole
               detail) draws NO rule — a rule under a curve that has no holes
-              behind it is a promise the drawing cannot keep (§4). */}
-          <span ref={setShapeBand} style={{ display: 'block', width: '100%', marginTop: 8 }}>
-            <RoundShape
-              row={row}
-              shape={shape}
-              width={shapeWidth}
-              height={AMATEUR_HERO_SHAPE_H}
-              showMeta={false}
-              showBaseline={false}
-              strokeWidth={2}
-              baselineColor={HERO_BASELINE}
-              beadHoleLabels
-            />
-          </span>
+              behind it is a promise the drawing cannot keep (§4).
 
+              AN AGGREGATE CARD DRAWS NO SHAPE (§2.2). Shaping one of the six
+              rounds behind a birdie count would be picking a round the figure
+              does not name, and shaping their average would be a graph nobody
+              played. The band is not rendered at all rather than rendered
+              empty, so the caption closes up instead of leaving a 34px hole. */}
+          {row && (
+            <span ref={setShapeBand} style={{ display: 'block', width: '100%', marginTop: 8 }}>
+              <RoundShape
+                row={row}
+                shape={shape}
+                width={shapeWidth}
+                height={AMATEUR_HERO_SHAPE_H}
+                showMeta={false}
+                showBaseline={false}
+                strokeWidth={2}
+                baselineColor={HERO_BASELINE}
+                beadHoleLabels
+              />
+            </span>
+          )}
+
+          {/* THE COURSE, or on an aggregate card THE SPREAD in its place: the
+              same slot, the same treatment, a different fact. A figure made of
+              many rounds says how many rounds and how many courses made it,
+              which is the aggregate answer to "one course" — never a course
+              name, because the rounds were not all at one. */}
           <span
             style={{
               ...KICKER,
@@ -449,7 +462,9 @@ export function AmateurHero({
               whiteSpace: 'nowrap',
             }}
           >
-            {row.course_name ?? t('discover.coursesPlayed.course', 'Course')}
+            {row
+              ? row.course_name ?? t('discover.coursesPlayed.course', 'Course')
+              : spreadLine}
           </span>
 
           {/* §4 THE CONTEXT LINE, AND IT IS NOT OPTIONAL. It says why this round
