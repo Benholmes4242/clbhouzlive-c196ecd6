@@ -781,6 +781,50 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         ))}
       </div>
 
+      {/* RESTORED EDIT DRAFT (_04 §1). Says so out loud, and offers the way back
+          to the published version. Not amber: amber means the viewing member. */}
+      {composer.restoredFromDraft && (
+        <div
+          role="status"
+          style={{
+            margin: '0 16px 16px',
+            padding: '12px 14px',
+            border: `1px solid ${RV2.hairline}`,
+            borderRadius: 12,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: RV2.ink }}>
+            {t('review.wizard.draftRestored.title')}
+          </div>
+          <div style={{ fontSize: 12.5, lineHeight: 1.45, color: RV2.secondary }}>
+            {t('review.wizard.draftRestored.body')}
+          </div>
+          <button
+            type="button"
+            onClick={composer.discardRestoredDraft}
+            style={{
+              alignSelf: 'flex-start',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              fontSize: 11.5,
+              fontWeight: 700,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              color: RV2.danger,
+              cursor: 'pointer',
+            }}
+          >
+            {t('review.wizard.draftRestored.discard')}
+          </button>
+        </div>
+      )}
+
+
+
       <div
         aria-live="polite"
         style={{
