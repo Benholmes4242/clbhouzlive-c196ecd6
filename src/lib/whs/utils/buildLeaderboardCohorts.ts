@@ -48,6 +48,15 @@ export function buildLeaderboardCohorts(
     }
   }
 
+  /* ACTIVE, WRITTEN DOWN ONCE (Sep 2026).
+     A circle member is ACTIVE when their most recent posted round is within
+     STALE_THRESHOLD_DAYS (90) of now. A member with NO last-round date is
+     INACTIVE — an unknown last round is not a recent one. The viewing member is
+     ALWAYS active regardless of their own last round: a table that can drop the
+     reader out of it has no rank to report. Every count on the page
+     (totalActive, totalInactive, the see-all count, the rank denominator) is
+     derived here and nowhere else, so the two totals that used to disagree
+     cannot. */
   const selfActiveIdx = active.findIndex((e) => e.is_self);
   const selfActiveRank = selfActiveIdx >= 0 ? selfActiveIdx + 1 : null;
 
