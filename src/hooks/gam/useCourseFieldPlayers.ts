@@ -15,7 +15,14 @@
  * course, includes the holder, and says nothing about players who posted
  * without taking a record.
  *
- * UNTIL get_course_field_sizes IS DEPLOYED this hook returns
+ * get_course_field_sizes(p_course_ids uuid[], p_exclude_user_id uuid) is live:
+ * definer, stable, search_path pinned, granted to authenticated and
+ * service_role only. It mirrors get_course_hole_field exactly -- verified: the
+ * same course with the same member excluded returns 17 players from both. IF
+ * THE TWO EVER DISAGREE the batched one is wrong by definition and must stop
+ * being used, because then there are two definitions of a field again.
+ *
+ * If the call fails or the grant is lost this hook returns
  * `{ available: false }` and the calling panel states counts without claiming
  * any course is won or uncontested. A missing function is NOT an excuse to fall
  * back to a head count of crown holders.
@@ -36,9 +43,15 @@ export interface CourseFieldPlayers {
   sizes: Map<string, number>;
 }
 
+/**
+ * The deployed shape: one row per requested course id, including courses with
+ * no qualifying mapping (0 players). course_players is already
+ * holder-excluded, so it is used as-is -- nothing is subtracted here.
+ */
 interface FieldSizeRow {
   course_id: string | null;
-  other_players: number | null;
+  course_players: number | null;
+  course_rounds?: number | null;
 }
 
 const UNAVAILABLE = (reason: string): CourseFieldPlayers => ({
@@ -74,7 +87,7 @@ export function useCourseFieldPlayers(
       const sizes = new Map<string, number>();
       for (const row of rows) {
         if (!row?.course_id) continue;
-        sizes.set(row.course_id, Number(row.other_players ?? 0));
+        sizes.set(row.course_id, Number(row.course_players ?? 0));
       }
       return { available: true, sizes };
     },
