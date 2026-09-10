@@ -2,7 +2,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import type { BoardKey, WindowKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
+
 import { RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import { useRoundHoleShapes, type HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { DISCOVER_FACT, DISCOVER_QUIET, KICKER, SANS } from '@/components/explore-tab-new/courseled/tokens';
@@ -102,17 +104,54 @@ function featKicker(shape: HoleShape | null): string {
   return 'JUST PLAYED';
 }
 
+/**
+ * §2.2 THE GOLD MARKS. Feat gold at 85%, the same gold as the shape's event dot,
+ * so the two families share one accent and the marks read as the same species of
+ * fact as the dot. 18x4 at radius 2 is a tick, not a bar: it has no length to
+ * compare, only presence to count.
+ */
+const MARK_GOLD = 'rgba(255,210,0,0.85)';
+/** §2.2 — above this the marks stop being countable and become texture. */
+const MARK_CAP = 24;
+
+/**
+ * §8 — WHICH BOARD ANSWERS THIS CARD, or null when none does.
+ *
+ * A card opens the board beneath it switched to its own metric and window, but
+ * only where the board ACTUALLY RANKS THAT FIGURE. Of the four aggregate
+ * metrics, one does:
+ *
+ *   birdies  -> the 'birdies' RANKING board, which ranks members on birdies in
+ *               the window. Same question, same figure.
+ *   eagles   -> NO. 'eagle' is a FEAT board: it LISTS eagle events in date
+ *               order and ranks nobody, so it cannot show a count of 2 in its
+ *               standing. Sending a "most eagles" card there would answer "when
+ *               were the eagles" instead of "who else, and by how much".
+ *   rounds   -> NO BOARD EXISTS. Nothing ranks members on rounds played.
+ *   courses  -> NO BOARD EXISTS. Nothing ranks members on courses visited.
+ *
+ * The three that cannot be driven keep the profile, which is the least-wrong
+ * door and is recorded as a CONSTRAINT of the board's board list, not a choice.
+ */
+function boardForMetric(metric: string): BoardKey | null {
+  return metric === 'birdies' ? 'birdies' : null;
+}
+
 export function AmateurHero({
   userId,
   onOpenRound,
+  onOpenBoard,
 }: {
   userId: string | undefined;
   /** §5 THE HERO IS A DOOR TO THE ROUND, not to the course: the feat the kicker
    *  names must be visible on the scorecard one tap away. */
   onOpenRound?: (scoreId: string, roundUserId: string) => void;
+  /** §8 An aggregate card drives the board beneath it and scrolls to it. */
+  onOpenBoard?: (board: BoardKey, window: WindowKey, scope: 'circle' | 'everyone') => void;
 }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
+
 
   /* §2.1 AND §2.2 THE CARD FIRST, BOTH FAMILIES. The rotation now holds every
      metric the library builds: four single-round and four aggregate. The families
@@ -173,6 +212,18 @@ export function AmateurHero({
      figure took. Null on every single-round card. */
   const spreadLine = card ? heroSpreadLine(t, card) : null;
   const isCard = !!card;
+  /* §8 — the board this card can be answered on, or null (see boardForMetric). */
+  const cardBoard = isAggregateCard && card ? boardForMetric(card.metric) : null;
+  /* §2.2 ONE MARK PER UNIT, CAPPED AT 24. The figure is a whole count on every
+     aggregate metric, so the marks and the figure are the same fact twice: the
+     marks make it legible before it is read, the figure confirms it. Above the
+     cap the figure carries the rest alone — forty marks is texture, not a
+     count, and a countable row is the entire justification for the space. */
+  const markCount =
+    isAggregateCard && card && card.figure != null
+      ? Math.min(MARK_CAP, Math.max(0, Math.round(card.figure)))
+      : 0;
+
 
   /* §10 ONE VIEW PER CARD, so the rotation can be judged later: which cards
      actually reach members, and how many were competing when one was chosen. */
@@ -259,28 +310,49 @@ export function AmateurHero({
       </CourseImageFallback>
 
       {subject && (
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              (e.currentTarget as HTMLDivElement).click();
+            }
+          }}
           onClick={() => {
             /* §5 THE ROUND FIRST. The hero names a feat, so the tap must land on
                the scorecard that carries it. The course page is the FALLBACK for
                a row with no score id (a suggested round with no card), never the
                primary destination.
 
-               AN AGGREGATE CARD HAS NO SCORECARD TO OPEN, so its door is the
-               member whose fortnight the figure describes — the one place the
-               rounds behind it are all listed. */
+               §8 AN AGGREGATE CARD OPENS THE BOARD BENEATH IT, switched to the
+               card's own metric, window and pool. The member tapping "MOST
+               BIRDIES / 30 DAYS / 14" is asking who else and by how much, and
+               that answer is forty pixels down the same page — so the page
+               answers it instead of handing the question to a profile. The
+               profile is still one tap away on the name (see below).
+
+               WHERE NO BOARD RANKS THE FIGURE the profile remains the door.
+               That is boardForMetric's list and it is a constraint of the
+               board's board set, not a preference. */
             if (card) {
               analyticsEvents.track('amateur_hero_card_tapped', {
                 card_id: card.id,
                 metric: card.metric,
                 window: card.window,
                 pool: card.pool,
+                destination: row?.score_id
+                  ? 'round'
+                  : isAggregateCard && cardBoard && onOpenBoard
+                    ? 'board'
+                    : 'profile',
               });
             }
             if (row?.score_id && onOpenRound) onOpenRound(row.score_id, row.user_id);
             else if (row?.course_id) navigate(`/courses/${row.course_id}`);
-            else if (isAggregateCard) navigate(`/profile/${subject.user_id}`);
+            else if (isAggregateCard && card && cardBoard && onOpenBoard) {
+              onOpenBoard(cardBoard, String(card.window) as WindowKey, card.pool === 'circle' ? 'circle' : 'everyone');
+            } else if (isAggregateCard) navigate(`/profile/${subject.user_id}`);
           }}
           style={{
             position: 'absolute',
@@ -297,10 +369,39 @@ export function AmateurHero({
             cursor: row?.course_id || isAggregateCard ? 'pointer' : 'default',
           }}
         >
+
           {/* WHO, on the photograph. Name and kicker form one column so the
               avatar centres against the pair, not against the first line. The
               score sits on the same row and shares the same vertical axis. */}
           <span style={{ display: 'flex', alignItems: 'center', gap: isCard ? 14 : 9 }}>
+            {/* §8 THE SMALLER DOOR FOR THE SMALLER QUESTION. "Who is this" is
+                answered by the profile, so the avatar and the name carry that
+                trip themselves and stop the event before the caption's own tap
+                sends the member to the board. Everything else in the caption —
+                the figure, the marks, the spread line — belongs to "who else,
+                and by how much" and goes to the board. */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                analyticsEvents.track('amateur_hero_subject_tapped', {
+                  card_id: card?.id ?? null,
+                  is_aggregate: isAggregateCard,
+                });
+                navigate(`/profile/${subject.user_id}`);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: isCard ? 14 : 9,
+                minWidth: 0,
+                padding: 0,
+                border: 0,
+                background: 'transparent',
+                textAlign: 'left',
+                cursor: 'pointer',
+              }}
+            >
             <SquircleAvatar
               size={isCard ? 44 : 30}
               src={subject.profile_photo_url ?? undefined}
@@ -309,6 +410,7 @@ export function AmateurHero({
               fallback={subject.display_name?.slice(0, 2).toUpperCase()}
               hairlineRing
             />
+
             <span
               style={{
                 minWidth: 0,
@@ -351,6 +453,8 @@ export function AmateurHero({
                 {kicker}
               </span>
             </span>
+            </button>
+
             {/* §2 GROSS OVER TO-PAR, right-aligned — the stacked shape and the
                 21 / 13 sizes are the Discover FriendRoundRow score column's, so
                 the hero states the score the way every round row already does
@@ -445,6 +549,42 @@ export function AmateurHero({
             </span>
           )}
 
+          {/* §2.2 THE GOLD MARKS, IN THE SPACE THE SHAPE WOULD HAVE FILLED.
+              An aggregate card left that space empty, which read as a shape that
+              failed to load rather than as a card of a different family. One
+              mark per unit: fourteen birdies draws fourteen marks, so the count
+              lands before the figure is read and the 14 then confirms it.
+
+              18x4, radius 2, 4px gap, wrapping, 16px above — and CAPPED AT 24.
+              The marks are aria-hidden: the figure beside them already says the
+              number, so announcing it twice would be noise to a screen reader. */}
+          {markCount > 0 && (
+            <span
+              aria-hidden
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 4,
+                width: '100%',
+                marginTop: 16,
+              }}
+            >
+              {Array.from({ length: markCount }, (_, i) => (
+                <span
+                  key={i}
+                  style={{
+                    display: 'block',
+                    width: 18,
+                    height: 4,
+                    borderRadius: 2,
+                    background: MARK_GOLD,
+                  }}
+                />
+              ))}
+            </span>
+
+          )}
+
           {/* THE COURSE, or on an aggregate card THE SPREAD in its place: the
               same slot, the same treatment, a different fact. A figure made of
               many rounds says how many rounds and how many courses made it,
@@ -488,7 +628,8 @@ export function AmateurHero({
               {contextLine}
             </span>
           )}
-        </button>
+        </div>
+
       )}
     </section>
   );

@@ -41,6 +41,9 @@ export default function AmateurPage() {
   const navigate = useNavigate();
   const opener = useScorecardOpener();
   const state = useAmateurBoardState(user?.id);
+  /* §8 — the scroll target a hero card drives the page to. */
+  const boardRef = useRef<HTMLDivElement | null>(null);
+
 
   useEffect(() => {
     analyticsEvents.track('amateur_page_viewed', {});
@@ -91,7 +94,21 @@ export default function AmateurPage() {
           analyticsEvents.track('amateur_hero_round_opened', { has_score: true });
           opener.openByScore(scoreId, null, roundUserId);
         }}
+        /* §8 AN AGGREGATE CARD IS ANSWERED ON THIS PAGE. The board state lives
+           here, so the hero hands up the metric, window and pool it named and
+           this page sets the board and brings it into view. The member reads the
+           same figure in its standing, with themselves in the list, without a
+           navigation. `touched` inside the board state is set by changeFilters,
+           so a card-driven pool will not be widened out from under the member by
+           the quiet-circle rule. */
+        onOpenBoard={(board, window, scope) => {
+          analyticsEvents.track('amateur_hero_board_driven', { board, window, scope });
+          state.changeBoard(board);
+          state.changeFilters({ ...state.filters, window, scope });
+          boardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }}
       />
+
 
       {/* THE SHARED CLEARANCE, never a page-local number: the floating pill's
           measured height + its 20px gap + 16px breathing + the home indicator.
@@ -101,10 +118,18 @@ export default function AmateurPage() {
           rail, which has no heading, pads itself to the same figure. */}
       <main style={{ padding: `18px 0 ${NAV_CLEARANCE}` }}>
 
-        <div style={{ padding: '0 20px' }}>
-          <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
+        {/* §8 THE SCROLL TARGET IS THE RAIL, NOT THE FIRST ROW. A card that sets
+            the board and window must land the member on the chips that now read
+            those values — arriving mid-list with a silently changed filter is the
+            undeclared widening this page exists to avoid. scrollMarginTop pays
+            for the floating glass island the rail would otherwise sit under. */}
+        <div ref={boardRef} style={{ scrollMarginTop: 84 }}>
+          <div style={{ padding: '0 20px' }}>
+            <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
+          </div>
+          <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
         </div>
-        <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
+
         <AmateurCoursesBlock userId={user?.id} state={state} onCoursePress={handleCourse} />
         <AmateurNewsBlock />
         <AmateurMediaBlock
