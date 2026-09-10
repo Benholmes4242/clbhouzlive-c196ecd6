@@ -467,7 +467,20 @@ export const StatRow: React.FC<{
    * one-line label.
    */
   labelLines?: 1 | 2;
-}> = ({ items, size = 22, style, labelLines = 2 }) => {
+  /**
+   * labelNoWrap - keep each label on ONE line and ellipsize rather than wrap.
+   * OPT-IN, default false, so every existing StatRow renders byte-identically.
+   *
+   * Pass it only where a label wrapping would read as TWO labels ("WORLD TOP
+   * 100" breaking after "TOP" looks like a "100" column), and only after
+   * measuring the labels against the narrowest supported column: this trades a
+   * wrap for a truncation, which is the worse failure if the label does not fit.
+   */
+  labelNoWrap?: boolean;
+}> = ({ items, size = 22, style, labelLines = 2, labelNoWrap = false }) => {
+  const noWrap: React.CSSProperties = labelNoWrap
+    ? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }
+    : {};
   const anySub = items.some((it) => !!it.sub);
 
   /**
