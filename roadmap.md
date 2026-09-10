@@ -325,14 +325,20 @@ OPEN ITEMS
   contested-first sort. Its 0 can mean "not mapped" as well as "nobody else played" -- safe for
   the split, not reusable elsewhere.
 
-## Trophy room — course count disagreement (open, 10 Sep 2026)
+## Trophy room — course counts (CLOSED, not a fault, 10 Sep 2026)
+NOT A DISAGREEMENT: the two counts answer different questions and both are right.
 The sheet's "N COURSES" beside course records counts DISTINCT COURSES WHERE THE
 MEMBER HOLDS RANK 1 (gam_course_legends_view, is_current = true, rank <= 1) — 22
 for member 8c240997. The 34 is distinct courses at ANY current rank (rank 1-15),
-i.e. it includes 12 courses where the member is placed but holds no record. Both
-counts are correct for their own question; nothing changed. When the surviving
-count is chosen, write its definition next to where it is computed. Second
-count-disagreement on this sheet after 245 vs 243 rounds.
+i.e. it includes 12 courses where the member is placed but holds no record.
+Nothing to reconcile, nothing changed, struck from the open list.
+
+CONSEQUENCE: the earlier 8 contested / 22 thin / 4 nobody-else split was computed
+over all 34 ranked courses and must NOT be quoted as the sheet's split. The bands
+over RANK-1 COURSES ONLY (the set the sheet counts), member 8c240997, mirroring
+get_course_field_sizes exactly: 22 courses = 4 contested (5+ others, the only band
+that reads WON) / 15 thin (1-4 others, of which 5 have exactly 1 other) / 3 with
+nobody else. Headline therefore shows 4 WON, 18 UNCONTESTED.
 
 ## Backfill gap row (report only)
 One row falls in the 13:20:17.479-15:52:46.765 UTC gap on 24 Jul 2026:
