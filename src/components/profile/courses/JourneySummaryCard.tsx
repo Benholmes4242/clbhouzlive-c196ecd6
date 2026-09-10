@@ -27,6 +27,14 @@ interface JourneySummaryCardProps {
   coursesPlayed: number | null;
   countriesPlayed: number | null;
   avgRating: number | null;
+  /**
+   * How many of their own ratings the RATING figure is the mean of. The label
+   * had to shorten to "RATING" to fit its column (see the item comment), so the
+   * word AVERAGE lives in the basis line instead and needs this count to say
+   * anything. Null means unknown: the basis line then omits the rating clause
+   * rather than guessing a population.
+   */
+  ratedCount?: number | null;
   top100Played?: number | null;
   isOwnProfile: boolean;
   displayName?: string;
@@ -37,6 +45,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   coursesPlayed,
   countriesPlayed,
   avgRating,
+  ratedCount,
   top100Played,
   isOwnProfile,
   displayName,
@@ -113,6 +122,34 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       : []),
   ];
 
+  /**
+   * THE BASIS LINE - IT CARRIES THE WORD THE LABELS CANNOT AFFORD.
+   *
+   * PLAYED counts every course on the member's record, including ones with no
+   * imported round, so it is stated rather than left to be inferred from the 35
+   * the analytics sheet lists. RATING had to lose "AVG" to fit its column, and
+   * "RATING 8.4" reads as one course's rating, so this line says what the figure
+   * averages over and how many ratings are in it. One sentence, both bases.
+   *
+   * The rating clause is omitted when the count is unknown - a basis line that
+   * names the wrong population is worse than a short one.
+   */
+  const ratingClause =
+    avgRating != null && avgRating > 0 && ratedCount != null && ratedCount > 0
+      ? t('legacy.basisRating', {
+          count: ratedCount,
+          defaultValue: 'Rating is the average of your {{count}} course ratings.',
+        })
+      : '';
+  const basis = [
+    t('legacy.basisPlayed', {
+      defaultValue: 'Played counts every course on your record, rated rounds or not.',
+    }),
+    ratingClause,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <motion.div
       initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
@@ -120,7 +157,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       transition={{ duration: 0.3 }}
       className={cn('px-4', className)}
     >
-      <Panel kicker={kicker}>
+      <Panel kicker={kicker} footer={isOwnProfile ? basis : undefined}>
         {/* labelNoWrap: every label here is measured to fit one 81.5px column at
             390pt (see the item comments), so a wrap can only mean a locale
             string longer than the English default - and a truncation reads as

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Pencil } from 'lucide-react';
+import { Plus, Pencil, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 
@@ -21,6 +21,18 @@ interface ClubsCardProps {
    * the owner's own profile whether or not they ever saw a prompt.
    */
   onSetHomeClub?: () => void;
+  /**
+   * THE CLUB THEY HAVE ASKED FOR AND ARE WAITING ON (§3.5), from
+   * user_profiles.home_club_pending_name via useHomeClubStatus - a typed name of
+   * a club not yet in the catalogue, not a club row.
+   *
+   * IT IS HERE BECAUSE AWAITING APPROVAL AND HAVING NO CLUB ARE TWO STATES AND
+   * WERE RENDERING AS ONE. When HomeClubPrompt was removed this treatment left
+   * with it, and a member who had already answered was told to answer again -
+   * the same collapse as an error shown as a zero. This is now the only surface
+   * that holds it.
+   */
+  pendingClubName?: string | null;
   className?: string;
 }
 
@@ -33,11 +45,48 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
   isPrivate = false,
   onEditClick,
   onSetHomeClub,
+  pendingClubName,
   className
 }) => {
   const hasClubs = homeClub || secondaryClubs.length > 0;
   const displayedSecondary = secondaryClubs.slice(0, MAX_SECONDARY_CLUBS);
   const remainingCount = secondaryClubs.length - MAX_SECONDARY_CLUBS;
+
+  /**
+   * PENDING OUTRANKS EMPTY. A member with a club on the way has answered the
+   * question the empty state asks, so it must not be asked again. Their answer
+   * is shown, visibly unconfirmed - the amber here is a status on the member's
+   * own profile, not decoration.
+   */
+  if (!hasClubs && isOwner && pendingClubName) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.24 }}
+        className={cn('px-5 py-4', className)}
+      >
+        <div className="mb-3">
+          <SectionHeader role="section" kicker="CLUBS" title="Clubs & Memberships" />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+            Home club
+          </span>
+          <span
+            className="inline-flex items-center gap-1 text-[9.5px] font-bold uppercase tracking-[0.12em] px-1.5 py-0.5 rounded-[6px]"
+            style={{ background: 'rgba(247,147,30,0.14)', color: '#F7931E' }}
+          >
+            <Clock size={10} strokeWidth={2.5} /> Pending
+          </span>
+        </div>
+        <p className="text-[15px] font-semibold mt-1 text-foreground">{pendingClubName}</p>
+        <p className="text-[12.5px] mt-1 text-muted-foreground">
+          We're adding this club. You'll be connected to it automatically - nothing more to do.
+        </p>
+      </motion.div>
+    );
+  }
 
   if (!hasClubs && isOwner) {
     return (
