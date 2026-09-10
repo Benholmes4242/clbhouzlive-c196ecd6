@@ -5,6 +5,7 @@ import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import WhsConnectScreen from './WhsConnectScreen';
 import HandicapDashboard from './HandicapDashboard';
+import NotConnectedSection from './sections/NotConnectedSection';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
