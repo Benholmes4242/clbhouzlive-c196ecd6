@@ -817,3 +817,125 @@ a wrap reads as two. Verified at 390pt: four labels, one line each (1.09 line
 boxes), zero truncated.
   NOT FIXED, and it predates this pass: legacy.* has NO keys in any of the six
   locale files, so all four labels fall back to the English defaults everywhere.
+
+## THE CIRCLE HAS FOUR DEFINITIONS, NOT TWO (10 Sep 2026) -- REPORT, NOTHING BUILT
+
+### 1. WHAT WRITES EACH TABLE
+
+Not two code paths. ONE conceptual write, mirrored by DB triggers in BOTH
+directions, which is why the newest rows match to the microsecond:
+
+  follows          -> trg_mirror_follows_to_legacy_ins/_del -> mirror_follows_to_legacy()
+                      personal/personal edge  -> user_follows
+                      personal/business edge  -> business_follows
+  user_follows     -> trg_mirror_user_follows_ins/_del -> mirror_user_follows_to_follows()
+                      -> follows as personal/personal
+  business_follows -> trg_mirror_business_follows_ins/_del -> follows as personal/business
+
+So follows is the SUPERSET and the two legacy tables are its two typed
+projections. Both mirrors use ON CONFLICT DO NOTHING, so the round trip
+terminates rather than looping.
+
+App writers: useToggleFollow, useBusinessFollow, followClbhouz (all -> follows);
+useFollow.ts and join-request edge fn still write user_follows directly (mirror
+carries them up); useBlockActions deletes from user_follows AND user_friends;
+delete-account deletes from follows. THE FOURTH WRITER IS A TRIGGER:
+auto_follow_on_friend_accept inserts TWO user_follows rows when a
+user_friends row flips pending -> accepted. Accepting a friend therefore creates
+a mutual follow, which is why accepted friendships add almost no members the
+follow tables do not already have (1 across the base).
+
+### 2. WHO READS WHAT (app-wide, not confined to Explore)
+
+follows (5 readers): useToggleFollow, useFollowState, useBusinessFollow,
+useCircleSize, useSuggestedGolfers, plus compute-golfer-eligibility-signals and
+delete-account edge fns.
+
+user_follows (18 readers): useFollow, useBlockActions, useFollowingIdSet
+(Explore course-led), usePlayedWith + useInboxStarters (messaging),
+usePostLikers, useNetworkActivity, useCircleLatestRounds, useMembersWhoPlayedCourse,
+useTopTenVisibility, useFriendsTop100Progress, useDiscoveryExclusions,
+useRealtimeSocialCounts, admin useUserDetails + useUsers (follower/following
+counts on the admin user record), join-request edge fn.
+
+user_friends (14 readers): useFriendship, useFriendActions, useFriendRequestsV2,
+useFriendsLeaderboard, useFriendIdSet, useTopTenVisibility, useNetworkActivity,
+useDiscoveryExclusions, useBlockActions, useEditorialCards, useCircleLatestRounds,
+FindGolfersSheet, notify-friend-review edge fn.
+
+BECAUSE THE MIRRORS ARE BIDIRECTIONAL, the personal-edge readers do NOT disagree
+with each other. The only disagreement is TYPE: a reader of follows sees business
+edges, a reader of user_follows does not. Every wrong branch traces to that.
+
+### 3. WHAT user_friends IS FOR -- IT IS LIVE AND CANNOT BE FOLDED IN
+
+It is not a legacy layer. It is the FRIEND REQUEST model and follows cannot
+express it: 100 accepted, 62 PENDING, 1 declined. The pending state is read and
+written by useFriendRequestsV2 (accept/decline), useFriendActions, useFriendship
+and the Activity feed; two notification triggers fire on it
+(create_friend_request_notification, create_friend_accepted_notification) and
+prevent_friend_if_blocked guards it. Blocked is NOT stored here (0 rows) -- that
+moved to blocked_actors.
+  So user_friends stays. What it must stop being is A SOURCE OF CIRCLE
+MEMBERSHIP, because accepted friendship already implies a mutual follow via
+auto_follow_on_friend_accept: only 1 member base-wide is in an accepted
+friendship without a follow edge, and that one is a pre-trigger row.
+
+### 4. THE FOURTH DEFINITION, WHICH THE BRIEF DID NOT NAME
+
+board_pool() -- the shipped leaderboard's own SQL -- builds `circle` as
+user_friends WITH NO STATUS FILTER, union user_follows, union the viewer. So a
+PENDING friend request puts a stranger's rounds on the circle board. 65 members
+appear in user_friends at any status against 43 accepted, and 18 members have
+pending-only rows and no other circle edge. That is the same class of fault as
+the business one, in the opposite direction: the server pool is too WIDE while
+useCircleSize is too wide in TYPE and useCircleLatestRounds is correct.
+
+  useCircleSize          follows, all actor types, no filter  -> too wide (business)
+  board_pool             user_friends any status + user_follows -> too wide (pending)
+  useCircleLatestRounds  user_friends accepted + user_follows   -> correct today
+  BRIEF definition       "people the member chose"              -> the intent
+
+### 5. THE COUNTS, RECOMPUTED
+
+101 member rows in user_profiles. 48 follow at least one golfer. 94 personal->
+business edges; 48 members follow a business and NO golfer (Ben's 47 plus one --
+the extra is a member with a business follow whose only other edge is nothing;
+all 48 also have no accepted friendship, so none is rescued). 5 members have no
+edge of any kind. 1 member has an accepted friendship without a follow row.
+  AND THE FIGURE WE DESIGNED AGAINST: "follows no golfers" = 53 of 101 (101 - 48).
+Read from follows it looks like 3, which is the business edges masking it. 52/99
+was right for the question and right by accident, and it is now stated with the
+question attached.
+
+### 6. PROPOSED FIX -- NOT BUILT
+
+Agreed with Ben's instinct, with one addition, because user_friends' pending
+state means the fix has to name a status rather than drop the table:
+
+ONE definition, in ONE file (`src/lib/social/circle.ts`, new):
+  THE CIRCLE = follows WHERE follower_actor_type = 'personal'
+                     AND following_actor_type = 'personal'
+                     AND follower_actor_id = viewer
+  Outbound only. No user_friends term at all: accepted friendship already
+  guarantees a follow edge via auto_follow_on_friend_accept, and including
+  user_friends is what let pending requests in.
+  ONE MIGRATION IS REQUIRED and it is the only server change: board_pool()'s
+  `circle` CTE is replaced with the same predicate, which simultaneously drops
+  pending friends and keeps business follows out. Nothing else in the RPC moves.
+  THE ONE PRE-TRIGGER ROW (accepted friendship, no follow edge) is backfilled in
+  the same migration rather than kept as a special case in the definition.
+  useCircleSize then becomes a count of that predicate, so size and membership
+  are the same query with a different projection and CANNOT disagree.
+  KEEP user_follows/user_friends readers as they are for now -- they are correct
+  for what they ask (personal follows; friendships) and the mirrors keep them
+  true. This item is about the CIRCLE, not about collapsing the tables.
+
+### 7. WHY THIS ONE WAS INVISIBLE
+
+The five before it were quantities: two numbers on a screen, one of them wrong,
+visible to anyone who looked twice. This one is a CONCEPT, and a concept
+disagrees in BRANCHES. Nobody saw a wrong figure -- 48 members saw a correct
+empty board, reached by asking the wrong question, on a page whose brief exists
+to prevent exactly that. The hero's pool ladder has been silently compensating
+for it since the day it was built.
