@@ -314,3 +314,13 @@ OPEN ITEMS
   backfill stamp it should not render at all. Needs a data ruling.
 - Dead list: CrownsPanel.tsx (replaced by CourseRecordsPanel), useCourseFieldSizes.ts (legacy
   crown-HOLDER head count, still read by CrownDetail's field line). Neither deleted.
+- FILED (scope named, derivation NOT attempted): badge and milestone attained_at is a BACKFILL
+  timestamp for the rows written on 24 Jul 2026 -- 201 rows / 14 members between
+  11:59:02.143Z and 13:20:17.479Z, plus 15 rows / 4 members between 15:52:46.765Z and
+  16:23:35.128Z. A real attained-at would have to be derived from the triggering round. Until
+  then those rows carry NO date: suppression is windowed in src/lib/gam/badgeBackfill.ts and
+  every row outside the windows renders its labelled date normally.
+- PENDING BEN: get_course_field_sizes(uuid[], uuid) to be run in production. On confirmation,
+  section C calls it once with all crown course ids, threshold from src/lib/gam/fieldGate.ts,
+  contested-first sort. Its 0 can mean "not mapped" as well as "nobody else played" -- safe for
+  the split, not reusable elsewhere.

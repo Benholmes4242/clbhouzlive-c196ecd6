@@ -19,6 +19,12 @@
  * `{ available: false }` and the calling panel states counts without claiming
  * any course is won or uncontested. A missing function is NOT an excuse to fall
  * back to a head count of crown holders.
+ *
+ * ZERO IS AMBIGUOUS, AND ONLY SAFE HERE. A course with no qualifying WHS
+ * mapping comes back with 0 players, which is indistinguishable from a mapped
+ * course nobody else has played. Both are UNCONTESTED, so the won/uncontested
+ * split reads it correctly -- but do NOT reuse this zero anywhere as "nobody has
+ * played here", because it may mean "not mapped".
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';

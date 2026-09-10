@@ -62,8 +62,9 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
         <span style={{ fontSize: 12.5, color: REC.MUTE }}>{item.description}</span>
       </div>
       {/* Omitted entirely when earned_at is null. No placeholder. */}
-      {monthYear(item.earnedAt) ? (
-        <Caption>{t('career.mostRecent', { when: monthYear(item.earnedAt) })}</Caption>
+      {/* Absent entirely for backfilled rows -- see src/lib/gam/badgeBackfill.ts. */}
+      {monthYear(attainedAt(item.earnedAt)) ? (
+        <Caption>{t('career.mostRecent', { when: monthYear(attainedAt(item.earnedAt)) })}</Caption>
       ) : null}
       {share !== null && (
         <Caption>

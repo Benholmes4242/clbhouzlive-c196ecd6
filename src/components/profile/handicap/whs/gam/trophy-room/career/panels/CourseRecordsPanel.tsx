@@ -18,6 +18,9 @@
  * batched read is unavailable the section states record counts and NOTHING
  * about contest.
  *
+ * A ZERO from that read may mean "not mapped", not "nobody else has played".
+ * Both are uncontested so this section is safe; nothing else may reuse the zero.
+ *
  * SORT: contested first by record count descending, uncontested after, also by
  * count. A member should see what they won before what they claimed.
  *

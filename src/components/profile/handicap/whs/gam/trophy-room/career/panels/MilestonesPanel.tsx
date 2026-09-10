@@ -1,6 +1,10 @@
 /**
  * MILESTONES -- one-off facts. Reached or not reached, with the month.
  *
+ * SAME COLUMN, SAME RULE: a month inside the 24 Jul 2026 backfill window is a
+ * write timestamp, not an achievement date, so the row shows the milestone as
+ * reached and says nothing about when. See src/lib/gam/badgeBackfill.ts.
+ *
  * THE MONTH IS THE SAME QUANTITY as the counting rows' date -- both are the
  * badge's earned_at -- so it is labelled the same way, "Reached {month year}".
  * See CountingStatsPanel for the open correctness question about that column.
@@ -14,6 +18,7 @@ import { ChevronRight } from 'lucide-react';
 import { REC } from '../tokens';
 import { Panel, RowButton, Dot, MetaLabel, Collapsible } from '../Primitives';
 import { monthYear } from '../format';
+import { attainedAt } from '@/lib/gam/badgeBackfill';
 import { measuredShare } from '../shareModel';
 import type { Achievement, CareerData } from '../types';
 
@@ -95,8 +100,10 @@ export const MilestonesPanel: React.FC<Props> = ({ data, items }) => {
                 }}
               >
                 {item.earned
-                  ? monthYear(item.earnedAt)
-                    ? t('career.milestoneReachedAt', { when: monthYear(item.earnedAt) })
+                  ? monthYear(attainedAt(item.earnedAt))
+                    ? t('career.milestoneReachedAt', {
+                        when: monthYear(attainedAt(item.earnedAt)),
+                      })
                     : t('career.achieved')
                   : 'NOT YET'}
               </span>
