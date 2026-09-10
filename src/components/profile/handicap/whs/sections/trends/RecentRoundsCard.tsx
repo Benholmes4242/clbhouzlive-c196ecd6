@@ -644,6 +644,17 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
    * left to be interpreted.
    */
   const isCounter = !!round.is_counter;
+  /**
+   * DELIBERATE, NOT AN OMISSION. There are FOUR cases on a counter, not three:
+   * a delta that moved, a delta computed and rounded flat inside the 0.05 dead
+   * band, a delta that was never computed at all (no handicap_index_at_time, or
+   * no following index to compare against), and — on non-counters — no delta
+   * possible. Only the SECOND may say "HCP held": saying it for the third would
+   * state a fact nobody knows, the same shape as rendering a backfill timestamp
+   * as an achievement date. The unknown case therefore renders the COUNTS mark
+   * alone, which says the round counts and says nothing about the index.
+   * `handicap_delta !== null` is the whole distinction — do not relax it.
+   */
   const heldFlat = isCounter && !deltaInfo && round.handicap_delta !== null;
   // Nine holes carries a mark on the DATE, not on a figure: gross scores stack
   // directly on one another here. PLAYED TO is already normalised to 18.

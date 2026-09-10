@@ -67,6 +67,16 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   // `tab` is retained as a property with the constant value 'page' so the
   // pre-cutover series (today/form/circle and the legacy five) keeps its shape
   // and the post-tab era is distinguishable rather than absent.
+  /**
+   * INSTRUMENTATION CUTOVER — 10 Sep 2026. `rounds_counting` CHANGES MEANING on
+   * the day this ships. fetchCounters used to carry a hard `.limit(8)`, so this
+   * property was the counter count CAPPED AT 8; the cap is gone, so it is now
+   * the true count of rows with is_counter = true. Any chart or comparison that
+   * spans 10 Sep 2026 will show a step at that date which is this change and
+   * not member behaviour — read the series in two halves, as with the handicap
+   * subtab cutover in Aug 2026. Eight counters is a WHS rule that applies at 20
+   * or more rounds; encoding it in the query asserted it everywhere.
+   */
   const { data: counters } = useCounters(connection.id);
   const roundsCounting = counters?.length ?? null;
   const viewedKeyRef = useRef<string | null>(null);

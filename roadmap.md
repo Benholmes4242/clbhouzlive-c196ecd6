@@ -371,3 +371,23 @@ POSTED HISTORY SHEET — REBUILD (10 Sep 2026)
   (useCounters) survives for HandicapDashboard's rounds_counting analytics property only,
   and its hard .limit(8) is gone — eight counters is a WHS rule at 20+ rounds, not a
   schema fact.
+
+- INSTRUMENTATION CUTOVER (10 Sep 2026): `rounds_counting` on `handicap_viewed`
+  changed meaning. fetchCounters carried `.limit(8)`, so the property was the
+  counter count CAPPED AT 8; the cap is removed and it is now the true count of
+  is_counter rows. Series spanning 10 Sep 2026 show a STEP at that date that is
+  this change, not member behaviour — read in two halves, as with the handicap
+  subtab cutover of Aug 2026. Reason for removal: eight counters is a WHS rule
+  that applies at twenty or more rounds, and the query asserted it at every
+  round count, a second copy of the same assumption.
+- OPEN (reported, not fixed): gam_round_stats.is_counter is a MIRROR of
+  whs_scores.is_counter with NO reconciliation. Writer: gam-evaluator, once per
+  round, copying `score.is_counter ?? false` at evaluation time. Drift is
+  detected only opportunistically by _shared/counter-requeue.ts around the sync
+  upsert (sync-whs-one, sync-whs-due), which is non-fatal on error and only sees
+  flips that happen while it is watching. Nothing sweeps or verifies the two
+  columns. MEASURED 10 Sep 2026: 80 of 3,554 mapped rounds diverge across 20
+  members (57 stale true, 23 stale false; play dates 18 Jul 2024 - 5 Sep 2026).
+  gam-weekly-digest and gam-refresh-streaks-weekly both filter the mirror, so
+  both currently act on a counter set that is wrong for 80 rounds and neither
+  reports anything wrong.
