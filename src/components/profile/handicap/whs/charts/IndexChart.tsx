@@ -79,6 +79,21 @@ const LABEL_OFFSET = POINT_R + LABEL_CLEAR; // 8.5
 const LABEL_BAND = LABEL_OFFSET + LABEL_LH; // 20.5
 /** Plot-area inset: derived from the band, never typed as a number. */
 const PAD_Y = Math.ceil(LABEL_BAND); // 21
+/* SNAGS_02 §1 — THE BAND IS PAID FOR BY THE BOX, NOT BY THE PLOT.
+ *
+ * SNAGS_01 reserved the band INSIDE the existing box, which cost the trend
+ * line 42px of vertical range on a 96px box: a 44% flattening of the one
+ * chart whose job is the SHAPE of an index over twelve months. The `height`
+ * prop therefore keeps meaning what it always meant — the PLOT box — and the
+ * rendered box GROWS by the extra the derived band needs over the inset that
+ * was already there, spending the empty space beneath the axis row instead.
+ *
+ *   innerH = boxH - 2*PAD_Y = height - 2*PAD_Y_LEGACY  (unchanged, by construction)
+ */
+/** The inset this chart carried before the label band existed. */
+const PAD_Y_LEGACY = 16;
+/** Extra height the band needs beyond the inset already present, per side. */
+const BAND_EXTRA = Math.max(0, PAD_Y - PAD_Y_LEGACY); // 5
 const FLAT_EPS = 0.001;
 
 function zoneColor(v: number, best: number, worst: number): string {
@@ -101,6 +116,9 @@ export const IndexChart: React.FC<Props> = ({
 }) => {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
 
+  /* The drawn box: the caller's plot box plus the band, top and bottom. */
+  const boxH = height + BAND_EXTRA * 2;
+
   const geom = useMemo(() => {
     if (!points || points.length < 2) return null;
     const values = points.map((p) => p.v);
@@ -110,7 +128,7 @@ export const IndexChart: React.FC<Props> = ({
     const flat = max - min <= FLAT_EPS;
 
     const innerW = VIEW_W - PAD_X * 2;
-    const innerH = height - PAD_Y * 2;
+    const innerH = boxH - PAD_Y * 2; // === height - PAD_Y_LEGACY * 2
 
     const x = (i: number) => PAD_X + (i / (points.length - 1)) * innerW;
     // SUBTRACTS: a bigger index sits higher on the plot.
@@ -118,7 +136,7 @@ export const IndexChart: React.FC<Props> = ({
 
     const pts = points.map((p, i) => ({ x: x(i), y: y(p.v) }));
     const line = monotonePath(pts);
-    const area = `${line} L${pts[pts.length - 1].x.toFixed(2)},${height} L${pts[0].x.toFixed(2)},${height} Z`;
+    const area = `${line} L${pts[pts.length - 1].x.toFixed(2)},${boxH} L${pts[0].x.toFixed(2)},${boxH} Z`;
 
     // NET DELTA of the series being drawn — the fill's only input.
     const net = values[values.length - 1] - values[0];
@@ -140,7 +158,7 @@ export const IndexChart: React.FC<Props> = ({
       lastIdx: points.length - 1,
       gridYs: [0.25, 0.5, 0.75].map((f) => PAD_Y + f * innerH),
     };
-  }, [points, height]);
+  }, [points, boxH]);
 
   if (!geom) return null;
 
@@ -160,11 +178,11 @@ export const IndexChart: React.FC<Props> = ({
 
   return (
     <div style={{ fontFamily: CHART_FONT }}>
-      <div style={{ position: 'relative', height }}>
+      <div style={{ position: 'relative', height: boxH }}>
         <svg
-          viewBox={`0 0 ${VIEW_W} ${height}`}
+          viewBox={`0 0 ${VIEW_W} ${boxH}`}
           preserveAspectRatio="none"
-          style={{ display: 'block', width: '100%', height }}
+          style={{ display: 'block', width: '100%', height: boxH }}
           aria-hidden
         >
           <defs>
@@ -267,7 +285,7 @@ export const IndexChart: React.FC<Props> = ({
           const py = pts[c.idx].y;
           let above = c.above;
           if (above && py - LABEL_BAND < 0) above = false;
-          else if (!above && py + LABEL_BAND > height) above = true;
+          else if (!above && py + LABEL_BAND > boxH) above = true;
           const style: React.CSSProperties = {
             position: 'absolute',
             top: py + (above ? -LABEL_OFFSET : LABEL_OFFSET),
