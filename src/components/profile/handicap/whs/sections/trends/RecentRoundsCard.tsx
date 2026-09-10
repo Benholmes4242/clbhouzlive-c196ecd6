@@ -617,6 +617,11 @@ interface FeedCardProps {
   labels: { gross: string; playedTo: string; counts: string; hcpHeld: string; nineHoles: string };
 }
 
+/** The one separator on the meta line. */
+const Dot: React.FC = () => (
+  <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
+);
+
 const FIGURE_LABEL: React.CSSProperties = {
   fontSize: 9.5,
   fontWeight: 700,
