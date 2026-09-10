@@ -318,7 +318,9 @@ function CommentsSheetV2Inner({
               onClearReply={() => setReplyingTo(null)}
               onSubmit={onSubmit}
               isSubmitting={addComment.isPending}
+              onDirtyChange={setComposerDirty}
             />
+
           </motion.div>
 
           {/* Action sheet */}
