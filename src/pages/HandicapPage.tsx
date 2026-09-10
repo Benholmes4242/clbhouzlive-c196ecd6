@@ -323,11 +323,14 @@ const HandicapPage: React.FC = () => {
    * ONE HANDLER, TWO VOCABULARIES.
    *
    * ?gam= is the current vocabulary. ?sheet= is the legacy one the push
-   * dispatcher emitted until this fix, and delivered pushes carry their URL
-   * verbatim and cannot be rewritten — so every badge and streak notification
-   * already sitting in a tray still arrives as ?sheet=. It is aliased here, on
-   * the same established footing as /handicap/rivalry/:id and the stale
-   * ?subtab= values above.
+   * dispatcher emitted until 10 Sep 2026, and delivered pushes carry their
+   * URL verbatim and cannot be rewritten. 591 notifications to 22 members
+   * were delivered with ?sheet= URLs between 13 Jul and 10 Sep 2026, and
+   * every one of them still arrives as ?sheet=. NOTHING NEW EMITS ?sheet=
+   * ANYMORE, so this branch looks dead — it is not. It is the only thing
+   * keeping those 591 delivered pushes working, and it must stay
+   * permanently. It sits on the same established footing as
+   * /handicap/rivalry/:id and the stale ?subtab= values above.
    *
    * BOTH VOCABULARIES RESOLVE THROUGH THIS ONE EFFECT so they cannot drift
    * apart again: the intent is read first, then handled once.
