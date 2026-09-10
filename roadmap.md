@@ -170,3 +170,4 @@
 ## Open item — nine-hole disclosure beyond the handicap page
 - Feed round card, friends' rounds rows, compare sheet, Discover board rows and profile round rows print gross/stableford without reading is_nine_hole or total_holes. Scope named, not fixed.
 - PostRoundCard is the only entry that prints a gross to OTHER PEOPLE rather than to the member themselves, so a misread has a cost beyond confusion. It is currently unreachable in the Clubhouse feed (round posts are hidden there) but still renders on the profile posts tab, so it is live though quieter.
+- All 30 nine-hole rounds carrying stableford points score under 33, so every one of them would land in OFF DAY by construction. That is the clearest proof the band thresholds (36+ / 33-35 / <33) assume eighteen holes without ever saying so.
