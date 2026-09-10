@@ -580,7 +580,8 @@ export function AmateurHero({
               {contextLine}
             </span>
           )}
-        </button>
+        </div>
+
       )}
     </section>
   );
