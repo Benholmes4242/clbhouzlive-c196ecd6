@@ -1249,7 +1249,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 and never on the tour surface.
               */}
               {courseSection.length > 0 && (
-                <Panel kicker={t('courses:scorecard.atThisCourse', { count: courseContext?.roundsHere ?? 0 })}>
+                {/* The kicker states the sample when we know it. With no round
+                    count (INDEX THEN can resolve on its own) it falls back to the
+                    bare title rather than claiming "your 0 rounds here". */}
+                <Panel
+                  kicker={(courseContext?.roundsHere ?? 0) > 0
+                    ? t('courses:scorecard.atThisCourse', { count: courseContext?.roundsHere as number })
+                    : t('courses:scorecard.atThisCourseBare')}
+                >
                   <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
                     {courseSection.map((it) => (
                       <div key={it.key} style={{ minWidth: 0 }}>
