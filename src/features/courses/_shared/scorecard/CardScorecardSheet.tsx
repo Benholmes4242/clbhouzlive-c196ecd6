@@ -934,14 +934,19 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
             {/* LEFT — date, course, member */}
             <div style={{ flex: '1 1 auto', minWidth: 0 }}>
-              {!!eyebrowText && (
+              {/* §B — THE KICKER CARRIES THE FORMAT. A nine-hole round is 30 of
+                  3,554 rounds, and on those the card, the totals and the to-par
+                  are all read against nine holes; the kicker is where that is
+                  said once. Eighteen holes is the default and says nothing. */}
+              {!!kickerText && (
                 <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {eyebrowText}
+                  {kickerText}
                 </div>
               )}
               <div
                 style={{
-                  fontSize: 16, fontWeight: 700, color: A.INK, marginTop: 3, lineHeight: 1.22,
+                  fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em',
+                  color: A.INK, marginTop: 3, lineHeight: 1.18,
                   display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                 }}
               >
