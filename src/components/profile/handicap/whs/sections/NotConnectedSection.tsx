@@ -5,9 +5,11 @@
  * hairlines, no withheld sections. Of roughly 100 accounts, 22 have a
  * connected handicap, so this is the majority page.
  *
- * Both buttons go to destinations that already exist:
- *   "Connect handicap" -> /manage/handicap, the existing connect flow
- *   "What's shared"    -> /privacy, the existing privacy document
+ * ONE call to action: "Connect handicap" -> /manage/handicap, the existing
+ * connect flow. The "What's shared" button was removed: /privacy is the legal
+ * document and does not answer what clbhouz reads from England Golf, so the
+ * button promised an answer it could not deliver. A purpose-built explainer
+ * is on the open list; when it exists, a second entry belongs here.
  * Nothing new is built here — no flow, no sheet, no route.
  */
 import React from 'react';
@@ -32,7 +34,7 @@ export const NotConnectedSection: React.FC = () => {
       <p style={{ margin: '10px 0 0', fontSize: 13, lineHeight: 1.55, color: CHART.MUTE }}>
         {t('handicap.notConnected.body')}
       </p>
-      <div style={{ marginTop: 20, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      <div style={{ marginTop: 20 }}>
         <button
           type="button"
           onClick={() => {
@@ -51,25 +53,6 @@ export const NotConnectedSection: React.FC = () => {
           }}
         >
           {t('handicap.notConnected.connect')}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            analyticsEvents.track('handicap_not_connected_cta', { action: 'whats_shared' });
-            navigate('/privacy');
-          }}
-          style={{
-            border: `1px solid ${CHART.BORDER}`,
-            borderRadius: 999,
-            padding: '11px 18px',
-            background: 'transparent',
-            color: CHART.MUTE,
-            fontFamily: CHART_FONT,
-            fontSize: 13,
-            fontWeight: 700,
-          }}
-        >
-          {t('handicap.notConnected.whatsShared')}
         </button>
       </div>
     </section>
