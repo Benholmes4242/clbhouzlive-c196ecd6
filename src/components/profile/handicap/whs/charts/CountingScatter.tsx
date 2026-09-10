@@ -51,6 +51,7 @@ export const CountingScatter: React.FC<Props> = ({
   showLegend = true,
   selectedIndex = null,
   onSelectIndex,
+  cutLine = null,
 }) => {
   if (!rounds || rounds.length === 0) return null;
 
