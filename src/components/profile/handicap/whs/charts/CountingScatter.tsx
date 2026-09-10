@@ -38,7 +38,13 @@ function fillFor(state: CountingState): string {
   return CHART.FAINT;
 }
 
-export const CountingScatter: React.FC<Props> = ({ rounds, height = 104 }) => {
+export const CountingScatter: React.FC<Props> = ({
+  rounds,
+  height = 104,
+  showLegend = true,
+  selectedIndex = null,
+  onSelectIndex,
+}) => {
   if (!rounds || rounds.length === 0) return null;
 
   const values = rounds.map((r) => r.diff);
