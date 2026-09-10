@@ -49,8 +49,17 @@ export interface UserAnalyticsCourse {
 }
 
 /**
- * Courses the signed-in user has imported rounds at, sourced from the same
- * WHS tables the Analytics tab reads. Ordered by rounds desc.
+ * THE 35 (BRIEF_PROFILE_PASS_ONE §D — the basis line).
+ * Courses the signed-in user has IMPORTED ROUNDS AT, sourced from the same WHS
+ * tables the Analytics tab reads. Ordered by rounds desc. One row per course
+ * that carries at least one MAPPED, NON-PENALTY round; the 239 round basis for
+ * the per-course analytics rows is the sum of `rounds_count` across these rows.
+ * Measured 10 Sep 2026: 35 courses, 239 rounds.
+ *
+ * IT IS NOT THE 49 the profile's PLAYED figure states. That counts
+ * `user_course_activity` rows — anything the member did at a course, imported
+ * round or not (see useUserCourseSummary). Two questions, two answers; a surface
+ * must say which one it is asking. Do not present one as a shortfall of the other.
  *
  * The RPC uses auth.uid() server-side, but the signed-in user id IS carried in
  * the query key so a cached result can never be read by a page about somebody

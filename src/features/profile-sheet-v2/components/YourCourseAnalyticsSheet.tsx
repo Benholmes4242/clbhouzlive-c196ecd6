@@ -3,7 +3,10 @@
  *
  * Course analytics entry point sheet, opened from the profile sheet.
  * List of courses the member has imported rounds at (gam_user_courses RPC),
- * most-rounds first. Search field above the list uses the shared
+ * most-rounds first. THAT IS THE 35 (§D), not the 49 the profile's PLAYED figure
+ * states: PLAYED counts `user_course_activity` — anything the member did at a
+ * course, imported round or not. This list can only show a course a WHS round was
+ * mapped to, so it is expected to be shorter, and the difference is not a gap. Search field above the list uses the shared
  * useCourseSearch hook so members can jump to a course they have no rounds at.
  *
  * The figure on each row is the member's OWN average to par at that course.

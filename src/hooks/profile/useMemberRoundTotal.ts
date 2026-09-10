@@ -7,13 +7,24 @@
  * the handicap footer's "All {n} rounds" link states, so the profile header and
  * the posted-history sheet can never disagree. Measured 10 Sep 2026: 245.
  *
- * IT IS NOT THE OTHER TWO COUNTS ON THIS MEMBER:
- *   243 — eighteen-hole rounds with hole detail (`is_nine_hole` excluded).
- *         The basis for every per-round figure in the handicap sections.
+ * IT IS NOT THE OTHER COUNTS. Each is a SEPARATE DEFINITION, and the fact that
+ * some of them return the same number for the test member is a property of that
+ * member, NOT a definition:
+ *   243 — `whs_scores` rows with `is_nine_hole` false. "Eighteen holes posted."
+ *   243 — rounds whose hole detail was fetched. "A card can be drawn."
+ *   243 — `gam_round_stats` rows with `holes_played = 18`. The evaluator's own
+ *         eighteen-hole population.
  *   239 — mapped, non-penalty rounds summed from `gam_user_courses()`.
  *         The basis for the per-course analytics rows.
- * Three questions, three answers. Do not reconcile them; state which one a
- * surface uses.
+ *
+ * THOSE THREE 243s COINCIDE ONLY BECAUSE THIS MEMBER'S ONLY GAPS ARE TWO
+ * NINE-HOLE ROUNDS. THEY DO NOT COINCIDE IN GENERAL. Measured across the base
+ * earlier this week: 568 of 3,554 rounds cannot draw a card — 420 have hole rows
+ * with no scores, 195 are partial, 148 have no hole rows at all. So "eighteen
+ * holes posted" and "has hole detail" are DIFFERENT POPULATIONS for most members,
+ * and reading them here as one definition will be wrong on the next member
+ * somebody checks. State which question a surface is asking; never assume two
+ * questions have one answer because they did once.
  *
  * THREE STATES, NEVER A CONFIDENT ZERO. A failed read returns `isError`, an
  * unrun or in-flight read is not fetched, and only a fetched read with zero

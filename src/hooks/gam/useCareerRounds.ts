@@ -6,6 +6,27 @@
  * RLS: own rows always, plus England-Golf-synced peers. In friend view where
  * the policy denies the rows the hook simply returns an empty list and the
  * dependent lines self-hide.
+ *
+ * THE 1,000-ROW CAP IS AN ASSUMPTION, NOT A FACT (filed 10 Sep 2026).
+ * The read is bounded at the 1,000 newest rounds. That is CORRECT for every
+ * member alive today — the heaviest member on the platform has 345 rows and
+ * nobody is over 1,000 — and it becomes SILENTLY WRONG above it: the header's
+ * sample figure (245 today) would report 1,000 and no error would be raised.
+ * Same species as the `.limit(8)` on posted-history counters.
+ *
+ * IT IS NOT REMOVED HERE, because the surface needs BOTH shapes and only one of
+ * them wants every row:
+ *   - The header's round count needs A COUNT ONLY, and a `head: true` count query
+ *     has no cap at all. That is the fix: count separately, leave the fetch
+ *     bounded.
+ *   - "Where" (courseSplitFor), the best round for a counting stat, and the
+ *     earliest milestone round all need ROWS, and they need the OLDEST ones —
+ *     milestoneRoundFor takes the last match — so lifting the cap by paging would
+ *     mean fetching a member's entire career on sheet open to answer questions
+ *     that are already answered by aggregation server-side.
+ * COST OF LIFTING BLIND: unbounded client fetch of up to 19 columns per round,
+ * on a sheet that opens from the trophy room. Not paid until somebody is near
+ * 1,000 rounds, and by then the count should already be a count query.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,6 +67,9 @@ export function useCareerRounds(userId: string | undefined) {
         .select(COLUMNS)
         .eq('user_id', userId as string)
         .order('play_date', { ascending: false })
+        /* BOUNDED ON PURPOSE — see the cap note above. Do not read
+           `data.length` as the member's career round total: it is the size of
+           this page, and above 1,000 rounds it stops being the same number. */
         .limit(1000);
       if (error) throw error;
       return (data ?? []) as unknown as CareerRoundRow[];

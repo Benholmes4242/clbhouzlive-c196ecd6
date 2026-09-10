@@ -1,10 +1,22 @@
 /**
  * COURSE-LEGACY SUMMARY — courses played and countries played.
  *
- * COUNTS: distinct rows in `user_course_activity` for the member. That includes
- * courses with no imported round, so it is NOT the mapped-round course count
- * (`gam_user_courses()`, 35 courses for the test member) and NOT the 49-row
- * activity total minus anything. Measured 10 Sep 2026: 49 courses.
+ * THE 49 (BRIEF_PROFILE_PASS_ONE §D — the basis line).
+ * COUNTS: rows in `user_course_activity` for the member, one per course. A row
+ * lands there when the member DID SOMETHING AT A COURSE — played it, rated it,
+ * marked it — so it includes courses with NO IMPORTED ROUND and courses that
+ * were never mapped to a WHS score. It is the member's course legacy, not their
+ * round history. Measured 10 Sep 2026: 49.
+ *
+ * IT IS NOT THE 35. That is a DIFFERENT QUESTION asked of different data:
+ * courses the member has IMPORTED ROUNDS AT, from `gam_user_courses()` (see
+ * useUserAnalyticsCourses). 49 minus 35 is not "14 missing courses" — it is 14
+ * courses with activity and no imported round, which is a normal state and not a
+ * gap to close. Neither figure is a subset the other can be derived from: a
+ * mapped round at a course with no activity row would sit in 35 and not in 49.
+ *
+ * The countries figure is counted from the SAME 49 rows, so it is the legacy
+ * question too, never the imported-round one.
  *
  * THREE STATES, NEVER A CONFIDENT ZERO. Both counts previously defaulted to 0,
  * so a failed read rendered "PLAYED 0" — a member with fifty courses told they

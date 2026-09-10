@@ -2,7 +2,14 @@
  * JourneySummaryCard - Course Legacy figure row.
  * Four figures: PLAYED, COUNTRIES, TOP 100, AVG RATING. No icons, no card
  * chrome beyond the analytical panel - the figures carry the meaning.
+ *
+ * PLAYED IS THE COURSE-LEGACY COUNT (§D): `user_course_activity` rows, courses
+ * with no imported round included — 49 for the test member, 10 Sep 2026. It is
+ * NOT the 35 courses with imported rounds that the course analytics sheet lists,
+ * and the two are not expected to match. COUNTRIES is counted from the same 49
+ * rows. See useUserCourseSummary for both definitions.
  */
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
