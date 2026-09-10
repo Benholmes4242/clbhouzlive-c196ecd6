@@ -408,6 +408,21 @@
       "withheldBody": "Your scoring spread needs about ten rounds to mean anything. You've posted {{count}}.",
       "metaPlain": "{{count}} rounds · {{days}} days",
       "sampleLine": "from {{count}} rounds"
+    },
+    "holes": {
+      "eyebrow": "Every hole you've played",
+      "heading": "How you score a hole",
+      "meta": "{{count}} rounds",
+      "birdiePlus": "Birdie+",
+      "par": "Par",
+      "bogey": "Bogey",
+      "doublePlus": "Double+",
+      "parNs": "Par {{n}}s",
+      "nHoles": "{{count}} holes",
+      "parSentence": "Your par {{worst}}s cost you {{worstAvg}} shots a hole against {{bestAvg}} on your par {{best}}s, and they make up {{share}}% of the holes behind these figures.",
+      "parMissing": "You haven't played enough par {{types}}s yet for a figure.",
+      "withheldNone": "Hole-by-hole scoring needs rounds with a full card. None of your rounds have one yet.",
+      "withheldSome": "Hole-by-hole scoring needs rounds with a full card. Only {{count}} of your rounds do."
     }
   },
   "connectGhost": {
