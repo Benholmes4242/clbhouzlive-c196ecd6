@@ -29,15 +29,15 @@ interface BottomSheetProps {
   style?: React.CSSProperties;
   ariaLabelledBy?: string;
   /*
-   * BRIEF_SHEET_BACK_BEHAVIOUR §2 — WHO OWNS THE HISTORY ENTRY.
-   *
-   * Default false: this sheet pushes and pops its own history entry, with no
-   * action required from its author. Set true ONLY for a sheet whose open
-   * state lives in the URL (?gam= / ?sheet= / ?score= / ?compare= / auth
-   * form), because that query parameter already created the entry. Naming the
-   * OWNER rather than a behaviour is deliberate — it is not "disable back".
+   * BRIEF_SHEET_BACK_BEHAVIOUR_02 §1 — `urlOwnsHistoryEntry` IS GONE FROM THE
+   * TYPE. It shipped as an opt-out and never acquired a single consumer: every
+   * sheet, URL-addressed or not, registers with the stack. An unused escape
+   * hatch is a capability that reads as tested and is not, so it is removed
+   * rather than left declared. Passing it is now a COMPILE ERROR. If a sheet
+   * ever genuinely needs a different history owner, that is a new named prop
+   * introduced with its consumer, not a standing option.
    */
-  urlOwnsHistoryEntry?: boolean;
+
   /*
    * BRIEF_SHEET_BACKGROUND_CANON_02 §1 — `variant` AND `surfaceColor` ARE GONE
    * FROM THE TYPE, not merely ignored. A silent no-op reports as a working
@@ -70,23 +70,24 @@ export function BottomSheet({
   grabberColor = 'rgba(255,255,255,0.18)',
   grabberRadius = 2,
   grabberPadding = '10px 0 4px',
-  urlOwnsHistoryEntry = false,
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const currentTranslateY = useRef(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  /* BRIEF_SHEET_BACK_BEHAVIOUR §2 — automatic registration with the stack.
+  /* BRIEF_SHEET_BACK_BEHAVIOUR §2 — automatic registration with the stack, for
+     every open sheet without exception (see the removed opt-out above).
      Read through a ref so a caller passing a fresh arrow function on every
      render cannot re-push the entry. */
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   useEffect(() => {
-    if (!open || urlOwnsHistoryEntry) return;
+    if (!open) return;
     const entry = pushSheetEntry(() => closeRef.current());
     return () => releaseSheetEntry(entry);
-  }, [open, urlOwnsHistoryEntry]);
+  }, [open]);
+
 
   // Animate in when opened
   useEffect(() => {

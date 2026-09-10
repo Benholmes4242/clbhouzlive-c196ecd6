@@ -894,5 +894,11 @@
     "playSoon": "Coming soon to Google Play",
     "terms": "Terms",
     "privacy": "Privacy"
+  },
+  "draftGuard": {
+    "question": "Discard what you have written?",
+    "body": "This will not be saved.",
+    "keepEditing": "Keep editing",
+    "discard": "Discard"
   }
 }

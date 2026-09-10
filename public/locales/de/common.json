@@ -584,5 +584,11 @@
     "playSoon": "Bald bei Google Play",
     "terms": "AGB",
     "privacy": "Datenschutz"
+  },
+  "draftGuard": {
+    "question": "Discard what you have written?",
+    "body": "This will not be saved.",
+    "keepEditing": "Keep editing",
+    "discard": "Discard"
   }
 }

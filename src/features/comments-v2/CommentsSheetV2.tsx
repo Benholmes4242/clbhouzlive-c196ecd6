@@ -11,6 +11,9 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { createPortal } from 'react-dom';
+import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
+import { useDraftDismissGuard } from '@/components/ui/useDraftDismissGuard';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/lib/toast';
@@ -93,6 +96,25 @@ function CommentsSheetV2Inner({
   const [deleteTarget, setDeleteTarget] = useState<CommentV2 | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [confirmDeleteWithReplies, setConfirmDeleteWithReplies] = useState(false);
+
+  /* BRIEF_SHEET_BACK_BEHAVIOUR_02 §3 — DRAFT-HOLDING SHEET.
+     Two drafts live here: the composer's typed text or attached image
+     (reported up by CommentComposer, which stays the owner of those fields)
+     and an in-progress edit of an existing comment. Either one is lost by a
+     dismissal, so both gate it.
+     REPORTED, NOT FIXED HERE: this sheet is its own portal overlay, not the
+     shared BottomSheet, so it has no Escape handler and no sheet-stack history
+     entry — backdrop tap is its only dismiss path, and hardware back leaves
+     the route with the sheet open. Migrating it to BottomSheet is a separate
+     change; the guard is wired to the dismiss path that exists today.
+     The `onClose` handed to CommentCard is deliberately NOT guarded: there it
+     means "a tap navigated away from this post", not "the member dismissed the
+     sheet", and a question on a navigation would be answered wrong. */
+  const [composerDirty, setComposerDirty] = useState(false);
+  const draftDirty =
+    composerDirty || (editing != null && editText.trim() !== (editing.content ?? '').trim());
+  const { requestClose, confirmOpen, discard, keepEditing } = useDraftDismissGuard(draftDirty, onClose);
+
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -223,7 +245,7 @@ function CommentsSheetV2Inner({
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[12002] bg-black/40"
-            onClick={onClose}
+            onClick={requestClose}
           />
           <motion.div
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
@@ -318,7 +340,18 @@ function CommentsSheetV2Inner({
               onClearReply={() => setReplyingTo(null)}
               onSubmit={onSubmit}
               isSubmitting={addComment.isPending}
+              onDirtyChange={setComposerDirty}
             />
+
+            {/* Above this sheet's z-[12003] shell. */}
+            <DiscardDraftDialog
+              open={confirmOpen}
+              onKeepEditing={keepEditing}
+              onDiscard={discard}
+              zIndex={12100}
+            />
+
+
           </motion.div>
 
           {/* Action sheet */}

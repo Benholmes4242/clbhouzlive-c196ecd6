@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Check, Loader2 } from 'lucide-react';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
+import { useDraftDismissGuard } from '@/components/ui/useDraftDismissGuard';
+
 import { TITLE } from '@/lib/tokens/type';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -77,7 +80,21 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, homeClub =
     }
   };
 
-  const close = () => onOpenChange(false);
+  /* BRIEF_SHEET_BACK_BEHAVIOUR_02 §3 — DRAFT-HOLDING SHEET.
+     This sheet holds typed course name, location and note that exist nowhere
+     else until submit succeeds, so a dismissal loses them. Dirty is measured
+     against what the sheet was opened with (a prefilled name is not the
+     member's work), and only while the form is on screen: the success state
+     has nothing left to lose. `requestClose` is passed to every dismiss path
+     below, so backdrop, Escape, history back and the Done button all ask the
+     same question exactly once. */
+  const dirty =
+    status === 'form' &&
+    (name !== (prefillName ?? '') || location.trim().length > 0 || note.trim().length > 0);
+  const closeNow = () => onOpenChange(false);
+  const { requestClose, confirmOpen, discard, keepEditing } = useDraftDismissGuard(dirty, closeNow);
+  const close = requestClose;
+
 
   const labelCls = 'block text-[13px] font-medium text-[rgba(255,255,255,0.62)] mb-1.5';
   /* FIELD CANON (lib/tokens/field.ts). This field painted WHITE with
@@ -191,8 +208,16 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, homeClub =
           </>
         )}
       </div>
+      {/* Above this sheet's own z base so the question is never painted under it. */}
+      <DiscardDraftDialog
+        open={confirmOpen}
+        onKeepEditing={keepEditing}
+        onDiscard={discard}
+        zIndex={zIndexBase + 100}
+      />
     </BottomSheet>
   );
+
 }
 
 export default RequestCourseSheet;

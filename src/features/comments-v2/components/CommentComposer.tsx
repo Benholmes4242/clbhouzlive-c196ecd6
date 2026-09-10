@@ -49,9 +49,15 @@ interface Props {
     actor: ActiveActor;
   }) => Promise<void>;
   isSubmitting: boolean;
+  /* BRIEF_SHEET_BACK_BEHAVIOUR_02 §3 — the draft lives here, the dismiss lives
+     in the sheet above. This reports typed text or an attached image upward so
+     the sheet can ask before throwing it away. Reporting rather than lifting
+     the state keeps the composer the only owner of its own fields. */
+  onDirtyChange?: (dirty: boolean) => void;
+
 }
 
-export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting }: Props) {
+export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting, onDirtyChange }: Props) {
   const { user } = useSupabaseSession();
   const { t } = useTranslation('common');
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
@@ -72,6 +78,15 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
   useEffect(() => {
     if (replyingTo) requestAnimationFrame(() => inputRef.current?.focus());
   }, [replyingTo]);
+
+  /* Typed text or an uploaded-but-unsent image is a draft. An open actor
+     picker or a focused empty field is not. Reported on every change so the
+     owning sheet's dismiss guard is never a frame behind. */
+  useEffect(() => {
+    onDirtyChange?.(hasText || hasImage);
+  }, [hasText, hasImage, onDirtyChange]);
+  useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
+
 
   const handleFile = async (file: File) => {
     if (!user?.id) return;

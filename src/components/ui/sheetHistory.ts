@@ -3,12 +3,14 @@
  *
  * One history entry per open sheet, owned by the BottomSheet primitive.
  *
- * REGISTRATION IS AUTOMATIC. BottomSheet already receives `open` and
- * `onClose`, which is everything this needs, so no sheet author is asked to
- * opt in and therefore no sheet author can forget. The only escape hatch is
- * the explicit `urlOwnsHistoryEntry` prop, for the handful of sheets that are
- * addressed by a query parameter and so already own a history entry of their
- * own — without it those would need two backs to close.
+ * REGISTRATION IS AUTOMATIC AND UNCONDITIONAL. BottomSheet already receives
+ * `open` and `onClose`, which is everything this needs, so no sheet author is
+ * asked to opt in and therefore no sheet author can forget. There is no escape
+ * hatch: the `urlOwnsHistoryEntry` opt-out was removed in
+ * BRIEF_SHEET_BACK_BEHAVIOUR_02 §1 having never had a consumer. A sheet whose
+ * open state also lives in a query parameter therefore closes its sheet entry
+ * first and clears the parameter on the next back.
+
  *
  * WHY A STACK: sheets stack (the round scorecard opens from inside another
  * sheet), so back must close the top one only, then the one beneath, and only

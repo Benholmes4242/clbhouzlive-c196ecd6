@@ -583,5 +583,11 @@
     "playSoon": "Google Play で近日公開",
     "terms": "利用規約",
     "privacy": "プライバシー"
+  },
+  "draftGuard": {
+    "question": "Discard what you have written?",
+    "body": "This will not be saved.",
+    "keepEditing": "Keep editing",
+    "discard": "Discard"
   }
 }
