@@ -26,6 +26,13 @@ interface Props {
   showLegend?: boolean;
   selectedIndex?: number | null;
   onSelectIndex?: (index: number) => void;
+  /**
+   * ADDITIVE, default null = no line and every existing call site unchanged.
+   * A differential value to rule across the plot: the worst differential that
+   * still counts. Everything on or below it is a counter, which is the thing
+   * the section's sentence names ("the 8 below the line").
+   */
+  cutLine?: number | null;
 }
 
 const VIEW_W = 320;
