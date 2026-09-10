@@ -55,7 +55,14 @@ interface Props {
      the state keeps the composer the only owner of its own fields. */
   onDirtyChange?: (dirty: boolean) => void;
 
+  /* BRIEF_SHEET_BACK_BEHAVIOUR_05 §2 — where this composer's words survive a
+     dismiss. The sheet computes the key (it knows the thread); the composer
+     still owns the text, so persistence is a write of state it already holds
+     rather than a second owner of the field. Absent key = no persistence. */
+  draftKey?: string | null;
+
 }
+
 
 export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting, onDirtyChange }: Props) {
   const { user } = useSupabaseSession();
