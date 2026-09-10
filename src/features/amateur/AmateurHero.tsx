@@ -549,6 +549,42 @@ export function AmateurHero({
             </span>
           )}
 
+          {/* §2.2 THE GOLD MARKS, IN THE SPACE THE SHAPE WOULD HAVE FILLED.
+              An aggregate card left that space empty, which read as a shape that
+              failed to load rather than as a card of a different family. One
+              mark per unit: fourteen birdies draws fourteen marks, so the count
+              lands before the figure is read and the 14 then confirms it.
+
+              18x4, radius 2, 4px gap, wrapping, 16px above — and CAPPED AT 24.
+              The marks are aria-hidden: the figure beside them already says the
+              number, so announcing it twice would be noise to a screen reader. */}
+          {markCount > 0 && (
+            <span
+              aria-hidden
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 4,
+                width: '100%',
+                marginTop: 16,
+              }}
+            >
+              {Array.from({ length: markCount }, (_, i) => (
+                <span
+                  key={i}
+                  style={{
+                    display: 'block',
+                    width: 18,
+                    height: 4,
+                    borderRadius: 2,
+                    background: MARK_GOLD,
+                  }}
+                />
+              ))}
+            </span>
+
+          )}
+
           {/* THE COURSE, or on an aggregate card THE SPREAD in its place: the
               same slot, the same treatment, a different fact. A figure made of
               many rounds says how many rounds and how many courses made it,
