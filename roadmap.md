@@ -380,14 +380,36 @@ POSTED HISTORY SHEET — REBUILD (10 Sep 2026)
   subtab cutover of Aug 2026. Reason for removal: eight counters is a WHS rule
   that applies at twenty or more rounds, and the query asserted it at every
   round count, a second copy of the same assumption.
-- OPEN (reported, not fixed): gam_round_stats.is_counter is a MIRROR of
-  whs_scores.is_counter with NO reconciliation. Writer: gam-evaluator, once per
-  round, copying `score.is_counter ?? false` at evaluation time. Drift is
-  detected only opportunistically by _shared/counter-requeue.ts around the sync
-  upsert (sync-whs-one, sync-whs-due), which is non-fatal on error and only sees
-  flips that happen while it is watching. Nothing sweeps or verifies the two
-  columns. MEASURED 10 Sep 2026: 80 of 3,554 mapped rounds diverge across 20
-  members (57 stale true, 23 stale false; play dates 18 Jul 2024 - 5 Sep 2026).
-  gam-weekly-digest and gam-refresh-streaks-weekly both filter the mirror, so
-  both currently act on a counter set that is wrong for 80 rounds and neither
-  reports anything wrong.
+- OPEN (reported, not fixed; filed with fix shape 10 Sep 2026):
+  gam_round_stats.is_counter is a COPY of whs_scores.is_counter, written once by
+  gam-evaluator at first evaluation and never revisited, because
+  evaluator_version_last gates the row. Drift is detected only opportunistically
+  by _shared/counter-requeue.ts around the sync upsert (sync-whs-one,
+  sync-whs-due): it only sees flips that happen while it is watching, skips
+  rounds absent from its snapshot, and fails silently on every path — it is not
+  a partial reconciliation, it is a mechanism that makes the divergence look
+  handled. MEASURED 10 Sep 2026: 80 of 3,554 mapped rounds disagree, across 20
+  members — 57 where the copy says counter and England Golf does not, 23 the
+  other way — with play dates running to 5 Sep 2026, so it is current drift, not
+  a historical artefact. gam-weekly-digest and gam-refresh-streaks-weekly both
+  filter on the copy, so both act on a counter set that is wrong for those
+  rounds, and neither surfaces it. 19 rounds carry counter_settled = false,
+  which is a KNOWN unknown and a different state that must not be folded into
+  the same fix.
+
+  FIX SHAPE (do not start from scratch; do NOT propose a reconciliation sweep —
+  a sweep keeps two columns and adds a third thing that can fail; removing the
+  read removes the class): STOP READING THE COPY FIRST, DROP IT LATER. Point
+  gam-weekly-digest and gam-refresh-streaks-weekly at whs_scores.is_counter,
+  verify they agree with the client, and only then decide whether the mirror
+  column is worth keeping at all. Stop reading first, drop later — the order the
+  programme settled in August — makes the change reversible at every step.
+
+  READ SURFACE (measured 10 Sep 2026): the move is a JOIN, not a swap.
+  gam-weekly-digest's main read (index.ts:175-181) selects whs_score_id,
+  user_id, play_date, course_id, course_name, course_par, gross_score, birdies,
+  eagles, albatrosses, holes_in_one, delta_index alongside is_counter, and its
+  rival-rounds count (index.ts:277-283) filters play_date on the mirror too.
+  gam-refresh-streaks-weekly (index.ts:48-54 and 254-260) needs only
+  whs_score_id + play_date + is_counter — a pure swap for the streak job, a
+  join for the digest.
