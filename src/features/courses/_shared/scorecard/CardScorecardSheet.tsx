@@ -369,7 +369,11 @@ const Nine: React.FC<{
 
       {withField && (
         <CardRow
-          label={t('courses:scorecard.fieldAvg')}
+          /* §D3 — MEASURED FOR THE 26px LABEL COLUMN. 'Field avg' was sized for
+             the old 54px column and clipped at 26px; the row's figures are
+             already par-relative, so 'avg' was carrying no meaning. Key
+             `fieldAvg` stays for the holes sheet. */
+          label={t('courses:scorecard.fieldShort')}
           cells={rows.map((h) => {
             const d = h.fieldAvg != null && h.par != null ? h.fieldAvg - h.par : null;
             if (d == null) return '';
