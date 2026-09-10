@@ -451,3 +451,58 @@ until that function exists and is verified.
   STATUS_BAR_CANVAS). Two literals deliberately retained: the CSS root
   declarations of `--bg-page`/`--background`, and `CT_DARK.surface` (a ramp
   step on the composer's own darker canvas, not a page or sheet ground).
+
+## BRIEF_PROFILE_PASS_ONE §C — THE THREE ROUND COUNTS (10 Sep 2026)
+
+THREE COUNTS, THREE QUESTIONS. Measured on test member
+`8c240997-b6a1-408c-a953-794bc17ee35c`, 10 Sep 2026:
+- 245 — PLAIN TOTAL: every `whs_scores` row on the member's connection.
+  Nine-hole rounds, penalty scores and unmapped courses all included.
+- 243 — EIGHTEEN-HOLE BASIS: `is_nine_hole` excluded (also the count with hole
+  detail fetched, and `gam_round_stats.holes_played = 18`). The basis of every
+  per-round handicap figure. It keeps its place and states its own basis.
+- 239 — MAPPED, NON-PENALTY: summed from `gam_user_courses()`. The basis of the
+  per-course analytics rows.
+They are not a disagreement to reconcile. Each surface now names which it uses.
+
+EVERY SURFACE RENDERING A MEMBER'S ROUND TOTAL OR COURSE COUNT:
+- Profile header ROUNDS (`ProfileHero` via `ProfilePageV2`) — WAS the 239
+  analytics sum, NOW the plain total 245 via `hooks/profile/useMemberRoundTotal`.
+  Owner-only by construction (unchanged).
+- Handicap footer "All {n} rounds" (`HandicapFooter`, `useAllScores`) — plain
+  total 245. Already agreed with posted history.
+- Posted history sheet (`RoundsArchiveSheet` / `RecentRoundsCard`) — plain
+  total 245, same `useAllScores` population.
+- Career record header (`CareerHeader`, `useCareerRounds`) — `gam_round_stats`
+  rows, 245 today; that table's own population, capped at 1,000 newest rows.
+- Profile Courses tab PLAYED / COUNTRIES (`JourneySummaryCard` via
+  `useUserCourseSummary`) — distinct `user_course_activity` rows, 49.
+- Handicap sections F/G and Scoring — windowed samples, not totals; F excludes
+  nine-hole rounds (the 243 population), G counts holes and includes them.
+- `GolfDNASheet` renders `roundsThisYear` / `coursesPlayed` but has NO importer:
+  dead, not a live fourth reader. Not swept in this pass.
+
+CONFIDENT ZEROES REMOVED (same three-state rule as §A):
+- `useUserCourseSummary` no longer defaults both counts to 0; a failed or unrun
+  read is null and `JourneySummaryCard` renders the label without a figure.
+  Only a fetched 0 reaches the "No courses logged yet" empty state.
+- `usePersonalReviewsCount`'s `= 0` default in `ProfilePageV2` removed; RATED
+  carries `ratedCountState`.
+- Round total carries its own state; `profile_counter_read_failed` gains
+  `source: whs_scores.count | usePersonalReviewsCount | useUserCourseSummary`
+  on the existing series.
+
+- DEAD LIST ADDITION — `ProfileTop100Chip.tsx`. Nothing mounts it. Its
+  zero-on-error fault was fixed before listing: a fault fixed in a file about to
+  be swept costs nothing, one left in a file that turns out to be live costs a
+  lot. Not deleted here.
+
+- THE `isLoading` GATE HAZARD — TWO INSTANCES, BOTH FOUND BY ASKING WHICH FLAG
+  THE GATE READS, NEITHER BY ANYTHING FAILING. A DISABLED React Query v5 query
+  is pending with `fetchStatus: 'idle'`, so `isLoading` is FALSE before it has
+  ever run: an `isLoading` gate renders a placeholder that never resolves, and a
+  permanent em dash is a value — the exact thing the three-state treatment
+  exists to prevent, defeated by the gate rather than by the fallback.
+  1. `ChromeIsland.tsx:230-246` — documented in its own comments.
+  2. `ProfilePageV2` social counters — was `isLoading`, now `isFetched`.
+  Every new counter gate in this pass reads `isFetched`.

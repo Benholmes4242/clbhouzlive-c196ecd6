@@ -39,8 +39,19 @@ interface Props {
   isSelf: boolean;
   /** Resolved index (manual or WHS) as the page already resolves it. */
   indexValue: number | null;
+  /**
+   * PLAIN ROUND TOTAL — every `whs_scores` row for the member's connection,
+   * nine-hole rounds included (245 for the test member, 10 Sep 2026). Same
+   * population as posted history and the handicap footer's "All {n} rounds",
+   * so the three surfaces agree. NOT the 243 eighteen-hole handicap basis and
+   * NOT the 239 mapped non-penalty analytics basis.
+   */
   roundsCount: number | null;
   ratedCount: number | null;
+  /** State of the round-total read. 'error' renders the label with no figure. */
+  roundsCountState?: 'ok' | 'loading' | 'error';
+  /** State of the rated-courses read. Same three-state rule. */
+  ratedCountState?: 'ok' | 'loading' | 'error';
   /** Round 3 §3: social counts from the page's existing realtime hook. */
   friendsCount?: number | null;
   followersCount?: number | null;
@@ -128,6 +139,8 @@ export const ProfileHero: React.FC<Props> = ({
   indexValue,
   roundsCount,
   ratedCount,
+  roundsCountState = 'ok',
+  ratedCountState = 'ok',
   friendsCount,
   followersCount,
   socialCountState = 'ok',
@@ -343,9 +356,9 @@ export const ProfileHero: React.FC<Props> = ({
            visitor. A visitor sees THREE figures, not four: an em dash in a row
            of figures reads as zero-or-unknown, absence reads as not-shown. */
         ...(isSelf
-          ? [{ key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, onTap: tap('rounds') }]
+          ? [{ key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, state: roundsCountState, onTap: tap('rounds') }]
           : []),
-        { key: 'rated', label: t('hero.rated', 'Rated'), value: ratedCount, onTap: tap('rated') },
+        { key: 'rated', label: t('hero.rated', 'Rated'), value: ratedCount, state: ratedCountState, onTap: tap('rated') },
         { key: 'friends', label: t('hero.friends', 'Friends'), value: friendsCount ?? null, state: socialCountState, onTap: tap('friends') },
         { key: 'followers', label: t('hero.followers', 'Followers'), value: followersCount ?? null, state: socialCountState, onTap: tap('followers') },
       ]}

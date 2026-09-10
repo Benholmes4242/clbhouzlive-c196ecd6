@@ -82,6 +82,7 @@ import { A, SANS, Panel, StatRow, Action } from '@/features/courses/components/h
 import { formatNumber } from '@/i18n/format';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
+import { useMemberRoundTotal } from '@/hooks/profile/useMemberRoundTotal';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
@@ -196,7 +197,18 @@ const ProfilePageV2Content: React.FC = () => {
   const { t } = useTranslation('profile');
   const { data: profile, isLoading: profileLoading, isError: profileError, refetch: refetchProfile } = useUserProfile(profileUserId);
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
-  const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
+  /* RATED — non-mock `course_ratings` rows for the member. The `= 0` default was
+     a confident zero on a failed read; the count is now unknown until fetched,
+     and the gate is `isFetched` (a disabled v5 query is pending with
+     `fetchStatus: 'idle'`, so `isLoading` is false before it ever runs). */
+  const {
+    data: reviewsCountData,
+    isFetched: reviewsCountFetched,
+    isError: reviewsCountError,
+  } = usePersonalReviewsCount(profileUserId);
+  const reviewsCount = reviewsCountData ?? 0;
+  const ratedCountState: 'ok' | 'loading' | 'error' =
+    reviewsCountError ? 'error' : !profileUserId || !reviewsCountFetched ? 'loading' : 'ok';
   const { data: achievements, isLoading: achievementsLoading } = useProfileAchievements(profileUserId);
 
   // Two-flag model:
@@ -399,15 +411,56 @@ const ProfilePageV2Content: React.FC = () => {
   }, [socialCountsError, profileUserId, isSelf]);
   const followersCount = socialCounts?.followers ?? null;
 
-  // Shell figures. Courses come from the same summary hook the Courses tab
-  // uses; rounds come from the own-profile analytics RPC (auth.uid()).
-  const { totalCoursesPlayed: shellCoursesPlayed } = useUserCourseSummary(profileUserId ?? undefined);
-  const { data: shellAnalyticsCourses } = useUserAnalyticsCourses({ enabled: !!isSelf });
-  const shellRoundsCount = React.useMemo(() => {
-    if (!isSelf) return null;
-    if (!shellAnalyticsCourses) return null;
-    return shellAnalyticsCourses.reduce((sum, r) => sum + (r.rounds_count ?? 0), 0) || null;
-  }, [isSelf, shellAnalyticsCourses]);
+  /* SHELL FIGURES — WHICH COUNT EACH ONE IS.
+     Courses: distinct `user_course_activity` rows, via the same summary hook the
+     Courses tab uses (49 for the test member).
+     Rounds: THE PLAIN TOTAL — every `whs_scores` row for the member's connection,
+     nine-hole rounds included (245). It previously summed
+     `gam_user_courses().rounds_count`, which counts only MAPPED, NON-PENALTY
+     rounds (239) and so disagreed with posted history and with the handicap
+     footer's "All {n} rounds". Those two both read the plain total, and the
+     header now reads it too. The 243 eighteen-hole basis keeps its own place in
+     the handicap sections and is a different question, not a rival answer. */
+  const { totalCoursesPlayed: shellCoursesPlayed, isCoursesError: shellCoursesError } =
+    useUserCourseSummary(profileUserId ?? undefined);
+  const { total: shellRoundsTotal, state: shellRoundsState } = useMemberRoundTotal(
+    isSelf ? profileUserId ?? undefined : undefined,
+  );
+  const shellRoundsCount = isSelf ? shellRoundsTotal : null;
+
+  /* Same series as the social counters, distinguished by `source` — one event
+     with a source is a reading; two series are a search. */
+  React.useEffect(() => {
+    if (!profileUserId) return;
+    if (shellRoundsState === 'error') {
+      analyticsEvents.track('profile_counter_read_failed', {
+        counters: 'rounds_total',
+        source: 'whs_scores.count',
+        profile_user_id: profileUserId,
+        is_self: !!isSelf,
+      });
+    }
+  }, [shellRoundsState, profileUserId, isSelf]);
+
+  React.useEffect(() => {
+    if (!profileUserId || !reviewsCountError) return;
+    analyticsEvents.track('profile_counter_read_failed', {
+      counters: 'rated_courses',
+      source: 'usePersonalReviewsCount',
+      profile_user_id: profileUserId,
+      is_self: !!isSelf,
+    });
+  }, [reviewsCountError, profileUserId, isSelf]);
+
+  React.useEffect(() => {
+    if (!profileUserId || !shellCoursesError) return;
+    analyticsEvents.track('profile_counter_read_failed', {
+      counters: 'courses_played',
+      source: 'useUserCourseSummary',
+      profile_user_id: profileUserId,
+      is_self: !!isSelf,
+    });
+  }, [shellCoursesError, profileUserId, isSelf]);
   const followingCount = socialCounts?.following ?? null;
   const friendsCount = isPersonal ? (socialCounts?.friends ?? null) : null;
   
@@ -696,7 +749,9 @@ const ProfilePageV2Content: React.FC = () => {
             isSelf={isSelf}
             indexValue={resolvedHcp.value ?? null}
             roundsCount={shellRoundsCount}
-            ratedCount={reviewsCount ?? null}
+            roundsCountState={isSelf ? shellRoundsState : 'ok'}
+            ratedCount={reviewsCountFetched && !reviewsCountError ? reviewsCount : null}
+            ratedCountState={ratedCountState}
             friendsCount={isPersonal ? friendsCount : null}
             followersCount={followersCount}
             socialCountState={socialCountState}
