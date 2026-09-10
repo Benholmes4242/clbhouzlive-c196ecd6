@@ -74,7 +74,6 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
         play_date: r.play_date,
         diff: r.handicap_differential ?? null,
         is_counter: counterIds.has(r.id),
-        delta: r.handicap_delta ?? null,
       }));
   }, [allScores, counters]);
 
