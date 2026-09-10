@@ -93,12 +93,23 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       ? [{
           // Names the list: the figure is the WORLDWIDE list's played count
           // (useTop100ProgressForUser), not every Top 100 list combined.
-          label: t('legacy.top100World', { defaultValue: 'WORLD TOP 100' }),
+          //
+          // "WORLD 100", NOT "WORLD TOP 100", AND THE REASON IS MEASURED. Four
+          // items share the panel's inner width: at 390pt that is
+          // (390 - 32 page - 32 panel) / 4 = 81.5px a column. At the label's
+          // canon 11/700/0.13em, "WORLD TOP 100" measures 105.5px, so it CANNOT
+          // fit at any legal type size and used to break after "TOP" - which
+          // read as a separate "100" column. "WORLD 100" measures 75.3px and
+          // holds one line with the list still named.
+          label: t('legacy.top100World', { defaultValue: 'WORLD 100' }),
           value: String(top100Played),
         }]
       : []),
     ...(avgRating != null && avgRating > 0
-      ? [{ label: t('legacy.avgRating', { defaultValue: 'AVG RATING' }), value: avgRating.toFixed(1) }]
+      // "AVG RATING" measures 80.9px against an 81.5px column - it fitted only
+      // by 0.6px, which is a wrap waiting for a wider glyph or a longer locale.
+      // "RATING" is 50.2px and says the same thing beside a one-decimal figure.
+      ? [{ label: t('legacy.avgRating', { defaultValue: 'RATING' }), value: avgRating.toFixed(1) }]
       : []),
   ];
 
