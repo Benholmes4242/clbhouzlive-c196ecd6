@@ -319,34 +319,83 @@ function buildAggregateCard(
  * EVERY QUALIFYING CARD, in a stable order (metric family then window). The
  * caller picks one; the COUNT is instrumented (§10) because it is the only way
  * to learn later whether the rotation was genuinely varied.
+ *
+ * THE POOL LADDER IS THREE STEPS, AND IT RUNS PER WINDOW (ruling, 10 Sep 2026).
+ *
+ *   1. THE CIRCLE, if the member has one AND it clears the depth test FOR THIS
+ *      WINDOW.
+ *   2. EVERYONE, if it does not.
+ *   3. The §5 fallback only if everyone fails too — which, with 271 rounds from
+ *      22 members over 90 days, never happens.
+ *
+ * WHY PER WINDOW AND NOT PER MEMBER: a circle of three clears the depth test at
+ * 90 days and fails it at 14 the moment one of the three stops playing. Measured
+ * 10 Sep 2026 — of the 18 members whose circle holds 1-3 people, THIRTEEN have a
+ * circle that can never reach three members, so their circle fails every window
+ * outright. Without step 2 those thirteen would be the only members who never
+ * saw the new hero, and the emergency fallback would be their normal state.
+ *
+ * A member therefore CAN get a circle card at 90 days and an everyone card at
+ * 14 in the same session. Each card states its own pool in its own context line,
+ * which is the whole reason that line carries `pool`.
  */
 export function buildHeroCards({
-  rows,
+  circleRows,
+  everyoneRows,
   netByScore,
-  pool,
+  hasCircle,
+  circleTruncated = false,
+  everyoneTruncated = false,
+  families,
   now = Date.now(),
 }: {
-  rows: readonly CircleRoundRow[];
+  /** The member's circle. Empty when they have none. */
+  circleRows: readonly CircleRoundRow[];
+  /** Every visible round in the window. Step 2 of the ladder. */
+  everyoneRows: readonly CircleRoundRow[];
   netByScore: ReadonlyMap<string, { net: number }>;
-  pool: HeroPool;
+  hasCircle: boolean;
+  circleTruncated?: boolean;
+  everyoneTruncated?: boolean;
+  /** Which card families may enter the rotation. Both, unless narrowed. */
+  families?: readonly HeroMetric[];
   now?: number;
 }): HeroCard[] {
+  const allowed = families ?? [...SINGLE_ROUND_METRICS, ...AGGREGATE_METRICS];
   const out: HeroCard[] = [];
+
   for (const window of HERO_WINDOWS) {
-    const windowRows = inWindow(rows, window, now);
-    const shape = poolShape(windowRows);
-    if (!poolIsReal(shape)) continue;
+    const circleWindow = hasCircle ? inWindow(circleRows, window, now) : [];
+    const circleShape = poolShape(circleWindow, 'circle', circleTruncated);
+
+    let rowsForWindow: readonly CircleRoundRow[];
+    let shape: PoolShape;
+    if (hasCircle && poolIsReal(circleShape)) {
+      rowsForWindow = circleWindow;
+      shape = circleShape;
+    } else {
+      const everyoneWindow = inWindow(everyoneRows, window, now);
+      const everyoneShape = poolShape(everyoneWindow, 'everyone', everyoneTruncated);
+      /* STEP 3. Nothing to widen to, so this window contributes no cards. */
+      if (!poolIsReal(everyoneShape)) continue;
+      rowsForWindow = everyoneWindow;
+      shape = everyoneShape;
+    }
+
     for (const metric of SINGLE_ROUND_METRICS) {
-      const card = buildSingleRoundCard(metric, window, windowRows, netByScore, pool, shape);
+      if (!allowed.includes(metric)) continue;
+      const card = buildSingleRoundCard(metric, window, rowsForWindow, netByScore, shape);
       if (card) out.push(card);
     }
     for (const metric of AGGREGATE_METRICS) {
-      const card = buildAggregateCard(metric, window, windowRows, pool, shape);
+      if (!allowed.includes(metric)) continue;
+      const card = buildAggregateCard(metric, window, rowsForWindow, shape);
       if (card) out.push(card);
     }
   }
   return out;
 }
+
 
 /* ------------------------------------------------------------------ §6 ----
  * ROTATION IS PER SESSION, NOT PER MOUNT. A member who taps a card into the
