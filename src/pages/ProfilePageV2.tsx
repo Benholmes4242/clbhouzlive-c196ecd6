@@ -115,6 +115,8 @@ const ClubsSectionWrapper: React.FC<{
   const navigate = useNavigate();
   const editRoute = useEditProfileRoute();
   const { homeClub, secondaryClubs, isLoading, isPrivate } = useProfileClubs(profileId, viewerId);
+  /* Own-account only: nobody else's pending club is anyone else's business. */
+  const homeClubStatus = useHomeClubStatus(isSelf ? profileId : undefined);
 
   if (!isPersonal || !profileId || !viewerId || isLoading) return null;
 
@@ -124,8 +126,12 @@ const ClubsSectionWrapper: React.FC<{
       {/* THE HOME CLUB PROMPT IS GONE (pass one, 10 Sep 2026). ClubsCard already
           states the empty case for the owner and carries the same picker, so the
           prompt was a second door to one destination sitting above it. Its file
-          is dead-listed, NOT deleted; the pending treatment it also held is the
-          one thing that left with it and is recorded as such. */}
+          is dead-listed, NOT deleted.
+
+          THE PENDING TREATMENT CAME BACK WITH THE RULING OF 10 Sep - into
+          ClubsCard, from the same useHomeClubStatus read the prompt used, so
+          nothing is reconstructed from an adjacent field. Awaiting approval and
+          having no club are two states and briefly rendered as one. */}
       <ClubsCard
         homeClub={homeClub}
         secondaryClubs={secondaryClubs}
@@ -133,6 +139,11 @@ const ClubsSectionWrapper: React.FC<{
         isPrivate={isPrivate}
         onEditClick={() => navigate(editRoute)}
         onSetHomeClub={() => openHomeClubPicker()}
+        pendingClubName={
+          isSelf && !homeClubStatus.isLoading && homeClubStatus.state === 'pending'
+            ? homeClubStatus.pendingName
+            : null
+        }
       />
     </section>
   );
