@@ -346,3 +346,14 @@ badge_id 'founder', user 370e6b6b, 14:58:28.163529 UTC. Single row, single
 member, a one-off grant rather than a third partial run — it renders a date, by
 ruling. Recorded in src/lib/gam/badgeBackfill.ts so nobody reads that rendered
 date as the suppression rule leaking.
+
+## Circle leaderboard — one row, two consumers (10 Sep 2026)
+- CircleRow + useCircleClubs are the shared row and the single club source for the
+  handicap page's CircleSection and the see-all FullLeaderboardSheet.
+- Rank-movement chip and its "30D RANK" header retired: the slot was empty on held
+  positions, unknown deltas and every stale row. Sheet header now reads "By index".
+- LeaderboardRow.tsx (with RankDeltaChip, imported nowhere else) is on the dead list,
+  unreferenced, not deleted in this pass.
+- useFriendLeaderboardRankDeltas now has no consumer on this surface; hook retained.
+- OPEN (ruling wanted): the flame and the viewing member's own row are both #F7931E,
+  so on the viewer's own flamed row one colour carries two meanings.
