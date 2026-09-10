@@ -30,8 +30,20 @@ export type WizardStep = 0 | 1 | 2;
 
 const DRAFT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
-function draftKey(courseId: string | null | undefined) {
-  return `review-draft:${courseId ?? 'unknown'}`;
+/* DRAFT KEYS (BRIEF_SHEET_BACK_BEHAVIOUR_04 §1).
+ *
+ * Two namespaces, never one:
+ *   create  review-draft:<courseId>
+ *   edit    review-draft:edit:<ratingId>
+ *
+ * A create draft and an edit draft for the same course are different bodies of
+ * work, and two edits of two different reviews are different again, so the key
+ * carries the rating id in edit mode. Nothing can collide.
+ */
+function draftKey(courseId: string | null | undefined, reviewId?: string | null) {
+  return reviewId
+    ? `review-draft:edit:${reviewId}`
+    : `review-draft:${courseId ?? 'unknown'}`;
 }
 
 interface DraftShape {
@@ -43,6 +55,7 @@ interface DraftShape {
   teeLabel: string | null;
   savedAt: number;
 }
+
 
 function readDraft(courseId: string | null | undefined): DraftShape | null {
   try {
