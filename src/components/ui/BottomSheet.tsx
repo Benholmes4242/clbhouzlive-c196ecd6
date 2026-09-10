@@ -152,15 +152,14 @@ export function BottomSheet({
           borderTopLeftRadius: topRadius,
           borderTopRightRadius: topRadius,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
-          /* The sheet itself owns the entire rounded surface, including the
-             strip behind its grabber. Apply explicit surfaces to both legacy
-             variants so underlying photography can never leak above children. */
-          ...(surfaceColor
-            ? { background: surfaceColor }
-            : variant === 'dark'
-              ? { background: '#0F172A' }
-              : null),
           ...style,
+          /* BRIEF_SHEET_BACKGROUND_CANON — THE ONE SHEET BACKGROUND.
+             The sheet owns the whole rounded surface, grabber strip included,
+             so chrome and body cannot show a seam. It is applied AFTER
+             `...style` deliberately: a caller's own background cannot win, or
+             the canon is advisory. Value = SHEET_SURFACE (#15171F), the
+             background the Your-circle leaderboard sits on. */
+          background: SHEET_SURFACE,
         }}
         role="dialog"
         aria-modal="true"
