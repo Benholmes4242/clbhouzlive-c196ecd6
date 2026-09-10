@@ -70,23 +70,24 @@ export function BottomSheet({
   grabberColor = 'rgba(255,255,255,0.18)',
   grabberRadius = 2,
   grabberPadding = '10px 0 4px',
-  urlOwnsHistoryEntry = false,
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const currentTranslateY = useRef(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  /* BRIEF_SHEET_BACK_BEHAVIOUR §2 — automatic registration with the stack.
+  /* BRIEF_SHEET_BACK_BEHAVIOUR §2 — automatic registration with the stack, for
+     every open sheet without exception (see the removed opt-out above).
      Read through a ref so a caller passing a fresh arrow function on every
      render cannot re-push the entry. */
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   useEffect(() => {
-    if (!open || urlOwnsHistoryEntry) return;
+    if (!open) return;
     const entry = pushSheetEntry(() => closeRef.current());
     return () => releaseSheetEntry(entry);
-  }, [open, urlOwnsHistoryEntry]);
+  }, [open]);
+
 
   // Animate in when opened
   useEffect(() => {
