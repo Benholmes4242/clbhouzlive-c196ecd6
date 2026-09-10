@@ -273,6 +273,9 @@ export function useReviewComposer(
     state,
     step,
     setStep,
+    restoredFromDraft,
+    discardRestoredDraft,
+
     setVerdict,
     setOverall,
     setCategory,
