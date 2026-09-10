@@ -98,25 +98,6 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({
           );
         })}
 
-        {remainder > 0 && (
-          <button
-            type="button"
-            onClick={() => onTap('preview')}
-            style={{
-              flex: `0 0 ${TILE_W}px`,
-              height: TILE_H,
-              borderRadius: 10,
-              border: `1px dashed ${A.DIM}`,
-              background: 'transparent',
-              cursor: 'pointer',
-              fontFamily: SANS,
-              ...LABEL,
-              color: A.MUTE,
-            }}
-          >
-            {t('toRate.more', { count: remainder, defaultValue: '+{{count}} more' })}
-          </button>
-        )}
       </div>
 
       <div style={{ marginTop: 12 }}>

@@ -121,7 +121,11 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       className={cn('px-4', className)}
     >
       <Panel kicker={kicker}>
-        <StatRow size={22} items={items} />
+        {/* labelNoWrap: every label here is measured to fit one 81.5px column at
+            390pt (see the item comments), so a wrap can only mean a locale
+            string longer than the English default - and a truncation reads as
+            one label where a wrap reads as two. */}
+        <StatRow size={22} items={items} labelNoWrap />
       </Panel>
     </motion.div>
   );
