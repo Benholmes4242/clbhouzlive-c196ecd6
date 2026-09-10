@@ -206,5 +206,5 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   );
 };
 
-export { FIELD_MIN_PLAYERS };
+export { CROWN_MIN_OTHERS, hasContest };
 export default CourseRecordsPanel;
