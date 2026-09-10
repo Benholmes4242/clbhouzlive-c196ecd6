@@ -154,7 +154,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           CompareEntryPanel, PulseSection and CircleInviteAction are all
           dead-listed, not deleted: the rank is the heading, the gap is the
           sub-line, the percentile is gone, and compare is reached by tapping a
-          person through the existing resolver. */
+          person through the existing resolver. */}
       {!readOnly && <CircleSection userId={userId} />}
 
       {/* 9 — FRIENDS' ROUNDS (Section J) */}
