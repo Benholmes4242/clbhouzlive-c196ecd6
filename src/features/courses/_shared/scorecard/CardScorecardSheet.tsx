@@ -1014,14 +1014,13 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       open={open}
       onClose={onClose}
       variant="dark"
-      // The grabber strip is the only place the BottomSheet surface itself
-      // shows through — everything below it is painted by the content column
-      // (fixed summary header on PANEL, scrolling body on CANVAS). So the
-      // surface takes PANEL, or the grabber sits on a visibly different band
-      // from the header directly under it.
-      style={{ background: A.PANEL, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column', ...sheetStyle }}
+      // BRIEF_SHEET_BACKGROUND_CANON — this sheet paints NOTHING. It used to
+      // set the surface to PANEL and the body to CANVAS, which is exactly the
+      // seam that showed as a band behind the action strip at the foot. The
+      // shared BottomSheet owns the one surface for chrome and body alike.
+      style={{ height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column', ...sheetStyle }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
+      <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, flex: 1, minHeight: 0, ...FIGS }}>
         {/*
           S1 — THE FIXED SUMMARY (BRIEF_ROUND_SHEET_SPLIT).
 
