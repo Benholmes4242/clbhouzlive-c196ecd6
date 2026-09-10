@@ -86,7 +86,7 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
           }}
         >
           <p style={{ ...LABEL_STYLE, flex: 1 }}>ALL ACTIVE · {cohorts.totalActive}</p>
-          <p style={{ ...LABEL_STYLE, width: 26, textAlign: 'right' }}>30D</p>
+          <p style={{ ...LABEL_STYLE, width: 26, textAlign: 'right' }}>30D RANK</p>
           <div style={{ width: 42 }} />
         </div>
 

@@ -237,6 +237,8 @@ export interface WhsFriendActivityWithImage {
   last_round_stableford: number | null;
   last_round_differential: number | null;
   last_round_score_id: string | null;
+  is_nine_hole: boolean;
+  total_holes: number | null;
   course_thumbnail_image: string | null;
   /** True when last_round equals the friend's 90-day best for that course. */
   is_course_best: boolean;

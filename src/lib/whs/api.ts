@@ -478,6 +478,8 @@ export async function fetchFriendsActivity(
         adjusted_gross,
         stableford_points,
         handicap_differential,
+        is_nine_hole,
+        total_holes,
         is_counter,
         handicap_index_at_time,
         course_id,
@@ -535,6 +537,8 @@ export async function fetchFriendsActivity(
       last_round_stableford: s.stableford_points ?? null,
       last_round_differential: s.handicap_differential ?? null,
       last_round_score_id: s.id,
+      is_nine_hole: s.is_nine_hole === true || Number(s.total_holes) === 9,
+      total_holes: s.total_holes == null ? null : Number(s.total_holes),
       course_thumbnail_image:
         thumbsByName[courseNameKey] ??
         thumbsByName[(f.last_round_course_name ?? '').toLowerCase()] ??
@@ -573,6 +577,8 @@ export async function fetchFriendsActivity(
       last_round_stableford: null,
       last_round_differential: null,
       last_round_score_id: null,
+      is_nine_hole: false,
+      total_holes: null,
       course_thumbnail_image: thumbsByName[courseNameKey] ?? null,
       is_course_best: false,
       friend_handicap_index: f.friend_handicap_index ?? null,
@@ -602,6 +608,8 @@ export async function fetchFriendsActivity(
       last_round_stableford: null,
       last_round_differential: null,
       last_round_score_id: null,
+      is_nine_hole: false,
+      total_holes: null,
       course_thumbnail_image: thumbsByName[courseNameKey] ?? null,
       is_course_best: false,
       friend_handicap_index: f.friend_handicap_index ?? null,
@@ -612,13 +620,19 @@ export async function fetchFriendsActivity(
     });
   }
 
-  items.sort((a, b) => {
+  const recentItems = items.filter((item) => {
+    if (!item.last_round_played_at) return false;
+    const playedAt = new Date(item.last_round_played_at).getTime();
+    return Number.isFinite(playedAt) && playedAt >= cutoff.getTime();
+  });
+
+  recentItems.sort((a, b) => {
     const da = a.last_round_played_at ?? '';
     const db = b.last_round_played_at ?? '';
     return db.localeCompare(da);
   });
 
-  return items.slice(0, limit);
+  return recentItems.slice(0, limit);
 }
 
 /**
