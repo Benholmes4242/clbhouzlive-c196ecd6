@@ -38,7 +38,20 @@ export interface CareerData {
   streaks: StreakRow[];
   shares: Map<string, BadgeShareRow>;
   distribution: Top100DistributionRow[];
+  /**
+   * LEGACY crown-holder head count, read only by the retired CrownsPanel and
+   * the crown detail's field line. It counts crown HOLDERS and includes the
+   * holder, so it is NOT a field size -- do not use it for a contest decision.
+   */
   fieldSizes: Map<string, number>;
+  /**
+   * Distinct OTHER players with a scored round at a course, holder excluded:
+   * the same count and the same threshold the scorecard sheet's field row uses.
+   * Undefined entries mean "not measured", never zero.
+   */
+  fieldPlayers?: Map<string, number>;
+  /** False when the batched field read is unavailable; no split is claimed. */
+  fieldPlayersAvailable?: boolean;
   config: GamRecordConfig;
   onOpen: (view: CareerView) => void;
 }
