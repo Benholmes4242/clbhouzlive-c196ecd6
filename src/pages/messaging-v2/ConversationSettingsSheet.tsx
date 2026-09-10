@@ -52,6 +52,9 @@ import {
   GitCompareArrows,
 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
+import { useDraftDismissGuard } from '@/components/ui/useDraftDismissGuard';
+
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
