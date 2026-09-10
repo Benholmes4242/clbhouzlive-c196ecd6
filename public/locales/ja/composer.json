@@ -1,57 +1,61 @@
 {
-  "schedule": {
-    "today": "Today",
-    "tomorrow": "Tomorrow"
-  },
-  "success": {
-    "posted": "Posted",
-    "postedBody": "It is live. Pull to refresh if you don't see it yet.",
-    "posting": "Posting...",
-    "scheduled": "Scheduled",
-    "scheduledBody": "It is queued and will go out on time.",
-    "scheduledFor": "Scheduled for {{when}}",
-    "uploadFailed": "Upload failed",
-    "uploadFailedFallback": "Something went wrong - your post was not published.",
-    "uploadingBody": "Uploading - we'll take it from here. You can keep using the app.",
-    "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
-    "liveKicker": "クラブハウスに公開",
-    "uploadingKicker": "アップロード中 . {{n}}%",
-    "scheduledKicker": "予約中 . {{n}}%",
-    "statGross": "グロス",
-    "statToPar": "パー差",
-    "statBirdies": "バーディ",
-    "statPhotos": "写真",
-    "statVideos": "動画",
-    "stagePreparing": "準備中",
-    "stageUploading": "アップロード中",
-    "stagePublishing": "公開中",
-    "timeLeftSeconds": "残り{{n}}秒",
-    "timeLeftMinutes": "残り{{m}}分{{s}}秒"
-  },
-  "emptyState": {
-    "headline": "Put it on the wall",
-    "shareLead": "Share {{phrase}}",
-    "ctaLabel": "Add photos or video",
-    "microcopy": "Up to 10 · photos, video, or both",
-    "phrases": [
-      "that green you just stuck",
-      "the fourball on the first tee",
-      "your card from this morning",
-      "the view from the 18th"
-    ],
-    "limitKicker": "UP TO {{count}} PHOTOS OR CLIPS",
-    "prompt": "What happened out there?",
-    "promptEdit": "Add to this post",
-    "nextStep": "Photos and clips now. The round and the course come on the next step."
-  },
-  "drafts": {
-    "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
-  },
-  "closeGuard": {
-    "mediaNotSaved_one": "{{count}} photo will not be saved",
-    "mediaNotSaved_other": "{{count}} photos will not be saved"
-  },
-  "detailRows": {
-    "optional": "Optional"
-  }
+ "schedule": {
+  "today": "Today",
+  "tomorrow": "Tomorrow"
+ },
+ "success": {
+  "posted": "Posted",
+  "postedBody": "It is live. Pull to refresh if you don't see it yet.",
+  "posting": "Posting...",
+  "scheduled": "Scheduled",
+  "scheduledBody": "It is queued and will go out on time.",
+  "scheduledFor": "Scheduled for {{when}}",
+  "uploadFailed": "Upload failed",
+  "uploadFailedFallback": "Something went wrong - your post was not published.",
+  "uploadingBody": "Uploading - we'll take it from here. You can keep using the app.",
+  "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
+  "liveKicker": "クラブハウスに公開",
+  "uploadingKicker": "アップロード中 . {{n}}%",
+  "scheduledKicker": "予約中 . {{n}}%",
+  "statGross": "グロス",
+  "statToPar": "パー差",
+  "statBirdies": "バーディ",
+  "statPhotos": "写真",
+  "statVideos": "動画",
+  "stagePreparing": "準備中",
+  "stageUploading": "アップロード中",
+  "stagePublishing": "公開中",
+  "timeLeftSeconds": "残り{{n}}秒",
+  "timeLeftMinutes": "残り{{m}}分{{s}}秒"
+ },
+ "emptyState": {
+  "headline": "Put it on the wall",
+  "shareLead": "Share {{phrase}}",
+  "ctaLabel": "Add photos or video",
+  "microcopy": "Up to 10 · photos, video, or both",
+  "phrases": [
+   "that green you just stuck",
+   "the fourball on the first tee",
+   "your card from this morning",
+   "the view from the 18th"
+  ],
+  "limitKicker": "UP TO {{count}} PHOTOS OR CLIPS",
+  "prompt": "What happened out there?",
+  "promptEdit": "Add to this post",
+  "nextStep": "Photos and clips now. The round and the course come on the next step."
+ },
+ "drafts": {
+  "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
+ },
+ "closeGuard": {
+  "mediaNotSaved_one": "{{count}} photo will not be saved",
+  "mediaNotSaved_other": "{{count}} photos will not be saved",
+  "saveDraftKeepsNothingElse": "下書きを保存 . 本文とタグのみ",
+  "saveDraftLosesMedia": "写真と動画は保存されません",
+  "saveDraftLosesSchedule": "予約時刻は保存されません",
+  "saveDraftLosesBoth": "写真、動画、予約時刻は保存されません"
+ },
+ "detailRows": {
+  "optional": "Optional"
+ }
 }
