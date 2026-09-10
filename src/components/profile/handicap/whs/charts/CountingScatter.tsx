@@ -36,8 +36,31 @@ interface Props {
 }
 
 const VIEW_W = 320;
-const PAD_X = 8;
-const PAD_Y = 10;
+
+/* DOT GEOMETRY AND THE INSET DERIVED FROM IT (SNAGS_01 §C, §D).
+ *
+ * The counting dot is reduced a touch (5.5 -> 4.75) while the non-counting dot
+ * holds at 3, so the size difference that carries the meaning survives.
+ *
+ * THE SELECTION RING IS NEVER CLIPPED: the plot area is inset on all four
+ * sides by (ring radius + half its stroke + a hair), DERIVED from these
+ * constants, so the inset stays correct if the radius moves again. The tap
+ * target is NOT tied to the radius — selection is resolved from the pointer's
+ * horizontal fraction across the whole plot (see onPointerDown), so the hit
+ * area is the full height of the svg regardless of how big a dot is drawn. */
+/** Counting / falling-off dot. */
+const DOT_R = 4.75;
+/** Non-counting dot — deliberately much smaller. */
+const DOT_R_NONE = 3;
+/** Air between the selected dot and its ring. */
+const RING_GAP = 3.5;
+const RING_SW = 1;
+const RING_R = DOT_R + RING_GAP;
+/** Plot inset: the ring's full extent plus a hair of tolerance. */
+const INSET = Math.ceil(RING_R + RING_SW / 2 + 0.5);
+
+const PAD_X = INSET;
+const PAD_Y = Math.max(10, INSET);
 
 function fillFor(state: CountingState): string {
   if (state === 'counts') return CHART.DOWN;

@@ -86,7 +86,12 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   const showReauthBanner = !readOnly && reauthRequired;
 
   return (
-    <div className="pb-10" style={{ paddingTop: 32 }}>
+    /* SNAGS_01 §B: NO LOCAL NUMBER. HandicapPage already pays the shared
+       CHROME_CLEARANCE (src/lib/chromeClearance.ts) — the measured island
+       height plus CHROME_TOP_GAP + CHROME_BREATHING, from the island's BOTTOM
+       edge — so this page-level 32 was a second, hero-sized clearance stacked
+       on top of it. Removed; the shared constant is the only owner. */
+    <div className="pb-10" style={{ paddingTop: 0 }}>
       {showReauthBanner && (
         <div
           className="mx-4 mt-0 mb-3 p-3 rounded-xl flex gap-2.5 text-[13px]"

@@ -106,7 +106,12 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
               <button
                 type="button"
                 onClick={() => setAllOpen(true)}
-                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, border: 0, borderBottom: `1px solid ${CHART.BORDER}`, padding: '14px 0', background: 'transparent', color: CHART.MUTE, textAlign: 'left', fontFamily: CHART_FONT }}
+                /* SNAGS_01 §E: NO RULE BELOW. The rule that closes the list
+                   is the last FriendRoundRow's own bottom border, immediately
+                   above this row; the next rule on the page belongs to the
+                   footer. A second border here put three hairlines in a short
+                   span, two of them doing the same job. */
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, border: 0, padding: '14px 0 2px', background: 'transparent', color: CHART.MUTE, textAlign: 'left', fontFamily: CHART_FONT }}
               >
                 <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase' }}>
                   {t('handicap.friendsRounds.seeAll', { count: rounds.length })}
