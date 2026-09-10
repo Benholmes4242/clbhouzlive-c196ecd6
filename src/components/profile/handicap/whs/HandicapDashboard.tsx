@@ -28,7 +28,7 @@ import IndexSection from './sections/IndexSection';
 import NextRoundSection from './sections/NextRoundSection';
 import LastRoundSection from './sections/LastRoundSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
-import StablefordCard from './sections/trends/StablefordCard';
+import ScoringSection from './sections/ScoringSection';
 import GameEverywhereCard from './sections/trends/GameEverywhereCard';
 import RoundShapePanel from './sections/trends/RoundShapePanel';
 import PersonalBests from './sections/records/PersonalBests';
