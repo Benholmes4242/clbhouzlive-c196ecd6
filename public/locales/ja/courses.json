@@ -1514,6 +1514,16 @@
         "poolCircleShort": "サークル{{rounds}}ラウンド中のベスト。",
         "poolEveryoneLong": "{{span}}のclbhouz全体{{rounds}}ラウンド中のベスト。",
         "poolEveryoneShort": "clbhouz全体{{rounds}}ラウンド中のベスト。"
+      },
+      "spread": {
+        "rounds": "{{count}} rounds",
+        "rounds_one": "{{count}} round",
+        "rounds_other": "{{count}} rounds",
+        "courses": "{{count}} courses",
+        "courses_one": "{{count}} course",
+        "courses_other": "{{count}} courses",
+        "both": "Across {{rounds}}, {{courses}}.",
+        "roundsOnly": "Across {{rounds}}."
       }
     }
   }
