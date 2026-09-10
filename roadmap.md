@@ -203,3 +203,16 @@
 - Source limitation: `whs_friend_matches` has no hole-count field, so the WHS-only latest-round summaries cannot disclose nine-hole status. Synced score rows can and do.
 - Accepted contradiction: Section I can still resolve a WHS-only row tap to an invite outcome, although Section J is the only explicit visible Invite action in the handicap page body.
 - No files deleted. `FriendRoundRow` and `RecentlyPlayedFeed` retain their paths/exports; their implementations were replaced. `FriendsRoundsSheet` is additive.
+
+## Section K (Sep 2026)
+
+- K1 footer: `sections/HandicapFooter.tsx` replaces `RoundsArchivePanel`, `YourCoursesRail`,
+  `WhsConnectionCaption` on the page. All three dead-listed, not deleted. Reuses the existing
+  `RoundsArchiveSheet` and the existing `handicap_history_sheet_opened` event.
+- K2 not-connected: `sections/NotConnectedSection.tsx` replaces the own-profile redirect to
+  /manage/handicap in `WhsHandicapTab.tsx:96-101`. New events
+  `handicap_not_connected_viewed` / `handicap_not_connected_cta`.
+- Open: no handicap-specific "what's shared" explainer exists; the button goes to the existing
+  /privacy document. A purpose-built data-sharing explainer is unbuilt work.
+- Open: `AchievementsPanel` stays mounted until Ben confirms the TROPHY ROOM row on device.
+- Section J sheet returned to the shared 85dvh default; stale "75dvh" comments corrected.
