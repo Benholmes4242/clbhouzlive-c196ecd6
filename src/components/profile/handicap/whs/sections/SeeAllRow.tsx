@@ -5,8 +5,8 @@
  * Extracted from three hand-rolled copies that had already drifted:
  *   - CircleSection      "SEE ALL 24"  chevron pushed to the right edge
  *   - RecentlyPlayedFeed "SEE ALL 38"  chevron pushed to the right edge
- *   - StreaksCard        chevron attached to the label (DELETED 10 Sep 2026 — not
- *                        repointed, see the dead-file list)
+ *   - StreaksCard        chevron attached to the label (DELETED 10 Sep 2026 — never
+ *                        repointed)
  *
  * THE GRAMMAR, fixed by the brief:
  *   - Label 12 / 700 / 0.11em / uppercase / MUTE.

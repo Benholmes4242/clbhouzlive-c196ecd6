@@ -105,8 +105,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       )}
 
       {/*
-        THE GREETING AND WEATHER LINE IS REMOVED (Section A). TodayGreeting is
-        no longer rendered anywhere — dead list, not deleted.
+        THE GREETING AND WEATHER LINE IS REMOVED (Section A). TodayGreeting was deleted 10 Sep 2026.
       */}
 
       {/* 1 — INDEX */}
@@ -123,8 +122,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 4 — ROUNDS THAT COUNT (Section E). RoundsThatCountCard was deleted 10 Sep 2026,
-          not deleted: the flat section carries this slot now. */}
+      {/* 4 — ROUNDS THAT COUNT (Section E). RoundsThatCountCard was deleted 10 Sep 2026: the flat section carries this slot now. */}
       <RoundsThatCountSection connectionId={connection.id} userId={userId} />
 
       {/* 5 — HOW YOU'RE SCORING (Section F). The points half of StablefordCard
@@ -138,8 +136,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           "no weak stretch" verdict, so the block says nothing. */}
       <HolesSection userId={userId} connectionId={connection.id} readOnly={readOnly} />
 
-      {/* 7 — PERSONAL BESTS (Section H). records/PersonalBests was deleted 10 Sep 2026,
-          not deleted. AchievementsPanel is now OFF this page and deleted 10 Sep 2026
+      {/* 7 — PERSONAL BESTS (Section H). records/PersonalBests was deleted 10 Sep 2026. AchievementsPanel is now OFF this page and deleted 10 Sep 2026
           too: the terminal TROPHY ROOM › row at the foot of Personal bests is
           verified opening the room, so the tile's only reason to exist is gone.
           GamMount stays at page level, so ?gam=trophies (with &section= and
