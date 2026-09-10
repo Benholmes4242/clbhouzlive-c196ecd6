@@ -163,6 +163,7 @@
 - src/components/profile/handicap/whs/sections/LastRoundCard.tsx (whole file, off the page at Section D)
 - src/components/profile/handicap/whs/sections/last-round-card/CinemaCardMedia.tsx (whole file)
 - src/components/profile/handicap/whs/sections/last-round-card/LastRoundHeroCard.tsx:60-120 (scrim + masked blur layers)
+- src/components/profile/handicap/whs/sections/RoundsThatCountCard.tsx (whole file, off the page at Section E; still imported by views/TrendsView.tsx:2,52, which no route on the one-page handicap area renders). Inside it specifically: :125-128 the projectNextRound call at length >= 8, :279-289 the next-round footer figures, :302-308 the drop queue, :316-323 the legend/queue copy.
 
 ## Open item — nine-hole disclosure beyond the handicap page
 - Feed round card, friends' rounds rows, compare sheet, Discover board rows and profile round rows print gross/stableford without reading is_nine_hole or total_holes. Scope named, not fixed.

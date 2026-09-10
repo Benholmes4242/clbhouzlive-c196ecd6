@@ -697,6 +697,20 @@
       "spanDays": "{{count}} days",
       "fromRounds": "from {{count}} rounds",
       "withheld": "{{count}} rounds so far. A 90-day trend needs a longer record to say anything."
+    },
+    "roundsThatCount": {
+      "eyebrow": "Rounds that count",
+      "heading": "Your last 20",
+      "meta": "{{count}} count",
+      "metaAll": "{{count}} of {{count}} count",
+      "counts": "Counts",
+      "doesNotCount": "Doesn't count",
+      "openRound": "Open round from {{date}}",
+      "body": "The {{count}} below the line are the ones your index is built from. As they drop out, worse rounds take their place - your next one falls off in {{falls}}.",
+      "bodyNoFall": "The {{count}} below the line are the ones your index is built from. As they drop out, worse rounds take their place.",
+      "fallsIn_one": "{{count}} round",
+      "fallsIn_other": "{{count}} rounds",
+      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which."
     }
   },
   "comments": {

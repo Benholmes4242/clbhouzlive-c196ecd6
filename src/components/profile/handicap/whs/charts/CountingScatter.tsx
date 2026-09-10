@@ -19,6 +19,13 @@ export interface CountingRound {
 interface Props {
   rounds: CountingRound[];
   height?: number;
+  /**
+   * ADDITIVE. Defaults keep every existing call site byte-identical: the
+   * legend renders, no point is selectable and no point is ringed.
+   */
+  showLegend?: boolean;
+  selectedIndex?: number | null;
+  onSelectIndex?: (index: number) => void;
 }
 
 const VIEW_W = 320;
@@ -31,7 +38,13 @@ function fillFor(state: CountingState): string {
   return CHART.FAINT;
 }
 
-export const CountingScatter: React.FC<Props> = ({ rounds, height = 104 }) => {
+export const CountingScatter: React.FC<Props> = ({
+  rounds,
+  height = 104,
+  showLegend = true,
+  selectedIndex = null,
+  onSelectIndex,
+}) => {
   if (!rounds || rounds.length === 0) return null;
 
   const values = rounds.map((r) => r.diff);
@@ -55,8 +68,26 @@ export const CountingScatter: React.FC<Props> = ({ rounds, height = 104 }) => {
       <svg
         viewBox={`0 0 ${VIEW_W} ${height}`}
         preserveAspectRatio="none"
-        style={{ display: 'block', width: '100%', height }}
+        style={{
+          display: 'block',
+          width: '100%',
+          height,
+          touchAction: onSelectIndex ? 'pan-y' : undefined,
+        }}
         aria-hidden
+        onPointerDown={
+          onSelectIndex
+            ? (e) => {
+                // The viewBox is stretched (preserveAspectRatio none), so the
+                // nearest index is resolved from the horizontal fraction, not
+                // from circle geometry.
+                const rect = e.currentTarget.getBoundingClientRect();
+                if (rect.width === 0) return;
+                const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+                onSelectIndex(Math.round(frac * (rounds.length - 1)));
+              }
+            : undefined
+        }
       >
         <path
           d={path}
@@ -74,6 +105,17 @@ export const CountingScatter: React.FC<Props> = ({ rounds, height = 104 }) => {
             fill={fillFor(r.state)}
           />
         ))}
+        {selectedIndex != null && rounds[selectedIndex] && (
+          <circle
+            cx={x(selectedIndex)}
+            cy={y(rounds[selectedIndex].diff)}
+            r={9}
+            fill="none"
+            stroke={fillFor(rounds[selectedIndex].state)}
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
+        )}
       </svg>
 
       <div
@@ -88,19 +130,21 @@ export const CountingScatter: React.FC<Props> = ({ rounds, height = 104 }) => {
         <span>Newest</span>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          gap: 14,
-          marginTop: 8,
-          paddingTop: 8,
-          borderTop: `1px solid ${CHART.BORDER}`,
-          ...LABEL_STYLE,
-        }}
-      >
-        <LegendDot color={CHART.DOWN} text="Counts" />
-        <LegendDot color={CHART.AMBER} text="Falling off" />
-      </div>
+      {showLegend && (
+        <div
+          style={{
+            display: 'flex',
+            gap: 14,
+            marginTop: 8,
+            paddingTop: 8,
+            borderTop: `1px solid ${CHART.BORDER}`,
+            ...LABEL_STYLE,
+          }}
+        >
+          <LegendDot color={CHART.DOWN} text="Counts" />
+          <LegendDot color={CHART.AMBER} text="Falling off" />
+        </div>
+      )}
     </div>
   );
 };

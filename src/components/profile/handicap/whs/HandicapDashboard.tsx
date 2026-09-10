@@ -27,7 +27,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 import IndexSection from './sections/IndexSection';
 import NextRoundSection from './sections/NextRoundSection';
 import LastRoundSection from './sections/LastRoundSection';
-import RoundsThatCountCard from './sections/RoundsThatCountCard';
+import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import StablefordCard from './sections/trends/StablefordCard';
 import GameEverywhereCard from './sections/trends/GameEverywhereCard';
 import RoundShapePanel from './sections/trends/RoundShapePanel';
@@ -126,14 +126,9 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 4 — ROUNDS THAT COUNT (Section E) */}
-      <RoundsThatCountCard
-        connectionId={connection.id}
-        userId={userId}
-        currentHandicap={currentHandicap}
-        viewMode={viewMode}
-        ownerFirstName={ownerFirstName}
-      />
+      {/* 4 — ROUNDS THAT COUNT (Section E). RoundsThatCountCard is dead-listed,
+          not deleted: the flat section carries this slot now. */}
+      <RoundsThatCountSection connectionId={connection.id} userId={userId} />
 
       {/* 5 — HOW YOU'RE SCORING (Section F) */}
       <section style={{ padding: '0 16px', marginTop: 32 }}>
