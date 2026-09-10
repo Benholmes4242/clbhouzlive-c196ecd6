@@ -27,7 +27,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 import IndexSection from './sections/IndexSection';
 import NextRoundSection from './sections/NextRoundSection';
 import LastRoundSection from './sections/LastRoundSection';
-import RoundsThatCountCard from './sections/RoundsThatCountCard';
+import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import StablefordCard from './sections/trends/StablefordCard';
 import GameEverywhereCard from './sections/trends/GameEverywhereCard';
 import RoundShapePanel from './sections/trends/RoundShapePanel';
