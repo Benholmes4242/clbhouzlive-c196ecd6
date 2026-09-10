@@ -49,11 +49,23 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
   const { data: top100Progress } = useTop100ProgressForUser(userId);
 
-  // Fetch average rating for the summary card
-  const { data: avgRating } = useQuery({
+  /**
+   * THE RATING FIGURE AND WHAT IT AVERAGES OVER.
+   *
+   * The mean of this member's own `course_ratings` rows, mock rows excluded and
+   * zero ratings excluded. The COUNT travels with the mean because the strip's
+   * label had to shorten to "RATING" to fit its column, and "RATING 8.4" alone
+   * reads as one course's rating rather than the mean of however many. The basis
+   * line beneath the strip names the count; without it the figure is ambiguous.
+   *
+   * It is NOT the 49 played courses and NOT the 35 with imported rounds - a
+   * member can play a course without rating it. Three populations, three
+   * definitions, all three now stated where they render.
+   */
+  const { data: ratingSummary } = useQuery({
     queryKey: ['user-avg-rating', userId],
     enabled: !!userId,
-    queryFn: async () => {
+    queryFn: async (): Promise<{ avg: number; n: number } | null> => {
       const { data: ratings, error } = await supabase
         .from('course_ratings')
         .select('rating')
@@ -63,10 +75,14 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
       if (error) throw error;
       if (!ratings || ratings.length === 0) return null;
-      return ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+      return {
+        avg: ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length,
+        n: ratings.length,
+      };
     },
     staleTime: 60_000,
   });
+  const avgRating = ratingSummary?.avg ?? null;
 
   if (isLoading) {
     return (
