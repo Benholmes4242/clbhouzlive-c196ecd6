@@ -343,6 +343,15 @@ function CommentsSheetV2Inner({
               onDirtyChange={setComposerDirty}
             />
 
+            {/* Above this sheet's z-[12003] shell. */}
+            <DiscardDraftDialog
+              open={confirmOpen}
+              onKeepEditing={keepEditing}
+              onDiscard={discard}
+              zIndex={12100}
+            />
+
+
           </motion.div>
 
           {/* Action sheet */}
