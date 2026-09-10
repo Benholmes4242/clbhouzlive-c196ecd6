@@ -21,6 +21,18 @@ interface ClubsCardProps {
    * the owner's own profile whether or not they ever saw a prompt.
    */
   onSetHomeClub?: () => void;
+  /**
+   * THE CLUB THEY HAVE ASKED FOR AND ARE WAITING ON (§3.5), from
+   * user_profiles.home_club_pending_name via useHomeClubStatus - a typed name of
+   * a club not yet in the catalogue, not a club row.
+   *
+   * IT IS HERE BECAUSE AWAITING APPROVAL AND HAVING NO CLUB ARE TWO STATES AND
+   * WERE RENDERING AS ONE. When HomeClubPrompt was removed this treatment left
+   * with it, and a member who had already answered was told to answer again -
+   * the same collapse as an error shown as a zero. This is now the only surface
+   * that holds it.
+   */
+  pendingClubName?: string | null;
   className?: string;
 }
 
