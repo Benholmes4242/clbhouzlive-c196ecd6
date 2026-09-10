@@ -154,22 +154,23 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
 
 
 
-  const courseNames = useMemo(() => {
-    const counts = new Map<string, number>();
+  /** Every course the member has played, by ID, count descending. */
+  const courses = useMemo(() => {
+    const byId = new Map<string, { id: string; name: string; count: number }>();
     for (const r of rounds) {
-      const name = r.course?.name;
-      if (!name) continue;
-      counts.set(name, (counts.get(name) ?? 0) + 1);
+      const id = r.course_id;
+      if (!id) continue;
+      const existing = byId.get(id);
+      if (existing) existing.count += 1;
+      else byId.set(id, { id, name: r.course?.name ?? 'Unknown course', count: 1 });
     }
-    return Array.from(counts.entries())
-      .sort((a, b) => b[1] - a[1])
-      .map(([name, count]) => ({ name, count }));
+    return Array.from(byId.values()).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
   }, [rounds]);
 
   const filteredRounds = useMemo(() => {
-    if (filter === 'all') return rounds;
-    if (filter === 'counters') return rounds.filter((r) => r.is_counter);
-    return rounds.filter((r) => r.course?.name === filter);
+    if (filter.kind === 'all') return rounds;
+    if (filter.kind === 'counters') return rounds.filter((r) => r.is_counter);
+    return rounds.filter((r) => r.course_id === filter.id);
   }, [rounds, filter]);
 
   const visibleRounds = filteredRounds.slice(0, displayedCount);
