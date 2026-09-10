@@ -699,7 +699,7 @@
       "eyebrow": "Rounds that count",
       "heading": "Your last 20",
       "meta": "{{count}} count",
-      "metaAll": "{{count}} of {{count}} count",
+      "metaAll": "{{count}} rounds",
       "counts": "Counts",
       "doesNotCount": "Doesn't count",
       "openRound": "Open round from {{date}}",
@@ -708,6 +708,18 @@
       "fallsIn_one": "{{count}} round",
       "fallsIn_other": "{{count}} rounds",
       "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which."
+    },
+    "scoring": {
+      "eyebrow": "Stableford",
+      "heading": "How you're scoring",
+      "meta": "{{count}} eighteen-hole rounds · {{days}} days",
+      "metaWithheld": "{{count}} rounds",
+      "pointsAvg": "Points average",
+      "vsPrior": "{{delta}} vs prior {{days}} days",
+      "inZone": "In the zone",
+      "solid": "Solid",
+      "offDay": "Off day",
+      "withheldBody": "Your scoring spread needs about ten rounds to mean anything. You've posted {{count}}."
     }
   },
   "comments": {
