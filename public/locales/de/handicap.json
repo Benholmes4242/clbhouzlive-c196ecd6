@@ -64,6 +64,18 @@
     "recordsFewOthers": "Nur {{n}} andere Golfer haben hier gespielt",
     "recordsOneOther": "Nur 1 anderer Golfer hat hier gespielt",
     "recordsNobodyElse": "Sonst hat hier noch niemand gespielt",
-    "recordsSeeAll": "ALLE {{n}} PLAETZE"
+    "recordsSeeAll": "ALLE {{n}} PLAETZE",
+    "countingKicker": "ZAEHLSTATISTIKEN",
+    "countingComplete": "{{n}} VON {{total}} KOMPLETT",
+    "allTiersReached": "Alle Stufen erreicht",
+    "tierProgress": "{{n}} mehr fuer Stufe {{next}} · Stufe {{reached}} von {{total}}",
+    "tierReached": "Stufe {{tier}} erreicht {{when}}",
+    "top100Kicker": "TOP 100 LISTEN",
+    "top100Basis": "GESPIELTE PLAETZE JE LISTE VON 100",
+    "top100NotStarted": "Nicht begonnen",
+    "milestonesKicker": "MEILENSTEINE",
+    "milestonesReached": "{{n}} VON {{total}} ERREICHT",
+    "milestoneReachedAt": "Erreicht {{when}}",
+    "milestonesSeeAll": "ALLE {{n}}"
   }
 }

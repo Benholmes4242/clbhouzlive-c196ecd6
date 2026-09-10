@@ -64,6 +64,18 @@
     "recordsFewOthers": "Solo {{n}} otros golfistas han jugado aqui",
     "recordsOneOther": "Solo 1 otro golfista ha jugado aqui",
     "recordsNobodyElse": "Nadie mas ha jugado aqui todavia",
-    "recordsSeeAll": "VER LOS {{n}} CAMPOS"
+    "recordsSeeAll": "VER LOS {{n}} CAMPOS",
+    "countingKicker": "ESTADISTICAS",
+    "countingComplete": "{{n}} DE {{total}} COMPLETOS",
+    "allTiersReached": "Todos los niveles alcanzados",
+    "tierProgress": "{{n}} mas para el nivel {{next}} · nivel {{reached}} de {{total}}",
+    "tierReached": "Nivel {{tier}} alcanzado {{when}}",
+    "top100Kicker": "LISTAS TOP 100",
+    "top100Basis": "CAMPOS JUGADOS DE CADA LISTA DE 100",
+    "top100NotStarted": "Sin empezar",
+    "milestonesKicker": "HITOS",
+    "milestonesReached": "{{n}} DE {{total}} ALCANZADOS",
+    "milestoneReachedAt": "Alcanzado {{when}}",
+    "milestonesSeeAll": "VER LOS {{n}}"
   }
 }
