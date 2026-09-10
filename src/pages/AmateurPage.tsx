@@ -41,6 +41,9 @@ export default function AmateurPage() {
   const navigate = useNavigate();
   const opener = useScorecardOpener();
   const state = useAmateurBoardState(user?.id);
+  /* §8 — the scroll target a hero card drives the page to. */
+  const boardRef = useRef<HTMLDivElement | null>(null);
+
 
   useEffect(() => {
     analyticsEvents.track('amateur_page_viewed', {});
