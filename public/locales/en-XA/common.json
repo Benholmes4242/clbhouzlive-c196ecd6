@@ -671,7 +671,13 @@
       "stableford": "[~~Šţáƀļéƒőřđ~~]",
       "index": "[~~Íñđéẋ~~]",
       "indexHeldAt": "[~~Íñđéẋ ĥéļđ áţ~~]",
-      "notBest8": "[~~ñőţ őñé őƒ ýőúř ƀéšţ 8~~]"
+      "notBest8": "[~~ñőţ őñé őƒ ýőúř ƀéšţ 8~~]",
+      "eyebrow": "Last round",
+      "nineHoles": "9 holes",
+      "unknownCourse": "Unknown course",
+      "empty": "Your rounds appear here as soon as you post a score.",
+      "emptyFriend": "Rounds appear here once {{name}} posts a score.",
+      "theyFallback": "they"
     },
     "records": {
       "emptyHint": "[~~Ýőúř řéĉőřđš áƥƥéář ĥéřé őñĉé řőúñđš ářé ƥőšţéđ.~~]"
