@@ -162,9 +162,20 @@
 ## Dead-file sweep — DONE 10 Sep 2026
 - 56 files deleted in one pass: Cluster 1 (old TodayView tree, 17), Cluster 2 (old TrendsView tree, 10), Cluster 3 (old CircleView tree, 5), 6 CLEAN files, and the 28 secondary orphans they held alive. Stale comments updated in the same pass. Typecheck and full production build clean.
 - Region-only entries below are branches inside files that STAY, not deletions.
-- Still open: census the Champions drilldown folder as its own report (unreferenced but never dead-listed). Census delivered 10 Sep 2026, awaiting a ruling.
 - Tour hub and the round scorecard sheet contributed no whole-file entries: both were rebuilt in place rather than replaced.
 - Name-collision lesson: two files named types.ts, one live (src/lib/whs/types.ts) and one dead (whs/types.ts), and every grep hit for the filename belonged to the LIVE one. A hand-check reads as conclusive and is wrong; only a resolved import graph separates them. Use the graph, never the filename, before any sweep.
+
+## Champions drilldown sweep — DONE 10 Sep 2026
+- 18 files deleted in one commit: Cluster A (old panel/duel board and its deep sheet, 4), Cluster B (crown cabinet, You card, window toggle, 3), the 10 CLEAN files, and ChampionsHonoursBoard.tsx which lost its last importer with ChampionsInfoCarousel. Typecheck and full production build clean.
+- KEPT: _shared/championsOrder.test.ts. A spec for a live module is not unreachable code. NEVER sweep test files on reachability from main.tsx.
+- KEPT: the live spine (CourseLegendsDrilldown, DrilldownHeader, _shared/*, drilldown/_shared/*, flat/*, types.ts), untouched.
+- HELD, NOT SWEPT: src/components/handicap/ConnectGhostPrompt.tsx. It has a second importer, src/features/courses/components/holes/CourseHolesTab.tsx, which is itself unreferenced but has never been ruled on. Deleting the prompt would break the typecheck of a file nobody has retired. Both need one ruling together.
+- Region-only orphan left in place: WindowToggleVariant in course-legends/types.ts, annotated rather than removed.
+- Comment species, third instance this week: a comment ASSERTING A RELATIONSHIP THAT HAD ALREADY BEEN SEVERED. WindowToggle's header claimed the live drilldown still owned it long after the drilldown stopped importing it. Moot now the file is gone; the species is not.
+
+## Open — Champions has no connect prompt for unconnected members
+- Champions drilldown has no connect prompt for unconnected members; the handicap page's not-connected pattern is the model.
+- Roughly four in five accounts have never connected a handicap. They see a board they cannot appear on and no route to appearing on it. ChampionsInfoCarousel carried that prompt; the explainer copy survives as WhatCounts, the prompt does not. Not rebuilt in the sweep by decision.
 
 ## Handicap one-page brief — dead list (files below are now DELETED)
 - src/components/profile/handicap/whs/sections/LastRoundCard.tsx (whole file, off the page at Section D)

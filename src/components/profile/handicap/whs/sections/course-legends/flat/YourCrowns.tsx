@@ -1,8 +1,9 @@
 /**
  * BRIEF_CHAMPIONS_TAB_REBUILD §3.1 — YOUR CROWNS.
  *
- * A statement, not a cabinet. The seven-box CrownCabinet and ChampionsYouCard
- * are retired from this tab: seven dashed placeholders is a wall of nothing
+ * A statement, not a cabinet. The seven-box crown cabinet and its host card
+ * were retired from this tab in Aug 2026 and deleted 10 Sep 2026: seven
+ * dashed placeholders is a wall of nothing
  * for a member with no crowns, which is most members on most courses.
  *
  * ALWAYS ALL TIME. A crown is a claim on a course record; "you hold this over
