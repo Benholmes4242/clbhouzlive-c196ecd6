@@ -29,7 +29,7 @@ export const FriendsRoundsSheet: React.FC<Props> = ({
     <BottomSheet
       open={open}
       onClose={onClose}
-      maxHeight="85dvh"
+      maxHeight="75dvh"
       variant="dark"
       surfaceColor={CHART.CANVAS}
       style={{ color: CHART.INK, overflow: 'hidden' }}
