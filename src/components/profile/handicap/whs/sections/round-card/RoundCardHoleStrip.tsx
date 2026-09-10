@@ -30,7 +30,12 @@ const HoleCell: React.FC<{
   size?: number;
 }> = ({ score, par, size = 20 }) => (
   <div style={{ position: 'relative', width: size, height: size, flex: '0 0 auto' }}>
-    <ScoreMark strokes={score} par={par} size={size} surface="light" />
+    {/* BRIEF_ROUND_SCORECARD_REBUILD §A — ONE GRAMMAR, THE DARK ONE. This strip
+        was the last consumer asking ScoreMark for the legacy light outline
+        vocabulary, so a round read one way here and another way on the card.
+        The dark filled grammar (ratified 4 Sep 2026) is now the only grammar a
+        member ever sees. */}
+    <ScoreMark strokes={score} par={par} size={size} surface="dark" />
   </div>
 );
 

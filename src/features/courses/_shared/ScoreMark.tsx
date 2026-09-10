@@ -14,15 +14,25 @@ import {
 /**
  * ScoreMark - the universal scoring-mark renderer.
  *
- * Dark scorecards follow the paper-card convention: gold circles for eagle or
- * better, red circle for birdie, bare par, outlined-square bogey, blue square
- * double and deep-blue ringed square triple+. Rings encode degree. Light keeps
- * its established treatment unchanged.
- * Shared across:
+ * THE DARK GRAMMAR IS THE GRAMMAR (ratified 4 Sep 2026, BRIEF_ROUND_SCORECARD_
+ * REBUILD §A). Per outcome: unplayed a faint mid-dot; par a bare numeral;
+ * birdie a FILLED red disc; eagle a FILLED gold disc with one ring; albatross or
+ * ace a FILLED gold disc with two rings; bogey an OUTLINED ink square; double a
+ * FILLED blue square; triple+ a FILLED deep-blue square with one ring. Rings
+ * encode degree, gold encodes rarity. Filled is correct — do not "restore
+ * outlines"; the outline proposal was considered and is not the shipped grammar.
+ *
+ * THE LIGHT BRANCH IS ON THE DEAD LIST (see ScoreMark.tsx:225-280). No product
+ * surface passes surface="light" any more — RoundCardHoleStrip was the last one
+ * and moved to dark in §A. It is retained on disk (nothing is deleted) and is
+ * still exercised by ScoreMark.test.tsx; treat it as unreachable, not as an
+ * alternative theme, and do not add new callers.
+ *
+ * Shared across (all dark):
  *  - Card scorecard sheet (CardScorecardSheet)
- *  - Handicap personal scorecard
- *  - Course Holes tab legend
- *  - Clubhouse feed round card (surface="dark")
+ *  - Handicap round card strip (RoundCardHoleStrip)
+ *  - Course Holes tab legend (HolesScoringKey)
+ *  - Clubhouse feed round card (PostRoundCard)
  *
  * An ace has no bespoke branch: its mark is derived from strokes minus par.
  */
@@ -215,6 +225,14 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
     );
   }
 
+  /* ---------------------------------------------------------------------------
+     DEAD LIST (BRIEF_ROUND_SCORECARD_REBUILD §A) — THE LEGACY LIGHT BRANCH.
+     Everything from here to the end of the component is the older light
+     outline/tint vocabulary. It has NO product caller as of 10 Sep 2026; the
+     last one (RoundCardHoleStrip) moved to the dark grammar in §A. Retained on
+     disk deliberately (nothing is deleted) and still covered by
+     ScoreMark.test.tsx. Do not add callers, and do not treat it as a theme.
+     --------------------------------------------------------------------------- */
   return (
     <span
       style={{

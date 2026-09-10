@@ -413,7 +413,9 @@ const Legend: React.FC<{ holes: CardScorecardHole[]; hasUnplayed?: boolean }> = 
     { strokes: 3, label: t('courses:scorecard.legendBirdie') },
   ];
   if (rarities.eagle) keys.push({ strokes: 2, label: t('courses:scorecard.legendEagle') });
-  // AN ALBATROSS AND AN ACE TAKE THE SAME MARK (solid red, gold ring): the
+  // AN ALBATROSS AND AN ACE TAKE THE SAME MARK (GOLD-FILLED DISC, ringed —
+  // twice for an albatross, once for an eagle; the old note here said "solid
+  // red, gold ring" and was wrong about the fill): the
   // grammar does not distinguish them. If a round contains both we show the
   // RARER one once (albatross) rather than two identical entries.
   if (rarities.alba) keys.push({ strokes: 1, label: t('courses:scorecard.legendAlbatross') });
