@@ -212,6 +212,18 @@ export function AmateurHero({
      figure took. Null on every single-round card. */
   const spreadLine = card ? heroSpreadLine(t, card) : null;
   const isCard = !!card;
+  /* §8 — the board this card can be answered on, or null (see boardForMetric). */
+  const cardBoard = isAggregateCard && card ? boardForMetric(card.metric) : null;
+  /* §2.2 ONE MARK PER UNIT, CAPPED AT 24. The figure is a whole count on every
+     aggregate metric, so the marks and the figure are the same fact twice: the
+     marks make it legible before it is read, the figure confirms it. Above the
+     cap the figure carries the rest alone — forty marks is texture, not a
+     count, and a countable row is the entire justification for the space. */
+  const markCount =
+    isAggregateCard && card && card.figure != null
+      ? Math.min(MARK_CAP, Math.max(0, Math.round(card.figure)))
+      : 0;
+
 
   /* §10 ONE VIEW PER CARD, so the rotation can be judged later: which cards
      actually reach members, and how many were competing when one was chosen. */
