@@ -43,8 +43,13 @@ interface Props {
    * PLAIN ROUND TOTAL — every `whs_scores` row for the member's connection,
    * nine-hole rounds included (245 for the test member, 10 Sep 2026). Same
    * population as posted history and the handicap footer's "All {n} rounds",
-   * so the three surfaces agree. NOT the 243 eighteen-hole handicap basis and
-   * NOT the 239 mapped non-penalty analytics basis.
+   * so the three surfaces agree. NOT the eighteen-hole handicap basis (243 here)
+   * and NOT the 239 mapped non-penalty analytics basis.
+   *
+   * "243" IS THREE SEPARATE DEFINITIONS THAT HAPPEN TO AGREE FOR THIS MEMBER:
+   * eighteen holes posted, hole detail fetched, and `holes_played = 18`. They
+   * agree only because this member's only gaps are two nine-hole rounds — across
+   * the base 568 of 3,554 rounds cannot draw a card. See useMemberRoundTotal.
    */
   roundsCount: number | null;
   ratedCount: number | null;

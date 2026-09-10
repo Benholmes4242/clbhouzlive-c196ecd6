@@ -419,8 +419,11 @@ const ProfilePageV2Content: React.FC = () => {
      `gam_user_courses().rounds_count`, which counts only MAPPED, NON-PENALTY
      rounds (239) and so disagreed with posted history and with the handicap
      footer's "All {n} rounds". Those two both read the plain total, and the
-     header now reads it too. The 243 eighteen-hole basis keeps its own place in
-     the handicap sections and is a different question, not a rival answer. */
+     header now reads it too. The eighteen-hole basis (243 here) keeps its own
+     place in the handicap sections and is a different question, not a rival
+     answer — and it is itself three definitions (eighteen holes posted, hole
+     detail fetched, `holes_played = 18`) that coincide for this member and not in
+     general: 568 of 3,554 rounds base-wide cannot draw a card. */
   const { totalCoursesPlayed: shellCoursesPlayed, isCoursesError: shellCoursesError } =
     useUserCourseSummary(profileUserId ?? undefined);
   const { total: shellRoundsTotal, state: shellRoundsState } = useMemberRoundTotal(
