@@ -312,6 +312,15 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   /* PHOTO TAP (§Part 1). The strip shows the first three; the viewer receives
      ALL items so a 4-photo review stays fully reachable from the third tile. */
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+
+  /* THE ORPHANED VIEWER (BRIEF_SHEET_BACK_BEHAVIOUR_04 §4). The viewer portals
+     to <body>, so it outlives this sheet's own unmount path: back closed the
+     host sheet and left a fullscreen viewer floating over a page with no sheet
+     under it. The host closing takes the viewer with it. */
+  useEffect(() => {
+    if (!isOpen) setViewerIndex(null);
+  }, [isOpen]);
+
   const viewerItems: OrderedMediaItem[] = useMemo(
     () =>
       allMedia.map((m, i) => ({

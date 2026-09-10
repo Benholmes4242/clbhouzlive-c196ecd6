@@ -16,11 +16,29 @@
  * sheet), so back must close the top one only, then the one beneath, and only
  * then leave the route.
  *
+ * WHAT ACTUALLY HAPPENS ON A GUARDED SHEET (corrected in
+ * BRIEF_SHEET_BACK_BEHAVIOUR_04 §3; the previous wording here was wrong and is
+ * the reason this needed tracing twice). The browser pops the entry BEFORE the
+ * popstate listener runs, so by the time a draft-holding sheet shows its
+ * "discard / keep editing" question its marker is already spent. Choosing KEEP
+ * EDITING therefore leaves the sheet open with NO entry beneath it, and the
+ * next back is taken by whatever sits below — for a route-hosted composer, the
+ * router. The sheet stays open while the route leaves.
+ *
+ * THIS IS NOT FIXED BY RE-PUSHING INSIDE popstate. That cannot be made
+ * reliable on iOS edge-swipe, and a guard that works at the desk but not in the
+ * hand is worse than none because it gets trusted. The ruling (_04 §3) is that
+ * the fix is PERSISTENCE, not history: the review composer now keeps a 24h
+ * sessionStorage draft in both create and edit mode, so a back that takes the
+ * route no longer takes the work. What remains is a navigation oddity, not a
+ * data-loss path.
+ *
  * WHY `close()` AND NOT A LOCAL DISMISS: the entry closes through the sheet's
  * own `onClose` — the same function backdrop tap and escape already call. Back
  * therefore inherits whatever confirmation a draft-holding sheet already does
  * on those two paths instead of inventing a fourth behaviour (§3).
  */
+
 
 interface SheetEntry {
   id: number;

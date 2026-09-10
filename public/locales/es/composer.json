@@ -1,57 +1,61 @@
 {
-  "schedule": {
-    "today": "Today",
-    "tomorrow": "Tomorrow"
-  },
-  "success": {
-    "posted": "Posted",
-    "postedBody": "It is live. Pull to refresh if you don't see it yet.",
-    "posting": "Posting...",
-    "scheduled": "Scheduled",
-    "scheduledBody": "It is queued and will go out on time.",
-    "scheduledFor": "Scheduled for {{when}}",
-    "uploadFailed": "Upload failed",
-    "uploadFailedFallback": "Something went wrong - your post was not published.",
-    "uploadingBody": "Uploading - we'll take it from here. You can keep using the app.",
-    "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
-    "liveKicker": "En directo en el clubhouse",
-    "uploadingKicker": "Subiendo . {{n}}%",
-    "scheduledKicker": "Programando . {{n}}%",
-    "statGross": "Bruto",
-    "statToPar": "Al par",
-    "statBirdies": "Birdies",
-    "statPhotos": "Fotos",
-    "statVideos": "Videos",
-    "stagePreparing": "Preparando",
-    "stageUploading": "Subiendo",
-    "stagePublishing": "Publicando",
-    "timeLeftSeconds": "quedan {{n}}s",
-    "timeLeftMinutes": "quedan {{m}}m {{s}}s"
-  },
-  "emptyState": {
-    "headline": "Put it on the wall",
-    "shareLead": "Share {{phrase}}",
-    "ctaLabel": "Add photos or video",
-    "microcopy": "Up to 10 · photos, video, or both",
-    "phrases": [
-      "that green you just stuck",
-      "the fourball on the first tee",
-      "your card from this morning",
-      "the view from the 18th"
-    ],
-    "limitKicker": "UP TO {{count}} PHOTOS OR CLIPS",
-    "prompt": "What happened out there?",
-    "promptEdit": "Add to this post",
-    "nextStep": "Photos and clips now. The round and the course come on the next step."
-  },
-  "drafts": {
-    "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
-  },
-  "closeGuard": {
-    "mediaNotSaved_one": "{{count}} photo will not be saved",
-    "mediaNotSaved_other": "{{count}} photos will not be saved"
-  },
-  "detailRows": {
-    "optional": "Optional"
-  }
+ "schedule": {
+  "today": "Today",
+  "tomorrow": "Tomorrow"
+ },
+ "success": {
+  "posted": "Posted",
+  "postedBody": "It is live. Pull to refresh if you don't see it yet.",
+  "posting": "Posting...",
+  "scheduled": "Scheduled",
+  "scheduledBody": "It is queued and will go out on time.",
+  "scheduledFor": "Scheduled for {{when}}",
+  "uploadFailed": "Upload failed",
+  "uploadFailedFallback": "Something went wrong - your post was not published.",
+  "uploadingBody": "Uploading - we'll take it from here. You can keep using the app.",
+  "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
+  "liveKicker": "En directo en el clubhouse",
+  "uploadingKicker": "Subiendo . {{n}}%",
+  "scheduledKicker": "Programando . {{n}}%",
+  "statGross": "Bruto",
+  "statToPar": "Al par",
+  "statBirdies": "Birdies",
+  "statPhotos": "Fotos",
+  "statVideos": "Videos",
+  "stagePreparing": "Preparando",
+  "stageUploading": "Subiendo",
+  "stagePublishing": "Publicando",
+  "timeLeftSeconds": "quedan {{n}}s",
+  "timeLeftMinutes": "quedan {{m}}m {{s}}s"
+ },
+ "emptyState": {
+  "headline": "Put it on the wall",
+  "shareLead": "Share {{phrase}}",
+  "ctaLabel": "Add photos or video",
+  "microcopy": "Up to 10 · photos, video, or both",
+  "phrases": [
+   "that green you just stuck",
+   "the fourball on the first tee",
+   "your card from this morning",
+   "the view from the 18th"
+  ],
+  "limitKicker": "UP TO {{count}} PHOTOS OR CLIPS",
+  "prompt": "What happened out there?",
+  "promptEdit": "Add to this post",
+  "nextStep": "Photos and clips now. The round and the course come on the next step."
+ },
+ "drafts": {
+  "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
+ },
+ "closeGuard": {
+  "mediaNotSaved_one": "{{count}} photo will not be saved",
+  "mediaNotSaved_other": "{{count}} photos will not be saved",
+  "saveDraftKeepsNothingElse": "Guardar borrador . solo texto y etiquetas",
+  "saveDraftLosesMedia": "Las fotos y los videos no se guardaran",
+  "saveDraftLosesSchedule": "La hora programada no se guardara",
+  "saveDraftLosesBoth": "Las fotos, los videos y la hora programada no se guardaran"
+ },
+ "detailRows": {
+  "optional": "Optional"
+ }
 }

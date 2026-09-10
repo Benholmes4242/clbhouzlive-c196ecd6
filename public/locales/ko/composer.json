@@ -1,57 +1,61 @@
 {
-  "schedule": {
-    "today": "Today",
-    "tomorrow": "Tomorrow"
-  },
-  "success": {
-    "posted": "Posted",
-    "postedBody": "It is live. Pull to refresh if you don't see it yet.",
-    "posting": "Posting...",
-    "scheduled": "Scheduled",
-    "scheduledBody": "It is queued and will go out on time.",
-    "scheduledFor": "Scheduled for {{when}}",
-    "uploadFailed": "Upload failed",
-    "uploadFailedFallback": "Something went wrong - your post was not published.",
-    "uploadingBody": "Uploading - we'll take it from here. You can keep using the app.",
-    "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
-    "liveKicker": "클럽하우스에 게시됨",
-    "uploadingKicker": "업로드 중 . {{n}}%",
-    "scheduledKicker": "예약 중 . {{n}}%",
-    "statGross": "그로스",
-    "statToPar": "파 대비",
-    "statBirdies": "버디",
-    "statPhotos": "사진",
-    "statVideos": "동영상",
-    "stagePreparing": "준비 중",
-    "stageUploading": "업로드 중",
-    "stagePublishing": "게시 중",
-    "timeLeftSeconds": "{{n}}초 남음",
-    "timeLeftMinutes": "{{m}}분 {{s}}초 남음"
-  },
-  "emptyState": {
-    "headline": "Put it on the wall",
-    "shareLead": "Share {{phrase}}",
-    "ctaLabel": "Add photos or video",
-    "microcopy": "Up to 10 · photos, video, or both",
-    "phrases": [
-      "that green you just stuck",
-      "the fourball on the first tee",
-      "your card from this morning",
-      "the view from the 18th"
-    ],
-    "limitKicker": "UP TO {{count}} PHOTOS OR CLIPS",
-    "prompt": "What happened out there?",
-    "promptEdit": "Add to this post",
-    "nextStep": "Photos and clips now. The round and the course come on the next step."
-  },
-  "drafts": {
-    "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
-  },
-  "closeGuard": {
-    "mediaNotSaved_one": "{{count}} photo will not be saved",
-    "mediaNotSaved_other": "{{count}} photos will not be saved"
-  },
-  "detailRows": {
-    "optional": "Optional"
-  }
+ "schedule": {
+  "today": "Today",
+  "tomorrow": "Tomorrow"
+ },
+ "success": {
+  "posted": "Posted",
+  "postedBody": "It is live. Pull to refresh if you don't see it yet.",
+  "posting": "Posting...",
+  "scheduled": "Scheduled",
+  "scheduledBody": "It is queued and will go out on time.",
+  "scheduledFor": "Scheduled for {{when}}",
+  "uploadFailed": "Upload failed",
+  "uploadFailedFallback": "Something went wrong - your post was not published.",
+  "uploadingBody": "Uploading - we'll take it from here. You can keep using the app.",
+  "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
+  "liveKicker": "클럽하우스에 게시됨",
+  "uploadingKicker": "업로드 중 . {{n}}%",
+  "scheduledKicker": "예약 중 . {{n}}%",
+  "statGross": "그로스",
+  "statToPar": "파 대비",
+  "statBirdies": "버디",
+  "statPhotos": "사진",
+  "statVideos": "동영상",
+  "stagePreparing": "준비 중",
+  "stageUploading": "업로드 중",
+  "stagePublishing": "게시 중",
+  "timeLeftSeconds": "{{n}}초 남음",
+  "timeLeftMinutes": "{{m}}분 {{s}}초 남음"
+ },
+ "emptyState": {
+  "headline": "Put it on the wall",
+  "shareLead": "Share {{phrase}}",
+  "ctaLabel": "Add photos or video",
+  "microcopy": "Up to 10 · photos, video, or both",
+  "phrases": [
+   "that green you just stuck",
+   "the fourball on the first tee",
+   "your card from this morning",
+   "the view from the 18th"
+  ],
+  "limitKicker": "UP TO {{count}} PHOTOS OR CLIPS",
+  "prompt": "What happened out there?",
+  "promptEdit": "Add to this post",
+  "nextStep": "Photos and clips now. The round and the course come on the next step."
+ },
+ "drafts": {
+  "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
+ },
+ "closeGuard": {
+  "mediaNotSaved_one": "{{count}} photo will not be saved",
+  "mediaNotSaved_other": "{{count}} photos will not be saved",
+  "saveDraftKeepsNothingElse": "임시 저장 . 글과 태그만",
+  "saveDraftLosesMedia": "사진과 동영상은 저장되지 않습니다",
+  "saveDraftLosesSchedule": "예약 시간은 저장되지 않습니다",
+  "saveDraftLosesBoth": "사진, 동영상, 예약 시간은 저장되지 않습니다"
+ },
+ "detailRows": {
+  "optional": "Optional"
+ }
 }

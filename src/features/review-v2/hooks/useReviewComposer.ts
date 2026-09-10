@@ -30,8 +30,20 @@ export type WizardStep = 0 | 1 | 2;
 
 const DRAFT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
-function draftKey(courseId: string | null | undefined) {
-  return `review-draft:${courseId ?? 'unknown'}`;
+/* DRAFT KEYS (BRIEF_SHEET_BACK_BEHAVIOUR_04 §1).
+ *
+ * Two namespaces, never one:
+ *   create  review-draft:<courseId>
+ *   edit    review-draft:edit:<ratingId>
+ *
+ * A create draft and an edit draft for the same course are different bodies of
+ * work, and two edits of two different reviews are different again, so the key
+ * carries the rating id in edit mode. Nothing can collide.
+ */
+function draftKey(courseId: string | null | undefined, reviewId?: string | null) {
+  return reviewId
+    ? `review-draft:edit:${reviewId}`
+    : `review-draft:${courseId ?? 'unknown'}`;
 }
 
 interface DraftShape {
@@ -44,10 +56,14 @@ interface DraftShape {
   savedAt: number;
 }
 
-function readDraft(courseId: string | null | undefined): DraftShape | null {
+
+function readDraft(
+  courseId: string | null | undefined,
+  reviewId?: string | null,
+): DraftShape | null {
   try {
     if (typeof window === 'undefined') return null;
-    const raw = window.sessionStorage.getItem(draftKey(courseId));
+    const raw = window.sessionStorage.getItem(draftKey(courseId, reviewId));
     if (!raw) return null;
     const parsed = JSON.parse(raw) as DraftShape;
     if (!parsed || typeof parsed.savedAt !== 'number') return null;
@@ -58,23 +74,31 @@ function readDraft(courseId: string | null | undefined): DraftShape | null {
   }
 }
 
-function writeDraft(courseId: string | null | undefined, draft: DraftShape) {
+function writeDraft(
+  courseId: string | null | undefined,
+  draft: DraftShape,
+  reviewId?: string | null,
+) {
   try {
     if (typeof window === 'undefined') return;
-    window.sessionStorage.setItem(draftKey(courseId), JSON.stringify(draft));
+    window.sessionStorage.setItem(draftKey(courseId, reviewId), JSON.stringify(draft));
   } catch {
     /* private browsing throws */
   }
 }
 
-export function clearReviewDraft(courseId: string | null | undefined) {
+export function clearReviewDraft(
+  courseId: string | null | undefined,
+  reviewId?: string | null,
+) {
   try {
     if (typeof window === 'undefined') return;
-    window.sessionStorage.removeItem(draftKey(courseId));
+    window.sessionStorage.removeItem(draftKey(courseId, reviewId));
   } catch {
     /* private browsing throws */
   }
 }
+
 
 function seedFromExisting(existing: ExistingReview | null | undefined): ReviewComposerState {
   if (!existing) return EMPTY_STATE;
@@ -95,15 +119,44 @@ function seedFromExisting(existing: ExistingReview | null | undefined): ReviewCo
   };
 }
 
+function sameAsPublished(draft: DraftShape, base: ReviewComposerState): boolean {
+  const s = draft.scores ?? ({} as DraftShape['scores']);
+  return (
+    (draft.overall ?? null) === (base.overall ?? null) &&
+    (s.design ?? null) === (base.scores.design ?? null) &&
+    (s.condition ?? null) === (base.scores.condition ?? null) &&
+    (s.clubhouse ?? null) === (base.scores.clubhouse ?? null) &&
+    (s.facilities ?? null) === (base.scores.facilities ?? null) &&
+    (draft.reviewText ?? '') === (base.reviewText ?? '') &&
+    (draft.shareToFeed !== false) === (base.shareToFeed !== false) &&
+    (draft.teeLabel ?? null) === (base.teeLabel ?? null)
+  );
+}
+
 export function useReviewComposer(
   existing?: ExistingReview | null,
   courseId?: string | null,
 ) {
   const isEditMode = !!existing;
+  const reviewId = existing?.id ?? null;
 
-  // In edit mode the existing review always wins; drafts are create-mode only.
+  /* EDIT MODE PERSISTS TOO (BRIEF_SHEET_BACK_BEHAVIOUR_04 §1).
+   *
+   * It used to not: edit mode seeded from the published review and never wrote
+   * a draft, so an iOS edge-swipe out of an edit destroyed the rewrite outright
+   * while the header arrow — the path members use least — was the only one that
+   * asked. Both modes now write the same 24h sessionStorage draft, under keys
+   * that cannot collide (see draftKey).
+   *
+   * A restored EDIT draft is announced, never silent: showing text that differs
+   * from what is published without saying so would be a second fault. The
+   * announcement is suppressed when the stored draft is byte-identical to the
+   * published review, because then there is nothing to announce.
+   */
+  const publishedBase = useMemo(() => seedFromExisting(existing), [existing]);
+
   const restored = useMemo(
-    () => (isEditMode ? null : readDraft(courseId)),
+    () => readDraft(courseId, reviewId),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
@@ -120,6 +173,11 @@ export function useReviewComposer(
       teeLabel: restored.teeLabel ?? null,
     };
   });
+
+  // Edit mode only: true when unsaved changes were brought back from a draft.
+  const [restoredFromDraft, setRestoredFromDraft] = useState<boolean>(
+    () => !!(isEditMode && restored && !sameAsPublished(restored, publishedBase)),
+  );
 
   const [step, setStepRaw] = useState<WizardStep>(() => (restored?.step ?? 0) as WizardStep);
   const setStep = useCallback((n: WizardStep) => setStepRaw(n), []);
@@ -151,28 +209,47 @@ export function useReviewComposer(
     setState((s) => ({ ...s, teeLabel: label }));
   }, []);
 
-  // Debounced draft write. Create mode only; media is never persisted.
+  // Debounced draft write. Both modes; media is never persisted (see report).
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (isEditMode) return;
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      writeDraft(courseId, {
-        step,
-        overall: state.overall,
-        scores: state.scores,
-        reviewText: state.reviewText,
-        shareToFeed: state.shareToFeed,
-        teeLabel: state.teeLabel,
-        savedAt: Date.now(),
-      });
+      writeDraft(
+        courseId,
+        {
+          step,
+          overall: state.overall,
+          scores: state.scores,
+          reviewText: state.reviewText,
+          shareToFeed: state.shareToFeed,
+          teeLabel: state.teeLabel,
+          savedAt: Date.now(),
+        },
+        reviewId,
+      );
     }, 400);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [isEditMode, courseId, step, state]);
+  }, [courseId, reviewId, step, state]);
 
-  const clearDraft = useCallback(() => clearReviewDraft(courseId), [courseId]);
+  const clearDraft = useCallback(
+    () => clearReviewDraft(courseId, reviewId),
+    [courseId, reviewId],
+  );
+
+  /* GETTING BACK TO WHAT IS LIVE. A restoration the member cannot undo would
+   * trap them in an edit they may not remember making, so discarding returns
+   * the composer to the published review and drops the stored draft. */
+  const discardRestoredDraft = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    clearReviewDraft(courseId, reviewId);
+    setState(seedFromExisting(existing));
+    setRestoredFromDraft(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId, reviewId, existing]);
+
+
 
   const catsSet = useMemo(
     () =>
@@ -196,6 +273,9 @@ export function useReviewComposer(
     state,
     step,
     setStep,
+    restoredFromDraft,
+    discardRestoredDraft,
+
     setVerdict,
     setOverall,
     setCategory,

@@ -483,7 +483,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   }, [composer.state.overall, composer.state.scores, course.id, course.name]);
 
   // ---- navigation ------------------------------------------------------
-  /* THE DRAFT GUARD (BRIEF_SHEET_BACK_BEHAVIOUR_03 §1a).
+  /* THE DRAFT GUARD (BRIEF_SHEET_BACK_BEHAVIOUR_03 §1a, amended by _04 §1).
    *
    * This is the longest authored text in the app and the back arrow at step 0
    * used to call clearDraft() and leave — several paragraphs of prose destroyed
@@ -493,15 +493,20 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
    * category score, typed words, or an attached photo. NOT the tee label or
    * share toggle alone, which are defaults the member never touched.
    *
-   * PATHS COVERED / NOT COVERED is stated at the top of the file's report; the
-   * short version is that this component is a ROUTE, not a sheet, so it has one
-   * in-app dismiss (the header back arrow) and that is the path guarded. An OS
-   * or browser back leaves the route WITHOUT calling this, and that path is the
-   * safe one: the draft stays in sessionStorage for 24h and rehydrates on
-   * return. Edit mode does not persist (useReviewComposer skips writeDraft when
-   * isEditMode), so for an edit the arrow is the only thing standing between a
-   * rewritten review and nothing — which is why the guard is not create-only.
+   * PATHS: this component is a ROUTE, not a sheet, so it has one in-app dismiss
+   * (the header back arrow) and that is the path guarded. An OS or browser back
+   * leaves the route WITHOUT calling this — and BOTH MODES now survive it,
+   * because useReviewComposer writes the 24h sessionStorage draft for a create
+   * AND for an edit (_04 §1). The guard is kept as well: a prompt helps the
+   * member who is paying attention, a draft helps the one who was not, and this
+   * is the one surface holding paragraphs of a member's own prose.
+   *
+   * WHAT THE DRAFT COVERS: overall score, the four category scores, the review
+   * text, share-to-feed and tee label, plus the wizard step. WHAT IT DOES NOT:
+   * ATTACHED MEDIA. Photos and video live in the upload pipeline, are not
+   * serialisable to sessionStorage, and are still lost on an OS back.
    */
+
   const draftDirty =
     composer.state.overall != null ||
     composer.catsSet > 0 ||
@@ -775,6 +780,50 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           </div>
         ))}
       </div>
+
+      {/* RESTORED EDIT DRAFT (_04 §1). Says so out loud, and offers the way back
+          to the published version. Not amber: amber means the viewing member. */}
+      {composer.restoredFromDraft && (
+        <div
+          role="status"
+          style={{
+            margin: '0 16px 16px',
+            padding: '12px 14px',
+            border: `1px solid ${RV2.hairline}`,
+            borderRadius: 12,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: RV2.ink }}>
+            {t('review.wizard.draftRestored.title')}
+          </div>
+          <div style={{ fontSize: 12.5, lineHeight: 1.45, color: RV2.secondary }}>
+            {t('review.wizard.draftRestored.body')}
+          </div>
+          <button
+            type="button"
+            onClick={composer.discardRestoredDraft}
+            style={{
+              alignSelf: 'flex-start',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              fontSize: 11.5,
+              fontWeight: 700,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              color: RV2.danger,
+              cursor: 'pointer',
+            }}
+          >
+            {t('review.wizard.draftRestored.discard')}
+          </button>
+        </div>
+      )}
+
+
 
       <div
         aria-live="polite"
