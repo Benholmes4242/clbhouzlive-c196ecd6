@@ -140,16 +140,18 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       <HolesSection userId={userId} connectionId={connection.id} readOnly={readOnly} />
 
       {/* 7 — PERSONAL BESTS (Section H). records/PersonalBests is dead-listed,
-          not deleted. AchievementsPanel STAYS BELOW until the new TROPHY ROOM ›
-          terminal row is verified opening the room — the tile is the current
-          door. GamMount stays at page level regardless. */}
+          not deleted. AchievementsPanel is now OFF this page and dead-listed
+          too: the terminal TROPHY ROOM › row at the foot of Personal bests is
+          verified opening the room, so the tile's only reason to exist is gone.
+          GamMount stays at page level, so ?gam=trophies (with &section= and
+          &badge=) and the ?sheet= aliases all still resolve. */}
       <PersonalBestsSection
         connectionId={connection.id}
         currentHandicap={currentHandicap}
         viewMode={viewMode}
         ownerFirstName={ownerFirstName}
       />
-      <AchievementsPanel userId={userId} viewMode={viewMode} ownerFirstName={ownerFirstName} />
+
       {/* StreaksCard (the ON THE LINE - {n} ACTIVE rail) is OFF this page and
           dead-listed, not deleted. It went with the trophies layer: the streak
           material lives in the trophy room's StreaksPanel, whose door is the
