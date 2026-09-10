@@ -225,7 +225,7 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
           {handicap != null ? formatIndex(handicap) : '\u2014'}
         </div>
         {withheld ? null : show90 || show12 ? (
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 28, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 34, minWidth: 0 }}>
             {show90 && deltaCell(model.delta90 as number, t('common:handicap.index.delta90'), show12 ? 'left' : 'right')}
             {show12 && deltaCell(model.delta12 as number, t('common:handicap.index.delta12m'), 'right')}
           </div>

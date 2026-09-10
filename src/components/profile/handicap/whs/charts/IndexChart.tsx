@@ -23,6 +23,8 @@
 import React, { useId, useMemo } from 'react';
 import { CHART, CHART_FONT, LABEL_STYLE } from './tokens';
 import { monotonePath } from '@/lib/charts/monotonePath';
+/* Figures carry a TRUE MINUS / the WHS plus convention — never a hyphen. */
+import { fmtHcp } from '@/lib/whs/format';
 
 export interface IndexPoint {
   t: string;
@@ -51,8 +53,32 @@ interface Props {
 
 const VIEW_W = 320;
 const PAD_X = 4;
-/** 16px of headroom at each end so neither callout clips. */
-const PAD_Y = 16;
+
+/* THE POINT-LABEL BAND (SNAGS_01 §A).
+ *
+ * A callout label is HTML, absolutely positioned against its point, so the
+ * plot area must RESERVE the room the label needs — it is never shrunk and
+ * never nudged by a fixed offset, because a fixed offset is only correct at
+ * one index value. The reservation is derived from the label's own metrics:
+ *
+ *   band = label line height + the point radius it clears + clearance
+ *
+ * Applied at BOTH ends, so the low label (which hangs below its point, and is
+ * the current index whenever the series ends at its low) can never reach the
+ * axis row beneath the plot, and the high label can never leave the box. */
+/** Callout label font size / line box (fontSize 10, lineHeight ~1.2). */
+const LABEL_FS = 10;
+const LABEL_LH = Math.round(LABEL_FS * 1.2); // 12
+/** Largest marker a label has to clear: the last-point dot. */
+const POINT_R = 4.5;
+/** Air between the marker and the label. */
+const LABEL_CLEAR = 4;
+/** Distance from the point centre to the near edge of its label. */
+const LABEL_OFFSET = POINT_R + LABEL_CLEAR; // 8.5
+/** Room a label occupies beyond its point, in the direction it is drawn. */
+const LABEL_BAND = LABEL_OFFSET + LABEL_LH; // 20.5
+/** Plot-area inset: derived from the band, never typed as a number. */
+const PAD_Y = Math.ceil(LABEL_BAND); // 21
 const FLAT_EPS = 0.001;
 
 function zoneColor(v: number, best: number, worst: number): string {
@@ -226,7 +252,7 @@ export const IndexChart: React.FC<Props> = ({
               ),
           )}
 
-          <circle cx={pts[lastIdx].x} cy={pts[lastIdx].y} r={4.5} fill={fillColor} />
+          <circle cx={pts[lastIdx].x} cy={pts[lastIdx].y} r={POINT_R} fill={fillColor} />
         </svg>
 
         {/* Labels live in HTML: the SVG is stretched, text must not be. */}
@@ -234,11 +260,20 @@ export const IndexChart: React.FC<Props> = ({
           const fx = pts[c.idx].x / VIEW_W;
           const nearStart = fx < 0.0625;
           const nearEnd = fx > 0.9375;
+          /* THE LABEL MOVES, IT NEVER SHRINKS (§A). The band reserved by
+             PAD_Y means neither side can collide, but if a caller ever hands
+             this chart a height smaller than two bands, the label FLIPS to
+             the other side of its point rather than losing size. */
+          const py = pts[c.idx].y;
+          let above = c.above;
+          if (above && py - LABEL_BAND < 0) above = false;
+          else if (!above && py + LABEL_BAND > height) above = true;
           const style: React.CSSProperties = {
             position: 'absolute',
-            top: pts[c.idx].y + (c.above ? -8 : 15),
-            transform: c.above ? 'translateY(-100%)' : undefined,
-            fontSize: 10,  // AXIS floor: chart tick/axis label, 10 not 11
+            top: py + (above ? -LABEL_OFFSET : LABEL_OFFSET),
+            transform: above ? 'translateY(-100%)' : undefined,
+            fontSize: LABEL_FS, // AXIS floor: chart tick/axis label, 10 not 11
+            lineHeight: `${LABEL_LH}px`,
             fontWeight: 700,
             letterSpacing: '-0.01em',
             color: c.color,
@@ -250,13 +285,13 @@ export const IndexChart: React.FC<Props> = ({
           else if (nearEnd) style.right = 2;
           else {
             style.left = `${fx * 100}%`;
-            style.transform = c.above
+            style.transform = above
               ? 'translate(-50%, -100%)'
               : 'translateX(-50%)';
           }
           return (
-            <span key={`l${c.idx}-${c.above ? 'h' : 'l'}`} style={style}>
-              {c.v.toFixed(1)}
+            <span key={`l${c.idx}-${above ? 'h' : 'l'}`} style={style}>
+              {fmtHcp(c.v)}
             </span>
           );
         })}
@@ -311,8 +346,8 @@ export const IndexChart: React.FC<Props> = ({
             ...LABEL_STYLE,
           }}
         >
-          <span style={{ color: CHART.DOWN }}>Lowest {min.toFixed(1)}</span>
-          <span>Highest {max.toFixed(1)}</span>
+          <span style={{ color: CHART.DOWN }}>Lowest {fmtHcp(min)}</span>
+          <span>Highest {fmtHcp(max)}</span>
         </div>
       )}
     </div>

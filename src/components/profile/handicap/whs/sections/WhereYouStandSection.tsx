@@ -7,6 +7,8 @@ import type {
   HandicapPercentileBucket,
   HandicapBucket,
 } from '@/lib/whs/types';
+/* WHS plus convention / true minus — never a hyphen in a figure. */
+import { fmtHcp } from '@/lib/whs/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 
@@ -390,7 +392,7 @@ const AvailableCard: React.FC<{
                 letterSpacing: '-0.02em',
               }}
             >
-              {data.user_handicap.toFixed(1)}
+              {fmtHcp(data.user_handicap)}
             </span>
           </div>
 

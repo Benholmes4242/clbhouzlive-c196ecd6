@@ -20,6 +20,8 @@ import React, { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+/* TRUE MINUS on the differential; WHS plus convention on the index. */
+import { fmtDiff, fmtHcp } from '@/lib/whs/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useLastRound } from '@/lib/whs/hooks';
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
@@ -85,7 +87,7 @@ const LastRoundSection: React.FC<Props> = ({
     : dateLabel;
 
   const diff = round.handicap_differential;
-  const playedTo = diff == null ? null : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`;
+  const playedTo = diff == null ? null : fmtDiff(diff, { plus: true });
   const gross = round.adjusted_gross;
   const stableford = round.stableford_points;
 
@@ -172,7 +174,7 @@ const LastRoundSection: React.FC<Props> = ({
                   <>
                     <span style={KICKER}>{t('common:handicap.lastRound.index')}</span>
                     <span style={{ fontSize: 13, fontWeight: 600, color: CHART.MUTE, ...FIG }}>
-                      {indexBefore.toFixed(1)}
+                      {fmtHcp(indexBefore)}
                     </span>
                     <span aria-hidden style={{ ...KICKER, letterSpacing: 0 }}>
                       &rarr;
@@ -185,14 +187,14 @@ const LastRoundSection: React.FC<Props> = ({
                         ...FIG,
                       }}
                     >
-                      {indexAfter.toFixed(1)}
+                      {fmtHcp(indexAfter)}
                     </span>
                   </>
                 ) : (
                   <>
                     <span style={KICKER}>{t('common:handicap.lastRound.indexHeldAt')}</span>
                     <span style={{ fontSize: 15, fontWeight: 700, color: CHART.INK, ...FIG }}>
-                      {indexAfter.toFixed(1)}
+                      {fmtHcp(indexAfter)}
                     </span>
                   </>
                 ))}
