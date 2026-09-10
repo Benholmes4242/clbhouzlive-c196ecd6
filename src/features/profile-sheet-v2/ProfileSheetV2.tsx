@@ -1,21 +1,39 @@
 /**
  * ProfileSheetV2 — Switchboard redesign of the profile hub bottom sheet.
  *
- * Stage 1 (PS1): frame + actor cards + HCP strip. Body carries PS2
- * placeholder comments where the action row / nav group / sign-out land.
- *
  * Prop contract intentionally matches src/components/profile/ProfileHubSheet.tsx
  * verbatim so the eventual cutover in PostingAsMenu is a one-line import
  * swap. This file must not import from that old sheet or HandicapMasthead.
+ *
+ * BRIEF_ACCOUNT_SHEET_REBUILD E — THIS SHEET USES THE SHARED PRIMITIVE.
+ * It was a bespoke portal (own backdrop, own grab handle, own framer drag, own
+ * 85dvh cap, own scroll lock) and therefore sat OUTSIDE the sheet back stack
+ * that BottomSheet owns, so hardware back and the back gesture did not dismiss
+ * it. It is now BottomSheet + SheetHeader: fixed head titled "Account", body
+ * scrolls, back-stack registration is automatic.
+ *
+ * TWO KNOWN DELTAS, both accepted deliberately:
+ *  1. NO CLOSE ANIMATION. The 220ms slide-down is gone; BottomSheet unmounts on
+ *     close like all its other consumers. Being the one sheet outside the back
+ *     stack was the worse trade.
+ *  2. SCROLL LOCK IS WEAKER HERE THAN IT WAS. This file called
+ *     lockBodyScroll(), which is reference-counted and does position-fixed
+ *     locking with scroll capture and restore. BottomSheet only sets
+ *     body.style.overflow = 'hidden'. That is a fact about all of BottomSheet's
+ *     consumers, not about this sheet, and moving the primitive onto the helper
+ *     is filed as its own change — it is not bundled here.
+ *  3. Drag-to-dismiss is touch-only on the shared primitive (no mouse drag on
+ *     desktop). Left as-is: it matches every other sheet.
+ *
+ * The overlay perf timings (overlayOpen / overlayMark) are preserved by wrapping
+ * the shared sheet rather than by keeping the bespoke frame.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { AnimatePresence, motion, useMotionValue, animate, useDragControls } from 'framer-motion';
-import type { PanInfo } from 'framer-motion';
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { SheetHeader } from '@/components/ui/SheetHeader';
 import ActorCards from './components/ActorCards';
 import HcpStrip from './components/HcpStrip';
 import QuickActionsRow from './components/QuickActionsRow';
@@ -26,6 +44,7 @@ import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+
 
 interface Profile {
   id: string;
@@ -55,8 +74,11 @@ export interface ProfileSheetV2Props {
   isLoading?: boolean;
 }
 
-const SHEET_BG = A.CANVAS;
+/* SHEET_BG is gone: BottomSheet owns the one canonical sheet surface
+   (SHEET_SURFACE, #15171F) and applies it after any caller style, so a local
+   background here could not win and would only mislead. */
 const SKELETON_TILE = A.TRACK;
+
 
 function SheetSkeleton() {
   const block = (h: number, style: React.CSSProperties = {}) => (
@@ -101,10 +123,8 @@ export default function ProfileSheetV2({
   isAdmin,
   isLoading,
 }: ProfileSheetV2Props) {
-  const sheetY = useMotionValue(0);
-  // Drag is grab-handle only so the body below can scroll internally.
-  const dragControls = useDragControls();
   const { openInviteSheet } = useInviteSheet();
+
   const handleInviteFriends = () => {
     onClose();
     setTimeout(() => openInviteSheet('profile_sheet'), 250);
@@ -126,17 +146,7 @@ export default function ProfileSheetV2({
     onClose();
     setTimeout(() => onNavigate(route), 40);
   };
-  const panelRef = useRef<HTMLDivElement | null>(null);
-  const openTweenRef = useRef<ReturnType<typeof animate> | null>(null);
   const ovlId = useRef<number>(-1);
-  const [mounted, setMounted] = useState(false);
-
-  // Body scroll lock while open.
-  useEffect(() => {
-    if (!open) return;
-    lockBodyScroll();
-    return () => unlockBodyScroll();
-  }, [open]);
 
   // profile_hub_sheet_opened — instrumentation was lost in the v2 rewrite and
   // re-added 7 Sep 2026. Fires once per open, matching the v1 sheet's contract.
@@ -148,155 +158,62 @@ export default function ProfileSheetV2({
     });
   }, [open, currentActor.type, isAdmin]);
 
-
-  // Overlay perf timing.
+  /* Overlay perf timing — preserved through the migration (E). The bespoke
+     frame owned the open/close tweens, so it could mark 'animation-start' and
+     'animation-done' itself. BottomSheet owns the transition now, so the two
+     marks that remain measurable from here are the open and the close; the
+     animation pair is emitted around the primitive's own slide-in frame. */
   useEffect(() => {
     if (open) {
       ovlId.current = overlayOpen('profile-sheet-v2');
-    } else if (ovlId.current >= 0) {
+      const raf = requestAnimationFrame(() => {
+        if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-start');
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+    if (ovlId.current >= 0) {
       overlayMark(ovlId.current, 'close-start');
+      overlayMark(ovlId.current, 'closed');
+      ovlId.current = -1;
     }
   }, [open]);
 
-  // Open: mount, seed offscreen, slide to 0.
-  useEffect(() => {
-    if (!open) return;
-    const fallbackH = typeof window !== 'undefined' ? window.innerHeight : 1000;
-    sheetY.set(fallbackH);
-    setMounted(true);
-    const raf = requestAnimationFrame(() => {
-      const h = panelRef.current?.offsetHeight ?? fallbackH;
-      sheetY.set(h);
-      if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-start');
-      openTweenRef.current?.stop();
-      openTweenRef.current = animate(sheetY, 0, {
-        type: 'tween',
-        duration: 0.25,
-        ease: [0.32, 0.72, 0, 1],
-      });
-      openTweenRef.current.finished
-        .then(() => { if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-done'); })
-        .catch(() => {});
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [open, sheetY]);
+  /* Body scroll lock, escape, backdrop, drag-to-dismiss, the 85dvh cap and the
+     back-stack entry all belong to BottomSheet now. Nothing is reimplemented
+     here; see the file header for the two accepted deltas. */
 
-  // Close: slide down then unmount.
-  useEffect(() => {
-    if (open || !mounted) return;
-    openTweenRef.current?.stop();
-    const h = panelRef.current?.offsetHeight ?? window.innerHeight;
-    const t = animate(sheetY, h, {
-      type: 'tween',
-      duration: 0.22,
-      ease: [0.32, 0.72, 0, 1],
-    });
-    t.finished
-      .then(() => {
-        setMounted(false);
-        if (ovlId.current >= 0) overlayMark(ovlId.current, 'closed');
-      })
-      .catch(() => {});
-    return () => { t.stop(); };
-  }, [open, mounted, sheetY]);
-
-  // Escape closes.
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', h);
-    return () => document.removeEventListener('keydown', h);
-  }, [open, onClose]);
-
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (info.offset.y > 100 || info.velocity.y > 500) {
-      onClose();
-    } else {
-      animate(sheetY, 0, { type: 'spring', damping: 25, stiffness: 300 });
-    }
-  };
-
-  if (typeof document === 'undefined') return null;
-
-  const content = (
+  return (
     <>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="ps2-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={onClose}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(0,0,0,0.4)',
-              zIndex: 9998,
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      {mounted && (
-        <motion.div
-          ref={panelRef}
-          drag="y"
-          dragListener={false}
-          dragControls={dragControls}
-          dragConstraints={{ top: 0, bottom: 0 }}
-          dragElastic={{ top: 0, bottom: 0.4 }}
-          onDragStart={() => { openTweenRef.current?.stop(); }}
-          onDragEnd={handleDragEnd}
+      <BottomSheet
+        open={open}
+        onClose={onClose}
+        zIndexBase={9998}
+        topRadius={24}
+        ariaLabelledBy="ps2-title"
+        style={{
+          boxShadow: '0 -12px 40px rgba(0,0,0,0.3)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        {/* FIXED HEAD (E). The sheet had no title at all, so a scrolled open
+            landed mid-card with nothing naming the surface. */}
+        <SheetHeader
+          title="Account"
+          onClose={onClose}
+          dark
+          borderBottom
+        />
+        <div
           style={{
-            y: sheetY,
-            position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 9999,
-            background: SHEET_BG,
-            borderRadius: '24px 24px 0 0',
-            boxShadow: '0 -12px 40px rgba(0,0,0,0.3)',
-            maxHeight: '85dvh',
-            overflow: 'hidden',
-            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-            display: 'flex',
-            flexDirection: 'column',
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            overscrollBehavior: 'contain',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div
-            onPointerDown={(e) => dragControls.start(e)}
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              paddingTop: 8,
-              paddingBottom: 4,
-              flexShrink: 0,
-              touchAction: 'none',
-              cursor: 'grab',
-            }}
-          >
-            <div
-              style={{
-                width: 40,
-                height: 4.5,
-                borderRadius: 999,
-                background: A.BORDER,
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              overflowY: 'auto',
-              overscrollBehavior: 'contain',
-              WebkitOverflowScrolling: 'touch',
-            }}
-          >
           {isLoading ? (
             <SheetSkeleton />
           ) : (
@@ -329,14 +246,12 @@ export default function ProfileSheetV2({
                 /* D2: the dashed "+ Business" tile left the actor rail; this is
                    what decides whether the business row offers creation. */
                 hasBusinessActor={profiles.some((p) => p.type === 'business')}
-
               />
               <SignOutRow onNavigate={onNavigate} />
             </div>
           )}
-          </div>
-        </motion.div>
-      )}
+        </div>
+      </BottomSheet>
       <YourCourseAnalyticsSheet
         open={analyticsSheetOpen}
         onClose={() => setAnalyticsSheetOpen(false)}
@@ -345,6 +260,4 @@ export default function ProfileSheetV2({
       />
     </>
   );
-
-  return createPortal(content, document.body);
 }

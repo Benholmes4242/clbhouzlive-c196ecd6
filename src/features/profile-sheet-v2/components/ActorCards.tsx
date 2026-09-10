@@ -57,6 +57,17 @@ export default function ActorCards({
   const { countFor } = useActorUnreadCounts();
   const [switchingId, setSwitchingId] = React.useState<string | null>(null);
 
+  /* BRIEF_ACCOUNT_SHEET_REBUILD D3 — CARD WIDTH IS A FUNCTION OF ACTOR COUNT.
+     A peek is an affordance for content past the fold; with exactly two actors
+     there is nothing past it, so a fixed 220 showed a truncated tile
+     advertising nothing (2 x 220 + 10 gap + 40 side padding = 470 against a
+     390pt screen). Two or fewer actors therefore get a width that FITS:
+     (390 - 40 padding - 10 gap) / 2 = 170, taken as 168 to leave 2px slack for
+     any narrower device. Three or more keeps 220, so the third genuinely peeks
+     and the rail scrolls because something really is past the edge. */
+  const CARD_W = profiles.length <= 2 ? 168 : 220;
+
+
   // Active actor first; preserve original order for the rest (stable sort).
   const orderedProfiles = React.useMemo(() => {
     const indexed = profiles.map((p, i) => ({ p, i }));
@@ -135,7 +146,7 @@ export default function ActorCards({
               style={{
                 position: 'relative',
                 flexShrink: 0,
-                width: 220,
+                width: CARD_W,
                 background: A.PANEL,
                 borderRadius: 16,
                 padding: 14,

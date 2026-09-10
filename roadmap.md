@@ -1036,3 +1036,21 @@ correctness one.
 ### Over to Ben on device
 Two counter error states, the three-figure visitor hero, ROUNDS reading 245, the
 remainder tile at three digits, and the four legacy labels on one line.
+
+### 4. OPEN - BottomSheet does the weaker scroll lock, for all 52 consumers
+`lockBodyScroll` (src/lib/bodyScrollLock.ts) is reference-counted and does
+position-fixed locking with scroll-position capture and restore, route-aware
+restore on navigate-away, and a force-release escape hatch. `BottomSheet` only
+sets `body.style.overflow = 'hidden'`, so under it the page can still rubber-band
+on iOS and nested overlays cannot stack their locks. ProfileSheetV2 used the
+helper before BRIEF_ACCOUNT_SHEET_REBUILD E and now uses the primitive, so that
+one sheet regressed knowingly. SCOPE IF PICKED UP: move `BottomSheet` onto
+lock/unlockBodyScroll and verify all 52 consumers, especially sheets opened over
+an inner scroller and sheets that navigate on close. Deliberately NOT bundled
+with E: 52 consumers is not a side effect of tidying one sheet.
+
+### Also from BRIEF_ACCOUNT_SHEET_REBUILD E
+- ProfileSheetV2 no longer animates its close (BottomSheet unmounts on close,
+  as it does for every other consumer). Accepted.
+- Drag-to-dismiss is touch-only on the shared primitive: no mouse drag on
+  desktop. Noted, not fixed - it matches every other sheet.
