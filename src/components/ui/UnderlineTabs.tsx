@@ -1,4 +1,5 @@
 import React from 'react';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
 /**
  * TIER 1 canonical primary-nav primitive.
@@ -11,7 +12,7 @@ import React from 'react';
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
-const DEFAULT_UNDERLINE = '#15171F';
+const DEFAULT_UNDERLINE = INK_ON_LIGHT;
 
 export interface UnderlineTabsOption<T extends string> {
   id: T;

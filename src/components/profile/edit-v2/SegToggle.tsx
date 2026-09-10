@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
 const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -43,7 +44,7 @@ export function SegToggle({ options, value, onChange, fill }: SegToggleProps) {
               /* DARK INVERSION: selected = light chip, unselected = quiet well.
                  Same inversion FilterChips took. Check glyph inherits colour.
                  borderRadius 11 is chip-row geometry — NOT the 14px field canon. */
-              color: active ? '#15171F' : 'rgba(248,250,252,0.62)',
+              color: active ? INK_ON_LIGHT : 'rgba(248,250,252,0.62)',
               background: active ? '#F8FAFC' : 'rgba(255,255,255,0.06)',
               border: active
                 ? 'none'

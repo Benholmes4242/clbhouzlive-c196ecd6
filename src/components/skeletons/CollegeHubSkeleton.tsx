@@ -6,12 +6,13 @@
  */
 import { Skeleton } from '@/components/ui/skeleton';
 import { TOUR_HERO_BAND_H } from '@/features/tourhub/_shared/tokens';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const CHARCOAL = '#14161c';
 
 export const CollegeHubSkeleton = () => {
   return (
-    <div style={{ background: '#15171F', minHeight: '100dvh' }}>
+    <div style={{ background: PAGE_CANVAS, minHeight: '100dvh' }}>
       {/* Hero - matches CollegeHeroMasthead charcoal fallback exactly */}
       <div
         style={{

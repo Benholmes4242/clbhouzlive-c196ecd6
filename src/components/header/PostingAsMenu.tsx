@@ -370,7 +370,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                         <span
                           className={cn(
                             "absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#F7931E] text-white text-[9px] font-bold flex items-center justify-center",
-                            useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-[#15171F]"
+                            useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-[var(--bg-page)]"
                           )}
                           aria-label={`${actorUnread} unread for ${actor.name}`}
                         >

@@ -3,6 +3,7 @@ import { useWireActivity, type WireActivityRow, type WireFeatType } from './hook
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { TickerShell } from '@/components/shared/wire/TickerShell';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -97,7 +98,7 @@ export function WireTicker() {
         items={nodes}
         itemKey={(i) => `${items[i]?.score_id}-${i}`}
         height={36}
-        background="#15171F"
+        background={PAGE_CANVAS}
         gap={24}
         durationSec={durationSec}
         padding="0 14px"

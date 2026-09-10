@@ -56,6 +56,7 @@ import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/Lates
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
 /**
  * Emphasise only the figures inside a sentence: INK 700 with tabular figures
@@ -833,7 +834,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             type="button"
             onClick={() => onLensChange('played')}
             className="w-full mt-4 h-11 rounded-xl text-[12px] font-bold uppercase tracking-[0.10em]"
-            style={{ background: INK, color: '#15171F' }}
+            style={{ background: INK, color: INK_ON_LIGHT }}
           >
             {country
               ? t('statBrowse.empty.lensSwitch', { country })

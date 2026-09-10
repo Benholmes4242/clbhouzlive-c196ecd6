@@ -1,4 +1,5 @@
 import React from 'react';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
 /**
  * ScopeSegment — the canonical "Lens" segment control used across:
@@ -46,7 +47,7 @@ export function ScopeSegment<T extends string>({
   const dark = tone === 'dark';
   const capsuleBg = dark ? 'rgba(255,255,255,0.05)' : '#FFFFFF';
   const capsuleBorder = dark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.08)';
-  const activeBg = dark ? '#FFFFFF' : '#15171F';
+  const activeBg = dark ? '#FFFFFF' : INK_ON_LIGHT;
   const activeInk = dark ? '#12141A' : '#FFFFFF';
   const inactiveInk = dark ? 'rgba(255,255,255,0.56)' : 'rgba(15,23,42,0.55)';
   return (

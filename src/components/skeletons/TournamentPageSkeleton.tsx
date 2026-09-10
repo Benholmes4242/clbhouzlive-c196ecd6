@@ -6,8 +6,9 @@
  */
 import { Skeleton } from '@/components/ui/skeleton';
 import { TOUR_HERO_BAND_H } from '@/features/tourhub/_shared/tokens';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
-const SLATE_50 = '#15171F';
+const SLATE_50 = PAGE_CANVAS;
 const HAIRLINE_INK_8 = 'rgba(255,255,255,0.10)';
 
 export const TournamentPageSkeleton = () => {

@@ -8,8 +8,9 @@
  */
 
 import { Skeleton } from '@/components/ui/skeleton';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
-const SLATE_50 = '#15171F';
+const SLATE_50 = PAGE_CANVAS;
 const SURFACE = '#1B1E27';
 const HAIRLINE_INK_8 = 'rgba(255,255,255,0.10)';
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import {
   INK,
   SC_FILL_GOLD,
@@ -145,7 +146,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
         : variant === 'par'
           ? parInk
           : variant === 'eagle' || variant === 'alba'
-            ? '#15171F'
+            ? INK_ON_LIGHT
             : INK);
     const ringStep = STROKE + RING_GAP;
     const markInset = ringCount * ringStep;

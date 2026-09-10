@@ -9,6 +9,7 @@
  */
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { STATUS_BAR_CANVAS } from '@/lib/tokens/surfaces';
 
 export { A };
 
@@ -18,7 +19,7 @@ export const S = {
   /** Native status bar: LIGHT icons over the dark ground. */
   STATUS_BAR_STYLE: 'light' as const,
   /** Median expects RRGGBB prefixed with the alpha byte. */
-  STATUS_BAR_COLOR: 'FF15171F',
+  STATUS_BAR_COLOR: STATUS_BAR_CANVAS,
 
   /** FACTS — names, captions, figures. */
   INK: A.INK,

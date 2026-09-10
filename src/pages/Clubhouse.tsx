@@ -79,6 +79,7 @@ import { useClubhouseFeedNav } from '@/components/clubhouse/hooks/useClubhouseFe
 
 import { MoreOptionsDrawer } from '@/components/clubhouse/MoreOptionsDrawer';
 import { ClubhouseEmptyState } from '@/components/clubhouse/ClubhouseEmptyState';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 
 
@@ -492,7 +493,7 @@ const ClubhouseContent = () => {
       fixedHeight
       hasBottomNav={false}
       style={{ 
-        "--bg-page": "#15171F", 
+        "--bg-page": PAGE_CANVAS, 
         position: 'relative', 
         isolation: 'isolate', 
         zIndex: 0

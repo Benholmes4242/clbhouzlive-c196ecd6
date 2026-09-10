@@ -1,6 +1,7 @@
 import React from 'react';
 import { Compass, Users } from 'lucide-react';
 import { FriendsEmptyState } from '@/components/clubhouse/FriendsEmptyState';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface ClubhouseEmptyStateProps {
   activeTab: 'foryou' | 'friends';
@@ -26,7 +27,7 @@ export const ClubhouseEmptyState: React.FC<ClubhouseEmptyStateProps> = ({
       return (
         <div
           className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-          style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
+          style={{ background: PAGE_CANVAS, paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
         >
           <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
             <Users className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.5)' }} />
@@ -48,7 +49,7 @@ export const ClubhouseEmptyState: React.FC<ClubhouseEmptyStateProps> = ({
       return (
         <div
           className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-          style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
+          style={{ background: PAGE_CANVAS, paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
         >
           <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
             <Users className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.5)' }} />
@@ -70,7 +71,7 @@ export const ClubhouseEmptyState: React.FC<ClubhouseEmptyStateProps> = ({
   return (
     <div
       className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-      style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
+      style={{ background: PAGE_CANVAS, paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)' }}
     >
       <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
         <Compass className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.5)' }} />

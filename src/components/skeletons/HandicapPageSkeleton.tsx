@@ -1,4 +1,5 @@
 import React from 'react';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const shimmer: React.CSSProperties = {
   background: 'linear-gradient(90deg, #1B1E27 25%, #20242E 50%, #1B1E27 75%)',
@@ -11,7 +12,7 @@ export const HandicapPageSkeleton: React.FC = () => (
   <div
     className="min-h-screen w-full"
     style={{
-      background: '#15171F',
+      background: PAGE_CANVAS,
       paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
     }}
   >

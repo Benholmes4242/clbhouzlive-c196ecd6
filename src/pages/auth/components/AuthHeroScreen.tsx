@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { isMedianApp } from '@/utils/median/isMedianApp';
 import { BODY, DISPLAY_TRACKING } from '@/lib/tokens/type';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 // Toggle wordmark visibility
 const SHOW_WORDMARK = false;
@@ -122,7 +123,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       {/* Background */}
       <div
         className="absolute inset-0"
-        style={{ background: '#15171F' }}
+        style={{ background: PAGE_CANVAS }}
       />
 
       <div className="relative flex-1 flex flex-col px-6 pt-safe overflow-y-auto">
@@ -163,7 +164,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         <div
           className="pt-6 -mx-6 px-6"
           style={{
-            background: '#15171F',
+            background: PAGE_CANVAS,
             paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',
           }}
         >
@@ -338,7 +339,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       </div>
 
       <style>{`
-        html, body { background-color: #15171F !important; }
+        html, body { background-color: var(--bg-page) !important; }
 
         @keyframes auth-logo-in {
           0% { opacity: 0; transform: scale(0.85) translateY(20px); }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import {
   installBuildFreshnessCheck,
   subscribeBuildFreshness,
@@ -47,7 +48,7 @@ export default function UpdateReadyBar() {
         onClick={() => window.location.reload()}
         style={{
           background: '#F7931E',
-          color: '#15171F',
+          color: INK_ON_LIGHT,
           border: 'none',
           borderRadius: 8,
           padding: '7px 14px',

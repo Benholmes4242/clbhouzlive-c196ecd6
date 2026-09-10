@@ -19,6 +19,7 @@ import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
 import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
 import CreateSheetV3 from '@/features/post-v2/components/CreateSheetV3';
 import { NAV_CLEARANCE, NAV_PILL_H_FALLBACK, NAV_PILL_H_VAR } from '@/lib/navClearance';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
 
 /**
@@ -422,7 +423,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                                 padding: '0 3px',
                                 borderRadius: 999,
                                 background: '#F7931E',
-                                color: '#15171F',
+                                color: INK_ON_LIGHT,
                                 fontSize: 8,
                                 fontWeight: 700,
                                 lineHeight: '14px',
