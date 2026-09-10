@@ -29,15 +29,15 @@ interface BottomSheetProps {
   style?: React.CSSProperties;
   ariaLabelledBy?: string;
   /*
-   * BRIEF_SHEET_BACK_BEHAVIOUR §2 — WHO OWNS THE HISTORY ENTRY.
-   *
-   * Default false: this sheet pushes and pops its own history entry, with no
-   * action required from its author. Set true ONLY for a sheet whose open
-   * state lives in the URL (?gam= / ?sheet= / ?score= / ?compare= / auth
-   * form), because that query parameter already created the entry. Naming the
-   * OWNER rather than a behaviour is deliberate — it is not "disable back".
+   * BRIEF_SHEET_BACK_BEHAVIOUR_02 §1 — `urlOwnsHistoryEntry` IS GONE FROM THE
+   * TYPE. It shipped as an opt-out and never acquired a single consumer: every
+   * sheet, URL-addressed or not, registers with the stack. An unused escape
+   * hatch is a capability that reads as tested and is not, so it is removed
+   * rather than left declared. Passing it is now a COMPILE ERROR. If a sheet
+   * ever genuinely needs a different history owner, that is a new named prop
+   * introduced with its consumer, not a standing option.
    */
-  urlOwnsHistoryEntry?: boolean;
+
   /*
    * BRIEF_SHEET_BACKGROUND_CANON_02 §1 — `variant` AND `surfaceColor` ARE GONE
    * FROM THE TYPE, not merely ignored. A silent no-op reports as a working
