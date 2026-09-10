@@ -70,20 +70,9 @@ export const CircleSection: React.FC<Props> = ({ userId }) => {
 
   const cohorts = useMemo(() => buildLeaderboardCohorts(data), [data]);
 
-  const clbhouzIds = useMemo(
-    () =>
-      cohorts.active
-        .concat(cohorts.inactive)
-        .map((e) => e.friend_user_id)
-        .filter((v): v is string => !!v),
-    [cohorts],
-  );
-  const { data: clubs } = useCircleClubs(clbhouzIds);
-
-  const clubFor = (e: FriendLeaderboardEntry): string | null => {
-    const viaClbhouz = e.friend_user_id ? clubs?.get(e.friend_user_id) ?? null : null;
-    return viaClbhouz ?? e.friend_home_club ?? null;
-  };
+  /* ONE club source, resolved in the shared hook so the sheet cannot disagree. */
+  const circleEntries = useMemo(() => cohorts.active.concat(cohorts.inactive), [cohorts]);
+  const clubFor = useCircleClubs(circleEntries);
 
   const rank = cohorts.selfActiveRank;
   const total = cohorts.totalActive;
