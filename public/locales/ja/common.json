@@ -299,7 +299,13 @@
       "stableford": "ステーブルフォード",
       "index": "ハンディキャップ",
       "indexHeldAt": "ハンディキャップは",
-      "notBest8": "ベスト8には入っていません"
+      "notBest8": "ベスト8には入っていません",
+      "eyebrow": "Last round",
+      "nineHoles": "9 holes",
+      "unknownCourse": "Unknown course",
+      "empty": "Your rounds appear here as soon as you post a score.",
+      "emptyFriend": "Rounds appear here once {{name}} posts a score.",
+      "theyFallback": "they"
     },
     "records": {
       "emptyHint": "Rekodo wa raundo o toroku suru to koko ni hyoji saremasu."

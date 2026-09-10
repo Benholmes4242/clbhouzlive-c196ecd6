@@ -300,7 +300,13 @@
       "stableford": "Stableford",
       "index": "Handicap",
       "indexHeldAt": "El handicap se mantiene en",
-      "notBest8": "no esta entre tus 8 mejores"
+      "notBest8": "no esta entre tus 8 mejores",
+      "eyebrow": "Last round",
+      "nineHoles": "9 holes",
+      "unknownCourse": "Unknown course",
+      "empty": "Your rounds appear here as soon as you post a score.",
+      "emptyFriend": "Rounds appear here once {{name}} posts a score.",
+      "theyFallback": "they"
     },
     "records": {
       "emptyHint": "Tus records apareceran aqui cuando publiques rondas."

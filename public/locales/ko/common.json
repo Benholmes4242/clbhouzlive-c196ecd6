@@ -299,7 +299,13 @@
       "stableford": "스테이블포드",
       "index": "핸디캡",
       "indexHeldAt": "핸디캡 유지",
-      "notBest8": "상위 8개에 포함되지 않음"
+      "notBest8": "상위 8개에 포함되지 않음",
+      "eyebrow": "Last round",
+      "nineHoles": "9 holes",
+      "unknownCourse": "Unknown course",
+      "empty": "Your rounds appear here as soon as you post a score.",
+      "emptyFriend": "Rounds appear here once {{name}} posts a score.",
+      "theyFallback": "they"
     },
     "records": {
       "emptyHint": "Raundeu reul deungnok hamyeon girogi yeogie pyosi doemnida."

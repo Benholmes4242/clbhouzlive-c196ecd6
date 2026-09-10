@@ -674,7 +674,13 @@
       "stableford": "Stableford",
       "index": "Index",
       "indexHeldAt": "Index held at",
-      "notBest8": "not one of your best 8"
+      "notBest8": "not one of your best 8",
+      "eyebrow": "Last round",
+      "nineHoles": "9 holes",
+      "unknownCourse": "Unknown course",
+      "empty": "Your rounds appear here as soon as you post a score.",
+      "emptyFriend": "Rounds appear here once {{name}} posts a score.",
+      "theyFallback": "they"
     },
     "records": {
       "emptyHint": "Your records appear here once rounds are posted."

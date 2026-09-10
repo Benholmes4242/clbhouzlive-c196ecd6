@@ -158,3 +158,11 @@
 - [x] Preserve the 5-round entry gate and hide sort controls below 10 rounds.
 - [x] Retire duplicated legacy callouts while keeping form and Within reach summary on the You tab.
 - [ ] Verify populated personal data, sorting, generated opening-six copy, and dead-file candidates.
+
+## Handicap one-page brief — dead list (nothing deleted)
+- src/components/profile/handicap/whs/sections/LastRoundCard.tsx (whole file, off the page at Section D)
+- src/components/profile/handicap/whs/sections/last-round-card/CinemaCardMedia.tsx (whole file)
+- src/components/profile/handicap/whs/sections/last-round-card/LastRoundHeroCard.tsx:60-120 (scrim + masked blur layers)
+
+## Open item — nine-hole disclosure beyond the handicap page
+- Feed round card, friends' rounds rows, compare sheet, Discover board rows and profile round rows print gross/stableford without reading is_nine_hole or total_holes. Scope named, not fixed.
