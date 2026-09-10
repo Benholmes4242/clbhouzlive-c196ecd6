@@ -57,7 +57,7 @@ interface Props {
 
 }
 
-export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting }: Props) {
+export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting, onDirtyChange }: Props) {
   const { user } = useSupabaseSession();
   const { t } = useTranslation('common');
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
