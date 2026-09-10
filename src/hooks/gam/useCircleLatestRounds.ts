@@ -207,33 +207,23 @@ export function useCircleLatestRounds(
 
 
 
-      // 1. THE CIRCLE = accepted friendships (bidirectional) UNION the people
-      //    the member FOLLOWS. Outbound follows only: following is a choice the
-      //    member made, being followed is somebody else's choice and must never
-      //    put a stranger's rounds here (BRIEF_WHOS_BEEN_PLAYING 1.2).
+      // 1. THE CIRCLE = the personal profiles this member FOLLOWS, from the one
+      //    definition in src/lib/social/circle.ts. Outbound only: following is a
+      //    choice the member made, being followed is somebody else's choice and
+      //    must never put a stranger's rounds here (BRIEF_WHOS_BEEN_PLAYING 1.2).
+      //
+      //    IT USED TO READ user_friends UNION user_follows
+      //    (BRIEF_CIRCLE_DEFINITION §6). That was the safe one of the four
+      //    definitions - it did filter status='accepted' - but it was still a
+      //    second definition, and accepted friendships already carry a follow
+      //    edge (auto_follow_on_friend_accept), so the friendship read added
+      //    nothing except a way to drift.
       //
       //    NO EXTRA VISIBILITY PREDICATE (1.3). gam_round_stats RLS already
       //    grants through can_view_handicap(), which requires an accepted
       //    friendship for anyone on handicap_visibility 'friends'. A followed
       //    member who restricted themselves drops out on their own terms.
-      const [friendsRes, followsRes] = await Promise.all([
-        supabase
-          .from('user_friends')
-          .select('user_id, friend_id')
-          .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
-          .eq('status', 'accepted'),
-        supabase.from('user_follows').select('following_id').eq('follower_id', userId),
-      ]);
-
-      const circleSet = new Set<string>();
-      for (const f of (friendsRes.data ?? []) as Array<{ user_id: string; friend_id: string }>) {
-        const other = f.user_id === userId ? f.friend_id : f.user_id;
-        if (other && other !== userId) circleSet.add(other);
-      }
-      for (const f of (followsRes.data ?? []) as Array<{ following_id: string | null }>) {
-        if (f.following_id && f.following_id !== userId) circleSet.add(f.following_id);
-      }
-      const circleIds = Array.from(circleSet);
+      const circleIds = await fetchCircleIds(userId);
 
       type Round = {
         user_id: string;
