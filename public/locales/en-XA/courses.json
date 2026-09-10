@@ -1691,6 +1691,7 @@
     "writePromptInline": "[~~⭐ Ŵříţé ýőúř řéṽíéŵ~~]"
   },
   "scorecard": {
+    "atThisCourseBare": "At this course",
     "atThisCourse_one": "At this course · your {{count}} round here",
     "atThisCourse_other": "At this course · your {{count}} rounds here",
     "avgHereNeutral": "[~~Áṽĝ ĥéřé~~]",

@@ -154,6 +154,7 @@
     }
   },
   "scorecard": {
+    "atThisCourseBare": "At this course",
     "atThisCourse_one": "At this course · your {{count}} round here",
     "atThisCourse_other": "At this course · your {{count}} rounds here",
     "beatFieldOn": "You matched or beat the field average on {{beat}} of {{scored}} holes.",
