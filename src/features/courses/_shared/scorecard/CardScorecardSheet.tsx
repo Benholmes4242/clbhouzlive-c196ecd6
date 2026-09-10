@@ -1023,14 +1023,17 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 </div>
                 <div
                   style={{
-                    ...NUM, fontSize: 13, marginTop: 6,
+                    ...NUM, fontSize: 13, fontWeight: 700, marginTop: 6,
                     color: heroMuted ? EVEN_GRAY : toParColor(totals.toPar),
                   }}
                 >
                   {fmtRel(totals.toPar)}
                 </div>
+                {/* §B — THE PAR IS A KICKER, not a third figure: it is the
+                    basis the two figures above are read against, so it takes
+                    the caps-tracked label role. */}
                 {(shownPar > 0 || coursePar != null) && (
-                  <div style={{ ...LABEL_READ, marginTop: 3 }}>
+                  <div style={{ ...LABEL_READ, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 3 }}>
                     {t('courses:scorecard.parN', { n: shownPar > 0 ? shownPar : coursePar })}
                   </div>
                 )}
