@@ -4,9 +4,12 @@
  * Horizontal rail of "posting as" actor cards. Selection is marked with the
  * canonical 1px active border (amber means the viewing member, and BOTH cards are the viewing
  * member, so amber cannot tell them apart); inactive cards tap to switch. Per-actor unread
- * badges (notifications + DMs) via useActorUnreadCounts. A trailing
- * dashed "+ Business" door is rendered ONLY when the user has no
- * business actors yet.
+ * badges (notifications + DMs) via useActorUnreadCounts.
+ *
+ * THIS RAIL CONTAINS IDENTITIES ONLY (BRIEF_ACCOUNT_SHEET_REBUILD D). The
+ * dashed "+ Business" creation tile was removed to SheetNavGroup's business
+ * row, and the personal card no longer prints the account email.
+
  *
  * ON THIS SHEET A NOTIFICATION COUNT IS WHITE (ground A.INK, figure
  * A.CANVAS). Amber still means the viewing member app-wide, and still marks
@@ -40,18 +43,20 @@ interface Props {
   currentActor: ActorCardsCurrent;
   profiles: ActorCardsProfile[];
   onSwitchProfile: (id: string) => void | Promise<void>;
-  onNavigate: (route: string) => void;
+  /** D2 removed this rail's only navigation (the dashed tile). The prop stays
+   *  declared so the opener needs no change; it is currently unread. */
+  onNavigate?: (route: string) => void;
 }
+
 
 export default function ActorCards({
   currentActor,
   profiles,
   onSwitchProfile,
-  onNavigate,
 }: Props) {
   const { countFor } = useActorUnreadCounts();
   const [switchingId, setSwitchingId] = React.useState<string | null>(null);
-  const hasBusiness = profiles.some(p => p.type === 'business');
+
   // Active actor first; preserve original order for the rest (stable sort).
   const orderedProfiles = React.useMemo(() => {
     const indexed = profiles.map((p, i) => ({ p, i }));
@@ -94,11 +99,19 @@ export default function ActorCards({
         {orderedProfiles.map((p) => {
           const active = p.id === currentActor.id;
           const unread = countFor(p.type, p.id);
+          /* BRIEF_ACCOUNT_SHEET_REBUILD D1 — NO EMAIL ON THE PERSONAL CARD.
+             The second line was `@username · personal`, falling back to the
+             account EMAIL when a member has no username. The email is what
+             clipped at the screen edge, and it is the member's own address on
+             their own account sheet — the least useful string available. With
+             no username the line is simply "personal". `subtitle` is no longer
+             read here; the opener still passes it and it is now inert. */
           const sub = p.type === 'personal'
-            ? [p.username ? `@${p.username}` : (p.subtitle || ''), 'personal']
+            ? [p.username ? `@${p.username}` : null, 'personal']
                 .filter(Boolean).join(` ${DOT} `)
             : ['business', unread > 0 ? `${unread} unread` : null]
                 .filter(Boolean).join(` ${DOT} `);
+
           const initial = (p.name?.[0] || '?').toUpperCase();
 
           const handleCardTap = () => {
@@ -243,38 +256,14 @@ export default function ActorCards({
           );
         })}
 
-        {!hasBusiness && (
-          <div
-            onClick={() => onNavigate('/businesses/manage')}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onNavigate('/businesses/manage');
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            style={{
-              flexShrink: 0,
-              width: 92,
-              border: `1.5px dashed ${A.BORDER}`,
-              borderRadius: 16,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              padding: '13px 8px',
-            }}
-          >
-            <div style={{ fontWeight: 700, fontSize: 16, color: A.AMBER_DEEP, lineHeight: 1 }}>
-              +
-            </div>
-            <div style={{ fontWeight: 600, fontSize: 11, color: A.MUTE, marginTop: 4 }}>
-              Business
-            </div>
-          </div>
-        )}
+        {/* BRIEF_ACCOUNT_SHEET_REBUILD D2 — THE DASHED "+ BUSINESS" TILE IS
+            GONE FROM THIS RAIL. Creating a business is account creation, not an
+            identity, so it does not belong in an identity switcher; it also
+            took the second slot, which is why a scrolled sheet opened on a
+            dashed tile. It now rides the existing "Manage businesses" row in
+            SheetNavGroup as the subtitle "Create a business profile". Do not
+            put a creation door back in this rail. */}
+
       </div>
     </div>
   );

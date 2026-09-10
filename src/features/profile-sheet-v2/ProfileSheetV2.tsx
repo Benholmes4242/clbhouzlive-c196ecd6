@@ -326,6 +326,10 @@ export default function ProfileSheetV2({
                   currentActor.type === 'personal' ? handleOpenCourseAnalytics : undefined
                 }
                 analyticsState={analyticsState}
+                /* D2: the dashed "+ Business" tile left the actor rail; this is
+                   what decides whether the business row offers creation. */
+                hasBusinessActor={profiles.some((p) => p.type === 'business')}
+
               />
               <SignOutRow onNavigate={onNavigate} />
             </div>
