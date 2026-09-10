@@ -939,3 +939,52 @@ disagrees in BRANCHES. Nobody saw a wrong figure -- 48 members saw a correct
 empty board, reached by asking the wrong question, on a page whose brief exists
 to prevent exactly that. The hero's pool ladder has been silently compensating
 for it since the day it was built.
+
+## BRIEF_SHEET_BACK_BEHAVIOUR_03 (report)
+
+1a DONE: ReviewComposerV2 step-0 back now guarded (useDraftDismissGuard +
+DiscardDraftDialog). Dirty = overall score, any category score, typed text, or
+attached media. Tee label / share toggle alone are not dirty. It is a ROUTE, not
+a sheet: only the header arrow is guarded; browser/OS back leaves the route
+without calling it, and that path is safe for create mode (sessionStorage draft
+`review-draft:<courseId>`, 24h) but NOT for edit mode, which never persists.
+RateCourseSheet (CoursesContent.tsx) is a course search, holds no authored text,
+no guard needed.
+
+1b post composer: the SHELL already owns a guard. StageComposer.handleClose ->
+'close-guard' BottomSheet offering Save draft / Discard on state.dirty. Stage
+sheets (Actor, CourseTag, Adjust, CoverFrame, Drafts, more) write into that same
+composer state, so dismissing one returns to the composer with everything
+intact - no per-sheet guard. GAP: useDrafts.save persists caption + course tags
+ONLY. Media and scheduled time are NOT in post_drafts, so "Save draft" from the
+close guard loses attached media. Filed, not built.
+
+1c ScheduleSheetV2 assembles date + hour + minute locally and commits only in
+apply(); dismiss discards the assembled time. Left unguarded deliberately: it
+re-seeds from `value` on every open and is three stepper taps, not authored
+content. ScheduledPostsList holds no state; every action commits on tap.
+
+2 SPENT MARKER - CONTRADICTION. sheetHistory pops the entry BEFORE close runs,
+so after a hardware back the guard's keepEditing leaves the sheet open with NO
+marker. The next back is therefore taken by whatever is below: for a sheet, the
+parent sheet's marker; for the review ROUTE, the router - the route leaves while
+the composer is conceptually open. The existing comment claiming "the second
+back asks again" is wrong for the no-parent case. Not re-pushed here (would need
+a pushState during popstate); filed for ruling.
+
+3 MEDIA VIEWERS - none of the three own a history entry. FullscreenFeedOverlay
+(global, App.tsx:1105), MomentFullscreenViewer (Radix Dialog, MomentsTimeline),
+MediaPreviewViewer (portal; ReviewBottomSheet:854, MessageBubble:459). Back
+falls through to the router or to a parent BottomSheet marker. Confirmed
+ReviewBottomSheet never clears viewerIndex on sheet close (only viewer onClose),
+so a back-press closes the host sheet with the viewer still mounted. Fourth,
+out of scope: AvatarLightbox does push/pop its own entry.
+
+4 AMBER: non-member uses inventoried (nav unread badge, activity glyph tiles and
+active chip, crowns for other members' records, rating band BAND_AMBER, business
+status/waiting chips, connect/request/report CTAs, tab-underline vars,
+SectionHeader amber eyebrow). TugStat documents itself as a deliberate
+exception. Report-only, nothing recoloured.
+
+5 Eight device/runtime history tests STILL UNRUN - authenticated device runtime
+unavailable. Nothing deleted this pass.
