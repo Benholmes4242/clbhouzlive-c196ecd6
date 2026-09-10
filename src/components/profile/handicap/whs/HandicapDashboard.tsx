@@ -32,7 +32,6 @@ import ScoringSection from './sections/ScoringSection';
 import HolesSection from './sections/HolesSection';
 import PersonalBestsSection from './sections/PersonalBestsSection';
 import AchievementsPanel from './sections/AchievementsPanel';
-import StreaksCard from '../gam/streaks/StreaksCard';
 import CircleSection from './sections/CircleSection';
 import RecentlyPlayedFeed from './sections/recently-played/RecentlyPlayedFeed';
 import HandicapFooter from './sections/HandicapFooter';
@@ -146,7 +145,11 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         ownerFirstName={ownerFirstName}
       />
       <AchievementsPanel userId={userId} viewMode={viewMode} ownerFirstName={ownerFirstName} />
-      {!readOnly && <StreaksCard userId={userId} readOnly={readOnly} />}
+      {/* StreaksCard (the ON THE LINE - {n} ACTIVE rail) is OFF this page and
+          dead-listed, not deleted. It went with the trophies layer: the streak
+          material lives in the trophy room's StreaksPanel, whose door is the
+          terminal TROPHY ROOM row at the foot of Personal bests, and
+          StreaksSheetMount stays at page level so ?gam=streaks still opens. */}
 
       {/* 8 — YOUR CIRCLE (Section I). FriendsLeaderboardSection, StandingFigures,
           CompareEntryPanel, PulseSection and CircleInviteAction are all
