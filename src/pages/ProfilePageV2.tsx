@@ -421,12 +421,12 @@ const ProfilePageV2Content: React.FC = () => {
      footer's "All {n} rounds". Those two both read the plain total, and the
      header now reads it too. The 243 eighteen-hole basis keeps its own place in
      the handicap sections and is a different question, not a rival answer. */
-  const { totalCoursesPlayed: shellCoursesPlayed } = useUserCourseSummary(profileUserId ?? undefined);
+  const { totalCoursesPlayed: shellCoursesPlayed, isCoursesError: shellCoursesError } =
+    useUserCourseSummary(profileUserId ?? undefined);
   const { total: shellRoundsTotal, state: shellRoundsState } = useMemberRoundTotal(
     isSelf ? profileUserId ?? undefined : undefined,
   );
   const shellRoundsCount = isSelf ? shellRoundsTotal : null;
-  const { isCoursesError: shellCoursesError } = useUserCourseSummary(profileUserId ?? undefined);
 
   /* Same series as the social counters, distinguished by `source` — one event
      with a source is a reading; two series are a search. */
