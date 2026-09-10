@@ -176,3 +176,13 @@
 - src/components/profile/handicap/whs/sections/trends/GameEverywhereCard.tsx (whole file, off the page at Section G; the par-type rings move into HolesSection). Still imported by views/TrendsView.tsx.
 - src/components/profile/handicap/whs/sections/trends/RoundShapePanel.tsx (whole file, off the page and RETIRED, not pending): the "no weak stretch" census returned 22 of 22 eligible connections (>= 10 mapped 18-hole rounds with hole detail), spread 0.12-1.25 against the 1.5 threshold, mean 0.60. The verdict does not vary, so the block cannot say anything, and its coaching paragraph advised warming up immediately after disproving the problem.
 - StablefordCard.tsx SHOTS half: :735-870 the four-band ring and band chips are now dead (the distribution renders flat in Section G). :897+ MilestoneLadder still has no other home on this page and remains reported, not moved.
+
+## Section H — dead list (nothing deleted)
+- src/components/profile/handicap/whs/sections/records/PersonalBests.tsx (whole file, off the page at Section H). Inside it specifically: :137-163 the "Most Rounds in a Month" tile (volume is not a personal best) and :66-72 its empty placeholder, plus the rounded panel/skeleton block at :215-300. Still imported by views/TodayView.tsx and views/TrendsView.tsx.
+- AchievementsPanel is deliberately STILL MOUNTED beneath Section H: the tile is the current trophy-room door and it stays until the new terminal row is verified in a signed-in session. When it comes off, GamMount stays and ?gam=trophies / &section=crowns / &badge=<id> must keep resolving.
+
+## Open item — RoundShapePanel revival note
+- The "no weak stretch" verdict fires when the spread between the best and worst six-hole third is under 1.5 shots (RoundShapePanel.tsx, spread < 1.5). Live census: 22 of 22 eligible connections fall under it, spread 0.12-1.25, mean 0.60. Anyone reviving the block starts from the fact that the threshold can never fire at this population, not from rediscovering it.
+
+## Open item — mapped-course requirement on the par rings
+- get_my_scoring_breakdown_all_courses requires whs_to_golf_course_map. Live: 3,511 of 3,524 eighteen-hole rounds survive it (99.6% on average, worst member 96.4%), so the rings describe the same golfer and the basis caption is sufficient. Not its own item.

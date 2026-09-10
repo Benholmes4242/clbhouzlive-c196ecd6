@@ -193,7 +193,10 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
       hairline
       kicker={t('common:handicap.holes.eyebrow')}
       heading={t('common:handicap.holes.heading')}
-      meta={t('common:handicap.holes.meta', { count: rounds })}
+      /* NO META. Two round populations live in this section — every hole with a
+         card for the distribution, mapped eighteen-hole rounds for the rings —
+         and one figure in the meta slot could only describe one of them. Each
+         pool states its own basis beneath itself instead. */
     >
       {/* THE OUTCOME DISTRIBUTION — four counts, equal columns, no ring */}
       <div style={{ display: 'flex', gap: 12 }}>
@@ -221,6 +224,11 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
         })}
       </div>
 
+      {/* BASIS for the four counts above. Percentages need their denominator. */}
+      <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
+        {t('common:handicap.holes.basisHoles', { count: totalHoles })}
+      </div>
+
       {/* Hairline across the content width */}
       <div aria-hidden style={{ height: 1, background: CHART.BORDER, margin: '18px 0' }} />
 
@@ -242,6 +250,13 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
             </div>
           );
         })}
+      </div>
+
+      {/* BASIS for the rings: both restrictions are real and neither is visible
+          from the hole counts alone. The RPC excludes nine-hole rounds and
+          requires a mapped course; it is deployed, so this states it. */}
+      <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
+        {t('common:handicap.holes.basisRings')}
       </div>
 
       {(ringSentence || missingSentence) && (
