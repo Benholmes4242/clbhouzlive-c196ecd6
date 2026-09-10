@@ -156,7 +156,12 @@ function sameAsPublished(draft: DraftShape, base: ReviewComposerState): boolean 
 export function useReviewComposer(
   existing?: ExistingReview | null,
   courseId?: string | null,
+  /* Live attached-media counts, supplied by the shell (which owns the media
+     pipeline). Read at every debounced write so the stored numbers describe
+     what was attached at the moment the draft was last saved. */
+  mediaCounts?: DraftMediaCounts,
 ) {
+
   const isEditMode = !!existing;
   const reviewId = existing?.id ?? null;
 
