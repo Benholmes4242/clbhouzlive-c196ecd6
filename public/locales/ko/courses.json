@@ -1471,5 +1471,53 @@
       "university": "University",
       "international": "International"
     }
+  },
+  "amateur": {
+    "hero": {
+      "metric": {
+        "lowestGross": "최저 그로스",
+        "lowestNet": "최저 네트",
+        "bestStableford": "최고 스테이블포드",
+        "vsHandicap": "핸디캡 대비 최고",
+        "mostBirdies": "최다 버디",
+        "mostEagles": "최다 이글",
+        "mostRounds": "최다 라운드",
+        "mostCourses": "최다 코스"
+      },
+      "window": {
+        "d14": "14일",
+        "d30": "30일",
+        "d90": "90일"
+      },
+      "span": {
+        "d14": "지난 2주",
+        "d30": "이번 달",
+        "d90": "이번 분기"
+      },
+      "spanNoun": {
+        "d14": "2주",
+        "d30": "달",
+        "d90": "분기"
+      },
+      "unit": {
+        "net": "네트",
+        "points": "포인트",
+        "underPar": "언더파",
+        "birdies": "버디",
+        "eagles": "이글",
+        "rounds": "라운드",
+        "courses": "코스"
+      },
+      "context": {
+        "clear": "2위와 {{margin}} 차이.",
+        "offGross": "핸디캡 {{hcp}}, 그로스 {{gross}}.",
+        "nobody": "다른 사람은 {{runnerUp}}가 최고.",
+        "busiestCircle": "서클에서 가장 활발한 {{span}}.",
+        "poolCircleLong": "{{span}} 서클 {{rounds}}라운드 중 최고.",
+        "poolCircleShort": "서클 {{rounds}}라운드 중 최고.",
+        "poolEveryoneLong": "{{span}} clbhouz {{rounds}}라운드 중 최고.",
+        "poolEveryoneShort": "clbhouz {{rounds}}라운드 중 최고."
+      }
+    }
   }
 }

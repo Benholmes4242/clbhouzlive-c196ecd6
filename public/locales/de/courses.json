@@ -1532,5 +1532,53 @@
       "university": "University",
       "international": "International"
     }
+  },
+  "amateur": {
+    "hero": {
+      "metric": {
+        "lowestGross": "NIEDRIGSTES BRUTTO",
+        "lowestNet": "NIEDRIGSTES NETTO",
+        "bestStableford": "BESTES STABLEFORD",
+        "vsHandicap": "BESTES GEGEN HANDICAP",
+        "mostBirdies": "MEISTE BIRDIES",
+        "mostEagles": "MEISTE EAGLES",
+        "mostRounds": "MEISTE RUNDEN",
+        "mostCourses": "MEISTE PLAETZE"
+      },
+      "window": {
+        "d14": "14 TAGE",
+        "d30": "30 TAGE",
+        "d90": "90 TAGE"
+      },
+      "span": {
+        "d14": "in diesen zwei Wochen",
+        "d30": "in diesem Monat",
+        "d90": "in diesem Quartal"
+      },
+      "spanNoun": {
+        "d14": "Zweiwochenzeitraum",
+        "d30": "Monat",
+        "d90": "Quartal"
+      },
+      "unit": {
+        "net": "Netto",
+        "points": "Punkte",
+        "underPar": "unter Par",
+        "birdies": "Birdies",
+        "eagles": "Eagles",
+        "rounds": "Runden",
+        "courses": "Plaetze"
+      },
+      "context": {
+        "clear": "{{margin}} Vorsprung auf den Naechsten.",
+        "offGross": "Von {{hcp}}, Brutto {{gross}}.",
+        "nobody": "Niemand sonst schaffte mehr als {{runnerUp}}.",
+        "busiestCircle": "Der aktivste {{span}} in deinem Kreis.",
+        "poolCircleLong": "Beste von {{rounds}} Runden in deinem Kreis {{span}}.",
+        "poolCircleShort": "Beste von {{rounds}} in deinem Kreis.",
+        "poolEveryoneLong": "Beste von {{rounds}} Runden auf clbhouz {{span}}.",
+        "poolEveryoneShort": "Beste von {{rounds}} auf clbhouz."
+      }
+    }
   }
 }

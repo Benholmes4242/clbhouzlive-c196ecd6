@@ -50,6 +50,12 @@ const SPAN_FALLBACK: Record<HeroWindow, string> = {
   90: 'this quarter',
 };
 
+const SPAN_NOUN_FALLBACK: Record<HeroWindow, string> = {
+  14: 'fortnight',
+  30: 'month',
+  90: 'quarter',
+};
+
 /** §3 THE KICKER ALWAYS NAMES THE WINDOW (§7) — "LOWEST GROSS . 14 DAYS". */
 export function heroKicker(t: TFunction, metric: HeroMetric, window: HeroWindow): string {
   const metricLabel = t(`amateur.hero.metric.${METRIC_KEY[metric]}`, METRIC_FALLBACK[metric]);
@@ -129,10 +135,7 @@ export function heroContextLine(t: TFunction, card: HeroCard): string {
     rule =
       ctx.pool === 'circle'
         ? t('amateur.hero.context.busiestCircle', 'The busiest {{span}} in your circle.', {
-            span: t(`amateur.hero.span.d${card.window}`, SPAN_FALLBACK[card.window]).replace(
-              /^this /,
-              '',
-            ),
+            span: t(`amateur.hero.spanNoun.d${card.window}`, SPAN_NOUN_FALLBACK[card.window]),
           })
         : null;
   }
