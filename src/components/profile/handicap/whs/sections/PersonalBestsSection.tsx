@@ -152,7 +152,15 @@ export const PersonalBestsSection: React.FC<Props> = ({
     return ORDER.flatMap((k) => out.filter((r) => r.key === k));
   }, [scores, currentHandicap, t]);
 
-  const missing = ORDER.length - rows.length;
+  /* THE SENTENCE NAMES WHAT IS MISSING AND EXPLAINS NOTHING (Sep 2026 ruling).
+     The old wording named a stableford and a round off handicap whatever was
+     actually absent, so it was wrong whenever the missing record was another
+     one. The list is generated from the same record names the rows use, so the
+     two can never disagree. No instruction on how to set a record: the section
+     is called Records to break. */
+  const missingNames = ORDER.filter((k) => !rows.some((r) => r.key === k)).map((k) =>
+    t(`common:handicap.bests.lower.${k}`),
+  );
 
   const fired = useRef(false);
   useEffect(() => {
