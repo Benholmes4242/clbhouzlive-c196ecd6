@@ -208,8 +208,16 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, homeClub =
           </>
         )}
       </div>
+      {/* Above this sheet's own z base so the question is never painted under it. */}
+      <DiscardDraftDialog
+        open={confirmOpen}
+        onKeepEditing={keepEditing}
+        onDiscard={discard}
+        zIndex={zIndexBase + 100}
+      />
     </BottomSheet>
   );
+
 }
 
 export default RequestCourseSheet;
