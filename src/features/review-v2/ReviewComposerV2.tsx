@@ -481,14 +481,45 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   }, [composer.state.overall, composer.state.scores, course.id, course.name]);
 
   // ---- navigation ------------------------------------------------------
+  /* THE DRAFT GUARD (BRIEF_SHEET_BACK_BEHAVIOUR_03 §1a).
+   *
+   * This is the longest authored text in the app and the back arrow at step 0
+   * used to call clearDraft() and leave — several paragraphs of prose destroyed
+   * by one 44px target with no question asked. It now asks.
+   *
+   * WHAT COUNTS AS DIRTY: anything the member put in — the overall score, any
+   * category score, typed words, or an attached photo. NOT the tee label or
+   * share toggle alone, which are defaults the member never touched.
+   *
+   * PATHS COVERED / NOT COVERED is stated at the top of the file's report; the
+   * short version is that this component is a ROUTE, not a sheet, so it has one
+   * in-app dismiss (the header back arrow) and that is the path guarded. An OS
+   * or browser back leaves the route WITHOUT calling this, and that path is the
+   * safe one: the draft stays in sessionStorage for 24h and rehydrates on
+   * return. Edit mode does not persist (useReviewComposer skips writeDraft when
+   * isEditMode), so for an edit the arrow is the only thing standing between a
+   * rewritten review and nothing — which is why the guard is not create-only.
+   */
+  const draftDirty =
+    composer.state.overall != null ||
+    composer.catsSet > 0 ||
+    composer.state.reviewText.trim().length > 0 ||
+    media.count > 0;
+
+  const exitForReal = useCallback(() => {
+    composer.clearDraft();
+    onExit();
+  }, [composer, onExit]);
+
+  const exitGuard = useDraftDismissGuard(draftDirty, exitForReal);
+
   const handleBack = useCallback(() => {
     if (step > 0) {
       composer.setStep((step - 1) as WizardStep);
       return;
     }
-    composer.clearDraft();
-    onExit();
-  }, [step, composer, onExit]);
+    exitGuard.requestClose();
+  }, [step, composer, exitGuard]);
 
   const handleSubmit = useCallback(async () => {
     try {
