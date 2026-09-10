@@ -172,102 +172,25 @@ export const CircleSection: React.FC<Props> = ({ userId }) => {
         {cohorts.topFive.map((entry, i) => {
           const activeIdx = cohorts.active.findIndex((e) => e === entry);
           const position = activeIdx >= 0 ? activeIdx + 1 : null;
-          const isYou = entry.is_self;
           const tappable = isResolvable(entry);
-          const name = isYou
-            ? t('common:handicap.circle.section.you')
-            : reformatFriendName(entry.friend_name);
-          const club = clubFor(entry);
-          const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
-          const Tag: React.ElementType = tappable ? 'button' : 'div';
           return (
-            <Tag
-              key={isYou ? 'self' : `${entry.friend_user_id ?? entry.friend_row_id ?? entry.friend_name}`}
-              type={tappable ? 'button' : undefined}
-              onClick={tappable ? () => void handleRowTap(entry) : undefined}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                width: '100%',
-                padding: '11px 0',
-                background: 'none',
-                border: 'none',
-                borderTop: i === 0 ? 'none' : `1px solid ${CHART.BORDER}`,
-                textAlign: 'left',
-                font: 'inherit',
-                color: 'inherit',
-                cursor: tappable ? 'pointer' : 'default',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <span
-                style={{
-                  width: 16,
-                  flexShrink: 0,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: isYou ? CHART.AMBER : CHART.DIM,
-                  ...FIG,
-                }}
-              >
-                {position ?? ''}
-              </span>
-
-              {/* 30px avatar, radius 9. A broken source used to leave an empty
-                  square because the initials only render when the source is
-                  absent; onError drops back to the initials instead. */}
-              <Avatar
-                src={avatarSrc}
-                name={entry.friend_name}
-                seed={entry.friend_user_id ?? entry.friend_row_id ?? entry.friend_name}
-              />
-
-              <span style={{ minWidth: 0, flex: 1 }}>
-                <span
-                  style={{
-                    display: 'block',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    letterSpacing: '-0.01em',
-                    color: isYou ? CHART.AMBER : CHART.INK,
-                    overflowWrap: 'anywhere',
-                  }}
-                >
-                  {name}
-                </span>
-                {club && (
-                  <span
-                    style={{
-                      display: 'block',
-                      marginTop: 2,
-                      fontSize: 11,
-                      color: CHART.DIM,
-                      lineHeight: 1.35,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {club}
-                  </span>
-                )}
-              </span>
-
-              <span
-                style={{
-                  flexShrink: 0,
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: isYou ? CHART.AMBER : CHART.INK,
-                  ...FIG,
-                }}
-              >
-                {fmtHcp(entry.friend_handicap_index)}
-              </span>
-            </Tag>
+            <CircleRow
+              key={entry.is_self ? 'self' : `${entry.friend_user_id ?? entry.friend_row_id ?? entry.friend_name}`}
+              entry={entry}
+              position={position}
+              club={clubFor(entry)}
+              selfLabel={t('common:handicap.circle.section.you')}
+              isFirst={i === 0}
+              onPress={tappable ? () => void handleRowTap(entry) : undefined}
+            />
           );
         })}
+
+        {/* The flame is the only form figure on a standing list, so it is
+            labelled — and only when one is on screen. */}
+        {cohorts.topFive.some((e) => hasFlame(e)) && (
+          <CircleFlameLegend label={t('common:handicap.circle.section.flameLegend')} />
+        )}
 
         {/* SNAGS_02 §2: the ONE extracted see-all row. Rule above only. */}
         <SeeAllRow
