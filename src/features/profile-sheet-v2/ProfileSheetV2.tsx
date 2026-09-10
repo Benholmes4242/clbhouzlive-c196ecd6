@@ -1,21 +1,39 @@
 /**
  * ProfileSheetV2 — Switchboard redesign of the profile hub bottom sheet.
  *
- * Stage 1 (PS1): frame + actor cards + HCP strip. Body carries PS2
- * placeholder comments where the action row / nav group / sign-out land.
- *
  * Prop contract intentionally matches src/components/profile/ProfileHubSheet.tsx
  * verbatim so the eventual cutover in PostingAsMenu is a one-line import
  * swap. This file must not import from that old sheet or HandicapMasthead.
+ *
+ * BRIEF_ACCOUNT_SHEET_REBUILD E — THIS SHEET USES THE SHARED PRIMITIVE.
+ * It was a bespoke portal (own backdrop, own grab handle, own framer drag, own
+ * 85dvh cap, own scroll lock) and therefore sat OUTSIDE the sheet back stack
+ * that BottomSheet owns, so hardware back and the back gesture did not dismiss
+ * it. It is now BottomSheet + SheetHeader: fixed head titled "Account", body
+ * scrolls, back-stack registration is automatic.
+ *
+ * TWO KNOWN DELTAS, both accepted deliberately:
+ *  1. NO CLOSE ANIMATION. The 220ms slide-down is gone; BottomSheet unmounts on
+ *     close like all its other consumers. Being the one sheet outside the back
+ *     stack was the worse trade.
+ *  2. SCROLL LOCK IS WEAKER HERE THAN IT WAS. This file called
+ *     lockBodyScroll(), which is reference-counted and does position-fixed
+ *     locking with scroll capture and restore. BottomSheet only sets
+ *     body.style.overflow = 'hidden'. That is a fact about all of BottomSheet's
+ *     consumers, not about this sheet, and moving the primitive onto the helper
+ *     is filed as its own change — it is not bundled here.
+ *  3. Drag-to-dismiss is touch-only on the shared primitive (no mouse drag on
+ *     desktop). Left as-is: it matches every other sheet.
+ *
+ * The overlay perf timings (overlayOpen / overlayMark) are preserved by wrapping
+ * the shared sheet rather than by keeping the bespoke frame.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { AnimatePresence, motion, useMotionValue, animate, useDragControls } from 'framer-motion';
-import type { PanInfo } from 'framer-motion';
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { SheetHeader } from '@/components/ui/SheetHeader';
 import ActorCards from './components/ActorCards';
 import HcpStrip from './components/HcpStrip';
 import QuickActionsRow from './components/QuickActionsRow';
@@ -26,6 +44,7 @@ import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+
 
 interface Profile {
   id: string;
