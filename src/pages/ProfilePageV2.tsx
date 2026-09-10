@@ -122,12 +122,11 @@ const ClubsSectionWrapper: React.FC<{
   return (
     // Reduced mb: mb-6 → mb-4 (16px from clubs to tabs)
     <section className="px-4 mb-4">
-      {/* §2.2/§3.5 — owner-only home club prompt / pending treatment. */}
-      {isSelf && (
-        <div className="mb-3">
-          <HomeClubPrompt userId={profileId} />
-        </div>
-      )}
+      {/* THE HOME CLUB PROMPT IS GONE (pass one, 10 Sep 2026). ClubsCard already
+          states the empty case for the owner and carries the same picker, so the
+          prompt was a second door to one destination sitting above it. Its file
+          is dead-listed, NOT deleted; the pending treatment it also held is the
+          one thing that left with it and is recorded as such. */}
       <ClubsCard
         homeClub={homeClub}
         secondaryClubs={secondaryClubs}
