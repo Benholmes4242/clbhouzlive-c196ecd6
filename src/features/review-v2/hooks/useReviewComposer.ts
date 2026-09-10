@@ -119,15 +119,44 @@ function seedFromExisting(existing: ExistingReview | null | undefined): ReviewCo
   };
 }
 
+function sameAsPublished(draft: DraftShape, base: ReviewComposerState): boolean {
+  const s = draft.scores ?? ({} as DraftShape['scores']);
+  return (
+    (draft.overall ?? null) === (base.overall ?? null) &&
+    (s.design ?? null) === (base.scores.design ?? null) &&
+    (s.condition ?? null) === (base.scores.condition ?? null) &&
+    (s.clubhouse ?? null) === (base.scores.clubhouse ?? null) &&
+    (s.facilities ?? null) === (base.scores.facilities ?? null) &&
+    (draft.reviewText ?? '') === (base.reviewText ?? '') &&
+    (draft.shareToFeed !== false) === (base.shareToFeed !== false) &&
+    (draft.teeLabel ?? null) === (base.teeLabel ?? null)
+  );
+}
+
 export function useReviewComposer(
   existing?: ExistingReview | null,
   courseId?: string | null,
 ) {
   const isEditMode = !!existing;
+  const reviewId = existing?.id ?? null;
 
-  // In edit mode the existing review always wins; drafts are create-mode only.
+  /* EDIT MODE PERSISTS TOO (BRIEF_SHEET_BACK_BEHAVIOUR_04 §1).
+   *
+   * It used to not: edit mode seeded from the published review and never wrote
+   * a draft, so an iOS edge-swipe out of an edit destroyed the rewrite outright
+   * while the header arrow — the path members use least — was the only one that
+   * asked. Both modes now write the same 24h sessionStorage draft, under keys
+   * that cannot collide (see draftKey).
+   *
+   * A restored EDIT draft is announced, never silent: showing text that differs
+   * from what is published without saying so would be a second fault. The
+   * announcement is suppressed when the stored draft is byte-identical to the
+   * published review, because then there is nothing to announce.
+   */
+  const publishedBase = useMemo(() => seedFromExisting(existing), [existing]);
+
   const restored = useMemo(
-    () => (isEditMode ? null : readDraft(courseId)),
+    () => readDraft(courseId, reviewId),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
@@ -144,6 +173,11 @@ export function useReviewComposer(
       teeLabel: restored.teeLabel ?? null,
     };
   });
+
+  // Edit mode only: true when unsaved changes were brought back from a draft.
+  const [restoredFromDraft, setRestoredFromDraft] = useState<boolean>(
+    () => !!(isEditMode && restored && !sameAsPublished(restored, publishedBase)),
+  );
 
   const [step, setStepRaw] = useState<WizardStep>(() => (restored?.step ?? 0) as WizardStep);
   const setStep = useCallback((n: WizardStep) => setStepRaw(n), []);
@@ -175,28 +209,47 @@ export function useReviewComposer(
     setState((s) => ({ ...s, teeLabel: label }));
   }, []);
 
-  // Debounced draft write. Create mode only; media is never persisted.
+  // Debounced draft write. Both modes; media is never persisted (see report).
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (isEditMode) return;
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      writeDraft(courseId, {
-        step,
-        overall: state.overall,
-        scores: state.scores,
-        reviewText: state.reviewText,
-        shareToFeed: state.shareToFeed,
-        teeLabel: state.teeLabel,
-        savedAt: Date.now(),
-      });
+      writeDraft(
+        courseId,
+        {
+          step,
+          overall: state.overall,
+          scores: state.scores,
+          reviewText: state.reviewText,
+          shareToFeed: state.shareToFeed,
+          teeLabel: state.teeLabel,
+          savedAt: Date.now(),
+        },
+        reviewId,
+      );
     }, 400);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [isEditMode, courseId, step, state]);
+  }, [courseId, reviewId, step, state]);
 
-  const clearDraft = useCallback(() => clearReviewDraft(courseId), [courseId]);
+  const clearDraft = useCallback(
+    () => clearReviewDraft(courseId, reviewId),
+    [courseId, reviewId],
+  );
+
+  /* GETTING BACK TO WHAT IS LIVE. A restoration the member cannot undo would
+   * trap them in an edit they may not remember making, so discarding returns
+   * the composer to the published review and drops the stored draft. */
+  const discardRestoredDraft = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    clearReviewDraft(courseId, reviewId);
+    setState(seedFromExisting(existing));
+    setRestoredFromDraft(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId, reviewId, existing]);
+
+
 
   const catsSet = useMemo(
     () =>
