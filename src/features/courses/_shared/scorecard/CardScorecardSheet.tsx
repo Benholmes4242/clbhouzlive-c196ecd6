@@ -111,6 +111,13 @@ export interface CardScorecardCourseContext {
   avgToParOthers?: number | null;
   roundsHere?: number | null;
   rankHere?: number | null;
+  /**
+   * §C — THE INDEX THE ROUND WAS PLAYED OFF (`whs_scores.handicap_index_at_time`).
+   * OPTIONAL AND DEFAULTING ABSENT: the tour caller never passes it and its
+   * output is unchanged. NULL means the provider recorded none for that score —
+   * nothing renders, and today's index is NOT substituted.
+   */
+  indexAtTime?: number | null;
 }
 
 export interface CardScorecardSheetProps {
@@ -219,7 +226,15 @@ function toParColor(n: number | null): string {
  * columns, NOT out of the type. The centred OUT/IN segments sit on those nine
  * columns and so lose ~3px each at 320; both strings are nowrap and still fit.
  */
-const NINE_GRID = '54px repeat(9, minmax(0, 1fr)) 32px';
+/*
+ * §D1 — THE ROW LABEL COLUMN DROPS FROM 54px TO 26px. 54 was sized for the
+ * TOTAL / PAR 72 rows of the grand-totals block, which §B removed; the labels
+ * that remain are HOLE, PAR, YOU and FIELD at 9.5px tracked caps, the widest of
+ * which measures under 26. The 28px it gives back goes to the nine score
+ * columns, which is where a 390pt card is tightest. The right-hand total column
+ * stays at 32px — it carries two-digit strokes and is unchanged.
+ */
+const NINE_GRID = '26px repeat(9, minmax(0, 1fr)) 32px';
 
 /**
  * Result marks come from the shared ScoreMark renderer — one grammar across the
@@ -420,6 +435,15 @@ const Legend: React.FC<{ holes: CardScorecardHole[]; hasUnplayed?: boolean }> = 
   // RARER one once (albatross) rather than two identical entries.
   if (rarities.alba) keys.push({ strokes: 1, label: t('courses:scorecard.legendAlbatross') });
   else if (rarities.ace) keys.push({ strokes: 1, label: t('courses:scorecard.legendAce') });
+  /**
+   * §D5 — PAR IS NAMED. It is the most common cell on the card and was the only
+   * unexplained one on a completed round: a reader who sees a numeral with no
+   * mark had nothing telling them that absence of a mark IS the statement. The
+   * entry is a bare numeral (strokes === par), which is exactly what the card
+   * draws — the key stays generated from ScoreMark, never hand-drawn. It sits
+   * between the under-par marks and the over-par marks, in scoring order.
+   */
+  keys.push({ strokes: 4, label: t('courses:scorecard.legendPar'), showStroke: true });
   keys.push({ strokes: 5, label: t('courses:scorecard.legendBogey') });
   keys.push({ strokes: 6, label: t('courses:scorecard.legendDouble') });
   /**
@@ -641,7 +665,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   void emptyMessage;
   void coursePar;
   void courseSlope;
-  void nineHole;
+
+  /**
+   * §B — THE KICKER. `nineHole` is no longer voided: a nine-hole round says so
+   * on the one line that describes the round's format, and an eighteen-hole
+   * round is unchanged (no suffix, no separator, no empty space).
+   */
+  const kickerText = nineHole
+    ? (eyebrowText
+        ? `${eyebrowText} \u00B7 ${t('courses:scorecard.nineHoleTag')}`
+        : t('courses:scorecard.nineHoleTag'))
+    : eyebrowText;
+
 
   const isTour = surface === 'tour';
   /**
@@ -698,14 +733,34 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     ? fieldHoles.filter((h) => (h.strokes as number) <= (h.fieldAvg as number)).length
     : null;
 
+  /**
+   * §G — WHY THERE IS NO CARD, AS A MEASURED FACT.
+   *
+   * 568 of 3,554 rounds (16%) cannot draw a card, and they fail for THREE
+   * different reasons that the sheet previously collapsed into one: 148 have no
+   * hole rows at all, 420 have rows with every gross null, and 195 have some
+   * holes scored and some not. `holes.length > 0` was true for the middle group,
+   * so those rounds drew an eighteen-column grid of empty cells.
+   *
+   * The cause is derived once, here, and used both by the render gate and by the
+   * event, so what a member saw and what we recorded cannot disagree.
+   */
+  const cardCause: 'ok' | 'partial' | 'unscored' | 'norows' = useMemo(() => {
+    if (holes.length === 0) return 'norows';
+    if (played.length === 0) return 'unscored';
+    return played.length === holes.length ? 'ok' : 'partial';
+  }, [holes.length, played.length]);
+
   // scorecard_opened — has_field_data is the evidence for whether the
-  // enrichment is reaching members at all.
+  // enrichment is reaching members at all; card_cause is the evidence for how
+  // often the sheet opens on a round it cannot draw, split by reason.
   useEffect(() => {
     if (!open) return;
     analyticsEvents.track('scorecard_opened', {
       surface,
       holes: played.length,
       has_field_data: withField,
+      card_cause: cardCause,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -733,36 +788,71 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    *    as "1st of 19"). It prints BEST instead, the same correction the
    *    neutral-best sentence carried.
    */
+  /**
+   * §C — ONE POOL PER PANEL. The member's rank here, this round against their
+   * other rounds here, and the index they carried INTO the round are all one
+   * pool: THE MEMBER'S OWN HISTORY AT THIS COURSE. They leave the header rail
+   * and become a titled section that states its own sample ("Your 7 rounds
+   * here"), so no figure sits beside a figure drawn from a different pool
+   * without a basis.
+   *
+   * The derivations are byte-for-byte the ones that were in the rail:
+   *  - rank 1 prints BEST, never "1st of 1".
+   *  - vs-avg is gated on avgToParOthers being non-null (the RPC returns null
+   *    when this is the member's only round here) — never on roundsHere > 1.
+   *  - INDEX THEN is `handicap_index_at_time`, the index the round was played
+   *    off. It is NOT the member's current index: the current index is a fact
+   *    about today, and putting it on a round from March claimed something
+   *    false. When the provider gave no index at the time, NOTHING renders —
+   *    there is no fallback to today's figure.
+   */
+  const courseSection = useMemo(() => {
+    const items: { key: string; value: string; label: string; tone?: string }[] = [];
+    if (isTour || !courseContext) return items;
+    const roundsHere = courseContext.roundsHere ?? 0;
+    if (courseContext.rankHere != null && roundsHere > 0) {
+      items.push({
+        key: 'rank',
+        value: courseContext.rankHere === 1
+          ? t('courses:scorecard.figBest')
+          : formatOrdinal(courseContext.rankHere),
+        label: t('courses:scorecard.figOf', { count: roundsHere }),
+      });
+    }
+    const avgOthers = courseContext.avgToParOthers;
+    if (avgOthers != null && totals.played) {
+      const diff = Math.round((totals.toPar - avgOthers) * 10) / 10;
+      items.push({
+        key: 'vsavg',
+        value: Math.abs(diff) < 0.05
+          ? 'E'
+          : diff < 0
+            ? `\u2212${Math.abs(diff).toFixed(1)}`
+            : `+${diff.toFixed(1)}`,
+        label: t('courses:scorecard.figVsAvg'),
+        tone: Math.abs(diff) < 0.05 ? EVEN_GRAY : toParColor(diff < 0 ? -1 : 1),
+      });
+    }
+    if (courseContext.indexAtTime != null) {
+      items.push({
+        key: 'indexthen',
+        value: formatHcp(courseContext.indexAtTime),
+        label: t('courses:scorecard.figIndexThen'),
+      });
+    }
+    return items;
+  }, [isTour, courseContext, totals, t]);
+
   const rail = useMemo(() => {
     const items: { key: string; value: string; label: string; tone?: string }[] = [];
-    if (!isTour && courseContext) {
-      const roundsHere = courseContext.roundsHere ?? 0;
-      if (courseContext.rankHere != null && roundsHere > 0) {
-        items.push({
-          key: 'rank',
-          value: courseContext.rankHere === 1
-            ? t('courses:scorecard.figBest')
-            : formatOrdinal(courseContext.rankHere),
-          label: t('courses:scorecard.figOf', { count: roundsHere }),
-        });
-      }
-      const avgOthers = courseContext.avgToParOthers;
-      const othersCount = Math.max(roundsHere - 1, 1);
-      void othersCount;
-      if (avgOthers != null && totals.played) {
-        const diff = Math.round((totals.toPar - avgOthers) * 10) / 10;
-        items.push({
-          key: 'vsavg',
-          value: Math.abs(diff) < 0.05
-            ? 'E'
-            : diff < 0
-              ? `\u2212${Math.abs(diff).toFixed(1)}`
-              : `+${diff.toFixed(1)}`,
-          label: t('courses:scorecard.figVsAvg'),
-          tone: Math.abs(diff) < 0.05 ? EVEN_GRAY : toParColor(diff < 0 ? -1 : 1),
-        });
-      }
-    }
+    /**
+     * THE BEAT-FIELD FIGURE STAYS IN THE RAIL FOR NOW (§E2/E3 HELD). It is the
+     * one figure on this sheet drawn from the FIELD pool rather than the
+     * member's own history, and it cannot state its basis until the field
+     * average can exclude the caller and report how many players it covers.
+     * Moving it and gating it is ONE change, made once that function exists —
+     * not two half-changes. Until then it renders exactly as it shipped.
+     */
     if (withField && beatFieldOn != null) {
       items.push({
         key: 'field',
@@ -771,14 +861,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       });
     }
     /**
-     * The tour position and the member's handicap index used to sit in the
-     * header's right column. The right column now belongs to the score, so
-     * they join the rail as figures rather than being dropped — the tour caller
-     * passes identityStat and would otherwise lose "T4".
+     * The tour position keeps the rail — a pro has no history section to move
+     * into. The member's CURRENT index no longer appears here at all when the
+     * course section renders: that section carries INDEX THEN, and showing both
+     * put two different indexes on one sheet.
      */
     if (identityStat) {
       items.push({ key: 'identity', value: identityStat.value, label: identityStat.label });
-    } else if (playerHcp != null) {
+    } else if (playerHcp != null && courseSection.length === 0) {
       items.push({
         key: 'hcp',
         value: formatHcp(playerHcp),
@@ -786,7 +876,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       });
     }
     return items;
-  }, [isTour, courseContext, totals, withField, beatFieldOn, fieldHoles.length, identityStat, playerHcp, t]);
+  }, [withField, beatFieldOn, fieldHoles.length, identityStat, playerHcp, courseSection.length, t]);
 
 
 
@@ -830,8 +920,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    */
   const allHolesPlayed = holes.length > 0 && played.length === holes.length;
   const shownPar = allHolesPlayed ? cardTotalPar : totalPar;
+  /* §B — these gated the OUT / IN segments of the removed grand-totals row. The
+     derivations are kept and voided rather than deleted: they are the sole
+     record of the "a nine that has not started contributes NO segment" rule, and
+     the per-nine totals inside <Nine> may need it if that row ever returns. */
   const showOutSeg = outSummary.playedCount > 0;
   const showInSeg = (backSummary?.playedCount ?? 0) > 0;
+  void showOutSeg;
+  void showInSeg;
   if (import.meta.env.DEV) {
     // The visible sum must agree with the hero/stat gross. A mismatch means the
     // nines and the round totals were filtered differently - loud, not silent.
@@ -856,12 +952,24 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
   // The card column header has no room for a name and the legend above already
   // names the player, so a third-person card leaves the score-column label blank.
-  const cardScoreLabel = isOwner ? t('courses:scorecard.you') : '';
+  /*
+   * §D2 — A THIRD-PERSON CARD NO LONGER HAS AN UNLABELLED SCORE ROW. YOU is
+   * right for the viewer's own round and wrong for anyone else's, but the answer
+   * was never an empty cell: on a pro's card the row beneath PAR had no name at
+   * all. It falls back to SCORE, which is true of every card.
+   */
+  const cardScoreLabel = isOwner ? t('courses:scorecard.you') : t('courses:scorecard.scoreRow');
 
 
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
   const showIdentity = !!playerName;
-  const hasHoles = holes.length > 0;
+  /*
+   * §G — THE GATE READS SCORED HOLES, NOT HOLE ROWS. 420 rounds carry eighteen
+   * rows with every gross null; `holes.length > 0` let those through and drew a
+   * grid of empty cells with a scoring key beneath it. An unscored round now
+   * takes the same explained state as a round with no rows at all.
+   */
+  const hasHoles = cardCause === 'ok' || cardCause === 'partial';
 
   return (
     <BottomSheet
@@ -934,21 +1042,29 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
             {/* LEFT — date, course, member */}
             <div style={{ flex: '1 1 auto', minWidth: 0 }}>
-              {!!eyebrowText && (
+              {/* §B — THE KICKER CARRIES THE FORMAT. A nine-hole round is 30 of
+                  3,554 rounds, and on those the card, the totals and the to-par
+                  are all read against nine holes; the kicker is where that is
+                  said once. Eighteen holes is the default and says nothing. */}
+              {!!kickerText && (
                 <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {eyebrowText}
+                  {kickerText}
                 </div>
               )}
               <div
                 style={{
-                  fontSize: 16, fontWeight: 700, color: A.INK, marginTop: 3, lineHeight: 1.22,
+                  fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em',
+                  color: A.INK, marginTop: 3, lineHeight: 1.18,
                   display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                 }}
               >
                 {courseName}
               </div>
+              {/* §B — THE VENUE'S PLACE STEPS BACK ONE TONE. The course name
+                  went up to 20px, so the line beneath it has to drop from MUTE
+                  to DIM or the two read as one two-line title. */}
               {courseLocation && (
-                <div style={{ fontSize: 12, color: A.MUTE, marginTop: 2 }}>{courseLocation}</div>
+                <div style={{ fontSize: 12, color: A.DIM, marginTop: 2 }}>{courseLocation}</div>
               )}
               {/* MEMBER ROW. With NO NAME nothing renders — no avatar, no
                   avatar-shaped hole. Amber marks the viewer's own round. */}
@@ -975,8 +1091,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   >
                     {playerName}
                   </span>
+                   {/* §B — THE ENGAGEMENT PAIR IS PUSHED TO THE RIGHT EDGE of the
+                       member row instead of hanging one gap off the end of the
+                       name. A short name no longer leaves the heart floating in
+                       the middle of the row. */}
                    {engagement && (
-                     <span style={{ marginLeft: STAT_RAIL_ITEM_GAP, flexShrink: 0 }}>
+                     <span style={{ marginLeft: 'auto', paddingLeft: 12, flexShrink: 0 }}>
                     <RoundEngagementActions
                       comment={engagement.comment ?? null}
                       like={{
@@ -999,7 +1119,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               <div style={{ flex: 'none', textAlign: 'right' }}>
                 <div
                   style={{
-                    ...NUM, fontSize: 38, fontWeight: 800, lineHeight: 0.9,
+                    /* §B — 34, not 38. The course name went to 20 and the gross
+                       no longer competes with a second copy of itself in the
+                       totals block, so it can give back four points. */
+                    ...NUM, fontSize: 34, fontWeight: 800, lineHeight: 0.9,
                     letterSpacing: '-0.05em',
                     color: heroMuted ? EVEN_GRAY : A.INK,
                   }}
@@ -1008,14 +1131,17 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 </div>
                 <div
                   style={{
-                    ...NUM, fontSize: 13, marginTop: 6,
+                    ...NUM, fontSize: 13, fontWeight: 700, marginTop: 6,
                     color: heroMuted ? EVEN_GRAY : toParColor(totals.toPar),
                   }}
                 >
                   {fmtRel(totals.toPar)}
                 </div>
+                {/* §B — THE PAR IS A KICKER, not a third figure: it is the
+                    basis the two figures above are read against, so it takes
+                    the caps-tracked label role. */}
                 {(shownPar > 0 || coursePar != null) && (
-                  <div style={{ ...LABEL_READ, marginTop: 3 }}>
+                  <div style={{ ...LABEL_READ, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 3 }}>
                     {t('courses:scorecard.parN', { n: shownPar > 0 ? shownPar : coursePar })}
                   </div>
                 )}
@@ -1106,55 +1232,47 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   )}
 
                   {/*
-                    TOTALS BLOCK — a member of the HOLE / PAR / YOU family. Two
-                    rows on the same NINE_GRID so every figure lines up down the
-                    right edge. On a nine-hole card OUT spans the nine columns
-                    and no IN segment renders.
+                    BRIEF_ROUND_SCORECARD_REBUILD §B — THE GRAND TOTALS BLOCK IS
+                    GONE. It printed the gross, the round par and the to-par a
+                    second time, directly under a fixed header that shows all
+                    three and never scrolls away. THE PER-NINE TOTALS SURVIVE:
+                    each <Nine> still carries its own par and strokes total in
+                    the right-hand column beside its OUT / IN label, which is the
+                    figure a reader actually adds. Nothing else moved.
                   */}
-                  <div>
-                    <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-                      <span style={{ ...LABEL_READ, color: A.INK }}>{t('courses:scorecard.total')}</span>
-                      {/* S1.2 — a nine that has not started contributes NO segment.
-                          "IN 0" was a false claim; absence is the truth. The gross
-                          on the right is unchanged, so OUT + IN still equals it. */}
-                      {showOutSeg && (
-                        <span
-                          style={{
-                            gridColumn: showInSeg ? 'span 4' : 'span 9',
-                            ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {t('courses:scorecard.outN', { n: outSummary.strokes })}
-                        </span>
-                      )}
-                      {showInSeg && backSummary && (
-                        <span
-                          style={{
-                            gridColumn: showOutSeg ? 'span 5' : 'span 9',
-                            ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {t('courses:scorecard.inN', { n: backSummary.strokes })}
-                        </span>
-                      )}
-                      {!showOutSeg && !showInSeg && <span style={{ gridColumn: 'span 9' }} />}
-                      <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
-                    </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-                      <span style={{ ...LABEL_READ, color: A.MUTE, whiteSpace: 'nowrap' }}>
-                        {t('courses:scorecard.parN', { n: shownPar })}
-                      </span>
-                      <span style={{ gridColumn: 'span 9' }} />
-                      <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
-                        {fmtRel(totals.toPar)}
-                      </span>
-                    </div>
-                  </div>
 
                   <Legend holes={played} hasUnplayed={!allHolesPlayed} />
                 </div>
               </Panel>
+
+              {/*
+                §C — AT THIS COURSE. ONE POOL: the member's own rounds at this
+                venue. The kicker names the sample, so "BEST OF 1" — the most
+                common case, since 274 member-course pairs hold exactly one
+                round — reads as a fact about one round rather than a ranking
+                against an invisible field. Renders only when a figure resolves,
+                and never on the tour surface.
+              */}
+              {/* The kicker states the sample when we know it. With no round
+                  count (INDEX THEN can resolve on its own) it falls back to the
+                  bare title rather than claiming "your 0 rounds here". */}
+              {courseSection.length > 0 && (
+                <Panel
+                  kicker={(courseContext?.roundsHere ?? 0) > 0
+                    ? t('courses:scorecard.atThisCourse', { count: courseContext?.roundsHere as number })
+                    : t('courses:scorecard.atThisCourseBare')}
+                >
+                  <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
+                    {courseSection.map((it) => (
+                      <div key={it.key} style={{ minWidth: 0 }}>
+                        <div style={{ ...RAIL_FIG, color: it.tone ?? A.INK }}>{it.value}</div>
+                        <div style={{ ...LABEL, fontSize: 9.5, letterSpacing: '0.12em', marginTop: 3 }}>{it.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </Panel>
+              )}
 
               {/* HOW IT BROKE DOWN — the birdie+ figure keeps its RED (S4.3). */}
               <Panel kicker={t('courses:scorecard.howItBrokeDown')}>

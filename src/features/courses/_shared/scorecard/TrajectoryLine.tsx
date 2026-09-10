@@ -563,9 +563,16 @@ export const TrajectoryLine: React.FC<Props> = ({
     if (hovered.fieldAvg != null) {
       subParts.push(t('courses:scorecard.trajField', { n: fmt1(hovered.fieldAvg) }));
     }
-  } else {
-    subParts.push(t('courses:scorecard.trajThrough', { n: lastScored }));
   }
+  /*
+   * BRIEF_ROUND_SCORECARD_REBUILD §B — "{n} THROUGH 18" IS GONE FROM THE RESTING
+   * STATE. It restated the hole count the card above it already shows eighteen
+   * times, and on a completed round it said "through 18" — a fact with no
+   * reader. The scrub readout (hole / par / field) is untouched: during a scrub
+   * the subline is the only thing naming which hole is being read.
+   * `courses:scorecard.trajThrough` now has no caller; the key is dead-listed,
+   * not removed, because six locale files carry it.
+   */
 
   // rightText is a whole-round fact; it deliberately empties during a scrub.
   const rightText =
