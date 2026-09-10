@@ -122,15 +122,37 @@ function inWindow(rows: readonly CircleRoundRow[], window: HeroWindow, now: numb
   return rows.filter((r) => !!r.play_date && r.play_date >= from);
 }
 
-/** §5c — the pool behind EVERY card in this window. */
-function poolShape(rows: readonly CircleRoundRow[]) {
+/**
+ * §5c — the pool behind EVERY card in this window, and which pool it was.
+ *
+ * `truncated` is TRUE when the read that produced these rows came back at its
+ * own limit, because then `poolRounds` is a floor, not a count. A card whose
+ * only honest context line is the pool line does not qualify in that state
+ * (§4) — a fetch cap must never be printed as "best of N rounds".
+ */
+interface PoolShape {
+  poolRounds: number;
+  poolMembers: number;
+  pool: HeroPool;
+  truncated: boolean;
+}
+
+function poolShape(rows: readonly CircleRoundRow[], pool: HeroPool, truncated: boolean): PoolShape {
   const members = new Set<string>();
   for (const r of rows) members.add(r.user_id);
-  return { poolRounds: rows.length, poolMembers: members.size };
+  return { poolRounds: rows.length, poolMembers: members.size, pool, truncated };
 }
 
 const poolIsReal = (p: { poolRounds: number; poolMembers: number }) =>
   p.poolRounds >= POOL_MIN_ROUNDS && p.poolMembers >= POOL_MIN_MEMBERS;
+
+/** The context line the card will carry; `truncated` never reaches the card. */
+const contextShape = (s: PoolShape) => ({
+  poolRounds: s.poolRounds,
+  poolMembers: s.poolMembers,
+  pool: s.pool,
+});
+
 
 /** The value a single-round metric ranks on, or null when the round cannot carry it. */
 function singleValue(
