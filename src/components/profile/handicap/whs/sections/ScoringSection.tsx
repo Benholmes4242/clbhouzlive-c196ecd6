@@ -38,6 +38,8 @@ import { CHART, DEAD_BAND, pointsTone, toneColor } from '../charts';
 const WINDOW_DAYS = 90;
 /** Below this the spread does not mean anything, so it is not drawn. */
 const MIN_ROUNDS = 10;
+/** Below this even a bare average has nothing behind it. */
+const MIN_FIGURE_ROUNDS = 3;
 
 const IN_ZONE = 36;
 const SOLID_LOWER = 33;
