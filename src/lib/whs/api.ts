@@ -239,8 +239,10 @@ export async function fetchCounters(connectionId: string): Promise<WhsCounterSco
     .select(`id, play_date, adjusted_gross, handicap_differential, course:whs_courses(name)`)
     .eq('connection_id', connectionId)
     .eq('is_counter', true)
-    .order('play_date', { ascending: false })
-    .limit(8);
+    // NO .limit(8): eight counters is what WHS uses at twenty or more rounds
+    // and not what it uses below that, so a hard limit asserted a rule the
+    // schema does not enforce. Every row where is_counter is true.
+    .order('play_date', { ascending: false });
   if (error) throw error;
   return (data as unknown as WhsCounterScore[]) ?? [];
 }

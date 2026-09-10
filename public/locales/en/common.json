@@ -508,7 +508,12 @@
         "gross": "Gross",
         "playedTo": "Played to",
         "roundsTitle_one": "{{count}} round",
-        "roundsTitle_other": "{{count}} rounds"
+        "roundsTitle_other": "{{count}} rounds",
+        "counts": "Counts",
+        "hcpHeld": "HCP held",
+        "nineHoles": "9 holes",
+        "anyCourse": "Any course",
+        "pickCourse": "Choose a course"
       }
     },
     "nextRound": {

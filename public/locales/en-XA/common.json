@@ -508,7 +508,12 @@
         "gross": "[~~Ĝřőšš~~]",
         "playedTo": "[~~Ƥļáýéđ ţő~~]",
         "roundsTitle_one": "[~~{{count}} řőúñđ~~]",
-        "roundsTitle_other": "[~~{{count}} řőúñđš~~]"
+        "roundsTitle_other": "[~~{{count}} řőúñđš~~]",
+        "counts": "[~~Çóúñţş~~]",
+        "hcpHeld": "[~~ĤÇƤ ĥéļđ~~]",
+        "nineHoles": "[~~9 ĥőļéş~~]",
+        "anyCourse": "[~~Áñý çőúrşé~~]",
+        "pickCourse": "[~~Çĥőőşé á çőúrşé~~]"
       }
     },
     "nextRound": {
