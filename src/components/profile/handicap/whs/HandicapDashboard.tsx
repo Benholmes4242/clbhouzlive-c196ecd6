@@ -31,7 +31,6 @@ import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import ScoringSection from './sections/ScoringSection';
 import HolesSection from './sections/HolesSection';
 import PersonalBestsSection from './sections/PersonalBestsSection';
-import AchievementsPanel from './sections/AchievementsPanel';
 import CircleSection from './sections/CircleSection';
 import RecentlyPlayedFeed from './sections/recently-played/RecentlyPlayedFeed';
 import HandicapFooter from './sections/HandicapFooter';
