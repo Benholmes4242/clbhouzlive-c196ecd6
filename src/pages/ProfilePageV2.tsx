@@ -88,6 +88,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { openHomeClubPicker } from '@/features/home-club/homeClubPickerStore';
+import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
 import { GolfJourneyProgress } from '@/components/profile/phase6';
 import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
