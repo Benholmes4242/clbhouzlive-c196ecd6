@@ -58,7 +58,7 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
         {item.name}
       </h3>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, margin: '12px 0 4px' }}>
-        <Figure value={value} size={40} color={value > 0 ? REC.AMBER : REC.DIM} />
+        <Figure value={value} size={40} color={value > 0 ? REC.INK : REC.DIM} />
         <span style={{ fontSize: 12.5, color: REC.MUTE }}>{item.description}</span>
       </div>
       {/* Omitted entirely when earned_at is null. No placeholder. */}
@@ -106,7 +106,7 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                color: tier.earned ? REC.AMBER : REC.DIM,
+                color: tier.earned ? REC.INK : REC.DIM,
                 ...REC.TABULAR,
               }}
             >
@@ -167,7 +167,7 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
               <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 700, color: REC.INK }}>
                 {best.course_name ?? 'A course'}
               </span>
-              <Figure value={Number(best[metric] ?? 0)} size={17} color={REC.AMBER} />
+              <Figure value={Number(best[metric] ?? 0)} size={17} color={REC.INK} />
             </div>
             {/* Separator is a middle dot in the OUTPUT, written as an ASCII
                 escape in the locale value. Never "--" in rendered prose. */}

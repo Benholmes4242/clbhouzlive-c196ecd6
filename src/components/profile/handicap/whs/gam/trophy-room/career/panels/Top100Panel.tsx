@@ -61,7 +61,7 @@ export const Top100Panel: React.FC<Props> = ({ data, items }) => {
                 {LIST_LABEL[item.badgeId] ?? item.name}
               </span>
               <span style={{ ...REC.TABULAR, fontSize: 12, color: REC.MUTE }}>
-                <Figure value={count} size={20} color={count > 0 ? REC.AMBER : REC.DIM} /> of 100
+                <Figure value={count} size={20} color={count > 0 ? REC.INK : REC.DIM} /> of 100
               </span>
             </div>
             <div style={{ marginTop: 8 }}>

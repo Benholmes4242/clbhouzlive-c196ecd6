@@ -172,7 +172,7 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
             >
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
                 <span style={{ flex: 1, minWidth: 0, ...NAME }}>{r.item.name}</span>
-                <span style={FIG(17, REC.AMBER)}>{r.toGo}</span>
+                <span style={FIG(17, REC.INK)}>{r.toGo}</span>
                 <span style={{ ...LABEL_7 }}>{t('career.toGo')}</span>
               </div>
               <div style={{ marginTop: 8 }}>

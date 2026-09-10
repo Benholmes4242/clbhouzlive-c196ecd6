@@ -77,7 +77,7 @@ export const MilestonesPanel: React.FC<Props> = ({ data, items }) => {
               <span
                 style={{
                   fontSize: 11,
-                  color: item.earned ? REC.AMBER : REC.DIM,
+                  color: item.earned ? REC.INK : REC.DIM,
                   fontWeight: 700,
                   letterSpacing: '0.06em',
                   ...REC.TABULAR,

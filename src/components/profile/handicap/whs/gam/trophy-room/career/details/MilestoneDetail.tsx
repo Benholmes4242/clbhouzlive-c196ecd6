@@ -49,7 +49,7 @@ export const MilestoneDetail: React.FC<Props> = ({ data, item, onBack }) => {
       </div>
       {item.earned && (
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 12 }}>
-          <Figure value={monthYear(item.earnedAt) || 'ON THE RECORD'} size={20} color={REC.AMBER} />
+          <Figure value={monthYear(item.earnedAt) || 'ON THE RECORD'} size={20} color={REC.GOOD} />
         </div>
       )}
       {share !== null && item.earned && (
@@ -75,7 +75,7 @@ export const MilestoneDetail: React.FC<Props> = ({ data, item, onBack }) => {
                   {round.course_name ?? 'A course'}
                 </span>
                 {round.gross_score ? (
-                  <Figure value={round.gross_score} size={17} color={REC.AMBER} />
+                  <Figure value={round.gross_score} size={17} color={REC.INK} />
                 ) : null}
               </div>
               <div style={{ marginTop: 4, fontSize: 11.5, color: REC.MUTE, ...REC.TABULAR }}>
