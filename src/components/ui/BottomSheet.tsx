@@ -11,15 +11,19 @@ interface BottomSheetProps {
   style?: React.CSSProperties;
   ariaLabelledBy?: string;
   /**
-   * NOTE ON THE VARIANT NAMES (dark-only baseline): 'light' and 'dark' no
-   * longer mean light vs dark. Both paint a DARK surface — 'light' takes
-   * `bg-background`, which resolves to #15171F, and 'dark' takes an explicit
-   * #0F172A (or `surfaceColor`). The names are kept because 45 files import
-   * them; do NOT rename. Consequence: the grabber is white in both cases.
+   * DEAD, KEPT FOR COMPILE COMPATIBILITY (BRIEF_SHEET_BACKGROUND_CANON).
+   * Neither variant selects a surface any more: there is ONE sheet
+   * background, `SHEET_SURFACE` below, and this component owns it. The prop
+   * is ignored. Do not reintroduce a per-variant surface.
    */
   variant?: 'light' | 'dark';
 
-  /** Optional surface colour override for the dark variant. */
+  /**
+   * DEAD, IGNORED (BRIEF_SHEET_BACKGROUND_CANON). Four sheets had drifted to
+   * four different fills through this prop, each correct on the day it was
+   * written. Passing it now does nothing on purpose: an override that agrees
+   * with the canon today is an override that will disagree later.
+   */
   surfaceColor?: string;
   /** Optional max-height override (default '85dvh'). Use e.g. '75dvh' for dvh-aware caps. */
   maxHeight?: string;
