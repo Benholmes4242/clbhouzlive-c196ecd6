@@ -465,17 +465,106 @@ const FilterChip: React.FC<{
     >
       {label}
     </span>
-    <span
-      style={{
-        fontSize: 11,
-        fontWeight: 700,
-        fontVariantNumeric: 'tabular-nums lining-nums',
-        opacity: active ? 0.7 : 0.5,
-      }}
-    >
-      {count}
-    </span>
+    {count !== undefined && (
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          fontVariantNumeric: 'tabular-nums lining-nums',
+          opacity: active ? 0.7 : 0.5,
+        }}
+      >
+        {count}
+      </span>
+    )}
+    {trailingChevron && <ChevronDown size={13} strokeWidth={2.5} style={{ opacity: active ? 0.8 : 0.55 }} />}
   </button>
+);
+
+// ─── Course picker ──────────────────────────────────────────────────
+// EVERY course the member has played, count descending. One row per WHS
+// course record, keyed on the id, so two records sharing a name stay two rows.
+const CoursePickerSheet: React.FC<{
+  open: boolean;
+  onClose: () => void;
+  courses: { id: string; name: string; count: number }[];
+  selectedId: string | null;
+  onSelect: (c: { id: string; name: string }) => void;
+  title: string;
+}> = ({ open, onClose, courses, selectedId, onSelect, title }) => (
+  <BottomSheet
+    open={open}
+    onClose={onClose}
+    variant="dark"
+    surfaceColor="var(--hcp-bg-1)"
+    className="hcp-dark"
+    zIndexBase={1500}
+    style={{
+      height: 'auto',
+      maxHeight: '75dvh',
+      display: 'flex',
+      flexDirection: 'column',
+      fontFamily: FONT,
+    }}
+  >
+    <div style={{ padding: '4px 16px 8px' }}>
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          color: T.inkMute,
+        }}
+      >
+        {title}
+      </div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: T.inkFaded, marginTop: 3, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+        {courses.length} {courses.length === 1 ? 'course' : 'courses'}
+      </div>
+    </div>
+    <div style={{ overflowY: 'auto', padding: '0 16px 24px', WebkitOverflowScrolling: 'touch' }}>
+      {courses.map((c, i) => {
+        const active = c.id === selectedId;
+        return (
+          <button
+            key={c.id}
+            type="button"
+            onClick={() => onSelect(c)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              width: '100%',
+              padding: '13px 0',
+              background: 'transparent',
+              border: 'none',
+              borderTop: i === 0 ? 'none' : `1px solid ${T.hairline}`,
+              textAlign: 'left',
+              fontFamily: FONT,
+              cursor: 'pointer',
+            }}
+          >
+            <span style={{ ...DARK_ROW_TITLE, minWidth: 0, overflowWrap: 'anywhere', fontWeight: active ? 700 : 600 }}>
+              {c.name}
+            </span>
+            <span
+              style={{
+                flexShrink: 0,
+                fontSize: 13,
+                fontWeight: 700,
+                color: active ? T.ink : T.inkMute,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {c.count}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  </BottomSheet>
 );
 
 // ─── Month header ───────────────────────────────────────────────────
