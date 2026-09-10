@@ -1106,51 +1106,15 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   )}
 
                   {/*
-                    TOTALS BLOCK — a member of the HOLE / PAR / YOU family. Two
-                    rows on the same NINE_GRID so every figure lines up down the
-                    right edge. On a nine-hole card OUT spans the nine columns
-                    and no IN segment renders.
+                    BRIEF_ROUND_SCORECARD_REBUILD §B — THE GRAND TOTALS BLOCK IS
+                    GONE. It printed the gross, the round par and the to-par a
+                    second time, directly under a fixed header that shows all
+                    three and never scrolls away. THE PER-NINE TOTALS SURVIVE:
+                    each <Nine> still carries its own par and strokes total in
+                    the right-hand column beside its OUT / IN label, which is the
+                    figure a reader actually adds. Nothing else moved.
                   */}
-                  <div>
-                    <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-                      <span style={{ ...LABEL_READ, color: A.INK }}>{t('courses:scorecard.total')}</span>
-                      {/* S1.2 — a nine that has not started contributes NO segment.
-                          "IN 0" was a false claim; absence is the truth. The gross
-                          on the right is unchanged, so OUT + IN still equals it. */}
-                      {showOutSeg && (
-                        <span
-                          style={{
-                            gridColumn: showInSeg ? 'span 4' : 'span 9',
-                            ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {t('courses:scorecard.outN', { n: outSummary.strokes })}
-                        </span>
-                      )}
-                      {showInSeg && backSummary && (
-                        <span
-                          style={{
-                            gridColumn: showOutSeg ? 'span 5' : 'span 9',
-                            ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {t('courses:scorecard.inN', { n: backSummary.strokes })}
-                        </span>
-                      )}
-                      {!showOutSeg && !showInSeg && <span style={{ gridColumn: 'span 9' }} />}
-                      <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
-                    </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-                      <span style={{ ...LABEL_READ, color: A.MUTE, whiteSpace: 'nowrap' }}>
-                        {t('courses:scorecard.parN', { n: shownPar })}
-                      </span>
-                      <span style={{ gridColumn: 'span 9' }} />
-                      <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
-                        {fmtRel(totals.toPar)}
-                      </span>
-                    </div>
-                  </div>
 
                   <Legend holes={played} hasUnplayed={!allHolesPlayed} />
                 </div>
