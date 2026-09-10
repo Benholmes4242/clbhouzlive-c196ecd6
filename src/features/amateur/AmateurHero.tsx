@@ -390,6 +390,8 @@ export function AmateurHero({
                 {kicker}
               </span>
             </span>
+            </button>
+
             {/* §2 GROSS OVER TO-PAR, right-aligned — the stacked shape and the
                 21 / 13 sizes are the Discover FriendRoundRow score column's, so
                 the hero states the score the way every round row already does
