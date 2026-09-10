@@ -183,6 +183,19 @@ const ScoringSection: React.FC<Props> = ({ scores }) => {
             {avg.toFixed(1)}
           </div>
           <div style={{ ...KICKER, marginTop: 6 }}>{t('common:handicap.scoring.pointsAvg')}</div>
+          {partial && (
+            <div
+              style={{
+                marginTop: 4,
+                fontSize: 12,
+                fontWeight: 700,
+                color: CHART.DIM,
+                ...FIG,
+              }}
+            >
+              {t('common:handicap.scoring.sampleLine', { count: n })}
+            </div>
+          )}
           {showDelta && delta != null && (
             <div
               style={{
@@ -201,36 +214,38 @@ const ScoringSection: React.FC<Props> = ({ scores }) => {
           )}
         </div>
 
-        {/* THE THREE COUNTS */}
-        <div style={{ display: 'flex', flex: 1, minWidth: 0, gap: 12 }}>
-          {bands.map((b) => (
-            <div key={b.label} style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: b.count === 0 ? CHART.MUTE : b.color,
-                  lineHeight: 1,
-                  ...FIG,
-                }}
-              >
-                {b.count}
+        {/* THE THREE COUNTS — a distribution is a verdict, so ten rounds or nothing. */}
+        {!partial && (
+          <div style={{ display: 'flex', flex: 1, minWidth: 0, gap: 12 }}>
+            {bands.map((b) => (
+              <div key={b.label} style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: b.count === 0 ? CHART.MUTE : b.color,
+                    lineHeight: 1,
+                    ...FIG,
+                  }}
+                >
+                  {b.count}
+                </div>
+                <div style={{ ...KICKER, marginTop: 6 }}>{b.label}</div>
+                <div
+                  style={{
+                    marginTop: 3,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: CHART.DIM,
+                    ...FIG,
+                  }}
+                >
+                  {b.range}
+                </div>
               </div>
-              <div style={{ ...KICKER, marginTop: 6 }}>{b.label}</div>
-              <div
-                style={{
-                  marginTop: 3,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: CHART.DIM,
-                  ...FIG,
-                }}
-              >
-                {b.range}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </HcpSection>
   );
