@@ -34,7 +34,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { SLATE_50 } from '@/features/courses/_shared/tokens';
+
 
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview } from '@/hooks/useCourseReviews';
@@ -422,7 +422,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   if (isLoading) {
     return (
-      <div style={{ background: SLATE_50, minHeight: '100%', padding: `0 ${GUTTER}px` }}>
+      <div style={{ background: A.CANVAS, minHeight: '100%', padding: `0 ${GUTTER}px` }}>
         <Skeleton className="h-[40px] w-[140px]" />
         <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-[16px] w-full" />)}
@@ -442,7 +442,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   if (isError) {
     return (
-      <div style={{ background: SLATE_50, minHeight: '100%', padding: `32px ${GUTTER}px`, fontFamily: SANS }}>
+      <div style={{ background: A.CANVAS, minHeight: '100%', padding: `32px ${GUTTER}px`, fontFamily: SANS }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <AlertCircle style={{ width: 20, height: 20, color: A.DIM, marginBottom: 10 }} />
           <p style={{ fontSize: 14, fontWeight: 600, color: A.INK, margin: 0 }}>{t('review.error.title')}</p>
@@ -455,7 +455,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
-      <div style={{ background: SLATE_50, minHeight: '100%', paddingBottom: 8, fontFamily: SANS }}>
+      <div style={{ background: A.CANVAS, minHeight: '100%', paddingBottom: 8, fontFamily: SANS }}>
         {/* §6A — no reviews: no figure, no tier, no zero. One section. */}
         {!hasRatings ? (
           <AboutSection heading="Reviews" first space={0}>

@@ -124,7 +124,6 @@ export function FullListSheet({
       open={open}
       onClose={onClose}
       ariaLabelledBy="tour-leaders-full-sheet-title"
-      variant="light"
       style={{
         height: 'auto',
         maxHeight: '85dvh',

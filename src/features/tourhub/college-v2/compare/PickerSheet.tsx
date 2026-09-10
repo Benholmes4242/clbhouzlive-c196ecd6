@@ -75,7 +75,6 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
     <BottomSheet
       open={open}
       onClose={onClose}
-      variant="light"
       style={{
         height: 'auto',
         maxHeight: '85dvh',

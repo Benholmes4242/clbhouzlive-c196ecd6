@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,7 +32,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE, INK_TINT_05, SLATE_50 } from '@/features/courses/_shared/tokens';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE, INK_TINT_05 } from '@/features/courses/_shared/tokens';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -90,7 +91,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
       <div
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1201,
-          background: SLATE_50,
+          background: A.CANVAS,
           borderTopLeftRadius: 20, borderTopRightRadius: 20,
           maxHeight: '85dvh', display: 'flex', flexDirection: 'column',
           boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',

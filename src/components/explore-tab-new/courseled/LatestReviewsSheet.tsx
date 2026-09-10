@@ -188,7 +188,6 @@ export function LatestReviewsSheet({
       open={open}
       onClose={onClose}
       ariaLabelledBy="courseled-reviews-title"
-      variant="light"
       zIndexBase={SHEET_Z_UNDER_REVIEW}
       style={{
         height: 'auto',

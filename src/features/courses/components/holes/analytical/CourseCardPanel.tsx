@@ -1391,7 +1391,6 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName, embedde
       <BottomSheet
         open={open}
         onClose={closeSheet}
-        variant="light"
         ariaLabelledBy="course-card-sheet-title"
         style={{
           height: 'auto',

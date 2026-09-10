@@ -394,7 +394,6 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
       open={open}
       onClose={onClose}
       zIndexBase={1500}
-      variant="dark"
     >
       <SheetHeader title={t('messaging:sheet.detailsTitle')} onClose={onClose} dark />
 
@@ -980,7 +979,6 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
       open={open}
       onClose={handleClose}
       zIndexBase={1600}
-      variant="dark"
     >
       <SheetHeader title={t('messaging:action.addPeople')} onClose={handleClose} dark />
       <div style={{ /* canon: sheet surface */ paddingBottom: 16 }}>

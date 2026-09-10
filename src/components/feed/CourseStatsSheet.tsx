@@ -162,7 +162,7 @@ export const CourseStatsSheet: React.FC<Props> = ({
     : null;
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="dark" maxHeight="85dvh">
+    <BottomSheet open={open} onClose={onClose} maxHeight="85dvh">
       <div style={{ overflowY: 'auto', maxHeight: 'calc(85dvh - 40px)' }}>
         {/* Header */}
         <div style={{ padding: '4px 18px 14px' }}>

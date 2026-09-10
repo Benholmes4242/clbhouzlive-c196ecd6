@@ -247,7 +247,6 @@ function SeasonResultsSheet({
     <BottomSheet
       open={open}
       onClose={onClose}
-      variant="light"
       ariaLabelledBy="player-season-sheet-title"
       style={{
         height: 'auto',

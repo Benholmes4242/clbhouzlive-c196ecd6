@@ -146,7 +146,6 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
     <BottomSheet
       open={open}
       onClose={onClose}
-      variant="dark"
       maxHeight="85dvh"
       ariaLabelledBy="course-directory-title"
       style={{

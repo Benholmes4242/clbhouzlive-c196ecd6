@@ -23,7 +23,15 @@ export const INK_ALPHA_60 = 'rgba(248,250,252,0.62)';       // supporting text �
 /* ── Surfaces ───────────────────────────────────────────────────────── */
 export const SURFACE = '#1B1E27';                           // canonical panel surface
 export const SHELL_BG = '#0A0E14';                          // dark shell band (matches global header)
-export const SLATE_50 = '#15171F';                          // page canvas
+/*
+ * BRIEF_SHEET_BACKGROUND_CANON_02 §2 — COLLAPSED. This module's `SLATE_50`
+ * meant "page canvas", which is exactly what `A.CANVAS` in
+ * features/courses/components/holes/analytical/tokens.tsx means. One idea
+ * under two names is how four sheet shades became possible, so the nine
+ * consumers now read A.CANVAS and this name is gone. NOT collapsed: tourhub's
+ * own SLATE_50 (a ramp step), CHARCOAL (a named product surface) and V4.bg
+ * each carry a recorded non-merge reason.
+ */
 
 /* ── Brand amber ────────────────────────────────────────────────────── */
 export const AMBER = '#F7931E';                             // brand amber accent

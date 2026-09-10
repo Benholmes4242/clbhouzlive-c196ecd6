@@ -7,7 +7,7 @@ import { useCourseMedia, type CourseMediaFilter } from './hooks/useCourseMedia';
 import { CourseMediaHeader } from './CourseMediaHeader';
 import { CourseMediaCanonGrid } from './CourseMediaCanonGrid';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import { SLATE_50 } from '@/features/courses/_shared/tokens';
+
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface CourseMediaTabNewProps {
@@ -70,7 +70,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   }
 
   return (
-    <div className="animate-in fade-in duration-200 flex flex-col" style={{ background: SLATE_50, minHeight: '100%' }}>
+    <div className="animate-in fade-in duration-200 flex flex-col" style={{ background: A.CANVAS, minHeight: '100%' }}>
       <CourseMediaHeader
         mediaCounts={mediaCounts}
         activeFilter={activeFilter}

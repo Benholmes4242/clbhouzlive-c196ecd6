@@ -57,7 +57,6 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
       open={open}
       onClose={onClose}
       ariaLabelledBy="friends-rounds-title"
-      variant="light"
       style={{
         height: 'auto',
         maxHeight: '75dvh',

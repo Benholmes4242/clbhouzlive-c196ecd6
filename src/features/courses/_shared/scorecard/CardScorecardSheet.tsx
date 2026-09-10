@@ -21,14 +21,14 @@ import {
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
   TREND_UP, TREND_DOWN,
-  TOPAR_UNDER_DARK, TOPAR_OVER_DARK, TOPAR_EVEN_DARK,
+  TOPAR_EVEN_DARK,
 } from '@/features/tourhub/_shared/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
-  A, SANS, FIGS, NUM, KICKER, Panel, StatRow, Action, Hairline,
+  A, SANS, FIGS, NUM, KICKER, Panel, StatRow, Action, Hairline, RAMP_TOPAR,
 } from '@/features/courses/components/holes/analytical/tokens';
 import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
@@ -519,12 +519,13 @@ const Legend: React.FC<{ holes: CardScorecardHole[]; hasUnplayed?: boolean }> = 
 /* ------------------------------------------------------ round breakdown */
 
 /**
- * THE BREAKDOWN BAR KEEPS ITS SEMANTIC COLOURS — deliberate, do not neutralise.
- * This sheet pairs one round with a facsimile of a physical card, where RED
- * ALREADY MEANS UNDER PAR in the card's red circles, so a red BIRDIE+ agrees
- * with the card inches below it. The Course-tab hole rows had to surrender the
- * bar's colour because they are a FIELD comparison and needed green/red to mark
- * you against the field. Different jobs, different rules. Do not "harmonise".
+ * THE BREAKDOWN BAR READS THE SHARED RAMP (BRIEF_SHEET_BACKGROUND_CANON_02 §4).
+ * It no longer carries its own four colours. RAMP_TOPAR is the one distribution
+ * palette app-wide — birdie+ RED, par GREY, bogey LIGHT BLUE, double+ DEEP BLUE
+ * — and the same ramp draws How It Plays, All Holes, Your Holes, the member
+ * hole rows and the round shape. RED still means UNDER par, agreeing with the
+ * card's red circles inches below; it is not an error and must not be
+ * "corrected" to green. Any future change belongs in the ramp, not here.
  *
  * A zero band renders NO segment (never a zero-width sliver) and its cell shows
  * 0 in quiet chrome rather than the band colour — a colour there would claim a score
@@ -921,10 +922,15 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const split = useMemo(() => {
     const d = (h: CardScorecardHole) => (h.strokes as number) - (h.par as number);
     return [
-      { label: t('courses:scorecard.splitBirdie'), n: played.filter((h) => d(h) <= -1).length, tone: TOPAR_UNDER_DARK },
-      { label: t('courses:scorecard.splitPar'), n: played.filter((h) => d(h) === 0).length, tone: TOPAR_EVEN_DARK },
-      { label: t('courses:scorecard.splitBogey'), n: played.filter((h) => d(h) === 1).length, tone: A.MUTE },
-      { label: t('courses:scorecard.splitDouble'), n: played.filter((h) => d(h) >= 2).length, tone: TOPAR_OVER_DARK },
+      /* BRIEF_SHEET_BACKGROUND_CANON_02 §4 — ONE DISTRIBUTION PALETTE.
+         The private four colours (red / grey / A.MUTE grey / deep blue) are
+         retired: bogey was a second grey, so a reader could not tell bogeys
+         from pars in the bar. Every distribution now reads RAMP_TOPAR —
+         birdie+ RED, par GREY, bogey LIGHT BLUE, double+ DEEP BLUE. */
+      { label: t('courses:scorecard.splitBirdie'), n: played.filter((h) => d(h) <= -1).length, tone: RAMP_TOPAR.birdie },
+      { label: t('courses:scorecard.splitPar'), n: played.filter((h) => d(h) === 0).length, tone: RAMP_TOPAR.par },
+      { label: t('courses:scorecard.splitBogey'), n: played.filter((h) => d(h) === 1).length, tone: RAMP_TOPAR.bogey },
+      { label: t('courses:scorecard.splitDouble'), n: played.filter((h) => d(h) >= 2).length, tone: RAMP_TOPAR.double },
     ];
   }, [played, t]);
 
@@ -1013,7 +1019,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     <BottomSheet
       open={open}
       onClose={onClose}
-      variant="dark"
       // BRIEF_SHEET_BACKGROUND_CANON — this sheet paints NOTHING. It used to
       // set the surface to PANEL and the body to CANVAS, which is exactly the
       // seam that showed as a band behind the action strip at the foot. The

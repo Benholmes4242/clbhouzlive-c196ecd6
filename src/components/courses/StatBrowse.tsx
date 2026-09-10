@@ -55,16 +55,7 @@ import { useBrowseReviews } from './useBrowseReviews';
 import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/LatestReviewsSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
-import {
-  AMBER,
-  HAIRLINE_INK_8,
-  HAIRLINE_INK_10,
-  INK,
-  INK_FAINT,
-  INK_MUTE,
-  SURFACE,
-  SLATE_50,
-} from '@/features/courses/_shared/tokens';
+import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 
 /**
  * Emphasise only the figures inside a sentence: INK 700 with tabular figures
@@ -740,7 +731,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     <div className="w-full">
       {/* Sentinel: once this leaves the top, the sticky bar condenses. */}
       <div ref={sentinelRef} style={{ height: 0 }} aria-hidden="true" />
-      <StickySafeAreaScrim visible={condensed} background={SLATE_50} />
+      <StickySafeAreaScrim visible={condensed} background={A.CANVAS} />
 
       {/* ── Applied filters + board order ───────────────────────── */}
       <div
@@ -752,7 +743,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           // The bar sits on the same page canvas as the hero and the post
           // wizard step 1 surface. No glass treatment — a solid band reads as
           // part of the page, not a floating darker banner.
-          background: SLATE_50,
+          background: A.CANVAS,
         }}
       >
         <div className="flex items-center gap-2">
@@ -985,7 +976,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             type="button"
             onClick={() => openDirectory(null, 'footer')}
             className="w-full mt-3 h-11 rounded-xl text-[11.5px] font-bold uppercase tracking-[0.10em]"
-            style={{ background: SLATE_50, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+            style={{ background: A.CANVAS, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
           >
             {t('statBrowse.directory.cta')}
           </button>

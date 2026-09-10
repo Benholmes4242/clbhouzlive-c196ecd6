@@ -50,7 +50,7 @@ export function PhotoActionSheet({
   const fire = (fn: () => void) => () => { onClose(); setTimeout(fn, 60); };
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light">
+    <BottomSheet open={open} onClose={onClose}>
       <div style={{ paddingTop: 4, paddingBottom: 12 }}>
         <div
           style={{
