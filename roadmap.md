@@ -241,4 +241,32 @@ OPEN ITEMS
 - Holes basis definition: birdie-or-better is now derived as
   total_holes_in_window minus pars minus bogey minus double_plus. The RPC's
   aces/albatross/eagles/birdies window counts overlap (an ace on a par 3 is also
-  gross = par - 2), which is the 4034-vs-4032 gap. 4032 is right. RPC unchanged.
+   gross = par - 2), which is the 4034-vs-4032 gap. 4032 is right. RPC unchanged.
+- ACE DOUBLE-COUNT SWEEP (report only, nothing changed). Two other places add
+  overlapping ace/eagle/albatross counts. Both are outside the handicap page.
+  1. src/components/profile/handicap/whs/sections/trends/StablefordCard.tsx:716-727
+     sums aces + albatross + eagles + birdies from get_trophy_aggregates window
+     counts. Same defect the Holes section had; the file is already dead-listed
+     (only importer is views/TrendsView.tsx:65, itself dead-listed), so it is not
+     rendered on any live route.
+  2. src/features/business/clubAnalytics/sections.tsx:283 (o.birdie + o.eagle +
+     o.albatross + o.ace for the distribution strip) and sections.tsx:576
+     (rows.reduce fallback total). get_club_course_analytics defines ace as
+     actual_gross = 1 while eagle/albatross are to-par, so every ace is counted
+     twice. Line 283 is LIVE on the claimed-club analytics surface. Line 576 only
+     bites when outcomes_total is absent; the primary path uses outcomes_total,
+     which is the true scored-hole count. Fix shape is the same subtraction:
+     birdie-or-better = outcomes_total minus par minus bogey minus double_plus.
+  NOT affected, verified: get_course_hole_analysis excludes ace from the eagle and
+  albatross filters, so HoleDataSheet.tsx:1041/1201/1220 and HoleRows.tsx:72 sum
+  mutually exclusive bands; get_trophy_aggregates' own
+  birdies_or_better_prev_window uses OR, so it counts each hole once;
+  useCompareStats.ts:141-154 / CompareSheet.tsx:251-276 and the trophy catalogue
+  read the fields individually; useWinnerScorecardStats.ts:53 sums one field
+  across rounds. Scope is two files, so it is an open item, not a sweep.
+- ?sheet= break provenance (corrected framing): the dispatcher never regressed —
+  it has emitted ?sheet= throughout. The client stopped honouring that vocabulary
+  when the in-app links moved to ?gam=, so the break dates from whenever the
+  ?sheet= reader was dropped, not from the August link change. The client alias
+  STAYS permanently after the Part 2 dispatcher change: it is what keeps the 591
+  already-delivered notifications working.
