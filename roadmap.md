@@ -171,3 +171,8 @@
 - Feed round card, friends' rounds rows, compare sheet, Discover board rows and profile round rows print gross/stableford without reading is_nine_hole or total_holes. Scope named, not fixed.
 - PostRoundCard is the only entry that prints a gross to OTHER PEOPLE rather than to the member themselves, so a misread has a cost beyond confusion. It is currently unreachable in the Clubhouse feed (round posts are hidden there) but still renders on the profile posts tab, so it is live though quieter.
 - All 30 nine-hole rounds carrying stableford points score under 33, so every one of them would land in OFF DAY by construction. That is the clearest proof the band thresholds (36+ / 33-35 / <33) assume eighteen holes without ever saying so.
+
+## Section G — dead list and census (nothing deleted)
+- src/components/profile/handicap/whs/sections/trends/GameEverywhereCard.tsx (whole file, off the page at Section G; the par-type rings move into HolesSection). Still imported by views/TrendsView.tsx.
+- src/components/profile/handicap/whs/sections/trends/RoundShapePanel.tsx (whole file, off the page and RETIRED, not pending): the "no weak stretch" census returned 22 of 22 eligible connections (>= 10 mapped 18-hole rounds with hole detail), spread 0.12-1.25 against the 1.5 threshold, mean 0.60. The verdict does not vary, so the block cannot say anything, and its coaching paragraph advised warming up immediately after disproving the problem.
+- StablefordCard.tsx SHOTS half: :735-870 the four-band ring and band chips are now dead (the distribution renders flat in Section G). :897+ MilestoneLadder still has no other home on this page and remains reported, not moved.
