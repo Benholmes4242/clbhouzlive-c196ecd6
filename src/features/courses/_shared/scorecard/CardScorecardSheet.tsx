@@ -111,6 +111,13 @@ export interface CardScorecardCourseContext {
   avgToParOthers?: number | null;
   roundsHere?: number | null;
   rankHere?: number | null;
+  /**
+   * §C — THE INDEX THE ROUND WAS PLAYED OFF (`whs_scores.handicap_index_at_time`).
+   * OPTIONAL AND DEFAULTING ABSENT: the tour caller never passes it and its
+   * output is unchanged. NULL means the provider recorded none for that score —
+   * nothing renders, and today's index is NOT substituted.
+   */
+  indexAtTime?: number | null;
 }
 
 export interface CardScorecardSheetProps {
