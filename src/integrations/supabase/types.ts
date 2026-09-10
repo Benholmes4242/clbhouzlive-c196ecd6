@@ -19784,6 +19784,10 @@ export type Database = {
         }[]
       }
       get_course_tee_sets: { Args: { p_golf_course_id: string }; Returns: Json }
+      get_courses_by_round_volume: {
+        Args: { p_min_rounds?: number }
+        Returns: Json
+      }
       get_cron_job_health: {
         Args: never
         Returns: {
@@ -21340,6 +21344,7 @@ export type Database = {
           viewer_liked: boolean
         }[]
       }
+      get_stroke_index_verdict: { Args: { p_course_id: string }; Returns: Json }
       get_suggested_creators: {
         Args: { p_limit?: number; p_user_id: string }
         Returns: {
