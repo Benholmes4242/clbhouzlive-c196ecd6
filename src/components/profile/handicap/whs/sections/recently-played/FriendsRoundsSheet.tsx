@@ -33,7 +33,6 @@ export const FriendsRoundsSheet: React.FC<Props> = ({
       variant="dark"
       surfaceColor={CHART.CANVAS}
       style={{ color: CHART.INK, overflow: 'hidden' }}
-      ariaLabelledBy="friends-rounds-sheet-title"
     >
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <SheetHeader

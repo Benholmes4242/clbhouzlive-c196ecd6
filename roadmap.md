@@ -193,3 +193,13 @@
 - Nine-hole open item strengthened: **12 of 22 connected members would show a false best gross** if the `is_nine_hole` filter in Personal Bests were removed (a 43 beats a 68). Strongest argument in the codebase for reading `is_nine_hole` on every gross/stableford surface — see the nine-hole sweep list (PostRoundCard first: only surface printing a gross to other people; hidden from Clubhouse feed, live on profile posts tab).
 - Club-name split resolved by batch-resolving the clbhouz `user_profiles.home_club` for every circle row with a clbhouz account (one read). WHS-only friends keep the England Golf value; no normaliser. Open item: 586 of 672 circle rows are WHS-only, so most rows still render England Golf's shorter form — the two flavours coexist by row type, not by field mixing.
 - Dead-listed by Section I (not deleted): `sections/friends-leaderboard-v2/FriendsLeaderboardSection.tsx`, `StandingFigures.tsx`, `WeeklyBanner.tsx`, `sections/compare/CompareEntryPanel.tsx`, `sections/PulseSection.tsx`, `sections/invite-to-clbhouz/CircleInviteAction.tsx`. `LeaderboardRow.tsx` and `FullLeaderboardSheet.tsx` stay live (see-all destination).
+
+## Section J — Friends' rounds (Sep 2026)
+
+- [x] Replace the mounted panel with a flat owner-only section showing five newest rows and an 85dvh dark complete-list sheet.
+- [x] Make synced score rows open `RoundDetailSheet`, clbhouz summary rows inert, and WHS-only rows expose one amber Invite using the existing `invite_sent` series.
+- [x] Strictly bound fallback summaries to the stated 14-day window and carry `is_nine_hole` / `total_holes` on synced score rows.
+- [ ] Authenticated populated verification: the external unmanaged auth context still blocks a representative signed-in run.
+- Source limitation: `whs_friend_matches` has no hole-count field, so the WHS-only latest-round summaries cannot disclose nine-hole status. Synced score rows can and do.
+- Accepted contradiction: Section I can still resolve a WHS-only row tap to an invite outcome, although Section J is the only explicit visible Invite action in the handicap page body.
+- No files deleted. `FriendRoundRow` and `RecentlyPlayedFeed` retain their paths/exports; their implementations were replaced. `FriendsRoundsSheet` is additive.

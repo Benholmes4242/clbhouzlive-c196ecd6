@@ -593,6 +593,20 @@
         "findGolfers": "Find golfers"
       }
     },
+    "friendsRounds": {
+      "kicker": "Friends' rounds",
+      "heading": "Recently played",
+      "meta": "Last fortnight",
+      "sheetTitle": "Friends' rounds",
+      "seeAll": "See all",
+      "empty": "No friends have posted a round in the last fortnight.",
+      "gross": "Gross",
+      "stbl": "Stbl",
+      "diff": "Diff",
+      "invite": "Invite",
+      "nineHoles": "9 holes",
+      "unknownCourse": "Unknown course"
+    },
     "hero": {
       "chartSample": "[~~{{count}} ƥőíñţš, 90 đáýš~~]"
     },

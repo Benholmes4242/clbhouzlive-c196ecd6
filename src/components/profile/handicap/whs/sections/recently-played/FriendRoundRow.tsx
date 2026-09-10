@@ -101,23 +101,32 @@ export const FriendRoundRow: React.FC<Props> = ({
     display: 'flex',
     alignItems: 'flex-start',
     gap: 10,
-    padding: '12px 0 0',
+    padding: 0,
     border: 0,
     background: 'transparent',
     textAlign: 'left',
   };
 
   return (
-    <div style={{ borderBottom: `1px solid ${CHART.BORDER}`, paddingBottom: 12 }}>
-      {canOpen ? (
-        <button type="button" style={rowStyle} onClick={() => onOpenRound(activity)}>{main}</button>
-      ) : (
+    canOpen ? (
+      <button
+        type="button"
+        onClick={() => onOpenRound(activity)}
+        style={{ width: '100%', padding: '12px 0', border: 0, borderBottom: `1px solid ${CHART.BORDER}`, background: 'transparent', textAlign: 'left' }}
+      >
+        <span style={rowStyle}>{main}</span>
+        <span style={{ display: 'block', marginTop: GAP_FIGURES_TO_COURSE, fontFamily: CHART_FONT, fontSize: 12, lineHeight: '16px', fontWeight: 500, color: CHART.MUTE, overflowWrap: 'anywhere' }}>
+          {course}
+        </span>
+      </button>
+    ) : (
+      <div style={{ padding: '12px 0', borderBottom: `1px solid ${CHART.BORDER}` }}>
         <div style={rowStyle}>{main}</div>
-      )}
-      <p style={{ margin: `${GAP_FIGURES_TO_COURSE}px 0 0`, fontFamily: CHART_FONT, fontSize: 12, lineHeight: '16px', fontWeight: 500, color: CHART.MUTE, overflowWrap: 'anywhere' }}>
-        {course}
-      </p>
-    </div>
+        <p style={{ margin: `${GAP_FIGURES_TO_COURSE}px 0 0`, fontFamily: CHART_FONT, fontSize: 12, lineHeight: '16px', fontWeight: 500, color: CHART.MUTE, overflowWrap: 'anywhere' }}>
+          {course}
+        </p>
+      </div>
+    )
   );
 };
 
