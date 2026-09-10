@@ -1,17 +1,39 @@
-import React, { useState } from 'react';
+/**
+ * FullLeaderboardSheet — the see-all for the handicap page's circle section.
+ *
+ * THIS SHEET IS THIN. It renders the SAME CircleRow the page renders, from the
+ * same cohorts, with the same club resolution (useCircleClubs) — so the amber
+ * rule, the single figure column and the viewer's club string cannot drift from
+ * the page again. It owns only the sheet chrome, the cohort labels and the
+ * inactive expander.
+ *
+ * NO RANK-MOVEMENT COLUMN and no "30D RANK" header: the chip was empty on held
+ * positions, unknown deltas and every stale row, so the label read as a header
+ * for the index column beside it. The header now carries the page's meta —
+ * "By index" — which is what the list is sorted on.
+ *
+ * THE INACTIVE COUNT IS THE CONTROL. It used to be a claim in the header with
+ * its expander at the foot of a twenty-four-row scroll. The count itself now
+ * expands, with a DOWN chevron because it expands rather than navigates.
+ *
+ * INACTIVE means no posted round within 90 days (STALE_THRESHOLD_DAYS in
+ * buildLeaderboardCohorts) — the same definition the page counts, because it is
+ * the same computation. The viewing member is always active.
+ */
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { ChevronDown } from 'lucide-react';
-import LeaderboardRow from './LeaderboardRow';
+import { CircleRow, CircleFlameLegend, hasFlame } from './CircleRow';
+import { useCircleClubs } from './useCircleClubs';
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
-import { useFriendLeaderboardRankDeltas } from '@/lib/whs/hooks';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
 interface FullLeaderboardSheetProps {
   open: boolean;
   onClose: () => void;
   cohorts: ReturnType<typeof buildLeaderboardCohorts>;
-  deltasData: ReturnType<typeof useFriendLeaderboardRankDeltas>['data'];
   onRowClick: (entry: FriendLeaderboardEntry) => void;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
@@ -29,19 +51,25 @@ const LABEL_STYLE: React.CSSProperties = {
   margin: 0,
 };
 
-
 export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
   open,
   onClose,
   cohorts,
-  deltasData,
   onRowClick,
   viewMode = 'owner',
   ownerFirstName = null,
 }) => {
+  const { t } = useTranslation(['common']);
   const [showInactive, setShowInactive] = useState(false);
   const isFriend = viewMode === 'friend';
   const possessive = ownerFirstName ? `${ownerFirstName}'s` : 'Their';
+
+  const circleEntries = useMemo(() => cohorts.active.concat(cohorts.inactive), [cohorts]);
+  const clubFor = useCircleClubs(circleEntries);
+
+  const flameOnScreen =
+    cohorts.active.some((e) => hasFlame(e)) ||
+    (showInactive && cohorts.inactive.some((e) => hasFlame(e, true)));
 
   return (
     <BottomSheet
@@ -61,9 +89,41 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
         eyebrow="LEADERBOARD"
         title={<span id="full-leaderboard-title">{isFriend ? `${possessive} circle` : 'Your circle'}</span>}
         sub={
-          <span>
-            {cohorts.totalActive} active
-            {cohorts.totalInactive > 0 ? `, ${cohorts.totalInactive} inactive` : ''}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <span>
+              {cohorts.totalActive} active &middot; {t('common:handicap.circle.section.meta')}
+            </span>
+            {cohorts.totalInactive > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowInactive((v) => !v)}
+                aria-expanded={showInactive}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  padding: 0,
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'inherit',
+                  font: 'inherit',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: 2,
+                  cursor: 'pointer',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                {cohorts.totalInactive} inactive
+                <ChevronDown
+                  size={12}
+                  strokeWidth={2}
+                  style={{
+                    transform: showInactive ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 160ms ease',
+                  }}
+                />
+              </button>
+            )}
           </span>
         }
         onClose={onClose}
@@ -77,114 +137,47 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
           fontFamily: FONT,
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 11,
-            padding: '12px 16px 4px',
-          }}
-        >
-          <p style={{ ...LABEL_STYLE, flex: 1 }}>ALL ACTIVE · {cohorts.totalActive}</p>
-          <p style={{ ...LABEL_STYLE, width: 26, textAlign: 'right' }}>30D RANK</p>
-          <div style={{ width: 42 }} />
+        <div style={{ padding: '12px 16px 4px' }}>
+          <p style={LABEL_STYLE}>ALL ACTIVE &middot; {cohorts.totalActive}</p>
         </div>
 
-        {/* 16px horizontal padding matches the row's negative margin, so the
-            self row's wash reaches both sheet edges. */}
         <div style={{ padding: '0 16px' }}>
-          {cohorts.active.map((entry, idx) => {
-            const rank = idx + 1;
-            const delta = entry.friend_row_id
-              ? deltasData?.byFriendRowId.get(entry.friend_row_id)
-              : undefined;
-            return (
-              <LeaderboardRow
-                key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
-                entry={entry}
-                rank={rank}
-                isStaleRow={false}
-                rankDelta={delta}
-                onClick={entry.is_self ? undefined : () => onRowClick(entry)}
-              />
-            );
-          })}
+          {cohorts.active.map((entry, idx) => (
+            <CircleRow
+              key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
+              entry={entry}
+              position={idx + 1}
+              club={clubFor(entry)}
+              selfLabel={t('common:handicap.circle.section.you')}
+              isFirst={idx === 0}
+              onPress={entry.is_self ? undefined : () => onRowClick(entry)}
+            />
+          ))}
 
           {cohorts.totalInactive > 0 && showInactive && (
             <>
               <div style={{ padding: '16px 0 4px' }}>
-                <p style={LABEL_STYLE}>INACTIVE · {cohorts.totalInactive}</p>
+                <p style={LABEL_STYLE}>INACTIVE &middot; {cohorts.totalInactive}</p>
               </div>
-              {cohorts.inactive.map((entry) => {
-                const delta = entry.friend_row_id
-                  ? deltasData?.byFriendRowId.get(entry.friend_row_id)
-                  : undefined;
-                return (
-                  <LeaderboardRow
-                    key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
-                    entry={entry}
-                    rank={null}
-                    isStaleRow={true}
-                    rankDelta={delta}
-                    onClick={() => onRowClick(entry)}
-                  />
-                );
-              })}
+              {cohorts.inactive.map((entry, idx) => (
+                <CircleRow
+                  key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
+                  entry={entry}
+                  position={null}
+                  club={clubFor(entry)}
+                  selfLabel={t('common:handicap.circle.section.you')}
+                  isFirst={idx === 0}
+                  stale
+                  onPress={() => onRowClick(entry)}
+                />
+              ))}
             </>
           )}
+
+          {flameOnScreen && (
+            <CircleFlameLegend label={t('common:handicap.circle.section.flameLegend')} />
+          )}
         </div>
-
-        {cohorts.totalInactive > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowInactive((v) => !v)}
-            aria-expanded={showInactive}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              // 44px tap target without moving the label: the original 12/16
-              // margins shrink by the 14px added above and below.
-              margin: '-2px 16px 2px',
-              minHeight: 44,
-              padding: 0,
-              background: 'transparent',
-              border: 'none',
-              color: DIM,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              cursor: 'pointer',
-              fontFamily: FONT,
-              WebkitTapHighlightColor: 'transparent',
-            }}
-          >
-            {!showInactive && (
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  letterSpacing: '-0.03em',
-                  color: 'rgba(242,244,247,0.96)',
-                  fontVariantNumeric: 'tabular-nums lining-nums',
-                }}
-              >
-                {cohorts.totalInactive}
-              </span>
-            )}
-            {showInactive ? 'Hide inactive' : 'Inactive'}
-            <ChevronDown
-              size={12}
-              strokeWidth={2}
-              style={{
-                transform: showInactive ? 'rotate(180deg)' : 'none',
-                transition: 'transform 160ms ease',
-              }}
-            />
-          </button>
-        )}
-
       </div>
     </BottomSheet>
   );

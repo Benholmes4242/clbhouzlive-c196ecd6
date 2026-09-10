@@ -355,7 +355,8 @@
         "you": "You",
         "emptyHeading": "No one here yet",
         "emptyBody": "Your circle is the golfers you've played with who are also on clbhouz. Connect with a few and this becomes a live table.",
-        "findGolfers": "Find golfers"
+        "findGolfers": "Find golfers",
+        "flameLegend": "過去30日間で0.5打以上改善。"
       }
     },
     "friendsRounds": {
