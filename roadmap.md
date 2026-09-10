@@ -162,8 +162,9 @@
 ## Dead-file sweep — DONE 10 Sep 2026
 - 56 files deleted in one pass: Cluster 1 (old TodayView tree, 17), Cluster 2 (old TrendsView tree, 10), Cluster 3 (old CircleView tree, 5), 6 CLEAN files, and the 28 secondary orphans they held alive. Stale comments updated in the same pass. Typecheck and full production build clean.
 - Region-only entries below are branches inside files that STAY, not deletions.
-- Still open: census the Champions drilldown folder as its own report (unreferenced but never dead-listed).
+- Still open: census the Champions drilldown folder as its own report (unreferenced but never dead-listed). Census delivered 10 Sep 2026, awaiting a ruling.
 - Tour hub and the round scorecard sheet contributed no whole-file entries: both were rebuilt in place rather than replaced.
+- Name-collision lesson: two files named types.ts, one live (src/lib/whs/types.ts) and one dead (whs/types.ts), and every grep hit for the filename belonged to the LIVE one. A hand-check reads as conclusive and is wrong; only a resolved import graph separates them. Use the graph, never the filename, before any sweep.
 
 ## Handicap one-page brief — dead list (files below are now DELETED)
 - src/components/profile/handicap/whs/sections/LastRoundCard.tsx (whole file, off the page at Section D)
