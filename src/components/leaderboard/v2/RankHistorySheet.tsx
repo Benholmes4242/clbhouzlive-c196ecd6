@@ -7,12 +7,7 @@ import React from 'react';
 import { Trophy, Target, Zap, ArrowUp, Plus } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -99,14 +94,22 @@ export function RankHistorySheet({
   isLoading,
 }: RankHistorySheetProps) {
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85dvh]">
-        <DrawerHeader className="pb-2">
-          <DrawerTitle className="text-center">Your Rank History</DrawerTitle>
+    /* BRIEF_SHEET_BACK_BEHAVIOUR §1a — primitive swap, vaul -> BottomSheet.
+       Content untouched; vaul's DrawerHeader/DrawerTitle become a plain
+       header block because BottomSheet is already role="dialog" aria-modal
+       and draws the canonical grabber. */
+    <BottomSheet
+      open={open}
+      onClose={() => onOpenChange(false)}
+      className="flex flex-col"
+    >
+      <>
+        <div className="pb-2 px-4">
+          <h2 className="text-center text-base font-semibold text-foreground">Your Rank History</h2>
           <p className="text-xs text-muted-foreground text-center mt-1">
             Key moments in your Top 100 journey
           </p>
-        </DrawerHeader>
+        </div>
 
         <ScrollArea className="flex-1 px-4">
           {isLoading ? (
@@ -131,8 +134,8 @@ export function RankHistorySheet({
             </div>
           )}
         </ScrollArea>
-      </DrawerContent>
-    </Drawer>
+      </>
+    </BottomSheet>
   );
 }
 

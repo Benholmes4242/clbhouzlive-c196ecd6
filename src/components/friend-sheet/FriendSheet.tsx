@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
  */
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Drawer as DrawerPrimitive } from 'vaul';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { formatMonthDay2ShortGB } from '@/i18n/format';
@@ -218,68 +218,39 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     state?.kind === 'clbhouz_synced_duelsOnly' ||
     state?.kind === 'clbhouz_synced_empty';
 
+  /*
+   * BRIEF_SHEET_BACK_BEHAVIOUR §1a — PRIMITIVE SWAP, vaul -> BottomSheet.
+   *
+   * Content is untouched. What went: vaul's Root/Portal/Overlay/Content, the
+   * sr-only Title/Description (BottomSheet is role="dialog" aria-modal with an
+   * ariaLabelledBy hook; the friend name is already the first thing read in
+   * SheetHeader), and this sheet's OWN drag handle — BottomSheet draws the
+   * canonical 36x4 grabber, and keeping both would show two.
+   *
+   * `hcp-light` is carried over unchanged pending the §1d ruling: nothing in
+   * this sheet reads a var(--hcp-*) token, and BottomSheet paints
+   * SHEET_SURFACE after caller styles, so it is currently inert.
+   */
   return (
-    <DrawerPrimitive.Root
+    <BottomSheet
       open={open}
-      onOpenChange={(o) => {
-        if (!o) onClose();
+      onClose={onClose}
+      zIndexBase={Z.sheetBackdrop}
+      className="hcp-light"
+      style={{
+        minHeight: 0,
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        fontFamily: FONT,
+        color: T100,
+        /* The sticky footer already owns the safe-area inset; BottomSheet's
+           own default would double it. */
+        paddingBottom: 0,
       }}
     >
-      <DrawerPrimitive.Portal>
-        <DrawerPrimitive.Overlay
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.65)',
-            zIndex: Z.sheetBackdrop,
-          }}
-        />
-        <DrawerPrimitive.Content
-          className="hcp-light"
-          style={{
-            position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: Z.sheet,
-            background: BG_0,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            maxHeight: '85dvh',
-            minHeight: 0,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            fontFamily: FONT,
-            color: T100,
-          }}
-        >
-          <DrawerPrimitive.Title className="sr-only">
-            {titleName}
-          </DrawerPrimitive.Title>
-          <DrawerPrimitive.Description className="sr-only">
-            Friend snapshot
-          </DrawerPrimitive.Description>
+      <>
 
-          {/* Drag handle */}
-          <div
-            aria-hidden
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              padding: '8px 0 4px',
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{
-                width: 36,
-                height: 4,
-                borderRadius: 2,
-                background: 'rgba(255,255,255,0.18)',
-              }}
-            />
-          </div>
 
           {/* Close */}
           <button
@@ -396,9 +367,8 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
               />
             </div>
           )}
-        </DrawerPrimitive.Content>
-      </DrawerPrimitive.Portal>
-    </DrawerPrimitive.Root>
+      </>
+    </BottomSheet>
   );
 };
 
