@@ -635,3 +635,68 @@ CONFIDENT ZEROES REMOVED (same three-state rule as §A):
   to the 239 analytics round basis. Neither derives from the other — a mapped
   round at a course with no activity row would appear in 35 and not in 49 — and
   49 minus 35 is not a shortfall.
+
+## BRIEF_SHEET_BACK_BEHAVIOUR_02 (build + report)
+
+REMOVAL. `urlOwnsHistoryEntry` is gone from `BottomSheetProps`, from the
+destructuring, and from the registration condition. It never had a consumer;
+passing it is now a compile error. `sheetHistory.ts` no longer documents an
+opt-out. Every open `BottomSheet` registers exactly one history entry.
+
+DRAFT CLASSIFICATION (code read, 52 direct `BottomSheet` consumers + 2 bespoke
+overlays). DRAFT-HOLDING — now guarded:
+ - `RequestCourseSheet` — typed course name / location / note, nowhere else
+   until submit. Dirty measured against the prefill, form status only.
+ - `ConversationSettingsSheet` — group-name editor only. Every other control
+   commits on tap.
+ - `CommentsSheetV2` — composer text or attached-but-unsent image, plus an
+   in-progress comment edit.
+SAFE TO CLOSE — search, filter, picker and read-only sheets whose state is
+either committed on tap or a view preference: `AddCourseModal` (adds/removes
+write immediately; only a search query is transient), `FindGolfersSheet`,
+`CourseDirectorySheet`, `CoursesPlayedSeeAllSheet`, `HomeClubPickerSheet`,
+`PickerSheet`, `RatingFilterChips`, `CompareSheet`, `Top100MoversSheet`,
+`Top100ListProgressSheet`, `FullListSheet`, `YourHolesSheet`,
+`YourRoundsSheet`, `YourCourseAnalyticsSheet`, `AllTeeTimesSheet`,
+`NewConversationSheet`, `FeedActorPicker`, `InviteFriendsSheet` (search only;
+the invite link is generated, not authored), `RecentRoundsCard`,
+`CourseSection`.
+
+ONE DISMISS PATH. `useDraftDismissGuard` wraps the caller's `onClose`, which is
+the single function backdrop tap, Escape, the sheet-stack history entry and any
+explicit close/done button already call — so the question is asked once per
+dismissal on all four paths, and never when the sheet is clean.
+
+HISTORY COST, NAMED. A back gesture has already consumed the sheet's history
+marker by the time the guard runs, so "keep editing" leaves the sheet open with
+its marker spent and a second back closes it (asking again). Re-pushing from
+inside a popstate handler cannot be made reliable on iOS edge-swipe, so it is
+not attempted.
+
+CONTRADICTIONS FOUND, NOT SWEPT.
+ - `CommentsSheetV2` is a bespoke portal overlay, not a `BottomSheet`: no
+   Escape handler, no sheet-stack entry. Backdrop tap is its only dismiss, and
+   hardware back leaves the route with the sheet open. Guard wired to the path
+   that exists; migration is a separate change.
+ - `RateCourseSheet` inside `CoursesContent.tsx` is a second bespoke bottom
+   sheet with its own portal and backdrop, outside the primitive and the stack.
+   Holds a search query only, so nothing is lost today.
+ - Media/full-screen overlays own history inconsistently: `AvatarLightbox`
+   pushes its own `{ lightbox: true }` entry and closes on popstate,
+   `FullscreenFeedOverlay` handles Escape but registers nothing, and
+   `MomentFullscreenViewer` (Radix Dialog) registers nothing. RECOMMENDATION:
+   route all three through `sheetHistory` so back closes the top layer in one
+   order; `AvatarLightbox`'s private entry should be retired in that change,
+   not before.
+
+COPY. `draftGuard.question` / `.body` / `.keepEditing` / `.discard` added to
+`common.json` in all six locales (en, de, es, ja, ko, en-XA), following the
+existing convention that de/es/ja/ko carry English pending translation and
+en-XA carries pseudo-text. No amber in the confirmation: keeping is the filled
+action, discarding is plain text and never the default.
+
+DEVICE TESTS OWED, ALL UNVERIFIED. iOS installed-PWA edge-swipe, Android
+hardware back, stacked sheets, refresh with a sheet open, cold URL capture and
+open, and background/restore have NOT been run — no authenticated device
+runtime is available here. Typecheck and full production build pass; the eight
+runtime/history tests remain blocking on sign-off.
