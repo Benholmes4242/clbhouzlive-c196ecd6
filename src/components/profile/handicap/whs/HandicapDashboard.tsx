@@ -130,12 +130,9 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           not deleted: the flat section carries this slot now. */}
       <RoundsThatCountSection connectionId={connection.id} userId={userId} />
 
-      {/* 5 — HOW YOU'RE SCORING (Section F) */}
-      <section style={{ padding: '0 16px', marginTop: 32 }}>
-        {scoresLoading ? null : (
-          <StablefordCard scores={scores ?? []} userId={userId} connectionId={connection.id} />
-        )}
-      </section>
+      {/* 5 — HOW YOU'RE SCORING (Section F). The points half of StablefordCard
+          is dead-listed, not deleted; SCORE STATS is still reported, not moved. */}
+      {scoresLoading ? null : <ScoringSection scores={scores ?? []} />}
 
       {/* 6 — WHICH HOLES COST YOU (Section G; RoundShapePanel pending the
           "no weak stretch" census the brief requires before it is touched) */}
