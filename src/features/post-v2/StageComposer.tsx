@@ -739,14 +739,33 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               Keep this post as a draft to finish later?
             </div>
             {!isEditMode && (
-              <button
-                onClick={saveAsDraft}
-                disabled={savingDraft}
-                style={{ height: 48, background: PAGE2.ink, color: PAGE2.canvas, border: 0, borderRadius: 999, fontSize: 12.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.10em', cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}
-              >
-                {savingDraft ? 'Saving' : 'Save draft'}
-              </button>
+              /* SAVE DRAFT TELLS THE TRUTH (BRIEF_SHEET_BACK_BEHAVIOUR_04 §2).
+                 post_drafts has no media or scheduled_at column, so this option
+                 keeps words, course tags and settings and NOTHING ELSE. It used
+                 to say only "Save draft", which reads as safe and threw photos
+                 away in silence. The option now names what it will not keep, in
+                 the option itself. It is NOT disabled: a member who cannot see
+                 why a control is greyed out learns nothing. */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <button
+                  onClick={saveAsDraft}
+                  disabled={savingDraft}
+                  style={{ height: 48, background: PAGE2.ink, color: PAGE2.canvas, border: 0, borderRadius: 999, fontSize: 12.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.10em', cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}
+                >
+                  {savingDraft ? 'Saving' : t('closeGuard.saveDraftKeepsNothingElse')}
+                </button>
+                {(state.media.length > 0 || !!state.scheduledAt) && (
+                  <div style={{ fontSize: 12, fontWeight: 600, color: PAGE2.mute, textAlign: 'center' }}>
+                    {state.media.length > 0 && state.scheduledAt
+                      ? t('closeGuard.saveDraftLosesBoth')
+                      : state.media.length > 0
+                        ? t('closeGuard.saveDraftLosesMedia')
+                        : t('closeGuard.saveDraftLosesSchedule')}
+                  </div>
+                )}
+              </div>
             )}
+
             <button
               onClick={() => { setSheet(null); reset(); onClose(); }}
               style={{ background: 'transparent', border: 0, padding: 0, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.10em', cursor: 'pointer', color: '#C0392B' }}
