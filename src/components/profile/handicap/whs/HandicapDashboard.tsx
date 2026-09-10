@@ -30,7 +30,7 @@ import LastRoundSection from './sections/LastRoundSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import ScoringSection from './sections/ScoringSection';
 import HolesSection from './sections/HolesSection';
-import PersonalBests from './sections/records/PersonalBests';
+import PersonalBestsSection from './sections/PersonalBestsSection';
 import AchievementsPanel from './sections/AchievementsPanel';
 import StreaksCard from '../gam/streaks/StreaksCard';
 import PulseSection from './sections/PulseSection';
