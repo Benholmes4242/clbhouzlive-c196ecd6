@@ -1,7 +1,9 @@
 // Shared sheet chrome. Bottom sheet with hairline grabber, 17/800 title.
 // Aligned to messaging-v2 sheet polish.
 
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { pushSheetEntry, releaseSheetEntry } from '@/components/ui/sheetHistory';
 import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
 import { CT } from '@/features/_shared/composerTokens';
@@ -21,6 +23,23 @@ interface Props {
 
 export default function BottomSheet({ open, title, onClose, children, fullHeight, fixedHeight, bottomOffset }: Props) {
   const { t } = useTranslation('common');
+
+  /* BRIEF_SHEET_BACK_BEHAVIOUR §2 — THE SECOND PRIMITIVE.
+     The post composer does not use ui/BottomSheet; it has its own sheet chrome
+     (this file), which automatic registration in the shared primitive would
+     have missed entirely. It registers with the SAME stack, so a composer
+     stage sheet and a sheet opened over it pop in order. Reported as the one
+     mounting pattern that defeated a single-primitive default.
+     NOTE: this primitive still has no escape-key handling — backdrop tap and
+     the X are its only dismiss paths. Back now joins them, unchanged. */
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  useEffect(() => {
+    if (!open) return;
+    const entry = pushSheetEntry(() => closeRef.current());
+    return () => releaseSheetEntry(entry);
+  }, [open]);
+
   if (!open) return null;
   return (
     <div
