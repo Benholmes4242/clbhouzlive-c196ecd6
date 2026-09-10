@@ -719,7 +719,9 @@
       "inZone": "In the zone",
       "solid": "Solid",
       "offDay": "Off day",
-      "withheldBody": "Your scoring spread needs about ten rounds to mean anything. You've posted {{count}}."
+      "withheldBody": "Your scoring spread needs about ten rounds to mean anything. You've posted {{count}}.",
+      "metaPlain": "{{count}} rounds · {{days}} days",
+      "sampleLine": "from {{count}} rounds"
     }
   },
   "comments": {
