@@ -15,7 +15,8 @@ import { cn } from '@/lib/utils';
  * band, it uses a hairline or a PANEL panel INSIDE the body — never a second
  * full-width fill, which is what produced the seams this brief removed.
  */
-export { SHEET_SURFACE } from '@/lib/tokens/surfaces';
+import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
+export { SHEET_SURFACE };
 
 
 interface BottomSheetProps {
