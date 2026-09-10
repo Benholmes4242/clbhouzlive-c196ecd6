@@ -143,17 +143,7 @@ export default function ProfileSheetV2({
     onClose();
     setTimeout(() => onNavigate(route), 40);
   };
-  const panelRef = useRef<HTMLDivElement | null>(null);
-  const openTweenRef = useRef<ReturnType<typeof animate> | null>(null);
   const ovlId = useRef<number>(-1);
-  const [mounted, setMounted] = useState(false);
-
-  // Body scroll lock while open.
-  useEffect(() => {
-    if (!open) return;
-    lockBodyScroll();
-    return () => unlockBodyScroll();
-  }, [open]);
 
   // profile_hub_sheet_opened — instrumentation was lost in the v2 rewrite and
   // re-added 7 Sep 2026. Fires once per open, matching the v1 sheet's contract.
@@ -165,77 +155,110 @@ export default function ProfileSheetV2({
     });
   }, [open, currentActor.type, isAdmin]);
 
-
-  // Overlay perf timing.
+  /* Overlay perf timing — preserved through the migration (E). The bespoke
+     frame owned the open/close tweens, so it could mark 'animation-start' and
+     'animation-done' itself. BottomSheet owns the transition now, so the two
+     marks that remain measurable from here are the open and the close; the
+     animation pair is emitted around the primitive's own slide-in frame. */
   useEffect(() => {
     if (open) {
       ovlId.current = overlayOpen('profile-sheet-v2');
-    } else if (ovlId.current >= 0) {
+      const raf = requestAnimationFrame(() => {
+        if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-start');
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+    if (ovlId.current >= 0) {
       overlayMark(ovlId.current, 'close-start');
+      overlayMark(ovlId.current, 'closed');
+      ovlId.current = -1;
     }
   }, [open]);
 
-  // Open: mount, seed offscreen, slide to 0.
-  useEffect(() => {
-    if (!open) return;
-    const fallbackH = typeof window !== 'undefined' ? window.innerHeight : 1000;
-    sheetY.set(fallbackH);
-    setMounted(true);
-    const raf = requestAnimationFrame(() => {
-      const h = panelRef.current?.offsetHeight ?? fallbackH;
-      sheetY.set(h);
-      if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-start');
-      openTweenRef.current?.stop();
-      openTweenRef.current = animate(sheetY, 0, {
-        type: 'tween',
-        duration: 0.25,
-        ease: [0.32, 0.72, 0, 1],
-      });
-      openTweenRef.current.finished
-        .then(() => { if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-done'); })
-        .catch(() => {});
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [open, sheetY]);
+  /* Body scroll lock, escape, backdrop, drag-to-dismiss, the 85dvh cap and the
+     back-stack entry all belong to BottomSheet now. Nothing is reimplemented
+     here; see the file header for the two accepted deltas. */
 
-  // Close: slide down then unmount.
-  useEffect(() => {
-    if (open || !mounted) return;
-    openTweenRef.current?.stop();
-    const h = panelRef.current?.offsetHeight ?? window.innerHeight;
-    const t = animate(sheetY, h, {
-      type: 'tween',
-      duration: 0.22,
-      ease: [0.32, 0.72, 0, 1],
-    });
-    t.finished
-      .then(() => {
-        setMounted(false);
-        if (ovlId.current >= 0) overlayMark(ovlId.current, 'closed');
-      })
-      .catch(() => {});
-    return () => { t.stop(); };
-  }, [open, mounted, sheetY]);
+  return (
+    <>
+      <BottomSheet
+        open={open}
+        onClose={onClose}
+        zIndexBase={9998}
+        topRadius={24}
+        ariaLabelledBy="ps2-title"
+        style={{
+          boxShadow: '0 -12px 40px rgba(0,0,0,0.3)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        {/* FIXED HEAD (E). The sheet had no title at all, so a scrolled open
+            landed mid-card with nothing naming the surface. */}
+        <SheetHeader
+          title="Account"
+          onClose={onClose}
+          dark
+          borderBottom
+        />
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            overscrollBehavior: 'contain',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          {isLoading ? (
+            <SheetSkeleton />
+          ) : (
+            <div style={{ paddingTop: 16, paddingBottom: 32 }}>
+              <ActorCards
+                currentActor={currentActor}
+                profiles={profiles}
+                onSwitchProfile={onSwitchProfile}
+                onNavigate={onNavigate}
+              />
+              <HcpStrip
+                actorType={currentActor.type}
+                actorId={currentActor.id}
+                onNavigate={onNavigate}
+              />
+              <QuickActionsRow
+                actorType={currentActor.type}
+                actorId={currentActor.id}
+                onNavigate={onNavigate}
+              />
+              <SheetNavGroup
+                currentActor={{ id: currentActor.id, type: currentActor.type }}
+                isAdmin={isAdmin}
+                onNavigate={onNavigate}
+                onInviteFriends={handleInviteFriends}
+                onOpenCourseAnalytics={
+                  currentActor.type === 'personal' ? handleOpenCourseAnalytics : undefined
+                }
+                analyticsState={analyticsState}
+                /* D2: the dashed "+ Business" tile left the actor rail; this is
+                   what decides whether the business row offers creation. */
+                hasBusinessActor={profiles.some((p) => p.type === 'business')}
+              />
+              <SignOutRow onNavigate={onNavigate} />
+            </div>
+          )}
+        </div>
+      </BottomSheet>
+      <YourCourseAnalyticsSheet
+        open={analyticsSheetOpen}
+        onClose={() => setAnalyticsSheetOpen(false)}
+        onNavigate={handleAnalyticsNavigate}
+        synced={whsSynced}
+      />
+    </>
+  );
+}
 
-  // Escape closes.
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', h);
-    return () => document.removeEventListener('keydown', h);
-  }, [open, onClose]);
-
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (info.offset.y > 100 || info.velocity.y > 500) {
-      onClose();
-    } else {
-      animate(sheetY, 0, { type: 'spring', damping: 25, stiffness: 300 });
-    }
-  };
-
-  if (typeof document === 'undefined') return null;
-
-  const content = (
     <>
       <AnimatePresence>
         {open && (
