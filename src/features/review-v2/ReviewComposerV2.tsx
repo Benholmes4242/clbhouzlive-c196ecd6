@@ -19,6 +19,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 import AccessControl from '@/components/AccessControl';
+import { useDraftDismissGuard } from '@/components/ui/useDraftDismissGuard';
+import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
 import { useTranslation } from 'react-i18next';
 
 import { RV2 } from './tokens';
@@ -1014,6 +1016,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         label={buttonLabel}
         enabled={gateMet && !submit.submitting}
         onPress={handlePrimary}
+      />
+
+      {/* §1a: the one question before several paragraphs are thrown away. */}
+      <DiscardDraftDialog
+        open={exitGuard.confirmOpen}
+        onKeepEditing={exitGuard.keepEditing}
+        onDiscard={exitGuard.discard}
       />
 
       <RemoveReviewSheetV2
