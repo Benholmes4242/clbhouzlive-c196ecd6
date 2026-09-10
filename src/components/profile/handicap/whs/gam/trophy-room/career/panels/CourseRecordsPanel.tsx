@@ -43,7 +43,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { REC, LABEL } from '../tokens';
 import { Panel, RowButton, Figure, Collapsible, MetaLabel } from '../Primitives';
-import { FIELD_MIN_PLAYERS, hasField } from '@/lib/gam/fieldGate';
+import { CROWN_MIN_OTHERS, hasContest, hasField } from '@/lib/gam/fieldGate';
 import type { CourseCrownGroup } from './CrownsPanel';
 import type { CareerData } from '../types';
 
@@ -52,7 +52,13 @@ interface Props {
   groups: CourseCrownGroup[];
 }
 
-/** A row's contest state. `unknown` = the batched field read is unavailable. */
+/**
+ * A row's contest state. `unknown` = the batched field read is unavailable.
+ *
+ * FOUR COPY BANDS, UNCHANGED: alone / one / few (2-4) / won (5+) each keep their
+ * own sentence, because the SIZE of a contest is worth showing. What changed is
+ * which of them counts as WON in the headline: everything except `alone`.
+ */
 type Contest =
   | { kind: 'unknown' }
   | { kind: 'won'; others: number }
@@ -66,10 +72,14 @@ export function contestOf(
 ): Contest {
   if (!available || others === undefined) return { kind: 'unknown' };
   if (hasField(others)) return { kind: 'won', others };
-  if (others <= 0) return { kind: 'alone' };
+  if (others < CROWN_MIN_OTHERS) return { kind: 'alone' };
   if (others === 1) return { kind: 'one' };
   return { kind: 'few', others };
 }
+
+/** WON in the headline: a record beaten somebody. Only `alone` is uncontested. */
+const isWon = (c: Contest): boolean =>
+  c.kind === 'won' || c.kind === 'few' || c.kind === 'one';
 
 export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   const { t } = useTranslation('handicap');
@@ -85,7 +95,7 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
 
   // Contested first, each band by record count descending, then by name so the
   // order is stable between renders.
-  const rank = (c: Contest) => (c.kind === 'won' ? 0 : 1);
+  const rank = (c: Contest) => (isWon(c) ? 0 : 1);
   const ordered = [...rows].sort((a, b) => {
     if (rank(a.contest) !== rank(b.contest)) return rank(a.contest) - rank(b.contest);
     if (b.group.records.length !== a.group.records.length)
@@ -94,10 +104,10 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   });
 
   const won = rows
-    .filter((r) => r.contest.kind === 'won')
+    .filter((r) => isWon(r.contest))
     .reduce((sum, r) => sum + r.group.records.length, 0);
   const uncontested = rows
-    .filter((r) => r.contest.kind !== 'won' && r.contest.kind !== 'unknown')
+    .filter((r) => r.contest.kind === 'alone')
     .reduce((sum, r) => sum + r.group.records.length, 0);
   const total = rows.reduce((sum, r) => sum + r.group.records.length, 0);
 
