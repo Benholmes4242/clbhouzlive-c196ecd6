@@ -298,28 +298,49 @@ export function AmateurHero({
       </CourseImageFallback>
 
       {subject && (
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              (e.currentTarget as HTMLDivElement).click();
+            }
+          }}
           onClick={() => {
             /* §5 THE ROUND FIRST. The hero names a feat, so the tap must land on
                the scorecard that carries it. The course page is the FALLBACK for
                a row with no score id (a suggested round with no card), never the
                primary destination.
 
-               AN AGGREGATE CARD HAS NO SCORECARD TO OPEN, so its door is the
-               member whose fortnight the figure describes — the one place the
-               rounds behind it are all listed. */
+               §8 AN AGGREGATE CARD OPENS THE BOARD BENEATH IT, switched to the
+               card's own metric, window and pool. The member tapping "MOST
+               BIRDIES / 30 DAYS / 14" is asking who else and by how much, and
+               that answer is forty pixels down the same page — so the page
+               answers it instead of handing the question to a profile. The
+               profile is still one tap away on the name (see below).
+
+               WHERE NO BOARD RANKS THE FIGURE the profile remains the door.
+               That is boardForMetric's list and it is a constraint of the
+               board's board set, not a preference. */
             if (card) {
               analyticsEvents.track('amateur_hero_card_tapped', {
                 card_id: card.id,
                 metric: card.metric,
                 window: card.window,
                 pool: card.pool,
+                destination: row?.score_id
+                  ? 'round'
+                  : isAggregateCard && cardBoard && onOpenBoard
+                    ? 'board'
+                    : 'profile',
               });
             }
             if (row?.score_id && onOpenRound) onOpenRound(row.score_id, row.user_id);
             else if (row?.course_id) navigate(`/courses/${row.course_id}`);
-            else if (isAggregateCard) navigate(`/profile/${subject.user_id}`);
+            else if (isAggregateCard && card && cardBoard && onOpenBoard) {
+              onOpenBoard(cardBoard, String(card.window) as WindowKey, card.pool === 'circle' ? 'circle' : 'everyone');
+            } else if (isAggregateCard) navigate(`/profile/${subject.user_id}`);
           }}
           style={{
             position: 'absolute',
@@ -336,6 +357,7 @@ export function AmateurHero({
             cursor: row?.course_id || isAggregateCard ? 'pointer' : 'default',
           }}
         >
+
           {/* WHO, on the photograph. Name and kicker form one column so the
               avatar centres against the pair, not against the first line. The
               score sits on the same row and shares the same vertical axis. */}
