@@ -19,6 +19,13 @@ export interface CountingRound {
 interface Props {
   rounds: CountingRound[];
   height?: number;
+  /**
+   * ADDITIVE. Defaults keep every existing call site byte-identical: the
+   * legend renders, no point is selectable and no point is ringed.
+   */
+  showLegend?: boolean;
+  selectedIndex?: number | null;
+  onSelectIndex?: (index: number) => void;
 }
 
 const VIEW_W = 320;
