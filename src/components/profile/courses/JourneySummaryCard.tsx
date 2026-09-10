@@ -45,6 +45,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   coursesPlayed,
   countriesPlayed,
   avgRating,
+  ratedCount,
   top100Played,
   isOwnProfile,
   displayName,
