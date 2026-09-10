@@ -246,7 +246,10 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
           onChange={handleSetFilter}
           totalCount={rounds.length}
           counterCount={counterCount}
-          courseNames={courseNames}
+          onOpenPicker={() => setPickerOpen(true)}
+          anyCourseLabel={t('handicap.form.archive.anyCourse')}
+          allLabel={t('handicap.form.archive.allRounds')}
+          countersLabel={t('handicap.form.archive.counters')}
         />
       )}
 
