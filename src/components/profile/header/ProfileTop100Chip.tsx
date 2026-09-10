@@ -38,10 +38,18 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   // Only show for personal profiles with Top 100 progress
   if (!isPersonal || !top100Overview) return null;
   
-  const totalPlayed = top100Overview.total_rated ?? top100Overview.total_played ?? 0;
+  /*
+   * BRIEF_PROFILE_PASS_ONE §A (follow-up) — NO FABRICATED ZERO. This used to
+   * end in `?? 0`. An overview that arrived without either total is NOT KNOWN,
+   * not zero, so the chip renders nothing rather than treating an unreadable
+   * figure as "has played none". A null/undefined overview already returned
+   * null above, and the 5-course floor below meant a `0` never reached the
+   * screen as a figure — but the zero itself is gone at source.
+   */
+  const totalPlayed = top100Overview.total_rated ?? top100Overview.total_played ?? null;
   
-  // Only show if user has first achievement (5+ courses)
-  if (totalPlayed < 5) return null;
+  // Only show if the figure is known AND the first achievement (5+) is reached.
+  if (totalPlayed == null || totalPlayed < 5) return null;
   
   const club = getTop100Club(totalPlayed);
   const completionStamps = getCompletionStamps(top100Overview.lists);
