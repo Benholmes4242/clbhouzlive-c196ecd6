@@ -189,7 +189,6 @@ export function LatestReviewsSheet({
       onClose={onClose}
       ariaLabelledBy="courseled-reviews-title"
       variant="light"
-      surfaceColor={A.CANVAS}
       zIndexBase={SHEET_Z_UNDER_REVIEW}
       style={{
         height: 'auto',

@@ -76,7 +76,6 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
       open={open}
       onClose={onClose}
       variant="light"
-      surfaceColor={SLATE_50}
       style={{
         height: 'auto',
         maxHeight: '85dvh',

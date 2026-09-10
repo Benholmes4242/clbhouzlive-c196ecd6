@@ -132,7 +132,6 @@ export function CourseNewsSheet({
       onClose={onClose}
       ariaLabelledBy="courseled-news-title"
       variant="light"
-      surfaceColor={A.CANVAS}
       style={{
         height: 'auto',
         maxHeight: '85dvh',

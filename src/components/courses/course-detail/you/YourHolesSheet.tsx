@@ -155,7 +155,6 @@ const YourHolesSheet: React.FC<Props> = ({ open, onClose, courseId, courseName }
       open={open}
       onClose={onClose}
       variant="light"
-      surfaceColor={A.CANVAS}
       maxHeight="85dvh"
       topRadius={22}
       grabberColor="rgba(248,250,252,0.22)"

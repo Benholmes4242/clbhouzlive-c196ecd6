@@ -533,7 +533,6 @@ export const CompareSheet: React.FC<Props> = ({
       onClose={handleClose}
       ariaLabelledBy="handicap-compare-title"
       variant="dark"
-      surfaceColor={CHART.CANVAS}
       maxHeight="85dvh"
       style={{
         height: 'auto',

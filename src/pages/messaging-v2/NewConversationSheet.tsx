@@ -364,7 +364,6 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
       onClose={handleClose}
       zIndexBase={1400}
       variant="dark"
-      surfaceColor={SHEET}
     >
       <SheetHeader title={t('action.newMessage')} onClose={handleClose} dark />
 

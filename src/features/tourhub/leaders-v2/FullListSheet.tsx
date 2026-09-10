@@ -125,7 +125,6 @@ export function FullListSheet({
       onClose={onClose}
       ariaLabelledBy="tour-leaders-full-sheet-title"
       variant="light"
-      surfaceColor={SLATE_50}
       style={{
         height: 'auto',
         maxHeight: '85dvh',

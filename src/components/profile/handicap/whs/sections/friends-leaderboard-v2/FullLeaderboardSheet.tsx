@@ -77,7 +77,6 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
       onClose={onClose}
       ariaLabelledBy="full-leaderboard-title"
       variant="dark"
-      surfaceColor="#15171F"
       style={{
         maxHeight: '85dvh',
         display: 'flex',

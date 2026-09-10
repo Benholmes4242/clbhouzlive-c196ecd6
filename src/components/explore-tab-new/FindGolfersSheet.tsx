@@ -480,7 +480,6 @@ export function FindGolfersSheet({ open, onClose }: Props) {
       onClose={onClose}
       ariaLabelledBy="find-golfers-title"
       variant="light"
-      surfaceColor={A.CANVAS}
       style={{
         height: 'auto',
         maxHeight: '85dvh',

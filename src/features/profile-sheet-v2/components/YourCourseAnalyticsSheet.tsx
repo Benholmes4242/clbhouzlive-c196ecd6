@@ -853,7 +853,6 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
       zIndexBase={10000}
       maxHeight="85dvh"
       variant="dark"
-      surfaceColor={A.CANVAS}
       // Make the sheet panel a flex column so we can pin the header and
       // scroll only the list. `overflow: hidden` keeps the rounded top
       // corners clipping the scroll region.

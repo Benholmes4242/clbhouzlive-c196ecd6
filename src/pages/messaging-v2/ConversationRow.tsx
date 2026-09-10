@@ -345,7 +345,6 @@ export const ConversationRow: React.FC<Props> = ({ conversation, ground }) => {
         }}
         zIndexBase={1500}
         variant="dark"
-        surfaceColor={SHEET_SURFACE}
       >
         <SheetHeader title={identity.name} onClose={() => setMenuOpen(false)} dark />
         <div style={{ background: SHEET_SURFACE, paddingBottom: 32 }}>

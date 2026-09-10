@@ -159,7 +159,7 @@ export function InsightSheet({
   const courseTypeLabel = formatCourseType(dna?.course_type ?? null);
 
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="insight-sheet-title" variant="dark" surfaceColor={A.CANVAS}>
+    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="insight-sheet-title" variant="dark">
       <div
         style={{
           padding: '4px 20px 20px',

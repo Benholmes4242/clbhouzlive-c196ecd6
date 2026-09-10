@@ -58,7 +58,6 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
       onClose={onClose}
       ariaLabelledBy="friends-rounds-title"
       variant="light"
-      surfaceColor={A.CANVAS}
       style={{
         height: 'auto',
         maxHeight: '75dvh',

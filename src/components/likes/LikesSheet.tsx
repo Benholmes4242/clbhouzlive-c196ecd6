@@ -63,7 +63,6 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post' }: Li
       open={open}
       onClose={onClose}
       zIndexBase={LIKES_SHEET_Z}
-      surfaceColor={A.CANVAS}
       maxHeight="85dvh"
     >
       <div style={{ padding: '4px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>

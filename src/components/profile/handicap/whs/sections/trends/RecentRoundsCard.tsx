@@ -500,7 +500,6 @@ const CoursePickerSheet: React.FC<{
     open={open}
     onClose={onClose}
     variant="dark"
-    surfaceColor="var(--hcp-bg-1)"
     className="hcp-dark"
     zIndexBase={1500}
     style={{
