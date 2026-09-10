@@ -285,6 +285,9 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
           ))}
 
 
+          {/* Observer target: the next page loads before the list runs out. */}
+          {hasMore && <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />}
+
           {hasMore && (
             <button
               type="button"
