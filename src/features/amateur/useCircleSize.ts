@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { supabase } from '@/integrations/supabase/client';
+import { fetchCircleCount } from '@/lib/social/circle';
 
 /**
  * DOES THIS MEMBER HAVE A CIRCLE AT ALL?
@@ -10,19 +10,18 @@ import { supabase } from '@/integrations/supabase/client';
  * answers: a quiet fortnight (C1) is not a problem to solve, while an empty
  * circle (C2) is the cold start. One head-count read separates them; it is only
  * asked for when the board comes back empty.
+ *
+ * IT USED TO COUNT EVERY ROW OF `follows` (BRIEF_CIRCLE_DEFINITION §6). That
+ * included follows of BUSINESS profiles, so 48 of 101 members were told they
+ * had a circle when the circle pool - which only ever contained people - found
+ * nobody. The count now comes from src/lib/social/circle.ts, the one definition,
+ * so this answer and the pool's answer cannot disagree.
  */
 export function useCircleSize(userId: string | undefined, enabled: boolean) {
   return useQuery({
     queryKey: ['amateur', 'circle-size', userId],
     enabled: !!userId && enabled,
     staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { count, error } = await supabase
-        .from('follows')
-        .select('id', { count: 'exact', head: true })
-        .eq('follower_user_id', userId!);
-      if (error) throw error;
-      return count ?? 0;
-    },
+    queryFn: () => fetchCircleCount(userId!),
   });
 }

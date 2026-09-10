@@ -26,12 +26,14 @@ import {
  * must be in hand when it is made. Neither read can be skipped: the everyone
  * pool is step 2 for EVERY member, not just the ones with no circle.
  *
- * WHOSE CIRCLE. `hasCircle` is taken from the circle read itself, NOT from
- * useCircleSize — that hook counts the `follows` table, while the circle pool is
- * built from `user_friends` UNION `user_follows`. Two live follow tables is a
- * contradiction worth reporting on its own; the hero simply asks the pool it is
- * going to use. A circle with no rounds in 90 days is a circle that fails the
- * depth test in every window anyway, so the two readings agree on the outcome.
+ * WHOSE CIRCLE. `hasCircle` is still taken from the circle read itself, and the
+ * two readings can no longer disagree: since BRIEF_CIRCLE_DEFINITION §6 the pool
+ * and useCircleSize both come from src/lib/social/circle.ts — personal profiles
+ * the member follows. Before that fix the size hook counted business follows, so
+ * 48 of 101 members reported a circle and then fell through an empty one; the
+ * ladder was quietly compensating for a fault rather than widening on merit.
+ * A circle with no rounds in 90 days still fails the depth test in every window,
+ * so a member with a genuine but dormant circle reaches step 2 as designed.
  *
  * NET IS THE DATABASE'S NUMBER. gam_round_net through useRoundNetScores, the
  * same source the Lowest net board reads. No formula in the app.
