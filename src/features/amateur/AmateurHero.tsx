@@ -2,7 +2,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import type { BoardKey, WindowKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
+
 import { RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import { useRoundHoleShapes, type HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { DISCOVER_FACT, DISCOVER_QUIET, KICKER, SANS } from '@/components/explore-tab-new/courseled/tokens';
