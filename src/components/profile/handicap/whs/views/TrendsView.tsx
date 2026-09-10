@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
  * FORM - the whole of the old Trends tab plus the whole of the old Rounds tab.
  *
  * The round list is no longer a section: RoundsArchivePanel states the figures
- * and RoundsArchiveSheet carries the list at 75dvh.
+ * and RoundsArchiveSheet carries the list at 85dvh.
  */
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -80,7 +80,7 @@ export const TrendsView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 6. Posted history — figures here, list in the 75dvh sheet */}
+      {/* 6. Posted history — figures here, list in the 85dvh sheet */}
       <RoundsArchivePanel
         connectionId={connectionId}
         userId={userId}
