@@ -641,7 +641,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   void emptyMessage;
   void coursePar;
   void courseSlope;
-  void nineHole;
+
+  /**
+   * §B — THE KICKER. `nineHole` is no longer voided: a nine-hole round says so
+   * on the one line that describes the round's format, and an eighteen-hole
+   * round is unchanged (no suffix, no separator, no empty space).
+   */
+  const kickerText = nineHole
+    ? (eyebrowText
+        ? `${eyebrowText} \u00B7 ${t('courses:scorecard.nineHoleTag')}`
+        : t('courses:scorecard.nineHoleTag'))
+    : eyebrowText;
+
 
   const isTour = surface === 'tour';
   /**
