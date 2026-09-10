@@ -365,14 +365,25 @@ const ProfilePageV2Content: React.FC = () => {
    */
   const {
     data: socialCounts,
-    isLoading: socialCountsLoading,
+    isFetched: socialCountsFetched,
     isError: socialCountsError,
   } = useSocialCounts(
     profileUserId ? { type: 'personal', id: profileUserId } : undefined,
   );
-  const socialCountState: 'ok' | 'loading' | 'error' = socialCountsError
+  /*
+   * THE LOADING GATE READS `isFetched`, NOT `isLoading`. The hook is disabled
+   * without an actor, and a disabled React Query v5 query is pending with
+   * fetchStatus 'idle': isLoading is FALSE before it has ever run, so an
+   * isLoading gate would call the state 'ok' with null figures and print a
+   * permanent em dash — a dash that never resolves is a value, which is the
+   * thing this section exists to prevent. isFetched only turns true once a real
+   * result has landed. A read that CANNOT run (no actor at all) is not loading
+   * either: nothing is known, so it takes the error branch and the cell is
+   * inert. Same reasoning as ChromeIsland and the handicap connected gate.
+   */
+  const socialCountState: 'ok' | 'loading' | 'error' = socialCountsError || !profileUserId
     ? 'error'
-    : socialCountsLoading
+    : !socialCountsFetched
       ? 'loading'
       : 'ok';
   /* The failure stops being invisible: one event per failed read, naming the
