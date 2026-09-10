@@ -11,6 +11,15 @@
  * states the rule in words directly beneath them, because a member reading
  * "uncontested" without it will read an accusation.
  *
+ * THE TWO FIGURES COUNT RECORDS, NOT COURSES (ruled 10 Sep 2026). They sum to
+ * the same total the sheet showed before the split -- 67 for member 8c240997 --
+ * so the headline keeps continuity with the figure the member already knows and
+ * answers "of my sixty-seven records, how many did I actually win?". WON = 10
+ * records at the 4 courses with FIELD_MIN_PLAYERS+ other golfers; UNCONTESTED =
+ * 57 at the other 18. The COURSE count stays in the meta ("{n} courses") and
+ * must never move into the headline: a courses split would shrink the figure
+ * from 67 to 22 for reasons that have nothing to do with contest.
+ *
  * THE THRESHOLD IS NOT LOCAL. Contested means FIELD_MIN_PLAYERS or more
  * distinct players with a scored round at the course EXCLUDING the holder --
  * the same constant and the same count the scorecard sheet's field row uses
