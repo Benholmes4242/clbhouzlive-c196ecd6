@@ -79,6 +79,15 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
     if (replyingTo) requestAnimationFrame(() => inputRef.current?.focus());
   }, [replyingTo]);
 
+  /* Typed text or an uploaded-but-unsent image is a draft. An open actor
+     picker or a focused empty field is not. Reported on every change so the
+     owning sheet's dismiss guard is never a frame behind. */
+  useEffect(() => {
+    onDirtyChange?.(hasText || hasImage);
+  }, [hasText, hasImage, onDirtyChange]);
+  useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
+
+
   const handleFile = async (file: File) => {
     if (!user?.id) return;
     setUploading(true);
