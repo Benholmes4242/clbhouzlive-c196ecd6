@@ -251,6 +251,10 @@ export const RoundDetailSheet: React.FC<Props> = ({
         avgToParOthers: ctx.avg_to_par_others,
         roundsHere: ctx.rounds_here,
         rankHere: ctx.rank_here,
+        /* §C — the index this round was played off, straight from the provider's
+           score record. No new query: userQuery already carries it. Null stays
+           null; the sheet omits the figure rather than showing today's index. */
+        indexAtTime: userData?.handicap_index_at_time ?? null,
       } : null}
       playerName={displayName}
       playerAvatarUrl={profile?.profile_photo_url ?? null}
