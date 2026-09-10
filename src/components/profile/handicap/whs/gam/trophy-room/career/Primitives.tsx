@@ -186,14 +186,20 @@ export const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children
   </div>
 );
 
-export const Dot: React.FC<{ on: boolean }> = ({ on }) => (
+/**
+ * State dot. `color` is additive and defaults to AMBER so every existing call
+ * site renders byte-identically; the trophy room's milestone rows pass GOOD,
+ * because a reached milestone is a completion and green is this sheet's one
+ * completion colour.
+ */
+export const Dot: React.FC<{ on: boolean; color?: string }> = ({ on, color }) => (
   <span
     aria-hidden
     style={{
       width: 7,
       height: 7,
       borderRadius: 4,
-      background: on ? REC.AMBER : REC.TRACK,
+      background: on ? (color ?? REC.AMBER) : REC.TRACK,
       display: 'inline-block',
       flexShrink: 0,
     }}
