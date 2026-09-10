@@ -34,15 +34,10 @@
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 
-import { supabase } from '@/integrations/supabase/client';
 import { useFriendLeaderboard, useFriendLeaderboardRankDeltas } from '@/lib/whs/hooks';
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
-import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
-import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
-import { fmtHcp } from '@/lib/whs/format';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
@@ -52,36 +47,11 @@ import { SeeAllRow } from './SeeAllRow';
 import { HcpSection } from './HcpSection';
 import { CHART } from '../charts/tokens';
 import FullLeaderboardSheet from './friends-leaderboard-v2/FullLeaderboardSheet';
-
-const FIG: React.CSSProperties = {
-  fontVariantNumeric: 'tabular-nums lining-nums',
-  letterSpacing: '-0.04em',
-};
+import { CircleRow, CircleFlameLegend, hasFlame } from './friends-leaderboard-v2/CircleRow';
+import { useCircleClubs } from './friends-leaderboard-v2/useCircleClubs';
 
 interface Props {
   userId: string;
-}
-
-/** One read for every clbhouz account in the circle. No per-row fetch. */
-function useCircleClubs(userIds: string[]) {
-  const key = Array.from(new Set(userIds)).sort();
-  return useQuery({
-    queryKey: ['circle-home-clubs', key],
-    enabled: key.length > 0,
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('id, home_club')
-        .in('id', key);
-      if (error) throw error;
-      const map = new Map<string, string | null>();
-      for (const row of (data as { id: string; home_club: string | null }[]) ?? []) {
-        map.set(row.id, row.home_club ?? null);
-      }
-      return map;
-    },
-  });
 }
 
 /** A row only responds where the resolver has somewhere to go. */
