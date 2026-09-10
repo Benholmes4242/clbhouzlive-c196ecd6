@@ -35,7 +35,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useFriendLeaderboard, useFriendLeaderboardRankDeltas } from '@/lib/whs/hooks';
+import { useFriendLeaderboard } from '@/lib/whs/hooks';
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { formatOrdinal } from '@/i18n/format';
@@ -64,7 +64,6 @@ function isResolvable(e: FriendLeaderboardEntry): boolean {
 export const CircleSection: React.FC<Props> = ({ userId }) => {
   const { t } = useTranslation(['common']);
   const { data, isFetched } = useFriendLeaderboard(userId);
-  const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 30);
   const { resolve } = useMemberTapResolver();
   const [seeAllOpen, setSeeAllOpen] = useState(false);
 
@@ -203,7 +202,6 @@ export const CircleSection: React.FC<Props> = ({ userId }) => {
         open={seeAllOpen}
         onClose={() => setSeeAllOpen(false)}
         cohorts={cohorts}
-        deltasData={deltasData}
         onRowClick={(entry) => void handleRowTap(entry)}
         viewMode="owner"
       />
