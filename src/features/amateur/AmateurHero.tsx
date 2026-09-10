@@ -13,7 +13,7 @@ import { useHeroCourseImage } from '@/features/amateur/useHeroCourseImage';
 import { SINGLE_ROUND_METRICS } from '@/features/amateur/hero/heroCards';
 import { heroContextLine, heroKicker, heroUnit } from '@/features/amateur/hero/heroCopy';
 import { useAmateurHeroCards } from '@/features/amateur/hero/useAmateurHeroCards';
-import { analyticsEvents } from '@/lib/analytics/events';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
