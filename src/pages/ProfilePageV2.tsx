@@ -87,7 +87,6 @@ import { useMemberRoundTotal } from '@/hooks/profile/useMemberRoundTotal';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
-import { HomeClubPrompt } from '@/features/home-club/HomeClubPrompt';
 import { openHomeClubPicker } from '@/features/home-club/homeClubPickerStore';
 import { GolfJourneyProgress } from '@/components/profile/phase6';
 import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
