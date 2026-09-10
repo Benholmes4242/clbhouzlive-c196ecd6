@@ -4,7 +4,7 @@
  * The subject of this section is THE HOLE, not the round: what a member scores
  * on a hole (the outcome distribution, arriving here from SCORE STATS) and
  * which par types cost them (the three MiniRings, arriving from
- * GameEverywhereCard).
+ * the deleted GameEverywhereCard).
  *
  * NINE-HOLE ROUNDS ARE INCLUDED AND CARRY NO MARK. The unit here is the hole,
  * so nine holes contribute nine holes and every figure stays on one basis.

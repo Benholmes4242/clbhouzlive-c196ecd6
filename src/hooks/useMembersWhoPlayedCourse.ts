@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 /**
  * BRIEF_COURSE_TAB_REBUILD §3.7 (widened) — EVERYONE WHO HAS PLAYED HERE.
  *
- * useFriendsWhoPlayedCourse is friends-only AT THE SOURCE: it reads the follow
+ * The former useFriendsWhoPlayedCourse (deleted 10 Sep 2026) was friends-only AT THE SOURCE: it read the follow
  * graph first and passes the resulting ids into `.in('user_id', ...)`, so it
  * cannot serve the wider set and returns [] the moment the viewer follows
  * nobody. This hook reads the same table WITHOUT that filter and then marks

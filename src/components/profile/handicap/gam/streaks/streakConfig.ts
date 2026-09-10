@@ -4,7 +4,7 @@ import type { StreakType } from '@/lib/gam/types';
 
 /**
  * STREAK_CARD_CONFIG — per-type display metadata for the home streak card.
- * The picker (`selectFeaturedStreaks`) chooses which 3 to feature; this map
+ * The former picker (`selectFeaturedStreaks`, deleted 10 Sep 2026) chose which 3 to feature; this map
  * provides labels/icons/copy for any of the 7 types it might pick.
  */
 export interface StreakCardEntry {
@@ -78,7 +78,7 @@ export const STREAK_CARD_CONFIG: Record<StreakType, StreakCardEntry> = {
 };
 
 /**
- * @deprecated The home card now uses `selectFeaturedStreaks()` as the source
+ * @deprecated The home streaks card and `selectFeaturedStreaks()` were deleted 10 Sep 2026; kept as the source
  * of truth for which 3 streaks to display. Remove in a follow-up PR once no
  * consumer imports this.
  */

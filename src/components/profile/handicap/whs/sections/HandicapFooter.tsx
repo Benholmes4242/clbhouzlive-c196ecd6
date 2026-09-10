@@ -6,7 +6,7 @@
  *   right  "Live WHS data - Member {n}"  10 / DIM
  *
  * The posted-history panel (RoundsArchivePanel) and the your-courses rail
- * (YourCoursesRail) come off the page here — dead-listed, not deleted. Their
+ * (YourCoursesRail) come off the page here — deleted 10 Sep 2026. Their
  * three figures all survive elsewhere: the rounds total is this footer link,
  * the counters figure is Section E's meta, the 90-day count is Section F's.
  *

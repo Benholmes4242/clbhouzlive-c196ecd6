@@ -1,6 +1,6 @@
 /**
  * RoundCardHoleStrip — hole-by-hole strip for light-themed round cards.
- * Used by both LastRoundCard (own) and FriendsYesterdayCard (enriched).
+ * Used by FriendsYesterdayCard (enriched); LastRoundCard was deleted 10 Sep 2026.
  *
  * The marks are NOT drawn here any more. They are `ScoreMark`, the app's one
  * scoring-mark renderer (SCORE MARK PILL grammar): solid red under par, ink

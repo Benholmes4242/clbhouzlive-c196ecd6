@@ -2,7 +2,7 @@
  * BRIEF_COURSE_TAB_REBUILD §3.11 — KEEP EXPLORING, flat.
  *
  * The last section: navigation away from this course. Same three destinations
- * and the same routing as CourseActionRows built them — more courses nearby,
+ * and the same routing as the deleted CourseActionRows built them — more courses nearby,
  * the Top 100 list this course belongs to (a navigation link, NOT this course's
  * own standing, which lives in the hero), and the official website behind the
  * external-link sheet.

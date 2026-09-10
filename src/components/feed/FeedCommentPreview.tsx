@@ -12,7 +12,7 @@
  * open one — and most commented posts here carry one or two.
  *
  * ONE COMPONENT, TWO SURFACES (addendum). This block is shared by FeedCard
- * (dark, #10151C) and LightFeedCard (light, #F8FAFC). Two copies would drift
+ * (dark, #10151C) and the light feed card (light, #F8FAFC; deleted 10 Sep 2026). Two copies would drift
  * the first time either was touched, and the rules attached here — render from
  * the comment not the count, "view all" only at two or more, replies and
  * non-post targets filtered upstream, business actors resolved as the business

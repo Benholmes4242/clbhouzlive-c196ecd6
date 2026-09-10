@@ -5,7 +5,7 @@
  * Extracted from three hand-rolled copies that had already drifted:
  *   - CircleSection      "SEE ALL 24"  chevron pushed to the right edge
  *   - RecentlyPlayedFeed "SEE ALL 38"  chevron pushed to the right edge
- *   - StreaksCard        chevron attached to the label (UNMOUNTED — not
+ *   - StreaksCard        chevron attached to the label (DELETED 10 Sep 2026 — not
  *                        repointed, see the dead-file list)
  *
  * THE GRAMMAR, fixed by the brief:

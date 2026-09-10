@@ -17,7 +17,7 @@ import { TILE_SCRIM } from './StandoutTile';
  *   (a) PROGRESSION — WITHDRAWN (BRIEF_FEAT_SECTIONS_FINISHING §5.1). A feat
  *       with a previous best now renders the STANDARD photo tile, with the
  *       improvement inside the glass chip. `treatmentFor` still names the case
- *       so the parse stays tested; PersonalBests maps it to StandoutTile.
+ *       so the parse stays tested; PersonalBestsSection maps it to StandoutTile.
  *   (b) EFFORT — the feat has an ATTEMPT COUNT and no previous best. A short
  *       74px photo strip, the figure, and the wait emphasised in the sentence.
  *   (c) PHOTO — neither. Unchanged, full height (StandoutTile).

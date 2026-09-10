@@ -2,7 +2,7 @@
  * BRIEF_COURSE_TAB_REBUILD §3.5 — THE RECORD BOOK, flat.
  *
  * The bordered CourseRecordBook Panel becomes a flat section. Nothing is
- * deleted: CourseRecordBook.tsx is untouched (AchievementsPanel still refers to
+ * deleted: CourseRecordBook.tsx is untouched (AchievementsPanel, which referred to
  * it) and the data is the SAME read — useCourseRecordSummary over the existing
  * get_course_legends RPC. No new query, no RPC change.
  *

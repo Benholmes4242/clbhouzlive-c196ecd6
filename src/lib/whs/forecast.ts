@@ -12,7 +12,7 @@ import { formatMonthLongGB } from '@/i18n/format';
  * after step 5. "EWMA" is never exposed to users; in copy it's "trend projection".
  *
  * Cut-target guidance is delegated to projectNextRound so the same number
- * surfaces on both the Forecast card and NextRoundWatch.
+ * surfaces on the Forecast card and NextRoundSection (NextRoundWatch deleted 10 Sep 2026).
  */
 
 export type ForecastState =
@@ -55,7 +55,7 @@ export interface Forecast {
    * strip header copy AND the marked amber bars on the strip — they agree.
    */
   countersAtRiskInHorizon: number;
-  /** Sourced from projectNextRound — single source of truth shared with NextRoundWatch. */
+  /** Sourced from projectNextRound — single source of truth shared with NextRoundSection. */
   cutTarget: number | null;
   /** Index the user would drop to if they hit cutTarget (≈ current − 0.1). */
   ifTheyHitCut: number | null;

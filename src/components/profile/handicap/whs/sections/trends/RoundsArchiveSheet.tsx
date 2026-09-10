@@ -1,7 +1,7 @@
 /**
  * RoundsArchiveSheet - the full posted history, at 85dvh (the area's one sheet height, and BottomSheet's default).
  *
- * The Rounds tab is gone; its list lives here, opened from RoundsArchivePanel
+ * The Rounds tab is gone; its list lives here, opened from the footer (RoundsArchivePanel deleted 10 Sep 2026)
  * on Form. RecentRoundsCard is rendered in `variant="sheet"` so its filter
  * chips and month groups move across UNCHANGED - only the section header and
  * the outer margin are suppressed.

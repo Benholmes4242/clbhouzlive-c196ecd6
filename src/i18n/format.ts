@@ -644,7 +644,7 @@ export function formatRelativeAgo(
 /**
  * Feed-card compact relative time. Matches the local `timeAgo` in
  * `feed/FeedCard.tsx`, `fullscreen-feed/ImmersiveFullscreenChrome.tsx`,
- * and `posts-tab/LightFeedCard.tsx`.
+ * and the light feed card (deleted 10 Sep 2026).
  *
  * en output (all lowercase, no space):
  *   < 60s  → "{s}s"           (min 1s — mirrors Math.max(1, …))
@@ -794,7 +794,7 @@ export function formatRelativeAgoLong(iso: string | null | undefined): string {
 /**
  * Feed engagement counts. Matches the local `formatCount` in
  * `feed/FeedCard`, `feed/FeedTopActionBar`, `feed/FeedActionRail`,
- * `fullscreen-feed/ImmersiveFullscreenChrome`, `posts-tab/LightFeedCard`.
+ * `fullscreen-feed/ImmersiveFullscreenChrome` (the light feed card that also used it was deleted 10 Sep 2026).
  *
  * en quirks (all preserved):
  *   - uppercase `M`, lowercase `k` (mixed case — Intl uses matching case)

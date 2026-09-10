@@ -28,7 +28,7 @@ interface FeedActorPickerProps {
   /** Local "acting as" actor for this card. Falls back to the global activeActor. */
   value?: FeedActorPickerValue | null;
   onChange?: (actor: ActiveActor) => void;
-  /** Visual theme. Defaults to 'dark' (Clubhouse). LightFeedCard passes 'light'. */
+  /** Visual theme. Defaults to 'dark' (Clubhouse). The 'light' caller was the light feed card, deleted 10 Sep 2026. */
   theme?: 'light' | 'dark';
 }
 
