@@ -920,8 +920,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    */
   const allHolesPlayed = holes.length > 0 && played.length === holes.length;
   const shownPar = allHolesPlayed ? cardTotalPar : totalPar;
+  /* §B — these gated the OUT / IN segments of the removed grand-totals row. The
+     derivations are kept and voided rather than deleted: they are the sole
+     record of the "a nine that has not started contributes NO segment" rule, and
+     the per-nine totals inside <Nine> may need it if that row ever returns. */
   const showOutSeg = outSummary.playedCount > 0;
   const showInSeg = (backSummary?.playedCount ?? 0) > 0;
+  void showOutSeg;
+  void showInSeg;
   if (import.meta.env.DEV) {
     // The visible sum must agree with the hero/stat gross. A mismatch means the
     // nines and the round totals were filtered differently - loud, not silent.
