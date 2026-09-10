@@ -5,13 +5,14 @@
  * The other list-shaped course routes keep CoursesListSkeleton.
  */
 import { Skeleton } from '@/components/ui/skeleton';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const HERO_MIN_HEIGHT =
   'calc(clamp(280px, 35dvh, 390px) + env(safe-area-inset-top, 0px))';
 
 export const CoursesHubSkeleton = () => {
   return (
-    <div style={{ minHeight: '100vh', background: '#15171F' }}>
+    <div style={{ minHeight: '100vh', background: PAGE_CANVAS }}>
       {/* Hero hold — plain gradient placeholder for the hub hero. */}
 
       <div

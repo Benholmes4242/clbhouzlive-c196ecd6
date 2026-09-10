@@ -5,7 +5,8 @@
  * ASCII only.
  */
 
-export const CANVAS = '#15171F';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+export const CANVAS = PAGE_CANVAS;
 export const PANEL = '#1B1E27';
 export const BORDER = 'rgba(255,255,255,0.10)';
 export const INK = '#F8FAFC';
@@ -24,7 +25,7 @@ export const FONT =
  * Connect-surface base. Matches the host page (ManagePageShell) and the notch
  * shield exactly, so there is no seam or bright strip under the header.
  */
-export const SURFACE = '#15171F';
+export const SURFACE = PAGE_CANVAS;
 
 /** Amber wash. Runs edge to edge, sits behind the content, never a top bar. */
 export const WASH =

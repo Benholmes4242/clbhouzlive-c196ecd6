@@ -45,6 +45,7 @@ import type { WhsConnection } from '@/lib/whs/types';
 import { HcpSection } from './HcpSection';
 import { IndexChart, type IndexPoint } from '../charts';
 import { CHART, indexTone, toneColor } from '../charts/tokens';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface Props {
   connection: WhsConnection;
@@ -52,7 +53,7 @@ interface Props {
 
 /** The page canvas (--hcp-bg-0 in handicap-dark.css) — the chart halo must
  *  be the page colour now that there is no panel behind it. */
-const PAGE_CANVAS = '#15171F';
+
 
 const MS_PER_DAY = 86_400_000;
 /** useHandicapTrend12mo's guard: 335 days of record before we claim 12 months. */

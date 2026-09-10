@@ -51,11 +51,12 @@ import { ReviewGhostNumeral, ReviewVerdictLabel, reviewLabelColor } from '@/comp
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { TITLE } from '@/lib/tokens/type';
+import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
    a caption would take: this sheet's payload is three paragraphs of member
    prose, and body copy needs more separation than a label does. */
-const CANVAS = '#15171F';
+const CANVAS = SHEET_SURFACE;
 const PANEL = '#1B1E27';
 const BORDER = 'rgba(255,255,255,0.10)';
 const INK = '#F8FAFC';

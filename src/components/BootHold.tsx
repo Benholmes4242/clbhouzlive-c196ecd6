@@ -1,7 +1,8 @@
 import React from 'react';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
-const CANVAS = '#15171F';
+const CANVAS = PAGE_CANVAS;
 const MARK = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 
 /**

@@ -39,8 +39,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { GREEN } from '@/components/manage/ui';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
-const CANVAS = '#15171F';
+const CANVAS = PAGE_CANVAS;
 const INK = '#FFFFFF';
 const BODY = 'rgba(255,255,255,0.66)';
 const MUTE = 'rgba(255,255,255,0.42)';

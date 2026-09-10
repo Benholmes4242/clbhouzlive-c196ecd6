@@ -23,6 +23,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRatingValue } from '@/utils/formatters';
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { FIGS, TITLE } from '@/lib/tokens/type';
+import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 
 const THIN_ROUNDS = 10;
 
@@ -34,7 +35,7 @@ const RED = '#EF4444';
 const AMBER = '#F7931E';
 const LINE = 'rgba(255,255,255,0.10)';
 // App charcoal surface (same value the dark handicap hero uses via --hcp-bg-0).
-const CHARCOAL = '#15171F';
+const CHARCOAL = SHEET_SURFACE;
 
 const kickerStyle: React.CSSProperties = {
   fontSize: 9,

@@ -428,3 +428,26 @@ named as one. FIX SHAPE (not started): a read-only function that takes a user id
 as an argument instead of reading auth.uid(), returning the same round total, so
 the fourth counter can render for visitors too. Nothing here should be built
 until that function exists and is verified.
+
+## BRIEF_SHEET_BACKGROUND_CANON_03 (10 Sep 2026)
+
+- OPEN — TWO SHEET PRIMITIVES. `components/ui/BottomSheet` (72 consumers) and
+  vaul `Drawer` (4 consumers: `ui/drawer.tsx` shadcn wrapper, `FriendSheet`
+  direct, `ScheduledPostsList`, `RankHistorySheet`). No consumer uses a vaul
+  feature BottomSheet lacks — no snap points, no nested drawers, no scaled
+  background. Decision needed on which survives before any code moves
+  (CANON_03 §3c forbids consolidating in this brief).
+- OPEN — HARDWARE BACK AND SHEETS. BottomSheet has no history handling: back
+  or edge-swipe leaves the route with the sheet on it. Only URL-addressed
+  sheets behave (handicap `?gam=`/`?sheet=`/`?score=`, course detail
+  `?sheet=`, college compare picker, auth form). Proposal delivered
+  10 Sep 2026, no code changed; awaiting ruling.
+- OPEN — `FriendSheet` renders `className="hcp-light"` on a dark surface.
+  Found while pointing BG_0 at SHEET_SURFACE; not touched.
+- CLOSED — All Holes empty distribution band draws nothing (was a 2px 28%
+  stub). Local to `AllHolesSheet`, not shared.
+- CLOSED — every hardcoded `#15171F` replaced by a token from
+  `src/lib/tokens/surfaces.ts` (PAGE_CANVAS / SHEET_SURFACE / INK_ON_LIGHT /
+  STATUS_BAR_CANVAS). Two literals deliberately retained: the CSS root
+  declarations of `--bg-page`/`--background`, and `CT_DARK.surface` (a ramp
+  step on the composer's own darker canvas, not a page or sheet ground).

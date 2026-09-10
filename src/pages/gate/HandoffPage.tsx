@@ -23,9 +23,10 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 /** Gate tokens, copied deliberately: the two surfaces are one product. */
-const CANVAS = '#15171F';
+const CANVAS = PAGE_CANVAS;
 const INK = '#FFFFFF';
 const BODY = 'rgba(255,255,255,0.66)';
 const MUTE = 'rgba(255,255,255,0.42)';

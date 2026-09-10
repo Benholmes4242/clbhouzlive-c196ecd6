@@ -19,7 +19,7 @@
 
 .hcp-dark {
   /* ── Surface hierarchy ──────────────────────────────────────────── */
-  --hcp-bg-0:   #15171F;          /* page canvas — match Clubhouse charcoal */
+  --hcp-bg-0:   var(--bg-page);          /* page canvas — match Clubhouse charcoal */
   --hcp-bg-1:   #1B1E27;          /* default card */
   --hcp-bg-2:   #20242E;          /* raised / inset */
   --hcp-bg-3:   #272C37;          /* track / chip / icon-square neutral */

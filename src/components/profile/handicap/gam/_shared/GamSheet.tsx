@@ -1,5 +1,6 @@
 import React from 'react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 
 interface GamSheetProps {
   open: boolean;
@@ -32,7 +33,7 @@ interface GamSheetProps {
 export const GamSheet: React.FC<GamSheetProps> = ({
   open,
   onClose,
-  surface = '#15171F',
+  surface = SHEET_SURFACE,
   children,
 }) => (
   <BottomSheet

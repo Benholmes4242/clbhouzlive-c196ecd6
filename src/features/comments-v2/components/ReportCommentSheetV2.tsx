@@ -9,6 +9,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
 const INK = '#F8FAFC';
 const SECONDARY = 'rgba(248,250,252,0.60)';
@@ -208,7 +209,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                       the fill.
                     */
                     borderRadius: 12, border: 0, background: INK,
-                    color: '#15171F',
+                    color: INK_ON_LIGHT,
                     /* CAPS BUTTON */
                     fontSize: 13, fontWeight: 700,
                     textTransform: 'uppercase', letterSpacing: '0.10em',

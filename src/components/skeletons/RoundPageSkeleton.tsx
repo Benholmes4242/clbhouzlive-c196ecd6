@@ -11,8 +11,9 @@
  */
 import React from 'react';
 import { useSkeletonShown } from '@/perf/usePageReady';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
-const CANVAS = '#15171F';
+const CANVAS = PAGE_CANVAS;
 const PANEL = '#1B1E27';
 
 const shimmer: React.CSSProperties = {

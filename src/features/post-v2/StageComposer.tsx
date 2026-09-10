@@ -54,6 +54,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import StageLoadingShell from './StageLoadingShell';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
+import { STATUS_BAR_CANVAS } from '@/lib/tokens/surfaces';
 
 interface Props {
   onClose: () => void;
@@ -269,7 +270,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   useEffect(() => {
     try {
       if (page === 1) setStatusBarStyleColor('light', 'FF0B0F14');
-      else setStatusBarStyleColor('light', 'FF15171F');
+      else setStatusBarStyleColor('light', STATUS_BAR_CANVAS);
     } catch { /* status bar best-effort */ }
   }, [page]);
 

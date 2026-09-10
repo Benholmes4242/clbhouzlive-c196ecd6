@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sheet';
 import type { RatedCourseData } from './my-ratings/myRatingsTiers';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 
 interface BreakdownsPickerSheetProps {
   isOpen: boolean;
@@ -108,8 +109,8 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
       <SheetContent
         side="bottom"
         hideCloseButton
-        className="!bg-[#15171F] border-0 p-0 flex flex-col rounded-t-2xl"
-        style={{ height: 'auto', maxHeight: '85dvh' }}
+        className="border-0 p-0 flex flex-col rounded-t-2xl"
+        style={{ height: 'auto', maxHeight: '85dvh', background: SHEET_SURFACE }}
       >
 
         {/* Drag handle */}

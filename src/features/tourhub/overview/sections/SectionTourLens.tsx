@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useEdgeFades } from '@/components/watch/shared/useEdgeFades';
 import { FilterChips } from '@/components/ui/FilterChips';
 import { TOUR_CONFIG, type TourId } from '../../hooks/useOverviewData';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface SectionTourLensProps {
   value: TourId | null;
@@ -81,7 +82,7 @@ function SectionTourLensInner({ value, onChange, showAllTours = true, excludeTou
         className="pointer-events-none absolute top-0 right-0 h-full hrail-fade hrail-fade-right"
         style={{
           width: 5,
-          background: '#15171F',
+          background: PAGE_CANVAS,
           opacity: 0,
           transition: 'opacity 150ms ease',
         }}

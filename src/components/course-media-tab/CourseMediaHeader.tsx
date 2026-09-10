@@ -6,6 +6,7 @@ import type { MediaCounts } from './hooks/useCourseMedia';
 import type { CourseMediaFilter } from './hooks/useCourseMedia';
 import { INK, INK_MUTE, HAIRLINE_INK_10 } from '@/features/courses/_shared/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
 
 
@@ -72,7 +73,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
           aria-label={t('courses:media.addMediaA11y')}
           style={{
             marginLeft: 'auto', width: 34, height: 34, borderRadius: 17,
-            background: A.INK, color: '#15171F', border: 'none',
+            background: A.INK, color: INK_ON_LIGHT, border: 'none',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', flexShrink: 0,
           }}
@@ -105,7 +106,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
               background: isActive ? INK : 'rgba(255,255,255,0.06)',
               border: isActive ? `1px solid ${INK}` : `1px solid ${HAIRLINE_INK_10}`,
               fontSize: 12.5, fontWeight: isActive ? 700 : 600,
-              color: isActive ? '#15171F' : INK_MUTE,
+              color: isActive ? INK_ON_LIGHT : INK_MUTE,
               cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
             }}
           >
@@ -128,7 +129,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
           aria-label={t('courses:media.addMediaA11y')}
           style={{
             marginLeft: 'auto', width: 34, height: 34, borderRadius: 17,
-            background: A.INK, color: '#15171F', border: 'none',
+            background: A.INK, color: INK_ON_LIGHT, border: 'none',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', flexShrink: 0,
           }}

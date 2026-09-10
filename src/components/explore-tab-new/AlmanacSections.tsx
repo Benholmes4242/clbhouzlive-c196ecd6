@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { FONT } from './gamingLightTokens';
 import type { RecordsMode } from './hooks/useRegionFeats';
 import { ScopeSegment } from '@/components/shared/ScopeSegment';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
 
 export const REGION_TABS: Array<{ slug: string | null; label: string }> = [
@@ -65,7 +66,7 @@ function AlmanacLensInner({ region, onRegionChange, scope, onScopeChange }: Lens
                 flexShrink: 0,
                 padding: '6px 12px',
                 borderRadius: 999,
-                background: active ? '#15171F' : '#FFFFFF',
+                background: active ? INK_ON_LIGHT : '#FFFFFF',
                 color: active ? '#FFFFFF' : '#0F172A',
                 border: active ? 'none' : '1px solid rgba(15,23,42,0.08)',
                 fontFamily: FONT,

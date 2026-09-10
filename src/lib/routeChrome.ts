@@ -1,3 +1,4 @@
+import { PAGE_CANVAS, STATUS_BAR_CANVAS } from '@/lib/tokens/surfaces';
 import {
   CANVAS_DARK_CANVAS,
   isCanvasDarkRoute,
@@ -91,7 +92,7 @@ export function applyRouteChrome(pathname: string, force = false): void {
   const surface = canvasDark
     ? CANVAS_DARK_CANVAS
     : darkChrome
-    ? '#15171F'
+    ? PAGE_CANVAS
     : immersive
       ? (lightImmersive ? '#F8FAFC' : '#0F172A')
       : '#F8FAFC';
@@ -99,7 +100,7 @@ export function applyRouteChrome(pathname: string, force = false): void {
     ? CANVAS_DARK_CANVAS
     : immersive
       ? 'transparent'
-      : (darkChrome ? '#15171F' : '#F8FAFC');
+      : (darkChrome ? PAGE_CANVAS : '#F8FAFC');
 
   // Status bar icon intent (see useMedianStatusBar for the inverted mapping):
   //   'dark'  intent = DARK icons  (for a LIGHT background)
@@ -113,7 +114,7 @@ export function applyRouteChrome(pathname: string, force = false): void {
     : darkChrome
     ? (immersive
         ? { style: 'light' as const, color: '00000000' }
-        : { style: 'light' as const, color: 'FF15171F' })
+        : { style: 'light' as const, color: STATUS_BAR_CANVAS })
     : immersive
       ? { style: 'dark' as const, color: '00000000' }
       : { style: 'dark' as const, color: 'FFF8FAFC' };

@@ -35,6 +35,7 @@ import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/rou
 import { A, SANS, Panel } from '@/features/courses/components/holes/analytical/tokens';
 import { RoundPageSkeleton } from '@/components/skeletons/RoundPageSkeleton';
 import { usePageReady } from '@/perf/usePageReady';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
 
 /**
@@ -106,7 +107,7 @@ const StateShell: React.FC<{
             onClick={cta.onClick}
             style={{
               marginTop: 8, padding: '10px 18px', borderRadius: 14,
-              background: A.AMBER, color: '#15171F', fontSize: 13, fontWeight: 700,
+              background: A.AMBER, color: INK_ON_LIGHT, fontSize: 13, fontWeight: 700,
             }}
           >
             {cta.label}

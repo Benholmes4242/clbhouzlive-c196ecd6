@@ -18,6 +18,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { expectedRating } from '@/components/top100/verdict';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import { TITLE } from '@/lib/tokens/type';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import {
   AMBER,
   HAIRLINE_INK_8,
@@ -358,7 +359,7 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
                 padding: '12px 16px',
                 borderRadius: 12,
                 background: INK,
-                color: '#15171F',
+                color: INK_ON_LIGHT,
                 fontSize: 13.5,
                 fontWeight: 700,
                 letterSpacing: '-0.01em',

@@ -12,6 +12,7 @@
  * both delegate here so they stay pixel-identical.
  */
 import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const STYLE_ID = 'ticker-shell-keyframes';
 function ensureStyles() {
@@ -55,7 +56,7 @@ export function TickerShell({
   items,
   itemKey,
   height = 36,
-  background = '#15171F',
+  background = PAGE_CANVAS,
   gap = 24,
   durationSec = 40,
   padding = '0 14px',
