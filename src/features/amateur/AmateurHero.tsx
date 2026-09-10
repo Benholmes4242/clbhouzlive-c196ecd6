@@ -330,7 +330,7 @@ export function AmateurHero({
                   textShadow: '0 1px 2px rgba(0,0,0,0.72)',
                 }}
               >
-                {row.display_name}
+                {subject.display_name}
               </span>
               {/* §1 THE KICKER, BENEATH THE NAME. It NAMES THE FEAT, which is what
                   explains the gold dot on the shape below — the label keys the
