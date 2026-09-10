@@ -367,7 +367,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
     >
       <SheetHeader title={t('action.newMessage')} onClose={handleClose} dark />
 
-      <div style={{ background: SHEET, paddingBottom: 4 }}>
+      <div style={{ /* canon: sheet surface */ paddingBottom: 4 }}>
         {/* Selected chips */}
         {selected.length > 0 && (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '12px 16px 0' }}>
