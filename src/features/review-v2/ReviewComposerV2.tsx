@@ -816,6 +816,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           <div style={{ fontSize: 12.5, lineHeight: 1.45, color: RV2.secondary }}>
             {t('review.wizard.draftRestored.body')}
           </div>
+          {/* WHAT IT COULD NOT KEEP (_05 §1). Named inside the same notice, so a
+              member reading one sentence reads both. */}
+          {restoredMediaLine && (
+            <div style={{ fontSize: 12.5, lineHeight: 1.45, color: RV2.secondary }}>
+              {restoredMediaLine}
+            </div>
+          )}
           <button
             type="button"
             onClick={composer.discardRestoredDraft}
@@ -836,6 +843,48 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           </button>
         </div>
       )}
+
+      {/* CREATE MODE (_05 §1). A create restore stays otherwise silent — there
+          is no published version to differ from — but silence is exactly what
+          made the media loss invisible, so the media sentence stands alone and
+          is dismissible without discarding the words. */}
+      {!composer.restoredFromDraft && restoredMediaLine && (
+        <div
+          role="status"
+          style={{
+            margin: '0 16px 16px',
+            padding: '12px 14px',
+            border: `1px solid ${RV2.hairline}`,
+            borderRadius: 12,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          <div style={{ fontSize: 12.5, lineHeight: 1.45, color: RV2.secondary }}>
+            {restoredMediaLine}
+          </div>
+          <button
+            type="button"
+            onClick={composer.acknowledgeRestoredMedia}
+            style={{
+              alignSelf: 'flex-start',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              fontSize: 11.5,
+              fontWeight: 700,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              color: RV2.secondary,
+              cursor: 'pointer',
+            }}
+          >
+            {t('review.wizard.draftRestored.mediaDismiss')}
+          </button>
+        </div>
+      )}
+
 
 
 
