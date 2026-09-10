@@ -223,7 +223,8 @@
     "beatFieldBasis_other": "Basado en {{count}} golfistas mas que han jugado aqui.",
     "noFieldLine_one": "Solo 1 golfista mas ha jugado aqui, asi que todavia no hay un grupo con el que comparar.",
     "noFieldLine_other": "Solo {{count}} golfistas mas han jugado aqui, asi que todavia no hay un grupo con el que comparar.",
-    "noFieldNobody": "Nadie mas ha jugado aqui todavia, asi que no hay un grupo con el que comparar."
+    "noFieldNobody": "Nadie mas ha jugado aqui todavia, asi que no hay un grupo con el que comparar.",
+    "fieldShort": "Campo"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

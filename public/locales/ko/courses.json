@@ -219,7 +219,8 @@
     "beatFieldBasis_other": "이곳에서 플레이한 다른 골프사 {{count}}명 기준.",
     "noFieldLine_one": "이곳에서 플레이한 다른 골프사가 1명밖이라 아직 바교할 필드가 없습니다.",
     "noFieldLine_other": "이곳에서 플레이한 다른 골프사가 {{count}}명밖이라 아직 바교할 필드가 없습니다.",
-    "noFieldNobody": "아직 이곳에서 플레이한 다른 사람이 없어 바교할 필드가 없습니다."
+    "noFieldNobody": "아직 이곳에서 플레이한 다른 사람이 없어 바교할 필드가 없습니다.",
+    "fieldShort": "필드"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

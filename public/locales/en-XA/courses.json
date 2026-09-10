@@ -1800,7 +1800,8 @@
     "beatFieldBasis_other": "[Based on {{count}} other golfers who have played here.]",
     "noFieldLine_one": "[Only 1 other golfer has played here, so there is no field to compare with yet.]",
     "noFieldLine_other": "[Only {{count}} other golfers have played here, so there is no field to compare with yet.]",
-    "noFieldNobody": "[Nobody else has played here yet, so there is no field to compare with.]"
+    "noFieldNobody": "[Nobody else has played here yet, so there is no field to compare with.]",
+    "fieldShort": "[Field]"
   },
   "search": {
     "yourRounds": "[~~Ýőúř řőúñđš~~]"
