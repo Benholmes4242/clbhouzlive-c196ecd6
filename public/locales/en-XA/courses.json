@@ -1794,7 +1794,14 @@
     "vsYourAvgLevel": "[~~Říĝĥţ őñ ýőúř áṽéřáĝé ĥéřé.~~]",
     "vsYourAvgWorse": "[~~{{n}} šĥőţš ŵőřšé ţĥáñ ýőúř áṽéřáĝé ĥéřé.~~]",
     "you": "[~~Ýőú~~]",
-    "yourAvgHere": "[~~Ýőúř áṽĝ ĥéřé~~]"
+    "yourAvgHere": "[~~Ýőúř áṽĝ ĥéřé~~]",
+    "beatFieldSentence": "[You beat the field average on {{n}} of {{m}} holes.]",
+    "beatFieldBasis_one": "[Based on 1 other golfer who has played here.]",
+    "beatFieldBasis_other": "[Based on {{count}} other golfers who have played here.]",
+    "noFieldLine_one": "[Only 1 other golfer has played here, so there is no field to compare with yet.]",
+    "noFieldLine_other": "[Only {{count}} other golfers have played here, so there is no field to compare with yet.]",
+    "noFieldNobody": "[Nobody else has played here yet, so there is no field to compare with.]",
+    "fieldShort": "[Field]"
   },
   "search": {
     "yourRounds": "[~~Ýőúř řőúñđš~~]"

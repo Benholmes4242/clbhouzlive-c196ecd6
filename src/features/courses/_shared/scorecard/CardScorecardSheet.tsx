@@ -152,6 +152,17 @@ export interface CardScorecardSheetProps {
   surface?: 'member' | 'tour';
   /** Member enrichment — omitted for a pro, who has no history at the venue. */
   courseContext?: CardScorecardCourseContext | null;
+  /**
+   * §D3/E2/E3 — HOW MANY OTHER GOLFERS THE FIELD IS MADE OF, from
+   * get_course_hole_field's `course_players` (the round's owner already
+   * excluded). OPTIONAL AND DEFAULTING ABSENT: the tour caller never passes it
+   * and the tour field path is untouched.
+   *
+   * ONE THRESHOLD, TWO CONSUMERS: this single number drives BOTH the per-hole
+   * FIELD row on the card and the beat-the-field sentence under the trajectory,
+   * through the one `fieldGateOpen` value below, so the two cannot drift apart.
+   */
+  fieldPlayers?: number | null;
 
   // IDENTITY BLOCK (below scorecard)
   playerName: string;
@@ -235,6 +246,13 @@ function toParColor(n: number | null): string {
  * stays at 32px — it carries two-digit strokes and is unchanged.
  */
 const NINE_GRID = '26px repeat(9, minmax(0, 1fr)) 32px';
+
+/**
+ * §D3/E2 — THE ONE FIELD THRESHOLD. Both the per-hole FIELD row and the
+ * beat-the-field sentence read this single constant through one derived
+ * `fieldGateOpen`, so they can never disagree about whether a field exists.
+ */
+const FIELD_MIN_PLAYERS = 5;
 
 /**
  * Result marks come from the shared ScoreMark renderer — one grammar across the
@@ -351,7 +369,11 @@ const Nine: React.FC<{
 
       {withField && (
         <CardRow
-          label={t('courses:scorecard.fieldAvg')}
+          /* §D3 — MEASURED FOR THE 26px LABEL COLUMN. 'Field avg' was sized for
+             the old 54px column and clipped at 26px; the row's figures are
+             already par-relative, so 'avg' was carrying no meaning. Key
+             `fieldAvg` stays for the holes sheet. */
+          label={t('courses:scorecard.fieldShort')}
           cells={rows.map((h) => {
             const d = h.fieldAvg != null && h.par != null ? h.fieldAvg - h.par : null;
             if (d == null) return '';
@@ -653,7 +675,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   courseName, courseLocation, coursePar, courseSlope,
   holes, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
-  surface = 'member', courseContext,
+  surface = 'member', courseContext, fieldPlayers = null,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, identityStat,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
@@ -729,9 +751,27 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     ? fieldHoles.reduce((s, h) => s + (h.fieldAvg as number), 0)
     : null;
 
+  /**
+   * §E2 — "BEAT" IS STRICTLY BETTER. This counted `<=`, so a hole MATCHED
+   * against the field average was reported as a hole beaten. Level is level.
+   */
   const beatFieldOn = withField
-    ? fieldHoles.filter((h) => (h.strokes as number) <= (h.fieldAvg as number)).length
+    ? fieldHoles.filter((h) => (h.strokes as number) < (h.fieldAvg as number)).length
     : null;
+
+  /**
+   * §D3/E2 — ONE GATE, ONE THRESHOLD, TWO CONSUMERS.
+   *
+   * A field of one or two other golfers is not a field: measured 10 Sep 2026,
+   * only about 15 of 198 mapped courses carry five or more players, so this gate
+   * closes almost everywhere. THAT IS THE CORRECTION, NOT A REGRESSION — before
+   * it, the comparison on every other course was a member measured largely
+   * against themselves. Do not soften it.
+   *
+   * TOUR IS UNAFFECTED: a tournament field is a field by definition, so the tour
+   * surface passes through ungated and never calls the member field function.
+   */
+  const fieldGateOpen = isTour || (fieldPlayers != null && fieldPlayers >= FIELD_MIN_PLAYERS);
 
   /**
    * §G — WHY THERE IS NO CARD, AS A MEASURED FACT.
@@ -846,20 +886,13 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const rail = useMemo(() => {
     const items: { key: string; value: string; label: string; tone?: string }[] = [];
     /**
-     * THE BEAT-FIELD FIGURE STAYS IN THE RAIL FOR NOW (§E2/E3 HELD). It is the
-     * one figure on this sheet drawn from the FIELD pool rather than the
-     * member's own history, and it cannot state its basis until the field
-     * average can exclude the caller and report how many players it covers.
-     * Moving it and gating it is ONE change, made once that function exists —
-     * not two half-changes. Until then it renders exactly as it shipped.
+     * §E2 — THE BEAT-FIELD FIGURE HAS LEFT THE RAIL. It is the one figure on
+     * this sheet drawn from the FIELD pool rather than the member's own history,
+     * so it cannot sit beside self-history figures with no basis stated. It is
+     * now a sentence under the trajectory with its sample beneath it, gated on
+     * the same `fieldGateOpen` as the card's FIELD row. `figBeatField` is
+     * dead-listed, not deleted.
      */
-    if (withField && beatFieldOn != null) {
-      items.push({
-        key: 'field',
-        value: `${beatFieldOn}/${fieldHoles.length}`,
-        label: t('courses:scorecard.figBeatField'),
-      });
-    }
     /**
      * The tour position keeps the rail — a pro has no history section to move
      * into. The member's CURRENT index no longer appears here at all when the
@@ -944,11 +977,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
 
   /**
-   * The FIELD row is a tour-card row only — see the note on <Nine>. On the
-   * member card the prose above states the field comparison and the per-hole
-   * figures live in the holes sheet.
+   * §D3 — THE FIELD ROW IS BACK ON THE MEMBER CARD, GATED. It renders when the
+   * round carries per-hole field averages AND the course clears the five-player
+   * gate; a hole with no average leaves an EMPTY CELL, never a zero. The tour
+   * card is unchanged — `fieldGateOpen` is true for tour by definition.
    */
-  const showFieldRow = withField && isTour;
+  const showFieldRow = withField && fieldGateOpen;
 
   // The card column header has no room for a name and the legend above already
   // names the player, so a third-person card leaves the score-column label blank.
@@ -1283,6 +1317,36 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   referenced element. Construction and monotonePath unchanged. */}
               <Panel kicker={t('courses:scorecard.howItUnfolded')}>
                 <TrajectoryLine holes={holes} height={120} surface="dark" interactive />
+                {/*
+                  §E2/E3 — THE FIELD SENTENCE SITS WITH THE SHAPE OF THE ROUND,
+                  not in the self-history rail. {m} counts only holes carrying
+                  BOTH a score and a field average — never a hard 18 — and the
+                  basis line names the pool the sentence is measured against.
+                  Member surface only; a pro's field is the tournament field.
+                */}
+                {!isTour && fieldPlayers != null && (
+                  <div style={{ marginTop: 12 }}>
+                    {fieldGateOpen && withField && beatFieldOn != null ? (
+                      <>
+                        <p style={CAPTION}>
+                          {t('courses:scorecard.beatFieldSentence', {
+                            n: beatFieldOn,
+                            m: fieldHoles.length,
+                          })}
+                        </p>
+                        <div style={{ ...LABEL_AXIS, marginTop: 4 }}>
+                          {t('courses:scorecard.beatFieldBasis', { count: fieldPlayers })}
+                        </div>
+                      </>
+                    ) : (
+                      <p style={CAPTION}>
+                        {fieldPlayers === 0
+                          ? t('courses:scorecard.noFieldNobody')
+                          : t('courses:scorecard.noFieldLine', { count: fieldPlayers })}
+                      </p>
+                    )}
+                  </div>
+                )}
               </Panel>
             </>
           )}

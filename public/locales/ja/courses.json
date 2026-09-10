@@ -213,7 +213,14 @@
     "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
     "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here.",
     "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
-    "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here."
+    "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
+    "beatFieldSentence": "{{m}} ホール中 {{n}} ホールで平均を上回りました。",
+    "beatFieldBasis_one": "ここでプレーした他の 1 人に基づく。",
+    "beatFieldBasis_other": "ここでプレーした他の {{count}} 人に基づく。",
+    "noFieldLine_one": "ここでプレーした他のプレーヤーは 1 人だけなので、まだ比較できる平均がありません。",
+    "noFieldLine_other": "ここでプレーした他のプレーヤーは {{count}} 人だけなので、まだ比較できる平均がありません。",
+    "noFieldNobody": "まだ他にプレーした人がいないため、比較できる平均がありません。",
+    "fieldShort": "平均"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

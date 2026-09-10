@@ -217,7 +217,14 @@
     "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
     "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here.",
     "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
-    "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here."
+    "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
+    "beatFieldSentence": "Superaste el promedio del campo en {{n}} de {{m}} hoyos.",
+    "beatFieldBasis_one": "Basado en 1 golfista mas que ha jugado aqui.",
+    "beatFieldBasis_other": "Basado en {{count}} golfistas mas que han jugado aqui.",
+    "noFieldLine_one": "Solo 1 golfista mas ha jugado aqui, asi que todavia no hay un grupo con el que comparar.",
+    "noFieldLine_other": "Solo {{count}} golfistas mas han jugado aqui, asi que todavia no hay un grupo con el que comparar.",
+    "noFieldNobody": "Nadie mas ha jugado aqui todavia, asi que no hay un grupo con el que comparar.",
+    "fieldShort": "Campo"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
