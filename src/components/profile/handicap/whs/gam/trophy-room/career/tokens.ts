@@ -4,9 +4,11 @@
  * Literal values (not var(--hcp-*)) because the room renders inside a
  * portalled bottom sheet where the page scope does not resolve.
  *
- * COLOUR RULES, and there are only two:
- *   AMBER means a threshold passed, a record held, or the viewing member.
- *   GOOD (green) means a measured share that is favourable.
+ * COLOUR RULES, and there are only three:
+ *   INK is every figure. This whole sheet IS the viewing member, so amber on a
+ *   figure here distinguishes them from nobody and makes each one shout equally.
+ *   GOOD (green) means a completed ladder or a reached milestone, nothing else.
+ *   AMBER survives only as a BAR FILL -- a bar is a state, not an identity.
  * Nothing else on this surface carries colour.
  */
 import { CHART, CHART_FONT } from '../../../charts/tokens';
