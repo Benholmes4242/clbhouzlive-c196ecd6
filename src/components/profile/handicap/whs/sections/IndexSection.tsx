@@ -184,19 +184,24 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
      beneath, the same grammar as Last round and Friends' rounds. Aligning the
      block instead would put the kickers on the baseline and lift the figures
      off it. */
-  const deltaCell = (delta: number, label: string) => {
+  /* THE LAST KICKER IS ANCHORED TO ITS RIGHT EDGE, not its left. The label is
+     wider than the figure above it and sits out of flow, so a left anchor on
+     the rightmost block pushed "12 MONTHS" past the 20px gutter and the S was
+     clipped. Anchored right, it grows inwards and both kickers render whole. */
+  const deltaCell = (delta: number, label: string, anchor: 'left' | 'right') => {
     const pts = label === t('common:handicap.index.delta90') ? model.slices['90d'] : model.slices['12m'];
     const color = toneColor(indexTone(pts[0].v, pts[pts.length - 1].v));
     return (
       <div key={label} style={{ position: 'relative' }}>
-        <div style={{ fontSize: 17, fontWeight: 700, color, lineHeight: 1.1, ...FIG }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color, lineHeight: 1.1, textAlign: anchor, ...FIG }}>
           {formatDelta(delta)}
         </div>
         <div
           style={{
             position: 'absolute',
             top: '100%',
-            left: 0,
+            [anchor === 'right' ? 'right' : 'left']: 0,
+            textAlign: anchor,
             marginTop: 3,
             whiteSpace: 'nowrap',
             fontSize: 9,
