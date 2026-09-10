@@ -120,10 +120,8 @@ export default function ProfileSheetV2({
   isAdmin,
   isLoading,
 }: ProfileSheetV2Props) {
-  const sheetY = useMotionValue(0);
-  // Drag is grab-handle only so the body below can scroll internally.
-  const dragControls = useDragControls();
   const { openInviteSheet } = useInviteSheet();
+
   const handleInviteFriends = () => {
     onClose();
     setTimeout(() => openInviteSheet('profile_sheet'), 250);
