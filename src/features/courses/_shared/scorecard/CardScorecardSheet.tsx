@@ -226,7 +226,15 @@ function toParColor(n: number | null): string {
  * columns, NOT out of the type. The centred OUT/IN segments sit on those nine
  * columns and so lose ~3px each at 320; both strings are nowrap and still fit.
  */
-const NINE_GRID = '54px repeat(9, minmax(0, 1fr)) 32px';
+/*
+ * §D1 — THE ROW LABEL COLUMN DROPS FROM 54px TO 26px. 54 was sized for the
+ * TOTAL / PAR 72 rows of the grand-totals block, which §B removed; the labels
+ * that remain are HOLE, PAR, YOU and FIELD at 9.5px tracked caps, the widest of
+ * which measures under 26. The 28px it gives back goes to the nine score
+ * columns, which is where a 390pt card is tightest. The right-hand total column
+ * stays at 32px — it carries two-digit strokes and is unchanged.
+ */
+const NINE_GRID = '26px repeat(9, minmax(0, 1fr)) 32px';
 
 /**
  * Result marks come from the shared ScoreMark renderer — one grammar across the
