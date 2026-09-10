@@ -324,3 +324,17 @@ OPEN ITEMS
   section C calls it once with all crown course ids, threshold from src/lib/gam/fieldGate.ts,
   contested-first sort. Its 0 can mean "not mapped" as well as "nobody else played" -- safe for
   the split, not reusable elsewhere.
+
+## Trophy room — course count disagreement (open, 10 Sep 2026)
+The sheet's "N COURSES" beside course records counts DISTINCT COURSES WHERE THE
+MEMBER HOLDS RANK 1 (gam_course_legends_view, is_current = true, rank <= 1) — 22
+for member 8c240997. The 34 is distinct courses at ANY current rank (rank 1-15),
+i.e. it includes 12 courses where the member is placed but holds no record. Both
+counts are correct for their own question; nothing changed. When the surviving
+count is chosen, write its definition next to where it is computed. Second
+count-disagreement on this sheet after 245 vs 243 rounds.
+
+## Backfill gap row (report only)
+One row falls in the 13:20:17.479-15:52:46.765 UTC gap on 24 Jul 2026:
+badge_id 'founder', user 370e6b6b, 14:58:28.163529 UTC. Single row, single
+member, a one-off grant rather than a third partial run — it renders a date.
