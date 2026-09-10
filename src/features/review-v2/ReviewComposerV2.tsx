@@ -384,7 +384,21 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         }
       : undefined,
   });
-  const composer = useReviewComposer(existing, course.id);
+  /* LOCAL items only (_05 §1): media already on the server carries
+     status 'existing' and is never at risk, so counting it would warn about
+     something that is still there. */
+  const draftMediaCounts = useMemo(() => {
+    let photos = 0;
+    let videos = 0;
+    for (const it of media.items) {
+      if (it.status === 'existing') continue;
+      if (it.type === 'video') videos += 1;
+      else photos += 1;
+    }
+    return { photos, videos };
+  }, [media.items]);
+  const composer = useReviewComposer(existing, course.id, draftMediaCounts);
+
   const submit = useReviewSubmit();
 
   // ONE fetch of the member's own overall ratings (this course excluded, so an
