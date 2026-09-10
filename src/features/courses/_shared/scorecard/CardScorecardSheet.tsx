@@ -946,12 +946,24 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
   // The card column header has no room for a name and the legend above already
   // names the player, so a third-person card leaves the score-column label blank.
-  const cardScoreLabel = isOwner ? t('courses:scorecard.you') : '';
+  /*
+   * §D2 — A THIRD-PERSON CARD NO LONGER HAS AN UNLABELLED SCORE ROW. YOU is
+   * right for the viewer's own round and wrong for anyone else's, but the answer
+   * was never an empty cell: on a pro's card the row beneath PAR had no name at
+   * all. It falls back to SCORE, which is true of every card.
+   */
+  const cardScoreLabel = isOwner ? t('courses:scorecard.you') : t('courses:scorecard.scoreRow');
 
 
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
   const showIdentity = !!playerName;
-  const hasHoles = holes.length > 0;
+  /*
+   * §G — THE GATE READS SCORED HOLES, NOT HOLE ROWS. 420 rounds carry eighteen
+   * rows with every gross null; `holes.length > 0` let those through and drew a
+   * grid of empty cells with a scoring key beneath it. An unscored round now
+   * takes the same explained state as a round with no rows at all.
+   */
+  const hasHoles = cardCause === 'ok' || cardCause === 'partial';
 
   return (
     <BottomSheet
