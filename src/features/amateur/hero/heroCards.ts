@@ -186,8 +186,7 @@ function buildSingleRoundCard(
   window: HeroWindow,
   rows: readonly CircleRoundRow[],
   netByScore: ReadonlyMap<string, { net: number }>,
-  pool: HeroPool,
-  shape: { poolRounds: number; poolMembers: number },
+  shape: PoolShape,
 ): HeroCard | null {
   const scored: Array<{ row: CircleRoundRow; value: number }> = [];
   for (const row of rows) {
@@ -211,19 +210,23 @@ function buildSingleRoundCard(
       rule: 'offGross',
       hcp: best.row.hcp_at_time,
       gross: best.row.gross,
-      ...shape,
+      ...contextShape(shape),
     };
   } else if (margin != null && margin > 0) {
-    context = { rule: 'clear', margin, runnerUp, ...shape };
+    context = { rule: 'clear', margin, runnerUp, ...contextShape(shape) };
   } else {
-    context = { rule: 'pool', ...shape };
+    /* The pool line is the only one left, so a truncated read takes the card
+       out rather than printing a fetch cap as a count. */
+    if (shape.truncated) return null;
+    context = { rule: 'pool', ...contextShape(shape) };
   }
 
   return {
     id: `${metric}-${window}`,
     metric,
     window,
-    pool,
+    pool: shape.pool,
+
     figure: best.value,
     member: {
       user_id: best.row.user_id,
