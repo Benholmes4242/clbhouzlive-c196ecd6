@@ -30,6 +30,7 @@ import React, { useState } from 'react';
 import { CHART } from '../../charts/tokens';
 import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
+import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
@@ -121,7 +122,7 @@ export const CircleRow: React.FC<CircleRowProps> = ({
   staleLabel = 'STALE',
 }) => {
   const isYou = entry.is_self;
-  const name = isYou ? selfLabel : entry.friend_name;
+  const name = isYou ? selfLabel : reformatFriendName(entry.friend_name);
   const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
   const flame = hasFlame(entry, stale);
   const tappable = !!onPress;
