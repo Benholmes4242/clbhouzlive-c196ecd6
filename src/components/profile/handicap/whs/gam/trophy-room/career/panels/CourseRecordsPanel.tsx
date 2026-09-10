@@ -37,6 +37,12 @@
  * SORT: contested first by record count descending, uncontested after, also by
  * count. A member should see what they won before what they claimed.
  *
+ * THREE COPY BANDS, NOT FOUR: nobody else / one other / 2+ others. The 2-4 and
+ * 5+ bands collapse because under the new rule they are the same thing -- a
+ * contest -- and the number carries how big it was. A row that counts as WON
+ * opens with "Won against", never "Only". Won rows render in INK; nobody-else
+ * rows render in T40.
+ *
  * REPLACES CrownsPanel, which stays on disk on the dead list.
  */
 import React from 'react';
@@ -44,7 +50,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { REC, LABEL } from '../tokens';
 import { Panel, RowButton, Figure, Collapsible, MetaLabel } from '../Primitives';
-import { CROWN_MIN_OTHERS, hasContest, hasField } from '@/lib/gam/fieldGate';
+import { CROWN_MIN_OTHERS, hasContest } from '@/lib/gam/fieldGate';
 import type { CourseCrownGroup } from './CrownsPanel';
 import type { CareerData } from '../types';
 
@@ -56,14 +62,13 @@ interface Props {
 /**
  * A row's contest state. `unknown` = the batched field read is unavailable.
  *
- * FOUR COPY BANDS, UNCHANGED: alone / one / few (2-4) / won (5+) each keep their
- * own sentence, because the SIZE of a contest is worth showing. What changed is
- * which of them counts as WON in the headline: everything except `alone`.
+ * THREE BANDS: alone / one / won (2+). Won rows use "Won against..."; alone
+ * rows use "Nobody else has played here yet". The number carries the size of
+ * the contest, so there is no separate 2-4 band.
  */
 type Contest =
   | { kind: 'unknown' }
   | { kind: 'won'; others: number }
-  | { kind: 'few'; others: number }
   | { kind: 'one' }
   | { kind: 'alone' };
 
@@ -72,15 +77,13 @@ export function contestOf(
   available: boolean,
 ): Contest {
   if (!available || others === undefined) return { kind: 'unknown' };
-  if (hasField(others)) return { kind: 'won', others };
   if (others < CROWN_MIN_OTHERS) return { kind: 'alone' };
   if (others === 1) return { kind: 'one' };
-  return { kind: 'few', others };
+  return { kind: 'won', others };
 }
 
 /** WON in the headline: a record beaten somebody. Only `alone` is uncontested. */
-const isWon = (c: Contest): boolean =>
-  c.kind === 'won' || c.kind === 'few' || c.kind === 'one';
+const isWon = (c: Contest): boolean => c.kind === 'won' || c.kind === 'one';
 
 export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   const { t } = useTranslation('handicap');
@@ -114,7 +117,6 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
 
   const subLine = (c: Contest): string | null => {
     if (c.kind === 'won') return t('career.recordsWonAgainst', { n: c.others });
-    if (c.kind === 'few') return t('career.recordsFewOthers', { n: c.others });
     if (c.kind === 'one') return t('career.recordsOneOther');
     if (c.kind === 'alone') return t('career.recordsNobodyElse');
     return null;
@@ -173,7 +175,7 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
         showFewerLabel={t('career.showFewer')}
       >
         {ordered.map(({ group, contest }, i) => {
-          const contested = contest.kind === 'won';
+          const wonRow = isWon(contest);
           const sub = subLine(contest);
           return (
             <RowButton
@@ -184,18 +186,31 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
             >
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
                 <span
-                  style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: REC.INK }}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: wonRow ? REC.INK : REC.DIM,
+                  }}
                 >
                   {group.courseName}
                 </span>
                 <Figure
                   value={group.records.length}
                   size={16}
-                  color={contested ? REC.INK : REC.DIM}
+                  color={wonRow ? REC.INK : REC.DIM}
                 />
               </div>
               {sub ? (
-                <div style={{ marginTop: 5, fontSize: 11, color: REC.DIM, ...REC.TABULAR }}>
+                <div
+                  style={{
+                    marginTop: 5,
+                    fontSize: 11,
+                    color: wonRow ? REC.INK : REC.DIM,
+                    ...REC.TABULAR,
+                  }}
+                >
                   {sub}
                 </div>
               ) : null}
@@ -209,3 +224,4 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
 
 export { CROWN_MIN_OTHERS, hasContest };
 export default CourseRecordsPanel;
+
