@@ -583,5 +583,11 @@
     "playSoon": "Google Play 출시 예정",
     "terms": "이용약관",
     "privacy": "개인정보"
+  },
+  "draftGuard": {
+    "question": "Discard what you have written?",
+    "body": "This will not be saved.",
+    "keepEditing": "Keep editing",
+    "discard": "Discard"
   }
 }

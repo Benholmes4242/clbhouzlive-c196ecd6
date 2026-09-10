@@ -890,5 +890,11 @@
     "playSoon": "Coming soon to Google Play",
     "terms": "Terms",
     "privacy": "Privacy"
+  },
+  "draftGuard": {
+    "question": "[~~Đíšĉářđ ŵĥáţ ýőú ĥáṽé ŵříţţéñ?~~]",
+    "body": "[~~Ţĥíš ŵíļļ ñőţ ƀé šáṽéđ.~~]",
+    "keepEditing": "[~~Ǩééƥ éđíţíñĝ~~]",
+    "discard": "[~~Đíšĉářđ~~]"
   }
 }
