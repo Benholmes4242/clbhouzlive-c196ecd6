@@ -144,6 +144,11 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
     setPendingImage(null);
     try {
       await onSubmit({ content, mediaUrl, mediaType, actor: selfActor });
+      /* CLEARED ON SUCCESS ONLY (_05 §2). The in-flight debounce is cancelled
+         first, or a timer armed before the send would rewrite the words a
+         moment after the comment landed and offer them back on reopen. */
+      if (draftTimer.current) clearTimeout(draftTimer.current);
+      if (draftKey) clearCommentDraft(draftKey);
     } catch (e) {
       // restore text on failure
       if (content) setText(content);
@@ -151,6 +156,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
       throw e;
     }
   };
+
 
   return (
     <div
