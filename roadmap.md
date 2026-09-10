@@ -216,3 +216,8 @@
   /privacy document. A purpose-built data-sharing explainer is unbuilt work.
 - Open: `AchievementsPanel` stays mounted until Ben confirms the TROPHY ROOM row on device.
 - Section J sheet returned to the shared 85dvh default; stale "75dvh" comments corrected.
+
+## K final amendment (2026-09-10)
+- NotConnectedSection: "What's shared" button removed (promised an answer /privacy cannot give). One CTA: Connect handicap -> /manage/handicap. handicap_not_connected_cta kept with action:'connect' only.
+- whatsShared locale keys dropped from all six locales.
+- Redirect dependency audit: nothing depended on the old /handicap -> /manage/handicap redirect. Gam push routes (/handicap, /handicap?sheet=...) fire only for members with gam activity; an unconnected recipient now lands on the not-connected page instead of the connect flow - neither old nor new behaviour opened the sheet. In-app links to /handicap (ProfilePageV2, ManageProfile, RoundPage fallback, resolver, rivalry redirect, HandoffPage) assume the page, not the connect screen.
