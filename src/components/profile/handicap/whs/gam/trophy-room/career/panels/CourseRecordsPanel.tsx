@@ -14,9 +14,10 @@
  * THE TWO FIGURES COUNT RECORDS, NOT COURSES (ruled 10 Sep 2026). They sum to
  * the same total the sheet showed before the split -- 67 for member 8c240997 --
  * so the headline keeps continuity with the figure the member already knows and
- * answers "of my sixty-seven records, how many did I actually win?". WON = 10
- * records at the 4 courses with FIELD_MIN_PLAYERS+ other golfers; UNCONTESTED =
- * 57 at the other 18. The COURSE count stays in the meta ("{n} courses") and
+ * answers "of my sixty-seven records, how many did I actually win?". WON = 49
+ * records at the 19 courses where at least one other golfer has played;
+ * UNCONTESTED = 18 at the 3 where nobody has. The COURSE count stays in the
+ * meta ("{n} courses") and
  * must never move into the headline: a courses split would shrink the figure
  * from 67 to 22 for reasons that have nothing to do with contest.
  *
