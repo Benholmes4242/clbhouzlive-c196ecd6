@@ -27,6 +27,14 @@ interface JourneySummaryCardProps {
   coursesPlayed: number | null;
   countriesPlayed: number | null;
   avgRating: number | null;
+  /**
+   * How many of their own ratings the RATING figure is the mean of. The label
+   * had to shorten to "RATING" to fit its column (see the item comment), so the
+   * word AVERAGE lives in the basis line instead and needs this count to say
+   * anything. Null means unknown: the basis line then omits the rating clause
+   * rather than guessing a population.
+   */
+  ratedCount?: number | null;
   top100Played?: number | null;
   isOwnProfile: boolean;
   displayName?: string;
