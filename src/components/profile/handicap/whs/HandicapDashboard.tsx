@@ -140,10 +140,11 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           "no weak stretch" verdict, so the block says nothing. */}
       <HolesSection userId={userId} connectionId={connection.id} readOnly={readOnly} />
 
-      {/* 7 — PERSONAL BESTS (Section H; the achievements tile + streaks come
-          off here, replaced by the TROPHY ROOM › terminal row per the
-          amendment — GamMount itself stays at page level regardless) */}
-      <PersonalBests
+      {/* 7 — PERSONAL BESTS (Section H). records/PersonalBests is dead-listed,
+          not deleted. AchievementsPanel STAYS BELOW until the new TROPHY ROOM ›
+          terminal row is verified opening the room — the tile is the current
+          door. GamMount stays at page level regardless. */}
+      <PersonalBestsSection
         connectionId={connection.id}
         currentHandicap={currentHandicap}
         viewMode={viewMode}
