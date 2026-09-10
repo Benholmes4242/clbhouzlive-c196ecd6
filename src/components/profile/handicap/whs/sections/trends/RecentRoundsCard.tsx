@@ -345,50 +345,45 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
   );
 };
 
-// ─── Counter badge (right slot) ─────────────────────────────────────
-const CounterBadge: React.FC<{ count: number }> = ({ count }) => (
-  <div style={{ textAlign: 'right' }}>
-    <div
-      style={{
-        fontSize: 11,
-        fontWeight: 700,
-        letterSpacing: '0.14em',
-        color: T.inkFaded,
-        marginBottom: 4,
-      }}
-    >
-      OF WHICH
-    </div>
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-        fontSize: 13,
-        fontWeight: 700,
-        color: T.ink,
-      }}
-    >
-      <span
-        style={{
-          width: 5,
-          height: 5,
-          borderRadius: 999,
-          background: 'var(--hcp-amber)',
-        }}
-      />
-      {count} {count === 1 ? 'counter' : 'counters'}
-    </div>
-  </div>
+// ─── Counter mark (row) ─────────────────────────────────────────────
+// This was an unrendered "OF WHICH n counters" right-slot summary. It is now
+// the ROW mark the brief asks for: only a counter carries it, and only a
+// marked row can ever carry an HCP figure beside it.
+const CounterBadge: React.FC<{ label: string }> = ({ label }) => (
+  <span
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 4,
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: '0.12em',
+      textTransform: 'uppercase',
+      color: T.ink,
+    }}
+  >
+    <span
+      aria-hidden
+      style={{ width: 5, height: 5, borderRadius: 999, background: 'var(--hcp-amber)' }}
+    />
+    {label}
+  </span>
 );
 
 // ─── Filter chips ───────────────────────────────────────────────────
+// TWO state chips, always visible, plus ONE course chip that opens a picker.
+// There is no horizontal scroller: a control whose remaining options are
+// invisible is worse than a control with fewer options. The dead
+// `.rrc-chips::-webkit-scrollbar` rule went with the scroller.
 interface FilterChipsProps {
-  filter: FilterKey;
-  onChange: (next: FilterKey) => void;
+  filter: Filter;
+  onChange: (next: Filter) => void;
   totalCount: number;
   counterCount: number;
-  courseNames: { name: string; count: number }[];
+  onOpenPicker: () => void;
+  anyCourseLabel: string;
+  allLabel: string;
+  countersLabel: string;
 }
 
 const FilterChips: React.FC<FilterChipsProps> = ({
@@ -396,44 +391,40 @@ const FilterChips: React.FC<FilterChipsProps> = ({
   onChange,
   totalCount,
   counterCount,
-  courseNames,
+  onOpenPicker,
+  anyCourseLabel,
+  allLabel,
+  countersLabel,
 }) => (
   <div
     style={{
       marginTop: 12,
       display: 'flex',
       gap: 6,
-      overflowX: 'auto',
-      WebkitOverflowScrolling: 'touch',
-      scrollbarWidth: 'none',
+      flexWrap: 'wrap',
       paddingBottom: 2,
     }}
   >
-    <style>{`.rrc-chips::-webkit-scrollbar{display:none}`}</style>
     <FilterChip
-      label="All rounds"
+      label={allLabel}
       count={totalCount}
-      active={filter === 'all'}
-      onClick={() => onChange('all')}
+      active={filter.kind === 'all'}
+      onClick={() => onChange({ kind: 'all' })}
     />
     {counterCount > 0 && (
       <FilterChip
-        label="Counters"
+        label={countersLabel}
         count={counterCount}
-        active={filter === 'counters'}
-        onClick={() => onChange('counters')}
+        active={filter.kind === 'counters'}
+        onClick={() => onChange({ kind: 'counters' })}
       />
     )}
-    {courseNames.length >= 2 &&
-      courseNames.slice(0, 4).map((c) => (
-        <FilterChip
-          key={c.name}
-          label={shortenCourseName(c.name)}
-          count={c.count}
-          active={filter === c.name}
-          onClick={() => onChange(c.name)}
-        />
-      ))}
+    <FilterChip
+      label={filter.kind === 'course' ? shortenCourseName(filter.name) : anyCourseLabel}
+      active={filter.kind === 'course'}
+      onClick={onOpenPicker}
+      trailingChevron
+    />
   </div>
 );
 
