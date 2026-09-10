@@ -50,7 +50,7 @@
  "closeGuard": {
   "mediaNotSaved_one": "{{count}} photo will not be saved",
   "mediaNotSaved_other": "{{count}} photos will not be saved",
-  "saveDraftKeepsNothingElse": "Guardar borrador . solo texto y etiquetas",
+  "saveDraftKeepsNothingElse": "Guardar borrador · solo texto y etiquetas",
   "saveDraftLosesMedia": "Las fotos y los videos no se guardaran",
   "saveDraftLosesSchedule": "La hora programada no se guardara",
   "saveDraftLosesBoth": "Las fotos, los videos y la hora programada no se guardaran"

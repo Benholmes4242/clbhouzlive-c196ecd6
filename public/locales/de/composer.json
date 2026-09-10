@@ -50,7 +50,7 @@
  "closeGuard": {
   "mediaNotSaved_one": "{{count}} photo will not be saved",
   "mediaNotSaved_other": "{{count}} photos will not be saved",
-  "saveDraftKeepsNothingElse": "Entwurf speichern . nur Text und Tags",
+  "saveDraftKeepsNothingElse": "Entwurf speichern · nur Text und Tags",
   "saveDraftLosesMedia": "Fotos und Videos werden nicht gespeichert",
   "saveDraftLosesSchedule": "Die geplante Zeit wird nicht gespeichert",
   "saveDraftLosesBoth": "Fotos, Videos und die geplante Zeit werden nicht gespeichert"
