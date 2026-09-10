@@ -988,3 +988,51 @@ exception. Report-only, nothing recoloured.
 
 5 Eight device/runtime history tests STILL UNRUN - authenticated device runtime
 unavailable. Nothing deleted this pass.
+
+## Pass one closing rulings (10 Sep 2026)
+
+### 1. Pending home club restored - in ClubsCard, not in a prompt
+`ClubsCard` gained `pendingClubName`, read on the owner's own profile from the
+same `useHomeClubStatus` hook the removed prompt used
+(`user_profiles.home_club_pending_name`, plus the open `course_requests` check
+the hook already makes). NOTHING RECONSTRUCTED - no data ClubsCard could not get
+from the canonical source. Pending now outranks the empty state: a member with a
+club on the way is shown their answer with a Pending status instead of being
+asked the question again. `HomeClubPrompt.tsx` stays dead-listed, not deleted.
+
+### 2. RATING keeps its short label; the basis line carries "average"
+The strip's basis line was a CODE COMMENT ONLY before this ruling - section D
+wrote the PLAYED definition into `JourneySummaryCard`'s header comment, and no
+sentence rendered beneath the strip. There is now a visible one, own-profile
+only, in the panel footer:
+
+  "Played counts every course on your record, rated rounds or not.
+   Rating is the average of your 49 course ratings."
+
+The rating count comes from the same `course_ratings` read that produces the mean
+(mock rows and zero ratings excluded); the query now returns `{ avg, n }`. The
+rating clause is OMITTED when the count is unknown rather than naming a
+population it has not counted. Third population stated where it renders: played
+(49) is not rated (n) is not imported-round courses (35).
+
+`WORLD 100` accepted as shipped.
+
+### 3. OPEN - `legacy.*` locale keys missing in all six locales
+Every label and both basis sentences in `JourneySummaryCard` fall back to the
+English `defaultValue` in en/de/es/ja/ko/en-XA. Pre-existing, unrelated to the
+correctness pass. SCOPE IF PICKED UP: `legacy.played`, `legacy.countries`,
+`legacy.top100World`, `legacy.avgRating`, `legacy.basisPlayed`,
+`legacy.basisRating` (plural-aware), `legacy.kickerOwn/kickerOther`,
+`legacy.emptyTitle*/emptyBody*`, `legacy.findCourses`, plus `toRate` from F1 -
+six locales' worth of new copy, which is a translation pass and not a
+correctness one.
+
+### Also on the open list
+- `useCareerRounds` 1,000-row cap: header count visibly wrong above 1,000,
+  milestone "first round" plausibly wrong above it. Heaviest member 345.
+- `useDrafts.save` does not persist post media or schedule time.
+- Eight sheet back-behaviour device tests still unrun.
+
+### Over to Ben on device
+Two counter error states, the three-figure visitor hero, ROUNDS reading 245, the
+remainder tile at three digits, and the four legacy labels on one line.
