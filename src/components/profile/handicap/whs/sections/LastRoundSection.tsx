@@ -141,10 +141,10 @@ const LastRoundSection: React.FC<Props> = ({
                 <div style={{ ...KICKER, marginBottom: 6 }}>{label}</div>
                 <div
                   style={{
-                    height: 30,
+                    height: 23,
                     display: 'flex',
                     alignItems: 'flex-end',
-                    fontSize: 28,
+                    fontSize: 21,
                     fontWeight: 700,
                     lineHeight: 1,
                     color: CHART.INK,
