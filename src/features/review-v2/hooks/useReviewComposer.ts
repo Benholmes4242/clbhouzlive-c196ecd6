@@ -246,8 +246,12 @@ export function useReviewComposer(
     setState((s) => ({ ...s, teeLabel: label }));
   }, []);
 
-  // Debounced draft write. Both modes; media is never persisted (see report).
+  /* Debounced draft write. Both modes. The FILES are still never persisted —
+     they are local blobs — but their COUNTS are, so the restore can say what it
+     could not bring back (_05 §1). */
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const photoCount = mediaCounts?.photos ?? 0;
+  const videoCount = mediaCounts?.videos ?? 0;
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
@@ -260,6 +264,8 @@ export function useReviewComposer(
           reviewText: state.reviewText,
           shareToFeed: state.shareToFeed,
           teeLabel: state.teeLabel,
+          photoCount,
+          videoCount,
           savedAt: Date.now(),
         },
         reviewId,
@@ -268,7 +274,7 @@ export function useReviewComposer(
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [courseId, reviewId, step, state]);
+  }, [courseId, reviewId, step, state, photoCount, videoCount]);
 
   const clearDraft = useCallback(
     () => clearReviewDraft(courseId, reviewId),
@@ -283,8 +289,14 @@ export function useReviewComposer(
     clearReviewDraft(courseId, reviewId);
     setState(seedFromExisting(existing));
     setRestoredFromDraft(false);
+    setRestoredMediaCounts(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, reviewId, existing]);
+
+  /* Dismissing the media sentence alone, without discarding the restored work:
+     the member has read it and re-attached, or decided not to. */
+  const acknowledgeRestoredMedia = useCallback(() => setRestoredMediaCounts(null), []);
+
 
 
 
