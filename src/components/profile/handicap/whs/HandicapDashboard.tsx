@@ -26,7 +26,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 
 import IndexSection from './sections/IndexSection';
 import NextRoundSection from './sections/NextRoundSection';
-import LastRoundCard from './sections/LastRoundCard';
+import LastRoundSection from './sections/LastRoundSection';
 import RoundsThatCountCard from './sections/RoundsThatCountCard';
 import StablefordCard from './sections/trends/StablefordCard';
 import GameEverywhereCard from './sections/trends/GameEverywhereCard';
@@ -119,7 +119,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       <NextRoundSection connectionId={connection.id} currentHandicap={currentHandicap} />
 
       {/* 3 — LAST ROUND (Section D) */}
-      <LastRoundCard
+      <LastRoundSection
         connectionId={connection.id}
         userId={userId}
         viewMode={viewMode}
