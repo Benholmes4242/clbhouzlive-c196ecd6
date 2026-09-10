@@ -739,7 +739,21 @@
       "parSentence": "Your par {{worst}}s cost you {{worstAvg}} shots a hole against {{bestAvg}} on your par {{best}}s, and they make up {{share}}% of the holes behind these figures.",
       "parMissing": "You haven't played enough par {{types}}s yet for a figure.",
       "withheldNone": "Hole-by-hole scoring needs rounds with a full card. None of your rounds have one yet.",
-      "withheldSome": "Hole-by-hole scoring needs rounds with a full card. Only {{count}} of your rounds do."
+      "withheldSome": "Hole-by-hole scoring needs rounds with a full card. Only {{count}} of your rounds do.",
+      "basisHoles": "Across {{count}} holes.",
+      "basisRings": "Eighteen-hole rounds at mapped courses."
+    },
+    "bests": {
+      "eyebrow": "Personal bests",
+      "heading": "Records to break",
+      "headingFriend": "{{name}}'s records to break",
+      "bestDiff": "Best differential",
+      "bestGross": "Best gross",
+      "bestStableford": "Best stableford",
+      "bestVsHcp": "Best against handicap",
+      "trophyRoom": "Trophy room",
+      "missing": "{{count}} more appear once you've posted a stableford and a round off your handicap.",
+      "missingAll": "Your records appear here once you've posted a round."
     }
   },
   "comments": {
