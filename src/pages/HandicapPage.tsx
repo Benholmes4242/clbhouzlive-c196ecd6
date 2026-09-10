@@ -319,41 +319,60 @@ const HandicapPage: React.FC = () => {
     setSearchParams(next, { replace: true });
   }, [searchParams, setSearchParams]);
 
-  // Deep-link: ?gam=trophies opens the Trophy Room sheet once on arrival.
-  // Defer the emit until after GamMount has mounted and subscribed. The
-  // early-return `loading` / `!ownerUserId` branches above unmount the
-  // subscriber, and a synchronous emit here would fire into the void on
-  // first render. Gate on `ownerUserId` (mount precondition) AND use a
-  // microtask so subscription effects run first in the same commit.
+  /**
+   * ONE HANDLER, TWO VOCABULARIES.
+   *
+   * ?gam= is the current vocabulary. ?sheet= is the legacy one the push
+   * dispatcher emitted until this fix, and delivered pushes carry their URL
+   * verbatim and cannot be rewritten — so every badge and streak notification
+   * already sitting in a tray still arrives as ?sheet=. It is aliased here, on
+   * the same established footing as /handicap/rivalry/:id and the stale
+   * ?subtab= values above.
+   *
+   * BOTH VOCABULARIES RESOLVE THROUGH THIS ONE EFFECT so they cannot drift
+   * apart again: the intent is read first, then handled once.
+   *
+   *   gam=trophies | sheet=achievements -> openGamAchievements()
+   *   gam=streaks  | sheet=streaks      -> openAllStreaks()
+   *
+   * LIMITATION, DELIBERATELY NOT PAPERED OVER: the push payload carries
+   * badge_id as a DATA field, not a query param, so an aliased
+   * ?sheet=achievements opens the trophy room but cannot open the specific
+   * badge that was earned. &section= and &badge= are honoured when present on
+   * either vocabulary; nothing is inferred from the data field.
+   *
+   * Defer the emit until after GamMount / StreaksSheetMount have mounted and
+   * subscribed. The early-return `loading` / `!ownerUserId` branches above
+   * unmount the subscriber, and a synchronous emit here would fire into the
+   * void on first render. Gate on `ownerUserId` (mount precondition) AND use a
+   * macrotask so subscription effects run first in the same commit.
+   */
   useEffect(() => {
-    if (searchParams.get('gam') !== 'trophies') return;
+    const gam = searchParams.get('gam');
+    const sheet = searchParams.get('sheet');
+    const intent: 'trophies' | 'streaks' | null =
+      gam === 'trophies' || sheet === 'achievements'
+        ? 'trophies'
+        : gam === 'streaks' || sheet === 'streaks'
+          ? 'streaks'
+          : null;
+    if (!intent) return;
     if (!ownerUserId) return;
     const section = searchParams.get('section') === 'crowns' ? 'crowns' : undefined;
     // ?badge=<id> preserves the retired NotificationsSheet behaviour: a badge
     // row in the Activity ledger opens the career record ON THAT BADGE.
     const badgeId = searchParams.get('badge') || undefined;
     const id = setTimeout(() => {
-      openGamAchievements(badgeId || section ? { badgeId, section } : undefined);
+      if (intent === 'trophies') {
+        openGamAchievements(badgeId || section ? { badgeId, section } : undefined);
+      } else {
+        openAllStreaks();
+      }
       const next = new URLSearchParams(searchParams);
       next.delete('gam');
+      next.delete('sheet');
       next.delete('section');
       next.delete('badge');
-      setSearchParams(next, { replace: true });
-    }, 0);
-    return () => clearTimeout(id);
-  }, [searchParams, setSearchParams, ownerUserId]);
-
-  // Deep-link: ?gam=streaks opens the Streaks sheet once on arrival. Same
-  // shape as the trophies effect: the setTimeout(0) lets StreaksSheetMount's
-  // subscription effect run before the emit in the same commit, and the
-  // ownerUserId gate is the mount precondition.
-  useEffect(() => {
-    if (searchParams.get('gam') !== 'streaks') return;
-    if (!ownerUserId) return;
-    const id = setTimeout(() => {
-      openAllStreaks();
-      const next = new URLSearchParams(searchParams);
-      next.delete('gam');
       setSearchParams(next, { replace: true });
     }, 0);
     return () => clearTimeout(id);
