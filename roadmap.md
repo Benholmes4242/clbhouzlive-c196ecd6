@@ -186,3 +186,10 @@
 
 ## Open item — mapped-course requirement on the par rings
 - get_my_scoring_breakdown_all_courses requires whs_to_golf_course_map. Live: 3,511 of 3,524 eighteen-hole rounds survive it (99.6% on average, worst member 96.4%), so the rings describe the same golfer and the basis caption is sufficient. Not its own item.
+
+## Section I — Your circle (Sep 2026)
+
+- ACTIVE definition now written at `src/lib/whs/utils/buildLeaderboardCohorts.ts:51-60`: last posted round within 90 days; NULL last-round = inactive; self always active. All counts derive there.
+- Nine-hole open item strengthened: **12 of 22 connected members would show a false best gross** if the `is_nine_hole` filter in Personal Bests were removed (a 43 beats a 68). Strongest argument in the codebase for reading `is_nine_hole` on every gross/stableford surface — see the nine-hole sweep list (PostRoundCard first: only surface printing a gross to other people; hidden from Clubhouse feed, live on profile posts tab).
+- Club-name split resolved by batch-resolving the clbhouz `user_profiles.home_club` for every circle row with a clbhouz account (one read). WHS-only friends keep the England Golf value; no normaliser. Open item: 586 of 672 circle rows are WHS-only, so most rows still render England Golf's shorter form — the two flavours coexist by row type, not by field mixing.
+- Dead-listed by Section I (not deleted): `sections/friends-leaderboard-v2/FriendsLeaderboardSection.tsx`, `StandingFigures.tsx`, `WeeklyBanner.tsx`, `sections/compare/CompareEntryPanel.tsx`, `sections/PulseSection.tsx`, `sections/invite-to-clbhouz/CircleInviteAction.tsx`. `LeaderboardRow.tsx` and `FullLeaderboardSheet.tsx` stay live (see-all destination).
