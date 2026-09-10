@@ -21,13 +21,18 @@
  * THE FLAME stays and is the only thing on this list about form rather than
  * standing: index improved by half a shot or more over 30 days
  * (handicap_30d_delta <= -0.5). It is labelled by CircleFlameLegend, which
- * renders only when a flame is on screen.
+ * renders only when a flame is on screen. The flame and its legend glyph take
+ * the INDEX_DELTA improved token (light pair - this is an #F8FAFC surface),
+ * the same green the 90-day and 12-month index deltas take at the top of the
+ * handicap page: a falling index means the same thing in both places. Amber is
+ * left doing exactly one job on this row - marking the viewing member.
  *
  * Tones are the CHART literals, so this renders identically on the page and
  * inside a portalled BottomSheet (no var(--hcp-*) dependency).
  */
 import React, { useState } from 'react';
 import { CHART } from '../../charts/tokens';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
@@ -49,7 +54,7 @@ export const FlameIcon: React.FC<{ size?: number }> = ({ size = 11 }) => (
     width={size}
     height={size}
     viewBox="0 0 24 24"
-    fill={CHART.AMBER}
+    fill={INDEX_DELTA.light.improved}
     aria-hidden
     style={{ flexShrink: 0 }}
   >
