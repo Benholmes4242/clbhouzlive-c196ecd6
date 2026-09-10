@@ -426,6 +426,41 @@ const ProfilePageV2Content: React.FC = () => {
     isSelf ? profileUserId ?? undefined : undefined,
   );
   const shellRoundsCount = isSelf ? shellRoundsTotal : null;
+  const { isCoursesError: shellCoursesError } = useUserCourseSummary(profileUserId ?? undefined);
+
+  /* Same series as the social counters, distinguished by `source` — one event
+     with a source is a reading; two series are a search. */
+  React.useEffect(() => {
+    if (!profileUserId) return;
+    if (shellRoundsState === 'error') {
+      analyticsEvents.track('profile_counter_read_failed', {
+        counters: 'rounds_total',
+        source: 'whs_scores.count',
+        profile_user_id: profileUserId,
+        is_self: !!isSelf,
+      });
+    }
+  }, [shellRoundsState, profileUserId, isSelf]);
+
+  React.useEffect(() => {
+    if (!profileUserId || !reviewsCountError) return;
+    analyticsEvents.track('profile_counter_read_failed', {
+      counters: 'rated_courses',
+      source: 'usePersonalReviewsCount',
+      profile_user_id: profileUserId,
+      is_self: !!isSelf,
+    });
+  }, [reviewsCountError, profileUserId, isSelf]);
+
+  React.useEffect(() => {
+    if (!profileUserId || !shellCoursesError) return;
+    analyticsEvents.track('profile_counter_read_failed', {
+      counters: 'courses_played',
+      source: 'useUserCourseSummary',
+      profile_user_id: profileUserId,
+      is_self: !!isSelf,
+    });
+  }, [shellCoursesError, profileUserId, isSelf]);
   const followingCount = socialCounts?.following ?? null;
   const friendsCount = isPersonal ? (socialCounts?.friends ?? null) : null;
   
