@@ -762,3 +762,58 @@ OPEN (recorded, not urgent): useRoundNetScores returns an empty map without
 complaint if gam_round_net is unreadable -- the two net cards would silently
 leave the rotation with only a console line as evidence. Same silent-failure
 shape as the cron jobs.
+
+## PROFILE PASS ONE, E AND F (10 Sep 2026)
+
+CAP ITEM AMENDED — the 1,000-row cap in useCareerRounds has TWO failure modes,
+and the second is the dangerous one. The cap keeps the 1,000 NEWEST rows; the
+three rows-needing consumers want the OLDEST (milestoneRoundFor takes the LAST
+match). So above 1,000 rounds:
+  1. the header count is VISIBLY wrong -- reports 1,000 and stops;
+  2. the milestone detail is PLAUSIBLY wrong -- "your first eagle" silently
+     becomes the oldest eagle still inside the window: a real round of theirs,
+     correct format, plausible date, not the first.
+A wrong count is noticed. A wrong first round is believed. Both now named at the
+read. Nothing built: heaviest member 345 rows, nobody near the cap.
+
+E -- HOME CLUB PROMPT REMOVED from ProfilePageV2 (import and render). It was the
+only mount: nothing else in the tree rendered it. The file
+src/features/home-club/HomeClubPrompt.tsx is DEAD-LISTED, not deleted, and its
+default export is now unused too. ClubsCard already states the owner's empty
+case and opens the same picker (openHomeClubPicker), so the prompt was a second
+door to one destination sitting directly above the first.
+  LOST WITH IT, recorded rather than rebuilt: the PENDING club treatment
+  (BRIEF_HOME_CLUB_PICKER §3.5) lived only in that prompt, and nothing else reads
+  a pending club (§3.6). A member with a pending club now sees the same empty
+  state as a member with none until it is approved. Open question for Ben's
+  structural call, not fixed on my own authority.
+  OTHER sessionStorage-DISMISSED PROMPTS IN THE PROFILE TREE: none. The only
+  other sessionStorage user in the profile tree is
+  ProfileAvatarRing.tsx (RING_ANIMATED_KEY) and it gates an ANIMATION once per
+  session, not a dismissal. Everything else is elsewhere (review composer drafts,
+  amateur hero rotation, amateur scroll memory, admin ops panel).
+
+F1 -- STILL TO RATE REMAINDER. The text was never clipped; the TILE was. Three
+96px tiles plus gaps are 318px against a 326px inner width at 390pt
+(390 - 32 page - 32 panel), leaving 8px for the fourth -- so the remainder tile
+rendered as a sliced "+1". The remainder now sits OUTSIDE the scroller, sized to
+its own text (padding 0 10, nowrap), with the thumbnail row taking the remaining
+width. Measured at 390pt: remainder box 88.2px, fully inside the panel, not
+truncated, and unchanged in behaviour for a three-digit value because the box is
+content-sized.
+
+F2 -- LEGACY STRIP LABELS, ALL FOUR ON ONE LINE AT 390pt. Four items share
+81.5px a column. Measured at the label's canon 11/700/0.13em:
+  WORLD TOP 100  105.5px  -- cannot fit at any legal type size; broke after
+                             "TOP", which read as a separate "100" column
+  AVG RATING      80.9px  -- fitted by 0.6px, a wrap waiting to happen
+  COUNTRIES       75.8px
+  PLAYED          49.6px
+Copy shortened to WORLD 100 (75.3px) and RATING (50.2px), both still naming what
+they count, with the measurements written at the items. StatRow gained an OPT-IN
+labelNoWrap (default false, every other StatRow byte-identical) so a longer
+locale string ellipsizes instead of wrapping -- a truncation reads as one label,
+a wrap reads as two. Verified at 390pt: four labels, one line each (1.09 line
+boxes), zero truncated.
+  NOT FIXED, and it predates this pass: legacy.* has NO keys in any of the six
+  locale files, so all four labels fall back to the English defaults everywhere.
