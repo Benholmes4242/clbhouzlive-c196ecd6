@@ -224,6 +224,11 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
         })}
       </div>
 
+      {/* BASIS for the four counts above. Percentages need their denominator. */}
+      <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
+        {t('common:handicap.holes.basisHoles', { count: totalHoles })}
+      </div>
+
       {/* Hairline across the content width */}
       <div aria-hidden style={{ height: 1, background: CHART.BORDER, margin: '18px 0' }} />
 
