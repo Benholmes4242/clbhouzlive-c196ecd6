@@ -219,6 +219,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
           showLegend={false}
           selectedIndex={selIdx}
           onSelectIndex={onSelect}
+          cutLine={cutLine}
         />
 
         <p style={{ margin: '14px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
