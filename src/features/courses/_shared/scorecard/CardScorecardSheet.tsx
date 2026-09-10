@@ -1,3 +1,4 @@
+import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, Table } from 'lucide-react';
@@ -251,8 +252,11 @@ const NINE_GRID = '26px repeat(9, minmax(0, 1fr)) 32px';
  * §D3/E2 — THE ONE FIELD THRESHOLD. Both the per-hole FIELD row and the
  * beat-the-field sentence read this single constant through one derived
  * `fieldGateOpen`, so they can never disagree about whether a field exists.
+ *
+ * It now lives in src/lib/gam/fieldGate.ts because the trophy room's won /
+ * uncontested split asks the same question. Value unchanged (5); it is imported
+ * rather than restated so a second definition of "a field" cannot appear.
  */
-const FIELD_MIN_PLAYERS = 5;
 
 /**
  * Result marks come from the shared ScoreMark renderer — one grammar across the
