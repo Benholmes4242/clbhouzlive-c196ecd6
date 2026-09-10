@@ -47,7 +47,7 @@ export const SeasonCutPanel: React.FC<Props> = ({ rounds }) => {
           >
             <MetaLabel>{cell.label}</MetaLabel>
             <div style={{ marginTop: 4 }}>
-              <Figure value={cell.value} size={20} color={REC.INK} />
+              <Figure value={cell.value} size={21} color={REC.INK} />
             </div>
           </div>
         ))}
