@@ -58,26 +58,31 @@ interface Props {
 const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }) => {
   const { t } = useTranslation(['common']);
   const { data: allScores, isLoading } = useAllScores(connectionId);
-  const { data: counters } = useCounters(connectionId);
 
   const [selIdx, setSelIdx] = useState<number | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const total = allScores?.length ?? 0;
 
-  /** Last 20, OLDEST FIRST, with the counter flag from the existing set. */
+  /**
+   * Last 20, OLDEST FIRST. ONE SOURCE FOR THE COUNTER SET: is_counter as it
+   * arrives on useAllScores (whs_scores), the same read the posted-history
+   * sheet uses. The previous useCounters set was a second query filtered
+   * is_counter = true with .limit(8) — eight is what WHS uses at twenty or
+   * more rounds and not what it uses below that, so the limit asserted a rule
+   * the schema does not enforce.
+   */
   const window20 = useMemo(() => {
     if (!allScores || allScores.length === 0) return [];
-    const counterIds = new Set((counters ?? []).map((c) => c.id));
     return [...allScores.slice(0, 20)]
       .sort((a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime())
       .map((r) => ({
         id: r.id,
         play_date: r.play_date,
         diff: r.handicap_differential ?? null,
-        is_counter: counterIds.has(r.id),
+        is_counter: !!r.is_counter,
       }));
-  }, [allScores, counters]);
+  }, [allScores]);
 
   const withheld = !isLoading && total > 0 && total < MIN_ROUNDS;
   const withheldFired = useRef(false);
