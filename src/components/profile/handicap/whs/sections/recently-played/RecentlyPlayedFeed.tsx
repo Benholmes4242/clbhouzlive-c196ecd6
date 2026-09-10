@@ -7,7 +7,7 @@ import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { HcpSection } from '../_shared/HcpSection';
+import { HcpSection } from '../HcpSection';
 import { CHART, CHART_FONT } from '../../charts';
 import FriendRoundRow, { type FriendRoundVariant } from './FriendRoundRow';
 import { FriendsRoundsSheet } from './FriendsRoundsSheet';
