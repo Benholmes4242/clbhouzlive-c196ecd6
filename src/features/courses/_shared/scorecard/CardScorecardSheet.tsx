@@ -1070,7 +1070,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
           style={{
             padding: '12px 16px 10px',
-            background: A.PANEL,
+            /* The summary band separates by HAIRLINE, not by a second fill
+               (BRIEF_SHEET_BACKGROUND_CANON). */
             borderBottom: `1px solid ${A.BORDER}`,
             flexShrink: 0,
           }}
