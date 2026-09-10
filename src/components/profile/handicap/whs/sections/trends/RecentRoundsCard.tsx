@@ -430,10 +430,11 @@ const FilterChips: React.FC<FilterChipsProps> = ({
 
 const FilterChip: React.FC<{
   label: string;
-  count: number;
+  count?: number;
   active: boolean;
   onClick: () => void;
-}> = ({ label, count, active, onClick }) => (
+  trailingChevron?: boolean;
+}> = ({ label, count, active, onClick, trailingChevron = false }) => (
   <button
     type="button"
     onClick={onClick}
