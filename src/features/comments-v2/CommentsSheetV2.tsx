@@ -28,6 +28,15 @@ import { useCommentsRealtimeV2 } from './hooks/useCommentsRealtimeV2';
 import { CommentCard } from './components/CommentCard';
 import { CommentComposer } from './components/CommentComposer';
 import { CommentActionSheetV2 } from './components/CommentActionSheetV2';
+import {
+  commentDraftKey,
+  commentEditDraftKey,
+  readCommentDraft,
+  writeCommentDraft,
+  clearCommentDraft,
+  COMMENT_DRAFT_DEBOUNCE_MS,
+} from './lib/commentDraft';
+
 import { ReportCommentSheetV2 } from './components/ReportCommentSheetV2';
 import { FIGS, A } from '@/features/courses/components/holes/analytical/tokens';
 import { TITLE as TITLE_SCALE, BODY } from '@/lib/tokens/type';
