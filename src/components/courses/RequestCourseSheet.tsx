@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Check, Loader2 } from 'lucide-react';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
+import { useDraftDismissGuard } from '@/components/ui/useDraftDismissGuard';
+
 import { TITLE } from '@/lib/tokens/type';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
