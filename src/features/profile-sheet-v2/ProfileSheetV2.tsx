@@ -74,8 +74,11 @@ export interface ProfileSheetV2Props {
   isLoading?: boolean;
 }
 
-const SHEET_BG = A.CANVAS;
+/* SHEET_BG is gone: BottomSheet owns the one canonical sheet surface
+   (SHEET_SURFACE, #15171F) and applies it after any caller style, so a local
+   background here could not win and would only mislead. */
 const SKELETON_TILE = A.TRACK;
+
 
 function SheetSkeleton() {
   const block = (h: number, style: React.CSSProperties = {}) => (
