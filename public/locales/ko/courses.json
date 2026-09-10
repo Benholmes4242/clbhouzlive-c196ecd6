@@ -213,7 +213,13 @@
     "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
     "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here.",
     "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
-    "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here."
+    "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
+    "beatFieldSentence": "{{m}}개 홀 중 {{n}}개 홀에서 필드 평거를 이겼습니다.",
+    "beatFieldBasis_one": "이곳에서 플레이한 다른 골프사 1명 기준.",
+    "beatFieldBasis_other": "이곳에서 플레이한 다른 골프사 {{count}}명 기준.",
+    "noFieldLine_one": "이곳에서 플레이한 다른 골프사가 1명밖이라 아직 바교할 필드가 없습니다.",
+    "noFieldLine_other": "이곳에서 플레이한 다른 골프사가 {{count}}명밖이라 아직 바교할 필드가 없습니다.",
+    "noFieldNobody": "아직 이곳에서 플레이한 다른 사람이 없어 바교할 필드가 없습니다."
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

@@ -14,7 +14,7 @@ import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardSco
 import type { HonoursFeat } from '@/features/courses/_shared/scorecard/honoursTreatment';
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
 import { useRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
-import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
+import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
@@ -87,9 +87,27 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const contextQuery = useRoundCourseContext(scoreId, open);
   const ctx = contextQuery.data ?? null;
   const analysisCourseId = ctx?.course_id ?? courseIdQuery.data ?? undefined;
-  const analysisQuery = useCourseHoleAnalysis(open ? analysisCourseId : undefined);
-  // get_course_hole_analysis returns available:false for a signed-out viewer —
-  // that is "no field data", not an error.
+  /**
+   * §D3 — THE FIELD EXCLUDES THE ROUND'S OWNER, NOT THE VIEWER.
+   *
+   * The subject of this card is `profileUserId`, the member whose round it is,
+   * so that is the id passed as `p_exclude_user_id`. Passing the signed-in
+   * viewer instead would compare David against a field containing David and
+   * missing Ben — the same fault in reverse, and it would look plausible.
+   *
+   * get_course_hole_field replaces get_course_hole_analysis here: the analysis
+   * function includes every player, so the old field average included the
+   * member it was being compared with. available:false ('unauthenticated' or
+   * 'no_whs_mapping') means NO FIELD; an empty field is a structured object with
+   * course_players 0, so the count is what is branched on, never null.
+   */
+  const analysisQuery = useCourseHoleField(
+    open ? analysisCourseId : undefined,
+    profileUserId ?? undefined,
+  );
+  const fieldPlayers = analysisQuery.data?.available
+    ? (analysisQuery.data.course_players ?? 0)
+    : null;
   const fieldByHole = useMemo(() => {
     const m = new Map<number, number>();
     const a = analysisQuery.data;
@@ -261,6 +279,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       playerHcp={playerHcp}
       playerHcpDelta={handicapDelta ?? null}
       playerUserId={profileUserId ?? null}
+      fieldPlayers={fieldPlayers}
       onViewProfile={onViewProfile}
       onViewCourse={onViewCourse}
       onShareRound={onShareRound}

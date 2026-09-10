@@ -1953,7 +1953,13 @@
     "vsYourAvgLevel": "Right on your average here.",
     "vsYourAvgWorse": "{{n}} shots worse than your average here.",
     "you": "You",
-    "yourAvgHere": "Your avg here"
+    "yourAvgHere": "Your avg here",
+    "beatFieldSentence": "You beat the field average on {{n}} of {{m}} holes.",
+    "beatFieldBasis_one": "Based on 1 other golfer who has played here.",
+    "beatFieldBasis_other": "Based on {{count}} other golfers who have played here.",
+    "noFieldLine_one": "Only 1 other golfer has played here, so there is no field to compare with yet.",
+    "noFieldLine_other": "Only {{count}} other golfers have played here, so there is no field to compare with yet.",
+    "noFieldNobody": "Nobody else has played here yet, so there is no field to compare with."
   },
   "search": {
     "yourRounds": "Your rounds"
