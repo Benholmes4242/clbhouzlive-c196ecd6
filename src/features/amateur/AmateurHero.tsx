@@ -10,8 +10,7 @@ import { toParFor } from '@/components/explore-tab-new/friendRoundParts';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
 import { useHeroCourseImage } from '@/features/amateur/useHeroCourseImage';
-import { SINGLE_ROUND_METRICS } from '@/features/amateur/hero/heroCards';
-import { heroContextLine, heroKicker, heroUnit } from '@/features/amateur/hero/heroCopy';
+import { heroContextLine, heroKicker, heroSpreadLine, heroUnit } from '@/features/amateur/hero/heroCopy';
 import { useAmateurHeroCards } from '@/features/amateur/hero/useAmateurHeroCards';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
@@ -115,10 +114,18 @@ export function AmateurHero({
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
 
-  /* §2.1 THE CARD FIRST. Single-round family only for now; the aggregate family
-     joins the same rotation by widening this list. */
-  const hero = useAmateurHeroCards(userId, SINGLE_ROUND_METRICS);
+  /* §2.1 AND §2.2 THE CARD FIRST, BOTH FAMILIES. The rotation now holds every
+     metric the library builds: four single-round and four aggregate. The families
+     are not narrowed here, so which one a member sees is the rotation's decision
+     and not this component's. */
+  const hero = useAmateurHeroCards(userId);
   const card = hero.card;
+  /* AN AGGREGATE CARD HAS NO ROUND, AND THAT IS THE WHOLE DIFFERENCE (§2.2).
+     Many rounds stand behind the figure, so there is no scorecard to shape, no
+     course to name and no to-par to print — the spread line does that work
+     instead. The test is the round itself rather than the metric list, because
+     the round is what the anatomy actually depends on. */
+  const isAggregateCard = !!card && card.round == null;
 
   const { data: rounds, isFetched: fallbackFetched } = useCircleLatestRounds(userId, {
     limit: 1,
@@ -129,12 +136,26 @@ export function AmateurHero({
      the caption arrive together. */
   const fallbackRow = rounds?.[0] ?? null;
   const resolved = hero.ready && (fallbackFetched || !!card);
-  const row = !resolved ? null : (card?.round ?? fallbackRow);
+  /* `row` IS THE ROUND THE HERO IS ABOUT. An aggregate card is about no single
+     round, so it holds none — the fallback round must NOT stand in, or the hero
+     would print one member's name over another member's scorecard. */
+  const row = !resolved ? null : (card?.round ?? (isAggregateCard ? null : fallbackRow));
+  /* WHO THE CARD NAMES. The round's member for a single-round card and the
+     fallback; the card's own member for an aggregate one. */
+  const subject = !resolved
+    ? null
+    : isAggregateCard && card
+      ? card.member
+      : row
+        ? { user_id: row.user_id, display_name: row.display_name, profile_photo_url: row.profile_photo_url }
+        : null;
   const scoreIds = useMemo(() => [row?.score_id ?? null], [row?.score_id]);
   const shapes = useRoundHoleShapes(scoreIds);
   const shape = shapes?.get(row?.score_id ?? '') ?? null;
   /* THE PHOTOGRAPH. The rounds hook carries no image column, so the hero reads
-     golf_courses.thumbnail_image — the same field block 2's course rows use. */
+     golf_courses.thumbnail_image — the same field block 2's course rows use. An
+     aggregate card has no course, so it takes the flat tone rather than borrowing
+     a picture of somewhere the figure was only partly made. */
   const heroImage = useHeroCourseImage(row?.course_id);
 
   /* §2 THE SCORE. toParFor is the SHARED rule the Discover friend round row
@@ -148,6 +169,9 @@ export function AmateurHero({
   const figure = card ? card.figure : row?.gross ?? null;
   const figureUnit = card ? heroUnit(t, card.metric) : null;
   const contextLine = card ? heroContextLine(t, card) : null;
+  /* §2.2 THE LINE THAT REPLACES THE SHAPE: how many rounds and courses the
+     figure took. Null on every single-round card. */
+  const spreadLine = card ? heroSpreadLine(t, card) : null;
   const isCard = !!card;
 
   /* §10 ONE VIEW PER CARD, so the rotation can be judged later: which cards
@@ -234,14 +258,18 @@ export function AmateurHero({
 
       </CourseImageFallback>
 
-      {row && (
+      {subject && (
         <button
           type="button"
           onClick={() => {
             /* §5 THE ROUND FIRST. The hero names a feat, so the tap must land on
                the scorecard that carries it. The course page is the FALLBACK for
                a row with no score id (a suggested round with no card), never the
-               primary destination. */
+               primary destination.
+
+               AN AGGREGATE CARD HAS NO SCORECARD TO OPEN, so its door is the
+               member whose fortnight the figure describes — the one place the
+               rounds behind it are all listed. */
             if (card) {
               analyticsEvents.track('amateur_hero_card_tapped', {
                 card_id: card.id,
@@ -250,8 +278,9 @@ export function AmateurHero({
                 pool: card.pool,
               });
             }
-            if (row.score_id && onOpenRound) onOpenRound(row.score_id, row.user_id);
-            else if (row.course_id) navigate(`/courses/${row.course_id}`);
+            if (row?.score_id && onOpenRound) onOpenRound(row.score_id, row.user_id);
+            else if (row?.course_id) navigate(`/courses/${row.course_id}`);
+            else if (isAggregateCard) navigate(`/profile/${subject.user_id}`);
           }}
           style={{
             position: 'absolute',
@@ -265,7 +294,7 @@ export function AmateurHero({
             border: 0,
             background: 'transparent',
             textAlign: 'left',
-            cursor: row.course_id ? 'pointer' : 'default',
+            cursor: row?.course_id || isAggregateCard ? 'pointer' : 'default',
           }}
         >
           {/* WHO, on the photograph. Name and kicker form one column so the
@@ -274,10 +303,10 @@ export function AmateurHero({
           <span style={{ display: 'flex', alignItems: 'center', gap: isCard ? 14 : 9 }}>
             <SquircleAvatar
               size={isCard ? 44 : 30}
-              src={row.profile_photo_url ?? undefined}
-              alt={row.display_name}
-              userId={row.user_id}
-              fallback={row.display_name?.slice(0, 2).toUpperCase()}
+              src={subject.profile_photo_url ?? undefined}
+              alt={subject.display_name}
+              userId={subject.user_id}
+              fallback={subject.display_name?.slice(0, 2).toUpperCase()}
               hairlineRing
             />
             <span
@@ -301,7 +330,7 @@ export function AmateurHero({
                   textShadow: '0 1px 2px rgba(0,0,0,0.72)',
                 }}
               >
-                {row.display_name}
+                {subject.display_name}
               </span>
               {/* §1 THE KICKER, BENEATH THE NAME. It NAMES THE FEAT, which is what
                   explains the gold dot on the shape below — the label keys the
@@ -388,26 +417,39 @@ export function AmateurHero({
 
 
 
-          {/* THE ROUND SHAPE, over the scrim, 34px.
+          {/* THE ROUND SHAPE, over the scrim, 34px. SINGLE-ROUND ONLY.
               §3 TWO QUIET ADDITIONS, BOTH DEPENDENT ON THE HOLE SERIES: the
               level-par rule at 14% white and the hole number under the bead.
               showBaseline stays FALSE so the three-point fallback (no hole
               detail) draws NO rule — a rule under a curve that has no holes
-              behind it is a promise the drawing cannot keep (§4). */}
-          <span ref={setShapeBand} style={{ display: 'block', width: '100%', marginTop: 8 }}>
-            <RoundShape
-              row={row}
-              shape={shape}
-              width={shapeWidth}
-              height={AMATEUR_HERO_SHAPE_H}
-              showMeta={false}
-              showBaseline={false}
-              strokeWidth={2}
-              baselineColor={HERO_BASELINE}
-              beadHoleLabels
-            />
-          </span>
+              behind it is a promise the drawing cannot keep (§4).
 
+              AN AGGREGATE CARD DRAWS NO SHAPE (§2.2). Shaping one of the six
+              rounds behind a birdie count would be picking a round the figure
+              does not name, and shaping their average would be a graph nobody
+              played. The band is not rendered at all rather than rendered
+              empty, so the caption closes up instead of leaving a 34px hole. */}
+          {row && (
+            <span ref={setShapeBand} style={{ display: 'block', width: '100%', marginTop: 8 }}>
+              <RoundShape
+                row={row}
+                shape={shape}
+                width={shapeWidth}
+                height={AMATEUR_HERO_SHAPE_H}
+                showMeta={false}
+                showBaseline={false}
+                strokeWidth={2}
+                baselineColor={HERO_BASELINE}
+                beadHoleLabels
+              />
+            </span>
+          )}
+
+          {/* THE COURSE, or on an aggregate card THE SPREAD in its place: the
+              same slot, the same treatment, a different fact. A figure made of
+              many rounds says how many rounds and how many courses made it,
+              which is the aggregate answer to "one course" — never a course
+              name, because the rounds were not all at one. */}
           <span
             style={{
               ...KICKER,
@@ -420,7 +462,9 @@ export function AmateurHero({
               whiteSpace: 'nowrap',
             }}
           >
-            {row.course_name ?? t('discover.coursesPlayed.course', 'Course')}
+            {row
+              ? row.course_name ?? t('discover.coursesPlayed.course', 'Course')
+              : spreadLine}
           </span>
 
           {/* §4 THE CONTEXT LINE, AND IT IS NOT OPTIONAL. It says why this round

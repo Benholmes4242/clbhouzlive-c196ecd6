@@ -2162,6 +2162,16 @@
         "poolCircleShort": "[Best of {{rounds}} in your circle.]",
         "poolEveryoneLong": "[Best of {{rounds}} rounds across clbhouz {{span}}.]",
         "poolEveryoneShort": "[Best of {{rounds}} across clbhouz.]"
+      },
+      "spread": {
+        "rounds": "[{{count}} rounds]",
+        "rounds_one": "[{{count}} round]",
+        "rounds_other": "[{{count}} rounds]",
+        "courses": "[{{count}} courses]",
+        "courses_one": "[{{count}} course]",
+        "courses_other": "[{{count}} courses]",
+        "both": "[Across {{rounds}}, {{courses}}.]",
+        "roundsOnly": "[Across {{rounds}}.]"
       }
     }
   }

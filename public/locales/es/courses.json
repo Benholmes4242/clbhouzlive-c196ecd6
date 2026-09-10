@@ -1578,6 +1578,16 @@
         "poolCircleShort": "La mejor de {{rounds}} en tu circulo.",
         "poolEveryoneLong": "La mejor de {{rounds}} vueltas en clbhouz {{span}}.",
         "poolEveryoneShort": "La mejor de {{rounds}} en clbhouz."
+      },
+      "spread": {
+        "rounds": "{{count}} rounds",
+        "rounds_one": "{{count}} round",
+        "rounds_other": "{{count}} rounds",
+        "courses": "{{count}} courses",
+        "courses_one": "{{count}} course",
+        "courses_other": "{{count}} courses",
+        "both": "Across {{rounds}}, {{courses}}.",
+        "roundsOnly": "Across {{rounds}}."
       }
     }
   }

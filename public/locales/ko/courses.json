@@ -1517,6 +1517,16 @@
         "poolCircleShort": "서클 {{rounds}}라운드 중 최고.",
         "poolEveryoneLong": "{{span}} clbhouz {{rounds}}라운드 중 최고.",
         "poolEveryoneShort": "clbhouz {{rounds}}라운드 중 최고."
+      },
+      "spread": {
+        "rounds": "{{count}} rounds",
+        "rounds_one": "{{count}} round",
+        "rounds_other": "{{count}} rounds",
+        "courses": "{{count}} courses",
+        "courses_one": "{{count}} course",
+        "courses_other": "{{count}} courses",
+        "both": "Across {{rounds}}, {{courses}}.",
+        "roundsOnly": "Across {{rounds}}."
       }
     }
   }
