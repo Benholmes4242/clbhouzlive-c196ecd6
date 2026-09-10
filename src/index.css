@@ -850,14 +850,14 @@ html.lightbox-open {
    preventing a light flash before React mounts.
    ──────────────────────────────────────────────────────────────────────── */
 body.route-clubhouse .app-shell {
-  background-color: #15171F !important;
+  background-color: var(--bg-page) !important;
 }
 body.route-handicap .app-shell {
-  background-color: #15171F !important;
+  background-color: var(--bg-page) !important;
 }
 
 body.route-auth .app-shell {
-  background-color: #15171F !important;
+  background-color: var(--bg-page) !important;
 }
 
 /* Light routes restore the page background after mount */
@@ -908,18 +908,18 @@ html[data-immersive-route='true'] .app-shell {
   /* Clubhouse dark edge-to-edge */
   body.route-clubhouse,
   body.route-clubhouse #root {
-    background-color: #15171F !important;
+    background-color: var(--bg-page) !important;
   }
   body.route-clubhouse .app-shell {
-    background-color: #15171F !important;
+    background-color: var(--bg-page) !important;
   }
   /* Handicap dark edge-to-edge */
   body.route-handicap,
   body.route-handicap #root {
-    background-color: #15171F !important;
+    background-color: var(--bg-page) !important;
   }
   body.route-handicap .app-shell {
-    background-color: #15171F !important;
+    background-color: var(--bg-page) !important;
   }
 }
 
@@ -1875,7 +1875,7 @@ body.route-clubhouse .global-header {
   inset: 0;
   height: 100svh;
   width: 100%;
-  background: #15171F; /* match the feed canvas so iPad gutters remain continuous */
+  background: var(--bg-page); /* match the feed canvas so iPad gutters remain continuous */
   overflow: hidden;
 }
 
