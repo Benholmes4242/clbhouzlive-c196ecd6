@@ -36,9 +36,15 @@ export interface CourseFieldPlayers {
   sizes: Map<string, number>;
 }
 
+/**
+ * The deployed shape: one row per requested course id, including courses with
+ * no qualifying mapping (0 players). course_players is already
+ * holder-excluded, so it is used as-is -- nothing is subtracted here.
+ */
 interface FieldSizeRow {
   course_id: string | null;
-  other_players: number | null;
+  course_players: number | null;
+  course_rounds?: number | null;
 }
 
 const UNAVAILABLE = (reason: string): CourseFieldPlayers => ({
