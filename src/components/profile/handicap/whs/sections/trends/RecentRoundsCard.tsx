@@ -703,12 +703,30 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
           }}
         >
           <span>{weekday} {dayOfMonth}</span>
-          {deltaInfo && (
+          {isNine && (
             <>
-              <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
+              <Dot />
+              <span>{labels.nineHoles}</span>
+            </>
+          )}
+          {isCounter && (
+            <>
+              <Dot />
+              <CounterBadge label={labels.counts} />
+            </>
+          )}
+          {isCounter && deltaInfo && (
+            <>
+              <Dot />
               <span style={{ color: deltaInfo.color, fontWeight: 700, letterSpacing: '0.02em' }}>
                 HCP {deltaInfo.sign} {deltaInfo.value}
               </span>
+            </>
+          )}
+          {isCounter && heldFlat && (
+            <>
+              <Dot />
+              <span style={{ fontWeight: 700, letterSpacing: '0.02em' }}>{labels.hcpHeld}</span>
             </>
           )}
         </div>
