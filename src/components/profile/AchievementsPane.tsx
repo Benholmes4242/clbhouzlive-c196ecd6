@@ -11,6 +11,7 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { MILESTONE_TIER_META } from '@/config/achievements';
 import { formatNumber } from '@/i18n/format';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 // Using the user's original padlock image
 const padlockIcon = '/lovable-uploads/fa944ae3-272a-4bae-82bf-06e9bde7d784.png';
 
@@ -68,9 +69,40 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
   const scrollDebounceTimer = useRef<NodeJS.Timeout | null>(null);
   const directionChangeTimer = useRef<NodeJS.Timeout | null>(null);
   
-  // Fetch real Top 100 progress data for the user
-  const { data: top100Progress } = useTop100ProgressForUser(userId);
-  const totalTop100Played = top100Progress?.totalTop100Played ?? 0;
+  /*
+   * BRIEF_PROFILE_PASS_ONE §A (follow-up) — AN ERROR MUST NOT RENDER AS A ZERO.
+   * This read used to end in `?? 0`, so a failed Top 100 overview and a member
+   * who has played none of them were the same pixels: every tier locked with
+   * "0 / 5 courses" and "Play 5 more ... to unlock". That is a fabricated fact.
+   * `null` now means NOT KNOWN, and a not-known tier prints its title with no
+   * figure and no nudge.
+   *
+   * THE GATE IS `isFetched`, NOT `isLoading`. The query is disabled without a
+   * userId, and a disabled React Query v5 query is pending with fetchStatus
+   * 'idle' — isLoading is FALSE before it has ever run, which would render a
+   * confident 0 for a query that never fired. isFetched is false until a real
+   * result lands. Same reason ChromeIsland and the handicap connected gate read
+   * isFetched.
+   */
+  const {
+    data: top100Progress,
+    isError: top100Error,
+    isFetched: top100Fetched,
+  } = useTop100ProgressForUser(userId);
+  const totalTop100Played: number | null =
+    top100Error || !top100Fetched ? null : (top100Progress?.totalTop100Played ?? 0);
+
+  /* The failure stops being invisible. Same event as the hero counters, with the
+     source naming this read — one series, not two. */
+  useEffect(() => {
+    if (!top100Error || !userId) return;
+    analyticsEvents.track('profile_counter_read_failed', {
+      counters: 'top100_played',
+      source: 'useTop100ProgressForUser',
+      profile_user_id: userId,
+      is_self: !!isCurrentUser,
+    });
+  }, [top100Error, userId, isCurrentUser]);
   
   // Mock data for XP system (can be replaced later)
   const totalXP = 2500; // TODO: Replace with real XP from user data
@@ -463,7 +495,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
     };
 
     return MILESTONE_TIER_META.map(tier => {
-      const isEarned = totalTop100Played >= tier.threshold;
+      /* Not known: the tier cannot claim earned, and it must not print a count
+         or a "play n more" nudge derived from a figure we do not have. */
+      const known = totalTop100Played != null;
+      const isEarned = known && (totalTop100Played as number) >= tier.threshold;
       const meta = milestoneMetadata[tier.threshold];
       
       return {
@@ -473,9 +508,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
         description: meta?.description ?? `Play ${tier.threshold} Top 100 courses.`,
         xp: meta?.xp ?? tier.threshold * 10,
         isRepeatable: false,
-        progress: `${Math.min(totalTop100Played, tier.threshold)} / ${tier.threshold} courses`,
+        progress: known
+          ? `${Math.min(totalTop100Played as number, tier.threshold)} / ${tier.threshold} courses`
+          : undefined,
         dateEarned: isEarned ? undefined : undefined, // Could be enhanced with actual date tracking
-        unlockHint: isEarned ? undefined : `Play ${tier.threshold - totalTop100Played} more Top 100 courses to unlock!`
+        unlockHint: !known || isEarned
+          ? undefined
+          : `Play ${tier.threshold - (totalTop100Played as number)} more Top 100 courses to unlock!`
       };
     });
   }, [totalTop100Played]);
