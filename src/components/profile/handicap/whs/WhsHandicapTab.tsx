@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -93,11 +93,11 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
   // The flow stays mounted while it is unfinished, even once a connection row
   // exists - the connected screen is the last thing the member sees.
   if (!connection || (startedDisconnected.current === true && !flowFinished)) {
-    // Own profile and no connection: the full-page connect form lives in
-    // Manage -> Handicap (/manage/handicap). Redirect there instead of
-    // rendering it inside the dark-chrome /handicap route.
+    // SECTION K2. Own profile and no connection: the page is ONE section, not
+    // ten withheld ones. The redirect to /manage/handicap is gone — the member
+    // now reads what the page becomes and taps into that same existing flow.
     if (!connection && userId === sessionUser?.id) {
-      return <Navigate to="/manage/handicap" replace />;
+      return <NotConnectedSection />;
     }
 
     // Friend view without a connection: keep existing behavior unchanged.
