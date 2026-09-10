@@ -115,10 +115,18 @@ export function AmateurHero({
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
 
-  /* §2.1 THE CARD FIRST. Single-round family only for now; the aggregate family
-     joins the same rotation by widening this list. */
-  const hero = useAmateurHeroCards(userId, SINGLE_ROUND_METRICS);
+  /* §2.1 AND §2.2 THE CARD FIRST, BOTH FAMILIES. The rotation now holds every
+     metric the library builds: four single-round and four aggregate. The families
+     are not narrowed here, so which one a member sees is the rotation's decision
+     and not this component's. */
+  const hero = useAmateurHeroCards(userId);
   const card = hero.card;
+  /* AN AGGREGATE CARD HAS NO ROUND, AND THAT IS THE WHOLE DIFFERENCE (§2.2).
+     Many rounds stand behind the figure, so there is no scorecard to shape, no
+     course to name and no to-par to print — the spread line does that work
+     instead. The test is the round itself rather than the metric list, because
+     the round is what the anatomy actually depends on. */
+  const isAggregateCard = !!card && card.round == null;
 
   const { data: rounds, isFetched: fallbackFetched } = useCircleLatestRounds(userId, {
     limit: 1,
@@ -129,12 +137,26 @@ export function AmateurHero({
      the caption arrive together. */
   const fallbackRow = rounds?.[0] ?? null;
   const resolved = hero.ready && (fallbackFetched || !!card);
-  const row = !resolved ? null : (card?.round ?? fallbackRow);
+  /* `row` IS THE ROUND THE HERO IS ABOUT. An aggregate card is about no single
+     round, so it holds none — the fallback round must NOT stand in, or the hero
+     would print one member's name over another member's scorecard. */
+  const row = !resolved ? null : (card?.round ?? (isAggregateCard ? null : fallbackRow));
+  /* WHO THE CARD NAMES. The round's member for a single-round card and the
+     fallback; the card's own member for an aggregate one. */
+  const subject = !resolved
+    ? null
+    : isAggregateCard && card
+      ? card.member
+      : row
+        ? { user_id: row.user_id, display_name: row.display_name, profile_photo_url: row.profile_photo_url }
+        : null;
   const scoreIds = useMemo(() => [row?.score_id ?? null], [row?.score_id]);
   const shapes = useRoundHoleShapes(scoreIds);
   const shape = shapes?.get(row?.score_id ?? '') ?? null;
   /* THE PHOTOGRAPH. The rounds hook carries no image column, so the hero reads
-     golf_courses.thumbnail_image — the same field block 2's course rows use. */
+     golf_courses.thumbnail_image — the same field block 2's course rows use. An
+     aggregate card has no course, so it takes the flat tone rather than borrowing
+     a picture of somewhere the figure was only partly made. */
   const heroImage = useHeroCourseImage(row?.course_id);
 
   /* §2 THE SCORE. toParFor is the SHARED rule the Discover friend round row
@@ -148,6 +170,9 @@ export function AmateurHero({
   const figure = card ? card.figure : row?.gross ?? null;
   const figureUnit = card ? heroUnit(t, card.metric) : null;
   const contextLine = card ? heroContextLine(t, card) : null;
+  /* §2.2 THE LINE THAT REPLACES THE SHAPE: how many rounds and courses the
+     figure took. Null on every single-round card. */
+  const spreadLine = card ? heroSpreadLine(t, card) : null;
   const isCard = !!card;
 
   /* §10 ONE VIEW PER CARD, so the rotation can be judged later: which cards
