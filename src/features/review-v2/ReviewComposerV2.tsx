@@ -384,7 +384,49 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         }
       : undefined,
   });
-  const composer = useReviewComposer(existing, course.id);
+  /* LOCAL items only (_05 §1): media already on the server carries
+     status 'existing' and is never at risk, so counting it would warn about
+     something that is still there. */
+  const draftMediaCounts = useMemo(() => {
+    let photos = 0;
+    let videos = 0;
+    for (const it of media.items) {
+      if (it.status === 'existing') continue;
+      if (it.type === 'video') videos += 1;
+      else photos += 1;
+    }
+    return { photos, videos };
+  }, [media.items]);
+  const composer = useReviewComposer(existing, course.id, draftMediaCounts);
+
+  /* The one sentence that names the loss (_05 §1). Built from separate singular
+     and plural keys rather than an interpolated count, because the six locales
+     do not share one plural rule; the joiner is a key too, for the same reason.
+     Null when the restored draft recorded no attached media. */
+  const restoredMediaLine = useMemo(() => {
+    const c = composer.restoredMediaCounts;
+    if (!c) return null;
+    const parts: string[] = [];
+    if (c.photos > 0) {
+      parts.push(
+        c.photos === 1
+          ? t('review.wizard.draftRestored.mediaPhoto', { count: 1 })
+          : t('review.wizard.draftRestored.mediaPhotos', { count: c.photos }),
+      );
+    }
+    if (c.videos > 0) {
+      parts.push(
+        c.videos === 1
+          ? t('review.wizard.draftRestored.mediaVideo', { count: 1 })
+          : t('review.wizard.draftRestored.mediaVideos', { count: c.videos }),
+      );
+    }
+    if (!parts.length) return null;
+    const subject = parts.join(t('review.wizard.draftRestored.mediaJoin'));
+    return t('review.wizard.draftRestored.mediaLost', { subject });
+  }, [composer.restoredMediaCounts, t]);
+
+
   const submit = useReviewSubmit();
 
   // ONE fetch of the member's own overall ratings (this course excluded, so an
@@ -802,6 +844,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           <div style={{ fontSize: 12.5, lineHeight: 1.45, color: RV2.secondary }}>
             {t('review.wizard.draftRestored.body')}
           </div>
+          {/* WHAT IT COULD NOT KEEP (_05 §1). Named inside the same notice, so a
+              member reading one sentence reads both. */}
+          {restoredMediaLine && (
+            <div style={{ fontSize: 12.5, lineHeight: 1.45, color: RV2.secondary }}>
+              {restoredMediaLine}
+            </div>
+          )}
           <button
             type="button"
             onClick={composer.discardRestoredDraft}
@@ -822,6 +871,48 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           </button>
         </div>
       )}
+
+      {/* CREATE MODE (_05 §1). A create restore stays otherwise silent — there
+          is no published version to differ from — but silence is exactly what
+          made the media loss invisible, so the media sentence stands alone and
+          is dismissible without discarding the words. */}
+      {!composer.restoredFromDraft && restoredMediaLine && (
+        <div
+          role="status"
+          style={{
+            margin: '0 16px 16px',
+            padding: '12px 14px',
+            border: `1px solid ${RV2.hairline}`,
+            borderRadius: 12,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          <div style={{ fontSize: 12.5, lineHeight: 1.45, color: RV2.secondary }}>
+            {restoredMediaLine}
+          </div>
+          <button
+            type="button"
+            onClick={composer.acknowledgeRestoredMedia}
+            style={{
+              alignSelf: 'flex-start',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              fontSize: 11.5,
+              fontWeight: 700,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              color: RV2.secondary,
+              cursor: 'pointer',
+            }}
+          >
+            {t('review.wizard.draftRestored.mediaDismiss')}
+          </button>
+        </div>
+      )}
+
 
 
 

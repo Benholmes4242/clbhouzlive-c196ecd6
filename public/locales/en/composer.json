@@ -59,7 +59,7 @@
  "closeGuard": {
   "mediaNotSaved_one": "{{count}} photo will not be saved",
   "mediaNotSaved_other": "{{count}} photos will not be saved",
-  "saveDraftKeepsNothingElse": "Save draft . words and tags only",
+  "saveDraftKeepsNothingElse": "Save draft · words and tags only",
   "saveDraftLosesMedia": "Photos and video will not be kept",
   "saveDraftLosesSchedule": "The scheduled time will not be kept",
   "saveDraftLosesBoth": "Photos, video and the scheduled time will not be kept"

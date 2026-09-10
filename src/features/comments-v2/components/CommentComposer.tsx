@@ -21,6 +21,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
 import type { ActiveActor } from '@/types/actor';
 import { FIELD_REST_BG, FIELD_REST_BORDER, FIELD_FOCUS_BG, FIELD_FOCUS_BORDER } from '@/lib/tokens/field';
+import { readCommentDraft, writeCommentDraft, clearCommentDraft, COMMENT_DRAFT_DEBOUNCE_MS } from '../lib/commentDraft';
+
 
 /*
   DARK BASELINE (MICRO_BRIEF_COMMENTS_DARK §1). The comments sheet is no
@@ -55,13 +57,23 @@ interface Props {
      the state keeps the composer the only owner of its own fields. */
   onDirtyChange?: (dirty: boolean) => void;
 
+  /* BRIEF_SHEET_BACK_BEHAVIOUR_05 §2 — where this composer's words survive a
+     dismiss. The sheet computes the key (it knows the thread); the composer
+     still owns the text, so persistence is a write of state it already holds
+     rather than a second owner of the field. Absent key = no persistence. */
+  draftKey?: string | null;
+
 }
 
-export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting, onDirtyChange }: Props) {
+
+export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting, onDirtyChange, draftKey }: Props) {
   const { user } = useSupabaseSession();
   const { t } = useTranslation('common');
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
-  const [text, setText] = useState('');
+  /* RESTORED SILENTLY (_05 §2). The stored draft seeds the field on mount, with
+     no notice: a comment box is not a document, and announcing three recovered
+     words costs more attention than losing them. */
+  const [text, setText] = useState(() => (draftKey ? readCommentDraft(draftKey) : ''));
   const [uploading, setUploading] = useState(false);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -79,12 +91,28 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
     if (replyingTo) requestAnimationFrame(() => inputRef.current?.focus());
   }, [replyingTo]);
 
+  /* Debounced write, 400ms, same figure as the review composer. The key is the
+     thread, so words typed on one post cannot appear on another. */
+  const draftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!draftKey) return;
+    if (draftTimer.current) clearTimeout(draftTimer.current);
+    draftTimer.current = setTimeout(() => {
+      writeCommentDraft(draftKey, text);
+    }, COMMENT_DRAFT_DEBOUNCE_MS);
+    return () => {
+      if (draftTimer.current) clearTimeout(draftTimer.current);
+    };
+  }, [draftKey, text]);
+
   /* Typed text or an uploaded-but-unsent image is a draft. An open actor
      picker or a focused empty field is not. Reported on every change so the
      owning sheet's dismiss guard is never a frame behind. */
   useEffect(() => {
     onDirtyChange?.(hasText || hasImage);
   }, [hasText, hasImage, onDirtyChange]);
+  useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
+
   useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
 
 
@@ -116,6 +144,11 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
     setPendingImage(null);
     try {
       await onSubmit({ content, mediaUrl, mediaType, actor: selfActor });
+      /* CLEARED ON SUCCESS ONLY (_05 §2). The in-flight debounce is cancelled
+         first, or a timer armed before the send would rewrite the words a
+         moment after the comment landed and offer them back on reopen. */
+      if (draftTimer.current) clearTimeout(draftTimer.current);
+      if (draftKey) clearCommentDraft(draftKey);
     } catch (e) {
       // restore text on failure
       if (content) setText(content);
@@ -123,6 +156,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
       throw e;
     }
   };
+
 
   return (
     <div

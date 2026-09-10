@@ -50,7 +50,7 @@
  "closeGuard": {
   "mediaNotSaved_one": "{{count}} photo will not be saved",
   "mediaNotSaved_other": "{{count}} photos will not be saved",
-  "saveDraftKeepsNothingElse": "下書きを保存 . 本文とタグのみ",
+  "saveDraftKeepsNothingElse": "下書きを保存 · 本文とタグのみ",
   "saveDraftLosesMedia": "写真と動画は保存されません",
   "saveDraftLosesSchedule": "予約時刻は保存されません",
   "saveDraftLosesBoth": "写真、動画、予約時刻は保存されません"

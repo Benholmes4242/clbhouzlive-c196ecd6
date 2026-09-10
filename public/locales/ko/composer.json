@@ -50,7 +50,7 @@
  "closeGuard": {
   "mediaNotSaved_one": "{{count}} photo will not be saved",
   "mediaNotSaved_other": "{{count}} photos will not be saved",
-  "saveDraftKeepsNothingElse": "임시 저장 . 글과 태그만",
+  "saveDraftKeepsNothingElse": "임시 저장 · 글과 태그만",
   "saveDraftLosesMedia": "사진과 동영상은 저장되지 않습니다",
   "saveDraftLosesSchedule": "예약 시간은 저장되지 않습니다",
   "saveDraftLosesBoth": "사진, 동영상, 예약 시간은 저장되지 않습니다"

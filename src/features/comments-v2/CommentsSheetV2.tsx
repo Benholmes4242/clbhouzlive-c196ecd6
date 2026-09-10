@@ -28,6 +28,15 @@ import { useCommentsRealtimeV2 } from './hooks/useCommentsRealtimeV2';
 import { CommentCard } from './components/CommentCard';
 import { CommentComposer } from './components/CommentComposer';
 import { CommentActionSheetV2 } from './components/CommentActionSheetV2';
+import {
+  commentDraftKey,
+  commentEditDraftKey,
+  readCommentDraft,
+  writeCommentDraft,
+  clearCommentDraft,
+  COMMENT_DRAFT_DEBOUNCE_MS,
+} from './lib/commentDraft';
+
 import { ReportCommentSheetV2 } from './components/ReportCommentSheetV2';
 import { FIGS, A } from '@/features/courses/components/holes/analytical/tokens';
 import { TITLE as TITLE_SCALE, BODY } from '@/lib/tokens/type';
@@ -115,6 +124,14 @@ function CommentsSheetV2Inner({
     composerDirty || (editing != null && editText.trim() !== (editing.content ?? '').trim());
   const { requestClose, confirmOpen, discard, keepEditing } = useDraftDismissGuard(draftDirty, onClose);
 
+  /* PERSISTED, NOT JUST GUARDED (BRIEF_SHEET_BACK_BEHAVIOUR_05 §2). The guard
+     above only asks; it cannot survive a hardware back, which this sheet does
+     not own an entry for. The words are therefore written to sessionStorage
+     under a per-thread key and restored silently on reopen — same mechanism,
+     same 24h window, same 400ms debounce as the review draft. */
+  const commentsDraftKey = commentDraftKey(targetType, targetId);
+
+
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -190,19 +207,46 @@ function CommentsSheetV2Inner({
         .catch(() => toast.error('Could not copy'));
     }
   }, []);
+  /* AN EDIT IS ITS OWN NAMESPACE (_05 §2). comment-draft:edit:<id> can never
+     collide with the new-comment key for the thread, so an abandoned rewrite
+     cannot surface in the box where a fresh comment is typed. A stored edit
+     seeds the field; with none, the published text does, as before. */
   const beginEdit = useCallback((c: CommentV2) => {
-    setEditing(c); setEditText(c.content ?? '');
+    const stored = readCommentDraft(commentEditDraftKey(c.id));
+    setEditing(c);
+    setEditText(stored || (c.content ?? ''));
   }, []);
+
+  /* Debounced write of the in-progress edit, 400ms, matching the composer. */
+  const editDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!editing) return;
+    const key = commentEditDraftKey(editing.id);
+    if (editDraftTimer.current) clearTimeout(editDraftTimer.current);
+    editDraftTimer.current = setTimeout(() => {
+      /* Identical to what is published is not a draft: storing it would keep a
+         key alive that restores nothing. */
+      if (editText.trim() === (editing.content ?? '').trim()) clearCommentDraft(key);
+      else writeCommentDraft(key, editText);
+    }, COMMENT_DRAFT_DEBOUNCE_MS);
+    return () => {
+      if (editDraftTimer.current) clearTimeout(editDraftTimer.current);
+    };
+  }, [editing, editText]);
+
   const saveEdit = useCallback(async () => {
     if (!editing) return;
     try {
       await editComment.mutateAsync({ id: editing.id, content: editText });
       toast.success('Comment updated');
+      if (editDraftTimer.current) clearTimeout(editDraftTimer.current);
+      clearCommentDraft(commentEditDraftKey(editing.id));
       setEditing(null); setEditText('');
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed to update');
     }
   }, [editing, editText, editComment]);
+
   const beginDelete = useCallback((c: CommentV2) => {
     setDeleteTarget(c);
     setConfirmDeleteWithReplies(c.reply_count > 0);
@@ -341,7 +385,9 @@ function CommentsSheetV2Inner({
               onSubmit={onSubmit}
               isSubmitting={addComment.isPending}
               onDirtyChange={setComposerDirty}
+              draftKey={commentsDraftKey}
             />
+
 
             {/* Above this sheet's z-[12003] shell. */}
             <DiscardDraftDialog

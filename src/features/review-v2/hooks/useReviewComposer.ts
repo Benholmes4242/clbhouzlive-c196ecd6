@@ -53,8 +53,28 @@ interface DraftShape {
   reviewText: string;
   shareToFeed: boolean;
   teeLabel: string | null;
+  /* THE COUNT, NOT THE FILES (BRIEF_SHEET_BACK_BEHAVIOUR_05 §1).
+   *
+   * Attached media is local File/blob data at guard time and is not
+   * serialisable, so it cannot be restored. Two numbers can be, and they are
+   * what turns a silent loss into a stated one: on restore the notice names how
+   * many photos and videos were attached and could not be kept, so the member
+   * re-attaches before publishing instead of discovering it afterwards.
+   *
+   * Counted from LOCAL items only. Existing media on an edited review lives in
+   * course_review_media and is never at risk, so counting it would warn about
+   * something that is still there. Optional for drafts written before this. */
+  photoCount?: number;
+  videoCount?: number;
   savedAt: number;
 }
+
+/** Attached-media counts at save time, local (unuploaded) items only. */
+export interface DraftMediaCounts {
+  photos: number;
+  videos: number;
+}
+
 
 
 function readDraft(
@@ -136,7 +156,12 @@ function sameAsPublished(draft: DraftShape, base: ReviewComposerState): boolean 
 export function useReviewComposer(
   existing?: ExistingReview | null,
   courseId?: string | null,
+  /* Live attached-media counts, supplied by the shell (which owns the media
+     pipeline). Read at every debounced write so the stored numbers describe
+     what was attached at the moment the draft was last saved. */
+  mediaCounts?: DraftMediaCounts,
 ) {
+
   const isEditMode = !!existing;
   const reviewId = existing?.id ?? null;
 
@@ -179,6 +204,18 @@ export function useReviewComposer(
     () => !!(isEditMode && restored && !sameAsPublished(restored, publishedBase)),
   );
 
+  /* WHAT COULD NOT COME BACK WITH IT (_05 §1). Non-null only when the restored
+     draft records attached media, in BOTH modes: a create-mode restore is
+     otherwise silent, and silence is exactly what made the loss invisible. The
+     counts are frozen at first read, like the draft itself, so re-attaching does
+     not rewrite the sentence describing what was lost. */
+  const [restoredMediaCounts, setRestoredMediaCounts] = useState<DraftMediaCounts | null>(() => {
+    const photos = restored?.photoCount ?? 0;
+    const videos = restored?.videoCount ?? 0;
+    return photos > 0 || videos > 0 ? { photos, videos } : null;
+  });
+
+
   const [step, setStepRaw] = useState<WizardStep>(() => (restored?.step ?? 0) as WizardStep);
   const setStep = useCallback((n: WizardStep) => setStepRaw(n), []);
 
@@ -209,8 +246,12 @@ export function useReviewComposer(
     setState((s) => ({ ...s, teeLabel: label }));
   }, []);
 
-  // Debounced draft write. Both modes; media is never persisted (see report).
+  /* Debounced draft write. Both modes. The FILES are still never persisted —
+     they are local blobs — but their COUNTS are, so the restore can say what it
+     could not bring back (_05 §1). */
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const photoCount = mediaCounts?.photos ?? 0;
+  const videoCount = mediaCounts?.videos ?? 0;
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
@@ -223,6 +264,8 @@ export function useReviewComposer(
           reviewText: state.reviewText,
           shareToFeed: state.shareToFeed,
           teeLabel: state.teeLabel,
+          photoCount,
+          videoCount,
           savedAt: Date.now(),
         },
         reviewId,
@@ -231,7 +274,7 @@ export function useReviewComposer(
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [courseId, reviewId, step, state]);
+  }, [courseId, reviewId, step, state, photoCount, videoCount]);
 
   const clearDraft = useCallback(
     () => clearReviewDraft(courseId, reviewId),
@@ -246,8 +289,14 @@ export function useReviewComposer(
     clearReviewDraft(courseId, reviewId);
     setState(seedFromExisting(existing));
     setRestoredFromDraft(false);
+    setRestoredMediaCounts(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, reviewId, existing]);
+
+  /* Dismissing the media sentence alone, without discarding the restored work:
+     the member has read it and re-attached, or decided not to. */
+  const acknowledgeRestoredMedia = useCallback(() => setRestoredMediaCounts(null), []);
+
 
 
 
@@ -275,6 +324,9 @@ export function useReviewComposer(
     setStep,
     restoredFromDraft,
     discardRestoredDraft,
+    restoredMediaCounts,
+    acknowledgeRestoredMedia,
+
 
     setVerdict,
     setOverall,
