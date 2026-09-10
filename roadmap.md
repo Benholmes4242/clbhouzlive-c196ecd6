@@ -340,7 +340,9 @@ get_course_field_sizes exactly: 22 courses = 4 contested (5+ others, the only ba
 that reads WON) / 15 thin (1-4 others, of which 5 have exactly 1 other) / 3 with
 nobody else. Headline therefore shows 4 WON, 18 UNCONTESTED.
 
-## Backfill gap row (report only)
+## Backfill gap row (CLOSED — keeps its date, 10 Sep 2026)
 One row falls in the 13:20:17.479-15:52:46.765 UTC gap on 24 Jul 2026:
 badge_id 'founder', user 370e6b6b, 14:58:28.163529 UTC. Single row, single
-member, a one-off grant rather than a third partial run — it renders a date.
+member, a one-off grant rather than a third partial run — it renders a date, by
+ruling. Recorded in src/lib/gam/badgeBackfill.ts so nobody reads that rendered
+date as the suppression rule leaking.
