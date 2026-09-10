@@ -611,3 +611,27 @@ CONFIDENT ZEROES REMOVED (same three-state rule as §A):
 - `useRoundNetScores` SILENTLY RETURNS AN EMPTY MAP if the read fails or the view is
   missing. The hero degrades to "no net cards" with no error surfaced — worth an
   instrumented failure later.
+
+## Profile counts §D and two recorded rulings (10 Sep 2026)
+
+- "243 is identical to the hole-detail population" IS TRUE FOR THE TEST MEMBER
+  ONLY, and the comments now say so. Three separate definitions return 243 for
+  this member — eighteen holes posted (`is_nine_hole` false), hole detail fetched,
+  and `gam_round_stats.holes_played = 18` — because their only gaps are two
+  nine-hole rounds. Base-wide they diverge: 568 of 3,554 rounds cannot draw a card
+  (420 hole rows with no scores, 195 partial, 148 with no hole rows). Each surface
+  names the definition it uses; none claims they are the same population.
+- CAREER RECORD HEADER IS CAPPED AT 1,000 ROWS (`useCareerRounds`), and the cap
+  stays for now, documented at the read. Correct below 1,000 rounds, silently
+  wrong above it, nobody near it: the heaviest member on the platform has 345
+  `gam_round_stats` rows and zero members exceed 1,000. THE HEADER NEEDS ONLY A
+  COUNT, and a `head: true` count query has no cap — that is the fix when it is
+  wanted. The sheet's other consumers (course split, best round for a counting
+  stat, earliest milestone round) need ROWS including the oldest, so lifting the
+  cap blind means fetching an entire career on sheet open. Cost filed, not paid.
+- §D BASIS LINES WRITTEN AT THE SURFACES. 49 = `user_course_activity` rows (course
+  legacy; includes courses with no imported round). 35 = courses with mapped,
+  non-penalty imported rounds from `gam_user_courses()`, whose `rounds_count` sums
+  to the 239 analytics round basis. Neither derives from the other — a mapped
+  round at a course with no activity row would appear in 35 and not in 49 — and
+  49 minus 35 is not a shortfall.
