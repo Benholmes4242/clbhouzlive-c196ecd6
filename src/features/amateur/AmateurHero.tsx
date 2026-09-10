@@ -340,6 +340,34 @@ export function AmateurHero({
               avatar centres against the pair, not against the first line. The
               score sits on the same row and shares the same vertical axis. */}
           <span style={{ display: 'flex', alignItems: 'center', gap: isCard ? 14 : 9 }}>
+            {/* §8 THE SMALLER DOOR FOR THE SMALLER QUESTION. "Who is this" is
+                answered by the profile, so the avatar and the name carry that
+                trip themselves and stop the event before the caption's own tap
+                sends the member to the board. Everything else in the caption —
+                the figure, the marks, the spread line — belongs to "who else,
+                and by how much" and goes to the board. */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                analyticsEvents.track('amateur_hero_subject_tapped', {
+                  card_id: card?.id ?? null,
+                  is_aggregate: isAggregateCard,
+                });
+                navigate(`/profile/${subject.user_id}`);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: isCard ? 14 : 9,
+                minWidth: 0,
+                padding: 0,
+                border: 0,
+                background: 'transparent',
+                textAlign: 'left',
+                cursor: 'pointer',
+              }}
+            >
             <SquircleAvatar
               size={isCard ? 44 : 30}
               src={subject.profile_photo_url ?? undefined}
@@ -348,6 +376,7 @@ export function AmateurHero({
               fallback={subject.display_name?.slice(0, 2).toUpperCase()}
               hairlineRing
             />
+
             <span
               style={{
                 minWidth: 0,
