@@ -204,6 +204,18 @@ export function useReviewComposer(
     () => !!(isEditMode && restored && !sameAsPublished(restored, publishedBase)),
   );
 
+  /* WHAT COULD NOT COME BACK WITH IT (_05 §1). Non-null only when the restored
+     draft records attached media, in BOTH modes: a create-mode restore is
+     otherwise silent, and silence is exactly what made the loss invisible. The
+     counts are frozen at first read, like the draft itself, so re-attaching does
+     not rewrite the sentence describing what was lost. */
+  const [restoredMediaCounts, setRestoredMediaCounts] = useState<DraftMediaCounts | null>(() => {
+    const photos = restored?.photoCount ?? 0;
+    const videos = restored?.videoCount ?? 0;
+    return photos > 0 || videos > 0 ? { photos, videos } : null;
+  });
+
+
   const [step, setStepRaw] = useState<WizardStep>(() => (restored?.step ?? 0) as WizardStep);
   const setStep = useCallback((n: WizardStep) => setStepRaw(n), []);
 
