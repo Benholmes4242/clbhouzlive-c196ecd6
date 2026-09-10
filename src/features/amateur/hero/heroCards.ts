@@ -286,18 +286,23 @@ function buildAggregateCard(
   if (floor != null && best.figure < floor) return null;
 
   const runnerUp = ranked[1]?.figure ?? null;
-  const context: HeroContext =
+  const context: HeroContext | null =
     runnerUp != null && runnerUp > 0
-      ? { rule: 'nobody', runnerUp, margin: best.figure - runnerUp, ...shape }
+      ? { rule: 'nobody', runnerUp, margin: best.figure - runnerUp, ...contextShape(shape) }
       : metric === 'rounds' || metric === 'courses'
-        ? { rule: 'busiest', ...shape }
-        : { rule: 'pool', ...shape };
+        ? { rule: 'busiest', ...contextShape(shape) }
+        : /* Pool line only — a truncated read cannot honestly carry it. */
+          shape.truncated
+          ? null
+          : { rule: 'pool', ...contextShape(shape) };
+  if (!context) return null;
 
   return {
     id: `${metric}-${window}`,
     metric,
     window,
-    pool,
+    pool: shape.pool,
+
     figure: best.figure,
     member: {
       user_id: best.row.user_id,
