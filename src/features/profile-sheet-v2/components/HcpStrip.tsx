@@ -24,7 +24,21 @@
  *
  * Both states are the SAME HEIGHT, so connecting does not make the sheet
  * below jump.
+ *
+ * NO SAMPLE DATA ON THE UNCONNECTED CARD. EVER. (BRIEF_ACCOUNT_SHEET_REBUILD A)
+ * This card previously drew an eight-point hardcoded "sample improving trend"
+ * under a WORST/MID/BEST key. A line with a legend is a READING, and there was
+ * nothing to read; roughly four in five accounts have no handicap, so the
+ * invented version was the version most members saw. It also ran the wrong way
+ * on this file's own axis, which is how it was caught.
+ *
+ * THE CLASS OF FAULT: a state we cannot describe rendered as one we can. If the
+ * unconnected card ever needs more weight, use a treatment that CANNOT be
+ * mistaken for data — a flat field, a mark, or nothing. Never a shape that
+ * resembles a trace, and never an axis or a key. Decoration acquiring a key is
+ * the whole failure. Do not reintroduce a sample trend as a nice touch.
  */
+
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
@@ -33,7 +47,6 @@ import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/wh
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { A, KICKER, LABEL, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatDayMonthShortGB } from '@/i18n/format';
-import { smoothPathXY } from '@/lib/charts/smoothPath';
 import { HcpTrendChart } from '@/components/profile/handicap/whs/charts';
 
 interface Props {
@@ -53,30 +66,20 @@ const PLOT_H = 96;
 const LEGEND_H = 18;
 const PAD = 14;
 
-const AMBER = A.AMBER;
 const AMBER_TEXT = A.AMBER_DEEP;
 
 interface Point { t: string; v: number }
 
-/** Zone of a revision between the window's worst (0) and best (1) index. */
-function zoneColor(v: number, best: number, worst: number): string {
-  const span = worst - best;
-  const toBest = span <= 0 ? 1 : (worst - v) / span;
-  if (toBest >= 0.66) return A.IMPROVED;
-  if (toBest >= 0.33) return AMBER;
-  return A.DRIFTED;
-}
+/* BRIEF_ACCOUNT_SHEET_REBUILD A/B — the local `zoneColor`, the local
+   `smoothPath` alias and `LegendSwatch` are gone from this file. The zone
+   colouring lives in HcpTrendChart, which owns the connected plot; the only
+   consumers here were the removed sample curve and the removed WORST/MID/BEST
+   key. Do not reintroduce either: a curve in this file has no data behind it. */
 
 function formatIndex(v: number): string {
   return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
 }
 
-
-/** Smooth polyline through points using cubic Bezier splines.
- *  NOW SHARED: the implementation lives in `@/lib/charts/smoothPath` so the
- *  round curves (RoundShape / TrajectoryLine) draw with the same tangent method
- *  and the same tension 0.25. Do not re-inline a local copy. */
-const smoothPath = smoothPathXY;
 
 
 
@@ -144,7 +147,11 @@ const Shell: React.FC<{
         </div>
         <div
           style={{
-            height: LEGEND_H,
+            /* minHeight, not height: the connected caption line wraps at
+               narrow widths and a fixed 18px band clipped it (the card sets
+               overflow hidden). Both states share this band, so parity of
+               card height between connected and unconnected is unaffected. */
+            minHeight: LEGEND_H,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -160,12 +167,7 @@ const Shell: React.FC<{
   );
 };
 
-const LegendSwatch: React.FC<{ color: string; label: string }> = ({ color, label }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-    <span style={{ width: 9, height: 9, borderRadius: 2.5, background: color }} />
-    <span style={{ ...LABEL, letterSpacing: '0.1em', color: A.MUTE }}>{label}</span>
-  </span>
-);
+
 
 // ---------------------------------------------------------------------------
 // The unconnected card. Amber throughout, and NO FIGURES ANYWHERE — nothing
@@ -184,71 +186,34 @@ const GhostCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
         for stats, analytics and your circle.
       </div>
     }
-    plot={(w) => {
-      const h = PLOT_H;
-      const pad = 2;
-      // A sample improving trend: starts far from best (red), passes mid
-      // (amber), and ends near best (green). It previews the real colour
-      // system without pretending to be the member's own data.
-      const ys = [0.78, 0.68, 0.72, 0.52, 0.46, 0.38, 0.28, 0.18];
-      const ghostPoints = ys.map((r, i) => {
-        const x = (i / (ys.length - 1)) * w;
-        const y = pad + r * (h - pad * 2);
-        return [x, y] as const;
-      });
-      const d = smoothPath(ghostPoints);
-      const area = `${d} L${w},${h} L0,${h} Z`;
-
-      return (
-        <>
-          <svg width={w} height={h} style={{ display: 'block' }} aria-hidden>
-            <defs>
-              <linearGradient id="hcp-ghost-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={A.DRIFTED} stopOpacity={0.26} />
-                <stop offset="45%" stopColor={AMBER} stopOpacity={0.18} />
-                <stop offset="100%" stopColor={A.IMPROVED} stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="hcp-ghost-stroke" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor={A.DRIFTED} />
-                <stop offset="48%" stopColor={AMBER} />
-                <stop offset="100%" stopColor={A.IMPROVED} />
-              </linearGradient>
-            </defs>
-            <path d={area} fill="url(#hcp-ghost-fill)" />
-            {/* The white halo is what stops the line reading flat on its own fill. */}
-            <path d={d} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={4.0} strokeLinecap="round" strokeLinejoin="round" />
-            <path d={d} fill="none" stroke="url(#hcp-ghost-stroke)" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          {/* The action sits INSIDE the plot on its baseline — the row the date
-              ticks would use — so it costs no height. */}
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              bottom: 6,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 4,
-              color: AMBER_TEXT,
-            }}
-          >
-            <span style={{ ...LABEL, color: AMBER_TEXT }}>Connect your handicap</span>
-            <ChevronRight size={12} strokeWidth={2.6} />
-          </div>
-        </>
-      );
-    }}
-    legend={
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <LegendSwatch color={A.DRIFTED} label="Worst" />
-        <LegendSwatch color={AMBER} label="Mid" />
-        <LegendSwatch color={A.IMPROVED} label="Best" />
+    /* BRIEF_ACCOUNT_SHEET_REBUILD A — THE PLOT BAND IS DELIBERATELY EMPTY.
+       It previously drew eight hardcoded points under a WORST/MID/BEST key.
+       That is invented data wearing a legend, on the state ~4 in 5 accounts
+       see. Nothing here may resemble a trace, an axis or a key: no svg, no
+       path, no gradient, no swatch. The band is retained ONLY so the card is
+       the same height connected and unconnected. The CTA sits on its
+       baseline, which is the whole of its content. */
+    plot={() => (
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 6,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 4,
+          color: AMBER_TEXT,
+        }}
+      >
+        <span style={{ ...LABEL, color: AMBER_TEXT }}>Connect your handicap</span>
+        <ChevronRight size={12} strokeWidth={2.6} />
       </div>
-    }
+    )}
   />
 );
+
 
 // ---------------------------------------------------------------------------
 // The connected card.
@@ -425,11 +390,24 @@ const TrendCard: React.FC<{
       )}
       legend={
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <LegendSwatch color={A.DRIFTED} label="Worst" />
-            <LegendSwatch color={AMBER} label="Mid" />
-            <LegendSwatch color={A.IMPROVED} label="Best" />
-          </div>
+          {/* BRIEF_ACCOUNT_SHEET_REBUILD B — the three WORST/MID/BEST swatches
+              are gone. best/worst are the min/max of the SELECTED WINDOW, so
+              green and red were guaranteed on every window by construction:
+              a shape key wearing quality words. The gradient is unchanged; it
+              now simply says what it keys. */}
+          <span
+            style={{
+              fontFamily: SANS,
+              fontSize: 11,
+              lineHeight: 1.35,
+              color: A.DIM,
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
+            Coloured against your best and worst in this window.
+          </span>
+
           <button
             type="button"
             onClick={() => onNavigate('/handicap')}

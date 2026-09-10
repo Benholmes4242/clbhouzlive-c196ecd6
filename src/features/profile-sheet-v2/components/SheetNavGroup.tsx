@@ -31,7 +31,10 @@ interface Props {
   /** Course analytics entry — omit to hide the row. */
   onOpenCourseAnalytics?: () => void;
   analyticsState?: AnalyticsState;
+  /** D2: false puts "Create a business profile" under the business row. */
+  hasBusinessActor?: boolean;
 }
+
 
 interface RowProps {
   label: string;
@@ -85,22 +88,37 @@ export default function SheetNavGroup({
   onInviteFriends,
   onOpenCourseAnalytics,
   analyticsState = 'disconnected',
+  hasBusinessActor = true,
+
 }: Props) {
   const showAnalytics = currentActor.type === 'personal' && !!onOpenCourseAnalytics;
+  /* BRIEF_ACCOUNT_SHEET_REBUILD C — COURSE ANALYTICS IS NOT DIMMED.
+     It is a real button, it has never been `disabled`, and tapping it opens the
+     connect flow. Rendering it at 0.55 told the member it does nothing, which
+     is the opposite of true and cost them the feature entirely: nobody taps a
+     row they have been told is off. The subtitle now states what the tap does,
+     and the chevron honestly means navigation. */
   const analyticsSubLabel =
     analyticsState === 'ready'
       ? 'Your game, course by course'
       : analyticsState === 'building'
         ? 'Your analytics build as your rounds sync'
-        : 'Sync your official WHS handicap for live course analytics';
-  const analyticsDisabled = analyticsState === 'disconnected';
+        : 'Connect your handicap to see your game course by course.';
   const handleAnalyticsTap = () => {
     if (analyticsState === 'disconnected') {
-      onNavigate('/handicap');
+      /* BRIEF_ACCOUNT_SHEET_REBUILD F — /manage/handicap, not /handicap.
+         /handicap is the DASHBOARD route; it only showed the connect flow as a
+         fall-through for members with no connection, so the moment a member
+         connects that destination silently changes meaning. The island
+         (ChromeIsland) and the teaser card (HcpStrip) both use
+         /manage/handicap; this row now agrees with them. The CONNECTED branch
+         is unchanged — it opens the analytics sheet. */
+      onNavigate('/manage/handicap');
       return;
     }
     onOpenCourseAnalytics?.();
   };
+
 
   return (
     <div
@@ -121,7 +139,8 @@ export default function SheetNavGroup({
           label="Course analytics"
           subLabel={analyticsSubLabel}
           onClick={handleAnalyticsTap}
-          disabled={analyticsDisabled}
+          // Full opacity in every state (C). `disabled` stays on Row for a
+          // genuinely inert future row; this one is not one.
           // No trailing tag: this row takes the same chevron as View profile,
           // Invite friends and Manage businesses. The old amber "New" badge
           // replaced the chevron, making this the one row without one.
@@ -135,10 +154,17 @@ export default function SheetNavGroup({
           onClick={onInviteFriends}
         />
       )}
+      {/* BRIEF_ACCOUNT_SHEET_REBUILD D2 — the dashed "+ Business" tile moved
+          off the identity switcher and landed HERE, as the subtitle on the
+          existing business row. Creating a business is account creation, not an
+          identity, and it already had a door to the same route; a second row
+          would have been two doors to one destination. */}
       <Row
         label="Manage businesses"
+        subLabel={hasBusinessActor ? undefined : 'Create a business profile'}
         onClick={() => onNavigate('/businesses/manage')}
       />
+
       <Row
         label="Settings and Manage Profile"
         onClick={() => onNavigate('/edit-profile?tab=settings')}
