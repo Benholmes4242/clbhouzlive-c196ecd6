@@ -46,8 +46,9 @@ const T = {
 };
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
-const INITIAL_COUNT = 30;
-const LOAD_MORE_COUNT = 15;
+// ONE page size for both the observer and the fallback button.
+const INITIAL_COUNT = 50;
+const LOAD_MORE_COUNT = 50;
 
 // ─── Format helpers ─────────────────────────────────────────────────
 // Absent renders NOTHING - the column keeps its width via the label beneath.
