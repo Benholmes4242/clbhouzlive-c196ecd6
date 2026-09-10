@@ -179,12 +179,12 @@ export const BoardRow: React.FC<{
         }}
       >
         {/* STROKE GAP paired with the score. The string arrives already signed
-            from formatGapFromChampion (see ChampionsDuelCard / the Dispatch
-            sheet call sites) - never re-derived here. The ASCII hyphen is
-            swapped for a true minus (U+2212) so this column prints the same
-            glyph as the full leaderboard sheet's "-n from champion" subline
-            (ChampionsListRow.tsx). The sheet keeps that subline on purpose:
-            it has room for the word "champion", this five-row panel does not. */}
+            from formatGapFromChampion at the call site - never re-derived here.
+            The ASCII hyphen is swapped for a true minus (U+2212) so this column
+            prints the same glyph as the sheet's "-n from champion" subline. The
+            sheet keeps that subline on purpose: it has room for the word
+            "champion", this five-row panel does not. (The old panel and row
+            files named here previously were deleted 10 Sep 2026.) */}
         {row.gapDisplay ? (
           <span style={{ ...NUM, fontSize: 11, fontWeight: 600, color: A.DIM, textAlign: 'center' }}>
             {row.gapDisplay.replace('-', '\u2212')}

@@ -13,9 +13,9 @@
  *    shown to somebody who is not on the board. The CTA is INK, matching the You
  *    tab where the same action already renders in ink.
  *
- * Dismissal is per-surface via versioned localStorage keys (matching the
- * ChampionsInfoCarousel pattern, wrapped in try/catch). Once dismissed the
- * full card is replaced by a slim neutral re-entry row.
+ * Dismissal is per-surface via versioned localStorage keys, wrapped in
+ * try/catch (the pattern came from ChampionsInfoCarousel, deleted 10 Sep 2026).
+ * Once dismissed the full card is replaced by a slim neutral re-entry row.
  *
  * Connected users must never see this — the parent decides render/no-render
  * based on useWhsConnection. This component assumes it should render.
@@ -28,9 +28,10 @@ import { FIELD_REST_BG } from '@/lib/tokens/field';
 
 /**
  * DARK-ONLY (BRIEF_CONNECT_GHOST_PROMPT_DARK). The local light palette that
- * used to live here painted a white card around the already-dark
- * ChampionsHonoursBoard, making holder names near-white on white. The shared
- * analytical tokens are consumed here, never forked.
+ * used to live here painted a white card around the already-dark honours
+ * board it once wrapped (ChampionsHonoursBoard, deleted 10 Sep 2026), making
+ * holder names near-white on white. The shared analytical tokens are consumed
+ * here, never forked.
  */
 const INK = A.INK;
 const INK_60 = A.MUTE;

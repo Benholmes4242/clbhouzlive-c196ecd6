@@ -254,7 +254,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
   const youOwnedCount = Object.values(yourRanks).filter((r) => r === 1).length;
 
-  // ISO attained_at per crown the viewer holds — feeds CrownCabinet reign lengths.
+  // ISO attained_at per crown the viewer holds — feeds reign lengths in YourCrowns
+  // (previously CrownCabinet, deleted 10 Sep 2026).
   const yourAttainedAt = useMemo(() => {
     const r: Partial<Record<LegendCategory, string | null>> = {};
     visibleCategories.forEach((cat) => {

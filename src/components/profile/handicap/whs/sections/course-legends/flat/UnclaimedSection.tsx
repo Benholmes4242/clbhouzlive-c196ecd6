@@ -2,7 +2,8 @@
  * BRIEF_CHAMPIONS_TAB_REBUILD §3.3 + §3.4.
  *
  * UNCLAIMED names the boards nobody holds — a sentence, not seven dashed
- * boxes. WHAT COUNTS is the footnote that replaces ChampionsInfoCarousel:
+ * boxes. WHAT COUNTS is the footnote that replaced the old explainer carousel
+ * (ChampionsInfoCarousel, deleted 10 Sep 2026):
  * nobody needs the definition before they have seen the thing being defined.
  */
 import React from 'react';
