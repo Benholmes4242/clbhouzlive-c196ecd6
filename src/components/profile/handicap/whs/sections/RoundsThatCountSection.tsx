@@ -233,7 +233,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
           profileUserId={userId ?? null}
           open={sheetOpen}
           onClose={() => setSheetOpen(false)}
-          handicapDelta={selected.delta}
+          handicapDelta={null}
         />
       )}
     </>
