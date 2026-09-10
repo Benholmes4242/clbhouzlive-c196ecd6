@@ -35,9 +35,7 @@ import AchievementsPanel from './sections/AchievementsPanel';
 import StreaksCard from '../gam/streaks/StreaksCard';
 import CircleSection from './sections/CircleSection';
 import RecentlyPlayedFeed from './sections/recently-played/RecentlyPlayedFeed';
-import RoundsArchivePanel from './sections/trends/RoundsArchivePanel';
-import YourCoursesRail from './sections/trends/YourCoursesRail';
-import WhsConnectionCaption from './sections/WhsConnectionCaption';
+import HandicapFooter from './sections/HandicapFooter';
 import { LaunchSheetMount } from '../gam/launch/LaunchSheetMount';
 
 interface Props {
@@ -160,19 +158,19 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       {/* 9 — FRIENDS' ROUNDS (Section J) */}
       {!readOnly && <RecentlyPlayedFeed ownerUserId={userId} />}
 
-      {/* 10 — FOOTER (Section K; the posted-history panel becomes the
-          "All rounds" footer link, the caption and your-courses rail come off) */}
-      <RoundsArchivePanel
+      {/* 10 — FOOTER (Section K1). RoundsArchivePanel, YourCoursesRail and
+          WhsConnectionCaption are dead-listed, not deleted: the rounds total is
+          the footer link into the SAME RoundsArchiveSheet, the counters figure
+          is Section E's meta, the 90-day count is Section F's meta, and the
+          provenance line moves into the footer row. No second terminal link —
+          TROPHY ROOM stays at the foot of Personal bests. */}
+      <HandicapFooter
         connectionId={connection.id}
         userId={userId}
+        membershipNumber={connection.membership_number}
         viewMode={viewMode}
         ownerFirstName={ownerFirstName}
       />
-      <YourCoursesRail readOnly={readOnly} />
-
-      {!readOnly && (
-        <WhsConnectionCaption membershipNumber={connection.membership_number} />
-      )}
 
       {/* Sheet mounts that lived inside the old views must survive them. */}
       <LaunchSheetMount userId={userId} />
