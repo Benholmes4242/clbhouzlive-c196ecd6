@@ -80,9 +80,19 @@ export interface HeroContext {
   runnerUp?: number;
   hcp?: number;
   gross?: number;
+  /**
+   * THE REAL NUMBER OF ROUNDS IN THE WINDOW, not the number fetched and not an
+   * array length after a client-side filter. It is the length of the window
+   * slice of the pool read, which is only the same thing while the read is not
+   * truncated — hence `poolTruncated`, which takes the card out rather than
+   * letting a cap masquerade as a count.
+   */
   poolRounds: number;
   poolMembers: number;
+  /** Which pool the ladder settled on. The context line MUST say it. */
+  pool: HeroPool;
 }
+
 
 export interface HeroCard {
   /** `${metric}-${window}` — the rotation's exclusion key (§6). */
