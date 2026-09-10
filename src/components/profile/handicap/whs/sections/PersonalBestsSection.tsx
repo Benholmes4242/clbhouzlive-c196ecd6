@@ -152,7 +152,15 @@ export const PersonalBestsSection: React.FC<Props> = ({
     return ORDER.flatMap((k) => out.filter((r) => r.key === k));
   }, [scores, currentHandicap, t]);
 
-  const missing = ORDER.length - rows.length;
+  /* THE SENTENCE NAMES WHAT IS MISSING AND EXPLAINS NOTHING (Sep 2026 ruling).
+     The old wording named a stableford and a round off handicap whatever was
+     actually absent, so it was wrong whenever the missing record was another
+     one. The list is generated from the same record names the rows use, so the
+     two can never disagree. No instruction on how to set a record: the section
+     is called Records to break. */
+  const missingNames = ORDER.filter((k) => !rows.some((r) => r.key === k)).map((k) =>
+    t(`common:handicap.bests.lower.${k}`),
+  );
 
   const fired = useRef(false);
   useEffect(() => {
@@ -216,8 +224,9 @@ export const PersonalBestsSection: React.FC<Props> = ({
         </div>
       ))}
 
-      {/* Never a section with no rows and no sentence. */}
-      {missing > 0 && (
+      {/* Never a section with no rows and no sentence. Same sentence whether
+          one record is missing or all four. */}
+      {missingNames.length > 0 && (
         <div
           style={{
             marginTop: rows.length ? 12 : 0,
@@ -226,9 +235,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
             lineHeight: 1.5,
           }}
         >
-          {rows.length === 0
-            ? t('common:handicap.bests.missingAll')
-            : t('common:handicap.bests.missing', { count: missing })}
+          {t('common:handicap.bests.stillToSet', { list: missingNames.join(', ') })}
         </div>
       )}
 

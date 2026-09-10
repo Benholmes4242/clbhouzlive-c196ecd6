@@ -44,6 +44,14 @@ import {
   deriveSheetStateFromWhsEntry,
 } from './parts/_shared/deriveSheetState';
 
+/**
+ * WHICH DOOR OPENED. Returned additively so a caller can instrument the
+ * outcome without re-deriving the state — a second derivation is a second
+ * resolver. 'unresolved' means nothing happened: no id, no snapshot, no
+ * passport, or a failed lookup.
+ */
+export type MemberTapOutcome = 'compare' | 'nudge' | 'invite' | 'unresolved';
+
 export interface MemberTapArgs {
   /** For clbhouz members. */
   targetUserId?: string | null;
@@ -64,45 +72,46 @@ export function useMemberTapResolver() {
   const { start: startConversation } = useStartConversation();
   const viewerId = user?.id ?? null;
 
-  const invite = useCallback(async (entry: FriendLeaderboardEntry) => {
+  const invite = useCallback(async (entry: FriendLeaderboardEntry): Promise<MemberTapOutcome> => {
     const state = deriveSheetStateFromWhsEntry(entry);
-    if (state.kind !== 'whs_only') return;
+    if (state.kind !== 'whs_only') return 'unresolved';
     const passportId = state.entry.friend_passport_id;
     if (passportId == null) {
       toast.error("Can't invite this player yet");
-      return;
+      return 'unresolved';
     }
     const res = await callCreateInvite(passportId, 'copy_link');
     if (!res.ok || !res.share_url || !res.share_message) {
       toast.error(res.message ?? "Couldn't create invite");
-      return;
+      return 'unresolved';
     }
     await shareInvite({
       share_url: res.share_url,
       share_message: res.share_message,
       invitee_name: state.entry.friend_name,
     });
+    return 'invite';
   }, []);
 
   const resolve = useCallback(
-    async (args: MemberTapArgs) => {
+    async (args: MemberTapArgs): Promise<MemberTapOutcome> => {
       const targetUserId = args.targetUserId ?? null;
       const whsOnlyEntry = args.whsOnlyEntry ?? null;
 
       // No clbhouz identity to resolve: this is an England Golf friend who is
       // not on clbhouz, so the only destination that exists is the invite.
       if (!targetUserId) {
-        if (whsOnlyEntry) await invite(whsOnlyEntry);
-        return;
+        if (whsOnlyEntry) return await invite(whsOnlyEntry);
+        return 'unresolved';
       }
 
       // SELF IS NEVER ROUTED THROUGH HERE. A member's own handicap page is
       // untouched by this change; callers guard, and this is the backstop.
       if (viewerId && targetUserId === viewerId) {
         navigate('/handicap');
-        return;
+        return 'unresolved';
       }
-      if (!viewerId) return;
+      if (!viewerId) return 'unresolved';
 
       let snapshot: FriendHybridSnapshot | null = null;
       try {
@@ -121,9 +130,9 @@ export function useMemberTapResolver() {
         });
       } catch {
         // Inert on failure — see the header note.
-        return;
+        return 'unresolved';
       }
-      if (!snapshot) return;
+      if (!snapshot) return 'unresolved';
 
       const state = deriveSheetStateFromSnapshot({ snapshot, rivalry: undefined });
 
@@ -143,11 +152,12 @@ export function useMemberTapResolver() {
           }),
           { asActor: { actorType: 'personal', actorId: viewerId } },
         );
-        return;
+        return 'nudge';
       }
 
 
       navigate(compareRouteFor(targetUserId));
+      return 'compare';
     },
     [invite, navigate, queryClient, startConversation, t, viewerId],
   );
