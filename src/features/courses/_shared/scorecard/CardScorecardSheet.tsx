@@ -952,8 +952,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               >
                 {courseName}
               </div>
+              {/* §B — THE VENUE'S PLACE STEPS BACK ONE TONE. The course name
+                  went up to 20px, so the line beneath it has to drop from MUTE
+                  to DIM or the two read as one two-line title. */}
               {courseLocation && (
-                <div style={{ fontSize: 12, color: A.MUTE, marginTop: 2 }}>{courseLocation}</div>
+                <div style={{ fontSize: 12, color: A.DIM, marginTop: 2 }}>{courseLocation}</div>
               )}
               {/* MEMBER ROW. With NO NAME nothing renders — no avatar, no
                   avatar-shaped hole. Amber marks the viewer's own round. */}
