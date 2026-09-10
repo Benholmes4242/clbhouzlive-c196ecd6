@@ -243,9 +243,9 @@ function buildAggregateCard(
   metric: HeroMetric,
   window: HeroWindow,
   rows: readonly CircleRoundRow[],
-  pool: HeroPool,
-  shape: { poolRounds: number; poolMembers: number },
+  shape: PoolShape,
 ): HeroCard | null {
+
   interface Tally {
     row: CircleRoundRow;
     figure: number;
