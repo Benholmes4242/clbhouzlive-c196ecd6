@@ -19534,6 +19534,14 @@ export type Database = {
           last_change_at: string
         }[]
       }
+      get_course_field_sizes: {
+        Args: { p_course_ids: string[]; p_exclude_user_id: string }
+        Returns: {
+          course_id: string
+          course_players: number
+          course_rounds: number
+        }[]
+      }
       get_course_hall_of_fame: {
         Args: never
         Returns: {
