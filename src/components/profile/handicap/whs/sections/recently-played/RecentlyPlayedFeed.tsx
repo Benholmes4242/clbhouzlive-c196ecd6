@@ -7,6 +7,7 @@ import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { SeeAllRow } from '../SeeAllRow';
 import { HcpSection } from '../HcpSection';
 import { CHART, CHART_FONT } from '../../charts';
 import FriendRoundRow, { type FriendRoundVariant } from './FriendRoundRow';
@@ -103,21 +104,16 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
             {rounds.length > INLINE_ROUNDS && (
               /* Terminal row, same treatment as the circle's SEE ALL 24 ›:
                  uppercase 9/0.19em, the count, and the chevron on the right. */
-              <button
-                type="button"
-                onClick={() => setAllOpen(true)}
-                /* SNAGS_01 §E: NO RULE BELOW. The rule that closes the list
-                   is the last FriendRoundRow's own bottom border, immediately
-                   above this row; the next rule on the page belongs to the
-                   footer. A second border here put three hairlines in a short
-                   span, two of them doing the same job. */
-                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, border: 0, padding: '14px 0 2px', background: 'transparent', color: CHART.MUTE, textAlign: 'left', fontFamily: CHART_FONT }}
-              >
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase' }}>
-                  {t('handicap.friendsRounds.seeAll', { count: rounds.length })}
-                </span>
-                <span style={{ fontSize: 11 }}>&rsaquo;</span>
-              </button>
+              <SeeAllRow
+                /* SNAGS_01 §E, kept through the SNAGS_02 extraction: NO RULE
+                   ABOVE HERE EITHER. The rule that closes this list is the
+                   last FriendRoundRow's own bottom border, immediately above;
+                   the next rule on the page belongs to the footer. A rule
+                   here would put three hairlines in a short span. */
+                rule={false}
+                label={t('handicap.friendsRounds.seeAll', { count: rounds.length })}
+                onPress={() => setAllOpen(true)}
+              />
             )}
           </>
         )}
