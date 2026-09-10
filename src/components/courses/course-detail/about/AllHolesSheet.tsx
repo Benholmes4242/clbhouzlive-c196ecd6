@@ -67,23 +67,34 @@ const DistributionSummary: React.FC<{ shares: BucketShares }> = ({ shares }) => 
   );
 };
 
+/*
+ * BRIEF_SHEET_BACKGROUND_CANON_03 §1 — AN EMPTY BAND DRAWS NOTHING.
+ *
+ * This used to render a 2px, 28%-opacity sliver for a band with no rounds in
+ * it. A sliver in a distribution bar is a claim that the band is non-empty and
+ * very small; nobody made a birdie on that hole, and the bar said somebody
+ * nearly did. The four category labels beneath the bar already carry the
+ * structure, so the stub carried nothing but a false quantity. Matches the
+ * round scorecard, which has always filtered empty bands out.
+ */
 const HoleDistribution: React.FC<{ hole: CourseHole }> = ({ hole }) => {
   const values = bucketValues(hole);
   const total = values.reduce((sum, value) => sum + Math.max(0, value), 0);
+  if (total <= 0) return null;
+  const colours = [RAMP_TOPAR.birdie, RAMP_TOPAR.par, RAMP_TOPAR.bogey, RAMP_TOPAR.double];
   return (
     <span style={{ display: 'flex', gap: 2, minWidth: 0, height: 4 }}>
-      {values.map((value, index) => (
+      {values.map((value, index) => (value > 0 ? (
         <i
           key={BUCKETS[index].key}
           style={{
-            width: total > 0 && value > 0 ? `${(value / total) * 100}%` : 2,
+            width: `${(value / total) * 100}%`,
             flexShrink: 0,
             borderRadius: BAR_RADIUS,
-             background: [RAMP_TOPAR.birdie, RAMP_TOPAR.par, RAMP_TOPAR.bogey, RAMP_TOPAR.double][index],
-            opacity: value > 0 ? 1 : 0.28,
+            background: colours[index],
           }}
         />
-      ))}
+      ) : null))}
     </span>
   );
 };
