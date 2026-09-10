@@ -3,10 +3,20 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type SocialCountsActorType = 'personal' | 'business';
 
+/**
+ * BRIEF_PROFILE_PASS_ONE §A — A COUNT IS `null` WHEN IT IS NOT KNOWN.
+ *
+ * These were `number` and the hook coerced a missing row to 0, so a member
+ * with 42 followers and a failed read drew identical pixels. A real zero is
+ * still 0; an absent row is now `null` and the surface must render the label
+ * with NO figure. The query itself throws on RPC error, so consumers get
+ * `isError` for the failed-call case and `null` for the no-row case; neither
+ * may be shown as a zero.
+ */
 export interface SocialCounts {
-  followers: number;
-  following: number;
-  friends: number;
+  followers: number | null;
+  following: number | null;
+  friends: number | null;
 }
 
 /**
@@ -35,7 +45,7 @@ export function useSocialCounts(
     enabled: !!actorType && !!actorId,
     queryFn: async (): Promise<SocialCounts> => {
       if (!actorType || !actorId) {
-        return { followers: 0, following: 0, friends: 0 };
+        return { followers: null, following: null, friends: null };
       }
 
       const { data, error } = await supabase.rpc('get_actor_social_counts', {
@@ -45,10 +55,11 @@ export function useSocialCounts(
       if (error) throw error;
 
       const row = Array.isArray(data) ? data[0] : data;
+      // No row = nothing is known. Do NOT substitute 0 here.
       return {
-        followers: row?.followers ?? 0,
-        following: row?.following ?? 0,
-        friends: row?.friends ?? 0,
+        followers: row?.followers ?? null,
+        following: row?.following ?? null,
+        friends: row?.friends ?? null,
       };
     },
     staleTime: 30_000,

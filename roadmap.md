@@ -413,3 +413,18 @@ POSTED HISTORY SHEET — REBUILD (10 Sep 2026)
   gam-refresh-streaks-weekly (index.ts:48-54 and 254-260) needs only
   whs_score_id + play_date + is_counter — a pure swap for the streak job, a
   join for the digest.
+
+## OPEN — A VISITOR CANNOT BE SHOWN A ROUND TOTAL (filed 10 Sep 2026, do not build)
+
+BRIEF_PROFILE_PASS_ONE §B. The profile hero's ROUNDS counter is owner-only by
+CONSTRUCTION, not by policy: gam_user_courses() keys off auth.uid(), so it can
+only ever resolve for the signed-in member looking at their own profile. The
+hero now DROPS the column for visitors rather than dashing it (absence reads as
+not-shown; an em dash in a row of figures reads as zero-or-unknown).
+
+A member's round total is NOT private — their rounds already appear in friends'
+feeds — so this is a TECHNICAL LIMITATION, not a privacy decision, and must be
+named as one. FIX SHAPE (not started): a read-only function that takes a user id
+as an argument instead of reading auth.uid(), returning the same round total, so
+the fourth counter can render for visitors too. Nothing here should be built
+until that function exists and is verified.

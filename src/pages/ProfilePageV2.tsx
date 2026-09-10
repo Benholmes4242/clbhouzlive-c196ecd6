@@ -357,10 +357,36 @@ const ProfilePageV2Content: React.FC = () => {
     }
   }, [activeSection, setSearchParams]);
 
-  const { data: socialCounts, isLoading: socialCountsLoading } = useSocialCounts(
+  /*
+   * BRIEF_PROFILE_PASS_ONE §A — AN ERROR MUST NOT RENDER AS A ZERO.
+   * These three figures used to fall back to 0, so a failed RPC and a member
+   * with nobody following them were the same pixels. `null` now means NOT
+   * KNOWN and the hero renders the label alone.
+   */
+  const {
+    data: socialCounts,
+    isLoading: socialCountsLoading,
+    isError: socialCountsError,
+  } = useSocialCounts(
     profileUserId ? { type: 'personal', id: profileUserId } : undefined,
   );
-  const followersCount = socialCounts?.followers ?? 0;
+  const socialCountState: 'ok' | 'loading' | 'error' = socialCountsError
+    ? 'error'
+    : socialCountsLoading
+      ? 'loading'
+      : 'ok';
+  /* The failure stops being invisible: one event per failed read, naming the
+     counters that could not resolve. */
+  React.useEffect(() => {
+    if (!socialCountsError || !profileUserId) return;
+    analyticsEvents.track('profile_counter_read_failed', {
+      counters: 'followers,following,friends',
+      source: 'get_actor_social_counts',
+      profile_user_id: profileUserId,
+      is_self: !!isSelf,
+    });
+  }, [socialCountsError, profileUserId, isSelf]);
+  const followersCount = socialCounts?.followers ?? null;
 
   // Shell figures. Courses come from the same summary hook the Courses tab
   // uses; rounds come from the own-profile analytics RPC (auth.uid()).
@@ -371,8 +397,8 @@ const ProfilePageV2Content: React.FC = () => {
     if (!shellAnalyticsCourses) return null;
     return shellAnalyticsCourses.reduce((sum, r) => sum + (r.rounds_count ?? 0), 0) || null;
   }, [isSelf, shellAnalyticsCourses]);
-  const followingCount = socialCounts?.following ?? 0;
-  const friendsCount = isPersonal ? (socialCounts?.friends ?? 0) : 0;
+  const followingCount = socialCounts?.following ?? null;
+  const friendsCount = isPersonal ? (socialCounts?.friends ?? null) : null;
   
   useRealtimeSocialCounts({
     viewerUserId: user?.id ?? null,
@@ -662,6 +688,7 @@ const ProfilePageV2Content: React.FC = () => {
             ratedCount={reviewsCount ?? null}
             friendsCount={isPersonal ? friendsCount : null}
             followersCount={followersCount}
+            socialCountState={socialCountState}
             onAvatarTap={() => (isSelf ? setPhotoSheet('avatar') : setIsAvatarLightboxOpen(true))}
             action={
               isSelfView ? (

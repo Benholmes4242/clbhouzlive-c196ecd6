@@ -44,6 +44,11 @@ interface Props {
   /** Round 3 §3: social counts from the page's existing realtime hook. */
   friendsCount?: number | null;
   followersCount?: number | null;
+  /**
+   * BRIEF_PROFILE_PASS_ONE §A — state of the social-count read. 'error' renders
+   * the label with no figure rather than a fabricated zero.
+   */
+  socialCountState?: 'ok' | 'loading' | 'error';
   /** Member's own cover/banner photo (user_profiles.header_photo_url). */
   coverUrl?: string | null;
   /** Right-hand control: EDIT pill (own) or the follow/friend set (other). */
@@ -119,12 +124,13 @@ export const ProfileHero: React.FC<Props> = ({
   displayName,
   avatarUrl,
   region,
-  isSelf: _isSelf,
+  isSelf,
   indexValue,
   roundsCount,
   ratedCount,
   friendsCount,
   followersCount,
+  socialCountState = 'ok',
   coverUrl,
   action,
   onAvatarTap,
@@ -332,10 +338,16 @@ export const ProfileHero: React.FC<Props> = ({
             }
       }
       counters={[
-        { key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, onTap: tap('rounds') },
+        /* BRIEF_PROFILE_PASS_ONE §B — ROUNDS IS OWNER-ONLY BY CONSTRUCTION.
+           gam_user_courses() keys off auth.uid(), so it can never resolve for a
+           visitor. A visitor sees THREE figures, not four: an em dash in a row
+           of figures reads as zero-or-unknown, absence reads as not-shown. */
+        ...(isSelf
+          ? [{ key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, onTap: tap('rounds') }]
+          : []),
         { key: 'rated', label: t('hero.rated', 'Rated'), value: ratedCount, onTap: tap('rated') },
-        { key: 'friends', label: t('hero.friends', 'Friends'), value: friendsCount ?? null, onTap: tap('friends') },
-        { key: 'followers', label: t('hero.followers', 'Followers'), value: followersCount ?? null, onTap: tap('followers') },
+        { key: 'friends', label: t('hero.friends', 'Friends'), value: friendsCount ?? null, state: socialCountState, onTap: tap('friends') },
+        { key: 'followers', label: t('hero.followers', 'Followers'), value: followersCount ?? null, state: socialCountState, onTap: tap('followers') },
       ]}
     />
   );
