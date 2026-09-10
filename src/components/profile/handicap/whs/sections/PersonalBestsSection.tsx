@@ -224,8 +224,9 @@ export const PersonalBestsSection: React.FC<Props> = ({
         </div>
       ))}
 
-      {/* Never a section with no rows and no sentence. */}
-      {missing > 0 && (
+      {/* Never a section with no rows and no sentence. Same sentence whether
+          one record is missing or all four. */}
+      {missingNames.length > 0 && (
         <div
           style={{
             marginTop: rows.length ? 12 : 0,
@@ -234,9 +235,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
             lineHeight: 1.5,
           }}
         >
-          {rows.length === 0
-            ? t('common:handicap.bests.missingAll')
-            : t('common:handicap.bests.missing', { count: missing })}
+          {t('common:handicap.bests.stillToSet', { list: missingNames.join(', ') })}
         </div>
       )}
 
