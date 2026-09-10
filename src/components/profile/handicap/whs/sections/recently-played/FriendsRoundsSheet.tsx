@@ -29,17 +29,18 @@ export const FriendsRoundsSheet: React.FC<Props> = ({
     <BottomSheet
       open={open}
       onClose={onClose}
-      height="85dvh"
       maxHeight="85dvh"
-      contentStyle={{ background: CHART.CANVAS, color: CHART.INK, overflow: 'hidden' }}
-      ariaLabel={t('handicap.friendsRounds.sheetTitle')}
+      variant="dark"
+      surfaceColor={CHART.CANVAS}
+      style={{ color: CHART.INK, overflow: 'hidden' }}
+      ariaLabelledBy="friends-rounds-sheet-title"
     >
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <SheetHeader
           title={t('handicap.friendsRounds.sheetTitle')}
-          subtitle={t('handicap.friendsRounds.meta')}
+          sub={t('handicap.friendsRounds.meta')}
           onClose={onClose}
-          variant="dark"
+          dark
         />
         <div
           data-friends-rounds-scroll
@@ -55,7 +56,8 @@ export const FriendsRoundsSheet: React.FC<Props> = ({
           {rounds.map((round) => (
             <FriendRoundRow
               key={`${round.friend_row_id}:${round.last_round_score_id ?? round.last_round_played_at}`}
-              round={round}
+              activity={round}
+              variant={round.is_clbhouz_user && round.friend_connection_id ? 'clbhouz-synced' : round.is_clbhouz_user ? 'clbhouz-not-synced' : 'eg-only'}
               onOpenRound={onOpenRound}
               onInvite={onInvite}
               inviting={invitingId === round.friend_row_id}

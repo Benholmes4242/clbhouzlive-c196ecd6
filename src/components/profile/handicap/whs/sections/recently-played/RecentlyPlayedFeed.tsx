@@ -1,146 +1,130 @@
-/**
- * RecentlyPlayedFeed - friends' rounds, as rows.
- *
- * One house row per round, two lines each, inside a single panel. The action
- * for an unconnected friend lives on the row itself (in the columns their
- * round leaves empty), so there is no footer restating it.
- *
- * Renders NOTHING when there are no rounds.
- */
-import React, { useState } from 'react';
-import { useFriendsActivity } from '@/lib/whs/hooks';
-import { Skeleton } from '@/components/ui/skeleton';
-
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/lib/toast';
+import { useFriendsActivity, whsKeys } from '@/lib/whs/hooks';
+import { callCreateInvite } from '@/lib/whs/api';
+import { shareInvite } from '@/lib/whs/share';
+import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { HcpSection } from '../_shared/HcpSection';
+import { CHART, CHART_FONT } from '../../charts';
 import FriendRoundRow, { type FriendRoundVariant } from './FriendRoundRow';
+import { FriendsRoundsSheet } from './FriendsRoundsSheet';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
-import { DarkSectionHeader } from '../_shared/darkAtoms';
-import { CHART } from '../../charts';
-import type { WhsFriendActivityWithImage, FriendLeaderboardEntry } from '@/lib/whs/types';
-import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 
-interface Props {
-  ownerUserId: string;
-}
+const INLINE_ROUNDS = 5;
+const COMPLETE_LIST_LIMIT = 200;
 
-const toWhsOnlyEntry = (a: WhsFriendActivityWithImage): FriendLeaderboardEntry => ({
-  is_self: false,
-  friend_user_id: null,
-  friend_connection_id: a.friend_connection_id,
-  friend_passport_id: a.friend_passport_id ?? null,
-  friend_row_id: a.friend_row_id ?? null,
-  friend_name: a.friend_name,
-  friend_thumbnail_url: a.friend_thumbnail_url,
-  friend_profile_photo_url: a.friend_profile_photo_url ?? null,
-  friend_handicap_index: a.friend_handicap_index,
-  friend_home_club: null,
-  last_round_played_at: a.last_round_played_at,
-  last_round_course_name: a.last_round_course_name,
-  is_clbhouz_user: false,
-  handicap_30d_ago: null,
-  handicap_30d_delta: null,
-  rounds_last_30d: 0,
-});
+interface Props { ownerUserId: string; }
 
-const variantFor = (a: WhsFriendActivityWithImage): FriendRoundVariant =>
-  a.is_clbhouz_user && a.friend_connection_id
+const variantFor = (activity: WhsFriendActivityWithImage): FriendRoundVariant =>
+  activity.is_clbhouz_user && activity.friend_connection_id
     ? 'clbhouz-synced'
-    : a.is_clbhouz_user
+    : activity.is_clbhouz_user
       ? 'clbhouz-not-synced'
       : 'eg-only';
 
 export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
-  // SETTLED IS NOT "NOT LOADING" — useFriendsActivity is gated on ownerUserId,
-  // so a disabled query is isLoading:false before it has ever run. Deciding
-  // "no rounds, render nothing" from !isLoading hides the section on first paint.
-  const { data, isLoading: fetching, isFetched } = useFriendsActivity(ownerUserId);
+  const { t } = useTranslation('common');
+  const queryClient = useQueryClient();
+  const { data, isLoading: fetching, isFetched } = useFriendsActivity(ownerUserId, COMPLETE_LIST_LIMIT);
   const isLoading = !isFetched || fetching;
+  const rounds = useMemo(() => [...(data ?? [])].sort((a, b) => (b.last_round_played_at ?? '').localeCompare(a.last_round_played_at ?? '')), [data]);
+  const [allOpen, setAllOpen] = useState(false);
+  const [selected, setSelected] = useState<WhsFriendActivityWithImage | null>(null);
+  const [invitingId, setInvitingId] = useState<string | null>(null);
 
-  const [sheetActivity, setSheetActivity] =
-    useState<WhsFriendActivityWithImage | null>(null);
-  const { resolve } = useMemberTapResolver();
+  useEffect(() => {
+    if (isLoading || rounds.length > 0) return;
+    analyticsEvents.track('handicap_section_withheld', {
+      section: 'friends_rounds',
+      reason: 'no_rounds_last_fortnight',
+      sample_size: 0,
+    });
+  }, [isLoading, rounds.length]);
 
-  const handleOpen = (item: WhsFriendActivityWithImage) => {
-    // State D — Not a Clbhouz user (or unresolvable user_id) → invite
-    if (!item.is_clbhouz_user || !item.friend_user_id) {
-      void resolve({ whsOnlyEntry: toWhsOnlyEntry(item) });
-      return;
+  const openRound = useCallback((round: WhsFriendActivityWithImage) => {
+    if (!round.is_clbhouz_user || !round.last_round_score_id) return;
+    analyticsEvents.track('handicap_friends_round_opened', {
+      source: allOpen ? 'friends_rounds_sheet' : 'friends_rounds_section',
+      whs_score_id: round.last_round_score_id,
+      is_nine_hole: round.is_nine_hole || round.total_holes === 9,
+    });
+    setSelected(round);
+  }, [allOpen]);
+
+  const invite = useCallback(async (round: WhsFriendActivityWithImage) => {
+    if (invitingId || round.friend_passport_id == null) return;
+    setInvitingId(round.friend_row_id);
+    try {
+      const res = await callCreateInvite(round.friend_passport_id, 'copy_link');
+      if (!res.ok || !res.share_url) {
+        toast.error(res.message ?? t('invite.toast.createFailed'));
+        return;
+      }
+      analyticsEvents.track('invite_sent', {
+        source: allOpen ? 'handicap_friends_rounds_sheet' : 'handicap_friends_rounds',
+        kind: 'friend',
+        is_reshare: false,
+      });
+      queryClient.invalidateQueries({ queryKey: whsKeys.sentInvites() });
+      await shareInvite({ share_url: res.share_url, share_message: res.share_message ?? '', invitee_name: res.invitee_name ?? round.friend_name });
+    } finally {
+      setInvitingId(null);
     }
-    // State C — Clbhouz member, no handicap connected → nudge to sync, NOT an
-    // invite-to-clbhouz: they are already here.
-    if (!item.friend_connection_id) {
-      void resolve({ targetUserId: item.friend_user_id });
-      return;
-    }
-    // State B — Synced member, no detailed scorecard for this round → compare
-    if (!item.last_round_score_id) {
-      void resolve({ targetUserId: item.friend_user_id });
-      return;
-    }
-    // State A — Synced + has scorecard → real scorecard sheet
-    setSheetActivity(item);
-  };
+  }, [allOpen, invitingId, queryClient, t]);
 
-  const items = data ?? [];
-
-  // Nothing at all when the fortnight is empty.
-  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
-  if (!isLoading && items.length === 0) return null;
+  if (isLoading) return null;
 
   return (
-    <section style={{ marginTop: 32 }}>
-      <DarkSectionHeader
-        eyebrow="FRIENDS' ROUNDS"
-        right={!isLoading ? `LAST FORTNIGHT \u00B7 ${items.length}` : undefined}
-      />
+    <>
+      <HcpSection
+        id="friends-rounds-section"
+        eyebrow={t('handicap.friendsRounds.kicker')}
+        title={t('handicap.friendsRounds.heading')}
+        meta={t('handicap.friendsRounds.meta')}
+      >
+        {rounds.length === 0 ? (
+          <p style={{ margin: 0, fontFamily: CHART_FONT, fontSize: 12, lineHeight: '17px', color: CHART.DIM }}>
+            {t('handicap.friendsRounds.empty')}
+          </p>
+        ) : (
+          <>
+            {rounds.slice(0, INLINE_ROUNDS).map((round) => (
+              <FriendRoundRow
+                key={`${round.friend_row_id}:${round.last_round_score_id ?? round.last_round_played_at}`}
+                activity={round}
+                variant={variantFor(round)}
+                onOpenRound={openRound}
+                onInvite={invite}
+                inviting={invitingId === round.friend_row_id}
+              />
+            ))}
+            {rounds.length > INLINE_ROUNDS && (
+              <button
+                type="button"
+                onClick={() => setAllOpen(true)}
+                style={{ width: '100%', border: 0, borderBottom: `1px solid ${CHART.BORDER}`, padding: '14px 0', background: 'transparent', color: CHART.INK, textAlign: 'left', fontFamily: CHART_FONT, fontSize: 11, lineHeight: '13px', fontWeight: 700, letterSpacing: 0, textTransform: 'uppercase' }}
+              >
+                {t('handicap.friendsRounds.seeAll')}
+              </button>
+            )}
+          </>
+        )}
+      </HcpSection>
 
-      {isLoading ? (
-        <div style={{ padding: '0 16px' }}>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton
-              key={i}
-              variant="dark"
-              style={{ height: 74, borderRadius: 0, marginBottom: 1 }}
-            />
-          ))}
-        </div>
-      ) : (
-        <div
-          style={{
-            margin: '0 16px',
-            background: CHART.PANEL,
-            border: `1px solid ${CHART.BORDER}`,
-            borderRadius: 16,
-            overflow: 'hidden',
-          }}
-        >
-          {items.map((item) => (
-            <FriendRoundRow
-              key={
-                item.last_round_score_id ??
-                `${item.friend_passport_id}-${item.last_round_played_at}`
-              }
-              activity={item}
-              variant={variantFor(item)}
-              onClick={() => handleOpen(item)}
-            />
-          ))}
-        </div>
-      )}
+      <FriendsRoundsSheet open={allOpen} onClose={() => setAllOpen(false)} rounds={rounds} onOpenRound={openRound} onInvite={invite} invitingId={invitingId} />
 
       <RoundDetailSheet
-        scoreId={sheetActivity?.last_round_score_id ?? null}
-        profileUserId={sheetActivity?.friend_user_id ?? null}
-        open={!!sheetActivity}
-        onClose={() => setSheetActivity(null)}
-        handicapDelta={
-          sheetActivity?.is_counter &&
-          sheetActivity.friend_handicap_index != null &&
-          sheetActivity.handicap_index_at_time != null
-            ? sheetActivity.friend_handicap_index - sheetActivity.handicap_index_at_time
-            : null
-        }
+        scoreId={selected?.last_round_score_id ?? null}
+        connectionId={selected?.friend_connection_id ?? null}
+        profileUserId={selected?.friend_user_id ?? null}
+        open={selected != null}
+        onClose={() => setSelected(null)}
+        handicapDelta={selected?.is_counter && selected.friend_handicap_index != null && selected.handicap_index_at_time != null ? selected.friend_handicap_index - selected.handicap_index_at_time : null}
       />
-    </section>
+    </>
   );
 };
 
