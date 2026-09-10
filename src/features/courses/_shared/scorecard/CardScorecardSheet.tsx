@@ -1191,6 +1191,27 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 </div>
               </Panel>
 
+              {/*
+                §C — AT THIS COURSE. ONE POOL: the member's own rounds at this
+                venue. The kicker names the sample, so "BEST OF 1" — the most
+                common case, since 274 member-course pairs hold exactly one
+                round — reads as a fact about one round rather than a ranking
+                against an invisible field. Renders only when a figure resolves,
+                and never on the tour surface.
+              */}
+              {courseSection.length > 0 && (
+                <Panel kicker={t('courses:scorecard.atThisCourse', { count: courseContext?.roundsHere ?? 0 })}>
+                  <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
+                    {courseSection.map((it) => (
+                      <div key={it.key} style={{ minWidth: 0 }}>
+                        <div style={{ ...RAIL_FIG, color: it.tone ?? A.INK }}>{it.value}</div>
+                        <div style={{ ...LABEL, fontSize: 9.5, letterSpacing: '0.12em', marginTop: 3 }}>{it.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </Panel>
+              )}
+
               {/* HOW IT BROKE DOWN — the birdie+ figure keeps its RED (S4.3). */}
               <Panel kicker={t('courses:scorecard.howItBrokeDown')}>
                 <RoundSplit split={split} />
