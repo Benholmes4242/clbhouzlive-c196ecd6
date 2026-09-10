@@ -1019,7 +1019,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       // (fixed summary header on PANEL, scrolling body on CANVAS). So the
       // surface takes PANEL, or the grabber sits on a visibly different band
       // from the header directly under it.
-      surfaceColor={A.PANEL}
       style={{ background: A.PANEL, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column', ...sheetStyle }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>

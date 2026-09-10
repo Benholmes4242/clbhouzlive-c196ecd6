@@ -75,7 +75,6 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
       open={open}
       onClose={onClose}
       variant="light"
-      surfaceColor={A.PANEL}
       ariaLabelledBy="tournament-full-board-sheet-title"
       style={{ height: 'auto', maxHeight: '85dvh' }}
     >

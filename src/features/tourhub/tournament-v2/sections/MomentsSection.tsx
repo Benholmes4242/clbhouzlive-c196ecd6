@@ -104,7 +104,6 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
         open={open}
         onClose={() => setOpen(false)}
         variant="light"
-        surfaceColor={A.PANEL}
         ariaLabelledBy="tournament-moments-sheet-title"
         style={{ height: 'auto', maxHeight: '85dvh' }}
       >

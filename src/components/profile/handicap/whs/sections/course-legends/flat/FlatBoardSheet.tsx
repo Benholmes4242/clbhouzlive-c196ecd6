@@ -80,7 +80,7 @@ export const FlatBoardSheet: React.FC<Props> = ({
   if (!active) return null;
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={A.CANVAS} maxHeight="88dvh">
+    <BottomSheet open={open} onClose={onClose} variant="light" maxHeight="88dvh">
       <div style={{ padding: '4px 20px 8px', fontFamily: SANS, background: A.CANVAS }}>
         <div
           style={{

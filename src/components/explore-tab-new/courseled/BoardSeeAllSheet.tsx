@@ -97,7 +97,6 @@ export function BoardSeeAllSheet({
       open={open}
       onClose={onClose}
       variant="dark"
-      surfaceColor={A.CANVAS}
       maxHeight="85dvh"
       ariaLabelledBy="board-see-all-title"
       style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}

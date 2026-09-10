@@ -63,7 +63,6 @@ export function CoursesPlayedSeeAllSheet({
       open={open}
       onClose={onClose}
       variant="dark"
-      surfaceColor={A.CANVAS}
       maxHeight="85dvh"
       ariaLabelledBy="courses-see-all-title"
       style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}

@@ -952,7 +952,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               <LikedByRow
                 postId={post.id}
                 count={likeCount}
-                surfaceColor={CARD}
                 style={{ padding: `0 20px ${likedByBottom}px` }}
               />
             )}

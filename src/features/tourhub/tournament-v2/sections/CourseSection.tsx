@@ -229,7 +229,6 @@ function HolesSheet({
       open={open}
       onClose={onClose}
       variant="dark"
-      surfaceColor={SLATE_50}
       ariaLabelledBy="tournament-holes-sheet-title"
       style={{ height: 'auto', maxHeight: '85dvh' }}
     >

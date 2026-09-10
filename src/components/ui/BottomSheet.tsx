@@ -2,6 +2,22 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
+/**
+ * BRIEF_SHEET_BACKGROUND_CANON — THE SHEET SURFACE.
+ *
+ * One value for every bottom sheet in the app: #15171F, the background the
+ * Your-circle leaderboard sits on (CSS `--background`, and the same value as
+ * the existing feature tokens `A.CANVAS` and tourhub `SLATE_50`). It is
+ * redeclared here rather than imported because a shared ui primitive must not
+ * depend on a feature token file; the three names must stay in step.
+ *
+ * Sheets do NOT paint their own body or chrome. If a sheet needs a raised
+ * band, it uses a hairline or a PANEL panel INSIDE the body — never a second
+ * full-width fill, which is what produced the seams this brief removed.
+ */
+export const SHEET_SURFACE = '#15171F';
+
+
 interface BottomSheetProps {
   open: boolean;
   onClose: () => void;
@@ -11,15 +27,19 @@ interface BottomSheetProps {
   style?: React.CSSProperties;
   ariaLabelledBy?: string;
   /**
-   * NOTE ON THE VARIANT NAMES (dark-only baseline): 'light' and 'dark' no
-   * longer mean light vs dark. Both paint a DARK surface — 'light' takes
-   * `bg-background`, which resolves to #15171F, and 'dark' takes an explicit
-   * #0F172A (or `surfaceColor`). The names are kept because 45 files import
-   * them; do NOT rename. Consequence: the grabber is white in both cases.
+   * DEAD, KEPT FOR COMPILE COMPATIBILITY (BRIEF_SHEET_BACKGROUND_CANON).
+   * Neither variant selects a surface any more: there is ONE sheet
+   * background, `SHEET_SURFACE` below, and this component owns it. The prop
+   * is ignored. Do not reintroduce a per-variant surface.
    */
   variant?: 'light' | 'dark';
 
-  /** Optional surface colour override for the dark variant. */
+  /**
+   * DEAD, IGNORED (BRIEF_SHEET_BACKGROUND_CANON). Four sheets had drifted to
+   * four different fills through this prop, each correct on the day it was
+   * written. Passing it now does nothing on purpose: an override that agrees
+   * with the canon today is an override that will disagree later.
+   */
   surfaceColor?: string;
   /** Optional max-height override (default '85dvh'). Use e.g. '75dvh' for dvh-aware caps. */
   maxHeight?: string;
@@ -138,7 +158,6 @@ export function BottomSheet({
         ref={sheetRef}
         className={cn(
           "fixed bottom-0 left-0 right-0 transition-transform duration-300 ease-out",
-          variant === 'light' && 'bg-background',
           isAnimating ? "translate-y-0" : "translate-y-full",
           className
         )}
@@ -149,15 +168,14 @@ export function BottomSheet({
           borderTopLeftRadius: topRadius,
           borderTopRightRadius: topRadius,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
-          /* The sheet itself owns the entire rounded surface, including the
-             strip behind its grabber. Apply explicit surfaces to both legacy
-             variants so underlying photography can never leak above children. */
-          ...(surfaceColor
-            ? { background: surfaceColor }
-            : variant === 'dark'
-              ? { background: '#0F172A' }
-              : null),
           ...style,
+          /* BRIEF_SHEET_BACKGROUND_CANON — THE ONE SHEET BACKGROUND.
+             The sheet owns the whole rounded surface, grabber strip included,
+             so chrome and body cannot show a seam. It is applied AFTER
+             `...style` deliberately: a caller's own background cannot win, or
+             the canon is advisory. Value = SHEET_SURFACE (#15171F), the
+             background the Your-circle leaderboard sits on. */
+          background: SHEET_SURFACE,
         }}
         role="dialog"
         aria-modal="true"
