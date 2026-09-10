@@ -495,7 +495,7 @@ export const StatRow: React.FC<{
         {items.map((it) => (
           <div
             key={`l-${it.label}`}
-            style={{ ...LABEL, lineHeight: STATROW_LABEL_LH, textAlign: 'center', minWidth: 0 }}
+            style={{ ...LABEL, lineHeight: STATROW_LABEL_LH, textAlign: 'center', minWidth: 0, ...noWrap }}
           >
             {it.label}
           </div>
@@ -539,7 +539,9 @@ export const StatRow: React.FC<{
         return (
           <div key={it.label} style={{ textAlign: 'center', minWidth: 0 }}>
             {/* Reservation keeps every value on one baseline; labels stay top-aligned. */}
-            <div style={{ ...LABEL, ...statRowLabelBox(LABEL.fontSize as number, labelLines) }}>{it.label}</div>
+            <div style={{ ...LABEL, ...statRowLabelBox(LABEL.fontSize as number, labelLines), ...noWrap }}>
+              {it.label}
+            </div>
 
             <div style={{ ...NUM, fontSize: size, color: it.tone ?? A.INK, marginTop: 4, whiteSpace: 'nowrap' }}>
               {it.value}
