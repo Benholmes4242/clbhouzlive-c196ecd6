@@ -20,12 +20,15 @@
  * must never move into the headline: a courses split would shrink the figure
  * from 67 to 22 for reasons that have nothing to do with contest.
  *
- * THE THRESHOLD IS NOT LOCAL. Contested means FIELD_MIN_PLAYERS or more
- * distinct players with a scored round at the course EXCLUDING the holder --
- * the same constant and the same count the scorecard sheet's field row uses
- * (src/lib/gam/fieldGate.ts). No second player count is computed here: when the
- * batched read is unavailable the section states record counts and NOTHING
- * about contest.
+ * THE THRESHOLD IS NOT LOCAL, AND IT IS NOT THE FIELD THRESHOLD. Contested here
+ * means CROWN_MIN_OTHERS (1) or more distinct players with a scored round at the
+ * course EXCLUDING the holder. That is deliberately NOT the scorecard's
+ * FIELD_MIN_PLAYERS (5): a field row gates an AVERAGE, a record gates a CONTEST,
+ * and one other golfer on the board is a contest you won. Both constants and the
+ * reason they differ live in src/lib/gam/fieldGate.ts. The player COUNT is
+ * shared with the scorecard; only the floor differs. No second player count is
+ * computed here: when the batched read is unavailable the section states record
+ * counts and NOTHING about contest.
  *
  * A ZERO from that read may mean "not mapped", not "nobody else has played".
  * Both are uncontested so this section is safe; nothing else may reuse the zero.
