@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { useRoundNetScores } from '@/components/explore-tab-new/courseled/hooks/useRoundNetScores';
-import { useCircleSize } from '@/features/amateur/useCircleSize';
 import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
 
 import {
@@ -24,10 +23,15 @@ import {
  * TWO READS, NOT ONE, BECAUSE THE LADDER IS THREE STEPS (ruling, 10 Sep 2026).
  * A member's circle can clear the depth test at 90 days and fail it at 14, so
  * the widening decision is made PER WINDOW inside buildHeroCards and both pools
- * must be in hand when it is made. The everyone read is skipped entirely for a
- * member with no circle... no: it is the ONLY pool for them, and it is skipped
- * for nobody, because a circle that fails at 14 days needs it too. The circle
- * read is the one that is skipped, when there is no circle to read.
+ * must be in hand when it is made. Neither read can be skipped: the everyone
+ * pool is step 2 for EVERY member, not just the ones with no circle.
+ *
+ * WHOSE CIRCLE. `hasCircle` is taken from the circle read itself, NOT from
+ * useCircleSize — that hook counts the `follows` table, while the circle pool is
+ * built from `user_friends` UNION `user_follows`. Two live follow tables is a
+ * contradiction worth reporting on its own; the hero simply asks the pool it is
+ * going to use. A circle with no rounds in 90 days is a circle that fails the
+ * depth test in every window anyway, so the two readings agree on the outcome.
  *
  * NET IS THE DATABASE'S NUMBER. gam_round_net through useRoundNetScores, the
  * same source the Lowest net board reads. No formula in the app.
@@ -61,10 +65,7 @@ export function useAmateurHeroCards(
   /** Narrow the rotation while a card family is still being built. */
   families: readonly HeroMetric[] = SINGLE_ROUND_METRICS,
 ): HeroCardsResult {
-  const circle = useCircleSize(userId, !!userId);
-  const hasCircle = circle.data == null ? null : circle.data > 0;
-
-  const circleRounds = useCircleLatestRounds(hasCircle === true ? userId : undefined, {
+  const circleRounds = useCircleLatestRounds(userId, {
     limit: CIRCLE_LIMIT,
     includeSuggested: false,
     scope: 'circle',
@@ -81,6 +82,7 @@ export function useAmateurHeroCards(
 
   const circleRows = circleRounds.data ?? [];
   const everyoneRows = everyoneRounds.data ?? [];
+  const hasCircle = circleRounds.isFetched ? circleRows.length > 0 : null;
 
   /* ONE BATCHED NET READ COVERING BOTH POOLS. Circle rounds are a subset of the
      everyone pool in principle, but RLS decides both, so the union is taken
@@ -125,7 +127,7 @@ export function useAmateurHeroCards(
       !!userId &&
       hasCircle != null &&
       everyoneRounds.isFetched &&
-      (hasCircle === false || circleRounds.isFetched),
+      circleRounds.isFetched,
   };
 }
 
