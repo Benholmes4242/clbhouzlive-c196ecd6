@@ -57,10 +57,13 @@ interface DraftShape {
 }
 
 
-function readDraft(courseId: string | null | undefined): DraftShape | null {
+function readDraft(
+  courseId: string | null | undefined,
+  reviewId?: string | null,
+): DraftShape | null {
   try {
     if (typeof window === 'undefined') return null;
-    const raw = window.sessionStorage.getItem(draftKey(courseId));
+    const raw = window.sessionStorage.getItem(draftKey(courseId, reviewId));
     if (!raw) return null;
     const parsed = JSON.parse(raw) as DraftShape;
     if (!parsed || typeof parsed.savedAt !== 'number') return null;
@@ -71,23 +74,31 @@ function readDraft(courseId: string | null | undefined): DraftShape | null {
   }
 }
 
-function writeDraft(courseId: string | null | undefined, draft: DraftShape) {
+function writeDraft(
+  courseId: string | null | undefined,
+  draft: DraftShape,
+  reviewId?: string | null,
+) {
   try {
     if (typeof window === 'undefined') return;
-    window.sessionStorage.setItem(draftKey(courseId), JSON.stringify(draft));
+    window.sessionStorage.setItem(draftKey(courseId, reviewId), JSON.stringify(draft));
   } catch {
     /* private browsing throws */
   }
 }
 
-export function clearReviewDraft(courseId: string | null | undefined) {
+export function clearReviewDraft(
+  courseId: string | null | undefined,
+  reviewId?: string | null,
+) {
   try {
     if (typeof window === 'undefined') return;
-    window.sessionStorage.removeItem(draftKey(courseId));
+    window.sessionStorage.removeItem(draftKey(courseId, reviewId));
   } catch {
     /* private browsing throws */
   }
 }
+
 
 function seedFromExisting(existing: ExistingReview | null | undefined): ReviewComposerState {
   if (!existing) return EMPTY_STATE;
