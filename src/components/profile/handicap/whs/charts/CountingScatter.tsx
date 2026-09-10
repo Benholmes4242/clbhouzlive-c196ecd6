@@ -130,19 +130,21 @@ export const CountingScatter: React.FC<Props> = ({
         <span>Newest</span>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          gap: 14,
-          marginTop: 8,
-          paddingTop: 8,
-          borderTop: `1px solid ${CHART.BORDER}`,
-          ...LABEL_STYLE,
-        }}
-      >
-        <LegendDot color={CHART.DOWN} text="Counts" />
-        <LegendDot color={CHART.AMBER} text="Falling off" />
-      </div>
+      {showLegend && (
+        <div
+          style={{
+            display: 'flex',
+            gap: 14,
+            marginTop: 8,
+            paddingTop: 8,
+            borderTop: `1px solid ${CHART.BORDER}`,
+            ...LABEL_STYLE,
+          }}
+        >
+          <LegendDot color={CHART.DOWN} text="Counts" />
+          <LegendDot color={CHART.AMBER} text="Falling off" />
+        </div>
+      )}
     </div>
   );
 };
