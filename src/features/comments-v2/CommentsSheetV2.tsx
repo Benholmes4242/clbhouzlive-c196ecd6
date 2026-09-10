@@ -341,7 +341,9 @@ function CommentsSheetV2Inner({
               onSubmit={onSubmit}
               isSubmitting={addComment.isPending}
               onDirtyChange={setComposerDirty}
+              draftKey={commentsDraftKey}
             />
+
 
             {/* Above this sheet's z-[12003] shell. */}
             <DiscardDraftDialog
