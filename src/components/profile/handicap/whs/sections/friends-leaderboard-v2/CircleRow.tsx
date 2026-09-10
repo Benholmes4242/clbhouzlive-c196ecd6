@@ -21,18 +21,27 @@
  * THE FLAME stays and is the only thing on this list about form rather than
  * standing: index improved by half a shot or more over 30 days
  * (handicap_30d_delta <= -0.5). It is labelled by CircleFlameLegend, which
- * renders only when a flame is on screen. The flame and its legend glyph take
- * the INDEX_DELTA improved token (light pair - this is an #F8FAFC surface),
- * the same green the 90-day and 12-month index deltas take at the top of the
- * handicap page: a falling index means the same thing in both places. Amber is
- * left doing exactly one job on this row - marking the viewing member.
+ * renders only when a flame is on screen.
+ *
+ * THE FLAME IS GREEN, AND THE GREEN IS CHART.DOWN - NOT INDEX_DELTA.
+ * The argument for green is that the flame marks a falling index, so it must
+ * match the 90-day and 12-month index deltas at the top of THIS page. Those
+ * deltas are coloured by toneColor(indexTone(...)) in IndexSection, which
+ * resolves a falling index to CHART.DOWN (#5EE9A6). Sourcing INDEX_DELTA here
+ * would be a DIFFERENT green from the figures it is supposed to agree with.
+ * INDEX_DELTA.light / .dark are named for the BACKGROUND LUMINANCE they are
+ * legible on, not for a palette: .light is for white / #F8FAFC analytical
+ * surfaces (HcpStrip, Discover), .dark for near-black ones. The handicap page
+ * is dark-only, so .light was wrong on both counts and is not the token here.
+ * The flame and the legend glyph share one FlameIcon, so mark and line cannot
+ * drift apart. Amber is left doing exactly one job on this row - marking the
+ * viewing member.
  *
  * Tones are the CHART literals, so this renders identically on the page and
  * inside a portalled BottomSheet (no var(--hcp-*) dependency).
  */
 import React, { useState } from 'react';
 import { CHART } from '../../charts/tokens';
-import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
@@ -54,7 +63,7 @@ export const FlameIcon: React.FC<{ size?: number }> = ({ size = 11 }) => (
     width={size}
     height={size}
     viewBox="0 0 24 24"
-    fill={INDEX_DELTA.light.improved}
+    fill={CHART.DOWN}
     aria-hidden
     style={{ flexShrink: 0 }}
   >
