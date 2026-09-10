@@ -38,6 +38,7 @@ import { Panel, RowButton, Bar, MetaLabel } from '../Primitives';
 import { measuredShare } from '../shareModel';
 import { namedPartsFor } from '../criteria';
 import { monthYear } from '../format';
+import { attainedAt } from '@/lib/gam/badgeBackfill';
 import type { Achievement, CareerData } from '../types';
 
 interface Props {
@@ -133,11 +134,16 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
       share,
       // The date belongs to a REACHED tier. No tier reached, no date -- and the
       // row does not keep a blank slot for one.
+      //
+      // attainedAt() returns null for the 24 Jul 2026 bulk evaluation rows, whose
+      // earned_at records when the row was written, not when the tier was
+      // reached. Those rows render NO date rather than a fabricated one; rows
+      // earned since that run render normally. See src/lib/gam/badgeBackfill.ts.
       when:
-        item.reachedTier > 0 && monthYear(item.earnedAt)
+        item.reachedTier > 0 && monthYear(attainedAt(item.earnedAt))
           ? t('career.tierReached', {
               tier: item.reachedTier,
-              when: monthYear(item.earnedAt),
+              when: monthYear(attainedAt(item.earnedAt)),
             })
           : null,
     };

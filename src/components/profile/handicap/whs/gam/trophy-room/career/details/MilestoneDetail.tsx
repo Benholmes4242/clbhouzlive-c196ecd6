@@ -49,7 +49,13 @@ export const MilestoneDetail: React.FC<Props> = ({ data, item, onBack }) => {
       </div>
       {item.earned && (
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 12 }}>
-          <Figure value={monthYear(item.earnedAt) || 'ON THE RECORD'} size={20} color={REC.GOOD} />
+          {/* A backfilled stamp yields no month, so the detail states the
+              milestone is on the record and claims no moment for it. */}
+          <Figure
+            value={monthYear(attainedAt(item.earnedAt)) || 'ON THE RECORD'}
+            size={20}
+            color={REC.GOOD}
+          />
         </div>
       )}
       {share !== null && item.earned && (
