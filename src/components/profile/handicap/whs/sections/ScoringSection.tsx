@@ -64,6 +64,12 @@ interface Props {
 interface Windowed {
   current: number[];
   prior: number[];
+  /**
+   * Whether the nine-hole exclusion actually removed a round from either
+   * window. The caption only appears when the filter bites; a caption that
+   * qualifies a filter which removed nothing is noise.
+   */
+  excludedNine: boolean;
 }
 
 /** Eighteen-hole rounds with a real stableford total, split into the two windows. */
@@ -75,17 +81,24 @@ function windows(scores: WhsScore[]): Windowed {
 
   const current: number[] = [];
   const prior: number[] = [];
+  let excludedNine = false;
 
   for (const s of scores) {
     // A zero stableford is an incomplete sync, not a zero-point round.
     if (s.stableford_points == null || s.stableford_points <= 0) continue;
-    if (s.is_nine_hole) continue;
     const t = new Date(s.play_date).getTime();
-    if (t >= currentStart) current.push(s.stableford_points);
-    else if (t >= priorStart) prior.push(s.stableford_points);
+    const inCurrent = t >= currentStart;
+    const inPrior = !inCurrent && t >= priorStart;
+    if (!inCurrent && !inPrior) continue;
+    if (s.is_nine_hole) {
+      excludedNine = true;
+      continue;
+    }
+    if (inCurrent) current.push(s.stableford_points);
+    else prior.push(s.stableford_points);
   }
 
-  return { current, prior };
+  return { current, prior, excludedNine };
 }
 
 const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
@@ -93,23 +106,39 @@ const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
 const ScoringSection: React.FC<Props> = ({ scores }) => {
   const { t } = useTranslation(['common']);
 
-  const { current, prior } = useMemo(() => windows(scores), [scores]);
+  const { current, prior, excludedNine } = useMemo(() => windows(scores), [scores]);
 
   const n = current.length;
-  const withheld = n < MIN_ROUNDS;
+  /** Under three rounds: nothing at all. */
+  const withheld = n < MIN_FIGURE_ROUNDS;
+  /** Three to nine: the figure and its sample, no verdicts. */
+  const partial = !withheld && n < MIN_ROUNDS;
 
-  const withheldFired = useRef(false);
+  const meta = excludedNine
+    ? t('common:handicap.scoring.meta', { count: n, days: WINDOW_DAYS })
+    : t('common:handicap.scoring.metaPlain', { count: n, days: WINDOW_DAYS });
+
+  const fired = useRef(false);
   useEffect(() => {
-    if (!withheld || withheldFired.current) return;
-    withheldFired.current = true;
-    analyticsEvents.track('handicap_section_withheld', {
-      section: 'scoring',
-      sample: n,
-      required: MIN_ROUNDS,
-    });
-  }, [withheld, n]);
+    if (fired.current) return;
+    fired.current = true;
+    if (withheld) {
+      analyticsEvents.track('handicap_section_withheld', {
+        section: 'scoring',
+        sample: n,
+        required: MIN_FIGURE_ROUNDS,
+      });
+    } else {
+      analyticsEvents.track('handicap_section_shown', {
+        section: 'scoring',
+        sample: n,
+        partial,
+        excluded_nine_hole: excludedNine,
+      });
+    }
+  }, [withheld, partial, n, excludedNine]);
 
-  // ── Withheld: fewer than ten eighteen-hole rounds in the window ───────
+  // ── Withheld: fewer than three eighteen-hole rounds in the window ──────
   if (withheld) {
     return (
       <HcpSection
@@ -128,7 +157,7 @@ const ScoringSection: React.FC<Props> = ({ scores }) => {
   const avg = mean(current);
   const priorAvg = prior.length >= MIN_ROUNDS ? mean(prior) : null;
   const delta = priorAvg != null ? avg - priorAvg : null;
-  const showDelta = delta != null && Math.abs(delta) >= DEAD_BAND;
+  const showDelta = !partial && delta != null && Math.abs(delta) >= DEAD_BAND;
 
   const inZone = current.filter((p) => p >= IN_ZONE).length;
   const solid = current.filter((p) => p >= SOLID_LOWER && p < IN_ZONE).length;
@@ -145,7 +174,7 @@ const ScoringSection: React.FC<Props> = ({ scores }) => {
       hairline
       kicker={t('common:handicap.scoring.eyebrow')}
       heading={t('common:handicap.scoring.heading')}
-      meta={t('common:handicap.scoring.meta', { count: n, days: WINDOW_DAYS })}
+      meta={meta}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
         {/* THE AVERAGE */}
