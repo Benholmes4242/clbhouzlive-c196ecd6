@@ -8,11 +8,20 @@
  * dependent lines self-hide.
  *
  * THE 1,000-ROW CAP IS AN ASSUMPTION, NOT A FACT (filed 10 Sep 2026).
- * The read is bounded at the 1,000 newest rounds. That is CORRECT for every
+ * The read is bounded at the 1,000 NEWEST rounds. That is CORRECT for every
  * member alive today — the heaviest member on the platform has 345 rows and
- * nobody is over 1,000 — and it becomes SILENTLY WRONG above it: the header's
- * sample figure (245 today) would report 1,000 and no error would be raised.
- * Same species as the `.limit(8)` on posted-history counters.
+ * nobody is over 1,000 — and above it the cap fails in TWO DIFFERENT WAYS:
+ *
+ *   1. THE COUNT IS VISIBLY WRONG. The header's sample figure (245 today) would
+ *      report 1,000 and stop, with no error raised. Same species as the
+ *      `.limit(8)` on posted-history counters.
+ *   2. THE MILESTONE IS PLAUSIBLY WRONG, WHICH IS WORSE. The rows-needing
+ *      consumers want the OLDEST rounds — milestoneRoundFor takes the LAST match
+ *      in the list — and the oldest rounds are precisely the ones a newest-first
+ *      cap discards. So "your first eagle" would quietly become the oldest eagle
+ *      STILL INSIDE THE WINDOW: a real round of theirs, correctly formatted, on a
+ *      plausible date, and simply not the first. A wrong count is noticed; a
+ *      wrong first round is believed.
  *
  * IT IS NOT REMOVED HERE, because the surface needs BOTH shapes and only one of
  * them wants every row:

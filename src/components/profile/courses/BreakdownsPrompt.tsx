@@ -39,15 +39,25 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({
 
   return (
     <Panel kicker={variant === 'review' ? kicker : kicker} aside={count} style={{ fontFamily: SANS }}>
-      <div
-        style={{
-          display: 'flex',
-          gap: 10,
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
-          paddingBottom: 2,
-        }}
-      >
+      {/* THE REMAINDER SITS OUTSIDE THE SCROLLER, AND THAT IS THE FIX.
+          Three 96px tiles plus their gaps are 318px; the panel's inner width at
+          390pt is 390 - 32 page - 32 panel = 326px. A fourth 96px tile inside
+          the same scroller therefore had 8px of visible room and rendered as a
+          sliced "+1" - the text was never clipped, the TILE was. So the count
+          now lives beside the scroller, sized to its own text, and is fully
+          legible at every width while the thumbnails scroll under it. */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 10,
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+            paddingBottom: 2,
+            flex: '1 1 auto',
+            minWidth: 0,
+          }}
+        >
         {preview.map((c) => {
           const played = c.last_played_at ? formatDayMonthYearShortGB(new Date(c.last_played_at)) : null;
           return (
@@ -97,19 +107,24 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({
             </button>
           );
         })}
+        </div>
 
         {remainder > 0 && (
           <button
             type="button"
             onClick={() => onTap('preview')}
             style={{
-              flex: `0 0 ${TILE_W}px`,
+              /* Sized to its text, not to a tile: a two- or three-digit
+                 remainder grows the box instead of losing digits. */
+              flex: '0 0 auto',
               height: TILE_H,
+              padding: '0 10px',
               borderRadius: 10,
               border: `1px dashed ${A.DIM}`,
               background: 'transparent',
               cursor: 'pointer',
               fontFamily: SANS,
+              whiteSpace: 'nowrap',
               ...LABEL,
               color: A.MUTE,
             }}
@@ -118,6 +133,7 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({
           </button>
         )}
       </div>
+
 
       <div style={{ marginTop: 12 }}>
         <Action
