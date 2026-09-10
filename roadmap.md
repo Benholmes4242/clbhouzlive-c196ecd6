@@ -357,3 +357,17 @@ date as the suppression rule leaking.
 - useFriendLeaderboardRankDeltas now has no consumer on this surface; hook retained.
 - OPEN (ruling wanted): the flame and the viewing member's own row are both #F7931E,
   so on the viewer's own flamed row one colour carries two meanings.
+
+POSTED HISTORY SHEET — REBUILD (10 Sep 2026)
+- OPEN (labelling, on the COURSE page, not here): the course detail page's round count
+  for a course is EIGHTEEN-HOLE ONLY (gam_round_stats, holes_played = 18) and does not
+  say so. The posted-history sheet's per-course count includes nine-hole rounds because
+  it lists them, so Sundridge Park-West reads 76 in the sheet and 74 on the course page —
+  exactly that member's two nine-hole rounds. Neither figure is wrong; the course page
+  needs the basis stated. Nine-hole rows now carry "9 holes" on the date line here, so
+  the difference is visible from the sheet's side.
+- ONE COUNTER SET: is_counter as it arrives on useAllScores (whs_scores) is the single
+  source for both the posted-history sheet and RoundsThatCountSection. fetchCounters
+  (useCounters) survives for HandicapDashboard's rounds_counting analytics property only,
+  and its hard .limit(8) is gone — eight counters is a WHS rule at 20+ rounds, not a
+  schema fact.
