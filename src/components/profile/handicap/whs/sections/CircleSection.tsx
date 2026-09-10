@@ -48,6 +48,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
+import { SeeAllRow } from './SeeAllRow';
 import { HcpSection } from './HcpSection';
 import { CHART } from '../charts/tokens';
 import FullLeaderboardSheet from './friends-leaderboard-v2/FullLeaderboardSheet';
@@ -309,40 +310,11 @@ export const CircleSection: React.FC<Props> = ({ userId }) => {
           );
         })}
 
-        <button
-          type="button"
-          onClick={() => setSeeAllOpen(true)}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            marginTop: 12,
-            padding: '14px 0 0',
-            background: 'none',
-            border: 'none',
-            borderTopStyle: 'solid',
-            borderTopWidth: 1,
-            borderTopColor: CHART.BORDER,
-            color: CHART.MUTE,
-            textAlign: 'left',
-            cursor: 'pointer',
-            WebkitTapHighlightColor: 'transparent',
-          }}
-        >
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: '0.19em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('common:handicap.circle.section.seeAll', { count: total })}
-          </span>
-          <span style={{ fontSize: 11 }}>&rsaquo;</span>
-        </button>
+        {/* SNAGS_02 §2: the ONE extracted see-all row. Rule above only. */}
+        <SeeAllRow
+          label={t('common:handicap.circle.section.seeAll', { count: total })}
+          onPress={() => setSeeAllOpen(true)}
+        />
       </HcpSection>
 
       <FullLeaderboardSheet
