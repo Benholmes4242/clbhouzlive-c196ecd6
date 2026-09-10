@@ -21,6 +21,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
 import type { ActiveActor } from '@/types/actor';
 import { FIELD_REST_BG, FIELD_REST_BORDER, FIELD_FOCUS_BG, FIELD_FOCUS_BORDER } from '@/lib/tokens/field';
+import { readCommentDraft, writeCommentDraft, clearCommentDraft, COMMENT_DRAFT_DEBOUNCE_MS } from '../lib/commentDraft';
+
 
 /*
   DARK BASELINE (MICRO_BRIEF_COMMENTS_DARK §1). The comments sheet is no
