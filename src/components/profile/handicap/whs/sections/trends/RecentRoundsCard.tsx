@@ -195,12 +195,28 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
     ? rounds.find((r) => r.id === openScoreId)?.handicap_delta ?? null
     : null;
 
-  const handleLoadMore = () => setDisplayedCount((n) => n + LOAD_MORE_COUNT);
+  const handleLoadMore = useCallback(() => setDisplayedCount((n) => n + LOAD_MORE_COUNT), []);
 
-  const handleSetFilter = (next: FilterKey) => {
+  const handleSetFilter = (next: Filter) => {
     setFilter(next);
     setDisplayedCount(INITIAL_COUNT);
   };
+
+  // Auto-advance as the member approaches the end. The button below stays as
+  // the fallback for environments where the observer never fires.
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || !hasMore) return;
+    if (typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) handleLoadMore();
+      },
+      { rootMargin: '600px 0px' },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, [hasMore, handleLoadMore, visibleRounds.length]);
 
   const inSheet = variant === 'sheet';
 
