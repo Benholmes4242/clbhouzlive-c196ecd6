@@ -12,8 +12,10 @@
  *
  * NO Panel, and Panel itself is untouched (it is shared app-wide). The wrapper
  * and heading are the Course tab's — AboutSection + DiscoverSectionHeading,
- * neither modified. ShapeChart, ParTypeBars, HoleDataSheet, ConnectGhostPrompt
- * and PersonalReviewCard are all untouched; this tab stops calling them.
+ * neither modified. ShapeChart, ParTypeBars and PersonalReviewCard are all
+ * untouched; this tab stops calling them. HoleDataSheet was deleted on
+ * 10 Sep 2026 with the Holes tab; ConnectGhostPrompt is retained but
+ * unreferenced (see its header).
  *
  * RETIRED FROM THIS TAB (files kept): FieldHero and ReferencePanel — the
  * field's chart, its shots-over-par row and the par bars are the COURSE tab's
