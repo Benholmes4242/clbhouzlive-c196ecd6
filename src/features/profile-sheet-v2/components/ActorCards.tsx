@@ -146,7 +146,7 @@ export default function ActorCards({
               style={{
                 position: 'relative',
                 flexShrink: 0,
-                width: 220,
+                width: CARD_W,
                 background: A.PANEL,
                 borderRadius: 16,
                 padding: 14,
