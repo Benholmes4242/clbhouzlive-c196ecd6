@@ -744,36 +744,71 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    *    as "1st of 19"). It prints BEST instead, the same correction the
    *    neutral-best sentence carried.
    */
+  /**
+   * §C — ONE POOL PER PANEL. The member's rank here, this round against their
+   * other rounds here, and the index they carried INTO the round are all one
+   * pool: THE MEMBER'S OWN HISTORY AT THIS COURSE. They leave the header rail
+   * and become a titled section that states its own sample ("Your 7 rounds
+   * here"), so no figure sits beside a figure drawn from a different pool
+   * without a basis.
+   *
+   * The derivations are byte-for-byte the ones that were in the rail:
+   *  - rank 1 prints BEST, never "1st of 1".
+   *  - vs-avg is gated on avgToParOthers being non-null (the RPC returns null
+   *    when this is the member's only round here) — never on roundsHere > 1.
+   *  - INDEX THEN is `handicap_index_at_time`, the index the round was played
+   *    off. It is NOT the member's current index: the current index is a fact
+   *    about today, and putting it on a round from March claimed something
+   *    false. When the provider gave no index at the time, NOTHING renders —
+   *    there is no fallback to today's figure.
+   */
+  const courseSection = useMemo(() => {
+    const items: { key: string; value: string; label: string; tone?: string }[] = [];
+    if (isTour || !courseContext) return items;
+    const roundsHere = courseContext.roundsHere ?? 0;
+    if (courseContext.rankHere != null && roundsHere > 0) {
+      items.push({
+        key: 'rank',
+        value: courseContext.rankHere === 1
+          ? t('courses:scorecard.figBest')
+          : formatOrdinal(courseContext.rankHere),
+        label: t('courses:scorecard.figOf', { count: roundsHere }),
+      });
+    }
+    const avgOthers = courseContext.avgToParOthers;
+    if (avgOthers != null && totals.played) {
+      const diff = Math.round((totals.toPar - avgOthers) * 10) / 10;
+      items.push({
+        key: 'vsavg',
+        value: Math.abs(diff) < 0.05
+          ? 'E'
+          : diff < 0
+            ? `\u2212${Math.abs(diff).toFixed(1)}`
+            : `+${diff.toFixed(1)}`,
+        label: t('courses:scorecard.figVsAvg'),
+        tone: Math.abs(diff) < 0.05 ? EVEN_GRAY : toParColor(diff < 0 ? -1 : 1),
+      });
+    }
+    if (courseContext.indexAtTime != null) {
+      items.push({
+        key: 'indexthen',
+        value: formatHcp(courseContext.indexAtTime),
+        label: t('courses:scorecard.figIndexThen'),
+      });
+    }
+    return items;
+  }, [isTour, courseContext, totals, t]);
+
   const rail = useMemo(() => {
     const items: { key: string; value: string; label: string; tone?: string }[] = [];
-    if (!isTour && courseContext) {
-      const roundsHere = courseContext.roundsHere ?? 0;
-      if (courseContext.rankHere != null && roundsHere > 0) {
-        items.push({
-          key: 'rank',
-          value: courseContext.rankHere === 1
-            ? t('courses:scorecard.figBest')
-            : formatOrdinal(courseContext.rankHere),
-          label: t('courses:scorecard.figOf', { count: roundsHere }),
-        });
-      }
-      const avgOthers = courseContext.avgToParOthers;
-      const othersCount = Math.max(roundsHere - 1, 1);
-      void othersCount;
-      if (avgOthers != null && totals.played) {
-        const diff = Math.round((totals.toPar - avgOthers) * 10) / 10;
-        items.push({
-          key: 'vsavg',
-          value: Math.abs(diff) < 0.05
-            ? 'E'
-            : diff < 0
-              ? `\u2212${Math.abs(diff).toFixed(1)}`
-              : `+${diff.toFixed(1)}`,
-          label: t('courses:scorecard.figVsAvg'),
-          tone: Math.abs(diff) < 0.05 ? EVEN_GRAY : toParColor(diff < 0 ? -1 : 1),
-        });
-      }
-    }
+    /**
+     * THE BEAT-FIELD FIGURE STAYS IN THE RAIL FOR NOW (§E2/E3 HELD). It is the
+     * one figure on this sheet drawn from the FIELD pool rather than the
+     * member's own history, and it cannot state its basis until the field
+     * average can exclude the caller and report how many players it covers.
+     * Moving it and gating it is ONE change, made once that function exists —
+     * not two half-changes. Until then it renders exactly as it shipped.
+     */
     if (withField && beatFieldOn != null) {
       items.push({
         key: 'field',
@@ -782,14 +817,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       });
     }
     /**
-     * The tour position and the member's handicap index used to sit in the
-     * header's right column. The right column now belongs to the score, so
-     * they join the rail as figures rather than being dropped — the tour caller
-     * passes identityStat and would otherwise lose "T4".
+     * The tour position keeps the rail — a pro has no history section to move
+     * into. The member's CURRENT index no longer appears here at all when the
+     * course section renders: that section carries INDEX THEN, and showing both
+     * put two different indexes on one sheet.
      */
     if (identityStat) {
       items.push({ key: 'identity', value: identityStat.value, label: identityStat.label });
-    } else if (playerHcp != null) {
+    } else if (playerHcp != null && courseSection.length === 0) {
       items.push({
         key: 'hcp',
         value: formatHcp(playerHcp),
@@ -797,7 +832,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       });
     }
     return items;
-  }, [isTour, courseContext, totals, withField, beatFieldOn, fieldHoles.length, identityStat, playerHcp, t]);
+  }, [withField, beatFieldOn, fieldHoles.length, identityStat, playerHcp, courseSection.length, t]);
 
 
 
