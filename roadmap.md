@@ -435,15 +435,16 @@ until that function exists and is verified.
   vaul `Drawer` (4 consumers: `ui/drawer.tsx` shadcn wrapper, `FriendSheet`
   direct, `ScheduledPostsList`, `RankHistorySheet`). No consumer uses a vaul
   feature BottomSheet lacks — no snap points, no nested drawers, no scaled
-  background. Decision needed on which survives before any code moves
-  (CANON_03 §3c forbids consolidating in this brief).
+  background. CLOSED by BRIEF_SHEET_BACK_BEHAVIOUR §1: BottomSheet survives,
+  vaul retired, drawer.tsx on the dead-file list.
 - OPEN — HARDWARE BACK AND SHEETS. BottomSheet has no history handling: back
   or edge-swipe leaves the route with the sheet on it. Only URL-addressed
   sheets behave (handicap `?gam=`/`?sheet=`/`?score=`, course detail
-  `?sheet=`, college compare picker, auth form). Proposal delivered
-  10 Sep 2026, no code changed; awaiting ruling.
-- OPEN — `FriendSheet` renders `className="hcp-light"` on a dark surface.
-  Found while pointing BG_0 at SHEET_SURFACE; not touched.
+  `?sheet=`, college compare picker, auth form). CLOSED by
+  BRIEF_SHEET_BACK_BEHAVIOUR §2 — see that section, including the correction
+  that those URL sheets use replace, not push.
+- CLOSED — `FriendSheet` `className="hcp-light"` investigated under
+  BRIEF_SHEET_BACK_BEHAVIOUR §1d: inert, kept, nothing reads it.
 - CLOSED — All Holes empty distribution band draws nothing (was a 2px 28%
   stub). Local to `AllHolesSheet`, not shared.
 - CLOSED — every hardcoded `#15171F` replaced by a token from
@@ -451,6 +452,88 @@ until that function exists and is verified.
   STATUS_BAR_CANVAS). Two literals deliberately retained: the CSS root
   declarations of `--bg-page`/`--background`, and `CT_DARK.surface` (a ramp
   step on the composer's own darker canvas, not a page or sheet ground).
+
+## BRIEF_SHEET_BACK_BEHAVIOUR (10 Sep 2026)
+
+- CLOSED — VAUL RETIRED. `FriendSheet`, `RankHistorySheet` and
+  `ScheduledPostsList` now use `components/ui/BottomSheet`. Zero vaul
+  consumers remain in `src/`.
+- DEAD FILE LIST (not deleted, dependency untouched):
+  `src/components/ui/drawer.tsx` — the shadcn vaul wrapper, now unreferenced.
+  The `vaul` entry in package.json is left in place; removing a dependency is
+  the sweep's job and is not reversible the way a file is.
+- CLOSED — `hcp-light` ON FRIENDSHEET IS INERT AND WAS KEPT. `.hcp-light`
+  redefines the `--hcp-*` variables to light values AND applies
+  `background: var(--hcp-bg-0); color: var(--hcp-t-100)` to its scope. Nothing
+  in `src/components/friend-sheet/**` reads a `var(--hcp-*)` token (the parts
+  use hardcoded hexes in `parts/_shared/tokens.ts`, precisely because the sheet
+  portals outside `.hcp-dark`), and both the class background and colour lose
+  to BottomSheet's own `SHEET_SURFACE` (applied after caller styles) and the
+  inline `color: T100`. Removing it changes nothing on screen; kept so the
+  removal is a separate, visible change.
+- CLOSED — SHEET STACK, AUTOMATIC REGISTRATION. `src/components/ui/
+  sheetHistory.ts` owns one `history.pushState` marker per open sheet and pops
+  the top entry on `popstate`. `BottomSheet` pushes/pops from its existing
+  `open` + `onClose`, so no sheet author registers anything and none can
+  forget. Opt-out prop: `urlOwnsHistoryEntry`.
+- ONE MOUNTING PATTERN DEFEATED THE SINGLE-PRIMITIVE DEFAULT: the post
+  composer has its OWN sheet chrome at
+  `src/features/post-v2/components/BottomSheet.tsx` (StageComposer, ActorSheet,
+  AdjustSheet, CourseTagSheet, CoverFrameSheet, CreateSheetV3, DraftsSheetV2,
+  ScheduleSheetV2, ScheduledPostsSheetV2). It was wired into the SAME stack
+  rather than left silently unregistered. That primitive still has no
+  escape-key handling — backdrop tap and the X are its only dismiss paths.
+- CONTRADICTS THE BRIEF (§2 bullet 2, AT5). The six URL-addressed sheets do
+  NOT own a history entry: every one writes its param with
+  `setSearchParams(next, { replace: true })` — handicap `?gam=`/`?sheet=`/
+  `?score=` (HandicapPage.tsx:300-380, which also strips the param on arrival),
+  course detail `?sheet=rounds`/`?sheet=your-holes` (GolfClubView.tsx:136-148),
+  `?sheet=holes` (HowItPlays.tsx:260-278), college `?compare=`
+  (CollegeHubPage.tsx:72-110). Opting them out would make back LEAVE THE ROUTE
+  with the sheet still on screen — the bug the brief is closing. They are left
+  on automatic registration, close on ONE back, and `urlOwnsHistoryEntry`
+  exists unused for a future sheet that genuinely pushes.
+- CONTRADICTS THE BRIEF (§3). No sheet in the app confirms before discarding a
+  draft on backdrop tap or escape today — the strictest existing behaviour is
+  silent discard. Back routes through each sheet's own `onClose`, the same
+  function backdrop and escape call, so back is exactly as safe as the two
+  paths that already exist and introduces NO new data-loss path. Adding a
+  confirmation is a three-path change to the composer and forms; not done
+  unilaterally. OPEN.
+  - DRAFT-HOLDING: post composer `StageComposer` (caption/media), its stage
+    sheets `AdjustSheet`, `CoverFrameSheet`, `CourseTagSheet`, `ActorSheet`,
+    `ScheduleSheetV2` (date/time selection), `CreateSheetV3`,
+    `RequestCourseSheet` (name/location/note), `ClaimCourseSheet`,
+    `AddCourseModal`, `NewConversationSheet` (query/selected/title).
+  - SAFE TO CLOSE (read-only or write-on-tap, nothing typed to lose):
+    AllHolesSheet, YourHolesSheet, YourRoundsSheet, CardScorecardSheet,
+    CourseDirectorySheet, CourseStatsSheet, CourseNewsSheet, LatestReviewsSheet,
+    BoardSeeAllSheet, CoursesPlayedSeeAllSheet, FriendsRoundsSheet,
+    FriendsRoundsSeeAllSheet, FindGolfersSheet, RegionSheet, LikesSheet,
+    InviteFriendsSheet, SentInvitesSheet, FriendSheet, RankHistorySheet,
+    ScheduledPostsList, ScheduledPostsSheetV2, DraftsSheetV2, GamSheet,
+    CompareSheet, FlatBoardSheet, FullLeaderboardSheet, RecentRoundsCard,
+    RoundsArchiveSheet, Top100ListProgressSheet, Top100MoversSheet,
+    Top100VerdictExplainerSheet, CourseAnalyticsPanels, CourseCardPanel,
+    YourCourseAnalyticsSheet, HomeClubPickerSheet, PhotoActionSheet,
+    FeedActorPicker, PickerSheet, TourPickerSheet, InsightSheet, FullListSheet,
+    StatsSheet, TournamentsSection, AllTeeTimesSheet, CourseSection,
+    FullBoardSheet, MomentsSection, ConversationRow, ConversationSettingsSheet,
+    RatingFilterChips.
+- OPEN — §4 DEVICE TESTS NOT RUN. iOS PWA edge-swipe, Android hardware back
+  and long-press-back, app background/restore, and the media-viewer-over-feed
+  stack all need a signed-in device; this project is `external_unmanaged`, so
+  no authenticated runtime is available here. Verified in isolation instead
+  (stack harness, 10 Sep 2026): two stacked entries pop one at a time, then
+  history leaves the route; closing a sheet through its own UI unwinds only its
+  own entry and does not cascade to the parent.
+- REFRESH / SHARED URL: the pushed entry carries no URL change (state marker
+  only), so a refresh with a sheet open resolves to the underlying route and a
+  URL captured with a sheet open never sends anyone to a broken state.
+- FORWARD AFTER A BACK-DISMISS: forward does NOT reopen the sheet, and that is
+  the behaviour we want. A sheet is a transient view of the page beneath, not a
+  destination; a reopened sheet with stale data is worse than a page the member
+  can tap again.
 
 ## BRIEF_PROFILE_PASS_ONE §C — THE THREE ROUND COUNTS (10 Sep 2026)
 
