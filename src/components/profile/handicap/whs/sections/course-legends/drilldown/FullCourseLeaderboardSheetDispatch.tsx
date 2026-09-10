@@ -1,7 +1,7 @@
 /**
  * FullCourseLeaderboardSheetDispatch — the Champions tab's full leaderboard.
  *
- * Analytical treatment: 75dvh, kicker + title + plain close, the shared
+ * Analytical treatment: 85dvh, kicker + title + plain close, the shared
  * column-header row, then the SAME BoardRow the panel uses. No trophy
  * watermark, no tinted member row - the member takes amber name and value.
  */

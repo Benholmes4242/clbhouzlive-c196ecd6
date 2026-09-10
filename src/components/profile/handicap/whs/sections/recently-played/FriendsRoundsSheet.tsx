@@ -29,7 +29,8 @@ export const FriendsRoundsSheet: React.FC<Props> = ({
     <BottomSheet
       open={open}
       onClose={onClose}
-      maxHeight="75dvh"
+      /* No explicit height: BottomSheet's default IS 85dvh, which is what
+         every other sheet in the handicap area renders at. */
       variant="dark"
       surfaceColor={CHART.CANVAS}
       style={{ color: CHART.INK, overflow: 'hidden' }}

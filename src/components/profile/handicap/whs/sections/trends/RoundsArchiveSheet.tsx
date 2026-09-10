@@ -1,5 +1,5 @@
 /**
- * RoundsArchiveSheet - the full posted history, at 75dvh.
+ * RoundsArchiveSheet - the full posted history, at 85dvh (the area's one sheet height, and BottomSheet's default).
  *
  * The Rounds tab is gone; its list lives here, opened from RoundsArchivePanel
  * on Form. RecentRoundsCard is rendered in `variant="sheet"` so its filter
