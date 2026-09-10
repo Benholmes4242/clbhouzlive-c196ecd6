@@ -52,6 +52,18 @@
     }
   },
   "career": {
-    "seasonBestScoped": "BESTE {{year}}"
+    "seasonBestScoped": "BESTE {{year}}",
+    "recordsKicker": "PLATZREKORDE",
+    "recordsCourses": "{{n}} PLAETZE",
+    "recordsWon": "GEWONNEN",
+    "recordsUncontested": "OHNE GEGNER",
+    "recordsHeld": "REKORDE",
+    "recordsDefinition": "Ein Rekord ist gewonnen, wenn auch andere den Platz gespielt haben. Die uebrigen bestehen, weil noch niemand dort war.",
+    "recordsNoFieldData": "Gehaltene Platzrekorde. Wie viele gegen ein Feld gewonnen wurden, ist noch nicht gemessen.",
+    "recordsWonAgainst": "Gegen {{n}} andere Golfer hier gewonnen",
+    "recordsFewOthers": "Nur {{n}} andere Golfer haben hier gespielt",
+    "recordsOneOther": "Nur 1 anderer Golfer hat hier gespielt",
+    "recordsNobodyElse": "Sonst hat hier noch niemand gespielt",
+    "recordsSeeAll": "ALLE {{n}} PLAETZE"
   }
 }

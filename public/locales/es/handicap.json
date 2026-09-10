@@ -52,6 +52,18 @@
     }
   },
   "career": {
-    "seasonBestScoped": "MEJOR {{year}}"
+    "seasonBestScoped": "MEJOR {{year}}",
+    "recordsKicker": "RECORDS DE CAMPO",
+    "recordsCourses": "{{n}} CAMPOS",
+    "recordsWon": "GANADOS",
+    "recordsUncontested": "SIN RIVALES",
+    "recordsHeld": "RECORDS",
+    "recordsDefinition": "Un record se gana cuando alguien mas ha jugado el campo. El resto se mantienen porque nadie ha estado alli todavia.",
+    "recordsNoFieldData": "Records de campo en tu poder. Cuantos se ganaron ante rivales aun no se mide.",
+    "recordsWonAgainst": "Ganado ante {{n}} otros golfistas aqui",
+    "recordsFewOthers": "Solo {{n}} otros golfistas han jugado aqui",
+    "recordsOneOther": "Solo 1 otro golfista ha jugado aqui",
+    "recordsNobodyElse": "Nadie mas ha jugado aqui todavia",
+    "recordsSeeAll": "VER LOS {{n}} CAMPOS"
   }
 }
