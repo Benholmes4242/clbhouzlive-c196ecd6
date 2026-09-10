@@ -14,18 +14,22 @@
  * THE TWO FIGURES COUNT RECORDS, NOT COURSES (ruled 10 Sep 2026). They sum to
  * the same total the sheet showed before the split -- 67 for member 8c240997 --
  * so the headline keeps continuity with the figure the member already knows and
- * answers "of my sixty-seven records, how many did I actually win?". WON = 10
- * records at the 4 courses with FIELD_MIN_PLAYERS+ other golfers; UNCONTESTED =
- * 57 at the other 18. The COURSE count stays in the meta ("{n} courses") and
+ * answers "of my sixty-seven records, how many did I actually win?". WON = 49
+ * records at the 19 courses where at least one other golfer has played;
+ * UNCONTESTED = 18 at the 3 where nobody has. The COURSE count stays in the
+ * meta ("{n} courses") and
  * must never move into the headline: a courses split would shrink the figure
  * from 67 to 22 for reasons that have nothing to do with contest.
  *
- * THE THRESHOLD IS NOT LOCAL. Contested means FIELD_MIN_PLAYERS or more
- * distinct players with a scored round at the course EXCLUDING the holder --
- * the same constant and the same count the scorecard sheet's field row uses
- * (src/lib/gam/fieldGate.ts). No second player count is computed here: when the
- * batched read is unavailable the section states record counts and NOTHING
- * about contest.
+ * THE THRESHOLD IS NOT LOCAL, AND IT IS NOT THE FIELD THRESHOLD. Contested here
+ * means CROWN_MIN_OTHERS (1) or more distinct players with a scored round at the
+ * course EXCLUDING the holder. That is deliberately NOT the scorecard's
+ * FIELD_MIN_PLAYERS (5): a field row gates an AVERAGE, a record gates a CONTEST,
+ * and one other golfer on the board is a contest you won. Both constants and the
+ * reason they differ live in src/lib/gam/fieldGate.ts. The player COUNT is
+ * shared with the scorecard; only the floor differs. No second player count is
+ * computed here: when the batched read is unavailable the section states record
+ * counts and NOTHING about contest.
  *
  * A ZERO from that read may mean "not mapped", not "nobody else has played".
  * Both are uncontested so this section is safe; nothing else may reuse the zero.
@@ -40,7 +44,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { REC, LABEL } from '../tokens';
 import { Panel, RowButton, Figure, Collapsible, MetaLabel } from '../Primitives';
-import { FIELD_MIN_PLAYERS, hasField } from '@/lib/gam/fieldGate';
+import { CROWN_MIN_OTHERS, hasContest, hasField } from '@/lib/gam/fieldGate';
 import type { CourseCrownGroup } from './CrownsPanel';
 import type { CareerData } from '../types';
 
@@ -49,7 +53,13 @@ interface Props {
   groups: CourseCrownGroup[];
 }
 
-/** A row's contest state. `unknown` = the batched field read is unavailable. */
+/**
+ * A row's contest state. `unknown` = the batched field read is unavailable.
+ *
+ * FOUR COPY BANDS, UNCHANGED: alone / one / few (2-4) / won (5+) each keep their
+ * own sentence, because the SIZE of a contest is worth showing. What changed is
+ * which of them counts as WON in the headline: everything except `alone`.
+ */
 type Contest =
   | { kind: 'unknown' }
   | { kind: 'won'; others: number }
@@ -63,10 +73,14 @@ export function contestOf(
 ): Contest {
   if (!available || others === undefined) return { kind: 'unknown' };
   if (hasField(others)) return { kind: 'won', others };
-  if (others <= 0) return { kind: 'alone' };
+  if (others < CROWN_MIN_OTHERS) return { kind: 'alone' };
   if (others === 1) return { kind: 'one' };
   return { kind: 'few', others };
 }
+
+/** WON in the headline: a record beaten somebody. Only `alone` is uncontested. */
+const isWon = (c: Contest): boolean =>
+  c.kind === 'won' || c.kind === 'few' || c.kind === 'one';
 
 export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   const { t } = useTranslation('handicap');
@@ -82,7 +96,7 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
 
   // Contested first, each band by record count descending, then by name so the
   // order is stable between renders.
-  const rank = (c: Contest) => (c.kind === 'won' ? 0 : 1);
+  const rank = (c: Contest) => (isWon(c) ? 0 : 1);
   const ordered = [...rows].sort((a, b) => {
     if (rank(a.contest) !== rank(b.contest)) return rank(a.contest) - rank(b.contest);
     if (b.group.records.length !== a.group.records.length)
@@ -91,10 +105,10 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   });
 
   const won = rows
-    .filter((r) => r.contest.kind === 'won')
+    .filter((r) => isWon(r.contest))
     .reduce((sum, r) => sum + r.group.records.length, 0);
   const uncontested = rows
-    .filter((r) => r.contest.kind !== 'won' && r.contest.kind !== 'unknown')
+    .filter((r) => r.contest.kind === 'alone')
     .reduce((sum, r) => sum + r.group.records.length, 0);
   const total = rows.reduce((sum, r) => sum + r.group.records.length, 0);
 
@@ -193,5 +207,5 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   );
 };
 
-export { FIELD_MIN_PLAYERS };
+export { CROWN_MIN_OTHERS, hasContest };
 export default CourseRecordsPanel;
