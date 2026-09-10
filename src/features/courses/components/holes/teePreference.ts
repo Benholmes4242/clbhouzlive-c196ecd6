@@ -5,6 +5,7 @@
  *   On 6 Aug 2026 the old "course tee card" (CourseTeeCard.tsx, Holes tab) was
  *   DELIBERATELY replaced by the analytical Course card, CourseCardPanel, which
  *   carries the same tee list and the same pick behaviour. CourseHolesTab
+ *   (deleted 10 Sep 2026 with the rest of the Holes tab)
  *   stopped mounting the tee card and its only remaining caller passed
  *   showTeeCard={false}. The replacement was not a regression: tee selection is
  *   alive on the About tab and in Discover.

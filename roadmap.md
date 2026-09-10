@@ -174,8 +174,21 @@
 - Comment species, third instance this week: a comment ASSERTING A RELATIONSHIP THAT HAD ALREADY BEEN SEVERED. WindowToggle's header claimed the live drilldown still owned it long after the drilldown stopped importing it. Moot now the file is gone; the species is not.
 
 ## Open — Champions has no connect prompt for unconnected members
-- Champions drilldown has no connect prompt for unconnected members; the handicap page's not-connected pattern is the model.
+- TWO surfaces now make no case at all to unconnected members: the Champions drilldown AND the course pages (the Holes tab carried the prompt until 10 Sep 2026). The handicap page's not-connected state is the pattern; src/components/handicap/ConnectGhostPrompt.tsx is the retained component to rebuild from.
 - Roughly four in five accounts have never connected a handicap. They see a board they cannot appear on and no route to appearing on it. ChampionsInfoCarousel carried that prompt; the explainer copy survives as WhatCounts, the prompt does not. Not rebuilt in the sweep by decision.
+
+## Sweep — course Holes tab retired, 10 Sep 2026 (11 files)
+- DELETED, one commit: CourseHolesTab (155), HoleDataSheet (1319), ScoringBreakdownSection (1344), HolesEmptyState (25), HoleGlyph (117), analytical/HoleRows (183), HoleFeatureCards (184), PersonalHoleFeatureCards (112), BirdieMapSummary (96), HolesCredibilityHeader (50), HolesScoringKey (61) — 3646 lines.
+- KEPT LIVE: src/pages/CourseHolesPage.tsx, the redirect from /courses/:courseId/holes into ?sheet=holes. The URL is in the wild.
+- Deleting HoleGlyph CLOSES the open item about a fourth scoring-mark grammar. It was scoped as its own piece of work; the answer turned out to be that it dies with the tab it served. ScoreMark's shared list no longer names the Holes legend.
+- RETAINED WITH WRITTEN REASON, not swept: AddHolePhotoRow, HolePhotoGallery (live admin queue reviewing a closed stream) and ConnectGhostPrompt (model for the connect-prompt gap). Header comments say so on each file.
+- Typecheck and full production build pass. CourseDetailPage chunk 197.86 kB.
+
+## Open — member hole-photo submission has no surface
+- The only member upload/display path (AddHolePhotoRow, HolePhotoGallery) went unreferenced when the Holes tab was retired. useHolePhotoQueue, HolePhotoReviewSheet and the InboxPage triage counts are still live and can never receive another item. Capability decision, not cleanup.
+
+## Practice — leave a route behind when a surface comes off
+- The redirect at CourseHolesPage is the ONLY reason the Holes tab was decidable: a live route saying where the surface went is written evidence of a deliberate retirement. Two other surfaces retired this week left nothing written down and had to be reconstructed from import graphs. Do this deliberately next time something comes off a page.
 
 ## Handicap one-page brief — dead list (files below are now DELETED)
 - src/components/profile/handicap/whs/sections/LastRoundCard.tsx (whole file, off the page at Section D)

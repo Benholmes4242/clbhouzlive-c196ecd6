@@ -31,7 +31,6 @@ import {
  * Shared across (all dark):
  *  - Card scorecard sheet (CardScorecardSheet)
  *  - Handicap round card strip (RoundCardHoleStrip)
- *  - Course Holes tab legend (HolesScoringKey)
  *  - Clubhouse feed round card (PostRoundCard)
  *
  * An ace has no bespoke branch: its mark is derived from strokes minus par.

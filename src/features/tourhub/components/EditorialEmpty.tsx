@@ -1,8 +1,8 @@
 /**
  * EditorialEmpty — story-driven empty state for tournament detail tabs.
  *
- * Visual language matches the course-detail empty states (HolesEmptyState;
- * also the Champions empty state, deleted 10 Sep 2026): centred squircle
+ * Visual language matches the course-detail empty states (HolesEmptyState
+ * and the Champions empty state, both deleted 10 Sep 2026): centred squircle
  * icon-tile → amber dot-eyebrow →
  * 20px/800 ink headline → slate body → optional amber accent pill.
  *

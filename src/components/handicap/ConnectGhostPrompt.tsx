@@ -1,4 +1,13 @@
 /**
+ * RETAINED DELIBERATELY - DO NOT SWEEP ON REACHABILITY.
+ *
+ * Unreferenced since the Champions drilldown (Sep 2026) and the course Holes
+ * tab (10 Sep 2026) were retired. Kept as the model for closing the
+ * connect-prompt gap on BOTH surfaces: Champions and the course pages
+ * currently make no case at all to members with no WHS link. The handicap
+ * page's not-connected state is the pattern to follow.
+ */
+/**
  * ConnectGhostPrompt — the persuasive connect-your-WHS-handicap prompt.
  *
  * THE RULE (BRIEF_CONNECT_GATE_HONOURS_BOARD, overturning the original blurred
