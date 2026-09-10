@@ -164,6 +164,8 @@
 - src/components/profile/handicap/whs/sections/last-round-card/CinemaCardMedia.tsx (whole file)
 - src/components/profile/handicap/whs/sections/last-round-card/LastRoundHeroCard.tsx:60-120 (scrim + masked blur layers)
 - src/components/profile/handicap/whs/sections/RoundsThatCountCard.tsx (whole file, off the page at Section E; still imported by views/TrendsView.tsx:2,52, which no route on the one-page handicap area renders). Inside it specifically: :125-128 the projectNextRound call at length >= 8, :279-289 the next-round footer figures, :302-308 the drop queue, :316-323 the legend/queue copy.
+- src/components/profile/handicap/whs/sections/trends/StablefordCard.tsx — the POINTS half only, off the page at Section F: :324-497 PointsBody, of which :397-426 is the distribution ring, :428-487 the band chips this section restates flat, :489-494 plus ScoringRangeBlock the SCORING RANGE strip, :278-315 the 30D/90D/ALL scope chips, :239-276 the POINTS/SCORE STATS toggle. The SHOTS half (:649-886 ShotsBody, :897+ MilestoneLadder) is NOT dead — it has no other home on the page and awaits a ruling. Whole file still mounted by views/TrendsView.tsx:9,65.
+- src/components/profile/handicap/whs/sections/trends/computeStablefordDistribution.ts (whole file, off the page at Section F; it never reads is_nine_hole). Still used by StablefordCard and StablefordDetailSheet.
 
 ## Open item — nine-hole disclosure beyond the handicap page
 - Feed round card, friends' rounds rows, compare sheet, Discover board rows and profile round rows print gross/stableford without reading is_nine_hole or total_holes. Scope named, not fixed.
