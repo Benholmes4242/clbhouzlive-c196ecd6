@@ -12,8 +12,13 @@ import { cn } from '@/lib/utils';
 import { A, SANS, Panel, StatRow, Action } from '@/features/courses/components/holes/analytical/tokens';
 
 interface JourneySummaryCardProps {
-  coursesPlayed: number;
-  countriesPlayed: number;
+  /**
+   * Distinct `user_course_activity` courses. NULL means the read failed or has
+   * not run: the figure is unknown and the label renders without one. Only a
+   * fetched 0 is "no courses yet" and reaches the empty state below.
+   */
+  coursesPlayed: number | null;
+  countriesPlayed: number | null;
   avgRating: number | null;
   top100Played?: number | null;
   isOwnProfile: boolean;
@@ -72,8 +77,9 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   }
 
   const items = [
-    { label: t('legacy.played', { defaultValue: 'PLAYED' }), value: String(coursesPlayed) },
-    ...(countriesPlayed > 0
+    // Unknown renders the label with no figure. A dash would read as a value.
+    { label: t('legacy.played', { defaultValue: 'PLAYED' }), value: coursesPlayed == null ? '' : String(coursesPlayed) },
+    ...(countriesPlayed != null && countriesPlayed > 0
       ? [{ label: t('legacy.countries', { defaultValue: 'COUNTRIES' }), value: String(countriesPlayed) }]
       : []),
     ...(top100Played != null && top100Played > 0
