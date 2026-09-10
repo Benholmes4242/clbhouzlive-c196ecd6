@@ -50,5 +50,32 @@
       "headlineRounds": "{{rounds}} rounds, all here.",
       "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
     }
+  },
+  "career": {
+    "seasonBestScoped": "BEST {{year}}",
+    "recordsKicker": "COURSE RECORDS",
+    "recordsCourses": "{{n}} COURSES",
+    "recordsWon": "WON",
+    "recordsUncontested": "UNCONTESTED",
+    "recordsHeld": "RECORDS HELD",
+    "recordsDefinition": "A record is won where someone else has played the course too. The rest are held because nobody has been there yet.",
+    "recordsNoFieldData": "Course records held. How many were won against a field is not measured yet.",
+    "recordsWonAgainst": "Won against {{n}} other golfers here",
+    "recordsFewOthers": "Only {{n}} other golfers have played here",
+    "recordsOneOther": "Only 1 other golfer has played here",
+    "recordsNobodyElse": "Nobody else has played here yet",
+    "recordsSeeAll": "SEE ALL {{n}} COURSES",
+    "countingKicker": "COUNTING STATS",
+    "countingComplete": "{{n}} OF {{total}} COMPLETE",
+    "allTiersReached": "All tiers reached",
+    "tierProgress": "{{n}} more for tier {{next}} · tier {{reached}} of {{total}}",
+    "tierReached": "Tier {{tier}} reached {{when}}",
+    "top100Kicker": "TOP 100 LISTS",
+    "top100Basis": "COURSES PLAYED OF EACH LIST OF 100",
+    "top100NotStarted": "Not started",
+    "milestonesKicker": "MILESTONES",
+    "milestonesReached": "{{n}} OF {{total}} REACHED",
+    "milestoneReachedAt": "Reached {{when}}",
+    "milestonesSeeAll": "SEE ALL {{n}}"
   }
 }

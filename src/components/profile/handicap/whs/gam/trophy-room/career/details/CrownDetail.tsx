@@ -37,7 +37,7 @@ export const CrownDetail: React.FC<Props> = ({ data, group, onBack }) => {
         {group.courseName}
       </h3>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, margin: '12px 0 6px' }}>
-        <Figure value={group.records.length} size={34} color={REC.AMBER} />
+        <Figure value={group.records.length} size={34} color={REC.INK} />
         <span style={{ fontSize: 13, color: REC.MUTE }}>
           {group.records.length === 1 ? 'record held here' : 'records held here'}
         </span>
@@ -58,7 +58,7 @@ export const CrownDetail: React.FC<Props> = ({ data, group, onBack }) => {
               <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 700, color: REC.INK }}>
                 {record.name}
               </span>
-              <Figure value={record.formattedValue} size={16} color={REC.AMBER} />
+              <Figure value={record.formattedValue} size={16} color={REC.INK} />
             </div>
             <div style={{ marginTop: 4, fontSize: 11.5, color: REC.MUTE, ...REC.TABULAR }}>
               Held since {monthYear(record.attainedAt)}

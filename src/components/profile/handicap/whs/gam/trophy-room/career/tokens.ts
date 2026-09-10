@@ -4,9 +4,11 @@
  * Literal values (not var(--hcp-*)) because the room renders inside a
  * portalled bottom sheet where the page scope does not resolve.
  *
- * COLOUR RULES, and there are only two:
- *   AMBER means a threshold passed, a record held, or the viewing member.
- *   GOOD (green) means a measured share that is favourable.
+ * COLOUR RULES, and there are only three:
+ *   INK is every figure. This whole sheet IS the viewing member, so amber on a
+ *   figure here distinguishes them from nobody and makes each one shout equally.
+ *   GOOD (green) means a completed ladder or a reached milestone, nothing else.
+ *   AMBER survives only as a BAR FILL -- a bar is a state, not an identity.
  * Nothing else on this surface carries colour.
  */
 import { CHART, CHART_FONT } from '../../../charts/tokens';
@@ -36,27 +38,35 @@ export const REC = {
   },
 } as const;
 
+/**
+ * TYPE SCALE, and it is the whole scale: section headline 21, head figure 24,
+ * row figures 16, small 11-13. Kicker 9/700/0.19em. Row kicker 9/700/0.12em.
+ * A call site that wants a size not on this list is a signal the treatment is
+ * wrong, not that the scale is short.
+ */
 export const KICKER = {
-  fontSize: 11,
+  fontSize: 9,
   fontWeight: 700,
-  letterSpacing: '0.16em',
+  letterSpacing: '0.19em',
   textTransform: 'uppercase' as const,
-  color: 'rgba(255,255,255,0.62)',
+  color: REC.DIM,
 };
 
+/** Row kicker: same size, tighter tracking, so it sits under a name not over it. */
 export const LABEL = {
-  fontSize: 11,
+  fontSize: 9,
   fontWeight: 700,
-  letterSpacing: '0.13em',
+  letterSpacing: '0.12em',
   textTransform: 'uppercase' as const,
   color: REC.DIM,
 };
 
 export const CAPTION = {
-  fontSize: 12.5,
-  lineHeight: 1.5,
+  fontSize: 13,
+  lineHeight: 1.55,
   color: REC.MUTE,
 };
+
 
 export const FIGURE = {
   fontWeight: 700,

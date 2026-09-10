@@ -86,7 +86,7 @@ export const CrownsPanel: React.FC<Props> = ({ data, groups }) => {
                   {group.courseName}
                 </span>
                 <span style={{ ...REC.TABULAR, fontSize: 11.5, color: REC.MUTE }}>
-                  <Figure value={group.records.length} size={18} color={REC.AMBER} />{' '}
+                  <Figure value={group.records.length} size={18} color={REC.INK} />{' '}
                   {plural(group.records.length, 'record', 'records')}
                 </span>
               </div>

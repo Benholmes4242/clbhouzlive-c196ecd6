@@ -50,5 +50,32 @@
       "headlineRounds": "{{rounds}} rounds, all here.",
       "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
     }
+  },
+  "career": {
+    "seasonBestScoped": "BESTE {{year}}",
+    "recordsKicker": "PLATZREKORDE",
+    "recordsCourses": "{{n}} PLAETZE",
+    "recordsWon": "GEWONNEN",
+    "recordsUncontested": "OHNE GEGNER",
+    "recordsHeld": "REKORDE",
+    "recordsDefinition": "Ein Rekord ist gewonnen, wenn auch andere den Platz gespielt haben. Die uebrigen bestehen, weil noch niemand dort war.",
+    "recordsNoFieldData": "Gehaltene Platzrekorde. Wie viele gegen ein Feld gewonnen wurden, ist noch nicht gemessen.",
+    "recordsWonAgainst": "Gegen {{n}} andere Golfer hier gewonnen",
+    "recordsFewOthers": "Nur {{n}} andere Golfer haben hier gespielt",
+    "recordsOneOther": "Nur 1 anderer Golfer hat hier gespielt",
+    "recordsNobodyElse": "Sonst hat hier noch niemand gespielt",
+    "recordsSeeAll": "ALLE {{n}} PLAETZE",
+    "countingKicker": "ZAEHLSTATISTIKEN",
+    "countingComplete": "{{n}} VON {{total}} KOMPLETT",
+    "allTiersReached": "Alle Stufen erreicht",
+    "tierProgress": "{{n}} mehr fuer Stufe {{next}} · Stufe {{reached}} von {{total}}",
+    "tierReached": "Stufe {{tier}} erreicht {{when}}",
+    "top100Kicker": "TOP 100 LISTEN",
+    "top100Basis": "GESPIELTE PLAETZE JE LISTE VON 100",
+    "top100NotStarted": "Nicht begonnen",
+    "milestonesKicker": "MEILENSTEINE",
+    "milestonesReached": "{{n}} VON {{total}} ERREICHT",
+    "milestoneReachedAt": "Erreicht {{when}}",
+    "milestonesSeeAll": "ALLE {{n}}"
   }
 }

@@ -50,5 +50,32 @@
       "headlineRounds": "{{rounds}} rounds, all here.",
       "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
     }
+  },
+  "career": {
+    "seasonBestScoped": "MEJOR {{year}}",
+    "recordsKicker": "RECORDS DE CAMPO",
+    "recordsCourses": "{{n}} CAMPOS",
+    "recordsWon": "GANADOS",
+    "recordsUncontested": "SIN RIVALES",
+    "recordsHeld": "RECORDS",
+    "recordsDefinition": "Un record se gana cuando alguien mas ha jugado el campo. El resto se mantienen porque nadie ha estado alli todavia.",
+    "recordsNoFieldData": "Records de campo en tu poder. Cuantos se ganaron ante rivales aun no se mide.",
+    "recordsWonAgainst": "Ganado ante {{n}} otros golfistas aqui",
+    "recordsFewOthers": "Solo {{n}} otros golfistas han jugado aqui",
+    "recordsOneOther": "Solo 1 otro golfista ha jugado aqui",
+    "recordsNobodyElse": "Nadie mas ha jugado aqui todavia",
+    "recordsSeeAll": "VER LOS {{n}} CAMPOS",
+    "countingKicker": "ESTADISTICAS",
+    "countingComplete": "{{n}} DE {{total}} COMPLETOS",
+    "allTiersReached": "Todos los niveles alcanzados",
+    "tierProgress": "{{n}} mas para el nivel {{next}} · nivel {{reached}} de {{total}}",
+    "tierReached": "Nivel {{tier}} alcanzado {{when}}",
+    "top100Kicker": "LISTAS TOP 100",
+    "top100Basis": "CAMPOS JUGADOS DE CADA LISTA DE 100",
+    "top100NotStarted": "Sin empezar",
+    "milestonesKicker": "HITOS",
+    "milestonesReached": "{{n}} DE {{total}} ALCANZADOS",
+    "milestoneReachedAt": "Alcanzado {{when}}",
+    "milestonesSeeAll": "VER LOS {{n}}"
   }
 }

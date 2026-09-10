@@ -30,7 +30,7 @@ export const CareerHeader: React.FC<Props> = ({ data }) => {
           margin: '8px 0 0',
           fontSize: 24,
           fontWeight: 700,
-          letterSpacing: '-0.02em',
+          letterSpacing: '-0.03em',
           color: REC.INK,
         }}
       >

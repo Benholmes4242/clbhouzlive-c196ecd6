@@ -301,3 +301,16 @@ OPEN ITEMS
   ?sheet= reader was dropped, not from the August link change. The client alias
   STAYS permanently after the Part 2 dispatcher change: it is what keeps the 591
   already-delivered notifications working.
+
+## Trophy room / career record rebuild (sections A-F)
+- OPEN: `get_course_field_sizes(uuid[], uuid)` batched read is NOT deployed. Until Ben runs it,
+  CourseRecordsPanel states record counts only and claims no won/uncontested split. Per-course
+  `get_course_hole_field` calls were rejected: 255 courses = 255 round trips on one list.
+- OPEN (reported, not fixed): head says 245 rounds (gam_round_stats, owner, limit 1000) vs the
+  handicap hole sections' 243. Same open reconciliation item.
+- OPEN (correctness, not labelling): gam_user_badges.earned_at looks like a bulk evaluation
+  artefact for the July 2026 cluster - 218 rows across 16 members on 2026-07-24 spread over 131
+  distinct seconds. The date is now labelled "Tier {n} reached {month}", but if that column is a
+  backfill stamp it should not render at all. Needs a data ruling.
+- Dead list: CrownsPanel.tsx (replaced by CourseRecordsPanel), useCourseFieldSizes.ts (legacy
+  crown-HOLDER head count, still read by CrownDetail's field line). Neither deleted.

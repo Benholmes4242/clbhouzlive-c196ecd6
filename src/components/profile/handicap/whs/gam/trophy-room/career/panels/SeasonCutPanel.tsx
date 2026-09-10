@@ -27,7 +27,7 @@ export const SeasonCutPanel: React.FC<Props> = ({ rounds }) => {
   const cells: Array<{ label: string; value: string | number }> = [
     { label: t('career.seasonRounds'), value: cut.rounds },
     { label: t('career.seasonBirdies'), value: cut.birdies },
-    ...(cut.best !== null ? [{ label: t('career.seasonBest'), value: cut.best }] : []),
+    ...(cut.best !== null ? [{ label: t('career.seasonBestScoped', { year }), value: cut.best }] : []),
   ];
 
   return (
@@ -47,7 +47,7 @@ export const SeasonCutPanel: React.FC<Props> = ({ rounds }) => {
           >
             <MetaLabel>{cell.label}</MetaLabel>
             <div style={{ marginTop: 4 }}>
-              <Figure value={cell.value} size={20} color={REC.AMBER} />
+              <Figure value={cell.value} size={21} color={REC.INK} />
             </div>
           </div>
         ))}

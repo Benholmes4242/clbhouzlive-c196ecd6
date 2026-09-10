@@ -79,7 +79,7 @@ export const Top100Detail: React.FC<Props> = ({ data, item, onBack }) => {
         {item.name}
       </h3>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, margin: '12px 0 8px' }}>
-        <Figure value={count} size={40} color={count > 0 ? REC.AMBER : REC.DIM} />
+        <Figure value={count} size={40} color={count > 0 ? REC.INK : REC.DIM} />
         <span style={{ fontSize: 13, color: REC.MUTE, ...REC.TABULAR }}>of 100 played</span>
       </div>
       <Bar pct={count} />
