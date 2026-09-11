@@ -1142,3 +1142,53 @@ thruLabel derives from the leader's own thru through the canonical
 features/tourhub/utils/formatThruDisplay.ts (F, stale F, shotgun, status
 overrides all handled), and totalRounds comes off num_rounds instead of the
 "LPGA is 54 holes, everything else 4" guess on the line above.
+
+## BRIEF_TOUR_OVERVIEW_STRUCTURAL — sections F and G
+
+### F. College Franchise compressed, and instrumented
+`src/features/tourhub/overview/sections/CollegeFranchise.tsx` now renders kicker,
+meta "All franchises", one 14/1.5 sentence with the leader bold, three 16px
+tabular figures under 0.12em name kickers, and a terminal ALL FRANCHISES row.
+Roughly 120px where the Open Duel treatment ran to roughly 700.
+
+RETIRED TO THE DEAD LIST (line ranges in the PREVIOUS revision of that file,
+499 lines; nothing deleted from disk beyond this file's own render blocks, and
+the full treatment still lives behind /tourhub?tab=college):
+- :60-102 SchoolSquircle — the logo pair's renderer.
+- :265-296 the duel row, including :285 the VS mark.
+- :416-497 DuelSide — the two captain rows (:464-491 the captain button).
+- :298-323 the tug bar and its two earnings ends.
+- :326-410 the hairline, AND BEHIND THEM label and ranks 3-5 rows with the
+  blurred brand haloes.
+Hooks no longer read HERE but untouched on disk and still read by the college
+pages: `useFranchiseCaptains`, `getCollegeLogoUrl`, `getCollegeColor`,
+`liftedBrandAlpha`, `getPlayerHeadshotCandidates`, `SquircleAvatar`.
+Locale keys now unused by this surface but KEPT: vs, tugLabel, captainLabel,
+captainSuffix, behindThem, rowMeta, rowMetaWithCaptain, onTour*, supporting*,
+headline* (the editorial headline chain still supplies the sentence).
+
+INSTRUMENTATION — this is the part that matters more than the compression.
+Ben's ruling was "keep it if it works", which is only answerable if something
+counts whether anyone reaches the foot of this page:
+- `tour_overview_college_view` — IntersectionObserver at threshold 0.5 on the
+  rendered body, once per mount. NOT on mount: LazySection mounts the section
+  200px early, so a mount is not a view. Never fires from the loading hold.
+- `tour_overview_college_tap` — the terminal row only, with target
+  `all_franchises`. Reach, then intent.
+Both write through `analyticsEvents.track` (bot-filtered, non-blocking).
+FIRST READING IS THE BASELINE: view count vs page-view count answers reach; tap
+over view answers whether the compressed section earns its place.
+
+### G. The provenance line
+`OverviewPageV3.tsx` foot: hairline, then "Leaderboards and rankings from the
+tours. Ratings from clbhouz members." at 10/T40 (rgba(248,250,252,0.40)), on the
+20px overview gutter. Six locales, key `overview.page.footerLicence`.
+
+### E2 note — the Wire gutter stays at 16, and this page is now a CONSUMER
+See the LeadStory/StoryRow gutter workaround. Inside a card the 16-versus-20
+difference was invisible; on the flat overview every section kicker lines up
+except the Wire's. The header was deliberately NOT pushed to 20 while its body
+carries the 14px LeadStory frame — a misaligned header and body is worse than a
+section 4px out from its neighbours. Whoever unwinds LeadStory with an additive
+`gutter` prop now has TWO surfaces to verify, and the Tour Hub overview is the
+one where the misalignment shows.

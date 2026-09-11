@@ -166,7 +166,8 @@
       "filterAriaLabel": "Filter section by tour"
     },
     "page": {
-      "offlineBanner": "You're offline. Some data may be outdated."
+      "offlineBanner": "You're offline. Some data may be outdated.",
+      "footerLicence": "Leaderboards and rankings from the tours. Ratings from clbhouz members."
     },
     "hero": {
       "prevAria": "Previous tournament",
@@ -384,7 +385,10 @@
       "headlineRunaway": "<0>{{leader}} runs away with it.</0>",
       "headlineClosing": "<0>{{leader}} leads. {{chaser}} is closing.</0>",
       "rowMetaWithCaptain": "{{count}} on tour · {{captain}} captains",
-      "rowMeta": "{{count}} on tour"
+      "rowMeta": "{{count}} on tour",
+      "summaryWide": "<0>{{leader}}</0> leads all franchises on {{amount}} in season alumni earnings, <1>{{gap}}</1> clear of {{chaser}}.",
+      "summaryClose": "<0>{{leader}}</0> leads all franchises on {{amount}}, with just <1>{{gap}}</1> between them and {{chaser}}.",
+      "allAction": "ALL FRANCHISES"
     },
     "cinematic": {
       "championEyebrow": "★ Champion",
