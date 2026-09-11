@@ -257,7 +257,10 @@
       "ourPicksLabel": "Nuestras apuestas",
       "ourPicksAll": "Todas las apuestas y sus razones",
       "ourPicksProvenance": "Confianza del modelo {{confidence}}%",
-      "ourPicksStale": "Actualizándose"
+      "ourPicksStale": "Actualizándose",
+      "figuresBasis": "Los tres de {{n}} rondas completadas en la ronda {{round}}.",
+      "figuresBasisLowOnly": "Mejor ronda de las rondas completadas en la ronda {{round}}; muy pocas para un promedio del campo.",
+      "figuresBasisLow": "Mejor ronda: {{names}}."
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

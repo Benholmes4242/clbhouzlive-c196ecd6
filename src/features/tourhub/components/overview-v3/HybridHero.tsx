@@ -577,17 +577,22 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           facts={heroFacts}
         />
         {/*
-          ALSO OUT is INFORMATION, not ambience, so it renders static (four
-          entries, positions 7-10 when continuing the board above). FULL
-          LEADERBOARD beneath is the route to 11 and beyond. The marquee stays
-          for the rotating FIELD SOON facts and for the news strip only.
+          THE CONTINUATION IS A TABLE, NOT A TICKER (section C). Positions 7-10
+          continuing the board above render as four equal columns, surname over
+          score, with no ALSO OUT label: the cells carry their own positions, so
+          the label was chrome competing with names for width. Without a
+          continuation (no board above) the strip is the standalone top-10 and
+          keeps the labelled static treatment. The marquee stays for the
+          rotating FIELD SOON facts and for the news strip only.
         */}
         <HeroWireTicker
           rows={top10}
           emptyStateFacts={emptyStateFacts}
           leadFacts={leadFacts}
           labelKind={tickerOffset > 0 ? 'continuation' : 'top10'}
-          presentation={top10.length > 0 ? 'static' : 'marquee'}
+          presentation={
+            top10.length === 0 ? 'marquee' : tickerOffset > 0 ? 'columns' : 'static'
+          }
         />
       </div>
     );

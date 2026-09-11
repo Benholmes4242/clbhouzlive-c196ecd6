@@ -210,6 +210,23 @@ export function deriveHeroState(
       // (3 rounds); everything else defaults to 4. Replace with tournament.num_rounds
       // when the cache exposes it.
       totalRounds: tournament.tourSlug === 'lpga' ? 3 : 4,
+      /**
+       * FAULT LOG — A HARDCODED LITERAL PRESENTED AS A LIVE READING.
+       * 'F THRU' is not a reading of anything: it says the leader has FINISHED
+       * every round of every live event, forever, and nothing in the app would
+       * ever have reported it. Same class as the backfilled timestamps, the
+       * invented handicap curve and an error rendering as a zero. Caught while
+       * building the hero facts rather than while auditing.
+       *
+       * WHERE A TRUE THRU BELONGS: HeroTournament carries neither `thru` nor
+       * `num_rounds`. When the hero cache exposes them, `thruLabel` must be
+       * derived from the leader's own thru through the canonical
+       * `formatThruDisplay` (features/tourhub/utils/formatThruDisplay.ts),
+       * which already handles F, stale F, shotgun starts and status overrides —
+       * and `totalRounds` must come off num_rounds, not the LPGA guess above.
+       * Until then this string stays a KNOWN placeholder: the Section B hero
+       * fact drops the THRU slot rather than printing it.
+       */
       thruLabel: 'F THRU',
     };
   }

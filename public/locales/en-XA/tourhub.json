@@ -253,7 +253,10 @@
       "ourPicksLabel": "[Our picks]",
       "ourPicksAll": "[All picks and the case for each]",
       "ourPicksProvenance": "[Model confidence {{confidence}}%]",
-      "ourPicksStale": "[Being refreshed]"
+      "ourPicksStale": "[Being refreshed]",
+      "figuresBasis": "[ALL THREE FROM {{n}} COMPLETED ROUNDS IN ROUND {{round}}.]",
+      "figuresBasisLowOnly": "[LOW ROUND FROM COMPLETED ROUNDS IN ROUND {{round}}; TOO FEW FOR A FIELD AVERAGE.]",
+      "figuresBasisLow": "[LOW ROUND: {{names}}.]"
     },
     "tiPicks": {
       "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",

@@ -115,7 +115,16 @@ interface HeroWireTickerProps {
    * one treatment for everyone, because the old reduced-motion degrade was a
    * silent horizontal scroller with no affordance.
    */
-  presentation?: 'marquee' | 'static';
+  /**
+   * 'columns' — BRIEF_TOUR_OVERVIEW_STRUCTURAL section C. The overview's
+   * continuation strip: FOUR EQUAL COLUMNS, surname over score, and NO band
+   * label at all. The label went because the strip's own content already says
+   * what it is (each cell carries its position) and because a label competing
+   * with four names for 390pt was the only reason a name could ever be
+   * squeezed. Same STATIC_ROWS source data as 'static' — nothing about the
+   * rows, the order or the positions changed.
+   */
+  presentation?: 'marquee' | 'static' | 'columns';
 }
 
 /** Entries shown in `presentation="static"` — four fit 390pt without ellipsis. */
@@ -372,7 +381,8 @@ export function HeroWireTicker({
 }: HeroWireTickerProps) {
   const { t } = useTranslation('tourhub');
 
-  const isStatic = presentation === 'static';
+  const isColumns = presentation === 'columns';
+  const isStatic = presentation === 'static' || isColumns;
   const allRows = rows ?? [];
   const safeRows = isStatic ? allRows.slice(0, STATIC_ROWS) : allRows;
   const lead = leadFacts ?? [];
@@ -486,6 +496,35 @@ export function HeroWireTicker({
       {label}
     </div>
   );
+
+  /**
+   * COLUMNS — four equal columns, no label, page gutter (section C).
+   * Equal columns rather than content-width cells so the four positions line
+   * up as a table: a member scanning down the board reads the continuation as
+   * more of the same list, not as a caption. The columns are 1fr each, so the
+   * longest surname sets nothing and clips nothing.
+   */
+  if (isColumns) {
+    return (
+      <section
+        style={{
+          background: BG,
+          height: 36,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          alignItems: 'center',
+          gap: 8,
+          padding: '0 20px',
+          width: '100%',
+          overflow: 'hidden',
+          borderTop: '0.5px solid rgba(255,255,255,0.08)',
+        }}
+        aria-label={label}
+      >
+        {staticCells}
+      </section>
+    );
+  }
 
   // STATIC — one treatment for everyone. No marquee, no auto-scroll, no loop,
   // no overflow scroller, and deliberately no prefers-reduced-motion branch.

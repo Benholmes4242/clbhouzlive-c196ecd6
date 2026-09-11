@@ -13,6 +13,17 @@
  * the micro-label says so. See useStatWatch's `anchor`.
  *
  * PGA-only today (see useStatWatch coverage). Self-hides otherwise.
+ *
+ * THE SELF-HIDE IS ABSENCE, NOT AN EMPTY SHELL, AND THAT IS A COVERAGE
+ * DECISION RATHER THAN A LAYOUT ONE. A member viewing DP World, LPGA, LIV,
+ * Champions or Korn Ferry loses this section entirely, because Sportradar
+ * carries season statistics for the PGA Tour only. That is right while NO other
+ * tour has rows and would be WRONG the moment one does — the fix then is a
+ * per-tour category list, not an eyebrow over an empty list.
+ *
+ * PLACE ON THE PAGE (BRIEF_TOUR_OVERVIEW_STRUCTURAL section E, item E3.5):
+ * between WORLD RANKINGS and COURSE OF THE WEEK. It is a season-long reference
+ * section, so it sits beside the rankings and away from the live event.
  */
 
 import { useMemo, useState } from 'react';

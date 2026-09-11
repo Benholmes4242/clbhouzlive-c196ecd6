@@ -1127,3 +1127,18 @@ faults: something unknowable rendered as something known. FIXED: get_screen_even
 SECURITY DEFINER, admin-gated, granted to authenticated and service_role only,
 and page_path_map keeps NO policy. The panel now has three states: loading, an
 unreadable lookup that says so, and a real zero.
+
+### 9. FAULT LOG - 'F THRU', a hardcoded literal presented as a live reading
+src/features/tourhub/components/overview-v3/HybridHero.utils.ts:213 returns
+thruLabel: 'F THRU' for EVERY live tournament. It is not a reading: it says the
+leader has finished every round of every live event, forever, and nothing in the
+app would have reported it. Eighth instance of the class today (backfilled
+timestamps, invented handicap curve, error rendering as zero, and the rest), and
+the first caught while building rather than while auditing.
+NOT FIXED, DELIBERATELY: HeroTournament carries neither thru nor num_rounds, so
+there is nothing to derive a true figure from. The Section B hero fact DROPS the
+THRU slot rather than printing the literal. When the hero cache exposes them,
+thruLabel derives from the leader's own thru through the canonical
+features/tourhub/utils/formatThruDisplay.ts (F, stale F, shotgun, status
+overrides all handled), and totalRounds comes off num_rounds instead of the
+"LPGA is 54 holes, everything else 4" guess on the line above.

@@ -257,7 +257,10 @@
       "ourPicksLabel": "Unsere Tipps",
       "ourPicksAll": "Alle Tipps und die Begründung",
       "ourPicksProvenance": "Modellvertrauen {{confidence}}%",
-      "ourPicksStale": "Wird aktualisiert"
+      "ourPicksStale": "Wird aktualisiert",
+      "figuresBasis": "Alle drei aus {{n}} abgeschlossenen Runden in Runde {{round}}.",
+      "figuresBasisLowOnly": "Beste Runde aus abgeschlossenen Runden in Runde {{round}}; zu wenige fuer einen Felddurchschnitt.",
+      "figuresBasisLow": "Beste Runde: {{names}}."
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
