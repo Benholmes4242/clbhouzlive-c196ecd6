@@ -462,7 +462,8 @@
       "ratingLabel": "Member pyeongjeom",
       "basis_one": "Play han member {{count}}gae pyeongjeom.",
       "basis_other": "Play han member {{count}}gae pyeongjeom.",
-      "seeAction": "COURSE BOGI"
+      "seeAction": "COURSE BOGI",
+      "playedLabel": "Play han member"
     }
   },
   "empty": {

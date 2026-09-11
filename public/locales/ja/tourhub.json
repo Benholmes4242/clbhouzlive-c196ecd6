@@ -462,7 +462,8 @@
       "ratingLabel": "Member hyoka",
       "basis_one": "Play shita member {{count}} ken no hyoka.",
       "basis_other": "Play shita member {{count}} ken no hyoka.",
-      "seeAction": "COURSE WO MIRU"
+      "seeAction": "COURSE WO MIRU",
+      "playedLabel": "Play shita member"
     }
   },
   "empty": {

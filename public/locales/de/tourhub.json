@@ -466,7 +466,8 @@
       "ratingLabel": "Mitglieder-Bewertung",
       "basis_one": "Aus {{count}} Bewertung von Mitgliedern, die dort gespielt haben.",
       "basis_other": "Aus {{count}} Bewertungen von Mitgliedern, die dort gespielt haben.",
-      "seeAction": "PLATZ ANSEHEN"
+      "seeAction": "PLATZ ANSEHEN",
+      "playedLabel": "Gespielt"
     }
   },
   "empty": {
