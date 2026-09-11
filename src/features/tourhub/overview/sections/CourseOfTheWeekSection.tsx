@@ -1,7 +1,41 @@
 /**
- * CourseOfTheWeekSection — daily Top-100 editorial pick on the tour overview.
+ * CourseOfTheWeekSection — daily Top-100 pick on the tour overview.
  * Placed between StatWatch and CollegeFranchise. Self-hides on no-data / error
  * (expansion pattern: no reservation, downstream sections move up).
+ *
+ * BRIEF_TOUR_OVERVIEW_TWO_SECTIONS B — WHAT THIS SECTION IS NOW.
+ * Full-bleed photograph at 210px with the RANK AND THE NAME ON IT, then two
+ * figures, one basis line, one terminal row. The old top-left TOP 100 pill is
+ * gone: the rank now reads as TYPE, not as a badge.
+ *
+ * NO CHARACTER LINE, AND THAT IS A RULING, NOT AN OMISSION (section C).
+ * The brief called for one sentence saying what the course IS, beneath the
+ * image. The only candidate source is golf_courses.description, and it was
+ * sampled: ten Top 100 courses, first sentence each. Four of ten open with
+ * "Nestled" or "Tucked" — a template voice a member meets twice a week in a
+ * section that rotates daily — and Archerfield and Aronimink open on club
+ * administrative history, not character. Good six times in ten is not good
+ * enough for the one line whose job is to justify the section.
+ *
+ * THE LINE RENDERS IF AND ONLY IF A PURPOSE-WRITTEN STRING EXISTS. The proper
+ * solution is filed in the roadmap open list: a nullable short editorial column
+ * on golf_courses, one hand-written sentence per course, rendered when present
+ * and omitted when not, so the section improves course by course. DO NOT
+ * POPULATE IT FROM description PROGRAMMATICALLY — the existing field is the
+ * wrong voice, which is the whole finding.
+ *
+ * TWO FIGURES, NOT THREE. MEMBERS' RATING and HAVE PLAYED IT, with ONE basis
+ * line under them. A rating and its own review count are a figure and its
+ * sample; splitting them across two figure slots would break the rule the whole
+ * programme runs on. "In your circle" is a good idea with no data behind it
+ * today and is filed, not built.
+ *
+ * HAVE PLAYED IT comes from get_course_field_sizes with the nil-uuid exclusion,
+ * exactly as VenueRecordBand does it — one call for the whole section. A failed
+ * read, an unavailable function or a zero renders NOTHING and the rating stands
+ * alone: that zero is returned both for a course nobody has played and for a
+ * course with no qualifying WHS mapping, so it must never read as "nobody has
+ * played here".
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -10,26 +44,40 @@ import { SectionShell } from './SectionShell';
 import { V4, OVERVIEW_GUTTER as GUT } from '../tokens';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCourseOfTheWeek } from '../../hooks/useCourseOfTheWeek';
-import { SPACE } from '@/lib/spacing';
-import { useMyCourseBest } from '../../hooks/useMyCourseBest';
-import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { CHIP_GLASS_CLASS, SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { useCourseFieldPlayers } from '@/hooks/gam/useCourseFieldPlayers';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
- * FigurePair — one label/value pair on the single figure line.
- * Label AXIS-adjacent at the READ floor (11), value 15/700 tabular, 5px gap.
- * Amber is reserved for the VIEWING MEMBER's figure (Your best).
+ * NOBODY IS EXCLUDED, DELIBERATELY. get_course_field_sizes takes an exclusion
+ * because the trophy room must drop the record holder from the field they hold a
+ * record against. Here the question is every member who has played the course,
+ * so a nil uuid is passed: the function compares with IS DISTINCT FROM, so it
+ * matches no member and excludes nobody. THIS IS NOT AN UNFILLED PLACEHOLDER —
+ * do not substitute the viewing member's id. Same call, same wording, as
+ * VenueRecordBand.
  */
-function FigurePair({ label, value, tone }: { label: string; value: string; tone?: string }) {
+const EXCLUDE_NOBODY = '00000000-0000-0000-0000-000000000000';
+
+/** Figure kicker on this section's two stats: 9/700/0.12em uppercase. */
+const FIGURE_KICKER: React.CSSProperties = {
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase',
+  color: A.DIM,
+};
+
+function Figure({ label, value }: { label: string; value: string }) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, whiteSpace: 'nowrap' }}>
-      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>
-        {label}
-      </span>
-      <span style={{ fontSize: 15, fontWeight: 700, color: tone ?? A.INK, letterSpacing: '-0.01em', ...FIGS }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <span
+        className="tabular-nums lining-nums"
+        style={{ fontSize: 20, fontWeight: 700, color: A.INK, letterSpacing: '-0.02em', ...FIGS }}
+      >
         {value}
       </span>
-    </span>
+      <span style={FIGURE_KICKER}>{label}</span>
+    </div>
   );
 }
 
