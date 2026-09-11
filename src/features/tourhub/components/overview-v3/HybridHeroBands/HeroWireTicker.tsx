@@ -115,7 +115,16 @@ interface HeroWireTickerProps {
    * one treatment for everyone, because the old reduced-motion degrade was a
    * silent horizontal scroller with no affordance.
    */
-  presentation?: 'marquee' | 'static';
+  /**
+   * 'columns' — BRIEF_TOUR_OVERVIEW_STRUCTURAL section C. The overview's
+   * continuation strip: FOUR EQUAL COLUMNS, surname over score, and NO band
+   * label at all. The label went because the strip's own content already says
+   * what it is (each cell carries its position) and because a label competing
+   * with four names for 390pt was the only reason a name could ever be
+   * squeezed. Same STATIC_ROWS source data as 'static' — nothing about the
+   * rows, the order or the positions changed.
+   */
+  presentation?: 'marquee' | 'static' | 'columns';
 }
 
 /** Entries shown in `presentation="static"` — four fit 390pt without ellipsis. */
