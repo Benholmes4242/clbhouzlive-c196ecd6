@@ -1,3 +1,30 @@
+/**
+ * POSITION: MEMBER MEDIA IS PUBLIC BY DESIGN.
+ *
+ * Recorded here, at the upload pipeline, because this is the assumption that
+ * gets remembered the other way round in a privacy conversation a year from
+ * now.
+ *
+ * - Every image and video this pipeline uploads lands at a BARE PERMANENT url
+ *   on a CDN outside Supabase (media.clbhouz.co.uk / Cloudflare Stream).
+ *   Nothing is signed and nothing expires.
+ * - The post's visibility setting governs THE FEED, NOT THE FILE. A
+ *   followers-only post's photograph is retrievable by anyone holding its url.
+ *   That consequence is deliberate: signing would touch every render path in
+ *   the app to protect something nothing currently relies on, and clbhouz is a
+ *   photo-sharing golf app.
+ * - There has never been a member-facing visibility picker. Every post is
+ *   created with 'anyone' (usePostSubmit.ts), so no member has ever been
+ *   offered an alternative or promised that a file is private. The one
+ *   followers-only row in the base came from create_round_posts, not from a
+ *   member choosing anything.
+ * - RLS on post_media therefore only ever gated METADATA, not files. The
+ *   blanket public-read policy was dropped to stop anonymous ENUMERATION of
+ *   every url in one request, and to stop a future exif column publishing
+ *   itself. That is not file protection and was never claimed to be.
+ * - If signed urls are ever introduced, this header and the audience-copy rule
+ *   beside the visibility enums (useUpdatePost.ts) both change together.
+ */
 // postUploadController - module-level upload engine that OUTLIVES the composer.
 //
 // The composer fires jobs at start(); the controller then owns their lifecycle
