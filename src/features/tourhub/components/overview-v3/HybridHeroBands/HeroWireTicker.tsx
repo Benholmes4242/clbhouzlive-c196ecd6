@@ -264,9 +264,9 @@ export function HeroWireTicker({
       style={{
         display: 'inline-flex',
         alignItems: 'baseline',
-        gap: 7,
+        gap: isStatic ? 5 : 7,
         ...NUMERIC_STYLE,
-        fontSize: 12,
+        fontSize: isStatic ? 11 : 12,
       }}
     >
       <span style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, color: 'rgba(255,255,255,0.42)', fontWeight: 700 }}>
@@ -276,10 +276,12 @@ export function HeroWireTicker({
         style={{
           fontWeight: 600,
           color: 'rgba(255,255,255,0.94)',
-          maxWidth: 140,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
+          // STATIC: no clamp and no ellipsis — a truncated name in a strip the
+          // member cannot scrub is unreadable. MARQUEE: 140px clamp retained.
+          ...(isStatic
+            ? null
+            : { maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis' }),
         }}
       >
         {r.shortName}
