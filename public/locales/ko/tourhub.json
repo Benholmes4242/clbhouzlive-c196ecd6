@@ -195,7 +195,8 @@
       "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
       "venueDefendsSep": " · {{name}} defends",
-      "subline": "투어 일정"
+      "subline": "투어 일정",
+      "pageAria": "{{total}}페이지 중 {{page}}페이지"
     },
     "onTheCourse": {
       "eyebrow": "On the course",

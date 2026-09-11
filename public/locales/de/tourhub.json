@@ -199,7 +199,8 @@
       "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
       "venueDefendsSep": " · {{name}} defends",
-      "subline": "Der Tour-Kalender"
+      "subline": "Der Tour-Kalender",
+      "pageAria": "Seite {{page}} von {{total}}"
     },
     "onTheCourse": {
       "eyebrow": "On the course",

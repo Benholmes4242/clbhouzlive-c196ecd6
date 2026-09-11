@@ -195,7 +195,8 @@
       "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
       "venueDefendsSep": " · {{name}} defends",
-      "subline": "ツアースケジュール"
+      "subline": "ツアースケジュール",
+      "pageAria": "{{total}} ページ中 {{page}} ページ"
     },
     "onTheCourse": {
       "eyebrow": "On the course",

@@ -236,7 +236,8 @@
       "inDays": "In {{count}} days",
       "figPurse": "Purse",
       "figField": "Field",
-      "figDefends": "Defends"
+      "figDefends": "Defends",
+      "pageAria": "Page {{page}} of {{total}}"
     },
     "onTheCourse": {
       "eyebrow": "On the course",
