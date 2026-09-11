@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { SectionShell } from '@/features/tourhub/overview/sections/SectionShell';
+import { OVERVIEW_GUTTER } from '@/features/tourhub/overview/tokens';
 import { HAIRLINE_INK_10 } from '@/features/tourhub/_shared/tokens';
 import { LeadStory, StoryRow } from './NewsTab';
 import { useTourStories, type TourStory } from './useTourStories';
@@ -44,7 +45,18 @@ export function WireOverviewSection() {
       linkLabel={t('news.allStories')}
       onLinkClick={() => navigate('/tourhub?tab=news')}
     >
-      {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} compact engagement={engagementFor(lead.id)} />}
+      {/* BOTH OVERVIEW IMAGES SIT ON THE 20px GUTTER (device-check E). The Wire
+          lead photograph ran edge to edge while Course of the Week's was inset,
+          so the two sections read as different page widths. This section now
+          owns the gutter and LeadStory renders its overlay text flush to the
+          image, which puts kicker and headline on the same 20px line as every
+          other section. The 16px LeadStory gutter recorded as an accepted
+          workaround applies to the FULL news tab, not to this inset consumer. */}
+      {lead && (
+        <div style={{ padding: `0 ${OVERVIEW_GUTTER}px` }}>
+          <LeadStory story={lead} onOpen={() => open(lead.slug)} compact onGutter engagement={engagementFor(lead.id)} />
+        </div>
+      )}
       <div style={{ marginTop: lead ? 8 : 0 }}>
         {rows.map((story, index) => (
           <div
