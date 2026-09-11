@@ -49,12 +49,90 @@ const stack: SheetEntry[] = [];
 let seq = 0;
 
 /**
- * Number of popstate events we caused ourselves (by unwinding an entry when a
- * sheet was closed through its own UI). Those must not be read as a member
- * pressing back, or closing one sheet with the X would also close its parent.
+ * BRIEF_CHOOSE_A_COURSE §A — HISTORY WRITES ARE SERIALISED, AND A BACK IS NEVER
+ * ISSUED AGAINST A ROUTE.
+ *
+ * Two faults lived here, both of them the same shape: `history.pushState` is
+ * SYNCHRONOUS and `history.back()` is ASYNCHRONOUS, so a back issued in one tick
+ * lands after anything pushed in the same tick and eats it.
+ *
+ *  1. SHEET SWAP (the CHOOSE A COURSE symptom). Opening a second sheet closes
+ *     the first in the same commit: release queued a back, the new sheet pushed
+ *     its marker, the back ate that push, and the browser stack was left one
+ *     entry out of step with our marker stack. The next release then spent its
+ *     back on a REAL route entry, which returned the member to the page they
+ *     started on.
+ *  2. CLOSE-THEN-NAVIGATE (the RATE IT symptom). A handler that pushed a route
+ *     and then let the sheet close had its route eaten the same way.
+ *
+ * FIX, ONCE, HERE — not per sheet and not with a delay:
+ *
+ *  • ALL history writes go through one queue, pumped on a microtask, and a back
+ *    is only issued once the previous one has landed. Ordering, not timing.
+ *  • A queued back followed by a push in the same tick CANCEL each other. The
+ *    marker is a count, not an address, so the pair is a no-op and neither is
+ *    issued — the swap case never touches history at all.
+ *  • A back is issued only while the top browser entry is one of OUR markers
+ *    (`history.state.__sheet`). If a route was pushed over it, the marker is
+ *    buried and the back is dropped rather than spent on the route. The cost is
+ *    one stale marker entry below the new route — one extra back press in the
+ *    worst case, never a member yanked off the page they asked for.
  */
 let selfInflictedPops = 0;
 let listening = false;
+
+type HistoryOp = 'push' | 'back';
+const ops: HistoryOp[] = [];
+/** True while a back has been issued and its popstate has not landed yet. */
+let awaitingPop = false;
+let pumpScheduled = false;
+
+function topEntryIsOurMarker(): boolean {
+  const state = window.history.state as { __sheet?: number } | null;
+  return !!(state && state.__sheet);
+}
+
+function schedulePump() {
+  if (pumpScheduled) return;
+  pumpScheduled = true;
+  queueMicrotask(() => {
+    pumpScheduled = false;
+    pump();
+  });
+}
+
+function pump() {
+  if (awaitingPop) return;
+  while (ops.length) {
+    const op = ops.shift() as HistoryOp;
+    if (op === 'push') {
+      window.history.pushState({ ...(window.history.state ?? {}), __sheet: ++seq }, '');
+      continue;
+    }
+    if (!topEntryIsOurMarker()) {
+      // A route sits on top of our marker: spending a back here would navigate
+      // the member away. Drop the unwind instead.
+      continue;
+    }
+    awaitingPop = true;
+    selfInflictedPops += 1;
+    window.history.back();
+    return;
+  }
+  drainSettleQueue();
+}
+
+function enqueue(op: HistoryOp) {
+  if (op === 'push' && ops.length && ops[ops.length - 1] === 'back') {
+    // Cancel the pair: closing one sheet and opening another leaves the depth
+    // unchanged, so neither write is issued.
+    ops.pop();
+    schedulePump();
+    return;
+  }
+  ops.push(op);
+  schedulePump();
+}
 
 function ensureListener() {
   if (listening || typeof window === 'undefined') return;
@@ -62,9 +140,10 @@ function ensureListener() {
   window.addEventListener('popstate', () => {
     if (selfInflictedPops > 0) {
       selfInflictedPops -= 1;
+      awaitingPop = false;
       // The stack is settled once the last unwind we caused has landed: that is
       // the moment a handler waiting to navigate away may safely push its route.
-      if (selfInflictedPops === 0) drainSettleQueue();
+      pump();
       return;
     }
     const top = stack.pop();
@@ -80,7 +159,7 @@ export function pushSheetEntry(close: () => void): SheetEntry | null {
   // No URL change: the entry is a marker, not an address. A refresh or a
   // shared link therefore resolves to the underlying route, never to a URL
   // that 404s (§4).
-  window.history.pushState({ ...(window.history.state ?? {}), __sheet: entry.id }, '');
+  enqueue('push');
   return entry;
 }
 
@@ -92,8 +171,7 @@ export function releaseSheetEntry(entry: SheetEntry | null): void {
     return;
   }
   stack.splice(i, 1);
-  selfInflictedPops += 1;
-  window.history.back();
+  enqueue('back');
 }
 
 /**
@@ -115,12 +193,13 @@ function drainSettleQueue() {
 }
 
 export function afterSheetHistorySettled(fn: () => void): void {
-  if (typeof window === 'undefined' || selfInflictedPops === 0) {
+  if (typeof window === 'undefined' || (!awaitingPop && ops.length === 0)) {
     queueMicrotask(fn);
     return;
   }
   ensureListener();
   settleQueue.push(fn);
+  schedulePump();
 }
 
 /** Test/diagnostic only. */

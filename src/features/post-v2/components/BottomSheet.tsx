@@ -41,6 +41,18 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
   }, [open]);
 
   if (!open) return null;
+
+  /* BRIEF_CHOOSE_A_COURSE §B — THE HEAD IS ALWAYS BELOW THE STATUS BAR.
+     This sheet's height was read straight from `fixedHeight` while the backdrop
+     was ALSO padded by the keyboard height, so with the keyboard up a 60dvh
+     sheet was pushed above the top of the screen and its title and close button
+     rendered under the clock. The height is now capped to what is actually free
+     between the safe-area inset and the keyboard, so the head stays put and the
+     body scrolls beneath it. With no keyboard the cap is above every existing
+     value, so closed-keyboard geometry is unchanged. */
+  const headroom = `calc(100dvh - max(env(safe-area-inset-top, 0px), 47px) - 12px${bottomOffset ? ` - ${bottomOffset}px` : ''})`;
+  const cap = (v: string) => `min(${v}, ${headroom})`;
+
   return (
     <div
       style={{
@@ -59,8 +71,8 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%',
-          maxHeight: fixedHeight ?? '85dvh',
-          height: fixedHeight ?? (fullHeight ? '85dvh' : 'auto'),
+          maxHeight: cap(fixedHeight ?? '85dvh'),
+          height: fixedHeight ? cap(fixedHeight) : (fullHeight ? cap('85dvh') : 'auto'),
           background: CT.canvas,
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
