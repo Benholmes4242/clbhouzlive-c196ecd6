@@ -315,6 +315,43 @@ export function HeroWireTicker({
     </div>
   );
 
+  // STATIC — one treatment for everyone. No marquee, no auto-scroll, no loop,
+  // no overflow scroller, and deliberately no prefers-reduced-motion branch.
+  if (isStatic) {
+    return (
+      <section
+        style={{
+          background: BG,
+          height: 36,
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          overflow: 'hidden',
+        }}
+        aria-label={label}
+      >
+        {leftAccessory}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+            padding: '0 12px',
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          {nodes.map((n, i) => (
+            <span key={`${safeRows[i]?.rank}-${safeRows[i]?.shortName}-${i}`} style={{ flexShrink: 0 }}>
+              {n}
+            </span>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <TickerShell
       items={nodes}
