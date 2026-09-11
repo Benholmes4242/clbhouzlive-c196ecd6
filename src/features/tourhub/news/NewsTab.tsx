@@ -81,11 +81,19 @@ function KickerLine({ kicker, at, compact = false, trailing }: { kicker: string 
  * 14px-gutter page, radius 0, no card border. Only the OVERLAID type keeps an
  * inset (20 from the viewport edge); the standfirst returns to the page gutter.
  */
-export function LeadStory({ story, onOpen, compact = false, immersiveHero = true, engagement, bleed = false }: { story: TourStory; onOpen: () => void; compact?: boolean; immersiveHero?: boolean; engagement?: StoryEngagement | null; bleed?: boolean }) {
+/**
+ * ON-GUTTER LEAD (device-check E). `onGutter` is additive and OFF by default, so
+ * every existing caller renders byte-identically. When it is on, the CALLER owns
+ * the horizontal gutter and the overlay text sits flush to the photograph's own
+ * edge, so kicker, headline and standfirst all land on the page's 20px gutter
+ * instead of 20 + 17. The full-bleed frame is suppressed for the same reason:
+ * one gutter, owned once.
+ */
+export function LeadStory({ story, onOpen, compact = false, immersiveHero = true, engagement, bleed = false, onGutter = false }: { story: TourStory; onOpen: () => void; compact?: boolean; immersiveHero?: boolean; engagement?: StoryEngagement | null; bleed?: boolean; onGutter?: boolean }) {
   const bandPadding = compact ? 6 : 8;
-  const sidePadding = bleed ? 20 : compact ? 17 : 14;
+  const sidePadding = onGutter ? 0 : bleed ? 20 : compact ? 17 : 14;
   const standfirstPad = compact ? 4 : 6;
-  const bleedFrame: React.CSSProperties = bleed
+  const bleedFrame: React.CSSProperties = bleed && !onGutter
     ? { marginInline: -14, width: 'calc(100% + 28px)', borderRadius: 0, border: 'none' }
     : {};
   return (
@@ -135,7 +143,7 @@ export function LeadStory({ story, onOpen, compact = false, immersiveHero = true
         </div>
       </div>
       {story.standfirst && (
-        <div style={{ padding: `${standfirstPad}px ${bleed ? 0 : 14}px 0`, fontSize: 13, lineHeight: 1.45, color: INK_MUTE }}>
+        <div style={{ padding: `${standfirstPad}px ${bleed || onGutter ? 0 : 14}px 0`, fontSize: 13, lineHeight: 1.45, color: INK_MUTE }}>
           {story.standfirst}
         </div>
       )}

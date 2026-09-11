@@ -143,13 +143,32 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
       ? playedRaw
       : null;
 
+  /**
+   * THE LINK IS THE GATE. A row means we KNOW the course, so the section
+   * renders. No row means we do NOT know the course, so it is absent. Nothing
+   * else decides WHETHER this section appears. UNRATED IS NOT UNKNOWN.
+   *
+   * BOTH HALVES OF THIS FEATURE HAVE HAD THE RATED-OR-RANKED GATE REMOVED —
+   * DO NOT REINTRODUCE IT IN EITHER. get_tournament_venue_record's predicate
+   * was changed from rated-or-ranked to link-only for exactly this reason: it
+   * hid the venues where the rate prompt is most valuable. The client carried
+   * an identical gate, so the SQL fix was real and invisible — the worst of
+   * both. That is the second time the same mistake was made in this one
+   * feature, and the ninth instance of the state-collapse class: "we have
+   * nothing from members" and "we do not know this course" rendered
+   * identically, with the collapsed version reading as the ordinary case.
+   *
+   * hasRating and hasRank still decide WHAT renders inside — figure plus its
+   * count, the published rank, or neither — never whether.
+   */
   if (!data) return null;
   const count = data.reviewCount ?? 0;
   /* A figure is only shown with a real count behind it. */
   const hasRating = data.rating != null && count >= RATING_FLOOR;
   const hasRank = data.listRank != null;
-  const belowFloor = data.rating != null && count < RATING_FLOOR;
-  if (!hasRating && !hasRank && !belowFloor) return null;
+  /* Below the floor is simply NOT hasRating — count < RATING_FLOOR, whether the
+     rating is null (nobody has rated it) or present but under-sampled. The old
+     third flag existed only to gate the whole section and is gone with it. */
 
   /* "#57 GB&I" — the published rank, on the heading baseline. */
   const meta = hasRank

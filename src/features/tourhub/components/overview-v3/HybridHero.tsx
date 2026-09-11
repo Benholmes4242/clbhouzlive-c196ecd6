@@ -50,6 +50,55 @@ import { BG, INK_15, OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 
 import { SLATE_700, SLATE_800 } from '../../_shared/tokens';
 
+/**
+ * The retired upcoming strip's "band absent" signal: zero rows AND zero facts
+ * makes HeroWireTicker render nothing (device-check B). A shared frozen array
+ * so the prop identity never changes between renders.
+ */
+const EMPTY_FACTS: TickerFact[] = [];
+
+/**
+ * SECTION F — THE TERMINAL ROW BENEATH THE PHOTOGRAPH. Standard uppercase
+ * terminal treatment on the hero's dark ground, ON the 20px gutter, so the only
+ * things over the image are the title block and its three facts.
+ */
+function HeroTerminalRow({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '11px 20px',
+        background: BG,
+        border: 'none',
+        borderTop: `0.5px solid ${INK_15}`,
+        cursor: 'pointer',
+        textAlign: 'left',
+      }}
+    >
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.72)',
+        }}
+      >
+        {label}
+      </span>
+      <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)' }} aria-hidden>
+        &rsaquo;
+      </span>
+    </button>
+  );
+}
+
+
 // ---------- Skeleton -------------------------------------------------------
 
 export function HybridHeroSkeleton() {
@@ -405,51 +454,17 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     return null;
   }, [state, safeLeaderboard, tiedLeaders, champion, defendingChamp, t]);
 
-  // "Awaiting the field" empty-state facts for the HeroWireTicker (Upcoming
-  // only, when no field/prediction rows are available yet). Each entry is
-  // optional; the wire only renders facts that exist. Zero facts ⇒ band absent.
   /**
-   * THE DATE RANGE AND THE VENUE ARE READ FACTS, NOT ATMOSPHERE. In the
-   * upcoming state the venue IS the content, so both leave the marquee and
-   * render in the static lead block above it (see HeroWireTicker.leadFacts):
-   * the badge no longer sits over them and the venue no longer clips mid-word.
-   * Everything below stays ambient and keeps the wire.
+   * THE UPCOMING STRIP IS RETIRED (device-check B) — leadFacts and
+   * emptyStateFacts are no longer built on this surface. They said everything
+   * twice: TEES OFF and VENUE in the static lead block above the hero facts
+   * that already carry TEES OFF, the venue already on the photograph's
+   * sub-line, and the purse again in the marquee below. The single thing they
+   * carried that the facts did not — the FIELD SOON state mark — is folded into
+   * the hero's third fact below. HeroWireTicker itself is untouched: the
+   * marquee, the lead block and the empty-state bar all remain for the news
+   * StoryLeaderboardStrip, its other consumer.
    */
-  const leadFacts: TickerFact[] | undefined = useMemo(() => {
-    if (state.kind !== 'upcoming') return undefined;
-    if (top10.length > 0) return undefined;
-    const facts: TickerFact[] = [];
-    if (datesString) facts.push({ label: t('overview.hero.teesOff'), value: datesString });
-    if (tournament.venueName) facts.push({ label: t('overview.hero.venueLabel'), value: tournament.venueName });
-    return facts;
-  }, [state.kind, top10.length, datesString, tournament.venueName, t]);
-
-  const emptyStateFacts: TickerFact[] | undefined = useMemo(() => {
-    if (state.kind !== 'upcoming') return undefined;
-    if (top10.length > 0) return undefined;
-    const facts: TickerFact[] = [];
-    if (defendingChamp?.name) {
-      facts.push({ label: t('overview.hero.defendsLabel'), value: defendingChamp.name, labelGold: true });
-      if (defendingChamp.score && defendingChamp.year) {
-        const surname = defendingChamp.name.trim().split(/\s+/).slice(-1)[0];
-        facts.push({
-          label: t('overview.hero.prevWinner', { year: defendingChamp.year }),
-          value: surname ? `${defendingChamp.score} · ${surname}` : defendingChamp.score,
-        });
-      }
-    }
-    if (typeof tournament.purse === 'number' && tournament.purse > 0) {
-      const m = tournament.purse / 1_000_000;
-      const purseStr = m >= 10 ? `$${Math.round(m)}M` : `$${m.toFixed(1)}M`;
-      facts.push({ label: t('overview.hero.purse'), value: purseStr });
-    }
-    facts.push({
-      label: t('overview.leaderboardBand.fieldEyebrow').toUpperCase(),
-      value: t('overview.hero.fieldAnnouncedSoon'),
-      pulseLabel: true,
-    });
-    return facts;
-  }, [state.kind, top10.length, tournament.purse, defendingChamp, t]);
 
   /**
    * SECTION B — THE KICKER AND THE THREE FACTS.
@@ -531,16 +546,28 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       return out;
     }
 
+    /* UPCOMING — TEES OFF, PURSE, and the third slot carrying the FIELD state
+       mark folded in from the retired strip (device-check B). With no field yet
+       (no rows on the board above) the third fact is FIELD / announced soon,
+       which is the one thing the strip said that the facts did not. Once the
+       field IS known the board itself says so, so the slot returns to the
+       defending champion. Still three, still static, still dropped rather than
+       dashed where the datum is missing. */
     if (datesString) out.push({ label: t('overview.hero.teesOff'), value: datesString });
-    if (defendingChamp?.name) {
+    if (purseFact) out.push(purseFact);
+    if (top10.length === 0) {
+      out.push({
+        label: t('overview.leaderboardBand.fieldEyebrow').toUpperCase(),
+        value: t('overview.hero.fieldAnnouncedSoon'),
+      });
+    } else if (defendingChamp?.name) {
       out.push({
         label: t('overview.hero.defendsLabel'),
         value: surname(defendingChamp.name) ?? defendingChamp.name,
       });
     }
-    if (purseFact) out.push(purseFact);
     return out;
-  }, [state, safeLeaderboard, tiedLeaders, champion, wasPlayoff, datesString, defendingChamp, purseFact, t]);
+  }, [state, safeLeaderboard, tiedLeaders, champion, wasPlayoff, datesString, defendingChamp, purseFact, top10.length, t]);
 
   if (!isCancelled) {
     return (
@@ -569,7 +596,13 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           momentLabel={moment?.label ?? null}
           momentName={moment?.name ?? null}
           momentScore={moment?.score ?? null}
-          onCtaTap={onCtaTap}
+          /* SECTION F — NOTHING OVERLAYS THE PHOTOGRAPH EXCEPT THE TITLE BLOCK
+             AND ITS FACTS. The TOURNAMENT link used to sit bottom-right ON the
+             image, level with the facts. The hero itself is NOT tappable (the
+             carousel wrapper binds touchstart/move/end for the swipe only, and
+             nothing navigates), so the link is the sole route to the tournament
+             from here and could not simply be dropped: it MOVES to a terminal
+             row beneath the photograph. */
           venueCourseName={tournament.venueCourseName}
           venueState={tournament.venueState}
           venueCountry={tournament.venueCountry}
@@ -588,18 +621,28 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           score, with no ALSO OUT label: the cells carry their own positions, so
           the label was chrome competing with names for width. Without a
           continuation (no board above) the strip is the standalone top-10 and
-          keeps the labelled static treatment. The marquee stays for the
-          rotating FIELD SOON facts and for the news strip only.
+          keeps the labelled static treatment.
+
+          THE UPCOMING STATE STRIP IS RETIRED (device-check B). It said
+          everything twice: TEES OFF and VENUE both appeared in the hero facts
+          and the sub-line above them, and the marquee below repeated the purse.
+          leadFacts is no longer supplied and emptyStateFacts is an EMPTY ARRAY
+          on this surface, which is the ticker's own "band absent" signal — so
+          on an upcoming slide nothing renders here at all. The FIELD SOON state
+          mark, the one thing the strip carried that the facts did not, is folded
+          into the hero's third fact (see heroFacts, upcoming branch). The
+          marquee remains for the news StoryLeaderboardStrip, which is the other
+          consumer of this component and is untouched.
         */}
         <HeroWireTicker
           rows={top10}
-          emptyStateFacts={emptyStateFacts}
-          leadFacts={leadFacts}
+          emptyStateFacts={top10.length === 0 ? EMPTY_FACTS : undefined}
           labelKind={tickerOffset > 0 ? 'continuation' : 'top10'}
           presentation={
             top10.length === 0 ? 'marquee' : tickerOffset > 0 ? 'columns' : 'static'
           }
         />
+        {onCtaTap && <HeroTerminalRow label={t('overview.photoBand.tournamentCta')} onPress={onCtaTap} />}
       </div>
     );
   }

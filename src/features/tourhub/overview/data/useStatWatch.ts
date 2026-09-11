@@ -36,6 +36,14 @@ export interface StatLeader {
 export interface StatCategory {
   key: StatKey;
   label: string; // overline (uppercase-ready)
+  /**
+   * THE PICKER LABEL IS SHORTER THAN THE STAT NAME (device-check D). There are
+   * exactly FOUR categories and there will only ever be four while Sportradar
+   * carries PGA season stats alone, so the picker should hold all four at 390pt
+   * rather than scroll a fixed set out of sight. The full `label` still names
+   * the stat wherever it is read as prose; only the chip is abbreviated.
+   */
+  pickerLabel: string;
   unit: string; // micro-label
   order: 'asc' | 'desc';
   format: (v: number) => string;
@@ -57,6 +65,7 @@ const CATEGORIES: Array<{
   key: StatKey;
   column: keyof StatRow;
   label: string;
+  pickerLabel: string;
   unit: string;
   order: 'asc' | 'desc';
   format: (v: number) => string;
@@ -66,6 +75,7 @@ const CATEGORIES: Array<{
     key: 'sg_putting',
     column: 'strokes_gained_putting',
     label: 'SG: PUTTING',
+    pickerLabel: 'PUTTING',
     unit: '',
     order: 'desc',
     format: (v) => (v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2)),
@@ -75,6 +85,7 @@ const CATEGORIES: Array<{
     key: 'sg_tee_to_green',
     column: 'strokes_gained_tee_green',
     label: 'SG: TEE TO GREEN',
+    pickerLabel: 'TEE TO GREEN',
     unit: '',
     order: 'desc',
     format: (v) => (v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2)),
@@ -84,6 +95,7 @@ const CATEGORIES: Array<{
     key: 'driving_distance',
     column: 'driving_distance',
     label: 'DRIVING DISTANCE',
+    pickerLabel: 'DISTANCE',
     unit: 'yards avg',
     order: 'desc',
     format: (v) => v.toFixed(1),
@@ -93,6 +105,7 @@ const CATEGORIES: Array<{
     key: 'scoring_average',
     column: 'scoring_average',
     label: 'SCORING AVERAGE',
+    pickerLabel: 'SCORING',
     unit: '',
     order: 'asc',
     format: (v) => v.toFixed(2),
@@ -270,6 +283,7 @@ export function useStatWatch(tour: TourId) {
           return {
             key: cfg.key,
             label: cfg.label,
+            pickerLabel: cfg.pickerLabel,
             unit: cfg.unit,
             order: cfg.order,
             format: cfg.format,

@@ -55,7 +55,7 @@ export function StatWatch({ tour }: { tour: TourId }) {
   );
 
   const pickerOptions: ReadonlyArray<PillFilterOption<StatKey>> = useMemo(
-    () => categories.map((c) => ({ value: c.key, label: c.label })),
+    () => categories.map((c) => ({ value: c.key, label: c.pickerLabel })),
     [categories],
   );
 
@@ -71,7 +71,7 @@ export function StatWatch({ tour }: { tour: TourId }) {
         </div>
         {/* Models the NEW shape: a picker row, then five list rows with a bar. */}
         <div style={{ display: 'flex', gap: 8, padding: `8px ${GUT}px 0`, overflow: 'hidden' }}>
-          {[92, 118, 128, 122].map((w, i) => (
+          {[78, 104, 88, 84].map((w, i) => (
             <Skeleton key={i} className="h-[34px] rounded-full" style={{ width: w, flex: 'none' }} />
           ))}
         </div>
