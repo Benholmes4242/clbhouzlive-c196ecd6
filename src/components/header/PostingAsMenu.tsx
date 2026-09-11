@@ -155,9 +155,17 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
 
   
 
+  /* CLOSE FIRST, NAVIGATE AFTER THE HISTORY UNWIND.
+     The account sheet is a BottomSheet consumer, so it owns a sheet-stack
+     history marker (src/components/ui/sheetHistory.ts). Closing it calls
+     releaseSheetEntry -> history.back(). That back lands AFTER a navigate()
+     issued in the same handler and cancels it, which is why every row and tile
+     on the sheet appeared to do nothing. The navigate must therefore be
+     deferred past the unwind task; do NOT collapse this back into
+     `navigate(); onClose();`. */
   const handleNavigate = (path: string) => {
-    navigate(path);
     onClose();
+    setTimeout(() => navigate(path), 80);
   };
 
   const displayName = userProfile?.display_name || user?.user_metadata?.full_name || 'User';
