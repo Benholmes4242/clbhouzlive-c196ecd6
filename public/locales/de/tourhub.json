@@ -387,7 +387,8 @@
       "rowMeta": "{{count}} on tour",
       "summaryWide": "<0>{{leader}}</0> leads all franchises on {{amount}} in season alumni earnings, <1>{{gap}}</1> clear of {{chaser}}.",
       "summaryClose": "<0>{{leader}}</0> leads all franchises on {{amount}}, with just <1>{{gap}}</1> between them and {{chaser}}.",
-      "allAction": "ALL FRANCHISES"
+      "allAction": "ALL FRANCHISES",
+      "earningsBasis": "Saisoneinnahmen nach dem College, das ihre Absolventen durchlaufen haben."
     },
     "cinematic": {
       "championEyebrow": "★ Champion",

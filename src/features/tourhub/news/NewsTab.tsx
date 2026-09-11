@@ -153,7 +153,25 @@ export function LeadStory({ story, onOpen, compact = false, immersiveHero = true
 
 
 
+/**
+ * STORY ROW THUMBNAIL — NO PLACEHOLDER FILL, NO EMPTY BOX (device-walk-3 A).
+ *
+ * The thumbnail used to carry `background: SLATE_100`, so a failed image left a
+ * 54x54 grey rectangle floating in the row. Measured on the tour overview at
+ * 430pt: two of them, same x, one per Wire row. That is the state-collapse class
+ * in its smallest form — "failed", "loading" and "no image" all rendered as one
+ * grey square, and the state a member meets most often is the broken one.
+ *
+ * So: no fill, and on error the element UNMOUNTS. The row reflows and the
+ * headline takes the full width. No fallback graphic, no background colour.
+ *
+ * THE REAL PROBLEM IS UPSTREAM AND IS FILED, NOT FIXED HERE: these images are
+ * hotlinked from third-party hosts (progolfweekly.com, assets.golfchannel.com),
+ * which fail on referrer policy, host blocks and publisher moves, and report
+ * nothing. Ingest or proxy at publish time — see the roadmap open list.
+ */
 export function StoryRow({ story, onOpen, compact = false, engagement }: { story: TourStory; onOpen: () => void; compact?: boolean; engagement?: StoryEngagement | null }) {
+  const [imageFailed, setImageFailed] = useState(false);
   return (
     <button
       type="button"
@@ -179,12 +197,13 @@ export function StoryRow({ story, onOpen, compact = false, engagement }: { story
           </div>
         )}
       </div>
-      {story.image_url && (
+      {story.image_url && !imageFailed && (
         <img
           src={story.image_url}
           alt=""
           loading="lazy"
-          style={{ width: compact ? 54 : 62, height: compact ? 54 : 62, borderRadius: 8, objectFit: 'cover', flexShrink: 0, background: SLATE_100 }}
+          onError={() => setImageFailed(true)}
+          style={{ width: compact ? 54 : 62, height: compact ? 54 : 62, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }}
         />
       )}
     </button>

@@ -385,7 +385,8 @@
       "rowMeta": "[~~{{count}} óñ tóúr~~]",
       "summaryWide": "[~~<0>{{leader}}</0> léádš áll fráñçhíšéš óñ {{amount}} íñ šéášóñ álúmñí éárñíñgš, <1>{{gap}}</1> çléár óf {{chaser}}.~~]",
       "summaryClose": "[~~<0>{{leader}}</0> léádš áll fráñçhíšéš óñ {{amount}}, wíth júšt <1>{{gap}}</1> bétwééñ thém áñd {{chaser}}.~~]",
-      "allAction": "[~~ÁLL FRÁÑÇHÍŠÉŠ~~]"
+      "allAction": "[~~ÁLL FRÁÑÇHÍŠÉŠ~~]",
+      "earningsBasis": "[Şééáşóń éáŕńíńĝş ƀý ţĥé çółłéĝé ţĥéíŕ áłůmńí çámé ţĥŕóůĝĥ.]"
     },
     "cinematic": {
       "championEyebrow": "[!! ★ Chámpíón !!]",
