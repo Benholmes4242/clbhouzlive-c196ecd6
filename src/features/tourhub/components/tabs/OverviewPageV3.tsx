@@ -25,6 +25,7 @@ import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { SPACE } from '@/lib/spacing';
 import { OVERVIEW_GUTTER } from '../../overview/tokens';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 
 
@@ -126,7 +127,7 @@ export function OverviewPageV3() {
           id="content-below-hero"
           className="relative z-10"
         >
-          <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 'var(--bottom-nav-height, 96px)' }}>
+          <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 'var(--bottom-nav-height, 96px)' }}>
             <WireOverviewSection />
             <LazySection minHeight={400}>
               <WorldRankingsSlot />
