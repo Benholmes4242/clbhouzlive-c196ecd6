@@ -194,10 +194,15 @@ export function WorldRankings({ tour }: { tour: TourId }) {
       <div style={{ padding: `2px ${GUT}px 0` }}>
         {pack.map((r, i) => {
           const tappable = !!r.playerId;
-          const share =
-            leaderPoints && leaderPoints > 0 && r.points != null
-              ? Math.max(0, Math.min(1, r.points / leaderPoints))
-              : null;
+          /* THE POINTS-SHARE FILL IS GONE (device-check C). A 5% white block
+             sized to each player's share of the leader's points read as a
+             SELECTION — rows 2-5 looked tinted/highlighted rather than measured,
+             and the figure it encoded is already printed in the points column
+             beside every name. The points column is the honest version; the
+             band was decoration that changed meaning. Do not reinstate it: if
+             share is ever worth drawing, it needs its own labelled axis, not a
+             wash behind names. leaderPoints is retained above only for the
+             existing sort/format path. */
           return (
             <div
               key={`${r.rank}-${i}`}
@@ -206,24 +211,6 @@ export function WorldRankings({ tour }: { tour: TourId }) {
                 borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
               }}
             >
-              {/* Points bar — BEHIND the content. No height, no column: it fills
-                  the row that already exists (same idea as the tee-difficulty
-                  bars on the course card). The content wrapper is
-                  position:relative and comes after, so no z-index is needed. */}
-              {share != null && (
-                <div
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: `${share * 100}%`,
-                    background: 'rgba(255,255,255,0.05)',
-                    borderRadius: '0 3px 3px 0',
-                  }}
-                />
-              )}
               <div
                 style={{
                   position: 'relative',
