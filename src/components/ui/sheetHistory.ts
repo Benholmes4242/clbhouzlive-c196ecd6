@@ -62,6 +62,9 @@ function ensureListener() {
   window.addEventListener('popstate', () => {
     if (selfInflictedPops > 0) {
       selfInflictedPops -= 1;
+      // The stack is settled once the last unwind we caused has landed: that is
+      // the moment a handler waiting to navigate away may safely push its route.
+      if (selfInflictedPops === 0) drainSettleQueue();
       return;
     }
     const top = stack.pop();
@@ -91,6 +94,33 @@ export function releaseSheetEntry(entry: SheetEntry | null): void {
   stack.splice(i, 1);
   selfInflictedPops += 1;
   window.history.back();
+}
+
+/**
+ * BRIEF_POST_SHEET_RATE_IT — NAVIGATING OUT OF A SHEET.
+ *
+ * releaseSheetEntry unwinds its marker with history.back(), which the browser
+ * resolves ASYNCHRONOUSLY. A handler that closes its sheet and then navigates
+ * therefore pushes its route BEFORE the back lands, and the back eats the push:
+ * the member arrives exactly where they started. That was the RATE IT symptom.
+ *
+ * This runs `fn` once every self-inflicted pop we are still waiting on has
+ * actually landed, so the navigation happens on a settled stack. It is ordering,
+ * NOT a delay — with nothing outstanding it runs on the next microtask.
+ */
+const settleQueue: Array<() => void> = [];
+
+function drainSettleQueue() {
+  while (settleQueue.length) settleQueue.shift()?.();
+}
+
+export function afterSheetHistorySettled(fn: () => void): void {
+  if (typeof window === 'undefined' || selfInflictedPops === 0) {
+    queueMicrotask(fn);
+    return;
+  }
+  ensureListener();
+  settleQueue.push(fn);
 }
 
 /** Test/diagnostic only. */

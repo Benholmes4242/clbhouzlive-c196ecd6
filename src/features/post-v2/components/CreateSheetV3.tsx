@@ -13,8 +13,9 @@
 // NO AMBER. Every round here belongs to the viewing member, so amber would be
 // on everything and mean nothing. The filled pill is INK.
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { afterSheetHistorySettled } from '@/components/ui/sheetHistory';
 import { useProfileData } from '@/hooks/useProfileData';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -54,6 +55,31 @@ export default function CreateSheetV3({ open, onClose, returnPath }: Props) {
   const { data: rounds = [] } = useRecentRoundsForCreate(open);
   const has = rounds.length > 0;
 
+  /* NAVIGATING AWAY FROM THIS SHEET — ORDER AND OWNERSHIP.
+     This sheet holds a sheet-history marker, and closing it unwinds that marker
+     with history.back(). A handler that closed the sheet and then navigated in
+     the same tick pushed its route BEFORE that back landed, so the back ate the
+     push and the member was returned to the page they started on. That was the
+     RATE IT symptom exactly; the two composer actions survived only because they
+     open an overlay through a store rather than navigating.
+     THE SHEET CLOSES FIRST, ITS ENTRY IS RELEASED, AND ONLY THEN DO WE NAVIGATE.
+     The target is parked here, the close releases the marker during commit, and
+     afterSheetHistorySettled runs the navigation once that unwind has landed. NOT
+     A DELAY — with nothing outstanding it runs on the next microtask. */
+  const pendingNav = useRef<string | null>(null);
+  const navigateAfterClose = (to: string) => {
+    pendingNav.current = to;
+    onClose();
+  };
+  useEffect(() => {
+    if (open) return;
+    const to = pendingNav.current;
+    if (!to) return;
+    pendingNav.current = null;
+    afterSheetHistorySettled(() => navigate(to));
+  }, [open, navigate]);
+
+
   // "Add photos" / "Add more" — the media lands ON the existing round post.
   const addToPost = (round: CreateSheetRound, files: File[]) => {
     if (!round.postId || files.length === 0) return;
@@ -65,8 +91,12 @@ export default function CreateSheetV3({ open, onClose, returnPath }: Props) {
   const rateIt = (round: CreateSheetRound) => {
     if (!round.courseId) return;
     analyticsEvents.track('create_sheet_action', { action: 'rate_it' });
-    onClose();
-    navigate(`/courses/${round.courseId}/rate`);
+    /* SAME ROUTE AND SAME PARAM SHAPE as the venue band's RATE THIS COURSE row —
+       one way in to the review composer, not a second. courseId here is a
+       golf_courses.id (the hook joins golf_courses to resolve name and image), and
+       a round whose course does not resolve carries no courseId, so no RATE IT
+       pill renders for it and this cannot route to a broken page. */
+    navigateAfterClose(`/courses/${round.courseId}/rate`);
   };
 
   const saySomething = (round: CreateSheetRound) => {
@@ -136,9 +166,11 @@ export default function CreateSheetV3({ open, onClose, returnPath }: Props) {
         onDone={(cs) => {
           const c = cs[0];
           if (!c) return;
+          // Same close-then-navigate order as RATE IT: two markers are released
+          // here (this sheet and the course picker) and the navigation waits for
+          // both to land.
           setCourseOpen(false);
-          onClose();
-          navigate(`/courses/${c.id}/rate`);
+          navigateAfterClose(`/courses/${c.id}/rate`);
         }}
       />
     </>
