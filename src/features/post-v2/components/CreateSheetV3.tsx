@@ -13,8 +13,9 @@
 // NO AMBER. Every round here belongs to the viewing member, so amber would be
 // on everything and mean nothing. The filled pill is INK.
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { afterSheetHistorySettled } from '@/components/ui/sheetHistory';
 import { useProfileData } from '@/hooks/useProfileData';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
