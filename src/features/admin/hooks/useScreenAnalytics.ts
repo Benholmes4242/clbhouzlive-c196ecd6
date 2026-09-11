@@ -71,6 +71,21 @@ export interface ScreenEventRow {
   count: number;
 }
 
+/**
+ * THE PATH LOOKUP GOES THROUGH A TRUSTED FUNCTION, NOT A DIRECT SELECT.
+ * `page_path_map` has RLS enabled and NO policy on purpose: it is closed to
+ * members and the function is its only door, exactly as `get_screen_analytics`
+ * already reads `page_route_manifest`. A direct client select returned 0 of
+ * 1,656 rows and the panel rendered that as "no events on this screen", which
+ * made an unreadable lookup indistinguishable from a screen nobody used.
+ * Do NOT add a member-facing policy to reopen the direct select.
+ *
+ * THREE STATES, NOT TWO. A failed read must NOT be shown as a zero: the hook
+ * throws (isError at the consumer, which renders no figure and says the panel
+ * cannot be read), while an empty array is a genuine zero - either the screen
+ * has no mapped paths at all, in which case it can have fired no events, or it
+ * has paths and no events in the window.
+ */
 export function useScreenTopEvents(routePattern: string | null, days: number) {
   return useQuery({
     queryKey: ['admin', 'screen-analytics', 'events', routePattern, days],
@@ -80,15 +95,14 @@ export function useScreenTopEvents(routePattern: string | null, days: number) {
       const since = new Date();
       since.setDate(since.getDate() - days);
 
-      const { data: paths, error: pErr } = await supabase
-        .from('page_path_map')
-        .select('raw_path')
-        .eq('route_pattern', routePattern as string)
-        .limit(1000);
+      const { data: paths, error: pErr } = await supabase.rpc(
+        'get_screen_event_paths' as never,
+        { p_route_pattern: routePattern as string } as never,
+      );
       if (pErr) throw pErr;
 
-      const rawPaths = (paths ?? [])
-        .map(p => (p as { raw_path: string }).raw_path)
+      const rawPaths = ((paths ?? []) as { raw_path: string }[])
+        .map(p => p.raw_path)
         .filter(Boolean);
       if (rawPaths.length === 0) return [];
 
@@ -113,3 +127,4 @@ export function useScreenTopEvents(routePattern: string | null, days: number) {
     },
   });
 }
+
