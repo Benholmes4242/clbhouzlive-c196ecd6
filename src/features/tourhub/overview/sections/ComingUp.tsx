@@ -319,12 +319,20 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
                 {page.map((group, gi) => (
                   <div key={group.key}>
                     {/* GROUP HEADER — the date once, the countdown once. */}
+                    {/* FULL-WIDTH DIVIDER (device-walk-2 B2). The tinted date
+                        bar is a divider, and a divider that stops short of the
+                        screen edge reads as a card that failed to fill. It
+                        cancels the track's GUT margin with a negative margin
+                        and re-pays it as padding, so the tint and the hairline
+                        reach both edges while the date and countdown stay on
+                        the 20px gutter with every other line. */}
                     <div
                       style={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '9px 0',
+                        padding: `9px ${GUT}px`,
+                        margin: `0 -${GUT}px`,
                         background: GROUP_BG,
                         borderTop: gi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
                       }}
