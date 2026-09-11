@@ -181,6 +181,15 @@ export function CollegeFranchise() {
   const isClosingRace = gap > 0 && gap < 5_000_000;
   const editorialLine = editorial.data?.headline as string | undefined;
 
+  /* THE HEADING IS THE VERDICT. Same editorial chain as before: the
+     championship_editorial_daily headline where there is one, otherwise the
+     templated close/runaway line. Plain strings — the leader is no longer bold
+     inside a sentence, because the heading IS the sentence now. */
+  const heading = editorialLine
+    ?? (isClosingRace
+      ? t('overview.collegeFranchise.headlineFallbackClose', { leader: leaderShort, chaser: chaserShort })
+      : t('overview.collegeFranchise.headlineFallbackWide', { leader: leaderShort }));
+
   return (
     <SectionShell
       padX={GUT}
@@ -188,41 +197,67 @@ export function CollegeFranchise() {
       rightMeta={t('overview.collegeFranchise.linkLabel')}
     >
       <div ref={viewRef} style={{ padding: `0 ${GUT}px` }}>
-        {/* ONE SENTENCE, 14/1.5, leader bold. */}
-        <div style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.5, color: V4.inkSoft }}>
-          {editorialLine ? (
-            editorialLine
-          ) : (
-            <Trans
-              t={t}
-              i18nKey={isClosingRace ? 'overview.collegeFranchise.summaryClose' : 'overview.collegeFranchise.summaryWide'}
-              values={{
-                leader: leaderShort,
-                chaser: chaserShort,
-                amount: formatCurrencyUsdCompact(leader.earnings_total),
-                gap: formatCurrencyUsdCompact(gap),
-              }}
-              components={[
-                <span key="l" style={{ color: V4.ink, fontWeight: 700 }} />,
-                <span key="g" style={{ color: V4.ink, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }} />,
-              ]}
-            />
-          )}
+        {/* HEADING — 18/700/-0.015em. The section now has a top of its own, so
+            it stops reading as the tail of Stat Watch above it. */}
+        <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.25, color: V4.ink }}>
+          {heading}
         </div>
 
-        {/* THREE FIGURES — the top three franchises' season alumni earnings,
-            each under its own name. The name IS the kicker, so no legend row is
-            needed and the figures carry what they are. */}
-        <div style={{ marginTop: 12, display: 'flex', gap: 24 }}>
-          {topThree.map((s) => (
-            <div key={s.id} style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0, flex: '0 1 auto' }}>
+        {/* ONE LINE saying what the figures are counting. */}
+        <div style={{ marginTop: 4, fontSize: 13, fontWeight: 500, lineHeight: 1.45, color: V4.inkSoft }}>
+          {t('overview.collegeFranchise.earningsBasis')}
+        </div>
+
+        {/* FIVE ROWS, HAIRLINE BETWEEN. A table shortened is a shape; three
+            floating figures was not. The retired three-figure row is on the
+            roadmap dead list with its old line ranges (216-228 of the previous
+            revision), together with the summary sentence it sat under (192-211).
+            Nothing was deleted from disk. */}
+        <div style={{ marginTop: 12 }}>
+          {topFive.map((s, i) => (
+            <div
+              key={s.id}
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 10,
+                padding: '9px 0',
+                borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
+              }}
+            >
               <span
                 className="tabular-nums lining-nums"
-                style={{ fontSize: 16, fontWeight: 700, color: V4.ink, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}
+                style={{ fontSize: 14, fontWeight: 600, color: V4.inkFaint, width: 16, flex: 'none', fontVariantNumeric: 'tabular-nums' }}
+              >
+                {i + 1}
+              </span>
+              <span
+                style={{
+                  flex: '1 1 auto',
+                  minWidth: 0,
+                  fontSize: 14,
+                  fontWeight: i === 0 ? 700 : 600,
+                  color: V4.ink,
+                  letterSpacing: '-0.01em',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {displayName(s, mediaMap?.get(s.normalized_name))}
+              </span>
+              <span
+                className="tabular-nums lining-nums"
+                style={{ width: 62, flex: 'none', textAlign: 'right', fontSize: 12, fontWeight: 600, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}
+              >
+                {t('overview.collegeFranchise.rowMeta', { count: s.player_count })}
+              </span>
+              <span
+                className="tabular-nums lining-nums"
+                style={{ width: 62, flex: 'none', textAlign: 'right', fontSize: 14, fontWeight: 700, color: V4.ink, fontVariantNumeric: 'tabular-nums' }}
               >
                 {formatCurrencyUsdCompact(s.earnings_total)}
               </span>
-              <span style={NAME_KICKER}>{displayName(s, mediaMap?.get(s.normalized_name))}</span>
             </div>
           ))}
         </div>
