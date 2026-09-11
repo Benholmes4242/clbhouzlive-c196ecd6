@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import { useTournamentMeta } from './useTournamentMeta';
+import { formatVenueLabel } from '../lib/venueLabel';
 
 interface ScorecardRow {
   round_number: number;
