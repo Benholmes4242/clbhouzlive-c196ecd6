@@ -166,9 +166,11 @@ export default function CreateSheetV3({ open, onClose, returnPath }: Props) {
         onDone={(cs) => {
           const c = cs[0];
           if (!c) return;
+          // Same close-then-navigate order as RATE IT: two markers are released
+          // here (this sheet and the course picker) and the navigation waits for
+          // both to land.
           setCourseOpen(false);
-          onClose();
-          navigate(`/courses/${c.id}/rate`);
+          navigateAfterClose(`/courses/${c.id}/rate`);
         }}
       />
     </>
