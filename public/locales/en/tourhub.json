@@ -522,7 +522,12 @@
       "tooFewRatings": "Too few members have rated this course yet.",
       "rateAction": "RATE THIS COURSE",
       "ratingFrom_one": "from {{count}} rating",
-      "ratingFrom_other": "from {{count}} ratings"
+      "ratingFrom_other": "from {{count}} ratings",
+      "sectionKicker": "This week's venue on clbhouz",
+      "ratingLabel": "Members' rating",
+      "basis_one": "From {{count}} rating by members who have played it.",
+      "basis_other": "From {{count}} ratings by members who have played it.",
+      "seeAction": "SEE THE COURSE"
     },
     "status": {
       "finished": "FINISHED",
