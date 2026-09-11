@@ -14,11 +14,21 @@
  * WHY IT IS INSTRUMENTED, AND WHY THAT MATTERS MORE THAN THE COMPRESSION:
  * Ben's ruling on this section was "keep it if it works", and that is only
  * answerable if something counts whether anyone reaches the foot of this page.
- * Two events, no sampling:
- *   tour_overview_college_view — fired ONCE per mount when the section is
- *     genuinely half in the viewport. NOT on mount: LazySection mounts this
- *     200px early, so a mount is not a view.
+ * Two events, no sampling.
+ *
+ * THE VIEW EVENT IS THE DETAIL THAT MAKES THIS USEFUL. A mount event would
+ * always report success, because this section is wrapped in LazySection and
+ * LazySection mounts children 200px before they enter the viewport. An
+ * instrument that always says "yes" answers nothing. So the view event fires
+ * ONCE per mount, at threshold 0.5, on the RENDERED BODY ref — never from the
+ * loading hold, never from LazySection's premature mount, and never more than
+ * once. If you add another view event on this page, copy this shape: the next
+ * maintainer will reach for onMount, and onMount here is a lie.
+ *
+ *   tour_overview_college_view — once per mount when the section is genuinely
+ *     half in the viewport.
  *   tour_overview_college_tap — the terminal row only. Reach, then intent.
+ *
  * Both are best-effort writes through analyticsEvents and never block the UI.
  *
  * DATA is unchanged: useCollegeSeasonStats (earnings-sorted standings) plus
