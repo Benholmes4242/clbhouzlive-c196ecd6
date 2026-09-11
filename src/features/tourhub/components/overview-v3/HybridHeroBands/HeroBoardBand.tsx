@@ -434,43 +434,67 @@ export function HeroBoardSection({
       {hasStrip && (
         <div
           style={{
-            display: 'flex',
-            gap: 10,
             padding: '12px 16px 16px',
             background: A.CANVAS,
             borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
           }}
         >
+          <div style={{ display: 'flex', gap: 10 }}>
+            {field && (
+              <StatCell
+                align="left"
+                label={t('overview.onTheCourse.fieldAverageToday')}
+                value={formatToParAvg(field.avg)}
+                color={tourFigColor(field.avg)}
+              />
+            )}
+            {low && (
+              <StatCell
+                align="center"
+                label={t('overview.onTheCourse.lowRoundLabel')}
+                value={formatToPar(low.toPar)}
+                color={tourFigColor(low.toPar)}
+              />
+            )}
+            {field && field.count > 0 && (
+              <StatCell
+                align="right"
+                label={t('overview.onTheCourse.underParTodayLabel')}
+                value={t('overview.onTheCourse.underParTodayValue', {
+                  n: field.underPar,
+                })}
+              />
+            )}
+          </div>
+          {/*
+            ONE BASIS LINE FOR THE WHOLE STRIP (section C). Three per-cell
+            sub-labels were three ways of saying the same sample: every figure
+            here is derived from the SAME set of completed rounds in the same
+            round, so the sample is stated once, in full, beneath them. The rule
+            that every figure carries its sample is satisfied by one line
+            covering all three; it is not satisfied by dropping it.
+
+            The low round's HOLDERS stay on this line rather than being lost
+            with the sub-labels: a name is data, not a caption.
+          */}
           {field && (
-            <StatCell
-              align="left"
-              label={t('overview.onTheCourse.fieldAverageToday')}
-              value={formatToParAvg(field.avg)}
-              color={tourFigColor(field.avg)}
-              sub={t('overview.onTheCourse.fromNRoundsIn', { n: field.count })}
-            />
-          )}
-          {low && (
-            <StatCell
-              align="center"
-              label={t('overview.onTheCourse.lowRoundLabel')}
-              value={formatToPar(low.toPar)}
-              color={tourFigColor(low.toPar)}
-              sub={holders.length > 0 ? holders.join(', ') : null}
-            />
-          )}
-          {field && field.count > 0 && (
-            <StatCell
-              align="right"
-              label={t('overview.onTheCourse.underParTodayLabel')}
-              /* EACH LINE READS ON ITS OWN. The figure is the figure and the
-                 sub-label is a complete phrase — "28" over "of 119 players in
-                 the field", not "28 of 119" over the fragment "players in". */
-              value={t('overview.onTheCourse.underParTodayValue', {
-                n: field.underPar,
+            <div
+              style={{
+                marginTop: 8,
+                fontSize: 11,
+                fontWeight: 600,
+                lineHeight: '15px',
+                color: WHITE_ALPHA_65,
+              }}
+            >
+              {t('overview.onTheCourse.figuresBasis', {
+                n: field.count,
+                round: currentRound ?? 1,
               })}
-              sub={t('overview.onTheCourse.underParTodaySub', { m: field.count })}
-            />
+              {low && holders.length > 0
+                ? ` ${t('overview.onTheCourse.figuresBasisLow', { names: holders.join(', ') })}`
+                : ''}
+            </div>
           )}
         </div>
       )}
