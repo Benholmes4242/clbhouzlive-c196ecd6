@@ -91,8 +91,12 @@ export default function CreateSheetV3({ open, onClose, returnPath }: Props) {
   const rateIt = (round: CreateSheetRound) => {
     if (!round.courseId) return;
     analyticsEvents.track('create_sheet_action', { action: 'rate_it' });
-    onClose();
-    navigate(`/courses/${round.courseId}/rate`);
+    /* SAME ROUTE AND SAME PARAM SHAPE as the venue band's RATE THIS COURSE row —
+       one way in to the review composer, not a second. courseId here is a
+       golf_courses.id (the hook joins golf_courses to resolve name and image), and
+       a round whose course does not resolve carries no courseId, so no RATE IT
+       pill renders for it and this cannot route to a broken page. */
+    navigateAfterClose(`/courses/${round.courseId}/rate`);
   };
 
   const saySomething = (round: CreateSheetRound) => {
