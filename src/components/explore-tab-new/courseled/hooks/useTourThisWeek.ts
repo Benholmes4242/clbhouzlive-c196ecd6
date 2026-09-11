@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { mapTourSlug } from '@/features/tourhub/_shared/tourOrder';
 import { getTournamentDisplayState } from '@/utils/tournamentState';
+import { formatVenueLabel } from '@/features/tourhub/lib/venueLabel';
 
 /**
  * useTourThisWeek — one card per venue playing THIS WEEK across the tours

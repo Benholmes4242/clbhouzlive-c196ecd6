@@ -220,7 +220,9 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
     if (courseName) meta.push(courseName);
     // post_visibility is ('anyone' | 'followers' | 'private') - 'anyone' IS
     // public. 'private' is named as itself rather than mislabelled "friends".
-    if (p.visibility === 'followers') meta.push('Friends only');
+    // NOT "Friends only": 'followers' is not friendship, and nothing enforces a
+    // restriction on the file. See the audience-copy rule in useUpdatePost.ts.
+    if (p.visibility === 'followers') meta.push('Followers');
     else if (p.visibility === 'private') meta.push('Private');
 
     items.push({
