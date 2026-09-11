@@ -371,7 +371,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
           </button>
         </V4Card>
         {pages.length > 1 ? (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 0, marginTop: 4 }}>
             {pages.map((_, i) => (
               /* THE DOTS ARE BUTTONS. 6px of ink is not a touch target, so the
                  hit area is 28x28 with the mark drawn inside it. */
