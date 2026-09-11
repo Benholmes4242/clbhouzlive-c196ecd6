@@ -24,6 +24,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { SPACE } from '@/lib/spacing';
+import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { OVERVIEW_GUTTER } from '../../overview/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
@@ -127,7 +128,7 @@ export function OverviewPageV3() {
           id="content-below-hero"
           className="relative z-10"
         >
-          <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 'var(--bottom-nav-height, 96px)' }}>
+          <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: NAV_CLEARANCE }}>
             <WireOverviewSection />
             <LazySection minHeight={400}>
               <WorldRankingsSlot />
@@ -144,17 +145,15 @@ export function OverviewPageV3() {
               <ConnectHandicapCue variant="tour-venue" courseName="" flat />
             </LazySection>
 
-            {/* THE PROVENANCE LINE (structural brief G). One line beneath a
-                hairline at the foot of the page, 10/T40. It is the only thing
-                on this page that says which half of it is licensed tour data
-                and which half is the app's own members. Not a legal notice and
-                not a link — a single sentence of attribution. */}
-            <div style={{ paddingLeft: OVERVIEW_GUTTER, paddingRight: OVERVIEW_GUTTER, paddingTop: 4 }}>
-              <div style={{ height: 1, background: 'rgba(255,255,255,0.14)', marginBottom: 10 }} />
-              <span style={{ fontSize: 10, fontWeight: 500, lineHeight: 1.5, color: 'rgba(248,250,252,0.40)' }}>
-                {t('overview.page.footerLicence')}
-              </span>
-            </div>
+            {/* THE PAGE ENDS AT ALL FRANCHISES (device-walk-2 F). The
+                provenance line ("Leaderboards and rankings from the tours.
+                Ratings from clbhouz members.") and the hairline above it are
+                gone by ruling, and its locale key is retired in all six files
+                rather than left rendering an empty line. The foot now reserves
+                only the measured bottom-control clearance (NAV_CLEARANCE) —
+                the old `var(--bottom-nav-height, 96px)` left close to a
+                screenful of nothing, which reads as content that failed to
+                load. */}
           </div>
         </div>
         <ScrollToTopGlass />
