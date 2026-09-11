@@ -39,7 +39,8 @@ import type { StreamItem } from './streamItem';
 export type CardSize = 'lead' | 'std' | 'pair';
 
 const PHOTO_H: Record<CardSize, number> = { lead: 340, std: 210, pair: 124 };
-const RADIUS: Record<CardSize, number> = { lead: r.lg, std: r.md, pair: r.md };
+/** The radius canon is a CSS length, not a number: r.lg '18px', r.md '14px'. */
+const RADIUS: Record<CardSize, string> = { lead: r.lg, std: r.md, pair: r.md };
 /** The trace width the lead and std pass. New widths, not new behaviour. */
 const SHAPE_W: Record<CardSize, number> = { lead: 350, std: 350, pair: 0 };
 /** The band the trace occupies at the foot of the photograph. */
