@@ -296,7 +296,10 @@
       "ourPicksLabel": "Our picks",
       "ourPicksAll": "All picks and the case for each",
       "ourPicksProvenance": "Model confidence {{confidence}}%",
-      "ourPicksStale": "Being refreshed"
+      "ourPicksStale": "Being refreshed",
+      "figuresBasis": "All three from {{n}} completed rounds in round {{round}}.",
+      "figuresBasisLowOnly": "Low round from completed rounds in round {{round}}; too few for a field average.",
+      "figuresBasisLow": "Low round: {{names}}."
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
