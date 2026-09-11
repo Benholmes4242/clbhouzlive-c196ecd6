@@ -295,7 +295,7 @@ function EmptyStateBar({
     return () => mq.removeEventListener?.('change', h);
   }, []);
 
-  const leftAccessory = (
+  const leftAccessory = showLabel ? (
     <div
       style={{
         padding: '0 12px',
@@ -314,7 +314,7 @@ function EmptyStateBar({
     >
       {labelText}
     </div>
-  );
+  ) : undefined;
 
   // <2 facts OR reduced-motion → static, no marquee.
   if (facts.length < 2 || reduced) {
