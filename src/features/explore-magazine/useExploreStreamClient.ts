@@ -282,9 +282,11 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
             : null,
           who: null,
           facts: {
-            headline: story.title,
+            headline: story.headline,
             story_slug: story.slug,
-            source: story.source ?? null,
+            /* amateur_stories carries no source column; the kicker is the nearest
+               honest thing and is absent rather than invented when null. */
+            source: story.kicker ?? null,
             published_at: story.published_at ?? null,
             arrived_at: story.published_at ?? null,
           },
@@ -379,7 +381,7 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
   const isFetched =
     contextFetched &&
     (!wantsRounds || (circle.isFetched && everyone.isFetched)) &&
-    (view !== 'all' && view !== 'reviews' ? true : reviews.query.isFetched) &&
+    (view !== 'all' && view !== 'reviews' ? true : !reviews.isPending) &&
     (view !== 'all' ? true : !stories.isPending) &&
     (!wantsWatch || media.isFetched) &&
     (view !== 'watch' || moments.isFetched);
