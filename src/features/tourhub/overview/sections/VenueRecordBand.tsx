@@ -58,13 +58,15 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
       <button
         type="button"
         onClick={() => navigate(`/course/${data.courseId}`)}
+        /* FLAT — no panel fill, no border, no radius (structural brief section
+           A). The band is bounded by space and its own hairline rule, and its
+           content runs to the page gutter. */
         style={{
           width: '100%',
           textAlign: 'left',
-          background: A.PANEL,
-          border: `1px solid ${A.BORDER}`,
-          borderRadius: 16,
-          padding: '12px 14px 14px',
+          background: 'transparent',
+          border: 'none',
+          padding: '0 0 2px',
           cursor: 'pointer',
           display: 'flex',
           flexDirection: 'column',
