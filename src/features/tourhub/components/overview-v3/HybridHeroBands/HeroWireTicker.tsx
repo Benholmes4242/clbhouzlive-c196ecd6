@@ -184,12 +184,105 @@ function factNode(fact: TickerFact, key: string): ReactNode {
   );
 }
 
+/**
+ * LEAD FACTS — static, unobscured, above the wire. The amber state badge sits
+ * on this block's first line BESIDE the date range, not over any strip, so
+ * nothing can pass beneath it. Values wrap; nothing is clipped or ellipsised.
+ */
+function LeadFactsBlock({ facts, labelText }: { facts: TickerFact[]; labelText: string }) {
+  return (
+    <section
+      style={{
+        background: BG,
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 4,
+        padding: '9px 14px 10px',
+        borderTop: '0.5px solid rgba(255,255,255,0.08)',
+      }}
+      aria-label={labelText}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <span
+          style={{
+            padding: '2px 7px',
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            color: AMBER,
+            background: 'rgba(247,147,30,0.16)',
+            flexShrink: 0,
+          }}
+        >
+          {labelText}
+        </span>
+        {facts[0] ? (
+          <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
+            <span
+              style={{
+                fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                color: 'rgba(255,255,255,0.45)',
+                flexShrink: 0,
+              }}
+            >
+              {facts[0].label}
+            </span>
+            <span
+              style={{
+                ...NUMERIC_STYLE,
+                fontSize: 13,
+                fontWeight: 700,
+                color: 'rgba(255,255,255,0.90)',
+              }}
+            >
+              {facts[0].value}
+            </span>
+          </span>
+        ) : null}
+      </div>
+      {facts.slice(1).map((f, i) => (
+        <div key={`lead-${i}`} style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <span
+            style={{
+              fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              color: 'rgba(255,255,255,0.45)',
+              flexShrink: 0,
+            }}
+          >
+            {f.label}
+          </span>
+          {/* A NAME WRAPS, IT DOES NOT CLIP. No nowrap, no ellipsis here. */}
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              lineHeight: '17px',
+              color: 'rgba(255,255,255,0.92)',
+              minWidth: 0,
+            }}
+          >
+            {f.value}
+          </span>
+        </div>
+      ))}
+    </section>
+  );
+}
+
 function EmptyStateBar({
   facts,
   labelText,
+  showLabel = true,
 }: {
   facts: TickerFact[];
   labelText: string;
+  /** false when a LeadFactsBlock above already carries the state badge. */
+  showLabel?: boolean;
 }) {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
