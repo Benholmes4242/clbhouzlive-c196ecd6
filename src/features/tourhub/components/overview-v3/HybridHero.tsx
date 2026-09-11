@@ -546,16 +546,28 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       return out;
     }
 
+    /* UPCOMING — TEES OFF, PURSE, and the third slot carrying the FIELD state
+       mark folded in from the retired strip (device-check B). With no field yet
+       (no rows on the board above) the third fact is FIELD / announced soon,
+       which is the one thing the strip said that the facts did not. Once the
+       field IS known the board itself says so, so the slot returns to the
+       defending champion. Still three, still static, still dropped rather than
+       dashed where the datum is missing. */
     if (datesString) out.push({ label: t('overview.hero.teesOff'), value: datesString });
-    if (defendingChamp?.name) {
+    if (purseFact) out.push(purseFact);
+    if (top10.length === 0) {
+      out.push({
+        label: t('overview.leaderboardBand.fieldEyebrow').toUpperCase(),
+        value: t('overview.hero.fieldAnnouncedSoon'),
+      });
+    } else if (defendingChamp?.name) {
       out.push({
         label: t('overview.hero.defendsLabel'),
         value: surname(defendingChamp.name) ?? defendingChamp.name,
       });
     }
-    if (purseFact) out.push(purseFact);
     return out;
-  }, [state, safeLeaderboard, tiedLeaders, champion, wasPlayoff, datesString, defendingChamp, purseFact, t]);
+  }, [state, safeLeaderboard, tiedLeaders, champion, wasPlayoff, datesString, defendingChamp, purseFact, top10.length, t]);
 
   if (!isCancelled) {
     return (
