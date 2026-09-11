@@ -167,7 +167,14 @@
     "hero": {
       "prevAria": "[~~Ƥřéṽíőúš ţőúřñáɱéñţ~~]",
       "nextAria": "[~~Ñéẋţ ţőúřñáɱéñţ~~]",
-      "counter": "[~~{{current}} / {{total}}~~]"
+      "counter": "[~~{{current}} / {{total}}~~]",
+      "stateLive": "[LIVE]",
+      "stateFinal": "[FINAL]",
+      "stateUpcoming": "[UPCOMING]",
+      "factRound": "[ROUND]",
+      "factThru": "[THRU]",
+      "factMargin": "[MARGIN]",
+      "factPlayoff": "[PLAYOFF]"
     },
     "leaderboardBand": {
       "ctaLive": "[~~ŐƤÉÑ ĻÍṼÉ ĻÉÁĐÉŘƁŐÁŘĐ~~]",

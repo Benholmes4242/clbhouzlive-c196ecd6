@@ -205,7 +205,14 @@
       "defendsLabel": "DEFENDS",
       "prevWinner": "{{year}} WINNER",
       "purse": "PURSE",
-      "fieldAnnouncedSoon": "Announced soon"
+      "fieldAnnouncedSoon": "Announced soon",
+      "stateLive": "LIVE",
+      "stateFinal": "FINAL",
+      "stateUpcoming": "UPCOMING",
+      "factRound": "ROUND",
+      "factThru": "THRU",
+      "factMargin": "MARGIN",
+      "factPlayoff": "PLAYOFF"
     },
     "leaderboardBand": {
       "ctaLive": "OPEN LIVE LEADERBOARD",

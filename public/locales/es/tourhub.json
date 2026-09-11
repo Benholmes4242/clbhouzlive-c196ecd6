@@ -171,7 +171,14 @@
     "hero": {
       "prevAria": "Previous tournament",
       "nextAria": "Next tournament",
-      "counter": "{{current}} / {{total}}"
+      "counter": "{{current}} / {{total}}",
+      "stateLive": "EN VIVO",
+      "stateFinal": "FINAL",
+      "stateUpcoming": "PROXIMO",
+      "factRound": "RONDA",
+      "factThru": "HASTA",
+      "factMargin": "MARGEN",
+      "factPlayoff": "PLAYOFF"
     },
     "leaderboardBand": {
       "ctaLive": "OPEN LIVE LEADERBOARD",

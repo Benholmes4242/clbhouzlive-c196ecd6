@@ -24,7 +24,7 @@ import { HeroBoardSection } from './HybridHeroBands/HeroBoardBand';
 import { tournamentRoute } from '../../routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HybridHero } from './HybridHero';
-import { PHOTO_BAND_HEIGHT } from './HybridHero.constants';
+import { PHOTO_BAND_HEIGHT, OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { INK_TINT_06 } from '../../_shared/tokens';
 
@@ -45,9 +45,15 @@ export const OVERVIEW_HERO_HEIGHT = `${PHOTO_BAND_HEIGHT}px`;
 /** Wire-ticker band height (kept in sync with HeroWireTicker). */
 export const OVERVIEW_HERO_TICKER_HEIGHT = 36;
 
-/** Full hero container height = photo band + wire ticker. */
+/**
+ * Full hero container height = photo band + wire ticker.
+ *
+ * Section B: the OVERVIEW's photo band is 300 (OVERVIEW_PHOTO_BAND_HEIGHT), so
+ * the container is 336. OVERVIEW_HERO_HEIGHT above stays 340 for the two news
+ * surfaces that import it and are outside this brief.
+ */
 export const OVERVIEW_HERO_TOTAL_HEIGHT =
-  `calc(${OVERVIEW_HERO_HEIGHT} + ${OVERVIEW_HERO_TICKER_HEIGHT}px)`;
+  `${OVERVIEW_PHOTO_BAND_HEIGHT + OVERVIEW_HERO_TICKER_HEIGHT}px`;
 
 export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');

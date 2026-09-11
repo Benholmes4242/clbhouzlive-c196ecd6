@@ -37,7 +37,17 @@ export const V4 = {
   slate: 'rgba(248,250,252,0.42)',
   hairline: 'rgba(255,255,255,0.14)',
 
-  // Accents — amber means the viewing member; amberDeep doubles as the
+  // AMBER ON THE TOUR OVERVIEW — MARKS, NOT ACTIONS.
+  //
+  // Amber means THE LIVE ROUND in any figure, mark or row state on this page
+  // (the app-wide "amber means the viewing member" reading does not hold on
+  // tour surfaces; a favourited player's row is the one other exception).
+  // It does NOT govern ACTIONS: a filled amber call to action is the app's
+  // action colour everywhere and always has been, and is unaffected by this
+  // fence. That distinction was implicit until BRIEF_TOUR_OVERVIEW_STRUCTURAL
+  // ruling 4 wrote it down.
+  //
+  // Accents — amberDeep doubles as the
   // MAJORS GOLD (see holes/_constants.ts). Never repointed.
   amber: '#F7931E',
   amberSoft: 'rgba(247,147,30,0.12)',

@@ -167,7 +167,14 @@
     "hero": {
       "prevAria": "Previous tournament",
       "nextAria": "Next tournament",
-      "counter": "{{current}} / {{total}}"
+      "counter": "{{current}} / {{total}}",
+      "stateLive": "ライブ",
+      "stateFinal": "終了",
+      "stateUpcoming": "予定",
+      "factRound": "ラウンド",
+      "factThru": "経過",
+      "factMargin": "差",
+      "factPlayoff": "プレーオフ"
     },
     "leaderboardBand": {
       "ctaLive": "OPEN LIVE LEADERBOARD",

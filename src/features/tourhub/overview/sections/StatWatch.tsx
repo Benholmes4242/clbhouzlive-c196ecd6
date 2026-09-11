@@ -153,10 +153,15 @@ function StatList({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: isLeader ? '10px 10px' : '10px 10px',
-                margin: isLeader ? '0 -10px' : '0 -10px',
-                background: isLeader ? 'rgba(255,255,255,0.03)' : 'transparent',
-                borderRadius: isLeader ? 12 : 0,
+                /* FLAT — the leader row carries NO tinted band and NO radius
+                   (structural brief, ruling 3). On a page that has removed
+                   every bordered card, a 3% tint with a 12px radius is the last
+                   thing left that reads as one, and a member cannot tell a tint
+                   from a border. The leader reads as the leader through TYPE:
+                   the avatar, the 700 name, the 18px figure and the solid bar.
+                   Same ruling as the circle leaderboard's own row. */
+                padding: '10px 0',
+                background: 'transparent',
                 cursor: 'pointer',
               }}
             >
