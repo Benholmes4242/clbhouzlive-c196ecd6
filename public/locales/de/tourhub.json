@@ -452,6 +452,21 @@
     },
     "board": {
       "clbhouzPick": "clbhouz-Tipp"
+    },
+    "venueRecord": {
+      "kicker": "Das Protokoll",
+      "clubhouseRating": "Clubhaus",
+      "reviews": "Bewertungen",
+      "top100": "Top 100",
+      "tooFewRatings": "Zu wenige Mitglieder haben diesen Platz bisher bewertet.",
+      "rateAction": "DIESEN PLATZ BEWERTEN",
+      "ratingFrom_one": "aus {{count}} Bewertung",
+      "ratingFrom_other": "aus {{count}} Bewertungen",
+      "sectionKicker": "Der Austragungsort dieser Woche auf clbhouz",
+      "ratingLabel": "Mitglieder-Bewertung",
+      "basis_one": "Aus {{count}} Bewertung von Mitgliedern, die dort gespielt haben.",
+      "basis_other": "Aus {{count}} Bewertungen von Mitgliedern, die dort gespielt haben.",
+      "seeAction": "PLATZ ANSEHEN"
     }
   },
   "empty": {

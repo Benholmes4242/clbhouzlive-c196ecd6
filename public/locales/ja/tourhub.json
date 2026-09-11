@@ -448,6 +448,21 @@
     },
     "board": {
       "clbhouzPick": "clbhouz の注目選手"
+    },
+    "venueRecord": {
+      "kicker": "Record book",
+      "clubhouseRating": "Clubhouse",
+      "reviews": "Review",
+      "top100": "Top 100",
+      "tooFewRatings": "Kono course wo hyoka shita member ga mada sukunai desu.",
+      "rateAction": "KONO COURSE WO HYOKA",
+      "ratingFrom_one": "{{count}} ken no hyoka",
+      "ratingFrom_other": "{{count}} ken no hyoka",
+      "sectionKicker": "clbhouz: konshu no kaijo",
+      "ratingLabel": "Member hyoka",
+      "basis_one": "Play shita member {{count}} ken no hyoka.",
+      "basis_other": "Play shita member {{count}} ken no hyoka.",
+      "seeAction": "COURSE WO MIRU"
     }
   },
   "empty": {
