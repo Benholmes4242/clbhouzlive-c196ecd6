@@ -193,12 +193,13 @@ function drainSettleQueue() {
 }
 
 export function afterSheetHistorySettled(fn: () => void): void {
-  if (typeof window === 'undefined' || selfInflictedPops === 0) {
+  if (typeof window === 'undefined' || (!awaitingPop && ops.length === 0)) {
     queueMicrotask(fn);
     return;
   }
   ensureListener();
   settleQueue.push(fn);
+  schedulePump();
 }
 
 /** Test/diagnostic only. */
