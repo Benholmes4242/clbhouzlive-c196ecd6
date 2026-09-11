@@ -381,7 +381,8 @@ export function HeroWireTicker({
 }: HeroWireTickerProps) {
   const { t } = useTranslation('tourhub');
 
-  const isStatic = presentation === 'static';
+  const isColumns = presentation === 'columns';
+  const isStatic = presentation === 'static' || isColumns;
   const allRows = rows ?? [];
   const safeRows = isStatic ? allRows.slice(0, STATIC_ROWS) : allRows;
   const lead = leadFacts ?? [];
