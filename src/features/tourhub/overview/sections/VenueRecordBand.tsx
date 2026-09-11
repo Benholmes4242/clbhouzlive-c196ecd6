@@ -6,7 +6,18 @@
  * then a centred three-up stat row — clubhouse rating, review count, Top 100
  * placement. Whole panel deep-links to the course page.
  *
- * Self-hides when the tournament has no linked course or no community rating.
+ * Self-hides only when the tournament has no linked course, or when the venue
+ * is neither rated nor ranked (the RPC returns no row in that case).
+ *
+ * THE BAND STATES ITS SAMPLE. A rating figure NEVER renders without its count:
+ * "8.7" alone invites a member to read one person's opinion as a verdict on a
+ * golf course. Below RATING_FLOOR ratings the FIGURE DOES NOT RENDER AT ALL —
+ * the band still shows, carrying the course name and the Top 100 rank, because
+ * a published rank is a fact that needs no sample, and it says plainly that too
+ * few members have rated the venue. At or above the floor: figure plus count,
+ * and NO TIER WORD — a tier word is a verdict, and twelve ratings is not enough
+ * to hand one down about Wentworth. Same rule as the course pages: show the
+ * figure, withhold the label, state the sample.
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +25,9 @@ import { useTranslation } from 'react-i18next';
 import { A, KICKER, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SPACE } from '@/lib/spacing';
 import { useTournamentVenueRecord } from '../data/useTournamentVenueRecord';
-import { formatNumber } from '@/i18n/format';
+
+/* Minimum ratings before the clubhouse figure may render at all. */
+const RATING_FLOOR = 3;
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
@@ -33,9 +46,12 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
   const { data } = useTournamentVenueRecord(tournamentId);
 
   if (!data) return null;
-  const hasRating = data.rating != null;
+  const count = data.reviewCount ?? 0;
+  /* A figure is only shown with a real count behind it. */
+  const hasRating = data.rating != null && count >= RATING_FLOOR;
   const hasRank = data.listRank != null;
-  if (!hasRating && !hasRank) return null;
+  const belowFloor = data.rating != null && count < RATING_FLOOR;
+  if (!hasRating && !hasRank && !belowFloor) return null;
 
   return (
     <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
@@ -70,14 +86,8 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
         <div style={{ display: 'flex', alignItems: 'flex-start' }}>
           {hasRating ? (
             <Stat
-              label={t('overview.venueRecord.clubhouseRating')}
+              label={t('overview.venueRecord.ratingFrom', { count })}
               value={Number(data.rating).toFixed(1)}
-            />
-          ) : null}
-          {data.reviewCount != null ? (
-            <Stat
-              label={t('overview.venueRecord.reviews')}
-              value={formatNumber(data.reviewCount)}
             />
           ) : null}
           {hasRank ? (
@@ -87,6 +97,12 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
             />
           ) : null}
         </div>
+
+        {hasRating ? null : (
+          <span style={{ fontSize: 12, fontWeight: 600, color: A.DIM }}>
+            {t('overview.venueRecord.tooFewRatings')}
+          </span>
+        )}
       </button>
     </div>
   );
