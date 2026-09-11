@@ -195,7 +195,8 @@
       "chipPlayoffs": "[~~Ƥļáýőƒƒš~~]",
       "daysLabel": "[~~ĐÁÝŠ~~]",
       "venueDefendsSep": "[~~ · {{name}} đéƒéñđš~~]",
-      "subline": "[~~Ţĥé ţőúŕ šçĥéðúļé~~]"
+      "subline": "[~~Ţĥé ţőúŕ šçĥéðúļé~~]",
+      "pageAria": "[Page {{page}} of {{total}}]"
     },
     "onTheCourse": {
       "eyebrow": "[~~Őñ ţĥé ĉőúřšé~~]",
