@@ -497,6 +497,35 @@ export function HeroWireTicker({
     </div>
   );
 
+  /**
+   * COLUMNS — four equal columns, no label, page gutter (section C).
+   * Equal columns rather than content-width cells so the four positions line
+   * up as a table: a member scanning down the board reads the continuation as
+   * more of the same list, not as a caption. The columns are 1fr each, so the
+   * longest surname sets nothing and clips nothing.
+   */
+  if (isColumns) {
+    return (
+      <section
+        style={{
+          background: BG,
+          height: 36,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          alignItems: 'center',
+          gap: 8,
+          padding: '0 20px',
+          width: '100%',
+          overflow: 'hidden',
+          borderTop: '0.5px solid rgba(255,255,255,0.08)',
+        }}
+        aria-label={label}
+      >
+        {staticCells}
+      </section>
+    );
+  }
+
   // STATIC — one treatment for everyone. No marquee, no auto-scroll, no loop,
   // no overflow scroller, and deliberately no prefers-reduced-motion branch.
   // The ENTRIES are fixed width and the LABEL absorbs whatever is left: at
