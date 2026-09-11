@@ -62,6 +62,9 @@ function ensureListener() {
   window.addEventListener('popstate', () => {
     if (selfInflictedPops > 0) {
       selfInflictedPops -= 1;
+      // The stack is settled once the last unwind we caused has landed: that is
+      // the moment a handler waiting to navigate away may safely push its route.
+      if (selfInflictedPops === 0) drainSettleQueue();
       return;
     }
     const top = stack.pop();
