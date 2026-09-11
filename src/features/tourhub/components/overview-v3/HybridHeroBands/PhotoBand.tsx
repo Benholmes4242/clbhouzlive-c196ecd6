@@ -25,6 +25,17 @@
  *
  * The lower-third stack now sits directly above the wire ticker; the removed
  * dots row freed the gap, so the title, venue, and moment chip move down.
+ *
+ * BRIEF_TOUR_OVERVIEW_STRUCTURAL section B — NOTHING OVERLAID, NOTHING MOVING.
+ * The overview passes `heightPx` (300), a `kicker` and exactly three `facts`.
+ * When facts are supplied the translucent blurred moment capsule is NOT drawn:
+ * the leader, the round and the through-mark are set as plain type over the
+ * photograph, because a frosted capsule is a second surface floating on a
+ * surface, and the ramp under it is already doing the legibility work. Every
+ * one of the three is a static fact; nothing in this band animates.
+ *
+ * The props are additive and default to today's values, so the results-state
+ * CinematicFrame path and the InsightSheet caller are unchanged.
  */
 
 import React from 'react';
@@ -80,6 +91,55 @@ export interface PhotoBandProps {
   venuePar?: number | null;
   venueYardage?: number | null;
   purse?: number | null;
+  /**
+   * Band height. Defaults to PHOTO_BAND_HEIGHT (340), which is what the
+   * legacy/cancelled path and the News lead story render. The Tour Hub
+   * overview passes 300 per its structural brief.
+   */
+  heightPx?: number;
+  /** Small caps line above the title: LIVE / FINAL / TEES OFF IN ... */
+  kicker?: string | null;
+  /**
+   * Exactly three static facts, bottom of the stack, plain type. When present
+   * they REPLACE the moment capsule. Absent by default.
+   */
+  facts?: ReadonlyArray<{ label: string; value: string; valueColor?: string }>;
+}
+
+/** One static fact: caps label over its figure. No container. */
+function HeroFact({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) {
+  return (
+    <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <span
+        style={{
+          fontSize: 9.5 /* AXIS 10 - hero broadcast exception (see file header) */,
+          fontWeight: 700,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.62)',
+          textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          ...NUMERIC_STYLE,
+          fontSize: 13,
+          fontWeight: 700,
+          letterSpacing: '-0.02em',
+          color: valueColor ?? 'white',
+          textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {value}
+      </span>
+    </div>
+  );
 }
 
 export function PhotoBand({
@@ -101,6 +161,9 @@ export function PhotoBand({
   venuePar = null,
   venueYardage = null,
   purse = null,
+  heightPx = PHOTO_BAND_HEIGHT,
+  kicker = null,
+  facts,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
   const useDusk =
@@ -126,7 +189,7 @@ export function PhotoBand({
         // HARD height, not a floor. It ABSORBS the safe-area inset so the hero
         // column (photo + 36px ticker) exactly fills OVERVIEW_HERO_TOTAL_HEIGHT
         // — otherwise the inset showed as a white gap above the live board.
-        height: `${PHOTO_BAND_HEIGHT}px`,
+        height: `${heightPx}px`,
         // MICRO_BRIEF_TOUR_OVERVIEW_HERO_CANON_LAYERING took this hero's RAMP
         // and LAYERING onto the canon but DELIBERATELY NOT its height: HERO_MIN_H
         // ADDS the inset and is a floor, while PHOTO_BAND_HEIGHT is a term in
@@ -156,6 +219,23 @@ export function PhotoBand({
           display: 'flex', flexDirection: 'column', gap: 8,
         }}
       >
+        {/* Kicker — the state, as a line of type. Never a pill: a pill is a
+            container, and this band draws none (structural brief section B). */}
+        {kicker ? (
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.72)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+            }}
+          >
+            {kicker}
+          </span>
+        ) : null}
+
         {/* Title — clamped to two lines; long sponsor-prefixed names step down
             rather than clip mid-word (threshold from real sr_tournaments names). */}
         <h1
@@ -197,8 +277,54 @@ export function PhotoBand({
           </div>
         )}
 
-        {/* Moment row + CTA */}
-        {(momentName || onCtaTap) && (
+        {/* THREE STATIC FACTS + CTA (structural brief section B). */}
+        {facts && facts.length > 0 ? (
+          <div
+            style={{
+              marginTop: 2,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between',
+              gap: 12,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, minWidth: 0, flex: 1 }}>
+              {facts.map((f) => (
+                <HeroFact key={f.label} label={f.label} value={f.value} valueColor={f.valueColor} />
+              ))}
+            </div>
+            {onCtaTap && (
+              <button
+                type="button"
+                onClick={onCtaTap}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 4px',
+                  margin: '-6px -4px',
+                  cursor: 'pointer',
+                  fontFamily: FONT,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  color: 'rgba(255,255,255,0.62)',
+                  textTransform: 'uppercase',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+                  flexShrink: 0,
+                }}
+              >
+                {ctaLabel ?? t('overview.photoBand.tournamentCta')}
+                <ChevronRight size={14} strokeWidth={2.5} />
+              </button>
+            )}
+          </div>
+        ) : null}
+
+        {/* Moment row + CTA — legacy treatment, kept for callers that pass no facts. */}
+        {!facts && (momentName || onCtaTap) && (
           <div
             style={{
               marginTop: 2,
