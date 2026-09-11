@@ -55,6 +55,31 @@ export default function CreateSheetV3({ open, onClose, returnPath }: Props) {
   const { data: rounds = [] } = useRecentRoundsForCreate(open);
   const has = rounds.length > 0;
 
+  /* NAVIGATING AWAY FROM THIS SHEET — ORDER AND OWNERSHIP.
+     This sheet holds a sheet-history marker, and closing it unwinds that marker
+     with history.back(). A handler that closed the sheet and then navigated in
+     the same tick pushed its route BEFORE that back landed, so the back ate the
+     push and the member was returned to the page they started on. That was the
+     RATE IT symptom exactly; the two composer actions survived only because they
+     open an overlay through a store rather than navigating.
+     THE SHEET CLOSES FIRST, ITS ENTRY IS RELEASED, AND ONLY THEN DO WE NAVIGATE.
+     The target is parked here, the close releases the marker during commit, and
+     afterSheetHistorySettled runs the navigation once that unwind has landed. NOT
+     A DELAY — with nothing outstanding it runs on the next microtask. */
+  const pendingNav = useRef<string | null>(null);
+  const navigateAfterClose = (to: string) => {
+    pendingNav.current = to;
+    onClose();
+  };
+  useEffect(() => {
+    if (open) return;
+    const to = pendingNav.current;
+    if (!to) return;
+    pendingNav.current = null;
+    afterSheetHistorySettled(() => navigate(to));
+  }, [open, navigate]);
+
+
   // "Add photos" / "Add more" — the media lands ON the existing round post.
   const addToPost = (round: CreateSheetRound, files: File[]) => {
     if (!round.postId || files.length === 0) return;
