@@ -1,12 +1,18 @@
 /**
- * CollegeFranchise — COMPRESSED (BRIEF_TOUR_OVERVIEW_STRUCTURAL section F).
+ * CollegeFranchise — A FIVE-ROW TABLE WITH A VERDICT ON TOP
+ * (BRIEF_TOUR_OVERVIEW_TWO_SECTIONS section D; compression from STRUCTURAL F).
  *
- * WHAT THIS SECTION IS NOW: kicker, meta, one sentence, three figures, one
- * terminal row. Roughly 120px where the Open Duel treatment ran to roughly 700.
+ * WHAT THIS SECTION IS NOW: kicker, meta, an 18px heading carrying the verdict,
+ * one line saying what is being counted, five ranked rows, one terminal row.
  * The full treatment (duel, captains, tug bar, chasing standings) lives behind
- * the see-all at /tourhub?tab=college — it was not deleted, it MOVED OFF THIS
+ * the see-all at /tourhub/college-golf — it was not deleted, it MOVED OFF THIS
  * PAGE. See the roadmap dead list for the retired blocks and their old line
- * ranges in this file's previous revision.
+ * ranges in this file's previous revisions.
+ *
+ * WHY A TABLE AND NOT THREE FIGURES. The three-figure row had nothing to look at
+ * and no top of its own, so it inherited the section edge above it and read as
+ * the tail of Stat Watch. A table shortened is still a recognisable shape; three
+ * floating figures is not. The heading gives the section its own top.
  *
  * GLOBAL section — one franchise game across golf. Does NOT read the tour
  * picker.
@@ -44,7 +50,7 @@
  */
 
 import { useEffect, useMemo, useRef } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
