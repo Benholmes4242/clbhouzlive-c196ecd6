@@ -466,8 +466,6 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
    * StoryLeaderboardStrip, its other consumer.
    */
 
-  }, [state.kind, top10.length, tournament.purse, defendingChamp, t]);
-
   /**
    * SECTION B — THE KICKER AND THE THREE FACTS.
    *
