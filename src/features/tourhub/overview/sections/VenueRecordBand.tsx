@@ -172,14 +172,28 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
 
       {hasRating ? (
         <>
-          <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <span
-              className="tabular-nums lining-nums"
-              style={{ fontSize: 21, fontWeight: 700, color: A.INK, letterSpacing: '-0.03em', ...FIGS }}
-            >
-              {Number(data.rating).toFixed(1)}
-            </span>
-            <span style={FIGURE_KICKER}>{t('overview.venueRecord.ratingLabel')}</span>
+          <div style={{ marginTop: 12, display: 'flex', gap: 32 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <span
+                className="tabular-nums lining-nums"
+                style={{ fontSize: 21, fontWeight: 700, color: A.INK, letterSpacing: '-0.03em', ...FIGS }}
+              >
+                {Number(data.rating).toFixed(1)}
+              </span>
+              <span style={FIGURE_KICKER}>{t('overview.venueRecord.ratingLabel')}</span>
+            </div>
+
+            {played != null ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <span
+                  className="tabular-nums lining-nums"
+                  style={{ fontSize: 21, fontWeight: 700, color: A.INK, letterSpacing: '-0.03em', ...FIGS }}
+                >
+                  {played}
+                </span>
+                <span style={FIGURE_KICKER}>{t('overview.venueRecord.playedLabel')}</span>
+              </div>
+            ) : null}
           </div>
 
           <div
