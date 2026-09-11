@@ -21189,6 +21189,12 @@ export type Database = {
           views: number
         }[]
       }
+      get_screen_event_paths: {
+        Args: { p_route_pattern: string }
+        Returns: {
+          raw_path: string
+        }[]
+      }
       get_season_calendar: {
         Args: never
         Returns: {

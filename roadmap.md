@@ -1118,11 +1118,12 @@ are unaffected by the flag; the client hooks are the risk.
 TIER 3, confirmed deliberate: the aggregates and reference views. explore_moments
 carries member post media (see note below) and is the one to decide.
 
-### 8. OPEN - page_path_map is read from the client and returns nothing
+### 8. CLOSED - page_path_map now read through a trusted function
 src/features/admin/hooks/useScreenAnalytics.ts:84 selects page_path_map directly.
 The table has RLS on and NO policy, so a member (admin included) gets 0 rows from
 1,656. The hook then returns [] at its own empty-path guard, and the screen's top
 events list renders as "no events" for every screen. Same class as the counter
-faults: something unknowable rendered as something known. FIX SHAPE: fold the
-path lookup into get_screen_analytics's family as a DEFINER function, as the
-manifest read already is. Not tonight.
+faults: something unknowable rendered as something known. FIXED: get_screen_event_paths(route_pattern) is
+SECURITY DEFINER, admin-gated, granted to authenticated and service_role only,
+and page_path_map keeps NO policy. The panel now has three states: loading, an
+unreadable lookup that says so, and a real zero.

@@ -318,7 +318,9 @@ export default function ScreensTab({ days }: { days: number }) {
 function ScreenDetailSheet({
   row, days, onClose,
 }: { row: ScreenRow | null; days: number; onClose: () => void }) {
-  const { data: events, isLoading } = useScreenTopEvents(row?.route_pattern ?? null, days);
+  // Three states, never two: loading, unreadable (isError - say so, show no
+  // figure), and a real zero. See useScreenTopEvents.
+  const { data: events, isLoading, isError } = useScreenTopEvents(row?.route_pattern ?? null, days);
 
   return (
     <AdminSheet
@@ -352,6 +354,8 @@ function ScreenDetailSheet({
                 height: 120, background: t.canvas, borderRadius: t.radius.md,
                 animation: 'admin-pulse 1.4s ease-in-out infinite',
               }} />
+            ) : isError ? (
+              <EmptyState title="Events could not be read" subtitle="This is not a zero - the lookup failed, so what fired on this screen is unknown." />
             ) : !events || events.length === 0 ? (
               <EmptyState title="No events on this screen" />
             ) : (
