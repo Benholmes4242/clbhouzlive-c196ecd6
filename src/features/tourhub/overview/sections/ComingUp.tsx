@@ -336,20 +336,77 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
             ))}
           </div>
           <style>{`.coming-up-track::-webkit-scrollbar{display:none}`}</style>
+          {/* TERMINAL ROW — the pager stops at 15 events, the season does not.
+              Standard uppercase treatment, carries the section's tour lens. */}
+          <button
+            type="button"
+            onClick={goSchedule}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              padding: '11px 14px',
+              background: 'transparent',
+              border: 'none',
+              borderTop: `0.5px solid ${V4.hairline}`,
+              cursor: 'pointer',
+              textAlign: 'left',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: V4.ink,
+              }}
+            >
+              {t('overview.comingUp.linkLabel')}
+            </span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: MUTE }} aria-hidden>
+              &rsaquo;
+            </span>
+          </button>
         </V4Card>
         {pages.length > 1 ? (
           <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 10 }}>
             {pages.map((_, i) => (
-              <span
+              /* THE DOTS ARE BUTTONS. 6px of ink is not a touch target, so the
+                 hit area is 28x28 with the mark drawn inside it. */
+              <button
                 key={i}
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: 999,
-                  background: i === activePage ? V4.ink : 'rgba(255,255,255,0.24)',
-                  transition: 'background 160ms ease',
+                type="button"
+                onClick={() => {
+                  const el = trackRef.current;
+                  if (!el) return;
+                  el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' });
                 }}
-              />
+                aria-label={t('overview.comingUp.pageAria', { page: i + 1, total: pages.length })}
+                aria-current={i === activePage ? 'true' : undefined}
+                style={{
+                  width: 28,
+                  height: 28,
+                  padding: 0,
+                  border: 'none',
+                  background: 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 999,
+                    background: i === activePage ? V4.ink : 'rgba(255,255,255,0.24)',
+                    transition: 'background 160ms ease',
+                  }}
+                />
+              </button>
             ))}
           </div>
         ) : null}
