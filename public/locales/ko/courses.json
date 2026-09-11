@@ -1540,6 +1540,20 @@
         "both": "Across {{rounds}}, {{courses}}.",
         "roundsOnly": "Across {{rounds}}."
       }
+    },
+    "stream": {
+      "view": {
+        "all": "전체",
+        "watch": "보기"
+      },
+      "shelf": {
+        "clips": "클립",
+        "moments": "커뮤니티에서"
+      },
+      "seeAll": "{{count}}개 모두 보기",
+      "views": "탐색 보기",
+      "aMember": "회원",
+      "nothingYet": "아직 내 코스와 관련된 내용이 없습니다. 코스를 팔로우하거나 핸디캡을 연결하면 이 페이지가 내 것이 됩니다."
     }
   }
 }

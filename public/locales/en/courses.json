@@ -63,6 +63,20 @@
         "both": "Across {{rounds}}, {{courses}}.",
         "roundsOnly": "Across {{rounds}}."
       }
+    },
+    "stream": {
+      "view": {
+        "all": "All",
+        "watch": "Watch"
+      },
+      "shelf": {
+        "clips": "Clips",
+        "moments": "From the community"
+      },
+      "seeAll": "See all {{count}}",
+      "views": "Explore views",
+      "aMember": "A member",
+      "nothingYet": "Nothing here touches your courses yet. Follow a course or connect a handicap and this page becomes yours."
     }
   },
   "amateurNews": {

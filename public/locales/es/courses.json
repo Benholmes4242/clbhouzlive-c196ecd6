@@ -1601,6 +1601,20 @@
         "both": "Across {{rounds}}, {{courses}}.",
         "roundsOnly": "Across {{rounds}}."
       }
+    },
+    "stream": {
+      "view": {
+        "all": "Todo",
+        "watch": "Ver"
+      },
+      "shelf": {
+        "clips": "Clips",
+        "moments": "De la comunidad"
+      },
+      "seeAll": "Ver los {{count}}",
+      "views": "Vistas de Explorar",
+      "aMember": "Un miembro",
+      "nothingYet": "Aqui aun no hay nada sobre tus campos. Sigue un campo o conecta un handicap y esta pagina sera tuya."
     }
   }
 }

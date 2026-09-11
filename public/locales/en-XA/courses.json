@@ -2185,6 +2185,20 @@
         "both": "[Across {{rounds}}, {{courses}}.]",
         "roundsOnly": "[Across {{rounds}}.]"
       }
+    },
+    "stream": {
+      "view": {
+        "all": "[Åll one]",
+        "watch": "[Wåtçh one]"
+      },
+      "shelf": {
+        "clips": "[Çlîps one]",
+        "moments": "[Fröm thé çömmünîty one]"
+      },
+      "seeAll": "[Séé åll {{count}} one two]",
+      "views": "[Éxplöré vîéws one]",
+      "aMember": "[Å mémbér one]",
+      "nothingYet": "[Nöthîng héré töüçhés yöür çöürsés yét. Föllöw å çöürsé ör çönnéçt å håndîçåp ånd thîs pågé béçömés yöürs. one two three four five]"
     }
   }
 }

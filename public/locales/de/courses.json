@@ -1601,6 +1601,20 @@
         "both": "Across {{rounds}}, {{courses}}.",
         "roundsOnly": "Across {{rounds}}."
       }
+    },
+    "stream": {
+      "view": {
+        "all": "Alle",
+        "watch": "Ansehen"
+      },
+      "shelf": {
+        "clips": "Clips",
+        "moments": "Aus der Community"
+      },
+      "seeAll": "Alle {{count}} ansehen",
+      "views": "Explore-Ansichten",
+      "aMember": "Ein Mitglied",
+      "nothingYet": "Hier gibt es noch nichts zu deinen Platzen. Folge einem Platz oder verbinde ein Handicap, und diese Seite wird deine."
     }
   }
 }

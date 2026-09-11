@@ -1537,6 +1537,20 @@
         "both": "Across {{rounds}}, {{courses}}.",
         "roundsOnly": "Across {{rounds}}."
       }
+    },
+    "stream": {
+      "view": {
+        "all": "すべて",
+        "watch": "見る"
+      },
+      "shelf": {
+        "clips": "クリップ",
+        "moments": "コミュニティから"
+      },
+      "seeAll": "{{count}}件すべて表示",
+      "views": "探索ビュー",
+      "aMember": "メンバー",
+      "nothingYet": "あなたのコースに関する情報はまだありません。コースをフォローするかハンディキャップを連携すると、このページがあなた仕様になります。"
     }
   }
 }
