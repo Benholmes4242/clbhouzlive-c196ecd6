@@ -226,8 +226,12 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
   }, [pages.length, pages]);
 
 
+  /* The door must tell the truth in EVERY lens. With no tour selected the
+     member is on ALL TOURS, so we say so explicitly — `?tour=all`. Omitting
+     the parameter let ScheduleTab fall back to the member's STORED tour, which
+     silently NARROWED a see-all to a tour they did not choose here. */
   const goSchedule = () =>
-    navigate(tour ? `/tourhub?tab=schedule&tour=${tour}` : '/tourhub?tab=schedule');
+    navigate(`/tourhub?tab=schedule&tour=${tour ?? 'all'}`);
 
   const countdown = (days: number) =>
     days <= 0
