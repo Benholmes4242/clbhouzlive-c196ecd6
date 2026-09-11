@@ -162,7 +162,8 @@
       "filterAriaLabel": "[~~Ƒíļţéř šéĉţíőñ ƀý ţőúř~~]"
     },
     "page": {
-      "offlineBanner": "[~~Ýőú'řé őƒƒļíñé. Šőɱé đáţá ɱáý ƀé őúţđáţéđ.~~]"
+      "offlineBanner": "[~~Ýőú'řé őƒƒļíñé. Šőɱé đáţá ɱáý ƀé őúţđáţéđ.~~]",
+      "footerLicence": "[~~Léádérbóárdš áñd ráñkíñgš fróm thé tóúrš. Rátíñgš fróm clbhouz mémbérš.~~]"
     },
     "hero": {
       "prevAria": "[~~Ƥřéṽíőúš ţőúřñáɱéñţ~~]",
@@ -382,7 +383,10 @@
       "headlineRunaway": "[~~<0>{{leader}} rúñš áwáy wíth ít.</0>~~]",
       "headlineClosing": "[~~<0>{{leader}} léádš. {{chaser}} íš çlóšíñg.</0>~~]",
       "rowMetaWithCaptain": "[~~{{count}} óñ tóúr · {{captain}} çáptáíñš~~]",
-      "rowMeta": "[~~{{count}} óñ tóúr~~]"
+      "rowMeta": "[~~{{count}} óñ tóúr~~]",
+      "summaryWide": "[~~<0>{{leader}}</0> léádš áll fráñçhíšéš óñ {{amount}} íñ šéášóñ álúmñí éárñíñgš, <1>{{gap}}</1> çléár óf {{chaser}}.~~]",
+      "summaryClose": "[~~<0>{{leader}}</0> léádš áll fráñçhíšéš óñ {{amount}}, wíth júšt <1>{{gap}}</1> bétwééñ thém áñd {{chaser}}.~~]",
+      "allAction": "[~~ÁLL FRÁÑÇHÍŠÉŠ~~]"
     },
     "cinematic": {
       "championEyebrow": "[!! ★ Chámpíón !!]",
