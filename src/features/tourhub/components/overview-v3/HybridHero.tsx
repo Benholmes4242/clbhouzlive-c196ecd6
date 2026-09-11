@@ -42,8 +42,10 @@ import {
   detectTopTie,
   deriveTickerRows,
   fmtScore,
+  roundLabel,
 } from './HybridHero.utils';
-import { BG, INK_15 } from './HybridHero.constants';
+import { getScoreColor } from '../../_shared/scoreColor';
+import { BG, INK_15, OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 
 
 import { SLATE_700, SLATE_800 } from '../../_shared/tokens';
@@ -449,6 +451,85 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     return facts;
   }, [state.kind, top10.length, tournament.purse, defendingChamp, t]);
 
+  /**
+   * SECTION B — THE KICKER AND THE THREE FACTS.
+   *
+   * Three per state, all STATIC, all read off data this component already
+   * fetched: no new query, no rotation, nothing that changes while a member
+   * looks at it. Under par is RED here as on every tour surface (scoreColor is
+   * the broadcast convention and is fenced).
+   *
+   * Where a fact's datum is missing the fact is DROPPED rather than filled with
+   * a dash: an empty slot is honest and a dash pretends there is a figure.
+   * Known gaps, measured against the live feed: purse is null on some events,
+   * and an upcoming event with no mapped defending champion loses that slot, so
+   * those states can render two.
+   */
+  const heroKicker: string | null = useMemo(() => {
+    if (state.kind === 'live') return t('overview.hero.stateLive');
+    if (state.kind === 'results') return t('overview.hero.stateFinal');
+    return state.countdown || t('overview.hero.stateUpcoming');
+  }, [state, t]);
+
+  const purseFact = useMemo(() => {
+    if (typeof tournament.purse !== 'number' || tournament.purse <= 0) return null;
+    const m = tournament.purse / 1_000_000;
+    return { label: t('overview.hero.purse'), value: m >= 10 ? `$${Math.round(m)}M` : `$${m.toFixed(1)}M` };
+  }, [tournament.purse, t]);
+
+  const heroFacts = useMemo(() => {
+    const surname = (n?: string | null) => (n ? n.trim().split(/\s+/).slice(-1)[0] : null);
+    const out: Array<{ label: string; value: string; valueColor?: string }> = [];
+
+    if (state.kind === 'live') {
+      const top: any = safeLeaderboard[0];
+      const name = tiedLeaders
+        ? t('overview.leaderRow.tiedAtTop', { count: tiedLeaders.count })
+        : surname(top?.player?.full_name || `${top?.player?.first_name ?? ''} ${top?.player?.last_name ?? ''}`);
+      const scoreStr = tiedLeaders ? tiedLeaders.score : top ? fmtScore(top.score) : null;
+      if (name && scoreStr) {
+        out.push({
+          label: t('overview.photoBand.leaderLabel'),
+          value: `${name} ${scoreStr}`,
+          valueColor: getScoreColor(tiedLeaders ? -1 : (top?.score ?? 0), 'dark', 'standard'),
+        });
+      }
+      out.push({ label: t('overview.hero.factRound'), value: roundLabel(state.round, state.totalRounds) });
+      if (state.thruLabel) out.push({ label: t('overview.hero.factThru'), value: state.thruLabel });
+      return out;
+    }
+
+    if (state.kind === 'results') {
+      if (champion) {
+        out.push({
+          label: t('overview.photoBand.championLabel'),
+          value: `${surname(champion.name) ?? champion.name} ${champion.score}`,
+        });
+      }
+      const leader: any = safeLeaderboard[0];
+      const runner: any = safeLeaderboard[1];
+      const margin =
+        typeof leader?.score === 'number' && typeof runner?.score === 'number' ? runner.score - leader.score : null;
+      if (wasPlayoff) {
+        out.push({ label: t('overview.hero.factMargin'), value: t('overview.hero.factPlayoff') });
+      } else if (margin != null && margin >= 0) {
+        out.push({ label: t('overview.hero.factMargin'), value: String(margin) });
+      }
+      if (purseFact) out.push(purseFact);
+      return out;
+    }
+
+    if (datesString) out.push({ label: t('overview.hero.teesOff'), value: datesString });
+    if (defendingChamp?.name) {
+      out.push({
+        label: t('overview.hero.defendsLabel'),
+        value: surname(defendingChamp.name) ?? defendingChamp.name,
+      });
+    }
+    if (purseFact) out.push(purseFact);
+    return out;
+  }, [state, safeLeaderboard, tiedLeaders, champion, wasPlayoff, datesString, defendingChamp, purseFact, t]);
+
   if (!isCancelled) {
     return (
       <div
@@ -483,6 +564,11 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           venuePar={tournament.venuePar}
           venueYardage={tournament.venueYardage}
           purse={tournament.purse}
+          /* Section B: fixed 300, a kicker line, three static facts, and no
+             overlaid capsule (passing facts suppresses the moment chip). */
+          heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
+          kicker={heroKicker}
+          facts={heroFacts}
         />
         {/*
           ALSO OUT is INFORMATION, not ambience, so it renders static (four
