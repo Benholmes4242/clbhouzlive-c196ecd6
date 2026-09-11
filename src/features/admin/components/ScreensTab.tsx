@@ -354,6 +354,8 @@ function ScreenDetailSheet({
                 height: 120, background: t.canvas, borderRadius: t.radius.md,
                 animation: 'admin-pulse 1.4s ease-in-out infinite',
               }} />
+            ) : isError ? (
+              <EmptyState title="Events could not be read" subtitle="This is not a zero - the lookup failed, so what fired on this screen is unknown." />
             ) : !events || events.length === 0 ? (
               <EmptyState title="No events on this screen" />
             ) : (
