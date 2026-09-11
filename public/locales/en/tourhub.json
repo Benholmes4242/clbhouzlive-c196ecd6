@@ -278,8 +278,8 @@
       "parShort": "Par {{par}}",
       "featuredGroupLabel": "Featured group",
       "underParTodayLabel": "UNDER PAR TODAY",
-      "underParTodayValue": "{{n}} of {{m}}",
-      "underParTodaySub": "players in",
+      "underParTodayValue": "{{n}}",
+      "underParTodaySub": "of {{m}} players in the field",
       "axisEasier": "Easier",
       "axisHarder": "Harder",
       "finishedLabel": "Finished",
@@ -510,6 +510,7 @@
       "reviews": "Reviews",
       "top100": "Top 100",
       "tooFewRatings": "Too few members have rated this course yet.",
+      "rateAction": "RATE THIS COURSE",
       "ratingFrom_one": "from {{count}} rating",
       "ratingFrom_other": "from {{count}} ratings"
     },

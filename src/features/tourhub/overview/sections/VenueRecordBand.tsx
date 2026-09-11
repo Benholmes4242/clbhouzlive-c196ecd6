@@ -104,6 +104,49 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
           </span>
         )}
       </button>
+
+      {/* THE BELOW-FLOOR STATE CARRIES AN ACTION. A tour venue in the week it
+          is on television, telling a member nobody has rated it, is the
+          strongest prompt to rate a course this app has — so it is a control,
+          not a dead sentence. Verified before building: rating requires no
+          played round (submit_course_review_v2 is SECURITY DEFINER and checks
+          only auth and value ranges), so any signed-in member can complete it.
+          At or above the floor there is NO ask — a rated course does not need
+          one. Routes to the existing composer; no new entry point. Sits outside
+          the panel button because a button may not nest inside a button. */}
+      {hasRating ? null : (
+        <button
+          type="button"
+          onClick={() => navigate(`/courses/${data.courseId}/rate`)}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '11px 14px',
+            background: 'transparent',
+            border: 'none',
+            borderTop: `1px solid ${A.BORDER}`,
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
+        >
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: A.INK,
+            }}
+          >
+            {t('overview.venueRecord.rateAction')}
+          </span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: A.MUTE }} aria-hidden>
+            &rsaquo;
+          </span>
+        </button>
+      )}
     </div>
   );
 }
