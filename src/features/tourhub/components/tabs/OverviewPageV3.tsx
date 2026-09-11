@@ -63,9 +63,19 @@ export function OverviewPageV3() {
         )}
       </AnimatePresence>
 
+      {/*
+        ONE CANVAS (device-walk-2 A). The hero bands and the board band paint
+        A.CANVAS === PAGE_CANVAS (#15171F, the Explore page's canvas). This page
+        used the Tailwind `bg-background` utility, whose HSL resolves to
+        rgb(23,24,28) — two levels off, which is exactly the range that reads as
+        "two surfaces stitched together" rather than as a deliberate step. The
+        canvas is now the same token the board uses; no new hex, Explore
+        untouched. The CSS var's own `#15171F` comment is inaccurate and is a
+        separate item — do not "fix" this by trusting it.
+      */}
       <motion.div
-        className="min-h-screen bg-background"
-        style={{ marginTop: 0, paddingTop: 0 }}
+        className="min-h-screen"
+        style={{ marginTop: 0, paddingTop: 0, background: PAGE_CANVAS }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
