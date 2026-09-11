@@ -42,9 +42,18 @@ const COPY: Record<CueVariant, { Icon: LucideIcon; benefitKey: string; subKey: s
 interface Props {
   variant: CueVariant;
   courseName?: string;
+  /**
+   * FLAT: draw no card frame and no inner horizontal padding, so the cue reads
+   * as a section of the page rather than a tile on it. Defaults to false, which
+   * is the framed treatment every existing caller renders today — the course
+   * detail tabs are unchanged. The Tour Hub overview passes flat (structural
+   * brief section A: that page stops drawing bordered cards) and supplies its
+   * own 20px gutter.
+   */
+  flat?: boolean;
 }
 
-export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => {
+export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName, flat = false }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
@@ -116,15 +125,19 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
 
   // Holes + Champions: plain card
   return (
-    <div style={{ padding: '12px 16px 4px' }}>
+    <div style={{ padding: flat ? '12px 20px 4px' : '12px 16px 4px' }}>
       <div
-        style={{
-          background: SURFACE,
-          border: `1px solid ${HAIRLINE_INK_8}`,
-          borderRadius: 14,
-          padding: 16,
-          fontFamily: FONT,
-        }}
+        style={
+          flat
+            ? { padding: 0, fontFamily: FONT }
+            : {
+                background: SURFACE,
+                border: `1px solid ${HAIRLINE_INK_8}`,
+                borderRadius: 14,
+                padding: 16,
+                fontFamily: FONT,
+              }
+        }
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
