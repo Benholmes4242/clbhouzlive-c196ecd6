@@ -163,11 +163,21 @@ function paginate(groups: DayGroup[]): DayGroup[][] {
   return pages;
 }
 
-export function ComingUp({ tour }: { tour: TourId | null }) {
+export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?: string | null }) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data, isLoading } = useComingUp(tour, 15);
-  const rows = data ?? [];
+  /**
+   * THE HERO IS NOT ALSO THE FIRST ROW. The tournament in view in the hero was
+   * arriving again ~300px below with the same name and the same venue, so the
+   * section's first row said nothing the member had not just read. It is
+   * filtered by id BEFORE grouping, which is what makes an emptied day
+   * disappear with its header rather than render a date with nothing under it.
+   */
+  const rows = useMemo(() => {
+    const all = data ?? [];
+    return excludeId ? all.filter((r) => r.id !== excludeId) : all;
+  }, [data, excludeId]);
 
   const pages = useMemo(() => paginate(groupByDay(rows)), [rows]);
 
