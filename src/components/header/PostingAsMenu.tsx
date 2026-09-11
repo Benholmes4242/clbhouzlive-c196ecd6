@@ -214,27 +214,25 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
 
   // Handle navigation from ProfileSheetV2.
   // A1: every branch that navigates must close the sheet FIRST so the sheet
-  // never survives into the destination route. `handleNavigate` already does
-  // (onClose then navigate); mirror that for the direct-navigate branches.
+  // never survives into the destination route. Every branch routes through
+  // `handleNavigate`, which closes and then navigates past the sheet-stack
+  // history unwind — a direct `navigate()` here is cancelled by that unwind.
   const handleAccountHubNavigate = (route: string) => {
     if (route === '/upload') {
       setUploadCenterOpen(true);
     } else if (route === '/logout') {
       handleLogout();
     } else if (route === '/settings/business') {
-      onClose();
-      navigate('/businesses/manage');
+      handleNavigate('/businesses/manage');
     } else if (route === '/settings/profile') {
-      onClose();
-      navigate(editProfileRoute);
+      handleNavigate(editProfileRoute);
     } else if (route === `/profile/${currentActorData.id}`) {
       // Profile sheet "View profile" → actor-aware target
       handleNavigate(viewProfileRoute);
     } else if (route === '/edit-profile?tab=settings') {
       handleNavigate(settingsRoute);
     } else {
-      onClose();
-      navigate(route);
+      handleNavigate(route);
     }
   };
 
