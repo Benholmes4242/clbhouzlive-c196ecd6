@@ -167,7 +167,14 @@
     "hero": {
       "prevAria": "Previous tournament",
       "nextAria": "Next tournament",
-      "counter": "{{current}} / {{total}}"
+      "counter": "{{current}} / {{total}}",
+      "stateLive": "라이부",
+      "stateFinal": "종료",
+      "stateUpcoming": "예정",
+      "factRound": "라운드",
+      "factThru": "진행",
+      "factMargin": "상황",
+      "factPlayoff": "허파우별"
     },
     "leaderboardBand": {
       "ctaLive": "OPEN LIVE LEADERBOARD",
