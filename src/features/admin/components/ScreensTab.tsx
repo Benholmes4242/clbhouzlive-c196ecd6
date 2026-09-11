@@ -318,7 +318,9 @@ export default function ScreensTab({ days }: { days: number }) {
 function ScreenDetailSheet({
   row, days, onClose,
 }: { row: ScreenRow | null; days: number; onClose: () => void }) {
-  const { data: events, isLoading } = useScreenTopEvents(row?.route_pattern ?? null, days);
+  // Three states, never two: loading, unreadable (isError - say so, show no
+  // figure), and a real zero. See useScreenTopEvents.
+  const { data: events, isLoading, isError } = useScreenTopEvents(row?.route_pattern ?? null, days);
 
   return (
     <AdminSheet
