@@ -112,7 +112,8 @@ export function OverviewPageV3() {
               <CollegeFranchise />
             </LazySection>
             <LazySection minHeight={90}>
-              <ConnectHandicapCue variant="tour-venue" courseName="" />
+              {/* flat: this page draws no bordered cards (structural brief A). */}
+              <ConnectHandicapCue variant="tour-venue" courseName="" flat />
             </LazySection>
           </div>
         </div>

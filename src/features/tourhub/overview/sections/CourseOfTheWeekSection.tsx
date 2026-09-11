@@ -7,7 +7,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SectionShell } from './SectionShell';
-import { V4 } from '../tokens';
+import { V4, OVERVIEW_GUTTER as GUT } from '../tokens';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCourseOfTheWeek } from '../../hooks/useCourseOfTheWeek';
 import { SPACE } from '@/lib/spacing';
@@ -79,21 +79,16 @@ export function CourseOfTheWeekSection() {
   // Loading: skeleton mirrors card geometry, no reservation beyond it.
   if (isLoading && !data) {
     return (
-      <SectionShell eyebrow="COURSE OF THE WEEK">
-        <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
+      <SectionShell padX={GUT} eyebrow="COURSE OF THE WEEK">
+        <div style={{ padding: `0 ${GUT}px` }}>
           <div
-            style={{
-              background: V4.surface,
-              border: `0.5px solid ${V4.cardBorder}`,
-              boxShadow: V4.cardShadow,
-              borderRadius: V4.cardRadius,
-              overflow: 'hidden',
-            }}
+            /* FLAT — no card frame (structural brief section A). */
+            style={{ overflow: 'hidden' }}
           >
             <Skeleton className="w-full" style={{ height: 170, borderRadius: 0 }} />
             {/* Hold mirrors the rebuilt card: one figure line, three quote
                 lines, one quiet action. No footer, no button block. */}
-            <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ padding: '14px 0 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
               <Skeleton className="h-4 w-2/3 rounded" />
               <div style={{ height: '0.5px', background: V4.hairline }} />
               <Skeleton className="h-3 w-full rounded" />
@@ -142,12 +137,12 @@ export function CourseOfTheWeekSection() {
         transition={{ duration: 0.32, ease: [0.22, 0.61, 0.36, 1] }}
         style={{ overflow: 'hidden' }}
       >
-        <SectionShell
+        <SectionShell padX={GUT}
           eyebrow="COURSE OF THE WEEK"
           linkLabel="Top 100"
           onLinkClick={() => navigate('/courses?tab=top100')}
         >
-          <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
+          <div style={{ padding: `0 ${GUT}px` }}>
             {/* THE WHOLE CARD IS THE TAP TARGET. It was not before — only the
                 filled button was — so a card that looked tappable was not, and
                 the button was the loudest thing on the page for a destination
@@ -163,14 +158,10 @@ export function CourseOfTheWeekSection() {
                   navigate(`/courses/${course_id}`);
                 }
               }}
-              style={{
-                cursor: 'pointer',
-                background: V4.surface,
-                border: `0.5px solid ${V4.cardBorder}`,
-                boxShadow: V4.cardShadow,
-                borderRadius: V4.cardRadius,
-                overflow: 'hidden',
-              }}
+              /* FLAT — no card frame (structural brief section A). The section
+                 is still one tap target; it is space, not a border, that bounds
+                 it now. */
+              style={{ cursor: 'pointer', overflow: 'hidden' }}
             >
               {/* Media header */}
               <div
@@ -283,7 +274,7 @@ export function CourseOfTheWeekSection() {
               </div>
 
               {/* Body */}
-              <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ padding: '14px 0 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {/* ONE figure line, not a three-up. The pairs are inline with a
                     5px internal gap and 16px between them; nothing wraps.
                     "1 round" is gone — it wrapped under YOUR BEST and cost the

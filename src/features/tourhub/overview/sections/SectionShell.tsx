@@ -25,6 +25,7 @@ export function SectionShell({
   children,
   eyebrowColor,
   rightMeta,
+  padX = SPACE.pagePadX,
 }: {
   eyebrow: string;
   subline?: string;
@@ -33,10 +34,17 @@ export function SectionShell({
   children: ReactNode;
   eyebrowColor?: string;
   rightMeta?: ReactNode;
+  /**
+   * Horizontal gutter for the HEADER ROW ONLY — children own their own.
+   * Defaults to SPACE.pagePadX (16), which is what every existing caller
+   * renders today, so this prop is additive and changes nothing unless passed.
+   * The Tour Hub overview passes OVERVIEW_GUTTER (20) per its structural brief.
+   */
+  padX?: number;
 }) {
   return (
     <section style={{ padding: '0 0 4px' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: `0 ${SPACE.pagePadX}px`, marginBottom: SPACE.sectionHeaderContent }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: `0 ${padX}px`, marginBottom: SPACE.sectionHeaderContent }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {/* DARK EYEBROW: the fallback is the dark MUTE, not A.INK (now
               #F8FAFC) and never amber — amber means the viewing member.

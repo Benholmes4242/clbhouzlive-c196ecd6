@@ -59,8 +59,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { SectionShell, V4Card } from './SectionShell';
-import { V4 } from '../tokens';
+import { SectionShell } from './SectionShell';
+import { V4, OVERVIEW_GUTTER as GUT } from '../tokens';
 import { useComingUp, type ComingUpRow } from '../data/useComingUp';
 import type { TourId } from '../../hooks/useOverviewData';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
@@ -252,14 +252,14 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
 
   if (isLoading && rows.length === 0) {
     return (
-      <SectionShell eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={goSchedule}>
-        <div style={{ margin: '0 16px' }}>
-          <V4Card style={{ overflow: 'hidden' }}>
+      <SectionShell padX={GUT} eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={goSchedule}>
+        <div style={{ margin: `0 ${GUT}px` }}>
+          <div style={{ overflow: 'hidden' }}>
             {[0, 1, 2, 3, 4].map((i) => (
               <div
                 key={i}
                 style={{
-                  padding: '11px 14px 12px',
+                  padding: '11px 0 12px',
                   borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
                 }}
               >
@@ -272,7 +272,7 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
                 <Skeleton className="mt-2 h-7 w-4/5 rounded" />
               </div>
             ))}
-          </V4Card>
+          </div>
         </div>
       </SectionShell>
     );
@@ -280,9 +280,9 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
   if (rows.length === 0) return null;
 
   return (
-    <SectionShell eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={goSchedule}>
-      <div style={{ margin: '0 16px' }}>
-        <V4Card style={{ overflow: 'hidden' }}>
+    <SectionShell padX={GUT} eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={goSchedule}>
+      <div style={{ margin: `0 ${GUT}px` }}>
+        <div style={{ overflow: 'hidden' }}>
           <div
             ref={trackRef}
             className="coming-up-track"
@@ -324,7 +324,7 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '9px 14px',
+                        padding: '9px 0',
                         background: GROUP_BG,
                         borderTop: gi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
                       }}
@@ -360,7 +360,7 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
               alignItems: 'center',
               justifyContent: 'space-between',
               width: '100%',
-              padding: '11px 14px',
+              padding: '11px 0',
               background: 'transparent',
               border: 'none',
               borderTop: `0.5px solid ${V4.hairline}`,
@@ -383,7 +383,7 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
               &rsaquo;
             </span>
           </button>
-        </V4Card>
+        </div>
         {pages.length > 1 ? (
           <div style={{ display: 'flex', justifyContent: 'center', gap: 0, marginTop: 4 }}>
             {pages.map((_, i) => (
@@ -445,7 +445,7 @@ function EventRow({ row, first, onOpen }: { row: ComingUpRow; first: boolean; on
       style={{
         display: 'block',
         width: '100%',
-        padding: '11px 14px 12px',
+        padding: '11px 0 12px',
         textAlign: 'left',
         background: 'transparent',
         border: 'none',

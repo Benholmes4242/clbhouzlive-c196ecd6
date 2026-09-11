@@ -74,6 +74,18 @@ export const V4 = {
   missFg: '#FF6B60',
 } as const;
 
+/**
+ * OVERVIEW GUTTER — 20, and it is the page's own, not the app's.
+ *
+ * BRIEF_TOUR_OVERVIEW_STRUCTURAL section A: the overview stops drawing bordered
+ * cards, so content that used to sit inside a card's 14px padding within a 16px
+ * page margin now runs to the page edge itself. The type needs a wider margin
+ * once nothing frames it. SPACE.pagePadX stays 16 for the rest of the app —
+ * this constant is scoped to the Tour Hub overview sections and is passed into
+ * the shared SectionShell through its `padX` prop, whose default is still 16.
+ */
+export const OVERVIEW_GUTTER = 20;
+
 // Match course-details hero height (full-viewport-under-safe-area).
 export const HERO_HEIGHT_CSS = 'calc(100dvh * 0.62)';
 

@@ -23,7 +23,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { A, KICKER, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { SPACE } from '@/lib/spacing';
+import { OVERVIEW_GUTTER as GUT } from '../tokens';
 import { useTournamentVenueRecord } from '../data/useTournamentVenueRecord';
 
 /* Minimum ratings before the clubhouse figure may render at all. */
@@ -54,17 +54,19 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
   if (!hasRating && !hasRank && !belowFloor) return null;
 
   return (
-    <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
+    <div style={{ padding: `0 ${GUT}px` }}>
       <button
         type="button"
         onClick={() => navigate(`/course/${data.courseId}`)}
+        /* FLAT — no panel fill, no border, no radius (structural brief section
+           A). The band is bounded by space and its own hairline rule, and its
+           content runs to the page gutter. */
         style={{
           width: '100%',
           textAlign: 'left',
-          background: A.PANEL,
-          border: `1px solid ${A.BORDER}`,
-          borderRadius: 16,
-          padding: '12px 14px 14px',
+          background: 'transparent',
+          border: 'none',
+          padding: '0 0 2px',
           cursor: 'pointer',
           display: 'flex',
           flexDirection: 'column',
@@ -123,7 +125,7 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '11px 14px',
+            padding: '11px 0',
             background: 'transparent',
             border: 'none',
             borderTop: `1px solid ${A.BORDER}`,

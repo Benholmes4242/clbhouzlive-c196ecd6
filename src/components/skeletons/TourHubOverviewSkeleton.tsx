@@ -47,7 +47,7 @@ function Bar({ style }: { style?: React.CSSProperties }) {
 /** Section head: the KICKER line box measures 17 and the subline 28. */
 function Head({ w = 150, sub = 210 }: { w?: number; sub?: number }) {
   return (
-    <div style={{ padding: '0 16px' }}>
+    <div style={{ padding: '0 20px' }}>
       <div style={{ height: 17, display: 'flex', alignItems: 'center' }}>
         <Bar style={{ height: 10, width: w }} />
         <Bar style={{ height: 10, width: 82, marginLeft: 'auto' }} />
@@ -73,7 +73,7 @@ function ComingUpBlock() {
   return (
     <section>
       <Head w={158} sub={228} />
-      <div style={{ padding: '0 16px' }}>
+      <div style={{ padding: '0 20px' }}>
         <div style={{ height: 624, display: 'flex', flexDirection: 'column' }}>
           {[0, 1].map((g) => (
             <div key={g} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -86,7 +86,7 @@ function ComingUpBlock() {
                   justifyContent: 'space-between',
                   boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.03)',
-                  padding: '0 14px',
+                  padding: '0 0',
                 }}
               >
                 <Bar style={{ height: 10, width: 54 }} />
@@ -99,7 +99,7 @@ function ComingUpBlock() {
                   style={{
                     height: 112,
                     boxSizing: 'border-box',
-                    padding: '11px 14px 12px',
+                    padding: '11px 0 12px',
                     borderTop: i === 0 ? 'none' : `1px solid ${A.BORDER}`,
                     display: 'flex',
                     flexDirection: 'column',
@@ -142,7 +142,7 @@ function ComingUpBlock() {
 /** The per-section tour lens above WORLD RANKINGS renders at 52. */
 function LensRow() {
   return (
-    <div style={{ height: 52, display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', overflow: 'hidden' }}>
+    <div style={{ height: 52, display: 'flex', alignItems: 'center', gap: 8, padding: '0 20px', overflow: 'hidden' }}>
       {[74, 82, 96, 70, 88].map((w, i) => (
         <Bar key={i} style={{ height: 30, width: w, borderRadius: 999, flexShrink: 0 }} />
       ))}
@@ -160,7 +160,7 @@ function WorldRankingsBlock() {
   return (
     <section>
       <Head w={144} sub={196} />
-      <div style={{ padding: '0 16px' }}>
+      <div style={{ padding: '0 20px' }}>
         <div style={{ height: 81, display: 'flex', alignItems: 'center', gap: 14 }}>
           <Bar style={{ height: 62, width: 62, borderRadius: 20, flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>

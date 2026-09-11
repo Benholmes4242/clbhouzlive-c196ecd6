@@ -21,7 +21,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { SectionShell } from './SectionShell';
-import { V4 } from '../tokens';
+import { V4, OVERVIEW_GUTTER as GUT } from '../tokens';
 import { MovementFigure } from '../../_shared/movement';
 
 import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
@@ -130,8 +130,8 @@ export function WorldRankings({ tour }: { tour: TourId }) {
   const rows = data ?? [];
   if (isLoading && rows.length === 0) {
     return (
-      <SectionShell eyebrow={eyebrow} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
-        <div style={{ padding: '4px 16px 12px', display: 'flex', alignItems: 'center', gap: 14 }}>
+      <SectionShell padX={GUT} eyebrow={eyebrow} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
+        <div style={{ padding: `4px ${GUT}px 12px`, display: 'flex', alignItems: 'center', gap: 14 }}>
           <Skeleton className="h-[62px] w-[62px]" style={{ borderRadius: 18 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <Skeleton className="h-3 w-24 rounded" />
@@ -140,8 +140,8 @@ export function WorldRankings({ tour }: { tour: TourId }) {
           </div>
           <Skeleton className="h-8 w-16 rounded" />
         </div>
-        <div style={{ margin: '0 16px', height: '0.5px', background: V4.hairline }} />
-        <div style={{ padding: '2px 16px 0' }}>
+        <div style={{ margin: `0 ${GUT}px`, height: '0.5px', background: V4.hairline }} />
+        <div style={{ padding: `2px ${GUT}px 0` }}>
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
@@ -177,9 +177,9 @@ export function WorldRankings({ tour }: { tour: TourId }) {
   };
 
   return (
-    <SectionShell eyebrow={eyebrow} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
+    <SectionShell padX={GUT} eyebrow={eyebrow} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
       {/* No.1 spotlight — cardless, scale does the work. */}
-      <div style={{ padding: '4px 16px 12px' }}>
+      <div style={{ padding: `4px ${GUT}px 12px` }}>
         <SpotlightRow
           row={top}
           board={board}
@@ -188,10 +188,10 @@ export function WorldRankings({ tour }: { tour: TourId }) {
         />
       </div>
 
-      <div style={{ margin: '0 16px', height: '0.5px', background: V4.hairline }} />
+      <div style={{ margin: `0 ${GUT}px`, height: '0.5px', background: V4.hairline }} />
 
       {/* Pack — rows 2-5 */}
-      <div style={{ padding: '2px 16px 0' }}>
+      <div style={{ padding: `2px ${GUT}px 0` }}>
         {pack.map((r, i) => {
           const tappable = !!r.playerId;
           const share =
