@@ -37,11 +37,13 @@ export interface StatCategory {
   key: StatKey;
   label: string; // overline (uppercase-ready)
   /**
-   * THE PICKER LABEL IS SHORTER THAN THE STAT NAME (device-check D). There are
+   * THE PICKER HOLDS THE WHOLE SET (device-check D, wrap ruling). There are
    * exactly FOUR categories and there will only ever be four while Sportradar
-   * carries PGA season stats alone, so the picker should hold all four at 390pt
-   * rather than scroll a fixed set out of sight. The full `label` still names
-   * the stat wherever it is read as prose; only the chip is abbreviated.
+   * carries PGA season stats alone, so the picker WRAPS TO TWO LINES and
+   * shows all four in full — it does not scroll, peek, or abbreviate into
+   * jargon (TEE-GRN / DIST were rejected: a member must not have to decode a
+   * control to use it). `pickerLabel` stays short so two lines hold the set;
+   * the full `label` still names the stat wherever it is read as prose.
    */
   pickerLabel: string;
   unit: string; // micro-label
