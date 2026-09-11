@@ -143,7 +143,13 @@ export function CollegeFranchise() {
 
   const goAll = () => {
     analyticsEvents.track('tour_overview_college_tap', { section: 'college_franchise', target: 'all_franchises' });
-    navigate('/tourhub?tab=college');
+    /* COLLEGE IS A ROUTE, NOT A TAB (device-walk-2 E). This row pushed
+       `/tourhub?tab=college`, and 'college' is not a member of TourHubTab: the
+       page's own switch fell through to the overview, so the tap re-rendered
+       the page the member was already on and read as a dead control. The side
+       menu has always special-cased it (TourHubMainPage.handleSelectTab) and
+       navigated to the route; this row now goes to the same place. */
+    navigate('/tourhub/college-golf');
   };
 
   if (isLoading && (!leader || !chaser)) {
