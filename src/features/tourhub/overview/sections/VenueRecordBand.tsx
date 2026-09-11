@@ -129,6 +129,20 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
   const navigate = useNavigate();
   const { data } = useTournamentVenueRecord(tournamentId);
 
+  /* ONE call, one course id. See EXCLUDE_NOBODY above for the nil uuid. */
+  const field = useCourseFieldPlayers(
+    data?.courseId ? [data.courseId] : [],
+    EXCLUDE_NOBODY,
+  );
+  const playedRaw = data?.courseId ? field.data?.sizes.get(data.courseId) : undefined;
+  /* A failed or absent read renders nothing; and zero is NOT printed either,
+     because get_course_field_sizes returns 0 both for a course nobody has
+     played and for a course with no qualifying WHS mapping. */
+  const played =
+    field.data?.available && typeof playedRaw === 'number' && playedRaw > 0
+      ? playedRaw
+      : null;
+
   if (!data) return null;
   const count = data.reviewCount ?? 0;
   /* A figure is only shown with a real count behind it. */
