@@ -1054,3 +1054,19 @@ with E: 52 consumers is not a side effect of tidying one sheet.
   as it does for every other consumer). Accepted.
 - Drag-to-dismiss is touch-only on the shared primitive: no mouse drag on
   desktop. Noted, not fixed - it matches every other sheet.
+
+### 5. OPEN - two cross-member counts run under RLS and are shown as totals
+`countMomentsLibrary` (src/features/media-library/libraryTotals.ts:27) and the
+video-post count in admin `useAnalytics.ts:429` count OTHER members' post_media
+rows through the caller's own RLS. Correct today only because every one of the
+756 rows belongs to a public-profile author, so the narrow SELECT siblings admit
+all of them. The day a private-profile member posts, both figures drift
+PER-VIEWER while still being labelled a total. FIX: a SECURITY DEFINER count
+function, one per figure. Deliberately NOT part of dropping
+`public_read_post_media` - the drop moved no number.
+
+### 6. FOR BEN - venue backfill match list
+Seven upcoming club names are weak enough to risk mismatching on their own
+(Albany The Bahamas, El Cardonal at Diamante, Hammock Beach, Pleasant Valley,
+St. Andrews, The Cliffs at Walnut Cove, Vidanta Vallarta) and Hoakalei Country
+Club is currently unmapped in sr_course_map.
