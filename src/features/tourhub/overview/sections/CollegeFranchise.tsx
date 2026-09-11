@@ -118,7 +118,7 @@ export function CollegeFranchise() {
 
   const leader = sorted[0];
   const chaser = sorted[1];
-  const topThree = useMemo(() => sorted.slice(0, 3), [sorted]);
+  const topFive = useMemo(() => sorted.slice(0, 5), [sorted]);
 
   /* VIEW EVENT — half the section in the viewport, once per mount. The ref is
      attached to the rendered body, so it cannot fire from the loading hold. */

@@ -383,7 +383,8 @@
       "rowMeta": "{{count}} on tour",
       "summaryWide": "<0>{{leader}}</0> leads all franchises on {{amount}} in season alumni earnings, <1>{{gap}}</1> clear of {{chaser}}.",
       "summaryClose": "<0>{{leader}}</0> leads all franchises on {{amount}}, with just <1>{{gap}}</1> between them and {{chaser}}.",
-      "allAction": "ALL FRANCHISES"
+      "allAction": "ALL FRANCHISES",
+      "earningsBasis": "선수들이 거쳐 온 대학별 시즌 상금."
     },
     "cinematic": {
       "championEyebrow": "★ Champion",
