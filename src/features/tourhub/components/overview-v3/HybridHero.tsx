@@ -495,7 +495,13 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         });
       }
       out.push({ label: t('overview.hero.factRound'), value: roundLabel(state.round, state.totalRounds) });
-      if (state.thruLabel) out.push({ label: t('overview.hero.factThru'), value: state.thruLabel });
+      /* NOT THRU. state.thruLabel is the hardcoded literal 'F THRU' in
+         deriveHeroState (HybridHero.utils, live branch) — it is not read from
+         the feed and would say "F" through every round of every event. A fact
+         that is always the same is not a fact, so the third live slot takes the
+         purse, which is real. If num_rounds/thru ever arrives on
+         HeroTournament, this is where a true THRU belongs. */
+      if (purseFact) out.push(purseFact);
       return out;
     }
 
