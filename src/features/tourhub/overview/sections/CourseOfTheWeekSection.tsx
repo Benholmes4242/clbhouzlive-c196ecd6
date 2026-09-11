@@ -142,7 +142,11 @@ export function CourseOfTheWeekSection() {
           linkLabel="Top 100"
           onLinkClick={() => navigate('/courses?tab=top100')}
         >
-          <div style={{ padding: `0 ${GUT}px` }}>
+          {/* FULL-BLEED IMAGE, GUTTERED TEXT (device-walk-2 B3 + D). The
+              section no longer insets its media: the photograph is the edge, so
+              it runs screen edge to screen edge and the body below re-pays the
+              20px gutter. */}
+          <div>
             {/* THE WHOLE CARD IS THE TAP TARGET. It was not before — only the
                 filled button was — so a card that looked tappable was not, and
                 the button was the loudest thing on the page for a destination
@@ -252,7 +256,7 @@ export function CourseOfTheWeekSection() {
                 ) : null}
 
                 {/* Course name + location over the image */}
-                <div style={{ position: 'absolute', left: 14, right: 14, bottom: 12 }}>
+                <div style={{ position: 'absolute', left: GUT, right: GUT, bottom: 12 }}>
                   <div
                     style={{
                       fontSize: 22,
@@ -274,27 +278,26 @@ export function CourseOfTheWeekSection() {
               </div>
 
               {/* Body */}
-              <div style={{ padding: '14px 0 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {/* ONE figure line, not a three-up. The pairs are inline with a
-                    5px internal gap and 16px between them; nothing wraps.
-                    "1 round" is gone — it wrapped under YOUR BEST and cost the
-                    card a line for one word. */}
-                {/* THE RATING CARRIES ITS COUNT ON ONE LINE. RATING and
-                    REVIEWS were two separate pairs, which read as two findings
-                    when they are one figure and its sample. The count is now
-                    the rating's qualifier, in the same line, so the figure can
-                    never appear without the sample behind it. */}
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                  <FigurePair
-                    label="Rating"
-                    value={`${Number(avg_rating ?? 0).toFixed(1)} from ${review_count.toLocaleString()}`}
-                  />
-                  {/* Never played / signed out => the pair COLLAPSES. No dash,
-                      no zero, no em-dash placeholder. */}
-                  {myBest?.best_gross != null ? (
+              <div style={{ padding: `14px ${GUT}px 0`, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {/* ONE LINE, IN WORDS (device-walk-2 D). The "RATING 7.9
+                    from 3" pair is gone: the label was doing work the sentence
+                    does better. The figure NEVER renders without its sample —
+                    the same rule as the venue band — so no rating and no
+                    reviews means no line at all rather than a bare figure.
+                    Singular at one: "from 1 member review". */}
+                {avg_rating != null && review_count > 0 ? (
+                  <div style={{ fontSize: 15, color: A.MUTE, letterSpacing: '-0.01em', ...FIGS }}>
+                    <span style={{ fontWeight: 700, color: A.INK }}>{Number(avg_rating).toFixed(1)}</span>
+                    {` from ${review_count.toLocaleString()} member review${review_count === 1 ? '' : 's'}`}
+                  </div>
+                ) : null}
+                {/* YOUR BEST stays amber and stays collapsible: the viewing
+                    member's own figure is the one amber thing on this card. */}
+                {myBest?.best_gross != null ? (
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
                     <FigurePair label="Your best" value={String(myBest.best_gross)} tone={A.AMBER} />
-                  ) : null}
-                </div>
+                  </div>
+                ) : null}
 
                 {/* THE MEMBER QUOTE IS GONE (structural brief section E). It
                     was selected by highest helpful count among qualifying
