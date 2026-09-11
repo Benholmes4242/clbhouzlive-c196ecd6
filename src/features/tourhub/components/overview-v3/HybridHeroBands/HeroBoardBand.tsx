@@ -463,11 +463,13 @@ export function HeroBoardSection({
             <StatCell
               align="right"
               label={t('overview.onTheCourse.underParTodayLabel')}
+              /* EACH LINE READS ON ITS OWN. The figure is the figure and the
+                 sub-label is a complete phrase — "28" over "of 119 players in
+                 the field", not "28 of 119" over the fragment "players in". */
               value={t('overview.onTheCourse.underParTodayValue', {
                 n: field.underPar,
-                m: field.count,
               })}
-              sub={t('overview.onTheCourse.underParTodaySub')}
+              sub={t('overview.onTheCourse.underParTodaySub', { m: field.count })}
             />
           )}
         </div>
