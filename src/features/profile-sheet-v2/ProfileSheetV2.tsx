@@ -142,9 +142,14 @@ export default function ProfileSheetV2({
       ? 'ready'
       : 'building';
   const handleOpenCourseAnalytics = () => setAnalyticsSheetOpen(true);
+  /* Two sheets are open here (this one and the analytics sheet), so TWO
+     sheet-stack markers unwind with a history.back() each. The navigate has to
+     land after both, or the second back cancels it — the same fault that made
+     every row on this sheet inert. */
   const handleAnalyticsNavigate = (route: string) => {
+    setAnalyticsSheetOpen(false);
     onClose();
-    setTimeout(() => onNavigate(route), 40);
+    setTimeout(() => onNavigate(route), 140);
   };
   const ovlId = useRef<number>(-1);
 
