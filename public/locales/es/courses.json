@@ -1614,7 +1614,40 @@
       "seeAll": "Ver los {{count}}",
       "views": "Vistas de Explorar",
       "aMember": "Un miembro",
-      "nothingYet": "Aqui aun no hay nada sobre tus campos. Sigue un campo o conecta un handicap y esta pagina sera tuya."
+      "nothingYet": "Aqui aun no hay nada sobre tus campos. Sigue un campo o conecta un handicap y esta pagina sera tuya.",
+      "you": "Tu",
+      "aCourse": "un campo",
+      "chip": {
+        "rating": "valoracion",
+        "world": "mundo",
+        "gbi": "GB&I"
+      },
+      "kicker": {
+        "ownRound": "Tu vuelta",
+        "courseRecord": "Record del campo",
+        "onYourList": "En tu lista",
+        "atYourClub": "En tu club",
+        "aroundRegion": "Por {{region}}",
+        "aroundWorld": "Por el mundo",
+        "backlog": "De {{month}}",
+        "review": "Resena",
+        "news": "Noticias",
+        "clip": "Clip",
+        "watch": "Video largo",
+        "moment": "De la comunidad",
+        "course": "Campo"
+      },
+      "headline": {
+        "recordTaken": "{{name}} bate el record del campo en {{course}} con {{gross}}.",
+        "ace": "{{name}} mete la bola desde el tee en {{course}}.",
+        "albatross": "{{name}} hace un albatros en {{course}}.",
+        "listNewLow": "{{gross}} en {{course}}, un campo de tu lista.",
+        "bogeyFree": "{{name}} firma una vuelta sin bogeys en {{course}} con {{gross}}.",
+        "birdieHaul": "{{name}} hace {{count}} birdies en {{course}}.",
+        "roundToPar": "{{name}} completa {{course}} en {{gross}}, {{topar}}.",
+        "round": "{{name}} completa {{course}} en {{gross}}.",
+        "played": "{{name}} jugo {{course}}."
+      }
     }
   }
 }

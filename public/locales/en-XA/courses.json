@@ -2198,7 +2198,40 @@
       "seeAll": "[Séé åll {{count}} one two]",
       "views": "[Éxplöré vîéws one]",
       "aMember": "[Å mémbér one]",
-      "nothingYet": "[Nöthîng héré töüçhés yöür çöürsés yét. Föllöw å çöürsé ör çönnéçt å håndîçåp ånd thîs pågé béçömés yöürs. one two three four five]"
+      "nothingYet": "[Nöthîng héré töüçhés yöür çöürsés yét. Föllöw å çöürsé ör çönnéçt å håndîçåp ånd thîs pågé béçömés yöürs. one two three four five]",
+      "you": "[Yöü one]",
+      "aCourse": "[å çöürsé one]",
+      "chip": {
+        "rating": "[råtîng one]",
+        "world": "[wörld one]",
+        "gbi": "[GB&Î one]"
+      },
+      "kicker": {
+        "ownRound": "[Yöür röünd one]",
+        "courseRecord": "[Çöürsé réçörd one]",
+        "onYourList": "[Ön yöür lîst one]",
+        "atYourClub": "[Åt yöür çlüb one]",
+        "aroundRegion": "[Åröünd {{region}} one]",
+        "aroundWorld": "[Åröünd thé wörld one]",
+        "backlog": "[Fröm {{month}} one]",
+        "review": "[Révîéw one]",
+        "news": "[Néws one]",
+        "clip": "[Çlîp one]",
+        "watch": "[Löngér wåtçh one]",
+        "moment": "[Fröm thé çömmünîty one]",
+        "course": "[Çöürsé one]"
+      },
+      "headline": {
+        "recordTaken": "[{{name}} töök thé çöürsé réçörd åt {{course}} wîth å {{gross}}. one two three]",
+        "ace": "[{{name}} höléd öüt fröm thé téé åt {{course}}. one two]",
+        "albatross": "[{{name}} mådé ån ålbåtröss åt {{course}}. one two]",
+        "listNewLow": "[{{gross}} åt {{course}}, å çöürsé ön yöür lîst. one two]",
+        "bogeyFree": "[{{name}} wént bögéy fréé åt {{course}} för {{gross}}. one two three]",
+        "birdieHaul": "[{{name}} mådé {{count}} bîrdîés åt {{course}}. one two]",
+        "roundToPar": "[{{name}} wént röünd {{course}} în {{gross}}, {{topar}}. one two three]",
+        "round": "[{{name}} wént röünd {{course}} în {{gross}}. one two]",
+        "played": "[{{name}} plåyéd {{course}}. one]"
+      }
     }
   }
 }

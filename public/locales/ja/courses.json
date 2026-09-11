@@ -1550,7 +1550,40 @@
       "seeAll": "{{count}}件すべて表示",
       "views": "探索ビュー",
       "aMember": "メンバー",
-      "nothingYet": "あなたのコースに関する情報はまだありません。コースをフォローするかハンディキャップを連携すると、このページがあなた仕様になります。"
+      "nothingYet": "あなたのコースに関する情報はまだありません。コースをフォローするかハンディキャップを連携すると、このページがあなた仕様になります。",
+      "you": "あなた",
+      "aCourse": "あるコース",
+      "chip": {
+        "rating": "評価",
+        "world": "世界",
+        "gbi": "GB&I"
+      },
+      "kicker": {
+        "ownRound": "あなたのラウンド",
+        "courseRecord": "コースレコード",
+        "onYourList": "あなたのリスト",
+        "atYourClub": "あなたのクラブ",
+        "aroundRegion": "{{region}}周辺",
+        "aroundWorld": "世界各地",
+        "backlog": "{{month}}より",
+        "review": "レビュー",
+        "news": "ニュース",
+        "clip": "クリップ",
+        "watch": "長編動画",
+        "moment": "コミュニティから",
+        "course": "コース"
+      },
+      "headline": {
+        "recordTaken": "{{name}}が{{course}}で{{gross}}のコースレコードを樹立。",
+        "ace": "{{name}}が{{course}}でホールインワン。",
+        "albatross": "{{name}}が{{course}}でアルバトロス。",
+        "listNewLow": "リストにある{{course}}で{{gross}}。",
+        "bogeyFree": "{{name}}が{{course}}でボギーなしの{{gross}}。",
+        "birdieHaul": "{{name}}が{{course}}でバーディー{{count}}個。",
+        "roundToPar": "{{name}}が{{course}}を{{gross}}（{{topar}}）でラウンド。",
+        "round": "{{name}}が{{course}}を{{gross}}でラウンド。",
+        "played": "{{name}}が{{course}}をプレー。"
+      }
     }
   }
 }

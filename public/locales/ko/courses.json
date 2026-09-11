@@ -1553,7 +1553,40 @@
       "seeAll": "{{count}}개 모두 보기",
       "views": "탐색 보기",
       "aMember": "회원",
-      "nothingYet": "아직 내 코스와 관련된 내용이 없습니다. 코스를 팔로우하거나 핸디캡을 연결하면 이 페이지가 내 것이 됩니다."
+      "nothingYet": "아직 내 코스와 관련된 내용이 없습니다. 코스를 팔로우하거나 핸디캡을 연결하면 이 페이지가 내 것이 됩니다.",
+      "you": "나",
+      "aCourse": "한 코스",
+      "chip": {
+        "rating": "평점",
+        "world": "세계",
+        "gbi": "GB&I"
+      },
+      "kicker": {
+        "ownRound": "내 라운드",
+        "courseRecord": "코스 레코드",
+        "onYourList": "내 리스트",
+        "atYourClub": "내 클럽",
+        "aroundRegion": "{{region}} 주변",
+        "aroundWorld": "전 세계",
+        "backlog": "{{month}}",
+        "review": "리뷰",
+        "news": "뉴스",
+        "clip": "클립",
+        "watch": "긴 영상",
+        "moment": "커뮤니티에서",
+        "course": "코스"
+      },
+      "headline": {
+        "recordTaken": "{{name}}님이 {{course}}에서 {{gross}}타로 코스 레코드를 세웠습니다.",
+        "ace": "{{name}}님이 {{course}}에서 홀인원을 했습니다.",
+        "albatross": "{{name}}님이 {{course}}에서 알바트로스를 기록했습니다.",
+        "listNewLow": "내 리스트의 {{course}}에서 {{gross}}타.",
+        "bogeyFree": "{{name}}님이 {{course}}에서 보기 없이 {{gross}}타를 쳤습니다.",
+        "birdieHaul": "{{name}}님이 {{course}}에서 버디 {{count}}개를 잡았습니다.",
+        "roundToPar": "{{name}}님이 {{course}}를 {{gross}}타({{topar}})로 돌았습니다.",
+        "round": "{{name}}님이 {{course}}를 {{gross}}타로 돌았습니다.",
+        "played": "{{name}}님이 {{course}}를 플레이했습니다."
+      }
     }
   }
 }

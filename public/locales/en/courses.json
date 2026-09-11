@@ -76,7 +76,40 @@
       "seeAll": "See all {{count}}",
       "views": "Explore views",
       "aMember": "A member",
-      "nothingYet": "Nothing here touches your courses yet. Follow a course or connect a handicap and this page becomes yours."
+      "nothingYet": "Nothing here touches your courses yet. Follow a course or connect a handicap and this page becomes yours.",
+      "you": "You",
+      "aCourse": "a course",
+      "chip": {
+        "rating": "rating",
+        "world": "world",
+        "gbi": "GB&I"
+      },
+      "kicker": {
+        "ownRound": "Your round",
+        "courseRecord": "Course record",
+        "onYourList": "On your list",
+        "atYourClub": "At your club",
+        "aroundRegion": "Around {{region}}",
+        "aroundWorld": "Around the world",
+        "backlog": "From {{month}}",
+        "review": "Review",
+        "news": "News",
+        "clip": "Clip",
+        "watch": "Longer watch",
+        "moment": "From the community",
+        "course": "Course"
+      },
+      "headline": {
+        "recordTaken": "{{name}} took the course record at {{course}} with a {{gross}}.",
+        "ace": "{{name}} holed out from the tee at {{course}}.",
+        "albatross": "{{name}} made an albatross at {{course}}.",
+        "listNewLow": "{{gross}} at {{course}}, a course on your list.",
+        "bogeyFree": "{{name}} went bogey free at {{course}} for {{gross}}.",
+        "birdieHaul": "{{name}} made {{count}} birdies at {{course}}.",
+        "roundToPar": "{{name}} went round {{course}} in {{gross}}, {{topar}}.",
+        "round": "{{name}} went round {{course}} in {{gross}}.",
+        "played": "{{name}} played {{course}}."
+      }
     }
   },
   "amateurNews": {
