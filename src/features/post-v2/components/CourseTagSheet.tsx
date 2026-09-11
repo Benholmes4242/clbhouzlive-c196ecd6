@@ -1,4 +1,10 @@
 // CourseTagSheet - multi-select course tagger.
+//
+// BRIEF_CHOOSE_A_COURSE §C — NO CATALOGUE FIGURE IN COPY. This sheet claimed
+// "40,000+ courses" in three places; golf_courses holds 23,296 rows, so the
+// claim was wrong by 17,000 and checkable by any member. The copy now says
+// "Search any course", which is true and cannot go stale. The courses directory
+// sheet already quotes no figure ("Search all courses"), so the two agree.
 // The FIRST selected course is the primary tag (posts.course_id). All
 // selected courses (incl. the first) are written to posts.tagged_course_ids
 // in selection order. Selected courses pin to the top of the list.
