@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { TourKey } from '../components/TourSwitcherPills';
+import { formatVenueLabel } from '../lib/venueLabel';
 
 /**
  * TourEvent interface - now sourced from sr_tournaments (single source of truth)
@@ -13,7 +14,7 @@ export interface TourEvent {
   status: 'live' | 'upcoming' | 'complete' | 'scheduled' | 'inprogress' | 'closed';
   start_date: string;
   end_date: string;
-  course_name: string | null; // venue_course_name
+  course_name: string | null; // club, then course: "Medinah Country Club \u00B7 Course No. 3"
   location: string | null; // venue_city, venue_state, venue_country combined
   logo_url: string | null; // Not available in sr_tournaments
   espn_event_id: string; // sr_id
@@ -52,7 +53,8 @@ function transformToTourEvent(row: any): TourEvent {
     status: mapTournamentStatus(row.status),
     start_date: row.start_date,
     end_date: row.end_date,
-    course_name: row.venue_course_name || row.venue_name,
+    // CLUB FIRST, COURSE AFTER (see venueLabel.ts).
+    course_name: formatVenueLabel(row.venue_name, row.venue_course_name),
     location: locationParts.length > 0 ? locationParts.join(', ') : null,
     logo_url: null, // Not available in sr_tournaments
     espn_event_id: row.sr_id,

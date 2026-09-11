@@ -11,6 +11,24 @@ import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { syncMentionsForContent } from '@/lib/mentions/syncMentions';
 
+/**
+ * AUDIENCE COPY RULE — READ BEFORE BUILDING ANY VISIBILITY PICKER.
+ *
+ * BRIEF_TOUR_OVERVIEW_UPCOMING_HERO, ruling 3. This enum mirrors the DB
+ * post_visibility type. It governs WHO SEES THE POST IN THE FEED. It does not
+ * protect the FILE: every image and video lives at a bare permanent CDN url
+ * outside Supabase, unsigned, retrievable by anyone holding that url.
+ *
+ * So audience copy MAY NOT use "only", "private", or any word implying the
+ * file is restricted, unless signed urls exist by then. If it ever needs
+ * saying to a member, it says exactly what is true: who sees the post in the
+ * feed. "Friends only" was wrong twice - 'followers' is not friendship, and
+ * "only" claimed a restriction nothing enforces.
+ *
+ * Today there is NO member-facing picker at all: every post is created with
+ * 'anyone' (usePostSubmit.ts), so no member has ever been offered an
+ * alternative or promised anything.
+ */
 export type UpdatePostVisibility = 'anyone' | 'followers' | 'private';
 
 export interface UpdatePostMediaOrder {

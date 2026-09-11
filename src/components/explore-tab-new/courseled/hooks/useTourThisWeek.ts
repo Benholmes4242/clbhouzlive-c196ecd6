@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { mapTourSlug } from '@/features/tourhub/_shared/tourOrder';
 import { getTournamentDisplayState } from '@/utils/tournamentState';
+import { formatVenueLabel } from '@/features/tourhub/lib/venueLabel';
 
 /**
  * useTourThisWeek — one card per venue playing THIS WEEK across the tours
@@ -35,8 +36,15 @@ export interface TourWeekEvent {
   id: string;
   name: string;
   tourLabel: string;
+  /** RESOLVER KEY — raw feed value, course-first. Do not display alone. */
   venueName: string;
   venueCourseName: string | null;
+  /**
+   * DISPLAY LABEL — club first, course after (see tourhub/lib/venueLabel.ts).
+   * Separate from venueName because that value keys the image/course resolver
+   * and must stay byte-identical.
+   */
+  venueLabel: string | null;
   venueCity: string | null;
   venueCountry: string | null;
   startDate: string;
@@ -104,6 +112,7 @@ export function useTourThisWeek(limit = 8) {
           tourLabel: TOUR_LABEL[slug] ?? String(r.season?.tour_name ?? 'Tour'),
           venueName: r.venue_course_name || r.venue_name || r.name,
           venueCourseName: r.venue_course_name ?? null,
+          venueLabel: formatVenueLabel(r.venue_name, r.venue_course_name),
           venueCity: r.venue_city ?? null,
           venueCountry: r.venue_country ?? null,
           startDate: r.start_date,

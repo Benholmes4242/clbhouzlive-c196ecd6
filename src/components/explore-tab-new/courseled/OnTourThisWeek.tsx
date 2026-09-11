@@ -889,7 +889,8 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
               key={e.id}
               e={e}
               courseId={courseId}
-              courseName={match?.name ?? e.venueName}
+              /* Unresolved venues fall back to the CLUB-first label, never the bare course. */
+              courseName={match?.name ?? e.venueLabel ?? e.venueName}
               imageUrl={match?.imageUrl ?? null}
               mediaCount={mediaCount}
               peek={peek}

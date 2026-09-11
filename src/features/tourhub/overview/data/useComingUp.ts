@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { mapTourSlug } from '../../_shared/tourOrder';
 import { isMajor } from '../../utils/majorScope';
 import type { TourId } from '../../hooks/useOverviewData';
+import { formatVenueLabel } from '../../lib/venueLabel';
 
 const DAY = 86_400_000;
 
@@ -81,7 +82,9 @@ export function useComingUp(tour: TourId | null, limit = 12) {
         end_date: r.end_date,
         purse: r.purse ?? null,
         field_size: null,
-        venue: r.venue_course_name || r.venue_name || [r.venue_city, r.venue_country].filter(Boolean).join(', ') || null,
+        // CLUB FIRST, COURSE AFTER (see venueLabel.ts). Was course-first, which
+        // rendered "Course No. 3" with no club for Presidents Cup.
+        venue: formatVenueLabel(r.venue_name, r.venue_course_name) || [r.venue_city, r.venue_country].filter(Boolean).join(', ') || null,
         days_away: Math.max(0, Math.ceil((new Date(r.start_date).getTime() - now) / DAY)),
         defending_champion: r.defending_champion ?? null,
         isMajor: isMajor(r.name),

@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import { useTournamentMeta } from './useTournamentMeta';
+import { formatVenueLabel } from '../lib/venueLabel';
 
 interface ScorecardRow {
   round_number: number;
@@ -140,7 +141,8 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
     ?? meta.data?.venue_name
     ?? t('tournament.scorecard.courseFallback');
   const courseLocation =
-    [meta.data?.venue_course_name ?? meta.data?.venue_name, meta.data?.venue_city]
+    // CLUB FIRST, COURSE AFTER (see venueLabel.ts), then the city.
+    [formatVenueLabel(meta.data?.venue_name, meta.data?.venue_course_name), meta.data?.venue_city]
       .filter(Boolean).join(` ${'\u00B7'} `) || null;
   const coursePar = meta.data?.venue_par ?? null;
 
