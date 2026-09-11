@@ -1192,3 +1192,15 @@ carries the 14px LeadStory frame — a misaligned header and body is worse than 
 section 4px out from its neighbours. Whoever unwinds LeadStory with an additive
 `gutter` prop now has TWO surfaces to verify, and the Tour Hub overview is the
 one where the misalignment shows.
+
+THIRD INCONSISTENCY ON THE SAME PAGE (device-check ruling): the Wire's two
+story rows beneath the lead sit on a 14px inset, 6px inside the image edge.
+That makes THREE on this one page — the kicker at 20, the header at 16, the
+story rows at 14 — which is the argument for unwinding LeadStory properly
+rather than patching any of them here.
+
+OPEN QUESTION (filed, not answered): the 300px hero photograph is NOT tappable
+(OverviewHero binds swipe only; TOURNAMENT › moved to a terminal row beneath
+the image). A photograph with a tournament name on it reads as a link to
+everyone who sees it — whether the hero SHOULD be tappable is Ben's call,
+separate from the CTA relocation.
