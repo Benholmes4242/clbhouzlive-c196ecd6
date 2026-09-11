@@ -264,9 +264,9 @@ export function HeroWireTicker({
       style={{
         display: 'inline-flex',
         alignItems: 'baseline',
-        gap: isStatic ? 5 : 7,
+        gap: 7,
         ...NUMERIC_STYLE,
-        fontSize: isStatic ? 11 : 12,
+        fontSize: 12,
       }}
     >
       <span style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, color: 'rgba(255,255,255,0.42)', fontWeight: 700 }}>
@@ -276,17 +276,50 @@ export function HeroWireTicker({
         style={{
           fontWeight: 600,
           color: 'rgba(255,255,255,0.94)',
+          maxWidth: 140,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
-          // STATIC: no clamp and no ellipsis — a truncated name in a strip the
-          // member cannot scrub is unreadable. MARQUEE: 140px clamp retained.
-          ...(isStatic
-            ? null
-            : { maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis' }),
         }}
       >
         {r.shortName}
       </span>
       <span style={{ fontWeight: 700, color: scoreColor(r.score) }}>{fmtScore(r.score)}</span>
+    </span>
+  ));
+
+  /**
+   * STATIC CELL — name on top, rank + score beneath, inside the same 36px band.
+   * The stack is what makes four entries fit 390pt with no ellipsis on a name:
+   * one line each way costs the WIDER of name/score rather than their sum
+   * (measured worst case 4 x 11-12 character surnames still clears the band).
+   * NO ellipsis and no clamp on the name here — a half-name in a strip the
+   * member cannot scrub is simply unreadable.
+   */
+  const staticCells = safeRows.map((r, i) => (
+    <span
+      key={`${r.rank}-${r.shortName}-${i}`}
+      style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, ...NUMERIC_STYLE }}
+    >
+      <span
+        style={{
+          fontSize: 11,
+          lineHeight: '13px',
+          fontWeight: 600,
+          color: 'rgba(255,255,255,0.94)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {r.shortName}
+      </span>
+      <span style={{ display: 'inline-flex', gap: 4, alignItems: 'baseline', lineHeight: '13px' }}>
+        <span style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, color: 'rgba(255,255,255,0.42)' }}>
+          {r.rank}
+        </span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: scoreColor(r.score) }}>
+          {fmtScore(r.score)}
+        </span>
+      </span>
     </span>
   ));
 
