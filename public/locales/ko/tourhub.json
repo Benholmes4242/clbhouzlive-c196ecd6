@@ -448,6 +448,21 @@
     },
     "board": {
       "clbhouzPick": "clbhouz 주목 선수"
+    },
+    "venueRecord": {
+      "kicker": "Record book",
+      "clubhouseRating": "Clubhouse",
+      "reviews": "Review",
+      "top100": "Top 100",
+      "tooFewRatings": "Ajik i course reul pyeongga han member ga jeokseumnida.",
+      "rateAction": "I COURSE PYEONGGA HAGI",
+      "ratingFrom_one": "pyeongjeom {{count}}gae",
+      "ratingFrom_other": "pyeongjeom {{count}}gae",
+      "sectionKicker": "clbhouz: ibeon ju gyeongginjang",
+      "ratingLabel": "Member pyeongjeom",
+      "basis_one": "Play han member {{count}}gae pyeongjeom.",
+      "basis_other": "Play han member {{count}}gae pyeongjeom.",
+      "seeAction": "COURSE BOGI"
     }
   },
   "empty": {

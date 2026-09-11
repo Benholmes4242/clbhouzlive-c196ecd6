@@ -461,10 +461,16 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
    *
    * Where a fact's datum is missing the fact is DROPPED rather than filled with
    * a dash: an empty slot is honest and a dash pretends there is a figure.
-   * Known gaps, measured against the live feed: purse is null on some events,
-   * and an upcoming event with no mapped defending champion loses that slot, so
-   * those states can render two.
+   *
+   * THE DROP IS SETTLED — NO FOURTH CANDIDATE FACT (structural brief C, closed).
+   * Measured against the live feed, 2026-09-11: of 37 upcoming events, purse is
+   * null on 2 (5%) and defending champion on 6 (16%), so 84% render three facts
+   * and six render two real ones. Of 67 events completed in the last 120 days,
+   * purse is null on 0 and defending champion on 3. Six events showing two true
+   * facts is an EDGE CASE, not a design fact, so no filler fact was added to
+   * pad the row. Do not re-open this on a hunch; re-measure first.
    */
+
   const heroKicker: string | null = useMemo(() => {
     if (state.kind === 'live') return t('overview.hero.stateLive');
     if (state.kind === 'results') return t('overview.hero.stateFinal');

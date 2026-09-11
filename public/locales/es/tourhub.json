@@ -452,6 +452,21 @@
     },
     "board": {
       "clbhouzPick": "selección de clbhouz"
+    },
+    "venueRecord": {
+      "kicker": "El registro",
+      "clubhouseRating": "Club",
+      "reviews": "Valoraciones",
+      "top100": "Top 100",
+      "tooFewRatings": "Muy pocos miembros han valorado este campo todavia.",
+      "rateAction": "VALORAR ESTE CAMPO",
+      "ratingFrom_one": "de {{count}} valoracion",
+      "ratingFrom_other": "de {{count}} valoraciones",
+      "sectionKicker": "La sede de esta semana en clbhouz",
+      "ratingLabel": "Valoracion de los miembros",
+      "basis_one": "De {{count}} valoracion de miembros que han jugado alli.",
+      "basis_other": "De {{count}} valoraciones de miembros que han jugado alli.",
+      "seeAction": "VER EL CAMPO"
     }
   },
   "empty": {

@@ -73,10 +73,29 @@ export function OverviewPageV3() {
             See OverviewHero.tsx. */}
         <OverviewHero />
 
-        {/* Cohesion unit: VenueRecordBand + Schedule sit in a tight 14px
-            group directly under the hero, keyed to viewingTournamentId so they
-            crossfade together in step with the hero. The larger sectionSection
-            gap that follows is what makes this unit read as one. */}
+        {/* SECTION TWO — THE VENUE ON CLBHOUZ (structural brief D). Out of the
+            hero cohesion unit entirely and standing as its own full section
+            directly beneath the hero: on a live tournament that is directly
+            beneath the board band, the hero's last band. Still keyed to
+            viewingTournamentId so it changes in step with the hero, and it
+            self-hides when the tournament has no linked course. */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`venue-${viewingTournamentId ?? 'none'}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            /* On a live slide the dark hero block ends with a straight edge
+               directly above this — the canvas must BREATHE, so the gap is
+               real (24), not the old 2px seam. */
+            style={{ paddingTop: viewingIsLive ? 24 : 12 }}
+          >
+            <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* The Schedule keeps its own keyed crossfade beneath the venue. */}
         <AnimatePresence mode="wait">
           <motion.div
             key={viewingTournamentId ?? 'none'}
@@ -84,16 +103,13 @@ export function OverviewPageV3() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            /* On a live slide the dark hero block ends with a straight edge
-               directly above this — the canvas must BREATHE before the Schedule,
-               so the gap is real (24), not the old 2px seam. */
-            style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: viewingIsLive ? 24 : 12 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: SPACE.sectionSection }}
           >
-            <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
             <ComingUpSlot />
           </motion.div>
 
         </AnimatePresence>
+
 
         <div
           id="content-below-hero"
