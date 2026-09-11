@@ -193,8 +193,7 @@
       "filterAriaLabel": "Filter section by tour"
     },
     "page": {
-      "offlineBanner": "You're offline. Some data may be outdated.",
-      "footerLicence": "Leaderboards and rankings from the tours. Ratings from clbhouz members."
+      "offlineBanner": "You're offline. Some data may be outdated."
     },
     "hero": {
       "prevAria": "Previous tournament",
