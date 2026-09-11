@@ -83,6 +83,10 @@ export function ScheduleTab() {
   // ?tour= when it names a known tour; All Tours (null) stays the default.
   const [tourLens, setTourLens] = useState<TourId | null>(() => {
     const param = searchParams.get('tour');
+    /* `?tour=all` is an EXPLICIT All Tours request from a caller that knows the
+       member's lens (Coming Up's FULL SCHEDULE row). It must beat the stored
+       single tour, otherwise a see-all silently narrows the scope. */
+    if (param === 'all') return null;
     if (param && Object.prototype.hasOwnProperty.call(TOUR_CONFIG, param)) {
       return param as TourId;
     }
