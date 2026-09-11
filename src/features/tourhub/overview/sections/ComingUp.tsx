@@ -32,6 +32,28 @@
  * but collapses on every upcoming event today. It is kept because the collapse
  * path is the whole point of the rule, and because the figure arrives the moment
  * the feed carries it — see useComingUp.field_size.
+ *
+ * BRIEF_TOUR_OVERVIEW_PASS_ONE B — TWO THINGS RECORDED HERE ON PURPOSE.
+ *
+ *  1. DATE HEADERS INSIDE A PAGED DECK IS A DELIBERATE COMPROMISE, NOT AN
+ *     OVERSIGHT. A date-grouped list that pages mixes two navigation models.
+ *     Both halves earn their place: the headers say the date and the countdown
+ *     once per day instead of once per row (claim b), and the pager exists
+ *     because page heights genuinely differ and the track measures each one
+ *     (claim c). Accepted rather than solved. Do not "fix" it by dropping the
+ *     headers or by converting the deck to a vertical list without a ruling.
+ *
+ *  2. THE DOTS ARE BUTTONS AND THERE IS A TERMINAL ROW. Four indicators that
+ *     could not be tapped, beside a swipe surface with no arrow, made page four
+ *     reachable only by three deliberate swipes from someone who already knew
+ *     it was there. The dots now scroll the track. The pager also caps at 15
+ *     events while the season does not, so the last row in the card is the door
+ *     to the full schedule — it carries the section's own tour lens (?tour=),
+ *     which ScheduleTab seeds from on mount, so the see-all never widens the
+ *     scope. ONE EXCEPTION, MEASURED, NOT WIRED AROUND: in the all-tours lens
+ *     no ?tour= can be sent and ScheduleTab then falls back to the member's
+ *     stored tour, so an all-tours member can land on a single-tour schedule.
+ *     Reported rather than papered over; ScheduleTab has no "all" param today.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
