@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "public_read_post_media" ON public.post_media;
