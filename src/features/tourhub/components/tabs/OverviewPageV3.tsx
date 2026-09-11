@@ -24,6 +24,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { SPACE } from '@/lib/spacing';
+import { OVERVIEW_GUTTER } from '../../overview/tokens';
 
 
 
@@ -131,6 +132,18 @@ export function OverviewPageV3() {
               {/* flat: this page draws no bordered cards (structural brief A). */}
               <ConnectHandicapCue variant="tour-venue" courseName="" flat />
             </LazySection>
+
+            {/* THE PROVENANCE LINE (structural brief G). One line beneath a
+                hairline at the foot of the page, 10/T40. It is the only thing
+                on this page that says which half of it is licensed tour data
+                and which half is the app's own members. Not a legal notice and
+                not a link — a single sentence of attribution. */}
+            <div style={{ paddingLeft: OVERVIEW_GUTTER, paddingRight: OVERVIEW_GUTTER, paddingTop: 4 }}>
+              <div style={{ height: 1, background: 'rgba(255,255,255,0.14)', marginBottom: 10 }} />
+              <span style={{ fontSize: 10, fontWeight: 500, lineHeight: 1.5, color: 'rgba(248,250,252,0.40)' }}>
+                {t('overview.page.footerLicence')}
+              </span>
+            </div>
           </div>
         </div>
         <ScrollToTopGlass />
