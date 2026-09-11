@@ -105,6 +105,12 @@ export function StatWatch({ tour }: { tour: TourId }) {
         options={pickerOptions}
         onChange={(next: StatKey) => setSelected(next)}
         ariaLabel={t('overview.statWatch.pickerAriaLabel', 'Choose a statistic')}
+        /* FOUR IS THE WHOLE SET (ruling on device-check D). The chips wrap to
+           two lines rather than scroll: a peek is right when more exists past
+           the edge than can be shown, wrong when the whole set is four items
+           two lines will hold. No abbreviations — TEE-GRN / DIST would be
+           jargon a member must decode to use a control. */
+        wrap
         style={{ padding: `2px ${GUT}px 0` }}
       />
 
