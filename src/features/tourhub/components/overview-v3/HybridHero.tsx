@@ -50,6 +50,55 @@ import { BG, INK_15, OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 
 import { SLATE_700, SLATE_800 } from '../../_shared/tokens';
 
+/**
+ * The retired upcoming strip's "band absent" signal: zero rows AND zero facts
+ * makes HeroWireTicker render nothing (device-check B). A shared frozen array
+ * so the prop identity never changes between renders.
+ */
+const EMPTY_FACTS: TickerFact[] = [];
+
+/**
+ * SECTION F — THE TERMINAL ROW BENEATH THE PHOTOGRAPH. Standard uppercase
+ * terminal treatment on the hero's dark ground, ON the 20px gutter, so the only
+ * things over the image are the title block and its three facts.
+ */
+function HeroTerminalRow({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '11px 20px',
+        background: BG,
+        border: 'none',
+        borderTop: `0.5px solid ${INK_15}`,
+        cursor: 'pointer',
+        textAlign: 'left',
+      }}
+    >
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.72)',
+        }}
+      >
+        {label}
+      </span>
+      <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)' }} aria-hidden>
+        &rsaquo;
+      </span>
+    </button>
+  );
+}
+
+
 // ---------- Skeleton -------------------------------------------------------
 
 export function HybridHeroSkeleton() {
