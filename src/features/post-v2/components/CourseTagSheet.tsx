@@ -246,7 +246,7 @@ export default function CourseTagSheet({
                     />
                   ))}
                   <div style={{ padding: '16px', fontSize: 12, color: CT.secondary }}>
-                    Can'''t see it? Search any course above.
+                    Can't see it? Search any course above.
                   </div>
                 </>
               ) : (
