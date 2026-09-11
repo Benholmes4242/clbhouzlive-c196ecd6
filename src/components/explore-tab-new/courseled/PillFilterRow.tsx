@@ -22,6 +22,15 @@ type PillFilterBaseProps<T extends string> = {
    * fill. Radius, padding, type and the selected treatment are identical.
    */
   surface?: PillFilterSurface;
+  /**
+   * WRAP (default false — every existing caller keeps its scroll behaviour
+   * byte-identically). When true the row wraps to as many lines as it needs
+   * instead of scrolling. Use ONLY when the option set is fixed and small
+   * enough to be shown whole: a peek is right when there is more past the
+   * edge than can be shown, wrong when the entire set is four items and two
+   * lines would hold them (Stat Watch ruling).
+   */
+  wrap?: boolean;
 };
 
 /**
