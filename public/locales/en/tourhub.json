@@ -510,6 +510,7 @@
       "reviews": "Reviews",
       "top100": "Top 100",
       "tooFewRatings": "Too few members have rated this course yet.",
+      "rateAction": "RATE THIS COURSE",
       "ratingFrom_one": "from {{count}} rating",
       "ratingFrom_other": "from {{count}} ratings"
     },
