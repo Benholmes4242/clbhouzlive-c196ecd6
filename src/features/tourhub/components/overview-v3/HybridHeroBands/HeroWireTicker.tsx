@@ -350,6 +350,9 @@ export function HeroWireTicker({
 
   // STATIC — one treatment for everyone. No marquee, no auto-scroll, no loop,
   // no overflow scroller, and deliberately no prefers-reduced-motion branch.
+  // The ENTRIES are fixed width and the LABEL absorbs whatever is left: at
+  // 390pt with the longest surnames and the longest translated label, the
+  // label ellipsises before a player's name ever does. Chrome yields to data.
   if (isStatic) {
     return (
       <section
@@ -363,23 +366,40 @@ export function HeroWireTicker({
         }}
         aria-label={label}
       >
-        {leftAccessory}
+        <div
+          style={{
+            padding: '0 10px',
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            color: 'rgba(255,255,255,0.55)',
+            background: BG,
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            flex: '1 1 auto',
+            minWidth: 0,
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            borderRight: '0.5px solid rgba(255,255,255,0.10)',
+            zIndex: 2,
+          }}
+        >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {label}
+          </span>
+        </div>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 8,
-            padding: '0 12px',
-            flex: 1,
-            minWidth: 0,
+            gap: 12,
+            padding: '0 10px',
+            flex: '0 0 auto',
           }}
         >
-          {nodes.map((n, i) => (
-            <span key={`${safeRows[i]?.rank}-${safeRows[i]?.shortName}-${i}`} style={{ flexShrink: 0 }}>
-              {n}
-            </span>
-          ))}
+          {staticCells}
         </div>
       </section>
     );
