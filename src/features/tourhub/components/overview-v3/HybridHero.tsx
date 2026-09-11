@@ -569,7 +569,13 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           momentLabel={moment?.label ?? null}
           momentName={moment?.name ?? null}
           momentScore={moment?.score ?? null}
-          onCtaTap={onCtaTap}
+          /* SECTION F — NOTHING OVERLAYS THE PHOTOGRAPH EXCEPT THE TITLE BLOCK
+             AND ITS FACTS. The TOURNAMENT link used to sit bottom-right ON the
+             image, level with the facts. The hero itself is NOT tappable (the
+             carousel wrapper binds touchstart/move/end for the swipe only, and
+             nothing navigates), so the link is the sole route to the tournament
+             from here and could not simply be dropped: it MOVES to a terminal
+             row beneath the photograph. */
           venueCourseName={tournament.venueCourseName}
           venueState={tournament.venueState}
           venueCountry={tournament.venueCountry}
@@ -588,18 +594,28 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           score, with no ALSO OUT label: the cells carry their own positions, so
           the label was chrome competing with names for width. Without a
           continuation (no board above) the strip is the standalone top-10 and
-          keeps the labelled static treatment. The marquee stays for the
-          rotating FIELD SOON facts and for the news strip only.
+          keeps the labelled static treatment.
+
+          THE UPCOMING STATE STRIP IS RETIRED (device-check B). It said
+          everything twice: TEES OFF and VENUE both appeared in the hero facts
+          and the sub-line above them, and the marquee below repeated the purse.
+          leadFacts is no longer supplied and emptyStateFacts is an EMPTY ARRAY
+          on this surface, which is the ticker's own "band absent" signal — so
+          on an upcoming slide nothing renders here at all. The FIELD SOON state
+          mark, the one thing the strip carried that the facts did not, is folded
+          into the hero's third fact (see heroFacts, upcoming branch). The
+          marquee remains for the news StoryLeaderboardStrip, which is the other
+          consumer of this component and is untouched.
         */}
         <HeroWireTicker
           rows={top10}
-          emptyStateFacts={emptyStateFacts}
-          leadFacts={leadFacts}
+          emptyStateFacts={top10.length === 0 ? EMPTY_FACTS : undefined}
           labelKind={tickerOffset > 0 ? 'continuation' : 'top10'}
           presentation={
             top10.length === 0 ? 'marquee' : tickerOffset > 0 ? 'columns' : 'static'
           }
         />
+        {onCtaTap && <HeroTerminalRow label={t('overview.photoBand.tournamentCta')} onPress={onCtaTap} />}
       </div>
     );
   }
