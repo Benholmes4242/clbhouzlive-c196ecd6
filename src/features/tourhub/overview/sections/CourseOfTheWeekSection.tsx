@@ -79,7 +79,7 @@ export function CourseOfTheWeekSection() {
   // Loading: skeleton mirrors card geometry, no reservation beyond it.
   if (isLoading && !data) {
     return (
-      <SectionShell eyebrow="COURSE OF THE WEEK">
+      <SectionShell padX={GUT} eyebrow="COURSE OF THE WEEK">
         <div style={{ padding: `0 ${GUT}px` }}>
           <div
             style={{
@@ -142,7 +142,7 @@ export function CourseOfTheWeekSection() {
         transition={{ duration: 0.32, ease: [0.22, 0.61, 0.36, 1] }}
         style={{ overflow: 'hidden' }}
       >
-        <SectionShell
+        <SectionShell padX={GUT}
           eyebrow="COURSE OF THE WEEK"
           linkLabel="Top 100"
           onLinkClick={() => navigate('/courses?tab=top100')}

@@ -252,7 +252,7 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
 
   if (isLoading && rows.length === 0) {
     return (
-      <SectionShell eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={goSchedule}>
+      <SectionShell padX={GUT} eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={goSchedule}>
         <div style={{ margin: `0 ${GUT}px` }}>
           <V4Card style={{ overflow: 'hidden' }}>
             {[0, 1, 2, 3, 4].map((i) => (
@@ -280,7 +280,7 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
   if (rows.length === 0) return null;
 
   return (
-    <SectionShell eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={goSchedule}>
+    <SectionShell padX={GUT} eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={goSchedule}>
       <div style={{ margin: `0 ${GUT}px` }}>
         <V4Card style={{ overflow: 'hidden' }}>
           <div

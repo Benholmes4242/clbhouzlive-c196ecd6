@@ -130,7 +130,7 @@ export function WorldRankings({ tour }: { tour: TourId }) {
   const rows = data ?? [];
   if (isLoading && rows.length === 0) {
     return (
-      <SectionShell eyebrow={eyebrow} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
+      <SectionShell padX={GUT} eyebrow={eyebrow} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
         <div style={{ padding: `4px ${GUT}px 12px`, display: 'flex', alignItems: 'center', gap: 14 }}>
           <Skeleton className="h-[62px] w-[62px]" style={{ borderRadius: 18 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -177,7 +177,7 @@ export function WorldRankings({ tour }: { tour: TourId }) {
   };
 
   return (
-    <SectionShell eyebrow={eyebrow} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
+    <SectionShell padX={GUT} eyebrow={eyebrow} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
       {/* No.1 spotlight — cardless, scale does the work. */}
       <div style={{ padding: `4px ${GUT}px 12px` }}>
         <SpotlightRow

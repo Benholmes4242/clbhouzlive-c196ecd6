@@ -23,7 +23,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { A, KICKER, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { SPACE } from '@/lib/spacing';
+import { OVERVIEW_GUTTER as GUT } from '../tokens';
 import { useTournamentVenueRecord } from '../data/useTournamentVenueRecord';
 
 /* Minimum ratings before the clubhouse figure may render at all. */

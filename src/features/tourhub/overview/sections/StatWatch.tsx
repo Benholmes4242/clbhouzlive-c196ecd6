@@ -50,7 +50,7 @@ export function StatWatch({ tour }: { tour: TourId }) {
 
   if (isLoading && categories.length === 0) {
     return (
-      <SectionShell
+      <SectionShell padX={GUT}
         eyebrow={t('overview.statWatch.eyebrow')}
         linkLabel={t('overview.statWatch.allStatsLink')}
         onLinkClick={() => navigate('/tourhub?tab=leaderboards')}
@@ -83,7 +83,7 @@ export function StatWatch({ tour }: { tour: TourId }) {
   if (categories.length === 0 || !active) return null;
 
   return (
-    <SectionShell
+    <SectionShell padX={GUT}
       eyebrow={t('overview.statWatch.eyebrow')}
       linkLabel={t('overview.statWatch.allStatsLink')}
       onLinkClick={() => navigate('/tourhub?tab=leaderboards')}

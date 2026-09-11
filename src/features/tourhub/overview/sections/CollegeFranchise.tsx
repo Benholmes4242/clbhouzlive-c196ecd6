@@ -139,7 +139,7 @@ export function CollegeFranchise() {
 
   if (isLoading && (!leader || !chaser)) {
     return (
-      <SectionShell
+      <SectionShell padX={GUT}
         eyebrow={t('overview.collegeFranchise.eyebrow')}
         linkLabel={t('overview.collegeFranchise.linkLabel')}
         onLinkClick={() => navigate('/tourhub?tab=college')}
@@ -218,7 +218,7 @@ export function CollegeFranchise() {
   const goCollege = (norm: string) => navigate(`/tourhub/college-golf/${norm}`);
 
   return (
-    <SectionShell
+    <SectionShell padX={GUT}
       eyebrow={t('overview.collegeFranchise.eyebrow')}
       linkLabel={t('overview.collegeFranchise.linkLabel')}
       onLinkClick={() => navigate('/tourhub?tab=college')}
