@@ -454,50 +454,18 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     return null;
   }, [state, safeLeaderboard, tiedLeaders, champion, defendingChamp, t]);
 
-  // "Awaiting the field" empty-state facts for the HeroWireTicker (Upcoming
-  // only, when no field/prediction rows are available yet). Each entry is
-  // optional; the wire only renders facts that exist. Zero facts ⇒ band absent.
   /**
-   * THE DATE RANGE AND THE VENUE ARE READ FACTS, NOT ATMOSPHERE. In the
-   * upcoming state the venue IS the content, so both leave the marquee and
-   * render in the static lead block above it (see HeroWireTicker.leadFacts):
-   * the badge no longer sits over them and the venue no longer clips mid-word.
-   * Everything below stays ambient and keeps the wire.
+   * THE UPCOMING STRIP IS RETIRED (device-check B) — leadFacts and
+   * emptyStateFacts are no longer built on this surface. They said everything
+   * twice: TEES OFF and VENUE in the static lead block above the hero facts
+   * that already carry TEES OFF, the venue already on the photograph's
+   * sub-line, and the purse again in the marquee below. The single thing they
+   * carried that the facts did not — the FIELD SOON state mark — is folded into
+   * the hero's third fact below. HeroWireTicker itself is untouched: the
+   * marquee, the lead block and the empty-state bar all remain for the news
+   * StoryLeaderboardStrip, its other consumer.
    */
-  const leadFacts: TickerFact[] | undefined = useMemo(() => {
-    if (state.kind !== 'upcoming') return undefined;
-    if (top10.length > 0) return undefined;
-    const facts: TickerFact[] = [];
-    if (datesString) facts.push({ label: t('overview.hero.teesOff'), value: datesString });
-    if (tournament.venueName) facts.push({ label: t('overview.hero.venueLabel'), value: tournament.venueName });
-    return facts;
-  }, [state.kind, top10.length, datesString, tournament.venueName, t]);
 
-  const emptyStateFacts: TickerFact[] | undefined = useMemo(() => {
-    if (state.kind !== 'upcoming') return undefined;
-    if (top10.length > 0) return undefined;
-    const facts: TickerFact[] = [];
-    if (defendingChamp?.name) {
-      facts.push({ label: t('overview.hero.defendsLabel'), value: defendingChamp.name, labelGold: true });
-      if (defendingChamp.score && defendingChamp.year) {
-        const surname = defendingChamp.name.trim().split(/\s+/).slice(-1)[0];
-        facts.push({
-          label: t('overview.hero.prevWinner', { year: defendingChamp.year }),
-          value: surname ? `${defendingChamp.score} · ${surname}` : defendingChamp.score,
-        });
-      }
-    }
-    if (typeof tournament.purse === 'number' && tournament.purse > 0) {
-      const m = tournament.purse / 1_000_000;
-      const purseStr = m >= 10 ? `$${Math.round(m)}M` : `$${m.toFixed(1)}M`;
-      facts.push({ label: t('overview.hero.purse'), value: purseStr });
-    }
-    facts.push({
-      label: t('overview.leaderboardBand.fieldEyebrow').toUpperCase(),
-      value: t('overview.hero.fieldAnnouncedSoon'),
-      pulseLabel: true,
-    });
-    return facts;
   }, [state.kind, top10.length, tournament.purse, defendingChamp, t]);
 
   /**
