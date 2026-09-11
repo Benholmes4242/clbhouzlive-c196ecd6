@@ -279,9 +279,16 @@ export function CourseOfTheWeekSection() {
                     5px internal gap and 16px between them; nothing wraps.
                     "1 round" is gone — it wrapped under YOUR BEST and cost the
                     card a line for one word. */}
+                {/* THE RATING CARRIES ITS COUNT ON ONE LINE. RATING and
+                    REVIEWS were two separate pairs, which read as two findings
+                    when they are one figure and its sample. The count is now
+                    the rating's qualifier, in the same line, so the figure can
+                    never appear without the sample behind it. */}
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                  <FigurePair label="Rating" value={Number(avg_rating ?? 0).toFixed(1)} />
-                  <FigurePair label="Reviews" value={review_count.toLocaleString()} tone={A.MUTE} />
+                  <FigurePair
+                    label="Rating"
+                    value={`${Number(avg_rating ?? 0).toFixed(1)} from ${review_count.toLocaleString()}`}
+                  />
                   {/* Never played / signed out => the pair COLLAPSES. No dash,
                       no zero, no em-dash placeholder. */}
                   {myBest?.best_gross != null ? (
@@ -289,38 +296,15 @@ export function CourseOfTheWeekSection() {
                   ) : null}
                 </div>
 
-                {/* Quote block (only when present) */}
-                {quote ? (
-                  <>
-                    <div style={{ height: '0.5px', background: V4.hairline }} />
-                    <blockquote
-                      style={{
-                        margin: 0,
-                        padding: 0,
-                        borderLeft: `3px solid ${V4.amber}`,
-                        paddingLeft: 11,
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: 14.5,
-                          lineHeight: 1.5,
-                          color: A.MUTE,
-                          fontStyle: 'italic',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        “{trimmedQuote.text}{quoteSuffix}”
-                      </div>
-                      <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, color: A.DIM, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                        — {reviewer_name ?? 'A member'}
-                      </div>
-                    </blockquote>
-                  </>
-                ) : null}
+                {/* THE MEMBER QUOTE IS GONE (structural brief section E). It
+                    was selected by highest helpful count among qualifying
+                    reviews, which on this base can and did surface the viewing
+                    member's own words back at them as editorial voice — filed
+                    as the self-quote fault. The rating and its count say the
+                    same thing without attribution risk. The RPC still returns
+                    quote/reviewer_name and clampToSentence is still exported
+                    and tested; nothing was deleted, so a quote block can return
+                    when selection excludes the reader. */}
 
                 {/* Quiet action. The card owns the navigation; this is the
                     affordance, so it must not become a second tap target. */}

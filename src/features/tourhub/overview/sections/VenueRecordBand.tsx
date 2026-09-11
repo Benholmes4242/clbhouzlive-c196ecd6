@@ -24,14 +24,22 @@
  * TIER WORD — a tier word is a verdict, and twelve ratings is not enough to
  * hand one down about Wentworth.
  *
- * ONE FIGURE, NOT TWO. The brief asked for MEMBERS' RATING beside PLAYED IT.
- * get_tournament_venue_record returns (course_id, course_name, course_place,
- * rating, review_count, list_rank, list_label) — verified against
- * pg_get_function_result — so there is NO played count available, and it is not
- * computed here: a client-side count over a table this section does not own
- * would be a second figure invented to fill a slot. One figure that is true
- * beats two where one is invented. If a played count is worth adding it comes
- * from the function.
+ * TWO FIGURES, BOTH TRUE. get_tournament_venue_record returns (course_id,
+ * course_name, course_place, rating, review_count, list_rank, list_label) —
+ * verified against pg_get_function_result — so it carries NO played count, and
+ * one is NOT computed client-side here. PLAYED IT comes from the already-live
+ * get_course_field_sizes, which answers exactly this question with the same
+ * mapping filter and the same deleted-connection filter as
+ * get_course_hole_field (verified 17 = 17). Adding a column to the venue
+ * function would require DROP and recreate — discarding five grants and the
+ * pinned search_path on a live function for one figure — so it was not done.
+ *
+ * ONE EXTRA CALL FOR THE WHOLE SECTION. The band shows a single course, so the
+ * batched function is asked for exactly one id, once.
+ *
+ * IF THE PLAYED READ FAILS, PLAYED IT DOES NOT RENDER and MEMBERS' RATING
+ * stands alone. A zero is never printed from a failed read: "0" would say
+ * nobody has played Wentworth.
  *
  * NO ROW AT ALL: the section does not render. Absent, not empty.
  */
@@ -42,9 +50,21 @@ import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/to
 import { OVERVIEW_GUTTER as GUT } from '../tokens';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 import { useTournamentVenueRecord } from '../data/useTournamentVenueRecord';
+import { useCourseFieldPlayers } from '@/hooks/gam/useCourseFieldPlayers';
 
 /* Minimum ratings before the clubhouse figure may render at all. */
 const RATING_FLOOR = 3;
+
+/**
+ * NOBODY IS EXCLUDED, DELIBERATELY. get_course_field_sizes was written for the
+ * trophy room, where the crown HOLDER must be excluded from the field they hold
+ * a record against, so it takes p_exclude_user_id. Here the question is
+ * different: how many members have played this venue, all of them. The function
+ * compares with IS DISTINCT FROM, so a nil uuid matches no member and excludes
+ * nobody, which makes course_players a complete count. THIS IS NOT AN UNFILLED
+ * PLACEHOLDER — do not substitute the viewing member's id.
+ */
+const EXCLUDE_NOBODY = '00000000-0000-0000-0000-000000000000';
 
 /** The section kicker: 9/700/0.19em uppercase, above the heading. */
 const SECTION_KICKER: React.CSSProperties = {
@@ -109,6 +129,20 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
   const navigate = useNavigate();
   const { data } = useTournamentVenueRecord(tournamentId);
 
+  /* ONE call, one course id. See EXCLUDE_NOBODY above for the nil uuid. */
+  const field = useCourseFieldPlayers(
+    data?.courseId ? [data.courseId] : [],
+    EXCLUDE_NOBODY,
+  );
+  const playedRaw = data?.courseId ? field.data?.sizes.get(data.courseId) : undefined;
+  /* A failed or absent read renders nothing; and zero is NOT printed either,
+     because get_course_field_sizes returns 0 both for a course nobody has
+     played and for a course with no qualifying WHS mapping. */
+  const played =
+    field.data?.available && typeof playedRaw === 'number' && playedRaw > 0
+      ? playedRaw
+      : null;
+
   if (!data) return null;
   const count = data.reviewCount ?? 0;
   /* A figure is only shown with a real count behind it. */
@@ -138,14 +172,28 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
 
       {hasRating ? (
         <>
-          <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <span
-              className="tabular-nums lining-nums"
-              style={{ fontSize: 21, fontWeight: 700, color: A.INK, letterSpacing: '-0.03em', ...FIGS }}
-            >
-              {Number(data.rating).toFixed(1)}
-            </span>
-            <span style={FIGURE_KICKER}>{t('overview.venueRecord.ratingLabel')}</span>
+          <div style={{ marginTop: 12, display: 'flex', gap: 32 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <span
+                className="tabular-nums lining-nums"
+                style={{ fontSize: 21, fontWeight: 700, color: A.INK, letterSpacing: '-0.03em', ...FIGS }}
+              >
+                {Number(data.rating).toFixed(1)}
+              </span>
+              <span style={FIGURE_KICKER}>{t('overview.venueRecord.ratingLabel')}</span>
+            </div>
+
+            {played != null ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <span
+                  className="tabular-nums lining-nums"
+                  style={{ fontSize: 21, fontWeight: 700, color: A.INK, letterSpacing: '-0.03em', ...FIGS }}
+                >
+                  {played}
+                </span>
+                <span style={FIGURE_KICKER}>{t('overview.venueRecord.playedLabel')}</span>
+              </div>
+            ) : null}
           </div>
 
           <div

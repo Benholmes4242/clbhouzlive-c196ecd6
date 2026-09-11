@@ -466,7 +466,8 @@
       "ratingLabel": "Valoracion de los miembros",
       "basis_one": "De {{count}} valoracion de miembros que han jugado alli.",
       "basis_other": "De {{count}} valoraciones de miembros que han jugado alli.",
-      "seeAction": "VER EL CAMPO"
+      "seeAction": "VER EL CAMPO",
+      "playedLabel": "Lo han jugado"
     }
   },
   "empty": {
