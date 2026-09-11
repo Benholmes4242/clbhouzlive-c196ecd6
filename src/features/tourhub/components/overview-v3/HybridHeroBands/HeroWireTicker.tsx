@@ -68,7 +68,26 @@ interface HeroWireTickerProps {
    * such. 'top10' (default) is the standalone case.
    */
   labelKind?: 'top10' | 'continuation';
+  /**
+   * 'marquee' (DEFAULT, unchanged) — the ambient scrolling wire. Correct for
+   * rotating FIELD SOON facts and for the news StoryLeaderboardStrip, where the
+   * strip is atmosphere beside a headline.
+   *
+   * 'static' — no animation, no auto-scroll, no loop, no horizontal scroller.
+   * Used by the hero's ALSO OUT continuation strip: those positions are
+   * INFORMATION, and a member cannot pause, scrub or scroll a marquee, so half
+   * a name was unreadable until the loop came round again. Static mode renders
+   * STATIC_ROWS entries only (positions 7-10 in the continuation case) and the
+   * FULL LEADERBOARD row directly beneath is the route to 11 and beyond.
+   * Static mode deliberately has NO prefers-reduced-motion branch — there is
+   * one treatment for everyone, because the old reduced-motion degrade was a
+   * silent horizontal scroller with no affordance.
+   */
+  presentation?: 'marquee' | 'static';
 }
+
+/** Entries shown in `presentation="static"` — four fit 390pt without ellipsis. */
+const STATIC_ROWS = 4;
 
 const PULSE_STYLE_ID = 'hero-wire-ticker-pulse';
 function ensurePulseKeyframes() {
