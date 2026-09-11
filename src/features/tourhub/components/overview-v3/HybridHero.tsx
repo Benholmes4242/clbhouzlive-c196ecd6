@@ -470,10 +470,17 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           venueYardage={tournament.venueYardage}
           purse={tournament.purse}
         />
+        {/*
+          ALSO OUT is INFORMATION, not ambience, so it renders static (four
+          entries, positions 7-10 when continuing the board above). FULL
+          LEADERBOARD beneath is the route to 11 and beyond. The marquee stays
+          for the rotating FIELD SOON facts and for the news strip only.
+        */}
         <HeroWireTicker
           rows={top10}
           emptyStateFacts={emptyStateFacts}
           labelKind={tickerOffset > 0 ? 'continuation' : 'top10'}
+          presentation={top10.length > 0 ? 'static' : 'marquee'}
         />
       </div>
     );
