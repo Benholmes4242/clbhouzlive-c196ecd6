@@ -1070,3 +1070,33 @@ Seven upcoming club names are weak enough to risk mismatching on their own
 (Albany The Bahamas, El Cardonal at Diamante, Hammock Beach, Pleasant Valley,
 St. Andrews, The Cliffs at Walnut Cove, Vidanta Vallarta) and Hoakalei Country
 Club is currently unmapped in sr_course_map.
+
+### 7. OPEN (from 3 Aug) - views that run as their creator, now a list
+18 public views are readable over the API and do NOT have security_invoker set,
+so they run with the owner's rights and the caller's RLS never applies:
+reachable WITHOUT signing in - course_pooling_watch, course_rating_aggregates,
+course_rating_stats, explore_moments, public_golfer_blurbs, public_profiles,
+round_post_like_count_drift, season_leaderboard_view, stat_browse_base,
+tourhub_leaderboard_latest, vw_course_activity_30d, vw_region_activity_30d,
+vw_theme_activity_30d.
+signed-in only - user_achievements_view, user_course_activity,
+user_top100_progress_view, whs_friend_matches, whs_friend_window_rankings.
+Nine views already set the flag (cron_job_health, gam_course_legends_view,
+gam_round_net, gam_user_course_record_view, post_comments,
+user_top100_rated_courses, user_top_ten_courses_view, whs_friend_course_bests,
+whs_invite_status) - that is the part closed in August. Seven more owner-run
+views (admin_audit_feed, business_profile_daily_insights,
+gam_friend_handicap_leaderboard_view, gam_rivalry_results_flat_view,
+sr_tournament_course_resolution, user_friend_pairs, user_season_xp_view) are not
+granted to anon or authenticated at all and are not exposed.
+NOT TO BE FIXED IN PASSING: several feed live surfaces, and setting the flag
+changes which rows they return. Own pass, own verification.
+
+Also open, same census: 7 public tables with RLS off (_feed_v3_backup,
+_par_race_test, _round_post_fn_backup, geo_region_aliases, major_tournaments,
+spatial_ref_sys, tour_push_rotation) and 11 with RLS on and no policy at all
+(admin_email_notifications, invite_requests, leaderboard_snapshots,
+page_path_map, page_route_manifest, push_drain_debounce, site_gate_attempts,
+system_state_daily, system_state_history, web_vitals,
+whs_friend_leaderboard_snapshots) - the second group is closed to members
+already, since RLS with no policy denies everything.
