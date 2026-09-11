@@ -447,7 +447,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       pulseLabel: true,
     });
     return facts;
-  }, [state.kind, top10.length, datesString, tournament.venueName, tournament.purse, defendingChamp, t]);
+  }, [state.kind, top10.length, tournament.purse, defendingChamp, t]);
 
   if (!isCancelled) {
     return (
@@ -493,6 +493,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         <HeroWireTicker
           rows={top10}
           emptyStateFacts={emptyStateFacts}
+          leadFacts={leadFacts}
           labelKind={tickerOffset > 0 ? 'continuation' : 'top10'}
           presentation={top10.length > 0 ? 'static' : 'marquee'}
         />
