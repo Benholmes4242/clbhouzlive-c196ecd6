@@ -121,30 +121,32 @@ export function clampToSentence(text: string, budget = QUOTE_BUDGET): { text: st
 export function CourseOfTheWeekSection() {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useCourseOfTheWeek();
-  // No row (never played / signed out) => two-cell stat row, no error surface.
-  const { data: myBest } = useMyCourseBest(data?.course_id);
 
-  // Loading: skeleton mirrors card geometry, no reservation beyond it.
+  /* ONE call, one course id — see EXCLUDE_NOBODY above for the nil uuid. */
+  const field = useCourseFieldPlayers(
+    data?.course_id ? [data.course_id] : [],
+    EXCLUDE_NOBODY,
+  );
+  const playedRaw = data?.course_id ? field.data?.sizes.get(data.course_id) : undefined;
+  const played =
+    field.data?.available && typeof playedRaw === 'number' && playedRaw > 0
+      ? playedRaw
+      : null;
+
+  // Loading: hold mirrors the rebuilt anatomy — image, two figures, basis line,
+  // terminal row. No reservation beyond it.
   if (isLoading && !data) {
     return (
-      <SectionShell padX={GUT} eyebrow="COURSE OF THE WEEK">
-        <div style={{ padding: `0 ${GUT}px` }}>
-          <div
-            /* FLAT — no card frame (structural brief section A). */
-            style={{ overflow: 'hidden' }}
-          >
-            <Skeleton className="w-full" style={{ height: 170, borderRadius: 0 }} />
-            {/* Hold mirrors the rebuilt card: one figure line, three quote
-                lines, one quiet action. No footer, no button block. */}
-            <div style={{ padding: '14px 0 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <Skeleton className="h-4 w-2/3 rounded" />
-              <div style={{ height: '0.5px', background: V4.hairline }} />
-              <Skeleton className="h-3 w-full rounded" />
-              <Skeleton className="h-3 w-full rounded" />
-              <Skeleton className="h-3 w-3/5 rounded" />
-              <Skeleton className="h-3 w-24 rounded" />
+      <SectionShell padX={GUT} eyebrow="COURSE OF THE WEEK" rightMeta="Top 100">
+        <div>
+          <Skeleton className="w-full" style={{ height: 210, borderRadius: 0 }} />
+          <div style={{ padding: `14px ${GUT}px 0`, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 32 }}>
+              <Skeleton className="h-6 w-16 rounded" />
+              <Skeleton className="h-6 w-16 rounded" />
             </div>
-
+            <Skeleton className="h-3 w-2/5 rounded" />
+            <Skeleton className="h-3 w-28 rounded" />
           </div>
         </div>
       </SectionShell>
@@ -157,23 +159,18 @@ export function CourseOfTheWeekSection() {
   const {
     course_id,
     course_name,
-    country,
     region,
     thumbnail_image,
     list_label,
     list_rank,
     avg_rating,
     review_count,
-    reviews_this_week,
-    quote,
-    reviewer_name,
   } = data;
 
-  const location = [region, country].filter(Boolean).join(' · ');
-  const trimmedQuote = clampToSentence(quote ?? '');
-  // Ellipsis only when text was genuinely dropped, and spaced off a full stop
-  // so a completed sentence does not read "heard.…".
-  const quoteSuffix = trimmedQuote.truncated ? (/[.!?]$/.test(trimmedQuote.text) ? ' …' : '…') : '';
+  /* THE RANK IS TYPE NOW. "GB&I #92 · SURREY" — the list label, the rank in
+     amber, the region at 50% white. The old glass pill is retired (dead list). */
+  const hasRank = list_rank != null;
+  const open = () => navigate(`/courses/${course_id}`);
 
   return (
     <AnimatePresence initial={false}>
@@ -185,183 +182,138 @@ export function CourseOfTheWeekSection() {
         transition={{ duration: 0.32, ease: [0.22, 0.61, 0.36, 1] }}
         style={{ overflow: 'hidden' }}
       >
-        <SectionShell padX={GUT}
+        <SectionShell
+          padX={GUT}
           eyebrow="COURSE OF THE WEEK"
           linkLabel="Top 100"
           onLinkClick={() => navigate('/courses?tab=top100')}
         >
-          {/* FULL-BLEED IMAGE, GUTTERED TEXT (device-walk-2 B3 + D). The
-              section no longer insets its media: the photograph is the edge, so
-              it runs screen edge to screen edge and the body below re-pays the
-              20px gutter. */}
-          <div>
-            {/* THE WHOLE CARD IS THE TAP TARGET. It was not before — only the
-                filled button was — so a card that looked tappable was not, and
-                the button was the loudest thing on the page for a destination
-                the card already implied. The quiet "See the course ›" below is
-                the affordance, not a second target. */}
+          {/* THE WHOLE SECTION IS THE TAP TARGET; the terminal row is the
+              affordance, not a second target. */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={open}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                open();
+              }
+            }}
+            style={{ cursor: 'pointer' }}
+          >
+            {/* FULL-BLEED PHOTOGRAPH, 210px. Screen edge to screen edge; the
+                body below re-pays the 20px gutter. */}
             <div
-              role="button"
-              tabIndex={0}
-              onClick={() => navigate(`/courses/${course_id}`)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  navigate(`/courses/${course_id}`);
-                }
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: 210,
+                background: 'linear-gradient(145deg, #0a1f0a, #0d0d0d)',
+                overflow: 'hidden',
               }}
-              /* FLAT — no card frame (structural brief section A). The section
-                 is still one tap target; it is space, not a border, that bounds
-                 it now. */
-              style={{ cursor: 'pointer', overflow: 'hidden' }}
             >
-              {/* Media header */}
+              {thumbnail_image ? (
+                <motion.img
+                  src={thumbnail_image}
+                  alt={course_name}
+                  loading="lazy"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4 }}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : null}
+
+              {/* Gradient to 72% at the foot — the type sits in it, not on a
+                  panel. */}
               <div
                 style={{
-                  position: 'relative',
-                  width: '100%',
-                  height: 170,
-                  background: 'linear-gradient(145deg, #0a1f0a, #0d0d0d)',
-                  overflow: 'hidden',
+                  position: 'absolute',
+                  inset: 0,
+                  background:
+                    'linear-gradient(to bottom, rgba(0,0,0,0) 38%, rgba(0,0,0,0.42) 72%, rgba(0,0,0,0.72) 100%)',
+                  pointerEvents: 'none',
                 }}
-              >
-                {thumbnail_image ? (
-                  <motion.img
-                    src={thumbnail_image}
-                    alt={course_name}
-                    loading="lazy"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.4 }}
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
-                  />
-                ) : null}
-                {/* Gradient overlays for chip + name legibility */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: SCRIM_STANDOUT,
-                    pointerEvents: 'none',
-                  }}
-                />
+              />
 
-                {/* Top-left chip: TOP 100 · {label} #{rank} */}
-                <div
-                  className={CHIP_GLASS_CLASS}
-                  style={{
-                    position: 'absolute',
-                    top: 12,
-                    left: 12,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '5px 10px',
-                    borderRadius: 999,
-                    color: '#FFFFFF',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
-                  <span>TOP 100</span>
-                  <span style={{ opacity: 0.55 }}>·</span>
-                  <span>{list_label}</span>
-                  <span style={{ color: V4.amber }}>#{list_rank}</span>
-                </div>
-
-                {/* Top-right: reviews this week (only when > 0) */}
-                {reviews_this_week > 0 ? (
+              {/* EVERYTHING ON THE IMAGE, BOTTOM-LEFT: rank line, then name. */}
+              <div style={{ position: 'absolute', left: GUT, right: GUT, bottom: 14 }}>
+                {hasRank || region ? (
                   <div
+                    className="tabular-nums lining-nums"
                     style={{
-                      position: 'absolute',
-                      top: 12,
-                      right: 12,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      padding: '5px 10px',
-                      borderRadius: 999,
-                      background: 'rgba(247,147,30,0.92)',
-                      color: '#FFFFFF',
-                      fontSize: 11,
+                      fontSize: 9,
                       fontWeight: 700,
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
-                      fontVariantNumeric: 'tabular-nums',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      marginBottom: 6,
                     }}
                   >
-                    +{reviews_this_week} this week
+                    {hasRank ? (
+                      <span style={{ color: '#FFFFFF' }}>
+                        {list_label ? `${list_label} ` : ''}
+                        <span style={{ color: V4.amber }}>#{list_rank}</span>
+                      </span>
+                    ) : null}
+                    {hasRank && region ? <span style={{ color: 'rgba(255,255,255,0.5)' }}>·</span> : null}
+                    {region ? <span style={{ color: 'rgba(255,255,255,0.5)' }}>{region}</span> : null}
                   </div>
                 ) : null}
-
-                {/* Course name + location over the image */}
-                <div style={{ position: 'absolute', left: GUT, right: GUT, bottom: 12 }}>
-                  <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: '#FFFFFF',
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.1,
-                      textShadow: '0 2px 12px rgba(0,0,0,0.55)',
-                    }}
-                  >
-                    {course_name}
-                  </div>
-                  {location ? (
-                    <div style={{ marginTop: 3, fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.78)', letterSpacing: '0.02em' }}>
-                      {location}
-                    </div>
-                  ) : null}
+                <div
+                  style={{
+                    fontSize: 23,
+                    fontWeight: 700,
+                    color: '#FFFFFF',
+                    letterSpacing: '-0.025em',
+                    lineHeight: 1.12,
+                  }}
+                >
+                  {course_name}
                 </div>
               </div>
+            </div>
 
-              {/* Body */}
-              <div style={{ padding: `14px ${GUT}px 0`, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {/* ONE LINE, IN WORDS (device-walk-2 D). The "RATING 7.9
-                    from 3" pair is gone: the label was doing work the sentence
-                    does better. The figure NEVER renders without its sample —
-                    the same rule as the venue band — so no rating and no
-                    reviews means no line at all rather than a bare figure.
-                    Singular at one: "from 1 member review". */}
-                {avg_rating != null && review_count > 0 ? (
-                  <div style={{ fontSize: 15, color: A.MUTE, letterSpacing: '-0.01em', ...FIGS }}>
-                    <span style={{ fontWeight: 700, color: A.INK }}>{Number(avg_rating).toFixed(1)}</span>
-                    {` from ${review_count.toLocaleString()} member review${review_count === 1 ? '' : 's'}`}
+            {/* Body, back on the 20px gutter. NO CHARACTER LINE — see the file
+                header: it renders only when a purpose-written sentence exists,
+                and that column does not exist yet. */}
+            <div style={{ padding: `14px ${GUT}px 0` }}>
+              {avg_rating != null && review_count > 0 ? (
+                <>
+                  <div style={{ display: 'flex', gap: 32 }}>
+                    <Figure label="Members' rating" value={Number(avg_rating).toFixed(1)} />
+                    {played != null ? <Figure label="Have played it" value={String(played)} /> : null}
                   </div>
-                ) : null}
-                {/* YOUR BEST stays amber and stays collapsible: the viewing
-                    member's own figure is the one amber thing on this card. */}
-                {myBest?.best_gross != null ? (
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
-                    <FigurePair label="Your best" value={String(myBest.best_gross)} tone={A.AMBER} />
+                  {/* ONE basis line for the figures above. Singular at one. */}
+                  <div
+                    className="tabular-nums lining-nums"
+                    style={{ marginTop: 10, fontSize: 13, fontWeight: 600, lineHeight: '18px', color: A.BODY }}
+                  >
+                    {`From ${review_count.toLocaleString()} member review${review_count === 1 ? '' : 's'}.`}
                   </div>
-                ) : null}
+                </>
+              ) : null}
 
-                {/* THE MEMBER QUOTE IS GONE (structural brief section E). It
-                    was selected by highest helpful count among qualifying
-                    reviews, which on this base can and did surface the viewing
-                    member's own words back at them as editorial voice — filed
-                    as the self-quote fault. The rating and its count say the
-                    same thing without attribution risk. The RPC still returns
-                    quote/reviewer_name and clampToSentence is still exported
-                    and tested; nothing was deleted, so a quote block can return
-                    when selection excludes the reader. */}
-
-                {/* Quiet action. The card owns the navigation; this is the
-                    affordance, so it must not become a second tap target. */}
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK }}>
-                  See the course ›
-                </div>
+              {/* Terminal row. */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginTop: 12,
+                  paddingTop: 11,
+                  borderTop: `1px solid ${V4.hairline}`,
+                }}
+              >
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.INK }}>
+                  See the course
+                </span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: A.MUTE }} aria-hidden>
+                  &rsaquo;
+                </span>
               </div>
             </div>
           </div>
