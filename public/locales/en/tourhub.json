@@ -509,9 +509,9 @@
       "clubhouseRating": "Clubhouse",
       "reviews": "Reviews",
       "top100": "Top 100",
-      "ratingFrom": "from {{count}} rating",
-      "ratingFrom_plural": "from {{count}} ratings",
-      "tooFewRatings": "Too few members have rated this course yet."
+      "tooFewRatings": "Too few members have rated this course yet.",
+      "ratingFrom_one": "from {{count}} rating",
+      "ratingFrom_other": "from {{count}} ratings"
     },
     "status": {
       "finished": "FINISHED",
