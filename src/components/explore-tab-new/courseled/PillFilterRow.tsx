@@ -61,6 +61,7 @@ export function PillFilterRow<T extends string>({
   ariaLabel,
   style,
   surface = 'canvas',
+  wrap = false,
   deselectable,
 }: PillFilterRowProps<T>) {
   const emit = onChange as (next: T | null) => void;
