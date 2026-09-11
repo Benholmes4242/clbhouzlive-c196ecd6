@@ -22,7 +22,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { SectionShell } from './SectionShell';
 import { V4, OVERVIEW_GUTTER as GUT } from '../tokens';
-import { MovementFigure } from '../../_shared/movement';
 
 import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
 import type { TourId } from '../../hooks/useOverviewData';
@@ -253,9 +252,18 @@ export function WorldRankings({ tour }: { tour: TourId }) {
                 <div style={{ minWidth: 38, flex: 'none', textAlign: 'right', fontSize: 15, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>
                   {r.points != null ? formatNumber(Math.round(r.points)) : ''}
                 </div>
-                <div style={{ minWidth: 22, flex: 'none', display: 'flex', justifyContent: 'flex-end' }}>
-                  <MovementFigure movement={r.movement} />
-                </div>
+                {/* NO MOVEMENT COLUMN ON THE OVERVIEW (device-walk-2 C
+                    ruling). The data is real — 4,479 of 5,611 rows at the
+                    newest ranking date changed position — but positions 1-6
+                    were unchanged at that date and this section shows five
+                    rows, so the column was five permanent dashes, which reads
+                    as a value that failed to load rather than as a stable
+                    ranking. A column earns its width where it usually has
+                    something to say: that is the FULL rankings page, where it
+                    stays. Same ruling as the circle leaderboard's 30D RANK
+                    column, for the same reason. `movement` is still carried on
+                    the row by useRankingsBoards — do not re-derive it if this
+                    ever comes back. */}
               </div>
             </div>
           );
