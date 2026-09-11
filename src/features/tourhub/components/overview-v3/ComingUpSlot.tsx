@@ -13,10 +13,12 @@ import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 const SCHEDULE_TOURS = new Set<string>(['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv']);
 
 export function ComingUpSlot() {
-  const { selectedTourSlug } = useTourSelection();
+  const { selectedTourSlug, viewingTournamentId } = useTourSelection();
   const active = selectedTourSlug ?? 'all';
   const tour = SCHEDULE_TOURS.has(active) ? (active as TourId) : null;
-  return <ComingUp tour={tour} />;
+  // The tournament in the hero is excluded from the list below it — one fact,
+  // one place. Same id the venue/schedule cohesion block is keyed by.
+  return <ComingUp tour={tour} excludeId={viewingTournamentId ?? null} />;
 }
 
 export default ComingUpSlot;
