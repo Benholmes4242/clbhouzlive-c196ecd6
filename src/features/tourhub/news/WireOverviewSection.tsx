@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { SectionShell } from '@/features/tourhub/overview/sections/SectionShell';
-import { OVERVIEW_GUTTER } from '@/features/tourhub/overview/tokens';
 import { HAIRLINE_INK_10 } from '@/features/tourhub/_shared/tokens';
 import { LeadStory, StoryRow } from './NewsTab';
 import { useTourStories, type TourStory } from './useTourStories';
@@ -45,17 +44,18 @@ export function WireOverviewSection() {
       linkLabel={t('news.allStories')}
       onLinkClick={() => navigate('/tourhub?tab=news')}
     >
-      {/* BOTH OVERVIEW IMAGES SIT ON THE 20px GUTTER (device-check E). The Wire
-          lead photograph ran edge to edge while Course of the Week's was inset,
-          so the two sections read as different page widths. This section now
-          owns the gutter and LeadStory renders its overlay text flush to the
-          image, which puts kicker and headline on the same 20px line as every
-          other section. The 16px LeadStory gutter recorded as an accepted
-          workaround applies to the FULL news tab, not to this inset consumer. */}
+      {/* THE LEAD PHOTOGRAPH IS FULL-BLEED (device-walk-2 B1, REVERSING
+          device-check E). E inset both overview images on the 20px gutter to
+          make the two sections read as one page width; Ben's ruling is the
+          opposite — where the content IS the edge, the image goes edge to edge,
+          matching the Amateur news page, with the kicker and headline overlaid
+          as they are there. Text, figures and rows stay on the gutter; only
+          images and full-width dividers break out. LeadStory's own default
+          (full-bleed, its own 16px inner gutter) is therefore what we want, so
+          the wrapper and the `onGutter` opt-in are both gone. `onGutter` stays
+          on LeadStory: it is additive, defaulted off, and harms nothing. */}
       {lead && (
-        <div style={{ padding: `0 ${OVERVIEW_GUTTER}px` }}>
-          <LeadStory story={lead} onOpen={() => open(lead.slug)} compact onGutter engagement={engagementFor(lead.id)} />
-        </div>
+        <LeadStory story={lead} onOpen={() => open(lead.slug)} compact engagement={engagementFor(lead.id)} />
       )}
       <div style={{ marginTop: lead ? 8 : 0 }}>
         {rows.map((story, index) => (
