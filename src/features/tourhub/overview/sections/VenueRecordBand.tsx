@@ -50,9 +50,21 @@ import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/to
 import { OVERVIEW_GUTTER as GUT } from '../tokens';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 import { useTournamentVenueRecord } from '../data/useTournamentVenueRecord';
+import { useCourseFieldPlayers } from '@/hooks/gam/useCourseFieldPlayers';
 
 /* Minimum ratings before the clubhouse figure may render at all. */
 const RATING_FLOOR = 3;
+
+/**
+ * NOBODY IS EXCLUDED, DELIBERATELY. get_course_field_sizes was written for the
+ * trophy room, where the crown HOLDER must be excluded from the field they hold
+ * a record against, so it takes p_exclude_user_id. Here the question is
+ * different: how many members have played this venue, all of them. The function
+ * compares with IS DISTINCT FROM, so a nil uuid matches no member and excludes
+ * nobody, which makes course_players a complete count. THIS IS NOT AN UNFILLED
+ * PLACEHOLDER — do not substitute the viewing member's id.
+ */
+const EXCLUDE_NOBODY = '00000000-0000-0000-0000-000000000000';
 
 /** The section kicker: 9/700/0.19em uppercase, above the heading. */
 const SECTION_KICKER: React.CSSProperties = {
