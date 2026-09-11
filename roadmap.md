@@ -1100,3 +1100,29 @@ page_path_map, page_route_manifest, push_drain_debounce, site_gate_attempts,
 system_state_daily, system_state_history, web_vitals,
 whs_friend_leaderboard_snapshots) - the second group is closed to members
 already, since RLS with no policy denies everything.
+
+### 7a. TRIAGE of item 7 - three tiers
+TIER 1, ops artefacts open to the internet, no reader in the app:
+round_post_like_count_drift, _feed_v3_backup, _round_post_fn_backup,
+_par_race_test. Only appearance anywhere in src/ or supabase/functions is the
+generated types file. Fix is REVOKE on anon/authenticated - not a policy, not the
+invoker flag, not a drop. Zero live surfaces.
+TIER 2, the five member-scoped creator-run views needing security_invoker, each
+with its live readers: whs_friend_matches (src/lib/whs/api.ts, friendViewRivalries,
+friend-content-recompute, snapshot-friend-leaderboard), whs_friend_window_rankings
+(api.ts), user_course_activity (useUserCourseSummary, useUserCourseActivity,
+useTop100ProgressForUser), user_achievements_view (useUserAchievements),
+user_top100_progress_view (useTop100ProgressForUser, useUserTop100Progress).
+Per-view pass with its own verification. Edge functions use the service role and
+are unaffected by the flag; the client hooks are the risk.
+TIER 3, confirmed deliberate: the aggregates and reference views. explore_moments
+carries member post media (see note below) and is the one to decide.
+
+### 8. OPEN - page_path_map is read from the client and returns nothing
+src/features/admin/hooks/useScreenAnalytics.ts:84 selects page_path_map directly.
+The table has RLS on and NO policy, so a member (admin included) gets 0 rows from
+1,656. The hook then returns [] at its own empty-path guard, and the screen's top
+events list renders as "no events" for every screen. Same class as the counter
+faults: something unknowable rendered as something known. FIX SHAPE: fold the
+path lookup into get_screen_analytics's family as a DEFINER function, as the
+manifest read already is. Not tonight.
