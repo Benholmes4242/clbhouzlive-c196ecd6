@@ -75,7 +75,10 @@ export function PillFilterRow<T extends string>({
       style={{
         display: 'flex',
         gap: 8,
-        overflowX: 'auto',
+        /* wrap=false (default): single scrolling row — every existing caller.
+           wrap=true: all options render in full on as many lines as needed. */
+        flexWrap: wrap ? 'wrap' : 'nowrap',
+        overflowX: wrap ? 'visible' : 'auto',
         minWidth: 0,
         ...style,
       }}
