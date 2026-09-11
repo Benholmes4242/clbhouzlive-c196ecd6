@@ -1212,3 +1212,80 @@ The prompt was kept and only reordered (above College Franchise, below Course of
 the Week), but the real decision belongs with the open connect-prompt work for
 Champions and the course pages — one ruling on where connect doors live across
 the app, not three separate judgements about three page feet.
+
+## BRIEF_TOUR_OVERVIEW_TWO_SECTIONS (11 Sep 2026)
+
+### A — THE GREY SQUARES (found, fixed)
+Not in the schedule section at all. They were the Wire story-row thumbnails,
+`src/features/tourhub/news/NewsTab.tsx` StoryRow, which carried
+`background: SLATE_100` on a 54x54 `<img>`. Measured at 430pt: two elements,
+both x=362 w=54 h=54, 92px apart, one per row. FIXED: no placeholder fill, and
+the element unmounts on error, so the row reflows and the headline takes the
+full width. No fallback graphic, no background colour.
+Tenth instance of the state-collapse class: "failed", "loading" and "no image"
+all rendered as one grey rectangle, and the state a member meets most often was
+the broken one.
+
+### OPEN (filed, NOT fixed) — THE WIRE'S THUMBNAILS ARE HOTLINKED FROM THIRD PARTIES
+Evidence, the two live URLs behind the grey squares:
+`progolfweekly.com/wp-content/uploads/...` and `assets.golfchannel.com/dims4/...`.
+Fragile by construction — they fail on referrer policy, host blocks and the
+publisher moving a file, and nothing reports it. It is also a rights question:
+we serve other publishers' images from their own servers inside our product.
+THE FIX is ingesting or proxying to our own bucket AT PUBLISH TIME, with its own
+verification. Own piece of work; not started.
+
+### C — NO CHARACTER LINE FROM golf_courses.description (RULED)
+Sampled ten Top 100 courses, first sentence each. Four of ten open with
+"Nestled" or "Tucked" — a template voice in a section that rotates daily — and
+Archerfield and Aronimink open on club administrative history, which is the
+brochure case. Good six times in ten is not good enough for the one line whose
+job is to justify the section. Note also the field carries curly apostrophes
+(U+2019), so it is not ASCII-only copy.
+
+### OPEN (filed with its shape, DO NOT BUILD) — A SHORT EDITORIAL COLUMN
+A nullable short editorial column on `golf_courses`: ONE hand-written sentence
+about what the course IS. Course of the Week renders it when present and omits
+it when absent, so the section improves course by course rather than needing a
+hundred lines written before anything ships. Start with the Top 100 GB&I list,
+which is what the section draws from. DO NOT POPULATE IT FROM `description`
+PROGRAMMATICALLY — the existing field being the wrong voice is the whole point.
+
+### OPEN (filed, no data) — IN YOUR CIRCLE ON COURSE OF THE WEEK
+A third figure saying how many of the member's circle have played the pick.
+Good idea; no data behind it today. Not built.
+
+### B — DEAD LIST (retired from CourseOfTheWeekSection, nothing deleted)
+Line ranges in the PREVIOUS revision of
+`src/features/tourhub/overview/sections/CourseOfTheWeekSection.tsx`:
+- 207-231 the top-left glass TOP 100 pill (the rank is type now).
+- 233-256 the amber "+N this week" chip, top-right. Retired with the pill: the
+  brief enumerates what sits on the image (rank line, name) and a filled amber
+  badge for a non-member figure also sits badly with the amber fence. RULING
+  WANTED if it should come back.
+- 294-300 the amber "Your best" FigurePair, and with it the `useMyCourseBest`
+  read on this section. The brief is TWO FIGURES; a third was three. The hook
+  and its file are untouched and read elsewhere. RULING WANTED.
+- `FigurePair`, `SPACE`, `LABEL`, `CHIP_GLASS_CLASS`, `SCRIM_STANDOUT` no longer
+  read here. `clampToSentence` stays exported and tested.
+
+### D — DEAD LIST (retired from CollegeFranchise, nothing deleted)
+Line ranges in the PREVIOUS revision of
+`src/features/tourhub/overview/sections/CollegeFranchise.tsx`:
+- 192-211 the one-sentence summary with the leader bold (`summaryWide` /
+  `summaryClose` keys, and the `Trans` import).
+- 213-228 the three-figure row and its `NAME_KICKER`-style figure treatment
+  (the `NAME_KICKER` const itself is retained, unread, in place).
+Replaced by the 18px verdict heading, the basis line
+(`overview.collegeFranchise.earningsBasis`, new in all six locales) and five
+ranked rows. Instrumentation UNCHANGED: `tour_overview_college_view` at
+threshold 0.5 on the rendered body, once per mount, and
+`tour_overview_college_tap` on the terminal row.
+
+### VERIFIED AT 390pt (guest session)
+Course of the Week 373px tall, College Franchise 331px. Rank line reads
+"GB&I #92 · SURREY" with the number amber and the region at 50%. Earnings fit
+the 62px column at $40.5M. HAVE PLAYED IT did NOT render in the guest check:
+`get_course_field_sizes` is granted to authenticated and service_role only, so
+the read is unavailable and the figure is correctly absent rather than zero.
+Needs an authenticated device check to confirm it renders.
