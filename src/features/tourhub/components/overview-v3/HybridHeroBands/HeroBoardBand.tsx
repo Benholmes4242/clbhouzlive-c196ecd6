@@ -477,25 +477,30 @@ export function HeroBoardSection({
             The low round's HOLDERS stay on this line rather than being lost
             with the sub-labels: a name is data, not a caption.
           */}
-          {field && (
-            <div
-              style={{
-                marginTop: 8,
-                fontSize: 11,
-                fontWeight: 600,
-                lineHeight: '15px',
-                color: WHITE_ALPHA_65,
-              }}
-            >
-              {t('overview.onTheCourse.figuresBasis', {
-                n: field.count,
-                round: currentRound ?? 1,
-              })}
-              {low && holders.length > 0
-                ? ` ${t('overview.onTheCourse.figuresBasisLow', { names: holders.join(', ') })}`
-                : ''}
-            </div>
-          )}
+          <div
+            style={{
+              marginTop: 8,
+              fontSize: 11,
+              fontWeight: 600,
+              lineHeight: '15px',
+              color: WHITE_ALPHA_65,
+            }}
+          >
+            {field
+              ? t('overview.onTheCourse.figuresBasis', {
+                  n: field.count,
+                  round: currentRound ?? 1,
+                })
+              : /* BELOW THE 20-ROUND GATE there is no field average and no
+                   count to quote, so the line says what the low round is drawn
+                   from instead of inventing a sample size. */
+                t('overview.onTheCourse.figuresBasisLowOnly', {
+                  round: currentRound ?? 1,
+                })}
+            {low && holders.length > 0
+              ? ` ${t('overview.onTheCourse.figuresBasisLow', { names: holders.join(', ') })}`
+              : ''}
+          </div>
         </div>
       )}
 
