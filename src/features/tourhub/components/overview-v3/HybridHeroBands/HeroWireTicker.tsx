@@ -80,6 +80,21 @@ interface HeroWireTickerProps {
   /** When rows is empty, render this "awaiting the field" wire instead. */
   emptyStateFacts?: TickerFact[];
   /**
+   * NOTHING OVERLAYS THE FACTS (BRIEF_TOUR_OVERVIEW_UPCOMING_HERO 3).
+   * Facts that a member must be able to READ — the date range and the venue in
+   * the upcoming state, where the venue IS the content — render in a STATIC
+   * block ABOVE the wire, never inside it. Two things were wrong with carrying
+   * them in the marquee: the label chip sits at the strip's left edge with an
+   * edge fade over the same pixels, so a scrolling fact passed UNDER it
+   * ("...S OFF SEP 17 - 20"), and the right edge clipped the venue mid-word
+   * ("The Cliffs at Waln..."). Both are unreadable rather than untidy, and a
+   * member cannot pause or scrub a marquee to recover them.
+   *
+   * The venue here WRAPS rather than ellipsising: it is a name, the block owns
+   * its own height, and half a course name is not a course name.
+   */
+  leadFacts?: TickerFact[];
+  /**
    * 'continuation' — the always-on hero board below already shows the leading
    * positions, so this strip continues from the next one and is labelled as
    * such. 'top10' (default) is the standalone case.
@@ -169,12 +184,105 @@ function factNode(fact: TickerFact, key: string): ReactNode {
   );
 }
 
+/**
+ * LEAD FACTS — static, unobscured, above the wire. The amber state badge sits
+ * on this block's first line BESIDE the date range, not over any strip, so
+ * nothing can pass beneath it. Values wrap; nothing is clipped or ellipsised.
+ */
+function LeadFactsBlock({ facts, labelText }: { facts: TickerFact[]; labelText: string }) {
+  return (
+    <section
+      style={{
+        background: BG,
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 4,
+        padding: '9px 14px 10px',
+        borderTop: '0.5px solid rgba(255,255,255,0.08)',
+      }}
+      aria-label={labelText}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <span
+          style={{
+            padding: '2px 7px',
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            color: AMBER,
+            background: 'rgba(247,147,30,0.16)',
+            flexShrink: 0,
+          }}
+        >
+          {labelText}
+        </span>
+        {facts[0] ? (
+          <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
+            <span
+              style={{
+                fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                color: 'rgba(255,255,255,0.45)',
+                flexShrink: 0,
+              }}
+            >
+              {facts[0].label}
+            </span>
+            <span
+              style={{
+                ...NUMERIC_STYLE,
+                fontSize: 13,
+                fontWeight: 700,
+                color: 'rgba(255,255,255,0.90)',
+              }}
+            >
+              {facts[0].value}
+            </span>
+          </span>
+        ) : null}
+      </div>
+      {facts.slice(1).map((f, i) => (
+        <div key={`lead-${i}`} style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <span
+            style={{
+              fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              color: 'rgba(255,255,255,0.45)',
+              flexShrink: 0,
+            }}
+          >
+            {f.label}
+          </span>
+          {/* A NAME WRAPS, IT DOES NOT CLIP. No nowrap, no ellipsis here. */}
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              lineHeight: '17px',
+              color: 'rgba(255,255,255,0.92)',
+              minWidth: 0,
+            }}
+          >
+            {f.value}
+          </span>
+        </div>
+      ))}
+    </section>
+  );
+}
+
 function EmptyStateBar({
   facts,
   labelText,
+  showLabel = true,
 }: {
   facts: TickerFact[];
   labelText: string;
+  /** false when a LeadFactsBlock above already carries the state badge. */
+  showLabel?: boolean;
 }) {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -187,7 +295,7 @@ function EmptyStateBar({
     return () => mq.removeEventListener?.('change', h);
   }, []);
 
-  const leftAccessory = (
+  const leftAccessory = showLabel ? (
     <div
       style={{
         padding: '0 12px',
@@ -206,7 +314,7 @@ function EmptyStateBar({
     >
       {labelText}
     </div>
-  );
+  ) : undefined;
 
   // <2 facts OR reduced-motion → static, no marquee.
   if (facts.length < 2 || reduced) {
@@ -258,6 +366,7 @@ function EmptyStateBar({
 export function HeroWireTicker({
   rows,
   emptyStateFacts,
+  leadFacts,
   labelKind = 'top10',
   presentation = 'marquee',
 }: HeroWireTickerProps) {
@@ -266,10 +375,23 @@ export function HeroWireTicker({
   const isStatic = presentation === 'static';
   const allRows = rows ?? [];
   const safeRows = isStatic ? allRows.slice(0, STATIC_ROWS) : allRows;
+  const lead = leadFacts ?? [];
 
-  // Empty-state branch — "awaiting the field" wire.
-  if (safeRows.length === 0 && emptyStateFacts && emptyStateFacts.length > 0) {
-    return <EmptyStateBar facts={emptyStateFacts} labelText={t('overview.hero.fieldSoon')} />;
+  // Empty-state branch — "awaiting the field" wire, with any READ facts static
+  // above it. The wire below is atmosphere only and keeps its marquee.
+  if (safeRows.length === 0 && emptyStateFacts && (emptyStateFacts.length > 0 || lead.length > 0)) {
+    const fieldSoon = t('overview.hero.fieldSoon');
+    if (lead.length > 0) {
+      return (
+        <>
+          <LeadFactsBlock facts={lead} labelText={fieldSoon} />
+          {emptyStateFacts.length > 0 ? (
+            <EmptyStateBar facts={emptyStateFacts} labelText={fieldSoon} showLabel={false} />
+          ) : null}
+        </>
+      );
+    }
+    return <EmptyStateBar facts={emptyStateFacts} labelText={fieldSoon} />;
   }
   // Zero rows AND zero facts → band absent (hero collapses).
   if (safeRows.length === 0 && emptyStateFacts && emptyStateFacts.length === 0) {
