@@ -188,7 +188,7 @@ export default function CourseTagSheet({
               onChange={(e) => setQ(e.target.value)}
               onFocus={() => setFieldFocused(true)}
               onBlur={() => setFieldFocused(false)}
-              placeholder="Search any of 40,000+ courses"
+              placeholder="Search any course"
               className="placeholder:text-[rgba(255,255,255,0.38)]"
               style={{
                 width: '100%',
@@ -246,12 +246,12 @@ export default function CourseTagSheet({
                     />
                   ))}
                   <div style={{ padding: '16px', fontSize: 12, color: CT.secondary }}>
-                    Can't see it? Search any of 40,000+ courses above.
+                    Can'''t see it? Search any course above.
                   </div>
                 </>
               ) : (
                 <div style={{ padding: '32px 16px', fontSize: 13, color: CT.secondary, textAlign: 'center' }}>
-                  Search any of 40,000+ courses above.
+                  Search any course above.
                 </div>
               )}
             </>
