@@ -54,7 +54,7 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
   if (!hasRating && !hasRank && !belowFloor) return null;
 
   return (
-    <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
+    <div style={{ padding: `0 ${GUT}px` }}>
       <button
         type="button"
         onClick={() => navigate(`/course/${data.courseId}`)}

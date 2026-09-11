@@ -55,16 +55,16 @@ export function StatWatch({ tour }: { tour: TourId }) {
         linkLabel={t('overview.statWatch.allStatsLink')}
         onLinkClick={() => navigate('/tourhub?tab=leaderboards')}
       >
-        <div style={{ padding: '0 16px 6px' }}>
+        <div style={{ padding: `0 ${GUT}px 6px` }}>
           <Skeleton className="h-3 w-40 rounded" />
         </div>
         {/* Models the NEW shape: a picker row, then five list rows with a bar. */}
-        <div style={{ display: 'flex', gap: 8, padding: '8px 16px 0', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', gap: 8, padding: `8px ${GUT}px 0`, overflow: 'hidden' }}>
           {[92, 118, 128, 122].map((w, i) => (
             <Skeleton key={i} className="h-[34px] rounded-full" style={{ width: w, flex: 'none' }} />
           ))}
         </div>
-        <div style={{ padding: '10px 16px 0' }}>
+        <div style={{ padding: `10px ${GUT}px 0` }}>
           {[0, 1, 2, 3, 4].map((i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, height: i === 0 ? 62 : 54 }}>
               <Skeleton className="h-3 w-3.5 rounded" />
@@ -94,7 +94,7 @@ export function StatWatch({ tour }: { tour: TourId }) {
         options={pickerOptions}
         onChange={(next: StatKey) => setSelected(next)}
         ariaLabel={t('overview.statWatch.pickerAriaLabel', 'Choose a statistic')}
-        style={{ padding: '2px 16px 0' }}
+        style={{ padding: `2px ${GUT}px 0` }}
       />
 
       <StatList category={active} tour={tour} onNavigate={(id) => navigate(`/tourhub/player/${id}`)} />
@@ -124,7 +124,7 @@ function StatList({
       : null;
 
   return (
-    <div style={{ padding: '10px 16px 0' }}>
+    <div style={{ padding: `10px ${GUT}px 0` }}>
       {/* READ floor 11. */}
       {category.unit || anchorNote ? (
         <div

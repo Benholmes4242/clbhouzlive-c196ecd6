@@ -80,7 +80,7 @@ export function CourseOfTheWeekSection() {
   if (isLoading && !data) {
     return (
       <SectionShell eyebrow="COURSE OF THE WEEK">
-        <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
+        <div style={{ padding: `0 ${GUT}px` }}>
           <div
             style={{
               background: V4.surface,
@@ -147,7 +147,7 @@ export function CourseOfTheWeekSection() {
           linkLabel="Top 100"
           onLinkClick={() => navigate('/courses?tab=top100')}
         >
-          <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
+          <div style={{ padding: `0 ${GUT}px` }}>
             {/* THE WHOLE CARD IS THE TAP TARGET. It was not before — only the
                 filled button was — so a card that looked tappable was not, and
                 the button was the loudest thing on the page for a destination

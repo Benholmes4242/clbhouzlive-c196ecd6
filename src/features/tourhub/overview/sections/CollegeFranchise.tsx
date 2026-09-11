@@ -144,11 +144,11 @@ export function CollegeFranchise() {
         linkLabel={t('overview.collegeFranchise.linkLabel')}
         onLinkClick={() => navigate('/tourhub?tab=college')}
       >
-        <div style={{ padding: '0 16px', marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ padding: `0 ${GUT}px`, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <Skeleton className="h-5 w-4/5 rounded" />
           <Skeleton className="h-4 w-11/12 rounded" />
         </div>
-        <div style={{ padding: '0 16px 12px', display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 12 }}>
+        <div style={{ padding: `0 ${GUT}px 12px`, display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 12 }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
             <Skeleton className="h-11 w-11" style={{ borderRadius: 15 }} />
             <Skeleton className="h-3.5 w-20 rounded" />
@@ -159,10 +159,10 @@ export function CollegeFranchise() {
             <Skeleton className="h-3.5 w-20 rounded" />
           </div>
         </div>
-        <div style={{ padding: '0 16px 4px' }}>
+        <div style={{ padding: `0 ${GUT}px 4px` }}>
           <Skeleton className="h-[7px] w-full rounded" />
         </div>
-        <div style={{ height: 1, background: V4.hairline, margin: '16px 16px 6px' }} />
+        <div style={{ height: 1, background: V4.hairline, margin: `16px ${GUT}px 6px` }} />
         <div style={{ padding: '0 4px' }}>
           {[0, 1, 2].map((i) => (
             <div
@@ -229,7 +229,7 @@ export function CollegeFranchise() {
           championship_editorial_daily row supplies the headline (which may be
           human-edited), its own headlineTwo is used instead, so a generated
           line never sits under a hand-written one. */}
-      <div style={{ padding: '0 16px', marginBottom: 16 }}>
+      <div style={{ padding: `0 ${GUT}px`, marginBottom: 16 }}>
         <div style={{ fontSize: 19, fontWeight: 700, color: V4.ink, letterSpacing: '-0.02em', lineHeight: 1.25 }}>
           {useEditorial ? (
             editorialLine1
@@ -265,7 +265,7 @@ export function CollegeFranchise() {
       {/* THE DUEL */}
       <div
         style={{
-          padding: '0 16px 12px',
+          padding: `0 ${GUT}px 12px`,
           display: 'grid',
           gridTemplateColumns: '1fr auto 1fr',
           alignItems: 'center',
@@ -296,7 +296,7 @@ export function CollegeFranchise() {
       </div>
 
       {/* TUG BAR */}
-      <div style={{ padding: '0 16px 4px' }}>
+      <div style={{ padding: `0 ${GUT}px 4px` }}>
         <div
           style={{
             height: 7,
@@ -323,12 +323,12 @@ export function CollegeFranchise() {
       </div>
 
       {/* HAIRLINE */}
-      <div style={{ height: 1, background: V4.hairline, margin: '16px 16px 6px' }} />
+      <div style={{ height: 1, background: V4.hairline, margin: `16px ${GUT}px 6px` }} />
 
       {/* AND BEHIND THEM — ranks 3-5 only. Ranks 1 and 2 ARE the duel above;
           repeating them made the section say two things twice. The rows also do
           NOT repeat the captain — that is what the duel is for. */}
-      <div style={{ padding: '0 16px 6px' }}>
+      <div style={{ padding: `0 ${GUT}px 6px` }}>
         <span style={{ fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em' }}>
           {t('overview.collegeFranchise.behindThem')}
         </span>
