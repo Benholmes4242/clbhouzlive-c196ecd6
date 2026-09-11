@@ -1204,3 +1204,11 @@ OPEN QUESTION (filed, not answered): the 300px hero photograph is NOT tappable
 the image). A photograph with a tournament name on it reads as a link to
 everyone who sees it — whether the hero SHOULD be tappable is Ben's call,
 separate from the CTA relocation.
+
+OPEN QUESTION (filed, not answered): is the foot of the tour overview a sensible
+home for a connect-handicap prompt at all? It sits after nine sections of tour
+content, so a member who reaches it is not thinking about their own handicap.
+The prompt was kept and only reordered (above College Franchise, below Course of
+the Week), but the real decision belongs with the open connect-prompt work for
+Champions and the course pages — one ruling on where connect doors live across
+the app, not three separate judgements about three page feet.

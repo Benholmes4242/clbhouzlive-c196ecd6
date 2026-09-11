@@ -137,12 +137,12 @@ export function OverviewPageV3() {
               <StatWatchSlot />
             </LazySection>
             <CourseOfTheWeekSection />
-            <LazySection minHeight={350}>
-              <CollegeFranchise />
-            </LazySection>
             <LazySection minHeight={90}>
               {/* flat: this page draws no bordered cards (structural brief A). */}
               <ConnectHandicapCue variant="tour-venue" courseName="" flat />
+            </LazySection>
+            <LazySection minHeight={350}>
+              <CollegeFranchise />
             </LazySection>
 
             {/* THE PAGE ENDS AT ALL FRANCHISES (device-walk-2 F). The
