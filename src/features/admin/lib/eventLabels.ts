@@ -211,7 +211,20 @@ export const EVENT_LABELS: Record<string, string> = {
   profile_hero_stat_tap: 'Profile hero stat tapped',
   profile_top10_card_tap: 'Profile Top 10 card tapped',
 
+  // ─── Explore magazine (/amateur) ──────────────────────────────
+  // The `amateur_*` prefix predates the tab's rename to Explore and stays, so
+  // the Discover baseline comparison keeps working. An event name is not a label.
+  amateur_stream_page_loaded: 'Explore stream page loaded',
+  amateur_stream_end: 'Explore stream reached the end',
+  amateur_card_tapped: 'Explore card tapped',
+  amateur_card_who_tapped: 'Explore card member tapped',
+  amateur_view_changed: 'Explore view changed',
+  amateur_shelf_seen: 'Explore shelf seen',
+  amateur_shelf_tile_tapped: 'Explore shelf tile tapped',
+  amateur_shelf_see_all: 'Explore shelf see-all opened',
+
 };
+
 
 
 export function titleize(name: string): string {
