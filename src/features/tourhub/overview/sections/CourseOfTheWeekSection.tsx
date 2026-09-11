@@ -7,7 +7,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SectionShell } from './SectionShell';
-import { V4 } from '../tokens';
+import { V4, OVERVIEW_GUTTER as GUT } from '../tokens';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCourseOfTheWeek } from '../../hooks/useCourseOfTheWeek';
 import { SPACE } from '@/lib/spacing';

@@ -37,7 +37,7 @@ import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { COLLEGE_RIVALRY_FALLBACK } from '../../utils/editorialFallbacks';
 import { SectionShell } from './SectionShell';
-import { V4 } from '../tokens';
+import { V4, OVERVIEW_GUTTER as GUT } from '../tokens';
 import { getCollegeColor } from '../data/collegeColors';
 import { liftedBrandAlpha } from '../../_shared/heroGradient';
 import { Skeleton } from '@/components/ui/skeleton';

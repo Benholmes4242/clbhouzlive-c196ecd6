@@ -60,7 +60,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { SectionShell, V4Card } from './SectionShell';
-import { V4 } from '../tokens';
+import { V4, OVERVIEW_GUTTER as GUT } from '../tokens';
 import { useComingUp, type ComingUpRow } from '../data/useComingUp';
 import type { TourId } from '../../hooks/useOverviewData';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
