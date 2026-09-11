@@ -26,6 +26,23 @@
  * defender, prior winner, purse, pulsing "Announced soon"). Zero facts and
  * zero rows → the band is absent (returns null) so the hero collapses onto
  * the page divider.
+ *
+ * CHROME YIELDS TO DATA — THE RULE BEHIND THE TWO-LINE STATIC CELL.
+ * In `presentation="static"` a cell stacks the player's surname above its rank
+ * and score rather than putting all three on one line, because four entries on
+ * one line do not fit 390pt. When something has to give, THE LABEL GIVES: the
+ * band label may ellipsise, the names never do. That is the opposite of the
+ * usual instinct, which is to shorten the data so the chrome stays whole — so
+ * it is written here: a member reads names and scores, and a clipped name is
+ * unreadable information, where a clipped label is only untidy chrome. Do NOT
+ * abbreviate or truncate names to make a label fit.
+ *
+ * MARQUEE VERSUS STATIC IS NOT THE DISTINCTION. The question is whether a
+ * member might need to read ONE SPECIFIC ITEM. If they might, it cannot move:
+ * leaderboard positions are information, so the ALSO OUT strip is static. The
+ * story strip and the FIELD SOON rotating facts are atmosphere — nobody needs a
+ * specific entry out of either — so those keep the marquee, which is why the
+ * `presentation` default stays 'marquee' for every existing consumer.
  */
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
