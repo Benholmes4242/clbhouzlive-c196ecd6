@@ -1601,6 +1601,53 @@
         "both": "Across {{rounds}}, {{courses}}.",
         "roundsOnly": "Across {{rounds}}."
       }
+    },
+    "stream": {
+      "view": {
+        "all": "Alle",
+        "watch": "Ansehen"
+      },
+      "shelf": {
+        "clips": "Clips",
+        "moments": "Aus der Community"
+      },
+      "seeAll": "Alle {{count}} ansehen",
+      "views": "Explore-Ansichten",
+      "aMember": "Ein Mitglied",
+      "nothingYet": "Hier gibt es noch nichts zu deinen Platzen. Folge einem Platz oder verbinde ein Handicap, und diese Seite wird deine.",
+      "you": "Du",
+      "aCourse": "einem Platz",
+      "chip": {
+        "rating": "Bewertung",
+        "world": "Welt",
+        "gbi": "GB&I"
+      },
+      "kicker": {
+        "ownRound": "Deine Runde",
+        "courseRecord": "Platzrekord",
+        "onYourList": "Auf deiner Liste",
+        "atYourClub": "In deinem Club",
+        "aroundRegion": "Rund um {{region}}",
+        "aroundWorld": "Rund um die Welt",
+        "backlog": "Aus {{month}}",
+        "review": "Bewertung",
+        "news": "News",
+        "clip": "Clip",
+        "watch": "Langes Video",
+        "moment": "Aus der Community",
+        "course": "Platz"
+      },
+      "headline": {
+        "recordTaken": "{{name}} holt den Platzrekord auf {{course}} mit {{gross}}.",
+        "ace": "{{name}} schlaegt ein Hole-in-One auf {{course}}.",
+        "albatross": "{{name}} spielt einen Albatros auf {{course}}.",
+        "listNewLow": "{{gross}} auf {{course}}, einem Platz auf deiner Liste.",
+        "bogeyFree": "{{name}} spielt bogeyfrei auf {{course}} und schreibt {{gross}}.",
+        "birdieHaul": "{{name}} spielt {{count}} Birdies auf {{course}}.",
+        "roundToPar": "{{name}} spielt {{course}} in {{gross}}, {{topar}}.",
+        "round": "{{name}} spielt {{course}} in {{gross}}.",
+        "played": "{{name}} hat {{course}} gespielt."
+      }
     }
   }
 }

@@ -1,20 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
-
-import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
-import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { AmateurFilterRail } from '@/features/amateur/AmateurFilterRail';
-import { AmateurCoursesBlock } from '@/features/amateur/AmateurCoursesBlock';
-import { AmateurHero } from '@/features/amateur/AmateurHero';
-import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBlock';
-import { AmateurMediaBlock } from '@/features/amateur/AmateurMediaBlock';
-import { AmateurNewsBlock } from '@/features/amateur/AmateurNewsBlock';
-import { rememberAmateurScroll, restoreAmateurScroll, takeAmateurScroll } from '@/features/amateur/amateurScrollMemory';
-import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
+import { restoreAmateurScroll, takeAmateurScroll } from '@/features/amateur/amateurScrollMemory';
+import { ExploreMagazine } from '@/features/explore-magazine/ExploreMagazine';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
@@ -22,35 +12,32 @@ import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /**
- * THE AMATEUR PAGE (BRIEF_AMATEUR_PAGE).
+ * THE AMATEUR PAGE — now the MAGAZINE (BRIEF_EXPLORE_MAGAZINE, PHASE A).
  *
- * One page, one scroll, no tabs. Landed so far: the shell, the over-hero
- * header, the 340px hero and BLOCK 1, the leaderboard. Blocks 2-4 (courses,
- * amateur news, media) follow beneath, one at a time.
+ * ONE RANKED STREAM OF ONE UNIT. The previous composition — hero, filter rail,
+ * leaderboard, courses block, amateur news, media block — no longer renders
+ * here. NOTHING WAS DELETED: `AmateurHero`, `AmateurFilterRail`,
+ * `AmateurLeaderboardBlock`, `AmateurCoursesBlock`, `AmateurNewsBlock`,
+ * `AmateurMediaBlock`, `useAmateurBoardState` and `BoardFilterPanel` remain on
+ * disk, and the board state and filter panel are the parts Phase B draws back
+ * in when Scores becomes a chip that can change what you see. They are DEAD
+ * FROM THIS PAGE ONLY, and the retirement pass is Phase E.
  *
- * THE FILTER GOVERNS THE FIRST TWO BLOCKS, so its state lives here and not
- * inside either of them.
- *
- * EVENT NAMES: the `amateur_*` prefix PREDATES the tab's rename to "Explore"
- * and stays. Renaming it would break the comparison against the Discover
- * baseline we are still collecting, and an event name is not a label. The route
- * is likewise still '/amateur' — a deliberate, recorded mismatch.
+ * WHAT SURVIVES UNCHANGED: the route ('/amateur'), the `amateur_*` event prefix
+ * (an event name is not a label, and the Discover baseline comparison depends on
+ * it), the scroll memory, the scorecard opener and its round sheet, and the
+ * shared floating glass islands — this page owns no header.
  */
 export default function AmateurPage() {
   const { user } = useSupabaseSession();
-  const navigate = useNavigate();
   const opener = useScorecardOpener();
-  const state = useAmateurBoardState(user?.id);
-  /* §8 — the scroll target a hero card drives the page to. */
-  const boardRef = useRef<HTMLDivElement | null>(null);
-
 
   useEffect(() => {
     analyticsEvents.track('amateur_page_viewed', {});
   }, []);
 
   /* COMING BACK IS FREE. A see-all, a course row or a story leaves the page;
-     returning lands on the row that was tapped, not the hero. */
+     returning lands on the row that was tapped, not the first card. */
   const returnTo = useRef<number | null>(takeAmateurScroll());
   useLayoutEffect(() => {
     const y = returnTo.current;
@@ -59,100 +46,13 @@ export default function AmateurPage() {
     return restoreAmateurScroll(y);
   }, []);
 
-  const handleRow = useCallback(
-    (row: BoardRow) => {
-      analyticsEvents.track('amateur_board_row_tapped', {
-        pos: row.pos,
-        has_score: !!row.whs_score_id,
-      });
-      if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
-      else opener.openProfile(row.user_id);
-    },
-    [opener],
-  );
-
-  /* A COURSE ROW IS A LINK: the whole row goes to that course's page. */
-  const handleCourse = useCallback(
-    (courseId: string) => {
-      rememberAmateurScroll();
-      navigate(`/courses/${courseId}`);
-    },
-    [navigate],
-  );
-
   return (
     <div style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, ...FIGS }}>
-      {/* No page-owned header: /amateur wears the shared floating glass
-          islands (registry rule), the same object the feed and course detail
-          wear. The island pays the notch; the hero bleeds beneath it. */}
-      {/* THE HERO OPENS THE ROUND IT NAMES (BRIEF_EXPLORE_HERO_MESSAGING §5),
-          through the SAME scorecard opener the leaderboard rows use — so the
-          feat named in the kicker is one tap from being visible on the card. */}
-      <AmateurHero
-        userId={user?.id}
-        onOpenRound={(scoreId, roundUserId) => {
-          analyticsEvents.track('amateur_hero_round_opened', { has_score: true });
-          opener.openByScore(scoreId, null, roundUserId);
-        }}
-        /* §8 AN AGGREGATE CARD IS ANSWERED ON THIS PAGE. The board state lives
-           here, so the hero hands up the metric, window and pool it named and
-           this page sets the board and brings it into view. The member reads the
-           same figure in its standing, with themselves in the list, without a
-           navigation. `touched` inside the board state is set by changeFilters,
-           so a card-driven pool will not be widened out from under the member by
-           the quiet-circle rule. */
-        onOpenBoard={(board, window, scope) => {
-          analyticsEvents.track('amateur_hero_board_driven', { board, window, scope });
-          state.changeBoard(board);
-          state.changeFilters({ ...state.filters, window, scope });
-          boardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }}
-      />
-
-
       {/* THE SHARED CLEARANCE, never a page-local number: the floating pill's
-          measured height + its 20px gap + 16px breathing + the home indicator.
-          When the pill grows, this page moves with it. */}
-      {/* §7 ONE TYPE SCALE — the page no longer owns a 14px gutter. Every
-          section owns the SHARED 20px gutter through AboutSection; the filter
-          rail, which has no heading, pads itself to the same figure. */}
-      <main style={{ padding: `18px 0 ${NAV_CLEARANCE}` }}>
-
-        {/* §8 THE SCROLL TARGET IS THE RAIL, NOT THE FIRST ROW. A card that sets
-            the board and window must land the member on the chips that now read
-            those values — arriving mid-list with a silently changed filter is the
-            undeclared widening this page exists to avoid. scrollMarginTop pays
-            for the floating glass island the rail would otherwise sit under. */}
-        <div ref={boardRef} style={{ scrollMarginTop: 84 }}>
-          <div style={{ padding: '0 20px' }}>
-            <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
-          </div>
-          <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
-        </div>
-
-        <AmateurCoursesBlock userId={user?.id} state={state} onCoursePress={handleCourse} />
-        <AmateurNewsBlock />
-        <AmateurMediaBlock
-          userId={user?.id}
-          onSeeAll={(path) => {
-            rememberAmateurScroll();
-            navigate(path);
-          }}
-          onDepart={rememberAmateurScroll}
-        />
+          measured height + its gap + the home indicator. */}
+      <main style={{ padding: `0 0 ${NAV_CLEARANCE}` }}>
+        <ExploreMagazine userId={user?.id} />
       </main>
-
-      <BoardFilterPanel
-        open={state.panelOpen}
-        onClose={state.closePanel}
-        userId={user?.id}
-        board={state.board}
-        onBoardChange={state.changeBoard}
-        resultCount={state.total}
-        filters={state.filters}
-        onChange={state.changeFilters}
-        facets={state.facets}
-      />
 
       <RoundDetailSheet
         open={!!opener.target}
@@ -164,3 +64,4 @@ export default function AmateurPage() {
     </div>
   );
 }
+
