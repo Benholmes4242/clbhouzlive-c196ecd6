@@ -68,7 +68,26 @@ interface HeroWireTickerProps {
    * such. 'top10' (default) is the standalone case.
    */
   labelKind?: 'top10' | 'continuation';
+  /**
+   * 'marquee' (DEFAULT, unchanged) — the ambient scrolling wire. Correct for
+   * rotating FIELD SOON facts and for the news StoryLeaderboardStrip, where the
+   * strip is atmosphere beside a headline.
+   *
+   * 'static' — no animation, no auto-scroll, no loop, no horizontal scroller.
+   * Used by the hero's ALSO OUT continuation strip: those positions are
+   * INFORMATION, and a member cannot pause, scrub or scroll a marquee, so half
+   * a name was unreadable until the loop came round again. Static mode renders
+   * STATIC_ROWS entries only (positions 7-10 in the continuation case) and the
+   * FULL LEADERBOARD row directly beneath is the route to 11 and beyond.
+   * Static mode deliberately has NO prefers-reduced-motion branch — there is
+   * one treatment for everyone, because the old reduced-motion degrade was a
+   * silent horizontal scroller with no affordance.
+   */
+  presentation?: 'marquee' | 'static';
 }
+
+/** Entries shown in `presentation="static"` — four fit 390pt without ellipsis. */
+const STATIC_ROWS = 4;
 
 const PULSE_STYLE_ID = 'hero-wire-ticker-pulse';
 function ensurePulseKeyframes() {
@@ -223,10 +242,13 @@ export function HeroWireTicker({
   rows,
   emptyStateFacts,
   labelKind = 'top10',
+  presentation = 'marquee',
 }: HeroWireTickerProps) {
   const { t } = useTranslation('tourhub');
 
-  const safeRows = rows ?? [];
+  const isStatic = presentation === 'static';
+  const allRows = rows ?? [];
+  const safeRows = isStatic ? allRows.slice(0, STATIC_ROWS) : allRows;
 
   // Empty-state branch — "awaiting the field" wire.
   if (safeRows.length === 0 && emptyStateFacts && emptyStateFacts.length > 0) {
@@ -266,6 +288,41 @@ export function HeroWireTicker({
     </span>
   ));
 
+  /**
+   * STATIC CELL — name on top, rank + score beneath, inside the same 36px band.
+   * The stack is what makes four entries fit 390pt with no ellipsis on a name:
+   * one line each way costs the WIDER of name/score rather than their sum
+   * (measured worst case 4 x 11-12 character surnames still clears the band).
+   * NO ellipsis and no clamp on the name here — a half-name in a strip the
+   * member cannot scrub is simply unreadable.
+   */
+  const staticCells = safeRows.map((r, i) => (
+    <span
+      key={`${r.rank}-${r.shortName}-${i}`}
+      style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, ...NUMERIC_STYLE }}
+    >
+      <span
+        style={{
+          fontSize: 11,
+          lineHeight: '13px',
+          fontWeight: 600,
+          color: 'rgba(255,255,255,0.94)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {r.shortName}
+      </span>
+      <span style={{ display: 'inline-flex', gap: 4, alignItems: 'baseline', lineHeight: '13px' }}>
+        <span style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, color: 'rgba(255,255,255,0.42)' }}>
+          {r.rank}
+        </span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: scoreColor(r.score) }}>
+          {fmtScore(r.score)}
+        </span>
+      </span>
+    </span>
+  ));
+
   const label =
     labelKind === 'continuation'
       ? t('overview.ticker.alsoOutLabel')
@@ -290,6 +347,63 @@ export function HeroWireTicker({
       {label}
     </div>
   );
+
+  // STATIC — one treatment for everyone. No marquee, no auto-scroll, no loop,
+  // no overflow scroller, and deliberately no prefers-reduced-motion branch.
+  // The ENTRIES are fixed width and the LABEL absorbs whatever is left: at
+  // 390pt with the longest surnames and the longest translated label, the
+  // label ellipsises before a player's name ever does. Chrome yields to data.
+  if (isStatic) {
+    return (
+      <section
+        style={{
+          background: BG,
+          height: 36,
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          overflow: 'hidden',
+        }}
+        aria-label={label}
+      >
+        <div
+          style={{
+            padding: '0 10px',
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            color: 'rgba(255,255,255,0.55)',
+            background: BG,
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            flex: '1 1 auto',
+            minWidth: 0,
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            borderRight: '0.5px solid rgba(255,255,255,0.10)',
+            zIndex: 2,
+          }}
+        >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {label}
+          </span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            padding: '0 10px',
+            flex: '0 0 auto',
+          }}
+        >
+          {staticCells}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <TickerShell
