@@ -125,7 +125,7 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '11px 14px',
+            padding: '11px 0',
             background: 'transparent',
             border: 'none',
             borderTop: `1px solid ${A.BORDER}`,
