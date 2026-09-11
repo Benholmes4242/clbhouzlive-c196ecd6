@@ -80,6 +80,21 @@ interface HeroWireTickerProps {
   /** When rows is empty, render this "awaiting the field" wire instead. */
   emptyStateFacts?: TickerFact[];
   /**
+   * NOTHING OVERLAYS THE FACTS (BRIEF_TOUR_OVERVIEW_UPCOMING_HERO 3).
+   * Facts that a member must be able to READ — the date range and the venue in
+   * the upcoming state, where the venue IS the content — render in a STATIC
+   * block ABOVE the wire, never inside it. Two things were wrong with carrying
+   * them in the marquee: the label chip sits at the strip's left edge with an
+   * edge fade over the same pixels, so a scrolling fact passed UNDER it
+   * ("...S OFF SEP 17 - 20"), and the right edge clipped the venue mid-word
+   * ("The Cliffs at Waln..."). Both are unreadable rather than untidy, and a
+   * member cannot pause or scrub a marquee to recover them.
+   *
+   * The venue here WRAPS rather than ellipsising: it is a name, the block owns
+   * its own height, and half a course name is not a course name.
+   */
+  leadFacts?: TickerFact[];
+  /**
    * 'continuation' — the always-on hero board below already shows the leading
    * positions, so this strip continues from the next one and is labelled as
    * such. 'top10' (default) is the standalone case.
