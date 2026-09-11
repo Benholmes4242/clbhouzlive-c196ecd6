@@ -242,10 +242,13 @@ export function HeroWireTicker({
   rows,
   emptyStateFacts,
   labelKind = 'top10',
+  presentation = 'marquee',
 }: HeroWireTickerProps) {
   const { t } = useTranslation('tourhub');
 
-  const safeRows = rows ?? [];
+  const isStatic = presentation === 'static';
+  const allRows = rows ?? [];
+  const safeRows = isStatic ? allRows.slice(0, STATIC_ROWS) : allRows;
 
   // Empty-state branch — "awaiting the field" wire.
   if (safeRows.length === 0 && emptyStateFacts && emptyStateFacts.length > 0) {
