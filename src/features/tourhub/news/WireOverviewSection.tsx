@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { SectionShell } from '@/features/tourhub/overview/sections/SectionShell';
-import { OVERVIEW_GUTTER } from '@/features/tourhub/overview/tokens';
 import { HAIRLINE_INK_10 } from '@/features/tourhub/_shared/tokens';
 import { LeadStory, StoryRow } from './NewsTab';
 import { useTourStories, type TourStory } from './useTourStories';
