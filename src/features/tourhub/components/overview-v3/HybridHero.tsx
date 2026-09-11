@@ -406,12 +406,26 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   // "Awaiting the field" empty-state facts for the HeroWireTicker (Upcoming
   // only, when no field/prediction rows are available yet). Each entry is
   // optional; the wire only renders facts that exist. Zero facts ⇒ band absent.
-  const emptyStateFacts: TickerFact[] | undefined = useMemo(() => {
+  /**
+   * THE DATE RANGE AND THE VENUE ARE READ FACTS, NOT ATMOSPHERE. In the
+   * upcoming state the venue IS the content, so both leave the marquee and
+   * render in the static lead block above it (see HeroWireTicker.leadFacts):
+   * the badge no longer sits over them and the venue no longer clips mid-word.
+   * Everything below stays ambient and keeps the wire.
+   */
+  const leadFacts: TickerFact[] | undefined = useMemo(() => {
     if (state.kind !== 'upcoming') return undefined;
     if (top10.length > 0) return undefined;
     const facts: TickerFact[] = [];
     if (datesString) facts.push({ label: t('overview.hero.teesOff'), value: datesString });
     if (tournament.venueName) facts.push({ label: t('overview.hero.venueLabel'), value: tournament.venueName });
+    return facts;
+  }, [state.kind, top10.length, datesString, tournament.venueName, t]);
+
+  const emptyStateFacts: TickerFact[] | undefined = useMemo(() => {
+    if (state.kind !== 'upcoming') return undefined;
+    if (top10.length > 0) return undefined;
+    const facts: TickerFact[] = [];
     if (defendingChamp?.name) {
       facts.push({ label: t('overview.hero.defendsLabel'), value: defendingChamp.name, labelGold: true });
       if (defendingChamp.score && defendingChamp.year) {
