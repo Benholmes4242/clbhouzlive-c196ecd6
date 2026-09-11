@@ -366,6 +366,7 @@ function EmptyStateBar({
 export function HeroWireTicker({
   rows,
   emptyStateFacts,
+  leadFacts,
   labelKind = 'top10',
   presentation = 'marquee',
 }: HeroWireTickerProps) {
@@ -374,10 +375,23 @@ export function HeroWireTicker({
   const isStatic = presentation === 'static';
   const allRows = rows ?? [];
   const safeRows = isStatic ? allRows.slice(0, STATIC_ROWS) : allRows;
+  const lead = leadFacts ?? [];
 
-  // Empty-state branch — "awaiting the field" wire.
-  if (safeRows.length === 0 && emptyStateFacts && emptyStateFacts.length > 0) {
-    return <EmptyStateBar facts={emptyStateFacts} labelText={t('overview.hero.fieldSoon')} />;
+  // Empty-state branch — "awaiting the field" wire, with any READ facts static
+  // above it. The wire below is atmosphere only and keeps its marquee.
+  if (safeRows.length === 0 && emptyStateFacts && (emptyStateFacts.length > 0 || lead.length > 0)) {
+    const fieldSoon = t('overview.hero.fieldSoon');
+    if (lead.length > 0) {
+      return (
+        <>
+          <LeadFactsBlock facts={lead} labelText={fieldSoon} />
+          {emptyStateFacts.length > 0 ? (
+            <EmptyStateBar facts={emptyStateFacts} labelText={fieldSoon} showLabel={false} />
+          ) : null}
+        </>
+      );
+    }
+    return <EmptyStateBar facts={emptyStateFacts} labelText={fieldSoon} />;
   }
   // Zero rows AND zero facts → band absent (hero collapses).
   if (safeRows.length === 0 && emptyStateFacts && emptyStateFacts.length === 0) {
