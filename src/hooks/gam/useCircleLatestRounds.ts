@@ -279,18 +279,24 @@ export function useCircleLatestRounds(
         courseFilter == null ? q : (q as Filterable).in('course_id', courseFilter);
 
       let circleRounds: Round[] = [];
-      if (scope === 'circle' && circleIds.length > 0) {
+      /* THE VIEWER IS ADMITTED HERE AND NOWHERE ELSE, so the one circle
+         definition in src/lib/social/circle.ts stays untouched: the circle is
+         still the people you follow, and "the circle plus me" is a reading this
+         caller asks for rather than a second definition. */
+      const readIds = includeSelf ? Array.from(new Set([...circleIds, userId])) : circleIds;
+      if (scope === 'circle' && readIds.length > 0) {
         const { data: rounds } = (await scoped(
           supabase
             .from('gam_round_stats' as never)
             .select(ROUND_COLS)
-            .in('user_id', circleIds)
+            .in('user_id', readIds)
             .gte('play_date', windowStartIso)
             .eq('holes_played', 18)
             .order('play_date', { ascending: false }),
         )) as { data: unknown };
         circleRounds = ((rounds ?? []) as unknown) as Round[];
       }
+
 
 
       // 3. Pick rounds per circle member. Default: newest round each.
