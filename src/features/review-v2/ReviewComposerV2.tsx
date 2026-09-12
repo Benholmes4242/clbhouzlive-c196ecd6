@@ -718,7 +718,28 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
   const region = [course.region, course.sub_country || course.country].filter(Boolean).join(', ');
 
+  // The spacer cannot hold its own opinion about how tall the header is: it
+  // reads the header element's measured box. Safe area, font metrics and the
+  // rule are all included by construction, in BOTH render contexts.
+  const headerRef = useRef<HTMLElement | null>(null);
+  const [headerH, setHeaderH] = useState<number | null>(null);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const read = () => setHeaderH(el.getBoundingClientRect().height);
+    read();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(read) : null;
+    ro?.observe(el);
+    // Safe-area values can land after first paint on a cold launch.
+    const timer = window.setTimeout(read, 300);
+    return () => {
+      ro?.disconnect();
+      window.clearTimeout(timer);
+    };
+  }, []);
+
   return (
+
     <div
       style={{
         minHeight: '100vh',
