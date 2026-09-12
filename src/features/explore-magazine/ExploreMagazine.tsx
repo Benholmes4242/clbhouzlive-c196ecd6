@@ -420,7 +420,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       {/* COLD START SHOWS THE SHORTEST PLAUSIBLE CARD, never a lead shell: a
           loading state is never larger than the state it resolves into. */}
       {!stream.isFetched && enriched.length === 0 ? (
-        <div style={{ display: 'grid', gap: BLOCK_GAP, paddingInline: CARD_INSET }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP, paddingInline: CARD_INSET }}>
           <StdShell />
           <StdShell />
         </div>
@@ -438,7 +438,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       ) : null}
 
-      <div style={{ display: 'grid', gap: BLOCK_GAP }}>
+      {/* minmax(0,1fr), NOT bare 1fr: a grid item's automatic minimum is its
+          min-content, and the kicker/who-line are single-line nowrap — without
+          the zero minimum a long course name widens the whole track past the
+          viewport at 320px instead of clipping inside the card. */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
         {blocks.map((block, index) => {
           if (block.kind === 'shelf') {
             const pos = cardPos;
@@ -459,7 +463,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             return (
               <div
                 key={`pair:${block.items[0].id}`}
-                style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, paddingInline: CARD_INSET }}
+                style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, paddingInline: CARD_INSET }}
               >
                 {block.items.map((item, offset) => (
                   <ExploreCard
