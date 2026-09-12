@@ -41,6 +41,26 @@ import type { CategoryKey, ExistingMedia, ExistingReview, ReviewV2Course } from 
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
 import { useCourseTeeSets, type TeeSet } from '@/features/courses/hooks/useCourseTeeSets';
 
+/**
+ * THE HEADER'S OWN GEOMETRY — one expression, two consumers.
+ *
+ * This page renders in TWO contexts: as a route at /courses/:courseId/rate
+ * inside .app-shell, AND as a fixed overlay (position: fixed; inset: 0,
+ * App.tsx backgroundLocation path) that is OUTSIDE .app-shell's safe-area
+ * padding. The fixed header pays env(safe-area-inset-top) ITSELF in both
+ * contexts, so the spacer that clears it must pay it too. A spacer that
+ * assumed .app-shell had already paid the inset was correct on the route and
+ * hid the step strip in the overlay on any device with a notch.
+ *
+ * The spacer therefore reads the header's MEASURED height (below), with this
+ * expression only as the first-paint fallback. Neither number is retyped.
+ */
+const RV2_HEADER_CHROME_H = 8 + 6 + 44 + 10 + 1; // pad + row pad + 44 row + pad + rule
+const RV2_HEADER_H_CSS = `calc(env(safe-area-inset-top, 0px) + ${RV2_HEADER_CHROME_H}px)`;
+/** Breathing room between the header rule and the step strip. */
+const RV2_HEADER_GAP = 14;
+
+
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <div
@@ -698,7 +718,38 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
   const region = [course.region, course.sub_country || course.country].filter(Boolean).join(', ');
 
+  // The spacer cannot hold its own opinion about how tall the header is: it
+  // measures the header's BOTTOM EDGE against its own TOP EDGE (which is
+  // independent of its height) and reserves exactly the difference. That is
+  // one derivation, correct in BOTH render contexts — it never has to know
+  // whether .app-shell or the fixed header paid env(safe-area-inset-top).
+  const headerRef = useRef<HTMLElement | null>(null);
+  const spacerRef = useRef<HTMLDivElement | null>(null);
+  const [spacerH, setSpacerH] = useState<number | null>(null);
+  useEffect(() => {
+    const header = headerRef.current;
+    const spacer = spacerRef.current;
+    if (!header || !spacer) return;
+    const read = () => {
+      const overlap = header.getBoundingClientRect().bottom - spacer.getBoundingClientRect().top;
+      setSpacerH(Math.max(0, Math.round(overlap)) + RV2_HEADER_GAP);
+    };
+    read();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(read) : null;
+    ro?.observe(header);
+    // Safe-area values can land after first paint on a cold launch.
+    const timer = window.setTimeout(read, 300);
+    window.addEventListener('resize', read);
+    return () => {
+      ro?.disconnect();
+      window.clearTimeout(timer);
+      window.removeEventListener('resize', read);
+    };
+  }, []);
+
+
   return (
+
     <div
       style={{
         minHeight: '100vh',
@@ -710,6 +761,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     >
       {/* Header */}
       <header
+        ref={headerRef}
+
         style={{
           position: 'fixed',
           top: 0,
@@ -785,12 +838,32 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           )}
         </div>
       </header>
-      {/* Spacer must clear the FIXED header, whose box is
-          env(safe-area-inset-top) + 8 (pad) + 6 + 44 (row) + 10 (pad) + 1 (rule).
-          The page sits inside .app-shell, which already pays padding-top: var(--sat),
-          so the spacer only owes the 69px chrome below the notch. Was a flat 54 —
-          that is why step content started under the header. */}
-      <div aria-hidden style={{ height: 69 + 14, flexShrink: 0 }} />
+      {/* THE RESERVATION for the FIXED header above.
+          This page renders BOTH as a route at /courses/:courseId/rate inside
+          .app-shell AND as a fixed overlay (position: fixed; inset: 0, the
+          App.tsx backgroundLocation path) OUTSIDE it. The header is fixed and
+          pays env(safe-area-inset-top) itself in both contexts; .app-shell
+          additionally pays var(--sat) on the route path only. So "who paid the
+          inset" has two different answers, and the old flat 69 assumed one of
+          them — true on the route, false in the overlay, which is why the step
+          strip vanished behind the header on any device with a notch.
+          The spacer therefore holds NO opinion of its own: it measures the
+          header's bottom edge against its own top edge and reserves exactly
+          the overlap plus the gap. The CSS value below is the first-paint
+          fallback only (the header's full self-paid box), replaced on layout. */}
+      <div
+        ref={spacerRef}
+        aria-hidden
+        style={{
+          height:
+            spacerH != null
+              ? `${spacerH}px`
+              : `calc(${RV2_HEADER_H_CSS} + ${RV2_HEADER_GAP}px)`,
+          flexShrink: 0,
+        }}
+      />
+
+
 
       {/* Step rail */}
       <div
