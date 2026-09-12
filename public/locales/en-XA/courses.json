@@ -2193,7 +2193,8 @@
       },
       "shelf": {
         "clips": "[Çlîps one]",
-        "moments": "[Fröm thé çömmünîty one]"
+        "moments": "[Fröm thé çömmünîty one]",
+        "standing": "[Where you stand]"
       },
       "seeAll": "[Séé åll {{count}} one two]",
       "views": "[Éxplöré vîéws one]",
@@ -2231,6 +2232,11 @@
         "roundToPar": "[{{name}} wént röünd {{course}} în {{gross}}, {{topar}}. one two three]",
         "round": "[{{name}} wént röünd {{course}} în {{gross}}. one two]",
         "played": "[{{name}} plåyéd {{course}}. one]"
+      },
+      "standing": {
+        "board": "[Lowest gross]",
+        "of": "[of {{count}}]",
+        "lastChange": "[last change {{when}}]"
       }
     }
   }

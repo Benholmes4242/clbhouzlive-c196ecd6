@@ -1545,7 +1545,8 @@
       },
       "shelf": {
         "clips": "クリップ",
-        "moments": "コミュニティから"
+        "moments": "コミュニティから",
+        "standing": "あなたの順位"
       },
       "seeAll": "{{count}}件すべて表示",
       "views": "探索ビュー",
@@ -1583,6 +1584,11 @@
         "roundToPar": "{{name}}が{{course}}を{{gross}}（{{topar}}）でラウンド。",
         "round": "{{name}}が{{course}}を{{gross}}でラウンド。",
         "played": "{{name}}が{{course}}をプレー。"
+      },
+      "standing": {
+        "board": "ベストグロス",
+        "of": "{{count}}人中",
+        "lastChange": "最新の変動 {{when}}"
       }
     }
   }

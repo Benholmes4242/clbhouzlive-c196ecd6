@@ -1548,7 +1548,8 @@
       },
       "shelf": {
         "clips": "클립",
-        "moments": "커뮤니티에서"
+        "moments": "커뮤니티에서",
+        "standing": "나의 순위"
       },
       "seeAll": "{{count}}개 모두 보기",
       "views": "탐색 보기",
@@ -1586,6 +1587,11 @@
         "roundToPar": "{{name}}님이 {{course}}를 {{gross}}타({{topar}})로 돌았습니다.",
         "round": "{{name}}님이 {{course}}를 {{gross}}타로 돌았습니다.",
         "played": "{{name}}님이 {{course}}를 플레이했습니다."
+      },
+      "standing": {
+        "board": "베스트 그로스",
+        "of": "{{count}}명 중",
+        "lastChange": "마지막 변동 {{when}}"
       }
     }
   }
