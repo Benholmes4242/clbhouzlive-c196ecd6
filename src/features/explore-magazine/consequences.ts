@@ -92,9 +92,11 @@ export function roundConsequence(input: RoundConsequenceInput, sources: Conseque
     if (stand && gross != null && myBest != null && gross < myBest) {
       return { kind: 'rank_down', n: stand.rank_now, of: field, delta: moved };
     }
-    if (courseId && sources.shortlist.has(courseId)) {
-      return gross != null ? { kind: 'list_new_low', n: gross } : { kind: 'list_first' };
-    }
+    /* A COURSE ON THE VIEWER'S LIST, and that is ALL this says. Phase A read
+       list_new_low off the other member's own best there, which is a fact about
+       them and not a low on any list — so this emits list_first only. */
+    if (courseId && sources.shortlist.has(courseId)) return { kind: 'list_first' };
+
     return { kind: 'circle_round' };
   }
 
