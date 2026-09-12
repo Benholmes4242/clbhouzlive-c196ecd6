@@ -12,6 +12,7 @@ import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -394,13 +395,16 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
   return (
     <div style={{ fontFamily: SANS }}>
-      {/* §3b THE CHIP ROW sticks beneath the island, which already sticks. The
-          active view takes the FILLED ground (applied) and the rest the outline
-          (selectable) — the shared RailChips grammar, not a local look-alike. */}
+      {/* §3b THE CHIP ROW sticks JUST BENEATH the floating islands — top is
+          CHROME_CLEARANCE (island bottom edge, safe-area inclusive), not 0,
+          so it never pins at viewport top under the search/avatar island.
+          Same grammar as Clubhouse's sticky row. The active view takes the
+          FILLED ground (applied) and the rest the outline (selectable) —
+          the shared RailChips grammar, not a local look-alike. */}
       <div
         style={{
           position: 'sticky',
-          top: 0,
+          top: CHROME_CLEARANCE,
           zIndex: 3,
           background: A.CANVAS,
           padding: '10px 0 12px',
