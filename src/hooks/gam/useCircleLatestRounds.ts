@@ -196,6 +196,7 @@ export function useCircleLatestRounds(
     windowDays = WINDOW_DAYS,
     courseIds = null,
     oneRoundPerMember = true,
+    includeSelf = false,
   }: Options = {},
 ) {
   const courseFilter = courseIds == null ? null : Array.from(new Set(courseIds)).sort();
@@ -210,7 +211,11 @@ export function useCircleLatestRounds(
       windowDays,
       courseFilter == null ? 'all-courses' : courseFilter.join('|'),
       oneRoundPerMember,
+      /* APPENDED ONLY WHEN ASKED FOR, so every existing caller's cache key is
+         unchanged to the byte and nothing refetches on deploy. */
+      ...(includeSelf ? (['with-self'] as const) : []),
     ],
+
 
 
     queryFn: async (): Promise<CircleRoundRow[]> => {
