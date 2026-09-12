@@ -188,7 +188,7 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
                 border: 0,
                 background: 'transparent',
                 padding: '11px 0',
-                borderTop: `0.5px solid ${A.HAIR}`,
+                borderTop: `0.5px solid ${A.HAIRLINE}`,
                 textAlign: 'left',
                 cursor: 'pointer',
               }}
