@@ -41,6 +41,26 @@ import type { CategoryKey, ExistingMedia, ExistingReview, ReviewV2Course } from 
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
 import { useCourseTeeSets, type TeeSet } from '@/features/courses/hooks/useCourseTeeSets';
 
+/**
+ * THE HEADER'S OWN GEOMETRY — one expression, two consumers.
+ *
+ * This page renders in TWO contexts: as a route at /courses/:courseId/rate
+ * inside .app-shell, AND as a fixed overlay (position: fixed; inset: 0,
+ * App.tsx backgroundLocation path) that is OUTSIDE .app-shell's safe-area
+ * padding. The fixed header pays env(safe-area-inset-top) ITSELF in both
+ * contexts, so the spacer that clears it must pay it too. A spacer that
+ * assumed .app-shell had already paid the inset was correct on the route and
+ * hid the step strip in the overlay on any device with a notch.
+ *
+ * The spacer therefore reads the header's MEASURED height (below), with this
+ * expression only as the first-paint fallback. Neither number is retyped.
+ */
+const RV2_HEADER_CHROME_H = 8 + 6 + 44 + 10 + 1; // pad + row pad + 44 row + pad + rule
+const RV2_HEADER_H_CSS = `calc(env(safe-area-inset-top, 0px) + ${RV2_HEADER_CHROME_H}px)`;
+/** Breathing room between the header rule and the step strip. */
+const RV2_HEADER_GAP = 14;
+
+
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <div
