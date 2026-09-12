@@ -7,7 +7,7 @@ import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useDiscoverMediaPreview } from '@/components/explore-tab-new/courseled/hooks/useDiscoverMediaPreview';
 import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
-import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { useRoundHoleShapes, type HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
@@ -48,6 +48,10 @@ const BLOCK_GAP = 26;
 
 const CLIP_TILE = { w: 118, h: 210 };
 const MOMENT_TILE = { w: 132, h: 132 };
+
+/** ONE frozen empty map, so an unresolved shape source is a stable identity
+ *  rather than a new object (and a new render) on every pass. */
+const EMPTY_SHAPES: Map<string, HoleShape> = new Map();
 
 type Block =
   | { kind: 'lead'; item: StreamItem }
@@ -212,7 +216,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [visible],
   );
   const meta = useCourseCardMeta(courseIds);
-  const shapes = useRoundHoleShapes(useMemo(() => visible.map((item) => item.facts.score_id ?? null), [visible]));
+  /* useRoundHoleShapes RETURNS `Map | null` — null while the read is in flight,
+     disabled, or unreachable. UNRESOLVED IS NOT ABSENT and it is never a crash:
+     the map is coerced to an EMPTY Map here, a missing key yields no shape, and
+     the card draws its own fallback curve. The other three callers of this hook
+     already read it optionally; this one did not, which is the `.get` on null
+     that took /amateur to the error boundary. */
+  const shapesMap = useRoundHoleShapes(useMemo(() => visible.map((item) => item.facts.score_id ?? null), [visible]));
+  const shapes = useMemo(() => shapesMap ?? EMPTY_SHAPES, [shapesMap]);
 
   const enriched = useMemo(
     () =>
