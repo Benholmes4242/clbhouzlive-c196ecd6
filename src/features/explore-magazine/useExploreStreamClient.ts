@@ -95,14 +95,13 @@ function scoreItem(item: StreamItem): number {
   return item.kind === 'story' ? base * STORY_DAMP : base;
 }
 
-function roundConsequence(courseId: string | null, gross: number | null, bestHere: number | null, isSelf: boolean, ctx: ViewerCourseContext): Consequence | null {
-  if (courseId && ctx.shortlist.has(courseId) && gross != null && bestHere != null && gross <= bestHere) {
-    return { kind: 'list_new_low', n: gross };
-  }
-  if (courseId && ctx.shortlist.has(courseId)) return { kind: 'list_first' };
-  if (isSelf) return null;
-  return { kind: 'circle_round' };
-}
+/**
+ * PHASE A's LOCAL ROUND CONSEQUENCE IS GONE (§3a). It could only see the
+ * viewer's list, so every round by another member read as 'circle_round'. The
+ * typed kinds now come from ./consequences, which reads standing, the record
+ * book and the viewer's own bests. This file no longer decides consequences.
+ */
+
 
 /**
  * THE CADENCE PASS IS POSITIONAL, NOT A SCORE DAMP. Positional guarantees are
