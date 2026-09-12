@@ -41,7 +41,6 @@ const DEFAULT_STATE: PersistedState = {
 
 export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [state, setState] = useState<PersistedState>(() => {
     if (typeof window === 'undefined') return DEFAULT_STATE;
