@@ -420,17 +420,22 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
     for (const item of out) item.score = scoreItem(item);
     out.sort((a, b) => (b.score - a.score) || a.id.localeCompare(b.id));
     return cadence(out);
-  }, [circle.data, everyone.data, reviews.reviews, stories.stories, media.data, moments.data, context, lastSeen, view, viewerId, wantsRounds, wantsWatch]);
+  }, [roundRows, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch]);
 
   /* READINESS IS isFetched, NEVER isLoading: a disabled query reports isLoading
-     false and would report the page ready before anything had been asked for. */
+     false and would report the page ready before anything had been asked for.
+     THE CONSEQUENCE SOURCES ARE PART OF READINESS: a round rendered before
+     standing lands would state a weaker consequence and then change under the
+     member's eyes. An UNRESOLVED source is still fetched — it renders no
+     consequence rather than a wrong one. */
   const isFetched =
     contextFetched &&
-    (!wantsRounds || (circle.isFetched && everyone.isFetched)) &&
+    (!wantsRounds || (circle.isFetched && everyone.isFetched && standing.isFetched && bests.isFetched && records.isFetched)) &&
     (view !== 'all' && view !== 'reviews' ? true : !reviews.isPending) &&
     (view !== 'all' ? true : !stories.isPending) &&
     (!wantsWatch || media.isFetched) &&
     (view !== 'watch' || moments.isFetched);
+
 
   return { items, total: items.length, isFetched, isPending: !isFetched && items.length === 0 };
 }
