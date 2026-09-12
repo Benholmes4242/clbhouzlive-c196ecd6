@@ -751,6 +751,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     >
       {/* Header */}
       <header
+        ref={headerRef}
+
         style={{
           position: 'fixed',
           top: 0,
