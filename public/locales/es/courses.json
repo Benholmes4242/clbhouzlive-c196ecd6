@@ -1609,7 +1609,8 @@
       },
       "shelf": {
         "clips": "Clips",
-        "moments": "De la comunidad"
+        "moments": "De la comunidad",
+        "standing": "Donde estas"
       },
       "seeAll": "Ver los {{count}}",
       "views": "Vistas de Explorar",
@@ -1647,6 +1648,11 @@
         "roundToPar": "{{name}} completa {{course}} en {{gross}}, {{topar}}.",
         "round": "{{name}} completa {{course}} en {{gross}}.",
         "played": "{{name}} jugo {{course}}."
+      },
+      "standing": {
+        "board": "Golpes brutos mas bajos",
+        "of": "de {{count}}",
+        "lastChange": "ultimo cambio {{when}}"
       }
     }
   }

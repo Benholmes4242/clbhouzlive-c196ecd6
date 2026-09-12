@@ -71,7 +71,8 @@
       },
       "shelf": {
         "clips": "Clips",
-        "moments": "From the community"
+        "moments": "From the community",
+        "standing": "Where you stand"
       },
       "seeAll": "See all {{count}}",
       "views": "Explore views",
@@ -109,6 +110,11 @@
         "roundToPar": "{{name}} went round {{course}} in {{gross}}, {{topar}}.",
         "round": "{{name}} went round {{course}} in {{gross}}.",
         "played": "{{name}} played {{course}}."
+      },
+      "standing": {
+        "board": "Lowest gross",
+        "of": "of {{count}}",
+        "lastChange": "last change {{when}}"
       }
     }
   },

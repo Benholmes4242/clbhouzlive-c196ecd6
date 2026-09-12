@@ -1609,7 +1609,8 @@
       },
       "shelf": {
         "clips": "Clips",
-        "moments": "Aus der Community"
+        "moments": "Aus der Community",
+        "standing": "Wo du stehst"
       },
       "seeAll": "Alle {{count}} ansehen",
       "views": "Explore-Ansichten",
@@ -1647,6 +1648,11 @@
         "roundToPar": "{{name}} spielt {{course}} in {{gross}}, {{topar}}.",
         "round": "{{name}} spielt {{course}} in {{gross}}.",
         "played": "{{name}} hat {{course}} gespielt."
+      },
+      "standing": {
+        "board": "Niedrigster Brutto",
+        "of": "von {{count}}",
+        "lastChange": "letzte Aenderung {{when}}"
       }
     }
   }

@@ -222,6 +222,9 @@ export const EVENT_LABELS: Record<string, string> = {
   amateur_shelf_seen: 'Explore shelf seen',
   amateur_shelf_tile_tapped: 'Explore shelf tile tapped',
   amateur_shelf_see_all: 'Explore shelf see-all opened',
+  /* BRIEF_EXPLORE_MAGAZINE Phase B1 — the standing shelf. */
+  amateur_standing_tile_tapped: 'Explore standing tile tapped',
+  amateur_standing_see_all_opened: 'Explore standing see-all opened',
 
 };
 
