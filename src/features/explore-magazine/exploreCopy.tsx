@@ -189,7 +189,18 @@ export function headlineFor(item: StreamItem, t: T): string {
       count: item.facts.birdies,
     });
   }
+  /* PLAYED, AND THE BOARD DID NOT MOVE (§3a). Only where the standing figures
+     exist; otherwise the plain round sentence, which claims nothing. */
+  if (c?.kind === 'played_nochange' && c.n != null && c.of != null && gross != null && item.who?.is_viewer) {
+    return t('amateur.stream.headline.playedNoChange', 'You went round {{course}} in {{gross}}, still {{n}} of {{of}}.', {
+      course,
+      gross,
+      n: c.n,
+      of: c.of,
+    });
+  }
   if (gross != null && toPar) {
+
     return t('amateur.stream.headline.roundToPar', '{{name}} went round {{course}} in {{gross}}, {{topar}}.', {
       name,
       course,
