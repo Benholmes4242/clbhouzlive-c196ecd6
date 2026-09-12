@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 // PR-5 (queue family strip): pruned to Continue Watching only.
 // Removed drawer-only fields: nextVideoId, nextMeta, setNext, consumeNext,
@@ -21,7 +21,7 @@ interface VideoPlaybackContextValue {
 
   openMini: (videoId: string, meta?: MiniPlayerMeta) => void;
   closeMini: () => void;
-  openFull: (videoId: string, backgroundLocation?: Location) => void;
+  openFull: (videoId: string) => void;
   setMiniMeta: (meta: MiniPlayerMeta | null) => void;
 }
 
