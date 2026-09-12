@@ -7,6 +7,7 @@ import { restoreAmateurScroll, takeAmateurScroll } from '@/features/amateur/amat
 import { ExploreMagazine } from '@/features/explore-magazine/ExploreMagazine';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';

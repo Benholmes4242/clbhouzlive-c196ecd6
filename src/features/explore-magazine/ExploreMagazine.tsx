@@ -12,6 +12,7 @@ import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
