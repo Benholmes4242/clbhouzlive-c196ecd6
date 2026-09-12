@@ -302,6 +302,11 @@ export function ExploreCard({
         WebkitLineClamp: size === 'lead' ? 3 : 2,
         WebkitBoxOrient: 'vertical',
         overflow: 'hidden',
+        /* §4a a long unbroken token WRAPS at the card edge — it never pushes
+            the card wider. */
+        overflowWrap: 'break-word',
+        wordBreak: 'break-word',
+        minWidth: 0,
       }}
     >
       {headline}
