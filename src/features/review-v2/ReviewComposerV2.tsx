@@ -847,10 +847,19 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           inset" has two different answers, and the old flat 69 assumed one of
           them — true on the route, false in the overlay, which is why the step
           strip vanished behind the header on any device with a notch.
+          DO NOT REPLACE THIS WITH ARITHMETIC. The obvious instinct is
+          `env(safe-area-inset-top) + 69 + 14`, and it is wrong: that is right
+          in the OVERLAY (where only the header pays the inset) and wrong on the
+          ROUTE (where .app-shell pays var(--sat) and the fixed header pays
+          env(safe-area-inset-top) again, so the sum double-counts the notch).
+          Any fixed number, or any sum, has to assume an answer to "who paid the
+          inset" — and there are two answers on this one page, so the assumption
+          drifts the moment the render context changes.
           The spacer therefore holds NO opinion of its own: it measures the
           header's bottom edge against its own top edge and reserves exactly
-          the overlap plus the gap. The CSS value below is the first-paint
-          fallback only (the header's full self-paid box), replaced on layout. */}
+          the overlap plus the gap. That derivation needs no answer at all. The
+          CSS value below is the first-paint fallback only (the header's full
+          self-paid box), replaced on layout. */}
       <div
         ref={spacerRef}
         aria-hidden
