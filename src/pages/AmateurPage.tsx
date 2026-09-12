@@ -48,9 +48,13 @@ export default function AmateurPage() {
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, ...FIGS }}>
-      {/* THE SHARED CLEARANCE, never a page-local number: the floating pill's
-          measured height + its gap + the home indicator. */}
-      <main style={{ padding: `0 0 ${NAV_CLEARANCE}` }}>
+      {/* TOP CLEARANCE: CHROME_CLEARANCE, the twin of NAV_CLEARANCE — the
+          island row measures itself (safe-area inclusive, from the island's
+          BOTTOM edge) and the first content starts below it. NOT an immersive
+          route: a card photo under the islands reads as the page failing to
+          start (BRIEF_EXPLORE_MAGAZINE §3a correction). The shell pays
+          var(--sat); this page never does. */}
+      <main style={{ padding: `${CHROME_CLEARANCE} 0 ${NAV_CLEARANCE}` }}>
         <ExploreMagazine userId={user?.id} />
       </main>
 

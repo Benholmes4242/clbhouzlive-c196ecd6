@@ -21,7 +21,13 @@ export const IMMERSIVE_EXACT_ROUTES = [
   '/clubhouse',
   '/courses',
   '/explore',
-  '/amateur',
+  /* '/amateur' REMOVED (BRIEF_EXPLORE_MAGAZINE §3a correction, 12 Sep 2026):
+     immersive is for hero pages whose photograph runs under the notch.
+     Explore has NO hero — its first content is a card, and a card photo
+     sliding under the floating islands reads as the page failing to start.
+     Content starts BELOW the islands via CHROME_CLEARANCE, exactly as the
+     Handicap page does. The '/explore' entry stays: it is the redirect shim
+     into /amateur, not a surface of its own. */
   '/watch',
   '/watch/clips',
   '/watch/videos',
