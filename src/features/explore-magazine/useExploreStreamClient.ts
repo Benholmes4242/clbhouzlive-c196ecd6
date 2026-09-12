@@ -170,7 +170,7 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
    */
   const roundRows = useMemo(() => {
     if (!wantsRounds) return [];
-    const out: typeof circleRowsType = [];
+    const out: CircleRoundRow[] = [];
     const taken = new Set<string>();
     for (const row of [...(circle.data ?? []), ...(everyone.data ?? [])]) {
       if (!row.score_id || taken.has(row.score_id)) continue;
