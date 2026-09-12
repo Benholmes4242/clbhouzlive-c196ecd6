@@ -839,23 +839,30 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         </div>
       </header>
       {/* THE RESERVATION for the FIXED header above.
-          This page renders BOTH as a route inside .app-shell AND as a fixed
-          overlay (position: fixed; inset: 0) outside it. The header pays
-          env(safe-area-inset-top) itself in both, and so must this spacer —
-          the previous version assumed .app-shell had paid the inset, which is
-          false on the overlay path and hid the step strip on any device with a
-          notch. Height is the header's own measured box; the CSS expression is
-          only the first-paint fallback, and neither retypes the other's number. */}
+          This page renders BOTH as a route at /courses/:courseId/rate inside
+          .app-shell AND as a fixed overlay (position: fixed; inset: 0, the
+          App.tsx backgroundLocation path) OUTSIDE it. The header is fixed and
+          pays env(safe-area-inset-top) itself in both contexts; .app-shell
+          additionally pays var(--sat) on the route path only. So "who paid the
+          inset" has two different answers, and the old flat 69 assumed one of
+          them — true on the route, false in the overlay, which is why the step
+          strip vanished behind the header on any device with a notch.
+          The spacer therefore holds NO opinion of its own: it measures the
+          header's bottom edge against its own top edge and reserves exactly
+          the overlap plus the gap. The CSS value below is the first-paint
+          fallback only (the header's full self-paid box), replaced on layout. */}
       <div
+        ref={spacerRef}
         aria-hidden
         style={{
           height:
-            headerH != null
-              ? `${headerH + RV2_HEADER_GAP}px`
+            spacerH != null
+              ? `${spacerH}px`
               : `calc(${RV2_HEADER_H_CSS} + ${RV2_HEADER_GAP}px)`,
           flexShrink: 0,
         }}
       />
+
 
 
       {/* Step rail */}
