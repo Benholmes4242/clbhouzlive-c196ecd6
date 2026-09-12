@@ -828,12 +828,25 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           )}
         </div>
       </header>
-      {/* Spacer must clear the FIXED header, whose box is
-          env(safe-area-inset-top) + 8 (pad) + 6 + 44 (row) + 10 (pad) + 1 (rule).
-          The page sits inside .app-shell, which already pays padding-top: var(--sat),
-          so the spacer only owes the 69px chrome below the notch. Was a flat 54 —
-          that is why step content started under the header. */}
-      <div aria-hidden style={{ height: 69 + 14, flexShrink: 0 }} />
+      {/* THE RESERVATION for the FIXED header above.
+          This page renders BOTH as a route inside .app-shell AND as a fixed
+          overlay (position: fixed; inset: 0) outside it. The header pays
+          env(safe-area-inset-top) itself in both, and so must this spacer —
+          the previous version assumed .app-shell had paid the inset, which is
+          false on the overlay path and hid the step strip on any device with a
+          notch. Height is the header's own measured box; the CSS expression is
+          only the first-paint fallback, and neither retypes the other's number. */}
+      <div
+        aria-hidden
+        style={{
+          height:
+            headerH != null
+              ? `${headerH + RV2_HEADER_GAP}px`
+              : `calc(${RV2_HEADER_H_CSS} + ${RV2_HEADER_GAP}px)`,
+          flexShrink: 0,
+        }}
+      />
+
 
       {/* Step rail */}
       <div
