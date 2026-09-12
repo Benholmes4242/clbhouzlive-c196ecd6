@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
+import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { useLatestReviews } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { useDiscoverMediaPreview } from '@/components/explore-tab-new/courseled/hooks/useDiscoverMediaPreview';
 import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
