@@ -99,13 +99,73 @@ export function headlineFor(item: StreamItem, t: T): string {
   const toPar = toParLabel(item.facts.to_par);
   const c = item.consequence;
 
-  if (item.facts.is_course_record && gross != null) {
+  /**
+   * THE CONSEQUENCE HEADLINES (§3d, PHASE B2). Every figure in these sentences
+   * was READ, not derived: n and of come from get_viewer_standing, where `of` is
+   * the matched field the Champions tab shows, and the record fact comes from
+   * the record book. A kind whose figures are missing falls through to the plain
+   * round sentence rather than printing a sentence with a hole in it.
+   */
+  if (c?.kind === 'record_lost' && gross != null) {
+    if (c.delta != null && c.delta > 0) {
+      return t(
+        'amateur.stream.headline.recordLostGap',
+        '{{name}} took your course record at {{course}} with a {{gross}}, {{delta}} better than your best.',
+        { name, course, gross, delta: c.delta },
+      );
+    }
+    return t('amateur.stream.headline.recordLost', '{{name}} took your course record at {{course}} with a {{gross}}.', {
+      name,
+      course,
+      gross,
+    });
+  }
+  if (c?.kind === 'rank_down' && c.n != null && c.of != null && gross != null) {
+    if (c.delta != null && c.delta > 0) {
+      return t(
+        'amateur.stream.headline.rankDownBy',
+        '{{name}} went round {{course}} in {{gross}} and pushed you down {{delta}} to {{n}} of {{of}}.',
+        { name, course, gross, delta: c.delta, n: c.n, of: c.of },
+      );
+    }
+    return t(
+      'amateur.stream.headline.rankDown',
+      '{{name}} went round {{course}} in {{gross}}. You are {{n}} of {{of}} there.',
+      { name, course, gross, n: c.n, of: c.of },
+    );
+  }
+  if (c?.kind === 'rank_up' && c.n != null && c.of != null && gross != null) {
+    if (c.delta != null && c.delta > 0) {
+      return t(
+        'amateur.stream.headline.rankUpBy',
+        'Your {{gross}} at {{course}} moves you up {{delta}} to {{n}} of {{of}}.',
+        { course, gross, delta: c.delta, n: c.n, of: c.of },
+      );
+    }
+    return t('amateur.stream.headline.rankUp', 'Your {{gross}} at {{course}} takes you to {{n}} of {{of}}.', {
+      course,
+      gross,
+      n: c.n,
+      of: c.of,
+    });
+  }
+  if (c?.kind === 'rank_hold' && c.n != null && c.of != null && gross != null) {
+    return t('amateur.stream.headline.rankHold', 'Your {{gross}} at {{course}} holds {{n}} of {{of}}.', {
+      course,
+      gross,
+      n: c.n,
+      of: c.of,
+    });
+  }
+
+  if ((item.facts.is_course_record || c?.kind === 'record_taken') && gross != null) {
     return t('amateur.stream.headline.recordTaken', '{{name}} took the course record at {{course}} with a {{gross}}.', {
       name,
       course,
       gross,
     });
   }
+
   if (item.facts.holes_in_one && item.facts.holes_in_one > 0) {
     return t('amateur.stream.headline.ace', '{{name}} holed out from the tee at {{course}}.', { name, course });
   }
@@ -129,7 +189,18 @@ export function headlineFor(item: StreamItem, t: T): string {
       count: item.facts.birdies,
     });
   }
+  /* PLAYED, AND THE BOARD DID NOT MOVE (§3a). Only where the standing figures
+     exist; otherwise the plain round sentence, which claims nothing. */
+  if (c?.kind === 'played_nochange' && c.n != null && c.of != null && gross != null && item.who?.is_viewer) {
+    return t('amateur.stream.headline.playedNoChange', 'You went round {{course}} in {{gross}}, still {{n}} of {{of}}.', {
+      course,
+      gross,
+      n: c.n,
+      of: c.of,
+    });
+  }
   if (gross != null && toPar) {
+
     return t('amateur.stream.headline.roundToPar', '{{name}} went round {{course}} in {{gross}}, {{topar}}.', {
       name,
       course,

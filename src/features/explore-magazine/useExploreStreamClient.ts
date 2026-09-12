@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
+import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { useLatestReviews } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { useDiscoverMediaPreview } from '@/components/explore-tab-new/courseled/hooks/useDiscoverMediaPreview';
 import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
@@ -10,6 +10,11 @@ import { readDiscoverLastSeen } from '@/hooks/useDiscoverLastSeen';
 import type { ExploreView } from './exploreViewMemory';
 import { RING_WEIGHT, consequenceWeight, type Consequence, type StreamItem } from './streamItem';
 import { useViewerCourseContext, type ViewerCourseContext } from './useViewerCourseContext';
+import { roundConsequence as consequenceFor } from './consequences';
+import { useCourseRecordSignal } from './useCourseRecordSignal';
+import { useViewerCourseBests } from './useViewerCourseBests';
+import { useViewerStanding, type StandingRow } from './useViewerStanding';
+
 
 /**
  * ============================================================================
@@ -90,14 +95,13 @@ function scoreItem(item: StreamItem): number {
   return item.kind === 'story' ? base * STORY_DAMP : base;
 }
 
-function roundConsequence(courseId: string | null, gross: number | null, bestHere: number | null, isSelf: boolean, ctx: ViewerCourseContext): Consequence | null {
-  if (courseId && ctx.shortlist.has(courseId) && gross != null && bestHere != null && gross <= bestHere) {
-    return { kind: 'list_new_low', n: gross };
-  }
-  if (courseId && ctx.shortlist.has(courseId)) return { kind: 'list_first' };
-  if (isSelf) return null;
-  return { kind: 'circle_round' };
-}
+/**
+ * PHASE A's LOCAL ROUND CONSEQUENCE IS GONE (§3a). It could only see the
+ * viewer's list, so every round by another member read as 'circle_round'. The
+ * typed kinds now come from ./consequences, which reads standing, the record
+ * book and the viewer's own bests. This file no longer decides consequences.
+ */
+
 
 /**
  * THE CADENCE PASS IS POSITIONAL, NOT A SCORE DAMP. Positional guarantees are
@@ -142,6 +146,9 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
     windowDays: 30,
     includeSuggested: false,
     oneRoundPerMember: false,
+    /* §3c THE VIEWER'S OWN ROUNDS ARE ADMITTED, deduped on score_id below. A
+       stream of other people's rounds only ever moves the viewer down (§3b). */
+    includeSelf: true,
   });
   const everyone = useCircleLatestRounds(viewerId, {
     limit: 14,
@@ -155,6 +162,40 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
   const moments = useMomentsOfTheWeek(30, { enabled: view === 'watch', candidateLimit: 72 });
   const { context, isFetched: contextFetched } = useViewerCourseContext(viewerId);
 
+  /**
+   * §3c DEDUPE ON score_id, NOT round_id. The viewer now appears in BOTH the
+   * circle read (as themselves) and the everyone read, and the two reads build
+   * their row ids independently — score_id is the round's identity, and a round
+   * with no score_id has no card to open, so it is dropped here.
+   */
+  const roundRows = useMemo(() => {
+    if (!wantsRounds) return [];
+    const out: CircleRoundRow[] = [];
+    const taken = new Set<string>();
+    for (const row of [...(circle.data ?? []), ...(everyone.data ?? [])]) {
+      if (!row.score_id || taken.has(row.score_id)) continue;
+      taken.add(row.score_id);
+      out.push(row);
+    }
+    return out;
+  }, [circle.data, everyone.data, wantsRounds]);
+
+  /* THE CONSEQUENCE SOURCES (§3a). Standing supplies every rank and every field
+     size; the record book supplies who holds what; bests decide only whether a
+     round passed the viewer. */
+  const standing = useViewerStanding(viewerId);
+  const standingMap = useMemo(() => {
+    const map = new Map<string, StandingRow>();
+    for (const row of standing.rows) map.set(row.course_id, row);
+    return map;
+  }, [standing.rows]);
+  const bests = useViewerCourseBests(viewerId);
+  const roundCourseIds = useMemo(
+    () => roundRows.map((row) => row.course_id).filter((id): id is string => !!id),
+    [roundRows],
+  );
+  const records = useCourseRecordSignal(viewerId, roundCourseIds);
+
   const lastSeen = useMemo(() => readDiscoverLastSeen(viewerId), [viewerId]);
 
   const items = useMemo<StreamItem[]>(() => {
@@ -166,12 +207,7 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
     };
 
     if (wantsRounds) {
-      const rows = [...(circle.data ?? []), ...(everyone.data ?? [])];
-      const takenRounds = new Set<string>();
-      for (const row of rows) {
-        if (takenRounds.has(row.round_id)) continue;
-        takenRounds.add(row.round_id);
-        if (!row.score_id) continue; // a card with no resolvable target does not render
+      for (const row of roundRows) {
         const toPar = row.gross != null && row.course_par != null ? row.gross - row.course_par : null;
         const item: StreamItem = {
           id: `round:${row.round_id}`,
@@ -180,7 +216,17 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
           ring: row.is_self ? 'own' : null,
           lane: 'news',
           score: 0,
-          consequence: roundConsequence(row.course_id, row.gross, row.best_here, row.is_self, context),
+          consequence: consequenceFor(
+            {
+              courseId: row.course_id,
+              userId: row.user_id,
+              gross: row.gross,
+              playDate: row.play_date,
+              isSelf: row.is_self,
+            },
+            { standing: standingMap, records, bests: bests.bests, shortlist: context.shortlist },
+          ),
+
           subject: {
             course_id: row.course_id,
             course_name: row.course_name,
@@ -374,17 +420,22 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
     for (const item of out) item.score = scoreItem(item);
     out.sort((a, b) => (b.score - a.score) || a.id.localeCompare(b.id));
     return cadence(out);
-  }, [circle.data, everyone.data, reviews.reviews, stories.stories, media.data, moments.data, context, lastSeen, view, viewerId, wantsRounds, wantsWatch]);
+  }, [roundRows, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch]);
 
   /* READINESS IS isFetched, NEVER isLoading: a disabled query reports isLoading
-     false and would report the page ready before anything had been asked for. */
+     false and would report the page ready before anything had been asked for.
+     THE CONSEQUENCE SOURCES ARE PART OF READINESS: a round rendered before
+     standing lands would state a weaker consequence and then change under the
+     member's eyes. An UNRESOLVED source is still fetched — it renders no
+     consequence rather than a wrong one. */
   const isFetched =
     contextFetched &&
-    (!wantsRounds || (circle.isFetched && everyone.isFetched)) &&
+    (!wantsRounds || (circle.isFetched && everyone.isFetched && standing.isFetched && bests.isFetched && records.isFetched)) &&
     (view !== 'all' && view !== 'reviews' ? true : !reviews.isPending) &&
     (view !== 'all' ? true : !stories.isPending) &&
     (!wantsWatch || media.isFetched) &&
     (view !== 'watch' || moments.isFetched);
+
 
   return { items, total: items.length, isFetched, isPending: !isFetched && items.length === 0 };
 }

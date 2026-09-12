@@ -2231,7 +2231,15 @@
         "birdieHaul": "[{{name}} mådé {{count}} bîrdîés åt {{course}}. one two]",
         "roundToPar": "[{{name}} wént röünd {{course}} în {{gross}}, {{topar}}. one two three]",
         "round": "[{{name}} wént röünd {{course}} în {{gross}}. one two]",
-        "played": "[{{name}} plåyéd {{course}}. one]"
+        "played": "[{{name}} plåyéd {{course}}. one]",
+        "recordLost": "[{{name}} töök yöür cöürsé récörd åt {{course}} wîth å {{gross}}. one two]",
+        "recordLostGap": "[{{name}} töök yöür cöürsé récörd åt {{course}} wîth å {{gross}}, {{delta}} béttér thån yöür bést. one two three]",
+        "rankDown": "[{{name}} wént röünd {{course}} în {{gross}}. Yöü åré {{n}} öf {{of}} théré. one two three]",
+        "rankDownBy": "[{{name}} wént röünd {{course}} în {{gross}} ånd püshéd yöü döwn {{delta}} tö {{n}} öf {{of}}. one two three]",
+        "rankUp": "[Yöür {{gross}} åt {{course}} tåkés yöü tö {{n}} öf {{of}}. one two]",
+        "rankUpBy": "[Yöür {{gross}} åt {{course}} mövés yöü üp {{delta}} tö {{n}} öf {{of}}. one two three]",
+        "rankHold": "[Yöür {{gross}} åt {{course}} hölds {{n}} öf {{of}}. one two]",
+        "playedNoChange": "[Yöü wént röünd {{course}} în {{gross}}, stîll {{n}} öf {{of}}. one two]"
       },
       "standing": {
         "board": "[Lowest gross]",

@@ -1647,7 +1647,15 @@
         "birdieHaul": "{{name}} hace {{count}} birdies en {{course}}.",
         "roundToPar": "{{name}} completa {{course}} en {{gross}}, {{topar}}.",
         "round": "{{name}} completa {{course}} en {{gross}}.",
-        "played": "{{name}} jugo {{course}}."
+        "played": "{{name}} jugo {{course}}.",
+        "recordLost": "{{name}} te quita el record del campo en {{course}} con {{gross}}.",
+        "recordLostGap": "{{name}} te quita el record del campo en {{course}} con {{gross}}, {{delta}} mejor que tu mejor vuelta.",
+        "rankDown": "{{name}} juega {{course}} en {{gross}}. Estas {{n}} de {{of}} ahi.",
+        "rankDownBy": "{{name}} juega {{course}} en {{gross}} y te baja {{delta}} puestos hasta {{n}} de {{of}}.",
+        "rankUp": "Tu {{gross}} en {{course}} te coloca {{n}} de {{of}}.",
+        "rankUpBy": "Tu {{gross}} en {{course}} te sube {{delta}} puestos hasta {{n}} de {{of}}.",
+        "rankHold": "Tu {{gross}} en {{course}} mantiene {{n}} de {{of}}.",
+        "playedNoChange": "Juegas {{course}} en {{gross}}, sigues {{n}} de {{of}}."
       },
       "standing": {
         "board": "Golpes brutos mas bajos",

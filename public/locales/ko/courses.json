@@ -1586,7 +1586,15 @@
         "birdieHaul": "{{name}}님이 {{course}}에서 버디 {{count}}개를 잡았습니다.",
         "roundToPar": "{{name}}님이 {{course}}를 {{gross}}타({{topar}})로 돌았습니다.",
         "round": "{{name}}님이 {{course}}를 {{gross}}타로 돌았습니다.",
-        "played": "{{name}}님이 {{course}}를 플레이했습니다."
+        "played": "{{name}}님이 {{course}}를 플레이했습니다.",
+        "recordLost": "{{name}}이(가) {{course}}에서 {{gross}}로 당신의 코스 레코드를 가져갔습니다.",
+        "recordLostGap": "{{name}}이(가) {{course}}에서 {{gross}}로 당신의 최고 기록보다 {{delta}}타 좋은 코스 레코드를 세웠습니다.",
+        "rankDown": "{{name}}이(가) {{course}}를 {{gross}}로 돌았습니다. 당신은 {{of}}명 중 {{n}}위입니다.",
+        "rankDownBy": "{{name}}이(가) {{course}}를 {{gross}}로 돌아 당신은 {{delta}}계단 내려가 {{of}}명 중 {{n}}위입니다.",
+        "rankUp": "{{course}}에서의 {{gross}}로 {{of}}명 중 {{n}}위입니다.",
+        "rankUpBy": "{{course}}에서의 {{gross}}로 {{delta}}계단 올라 {{of}}명 중 {{n}}위입니다.",
+        "rankHold": "{{course}}에서의 {{gross}}로 {{of}}명 중 {{n}}위를 지켰습니다.",
+        "playedNoChange": "{{course}}를 {{gross}}로 돌았고 여전히 {{of}}명 중 {{n}}위입니다."
       },
       "standing": {
         "board": "베스트 그로스",

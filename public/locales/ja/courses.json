@@ -1583,7 +1583,15 @@
         "birdieHaul": "{{name}}が{{course}}でバーディー{{count}}個。",
         "roundToPar": "{{name}}が{{course}}を{{gross}}（{{topar}}）でラウンド。",
         "round": "{{name}}が{{course}}を{{gross}}でラウンド。",
-        "played": "{{name}}が{{course}}をプレー。"
+        "played": "{{name}}が{{course}}をプレー。",
+        "recordLost": "{{name}}が{{course}}で{{gross}}を出し、あなたのコースレコードを更新。",
+        "recordLostGap": "{{name}}が{{course}}で{{gross}}。あなたのベストより{{delta}}良いスコアでコースレコードを更新。",
+        "rankDown": "{{name}}が{{course}}を{{gross}}でラウンド。あなたは{{of}}人中{{n}}位。",
+        "rankDownBy": "{{name}}が{{course}}を{{gross}}でラウンド。あなたは{{delta}}下がって{{of}}人中{{n}}位。",
+        "rankUp": "{{course}}での{{gross}}で{{of}}人中{{n}}位。",
+        "rankUpBy": "{{course}}での{{gross}}で{{delta}}上がって{{of}}人中{{n}}位。",
+        "rankHold": "{{course}}での{{gross}}で{{of}}人中{{n}}位を維持。",
+        "playedNoChange": "{{course}}を{{gross}}でラウンド。{{of}}人中{{n}}位のまま。"
       },
       "standing": {
         "board": "ベストグロス",

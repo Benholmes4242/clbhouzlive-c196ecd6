@@ -1647,7 +1647,15 @@
         "birdieHaul": "{{name}} spielt {{count}} Birdies auf {{course}}.",
         "roundToPar": "{{name}} spielt {{course}} in {{gross}}, {{topar}}.",
         "round": "{{name}} spielt {{course}} in {{gross}}.",
-        "played": "{{name}} hat {{course}} gespielt."
+        "played": "{{name}} hat {{course}} gespielt.",
+        "recordLost": "{{name}} holt deinen Platzrekord auf {{course}} mit {{gross}}.",
+        "recordLostGap": "{{name}} holt deinen Platzrekord auf {{course}} mit {{gross}}, {{delta}} besser als deine Bestleistung.",
+        "rankDown": "{{name}} spielt {{course}} in {{gross}}. Du bist dort {{n}} von {{of}}.",
+        "rankDownBy": "{{name}} spielt {{course}} in {{gross}} und schiebt dich {{delta}} Plaetze zurueck auf {{n}} von {{of}}.",
+        "rankUp": "Deine {{gross}} auf {{course}} bringt dich auf {{n}} von {{of}}.",
+        "rankUpBy": "Deine {{gross}} auf {{course}} bringt dich {{delta}} Plaetze nach vorn auf {{n}} von {{of}}.",
+        "rankHold": "Deine {{gross}} auf {{course}} haelt {{n}} von {{of}}.",
+        "playedNoChange": "Du spielst {{course}} in {{gross}}, weiterhin {{n}} von {{of}}."
       },
       "standing": {
         "board": "Niedrigster Brutto",

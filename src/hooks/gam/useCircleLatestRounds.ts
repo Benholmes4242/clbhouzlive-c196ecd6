@@ -169,7 +169,19 @@ interface Options {
    * so it passes false.
    */
   oneRoundPerMember?: boolean;
+  /**
+   * ADMIT THE VIEWING MEMBER'S OWN ROUNDS to the 'circle' scope
+   * (BRIEF_EXPLORE_MAGAZINE §3c). The circle is the people you follow and never
+   * yourself, which is correct for a friends rail and wrong for a page that
+   * reports consequences: another member's round can only ever move you DOWN a
+   * board (§3b), so a stream without your own rounds delivers nothing but bad
+   * news.
+   *
+   * DEFAULT false — every existing caller behaves byte-identically.
+   */
+  includeSelf?: boolean;
 }
+
 
 const DAY_MS = 86_400_000;
 const WINDOW_DAYS = 60;
@@ -184,6 +196,7 @@ export function useCircleLatestRounds(
     windowDays = WINDOW_DAYS,
     courseIds = null,
     oneRoundPerMember = true,
+    includeSelf = false,
   }: Options = {},
 ) {
   const courseFilter = courseIds == null ? null : Array.from(new Set(courseIds)).sort();
@@ -198,7 +211,11 @@ export function useCircleLatestRounds(
       windowDays,
       courseFilter == null ? 'all-courses' : courseFilter.join('|'),
       oneRoundPerMember,
+      /* APPENDED ONLY WHEN ASKED FOR, so every existing caller's cache key is
+         unchanged to the byte and nothing refetches on deploy. */
+      ...(includeSelf ? (['with-self'] as const) : []),
     ],
+
 
 
     queryFn: async (): Promise<CircleRoundRow[]> => {
@@ -262,18 +279,24 @@ export function useCircleLatestRounds(
         courseFilter == null ? q : (q as Filterable).in('course_id', courseFilter);
 
       let circleRounds: Round[] = [];
-      if (scope === 'circle' && circleIds.length > 0) {
+      /* THE VIEWER IS ADMITTED HERE AND NOWHERE ELSE, so the one circle
+         definition in src/lib/social/circle.ts stays untouched: the circle is
+         still the people you follow, and "the circle plus me" is a reading this
+         caller asks for rather than a second definition. */
+      const readIds = includeSelf ? Array.from(new Set([...circleIds, userId])) : circleIds;
+      if (scope === 'circle' && readIds.length > 0) {
         const { data: rounds } = (await scoped(
           supabase
             .from('gam_round_stats' as never)
             .select(ROUND_COLS)
-            .in('user_id', circleIds)
+            .in('user_id', readIds)
             .gte('play_date', windowStartIso)
             .eq('holes_played', 18)
             .order('play_date', { ascending: false }),
         )) as { data: unknown };
         circleRounds = ((rounds ?? []) as unknown) as Round[];
       }
+
 
 
       // 3. Pick rounds per circle member. Default: newest round each.

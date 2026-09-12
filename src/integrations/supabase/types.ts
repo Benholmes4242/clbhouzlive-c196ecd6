@@ -22202,6 +22202,22 @@ export type Database = {
           why_ai: string
         }[]
       }
+      get_viewer_standing: {
+        Args: { p_viewer: string }
+        Returns: {
+          board: string
+          course_id: string
+          course_name: string
+          delta: number
+          field_now: number
+          image_url: string
+          last_change_at: string
+          rank_now: number
+          rank_then: number
+          region: string
+          sub_country: string
+        }[]
+      }
       get_waitlist_display: {
         Args: { _country_id: string }
         Returns: {
