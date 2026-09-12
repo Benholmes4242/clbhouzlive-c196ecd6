@@ -169,7 +169,19 @@ interface Options {
    * so it passes false.
    */
   oneRoundPerMember?: boolean;
+  /**
+   * ADMIT THE VIEWING MEMBER'S OWN ROUNDS to the 'circle' scope
+   * (BRIEF_EXPLORE_MAGAZINE §3c). The circle is the people you follow and never
+   * yourself, which is correct for a friends rail and wrong for a page that
+   * reports consequences: another member's round can only ever move you DOWN a
+   * board (§3b), so a stream without your own rounds delivers nothing but bad
+   * news.
+   *
+   * DEFAULT false — every existing caller behaves byte-identically.
+   */
+  includeSelf?: boolean;
 }
+
 
 const DAY_MS = 86_400_000;
 const WINDOW_DAYS = 60;
