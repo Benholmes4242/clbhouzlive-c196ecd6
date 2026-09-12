@@ -93,15 +93,19 @@ export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
     }));
   }, []);
 
-  const openFull = useCallback((videoId: string, backgroundLocation?: Location) => {
-    // VideoPlayerModal was deleted in PR-5. Route deep-links to /post/:id instead.
+  const openFull = useCallback((videoId: string) => {
+    // VideoPlayerModal was deleted in PR-5. Plain deep-link navigation is the
+    // intent: /post/:postId is a full deep-link page (logged-out preview, web
+    // gate exempt), with no overlay presentation, no dismiss affordance and no
+    // expectation of a page behind it. It must NOT be added to App.tsx's
+    // backgroundLocation overlay list — that would change every ordinary
+    // navigation to a post to fix a path the deleted modal was the last real
+    // user of. (The old { state: { backgroundLocation } } here was a leftover
+    // from that modal: the overlay router mounts nothing for /post/:postId, so
+    // the tap silently returned the member to where they were.)
     setState(prev => ({ ...prev, isMiniOpen: false }));
-    const bgLoc = backgroundLocation || location;
-    navigate(`/post/${videoId}`, {
-      state: { backgroundLocation: bgLoc },
-      replace: false,
-    });
-  }, [navigate, location]);
+    navigate(`/post/${videoId}`, { replace: false });
+  }, [navigate]);
 
   const setMiniMeta = useCallback((meta: MiniPlayerMeta | null) => {
     setState(prev => ({ ...prev, miniMeta: meta }));
