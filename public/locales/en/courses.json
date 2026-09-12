@@ -109,7 +109,15 @@
         "birdieHaul": "{{name}} made {{count}} birdies at {{course}}.",
         "roundToPar": "{{name}} went round {{course}} in {{gross}}, {{topar}}.",
         "round": "{{name}} went round {{course}} in {{gross}}.",
-        "played": "{{name}} played {{course}}."
+        "played": "{{name}} played {{course}}.",
+        "recordLost": "{{name}} took your course record at {{course}} with a {{gross}}.",
+        "recordLostGap": "{{name}} took your course record at {{course}} with a {{gross}}, {{delta}} better than your best.",
+        "rankDown": "{{name}} went round {{course}} in {{gross}}. You are {{n}} of {{of}} there.",
+        "rankDownBy": "{{name}} went round {{course}} in {{gross}} and pushed you down {{delta}} to {{n}} of {{of}}.",
+        "rankUp": "Your {{gross}} at {{course}} takes you to {{n}} of {{of}}.",
+        "rankUpBy": "Your {{gross}} at {{course}} moves you up {{delta}} to {{n}} of {{of}}.",
+        "rankHold": "Your {{gross}} at {{course}} holds {{n}} of {{of}}.",
+        "playedNoChange": "You went round {{course}} in {{gross}}, still {{n}} of {{of}}."
       },
       "standing": {
         "board": "Lowest gross",
