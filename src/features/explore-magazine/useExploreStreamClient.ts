@@ -146,6 +146,9 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
     windowDays: 30,
     includeSuggested: false,
     oneRoundPerMember: false,
+    /* §3c THE VIEWER'S OWN ROUNDS ARE ADMITTED, deduped on score_id below. A
+       stream of other people's rounds only ever moves the viewer down (§3b). */
+    includeSelf: true,
   });
   const everyone = useCircleLatestRounds(viewerId, {
     limit: 14,
@@ -159,6 +162,40 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
   const moments = useMomentsOfTheWeek(30, { enabled: view === 'watch', candidateLimit: 72 });
   const { context, isFetched: contextFetched } = useViewerCourseContext(viewerId);
 
+  /**
+   * §3c DEDUPE ON score_id, NOT round_id. The viewer now appears in BOTH the
+   * circle read (as themselves) and the everyone read, and the two reads build
+   * their row ids independently — score_id is the round's identity, and a round
+   * with no score_id has no card to open, so it is dropped here.
+   */
+  const roundRows = useMemo(() => {
+    if (!wantsRounds) return [];
+    const out: typeof circleRowsType = [];
+    const taken = new Set<string>();
+    for (const row of [...(circle.data ?? []), ...(everyone.data ?? [])]) {
+      if (!row.score_id || taken.has(row.score_id)) continue;
+      taken.add(row.score_id);
+      out.push(row);
+    }
+    return out;
+  }, [circle.data, everyone.data, wantsRounds]);
+
+  /* THE CONSEQUENCE SOURCES (§3a). Standing supplies every rank and every field
+     size; the record book supplies who holds what; bests decide only whether a
+     round passed the viewer. */
+  const standing = useViewerStanding(viewerId);
+  const standingMap = useMemo(() => {
+    const map = new Map<string, StandingRow>();
+    for (const row of standing.rows) map.set(row.course_id, row);
+    return map;
+  }, [standing.rows]);
+  const bests = useViewerCourseBests(viewerId);
+  const roundCourseIds = useMemo(
+    () => roundRows.map((row) => row.course_id).filter((id): id is string => !!id),
+    [roundRows],
+  );
+  const records = useCourseRecordSignal(viewerId, roundCourseIds);
+
   const lastSeen = useMemo(() => readDiscoverLastSeen(viewerId), [viewerId]);
 
   const items = useMemo<StreamItem[]>(() => {
@@ -170,12 +207,7 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
     };
 
     if (wantsRounds) {
-      const rows = [...(circle.data ?? []), ...(everyone.data ?? [])];
-      const takenRounds = new Set<string>();
-      for (const row of rows) {
-        if (takenRounds.has(row.round_id)) continue;
-        takenRounds.add(row.round_id);
-        if (!row.score_id) continue; // a card with no resolvable target does not render
+      for (const row of roundRows) {
         const toPar = row.gross != null && row.course_par != null ? row.gross - row.course_par : null;
         const item: StreamItem = {
           id: `round:${row.round_id}`,
@@ -184,7 +216,17 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
           ring: row.is_self ? 'own' : null,
           lane: 'news',
           score: 0,
-          consequence: roundConsequence(row.course_id, row.gross, row.best_here, row.is_self, context),
+          consequence: consequenceFor(
+            {
+              courseId: row.course_id,
+              userId: row.user_id,
+              gross: row.gross,
+              playDate: row.play_date,
+              isSelf: row.is_self,
+            },
+            { standing: standingMap, records, bests: bests.bests, shortlist: context.shortlist },
+          ),
+
           subject: {
             course_id: row.course_id,
             course_name: row.course_name,
