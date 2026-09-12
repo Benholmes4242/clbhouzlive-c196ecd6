@@ -1289,3 +1289,28 @@ the 62px column at $40.5M. HAVE PLAYED IT did NOT render in the guest check:
 `get_course_field_sizes` is granted to authenticated and service_role only, so
 the read is unavailable and the figure is correctly absent rather than zero.
 Needs an authenticated device check to confirm it renders.
+
+## OPEN — BUILT, WORKING, UNREACHABLE (heading for one class of fault, 12 Sep 2026)
+Two instances this week of a working capability whose entrance was removed while
+the machinery stayed mounted, reporting nothing because nothing is broken:
+1. HOLE PHOTOGRAPHY MODERATION QUEUE — see "Open — member hole-photo submission
+   has no surface" above. Review machinery live, submission door gone.
+2. CONTINUE WATCHING MINI-PLAYER (12 Sep 2026). `openMini` has zero callers, so
+   nothing in the current build can open the mini-player. The context
+   (`src/context/VideoPlaybackContext.tsx`), `src/components/videos/MiniPlayer.tsx`,
+   its sessionStorage restore (`mini_player_state`) and its expand button are
+   all live code serving a surface with no door. The sessionStorage restore
+   keeps this from a hard zero: it can resurrect a surface nothing can open.
+The question both raise: what else is built, working, and unreachable? A census
+of surfaces with no live entry point is unstarted work.
+
+## CLOSED — MiniPlayer expand dead end (12 Sep 2026)
+`openFull` passed `{ state: { backgroundLocation } }` to `navigate(/post/:id)`,
+a leftover from the deleted VideoPlayerModal. `/post/:postId` is not in the
+overlay list, so the tap mounted nothing and silently returned the member to
+where they were — the third instance of that fault family in one night (RATE IT,
+course picker, this). Fixed with a plain deep-link navigation; signature and the
+unused useLocation went with it. `/post/:postId` must NOT be added to the
+overlay list: it is a full deep-link page (logged-out preview, web gate exempt)
+with no overlay presentation, no dismiss affordance and no expectation of a
+page behind it — recorded at the site in VideoPlaybackContext.openFull.
