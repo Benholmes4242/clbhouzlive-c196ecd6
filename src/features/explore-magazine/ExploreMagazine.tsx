@@ -19,6 +19,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreCard, type CardSize } from './ExploreCard';
 import { ExploreShelf } from './ExploreShelf';
+import { StandingShelf } from './StandingShelf';
 import { LeadShell, PairShell, ShelfShell, StdShell } from './ExploreShells';
 import { PHASE_A_VIEWS, readExploreView, writeExploreView, type ExploreView } from './exploreViewMemory';
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
@@ -70,7 +71,7 @@ const PAIRABLE = new Set(['review', 'course', 'story']);
 
 /** §5 shelves are inserted after card positions 3, 7, 11 ... and an empty
  *  source means the next shelf takes the slot rather than a gap appearing. */
-function buildBlocks(items: StreamItem[], shelves: Array<'clips' | 'moments'>): Block[] {
+function buildBlocks(items: StreamItem[], shelves: ShelfKind[]): Block[] {
   const blocks: Block[] = [];
   let cards = 0;
   let nextShelf = 0;
@@ -252,7 +253,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [visible, meta.data, meta.isFetched],
   );
 
-  const shelves: Array<'clips' | 'moments'> = view === 'watch' ? ['moments'] : ['clips', 'moments'];
+  const shelves: ShelfKind[] = view === 'watch' ? ['moments'] : ['clips', 'standing', 'moments'];
   const blocks = useMemo(() => buildBlocks(enriched, shelves), [enriched, view]);
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
@@ -459,6 +460,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               <div key={`shelf:${block.shelf}:${index}`}>
                 {block.shelf === 'clips' ? (
                   <ClipsShelf pos={pos} onDepart={depart} />
+                ) : block.shelf === 'standing' ? (
+                  <StandingShelf viewerId={userId} pos={pos} />
                 ) : (
                   <MomentsShelf pos={pos} onDepart={depart} />
                 )}
