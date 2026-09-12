@@ -194,7 +194,17 @@ function WhoLine({
   if (!who && !sub) return null;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: size === 'pair' ? 5 : 7, minWidth: 0 }}>
+    <div
+      className="explore-who-line"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        marginTop: size === 'pair' ? 5 : 7,
+        minWidth: 0,
+        overflow: 'hidden',
+      }}
+    >
       {who?.user_id ? (
         <span
           role={onWhoTap ? 'button' : undefined}
@@ -217,22 +227,50 @@ function WhoLine({
           />
         </span>
       ) : null}
-      <span
+      <div
         style={{
-          fontFamily: SANS,
-          fontSize: size === 'pair' ? 11 : 12,
-          fontWeight: 600,
-          color: nameColor,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 4,
           minWidth: 0,
+          overflow: 'hidden',
         }}
       >
-        {who ? name : null}
-        {who && sub ? <span style={{ color: subColor }}> {'\u00B7'} {sub}</span> : null}
-        {!who && sub ? <span style={{ color: subColor }}>{sub}</span> : null}
-      </span>
+        {who ? (
+          <span
+            style={{
+              fontFamily: SANS,
+              fontSize: size === 'pair' ? 11 : 12,
+              fontWeight: 600,
+              color: nameColor,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              minWidth: 0,
+              flex: '1 1 auto',
+            }}
+          >
+            {name}
+          </span>
+        ) : null}
+        {sub ? (
+          <span
+            style={{
+              fontFamily: SANS,
+              fontSize: size === 'pair' ? 11 : 12,
+              fontWeight: 600,
+              color: subColor,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              minWidth: 0,
+              flex: '0 1 auto',
+            }}
+          >
+            {who ? `\u00B7 ${sub}` : sub}
+          </span>
+        ) : null}
+      </div>
     </div>
   );
 }
