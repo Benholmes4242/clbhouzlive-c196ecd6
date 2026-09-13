@@ -47,7 +47,12 @@ export function kickerParts(item: StreamItem, t: T): string[] {
   if (item.consequence?.kind === 'review_on_list' || item.consequence?.kind === 'list_new_low' || item.consequence?.kind === 'list_first') {
     return withCourse(t('amateur.stream.kicker.onYourList', 'On your list'));
   }
-  if (item.ring === 'club') return withCourse(t('amateur.stream.kicker.atYourClub', 'At your club'));
+  /* NO "AT YOUR CLUB" PREFIX. The club's own name follows it and a member knows
+     their own club, so the prefix states what the name already says — the same
+     reasoning that removed "COURSE RECORD". The other ring prefixes STAY: a
+     course name alone does not say why the card reached you. */
+  if (item.ring === 'club') return course ? [course] : [];
+
   if (item.ring === 'county' && item.subject?.region) {
     return withCourse(t('amateur.stream.kicker.aroundRegion', 'Around {{region}}', { region: item.subject.region }));
   }
