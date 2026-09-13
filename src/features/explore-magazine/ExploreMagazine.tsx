@@ -328,6 +328,33 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   );
   const scoresStanding = useViewerStanding(userId);
 
+  /* §6h THE NO-CONNECTION SENTENCE IS ABOUT THE MEMBER, NOT ABOUT THE PAGE.
+     It renders only when EVERY one of the five viewer checks has SETTLED and
+     every one is empty: no played courses (get_viewer_standing), no shortlist,
+     no ratings of their own, no follows, and neither a club nor a county.
+     UNRESOLVED IS NOT EMPTY - while anything is pending, unresolved or errored
+     the sentence stays away. A disabled query reports isLoading false, so
+     readiness is isFetched here and never isLoading. */
+  const viewerContext = useViewerCourseContext(userId);
+  const viewerFollows = useFollowingIdSet(userId);
+  const viewerChecksSettled =
+    !!userId &&
+    scoresStanding.isFetched &&
+    !scoresStanding.unresolved &&
+    viewerContext.isFetched &&
+    viewerFollows.isFetched &&
+    !viewerFollows.isError &&
+    geography.isFetched;
+  const viewerHasNothing =
+    viewerChecksSettled &&
+    scoresStanding.rows.length === 0 &&
+    viewerContext.context.shortlist.size === 0 &&
+    viewerContext.context.ratings.size === 0 &&
+    (viewerFollows.data?.size ?? 0) === 0 &&
+    !geography.scope.primaryClubId &&
+    !geography.scope.county;
+
+
   /* §5b THE COURSES VIEW'S OWN BODY. Course cards are not rounds, reviews or
      media, so they are composed by their own hook off get_board_courses and the
      shared geography — the client stream is left exactly as B2 shipped it. */
