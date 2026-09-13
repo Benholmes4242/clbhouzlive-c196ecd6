@@ -1272,7 +1272,13 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               {/* HOW IT UNFOLDED — last, the most decorative and least
                   referenced element. Construction and monotonePath unchanged. */}
               <Panel kicker={t('courses:scorecard.howItUnfolded')}>
-                <TrajectoryLine holes={holes} height={120} surface="dark" interactive />
+                <TrajectoryLine
+                  holes={holes}
+                  height={120}
+                  surface="dark"
+                  interactive
+                  showFieldComparison={fieldGateOpen}
+                />
                 {/* The FIELD row's pool-basis and gate-fail lines left with the
                     row. Beat-the-field remains an independent trajectory fact;
                     when its five-player gate fails, this section says nothing. */}
