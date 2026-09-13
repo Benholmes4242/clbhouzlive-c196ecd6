@@ -21,38 +21,62 @@ import { supabase } from '@/integrations/supabase/client';
  * cannot silently become the viewer's "best" on an 18-hole board.
  */
 
+export interface ViewerBest {
+  gross: number;
+  /** The play date of that best round, ISO, so a headline can say when it stood
+   *  from. Null when the row carries no date. */
+  playDate: string | null;
+}
+
 export interface ViewerCourseBests {
   /** course_id -> lowest 18-hole gross the viewer has recorded there. */
   bests: Map<string, number>;
+  /** THE SAME READ, additive: the best plus the date it was set. No extra query
+   *  — a record headline needs "had stood since June 2025" and the row was
+   *  already fetched. `bests` is unchanged for its existing callers. */
+  bestsAt: Map<string, ViewerBest>;
   isFetched: boolean;
 }
 
 const EMPTY = new Map<string, number>();
+const EMPTY_AT = new Map<string, ViewerBest>();
 
 export function useViewerCourseBests(viewerId: string | undefined): ViewerCourseBests {
-  const query = useQuery<Map<string, number>>({
+  const query = useQuery<Map<string, ViewerBest>>({
     queryKey: ['explore-magazine', 'viewer-course-bests', viewerId ?? 'anon'],
     enabled: !!viewerId,
     staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('gam_round_stats' as never)
-        .select('course_id, gross_score')
+        .select('course_id, gross_score, play_date')
         .eq('user_id', viewerId as string)
         .eq('holes_played', 18);
       if (error) throw error;
-      const out = new Map<string, number>();
-      for (const row of ((data ?? []) as unknown as Array<{ course_id: string | null; gross_score: number | null }>)) {
+      const out = new Map<string, ViewerBest>();
+      for (const row of ((data ?? []) as unknown as Array<{
+        course_id: string | null;
+        gross_score: number | null;
+        play_date: string | null;
+      }>)) {
         if (!row.course_id || row.gross_score == null) continue;
         const current = out.get(row.course_id);
-        if (current == null || row.gross_score < current) out.set(row.course_id, row.gross_score);
+        if (current == null || row.gross_score < current) {
+          out.set(row.course_id, { gross: row.gross_score, playDate: row.play_date ?? null });
+        }
       }
       return out;
     },
   });
 
+  const bestsAt = query.data ?? EMPTY_AT;
+  const bests = query.data
+    ? new Map(Array.from(bestsAt.entries()).map(([id, v]) => [id, v.gross] as const))
+    : EMPTY;
+
   return {
-    bests: query.data ?? EMPTY,
+    bests,
+    bestsAt,
     isFetched: viewerId ? query.isFetched : true,
   };
 }

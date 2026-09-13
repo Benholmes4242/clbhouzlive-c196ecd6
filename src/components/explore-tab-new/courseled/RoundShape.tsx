@@ -193,7 +193,14 @@ export function RoundShape({
     const path = smoothPath(points);
     const baselineY = yFor(0);
     const last = points.at(-1);
-    const tone = (lineValues.at(-1) ?? 0) < 0 ? RAMP_DIST.birdie : A.INK;
+    /* ONE WHITE TRACE, ABOVE AND BELOW LEVEL PAR. The red segment existed when
+       the shape carried a FILL and the colour marked the under-par AREA. With
+       the fill gone and the good holes marked by DOTS, red was a second and
+       weaker telling of what the dots already say, and it is the least legible
+       colour in the set over a photograph. Explore only: the gradient paths
+       below, which the friends rail, the scorecard post and the scorecard sheet
+       draw, keep their red exactly as today. */
+    const tone = A.INK;
     return (
       <svg width="100%" height={renderedHeight} viewBox={`0 0 ${width} ${renderedHeight}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
         <line x1={SHAPE_PAD_X} x2={width - SHAPE_PAD_X} y1={baselineY} y2={baselineY}
