@@ -188,6 +188,61 @@ function toItem(row: StreamRow): StreamItem {
   };
 }
 
+/**
+ * A FAILING VIEW MUST BE VISIBLE (AUDIT RULING 2).
+ *
+ * The D4 fallback is the reason `g.id` survived two ship reports and a device
+ * check: the RPC errored, `unavailable` went true, the client composition took
+ * over and the page looked perfect. Resilience without detection is how a dead
+ * view stays dead. So the moment the error transitions to set we report it to
+ * the SAME pipeline that carries app errors (trackError -> analytics_events
+ * `app_error`, whose redaction, 10s dedupe and 5-per-session cap already stop
+ * this flooding), and we mark the fact that a view is SERVING FROM FALLBACK as
+ * its own reportable state.
+ *
+ * ONCE PER VIEW AND CODE. A retry: false query fails once per view per session,
+ * but the hook remounts on every tab switch; the module-level sets below keep
+ * one report per view/code and one fallback marker per view for the session.
+ * They are module-level ON PURPOSE — a ref would reset with the component and
+ * re-report on every visit.
+ */
+const reportedErrors = new Set<string>();
+const reportedFallback = new Set<string>();
+
+/** The PostgREST error code (`42703` for the undefined column that hid here). */
+function pgCode(error: unknown): string {
+  const e = error as { code?: string } | null;
+  return e?.code ? String(e.code) : 'unknown';
+}
+
+function reportStreamFailure(
+  view: ExploreView,
+  scope: string,
+  error: unknown,
+): void {
+  const code = pgCode(error);
+  const key = `${view}|${code}`;
+  if (!reportedErrors.has(key)) {
+    reportedErrors.add(key);
+    const e = error as { message?: string; details?: string; hint?: string } | null;
+    trackError({
+      kind: 'error',
+      message: `get_explore_stream ${view} ${code}: ${e?.message ?? 'unknown'}`,
+      stack: `explore_stream view=${view} scope=${scope} code=${code}`,
+    });
+  }
+  if (!reportedFallback.has(view)) {
+    reportedFallback.add(view);
+    /* Running on the net is not a success. This event exists so "how many
+       members were served the fallback today" is answerable at all. */
+    analyticsEvents.track('amateur_stream_fallback_served', {
+      view,
+      scope,
+      code,
+    });
+  }
+}
+
 export function useExploreStream(
   viewerId: string | undefined,
   view: ExploreView,
