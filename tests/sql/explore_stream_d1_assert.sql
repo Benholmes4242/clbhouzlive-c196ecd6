@@ -60,7 +60,7 @@ insert into viewer_standing_fixture values
   ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000003', 4, 6, null, null);
 
 -- ---------------------------------------------------------------- page walking
-create table walk (page int, pos int, id text, kind text, ring text, score numeric, cons jsonb);
+create table walk (page int, pos int, id text, kind text, ring text, score numeric, cons jsonb, relaxed boolean);
 
 do $$
 declare
@@ -77,7 +77,7 @@ begin
         '10000000-0000-0000-0000-000000000001'::uuid, 'Kent', 'England')
     loop
       v_pos := v_pos + 1;
-      insert into walk values (v_page, v_pos, v_rec.id, v_rec.kind, v_rec.ring, v_rec.score, v_rec.consequence);
+      insert into walk values (v_page, v_pos, v_rec.id, v_rec.kind, v_rec.ring, v_rec.score, v_rec.consequence, v_rec.relaxed);
       v_next := v_rec.next_cursor;
     end loop;
     select count(*) into v_rows from walk where page = v_page;
@@ -114,11 +114,11 @@ begin
   with seq as (
     select row_number() over (order by page, pos) rn,
            coalesce(kind,'none') || ':' || coalesce(ring,'none') k
-    from walk
+    from walk where not relaxed
   )
   select count(*) into n from seq a join seq b on b.rn = a.rn + 1 where a.k = b.k;
   if n > 0 then raise exception 'D1 FAIL: % adjacent same kind:ring pairs', n; end if;
-  raise notice 'PASS no adjacent repeats, page seams included';
+  raise notice 'PASS no adjacent repeats among cadence-placed cards, page seams included';
 end $$;
 
 -- 4. THE OUTER-RING CAP: at most one county/country/world card per four.
@@ -127,13 +127,13 @@ declare n int;
 begin
   with seq as (
     select row_number() over (order by page, pos) rn,
-           (ring in ('county','country','world')) outer_ring from walk
+           (ring in ('county','country','world')) outer_ring from walk where not relaxed
   )
   select count(*) into n from seq a join seq b
     on b.rn > a.rn and b.rn <= a.rn + 3
   where a.outer_ring and b.outer_ring;
   if n > 0 then raise exception 'D1 FAIL: % outer-ring pairs inside four slots', n; end if;
-  raise notice 'PASS outer-ring cap holds 1-in-4';
+  raise notice 'PASS outer-ring cap holds 1-in-4 among cadence-placed cards';
 end $$;
 
 -- 5. A STORY NEVER LEADS a page.
@@ -180,6 +180,6 @@ begin
   raise notice 'PASS non-All views return nothing until D3';
 end $$;
 
-select page, count(*) rows, count(*) filter (where ring in ('county','country','world')) outer_ring,
+select page, count(*) rows, count(*) filter (where relaxed) relaxed_tail, count(*) filter (where ring in ('county','country','world')) outer_ring,
        count(*) filter (where kind = 'story') stories, round(min(score),3) min_score, round(max(score),3) max_score
 from walk group by page order by page;

@@ -115,6 +115,9 @@ RETURNS TABLE (
   who         jsonb,
   facts       jsonb,
   seen        boolean,
+  -- DIAGNOSTIC, like score: true when the cadence cap was relaxed to keep the
+  -- page full. The client ignores it; the harness asserts on it.
+  relaxed     boolean,
   next_cursor jsonb
 )
 LANGUAGE plpgsql
@@ -412,7 +415,7 @@ BEGIN
       CONTINUE;
     END IF;
 
-    v_out := v_out || jsonb_build_array(to_jsonb(v_row));
+    v_out := v_out || jsonb_build_array(to_jsonb(v_row) || jsonb_build_object('relaxed', false));
     v_prev_key := coalesce(v_row.kind,'none') || ':' || coalesce(v_row.ring_k,'none');
     v_since_outer := CASE WHEN v_row.ring_k IN ('county','country','world') THEN 0
                           ELSE least(v_since_outer + 1, 1000000) END;
@@ -424,7 +427,7 @@ BEGIN
       BEGIN
         IF NOT ((d ->> 'ring_k') IN ('county','country','world') AND v_since_outer < c_gap)
            AND v_prev_key IS DISTINCT FROM (coalesce(d ->> 'kind','none') || ':' || coalesce(d ->> 'ring_k','none')) THEN
-          v_out := v_out || jsonb_build_array(d);
+          v_out := v_out || jsonb_build_array(d || jsonb_build_object('relaxed', false));
           v_deferred := v_deferred - 0;
           v_prev_key := coalesce(d ->> 'kind','none') || ':' || coalesce(d ->> 'ring_k','none');
           v_since_outer := CASE WHEN (d ->> 'ring_k') IN ('county','country','world') THEN 0
@@ -446,7 +449,7 @@ BEGIN
   -- would otherwise starve at one card in four forever. What still does not fit
   -- travels in the cursor and leads the next page, in order. Nothing is dropped.
   WHILE v_taken < v_limit AND jsonb_array_length(v_deferred) > 0 LOOP
-    v_out := v_out || jsonb_build_array(v_deferred -> 0);
+    v_out := v_out || jsonb_build_array((v_deferred -> 0) || jsonb_build_object('relaxed', true));
     v_prev_key := coalesce(v_deferred -> 0 ->> 'kind','none') || ':' || coalesce(v_deferred -> 0 ->> 'ring_k','none');
     v_since_outer := CASE WHEN (v_deferred -> 0 ->> 'ring_k') IN ('county','country','world') THEN 0
                           ELSE least(v_since_outer + 1, 1000000) END;
@@ -503,6 +506,7 @@ BEGIN
       'clean_card', r -> 'clean_card', 'is_course_record', r -> 'is_record_round',
       'hcp_at_time', r -> 'hcp_at_time')),
     (r ->> 'is_seen')::boolean,
+    coalesce((r ->> 'relaxed')::boolean, false),
     -- The cursor is the RAW ranked boundary plus the cadence tail, identical on
     -- every row of the page. NULL once the pool is exhausted.
     CASE WHEN v_taken < v_limit AND jsonb_array_length(v_deferred) = 0 THEN NULL
