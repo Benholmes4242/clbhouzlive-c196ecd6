@@ -19,6 +19,7 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreCard, type CardSize } from './ExploreCard';
+import { monthLabel } from './exploreCopy';
 import { ExploreShelf } from './ExploreShelf';
 import { StandingShelf } from './StandingShelf';
 import { LeadShell, PairShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
@@ -40,6 +41,7 @@ import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCo
 import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding } from './useViewerStanding';
+import { useViewerCourseBests } from './useViewerCourseBests';
 import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
 
 /**
@@ -263,7 +265,7 @@ function MomentsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) 
 
 export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const { sentinelRef: chipSentinelRef, stuck: chipsStuck } = useStickySafeAreaState();
-  const { t } = useTranslation('courses');
+  const { t, i18n } = useTranslation('courses');
   const navigate = useNavigate();
   const opener = useScorecardOpener();
   const openReview = useReviewSheetStore((state) => state.open);
@@ -376,6 +378,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      state distinct from a settled map with no key, so cards never manufacture a
      treatment from hole detail that has not arrived. */
   const shapesMap = useRoundHoleShapes(useMemo(() => visible.map((item) => item.facts.score_id ?? null), [visible]));
+  /* THE VIEWER'S OWN BEST PER COURSE. ONE batched viewer-scoped read for the
+     whole page, never per card, so a record headline can say what the record was
+     measured against. Absent = the comparison is dropped, never invented. */
+  const viewerBests = useViewerCourseBests(userId ?? undefined);
 
   const enriched = useMemo(
     () =>
@@ -858,12 +864,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const pos = cardPos;
           cardPos += 1;
           const size: CardSize = block.kind === 'lead' ? 'lead' : 'std';
+          const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>
               <ExploreCard
                 item={item}
                 size={size}
                 shape={shapesMap === null ? undefined : item.facts.score_id ? shapesMap.get(item.facts.score_id) ?? null : null}
+                viewerBest={own?.gross ?? null}
+                viewerBestSince={monthLabel(own?.playDate ?? null, i18n.language || 'en')}
                 onTap={() => tapCard(item, size, pos)}
                 onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
               />

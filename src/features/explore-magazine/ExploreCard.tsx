@@ -284,6 +284,8 @@ export function ExploreCard({
   item,
   size,
   shape,
+  viewerBest,
+  viewerBestSince,
   onTap,
   onWhoTap,
 }: {
@@ -292,12 +294,21 @@ export function ExploreCard({
   /** Rounds only. A pair never draws a shape: at 124px it cannot be read. */
   /** undefined = unresolved; null = settled without usable hole detail. */
   shape?: HoleShape | null;
+  /** The viewer's own best gross at this course, and the month it was set, both
+   *  from the viewer's own rounds. Absent = the sentence drops the comparison
+   *  rather than inventing one. */
+  viewerBest?: number | null;
+  viewerBestSince?: string | null;
   onTap: () => void;
   onWhoTap?: () => void;
 }) {
   const { t, i18n } = useTranslation('courses');
   const parts = kickerParts(item, t as never);
-  const headline = headlineFor(item, t as never, i18n.language || 'en');
+  const headline = headlineFor(item, t as never, i18n.language || 'en', {
+    holes: shape?.holes,
+    viewerBest,
+    viewerBestSince,
+  });
   const chips = chipsFor(item, t as never);
   const onPhoto = size === 'lead';
 

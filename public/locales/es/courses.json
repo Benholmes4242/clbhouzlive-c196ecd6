@@ -1667,23 +1667,35 @@
         "aroundCountry": "Por {{country}}"
       },
       "headline": {
-        "recordTaken": "Batio el record del campo con {{gross}}.",
-        "ace": "Emboco desde el tee.",
-        "albatross": "Hizo un albatros.",
+        "recordTaken": "{{player}} batio el record del campo con {{gross}}.",
+        "ace": "Un hoyo en uno.",
+        "albatross": "Un albatros.",
         "listNewLow": "{{gross}}, una nueva mejor marca en tu lista.",
         "bogeyFree": "Vuelta sin bogeys con {{gross}}.",
-        "birdieHaul": "Hizo {{count}} birdies.",
-        "roundToPar": "Completo la vuelta en {{gross}}, {{topar}}.",
-        "round": "Completo la vuelta en {{gross}}.",
+        "birdieHaul": "{{count}} birdies en una vuelta de {{gross}}.",
+        "roundToPar": "{{player}} completo la vuelta en {{gross}}, {{topar}}.",
+        "round": "{{player}} completo la vuelta en {{gross}}.",
         "played": "Jugo.",
-        "recordLost": "Te quito el record del campo con {{gross}}.",
+        "recordLost": "{{player}} te quito el record del campo con {{gross}}.",
         "recordLostGap": "Te quito el record del campo con {{gross}}. Tu mejor vuelta queda a {{delta}}.",
-        "rankDown": "Completo la vuelta en {{gross}}. Estas {{n}} de {{of}} ahi.",
+        "rankDown": "{{player}} completo la vuelta en {{gross}}, lo que te deja {{ord}} de los {{of}} que han jugado aqui.",
         "rankDownBy": "Completo la vuelta en {{gross}} y te bajo {{delta}} puestos hasta {{n}} de {{of}}.",
-        "rankUp": "Tu {{gross}} te coloca {{n}} de {{of}}.",
-        "rankUpBy": "Tu {{gross}} te sube {{delta}} puestos hasta {{n}} de {{of}}.",
-        "rankHold": "Tu {{gross}} mantiene {{n}} de {{of}} aqui.",
-        "playedNoChange": "Tu {{gross}} mantiene {{n}} de {{of}} aqui."
+        "rankUp": "Tu {{gross}} es la {{ord}} mejor vuelta jugada aqui.",
+        "rankUpBy": "Tu {{gross}} es la {{ord}} mejor vuelta jugada aqui, {{n}} puestos mas arriba.",
+        "rankHold": "Tu {{gross}} sigue siendo la {{ord}} mejor vuelta que se ha jugado aqui.",
+        "playedNoChange": "{{player}} completo la vuelta en {{gross}}. Tu {{ord}} de {{of}} aqui no cambia.",
+        "recordTakenBest": "{{player}} batio el record del campo con {{gross}}, {{topar}}. Tu mejor vuelta aqui es {{best}}.",
+        "recordTakenToPar": "{{player}} batio el record del campo con {{gross}}, {{topar}}.",
+        "recordOwnToPar": "Batiste el record del campo con {{gross}}, {{topar}}.",
+        "recordOwn": "Batiste el record del campo con {{gross}}.",
+        "recordLostSince": "{{player}} te quito el record del campo con {{gross}}. Tu {{best}} se mantenia desde {{month}}.",
+        "recordLostBest": "{{player}} te quito el record del campo con {{gross}}. Tu mejor vuelta aqui es {{best}}.",
+        "eagleHole": "Un eagle en el hoyo {{ordHole}}, en una vuelta de {{gross}}.",
+        "eagle": "Un eagle, en una vuelta de {{gross}}.",
+        "aceHole": "Un hoyo en uno en el hoyo {{ordHole}}.",
+        "albatrossHole": "Un albatros en el hoyo {{ordHole}}, en una vuelta de {{gross}}.",
+        "albatrossRound": "Un albatros, en una vuelta de {{gross}}.",
+        "listFirst": "{{player}} completo la vuelta en {{gross}}: la mas baja que se ha jugado aqui."
       },
       "standing": {
         "board": "Golpes brutos mas bajos",
@@ -1709,7 +1721,12 @@
         "eventRating": "Valorado ahora {{rating}}"
       },
       "failed": "Esto no se cargo.",
-      "retry": "Reintentar"
+      "retry": "Reintentar",
+      "topar": {
+        "level": "par del campo",
+        "under": "{{n}} bajo par",
+        "over": "{{n}} sobre par"
+      }
     },
     "shelf": {
       "aroundCounty": "Por {{county}}",

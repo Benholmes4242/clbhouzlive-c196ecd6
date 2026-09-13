@@ -1566,7 +1566,7 @@
       },
       "seeAll": "{{count}}件すべて表示",
       "views": "探索ビュー",
-      "aMember": "メンバー",
+      "aMember": "あるメンバー",
       "nothingYet": "あなたのコースに関する情報はまだありません。コースをフォローするかハンディキャップを連携すると、このページがあなた仕様になります。",
       "you": "あなた",
       "aCourse": "あるコース",
@@ -1603,23 +1603,35 @@
         "aroundCountry": "{{country}}周辺"
       },
       "headline": {
-        "recordTaken": "{{gross}}でコースレコードを樹立。",
-        "ace": "ホールインワンを達成。",
-        "albatross": "アルバトロスを達成。",
+        "recordTaken": "{{player}}が{{gross}}でコースレコードを樹立。",
+        "ace": "ホールインワン。",
+        "albatross": "アルバトロス。",
         "listNewLow": "{{gross}}、リスト内の新ベスト。",
         "bogeyFree": "ボギーなしの{{gross}}。",
-        "birdieHaul": "バーディー{{count}}個。",
-        "roundToPar": "{{gross}}（{{topar}}）でラウンド。",
-        "round": "{{gross}}でラウンド。",
+        "birdieHaul": "{{gross}}のラウンドでバーディー{{count}}個。",
+        "roundToPar": "{{player}}が{{gross}}（{{topar}}）でラウンド。",
+        "round": "{{player}}が{{gross}}でラウンド。",
         "played": "プレー。",
-        "recordLost": "{{gross}}であなたのコースレコードを更新。",
+        "recordLost": "{{player}}が{{gross}}であなたのコースレコードを更新。",
         "recordLostGap": "{{gross}}であなたのコースレコードを更新。あなたのベストは{{delta}}差。",
-        "rankDown": "{{gross}}でラウンド。あなたは{{of}}人中{{n}}位。",
+        "rankDown": "{{player}}が{{gross}}でラウンドし、ここでプレーした{{of}}人中{{ord}}番目になりました。",
         "rankDownBy": "{{gross}}でラウンド。あなたは{{delta}}下がって{{of}}人中{{n}}位。",
-        "rankUp": "{{gross}}で{{of}}人中{{n}}位。",
-        "rankUpBy": "{{gross}}で{{delta}}上がって{{of}}人中{{n}}位。",
-        "rankHold": "{{gross}}でここでの{{of}}人中{{n}}位を維持。",
-        "playedNoChange": "{{gross}}でここでの{{of}}人中{{n}}位を維持。"
+        "rankUp": "あなたの{{gross}}は、ここで記録された{{ord}}番目に良いラウンドです。",
+        "rankUpBy": "あなたの{{gross}}は、ここで記録された{{ord}}番目に良いラウンドで、{{n}}つ順位が上がりました。",
+        "rankHold": "あなたの{{gross}}は、ここで記録された{{ord}}番目に良いラウンドのままです。",
+        "playedNoChange": "{{player}}が{{gross}}でラウンド。ここでのあなたの{{of}}人中{{ord}}位は変わりません。",
+        "recordTakenBest": "{{player}}が{{gross}}（{{topar}}）でコースレコードを樹立。ここでのあなたのベストは{{best}}です。",
+        "recordTakenToPar": "{{player}}が{{gross}}（{{topar}}）でコースレコードを樹立。",
+        "recordOwnToPar": "あなたが{{gross}}（{{topar}}）でコースレコードを樹立。",
+        "recordOwn": "あなたが{{gross}}でコースレコードを樹立。",
+        "recordLostSince": "{{player}}が{{gross}}であなたのコースレコードを更新。あなたの{{best}}は{{month}}から守られていました。",
+        "recordLostBest": "{{player}}が{{gross}}であなたのコースレコードを更新。ここでのあなたのベストは{{best}}です。",
+        "eagleHole": "{{gross}}のラウンド、{{ordHole}}番でイーグル。",
+        "eagle": "{{gross}}のラウンドでイーグル。",
+        "aceHole": "{{ordHole}}番でホールインワン。",
+        "albatrossHole": "{{gross}}のラウンド、{{ordHole}}番でアルバトロス。",
+        "albatrossRound": "{{gross}}のラウンドでアルバトロス。",
+        "listFirst": "{{player}}が{{gross}}でラウンド。ここでの最少ストロークです。"
       },
       "standing": {
         "board": "ベストグロス",
@@ -1645,7 +1657,12 @@
         "eventRating": "新たな評価 {{rating}}"
       },
       "failed": "読み込めませんでした。",
-      "retry": "再試行"
+      "retry": "再試行",
+      "topar": {
+        "level": "イーブンパー",
+        "under": "{{n}}アンダー",
+        "over": "{{n}}オーバー"
+      }
     },
     "shelf": {
       "aroundCounty": "{{county}}周辺",

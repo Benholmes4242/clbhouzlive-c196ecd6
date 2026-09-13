@@ -18,6 +18,19 @@ type T = (key: string, fallback?: string, vars?: Record<string, unknown>) => str
 
 export const MINUS = '\u2212';
 
+/** "June 2025" in the viewer's locale. Null in, null out — a headline that
+ *  cannot date a fact drops the clause rather than guessing a month. */
+export function monthLabel(iso: string | null | undefined, locale: string): string | null {
+  if (!iso) return null;
+  const when = new Date(iso);
+  if (Number.isNaN(when.getTime())) return null;
+  try {
+    return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(when);
+  } catch {
+    return new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' }).format(when);
+  }
+}
+
 /** "-6" is a hyphen; a score under par takes the true minus. */
 export function toParLabel(toPar: number | null | undefined): string | null {
   if (toPar == null || !Number.isFinite(toPar)) return null;
@@ -87,14 +100,75 @@ export function kickerParts(item: StreamItem, t: T): string[] {
 }
 
 /**
+ * SPOKEN TO-PAR. The chip already carries the symbolic form (+2, U+2212 3), so a
+ * headline speaks it: "three under", "level par", "two over". English spells the
+ * figure; every other shipped locale takes the plain number, the settled rule
+ * from the ordinal helper — an invented number-word system per locale is worse
+ * than a digit.
+ */
+const EN_NUMBER_WORDS = [
+  'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
+  'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen',
+];
+
+export function spokenNumber(value: number, locale: string): string {
+  if (locale.toLowerCase() !== 'en') return String(value);
+  return EN_NUMBER_WORDS[value] ?? String(value);
+}
+
+export function spokenToPar(toPar: number | null | undefined, t: T, locale: string): string | null {
+  if (toPar == null || !Number.isFinite(toPar)) return null;
+  if (toPar === 0) return t('amateur.stream.topar.level', 'level par');
+  const n = spokenNumber(Math.abs(toPar), locale);
+  return toPar < 0
+    ? t('amateur.stream.topar.under', '{{n}} under', { n })
+    : t('amateur.stream.topar.over', '{{n}} over', { n });
+}
+
+/** The hole a single notable score happened on, read from the round's own hole
+ *  rows. NEVER guessed: without hole detail the sentence drops the hole rather
+ *  than naming one. */
+function holeFor(holes: HoleRow[] | undefined, kind: 'ace' | 'albatross' | 'eagle'): number | null {
+  if (!holes || holes.length === 0) return null;
+  for (const h of holes) {
+    if (h.strokes == null) continue;
+    if (kind === 'ace' && h.strokes === 1) return h.holeNo;
+    if (h.par == null) continue;
+    const diff = h.strokes - h.par;
+    if (kind === 'albatross' && diff === -3) return h.holeNo;
+    if (kind === 'eagle' && diff === -2) return h.holeNo;
+  }
+  return null;
+}
+
+interface HoleRow { holeNo: number; par: number | null; strokes: number | null }
+
+export interface HeadlineContext {
+  /** The round's played holes, so a single notable score can name its hole. */
+  holes?: HoleRow[];
+  /** The viewer's own best gross at this course, read from their own rounds. */
+  viewerBest?: number | null;
+  /** Month the viewer's best was set, e.g. "June 2025". */
+  viewerBestSince?: string | null;
+}
+
+/**
  * THE HEADLINE. Composed here from typed fields, never returned as prose by a
  * query, so six locales stay honest.
  *
- * PHASE A CANNOT SAY "your 71 is now six behind": the viewer's own best at
- * another member's course is Phase B's get_viewer_standing. So a record card
- * states the fact and stops rather than inventing the gap.
+ * TWO RULES GOVERN EVERY SENTENCE BELOW (and the locale file repeats them):
+ *  (a) NEVER REPEAT THE KICKER, THE WHO-LINE OR THE CHIP. The kicker names the
+ *      course and the ring, the who-line names the player and the date, the chip
+ *      carries gross and to-par. Restating any of them spends two lines on
+ *      nothing.
+ *  (b) A FIGURE MEANS NOTHING WITHOUT WHAT IT IS MEASURED AGAINST. "75" is
+ *      arbitrary; "75, three under" is an achievement. "8 of 18" is a
+ *      coordinate; "the 8th best round anyone has played here" is a fact.
+ *
+ * A sentence whose figures are missing falls through to a shorter honest one
+ * rather than printing a sentence with a hole in it.
  */
-export function headlineFor(item: StreamItem, t: T, locale = 'en'): string {
+export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: HeadlineContext = {}): string {
   const course = item.subject?.course_name?.trim() || t('amateur.stream.aCourse', 'a course');
 
   if (item.kind === 'story') return item.facts.headline?.trim() || '';
@@ -108,100 +182,162 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en'): string {
 
   /* ROUNDS — the consequence carries the sentence. */
   const gross = item.facts.gross;
-  const toPar = toParLabel(item.facts.to_par);
+  const topar = spokenToPar(item.facts.to_par, t, locale);
   const c = item.consequence;
-  const rank = c?.n != null ? standingOrdinal(c.n, locale) : null;
+  const ord = c?.n != null ? standingOrdinal(c.n, locale) : null;
+  const isOwn = !!item.who?.is_viewer;
+  const player = isOwn
+    ? t('amateur.stream.you', 'You')
+    : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
 
-  /**
-   * THE CONSEQUENCE HEADLINES (§3d, PHASE B2). Every figure in these sentences
-   * was READ, not derived: n and of come from get_viewer_standing, where `of` is
-   * the matched field the Champions tab shows, and the record fact comes from
-   * the record book. A kind whose figures are missing falls through to the plain
-   * round sentence rather than printing a sentence with a hole in it.
-   */
   if (c?.kind === 'record_lost' && gross != null) {
-    if (c.delta != null && c.delta > 0) {
+    const best = ctx.viewerBest ?? null;
+    if (best != null && ctx.viewerBestSince) {
       return t(
-        'amateur.stream.headline.recordLostGap',
-        'Took your course record with a {{gross}}. Your best is {{delta}} behind.',
-        { gross, delta: c.delta },
+        'amateur.stream.headline.recordLostSince',
+        '{{player}} took your course record with a {{gross}}. Your {{best}} had stood since {{month}}.',
+        { player, gross, best, month: ctx.viewerBestSince },
       );
     }
-    return t('amateur.stream.headline.recordLost', 'Took your course record with a {{gross}}.', { gross });
+    if (best != null) {
+      return t(
+        'amateur.stream.headline.recordLostBest',
+        '{{player}} took your course record with a {{gross}}. Your best here is {{best}}.',
+        { player, gross, best },
+      );
+    }
+    return t('amateur.stream.headline.recordLost', '{{player}} took your course record with a {{gross}}.', {
+      player,
+      gross,
+    });
   }
   if (c?.kind === 'rank_down' && c.n != null && c.of != null && gross != null) {
-    if (c.delta != null && c.delta > 0) {
-      return t(
-        'amateur.stream.headline.rankDownBy',
-        'Went round in {{gross}} and pushed you down {{delta}} to {{n}} of {{of}}.',
-         { gross, delta: c.delta, n: rank, of: c.of },
-      );
-    }
     return t(
       'amateur.stream.headline.rankDown',
-      'Went round in {{gross}}. You are {{n}} of {{of}} there.',
-       { gross, n: rank, of: c.of },
+      '{{player}} went round in {{gross}}, which puts you {{ord}} of the {{of}} who have played here.',
+      { player, gross, ord, of: c.of },
     );
   }
-  if (c?.kind === 'rank_up' && c.n != null && c.of != null && gross != null) {
+  if (c?.kind === 'rank_up' && c.n != null && gross != null) {
     if (c.delta != null && c.delta > 0) {
       return t(
         'amateur.stream.headline.rankUpBy',
-        'Your {{gross}} moves you up {{delta}} to {{n}} of {{of}}.',
-         { gross, delta: c.delta, n: rank, of: c.of },
+        'Your {{gross}} is the {{ord}} best round played here, up {{n}} places.',
+        { gross, ord, n: c.delta },
       );
     }
-    return t('amateur.stream.headline.rankUp', 'Your {{gross}} takes you to {{n}} of {{of}}.', {
+    return t('amateur.stream.headline.rankUp', 'Your {{gross}} is the {{ord}} best round played here.', {
       gross,
-       n: rank,
-      of: c.of,
+      ord,
     });
   }
-  if (c?.kind === 'rank_hold' && c.n != null && c.of != null && gross != null) {
-    return t('amateur.stream.headline.rankHold', 'Your {{gross}} holds {{n}} of {{of}} here.', {
-      gross,
-       n: rank,
-      of: c.of,
-    });
+  if (c?.kind === 'rank_hold' && c.n != null && gross != null) {
+    return t(
+      'amateur.stream.headline.rankHold',
+      'Your {{gross}} is still the {{ord}} best round anyone has played here.',
+      { gross, ord },
+    );
   }
 
   if ((item.facts.is_course_record || c?.kind === 'record_taken') && gross != null) {
-    return t('amateur.stream.headline.recordTaken', 'Took the course record with a {{gross}}.', { gross });
-  }
-
-  if (item.facts.holes_in_one && item.facts.holes_in_one > 0) {
-    return t('amateur.stream.headline.ace', 'Holed out from the tee.');
-  }
-  if (item.facts.albatrosses && item.facts.albatrosses > 0) {
-    return t('amateur.stream.headline.albatross', 'Made an albatross.');
-  }
-  if (c?.kind === 'list_new_low' && gross != null) {
-    return t('amateur.stream.headline.listNewLow', '{{gross}}, a new low on your list.', { gross });
-  }
-  if (item.facts.clean_card && gross != null) {
-    return t('amateur.stream.headline.bogeyFree', 'Went bogey free for {{gross}}.', { gross });
-  }
-  if (item.facts.birdies != null && item.facts.birdies >= 5 && gross != null) {
-    return t('amateur.stream.headline.birdieHaul', 'Made {{count}} birdies.', { count: item.facts.birdies });
-  }
-  /* PLAYED, AND THE BOARD DID NOT MOVE (§3a). Only where the standing figures
-     exist; otherwise the plain round sentence, which claims nothing. */
-  if (c?.kind === 'played_nochange' && c.n != null && c.of != null && gross != null && item.who?.is_viewer) {
-    return t('amateur.stream.headline.playedNoChange', 'Your {{gross}} still holds {{n}} of {{of}} here.', {
+    if (isOwn || c?.held_by_viewer) {
+      return topar
+        ? t('amateur.stream.headline.recordOwnToPar', 'You took the course record with a {{gross}}, {{topar}}.', {
+            gross,
+            topar,
+          })
+        : t('amateur.stream.headline.recordOwn', 'You took the course record with a {{gross}}.', { gross });
+    }
+    const best = ctx.viewerBest ?? null;
+    if (topar && best != null) {
+      return t(
+        'amateur.stream.headline.recordTakenBest',
+        '{{player}} took the course record with a {{gross}}, {{topar}}. Your best here is {{best}}.',
+        { player, gross, topar, best },
+      );
+    }
+    if (topar) {
+      return t(
+        'amateur.stream.headline.recordTakenToPar',
+        '{{player}} took the course record with a {{gross}}, {{topar}}.',
+        { player, gross, topar },
+      );
+    }
+    return t('amateur.stream.headline.recordTaken', '{{player}} took the course record with a {{gross}}.', {
+      player,
       gross,
-       n: rank,
-      of: c.of,
     });
   }
-  if (gross != null && toPar) {
 
-    return t('amateur.stream.headline.roundToPar', 'Went round in {{gross}}, {{topar}}.', {
+  /* ONE NOTABLE SCORE NAMES ITS HOLE when the round's own hole rows say which.
+     THE ACE'S "their first" SENTENCE IS NOT BUILT: it needs the player's whole
+     hole-in-one history, which is not on this card and cannot be read per card,
+     and an invented "first" on a second ace is exactly the false claim this page
+     exists to avoid. */
+  if (item.facts.holes_in_one && item.facts.holes_in_one > 0) {
+    const hole = holeFor(ctx.holes, 'ace');
+    return hole != null
+      ? t('amateur.stream.headline.aceHole', 'A hole in one on the {{ordHole}}.', {
+          ordHole: standingOrdinal(hole, locale),
+        })
+      : t('amateur.stream.headline.ace', 'A hole in one.');
+  }
+  if (item.facts.albatrosses && item.facts.albatrosses > 0) {
+    const hole = holeFor(ctx.holes, 'albatross');
+    if (hole != null && gross != null) {
+      return t('amateur.stream.headline.albatrossHole', 'An albatross on the {{ordHole}}, in a round of {{gross}}.', {
+        ordHole: standingOrdinal(hole, locale),
+        gross,
+      });
+    }
+    return gross != null
+      ? t('amateur.stream.headline.albatrossRound', 'An albatross, in a round of {{gross}}.', { gross })
+      : t('amateur.stream.headline.albatross', 'An albatross.');
+  }
+  if (item.facts.eagles && item.facts.eagles > 0 && gross != null) {
+    const hole = holeFor(ctx.holes, 'eagle');
+    return hole != null
+      ? t('amateur.stream.headline.eagleHole', 'An eagle on the {{ordHole}}, in a round of {{gross}}.', {
+          ordHole: standingOrdinal(hole, locale),
+          gross,
+        })
+      : t('amateur.stream.headline.eagle', 'An eagle, in a round of {{gross}}.', { gross });
+  }
+  if ((c?.kind === 'list_new_low' || c?.kind === 'list_first') && gross != null) {
+    return t(
+      'amateur.stream.headline.listFirst',
+      '{{player}} went round in {{gross}} \u2014 the lowest anyone has played here.',
+      { player, gross },
+    );
+  }
+  if (item.facts.clean_card && gross != null) {
+    return t('amateur.stream.headline.bogeyFree', 'Not a single bogey, in a round of {{gross}}.', { gross });
+  }
+  if (item.facts.birdies != null && item.facts.birdies >= 5 && gross != null) {
+    return t('amateur.stream.headline.birdieHaul', '{{count}} birdies in a round of {{gross}}.', {
+      count: spokenNumber(item.facts.birdies, locale),
       gross,
-      topar: toPar,
+    });
+  }
+  if (c?.kind === 'played_nochange' && c.n != null && c.of != null && gross != null && isOwn) {
+    return t(
+      'amateur.stream.headline.playedNoChange',
+      '{{player}} went round in {{gross}}. Your {{ord}} of {{of}} here is unchanged.',
+      { player, gross, ord, of: c.of },
+    );
+  }
+  if (gross != null && topar) {
+    return t('amateur.stream.headline.roundToPar', '{{player}} went round in {{gross}}, {{topar}}.', {
+      player,
+      gross,
+      topar,
     });
   }
   if (gross != null) {
-    return t('amateur.stream.headline.round', 'Went round in {{gross}}.', { gross });
+    /* DELIBERATELY THE SHORTEST LINE ON THE PAGE. The chip already says +16;
+       there is genuinely nothing to add, which is not the same fault as a
+       sentence missing a fact. */
+    return t('amateur.stream.headline.round', '{{player}} went round in {{gross}}.', { player, gross });
   }
   return t('amateur.stream.headline.played', 'Played.');
 }
