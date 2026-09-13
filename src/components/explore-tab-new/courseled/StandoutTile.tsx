@@ -59,6 +59,14 @@ interface Props {
   subline?: string | null;
   /** Fixed-width trailing slot on the WHO row (the reaction control). */
   trailing?: React.ReactNode;
+  /**
+   * HORIZONTAL RAILS ONLY (BRIEF_EXPLORE_BOARD_SELECTOR §2): reserve the tallest
+   * wording case — two lines of name and two of fact — so every tile in a rail
+   * is the same height whatever the course or member name does. Omitted
+   * everywhere else, which keeps vertical lists free to size to content.
+   */
+  reserveTwoLines?: boolean;
+
   /** Anything below the detail line ("+n more here"). */
   footer?: React.ReactNode;
   /**
