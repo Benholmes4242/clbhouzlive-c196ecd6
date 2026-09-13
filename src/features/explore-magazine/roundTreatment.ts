@@ -3,6 +3,7 @@ import type { StreamItem } from './streamItem';
 
 export type RoundTreatment = 'shape' | 'ticks' | 'bar' | 'none';
 export const MIN_SHAPE_SPAN = 3;
+export const MIN_TICK_OFF_PAR = 3;
 
 function holeDeltas(shape: HoleShape | null | undefined): number[] {
   if (!shape) return [];
@@ -16,6 +17,10 @@ export function cumulativeSpan(shape: HoleShape | null | undefined): number | nu
   return Math.max(...shape.series) - Math.min(...shape.series);
 }
 
+export function offParHoleCount(shape: HoleShape | null | undefined): number {
+  return holeDeltas(shape).filter((delta) => delta !== 0).length;
+}
+
 /** First-match rule for the Explore round visual. No reads happen here. */
 export function treatmentFor(
   item: StreamItem,
@@ -24,11 +29,15 @@ export function treatmentFor(
   const { facts } = item;
   const deltas = holeDeltas(shape);
 
-  // One override clause: both rare outcomes demand the hole-level tick treatment.
-  if ((facts.holes_in_one ?? 0) > 0 || (facts.albatrosses ?? 0) > 0) return 'ticks';
+  // A quiet ace remains a single, earned gold mark. Other notable holes must
+  // form a readable row and otherwise fall through to the next treatment.
+  if ((facts.holes_in_one ?? 0) > 0) return 'ticks';
   const shapeQualifies = (cumulativeSpan(shape) ?? -1) >= MIN_SHAPE_SPAN;
   if (((facts.to_par ?? 0) < 0 || facts.is_course_record === true) && shapeQualifies) return 'shape';
-  if (deltas.some((delta) => delta <= -2 || delta >= 2)) return 'ticks';
+  const ticksQualify = offParHoleCount(shape) >= MIN_TICK_OFF_PAR;
+  if (((facts.albatrosses ?? 0) > 0 || deltas.some((delta) => delta <= -2 || delta >= 2)) && ticksQualify) {
+    return 'ticks';
+  }
 
   const derivedClean =
     facts.clean_card == null && deltas.length > 0
