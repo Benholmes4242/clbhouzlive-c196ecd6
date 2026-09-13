@@ -55,6 +55,8 @@ export interface ViewerStanding {
    * the request, so a gross rank is never labelled net.
    */
   board: StandingBoard;
+  /** ADDITIVE. Lets the shelf's failure state offer a retry. */
+  retry: () => void;
 }
 
 const EMPTY: StandingRow[] = [];
