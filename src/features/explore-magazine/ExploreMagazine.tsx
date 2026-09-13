@@ -376,6 +376,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      state distinct from a settled map with no key, so cards never manufacture a
      treatment from hole detail that has not arrived. */
   const shapesMap = useRoundHoleShapes(useMemo(() => visible.map((item) => item.facts.score_id ?? null), [visible]));
+  /* THE VIEWER'S OWN BEST PER COURSE. ONE batched viewer-scoped read for the
+     whole page, never per card, so a record headline can say what the record was
+     measured against. Absent = the comparison is dropped, never invented. */
+  const viewerBests = useViewerCourseBests(userId ?? undefined);
 
   const enriched = useMemo(
     () =>
