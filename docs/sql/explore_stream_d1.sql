@@ -343,7 +343,9 @@ BEGIN
     scored AS (
       SELECT g.*,
         (g.seen_at IS NOT NULL AND g.arrived_at IS NOT NULL AND g.arrived_at < g.seen_at) AS is_seen,
-        coalesce(w.weight, 0) AS cons_w,
+        -- The consequence ORDER *is* the weighting: 1.0 for the heaviest kind,
+        -- descending in equal steps, never 0. Identical to consequenceWeight().
+        coalesce(w.rank::numeric / 14, 0) AS cons_w,
         CASE g.ring_k WHEN 'own' THEN 1 WHEN 'club' THEN 0.8 WHEN 'county' THEN 0.55
              WHEN 'country' THEN 0.35 WHEN 'world' THEN 0.2 ELSE 0 END AS ring_w,
         CASE
@@ -364,41 +366,25 @@ BEGIN
         ('review_on_list',6),('review_played',5),('circle_round',4),
         ('played_nochange',3),('backlog_own_best',2),('platform_notable',1)
       ) AS w(kind, rank) ON w.kind = g.cons_kind
-      LEFT JOIN LATERAL (SELECT (w.rank::numeric / 14) AS weight) w2 ON true
-      LEFT JOIN LATERAL (SELECT (w.rank::numeric / 14) AS weight) w ON true
-    )
-    SELECT
-      s.cid, s.kind, s.ring_k, s.cons_kind, s.is_seen,
-      (
-        (c_w_cons * s.cons_w * CASE WHEN s.is_seen THEN c_seen ELSE 1 END)
-        + (c_w_ring * s.ring_w * CASE WHEN s.is_seen THEN c_seen ELSE 1 END)
-        + (c_w_fresh * power(0.5, greatest(0, extract(epoch FROM (now() - coalesce(s.arrived_at, now()))) / 3600.0) / c_half))
-        + (c_w_not * s.notable)
-      ) * CASE WHEN s.kind = 'story' THEN c_story ELSE 1 END AS sc,
-      s.*
-    FROM scored s
-    WHERE (
-      v_cur_s IS NULL
-      OR (
+    ),
+    ranked AS (
+      SELECT s.*,
         (
           (c_w_cons * s.cons_w * CASE WHEN s.is_seen THEN c_seen ELSE 1 END)
           + (c_w_ring * s.ring_w * CASE WHEN s.is_seen THEN c_seen ELSE 1 END)
           + (c_w_fresh * power(0.5, greatest(0, extract(epoch FROM (now() - coalesce(s.arrived_at, now()))) / 3600.0) / c_half))
           + (c_w_not * s.notable)
-        ) * CASE WHEN s.kind = 'story' THEN c_story ELSE 1 END < v_cur_s
-        OR (
-          (
-            (c_w_cons * s.cons_w * CASE WHEN s.is_seen THEN c_seen ELSE 1 END)
-            + (c_w_ring * s.ring_w * CASE WHEN s.is_seen THEN c_seen ELSE 1 END)
-            + (c_w_fresh * power(0.5, greatest(0, extract(epoch FROM (now() - coalesce(s.arrived_at, now()))) / 3600.0) / c_half))
-            + (c_w_not * s.notable)
-          ) * CASE WHEN s.kind = 'story' THEN c_story ELSE 1 END = v_cur_s
-          AND s.cid > v_cur_i
-        )
-      )
+        ) * CASE WHEN s.kind = 'story' THEN c_story ELSE 1 END AS sc
+      FROM scored s
     )
-    ORDER BY sc DESC, s.cid ASC
+    SELECT q.*
+    FROM ranked q
+    WHERE v_cur_s IS NULL
+       OR q.sc < v_cur_s
+       OR (q.sc = v_cur_s AND q.cid > v_cur_i)
+    ORDER BY q.sc DESC, q.cid ASC
     LIMIT v_limit * 6
+
   LOOP
     -- THE CADENCE PASS, POSITIONAL, exactly as the client ships it.
     -- 1. an outer-ring card cannot sit within c_gap of the previous one: it is
