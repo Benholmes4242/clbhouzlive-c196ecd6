@@ -570,7 +570,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             value={scoreScope}
             onChange={(next) => {
               const value = next as ScoreScope;
-              analyticsEvents.track('amateur_scope_changed', { view: 'scores', from: scoreScope, to: value });
+              analyticsEvents.track('amateur_scope_changed', { view, from: scoreScope, to: value });
               scoreScopeChosen.current = true;
               setScoreScope(value);
               setRevealed(STREAM_PAGE_SIZE);
@@ -632,7 +632,28 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       ) : null}
 
-      {view !== 'scores' && stream.isFetched && stream.items.length === 0 ? (
+      {singleType && source.isFetched && source.items.length === 0 ? (
+        /* §5d NEVER A BLANK VIEW. Where the shelves carry content they render and
+           the sentence stays away; where the scope is empty of EVERYTHING there
+           is exactly ONE sentence, and the scope row above it stays so the
+           member can widen. */
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
+          {shelves.map((shelf) => (
+            <div key={`empty-shelf:${shelf}`}>{renderShelf(shelf, 0)}</div>
+          ))}
+          {!shelvesHaveContent ? (
+            <div style={{ paddingInline: 20, marginTop: 8 }}>
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
+                {view === 'courses'
+                  ? t('amateur.stream.empty.courses', 'No courses in {{scope}} yet.', { scope: scopeName })
+                  : t('amateur.stream.empty.reviews', 'No reviews in {{scope}} yet.', { scope: scopeName })}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {!singleType && view !== 'scores' && stream.isFetched && stream.items.length === 0 ? (
         /* §6h THE ONE SENTENCE ON THE PAGE. No heading, no placeholder card. */
         <div style={{ paddingInline: 20, marginTop: 8 }}>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
