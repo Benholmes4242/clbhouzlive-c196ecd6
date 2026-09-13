@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { StandoutTile } from '@/components/explore-tab-new/courseled/StandoutTile';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -45,6 +46,7 @@ export function CourseShelf({
   onDepart: () => void;
 }) {
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
 
   if (!isFetched) return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
   /* AN EMPTY SHELF RENDERS NOTHING — no heading over nothing (§3e). */
@@ -78,7 +80,7 @@ export function CourseShelf({
             whenLabel=""
             who=""
             isOwn={false}
-            detail={sublineFor(row)}
+            detail={sublineFor(row, t)}
             onPress={() => {
               analyticsEvents.track('amateur_shelf_tile_tapped', { kind, pos });
               onDepart();
@@ -91,12 +93,20 @@ export function CourseShelf({
   );
 }
 
-/** area, then the sample the figure came from — never a figure with no basis. */
-function sublineFor(row: CourseShelfRow): string {
+/** area, then the sample the figure came from — never a figure with no basis.
+ *  THE INTERPUNCT IS NEVER IN A STRING: the parts are localised, the joiner is
+ *  not translatable. */
+function sublineFor(
+  row: CourseShelfRow,
+  t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string,
+): string {
   const parts: string[] = [];
   if (row.area) parts.push(row.area);
-  if (row.ratingCount > 0) parts.push(`${row.ratingCount} ratings`);
-  else if (row.rounds > 0) parts.push(`${row.rounds} rounds`);
+  if (row.ratingCount > 0) {
+    parts.push(t('amateur.stream.ratingCount', '{{count}} ratings', { count: row.ratingCount }));
+  } else if (row.rounds > 0) {
+    parts.push(t('amateur.stream.roundCount', '{{count}} rounds', { count: row.rounds }));
+  }
   return parts.join(' \u00B7 ');
 }
 
