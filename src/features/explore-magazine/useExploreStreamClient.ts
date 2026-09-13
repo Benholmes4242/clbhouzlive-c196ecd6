@@ -200,7 +200,10 @@ export function useExploreStreamClient(
     windowDays: 14,
     oneRoundPerMember: false,
   });
-  const reviews = useLatestReviews(12, view === 'all' || view === 'reviews');
+  /* §5c THE REVIEWS VIEW READS DEEPER THAN THE MIXED STREAM, because it is
+     filtered by scope afterwards: a twelve-row read would empty a club scope on
+     22-member data. The mixed stream keeps its twelve exactly as B2 shipped. */
+  const reviews = useLatestReviews(view === 'reviews' ? 60 : 12, view === 'all' || view === 'reviews');
   const stories = useAmateurStories(null);
   const media = useDiscoverMediaPreview(wantsWatch);
   const moments = useMomentsOfTheWeek(30, { enabled: view === 'watch', candidateLimit: 72 });
@@ -242,7 +245,15 @@ export function useExploreStreamClient(
     () => roundRows.map((row) => row.course_id).filter((id): id is string => !!id),
     [roundRows],
   );
-  const roundCourseMeta = useCourseCardMeta(roundCourseIds);
+  /* §5c THE REVIEW COURSES JOIN THE SAME METADATA READ. Scope and ring are
+     decided from the canonical club id and exact region, exactly as rounds are —
+     the review row's own course_region is a display string, not a scope key. */
+  const metaCourseIds = useMemo(() => {
+    const ids = new Set(roundCourseIds);
+    if (view === 'all' || view === 'reviews') for (const review of reviews.reviews ?? []) ids.add(review.courseId);
+    return [...ids];
+  }, [roundCourseIds, reviews.reviews, view]);
+  const roundCourseMeta = useCourseCardMeta(metaCourseIds);
   const records = useCourseRecordSignal(viewerId, roundCourseIds);
 
   const lastSeen = useMemo(() => readDiscoverLastSeen(viewerId), [viewerId]);
@@ -356,7 +367,19 @@ export function useExploreStreamClient(
     }
 
     if (view === 'all' || view === 'reviews') {
+      const geography = scores?.geography;
       for (const review of reviews.reviews ?? []) {
+        const course = roundCourseMeta.data?.get(review.courseId) ?? null;
+        /* §5c THE SCOPE ROW FILTERS THE REVIEWS VIEW, and nothing else: the
+           mixed stream's reviews are unscoped, as B2 shipped them. */
+        if (view === 'reviews') {
+          const active = scores?.active ?? 'world';
+          const inScope = active === 'world'
+            || (active === 'club' && !!geography?.primaryClubId && course?.clubId === geography.primaryClubId)
+            || (active === 'county' && !!geography?.county && course?.rawRegion === geography.county)
+            || (active === 'country' && !!geography?.country && course?.subCountry === geography.country);
+          if (!inScope) continue;
+        }
         const yours = context.ratings.get(review.courseId) ?? null;
         const consequence: Consequence | null = yours != null
           ? { kind: 'review_disagree', theirs: review.rating, yours }
@@ -365,10 +388,21 @@ export function useExploreStreamClient(
             : review.rating >= 9
               ? { kind: 'platform_notable' }
               : null;
+        /* THE RING IS THE SAME LADDER THE ROUNDS USE — nearest wins, and an
+           unresolved course carries no ring rather than a guessed world one. */
+        const ring: StreamItem['ring'] = geography?.primaryClubId && course?.clubId === geography.primaryClubId
+          ? 'club'
+          : geography?.county && course?.rawRegion === geography.county
+            ? 'county'
+            : geography?.country && course?.subCountry === geography.country
+              ? 'country'
+              : course
+                ? 'world'
+                : null;
         out.push({
           id: `review:${review.reviewId}`,
           kind: 'review',
-          ring: null,
+          ring,
           lane: 'news',
           score: 0,
           consequence,
@@ -508,7 +542,9 @@ export function useExploreStreamClient(
     /* THE ORDER IS: score, then cadence (kind/consequence AND ring), then the
        positional outer-ring cap. The cap runs LAST because it is a positional
        guarantee, and a score damp could not make one. */
-    return capOuterRing(cadence(out, view === 'scores'));
+    /* §5c A SINGLE-KIND VIEW CADENCES BY CONSEQUENCE, since every card's kind is
+       the same and the kind key would make the pass a no-op. */
+    return capOuterRing(cadence(out, view === 'scores' || view === 'reviews'));
   }, [roundRows, circleScoreIds, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch, roundCourseMeta.data, scores?.active, scores?.geography]);
 
   /* READINESS IS isFetched, NEVER isLoading: a disabled query reports isLoading
@@ -521,6 +557,7 @@ export function useExploreStreamClient(
     contextFetched &&
     (!wantsRounds || (circle.isFetched && everyone.isFetched && standing.isFetched && bests.isFetched && records.isFetched
       && (view !== 'scores' || roundCourseIds.length === 0 || roundCourseMeta.isFetched))) &&
+    (view !== 'reviews' || metaCourseIds.length === 0 || roundCourseMeta.isFetched) &&
     (view !== 'all' && view !== 'reviews' ? true : !reviews.isPending) &&
     (view !== 'all' ? true : !stories.isPending) &&
     (!wantsWatch || media.isFetched) &&
