@@ -863,12 +863,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const pos = cardPos;
           cardPos += 1;
           const size: CardSize = block.kind === 'lead' ? 'lead' : 'std';
+          const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>
               <ExploreCard
                 item={item}
                 size={size}
                 shape={shapesMap === null ? undefined : item.facts.score_id ? shapesMap.get(item.facts.score_id) ?? null : null}
+                viewerBest={own?.gross ?? null}
+                viewerBestSince={monthLabel(own?.playDate ?? null, i18n.language || 'en')}
                 onTap={() => tapCard(item, size, pos)}
                 onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
               />
