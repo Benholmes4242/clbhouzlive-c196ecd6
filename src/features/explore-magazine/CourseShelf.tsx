@@ -77,6 +77,7 @@ export function CourseShelf({
             imageUrl={row.imageUrl}
             region={row.area}
             photo={TILE.h}
+              reserveTwoLines
             figure={
               row.rank != null
                 ? `#${row.rank}`

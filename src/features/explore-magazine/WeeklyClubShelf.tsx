@@ -72,6 +72,7 @@ export function WeeklyClubShelf({
               imageUrl={course?.imageUrl ?? null}
               region={null}
               photo={TILE.h}
+              reserveTwoLines
               figure={row.gross_score != null ? String(row.gross_score) : null}
               unit={toParLabel(toPar) ?? undefined}
               whenLabel={relativeDay(row.play_date) ?? ''}
