@@ -61,8 +61,8 @@
     },
     "scoringKey": {
       "title": "Scoring key",
-      "ace": "Ace",
-      "albatross": "Albatross",
+      "ace": "Emboco desde el tee.",
+      "albatross": "Hizo un albatros.",
       "eagle": "Eagle",
       "birdie": "Birdie",
       "bogey": "Bogey",
@@ -233,7 +233,7 @@
     "avgRating": "Avg: {{rating}}",
     "xpValue": "{{xp}} XP",
     "rate": "Rate",
-    "played": "Played",
+    "played": "Jugo.",
     "logged": "Logged: {{date}}",
     "friendsPlayedCount_one": "{{count}} friend played",
     "friendsPlayedCount_other": "{{count}} friends played",
@@ -1093,7 +1093,7 @@
     "playersTied_one": "{{count}} jugadores empatados",
     "row": {
       "underPar": "Round under par",
-      "bogeyFree": "Bogey-free round",
+      "bogeyFree": "Vuelta sin bogeys con {{gross}}.",
       "moreHere_one": "+{{count}} more here",
       "moreHere_other": "+{{count}} more here"
     },
@@ -1129,7 +1129,7 @@
       "birdies_other": "{{count}} birdies"
     },
     "tour": {
-      "round": "Round",
+      "round": "Completo la vuelta en {{gross}}.",
       "thru": "Thru",
       "thruF": "F",
       "second": "Second",
@@ -1224,7 +1224,7 @@
         "crown": "Récord del campo",
         "bogeyFree": "Ronda sin bogeys",
         "underPar": "Ronda bajo par",
-        "birdieHaul": "Racha de birdies"
+        "birdieHaul": "Hizo {{count}} birdies."
       }
     },
     "pb": {
@@ -1667,23 +1667,23 @@
         "aroundCountry": "Por {{country}}"
       },
       "headline": {
-        "recordTaken": "{{name}} bate el record del campo en {{course}} con {{gross}}.",
-        "ace": "{{name}} mete la bola desde el tee en {{course}}.",
-        "albatross": "{{name}} hace un albatros en {{course}}.",
-        "listNewLow": "{{gross}} en {{course}}, un campo de tu lista.",
-        "bogeyFree": "{{name}} firma una vuelta sin bogeys en {{course}} con {{gross}}.",
-        "birdieHaul": "{{name}} hace {{count}} birdies en {{course}}.",
-        "roundToPar": "{{name}} completa {{course}} en {{gross}}, {{topar}}.",
-        "round": "{{name}} completa {{course}} en {{gross}}.",
-        "played": "{{name}} jugo {{course}}.",
-        "recordLost": "{{name}} te quita el record del campo en {{course}} con {{gross}}.",
-        "recordLostGap": "{{name}} te quita el record del campo en {{course}} con {{gross}}, {{delta}} mejor que tu mejor vuelta.",
-        "rankDown": "{{name}} juega {{course}} en {{gross}}. Estas {{n}} de {{of}} ahi.",
-        "rankDownBy": "{{name}} juega {{course}} en {{gross}} y te baja {{delta}} puestos hasta {{n}} de {{of}}.",
-        "rankUp": "Tu {{gross}} en {{course}} te coloca {{n}} de {{of}}.",
-        "rankUpBy": "Tu {{gross}} en {{course}} te sube {{delta}} puestos hasta {{n}} de {{of}}.",
-        "rankHold": "Tu {{gross}} en {{course}} mantiene {{n}} de {{of}}.",
-        "playedNoChange": "Juegas {{course}} en {{gross}}, sigues {{n}} de {{of}}."
+        "recordTaken": "Batio el record del campo con {{gross}}.",
+        "ace": "Emboco desde el tee.",
+        "albatross": "Hizo un albatros.",
+        "listNewLow": "{{gross}}, una nueva mejor marca en tu lista.",
+        "bogeyFree": "Vuelta sin bogeys con {{gross}}.",
+        "birdieHaul": "Hizo {{count}} birdies.",
+        "roundToPar": "Completo la vuelta en {{gross}}, {{topar}}.",
+        "round": "Completo la vuelta en {{gross}}.",
+        "played": "Jugo.",
+        "recordLost": "Te quito el record del campo con {{gross}}.",
+        "recordLostGap": "Te quito el record del campo con {{gross}}. Tu mejor vuelta queda a {{delta}}.",
+        "rankDown": "Completo la vuelta en {{gross}}. Estas {{n}} de {{of}} ahi.",
+        "rankDownBy": "Completo la vuelta en {{gross}} y te bajo {{delta}} puestos hasta {{n}} de {{of}}.",
+        "rankUp": "Tu {{gross}} te coloca {{n}} de {{of}}.",
+        "rankUpBy": "Tu {{gross}} te sube {{delta}} puestos hasta {{n}} de {{of}}.",
+        "rankHold": "Tu {{gross}} mantiene {{n}} de {{of}} aqui.",
+        "playedNoChange": "Tu {{gross}} mantiene {{n}} de {{of}} aqui."
       },
       "standing": {
         "board": "Golpes brutos mas bajos",

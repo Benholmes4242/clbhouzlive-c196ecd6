@@ -61,8 +61,8 @@
     },
     "scoringKey": {
       "title": "Scoring key",
-      "ace": "Ace",
-      "albatross": "Albatross",
+      "ace": "ホールインワンを達成。",
+      "albatross": "アルバトロスを達成。",
       "eagle": "Eagle",
       "birdie": "Birdie",
       "bogey": "Bogey",
@@ -229,7 +229,7 @@
     "avgRating": "Avg: {{rating}}",
     "xpValue": "{{xp}} XP",
     "rate": "Rate",
-    "played": "Played",
+    "played": "プレー。",
     "logged": "Logged: {{date}}",
     "friendsPlayedCount_one": "{{count}} friend played",
     "friendsPlayedCount_other": "{{count}} friends played",
@@ -1046,7 +1046,7 @@
     "playersTied_one": "{{count}}人がタイ",
     "row": {
       "underPar": "Round under par",
-      "bogeyFree": "Bogey-free round",
+      "bogeyFree": "ボギーなしの{{gross}}。",
       "moreHere_one": "+{{count}} more here",
       "moreHere_other": "+{{count}} more here"
     },
@@ -1081,7 +1081,7 @@
       "birdies_other": "バーディ{{count}}個"
     },
     "tour": {
-      "round": "Round",
+      "round": "{{gross}}でラウンド。",
       "thru": "Thru",
       "thruF": "F",
       "second": "Second",
@@ -1165,7 +1165,7 @@
         "crown": "コースレコード",
         "bogeyFree": "ボギーなしラウンド",
         "underPar": "アンダーパーのラウンド",
-        "birdieHaul": "バーディ量産"
+        "birdieHaul": "バーディー{{count}}個。"
       }
     },
     "pb": {
@@ -1603,23 +1603,23 @@
         "aroundCountry": "{{country}}周辺"
       },
       "headline": {
-        "recordTaken": "{{name}}が{{course}}で{{gross}}のコースレコードを樹立。",
-        "ace": "{{name}}が{{course}}でホールインワン。",
-        "albatross": "{{name}}が{{course}}でアルバトロス。",
-        "listNewLow": "リストにある{{course}}で{{gross}}。",
-        "bogeyFree": "{{name}}が{{course}}でボギーなしの{{gross}}。",
-        "birdieHaul": "{{name}}が{{course}}でバーディー{{count}}個。",
-        "roundToPar": "{{name}}が{{course}}を{{gross}}（{{topar}}）でラウンド。",
-        "round": "{{name}}が{{course}}を{{gross}}でラウンド。",
-        "played": "{{name}}が{{course}}をプレー。",
-        "recordLost": "{{name}}が{{course}}で{{gross}}を出し、あなたのコースレコードを更新。",
-        "recordLostGap": "{{name}}が{{course}}で{{gross}}。あなたのベストより{{delta}}良いスコアでコースレコードを更新。",
-        "rankDown": "{{name}}が{{course}}を{{gross}}でラウンド。あなたは{{of}}人中{{n}}位。",
-        "rankDownBy": "{{name}}が{{course}}を{{gross}}でラウンド。あなたは{{delta}}下がって{{of}}人中{{n}}位。",
-        "rankUp": "{{course}}での{{gross}}で{{of}}人中{{n}}位。",
-        "rankUpBy": "{{course}}での{{gross}}で{{delta}}上がって{{of}}人中{{n}}位。",
-        "rankHold": "{{course}}での{{gross}}で{{of}}人中{{n}}位を維持。",
-        "playedNoChange": "{{course}}を{{gross}}でラウンド。{{of}}人中{{n}}位のまま。"
+        "recordTaken": "{{gross}}でコースレコードを樹立。",
+        "ace": "ホールインワンを達成。",
+        "albatross": "アルバトロスを達成。",
+        "listNewLow": "{{gross}}、リスト内の新ベスト。",
+        "bogeyFree": "ボギーなしの{{gross}}。",
+        "birdieHaul": "バーディー{{count}}個。",
+        "roundToPar": "{{gross}}（{{topar}}）でラウンド。",
+        "round": "{{gross}}でラウンド。",
+        "played": "プレー。",
+        "recordLost": "{{gross}}であなたのコースレコードを更新。",
+        "recordLostGap": "{{gross}}であなたのコースレコードを更新。あなたのベストは{{delta}}差。",
+        "rankDown": "{{gross}}でラウンド。あなたは{{of}}人中{{n}}位。",
+        "rankDownBy": "{{gross}}でラウンド。あなたは{{delta}}下がって{{of}}人中{{n}}位。",
+        "rankUp": "{{gross}}で{{of}}人中{{n}}位。",
+        "rankUpBy": "{{gross}}で{{delta}}上がって{{of}}人中{{n}}位。",
+        "rankHold": "{{gross}}でここでの{{of}}人中{{n}}位を維持。",
+        "playedNoChange": "{{gross}}でここでの{{of}}人中{{n}}位を維持。"
       },
       "standing": {
         "board": "ベストグロス",

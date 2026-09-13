@@ -392,7 +392,7 @@ export function ExploreCard({
           {treatment === 'shape' ? (
             <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
               height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
-              baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels />
+              baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow />
           ) : treatment === 'ticks' ? <RoundTicks shape={shape} /> : <RoundDistribution shape={shape} />}
         </span>
       ) : null}

@@ -89,6 +89,7 @@ export function RoundShape({
   beadHoleLabels = false,
   exploreLineOnly = false,
   endLabels = false,
+  exploreGlow = false,
 }: {
   row: CircleRoundRow;
   shape: HoleShape | null;
@@ -117,6 +118,8 @@ export function RoundShape({
   exploreLineOnly?: boolean;
   /** Explore-only 1 / LEVEL / 18 footer. Defaults false for all shared consumers. */
   endLabels?: boolean;
+  /** Explore-only layered-stroke depth. No filter; defaults off for shared callers. */
+  exploreGlow?: boolean;
 }) {
   const { t } = useTranslation('courses');
 
@@ -183,6 +186,10 @@ export function RoundShape({
       <svg width="100%" height={renderedHeight} viewBox={`0 0 ${width} ${renderedHeight}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
         <line x1={SHAPE_PAD_X} x2={width - SHAPE_PAD_X} y1={baselineY} y2={baselineY}
           stroke={baselineColor ?? A.HAIRLINE} strokeWidth={1} strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
+        {exploreGlow ? (
+          <path d={path} fill="none" stroke={tone} strokeOpacity={0.22} strokeWidth={strokeWidth + 4}
+            strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+        ) : null}
         <path d={path} fill="none" stroke={tone} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
         {last ? <circle cx={last.x} cy={last.y} r={2.6} fill={tone} /> : null}
         {endLabels ? (

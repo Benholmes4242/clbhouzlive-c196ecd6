@@ -61,8 +61,8 @@
     },
     "scoringKey": {
       "title": "Scoring key",
-      "ace": "Ace",
-      "albatross": "Albatross",
+      "ace": "Hole-in-One geschlagen.",
+      "albatross": "Einen Albatros gespielt.",
       "eagle": "Eagle",
       "birdie": "Birdie",
       "bogey": "Bogey",
@@ -233,7 +233,7 @@
     "avgRating": "Avg: {{rating}}",
     "xpValue": "{{xp}} XP",
     "rate": "Rate",
-    "played": "Played",
+    "played": "Gespielt.",
     "logged": "Logged: {{date}}",
     "friendsPlayedCount_one": "{{count}} friend played",
     "friendsPlayedCount_other": "{{count}} friends played",
@@ -1093,7 +1093,7 @@
     "playersTied_one": "{{count}} Spieler gleichauf",
     "row": {
       "underPar": "Round under par",
-      "bogeyFree": "Bogey-free round",
+      "bogeyFree": "Bogeyfrei mit {{gross}}.",
       "moreHere_one": "+{{count}} more here",
       "moreHere_other": "+{{count}} more here"
     },
@@ -1129,7 +1129,7 @@
       "birdies_other": "{{count}} Birdies"
     },
     "tour": {
-      "round": "Round",
+      "round": "Runde in {{gross}}.",
       "thru": "Thru",
       "thruF": "F",
       "second": "Second",
@@ -1224,7 +1224,7 @@
         "crown": "Platzrekord",
         "bogeyFree": "Bogeyfreie Runde",
         "underPar": "Runde unter Par",
-        "birdieHaul": "Birdie-Serie"
+        "birdieHaul": "{{count}} Birdies gespielt."
       }
     },
     "pb": {
@@ -1667,23 +1667,23 @@
         "aroundCountry": "Rund um {{country}}"
       },
       "headline": {
-        "recordTaken": "{{name}} holt den Platzrekord auf {{course}} mit {{gross}}.",
-        "ace": "{{name}} schlaegt ein Hole-in-One auf {{course}}.",
-        "albatross": "{{name}} spielt einen Albatros auf {{course}}.",
-        "listNewLow": "{{gross}} auf {{course}}, einem Platz auf deiner Liste.",
-        "bogeyFree": "{{name}} spielt bogeyfrei auf {{course}} und schreibt {{gross}}.",
-        "birdieHaul": "{{name}} spielt {{count}} Birdies auf {{course}}.",
-        "roundToPar": "{{name}} spielt {{course}} in {{gross}}, {{topar}}.",
-        "round": "{{name}} spielt {{course}} in {{gross}}.",
-        "played": "{{name}} hat {{course}} gespielt.",
-        "recordLost": "{{name}} holt deinen Platzrekord auf {{course}} mit {{gross}}.",
-        "recordLostGap": "{{name}} holt deinen Platzrekord auf {{course}} mit {{gross}}, {{delta}} besser als deine Bestleistung.",
-        "rankDown": "{{name}} spielt {{course}} in {{gross}}. Du bist dort {{n}} von {{of}}.",
-        "rankDownBy": "{{name}} spielt {{course}} in {{gross}} und schiebt dich {{delta}} Plaetze zurueck auf {{n}} von {{of}}.",
-        "rankUp": "Deine {{gross}} auf {{course}} bringt dich auf {{n}} von {{of}}.",
-        "rankUpBy": "Deine {{gross}} auf {{course}} bringt dich {{delta}} Plaetze nach vorn auf {{n}} von {{of}}.",
-        "rankHold": "Deine {{gross}} auf {{course}} haelt {{n}} von {{of}}.",
-        "playedNoChange": "Du spielst {{course}} in {{gross}}, weiterhin {{n}} von {{of}}."
+        "recordTaken": "Platzrekord mit {{gross}} uebernommen.",
+        "ace": "Hole-in-One geschlagen.",
+        "albatross": "Einen Albatros gespielt.",
+        "listNewLow": "{{gross}}, eine neue Bestleistung auf deiner Liste.",
+        "bogeyFree": "Bogeyfrei mit {{gross}}.",
+        "birdieHaul": "{{count}} Birdies gespielt.",
+        "roundToPar": "Runde in {{gross}}, {{topar}}.",
+        "round": "Runde in {{gross}}.",
+        "played": "Gespielt.",
+        "recordLost": "Deinen Platzrekord mit {{gross}} uebernommen.",
+        "recordLostGap": "Deinen Platzrekord mit {{gross}} uebernommen. Deine Bestleistung liegt {{delta}} dahinter.",
+        "rankDown": "Runde in {{gross}}. Du bist dort {{n}} von {{of}}.",
+        "rankDownBy": "Runde in {{gross}} und dich {{delta}} Plaetze zurueck auf {{n}} von {{of}} geschoben.",
+        "rankUp": "Deine {{gross}} bringt dich auf {{n}} von {{of}}.",
+        "rankUpBy": "Deine {{gross}} bringt dich {{delta}} Plaetze nach vorn auf {{n}} von {{of}}.",
+        "rankHold": "Deine {{gross}} haelt dort {{n}} von {{of}}.",
+        "playedNoChange": "Deine {{gross}} haelt dort weiter {{n}} von {{of}}."
       },
       "standing": {
         "board": "Niedrigster Brutto",
