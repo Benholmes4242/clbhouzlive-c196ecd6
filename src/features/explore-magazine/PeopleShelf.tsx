@@ -10,7 +10,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { r } from '@/lib/radius';
 
 import { ExploreShelf } from './ExploreShelf';
 import { ShelfShell } from './ExploreShells';
@@ -113,8 +112,8 @@ function PersonTile({ golfer, pos }: { golfer: ClubGolfer; pos: number }) {
         width: TILE.w,
         minWidth: 0,
         height: TILE.h,
-        borderRadius: r('lg'),
-        border: `1px solid ${A.HAIR}`,
+        borderRadius: 14,
+        border: `1px solid ${A.HAIRLINE}`,
         padding: 10,
         display: 'flex',
         flexDirection: 'column',
@@ -173,8 +172,8 @@ function PersonTile({ golfer, pos }: { golfer: ClubGolfer; pos: number }) {
         style={{
           marginTop: 'auto',
           width: '100%',
-          border: following ? 0 : `1px solid ${A.HAIR}`,
-          background: following ? A.INK_SOFT ?? 'rgba(255,255,255,0.10)' : 'transparent',
+          border: following ? 0 : `1px solid ${A.HAIRLINE}`,
+          background: following ? 'rgba(255,255,255,0.10)' : 'transparent',
           color: A.INK,
           borderRadius: 999,
           padding: '6px 0',
