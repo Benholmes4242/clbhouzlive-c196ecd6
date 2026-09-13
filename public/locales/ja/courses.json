@@ -1642,7 +1642,9 @@
         "lastChange": "最新の変動 {{when}}",
         "boardNet": "ネット",
         "boardGross": "グロス",
-        "pickBoard": "ランキングを切り替える"
+        "pickBoard": "ランキングを切り替える",
+        "unreadable": "順位を読み込めませんでした。",
+        "retry": "再試行"
       },
       "ratingCount": "{{count}}件の評価",
       "empty": {

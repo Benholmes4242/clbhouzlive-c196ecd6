@@ -1645,7 +1645,9 @@
         "lastChange": "마지막 변동 {{when}}",
         "boardNet": "네트",
         "boardGross": "그로스",
-        "pickBoard": "보드 변경"
+        "pickBoard": "보드 변경",
+        "unreadable": "순위를 불러올 수 없습니다.",
+        "retry": "다시 시도"
       },
       "ratingCount": "평가 {{count}}건",
       "empty": {

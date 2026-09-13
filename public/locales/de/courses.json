@@ -1706,7 +1706,9 @@
         "lastChange": "letzte Aenderung {{when}}",
         "boardNet": "Netto",
         "boardGross": "Brutto",
-        "pickBoard": "Wertung wechseln"
+        "pickBoard": "Wertung wechseln",
+        "unreadable": "Deine Platzierung konnte nicht geladen werden.",
+        "retry": "Erneut versuchen"
       },
       "ratingCount": "{{count}} Bewertungen",
       "empty": {

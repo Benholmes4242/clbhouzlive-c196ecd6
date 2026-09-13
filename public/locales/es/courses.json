@@ -1706,7 +1706,9 @@
         "lastChange": "ultimo cambio {{when}}",
         "boardNet": "Neto",
         "boardGross": "Bruto",
-        "pickBoard": "Cambiar tabla"
+        "pickBoard": "Cambiar tabla",
+        "unreadable": "No se pudo cargar tu clasificacion.",
+        "retry": "Reintentar"
       },
       "ratingCount": "{{count}} valoraciones",
       "empty": {
