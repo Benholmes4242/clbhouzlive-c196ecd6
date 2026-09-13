@@ -634,7 +634,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           ? geography.scope.country ?? t('amateur.stream.scope.theWorld', 'the world')
           : t('amateur.stream.scope.theWorld', 'the world');
   /* A SCOPE WITH NO CARDS BUT SHELVES WITH CONTENT RENDERS THE SHELVES AND NO
-     SENTENCE (§5d). The shelves each report their own emptiness. */
+     SENTENCE (§5d). The shelves each report their own emptiness. UNSETTLED IS
+     NOT EMPTY: while any shelf source is still in flight the sentence is held
+     back, so a scope that does have shelves never flashes "nothing here". */
+  const shelvesSettled =
+    listCourses.isFetched && countyCourses.isFetched && topRatedCourses.isFetched && worldCourses.isFetched;
   const shelvesHaveContent =
     (listCourses.rows.length > 0) ||
     (countyCourses.rows.length > 0) ||
