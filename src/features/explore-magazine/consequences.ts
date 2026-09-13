@@ -106,17 +106,15 @@ export function roundConsequence(input: RoundConsequenceInput, sources: Conseque
     return null;
   }
 
-  /* 3. THE VIEWER'S OWN ROUND — the only path that can carry good news. */
-  if (stand) {
-    if (stand.delta != null && stand.delta > 0) {
-      return { kind: 'rank_up', n: stand.rank_now, of: field, delta: moved };
-    }
-    /* HOLD, NOT DRIFT: they are still where they were, on a board that has a
-       field to be top of. rank_then null means there is no reference, so there
-       is nothing to call a hold — that is played_nochange. */
-    if (stand.rank_then != null && stand.delta === 0) {
-      return { kind: 'rank_hold', n: stand.rank_now, of: field };
-    }
+  /* 3. THE VIEWER'S OWN ROUND — the only path that can carry good news.
+        A STANDING CLAIM REQUIRES A CHANGE. Neither the viewer's own round nor
+        anyone else's may state the viewer's rank unless that rank MOVED. A rank
+        that stayed the same is not news, however recently it was earned — so
+        rank_hold is RETIRED and an unmoved own round falls to the plain
+        sentence. The standing shelf is where a member reads where they stand;
+        the feed does not restate it once per round. */
+  if (stand && stand.delta != null && stand.delta > 0) {
+    return { kind: 'rank_up', n: stand.rank_now, of: field, delta: moved };
   }
   return { kind: 'played_nochange', n: stand?.rank_now ?? null, of: field };
 }

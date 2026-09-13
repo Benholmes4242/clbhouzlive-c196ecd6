@@ -55,9 +55,29 @@ describe('Explore round headline ownership', () => {
   it('measures a standing against the field, not as a coordinate', () => {
     const item = round({
       who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true },
-      consequence: { kind: 'rank_hold', n: 7, of: 41 },
+      consequence: { kind: 'rank_up', n: 7, of: 41, delta: 2 },
     });
-    expect(headlineFor(item, translate)).toBe('Your 68 is still the 7th best round anyone has played here.');
+    expect(headlineFor(item, translate)).toBe('Your 68 is the 7th best round played here, up 2 places.');
+  });
+
+  /* A STANDING CLAIM REQUIRES A CHANGE: the retired rank_hold sentence must not
+     come back under any locale tag, and an unmoved own round reads plainly. */
+  it('states no rank when the rank did not move', () => {
+    const item = round({
+      who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true },
+      consequence: { kind: 'played_nochange', n: 7, of: 41 },
+    });
+    expect(headlineFor(item, translate, 'en-GB')).toBe('You went round in 68.');
+    expect(headlineFor(item, translate, 'en-GB')).not.toContain('still');
+  });
+
+  it('gives the ordinal suffix on a regional English tag', () => {
+    const item = round({
+      who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true },
+      consequence: { kind: 'rank_up', n: 8, of: 41 },
+    });
+    expect(headlineFor(item, translate, 'en-GB')).toContain('the 8th best');
+    expect(headlineFor(item, translate, 'en-US')).toContain('the 8th best');
   });
 
   it('names the hole of a single notable score only when hole rows say which', () => {
@@ -79,9 +99,10 @@ describe('Explore round headline ownership', () => {
   it('gives non-English locales the plain figure', () => {
     const item = round({
       who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true },
-      consequence: { kind: 'rank_hold', n: 7, of: 41 },
+      consequence: { kind: 'rank_up', n: 7, of: 41 },
     });
     expect(headlineFor(item, translate, 'de')).toContain('the 7 best');
+    expect(headlineFor(item, translate, 'en-XA')).toContain('the 7 best');
   });
 });
 
