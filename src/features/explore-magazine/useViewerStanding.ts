@@ -135,5 +135,6 @@ export function useViewerStanding(
     isFetched: viewerId ? query.isFetched : true,
     unresolved: !!query.error,
     board: query.data?.board ?? (board === 'net' ? DEFAULT_STANDING_BOARD : 'topar'),
+    retry: () => { void query.refetch(); },
   };
 }
