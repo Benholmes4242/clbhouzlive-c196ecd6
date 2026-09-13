@@ -571,6 +571,17 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     pos={pos}
                     onDepart={depart}
                   />
+                ) : shelf === 'coursesTopRated' ? (
+                  /* §5b THE NEW SHELF: rated in the last 30 days, floor of two
+                     ratings, mean descending. The same CourseShelf tile. */
+                  <CourseShelf
+                    heading={t('amateur.shelf.topRated', 'Best rated lately')}
+                    rows={topRatedCourses.rows}
+                    isFetched={topRatedCourses.isFetched}
+                    kind="courses_top_rated"
+                    pos={pos}
+                    onDepart={depart}
+                  />
                 ) : shelf === 'people' ? (
                   <PeopleShelf
                     viewerId={userId}
@@ -581,7 +592,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                   />
                 ) : (
                   <MomentsShelf pos={pos} onDepart={depart} />
-                )}}
+                )}
     </>
   );
 
