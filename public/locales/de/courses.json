@@ -1606,7 +1606,9 @@
       "view": {
         "all": "Alle",
         "scores": "Ergebnisse",
-        "watch": "Ansehen"
+        "watch": "Ansehen",
+        "courses": "Platze",
+        "reviews": "Bewertungen"
       },
       "shelf": {
         "clips": "Clips",
@@ -1616,7 +1618,9 @@
       },
       "scope": {
         "club": "Mein Club",
-        "world": "Welt"
+        "world": "Welt",
+        "yourClub": "deinem Club",
+        "theWorld": "der Welt"
       },
       "scopes": "Ergebnisbereich",
       "roundCount": "{{count}} Runden",
@@ -1675,7 +1679,11 @@
         "of": "von {{count}}",
         "lastChange": "letzte Aenderung {{when}}"
       },
-      "ratingCount": "{{count}} Bewertungen"
+      "ratingCount": "{{count}} Bewertungen",
+      "empty": {
+        "courses": "Noch keine Platze in {{scope}}.",
+        "reviews": "Noch keine Bewertungen in {{scope}}."
+      }
     },
     "shelf": {
       "aroundCounty": "Rund um {{county}}",
@@ -1687,7 +1695,8 @@
       "roundsHere": "{{count}} Runden hier",
       "newThisMonth": "Neu diesen Monat",
       "follow": "Folgen",
-      "following": "Folgt"
+      "following": "Folgt",
+      "topRated": "Zuletzt am besten bewertet"
     }
   }
 }

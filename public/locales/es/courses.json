@@ -1606,7 +1606,9 @@
       "view": {
         "all": "Todo",
         "scores": "Resultados",
-        "watch": "Ver"
+        "watch": "Ver",
+        "courses": "Campos",
+        "reviews": "Resenas"
       },
       "shelf": {
         "clips": "Clips",
@@ -1616,7 +1618,9 @@
       },
       "scope": {
         "club": "Mi club",
-        "world": "Mundo"
+        "world": "Mundo",
+        "yourClub": "tu club",
+        "theWorld": "el mundo"
       },
       "scopes": "Ambito de resultados",
       "roundCount": "{{count}} vueltas",
@@ -1675,7 +1679,11 @@
         "of": "de {{count}}",
         "lastChange": "ultimo cambio {{when}}"
       },
-      "ratingCount": "{{count}} valoraciones"
+      "ratingCount": "{{count}} valoraciones",
+      "empty": {
+        "courses": "Aun no hay campos en {{scope}}.",
+        "reviews": "Aun no hay resenas en {{scope}}."
+      }
     },
     "shelf": {
       "aroundCounty": "Por {{county}}",
@@ -1687,7 +1695,8 @@
       "roundsHere": "{{count}} rondas aqui",
       "newThisMonth": "Nuevo este mes",
       "follow": "Seguir",
-      "following": "Siguiendo"
+      "following": "Siguiendo",
+      "topRated": "Mejor valorados ultimamente"
     }
   }
 }

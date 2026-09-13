@@ -2190,7 +2190,9 @@
       "view": {
         "all": "[Åll one]",
         "scores": "[Sçörés one]",
-        "watch": "[Wåtçh one]"
+        "watch": "[Wåtçh one]",
+        "courses": "[Courses]",
+        "reviews": "[Reviews]"
       },
       "shelf": {
         "clips": "[Çlîps one]",
@@ -2200,7 +2202,9 @@
       },
       "scope": {
         "club": "[Mý çlüb one]",
-        "world": "[Wörld one]"
+        "world": "[Wörld one]",
+        "yourClub": "[your club]",
+        "theWorld": "[the world]"
       },
       "scopes": "[Sçörés sçöpé one]",
       "roundCount": "[{{count}} röünds one]",
@@ -2259,7 +2263,11 @@
         "of": "[of {{count}}]",
         "lastChange": "[last change {{when}}]"
       },
-      "ratingCount": "[{{count}} rãtïñgs]"
+      "ratingCount": "[{{count}} rãtïñgs]",
+      "empty": {
+        "courses": "[No courses in {{scope}} yet.]",
+        "reviews": "[No reviews in {{scope}} yet.]"
+      }
     },
     "shelf": {
       "aroundCounty": "[Ãrõũñd {{county}}]",
@@ -2271,7 +2279,8 @@
       "roundsHere": "[{{count}} rõũñds héré]",
       "newThisMonth": "[Néw thïs mõñth]",
       "follow": "[Fõllõw]",
-      "following": "[Fõllõwïñg]"
+      "following": "[Fõllõwïñg]",
+      "topRated": "[Best rated lately]"
     }
   }
 }
