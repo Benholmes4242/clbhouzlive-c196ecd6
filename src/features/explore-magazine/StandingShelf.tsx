@@ -12,7 +12,9 @@ import { ShelfShell } from './ExploreShells';
 import { ExploreShelf } from './ExploreShelf';
 import { relativeDay } from './exploreCopy';
 import { standingOrdinal } from './ordinal';
+import { useViewerIdentity } from './useViewerIdentity';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
+
 
 /**
  * "WHERE YOU STAND" (BRIEF_EXPLORE_MAGAZINE §2b, PHASE B1).
