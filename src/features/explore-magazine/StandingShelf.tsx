@@ -146,6 +146,9 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
               whenLabel={relativeDay(row.last_change_at) ?? ''}
               who={copy.you}
               isOwn
+              avatarUrl={identity?.photoUrl ?? null}
+              avatarUserId={viewerId ?? null}
+
               subline={sublineFor(row, copy)}
               trailing={row.delta != null && row.delta !== 0 ? <MovementChip delta={row.delta} /> : undefined}
               onPress={() => open(row)}
