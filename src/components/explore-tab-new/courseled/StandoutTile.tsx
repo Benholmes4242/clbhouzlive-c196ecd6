@@ -431,10 +431,13 @@ export function StandoutTile({
                 <div
                   style={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: reserveTwoLines ? 'flex-start' : 'center',
                     gap: 6,
                     marginTop: factIsSubline ? 3 : 2,
-                    minHeight: 20,
+                    /* Two reserved lines in a rail: 11px x 1.3 = 29, 12px x
+                       1.32 = 32. One line elsewhere, exactly as before. */
+                    minHeight: reserveTwoLines ? (factIsSubline ? 29 : 32) : 20,
+
                   }}
                 >
                   <div
