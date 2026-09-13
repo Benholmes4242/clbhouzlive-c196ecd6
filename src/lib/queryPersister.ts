@@ -29,6 +29,8 @@ const INFINITE_KEY_PREFIXES = [
   'longform-videos-base',
   'clubhouse-explore-shorts',
   'golf-courses-infinite',
+  // Explore/amateur server ranker - first page only, like every other feed.
+  'explore-magazine-stream',
 ];
 
 /**
@@ -127,6 +129,8 @@ const PERSIST_PREFIXES = [
   'tour',
   'handicap',
   'profile-sheet-stats',
+  // Explore server ranker (Phase D1). Viewer id is inside the key.
+  'explore-magazine-stream',
   
 ];
 
