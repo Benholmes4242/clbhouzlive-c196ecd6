@@ -234,6 +234,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const stream = useExploreStreamClient(userId, view, { active: scoreScope, geography: geography.scope });
   const scoresStanding = useViewerStanding(userId);
 
+  /* PHASE C §3a-§3c THE COURSE SHELVES. The sources are asked ONLY on All, and
+     each shelf renders nothing when its source is empty. Geography comes from
+     the shared resolver above — no second derivation. */
+  const countyCourses = useCountyCourses(userId, geography.scope, view === 'all' && geography.isFetched);
+  const worldCourses = useWorldTop100Courses(view === 'all');
+  const listCourses = useListCourses(userId, view === 'all');
+
   const visible = useMemo(() => stream.items.slice(0, revealed), [stream.items, revealed]);
 
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
