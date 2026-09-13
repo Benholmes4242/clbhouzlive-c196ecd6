@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
-import { RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
+import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -303,7 +303,9 @@ export function ExploreCard({
 
   const treatment = item.kind === 'round' && size !== 'pair' ? treatmentFor(item, shape) : 'none';
   const hasVisual = treatment !== 'none' && shape != null && item.payload.round != null;
-  const band = hasVisual ? SHAPE_BAND[size] : 0;
+  const band = hasVisual
+    ? SHAPE_BAND[size] + (treatment === 'shape' ? EXPLORE_END_LABEL_BAND : 0)
+    : 0;
 
   const kicker = (
     <div
@@ -388,8 +390,9 @@ export function ExploreCard({
           }}
         >
           {treatment === 'shape' ? (
-            <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]} height={band}
-              showMeta={false} showBaseline baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly />
+            <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
+              height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
+              baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels />
           ) : treatment === 'ticks' ? <RoundTicks shape={shape} /> : <RoundDistribution shape={shape} />}
         </span>
       ) : null}
@@ -399,7 +402,7 @@ export function ExploreCard({
             position: 'absolute',
             left: 16,
             right: 16,
-             bottom: hasVisual ? 68 : 14,
+             bottom: hasVisual ? band + 12 : 14,
             zIndex: 2,
             display: 'block',
           }}
