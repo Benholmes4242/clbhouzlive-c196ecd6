@@ -108,9 +108,12 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
               flexShrink: 0,
               padding: '6px 11px',
               borderRadius: RAIL_CHIP_RADIUS,
-              border: filled || (filledSelection && active) ? 'none' : `1px solid ${active && !filledSelection ? 'transparent' : A.BORDER}`,
+              /* The active chip keeps a TRANSPARENT hairline rather than none, so
+                 switching view costs no 1px width shift in the row. */
+              border: filled ? 'none' : `1px solid ${active ? 'transparent' : A.BORDER}`,
               background: filled || (filledSelection && active) ? APPLIED_FILL : active ? A.INK : 'transparent',
               color: filled || (filledSelection && active) ? A.INK : active ? A.CANVAS : A.MUTE,
+
 
               fontFamily: SANS,
               fontSize: 12,
