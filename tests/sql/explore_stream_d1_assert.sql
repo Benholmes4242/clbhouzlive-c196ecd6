@@ -18,7 +18,7 @@ select ('20000000-0000-0000-0000-00000000000' || i)::uuid, 'Member ' || i,
 from generate_series(1, 6) i;
 
 -- viewer = member 1. Circle = members 2 and 3.
-insert into follows values
+insert into follows (follower_actor_id, follower_actor_type, following_actor_id, following_actor_type) values
   ('20000000-0000-0000-0000-000000000001','personal','20000000-0000-0000-0000-000000000002','personal'),
   ('20000000-0000-0000-0000-000000000001','personal','20000000-0000-0000-0000-000000000003','personal');
 
@@ -35,7 +35,8 @@ select ('20000000-0000-0000-0000-00000000000' || (1 + (i % 6)))::uuid,
        (i % 11) = 0, 12.4
 from generate_series(1, 150) i;
 
-insert into gam_round_net select whs_score_id, gross_score - 12 from gam_round_stats;
+insert into gam_round_net (whs_score_id, user_id, course_id, play_date, gross_score, course_handicap, net_score)
+  select whs_score_id, user_id, course_id, play_date, gross_score, 12, gross_score - 12 from gam_round_stats;
 
 insert into course_ratings (user_id, course_id, rating, review, created_at)
 select ('20000000-0000-0000-0000-00000000000' || (2 + (i % 5)))::uuid,
@@ -48,9 +49,9 @@ insert into amateur_stories (slug, kicker, headline, image_url, published_at)
 select 'story-' || i, 'THE WIRE', 'Headline ' || i, 'simg' || i, now() - (i || ' hours')::interval
 from generate_series(1, 8) i;
 
-insert into course_shortlists values
+insert into course_shortlists (user_id, course_id) values
   ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000005');
-insert into user_surface_last_seen values
+insert into user_surface_last_seen (user_id, surface_key, last_seen_at) values
   ('20000000-0000-0000-0000-000000000001','discover', now() - interval '20 hours');
 
 -- The viewer's standing on three courses, from the stub: the RPC CALLS it.

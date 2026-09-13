@@ -19,7 +19,7 @@ select ('20000000-0000-0000-0000-00000000000' || i)::uuid, 'Member ' || i,
        '10000000-0000-0000-0000-000000000001'::uuid
 from generate_series(1, 6) i;
 
-insert into follows values
+insert into follows (follower_actor_id, follower_actor_type, following_actor_id, following_actor_type) values
   ('20000000-0000-0000-0000-000000000001','personal','20000000-0000-0000-0000-000000000002','personal'),
   ('20000000-0000-0000-0000-000000000001','personal','20000000-0000-0000-0000-000000000003','personal');
 
@@ -60,7 +60,8 @@ values ('99999999-9999-9999-9999-999999999999',
         gen_random_uuid(), current_date - 3, now() - interval '1 hour',
         69, 72, 41, 4, 0, 0, 1, false, 8.2);
 
-insert into gam_round_net select whs_score_id, gross_score - 12 from gam_round_stats;
+insert into gam_round_net (whs_score_id, user_id, course_id, play_date, gross_score, course_handicap, net_score)
+  select whs_score_id, user_id, course_id, play_date, gross_score, 12, gross_score - 12 from gam_round_stats;
 
 insert into course_ratings (user_id, course_id, rating, review, created_at)
 select ('20000000-0000-0000-0000-00000000000' || (2 + (i % 5)))::uuid,
@@ -73,9 +74,9 @@ insert into amateur_stories (slug, kicker, headline, image_url, published_at)
 select 'story-' || i, 'THE WIRE', 'Headline ' || i, 'simg' || i, now() - (i || ' hours')::interval
 from generate_series(1, 8) i;
 
-insert into course_shortlists values
+insert into course_shortlists (user_id, course_id) values
   ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000005');
-insert into user_surface_last_seen values
+insert into user_surface_last_seen (user_id, surface_key, last_seen_at) values
   ('20000000-0000-0000-0000-000000000001','discover', now() - interval '20 hours');
 
 insert into viewer_standing_fixture values

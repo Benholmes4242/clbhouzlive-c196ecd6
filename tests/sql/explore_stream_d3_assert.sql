@@ -31,7 +31,7 @@ from generate_series(1, 6) i;
 insert into user_profiles (id, display_name, primary_club_id)
 values ('20000000-0000-0000-0000-000000000009','Clubless', null);
 
-insert into follows values
+insert into follows (follower_actor_id, follower_actor_type, following_actor_id, following_actor_type) values
   ('20000000-0000-0000-0000-000000000001','personal','20000000-0000-0000-0000-000000000002','personal'),
   ('20000000-0000-0000-0000-000000000001','personal','20000000-0000-0000-0000-000000000003','personal');
 
@@ -56,7 +56,8 @@ select ('20000000-0000-0000-0000-00000000000' || (1 + (i % 6)))::uuid,
        70 + (i % 18), 72, 28 + (i % 16), i % 5, 0, 0, 0, (i % 13) = 0, 14.1
 from generate_series(1, 120) i;
 
-insert into gam_round_net select whs_score_id, gross_score - 12 from gam_round_stats;
+insert into gam_round_net (whs_score_id, user_id, course_id, play_date, gross_score, course_handicap, net_score)
+  select whs_score_id, user_id, course_id, play_date, gross_score, 12, gross_score - 12 from gam_round_stats;
 
 -- PROSE REVIEWS, plus SCORE-ONLY ratings that must never become candidates.
 insert into course_ratings (user_id, course_id, rating, review, created_at)
@@ -84,17 +85,17 @@ insert into amateur_stories (slug, kicker, headline, image_url, published_at)
 select 'story-' || i, 'THE WIRE', 'Headline ' || i, 'simg' || i, now() - (i || ' hours')::interval
 from generate_series(1, 8) i;
 
-insert into top100_lists values
+insert into top100_lists (id, slug) values
   ('30000000-0000-0000-0000-000000000001','top-100-worldwide'),
   ('30000000-0000-0000-0000-000000000002','top-100-gbi');
-insert into course_top100_memberships values
+insert into course_top100_memberships (course_id, list_id, rank) values
   ('00000000-0000-0000-0000-000000000001','30000000-0000-0000-0000-000000000001', 14),
   ('00000000-0000-0000-0000-000000000001','30000000-0000-0000-0000-000000000002',  3),
   ('00000000-0000-0000-0000-000000000003','30000000-0000-0000-0000-000000000002',  8);
 
-insert into course_shortlists values
+insert into course_shortlists (user_id, course_id) values
   ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000005');
-insert into user_surface_last_seen values
+insert into user_surface_last_seen (user_id, surface_key, last_seen_at) values
   ('20000000-0000-0000-0000-000000000001','discover', now() - interval '20 hours');
 
 insert into viewer_standing_fixture values
