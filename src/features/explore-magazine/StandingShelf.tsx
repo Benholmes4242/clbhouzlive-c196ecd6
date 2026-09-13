@@ -236,7 +236,22 @@ function BoardSelector({
 export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined; pos: number }) {
   const navigate = useNavigate();
   const copy = useStandingCopy();
-  const standing = useViewerStanding(viewerId);
+  /* THE SELECTION HOLDS FOR THE SESSION, PER MEMBER: seeded from
+     sessionStorage on mount so a scroll away and back does not reset it, and
+     written on every pick. Next visit starts at net again. */
+  const [board, setBoard] = useState<StandingBoard>(() => readStandingBoard(viewerId));
+  useEffect(() => setBoard(readStandingBoard(viewerId)), [viewerId]);
+  const pickBoard = useCallback(
+    (next: StandingBoard) => {
+      setBoard(next);
+      writeStandingBoard(viewerId, next);
+      analyticsEvents.track('amateur_standing_board_picked', { board: next });
+    },
+    [viewerId],
+  );
+  const standing = useViewerStanding(viewerId, board);
+  /* The heading names the board the ROWS are, not the one that was asked for. */
+  const shownBoard = standing.board;
   /* The tiles are all the VIEWER's, so the avatar is the viewer's own photo,
      read from user_profiles — never a board row's nearest photo field. */
   const { identity } = useViewerIdentity(viewerId);
