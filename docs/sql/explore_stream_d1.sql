@@ -131,7 +131,8 @@ DECLARE
   v_row      record;
   v_taken    integer := 0;
   v_last_s   numeric; v_last_i text;
-  v_deferred jsonb := '[]'::jsonb;   -- outer-ring cards awaiting a slot
+  v_deferred jsonb := '[]'::jsonb;   -- cards cadence could not place yet
+  v_carry    text[] := '{}';         -- deferred ids handed back by the cursor
   v_out      jsonb := '[]'::jsonb;
 BEGIN
   SELECT
@@ -156,6 +157,11 @@ BEGIN
   v_cur_i       := p_cursor ->> 'i';
   v_prev_key    := p_cursor #>> '{tail,key}';
   v_since_outer := coalesce((p_cursor #>> '{tail,since_outer}')::int, 1000000);
+  -- CARRIED DEFERRALS. A card cadence could not place on the previous page sits
+  -- ABOVE the keyset boundary, so the boundary alone would skip it. Its id
+  -- travels in the cursor and is re-admitted below alongside the keyset window.
+  SELECT coalesce(array_agg(x), '{}') INTO v_carry
+  FROM jsonb_array_elements_text(coalesce(p_cursor #> '{tail,deferred}', '[]'::jsonb)) x;
 
   FOR v_row IN
     WITH stamp AS (
@@ -380,6 +386,7 @@ BEGIN
     SELECT q.*
     FROM ranked q
     WHERE v_cur_s IS NULL
+       OR q.cid = ANY(v_carry)
        OR q.sc < v_cur_s
        OR (q.sc = v_cur_s AND q.cid > v_cur_i)
     ORDER BY q.sc DESC, q.cid ASC
@@ -430,19 +437,11 @@ BEGIN
     -- Every candidate consumed is either placed or deferred, and the deferred
     -- are flushed below before the page returns - so the keyset boundary can
     -- never skip one. That is why the exit counts BOTH.
-    EXIT WHEN v_taken + jsonb_array_length(v_deferred) >= v_limit;
+    EXIT WHEN v_taken >= v_limit;
   END LOOP;
 
-  -- THE REMAINDER KEEPS ITS ORDER RATHER THAN BEING DISCARDED (client parity:
-  -- capOuterRing appends what it could not place). Nothing is ever dropped.
-  WHILE jsonb_array_length(v_deferred) > 0 LOOP
-    v_out := v_out || jsonb_build_array(v_deferred -> 0);
-    v_prev_key := coalesce(v_deferred -> 0 ->> 'kind','none') || ':' || coalesce(v_deferred -> 0 ->> 'ring_k','none');
-    v_since_outer := CASE WHEN (v_deferred -> 0 ->> 'ring_k') IN ('county','country','world') THEN 0
-                          ELSE least(v_since_outer + 1, 1000000) END;
-    v_deferred := v_deferred - 0;
-    v_taken := v_taken + 1;
-  END LOOP;
+  -- NOTHING IS DROPPED. Whatever cadence could not place travels in the
+  -- cursor and leads the next page, in order.
 
 
   RETURN QUERY
@@ -497,7 +496,10 @@ BEGIN
     -- every row of the page. NULL once the pool is exhausted.
     CASE WHEN v_taken < v_limit AND jsonb_array_length(v_deferred) = 0 THEN NULL
          ELSE jsonb_build_object('s', v_last_s, 'i', v_last_i,
-                'tail', jsonb_build_object('key', v_prev_key, 'since_outer', v_since_outer)) END
+                'tail', jsonb_build_object(
+                  'key', v_prev_key, 'since_outer', v_since_outer,
+                  'deferred', (SELECT coalesce(jsonb_agg(d ->> 'cid'), '[]'::jsonb)
+                               FROM jsonb_array_elements(v_deferred) d))) END
   FROM jsonb_array_elements(v_out) AS r;
 END;
 $function$;
