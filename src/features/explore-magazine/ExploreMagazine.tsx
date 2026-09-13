@@ -29,6 +29,7 @@ import {
   type ExploreView,
 } from './exploreViewMemory';
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
+import { useExploreStream } from './useExploreStream';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
 import { CourseShelf } from './CourseShelf';
@@ -261,6 +262,17 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   }, [scoped, geography.isFetched, geography.scope.primaryClubId, geography.scope.county]);
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
   const stream = useExploreStreamClient(userId, view, { active: scoreScope, geography: geography.scope });
+  /* PHASE D1 THE SERVER RANKER, All only. The viewer id is withheld on every
+     other view so the read is not even issued until D3 opens them. Until Ben
+     runs docs/sql/explore_stream_d1.sql the RPC is absent, `unavailable` is
+     true, and the accepted client composition below stays in charge - the
+     fallback is deliberate and is never an empty page. */
+  const server = useExploreStream(userId && view === 'all' ? userId : undefined, 'all', scoreScope, {
+    clubId: geography.scope.primaryClubId,
+    county: geography.scope.county,
+    country: geography.scope.country,
+  });
+  const serverOn = view === 'all' && !server.unavailable && server.isFetched && server.items.length > 0;
   const scoresStanding = useViewerStanding(userId);
 
   /* §5b THE COURSES VIEW'S OWN BODY. Course cards are not rounds, reviews or
@@ -270,7 +282,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so a
      single-type view and the mixed stream take the same reveal, sentinel,
      page-loaded and end paths. */
-  const source = view === 'courses' ? coursesView : stream;
+  const source = view === 'courses' ? coursesView : serverOn ? server : stream;
 
   /* PHASE C §3a-§3c THE COURSE SHELVES. Each shelf renders nothing when its
      source is empty. Geography comes from the shared resolver above — no second
@@ -281,7 +293,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const listCourses = useListCourses(userId, shelvesWanted);
   const topRatedCourses = useRecentCourseRatings(view === 'courses' || view === 'reviews');
 
-  const visible = useMemo(() => source.items.slice(0, revealed), [source.items, revealed]);
+  /* THE SERVER PAGE IS ALREADY A PAGE. Reveal slicing belongs to the client
+     composition only; re-slicing a ranked, cadenced page would hide cards the
+     RPC deliberately placed. */
+  const visible = useMemo(
+    () => (serverOn ? source.items : source.items.slice(0, revealed)),
+    [serverOn, source.items, revealed],
+  );
 
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
      screen, and a card holds its whole shell until that resolver settles —
@@ -376,19 +394,21 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   /* §6f THE SENTINEL MEANS LOADING, NOT "MORE EXISTS". When the pool is spent it
      unmounts and the page ends at the last card. */
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const hasMore = revealed < source.items.length;
+  const hasMore = serverOn ? server.hasNextPage : revealed < source.items.length;
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || !hasMore) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) setRevealed((n) => n + STREAM_PAGE_SIZE);
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        if (serverOn) server.fetchNextPage();
+        else setRevealed((n) => n + STREAM_PAGE_SIZE);
       },
       { rootMargin: '600px 0px' },
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [hasMore]);
+  }, [hasMore, serverOn, server]);
 
   useEffect(() => {
     if (source.isFetched && !hasMore && source.items.length > 0) {
