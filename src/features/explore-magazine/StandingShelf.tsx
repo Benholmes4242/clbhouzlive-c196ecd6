@@ -149,6 +149,7 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
               avatarUrl={identity?.photoUrl ?? null}
               avatarUserId={viewerId ?? null}
 
+              reserveTwoLines
               subline={sublineFor(row, copy)}
               trailing={row.delta != null && row.delta !== 0 ? <MovementChip delta={row.delta} /> : undefined}
               onPress={() => open(row)}
