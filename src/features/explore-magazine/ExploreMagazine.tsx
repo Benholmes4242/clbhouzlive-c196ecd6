@@ -818,8 +818,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       ) : null}
 
-      {!singleType && view !== 'scores' && stream.isFetched && stream.items.length === 0 ? (
-        /* §6h THE ONE SENTENCE ON THE PAGE. No heading, no placeholder card. */
+      {!singleType && view !== 'scores' && viewerHasNothing ? (
+        /* §6h THE ONE SENTENCE ON THE PAGE. No heading, no placeholder card.
+           IT IS ABOUT THE MEMBER, NEVER ABOUT THIS PAGE: an outer-ring heavy
+           page is a ranking outcome, not a statement that the member has no
+           connections. See viewerHasNothing above. */
         <div style={{ paddingInline: 20, marginTop: 8 }}>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
             {t(
