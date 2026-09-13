@@ -15,11 +15,14 @@ export function useHubLongFormVideos(userId: string | undefined) {
         p_mode: 'latest',
         p_page_size: 10,
       });
-      if (error) {
-        if (import.meta.env.DEV) console.error(error);
-        return [] as HubRpcRow[];
-      }
+      /* ERRORED IS NOT EMPTY (BRIEF_EXPLORE_MAGAZINE PHASE D §5b). This read used
+         to swallow the error and return [], so a FAILED long-form rail and a
+         genuinely empty one were the same render - a failure that looks like a
+         correct empty state is invisible forever. It now throws; the row shows
+         its failed state and offers the read again. */
+      if (error) throw error;
       return (data ?? []) as HubRpcRow[];
     },
+    retry: 1,
   });
 }
