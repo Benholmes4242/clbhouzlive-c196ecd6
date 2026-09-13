@@ -170,7 +170,7 @@ function WhoLine({
   size: CardSize;
   onWhoTap?: () => void;
 }) {
-  const { t, i18n } = useTranslation('courses');
+  const { t } = useTranslation('courses');
   const who = item.who;
   const onPhoto = size === 'lead';
   const nameColor = who?.is_viewer ? A.AMBER : onPhoto ? 'rgba(255,255,255,0.72)' : A.MUTE;
@@ -289,7 +289,7 @@ export function ExploreCard({
   onTap: () => void;
   onWhoTap?: () => void;
 }) {
-  const { t } = useTranslation('courses');
+  const { t, i18n } = useTranslation('courses');
   const parts = kickerParts(item, t as never);
   const headline = headlineFor(item, t as never, i18n.language || 'en');
   const chips = chipsFor(item, t as never);
