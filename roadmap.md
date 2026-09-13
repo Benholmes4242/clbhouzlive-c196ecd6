@@ -1429,3 +1429,9 @@ page behind it — recorded at the site in VideoPlaybackContext.openFull.
   check (bounded at one row; the cursor keys on the last row actually returned).
 - Not verified: authenticated device check, and the forced-RPC-error fallback in
   a real session (the condition is proved in source, not on a device).
+
+## Explore D5 hotfix (2026-09-13)
+- ROOT CAUSE: deployed get_explore_stream references g.id on public.gam_round_stats, which has NO id column (key is whs_score_id). ALL FOUR views (all/scores/courses/reviews) errored 42703 live; the D4 client fallback hid it.
+- Draft for Ben: docs/sql/explore_stream_d5_fix.sql (deployed body, md5 2269e61522a052c8bae115621a5ff276, two references changed to g.whs_score_id).
+- Fixture corrected to production parity (tests/sql/explore_stream_d1_fixture.sql), test-side join fixed, scripts/explore-d5-harness.sh added; 12 D3 assertions pass.
+- OPEN: useExploreStream sets unavailable on error but does not report to the app error pipeline (src/lib/errorTracking.ts). Proposed, not built.

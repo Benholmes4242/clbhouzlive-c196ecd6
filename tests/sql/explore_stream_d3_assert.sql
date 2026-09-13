@@ -305,7 +305,7 @@ do $$
 declare n int;
 begin
   select count(*) into n from walk3 w join gam_round_stats g
-    on ('round:' || g.id::text) = w.id
+    on ('round:' || g.whs_score_id::text) = w.id
   where w.view = 'scores'
     and (w.lane = 'backlog') <> ((g.created_at::date - g.play_date) > 30);
   if n > 0 then raise exception 'D3 FAIL: % Scores rounds in the wrong lane', n; end if;

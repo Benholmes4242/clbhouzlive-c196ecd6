@@ -7,9 +7,12 @@ create table user_profiles (
 create table golf_courses (
   id uuid primary key, name text, country text, sub_country text, region text,
   thumbnail_image text, club_id uuid);
+-- SCHEMA PARITY IS THE POINT: production gam_round_stats has NO id column -
+-- whs_score_id (attnum 1) is its key. The invented id here is what let the
+-- 42703 through D1-D3 green. Never add a column production does not have.
 create table gam_round_stats (
-  id uuid primary key default gen_random_uuid(), user_id uuid, course_id uuid,
-  whs_score_id uuid, play_date date, created_at timestamptz default now(),
+  user_id uuid, course_id uuid,
+  whs_score_id uuid primary key, play_date date, created_at timestamptz default now(),
   gross_score int, course_par int, stableford_points int, birdies int, eagles int,
   albatrosses int, holes_in_one int, clean_card boolean, hcp_at_time numeric,
   holes_played int default 18);
