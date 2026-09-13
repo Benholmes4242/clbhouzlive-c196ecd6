@@ -96,6 +96,10 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
   const navigate = useNavigate();
   const copy = useStandingCopy();
   const standing = useViewerStanding(viewerId);
+  /* The tiles are all the VIEWER's, so the avatar is the viewer's own photo,
+     read from user_profiles — never a board row's nearest photo field. */
+  const { identity } = useViewerIdentity(viewerId);
+
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const tiles = useMemo(() => standing.rows.slice(0, RENDERED), [standing.rows]);
