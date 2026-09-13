@@ -109,7 +109,12 @@ function buildBlocks(items: StreamItem[], shelves: ShelfKind[], sameKindPairs = 
       blocks.push({ kind: 'lead', item });
       index += 1;
       cards += 1;
-    } else if (next && PAIRABLE.has(item.kind) && PAIRABLE.has(next.kind) && item.kind !== next.kind) {
+    } else if (
+      next &&
+      PAIRABLE.has(item.kind) &&
+      PAIRABLE.has(next.kind) &&
+      (sameKindPairs || item.kind !== next.kind)
+    ) {
       blocks.push({ kind: 'pair', items: [item, next] });
       index += 2;
       cards += 2;
