@@ -64,9 +64,13 @@ function nowIso() {
  * belongs in ALL and nowhere else — matching an empty array against every
  * filter put a men's county story under GIRLS.
  */
-export function useAmateurStories(category: string | null) {
+/** PHASE D §5c: `enabled` is ADDITIVE and DEFAULTS TO TRUE, so every existing
+ *  caller behaves byte-identically. Only the retired client ranker passes false,
+ *  and only while the RPC is serving the view. */
+export function useAmateurStories(category: string | null, enabled = true) {
   const q = useQuery({
     queryKey: ['amateur-stories', 'list'],
+    enabled,
     staleTime: 5 * 60_000,
     queryFn: async (): Promise<AmateurStory[]> => {
       const { data, error } = await supabase

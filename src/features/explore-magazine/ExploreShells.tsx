@@ -90,3 +90,52 @@ export function ShelfShell({ tileW, tileH }: { tileW: number; tileH: number }) {
     </div>
   );
 }
+
+/**
+ * THE FAILED SHELF (BRIEF_EXPLORE_MAGAZINE PHASE D §5b).
+ *
+ * ERRORED IS NOT EMPTY. A shelf whose source THREW renders this row and offers
+ * the read again; a shelf that settled EMPTY still renders nothing. The two
+ * states looked identical for as long as the sources returned [] on failure,
+ * which is exactly how a broken read stays broken forever.
+ *
+ * It is deliberately the quietest possible row: one line of MUTE text and one
+ * INK action, no icon, no panel, no amber — nothing here is a member's own
+ * doing, and nothing here is a Post control.
+ */
+export function ShelfRetry({
+  heading,
+  label,
+  action,
+  onRetry,
+}: {
+  heading: string;
+  label: string;
+  action: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div style={{ fontFamily: SANS, padding: '0 16px' }}>
+      <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK }}>{heading}</div>
+      <div style={{ marginTop: 6, display: 'flex', alignItems: 'baseline', gap: 10 }}>
+        <span style={{ fontSize: 13, color: A.MUTE }}>{label}</span>
+        <button
+          type="button"
+          onClick={onRetry}
+          style={{
+            background: 'none',
+            border: 0,
+            padding: 0,
+            font: 'inherit',
+            fontSize: 13,
+            fontWeight: 600,
+            color: A.INK,
+            cursor: 'pointer',
+          }}
+        >
+          {action}
+        </button>
+      </div>
+    </div>
+  );
+}

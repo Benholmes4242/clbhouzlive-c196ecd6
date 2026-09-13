@@ -5,7 +5,7 @@
 - [x] D1 client gate (landed with automatic fallback while the SQL is unapplied): add the centralized viewer/view/scope infinite-query key, first-page persistence, final server ordering, and bottom sentinel after the RPC exists live.
 - [ ] D2: add the round-only news/backlog lane from `gam_round_stats.created_at` versus `play_date`, page filling, and platform-notable tail; verify real arrival behavior.
 - [ ] D3: move Scores, Courses, Reviews, and Watch bodies to the RPC while retaining existing shelf hooks and shared geography inputs.
-- [ ] D4: wire shortlisted-course recent-event copy, distinguish long-form errors from settled-empty, audit every stream source, and dead-list the client ranker without deleting it.
+- [x] D4: wire shortlisted-course recent-event copy, distinguish long-form errors from settled-empty, audit every stream source, and dead-list the client ranker without deleting it.
 - Device acceptance items remain **landed, not verified** until Ben checks them.
 
 ## Explore Magazine Phase B2 — Scores (13 Sep 2026)
@@ -1382,3 +1382,42 @@ page behind it — recorded at the site in VideoPlaybackContext.openFull.
   were missing from every locale file and are now added in all six.
 - Asserted as DEPLOYED behaviour, not changed: a page may go short while the
   stream continues, and may carry one card over p_limit.
+
+## Explore Phase D4 - the last one (landed, not device-verified)
+- §5a ON YOUR LIST second line: src/features/explore-magazine/listCourseEvents.ts
+  reads the events the ranker ALREADY returned on the page (no second query) -
+  record, then recent low, then new rating. A course with NO event, or with two
+  DIFFERENT kinds at equal strength, keeps its AREA; the area is correct, not a
+  placeholder. Threaded through CourseShelf via an optional `events` map.
+- §5b ERRORED IS NOT EMPTY: useHubLongFormVideos now THROWS instead of returning
+  [], HubVideoRow gained a failed/retry state, and the Explore clips and moments
+  shelves render ShelfRetry (new, in ExploreShells.tsx) on error. Settled-empty
+  still renders nothing anywhere.
+  Sweep result - already loud (throw): useLatestReviews, useMomentsOfTheWeek,
+  useAmateurStories, useCourseCardMeta, useBoardCourses, useUserWantToPlay,
+  useViewerStanding, useViewerCourseBests, useCourseRecordSignal,
+  useViewerCourseContext, useDiscoverMediaPreview, useClubGolfers,
+  useVideosFeedV2, useExploreStream.
+  STILL SWALLOWING, reported for a decision, NOT changed (shared far past
+  Explore): useCircleLatestRounds primary reads (:288, :340, :374 destructure
+  data only, so a failed pool looks empty) plus its soft enrichment reads;
+  useRoundHoleShapes (deliberate missing-table compatibility fallback).
+- §5c CLIENT RANKER RETIRED: useExploreStreamClient is DEAD-LISTED, NOT DELETED.
+  It is off the page path (ExploreMagazine passes enabled:false while the RPC
+  serves the view) but STAYS WIRED as the fallback - `fallbackWanted =
+  !serverView || server.unavailable`, and useExploreStream sets unavailable on
+  any query error, so a forced RPC error re-enables the whole composition. It is
+  also still the only composer for Watch. New additive `options.enabled`
+  (default TRUE) on useExploreStreamClient and `enabled` (default TRUE) on
+  useAmateurStories; every other caller is byte-identical.
+  Importer counts for the hooks kept: consequences 6, useViewerStanding 4,
+  useViewerCourseBests 2, useCourseRecordSignal 3, useViewerScoreScope 5,
+  useRoundHoleShapes 10, useExploreStreamClient 3 (page, useExploreStream for
+  STREAM_PAGE_SIZE, and a comment reference).
+- docs/sql/explore_stream_d4.sql: COMMENT-ONLY draft over the deployed D3 body,
+  writing down the two asserted behaviours - short pages continue because the
+  backlog allowance and cadence TURN ROWS AWAY without consuming them, and the
+  one-card overshoot happens because deferred placement resolves after the limit
+  check (bounded at one row; the cursor keys on the last row actually returned).
+- Not verified: authenticated device check, and the forced-RPC-error fallback in
+  a real session (the condition is proved in source, not on a device).

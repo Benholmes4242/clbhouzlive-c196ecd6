@@ -1627,7 +1627,14 @@
         "factRated": "{{rounds}}ラウンドを記録、{{count}}件の評価で{{rating}}。",
         "factRounds": "ここで{{rounds}}ラウンドを記録。",
         "factRatedOnly": "{{count}}件の評価で{{rating}}。"
-      }
+      },
+      "list": {
+        "eventRecord": "コースレコード更新",
+        "eventLow": "最少スコア更新 {{gross}}",
+        "eventRating": "新たな評価 {{rating}}"
+      },
+      "failed": "読み込めませんでした。",
+      "retry": "再試行"
     },
     "shelf": {
       "aroundCounty": "{{county}}周辺",

@@ -1691,7 +1691,14 @@
         "factRated": "{{rounds}} vueltas registradas, valorado {{rating}} de {{count}}.",
         "factRounds": "{{rounds}} vueltas registradas aqui.",
         "factRatedOnly": "Valorado {{rating}} de {{count}}."
-      }
+      },
+      "list": {
+        "eventRecord": "Nuevo record del campo",
+        "eventLow": "Nueva mejor tarjeta: {{gross}}",
+        "eventRating": "Valorado ahora {{rating}}"
+      },
+      "failed": "Esto no se cargo.",
+      "retry": "Reintentar"
     },
     "shelf": {
       "aroundCounty": "Por {{county}}",
