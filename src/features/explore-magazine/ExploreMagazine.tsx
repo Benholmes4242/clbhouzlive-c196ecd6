@@ -26,6 +26,7 @@ import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClie
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
 import { CourseShelf } from './CourseShelf';
+import { PeopleShelf } from './PeopleShelf';
 import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCourseShelves';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding } from './useViewerStanding';
@@ -526,6 +527,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             enabled={(scoreScope === 'club' || scoreScope === 'county') && !!geography.scope.primaryClubId}
             pos={0}
           />
+          {/* §4 THE PEOPLE SHELF MOUNTS IN BOTH VIEWS. In Scores it belongs to
+              the club and county scopes, which are the scopes that have a club. */}
+          <PeopleShelf
+            viewerId={userId}
+            clubId={geography.scope.primaryClubId}
+            clubName={geography.scope.primaryClubName}
+            enabled={geography.isFetched && (scoreScope === 'club' || scoreScope === 'county')}
+            pos={0}
+          />
         </div>
       ) : null}
 
@@ -602,9 +612,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     onDepart={depart}
                   />
                 ) : block.shelf === 'people' ? (
-                  /* C2 builds the people shelf; until then this slot is empty
-                     and the next shelf takes it, exactly as an empty rail does. */
-                  null
+                  <PeopleShelf
+                    viewerId={userId}
+                    clubId={geography.scope.primaryClubId}
+                    clubName={geography.scope.primaryClubName}
+                    enabled={geography.isFetched}
+                    pos={pos}
+                  />
                 ) : (
                   <MomentsShelf pos={pos} onDepart={depart} />
                 )}

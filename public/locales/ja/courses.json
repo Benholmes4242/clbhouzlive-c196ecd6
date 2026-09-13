@@ -1616,7 +1616,14 @@
     "shelf": {
       "aroundCounty": "{{county}}周辺",
       "aroundWorld": "世界各地",
-      "onYourList": "あなたのリスト"
+      "onYourList": "あなたのリスト",
+      "golfersAtClub": "{{club}}のゴルファー",
+      "yourClub": "あなたのクラブ",
+      "holdsBoards": "コースレコード{{count}}件",
+      "roundsHere": "ここで{{count}}ラウンド",
+      "newThisMonth": "今月から参加",
+      "follow": "フォロー",
+      "following": "フォロー中"
     }
   }
 }

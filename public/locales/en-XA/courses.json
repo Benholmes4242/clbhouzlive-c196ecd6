@@ -2264,7 +2264,14 @@
     "shelf": {
       "aroundCounty": "[Ãrõũñd {{county}}]",
       "aroundWorld": "[Ãrõũñd thé wõrld]",
-      "onYourList": "[Õñ ýõũr lïst]"
+      "onYourList": "[Õñ ýõũr lïst]",
+      "golfersAtClub": "[Gõlférs ãt {{club}}]",
+      "yourClub": "[ýõũr člũb]",
+      "holdsBoards": "[Hõlds {{count}} bõãrds]",
+      "roundsHere": "[{{count}} rõũñds héré]",
+      "newThisMonth": "[Néw thïs mõñth]",
+      "follow": "[Fõllõw]",
+      "following": "[Fõllõwïñg]"
     }
   }
 }

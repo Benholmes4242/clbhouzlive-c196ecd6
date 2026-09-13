@@ -227,6 +227,8 @@ export const EVENT_LABELS: Record<string, string> = {
   /* BRIEF_EXPLORE_MAGAZINE Phase B1 — the standing shelf. */
   amateur_standing_tile_tapped: 'Explore standing tile tapped',
   amateur_standing_see_all_opened: 'Explore standing see-all opened',
+  /* Phase C §4 — the club people shelf. */
+  amateur_follow_tapped: 'Explore follow tapped',
 
 };
 
