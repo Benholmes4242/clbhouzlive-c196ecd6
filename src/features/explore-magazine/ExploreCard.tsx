@@ -391,11 +391,11 @@ export function ExploreCard({
             overflow: 'hidden',
           }}
         >
-          {treatment === 'shape' ? (
-            <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
-              height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
-              baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow />
-          ) : treatment === 'ticks' ? <RoundTicks shape={shape} /> : <RoundDistribution shape={shape} />}
+          <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
+            height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
+            baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow
+            exploreDots={dots} />
+
         </span>
       ) : null}
       {onPhoto ? (
