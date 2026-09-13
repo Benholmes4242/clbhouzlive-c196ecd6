@@ -383,13 +383,18 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     const page = Math.ceil(visible.length / STREAM_PAGE_SIZE);
     if (page === loggedRef.current) return;
     loggedRef.current = page;
+    /* THE REAL LANE MIX (D2). Counted from what is on the page, never asserted:
+       the client fallback is all news, the RPC splits rounds into news/backlog. */
+    const backlog = visible.reduce((n, item) => n + (item.lane === 'backlog' ? 1 : 0), 0);
     analyticsEvents.track('amateur_stream_page_loaded', {
       page,
       returned: visible.length,
-      lane_mix: 'news',
+      lane_mix: `news:${visible.length - backlog},backlog:${backlog}`,
+      backlog_count: backlog,
       view,
     });
-  }, [source.isFetched, visible.length, view]);
+  }, [source.isFetched, visible, view]);
+
 
   /* §6f THE SENTINEL MEANS LOADING, NOT "MORE EXISTS". When the pool is spent it
      unmounts and the page ends at the last card. */
