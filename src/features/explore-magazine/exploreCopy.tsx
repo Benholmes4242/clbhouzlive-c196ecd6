@@ -211,13 +211,9 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
       gross,
     });
   }
-  if (c?.kind === 'rank_down' && c.n != null && c.of != null && gross != null) {
-    return t(
-      'amateur.stream.headline.rankDown',
-      '{{player}} went round in {{gross}}, which puts you {{ord}} of the {{of}} who have played here.',
-      { player, gross, ord, of: c.of },
-    );
-  }
+  /* NO rankDown / playedNoChange SENTENCE. Both kinds are retired: they
+     explained a non-event, which is exactly why the sentence was long enough to
+     run off the card. Their locale keys stay in place, unused, for Phase E. */
   if (c?.kind === 'rank_up' && c.n != null && gross != null) {
     if (c.delta != null && c.delta > 0) {
       return t(
