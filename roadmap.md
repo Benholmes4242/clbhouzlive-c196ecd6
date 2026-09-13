@@ -1358,3 +1358,9 @@ page behind it — recorded at the site in VideoPlaybackContext.openFull.
   (`holes.fieldAvg` is a separate key and still live in the holes sheet).
 - OPEN CONTRADICTION: the tour-only FIELD row of signed decimals is now unlabelled
   and is the one row on the card that was not inferable from its contents.
+
+## Explore Phase D2 - backlog lane (landed, not device-verified)
+- docs/sql/explore_stream_d2.sql drafted from the LIVE pg_get_functiondef dump; Ben runs it.
+- Local PG16 harness: scripts/explore-d2-harness.sh (all assertions pass).
+- Departure filed: when the news lane is exhausted an all-backlog page may open; while any news remains backlog never leads.
+- ExploreMagazine analytics now reports the real lane mix.
