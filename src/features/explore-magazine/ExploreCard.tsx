@@ -129,7 +129,7 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
         figure={String(facts.gross)}
         unit={toPar ?? undefined}
         tone="#FFFFFF"
-        unitTone={under ? A.RED : undefined}
+        unitTone={under ? PHOTO_FIG_UNDER : undefined}
       />,
     );
   }
@@ -141,7 +141,7 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
         corner="left"
         figure={facts.rating.toFixed(1)}
         unit={t('amateur.stream.chip.rating', 'rating')}
-        tone={facts.rating >= 9 ? A.GREEN : '#FFFFFF'}
+        tone={facts.rating >= 9 ? PHOTO_FIG_GOOD : '#FFFFFF'}
       />,
     );
   }
@@ -154,7 +154,7 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
           corner="left"
           figure={facts.rating.toFixed(1)}
           unit={facts.rating_n != null ? `${facts.rating_n}` : undefined}
-          tone={facts.rating >= 9 ? A.GREEN : '#FFFFFF'}
+          tone={facts.rating >= 9 ? PHOTO_FIG_GOOD : '#FFFFFF'}
         />,
       );
     }
