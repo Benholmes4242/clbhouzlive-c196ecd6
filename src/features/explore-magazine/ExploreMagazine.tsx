@@ -328,32 +328,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   );
   const scoresStanding = useViewerStanding(userId);
 
-  /* §6h THE NO-CONNECTION SENTENCE IS ABOUT THE MEMBER, NOT ABOUT THE PAGE.
-     It renders only when EVERY one of the five viewer checks has SETTLED and
-     every one is empty: no played courses (get_viewer_standing), no shortlist,
-     no ratings of their own, no follows, and neither a club nor a county.
-     UNRESOLVED IS NOT EMPTY - while anything is pending, unresolved or errored
-     the sentence stays away. A disabled query reports isLoading false, so
-     readiness is isFetched here and never isLoading. */
-  const viewerContext = useViewerCourseContext(userId);
-  const viewerFollows = useFollowingIdSet(userId);
-  const viewerChecksSettled =
-    !!userId &&
-    scoresStanding.isFetched &&
-    !scoresStanding.unresolved &&
-    viewerContext.isFetched &&
-    viewerFollows.isFetched &&
-    !viewerFollows.isError &&
-    geography.isFetched;
-  const viewerHasNothing =
-    viewerChecksSettled &&
-    scoresStanding.rows.length === 0 &&
-    viewerContext.context.shortlist.size === 0 &&
-    viewerContext.context.ratings.size === 0 &&
-    (viewerFollows.data?.size ?? 0) === 0 &&
-    !geography.scope.primaryClubId &&
-    !geography.scope.county;
-
+  /* §6h REMOVED BY RULING: the no-connection sentence never renders on All,
+     for any member. An unconnected member simply gets the platform-wide
+     stream. The invitation lives on Scores, in context. The
+     'amateur.stream.nothingYet' locale keys stay, unused, for Phase E. */
 
   /* §5b THE COURSES VIEW'S OWN BODY. Course cards are not rounds, reviews or
      media, so they are composed by their own hook off get_board_courses and the
@@ -849,20 +827,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       ) : null}
 
-      {!singleType && view !== 'scores' && viewerHasNothing ? (
-        /* §6h THE ONE SENTENCE ON THE PAGE. No heading, no placeholder card.
-           IT IS ABOUT THE MEMBER, NEVER ABOUT THIS PAGE: an outer-ring heavy
-           page is a ranking outcome, not a statement that the member has no
-           connections. See viewerHasNothing above. */
-        <div style={{ paddingInline: 20, marginTop: 8 }}>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
-            {t(
-              'amateur.stream.nothingYet',
-              'Nothing here touches your courses yet. Follow a course or connect a handicap and this page becomes yours.',
-            )}
-          </p>
-        </div>
-      ) : null}
 
       {/* minmax(0,1fr), NOT bare 1fr: a grid item's automatic minimum is its
           min-content, and the kicker/who-line are single-line nowrap — without
