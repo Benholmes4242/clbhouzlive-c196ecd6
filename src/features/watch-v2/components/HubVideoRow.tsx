@@ -253,7 +253,7 @@ export function HubVideoRow() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useSupabaseSession();
   // SETTLED IS NOT "NOT LOADING": useHubLongFormVideos is gated on user?.id.
-  const { data, isLoading: fetching, isFetched } = useHubLongFormVideos(user?.id);
+  const { data, isLoading: fetching, isFetched, isError, refetch } = useHubLongFormVideos(user?.id);
   const isLoading = !isFetched || fetching;
 
   const rows = (data ?? []) as HubRpcRow[];
@@ -263,6 +263,37 @@ export function HubVideoRow() {
     posts: feedPosts,
     maxActive: 1,
   });
+
+  /* ERRORED IS NOT EMPTY (BRIEF_EXPLORE_MAGAZINE PHASE D §5b). The read used to
+     return [] on failure, so a broken rail rendered as a correct empty one and
+     stayed broken silently. A failure now says so and offers the read again;
+     SETTLED-EMPTY still renders nothing. */
+  if (isError) {
+    return (
+      <section style={{ fontFamily: FONT_FAMILY }}>
+        <SectionHeader role="section" accent="#F7931E" kicker="LONG FORM" title="New videos" paddingX={16} />
+        <div style={{ padding: '0 16px', display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <span style={{ fontSize: 13, color: 'rgba(15,23,42,0.62)' }}>This did not load.</span>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            style={{
+              background: 'none',
+              border: 0,
+              padding: 0,
+              font: 'inherit',
+              fontSize: 13,
+              fontWeight: 600,
+              color: '#0F172A',
+              cursor: 'pointer',
+            }}
+          >
+            Try again
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   if (!isLoading && !authLoading && rows.length === 0) return null;
