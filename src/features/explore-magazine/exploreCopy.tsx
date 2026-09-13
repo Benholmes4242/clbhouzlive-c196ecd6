@@ -40,7 +40,9 @@ export function kickerParts(item: StreamItem, t: T): string[] {
     return withCourse(t('amateur.stream.kicker.ownRound', 'Your round'));
   }
   if (item.facts.is_course_record) {
-    return withCourse(t('amateur.stream.kicker.courseRecord', 'Course record'));
+    // The headline owns the event. The kicker keeps only the course so the
+    // adjacent lines never repeat "course record" or sacrifice its name.
+    return course ? [course] : [];
   }
   if (item.consequence?.kind === 'review_on_list' || item.consequence?.kind === 'list_new_low' || item.consequence?.kind === 'list_first') {
     return withCourse(t('amateur.stream.kicker.onYourList', 'On your list'));

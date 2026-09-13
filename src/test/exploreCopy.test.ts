@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { headlineFor } from '@/features/explore-magazine/exploreCopy';
+import { headlineFor, kickerParts } from '@/features/explore-magazine/exploreCopy';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
 const translate = (_key: string, fallback = '', vars: Record<string, unknown> = {}) =>
@@ -50,5 +50,24 @@ describe('Explore round headline ownership', () => {
       consequence: { kind: 'rank_hold', n: 7, of: 41 },
     });
     expect(headlineFor(item, translate)).toBe('Your 68 holds 7th of 41 here.');
+  });
+});
+
+describe('Explore round kicker ownership', () => {
+  it('removes the record event category and leaves the course', () => {
+    expect(kickerParts(round({ facts: { gross: 68, is_course_record: true } }), translate))
+      .toEqual(["Prince's Golf Club (Shore, Dunes & Himalayas)"]);
+  });
+
+  it.each([
+    ['own', { who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true } }, 'Your round'],
+    ['list', { consequence: { kind: 'list_new_low' as const } }, 'On your list'],
+    ['club', { ring: 'club' as const }, 'At your club'],
+    ['county', { ring: 'county' as const }, 'Around Kent'],
+    ['country', { ring: 'country' as const }, 'Around England'],
+    ['world', { ring: 'world' as const }, 'Around the world'],
+    ['backlog', { ring: null, lane: 'backlog' as const }, 'From September'],
+  ])('keeps the %s reason before the course', (_label, overrides, expected) => {
+    expect(kickerParts(round(overrides as Partial<StreamItem>), translate)[0]).toBe(expected);
   });
 });
