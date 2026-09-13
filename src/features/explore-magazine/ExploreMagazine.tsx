@@ -21,7 +21,13 @@ import { ExploreCard, type CardSize } from './ExploreCard';
 import { ExploreShelf } from './ExploreShelf';
 import { StandingShelf } from './StandingShelf';
 import { LeadShell, PairShell, ShelfShell, StdShell } from './ExploreShells';
-import { EXPLORE_VIEWS, readExploreView, writeExploreView, type ExploreView } from './exploreViewMemory';
+import {
+  EXPLORE_VIEWS,
+  SCOPED_VIEWS,
+  readExploreView,
+  writeExploreView,
+  type ExploreView,
+} from './exploreViewMemory';
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
