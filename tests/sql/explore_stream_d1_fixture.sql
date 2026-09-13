@@ -153,6 +153,26 @@ create table gam_course_legends (
   is_current boolean,
   updated_at timestamptz default now());
 
+/* The D3 candidate branch reads notifications for the platform-notable path. */
+create table notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  type text,
+  title text,
+  message text,
+  data jsonb,
+  read boolean,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  is_read boolean,
+  actor_id uuid,
+  entity_type text,
+  entity_id uuid,
+  is_deleted boolean,
+  recipient_actor_type text,
+  recipient_actor_id uuid,
+  actor_type text);
+
 create table user_surface_last_seen (
   user_id uuid,
   surface_key text,
