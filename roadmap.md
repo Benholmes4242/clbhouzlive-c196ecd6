@@ -1,5 +1,13 @@
 # Roadmap
 
+## Explore island-to-chip seam (13 Sep 2026)
+- [x] Classify `/amateur` as `scrollAway` through the shared chrome registry.
+- [x] Pin the primary view chips at `var(--sat)` and register the existing sentinel-driven safe-area scrim.
+- [x] Keep first-card clearance, scroll memory, and the non-sticky scope row unchanged.
+- [x] Verify 320px and 390px top/stuck/return geometry with no horizontal page overflow; production build passes.
+- [ ] Ben device acceptance: confirm native notch inset, touch scrolling, and restored-position return without a visible jump.
+- [ ] Separate production data blocker: `get_explore_stream` Scores/World fails with `42703 column g.id does not exist`; no SQL changed in this UI pass.
+
 ## Explore Magazine Phase D — server ranker (13 Sep 2026)
 - [x] D1: dump every touched live function; draft `explore_config` and All-only `get_explore_stream` under `docs/sql/`; build and run the PG16 fidelity/keyset/cadence/cold-viewer harness; stop for Ben to run the SQL before switching All.
 - [x] D1 client gate (landed with automatic fallback while the SQL is unapplied): add the centralized viewer/view/scope infinite-query key, first-page persistence, final server ordering, and bottom sentinel after the RPC exists live.
