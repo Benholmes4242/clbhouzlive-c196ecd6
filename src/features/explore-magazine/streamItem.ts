@@ -16,8 +16,8 @@ import type { CommunityLibraryItem } from '@/components/explore-tab-new/coursele
  *   - `ring` is only 'own' or null, because geography is Phase C. Nothing on
  *     this page claims a club, a county or a country yet, so the outer-ring
  *     cadence cap has nothing to act on.
- *   - rank consequences (rank_down / rank_up / rank_hold / record_taken with a
- *     gap / played_nochange) need the viewer's standing per course, which is
+ *   - rank consequences (rank_up / rank_hold / record_taken with a
+ *     gap) need the viewer's standing per course, which is
  *     Phase B's get_viewer_standing. They are declared here and never emitted
  *     by Phase A.
  *   - `lane` is always 'news' in Phase A. The backlog lane needs arrived_at
@@ -30,11 +30,17 @@ export type ExploreRing = 'own' | 'club' | 'county' | 'country' | 'world';
 
 export type ExploreLane = 'news' | 'backlog';
 
-/** §6b, highest weight first. The order IS the weighting. */
+/** §6b, highest weight first. The order IS the weighting.
+ *
+ *  RETIRED KINDS: `rank_down` and `played_nochange` were removed from this table
+ *  (Sep 2026 ruling). They restated the viewer's standing once per round anyone
+ *  played anywhere the viewer had teed off, so eighteen rounds at one club drew
+ *  eighteen near-identical cards. A round by someone else is only news if it
+ *  CHANGED something — see consequences.ts. Their locale keys survive unused for
+ *  the Phase E sweep; nothing weights or branches on them any more. */
 export const CONSEQUENCE_ORDER = [
   'record_taken',
   'record_lost',
-  'rank_down',
   'rank_up',
   'rank_hold',
   'list_new_low',
@@ -43,7 +49,6 @@ export const CONSEQUENCE_ORDER = [
   'review_on_list',
   'review_played',
   'circle_round',
-  'played_nochange',
   'backlog_own_best',
   'platform_notable',
 ] as const;

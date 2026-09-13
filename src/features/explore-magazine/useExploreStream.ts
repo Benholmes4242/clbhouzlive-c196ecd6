@@ -7,6 +7,7 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
 import { courseHeadline } from './courseHeadline';
+import { admitRetired, isRetiredConsequenceKind } from './consequences';
 import { trackError } from '@/lib/errorTracking';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -280,7 +281,18 @@ export function useExploreStream(
       if (error) throw error;
       const rows = data ?? [];
       return {
-        items: rows.map(toItem),
+        /* THE RETIRED KINDS ARE NOT CARDS (Sep 2026 ruling). The deployed RPC
+           still ranks them, so the page admits them here: the viewer's own round
+           keeps its place with no consequence, a notable round becomes
+           platform_notable, and anything else is dropped. THE CURSOR IS STILL
+           READ FROM THE RAW ROWS below, so dropping a card never shortens the
+           keyset or skips a page. */
+        items: rows.flatMap((row) => {
+          if (!isRetiredConsequenceKind(row.consequence?.kind)) return [toItem(row)];
+          const admitted = admitRetired(row.facts, !!row.who?.is_viewer);
+          if (!admitted) return [];
+          return [{ ...toItem(row), consequence: admitted.consequence }];
+        }),
         /* Every row carries the same cursor; the last one is the page boundary. */
         cursor: rows.length ? (rows[rows.length - 1].next_cursor ?? null) : null,
       };
