@@ -1542,7 +1542,9 @@
       "view": {
         "all": "すべて",
         "scores": "スコア",
-        "watch": "見る"
+        "watch": "見る",
+        "courses": "Courses",
+        "reviews": "Reviews"
       },
       "shelf": {
         "clips": "クリップ",
@@ -1552,7 +1554,9 @@
       },
       "scope": {
         "club": "マイクラブ",
-        "world": "世界"
+        "world": "世界",
+        "yourClub": "your club",
+        "theWorld": "the world"
       },
       "scopes": "スコアの範囲",
       "roundCount": "{{count}}ラウンド",
@@ -1611,7 +1615,11 @@
         "of": "{{count}}人中",
         "lastChange": "最新の変動 {{when}}"
       },
-      "ratingCount": "{{count}}件の評価"
+      "ratingCount": "{{count}}件の評価",
+      "empty": {
+        "courses": "No courses in {{scope}} yet.",
+        "reviews": "No reviews in {{scope}} yet."
+      }
     },
     "shelf": {
       "aroundCounty": "{{county}}周辺",
@@ -1623,7 +1631,8 @@
       "roundsHere": "ここで{{count}}ラウンド",
       "newThisMonth": "今月から参加",
       "follow": "フォロー",
-      "following": "フォロー中"
+      "following": "フォロー中",
+      "topRated": "Best rated lately"
     }
   }
 }

@@ -68,7 +68,9 @@
       "view": {
         "all": "All",
         "scores": "Scores",
-        "watch": "Watch"
+        "watch": "Watch",
+        "courses": "Courses",
+        "reviews": "Reviews"
       },
       "shelf": {
         "clips": "Clips",
@@ -78,7 +80,9 @@
       },
       "scope": {
         "club": "My club",
-        "world": "World"
+        "world": "World",
+        "yourClub": "your club",
+        "theWorld": "the world"
       },
       "scopes": "Scores scope",
       "roundCount": "{{count}} rounds",
@@ -135,6 +139,10 @@
         "board": "Lowest gross",
         "of": "of {{count}}",
         "lastChange": "last change {{when}}"
+      },
+      "empty": {
+        "courses": "No courses in {{scope}} yet.",
+        "reviews": "No reviews in {{scope}} yet."
       }
     },
     "shelf": {
@@ -144,7 +152,8 @@
       "roundsHere": "{{count}} rounds here",
       "newThisMonth": "New this month",
       "follow": "Follow",
-      "following": "Following"
+      "following": "Following",
+      "topRated": "Best rated lately"
     }
   },
   "amateurNews": {

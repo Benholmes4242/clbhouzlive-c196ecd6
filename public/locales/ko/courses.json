@@ -1545,7 +1545,9 @@
       "view": {
         "all": "전체",
         "scores": "스코어",
-        "watch": "보기"
+        "watch": "보기",
+        "courses": "Courses",
+        "reviews": "Reviews"
       },
       "shelf": {
         "clips": "클립",
@@ -1555,7 +1557,9 @@
       },
       "scope": {
         "club": "내 클럽",
-        "world": "세계"
+        "world": "세계",
+        "yourClub": "your club",
+        "theWorld": "the world"
       },
       "scopes": "스코어 범위",
       "roundCount": "{{count}}라운드",
@@ -1614,7 +1618,11 @@
         "of": "{{count}}명 중",
         "lastChange": "마지막 변동 {{when}}"
       },
-      "ratingCount": "평가 {{count}}건"
+      "ratingCount": "평가 {{count}}건",
+      "empty": {
+        "courses": "No courses in {{scope}} yet.",
+        "reviews": "No reviews in {{scope}} yet."
+      }
     },
     "shelf": {
       "aroundCounty": "{{county}} 주변",
@@ -1626,7 +1634,8 @@
       "roundsHere": "여기서 {{count}}라운드",
       "newThisMonth": "이번 달 신규",
       "follow": "팔로우",
-      "following": "팔로잉"
+      "following": "팔로잉",
+      "topRated": "Best rated lately"
     }
   }
 }

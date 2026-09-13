@@ -21,13 +21,20 @@ import { ExploreCard, type CardSize } from './ExploreCard';
 import { ExploreShelf } from './ExploreShelf';
 import { StandingShelf } from './StandingShelf';
 import { LeadShell, PairShell, ShelfShell, StdShell } from './ExploreShells';
-import { EXPLORE_VIEWS, readExploreView, writeExploreView, type ExploreView } from './exploreViewMemory';
+import {
+  EXPLORE_VIEWS,
+  SCOPED_VIEWS,
+  readExploreView,
+  writeExploreView,
+  type ExploreView,
+} from './exploreViewMemory';
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
 import { CourseShelf } from './CourseShelf';
 import { PeopleShelf } from './PeopleShelf';
 import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCourseShelves';
+import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding } from './useViewerStanding';
 import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
@@ -73,7 +80,10 @@ type ShelfKind =
   | 'moments'
   | 'people'
   | 'coursesWorld'
-  | 'coursesList';
+  | 'coursesList'
+  /** §5b PHASE C C3 — courses:top-rated, the one NEW shelf of this step. The
+   *  county and world course shelves already exist from C1 and are REUSED. */
+  | 'coursesTopRated';
 
 type Block =
   | { kind: 'lead'; item: StreamItem }
@@ -85,8 +95,14 @@ type Block =
 const PAIRABLE = new Set(['review', 'course', 'story']);
 
 /** §5 shelves are inserted after card positions 3, 7, 11 ... and an empty
- *  source means the next shelf takes the slot rather than a gap appearing. */
-function buildBlocks(items: StreamItem[], shelves: ShelfKind[]): Block[] {
+ *  source means the next shelf takes the slot rather than a gap appearing.
+ *
+ *  §5b/§5c A SINGLE-TYPE VIEW PAIRS ITS OWN KIND. The mixed stream refuses two
+ *  cards of the same kind side by side, because there it would read as one
+ *  repeated card; the Courses and Reviews views are all one kind by definition
+ *  and the brief allows pairs in both, so `sameKindPairs` opens that door for
+ *  those two views only. */
+function buildBlocks(items: StreamItem[], shelves: ShelfKind[], sameKindPairs = false): Block[] {
   const blocks: Block[] = [];
   let cards = 0;
   let nextShelf = 0;
@@ -100,7 +116,12 @@ function buildBlocks(items: StreamItem[], shelves: ShelfKind[]): Block[] {
       blocks.push({ kind: 'lead', item });
       index += 1;
       cards += 1;
-    } else if (next && PAIRABLE.has(item.kind) && PAIRABLE.has(next.kind) && item.kind !== next.kind) {
+    } else if (
+      next &&
+      PAIRABLE.has(item.kind) &&
+      PAIRABLE.has(next.kind) &&
+      (sameKindPairs || item.kind !== next.kind)
+    ) {
       blocks.push({ kind: 'pair', items: [item, next] });
       index += 2;
       cards += 2;
@@ -226,25 +247,41 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
   const [view, setView] = useState<ExploreView>(() => readExploreView());
   const geography = useViewerScoreScope(userId);
+  /* §1 ONE SCOPE, ONE COMPONENT, THREE VIEWS. Scores, Courses and Reviews all
+     read the SAME scope state from the SAME shared resolver; All and Watch never
+     show the row. The default on entry is My club where it resolves, else the
+     county, else World with no row at all. */
+  const scoped = SCOPED_VIEWS.includes(view);
   const [scoreScope, setScoreScope] = useState<ScoreScope>('world');
   const scoreScopeChosen = useRef(false);
   useEffect(() => {
-    if (view !== 'scores' || !geography.isFetched || scoreScopeChosen.current) return;
+    if (!scoped || !geography.isFetched || scoreScopeChosen.current) return;
     setScoreScope(geography.scope.primaryClubId ? 'club' : geography.scope.county ? 'county' : 'world');
     scoreScopeChosen.current = true;
-  }, [view, geography.isFetched, geography.scope.primaryClubId, geography.scope.county]);
+  }, [scoped, geography.isFetched, geography.scope.primaryClubId, geography.scope.county]);
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
   const stream = useExploreStreamClient(userId, view, { active: scoreScope, geography: geography.scope });
   const scoresStanding = useViewerStanding(userId);
 
-  /* PHASE C §3a-§3c THE COURSE SHELVES. The sources are asked ONLY on All, and
-     each shelf renders nothing when its source is empty. Geography comes from
-     the shared resolver above — no second derivation. */
-  const countyCourses = useCountyCourses(userId, geography.scope, view === 'all' && geography.isFetched);
-  const worldCourses = useWorldTop100Courses(view === 'all');
-  const listCourses = useListCourses(userId, view === 'all');
+  /* §5b THE COURSES VIEW'S OWN BODY. Course cards are not rounds, reviews or
+     media, so they are composed by their own hook off get_board_courses and the
+     shared geography — the client stream is left exactly as B2 shipped it. */
+  const coursesView = useScopeCourses(userId, scoreScope, geography.scope, view === 'courses' && geography.isFetched);
+  /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so a
+     single-type view and the mixed stream take the same reveal, sentinel,
+     page-loaded and end paths. */
+  const source = view === 'courses' ? coursesView : stream;
 
-  const visible = useMemo(() => stream.items.slice(0, revealed), [stream.items, revealed]);
+  /* PHASE C §3a-§3c THE COURSE SHELVES. Each shelf renders nothing when its
+     source is empty. Geography comes from the shared resolver above — no second
+     derivation, and C1's county and world shelves are REUSED here, not rebuilt. */
+  const shelvesWanted = view === 'all' || view === 'courses' || view === 'reviews';
+  const countyCourses = useCountyCourses(userId, geography.scope, shelvesWanted && geography.isFetched);
+  const worldCourses = useWorldTop100Courses(shelvesWanted);
+  const listCourses = useListCourses(userId, shelvesWanted);
+  const topRatedCourses = useRecentCourseRatings(view === 'courses' || view === 'reviews');
+
+  const visible = useMemo(() => source.items.slice(0, revealed), [source.items, revealed]);
 
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
      screen, and a card holds its whole shell until that resolver settles —
@@ -297,13 +334,34 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     'coursesWorld',
     'coursesList',
   ];
-  const shelves: ShelfKind[] = view === 'watch' ? ['moments'] : view === 'scores' ? [] : ALL_SHELVES;
-  const blocks = useMemo(() => buildBlocks(enriched, shelves), [enriched, view]);
+  /* §5b THE COURSES SHELF ORDER, skipping empties: list first where the viewer
+     has one, then county, then the new top-rated shelf, then world — and world
+     ONLY where the scope has already widened past the county (§5b).
+     §5c REVIEWS: top-rated, then list. */
+  const COURSES_SHELVES: ShelfKind[] = [
+    'coursesList',
+    'coursesCounty',
+    'coursesTopRated',
+    ...(scoreScope === 'country' || scoreScope === 'world' ? (['coursesWorld'] as ShelfKind[]) : []),
+  ];
+  const REVIEWS_SHELVES: ShelfKind[] = ['coursesTopRated', 'coursesList'];
+  const shelves: ShelfKind[] =
+    view === 'watch'
+      ? ['moments']
+      : view === 'scores'
+        ? []
+        : view === 'courses'
+          ? COURSES_SHELVES
+          : view === 'reviews'
+            ? REVIEWS_SHELVES
+            : ALL_SHELVES;
+  const singleType = view === 'courses' || view === 'reviews';
+  const blocks = useMemo(() => buildBlocks(enriched, shelves, singleType), [enriched, view, scoreScope, singleType]);
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
   const loggedRef = useRef(0);
   useEffect(() => {
-    if (!stream.isFetched) return;
+    if (!source.isFetched) return;
     const page = Math.ceil(visible.length / STREAM_PAGE_SIZE);
     if (page === loggedRef.current) return;
     loggedRef.current = page;
@@ -313,12 +371,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       lane_mix: 'news',
       view,
     });
-  }, [stream.isFetched, visible.length, view]);
+  }, [source.isFetched, visible.length, view]);
 
   /* §6f THE SENTINEL MEANS LOADING, NOT "MORE EXISTS". When the pool is spent it
      unmounts and the page ends at the last card. */
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const hasMore = revealed < stream.items.length;
+  const hasMore = revealed < source.items.length;
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || !hasMore) return;
@@ -333,10 +391,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   }, [hasMore]);
 
   useEffect(() => {
-    if (stream.isFetched && !hasMore && stream.items.length > 0) {
-      analyticsEvents.track('amateur_stream_end', { pages: Math.ceil(stream.items.length / STREAM_PAGE_SIZE), view });
+    if (source.isFetched && !hasMore && source.items.length > 0) {
+      analyticsEvents.track('amateur_stream_end', { pages: Math.ceil(source.items.length / STREAM_PAGE_SIZE), view });
     }
-  }, [stream.isFetched, hasMore, stream.items.length, view]);
+  }, [source.isFetched, hasMore, source.items.length, view]);
 
   const depart = useCallback(() => rememberAmateurScroll(), []);
 
@@ -439,9 +497,103 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             ? t('amateur.stream.view.all', 'All')
             : key === 'scores'
               ? t('amateur.stream.view.scores', 'Scores')
-              : t('amateur.stream.view.watch', 'Watch'),
+              : key === 'watch'
+                ? t('amateur.stream.view.watch', 'Watch')
+                : key === 'courses'
+                  ? t('amateur.stream.view.courses', 'Courses')
+                  : t('amateur.stream.view.reviews', 'Reviews'),
       })),
     [t],
+  );
+
+  /** §5d THE ONE EMPTY SENTENCE of these two views names the scope the member is
+   *  looking at, so the row above it is the way out. The county and country names
+   *  are DATA; "your club" and "the world" are the only translated ones. */
+  const scopeName =
+    scoreScope === 'club'
+      ? geography.scope.primaryClubName ?? t('amateur.stream.scope.yourClub', 'your club')
+      : scoreScope === 'county'
+        ? geography.scope.county ?? t('amateur.stream.scope.theWorld', 'the world')
+        : scoreScope === 'country'
+          ? geography.scope.country ?? t('amateur.stream.scope.theWorld', 'the world')
+          : t('amateur.stream.scope.theWorld', 'the world');
+  /* A SCOPE WITH NO CARDS BUT SHELVES WITH CONTENT RENDERS THE SHELVES AND NO
+     SENTENCE (§5d). The shelves each report their own emptiness. */
+  const shelvesHaveContent =
+    (listCourses.rows.length > 0) ||
+    (countyCourses.rows.length > 0) ||
+    (topRatedCourses.rows.length > 0) ||
+    ((scoreScope === 'country' || scoreScope === 'world') && worldCourses.rows.length > 0);
+
+  /** ONE SHELF RENDERER, TWO CALLERS (§5d): the stream's every-fourth-card slot
+   *  and the shelf-only state of an empty scope. A shelf reports its own
+   *  emptiness in both. */
+  const renderShelf = (shelf: ShelfKind, pos: number) => (
+    <>
+      {shelf === 'clips' ? (
+                  <ClipsShelf pos={pos} onDepart={depart} />
+                ) : shelf === 'clubWeek' ? (
+                  /* THE SAME SHELF THE SCORES VIEW USES — reused, not copied. */
+                  <WeeklyClubShelf
+                    viewerId={userId}
+                    clubName={geography.scope.primaryClubName}
+                    enabled={!!geography.scope.primaryClubId}
+                    pos={pos}
+                  />
+                ) : shelf === 'standing' ? (
+                  <StandingShelf viewerId={userId} pos={pos} />
+                ) : shelf === 'coursesCounty' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.aroundCounty', 'Around {{county}}', {
+                      county: geography.scope.county ?? '',
+                    })}
+                    rows={geography.scope.county ? countyCourses.rows : []}
+                    isFetched={geography.isFetched && countyCourses.isFetched}
+                    kind="courses_county"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : shelf === 'coursesWorld' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.aroundWorld', 'Around the world')}
+                    rows={worldCourses.rows}
+                    isFetched={worldCourses.isFetched}
+                    kind="courses_world"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : shelf === 'coursesList' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.onYourList', 'On your list')}
+                    rows={listCourses.rows}
+                    isFetched={listCourses.isFetched}
+                    kind="courses_list"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : shelf === 'coursesTopRated' ? (
+                  /* §5b THE NEW SHELF: rated in the last 30 days, floor of two
+                     ratings, mean descending. The same CourseShelf tile. */
+                  <CourseShelf
+                    heading={t('amateur.shelf.topRated', 'Best rated lately')}
+                    rows={topRatedCourses.rows}
+                    isFetched={topRatedCourses.isFetched}
+                    kind="courses_top_rated"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : shelf === 'people' ? (
+                  <PeopleShelf
+                    viewerId={userId}
+                    clubId={geography.scope.primaryClubId}
+                    clubName={geography.scope.primaryClubName}
+                    enabled={geography.isFetched}
+                    pos={pos}
+                  />
+                ) : (
+                  <MomentsShelf pos={pos} onDepart={depart} />
+                )}
+    </>
   );
 
   let cardPos = 0;
@@ -474,7 +626,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       </div>
 
-      {view === 'scores' && geography.isFetched && (geography.scope.primaryClubId || geography.scope.county) ? (
+      {/* §1 THE SAME SCOPE ROW, THE SAME COMPONENT, for Scores, Courses and
+          Reviews. It does not render at all where neither a club nor a county
+          resolves, and the view is then World. */}
+      {scoped && geography.isFetched && (geography.scope.primaryClubId || geography.scope.county) ? (
         <div style={{ padding: '0 12px 14px', minWidth: 0, overflow: 'hidden' }}>
           <RailChips
             options={[
@@ -486,7 +641,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             value={scoreScope}
             onChange={(next) => {
               const value = next as ScoreScope;
-              analyticsEvents.track('amateur_scope_changed', { view: 'scores', from: scoreScope, to: value });
+              analyticsEvents.track('amateur_scope_changed', { view, from: scoreScope, to: value });
               scoreScopeChosen.current = true;
               setScoreScope(value);
               setRevealed(STREAM_PAGE_SIZE);
@@ -541,14 +696,35 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
       {/* COLD START SHOWS THE SHORTEST PLAUSIBLE CARD, never a lead shell: a
           loading state is never larger than the state it resolves into. */}
-      {!stream.isFetched && enriched.length === 0 ? (
+      {!source.isFetched && enriched.length === 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP, paddingInline: CARD_INSET }}>
           <StdShell />
           <StdShell />
         </div>
       ) : null}
 
-      {view !== 'scores' && stream.isFetched && stream.items.length === 0 ? (
+      {singleType && source.isFetched && source.items.length === 0 ? (
+        /* §5d NEVER A BLANK VIEW. Where the shelves carry content they render and
+           the sentence stays away; where the scope is empty of EVERYTHING there
+           is exactly ONE sentence, and the scope row above it stays so the
+           member can widen. */
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
+          {shelves.map((shelf) => (
+            <div key={`empty-shelf:${shelf}`}>{renderShelf(shelf, 0)}</div>
+          ))}
+          {!shelvesHaveContent ? (
+            <div style={{ paddingInline: 20, marginTop: 8 }}>
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
+                {view === 'courses'
+                  ? t('amateur.stream.empty.courses', 'No courses in {{scope}} yet.', { scope: scopeName })
+                  : t('amateur.stream.empty.reviews', 'No reviews in {{scope}} yet.', { scope: scopeName })}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {!singleType && view !== 'scores' && stream.isFetched && stream.items.length === 0 ? (
         /* §6h THE ONE SENTENCE ON THE PAGE. No heading, no placeholder card. */
         <div style={{ paddingInline: 20, marginTop: 8 }}>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
@@ -568,62 +744,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         {blocks.map((block, index) => {
           if (block.kind === 'shelf') {
             const pos = cardPos;
-            return (
-              <div key={`shelf:${block.shelf}:${index}`}>
-                {block.shelf === 'clips' ? (
-                  <ClipsShelf pos={pos} onDepart={depart} />
-                ) : block.shelf === 'clubWeek' ? (
-                  /* THE SAME SHELF THE SCORES VIEW USES — reused, not copied. */
-                  <WeeklyClubShelf
-                    viewerId={userId}
-                    clubName={geography.scope.primaryClubName}
-                    enabled={!!geography.scope.primaryClubId}
-                    pos={pos}
-                  />
-                ) : block.shelf === 'standing' ? (
-                  <StandingShelf viewerId={userId} pos={pos} />
-                ) : block.shelf === 'coursesCounty' ? (
-                  <CourseShelf
-                    heading={t('amateur.shelf.aroundCounty', 'Around {{county}}', {
-                      county: geography.scope.county ?? '',
-                    })}
-                    rows={geography.scope.county ? countyCourses.rows : []}
-                    isFetched={geography.isFetched && countyCourses.isFetched}
-                    kind="courses_county"
-                    pos={pos}
-                    onDepart={depart}
-                  />
-                ) : block.shelf === 'coursesWorld' ? (
-                  <CourseShelf
-                    heading={t('amateur.shelf.aroundWorld', 'Around the world')}
-                    rows={worldCourses.rows}
-                    isFetched={worldCourses.isFetched}
-                    kind="courses_world"
-                    pos={pos}
-                    onDepart={depart}
-                  />
-                ) : block.shelf === 'coursesList' ? (
-                  <CourseShelf
-                    heading={t('amateur.shelf.onYourList', 'On your list')}
-                    rows={listCourses.rows}
-                    isFetched={listCourses.isFetched}
-                    kind="courses_list"
-                    pos={pos}
-                    onDepart={depart}
-                  />
-                ) : block.shelf === 'people' ? (
-                  <PeopleShelf
-                    viewerId={userId}
-                    clubId={geography.scope.primaryClubId}
-                    clubName={geography.scope.primaryClubName}
-                    enabled={geography.isFetched}
-                    pos={pos}
-                  />
-                ) : (
-                  <MomentsShelf pos={pos} onDepart={depart} />
-                )}
-              </div>
-            );
+            return <div key={`shelf:${block.shelf}:${index}`}>{renderShelf(block.shelf, pos)}</div>;
           }
 
           if (block.kind === 'pair') {

@@ -9,9 +9,12 @@
 
 export type ExploreView = 'all' | 'scores' | 'watch' | 'courses' | 'reviews';
 
-/** The views implemented through Phase B2. Courses and Reviews remain absent
- *  until Phase C rather than rendering controls with no complete answer. */
-export const EXPLORE_VIEWS: ExploreView[] = ['all', 'scores', 'watch'];
+/** PHASE C §1 THE CHIP ROW IS COMPLETE. Courses and Reviews are built, so they
+ *  render; a control that cannot change what you see still never appears. */
+export const EXPLORE_VIEWS: ExploreView[] = ['all', 'scores', 'watch', 'courses', 'reviews'];
+
+/** §1 the views that carry the SCOPE ROW. All and Watch never do. */
+export const SCOPED_VIEWS: ExploreView[] = ['scores', 'courses', 'reviews'];
 
 const KEY = 'amateur:view';
 
