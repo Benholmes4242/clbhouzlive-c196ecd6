@@ -80,7 +80,7 @@ export function CourseShelf({
             whenLabel=""
             who=""
             isOwn={false}
-            detail={sublineFor(row, t)}
+            detail={sublineFor(row, t as never)}
             onPress={() => {
               analyticsEvents.track('amateur_shelf_tile_tapped', { kind, pos });
               onDepart();
