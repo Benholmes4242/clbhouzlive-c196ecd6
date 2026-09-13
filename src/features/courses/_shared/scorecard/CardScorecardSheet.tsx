@@ -384,8 +384,8 @@ const Nine: React.FC<{
              from its contents, and the ruling removes the column that named it.
              It is left unlabelled rather than kept as the single labelled row,
              because one label beside three unlabelled rows is the two-grammar
-             problem in miniature. `scorecard.fieldShort` stays in the locales for
-             the holes sheet. */
+             problem in miniature. `scorecard.fieldShort` is dead-listed with the
+             other stub keys, not deleted. */
           cells={rows.map((h) => {
             const d = h.fieldAvg != null && h.par != null ? h.fieldAvg - h.par : null;
             if (d == null) return '';
