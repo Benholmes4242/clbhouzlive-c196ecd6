@@ -287,6 +287,13 @@ export function useExploreStream(
     },
   });
 
+  /* AUDIT RULING 2 — report the failure, once, when it transitions to set. */
+  useEffect(() => {
+    if (query.error) reportStreamFailure(view, scope, query.error);
+  }, [query.error, view, scope]);
+
+
+
   /* THE COURSE SENTENCE, IN THE MEMBER'S LANGUAGE. Only added where the row is a
      course card and the server did not carry a headline of its own. */
   const items = useMemo(
