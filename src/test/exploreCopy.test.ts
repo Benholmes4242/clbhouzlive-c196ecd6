@@ -94,7 +94,9 @@ describe('Explore round kicker ownership', () => {
   it.each([
     ['own', { who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true } }, 'Your round'],
     ['list', { consequence: { kind: 'list_new_low' as const } }, 'On your list'],
-    ['club', { ring: 'club' as const }, 'At your club'],
+    /* THE CLUB CARD WEARS ONLY ITS COURSE: "AT YOUR CLUB" was removed because
+       the club's own name follows it. */
+    ['club', { ring: 'club' as const }, "Prince's Golf Club (Shore, Dunes & Himalayas)"],
     ['county', { ring: 'county' as const }, 'Around Kent'],
     ['country', { ring: 'country' as const }, 'Around England'],
     ['world', { ring: 'world' as const }, 'Around the world'],
