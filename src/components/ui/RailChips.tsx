@@ -53,8 +53,16 @@ export interface RailChipsProps {
   /**
    * ADDITIVE. Omitted or 'outline' renders exactly as every existing consumer
    * always has. 'filled' is the applied-state ground described above.
+   *
+   * 'filled-selection' (BRIEF_EXPLORE_BOARD_SELECTOR §1) is the THIRD ground and
+   * the only one that both SWITCHES the surface below and states the applied
+   * chip with the 6% ground: the selected chip takes APPLIED_FILL with ink text
+   * and no border, every other chip stays transparent with the hairline. It
+   * exists because 'filled' marks NOTHING as selected — correct for a panel
+   * opener, wrong for a row of views, where it left all five chips identical.
    */
-  ground?: 'outline' | 'filled';
+  ground?: 'outline' | 'filled' | 'filled-selection';
+
   /** ADDITIVE: centre a fitting choice group; overflow still starts at the leading edge. */
   align?: 'start' | 'center-when-fit';
 }
