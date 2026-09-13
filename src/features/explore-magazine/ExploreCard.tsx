@@ -85,9 +85,30 @@ function FigureChip({
         ...FIGS,
       }}
     >
-      <span style={{ fontSize: 15, fontWeight: 700, color: tone ?? '#FFFFFF' }}>{figure}</span>
+      {/* THE SHADOW IS FOR COLOUR ONLY (§2b fallback). White has the headroom to
+          sit on any ground; a hue does not, so a coloured figure — and only a
+          coloured figure — takes the tight dark shadow. */}
+      <span
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          color: tone ?? '#FFFFFF',
+          textShadow: tone && tone !== '#FFFFFF' ? PHOTO_FIG_SHADOW : undefined,
+        }}
+      >
+        {figure}
+      </span>
       {unit ? (
-        <span style={{ fontSize: 10, fontWeight: 700, color: unitTone ?? 'rgba(255,255,255,0.72)' }}>{unit}</span>
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: unitTone ?? 'rgba(255,255,255,0.72)',
+            textShadow: unitTone ? PHOTO_FIG_SHADOW : undefined,
+          }}
+        >
+          {unit}
+        </span>
       ) : null}
     </span>
   );
