@@ -5,6 +5,7 @@ import {
   dotsFor,
   treatmentFor,
 } from '@/features/explore-magazine/roundTreatment';
+import { roundConsequence } from '@/features/explore-magazine/consequences';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
