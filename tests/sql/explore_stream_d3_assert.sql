@@ -98,10 +98,13 @@ insert into course_shortlists (user_id, course_id) values
 insert into user_surface_last_seen (user_id, surface_key, last_seen_at) values
   ('20000000-0000-0000-0000-000000000001','discover', now() - interval '20 hours');
 
-insert into viewer_standing_fixture values
-  ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000001', 2, 6, 4, 2),
-  ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002', 1, 5, 1, 0),
-  ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000003', 4, 6, null, null);
+/* NO FABRICATED STANDING (AUDIT RULING 3). The rows that used to sit here
+   invented the viewer's rank and field, so the card-versus-shelf assertion
+   below was comparing the RPC against this file rather than against the rank
+   logic. tests/sql/explore_stream_d1_fixture.sql now installs the DEPLOYED
+   get_viewer_standing and its board_pool family, which derive both figures from
+   the same rounds the RPC reads. viewer_standing_fixture is retained, unused, by
+   the harness scripts so an older checkout still loads. */
 
 -- ---------------------------------------------------------------- page walking
 create table walk3 (view text, scope text, page int, pos int, id text, kind text,
