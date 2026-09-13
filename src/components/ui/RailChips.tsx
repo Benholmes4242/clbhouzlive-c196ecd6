@@ -72,6 +72,9 @@ const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 
 export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start' }: RailChipsProps) {
   const filled = ground === 'filled';
+  /* The selecting filled ground: a choice group, so tablist/tab semantics stay. */
+  const filledSelection = ground === 'filled-selection';
+
   return (
     <div
       role={filled ? 'group' : 'tablist'}
