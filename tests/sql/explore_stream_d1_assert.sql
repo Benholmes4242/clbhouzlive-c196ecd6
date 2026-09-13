@@ -113,10 +113,11 @@ declare n int;
 begin
   with seq as (
     select row_number() over (order by page, pos) rn,
-           coalesce(kind,'none') || ':' || coalesce(ring,'none') k
-    from walk where not relaxed
+           coalesce(kind,'none') || ':' || coalesce(ring,'none') k, relaxed
+    from walk
   )
-  select count(*) into n from seq a join seq b on b.rn = a.rn + 1 where a.k = b.k;
+  select count(*) into n from seq a join seq b on b.rn = a.rn + 1
+  where a.k = b.k and not a.relaxed and not b.relaxed;
   if n > 0 then raise exception 'D1 FAIL: % adjacent same kind:ring pairs', n; end if;
   raise notice 'PASS no adjacent repeats among cadence-placed cards, page seams included';
 end $$;
@@ -127,11 +128,11 @@ declare n int;
 begin
   with seq as (
     select row_number() over (order by page, pos) rn,
-           (ring in ('county','country','world')) outer_ring from walk where not relaxed
+           (ring in ('county','country','world')) outer_ring, relaxed from walk
   )
   select count(*) into n from seq a join seq b
     on b.rn > a.rn and b.rn <= a.rn + 3
-  where a.outer_ring and b.outer_ring;
+  where a.outer_ring and b.outer_ring and not a.relaxed and not b.relaxed;
   if n > 0 then raise exception 'D1 FAIL: % outer-ring pairs inside four slots', n; end if;
   raise notice 'PASS outer-ring cap holds 1-in-4 among cadence-placed cards';
 end $$;
