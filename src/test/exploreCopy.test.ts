@@ -99,9 +99,10 @@ describe('Explore round headline ownership', () => {
   it('gives non-English locales the plain figure', () => {
     const item = round({
       who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true },
-      consequence: { kind: 'rank_hold', n: 7, of: 41 },
+      consequence: { kind: 'rank_up', n: 7, of: 41 },
     });
     expect(headlineFor(item, translate, 'de')).toContain('the 7 best');
+    expect(headlineFor(item, translate, 'en-XA')).toContain('the 7 best');
   });
 });
 
