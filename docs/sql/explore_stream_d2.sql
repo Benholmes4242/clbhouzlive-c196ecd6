@@ -398,7 +398,9 @@ BEGIN
 
 
     -- THE NEWS PATH, D1 VERBATIM. Only news moves the news keyset boundary.
+    v_news_seen := v_news_seen + 1;
     v_last_s := v_row.sc; v_last_i := v_row.cid;
+
 
     IF v_row.ring_k IN ('county','country','world') AND v_since_outer < c_gap THEN
       v_deferred := v_deferred || jsonb_build_array(to_jsonb(v_row));
