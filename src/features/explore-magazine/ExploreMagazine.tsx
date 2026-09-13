@@ -773,7 +773,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           ) : null}
           <WeeklyClubShelf
             viewerId={userId}
+            clubId={geography.scope.primaryClubId}
             clubName={geography.scope.primaryClubName}
+
             enabled={(scoreScope === 'club' || scoreScope === 'county') && !!geography.scope.primaryClubId}
             pos={0}
           />
