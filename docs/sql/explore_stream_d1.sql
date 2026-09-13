@@ -254,8 +254,8 @@ BEGIN
         r.rating, mr.rating::integer,
         NULL::text, NULL::text, NULL::text,
         r.id::text,
-        left(btrim(coalesce(r.review, '')), 240),
-        NULL::text
+        left(btrim(coalesce(r.review, '')), 240)
+
       FROM public.course_ratings r
       JOIN public.golf_courses c   ON c.id = r.course_id
       JOIN public.user_profiles up ON up.id = r.user_id
