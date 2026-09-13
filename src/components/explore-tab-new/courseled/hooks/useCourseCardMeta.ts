@@ -26,7 +26,9 @@ export interface CourseCardMeta {
 export function useCourseCardMeta(courseIds: string[]) {
   const key = Array.from(new Set(courseIds.filter(Boolean))).sort();
   return useQuery({
-    queryKey: ['courseled', 'course-meta', key.join('|')],
+    /* v2 adds clubId/rawRegion for Scores geography. Do not let a persisted v1
+       map resolve those fields as absent until the old stale window expires. */
+    queryKey: ['courseled', 'course-meta-v2', key.join('|')],
     queryFn: async (): Promise<Map<string, CourseCardMeta>> => {
       const out = new Map<string, CourseCardMeta>();
       if (key.length === 0) return out;
