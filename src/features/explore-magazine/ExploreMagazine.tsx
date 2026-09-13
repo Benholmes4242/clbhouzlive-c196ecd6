@@ -40,6 +40,8 @@ import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCo
 import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding } from './useViewerStanding';
+import { useViewerCourseContext } from './useViewerCourseContext';
+import { useFollowingIdSet } from '@/components/explore-tab-new/courseled/hooks/useFollowingIdSet';
 import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
 
 /**
@@ -326,6 +328,33 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   );
   const scoresStanding = useViewerStanding(userId);
 
+  /* §6h THE NO-CONNECTION SENTENCE IS ABOUT THE MEMBER, NOT ABOUT THE PAGE.
+     It renders only when EVERY one of the five viewer checks has SETTLED and
+     every one is empty: no played courses (get_viewer_standing), no shortlist,
+     no ratings of their own, no follows, and neither a club nor a county.
+     UNRESOLVED IS NOT EMPTY - while anything is pending, unresolved or errored
+     the sentence stays away. A disabled query reports isLoading false, so
+     readiness is isFetched here and never isLoading. */
+  const viewerContext = useViewerCourseContext(userId);
+  const viewerFollows = useFollowingIdSet(userId);
+  const viewerChecksSettled =
+    !!userId &&
+    scoresStanding.isFetched &&
+    !scoresStanding.unresolved &&
+    viewerContext.isFetched &&
+    viewerFollows.isFetched &&
+    !viewerFollows.isError &&
+    geography.isFetched;
+  const viewerHasNothing =
+    viewerChecksSettled &&
+    scoresStanding.rows.length === 0 &&
+    viewerContext.context.shortlist.size === 0 &&
+    viewerContext.context.ratings.size === 0 &&
+    (viewerFollows.data?.size ?? 0) === 0 &&
+    !geography.scope.primaryClubId &&
+    !geography.scope.county;
+
+
   /* §5b THE COURSES VIEW'S OWN BODY. Course cards are not rounds, reviews or
      media, so they are composed by their own hook off get_board_courses and the
      shared geography — the client stream is left exactly as B2 shipped it. */
@@ -605,7 +634,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           ? geography.scope.country ?? t('amateur.stream.scope.theWorld', 'the world')
           : t('amateur.stream.scope.theWorld', 'the world');
   /* A SCOPE WITH NO CARDS BUT SHELVES WITH CONTENT RENDERS THE SHELVES AND NO
-     SENTENCE (§5d). The shelves each report their own emptiness. */
+     SENTENCE (§5d). The shelves each report their own emptiness. UNSETTLED IS
+     NOT EMPTY: while any shelf source is still in flight the sentence is held
+     back, so a scope that does have shelves never flashes "nothing here". */
+  const shelvesSettled =
+    listCourses.isFetched && countyCourses.isFetched && topRatedCourses.isFetched && worldCourses.isFetched;
   const shelvesHaveContent =
     (listCourses.rows.length > 0) ||
     (countyCourses.rows.length > 0) ||
@@ -804,7 +837,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           {shelves.map((shelf) => (
             <div key={`empty-shelf:${shelf}`}>{renderShelf(shelf, 0)}</div>
           ))}
-          {!shelvesHaveContent ? (
+          {shelvesSettled && !shelvesHaveContent ? (
             <div style={{ paddingInline: 20, marginTop: 8 }}>
               <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
                 {view === 'courses'
@@ -816,8 +849,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       ) : null}
 
-      {!singleType && view !== 'scores' && stream.isFetched && stream.items.length === 0 ? (
-        /* §6h THE ONE SENTENCE ON THE PAGE. No heading, no placeholder card. */
+      {!singleType && view !== 'scores' && viewerHasNothing ? (
+        /* §6h THE ONE SENTENCE ON THE PAGE. No heading, no placeholder card.
+           IT IS ABOUT THE MEMBER, NEVER ABOUT THIS PAGE: an outer-ring heavy
+           page is a ranking outcome, not a statement that the member has no
+           connections. See viewerHasNothing above. */
         <div style={{ paddingInline: 20, marginTop: 8 }}>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
             {t(
