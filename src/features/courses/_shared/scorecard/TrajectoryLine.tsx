@@ -32,8 +32,9 @@ import { smoothPath } from '@/lib/charts/smoothPath';
  * +8 over eighteen holes, and a -1 round travels between -2 and 0 — so the
  * subject of the sheet got about a fifth of the plot height and could not move.
  * Saturating a line that cannot travel changes nothing. THE FIELD IS NOT DELETED
- * AS DATA: it moves to the scrub readout, where the comparison is actually
- * decided per hole, and the sheet still carries it in prose and in the hero.
+ * AS DATA: it remains in the scrub readout and the sheet's independent
+ * beat-the-field trajectory comparison. The scorecard's FIELD row was removed
+ * by decision; this chart does not depend on that row rendering.
  *
  * Beads mark ONLY an ace or an albatross (BRIEF_ROUND_CURVE_BEADS_GOLD_ONLY).
  * Every other outcome is carried by the graded stroke. The rule lives in
@@ -133,6 +134,13 @@ interface Props {
    */
   interactive?: boolean;
   /**
+   * Whether field-derived scrub and beat figures may render. Default TRUE keeps
+   * every existing caller byte-identical. The scorecard passes its five-player
+   * gate so removing the FIELD row cannot leak the same comparison below its
+   * statistical floor through this component's own readout.
+   */
+  showFieldComparison?: boolean;
+  /**
    * Hole-number tick row. Default TRUE (feed card + sheet). The Discover
    * friends tile is 34px tall and has its own meta row, so it passes false —
    * the CURVE is identical either way.
@@ -217,6 +225,7 @@ export const TrajectoryLine: React.FC<Props> = ({
   height = 150,
   surface = 'light',
   interactive = false,
+  showFieldComparison = true,
   showTicks = true,
   padY = 10,
   viewWidth = 340,
@@ -287,12 +296,14 @@ export const TrajectoryLine: React.FC<Props> = ({
   const allPts = segments.flat();
 
   const beatField = useMemo(() => {
+    if (!showFieldComparison) return null;
     const pool = holes.filter(
       (h) => h.fieldAvg != null && h.strokes != null && (h.strokes as number) > 0,
     );
     if (pool.length < 2) return null;
-    return pool.filter((h) => (h.strokes as number) <= (h.fieldAvg as number)).length;
-  }, [holes]);
+    // STRICTLY BETTER. Matching the field average is level, not beaten.
+    return pool.filter((h) => (h.strokes as number) < (h.fieldAvg as number)).length;
+  }, [holes, showFieldComparison]);
 
   if (m < 2 || allPts.length < 2) return null;
 
@@ -560,7 +571,7 @@ export const TrajectoryLine: React.FC<Props> = ({
     subParts.push(t('courses:scorecard.trajHole', { n: hovered.holeNo }));
     if (hovered.par != null) subParts.push(t('courses:scorecard.trajPar', { n: hovered.par }));
     // NEVER print a field figure for a hole with no fieldAvg — omit the segment.
-    if (hovered.fieldAvg != null) {
+    if (showFieldComparison && hovered.fieldAvg != null) {
       subParts.push(t('courses:scorecard.trajField', { n: fmt1(hovered.fieldAvg) }));
     }
   }
