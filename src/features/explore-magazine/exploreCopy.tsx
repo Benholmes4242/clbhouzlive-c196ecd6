@@ -349,12 +349,12 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
       gross,
     });
   }
-  if (c?.kind === 'played_nochange' && c.n != null && c.of != null && gross != null && isOwn) {
-    return t(
-      'amateur.stream.headline.playedNoChange',
-      '{{player}} went round in {{gross}}. Your {{ord}} of {{of}} here is unchanged.',
-      { player, gross, ord, of: c.of },
-    );
+  /* THE VIEWER'S OWN ROUND THAT MOVED NOTHING. No standing claim, no to-par
+     restatement of the chip: "You went round in 73." and the shape says the
+     rest. This is the retirement of both rank_hold and the old "unchanged"
+     sentence, in one line. */
+  if (c?.kind === 'played_nochange' && isOwn && gross != null) {
+    return t('amateur.stream.headline.round', '{{player}} went round in {{gross}}.', { player, gross });
   }
   if (gross != null && topar) {
     return t('amateur.stream.headline.roundToPar', '{{player}} went round in {{gross}}, {{topar}}.', {
