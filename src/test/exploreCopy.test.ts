@@ -4,7 +4,7 @@ import { headlineFor } from '@/features/explore-magazine/exploreCopy';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
 const translate = (_key: string, fallback = '', vars: Record<string, unknown> = {}) =>
-  Object.entries(vars).reduce((copy, [key, value]) => copy.replaceAll(`{{${key}}}`, String(value)), fallback);
+  Object.entries(vars).reduce((copy, [key, value]) => copy.split(`{{${key}}}`).join(String(value)), fallback);
 
 function round(overrides: Partial<StreamItem>): StreamItem {
   return {
