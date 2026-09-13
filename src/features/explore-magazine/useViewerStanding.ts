@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
 
+import { DEFAULT_STANDING_BOARD, type StandingBoard } from './standingBoard';
+
 /**
  * WHERE THE VIEWER STANDS (BRIEF_EXPLORE_MAGAZINE §2, PHASE B1).
  *
@@ -47,13 +49,40 @@ export interface ViewerStanding {
   total: number;
   isFetched: boolean;
   unresolved: boolean;
+  /**
+   * The board these rows ARE, which is not always the board that was asked
+   * for: see NET IS NOT DEPLOYED YET below. The heading must name THIS, never
+   * the request, so a gross rank is never labelled net.
+   */
+  board: StandingBoard;
 }
 
 const EMPTY: StandingRow[] = [];
 
-export function useViewerStanding(viewerId: string | undefined): ViewerStanding {
-  const query = useQuery<StandingRow[]>({
-    queryKey: ['explore-magazine', 'viewer-standing', viewerId ?? 'anon'],
+/**
+ * ONE READ, ONE BOARD (Ben's ruling on the board selector).
+ *
+ * THE BOARD IS IN THE KEY, alongside the viewer. Net and gross are two
+ * different answers about the same member and must never share a cache entry.
+ *
+ * TWO FUNCTIONS, DELIBERATELY. Gross calls the one-argument
+ * get_viewer_standing(uuid) that is live today, unchanged, so every existing
+ * caller and this shelf's gross view behave exactly as before. Net calls the
+ * additive two-argument overload drafted in
+ * docs/sql/get_viewer_standing_board.sql, which is Ben's to run.
+ *
+ * NET IS NOT DEPLOYED YET, SO NET FALLS BACK TO GROSS RATHER THAN TO NOTHING.
+ * Net is the default board for everyone; if the overload is missing the read
+ * errors, and treating that as unresolved would delete the shelf for every
+ * member until the SQL lands. Instead the gross read answers and `board`
+ * reports 'topar', so the heading says Gross and nothing is mislabelled.
+ */
+export function useViewerStanding(
+  viewerId: string | undefined,
+  board: StandingBoard = 'topar',
+): ViewerStanding {
+  const query = useQuery<{ rows: StandingRow[]; board: StandingBoard }>({
+    queryKey: ['explore-magazine', 'viewer-standing', viewerId ?? 'anon', board],
     enabled: !!viewerId,
     staleTime: 5 * 60_000,
     /* A missing function is a permanent failure this session, not a flake. */
@@ -62,22 +91,36 @@ export function useViewerStanding(viewerId: string | undefined): ViewerStanding 
       /* The RPC is newer than src/integrations/supabase/types.ts (that file is
          regenerated from the project and is never hand-edited), so the name is
          cast at this one call site rather than the row shape being invented. */
-      const { data, error } = await (supabase.rpc as unknown as (
+      const call = (supabase.rpc as unknown as (
         fn: string,
         args: Record<string, unknown>,
-      ) => Promise<{ data: StandingRow[] | null; error: unknown }>)('get_viewer_standing', {
+      ) => Promise<{ data: StandingRow[] | null; error: unknown }>);
+
+      if (board === 'topar') {
+        const { data, error } = await call('get_viewer_standing', { p_viewer: viewerId as string });
+        if (error) throw error;
+        return { rows: (data ?? []) as StandingRow[], board: 'topar' as StandingBoard };
+      }
+
+      const { data, error } = await call('get_viewer_standing', {
         p_viewer: viewerId as string,
+        p_board: board,
       });
-      if (error) throw error;
-      return (data ?? []) as StandingRow[];
+      if (!error) return { rows: (data ?? []) as StandingRow[], board };
+
+      /* The overload is not there yet. Answer with the board that is. */
+      const fallback = await call('get_viewer_standing', { p_viewer: viewerId as string });
+      if (fallback.error) throw fallback.error;
+      return { rows: (fallback.data ?? []) as StandingRow[], board: 'topar' as StandingBoard };
     },
   });
 
-  const rows = query.data ?? EMPTY;
+  const rows = query.data?.rows ?? EMPTY;
   return {
     rows,
     total: rows.length,
     isFetched: viewerId ? query.isFetched : true,
     unresolved: !!query.error,
+    board: query.data?.board ?? (board === 'net' ? DEFAULT_STANDING_BOARD : 'topar'),
   };
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +12,12 @@ import { ShelfShell } from './ExploreShells';
 import { ExploreShelf } from './ExploreShelf';
 import { relativeDay } from './exploreCopy';
 import { standingOrdinal } from './ordinal';
+import {
+  STANDING_BOARDS,
+  readStandingBoard,
+  writeStandingBoard,
+  type StandingBoard,
+} from './standingBoard';
 import { useViewerIdentity } from './useViewerIdentity';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
 
@@ -36,6 +42,17 @@ import { useViewerStanding, type StandingRow } from './useViewerStanding';
  * EMPTY RENDERS NOTHING. A viewer with no played courses gets no shelf at all
  * in the All view — no heading over nothing. The Scores connect sentence is
  * Phase B2 and is not smuggled in here.
+ *
+ * THE BOARD SELECTOR (Ben's ruling). Net for everyone by default, net or gross
+ * only, no handicap threshold — the reasoning lives in standingBoard.ts. The
+ * HEADING names the board ("Where you stand · Net"); the tiles never repeat it,
+ * so their subline stays about the course. The selector sits in the heading's
+ * right slot, which pushes SEE ALL beneath the cards in the uppercase foot
+ * convention. The see-all sheet reads the same selection.
+ *
+ * THE CONSEQUENCE CARDS DO NOT FOLLOW THIS SELECTOR and must not be made to:
+ * a card is a dated statement about a round that happened, while this shelf is
+ * a live view. See standingBoard.ts and rankCards.ts.
  */
 
 /** §2b tile geometry — one fixed size for the whole rail. */
@@ -76,7 +93,12 @@ function useStandingCopy() {
   return useMemo(
     () => ({
       heading: t('amateur.stream.shelf.standing', 'Where you stand'),
-      boardLabel: t('amateur.stream.standing.board', 'Lowest gross'),
+      /** The two board names. These are what the heading appends. */
+      boardName: (board: StandingBoard) =>
+        board === 'net'
+          ? t('amateur.stream.standing.boardNet', 'Net')
+          : t('amateur.stream.standing.boardGross', 'Gross'),
+      pickBoard: t('amateur.stream.standing.pickBoard', 'Change board'),
       unit: (count: number) => t('amateur.stream.standing.of', 'of {{count}}', { count }),
       lastChange: (when: string) => t('amateur.stream.standing.lastChange', 'last change {{when}}', { when }),
       seeAll: (count: number) => t('amateur.stream.seeAll', 'See all {{count}}', { count }),
@@ -87,11 +109,128 @@ function useStandingCopy() {
   );
 }
 
-/** The subline: board label and when the board last moved. The interpunct is
- *  composed HERE and never lives inside a locale string. */
+/**
+ * THE SUBLINE IS ABOUT THE COURSE, NOT THE BOARD (Ben's ruling). The heading
+ * already names the board, so repeating "Lowest gross" on twelve tiles said
+ * the same thing thirteen times. What is left is when this board last moved
+ * and, failing that, where the course is. The interpunct is composed HERE and
+ * never lives inside a locale string.
+ */
 function sublineFor(row: StandingRow, copy: ReturnType<typeof useStandingCopy>): string {
   const when = relativeDay(row.last_change_at);
-  return when ? `${copy.boardLabel} \u00B7 ${copy.lastChange(when)}` : copy.boardLabel;
+  const place = row.region ?? row.sub_country ?? '';
+  if (when && place) return `${place} \u00B7 ${copy.lastChange(when)}`;
+  if (when) return copy.lastChange(when);
+  return place;
+}
+
+/**
+ * THE BOARD SELECTOR. Two options, so this is a two-row menu and not a native
+ * select: it has to wear the dark surface and the flat row convention. It is a
+ * CHOICE and reads like one - the current board is stated, the panel marks the
+ * selected row, and dismissing changes nothing.
+ */
+function BoardSelector({
+  board,
+  label,
+  ariaLabel,
+  nameFor,
+  onPick,
+}: {
+  board: StandingBoard;
+  label: string;
+  ariaLabel: string;
+  nameFor: (b: StandingBoard) => string;
+  onPick: (b: StandingBoard) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const hostRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: PointerEvent) => {
+      if (!hostRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', onDoc);
+    return () => document.removeEventListener('pointerdown', onDoc);
+  }, [open]);
+
+  return (
+    <div ref={hostRef} style={{ position: 'relative', fontFamily: SANS }}>
+      <button
+        type="button"
+        aria-label={ariaLabel}
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+          border: 0,
+          background: 'transparent',
+          padding: 0,
+          color: A.MUTE,
+          fontFamily: SANS,
+          fontSize: 13,
+          fontWeight: 600,
+          cursor: 'pointer',
+        }}
+      >
+        {label}
+        <span aria-hidden style={{ fontSize: 9, lineHeight: 1 }}>{'\u25BE'}</span>
+      </button>
+
+      {open ? (
+        <div
+          role="menu"
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 6px)',
+            right: 0,
+            zIndex: 5,
+            minWidth: 128,
+            background: '#1B1E27',
+            border: `0.5px solid ${A.HAIRLINE}`,
+            borderRadius: 10,
+            overflow: 'hidden',
+          }}
+        >
+          {STANDING_BOARDS.map((b, i) => (
+            <button
+              key={b}
+              type="button"
+              role="menuitemradio"
+              aria-checked={b === board}
+              onClick={() => {
+                setOpen(false);
+                if (b !== board) onPick(b);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                width: '100%',
+                border: 0,
+                borderTop: i === 0 ? undefined : `0.5px solid ${A.HAIRLINE}`,
+                background: 'transparent',
+                padding: '10px 12px',
+                color: b === board ? A.INK : A.MUTE,
+                fontFamily: SANS,
+                fontSize: 13,
+                fontWeight: b === board ? 700 : 600,
+                textAlign: 'left',
+                cursor: 'pointer',
+              }}
+            >
+              {nameFor(b)}
+              {b === board ? <span aria-hidden>{'\u2713'}</span> : null}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined; pos: number }) {
