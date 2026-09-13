@@ -20,7 +20,14 @@ import type { ScoreScope, ViewerScoreScope } from './useViewerScoreScope';
 
 /**
  * ============================================================================
- * TEMPORARY — PHASE A ONLY (BRIEF_EXPLORE_MAGAZINE §14, PHASE A).
+ * DEAD-LISTED, NOT DELETED (PHASE D §5c). This is no longer the page's ranking
+ * path: get_explore_stream serves All, Scores, Courses and Reviews. It stays for
+ * two reasons - it is the REFERENCE MODEL for the scoring the RPC ports, and it
+ * is the ROLLBACK. It is also still the live FALLBACK: the page re-enables it
+ * whenever the RPC read is unavailable, and it is the only composer for Watch,
+ * whose clips and long-form video are not in the ranker's pool.
+ * ============================================================================
+ * ORIGINALLY — PHASE A ONLY (BRIEF_EXPLORE_MAGAZINE §14, PHASE A).
  * ============================================================================
  *
  * This hook is a CLIENT-SIDE STAND-IN for get_explore_stream (§6d) and is
@@ -180,11 +187,18 @@ export function useExploreStreamClient(
   viewerId: string | undefined,
   view: ExploreView,
   scores?: { active: ScoreScope; geography: ViewerScoreScope },
+  /* PHASE D §5c ADDITIVE, DEFAULT UNCHANGED. `enabled` defaults to true, so every
+     existing caller behaves exactly as before. The page passes false while the
+     RPC is serving the view, which stops this composition from issuing a single
+     read - and passes true the moment the RPC read is unavailable, which is the
+     fallback that keeps a failing RPC from blanking the page. */
+  options?: { enabled?: boolean },
 ): ExploreStream {
-  const wantsRounds = view === 'all' || view === 'scores';
-  const wantsWatch = view === 'all' || view === 'watch';
+  const enabled = options?.enabled ?? true;
+  const wantsRounds = enabled && (view === 'all' || view === 'scores');
+  const wantsWatch = enabled && (view === 'all' || view === 'watch');
 
-  const circle = useCircleLatestRounds(viewerId, {
+  const circle = useCircleLatestRounds(wantsRounds ? viewerId : undefined, {
     limit: 14,
     scope: 'circle',
     windowDays: 30,
@@ -194,7 +208,7 @@ export function useExploreStreamClient(
        stream of other people's rounds only ever moves the viewer down (§3b). */
     includeSelf: true,
   });
-  const everyone = useCircleLatestRounds(viewerId, {
+  const everyone = useCircleLatestRounds(wantsRounds ? viewerId : undefined, {
     limit: 14,
     scope: 'everyone',
     windowDays: 14,
@@ -203,11 +217,12 @@ export function useExploreStreamClient(
   /* §5c THE REVIEWS VIEW READS DEEPER THAN THE MIXED STREAM, because it is
      filtered by scope afterwards: a twelve-row read would empty a club scope on
      22-member data. The mixed stream keeps its twelve exactly as B2 shipped. */
-  const reviews = useLatestReviews(view === 'reviews' ? 60 : 12, view === 'all' || view === 'reviews');
-  const stories = useAmateurStories(null);
+  const wantsReviews = enabled && (view === 'all' || view === 'reviews');
+  const reviews = useLatestReviews(view === 'reviews' ? 60 : 12, wantsReviews);
+  const stories = useAmateurStories(null, enabled && view === 'all');
   const media = useDiscoverMediaPreview(wantsWatch);
-  const moments = useMomentsOfTheWeek(30, { enabled: view === 'watch', candidateLimit: 72 });
-  const { context, isFetched: contextFetched } = useViewerCourseContext(viewerId);
+  const moments = useMomentsOfTheWeek(30, { enabled: enabled && view === 'watch', candidateLimit: 72 });
+  const { context, isFetched: contextFetched } = useViewerCourseContext(enabled ? viewerId : undefined);
 
   /**
    * §3c DEDUPE ON score_id, NOT round_id. The viewer now appears in BOTH the
@@ -234,13 +249,13 @@ export function useExploreStreamClient(
   /* THE CONSEQUENCE SOURCES (§3a). Standing supplies every rank and every field
      size; the record book supplies who holds what; bests decide only whether a
      round passed the viewer. */
-  const standing = useViewerStanding(viewerId);
+  const standing = useViewerStanding(wantsRounds ? viewerId : undefined);
   const standingMap = useMemo(() => {
     const map = new Map<string, StandingRow>();
     for (const row of standing.rows) map.set(row.course_id, row);
     return map;
   }, [standing.rows]);
-  const bests = useViewerCourseBests(viewerId);
+  const bests = useViewerCourseBests(wantsRounds ? viewerId : undefined);
   const roundCourseIds = useMemo(
     () => roundRows.map((row) => row.course_id).filter((id): id is string => !!id),
     [roundRows],
@@ -366,7 +381,7 @@ export function useExploreStreamClient(
       }
     }
 
-    if (view === 'all' || view === 'reviews') {
+    if (wantsReviews) {
       const geography = scores?.geography;
       for (const review of reviews.reviews ?? []) {
         const course = roundCourseMeta.data?.get(review.courseId) ?? null;
@@ -434,7 +449,7 @@ export function useExploreStreamClient(
       }
     }
 
-    if (view === 'all') {
+    if (enabled && view === 'all') {
       for (const story of stories.stories ?? []) {
         out.push({
           id: `story:${story.id}`,
@@ -502,7 +517,7 @@ export function useExploreStreamClient(
       }
     }
 
-    if (view === 'watch') {
+    if (enabled && view === 'watch') {
       for (const moment of moments.data ?? []) {
         out.push({
           id: `moment:${moment.key}`,
@@ -545,7 +560,7 @@ export function useExploreStreamClient(
     /* §5c A SINGLE-KIND VIEW CADENCES BY CONSEQUENCE, since every card's kind is
        the same and the kind key would make the pass a no-op. */
     return capOuterRing(cadence(out, view === 'scores' || view === 'reviews'));
-  }, [roundRows, circleScoreIds, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch, roundCourseMeta.data, scores?.active, scores?.geography]);
+  }, [roundRows, circleScoreIds, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, enabled, wantsRounds, wantsWatch, wantsReviews, roundCourseMeta.data, scores?.active, scores?.geography]);
 
   /* READINESS IS isFetched, NEVER isLoading: a disabled query reports isLoading
      false and would report the page ready before anything had been asked for.
@@ -558,10 +573,10 @@ export function useExploreStreamClient(
     (!wantsRounds || (circle.isFetched && everyone.isFetched && standing.isFetched && bests.isFetched && records.isFetched
       && (view !== 'scores' || roundCourseIds.length === 0 || roundCourseMeta.isFetched))) &&
     (view !== 'reviews' || metaCourseIds.length === 0 || roundCourseMeta.isFetched) &&
-    (view !== 'all' && view !== 'reviews' ? true : !reviews.isPending) &&
-    (view !== 'all' ? true : !stories.isPending) &&
+    (!wantsReviews ? true : !reviews.isPending) &&
+    (!enabled || view !== 'all' ? true : !stories.isPending) &&
     (!wantsWatch || media.isFetched) &&
-    (view !== 'watch' || moments.isFetched);
+    (!enabled || view !== 'watch' || moments.isFetched);
 
 
   return { items, total: items.length, isFetched, isPending: !isFetched && items.length === 0 };
