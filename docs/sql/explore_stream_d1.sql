@@ -412,10 +412,10 @@ BEGIN
     v_taken := v_taken + 1;
 
     -- A deferred card takes the next slot it legally can.
-    IF jsonb_array_length(v_deferred) > 0 AND v_taken < v_limit THEN
+    IF jsonb_array_length(v_deferred) > 0 THEN
       DECLARE d jsonb := v_deferred -> 0;
       BEGIN
-        IF NOT (d ->> 'ring_k' IN ('county','country','world') AND v_since_outer < c_gap)
+        IF NOT ((d ->> 'ring_k') IN ('county','country','world') AND v_since_outer < c_gap)
            AND v_prev_key IS DISTINCT FROM (coalesce(d ->> 'kind','none') || ':' || coalesce(d ->> 'ring_k','none')) THEN
           v_out := v_out || jsonb_build_array(d);
           v_deferred := v_deferred - 0;
@@ -427,8 +427,23 @@ BEGIN
       END;
     END IF;
 
-    EXIT WHEN v_taken >= v_limit;
+    -- Every candidate consumed is either placed or deferred, and the deferred
+    -- are flushed below before the page returns - so the keyset boundary can
+    -- never skip one. That is why the exit counts BOTH.
+    EXIT WHEN v_taken + jsonb_array_length(v_deferred) >= v_limit;
   END LOOP;
+
+  -- THE REMAINDER KEEPS ITS ORDER RATHER THAN BEING DISCARDED (client parity:
+  -- capOuterRing appends what it could not place). Nothing is ever dropped.
+  WHILE jsonb_array_length(v_deferred) > 0 LOOP
+    v_out := v_out || jsonb_build_array(v_deferred -> 0);
+    v_prev_key := coalesce(v_deferred -> 0 ->> 'kind','none') || ':' || coalesce(v_deferred -> 0 ->> 'ring_k','none');
+    v_since_outer := CASE WHEN (v_deferred -> 0 ->> 'ring_k') IN ('county','country','world') THEN 0
+                          ELSE least(v_since_outer + 1, 1000000) END;
+    v_deferred := v_deferred - 0;
+    v_taken := v_taken + 1;
+  END LOOP;
+
 
   RETURN QUERY
   SELECT
