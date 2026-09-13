@@ -2290,7 +2290,9 @@
         "lastChange": "[last change {{when}}]",
         "boardNet": "[Nét one]",
         "boardGross": "[Gröss one]",
-        "pickBoard": "[Chånge böård one two]"
+        "pickBoard": "[Chånge böård one two]",
+        "unreadable": "[Yöür ståndîng çöüld nöt bé löådéd. one two three]",
+        "retry": "[Trý ågåîn one]"
       },
       "ratingCount": "[{{count}} rãtïñgs]",
       "empty": {

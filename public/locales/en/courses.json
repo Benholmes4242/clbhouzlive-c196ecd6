@@ -169,7 +169,9 @@
         "lastChange": "last change {{when}}",
         "boardNet": "Net",
         "boardGross": "Gross",
-        "pickBoard": "Change board"
+        "pickBoard": "Change board",
+        "unreadable": "Your standing could not be loaded.",
+        "retry": "Try again"
       },
       "empty": {
         "courses": "No courses in {{scope}} yet.",
