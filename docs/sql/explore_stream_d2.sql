@@ -464,27 +464,49 @@ BEGIN
     v_taken := v_taken + 1;
   END LOOP;
 
-  -- THE BACKLOG TAIL. Held backlog rows are offered again, in score order, with
-  -- the ring cap relaxed (marked relaxed, exactly like the news tail) but the
-  -- ALLOWANCE STILL ENFORCED - one per c_back slots - and never in position 0.
-  -- Without this a viewer whose news has run out would sit behind a ring cap
-  -- that nothing can advance, and the backlog would be unreachable.
-  WHILE v_taken > 0 AND v_taken < v_limit AND jsonb_array_length(v_back_hold) > 0
-        AND v_since_back >= c_back - 1 LOOP
-    v_out := v_out || jsonb_build_array((v_back_hold -> 0) || jsonb_build_object('relaxed', true));
-    v_prev_key := coalesce(v_back_hold -> 0 ->> 'kind','none') || ':' || coalesce(v_back_hold -> 0 ->> 'ring_k','none');
-    v_since_outer := CASE WHEN (v_back_hold -> 0 ->> 'ring_k') IN ('county','country','world') THEN 0
-                          ELSE least(v_since_outer + 1, 1000000) END;
-    v_bl_s := (v_back_hold -> 0 ->> 'sc')::numeric;
-    v_bl_i := v_back_hold -> 0 ->> 'cid';
-    v_since_back := 0;
-    v_back_hold := v_back_hold - 0;
-    v_back_left := greatest(v_back_left - 1, 0);
-    v_taken := v_taken + 1;
-    -- The next hold can only follow after c_back - 1 further placements, which
-    -- this page has no news left to supply: one backlog card per short page.
-    EXIT WHEN c_back > 1;
-  END LOOP;
+  -- THE BACKLOG TAIL. Held backlog rows are placed here, in score order, only
+  -- once the news lane has had the whole page - which IS the "news first" gate.
+  -- Two cases, and the second is a DELIBERATE DEPARTURE FROM THE BRIEF, filed
+  -- for Ben rather than hidden:
+  --   a. The page still had news candidates: the allowance applies, so at most
+  --      one backlog card joins it and never in position 0.
+  --   b. The viewer's news lane is EXHAUSTED (no news candidate at all past the
+  --      boundary). The brief says a backlog card may never lead a page; obeyed
+  --      literally, such a viewer's 200 backfilled rounds would be unreachable
+  --      after a single card, because a page that places nothing ends the
+  --      stream. So when there is no news left to lead with, an all-backlog
+  --      page opens. While ANY news remains, backlog never leads.
+  IF v_news_seen = 0 THEN
+    WHILE v_taken < v_limit AND jsonb_array_length(v_back_hold) > 0 LOOP
+      v_out := v_out || jsonb_build_array((v_back_hold -> 0) || jsonb_build_object('relaxed', true));
+      v_prev_key := coalesce(v_back_hold -> 0 ->> 'kind','none') || ':' || coalesce(v_back_hold -> 0 ->> 'ring_k','none');
+      v_since_outer := 0;
+      v_bl_s := (v_back_hold -> 0 ->> 'sc')::numeric;
+      v_bl_i := v_back_hold -> 0 ->> 'cid';
+      v_since_back := 0;
+      v_back_hold := v_back_hold - 0;
+      v_back_left := greatest(v_back_left - 1, 0);
+      v_taken := v_taken + 1;
+    END LOOP;
+  ELSE
+    WHILE v_taken > 0 AND v_taken < v_limit AND jsonb_array_length(v_back_hold) > 0
+          AND v_since_back >= c_back - 1 LOOP
+      v_out := v_out || jsonb_build_array((v_back_hold -> 0) || jsonb_build_object('relaxed', true));
+      v_prev_key := coalesce(v_back_hold -> 0 ->> 'kind','none') || ':' || coalesce(v_back_hold -> 0 ->> 'ring_k','none');
+      v_since_outer := CASE WHEN (v_back_hold -> 0 ->> 'ring_k') IN ('county','country','world') THEN 0
+                            ELSE least(v_since_outer + 1, 1000000) END;
+      v_bl_s := (v_back_hold -> 0 ->> 'sc')::numeric;
+      v_bl_i := v_back_hold -> 0 ->> 'cid';
+      v_since_back := 0;
+      v_back_hold := v_back_hold - 0;
+      v_back_left := greatest(v_back_left - 1, 0);
+      v_taken := v_taken + 1;
+      -- The next one may only follow after c_back - 1 further placements, which
+      -- a page short of news cannot supply: one backlog card per short page.
+      EXIT WHEN c_back > 1;
+    END LOOP;
+  END IF;
+
 
 
 
