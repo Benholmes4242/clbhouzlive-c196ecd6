@@ -1619,7 +1619,14 @@
     "shelf": {
       "aroundCounty": "{{county}} 주변",
       "aroundWorld": "세계 각지",
-      "onYourList": "내 목록"
+      "onYourList": "내 목록",
+      "golfersAtClub": "{{club}} 골퍼",
+      "yourClub": "내 클럽",
+      "holdsBoards": "코스 레코드 {{count}}개",
+      "roundsHere": "여기서 {{count}}라운드",
+      "newThisMonth": "이번 달 신규",
+      "follow": "팔로우",
+      "following": "팔로잉"
     }
   }
 }

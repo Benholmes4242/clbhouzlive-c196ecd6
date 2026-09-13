@@ -136,6 +136,15 @@
         "of": "of {{count}}",
         "lastChange": "last change {{when}}"
       }
+    },
+    "shelf": {
+      "golfersAtClub": "Golfers at {{club}}",
+      "yourClub": "your club",
+      "holdsBoards": "Holds {{count}} boards",
+      "roundsHere": "{{count}} rounds here",
+      "newThisMonth": "New this month",
+      "follow": "Follow",
+      "following": "Following"
     }
   },
   "amateurNews": {

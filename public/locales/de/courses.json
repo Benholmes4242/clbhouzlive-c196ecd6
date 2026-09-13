@@ -1680,7 +1680,14 @@
     "shelf": {
       "aroundCounty": "Rund um {{county}}",
       "aroundWorld": "Rund um die Welt",
-      "onYourList": "Auf deiner Liste"
+      "onYourList": "Auf deiner Liste",
+      "golfersAtClub": "Golfer bei {{club}}",
+      "yourClub": "deinem Club",
+      "holdsBoards": "Haelt {{count}} Rekorde",
+      "roundsHere": "{{count}} Runden hier",
+      "newThisMonth": "Neu diesen Monat",
+      "follow": "Folgen",
+      "following": "Folgt"
     }
   }
 }

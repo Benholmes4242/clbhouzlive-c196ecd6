@@ -1680,7 +1680,14 @@
     "shelf": {
       "aroundCounty": "Por {{county}}",
       "aroundWorld": "Por el mundo",
-      "onYourList": "En tu lista"
+      "onYourList": "En tu lista",
+      "golfersAtClub": "Golfistas en {{club}}",
+      "yourClub": "tu club",
+      "holdsBoards": "Tiene {{count}} records",
+      "roundsHere": "{{count}} rondas aqui",
+      "newThisMonth": "Nuevo este mes",
+      "follow": "Seguir",
+      "following": "Siguiendo"
     }
   }
 }
