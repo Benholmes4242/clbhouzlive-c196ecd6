@@ -329,8 +329,18 @@ export function useExploreStreamClient(
            cap bounds how many of them the page can show. An outer-ring card
            with no resolvable target (no course, no scorecard) still does not
            render. */
-        const outerPlain = !consequence && ring !== null && ring !== 'own' && ring !== 'club';
-        if (!consequence && !(outerPlain && !!row.course_id && !!row.score_id)) continue;
+        /* A RETIRED KIND MUST NOT COME BACK AS A PLAIN OUTER-RING CARD (Sep 2026
+           ruling). A round by someone else at a course the VIEWER HAS PLAYED —
+           which is precisely a course with a standing row — used to be
+           rank_down / played_nochange. It is not news, so it is not admitted
+           through the outer ring either. The outer-ring plain card stays what it
+           was meant to be: a course the viewer has never played. */
+        const viewerHasPlayed = !!row.course_id && standingMap.has(row.course_id);
+        const outerPlain =
+          !consequence && !viewerHasPlayed && ring !== null && ring !== 'own' && ring !== 'club';
+        /* THE VIEWER'S OWN ROUND IS ALWAYS THEIR NEWS, consequence or not. */
+        const ownPlain = !consequence && row.is_self && !!row.score_id;
+        if (!consequence && !ownPlain && !(outerPlain && !!row.course_id && !!row.score_id)) continue;
         const item: StreamItem = {
           id: `round:${row.round_id}`,
           kind: 'round',
