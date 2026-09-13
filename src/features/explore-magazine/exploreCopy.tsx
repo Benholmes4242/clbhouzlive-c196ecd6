@@ -261,13 +261,13 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
     }
   }
 
-  if (c?.kind === 'rank_hold' && c.n != null && gross != null) {
-    return t(
-      'amateur.stream.headline.rankHold',
-      'Your {{gross}} is still the {{ord}} best round anyone has played here.',
-      { gross, ord },
-    );
-  }
+  /* rank_hold IS RETIRED. Its whole content was that NOTHING CHANGED, the same
+     fault as played_nochange's "unchanged" sentence below it: a card whose news
+     is the absence of news, recurring every time a settled member posts at their
+     home club. An unmoved own round is STILL A CARD — photo, chip, shape, dots —
+     it simply carries the plain sentence. amateur.stream.headline.rankHold and
+     amateur.stream.headline.playedNoChange are retired keys, kept in all six
+     locale files for the Phase E sweep. */
 
   if ((item.facts.is_course_record || c?.kind === 'record_taken') && gross != null) {
     if (isOwn || c?.held_by_viewer) {
