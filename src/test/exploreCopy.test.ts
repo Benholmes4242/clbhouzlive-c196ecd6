@@ -31,25 +31,57 @@ function round(overrides: Partial<StreamItem>): StreamItem {
 }
 
 describe('Explore round headline ownership', () => {
-  it('keeps the long course and player out of a record-loss gap headline', () => {
+  it('names the viewer best and the month it stood when both are known', () => {
     const item = round({ consequence: { kind: 'record_lost', delta: 3 } });
-    const headline = headlineFor(item, translate);
-    expect(headline).toBe('Took your course record with a 68. Your best is 3 behind.');
+    const headline = headlineFor(item, translate, 'en', { viewerBest: 71, viewerBestSince: 'June 2025' });
+    expect(headline).toBe('henryd3737 took your course record with a 68. Your 71 had stood since June 2025.');
     expect(headline).not.toContain("Prince's");
-    expect(headline).not.toContain('henryd3737');
   });
 
-  it('keeps course and player out of ordinary and birdie headlines', () => {
-    expect(headlineFor(round({}), translate)).toBe('Went round in 68, −4.');
-    expect(headlineFor(round({ facts: { gross: 70, birdies: 6 } }), translate)).toBe('Made 6 birdies.');
+  it('drops the comparison rather than inventing one', () => {
+    expect(headlineFor(round({ consequence: { kind: 'record_lost' } }), translate)).toBe(
+      'henryd3737 took your course record with a 68.',
+    );
   });
 
-  it('keeps own-standing copy local to the course without repeating its name', () => {
+  it('speaks the to-par and keeps the course out of the sentence', () => {
+    expect(headlineFor(round({}), translate)).toBe('henryd3737 went round in 68, four under.');
+    expect(headlineFor(round({ facts: { gross: 70, birdies: 6 } }), translate)).toBe(
+      'six birdies in a round of 70.',
+    );
+    expect(headlineFor(round({ facts: { gross: 86 } }), translate)).toBe('henryd3737 went round in 86.');
+  });
+
+  it('measures a standing against the field, not as a coordinate', () => {
     const item = round({
       who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true },
       consequence: { kind: 'rank_hold', n: 7, of: 41 },
     });
-    expect(headlineFor(item, translate)).toBe('Your 68 holds 7th of 41 here.');
+    expect(headlineFor(item, translate)).toBe('Your 68 is still the 7th best round anyone has played here.');
+  });
+
+  it('names the hole of a single notable score only when hole rows say which', () => {
+    const holes = [
+      { holeNo: 5, par: 4, strokes: 4 },
+      { holeNo: 12, par: 5, strokes: 3 },
+    ];
+    const eagle = round({ facts: { gross: 70, eagles: 1 } });
+    expect(headlineFor(eagle, translate, 'en', { holes })).toBe('An eagle on the 12th, in a round of 70.');
+    expect(headlineFor(eagle, translate)).toBe('An eagle, in a round of 70.');
+  });
+
+  it('never claims a first hole in one', () => {
+    const ace = round({ facts: { gross: 74, holes_in_one: 1 } });
+    expect(headlineFor(ace, translate)).toBe('A hole in one.');
+    expect(headlineFor(ace, translate)).not.toContain('first');
+  });
+
+  it('gives non-English locales the plain figure', () => {
+    const item = round({
+      who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true },
+      consequence: { kind: 'rank_hold', n: 7, of: 41 },
+    });
+    expect(headlineFor(item, translate, 'de')).toContain('the 7 best');
   });
 });
 
