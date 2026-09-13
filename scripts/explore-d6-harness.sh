@@ -23,3 +23,4 @@ psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d3.sql   # D3 body
 psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d5_fix.sql # D5 hotfix replaces the body
 psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d6_arrival_lane.sql # D6 re-keys the lane
 psql -v ON_ERROR_STOP=1 -f tests/sql/explore_stream_d3_assert.sql
+psql -v ON_ERROR_STOP=1 -f tests/sql/explore_stream_d6_assert.sql
