@@ -241,7 +241,7 @@ end $$;
 -- News is cut to a handful of cards. From the page where news runs short the
 -- backlog must start appearing and must still be arriving on page 6.
 delete from gam_round_stats where (created_at::date - play_date) <= 30
-  and id <> '99999999-9999-9999-9999-999999999999'
+  and whs_score_id <> '99999999-9999-9999-9999-999999999999'
   and ctid not in (select ctid from gam_round_stats
                    where (created_at::date - play_date) <= 30 limit 12);
 delete from course_ratings where ctid not in (select ctid from course_ratings limit 3);
