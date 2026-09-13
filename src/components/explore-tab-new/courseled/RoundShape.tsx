@@ -203,7 +203,19 @@ export function RoundShape({
             strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
         ) : null}
         <path d={path} fill="none" stroke={tone} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+        {/* GOOD HOLES ONLY. The tones are chosen by the caller's pure rule and
+            never include a bad hole; the thin canvas ring keeps a 3px dot
+            legible over a bright photograph. */}
+        {(exploreDots ?? []).map((dot) => {
+          const point = points[dot.i];
+          if (!point) return null;
+          return (
+            <circle key={`${dot.i}:${dot.tone}`} cx={point.x} cy={point.y} r={3} fill={dot.tone}
+              stroke={exploreDotCanvas} strokeWidth={0.8} vectorEffect="non-scaling-stroke" />
+          );
+        })}
         {last ? <circle cx={last.x} cy={last.y} r={2.6} fill={tone} /> : null}
+
         {endLabels ? (
           <g fill={A.MUTE} fontSize={END_LABEL_FONT_SIZE} fontFamily="Geist, sans-serif">
             <text x={END_LABEL_GUTTER} y={height} dominantBaseline="text-before-edge">1</text>
