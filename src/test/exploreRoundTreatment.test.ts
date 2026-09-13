@@ -19,7 +19,7 @@ const shape = (ds: number[]): HoleShape => ({
 
 describe('treatmentFor', () => {
   it.each([
-    ['quiet ace keeps the earned override', { holes_in_one: 1, to_par: -6 }, shape([-1]), 'ticks'],
+    ['quiet ace keeps the earned override', { holes_in_one: 1, to_par: -3 }, shape([-3]), 'ticks'],
     ['quiet albatross falls through without a row', { albatrosses: 1 }, shape([-3, 1, 0]), 'none'],
     ['albatross with three off-par holes is ticks', { albatrosses: 1 }, shape([-3, 1, 1]), 'ticks'],
     ['under par with travel is shape', { to_par: -3 }, shape([-1, -1, -1]), 'shape'],
