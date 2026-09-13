@@ -29,6 +29,15 @@ import { A, CHIP_RADIUS } from './tokens';
 
 const SHAPE_PAD_X = 6;
 
+/** Explore end-label metrics. The footer is derived from the label's own line
+ * box plus clear space beneath it; callers add this exported band to the
+ * clipping container while `height` continues to describe today's plot box. */
+const END_LABEL_FONT_SIZE = 7;
+const END_LABEL_LINE_HEIGHT = Math.ceil(END_LABEL_FONT_SIZE * 1.3); // 10
+const END_LABEL_CLEARANCE = Math.ceil(END_LABEL_FONT_SIZE * 0.4); // 3
+export const EXPLORE_END_LABEL_BAND = END_LABEL_LINE_HEIGHT + END_LABEL_CLEARANCE; // 13
+const END_LABEL_GUTTER = 8;
+
 const OVER_TONE = A.INK;
 const UNDER_TONE = TOPAR_RED;
 
@@ -79,6 +88,7 @@ export function RoundShape({
   baselineColor,
   beadHoleLabels = false,
   exploreLineOnly = false,
+  endLabels = false,
 }: {
   row: CircleRoundRow;
   shape: HoleShape | null;
@@ -105,6 +115,8 @@ export function RoundShape({
   beadHoleLabels?: boolean;
   /** Explore-only line treatment. Defaults false, preserving every existing caller. */
   exploreLineOnly?: boolean;
+  /** Explore-only 1 / LEVEL / 18 footer. Defaults false for all shared consumers. */
+  endLabels?: boolean;
 }) {
   const { t } = useTranslation('courses');
 
@@ -154,6 +166,7 @@ export function RoundShape({
 
   if (shape && exploreLineOnly) {
     const lineValues = shape.series;
+    const renderedHeight = height + (endLabels ? EXPLORE_END_LABEL_BAND : 0);
     const lo = Math.min(0, ...lineValues) - 0.7;
     const hi = Math.max(0, ...lineValues) + 0.7;
     const span = Math.max(hi - lo, 2);
@@ -167,16 +180,20 @@ export function RoundShape({
     const last = points.at(-1);
     const tone = (lineValues.at(-1) ?? 0) < 0 ? RAMP_DIST.birdie : A.INK;
     return (
-      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
+      <svg width="100%" height={renderedHeight} viewBox={`0 0 ${width} ${renderedHeight}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
         <line x1={SHAPE_PAD_X} x2={width - SHAPE_PAD_X} y1={baselineY} y2={baselineY}
           stroke={baselineColor ?? A.HAIRLINE} strokeWidth={1} strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
         <path d={path} fill="none" stroke={tone} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
         {last ? <circle cx={last.x} cy={last.y} r={2.6} fill={tone} /> : null}
-        <text x={SHAPE_PAD_X} y={height - 2} fill={A.MUTE} fontSize="7" fontFamily="Geist, sans-serif">1</text>
-        <text x={width - SHAPE_PAD_X} y={height - 2} textAnchor="end" fill={A.MUTE} fontSize="7" fontFamily="Geist, sans-serif">18</text>
-        <text x={width / 2} y={Math.max(7, baselineY - 3)} textAnchor="middle" fill={A.MUTE} fontSize="7" fontFamily="Geist, sans-serif">
-          {t('amateur.stream.visual.level', 'LEVEL')}
-        </text>
+        {endLabels ? (
+          <g fill={A.MUTE} fontSize={END_LABEL_FONT_SIZE} fontFamily="Geist, sans-serif">
+            <text x={END_LABEL_GUTTER} y={height} dominantBaseline="text-before-edge">1</text>
+            <text x={width / 2} y={height} dominantBaseline="text-before-edge" textAnchor="middle">
+              {t('amateur.stream.visual.level', 'LEVEL')}
+            </text>
+            <text x={width - END_LABEL_GUTTER} y={height} dominantBaseline="text-before-edge" textAnchor="end">18</text>
+          </g>
+        ) : null}
       </svg>
     );
   }
