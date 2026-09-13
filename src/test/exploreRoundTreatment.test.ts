@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
-  MIN_TICK_OFF_PAR,
-  offParHoleCount,
+  MIN_SHAPE_SPAN,
+  cumulativeSpan,
+  dotsFor,
   treatmentFor,
 } from '@/features/explore-magazine/roundTreatment';
+import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 
@@ -19,26 +22,43 @@ const shape = (ds: number[]): HoleShape => ({
 
 describe('treatmentFor', () => {
   it.each([
-    ['quiet ace keeps the earned override', { holes_in_one: 1, to_par: -3 }, shape([-3]), 'ticks'],
-    ['quiet albatross falls through without a row', { albatrosses: 1 }, shape([-3, 1, 0]), 'none'],
-    ['albatross with three off-par holes is ticks', { albatrosses: 1 }, shape([-3, 1, 1]), 'ticks'],
-    ['under par with travel is shape', { to_par: -3 }, shape([-1, -1, -1]), 'shape'],
-    ['course record with travel is shape', { is_course_record: true }, shape([1, 1, 1]), 'shape'],
-    ['flat under-par clean round falls through to bar', { to_par: -1 }, shape([-1, 0, 0]), 'bar'],
-    ['flat record with only two off-par holes falls through', { is_course_record: true }, shape([2, -1, 0]), 'none'],
-    ['flat record falls through to birdie bar', { is_course_record: true, birdies: 4 }, shape([-1, 0, 0]), 'bar'],
-    ['single extreme hole falls through', {}, shape([0, 2, 0]), 'none'],
-    ['extreme hole with three off-par holes is ticks', {}, shape([1, 2, 1]), 'ticks'],
-    ['four birdies is bar', { birdies: 4 }, shape([-1, -1, -1, -1]), 'bar'],
-    ['derived clean card is bar', { clean_card: null }, shape([0, -1, 0]), 'bar'],
-    ['ordinary round is none', { to_par: 4 }, shape([1, 0, 1]), 'none'],
+    ['an ace draws the line', { holes_in_one: 1 }, shape([-3, 0, 0]), 'line'],
+    ['an albatross draws the line', { albatrosses: 1 }, shape([-3, 0, 0]), 'line'],
+    ['an eagle draws the line', { eagles: 1 }, shape([-2, 0, 0]), 'line'],
+    ['four birdies draws the line', { birdies: 4 }, shape([-1, -1, -1, -1]), 'line'],
+    ['under par draws the line even when flat', { to_par: -1 }, shape([-1, 0, 0]), 'line'],
+    ['a course record draws the line', { is_course_record: true }, shape([0, 0, 0]), 'line'],
+    ['movement alone draws the line', { to_par: 4 }, shape([1, 1, 1]), 'line'],
+    ['a flat ordinary round draws nothing', { to_par: 2 }, shape([1, 0, 1]), 'none'],
+    ['a disaster-only round draws nothing', { to_par: 2 }, shape([2, 0, 0]), 'none'],
+    ['no hole detail draws nothing', { to_par: -4 }, null, 'none'],
   ])('%s', (_label, facts, holes, expected) => {
     expect(treatmentFor(item(facts), holes)).toBe(expected);
   });
 
-  it('counts every played hole away from par', () => {
-    expect(MIN_TICK_OFF_PAR).toBe(3);
-    expect(offParHoleCount(shape([0, -1, 0, 2, 1]))).toBe(3);
-    expect(offParHoleCount(null)).toBe(0);
+  it('uses the span threshold derived from real rounds', () => {
+    expect(MIN_SHAPE_SPAN).toBe(3);
+    expect(cumulativeSpan(shape([1, 1, 1]))).toBe(3);
+    expect(cumulativeSpan(shape([1, -1, 0]))).toBe(1);
+    expect(cumulativeSpan(null)).toBeNull();
+  });
+});
+
+describe('dotsFor', () => {
+  it('marks only good holes, on the cumulative value after the hole', () => {
+    const dots = dotsFor(item({ eagles: 1 }), shape([-2, -1, 1, 2, 0, 3]));
+    expect(dots).toEqual([
+      { i: 1, tone: SC_FILL_GOLD },
+      { i: 2, tone: TOPAR_UNDER_DARK },
+    ]);
+  });
+
+  it('marks an ace in gold whatever its par', () => {
+    const ace: HoleShape = { ...shape([0]), holes: [{ holeNo: 1, par: 3, strokes: 1 }] };
+    expect(dotsFor(item({ holes_in_one: 1 }), ace)).toEqual([{ i: 1, tone: SC_FILL_GOLD }]);
+  });
+
+  it('never marks a round that earned its line on movement alone', () => {
+    expect(dotsFor(item({ to_par: 4 }), shape([1, -1, 1, 1, 1]))).toEqual([]);
   });
 });
