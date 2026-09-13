@@ -1703,7 +1703,10 @@
       "standing": {
         "board": "Niedrigster Brutto",
         "of": "von {{count}}",
-        "lastChange": "letzte Aenderung {{when}}"
+        "lastChange": "letzte Aenderung {{when}}",
+        "boardNet": "Netto",
+        "boardGross": "Brutto",
+        "pickBoard": "Wertung wechseln"
       },
       "ratingCount": "{{count}} Bewertungen",
       "empty": {

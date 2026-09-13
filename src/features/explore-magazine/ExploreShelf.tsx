@@ -20,6 +20,8 @@ export function ExploreShelf({
   heading,
   seeAllLabel,
   metaLabel,
+  headingRight,
+  foot,
   onSeeAll,
   onSeen,
   children,
@@ -28,6 +30,15 @@ export function ExploreShelf({
   seeAllLabel?: string | null;
   /** Additive quiet total when the rail has no command in the meta slot. */
   metaLabel?: string | null;
+  /**
+   * ADDITIVE. A control that belongs to the heading rather than to the rail -
+   * the standing board selector. When present it owns the right slot, so the
+   * see-all cannot sit there too and moves BENEATH the cards via `foot`.
+   * Omitted everywhere else, so every other shelf is unchanged.
+   */
+  headingRight?: React.ReactNode;
+  /** ADDITIVE. Rendered under the rail, for the uppercase foot see-all. */
+  foot?: React.ReactNode;
   onSeeAll?: () => void;
   /** Fired once, at 50% visibility (amateur_shelf_seen). */
   onSeen?: () => void;
@@ -69,7 +80,9 @@ export function ExploreShelf({
         <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK, minWidth: 0 }}>
           {heading}
         </span>
-        {seeAllLabel && onSeeAll ? (
+        {headingRight ? (
+          <span style={{ marginLeft: 'auto', flexShrink: 0 }}>{headingRight}</span>
+        ) : seeAllLabel && onSeeAll ? (
           <button
             type="button"
             onClick={onSeeAll}
@@ -110,6 +123,8 @@ export function ExploreShelf({
       >
         {children}
       </div>
+
+      {foot ? <div style={{ padding: '10px 16px 0' }}>{foot}</div> : null}
     </div>
   );
 }

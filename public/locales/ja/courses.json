@@ -1639,7 +1639,10 @@
       "standing": {
         "board": "ベストグロス",
         "of": "{{count}}人中",
-        "lastChange": "最新の変動 {{when}}"
+        "lastChange": "最新の変動 {{when}}",
+        "boardNet": "ネット",
+        "boardGross": "グロス",
+        "pickBoard": "ランキングを切り替える"
       },
       "ratingCount": "{{count}}件の評価",
       "empty": {

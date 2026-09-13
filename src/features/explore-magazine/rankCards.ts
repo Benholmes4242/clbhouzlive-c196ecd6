@@ -42,6 +42,15 @@ import type { StandingRow } from './useViewerStanding';
  * STRIPPING A CLAIM IS NOT HIDING A CARD. A card that loses its rank
  * consequence keeps its place, its photo and its figures and falls through to
  * the plain or notable headline - the card still states what happened.
+ *
+ * THESE CARDS DO NOT READ THE STANDING BOARD SELECTOR, AND MUST NOT BE MADE TO
+ * (Ben's ruling, §3e). "Where you stand" gained a net/gross dropdown; the cards
+ * stay on gross and never consult it. A card is a dated statement about a round
+ * that happened. A headline that flips because a dropdown moved stops being a
+ * record of anything - the same round would read as a rise this minute and a
+ * fall the next. The shelf is a live view and may change under a control; a
+ * record may not. Do not "fix" this later by making the card follow the shelf
+ * for consistency: the inconsistency is the correct behaviour.
  */
 
 /** Consequences that speak about where the viewer stands. */

@@ -1703,7 +1703,10 @@
       "standing": {
         "board": "Golpes brutos mas bajos",
         "of": "de {{count}}",
-        "lastChange": "ultimo cambio {{when}}"
+        "lastChange": "ultimo cambio {{when}}",
+        "boardNet": "Neto",
+        "boardGross": "Bruto",
+        "pickBoard": "Cambiar tabla"
       },
       "ratingCount": "{{count}} valoraciones",
       "empty": {
