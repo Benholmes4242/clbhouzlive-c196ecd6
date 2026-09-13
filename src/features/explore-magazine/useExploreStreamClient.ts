@@ -505,7 +505,10 @@ export function useExploreStreamClient(
 
     for (const item of out) item.score = scoreItem(item);
     out.sort((a, b) => (b.score - a.score) || a.id.localeCompare(b.id));
-    return cadence(out, view === 'scores');
+    /* THE ORDER IS: score, then cadence (kind/consequence AND ring), then the
+       positional outer-ring cap. The cap runs LAST because it is a positional
+       guarantee, and a score damp could not make one. */
+    return capOuterRing(cadence(out, view === 'scores'));
   }, [roundRows, circleScoreIds, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch, roundCourseMeta.data, scores?.active, scores?.geography]);
 
   /* READINESS IS isFetched, NEVER isLoading: a disabled query reports isLoading
