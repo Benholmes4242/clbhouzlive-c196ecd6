@@ -119,10 +119,14 @@ export function roundConsequence(input: RoundConsequenceInput, sources: Conseque
     }
     /* HOLD, NOT DRIFT: they are still where they were, on a board that has a
        field to be top of. rank_then null means there is no reference, so there
-       is nothing to call a hold — that is played_nochange. */
+       is nothing to call a hold — the round then carries NO consequence and the
+       card falls back to what the round itself was, which is the honest line. */
     if (stand.rank_then != null && stand.delta === 0) {
       return { kind: 'rank_hold', n: stand.rank_now, of: field };
     }
   }
-  return { kind: 'played_nochange', n: stand?.rank_now ?? null, of: field };
+  /* THE VIEWER'S OWN ROUND IS ALWAYS A CANDIDATE — it is their own news. With no
+     standing consequence it carries none, and the headline speaks the round
+     (birdies, eagle, under par, or plain). played_nochange is retired. */
+  return null;
 }
