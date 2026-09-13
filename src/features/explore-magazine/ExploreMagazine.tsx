@@ -58,10 +58,19 @@ const MOMENT_TILE = { w: 132, h: 132 };
  *  rather than a new object (and a new render) on every pass. */
 const EMPTY_SHAPES: Map<string, HoleShape> = new Map();
 
-/** §2c PHASE B1 adds `standing` at its shelf slot, after clips. An empty or
- *  unresolved standing shelf renders nothing and leaves no gap — the same path
- *  an empty clips shelf already takes. */
-type ShelfKind = 'clips' | 'standing' | 'moments';
+/** §3e PHASE C — THE FINAL ALL ORDER, skipping empties: clips, rounds (this week
+ *  at the club), standing, courses:county, moments, people, courses:world,
+ *  courses:list. An empty or unresolved shelf renders nothing and leaves no gap,
+ *  which is the same path an empty clips shelf already takes. */
+type ShelfKind =
+  | 'clips'
+  | 'clubWeek'
+  | 'standing'
+  | 'coursesCounty'
+  | 'moments'
+  | 'people'
+  | 'coursesWorld'
+  | 'coursesList';
 
 type Block =
   | { kind: 'lead'; item: StreamItem }
