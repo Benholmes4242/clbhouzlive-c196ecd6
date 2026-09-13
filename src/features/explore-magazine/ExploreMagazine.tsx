@@ -283,7 +283,20 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [visible, meta.data, meta.isFetched],
   );
 
-  const shelves: ShelfKind[] = view === 'watch' ? ['moments'] : view === 'scores' ? [] : ['clips', 'standing', 'moments'];
+  /* §3e THE ALL ORDER, in one place. Page 3+ restarts from clips, which the
+     modulo in the renderer does; an empty shelf is skipped by the shelf itself
+     and the next one takes its slot. */
+  const ALL_SHELVES: ShelfKind[] = [
+    'clips',
+    'clubWeek',
+    'standing',
+    'coursesCounty',
+    'moments',
+    'people',
+    'coursesWorld',
+    'coursesList',
+  ];
+  const shelves: ShelfKind[] = view === 'watch' ? ['moments'] : view === 'scores' ? [] : ALL_SHELVES;
   const blocks = useMemo(() => buildBlocks(enriched, shelves), [enriched, view]);
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
