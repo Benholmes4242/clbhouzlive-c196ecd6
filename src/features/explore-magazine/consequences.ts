@@ -1,6 +1,53 @@
-import type { Consequence } from './streamItem';
+import type { Consequence, StreamFacts } from './streamItem';
 import type { StandingRow } from './useViewerStanding';
 import type { CourseRecordSignal } from './useCourseRecordSignal';
+
+/**
+ * THE RETIRED KINDS, AND THE SERVER (Sep 2026 ruling).
+ *
+ * The deployed get_explore_stream still ranks and returns rows whose consequence
+ * is one of the two retired kinds; changing that is SQL and is Ben's to run. So
+ * the client admits server rows through the same rule the engine below now
+ * follows: a retired kind is not a card, and the round only survives on its own
+ * merits — the viewer's own round, or a round notable in its own right.
+ *
+ * CIRCLE MEMBERSHIP IS NOT ON A SERVER ROW, so a followed member's otherwise
+ * ordinary round arriving with a retired kind cannot be re-admitted as
+ * circle_round here. It is dropped. That is a stated narrowing of the
+ * fall-through on the RPC path, not a second rule.
+ */
+const RETIRED_KINDS = new Set<string>(['rank_down', 'played_nochange']);
+
+export function isRetiredConsequenceKind(kind: string | null | undefined): boolean {
+  return !!kind && RETIRED_KINDS.has(kind);
+}
+
+/** Notable in its own right — the same facts the platform_notable kind means. */
+export function isNotableRoundFacts(facts: StreamFacts | null | undefined): boolean {
+  if (!facts) return false;
+  return (
+    (facts.holes_in_one ?? 0) > 0 ||
+    (facts.albatrosses ?? 0) > 0 ||
+    (facts.eagles ?? 0) > 0 ||
+    (facts.to_par ?? 0) < 0 ||
+    facts.is_course_record === true
+  );
+}
+
+/**
+ * One decision for a server row carrying a retired kind:
+ *   - the viewer's own round  -> keep it, with no consequence;
+ *   - notable in its own right -> keep it as platform_notable;
+ *   - otherwise                -> null, meaning NOT A CANDIDATE.
+ */
+export function admitRetired(
+  facts: StreamFacts | null | undefined,
+  isViewer: boolean,
+): { consequence: Consequence | null } | null {
+  if (isViewer) return { consequence: null };
+  if (isNotableRoundFacts(facts)) return { consequence: { kind: 'platform_notable' } };
+  return null;
+}
 
 /**
  * THE CONSEQUENCE ENGINE (BRIEF_EXPLORE_MAGAZINE §3a, PHASE B2).
