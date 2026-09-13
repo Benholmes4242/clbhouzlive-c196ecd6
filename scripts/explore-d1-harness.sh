@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Phase D1 port-fidelity harness. Local throwaway cluster; touches nothing live.
 set -euo pipefail
-DIR=/tmp/exd1
+DIR=${EXD1_DIR:-/tmp/exd1pg}   # throwaway cluster dir; must NOT hold the repo
 export PGDATA=$DIR/pg PGHOST=$DIR/sock PGPORT=55432 PGUSER=postgres PGDATABASE=postgres
 unset PGPASSWORD PGSSLMODE || true
 rm -rf "$DIR"; mkdir -p "$PGDATA" "$PGHOST"
