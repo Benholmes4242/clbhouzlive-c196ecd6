@@ -9,16 +9,16 @@
 
 export type ExploreView = 'all' | 'scores' | 'watch' | 'courses' | 'reviews';
 
-/** The views Phase A can actually answer. A chip that cannot change what you
- *  see does not render, so Scores/Courses/Reviews are absent until they work. */
-export const PHASE_A_VIEWS: ExploreView[] = ['all', 'watch'];
+/** The views implemented through Phase B2. Courses and Reviews remain absent
+ *  until Phase C rather than rendering controls with no complete answer. */
+export const EXPLORE_VIEWS: ExploreView[] = ['all', 'scores', 'watch'];
 
 const KEY = 'amateur:view';
 
 export function readExploreView(): ExploreView {
   try {
     const raw = sessionStorage.getItem(KEY);
-    if (raw && PHASE_A_VIEWS.includes(raw as ExploreView)) return raw as ExploreView;
+    if (raw && EXPLORE_VIEWS.includes(raw as ExploreView)) return raw as ExploreView;
   } catch {
     /* private mode: All. */
   }

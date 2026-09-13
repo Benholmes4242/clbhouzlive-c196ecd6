@@ -35,6 +35,10 @@ export interface RoundConsequenceInput {
   gross: number | null;
   playDate: string | null;
   isSelf: boolean;
+  /** True only when the row came from the shared personal-circle source. */
+  isCircle: boolean;
+  /** Settled notable feat, never a substitute for a geographic consequence. */
+  isNotable: boolean;
 }
 
 export interface ConsequenceSources {
@@ -96,8 +100,10 @@ export function roundConsequence(input: RoundConsequenceInput, sources: Conseque
        list_new_low off the other member's own best there, which is a fact about
        them and not a low on any list — so this emits list_first only. */
     if (courseId && sources.shortlist.has(courseId)) return { kind: 'list_first' };
-
-    return { kind: 'circle_round' };
+    if (stand) return { kind: 'played_nochange', n: stand.rank_now, of: field };
+    if (input.isCircle) return { kind: 'circle_round' };
+    if (input.isNotable) return { kind: 'platform_notable' };
+    return null;
   }
 
   /* 3. THE VIEWER'S OWN ROUND — the only path that can carry good news. */

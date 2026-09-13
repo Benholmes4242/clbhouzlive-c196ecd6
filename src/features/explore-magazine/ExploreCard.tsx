@@ -289,9 +289,9 @@ export function ExploreCard({
   onTap: () => void;
   onWhoTap?: () => void;
 }) {
-  const { t } = useTranslation('courses');
+  const { t, i18n } = useTranslation('courses');
   const parts = kickerParts(item, t as never);
-  const headline = headlineFor(item, t as never);
+  const headline = headlineFor(item, t as never, i18n.language || 'en');
   const chips = chipsFor(item, t as never);
   const onPhoto = size === 'lead';
 

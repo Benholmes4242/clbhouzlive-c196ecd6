@@ -1,14 +1,17 @@
 # Roadmap
 
 ## Explore Magazine Phase B2 — Scores (13 Sep 2026)
-- [ ] Reuse the standing ordinal helper across all rank consequence headlines and six locales.
-- [ ] Add the Scores view and geography scope row without changing All or Watch behavior.
-- [ ] Build one reusable club/county/country resolver and report each available test-account path.
-- [ ] Filter and rank round-only Scores content with consequence-kind cadence.
-- [ ] Add standing, weekly club, and no-handicap connect states with existing navigation and analytics.
-- [ ] Verify type/build, event invocations, source geometry, and report device checks as landed, not verified.
+- [x] Reuse the standing ordinal helper across all rank consequence headlines and six locales.
+- [x] Add the Scores view and geography scope row without changing All or Watch behavior.
+- [x] Build one reusable club/county/country resolver and report each available test-account path.
+- [x] Filter and rank round-only Scores content with consequence-kind cadence.
+- [x] Add standing, weekly club, and no-handicap connect states with existing navigation and analytics.
+- [x] Verify type/build, event invocations, source geometry, and report device checks as landed, not verified.
 
 ## Tour scorecard sheet geometry (13 Sep 2026)
+- [ ] Report the member `RoundDetailSheet` path's usable grid width at 390px and whether `SCORE` overflows its 26px cell; make no further scorecard fix before this scope answer.
+- [ ] Report the round selector's vertical behavior: scrolling-body/sticky-head relationship, visibility at scroll zero, and intended sticky versus scrolling treatment.
+- [ ] File: tour scorecard sheet has not had the flat-sections pass. Do not include that pass tonight.
 - [x] Measure the member and tour scorecard grid and contain row labels inside their cells.
 - [ ] Rule on widening the label column: measured SCORE requires 44px, which leaves 1.89px mark clearance per side at 390px.
 - [ ] Resolve the sliced round selector.

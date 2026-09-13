@@ -219,6 +219,8 @@ export const EVENT_LABELS: Record<string, string> = {
   amateur_card_tapped: 'Explore card tapped',
   amateur_card_who_tapped: 'Explore card member tapped',
   amateur_view_changed: 'Explore view changed',
+  amateur_scope_changed: 'Explore Scores scope changed',
+  amateur_connect_tapped: 'Explore handicap connect tapped',
   amateur_shelf_seen: 'Explore shelf seen',
   amateur_shelf_tile_tapped: 'Explore shelf tile tapped',
   amateur_shelf_see_all: 'Explore shelf see-all opened',

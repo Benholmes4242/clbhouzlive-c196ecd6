@@ -21,9 +21,13 @@ import { ExploreCard, type CardSize } from './ExploreCard';
 import { ExploreShelf } from './ExploreShelf';
 import { StandingShelf } from './StandingShelf';
 import { LeadShell, PairShell, ShelfShell, StdShell } from './ExploreShells';
-import { PHASE_A_VIEWS, readExploreView, writeExploreView, type ExploreView } from './exploreViewMemory';
+import { EXPLORE_VIEWS, readExploreView, writeExploreView, type ExploreView } from './exploreViewMemory';
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
 import type { StreamItem } from './streamItem';
+import { WeeklyClubShelf } from './WeeklyClubShelf';
+import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
+import { useViewerStanding } from './useViewerStanding';
+import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
 
 /**
  * THE MAGAZINE (BRIEF_EXPLORE_MAGAZINE, PHASE A).
@@ -32,9 +36,8 @@ import type { StreamItem } from './streamItem';
  * owns NO header: /amateur wears the shared floating glass islands (registry
  * rule), exactly as it did before.
  *
- * TWO CHIPS ONLY. Scores, Courses and Reviews are absent, not disabled and not
- * labelled "coming next": a control that cannot change what you see does not
- * render. They arrive with Phase B and Phase C.
+ * THREE CHIPS THROUGH PHASE B2. Courses and Reviews remain absent rather than
+ * disabled; a control that cannot change what you see does not render.
  *
  * SHELVES PRESENT IN PHASE A are clips and moments — the two whose sources ship
  * today with no geography and no standing behind them. The rounds, standing,
@@ -210,8 +213,17 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const openReview = useReviewSheetStore((state) => state.open);
 
   const [view, setView] = useState<ExploreView>(() => readExploreView());
+  const geography = useViewerScoreScope(userId);
+  const [scoreScope, setScoreScope] = useState<ScoreScope>('world');
+  const scoreScopeChosen = useRef(false);
+  useEffect(() => {
+    if (view !== 'scores' || !geography.isFetched || scoreScopeChosen.current) return;
+    setScoreScope(geography.scope.primaryClubId ? 'club' : geography.scope.county ? 'county' : 'world');
+    scoreScopeChosen.current = true;
+  }, [view, geography.isFetched, geography.scope.primaryClubId, geography.scope.county]);
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
-  const stream = useExploreStreamClient(userId, view);
+  const stream = useExploreStreamClient(userId, view, { active: scoreScope, geography: geography.scope });
+  const scoresStanding = useViewerStanding(userId);
 
   const visible = useMemo(() => stream.items.slice(0, revealed), [stream.items, revealed]);
 
@@ -253,7 +265,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [visible, meta.data, meta.isFetched],
   );
 
-  const shelves: ShelfKind[] = view === 'watch' ? ['moments'] : ['clips', 'standing', 'moments'];
+  const shelves: ShelfKind[] = view === 'watch' ? ['moments'] : view === 'scores' ? [] : ['clips', 'standing', 'moments'];
   const blocks = useMemo(() => buildBlocks(enriched, shelves), [enriched, view]);
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
@@ -299,9 +311,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const changeView = useCallback(
     (next: string) => {
       const value = next as ExploreView;
-      if (!PHASE_A_VIEWS.includes(value)) return;
+      if (!EXPLORE_VIEWS.includes(value)) return;
       analyticsEvents.track('amateur_view_changed', { from: view, to: value });
       setView(value);
+      if (value === 'scores') scoreScopeChosen.current = false;
       writeExploreView(value);
       setRevealed(STREAM_PAGE_SIZE);
       loggedRef.current = 0;
@@ -387,12 +400,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
   const chips = useMemo(
     () =>
-      PHASE_A_VIEWS.map((key) => ({
+      EXPLORE_VIEWS.map((key) => ({
         id: key,
         label:
           key === 'all'
             ? t('amateur.stream.view.all', 'All')
-            : t('amateur.stream.view.watch', 'Watch'),
+            : key === 'scores'
+              ? t('amateur.stream.view.scores', 'Scores')
+              : t('amateur.stream.view.watch', 'Watch'),
       })),
     [t],
   );
@@ -427,6 +442,62 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       </div>
 
+      {view === 'scores' && geography.isFetched && (geography.scope.primaryClubId || geography.scope.county) ? (
+        <div style={{ padding: '0 12px 14px', minWidth: 0, overflow: 'hidden' }}>
+          <RailChips
+            options={[
+              ...(geography.scope.primaryClubId ? [{ id: 'club', label: t('amateur.stream.scope.club', 'My club') }] : []),
+              ...(geography.scope.county ? [{ id: 'county', label: geography.scope.county }] : []),
+              ...(geography.scope.country ? [{ id: 'country', label: geography.scope.country }] : []),
+              { id: 'world', label: t('amateur.stream.scope.world', 'World') },
+            ]}
+            value={scoreScope}
+            onChange={(next) => {
+              const value = next as ScoreScope;
+              analyticsEvents.track('amateur_scope_changed', { view: 'scores', from: scoreScope, to: value });
+              scoreScopeChosen.current = true;
+              setScoreScope(value);
+              setRevealed(STREAM_PAGE_SIZE);
+              loggedRef.current = 0;
+            }}
+            ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
+          />
+        </div>
+      ) : null}
+
+      {view === 'scores' ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP, marginBottom: BLOCK_GAP }}>
+          {!scoresStanding.isFetched ? <ShelfShell tileW={206} tileH={118} /> : null}
+          {scoresStanding.isFetched && !scoresStanding.unresolved && scoresStanding.rows.length > 0 ? (
+            <StandingShelf viewerId={userId} pos={0} />
+          ) : null}
+          {scoresStanding.isFetched && !scoresStanding.unresolved && scoresStanding.rows.length === 0 ? (
+            <div style={{ paddingInline: 20 }}>
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
+                {t('amateur.stream.connect.body', 'Connect a handicap and every round you play lands here, ranked against everyone who has played the same course.')}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  analyticsEvents.track('amateur_connect_tapped', { from: 'scores_sentence' });
+                  depart();
+                  navigate(WHS_CONNECT_PATH);
+                }}
+                style={{ border: 0, background: 'transparent', padding: '8px 0 0', color: A.INK, fontFamily: SANS, fontSize: 13, fontWeight: 700 }}
+              >
+                {t('amateur.stream.connect.action', 'Connect a handicap >')}
+              </button>
+            </div>
+          ) : null}
+          <WeeklyClubShelf
+            viewerId={userId}
+            clubName={geography.scope.primaryClubName}
+            enabled={(scoreScope === 'club' || scoreScope === 'county') && !!geography.scope.primaryClubId}
+            pos={0}
+          />
+        </div>
+      ) : null}
+
       {/* COLD START SHOWS THE SHORTEST PLAUSIBLE CARD, never a lead shell: a
           loading state is never larger than the state it resolves into. */}
       {!stream.isFetched && enriched.length === 0 ? (
@@ -436,7 +507,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       ) : null}
 
-      {stream.isFetched && stream.items.length === 0 ? (
+      {view !== 'scores' && stream.isFetched && stream.items.length === 0 ? (
         /* §6h THE ONE SENTENCE ON THE PAGE. No heading, no placeholder card. */
         <div style={{ paddingInline: 20, marginTop: 8 }}>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>

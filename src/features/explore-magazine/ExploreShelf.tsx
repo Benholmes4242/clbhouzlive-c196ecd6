@@ -19,12 +19,15 @@ import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 export function ExploreShelf({
   heading,
   seeAllLabel,
+  metaLabel,
   onSeeAll,
   onSeen,
   children,
 }: {
   heading: string;
   seeAllLabel?: string | null;
+  /** Additive quiet total when the rail has no command in the meta slot. */
+  metaLabel?: string | null;
   onSeeAll?: () => void;
   /** Fired once, at 50% visibility (amateur_shelf_seen). */
   onSeen?: () => void;
@@ -85,6 +88,10 @@ export function ExploreShelf({
           >
             {seeAllLabel}
           </button>
+        ) : metaLabel ? (
+          <span style={{ marginLeft: 'auto', flexShrink: 0, color: A.MUTE, fontSize: 13, fontWeight: 600 }}>
+            {metaLabel}
+          </span>
         ) : null}
       </div>
 

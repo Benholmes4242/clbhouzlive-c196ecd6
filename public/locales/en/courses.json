@@ -67,12 +67,24 @@
     "stream": {
       "view": {
         "all": "All",
+        "scores": "Scores",
         "watch": "Watch"
       },
       "shelf": {
         "clips": "Clips",
         "moments": "From the community",
-        "standing": "Where you stand"
+        "standing": "Where you stand",
+        "clubWeek": "This week at {{club}}"
+      },
+      "scope": {
+        "club": "My club",
+        "world": "World"
+      },
+      "scopes": "Scores scope",
+      "roundCount": "{{count}} rounds",
+      "connect": {
+        "body": "Connect a handicap and every round you play lands here, ranked against everyone who has played the same course.",
+        "action": "Connect a handicap >"
       },
       "seeAll": "See all {{count}}",
       "views": "Explore views",

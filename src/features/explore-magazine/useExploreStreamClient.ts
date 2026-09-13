@@ -14,6 +14,8 @@ import { roundConsequence as consequenceFor } from './consequences';
 import { useCourseRecordSignal } from './useCourseRecordSignal';
 import { useViewerCourseBests } from './useViewerCourseBests';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
+import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
+import type { ScoreScope, ViewerScoreScope } from './useViewerScoreScope';
 
 
 /**
@@ -27,12 +29,10 @@ import { useViewerStanding, type StandingRow } from './useViewerStanding';
  *
  *   NO LANES.        Everything is lane 'news'. The backlog rule (§6e) needs
  *                    arrived_at versus play_date, which means the RPC.
- *   NO GEOGRAPHY.    ring is 'own' or null. Club/county/country arrive in
- *                    Phase C, so the outer-ring 1-in-4 cadence cap has nothing
- *                    to act on yet and is not simulated.
- *   NO STANDING.     rank_down / rank_up / rank_hold / played_nochange and a
- *                    record card's GAP sentence all need the viewer's rank per
- *                    course (Phase B). They are never emitted here.
+ *   PART GEOGRAPHY.  Phase B2 filters Scores with canonical club/course fields;
+ *                    Phase C still owns geography rings and shelves.
+ *   STANDING LIVE.   Phase B supplies typed round consequences from the viewer's
+ *                    per-course board standing.
  *   NO KEYSET.       Depth is a client pool revealed a page at a time. The real
  *                    cursor is (score, id) from the RPC.
  *
@@ -107,14 +107,17 @@ function scoreItem(item: StreamItem): number {
  * THE CADENCE PASS IS POSITIONAL, NOT A SCORE DAMP. Positional guarantees are
  * the only ones that hold when score gaps are large.
  */
-function cadence(items: StreamItem[]): StreamItem[] {
+function cadence(items: StreamItem[], byConsequence = false): StreamItem[] {
   const out: StreamItem[] = [];
   const pool = [...items];
   while (pool.length > 0) {
     const previous = out[out.length - 1];
     let index = 0;
     if (previous) {
-      const different = pool.findIndex((candidate) => candidate.kind !== previous.kind);
+      const previousKey = byConsequence ? previous.consequence?.kind ?? 'none' : previous.kind;
+      const different = pool.findIndex((candidate) =>
+        (byConsequence ? candidate.consequence?.kind ?? 'none' : candidate.kind) !== previousKey,
+      );
       if (different >= 0) index = different;
     }
     /* A STORY NEVER LEADS unless it is the only candidate. */
@@ -136,7 +139,11 @@ export interface ExploreStream {
   isPending: boolean;
 }
 
-export function useExploreStreamClient(viewerId: string | undefined, view: ExploreView): ExploreStream {
+export function useExploreStreamClient(
+  viewerId: string | undefined,
+  view: ExploreView,
+  scores?: { active: ScoreScope; geography: ViewerScoreScope },
+): ExploreStream {
   const wantsRounds = view === 'all' || view === 'scores';
   const wantsWatch = view === 'all' || view === 'watch';
 
@@ -179,6 +186,10 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
     }
     return out;
   }, [circle.data, everyone.data, wantsRounds]);
+  const circleScoreIds = useMemo(
+    () => new Set((circle.data ?? []).map((row) => row.score_id).filter((id): id is string => !!id)),
+    [circle.data],
+  );
 
   /* THE CONSEQUENCE SOURCES (§3a). Standing supplies every rank and every field
      size; the record book supplies who holds what; bests decide only whether a
@@ -194,6 +205,7 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
     () => roundRows.map((row) => row.course_id).filter((id): id is string => !!id),
     [roundRows],
   );
+  const roundCourseMeta = useCourseCardMeta(roundCourseIds);
   const records = useCourseRecordSignal(viewerId, roundCourseIds);
 
   const lastSeen = useMemo(() => readDiscoverLastSeen(viewerId), [viewerId]);
@@ -208,7 +220,35 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
 
     if (wantsRounds) {
       for (const row of roundRows) {
+        if (view === 'scores') {
+          const course = row.course_id ? roundCourseMeta.data?.get(row.course_id) : null;
+          const active = scores?.active ?? 'world';
+          const geography = scores?.geography;
+          const inScope = active === 'world'
+            || (active === 'club' && !!geography?.primaryClubId && course?.clubId === geography.primaryClubId)
+            || (active === 'county' && !!geography?.county && course?.rawRegion === geography.county)
+            || (active === 'country' && !!geography?.country && course?.subCountry === geography.country);
+          if (!inScope) continue;
+        }
         const toPar = row.gross != null && row.course_par != null ? row.gross - row.course_par : null;
+        const consequence = consequenceFor(
+          {
+            courseId: row.course_id,
+            userId: row.user_id,
+            gross: row.gross,
+            playDate: row.play_date,
+            isSelf: row.is_self,
+            isCircle: !!row.score_id && circleScoreIds.has(row.score_id),
+            isNotable: row.holes_in_one > 0 || row.albatrosses > 0 || row.is_course_record
+              || (row.stableford_points ?? 0) >= 45 || toPar != null && toPar < 0
+              || row.clean_card || (row.birdies ?? 0) >= 5,
+          },
+          { standing: standingMap, records, bests: bests.bests, shortlist: context.shortlist },
+        );
+        /* §3d NO CONSEQUENCE, NO CARD. An everyone-pool round outside the
+           viewer's circle and played geography is not promoted into generic
+           content merely because the client happened to fetch it. */
+        if (!consequence) continue;
         const item: StreamItem = {
           id: `round:${row.round_id}`,
           kind: 'round',
@@ -216,16 +256,7 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
           ring: row.is_self ? 'own' : null,
           lane: 'news',
           score: 0,
-          consequence: consequenceFor(
-            {
-              courseId: row.course_id,
-              userId: row.user_id,
-              gross: row.gross,
-              playDate: row.play_date,
-              isSelf: row.is_self,
-            },
-            { standing: standingMap, records, bests: bests.bests, shortlist: context.shortlist },
-          ),
+          consequence,
 
           subject: {
             course_id: row.course_id,
@@ -419,8 +450,8 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
 
     for (const item of out) item.score = scoreItem(item);
     out.sort((a, b) => (b.score - a.score) || a.id.localeCompare(b.id));
-    return cadence(out);
-  }, [roundRows, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch]);
+    return cadence(out, view === 'scores');
+  }, [roundRows, circleScoreIds, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch, roundCourseMeta.data, scores?.active, scores?.geography]);
 
   /* READINESS IS isFetched, NEVER isLoading: a disabled query reports isLoading
      false and would report the page ready before anything had been asked for.
@@ -430,7 +461,8 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
      consequence rather than a wrong one. */
   const isFetched =
     contextFetched &&
-    (!wantsRounds || (circle.isFetched && everyone.isFetched && standing.isFetched && bests.isFetched && records.isFetched)) &&
+    (!wantsRounds || (circle.isFetched && everyone.isFetched && standing.isFetched && bests.isFetched && records.isFetched
+      && (view !== 'scores' || roundCourseIds.length === 0 || roundCourseMeta.isFetched))) &&
     (view !== 'all' && view !== 'reviews' ? true : !reviews.isPending) &&
     (view !== 'all' ? true : !stories.isPending) &&
     (!wantsWatch || media.isFetched) &&

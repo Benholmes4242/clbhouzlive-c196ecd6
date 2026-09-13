@@ -2189,12 +2189,24 @@
     "stream": {
       "view": {
         "all": "[Åll one]",
+        "scores": "[Sçörés one]",
         "watch": "[Wåtçh one]"
       },
       "shelf": {
         "clips": "[Çlîps one]",
         "moments": "[Fröm thé çömmünîty one]",
-        "standing": "[Where you stand]"
+        "standing": "[Where you stand]",
+        "clubWeek": "[Thîs wéék åt {{club}} one two]"
+      },
+      "scope": {
+        "club": "[Mý çlüb one]",
+        "world": "[Wörld one]"
+      },
+      "scopes": "[Sçörés sçöpé one]",
+      "roundCount": "[{{count}} röünds one]",
+      "connect": {
+        "body": "[Çönnéçt å håndîçåp ånd évérý röünd yöü plåý lånds héré, rånkéd ågåînst évérýöné whö hås plåýéd thé såmé çöürsé. one two three four]",
+        "action": "[Çönnéçt å håndîçåp > one two]"
       },
       "seeAll": "[Séé åll {{count}} one two]",
       "views": "[Éxplöré vîéws one]",
