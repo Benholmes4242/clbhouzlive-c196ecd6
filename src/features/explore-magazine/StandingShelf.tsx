@@ -99,6 +99,13 @@ function useStandingCopy() {
           ? t('amateur.stream.standing.boardNet', 'Net')
           : t('amateur.stream.standing.boardGross', 'Gross'),
       pickBoard: t('amateur.stream.standing.pickBoard', 'Change board'),
+      /* ERRORED IS NOT EMPTY. A read that failed says so; it never renders as
+         a member with no standing, and never as nothing at all. */
+      unreadable: t(
+        'amateur.stream.standing.unreadable',
+        'Your standing could not be loaded.',
+      ),
+      retry: t('amateur.stream.standing.retry', 'Try again'),
       unit: (count: number) => t('amateur.stream.standing.of', 'of {{count}}', { count }),
       lastChange: (when: string) => t('amateur.stream.standing.lastChange', 'last change {{when}}', { when }),
       seeAll: (count: number) => t('amateur.stream.seeAll', 'See all {{count}}', { count }),
