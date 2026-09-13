@@ -7,6 +7,7 @@ import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFil
 import { useBoardCourses } from '@/components/explore-tab-new/courseled/hooks/useBoardCourses';
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
 
+import { courseEventStrength, courseHeadline, type CourseEventKind } from './courseHeadline';
 import type { CourseShelfRow } from './useCourseShelves';
 import type { StreamItem } from './streamItem';
 import type { ScoreScope, ViewerScoreScope } from './useViewerScoreScope';
@@ -163,7 +164,9 @@ function useTop100Ranks(courseIds: string[]) {
   return { ranks: query.data ?? null, isFetched: key.length === 0 ? true : query.isFetched };
 }
 
-export type CourseEventKind = 'ratings' | 'low' | 'stable';
+/** Re-exported so existing importers keep their symbol (D3 moved the type
+ *  next to the shared headline composer). */
+export type { CourseEventKind };
 
 export interface CoursesView {
   items: StreamItem[];
@@ -243,40 +246,23 @@ export function useScopeCourses(
       /* §5b/§6.3 NEITHER ROUNDS NOR A RATING IS NOT A CANDIDATE. */
       if (row.rounds <= 0 && row.rating == null) continue;
 
-      let event: CourseEventKind = 'stable';
-      let strength = 0;
-      let headline: string;
+      /* ONE LADDER, TWO CALLERS (D3): the same composer the server stream uses,
+         so the RPC's Courses page and this fallback read identical copy. */
+      const burstQualifies = !!burst && burst.count >= 2;
+      const event: CourseEventKind = burstQualifies ? 'ratings' : low ? 'low' : 'stable';
+      const strength = courseEventStrength(event, burst?.count ?? null);
+      const headline =
+        courseHeadline(t, {
+          event,
+          burstCount: burst?.count ?? null,
+          burstMean: burst?.mean ?? null,
+          lowGross: low?.gross ?? null,
+          lowBy: low?.by ?? null,
+          rounds: row.rounds,
+          rating: row.rating,
+          ratingCount: row.rating_count,
+        }) ?? '';
 
-      if (burst && burst.count >= 2) {
-        event = 'ratings';
-        strength = 2 + Math.min(burst.count, 12) / 12;
-        headline = t('amateur.stream.course.eventRatings', '{{count}} ratings this month, averaging {{mean}}.', {
-          count: burst.count,
-          mean: burst.mean.toFixed(1),
-        });
-      } else if (low) {
-        event = 'low';
-        strength = 1;
-        headline = low.by
-          ? t('amateur.stream.course.eventLow', "{{name}}'s {{gross}} is the low here this month.", {
-              name: low.by,
-              gross: low.gross,
-            })
-          : t('amateur.stream.course.eventLowAnon', '{{gross}} is the low here this month.', { gross: low.gross });
-      } else if (row.rating != null && row.rounds > 0) {
-        headline = t(
-          'amateur.stream.course.factRated',
-          '{{rounds}} rounds tracked, rated {{rating}} from {{count}}.',
-          { rounds: row.rounds, rating: row.rating.toFixed(1), count: row.rating_count },
-        );
-      } else if (row.rounds > 0) {
-        headline = t('amateur.stream.course.factRounds', '{{rounds}} rounds tracked here.', { rounds: row.rounds });
-      } else {
-        headline = t('amateur.stream.course.factRatedOnly', 'Rated {{rating}} from {{count}}.', {
-          rating: (row.rating as number).toFixed(1),
-          count: row.rating_count,
-        });
-      }
 
       const ring: StreamItem['ring'] =
         geography.primaryClubId && course?.clubId === geography.primaryClubId

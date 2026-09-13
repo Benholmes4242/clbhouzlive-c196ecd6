@@ -262,27 +262,40 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   }, [scoped, geography.isFetched, geography.scope.primaryClubId, geography.scope.county]);
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
   const stream = useExploreStreamClient(userId, view, { active: scoreScope, geography: geography.scope });
-  /* PHASE D1 THE SERVER RANKER, All only. The viewer id is withheld on every
-     other view so the read is not even issued until D3 opens them. Until Ben
-     runs docs/sql/explore_stream_d1.sql the RPC is absent, `unavailable` is
-     true, and the accepted client composition below stays in charge - the
-     fallback is deliberate and is never an empty page. */
-  const server = useExploreStream(userId && view === 'all' ? userId : undefined, 'all', scoreScope, {
+  /* PHASE D3 THE SERVER RANKER: All, Scores, Courses and Reviews. WATCH IS NOT
+     ON THE RPC - its clips and long-form video are not in the ranker's pool, so
+     it stays client-composed with its current finite depth. The viewer id is
+     withheld on Watch so the read is never even issued.
+     A SCOPED VIEW WAITS FOR ITS GEOGRAPHY: asking before the shared resolver
+     settles would send a null club and read as "no cards at your club".
+     Until Ben runs docs/sql/explore_stream_d3.sql the non-All views error,
+     `unavailable` is true, and the accepted client composition below stays in
+     charge - the fallback is deliberate and is never an empty page. */
+  const serverView = view !== 'watch';
+  const serverReady = serverView && (!scoped || geography.isFetched);
+  const server = useExploreStream(userId && serverReady ? userId : undefined, view, scoreScope, {
     clubId: geography.scope.primaryClubId,
     county: geography.scope.county,
     country: geography.scope.country,
   });
-  const serverOn = view === 'all' && !server.unavailable && server.isFetched && server.items.length > 0;
+  const serverOn = serverView && !server.unavailable && server.isFetched && server.items.length > 0;
   const scoresStanding = useViewerStanding(userId);
 
   /* §5b THE COURSES VIEW'S OWN BODY. Course cards are not rounds, reviews or
      media, so they are composed by their own hook off get_board_courses and the
      shared geography — the client stream is left exactly as B2 shipped it. */
-  const coursesView = useScopeCourses(userId, scoreScope, geography.scope, view === 'courses' && geography.isFetched);
+  const coursesView = useScopeCourses(
+    userId,
+    scoreScope,
+    geography.scope,
+    /* THE FALLBACK ONLY. With the RPC serving Courses this composition is not
+       fetched at all; it wakes up if the server read is unavailable. */
+    view === 'courses' && geography.isFetched && !serverOn,
+  );
   /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so a
      single-type view and the mixed stream take the same reveal, sentinel,
      page-loaded and end paths. */
-  const source = view === 'courses' ? coursesView : serverOn ? server : stream;
+  const source = serverOn ? server : view === 'courses' ? coursesView : stream;
 
   /* PHASE C §3a-§3c THE COURSE SHELVES. Each shelf renders nothing when its
      source is empty. Geography comes from the shared resolver above — no second

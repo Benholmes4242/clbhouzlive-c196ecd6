@@ -130,7 +130,16 @@ export interface StreamFacts {
   clean_card?: boolean | null;
   is_course_record?: boolean | null;
   hcp_at_time?: number | null;
+  /** COURSE-CARD FIGURES (D3). The RPC returns these and courseHeadline() turns
+   *  them into the localized sentence; SQL cannot localise six locales. */
+  rounds_tracked?: number | null;
+  low_gross?: number | null;
+  low_by?: string | null;
+  ratings_burst_n?: number | null;
+  ratings_burst_mean?: number | null;
+  course_event?: 'ratings' | 'low' | 'stable' | null;
 }
+
 
 /** What a tap needs. Carried rather than re-fetched: the page opens the same
  *  sheets and viewer these hooks already feed elsewhere. */

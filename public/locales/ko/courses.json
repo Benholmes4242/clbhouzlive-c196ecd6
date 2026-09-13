@@ -1622,6 +1622,14 @@
       "empty": {
         "courses": "No courses in {{scope}} yet.",
         "reviews": "No reviews in {{scope}} yet."
+      },
+      "course": {
+        "eventRatings": "이번 달 평가 {{count}}건, 평균 {{mean}}.",
+        "eventLow": "이번 달 이곳 최저 스코어는 {{name}}의 {{gross}}.",
+        "eventLowAnon": "이번 달 이곳 최저 스코어는 {{gross}}.",
+        "factRated": "{{rounds}}라운드 기록, 평가 {{count}}건에 {{rating}}.",
+        "factRounds": "이곳에서 {{rounds}}라운드 기록.",
+        "factRatedOnly": "평가 {{count}}건에 {{rating}}."
       }
     },
     "shelf": {

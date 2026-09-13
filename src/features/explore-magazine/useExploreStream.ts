@@ -1,9 +1,12 @@
+import { useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { supabase } from '@/integrations/supabase/client';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
+import { courseHeadline } from './courseHeadline';
 import { exploreKeys } from './exploreKeys';
 import type { ExploreView } from './exploreViewMemory';
 import { STREAM_PAGE_SIZE } from './useExploreStreamClient';
@@ -20,14 +23,23 @@ import type {
 } from './streamItem';
 
 /**
- * THE SERVER RANKER (BRIEF_EXPLORE_MAGAZINE PHASE D1).
+ * THE SERVER RANKER (BRIEF_EXPLORE_MAGAZINE PHASES D1-D3).
  *
  * One RPC ranks the whole eligible universe and hands back one page plus an
  * opaque keyset cursor, so the page no longer ends where a fetched pool ends.
- * The draft SQL is docs/sql/explore_stream_d1.sql and is Ben's to run; the
- * local PG16 harness (scripts/explore-d1-harness.sh) proves rank fidelity, no
- * duplicate/skip across five pages, cadence across page seams, and a full cold
- * member page.
+ * D3 serves All, Scores, Courses and Reviews. WATCH IS NOT ON THE RPC and stays
+ * client-composed: its sources are clips and long-form video, which are not in
+ * the ranker's pool, so Watch keeps its current finite depth - a stated limit,
+ * reported rather than hidden.
+ *
+ * The draft SQL is docs/sql/explore_stream_d3.sql and is Ben's to run; the local
+ * PG16 harness (scripts/explore-d3-harness.sh) proves per-view candidates, the
+ * scope predicate, keyset integrity, the single-type cadence, standing fidelity
+ * and that All's first page is IDENTICAL under the deployed D2 body and D3.
+ *
+ * COURSE COPY IS COMPOSED HERE, not in SQL: the RPC returns the figures and the
+ * shared courseHeadline() turns them into the member's own language, from the
+ * same locale keys the client composition uses.
  *
  * UNTIL BEN RUNS THE DRAFT this read errors, `unavailable` is true, and
  * ExploreMagazine keeps the accepted client composition. That is a deliberate
@@ -179,6 +191,7 @@ export function useExploreStream(
   scope: string,
   geography?: { clubId?: string | null; county?: string | null; country?: string | null },
 ): ExploreServerStream {
+  const { t } = useTranslation('courses');
   const query = useInfiniteQuery<ExploreStreamPage>({
     queryKey: exploreKeys.stream(viewerId, view, scope),
     enabled: !!viewerId,
@@ -216,7 +229,26 @@ export function useExploreStream(
     },
   });
 
-  const items = (query.data?.pages ?? []).flatMap((p) => p.items);
+  /* THE COURSE SENTENCE, IN THE MEMBER'S LANGUAGE. Only added where the row is a
+     course card and the server did not carry a headline of its own. */
+  const items = useMemo(
+    () =>
+      (query.data?.pages ?? []).flatMap((p) => p.items).map((item) => {
+        if (item.kind !== 'course' || item.facts.headline) return item;
+        const headline = courseHeadline(t, {
+          event: item.facts.course_event ?? 'stable',
+          burstCount: item.facts.ratings_burst_n ?? null,
+          burstMean: item.facts.ratings_burst_mean ?? null,
+          lowGross: item.facts.low_gross ?? null,
+          lowBy: item.facts.low_by ?? null,
+          rounds: item.facts.rounds_tracked ?? null,
+          rating: item.facts.rating ?? null,
+          ratingCount: item.facts.rating_n ?? null,
+        });
+        return headline ? { ...item, facts: { ...item.facts, headline } } : item;
+      }),
+    [query.data, t],
+  );
   return {
     items,
     total: items.length,
