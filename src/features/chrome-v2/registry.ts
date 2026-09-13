@@ -321,7 +321,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // The Amateur destination (bottom-nav tab). Wears the shared floating glass
   // islands over its 340px hero, exactly as the feed and course detail do:
   // logo left, standard right capsule, dark tone, hero bleeds beneath.
-  { match: { exact: '/amateur' },                  spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, note: 'amateur — shared islands over hero' } },
+  { match: { exact: '/amateur' },                  spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, scrollAway: true, note: 'amateur — islands clear the pinned view row on scroll' } },
 
   // /media — the one media destination. Shared islands, exactly as the course
   // detail page: back on the left (fallback /amateur, the surface its See all
