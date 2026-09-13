@@ -2262,7 +2262,7 @@
         "played": "[Plåyéd. one]",
         "recordLost": "[{{player}} took your course record with a {{gross}}. one two]",
         "recordLostGap": "[Töök yöür cöürsé récörd wîth å {{gross}}. Yöür bést îs {{delta}} béhînd. one two three]",
-        "rankDown": "[{{player}} went round in {{gross}}, which puts you {{ord}} of the {{of}} who have played here. one two]",
+        "rankDown": "[{{player}} went round in {{gross}}. You are now {{ord}} of {{of}} here. one two]",
         "rankDownBy": "[Wént röünd în {{gross}} ånd püshéd yöü döwn {{delta}} tö {{n}} öf {{of}}. one two three]",
         "rankUp": "[Your {{gross}} is the {{ord}} best round played here. one two]",
         "rankUpBy": "[Your {{gross}} is the {{ord}} best round played here, up {{n}} places. one two]",
@@ -2279,7 +2279,10 @@
         "aceHole": "[A hole in one on the {{ordHole}}. one two]",
         "albatrossHole": "[An albatross on the {{ordHole}}, in a round of {{gross}}. one two]",
         "albatrossRound": "[An albatross, in a round of {{gross}}. one two]",
-        "listFirst": "[{{player}} went round in {{gross}} — the lowest anyone has played here. one two]"
+        "listFirst": "[{{player}} went round in {{gross}} — the lowest anyone has played here. one two]",
+        "rankDownMoved": "[{{player}} went round in {{gross}}. You are now {{ord}} of {{of}} here, down {{n}}. one two]",
+        "rankUpOthers": "[You are now {{ord}} of {{of}} here, up {{n}}. one two]",
+        "rankUpOthersPlain": "[You are now {{ord}} of {{of}} here. one two]"
       },
       "standing": {
         "board": "[Lowest gross]",

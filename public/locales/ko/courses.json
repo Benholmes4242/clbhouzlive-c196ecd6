@@ -1617,7 +1617,7 @@
         "played": "플레이했습니다.",
         "recordLost": "{{player}}이(가) {{gross}}타로 당신의 코스 레코드를 가져갔습니다.",
         "recordLostGap": "{{gross}}타로 당신의 코스 레코드를 가져갔습니다. 당신의 최고 기록은 {{delta}}타 뒤입니다.",
-        "rankDown": "{{player}}이(가) {{gross}}타로 돌아, 이곳에서 플레이한 {{of}}명 중 당신은 {{ord}}위입니다.",
+        "rankDown": "{{player}}이(가) {{gross}}타로 돌았습니다. 당신은 이곳에서 {{of}}명 중 {{ord}}위입니다.",
         "rankDownBy": "{{gross}}타로 돌아 당신은 {{delta}}계단 내려가 {{of}}명 중 {{n}}위입니다.",
         "rankUp": "당신의 {{gross}}타는 이곳에서 기록된 {{ord}}번째로 좋은 라운드입니다.",
         "rankUpBy": "당신의 {{gross}}타는 이곳에서 {{ord}}번째로 좋은 라운드이며 {{n}}계단 올랐습니다.",
@@ -1634,7 +1634,10 @@
         "aceHole": "{{ordHole}}번 홀에서 홀인원.",
         "albatrossHole": "{{gross}}타 라운드, {{ordHole}}번 홀에서 알바트로스.",
         "albatrossRound": "{{gross}}타 라운드에서 알바트로스.",
-        "listFirst": "{{player}}이(가) {{gross}}타로 돌았습니다. 이곳에서 가장 낮은 기록입니다."
+        "listFirst": "{{player}}이(가) {{gross}}타로 돌았습니다. 이곳에서 가장 낮은 기록입니다.",
+        "rankDownMoved": "{{player}}이(가) {{gross}}타로 돌았습니다. 당신은 이곳에서 {{of}}명 중 {{ord}}위로 {{n}}계단 내려갔습니다.",
+        "rankUpOthers": "당신은 이곳에서 {{of}}명 중 {{ord}}위로 {{n}}계단 올라갔습니다.",
+        "rankUpOthersPlain": "당신은 이곳에서 {{of}}명 중 {{ord}}위입니다."
       },
       "standing": {
         "board": "베스트 그로스",

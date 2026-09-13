@@ -1678,7 +1678,7 @@
         "played": "Gespielt.",
         "recordLost": "{{player}} holte deinen Platzrekord mit {{gross}}.",
         "recordLostGap": "Deinen Platzrekord mit {{gross}} uebernommen. Deine Bestleistung liegt {{delta}} dahinter.",
-        "rankDown": "{{player}} spielte eine Runde in {{gross}}, damit stehst du auf {{ord}} von {{of}}, die hier gespielt haben.",
+        "rankDown": "{{player}} spielte eine Runde in {{gross}}. Du stehst hier jetzt auf {{ord}} von {{of}}.",
         "rankDownBy": "Runde in {{gross}} und dich {{delta}} Plaetze zurueck auf {{n}} von {{of}} geschoben.",
         "rankUp": "Deine {{gross}} ist die {{ord}}-beste hier gespielte Runde.",
         "rankUpBy": "Deine {{gross}} ist die {{ord}}-beste hier gespielte Runde, {{n}} Plaetze nach vorn.",
@@ -1695,7 +1695,10 @@
         "aceHole": "Ein Hole-in-One am {{ordHole}}. Loch.",
         "albatrossHole": "Ein Albatros am {{ordHole}}. Loch, in einer Runde von {{gross}}.",
         "albatrossRound": "Ein Albatros, in einer Runde von {{gross}}.",
-        "listFirst": "{{player}} spielte eine Runde in {{gross}} - die niedrigste, die hier jemand gespielt hat."
+        "listFirst": "{{player}} spielte eine Runde in {{gross}} - die niedrigste, die hier jemand gespielt hat.",
+        "rankDownMoved": "{{player}} spielte eine Runde in {{gross}}. Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plaetze tiefer.",
+        "rankUpOthers": "Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plaetze hoeher.",
+        "rankUpOthersPlain": "Du stehst hier jetzt auf {{ord}} von {{of}}."
       },
       "standing": {
         "board": "Niedrigster Brutto",

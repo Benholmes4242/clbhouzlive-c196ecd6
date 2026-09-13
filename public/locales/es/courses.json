@@ -1678,7 +1678,7 @@
         "played": "Jugo.",
         "recordLost": "{{player}} te quito el record del campo con {{gross}}.",
         "recordLostGap": "Te quito el record del campo con {{gross}}. Tu mejor vuelta queda a {{delta}}.",
-        "rankDown": "{{player}} completo la vuelta en {{gross}}, lo que te deja {{ord}} de los {{of}} que han jugado aqui.",
+        "rankDown": "{{player}} completo la vuelta en {{gross}}. Ahora estas {{ord}} de {{of}} aqui.",
         "rankDownBy": "Completo la vuelta en {{gross}} y te bajo {{delta}} puestos hasta {{n}} de {{of}}.",
         "rankUp": "Tu {{gross}} es la {{ord}} mejor vuelta jugada aqui.",
         "rankUpBy": "Tu {{gross}} es la {{ord}} mejor vuelta jugada aqui, {{n}} puestos mas arriba.",
@@ -1695,7 +1695,10 @@
         "aceHole": "Un hoyo en uno en el hoyo {{ordHole}}.",
         "albatrossHole": "Un albatros en el hoyo {{ordHole}}, en una vuelta de {{gross}}.",
         "albatrossRound": "Un albatros, en una vuelta de {{gross}}.",
-        "listFirst": "{{player}} completo la vuelta en {{gross}}: la mas baja que se ha jugado aqui."
+        "listFirst": "{{player}} completo la vuelta en {{gross}}: la mas baja que se ha jugado aqui.",
+        "rankDownMoved": "{{player}} completo la vuelta en {{gross}}. Ahora estas {{ord}} de {{of}} aqui, {{n}} puestos abajo.",
+        "rankUpOthers": "Ahora estas {{ord}} de {{of}} aqui, {{n}} puestos arriba.",
+        "rankUpOthersPlain": "Ahora estas {{ord}} de {{of}} aqui."
       },
       "standing": {
         "board": "Golpes brutos mas bajos",
