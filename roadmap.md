@@ -1331,3 +1331,13 @@ unused useLocation went with it. `/post/:postId` must NOT be added to the
 overlay list: it is a full deep-link page (logged-out preview, web gate exempt)
 with no overlay presentation, no dismiss affordance and no expectation of a
 page behind it — recorded at the site in VideoPlaybackContext.openFull.
+
+## DEAD-LISTED — SCORECARD ROW LABELS (not deleted)
+- The row label cell in `CardRow` (`CardScorecardSheet.tsx`) and the `scoreLabel`
+  prop chain that fed it. Both surfaces now draw nine holes plus the OUT/IN total.
+- Locale keys with zero readers after the change, kept in all six locales:
+  `courses:scorecard.hole`, `scorecard.par`, `scorecard.you`,
+  `scorecard.scoreRow`, `scorecard.fieldShort`. Nothing else reads any of them
+  (`holes.fieldAvg` is a separate key and still live in the holes sheet).
+- OPEN CONTRADICTION: the tour-only FIELD row of signed decimals is now unlabelled
+  and is the one row on the card that was not inferable from its contents.
