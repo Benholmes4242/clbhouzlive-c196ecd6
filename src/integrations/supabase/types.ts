@@ -5096,6 +5096,27 @@ export type Database = {
           },
         ]
       }
+      explore_config: {
+        Row: {
+          created_at: string
+          key: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: []
+      }
       explore_course_themes: {
         Row: {
           course_id: string
@@ -20094,6 +20115,32 @@ export type Database = {
           rating_avg: number
           review_count: number
           why_ai: string
+        }[]
+      }
+      get_explore_stream: {
+        Args: {
+          p_club_id?: string
+          p_country?: string
+          p_county?: string
+          p_cursor?: Json
+          p_limit?: number
+          p_scope?: string
+          p_view?: string
+          p_viewer: string
+        }
+        Returns: {
+          consequence: Json
+          facts: Json
+          id: string
+          kind: string
+          lane: string
+          next_cursor: Json
+          relaxed: boolean
+          ring: string
+          score: number
+          seen: boolean
+          subject: Json
+          who: Json
         }[]
       }
       get_fast_climbers: {

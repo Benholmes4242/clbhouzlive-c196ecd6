@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Phase D2 backlog-lane harness. Local throwaway cluster; touches nothing live.
+set -euo pipefail
+DIR=${EXD2_DIR:-/tmp/exd2pg}   # throwaway cluster dir; must NOT hold the repo
+export PGDATA=$DIR/pg PGHOST=$DIR/sock PGPORT=55433 PGUSER=postgres PGDATABASE=postgres
+unset PGPASSWORD PGSSLMODE || true
+rm -rf "$DIR"; mkdir -p "$PGDATA" "$PGHOST"
+initdb -U postgres -A trust >/dev/null
+pg_ctl -D "$PGDATA" -o "-k $PGHOST -p $PGPORT -c listen_addresses=''" -w start >/dev/null
+trap 'pg_ctl -D "$PGDATA" -m immediate stop >/dev/null 2>&1 || true' EXIT
+
+psql -v ON_ERROR_STOP=1 -q -c "create role anon; create role authenticated; create role service_role;"
+psql -v ON_ERROR_STOP=1 -q -c "create table viewer_standing_fixture(viewer uuid, course_id uuid, rank_now int, field_now int, rank_then int, delta int);"
+psql -v ON_ERROR_STOP=1 -q -f tests/sql/explore_stream_d1_fixture.sql
+psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d1.sql   # config table + D1 body
+psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d2.sql   # D2 replaces the body
+psql -v ON_ERROR_STOP=1 -f tests/sql/explore_stream_d2_assert.sql
