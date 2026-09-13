@@ -128,23 +128,37 @@
         "course": "Course"
       },
       "headline": {
-        "recordTaken": "Took the course record with a {{gross}}.",
-        "ace": "Holed out from the tee.",
-        "albatross": "Made an albatross.",
+        "recordTaken": "{{player}} took the course record with a {{gross}}.",
+        "ace": "A hole in one.",
+        "albatross": "An albatross.",
         "listNewLow": "{{gross}}, a new low on your list.",
         "bogeyFree": "Went bogey free for {{gross}}.",
-        "birdieHaul": "Made {{count}} birdies.",
-        "roundToPar": "Went round in {{gross}}, {{topar}}.",
-        "round": "Went round in {{gross}}.",
+        "birdieHaul": "{{count}} birdies in a round of {{gross}}.",
+        "roundToPar": "{{player}} went round in {{gross}}, {{topar}}.",
+        "round": "{{player}} went round in {{gross}}.",
         "played": "Played.",
-        "recordLost": "Took your course record with a {{gross}}.",
+        "recordLost": "{{player}} took your course record with a {{gross}}.",
         "recordLostGap": "Took your course record with a {{gross}}. Your best is {{delta}} behind.",
-        "rankDown": "Went round in {{gross}}. You are {{n}} of {{of}} there.",
+        "rankDown": "{{player}} went round in {{gross}}, which puts you {{ord}} of the {{of}} who have played here.",
         "rankDownBy": "Went round in {{gross}} and pushed you down {{delta}} to {{n}} of {{of}}.",
-        "rankUp": "Your {{gross}} takes you to {{n}} of {{of}}.",
-        "rankUpBy": "Your {{gross}} moves you up {{delta}} to {{n}} of {{of}}.",
-        "rankHold": "Your {{gross}} holds {{n}} of {{of}} here.",
-        "playedNoChange": "Your {{gross}} still holds {{n}} of {{of}} here."
+        "rankUp": "Your {{gross}} is the {{ord}} best round played here.",
+        "rankUpBy": "Your {{gross}} is the {{ord}} best round played here, up {{n}} places.",
+        "rankHold": "Your {{gross}} is still the {{ord}} best round anyone has played here.",
+        "playedNoChange": "{{player}} went round in {{gross}}. Your {{ord}} of {{of}} here is unchanged.",
+        "_rules_a": "NEVER REPEAT THE KICKER, THE WHO-LINE OR THE CHIP: the kicker names the course and the ring, the who-line names the player and the date, the chip carries the gross and the to-par.",
+        "_rules_b": "A FIGURE MEANS NOTHING WITHOUT WHAT IT IS MEASURED AGAINST: not 75 but 75, three under; not 8 of 18 but the 8th best round anyone has played here.",
+        "recordTakenBest": "{{player}} took the course record with a {{gross}}, {{topar}}. Your best here is {{best}}.",
+        "recordTakenToPar": "{{player}} took the course record with a {{gross}}, {{topar}}.",
+        "recordOwnToPar": "You took the course record with a {{gross}}, {{topar}}.",
+        "recordOwn": "You took the course record with a {{gross}}.",
+        "recordLostSince": "{{player}} took your course record with a {{gross}}. Your {{best}} had stood since {{month}}.",
+        "recordLostBest": "{{player}} took your course record with a {{gross}}. Your best here is {{best}}.",
+        "eagleHole": "An eagle on the {{ordHole}}, in a round of {{gross}}.",
+        "eagle": "An eagle, in a round of {{gross}}.",
+        "aceHole": "A hole in one on the {{ordHole}}.",
+        "albatrossHole": "An albatross on the {{ordHole}}, in a round of {{gross}}.",
+        "albatrossRound": "An albatross, in a round of {{gross}}.",
+        "listFirst": "{{player}} went round in {{gross}} — the lowest anyone has played here."
       },
       "standing": {
         "board": "Lowest gross",
@@ -169,7 +183,12 @@
         "eventRating": "Newly rated {{rating}}"
       },
       "failed": "This did not load.",
-      "retry": "Try again"
+      "retry": "Try again",
+      "topar": {
+        "level": "level par",
+        "under": "{{n}} under",
+        "over": "{{n}} over"
+      }
     },
     "shelf": {
       "golfersAtClub": "Golfers at {{club}}",

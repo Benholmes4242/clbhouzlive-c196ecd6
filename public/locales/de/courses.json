@@ -1667,23 +1667,35 @@
         "aroundCountry": "Rund um {{country}}"
       },
       "headline": {
-        "recordTaken": "Platzrekord mit {{gross}} uebernommen.",
-        "ace": "Hole-in-One geschlagen.",
-        "albatross": "Einen Albatros gespielt.",
+        "recordTaken": "{{player}} holte den Platzrekord mit {{gross}}.",
+        "ace": "Ein Hole-in-One.",
+        "albatross": "Ein Albatros.",
         "listNewLow": "{{gross}}, eine neue Bestleistung auf deiner Liste.",
         "bogeyFree": "Bogeyfrei mit {{gross}}.",
-        "birdieHaul": "{{count}} Birdies gespielt.",
-        "roundToPar": "Runde in {{gross}}, {{topar}}.",
-        "round": "Runde in {{gross}}.",
+        "birdieHaul": "{{count}} Birdies in einer Runde von {{gross}}.",
+        "roundToPar": "{{player}} spielte eine Runde in {{gross}}, {{topar}}.",
+        "round": "{{player}} spielte eine Runde in {{gross}}.",
         "played": "Gespielt.",
-        "recordLost": "Deinen Platzrekord mit {{gross}} uebernommen.",
+        "recordLost": "{{player}} holte deinen Platzrekord mit {{gross}}.",
         "recordLostGap": "Deinen Platzrekord mit {{gross}} uebernommen. Deine Bestleistung liegt {{delta}} dahinter.",
-        "rankDown": "Runde in {{gross}}. Du bist dort {{n}} von {{of}}.",
+        "rankDown": "{{player}} spielte eine Runde in {{gross}}, damit stehst du auf {{ord}} von {{of}}, die hier gespielt haben.",
         "rankDownBy": "Runde in {{gross}} und dich {{delta}} Plaetze zurueck auf {{n}} von {{of}} geschoben.",
-        "rankUp": "Deine {{gross}} bringt dich auf {{n}} von {{of}}.",
-        "rankUpBy": "Deine {{gross}} bringt dich {{delta}} Plaetze nach vorn auf {{n}} von {{of}}.",
-        "rankHold": "Deine {{gross}} haelt dort {{n}} von {{of}}.",
-        "playedNoChange": "Deine {{gross}} haelt dort weiter {{n}} von {{of}}."
+        "rankUp": "Deine {{gross}} ist die {{ord}}-beste hier gespielte Runde.",
+        "rankUpBy": "Deine {{gross}} ist die {{ord}}-beste hier gespielte Runde, {{n}} Plaetze nach vorn.",
+        "rankHold": "Deine {{gross}} ist weiterhin die {{ord}}-beste Runde, die hier jemand gespielt hat.",
+        "playedNoChange": "{{player}} spielte eine Runde in {{gross}}. Dein {{ord}} von {{of}} hier bleibt unveraendert.",
+        "recordTakenBest": "{{player}} holte den Platzrekord mit {{gross}}, {{topar}}. Deine Bestleistung hier ist {{best}}.",
+        "recordTakenToPar": "{{player}} holte den Platzrekord mit {{gross}}, {{topar}}.",
+        "recordOwnToPar": "Du hast den Platzrekord mit {{gross}} geholt, {{topar}}.",
+        "recordOwn": "Du hast den Platzrekord mit {{gross}} geholt.",
+        "recordLostSince": "{{player}} holte deinen Platzrekord mit {{gross}}. Deine {{best}} stand seit {{month}}.",
+        "recordLostBest": "{{player}} holte deinen Platzrekord mit {{gross}}. Deine Bestleistung hier ist {{best}}.",
+        "eagleHole": "Ein Eagle am {{ordHole}}. Loch, in einer Runde von {{gross}}.",
+        "eagle": "Ein Eagle, in einer Runde von {{gross}}.",
+        "aceHole": "Ein Hole-in-One am {{ordHole}}. Loch.",
+        "albatrossHole": "Ein Albatros am {{ordHole}}. Loch, in einer Runde von {{gross}}.",
+        "albatrossRound": "Ein Albatros, in einer Runde von {{gross}}.",
+        "listFirst": "{{player}} spielte eine Runde in {{gross}} - die niedrigste, die hier jemand gespielt hat."
       },
       "standing": {
         "board": "Niedrigster Brutto",
@@ -1709,7 +1721,12 @@
         "eventRating": "Neu bewertet mit {{rating}}"
       },
       "failed": "Das wurde nicht geladen.",
-      "retry": "Erneut versuchen"
+      "retry": "Erneut versuchen",
+      "topar": {
+        "level": "Par",
+        "under": "{{n}} unter Par",
+        "over": "{{n}} ueber Par"
+      }
     },
     "shelf": {
       "aroundCounty": "Rund um {{county}}",

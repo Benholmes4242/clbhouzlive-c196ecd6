@@ -2251,23 +2251,35 @@
         "aroundCountry": "[Ãrõũñd {{country}}]"
       },
       "headline": {
-        "recordTaken": "[Töök thé çöürsé réçörd wîth å {{gross}}. one two]",
-        "ace": "[Höléd öüt fröm thé téé. one]",
-        "albatross": "[Mådé ån ålbåtröss. one]",
+        "recordTaken": "[{{player}} took the course record with a {{gross}}. one two]",
+        "ace": "[A hole in one. one two]",
+        "albatross": "[An albatross. one two]",
         "listNewLow": "[{{gross}}, å néw löw ön yöür lîst. one two]",
         "bogeyFree": "[Wént bögéy fréé för {{gross}}. one two]",
-        "birdieHaul": "[Mådé {{count}} bîrdîés. one]",
-        "roundToPar": "[Wént röünd în {{gross}}, {{topar}}. one two]",
-        "round": "[Wént röünd în {{gross}}. one]",
+        "birdieHaul": "[{{count}} birdies in a round of {{gross}}. one two]",
+        "roundToPar": "[{{player}} went round in {{gross}}, {{topar}}. one two]",
+        "round": "[{{player}} went round in {{gross}}. one two]",
         "played": "[Plåyéd. one]",
-        "recordLost": "[Töök yöür cöürsé récörd wîth å {{gross}}. one two]",
+        "recordLost": "[{{player}} took your course record with a {{gross}}. one two]",
         "recordLostGap": "[Töök yöür cöürsé récörd wîth å {{gross}}. Yöür bést îs {{delta}} béhînd. one two three]",
-        "rankDown": "[Wént röünd în {{gross}}. Yöü åré {{n}} öf {{of}} théré. one two]",
+        "rankDown": "[{{player}} went round in {{gross}}, which puts you {{ord}} of the {{of}} who have played here. one two]",
         "rankDownBy": "[Wént röünd în {{gross}} ånd püshéd yöü döwn {{delta}} tö {{n}} öf {{of}}. one two three]",
-        "rankUp": "[Yöür {{gross}} tåkés yöü tö {{n}} öf {{of}}. one two]",
-        "rankUpBy": "[Yöür {{gross}} mövés yöü üp {{delta}} tö {{n}} öf {{of}}. one two]",
-        "rankHold": "[Yöür {{gross}} hölds {{n}} öf {{of}} héré. one two]",
-        "playedNoChange": "[Yöür {{gross}} stîll hölds {{n}} öf {{of}} héré. one two]"
+        "rankUp": "[Your {{gross}} is the {{ord}} best round played here. one two]",
+        "rankUpBy": "[Your {{gross}} is the {{ord}} best round played here, up {{n}} places. one two]",
+        "rankHold": "[Your {{gross}} is still the {{ord}} best round anyone has played here. one two]",
+        "playedNoChange": "[{{player}} went round in {{gross}}. Your {{ord}} of {{of}} here is unchanged. one two]",
+        "recordTakenBest": "[{{player}} took the course record with a {{gross}}, {{topar}}. Your best here is {{best}}. one two]",
+        "recordTakenToPar": "[{{player}} took the course record with a {{gross}}, {{topar}}. one two]",
+        "recordOwnToPar": "[You took the course record with a {{gross}}, {{topar}}. one two]",
+        "recordOwn": "[You took the course record with a {{gross}}. one two]",
+        "recordLostSince": "[{{player}} took your course record with a {{gross}}. Your {{best}} had stood since {{month}}. one two]",
+        "recordLostBest": "[{{player}} took your course record with a {{gross}}. Your best here is {{best}}. one two]",
+        "eagleHole": "[An eagle on the {{ordHole}}, in a round of {{gross}}. one two]",
+        "eagle": "[An eagle, in a round of {{gross}}. one two]",
+        "aceHole": "[A hole in one on the {{ordHole}}. one two]",
+        "albatrossHole": "[An albatross on the {{ordHole}}, in a round of {{gross}}. one two]",
+        "albatrossRound": "[An albatross, in a round of {{gross}}. one two]",
+        "listFirst": "[{{player}} went round in {{gross}} — the lowest anyone has played here. one two]"
       },
       "standing": {
         "board": "[Lowest gross]",
@@ -2293,7 +2305,12 @@
         "eventRating": "[Néwly råtéd {{rating}} one]"
       },
       "failed": "[Thís díd nöt löåd. one]",
-      "retry": "[Try ågåín one]"
+      "retry": "[Try ågåín one]",
+      "topar": {
+        "level": "[lévél pår one]",
+        "under": "[{{n}} ündér one]",
+        "over": "[{{n}} övér one]"
+      }
     },
     "shelf": {
       "aroundCounty": "[Ãrõũñd {{county}}]",
