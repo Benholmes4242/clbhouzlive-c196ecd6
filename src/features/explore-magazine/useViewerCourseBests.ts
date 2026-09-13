@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -61,7 +62,7 @@ export function useViewerCourseBests(viewerId: string | undefined): ViewerCourse
       }>)) {
         if (!row.course_id || row.gross_score == null) continue;
         const current = out.get(row.course_id);
-        if (current == null || row.gross_score < current) {
+        if (current == null || row.gross_score < current.gross) {
           out.set(row.course_id, { gross: row.gross_score, playDate: row.play_date ?? null });
         }
       }
@@ -70,9 +71,12 @@ export function useViewerCourseBests(viewerId: string | undefined): ViewerCourse
   });
 
   const bestsAt = query.data ?? EMPTY_AT;
-  const bests = query.data
-    ? new Map(Array.from(bestsAt.entries()).map(([id, v]) => [id, v.gross] as const))
-    : EMPTY;
+  /* STABLE IDENTITY. `bests` is derived, so it is memoised on the query data —
+     a fresh Map every render would invalidate every consumer's memo. */
+  const bests = useMemo(
+    () => (query.data ? new Map(Array.from(query.data.entries()).map(([id, v]) => [id, v.gross] as const)) : EMPTY),
+    [query.data],
+  );
 
   return {
     bests,
