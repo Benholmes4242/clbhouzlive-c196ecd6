@@ -49,6 +49,13 @@ export function kickerParts(item: StreamItem, t: T): string[] {
   if (item.ring === 'county' && item.subject?.region) {
     return withCourse(t('amateur.stream.kicker.aroundRegion', 'Around {{region}}', { region: item.subject.region }));
   }
+  /* PHASE C §3d — the country ring wears its NATION, which is the sub_country
+     the shared resolver matched on, never the macro area. */
+  if (item.ring === 'country' && item.subject?.sub_country) {
+    return withCourse(
+      t('amateur.stream.kicker.aroundCountry', 'Around {{country}}', { country: item.subject.sub_country }),
+    );
+  }
   if (item.ring === 'world') return withCourse(t('amateur.stream.kicker.aroundWorld', 'Around the world'));
   if (item.lane === 'backlog' && item.facts.play_date) {
     const month = new Date(item.facts.play_date).toLocaleDateString(undefined, { month: 'long' });

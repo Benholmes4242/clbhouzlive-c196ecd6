@@ -1648,7 +1648,8 @@
         "clip": "Clip",
         "watch": "Langes Video",
         "moment": "Aus der Community",
-        "course": "Platz"
+        "course": "Platz",
+        "aroundCountry": "Rund um {{country}}"
       },
       "headline": {
         "recordTaken": "{{name}} holt den Platzrekord auf {{course}} mit {{gross}}.",
@@ -1673,7 +1674,13 @@
         "board": "Niedrigster Brutto",
         "of": "von {{count}}",
         "lastChange": "letzte Aenderung {{when}}"
-      }
+      },
+      "ratingCount": "{{count}} Bewertungen"
+    },
+    "shelf": {
+      "aroundCounty": "Rund um {{county}}",
+      "aroundWorld": "Rund um die Welt",
+      "onYourList": "Auf deiner Liste"
     }
   }
 }

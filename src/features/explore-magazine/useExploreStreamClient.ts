@@ -110,14 +110,17 @@ function scoreItem(item: StreamItem): number {
 function cadence(items: StreamItem[], byConsequence = false): StreamItem[] {
   const out: StreamItem[] = [];
   const pool = [...items];
+  /* PHASE C: THE CADENCE KEY CARRIES THE RING. Two "Around Kent" cards in a row
+     read as one repeated card even when their kinds differ, so the ring is part
+     of the key rather than a second pass. */
+  const keyOf = (item: StreamItem) =>
+    `${byConsequence ? item.consequence?.kind ?? 'none' : item.kind}:${item.ring ?? 'none'}`;
   while (pool.length > 0) {
     const previous = out[out.length - 1];
     let index = 0;
     if (previous) {
-      const previousKey = byConsequence ? previous.consequence?.kind ?? 'none' : previous.kind;
-      const different = pool.findIndex((candidate) =>
-        (byConsequence ? candidate.consequence?.kind ?? 'none' : candidate.kind) !== previousKey,
-      );
+      const previousKey = keyOf(previous);
+      const different = pool.findIndex((candidate) => keyOf(candidate) !== previousKey);
       if (different >= 0) index = different;
     }
     /* A STORY NEVER LEADS unless it is the only candidate. */
@@ -127,6 +130,40 @@ function cadence(items: StreamItem[], byConsequence = false): StreamItem[] {
     }
     out.push(pool.splice(index, 1)[0]);
   }
+  return out;
+}
+
+/** The rings that are NOT the viewer's own or their club's (§3d). */
+const OUTER: ReadonlySet<string> = new Set(['county', 'country', 'world']);
+export const isOuterRing = (item: StreamItem) => !!item.ring && OUTER.has(item.ring);
+
+/**
+ * §3d THE OUTER-RING CAP IS POSITIONAL AND APPLIED AFTER SCORING — at most ONE
+ * outer-ring card in every FOUR cards. Nothing is dropped: an outer-ring card
+ * that cannot take its position is DEFERRED behind the next inner-ring card, so
+ * a page whose whole pool is outer-ring still renders (the cap then admits one
+ * per four and the rest follow in order).
+ */
+function capOuterRing(items: StreamItem[]): StreamItem[] {
+  const out: StreamItem[] = [];
+  const deferred: StreamItem[] = [];
+  let sinceOuter = Infinity;
+  const take = (item: StreamItem) => {
+    out.push(item);
+    sinceOuter = isOuterRing(item) ? 0 : sinceOuter + 1;
+  };
+  for (const item of items) {
+    if (deferred.length > 0 && !isOuterRing(item) && sinceOuter >= 3) {
+      take(deferred.shift() as StreamItem);
+    }
+    if (isOuterRing(item) && sinceOuter < 3) {
+      deferred.push(item);
+      continue;
+    }
+    take(item);
+  }
+  /* The remainder keeps its order rather than being discarded. */
+  for (const item of deferred) out.push(item);
   return out;
 }
 
@@ -220,16 +257,30 @@ export function useExploreStreamClient(
 
     if (wantsRounds) {
       for (const row of roundRows) {
+        const course = row.course_id ? roundCourseMeta.data?.get(row.course_id) : null;
+        const geography = scores?.geography;
         if (view === 'scores') {
-          const course = row.course_id ? roundCourseMeta.data?.get(row.course_id) : null;
           const active = scores?.active ?? 'world';
-          const geography = scores?.geography;
           const inScope = active === 'world'
             || (active === 'club' && !!geography?.primaryClubId && course?.clubId === geography.primaryClubId)
             || (active === 'county' && !!geography?.county && course?.rawRegion === geography.county)
             || (active === 'country' && !!geography?.country && course?.subCountry === geography.country);
           if (!inScope) continue;
         }
+        /* PHASE C §3d THE RING, from the SHARED resolver's geography — never
+           re-derived here. Nearest ring wins; a course whose geography has not
+           resolved carries NO ring rather than a guessed world one. */
+        const ring: StreamItem['ring'] = row.is_self
+          ? 'own'
+          : geography?.primaryClubId && course?.clubId === geography.primaryClubId
+            ? 'club'
+            : geography?.county && course?.rawRegion === geography.county
+              ? 'county'
+              : geography?.country && course?.subCountry === geography.country
+                ? 'country'
+                : course
+                  ? 'world'
+                  : null;
         const toPar = row.gross != null && row.course_par != null ? row.gross - row.course_par : null;
         const consequence = consequenceFor(
           {
@@ -245,15 +296,19 @@ export function useExploreStreamClient(
           },
           { standing: standingMap, records, bests: bests.bests, shortlist: context.shortlist },
         );
-        /* §3d NO CONSEQUENCE, NO CARD. An everyone-pool round outside the
-           viewer's circle and played geography is not promoted into generic
-           content merely because the client happened to fetch it. */
-        if (!consequence) continue;
+        /* §3d NO CONSEQUENCE, NO CARD — UNLESS IT IS AN OUTER RING. A county /
+           country / world round at a course the viewer has never played carries
+           NO invented consequence: it is admitted as a plain "someone played
+           here" card, wearing its ring kicker only, and the 1-in-4 positional
+           cap bounds how many of them the page can show. An outer-ring card
+           with no resolvable target (no course, no scorecard) still does not
+           render. */
+        const outerPlain = !consequence && ring !== null && ring !== 'own' && ring !== 'club';
+        if (!consequence && !(outerPlain && !!row.course_id && !!row.score_id)) continue;
         const item: StreamItem = {
           id: `round:${row.round_id}`,
           kind: 'round',
-          /* GEOGRAPHY IS PHASE C: 'own' or nothing. */
-          ring: row.is_self ? 'own' : null,
+          ring,
           lane: 'news',
           score: 0,
           consequence,
@@ -450,7 +505,10 @@ export function useExploreStreamClient(
 
     for (const item of out) item.score = scoreItem(item);
     out.sort((a, b) => (b.score - a.score) || a.id.localeCompare(b.id));
-    return cadence(out, view === 'scores');
+    /* THE ORDER IS: score, then cadence (kind/consequence AND ring), then the
+       positional outer-ring cap. The cap runs LAST because it is a positional
+       guarantee, and a score damp could not make one. */
+    return capOuterRing(cadence(out, view === 'scores'));
   }, [roundRows, circleScoreIds, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch, roundCourseMeta.data, scores?.active, scores?.geography]);
 
   /* READINESS IS isFetched, NEVER isLoading: a disabled query reports isLoading

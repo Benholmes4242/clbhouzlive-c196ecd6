@@ -2232,7 +2232,8 @@
         "clip": "[Çlîp one]",
         "watch": "[Löngér wåtçh one]",
         "moment": "[Fröm thé çömmünîty one]",
-        "course": "[Çöürsé one]"
+        "course": "[Çöürsé one]",
+        "aroundCountry": "[Ãrõũñd {{country}}]"
       },
       "headline": {
         "recordTaken": "[{{name}} töök thé çöürsé réçörd åt {{course}} wîth å {{gross}}. one two three]",
@@ -2257,7 +2258,13 @@
         "board": "[Lowest gross]",
         "of": "[of {{count}}]",
         "lastChange": "[last change {{when}}]"
-      }
+      },
+      "ratingCount": "[{{count}} rãtïñgs]"
+    },
+    "shelf": {
+      "aroundCounty": "[Ãrõũñd {{county}}]",
+      "aroundWorld": "[Ãrõũñd thé wõrld]",
+      "onYourList": "[Õñ ýõũr lïst]"
     }
   }
 }

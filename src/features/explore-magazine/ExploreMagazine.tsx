@@ -25,6 +25,8 @@ import { EXPLORE_VIEWS, readExploreView, writeExploreView, type ExploreView } fr
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
+import { CourseShelf } from './CourseShelf';
+import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCourseShelves';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding } from './useViewerStanding';
 import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
@@ -58,10 +60,19 @@ const MOMENT_TILE = { w: 132, h: 132 };
  *  rather than a new object (and a new render) on every pass. */
 const EMPTY_SHAPES: Map<string, HoleShape> = new Map();
 
-/** §2c PHASE B1 adds `standing` at its shelf slot, after clips. An empty or
- *  unresolved standing shelf renders nothing and leaves no gap — the same path
- *  an empty clips shelf already takes. */
-type ShelfKind = 'clips' | 'standing' | 'moments';
+/** §3e PHASE C — THE FINAL ALL ORDER, skipping empties: clips, rounds (this week
+ *  at the club), standing, courses:county, moments, people, courses:world,
+ *  courses:list. An empty or unresolved shelf renders nothing and leaves no gap,
+ *  which is the same path an empty clips shelf already takes. */
+type ShelfKind =
+  | 'clips'
+  | 'clubWeek'
+  | 'standing'
+  | 'coursesCounty'
+  | 'moments'
+  | 'people'
+  | 'coursesWorld'
+  | 'coursesList';
 
 type Block =
   | { kind: 'lead'; item: StreamItem }
@@ -225,6 +236,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const stream = useExploreStreamClient(userId, view, { active: scoreScope, geography: geography.scope });
   const scoresStanding = useViewerStanding(userId);
 
+  /* PHASE C §3a-§3c THE COURSE SHELVES. The sources are asked ONLY on All, and
+     each shelf renders nothing when its source is empty. Geography comes from
+     the shared resolver above — no second derivation. */
+  const countyCourses = useCountyCourses(userId, geography.scope, view === 'all' && geography.isFetched);
+  const worldCourses = useWorldTop100Courses(view === 'all');
+  const listCourses = useListCourses(userId, view === 'all');
+
   const visible = useMemo(() => stream.items.slice(0, revealed), [stream.items, revealed]);
 
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
@@ -265,7 +283,20 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [visible, meta.data, meta.isFetched],
   );
 
-  const shelves: ShelfKind[] = view === 'watch' ? ['moments'] : view === 'scores' ? [] : ['clips', 'standing', 'moments'];
+  /* §3e THE ALL ORDER, in one place. Page 3+ restarts from clips, which the
+     modulo in the renderer does; an empty shelf is skipped by the shelf itself
+     and the next one takes its slot. */
+  const ALL_SHELVES: ShelfKind[] = [
+    'clips',
+    'clubWeek',
+    'standing',
+    'coursesCounty',
+    'moments',
+    'people',
+    'coursesWorld',
+    'coursesList',
+  ];
+  const shelves: ShelfKind[] = view === 'watch' ? ['moments'] : view === 'scores' ? [] : ALL_SHELVES;
   const blocks = useMemo(() => buildBlocks(enriched, shelves), [enriched, view]);
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
@@ -531,8 +562,49 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               <div key={`shelf:${block.shelf}:${index}`}>
                 {block.shelf === 'clips' ? (
                   <ClipsShelf pos={pos} onDepart={depart} />
+                ) : block.shelf === 'clubWeek' ? (
+                  /* THE SAME SHELF THE SCORES VIEW USES — reused, not copied. */
+                  <WeeklyClubShelf
+                    viewerId={userId}
+                    clubName={geography.scope.primaryClubName}
+                    enabled={!!geography.scope.primaryClubId}
+                    pos={pos}
+                  />
                 ) : block.shelf === 'standing' ? (
                   <StandingShelf viewerId={userId} pos={pos} />
+                ) : block.shelf === 'coursesCounty' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.aroundCounty', 'Around {{county}}', {
+                      county: geography.scope.county ?? '',
+                    })}
+                    rows={geography.scope.county ? countyCourses.rows : []}
+                    isFetched={geography.isFetched && countyCourses.isFetched}
+                    kind="courses_county"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : block.shelf === 'coursesWorld' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.aroundWorld', 'Around the world')}
+                    rows={worldCourses.rows}
+                    isFetched={worldCourses.isFetched}
+                    kind="courses_world"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : block.shelf === 'coursesList' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.onYourList', 'On your list')}
+                    rows={listCourses.rows}
+                    isFetched={listCourses.isFetched}
+                    kind="courses_list"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : block.shelf === 'people' ? (
+                  /* C2 builds the people shelf; until then this slot is empty
+                     and the next shelf takes it, exactly as an empty rail does. */
+                  null
                 ) : (
                   <MomentsShelf pos={pos} onDepart={depart} />
                 )}

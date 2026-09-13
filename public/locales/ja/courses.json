@@ -1584,7 +1584,8 @@
         "clip": "クリップ",
         "watch": "長編動画",
         "moment": "コミュニティから",
-        "course": "コース"
+        "course": "コース",
+        "aroundCountry": "{{country}}周辺"
       },
       "headline": {
         "recordTaken": "{{name}}が{{course}}で{{gross}}のコースレコードを樹立。",
@@ -1609,7 +1610,13 @@
         "board": "ベストグロス",
         "of": "{{count}}人中",
         "lastChange": "最新の変動 {{when}}"
-      }
+      },
+      "ratingCount": "{{count}}件の評価"
+    },
+    "shelf": {
+      "aroundCounty": "{{county}}周辺",
+      "aroundWorld": "世界各地",
+      "onYourList": "あなたのリスト"
     }
   }
 }
