@@ -276,16 +276,48 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
   return (
     <>
       <ExploreShelf
-        heading={copy.heading}
-        /* SEE-ALL ONLY WHEN THERE IS MORE THAN IS SHOWN: the thin member with
-           one course sees no control, because the total equals the rail. */
-        seeAllLabel={standing.total > tiles.length ? copy.seeAll(standing.total) : null}
+        /* THE HEADING NAMES THE BOARD. Composed here, interpunct and all, so no
+           locale string has to carry punctuation. */
+        heading={`${copy.heading} \u00B7 ${copy.boardName(shownBoard)}`}
+        headingRight={
+          <BoardSelector
+            board={shownBoard}
+            label={copy.boardName(shownBoard)}
+            ariaLabel={copy.pickBoard}
+            nameFor={copy.boardName}
+            onPick={pickBoard}
+          />
+        }
         onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'standing', pos })}
-        onSeeAll={() => {
-          analyticsEvents.track('amateur_standing_see_all_opened', {});
-          /* A SHEET, NOT A ROUTE: the member is coming back to the stream. */
-          setSheetOpen(true);
-        }}
+        /* SEE ALL MOVED BENEATH THE CARDS because the selector owns the right
+           slot. Uppercase foot convention, and only when there is more than the
+           rail shows: the member with one course sees no control. */
+        foot={
+          standing.total > tiles.length ? (
+            <button
+              type="button"
+              onClick={() => {
+                analyticsEvents.track('amateur_standing_see_all_opened', { board: shownBoard });
+                /* A SHEET, NOT A ROUTE: the member is coming back to the stream. */
+                setSheetOpen(true);
+              }}
+              style={{
+                border: 0,
+                background: 'transparent',
+                padding: 0,
+                color: A.MUTE,
+                fontFamily: SANS,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+              }}
+            >
+              {copy.seeAll(standing.total)}
+            </button>
+          ) : null
+        }
       >
         {tiles.map((row) => (
           <div key={row.course_id} style={{ flex: `0 0 ${TILE.w}px`, width: TILE.w }}>
