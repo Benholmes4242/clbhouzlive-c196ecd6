@@ -40,6 +40,8 @@ import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCo
 import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding } from './useViewerStanding';
+import { useViewerCourseContext } from './useViewerCourseContext';
+import { useFollowingIdSet } from '@/components/explore-tab-new/courseled/hooks/useFollowingIdSet';
 import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
 
 /**
