@@ -29,12 +29,10 @@ import type { ScoreScope, ViewerScoreScope } from './useViewerScoreScope';
  *
  *   NO LANES.        Everything is lane 'news'. The backlog rule (§6e) needs
  *                    arrived_at versus play_date, which means the RPC.
- *   NO GEOGRAPHY.    ring is 'own' or null. Club/county/country arrive in
- *                    Phase C, so the outer-ring 1-in-4 cadence cap has nothing
- *                    to act on yet and is not simulated.
- *   NO STANDING.     rank_down / rank_up / rank_hold / played_nochange and a
- *                    record card's GAP sentence all need the viewer's rank per
- *                    course (Phase B). They are never emitted here.
+ *   PART GEOGRAPHY.  Phase B2 filters Scores with canonical club/course fields;
+ *                    Phase C still owns geography rings and shelves.
+ *   STANDING LIVE.   Phase B supplies typed round consequences from the viewer's
+ *                    per-course board standing.
  *   NO KEYSET.       Depth is a client pool revealed a page at a time. The real
  *                    cursor is (score, id) from the RPC.
  *

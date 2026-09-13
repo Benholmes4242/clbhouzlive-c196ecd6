@@ -1605,12 +1605,24 @@
     "stream": {
       "view": {
         "all": "Todo",
+        "scores": "Resultados",
         "watch": "Ver"
       },
       "shelf": {
         "clips": "Clips",
         "moments": "De la comunidad",
-        "standing": "Donde estas"
+        "standing": "Donde estas",
+        "clubWeek": "Esta semana en {{club}}"
+      },
+      "scope": {
+        "club": "Mi club",
+        "world": "Mundo"
+      },
+      "scopes": "Ambito de resultados",
+      "roundCount": "{{count}} vueltas",
+      "connect": {
+        "body": "Conecta un handicap y cada vuelta que juegues aparecera aqui, clasificada frente a todos los que hayan jugado el mismo campo.",
+        "action": "Conectar un handicap >"
       },
       "seeAll": "Ver los {{count}}",
       "views": "Vistas de Explorar",

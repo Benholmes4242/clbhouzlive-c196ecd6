@@ -1541,12 +1541,24 @@
     "stream": {
       "view": {
         "all": "すべて",
+        "scores": "スコア",
         "watch": "見る"
       },
       "shelf": {
         "clips": "クリップ",
         "moments": "コミュニティから",
-        "standing": "あなたの順位"
+        "standing": "あなたの順位",
+        "clubWeek": "{{club}}の今週"
+      },
+      "scope": {
+        "club": "マイクラブ",
+        "world": "世界"
+      },
+      "scopes": "スコアの範囲",
+      "roundCount": "{{count}}ラウンド",
+      "connect": {
+        "body": "ハンディキャップを連携すると、プレーした各ラウンドがここに表示され、同じコースをプレーした全員と比較して順位付けされます。",
+        "action": "ハンディキャップを連携 >"
       },
       "seeAll": "{{count}}件すべて表示",
       "views": "探索ビュー",

@@ -36,9 +36,8 @@ import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
  * owns NO header: /amateur wears the shared floating glass islands (registry
  * rule), exactly as it did before.
  *
- * TWO CHIPS ONLY. Scores, Courses and Reviews are absent, not disabled and not
- * labelled "coming next": a control that cannot change what you see does not
- * render. They arrive with Phase B and Phase C.
+ * THREE CHIPS THROUGH PHASE B2. Courses and Reviews remain absent rather than
+ * disabled; a control that cannot change what you see does not render.
  *
  * SHELVES PRESENT IN PHASE A are clips and moments — the two whose sources ship
  * today with no geography and no standing behind them. The rounds, standing,

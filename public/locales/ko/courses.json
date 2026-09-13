@@ -1544,12 +1544,24 @@
     "stream": {
       "view": {
         "all": "전체",
+        "scores": "스코어",
         "watch": "보기"
       },
       "shelf": {
         "clips": "클립",
         "moments": "커뮤니티에서",
-        "standing": "나의 순위"
+        "standing": "나의 순위",
+        "clubWeek": "이번 주 {{club}}"
+      },
+      "scope": {
+        "club": "내 클럽",
+        "world": "세계"
+      },
+      "scopes": "스코어 범위",
+      "roundCount": "{{count}}라운드",
+      "connect": {
+        "body": "핸디캡을 연결하면 플레이한 모든 라운드가 여기에 표시되고 같은 코스를 플레이한 모든 사람과 비교해 순위가 매겨집니다.",
+        "action": "핸디캡 연결 >"
       },
       "seeAll": "{{count}}개 모두 보기",
       "views": "탐색 보기",

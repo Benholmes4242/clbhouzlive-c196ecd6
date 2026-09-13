@@ -1605,12 +1605,24 @@
     "stream": {
       "view": {
         "all": "Alle",
+        "scores": "Ergebnisse",
         "watch": "Ansehen"
       },
       "shelf": {
         "clips": "Clips",
         "moments": "Aus der Community",
-        "standing": "Wo du stehst"
+        "standing": "Wo du stehst",
+        "clubWeek": "Diese Woche bei {{club}}"
+      },
+      "scope": {
+        "club": "Mein Club",
+        "world": "Welt"
+      },
+      "scopes": "Ergebnisbereich",
+      "roundCount": "{{count}} Runden",
+      "connect": {
+        "body": "Verbinde ein Handicap, dann erscheint jede deiner Runden hier, eingeordnet gegen alle, die denselben Platz gespielt haben.",
+        "action": "Handicap verbinden >"
       },
       "seeAll": "Alle {{count}} ansehen",
       "views": "Explore-Ansichten",
