@@ -13,8 +13,8 @@ import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
-import { treatmentFor } from './roundTreatment';
-import { RoundDistribution, RoundTicks } from './RoundTreatments';
+import { dotsFor, treatmentFor } from './roundTreatment';
+
 
 /**
  * THE UNIT (BRIEF_EXPLORE_MAGAZINE §4).
