@@ -12,7 +12,8 @@ import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
-import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
+import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
+import { Z } from '@/config/zIndex';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -265,6 +266,7 @@ function MomentsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) 
 }
 
 export function ExploreMagazine({ userId }: { userId: string | undefined }) {
+  const { sentinelRef: chipSentinelRef, stuck: chipsStuck } = useStickySafeAreaState();
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const opener = useScorecardOpener();
@@ -686,17 +688,21 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
   return (
     <div style={{ fontFamily: SANS }}>
-      {/* §3b THE CHIP ROW sticks JUST BENEATH the floating islands — top is
-          CHROME_CLEARANCE (island bottom edge, safe-area inclusive), not 0,
-          so it never pins at viewport top under the search/avatar island.
-          Same grammar as Clubhouse's sticky row. The active view takes the
+      {/* §3b THE VIEW CHIP ROW starts below the islands because AmateurPage's
+          shell pays CHROME_CLEARANCE. On scroll, the shared islands ride away
+          and this row pins directly beneath the notch. The sentinel drives the
+          one shared safe-area scrim; the scope row remains in normal flow.
+          The active view takes the
           FILLED ground (applied) and the rest the outline (selectable) —
           the shared RailChips grammar, not a local look-alike. */}
+      <div ref={chipSentinelRef} style={{ height: 0 }} aria-hidden="true" />
+      <StickySafeAreaScrim visible={chipsStuck} background={A.CANVAS} />
       <div
+        data-stuck={chipsStuck ? 'true' : 'false'}
         style={{
           position: 'sticky',
-          top: CHROME_CLEARANCE,
-          zIndex: 3,
+          top: 'var(--sat, env(safe-area-inset-top, 0px))',
+          zIndex: Z.stickyTabs,
           background: A.CANVAS,
           padding: '10px 0 12px',
         }}
