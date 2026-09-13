@@ -45,10 +45,11 @@ import { useViewerStanding, type StandingRow } from './useViewerStanding';
  *
  * THE BOARD SELECTOR (Ben's ruling). Net for everyone by default, net or gross
  * only, no handicap threshold — the reasoning lives in standingBoard.ts. The
- * HEADING names the board ("Where you stand · Net"); the tiles never repeat it,
- * so their subline stays about the course. The selector sits in the heading's
- * right slot, which pushes SEE ALL beneath the cards in the uppercase foot
- * convention. The see-all sheet reads the same selection.
+ * HEADING reads only "Where you stand"; the selector in the heading's right
+ * slot already names the active board, so repeating it in the heading would be
+ * the same word twice. The tiles never repeat the board either, so their
+ * subline stays about the course. The selector pushes SEE ALL beneath the cards
+ * in the uppercase foot convention. The see-all sheet reads the same selection.
  *
  * THE CONSEQUENCE CARDS DO NOT FOLLOW THIS SELECTOR and must not be made to:
  * a card is a dated statement about a round that happened, while this shelf is
@@ -93,7 +94,15 @@ function useStandingCopy() {
   return useMemo(
     () => ({
       heading: t('amateur.stream.shelf.standing', 'Where you stand'),
-      /** The two board names. These are what the heading appends. */
+      /**
+       * The two board names, used ONLY by the dropdown. The heading no longer
+       * appends the board name (Ben: "the same word twice in one row").
+       *
+       * RETIRED FOR PHASE E: `amateur.stream.standing.board` ("Lowest gross")
+       * was the legacy board-name-in-heading key. It is kept in all six locale
+       * files but is no longer read by code; the Phase E cleanup pass may
+       * remove it.
+       */
       boardName: (board: StandingBoard) =>
         board === 'net'
           ? t('amateur.stream.standing.boardNet', 'Net')
@@ -277,14 +286,13 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
   /* A HOLD, NOT A GUESS, while the read is in flight — the rail's own shape. */
   if (!standing.isFetched) return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
   /* ERRORED IS NOT EMPTY (the fault that hid this shelf). A read that FAILED
-     says so, with the heading still naming the board that was asked for and a
-     retry; only a genuinely empty answer renders nothing, because "no standing"
-     is not a sentence worth a heading. */
+     says so, with the plain heading and a retry; only a genuinely empty answer
+     renders nothing, because "no standing" is not a sentence worth a heading. */
   if (standing.unresolved) {
     return (
       <div style={{ fontFamily: SANS, padding: '0 16px' }}>
         <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK }}>
-          {`${copy.heading} \u00B7 ${copy.boardName(board)}`}
+          {copy.heading}
         </div>
         <div style={{ marginTop: 6, fontSize: 13, fontWeight: 600, color: A.MUTE }}>
           {copy.unreadable}
@@ -314,9 +322,7 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
   return (
     <>
       <ExploreShelf
-        /* THE HEADING NAMES THE BOARD. Composed here, interpunct and all, so no
-           locale string has to carry punctuation. */
-        heading={`${copy.heading} \u00B7 ${copy.boardName(shownBoard)}`}
+        heading={copy.heading}
         headingRight={
           <BoardSelector
             board={shownBoard}
@@ -385,10 +391,8 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} maxHeight="75dvh">
         <div style={{ fontFamily: SANS, padding: '4px 16px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, paddingBottom: 12 }}>
-            {/* THE SHEET FOLLOWS THE SELECTED BOARD - it reads the same rows,
-                so it names the same board. */}
             <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK }}>
-              {`${copy.heading} \u00B7 ${copy.boardName(shownBoard)}`}
+              {copy.heading}
             </span>
             <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 600, color: A.MUTE }}>
               {standing.total}
