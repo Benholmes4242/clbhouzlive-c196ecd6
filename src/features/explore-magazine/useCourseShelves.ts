@@ -1,0 +1,187 @@
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+
+import { supabase } from '@/integrations/supabase/client';
+import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
+import { useBoardCourses } from '@/components/explore-tab-new/courseled/hooks/useBoardCourses';
+import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
+import { useUserWantToPlay } from '@/hooks/useUserWantToPlay';
+
+import type { ViewerScoreScope } from './useViewerScoreScope';
+
+/**
+ * THE COURSE SHELF SOURCES (BRIEF_EXPLORE_MAGAZINE PHASE C, §3a-§3c).
+ *
+ * GEOGRAPHY IS NEVER RE-DERIVED HERE. County and country arrive from the shared
+ * useViewerScoreScope resolver (its own header names Phase C as the reuse
+ * target); this file only asks the board for courses and filters them.
+ *
+ * THE COUNTY FILTER IS CLIENT-SIDE, ON EVIDENCE. get_board_courses passes
+ * p_region_kind/p_region_value straight to board_pool, whose ok_region predicate
+ * reads:
+ *
+ *   when p_region_kind is null         then true
+ *   when p_region_kind = 'country'     then c.country     = p_region_value
+ *   when p_region_kind = 'sub_country' then c.sub_country = p_region_value
+ *   else true
+ *
+ * There is NO region (county) branch, and `else true` means an invented
+ * p_region_kind='region' would silently pass EVERY course rather than fail —
+ * the worst possible outcome. So the county shelf takes path (a) of §3a: it
+ * asks for a BOUNDED set (the viewer's sub_country when known) and filters to
+ * golf_courses.region client-side. The schema-adjacent p_region proposal is
+ * filed, unapplied, in docs/sql/explore_phase_c_region_and_club.md.
+ */
+
+export interface CourseShelfRow {
+  courseId: string;
+  name: string | null;
+  area: string | null;
+  imageUrl: string | null;
+  rounds: number;
+  rating: number | null;
+  ratingCount: number;
+  /** Top 100 rank, when the course carries one. */
+  rank: number | null;
+  rankScopeWorld: boolean;
+}
+
+/** §3a AROUND {county} — most tracked rounds, then rating. */
+export function useCountyCourses(
+  viewerId: string | undefined,
+  geography: ViewerScoreScope,
+  enabled: boolean,
+) {
+  const county = geography.county;
+  const filters = useMemo(
+    () => ({
+      ...DEFAULT_FILTERS,
+      window: '90' as const,
+      regionKind: geography.country ? ('sub_country' as const) : null,
+      regionValue: geography.country ?? null,
+    }),
+    [geography.country],
+  );
+  const board = useBoardCourses(viewerId, filters, { limit: 60, enabled: enabled && !!county, sort: 'played' });
+  const ids = useMemo(() => (board.data?.rows ?? []).map((row) => row.course_id), [board.data]);
+  const meta = useCourseCardMeta(ids);
+
+  const rows = useMemo<CourseShelfRow[]>(() => {
+    if (!county) return [];
+    return (board.data?.rows ?? [])
+      /* THE COUNTY IS golf_courses.region EXACTLY — never the board's `area`,
+         which falls back to sub_country and would fold a whole nation in. */
+      .filter((row) => meta.data?.get(row.course_id)?.rawRegion === county)
+      .map((row) => ({
+        courseId: row.course_id,
+        name: row.name,
+        area: row.area,
+        imageUrl: row.thumbnail_image ?? meta.data?.get(row.course_id)?.imageUrl ?? null,
+        rounds: row.rounds,
+        rating: row.rating,
+        ratingCount: row.rating_count,
+        rank: null,
+        rankScopeWorld: false,
+      }))
+      .sort((a, b) => (b.rounds - a.rounds) || ((b.rating ?? 0) - (a.rating ?? 0)))
+      .slice(0, 12);
+  }, [board.data, meta.data, county]);
+
+  return {
+    rows,
+    isFetched: !enabled || !county ? true : board.isFetched && (ids.length === 0 || meta.isFetched),
+  };
+}
+
+interface Top100Row {
+  course_id: string;
+  rank: number;
+  world: boolean;
+}
+
+/** §3b AROUND THE WORLD — the Top 100 rank table, ordered by rank. */
+export function useWorldTop100Courses(enabled: boolean) {
+  const query = useQuery<Top100Row[]>({
+    queryKey: ['explore-magazine', 'world-top100'],
+    enabled,
+    staleTime: 60 * 60_000,
+    queryFn: async () => {
+      const { data: lists, error: listError } = await supabase.from('top100_lists').select('id, slug');
+      if (listError) throw listError;
+      const slugs = new Map((lists ?? []).map((row: { id: string; slug: string }) => [row.id, row.slug]));
+      const worldId = (lists ?? []).find((row: { slug: string }) => row.slug === 'top-100-worldwide')?.id ?? null;
+      const { data, error } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id, list_id, rank')
+        .order('rank', { ascending: true })
+        .limit(400);
+      if (error) throw error;
+      const out = new Map<string, Top100Row>();
+      for (const row of (data ?? []) as Array<{ course_id: string; list_id: string; rank: number | null }>) {
+        if (row.rank == null) continue;
+        const world = !!worldId && row.list_id === worldId;
+        const existing = out.get(row.course_id);
+        /* WORLD OUTRANKS REGIONAL, NEVER BOTH (§3b). */
+        if (existing && (existing.world || !world)) continue;
+        if (!slugs.has(row.list_id)) continue;
+        out.set(row.course_id, { course_id: row.course_id, rank: row.rank, world });
+      }
+      return Array.from(out.values())
+        .sort((a, b) => (Number(b.world) - Number(a.world)) || a.rank - b.rank)
+        .slice(0, 14);
+    },
+  });
+
+  const ids = useMemo(() => (query.data ?? []).map((row) => row.course_id), [query.data]);
+  const meta = useCourseCardMeta(ids);
+
+  const rows = useMemo<CourseShelfRow[]>(
+    () =>
+      (query.data ?? []).map((row) => {
+        const course = meta.data?.get(row.course_id);
+        return {
+          courseId: row.course_id,
+          name: course?.name ?? null,
+          area: course?.region ?? course?.subCountry ?? null,
+          imageUrl: course?.imageUrl ?? null,
+          rounds: 0,
+          rating: null,
+          ratingCount: 0,
+          rank: row.rank,
+          rankScopeWorld: row.world,
+        };
+      }),
+    [query.data, meta.data],
+  );
+
+  return { rows, isFetched: !enabled ? true : query.isFetched && (ids.length === 0 || meta.isFetched) };
+}
+
+/**
+ * §3c ON YOUR LIST — course_shortlists through useUserWantToPlay.
+ *
+ * CONTRADICTION, REPORTED: §3c asks the subline to be "the strongest recent
+ * event at that course" where one exists. Nothing on this page holds a
+ * per-course recent-event index, and inventing one would mean a read per tile.
+ * The subline is therefore the AREA in every case — a fact we hold — and the
+ * event subline waits for the Phase D ranker, which already computes events.
+ */
+export function useListCourses(viewerId: string | undefined, enabled: boolean) {
+  const { wantToPlay, isLoading } = useUserWantToPlay(enabled ? viewerId : undefined);
+  const rows = useMemo<CourseShelfRow[]>(
+    () =>
+      (wantToPlay ?? []).slice(0, 12).map((row) => ({
+        courseId: row.course_id,
+        name: row.course_name,
+        area: row.sub_country ?? row.country ?? null,
+        imageUrl: row.thumbnail_image,
+        rounds: 0,
+        rating: null,
+        ratingCount: 0,
+        rank: row.global_rank ?? row.regional_rank ?? null,
+        rankScopeWorld: row.global_rank != null,
+      })),
+    [wantToPlay],
+  );
+  return { rows, total: wantToPlay?.length ?? 0, isFetched: !enabled || !viewerId ? true : !isLoading };
+}
