@@ -13,6 +13,10 @@ psql -v ON_ERROR_STOP=1 -q -c "create role anon; create role authenticated; crea
 psql -v ON_ERROR_STOP=1 -q -c "create table viewer_standing_fixture(viewer uuid, course_id uuid, rank_now int, field_now int, rank_then int, delta int);"
 psql -v ON_ERROR_STOP=1 -q -f tests/sql/explore_stream_d1_fixture.sql
 psql -v ON_ERROR_STOP=1 -q -f tests/sql/explore_stream_d3_fixture.sql
+# SCHEMA PARITY FIRST (audit ruling 3). A harness on a schema production does not
+# have proves nothing, so this runs before any function body is loaded.
+psql -v ON_ERROR_STOP=1 -q -f tests/sql/production_columns.snapshot.sql
+psql -v ON_ERROR_STOP=1 -f tests/sql/schema_parity_assert.sql
 psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d1.sql   # config table + D1 body
 psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d2.sql   # D2 body (deployed)
 psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d3.sql   # D3 body
