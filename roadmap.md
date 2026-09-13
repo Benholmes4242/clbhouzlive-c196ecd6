@@ -1,5 +1,13 @@
 # Roadmap
 
+## Explore Magazine Phase D — server ranker (13 Sep 2026)
+- [ ] D1: dump every touched live function; draft `explore_config` and All-only `get_explore_stream` under `docs/sql/`; build and run the PG16 fidelity/keyset/cadence/cold-viewer harness; stop for Ben to run the SQL before switching All.
+- [ ] D1 client gate: add the centralized viewer/view/scope infinite-query key, first-page persistence, final server ordering, and bottom sentinel after the RPC exists live.
+- [ ] D2: add the round-only news/backlog lane from `gam_round_stats.created_at` versus `play_date`, page filling, and platform-notable tail; verify real arrival behavior.
+- [ ] D3: move Scores, Courses, Reviews, and Watch bodies to the RPC while retaining existing shelf hooks and shared geography inputs.
+- [ ] D4: wire shortlisted-course recent-event copy, distinguish long-form errors from settled-empty, audit every stream source, and dead-list the client ranker without deleting it.
+- Device acceptance items remain **landed, not verified** until Ben checks them.
+
 ## Explore Magazine Phase B2 — Scores (13 Sep 2026)
 - [x] Reuse the standing ordinal helper across all rank consequence headlines and six locales.
 - [x] Add the Scores view and geography scope row without changing All or Watch behavior.
