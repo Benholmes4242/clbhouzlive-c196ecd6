@@ -837,7 +837,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           {shelves.map((shelf) => (
             <div key={`empty-shelf:${shelf}`}>{renderShelf(shelf, 0)}</div>
           ))}
-          {!shelvesHaveContent ? (
+          {shelvesSettled && !shelvesHaveContent ? (
             <div style={{ paddingInline: 20, marginTop: 8 }}>
               <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
                 {view === 'courses'
