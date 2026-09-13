@@ -624,8 +624,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                   /* THE SAME SHELF THE SCORES VIEW USES — reused, not copied. */
                   <WeeklyClubShelf
                     viewerId={userId}
+                    clubId={geography.scope.primaryClubId}
                     clubName={geography.scope.primaryClubName}
                     enabled={!!geography.scope.primaryClubId}
+
                     pos={pos}
                   />
                 ) : shelf === 'standing' ? (
