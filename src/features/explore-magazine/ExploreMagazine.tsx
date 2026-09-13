@@ -25,6 +25,8 @@ import { EXPLORE_VIEWS, readExploreView, writeExploreView, type ExploreView } fr
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
+import { CourseShelf } from './CourseShelf';
+import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCourseShelves';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding } from './useViewerStanding';
 import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
