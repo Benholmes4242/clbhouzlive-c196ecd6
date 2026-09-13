@@ -1639,6 +1639,17 @@
         "world": "Welt",
         "gbi": "GB&I"
       },
+      "visual": {
+        "level": "LEVEL",
+        "ace": "HOLE-IN-ONE AN {{n}}",
+        "albatross": "ALBATROSS AN {{n}}",
+        "eagle": "EAGLE AN {{n}}",
+        "triple": "TRIPLE AN {{n}}",
+        "double": "DOUBLE AN {{n}}",
+        "birdie": "BIRDIE",
+        "par": "PAR",
+        "bogey": "BOGEY"
+      },
       "kicker": {
         "ownRound": "Deine Runde",
         "courseRecord": "Platzrekord",

@@ -1578,6 +1578,17 @@
         "world": "세계",
         "gbi": "GB&I"
       },
+      "visual": {
+        "level": "LEVEL",
+        "ace": "HOLE IN ONE ON {{n}}",
+        "albatross": "ALBATROSS ON {{n}}",
+        "eagle": "EAGLE ON {{n}}",
+        "triple": "TRIPLE ON {{n}}",
+        "double": "DOUBLE ON {{n}}",
+        "birdie": "BIRDIE",
+        "par": "PAR",
+        "bogey": "BOGEY"
+      },
       "kicker": {
         "ownRound": "내 라운드",
         "courseRecord": "코스 레코드",

@@ -2223,6 +2223,17 @@
         "world": "[wörld one]",
         "gbi": "[GB&Î one]"
       },
+      "visual": {
+        "level": "[LÉVÉL one]",
+        "ace": "[HÖLÉ ÎN ÖNÉ ÖN {{n}} one]",
+        "albatross": "[ÅLBÅTRÖSS ÖN {{n}} one]",
+        "eagle": "[ÉÅGLÉ ÖN {{n}} one]",
+        "triple": "[TRÎPLÉ ÖN {{n}} one]",
+        "double": "[DÖÜBLÉ ÖN {{n}} one]",
+        "birdie": "[BÎRDÎÉ one]",
+        "par": "[PÅR one]",
+        "bogey": "[BÖGÉÝ one]"
+      },
       "kicker": {
         "ownRound": "[Yöür röünd one]",
         "courseRecord": "[Çöürsé réçörd one]",
