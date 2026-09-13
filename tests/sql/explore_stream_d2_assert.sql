@@ -53,11 +53,12 @@ from generate_series(1, 200) i;
 -- AN ACE, PLAYED THREE DAYS AGO AND SYNCED TODAY. Arrival is not late, so it is
 -- NEWS and must not be pushed into the backlog by its notability.
 insert into gam_round_stats
-  (id, user_id, course_id, whs_score_id, play_date, created_at, gross_score, course_par,
+  (user_id, course_id, whs_score_id, play_date, created_at, gross_score, course_par,
    stableford_points, birdies, eagles, albatrosses, holes_in_one, clean_card, hcp_at_time)
-values ('99999999-9999-9999-9999-999999999999',
-        '20000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000001',
-        gen_random_uuid(), current_date - 3, now() - interval '1 hour',
+values ('20000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000001',
+        /* The card id is 'round:' || whs_score_id, so the ace round's KEY is
+           what the assertions below look it up by (audit ruling 3). */
+        '99999999-9999-9999-9999-999999999999', current_date - 3, now() - interval '1 hour',
         69, 72, 41, 4, 0, 0, 1, false, 8.2);
 
 insert into gam_round_net (whs_score_id, user_id, course_id, play_date, gross_score, course_handicap, net_score)

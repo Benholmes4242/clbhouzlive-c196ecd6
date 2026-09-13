@@ -1,4 +1,11 @@
 -- ============================================================================
+--
+-- SCHEMA CORRECTION (audit ruling 3, 2026-09-13): the two `g.id` references in
+-- this archived stage draft were `gam_round_stats.id`, a column production does
+-- not have - the drift the invented fixture column hid until D5. They now read
+-- `g.whs_score_id`, identically to the live body (docs/sql/explore_stream_d5_fix.sql),
+-- so this stage harness runs against the real schema. Behaviour is unchanged:
+-- whs_score_id was always the row's key.
 -- BRIEF_EXPLORE_MAGAZINE - PHASE D3 DRAFT. BEN RUNS THIS. NOT A MIGRATION.
 -- ============================================================================
 -- THE REMAINING VIEWS. Built on the DEPLOYED get_explore_stream: its body was
@@ -227,7 +234,7 @@ BEGIN
       WHERE g.holes_played = 18 AND g.course_id IS NOT NULL
         AND g.gross_score IS NOT NULL
         AND g.play_date >= (now() - interval '30 days')::date
-      ORDER BY g.course_id, g.gross_score ASC, g.id ASC
+      ORDER BY g.course_id, g.gross_score ASC, g.whs_score_id ASC
     ),
     c_top AS (
       SELECT m.course_id,
@@ -241,7 +248,7 @@ BEGIN
     -- ROUNDS -----------------------------------------------------------------
     rounds AS (
       SELECT
-        'round:' || g.id::text                        AS cid,
+        'round:' || g.whs_score_id::text                        AS cid,
         'round'::text                                 AS kind,
         g.created_at                                  AS arrived_at,
         g.play_date::text                             AS play_date,
