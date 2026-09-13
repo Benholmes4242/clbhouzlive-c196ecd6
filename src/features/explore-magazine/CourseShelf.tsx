@@ -5,6 +5,8 @@ import { StandoutTile } from '@/components/explore-tab-new/courseled/StandoutTil
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreShelf } from './ExploreShelf';
+import { PHOTO_FIG_GOOD } from '@/styles/photoScrim';
+
 import type { ListEvent } from './listCourseEvents';
 import { ShelfShell } from './ExploreShells';
 import type { CourseShelfRow } from './useCourseShelves';
