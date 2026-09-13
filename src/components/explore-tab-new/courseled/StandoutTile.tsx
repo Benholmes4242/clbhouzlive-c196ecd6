@@ -377,8 +377,17 @@ export function StandoutTile({
         ) : null}
         {/* THE NAME ROW owns the whole width now: the reaction control moved
             DOWN onto the detail line, so a long member name wraps to a second
-            line instead of being cut off mid-word. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            line instead of being cut off mid-word.
+
+            RESERVED TWO LINES IN A RAIL (BRIEF_EXPLORE_BOARD_SELECTOR §2).
+            Variable heights are fine in a vertical list and never in a
+            horizontal rail: a tile whose name wraps used to stand taller than
+            its neighbours. With `reserveTwoLines` the row holds the tallest
+            case (2 x 13px x 1.2 = 32px) and a one-line name simply leaves the
+            second line empty. Every masonry/vertical consumer omits the prop
+            and is byte-identical to before. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, ...(reserveTwoLines ? { minHeight: 32 } : null) }}>
+
           {who ? (
             <SquircleAvatar
               src={avatarUrl}
