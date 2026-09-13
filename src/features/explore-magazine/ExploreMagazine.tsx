@@ -88,8 +88,14 @@ type Block =
 const PAIRABLE = new Set(['review', 'course', 'story']);
 
 /** §5 shelves are inserted after card positions 3, 7, 11 ... and an empty
- *  source means the next shelf takes the slot rather than a gap appearing. */
-function buildBlocks(items: StreamItem[], shelves: ShelfKind[]): Block[] {
+ *  source means the next shelf takes the slot rather than a gap appearing.
+ *
+ *  §5b/§5c A SINGLE-TYPE VIEW PAIRS ITS OWN KIND. The mixed stream refuses two
+ *  cards of the same kind side by side, because there it would read as one
+ *  repeated card; the Courses and Reviews views are all one kind by definition
+ *  and the brief allows pairs in both, so `sameKindPairs` opens that door for
+ *  those two views only. */
+function buildBlocks(items: StreamItem[], shelves: ShelfKind[], sameKindPairs = false): Block[] {
   const blocks: Block[] = [];
   let cards = 0;
   let nextShelf = 0;
