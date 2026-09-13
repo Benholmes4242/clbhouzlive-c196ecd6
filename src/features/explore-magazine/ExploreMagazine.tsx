@@ -334,13 +334,34 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     'coursesWorld',
     'coursesList',
   ];
-  const shelves: ShelfKind[] = view === 'watch' ? ['moments'] : view === 'scores' ? [] : ALL_SHELVES;
-  const blocks = useMemo(() => buildBlocks(enriched, shelves), [enriched, view]);
+  /* §5b THE COURSES SHELF ORDER, skipping empties: list first where the viewer
+     has one, then county, then the new top-rated shelf, then world — and world
+     ONLY where the scope has already widened past the county (§5b).
+     §5c REVIEWS: top-rated, then list. */
+  const COURSES_SHELVES: ShelfKind[] = [
+    'coursesList',
+    'coursesCounty',
+    'coursesTopRated',
+    ...(scoreScope === 'country' || scoreScope === 'world' ? (['coursesWorld'] as ShelfKind[]) : []),
+  ];
+  const REVIEWS_SHELVES: ShelfKind[] = ['coursesTopRated', 'coursesList'];
+  const shelves: ShelfKind[] =
+    view === 'watch'
+      ? ['moments']
+      : view === 'scores'
+        ? []
+        : view === 'courses'
+          ? COURSES_SHELVES
+          : view === 'reviews'
+            ? REVIEWS_SHELVES
+            : ALL_SHELVES;
+  const singleType = view === 'courses' || view === 'reviews';
+  const blocks = useMemo(() => buildBlocks(enriched, shelves, singleType), [enriched, view, scoreScope, singleType]);
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
   const loggedRef = useRef(0);
   useEffect(() => {
-    if (!stream.isFetched) return;
+    if (!source.isFetched) return;
     const page = Math.ceil(visible.length / STREAM_PAGE_SIZE);
     if (page === loggedRef.current) return;
     loggedRef.current = page;
