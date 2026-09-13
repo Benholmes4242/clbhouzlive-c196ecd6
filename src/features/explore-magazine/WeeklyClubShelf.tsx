@@ -76,7 +76,17 @@ export function WeeklyClubShelf({
               unit={toParLabel(toPar) ?? undefined}
               whenLabel={relativeDay(row.play_date) ?? ''}
               who={who}
+              /* IDENTITY IS user_profiles AND NOTHING ELSE. get_board_page
+                 already joins user_profiles for display_name and
+                 profile_photo_url; the shelf simply never threaded the photo
+                 through, so every tile fell back to initials. Never
+                 whs_friends / whs_friend_matches: those hold England Golf
+                 names and photo URLs and leaked once already. A null photo
+                 keeps the deterministic initials gradient. */
+              avatarUrl={row.profile_photo_url ?? null}
+              avatarUserId={row.user_id}
               isOwn={row.user_id === viewerId}
+
               onPress={() => {
                 analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'club_week', pos });
                 if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
