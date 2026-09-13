@@ -89,18 +89,24 @@ export function roundConsequence(input: RoundConsequenceInput, sources: Conseque
     return { kind: 'record_taken', n: gross ?? null, of: field, held_by_viewer: isSelf };
   }
 
-  /* 2. ANOTHER MEMBER'S ROUND. It passed the viewer only if it is better than
-        the viewer's own best there, and only a course the viewer has played can
-        have a standing row at all. */
+  /* 2. ANOTHER MEMBER'S ROUND.
+        A ROUND BY SOMEONE ELSE IS ONLY NEWS IF IT CHANGED SOMETHING. Another
+        member playing a course you have played is not, by itself, an event —
+        however much it moves a number you were not watching. That is why
+        rank_down is gone: it fired on EVERY round at EVERY course the viewer had
+        ever teed off, and eighteen rounds at one club drew eighteen
+        near-identical cards whose only difference was a rank the viewer had not
+        been watching. Do not reinstate it, and do not reintroduce it under
+        another name.
+
+        So these rounds fall THROUGH to whatever they qualify for on their own
+        merits: the viewer's list, their circle, or a notable round. If none
+        holds, the round is NOT A CANDIDATE and returns null. */
   if (!isSelf) {
-    if (stand && gross != null && myBest != null && gross < myBest) {
-      return { kind: 'rank_down', n: stand.rank_now, of: field, delta: moved };
-    }
     /* A COURSE ON THE VIEWER'S LIST, and that is ALL this says. Phase A read
        list_new_low off the other member's own best there, which is a fact about
        them and not a low on any list — so this emits list_first only. */
     if (courseId && sources.shortlist.has(courseId)) return { kind: 'list_first' };
-    if (stand) return { kind: 'played_nochange', n: stand.rank_now, of: field };
     if (input.isCircle) return { kind: 'circle_round' };
     if (input.isNotable) return { kind: 'platform_notable' };
     return null;
