@@ -155,7 +155,7 @@ BEGIN
   v_cur_s       := nullif(p_cursor -> 's', 'null')::text::numeric;
   v_cur_i       := p_cursor ->> 'i';
   v_prev_key    := p_cursor #>> '{tail,key}';
-  v_since_outer := coalesce((p_cursor #>> '{tail,since_outer}')::int, 2147483647);
+  v_since_outer := coalesce((p_cursor #>> '{tail,since_outer}')::int, 1000000);
 
   FOR v_row IN
     WITH stamp AS (
@@ -408,7 +408,7 @@ BEGIN
     v_out := v_out || jsonb_build_array(to_jsonb(v_row));
     v_prev_key := coalesce(v_row.kind,'none') || ':' || coalesce(v_row.ring_k,'none');
     v_since_outer := CASE WHEN v_row.ring_k IN ('county','country','world') THEN 0
-                          ELSE v_since_outer + 1 END;
+                          ELSE least(v_since_outer + 1, 1000000) END;
     v_taken := v_taken + 1;
 
     -- A deferred card takes the next slot it legally can.
@@ -421,7 +421,7 @@ BEGIN
           v_deferred := v_deferred - 0;
           v_prev_key := coalesce(d ->> 'kind','none') || ':' || coalesce(d ->> 'ring_k','none');
           v_since_outer := CASE WHEN (d ->> 'ring_k') IN ('county','country','world') THEN 0
-                                ELSE v_since_outer + 1 END;
+                                ELSE least(v_since_outer + 1, 1000000) END;
           v_taken := v_taken + 1;
         END IF;
       END;
