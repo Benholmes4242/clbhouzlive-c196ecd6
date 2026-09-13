@@ -1587,7 +1587,8 @@
         "clip": "클립",
         "watch": "긴 영상",
         "moment": "커뮤니티에서",
-        "course": "코스"
+        "course": "코스",
+        "aroundCountry": "{{country}} 주변"
       },
       "headline": {
         "recordTaken": "{{name}}님이 {{course}}에서 {{gross}}타로 코스 레코드를 세웠습니다.",
@@ -1612,7 +1613,13 @@
         "board": "베스트 그로스",
         "of": "{{count}}명 중",
         "lastChange": "마지막 변동 {{when}}"
-      }
+      },
+      "ratingCount": "평가 {{count}}건"
+    },
+    "shelf": {
+      "aroundCounty": "{{county}} 주변",
+      "aroundWorld": "세계 각지",
+      "onYourList": "내 목록"
     }
   }
 }
