@@ -455,7 +455,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             ? REVIEWS_SHELVES
             : ALL_SHELVES;
   const singleType = view === 'courses' || view === 'reviews';
-  const blocks = useMemo(() => buildBlocks(enriched, shelves, singleType), [enriched, view, scoreScope, singleType]);
+  const blocks = useMemo(() => buildBlocks(ranked, shelves, singleType), [ranked, view, scoreScope, singleType]);
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
   const loggedRef = useRef(0);
@@ -815,7 +815,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
       {/* COLD START SHOWS THE SHORTEST PLAUSIBLE CARD, never a lead shell: a
           loading state is never larger than the state it resolves into. */}
-      {!source.isFetched && enriched.length === 0 ? (
+      {!source.isFetched && ranked.length === 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP, paddingInline: CARD_INSET }}>
           <StdShell />
           <StdShell />
