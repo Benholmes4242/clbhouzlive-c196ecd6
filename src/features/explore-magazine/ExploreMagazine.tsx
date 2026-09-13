@@ -20,7 +20,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ExploreCard, type CardSize } from './ExploreCard';
 import { ExploreShelf } from './ExploreShelf';
 import { StandingShelf } from './StandingShelf';
-import { LeadShell, PairShell, ShelfShell, StdShell } from './ExploreShells';
+import { LeadShell, PairShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
+import { listCourseEvents } from './listCourseEvents';
 import {
   EXPLORE_VIEWS,
   SCOPED_VIEWS,
@@ -146,7 +147,19 @@ function ClipsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) {
   const media = useDiscoverMediaPreview(true);
   const clips = useMemo(() => (media.data?.clips ?? []).slice(0, 12), [media.data]);
 
-  if (!media.isFetched) return <ShelfShell tileW={CLIP_TILE.w} tileH={CLIP_TILE.h} />;
+  if (!media.isFetched && !media.isError) return <ShelfShell tileW={CLIP_TILE.w} tileH={CLIP_TILE.h} />;
+  /* §5b ERRORED IS NOT EMPTY. A failed read shows its state and offers the read
+     again; a settled-empty read still renders nothing. */
+  if (media.isError) {
+    return (
+      <ShelfRetry
+        heading={t('amateur.stream.shelf.clips', 'Clips')}
+        label={t('amateur.stream.failed', 'This did not load.')}
+        action={t('amateur.stream.retry', 'Try again')}
+        onRetry={() => void media.refetch()}
+      />
+    );
+  }
   if (clips.length === 0) return null;
 
   return (
@@ -194,7 +207,18 @@ function MomentsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) 
   const moments = useMomentsOfTheWeek(30, { enabled: true, candidateLimit: 72 });
   const tiles = useMemo(() => (moments.data ?? []).slice(0, 12), [moments.data]);
 
-  if (!moments.isFetched) return <ShelfShell tileW={MOMENT_TILE.w} tileH={MOMENT_TILE.h} />;
+  if (!moments.isFetched && !moments.isError) return <ShelfShell tileW={MOMENT_TILE.w} tileH={MOMENT_TILE.h} />;
+  /* §5b ERRORED IS NOT EMPTY - see ClipsShelf. */
+  if (moments.isError) {
+    return (
+      <ShelfRetry
+        heading={t('amateur.stream.shelf.moments', 'From the community')}
+        label={t('amateur.stream.failed', 'This did not load.')}
+        action={t('amateur.stream.retry', 'Try again')}
+        onRetry={() => void moments.refetch()}
+      />
+    );
+  }
   if (tiles.length === 0) return null;
 
   return (
@@ -261,7 +285,16 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     scoreScopeChosen.current = true;
   }, [scoped, geography.isFetched, geography.scope.primaryClubId, geography.scope.county]);
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
-  const stream = useExploreStreamClient(userId, view, { active: scoreScope, geography: geography.scope });
+  /* §5c THE CLIENT RANKER IS OFF THE PAGE PATH. It is DEAD-LISTED, not deleted:
+     it stays as the reference model for the scoring the RPC ports, and as the
+     rollback. THE SAFETY NET STAYS WIRED - `fallbackWanted` below re-enables the
+     whole composition the moment the RPC read is unavailable, so a failing RPC
+     falls back to cards rather than to a blank page. Watch is never on the RPC,
+     so Watch always composes here.
+     The consequence and standing HOOKS it calls are NOT retired: consequences,
+     useViewerStanding, useViewerCourseBests, useCourseRecordSignal,
+     useViewerScoreScope and useRoundHoleShapes are all still read by this page,
+     its shelves and its cards. */
   /* PHASE D3 THE SERVER RANKER: All, Scores, Courses and Reviews. WATCH IS NOT
      ON THE RPC - its clips and long-form video are not in the ranker's pool, so
      it stays client-composed with its current finite depth. The viewer id is
@@ -279,6 +312,16 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     country: geography.scope.country,
   });
   const serverOn = serverView && !server.unavailable && server.isFetched && server.items.length > 0;
+  /* THE FALLBACK CONDITION, in one place. While the RPC is still in flight the
+     client composition is NOT fetched - the server hook shows its own shells, so
+     a member never pays for two rankers. */
+  const fallbackWanted = !serverView || server.unavailable;
+  const stream = useExploreStreamClient(
+    fallbackWanted ? userId : undefined,
+    view,
+    { active: scoreScope, geography: geography.scope },
+    { enabled: fallbackWanted },
+  );
   const scoresStanding = useViewerStanding(userId);
 
   /* §5b THE COURSES VIEW'S OWN BODY. Course cards are not rounds, reviews or
@@ -304,6 +347,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const countyCourses = useCountyCourses(userId, geography.scope, shelvesWanted && geography.isFetched);
   const worldCourses = useWorldTop100Courses(shelvesWanted);
   const listCourses = useListCourses(userId, shelvesWanted);
+  /* §5a THE LIST SHELF'S SECOND LINE reads the events the ranker already
+     computed for the rows on this page - no per-tile query. A course with no
+     event, or with a tie between two kinds, keeps its AREA. */
+  const listEvents = useMemo(() => listCourseEvents(source.items), [source.items]);
   const topRatedCourses = useRecentCourseRatings(view === 'courses' || view === 'reviews');
 
   /* THE SERVER PAGE IS ALREADY A PAGE. Reveal slicing belongs to the client
@@ -605,6 +652,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     heading={t('amateur.shelf.onYourList', 'On your list')}
                     rows={listCourses.rows}
                     isFetched={listCourses.isFetched}
+                    events={listEvents}
                     kind="courses_list"
                     pos={pos}
                     onDepart={depart}
