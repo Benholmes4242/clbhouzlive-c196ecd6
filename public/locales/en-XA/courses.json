@@ -2287,7 +2287,10 @@
       "standing": {
         "board": "[Lowest gross]",
         "of": "[of {{count}}]",
-        "lastChange": "[last change {{when}}]"
+        "lastChange": "[last change {{when}}]",
+        "boardNet": "[Nét one]",
+        "boardGross": "[Gröss one]",
+        "pickBoard": "[Chånge böård one two]"
       },
       "ratingCount": "[{{count}} rãtïñgs]",
       "empty": {

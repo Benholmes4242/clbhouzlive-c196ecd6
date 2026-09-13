@@ -1642,7 +1642,10 @@
       "standing": {
         "board": "베스트 그로스",
         "of": "{{count}}명 중",
-        "lastChange": "마지막 변동 {{when}}"
+        "lastChange": "마지막 변동 {{when}}",
+        "boardNet": "네트",
+        "boardGross": "그로스",
+        "pickBoard": "보드 변경"
       },
       "ratingCount": "평가 {{count}}건",
       "empty": {

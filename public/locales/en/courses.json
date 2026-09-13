@@ -166,7 +166,10 @@
       "standing": {
         "board": "Lowest gross",
         "of": "of {{count}}",
-        "lastChange": "last change {{when}}"
+        "lastChange": "last change {{when}}",
+        "boardNet": "Net",
+        "boardGross": "Gross",
+        "pickBoard": "Change board"
       },
       "empty": {
         "courses": "No courses in {{scope}} yet.",
