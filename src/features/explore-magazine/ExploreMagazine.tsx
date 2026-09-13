@@ -497,10 +497,33 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             ? t('amateur.stream.view.all', 'All')
             : key === 'scores'
               ? t('amateur.stream.view.scores', 'Scores')
-              : t('amateur.stream.view.watch', 'Watch'),
+              : key === 'watch'
+                ? t('amateur.stream.view.watch', 'Watch')
+                : key === 'courses'
+                  ? t('amateur.stream.view.courses', 'Courses')
+                  : t('amateur.stream.view.reviews', 'Reviews'),
       })),
     [t],
   );
+
+  /** §5d THE ONE EMPTY SENTENCE of these two views names the scope the member is
+   *  looking at, so the row above it is the way out. The county and country names
+   *  are DATA; "your club" and "the world" are the only translated ones. */
+  const scopeName =
+    scoreScope === 'club'
+      ? geography.scope.primaryClubName ?? t('amateur.stream.scope.yourClub', 'your club')
+      : scoreScope === 'county'
+        ? geography.scope.county ?? t('amateur.stream.scope.theWorld', 'the world')
+        : scoreScope === 'country'
+          ? geography.scope.country ?? t('amateur.stream.scope.theWorld', 'the world')
+          : t('amateur.stream.scope.theWorld', 'the world');
+  /* A SCOPE WITH NO CARDS BUT SHELVES WITH CONTENT RENDERS THE SHELVES AND NO
+     SENTENCE (§5d). The shelves each report their own emptiness. */
+  const shelvesHaveContent =
+    (listCourses.rows.length > 0) ||
+    (countyCourses.rows.length > 0) ||
+    (topRatedCourses.rows.length > 0) ||
+    ((scoreScope === 'country' || scoreScope === 'world') && worldCourses.rows.length > 0);
 
   let cardPos = 0;
 
