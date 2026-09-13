@@ -276,9 +276,40 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
 
   /* A HOLD, NOT A GUESS, while the read is in flight — the rail's own shape. */
   if (!standing.isFetched) return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
-  /* Unresolved (no function yet, or an unreadable read) and genuinely empty both
-     render nothing. Neither is "of 0". */
-  if (standing.unresolved || standing.rows.length === 0) return null;
+  /* ERRORED IS NOT EMPTY (the fault that hid this shelf). A read that FAILED
+     says so, with the heading still naming the board that was asked for and a
+     retry; only a genuinely empty answer renders nothing, because "no standing"
+     is not a sentence worth a heading. */
+  if (standing.unresolved) {
+    return (
+      <div style={{ fontFamily: SANS, padding: '0 16px' }}>
+        <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK }}>
+          {`${copy.heading} \u00B7 ${copy.boardName(board)}`}
+        </div>
+        <div style={{ marginTop: 6, fontSize: 13, fontWeight: 600, color: A.MUTE }}>
+          {copy.unreadable}
+        </div>
+        <button
+          type="button"
+          onClick={() => standing.retry()}
+          style={{
+            marginTop: 8,
+            border: 0,
+            background: 'transparent',
+            padding: 0,
+            color: A.INK,
+            fontFamily: SANS,
+            fontSize: 13,
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          {copy.retry}
+        </button>
+      </div>
+    );
+  }
+  if (standing.rows.length === 0) return null;
 
   return (
     <>
