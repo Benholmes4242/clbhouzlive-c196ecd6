@@ -347,8 +347,10 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} maxHeight="75dvh">
         <div style={{ fontFamily: SANS, padding: '4px 16px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, paddingBottom: 12 }}>
+            {/* THE SHEET FOLLOWS THE SELECTED BOARD - it reads the same rows,
+                so it names the same board. */}
             <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK }}>
-              {copy.heading}
+              {`${copy.heading} \u00B7 ${copy.boardName(shownBoard)}`}
             </span>
             <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 600, color: A.MUTE }}>
               {standing.total}
