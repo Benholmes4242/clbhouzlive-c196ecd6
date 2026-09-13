@@ -65,13 +65,13 @@ export function admitRetired(
  *             WHETHER a round passed them, never where they now sit.
  *
  * §3b OTHERS ONLY EVER MOVE YOU DOWN. A round by another member can produce
- * record_lost or rank_down and nothing better; the good news comes from the
- * viewer's own rounds, which is exactly why §3c admits them.
+ * record_lost and nothing better; the good news comes from the viewer's own
+ * rounds, which is exactly why §3c admits them.
  *
- * NO CONSEQUENCE, NO INVENTED SENTENCE. Where none of the typed kinds holds,
- * a round falls back to the plain kinds Phase A already shipped —
- * circle_round for another member, played_nochange for the viewer — so the card
- * states what happened and claims nothing about a board. A round with no
+ * NO CONSEQUENCE, NO INVENTED SENTENCE. Where none of the typed kinds holds, a
+ * round by another member falls through to list_first, circle_round or
+ * platform_notable, and otherwise IS NOT A CANDIDATE. The viewer's own round is
+ * always their own news and simply carries no consequence. A round with no
  * resolvable course or score id still does not render at all; that gate is in
  * the stream, not here.
  */

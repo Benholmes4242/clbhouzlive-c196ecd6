@@ -16,8 +16,8 @@ import type { CommunityLibraryItem } from '@/components/explore-tab-new/coursele
  *   - `ring` is only 'own' or null, because geography is Phase C. Nothing on
  *     this page claims a club, a county or a country yet, so the outer-ring
  *     cadence cap has nothing to act on.
- *   - rank consequences (rank_down / rank_up / rank_hold / record_taken with a
- *     gap / played_nochange) need the viewer's standing per course, which is
+ *   - rank consequences (rank_up / rank_hold / record_taken with a
+ *     gap) need the viewer's standing per course, which is
  *     Phase B's get_viewer_standing. They are declared here and never emitted
  *     by Phase A.
  *   - `lane` is always 'news' in Phase A. The backlog lane needs arrived_at
