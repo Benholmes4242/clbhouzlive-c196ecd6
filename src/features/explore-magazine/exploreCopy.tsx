@@ -18,6 +18,19 @@ type T = (key: string, fallback?: string, vars?: Record<string, unknown>) => str
 
 export const MINUS = '\u2212';
 
+/** "June 2025" in the viewer's locale. Null in, null out — a headline that
+ *  cannot date a fact drops the clause rather than guessing a month. */
+export function monthLabel(iso: string | null | undefined, locale: string): string | null {
+  if (!iso) return null;
+  const when = new Date(iso);
+  if (Number.isNaN(when.getTime())) return null;
+  try {
+    return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(when);
+  } catch {
+    return new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' }).format(when);
+  }
+}
+
 /** "-6" is a hyphen; a score under par takes the true minus. */
 export function toParLabel(toPar: number | null | undefined): string | null {
   if (toPar == null || !Number.isFinite(toPar)) return null;

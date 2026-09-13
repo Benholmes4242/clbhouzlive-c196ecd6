@@ -264,7 +264,7 @@ function MomentsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) 
 
 export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const { sentinelRef: chipSentinelRef, stuck: chipsStuck } = useStickySafeAreaState();
-  const { t } = useTranslation('courses');
+  const { t, i18n } = useTranslation('courses');
   const navigate = useNavigate();
   const opener = useScorecardOpener();
   const openReview = useReviewSheetStore((state) => state.open);
