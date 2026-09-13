@@ -264,10 +264,14 @@ export function useExploreStream(
       /* The RPC is newer than src/integrations/supabase/types.ts (regenerated
          from the project, never hand-edited), so the name is cast at this one
          call site rather than the row shape being invented. */
+      /* BOUND, DELIBERATELY. supabase.rpc reads `this.rest`; a cast expression
+         called on its own drops the receiver and throws before any request is
+         sent, which silently pushed this hook onto its client fallback for
+         every member. `.call(supabase, ...)` keeps the receiver. */
       const { data, error } = await (supabase.rpc as unknown as (
         fn: string,
         args: Record<string, unknown>,
-      ) => Promise<{ data: StreamRow[] | null; error: unknown }>)('get_explore_stream', {
+      ) => Promise<{ data: StreamRow[] | null; error: unknown }>).call(supabase, 'get_explore_stream', {
         p_viewer: viewerId as string,
         p_view: view,
         p_scope: scope,
