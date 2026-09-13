@@ -286,9 +286,8 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
   /* A HOLD, NOT A GUESS, while the read is in flight — the rail's own shape. */
   if (!standing.isFetched) return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
   /* ERRORED IS NOT EMPTY (the fault that hid this shelf). A read that FAILED
-     says so, with the heading still naming the board that was asked for and a
-     retry; only a genuinely empty answer renders nothing, because "no standing"
-     is not a sentence worth a heading. */
+     says so, with the plain heading and a retry; only a genuinely empty answer
+     renders nothing, because "no standing" is not a sentence worth a heading. */
   if (standing.unresolved) {
     return (
       <div style={{ fontFamily: SANS, padding: '0 16px' }}>
@@ -392,10 +391,10 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} maxHeight="75dvh">
         <div style={{ fontFamily: SANS, padding: '4px 16px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, paddingBottom: 12 }}>
-          <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK }}>
-            {copy.heading}
-          </span>
-          <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 600, color: A.MUTE }}>
+            <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK }}>
+              {copy.heading}
+            </span>
+            <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 600, color: A.MUTE }}>
               {standing.total}
             </span>
           </div>
