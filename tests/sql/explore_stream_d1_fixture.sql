@@ -178,6 +178,28 @@ create table user_follows (
   follower_actor_type text,
   follower_actor_id uuid);
 
+/* TOP 100 - created here, not in the D3 fixture, because board_pool's ok_courses
+   branch references course_top100_memberships and a SQL function body is
+   validated at CREATE time: the family below will not load without it. */
+create table top100_lists (
+  id uuid primary key,
+  slug text,
+  name text,
+  short_label text,
+  description text,
+  is_active boolean,
+  sort_order int,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now());
+
+create table course_top100_memberships (
+  id uuid primary key default gen_random_uuid(),
+  course_id uuid,
+  list_id uuid,
+  rank int,
+  added_at timestamptz default now(),
+  updated_at timestamptz default now());
+
 -- ---------------------------------------------------------------------------
 -- THE DEPLOYED STANDING FAMILY, verbatim (pg_get_functiondef, 2026-09-13).
 -- Do not simplify these. A local simplification is a second rank logic, which
