@@ -158,7 +158,9 @@ begin
   select count(*) into n
   from walk w
   where w.cons ->> 'of' is not null
-    and (w.cons ->> 'of')::int not in (select field_now from viewer_standing_fixture);
+    and (w.cons ->> 'of')::int not in (
+      select field_now
+      from public.get_viewer_standing('20000000-0000-0000-0000-000000000001'::uuid));
   if n > 0 then raise exception 'D1 FAIL: % field sizes not from get_viewer_standing', n; end if;
   raise notice 'PASS every field size came from get_viewer_standing';
 end $$;

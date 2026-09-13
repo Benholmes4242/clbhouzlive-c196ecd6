@@ -109,7 +109,10 @@ insert into user_surface_last_seen (user_id, surface_key, last_seen_at) values
 -- ---------------------------------------------------------------- page walking
 create table walk3 (view text, scope text, page int, pos int, id text, kind text,
                     ring text, lane text, score numeric, cons jsonb,
-                    relaxed boolean, facts jsonb, subject jsonb);
+                    relaxed boolean, facts jsonb, subject jsonb,
+                    /* AUDIT RULING 3 - the rank assertion needs to know WHOSE
+                       card it is; a rank only belongs to the viewer's own. */
+                    who_id uuid);
 
 create function walk3_run(p_view text, p_scope text, p_viewer uuid,
                           p_club uuid, p_pages int default 3) returns void
@@ -126,7 +129,7 @@ begin
       v_pos := v_pos + 1;
       insert into walk3 values (p_view, p_scope, v_page, v_pos, v_rec.id, v_rec.kind,
         v_rec.ring, v_rec.lane, v_rec.score, v_rec.consequence, v_rec.relaxed,
-        v_rec.facts, v_rec.subject);
+        v_rec.facts, v_rec.subject, (v_rec.who ->> 'user_id')::uuid);
       v_next := v_rec.next_cursor;
     end loop;
     select count(*) into v_rows from walk3
@@ -294,13 +297,38 @@ end $$;
 do $$
 declare n int;
 begin
+  /* FIELD SIZE - every card that names a field names the standing's field. */
   select count(*) into n from walk3 w
   join public.get_viewer_standing('20000000-0000-0000-0000-000000000001'::uuid) s
     on s.course_id = (w.subject ->> 'course_id')::uuid
   where w.cons ->> 'of' is not null
     and (w.cons ->> 'of')::int <> s.field_now;
   if n > 0 then raise exception 'D3 FAIL: % cards disagree with the standing field', n; end if;
-  raise notice 'PASS every field size on a card is the standing field size';
+
+  /* THE RANK ITSELF (AUDIT RULING 3). `of` alone never caught a wrong rank: the
+     field size is a property of the course, the rank is the property of the
+     member, and the rank is the figure the card actually asserts. Where the card
+     is the VIEWER'S own and names a position, that position must equal
+     get_viewer_standing's rank_now for the same course - "3rd of 12" on the card
+     and "3rd of 12" on the shelf, from one function. */
+  select count(*) into n from walk3 w
+  join public.get_viewer_standing('20000000-0000-0000-0000-000000000001'::uuid) s
+    on s.course_id = (w.subject ->> 'course_id')::uuid
+  where (w.who_id = '20000000-0000-0000-0000-000000000001'::uuid)
+    and w.cons ->> 'n' is not null
+    and (w.cons ->> 'n')::int <> s.rank_now;
+  if n > 0 then raise exception 'D3 FAIL: % viewer cards disagree with the standing rank', n; end if;
+
+  /* And no card may claim a rank on a course the standing does not rank the
+     viewer on at all - a figure with no source is worse than no figure. */
+  select count(*) into n from walk3 w
+  where w.who_id = '20000000-0000-0000-0000-000000000001'::uuid
+    and w.cons ->> 'n' is not null
+    and not exists (
+      select 1 from public.get_viewer_standing('20000000-0000-0000-0000-000000000001'::uuid) s
+      where s.course_id = (w.subject ->> 'course_id')::uuid);
+  if n > 0 then raise exception 'D3 FAIL: % cards rank the viewer off the standing', n; end if;
+  raise notice 'PASS card rank and field both come from get_viewer_standing';
 end $$;
 
 -- 10. SCORES KEEPS THE D2 LANE RULES: rounds split correctly, and backlog never
