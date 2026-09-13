@@ -40,7 +40,9 @@ import { PeopleShelf } from './PeopleShelf';
 import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCourseShelves';
 import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
-import { useViewerStanding } from './useViewerStanding';
+import { useViewerStanding, type StandingRow } from './useViewerStanding';
+import { applyRankCardRule } from './rankCards';
+
 import { useViewerCourseBests } from './useViewerCourseBests';
 import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
 
