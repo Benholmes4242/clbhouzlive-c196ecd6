@@ -19,6 +19,7 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreCard, type CardSize } from './ExploreCard';
+import { monthLabel } from './exploreCopy';
 import { ExploreShelf } from './ExploreShelf';
 import { StandingShelf } from './StandingShelf';
 import { LeadShell, PairShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
