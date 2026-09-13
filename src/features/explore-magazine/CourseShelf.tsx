@@ -21,8 +21,10 @@ import type { CourseShelfRow } from './useCourseShelves';
  */
 
 const TILE = { w: 180, h: 118 };
-/** #4ADE80 survives a bright course photograph; the darker band green does not. */
-const GREEN = '#4ADE80';
+/** #4ADE80 survives a bright course photograph; the darker band green does not.
+ *  SOURCED, NOT REDECLARED (BRIEF_EXPLORE_FIGURE_CHIP_CONTRAST §4): the same
+ *  value now has a name, so the figure chip and this shelf cannot drift. */
+const GREEN = PHOTO_FIG_GOOD;
 
 export function CourseShelf({
   heading,
