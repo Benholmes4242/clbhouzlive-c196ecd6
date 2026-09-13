@@ -1630,6 +1630,11 @@
         "factRated": "{{rounds}}라운드 기록, 평가 {{count}}건에 {{rating}}.",
         "factRounds": "이곳에서 {{rounds}}라운드 기록.",
         "factRatedOnly": "평가 {{count}}건에 {{rating}}."
+      },
+      "list": {
+        "eventRecord": "코스 레코드 경신",
+        "eventLow": "최저 스코어 경신 {{gross}}",
+        "eventRating": "새 평가 {{rating}}"
       }
     },
     "shelf": {

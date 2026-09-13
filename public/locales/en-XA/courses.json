@@ -2275,6 +2275,11 @@
         "factRated": "[{{rounds}} röünds tråçkéd, råtéd {{rating}} fröm {{count}}. one two]",
         "factRounds": "[{{rounds}} röünds tråçkéd héré. one]",
         "factRatedOnly": "[Råtéd {{rating}} fröm {{count}}. one]"
+      },
+      "list": {
+        "eventRecord": "[Néw çöürsé réçörd one]",
+        "eventLow": "[Néw löw öf {{gross}} one]",
+        "eventRating": "[Néwly råtéd {{rating}} one]"
       }
     },
     "shelf": {

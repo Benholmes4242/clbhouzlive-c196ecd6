@@ -1691,6 +1691,11 @@
         "factRated": "{{rounds}} Runden erfasst, bewertet mit {{rating}} aus {{count}}.",
         "factRounds": "{{rounds}} Runden hier erfasst.",
         "factRatedOnly": "Bewertet mit {{rating}} aus {{count}}."
+      },
+      "list": {
+        "eventRecord": "Neuer Platzrekord",
+        "eventLow": "Neue Bestmarke: {{gross}}",
+        "eventRating": "Neu bewertet mit {{rating}}"
       }
     },
     "shelf": {
