@@ -211,26 +211,56 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
       gross,
     });
   }
+  /* THE RANK SENTENCE IS ABOUT THE MOVEMENT, not about the round. The kicker
+     already carries the course, so the sentence never names it; the ordinal
+     comes from the shared helper, so it reads "8th" and never a bare "8". */
   if (c?.kind === 'rank_down' && c.n != null && c.of != null && gross != null) {
+    if (c.delta != null && c.delta > 0) {
+      return t(
+        'amateur.stream.headline.rankDownMoved',
+        '{{player}} went round in {{gross}}. You are now {{ord}} of {{of}} here, down {{n}}.',
+        { player, gross, ord, of: c.of, n: c.delta },
+      );
+    }
     return t(
       'amateur.stream.headline.rankDown',
-      '{{player}} went round in {{gross}}, which puts you {{ord}} of the {{of}} who have played here.',
+      '{{player}} went round in {{gross}}. You are now {{ord}} of {{of}} here.',
       { player, gross, ord, of: c.of },
     );
   }
-  if (c?.kind === 'rank_up' && c.n != null && gross != null) {
-    if (c.delta != null && c.delta > 0) {
+  if (c?.kind === 'rank_up' && c.n != null) {
+    /* RANK_UP WITHOUT THE VIEWER'S OWN ROUND names NOBODY: nothing anyone
+       played caused it - a score was corrected or removed. Rare by design. */
+    if (!isOwn) {
+      if (c.of != null && c.delta != null && c.delta > 0) {
+        return t(
+          'amateur.stream.headline.rankUpOthers',
+          'You are now {{ord}} of {{of}} here, up {{n}}.',
+          { ord, of: c.of, n: c.delta },
+        );
+      }
+      if (c.of != null) {
+        return t('amateur.stream.headline.rankUpOthersPlain', 'You are now {{ord}} of {{of}} here.', {
+          ord,
+          of: c.of,
+        });
+      }
+    }
+    if (gross != null && c.delta != null && c.delta > 0) {
       return t(
         'amateur.stream.headline.rankUpBy',
         'Your {{gross}} is the {{ord}} best round played here, up {{n}} places.',
         { gross, ord, n: c.delta },
       );
     }
-    return t('amateur.stream.headline.rankUp', 'Your {{gross}} is the {{ord}} best round played here.', {
-      gross,
-      ord,
-    });
+    if (gross != null) {
+      return t('amateur.stream.headline.rankUp', 'Your {{gross}} is the {{ord}} best round played here.', {
+        gross,
+        ord,
+      });
+    }
   }
+
   if (c?.kind === 'rank_hold' && c.n != null && gross != null) {
     return t(
       'amateur.stream.headline.rankHold',

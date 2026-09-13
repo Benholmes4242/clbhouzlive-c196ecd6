@@ -139,7 +139,7 @@
         "played": "Played.",
         "recordLost": "{{player}} took your course record with a {{gross}}.",
         "recordLostGap": "Took your course record with a {{gross}}. Your best is {{delta}} behind.",
-        "rankDown": "{{player}} went round in {{gross}}, which puts you {{ord}} of the {{of}} who have played here.",
+        "rankDown": "{{player}} went round in {{gross}}. You are now {{ord}} of {{of}} here.",
         "rankDownBy": "Went round in {{gross}} and pushed you down {{delta}} to {{n}} of {{of}}.",
         "rankUp": "Your {{gross}} is the {{ord}} best round played here.",
         "rankUpBy": "Your {{gross}} is the {{ord}} best round played here, up {{n}} places.",
@@ -158,7 +158,10 @@
         "aceHole": "A hole in one on the {{ordHole}}.",
         "albatrossHole": "An albatross on the {{ordHole}}, in a round of {{gross}}.",
         "albatrossRound": "An albatross, in a round of {{gross}}.",
-        "listFirst": "{{player}} went round in {{gross}} — the lowest anyone has played here."
+        "listFirst": "{{player}} went round in {{gross}} — the lowest anyone has played here.",
+        "rankDownMoved": "{{player}} went round in {{gross}}. You are now {{ord}} of {{of}} here, down {{n}}.",
+        "rankUpOthers": "You are now {{ord}} of {{of}} here, up {{n}}.",
+        "rankUpOthersPlain": "You are now {{ord}} of {{of}} here."
       },
       "standing": {
         "board": "Lowest gross",

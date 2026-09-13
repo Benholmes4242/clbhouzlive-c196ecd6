@@ -1614,7 +1614,7 @@
         "played": "プレー。",
         "recordLost": "{{player}}が{{gross}}であなたのコースレコードを更新。",
         "recordLostGap": "{{gross}}であなたのコースレコードを更新。あなたのベストは{{delta}}差。",
-        "rankDown": "{{player}}が{{gross}}でラウンドし、ここでプレーした{{of}}人中{{ord}}番目になりました。",
+        "rankDown": "{{player}}が{{gross}}でラウンド。あなたはここで{{of}}人中{{ord}}番目です。",
         "rankDownBy": "{{gross}}でラウンド。あなたは{{delta}}下がって{{of}}人中{{n}}位。",
         "rankUp": "あなたの{{gross}}は、ここで記録された{{ord}}番目に良いラウンドです。",
         "rankUpBy": "あなたの{{gross}}は、ここで記録された{{ord}}番目に良いラウンドで、{{n}}つ順位が上がりました。",
@@ -1631,7 +1631,10 @@
         "aceHole": "{{ordHole}}番でホールインワン。",
         "albatrossHole": "{{gross}}のラウンド、{{ordHole}}番でアルバトロス。",
         "albatrossRound": "{{gross}}のラウンドでアルバトロス。",
-        "listFirst": "{{player}}が{{gross}}でラウンド。ここでの最少ストロークです。"
+        "listFirst": "{{player}}が{{gross}}でラウンド。ここでの最少ストロークです。",
+        "rankDownMoved": "{{player}}が{{gross}}でラウンド。あなたはここで{{of}}人中{{ord}}番目、{{n}}つ下がりました。",
+        "rankUpOthers": "あなたはここで{{of}}人中{{ord}}番目、{{n}}つ上がりました。",
+        "rankUpOthersPlain": "あなたはここで{{of}}人中{{ord}}番目です。"
       },
       "standing": {
         "board": "ベストグロス",

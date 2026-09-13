@@ -40,7 +40,9 @@ import { PeopleShelf } from './PeopleShelf';
 import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCourseShelves';
 import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
-import { useViewerStanding } from './useViewerStanding';
+import { useViewerStanding, type StandingRow } from './useViewerStanding';
+import { applyRankCardRule } from './rankCards';
+
 import { useViewerCourseBests } from './useViewerCourseBests';
 import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
 
@@ -404,6 +406,20 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [visible, meta.data, meta.isFetched],
   );
 
+  /* ONE RANK CARD PER COURSE PER CHANGE. The gate sits HERE, after enrichment
+     and before blocks, so the SERVER page and the client fallback are rationed
+     by the same rule and neither can slip a standing claim past it. It reads the
+     standing rows this page already holds - no new query. */
+  const standingByCourse = useMemo(() => {
+    const map = new Map<string, StandingRow>();
+    for (const row of scoresStanding.rows) map.set(row.course_id, row);
+    return map;
+  }, [scoresStanding.rows]);
+  const rankGate = useMemo(() => applyRankCardRule(enriched, standingByCourse), [enriched, standingByCourse]);
+  const ranked = rankGate.items;
+
+
+
   /* §3e THE ALL ORDER, in one place. Page 3+ restarts from clips, which the
      modulo in the renderer does; an empty shelf is skipped by the shelf itself
      and the next one takes its slot. */
@@ -439,7 +455,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             ? REVIEWS_SHELVES
             : ALL_SHELVES;
   const singleType = view === 'courses' || view === 'reviews';
-  const blocks = useMemo(() => buildBlocks(enriched, shelves, singleType), [enriched, view, scoreScope, singleType]);
+  const blocks = useMemo(() => buildBlocks(ranked, shelves, singleType), [ranked, view, scoreScope, singleType]);
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
   const loggedRef = useRef(0);
@@ -799,7 +815,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
       {/* COLD START SHOWS THE SHORTEST PLAUSIBLE CARD, never a lead shell: a
           loading state is never larger than the state it resolves into. */}
-      {!source.isFetched && enriched.length === 0 ? (
+      {!source.isFetched && ranked.length === 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP, paddingInline: CARD_INSET }}>
           <StdShell />
           <StdShell />
