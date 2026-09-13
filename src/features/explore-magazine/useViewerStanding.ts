@@ -91,10 +91,21 @@ export function useViewerStanding(
       /* The RPC is newer than src/integrations/supabase/types.ts (that file is
          regenerated from the project and is never hand-edited), so the name is
          cast at this one call site rather than the row shape being invented. */
-      const call = (supabase.rpc as unknown as (
+      /* THE CALL MUST STAY BOUND TO THE CLIENT. supabase.rpc is a prototype
+         method whose body reads `this.rest`; lifting it into a bare local
+         (`const call = supabase.rpc`) drops the receiver and every call throws
+         "Cannot read properties of undefined (reading 'rest')" BEFORE any
+         request is made. That is the fault that emptied this shelf - it was
+         never a PostgREST overload ambiguity, and PGRST203 was never reached
+         because nothing was ever sent. Keep the arrow wrapper. */
+      const call = (
         fn: string,
         args: Record<string, unknown>,
-      ) => Promise<{ data: StandingRow[] | null; error: unknown }>);
+      ): Promise<{ data: StandingRow[] | null; error: unknown }> =>
+        (supabase.rpc as unknown as (
+          f: string,
+          a: Record<string, unknown>,
+        ) => Promise<{ data: StandingRow[] | null; error: unknown }>).call(supabase, fn, args);
 
       if (board === 'topar') {
         const { data, error } = await call('get_viewer_standing', { p_viewer: viewerId as string });
