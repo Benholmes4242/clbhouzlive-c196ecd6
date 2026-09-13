@@ -87,7 +87,10 @@ function PersonTile({ golfer, pos }: { golfer: ClubGolfer; pos: number }) {
     event.stopPropagation();
     analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'people', pos });
     rememberAmateurScroll();
-    navigate(golfer.username ? `/u/${golfer.username}` : `/profile/${golfer.userId}`);
+    /* THE PROFILE ROUTE, the same username-or-id form the search surfaces use.
+       NOT the scorecard opener the round cards use: that resolver deliberately
+       sends a tap to compare/nudge, and the brief asks for the profile. */
+    navigate(`/profile/${golfer.username ?? golfer.userId}`);
   };
 
   const onFollow = (event: React.MouseEvent) => {
