@@ -440,8 +440,19 @@ BEGIN
     EXIT WHEN v_taken >= v_limit;
   END LOOP;
 
-  -- NOTHING IS DROPPED. Whatever cadence could not place travels in the
-  -- cursor and leads the next page, in order.
+  -- THE CAP RELAXES BEFORE THE PAGE GOES SHORT - client parity: capOuterRing
+  -- appends what it could not place rather than shortening the page. A pool
+  -- that is almost entirely outer-ring (a member with no club and no standing)
+  -- would otherwise starve at one card in four forever. What still does not fit
+  -- travels in the cursor and leads the next page, in order. Nothing is dropped.
+  WHILE v_taken < v_limit AND jsonb_array_length(v_deferred) > 0 LOOP
+    v_out := v_out || jsonb_build_array(v_deferred -> 0);
+    v_prev_key := coalesce(v_deferred -> 0 ->> 'kind','none') || ':' || coalesce(v_deferred -> 0 ->> 'ring_k','none');
+    v_since_outer := CASE WHEN (v_deferred -> 0 ->> 'ring_k') IN ('county','country','world') THEN 0
+                          ELSE least(v_since_outer + 1, 1000000) END;
+    v_deferred := v_deferred - 0;
+    v_taken := v_taken + 1;
+  END LOOP;
 
 
   RETURN QUERY
