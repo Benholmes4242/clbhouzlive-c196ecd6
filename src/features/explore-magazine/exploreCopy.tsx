@@ -112,7 +112,10 @@ const EN_NUMBER_WORDS = [
 ];
 
 export function spokenNumber(value: number, locale: string): string {
-  if (locale.toLowerCase() !== 'en') return String(value);
+  /* BASE LANGUAGE, NOT THE FULL TAG — the same fault the ordinal helper carried:
+     "en-GB" is English and must speak the figure. en-XA is not English. */
+  const tag = locale.toLowerCase();
+  if (tag.split('-')[0] !== 'en' || tag.startsWith('en-xa')) return String(value);
   return EN_NUMBER_WORDS[value] ?? String(value);
 }
 

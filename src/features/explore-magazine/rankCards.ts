@@ -33,9 +33,11 @@ import type { StandingRow } from './useViewerStanding';
  *     on this page (a deletion, a correction, a backfill) renders no rank card
  *     rather than an invented one.
  *
- * THE VIEWER'S OWN ROUNDS ARE UNTOUCHED. rank_up and rank_hold on a round the
- * viewer posted are about their own play and already fire once per round, so
- * they pass through this gate unchanged.
+ * THE VIEWER'S OWN ROUNDS ARE UNTOUCHED. rank_up on a round the viewer posted is
+ * about their own play and already fires once per round, so it passes through
+ * this gate unchanged. rank_hold is RETIRED at the consequence engine (A STANDING
+ * CLAIM REQUIRES A CHANGE) and is no longer emitted; the kind name stays here so
+ * any legacy persisted payload is still stripped rather than trusted.
  *
  * STRIPPING A CLAIM IS NOT HIDING A CARD. A card that loses its rank
  * consequence keeps its place, its photo and its figures and falls through to
