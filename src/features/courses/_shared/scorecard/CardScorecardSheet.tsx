@@ -241,10 +241,12 @@ function toParColor(n: number | null): string {
 /*
  * §D1 — THE ROW LABEL COLUMN DROPS FROM 54px TO 26px. 54 was sized for the
  * TOTAL / PAR 72 rows of the grand-totals block, which §B removed; the labels
- * that remain are HOLE, PAR, YOU and FIELD at 9.5px tracked caps, the widest of
- * which measures under 26. The 28px it gives back goes to the nine score
- * columns, which is where a 390pt card is tightest. The right-hand total column
- * stays at 32px — it carries two-digit strokes and is unchanged.
+ * that remain are HOLE, PAR, YOU and FIELD. SCORE is wider than this column at
+ * the rendered 10px tracked-caps role, so the row stub below contains and
+ * truncates labels rather than allowing text to paint over hole one. The 28px
+ * this column gives back goes to the nine score columns, which is where a 390pt
+ * card is tightest. The right-hand total column stays at 32px — it carries
+ * two-digit strokes and is unchanged.
  */
 const NINE_GRID = '26px repeat(9, minmax(0, 1fr)) 32px';
 
@@ -273,7 +275,18 @@ const CardRow: React.FC<{
   tone?: string;
 }> = ({ label, cells, total, muted, tone }) => (
   <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-    <span style={{ ...LABEL_AXIS }}>{label}</span>
+    <span
+      style={{
+        ...LABEL_AXIS,
+        minWidth: 0,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}
+      title={label}
+    >
+      {label}
+    </span>
     {cells.map((c, i) => (
       <span key={i} style={{ textAlign: 'center', minWidth: 0 }}>
         {typeof c === 'object' ? c : (
