@@ -229,6 +229,30 @@ export const EVENT_LABELS: Record<string, string> = {
   amateur_standing_see_all_opened: 'Explore standing see-all opened',
   /* Phase C §4 — the club people shelf. */
   amateur_follow_tapped: 'Explore follow tapped',
+  /* AUDIT RULING 2 — a view served by the client fallback is a reportable
+     state, not a silent success. Paired with the `app_error` report. */
+  amateur_stream_fallback_served: 'Explore stream served from fallback',
+  /* AUDIT RULING 4 — the rest of the surface, including the board and hero
+     paths that are dead-listed for Phase E: an event that is still firing must
+     still read properly in admin analytics. */
+  amateur_page_viewed: 'Explore page viewed',
+  amateur_filter_opened: 'Explore filter opened',
+  amateur_filter_changed: 'Explore filter changed',
+  amateur_filter_reset: 'Explore filter reset',
+  amateur_board_changed: 'Explore board changed',
+  amateur_board_see_all_opened: 'Explore board see-all opened',
+  amateur_board_widened_to_everyone: 'Explore board widened to everyone',
+  amateur_see_everyone_tapped: 'Explore see-everyone tapped',
+  amateur_course_board_changed: 'Explore course board changed',
+  amateur_course_row_tapped: 'Explore course row tapped',
+  amateur_courses_see_all_opened: 'Explore courses see-all opened',
+  amateur_hero_card_viewed: 'Explore hero card viewed',
+  amateur_hero_card_tapped: 'Explore hero card tapped',
+  amateur_hero_subject_tapped: 'Explore hero card subject tapped',
+  amateur_media_tile_tapped: 'Explore media tile tapped',
+  amateur_media_see_all_opened: 'Explore media see-all opened',
+  amateur_news_story_opened: 'Explore news story opened',
+  amateur_news_see_all_opened: 'Explore news see-all opened',
 
 };
 

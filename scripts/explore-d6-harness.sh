@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Phase D3 harness: the remaining views. Local throwaway cluster; nothing live.
+# Phase D6 harness: the arrival-keyed lane on the live body. Local throwaway cluster; nothing live.
 set -euo pipefail
-DIR=${EXD5_DIR:-/tmp/exd5pg}   # throwaway cluster dir; must NOT hold the repo
-export PGDATA=$DIR/pg PGHOST=$DIR/sock PGPORT=55434 PGUSER=postgres PGDATABASE=postgres
+DIR=${EXD6_DIR:-/tmp/exd6pg}   # throwaway cluster dir; must NOT hold the repo
+export PGDATA=$DIR/pg PGHOST=$DIR/sock PGPORT=55436 PGUSER=postgres PGDATABASE=postgres
 unset PGPASSWORD PGSSLMODE || true
 rm -rf "$DIR"; mkdir -p "$PGDATA" "$PGHOST"
 initdb -U postgres -A trust >/dev/null
@@ -21,4 +21,6 @@ psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d1.sql   # config table + 
 psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d2.sql   # D2 body (deployed)
 psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d3.sql   # D3 body
 psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d5_fix.sql # D5 hotfix replaces the body
+psql -v ON_ERROR_STOP=1 -q -f docs/sql/explore_stream_d6_arrival_lane.sql # D6 re-keys the lane
 psql -v ON_ERROR_STOP=1 -f tests/sql/explore_stream_d3_assert.sql
+psql -v ON_ERROR_STOP=1 -f tests/sql/explore_stream_d6_assert.sql

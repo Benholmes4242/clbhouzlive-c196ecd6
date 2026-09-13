@@ -1,4 +1,11 @@
 -- ============================================================================
+--
+-- SCHEMA CORRECTION (audit ruling 3, 2026-09-13): the two `g.id` references in
+-- this archived stage draft were `gam_round_stats.id`, a column production does
+-- not have - the drift the invented fixture column hid until D5. They now read
+-- `g.whs_score_id`, identically to the live body (docs/sql/explore_stream_d5_fix.sql),
+-- so this stage harness runs against the real schema. Behaviour is unchanged:
+-- whs_score_id was always the row's key.
 -- BRIEF_EXPLORE_MAGAZINE - PHASE D1 DRAFT. BEN RUNS THIS. NOT A MIGRATION.
 -- ============================================================================
 -- Ranked, cadenced, keyset-paginated ALL view for /amateur.
@@ -213,7 +220,7 @@ BEGIN
     -- ROUNDS -----------------------------------------------------------------
     rounds AS (
       SELECT
-        'round:' || g.id::text                        AS cid,
+        'round:' || g.whs_score_id::text                        AS cid,
         'round'::text                                 AS kind,
         g.created_at                                  AS arrived_at,
         g.play_date::text                             AS play_date,

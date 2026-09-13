@@ -31,7 +31,7 @@ from generate_series(1, 6) i;
 insert into user_profiles (id, display_name, primary_club_id)
 values ('20000000-0000-0000-0000-000000000009','Clubless', null);
 
-insert into follows values
+insert into follows (follower_actor_id, follower_actor_type, following_actor_id, following_actor_type) values
   ('20000000-0000-0000-0000-000000000001','personal','20000000-0000-0000-0000-000000000002','personal'),
   ('20000000-0000-0000-0000-000000000001','personal','20000000-0000-0000-0000-000000000003','personal');
 
@@ -56,7 +56,22 @@ select ('20000000-0000-0000-0000-00000000000' || (1 + (i % 6)))::uuid,
        70 + (i % 18), 72, 28 + (i % 16), i % 5, 0, 0, 0, (i % 13) = 0, 14.1
 from generate_series(1, 120) i;
 
-insert into gam_round_net select whs_score_id, gross_score - 12 from gam_round_stats;
+-- ARRIVAL-OLD ROUNDS (D6). Played and synced together, months ago: the ARRIVAL
+-- rule calls these backlog, the older gap rule calls them news. Both lane rules
+-- therefore have something to be judged on, and assertion 10 below reads which
+-- rule the loaded body implements rather than assuming one.
+insert into gam_round_stats
+  (user_id, course_id, whs_score_id, play_date, created_at, gross_score, course_par,
+   stableford_points, birdies, eagles, albatrosses, holes_in_one, clean_card, hcp_at_time)
+select ('20000000-0000-0000-0000-00000000000' || (1 + (i % 6)))::uuid,
+       ('00000000-0000-0000-0000-00000000000' || (1 + (i % 4)))::uuid,
+       gen_random_uuid(), (now() - ((120 + (i % 30)) || ' days')::interval)::date,
+       now() - ((120 + (i % 30)) || ' days')::interval,
+       71 + (i % 15), 72, 29 + (i % 14), i % 4, 0, 0, 0, false, 13.7
+from generate_series(1, 40) i;
+
+insert into gam_round_net (whs_score_id, user_id, course_id, play_date, gross_score, course_handicap, net_score)
+  select whs_score_id, user_id, course_id, play_date, gross_score, 12, gross_score - 12 from gam_round_stats;
 
 -- PROSE REVIEWS, plus SCORE-ONLY ratings that must never become candidates.
 insert into course_ratings (user_id, course_id, rating, review, created_at)
@@ -84,28 +99,34 @@ insert into amateur_stories (slug, kicker, headline, image_url, published_at)
 select 'story-' || i, 'THE WIRE', 'Headline ' || i, 'simg' || i, now() - (i || ' hours')::interval
 from generate_series(1, 8) i;
 
-insert into top100_lists values
+insert into top100_lists (id, slug) values
   ('30000000-0000-0000-0000-000000000001','top-100-worldwide'),
   ('30000000-0000-0000-0000-000000000002','top-100-gbi');
-insert into course_top100_memberships values
+insert into course_top100_memberships (course_id, list_id, rank) values
   ('00000000-0000-0000-0000-000000000001','30000000-0000-0000-0000-000000000001', 14),
   ('00000000-0000-0000-0000-000000000001','30000000-0000-0000-0000-000000000002',  3),
   ('00000000-0000-0000-0000-000000000003','30000000-0000-0000-0000-000000000002',  8);
 
-insert into course_shortlists values
+insert into course_shortlists (user_id, course_id) values
   ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000005');
-insert into user_surface_last_seen values
+insert into user_surface_last_seen (user_id, surface_key, last_seen_at) values
   ('20000000-0000-0000-0000-000000000001','discover', now() - interval '20 hours');
 
-insert into viewer_standing_fixture values
-  ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000001', 2, 6, 4, 2),
-  ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002', 1, 5, 1, 0),
-  ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000003', 4, 6, null, null);
+/* NO FABRICATED STANDING (AUDIT RULING 3). The rows that used to sit here
+   invented the viewer's rank and field, so the card-versus-shelf assertion
+   below was comparing the RPC against this file rather than against the rank
+   logic. tests/sql/explore_stream_d1_fixture.sql now installs the DEPLOYED
+   get_viewer_standing and its board_pool family, which derive both figures from
+   the same rounds the RPC reads. viewer_standing_fixture is retained, unused, by
+   the harness scripts so an older checkout still loads. */
 
 -- ---------------------------------------------------------------- page walking
 create table walk3 (view text, scope text, page int, pos int, id text, kind text,
                     ring text, lane text, score numeric, cons jsonb,
-                    relaxed boolean, facts jsonb, subject jsonb);
+                    relaxed boolean, facts jsonb, subject jsonb,
+                    /* AUDIT RULING 3 - the rank assertion needs to know WHOSE
+                       card it is; a rank only belongs to the viewer's own. */
+                    who_id uuid);
 
 create function walk3_run(p_view text, p_scope text, p_viewer uuid,
                           p_club uuid, p_pages int default 3) returns void
@@ -122,7 +143,7 @@ begin
       v_pos := v_pos + 1;
       insert into walk3 values (p_view, p_scope, v_page, v_pos, v_rec.id, v_rec.kind,
         v_rec.ring, v_rec.lane, v_rec.score, v_rec.consequence, v_rec.relaxed,
-        v_rec.facts, v_rec.subject);
+        v_rec.facts, v_rec.subject, (v_rec.who ->> 'user_id')::uuid);
       v_next := v_rec.next_cursor;
     end loop;
     select count(*) into v_rows from walk3
@@ -290,13 +311,38 @@ end $$;
 do $$
 declare n int;
 begin
+  /* FIELD SIZE - every card that names a field names the standing's field. */
   select count(*) into n from walk3 w
   join public.get_viewer_standing('20000000-0000-0000-0000-000000000001'::uuid) s
     on s.course_id = (w.subject ->> 'course_id')::uuid
   where w.cons ->> 'of' is not null
     and (w.cons ->> 'of')::int <> s.field_now;
   if n > 0 then raise exception 'D3 FAIL: % cards disagree with the standing field', n; end if;
-  raise notice 'PASS every field size on a card is the standing field size';
+
+  /* THE RANK ITSELF (AUDIT RULING 3). `of` alone never caught a wrong rank: the
+     field size is a property of the course, the rank is the property of the
+     member, and the rank is the figure the card actually asserts. Where the card
+     is the VIEWER'S own and names a position, that position must equal
+     get_viewer_standing's rank_now for the same course - "3rd of 12" on the card
+     and "3rd of 12" on the shelf, from one function. */
+  select count(*) into n from walk3 w
+  join public.get_viewer_standing('20000000-0000-0000-0000-000000000001'::uuid) s
+    on s.course_id = (w.subject ->> 'course_id')::uuid
+  where (w.who_id = '20000000-0000-0000-0000-000000000001'::uuid)
+    and w.cons ->> 'n' is not null
+    and (w.cons ->> 'n')::int <> s.rank_now;
+  if n > 0 then raise exception 'D3 FAIL: % viewer cards disagree with the standing rank', n; end if;
+
+  /* And no card may claim a rank on a course the standing does not rank the
+     viewer on at all - a figure with no source is worse than no figure. */
+  select count(*) into n from walk3 w
+  where w.who_id = '20000000-0000-0000-0000-000000000001'::uuid
+    and w.cons ->> 'n' is not null
+    and not exists (
+      select 1 from public.get_viewer_standing('20000000-0000-0000-0000-000000000001'::uuid) s
+      where s.course_id = (w.subject ->> 'course_id')::uuid);
+  if n > 0 then raise exception 'D3 FAIL: % cards rank the viewer off the standing', n; end if;
+  raise notice 'PASS card rank and field both come from get_viewer_standing';
 end $$;
 
 -- 10. SCORES KEEPS THE D2 LANE RULES: rounds split correctly, and backlog never
@@ -304,11 +350,34 @@ end $$;
 do $$
 declare n int;
 begin
-  select count(*) into n from walk3 w join gam_round_stats g
-    on ('round:' || g.whs_score_id::text) = w.id
-  where w.view = 'scores'
-    and (w.lane = 'backlog') <> ((g.created_at::date - g.play_date) > 30);
-  if n > 0 then raise exception 'D3 FAIL: % Scores rounds in the wrong lane', n; end if;
+  /* WHICH LANE RULE IS LOADED? The arrival-recency body (D6) seeds
+     explore_config.news_days; the earlier gap-based bodies do not. The
+     assertion reads the rule rather than assuming it, so this one file verifies
+     whichever body the harness loaded - and a body that implements NEITHER rule
+     still fails. */
+  if exists (select 1 from public.explore_config where key = 'news_days') then
+    select count(*) into n from walk3 w join gam_round_stats g
+      on ('round:' || g.whs_score_id::text) = w.id
+    where w.view = 'scores'
+      and (w.lane = 'backlog') <> (g.created_at <
+            now() - ((select max(value) from public.explore_config
+                      where key = 'news_days') || ' days')::interval);
+    if n > 0 then raise exception 'D3 FAIL: % Scores rounds in the wrong ARRIVAL lane', n; end if;
+    /* And play date must have no say: an old round that arrived inside the
+       window is news. That is the whole point of the re-key. */
+    if not exists (
+      select 1 from walk3 w join gam_round_stats g
+        on ('round:' || g.whs_score_id::text) = w.id
+      where w.lane = 'news' and g.play_date < current_date - 200) then
+      raise notice 'NOTE no old-played, newly-arrived round was reached in this walk';
+    end if;
+  else
+    select count(*) into n from walk3 w join gam_round_stats g
+      on ('round:' || g.whs_score_id::text) = w.id
+    where w.view = 'scores'
+      and (w.lane = 'backlog') <> ((g.created_at::date - g.play_date) > 30);
+    if n > 0 then raise exception 'D3 FAIL: % Scores rounds in the wrong GAP lane', n; end if;
+  end if;
   select count(*) into n from walk3 w
   where w.view = 'scores' and w.pos = 1 and w.lane = 'backlog'
     and exists (select 1 from walk3 x where x.view = w.view and x.scope = w.scope

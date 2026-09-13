@@ -1,4 +1,9 @@
--- Extra local shapes the D3 branches read. Additive to
--- tests/sql/explore_stream_d1_fixture.sql; NOT production SQL.
-create table top100_lists (id uuid primary key, slug text);
-create table course_top100_memberships (course_id uuid, list_id uuid, rank int);
+-- The D3 shapes now live in tests/sql/explore_stream_d1_fixture.sql.
+--
+-- top100_lists and course_top100_memberships moved there because board_pool -
+-- part of the DEPLOYED standing family the D1 fixture installs (audit ruling 3)
+-- - references course_top100_memberships, and PostgreSQL validates a SQL
+-- function body at CREATE time. Loading the tables afterwards was too late.
+--
+-- This file is retained, and still loaded by every harness script, so an older
+-- checkout and any external caller keep working. Nothing to do here.

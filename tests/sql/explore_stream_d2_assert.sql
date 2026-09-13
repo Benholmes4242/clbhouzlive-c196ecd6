@@ -19,7 +19,7 @@ select ('20000000-0000-0000-0000-00000000000' || i)::uuid, 'Member ' || i,
        '10000000-0000-0000-0000-000000000001'::uuid
 from generate_series(1, 6) i;
 
-insert into follows values
+insert into follows (follower_actor_id, follower_actor_type, following_actor_id, following_actor_type) values
   ('20000000-0000-0000-0000-000000000001','personal','20000000-0000-0000-0000-000000000002','personal'),
   ('20000000-0000-0000-0000-000000000001','personal','20000000-0000-0000-0000-000000000003','personal');
 
@@ -53,14 +53,16 @@ from generate_series(1, 200) i;
 -- AN ACE, PLAYED THREE DAYS AGO AND SYNCED TODAY. Arrival is not late, so it is
 -- NEWS and must not be pushed into the backlog by its notability.
 insert into gam_round_stats
-  (id, user_id, course_id, whs_score_id, play_date, created_at, gross_score, course_par,
+  (user_id, course_id, whs_score_id, play_date, created_at, gross_score, course_par,
    stableford_points, birdies, eagles, albatrosses, holes_in_one, clean_card, hcp_at_time)
-values ('99999999-9999-9999-9999-999999999999',
-        '20000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000001',
-        gen_random_uuid(), current_date - 3, now() - interval '1 hour',
+values ('20000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000001',
+        /* The card id is 'round:' || whs_score_id, so the ace round's KEY is
+           what the assertions below look it up by (audit ruling 3). */
+        '99999999-9999-9999-9999-999999999999', current_date - 3, now() - interval '1 hour',
         69, 72, 41, 4, 0, 0, 1, false, 8.2);
 
-insert into gam_round_net select whs_score_id, gross_score - 12 from gam_round_stats;
+insert into gam_round_net (whs_score_id, user_id, course_id, play_date, gross_score, course_handicap, net_score)
+  select whs_score_id, user_id, course_id, play_date, gross_score, 12, gross_score - 12 from gam_round_stats;
 
 insert into course_ratings (user_id, course_id, rating, review, created_at)
 select ('20000000-0000-0000-0000-00000000000' || (2 + (i % 5)))::uuid,
@@ -73,19 +75,22 @@ insert into amateur_stories (slug, kicker, headline, image_url, published_at)
 select 'story-' || i, 'THE WIRE', 'Headline ' || i, 'simg' || i, now() - (i || ' hours')::interval
 from generate_series(1, 8) i;
 
-insert into course_shortlists values
+insert into course_shortlists (user_id, course_id) values
   ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000005');
-insert into user_surface_last_seen values
+insert into user_surface_last_seen (user_id, surface_key, last_seen_at) values
   ('20000000-0000-0000-0000-000000000001','discover', now() - interval '20 hours');
 
-insert into viewer_standing_fixture values
-  ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000001', 2, 6, 4, 2),
-  ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002', 1, 5, 1, 0),
-  ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000003', 4, 6, null, null);
+/* NO FABRICATED STANDING (AUDIT RULING 3). The rows that used to sit here
+   invented the viewer's rank and field, so the card-versus-shelf assertion
+   below was comparing the RPC against this file rather than against the rank
+   logic. tests/sql/explore_stream_d1_fixture.sql now installs the DEPLOYED
+   get_viewer_standing and its board_pool family, which derive both figures from
+   the same rounds the RPC reads. viewer_standing_fixture is retained, unused, by
+   the harness scripts so an older checkout still loads. */
 
 -- ------------------------------------------------------- lane truth, read once
 create table lane_truth as
-select 'round:' || id::text cid,
+select 'round:' || whs_score_id::text cid,
        (created_at::date - play_date) > 30 as should_backlog
 from gam_round_stats;
 
@@ -225,7 +230,9 @@ declare n int;
 begin
   select count(*) into n from walk w
   where w.cons ->> 'of' is not null
-    and (w.cons ->> 'of')::int not in (select field_now from viewer_standing_fixture);
+    and (w.cons ->> 'of')::int not in (
+      select field_now
+      from public.get_viewer_standing('20000000-0000-0000-0000-000000000001'::uuid));
   if n > 0 then raise exception 'D2 FAIL: % field sizes not from get_viewer_standing', n; end if;
   raise notice 'PASS every field size came from get_viewer_standing';
 end $$;
@@ -234,7 +241,7 @@ end $$;
 -- News is cut to a handful of cards. From the page where news runs short the
 -- backlog must start appearing and must still be arriving on page 6.
 delete from gam_round_stats where (created_at::date - play_date) <= 30
-  and id <> '99999999-9999-9999-9999-999999999999'
+  and whs_score_id <> '99999999-9999-9999-9999-999999999999'
   and ctid not in (select ctid from gam_round_stats
                    where (created_at::date - play_date) <= 30 limit 12);
 delete from course_ratings where ctid not in (select ctid from course_ratings limit 3);

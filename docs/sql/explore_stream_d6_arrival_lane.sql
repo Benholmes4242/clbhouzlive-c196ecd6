@@ -1,72 +1,52 @@
--- ============================================================================
+-- =====================================================================
+-- ARRIVAL RECENCY (D6) - get_explore_stream: the LANE is re-keyed
 --
--- SCHEMA CORRECTION (audit ruling 3, 2026-09-13): the two `g.id` references in
--- this archived stage draft were `gam_round_stats.id`, a column production does
--- not have - the drift the invented fixture column hid until D5. They now read
--- `g.whs_score_id`, identically to the live body (docs/sql/explore_stream_d5_fix.sql),
--- so this stage harness runs against the real schema. Behaviour is unchanged:
--- whs_score_id was always the row's key.
--- BRIEF_EXPLORE_MAGAZINE - PHASE D3 DRAFT. BEN RUNS THIS. NOT A MIGRATION.
--- ============================================================================
--- THE REMAINING VIEWS. Built on the DEPLOYED get_explore_stream: its body was
--- dumped with pg_get_functiondef before this file was written and proved
--- BYTE-IDENTICAL to docs/sql/explore_stream_d2.sql (prosrc md5
--- e949b1b72c8aabbfbb881dbbbf567af1, 25209 chars), so this file is that live body
--- with the changes below and nothing else. The D1 file is not authoritative.
+-- BASE: docs/sql/explore_stream_d5_fix.sql, i.e. the DEPLOYED body
+-- (prosrc md5 5fcbc259414bcf017b6800a66f1102fb, 32332 bytes). This file is that
+-- body with ONE changed predicate and ONE new config key. Nothing else.
 --
--- WHAT CHANGES, AND ONLY THIS:
---   1. p_view accepts 'all', 'scores', 'courses' and 'reviews'. The candidate
---      pool is the view's own: scores = rounds, reviews = prose reviews,
---      courses = a new course-card CTE, all = rounds + reviews + stories exactly
---      as D1/D2 shipped. WATCH IS NOT IN THE RPC - see THE WATCH DECISION.
---   2. p_scope filters candidates by the SUBJECT COURSE's geography: club_id =
---      p_club_id, region = p_county, sub_country = p_country, world unfiltered.
---      The All view is NOT scope-filtered - that is D1 behaviour, preserved.
---   3. The cadence key becomes per-view (cad_k). Phases B2 and C shipped and Ben
---      approved a SINGLE-TYPE cadence: scores and reviews alternate on the
---      CONSEQUENCE kind, courses on the EVENT kind (ratings burst / recent low /
---      stable fact), All still alternates on kind:ring, unchanged.
---   4. The outer-ring cap stays an ALL-VIEW rule. In a scoped single-type view
---      nearly every card shares one ring, so applying it would defer the whole
---      page into the relaxation tail and change an order Ben already accepted.
---      Geography in those views is bounded by p_scope instead.
---   5. Ranking per view reproduces what shipped. All and Scores keep the D1/D2
---      formula VERBATIM (so the backlog lane keeps working on Scores). Reviews
---      rank consequence, then rating, then freshness. Courses rank event
---      strength, then rating, then tracked rounds - the same arithmetic as
---      src/features/explore-magazine/useCoursesView.ts.
+-- THE FAULT, WHICH IS IN THE BRIEF AND NOT IN THE BUILD. D2 keyed the lane on
+-- the GAP between arrival and play: `arrived_at::date - play_date > 30`. That
+-- reads "a round entered long after it was played is a backfill", which sounds
+-- right and measures wrong. Counted against the live base it puts 3,349 of
+-- 3,554 rounds (94%) in the backlog and leaves 205 in news; for Simon Savage it
+-- is 237 backlog against 8 news. The reason is history: the England Golf sync
+-- arrives with a member's WHOLE record at once, so a round played in 2019 and
+-- imported this year has a five-year gap and is called a backfill forever - even
+-- on the day it lands, which is the one day it IS news.
 --
--- GEOGRAPHY IS PASSED, NEVER RE-RESOLVED. p_club_id / p_county / p_country come
--- from the shared client resolver (useViewerScoreScope). This function does not
--- read primary_club_id, does not read home_club free text, and does not infer a
--- county from a member's rounds. A viewer with no club asking for 'club' gets
--- nothing, by construction.
+-- THE RULE NOW. news = the row ARRIVED recently; backlog = it arrived a while
+-- ago. Play date drives the kicker on the card and NOTHING about the lane. A
+-- five-year-old round that landed this morning is news this morning and slides
+-- into the backlog when it stops being new, which is what the lanes are for.
 --
--- STANDING IS CALLED, NEVER RE-DERIVED. public.get_viewer_standing supplies
--- rank_now / field_now in every view, so a card's n / of equals the "Where you
--- stand" shelf on the same page. There is no rank() and no
--- count(distinct user_id) in this file. Ties are still REJECTED, not resolved
--- (holders ... HAVING count(*) = 1).
+-- N = 30 DAYS, and the honest caveat. Base-wide, with news = arrived within N:
+--     N=7      90 news / 3,426 backlog   (Simon 0 / 243)
+--     N=14    117 news / 3,399 backlog   (Simon 0 / 243)
+--     N=30    708 news / 2,808 backlog   (Simon 2 / 241)
+--     N=60  3,516 news /     0 backlog   (Simon 243 / 0)
+--     N=90  3,516 news /     0 backlog   (Simon 243 / 0)
+-- Arrival is CLUSTERED, not spread: 2,540 rounds landed in the week of
+-- 2026-07-20, then 436, 374, 20, 2, 27, 113 and 4 in the weeks after. So NO N
+-- gives a sensible mix TODAY - anything up to 30 days makes the import an
+-- archive, and 60 or more makes the entire base news. N=30 is the right
+-- STEADY-STATE choice, and the lanes only become meaningful once ordinary sync
+-- traffic outweighs the one-off import. That is a data reality, not something a
+-- threshold can fix, and a number chosen to flatter the page would be worse.
 --
--- THE PROSE QUALIFICATION SURVIVES: btrim(review) <> '' means a score-only
--- rating is never a candidate, in the Reviews view or in All.
+-- The value is CONFIGURABLE (`news_days`), seeded at 30 and never overwritten,
+-- so retuning it is a row and not a deploy.
 --
--- THE COURSE CANDIDATE RULE: a course with NEITHER tracked rounds NOR a rating
--- has no honest sentence and is not selected at all.
---
--- CARRIED FROM D2, ACCEPTED BY BEN, DO NOT "FIX": when a viewer's news lane is
--- exhausted past the cursor an all-backlog page may open, because a page that
--- places nothing ends the stream and would strand a backfilled member's
--- history. While ANY news remains, backlog never leads. Also carried: a story
--- never leads a page, tested on POSITION alone (D1 tested v_prev_key IS NULL,
--- so a story could lead page 2 onward once the cadence tail travelled).
---
--- THE WATCH DECISION, REPORTED NOT HIDDEN: WATCH STAYS CLIENT-COMPOSED. Its
--- sources are clips and long-form video, which are not in this pool and whose
--- depth is bounded by the media hooks that already ship. Watch therefore keeps
--- its current finite depth - a stated limit, not a defect. Bringing
--- Cloudflare-backed media into the ranker is a separate phase.
--- ============================================================================
+-- PRESERVED, UNCHANGED: zero freshness weight in the backlog lane, backlog never
+-- leads a page that placed news, the one-in-`backlog_ratio` admission, the
+-- accepted all-backlog-page departure, the keyset cursor, tie rejection, the
+-- story rule, the standing figures, and Watch staying client-composed.
+-- =====================================================================
+
+-- The lane threshold, in days of ARRIVAL age. Seeded, never overwritten.
+INSERT INTO public.explore_config (key, value) VALUES
+  ('news_days', 30)
+ON CONFLICT (key) DO NOTHING;
 
 -- One new weight. Seeded, never overwritten.
 INSERT INTO public.explore_config (key, value) VALUES
@@ -105,7 +85,7 @@ AS $function$
 DECLARE
   c_w_cons   numeric; c_w_ring numeric; c_w_fresh numeric; c_w_not numeric;
   c_half     numeric; c_story  numeric; c_seen    numeric;
-  c_gap      integer; v_limit  integer; c_back    integer;
+  c_gap      integer; v_limit  integer; c_back    integer; c_news integer;
   v_view     text;    v_scope  text;    -- normalised view / scope (D3)
   v_cur_s    numeric; v_cur_i text;
   v_prev_key text;    v_since_outer integer;
@@ -135,9 +115,10 @@ BEGIN
     coalesce(max(value) FILTER (WHERE key = 'seen_damp'),    0.5),
     coalesce(max(value) FILTER (WHERE key = 'outer_ring_gap'), 3)::int,
     coalesce(p_limit, max(value) FILTER (WHERE key = 'page_size'), 12)::int,
-    greatest(coalesce(max(value) FILTER (WHERE key = 'backlog_ratio'), 3)::int, 1)
+    greatest(coalesce(max(value) FILTER (WHERE key = 'backlog_ratio'), 3)::int, 1),
+    greatest(coalesce(max(value) FILTER (WHERE key = 'news_days'), 30)::int, 1)
   INTO c_w_cons, c_w_ring, c_w_fresh, c_w_not, c_half, c_story, c_seen, c_gap,
-       v_limit, c_back
+       v_limit, c_back, c_news
   FROM public.explore_config;
 
   v_view  := lower(coalesce(nullif(btrim(p_view),  ''), 'all'));
@@ -394,11 +375,15 @@ BEGIN
           WHEN p.course_id IS NOT NULL THEN 'world'
           ELSE NULL
         END AS ring_k,
-        -- THE LANE. ROUNDS ONLY. Arrival more than 30 days after play is a
-        -- backfill, not news. Reviews and stories are their own event.
+        -- THE LANE. ROUNDS ONLY, and keyed on ARRIVAL RECENCY (see header).
+        -- A round that arrived within c_news days is news whenever it was
+        -- played; one that arrived longer ago is backlog. play_date is the
+        -- kicker's business and has NO say in the lane. A round with no arrival
+        -- stamp cannot be SHOWN to be old, so it stays news rather than being
+        -- buried on a missing value.
         CASE
-          WHEN p.kind = 'round' AND p.play_date IS NOT NULL AND p.arrived_at IS NOT NULL
-               AND (p.arrived_at::date - p.play_date::date) > 30 THEN 'backlog'
+          WHEN p.kind = 'round' AND p.arrived_at IS NOT NULL
+               AND p.arrived_at < now() - (c_news || ' days')::interval THEN 'backlog'
           ELSE 'news'
         END AS lane_k,
         CASE WHEN p.gross_score IS NOT NULL AND p.course_par IS NOT NULL
