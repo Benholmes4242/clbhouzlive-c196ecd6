@@ -10,7 +10,7 @@ import {
 } from '@/features/courses/components/holes/_constants';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
-import { TOPAR_RED, RAMP_TOPAR, RAMP_DIST, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
