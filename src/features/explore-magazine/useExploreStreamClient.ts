@@ -14,6 +14,8 @@ import { roundConsequence as consequenceFor } from './consequences';
 import { useCourseRecordSignal } from './useCourseRecordSignal';
 import { useViewerCourseBests } from './useViewerCourseBests';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
+import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
+import type { ScoreScope, ViewerScoreScope } from './useViewerScoreScope';
 
 
 /**
@@ -107,14 +109,17 @@ function scoreItem(item: StreamItem): number {
  * THE CADENCE PASS IS POSITIONAL, NOT A SCORE DAMP. Positional guarantees are
  * the only ones that hold when score gaps are large.
  */
-function cadence(items: StreamItem[]): StreamItem[] {
+function cadence(items: StreamItem[], byConsequence = false): StreamItem[] {
   const out: StreamItem[] = [];
   const pool = [...items];
   while (pool.length > 0) {
     const previous = out[out.length - 1];
     let index = 0;
     if (previous) {
-      const different = pool.findIndex((candidate) => candidate.kind !== previous.kind);
+      const previousKey = byConsequence ? previous.consequence?.kind ?? 'none' : previous.kind;
+      const different = pool.findIndex((candidate) =>
+        (byConsequence ? candidate.consequence?.kind ?? 'none' : candidate.kind) !== previousKey,
+      );
       if (different >= 0) index = different;
     }
     /* A STORY NEVER LEADS unless it is the only candidate. */
@@ -136,7 +141,11 @@ export interface ExploreStream {
   isPending: boolean;
 }
 
-export function useExploreStreamClient(viewerId: string | undefined, view: ExploreView): ExploreStream {
+export function useExploreStreamClient(
+  viewerId: string | undefined,
+  view: ExploreView,
+  scores?: { active: ScoreScope; geography: ViewerScoreScope },
+): ExploreStream {
   const wantsRounds = view === 'all' || view === 'scores';
   const wantsWatch = view === 'all' || view === 'watch';
 
@@ -194,6 +203,7 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
     () => roundRows.map((row) => row.course_id).filter((id): id is string => !!id),
     [roundRows],
   );
+  const roundCourseMeta = useCourseCardMeta(roundCourseIds);
   const records = useCourseRecordSignal(viewerId, roundCourseIds);
 
   const lastSeen = useMemo(() => readDiscoverLastSeen(viewerId), [viewerId]);
@@ -208,6 +218,16 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
 
     if (wantsRounds) {
       for (const row of roundRows) {
+        if (view === 'scores') {
+          const course = row.course_id ? roundCourseMeta.data?.get(row.course_id) : null;
+          const active = scores?.active ?? 'world';
+          const geography = scores?.geography;
+          const inScope = active === 'world'
+            || (active === 'club' && !!geography?.primaryClubId && course?.clubId === geography.primaryClubId)
+            || (active === 'county' && !!geography?.county && course?.region === geography.county)
+            || (active === 'country' && !!geography?.country && course?.subCountry === geography.country);
+          if (!inScope) continue;
+        }
         const toPar = row.gross != null && row.course_par != null ? row.gross - row.course_par : null;
         const item: StreamItem = {
           id: `round:${row.round_id}`,
@@ -419,8 +439,8 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
 
     for (const item of out) item.score = scoreItem(item);
     out.sort((a, b) => (b.score - a.score) || a.id.localeCompare(b.id));
-    return cadence(out);
-  }, [roundRows, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch]);
+    return cadence(out, view === 'scores');
+  }, [roundRows, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch, roundCourseMeta.data, scores?.active, scores?.geography]);
 
   /* READINESS IS isFetched, NEVER isLoading: a disabled query reports isLoading
      false and would report the page ready before anything had been asked for.
@@ -430,7 +450,8 @@ export function useExploreStreamClient(viewerId: string | undefined, view: Explo
      consequence rather than a wrong one. */
   const isFetched =
     contextFetched &&
-    (!wantsRounds || (circle.isFetched && everyone.isFetched && standing.isFetched && bests.isFetched && records.isFetched)) &&
+    (!wantsRounds || (circle.isFetched && everyone.isFetched && standing.isFetched && bests.isFetched && records.isFetched
+      && (view !== 'scores' || roundCourseIds.length === 0 || roundCourseMeta.isFetched))) &&
     (view !== 'all' && view !== 'reviews' ? true : !reviews.isPending) &&
     (view !== 'all' ? true : !stories.isPending) &&
     (!wantsWatch || media.isFetched) &&

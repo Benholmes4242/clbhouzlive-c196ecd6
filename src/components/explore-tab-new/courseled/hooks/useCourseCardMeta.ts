@@ -10,6 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 export interface CourseCardMeta {
   id: string;
   name: string;
+  /** Canonical golf_clubs id; used by the shared Explore geography resolver. */
+  clubId: string | null;
   /** "Kent", "Perthshire" — the tightest place name we hold. */
   region: string | null;
   /** Macro area, the Courses browse vocabulary: "Britain & Ireland". */
@@ -28,12 +30,13 @@ export function useCourseCardMeta(courseIds: string[]) {
       if (key.length === 0) return out;
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('id, name, region, sub_country, country, thumbnail_image')
+        .select('id, name, club_id, region, sub_country, country, thumbnail_image')
         .in('id', key);
       if (error) throw error;
       for (const c of (data ?? []) as Array<{
         id: string;
         name: string;
+        club_id: string | null;
         region: string | null;
         sub_country: string | null;
         country: string;
@@ -42,6 +45,7 @@ export function useCourseCardMeta(courseIds: string[]) {
         out.set(c.id, {
           id: c.id,
           name: c.name,
+          clubId: c.club_id,
           region: c.region || c.sub_country || c.country || null,
           country: c.country || null,
           subCountry: c.sub_country || null,
