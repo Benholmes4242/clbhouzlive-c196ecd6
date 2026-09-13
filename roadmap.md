@@ -1435,3 +1435,14 @@ page behind it — recorded at the site in VideoPlaybackContext.openFull.
 - Draft for Ben: docs/sql/explore_stream_d5_fix.sql (deployed body, md5 2269e61522a052c8bae115621a5ff276, two references changed to g.whs_score_id).
 - Fixture corrected to production parity (tests/sql/explore_stream_d1_fixture.sql), test-side join fixed, scripts/explore-d5-harness.sh added; 12 D3 assertions pass.
 - OPEN: useExploreStream sets unavailable on error but does not report to the app error pipeline (src/lib/errorTracking.ts). Proposed, not built.
+
+## Explore audit rulings (2026-09-13)
+- [x] 2. RPC failure wired to trackError + `amateur_stream_fallback_served` (useExploreStream.ts:190-244).
+- [x] 4. Every `amateur_*` event labelled (features/admin/lib/eventLabels.ts).
+- [x] 3. Harness calls the REAL get_viewer_standing; schema parity guard added
+      (tests/sql/production_columns.snapshot.sql, schema_parity_assert.sql).
+- [x] 1. Arrival-recency lane drafted: docs/sql/explore_stream_d6_arrival_lane.sql
+      (news_days = 30, configurable). BEN RUNS IT. Harness: scripts/explore-d6-harness.sh.
+- [ ] 5. WATCH: deferred-ID cursor payload size.
+- [ ] 6. Phase E: six dead-board locale keys in non-English locales.
+- [ ] Device verification for all of the above is Ben's.
