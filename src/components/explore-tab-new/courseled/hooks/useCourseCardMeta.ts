@@ -14,6 +14,8 @@ export interface CourseCardMeta {
   clubId: string | null;
   /** "Kent", "Perthshire" — the tightest place name we hold. */
   region: string | null;
+  /** Exact golf_courses.region, without the display fallback above. */
+  rawRegion: string | null;
   /** Macro area, the Courses browse vocabulary: "Britain & Ireland". */
   country: string | null;
   /** Nation: "Scotland", "England". */
@@ -47,6 +49,7 @@ export function useCourseCardMeta(courseIds: string[]) {
           name: c.name,
           clubId: c.club_id,
           region: c.region || c.sub_country || c.country || null,
+          rawRegion: c.region,
           country: c.country || null,
           subCountry: c.sub_country || null,
           imageUrl: c.thumbnail_image ?? null,

@@ -222,7 +222,7 @@ export function useExploreStreamClient(
           const geography = scores?.geography;
           const inScope = active === 'world'
             || (active === 'club' && !!geography?.primaryClubId && course?.clubId === geography.primaryClubId)
-            || (active === 'county' && !!geography?.county && course?.region === geography.county)
+            || (active === 'county' && !!geography?.county && course?.rawRegion === geography.county)
             || (active === 'country' && !!geography?.country && course?.subCountry === geography.country);
           if (!inScope) continue;
         }

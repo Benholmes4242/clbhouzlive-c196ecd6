@@ -7,6 +7,7 @@ import { useBoardPage } from '@/components/explore-tab-new/courseled/hooks/useBo
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
 import { StandoutTile } from '@/components/explore-tab-new/courseled/StandoutTile';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 
 import { ExploreShelf } from './ExploreShelf';
 import { ShelfShell } from './ExploreShells';
@@ -28,6 +29,7 @@ export function WeeklyClubShelf({
 }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
+  const opener = useScorecardOpener();
   const filters = useMemo(() => ({ ...DEFAULT_FILTERS, scope: 'club' as const, window: '14' as const }), []);
   const board = useBoardPage(viewerId, 'recent', filters, { limit: 12, enabled: enabled && !!viewerId });
   const rows = board.data?.rows ?? [];
@@ -63,7 +65,8 @@ export function WeeklyClubShelf({
               isOwn={row.user_id === viewerId}
               onPress={() => {
                 analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'club_week', pos });
-                if (row.course_id) navigate(`/courses/${row.course_id}?tab=champions`);
+                if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
+                else if (row.course_id) navigate(`/courses/${row.course_id}?tab=champions`);
               }}
             />
           </div>
