@@ -13,8 +13,8 @@ import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
-import { treatmentFor } from './roundTreatment';
-import { RoundDistribution, RoundTicks } from './RoundTreatments';
+import { dotsFor, treatmentFor } from './roundTreatment';
+
 
 /**
  * THE UNIT (BRIEF_EXPLORE_MAGAZINE §4).
@@ -301,11 +301,13 @@ export function ExploreCard({
   const chips = chipsFor(item, t as never);
   const onPhoto = size === 'lead';
 
+  /* ONE VISUAL: THE TREND LINE, with gold / red dots on the good holes. The
+     ticks row and the distribution bar are retired — see roundTreatment.ts. */
   const treatment = item.kind === 'round' && size !== 'pair' ? treatmentFor(item, shape) : 'none';
-  const hasVisual = treatment !== 'none' && shape != null && item.payload.round != null;
-  const band = hasVisual
-    ? SHAPE_BAND[size] + (treatment === 'shape' ? EXPLORE_END_LABEL_BAND : 0)
-    : 0;
+  const hasVisual = treatment === 'line' && shape != null && item.payload.round != null;
+  const dots = hasVisual ? dotsFor(item, shape) : [];
+  const band = hasVisual ? SHAPE_BAND[size] + EXPLORE_END_LABEL_BAND : 0;
+
 
   const kicker = (
     <div
@@ -389,11 +391,11 @@ export function ExploreCard({
             overflow: 'hidden',
           }}
         >
-          {treatment === 'shape' ? (
-            <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
-              height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
-              baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow />
-          ) : treatment === 'ticks' ? <RoundTicks shape={shape} /> : <RoundDistribution shape={shape} />}
+          <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
+            height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
+            baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow
+            exploreDots={dots} />
+
         </span>
       ) : null}
       {onPhoto ? (
