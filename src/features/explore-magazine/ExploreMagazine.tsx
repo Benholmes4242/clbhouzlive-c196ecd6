@@ -404,6 +404,20 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [visible, meta.data, meta.isFetched],
   );
 
+  /* ONE RANK CARD PER COURSE PER CHANGE. The gate sits HERE, after enrichment
+     and before blocks, so the SERVER page and the client fallback are rationed
+     by the same rule and neither can slip a standing claim past it. It reads the
+     standing rows this page already holds - no new query. */
+  const standingByCourse = useMemo(() => {
+    const map = new Map<string, StandingRow>();
+    for (const row of scoresStanding.rows) map.set(row.course_id, row);
+    return map;
+  }, [scoresStanding.rows]);
+  const rankGate = useMemo(() => applyRankCardRule(enriched, standingByCourse), [enriched, standingByCourse]);
+  const ranked = rankGate.items;
+
+
+
   /* §3e THE ALL ORDER, in one place. Page 3+ restarts from clips, which the
      modulo in the renderer does; an empty shelf is skipped by the shelf itself
      and the next one takes its slot. */
