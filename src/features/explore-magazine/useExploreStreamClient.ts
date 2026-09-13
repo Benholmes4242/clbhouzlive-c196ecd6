@@ -110,14 +110,17 @@ function scoreItem(item: StreamItem): number {
 function cadence(items: StreamItem[], byConsequence = false): StreamItem[] {
   const out: StreamItem[] = [];
   const pool = [...items];
+  /* PHASE C: THE CADENCE KEY CARRIES THE RING. Two "Around Kent" cards in a row
+     read as one repeated card even when their kinds differ, so the ring is part
+     of the key rather than a second pass. */
+  const keyOf = (item: StreamItem) =>
+    `${byConsequence ? item.consequence?.kind ?? 'none' : item.kind}:${item.ring ?? 'none'}`;
   while (pool.length > 0) {
     const previous = out[out.length - 1];
     let index = 0;
     if (previous) {
-      const previousKey = byConsequence ? previous.consequence?.kind ?? 'none' : previous.kind;
-      const different = pool.findIndex((candidate) =>
-        (byConsequence ? candidate.consequence?.kind ?? 'none' : candidate.kind) !== previousKey,
-      );
+      const previousKey = keyOf(previous);
+      const different = pool.findIndex((candidate) => keyOf(candidate) !== previousKey);
       if (different >= 0) index = different;
     }
     /* A STORY NEVER LEADS unless it is the only candidate. */
@@ -127,6 +130,40 @@ function cadence(items: StreamItem[], byConsequence = false): StreamItem[] {
     }
     out.push(pool.splice(index, 1)[0]);
   }
+  return out;
+}
+
+/** The rings that are NOT the viewer's own or their club's (§3d). */
+const OUTER: ReadonlySet<string> = new Set(['county', 'country', 'world']);
+export const isOuterRing = (item: StreamItem) => !!item.ring && OUTER.has(item.ring);
+
+/**
+ * §3d THE OUTER-RING CAP IS POSITIONAL AND APPLIED AFTER SCORING — at most ONE
+ * outer-ring card in every FOUR cards. Nothing is dropped: an outer-ring card
+ * that cannot take its position is DEFERRED behind the next inner-ring card, so
+ * a page whose whole pool is outer-ring still renders (the cap then admits one
+ * per four and the rest follow in order).
+ */
+function capOuterRing(items: StreamItem[]): StreamItem[] {
+  const out: StreamItem[] = [];
+  const deferred: StreamItem[] = [];
+  let sinceOuter = Infinity;
+  const take = (item: StreamItem) => {
+    out.push(item);
+    sinceOuter = isOuterRing(item) ? 0 : sinceOuter + 1;
+  };
+  for (const item of items) {
+    if (deferred.length > 0 && !isOuterRing(item) && sinceOuter >= 3) {
+      take(deferred.shift() as StreamItem);
+    }
+    if (isOuterRing(item) && sinceOuter < 3) {
+      deferred.push(item);
+      continue;
+    }
+    take(item);
+  }
+  /* The remainder keeps its order rather than being discarded. */
+  for (const item of deferred) out.push(item);
   return out;
 }
 
