@@ -50,3 +50,32 @@ export const CHIP_GLASS_BORDER = '1px solid rgba(255,255,255,0.28)';
 export const CHIP_GLASS: CSSProperties = {
   color: '#FFFFFF',
 };
+
+/* ==========================================================================
+   ON-PHOTO FIGURE TINTS (BRIEF_EXPLORE_FIGURE_CHIP_CONTRAST §2a)
+
+   NOT NEW COLOURS. Both values are already shipping, as unnamed local
+   constants, on surfaces that solved this exact problem earlier:
+
+     PHOTO_FIG_UNDER  #FF8A80  = FriendsPlayedRail's GLASS_UNDER, the lighter
+                                 under-par red its chip adopted because
+                                 TOPAR_UNDER_LIGHT / _DARK are too deep to read
+                                 on glass over a photograph.
+     PHOTO_FIG_GOOD   #4ADE80  = the green StandoutTile's delta chip and the
+                                 Explore course shelves already use, chosen
+                                 because BAND_GREEN / BAND_GREEN_DARK die on a
+                                 bright sky.
+
+   THE CANVAS TOKENS (TOPAR_UNDER_DARK #E24B3F, BAND_GREEN_DARK #34D399) are
+   correct on the near-black canvas and must not be used on glass over photos.
+
+   MEASURED LIMIT, REPORTED: over the brightest ground in the catalogue no
+   mid-tone hue reaches 4.5:1 through translucent glass — only white has that
+   headroom. These tints plus the 0.62 fill plus PHOTO_FIG_SHADOW are the
+   readable ceiling that still leaves the chip glass; see the brief report.
+   ========================================================================== */
+export const PHOTO_FIG_UNDER = '#FF8A80';
+export const PHOTO_FIG_GOOD = '#4ADE80';
+/** A tight dark shadow, not a glow: separates a coloured figure from a lifted
+ *  ground without adding a second fill. Neutral white figures do not need it. */
+export const PHOTO_FIG_SHADOW = '0 1px 2px rgba(0,0,0,0.62)';

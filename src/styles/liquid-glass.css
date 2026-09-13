@@ -72,9 +72,16 @@
   border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
+/* BRIEF_EXPLORE_FIGURE_CHIP_CONTRAST §2b — 0.40 -> 0.62 in the BLURRED branch.
+   Blur softens what is behind the chip; it does not DARKEN it, so over a pale
+   sunset or a white clubhouse the ground beneath the text lifted to roughly
+   65% grey and every mid-tone figure lost its separation. 0.62 is not a new
+   value: it is the flat fallback this same rule already ships, and the two
+   branches now agree. The blur and the white border stay, which is what keeps
+   it glass rather than a plate. */
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .standout-figure-chip {
-    background: rgba(24, 30, 26, 0.4);
+    background: rgba(24, 30, 26, 0.62);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     backdrop-filter: blur(16px) saturate(180%);
   }

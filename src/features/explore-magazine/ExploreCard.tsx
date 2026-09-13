@@ -9,7 +9,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { A, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { r } from '@/lib/radius';
-import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS, PHOTO_FIG_GOOD, PHOTO_FIG_SHADOW, PHOTO_FIG_UNDER } from '@/styles/photoScrim';
 
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
@@ -85,9 +85,30 @@ function FigureChip({
         ...FIGS,
       }}
     >
-      <span style={{ fontSize: 15, fontWeight: 700, color: tone ?? '#FFFFFF' }}>{figure}</span>
+      {/* THE SHADOW IS FOR COLOUR ONLY (§2b fallback). White has the headroom to
+          sit on any ground; a hue does not, so a coloured figure — and only a
+          coloured figure — takes the tight dark shadow. */}
+      <span
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          color: tone ?? '#FFFFFF',
+          textShadow: tone && tone !== '#FFFFFF' ? PHOTO_FIG_SHADOW : undefined,
+        }}
+      >
+        {figure}
+      </span>
       {unit ? (
-        <span style={{ fontSize: 10, fontWeight: 700, color: unitTone ?? 'rgba(255,255,255,0.72)' }}>{unit}</span>
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: unitTone ?? 'rgba(255,255,255,0.72)',
+            textShadow: unitTone ? PHOTO_FIG_SHADOW : undefined,
+          }}
+        >
+          {unit}
+        </span>
       ) : null}
     </span>
   );
@@ -108,7 +129,7 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
         figure={String(facts.gross)}
         unit={toPar ?? undefined}
         tone="#FFFFFF"
-        unitTone={under ? A.RED : undefined}
+        unitTone={under ? PHOTO_FIG_UNDER : undefined}
       />,
     );
   }
@@ -120,7 +141,7 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
         corner="left"
         figure={facts.rating.toFixed(1)}
         unit={t('amateur.stream.chip.rating', 'rating')}
-        tone={facts.rating >= 9 ? A.GREEN : '#FFFFFF'}
+        tone={facts.rating >= 9 ? PHOTO_FIG_GOOD : '#FFFFFF'}
       />,
     );
   }
@@ -133,7 +154,7 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
           corner="left"
           figure={facts.rating.toFixed(1)}
           unit={facts.rating_n != null ? `${facts.rating_n}` : undefined}
-          tone={facts.rating >= 9 ? A.GREEN : '#FFFFFF'}
+          tone={facts.rating >= 9 ? PHOTO_FIG_GOOD : '#FFFFFF'}
         />,
       );
     }
