@@ -371,12 +371,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       lane_mix: 'news',
       view,
     });
-  }, [stream.isFetched, visible.length, view]);
+  }, [source.isFetched, visible.length, view]);
 
   /* §6f THE SENTINEL MEANS LOADING, NOT "MORE EXISTS". When the pool is spent it
      unmounts and the page ends at the last card. */
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const hasMore = revealed < stream.items.length;
+  const hasMore = revealed < source.items.length;
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || !hasMore) return;
@@ -391,10 +391,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   }, [hasMore]);
 
   useEffect(() => {
-    if (stream.isFetched && !hasMore && stream.items.length > 0) {
-      analyticsEvents.track('amateur_stream_end', { pages: Math.ceil(stream.items.length / STREAM_PAGE_SIZE), view });
+    if (source.isFetched && !hasMore && source.items.length > 0) {
+      analyticsEvents.track('amateur_stream_end', { pages: Math.ceil(source.items.length / STREAM_PAGE_SIZE), view });
     }
-  }, [stream.isFetched, hasMore, stream.items.length, view]);
+  }, [source.isFetched, hasMore, source.items.length, view]);
 
   const depart = useCallback(() => rememberAmateurScroll(), []);
 
@@ -599,7 +599,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
       {/* COLD START SHOWS THE SHORTEST PLAUSIBLE CARD, never a lead shell: a
           loading state is never larger than the state it resolves into. */}
-      {!stream.isFetched && enriched.length === 0 ? (
+      {!source.isFetched && enriched.length === 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP, paddingInline: CARD_INSET }}>
           <StdShell />
           <StdShell />
