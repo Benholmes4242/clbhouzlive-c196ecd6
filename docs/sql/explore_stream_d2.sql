@@ -572,7 +572,7 @@ BEGIN
     -- stream still terminates: a page that places NO news cannot open another
     -- (backlog may not lead), so the cursor goes NULL there.
     CASE WHEN v_taken < v_limit AND jsonb_array_length(v_deferred) = 0
-              AND (v_back_left = 0 OR v_news_placed = 0) THEN NULL
+              AND (v_back_left = 0 OR v_taken = 0) THEN NULL
 
          ELSE jsonb_build_object('s', v_last_s, 'i', v_last_i,
                 'tail', jsonb_build_object(
