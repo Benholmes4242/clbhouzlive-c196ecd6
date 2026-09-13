@@ -56,6 +56,20 @@ select ('20000000-0000-0000-0000-00000000000' || (1 + (i % 6)))::uuid,
        70 + (i % 18), 72, 28 + (i % 16), i % 5, 0, 0, 0, (i % 13) = 0, 14.1
 from generate_series(1, 120) i;
 
+-- ARRIVAL-OLD ROUNDS (D6). Played and synced together, months ago: the ARRIVAL
+-- rule calls these backlog, the older gap rule calls them news. Both lane rules
+-- therefore have something to be judged on, and assertion 10 below reads which
+-- rule the loaded body implements rather than assuming one.
+insert into gam_round_stats
+  (user_id, course_id, whs_score_id, play_date, created_at, gross_score, course_par,
+   stableford_points, birdies, eagles, albatrosses, holes_in_one, clean_card, hcp_at_time)
+select ('20000000-0000-0000-0000-00000000000' || (1 + (i % 6)))::uuid,
+       ('00000000-0000-0000-0000-00000000000' || (1 + (i % 4)))::uuid,
+       gen_random_uuid(), (now() - ((120 + (i % 30)) || ' days')::interval)::date,
+       now() - ((120 + (i % 30)) || ' days')::interval,
+       71 + (i % 15), 72, 29 + (i % 14), i % 4, 0, 0, 0, false, 13.7
+from generate_series(1, 40) i;
+
 insert into gam_round_net (whs_score_id, user_id, course_id, play_date, gross_score, course_handicap, net_score)
   select whs_score_id, user_id, course_id, play_date, gross_score, 12, gross_score - 12 from gam_round_stats;
 
@@ -336,11 +350,34 @@ end $$;
 do $$
 declare n int;
 begin
-  select count(*) into n from walk3 w join gam_round_stats g
-    on ('round:' || g.whs_score_id::text) = w.id
-  where w.view = 'scores'
-    and (w.lane = 'backlog') <> ((g.created_at::date - g.play_date) > 30);
-  if n > 0 then raise exception 'D3 FAIL: % Scores rounds in the wrong lane', n; end if;
+  /* WHICH LANE RULE IS LOADED? The arrival-recency body (D6) seeds
+     explore_config.news_days; the earlier gap-based bodies do not. The
+     assertion reads the rule rather than assuming it, so this one file verifies
+     whichever body the harness loaded - and a body that implements NEITHER rule
+     still fails. */
+  if exists (select 1 from public.explore_config where key = 'news_days') then
+    select count(*) into n from walk3 w join gam_round_stats g
+      on ('round:' || g.whs_score_id::text) = w.id
+    where w.view = 'scores'
+      and (w.lane = 'backlog') <> (g.created_at <
+            now() - ((select max(value) from public.explore_config
+                      where key = 'news_days') || ' days')::interval);
+    if n > 0 then raise exception 'D3 FAIL: % Scores rounds in the wrong ARRIVAL lane', n; end if;
+    /* And play date must have no say: an old round that arrived inside the
+       window is news. That is the whole point of the re-key. */
+    if not exists (
+      select 1 from walk3 w join gam_round_stats g
+        on ('round:' || g.whs_score_id::text) = w.id
+      where w.lane = 'news' and g.play_date < current_date - 200) then
+      raise notice 'NOTE no old-played, newly-arrived round was reached in this walk';
+    end if;
+  else
+    select count(*) into n from walk3 w join gam_round_stats g
+      on ('round:' || g.whs_score_id::text) = w.id
+    where w.view = 'scores'
+      and (w.lane = 'backlog') <> ((g.created_at::date - g.play_date) > 30);
+    if n > 0 then raise exception 'D3 FAIL: % Scores rounds in the wrong GAP lane', n; end if;
+  end if;
   select count(*) into n from walk3 w
   where w.view = 'scores' and w.pos = 1 and w.lane = 'backlog'
     and exists (select 1 from walk3 x where x.view = w.view and x.scope = w.scope
