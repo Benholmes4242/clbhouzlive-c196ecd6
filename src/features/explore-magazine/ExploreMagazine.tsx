@@ -73,7 +73,10 @@ type ShelfKind =
   | 'moments'
   | 'people'
   | 'coursesWorld'
-  | 'coursesList';
+  | 'coursesList'
+  /** §5b PHASE C C3 — courses:top-rated, the one NEW shelf of this step. The
+   *  county and world course shelves already exist from C1 and are REUSED. */
+  | 'coursesTopRated';
 
 type Block =
   | { kind: 'lead'; item: StreamItem }
