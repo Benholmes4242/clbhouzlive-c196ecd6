@@ -231,24 +231,22 @@ function toParColor(n: number | null): string {
 /* --------------------------------------------------------------- the card */
 
 /*
- * THE STUB COLUMN (item 4). It was 26px, set when the axis labels were 8px, and
- * it was already too narrow for TOTAL then. With the floor at 11 the widest stub
- * string, "PAR 72", measures 48.3px, so the column is widened to 54px — the
- * measured width plus slack — and the width is taken out of the nine hole
- * columns, NOT out of the type. The centred OUT/IN segments sit on those nine
- * columns and so lose ~3px each at 320; both strings are nowrap and still fit.
+ * THE ROW LABEL COLUMN IS GONE (Ben's ruling, superseding §D1 and everything
+ * about widening it or measuring SCORE). A scorecard does not need to be told
+ * that a row of 1..9 is the holes, that the row under it is par, or that the
+ * marked row is the score — the marks are what distinguish the score row from
+ * the par row above it. Removing the column removes the collision at source
+ * instead of making room for a word nobody reads, and the freed 28px goes to
+ * the nine hole columns, which is where a 390pt card is tightest.
+ *
+ * THE RIGHT-HAND 32px COLUMN STAYS. OUT / IN is a heading for a figure, not a
+ * row label, and it is the one string on the card that is not inferable.
+ *
+ * BOTH SURFACES, ONE GRAMMAR: the member card was signed off WITH the labels
+ * and loses them here too, because a tour card without them beside a member card
+ * with them would be two grammars for the same object.
  */
-/*
- * §D1 — THE ROW LABEL COLUMN DROPS FROM 54px TO 26px. 54 was sized for the
- * TOTAL / PAR 72 rows of the grand-totals block, which §B removed; the labels
- * that remain are HOLE, PAR, YOU and FIELD. SCORE is wider than this column at
- * the rendered 10px tracked-caps role, so the row stub below contains and
- * truncates labels rather than allowing text to paint over hole one. The 28px
- * this column gives back goes to the nine score columns, which is where a 390pt
- * card is tightest. The right-hand total column stays at 32px — it carries
- * two-digit strokes and is unchanged.
- */
-const NINE_GRID = '26px repeat(9, minmax(0, 1fr)) 32px';
+const NINE_GRID = 'repeat(9, minmax(0, 1fr)) 32px';
 
 /**
  * §D3/E2 — THE ONE FIELD THRESHOLD. Both the per-hole FIELD row and the
@@ -268,27 +266,23 @@ const NINE_GRID = '26px repeat(9, minmax(0, 1fr)) 32px';
 
 
 const CardRow: React.FC<{
-  label: string;
   cells: React.ReactNode[];
   total: React.ReactNode;
   muted?: boolean;
   tone?: string;
-}> = ({ label, cells, total, muted, tone }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-    <span
-      style={{
-        ...LABEL_AXIS,
-        minWidth: 0,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}
-      title={label}
-    >
-      {label}
-    </span>
+}> = ({ cells, total, muted, tone }) => (
+  /* CONTAINMENT, INDEPENDENT OF THE LABELS: every cell is minWidth 0 and clips
+     its own box, so whatever ends up in a cell — a long field figure, a
+     translated string, a future two-character mark — cannot paint over the
+     column beside it. */
+  <div
+    style={{
+      display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2,
+      padding: '3px 0', minWidth: 0, overflow: 'hidden',
+    }}
+  >
     {cells.map((c, i) => (
-      <span key={i} style={{ textAlign: 'center', minWidth: 0 }}>
+      <span key={i} style={{ textAlign: 'center', minWidth: 0, overflow: 'hidden' }}>
         {typeof c === 'object' ? c : (
           <span style={{ ...NUM, fontSize: 12, fontWeight: muted ? 500 : 700, color: tone ?? (muted ? A.MUTE : A.INK) }}>
             {c}
@@ -296,7 +290,9 @@ const CardRow: React.FC<{
         )}
       </span>
     ))}
-    <span style={{ ...NUM, fontSize: 13, color: A.INK, textAlign: 'center' }}>{total}</span>
+    <span style={{ ...NUM, fontSize: 13, color: A.INK, textAlign: 'center', minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap' }}>
+      {total}
+    </span>
   </div>
 );
 
@@ -349,9 +345,7 @@ const Nine: React.FC<{
    * point, not a secondary one, so callers gate this on surface.
    */
   withField: boolean;
-  scoreLabel: string;
-}> = ({ rows, label, withField, scoreLabel }) => {
-  const { t } = useTranslation(['courses']);
+}> = ({ rows, label, withField }) => {
   const { par, strokes, playedCount, parPlayed } = nineSummary(rows);
   /**
    * S1.2 / S1.3 — the nine's two totals.
@@ -374,10 +368,9 @@ const Nine: React.FC<{
 
   return (
     <div>
-      <CardRow label={t('courses:scorecard.hole')} cells={rows.map((h) => h.holeNo)} total={label} muted />
-      <CardRow label={t('courses:scorecard.par')} cells={rows.map((h) => h.par ?? '\u2014')} total={parTotal} muted />
+      <CardRow cells={rows.map((h) => h.holeNo)} total={label} muted />
+      <CardRow cells={rows.map((h) => h.par ?? '\u2014')} total={parTotal} muted />
       <CardRow
-        label={scoreLabel}
         cells={rows.map((h) => (
           <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="dark" />
         ))}
@@ -386,11 +379,13 @@ const Nine: React.FC<{
 
       {withField && (
         <CardRow
-          /* §D3 — MEASURED FOR THE 26px LABEL COLUMN. 'Field avg' was sized for
-             the old 54px column and clipped at 26px; the row's figures are
-             already par-relative, so 'avg' was carrying no meaning. Key
-             `fieldAvg` stays for the holes sheet. */
-          label={t('courses:scorecard.fieldShort')}
+          /* CONTRADICTION, REPORTED, NOT RESOLVED HERE: this tour-only row of
+             signed decimals is the ONE row on the card that was not inferable
+             from its contents, and the ruling removes the column that named it.
+             It is left unlabelled rather than kept as the single labelled row,
+             because one label beside three unlabelled rows is the two-grammar
+             problem in miniature. `scorecard.fieldShort` stays in the locales for
+             the holes sheet. */
           cells={rows.map((h) => {
             const d = h.fieldAvg != null && h.par != null ? h.fieldAvg - h.par : null;
             if (d == null) return '';
@@ -1015,7 +1010,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    * was never an empty cell: on a pro's card the row beneath PAR had no name at
    * all. It falls back to SCORE, which is true of every card.
    */
-  const cardScoreLabel = isOwner ? t('courses:scorecard.you') : t('courses:scorecard.scoreRow');
+  /* DEAD-LISTED, NOT DELETED: the score-row stub string (scorecard.you /
+     scorecard.scoreRow) had exactly one reader, the removed label cell. Keys
+     stay in all six locales. */
 
 
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
@@ -1282,9 +1279,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               */}
               <Panel kicker={t('courses:scorecard.theCard')}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <Nine rows={out} label={t('courses:scorecard.out')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
+                  <Nine rows={out} label={t('courses:scorecard.out')} withField={showFieldRow} />
                   {back.length > 0 && (
-                    <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
+                    <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} />
                   )}
 
                   {/*
