@@ -1364,3 +1364,21 @@ page behind it — recorded at the site in VideoPlaybackContext.openFull.
 - Local PG16 harness: scripts/explore-d2-harness.sh (all assertions pass).
 - Departure filed: when the news lane is exhausted an all-backlog page may open; while any news remains backlog never leads.
 - ExploreMagazine analytics now reports the real lane mix.
+
+## Explore Phase D3 - the remaining views (landed, not device-verified)
+- docs/sql/explore_stream_d3.sql drafted from the LIVE dump; the deployed prosrc
+  proved byte-identical to the D2 draft (md5 e949b1b7..., 25209 chars), so D3 is
+  that body plus the view branches and nothing else. BEN RUNS IT.
+- Scores, Courses and Reviews now come from get_explore_stream. WATCH STAYS
+  CLIENT-COMPOSED (clips and long-form video are not in the ranker's pool) - a
+  stated depth limit, reported not hidden.
+- Cadence in a single-type view keys on the CONSEQUENCE (scores/reviews) or the
+  EVENT (courses) alone; the outer-ring cap stays an All-view rule because a
+  scoped single-type page shares one ring.
+- Harness: scripts/explore-d3-harness.sh, 12 assertions pass, plus a separate
+  check that All's first page is IDENTICAL under the deployed D2 body and D3.
+- Course copy is composed client-side by src/features/explore-magazine/
+  courseHeadline.ts (shared with the client fallback); the five headline keys
+  were missing from every locale file and are now added in all six.
+- Asserted as DEPLOYED behaviour, not changed: a page may go short while the
+  stream continues, and may carry one card over p_limit.

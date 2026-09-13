@@ -143,6 +143,14 @@
       "empty": {
         "courses": "No courses in {{scope}} yet.",
         "reviews": "No reviews in {{scope}} yet."
+      },
+      "course": {
+        "eventRatings": "{{count}} ratings this month, averaging {{mean}}.",
+        "eventLow": "{{name}}'s {{gross}} is the low here this month.",
+        "eventLowAnon": "{{gross}} is the low here this month.",
+        "factRated": "{{rounds}} rounds tracked, rated {{rating}} from {{count}}.",
+        "factRounds": "{{rounds}} rounds tracked here.",
+        "factRatedOnly": "Rated {{rating}} from {{count}}."
       }
     },
     "shelf": {

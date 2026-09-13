@@ -2267,6 +2267,14 @@
       "empty": {
         "courses": "[No courses in {{scope}} yet.]",
         "reviews": "[No reviews in {{scope}} yet.]"
+      },
+      "course": {
+        "eventRatings": "[{{count}} råtîngs thîs mönth, åvéråging {{mean}}. one two]",
+        "eventLow": "[{{name}}'s {{gross}} îs thé löw héré thîs mönth. one two]",
+        "eventLowAnon": "[{{gross}} îs thé löw héré thîs mönth. one]",
+        "factRated": "[{{rounds}} röünds tråçkéd, råtéd {{rating}} fröm {{count}}. one two]",
+        "factRounds": "[{{rounds}} röünds tråçkéd héré. one]",
+        "factRatedOnly": "[Råtéd {{rating}} fröm {{count}}. one]"
       }
     },
     "shelf": {

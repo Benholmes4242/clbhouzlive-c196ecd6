@@ -1683,6 +1683,14 @@
       "empty": {
         "courses": "Noch keine Platze in {{scope}}.",
         "reviews": "Noch keine Bewertungen in {{scope}}."
+      },
+      "course": {
+        "eventRatings": "{{count}} Bewertungen diesen Monat, im Schnitt {{mean}}.",
+        "eventLow": "{{name}} spielte diesen Monat mit {{gross}} das beste Ergebnis hier.",
+        "eventLowAnon": "{{gross}} ist diesen Monat das beste Ergebnis hier.",
+        "factRated": "{{rounds}} Runden erfasst, bewertet mit {{rating}} aus {{count}}.",
+        "factRounds": "{{rounds}} Runden hier erfasst.",
+        "factRatedOnly": "Bewertet mit {{rating}} aus {{count}}."
       }
     },
     "shelf": {

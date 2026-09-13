@@ -1683,6 +1683,14 @@
       "empty": {
         "courses": "Aun no hay campos en {{scope}}.",
         "reviews": "Aun no hay resenas en {{scope}}."
+      },
+      "course": {
+        "eventRatings": "{{count}} valoraciones este mes, con una media de {{mean}}.",
+        "eventLow": "El {{gross}} de {{name}} es el mejor resultado aqui este mes.",
+        "eventLowAnon": "{{gross}} es el mejor resultado aqui este mes.",
+        "factRated": "{{rounds}} vueltas registradas, valorado {{rating}} de {{count}}.",
+        "factRounds": "{{rounds}} vueltas registradas aqui.",
+        "factRatedOnly": "Valorado {{rating}} de {{count}}."
       }
     },
     "shelf": {

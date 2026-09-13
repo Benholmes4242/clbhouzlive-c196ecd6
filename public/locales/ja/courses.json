@@ -1619,6 +1619,14 @@
       "empty": {
         "courses": "No courses in {{scope}} yet.",
         "reviews": "No reviews in {{scope}} yet."
+      },
+      "course": {
+        "eventRatings": "今月は{{count}}件の評価、平均{{mean}}。",
+        "eventLow": "今月ここでの最少スコアは{{name}}の{{gross}}。",
+        "eventLowAnon": "今月ここでの最少スコアは{{gross}}。",
+        "factRated": "{{rounds}}ラウンドを記録、{{count}}件の評価で{{rating}}。",
+        "factRounds": "ここで{{rounds}}ラウンドを記録。",
+        "factRatedOnly": "{{count}}件の評価で{{rating}}。"
       }
     },
     "shelf": {
