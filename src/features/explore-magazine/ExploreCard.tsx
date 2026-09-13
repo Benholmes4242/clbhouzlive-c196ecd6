@@ -402,7 +402,7 @@ export function ExploreCard({
             position: 'absolute',
             left: 16,
             right: 16,
-             bottom: hasVisual ? 68 : 14,
+             bottom: hasVisual ? band + 12 : 14,
             zIndex: 2,
             display: 'block',
           }}
