@@ -65,6 +65,7 @@ create table walk (page int, pos int, id text, kind text, ring text, score numer
 do $$
 declare
   v_cur jsonb := null; v_page int := 0; v_pos int; v_rows int; v_next jsonb;
+  v_rec record;
 begin
   loop
     v_page := v_page + 1;
