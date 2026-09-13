@@ -8,3 +8,4 @@
 - [x] Remove duplicated event categories from round kickers while preserving ring and age reasons.
 - [x] Gate tick rows on three off-par holes, with an explicit quiet-ace exception.
 - [x] Verify 390px width and no horizontal overflow; authenticated record/ace capture remains blocked by external auth.
+- [x] Scope "This week at {club}" to the club's courses (per-course board reads), not its members.
