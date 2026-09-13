@@ -738,7 +738,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             value={view}
             onChange={changeView}
             ariaLabel={t('amateur.stream.views', 'Explore views')}
-            ground="filled"
+            ground="filled-selection"
           />
         </div>
       </div>

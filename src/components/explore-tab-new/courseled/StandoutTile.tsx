@@ -59,6 +59,14 @@ interface Props {
   subline?: string | null;
   /** Fixed-width trailing slot on the WHO row (the reaction control). */
   trailing?: React.ReactNode;
+  /**
+   * HORIZONTAL RAILS ONLY (BRIEF_EXPLORE_BOARD_SELECTOR §2): reserve the tallest
+   * wording case — two lines of name and two of fact — so every tile in a rail
+   * is the same height whatever the course or member name does. Omitted
+   * everywhere else, which keeps vertical lists free to size to content.
+   */
+  reserveTwoLines?: boolean;
+
   /** Anything below the detail line ("+n more here"). */
   footer?: React.ReactNode;
   /**
@@ -120,6 +128,8 @@ export function StandoutTile({
   onDetailPress,
   subline = null,
   trailing,
+  reserveTwoLines = false,
+
   footer,
   kicker = null,
   avatarUrl = null,
@@ -377,8 +387,17 @@ export function StandoutTile({
         ) : null}
         {/* THE NAME ROW owns the whole width now: the reaction control moved
             DOWN onto the detail line, so a long member name wraps to a second
-            line instead of being cut off mid-word. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            line instead of being cut off mid-word.
+
+            RESERVED TWO LINES IN A RAIL (BRIEF_EXPLORE_BOARD_SELECTOR §2).
+            Variable heights are fine in a vertical list and never in a
+            horizontal rail: a tile whose name wraps used to stand taller than
+            its neighbours. With `reserveTwoLines` the row holds the tallest
+            case (2 x 13px x 1.2 = 32px) and a one-line name simply leaves the
+            second line empty. Every masonry/vertical consumer omits the prop
+            and is byte-identical to before. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, ...(reserveTwoLines ? { minHeight: 32 } : null) }}>
+
           {who ? (
             <SquircleAvatar
               src={avatarUrl}
@@ -422,10 +441,13 @@ export function StandoutTile({
                 <div
                   style={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: reserveTwoLines ? 'flex-start' : 'center',
                     gap: 6,
                     marginTop: factIsSubline ? 3 : 2,
-                    minHeight: 20,
+                    /* Two reserved lines in a rail: 11px x 1.3 = 29, 12px x
+                       1.32 = 32. One line elsewhere, exactly as before. */
+                    minHeight: reserveTwoLines ? (factIsSubline ? 29 : 32) : 20,
+
                   }}
                 >
                   <div

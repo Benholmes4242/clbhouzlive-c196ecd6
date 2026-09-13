@@ -53,8 +53,16 @@ export interface RailChipsProps {
   /**
    * ADDITIVE. Omitted or 'outline' renders exactly as every existing consumer
    * always has. 'filled' is the applied-state ground described above.
+   *
+   * 'filled-selection' (BRIEF_EXPLORE_BOARD_SELECTOR §1) is the THIRD ground and
+   * the only one that both SWITCHES the surface below and states the applied
+   * chip with the 6% ground: the selected chip takes APPLIED_FILL with ink text
+   * and no border, every other chip stays transparent with the hairline. It
+   * exists because 'filled' marks NOTHING as selected — correct for a panel
+   * opener, wrong for a row of views, where it left all five chips identical.
    */
-  ground?: 'outline' | 'filled';
+  ground?: 'outline' | 'filled' | 'filled-selection';
+
   /** ADDITIVE: centre a fitting choice group; overflow still starts at the leading edge. */
   align?: 'start' | 'center-when-fit';
 }
@@ -64,6 +72,9 @@ const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 
 export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start' }: RailChipsProps) {
   const filled = ground === 'filled';
+  /* The selecting filled ground: a choice group, so tablist/tab semantics stay. */
+  const filledSelection = ground === 'filled-selection';
+
   return (
     <div
       role={filled ? 'group' : 'tablist'}
@@ -97,9 +108,13 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
               flexShrink: 0,
               padding: '6px 11px',
               borderRadius: RAIL_CHIP_RADIUS,
+              /* The active chip keeps a TRANSPARENT hairline rather than none, so
+                 switching view costs no 1px width shift in the row. */
               border: filled ? 'none' : `1px solid ${active ? 'transparent' : A.BORDER}`,
-              background: filled ? APPLIED_FILL : active ? A.INK : 'transparent',
-              color: filled ? A.INK : active ? A.CANVAS : A.MUTE,
+              background: filled || (filledSelection && active) ? APPLIED_FILL : active ? A.INK : 'transparent',
+              color: filled || (filledSelection && active) ? A.INK : active ? A.CANVAS : A.MUTE,
+
+
               fontFamily: SANS,
               fontSize: 12,
               fontWeight: 700,
