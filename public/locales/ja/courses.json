@@ -1632,7 +1632,9 @@
         "eventRecord": "コースレコード更新",
         "eventLow": "最少スコア更新 {{gross}}",
         "eventRating": "新たな評価 {{rating}}"
-      }
+      },
+      "failed": "読み込めませんでした。",
+      "retry": "再試行"
     },
     "shelf": {
       "aroundCounty": "{{county}}周辺",

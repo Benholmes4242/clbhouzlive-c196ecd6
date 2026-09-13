@@ -1635,7 +1635,9 @@
         "eventRecord": "코스 레코드 경신",
         "eventLow": "최저 스코어 경신 {{gross}}",
         "eventRating": "새 평가 {{rating}}"
-      }
+      },
+      "failed": "불러오지 못했습니다.",
+      "retry": "다시 시도"
     },
     "shelf": {
       "aroundCounty": "{{county}} 주변",

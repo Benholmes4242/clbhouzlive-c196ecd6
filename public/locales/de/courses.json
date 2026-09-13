@@ -1696,7 +1696,9 @@
         "eventRecord": "Neuer Platzrekord",
         "eventLow": "Neue Bestmarke: {{gross}}",
         "eventRating": "Neu bewertet mit {{rating}}"
-      }
+      },
+      "failed": "Das wurde nicht geladen.",
+      "retry": "Erneut versuchen"
     },
     "shelf": {
       "aroundCounty": "Rund um {{county}}",

@@ -156,7 +156,9 @@
         "eventRecord": "New course record",
         "eventLow": "New low of {{gross}}",
         "eventRating": "Newly rated {{rating}}"
-      }
+      },
+      "failed": "This did not load.",
+      "retry": "Try again"
     },
     "shelf": {
       "golfersAtClub": "Golfers at {{club}}",
