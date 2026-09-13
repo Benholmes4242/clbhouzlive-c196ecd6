@@ -1,5 +1,11 @@
 # Roadmap
 
+## Tour scorecard sheet geometry (13 Sep 2026)
+- [x] Measure the member and tour scorecard grid and contain row labels inside their cells.
+- [ ] Rule on widening the label column: measured SCORE requires 44px, which leaves 1.89px mark clearance per side at 390px.
+- [ ] Resolve the sliced round selector.
+- [ ] Report whether each bordered frame is shared Panel or local.
+
 ## England federation picker label (9 Sep 2026)
 - [x] Trace the picker label to its constants-file source and audit every other England Golf reference.
 - [x] Name all three supported England products on the picker only, without changing connection-specific copy.
