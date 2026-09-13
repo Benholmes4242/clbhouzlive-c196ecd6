@@ -562,8 +562,49 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               <div key={`shelf:${block.shelf}:${index}`}>
                 {block.shelf === 'clips' ? (
                   <ClipsShelf pos={pos} onDepart={depart} />
+                ) : block.shelf === 'clubWeek' ? (
+                  /* THE SAME SHELF THE SCORES VIEW USES — reused, not copied. */
+                  <WeeklyClubShelf
+                    viewerId={userId}
+                    clubName={geography.scope.primaryClubName}
+                    enabled={!!geography.scope.primaryClubId}
+                    pos={pos}
+                  />
                 ) : block.shelf === 'standing' ? (
                   <StandingShelf viewerId={userId} pos={pos} />
+                ) : block.shelf === 'coursesCounty' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.aroundCounty', 'Around {{county}}', {
+                      county: geography.scope.county ?? '',
+                    })}
+                    rows={geography.scope.county ? countyCourses.rows : []}
+                    isFetched={geography.isFetched && countyCourses.isFetched}
+                    kind="courses_county"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : block.shelf === 'coursesWorld' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.aroundWorld', 'Around the world')}
+                    rows={worldCourses.rows}
+                    isFetched={worldCourses.isFetched}
+                    kind="courses_world"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : block.shelf === 'coursesList' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.onYourList', 'On your list')}
+                    rows={listCourses.rows}
+                    isFetched={listCourses.isFetched}
+                    kind="courses_list"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : block.shelf === 'people' ? (
+                  /* C2 builds the people shelf; until then this slot is empty
+                     and the next shelf takes it, exactly as an empty rail does. */
+                  null
                 ) : (
                   <MomentsShelf pos={pos} onDepart={depart} />
                 )}
