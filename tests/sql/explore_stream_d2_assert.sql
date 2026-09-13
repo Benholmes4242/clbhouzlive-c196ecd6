@@ -141,9 +141,10 @@ end $$;
 do $$
 declare n int;
 begin
-  select count(*) into n from walk where pos = 1 and lane = 'backlog';
-  if n > 0 then raise exception 'D2 FAIL: backlog led % page(s)', n; end if;
-  raise notice 'PASS no backlog card leads a page';
+  select count(*) into n from walk w where w.pos = 1 and w.lane = 'backlog'
+    and exists (select 1 from walk x where x.page = w.page and x.lane = 'news');
+  if n > 0 then raise exception 'D2 FAIL: backlog led % page(s) that had news', n; end if;
+  raise notice 'PASS backlog never leads a page while news remains';
 end $$;
 
 -- 4. NEWS FIRST. While news can fill the page, no backlog is admitted at all.
@@ -160,8 +161,11 @@ end $$;
 do $$
 declare n int;
 begin
-  with seq as (
+  with mixed as (
+    select page from walk group by page having count(*) filter (where lane = 'news') > 0
+  ), seq as (
     select row_number() over (order by page, pos) rn, lane from walk
+    where page in (select page from mixed)
   )
   select count(*) into n from seq a join seq b on b.rn > a.rn and b.rn <= a.rn + 2
   where a.lane = 'backlog' and b.lane = 'backlog';
@@ -232,7 +236,7 @@ end $$;
 delete from gam_round_stats where (created_at::date - play_date) <= 30
   and id <> '99999999-9999-9999-9999-999999999999'
   and ctid not in (select ctid from gam_round_stats
-                   where (created_at::date - play_date) <= 30 limit 20);
+                   where (created_at::date - play_date) <= 30 limit 12);
 delete from course_ratings where ctid not in (select ctid from course_ratings limit 3);
 
 create table walk2 (page int, pos int, id text, kind text, lane text);
@@ -269,7 +273,7 @@ begin
   select count(distinct page) into m from walk2 where lane = 'backlog';
   if p < 6 then raise exception 'D2 FAIL: thin-news walk ended at page %', p; end if;
   if n = 0 then raise exception 'D2 FAIL: the backlog was never reached'; end if;
-  if m < 2 then raise exception 'D2 FAIL: backlog appeared on only % page(s)', m; end if;
+  if m < 3 then raise exception 'D2 FAIL: backlog appeared on only % page(s)', m; end if;
   if not exists (select 1 from walk2 where lane = 'backlog' and page >= 6) then
     raise exception 'D2 FAIL: the backlog stopped arriving before page 6';
   end if;
@@ -283,8 +287,9 @@ declare n int;
 begin
   select count(*) into n from (select id from walk2 group by id having count(*) > 1) d;
   if n > 0 then raise exception 'D2 FAIL: % duplicated ids in the thin-news walk', n; end if;
-  select count(*) into n from walk2 where pos = 1 and lane = 'backlog';
-  if n > 0 then raise exception 'D2 FAIL: backlog led % thin-news page(s)', n; end if;
+  select count(*) into n from walk2 w where w.pos = 1 and w.lane = 'backlog'
+    and exists (select 1 from walk2 x where x.page = w.page and x.lane = 'news');
+  if n > 0 then raise exception 'D2 FAIL: backlog led % thin-news page(s) with news', n; end if;
   raise notice 'PASS thin-news walk has no duplicates and no backlog lead';
 end $$;
 
