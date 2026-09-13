@@ -128,6 +128,11 @@ BEGIN
   v_bl_s        := nullif(p_cursor #> '{tail,bl,s}', 'null')::text::numeric;
   v_bl_i        := p_cursor #>> '{tail,bl,i}';
   v_since_back  := coalesce((p_cursor #>> '{tail,since_back}')::int, 1000000);
+  -- The news boundary CARRIES even when a page places no news at all (an
+  -- all-backlog page), or the next page would restart the news lane and repeat
+  -- cards already served.
+  v_last_s := v_cur_s; v_last_i := v_cur_i;
+
   SELECT coalesce(array_agg(x), '{}') INTO v_carry
   FROM jsonb_array_elements_text(coalesce(p_cursor #> '{tail,deferred}', '[]'::jsonb)) x;
 
