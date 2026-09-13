@@ -1,4 +1,15 @@
+/**
+ * DEAD FILE — NOT RENDERED ANYWHERE (retired by the one-visual ruling).
+ *
+ * RoundTicks outlined and captioned a member's WORST hole ("TRIPLE ON 8") on a
+ * public page; RoundDistribution counted bogeys and doubles beside it. The
+ * Explore round visual is now the trend line alone, with gold / red dots on the
+ * GOOD holes only — see roundTreatment.ts. Kept on the dead-file list, not
+ * deleted. No importer remains inside or outside Explore. Do not re-wire this
+ * without a fresh ruling.
+ */
 import { useTranslation } from 'react-i18next';
+
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { RAMP_DIST } from '@/features/courses/components/holes/analytical/tokens';
 import { A, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
