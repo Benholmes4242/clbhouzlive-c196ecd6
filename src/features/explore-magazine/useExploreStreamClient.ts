@@ -186,6 +186,10 @@ export function useExploreStreamClient(
     }
     return out;
   }, [circle.data, everyone.data, wantsRounds]);
+  const circleScoreIds = useMemo(
+    () => new Set((circle.data ?? []).map((row) => row.score_id).filter((id): id is string => !!id)),
+    [circle.data],
+  );
 
   /* THE CONSEQUENCE SOURCES (§3a). Standing supplies every rank and every field
      size; the record book supplies who holds what; bests decide only whether a
@@ -227,6 +231,24 @@ export function useExploreStreamClient(
           if (!inScope) continue;
         }
         const toPar = row.gross != null && row.course_par != null ? row.gross - row.course_par : null;
+        const consequence = consequenceFor(
+          {
+            courseId: row.course_id,
+            userId: row.user_id,
+            gross: row.gross,
+            playDate: row.play_date,
+            isSelf: row.is_self,
+            isCircle: !!row.score_id && circleScoreIds.has(row.score_id),
+            isNotable: row.holes_in_one > 0 || row.albatrosses > 0 || row.is_course_record
+              || (row.stableford_points ?? 0) >= 45 || toPar != null && toPar < 0
+              || row.clean_card || (row.birdies ?? 0) >= 5,
+          },
+          { standing: standingMap, records, bests: bests.bests, shortlist: context.shortlist },
+        );
+        /* §3d NO CONSEQUENCE, NO CARD. An everyone-pool round outside the
+           viewer's circle and played geography is not promoted into generic
+           content merely because the client happened to fetch it. */
+        if (!consequence) continue;
         const item: StreamItem = {
           id: `round:${row.round_id}`,
           kind: 'round',
@@ -234,16 +256,7 @@ export function useExploreStreamClient(
           ring: row.is_self ? 'own' : null,
           lane: 'news',
           score: 0,
-          consequence: consequenceFor(
-            {
-              courseId: row.course_id,
-              userId: row.user_id,
-              gross: row.gross,
-              playDate: row.play_date,
-              isSelf: row.is_self,
-            },
-            { standing: standingMap, records, bests: bests.bests, shortlist: context.shortlist },
-          ),
+          consequence,
 
           subject: {
             course_id: row.course_id,
@@ -438,7 +451,7 @@ export function useExploreStreamClient(
     for (const item of out) item.score = scoreItem(item);
     out.sort((a, b) => (b.score - a.score) || a.id.localeCompare(b.id));
     return cadence(out, view === 'scores');
-  }, [roundRows, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch, roundCourseMeta.data, scores?.active, scores?.geography]);
+  }, [roundRows, circleScoreIds, reviews.reviews, stories.stories, media.data, moments.data, context, standingMap, records, bests.bests, lastSeen, view, viewerId, wantsRounds, wantsWatch, roundCourseMeta.data, scores?.active, scores?.geography]);
 
   /* READINESS IS isFetched, NEVER isLoading: a disabled query reports isLoading
      false and would report the page ready before anything had been asked for.
