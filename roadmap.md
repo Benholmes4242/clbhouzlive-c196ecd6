@@ -1,5 +1,13 @@
 # Roadmap
 
+## Explore Magazine Phase B2 — Scores (13 Sep 2026)
+- [ ] Reuse the standing ordinal helper across all rank consequence headlines and six locales.
+- [ ] Add the Scores view and geography scope row without changing All or Watch behavior.
+- [ ] Build one reusable club/county/country resolver and report each available test-account path.
+- [ ] Filter and rank round-only Scores content with consequence-kind cadence.
+- [ ] Add standing, weekly club, and no-handicap connect states with existing navigation and analytics.
+- [ ] Verify type/build, event invocations, source geometry, and report device checks as landed, not verified.
+
 ## Tour scorecard sheet geometry (13 Sep 2026)
 - [x] Measure the member and tour scorecard grid and contain row labels inside their cells.
 - [ ] Rule on widening the label column: measured SCORE requires 44px, which leaves 1.89px mark clearance per side at 390px.
