@@ -17,8 +17,11 @@ describe('treatmentFor', () => {
   it.each([
     ['ace overrides under par', { holes_in_one: 1, to_par: -6 }, shape([-1]), 'ticks'],
     ['albatross shares the override', { albatrosses: 1, to_par: -3 }, shape([-3]), 'ticks'],
-    ['under par is shape', { to_par: -1 }, shape([-1]), 'shape'],
-    ['course record is shape', { is_course_record: true }, shape([0]), 'shape'],
+    ['under par with travel is shape', { to_par: -3 }, shape([-1, -1, -1]), 'shape'],
+    ['course record with travel is shape', { is_course_record: true }, shape([1, 1, 1]), 'shape'],
+    ['flat under-par round falls through to none', { to_par: -1 }, shape([-1, 0, 0]), 'none'],
+    ['flat record falls through to standout ticks', { is_course_record: true }, shape([2, -1, 0]), 'ticks'],
+    ['flat record falls through to birdie bar', { is_course_record: true, birdies: 4 }, shape([-1, 0, 0]), 'bar'],
     ['extreme hole is ticks', {}, shape([2]), 'ticks'],
     ['four birdies is bar', { birdies: 4 }, shape([-1, -1, -1, -1]), 'bar'],
     ['derived clean card is bar', { clean_card: null }, shape([0, -1, 0]), 'bar'],

@@ -88,9 +88,6 @@ export function kickerParts(item: StreamItem, t: T): string[] {
  * states the fact and stops rather than inventing the gap.
  */
 export function headlineFor(item: StreamItem, t: T, locale = 'en'): string {
-  const name = item.who?.is_viewer
-    ? t('amateur.stream.you', 'You')
-    : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
   const course = item.subject?.course_name?.trim() || t('amateur.stream.aCourse', 'a course');
 
   if (item.kind === 'story') return item.facts.headline?.trim() || '';
@@ -119,48 +116,42 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en'): string {
     if (c.delta != null && c.delta > 0) {
       return t(
         'amateur.stream.headline.recordLostGap',
-        '{{name}} took your course record at {{course}} with a {{gross}}, {{delta}} better than your best.',
-        { name, course, gross, delta: c.delta },
+        'Took your course record with a {{gross}}. Your best is {{delta}} behind.',
+        { gross, delta: c.delta },
       );
     }
-    return t('amateur.stream.headline.recordLost', '{{name}} took your course record at {{course}} with a {{gross}}.', {
-      name,
-      course,
-      gross,
-    });
+    return t('amateur.stream.headline.recordLost', 'Took your course record with a {{gross}}.', { gross });
   }
   if (c?.kind === 'rank_down' && c.n != null && c.of != null && gross != null) {
     if (c.delta != null && c.delta > 0) {
       return t(
         'amateur.stream.headline.rankDownBy',
-        '{{name}} went round {{course}} in {{gross}} and pushed you down {{delta}} to {{n}} of {{of}}.',
-         { name, course, gross, delta: c.delta, n: rank, of: c.of },
+        'Went round in {{gross}} and pushed you down {{delta}} to {{n}} of {{of}}.',
+         { gross, delta: c.delta, n: rank, of: c.of },
       );
     }
     return t(
       'amateur.stream.headline.rankDown',
-      '{{name}} went round {{course}} in {{gross}}. You are {{n}} of {{of}} there.',
-       { name, course, gross, n: rank, of: c.of },
+      'Went round in {{gross}}. You are {{n}} of {{of}} there.',
+       { gross, n: rank, of: c.of },
     );
   }
   if (c?.kind === 'rank_up' && c.n != null && c.of != null && gross != null) {
     if (c.delta != null && c.delta > 0) {
       return t(
         'amateur.stream.headline.rankUpBy',
-        'Your {{gross}} at {{course}} moves you up {{delta}} to {{n}} of {{of}}.',
-         { course, gross, delta: c.delta, n: rank, of: c.of },
+        'Your {{gross}} moves you up {{delta}} to {{n}} of {{of}}.',
+         { gross, delta: c.delta, n: rank, of: c.of },
       );
     }
-    return t('amateur.stream.headline.rankUp', 'Your {{gross}} at {{course}} takes you to {{n}} of {{of}}.', {
-      course,
+    return t('amateur.stream.headline.rankUp', 'Your {{gross}} takes you to {{n}} of {{of}}.', {
       gross,
        n: rank,
       of: c.of,
     });
   }
   if (c?.kind === 'rank_hold' && c.n != null && c.of != null && gross != null) {
-    return t('amateur.stream.headline.rankHold', 'Your {{gross}} at {{course}} holds {{n}} of {{of}}.', {
-      course,
+    return t('amateur.stream.headline.rankHold', 'Your {{gross}} holds {{n}} of {{of}} here.', {
       gross,
        n: rank,
       of: c.of,
@@ -168,41 +159,28 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en'): string {
   }
 
   if ((item.facts.is_course_record || c?.kind === 'record_taken') && gross != null) {
-    return t('amateur.stream.headline.recordTaken', '{{name}} took the course record at {{course}} with a {{gross}}.', {
-      name,
-      course,
-      gross,
-    });
+    return t('amateur.stream.headline.recordTaken', 'Took the course record with a {{gross}}.', { gross });
   }
 
   if (item.facts.holes_in_one && item.facts.holes_in_one > 0) {
-    return t('amateur.stream.headline.ace', '{{name}} holed out from the tee at {{course}}.', { name, course });
+    return t('amateur.stream.headline.ace', 'Holed out from the tee.');
   }
   if (item.facts.albatrosses && item.facts.albatrosses > 0) {
-    return t('amateur.stream.headline.albatross', '{{name}} made an albatross at {{course}}.', { name, course });
+    return t('amateur.stream.headline.albatross', 'Made an albatross.');
   }
   if (c?.kind === 'list_new_low' && gross != null) {
-    return t('amateur.stream.headline.listNewLow', '{{gross}} at {{course}}, a course on your list.', { gross, course });
+    return t('amateur.stream.headline.listNewLow', '{{gross}}, a new low on your list.', { gross });
   }
   if (item.facts.clean_card && gross != null) {
-    return t('amateur.stream.headline.bogeyFree', '{{name}} went bogey free at {{course}} for {{gross}}.', {
-      name,
-      course,
-      gross,
-    });
+    return t('amateur.stream.headline.bogeyFree', 'Went bogey free for {{gross}}.', { gross });
   }
   if (item.facts.birdies != null && item.facts.birdies >= 5 && gross != null) {
-    return t('amateur.stream.headline.birdieHaul', '{{name}} made {{count}} birdies at {{course}}.', {
-      name,
-      course,
-      count: item.facts.birdies,
-    });
+    return t('amateur.stream.headline.birdieHaul', 'Made {{count}} birdies.', { count: item.facts.birdies });
   }
   /* PLAYED, AND THE BOARD DID NOT MOVE (§3a). Only where the standing figures
      exist; otherwise the plain round sentence, which claims nothing. */
   if (c?.kind === 'played_nochange' && c.n != null && c.of != null && gross != null && item.who?.is_viewer) {
-    return t('amateur.stream.headline.playedNoChange', 'You went round {{course}} in {{gross}}, still {{n}} of {{of}}.', {
-      course,
+    return t('amateur.stream.headline.playedNoChange', 'Your {{gross}} still holds {{n}} of {{of}} here.', {
       gross,
        n: rank,
       of: c.of,
@@ -210,17 +188,15 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en'): string {
   }
   if (gross != null && toPar) {
 
-    return t('amateur.stream.headline.roundToPar', '{{name}} went round {{course}} in {{gross}}, {{topar}}.', {
-      name,
-      course,
+    return t('amateur.stream.headline.roundToPar', 'Went round in {{gross}}, {{topar}}.', {
       gross,
       topar: toPar,
     });
   }
   if (gross != null) {
-    return t('amateur.stream.headline.round', '{{name}} went round {{course}} in {{gross}}.', { name, course, gross });
+    return t('amateur.stream.headline.round', 'Went round in {{gross}}.', { gross });
   }
-  return t('amateur.stream.headline.played', '{{name}} played {{course}}.', { name, course });
+  return t('amateur.stream.headline.played', 'Played.');
 }
 
 /** Relative day for the who-line's sub: "Tue" inside a week, "Sun 7 Sep" up to
