@@ -5,7 +5,6 @@ import {
   dotsFor,
   treatmentFor,
 } from '@/features/explore-magazine/roundTreatment';
-import { roundConsequence } from '@/features/explore-magazine/consequences';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
@@ -61,36 +60,5 @@ describe('dotsFor', () => {
 
   it('never marks a round that earned its line on movement alone', () => {
     expect(dotsFor(item({ to_par: 4 }), shape([1, -1, 1, 1, 1]))).toEqual([]);
-  });
-});
-
-describe('Retired consequence admission', () => {
-  it("drops another member's ordinary round at a course the viewer has played", () => {
-    const sources = {
-      standing: new Map([['c', { course_id: 'c', rank_now: 9, rank_then: 9, delta: 0, field_now: 18 } as never]]),
-      records: { holders: new Map(), lostToViewer: new Set<string>() } as never,
-      bests: new Map([['c', 74]]),
-      shortlist: new Set<string>(),
-    };
-    const base = { courseId: 'c', userId: 'u', playDate: '2026-09-12', isSelf: false, isCircle: false, isNotable: false };
-    expect(roundConsequence({ ...base, gross: 79 }, sources)).toBeNull();
-    expect(roundConsequence({ ...base, gross: 68 }, sources)).toBeNull();
-    expect(roundConsequence({ ...base, gross: 68, isCircle: true }, sources)?.kind).toBe('circle_round');
-    expect(roundConsequence({ ...base, gross: 68, isNotable: true }, sources)?.kind).toBe('platform_notable');
-  });
-
-  it('leaves the viewer their own round with no consequence rather than a restated standing', () => {
-    const sources = {
-      standing: new Map([['c', { course_id: 'c', rank_now: 9, rank_then: null, delta: null, field_now: 18 } as never]]),
-      records: { holders: new Map(), lostToViewer: new Set<string>() } as never,
-      bests: new Map<string, number>(),
-      shortlist: new Set<string>(),
-    };
-    expect(
-      roundConsequence(
-        { courseId: 'c', userId: 'v', gross: 79, playDate: '2026-09-12', isSelf: true, isCircle: false, isNotable: false },
-        sources,
-      ),
-    ).toBeNull();
   });
 });

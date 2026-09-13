@@ -1,53 +1,6 @@
-import type { Consequence, StreamFacts } from './streamItem';
+import type { Consequence } from './streamItem';
 import type { StandingRow } from './useViewerStanding';
 import type { CourseRecordSignal } from './useCourseRecordSignal';
-
-/**
- * THE RETIRED KINDS, AND THE SERVER (Sep 2026 ruling).
- *
- * The deployed get_explore_stream still ranks and returns rows whose consequence
- * is one of the two retired kinds; changing that is SQL and is Ben's to run. So
- * the client admits server rows through the same rule the engine below now
- * follows: a retired kind is not a card, and the round only survives on its own
- * merits — the viewer's own round, or a round notable in its own right.
- *
- * CIRCLE MEMBERSHIP IS NOT ON A SERVER ROW, so a followed member's otherwise
- * ordinary round arriving with a retired kind cannot be re-admitted as
- * circle_round here. It is dropped. That is a stated narrowing of the
- * fall-through on the RPC path, not a second rule.
- */
-const RETIRED_KINDS = new Set<string>(['rank_down', 'played_nochange']);
-
-export function isRetiredConsequenceKind(kind: string | null | undefined): boolean {
-  return !!kind && RETIRED_KINDS.has(kind);
-}
-
-/** Notable in its own right — the same facts the platform_notable kind means. */
-export function isNotableRoundFacts(facts: StreamFacts | null | undefined): boolean {
-  if (!facts) return false;
-  return (
-    (facts.holes_in_one ?? 0) > 0 ||
-    (facts.albatrosses ?? 0) > 0 ||
-    (facts.eagles ?? 0) > 0 ||
-    (facts.to_par ?? 0) < 0 ||
-    facts.is_course_record === true
-  );
-}
-
-/**
- * One decision for a server row carrying a retired kind:
- *   - the viewer's own round  -> keep it, with no consequence;
- *   - notable in its own right -> keep it as platform_notable;
- *   - otherwise                -> null, meaning NOT A CANDIDATE.
- */
-export function admitRetired(
-  facts: StreamFacts | null | undefined,
-  isViewer: boolean,
-): { consequence: Consequence | null } | null {
-  if (isViewer) return { consequence: null };
-  if (isNotableRoundFacts(facts)) return { consequence: { kind: 'platform_notable' } };
-  return null;
-}
 
 /**
  * THE CONSEQUENCE ENGINE (BRIEF_EXPLORE_MAGAZINE §3a, PHASE B2).
@@ -65,13 +18,13 @@ export function admitRetired(
  *             WHETHER a round passed them, never where they now sit.
  *
  * §3b OTHERS ONLY EVER MOVE YOU DOWN. A round by another member can produce
- * record_lost and nothing better; the good news comes from the viewer's own
- * rounds, which is exactly why §3c admits them.
+ * record_lost or rank_down and nothing better; the good news comes from the
+ * viewer's own rounds, which is exactly why §3c admits them.
  *
- * NO CONSEQUENCE, NO INVENTED SENTENCE. Where none of the typed kinds holds, a
- * round by another member falls through to list_first, circle_round or
- * platform_notable, and otherwise IS NOT A CANDIDATE. The viewer's own round is
- * always their own news and simply carries no consequence. A round with no
+ * NO CONSEQUENCE, NO INVENTED SENTENCE. Where none of the typed kinds holds,
+ * a round falls back to the plain kinds Phase A already shipped —
+ * circle_round for another member, played_nochange for the viewer — so the card
+ * states what happened and claims nothing about a board. A round with no
  * resolvable course or score id still does not render at all; that gate is in
  * the stream, not here.
  */
@@ -136,24 +89,18 @@ export function roundConsequence(input: RoundConsequenceInput, sources: Conseque
     return { kind: 'record_taken', n: gross ?? null, of: field, held_by_viewer: isSelf };
   }
 
-  /* 2. ANOTHER MEMBER'S ROUND.
-        A ROUND BY SOMEONE ELSE IS ONLY NEWS IF IT CHANGED SOMETHING. Another
-        member playing a course you have played is not, by itself, an event —
-        however much it moves a number you were not watching. That is why
-        rank_down is gone: it fired on EVERY round at EVERY course the viewer had
-        ever teed off, and eighteen rounds at one club drew eighteen
-        near-identical cards whose only difference was a rank the viewer had not
-        been watching. Do not reinstate it, and do not reintroduce it under
-        another name.
-
-        So these rounds fall THROUGH to whatever they qualify for on their own
-        merits: the viewer's list, their circle, or a notable round. If none
-        holds, the round is NOT A CANDIDATE and returns null. */
+  /* 2. ANOTHER MEMBER'S ROUND. It passed the viewer only if it is better than
+        the viewer's own best there, and only a course the viewer has played can
+        have a standing row at all. */
   if (!isSelf) {
+    if (stand && gross != null && myBest != null && gross < myBest) {
+      return { kind: 'rank_down', n: stand.rank_now, of: field, delta: moved };
+    }
     /* A COURSE ON THE VIEWER'S LIST, and that is ALL this says. Phase A read
        list_new_low off the other member's own best there, which is a fact about
        them and not a low on any list — so this emits list_first only. */
     if (courseId && sources.shortlist.has(courseId)) return { kind: 'list_first' };
+    if (stand) return { kind: 'played_nochange', n: stand.rank_now, of: field };
     if (input.isCircle) return { kind: 'circle_round' };
     if (input.isNotable) return { kind: 'platform_notable' };
     return null;
@@ -166,14 +113,10 @@ export function roundConsequence(input: RoundConsequenceInput, sources: Conseque
     }
     /* HOLD, NOT DRIFT: they are still where they were, on a board that has a
        field to be top of. rank_then null means there is no reference, so there
-       is nothing to call a hold — the round then carries NO consequence and the
-       card falls back to what the round itself was, which is the honest line. */
+       is nothing to call a hold — that is played_nochange. */
     if (stand.rank_then != null && stand.delta === 0) {
       return { kind: 'rank_hold', n: stand.rank_now, of: field };
     }
   }
-  /* THE VIEWER'S OWN ROUND IS ALWAYS A CANDIDATE — it is their own news. With no
-     standing consequence it carries none, and the headline speaks the round
-     (birdies, eagle, under par, or plain). played_nochange is retired. */
-  return null;
+  return { kind: 'played_nochange', n: stand?.rank_now ?? null, of: field };
 }

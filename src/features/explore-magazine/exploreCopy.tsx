@@ -211,9 +211,13 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
       gross,
     });
   }
-  /* NO rankDown / playedNoChange SENTENCE. Both kinds are retired: they
-     explained a non-event, which is exactly why the sentence was long enough to
-     run off the card. Their locale keys stay in place, unused, for Phase E. */
+  if (c?.kind === 'rank_down' && c.n != null && c.of != null && gross != null) {
+    return t(
+      'amateur.stream.headline.rankDown',
+      '{{player}} went round in {{gross}}, which puts you {{ord}} of the {{of}} who have played here.',
+      { player, gross, ord, of: c.of },
+    );
+  }
   if (c?.kind === 'rank_up' && c.n != null && gross != null) {
     if (c.delta != null && c.delta > 0) {
       return t(
@@ -314,6 +318,13 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
       count: spokenNumber(item.facts.birdies, locale),
       gross,
     });
+  }
+  if (c?.kind === 'played_nochange' && c.n != null && c.of != null && gross != null && isOwn) {
+    return t(
+      'amateur.stream.headline.playedNoChange',
+      '{{player}} went round in {{gross}}. Your {{ord}} of {{of}} here is unchanged.',
+      { player, gross, ord, of: c.of },
+    );
   }
   if (gross != null && topar) {
     return t('amateur.stream.headline.roundToPar', '{{player}} went round in {{gross}}, {{topar}}.', {

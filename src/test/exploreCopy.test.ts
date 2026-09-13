@@ -105,24 +105,3 @@ describe('Explore round kicker ownership', () => {
     expect(kickerParts(round(overrides as Partial<StreamItem>), translate)[0]).toBe(expected);
   });
 });
-describe('Retired rank cards', () => {
-  it('never prints the retired sentences for another member at a played course', () => {
-    /* Both retired kinds are gone from the type, so the only thing to assert is
-       that no surviving template produces their wording. */
-    const item = round({ consequence: null, facts: { gross: 79 } });
-    const headline = headlineFor(item, translate);
-    expect(headline).not.toContain('which puts you');
-    expect(headline).not.toContain('unchanged');
-  });
-
-  it('gives every surviving rank template an ordinal in English regional locales', () => {
-    const viewer = { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true };
-    const hold = round({ who: viewer, consequence: { kind: 'rank_hold', n: 8, of: 41 } });
-    const up = round({ who: viewer, consequence: { kind: 'rank_up', n: 6, of: 41 } });
-    expect(headlineFor(hold, translate, 'en-GB')).toContain('8th');
-    expect(headlineFor(up, translate, 'en-GB')).toContain('6th');
-    expect(headlineFor(hold, translate, 'en')).toContain('8th');
-    expect(headlineFor(up, translate, 'en')).toContain('6th');
-    expect(headlineFor(hold, translate, 'en-XA')).toContain('the 8 best');
-  });
-});
