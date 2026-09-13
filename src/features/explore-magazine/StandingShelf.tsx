@@ -11,6 +11,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ShelfShell } from './ExploreShells';
 import { ExploreShelf } from './ExploreShelf';
 import { relativeDay } from './exploreCopy';
+import { standingOrdinal } from './ordinal';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
 
 /**
@@ -49,24 +50,6 @@ const RENDERED = 12;
  * read a rank drop as an under-par score.
  */
 const MOVEMENT = { up: '#57E69A', down: '#F0655A' } as const;
-
-/** English ordinals. Other locales take the plain figure: a suffixed ordinal is
- *  not a translatable pattern, and an invented one is worse than a number. */
-function ordinal(n: number, locale: string): string {
-  if (!locale.toLowerCase().startsWith('en')) return String(n);
-  const mod100 = n % 100;
-  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
-  switch (n % 10) {
-    case 1:
-      return `${n}st`;
-    case 2:
-      return `${n}nd`;
-    case 3:
-      return `${n}rd`;
-    default:
-      return `${n}th`;
-  }
-}
 
 function MovementChip({ delta }: { delta: number }) {
   const up = delta > 0;
@@ -152,7 +135,7 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
               imageUrl={row.image_url}
               region={row.region ?? row.sub_country}
               photo={TILE.h}
-              figure={ordinal(row.rank_now, copy.locale)}
+               figure={standingOrdinal(row.rank_now, copy.locale)}
               unit={copy.unit(row.field_now)}
               whenLabel={relativeDay(row.last_change_at) ?? ''}
               who={copy.you}
@@ -194,7 +177,7 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
               }}
             >
               <span style={{ ...NUMF, fontSize: 14, color: A.INK, minWidth: 44 }}>
-                {ordinal(row.rank_now, copy.locale)}
+                 {standingOrdinal(row.rank_now, copy.locale)}
               </span>
               <span style={{ minWidth: 0, flex: 1 }}>
                 <span

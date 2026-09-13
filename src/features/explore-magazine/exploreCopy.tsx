@@ -1,4 +1,5 @@
 import type { StreamItem } from './streamItem';
+import { standingOrdinal } from './ordinal';
 
 /**
  * KICKER PARTS AND HEADLINES (BRIEF_EXPLORE_MAGAZINE §4c / §4d).
@@ -79,7 +80,7 @@ export function kickerParts(item: StreamItem, t: T): string[] {
  * another member's course is Phase B's get_viewer_standing. So a record card
  * states the fact and stops rather than inventing the gap.
  */
-export function headlineFor(item: StreamItem, t: T): string {
+export function headlineFor(item: StreamItem, t: T, locale = 'en'): string {
   const name = item.who?.is_viewer
     ? t('amateur.stream.you', 'You')
     : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
@@ -98,6 +99,7 @@ export function headlineFor(item: StreamItem, t: T): string {
   const gross = item.facts.gross;
   const toPar = toParLabel(item.facts.to_par);
   const c = item.consequence;
+  const rank = c?.n != null ? standingOrdinal(c.n, locale) : null;
 
   /**
    * THE CONSEQUENCE HEADLINES (§3d, PHASE B2). Every figure in these sentences
@@ -125,13 +127,13 @@ export function headlineFor(item: StreamItem, t: T): string {
       return t(
         'amateur.stream.headline.rankDownBy',
         '{{name}} went round {{course}} in {{gross}} and pushed you down {{delta}} to {{n}} of {{of}}.',
-        { name, course, gross, delta: c.delta, n: c.n, of: c.of },
+         { name, course, gross, delta: c.delta, n: rank, of: c.of },
       );
     }
     return t(
       'amateur.stream.headline.rankDown',
       '{{name}} went round {{course}} in {{gross}}. You are {{n}} of {{of}} there.',
-      { name, course, gross, n: c.n, of: c.of },
+       { name, course, gross, n: rank, of: c.of },
     );
   }
   if (c?.kind === 'rank_up' && c.n != null && c.of != null && gross != null) {
@@ -139,13 +141,13 @@ export function headlineFor(item: StreamItem, t: T): string {
       return t(
         'amateur.stream.headline.rankUpBy',
         'Your {{gross}} at {{course}} moves you up {{delta}} to {{n}} of {{of}}.',
-        { course, gross, delta: c.delta, n: c.n, of: c.of },
+         { course, gross, delta: c.delta, n: rank, of: c.of },
       );
     }
     return t('amateur.stream.headline.rankUp', 'Your {{gross}} at {{course}} takes you to {{n}} of {{of}}.', {
       course,
       gross,
-      n: c.n,
+       n: rank,
       of: c.of,
     });
   }
@@ -153,7 +155,7 @@ export function headlineFor(item: StreamItem, t: T): string {
     return t('amateur.stream.headline.rankHold', 'Your {{gross}} at {{course}} holds {{n}} of {{of}}.', {
       course,
       gross,
-      n: c.n,
+       n: rank,
       of: c.of,
     });
   }
@@ -195,7 +197,7 @@ export function headlineFor(item: StreamItem, t: T): string {
     return t('amateur.stream.headline.playedNoChange', 'You went round {{course}} in {{gross}}, still {{n}} of {{of}}.', {
       course,
       gross,
-      n: c.n,
+       n: rank,
       of: c.of,
     });
   }
