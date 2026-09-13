@@ -12,7 +12,9 @@ import { ShelfShell } from './ExploreShells';
 import { ExploreShelf } from './ExploreShelf';
 import { relativeDay } from './exploreCopy';
 import { standingOrdinal } from './ordinal';
+import { useViewerIdentity } from './useViewerIdentity';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
+
 
 /**
  * "WHERE YOU STAND" (BRIEF_EXPLORE_MAGAZINE §2b, PHASE B1).
@@ -96,6 +98,10 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
   const navigate = useNavigate();
   const copy = useStandingCopy();
   const standing = useViewerStanding(viewerId);
+  /* The tiles are all the VIEWER's, so the avatar is the viewer's own photo,
+     read from user_profiles — never a board row's nearest photo field. */
+  const { identity } = useViewerIdentity(viewerId);
+
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const tiles = useMemo(() => standing.rows.slice(0, RENDERED), [standing.rows]);
@@ -140,6 +146,9 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
               whenLabel={relativeDay(row.last_change_at) ?? ''}
               who={copy.you}
               isOwn
+              avatarUrl={identity?.photoUrl ?? null}
+              avatarUserId={viewerId ?? null}
+
               subline={sublineFor(row, copy)}
               trailing={row.delta != null && row.delta !== 0 ? <MovementChip delta={row.delta} /> : undefined}
               onPress={() => open(row)}

@@ -444,7 +444,12 @@ export function StandoutTile({
                       fontSize: factIsSubline ? 11 : 12,
                       fontWeight: 600,
                       lineHeight: factIsSubline ? 1.3 : 1.32,
-                      color: factIsSubline ? 'rgba(104,112,123,0.78)' : A.MUTE,
+                      /* THE SETTLED DARK MUTE, never a light-surface grey. The
+                         old literal rgba(104,112,123,0.78) was a slate mid-grey
+                         coloured for a light panel: 2.54:1 on A.PANEL. A.MUTE
+                         reads 6.86:1 and matches the who-line's tier. */
+                      color: A.MUTE,
+
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
@@ -466,7 +471,7 @@ export function StandoutTile({
                     fontSize: 11,
                     fontWeight: 600,
                     lineHeight: 1.3,
-                    color: 'rgba(104,112,123,0.78)',
+                    color: A.MUTE,
                     marginTop: 3,
                     display: '-webkit-box',
                     WebkitLineClamp: 2,

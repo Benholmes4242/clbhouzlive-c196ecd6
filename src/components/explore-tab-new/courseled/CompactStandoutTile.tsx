@@ -264,7 +264,9 @@ export function CompactStandoutTile({
                     fontSize: factIsSubline ? 11 : 12,
                     fontWeight: 600,
                     lineHeight: factIsSubline ? 1.3 : 1.32,
-                    color: factIsSubline ? 'rgba(104,112,123,0.78)' : A.MUTE,
+                    /* Dark-surface mute, not the old light-panel slate grey. */
+                    color: A.MUTE,
+
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical',
@@ -283,7 +285,7 @@ export function CompactStandoutTile({
                   fontSize: 11,
                   fontWeight: 600,
                   lineHeight: 1.3,
-                  color: 'rgba(104,112,123,0.78)',
+                  color: A.MUTE,
                   marginTop: 3,
                   display: '-webkit-box',
                   WebkitLineClamp: 2,
