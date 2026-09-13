@@ -90,7 +90,7 @@ insert into user_surface_last_seen (user_id, surface_key, last_seen_at) values
 
 -- ------------------------------------------------------- lane truth, read once
 create table lane_truth as
-select 'round:' || id::text cid,
+select 'round:' || whs_score_id::text cid,
        (created_at::date - play_date) > 30 as should_backlog
 from gam_round_stats;
 
