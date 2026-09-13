@@ -129,8 +129,8 @@
       },
       "headline": {
         "recordTaken": "Took the course record with a {{gross}}.",
-        "ace": "{{name}} holed out from the tee at {{course}}.",
-        "albatross": "{{name}} made an albatross at {{course}}.",
+        "ace": "Holed out from the tee.",
+        "albatross": "Made an albatross.",
         "listNewLow": "{{gross}}, a new low on your list.",
         "bogeyFree": "Went bogey free for {{gross}}.",
         "birdieHaul": "Made {{count}} birdies.",
