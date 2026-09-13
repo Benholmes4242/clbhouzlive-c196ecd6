@@ -257,16 +257,30 @@ export function useExploreStreamClient(
 
     if (wantsRounds) {
       for (const row of roundRows) {
+        const course = row.course_id ? roundCourseMeta.data?.get(row.course_id) : null;
+        const geography = scores?.geography;
         if (view === 'scores') {
-          const course = row.course_id ? roundCourseMeta.data?.get(row.course_id) : null;
           const active = scores?.active ?? 'world';
-          const geography = scores?.geography;
           const inScope = active === 'world'
             || (active === 'club' && !!geography?.primaryClubId && course?.clubId === geography.primaryClubId)
             || (active === 'county' && !!geography?.county && course?.rawRegion === geography.county)
             || (active === 'country' && !!geography?.country && course?.subCountry === geography.country);
           if (!inScope) continue;
         }
+        /* PHASE C §3d THE RING, from the SHARED resolver's geography — never
+           re-derived here. Nearest ring wins; a course whose geography has not
+           resolved carries NO ring rather than a guessed world one. */
+        const ring: StreamItem['ring'] = row.is_self
+          ? 'own'
+          : geography?.primaryClubId && course?.clubId === geography.primaryClubId
+            ? 'club'
+            : geography?.county && course?.rawRegion === geography.county
+              ? 'county'
+              : geography?.country && course?.subCountry === geography.country
+                ? 'country'
+                : course
+                  ? 'world'
+                  : null;
         const toPar = row.gross != null && row.course_par != null ? row.gross - row.course_par : null;
         const consequence = consequenceFor(
           {
@@ -282,15 +296,19 @@ export function useExploreStreamClient(
           },
           { standing: standingMap, records, bests: bests.bests, shortlist: context.shortlist },
         );
-        /* §3d NO CONSEQUENCE, NO CARD. An everyone-pool round outside the
-           viewer's circle and played geography is not promoted into generic
-           content merely because the client happened to fetch it. */
-        if (!consequence) continue;
+        /* §3d NO CONSEQUENCE, NO CARD — UNLESS IT IS AN OUTER RING. A county /
+           country / world round at a course the viewer has never played carries
+           NO invented consequence: it is admitted as a plain "someone played
+           here" card, wearing its ring kicker only, and the 1-in-4 positional
+           cap bounds how many of them the page can show. An outer-ring card
+           with no resolvable target (no course, no scorecard) still does not
+           render. */
+        const outerPlain = !consequence && ring !== null && ring !== 'own' && ring !== 'club';
+        if (!consequence && !(outerPlain && !!row.course_id && !!row.score_id)) continue;
         const item: StreamItem = {
           id: `round:${row.round_id}`,
           kind: 'round',
-          /* GEOGRAPHY IS PHASE C: 'own' or nothing. */
-          ring: row.is_self ? 'own' : null,
+          ring,
           lane: 'news',
           score: 0,
           consequence,
