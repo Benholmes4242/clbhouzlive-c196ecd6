@@ -555,7 +555,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       </div>
 
-      {view === 'scores' && geography.isFetched && (geography.scope.primaryClubId || geography.scope.county) ? (
+      {/* §1 THE SAME SCOPE ROW, THE SAME COMPONENT, for Scores, Courses and
+          Reviews. It does not render at all where neither a club nor a county
+          resolves, and the view is then World. */}
+      {scoped && geography.isFetched && (geography.scope.primaryClubId || geography.scope.county) ? (
         <div style={{ padding: '0 12px 14px', minWidth: 0, overflow: 'hidden' }}>
           <RailChips
             options={[
