@@ -240,25 +240,41 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
   const [view, setView] = useState<ExploreView>(() => readExploreView());
   const geography = useViewerScoreScope(userId);
+  /* §1 ONE SCOPE, ONE COMPONENT, THREE VIEWS. Scores, Courses and Reviews all
+     read the SAME scope state from the SAME shared resolver; All and Watch never
+     show the row. The default on entry is My club where it resolves, else the
+     county, else World with no row at all. */
+  const scoped = SCOPED_VIEWS.includes(view);
   const [scoreScope, setScoreScope] = useState<ScoreScope>('world');
   const scoreScopeChosen = useRef(false);
   useEffect(() => {
-    if (view !== 'scores' || !geography.isFetched || scoreScopeChosen.current) return;
+    if (!scoped || !geography.isFetched || scoreScopeChosen.current) return;
     setScoreScope(geography.scope.primaryClubId ? 'club' : geography.scope.county ? 'county' : 'world');
     scoreScopeChosen.current = true;
-  }, [view, geography.isFetched, geography.scope.primaryClubId, geography.scope.county]);
+  }, [scoped, geography.isFetched, geography.scope.primaryClubId, geography.scope.county]);
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
   const stream = useExploreStreamClient(userId, view, { active: scoreScope, geography: geography.scope });
   const scoresStanding = useViewerStanding(userId);
 
-  /* PHASE C §3a-§3c THE COURSE SHELVES. The sources are asked ONLY on All, and
-     each shelf renders nothing when its source is empty. Geography comes from
-     the shared resolver above — no second derivation. */
-  const countyCourses = useCountyCourses(userId, geography.scope, view === 'all' && geography.isFetched);
-  const worldCourses = useWorldTop100Courses(view === 'all');
-  const listCourses = useListCourses(userId, view === 'all');
+  /* §5b THE COURSES VIEW'S OWN BODY. Course cards are not rounds, reviews or
+     media, so they are composed by their own hook off get_board_courses and the
+     shared geography — the client stream is left exactly as B2 shipped it. */
+  const coursesView = useScopeCourses(userId, scoreScope, geography.scope, view === 'courses' && geography.isFetched);
+  /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so a
+     single-type view and the mixed stream take the same reveal, sentinel,
+     page-loaded and end paths. */
+  const source = view === 'courses' ? coursesView : stream;
 
-  const visible = useMemo(() => stream.items.slice(0, revealed), [stream.items, revealed]);
+  /* PHASE C §3a-§3c THE COURSE SHELVES. Each shelf renders nothing when its
+     source is empty. Geography comes from the shared resolver above — no second
+     derivation, and C1's county and world shelves are REUSED here, not rebuilt. */
+  const shelvesWanted = view === 'all' || view === 'courses' || view === 'reviews';
+  const countyCourses = useCountyCourses(userId, geography.scope, shelvesWanted && geography.isFetched);
+  const worldCourses = useWorldTop100Courses(shelvesWanted);
+  const listCourses = useListCourses(userId, shelvesWanted);
+  const topRatedCourses = useRecentCourseRatings(view === 'courses' || view === 'reviews');
+
+  const visible = useMemo(() => source.items.slice(0, revealed), [source.items, revealed]);
 
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
      screen, and a card holds its whole shell until that resolver settles —
