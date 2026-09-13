@@ -32,8 +32,9 @@ import { smoothPath } from '@/lib/charts/smoothPath';
  * +8 over eighteen holes, and a -1 round travels between -2 and 0 — so the
  * subject of the sheet got about a fifth of the plot height and could not move.
  * Saturating a line that cannot travel changes nothing. THE FIELD IS NOT DELETED
- * AS DATA: it moves to the scrub readout, where the comparison is actually
- * decided per hole, and the sheet still carries it in prose and in the hero.
+ * AS DATA: it remains in the scrub readout and the sheet's independent
+ * beat-the-field trajectory comparison. The scorecard's FIELD row was removed
+ * by decision; this chart does not depend on that row rendering.
  *
  * Beads mark ONLY an ace or an albatross (BRIEF_ROUND_CURVE_BEADS_GOLD_ONLY).
  * Every other outcome is carried by the graded stroke. The rule lives in
@@ -291,7 +292,8 @@ export const TrajectoryLine: React.FC<Props> = ({
       (h) => h.fieldAvg != null && h.strokes != null && (h.strokes as number) > 0,
     );
     if (pool.length < 2) return null;
-    return pool.filter((h) => (h.strokes as number) <= (h.fieldAvg as number)).length;
+    // STRICTLY BETTER. Matching the field average is level, not beaten.
+    return pool.filter((h) => (h.strokes as number) < (h.fieldAvg as number)).length;
   }, [holes]);
 
   if (m < 2 || allPts.length < 2) return null;

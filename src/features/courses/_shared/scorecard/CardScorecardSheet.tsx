@@ -91,7 +91,7 @@ export interface CardScorecardHole {
   holeNo: number;
   par: number | null;
   strokes: number | null;
-  /** Optional field average for the hole — member course field or tour field. */
+  /** Optional field average for the trajectory comparison and scrub readout. */
   fieldAvg?: number | null;
 }
 
@@ -154,14 +154,13 @@ export interface CardScorecardSheetProps {
   /** Member enrichment — omitted for a pro, who has no history at the venue. */
   courseContext?: CardScorecardCourseContext | null;
   /**
-   * §D3/E2/E3 — HOW MANY OTHER GOLFERS THE FIELD IS MADE OF, from
+   * §E2/E3 — HOW MANY OTHER GOLFERS THE FIELD IS MADE OF, from
    * get_course_hole_field's `course_players` (the round's owner already
-   * excluded). OPTIONAL AND DEFAULTING ABSENT: the tour caller never passes it
-   * and the tour field path is untouched.
+   * excluded). OPTIONAL AND DEFAULTING ABSENT: the tour caller never passes it.
    *
-   * ONE THRESHOLD, TWO CONSUMERS: this single number drives BOTH the per-hole
-   * FIELD row on the card and the beat-the-field sentence under the trajectory,
-   * through the one `fieldGateOpen` value below, so the two cannot drift apart.
+   * The per-hole FIELD row and its pool-basis / gate-fail copy were removed by
+   * decision. This count remains because the independent beat-the-field
+   * trajectory comparison still needs the five-player gate.
    */
   fieldPlayers?: number | null;
 
@@ -249,16 +248,6 @@ function toParColor(n: number | null): string {
 const NINE_GRID = 'repeat(9, minmax(0, 1fr)) 32px';
 
 /**
- * §D3/E2 — THE ONE FIELD THRESHOLD. Both the per-hole FIELD row and the
- * beat-the-field sentence read this single constant through one derived
- * `fieldGateOpen`, so they can never disagree about whether a field exists.
- *
- * It now lives in src/lib/gam/fieldGate.ts because the trophy room's won /
- * uncontested split asks the same question. Value unchanged (5); it is imported
- * rather than restated so a second definition of "a field" cannot appear.
- */
-
-/**
  * Result marks come from the shared ScoreMark renderer — one grammar across the
  * sheet, the feed card and the Holes legend. Par is unmarked on purpose:
  * marking every hole marks nothing.
@@ -335,17 +324,7 @@ function nineSummary(rows: CardScorecardHole[]): {
 const Nine: React.FC<{
   rows: CardScorecardHole[];
   label: string;
-  /**
-   * FIELD ROW — MEMBER CARD DOES NOT SHOW IT. The field comparison is already
-   * stated in prose directly above the card ("beat the field average on 14 of
-   * 18 holes scored so far"), and a third row of small signed figures under two
-   * rows that already carry the story is noise. Per-hole field figures remain
-   * available behind "See all 18 holes". The TOUR card keeps the row: there the
-   * field is the tournament field for that round and is the primary reference
-   * point, not a secondary one, so callers gate this on surface.
-   */
-  withField: boolean;
-}> = ({ rows, label, withField }) => {
+}> = ({ rows, label }) => {
   const { par, strokes, playedCount, parPlayed } = nineSummary(rows);
   /**
    * S1.2 / S1.3 — the nine's two totals.
@@ -359,13 +338,6 @@ const Nine: React.FC<{
   const parTotal = !started ? '' : partial ? parPlayed : (par || '\u2014');
   const strokesTotal = started ? strokes : '';
 
-  const fieldRel = withField
-    ? rows.reduce(
-        (s, h) => s + (h.fieldAvg != null && h.par != null ? h.fieldAvg - h.par : 0),
-        0,
-      )
-    : null;
-
   return (
     <div>
       <CardRow cells={rows.map((h) => h.holeNo)} total={label} muted />
@@ -377,29 +349,6 @@ const Nine: React.FC<{
         total={strokesTotal}
       />
 
-      {withField && (
-        <CardRow
-          /* CONTRADICTION, REPORTED, NOT RESOLVED HERE: this tour-only row of
-             signed decimals is the ONE row on the card that was not inferable
-             from its contents, and the ruling removes the column that named it.
-             It is left unlabelled rather than kept as the single labelled row,
-             because one label beside three unlabelled rows is the two-grammar
-             problem in miniature. `scorecard.fieldShort` is dead-listed with the
-             other stub keys, not deleted. */
-          cells={rows.map((h) => {
-            const d = h.fieldAvg != null && h.par != null ? h.fieldAvg - h.par : null;
-            if (d == null) return '';
-            const r = Math.round(d * 10) / 10;
-            return `${r > 0 ? '+' : r < 0 ? '\u2212' : ''}${Math.abs(r).toFixed(1)}`;
-          })}
-          total={
-            fieldRel != null
-              ? `${fieldRel > 0 ? '+' : fieldRel < 0 ? '\u2212' : ''}${Math.abs(Math.round(fieldRel * 10) / 10).toFixed(1)}`
-              : ''
-          }
-          muted
-        />
-      )}
     </div>
   );
 };
@@ -760,10 +709,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const fieldHoles = useMemo(() => played.filter((h) => h.fieldAvg != null), [played]);
   const withField = fieldHoles.length >= 2;
 
-  const fieldRoundTotal = withField
-    ? fieldHoles.reduce((s, h) => s + (h.fieldAvg as number), 0)
-    : null;
-
   /**
    * §E2 — "BEAT" IS STRICTLY BETTER. This counted `<=`, so a hole MATCHED
    * against the field average was reported as a hole beaten. Level is level.
@@ -773,7 +718,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     : null;
 
   /**
-   * §D3/E2 — ONE GATE, ONE THRESHOLD, TWO CONSUMERS.
+   * §E2 — THE TRAJECTORY COMPARISON'S FIELD GATE.
    *
    * A field of one or two other golfers is not a field: measured 10 Sep 2026,
    * only about 15 of 198 mapped courses carry five or more players, so this gate
@@ -781,8 +726,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    * it, the comparison on every other course was a member measured largely
    * against themselves. Do not soften it.
    *
-   * TOUR IS UNAFFECTED: a tournament field is a field by definition, so the tour
-   * surface passes through ungated and never calls the member field function.
+   * The per-hole FIELD row no longer exists. The threshold survives solely for
+   * the independent beat-the-field comparison under the trajectory. Tour is
+   * unaffected: it never calls the member field function.
    */
   const fieldGateOpen = isTour || (fieldPlayers != null && fieldPlayers >= FIELD_MIN_PLAYERS);
 
@@ -834,7 +780,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    *    case. othersCount stays Math.max(roundsHere - 1, 1) and is retained as
    *    the sample size behind the comparison even though the rail no longer
    *    prints it.
-   *  - the field figure counts strokes <= fieldAvg, so a MATCHED hole counts.
+   *  - the field figure counts strokes < fieldAvg. A matched hole does not count.
    *    The denominator is fieldHoles.length (holes with both a score and a
    *    field average), never 18 and never played.length.
    *  - rank 1 does not take an ordinal (formatOrdinal(1) -> "1st", which read
@@ -902,9 +848,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
      * §E2 — THE BEAT-FIELD FIGURE HAS LEFT THE RAIL. It is the one figure on
      * this sheet drawn from the FIELD pool rather than the member's own history,
      * so it cannot sit beside self-history figures with no basis stated. It is
-     * now a sentence under the trajectory with its sample beneath it, gated on
-     * the same `fieldGateOpen` as the card's FIELD row. `figBeatField` is
-     * deleted 10 Sep 2026.
+     * now a sentence under the trajectory, gated by `fieldGateOpen`.
+     * `figBeatField` is deleted 10 Sep 2026.
      */
     /**
      * The tour position keeps the rail — a pro has no history section to move
@@ -922,7 +867,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       });
     }
     return items;
-  }, [withField, beatFieldOn, fieldHoles.length, identityStat, playerHcp, courseSection.length, t]);
+  }, [identityStat, playerHcp, courseSection.length, t]);
 
 
 
@@ -993,14 +938,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     }
   }
 
-
-  /**
-   * §D3 — THE FIELD ROW IS BACK ON THE MEMBER CARD, GATED. It renders when the
-   * round carries per-hole field averages AND the course clears the five-player
-   * gate; a hole with no average leaves an EMPTY CELL, never a zero. The tour
-   * card is unchanged — `fieldGateOpen` is true for tour by definition.
-   */
-  const showFieldRow = withField && fieldGateOpen;
 
   // The card column header has no room for a name and the legend above already
   // names the player, so a third-person card leaves the score-column label blank.
@@ -1279,9 +1216,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               */}
               <Panel kicker={t('courses:scorecard.theCard')}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <Nine rows={out} label={t('courses:scorecard.out')} withField={showFieldRow} />
+                  <Nine rows={out} label={t('courses:scorecard.out')} />
                   {back.length > 0 && (
-                    <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} />
+                    <Nine rows={back} label={t('courses:scorecard.in')} />
                   )}
 
                   {/*
@@ -1336,35 +1273,16 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   referenced element. Construction and monotonePath unchanged. */}
               <Panel kicker={t('courses:scorecard.howItUnfolded')}>
                 <TrajectoryLine holes={holes} height={120} surface="dark" interactive />
-                {/*
-                  §E2/E3 — THE FIELD SENTENCE SITS WITH THE SHAPE OF THE ROUND,
-                  not in the self-history rail. {m} counts only holes carrying
-                  BOTH a score and a field average — never a hard 18 — and the
-                  basis line names the pool the sentence is measured against.
-                  Member surface only; a pro's field is the tournament field.
-                */}
-                {!isTour && fieldPlayers != null && (
-                  <div style={{ marginTop: 12 }}>
-                    {fieldGateOpen && withField && beatFieldOn != null ? (
-                      <>
-                        <p style={CAPTION}>
-                          {t('courses:scorecard.beatFieldSentence', {
-                            n: beatFieldOn,
-                            m: fieldHoles.length,
-                          })}
-                        </p>
-                        <div style={{ ...LABEL_AXIS, marginTop: 4 }}>
-                          {t('courses:scorecard.beatFieldBasis', { count: fieldPlayers })}
-                        </div>
-                      </>
-                    ) : (
-                      <p style={CAPTION}>
-                        {fieldPlayers === 0
-                          ? t('courses:scorecard.noFieldNobody')
-                          : t('courses:scorecard.noFieldLine', { count: fieldPlayers })}
-                      </p>
-                    )}
-                  </div>
+                {/* The FIELD row's pool-basis and gate-fail lines left with the
+                    row. Beat-the-field remains an independent trajectory fact;
+                    when its five-player gate fails, this section says nothing. */}
+                {!isTour && fieldGateOpen && withField && beatFieldOn != null && (
+                  <p style={{ ...CAPTION, marginTop: 12 }}>
+                    {t('courses:scorecard.beatFieldSentence', {
+                      n: beatFieldOn,
+                      m: fieldHoles.length,
+                    })}
+                  </p>
                 )}
               </Panel>
             </>

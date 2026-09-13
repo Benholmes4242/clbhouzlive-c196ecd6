@@ -2,9 +2,11 @@
  * TWO THRESHOLDS, TWO QUESTIONS. Both live here so nobody can tell them apart
  * by accident, and nobody can "unify" them without reading why they differ.
  *
- * FIELD_MIN_PLAYERS gates an AVERAGE. The scorecard sheet's per-hole FIELD row
- * and beat-the-field sentence ask "is there a field to average against?" -- a
- * statistical claim, and a mean over four golfers is not one. Five is the floor.
+ * FIELD_MIN_PLAYERS gates an AVERAGE. The scorecard sheet's independent
+ * beat-the-field trajectory comparison asks "is there a field to average
+ * against?" -- a statistical claim, and a mean over four golfers is not one.
+ * Five is the floor. The per-hole FIELD row that originally shared this gate was
+ * removed by decision; the comparison still reads it.
  *
  * CROWN_MIN_OTHERS gates a CONTEST. A course record asks the binary question
  * "did anyone else play here?". If one other golfer posted a round and you are
@@ -13,8 +15,8 @@
  *
  * DO NOT COLLAPSE THEM. Raising the crown floor to five would call a genuine
  * win over one golfer "uncontested"; lowering the field floor to one would print
- * a per-hole average computed from a single round. Two thresholds on two
- * surfaces is correct when the surfaces ask different questions.
+ * a field comparison computed from a single round. Two thresholds on two
+ * questions is correct when the questions differ.
  *
  * WHAT IS SHARED IS THE COUNT, NOT THE FLOOR. Both read distinct players with a
  * scored round at the course EXCLUDING the member being described, and that

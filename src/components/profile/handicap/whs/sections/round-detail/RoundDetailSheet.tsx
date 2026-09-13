@@ -83,7 +83,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
   );
 
   // Member enrichment — the member's own history at this course, and the
-  // per-hole field average that powers the course page's shape chart.
+  // per-hole field average that powers the trajectory comparison and scrub.
   const contextQuery = useRoundCourseContext(scoreId, open);
   const ctx = contextQuery.data ?? null;
   const analysisCourseId = ctx?.course_id ?? courseIdQuery.data ?? undefined;
@@ -97,7 +97,9 @@ export const RoundDetailSheet: React.FC<Props> = ({
    *
    * get_course_hole_field replaces get_course_hole_analysis here: the analysis
    * function includes every player, so the old field average included the
-   * member it was being compared with. available:false ('unauthenticated' or
+   * member it was being compared with. The scorecard FIELD row has been removed,
+   * but this read remains live for the independent beat-the-field trajectory
+   * comparison and its five-player gate. available:false ('unauthenticated' or
    * 'no_whs_mapping') means NO FIELD; an empty field is a structured object with
    * course_players 0, so the count is what is branched on, never null.
    */

@@ -17,6 +17,15 @@
 - [ ] Resolve the sliced round selector.
 - [ ] Report whether each bordered frame is shared Panel or local.
 
+## Scorecard field row removal (13 Sep 2026)
+- [x] Remove the per-hole FIELD row from the shared member/tour scorecard without deleting its source files or locale keys.
+- [x] Remove the row's pool-basis and below-five-player gate-fail copy; keep the independent strictly-better trajectory comparison.
+- [x] Confirm `get_course_hole_field` remains live through `RoundDetailSheet` for trajectory field data and the five-player gate.
+- [x] Keep `get_course_field_sizes`, `FIELD_MIN_PLAYERS`, and `CROWN_MIN_OTHERS`; update the threshold rationale for the remaining consumers.
+- Dead-listed locale keys, retained in all six locale files: `scorecard.beatFieldBasis_one`, `scorecard.beatFieldBasis_other`, `scorecard.noFieldLine_one`, `scorecard.noFieldLine_other`, and `scorecard.noFieldNobody`. No other source reads them.
+- Card geometry at 390pt is unchanged horizontally: 328px interior, 30.89px hole columns, 22px marks, 4.44px clearance per side. Each nine now has exactly hole-number, par, and score rows, with OUT/IN and their totals retained in the 32px final column.
+- [ ] Round selector vertical case remains separate: it is the first child of the scrolling body beneath the fixed header; investigate the reported underline stubs without bundling a horizontal fix.
+
 ## England federation picker label (9 Sep 2026)
 - [x] Trace the picker label to its constants-file source and audit every other England Golf reference.
 - [x] Name all three supported England products on the picker only, without changing connection-specific copy.
