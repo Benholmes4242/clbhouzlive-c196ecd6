@@ -94,6 +94,8 @@ DECLARE
   v_back_hold  jsonb := '[]'::jsonb;     -- backlog cadence could not place yet
 
   v_news_placed integer := 0;            -- news cards placed on THIS page
+  v_news_seen integer := 0;              -- news CANDIDATES this page had at all
+
 
   v_deferred jsonb := '[]'::jsonb;       -- news cadence could not place yet
   v_carry    text[] := '{}';             -- deferred ids handed back by the cursor
