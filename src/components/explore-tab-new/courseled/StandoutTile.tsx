@@ -128,6 +128,8 @@ export function StandoutTile({
   onDetailPress,
   subline = null,
   trailing,
+  reserveTwoLines = false,
+
   footer,
   kicker = null,
   avatarUrl = null,
