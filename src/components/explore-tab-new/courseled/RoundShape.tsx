@@ -10,7 +10,7 @@ import {
 } from '@/features/courses/components/holes/_constants';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
-import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { TOPAR_RED, RAMP_TOPAR, RAMP_DIST, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
@@ -78,6 +78,7 @@ export function RoundShape({
   strokeWidth = 1.8,
   baselineColor,
   beadHoleLabels = false,
+  exploreLineOnly = false,
 }: {
   row: CircleRoundRow;
   shape: HoleShape | null;
@@ -102,7 +103,10 @@ export function RoundShape({
   baselineColor?: string;
   /** §3b The hole number beneath each bead. Hero only; default FALSE. */
   beadHoleLabels?: boolean;
+  /** Explore-only line treatment. Defaults false, preserving every existing caller. */
+  exploreLineOnly?: boolean;
 }) {
+  const { t } = useTranslation('courses');
 
   const front = row.front_nine_to_par;
   const back = row.back_nine_to_par;
@@ -147,6 +151,35 @@ export function RoundShape({
       {showMeta && shape && <ShapeMeta buckets={buckets} />}
     </>
   );
+
+  if (shape && exploreLineOnly) {
+    const lineValues = shape.series;
+    const lo = Math.min(0, ...lineValues) - 0.7;
+    const hi = Math.max(0, ...lineValues) + 0.7;
+    const span = Math.max(hi - lo, 2);
+    const top = 8;
+    const bottom = height - 12;
+    const xFor = (i: number) => SHAPE_PAD_X + (i / Math.max(lineValues.length - 1, 1)) * (width - SHAPE_PAD_X * 2);
+    const yFor = (value: number) => bottom - ((value - lo) / span) * (bottom - top);
+    const points = lineValues.map((value, index) => ({ x: xFor(index), y: yFor(value) }));
+    const path = smoothPath(points);
+    const baselineY = yFor(0);
+    const last = points.at(-1);
+    const tone = (lineValues.at(-1) ?? 0) < 0 ? RAMP_DIST.birdie : A.INK;
+    return (
+      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
+        <line x1={SHAPE_PAD_X} x2={width - SHAPE_PAD_X} y1={baselineY} y2={baselineY}
+          stroke={baselineColor ?? A.HAIRLINE} strokeWidth={1} strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
+        <path d={path} fill="none" stroke={tone} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+        {last ? <circle cx={last.x} cy={last.y} r={2.6} fill={tone} /> : null}
+        <text x={SHAPE_PAD_X} y={height - 2} fill={A.MUTE} fontSize="7" fontFamily="Geist, sans-serif">1</text>
+        <text x={width - SHAPE_PAD_X} y={height - 2} textAnchor="end" fill={A.MUTE} fontSize="7" fontFamily="Geist, sans-serif">18</text>
+        <text x={width / 2} y={Math.max(7, baselineY - 3)} textAnchor="middle" fill={A.MUTE} fontSize="7" fontFamily="Geist, sans-serif">
+          {t('amateur.stream.visual.level', 'LEVEL')}
+        </text>
+      </svg>
+    );
+  }
 
   /* ONE CHART, THREE SURFACES. When the hole-by-hole data is present the tile
      renders THE SAME TrajectoryLine the Clubhouse scorecard post and the

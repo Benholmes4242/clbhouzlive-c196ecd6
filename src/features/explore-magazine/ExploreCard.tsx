@@ -13,6 +13,8 @@ import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
+import { treatmentFor } from './roundTreatment';
+import { RoundDistribution, RoundTicks } from './RoundTreatments';
 
 /**
  * THE UNIT (BRIEF_EXPLORE_MAGAZINE §4).
@@ -56,11 +58,13 @@ function FigureChip({
   figure,
   unit,
   tone,
+  unitTone,
   corner,
 }: {
   figure: string;
   unit?: string | null;
   tone?: string;
+  unitTone?: string;
   corner: 'left' | 'right';
 }) {
   return (
@@ -83,7 +87,7 @@ function FigureChip({
     >
       <span style={{ fontSize: 15, fontWeight: 700, color: tone ?? '#FFFFFF' }}>{figure}</span>
       {unit ? (
-        <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.72)' }}>{unit}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, color: unitTone ?? 'rgba(255,255,255,0.72)' }}>{unit}</span>
       ) : null}
     </span>
   );
@@ -103,7 +107,8 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
         corner="left"
         figure={String(facts.gross)}
         unit={toPar ?? undefined}
-        tone={under ? A.RED : '#FFFFFF'}
+        tone="#FFFFFF"
+        unitTone={under ? A.RED : undefined}
       />,
     );
   }
@@ -278,13 +283,14 @@ function WhoLine({
 export function ExploreCard({
   item,
   size,
-  shape = null,
+  shape,
   onTap,
   onWhoTap,
 }: {
   item: StreamItem;
   size: CardSize;
   /** Rounds only. A pair never draws a shape: at 124px it cannot be read. */
+  /** undefined = unresolved; null = settled without usable hole detail. */
   shape?: HoleShape | null;
   onTap: () => void;
   onWhoTap?: () => void;
@@ -295,9 +301,9 @@ export function ExploreCard({
   const chips = chipsFor(item, t as never);
   const onPhoto = size === 'lead';
 
-  const showShape =
-    item.kind === 'round' && size !== 'pair' && !!item.payload.round && (!!shape || !!item.facts.to_par);
-  const band = showShape ? SHAPE_BAND[size] : 0;
+  const treatment = item.kind === 'round' && size !== 'pair' ? treatmentFor(item, shape) : 'none';
+  const hasVisual = treatment !== 'none' && shape != null && item.payload.round != null;
+  const band = hasVisual ? SHAPE_BAND[size] : 0;
 
   const kicker = (
     <div
@@ -365,7 +371,7 @@ export function ExploreCard({
         <span aria-hidden style={{ position: 'absolute', inset: 0, background: LEAD_SCRIM, zIndex: 1 }} />
       ) : null}
       {chips}
-      {showShape ? (
+      {hasVisual ? (
         <span
           aria-hidden
           style={{
@@ -381,15 +387,10 @@ export function ExploreCard({
             overflow: 'hidden',
           }}
         >
-          <RoundShape
-            row={item.payload.round!}
-            shape={shape}
-            width={SHAPE_W[size]}
-            height={band}
-            showMeta={false}
-            showBaseline={(item.facts.to_par ?? 0) < 0}
-            baselineColor="rgba(255,255,255,0.34)"
-          />
+          {treatment === 'shape' ? (
+            <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]} height={band}
+              showMeta={false} showBaseline baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly />
+          ) : treatment === 'ticks' ? <RoundTicks shape={shape} /> : <RoundDistribution shape={shape} />}
         </span>
       ) : null}
       {onPhoto ? (
@@ -398,7 +399,7 @@ export function ExploreCard({
             position: 'absolute',
             left: 16,
             right: 16,
-            bottom: showShape ? 68 : 14,
+             bottom: hasVisual ? 68 : 14,
             zIndex: 2,
             display: 'block',
           }}

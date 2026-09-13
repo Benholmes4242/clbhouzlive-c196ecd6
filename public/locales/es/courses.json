@@ -1639,6 +1639,17 @@
         "world": "mundo",
         "gbi": "GB&I"
       },
+      "visual": {
+        "level": "PAR",
+        "ace": "HOYO EN UNO EN {{n}}",
+        "albatross": "ALBATROSS EN {{n}}",
+        "eagle": "EAGLE EN {{n}}",
+        "triple": "TRIPLE EN {{n}}",
+        "double": "DOBLE EN {{n}}",
+        "birdie": "BIRDIE",
+        "par": "PAR",
+        "bogey": "BOGEY"
+      },
       "kicker": {
         "ownRound": "Tu vuelta",
         "courseRecord": "Record del campo",

@@ -1575,6 +1575,17 @@
         "world": "世界",
         "gbi": "GB&I"
       },
+      "visual": {
+        "level": "LEVEL",
+        "ace": "HOLE IN ONE ON {{n}}",
+        "albatross": "ALBATROSS ON {{n}}",
+        "eagle": "EAGLE ON {{n}}",
+        "triple": "TRIPLE ON {{n}}",
+        "double": "DOUBLE ON {{n}}",
+        "birdie": "BIRDIE",
+        "par": "PAR",
+        "bogey": "BOGEY"
+      },
       "kicker": {
         "ownRound": "あなたのラウンド",
         "courseRecord": "コースレコード",
