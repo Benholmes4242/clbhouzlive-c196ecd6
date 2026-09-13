@@ -285,7 +285,7 @@ export function CompactStandoutTile({
                   fontSize: 11,
                   fontWeight: 600,
                   lineHeight: 1.3,
-                  color: 'rgba(104,112,123,0.78)',
+                  color: A.MUTE,
                   marginTop: 3,
                   display: '-webkit-box',
                   WebkitLineClamp: 2,
