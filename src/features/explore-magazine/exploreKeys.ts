@@ -1,4 +1,4 @@
-import type { ExploreView } from './useExploreStreamClient';
+import type { ExploreView } from './exploreViewMemory';
 
 /**
  * SHARED QUERY KEYS FOR EXPLORE (BRIEF_EXPLORE_MAGAZINE §0).
