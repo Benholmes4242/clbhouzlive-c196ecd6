@@ -40,6 +40,7 @@ import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCo
 import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding } from './useViewerStanding';
+import { useViewerCourseBests } from './useViewerCourseBests';
 import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
 
 /**
