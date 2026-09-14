@@ -67,6 +67,16 @@ export interface RailChipsProps {
   align?: 'start' | 'center-when-fit';
 
   /**
+   * ADDITIVE — SIZE CARRIES HIERARCHY, TREATMENT STAYS CONSTANT
+   * (BRIEF_EXPLORE_DEVICE_PASS §1b). Where two chip rows stack, the PRIMARY row
+   * (the views) keeps 'md' — the canonical 12/700, 6 by 11 geometry shared with
+   * the Courses page sort chips — and the SECONDARY row (the scope) takes 'sm'.
+   * Both rows state their active chip the SAME WAY, so nothing about a filter
+   * shouts louder than the thing it filters.
+   */
+  size?: 'sm' | 'md';
+
+  /**
    * ADDITIVE. An action rendered at the trailing edge of the scrollable row,
    * separated from the last chip by the same gap the chips use. The caller owns
    * the button styling and semantics; RailChips only guarantees it scrolls
@@ -74,6 +84,7 @@ export interface RailChipsProps {
    */
   trailing?: React.ReactNode;
 }
+
 
 /** The applied-state ground: 6% white, stated once. */
 const APPLIED_FILL = 'rgba(255,255,255,0.06)';
