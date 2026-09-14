@@ -207,7 +207,11 @@
       "newThisMonth": "New this month",
       "follow": "Follow",
       "following": "Following",
-      "topRated": "Best rated lately"
+      "topRated": "Best rated lately",
+      "golfersToFollow": "Golfers to follow",
+      "playsAtClub": "Plays at {{club}}",
+      "roundsThisMonth": "{{count}} rounds this month",
+      "alsoPlays": "Also plays {{course}}"
     }
   },
   "amateurNews": {

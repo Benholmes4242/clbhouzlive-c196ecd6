@@ -1748,7 +1748,11 @@
       "newThisMonth": "Nuevo este mes",
       "follow": "Seguir",
       "following": "Siguiendo",
-      "topRated": "Mejor valorados ultimamente"
+      "topRated": "Mejor valorados ultimamente",
+      "golfersToFollow": "Golfistas para seguir",
+      "playsAtClub": "Juega en {{club}}",
+      "roundsThisMonth": "{{count}} vueltas este mes",
+      "alsoPlays": "Tambien juega {{course}}"
     }
   }
 }

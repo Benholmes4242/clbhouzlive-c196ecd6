@@ -1684,7 +1684,11 @@
       "newThisMonth": "今月から参加",
       "follow": "フォロー",
       "following": "フォロー中",
-      "topRated": "Best rated lately"
+      "topRated": "Best rated lately",
+      "golfersToFollow": "フォローするゴルファー",
+      "playsAtClub": "{{club}}でプレー",
+      "roundsThisMonth": "今月{{count}}ラウンド",
+      "alsoPlays": "{{course}}でもプレー"
     }
   }
 }
