@@ -80,7 +80,7 @@ export function MediaRailTile({
       onClick={onPress}
       style={{ width, flex: `0 0 ${width}px`, padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}
     >
-      <div style={{ position: 'relative', width, aspectRatio: width === 176 ? '3 / 4' : '16 / 10', overflow: 'hidden', borderRadius: r.sm, background: A.PANEL }}>
+      <div style={{ position: 'relative', width, aspectRatio: aspect ?? (width === 176 ? '3 / 4' : '16 / 10'), overflow: 'hidden', borderRadius: r.sm, background: A.PANEL }}>
         {item.thumbnail && <img src={item.thumbnail} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
         {mountVideo && (
           <video

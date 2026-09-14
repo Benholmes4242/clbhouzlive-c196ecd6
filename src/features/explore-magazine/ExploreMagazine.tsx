@@ -243,6 +243,7 @@ function ClipsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) {
             item={clip}
             index={index}
             width={CLIP_TILE.w}
+            aspect="9 / 16"
             autoplayGroup="amateur-magazine"
             onPress={() => {
               analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'clips', pos });
