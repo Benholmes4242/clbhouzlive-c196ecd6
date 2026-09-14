@@ -11,6 +11,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
 import { uploadEventBus } from './uploadEventBus';
+import { derivePosterUrl } from './posterUrl';
 import { createPost } from '@/services/posts/createPost';
 
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
@@ -597,7 +598,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             ? Math.max(1, Math.floor(clientDuration / 2))
             : 1;
           const posterTime = mediaItem?.posterTimestamp ?? computedDefaultPosterTime;
-          posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: posterTime });
+          posterUrl = derivePosterUrl({ streamId, posterTimestamp: posterTime, height: 720 });
           
           // Track for potential cleanup
           if (streamId) {
@@ -1165,7 +1166,7 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
         streamId = result.streamId;
         publicUrl = generateStreamHlsUrl(streamId);
         const retryPosterTime = mediaItem?.posterTimestamp ?? (mediaItem as any)?.posterTimestamp ?? 1;
-        posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: retryPosterTime });
+        posterUrl = derivePosterUrl({ streamId, posterTimestamp: retryPosterTime, height: 720 });
         uploadedStreamUids.push(streamId);
       } else {
         let fileToUpload = file;
@@ -1564,7 +1565,7 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
             streamId = result.streamId;
             // Use proper URL generator instead of hardcoded URL
             publicUrl = generateStreamHlsUrl(streamId);
-            posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: (mediaItem as any)?.posterTimestamp ?? 1 });
+            posterUrl = derivePosterUrl({ streamId, posterTimestamp: (mediaItem as any)?.posterTimestamp ?? 1, height: 720 });
             uploadedStreamUids.push(streamId);
             
           } catch (videoError: any) {

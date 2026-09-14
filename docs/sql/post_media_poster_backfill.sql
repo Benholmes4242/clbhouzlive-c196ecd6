@@ -19,6 +19,13 @@
 -- what the old pipeline wrote and what Cloudflare Stream serves with
 -- cache-control: public, max-age=864000.
 
+-- URL SHAPE (updated): '?height=1080&fit=crop' - exactly what
+-- src/uploads/posterUrl.ts derivePosterUrl() now writes on every new video row.
+-- If an earlier copy of this draft was already run, those rows carry
+-- '?height=1080' with no '&fit=crop'. Cloudflare's default fit IS crop, so the
+-- served image is identical; re-running this file will NOT change them (they
+-- are no longer NULL). Normalising them is cosmetic and optional.
+
 BEGIN;
 
 -- Guard: fail loudly if the shape of the problem has changed since it was
@@ -41,7 +48,7 @@ UPDATE public.post_media
 SET poster_url =
       'https://customer-4ah4gni80ytefpck.cloudflarestream.com/'
       || stream_id
-      || '/thumbnails/thumbnail.jpg?height=1080'
+      || '/thumbnails/thumbnail.jpg?height=1080&fit=crop'
 WHERE media_type = 'video'
   AND poster_url IS NULL
   AND stream_id IS NOT NULL;

@@ -42,7 +42,8 @@ import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
-import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
+import { derivePosterUrl } from '@/uploads/posterUrl';
+import { trackError } from '@/lib/errorTracking';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import type { StageMediaItem } from '../hooks/useStageComposer';
 
@@ -257,9 +258,28 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
   });
 
   const posterTimestamp = typeof item.posterTimestamp === 'number' ? item.posterTimestamp : null;
-  const posterUrl = posterTimestamp && posterTimestamp > 0
-    ? `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg?time=${posterTimestamp}s&height=1080`
-    : null;
+
+  // A WRITE THAT NEVER HAPPENS LEAVES NO TRACE. A column that can be silently
+  // skipped will be. This used to be
+  //     ...(posterUrl ? { poster_url: posterUrl } : {})
+  // and because nobody ever picks a poster frame, poster_url was never written
+  // for eight weeks and nothing anywhere reported it. poster_url is now ALWAYS
+  // written: the member's chosen frame if there is one, otherwise the derived
+  // Stream thumbnail. One definition of that URL lives in @/uploads/posterUrl
+  // and the SQL backfill agrees with it exactly.
+  const posterUrl = derivePosterUrl({
+    streamId,
+    posterTimestamp,
+    durationSeconds: item.duration ?? null,
+  });
+
+  // Assert at the write. Never blocks the member's post - reports instead.
+  if (!posterUrl) {
+    trackError({
+      kind: 'error',
+      message: `postUploadController: poster_url absent at insert for stream ${streamId}`,
+    });
+  }
 
   await insertMediaRow(ctx.postId, displayOrder, {
     media_type: 'video',
@@ -268,7 +288,7 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
     trim_start: item.trimStart ?? null,
     trim_end: item.trimEnd ?? null,
     poster_timestamp: posterTimestamp,
-    ...(posterUrl ? { poster_url: posterUrl } : {}),
+    poster_url: posterUrl,
     studio_edits: { frame: item.frame, crop: item.crop ?? null },
   });
 
