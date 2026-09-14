@@ -46,6 +46,11 @@ interface Props {
   unit?: string;
   /** Relative age, top-right. */
   whenLabel: string;
+  /**
+   * CIRCLE RAIL ONLY: put the date on the same glass substrate as the score.
+   * Defaults false, preserving the plain age label on every existing surface.
+   */
+  whenGlass?: boolean;
   /** Member name, already resolved ("You" for the viewer). */
   who: string;
   isOwn: boolean;
@@ -138,6 +143,7 @@ export function StandoutTile({
   figure,
   unit,
   whenLabel,
+  whenGlass = false,
   who,
   isOwn,
   detail = '',
@@ -328,17 +334,29 @@ export function StandoutTile({
           </span>
         )}
 
-        {/* AGE — the least important fact on the tile, so not a pill. */}
+        {/* AGE — plain by default. Circle opts into glass because its caption's
+            second line already belongs to handicap disclosure. */}
         <span
+          className={whenGlass && whenLabel ? 'standout-figure-chip' : undefined}
           style={{
             position: 'absolute',
             top: 8,
-            right: 10,
+            right: whenGlass ? 8 : 10,
+            ...(whenGlass && whenLabel
+              ? {
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  minHeight: 28,
+                  padding: '5px 8px',
+                  borderRadius: 10,
+                }
+              : null),
             fontSize: 11,
             fontWeight: 700,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.72)',
+            letterSpacing: whenGlass ? 0 : '0.14em',
+            textTransform: whenGlass ? 'none' : 'uppercase',
+            lineHeight: 1,
+            color: whenGlass ? '#FFFFFF' : 'rgba(255,255,255,0.72)',
             textShadow: '0 1px 2px rgba(10,14,10,0.55)',
           }}
         >

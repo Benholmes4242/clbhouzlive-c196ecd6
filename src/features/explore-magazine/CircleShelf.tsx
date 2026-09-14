@@ -15,7 +15,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreShelf } from './ExploreShelf';
 import { ShelfShell } from './ExploreShells';
-import { relativeDay, toParLabel } from './exploreCopy';
+import { railCaptionDate, relativeDay, toParLabel } from './exploreCopy';
 import { circleHandicapDisplay } from './circleHandicap';
 
 /**
@@ -191,10 +191,14 @@ export function CircleShelf({
                    takes the under-par red, inside StandoutTile. */
                 figure={row.gross != null ? String(row.gross) : null}
                 unit={toParLabel(toPar(row)) ?? undefined}
-                /* Circle layout ruling: the photo carries only the score chip.
-                   This overrides the older no-window date treatment here; the
-                   top-right corner must remain empty. */
-                whenLabel=""
+                 /* INTENTIONALLY DIFFERENT FROM STANDING AND CLUB. Those rails
+                    place this same railCaptionDate beneath the name. Circle's
+                    second caption line belongs to HCP movement, so adding the
+                    date there would create a crowded third line. Keep the one
+                    app-wide date grammar, but put it in glass opposite the
+                    score here. Do not "harmonise" the position later. */
+                 whenLabel={railCaptionDate(row.play_date) ?? ''}
+                 whenGlass
                 who={row.display_name}
                 /* IDENTITY IS user_profiles / public_profiles AND NOTHING ELSE.
                    Never whs_friends or whs_friend_matches: those hold England
