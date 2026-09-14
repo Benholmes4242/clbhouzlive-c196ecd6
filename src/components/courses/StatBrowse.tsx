@@ -120,10 +120,19 @@ const WELL_TRIGGER_AUTO_CLS =
 
 /** Two states only. A default selection is still a selection and reads as active;
  *  only a control the member cannot operate is dimmed. */
+/**
+ * THE FILTER ROW'S RADIUS, STATED ONCE. The two dropdowns and the search
+ * control beside them are one set, so they read it from here rather than each
+ * typing 8. Their HEIGHT is not a number at all: the triggers are h-auto, so
+ * their height is padding + border + the label's line box, and the search
+ * control stretches to whatever that comes to.
+ */
+const WELL_RADIUS = 8;
+
 const WELL_ENABLED: React.CSSProperties = {
   background: 'rgba(255,255,255,0.14)',
   border: `1px solid ${A.BORDER}`,
-  borderRadius: 8,
+  borderRadius: WELL_RADIUS,
   padding: '8px 12px',
   color: INK,
 };
@@ -131,7 +140,7 @@ const WELL_ENABLED: React.CSSProperties = {
 const WELL_DISABLED: React.CSSProperties = {
   background: A.PANEL,
   border: `1px solid ${A.BORDER}`,
-  borderRadius: 8,
+  borderRadius: WELL_RADIUS,
   padding: '8px 12px',
   color: INK_FAINT,
   cursor: 'not-allowed',
@@ -763,7 +772,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           background: A.CANVAS,
         }}
       >
-        <div className="flex items-center gap-2">
+        {/* ITEMS-STRETCH IS THE DERIVATION. The search control is as tall as
+            the two dropdowns because the row makes all three the same height -
+            there is no matching number to go stale when the wells change. */}
+        <div className="flex items-stretch gap-2">
           <div className="min-w-0 flex-1">{countrySelect(condensed)}</div>
           <div className="min-w-0 flex-1">{regionSelect(condensed)}</div>
           {/* INLINE SEARCH OVER WHAT IS ON SCREEN. The old "Edit" text opened the
@@ -777,8 +789,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             }}
             aria-label={t('statBrowse.search.open', { defaultValue: 'Search this list' })}
             aria-expanded={searchOpen}
-            className={`${condensed ? 'h-8 w-8' : 'h-10 w-10'} shrink-0 flex items-center justify-center`}
-            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8 }}
+            /* WIDTH UNCHANGED, HEIGHT INHERITED. The glyph keeps its own size
+               and centres in the taller box; it is not scaled to fill it. */
+            className={`${condensed ? 'w-8' : 'w-10'} shrink-0 flex items-center justify-center`}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: WELL_RADIUS }}
           >
             {searchOpen ? (
               <X className={condensed ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
