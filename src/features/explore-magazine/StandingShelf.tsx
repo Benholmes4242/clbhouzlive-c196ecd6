@@ -12,6 +12,7 @@ import { ShelfShell } from './ExploreShells';
 import { ExploreShelf } from './ExploreShelf';
 import { railCaptionDate } from './exploreCopy';
 import { standingOrdinal } from './ordinal';
+import { coursePlaceLine } from './placeLine';
 import {
   readStandingBoard,
   writeStandingBoard,
@@ -427,7 +428,7 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
               courseId={row.course_id}
               courseName={row.course_name}
               imageUrl={row.image_url}
-              region={row.region ?? row.sub_country}
+              region={coursePlaceLine({ region: row.region, subCountry: row.sub_country })}
               photo={TILE.h}
                figure={standingOrdinal(row.rank_now, copy.locale)}
               unit={copy.unit(row.field_now)}

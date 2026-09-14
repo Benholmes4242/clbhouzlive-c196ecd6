@@ -230,7 +230,14 @@ function WhoLine({
       const label = item.facts.duration_s ? formatDuration(item.facts.duration_s) : null;
       return label;
     }
-    if (item.kind === 'moment' || item.kind === 'course') return item.subject?.region ?? null;
+    /* THE PLACE LINE IS REGION + NATION — 'Kerry, Ireland', never 'Kerry'. */
+    if (item.kind === 'moment' || item.kind === 'course') {
+      return coursePlaceLine({
+        region: item.subject?.region,
+        subCountry: item.subject?.sub_country,
+        country: item.subject?.country,
+      });
+    }
     return null;
   })();
 
