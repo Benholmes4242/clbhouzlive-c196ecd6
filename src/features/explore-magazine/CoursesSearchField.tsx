@@ -46,12 +46,13 @@ export function CoursesSearchField({
           type="text"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          placeholder={t('amateur.courses.searchPlaceholder', 'Search courses, regions and reviews')}
+          placeholder={placeholder ?? t('amateur.courses.searchPlaceholder', 'Search courses, regions and reviews')}
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-[rgba(255,255,255,0.38)]"
           style={{ color: 'rgba(255,255,255,0.96)', fontFamily: SANS, minWidth: 0 }}
           autoComplete="off"
           spellCheck="false"
-          aria-label={t('amateur.courses.searchPlaceholder', 'Search courses, regions and reviews')}
+          autoFocus={autoFocus}
+          aria-label={placeholder ?? t('amateur.courses.searchPlaceholder', 'Search courses, regions and reviews')}
         />
         {value.length > 0 ? (
           <button
