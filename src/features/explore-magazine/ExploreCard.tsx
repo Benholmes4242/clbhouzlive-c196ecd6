@@ -179,7 +179,9 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
           key="course-rating"
           corner="left"
           figure={facts.rating.toFixed(1)}
-          unit={facts.rating_n != null ? `${facts.rating_n}` : undefined}
+          /* RATING + LABEL, never the count — a bare "2" reads as a second
+             score, and the count already lives in the headline. */
+          unit={t('amateur.stream.chip.rating', 'rating')}
           tone={facts.rating >= 9 ? PHOTO_FIG_GOOD : '#FFFFFF'}
         />,
       );
