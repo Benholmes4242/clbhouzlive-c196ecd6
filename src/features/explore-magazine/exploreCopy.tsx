@@ -119,6 +119,20 @@ export function spokenNumber(value: number, locale: string): string {
   return EN_NUMBER_WORDS[value] ?? String(value);
 }
 
+/**
+ * SENTENCE CASE FOR A WORD THAT OPENS A SENTENCE (BRIEF_EXPLORE_SECOND_PASS §4a).
+ *
+ * Applied ONLY to a spoken number or another interpolated WORD that lands first
+ * in a template — "six birdies" becomes "Six birdies". It is NEVER applied to a
+ * player name: a username carries its own casing and "danny.akers1" must never
+ * become "Danny.akers1", which is why this helper is called at the one call site
+ * that interpolates a number word and nowhere near {{player}}.
+ */
+export function capitaliseFirst(value: string): string {
+  return value.length === 0 ? value : value[0].toLocaleUpperCase() + value.slice(1);
+}
+
+
 export function spokenToPar(toPar: number | null | undefined, t: T, locale: string): string | null {
   if (toPar == null || !Number.isFinite(toPar)) return null;
   if (toPar === 0) return t('amateur.stream.topar.level', 'level par');
@@ -306,34 +320,71 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
      THE ACE'S "their first" SENTENCE IS NOT BUILT: it needs the player's whole
      hole-in-one history, which is not on this card and cannot be read per card,
      and an invented "first" on a second ace is exactly the false claim this page
-     exists to avoid. */
+     exists to avoid.
+
+     EVERY FEAT SENTENCE CARRIES THE TO-PAR (BRIEF_EXPLORE_SECOND_PASS §4b). A
+     gross alone is arbitrary — the same rule the record sentences already follow
+     — so where the round's to-par is known the feat states it, in the SPOKEN
+     form from spokenToPar, never the symbolic +2 the chip already wears. Where
+     the to-par is unknown the shorter sentence stands rather than a sentence
+     with a hole in it. */
   if (item.facts.holes_in_one && item.facts.holes_in_one > 0) {
     const hole = holeFor(ctx.holes, 'ace');
-    return hole != null
-      ? t('amateur.stream.headline.aceHole', 'A hole in one on the {{ordHole}}.', {
-          ordHole: standingOrdinal(hole, locale),
-        })
+    if (hole != null) {
+      return gross != null && topar
+        ? t('amateur.stream.headline.aceHoleToPar', 'A hole in one on the {{ordHole}}, in a round of {{gross}}, {{topar}}.', {
+            ordHole: standingOrdinal(hole, locale),
+            gross,
+            topar,
+          })
+        : t('amateur.stream.headline.aceHole', 'A hole in one on the {{ordHole}}.', {
+            ordHole: standingOrdinal(hole, locale),
+          });
+    }
+    return gross != null && topar
+      ? t('amateur.stream.headline.aceToPar', 'A hole in one, in a round of {{gross}}, {{topar}}.', { gross, topar })
       : t('amateur.stream.headline.ace', 'A hole in one.');
   }
   if (item.facts.albatrosses && item.facts.albatrosses > 0) {
     const hole = holeFor(ctx.holes, 'albatross');
     if (hole != null && gross != null) {
-      return t('amateur.stream.headline.albatrossHole', 'An albatross on the {{ordHole}}, in a round of {{gross}}.', {
-        ordHole: standingOrdinal(hole, locale),
-        gross,
-      });
+      return topar
+        ? t(
+            'amateur.stream.headline.albatrossHoleToPar',
+            'An albatross on the {{ordHole}}, in a round of {{gross}}, {{topar}}.',
+            { ordHole: standingOrdinal(hole, locale), gross, topar },
+          )
+        : t('amateur.stream.headline.albatrossHole', 'An albatross on the {{ordHole}}, in a round of {{gross}}.', {
+            ordHole: standingOrdinal(hole, locale),
+            gross,
+          });
     }
-    return gross != null
-      ? t('amateur.stream.headline.albatrossRound', 'An albatross, in a round of {{gross}}.', { gross })
-      : t('amateur.stream.headline.albatross', 'An albatross.');
+    if (gross != null) {
+      return topar
+        ? t('amateur.stream.headline.albatrossRoundToPar', 'An albatross, in a round of {{gross}}, {{topar}}.', {
+            gross,
+            topar,
+          })
+        : t('amateur.stream.headline.albatrossRound', 'An albatross, in a round of {{gross}}.', { gross });
+    }
+    return t('amateur.stream.headline.albatross', 'An albatross.');
   }
   if (item.facts.eagles && item.facts.eagles > 0 && gross != null) {
     const hole = holeFor(ctx.holes, 'eagle');
-    return hole != null
-      ? t('amateur.stream.headline.eagleHole', 'An eagle on the {{ordHole}}, in a round of {{gross}}.', {
-          ordHole: standingOrdinal(hole, locale),
-          gross,
-        })
+    if (hole != null) {
+      return topar
+        ? t('amateur.stream.headline.eagleHoleToPar', 'An eagle on the {{ordHole}}, in a round of {{gross}}, {{topar}}.', {
+            ordHole: standingOrdinal(hole, locale),
+            gross,
+            topar,
+          })
+        : t('amateur.stream.headline.eagleHole', 'An eagle on the {{ordHole}}, in a round of {{gross}}.', {
+            ordHole: standingOrdinal(hole, locale),
+            gross,
+          });
+    }
+    return topar
+      ? t('amateur.stream.headline.eagleToPar', 'An eagle, in a round of {{gross}}, {{topar}}.', { gross, topar })
       : t('amateur.stream.headline.eagle', 'An eagle, in a round of {{gross}}.', { gross });
   }
   if ((c?.kind === 'list_new_low' || c?.kind === 'list_first') && gross != null) {
@@ -347,11 +398,19 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
     return t('amateur.stream.headline.bogeyFree', 'Not a single bogey, in a round of {{gross}}.', { gross });
   }
   if (item.facts.birdies != null && item.facts.birdies >= 5 && gross != null) {
-    return t('amateur.stream.headline.birdieHaul', '{{count}} birdies in a round of {{gross}}.', {
-      count: spokenNumber(item.facts.birdies, locale),
-      gross,
-    });
+    /* THE ONE TEMPLATE WHOSE FIRST WORD IS INTERPOLATED (§4a). The spoken number
+       opens the sentence, so it is capitalised HERE — the template cannot do it
+       and no player name is ever passed through this helper. */
+    const count = capitaliseFirst(spokenNumber(item.facts.birdies, locale));
+    return topar
+      ? t('amateur.stream.headline.birdieHaulToPar', '{{count}} birdies in a round of {{gross}}, {{topar}}.', {
+          count,
+          gross,
+          topar,
+        })
+      : t('amateur.stream.headline.birdieHaul', '{{count}} birdies in a round of {{gross}}.', { count, gross });
   }
+
   /* THE VIEWER'S OWN ROUND THAT MOVED NOTHING. No standing claim, no to-par
      restatement of the chip: "You went round in 73." and the shape says the
      rest. This is the retirement of both rank_hold and the old "unchanged"

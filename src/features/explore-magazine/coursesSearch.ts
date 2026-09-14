@@ -84,19 +84,31 @@ export interface PlaceNode {
  * GROUPED BY COUNTRY with regions nested, A COUNT ON EVERY ROW, and ONLY PLACES
  * WITH CONTENT.
  *
- * "HAS CONTENT" IS THE CANDIDATE RULE, not "any course": a place appears when it
- * holds at least one course with a tracked round or a rating. That is exactly
- * what the view can render, so no option can yield an empty page. Measured:
- * 6 countries and 68 regions have content, against 10 countries and 489 regions
- * in golf_courses.
+ * "HAS CONTENT" IS A PARAMETER, NOT A FORK (BRIEF_EXPLORE_SECOND_PASS §3). The
+ * two views render different material, so they qualify a place differently, but
+ * ONE tree builder serves both:
+ *   - 'roundsOrRatings' (the default, the merged Courses view): a place appears
+ *     when it holds a course with a tracked round OR a rating, which is exactly
+ *     what that view can render.
+ *   - 'rounds' (Scores): Scores is rounds, so a place with ratings and no
+ *     tracked round would offer an empty page and does not appear. This is
+ *     STRICTLY A SUBSET of the Courses rule — never a wider one.
  *
  * THE COUNTRY IS golf_courses.sub_country — the nation a member names (Scotland,
  * England), not the `country` column's continent-level value.
  */
-export function placeTree(index: CourseCandidateIndex): PlaceNode[] {
+export type PlaceContentRule = 'roundsOrRatings' | 'rounds';
+
+function qualifies(index: CourseCandidateIndex, courseId: string, rule: PlaceContentRule): boolean {
+  if (rule === 'rounds') return (index.roundsByCourse.get(courseId) ?? 0) > 0;
+  return true;
+}
+
+export function placeTree(index: CourseCandidateIndex, rule: PlaceContentRule = 'roundsOrRatings'): PlaceNode[] {
   const byCountry = new Map<string, Map<string, number>>();
   const countryTotals = new Map<string, number>();
   for (const course of index.courses.values()) {
+    if (!qualifies(index, course.id, rule)) continue;
     const country = course.subCountry ?? course.country;
     if (!country) continue;
     countryTotals.set(country, (countryTotals.get(country) ?? 0) + 1);
@@ -114,6 +126,7 @@ export function placeTree(index: CourseCandidateIndex): PlaceNode[] {
     }))
     .sort((a, b) => b.count - a.count || a.country.localeCompare(b.country));
 }
+
 
 export interface PlaceChoice {
   country: string;

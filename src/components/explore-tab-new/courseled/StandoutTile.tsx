@@ -473,9 +473,23 @@ export function StandoutTile({
             second line empty. Every masonry/vertical consumer omits the prop
             and is byte-identical to before. */}
         {railCaptionLine !== undefined ? (
-          <div style={{ display: 'flex', gap: 4, minHeight: 35 }}>
+          /* AVATAR LEFT, TEXT BLOCK RIGHT, THE TWO CENTRED AGAINST EACH OTHER
+             (BRIEF_EXPLORE_SECOND_PASS §5).
+
+             THE REGRESSION THIS FIXES: with two reserved name lines the NAME BOX
+             itself carried the reserved height, so a one-line name sat at the top
+             of a 36px box and the HCP line sat at the bottom — a visible gap
+             between them, with the avatar centred against the pair and therefore
+             stranded beside the gap. The reservation now belongs to the COLUMN,
+             not to the name: the column holds the tallest case at a constant
+             height and CENTRES its two lines inside it, so name and HCP are
+             always tight to one another and the avatar — centred against the
+             column — lands level with the gap between them. Constant height
+             means the avatar cannot move from tile to tile in the rail, whether a
+             name wraps or a private member has no HCP line at all. */
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', minHeight: 35 }}>
             {who ? (
-              <div style={{ display: 'flex', alignItems: 'center', flex: 'none', alignSelf: 'stretch' }}>
+              <div style={{ display: 'flex', alignItems: 'center', flex: 'none' }}>
                 <SquircleAvatar
                   src={avatarUrl}
                   userId={avatarUserId}
@@ -485,21 +499,24 @@ export function StandoutTile({
                 />
               </div>
             ) : null}
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                flex: 1,
+                minWidth: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                /* The reserved block: two name lines (2 x 13 x 1.2) plus the
+                   caption line and its 2px lead, or one name line where the
+                   caller has not opted into two. */
+                minHeight: captionNameLines === 2 ? 51 : 35,
+              }}
+            >
               <div
                 style={{
-                  /* TWO RESERVED LINES ARE OPT-IN (BRIEF_EXPLORE_DEVICE_PASS
-                     §2a). A rail whose member names are long — "Richard
-                     Lawrenson" — cut the name at one line. With
-                     captionNameLines 2 the name wraps to a second line and the
-                     box RESERVES that height, so every tile in the rail is the
-                     same height whether the name wraps or not. Callers that
-                     omit the prop keep the single ellipsized line. */
-                  minHeight: captionNameLines === 2 ? 36 : 20,
-                  display: captionNameLines === 2 ? '-webkit-box' : 'flex',
+                  display: captionNameLines === 2 ? '-webkit-box' : 'block',
                   WebkitLineClamp: captionNameLines === 2 ? 2 : undefined,
                   WebkitBoxOrient: captionNameLines === 2 ? 'vertical' : undefined,
-                  alignItems: 'center',
                   fontSize: 13,
                   fontWeight: 700,
                   letterSpacing: '-0.01em',
@@ -529,6 +546,7 @@ export function StandoutTile({
             </div>
           </div>
         ) : (
+
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, ...(reserveTwoLines ? { minHeight: nameLines === 2 ? 32 : 16 } : null) }}>
             {who ? (
               <SquircleAvatar

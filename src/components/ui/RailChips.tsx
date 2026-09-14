@@ -77,6 +77,19 @@ export interface RailChipsProps {
   size?: 'sm' | 'md';
 
   /**
+   * ADDITIVE — EQUAL WIDTH, DISTRIBUTED (BRIEF_EXPLORE_SECOND_PASS §2). The scope
+   * rows share the run between the gutter and the place dropdown evenly rather
+   * than sitting left-packed with dead space after them: every chip takes a
+   * flex-basis of 0 and grows equally, so with room they end up the same width.
+   *
+   * THE ROW STILL SCROLLS RATHER THAN SHRINKING THE TYPE. Each chip keeps a
+   * min-width of its own content, so when four chips plus the dropdown cannot
+   * fit — 320px, a long locale, a fifth scope — nothing is squeezed and the row
+   * overflows horizontally exactly as it does today.
+   */
+  distribute?: boolean;
+
+  /**
    * ADDITIVE. An action rendered at the trailing edge of the scrollable row,
    * separated from the last chip by the same gap the chips use. The caller owns
    * the button styling and semantics; RailChips only guarantees it scrolls
@@ -86,10 +99,11 @@ export interface RailChipsProps {
 }
 
 
+
 /** The applied-state ground: 6% white, stated once. */
 const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start', size = 'md', trailing }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start', size = 'md', distribute = false, trailing }: RailChipsProps) {
   const filled = ground === 'filled';
   /* The selecting filled ground: a choice group, so tablist/tab semantics stay. */
   const filledSelection = ground === 'filled-selection';
@@ -130,8 +144,13 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
             onClick={() => { if (!locked) onChange(option.id); }}
             style={{
               flexShrink: 0,
+              /* EQUAL WIDTH FROM A ZERO BASIS: all of the free space is shared
+                 equally, and `min-width: max-content` is what makes the row
+                 overflow-and-scroll instead of squeezing a label. */
+              ...(distribute ? { flex: '1 1 0%', minWidth: 'max-content', textAlign: 'center' as const } : null),
               padding: geo.padding,
               borderRadius: geo.radius,
+
 
               /* The active chip keeps a TRANSPARENT hairline rather than none, so
                  switching view costs no 1px width shift in the row. */
