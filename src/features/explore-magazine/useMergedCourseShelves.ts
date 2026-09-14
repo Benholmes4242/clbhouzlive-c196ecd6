@@ -5,6 +5,7 @@ import { fetchCircleIds } from '@/lib/social/circle';
 
 import type { CourseCandidateIndex } from './useCourseCandidateIndex';
 import type { CourseShelfRow } from './useCourseShelves';
+import { coursePlaceLine } from './placeLine';
 
 /**
  * THE MERGED COURSES SHELVES (BRIEF_COURSES_MERGED §4).
@@ -50,7 +51,8 @@ function rowFor(index: CourseCandidateIndex, courseId: string, override?: Partia
   return {
     courseId,
     name: course?.name ?? null,
-    area: course?.region ?? course?.subCountry ?? null,
+    /* REGION + NATION (placeLine): the candidate index carries region raw. */
+    area: coursePlaceLine({ region: course?.region, subCountry: course?.subCountry, country: course?.country }),
     imageUrl: course?.imageUrl ?? null,
     rounds: index.roundsByCourse.get(courseId) ?? 0,
     rating: ratings ? ratings.mean : null,

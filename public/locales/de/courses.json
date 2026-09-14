@@ -1834,6 +1834,9 @@
       "clearPlace": "Ortsfilter loeschen",
       "placeTitle": "Nach Ort suchen",
       "findPlace": "Land oder Region finden"
+    },
+    "place": {
+      "pair": "{{place}}, {{nation}}"
     }
   }
 }

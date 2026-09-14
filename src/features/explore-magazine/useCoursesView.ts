@@ -12,6 +12,7 @@ import type { CourseShelfRow } from './useCourseShelves';
 import type { StreamItem } from './streamItem';
 import type { ScoreScope, ViewerScoreScope } from './useViewerScoreScope';
 import { useTop100RankIndex } from './useTop100RankIndex';
+import { coursePlaceLine } from './placeLine';
 
 /**
  * THE COURSES VIEW (BRIEF_EXPLORE_MAGAZINE PHASE C, §5b).
@@ -108,7 +109,10 @@ export function useRecentCourseRatings(enabled: boolean) {
         return {
           courseId,
           name: course?.name ?? null,
-          area: course?.region ?? course?.subCountry ?? null,
+          /* THE PLACE LINE IS REGION + NATION. rawRegion, never meta.region,
+             which already folds sub_country in and would pair a nation with
+             itself. */
+          area: coursePlaceLine({ region: course?.rawRegion, subCountry: course?.subCountry, country: course?.country }),
           imageUrl: course?.imageUrl ?? null,
           rounds: 0,
           rating: group.mean,
@@ -261,8 +265,9 @@ export function useScopeCourses(
           subject: {
             course_id: row.course_id,
             course_name: row.name ?? course?.name ?? null,
-            region: course?.region ?? row.area ?? null,
-            sub_country: course?.subCountry ?? null,
+            region: course?.region ?? null,
+            sub_country: course?.subCountry ?? row.area ?? null,
+            country: course?.country ?? null,
             image_url: row.thumbnail_image ?? course?.imageUrl ?? null,
             /* THE RESOLVER HOLDS THE SHELL until it settles — never a gradient
                standing in for an unknown photograph. */

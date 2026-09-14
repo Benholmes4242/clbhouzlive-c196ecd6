@@ -14,6 +14,7 @@ import { CHIP_GLASS_CLASS, PHOTO_FIG_GOOD, PHOTO_FIG_SHADOW, PHOTO_FIG_UNDER } f
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
 import { dotsFor, treatmentFor } from './roundTreatment';
+import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
 
 
@@ -230,7 +231,14 @@ function WhoLine({
       const label = item.facts.duration_s ? formatDuration(item.facts.duration_s) : null;
       return label;
     }
-    if (item.kind === 'moment' || item.kind === 'course') return item.subject?.region ?? null;
+    /* THE PLACE LINE IS REGION + NATION — 'Kerry, Ireland', never 'Kerry'. */
+    if (item.kind === 'moment' || item.kind === 'course') {
+      return coursePlaceLine({
+        region: item.subject?.region,
+        subCountry: item.subject?.sub_country,
+        country: item.subject?.country,
+      });
+    }
     return null;
   })();
 

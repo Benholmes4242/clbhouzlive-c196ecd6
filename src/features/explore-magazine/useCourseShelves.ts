@@ -8,6 +8,7 @@ import { useUserWantToPlay } from '@/hooks/useUserWantToPlay';
 import { useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
 
 import type { ViewerScoreScope } from './useViewerScoreScope';
+import { coursePlaceLine } from './placeLine';
 
 /**
  * THE COURSE SHELF SOURCES (BRIEF_EXPLORE_MAGAZINE PHASE C, §3a-§3c).
@@ -78,7 +79,11 @@ export function useCountyCourses(
       .map((row) => ({
         courseId: row.course_id,
         name: row.name,
-        area: row.area,
+        area: coursePlaceLine({
+          region: meta.data?.get(row.course_id)?.rawRegion ?? row.area,
+          subCountry: meta.data?.get(row.course_id)?.subCountry,
+          country: meta.data?.get(row.course_id)?.country,
+        }),
         imageUrl: row.thumbnail_image ?? meta.data?.get(row.course_id)?.imageUrl ?? null,
         rounds: row.rounds,
         rating: row.rating,
@@ -126,7 +131,7 @@ export function useWorldTop100Courses(enabled: boolean) {
         return {
           courseId: row.courseId,
           name: course?.name ?? null,
-          area: course?.region ?? course?.subCountry ?? null,
+          area: coursePlaceLine({ region: course?.rawRegion, subCountry: course?.subCountry, country: course?.country }),
           imageUrl: course?.imageUrl ?? null,
           rounds: 0,
           rating: null,
@@ -165,7 +170,7 @@ export function useListCourses(viewerId: string | undefined, enabled: boolean) {
         return {
           courseId: row.course_id,
           name: row.course_name,
-          area: row.sub_country ?? row.country ?? null,
+          area: coursePlaceLine({ subCountry: row.sub_country, country: row.country }),
           imageUrl: row.thumbnail_image,
           rounds: 0,
           rating: null,

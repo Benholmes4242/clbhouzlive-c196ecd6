@@ -1773,6 +1773,9 @@
       "clearPlace": "지역 필터 해제",
       "placeTitle": "지역으로 찾기",
       "findPlace": "국가 또는 지역 검색"
+    },
+    "place": {
+      "pair": "{{place}}, {{nation}}"
     }
   }
 }

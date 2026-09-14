@@ -86,6 +86,9 @@ export interface StreamSubject {
   course_name: string | null;
   region: string | null;
   sub_country: string | null;
+  /** THE GROUPING ("USA", "Britain & Ireland") — the last resort for the place
+   *  line's nation half when a course carries no region and no sub_country. */
+  country?: string | null;
   image_url: string | null;
   /** TRUE while the image/region resolver is still in flight (§0 unresolved is not absent). */
   pending: boolean;
