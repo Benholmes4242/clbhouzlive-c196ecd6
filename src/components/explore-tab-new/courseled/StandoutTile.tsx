@@ -67,6 +67,16 @@ interface Props {
    */
   reserveTwoLines?: boolean;
   /**
+   * STANDING SHELF ONLY: the name is always the one word "You" and the fact
+   * line is the one-line "Last change …" — neither can wrap, so reserving two
+   * lines of each leaves the caption visibly taller than the club rail's.
+   * Passing 1 reserves a single line instead; the rail stays internally
+   * uniform because every tile gets the same value. Defaults keep every
+   * existing caller byte-identical.
+   */
+  nameLines?: 1 | 2;
+  factLines?: 1 | 2;
+  /**
    * Optional compact rail caption. It makes the member name one ellipsized line
    * and reserves one fixed line beneath it, indented past the 20px avatar.
    * Omitted by existing callers, whose caption layout remains unchanged.
