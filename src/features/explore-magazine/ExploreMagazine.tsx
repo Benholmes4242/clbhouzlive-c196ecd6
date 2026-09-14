@@ -36,6 +36,7 @@ import {
   type ExploreView,
 } from './exploreViewMemory';
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
+import { EXPLORE_SERVER_STREAM_ENABLED } from './serverStreamSwitch';
 import { useExploreStream } from './useExploreStream';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
@@ -345,7 +346,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      Until Ben runs docs/sql/explore_stream_d3.sql the non-All views error,
      `unavailable` is true, and the accepted client composition below stays in
      charge - the fallback is deliberate and is never an empty page. */
-  const serverView = view !== 'watch';
+  /* THE SWITCH (serverStreamSwitch.ts). With it off no RPC is issued at all —
+     the viewer id is withheld below, so no member waits 8 seconds for a
+     timeout before the fallback renders. Watch is never on the RPC anyway. */
+  const serverView = EXPLORE_SERVER_STREAM_ENABLED && view !== 'watch';
   /* EVERY SERVER VIEW WAITS FOR GEOGRAPHY, All included. All does not show the
      scope row (that is still SCOPED_VIEWS' job) but it does send the club,
      county and country, and the RING on every card is decided by them. Firing
