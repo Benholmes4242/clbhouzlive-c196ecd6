@@ -490,18 +490,33 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     ...(scoreScope === 'country' || scoreScope === 'world' ? (['coursesWorld'] as ShelfKind[]) : []),
   ];
   const REVIEWS_SHELVES: ShelfKind[] = ['coursesTopRated', 'coursesList'];
+  /* SCORES SHELVES — the four that are about the MEMBER'S OWN GOLF, inserted at
+     the page boundaries (12, 24, 36, 48) so the card rhythm reads first and a
+     shelf arrives as a change of pace rather than an interruption.
+     WHY 'standing' IS A SHELF AND NOT A CARD: a shelf may show a position with
+     no motion — that is a standing, and a standing is worth looking at. A CARD
+     must announce a CHANGE, which is the same distinction that retired
+     rank_hold; do not promote this shelf into the card ladder. */
+  const SCORES_SHELVES: ShelfKind[] = ['clubWeek', 'standing', 'coursesCounty', 'people'];
   const shelves: ShelfKind[] =
     view === 'watch'
       ? ['moments']
       : view === 'scores'
-        ? []
+        ? SCORES_SHELVES
         : view === 'courses'
           ? COURSES_SHELVES
           : view === 'reviews'
             ? REVIEWS_SHELVES
             : ALL_SHELVES;
   const singleType = view === 'courses' || view === 'reviews';
-  const blocks = useMemo(() => buildBlocks(ranked, shelves, singleType), [ranked, view, scoreScope, singleType]);
+  const blocks = useMemo(
+    () =>
+      buildBlocks(ranked, shelves, singleType, {
+        bareRoundPairs: view === 'scores',
+        shelfAt: view === 'scores' ? [12, 24, 36, 48] : undefined,
+      }),
+    [ranked, view, scoreScope, singleType],
+  );
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
   const loggedRef = useRef(0);
