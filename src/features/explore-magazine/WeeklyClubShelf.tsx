@@ -99,5 +99,17 @@ export function WeeklyClubShelf({
         );
       })}
     </ExploreShelf>
+
+    {/* A TAP THAT FIRES MUST LAND. This shelf called the opener but mounted no
+        sheet, so every tile tap did nothing. Mounted here, exactly as
+        CircleShelf does. */}
+    <RoundDetailSheet
+      open={!!opener.target}
+      onClose={opener.close}
+      scoreId={opener.target?.scoreId ?? null}
+      connectionId={opener.target?.connectionId ?? null}
+      profileUserId={opener.target?.profileUserId ?? null}
+    />
+    </>
   );
 }
