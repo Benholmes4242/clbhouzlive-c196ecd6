@@ -11,6 +11,7 @@ import { courseEventStrength, courseHeadline, type CourseEventKind } from './cou
 import type { CourseShelfRow } from './useCourseShelves';
 import type { StreamItem } from './streamItem';
 import type { ScoreScope, ViewerScoreScope } from './useViewerScoreScope';
+import { useTop100RankIndex } from './useTop100RankIndex';
 
 /**
  * THE COURSES VIEW (BRIEF_EXPLORE_MAGAZINE PHASE C, §5b).
@@ -126,42 +127,14 @@ export function useRecentCourseRatings(enabled: boolean) {
   };
 }
 
-interface RankRow {
-  courseId: string;
-  rank: number;
-  world: boolean;
-}
-
-/** Top 100 rank for a bounded set of courses. World outranks regional, never
- *  both (§5b), the same rule the C1 world shelf applies. */
+/** Top 100 rank AND THE LIST IT CAME FROM, regional first, read once from the
+ *  membership index. The previous local query resolved "world" against a slug
+ *  that does not exist in top100_lists, so nothing was ever world and every
+ *  ranked course was labelled GB&I downstream. */
 function useTop100Ranks(courseIds: string[]) {
-  const key = Array.from(new Set(courseIds)).sort();
-  const query = useQuery<Map<string, RankRow>>({
-    queryKey: ['explore-magazine', 'top100-ranks', key.join('|')],
-    enabled: key.length > 0,
-    staleTime: 60 * 60_000,
-    queryFn: async () => {
-      const out = new Map<string, RankRow>();
-      const { data: lists, error: listError } = await supabase.from('top100_lists').select('id, slug');
-      if (listError) throw listError;
-      const worldId = (lists ?? []).find((row: { slug: string }) => row.slug === 'top-100-worldwide')?.id ?? null;
-      const known = new Set((lists ?? []).map((row: { id: string }) => row.id));
-      const { data, error } = await supabase
-        .from('course_top100_memberships')
-        .select('course_id, list_id, rank')
-        .in('course_id', key);
-      if (error) throw error;
-      for (const row of (data ?? []) as Array<{ course_id: string; list_id: string; rank: number | null }>) {
-        if (row.rank == null || !known.has(row.list_id)) continue;
-        const world = !!worldId && row.list_id === worldId;
-        const existing = out.get(row.course_id);
-        if (existing && (existing.world || !world)) continue;
-        out.set(row.course_id, { courseId: row.course_id, rank: row.rank, world });
-      }
-      return out;
-    },
-  });
-  return { ranks: query.data ?? null, isFetched: key.length === 0 ? true : query.isFetched };
+  const enabled = courseIds.length > 0;
+  const { index, isFetched } = useTop100RankIndex(enabled);
+  return { ranks: index, isFetched: enabled ? isFetched : true };
 }
 
 /** Re-exported so existing importers keep their symbol (D3 moved the type
