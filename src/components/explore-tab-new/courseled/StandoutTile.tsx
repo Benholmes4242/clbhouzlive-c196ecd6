@@ -66,6 +66,12 @@ interface Props {
    * everywhere else, which keeps vertical lists free to size to content.
    */
   reserveTwoLines?: boolean;
+  /**
+   * Optional compact rail caption. It makes the member name one ellipsized line
+   * and reserves one fixed line beneath it, indented past the 20px avatar.
+   * Omitted by existing callers, whose caption layout remains unchanged.
+   */
+  railCaptionLine?: React.ReactNode;
 
   /** Anything below the detail line ("+n more here"). */
   footer?: React.ReactNode;
@@ -129,6 +135,7 @@ export function StandoutTile({
   subline = null,
   trailing,
   reserveTwoLines = false,
+  railCaptionLine,
 
   footer,
   kicker = null,
@@ -396,7 +403,7 @@ export function StandoutTile({
             case (2 x 13px x 1.2 = 32px) and a one-line name simply leaves the
             second line empty. Every masonry/vertical consumer omits the prop
             and is byte-identical to before. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, ...(reserveTwoLines ? { minHeight: 32 } : null) }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, ...(railCaptionLine !== undefined ? { minHeight: 20 } : reserveTwoLines ? { minHeight: 32 } : null) }}>
 
           {who ? (
             <SquircleAvatar
@@ -416,15 +423,33 @@ export function StandoutTile({
               letterSpacing: '-0.01em',
               color: isOwn ? A.AMBER_DEEP : A.INK,
               lineHeight: 1.2,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
+              display: railCaptionLine !== undefined ? 'block' : '-webkit-box',
+              WebkitLineClamp: railCaptionLine !== undefined ? undefined : 2,
+              WebkitBoxOrient: railCaptionLine !== undefined ? undefined : 'vertical',
               overflow: 'hidden',
+              ...(railCaptionLine !== undefined ? { textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : null),
             }}
           >
             {who || detail}
           </div>
         </div>
+
+        {railCaptionLine !== undefined ? (
+          <div
+            style={{
+              minHeight: 13,
+              marginLeft: 24,
+              marginTop: 2,
+              display: 'flex',
+              alignItems: 'baseline',
+              minWidth: 0,
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {railCaptionLine}
+          </div>
+        ) : null}
 
         {/* THE FACT LINE, WITH THE REACTION ON IT. The heart rides the LAST
             wording line the tile renders — the detail ("Bogey-free round") when
