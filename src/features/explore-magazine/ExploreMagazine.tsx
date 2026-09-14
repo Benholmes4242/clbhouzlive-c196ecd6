@@ -1108,10 +1108,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           says county - and the PLACE WINS, because it is the more recent and more
           specific answer; the scope chip stays lit so the way back is visible.
           REPORTED as the one conflict in practice. */}
-      {/* A CONTROL THAT CANNOT CHANGE WHAT YOU SEE DOES NOT RENDER: with no
-          circle and no county the only chip would be World. The place dropdown
-          still has somewhere to go, so it renders on its own. */}
-      {view === 'courses' && geography.isFetched && (hasCircle || geography.scope.county) ? (
+      {view === 'courses' && geography.isFetched ? (
         <div
           style={{
             display: 'flex',
@@ -1123,7 +1120,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             scrollbarWidth: 'none',
           }}
         >
+          {/* A CONTROL THAT CANNOT CHANGE WHAT YOU SEE DOES NOT RENDER: with no
+              circle and no county the only chip would be World, so the chips
+              stand down and the place dropdown - which does have somewhere to go
+              - keeps the row. */}
           <div style={{ minWidth: 0, flex: '1 1 auto', overflow: 'hidden' }}>
+            {hasCircle || geography.scope.county ? (
             <RailChips
               options={[
                 ...(hasCircle ? [{ id: 'circle', label: t('amateur.stream.scope.circle', 'My circle') }] : []),
@@ -1142,6 +1144,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               }}
               ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
             />
+            ) : null}
           </div>
           <RegionDropdown
             tree={places}
