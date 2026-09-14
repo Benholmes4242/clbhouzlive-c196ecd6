@@ -6,6 +6,7 @@ import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/
 import { StandoutTile } from '@/components/explore-tab-new/courseled/StandoutTile';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 import { ExploreShelf } from './ExploreShelf';
 import { ShelfShell } from './ExploreShells';
