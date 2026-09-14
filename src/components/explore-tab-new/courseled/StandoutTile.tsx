@@ -145,6 +145,8 @@ export function StandoutTile({
   subline = null,
   trailing,
   reserveTwoLines = false,
+  nameLines = 2,
+  factLines = 2,
   railCaptionLine,
 
   footer,
