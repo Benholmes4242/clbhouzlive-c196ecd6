@@ -279,13 +279,19 @@ function PersonTile({ golfer, pos, kind }: { golfer: ShelfPerson; pos: number; k
           fontSize: 11,
           fontWeight: 600,
           lineHeight: '16px',
-          height: 16,
+          /* TWO RESERVED LINES (§3a): the box is always 32 tall, so a one-line
+             reason leaves the second line empty and every tile matches. */
+          height: 32,
           flexShrink: 0,
-          whiteSpace: 'nowrap',
+          textAlign: 'center',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
         }}
       >
+
         {golfer.reason}
       </span>
       <button
