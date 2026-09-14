@@ -88,6 +88,15 @@ interface Props {
    */
   railCaptionLine?: React.ReactNode;
 
+  /**
+   * ADDITIVE. With the rail caption layout, allow the NAME two lines and reserve
+   * the height for both, so a long member name wraps instead of truncating and
+   * the rail stays uniform (BRIEF_EXPLORE_DEVICE_PASS §2a). Defaults to 1, so
+   * every existing caller keeps its single ellipsized line.
+   */
+  captionNameLines?: 1 | 2;
+
+
   /** Anything below the detail line ("+n more here"). */
   footer?: React.ReactNode;
   /**
@@ -154,6 +163,8 @@ export function StandoutTile({
   nameLines = 2,
   factLines = 2,
   railCaptionLine,
+  captionNameLines = 1,
+
 
   footer,
   kicker = null,
@@ -202,18 +213,41 @@ export function StandoutTile({
       >
         <div style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
 
+        {/* THE TOP LANES — COLLISION IS IMPOSSIBLE, NOT UNLIKELY
+            (BRIEF_EXPLORE_DEVICE_PASS §2a).
+
+            The score chip and the date used to be two independent absolutely
+            positioned children, one pinned left and one pinned right, so at some
+            width and some date length they HAD to meet. They are now the two
+            children of ONE flex row that spans the photo: the chip owns the left
+            lane and never shrinks, the date owns the right lane and shrinks
+            first, and a 10px gap sits between them by construction. The date is
+            one nowrap line with overflow ellipsis, so a longer date SHORTENS —
+            it can never reach the chip, at any tile width, in any locale.
+            The row does not take pointer events: taps belong to the tile. */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            right: 10,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 10,
+            pointerEvents: 'none',
+          }}
+        >
         {/* FIGURE CHIP — the reason the tile exists: 10px radius on a GLASS
             substrate, so the age beside it stops competing. The fill, hairline
             and blur live in `.standout-figure-chip` (liquid-glass.css) because
             the blur must be an @supports enhancement over a flat base fill —
             inline styles cannot express that (BRIEF_STANDOUT_TILE_MARGIN §5a). */}
-        {figure && (
+        {figure ? (
           <span
             className="standout-figure-chip"
             style={{
-              position: 'absolute',
-              top: 8,
-              left: 8,
+              flexShrink: 0,
               display: 'inline-flex',
               alignItems: 'baseline',
               gap: 4,
@@ -221,6 +255,7 @@ export function StandoutTile({
               borderRadius: large ? 12 : 10,
             }}
           >
+
             <span
               style={{
                 ...NUMF,
@@ -332,7 +367,7 @@ export function StandoutTile({
             ) : null}
 
           </span>
-        )}
+        ) : null}
 
         {/* AGE — PLAIN TEXT ON THE PHOTO, EVERYWHERE, NO EXCEPTIONS.
             The glass date badge is RETIRED. Glass is the score chip's material,
@@ -342,23 +377,30 @@ export function StandoutTile({
             chip on the photo, and it is the score.
             `whenGlass` is kept as an accepted prop so existing callsites stay
             valid, and is deliberately inert. Legibility is now carried entirely
-            by the shadow, hence the doubled, tighter stack below. */}
-        <span
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 10,
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            lineHeight: 1,
-            color: 'rgba(255,255,255,0.78)',
-            textShadow: '0 1px 2px rgba(10,14,10,0.62), 0 0 6px rgba(10,14,10,0.45)',
-          }}
-        >
-          {whenLabel}
-        </span>
+            by the shadow, hence the doubled, tighter stack below.
+            IT IS ALSO THE RIGHT LANE and shrinks first: minWidth 0 plus a nowrap
+            ellipsis is what makes a long date shorten instead of colliding. */}
+          <span
+            style={{
+              minWidth: 0,
+              flexShrink: 1,
+              textAlign: 'right',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              lineHeight: 1.35,
+              color: 'rgba(255,255,255,0.78)',
+              textShadow: '0 1px 2px rgba(10,14,10,0.62), 0 0 6px rgba(10,14,10,0.45)',
+            }}
+          >
+            {whenLabel}
+          </span>
+        </div>
+
 
         <div style={{ position: 'absolute', left: 10, right: 10, bottom: 9 }}>
           {/* COURSE NAME — two lines (BRIEF_STANDOUT_TILE_NAME_WRAP). Already
@@ -446,8 +488,17 @@ export function StandoutTile({
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{
-                  minHeight: 20,
-                  display: 'flex',
+                  /* TWO RESERVED LINES ARE OPT-IN (BRIEF_EXPLORE_DEVICE_PASS
+                     §2a). A rail whose member names are long — "Richard
+                     Lawrenson" — cut the name at one line. With
+                     captionNameLines 2 the name wraps to a second line and the
+                     box RESERVES that height, so every tile in the rail is the
+                     same height whether the name wraps or not. Callers that
+                     omit the prop keep the single ellipsized line. */
+                  minHeight: captionNameLines === 2 ? 36 : 20,
+                  display: captionNameLines === 2 ? '-webkit-box' : 'flex',
+                  WebkitLineClamp: captionNameLines === 2 ? 2 : undefined,
+                  WebkitBoxOrient: captionNameLines === 2 ? 'vertical' : undefined,
                   alignItems: 'center',
                   fontSize: 13,
                   fontWeight: 700,
@@ -455,12 +506,13 @@ export function StandoutTile({
                   color: isOwn ? A.AMBER_DEEP : A.INK,
                   lineHeight: 1.2,
                   textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  whiteSpace: captionNameLines === 2 ? 'normal' : 'nowrap',
                   overflow: 'hidden',
                 }}
               >
                 {who || detail}
               </div>
+
               <div
                 style={{
                   minHeight: 13,

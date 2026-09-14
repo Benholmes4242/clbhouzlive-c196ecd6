@@ -21,6 +21,7 @@ export function MediaRailTile({
   item,
   index,
   width,
+  aspect,
   autoplayGroup,
   maxPlaying = 2,
   onPress,
@@ -28,10 +29,19 @@ export function MediaRailTile({
   item: CommunityLibraryItem;
   index: number;
   width: number;
+  /**
+   * ADDITIVE. The tile's frame ratio, where the caller knows it. Width used to
+   * IMPLY the ratio (176 meant portrait, anything else landscape), which meant a
+   * rail could not be resized without silently changing shape
+   * (BRIEF_EXPLORE_DEVICE_PASS §2b). Omitted, the old width rule still applies,
+   * so every existing caller is unchanged.
+   */
+  aspect?: string;
   autoplayGroup: string;
   maxPlaying?: number;
   onPress: () => void;
 }) {
+
   const reducedMotion = usePrefersReducedMotion();
   const hostRef = useRef<HTMLButtonElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -70,7 +80,7 @@ export function MediaRailTile({
       onClick={onPress}
       style={{ width, flex: `0 0 ${width}px`, padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}
     >
-      <div style={{ position: 'relative', width, aspectRatio: width === 176 ? '3 / 4' : '16 / 10', overflow: 'hidden', borderRadius: r.sm, background: A.PANEL }}>
+      <div style={{ position: 'relative', width, aspectRatio: aspect ?? (width === 176 ? '3 / 4' : '16 / 10'), overflow: 'hidden', borderRadius: r.sm, background: A.PANEL }}>
         {item.thumbnail && <img src={item.thumbnail} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
         {mountVideo && (
           <video

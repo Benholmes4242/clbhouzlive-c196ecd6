@@ -52,8 +52,14 @@ import { circleHandicapDisplay } from './circleHandicap';
  * People shelf already exists to solve that.
  */
 
-/** §3 the rounds tile geometry named by the brief. */
-const TILE = { w: 170, h: 112 };
+/** §3 the rounds tile geometry.
+ *  BRIEF_EXPLORE_DEVICE_PASS §2a: SIZED TO THE "This week at {club}" TILE
+ *  (WeeklyClubShelf / StandingShelf, 206 x 118). The old 170 wide truncated
+ *  member names and pushed the date on the photo into the score chip. The width
+ *  removes the pressure; the chip/date lanes in StandoutTile remove the
+ *  possibility. */
+const TILE = { w: 206, h: 118 };
+
 /** §2 the rail draws ten; the see-all sheet carries the rest. */
 const RENDERED = 10;
 /** How deep the sheet reads. Newest first, so this is the newest N. */
@@ -220,6 +226,10 @@ export function CircleShelf({
                    Golf names and photo URLs and leaked once already. */
                 avatarUrl={row.profile_photo_url ?? null}
                 avatarUserId={row.user_id}
+                /* A LONG MEMBER NAME WRAPS RATHER THAN TRUNCATES (§2a), and the
+                   name box reserves both lines so the rail stays uniform. */
+                captionNameLines={2}
+
                 railCaptionLine={
                   handicap ? (
                     <>

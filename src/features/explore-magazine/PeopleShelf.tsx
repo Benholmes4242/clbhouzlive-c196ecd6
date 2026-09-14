@@ -43,8 +43,15 @@ import { reasonText } from '@/features/social-suggestions/SuggestedGolferRow';
 
 /* The caption rows reserve their full line boxes. The extra six pixels keep
    descenders, the reason line and the Follow control clear at narrow widths;
-   one shared height keeps both club and suggested rails uniform. */
-const TILE = { w: 132, h: 154 };
+   one shared height keeps both club and suggested rails uniform.
+   BRIEF_EXPLORE_DEVICE_PASS §3a: WIDER, AND THE REASON GETS TWO LINES. The
+   reason IS the value of the tile — "All-time stableford leader" cannot be cut
+   — so 132 becomes 156 and the reason line reserves 32px for two lines. Width
+   alone would not have saved the longest labels; two lines does. A one-line
+   reason simply leaves the second line empty, which is what keeps the rail
+   uniform. */
+const TILE = { w: 156, h: 170 };
+
 /** How many suggestions a rail can hold before it stops being a rail. */
 const RENDERED = 12;
 
@@ -272,13 +279,19 @@ function PersonTile({ golfer, pos, kind }: { golfer: ShelfPerson; pos: number; k
           fontSize: 11,
           fontWeight: 600,
           lineHeight: '16px',
-          height: 16,
+          /* TWO RESERVED LINES (§3a): the box is always 32 tall, so a one-line
+             reason leaves the second line empty and every tile matches. */
+          height: 32,
           flexShrink: 0,
-          whiteSpace: 'nowrap',
+          textAlign: 'center',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
         }}
       >
+
         {golfer.reason}
       </span>
       <button

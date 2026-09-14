@@ -67,6 +67,16 @@ export interface RailChipsProps {
   align?: 'start' | 'center-when-fit';
 
   /**
+   * ADDITIVE — SIZE CARRIES HIERARCHY, TREATMENT STAYS CONSTANT
+   * (BRIEF_EXPLORE_DEVICE_PASS §1b). Where two chip rows stack, the PRIMARY row
+   * (the views) keeps 'md' — the canonical 12/700, 6 by 11 geometry shared with
+   * the Courses page sort chips — and the SECONDARY row (the scope) takes 'sm'.
+   * Both rows state their active chip the SAME WAY, so nothing about a filter
+   * shouts louder than the thing it filters.
+   */
+  size?: 'sm' | 'md';
+
+  /**
    * ADDITIVE. An action rendered at the trailing edge of the scrollable row,
    * separated from the last chip by the same gap the chips use. The caller owns
    * the button styling and semantics; RailChips only guarantees it scrolls
@@ -75,13 +85,19 @@ export interface RailChipsProps {
   trailing?: React.ReactNode;
 }
 
+
 /** The applied-state ground: 6% white, stated once. */
 const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start', trailing }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start', size = 'md', trailing }: RailChipsProps) {
   const filled = ground === 'filled';
   /* The selecting filled ground: a choice group, so tablist/tab semantics stay. */
   const filledSelection = ground === 'filled-selection';
+  /* ONE geometry pair, stated once. 'md' is the canonical chip. */
+  const geo = size === 'sm'
+    ? { padding: '4px 9px', fontSize: 11, radius: 9 }
+    : { padding: '6px 11px', fontSize: 12, radius: RAIL_CHIP_RADIUS };
+
 
   return (
     <div
@@ -114,8 +130,9 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
             onClick={() => { if (!locked) onChange(option.id); }}
             style={{
               flexShrink: 0,
-              padding: '6px 11px',
-              borderRadius: RAIL_CHIP_RADIUS,
+              padding: geo.padding,
+              borderRadius: geo.radius,
+
               /* The active chip keeps a TRANSPARENT hairline rather than none, so
                  switching view costs no 1px width shift in the row. */
               border: filled ? 'none' : `1px solid ${active ? 'transparent' : A.BORDER}`,
@@ -124,7 +141,8 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
 
 
               fontFamily: SANS,
-              fontSize: 12,
+              fontSize: geo.fontSize,
+
               fontWeight: 700,
               whiteSpace: 'nowrap',
               cursor: 'pointer',

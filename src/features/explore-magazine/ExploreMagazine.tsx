@@ -81,7 +81,12 @@ const CARD_INSET = 12;
 /** §3d blocks are 26px apart. */
 const BLOCK_GAP = 26;
 
-const CLIP_TILE = { w: 118, h: 210 };
+/* THE CLIP TILE (BRIEF_EXPLORE_DEVICE_PASS §2b). ~2.4 tiles visible at 390:
+   140 wide keeps a 9:16 clip at 249 tall, which is clearly bigger than the old
+   118 and still reads as a RAIL rather than a carousel of posters. The Watch
+   clips rail carries the same 140 so the two surfaces agree. */
+const CLIP_TILE = { w: 140, h: 249 };
+
 const MOMENT_TILE = { w: 132, h: 132 };
 
 /** §3e PHASE C — THE FINAL ALL ORDER, skipping empties: clips, rounds (this week
@@ -238,6 +243,7 @@ function ClipsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) {
             item={clip}
             index={index}
             width={CLIP_TILE.w}
+            aspect="9 / 16"
             autoplayGroup="amateur-magazine"
             onPress={() => {
               analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'clips', pos });
@@ -1054,14 +1060,19 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         }}
       >
         <div style={{ paddingInline: CARD_INSET }}>
+          {/* PRIMARY ROW (§1a): the canonical 'md' chip — the same padding and
+              font size as the Courses page sort chips — and CENTRED, now that
+              four chips fit the row. */}
           <RailChips
             options={chips}
             value={view}
             onChange={changeView}
             ariaLabel={t('amateur.stream.views', 'Explore views')}
             ground="filled-selection"
+            align="center-when-fit"
           />
         </div>
+
       </div>
 
       {/* THE WATCH VIEW IS ONE ENDLESS MIXED FEED, shape-typed and searchable
@@ -1076,7 +1087,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
       {/* §1 THE SAME SCOPE ROW, THE SAME COMPONENT, for Scores and the merged
           Courses view. Scores does not render it at all where neither a club nor
-          a county resolves, and the view is then World. */}
+          a county resolves, and the view is then World.
+
+          BRIEF_EXPLORE_DEVICE_PASS §1b THE SCOPE ROW IS THE SECONDARY ROW. It
+          takes the SAME selection language as the view row above it — the 6%
+          white ground — one size down. The solid white fill is retired here: a
+          filter must never be the loudest control on the page, and SIZE, not
+          treatment, is what states the hierarchy. */}
       {view === 'scores' && geography.isFetched && (geography.scope.primaryClubId || geography.scope.county) ? (
         <div style={{ padding: '0 12px 14px', minWidth: 0, overflow: 'hidden' }}>
           <RailChips
@@ -1096,18 +1113,26 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               loggedRef.current = 0;
             }}
             ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
+            ground="filled-selection"
+            size="sm"
           />
         </div>
       ) : null}
 
-      {/* §5, §7 THE MERGED VIEW'S SCOPE ROW AND ITS PLACE DROPDOWN. My circle is
-          absent for a member who follows nobody; My club is retired here. The two
-          are DIFFERENT CONTROLS and both stay: the scope is the viewer's own
-          geography and social set, the place is somewhere they have no connection
-          to. THEY CAN DISAGREE - a place inside another country while the scope
-          says county - and the PLACE WINS, because it is the more recent and more
-          specific answer; the scope chip stays lit so the way back is visible.
-          REPORTED as the one conflict in practice. */}
+      {/* §5, §7 THE MERGED VIEW'S SCOPE ROW AND ITS PLACE DROPDOWN.
+          PLACE IS *WHERE*, SCOPE IS *WHOSE*, AND THEY COMPOSE — BUT CHOOSING A
+          PLACE RESETS SCOPE TO WORLD (BRIEF_EXPLORE_DEVICE_PASS §5).
+
+          Browsing a place MEANS browsing everyone in it, so picking Kent shows
+          everyone in Kent and the scope row says World, which is the truth. The
+          member can then narrow to My circle within Kent, because the chips stay
+          fully usable. Clearing the place leaves scope exactly where the member
+          last put it.
+
+          THE OLD RULE IS REVERSED AND DELIBERATELY SO: it left My circle lit
+          while the place quietly ignored it, so two controls looked active and
+          one did nothing, and "everyone in Kent" could not be reached at all.
+          NO CONTROL IS EVER LIT WHILE DOING NOTHING. */}
       {view === 'courses' && geography.isFetched ? (
         <div
           style={{
@@ -1143,6 +1168,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 loggedRef.current = 0;
               }}
               ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
+              ground="filled-selection"
+              size="sm"
             />
             ) : null}
           </div>
@@ -1153,14 +1180,23 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               analyticsEvents.track('amateur_place_changed', {
                 country: next?.country ?? null,
                 region: next?.region ?? null,
+                scope_reset: next !== null && coursesScope !== 'world',
               });
               setPlace(next);
+              /* CHOOSING A PLACE MEANS EVERYONE IN IT (§5). Clearing it changes
+                 nothing about scope. */
+              if (next !== null) {
+                coursesScopeChosen.current = true;
+                setCoursesScope('world');
+              }
               setRevealed(STREAM_PAGE_SIZE);
               loggedRef.current = 0;
             }}
           />
         </div>
       ) : null}
+
+
 
       {/* §6 EMPTY SEARCH: one line, controls intact, no suggestions. */}
       {view === 'courses' && query.length >= 2 && candidates.isFetched && source.items.length === 0 ? (

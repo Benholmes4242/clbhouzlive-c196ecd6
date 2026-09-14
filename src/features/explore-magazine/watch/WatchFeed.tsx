@@ -4,8 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
+import { autoplayBlocked } from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
+import { registerRailVideo } from '@/components/explore-tab-new/courseled/mediaRailAutoplay';
+import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
 import { RailChips } from '@/components/ui/RailChips';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { formatRelativeAgo } from '@/i18n/format';
 import { stripMentionMarkup } from '@/lib/mentions/format';
@@ -48,7 +54,12 @@ import { useWatchVideos } from './useWatchVideos';
  */
 
 const INSET = 16;
-const CLIP_W = 112;
+/* BRIEF_EXPLORE_DEVICE_PASS §2b — THE CLIPS RAIL AGREES WITH EXPLORE'S.
+   140 wide gives about 2.4 tiles at 390: clearly bigger than the old 112, and
+   still a rail rather than a carousel of posters. Explore's ClipsShelf carries
+   the same 140 x 249 so the two surfaces cannot drift. */
+const CLIP_W = 140;
+
 const MOMENT_W = 112;
 const RAIL_WINDOW = 10;
 /** Rails break the video run: after 2 videos, then every 4, alternating. */
@@ -112,6 +123,93 @@ function PosterFallback({ initial, size }: { initial: string; size: number }) {
   );
 }
 
+/**
+ * AUTOPLAY ON SCROLL — ONE STREAM ON THE PAGE, AND IT IS AN ENHANCEMENT
+ * (BRIEF_EXPLORE_DEVICE_PASS §4).
+ *
+ * NOTHING NEW WAS WRITTEN TO COORDINATE THIS. The page already owns a
+ * coordinator that does exactly what the brief asks: `mediaRailAutoplay`
+ * registers every tile in ONE registry, elects the tile NEAREST THE CENTRE OF
+ * THE VIEWPORT that is at least 60% visible, and gives it the only stream — so
+ * two items can never play at once, and on a rail only the tile in the centre
+ * plays. `reviewVideoAutoplay`'s coordinator was NOT reused here: its cap is two
+ * per group, which is right for the mosaic and wrong for a scroll page.
+ * `autoplayBlocked` (reduced motion, Save-Data) and `attachTileHls` are reused
+ * verbatim.
+ *
+ * THE POSTER IS THE RESTING STATE. The video fades in over it once it actually
+ * plays and is removed on the way out, so a blocked, failed or losing tile is a
+ * poster and never a black rectangle. Muted always, no controls: the tap still
+ * opens the post, where the real player and its mute affordance live.
+ */
+function AutoplayLayer({ hlsUrl, poster }: { hlsUrl: string | null; poster: string | null }) {
+  const reducedMotion = usePrefersReducedMotion();
+  const hostRef = useRef<HTMLSpanElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [active, setActive] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const mount = !!hlsUrl && !failed && !autoplayBlocked(reducedMotion);
+
+  useEffect(() => {
+    const el = hostRef.current;
+    if (!mount || !el) return;
+    return registerRailVideo(el, setActive);
+  }, [mount]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!active || !video || !hlsUrl) return;
+    const attachment = attachTileHls(video, hlsUrl, () => setFailed(true));
+    video.muted = true;
+    video.currentTime = 0;
+    video.play()?.catch(() => setPlaying(false));
+    return () => {
+      setPlaying(false);
+      video.pause();
+      attachment.detach();
+    };
+  }, [active, hlsUrl]);
+
+  if (!mount) return null;
+
+  return (
+    <span ref={hostRef} aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+      <video
+        ref={videoRef}
+        poster={poster ?? undefined}
+        muted
+        loop
+        playsInline
+        preload="none"
+        disableRemotePlayback
+        tabIndex={-1}
+        onPlaying={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onError={(event) => {
+          if (event.currentTarget.getAttribute('src')) setFailed(true);
+        }}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          opacity: playing ? 1 : 0,
+          transition: 'opacity 140ms linear',
+          pointerEvents: 'none',
+        }}
+      />
+    </span>
+  );
+}
+
+/** The HLS source for a row, or null where the row carries no stream. */
+function hlsFor(row: HubRpcRow): string | null {
+  if (row.hls_url) return String(row.hls_url);
+  if (row.stream_id) return generateStreamHlsUrl(String(row.stream_id));
+  return null;
+}
+
+
 /** THE VIDEO — full-bleed width, 16:9, YouTube-shaped: a CIRCULAR 30px avatar.
  *  This is the one deliberate departure from the platform squircle standard,
  *  because a long-form video row is read as a video row and not as a member
@@ -172,7 +270,12 @@ function VideoCard({
         ) : (
           <PosterFallback initial={initial} size={34} />
         )}
-        <GlassDurationBadge seconds={row.duration_seconds ?? null} />
+        <AutoplayLayer hlsUrl={hlsFor(row)} poster={poster} />
+        {/* The duration chip stays ABOVE the playing frame. */}
+        <span style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
+          <GlassDurationBadge seconds={row.duration_seconds ?? null} />
+        </span>
+
       </div>
 
       <div style={{ display: 'flex', gap: 10, padding: `9px ${INSET}px 0`, alignItems: 'flex-start' }}>
@@ -283,7 +386,12 @@ function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number | st
         ) : (
           <PosterFallback initial={initial} size={20} />
         )}
-        <GlassDurationBadge seconds={row.duration_seconds ?? null} />
+        <AutoplayLayer hlsUrl={hlsFor(row)} poster={poster} />
+        {/* The duration chip stays ABOVE the playing frame. */}
+        <span style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
+          <GlassDurationBadge seconds={row.duration_seconds ?? null} />
+        </span>
+
       </span>
       {who ? (
         <span
