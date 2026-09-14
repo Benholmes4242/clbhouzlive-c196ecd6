@@ -1059,14 +1059,19 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         }}
       >
         <div style={{ paddingInline: CARD_INSET }}>
+          {/* PRIMARY ROW (§1a): the canonical 'md' chip — the same padding and
+              font size as the Courses page sort chips — and CENTRED, now that
+              four chips fit the row. */}
           <RailChips
             options={chips}
             value={view}
             onChange={changeView}
             ariaLabel={t('amateur.stream.views', 'Explore views')}
             ground="filled-selection"
+            align="center-when-fit"
           />
         </div>
+
       </div>
 
       {/* THE WATCH VIEW IS ONE ENDLESS MIXED FEED, shape-typed and searchable
