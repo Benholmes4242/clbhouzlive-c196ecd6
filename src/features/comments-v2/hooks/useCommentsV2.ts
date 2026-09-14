@@ -396,6 +396,8 @@ export function useCommentsV2({
         patchEngagement(qc, targetId, { commentCountDelta: +1 });
       }
       invalidate();
+      /* RULING C — the card's preview line, not just the count. */
+      invalidateFeedPreviews();
     },
   });
 
@@ -405,7 +407,11 @@ export function useCommentsV2({
       if (error) throw error;
       return data as unknown;
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      invalidate();
+      /* An edited comment can be the very line the card is showing. */
+      invalidateFeedPreviews();
+    },
   });
 
   const deleteComment = useMutation({
