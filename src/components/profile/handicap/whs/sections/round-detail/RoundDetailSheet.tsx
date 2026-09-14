@@ -10,6 +10,7 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import type { HonoursFeat } from '@/features/courses/_shared/scorecard/honoursTreatment';
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
@@ -26,6 +27,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hooks/useRoundPostComments';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import { supabase } from '@/integrations/supabase/client';
+import { coursePlaceLine } from '@/features/explore-magazine/placeLine';
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
@@ -87,6 +90,28 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const contextQuery = useRoundCourseContext(scoreId, open);
   const ctx = contextQuery.data ?? null;
   const analysisCourseId = ctx?.course_id ?? courseIdQuery.data ?? undefined;
+  const canonicalCourseQuery = useQuery({
+    queryKey: ['scorecard-canonical-course', analysisCourseId],
+    enabled: open && !!analysisCourseId,
+    staleTime: 24 * 60 * 60 * 1000,
+    queryFn: async () => {
+      if (!analysisCourseId) return null;
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select('id, name, region, sub_country, country')
+        .eq('id', analysisCourseId)
+        .maybeSingle();
+      if (error) return null;
+      return data as {
+        id: string;
+        name: string;
+        region: string | null;
+        sub_country: string | null;
+        country: string | null;
+      } | null;
+    },
+    retry: false,
+  });
   /**
    * §D3 — THE FIELD EXCLUDES THE ROUND'S OWNER, NOT THE VIEWER.
    *
@@ -169,8 +194,15 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
 
   const eyebrowText = fmtDateEyebrow(userData?.play_date);
-  const courseName = userData?.course?.name ?? '';
-  const courseLocation = (userData?.course as { country_name?: string | null } | null | undefined)?.country_name ?? null;
+  const canonicalCourse = canonicalCourseQuery.data ?? null;
+  const courseName = canonicalCourse?.name ?? userData?.course?.name ?? '';
+  const courseLocation = canonicalCourse
+    ? coursePlaceLine({
+        region: canonicalCourse.region,
+        subCountry: canonicalCourse.sub_country,
+        country: canonicalCourse.country,
+      })
+    : (userData?.course as { country_name?: string | null } | null | undefined)?.country_name ?? null;
   const coursePar = totalPar > 0 ? totalPar : null;
   const courseSlope = (userData as { slope_rating?: number | null } | null | undefined)?.slope_rating ?? null;
 
@@ -281,6 +313,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       playerHcp={playerHcp}
       playerHcpDelta={handicapDelta ?? null}
       playerUserId={profileUserId ?? null}
+      subjectIsViewer={isOwnRound}
       fieldPlayers={fieldPlayers}
       onViewProfile={onViewProfile}
       onViewCourse={onViewCourse}
