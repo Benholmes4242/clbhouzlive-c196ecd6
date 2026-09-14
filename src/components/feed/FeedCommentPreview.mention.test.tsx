@@ -91,7 +91,7 @@ describe('FeedCommentPreview mention integration', () => {
     expect(clamp).toHaveStyle({
       overflow: 'hidden',
     });
-    expect(clamp?.style.getPropertyValue('-webkit-line-clamp')).toBe('2');
+    expect(clamp).toHaveStyle({ WebkitLineClamp: '2' });
     expect(clamp).toContainElement(container.querySelector('[data-mention-type="user"]') as HTMLElement);
   });
 
