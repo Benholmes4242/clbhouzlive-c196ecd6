@@ -500,6 +500,12 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
                 labelInset={8}
                 labelled={false}
                 autoplayGroup="amateur-watch-moments"
+                /* THE TILE MUST CARRY ITS OWN BOX. Everything inside it is
+                   absolutely positioned against the button, so a button with no
+                   width or height collapsed and the picture never painted — the
+                   square read as an empty box with the course name beneath. */
+                style={{ width: '100%', height: '100%', display: 'block' }}
+
                 onPress={() => {
                   analyticsEvents.track('amateur_watch_tapped', { kind: 'moment', filter });
                   onDepart();
