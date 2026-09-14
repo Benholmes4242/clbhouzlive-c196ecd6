@@ -15,4 +15,11 @@
  * once both EXPLAIN runs (as postgres and as authenticated) are comfortably
  * inside the 8-second authenticated timeout.
  */
-export const EXPLORE_SERVER_STREAM_ENABLED = false;
+/**
+ * ON. The shape fix (docs/sql/explore_stream_field_join.sql) is deployed and
+ * measured: 283 ms as postgres, 804 ms as authenticated, 140,706 buffer hits —
+ * comfortably inside the 8-second authenticated timeout with ~10x headroom.
+ * The RLS multiple is now 2.8x (was 4x); the policies are still expensive per
+ * row, but the row count they run against has collapsed. Filed, not chased.
+ */
+export const EXPLORE_SERVER_STREAM_ENABLED = true;
