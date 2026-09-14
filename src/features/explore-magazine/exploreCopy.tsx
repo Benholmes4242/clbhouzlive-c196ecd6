@@ -356,7 +356,7 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
      restatement of the chip: "You went round in 73." and the shape says the
      rest. This is the retirement of both rank_hold and the old "unchanged"
      sentence, in one line. */
-  if (c?.kind === 'played_nochange' && isOwn && gross != null) {
+  if ((c == null || c.kind === 'played_nochange') && isOwn && gross != null) {
     return t('amateur.stream.headline.round', '{{player}} went round in {{gross}}.', { player, gross });
   }
   if (gross != null && topar) {
