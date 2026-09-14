@@ -88,6 +88,15 @@ interface Props {
    */
   railCaptionLine?: React.ReactNode;
 
+  /**
+   * ADDITIVE. With the rail caption layout, allow the NAME two lines and reserve
+   * the height for both, so a long member name wraps instead of truncating and
+   * the rail stays uniform (BRIEF_EXPLORE_DEVICE_PASS §2a). Defaults to 1, so
+   * every existing caller keeps its single ellipsized line.
+   */
+  captionNameLines?: 1 | 2;
+
+
   /** Anything below the detail line ("+n more here"). */
   footer?: React.ReactNode;
   /**
