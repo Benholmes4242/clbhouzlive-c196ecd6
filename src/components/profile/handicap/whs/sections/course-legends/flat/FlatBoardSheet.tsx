@@ -85,7 +85,7 @@ export const FlatBoardSheet: React.FC<Props> = ({
       }
     }, 220);
     return () => globalThis.clearTimeout(id);
-  }, [open, scrollToSelf, activeKey, initialCategory, rows.length]);
+  }, [open, scrollToSelf, activeKey, initialCategory, grouped]);
 
   const chips: FlatChip[] = useMemo(
     () =>
