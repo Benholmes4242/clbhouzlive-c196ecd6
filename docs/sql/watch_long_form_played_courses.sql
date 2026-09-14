@@ -1,0 +1,31 @@
+-- UNAPPLIED PROPOSAL — BRIEF_WATCH_MIXED_FEED §4.
+--
+-- get_watch_shorts_v2 has p_filter with 'following' and 'played_courses'.
+-- get_long_form_videos_v2 has p_mode 'latest' | 'popular' | 'following' and NO
+-- played-courses equivalent, so the "Your courses" chip on Watch shows CLIPS
+-- ONLY today. Nothing renders unfiltered under a filter chip.
+--
+-- This adds ONE new mode value and changes nothing else: the signature, the
+-- column list, the security mode (SECURITY DEFINER), search_path and the grants
+-- all stay as deployed, and every existing caller of 'latest' / 'popular' /
+-- 'following' takes a byte-identical path.
+--
+-- To apply: paste the deployed body from
+--   select pg_get_functiondef(oid) from pg_proc where proname='get_long_form_videos_v2';
+-- add the predicate below to the `base` CTE's WHERE, and re-create.
+--
+--   AND (
+--     v_mode <> 'played_courses'
+--     OR p.course_id IS NULL
+--     OR EXISTS (
+--       SELECT 1
+--       FROM public.gam_round_stats grs
+--       WHERE grs.user_id = p_user_id
+--         AND grs.course_id = p.course_id
+--     )
+--   )
+--
+-- OPEN QUESTION FOR BEN: 'played_courses' on clips is defined by the shorts
+-- function's own played-course set. Before this ships, the two definitions must
+-- be read side by side and made the same thing, or the same chip will mean two
+-- different things depending on which shape a post happens to be.
