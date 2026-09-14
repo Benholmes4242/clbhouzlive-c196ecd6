@@ -1,5 +1,12 @@
 import React from 'react';
 
+/**
+ * Home mark — SOLID (Ben, 14 Sep: "every icon in the nav is a filled shape").
+ *
+ * This is the icon set's OWN fill-weight drawing, not the previous outline
+ * hand-filled: a hollow glyph flooded in software comes out heavier than a
+ * properly drawn solid, and the five marks have to match each other.
+ */
 const HouseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
   return (
     <svg
@@ -8,7 +15,7 @@ const HouseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
       fill="currentColor"
       {...props}
     >
-      <path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z" />
+      <path d="M224,120v96a8,8,0,0,1-8,8H160a8,8,0,0,1-8-8V164a4,4,0,0,0-4-4H108a4,4,0,0,0-4,4v52a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V120a16,16,0,0,1,4.69-11.31l80-80a16,16,0,0,1,22.62,0l80,80A16,16,0,0,1,224,120Z" />
     </svg>
   );
 };
