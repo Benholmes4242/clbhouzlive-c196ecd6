@@ -220,14 +220,18 @@ export function CircleShelf({
                         <span
                           style={{
                             ...NUMF,
-                            marginLeft: 7,
-                            fontSize: 10,
+                            marginLeft: 6,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 2,
+                            fontSize: 8,
                             fontWeight: 700,
                             lineHeight: 1,
                             color: handicap.delta.tone,
                           }}
                         >
-                          {handicap.delta.text}
+                          <span aria-hidden>{handicap.delta.arrow}</span>
+                          <span>{handicap.delta.text}</span>
                         </span>
                       ) : null}
                     </>
