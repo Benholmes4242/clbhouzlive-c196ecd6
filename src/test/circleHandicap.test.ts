@@ -22,16 +22,17 @@ describe('circleHandicapDisplay', () => {
     expect(circleHandicapDisplay(input)).toBeNull();
   });
 
-  it('formats a cut with a true minus and movement green', () => {
+  it('formats a cut as a down arrow and movement green with no sign', () => {
     expect(circleHandicapDisplay(base)).toEqual({
       index: '12.4',
-      delta: { text: '\u22120.1', tone: INDEX_DELTA.dark.improved },
+      delta: { arrow: '\u2193', text: '0.1', tone: INDEX_DELTA.dark.improved },
     });
   });
 
-  it('formats a rise with a plus and movement red', () => {
+  it('formats a rise as an up arrow and movement red with no sign', () => {
     expect(circleHandicapDisplay({ ...base, deltaIndex: 0.1 })?.delta).toEqual({
-      text: '+0.1',
+      arrow: '\u2191',
+      text: '0.1',
       tone: INDEX_DELTA.dark.drifted,
     });
   });
