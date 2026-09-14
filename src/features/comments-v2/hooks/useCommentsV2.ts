@@ -527,6 +527,15 @@ export function useCommentsV2({
     totalCount,
     totalCountLoading,
     isLoading,
+    /**
+     * THE ONLY HONEST GATES (RULING A). isLoading / totalCountLoading are
+     * `isPending && isFetching`, and these queries are DISABLED while the
+     * sheet is shut — pending with fetchStatus 'idle' — so both read FALSE on
+     * the frame the sheet opens, before anything has been asked. Consumers
+     * gate on these instead.
+     */
+    isFetched: pagesFetched,
+    totalCountFetched,
     fetchNextPage,
     hasNextPage: !!hasNextPage,
     isFetchingNextPage,
