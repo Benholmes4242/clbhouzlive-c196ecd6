@@ -226,6 +226,10 @@ export function CircleShelf({
                    Golf names and photo URLs and leaked once already. */
                 avatarUrl={row.profile_photo_url ?? null}
                 avatarUserId={row.user_id}
+                /* A LONG MEMBER NAME WRAPS RATHER THAN TRUNCATES (§2a), and the
+                   name box reserves both lines so the rail stays uniform. */
+                captionNameLines={2}
+
                 railCaptionLine={
                   handicap ? (
                     <>
