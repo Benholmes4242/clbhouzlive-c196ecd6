@@ -323,7 +323,7 @@ function CommentsSheetV2Inner({
                     : t('comments.count', { count: totalCount })}
                 </div>
               )}
-              {!totalCountLoading && totalCount === 0 && (
+              {totalCountFetched && totalCount === 0 && (
                 <div style={{ ...BODY, color: MUTE, marginTop: 4 }}>
                   {t('comments.emptyLine')}
                 </div>
