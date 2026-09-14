@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
@@ -55,7 +56,16 @@ export default function AmateurPage() {
      RPC is monotonic through GREATEST and clamps future stamps, so a stale
      tab cannot move the window backwards. */
   const { markSeen } = useDiscoverLastSeen(user?.id);
-  useMarkDiscoverSeenOnExit(markSeen);
+  const queryClient = useQueryClient();
+  /* MOVING THE STAMP INVALIDATES EVERY ANSWER MEASURED FROM IT. Standing and
+     the stream are cached for five minutes AND persisted, so without this the
+     next visit would re-render movement the member has already been shown.
+     Removed rather than invalidated: nothing is mounted at this point. */
+  const markSeenAndForget = useCallback(() => {
+    markSeen();
+    queryClient.removeQueries({ queryKey: ['explore-magazine'] });
+  }, [markSeen, queryClient]);
+  useMarkDiscoverSeenOnExit(markSeenAndForget);
 
   /* COMING BACK IS FREE. A see-all, a course row or a story leaves the page;
      returning lands on the row that was tapped, not the first card. */
