@@ -376,14 +376,19 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
     <>
       <ExploreShelf
         heading={copy.heading}
+        /* ONE BOARD IS NOT A CHOICE. A member with a single available board
+           gets the plain heading and no control that cannot change anything. */
         headingRight={
-          <BoardSelector
-            board={shownBoard}
-            label={copy.boardName(shownBoard)}
-            ariaLabel={copy.pickBoard}
-            nameFor={copy.boardName}
-            onPick={pickBoard}
-          />
+          availability.boards.length > 1 ? (
+            <BoardSelector
+              board={shownBoard}
+              options={availability.boards}
+              label={copy.boardName(shownBoard)}
+              ariaLabel={copy.pickBoard}
+              nameFor={copy.boardName}
+              onPick={pickBoard}
+            />
+          ) : undefined
         }
         onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'standing', pos })}
         /* SEE ALL MOVED BENEATH THE CARDS because the selector owns the right
