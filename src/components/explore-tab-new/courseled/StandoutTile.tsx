@@ -351,7 +351,7 @@ export function StandoutTile({
                   borderRadius: 10,
                 }
               : null),
-            fontSize: 11,
+            fontSize: whenGlass ? 9 : 11,
             fontWeight: 700,
             letterSpacing: whenGlass ? 0 : '0.14em',
             textTransform: whenGlass ? 'none' : 'uppercase',
