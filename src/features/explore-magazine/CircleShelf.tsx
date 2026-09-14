@@ -62,25 +62,39 @@ const SHEET_LIMIT = 60;
 const NO_WINDOW_DAYS = 3650;
 
 /**
- * THE REAL TOTAL, so "See all 24 rounds" is a fact and not the length of a page. One
- * head count over the same set the tiles are drawn from: 18-hole rounds by the
+ * THE REAL TOTAL, so "See all 24 rounds" is a fact and not the length of a page.
+ * A head count over the same set the tiles are drawn from: 18-hole rounds by the
  * people the viewer follows, viewer excluded.
+ *
+ * BOUNDED BY CONSTRUCTION. This used to send ONE `in.(...)` list containing every
+ * followed member. On an account that follows most of the platform that URL grew
+ * past what PostgREST accepts and the request came back 400 — repeatedly, on
+ * every Explore mount, so the count was never a count. The follow set is now cut
+ * into fixed slices and the per-slice counts summed, so no single URL can grow
+ * with the follow set. It also only runs once the rail has something to label.
  */
-function useCircleRoundTotal(viewerId: string | undefined) {
+const COUNT_CHUNK = 20;
+
+function useCircleRoundTotal(viewerId: string | undefined, ready: boolean) {
   return useQuery({
     queryKey: ['explore-magazine', 'circle-round-total', viewerId ?? 'anon'],
-    enabled: !!viewerId,
+    enabled: !!viewerId && ready,
     staleTime: 60_000,
     queryFn: async (): Promise<number> => {
       const ids = (await fetchCircleIds(viewerId as string)).filter((id) => id !== viewerId);
       if (ids.length === 0) return 0;
-      const { count, error } = await supabase
-        .from('gam_round_stats')
-        .select('id', { count: 'exact', head: true })
-        .in('user_id', ids)
-        .eq('holes_played', 18);
-      if (error) throw error;
-      return count ?? 0;
+      let total = 0;
+      for (let i = 0; i < ids.length; i += COUNT_CHUNK) {
+        const slice = ids.slice(i, i + COUNT_CHUNK);
+        const { count, error } = await supabase
+          .from('gam_round_stats')
+          .select('whs_score_id', { count: 'exact', head: true })
+          .in('user_id', slice)
+          .eq('holes_played', 18);
+        if (error) throw error;
+        total += count ?? 0;
+      }
+      return total;
     },
   });
 }
@@ -108,8 +122,6 @@ export function CircleShelf({
     allowMultiplePerFriend: true,
     windowDays: NO_WINDOW_DAYS,
   });
-  const total = useCircleRoundTotal(viewerId);
-
   /* NEWEST FIRST, stated here as well as in the hook, because this shelf's
      contract is the order. */
   const rows = useMemo(
@@ -121,6 +133,9 @@ export function CircleShelf({
     [circle.data],
   );
   const tiles = useMemo(() => rows.slice(0, RENDERED), [rows]);
+
+  /* The count labels the rail, so it does not run before there is a rail. */
+  const total = useCircleRoundTotal(viewerId, rows.length > 0);
 
   const courseIds = useMemo(
     () => tiles.map((row) => row.course_id).filter((id): id is string => !!id),
