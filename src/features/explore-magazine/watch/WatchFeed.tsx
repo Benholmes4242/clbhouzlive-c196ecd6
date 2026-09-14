@@ -326,7 +326,9 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
   /* PAGINATION. One sentinel for the page: videos drive it on every mixed or
      video view, clips drive it where the page IS clips. */
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const driver = isClipsOnly(filter) || filter === 'videos' && false ? clips : vParams ? videos : clips;
+  /* Where the page IS clips, clips paginate it; everywhere else the videos do,
+     and the rails top themselves up separately below. */
+  const driver = isClipsOnly(filter) ? clips : vParams ? videos : clips;
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || !driver.hasNextPage || driver.isFetchingNextPage) return;
