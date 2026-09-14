@@ -171,7 +171,7 @@ export function CircleShelf({
         /* Sentence-case see-all: the horizontal-rail convention. Only where
            there is more than the rail draws. */
         seeAllLabel={
-          shown > tiles.length ? t('amateur.stream.seeAllRounds', 'See all {{count}} rounds', { count: shown }) : null
+          shown > tiles.length ? t('amateur.stream.seeAllRoundsPlain', 'See all rounds') : null
         }
         metaLabel={t('amateur.stream.roundCount', '{{count}} rounds', { count: shown })}
         onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'circle', pos })}
