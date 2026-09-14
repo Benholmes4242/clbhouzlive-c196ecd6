@@ -188,6 +188,8 @@ export function useCommentsV2({
     placeholderData: keepPreviousData,
     enabled: enabled && rowIds.length > 0,
     staleTime: 30_000,
+    /* RULING B — scoped to the comments-v2 reads, see the pages query above. */
+    refetchOnMount: 'always',
     queryFn: async () => {
       const personalIds = Array.from(new Set(
         allRows.filter(r => (r.actor_type ?? 'personal') !== 'business')
