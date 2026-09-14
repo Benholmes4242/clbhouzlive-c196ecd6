@@ -141,7 +141,8 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
 
 
               fontFamily: SANS,
-              fontSize: 12,
+              fontSize: geo.fontSize,
+
               fontWeight: 700,
               whiteSpace: 'nowrap',
               cursor: 'pointer',
