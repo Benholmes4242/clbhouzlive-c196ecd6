@@ -309,19 +309,33 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
   const tiles = useMemo(() => standing.rows.slice(0, RENDERED), [standing.rows]);
 
   /**
-   * THE TAP OPENS THE COURSE AND CLAIMS NO PARITY (Ben's ruling SS4).
+   * BRIEF_STANDING_TAP 2a/2d - THE TAP CARRIES THE BOARD.
    *
-   * It lands on the Champions tab's OWN DEFAULT CATEGORY and passes no `?cat=`.
-   * No Champions category measures what these boards measure: Champions ranks
-   * CAREERS at the course, these boards rank single ROUNDS, and the pools are
-   * not the same either. Measured on production: on gross - the one case that
-   * looked cheaply correct - the shelf and Champions disagree on 4 of this
-   * member's 31 courses (shelf 1st / Champions 2nd at Royal Portrush and
-   * Westerham, 3rd / 4th at Parkstone and Royal Blackheath). Deep linking would
-   * therefore hand a member one rank on the shelf and a different rank on the
-   * screen they tapped into, which is the two-readers fault. Do NOT add a
-   * `?cat=` here, and do NOT add categories to Champions to close the gap.
+   * THIS SUPERSEDES RULING SS4, WHICH SAID TO PASS NO `?cat=`. That ruling
+   * stands as a WARNING, not as behaviour: Champions' gross, stableford and
+   * birdie boards rank CAREERS at the course from gam_course_legends, these
+   * boards rank single ROUNDS, and on production the two disagreed on 4 of one
+   * member's 31 courses on gross. The brief rules that landing on the board the
+   * member was looking at beats landing on an unrelated default, so the link is
+   * passed. NET IS THE EXCEPTION AND THE ONLY PARITY-GUARANTEED CASE: Champions'
+   * net board (docs/sql/champions_net_board.sql) is built on the same
+   * board_pool/board_qualifies/rank as this shelf, so those two can never
+   * disagree.
+   *
+   * `me=1` asks Champions to arrive at the member's own row.
    */
+  const CHAMPIONS_CAT: Record<StandingBoard, string | null> = {
+    net:        'lowest_net_all_time',
+    topar:      'lowest_gross_all_time',
+    stableford: 'best_stableford_all_time',
+    birdies:    'most_birdies_all_time',
+    /* NO EQUIVALENT, STATED NOT GUESSED: 'improved' ranks movement against the
+       member's own handicap over a window; Champions has no board for it.
+       best_score_diff is excluded from that tab entirely. This one opens the
+       tab at its default. */
+    improved:   null,
+  };
+
   const open = (row: StandingRow) => {
     analyticsEvents.track('amateur_standing_tile_tapped', {
       rank: row.rank_now,
@@ -330,7 +344,12 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
     });
     rememberAmateurScroll();
     setSheetOpen(false);
-    navigate(`/courses/${row.course_id}?tab=champions`);
+    const cat = CHAMPIONS_CAT[shownBoard];
+    navigate(
+      cat
+        ? `/courses/${row.course_id}?tab=champions&cat=${cat}&me=1`
+        : `/courses/${row.course_id}?tab=champions`,
+    );
   };
 
   /* A HOLD, NOT A GUESS, while either read is in flight — the rail's own
