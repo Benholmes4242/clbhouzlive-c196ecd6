@@ -926,8 +926,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               background: hasRoundBackdrop ? CARD : undefined,
             }}
           >
-            {/* Order and rhythm: picker, 22, heart group, 22, comment group,
-                then share pushed to the right edge by auto margin. */}
+            {/* ACTIONS RIGHT (Ben's ruling). The picker stays far left; heart,
+                comment and share form ONE group pushed to the right edge by an
+                auto margin, keeping their existing 22px rhythm and tap targets.
+                Same footer object on a normal post and a review post. */}
             <div
               style={{
                 display: 'flex',
@@ -937,31 +939,35 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               }}
             >
               <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
-              <FooterButton
-                icon={Heart}
-                label={likeCount > 0 ? formatCount(likeCount) : undefined}
-                active={liked}
-                onClick={() => onLike(post, effectiveActor)}
-                activeColor={AMBER}
-                haptic={!liked ? 'selection' : 'none'}
-              />
-              <FooterButton
-                icon={MessageCircle}
-                label={commentCount > 0 ? formatCount(commentCount) : undefined}
-                onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
-              />
-              <div style={{ marginLeft: 'auto' }}>
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 22 }}>
+                <FooterButton
+                  icon={Heart}
+                  label={likeCount > 0 ? formatCount(likeCount) : undefined}
+                  active={liked}
+                  onClick={() => onLike(post, effectiveActor)}
+                  activeColor={AMBER}
+                  haptic={!liked ? 'selection' : 'none'}
+                />
+                <FooterButton
+                  icon={MessageCircle}
+                  label={commentCount > 0 ? formatCount(commentCount) : undefined}
+                  onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
+                />
                 <FooterButton icon={Share} onClick={() => onShare(post)} />
               </div>
             </div>
 
             {showLikedBy && (
+              /* Right-aligned under the actions group. The line is nowrap with an
+                 end ellipsis, so long names truncate at the tail and the height
+                 never changes between the in-flight figure and the names. */
               <LikedByRow
                 postId={post.id}
                 count={likeCount}
-                style={{ padding: `0 20px ${likedByBottom}px` }}
+                style={{ padding: `0 20px ${likedByBottom}px`, textAlign: 'right' }}
               />
             )}
+
 
             {showComments && (
               <FeedCommentPreview
