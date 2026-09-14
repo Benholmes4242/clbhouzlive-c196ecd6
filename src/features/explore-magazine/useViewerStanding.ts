@@ -62,22 +62,29 @@ export interface ViewerStanding {
 const EMPTY: StandingRow[] = [];
 
 /**
- * ONE READ, ONE BOARD (Ben's ruling on the board selector).
+ * ONE READ, ONE BOARD (Ben's rulings on the board measurement).
  *
- * THE BOARD IS IN THE KEY, alongside the viewer. Net and gross are two
- * different answers about the same member and must never share a cache entry.
+ * THE BOARD IS IN THE KEY, alongside the viewer. Net, gross, stableford,
+ * birdies and improved are five different answers about the same member and
+ * must never share a cache entry.
  *
  * TWO FUNCTIONS, DELIBERATELY. Gross calls the one-argument
  * get_viewer_standing(uuid) that is live today, unchanged, so every existing
- * caller and this shelf's gross view behave exactly as before. Net calls the
- * additive two-argument overload drafted in
- * docs/sql/get_viewer_standing_board.sql, which is Ben's to run.
+ * caller - notably the rank consequence cards through get_explore_stream -
+ * behaves exactly as before. Every other board calls the additive
+ * two-argument overload drafted in
+ * docs/sql/get_viewer_standing_boards_five.sql, which is Ben's to run.
  *
- * NET IS NOT DEPLOYED YET, SO NET FALLS BACK TO GROSS RATHER THAN TO NOTHING.
- * Net is the default board for everyone; if the overload is missing the read
- * errors, and treating that as unresolved would delete the shelf for every
- * member until the SQL lands. Instead the gross read answers and `board`
- * reports 'topar', so the heading says Gross and nothing is mislabelled.
+ * THE FIELD IS THE QUALIFIED COUNT, not the played count. Both overloads count
+ * the members being ranked, per docs/sql/get_viewer_standing_field_qualified.sql.
+ * Before that fix a birdies board read "1st of 12" where 3 members held a
+ * qualifying round.
+ *
+ * A BOARD THAT IS NOT DEPLOYED YET FALLS BACK TO GROSS RATHER THAN TO NOTHING.
+ * If the overload is missing the read errors, and treating that as unresolved
+ * would delete the shelf for every member until the SQL lands. Instead the
+ * gross read answers and `board` reports 'topar', so the label says gross and
+ * nothing is mislabelled.
  */
 export function useViewerStanding(
   viewerId: string | undefined,
