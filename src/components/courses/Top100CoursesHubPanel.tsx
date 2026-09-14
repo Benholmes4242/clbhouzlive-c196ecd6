@@ -101,6 +101,13 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
     const rows = data?.pages.flat() ?? [];
     return [...rows].sort((a, b) => (rankFor(a, selectedList) ?? 999) - (rankFor(b, selectedList) ?? 999));
   }, [data, selectedList]);
+  /* Search narrows what is rendered only. The rated / tracked sentences above
+     describe the whole list, so they keep counting the unfiltered rows. */
+  const visibleCourses = useMemo(() => {
+    const q = nameQuery.trim().toLowerCase();
+    if (!q) return courses;
+    return courses.filter((course) => (course.name ?? '').toLowerCase().includes(q));
+  }, [courses, nameQuery]);
   const ids = useMemo(() => courses.map((course) => course.id), [courses]);
   const enrichment = useTop100Enrichment(ids, user?.id, selectedList);
   const ratedCount = courses.filter((course) => {
@@ -199,11 +206,16 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
           </div>
         ) : (
           <div>
-            {courses.map((course, index) => {
+            {nameQuery.trim().length > 0 && visibleCourses.length === 0 ? (
+              <div style={{ padding: '0 20px', color: A.MUTE, fontSize: 13 }}>
+                {`No course on this list matches ${nameQuery.trim()}.`}
+              </div>
+            ) : null}
+            {visibleCourses.map((course, index) => {
               const item = enrichment.get(course.id);
               const row = toBrowseRow(course, item, selectedList);
               return (
-                <div key={course.id} style={{ marginBottom: index < courses.length - 1 ? 32 : 0 }}>
+                <div key={course.id} style={{ marginBottom: index < visibleCourses.length - 1 ? 32 : 0 }}>
                   <BrowseCourseCard
                     row={row}
                     variant="top100"
