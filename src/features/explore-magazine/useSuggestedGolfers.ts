@@ -4,6 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { fetchCircleIds } from '@/lib/social/circle';
 
 /**
+ * DEAD-LISTED, NOT DELETED. The Explore suggestion shelf now reads the dedicated
+ * public.get_suggested_golfers engine through
+ * src/features/social-suggestions/useSuggestedGolfers.ts, which resolves club,
+ * reciprocal, shared-course, mutual and activity reasons server-side and never
+ * returns a reasonless person - so the compensating client reads below (monthly
+ * rounds, shared course, course names) are no longer needed by any caller.
+ *
  * SUGGESTED GOLFERS, FOR A MEMBER WHO FOLLOWS NOBODY
  * (BRIEF_EXPLORE_SUGGESTED_GOLFERS §3).
  *
