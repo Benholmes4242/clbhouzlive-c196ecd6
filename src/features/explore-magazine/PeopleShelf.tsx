@@ -144,7 +144,10 @@ function reasonForClubGolfer(
 ): string {
   if (category) return clubRecordReason(category, t);
   if (golfer.roundsHere > 0) {
-    return t('amateur.shelf.roundsHere', '{{count}} round here', { count: golfer.roundsHere });
+    /* Suspense is disabled. If this namespace has not arrived yet, i18next uses
+       this fallback verbatim, so the fallback must pluralise too. */
+    const fallback = golfer.roundsHere === 1 ? '{{count}} round here' : '{{count}} rounds here';
+    return t('amateur.shelf.roundsHere', fallback, { count: golfer.roundsHere });
   }
   if (golfer.isNew) return t('amateur.shelf.newThisMonth', 'New this month');
   return '';

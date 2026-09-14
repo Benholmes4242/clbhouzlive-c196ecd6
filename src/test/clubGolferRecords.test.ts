@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import i18next from 'i18next';
+import coursesEn from '../../public/locales/en/courses.json';
 
 import {
   assignClubRecordCategories,
@@ -47,5 +49,18 @@ describe('club golfer record assignment', () => {
     const first = [...assignClubRecordCategories(golfers).entries()];
     const second = [...assignClubRecordCategories(golfers).entries()];
     expect(second).toEqual(first);
+  });
+});
+
+describe('club golfer reason plurals', () => {
+  it('resolves one and many rounds through the shipped keys', async () => {
+    const instance = i18next.createInstance();
+    await instance.init({
+      lng: 'en',
+      defaultNS: 'courses',
+      resources: { en: { courses: coursesEn } },
+    });
+    expect(instance.t('amateur.shelf.roundsHere', { count: 1 })).toBe('1 round here');
+    expect(instance.t('amateur.shelf.roundsHere', { count: 8 })).toBe('8 rounds here');
   });
 });
