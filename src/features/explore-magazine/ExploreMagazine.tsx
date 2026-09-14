@@ -561,6 +561,57 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
        a single read for it. */
     { enabled: fallbackWanted && !indexPath && view !== 'watch' },
   );
+  /* BRIEF_EXPLORE_ALL_VIDEO — ONE LONG-FORM READ FOR THE WHOLE PAGE. The rail
+     (§1) and the stream candidates (§2) are the SAME rows, from the same read
+     Watch uses, under Watch's own 'latest' query key. Nothing new was written to
+     fetch video and nothing else on All reads long-form. */
+  const allVideos = useWatchVideos({ userId: view === 'all' ? userId : undefined, mode: 'latest', search: null });
+  const videoRows = useMemo(
+    () => ((allVideos.data?.pages ?? []).flat() as HubRpcRow[]).filter((row) => !!row?.post_id),
+    [allVideos.data],
+  );
+  const videoPosts = useMemo(() => toFeedPosts(videoRows), [videoRows]);
+  /* §2 LONG-FORM AS CANDIDATES, SCORED BY THE ONE MODEL (scoreItem). REPORTED,
+     NOT PAPERED OVER: a video has no course, no score and no standing, so it
+     carries NO consequence, and the ring is 'own' only when the viewer is the
+     creator - a followed creator is a circle relationship, which this model
+     expresses as a round's consequence and NOT as a ring, so a video from your
+     circle gets no ring lift. It therefore ranks on FRESHNESS alone, exactly as
+     a clip does. No consequence was invented to lift it.
+     FOUR AT MOST. The rail is where video has volume; the stream takes a
+     page's worth so a fresh batch cannot turn All into a media page. */
+  const videoItems = useMemo<StreamItem[]>(() => {
+    if (view !== 'all') return [];
+    return videoRows.slice(0, 4).map((row) => {
+      const item: StreamItem = {
+        id: `watch:${row.post_id}`,
+        kind: 'watch',
+        ring: row.post_user_id && userId && row.post_user_id === userId ? 'own' : null,
+        lane: 'news',
+        score: 0,
+        consequence: null,
+        subject: null,
+        who: {
+          user_id: row.post_user_id ?? null,
+          display_name: row.creator_display_name ?? row.creator_username ?? null,
+          photo_url: row.creator_avatar_url ?? null,
+          is_viewer: !!userId && row.post_user_id === userId,
+        },
+        facts: {
+          post_id: row.post_id,
+          media_id: row.media_id ?? null,
+          duration_s: row.duration_seconds ?? null,
+          arrived_at: row.post_created_at ?? null,
+          published_at: row.post_created_at ?? null,
+        },
+        payload: { video: row },
+        seen: false,
+      };
+      item.score = scoreItem(item);
+      return item;
+    });
+  }, [view, videoRows, userId]);
+
   const scoresStanding = useViewerStanding(userId);
 
   /* §6h REMOVED BY RULING: the no-connection sentence never renders on All,
@@ -669,10 +720,27 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   /* THE SERVER PAGE IS ALREADY A PAGE. Reveal slicing belongs to the client
      composition only; re-slicing a ranked, cadenced page would hide cards the
      RPC deliberately placed. */
-  const visible = useMemo(
-    () => (serverOn ? source.items : source.items.slice(0, revealed)),
-    [serverOn, source.items, revealed],
-  );
+  const visible = useMemo(() => {
+    const base = serverOn ? source.items : source.items.slice(0, revealed);
+    if (videoItems.length === 0) return base;
+    /* AN INSERTION, NOT A RE-SORT. The server's page is already ranked and
+       cadenced and the client re-sorts nothing: each video is placed at the
+       first position whose card scores below it, so every other card keeps the
+       order the ranker gave it. A row already on the page (the fallback's own
+       media pool) is never duplicated. */
+    const seen = new Set(base.map((entry) => entry.facts.post_id ?? entry.id));
+    const out = [...base];
+    for (const video of videoItems) {
+      if (seen.has(video.facts.post_id ?? video.id)) continue;
+      let at = out.findIndex((entry) => entry.score < video.score);
+      if (at < 0) at = out.length;
+      /* NEVER THE LEAD ON ITS FIRST FRAME OF A PAGE WITH REAL CARDS: a video
+         may lead (§2 asks for exactly that) but only by out-scoring the lead,
+         which freshness alone can do - so this does not hold it back. */
+      out.splice(at, 0, video);
+    }
+    return out;
+  }, [serverOn, source.items, revealed, videoItems]);
 
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
      screen, and a card holds its whole shell until that resolver settles —
