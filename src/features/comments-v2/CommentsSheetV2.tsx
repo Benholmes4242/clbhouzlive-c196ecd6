@@ -309,7 +309,18 @@ function CommentsSheetV2Inner({
               <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(255,255,255,0.18)' }} />
             </div>
 
-            {/* Header - the count is stated ONCE; no kicker, no close button. */}
+            {/* Header - the count is stated ONCE; no kicker, no close button.
+
+                NEVER GATE ON isLoading IN THIS CODEBASE. Every read here is
+                DISABLED while the sheet is shut, and a disabled React Query v5
+                query is pending with fetchStatus 'idle' — so isLoading is
+                FALSE before it has ever run, and `!isLoading && count === 0`
+                confidently announced "No comments yet" about a thread it had
+                not asked about. isFetched is the only gate that means "the
+                answer is in". This is the FOURTH instance of that trap here:
+                ChromeIsland, the profile counters, the review wizard's step
+                strip, and this sheet. Reaching for isLoading is the natural
+                thing to write and it has been wrong every time. */}
             <div className="px-5 pb-3 shrink-0">
               {!totalCountFetched ? (
                 <div
