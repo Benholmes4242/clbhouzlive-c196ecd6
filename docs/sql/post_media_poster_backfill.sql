@@ -41,7 +41,7 @@ UPDATE public.post_media
 SET poster_url =
       'https://customer-4ah4gni80ytefpck.cloudflarestream.com/'
       || stream_id
-      || '/thumbnails/thumbnail.jpg?height=1080'
+      || '/thumbnails/thumbnail.jpg?height=1080&fit=crop'
 WHERE media_type = 'video'
   AND poster_url IS NULL
   AND stream_id IS NOT NULL;

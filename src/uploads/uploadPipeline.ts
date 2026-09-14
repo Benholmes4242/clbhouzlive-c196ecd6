@@ -11,6 +11,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
 import { uploadEventBus } from './uploadEventBus';
+import { derivePosterUrl } from './posterUrl';
 import { createPost } from '@/services/posts/createPost';
 
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
