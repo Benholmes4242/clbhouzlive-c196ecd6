@@ -334,30 +334,27 @@ export function StandoutTile({
           </span>
         )}
 
-        {/* AGE — plain by default. Circle opts into glass because its caption's
-            second line already belongs to handicap disclosure. */}
+        {/* AGE — PLAIN TEXT ON THE PHOTO, EVERYWHERE, NO EXCEPTIONS.
+            The glass date badge is RETIRED. Glass is the score chip's material,
+            and a date wearing it gave the photo two equal-looking figures at
+            either end, so the eye had to work out which was which. The date is
+            the least important thing on the tile; it is now the quietest. ONE
+            chip on the photo, and it is the score.
+            `whenGlass` is kept as an accepted prop so existing callsites stay
+            valid, and is deliberately inert. Legibility is now carried entirely
+            by the shadow, hence the doubled, tighter stack below. */}
         <span
-          className={whenGlass && whenLabel ? 'standout-figure-chip' : undefined}
           style={{
             position: 'absolute',
             top: 8,
-            right: whenGlass ? 8 : 10,
-            ...(whenGlass && whenLabel
-              ? {
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  minHeight: 28,
-                  padding: '5px 8px',
-                  borderRadius: 10,
-                }
-              : null),
-            fontSize: whenGlass ? 9 : 11,
+            right: 10,
+            fontSize: 11,
             fontWeight: 700,
-            letterSpacing: whenGlass ? 0 : '0.14em',
-            textTransform: whenGlass ? 'none' : 'uppercase',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
             lineHeight: 1,
-            color: whenGlass ? '#FFFFFF' : 'rgba(255,255,255,0.72)',
-            textShadow: '0 1px 2px rgba(10,14,10,0.55)',
+            color: 'rgba(255,255,255,0.78)',
+            textShadow: '0 1px 2px rgba(10,14,10,0.62), 0 0 6px rgba(10,14,10,0.45)',
           }}
         >
           {whenLabel}
