@@ -7,22 +7,11 @@ import type { ActiveActor } from '@/types/actor';
 import { KICKER } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-/**
- * The footer's liked-by line derives its heart alignment from these exact
- * values. Keep the picker and that alignment on one geometry contract so a
- * future avatar, chevron, or internal-gap change cannot silently split them.
- */
-export const FEED_ACTOR_PICKER_GEOMETRY = {
+const FEED_ACTOR_PICKER_GEOMETRY = {
   avatar: 24,
   gap: 4,
   chevron: 14,
 } as const;
-
-export function feedActorPickerWidth(hasChevron: boolean): number {
-  return FEED_ACTOR_PICKER_GEOMETRY.avatar + (hasChevron
-    ? FEED_ACTOR_PICKER_GEOMETRY.gap + FEED_ACTOR_PICKER_GEOMETRY.chevron
-    : 0);
-}
 
 // Only the trigger chevron is theme-dependent; the sheet follows the dark canvas.
 const PALETTE = {

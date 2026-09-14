@@ -26,7 +26,6 @@
  *   light (#0F172A ramp over #F8FAFC): 1.00 #0F172A, 0.60 #6C727E, 0.42 #969BA4
  */
 import React from 'react';
-import { MessageCircle } from 'lucide-react';
 import { MentionText } from '@/components/mentions/MentionText';
 // SECTION C removed the avatar, the verified badge, the timestamp and the
 // emoji-only sizing from this block's output. Their modules stay in the repo
@@ -36,7 +35,7 @@ import type { FeedCommentPreview as PreviewData } from '@/hooks/feed/useFeedComm
 
 export type CommentPreviewSurface = 'dark' | 'light';
 
-interface Tones { ink: string; mid: string; dim: string; line: string }
+interface Tones { ink: string; mid: string; line: string }
 
 /**
  * Flattened, not faded. dark = card's #F8FAFC ramp over #10151C; light = the
@@ -48,13 +47,11 @@ const TONES: Record<CommentPreviewSurface, Tones> = {
   dark: {
     ink: '#F8FAFC',
     mid: '#A7AAAE',
-    dim: '#787C81',
     line: 'rgba(255,255,255,0.08)',
   },
   light: {
     ink: '#0F172A',
     mid: '#6C727E',
-    dim: '#969BA4',
     // The light card's shipped divider, not a computed one.
     line: '#E5E7EA',
   },
@@ -92,7 +89,7 @@ export const FeedCommentPreview: React.FC<Props> = ({
   topRule = true,
   padding = '9px 14px 11px',
 }) => {
-  const { ink: INK, mid: MID, dim: DIM, line: LINE } = TONES[surface];
+  const { ink: INK, mid: MID, line: LINE } = TONES[surface];
 
   /**
    * SECTION C — THE COMMENT ROW STOPS BEING PERMANENT.
@@ -150,12 +147,10 @@ export const FeedCommentPreview: React.FC<Props> = ({
             }
           }}
           style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 5,
+            display: 'block',
             width: '100%',
             marginTop: i === 0 ? 0 : 5,
-            fontSize: 12,
+            fontSize: 13,
             lineHeight: 1.5,
             background: 'transparent',
             border: 'none',
@@ -163,13 +158,6 @@ export const FeedCommentPreview: React.FC<Props> = ({
             cursor: 'pointer',
           }}
         >
-          <MessageCircle
-            aria-hidden
-            size={13}
-            strokeWidth={1.75}
-            color={DIM}
-            style={{ flex: 'none', position: 'relative', top: 2 }}
-          />
           <span
             style={{
               minWidth: 0,
@@ -179,7 +167,7 @@ export const FeedCommentPreview: React.FC<Props> = ({
               overflow: 'hidden',
             }}
           >
-            <span style={{ color: INK, fontWeight: 600 }}>{l.display_name}</span>
+            <span style={{ color: INK, fontWeight: 700 }}>{l.display_name}</span>
             <span style={{ color: MID, fontWeight: 500, marginLeft: 5 }}>
               <MentionText text={(l.content ?? '').trim()} />
             </span>

@@ -40,7 +40,7 @@ import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 import { LikedByRow } from '@/components/likes/LikedByRow';
-import { FeedActorPicker, feedActorPickerWidth } from './FeedActorPicker';
+import { FeedActorPicker } from './FeedActorPicker';
 import Pressable from '@/components/ui/Pressable';
 import { HeartBurst } from './HeartBurst';
 import { createTapHandler } from './mediaTap';
@@ -73,7 +73,7 @@ const LINE = 'rgba(255,255,255,0.08)';
 const AMBER = '#F7931E';
 const GREEN = '#22C55E';
 
-/** One geometry contract positions the action row and the line beneath it. */
+/** Shared inset and spacing for the unified footer. */
 const FOOTER_GUTTER = 20;
 const FOOTER_ACTION_GAP = 22;
 
@@ -920,13 +920,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
            the first comment is the comment block's own 10px. */
         const actionsBottom = showLikedBy || showComments ? 0 : 12;
         const likedByBottom = showComments ? 0 : 12;
-        /* HEART LEFT EDGE, not its centre. The heart follows the actor picker
-           by the row gap, so the liked-by text uses the same picker dimensions
-           and the same row gap. With a chevron this is 20 + (24 + 4 + 14) +
-           22 = 84px; without one it is 20 + 24 + 22 = 66px. */
-        const likedByIndent = FOOTER_GUTTER + (effectiveActor
-          ? feedActorPickerWidth(availableActors.length > 1) + FOOTER_ACTION_GAP
-          : 0);
 
         return (
           <div
@@ -937,9 +930,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               background: hasRoundBackdrop ? CARD : undefined,
             }}
           >
-            {/* EVERYTHING LEFT, SHARE RIGHT (Ben, 14 Sep). One reading edge,
-                one acting edge: avatar/chevron, heart+count and comment+count
-                start at the 20px left margin; share sits alone on the right.
+            {/* POST ACTIONS LEFT, ACTOR RIGHT (Ben, 14 Sep). Heart+count,
+                comment+count and share form one action group at the 20px
+                reading edge. The avatar/chevron is separated at the far right.
                 Same footer object on a normal post and a review post. */}
             <div
               style={{
@@ -949,7 +942,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 padding: `10px ${FOOTER_GUTTER}px ${actionsBottom}px`,
               }}
             >
-              <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
               <FooterButton
                 icon={Heart}
                 label={likeCount > 0 ? formatCount(likeCount) : undefined}
@@ -963,21 +955,21 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 label={commentCount > 0 ? formatCount(commentCount) : undefined}
                 onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
               />
-              <div style={{ marginLeft: 'auto' }} />
               <FooterButton icon={Share} onClick={() => onShare(post)} />
+              <div style={{ marginLeft: 'auto' }} />
+              <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
             </div>
 
 
             {showLikedBy && (
-              /* Ben, 14 Sep: attribution comes from WHERE this starts. Its first
-                 character is flush with the heart's left edge above; no glyph
-                 is repeated here. The in-flight count and resolved names occupy
-                 this same one-line box, so neither height nor x-position moves. */
+              /* Ben, 14 Sep: this begins at the same card gutter as the heart.
+                  The in-flight count and resolved names occupy this same
+                  one-line box, so neither height nor x-position moves. */
               <LikedByRow
                 postId={post.id}
                 count={likeCount}
                 style={{
-                  padding: `0 ${FOOTER_GUTTER}px ${likedByBottom}px ${likedByIndent}px`,
+                  padding: `0 ${FOOTER_GUTTER}px ${likedByBottom}px`,
                 }}
               />
             )}
