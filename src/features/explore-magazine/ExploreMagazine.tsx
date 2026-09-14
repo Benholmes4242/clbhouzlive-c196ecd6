@@ -36,6 +36,7 @@ import {
   type ExploreView,
 } from './exploreViewMemory';
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
+import { EXPLORE_SERVER_STREAM_ENABLED } from './serverStreamSwitch';
 import { useExploreStream } from './useExploreStream';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
