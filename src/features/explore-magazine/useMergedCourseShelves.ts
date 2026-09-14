@@ -56,7 +56,7 @@ function rowFor(index: CourseCandidateIndex, courseId: string, override?: Partia
     rating: ratings ? ratings.mean : null,
     ratingCount: ratings?.n ?? 0,
     rank: null,
-    rankScopeWorld: false,
+    rankScope: null,
     ...override,
   };
 }

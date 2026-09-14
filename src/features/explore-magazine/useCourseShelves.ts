@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 
-import { supabase } from '@/integrations/supabase/client';
 import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
 import { useBoardCourses } from '@/components/explore-tab-new/courseled/hooks/useBoardCourses';
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
 import { useUserWantToPlay } from '@/hooks/useUserWantToPlay';
+
+import { useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
 
 import type { ViewerScoreScope } from './useViewerScoreScope';
 
@@ -43,7 +43,10 @@ export interface CourseShelfRow {
   ratingCount: number;
   /** Top 100 rank, when the course carries one. */
   rank: number | null;
-  rankScopeWorld: boolean;
+  /** THE LIST THE RANK CAME FROM, read from the membership — never inferred from
+   *  a null field. Null means the scope is unresolved and the chip shows the
+   *  rank with NO label. */
+  rankScope: RankListSlug | null;
 }
 
 /** §3a AROUND {county} — most tracked rounds, then rating. */
@@ -81,7 +84,7 @@ export function useCountyCourses(
         rating: row.rating,
         ratingCount: row.rating_count,
         rank: null,
-        rankScopeWorld: false,
+        rankScope: null,
       }))
       .sort((a, b) => (b.rounds - a.rounds) || ((b.rating ?? 0) - (a.rating ?? 0)))
       .slice(0, 12);
@@ -93,54 +96,35 @@ export function useCountyCourses(
   };
 }
 
-interface Top100Row {
-  course_id: string;
-  rank: number;
-  world: boolean;
-}
-
-/** §3b AROUND THE WORLD — the Top 100 rank table, ordered by rank. */
+/**
+ * §3b AROUND THE WORLD — the published rank table, ordered by rank.
+ *
+ * THE SCOPE IS THE LIST, READ FROM THE MEMBERSHIP (useTop100RankIndex). The old
+ * implementation looked for a list slug that does not exist (`top-100-worldwide`
+ * against a table whose slugs are global / gb-i / usa / europe), so its `world`
+ * flag was always false and every tile was then labelled GB&I downstream.
+ */
 export function useWorldTop100Courses(enabled: boolean) {
-  const query = useQuery<Top100Row[]>({
-    queryKey: ['explore-magazine', 'world-top100'],
-    enabled,
-    staleTime: 60 * 60_000,
-    queryFn: async () => {
-      const { data: lists, error: listError } = await supabase.from('top100_lists').select('id, slug');
-      if (listError) throw listError;
-      const slugs = new Map((lists ?? []).map((row: { id: string; slug: string }) => [row.id, row.slug]));
-      const worldId = (lists ?? []).find((row: { slug: string }) => row.slug === 'top-100-worldwide')?.id ?? null;
-      const { data, error } = await supabase
-        .from('course_top100_memberships')
-        .select('course_id, list_id, rank')
-        .order('rank', { ascending: true })
-        .limit(400);
-      if (error) throw error;
-      const out = new Map<string, Top100Row>();
-      for (const row of (data ?? []) as Array<{ course_id: string; list_id: string; rank: number | null }>) {
-        if (row.rank == null) continue;
-        const world = !!worldId && row.list_id === worldId;
-        const existing = out.get(row.course_id);
-        /* WORLD OUTRANKS REGIONAL, NEVER BOTH (§3b). */
-        if (existing && (existing.world || !world)) continue;
-        if (!slugs.has(row.list_id)) continue;
-        out.set(row.course_id, { course_id: row.course_id, rank: row.rank, world });
-      }
-      return Array.from(out.values())
-        .sort((a, b) => (Number(b.world) - Number(a.world)) || a.rank - b.rank)
-        .slice(0, 14);
-    },
-  });
+  const { index, isFetched: indexFetched } = useTop100RankIndex(enabled);
 
-  const ids = useMemo(() => (query.data ?? []).map((row) => row.course_id), [query.data]);
+  const picked = useMemo(() => {
+    if (!index) return [] as Array<{ courseId: string; rank: number; scope: RankListSlug }>;
+    return Array.from(index.entries())
+      .map(([courseId, standing]) => ({ courseId, ...standing }))
+      /* The best-ranked courses lead; the scope only ever labels them. */
+      .sort((a, b) => a.rank - b.rank || a.courseId.localeCompare(b.courseId))
+      .slice(0, 14);
+  }, [index]);
+
+  const ids = useMemo(() => picked.map((row) => row.courseId), [picked]);
   const meta = useCourseCardMeta(ids);
 
   const rows = useMemo<CourseShelfRow[]>(
     () =>
-      (query.data ?? []).map((row) => {
-        const course = meta.data?.get(row.course_id);
+      picked.map((row) => {
+        const course = meta.data?.get(row.courseId);
         return {
-          courseId: row.course_id,
+          courseId: row.courseId,
           name: course?.name ?? null,
           area: course?.region ?? course?.subCountry ?? null,
           imageUrl: course?.imageUrl ?? null,
@@ -148,13 +132,13 @@ export function useWorldTop100Courses(enabled: boolean) {
           rating: null,
           ratingCount: 0,
           rank: row.rank,
-          rankScopeWorld: row.world,
+          rankScope: row.scope,
         };
       }),
-    [query.data, meta.data],
+    [picked, meta.data],
   );
 
-  return { rows, isFetched: !enabled ? true : query.isFetched && (ids.length === 0 || meta.isFetched) };
+  return { rows, isFetched: !enabled ? true : indexFetched && (ids.length === 0 || meta.isFetched) };
 }
 
 /**
@@ -168,20 +152,29 @@ export function useWorldTop100Courses(enabled: boolean) {
  */
 export function useListCourses(viewerId: string | undefined, enabled: boolean) {
   const { wantToPlay, isLoading } = useUserWantToPlay(enabled ? viewerId : undefined);
+  /* THE RANK AND ITS SCOPE COME FROM THE MEMBERSHIP INDEX, not from
+     useUserWantToPlay's global_rank / regional_rank — that hook resolves its
+     lists by slugs that do not exist in top100_lists (`top-100-worldwide`,
+     `top-100-usa`), so both fields are always undefined and this rail has never
+     shown a rank at all. Reported; that hook is left as it is. */
+  const { index } = useTop100RankIndex(enabled);
   const rows = useMemo<CourseShelfRow[]>(
     () =>
-      (wantToPlay ?? []).slice(0, 12).map((row) => ({
-        courseId: row.course_id,
-        name: row.course_name,
-        area: row.sub_country ?? row.country ?? null,
-        imageUrl: row.thumbnail_image,
-        rounds: 0,
-        rating: null,
-        ratingCount: 0,
-        rank: row.global_rank ?? row.regional_rank ?? null,
-        rankScopeWorld: row.global_rank != null,
-      })),
-    [wantToPlay],
+      (wantToPlay ?? []).slice(0, 12).map((row) => {
+        const standing = index?.get(row.course_id) ?? null;
+        return {
+          courseId: row.course_id,
+          name: row.course_name,
+          area: row.sub_country ?? row.country ?? null,
+          imageUrl: row.thumbnail_image,
+          rounds: 0,
+          rating: null,
+          ratingCount: 0,
+          rank: standing?.rank ?? null,
+          rankScope: standing?.scope ?? null,
+        };
+      }),
+    [wantToPlay, index],
   );
   return { rows, total: wantToPlay?.length ?? 0, isFetched: !enabled || !viewerId ? true : !isLoading };
 }
