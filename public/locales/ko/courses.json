@@ -1554,7 +1554,8 @@
         "moments": "커뮤니티에서",
         "standing": "나의 순위",
         "clubWeek": "이번 주 {{club}}",
-        "circle": "내 서클"
+        "circle": "내 서클",
+        "videos": "동영상"
       },
       "scope": {
         "club": "내 클럽",

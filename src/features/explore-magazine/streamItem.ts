@@ -1,4 +1,5 @@
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
+import type { HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import type { Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
@@ -152,6 +153,9 @@ export interface StreamFacts {
  *  sheets and viewer these hooks already feed elsewhere. */
 export interface StreamPayload {
   round?: CircleRoundRow;
+  /** BRIEF_EXPLORE_ALL_VIDEO §2 — the long-form row exactly as the Watch read
+   *  returned it, so the All card IS the Watch card and not a copy of it. */
+  video?: HubRpcRow;
   review?: LatestReview;
   moment?: Moment;
   media?: CommunityLibraryItem;

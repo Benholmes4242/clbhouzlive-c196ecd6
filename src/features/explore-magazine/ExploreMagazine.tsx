@@ -35,9 +35,12 @@ import {
   writeExploreView,
   type ExploreView,
 } from './exploreViewMemory';
-import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
+import { STREAM_PAGE_SIZE, scoreItem, useExploreStreamClient } from './useExploreStreamClient';
 import { EXPLORE_SERVER_STREAM_ENABLED } from './serverStreamSwitch';
 import { WatchFeed } from './watch/WatchFeed';
+import { VideoCard } from './watch/videoUnit';
+import { useWatchVideos } from './watch/useWatchVideos';
+import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { useExploreStream } from './useExploreStream';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
@@ -89,12 +92,20 @@ const CLIP_TILE = { w: 140, h: 249 };
 
 const MOMENT_TILE = { w: 132, h: 132 };
 
+/* THE VIDEO TILE (BRIEF_EXPLORE_ALL_VIDEO §1). LANDSCAPE, because that is what
+   tells a member this is not a clip: 200 wide at 16:9 is a 113 photo, about 1.8
+   tiles at 390, and it can never be mistaken for the 140x249 clip beside it. */
+const VIDEO_TILE = { w: 200, h: 113 };
+
 /** §3e PHASE C — THE FINAL ALL ORDER, skipping empties: clips, rounds (this week
  *  at the club), standing, courses:county, moments, people, courses:world,
  *  courses:list. An empty or unresolved shelf renders nothing and leaves no gap,
  *  which is the same path an empty clips shelf already takes. */
 type ShelfKind =
   | 'clips'
+  /** BRIEF_EXPLORE_ALL_VIDEO §1 — long-form video on All, landscape tiles, NO
+   *  see-all (a member wanting more taps Watch). */
+  | 'videos'
   | 'clubWeek'
   /** BRIEF_EXPLORE_CIRCLE_SHELF — latest rounds from the people you follow,
    *  newest first. ALL ONLY: it is absent from Scores, Courses, Reviews, Watch. */
@@ -256,6 +267,81 @@ function ClipsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) {
                 mediaIndex: clip.mediaIndex ?? 0,
                 mediaId: clip.mediaId ?? null,
                 openedFrom: 'amateur-clips',
+                forceStartAtZero: true,
+              });
+            }}
+          />
+        </div>
+      ))}
+    </ExploreShelf>
+  );
+}
+
+/**
+ * THE VIDEOS RAIL (BRIEF_EXPLORE_ALL_VIDEO §1).
+ *
+ * ONE SOURCE, ONE UNIT. The rows are the Watch long-form read
+ * (useWatchVideos, mode 'latest') under the SAME query key Watch's All chip
+ * uses, so the two surfaces share one cache entry and no second read is
+ * issued; the tile is Watch's own VideoCard at rail size, so no third video
+ * tile exists. The rows are passed in because the page also merges them into
+ * the stream (§2) - asking twice would be two reads for one fact.
+ *
+ * NO SEE-ALL, consistent with Watch: the rail is a window into the feed, not a
+ * preview of a list.
+ */
+function VideosShelf({
+  rows,
+  isFetched,
+  isError,
+  onRetry,
+  pos,
+  onDepart,
+}: {
+  rows: HubRpcRow[];
+  isFetched: boolean;
+  isError: boolean;
+  onRetry: () => void;
+  pos: number;
+  onDepart: () => void;
+}) {
+  const { t } = useTranslation('courses');
+  const tiles = useMemo(() => rows.slice(0, 12), [rows]);
+  const posts = useMemo(() => toFeedPosts(tiles), [tiles]);
+
+  if (!isFetched && !isError) return <ShelfShell tileW={VIDEO_TILE.w} tileH={VIDEO_TILE.h} />;
+  /* ERRORED IS NOT EMPTY - the same two gates every other shelf carries. */
+  if (isError) {
+    return (
+      <ShelfRetry
+        heading={t('amateur.stream.shelf.videos', 'Videos')}
+        label={t('amateur.stream.failed', 'This did not load.')}
+        action={t('amateur.stream.retry', 'Try again')}
+        onRetry={onRetry}
+      />
+    );
+  }
+  if (tiles.length === 0) return null;
+
+  return (
+    <ExploreShelf
+      heading={t('amateur.stream.shelf.videos', 'Videos')}
+      onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'videos', pos })}
+    >
+      {tiles.map((row, index) => (
+        <div key={row.post_id} style={{ flex: `0 0 ${VIDEO_TILE.w}px`, width: VIDEO_TILE.w }}>
+          <VideoCard
+            row={row}
+            size="rail"
+            onPress={() => {
+              analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'videos', pos });
+              onDepart();
+              openWithOrigin({
+                posts,
+                index,
+                originEl: null,
+                posterUrl: row.poster_url ?? null,
+                openedFrom: 'amateur-watch',
                 forceStartAtZero: true,
               });
             }}
@@ -475,6 +561,57 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
        a single read for it. */
     { enabled: fallbackWanted && !indexPath && view !== 'watch' },
   );
+  /* BRIEF_EXPLORE_ALL_VIDEO — ONE LONG-FORM READ FOR THE WHOLE PAGE. The rail
+     (§1) and the stream candidates (§2) are the SAME rows, from the same read
+     Watch uses, under Watch's own 'latest' query key. Nothing new was written to
+     fetch video and nothing else on All reads long-form. */
+  const allVideos = useWatchVideos({ userId: view === 'all' ? userId : undefined, mode: 'latest', search: null });
+  const videoRows = useMemo(
+    () => ((allVideos.data?.pages ?? []).flat() as HubRpcRow[]).filter((row) => !!row?.post_id),
+    [allVideos.data],
+  );
+  const videoPosts = useMemo(() => toFeedPosts(videoRows), [videoRows]);
+  /* §2 LONG-FORM AS CANDIDATES, SCORED BY THE ONE MODEL (scoreItem). REPORTED,
+     NOT PAPERED OVER: a video has no course, no score and no standing, so it
+     carries NO consequence, and the ring is 'own' only when the viewer is the
+     creator - a followed creator is a circle relationship, which this model
+     expresses as a round's consequence and NOT as a ring, so a video from your
+     circle gets no ring lift. It therefore ranks on FRESHNESS alone, exactly as
+     a clip does. No consequence was invented to lift it.
+     FOUR AT MOST. The rail is where video has volume; the stream takes a
+     page's worth so a fresh batch cannot turn All into a media page. */
+  const videoItems = useMemo<StreamItem[]>(() => {
+    if (view !== 'all') return [];
+    return videoRows.slice(0, 4).map((row) => {
+      const item: StreamItem = {
+        id: `watch:${row.post_id}`,
+        kind: 'watch',
+        ring: row.post_user_id && userId && row.post_user_id === userId ? 'own' : null,
+        lane: 'news',
+        score: 0,
+        consequence: null,
+        subject: null,
+        who: {
+          user_id: row.post_user_id ?? null,
+          display_name: row.creator_display_name ?? row.creator_username ?? null,
+          photo_url: row.creator_avatar_url ?? null,
+          is_viewer: !!userId && row.post_user_id === userId,
+        },
+        facts: {
+          post_id: row.post_id,
+          media_id: row.media_id ?? null,
+          duration_s: row.duration_seconds ?? null,
+          arrived_at: row.post_created_at ?? null,
+          published_at: row.post_created_at ?? null,
+        },
+        payload: { video: row },
+        seen: false,
+      };
+      item.score = scoreItem(item);
+      return item;
+    });
+  }, [view, videoRows, userId]);
+
   const scoresStanding = useViewerStanding(userId);
 
   /* §6h REMOVED BY RULING: the no-connection sentence never renders on All,
@@ -583,10 +720,27 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   /* THE SERVER PAGE IS ALREADY A PAGE. Reveal slicing belongs to the client
      composition only; re-slicing a ranked, cadenced page would hide cards the
      RPC deliberately placed. */
-  const visible = useMemo(
-    () => (serverOn ? source.items : source.items.slice(0, revealed)),
-    [serverOn, source.items, revealed],
-  );
+  const visible = useMemo(() => {
+    const base = serverOn ? source.items : source.items.slice(0, revealed);
+    if (videoItems.length === 0) return base;
+    /* AN INSERTION, NOT A RE-SORT. The server's page is already ranked and
+       cadenced and the client re-sorts nothing: each video is placed at the
+       first position whose card scores below it, so every other card keeps the
+       order the ranker gave it. A row already on the page (the fallback's own
+       media pool) is never duplicated. */
+    const seen = new Set(base.map((entry) => entry.facts.post_id ?? entry.id));
+    const out = [...base];
+    for (const video of videoItems) {
+      if (seen.has(video.facts.post_id ?? video.id)) continue;
+      let at = out.findIndex((entry) => entry.score < video.score);
+      if (at < 0) at = out.length;
+      /* A VIDEO MAY LEAD, and only by out-scoring the current lead - which
+         freshness alone can do on a quiet page. Nothing here holds it back and
+         nothing here promotes it. */
+      out.splice(at, 0, video);
+    }
+    return out;
+  }, [serverOn, source.items, revealed, videoItems]);
 
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
      screen, and a card holds its whole shell until that resolver settles —
@@ -645,10 +799,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      content, above the lead. Page 3+ restarts from clips, which the modulo in
      the renderer does; an empty shelf is skipped by the shelf itself and the
      next one takes its slot. */
+  /* BRIEF_EXPLORE_ALL_VIDEO §1 PLACEMENT: videos sit FOURTH, between standing
+     and the county courses rail, so no two media rails are adjacent - clips is
+     first, moments fifth, and videos has a non-media rail on either side. Two
+     media rails in a row would read as a media section, which All is not. */
   const ALL_SHELVES: ShelfKind[] = [
     'clips',
     'clubWeek',
     'standing',
+    'videos',
     'coursesCounty',
     'moments',
     'people',
@@ -914,6 +1073,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     <>
       {shelf === 'clips' ? (
                   <ClipsShelf pos={pos} onDepart={depart} />
+                ) : shelf === 'videos' ? (
+                  <VideosShelf
+                    rows={videoRows}
+                    isFetched={allVideos.isFetched}
+                    isError={allVideos.isError}
+                    onRetry={() => void allVideos.refetch()}
+                    pos={pos}
+                    onDepart={depart}
+                  />
                 ) : shelf === 'clubWeek' ? (
                   /* THE SAME SHELF THE SCORES VIEW USES — reused, not copied. */
                   <WeeklyClubShelf
@@ -1396,6 +1564,35 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const pos = cardPos;
           cardPos += 1;
           const size: CardSize = block.kind === 'lead' ? 'lead' : 'std';
+          /* §2 THE LONG-FORM CARD IS WATCH'S CARD. Full width, 16:9, duration
+             chip, title as the headline, creator and date on the who-line -
+             rendered by the SAME component Watch renders, so the two can never
+             drift and no second video card exists. It is NOT wrapped in the
+             12px card inset: a video row is full-bleed on Watch and reads as a
+             video row here for the same reason. */
+          if (item.kind === 'watch' && item.payload.video) {
+            const row = item.payload.video;
+            const index = videoRows.findIndex((entry) => entry.post_id === row.post_id);
+            return (
+              <div key={item.id}>
+                <VideoCard
+                  row={row}
+                  onPress={() => {
+                    analyticsEvents.track('amateur_card_tapped', { kind: 'watch', size, pos });
+                    depart();
+                    openWithOrigin({
+                      posts: videoPosts,
+                      index: index < 0 ? 0 : index,
+                      originEl: null,
+                      posterUrl: row.poster_url ?? null,
+                      openedFrom: 'amateur-watch',
+                      forceStartAtZero: true,
+                    });
+                  }}
+                />
+              </div>
+            );
+          }
           const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>

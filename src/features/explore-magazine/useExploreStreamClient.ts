@@ -89,7 +89,10 @@ function notability(item: StreamItem): number {
   return 0;
 }
 
-function scoreItem(item: StreamItem): number {
+/** THE ONE SCORING MODEL. Exported so a candidate composed OUTSIDE this file
+ *  (All's long-form video, BRIEF_EXPLORE_ALL_VIDEO §2) is scored by the same
+ *  terms rather than by a second model written next to it. */
+export function scoreItem(item: StreamItem): number {
   /* SEEN IS BINARY AND NEVER EXCLUDES. It halves consequence and ring; the
      freshness term is left alone, so an old-but-unseen item does not leapfrog a
      fresh one. Nothing is ever removed for having been seen. */
@@ -479,7 +482,12 @@ export function useExploreStreamClient(
 
     if (wantsWatch) {
       const clips = view === 'watch' ? media.data?.clips ?? [] : [];
-      const videos = media.data?.videos ?? [];
+      /* LONG-FORM ON ALL IS NOT COMPOSED HERE (BRIEF_EXPLORE_ALL_VIDEO §2).
+         All's video candidates come from the SAME read Watch uses
+         (useWatchVideos / get_long_form_videos_v2), merged by the page. Leaving
+         the media-preview videos in this pool too would be a SECOND long-form
+         source on one page, which the brief forbids. Watch is unchanged. */
+      const videos = view === 'watch' ? media.data?.videos ?? [] : [];
       for (const entry of [...videos.map((v) => ['watch', v] as const), ...clips.map((c) => ['clip', c] as const)]) {
         const [kind, mediaItem] = entry;
         out.push({

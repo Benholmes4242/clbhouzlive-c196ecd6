@@ -1551,7 +1551,8 @@
         "moments": "コミュニティから",
         "standing": "あなたの順位",
         "clubWeek": "{{club}}の今週",
-        "circle": "あなたのサークル"
+        "circle": "あなたのサークル",
+        "videos": "動画"
       },
       "scope": {
         "club": "マイクラブ",
