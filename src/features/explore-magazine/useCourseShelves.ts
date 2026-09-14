@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 
-import { supabase } from '@/integrations/supabase/client';
 import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
 import { useBoardCourses } from '@/components/explore-tab-new/courseled/hooks/useBoardCourses';
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
