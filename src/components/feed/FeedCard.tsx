@@ -312,7 +312,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   commentPreviewEnabled = false,
 }) => {
   
-  const { activeActor, availableActors, setActiveActor } = useActiveActor();
+  const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
   // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
