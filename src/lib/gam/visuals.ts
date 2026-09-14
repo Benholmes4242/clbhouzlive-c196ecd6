@@ -57,6 +57,7 @@ export const legendCategoryLabel: Record<LegendCategory, string> = {
   most_rounds_all_time:         'Rounds',
   lowest_gross_women_90d:       "Women's course record",
   lowest_gross_women_all_time:  "Women's course record",
+  lowest_net_all_time:          'Net Record',
 };
 
 
@@ -83,6 +84,7 @@ export const legendCategoryIcon: Record<LegendCategory, LucideIcon> = {
   most_rounds_all_time:         Flag,
   lowest_gross_women_90d:       Trophy,
   lowest_gross_women_all_time:  Trophy,
+  lowest_net_all_time:          Trophy,
 };
 
 /**
@@ -108,6 +110,7 @@ export const legendCategoryWindow: Record<LegendCategory, '90d' | 'all_time'> = 
   most_rounds_all_time:         'all_time',
   lowest_gross_women_90d:       '90d',
   lowest_gross_women_all_time:  'all_time',
+  lowest_net_all_time:          'all_time',
 };
 
 export const streakLabel: Record<StreakType, string> = {
@@ -148,6 +151,8 @@ export function formatLegendValue(category: LegendCategory, value: number): stri
       return `${value} round${value === 1 ? '' : 's'}`;
     case 'lowest_gross_women_90d':
     case 'lowest_gross_women_all_time':
+      return `${value}`;
+    case 'lowest_net_all_time':
       return `${value}`;
   }
 }
@@ -193,7 +198,8 @@ export function formatLegendGap(category: LegendCategory, gap: number): string {
     case 'best_score_diff_all_time':
       return `${abs.toFixed(1)} vs HCP`;
     case 'lowest_gross_90d':
-    case 'lowest_gross_all_time': {
+    case 'lowest_gross_all_time':
+    case 'lowest_net_all_time': {
       const n = Math.round(abs);
       return `${n} ${n === 1 ? 'stroke' : 'strokes'}`;
     }

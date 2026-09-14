@@ -20,7 +20,8 @@ export const MINUS = '\u2212';
 
 /** Lower is better on gross; every other board counts upwards. */
 export function lowerIsBetter(cat: string): boolean {
-  return String(cat).startsWith('lowest_gross');
+  // BRIEF_STANDING_TAP 2b - net joins gross as a board where lower wins.
+  return String(cat).startsWith('lowest_');
 }
 
 /** The board's own unit, pluralised for the gap sentence. */
@@ -29,6 +30,7 @@ export function unitKey(cat: string): string {
   switch (base) {
     case 'lowest_gross':
     case 'lowest_gross_women':
+    case 'lowest_net':
       return 'shot';
     case 'best_stableford':
       return 'point';
@@ -277,6 +279,10 @@ export const FlatBoardRow: React.FC<{
     <button
       type="button"
       onClick={onPress}
+      /* BRIEF_STANDING_TAP 2c - arrival scrolls to the viewer's own row, and
+         this is how it is found. Marker only; the amber tone above is what a
+         member sees. */
+      data-self={row.isSelf ? '1' : undefined}
       style={{
         display: 'grid',
         width: '100%',

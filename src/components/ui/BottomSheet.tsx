@@ -55,6 +55,27 @@ interface BottomSheetProps {
   grabberColor?: string;
   grabberRadius?: number;
   grabberPadding?: string;
+  /*
+   * BRIEF_SHEET_SCROLL §1 — OPT-IN SCROLLING BODY.
+   *
+   * The root is `fixed bottom-0` with a `maxHeight` and NO overflow rule and
+   * NO flex column. A consumer that hands over a long list in one plain block
+   * therefore renders a list taller than the capped sheet with no scroll
+   * container anywhere — the member sees the first rows and can reach no
+   * further. Every sheet that scrolls correctly today does so because IT
+   * declared its own inner `maxHeight: calc(85dvh - 30px)` + `overflowY:auto`
+   * band; nothing in this primitive provides one.
+   *
+   * `scrollBody` makes the root a flex column that clips, and wraps children
+   * in the single scrolling region (`flex:1; minHeight:0; overflowY:auto`,
+   * momentum + contained overscroll). DEFAULT FALSE, so all existing consumers
+   * render byte-identically and keep owning their own scroller.
+   *
+   * The drag-to-dismiss gesture is NOT affected: its handlers live only on the
+   * grabber strip, which stays OUTSIDE the scrolling region, so finger scroll
+   * in the list and drag on the handle can never contend.
+   */
+  scrollBody?: boolean;
 }
 
 export function BottomSheet({
@@ -70,6 +91,7 @@ export function BottomSheet({
   grabberColor = 'rgba(255,255,255,0.18)',
   grabberRadius = 2,
   grabberPadding = '10px 0 4px',
+  scrollBody = false,
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
@@ -185,6 +207,10 @@ export function BottomSheet({
           borderTopLeftRadius: topRadius,
           borderTopRightRadius: topRadius,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+          /* BRIEF_SHEET_SCROLL §1 — only under the opt-in. */
+          ...(scrollBody
+            ? { display: 'flex', flexDirection: 'column' as const, overflow: 'hidden' }
+            : null),
           ...style,
           /* BRIEF_SHEET_BACKGROUND_CANON — THE ONE SHEET BACKGROUND.
              The sheet owns the whole rounded surface, grabber strip included,
@@ -219,7 +245,23 @@ export function BottomSheet({
             }}
           />
         </div>
-        {children}
+        {scrollBody ? (
+          /* BRIEF_SHEET_SCROLL §1 — THE ONE SCROLLING REGION. Outside the
+             grabber, so drag-to-dismiss and finger scroll never contend. */
+          <div
+            style={{
+              flex: 1,
+              minHeight: 0,
+              overflowY: 'auto',
+              overscrollBehavior: 'contain',
+              WebkitOverflowScrolling: 'touch',
+            }}
+          >
+            {children}
+          </div>
+        ) : (
+          children
+        )}
       </div>
     </>,
     document.body

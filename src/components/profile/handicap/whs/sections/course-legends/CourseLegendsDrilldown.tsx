@@ -31,6 +31,7 @@ import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME, orderWithWomensRecord } 
 import { useProBenchmarks } from '@/hooks/gam/useProBenchmarks';
 import { pickProBenchmark, filterProsForViewer, PRO_BAND_BASES, type ProBandBase } from './drilldown/_shared/proBenchmark';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useCourseNetBoard } from '@/hooks/gam/useCourseNetBoard';
 
 const SHORT_LABELS: Record<LegendCategory, string> = {
   best_score_diff_90d:      'Score',
@@ -51,6 +52,7 @@ const SHORT_LABELS: Record<LegendCategory, string> = {
   most_rounds_all_time:         'Rounds',
   lowest_gross_women_90d:       "Women's",
   lowest_gross_women_all_time:  "Women's",
+  lowest_net_all_time:          'Net',
 };
 
 
@@ -61,7 +63,11 @@ const SHORT_LABELS: Record<LegendCategory, string> = {
  * missing. best_score_diff is excluded from this tab, as in the grid order.
  */
 const CANONICAL_BOARDS: LegendCategory[] = CHAMPIONS_ORDER_ALL_TIME.filter(
-  (c) => c !== 'best_score_diff_all_time',
+  // BRIEF_STANDING_TAP 2b - lowest_net_all_time is excluded from the Unclaimed
+  // roll-call: it comes from a SEPARATE rpc, so an empty net board may mean
+  // "not yet deployed" rather than "nobody holds it", and Unclaimed must only
+  // name boards it genuinely knows to be open.
+  (c) => c !== 'best_score_diff_all_time' && c !== 'lowest_net_all_time',
 );
 
 /** Lower-case board words for the Unclaimed sentence. */
@@ -106,9 +112,24 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   // matching window and autoscrolls to that crown section once data lands.
   const [searchParams] = useSearchParams();
   const deepCat = searchParams.get('cat') as LegendCategory | null;
+  /* BRIEF_STANDING_TAP 2c - ?me=1 accompanies a standing-tile tap: land on the
+     member's own row rather than the head of the board. */
+  const deepMe = searchParams.get('me') === '1';
 
   const { activeActor } = useActiveActor();
-  const { data, isLoading: fetching, isFetched, isError, refetch } = useCourseLegends(ctx.courseId, activeActor?.id);
+  const { data: legendRows, isLoading: fetching, isFetched, isError, refetch } = useCourseLegends(ctx.courseId, activeActor?.id);
+  /*
+   * BRIEF_STANDING_TAP 2b - the net board is a SEPARATE rpc because
+   * gam_course_legends has no net category, and it is merged into the same row
+   * list so every board below renders through the same machinery. Its failure
+   * is empty, not fatal: until the SQL draft is applied the other boards are
+   * unaffected and the net board simply does not appear.
+   */
+  const { data: netRows } = useCourseNetBoard(ctx.courseId, activeActor?.id);
+  const data = useMemo(
+    () => [...(legendRows ?? []), ...(netRows ?? [])],
+    [legendRows, netRows],
+  );
   // Settled is not "not loading": useCourseLegends is gated on courseId.
   const isLoading = !isFetched || fetching;
   const { data: meta } = useCourseMeta(ctx.courseId);
@@ -363,6 +384,21 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     if (deepScrolledRef.current === deepCat) return;
     if (isLoading || isError) return;
     if (!visibleCategories.includes(deepCat)) return;
+    /*
+     * BRIEF_STANDING_TAP 2c - the member is 13th of 18 and the tab shows six
+     * rows, so their row is NOT on the page. Open the full board instead and let
+     * it land on them. Not on the board at all, or inside the visible six? The
+     * section scroll below is the right arrival and the top is where it opens.
+     */
+    if (deepMe) {
+      const selfRank = groupedWithTotals.get(deepCat)?.rows.find((r) => r.isSelf)?.rank ?? null;
+      if (selfRank !== null && selfRank > 6) {
+        deepScrolledRef.current = deepCat;
+        setSelectedCategory(deepCat);
+        setFullLeaderboardCategory(deepCat);
+        return;
+      }
+    }
     const id = globalThis.setTimeout(() => {
       const el = containerRef.current?.querySelector<HTMLElement>(
         `[data-category="${deepCat}"]`,
@@ -382,7 +418,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       }, 1600);
     }, 260);
     return () => globalThis.clearTimeout(id);
-  }, [deepCat, isLoading, isError, visibleCategories]);
+  }, [deepCat, deepMe, isLoading, isError, visibleCategories, groupedWithTotals]);
 
 
 
@@ -568,6 +604,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         categories={boardDescriptors}
         grouped={grouped}
         initialCategory={fullLeaderboardCategory ?? activeBoardKey}
+        scrollToSelf={deepMe}
         legendWindow={window}
         coursePar={meta?.course_par ?? null}
         onCategoryChange={(from, to) =>
