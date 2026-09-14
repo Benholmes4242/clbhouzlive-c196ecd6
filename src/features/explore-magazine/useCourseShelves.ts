@@ -154,20 +154,29 @@ export function useWorldTop100Courses(enabled: boolean) {
  */
 export function useListCourses(viewerId: string | undefined, enabled: boolean) {
   const { wantToPlay, isLoading } = useUserWantToPlay(enabled ? viewerId : undefined);
+  /* THE RANK AND ITS SCOPE COME FROM THE MEMBERSHIP INDEX, not from
+     useUserWantToPlay's global_rank / regional_rank — that hook resolves its
+     lists by slugs that do not exist in top100_lists (`top-100-worldwide`,
+     `top-100-usa`), so both fields are always undefined and this rail has never
+     shown a rank at all. Reported; that hook is left as it is. */
+  const { index } = useTop100RankIndex(enabled);
   const rows = useMemo<CourseShelfRow[]>(
     () =>
-      (wantToPlay ?? []).slice(0, 12).map((row) => ({
-        courseId: row.course_id,
-        name: row.course_name,
-        area: row.sub_country ?? row.country ?? null,
-        imageUrl: row.thumbnail_image,
-        rounds: 0,
-        rating: null,
-        ratingCount: 0,
-        rank: row.global_rank ?? row.regional_rank ?? null,
-        rankScopeWorld: row.global_rank != null,
-      })),
-    [wantToPlay],
+      (wantToPlay ?? []).slice(0, 12).map((row) => {
+        const standing = index?.get(row.course_id) ?? null;
+        return {
+          courseId: row.course_id,
+          name: row.course_name,
+          area: row.sub_country ?? row.country ?? null,
+          imageUrl: row.thumbnail_image,
+          rounds: 0,
+          rating: null,
+          ratingCount: 0,
+          rank: standing?.rank ?? null,
+          rankScope: standing?.scope ?? null,
+        };
+      }),
+    [wantToPlay, index],
   );
   return { rows, total: wantToPlay?.length ?? 0, isFetched: !enabled || !viewerId ? true : !isLoading };
 }

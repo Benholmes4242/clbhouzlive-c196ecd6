@@ -10,6 +10,7 @@ import { PHOTO_FIG_GOOD } from '@/styles/photoScrim';
 import type { ListEvent } from './listCourseEvents';
 import { ShelfShell } from './ExploreShells';
 import type { CourseShelfRow } from './useCourseShelves';
+import { RANK_SCOPE_LABEL } from './useTop100RankIndex';
 
 /**
  * THE COURSE RAIL (BRIEF_EXPLORE_MAGAZINE PHASE C §3a-§3c) — kind: courses.
