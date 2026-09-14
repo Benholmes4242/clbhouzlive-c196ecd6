@@ -26,6 +26,7 @@
  *   light (#0F172A ramp over #F8FAFC): 1.00 #0F172A, 0.60 #6C727E, 0.42 #969BA4
  */
 import React from 'react';
+import { MessageCircle } from 'lucide-react';
 import { MentionText } from '@/components/mentions/MentionText';
 // SECTION C removed the avatar, the verified badge, the timestamp and the
 // emoji-only sizing from this block's output. Their modules stay in the repo
@@ -91,7 +92,7 @@ export const FeedCommentPreview: React.FC<Props> = ({
   topRule = true,
   padding = '9px 14px 11px',
 }) => {
-  const { ink: INK, mid: MID, line: LINE } = TONES[surface];
+  const { ink: INK, mid: MID, dim: DIM, line: LINE } = TONES[surface];
 
   /**
    * SECTION C — THE COMMENT ROW STOPS BEING PERMANENT.
@@ -149,23 +150,39 @@ export const FeedCommentPreview: React.FC<Props> = ({
             }
           }}
           style={{
-            display: 'block',
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 5,
             width: '100%',
             marginTop: i === 0 ? 0 : 5,
             fontSize: 12,
             lineHeight: 1.5,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
             background: 'transparent',
             border: 'none',
             textAlign: 'left',
             cursor: 'pointer',
           }}
         >
-          <span style={{ color: INK, fontWeight: 600 }}>{l.display_name}</span>
-          <span style={{ color: MID, fontWeight: 500, marginLeft: 5 }}>
-            <MentionText text={(l.content ?? '').trim()} />
+          <MessageCircle
+            aria-hidden
+            size={13}
+            strokeWidth={1.75}
+            color={DIM}
+            style={{ flex: 'none', position: 'relative', top: 2 }}
+          />
+          <span
+            style={{
+              minWidth: 0,
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              overflow: 'hidden',
+            }}
+          >
+            <span style={{ color: INK, fontWeight: 600 }}>{l.display_name}</span>
+            <span style={{ color: MID, fontWeight: 500, marginLeft: 5 }}>
+              <MentionText text={(l.content ?? '').trim()} />
+            </span>
           </span>
         </div>
       ))}

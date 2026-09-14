@@ -7,6 +7,23 @@ import type { ActiveActor } from '@/types/actor';
 import { KICKER } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
+/**
+ * The footer's liked-by line derives its heart alignment from these exact
+ * values. Keep the picker and that alignment on one geometry contract so a
+ * future avatar, chevron, or internal-gap change cannot silently split them.
+ */
+export const FEED_ACTOR_PICKER_GEOMETRY = {
+  avatar: 24,
+  gap: 4,
+  chevron: 14,
+} as const;
+
+export function feedActorPickerWidth(hasChevron: boolean): number {
+  return FEED_ACTOR_PICKER_GEOMETRY.avatar + (hasChevron
+    ? FEED_ACTOR_PICKER_GEOMETRY.gap + FEED_ACTOR_PICKER_GEOMETRY.chevron
+    : 0);
+}
+
 // Only the trigger chevron is theme-dependent; the sheet follows the dark canvas.
 const PALETTE = {
   dark: {
@@ -47,7 +64,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
 
   const avatar = (
     <SquircleAvatar
-      size={24}
+      size={FEED_ACTOR_PICKER_GEOMETRY.avatar}
       src={current.avatarUrl ?? undefined}
       alt={current.name}
       userId={current.type === 'personal' ? current.id : null}
@@ -78,7 +95,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
         style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 4,
+          gap: FEED_ACTOR_PICKER_GEOMETRY.gap,
           background: 'transparent',
           border: 'none',
           padding: 0,
@@ -86,7 +103,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
         }}
       >
         {avatar}
-        <ChevronDown size={14} color={c.chevron} strokeWidth={1.75} />
+        <ChevronDown size={FEED_ACTOR_PICKER_GEOMETRY.chevron} color={c.chevron} strokeWidth={1.75} />
       </button>
 
       <BottomSheet

@@ -92,6 +92,7 @@ export function LikedByRow({
         style={{
           display: 'block',
           width: '100%',
+          boxSizing: 'border-box',
           padding: 0,
           background: 'transparent',
           border: 'none',
@@ -101,7 +102,7 @@ export function LikedByRow({
       >
         <span
           style={{
-            fontSize: 12.5,
+            fontSize: 13,
             fontWeight: 500,
             color: A.MUTE,
             whiteSpace: 'nowrap',

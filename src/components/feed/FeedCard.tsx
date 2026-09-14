@@ -40,7 +40,7 @@ import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 import { LikedByRow } from '@/components/likes/LikedByRow';
-import { FeedActorPicker } from './FeedActorPicker';
+import { FeedActorPicker, feedActorPickerWidth } from './FeedActorPicker';
 import Pressable from '@/components/ui/Pressable';
 import { HeartBurst } from './HeartBurst';
 import { createTapHandler } from './mediaTap';
@@ -72,6 +72,10 @@ const T40 = 'rgba(248,250,252,0.45)';
 const LINE = 'rgba(255,255,255,0.08)';
 const AMBER = '#F7931E';
 const GREEN = '#22C55E';
+
+/** One geometry contract positions the action row and the line beneath it. */
+const FOOTER_GUTTER = 20;
+const FOOTER_ACTION_GAP = 22;
 
 const RATIO_MIN = 0.8;   // tallest allowed = 4:5 (portrait capped)
 const RATIO_MAX = 1.91;  // widest = ~cinematic landscape
@@ -308,7 +312,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   commentPreviewEnabled = false,
 }) => {
   
-  const { activeActor, setActiveActor } = useActiveActor();
+  const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
   // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
@@ -916,6 +920,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
            the first comment is the comment block's own 10px. */
         const actionsBottom = showLikedBy || showComments ? 0 : 12;
         const likedByBottom = showComments ? 0 : 12;
+        /* HEART LEFT EDGE, not its centre. The heart follows the actor picker
+           by the row gap, so the liked-by text uses the same picker dimensions
+           and the same row gap. With a chevron this is 20 + (24 + 4 + 14) +
+           22 = 84px; without one it is 20 + 24 + 22 = 66px. */
+        const likedByIndent = FOOTER_GUTTER + (effectiveActor
+          ? feedActorPickerWidth(availableActors.length > 1) + FOOTER_ACTION_GAP
+          : 0);
 
         return (
           <div
@@ -934,8 +945,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 22,
-                padding: `10px 20px ${actionsBottom}px`,
+                gap: FOOTER_ACTION_GAP,
+                padding: `10px ${FOOTER_GUTTER}px ${actionsBottom}px`,
               }}
             >
               <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
@@ -958,19 +969,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
 
             {showLikedBy && (
-              /* LEFT-ALIGNED (Ben, 14 Sep — supersedes the right-aligned line
-                 built earlier tonight). EVERY LINE OF TEXT ON THIS CARD STARTS
-                 AT THE SAME 20px LEFT MARGIN — course name, place, liked-by,
-                 comment preview — and everything a member TAPS sits on the
-                 right. One reading edge, one acting edge.
-                 Left-aligned also settles the truncation: the line grows
-                 rightward into empty space and ellipsises at the far edge, one
-                 line, truncating from the end. Height is identical between the
-                 in-flight figure and the resolved names, so nothing jumps. */
+              /* Ben, 14 Sep: attribution comes from WHERE this starts. Its first
+                 character is flush with the heart's left edge above; no glyph
+                 is repeated here. The in-flight count and resolved names occupy
+                 this same one-line box, so neither height nor x-position moves. */
               <LikedByRow
                 postId={post.id}
                 count={likeCount}
-                style={{ padding: `0 20px ${likedByBottom}px` }}
+                style={{
+                  padding: `0 ${FOOTER_GUTTER}px ${likedByBottom}px ${likedByIndent}px`,
+                }}
               />
             )}
 
@@ -984,7 +992,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 viewerName={effectiveActor?.name ?? null}
                 viewerId={effectiveActor?.id ?? null}
                 topRule={false}
-                padding="10px 20px 12px"
+                padding={`10px ${FOOTER_GUTTER}px 12px`}
               />
             )}
           </div>
