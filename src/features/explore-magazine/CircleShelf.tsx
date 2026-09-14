@@ -122,8 +122,6 @@ export function CircleShelf({
     allowMultiplePerFriend: true,
     windowDays: NO_WINDOW_DAYS,
   });
-  const total = useCircleRoundTotal(viewerId);
-
   /* NEWEST FIRST, stated here as well as in the hook, because this shelf's
      contract is the order. */
   const rows = useMemo(
@@ -135,6 +133,9 @@ export function CircleShelf({
     [circle.data],
   );
   const tiles = useMemo(() => rows.slice(0, RENDERED), [rows]);
+
+  /* The count labels the rail, so it does not run before there is a rail. */
+  const total = useCircleRoundTotal(viewerId, rows.length > 0);
 
   const courseIds = useMemo(
     () => tiles.map((row) => row.course_id).filter((id): id is string => !!id),
