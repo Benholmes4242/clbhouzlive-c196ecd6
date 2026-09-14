@@ -28,7 +28,10 @@ describe('treatmentFor', () => {
     ['four birdies draws the line', { birdies: 4 }, shape([-1, -1, -1, -1]), 'line'],
     ['under par draws the line even when flat', { to_par: -1 }, shape([-1, 0, 0]), 'line'],
     ['a course record draws the line', { is_course_record: true }, shape([0, 0, 0]), 'line'],
-    ['movement alone draws the line', { to_par: 4 }, shape([1, 1, 1]), 'line'],
+    /* MEDIAN TRAVEL, NOT ANY TRAVEL. A span of 10 draws; a span of 3 — which
+       passed under the old threshold — now goes quiet. */
+    ['median movement alone draws the line', { to_par: 10 }, shape([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]), 'line'],
+    ['small movement alone draws nothing', { to_par: 3 }, shape([1, 1, 1]), 'none'],
     ['a flat ordinary round draws nothing', { to_par: 2 }, shape([1, 0, 1]), 'none'],
     ['a disaster-only round draws nothing', { to_par: 2 }, shape([2, 0, 0]), 'none'],
     ['no hole detail draws nothing', { to_par: -4 }, null, 'none'],
