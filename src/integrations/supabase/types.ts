@@ -22282,6 +22282,13 @@ export type Database = {
               sub_country: string
             }[]
           }
+      get_viewer_standing_boards: {
+        Args: { p_viewer: string }
+        Returns: {
+          board: string
+          courses: number
+        }[]
+      }
       get_waitlist_display: {
         Args: { _country_id: string }
         Returns: {

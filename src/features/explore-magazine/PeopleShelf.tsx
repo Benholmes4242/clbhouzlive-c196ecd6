@@ -37,7 +37,10 @@ import { reasonText } from '@/features/social-suggestions/SuggestedGolferRow';
  * shelf takes the slot and there is never a "no golfers" placeholder.
  */
 
-const TILE = { w: 132, h: 148 };
+/* The caption rows reserve their full line boxes. The extra six pixels keep
+   descenders, the reason line and the Follow control clear at narrow widths;
+   one shared height keeps both club and suggested rails uniform. */
+const TILE = { w: 132, h: 154 };
 /** How many suggestions a rail can hold before it stops being a rail. */
 const RENDERED = 12;
 
@@ -132,7 +135,7 @@ function reasonForClubGolfer(
   golfer: ClubGolfer,
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string,
 ): string {
-  if (golfer.boards > 0) return t('amateur.shelf.holdsBoards', 'Holds {{count}} boards', { count: golfer.boards });
+  if (golfer.boards > 0) return t('amateur.shelf.holdsBoards', 'Holds {{count}} board', { count: golfer.boards });
   if (golfer.roundsHere > 0) return t('amateur.shelf.roundsHere', '{{count}} rounds here', { count: golfer.roundsHere });
   if (golfer.isNew) return t('amateur.shelf.newThisMonth', 'New this month');
   return '';
@@ -216,6 +219,9 @@ function PersonTile({ golfer, pos, kind }: { golfer: ShelfPerson; pos: number; k
           color: A.INK,
           fontSize: 13,
           fontWeight: 700,
+          lineHeight: '18px',
+          height: 18,
+          flexShrink: 0,
           letterSpacing: '-0.01em',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
@@ -234,6 +240,9 @@ function PersonTile({ golfer, pos, kind }: { golfer: ShelfPerson; pos: number; k
           color: A.MUTE,
           fontSize: 11,
           fontWeight: 600,
+          lineHeight: '16px',
+          height: 16,
+          flexShrink: 0,
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -255,6 +264,9 @@ function PersonTile({ golfer, pos, kind }: { golfer: ShelfPerson; pos: number; k
           fontFamily: SANS,
           fontSize: 12,
           fontWeight: 700,
+          lineHeight: '16px',
+          minHeight: 30,
+          flexShrink: 0,
           cursor: 'pointer',
         }}
       >
