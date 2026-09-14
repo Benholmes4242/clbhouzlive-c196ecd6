@@ -37,7 +37,7 @@ describe('treatmentFor', () => {
   });
 
   it('uses the span threshold derived from real rounds', () => {
-    expect(MIN_SHAPE_SPAN).toBe(3);
+    expect(MIN_SHAPE_SPAN).toBe(10);
     expect(cumulativeSpan(shape([1, 1, 1]))).toBe(3);
     expect(cumulativeSpan(shape([1, -1, 0]))).toBe(1);
     expect(cumulativeSpan(null)).toBeNull();
