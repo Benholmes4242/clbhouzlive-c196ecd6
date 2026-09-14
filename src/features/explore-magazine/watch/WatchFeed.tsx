@@ -48,7 +48,12 @@ import { useWatchVideos } from './useWatchVideos';
  */
 
 const INSET = 16;
-const CLIP_W = 112;
+/* BRIEF_EXPLORE_DEVICE_PASS §2b — THE CLIPS RAIL AGREES WITH EXPLORE'S.
+   140 wide gives about 2.4 tiles at 390: clearly bigger than the old 112, and
+   still a rail rather than a carousel of posters. Explore's ClipsShelf carries
+   the same 140 x 249 so the two surfaces cannot drift. */
+const CLIP_W = 140;
+
 const MOMENT_W = 112;
 const RAIL_WINDOW = 10;
 /** Rails break the video run: after 2 videos, then every 4, alternating. */
