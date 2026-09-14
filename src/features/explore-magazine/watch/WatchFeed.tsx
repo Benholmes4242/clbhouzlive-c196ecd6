@@ -241,7 +241,7 @@ function VideoCard({
 }
 
 /** THE CLIP — 112 wide, 9:16, radius 10, duration chip, creator beneath. */
-function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number; onPress: () => void }) {
+function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number | string; onPress: () => void }) {
   const who = creatorName(row);
   const initial = (who || '?').trim().charAt(0).toUpperCase() || '?';
   const poster = posterFor(row, 480);
@@ -552,7 +552,7 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
         <ClipTile
           key={`grid:${row.post_id}:${row.media_id ?? index}`}
           row={row}
-          width={undefined}
+          width="100%"
           onPress={() => openClip(index)}
         />
       ))}
@@ -564,10 +564,12 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
       ? (index - FIRST_RAIL_AFTER) / RAIL_EVERY
       : null;
     return (
-      <div key={`video:${row.post_id}`} style={{ display: 'grid', gap: 26 }}>
+      <div key={`video:${row.post_id}`} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
         <VideoCard row={row} onPress={() => openVideo(index)} />
         {rails && ordinal != null ? (
-          <div>{railKindAt(ordinal) === 'clips' ? clipsRail(ordinal) : communityRail(ordinal)}</div>
+          <div style={{ minWidth: 0, overflow: 'hidden' }}>
+            {railKindAt(ordinal) === 'clips' ? clipsRail(ordinal) : communityRail(ordinal)}
+          </div>
         ) : null}
       </div>
     );
@@ -648,7 +650,7 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
           )}
         </>
       ) : (
-        <div style={{ display: 'grid', gap: 26 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
           {videoList}
           {/* A SEARCH THAT MATCHES CLIPS SHOWS THEM. The rails stand down while
               searching, so matching clips arrive as one grid beneath the
@@ -668,7 +670,7 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
       ) : null}
 
       {!videosSettled && videoRows.length === 0 && !isClipsOnly(filter) ? (
-        <div style={{ display: 'grid', gap: 26 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
           <ShelfShell tileW={320} tileH={180} />
           <ShelfShell tileW={320} tileH={180} />
         </div>
