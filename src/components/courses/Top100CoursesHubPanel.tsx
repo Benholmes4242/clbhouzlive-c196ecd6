@@ -14,6 +14,7 @@ import type { CourseListMembership } from '@/hooks/useGolfCoursesSearch';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { COURSE_BROWSE_DESCRIPTION } from './courseBrowseTypography';
+import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
 
 const LISTS = [
   { id: 'global', label: 'Global' },
@@ -86,6 +87,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [selectedList, setSelectedList] = useState(savedList);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [nameQuery, setNameQuery] = useState('');
   const restored = useRef(false);
   const { data: summaries = [] } = useTop100ListSummaries(user?.id);
   const { data, isLoading, isError, refetch } = useGolfCoursesInfinite({ listSlug: selectedList });
