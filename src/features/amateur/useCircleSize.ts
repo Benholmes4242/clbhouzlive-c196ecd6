@@ -22,6 +22,11 @@ export function useCircleSize(userId: string | undefined, enabled: boolean) {
     queryKey: ['amateur', 'circle-size', userId],
     enabled: !!userId && enabled,
     staleTime: 5 * 60_000,
+    /* This read decides whether the first All-view shelf is a real circle or a
+       growth prompt. Recheck on every mount: a cached zero must never flash
+       suggestions after the member has started following people. Consumers
+       wait for `isSuccess && !isFetching`, so this creates no layout swap. */
+    refetchOnMount: 'always',
     queryFn: () => fetchCircleCount(userId!),
   });
 }

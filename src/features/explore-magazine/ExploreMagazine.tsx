@@ -431,16 +431,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
 
 
-  /* §3e THE ALL ORDER, in one place. Page 3+ restarts from clips, which the
-     modulo in the renderer does; an empty shelf is skipped by the shelf itself
-     and the next one takes its slot. */
+  /* §3e THE ALL ORDER AFTER THE LEAD, in one place. The circle/suggestions
+     slot is deliberately outside this cadence now: it is the first All-view
+     content, above the lead. Page 3+ restarts from clips, which the modulo in
+     the renderer does; an empty shelf is skipped by the shelf itself and the
+     next one takes its slot. */
   const ALL_SHELVES: ShelfKind[] = [
     'clips',
     'clubWeek',
-    /* AFTER THE CLIPS SHELF AND BEFORE "WHERE YOU STAND" (brief §1): recent
-       rounds from people you follow are more of a reason to open the page than
-       your own standing is. */
-    'circle',
     'standing',
     'coursesCounty',
     'moments',
@@ -676,7 +674,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                      FOLLOWS SOMEONE, NO ROUNDS -> nothing. They know who their
                      circle is; the gate is the FOLLOW SET, never the round count.
                      UNRESOLVED -> neither, not for one frame. */
-                  !circleSize.isFetched ? null : (circleSize.data ?? 0) === 0 ? (
+                  !circleSize.isSuccess || circleSize.isFetching ? null : circleSize.data === 0 ? (
                     <PeopleShelf
                       viewerId={userId}
                       clubId={null}
@@ -778,6 +776,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           />
         </div>
       </div>
+
+      {/* THE FIRST ALL-VIEW CONTENT. AmateurPage's CHROME_CLEARANCE remains
+          above this component, and the sticky chip row remains in normal flow
+          here, so this shelf clears both the islands and chips without owning
+          either offset. The settled-success gate prevents cached zero/error
+          states from flashing suggestions before the current follow-set read. */}
+      {view === 'all' ? renderShelf('circle', 0) : null}
 
       {/* §1 THE SAME SCOPE ROW, THE SAME COMPONENT, for Scores, Courses and
           Reviews. It does not render at all where neither a club nor a county
