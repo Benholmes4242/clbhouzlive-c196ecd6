@@ -282,7 +282,6 @@ DECLARE
   k13_old text := '      ''clean_card'', r -> ''clean_card'', ''is_course_record'', r -> ''is_record_round'',';
   k13_new text := '      ''clean_card'', r -> ''clean_card'', ''is_course_record'', r -> ''is_record_shown'',';
 
-  PROCEDURE_placeholder int := 0;
 BEGIN
   SELECT pg_get_functiondef(p.oid) INTO v_src
     FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
