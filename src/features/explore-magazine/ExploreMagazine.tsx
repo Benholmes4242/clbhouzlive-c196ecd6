@@ -35,9 +35,12 @@ import {
   writeExploreView,
   type ExploreView,
 } from './exploreViewMemory';
-import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
+import { STREAM_PAGE_SIZE, scoreItem, useExploreStreamClient } from './useExploreStreamClient';
 import { EXPLORE_SERVER_STREAM_ENABLED } from './serverStreamSwitch';
 import { WatchFeed } from './watch/WatchFeed';
+import { VideoCard } from './watch/videoUnit';
+import { useWatchVideos } from './watch/useWatchVideos';
+import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { useExploreStream } from './useExploreStream';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
@@ -89,12 +92,20 @@ const CLIP_TILE = { w: 140, h: 249 };
 
 const MOMENT_TILE = { w: 132, h: 132 };
 
+/* THE VIDEO TILE (BRIEF_EXPLORE_ALL_VIDEO §1). LANDSCAPE, because that is what
+   tells a member this is not a clip: 200 wide at 16:9 is a 113 photo, about 1.8
+   tiles at 390, and it can never be mistaken for the 140x249 clip beside it. */
+const VIDEO_TILE = { w: 200, h: 113 };
+
 /** §3e PHASE C — THE FINAL ALL ORDER, skipping empties: clips, rounds (this week
  *  at the club), standing, courses:county, moments, people, courses:world,
  *  courses:list. An empty or unresolved shelf renders nothing and leaves no gap,
  *  which is the same path an empty clips shelf already takes. */
 type ShelfKind =
   | 'clips'
+  /** BRIEF_EXPLORE_ALL_VIDEO §1 — long-form video on All, landscape tiles, NO
+   *  see-all (a member wanting more taps Watch). */
+  | 'videos'
   | 'clubWeek'
   /** BRIEF_EXPLORE_CIRCLE_SHELF — latest rounds from the people you follow,
    *  newest first. ALL ONLY: it is absent from Scores, Courses, Reviews, Watch. */
@@ -256,6 +267,81 @@ function ClipsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) {
                 mediaIndex: clip.mediaIndex ?? 0,
                 mediaId: clip.mediaId ?? null,
                 openedFrom: 'amateur-clips',
+                forceStartAtZero: true,
+              });
+            }}
+          />
+        </div>
+      ))}
+    </ExploreShelf>
+  );
+}
+
+/**
+ * THE VIDEOS RAIL (BRIEF_EXPLORE_ALL_VIDEO §1).
+ *
+ * ONE SOURCE, ONE UNIT. The rows are the Watch long-form read
+ * (useWatchVideos, mode 'latest') under the SAME query key Watch's All chip
+ * uses, so the two surfaces share one cache entry and no second read is
+ * issued; the tile is Watch's own VideoCard at rail size, so no third video
+ * tile exists. The rows are passed in because the page also merges them into
+ * the stream (§2) - asking twice would be two reads for one fact.
+ *
+ * NO SEE-ALL, consistent with Watch: the rail is a window into the feed, not a
+ * preview of a list.
+ */
+function VideosShelf({
+  rows,
+  isFetched,
+  isError,
+  onRetry,
+  pos,
+  onDepart,
+}: {
+  rows: HubRpcRow[];
+  isFetched: boolean;
+  isError: boolean;
+  onRetry: () => void;
+  pos: number;
+  onDepart: () => void;
+}) {
+  const { t } = useTranslation('courses');
+  const tiles = useMemo(() => rows.slice(0, 12), [rows]);
+  const posts = useMemo(() => toFeedPosts(tiles), [tiles]);
+
+  if (!isFetched && !isError) return <ShelfShell tileW={VIDEO_TILE.w} tileH={VIDEO_TILE.h} />;
+  /* ERRORED IS NOT EMPTY - the same two gates every other shelf carries. */
+  if (isError) {
+    return (
+      <ShelfRetry
+        heading={t('amateur.stream.shelf.videos', 'Videos')}
+        label={t('amateur.stream.failed', 'This did not load.')}
+        action={t('amateur.stream.retry', 'Try again')}
+        onRetry={onRetry}
+      />
+    );
+  }
+  if (tiles.length === 0) return null;
+
+  return (
+    <ExploreShelf
+      heading={t('amateur.stream.shelf.videos', 'Videos')}
+      onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'videos', pos })}
+    >
+      {tiles.map((row, index) => (
+        <div key={row.post_id} style={{ flex: `0 0 ${VIDEO_TILE.w}px`, width: VIDEO_TILE.w }}>
+          <VideoCard
+            row={row}
+            size="rail"
+            onPress={() => {
+              analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'videos', pos });
+              onDepart();
+              openWithOrigin({
+                posts,
+                index,
+                originEl: null,
+                posterUrl: row.poster_url ?? null,
+                openedFrom: 'amateur-watch',
                 forceStartAtZero: true,
               });
             }}
@@ -645,10 +731,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      content, above the lead. Page 3+ restarts from clips, which the modulo in
      the renderer does; an empty shelf is skipped by the shelf itself and the
      next one takes its slot. */
+  /* BRIEF_EXPLORE_ALL_VIDEO §1 PLACEMENT: videos sit FOURTH, between standing
+     and the county courses rail, so no two media rails are adjacent - clips is
+     first, moments fifth, and videos has a non-media rail on either side. Two
+     media rails in a row would read as a media section, which All is not. */
   const ALL_SHELVES: ShelfKind[] = [
     'clips',
     'clubWeek',
     'standing',
+    'videos',
     'coursesCounty',
     'moments',
     'people',
@@ -914,6 +1005,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     <>
       {shelf === 'clips' ? (
                   <ClipsShelf pos={pos} onDepart={depart} />
+                ) : shelf === 'videos' ? (
+                  <VideosShelf
+                    rows={videoRows}
+                    isFetched={allVideos.isFetched}
+                    isError={allVideos.isError}
+                    onRetry={() => void allVideos.refetch()}
+                    pos={pos}
+                    onDepart={depart}
+                  />
                 ) : shelf === 'clubWeek' ? (
                   /* THE SAME SHELF THE SCORES VIEW USES — reused, not copied. */
                   <WeeklyClubShelf
