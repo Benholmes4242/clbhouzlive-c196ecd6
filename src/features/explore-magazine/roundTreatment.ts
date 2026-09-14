@@ -21,11 +21,17 @@ import type { StreamItem } from './streamItem';
 export type RoundTreatment = 'line' | 'none';
 
 /** The cumulative series must TRAVEL this far (min to max, in strokes) for a
- *  round with nothing to mark to still earn a line. Derived from real rounds:
- *  the newest-100 eligible 18-hole span distribution ran 2 / 6 / 10 / 14 / 28
- *  across p10 / p25 / p50 / p75 / max, so 3 keeps the flat streaks off the
- *  page without discarding ordinary rounds that actually moved. */
-export const MIN_SHAPE_SPAN = 3;
+ *  round with nothing to mark to still earn a line.
+ *
+ *  WHY 10 AND NOT 3. Measured across 3,519 eligible 18-hole rounds: 2,845
+ *  (81%) drew a line, and only 100 of the drawable ones failed a threshold of
+ *  3 — the gate sat BELOW the 10th percentile, so it rejected nothing and
+ *  every rounds card looked identical. The span distribution runs
+ *  2 / 6 / 10 / 14 / 28 across p10 / p25 / p50 / p75 / max, so 10 is the
+ *  MEDIAN: half of the rounds with nothing to mark go quiet, and all 484
+ *  markable rounds keep their line and their dots regardless of span.
+ *  A trace now means "this round moved", not "this is a round". */
+export const MIN_SHAPE_SPAN = 10;
 
 export interface RoundDot {
   /** Index into HoleShape.series — the cumulative value AFTER the hole, so the

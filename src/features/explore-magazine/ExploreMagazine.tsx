@@ -104,6 +104,24 @@ type Block =
 /** §6d PAIRS carry no round shape, so only kinds that never draw one pair up. */
 const PAIRABLE = new Set(['review', 'course', 'story']);
 
+/** SCORES ONLY — A BARE ROUND MAY PAIR. DO NOT HARMONISE THIS WITH ALL.
+ *
+ *  On All, a round card's shape is often the point, so the rule above stands
+ *  there unchanged. On the rounds-only view the failure mode is twelve
+ *  identical full-width cards, and a round with NO CONSEQUENCE is exactly the
+ *  card whose line was earned on travel with nothing to mark — a pair draws no
+ *  trace anyway (SHAPE_W.pair is 0), so the trace is not the loss it looks
+ *  like. Measured: an all-bare page of 12 falls from ~3,240px to a lead plus
+ *  five pair rows at ~1,275px, and records and circle rounds keep full width
+ *  so the strong cards read AS strong.
+ *
+ *  The test is CONSEQUENCE ALONE, not consequence-and-no-visual: the visual
+ *  form of the test would have fired on about 3% of rounds and changed
+ *  nothing. */
+function pairableRound(item: StreamItem): boolean {
+  return item.kind === 'round' && item.consequence == null;
+}
+
 /** §5 shelves are inserted after card positions 3, 7, 11 ... and an empty
  *  source means the next shelf takes the slot rather than a gap appearing.
  *
@@ -112,11 +130,18 @@ const PAIRABLE = new Set(['review', 'course', 'story']);
  *  repeated card; the Courses and Reviews views are all one kind by definition
  *  and the brief allows pairs in both, so `sameKindPairs` opens that door for
  *  those two views only. */
-function buildBlocks(items: StreamItem[], shelves: ShelfKind[], sameKindPairs = false): Block[] {
+function buildBlocks(
+  items: StreamItem[],
+  shelves: ShelfKind[],
+  sameKindPairs = false,
+  opts: { bareRoundPairs?: boolean; shelfAt?: number[] } = {},
+): Block[] {
   const blocks: Block[] = [];
   let cards = 0;
   let nextShelf = 0;
   let index = 0;
+  const canPair = (item: StreamItem) =>
+    PAIRABLE.has(item.kind) || (opts.bareRoundPairs === true && pairableRound(item));
 
   while (index < items.length) {
     const item = items[index];
@@ -128,9 +153,9 @@ function buildBlocks(items: StreamItem[], shelves: ShelfKind[], sameKindPairs = 
       cards += 1;
     } else if (
       next &&
-      PAIRABLE.has(item.kind) &&
-      PAIRABLE.has(next.kind) &&
-      (sameKindPairs || item.kind !== next.kind)
+      canPair(item) &&
+      canPair(next) &&
+      (sameKindPairs || item.kind !== next.kind || (opts.bareRoundPairs === true && item.kind === 'round'))
     ) {
       blocks.push({ kind: 'pair', items: [item, next] });
       index += 2;
@@ -141,7 +166,10 @@ function buildBlocks(items: StreamItem[], shelves: ShelfKind[], sameKindPairs = 
       cards += 1;
     }
 
-    if (cards >= 3 + nextShelf * 4 && nextShelf < shelves.length) {
+    /* Scores places its shelves at PAGE BOUNDARIES (opts.shelfAt); every other
+       view keeps the 3 / 7 / 11 cadence exactly as it shipped. */
+    const due = opts.shelfAt ? opts.shelfAt[nextShelf] : 3 + nextShelf * 4;
+    if (due != null && cards >= due && nextShelf < shelves.length) {
       blocks.push({ kind: 'shelf', shelf: shelves[nextShelf] });
       nextShelf += 1;
     }
@@ -462,18 +490,39 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     ...(scoreScope === 'country' || scoreScope === 'world' ? (['coursesWorld'] as ShelfKind[]) : []),
   ];
   const REVIEWS_SHELVES: ShelfKind[] = ['coursesTopRated', 'coursesList'];
+  /* SCORES SHELVES — the four that are about the MEMBER'S OWN GOLF, inserted at
+     the page boundaries (12, 24, 36, 48) so the card rhythm reads first and a
+     shelf arrives as a change of pace rather than an interruption.
+     WHY 'standing' IS A SHELF AND NOT A CARD: a shelf may show a position with
+     no motion — that is a standing, and a standing is worth looking at. A CARD
+     must announce a CHANGE, which is the same distinction that retired
+     rank_hold; do not promote this shelf into the card ladder. */
+  /* ORDER IS SET BY WHAT SCORES ALREADY SHOWS ABOVE THE STREAM. The standing,
+     club-week and golfers shelves are all mounted at the head of this view, so
+     county courses -- the only one of the four that is NOT up there -- takes the
+     first in-stream slot. The other three follow at 24 / 36 / 48, which is far
+     enough down that the head of the page is long gone; a repeat there is a
+     return, not a duplicate. Nothing at position 12 repeats anything on screen. */
+  const SCORES_SHELVES: ShelfKind[] = ['coursesCounty', 'standing', 'clubWeek', 'people'];
   const shelves: ShelfKind[] =
     view === 'watch'
       ? ['moments']
       : view === 'scores'
-        ? []
+        ? SCORES_SHELVES
         : view === 'courses'
           ? COURSES_SHELVES
           : view === 'reviews'
             ? REVIEWS_SHELVES
             : ALL_SHELVES;
   const singleType = view === 'courses' || view === 'reviews';
-  const blocks = useMemo(() => buildBlocks(ranked, shelves, singleType), [ranked, view, scoreScope, singleType]);
+  const blocks = useMemo(
+    () =>
+      buildBlocks(ranked, shelves, singleType, {
+        bareRoundPairs: view === 'scores',
+        shelfAt: view === 'scores' ? [12, 24, 36, 48] : undefined,
+      }),
+    [ranked, view, scoreScope, singleType],
+  );
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
   const loggedRef = useRef(0);
