@@ -89,10 +89,11 @@ describe('FeedCommentPreview mention integration', () => {
     const clamp = screen.getByText('Bob').parentElement;
 
     expect(clamp).toHaveStyle({
+      display: '-webkit-box',
       overflow: 'hidden',
     });
-    expect(clamp).toHaveStyle({ WebkitLineClamp: '2' });
     expect(clamp).toContainElement(container.querySelector('[data-mention-type="user"]') as HTMLElement);
+    expect(clamp?.previousElementSibling).toHaveClass('lucide-message-circle');
   });
 
   it('renders the quiet comment glyph only when a real preview line exists', () => {
