@@ -257,7 +257,7 @@ export function useExploreStream(
 ): ExploreServerStream {
   const { t } = useTranslation('courses');
   const query = useInfiniteQuery<ExploreStreamPage>({
-    queryKey: exploreKeys.stream(viewerId, view, scope),
+    queryKey: exploreKeys.stream(viewerId, view, scope, geography),
     enabled: !!viewerId,
     staleTime: 5 * 60_000,
     refetchOnMount: true,
