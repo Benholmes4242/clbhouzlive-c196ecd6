@@ -750,14 +750,38 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         <div className="flex items-center gap-2">
           <div className="min-w-0 flex-1">{countrySelect(condensed)}</div>
           <div className="min-w-0 flex-1">{regionSelect(condensed)}</div>
+          {/* INLINE SEARCH OVER WHAT IS ON SCREEN. The old "Edit" text opened the
+              full directory sheet; that sheet keeps its three other doors (both
+              empty states and the footer CTA), so nothing lost its entrance. */}
           <button
             type="button"
-            onClick={() => openDirectory(country, 'filter_bar')}
-            style={{ flexShrink: 0, border: 0, background: 'transparent', color: INK_MUTE, fontSize: 12, fontWeight: 700 }}
+            onClick={() => {
+              if (searchOpen) setNameQuery('');
+              setSearchOpen((prev) => !prev);
+            }}
+            aria-label={t('statBrowse.search.open', { defaultValue: 'Search this list' })}
+            aria-expanded={searchOpen}
+            className={`${condensed ? 'h-8 w-8' : 'h-10 w-10'} shrink-0 flex items-center justify-center`}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8 }}
           >
-            Edit
+            {searchOpen ? (
+              <X className={condensed ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
+            ) : (
+              <Search className={condensed ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
+            )}
           </button>
         </div>
+        {searchOpen ? (
+          <div className="mt-2">
+            <CoursesSearchField
+              value={nameQuery}
+              onChange={setNameQuery}
+              padding="0"
+              autoFocus
+              placeholder={t('statBrowse.search.placeholder', { defaultValue: 'Search these courses' })}
+            />
+          </div>
+        ) : null}
         <div className="mt-2.5">
           <RailChips
             options={browseBoards}
