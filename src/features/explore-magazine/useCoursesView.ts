@@ -273,8 +273,11 @@ export function useScopeCourses(
             headline,
             rating: row.rating,
             rating_n: row.rating_count,
-            top100_world: rank?.world ? rank.rank : null,
-            top100_regional: rank && !rank.world ? rank.rank : null,
+            /* ONE RANK AND ITS LIST. The legacy world/regional pair is kept for
+               the server stream's shape; the SCOPE is what the chip labels. */
+            top100_world: rank?.scope === 'global' ? rank.rank : null,
+            top100_regional: rank && rank.scope !== 'global' ? rank.rank : null,
+            top100_scope: rank?.scope ?? null,
             /* BRIEF_COURSES_MERGED §3 — THE PAIRING RULE READS THIS FACT. The
                merged view pairs STABLE-FACT course cards two-up and gives event
                cards the full width, so the event kind has to travel with the card
