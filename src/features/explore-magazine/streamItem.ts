@@ -115,6 +115,10 @@ export interface StreamFacts {
   first_sentence?: string | null;
   top100_world?: number | null;
   top100_regional?: number | null;
+  /** THE LIST THE RANK CAME FROM ('global' | 'gb-i' | 'usa' | 'europe'). The
+   *  server stream does not carry it, so the card resolves the scope from the
+   *  membership index; a scope is NEVER inferred from which field is null. */
+  top100_scope?: string | null;
   post_id?: string | null;
   media_id?: string | null;
   duration_s?: number | null;
