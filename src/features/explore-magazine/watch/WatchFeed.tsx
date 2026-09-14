@@ -438,6 +438,9 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
               <MomentTile
                 moment={moment}
                 radius={10}
+                initialsSize={14}
+                labelSize={11}
+                labelInset={8}
                 labelled={false}
                 autoplayGroup="amateur-watch-moments"
                 onPress={() => {
