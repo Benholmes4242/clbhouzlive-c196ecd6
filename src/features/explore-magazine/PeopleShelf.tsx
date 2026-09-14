@@ -38,6 +38,8 @@ import { reasonText } from '@/features/social-suggestions/SuggestedGolferRow';
  */
 
 const TILE = { w: 132, h: 148 };
+/** How many suggestions a rail can hold before it stops being a rail. */
+const RENDERED = 12;
 
 export function PeopleShelf({
   viewerId,
