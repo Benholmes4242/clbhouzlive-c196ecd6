@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Award } from 'lucide-react';
+import { Award, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import BrowseCourseCard from './BrowseCourseCard';
@@ -135,14 +135,49 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
         <p style={{ ...COURSE_BROWSE_DESCRIPTION, margin: '10px 0 16px' }}>
           {ratingSentence} {roundSentence}
         </p>
-        <RailChips
-          options={LISTS}
-          value={selectedList}
-          onChange={(next) => { restored.current = true; setSelectedList(next); }}
-          ariaLabel="Top 100 region"
-          ground="outline"
-          align="center-when-fit"
-        />
+        {/* THE SAME INLINE SEARCH THE COURSES TAB CARRIES, one field component
+            shared by both: a plain case-insensitive contains-match over the
+            list already selected by the region chips. No catalogue query. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <RailChips
+              options={LISTS}
+              value={selectedList}
+              onChange={(next) => { restored.current = true; setSelectedList(next); }}
+              ariaLabel="Top 100 region"
+              ground="outline"
+              align="center-when-fit"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (searchOpen) setNameQuery('');
+              setSearchOpen((prev) => !prev);
+            }}
+            aria-label="Search this list"
+            aria-expanded={searchOpen}
+            className="h-9 w-9 shrink-0 flex items-center justify-center"
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8 }}
+          >
+            {searchOpen ? (
+              <X className="h-4 w-4" style={{ color: A.INK }} aria-hidden />
+            ) : (
+              <Search className="h-4 w-4" style={{ color: A.INK }} aria-hidden />
+            )}
+          </button>
+        </div>
+        {searchOpen ? (
+          <div style={{ marginTop: 10 }}>
+            <CoursesSearchField
+              value={nameQuery}
+              onChange={setNameQuery}
+              padding="0"
+              autoFocus
+              placeholder="Search these courses"
+            />
+          </div>
+        ) : null}
         {rateNudge ? <div style={{ marginTop: 24 }}>{rateNudge}</div> : null}
       </section>
 
