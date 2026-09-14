@@ -318,7 +318,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      `unavailable` is true, and the accepted client composition below stays in
      charge - the fallback is deliberate and is never an empty page. */
   const serverView = view !== 'watch';
-  const serverReady = serverView && (!scoped || geography.isFetched);
+  /* EVERY SERVER VIEW WAITS FOR GEOGRAPHY, All included. All does not show the
+     scope row (that is still SCOPED_VIEWS' job) but it does send the club,
+     county and country, and the RING on every card is decided by them. Firing
+     before the shared resolver settles sent a null club and read every card as
+     `world` — which is why the 0.8 club ring had never fired for anyone. */
+  const serverReady = serverView && geography.isFetched;
   const server = useExploreStream(userId && serverReady ? userId : undefined, view, scoreScope, {
     clubId: geography.scope.primaryClubId,
     county: geography.scope.county,
