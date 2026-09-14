@@ -128,16 +128,13 @@ function useStandingCopy() {
 /**
  * THE SUBLINE IS ABOUT THE COURSE, NOT THE BOARD (Ben's ruling). The heading
  * already names the board, so repeating "Lowest gross" on twelve tiles said
- * the same thing thirteen times. What is left is when this board last moved
- * and, failing that, where the course is. The interpunct is composed HERE and
- * never lives inside a locale string.
+ * the same thing thirteen times. The photo overlay already names the region, so
+ * repeating it here said the same thing twice. What is left is when this
+ * board last moved; when it never has, the line stays empty.
  */
 function sublineFor(row: StandingRow, copy: ReturnType<typeof useStandingCopy>): string {
   const when = relativeDay(row.last_change_at);
-  const place = row.region ?? row.sub_country ?? '';
-  if (when && place) return `${place} \u00B7 ${copy.lastChange(when)}`;
-  if (when) return copy.lastChange(when);
-  return place;
+  return when ? copy.lastChange(when) : '';
 }
 
 /**
