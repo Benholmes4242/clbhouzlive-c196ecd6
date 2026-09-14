@@ -355,7 +355,10 @@ function CommentsSheetV2Inner({
                 padding: threads.length === 0 ? 0 : '4px 16px 16px',
               }}
             >
-              {isLoading ? (
+              {/* SKELETON UNTIL THE READ HAS LANDED — see the header note. An
+                  unresolved thread used to render as blank space because
+                  isLoading was false while the query sat disabled-pending. */}
+              {!isFetched ? (
                 <SkeletonRows />
               ) : threads.length === 0 ? null : (
                 <div>
