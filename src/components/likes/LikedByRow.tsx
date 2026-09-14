@@ -109,7 +109,7 @@ export function LikedByRow({
             textOverflow: 'ellipsis',
             display: 'block',
             fontVariantNumeric: 'tabular-nums lining-nums',
-            letterSpacing: '-0.04em',
+            letterSpacing: 0,
           }}
         >
           {copy}
