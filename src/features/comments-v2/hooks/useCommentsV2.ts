@@ -344,6 +344,25 @@ export function useCommentsV2({
     qc.invalidateQueries({ queryKey: keyRoot as unknown as readonly unknown[] });
   }, [qc, targetType, targetId, targetSecondaryId]);
 
+  /**
+   * RULING C — THE CARD'S PREVIEW IS A SECOND LIST, AND IT WAS NEVER TOLD.
+   *
+   * The two COUNTS already agree by construction (both read
+   * posts.comment_count), and the two LISTS stay separate on purpose: the
+   * preview is one batched read across a whole feed page, the sheet is a
+   * paginated thread. What was missing is the message. `postCommentPreview`
+   * keys are `['post-comment-preview', scope, viewer, digest(ids)]` — the
+   * digest is a hash of the SORTED POST-ID SET, so there is no key that names
+   * one post. Invalidating the ROOT PREFIX is therefore the only honest reach:
+   * it marks every mounted feed page's preview stale, which is at most a
+   * handful of queries and one read each, and is what makes the card show the
+   * comment the member just wrote instead of the old line for up to 60s.
+   */
+  const invalidateFeedPreviews = useCallback(() => {
+    if (targetType !== 'post') return;
+    qc.invalidateQueries({ queryKey: ['post-comment-preview'] });
+  }, [qc, targetType]);
+
   // ── Mutations (RPC only) ──
 
   const addComment = useMutation({
