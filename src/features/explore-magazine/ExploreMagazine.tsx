@@ -104,6 +104,24 @@ type Block =
 /** §6d PAIRS carry no round shape, so only kinds that never draw one pair up. */
 const PAIRABLE = new Set(['review', 'course', 'story']);
 
+/** SCORES ONLY — A BARE ROUND MAY PAIR. DO NOT HARMONISE THIS WITH ALL.
+ *
+ *  On All, a round card's shape is often the point, so the rule above stands
+ *  there unchanged. On the rounds-only view the failure mode is twelve
+ *  identical full-width cards, and a round with NO CONSEQUENCE is exactly the
+ *  card whose line was earned on travel with nothing to mark — a pair draws no
+ *  trace anyway (SHAPE_W.pair is 0), so the trace is not the loss it looks
+ *  like. Measured: an all-bare page of 12 falls from ~3,240px to a lead plus
+ *  five pair rows at ~1,275px, and records and circle rounds keep full width
+ *  so the strong cards read AS strong.
+ *
+ *  The test is CONSEQUENCE ALONE, not consequence-and-no-visual: the visual
+ *  form of the test would have fired on about 3% of rounds and changed
+ *  nothing. */
+function pairableRound(item: StreamItem): boolean {
+  return item.kind === 'round' && item.consequence == null;
+}
+
 /** §5 shelves are inserted after card positions 3, 7, 11 ... and an empty
  *  source means the next shelf takes the slot rather than a gap appearing.
  *
