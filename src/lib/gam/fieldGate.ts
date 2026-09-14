@@ -26,6 +26,14 @@
  * containing themselves is comparing themselves to themselves.
  *
  * Import these -- do not restate the 5 or the 1.
+ *
+ * ONE PLACE CANNOT IMPORT THIS: get_explore_stream shapes a whole page in SQL
+ * and cannot call into TypeScript, so it applies CROWN_MIN_OTHERS inline as a
+ * course-wide count of >= 2 (the subject plus one other) before it will label a
+ * round a course record or print the record fact. That is the SAME floor stated
+ * in the only other language it can be stated in, not a second definition --
+ * see docs/sql/explore_stream_record_floor_author_cap.sql. If this 1 ever
+ * changes, that function changes with it.
  */
 export const FIELD_MIN_PLAYERS = 5;
 
