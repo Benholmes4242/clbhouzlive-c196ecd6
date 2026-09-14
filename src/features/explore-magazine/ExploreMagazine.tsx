@@ -497,7 +497,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      no motion — that is a standing, and a standing is worth looking at. A CARD
      must announce a CHANGE, which is the same distinction that retired
      rank_hold; do not promote this shelf into the card ladder. */
-  const SCORES_SHELVES: ShelfKind[] = ['clubWeek', 'standing', 'coursesCounty', 'people'];
+  /* ORDER IS SET BY WHAT SCORES ALREADY SHOWS ABOVE THE STREAM. The standing,
+     club-week and golfers shelves are all mounted at the head of this view, so
+     county courses -- the only one of the four that is NOT up there -- takes the
+     first in-stream slot. The other three follow at 24 / 36 / 48, which is far
+     enough down that the head of the page is long gone; a repeat there is a
+     return, not a duplicate. Nothing at position 12 repeats anything on screen. */
+  const SCORES_SHELVES: ShelfKind[] = ['coursesCounty', 'standing', 'clubWeek', 'people'];
   const shelves: ShelfKind[] =
     view === 'watch'
       ? ['moments']
