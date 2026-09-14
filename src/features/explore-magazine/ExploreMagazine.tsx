@@ -130,11 +130,18 @@ function pairableRound(item: StreamItem): boolean {
  *  repeated card; the Courses and Reviews views are all one kind by definition
  *  and the brief allows pairs in both, so `sameKindPairs` opens that door for
  *  those two views only. */
-function buildBlocks(items: StreamItem[], shelves: ShelfKind[], sameKindPairs = false): Block[] {
+function buildBlocks(
+  items: StreamItem[],
+  shelves: ShelfKind[],
+  sameKindPairs = false,
+  opts: { bareRoundPairs?: boolean; shelfAt?: number[] } = {},
+): Block[] {
   const blocks: Block[] = [];
   let cards = 0;
   let nextShelf = 0;
   let index = 0;
+  const canPair = (item: StreamItem) =>
+    PAIRABLE.has(item.kind) || (opts.bareRoundPairs === true && pairableRound(item));
 
   while (index < items.length) {
     const item = items[index];
@@ -146,9 +153,9 @@ function buildBlocks(items: StreamItem[], shelves: ShelfKind[], sameKindPairs = 
       cards += 1;
     } else if (
       next &&
-      PAIRABLE.has(item.kind) &&
-      PAIRABLE.has(next.kind) &&
-      (sameKindPairs || item.kind !== next.kind)
+      canPair(item) &&
+      canPair(next) &&
+      (sameKindPairs || item.kind !== next.kind || (opts.bareRoundPairs === true && item.kind === 'round'))
     ) {
       blocks.push({ kind: 'pair', items: [item, next] });
       index += 2;
@@ -159,7 +166,10 @@ function buildBlocks(items: StreamItem[], shelves: ShelfKind[], sameKindPairs = 
       cards += 1;
     }
 
-    if (cards >= 3 + nextShelf * 4 && nextShelf < shelves.length) {
+    /* Scores places its shelves at PAGE BOUNDARIES (opts.shelfAt); every other
+       view keeps the 3 / 7 / 11 cadence exactly as it shipped. */
+    const due = opts.shelfAt ? opts.shelfAt[nextShelf] : 3 + nextShelf * 4;
+    if (due != null && cards >= due && nextShelf < shelves.length) {
       blocks.push({ kind: 'shelf', shelf: shelves[nextShelf] });
       nextShelf += 1;
     }
