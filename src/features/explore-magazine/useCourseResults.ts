@@ -77,8 +77,12 @@ export function useCourseResults(
         subject: {
           course_id: courseId,
           course_name: course?.name ?? null,
-          region: course?.region ?? course?.subCountry ?? null,
+          /* RAW region — the card's meta line pairs it with the nation itself
+             (coursePlaceLine); folding sub_country in here would put a nation
+             into the county kicker. */
+          region: course?.region ?? null,
           sub_country: course?.subCountry ?? null,
+          country: course?.country ?? null,
           image_url: course?.imageUrl ?? null,
           pending: false,
         },
