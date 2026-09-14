@@ -271,7 +271,10 @@ function VideoCard({
           <PosterFallback initial={initial} size={34} />
         )}
         <AutoplayLayer hlsUrl={hlsFor(row)} poster={poster} />
-        <GlassDurationBadge seconds={row.duration_seconds ?? null} />
+        {/* The duration chip stays ABOVE the playing frame. */}
+        <span style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
+          <GlassDurationBadge seconds={row.duration_seconds ?? null} />
+        </span>
 
       </div>
 
@@ -384,7 +387,10 @@ function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number | st
           <PosterFallback initial={initial} size={20} />
         )}
         <AutoplayLayer hlsUrl={hlsFor(row)} poster={poster} />
-        <GlassDurationBadge seconds={row.duration_seconds ?? null} />
+        {/* The duration chip stays ABOVE the playing frame. */}
+        <span style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
+          <GlassDurationBadge seconds={row.duration_seconds ?? null} />
+        </span>
 
       </span>
       {who ? (
