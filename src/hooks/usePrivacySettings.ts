@@ -56,7 +56,6 @@ export function usePrivacySettings(
         .eq('id', userId);
       if (error) throw error;
       invalidate();
-      invalidateHandicapPrivacyCaches(queryClient);
     } catch {
       setIsPublic(prev);
       toast.error('Could not update privacy setting.');
@@ -78,6 +77,7 @@ export function usePrivacySettings(
         .eq('id', userId);
       if (error) throw error;
       invalidate();
+      invalidateHandicapPrivacyCaches(queryClient);
     } catch {
       setHandicapVisibility(prev);
       toast.error('Could not update handicap visibility.');
