@@ -14,6 +14,7 @@ import { CHIP_GLASS_CLASS, PHOTO_FIG_GOOD, PHOTO_FIG_SHADOW, PHOTO_FIG_UNDER } f
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
 import { dotsFor, treatmentFor } from './roundTreatment';
+import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
 
 
 /**
@@ -112,6 +113,31 @@ function FigureChip({
       ) : null}
     </span>
   );
+}
+
+/**
+ * THE RANK CHIP NAMES THE LIST THE RANK CAME FROM.
+ *
+ * It used to read `world != null ? 'world' : 'GB&I'`, which labelled every
+ * non-world course GB&I — Pine Valley, New Jersey, read "#1 GB&I" — and left the
+ * Continental Europe list with no way to be expressed at all. The scope is now
+ * READ from course_top100_memberships (regional first, global as the fallback).
+ * When it cannot be resolved the rank shows with NO scope label.
+ */
+function CourseRankChip({ item }: { item: StreamItem }) {
+  const { index } = useTop100RankIndex();
+  const courseId = item.subject.course_id ?? null;
+  const standing = courseId ? index?.get(courseId) ?? null : null;
+  const fallbackRank = item.facts.top100_world ?? item.facts.top100_regional ?? null;
+  const factScope = item.facts.top100_scope;
+
+  const rank = standing?.rank ?? fallbackRank;
+  if (rank == null) return null;
+  const scope =
+    standing?.scope ??
+    (factScope && factScope in RANK_SCOPE_LABEL ? (factScope as RankListSlug) : null);
+
+  return <FigureChip corner="right" figure={`#${rank}`} unit={scope ? RANK_SCOPE_LABEL[scope] : undefined} />;
 }
 
 /** §4b, by type. A story carries none; a moment carries none. */
