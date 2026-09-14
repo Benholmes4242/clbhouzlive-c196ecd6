@@ -56,35 +56,35 @@ export function PeopleShelf({
   source?: 'club' | 'suggested';
 }) {
   const { t } = useTranslation('courses');
+  /* THE REASON COPY LIVES WITH THE ENGINE, in the common namespace, so the shelf
+     says the same sentence as the rows on /golferstofollow. */
+  const { t: tc } = useTranslation('common');
   const suggested = source === 'suggested';
   const club = useClubGolfers(viewerId, clubId, enabled && !suggested);
-  const people = useSuggestedGolfers(viewerId, enabled && suggested);
+  const people = useSuggestedGolfers(RENDERED, enabled && suggested);
 
   /* ONE ANALYTICS KIND PER SOURCE, so the conversion question — does the
      suggestion shelf actually produce follows? — has an answer. */
   const kind = suggested ? 'suggested_golfers' : 'people';
   const rows: ShelfPerson[] = suggested
-    ? people.golfers.map((g) => ({
-        userId: g.userId,
-        name: g.name,
+    ? ((people.data ?? []) as SuggestedGolfer[]).map((g) => ({
+        userId: g.user_id,
+        name: (g.display_name || g.username || '').trim(),
         username: g.username,
-        photoUrl: g.photoUrl,
-        /* §3 THE FIRST REASON THAT APPLIES, ALL OF THEM REAL. Never "Suggested
-           for you": a reason a member cannot act on is worse than no reason. */
-        reason: g.homeClub
-          ? t('amateur.shelf.playsAtClub', 'Plays at {{club}}', { club: g.homeClub })
-          : g.roundsThisMonth > 0
-            ? t('amateur.shelf.roundsThisMonth', '{{count}} rounds this month', { count: g.roundsThisMonth })
-            : g.sharedCourseName
-              ? t('amateur.shelf.alsoPlays', 'Also plays {{course}}', { course: g.sharedCourseName })
-              : '',
+        photoUrl: g.profile_photo_url,
+        /* THE SERVER'S REASON, VERBATIM. Not recomputed here: the engine decided
+           the precedence and only returns people who have one. */
+        reason: reasonText(g, tc as unknown as (k: string, o?: Record<string, unknown>) => string),
       }))
     : club.golfers.map((g) => ({
         userId: g.userId,
         name: g.name,
         username: g.username,
         photoUrl: g.photoUrl,
-        reason: reasonForClubGolfer(g, t),
+        reason: reasonForClubGolfer(
+          g,
+          t as unknown as (key: string, fallback?: string, vars?: Record<string, unknown>) => string,
+        ),
       }));
   const isFetched = suggested ? people.isFetched : club.isFetched;
 
