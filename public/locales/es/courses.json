@@ -1634,6 +1634,8 @@
       "seeAll": "Ver los {{count}}",
       "seeAllRounds_one": "Ver {{count}} vuelta",
       "seeAllRounds_other": "Ver {{count}} vueltas",
+      "seeAllRoundsPlain": "Ver todas las vueltas",
+      "allRounds": "Todas las vueltas",
       "seeAllClips_one": "Ver {{count}} clip",
       "seeAllClips_other": "Ver {{count}} clips",
       "seeAllMoments_one": "Ver {{count}} momento",
