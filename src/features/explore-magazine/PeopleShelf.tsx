@@ -14,6 +14,10 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ExploreShelf } from './ExploreShelf';
 import { ShelfShell } from './ExploreShells';
 import { useClubGolfers, type ClubGolfer } from './useClubGolfers';
+import {
+  assignClubRecordCategories,
+  type ClubRecordCategory,
+} from './clubGolferRecords';
 /* THE ONE SUGGESTION ENGINE. public.get_suggested_golfers, SECURITY DEFINER,
    already excludes the viewer, everyone they follow, blocked actors, test and
    deleted profiles, and drops any candidate whose reason resolves to NULL
@@ -71,6 +75,7 @@ export function PeopleShelf({
   /* ONE ANALYTICS KIND PER SOURCE, so the conversion question — does the
      suggestion shelf actually produce follows? — has an answer. */
   const kind = suggested ? 'suggested_golfers' : 'people';
+  const clubAssignments = assignClubRecordCategories(club.golfers);
   const rows: ShelfPerson[] = suggested
     ? ((people.data ?? []) as SuggestedGolfer[]).map((g) => ({
         userId: g.user_id,
@@ -88,6 +93,7 @@ export function PeopleShelf({
         photoUrl: g.photoUrl,
         reason: reasonForClubGolfer(
           g,
+           clubAssignments.get(g.userId) ?? null,
           t as unknown as (key: string, fallback?: string, vars?: Record<string, unknown>) => string,
         ),
       }));
@@ -133,19 +139,34 @@ interface ShelfPerson {
    sources. */
 function reasonForClubGolfer(
   golfer: ClubGolfer,
+  category: ClubRecordCategory | null,
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string,
 ): string {
-  if (golfer.boards === 1 && golfer.singleRecordCategory === 'lowest_gross_all_time') {
-    return t('amateur.shelf.holdsCourseRecord', 'Holds the course record');
-  }
-  if (golfer.boards > 0) {
-    return t('amateur.shelf.holdsCourseRecords', 'Holds a course record', { count: golfer.boards });
-  }
+  if (category) return clubRecordReason(category, t);
   if (golfer.roundsHere > 0) {
     return t('amateur.shelf.roundsHere', '{{count}} round here', { count: golfer.roundsHere });
   }
   if (golfer.isNew) return t('amateur.shelf.newThisMonth', 'New this month');
   return '';
+}
+
+function clubRecordReason(
+  category: ClubRecordCategory,
+  t: (key: string, fallback?: string) => string,
+): string {
+  const labels: Record<ClubRecordCategory, [string, string]> = {
+    lowest_gross_all_time: ['courseRecordHolder', 'Course record holder'],
+    lowest_gross_women_all_time: ['womensCourseRecordHolder', "Women's course record holder"],
+    most_birdies_all_time: ['allTimeBirdieLeader', 'All-time birdie leader'],
+    most_eagles_all_time: ['allTimeEagleLeader', 'All-time eagle leader'],
+    most_aces_all_time: ['allTimeAceLeader', 'All-time ace leader'],
+    best_stableford_all_time: ['allTimeStablefordLeader', 'All-time stableford leader'],
+    most_albatrosses_all_time: ['allTimeAlbatrossHolder', 'All-time albatross holder'],
+    most_rounds_all_time: ['mostRoundsHere', 'Most rounds here'],
+    best_score_diff_all_time: ['bestScoreToParHere', 'Best score-to-par here'],
+  };
+  const [key, fallback] = labels[category];
+  return t(`amateur.shelf.recordReason.${key}`, fallback);
 }
 
 function PersonTile({ golfer, pos, kind }: { golfer: ShelfPerson; pos: number; kind: string }) {
