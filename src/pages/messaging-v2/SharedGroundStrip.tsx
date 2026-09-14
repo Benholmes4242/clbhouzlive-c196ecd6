@@ -135,6 +135,7 @@ export const SharedGroundStrip: React.FC<Props> = ({ ground, rivalFirstName }) =
         open={!!openScoreId}
         scoreId={openScoreId}
         connectionId={connectionId ?? null}
+        profileUserId={user?.id ?? null}
         onClose={() => setOpenScoreId(null)}
       />
     </>

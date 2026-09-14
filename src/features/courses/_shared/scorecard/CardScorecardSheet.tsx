@@ -6,7 +6,6 @@ import { RefreshCw, Table } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
-import { TrajectoryLine } from './TrajectoryLine';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
 import {
@@ -170,6 +169,8 @@ export interface CardScorecardSheetProps {
   playerHcp?: number | null;
   playerHcpDelta?: number | null;
   playerUserId?: string | null;
+  /** Member sheet subject. Resolved by the wrapper from viewer and round owner. */
+  subjectIsViewer?: boolean;
   /**
    * S3 — TOUR ONLY. sr_players.photo_url is populated for 2 of 2,879 players, so
    * reading it alone showed initials for nearly every tour player. With these two
@@ -214,6 +215,20 @@ export interface CardScorecardEngagement {
   /** Absent when the round has no post — no comment affordance at all (§1.6). */
   comment?: { count: number; label: string; onOpen: () => void } | null;
 }
+
+const ScorecardSection: React.FC<{
+  kicker: string;
+  flat: boolean;
+  children: React.ReactNode;
+}> = ({ kicker, flat, children }) => {
+  if (!flat) return <Panel kicker={kicker}>{children}</Panel>;
+  return (
+    <section style={{ padding: '8px 2px 12px' }}>
+      <div style={{ ...KICKER, color: A.MUTE, marginBottom: 14 }}>{kicker}</div>
+      {children}
+    </section>
+  );
+};
 
 /** Integer to-par: rounds first, then branches. Never `-0`. */
 function fmtRel(n: number | null): string {
@@ -638,7 +653,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   holes, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
-  playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, identityStat,
+  playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
   feat = null,
@@ -688,7 +703,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    * the sentences: a figure rail has no subject to name, so an empty
    * playerName can no longer produce a bare apostrophe anywhere.
    */
-  const isOwner = !isTour && !!playerUserId && !!user?.id && playerUserId === user.id;
+  const isOwner = !isTour && (subjectIsViewer ?? (!!playerUserId && !!user?.id && playerUserId === user.id));
 
 
   const played = useMemo(
@@ -815,7 +830,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         value: courseContext.rankHere === 1
           ? t('courses:scorecard.figBest')
           : formatOrdinal(courseContext.rankHere),
-        label: t('courses:scorecard.figOf', { count: roundsHere }),
+        label: t('courses:scorecard.figOfRounds', { count: roundsHere }),
       });
     }
     const avgOthers = courseContext.avgToParOthers;
@@ -828,7 +843,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           : diff < 0
             ? `\u2212${Math.abs(diff).toFixed(1)}`
             : `+${diff.toFixed(1)}`,
-        label: t('courses:scorecard.figVsAvg'),
+        label: t(isOwner ? 'courses:scorecard.figVsYourAvg' : 'courses:scorecard.figVsTheirAvg'),
         tone: Math.abs(diff) < 0.05 ? EVEN_GRAY : toParColor(diff < 0 ? -1 : 1),
       });
     }
@@ -836,11 +851,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       items.push({
         key: 'indexthen',
         value: formatHcp(courseContext.indexAtTime),
-        label: t('courses:scorecard.figIndexThen'),
+        label: t('courses:scorecard.figHcpAtTime'),
       });
     }
     return items;
-  }, [isTour, courseContext, totals, t]);
+  }, [isTour, courseContext, totals, isOwner, t]);
 
   const rail = useMemo(() => {
     const items: { key: string; value: string; label: string; tone?: string }[] = [];
