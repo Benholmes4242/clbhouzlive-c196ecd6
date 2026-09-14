@@ -110,6 +110,7 @@ export function useCommentsV2({
   const {
     data,
     isLoading,
+    isFetched: pagesFetched,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -118,6 +119,13 @@ export function useCommentsV2({
     queryKey: commentsKeys.pages(scope),
     enabled: enabled && !!targetId,
     staleTime: 30_000,
+    /* THE THREAD IS ASKED FOR EVERY TIME THE SHEET OPENS (RULING B).
+       The global refetchOnMount is `true`, which honours staleTime — so a
+       reopen inside 30s re-served the previous answer with no request, and a
+       reply posted while the member was reading the feed was invisible.
+       'always' is set HERE ONLY: the global default is load-bearing for the
+       rest of the app and staleTime is left alone. */
+    refetchOnMount: 'always',
     initialPageParam: null as string | null,
     getNextPageParam: (last) => last.nextCursor,
     queryFn: async ({ pageParam }) => {
