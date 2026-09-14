@@ -308,10 +308,16 @@ export function useCommentsV2({
   }, [parents, replies, hiddenIds, blockedIds, shape]);
 
   // Header total (top-level count for the current target).
-  const { data: totalCount = 0, isLoading: totalCountLoading } = useQuery({
+  const {
+    data: totalCount = 0,
+    isLoading: totalCountLoading,
+    isFetched: totalCountFetched,
+  } = useQuery({
     queryKey: commentsKeys.count(scope),
     enabled: enabled && !!targetId,
     staleTime: 30_000,
+    /* RULING B — scoped to the comments-v2 reads, see the pages query above. */
+    refetchOnMount: 'always',
     queryFn: async () => {
       // Prefer posts.comment_count when target is a post.
       if (targetType === 'post') {
