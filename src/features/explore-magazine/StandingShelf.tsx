@@ -43,8 +43,8 @@ import { useViewerStanding, type StandingRow } from './useViewerStanding';
  * in the All view — no heading over nothing. The Scores connect sentence is
  * Phase B2 and is not smuggled in here.
  *
- * THE BOARD SELECTOR (Ben's ruling). Net for everyone by default, net or gross
- * only, no handicap threshold — the reasoning lives in standingBoard.ts. The
+ * THE BOARD SELECTOR (Ben's ruling). Net for everyone by default, five boards,
+ * no handicap threshold — the reasoning lives in standingBoard.ts. The
  * HEADING reads only "Where you stand"; the selector in the heading's right
  * slot already names the active board, so repeating it in the heading would be
  * the same word twice. The tiles never repeat the board either, so their
