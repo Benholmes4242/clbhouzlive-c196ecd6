@@ -7,6 +7,7 @@ import { restoreAmateurScroll, takeAmateurScroll } from '@/features/amateur/amat
 import { ExploreMagazine } from '@/features/explore-magazine/ExploreMagazine';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useDiscoverLastSeen, useMarkDiscoverSeenOnExit } from '@/hooks/useDiscoverLastSeen';
 import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
 
@@ -36,6 +37,25 @@ export default function AmateurPage() {
   useEffect(() => {
     analyticsEvents.track('amateur_page_viewed', {});
   }, []);
+
+  /* THE LAST-LOOK STAMP IS WRITTEN HERE, AND NOWHERE ELSE.
+     Explore READS surface_key 'discover' through get_viewer_standing (the
+     "then" ranking behind every rank card and every movement chip), and until
+     now NOTHING wrote it: the stamp was frozen wherever the retired Discover
+     surface last left it, so the window only ever widened.
+
+     THE SAME KEY IS READ AND WRITTEN. useDiscoverLastSeen owns the single
+     SURFACE_KEY = 'discover' constant used by both the read and the
+     mark_surface_seen call, so the two cannot drift apart.
+
+     ON EXIT, NEVER ON ARRIVAL. Writing on arrival would clear the markers
+     before they could be read. useMarkDiscoverSeenOnExit fires on
+     visibilitychange -> hidden (the dependable background signal in the
+     Median WebView), on pagehide, and on unmount (route change away). The
+     RPC is monotonic through GREATEST and clamps future stamps, so a stale
+     tab cannot move the window backwards. */
+  const { markSeen } = useDiscoverLastSeen(user?.id);
+  useMarkDiscoverSeenOnExit(markSeen);
 
   /* COMING BACK IS FREE. A see-all, a course row or a story leaves the page;
      returning lands on the row that was tapped, not the first card. */
