@@ -145,7 +145,10 @@ export function applyRankCardRule(
   const out = items.map((item) => {
     const kind = item.consequence?.kind;
     if (!kind || !STANDING_KINDS.has(kind)) return item;
-    if (isOwn(item) && item.lane !== 'backlog') return item;
+    /* A NO-MOVEMENT KIND IS STRIPPED WHOEVER PLAYED THE ROUND. The own-round
+       pass-through below covers rank_up only; played_nochange on the viewer's
+       own round is the same "nothing changed" card by another name. */
+    if (isOwn(item) && item.lane !== 'backlog' && MOVEMENT_KINDS.has(kind)) return item;
     stats.before += 1;
 
     if (item.lane === 'backlog') {

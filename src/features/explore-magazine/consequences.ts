@@ -116,5 +116,13 @@ export function roundConsequence(input: RoundConsequenceInput, sources: Conseque
   if (stand && stand.delta != null && stand.delta > 0) {
     return { kind: 'rank_up', n: stand.rank_now, of: field, delta: moved };
   }
-  return { kind: 'played_nochange', n: stand?.rank_now ?? null, of: field };
+  /* A STANDING CLAIM REQUIRES A CHANGE — AND THAT INCLUDES THE VIEWER'S OWN
+     ROUND. played_nochange became the fallback here once rank_hold was retired,
+     which made it the fourth appearance of one fault: a card whose whole content
+     is that nothing changed (played_nochange on others' rounds, rank_hold, the
+     "still the 8th best round" wording, and this). There is NO surviving kind
+     whose content is "unchanged". An unmoved own round carries NO consequence
+     and falls to the plain sentence, keeping its photo, chip, shape and dots.
+     Do not add a fifth variant. */
+  return null;
 }
