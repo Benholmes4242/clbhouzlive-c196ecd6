@@ -65,6 +65,14 @@ export interface RailChipsProps {
 
   /** ADDITIVE: centre a fitting choice group; overflow still starts at the leading edge. */
   align?: 'start' | 'center-when-fit';
+
+  /**
+   * ADDITIVE. An action rendered at the trailing edge of the scrollable row,
+   * separated from the last chip by the same gap the chips use. The caller owns
+   * the button styling and semantics; RailChips only guarantees it scrolls
+   * with the chips and stays reachable when the row overflows.
+   */
+  trailing?: React.ReactNode;
 }
 
 /** The applied-state ground: 6% white, stated once. */
