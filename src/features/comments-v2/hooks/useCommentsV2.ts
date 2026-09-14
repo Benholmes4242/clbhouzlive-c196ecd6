@@ -427,6 +427,9 @@ export function useCommentsV2({
         patchEngagement(qc, targetId, { commentCountDelta: -(1 + (vars.replyCount ?? 0)) });
       }
       invalidate();
+      /* RULING C — deleting the newest comment leaves the card quoting a
+         comment that no longer exists; the same gap, same fix. */
+      invalidateFeedPreviews();
     },
   });
 
