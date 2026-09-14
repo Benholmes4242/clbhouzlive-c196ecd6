@@ -682,9 +682,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                       enabled={!!userId}
                       pos={pos}
                       source="suggested"
+                      blockGapAfter={pos === 0 ? BLOCK_GAP : 0}
                     />
                   ) : (
-                    <CircleShelf viewerId={userId} pos={pos} />
+                    <CircleShelf viewerId={userId} pos={pos} blockGapAfter={pos === 0 ? BLOCK_GAP : 0} />
                   )
                 ) : shelf === 'standing' ? (
                   <StandingShelf viewerId={userId} pos={pos} />

@@ -88,7 +88,16 @@ function toPar(row: CircleRoundRow): number | null {
   return row.gross != null && row.course_par != null ? row.gross - row.course_par : null;
 }
 
-export function CircleShelf({ viewerId, pos }: { viewerId: string | undefined; pos: number }) {
+export function CircleShelf({
+  viewerId,
+  pos,
+  blockGapAfter = 0,
+}: {
+  viewerId: string | undefined;
+  pos: number;
+  /** Additive layout hook for a shelf moved outside the stream's gap-owning grid. */
+  blockGapAfter?: number;
+}) {
   const { t } = useTranslation('courses');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [target, setTarget] = useState<{ scoreId: string; userId: string } | null>(null);
@@ -127,7 +136,13 @@ export function CircleShelf({ viewerId, pos }: { viewerId: string | undefined; p
   };
 
   if (!viewerId) return null;
-  if (!circle.isFetched || !total.isFetched) return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
+  if (!circle.isFetched || !total.isFetched) {
+    return (
+      <div style={{ marginBottom: blockGapAfter }}>
+        <ShelfShell tileW={TILE.w} tileH={TILE.h} />
+      </div>
+    );
+  }
   /* §4 A viewer who follows nobody, or whose circle has no tracked rounds, gets
      NO SHELF. Skipped; the next shelf takes the slot. */
   if (rows.length === 0) return null;
@@ -136,8 +151,9 @@ export function CircleShelf({ viewerId, pos }: { viewerId: string | undefined; p
 
   return (
     <>
-      <ExploreShelf
-        heading={t('amateur.stream.shelf.circle', 'Your circle')}
+      <div style={{ marginBottom: blockGapAfter }}>
+        <ExploreShelf
+          heading={t('amateur.stream.shelf.circle', 'Your circle')}
         /* Sentence-case see-all: the horizontal-rail convention. Only where
            there is more than the rail draws. */
         seeAllLabel={
@@ -145,11 +161,11 @@ export function CircleShelf({ viewerId, pos }: { viewerId: string | undefined; p
         }
         metaLabel={t('amateur.stream.roundCount', '{{count}} rounds', { count: shown })}
         onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'circle', pos })}
-        onSeeAll={() => {
+          onSeeAll={() => {
           analyticsEvents.track('amateur_shelf_see_all', { kind: 'circle' });
           setSheetOpen(true);
-        }}
-      >
+          }}
+        >
         {tiles.map((row) => {
           const course = row.course_id ? meta.data?.get(row.course_id) : null;
           return (
@@ -187,7 +203,8 @@ export function CircleShelf({ viewerId, pos }: { viewerId: string | undefined; p
             </div>
           );
         })}
-      </ExploreShelf>
+        </ExploreShelf>
+      </div>
 
       {/* SEE-ALL IS A SHEET, NOT A ROUTE: the member is coming back to the
           stream. Newest first, complete. */}

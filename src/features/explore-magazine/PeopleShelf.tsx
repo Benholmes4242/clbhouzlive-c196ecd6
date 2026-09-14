@@ -48,6 +48,7 @@ export function PeopleShelf({
   enabled,
   pos,
   source = 'club',
+  blockGapAfter = 0,
 }: {
   viewerId: string | undefined;
   clubId: string | null;
@@ -56,6 +57,8 @@ export function PeopleShelf({
   pos: number;
   /** ADDITIVE, DEFAULTED: omit it and this is the club shelf, unchanged. */
   source?: 'club' | 'suggested';
+  /** Additive layout hook for a shelf moved outside the stream's gap-owning grid. */
+  blockGapAfter?: number;
 }) {
   const { t } = useTranslation('courses');
   /* THE REASON COPY LIVES WITH THE ENGINE, in the common namespace, so the shelf
@@ -92,25 +95,33 @@ export function PeopleShelf({
 
   if (!enabled) return null;
   if (!suggested && !clubId) return null;
-  if (!isFetched) return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
+  if (!isFetched) {
+    return (
+      <div style={{ marginBottom: blockGapAfter }}>
+        <ShelfShell tileW={TILE.w} tileH={TILE.h} />
+      </div>
+    );
+  }
   /* §5 NOBODY TO SUGGEST, NO SHELF. No placeholder, no apology. */
   if (rows.length === 0) return null;
 
   return (
-    <ExploreShelf
-      heading={
-        suggested
-          ? t('amateur.shelf.golfersToFollow', 'Golfers to follow')
-          : t('amateur.shelf.golfersAtClub', 'Golfers at {{club}}', {
-              club: clubName ?? t('amateur.shelf.yourClub', 'your club'),
-            })
-      }
-      onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind, pos })}
-    >
-      {rows.map((person) => (
-        <PersonTile key={person.userId} golfer={person} pos={pos} kind={kind} />
-      ))}
-    </ExploreShelf>
+    <div style={{ marginBottom: blockGapAfter }}>
+      <ExploreShelf
+        heading={
+          suggested
+            ? t('amateur.shelf.golfersToFollow', 'Golfers to follow')
+            : t('amateur.shelf.golfersAtClub', 'Golfers at {{club}}', {
+                club: clubName ?? t('amateur.shelf.yourClub', 'your club'),
+              })
+        }
+        onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind, pos })}
+      >
+        {rows.map((person) => (
+          <PersonTile key={person.userId} golfer={person} pos={pos} kind={kind} />
+        ))}
+      </ExploreShelf>
+    </div>
   );
 }
 
