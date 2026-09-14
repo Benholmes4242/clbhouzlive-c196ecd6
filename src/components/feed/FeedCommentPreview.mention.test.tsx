@@ -86,12 +86,12 @@ describe('FeedCommentPreview mention integration', () => {
     const { container } = wrap(
       <FeedCommentPreview preview={{ ...preview, content: long }} commentCount={1} onOpenComments={() => {}} />,
     );
-    const clamp = container.querySelector('span[style*="-webkit-line-clamp: 2"]');
+    const clamp = screen.getByText('Bob').parentElement;
 
     expect(clamp).toHaveStyle({
       overflow: 'hidden',
     });
-    expect(clamp).toHaveStyle('-webkit-line-clamp: 2');
+    expect(clamp?.style.getPropertyValue('-webkit-line-clamp')).toBe('2');
     expect(clamp).toContainElement(container.querySelector('[data-mention-type="user"]') as HTMLElement);
   });
 
