@@ -50,7 +50,7 @@ function rowFor(index: CourseCandidateIndex, courseId: string, override?: Partia
   return {
     courseId,
     name: course?.name ?? null,
-    area: course?.region ?? course?.subCountry ?? null,
+    area: coursePlaceLine(course),
     imageUrl: course?.imageUrl ?? null,
     rounds: index.roundsByCourse.get(courseId) ?? 0,
     rating: ratings ? ratings.mean : null,

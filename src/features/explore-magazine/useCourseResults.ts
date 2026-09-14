@@ -135,6 +135,7 @@ export function useCourseResults(
           course_name: course?.name ?? null,
           region: course?.region ?? null,
           sub_country: course?.subCountry ?? null,
+          country: course?.country ?? null,
           image_url: course?.imageUrl ?? null,
           pending: false,
         },

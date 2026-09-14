@@ -108,7 +108,7 @@ export function useRecentCourseRatings(enabled: boolean) {
         return {
           courseId,
           name: course?.name ?? null,
-          area: course?.region ?? course?.subCountry ?? null,
+          area: coursePlaceLine(course),
           imageUrl: course?.imageUrl ?? null,
           rounds: 0,
           rating: group.mean,
@@ -261,8 +261,9 @@ export function useScopeCourses(
           subject: {
             course_id: row.course_id,
             course_name: row.name ?? course?.name ?? null,
-            region: course?.region ?? row.area ?? null,
-            sub_country: course?.subCountry ?? null,
+            region: course?.region ?? null,
+            sub_country: course?.subCountry ?? row.area ?? null,
+            country: course?.country ?? null,
             image_url: row.thumbnail_image ?? course?.imageUrl ?? null,
             /* THE RESOLVER HOLDS THE SHELL until it settles — never a gradient
                standing in for an unknown photograph. */
