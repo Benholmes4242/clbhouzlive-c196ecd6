@@ -21,6 +21,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
 import { ExploreShelf } from './ExploreShelf';
+import { CircleShelf } from './CircleShelf';
 import { StandingShelf } from './StandingShelf';
 import { LeadShell, PairShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
 import { listCourseEvents } from './listCourseEvents';
@@ -78,6 +79,9 @@ const MOMENT_TILE = { w: 132, h: 132 };
 type ShelfKind =
   | 'clips'
   | 'clubWeek'
+  /** BRIEF_EXPLORE_CIRCLE_SHELF — latest rounds from the people you follow,
+   *  newest first. ALL ONLY: it is absent from Scores, Courses, Reviews, Watch. */
+  | 'circle'
   | 'standing'
   | 'coursesCounty'
   | 'moments'
@@ -426,6 +430,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const ALL_SHELVES: ShelfKind[] = [
     'clips',
     'clubWeek',
+    /* AFTER THE CLIPS SHELF AND BEFORE "WHERE YOU STAND" (brief §1): recent
+       rounds from people you follow are more of a reason to open the page than
+       your own standing is. */
+    'circle',
     'standing',
     'coursesCounty',
     'moments',
@@ -652,6 +660,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
                     pos={pos}
                   />
+                ) : shelf === 'circle' ? (
+                  <CircleShelf viewerId={userId} pos={pos} />
                 ) : shelf === 'standing' ? (
                   <StandingShelf viewerId={userId} pos={pos} />
                 ) : shelf === 'coursesCounty' ? (

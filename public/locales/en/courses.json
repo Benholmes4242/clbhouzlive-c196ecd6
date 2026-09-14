@@ -76,7 +76,8 @@
         "clips": "Clips",
         "moments": "From the community",
         "standing": "Where you stand",
-        "clubWeek": "This week at {{club}}"
+        "clubWeek": "This week at {{club}}",
+        "circle": "Your circle"
       },
       "scope": {
         "club": "My club",

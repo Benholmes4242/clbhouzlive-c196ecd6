@@ -1550,7 +1550,8 @@
         "clips": "クリップ",
         "moments": "コミュニティから",
         "standing": "あなたの順位",
-        "clubWeek": "{{club}}の今週"
+        "clubWeek": "{{club}}の今週",
+        "circle": "あなたのサークル"
       },
       "scope": {
         "club": "マイクラブ",

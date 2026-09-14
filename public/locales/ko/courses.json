@@ -1553,7 +1553,8 @@
         "clips": "클립",
         "moments": "커뮤니티에서",
         "standing": "나의 순위",
-        "clubWeek": "이번 주 {{club}}"
+        "clubWeek": "이번 주 {{club}}",
+        "circle": "내 서클"
       },
       "scope": {
         "club": "내 클럽",

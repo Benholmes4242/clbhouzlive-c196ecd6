@@ -1614,7 +1614,8 @@
         "clips": "Clips",
         "moments": "De la comunidad",
         "standing": "Donde estas",
-        "clubWeek": "Esta semana en {{club}}"
+        "clubWeek": "Esta semana en {{club}}",
+        "circle": "Tu círculo"
       },
       "scope": {
         "club": "Mi club",

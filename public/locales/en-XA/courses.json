@@ -2198,7 +2198,8 @@
         "clips": "[Çlîps one]",
         "moments": "[Fröm thé çömmünîty one]",
         "standing": "[Where you stand]",
-        "clubWeek": "[Thîs wéék åt {{club}} one two]"
+        "clubWeek": "[Thîs wéék åt {{club}} one two]",
+        "circle": "[Yóür çîrçlé one two]"
       },
       "scope": {
         "club": "[Mý çlüb one]",
