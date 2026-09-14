@@ -83,10 +83,16 @@ export function leadRatedShelf(index: CourseCandidateIndex): LeadRatedShelf {
   return { rows: pick((s) => s.n365, (s) => s.mean365), window: 'year' };
 }
 
-/** §4 WORTH THE DRIVE — high rating, low round count. */
-export function worthTheDriveShelf(index: CourseCandidateIndex): CourseShelfRow[] {
+/** §4 WORTH THE DRIVE — high rating, low round count.
+ *
+ *  IT NEVER REPEATS THE LEAD RAIL'S TILES. The two rails share a rating floor,
+ *  so on today's base the same two courses led both and the second rail read as
+ *  the first one again. §4's rule is that a break must not repeat what another
+ *  break said; excluding the lead's courses is that rule at the tile level. */
+export function worthTheDriveShelf(index: CourseCandidateIndex, exclude: Set<string> = new Set()): CourseShelfRow[] {
   return Array.from(index.ratingsByCourse.entries())
     .filter(([courseId, stats]) => {
+      if (exclude.has(courseId)) return false;
       const rounds = index.roundsByCourse.get(courseId) ?? 0;
       return stats.n >= RATING_FLOOR && stats.mean >= WORTH_DRIVE_RATING && rounds <= WORTH_DRIVE_MAX_ROUNDS;
     })
@@ -163,13 +169,17 @@ export function countyShelfRows(index: CourseCandidateIndex, county: string | nu
 
 export function useMergedCourseShelves(index: CourseCandidateIndex, county: string | null, circleIds: string[]) {
   return useMemo(
-    () => ({
-      lead: leadRatedShelf(index),
-      worthDrive: worthTheDriveShelf(index),
+    () => {
+      const lead = leadRatedShelf(index);
+      const led = new Set(lead.rows.map((row) => row.courseId));
+      return {
+      lead,
+      worthDrive: worthTheDriveShelf(index, led),
       newly: newlyRatedShelf(index),
       circle: circleShelfRows(index, circleIds),
       county: countyShelfRows(index, county),
-    }),
+      };
+    },
     [index, county, circleIds],
   );
 }
