@@ -134,6 +134,11 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
           </button>
         );
       })}
+      {trailing ? (
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+          {trailing}
+        </div>
+      ) : null}
     </div>
   );
 }
