@@ -108,6 +108,17 @@ export function ExploreShelf({
         ) : null}
       </div>
 
+      {/* BRIEF_COURSES_MERGED §4 THE RAIL'S BASIS SITS UNDER ITS HEADING, not
+          beside it. Measured at 320px, "Rated highly by the few who have played
+          them" in the meta slot collided with a wrapping two-word heading; a
+          sentence that explains a rail is a sub-line, never a right-hand chip. */}
+      {sub ? (
+        <div style={{ padding: '2px 16px 0', color: A.MUTE, fontSize: 12, fontWeight: 500, lineHeight: 1.35 }}>
+          {sub}
+        </div>
+      ) : null}
+
+
       <div
         style={{
           marginTop: 10,
