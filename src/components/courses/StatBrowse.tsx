@@ -13,6 +13,7 @@ import {
   Globe,
   Search,
   Star,
+  X,
 } from 'lucide-react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
