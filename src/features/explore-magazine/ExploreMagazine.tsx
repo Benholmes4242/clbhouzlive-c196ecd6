@@ -427,12 +427,26 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   /* THE RPC HAS NO 'circle' SCOPE. Reported: rather than invent a scope string
      the deployed function would fall through, the circle set is composed from the
      index above and the RPC is not asked. */
-  const serverScope = activeScope === 'circle' ? 'world' : activeScope;
+  const chipScope = activeScope === 'circle' ? 'world' : activeScope;
+  /* SCORES: A CHOSEN PLACE IS THE *WHERE* (BRIEF_EXPLORE_SECOND_PASS §3). The
+     rounds body already reads geography from ONE resolver and already knows how
+     to be asked for a county or a country, so a chosen place is expressed in that
+     same vocabulary rather than in a second filtering path: the place supplies
+     the county and country, and the scope the ranker is asked for becomes
+     'county' (a region was chosen) or 'country'. The chips stay usable — a member
+     who then picks My club is asking a narrower question and gets it. */
+  const placeScoped = view === 'scores' && place !== null;
+  const streamGeo = placeScoped
+    ? { ...geography.scope, county: place?.region ?? null, country: place?.country ?? null }
+    : geography.scope;
+  const serverScope: ScoreScope =
+    placeScoped && chipScope === 'world' ? (place?.region ? 'county' : 'country') : chipScope;
   const server = useExploreStream(userId && serverReady && !indexPath ? userId : undefined, view, serverScope, {
-    clubId: geography.scope.primaryClubId,
-    county: geography.scope.county,
-    country: geography.scope.country,
+    clubId: streamGeo.primaryClubId,
+    county: streamGeo.county,
+    country: streamGeo.country,
   });
+
   /* §2 ONE MIXED STREAM, TWO SERVER POOLS. The ranker still serves this view -
      the merge changes COMPOSITION, not ranking: each pool arrives already ranked
      and cadenced by the RPC and the two are interleaved by the score the RPC
@@ -455,7 +469,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
        composed the reviews pool under the 'reviews' view; the merged view asks it
        for exactly that and takes its course cards from useScopeCourses below. */
     view === 'courses' ? 'reviews' : view,
-    { active: serverScope, geography: geography.scope },
+    { active: serverScope, geography: streamGeo },
     /* WATCH IS ITS OWN SURFACE NOW (BRIEF_WATCH_MIXED_FEED): WatchFeed owns the
        long-form, clip and community reads, so this composition no longer issues
        a single read for it. */
@@ -482,10 +496,18 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
   /* THE CANDIDATE INDEX (BRIEF_COURSES_MERGED). One bounded read behind the four
      new rails, the search and the region dropdown, so a count and a tile can
-     never disagree. */
-  const candidates = useCourseCandidateIndex(view === 'courses');
+     never disagree. SCORES SHARES IT (BRIEF_EXPLORE_SECOND_PASS §3): its place
+     dropdown is the same component reading the same index, so the two views can
+     never disagree about which places exist or how many courses are in one. */
+  const candidates = useCourseCandidateIndex(view === 'courses' || view === 'scores');
   const circle = useCircleCourseIds(userId, view === 'courses');
-  const places = useMemo(() => placeTree(candidates.index), [candidates.index]);
+  /* "HAS CONTENT" IS A PARAMETER, NOT A FORK (§3). Scores is rounds, so a place
+     qualifies on TRACKED ROUNDS; the merged Courses view keeps rounds OR ratings. */
+  const places = useMemo(
+    () => placeTree(candidates.index, view === 'scores' ? 'rounds' : 'roundsOrRatings'),
+    [candidates.index, view],
+  );
+
   const searchHit = useMemo(
     () => (query.length >= 2 ? searchCourses(candidates.index, query) : null),
     [candidates.index, query],
@@ -1089,13 +1111,29 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           Courses view. Scores does not render it at all where neither a club nor
           a county resolves, and the view is then World.
 
-          BRIEF_EXPLORE_DEVICE_PASS §1b THE SCOPE ROW IS THE SECONDARY ROW. It
-          takes the SAME selection language as the view row above it — the 6%
-          white ground — one size down. The solid white fill is retired here: a
-          filter must never be the loudest control on the page, and SIZE, not
-          treatment, is what states the hierarchy. */}
+          BRIEF_EXPLORE_SECOND_PASS §1 REVERSES THE 'sm' RULING. Every secondary
+          row in Explore is now ONE size — the Watch filter row's, which is the
+          canonical 'md' chip — so the three rows agree with each other and with
+          the reference. The hierarchy is carried by position and by the primary
+          row being CENTRED, not by shrinking the filter.
+
+          §2 EQUAL WIDTH, DISTRIBUTED: the four chips share the run between the
+          left gutter and the place dropdown evenly. The dropdown keeps its own
+          width at the right end and is not part of that distribution — it is a
+          different kind of control. */}
       {view === 'scores' && geography.isFetched && (geography.scope.primaryClubId || geography.scope.county) ? (
-        <div style={{ padding: '0 12px 14px', minWidth: 0, overflow: 'hidden' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '0 12px 14px',
+            minWidth: 0,
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+          }}
+        >
+          <div style={{ minWidth: 0, flex: '1 1 auto' }}>
           <RailChips
             options={[
               ...(geography.scope.primaryClubId ? [{ id: 'club', label: t('amateur.stream.scope.club', 'My club') }] : []),
@@ -1114,7 +1152,33 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             }}
             ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
             ground="filled-selection"
-            size="sm"
+            distribute
+          />
+          </div>
+          {/* §3 THE PLACE FILTER COMES TO SCORES — the SAME component and the
+              SAME data path as Courses, with the "has content" rule handed in as
+              a PARAMETER: Scores is rounds, so a place qualifies on TRACKED
+              ROUNDS, which is a strict subset of the Courses rule (rounds OR
+              ratings). Picking a place resets scope to World, exactly as on
+              Courses; clearing it leaves scope where the member left it. */}
+          <RegionDropdown
+            tree={places}
+            choice={place}
+            onChoose={(next) => {
+              analyticsEvents.track('amateur_place_changed', {
+                view,
+                country: next?.country ?? null,
+                region: next?.region ?? null,
+                scope_reset: next !== null && scoreScope !== 'world',
+              });
+              setPlace(next);
+              if (next !== null) {
+                scoreScopeChosen.current = true;
+                setScoreScope('world');
+              }
+              setRevealed(STREAM_PAGE_SIZE);
+              loggedRef.current = 0;
+            }}
           />
         </div>
       ) : null}
@@ -1149,7 +1213,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               circle and no county the only chip would be World, so the chips
               stand down and the place dropdown - which does have somewhere to go
               - keeps the row. */}
-          <div style={{ minWidth: 0, flex: '1 1 auto', overflow: 'hidden' }}>
+          <div style={{ minWidth: 0, flex: '1 1 auto' }}>
             {hasCircle || geography.scope.county ? (
             <RailChips
               options={[
@@ -1169,7 +1233,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               }}
               ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
               ground="filled-selection"
-              size="sm"
+              distribute
             />
             ) : null}
           </div>
@@ -1178,6 +1242,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             choice={place}
             onChoose={(next) => {
               analyticsEvents.track('amateur_place_changed', {
+                view,
                 country: next?.country ?? null,
                 region: next?.region ?? null,
                 scope_reset: next !== null && coursesScope !== 'world',
@@ -1195,6 +1260,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           />
         </div>
       ) : null}
+
 
 
 
