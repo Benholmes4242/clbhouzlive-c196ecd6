@@ -21,6 +21,7 @@ export function MediaRailTile({
   item,
   index,
   width,
+  aspect,
   autoplayGroup,
   maxPlaying = 2,
   onPress,
@@ -28,10 +29,19 @@ export function MediaRailTile({
   item: CommunityLibraryItem;
   index: number;
   width: number;
+  /**
+   * ADDITIVE. The tile's frame ratio, where the caller knows it. Width used to
+   * IMPLY the ratio (176 meant portrait, anything else landscape), which meant a
+   * rail could not be resized without silently changing shape
+   * (BRIEF_EXPLORE_DEVICE_PASS §2b). Omitted, the old width rule still applies,
+   * so every existing caller is unchanged.
+   */
+  aspect?: string;
   autoplayGroup: string;
   maxPlaying?: number;
   onPress: () => void;
 }) {
+
   const reducedMotion = usePrefersReducedMotion();
   const hostRef = useRef<HTMLButtonElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
