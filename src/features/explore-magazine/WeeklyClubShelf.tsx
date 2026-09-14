@@ -10,7 +10,7 @@ import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/rou
 
 import { ExploreShelf } from './ExploreShelf';
 import { ShelfShell } from './ExploreShells';
-import { relativeDay, toParLabel } from './exploreCopy';
+import { railCaptionDate, toParLabel } from './exploreCopy';
 import { useClubWeekRounds } from './useClubWeekRounds';
 
 const TILE = { w: 206, h: 118 };
@@ -74,10 +74,11 @@ export function WeeklyClubShelf({
               imageUrl={course?.imageUrl ?? null}
               region={null}
               photo={TILE.h}
-              reserveTwoLines
               figure={row.gross_score != null ? String(row.gross_score) : null}
               unit={toParLabel(toPar) ?? undefined}
-              whenLabel={relativeDay(row.play_date) ?? ''}
+              /* DATE BELONGS UNDER THE MEMBER NAME. Using the fixed calendar
+                 formatter prevents "Sun" and "Sun 6 Sep" within one rail. */
+              whenLabel=""
               who={who}
               /* IDENTITY IS user_profiles AND NOTHING ELSE. get_board_page
                  already joins user_profiles for display_name and
@@ -89,6 +90,11 @@ export function WeeklyClubShelf({
               avatarUrl={row.profile_photo_url ?? null}
               avatarUserId={row.user_id}
               isOwn={row.user_id === viewerId}
+              railCaptionLine={
+                <span style={{ fontSize: 11, lineHeight: 1, color: '#6B7280' }}>
+                  {railCaptionDate(row.play_date) ?? ''}
+                </span>
+              }
 
               onPress={() => {
                 analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'club_week', pos });
