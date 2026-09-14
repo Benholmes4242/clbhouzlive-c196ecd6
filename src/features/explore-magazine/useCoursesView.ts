@@ -302,7 +302,13 @@ export function useScopeCourses(
             rating_n: row.rating_count,
             top100_world: rank?.world ? rank.rank : null,
             top100_regional: rank && !rank.world ? rank.rank : null,
+            /* BRIEF_COURSES_MERGED §3 — THE PAIRING RULE READS THIS FACT. The
+               merged view pairs STABLE-FACT course cards two-up and gives event
+               cards the full width, so the event kind has to travel with the card
+               in the fallback exactly as it already does from the RPC. */
+            course_event: event,
           },
+
           payload: {},
           seen: false,
         },

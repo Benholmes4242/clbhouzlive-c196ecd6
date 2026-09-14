@@ -83,7 +83,9 @@
         "club": "My club",
         "world": "World",
         "yourClub": "your club",
-        "theWorld": "the world"
+        "theWorld": "the world",
+        "circle": "My circle",
+        "yourCircle": "your circle"
       },
       "scopes": "Scores scope",
       "roundCount": "{{count}} rounds",
@@ -240,7 +242,17 @@
       "golfersToFollow": "Golfers to follow",
       "playsAtClub": "Plays at {{club}}",
       "roundsThisMonth": "{{count}} rounds this month",
-      "alsoPlays": "Also plays {{course}}"
+      "alsoPlays": "Also plays {{course}}",
+      "highestRatedMonth": "Highest rated this month",
+      "highestRatedYear": "Highest rated this year",
+      "circlePlays": "Where your circle plays",
+      "circlePlaysSub": "Courses the people you follow have played",
+      "worthTheDrive": "Worth the drive",
+      "worthTheDriveSub": "Rated highly by the few who have played them",
+      "worldsBest": "The world's best",
+      "worldsBestSub": "Top 100 by rank",
+      "newOnClbhouz": "New on clbhouz",
+      "newOnClbhouzSub": "Courses rated here for the first time"
     },
     "watch": {
       "searchPlaceholder": "Search videos, clips and creators",
@@ -261,6 +273,17 @@
         "community": "From the community",
         "videos": "Videos"
       }
+    },
+    "courses": {
+      "searchPlaceholder": "Search courses, regions and reviews",
+      "searchClear": "Clear search",
+      "noMatch": "Nothing matches {{query}}.",
+      "noPlaceMatch": "Nothing matches {{query}}.",
+      "anywhere": "Anywhere",
+      "choosePlace": "Choose a place",
+      "clearPlace": "Clear place filter",
+      "placeTitle": "Browse by place",
+      "findPlace": "Find a country or region"
     }
   },
   "amateurNews": {

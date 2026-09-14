@@ -1557,7 +1557,9 @@
         "club": "マイクラブ",
         "world": "世界",
         "yourClub": "your club",
-        "theWorld": "the world"
+        "theWorld": "the world",
+        "circle": "マイサークル",
+        "yourCircle": "あなたのサークル"
       },
       "scopes": "スコアの範囲",
       "roundCount": "{{count}}ラウンド",
@@ -1717,7 +1719,17 @@
       "golfersToFollow": "フォローするゴルファー",
       "playsAtClub": "{{club}}でプレー",
       "roundsThisMonth": "今月{{count}}ラウンド",
-      "alsoPlays": "{{course}}でもプレー"
+      "alsoPlays": "{{course}}でもプレー",
+      "highestRatedMonth": "今月の高評価コース",
+      "highestRatedYear": "今年の高評価コース",
+      "circlePlays": "フォロー中の人がプレーした場所",
+      "circlePlaysSub": "あなたがフォローしている人がプレーしたコース",
+      "worthTheDrive": "足を運ぶ価値あり",
+      "worthTheDriveSub": "プレーした少数の人から高く評価されています",
+      "worldsBest": "世界のベストコース",
+      "worldsBestSub": "ランク順のトップ100",
+      "newOnClbhouz": "clbhouzの新着",
+      "newOnClbhouzSub": "ここで初めて評価されたコース"
     },
     "watch": {
       "searchPlaceholder": "動画・クリップ・クリエイターを検索",
@@ -1738,6 +1750,17 @@
         "community": "コミュニティから",
         "videos": "動画"
       }
+    },
+    "courses": {
+      "searchPlaceholder": "コース、地域、レビューを検索",
+      "searchClear": "検索をクリア",
+      "noMatch": "{{query}} に一致するものはありません。",
+      "noPlaceMatch": "{{query}} に一致するものはありません。",
+      "anywhere": "すべての地域",
+      "choosePlace": "地域を選ぶ",
+      "clearPlace": "地域の絞り込みを解除",
+      "placeTitle": "地域から探す",
+      "findPlace": "国または地域を検索"
     }
   }
 }

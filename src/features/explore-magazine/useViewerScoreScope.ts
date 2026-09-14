@@ -2,8 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
 
-/** Geography shared by Scores now and the Phase C county/world surfaces. */
-export type ScoreScope = 'club' | 'county' | 'country' | 'world';
+/** Geography shared by Scores now and the Phase C county/world surfaces.
+ *  'circle' is the MERGED COURSES VIEW'S OWN scope (BRIEF_COURSES_MERGED §5):
+ *  courses the people the viewer follows have played or rated. It is a SOCIAL
+ *  set, not a geographic one, which is why it never appears on Scores. */
+export type ScoreScope = 'club' | 'county' | 'country' | 'world' | 'circle';
 
 export interface ViewerScoreScope {
   primaryClubId: string | null;

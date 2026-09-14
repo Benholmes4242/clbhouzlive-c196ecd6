@@ -7,26 +7,35 @@
  * exactly that lifetime.
  */
 
+/** 'reviews' IS RETIRED AS A VIEW (BRIEF_COURSES_MERGED §1) and kept in the type
+ *  ON PURPOSE: the server ranker still answers p_view = 'reviews', the client
+ *  composition still composes it, and the merged Courses view reads BOTH pools.
+ *  Nothing about the reviews path is deleted; it simply has no chip. */
 export type ExploreView = 'all' | 'scores' | 'watch' | 'courses' | 'reviews';
 
-/** PHASE C §1 THE CHIP ROW IS COMPLETE. Courses and Reviews are built, so they
- *  render; a control that cannot change what you see still never appears. */
-export const EXPLORE_VIEWS: ExploreView[] = ['all', 'scores', 'watch', 'courses', 'reviews'];
+/** FOUR CHIPS (BRIEF_COURSES_MERGED §1). Courses and Reviews are ONE view named
+ *  Courses: a member arriving wants places to play, not a data type. It also
+ *  fixes the live 320px bleed the fifth chip caused. */
+export const EXPLORE_VIEWS: ExploreView[] = ['all', 'scores', 'watch', 'courses'];
 
 /** §1 the views that carry the SCOPE ROW. All and Watch never do. */
-export const SCOPED_VIEWS: ExploreView[] = ['scores', 'courses', 'reviews'];
+export const SCOPED_VIEWS: ExploreView[] = ['scores', 'courses'];
 
 const KEY = 'amateur:view';
 
 export function readExploreView(): ExploreView {
   try {
     const raw = sessionStorage.getItem(KEY);
+    /* A SESSION THAT REMEMBERED 'reviews' LANDS ON THE MERGED VIEW, never on a
+       chip that no longer exists. */
+    if (raw === 'reviews') return 'courses';
     if (raw && EXPLORE_VIEWS.includes(raw as ExploreView)) return raw as ExploreView;
   } catch {
     /* private mode: All. */
   }
   return 'all';
 }
+
 
 export function writeExploreView(view: ExploreView): void {
   try {

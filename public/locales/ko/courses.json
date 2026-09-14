@@ -1560,7 +1560,9 @@
         "club": "내 클럽",
         "world": "세계",
         "yourClub": "your club",
-        "theWorld": "the world"
+        "theWorld": "the world",
+        "circle": "내 서클",
+        "yourCircle": "내 서클"
       },
       "scopes": "스코어 범위",
       "roundCount": "{{count}}라운드",
@@ -1720,7 +1722,17 @@
       "golfersToFollow": "팔로우할 골퍼",
       "playsAtClub": "{{club}} 플레이",
       "roundsThisMonth": "이번 달 {{count}} 라운드",
-      "alsoPlays": "{{course}}도 플레이"
+      "alsoPlays": "{{course}}도 플레이",
+      "highestRatedMonth": "이번 달 최고 평점",
+      "highestRatedYear": "올해 최고 평점",
+      "circlePlays": "내 서클이 플레이한 곳",
+      "circlePlaysSub": "팔로우하는 사람들이 플레이한 코스",
+      "worthTheDrive": "멀리 갈 만한 곳",
+      "worthTheDriveSub": "플레이한 소수가 높게 평가한 코스",
+      "worldsBest": "세계 최고의 코스",
+      "worldsBestSub": "순위 기준 top 100",
+      "newOnClbhouz": "clbhouz의 새 코스",
+      "newOnClbhouzSub": "여기서 처음 평가된 코스"
     },
     "watch": {
       "searchPlaceholder": "영상, 클립, 크리에이터 검색",
@@ -1741,6 +1753,17 @@
         "community": "커뮤니티",
         "videos": "영상"
       }
+    },
+    "courses": {
+      "searchPlaceholder": "코스, 지역, 리뷰 검색",
+      "searchClear": "검색 지우기",
+      "noMatch": "{{query}}와 일치하는 것이 없습니다.",
+      "noPlaceMatch": "{{query}}와 일치하는 것이 없습니다.",
+      "anywhere": "모든 지역",
+      "choosePlace": "지역 선택",
+      "clearPlace": "지역 필터 해제",
+      "placeTitle": "지역으로 찾기",
+      "findPlace": "국가 또는 지역 검색"
     }
   }
 }
