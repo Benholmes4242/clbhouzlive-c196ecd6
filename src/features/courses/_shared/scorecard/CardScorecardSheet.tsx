@@ -1253,7 +1253,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   count (INDEX THEN can resolve on its own) it falls back to the
                   bare title rather than claiming "your 0 rounds here". */}
               {courseSection.length > 0 && (
-                <ScorecardSection kicker={t('courses:scorecard.atThisCourseBare')} flat={!isTour}>
+                <ScorecardSection
+                  kicker={t(isOwner ? 'courses:scorecard.atThisCourseSelf' : 'courses:scorecard.atThisCourseOther', {
+                    name: playerName,
+                  })}
+                  flat={!isTour}
+                >
                   <div style={{ display: 'grid', gridTemplateColumns: `repeat(${courseSection.length}, minmax(0, 1fr))`, alignItems: 'start' }}>
                     {courseSection.map((it) => (
                       <div key={it.key} style={{ minWidth: 0, textAlign: 'center', padding: '0 4px' }}>

@@ -2153,6 +2153,8 @@
   },
   "scorecard": {
     "atThisCourseBare": "At this course",
+    "atThisCourseSelf": "You at this course",
+    "atThisCourseOther": "{{name}} at this course",
     "atThisCourse_one": "At this course · your {{count}} round here",
     "atThisCourse_other": "At this course · your {{count}} rounds here",
     "avgHereNeutral": "Avg here",

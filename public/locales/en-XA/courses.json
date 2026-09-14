@@ -1704,6 +1704,8 @@
   },
   "scorecard": {
     "atThisCourseBare": "At this course",
+    "atThisCourseSelf": "[~~Ýőú áţ ţĥíš ĉőúřšé~~]",
+    "atThisCourseOther": "[~~{{name}} áţ ţĥíš ĉőúřšé~~]",
     "atThisCourse_one": "At this course · your {{count}} round here",
     "atThisCourse_other": "At this course · your {{count}} rounds here",
     "avgHereNeutral": "[~~Áṽĝ ĥéřé~~]",
