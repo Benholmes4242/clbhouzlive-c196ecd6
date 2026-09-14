@@ -285,7 +285,7 @@ export function CircleShelf({
               {t('amateur.stream.shelf.circle', 'Your circle')}
             </span>
             <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 600, color: A.MUTE }}>
-              {t('amateur.stream.roundCount', '{{count}} rounds', { count: shown })}
+              {t('amateur.stream.allRounds', 'All rounds')}
             </span>
           </div>
           {rows.map((row) => {
