@@ -6,6 +6,7 @@ import { RefreshCw, Table } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
+import { TrajectoryLine } from './TrajectoryLine';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
 import {
@@ -1278,7 +1279,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 <RoundSplit split={split} />
               </ScorecardSection>
 
-              {isTour && null}
+              {isTour && (
+                <Panel kicker={t('courses:scorecard.howItUnfolded')}>
+                  <TrajectoryLine holes={holes} height={120} surface="dark" interactive showFieldComparison />
+                </Panel>
+              )}
             </>
           )}
 
