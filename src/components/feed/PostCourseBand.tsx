@@ -192,6 +192,16 @@ interface Props {
   extra?: React.ReactNode;
   /** 'glass' when the card carries a photo backdrop. Default 'solid'. */
   surface?: 'solid' | 'glass';
+  /**
+   * BRIEF_CLUBHOUSE_REVIEW_POST_ONE_DESTINATION §1-2. Review post cards pass
+   * true: the band states the course name and its place and NOTHING else — no
+   * community rating chip, no contextual figure ("field avg 3.4 / top 10%
+   * hardest"), no chevron, and no tap. A review card has one destination and it
+   * is the review sheet, so the band cannot be a second door.
+   *
+   * Default false — every other post kind keeps the shipped band verbatim.
+   */
+  identityOnly?: boolean;
   /** Host surface palette. Default 'dark' (Clubhouse slab); the light profile
    *  feed passes 'light'. Named `tone` because `surface` already means
    *  solid-vs-glass (media context), which is an orthogonal question. */
