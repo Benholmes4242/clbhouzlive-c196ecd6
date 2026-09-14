@@ -118,3 +118,4 @@
 - [Saturation is a Currency](mem://style/theme/saturation-is-a-currency) — Dark-canvas colour law: one loud element, score-vs-quantity figure roles, motion budget
 - [Nav Clearance Token](mem://architecture/layout/nav-clearance-token) — NAV_CLEARANCE is the only bottom padding for nav-visible pages; measured pill + gap + home indicator
 - [Amateur Cutover](mem://features/amateur/cutover-authority) — /amateur tab, /explore and library shims, /media as the one media destination
+- [Club Flood Is A Test-Base Artefact](mem://constraints/amateur/club-flood-is-a-test-base-artefact) — Never damp circle_round, cap per course, or lower the club ring; measured base skew, David Lang control
