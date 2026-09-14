@@ -24,7 +24,11 @@ function round(
   id: string,
   courseId: string,
   playDate: string,
-  opts: { own?: boolean; lane?: 'news' | 'backlog'; kind?: 'rank_down' | 'rank_up' | 'rank_hold' } = {},
+  opts: {
+    own?: boolean;
+    lane?: 'news' | 'backlog';
+    kind?: 'rank_down' | 'rank_up' | 'rank_hold' | 'played_nochange';
+  } = {},
 ): StreamItem {
   return {
     id,
