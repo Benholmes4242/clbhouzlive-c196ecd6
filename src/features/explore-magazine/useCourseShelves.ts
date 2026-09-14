@@ -7,6 +7,8 @@ import { useBoardCourses } from '@/components/explore-tab-new/courseled/hooks/us
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
 import { useUserWantToPlay } from '@/hooks/useUserWantToPlay';
 
+import { useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
+
 import type { ViewerScoreScope } from './useViewerScoreScope';
 
 /**
@@ -43,7 +45,10 @@ export interface CourseShelfRow {
   ratingCount: number;
   /** Top 100 rank, when the course carries one. */
   rank: number | null;
-  rankScopeWorld: boolean;
+  /** THE LIST THE RANK CAME FROM, read from the membership — never inferred from
+   *  a null field. Null means the scope is unresolved and the chip shows the
+   *  rank with NO label. */
+  rankScope: RankListSlug | null;
 }
 
 /** §3a AROUND {county} — most tracked rounds, then rating. */
