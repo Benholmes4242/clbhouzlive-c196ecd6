@@ -926,9 +926,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               background: hasRoundBackdrop ? CARD : undefined,
             }}
           >
-            {/* ACTIONS RIGHT (Ben's ruling). The picker stays far left; heart,
-                comment and share form ONE group pushed to the right edge by an
-                auto margin, keeping their existing 22px rhythm and tap targets.
+            {/* EVERYTHING LEFT, SHARE RIGHT (Ben, 14 Sep). One reading edge,
+                one acting edge: avatar/chevron, heart+count and comment+count
+                start at the 20px left margin; share sits alone on the right.
                 Same footer object on a normal post and a review post. */}
             <div
               style={{
@@ -939,23 +939,23 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               }}
             >
               <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 22 }}>
-                <FooterButton
-                  icon={Heart}
-                  label={likeCount > 0 ? formatCount(likeCount) : undefined}
-                  active={liked}
-                  onClick={() => onLike(post, effectiveActor)}
-                  activeColor={AMBER}
-                  haptic={!liked ? 'selection' : 'none'}
-                />
-                <FooterButton
-                  icon={MessageCircle}
-                  label={commentCount > 0 ? formatCount(commentCount) : undefined}
-                  onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
-                />
-                <FooterButton icon={Share} onClick={() => onShare(post)} />
-              </div>
+              <FooterButton
+                icon={Heart}
+                label={likeCount > 0 ? formatCount(likeCount) : undefined}
+                active={liked}
+                onClick={() => onLike(post, effectiveActor)}
+                activeColor={AMBER}
+                haptic={!liked ? 'selection' : 'none'}
+              />
+              <FooterButton
+                icon={MessageCircle}
+                label={commentCount > 0 ? formatCount(commentCount) : undefined}
+                onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
+              />
+              <div style={{ marginLeft: 'auto' }} />
+              <FooterButton icon={Share} onClick={() => onShare(post)} />
             </div>
+
 
             {showLikedBy && (
               /* LEFT-ALIGNED (Ben, 14 Sep — supersedes the right-aligned line
