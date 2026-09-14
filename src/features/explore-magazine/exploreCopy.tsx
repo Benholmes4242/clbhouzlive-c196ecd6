@@ -386,3 +386,21 @@ export function relativeDay(iso: string | null | undefined): string | null {
   if (days <= 60) return then.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
   return then.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
 }
+
+/**
+ * A RAIL CAPTION DATE IS A DATE, NOT AN AGE BUCKET. Unlike relativeDay, this
+ * never changes from "Sun" to "Sun 6 Sep" at an arbitrary seven-day boundary,
+ * so adjacent tiles in one chronological rail use one consistent grammar.
+ * Browser locale supplies the six supported locale forms without new copy.
+ */
+export function railCaptionDate(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const then = new Date(iso);
+  if (Number.isNaN(then.getTime())) return null;
+  return then.toLocaleDateString(undefined, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    ...(then.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' as const } : null),
+  });
+}

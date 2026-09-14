@@ -10,7 +10,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ShelfShell } from './ExploreShells';
 import { ExploreShelf } from './ExploreShelf';
-import { relativeDay } from './exploreCopy';
+import { railCaptionDate } from './exploreCopy';
 import { standingOrdinal } from './ordinal';
 import {
   readStandingBoard,
@@ -43,8 +43,8 @@ import { useViewerStanding, type StandingRow } from './useViewerStanding';
  * in the All view — no heading over nothing. The Scores connect sentence is
  * Phase B2 and is not smuggled in here.
  *
- * THE BOARD SELECTOR (Ben's ruling). Net for everyone by default, net or gross
- * only, no handicap threshold — the reasoning lives in standingBoard.ts. The
+ * THE BOARD SELECTOR (Ben's ruling). Net for everyone by default, five boards,
+ * no handicap threshold — the reasoning lives in standingBoard.ts. The
  * HEADING reads only "Where you stand"; the selector in the heading's right
  * slot already names the active board, so repeating it in the heading would be
  * the same word twice. The tiles never repeat the board either, so their
@@ -151,7 +151,7 @@ function useStandingCopy() {
  * board last moved; when it never has, the line stays empty.
  */
 function sublineFor(row: StandingRow, copy: ReturnType<typeof useStandingCopy>): string {
-  const when = relativeDay(row.last_change_at);
+  const when = railCaptionDate(row.last_change_at);
   return when ? copy.lastChange(when) : '';
 }
 
@@ -431,22 +431,24 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
               photo={TILE.h}
                figure={standingOrdinal(row.rank_now, copy.locale)}
               unit={copy.unit(row.field_now)}
-              whenLabel={relativeDay(row.last_change_at) ?? ''}
+              /* DATE BELONGS IN THE CAPTION. The photo already carries rank,
+                 course and region; its top-right corner stays empty. */
+              whenLabel=""
               who={copy.you}
               isOwn
               avatarUrl={identity?.photoUrl ?? null}
               avatarUserId={viewerId ?? null}
 
-              reserveTwoLines
-              /* THE NAME IS ALWAYS "You" AND THE FACT IS ALWAYS ONE LINE
-                 ("Last change …"), so the two-line reserves left the caption
-                 visibly taller than the club rail's. Reserve one of each;
-                 every tile in the rail gets the same values, so heights stay
-                 uniform. */
-              nameLines={1}
-              factLines={1}
-              subline={sublineFor(row, copy)}
-              trailing={row.delta != null && row.delta !== 0 ? <MovementChip delta={row.delta} /> : undefined}
+              railCaptionLine={
+                <>
+                  <span style={{ fontSize: 11, lineHeight: 1, color: A.MUTE }}>
+                    {sublineFor(row, copy)}
+                  </span>
+                  {row.delta != null && row.delta !== 0 ? (
+                    <span style={{ marginLeft: 'auto' }}><MovementChip delta={row.delta} /></span>
+                  ) : null}
+                </>
+              }
               onPress={() => open(row)}
             />
           </div>

@@ -9,3 +9,5 @@
 - [x] Gate tick rows on three off-par holes, with an explicit quiet-ace exception.
 - [x] Verify 390px width and no horizontal overflow; authenticated record/ace capture remains blocked by external auth.
 - [x] Scope "This week at {club}" to the club's courses (per-course board reads), not its members.
+- [x] Move standing and weekly-club dates from photos into consistently formatted caption rows.
+- [x] Verify the deployed standing functions and measure five-board qualification for Benjamin Holmes.
