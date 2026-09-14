@@ -16,6 +16,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ExploreShelf } from './ExploreShelf';
 import { ShelfShell } from './ExploreShells';
 import { relativeDay, toParLabel } from './exploreCopy';
+import { circleHandicapDisplay } from './circleHandicap';
 
 /**
  * "YOUR CIRCLE" (BRIEF_EXPLORE_CIRCLE_SHELF) — the latest rounds from the people
@@ -160,6 +161,15 @@ export function CircleShelf({
         >
         {tiles.map((row) => {
           const course = row.course_id ? meta.data?.get(row.course_id) : null;
+          const handicap = circleHandicapDisplay({
+            hasActiveConnection: row.has_active_whs_connection,
+            handicapVisibility: row.handicap_visibility,
+            egVisible: row.eg_visible,
+            handicapIndex: row.current_handicap_index,
+            /* READ, NEVER DERIVED: gam_round_stats.delta_index, written by
+               gam-evaluator for the movement this exact round produced. */
+            deltaIndex: row.delta_index,
+          });
           return (
             <div
               key={`${row.round_id}`}
@@ -181,15 +191,48 @@ export function CircleShelf({
                    takes the under-par red, inside StandoutTile. */
                 figure={row.gross != null ? String(row.gross) : null}
                 unit={toParLabel(toPar(row)) ?? undefined}
-                /* THE DATE IS LOAD-BEARING on a no-window rail — it is what
-                   makes reaching further back honest. */
-                whenLabel={relativeDay(row.play_date) ?? ''}
+                /* Circle layout ruling: the photo carries only the score chip.
+                   This overrides the older no-window date treatment here; the
+                   top-right corner must remain empty. */
+                whenLabel=""
                 who={row.display_name}
                 /* IDENTITY IS user_profiles / public_profiles AND NOTHING ELSE.
                    Never whs_friends or whs_friend_matches: those hold England
                    Golf names and photo URLs and leaked once already. */
                 avatarUrl={row.profile_photo_url ?? null}
                 avatarUserId={row.user_id}
+                railCaptionLine={
+                  handicap ? (
+                    <>
+                      <span
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 700,
+                          letterSpacing: '0.19em',
+                          lineHeight: 1,
+                          color: A.DIM,
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {t('friendsRail.index', 'HCP')} {handicap.index}
+                      </span>
+                      {handicap.delta ? (
+                        <span
+                          style={{
+                            ...NUMF,
+                            marginLeft: 7,
+                            fontSize: 10,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            color: handicap.delta.tone,
+                          }}
+                        >
+                          {handicap.delta.text}
+                        </span>
+                      ) : null}
+                    </>
+                  ) : null
+                }
                 onPress={() => open(row)}
               />
             </div>

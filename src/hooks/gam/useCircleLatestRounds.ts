@@ -76,6 +76,13 @@ export interface CircleRoundRow {
    * absent OR when can_view_handicap() withheld it — either way, not comparable.
    */
   hcp_at_time: number | null;
+  /** Current federation index, disclosed only after the explicit Circle gate. */
+  current_handicap_index: number | null;
+  /** Explicit profile privacy inputs; never infer these from a readable row. */
+  handicap_visibility: string | null;
+  eg_visible: boolean;
+  /** An undeleted WHS connection exists for this member. */
+  has_active_whs_connection: boolean;
   /** Up to two feats, rarest first. */
   feats: RoundFeat[];
 
@@ -441,19 +448,28 @@ export function useCircleLatestRounds(
 
       // 5. Profiles (name + avatar) — ONE read covering circle AND suggested.
       const surfacedUserIds = Array.from(new Set(rowsWindow.map((r) => r.user_id)));
-      const { data: profiles } = await supabase
+      const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
-        .select('id, display_name, profile_photo_url, primary_club_id')
+        .select('id, display_name, profile_photo_url, primary_club_id, handicap_visibility, eg_visible')
         .in('id', surfacedUserIds);
+      if (profilesError) throw profilesError;
       const profileById = new Map<
         string,
-        { display_name: string | null; profile_photo_url: string | null; primary_club_id: string | null }
+        {
+          display_name: string | null;
+          profile_photo_url: string | null;
+          primary_club_id: string | null;
+          handicap_visibility: string | null;
+          eg_visible: boolean | null;
+        }
       >();
-      for (const p of (profiles ?? []) as Array<{ id: string; display_name: string | null; profile_photo_url: string | null; primary_club_id: string | null }>) {
+      for (const p of profiles ?? []) {
         profileById.set(p.id, {
           display_name: p.display_name,
           profile_photo_url: p.profile_photo_url,
           primary_club_id: p.primary_club_id ?? null,
+          handicap_visibility: p.handicap_visibility ?? null,
+          eg_visible: p.eg_visible ?? null,
         });
       }
 
@@ -486,24 +502,28 @@ export function useCircleLatestRounds(
       // 6. Current handicap index per friend (latest snapshot per connection).
       const surfacedFriendIds = Array.from(new Set(rowsWindow.map((r) => r.user_id)));
       const currentHcpByUser = new Map<string, number>();
+      const activeConnectionUsers = new Set<string>();
       if (surfacedFriendIds.length > 0) {
-        const { data: connections } = await supabase
+        const { data: connections, error: connectionsError } = await supabase
           .from('whs_connections')
           .select('id, user_id')
           .in('user_id', surfacedFriendIds)
           .is('deleted_at', null);
+        if (connectionsError) throw connectionsError;
         const connToUser = new Map<string, string>();
         const connectionIds: string[] = [];
         for (const c of ((connections ?? []) as unknown) as Array<{ id: string; user_id: string }>) {
           connToUser.set(c.id, c.user_id);
+          activeConnectionUsers.add(c.user_id);
           connectionIds.push(c.id);
         }
         if (connectionIds.length > 0) {
-          const { data: snaps } = await supabase
+          const { data: snaps, error: snapsError } = await supabase
             .from('whs_handicap_snapshots' as never)
             .select('connection_id, handicap_index, observed_at')
             .in('connection_id', connectionIds)
             .order('observed_at', { ascending: false });
+          if (snapsError) throw snapsError;
           for (const s of ((snaps ?? []) as unknown) as Array<{
             connection_id: string;
             handicap_index: number | string | null;
@@ -671,6 +691,10 @@ export function useCircleLatestRounds(
           net,
           hcp_delta: hcpDelta,
           hcp_at_time: r.hcp_at_time == null ? null : Number(r.hcp_at_time),
+          current_handicap_index: current,
+          handicap_visibility: profile?.handicap_visibility ?? null,
+          eg_visible: profile?.eg_visible === true,
+          has_active_whs_connection: activeConnectionUsers.has(r.user_id),
           feats: featsForRound(r),
 
           birdies: r.birdies,

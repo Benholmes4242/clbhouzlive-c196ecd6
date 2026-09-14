@@ -113,6 +113,12 @@ function roundPayload(row: StreamRow): CircleRoundRow | undefined {
     net: f.net ?? null,
     hcp_delta: null,
     hcp_at_time: f.hcp_at_time ?? null,
+    /* Server stream cards do not disclose the Circle rail's current-index pair.
+       These explicit closed defaults preserve their existing rendering. */
+    current_handicap_index: null,
+    handicap_visibility: null,
+    eg_visible: false,
+    has_active_whs_connection: false,
     feats: [],
     birdies: f.birdies ?? null,
     eagles: f.eagles ?? null,
