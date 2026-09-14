@@ -48,7 +48,10 @@ export const queryPersister = createAsyncStoragePersister({
     setItem: (key, value) => set(key, value),
     removeItem: (key) => del(key),
   },
-  key: 'clbhouz-query-cache-v2',
+  /* v3: v2 could hold entries dehydrated while PENDING (data undefined) under
+     infinite keys, which crashed react-query's optimistic result on hydrate.
+     The key is versioned so those bytes can never rehydrate again. */
+  key: 'clbhouz-query-cache-v3',
   throttleTime: 1000,
   // First-page trim for infinite queries — persist only pages[0]/pageParams[0]
   // so IDB stays in single-digit MB. Rest refetches on mount.
