@@ -1656,7 +1656,14 @@
         "boardGross": "그로스",
         "pickBoard": "보드 변경",
         "unreadable": "순위를 불러올 수 없습니다.",
-        "retry": "다시 시도"
+        "retry": "다시 시도",
+        "boards": {
+          "net": "베스트 네트 라운드",
+          "topar": "베스트 그로스 라운드",
+          "stableford": "베스트 스테이블포드",
+          "birdies": "한 라운드 최다 버디",
+          "improved": "핸디캡 최대 감소"
+        }
       },
       "ratingCount": "평가 {{count}}건",
       "empty": {
