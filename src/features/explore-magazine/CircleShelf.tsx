@@ -158,6 +158,8 @@ export function CircleShelf({ viewerId, pos }: { viewerId: string | undefined; p
               style={{ flex: `0 0 ${TILE.w}px`, width: TILE.w }}
             >
               <StandoutTile
+                /* Never the viewer: own rounds are excluded from this shelf. */
+                isOwn={false}
                 courseId={row.course_id ?? ''}
                 /* THE COURSE VARIES HERE AND SO IT IS NAMED. On the club shelf
                    the heading implies the course; on this shelf the course is
