@@ -37,6 +37,7 @@ import {
 } from './exploreViewMemory';
 import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
 import { EXPLORE_SERVER_STREAM_ENABLED } from './serverStreamSwitch';
+import { WatchFeed } from './watch/WatchFeed';
 import { useExploreStream } from './useExploreStream';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
@@ -370,7 +371,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     fallbackWanted ? userId : undefined,
     view,
     { active: scoreScope, geography: geography.scope },
-    { enabled: fallbackWanted },
+    /* WATCH IS ITS OWN SURFACE NOW (BRIEF_WATCH_MIXED_FEED): WatchFeed owns the
+       long-form, clip and community reads, so this composition no longer issues
+       a single read for it. */
+    { enabled: fallbackWanted && view !== 'watch' },
   );
   const scoresStanding = useViewerStanding(userId);
 
@@ -510,7 +514,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const SCORES_SHELVES: ShelfKind[] = ['coursesCounty', 'standing', 'clubWeek', 'people'];
   const shelves: ShelfKind[] =
     view === 'watch'
-      ? ['moments']
+      ? /* WATCH COMPOSES ITS OWN RAILS (BRIEF_WATCH_MIXED_FEED): windows into its
+           own clip and community feeds, with no see-all on any of them. */
+        []
       : view === 'scores'
         ? SCORES_SHELVES
         : view === 'courses'
@@ -834,6 +840,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           />
         </div>
       </div>
+
+      {/* THE WATCH VIEW IS ONE ENDLESS MIXED FEED, shape-typed and searchable
+          (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely; the
+          view chips above stay exactly where they are. */}
+      {view === 'watch' ? <WatchFeed userId={userId} onDepart={depart} /> : null}
 
       {/* §1 THE SAME SCOPE ROW, THE SAME COMPONENT, for Scores, Courses and
           Reviews. It does not render at all where neither a club nor a county
