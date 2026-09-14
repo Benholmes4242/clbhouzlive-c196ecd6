@@ -77,10 +77,18 @@ describe('one rank card per course per change', () => {
     expect(out.items[0].consequence).toBeNull();
   });
 
-  it("leaves the viewer's own rounds untouched", () => {
-    const items = [round('a', 'c1', '2026-09-10', { own: true, kind: 'rank_hold' })];
+  it("leaves the viewer's own moved rounds untouched", () => {
+    const items = [round('a', 'c1', '2026-09-10', { own: true, kind: 'rank_up' })];
     const out = applyRankCardRule(items, new Map());
-    expect(out.items[0].consequence?.kind).toBe('rank_hold');
+    expect(out.items[0].consequence?.kind).toBe('rank_up');
+  });
+
+  it("strips an unchanged claim on the viewer's own round", () => {
+    for (const kind of ['played_nochange', 'rank_hold'] as const) {
+      const items = [round('a', 'c1', '2026-09-10', { own: true, kind })];
+      const out = applyRankCardRule(items, new Map());
+      expect(out.items[0].consequence).toBeNull();
+    }
   });
 
   it('rations each course separately', () => {
