@@ -456,7 +456,10 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
         ))}
       </ExploreShelf>
 
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} maxHeight="75dvh">
+      {/* BRIEF_SHEET_SCROLL §1 — scrollBody: this sheet hands over a complete
+          list and owned no scroll container, so the rows past the cap were
+          unreachable on a device. */}
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} maxHeight="75dvh" scrollBody>
         <div style={{ fontFamily: SANS, padding: '4px 16px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, paddingBottom: 12 }}>
             <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK }}>

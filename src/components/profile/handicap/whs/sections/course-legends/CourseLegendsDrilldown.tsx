@@ -51,6 +51,7 @@ const SHORT_LABELS: Record<LegendCategory, string> = {
   most_rounds_all_time:         'Rounds',
   lowest_gross_women_90d:       "Women's",
   lowest_gross_women_all_time:  "Women's",
+  lowest_net_all_time:          'Net',
 };
 
 
@@ -61,7 +62,11 @@ const SHORT_LABELS: Record<LegendCategory, string> = {
  * missing. best_score_diff is excluded from this tab, as in the grid order.
  */
 const CANONICAL_BOARDS: LegendCategory[] = CHAMPIONS_ORDER_ALL_TIME.filter(
-  (c) => c !== 'best_score_diff_all_time',
+  // BRIEF_STANDING_TAP 2b - lowest_net_all_time is excluded from the Unclaimed
+  // roll-call: it comes from a SEPARATE rpc, so an empty net board may mean
+  // "not yet deployed" rather than "nobody holds it", and Unclaimed must only
+  // name boards it genuinely knows to be open.
+  (c) => c !== 'best_score_diff_all_time' && c !== 'lowest_net_all_time',
 );
 
 /** Lower-case board words for the Unclaimed sentence. */

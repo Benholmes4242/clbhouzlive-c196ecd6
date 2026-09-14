@@ -64,7 +64,15 @@ export type LegendCategory =
   | 'most_aces_90d'            | 'most_aces_all_time'
   | 'most_albatrosses_90d'     | 'most_albatrosses_all_time'
   | 'most_rounds_90d'          | 'most_rounds_all_time'
-  | 'lowest_gross_women_90d'   | 'lowest_gross_women_all_time';
+  | 'lowest_gross_women_90d'   | 'lowest_gross_women_all_time'
+  /*
+   * BRIEF_STANDING_TAP 2b - THE NET BOARD. Not a gam_course_legends category:
+   * it is served by get_course_net_board (docs/sql/champions_net_board.sql),
+   * which shares board_pool/board_qualifies with get_viewer_standing so the
+   * standing shelf and this board can never state different ranks. All-time
+   * only - there is no 90-day net board on either surface.
+   */
+  | 'lowest_net_all_time';
 
 export type LegendWindow = '90d' | 'all_time';
 

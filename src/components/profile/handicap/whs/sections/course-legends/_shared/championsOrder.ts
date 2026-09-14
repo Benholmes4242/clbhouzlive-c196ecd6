@@ -18,6 +18,9 @@ export const CHAMPIONS_ORDER_90D: LegendCategory[] = [
 
 export const CHAMPIONS_ORDER_ALL_TIME: LegendCategory[] = [
   'lowest_gross_all_time',
+  /* BRIEF_STANDING_TAP 2b - Net sits directly under Gross: same question,
+     the other scoring basis. All-time only; absent from the 90d order. */
+  'lowest_net_all_time',
   'best_stableford_all_time',
   'most_aces_all_time',
   'most_albatrosses_all_time',

@@ -31,6 +31,8 @@ export default function RegionSheet({
       onClose={() => onOpenChange(false)}
       ariaLabelledBy="explore-region-sheet-title"
       maxHeight="85dvh"
+      /* BRIEF_SHEET_SCROLL §1 — long region list, no scroller of its own. */
+      scrollBody
     >
       <div style={{ padding: '8px 20px 12px' }}>
         <div

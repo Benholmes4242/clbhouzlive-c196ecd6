@@ -73,7 +73,7 @@ export function RegionDropdown({
         {choice ? <X className="w-3 h-3 shrink-0" strokeWidth={2.5} /> : <ChevronDown className="w-3 h-3 shrink-0" strokeWidth={2.5} />}
       </button>
 
-      <BottomSheet open={open} onClose={() => setOpen(false)} ariaLabelledBy="explore-place-title" maxHeight="85dvh">
+      <BottomSheet open={open} onClose={() => setOpen(false)} ariaLabelledBy="explore-place-title" maxHeight="85dvh" scrollBody>
         <div style={{ padding: '8px 20px 12px' }}>
           <div id="explore-place-title" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 700, color: A.INK, letterSpacing: '-0.02em' }}>
             {t('amateur.courses.placeTitle', 'Browse by place')}
@@ -98,7 +98,7 @@ export function RegionDropdown({
           </div>
         </div>
 
-        <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.10)', overflowY: 'auto' }}>
+        <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.10)' }}>
           <PlaceRow
             label={t('amateur.courses.anywhere', 'Anywhere')}
             count={null}
