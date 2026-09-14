@@ -734,9 +734,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       if (seen.has(video.facts.post_id ?? video.id)) continue;
       let at = out.findIndex((entry) => entry.score < video.score);
       if (at < 0) at = out.length;
-      /* NEVER THE LEAD ON ITS FIRST FRAME OF A PAGE WITH REAL CARDS: a video
-         may lead (§2 asks for exactly that) but only by out-scoring the lead,
-         which freshness alone can do - so this does not hold it back. */
+      /* A VIDEO MAY LEAD, and only by out-scoring the current lead - which
+         freshness alone can do on a quiet page. Nothing here holds it back and
+         nothing here promotes it. */
       out.splice(at, 0, video);
     }
     return out;
@@ -1564,6 +1564,35 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const pos = cardPos;
           cardPos += 1;
           const size: CardSize = block.kind === 'lead' ? 'lead' : 'std';
+          /* §2 THE LONG-FORM CARD IS WATCH'S CARD. Full width, 16:9, duration
+             chip, title as the headline, creator and date on the who-line -
+             rendered by the SAME component Watch renders, so the two can never
+             drift and no second video card exists. It is NOT wrapped in the
+             12px card inset: a video row is full-bleed on Watch and reads as a
+             video row here for the same reason. */
+          if (item.kind === 'watch' && item.payload.video) {
+            const row = item.payload.video;
+            const index = videoRows.findIndex((entry) => entry.post_id === row.post_id);
+            return (
+              <div key={item.id}>
+                <VideoCard
+                  row={row}
+                  onPress={() => {
+                    analyticsEvents.track('amateur_card_tapped', { kind: 'watch', size, pos });
+                    depart();
+                    openWithOrigin({
+                      posts: videoPosts,
+                      index: index < 0 ? 0 : index,
+                      originEl: null,
+                      posterUrl: row.poster_url ?? null,
+                      openedFrom: 'amateur-watch',
+                      forceStartAtZero: true,
+                    });
+                  }}
+                />
+              </div>
+            );
+          }
           const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>
