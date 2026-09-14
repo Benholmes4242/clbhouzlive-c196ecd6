@@ -35,6 +35,7 @@ export function CourseShelf({
   kind,
   pos,
   metaLabel,
+  sub,
   seeAllLabel,
   events,
   onSeeAll,
@@ -47,6 +48,8 @@ export function CourseShelf({
   kind: string;
   pos: number;
   metaLabel?: string | null;
+  /** The rail's BASIS, one line under the heading (BRIEF_COURSES_MERGED §4). */
+  sub?: string | null;
   seeAllLabel?: string | null;
   /** §5a course_id -> its strongest recent event. Absent or null = the area,
    *  which is the CORRECT line when the page holds no event or holds a tie. */
@@ -65,6 +68,7 @@ export function CourseShelf({
     <ExploreShelf
       heading={heading}
       metaLabel={metaLabel ?? null}
+      sub={sub ?? null}
       seeAllLabel={seeAllLabel ?? null}
       onSeeAll={onSeeAll}
       onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind, pos })}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -940,7 +940,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                         ? t('amateur.shelf.worldsBest', "The world's best")
                         : t('amateur.shelf.aroundWorld', 'Around the world')
                     }
-                    metaLabel={view === 'courses' ? t('amateur.shelf.worldsBestSub', 'Top 100 by rank') : null}
+                    sub={view === 'courses' ? t('amateur.shelf.worldsBestSub', 'Top 100 by rank') : null}
                     rows={worldCourses.rows}
                     isFetched={worldCourses.isFetched}
                     kind="courses_world"
@@ -989,7 +989,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 ) : shelf === 'coursesCircle' ? (
                   <CourseShelf
                     heading={t('amateur.shelf.circlePlays', 'Where your circle plays')}
-                    metaLabel={t('amateur.shelf.circlePlaysSub', 'Courses the people you follow have played')}
+                    sub={t('amateur.shelf.circlePlaysSub', 'Courses the people you follow have played')}
                     rows={mergedShelves.circle}
                     isFetched={candidates.isFetched && circle.isFetched}
                     kind="courses_circle"
@@ -999,7 +999,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 ) : shelf === 'coursesWorthDrive' ? (
                   <CourseShelf
                     heading={t('amateur.shelf.worthTheDrive', 'Worth the drive')}
-                    metaLabel={t('amateur.shelf.worthTheDriveSub', 'Rated highly by the few who have played them')}
+                    sub={t('amateur.shelf.worthTheDriveSub', 'Rated highly by the few who have played them')}
                     rows={mergedShelves.worthDrive}
                     isFetched={candidates.isFetched}
                     kind="courses_worth_drive"
@@ -1009,7 +1009,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 ) : shelf === 'coursesNew' ? (
                   <CourseShelf
                     heading={t('amateur.shelf.newOnClbhouz', 'New on clbhouz')}
-                    metaLabel={t('amateur.shelf.newOnClbhouzSub', 'Courses rated here for the first time')}
+                    sub={t('amateur.shelf.newOnClbhouzSub', 'Courses rated here for the first time')}
                     rows={mergedShelves.newly}
                     isFetched={candidates.isFetched}
                     kind="courses_new"
@@ -1108,7 +1108,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           says county - and the PLACE WINS, because it is the more recent and more
           specific answer; the scope chip stays lit so the way back is visible.
           REPORTED as the one conflict in practice. */}
-      {view === 'courses' && geography.isFetched ? (
+      {/* A CONTROL THAT CANNOT CHANGE WHAT YOU SEE DOES NOT RENDER: with no
+          circle and no county the only chip would be World. The place dropdown
+          still has somewhere to go, so it renders on its own. */}
+      {view === 'courses' && geography.isFetched && (hasCircle || geography.scope.county) ? (
         <div
           style={{
             display: 'flex',
@@ -1218,8 +1221,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
            is exactly ONE sentence, and the scope row above it stays so the
            member can widen. */
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
+          {/* AN EMPTY SHELF LEAVES NO GAP. A wrapping div still claims its row
+              gap in this grid, so the shelf-only state renders each rail as a
+              FRAGMENT: a rail that returns null now occupies nothing at all. */}
           {shelves.map((shelf) => (
-            <div key={`empty-shelf:${shelf}`}>{renderShelf(shelf, 0)}</div>
+            <Fragment key={`empty-shelf:${shelf}`}>{renderShelf(shelf, 0)}</Fragment>
           ))}
           {shelvesSettled && !shelvesHaveContent ? (
             <div style={{ paddingInline: 20, marginTop: 8 }}>
