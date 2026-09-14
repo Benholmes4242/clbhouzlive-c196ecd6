@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
 import { StandoutTile } from '@/components/explore-tab-new/courseled/StandoutTile';
+import { A } from '@/components/explore-tab-new/courseled/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
@@ -91,7 +92,7 @@ export function WeeklyClubShelf({
               avatarUserId={row.user_id}
               isOwn={row.user_id === viewerId}
               railCaptionLine={
-                <span style={{ fontSize: 11, lineHeight: 1, color: '#6B7280' }}>
+                <span style={{ fontSize: 11, lineHeight: 1, color: A.MUTE }}>
                   {railCaptionDate(row.play_date) ?? ''}
                 </span>
               }
