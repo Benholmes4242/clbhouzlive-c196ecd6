@@ -11,3 +11,7 @@
 - [x] Scope "This week at {club}" to the club's courses (per-course board reads), not its members.
 - [x] Move standing and weekly-club dates from photos into consistently formatted caption rows.
 - [x] Verify the deployed standing functions and measure five-board qualification for Benjamin Holmes.
+- [x] Merge Explore Courses and Reviews into one four-chip view with seven rails, search and a place dropdown.
+- [x] Dead-list the retired Reviews view: `EXPLORE_VIEWS` drops the chip, `ExploreView` keeps 'reviews' (server pool and client composition still read it). Unused locale keys, kept: `amateur.stream.view.reviews`, `amateur.stream.empty.reviews`, `amateur.shelf.topRated`. `useRecentCourseRatings` is now called disabled and stays as the reference reader.
+- [ ] BLOCKED (external Supabase auth): authenticated acceptance of the merged view - reviewer-name search, the circle scope, and the merged server pages.
+- [ ] UNAPPLIED, Ben's to run: `docs/sql/explore_courses_merged_search.sql` (server search path plus the one-pool merge for `get_explore_stream`).
