@@ -270,7 +270,9 @@ function VideoCard({
         ) : (
           <PosterFallback initial={initial} size={34} />
         )}
+        <AutoplayLayer hlsUrl={hlsFor(row)} poster={poster} />
         <GlassDurationBadge seconds={row.duration_seconds ?? null} />
+
       </div>
 
       <div style={{ display: 'flex', gap: 10, padding: `9px ${INSET}px 0`, alignItems: 'flex-start' }}>
