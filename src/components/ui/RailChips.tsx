@@ -130,8 +130,9 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
             onClick={() => { if (!locked) onChange(option.id); }}
             style={{
               flexShrink: 0,
-              padding: '6px 11px',
-              borderRadius: RAIL_CHIP_RADIUS,
+              padding: geo.padding,
+              borderRadius: geo.radius,
+
               /* The active chip keeps a TRANSPARENT hairline rather than none, so
                  switching view costs no 1px width shift in the row. */
               border: filled ? 'none' : `1px solid ${active ? 'transparent' : A.BORDER}`,
