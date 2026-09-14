@@ -1717,7 +1717,14 @@
         "boardGross": "Bruto",
         "pickBoard": "Cambiar tabla",
         "unreadable": "No se pudo cargar tu clasificacion.",
-        "retry": "Reintentar"
+        "retry": "Reintentar",
+        "boards": {
+          "net": "Mejor vuelta neta",
+          "topar": "Mejor vuelta bruta",
+          "stableford": "Mejor vuelta stableford",
+          "birdies": "Mas birdies en una vuelta",
+          "improved": "Mayor rebaja de handicap"
+        }
       },
       "ratingCount": "{{count}} valoraciones",
       "empty": {

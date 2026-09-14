@@ -13,11 +13,11 @@ import { ExploreShelf } from './ExploreShelf';
 import { relativeDay } from './exploreCopy';
 import { standingOrdinal } from './ordinal';
 import {
-  STANDING_BOARDS,
   readStandingBoard,
   writeStandingBoard,
   type StandingBoard,
 } from './standingBoard';
+import { effectiveStandingBoard, useStandingBoards } from './useStandingBoards';
 import { useViewerIdentity } from './useViewerIdentity';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
 
@@ -95,18 +95,36 @@ function useStandingCopy() {
     () => ({
       heading: t('amateur.stream.shelf.standing', 'Where you stand'),
       /**
-       * The two board names, used ONLY by the dropdown. The heading no longer
+       * THE BOARD NAMES, used ONLY by the dropdown. The heading no longer
        * appends the board name (Ben: "the same word twice in one row").
        *
-       * RETIRED FOR PHASE E: `amateur.stream.standing.board` ("Lowest gross")
-       * was the legacy board-name-in-heading key. It is kept in all six locale
-       * files but is no longer read by code; the Phase E cleanup pass may
-       * remove it.
+       * EVERY LABEL NAMES A ROUND, because every one of these boards ranks a
+       * SINGLE ROUND. The Champions tab ranks careers and has a category
+       * called "Most birdies" meaning a career total at the course; if this
+       * dropdown said "Most birdies" too, a member could not tell the two
+       * claims apart, and they are different numbers. "Biggest handicap cut"
+       * has no Champions counterpart at all and says what it measures.
+       *
+       * RETIRED FOR PHASE E: `amateur.stream.standing.board` (the legacy
+       * board-name-in-heading key) and `boardNet` / `boardGross` (the short
+       * two-board names, now ambiguous against Champions). All three are kept
+       * in the six locale files and are no longer read by code.
        */
-      boardName: (board: StandingBoard) =>
-        board === 'net'
-          ? t('amateur.stream.standing.boardNet', 'Net')
-          : t('amateur.stream.standing.boardGross', 'Gross'),
+      boardName: (board: StandingBoard) => {
+        switch (board) {
+          case 'net':
+            return t('amateur.stream.standing.boards.net', 'Lowest net round');
+          case 'stableford':
+            return t('amateur.stream.standing.boards.stableford', 'Best stableford round');
+          case 'birdies':
+            return t('amateur.stream.standing.boards.birdies', 'Most birdies in a round');
+          case 'improved':
+            return t('amateur.stream.standing.boards.improved', 'Biggest handicap cut');
+          case 'topar':
+          default:
+            return t('amateur.stream.standing.boards.topar', 'Lowest gross round');
+        }
+      },
       pickBoard: t('amateur.stream.standing.pickBoard', 'Change board'),
       /* ERRORED IS NOT EMPTY. A read that failed says so; it never renders as
          a member with no standing, and never as nothing at all. */
@@ -138,19 +156,26 @@ function sublineFor(row: StandingRow, copy: ReturnType<typeof useStandingCopy>):
 }
 
 /**
- * THE BOARD SELECTOR. Two options, so this is a two-row menu and not a native
- * select: it has to wear the dark surface and the flat row convention. It is a
- * CHOICE and reads like one - the current board is stated, the panel marks the
- * selected row, and dismissing changes nothing.
+ * THE BOARD SELECTOR. Up to five options, so this is a flat menu and not a
+ * native select: it has to wear the dark surface and the flat row convention.
+ * It is a CHOICE and reads like one - the current board is stated, the panel
+ * marks the selected row, and dismissing changes nothing.
+ *
+ * THE OPTIONS ARE THE MEMBER'S OWN. `options` carries only boards where this
+ * member holds a course with a qualified field of 2 or more, so there is
+ * nothing greyed out: a disabled row is a promise the app cannot keep. A member
+ * with a single available board gets no control at all.
  */
 function BoardSelector({
   board,
+  options,
   label,
   ariaLabel,
   nameFor,
   onPick,
 }: {
   board: StandingBoard;
+  options: readonly StandingBoard[];
   label: string;
   ariaLabel: string;
   nameFor: (b: StandingBoard) => string;
@@ -208,7 +233,7 @@ function BoardSelector({
             overflow: 'hidden',
           }}
         >
-          {STANDING_BOARDS.map((b, i) => (
+          {options.map((b, i) => (
             <button
               key={b}
               type="button"
@@ -262,7 +287,16 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
     },
     [viewerId],
   );
-  const standing = useViewerStanding(viewerId, board);
+  /* WHICH BOARDS THIS MEMBER HAS. Only boards with a course whose qualified
+     field is 2 or more are offered, and the remembered selection is replaced
+     rather than requested when the member does not have it - the shelf never
+     asks for a board it has just said is unavailable. */
+  const availability = useStandingBoards(viewerId);
+  const askedBoard = effectiveStandingBoard(board, availability.boards);
+  /* A HOLD, NOT A GUESS: until availability has settled the standing read
+     stays disabled, so a member never sees one board's ranks replaced by
+     another's a frame later. */
+  const standing = useViewerStanding(availability.isFetched ? viewerId : undefined, askedBoard);
   /* The heading names the board the ROWS are, not the one that was asked for. */
   const shownBoard = standing.board;
   /* The tiles are all the VIEWER's, so the avatar is the viewer's own photo,
@@ -273,15 +307,37 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
 
   const tiles = useMemo(() => standing.rows.slice(0, RENDERED), [standing.rows]);
 
+  /**
+   * THE TAP OPENS THE COURSE AND CLAIMS NO PARITY (Ben's ruling SS4).
+   *
+   * It lands on the Champions tab's OWN DEFAULT CATEGORY and passes no `?cat=`.
+   * No Champions category measures what these boards measure: Champions ranks
+   * CAREERS at the course, these boards rank single ROUNDS, and the pools are
+   * not the same either. Measured on production: on gross - the one case that
+   * looked cheaply correct - the shelf and Champions disagree on 4 of this
+   * member's 31 courses (shelf 1st / Champions 2nd at Royal Portrush and
+   * Westerham, 3rd / 4th at Parkstone and Royal Blackheath). Deep linking would
+   * therefore hand a member one rank on the shelf and a different rank on the
+   * screen they tapped into, which is the two-readers fault. Do NOT add a
+   * `?cat=` here, and do NOT add categories to Champions to close the gap.
+   */
   const open = (row: StandingRow) => {
-    analyticsEvents.track('amateur_standing_tile_tapped', { rank: row.rank_now, delta: row.delta });
+    analyticsEvents.track('amateur_standing_tile_tapped', {
+      rank: row.rank_now,
+      delta: row.delta,
+      board: shownBoard,
+    });
     rememberAmateurScroll();
     setSheetOpen(false);
     navigate(`/courses/${row.course_id}?tab=champions`);
   };
 
-  /* A HOLD, NOT A GUESS, while the read is in flight — the rail's own shape. */
-  if (!standing.isFetched) return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
+  /* A HOLD, NOT A GUESS, while either read is in flight — the rail's own
+     shape. Availability settles first, so the shelf never draws one board's
+     ranks under another board's name. */
+  if (!availability.isFetched || !standing.isFetched) {
+    return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
+  }
   /* ERRORED IS NOT EMPTY (the fault that hid this shelf). A read that FAILED
      says so, with the plain heading and a retry; only a genuinely empty answer
      renders nothing, because "no standing" is not a sentence worth a heading. */
@@ -320,14 +376,19 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
     <>
       <ExploreShelf
         heading={copy.heading}
+        /* ONE BOARD IS NOT A CHOICE. A member with a single available board
+           gets the plain heading and no control that cannot change anything. */
         headingRight={
-          <BoardSelector
-            board={shownBoard}
-            label={copy.boardName(shownBoard)}
-            ariaLabel={copy.pickBoard}
-            nameFor={copy.boardName}
-            onPick={pickBoard}
-          />
+          availability.boards.length > 1 ? (
+            <BoardSelector
+              board={shownBoard}
+              options={availability.boards}
+              label={copy.boardName(shownBoard)}
+              ariaLabel={copy.pickBoard}
+              nameFor={copy.boardName}
+              onPick={pickBoard}
+            />
+          ) : undefined
         }
         onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'standing', pos })}
         /* SEE ALL MOVED BENEATH THE CARDS because the selector owns the right

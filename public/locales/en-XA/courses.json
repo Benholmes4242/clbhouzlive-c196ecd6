@@ -2301,7 +2301,14 @@
         "boardGross": "[Gröss one]",
         "pickBoard": "[Chånge böård one two]",
         "unreadable": "[Yöür ståndîng çöüld nöt bé löådéd. one two three]",
-        "retry": "[Trý ågåîn one]"
+        "retry": "[Trý ågåîn one]",
+        "boards": {
+          "net": "[Löwést nét röünd one two]",
+          "topar": "[Löwést gröss röünd one two]",
+          "stableford": "[Bést ståbléförd röünd one two]",
+          "birdies": "[Möst bîrdîés în å röünd one two three]",
+          "improved": "[Bîggést håndîçåp çüt one two]"
+        }
       },
       "ratingCount": "[{{count}} rãtïñgs]",
       "empty": {

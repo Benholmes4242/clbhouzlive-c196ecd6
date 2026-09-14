@@ -1717,7 +1717,14 @@
         "boardGross": "Brutto",
         "pickBoard": "Wertung wechseln",
         "unreadable": "Deine Platzierung konnte nicht geladen werden.",
-        "retry": "Erneut versuchen"
+        "retry": "Erneut versuchen",
+        "boards": {
+          "net": "Beste Nettorunde",
+          "topar": "Beste Bruttorunde",
+          "stableford": "Beste Stableford-Runde",
+          "birdies": "Meiste Birdies pro Runde",
+          "improved": "Groesste Handicap-Senkung"
+        }
       },
       "ratingCount": "{{count}} Bewertungen",
       "empty": {

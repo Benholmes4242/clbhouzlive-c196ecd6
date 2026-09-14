@@ -180,7 +180,14 @@
         "boardGross": "Gross",
         "pickBoard": "Change board",
         "unreadable": "Your standing could not be loaded.",
-        "retry": "Try again"
+        "retry": "Try again",
+        "boards": {
+          "net": "Lowest net round",
+          "topar": "Lowest gross round",
+          "stableford": "Best stableford round",
+          "birdies": "Most birdies in a round",
+          "improved": "Biggest handicap cut"
+        }
       },
       "empty": {
         "courses": "No courses in {{scope}} yet.",

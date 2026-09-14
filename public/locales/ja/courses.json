@@ -1653,7 +1653,14 @@
         "boardGross": "グロス",
         "pickBoard": "ランキングを切り替える",
         "unreadable": "順位を読み込めませんでした。",
-        "retry": "再試行"
+        "retry": "再試行",
+        "boards": {
+          "net": "ベストネットラウンド",
+          "topar": "ベストグロスラウンド",
+          "stableford": "ベストステーブルフォード",
+          "birdies": "1ラウンド最多バーディー",
+          "improved": "ハンディキャップ最大減少"
+        }
       },
       "ratingCount": "{{count}}件の評価",
       "empty": {
