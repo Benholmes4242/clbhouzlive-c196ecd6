@@ -31,6 +31,20 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 export const RAIL_CHIP_RADIUS = 11;
 
+/**
+ * THE CHIP GEOMETRY, PUBLISHED (BRIEF_SEARCH_CONTROL_HEIGHT). A `trailing`
+ * control sits in the chip row and must read as one of the set, so it needs the
+ * chips' radius WITHOUT restating the number: it reads it from here, and if the
+ * chip geometry ever changes the control follows. Its HEIGHT is not published
+ * because it is not a number - the trailing slot stretches to the row, so the
+ * control is exactly as tall as the chips whatever their padding and type make
+ * them.
+ */
+export const RAIL_CHIP_GEOMETRY = {
+  sm: { padding: '4px 9px', fontSize: 11, radius: 9 },
+  md: { padding: '6px 11px', fontSize: 12, radius: RAIL_CHIP_RADIUS },
+} as const;
+
 export interface RailChipOption {
   id: string;
   label: string;
@@ -108,9 +122,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
   /* The selecting filled ground: a choice group, so tablist/tab semantics stay. */
   const filledSelection = ground === 'filled-selection';
   /* ONE geometry pair, stated once. 'md' is the canonical chip. */
-  const geo = size === 'sm'
-    ? { padding: '4px 9px', fontSize: 11, radius: 9 }
-    : { padding: '6px 11px', fontSize: 12, radius: RAIL_CHIP_RADIUS };
+  const geo = size === 'sm' ? RAIL_CHIP_GEOMETRY.sm : RAIL_CHIP_GEOMETRY.md;
 
 
   return (
@@ -172,7 +184,9 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
         );
       })}
       {trailing ? (
-        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+        /* STRETCH, NOT A MATCHING NUMBER: the trailing control is as tall as
+           the chips because the row makes it so. Nothing here to keep in step. */
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'stretch' }}>
           {trailing}
         </div>
       ) : null}
