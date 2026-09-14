@@ -33,7 +33,26 @@ import type { StandingRow } from './useViewerStanding';
  *     on this page (a deletion, a correction, a backfill) renders no rank card
  *     rather than an invented one.
  *
+ * TWO LAYERS NOW ENFORCE THIS, AND THAT IS DELIBERATE (BEN'S RULING).
+ * docs/sql/explore_stream_retire_standing_claims.sql pushes the rules that can
+ * be expressed set-based down into get_explore_stream: rank_hold is no longer
+ * emitted at all, and rank_down / rank_up / played_nochange are emitted only in
+ * the news lane, only with a real standing movement, and never on another
+ * member's round for played_nochange. A function that states claims the client
+ * must delete cannot be read at face value, and raw RPC output is something we
+ * now audit against.
+ *
+ * THE ELECTION BELOW STAYS HERE. One card per course per change is an election
+ * over the rows that survive PLACEMENT (cadence, ring cap, author cap, deferral
+ * queue, relaxation), which SQL does not know when it types the consequence.
+ * Rules 5 and 6 travel with it.
+ *
+ * THIS GATE IS NOT REMOVED NOW THAT SQL DOES PART OF THE SAME JOB. Defence in
+ * depth on a claim this page has already got wrong twice. Two layers agreeing is
+ * fine; one layer silently carrying the other is what was ended.
+ *
  * THE VIEWER'S OWN ROUNDS ARE UNTOUCHED. rank_up on a round the viewer posted is
+
  * about their own play and already fires once per round, so it passes through
  * this gate unchanged. rank_hold is RETIRED at the consequence engine (A STANDING
  * CLAIM REQUIRES A CHANGE) and is no longer emitted; the kind name stays here so
