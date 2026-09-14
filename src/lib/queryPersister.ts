@@ -180,6 +180,7 @@ export async function removePersistedQueryCache(): Promise<void> {
   try {
     await del('clbhouz-query-cache');
     await del('clbhouz-query-cache-v2');
+    await del('clbhouz-query-cache-v3');
   } catch {
     /* noop */
   }
