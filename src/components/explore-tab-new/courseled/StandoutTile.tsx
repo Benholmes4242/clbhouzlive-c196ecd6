@@ -403,53 +403,82 @@ export function StandoutTile({
             case (2 x 13px x 1.2 = 32px) and a one-line name simply leaves the
             second line empty. Every masonry/vertical consumer omits the prop
             and is byte-identical to before. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, ...(railCaptionLine !== undefined ? { minHeight: 20 } : reserveTwoLines ? { minHeight: 32 } : null) }}>
-
-          {who ? (
-            <SquircleAvatar
-              src={avatarUrl}
-              userId={avatarUserId}
-              alt={who}
-              size={20}
-              hideRing
-            />
-          ) : null}
-          <div
-            style={{
-              flex: 1,
-              minWidth: 0,
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: '-0.01em',
-              color: isOwn ? A.AMBER_DEEP : A.INK,
-              lineHeight: 1.2,
-              display: railCaptionLine !== undefined ? 'block' : '-webkit-box',
-              WebkitLineClamp: railCaptionLine !== undefined ? undefined : 2,
-              WebkitBoxOrient: railCaptionLine !== undefined ? undefined : 'vertical',
-              overflow: 'hidden',
-              ...(railCaptionLine !== undefined ? { textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : null),
-            }}
-          >
-            {who || detail}
-          </div>
-        </div>
-
         {railCaptionLine !== undefined ? (
-          <div
-            style={{
-              minHeight: 13,
-              marginLeft: 24,
-              marginTop: 2,
-              display: 'flex',
-              alignItems: 'baseline',
-              minWidth: 0,
-              overflow: 'hidden',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {railCaptionLine}
+          <div style={{ display: 'flex', gap: 4, minHeight: 35 }}>
+            {who ? (
+              <div style={{ display: 'flex', alignItems: 'center', flex: 'none', alignSelf: 'stretch' }}>
+                <SquircleAvatar
+                  src={avatarUrl}
+                  userId={avatarUserId}
+                  alt={who}
+                  size={20}
+                  hideRing
+                />
+              </div>
+            ) : null}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  minHeight: 20,
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  letterSpacing: '-0.01em',
+                  color: isOwn ? A.AMBER_DEEP : A.INK,
+                  lineHeight: 1.2,
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                }}
+              >
+                {who || detail}
+              </div>
+              <div
+                style={{
+                  minHeight: 13,
+                  marginTop: 2,
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  minWidth: 0,
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {railCaptionLine}
+              </div>
+            </div>
           </div>
-        ) : null}
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, ...(reserveTwoLines ? { minHeight: 32 } : null) }}>
+            {who ? (
+              <SquircleAvatar
+                src={avatarUrl}
+                userId={avatarUserId}
+                alt={who}
+                size={20}
+                hideRing
+              />
+            ) : null}
+            <div
+              style={{
+                flex: 1,
+                minWidth: 0,
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: '-0.01em',
+                color: isOwn ? A.AMBER_DEEP : A.INK,
+                lineHeight: 1.2,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {who || detail}
+            </div>
+          </div>
+        )}
 
         {/* THE FACT LINE, WITH THE REACTION ON IT. The heart rides the LAST
             wording line the tile renders — the detail ("Bogey-free round") when
