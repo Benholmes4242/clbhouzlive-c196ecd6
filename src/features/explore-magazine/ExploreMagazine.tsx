@@ -1195,7 +1195,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       ) : null}
 
-      ) : null}
+
 
       {/* §6 EMPTY SEARCH: one line, controls intact, no suggestions. */}
       {view === 'courses' && query.length >= 2 && candidates.isFetched && source.items.length === 0 ? (
