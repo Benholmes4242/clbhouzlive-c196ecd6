@@ -11,6 +11,7 @@ import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
@@ -919,6 +920,18 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           so no block grows its own. */}
       {false ? <LeadShell /> : null}
       {false ? <PairShell /> : null}
+
+      {/* THE SHEET BELONGS TO THE OPENER THAT FILLS IT. AmateurPage mounts a
+          sheet on its OWN opener instance, which nothing here writes to, so the
+          stream's score-backed card taps also landed nowhere. Mounted against
+          this component's opener. */}
+      <RoundDetailSheet
+        open={!!opener.target}
+        onClose={opener.close}
+        scoreId={opener.target?.scoreId ?? null}
+        connectionId={opener.target?.connectionId ?? null}
+        profileUserId={opener.target?.profileUserId ?? null}
+      />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/
 import { StandoutTile } from '@/components/explore-tab-new/courseled/StandoutTile';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 import { ExploreShelf } from './ExploreShelf';
 import { ShelfShell } from './ExploreShells';
@@ -50,6 +51,7 @@ export function WeeklyClubShelf({
   if (!enabled || !clubId || !clubName || board.error || rows.length === 0) return null;
 
   return (
+    <>
     <ExploreShelf
       heading={t('amateur.stream.shelf.clubWeek', 'This week at {{club}}', { club: clubName })}
       /* The count is the sum of the per-course pools: rounds at this club's
@@ -98,5 +100,17 @@ export function WeeklyClubShelf({
         );
       })}
     </ExploreShelf>
+
+    {/* A TAP THAT FIRES MUST LAND. This shelf called the opener but mounted no
+        sheet, so every tile tap did nothing. Mounted here, exactly as
+        CircleShelf does. */}
+    <RoundDetailSheet
+      open={!!opener.target}
+      onClose={opener.close}
+      scoreId={opener.target?.scoreId ?? null}
+      connectionId={opener.target?.connectionId ?? null}
+      profileUserId={opener.target?.profileUserId ?? null}
+    />
+    </>
   );
 }
