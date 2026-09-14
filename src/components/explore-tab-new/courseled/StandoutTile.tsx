@@ -462,7 +462,7 @@ export function StandoutTile({
             </div>
           </div>
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, ...(reserveTwoLines ? { minHeight: 32 } : null) }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, ...(reserveTwoLines ? { minHeight: nameLines === 2 ? 32 : 16 } : null) }}>
             {who ? (
               <SquircleAvatar
                 src={avatarUrl}
@@ -511,8 +511,14 @@ export function StandoutTile({
                     gap: 6,
                     marginTop: factIsSubline ? 3 : 2,
                     /* Two reserved lines in a rail: 11px x 1.3 = 29, 12px x
-                       1.32 = 32. One line elsewhere, exactly as before. */
-                    minHeight: reserveTwoLines ? (factIsSubline ? 29 : 32) : 20,
+                       1.32 = 32. factLines=1 (standing shelf) reserves the
+                       single line the wording actually takes. One line
+                       elsewhere, exactly as before. */
+                    minHeight: reserveTwoLines
+                      ? factLines === 2
+                        ? factIsSubline ? 29 : 32
+                        : factIsSubline ? 15 : 16
+                      : 20,
 
                   }}
                 >
