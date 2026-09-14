@@ -202,18 +202,41 @@ export function StandoutTile({
       >
         <div style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
 
+        {/* THE TOP LANES — COLLISION IS IMPOSSIBLE, NOT UNLIKELY
+            (BRIEF_EXPLORE_DEVICE_PASS §2a).
+
+            The score chip and the date used to be two independent absolutely
+            positioned children, one pinned left and one pinned right, so at some
+            width and some date length they HAD to meet. They are now the two
+            children of ONE flex row that spans the photo: the chip owns the left
+            lane and never shrinks, the date owns the right lane and shrinks
+            first, and a 10px gap sits between them by construction. The date is
+            one nowrap line with overflow ellipsis, so a longer date SHORTENS —
+            it can never reach the chip, at any tile width, in any locale.
+            The row does not take pointer events: taps belong to the tile. */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            right: 10,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 10,
+            pointerEvents: 'none',
+          }}
+        >
         {/* FIGURE CHIP — the reason the tile exists: 10px radius on a GLASS
             substrate, so the age beside it stops competing. The fill, hairline
             and blur live in `.standout-figure-chip` (liquid-glass.css) because
             the blur must be an @supports enhancement over a flat base fill —
             inline styles cannot express that (BRIEF_STANDOUT_TILE_MARGIN §5a). */}
-        {figure && (
+        {figure ? (
           <span
             className="standout-figure-chip"
             style={{
-              position: 'absolute',
-              top: 8,
-              left: 8,
+              flexShrink: 0,
               display: 'inline-flex',
               alignItems: 'baseline',
               gap: 4,
@@ -221,6 +244,7 @@ export function StandoutTile({
               borderRadius: large ? 12 : 10,
             }}
           >
+
             <span
               style={{
                 ...NUMF,
