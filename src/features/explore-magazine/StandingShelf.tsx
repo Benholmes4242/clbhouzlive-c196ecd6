@@ -438,6 +438,13 @@ export function StandingShelf({ viewerId, pos }: { viewerId: string | undefined;
               avatarUserId={viewerId ?? null}
 
               reserveTwoLines
+              /* THE NAME IS ALWAYS "You" AND THE FACT IS ALWAYS ONE LINE
+                 ("Last change …"), so the two-line reserves left the caption
+                 visibly taller than the club rail's. Reserve one of each;
+                 every tile in the rail gets the same values, so heights stay
+                 uniform. */
+              nameLines={1}
+              factLines={1}
               subline={sublineFor(row, copy)}
               trailing={row.delta != null && row.delta !== 0 ? <MovementChip delta={row.delta} /> : undefined}
               onPress={() => open(row)}
