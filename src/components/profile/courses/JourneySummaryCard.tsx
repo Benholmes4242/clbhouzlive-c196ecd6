@@ -30,9 +30,10 @@ interface JourneySummaryCardProps {
   /**
    * How many of their own ratings the RATING figure is the mean of. The label
    * had to shorten to "RATING" to fit its column (see the item comment), so the
-   * word AVERAGE lives in the basis line instead and needs this count to say
-   * anything. Null means unknown: the basis line then omits the rating clause
-   * rather than guessing a population.
+   * word AVERAGE lived in the basis line, which was removed on 14 Sep 2026.
+   * THE PROP IS STILL ACCEPTED AND NO LONGER READ: ProfileCoursesTab passes it,
+   * and dropping it from the contract would be a change to a caller this brief
+   * did not ask for. Nothing renders it.
    */
   ratedCount?: number | null;
   top100Played?: number | null;
@@ -45,7 +46,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   coursesPlayed,
   countriesPlayed,
   avgRating,
-  ratedCount,
+  /* ratedCount is accepted and deliberately not destructured - see the prop. */
   top100Played,
   isOwnProfile,
   displayName,
@@ -122,33 +123,26 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       : []),
   ];
 
-  /**
-   * THE BASIS LINE - IT CARRIES THE WORD THE LABELS CANNOT AFFORD.
+  /*
+   * THE BASIS LINE IS GONE (Ben's ruling, 14 Sep 2026). It read "Played counts
+   * every course on your record, rated rounds or not. Rating is the average of
+   * your 35 course ratings.", and its `legacy.basisPlayed` / `legacy.basisRating`
+   * keys are retired from all six locale files - not left rendering empty.
    *
-   * PLAYED counts every course on the member's record, including ones with no
-   * imported round, so it is stated rather than left to be inferred from the 35
-   * the analytics sheet lists. RATING had to lose "AVG" to fit its column, and
-   * "RATING 8.4" reads as one course's rating, so this line says what the figure
-   * averages over and how many ratings are in it. One sentence, both bases.
+   * TWO THINGS WENT WITH IT, BOTH ON PURPOSE:
+   *   - THE CHEVRON. Panel renders `footer` as a button with a trailing chevron
+   *     and an `onOpen` handler. This panel never passed `onOpen`, so the whole
+   *     footer was a tappable control that did nothing and a chevron promising a
+   *     screen that does not exist. Passing no footer removes the button
+   *     outright; the panel now has no tap target anywhere.
+   *   - THE ONLY PLACE THAT EXPLAINED WHY PLAYED (49) AND RATING (mean of 35)
+   *     DO NOT AGREE. Those two figures now sit side by side unexplained. Stated
+   *     for the record; the ruling is the ruling.
    *
-   * The rating clause is omitted when the count is unknown - a basis line that
-   * names the wrong population is worse than a short one.
+   * Its appearance was also part of the objection: `footer` styles its text with
+   * LABEL (uppercase, 0.13em tracking), not the sentence-case 11px dim caption
+   * the line was specified as - which is why one quiet sentence read as a wall.
    */
-  const ratingClause =
-    avgRating != null && avgRating > 0 && ratedCount != null && ratedCount > 0
-      ? t('legacy.basisRating', {
-          count: ratedCount,
-          defaultValue: 'Rating is the average of your {{count}} course ratings.',
-        })
-      : '';
-  const basis = [
-    t('legacy.basisPlayed', {
-      defaultValue: 'Played counts every course on your record, rated rounds or not.',
-    }),
-    ratingClause,
-  ]
-    .filter(Boolean)
-    .join(' ');
 
   return (
     <motion.div
@@ -157,7 +151,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       transition={{ duration: 0.3 }}
       className={cn('px-4', className)}
     >
-      <Panel kicker={kicker} footer={isOwnProfile ? basis : undefined}>
+      <Panel kicker={kicker}>
         {/* labelNoWrap: every label here is measured to fit one 81.5px column at
             390pt (see the item comments), so a wrap can only mean a locale
             string longer than the English default - and a truncation reads as
