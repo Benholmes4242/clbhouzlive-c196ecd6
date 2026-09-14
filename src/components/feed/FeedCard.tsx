@@ -958,13 +958,19 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             </div>
 
             {showLikedBy && (
-              /* Right-aligned under the actions group. The line is nowrap with an
-                 end ellipsis, so long names truncate at the tail and the height
-                 never changes between the in-flight figure and the names. */
+              /* LEFT-ALIGNED (Ben, 14 Sep — supersedes the right-aligned line
+                 built earlier tonight). EVERY LINE OF TEXT ON THIS CARD STARTS
+                 AT THE SAME 20px LEFT MARGIN — course name, place, liked-by,
+                 comment preview — and everything a member TAPS sits on the
+                 right. One reading edge, one acting edge.
+                 Left-aligned also settles the truncation: the line grows
+                 rightward into empty space and ellipsises at the far edge, one
+                 line, truncating from the end. Height is identical between the
+                 in-flight figure and the resolved names, so nothing jumps. */
               <LikedByRow
                 postId={post.id}
                 count={likeCount}
-                style={{ padding: `0 20px ${likedByBottom}px`, textAlign: 'right' }}
+                style={{ padding: `0 20px ${likedByBottom}px` }}
               />
             )}
 
