@@ -20,6 +20,7 @@ export function ExploreShelf({
   heading,
   seeAllLabel,
   metaLabel,
+  sub,
   headingRight,
   foot,
   onSeeAll,
@@ -30,6 +31,10 @@ export function ExploreShelf({
   seeAllLabel?: string | null;
   /** Additive quiet total when the rail has no command in the meta slot. */
   metaLabel?: string | null;
+  /** ADDITIVE. The rail's BASIS, one line under the heading (BRIEF_COURSES_MERGED
+   *  §4). Distinct from metaLabel, which sits beside the heading and is for a
+   *  short total, not a sentence. */
+  sub?: string | null;
   /**
    * ADDITIVE. A control that belongs to the heading rather than to the rail -
    * the standing board selector. When present it owns the right slot, so the
@@ -107,6 +112,17 @@ export function ExploreShelf({
           </span>
         ) : null}
       </div>
+
+      {/* BRIEF_COURSES_MERGED §4 THE RAIL'S BASIS SITS UNDER ITS HEADING, not
+          beside it. Measured at 320px, "Rated highly by the few who have played
+          them" in the meta slot collided with a wrapping two-word heading; a
+          sentence that explains a rail is a sub-line, never a right-hand chip. */}
+      {sub ? (
+        <div style={{ padding: '2px 16px 0', color: A.MUTE, fontSize: 12, fontWeight: 500, lineHeight: 1.35 }}>
+          {sub}
+        </div>
+      ) : null}
+
 
       <div
         style={{

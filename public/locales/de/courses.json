@@ -1621,7 +1621,9 @@
         "club": "Mein Club",
         "world": "Welt",
         "yourClub": "deinem Club",
-        "theWorld": "der Welt"
+        "theWorld": "der Welt",
+        "circle": "Mein Kreis",
+        "yourCircle": "deinem Kreis"
       },
       "scopes": "Ergebnisbereich",
       "roundCount": "{{count}} Runden",
@@ -1781,7 +1783,17 @@
       "golfersToFollow": "Golfer zum Folgen",
       "playsAtClub": "Spielt in {{club}}",
       "roundsThisMonth": "{{count}} Runden diesen Monat",
-      "alsoPlays": "Spielt auch {{course}}"
+      "alsoPlays": "Spielt auch {{course}}",
+      "highestRatedMonth": "Am besten bewertet in diesem Monat",
+      "highestRatedYear": "Am besten bewertet in diesem Jahr",
+      "circlePlays": "Wo dein Kreis spielt",
+      "circlePlaysSub": "Plaetze, auf denen die Menschen spielen, denen du folgst",
+      "worthTheDrive": "Die Fahrt wert",
+      "worthTheDriveSub": "Hoch bewertet von den wenigen, die dort gespielt haben",
+      "worldsBest": "Die besten der Welt",
+      "worldsBestSub": "Top 100 nach Rang",
+      "newOnClbhouz": "Neu auf clbhouz",
+      "newOnClbhouzSub": "Plaetze, die hier erstmals bewertet wurden"
     },
     "watch": {
       "searchPlaceholder": "Videos, Clips und Creator suchen",
@@ -1802,6 +1814,17 @@
         "community": "Aus der Community",
         "videos": "Videos"
       }
+    },
+    "courses": {
+      "searchPlaceholder": "Plaetze, Regionen und Bewertungen suchen",
+      "searchClear": "Suche loeschen",
+      "noMatch": "Nichts passt zu {{query}}.",
+      "noPlaceMatch": "Nichts passt zu {{query}}.",
+      "anywhere": "Ueberall",
+      "choosePlace": "Ort waehlen",
+      "clearPlace": "Ortsfilter loeschen",
+      "placeTitle": "Nach Ort suchen",
+      "findPlace": "Land oder Region finden"
     }
   }
 }
