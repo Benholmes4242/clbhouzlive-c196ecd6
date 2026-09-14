@@ -16,13 +16,23 @@ import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 export function CoursesSearchField({
   value,
   onChange,
+  /* ADDITIVE, DEFAULTS UNCHANGED: the merged Explore Courses view keeps the
+     original padding, placeholder and non-focusing behaviour. The Courses hub
+     and Top 100 inline search pass their own so one field serves all three
+     rather than a fourth look-alike being written. */
+  padding = '0 12px 10px',
+  placeholder,
+  autoFocus = false,
 }: {
   value: string;
   onChange: (next: string) => void;
+  padding?: string;
+  placeholder?: string;
+  autoFocus?: boolean;
 }) {
   const { t } = useTranslation('courses');
   return (
-    <div style={{ padding: '0 12px 10px' }}>
+    <div style={{ padding }}>
       <div
         className="flex items-center gap-2 px-3 rounded-sq-sm"
         style={{
