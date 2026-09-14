@@ -113,7 +113,7 @@ export function useRecentCourseRatings(enabled: boolean) {
           rating: group.mean,
           ratingCount: group.count,
           rank: null,
-          rankScopeWorld: false,
+          rankScope: null,
         };
       }),
     [shelfIds, byCourse, meta.data],

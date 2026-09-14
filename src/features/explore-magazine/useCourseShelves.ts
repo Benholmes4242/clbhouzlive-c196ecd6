@@ -86,7 +86,7 @@ export function useCountyCourses(
         rating: row.rating,
         ratingCount: row.rating_count,
         rank: null,
-        rankScopeWorld: false,
+        rankScope: null,
       }))
       .sort((a, b) => (b.rounds - a.rounds) || ((b.rating ?? 0) - (a.rating ?? 0)))
       .slice(0, 12);

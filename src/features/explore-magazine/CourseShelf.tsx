@@ -89,7 +89,10 @@ export function CourseShelf({
                   ? row.rating.toFixed(1)
                   : null
             }
-            unit={row.rank != null ? (row.rankScopeWorld ? 'world' : 'GB&I') : undefined}
+            /* THE CHIP NAMES THE LIST THE RANK CAME FROM. An unresolved scope
+               shows the rank alone — "#3" is honest, "#3 GB&I" on a New Jersey
+               course is not. */
+            unit={row.rank != null && row.rankScope ? RANK_SCOPE_LABEL[row.rankScope] : undefined}
             figureTone={row.rank == null && row.rating != null && row.rating >= 9 ? GREEN : undefined}
             whenLabel=""
             who=""
