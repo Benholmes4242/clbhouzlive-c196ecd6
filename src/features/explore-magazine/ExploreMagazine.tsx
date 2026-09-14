@@ -173,7 +173,7 @@ function ClipsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) {
   return (
     <ExploreShelf
       heading={t('amateur.stream.shelf.clips', 'Clips')}
-      seeAllLabel={t('amateur.stream.seeAll', 'See all {{count}}', { count: clips.length })}
+      seeAllLabel={t('amateur.stream.seeAllClips', 'See all {{count}} clips', { count: clips.length })}
       onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'clips', pos })}
       onSeeAll={() => {
         analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips' });
@@ -232,7 +232,7 @@ function MomentsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) 
   return (
     <ExploreShelf
       heading={t('amateur.stream.shelf.moments', 'From the community')}
-      seeAllLabel={t('amateur.stream.seeAll', 'See all {{count}}', { count: tiles.length })}
+      seeAllLabel={t('amateur.stream.seeAllMoments', 'See all {{count}} moments', { count: tiles.length })}
       onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'moments', pos })}
       onSeeAll={() => {
         analyticsEvents.track('amateur_shelf_see_all', { kind: 'moments' });
@@ -682,10 +682,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                       enabled={!!userId}
                       pos={pos}
                       source="suggested"
-                      blockGapAfter={pos === 0 ? BLOCK_GAP : 0}
                     />
                   ) : (
-                    <CircleShelf viewerId={userId} pos={pos} blockGapAfter={pos === 0 ? BLOCK_GAP : 0} />
+                    <CircleShelf viewerId={userId} pos={pos} />
                   )
                 ) : shelf === 'standing' ? (
                   <StandingShelf viewerId={userId} pos={pos} />
@@ -778,13 +777,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       </div>
 
-      {/* THE FIRST ALL-VIEW CONTENT. AmateurPage's CHROME_CLEARANCE remains
-          above this component, and the sticky chip row remains in normal flow
-          here, so this shelf clears both the islands and chips without owning
-          either offset. The settled-success gate prevents cached zero/error
-          states from flashing suggestions before the current follow-set read. */}
-      {view === 'all' ? renderShelf('circle', 0) : null}
-
       {/* §1 THE SAME SCOPE ROW, THE SAME COMPONENT, for Scores, Courses and
           Reviews. It does not render at all where neither a club nor a county
           resolves, and the view is then World. */}
@@ -857,13 +849,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
       {/* COLD START SHOWS THE SHORTEST PLAUSIBLE CARD, never a lead shell: a
           loading state is never larger than the state it resolves into. */}
-      {!source.isFetched && ranked.length === 0 ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP, paddingInline: CARD_INSET }}>
-          <StdShell />
-          <StdShell />
-        </div>
-      ) : null}
-
       {singleType && source.isFetched && source.items.length === 0 ? (
         /* §5d NEVER A BLANK VIEW. Where the shelves carry content they render and
            the sentence stays away; where the scope is empty of EVERYTHING there
@@ -891,6 +876,21 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           the zero minimum a long course name widens the whole track past the
           viewport at 320px instead of clipping inside the card. */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
+        {/* THE FIRST ALL-VIEW CONTENT. It is a direct child of the same 26px
+            block stack as the lead, so the seam is position-independent and
+            identical whether CircleShelf or PeopleShelf occupies the slot.
+            The chip row remains in normal flow above, preserving its lead-in.
+            The settled-success gate inside renderShelf prevents a stale zero
+            from flashing suggestions before the current follow-set settles. */}
+        {view === 'all' ? renderShelf('circle', 0) : null}
+
+        {!source.isFetched && ranked.length === 0 ? (
+          <>
+            <div style={{ paddingInline: CARD_INSET }}><StdShell /></div>
+            <div style={{ paddingInline: CARD_INSET }}><StdShell /></div>
+          </>
+        ) : null}
+
         {blocks.map((block, index) => {
           if (block.kind === 'shelf') {
             const pos = cardPos;
