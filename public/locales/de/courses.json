@@ -1782,6 +1782,26 @@
       "playsAtClub": "Spielt in {{club}}",
       "roundsThisMonth": "{{count}} Runden diesen Monat",
       "alsoPlays": "Spielt auch {{course}}"
+    },
+    "watch": {
+      "searchPlaceholder": "Videos, Clips und Creator suchen",
+      "filters": "Watch-Filter",
+      "noResults": "Keine Treffer fuer {{query}}.",
+      "empty": "Hier gibt es noch nichts zu sehen.",
+      "untitled": "Video ohne Titel",
+      "chip": {
+        "all": "Alle",
+        "forYou": "Fuer dich",
+        "friends": "Freunde",
+        "yourCourses": "Deine Plaetze",
+        "clips": "Clips",
+        "videos": "Videos"
+      },
+      "rail": {
+        "clips": "Clips",
+        "community": "Aus der Community",
+        "videos": "Videos"
+      }
     }
   }
 }

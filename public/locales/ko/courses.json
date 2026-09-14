@@ -1721,6 +1721,26 @@
       "playsAtClub": "{{club}} 플레이",
       "roundsThisMonth": "이번 달 {{count}} 라운드",
       "alsoPlays": "{{course}}도 플레이"
+    },
+    "watch": {
+      "searchPlaceholder": "영상, 클립, 크리에이터 검색",
+      "filters": "Watch 필터",
+      "noResults": "{{query}} 결과가 없습니다.",
+      "empty": "아직 볼 내용이 없습니다.",
+      "untitled": "제목 없는 영상",
+      "chip": {
+        "all": "전체",
+        "forYou": "추천",
+        "friends": "친구",
+        "yourCourses": "내 코스",
+        "clips": "클립",
+        "videos": "영상"
+      },
+      "rail": {
+        "clips": "클립",
+        "community": "커뮤니티",
+        "videos": "영상"
+      }
     }
   }
 }

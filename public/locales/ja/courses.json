@@ -1718,6 +1718,26 @@
       "playsAtClub": "{{club}}でプレー",
       "roundsThisMonth": "今月{{count}}ラウンド",
       "alsoPlays": "{{course}}でもプレー"
+    },
+    "watch": {
+      "searchPlaceholder": "動画・クリップ・クリエイターを検索",
+      "filters": "Watch フィルター",
+      "noResults": "{{query}} に一致するものはありません。",
+      "empty": "まだ見るものがありません。",
+      "untitled": "無題の動画",
+      "chip": {
+        "all": "すべて",
+        "forYou": "おすすめ",
+        "friends": "友達",
+        "yourCourses": "あなたのコース",
+        "clips": "クリップ",
+        "videos": "動画"
+      },
+      "rail": {
+        "clips": "クリップ",
+        "community": "コミュニティから",
+        "videos": "動画"
+      }
     }
   }
 }

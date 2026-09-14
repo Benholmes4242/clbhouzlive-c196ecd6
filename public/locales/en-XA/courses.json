@@ -2366,6 +2366,26 @@
       "playsAtClub": "[Pläys ãt {{club}}]",
       "roundsThisMonth": "[{{count}} rõünds thís mõnth]",
       "alsoPlays": "[Álsõ pläys {{course}}]"
+    },
+    "watch": {
+      "searchPlaceholder": "[!! Search videos, clips and creators !!]",
+      "filters": "[!! Watch filters !!]",
+      "noResults": "[!! Nothing matches {{query}}. !!]",
+      "empty": "[!! Nothing to watch here yet. !!]",
+      "untitled": "[!! Untitled video !!]",
+      "chip": {
+        "all": "[!! All !!]",
+        "forYou": "[!! For you !!]",
+        "friends": "[!! Friends !!]",
+        "yourCourses": "[!! Your courses !!]",
+        "clips": "[!! Clips !!]",
+        "videos": "[!! Videos !!]"
+      },
+      "rail": {
+        "clips": "[!! Clips !!]",
+        "community": "[!! From the community !!]",
+        "videos": "[!! Videos !!]"
+      }
     }
   }
 }
