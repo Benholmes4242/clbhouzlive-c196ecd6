@@ -30,9 +30,10 @@ interface JourneySummaryCardProps {
   /**
    * How many of their own ratings the RATING figure is the mean of. The label
    * had to shorten to "RATING" to fit its column (see the item comment), so the
-   * word AVERAGE lives in the basis line instead and needs this count to say
-   * anything. Null means unknown: the basis line then omits the rating clause
-   * rather than guessing a population.
+   * word AVERAGE lived in the basis line, which was removed on 14 Sep 2026.
+   * THE PROP IS STILL ACCEPTED AND NO LONGER READ: ProfileCoursesTab passes it,
+   * and dropping it from the contract would be a change to a caller this brief
+   * did not ask for. Nothing renders it.
    */
   ratedCount?: number | null;
   top100Played?: number | null;
@@ -45,7 +46,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   coursesPlayed,
   countriesPlayed,
   avgRating,
-  ratedCount,
+  /* ratedCount is accepted and deliberately not destructured - see the prop. */
   top100Played,
   isOwnProfile,
   displayName,
