@@ -10,6 +10,7 @@ import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPos
 import { formatRelativeAgo } from '@/i18n/format';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { getThumbnailUrl } from '@/utils/thumbnail';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreShelf } from '../ExploreShelf';
@@ -69,6 +70,48 @@ function creatorName(row: HubRpcRow): string {
   return (row.creator_display_name || row.creator_username || '').toString();
 }
 
+/**
+ * THE POSTER IS DERIVED, NOT ASSUMED.
+ *
+ * MEASURED: both Watch RPCs DO return `poster_url` under that exact name, so
+ * the field is not misnamed - but a real share of rows carry NULL in it, all of
+ * them older `stream:<uid>` uploads whose poster was never written back. Every
+ * one of those rows still carries `stream_id`, and Cloudflare Stream will serve
+ * a frame for any uid, so the poster is derived from the stream rather than
+ * left blank. Reading `poster_url` alone is what made those tiles black.
+ */
+function posterFor(row: HubRpcRow, height: number): string | null {
+  if (row.poster_url) return row.poster_url;
+  if (row.stream_id) return getThumbnailUrl({ streamId: row.stream_id, height });
+  return null;
+}
+
+/** NEVER AN EMPTY BLACK RECTANGLE. When there is no poster and when a poster
+ *  404s, the tile still reads as content: a soft gradient carrying the
+ *  creator's initial, at the tile's own size. */
+function PosterFallback({ initial, size }: { initial: string; size: number }) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: `linear-gradient(135deg, ${A.PANEL} 0%, rgba(255,255,255,0.12) 100%)`,
+        color: A.MUTE,
+        fontFamily: SANS,
+        fontSize: size,
+        fontWeight: 700,
+        letterSpacing: '0.02em',
+      }}
+    >
+      {initial}
+    </span>
+  );
+}
+
 /** THE VIDEO — full-bleed width, 16:9, YouTube-shaped: a CIRCULAR 30px avatar.
  *  This is the one deliberate departure from the platform squircle standard,
  *  because a long-form video row is read as a video row and not as a member
@@ -89,6 +132,9 @@ function VideoCard({
      than invented from likes or impressions. */
   const meta = [who, when].filter(Boolean).join(' \u00B7 ');
   const initial = (who || '?').trim().charAt(0).toUpperCase() || '?';
+  const poster = posterFor(row, 720);
+  const [posterFailed, setPosterFailed] = useState(false);
+
 
   return (
     <button
@@ -114,15 +160,18 @@ function VideoCard({
           background: A.PANEL,
         }}
       >
-        {row.poster_url ? (
+        {poster && !posterFailed ? (
           <img
-            src={row.poster_url}
+            src={poster}
             alt=""
             loading="lazy"
             decoding="async"
+            onError={() => setPosterFailed(true)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
-        ) : null}
+        ) : (
+          <PosterFallback initial={initial} size={34} />
+        )}
         <GlassDurationBadge seconds={row.duration_seconds ?? null} />
       </div>
 
@@ -192,8 +241,11 @@ function VideoCard({
 }
 
 /** THE CLIP — 112 wide, 9:16, radius 10, duration chip, creator beneath. */
-function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number; onPress: () => void }) {
+function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number | string; onPress: () => void }) {
   const who = creatorName(row);
+  const initial = (who || '?').trim().charAt(0).toUpperCase() || '?';
+  const poster = posterFor(row, 480);
+  const [posterFailed, setPosterFailed] = useState(false);
   return (
     <button
       type="button"
@@ -219,15 +271,18 @@ function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number; onP
           background: A.PANEL,
         }}
       >
-        {row.poster_url ? (
+        {poster && !posterFailed ? (
           <img
-            src={row.poster_url}
+            src={poster}
             alt=""
             loading="lazy"
             decoding="async"
+            onError={() => setPosterFailed(true)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
-        ) : null}
+        ) : (
+          <PosterFallback initial={initial} size={20} />
+        )}
         <GlassDurationBadge seconds={row.duration_seconds ?? null} />
       </span>
       {who ? (
@@ -497,7 +552,7 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
         <ClipTile
           key={`grid:${row.post_id}:${row.media_id ?? index}`}
           row={row}
-          width={undefined}
+          width="100%"
           onPress={() => openClip(index)}
         />
       ))}
@@ -509,10 +564,12 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
       ? (index - FIRST_RAIL_AFTER) / RAIL_EVERY
       : null;
     return (
-      <div key={`video:${row.post_id}`} style={{ display: 'grid', gap: 26 }}>
+      <div key={`video:${row.post_id}`} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
         <VideoCard row={row} onPress={() => openVideo(index)} />
         {rails && ordinal != null ? (
-          <div>{railKindAt(ordinal) === 'clips' ? clipsRail(ordinal) : communityRail(ordinal)}</div>
+          <div style={{ minWidth: 0, overflow: 'hidden' }}>
+            {railKindAt(ordinal) === 'clips' ? clipsRail(ordinal) : communityRail(ordinal)}
+          </div>
         ) : null}
       </div>
     );
@@ -593,7 +650,7 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
           )}
         </>
       ) : (
-        <div style={{ display: 'grid', gap: 26 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
           {videoList}
           {/* A SEARCH THAT MATCHES CLIPS SHOWS THEM. The rails stand down while
               searching, so matching clips arrive as one grid beneath the
@@ -613,7 +670,7 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
       ) : null}
 
       {!videosSettled && videoRows.length === 0 && !isClipsOnly(filter) ? (
-        <div style={{ display: 'grid', gap: 26 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
           <ShelfShell tileW={320} tileH={180} />
           <ShelfShell tileW={320} tileH={180} />
         </div>
