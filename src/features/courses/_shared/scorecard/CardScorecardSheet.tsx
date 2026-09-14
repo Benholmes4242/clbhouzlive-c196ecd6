@@ -1050,7 +1050,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   3,554 rounds, and on those the card, the totals and the to-par
                   are all read against nine holes; the kicker is where that is
                   said once. Eighteen holes is the default and says nothing. */}
-              {!!kickerText && (
+              {!!kickerText && isTour && (
                 <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {kickerText}
                 </div>
@@ -1072,7 +1072,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               )}
               {/* MEMBER ROW. With NO NAME nothing renders — no avatar, no
                   avatar-shaped hole. Amber marks the viewer's own round. */}
-              {showIdentity && (
+              {showIdentity && isTour && (
                 <div style={{ display: 'flex', alignItems: 'center', marginTop: 8, minWidth: 0 }}>
                   <span style={{ flexShrink: 0, marginRight: 8 }}>
                     <SquircleAvatar
@@ -1099,20 +1099,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                        member row instead of hanging one gap off the end of the
                        name. A short name no longer leaves the heart floating in
                        the middle of the row. */}
-                   {engagement && (
-                     <span style={{ marginLeft: 'auto', paddingLeft: 12, flexShrink: 0 }}>
-                    <RoundEngagementActions
-                      comment={engagement.comment ?? null}
-                      like={{
-                        hidden: engagement.likeHidden,
-                        count: engagement.likeCount,
-                        reacted: engagement.likeMine,
-                        onToggle: engagement.onToggleLike,
-                        label: engagement.likeLabel,
-                      }}
-                    />
-                     </span>
-                  )}
                   {showChip && <span style={{ marginLeft: 8, flexShrink: 0 }}><HandicapChip delta={playerHcpDelta as number} /></span>}
                 </div>
               )}
@@ -1133,25 +1119,28 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 >
                   {totals.gross}
                 </div>
-                <div
-                  style={{
-                    ...NUM, fontSize: 13, fontWeight: 700, marginTop: 6,
-                    color: heroMuted ? EVEN_GRAY : toParColor(totals.toPar),
-                  }}
-                >
-                  {fmtRel(totals.toPar)}
+                <div style={{ ...NUM, fontSize: 12, fontWeight: 700, marginTop: 6, color: A.MUTE, whiteSpace: 'nowrap' }}>
+                  <span style={{ color: heroMuted ? EVEN_GRAY : toParColor(totals.toPar) }}>{fmtRel(totals.toPar)}</span>
+                  {(shownPar > 0 || coursePar != null) && (
+                    <span> {'\u00B7'} {t('courses:scorecard.parN', { n: shownPar > 0 ? shownPar : coursePar })}</span>
+                  )}
                 </div>
-                {/* §B — THE PAR IS A KICKER, not a third figure: it is the
-                    basis the two figures above are read against, so it takes
-                    the caps-tracked label role. */}
-                {(shownPar > 0 || coursePar != null) && (
-                  <div style={{ ...LABEL_READ, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 3 }}>
-                    {t('courses:scorecard.parN', { n: shownPar > 0 ? shownPar : coursePar })}
-                  </div>
-                )}
               </div>
             )}
           </div>
+
+          {!isTour && showIdentity && (
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: 10, minWidth: 0 }}>
+              <span style={{ flexShrink: 0, marginRight: 8 }}>
+                <SquircleAvatar src={playerAvatarUrl ?? null} alt={playerName} userId={playerUserId ?? undefined} size={24} hairlineRing />
+              </span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: isOwner ? A.AMBER : A.INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {playerName}
+              </span>
+              {!!kickerText && <span style={{ ...LABEL_READ, marginLeft: 8, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kickerText}</span>}
+              {showChip && <span style={{ marginLeft: 8, flexShrink: 0 }}><HandicapChip delta={playerHcpDelta as number} /></span>}
+            </div>
+          )}
 
           {/* S1.3 — THE RAIL. Nothing renders when no figure resolves. */}
           {rail.length > 0 && (
@@ -1229,7 +1218,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 the same screen as its own CTA. The scoring key stays with the
                 card, directly beneath it (S4.2).
               */}
-              <Panel kicker={t('courses:scorecard.theCard')}>
+              <ScorecardSection kicker={t('courses:scorecard.theCard')} flat={!isTour}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <Nine rows={out} label={t('courses:scorecard.out')} />
                   {back.length > 0 && (
@@ -1249,7 +1238,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
                   <Legend holes={played} hasUnplayed={!allHolesPlayed} />
                 </div>
-              </Panel>
+              </ScorecardSection>
 
               {/*
                 §C — AT THIS COURSE. ONE POOL: the member's own rounds at this
@@ -1263,55 +1252,51 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   count (INDEX THEN can resolve on its own) it falls back to the
                   bare title rather than claiming "your 0 rounds here". */}
               {courseSection.length > 0 && (
-                <Panel
-                  kicker={(courseContext?.roundsHere ?? 0) > 0
-                    ? t('courses:scorecard.atThisCourse', { count: courseContext?.roundsHere as number })
-                    : t('courses:scorecard.atThisCourseBare')}
-                >
-                  <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
+                <ScorecardSection kicker={t('courses:scorecard.atThisCourseBare')} flat={!isTour}>
+                  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${courseSection.length}, minmax(0, 1fr))`, alignItems: 'start' }}>
                     {courseSection.map((it) => (
-                      <div key={it.key} style={{ minWidth: 0 }}>
+                      <div key={it.key} style={{ minWidth: 0, textAlign: 'center', padding: '0 4px' }}>
                         <div style={{ ...RAIL_FIG, color: it.tone ?? A.INK }}>{it.value}</div>
-                        <div style={{ ...LABEL, fontSize: 9.5, letterSpacing: '0.12em', marginTop: 3 }}>{it.label}</div>
+                        <div style={{ ...LABEL, fontSize: 9.5, marginTop: 5, lineHeight: 1.25 }}>{it.label}</div>
                       </div>
                     ))}
                   </div>
-                </Panel>
+                  {!isTour && fieldGateOpen && withField && beatFieldOn != null && (
+                    <p style={{ ...CAPTION, textAlign: 'center', marginTop: 16 }}>
+                      {t(isOwner ? 'courses:scorecard.beatFieldSelf' : 'courses:scorecard.beatFieldOther', {
+                        name: playerName,
+                        n: beatFieldOn,
+                        m: fieldHoles.length,
+                      })}
+                    </p>
+                  )}
+                </ScorecardSection>
               )}
 
               {/* HOW IT BROKE DOWN — the birdie+ figure keeps its RED (S4.3). */}
-              <Panel kicker={t('courses:scorecard.howItBrokeDown')}>
+              <ScorecardSection kicker={t('courses:scorecard.howItBrokeDown')} flat={!isTour}>
                 <RoundSplit split={split} />
-              </Panel>
+              </ScorecardSection>
 
-              {/* HOW IT UNFOLDED — last, the most decorative and least
-                  referenced element. Construction and monotonePath unchanged. */}
-              <Panel kicker={t('courses:scorecard.howItUnfolded')}>
-                <TrajectoryLine
-                  holes={holes}
-                  height={120}
-                  surface="dark"
-                  interactive
-                  showFieldComparison={fieldGateOpen}
-                />
-                {/* The FIELD row's pool-basis and gate-fail lines left with the
-                    row. Beat-the-field remains an independent trajectory fact;
-                    when its five-player gate fails, this section says nothing. */}
-                {!isTour && fieldGateOpen && withField && beatFieldOn != null && (
-                  <p style={{ ...CAPTION, marginTop: 12 }}>
-                    {t('courses:scorecard.beatFieldSentence', {
-                      n: beatFieldOn,
-                      m: fieldHoles.length,
-                    })}
-                  </p>
-                )}
-              </Panel>
+              {isTour && null}
             </>
           )}
 
           {/* S3.3 — EXITS BELONG AT THE END. */}
-          {(onViewProfile || onViewCourse || onShareRound) && (
+          {(engagement || onViewProfile || onViewCourse || onShareRound) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', paddingTop: 2 }}>
+              {engagement && (
+                <RoundEngagementActions
+                  comment={engagement.comment ?? null}
+                  like={{
+                    hidden: engagement.likeHidden,
+                    count: engagement.likeCount,
+                    reacted: engagement.likeMine,
+                    onToggle: engagement.onToggleLike,
+                    label: engagement.likeLabel,
+                  }}
+                />
+              )}
               {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} align="left" />}
               {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} align="left" />}
               {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} align="left" />}
