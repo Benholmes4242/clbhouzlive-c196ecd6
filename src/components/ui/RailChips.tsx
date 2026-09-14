@@ -89,10 +89,15 @@ export interface RailChipsProps {
 /** The applied-state ground: 6% white, stated once. */
 const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start', trailing }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start', size = 'md', trailing }: RailChipsProps) {
   const filled = ground === 'filled';
   /* The selecting filled ground: a choice group, so tablist/tab semantics stay. */
   const filledSelection = ground === 'filled-selection';
+  /* ONE geometry pair, stated once. 'md' is the canonical chip. */
+  const geo = size === 'sm'
+    ? { padding: '4px 9px', fontSize: 11, radius: 9 }
+    : { padding: '6px 11px', fontSize: 12, radius: RAIL_CHIP_RADIUS };
+
 
   return (
     <div
