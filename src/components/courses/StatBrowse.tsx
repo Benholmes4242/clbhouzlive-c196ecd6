@@ -973,7 +973,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                     navigate(`/courses/${row.course_id}`);
                   }}
                 />
-                {i < rows.length - 1 && reviewSlots.get(i + 1) ? (
+                {/* Slot placement is computed against the unfiltered list, so
+                    the reviews stand down while a search is narrowing it. */}
+                {!searching && i < visibleRows.length - 1 && reviewSlots.get(i + 1) ? (
                   <div style={{ marginTop: 32 }}>
                     {reviewSlots.get(i + 1)!.kind === 'rail' ? (
                       <ReviewRailSlot
