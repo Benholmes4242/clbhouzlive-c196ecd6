@@ -163,6 +163,8 @@ export function StandoutTile({
   nameLines = 2,
   factLines = 2,
   railCaptionLine,
+  captionNameLines = 1,
+
 
   footer,
   kicker = null,
