@@ -78,7 +78,7 @@ export interface RailChipsProps {
 /** The applied-state ground: 6% white, stated once. */
 const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start' }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start', trailing }: RailChipsProps) {
   const filled = ground === 'filled';
   /* The selecting filled ground: a choice group, so tablist/tab semantics stay. */
   const filledSelection = ground === 'filled-selection';
