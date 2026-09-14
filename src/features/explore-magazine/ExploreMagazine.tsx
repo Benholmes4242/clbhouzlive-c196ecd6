@@ -11,6 +11,7 @@ import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
