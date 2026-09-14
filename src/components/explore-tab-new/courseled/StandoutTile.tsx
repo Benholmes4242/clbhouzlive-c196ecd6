@@ -477,8 +477,17 @@ export function StandoutTile({
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{
-                  minHeight: 20,
-                  display: 'flex',
+                  /* TWO RESERVED LINES ARE OPT-IN (BRIEF_EXPLORE_DEVICE_PASS
+                     §2a). A rail whose member names are long — "Richard
+                     Lawrenson" — cut the name at one line. With
+                     captionNameLines 2 the name wraps to a second line and the
+                     box RESERVES that height, so every tile in the rail is the
+                     same height whether the name wraps or not. Callers that
+                     omit the prop keep the single ellipsized line. */
+                  minHeight: captionNameLines === 2 ? 36 : 20,
+                  display: captionNameLines === 2 ? '-webkit-box' : 'flex',
+                  WebkitLineClamp: captionNameLines === 2 ? 2 : undefined,
+                  WebkitBoxOrient: captionNameLines === 2 ? 'vertical' : undefined,
                   alignItems: 'center',
                   fontSize: 13,
                   fontWeight: 700,
@@ -486,12 +495,13 @@ export function StandoutTile({
                   color: isOwn ? A.AMBER_DEEP : A.INK,
                   lineHeight: 1.2,
                   textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  whiteSpace: captionNameLines === 2 ? 'normal' : 'nowrap',
                   overflow: 'hidden',
                 }}
               >
                 {who || detail}
               </div>
+
               <div
                 style={{
                   minHeight: 13,
