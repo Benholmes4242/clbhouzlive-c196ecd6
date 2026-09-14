@@ -53,15 +53,15 @@ import { relativeDay, toParLabel } from './exploreCopy';
 
 /** §3 the rounds tile geometry named by the brief. */
 const TILE = { w: 170, h: 112 };
-/** §2 the rail draws eight; the see-all sheet carries the rest. */
-const RENDERED = 8;
+/** §2 the rail draws ten; the see-all sheet carries the rest. */
+const RENDERED = 10;
 /** How deep the sheet reads. Newest first, so this is the newest N. */
 const SHEET_LIMIT = 60;
 /** No window: ten years is "everything we hold" without an unbounded scan. */
 const NO_WINDOW_DAYS = 3650;
 
 /**
- * THE REAL TOTAL, so "See all 24" is a fact and not the length of a page. One
+ * THE REAL TOTAL, so "See all 24 rounds" is a fact and not the length of a page. One
  * head count over the same set the tiles are drawn from: 18-hole rounds by the
  * people the viewer follows, viewer excluded.
  */
@@ -91,12 +91,9 @@ function toPar(row: CircleRoundRow): number | null {
 export function CircleShelf({
   viewerId,
   pos,
-  blockGapAfter = 0,
 }: {
   viewerId: string | undefined;
   pos: number;
-  /** Additive layout hook for a shelf moved outside the stream's gap-owning grid. */
-  blockGapAfter?: number;
 }) {
   const { t } = useTranslation('courses');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -137,11 +134,7 @@ export function CircleShelf({
 
   if (!viewerId) return null;
   if (!circle.isFetched || !total.isFetched) {
-    return (
-      <div style={{ marginBottom: blockGapAfter }}>
-        <ShelfShell tileW={TILE.w} tileH={TILE.h} />
-      </div>
-    );
+    return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
   }
   /* §4 A viewer who follows nobody, or whose circle has no tracked rounds, gets
      NO SHELF. Skipped; the next shelf takes the slot. */
@@ -151,13 +144,12 @@ export function CircleShelf({
 
   return (
     <>
-      <div style={{ marginBottom: blockGapAfter }}>
-        <ExploreShelf
-          heading={t('amateur.stream.shelf.circle', 'Your circle')}
+      <ExploreShelf
+        heading={t('amateur.stream.shelf.circle', 'Your circle')}
         /* Sentence-case see-all: the horizontal-rail convention. Only where
            there is more than the rail draws. */
         seeAllLabel={
-          shown > tiles.length ? t('amateur.stream.seeAll', 'See all {{count}}', { count: shown }) : null
+          shown > tiles.length ? t('amateur.stream.seeAllRounds', 'See all {{count}} rounds', { count: shown }) : null
         }
         metaLabel={t('amateur.stream.roundCount', '{{count}} rounds', { count: shown })}
         onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'circle', pos })}
@@ -203,8 +195,7 @@ export function CircleShelf({
             </div>
           );
         })}
-        </ExploreShelf>
-      </div>
+      </ExploreShelf>
 
       {/* SEE-ALL IS A SHEET, NOT A ROUTE: the member is coming back to the
           stream. Newest first, complete. */}

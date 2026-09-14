@@ -117,7 +117,7 @@ function useStandingCopy() {
       retry: t('amateur.stream.standing.retry', 'Try again'),
       unit: (count: number) => t('amateur.stream.standing.of', 'of {{count}}', { count }),
       lastChange: (when: string) => t('amateur.stream.standing.lastChange', 'last change {{when}}', { when }),
-      seeAll: (count: number) => t('amateur.stream.seeAll', 'See all {{count}}', { count }),
+      seeAll: (count: number) => t('amateur.stream.seeAllCourses', 'See all {{count}} courses', { count }),
       you: t('amateur.stream.you', 'You'),
       locale: i18n.language || 'en',
     }),
