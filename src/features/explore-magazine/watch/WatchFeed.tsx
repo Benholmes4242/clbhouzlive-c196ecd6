@@ -117,6 +117,93 @@ function PosterFallback({ initial, size }: { initial: string; size: number }) {
   );
 }
 
+/**
+ * AUTOPLAY ON SCROLL — ONE STREAM ON THE PAGE, AND IT IS AN ENHANCEMENT
+ * (BRIEF_EXPLORE_DEVICE_PASS §4).
+ *
+ * NOTHING NEW WAS WRITTEN TO COORDINATE THIS. The page already owns a
+ * coordinator that does exactly what the brief asks: `mediaRailAutoplay`
+ * registers every tile in ONE registry, elects the tile NEAREST THE CENTRE OF
+ * THE VIEWPORT that is at least 60% visible, and gives it the only stream — so
+ * two items can never play at once, and on a rail only the tile in the centre
+ * plays. `reviewVideoAutoplay`'s coordinator was NOT reused here: its cap is two
+ * per group, which is right for the mosaic and wrong for a scroll page.
+ * `autoplayBlocked` (reduced motion, Save-Data) and `attachTileHls` are reused
+ * verbatim.
+ *
+ * THE POSTER IS THE RESTING STATE. The video fades in over it once it actually
+ * plays and is removed on the way out, so a blocked, failed or losing tile is a
+ * poster and never a black rectangle. Muted always, no controls: the tap still
+ * opens the post, where the real player and its mute affordance live.
+ */
+function AutoplayLayer({ hlsUrl, poster }: { hlsUrl: string | null; poster: string | null }) {
+  const reducedMotion = usePrefersReducedMotion();
+  const hostRef = useRef<HTMLSpanElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [active, setActive] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const mount = !!hlsUrl && !failed && !autoplayBlocked(reducedMotion);
+
+  useEffect(() => {
+    const el = hostRef.current;
+    if (!mount || !el) return;
+    return registerRailVideo(el, setActive);
+  }, [mount]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!active || !video || !hlsUrl) return;
+    const attachment = attachTileHls(video, hlsUrl, () => setFailed(true));
+    video.muted = true;
+    video.currentTime = 0;
+    video.play()?.catch(() => setPlaying(false));
+    return () => {
+      setPlaying(false);
+      video.pause();
+      attachment.detach();
+    };
+  }, [active, hlsUrl]);
+
+  if (!mount) return null;
+
+  return (
+    <span ref={hostRef} aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+      <video
+        ref={videoRef}
+        poster={poster ?? undefined}
+        muted
+        loop
+        playsInline
+        preload="none"
+        disableRemotePlayback
+        tabIndex={-1}
+        onPlaying={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onError={(event) => {
+          if (event.currentTarget.getAttribute('src')) setFailed(true);
+        }}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          opacity: playing ? 1 : 0,
+          transition: 'opacity 140ms linear',
+          pointerEvents: 'none',
+        }}
+      />
+    </span>
+  );
+}
+
+/** The HLS source for a row, or null where the row carries no stream. */
+function hlsFor(row: HubRpcRow): string | null {
+  if (row.hls_url) return String(row.hls_url);
+  if (row.stream_id) return generateStreamHlsUrl(String(row.stream_id));
+  return null;
+}
+
+
 /** THE VIDEO — full-bleed width, 16:9, YouTube-shaped: a CIRCULAR 30px avatar.
  *  This is the one deliberate departure from the platform squircle standard,
  *  because a long-form video row is read as a video row and not as a member
