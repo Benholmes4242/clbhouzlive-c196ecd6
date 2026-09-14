@@ -30,6 +30,8 @@ export interface ClubGolfer {
   photoUrl: string | null;
   /** Course records held at this club's courses. */
   boards: number;
+  /** Present only when the member holds exactly one current record. */
+  singleRecordCategory: string | null;
   /** 18-hole rounds tracked at this club's courses. */
   roundsHere: number;
   isNew: boolean;
@@ -80,7 +82,10 @@ export function useClubGolfers(viewerId: string | undefined, clubId: string | nu
         courseIds.length > 0
           ? supabase
               .from('gam_course_legends')
-              .select('user_id')
+              /* Category is already on the same rows. Selecting it adds no read
+                 and lets the tile reserve "the course record" exclusively for
+                 the all-time gross record. */
+              .select('user_id, category')
               .in('user_id', ids)
               .in('course_id', courseIds)
               .eq('rank', 1)
@@ -99,6 +104,13 @@ export function useClubGolfers(viewerId: string | undefined, clubId: string | nu
       };
       const rounds = tally(roundsResult.data);
       const boards = tally(legendsResult.data);
+      const recordCategories = new Map<string, string[]>();
+      for (const row of ((legendsResult.data ?? []) as Array<{ user_id: string | null; category: string | null }>)) {
+        if (!row.user_id || !row.category) continue;
+        const categories = recordCategories.get(row.user_id) ?? [];
+        categories.push(row.category);
+        recordCategories.set(row.user_id, categories);
+      }
       const now = Date.now();
 
       return (people ?? [])
@@ -110,6 +122,10 @@ export function useClubGolfers(viewerId: string | undefined, clubId: string | nu
             username: (row.username as string | null) ?? null,
             photoUrl: (row.profile_photo_url as string | null) ?? null,
             boards: boards.get(row.id as string) ?? 0,
+            singleRecordCategory:
+              recordCategories.get(row.id as string)?.length === 1
+                ? recordCategories.get(row.id as string)?.[0] ?? null
+                : null,
             roundsHere: rounds.get(row.id as string) ?? 0,
             isNew: Number.isFinite(created) && now - created <= NEW_WINDOW_MS,
           };

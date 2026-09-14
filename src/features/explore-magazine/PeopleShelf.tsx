@@ -135,8 +135,15 @@ function reasonForClubGolfer(
   golfer: ClubGolfer,
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string,
 ): string {
-  if (golfer.boards > 0) return t('amateur.shelf.holdsBoards', 'Holds {{count}} board', { count: golfer.boards });
-  if (golfer.roundsHere > 0) return t('amateur.shelf.roundsHere', '{{count}} rounds here', { count: golfer.roundsHere });
+  if (golfer.boards === 1 && golfer.singleRecordCategory === 'lowest_gross_all_time') {
+    return t('amateur.shelf.holdsCourseRecord', 'Holds the course record');
+  }
+  if (golfer.boards > 0) {
+    return t('amateur.shelf.holdsCourseRecords', 'Holds a course record', { count: golfer.boards });
+  }
+  if (golfer.roundsHere > 0) {
+    return t('amateur.shelf.roundsHere', '{{count}} round here', { count: golfer.roundsHere });
+  }
   if (golfer.isNew) return t('amateur.shelf.newThisMonth', 'New this month');
   return '';
 }
