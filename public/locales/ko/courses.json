@@ -1700,6 +1700,17 @@
       "holdsCourseRecord": "코스 레코드 보유",
       "holdsCourseRecords_one": "코스 레코드 1개 보유",
       "holdsCourseRecords_other": "코스 레코드 {{count}}개 보유",
+      "recordReason": {
+        "courseRecordHolder": "코스 레코드 보유자",
+        "womensCourseRecordHolder": "여자 코스 레코드 보유자",
+        "allTimeBirdieLeader": "역대 버디 최다",
+        "allTimeEagleLeader": "역대 이글 최다",
+        "allTimeAceLeader": "역대 홀인원 최다",
+        "allTimeStablefordLeader": "역대 스테이블포드 선두",
+        "allTimeAlbatrossHolder": "역대 알바트로스 최다",
+        "mostRoundsHere": "이곳 최다 라운드",
+        "bestScoreToParHere": "이곳 최저 파 대비 스코어"
+      },
       "roundsHere_one": "여기서 {{count}}라운드",
       "roundsHere_other": "여기서 {{count}}라운드",
       "newThisMonth": "이번 달 신규",

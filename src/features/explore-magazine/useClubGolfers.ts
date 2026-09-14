@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
 
+import { isClubRecordCategory, type ClubRecordCategory } from './clubGolferRecords';
+
 /**
  * GOLFERS AT THE VIEWER'S CLUB (BRIEF_EXPLORE_MAGAZINE PHASE C §4).
  *
@@ -28,10 +30,8 @@ export interface ClubGolfer {
   name: string;
   username: string | null;
   photoUrl: string | null;
-  /** Course records held at this club's courses. */
-  boards: number;
-  /** Present only when the member holds exactly one current record. */
-  singleRecordCategory: string | null;
+  /** Distinct current all-time record categories held at this club's courses. */
+  recordCategories: ClubRecordCategory[];
   /** 18-hole rounds tracked at this club's courses. */
   roundsHere: number;
   isNew: boolean;
@@ -69,7 +69,9 @@ export function useClubGolfers(viewerId: string | undefined, clubId: string | nu
 
       /* THE REASON SOURCES. Both are scoped to this club's courses, so "3 rounds
          here" means here and nowhere else. With no club course they stay empty
-         and the tiles fall through to "New this month" or the name alone. */
+         and the tiles fall through to "New this month" or the name alone.
+         Legend reasons are ALL-TIME ONLY: a rolling 90-day lead is temporary
+         state, not a golfer identity. */
       const [roundsResult, legendsResult] = await Promise.all([
         courseIds.length > 0
           ? supabase
@@ -90,6 +92,7 @@ export function useClubGolfers(viewerId: string | undefined, clubId: string | nu
               .in('course_id', courseIds)
               .eq('rank', 1)
               .eq('is_current', true)
+               .like('category', '%_all_time')
           : Promise.resolve({ data: [], error: null }),
       ]);
       if (roundsResult.error) throw roundsResult.error;
@@ -103,12 +106,11 @@ export function useClubGolfers(viewerId: string | undefined, clubId: string | nu
         return out;
       };
       const rounds = tally(roundsResult.data);
-      const boards = tally(legendsResult.data);
-      const recordCategories = new Map<string, string[]>();
+      const recordCategories = new Map<string, ClubRecordCategory[]>();
       for (const row of ((legendsResult.data ?? []) as Array<{ user_id: string | null; category: string | null }>)) {
-        if (!row.user_id || !row.category) continue;
+        if (!row.user_id || !isClubRecordCategory(row.category)) continue;
         const categories = recordCategories.get(row.user_id) ?? [];
-        categories.push(row.category);
+        if (!categories.includes(row.category)) categories.push(row.category);
         recordCategories.set(row.user_id, categories);
       }
       const now = Date.now();
@@ -121,22 +123,18 @@ export function useClubGolfers(viewerId: string | undefined, clubId: string | nu
             name: (row.display_name as string | null) || (row.username as string | null) || '',
             username: (row.username as string | null) ?? null,
             photoUrl: (row.profile_photo_url as string | null) ?? null,
-            boards: boards.get(row.id as string) ?? 0,
-            singleRecordCategory:
-              recordCategories.get(row.id as string)?.length === 1
-                ? recordCategories.get(row.id as string)?.[0] ?? null
-                : null,
+            recordCategories: recordCategories.get(row.id as string) ?? [],
             roundsHere: rounds.get(row.id as string) ?? 0,
             isNew: Number.isFinite(created) && now - created <= NEW_WINDOW_MS,
           };
         })
         /* A NAMELESS PROFILE IS NOT A TILE. */
         .filter((row) => row.name.length > 0)
-        /* §4 ORDER IS THE REASON STRENGTH: boards, then rounds here, then new,
+         /* §4 ORDER IS THE REASON STRENGTH: records, then rounds here, then new,
            then name so the rail is stable between renders. */
         .sort(
           (a, b) =>
-            (b.boards - a.boards) ||
+            (b.recordCategories.length - a.recordCategories.length) ||
             (b.roundsHere - a.roundsHere) ||
             (Number(b.isNew) - Number(a.isNew)) ||
             a.name.localeCompare(b.name),

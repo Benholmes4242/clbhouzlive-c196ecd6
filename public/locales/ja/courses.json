@@ -1697,6 +1697,17 @@
       "holdsCourseRecord": "コースレコード保持者",
       "holdsCourseRecords_one": "コースレコードを1件保持",
       "holdsCourseRecords_other": "コースレコードを{{count}}件保持",
+      "recordReason": {
+        "courseRecordHolder": "コースレコード保持者",
+        "womensCourseRecordHolder": "女子コースレコード保持者",
+        "allTimeBirdieLeader": "歴代バーディー最多",
+        "allTimeEagleLeader": "歴代イーグル最多",
+        "allTimeAceLeader": "歴代ホールインワン最多",
+        "allTimeStablefordLeader": "歴代ステーブルフォード首位",
+        "allTimeAlbatrossHolder": "歴代アルバトロス最多",
+        "mostRoundsHere": "ここで最多ラウンド",
+        "bestScoreToParHere": "ここでの対パー最少スコア"
+      },
       "roundsHere_one": "ここで{{count}}ラウンド",
       "roundsHere_other": "ここで{{count}}ラウンド",
       "newThisMonth": "今月から参加",

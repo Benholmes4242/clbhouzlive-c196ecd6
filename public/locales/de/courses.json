@@ -1761,6 +1761,17 @@
       "holdsCourseRecord": "Haelt den Platzrekord",
       "holdsCourseRecords_one": "Haelt einen Platzrekord",
       "holdsCourseRecords_other": "Haelt {{count}} Platzrekorde",
+      "recordReason": {
+        "courseRecordHolder": "Platzrekordhalter",
+        "womensCourseRecordHolder": "Halterin des Platzrekords",
+        "allTimeBirdieLeader": "Birdie-Bestmarke aller Zeiten",
+        "allTimeEagleLeader": "Eagle-Bestmarke aller Zeiten",
+        "allTimeAceLeader": "Ass-Bestmarke aller Zeiten",
+        "allTimeStablefordLeader": "Stableford-Bestmarke aller Zeiten",
+        "allTimeAlbatrossHolder": "Albatross-Bestmarke aller Zeiten",
+        "mostRoundsHere": "Meiste Runden hier",
+        "bestScoreToParHere": "Bestes Ergebnis zu Par hier"
+      },
       "roundsHere_one": "{{count}} Runde hier",
       "roundsHere_other": "{{count}} Runden hier",
       "newThisMonth": "Neu diesen Monat",

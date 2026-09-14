@@ -2345,6 +2345,17 @@
       "holdsCourseRecord": "[Hõlds thé kõũrsé rékõrd]",
       "holdsCourseRecords_one": "[Hõlds ã kõũrsé rékõrd]",
       "holdsCourseRecords_other": "[Hõlds {{count}} kõũrsé rékõrds]",
+      "recordReason": {
+        "courseRecordHolder": "[Cõũrsé récõrd hõldér]",
+        "womensCourseRecordHolder": "[Wõmén's cõũrsé récõrd hõldér]",
+        "allTimeBirdieLeader": "[Ãll-tïmé bïrdïé léãdér]",
+        "allTimeEagleLeader": "[Ãll-tïmé éãglé léãdér]",
+        "allTimeAceLeader": "[Ãll-tïmé ãcé léãdér]",
+        "allTimeStablefordLeader": "[Ãll-tïmé stãbléfõrd léãdér]",
+        "allTimeAlbatrossHolder": "[Ãll-tïmé ãlbãtrõss hõldér]",
+        "mostRoundsHere": "[Mõst rõũñds héré]",
+        "bestScoreToParHere": "[Bést scõré-tõ-pãr héré]"
+      },
       "roundsHere_one": "[{{count}} rõũñd héré]",
       "roundsHere_other": "[{{count}} rõũñds héré]",
       "newThisMonth": "[Néw thïs mõñth]",
