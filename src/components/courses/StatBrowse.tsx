@@ -948,9 +948,19 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         )
       ) : (
         <div className="mt-4 -mx-4">
-          {rows.map((row, i) => {
+          {/* A SEARCH THAT MATCHES NOTHING IS NOT AN EMPTY AREA: it says so in
+              its own words and leaves the area's empty states alone. */}
+          {searching && visibleRows.length === 0 ? (
+            <div className="px-4" style={{ fontSize: 13, color: INK_MUTE }}>
+              {t('statBrowse.search.noMatch', {
+                defaultValue: 'No course on this list matches {{query}}.',
+                query: nameQuery.trim(),
+              })}
+            </div>
+          ) : null}
+          {visibleRows.map((row, i) => {
             return (
-              <div key={row.course_id} style={{ marginBottom: i < rows.length - 1 ? 32 : 0 }}>
+              <div key={row.course_id} style={{ marginBottom: i < visibleRows.length - 1 ? 32 : 0 }}>
                 <BrowseCourseCard
                   row={row}
                   difficultyPercentile={browseTruth?.difficultyPercentiles.get(row.course_id)}
