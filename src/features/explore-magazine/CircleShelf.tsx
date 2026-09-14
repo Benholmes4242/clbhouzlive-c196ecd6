@@ -195,10 +195,10 @@ export function CircleShelf({
                     place this same railCaptionDate beneath the name. Circle's
                     second caption line belongs to HCP movement, so adding the
                     date there would create a crowded third line. Keep the one
-                    app-wide date grammar, but put it in glass opposite the
-                    score here. Do not "harmonise" the position later. */
+                    app-wide date grammar; the POSITION differs, the MATERIAL
+                    does not. The glass date badge is retired: plain kicker text
+                    on the photo, as on every other tile. */
                  whenLabel={railCaptionDate(row.play_date) ?? ''}
-                 whenGlass
                 who={row.display_name}
                 /* IDENTITY IS user_profiles / public_profiles AND NOTHING ELSE.
                    Never whs_friends or whs_friend_matches: those hold England
