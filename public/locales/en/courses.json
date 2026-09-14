@@ -217,7 +217,8 @@
     "shelf": {
       "golfersAtClub": "Golfers at {{club}}",
       "yourClub": "your club",
-      "holdsBoards": "Holds {{count}} boards",
+      "holdsBoards_one": "Holds {{count}} board",
+      "holdsBoards_other": "Holds {{count}} boards",
       "roundsHere": "{{count}} rounds here",
       "newThisMonth": "New this month",
       "follow": "Follow",
