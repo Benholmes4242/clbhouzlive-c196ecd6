@@ -226,6 +226,20 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     region,
   });
 
+  /* INLINE NAME SEARCH (Ben, 14 Sep). Narrows what the country/region/lens
+     controls have already selected: a plain case-insensitive contains-match
+     over the rows on screen, no query to the catalogue. `rows` is left
+     untouched so paging, empty-state causes and review-slot placement keep
+     reading the unfiltered list. */
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [nameQuery, setNameQuery] = useState('');
+  const searching = nameQuery.trim().length > 0;
+  const visibleRows = useMemo(() => {
+    const q = nameQuery.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((row) => row.name.toLowerCase().includes(q));
+  }, [rows, nameQuery]);
+
   /* ── Review slots (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL) ───── */
   /**
    * A review is decision content, so it lives where the decision is made. The
