@@ -2418,6 +2418,9 @@
       "clearPlace": "[Clear place filter]",
       "placeTitle": "[Browse by place]",
       "findPlace": "[Find a country or region]"
+    },
+    "place": {
+      "pair": "[{{place}}, {{nation}}]"
     }
   }
 }

@@ -1770,6 +1770,9 @@
       "clearPlace": "地域の絞り込みを解除",
       "placeTitle": "地域から探す",
       "findPlace": "国または地域を検索"
+    },
+    "place": {
+      "pair": "{{place}}、{{nation}}"
     }
   }
 }
