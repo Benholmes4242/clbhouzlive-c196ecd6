@@ -14,7 +14,20 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ExploreShelf } from './ExploreShelf';
 import { ShelfShell } from './ExploreShells';
 import { useClubGolfers, type ClubGolfer } from './useClubGolfers';
-import { useSuggestedGolfers } from './useSuggestedGolfers';
+/* THE ONE SUGGESTION ENGINE. public.get_suggested_golfers, SECURITY DEFINER,
+   already excludes the viewer, everyone they follow, blocked actors, test and
+   deleted profiles, and drops any candidate whose reason resolves to NULL
+   (WHERE r.reason IS NOT NULL) - so a reasonless person cannot reach this shelf
+   and nothing has to be recomputed on the client. Its precedence is club,
+   reciprocal, course, clubmate_mutual, mutual, active, recently_joined: a
+   superset of the shelf's club-then-rounds-then-shared-course order, with the
+   same three in the same relative order, so there is no conflict to report.
+   src/features/explore-magazine/useSuggestedGolfers.ts is now DEAD-LISTED. */
+import {
+  useSuggestedGolfers,
+  type SuggestedGolfer,
+} from '@/features/social-suggestions/useSuggestedGolfers';
+import { reasonText } from '@/features/social-suggestions/SuggestedGolferRow';
 
 /**
  * GOLFERS AT {CLUB} (BRIEF_EXPLORE_MAGAZINE PHASE C §4).
