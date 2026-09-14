@@ -13,6 +13,7 @@ import {
   Globe,
   Search,
   Star,
+  X,
 } from 'lucide-react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -57,6 +58,7 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
+import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
 
 /**
  * Emphasise only the figures inside a sentence: INK 700 with tabular figures
@@ -225,6 +227,20 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     country,
     region,
   });
+
+  /* INLINE NAME SEARCH (Ben, 14 Sep). Narrows what the country/region/lens
+     controls have already selected: a plain case-insensitive contains-match
+     over the rows on screen, no query to the catalogue. `rows` is left
+     untouched so paging, empty-state causes and review-slot placement keep
+     reading the unfiltered list. */
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [nameQuery, setNameQuery] = useState('');
+  const searching = nameQuery.trim().length > 0;
+  const visibleRows = useMemo(() => {
+    const q = nameQuery.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((row) => row.name.toLowerCase().includes(q));
+  }, [rows, nameQuery]);
 
   /* ── Review slots (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL) ───── */
   /**
@@ -750,14 +766,38 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         <div className="flex items-center gap-2">
           <div className="min-w-0 flex-1">{countrySelect(condensed)}</div>
           <div className="min-w-0 flex-1">{regionSelect(condensed)}</div>
+          {/* INLINE SEARCH OVER WHAT IS ON SCREEN. The old "Edit" text opened the
+              full directory sheet; that sheet keeps its three other doors (both
+              empty states and the footer CTA), so nothing lost its entrance. */}
           <button
             type="button"
-            onClick={() => openDirectory(country, 'filter_bar')}
-            style={{ flexShrink: 0, border: 0, background: 'transparent', color: INK_MUTE, fontSize: 12, fontWeight: 700 }}
+            onClick={() => {
+              if (searchOpen) setNameQuery('');
+              setSearchOpen((prev) => !prev);
+            }}
+            aria-label={t('statBrowse.search.open', { defaultValue: 'Search this list' })}
+            aria-expanded={searchOpen}
+            className={`${condensed ? 'h-8 w-8' : 'h-10 w-10'} shrink-0 flex items-center justify-center`}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8 }}
           >
-            Edit
+            {searchOpen ? (
+              <X className={condensed ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
+            ) : (
+              <Search className={condensed ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
+            )}
           </button>
         </div>
+        {searchOpen ? (
+          <div className="mt-2">
+            <CoursesSearchField
+              value={nameQuery}
+              onChange={setNameQuery}
+              padding="0"
+              autoFocus
+              placeholder={t('statBrowse.search.placeholder', { defaultValue: 'Search these courses' })}
+            />
+          </div>
+        ) : null}
         <div className="mt-2.5">
           <RailChips
             options={browseBoards}
@@ -910,9 +950,19 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         )
       ) : (
         <div className="mt-4 -mx-4">
-          {rows.map((row, i) => {
+          {/* A SEARCH THAT MATCHES NOTHING IS NOT AN EMPTY AREA: it says so in
+              its own words and leaves the area's empty states alone. */}
+          {searching && visibleRows.length === 0 ? (
+            <div className="px-4" style={{ fontSize: 13, color: INK_MUTE }}>
+              {t('statBrowse.search.noMatch', {
+                defaultValue: 'No course on this list matches {{query}}.',
+                query: nameQuery.trim(),
+              })}
+            </div>
+          ) : null}
+          {visibleRows.map((row, i) => {
             return (
-              <div key={row.course_id} style={{ marginBottom: i < rows.length - 1 ? 32 : 0 }}>
+              <div key={row.course_id} style={{ marginBottom: i < visibleRows.length - 1 ? 32 : 0 }}>
                 <BrowseCourseCard
                   row={row}
                   difficultyPercentile={browseTruth?.difficultyPercentiles.get(row.course_id)}
@@ -925,7 +975,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                     navigate(`/courses/${row.course_id}`);
                   }}
                 />
-                {i < rows.length - 1 && reviewSlots.get(i + 1) ? (
+                {/* Slot placement is computed against the unfiltered list, so
+                    the reviews stand down while a search is narrowing it. */}
+                {!searching && i < visibleRows.length - 1 && reviewSlots.get(i + 1) ? (
                   <div style={{ marginTop: 32 }}>
                     {reviewSlots.get(i + 1)!.kind === 'rail' ? (
                       <ReviewRailSlot

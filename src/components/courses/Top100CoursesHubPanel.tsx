@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Award } from 'lucide-react';
+import { Award, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import BrowseCourseCard from './BrowseCourseCard';
@@ -14,6 +14,7 @@ import type { CourseListMembership } from '@/hooks/useGolfCoursesSearch';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { COURSE_BROWSE_DESCRIPTION } from './courseBrowseTypography';
+import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
 
 const LISTS = [
   { id: 'global', label: 'Global' },
@@ -86,6 +87,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [selectedList, setSelectedList] = useState(savedList);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [nameQuery, setNameQuery] = useState('');
   const restored = useRef(false);
   const { data: summaries = [] } = useTop100ListSummaries(user?.id);
   const { data, isLoading, isError, refetch } = useGolfCoursesInfinite({ listSlug: selectedList });
@@ -98,6 +101,13 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
     const rows = data?.pages.flat() ?? [];
     return [...rows].sort((a, b) => (rankFor(a, selectedList) ?? 999) - (rankFor(b, selectedList) ?? 999));
   }, [data, selectedList]);
+  /* Search narrows what is rendered only. The rated / tracked sentences above
+     describe the whole list, so they keep counting the unfiltered rows. */
+  const visibleCourses = useMemo(() => {
+    const q = nameQuery.trim().toLowerCase();
+    if (!q) return courses;
+    return courses.filter((course) => (course.name ?? '').toLowerCase().includes(q));
+  }, [courses, nameQuery]);
   const ids = useMemo(() => courses.map((course) => course.id), [courses]);
   const enrichment = useTop100Enrichment(ids, user?.id, selectedList);
   const ratedCount = courses.filter((course) => {
@@ -135,14 +145,49 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
         <p style={{ ...COURSE_BROWSE_DESCRIPTION, margin: '10px 0 16px' }}>
           {ratingSentence} {roundSentence}
         </p>
-        <RailChips
-          options={LISTS}
-          value={selectedList}
-          onChange={(next) => { restored.current = true; setSelectedList(next); }}
-          ariaLabel="Top 100 region"
-          ground="outline"
-          align="center-when-fit"
-        />
+        {/* THE SAME INLINE SEARCH THE COURSES TAB CARRIES, one field component
+            shared by both: a plain case-insensitive contains-match over the
+            list already selected by the region chips. No catalogue query. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <RailChips
+              options={LISTS}
+              value={selectedList}
+              onChange={(next) => { restored.current = true; setSelectedList(next); }}
+              ariaLabel="Top 100 region"
+              ground="outline"
+              align="center-when-fit"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (searchOpen) setNameQuery('');
+              setSearchOpen((prev) => !prev);
+            }}
+            aria-label="Search this list"
+            aria-expanded={searchOpen}
+            className="h-9 w-9 shrink-0 flex items-center justify-center"
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8 }}
+          >
+            {searchOpen ? (
+              <X className="h-4 w-4" style={{ color: A.INK }} aria-hidden />
+            ) : (
+              <Search className="h-4 w-4" style={{ color: A.INK }} aria-hidden />
+            )}
+          </button>
+        </div>
+        {searchOpen ? (
+          <div style={{ marginTop: 10 }}>
+            <CoursesSearchField
+              value={nameQuery}
+              onChange={setNameQuery}
+              padding="0"
+              autoFocus
+              placeholder="Search these courses"
+            />
+          </div>
+        ) : null}
         {rateNudge ? <div style={{ marginTop: 24 }}>{rateNudge}</div> : null}
       </section>
 
@@ -161,11 +206,16 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
           </div>
         ) : (
           <div>
-            {courses.map((course, index) => {
+            {nameQuery.trim().length > 0 && visibleCourses.length === 0 ? (
+              <div style={{ padding: '0 20px', color: A.MUTE, fontSize: 13 }}>
+                {`No course on this list matches ${nameQuery.trim()}.`}
+              </div>
+            ) : null}
+            {visibleCourses.map((course, index) => {
               const item = enrichment.get(course.id);
               const row = toBrowseRow(course, item, selectedList);
               return (
-                <div key={course.id} style={{ marginBottom: index < courses.length - 1 ? 32 : 0 }}>
+                <div key={course.id} style={{ marginBottom: index < visibleCourses.length - 1 ? 32 : 0 }}>
                   <BrowseCourseCard
                     row={row}
                     variant="top100"

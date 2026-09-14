@@ -16,13 +16,23 @@ import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 export function CoursesSearchField({
   value,
   onChange,
+  /* ADDITIVE, DEFAULTS UNCHANGED: the merged Explore Courses view keeps the
+     original padding, placeholder and non-focusing behaviour. The Courses hub
+     and Top 100 inline search pass their own so one field serves all three
+     rather than a fourth look-alike being written. */
+  padding = '0 12px 10px',
+  placeholder,
+  autoFocus = false,
 }: {
   value: string;
   onChange: (next: string) => void;
+  padding?: string;
+  placeholder?: string;
+  autoFocus?: boolean;
 }) {
   const { t } = useTranslation('courses');
   return (
-    <div style={{ padding: '0 12px 10px' }}>
+    <div style={{ padding }}>
       <div
         className="flex items-center gap-2 px-3 rounded-sq-sm"
         style={{
@@ -36,12 +46,13 @@ export function CoursesSearchField({
           type="text"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          placeholder={t('amateur.courses.searchPlaceholder', 'Search courses, regions and reviews')}
+          placeholder={placeholder ?? t('amateur.courses.searchPlaceholder', 'Search courses, regions and reviews')}
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-[rgba(255,255,255,0.38)]"
           style={{ color: 'rgba(255,255,255,0.96)', fontFamily: SANS, minWidth: 0 }}
           autoComplete="off"
           spellCheck="false"
-          aria-label={t('amateur.courses.searchPlaceholder', 'Search courses, regions and reviews')}
+          autoFocus={autoFocus}
+          aria-label={placeholder ?? t('amateur.courses.searchPlaceholder', 'Search courses, regions and reviews')}
         />
         {value.length > 0 ? (
           <button
