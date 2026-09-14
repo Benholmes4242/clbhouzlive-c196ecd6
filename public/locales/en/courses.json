@@ -220,6 +220,17 @@
       "holdsCourseRecord": "Holds the course record",
       "holdsCourseRecords_one": "Holds a course record",
       "holdsCourseRecords_other": "Holds {{count}} course records",
+      "recordReason": {
+        "courseRecordHolder": "Course record holder",
+        "womensCourseRecordHolder": "Women's course record holder",
+        "allTimeBirdieLeader": "All-time birdie leader",
+        "allTimeEagleLeader": "All-time eagle leader",
+        "allTimeAceLeader": "All-time ace leader",
+        "allTimeStablefordLeader": "All-time stableford leader",
+        "allTimeAlbatrossHolder": "All-time albatross holder",
+        "mostRoundsHere": "Most rounds here",
+        "bestScoreToParHere": "Best score-to-par here"
+      },
       "roundsHere_one": "{{count}} round here",
       "roundsHere_other": "{{count}} rounds here",
       "newThisMonth": "New this month",

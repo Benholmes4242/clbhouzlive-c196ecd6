@@ -23,7 +23,7 @@ export function isClubRecordCategory(value: string | null): value is ClubRecordC
 
 interface AssignmentCandidate {
   userId: string;
-  recordCategories: ClubRecordCategory[];
+  recordCategories: readonly ClubRecordCategory[];
 }
 
 /**

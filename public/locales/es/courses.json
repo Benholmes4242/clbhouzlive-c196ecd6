@@ -1761,6 +1761,17 @@
       "holdsCourseRecord": "Tiene el record del campo",
       "holdsCourseRecords_one": "Tiene un record del campo",
       "holdsCourseRecords_other": "Tiene {{count}} records del campo",
+      "recordReason": {
+        "courseRecordHolder": "Titular del record del campo",
+        "womensCourseRecordHolder": "Titular del record femenino",
+        "allTimeBirdieLeader": "Lider historico en birdies",
+        "allTimeEagleLeader": "Lider historico en eagles",
+        "allTimeAceLeader": "Lider historico en hoyos en uno",
+        "allTimeStablefordLeader": "Lider historico en stableford",
+        "allTimeAlbatrossHolder": "Lider historico en albatros",
+        "mostRoundsHere": "Mas vueltas aqui",
+        "bestScoreToParHere": "Mejor resultado respecto al par aqui"
+      },
       "roundsHere_one": "{{count}} ronda aqui",
       "roundsHere_other": "{{count}} rondas aqui",
       "newThisMonth": "Nuevo este mes",
