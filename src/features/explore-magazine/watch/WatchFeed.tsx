@@ -132,6 +132,9 @@ function VideoCard({
      than invented from likes or impressions. */
   const meta = [who, when].filter(Boolean).join(' \u00B7 ');
   const initial = (who || '?').trim().charAt(0).toUpperCase() || '?';
+  const poster = posterFor(row, 720);
+  const [posterFailed, setPosterFailed] = useState(false);
+
 
   return (
     <button
@@ -157,15 +160,18 @@ function VideoCard({
           background: A.PANEL,
         }}
       >
-        {row.poster_url ? (
+        {poster && !posterFailed ? (
           <img
-            src={row.poster_url}
+            src={poster}
             alt=""
             loading="lazy"
             decoding="async"
+            onError={() => setPosterFailed(true)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
-        ) : null}
+        ) : (
+          <PosterFallback initial={initial} size={34} />
+        )}
         <GlassDurationBadge seconds={row.duration_seconds ?? null} />
       </div>
 
@@ -237,6 +243,9 @@ function VideoCard({
 /** THE CLIP — 112 wide, 9:16, radius 10, duration chip, creator beneath. */
 function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number; onPress: () => void }) {
   const who = creatorName(row);
+  const initial = (who || '?').trim().charAt(0).toUpperCase() || '?';
+  const poster = posterFor(row, 480);
+  const [posterFailed, setPosterFailed] = useState(false);
   return (
     <button
       type="button"
@@ -262,15 +271,18 @@ function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number; onP
           background: A.PANEL,
         }}
       >
-        {row.poster_url ? (
+        {poster && !posterFailed ? (
           <img
-            src={row.poster_url}
+            src={poster}
             alt=""
             loading="lazy"
             decoding="async"
+            onError={() => setPosterFailed(true)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
-        ) : null}
+        ) : (
+          <PosterFallback initial={initial} size={20} />
+        )}
         <GlassDurationBadge seconds={row.duration_seconds ?? null} />
       </span>
       {who ? (
