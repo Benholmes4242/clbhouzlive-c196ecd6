@@ -110,6 +110,7 @@ export function useCommentsV2({
   const {
     data,
     isLoading,
+    isFetched: pagesFetched,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -118,6 +119,13 @@ export function useCommentsV2({
     queryKey: commentsKeys.pages(scope),
     enabled: enabled && !!targetId,
     staleTime: 30_000,
+    /* THE THREAD IS ASKED FOR EVERY TIME THE SHEET OPENS (RULING B).
+       The global refetchOnMount is `true`, which honours staleTime — so a
+       reopen inside 30s re-served the previous answer with no request, and a
+       reply posted while the member was reading the feed was invisible.
+       'always' is set HERE ONLY: the global default is load-bearing for the
+       rest of the app and staleTime is left alone. */
+    refetchOnMount: 'always',
     initialPageParam: null as string | null,
     getNextPageParam: (last) => last.nextCursor,
     queryFn: async ({ pageParam }) => {
@@ -149,6 +157,8 @@ export function useCommentsV2({
     placeholderData: keepPreviousData,
     enabled: enabled && parentIds.length > 0,
     staleTime: 30_000,
+    /* RULING B — scoped to the comments-v2 reads, see the pages query above. */
+    refetchOnMount: 'always',
     queryFn: async () => {
       const { data } = await supabase
         .from('comments_v2')
@@ -178,6 +188,8 @@ export function useCommentsV2({
     placeholderData: keepPreviousData,
     enabled: enabled && rowIds.length > 0,
     staleTime: 30_000,
+    /* RULING B — scoped to the comments-v2 reads, see the pages query above. */
+    refetchOnMount: 'always',
     queryFn: async () => {
       const personalIds = Array.from(new Set(
         allRows.filter(r => (r.actor_type ?? 'personal') !== 'business')
@@ -296,10 +308,16 @@ export function useCommentsV2({
   }, [parents, replies, hiddenIds, blockedIds, shape]);
 
   // Header total (top-level count for the current target).
-  const { data: totalCount = 0, isLoading: totalCountLoading } = useQuery({
+  const {
+    data: totalCount = 0,
+    isLoading: totalCountLoading,
+    isFetched: totalCountFetched,
+  } = useQuery({
     queryKey: commentsKeys.count(scope),
     enabled: enabled && !!targetId,
     staleTime: 30_000,
+    /* RULING B — scoped to the comments-v2 reads, see the pages query above. */
+    refetchOnMount: 'always',
     queryFn: async () => {
       // Prefer posts.comment_count when target is a post.
       if (targetType === 'post') {
@@ -325,6 +343,25 @@ export function useCommentsV2({
   const invalidate = useCallback(() => {
     qc.invalidateQueries({ queryKey: keyRoot as unknown as readonly unknown[] });
   }, [qc, targetType, targetId, targetSecondaryId]);
+
+  /**
+   * RULING C — THE CARD'S PREVIEW IS A SECOND LIST, AND IT WAS NEVER TOLD.
+   *
+   * The two COUNTS already agree by construction (both read
+   * posts.comment_count), and the two LISTS stay separate on purpose: the
+   * preview is one batched read across a whole feed page, the sheet is a
+   * paginated thread. What was missing is the message. `postCommentPreview`
+   * keys are `['post-comment-preview', scope, viewer, digest(ids)]` — the
+   * digest is a hash of the SORTED POST-ID SET, so there is no key that names
+   * one post. Invalidating the ROOT PREFIX is therefore the only honest reach:
+   * it marks every mounted feed page's preview stale, which is at most a
+   * handful of queries and one read each, and is what makes the card show the
+   * comment the member just wrote instead of the old line for up to 60s.
+   */
+  const invalidateFeedPreviews = useCallback(() => {
+    if (targetType !== 'post') return;
+    qc.invalidateQueries({ queryKey: ['post-comment-preview'] });
+  }, [qc, targetType]);
 
   // ── Mutations (RPC only) ──
 
@@ -359,6 +396,8 @@ export function useCommentsV2({
         patchEngagement(qc, targetId, { commentCountDelta: +1 });
       }
       invalidate();
+      /* RULING C — the card's preview line, not just the count. */
+      invalidateFeedPreviews();
     },
   });
 
@@ -368,7 +407,11 @@ export function useCommentsV2({
       if (error) throw error;
       return data as unknown;
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      invalidate();
+      /* An edited comment can be the very line the card is showing. */
+      invalidateFeedPreviews();
+    },
   });
 
   const deleteComment = useMutation({
@@ -384,6 +427,9 @@ export function useCommentsV2({
         patchEngagement(qc, targetId, { commentCountDelta: -(1 + (vars.replyCount ?? 0)) });
       }
       invalidate();
+      /* RULING C — deleting the newest comment leaves the card quoting a
+         comment that no longer exists; the same gap, same fix. */
+      invalidateFeedPreviews();
     },
   });
 
@@ -481,6 +527,15 @@ export function useCommentsV2({
     totalCount,
     totalCountLoading,
     isLoading,
+    /**
+     * THE ONLY HONEST GATES (RULING A). isLoading / totalCountLoading are
+     * `isPending && isFetching`, and these queries are DISABLED while the
+     * sheet is shut — pending with fetchStatus 'idle' — so both read FALSE on
+     * the frame the sheet opens, before anything has been asked. Consumers
+     * gate on these instead.
+     */
+    isFetched: pagesFetched,
+    totalCountFetched,
     fetchNextPage,
     hasNextPage: !!hasNextPage,
     isFetchingNextPage,
