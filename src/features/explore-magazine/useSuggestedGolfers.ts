@@ -45,6 +45,7 @@ export interface SuggestedGolfer {
   roundsThisMonth: number;
   /** A course the viewer has also played, if any. */
   sharedCourseId: string | null;
+  sharedCourseName: string | null;
 }
 
 const EMPTY: SuggestedGolfer[] = [];
@@ -120,6 +121,22 @@ export function useSuggestedGolfers(viewerId: string | undefined, enabled: boole
         }
       }
 
+      /* THE COURSE NEEDS ITS NAME, and an id is not a reason line. One read over
+         the handful of shared ids; a course whose name does not resolve simply
+         drops the line rather than showing a UUID. */
+      const sharedIds = Array.from(new Set(shared.values()));
+      const courseNames = new Map<string, string>();
+      if (sharedIds.length > 0) {
+        const { data: courses, error: courseError } = await supabase
+          .from('golf_courses')
+          .select('id, name')
+          .in('id', sharedIds);
+        if (courseError) throw courseError;
+        for (const row of (courses ?? []) as Array<{ id: string; name: string | null }>) {
+          if (row.name) courseNames.set(row.id, row.name);
+        }
+      }
+
       return people
         .map((m) => ({
           userId: m.id,
@@ -129,6 +146,10 @@ export function useSuggestedGolfers(viewerId: string | undefined, enabled: boole
           homeClub: (m.home_club ?? '')?.trim() || null,
           roundsThisMonth: monthCount.get(m.id) ?? 0,
           sharedCourseId: shared.get(m.id) ?? null,
+          sharedCourseName: (() => {
+            const id = shared.get(m.id);
+            return id ? courseNames.get(id) ?? null : null;
+          })(),
         }))
         /* A NAMELESS PROFILE IS NOT A TILE. */
         .filter((row) => row.name.length > 0)
@@ -138,7 +159,7 @@ export function useSuggestedGolfers(viewerId: string | undefined, enabled: boole
           (a, b) =>
             (Number(!!b.homeClub) - Number(!!a.homeClub)) ||
             (Number(b.roundsThisMonth > 0) - Number(a.roundsThisMonth > 0)) ||
-            (Number(!!b.sharedCourseId) - Number(!!a.sharedCourseId)) ||
+            (Number(!!b.sharedCourseName) - Number(!!a.sharedCourseName)) ||
             (b.roundsThisMonth - a.roundsThisMonth) ||
             a.name.localeCompare(b.name),
         )
