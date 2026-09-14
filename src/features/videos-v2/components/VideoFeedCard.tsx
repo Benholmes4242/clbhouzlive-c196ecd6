@@ -105,9 +105,9 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
           overflow: 'hidden',
         }}
       >
-        {row.poster_url ? (
+        {posterUrl ? (
           <img
-            src={row.poster_url}
+            src={posterUrl}
             alt=""
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             loading="lazy"
