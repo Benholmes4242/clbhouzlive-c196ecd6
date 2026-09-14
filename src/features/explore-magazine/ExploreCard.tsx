@@ -158,19 +158,8 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
         />,
       );
     }
-    /* NEVER BOTH RANKS. World outranks regional. */
-    const world = facts.top100_world;
-    const regional = facts.top100_regional;
-    if (world != null || regional != null) {
-      out.push(
-        <FigureChip
-          key="course-rank"
-          corner="right"
-          figure={`#${world ?? regional}`}
-          unit={world != null ? t('amateur.stream.chip.world', 'world') : t('amateur.stream.chip.gbi', 'GB&I')}
-        />,
-      );
-    }
+    /* ONE RANK, AND IT NAMES ITS OWN LIST (see CourseRankChip). */
+    out.push(<CourseRankChip key="course-rank" item={item} />);
   }
 
   if ((kind === 'clip' || kind === 'watch') && facts.duration_s) {
