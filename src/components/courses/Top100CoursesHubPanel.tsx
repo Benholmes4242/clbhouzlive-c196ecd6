@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import BrowseCourseCard from './BrowseCourseCard';
 import type { StatBrowseRow } from './useStatBrowse';
-import { RailChips } from '@/components/ui/RailChips';
+import { RAIL_CHIP_GEOMETRY, RailChips } from '@/components/ui/RailChips';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
@@ -168,8 +168,15 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
               aria-label="Search this list"
               aria-expanded={searchOpen}
               style={{
-                padding: '6px 11px',
-                borderRadius: 11,
+                /* HEIGHT AND RADIUS COME FROM THE CHIPS (BRIEF_SEARCH_CONTROL_HEIGHT).
+                   alignSelf stretch makes it exactly as tall as the Global /
+                   GB&I / Europe / USA chips beside it, and the radius is read
+                   from the chip geometry rather than typed - if the chips ever
+                   change shape this follows them. Horizontal padding is
+                   unchanged, so the width is what it always was. */
+                alignSelf: 'stretch',
+                padding: `0 ${RAIL_CHIP_GEOMETRY.md.padding.split(' ')[1]}`,
+                borderRadius: RAIL_CHIP_GEOMETRY.md.radius,
                 border: `1px solid ${searchOpen ? 'transparent' : A.BORDER}`,
                 background: searchOpen ? A.INK : 'transparent',
                 color: searchOpen ? A.CANVAS : A.MUTE,
