@@ -356,7 +356,7 @@ export function StandoutTile({
             ) : null}
 
           </span>
-        )}
+        ) : null}
 
         {/* AGE — PLAIN TEXT ON THE PHOTO, EVERYWHERE, NO EXCEPTIONS.
             The glass date badge is RETIRED. Glass is the score chip's material,
@@ -366,23 +366,30 @@ export function StandoutTile({
             chip on the photo, and it is the score.
             `whenGlass` is kept as an accepted prop so existing callsites stay
             valid, and is deliberately inert. Legibility is now carried entirely
-            by the shadow, hence the doubled, tighter stack below. */}
-        <span
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 10,
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            lineHeight: 1,
-            color: 'rgba(255,255,255,0.78)',
-            textShadow: '0 1px 2px rgba(10,14,10,0.62), 0 0 6px rgba(10,14,10,0.45)',
-          }}
-        >
-          {whenLabel}
-        </span>
+            by the shadow, hence the doubled, tighter stack below.
+            IT IS ALSO THE RIGHT LANE and shrinks first: minWidth 0 plus a nowrap
+            ellipsis is what makes a long date shorten instead of colliding. */}
+          <span
+            style={{
+              minWidth: 0,
+              flexShrink: 1,
+              textAlign: 'right',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              lineHeight: 1.35,
+              color: 'rgba(255,255,255,0.78)',
+              textShadow: '0 1px 2px rgba(10,14,10,0.62), 0 0 6px rgba(10,14,10,0.45)',
+            }}
+          >
+            {whenLabel}
+          </span>
+        </div>
+
 
         <div style={{ position: 'absolute', left: 10, right: 10, bottom: 9 }}>
           {/* COURSE NAME — two lines (BRIEF_STANDOUT_TILE_NAME_WRAP). Already
