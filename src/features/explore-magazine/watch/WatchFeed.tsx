@@ -4,8 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
+import { autoplayBlocked } from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
+import { registerRailVideo } from '@/components/explore-tab-new/courseled/mediaRailAutoplay';
+import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
 import { RailChips } from '@/components/ui/RailChips';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { formatRelativeAgo } from '@/i18n/format';
 import { stripMentionMarkup } from '@/lib/mentions/format';
