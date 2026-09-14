@@ -1573,6 +1573,8 @@
       "seeAll": "{{count}}개 모두 보기",
       "seeAllRounds_one": "라운드 {{count}}개 모두 보기",
       "seeAllRounds_other": "라운드 {{count}}개 모두 보기",
+      "seeAllRoundsPlain": "모든 라운드 보기",
+      "allRounds": "모든 라운드",
       "seeAllClips_one": "클립 {{count}}개 모두 보기",
       "seeAllClips_other": "클립 {{count}}개 모두 보기",
       "seeAllMoments_one": "모먼트 {{count}}개 모두 보기",

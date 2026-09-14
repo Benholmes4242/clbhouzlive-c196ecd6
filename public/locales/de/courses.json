@@ -1634,6 +1634,8 @@
       "seeAll": "Alle {{count}} ansehen",
       "seeAllRounds_one": "{{count}} Runde ansehen",
       "seeAllRounds_other": "Alle {{count}} Runden ansehen",
+      "seeAllRoundsPlain": "Alle Runden ansehen",
+      "allRounds": "Alle Runden",
       "seeAllClips_one": "{{count}} Clip ansehen",
       "seeAllClips_other": "Alle {{count}} Clips ansehen",
       "seeAllMoments_one": "{{count}} Moment ansehen",

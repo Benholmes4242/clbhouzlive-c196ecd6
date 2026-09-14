@@ -1570,6 +1570,8 @@
       "seeAll": "{{count}}件すべて表示",
       "seeAllRounds_one": "{{count}}ラウンドをすべて表示",
       "seeAllRounds_other": "{{count}}ラウンドをすべて表示",
+      "seeAllRoundsPlain": "すべてのラウンドを表示",
+      "allRounds": "すべてのラウンド",
       "seeAllClips_one": "{{count}}件のクリップをすべて表示",
       "seeAllClips_other": "{{count}}件のクリップをすべて表示",
       "seeAllMoments_one": "{{count}}件のモーメントをすべて表示",

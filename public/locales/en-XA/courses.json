@@ -2218,6 +2218,8 @@
       "seeAll": "[Séé åll {{count}} one two]",
       "seeAllRounds_one": "[Šéé áļļ {{count}} řőúñđ]",
       "seeAllRounds_other": "[Šéé áļļ {{count}} řőúñđš]",
+      "seeAllRoundsPlain": "[Šéé áļļ řőúñđš]",
+      "allRounds": "[Áļļ řőúñđš]",
       "seeAllClips_one": "[Šéé áļļ {{count}} ĉļíƥ]",
       "seeAllClips_other": "[Šéé áļļ {{count}} ĉļíƥš]",
       "seeAllMoments_one": "[Šéé áļļ {{count}} ɱőɱéñţ]",

@@ -96,6 +96,8 @@
       "seeAll": "See all {{count}}",
       "seeAllRounds_one": "See all {{count}} round",
       "seeAllRounds_other": "See all {{count}} rounds",
+      "seeAllRoundsPlain": "See all rounds",
+      "allRounds": "All rounds",
       "seeAllClips_one": "See all {{count}} clip",
       "seeAllClips_other": "See all {{count}} clips",
       "seeAllMoments_one": "See all {{count}} moment",
