@@ -50,6 +50,7 @@ export function WeeklyClubShelf({
   if (!enabled || !clubId || !clubName || board.error || rows.length === 0) return null;
 
   return (
+    <>
     <ExploreShelf
       heading={t('amateur.stream.shelf.clubWeek', 'This week at {{club}}', { club: clubName })}
       /* The count is the sum of the per-course pools: rounds at this club's
