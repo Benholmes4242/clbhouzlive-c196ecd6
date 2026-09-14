@@ -81,7 +81,12 @@ const CARD_INSET = 12;
 /** §3d blocks are 26px apart. */
 const BLOCK_GAP = 26;
 
-const CLIP_TILE = { w: 118, h: 210 };
+/* THE CLIP TILE (BRIEF_EXPLORE_DEVICE_PASS §2b). ~2.4 tiles visible at 390:
+   140 wide keeps a 9:16 clip at 249 tall, which is clearly bigger than the old
+   118 and still reads as a RAIL rather than a carousel of posters. The Watch
+   clips rail carries the same 140 so the two surfaces agree. */
+const CLIP_TILE = { w: 140, h: 249 };
+
 const MOMENT_TILE = { w: 132, h: 132 };
 
 /** §3e PHASE C — THE FINAL ALL ORDER, skipping empties: clips, rounds (this week
