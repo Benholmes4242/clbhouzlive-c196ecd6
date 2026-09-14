@@ -1687,7 +1687,11 @@
       "newThisMonth": "이번 달 신규",
       "follow": "팔로우",
       "following": "팔로잉",
-      "topRated": "Best rated lately"
+      "topRated": "Best rated lately",
+      "golfersToFollow": "팔로우할 골퍼",
+      "playsAtClub": "{{club}} 플레이",
+      "roundsThisMonth": "이번 달 {{count}} 라운드",
+      "alsoPlays": "{{course}}도 플레이"
     }
   }
 }

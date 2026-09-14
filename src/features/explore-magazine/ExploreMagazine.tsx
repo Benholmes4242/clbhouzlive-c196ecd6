@@ -22,6 +22,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
 import { ExploreShelf } from './ExploreShelf';
+import { useCircleSize } from '@/features/amateur/useCircleSize';
+
 import { CircleShelf } from './CircleShelf';
 import { StandingShelf } from './StandingShelf';
 import { LeadShell, PairShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
@@ -275,6 +277,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const { t, i18n } = useTranslation('courses');
   const navigate = useNavigate();
   const opener = useScorecardOpener();
+  /* THE SETTLED FOLLOW-SET READ behind the circle slot's two occupants. One
+     definition (src/lib/social/circle.ts), so this gate and the circle shelf's
+     own rows can never disagree. */
+  const circleSize = useCircleSize(userId, !!userId);
   const openReview = useReviewSheetStore((state) => state.open);
 
   const [view, setView] = useState<ExploreView>(() => readExploreView());
@@ -662,7 +668,26 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     pos={pos}
                   />
                 ) : shelf === 'circle' ? (
-                  <CircleShelf viewerId={userId} pos={pos} />
+                  /* THE CIRCLE SLOT HAS TWO OCCUPANTS (BRIEF_EXPLORE_SUGGESTED_GOLFERS §1).
+                     FOLLOWS NOBODY -> suggested golfers; the circle shelf can
+                     never fill for them and skipping it silently means the page
+                     never says the one thing that would improve it (52 of 99
+                     members followed nobody at the last measurement).
+                     FOLLOWS SOMEONE, NO ROUNDS -> nothing. They know who their
+                     circle is; the gate is the FOLLOW SET, never the round count.
+                     UNRESOLVED -> neither, not for one frame. */
+                  !circleSize.isFetched ? null : (circleSize.data ?? 0) === 0 ? (
+                    <PeopleShelf
+                      viewerId={userId}
+                      clubId={null}
+                      clubName={null}
+                      enabled={!!userId}
+                      pos={pos}
+                      source="suggested"
+                    />
+                  ) : (
+                    <CircleShelf viewerId={userId} pos={pos} />
+                  )
                 ) : shelf === 'standing' ? (
                   <StandingShelf viewerId={userId} pos={pos} />
                 ) : shelf === 'coursesCounty' ? (

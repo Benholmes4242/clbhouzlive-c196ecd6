@@ -2332,7 +2332,11 @@
       "newThisMonth": "[Néw thïs mõñth]",
       "follow": "[Fõllõw]",
       "following": "[Fõllõwïñg]",
-      "topRated": "[Best rated lately]"
+      "topRated": "[Best rated lately]",
+      "golfersToFollow": "[Gõlférs tõ fõllów]",
+      "playsAtClub": "[Pläys ãt {{club}}]",
+      "roundsThisMonth": "[{{count}} rõünds thís mõnth]",
+      "alsoPlays": "[Álsõ pläys {{course}}]"
     }
   }
 }

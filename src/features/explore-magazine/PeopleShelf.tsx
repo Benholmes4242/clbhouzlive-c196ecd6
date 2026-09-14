@@ -14,6 +14,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ExploreShelf } from './ExploreShelf';
 import { ShelfShell } from './ExploreShells';
 import { useClubGolfers, type ClubGolfer } from './useClubGolfers';
+import { useSuggestedGolfers } from './useSuggestedGolfers';
 
 /**
  * GOLFERS AT {CLUB} (BRIEF_EXPLORE_MAGAZINE PHASE C §4).
@@ -31,35 +32,96 @@ export function PeopleShelf({
   clubName,
   enabled,
   pos,
+  source = 'club',
 }: {
   viewerId: string | undefined;
   clubId: string | null;
   clubName: string | null;
   enabled: boolean;
   pos: number;
+  /** ADDITIVE, DEFAULTED: omit it and this is the club shelf, unchanged. */
+  source?: 'club' | 'suggested';
 }) {
   const { t } = useTranslation('courses');
-  const { golfers, isFetched } = useClubGolfers(viewerId, clubId, enabled);
+  const suggested = source === 'suggested';
+  const club = useClubGolfers(viewerId, clubId, enabled && !suggested);
+  const people = useSuggestedGolfers(viewerId, enabled && suggested);
 
-  if (!enabled || !clubId) return null;
+  /* ONE ANALYTICS KIND PER SOURCE, so the conversion question — does the
+     suggestion shelf actually produce follows? — has an answer. */
+  const kind = suggested ? 'suggested_golfers' : 'people';
+  const rows: ShelfPerson[] = suggested
+    ? people.golfers.map((g) => ({
+        userId: g.userId,
+        name: g.name,
+        username: g.username,
+        photoUrl: g.photoUrl,
+        /* §3 THE FIRST REASON THAT APPLIES, ALL OF THEM REAL. Never "Suggested
+           for you": a reason a member cannot act on is worse than no reason. */
+        reason: g.homeClub
+          ? t('amateur.shelf.playsAtClub', 'Plays at {{club}}', { club: g.homeClub })
+          : g.roundsThisMonth > 0
+            ? t('amateur.shelf.roundsThisMonth', '{{count}} rounds this month', { count: g.roundsThisMonth })
+            : g.sharedCourseName
+              ? t('amateur.shelf.alsoPlays', 'Also plays {{course}}', { course: g.sharedCourseName })
+              : '',
+      }))
+    : club.golfers.map((g) => ({
+        userId: g.userId,
+        name: g.name,
+        username: g.username,
+        photoUrl: g.photoUrl,
+        reason: reasonForClubGolfer(g, t),
+      }));
+  const isFetched = suggested ? people.isFetched : club.isFetched;
+
+  if (!enabled) return null;
+  if (!suggested && !clubId) return null;
   if (!isFetched) return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
-  if (golfers.length === 0) return null;
+  /* §5 NOBODY TO SUGGEST, NO SHELF. No placeholder, no apology. */
+  if (rows.length === 0) return null;
 
   return (
     <ExploreShelf
-      heading={t('amateur.shelf.golfersAtClub', 'Golfers at {{club}}', {
-        club: clubName ?? t('amateur.shelf.yourClub', 'your club'),
-      })}
-      onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'people', pos })}
+      heading={
+        suggested
+          ? t('amateur.shelf.golfersToFollow', 'Golfers to follow')
+          : t('amateur.shelf.golfersAtClub', 'Golfers at {{club}}', {
+              club: clubName ?? t('amateur.shelf.yourClub', 'your club'),
+            })
+      }
+      onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind, pos })}
     >
-      {golfers.map((golfer) => (
-        <PersonTile key={golfer.userId} golfer={golfer} pos={pos} />
+      {rows.map((person) => (
+        <PersonTile key={person.userId} golfer={person} pos={pos} kind={kind} />
       ))}
     </ExploreShelf>
   );
 }
 
-function PersonTile({ golfer, pos }: { golfer: ClubGolfer; pos: number }) {
+interface ShelfPerson {
+  userId: string;
+  name: string;
+  username: string | null;
+  photoUrl: string | null;
+  /** Already localised at the source, or '' where none resolved. */
+  reason: string;
+}
+
+/* §3 THE CLUB REASON, IN PRECEDENCE ORDER, OR NOTHING. Unchanged wording and
+   unchanged precedence — lifted out of the tile only so one tile can serve two
+   sources. */
+function reasonForClubGolfer(
+  golfer: ClubGolfer,
+  t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string,
+): string {
+  if (golfer.boards > 0) return t('amateur.shelf.holdsBoards', 'Holds {{count}} boards', { count: golfer.boards });
+  if (golfer.roundsHere > 0) return t('amateur.shelf.roundsHere', '{{count}} rounds here', { count: golfer.roundsHere });
+  if (golfer.isNew) return t('amateur.shelf.newThisMonth', 'New this month');
+  return '';
+}
+
+function PersonTile({ golfer, pos, kind }: { golfer: ShelfPerson; pos: number; kind: string }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -85,7 +147,7 @@ function PersonTile({ golfer, pos }: { golfer: ClubGolfer; pos: number }) {
     /* THE TILE HAS TWO TARGETS. Stopping propagation here is what keeps a tap on
        the name or the avatar from also reaching the Follow pill. */
     event.stopPropagation();
-    analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'people', pos });
+    analyticsEvents.track('amateur_shelf_tile_tapped', { kind, pos });
     rememberAmateurScroll();
     /* THE PROFILE ROUTE, the same username-or-id form the search surfaces use.
        NOT the scorecard opener the round cards use: that resolver deliberately
@@ -96,7 +158,7 @@ function PersonTile({ golfer, pos }: { golfer: ClubGolfer; pos: number }) {
   const onFollow = (event: React.MouseEvent) => {
     event.stopPropagation();
     if (!user?.id || !viewerActorId || toggle.isPending) return;
-    analyticsEvents.track('amateur_follow_tapped', { from: 'people_shelf', pos });
+    analyticsEvents.track('amateur_follow_tapped', { from: kind === 'suggested_golfers' ? 'suggested_golfers' : 'people_shelf', pos });
     toggle.mutate({
       targetActorType: 'personal',
       targetActorId: golfer.userId,
@@ -146,9 +208,8 @@ function PersonTile({ golfer, pos }: { golfer: ClubGolfer; pos: number }) {
       >
         {golfer.name}
       </span>
-      {/* §3 THE REASON, IN PRECEDENCE ORDER, OR NOTHING. Nothing is invented: a
-          member with no boards, no rounds here and no recent join shows the
-          name alone. */}
+      {/* §3 THE REASON, RESOLVED AT THE SOURCE, OR NOTHING. Nothing is
+          invented: a member no line applies to shows the name alone. */}
       <span
         style={{
           maxWidth: '100%',
@@ -161,13 +222,7 @@ function PersonTile({ golfer, pos }: { golfer: ClubGolfer; pos: number }) {
           textOverflow: 'ellipsis',
         }}
       >
-        {golfer.boards > 0
-          ? t('amateur.shelf.holdsBoards', 'Holds {{count}} boards', { count: golfer.boards })
-          : golfer.roundsHere > 0
-            ? t('amateur.shelf.roundsHere', '{{count}} rounds here', { count: golfer.roundsHere })
-            : golfer.isNew
-              ? t('amateur.shelf.newThisMonth', 'New this month')
-              : ''}
+        {golfer.reason}
       </span>
       <button
         type="button"
