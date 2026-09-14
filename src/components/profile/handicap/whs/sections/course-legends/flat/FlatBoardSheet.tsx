@@ -10,7 +10,7 @@
  * of any of them. Its ONE addition is the per-row deficit, which only makes
  * sense when every row is visible, and it arrives as a prop on that same row.
  */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -37,6 +37,13 @@ interface Props {
   coursePar?: number | null;
   onCategoryChange?: (from: LegendCategory, to: LegendCategory) => void;
   onRowPress?: (row: FlatRow) => void;
+  /**
+   * BRIEF_STANDING_TAP 2c - opened from a standing tile where the member is,
+   * say, 13th of 18: bring THEIR row into view on arrival instead of the top of
+   * the list. Ignored when they are not on the board - the sheet then opens at
+   * the top rather than hunting for a row that is not there.
+   */
+  scrollToSelf?: boolean;
 }
 
 export const FlatBoardSheet: React.FC<Props> = ({
@@ -50,13 +57,35 @@ export const FlatBoardSheet: React.FC<Props> = ({
   coursePar = null,
   onCategoryChange,
   onRowPress,
+  scrollToSelf = false,
 }) => {
   const { t } = useTranslation('courses');
   const [activeKey, setActiveKey] = useState<LegendCategory>(initialCategory);
+  const rowsRef = useRef<HTMLDivElement>(null);
+  const landedRef = useRef(false);
 
   useEffect(() => {
     if (open) setActiveKey(initialCategory);
+    if (!open) landedRef.current = false;
   }, [open, initialCategory]);
+
+  /* BRIEF_STANDING_TAP 2c - once, on arrival, and only for the board that was
+     deep-linked. Changing board by chip afterwards keeps the top. */
+  useEffect(() => {
+    if (!open || !scrollToSelf || landedRef.current) return;
+    if (activeKey !== initialCategory) return;
+    const id = globalThis.setTimeout(() => {
+      const el = rowsRef.current?.querySelector<HTMLElement>('[data-self="1"]');
+      if (!el) return;
+      landedRef.current = true;
+      try {
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      } catch {
+        el.scrollIntoView();
+      }
+    }, 220);
+    return () => globalThis.clearTimeout(id);
+  }, [open, scrollToSelf, activeKey, initialCategory, rows.length]);
 
   const chips: FlatChip[] = useMemo(
     () =>
@@ -80,7 +109,9 @@ export const FlatBoardSheet: React.FC<Props> = ({
   if (!active) return null;
 
   return (
-    <BottomSheet open={open} onClose={onClose} maxHeight="88dvh">
+    /* BRIEF_SHEET_SCROLL 1 - a full board is the longest list in the app and
+        owned no scroll container of its own. */
+    <BottomSheet open={open} onClose={onClose} maxHeight="88dvh" scrollBody>
       <div style={{ padding: '4px 20px 8px', fontFamily: SANS, background: A.CANVAS }}>
         <div
           style={{
@@ -126,7 +157,7 @@ export const FlatBoardSheet: React.FC<Props> = ({
           </div>
         ) : null}
 
-        <div style={{ marginTop: 14 }}>
+        <div style={{ marginTop: 14 }} ref={rowsRef}>
           {rows.map((row, i) => (
             <FlatBoardRow
               key={`${row.userId ?? row.name}-${positions[i]}`}

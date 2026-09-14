@@ -279,6 +279,10 @@ export const FlatBoardRow: React.FC<{
     <button
       type="button"
       onClick={onPress}
+      /* BRIEF_STANDING_TAP 2c - arrival scrolls to the viewer's own row, and
+         this is how it is found. Marker only; the amber tone above is what a
+         member sees. */
+      data-self={row.isSelf ? '1' : undefined}
       style={{
         display: 'grid',
         width: '100%',
