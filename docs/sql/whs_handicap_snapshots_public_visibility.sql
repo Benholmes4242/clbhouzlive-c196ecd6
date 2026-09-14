@@ -11,9 +11,13 @@
 --
 -- This policy evaluates user_profiles on every read. Changing
 -- handicap_visibility away from 'public', setting eg_visible away from true,
--- or deleting the profile therefore closes this public path immediately; it
--- does not wait for the next WHS sync. The existing owner policy remains, so
--- a member can still read their own snapshots after making them private.
+-- or deleting the profile therefore closes this public path on the next
+-- database read; it does not wait for the next WHS sync. Existing client-side
+-- query data may remain visible until that reader refetches (the Circle query
+-- currently has a 30-minute stale window), so immediate on-screen revocation
+-- also requires privacy-setting invalidation or a shorter/refetching cache.
+-- The existing owner policy remains, so a member can still read their own
+-- snapshots after making them private.
 
 create policy "whs_handicap_snapshots_select_public_visible"
 on public.whs_handicap_snapshots
