@@ -919,6 +919,18 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           so no block grows its own. */}
       {false ? <LeadShell /> : null}
       {false ? <PairShell /> : null}
+
+      {/* THE SHEET BELONGS TO THE OPENER THAT FILLS IT. AmateurPage mounts a
+          sheet on its OWN opener instance, which nothing here writes to, so the
+          stream's score-backed card taps also landed nowhere. Mounted against
+          this component's opener. */}
+      <RoundDetailSheet
+        open={!!opener.target}
+        onClose={opener.close}
+        scoreId={opener.target?.scoreId ?? null}
+        connectionId={opener.target?.connectionId ?? null}
+        profileUserId={opener.target?.profileUserId ?? null}
+      />
     </div>
   );
 }
