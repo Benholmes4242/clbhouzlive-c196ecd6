@@ -863,10 +863,17 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               courseLocation={postRound ? null : courseLocation || null}
               courseRating={post.courseRating ?? null}
               ctx={courseContext ?? null}
-              onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
+              /**
+               * REVIEW POSTS HAVE ONE DESTINATION. The band on a review card
+               * carries the course name and its place only, and does not open
+               * the course stats sheet — the card's single destination is the
+               * review sheet. Every other post kind is unchanged.
+               */
+              identityOnly={!!post.isReview}
+              onOpenStats={post.courseId && !post.isReview ? () => setStatsOpen(true) : undefined}
               surface={hasRoundBackdrop ? 'glass' : 'solid'}
             />
-            {post.courseId && statsOpen && (
+            {post.courseId && !post.isReview && statsOpen && (
               <CourseStatsSheet
                 open={statsOpen}
                 onClose={() => setStatsOpen(false)}

@@ -192,6 +192,16 @@ interface Props {
   extra?: React.ReactNode;
   /** 'glass' when the card carries a photo backdrop. Default 'solid'. */
   surface?: 'solid' | 'glass';
+  /**
+   * BRIEF_CLUBHOUSE_REVIEW_POST_ONE_DESTINATION §1-2. Review post cards pass
+   * true: the band states the course name and its place and NOTHING else — no
+   * community rating chip, no contextual figure ("field avg 3.4 / top 10%
+   * hardest"), no chevron, and no tap. A review card has one destination and it
+   * is the review sheet, so the band cannot be a second door.
+   *
+   * Default false — every other post kind keeps the shipped band verbatim.
+   */
+  identityOnly?: boolean;
   /** Host surface palette. Default 'dark' (Clubhouse slab); the light profile
    *  feed passes 'light'. Named `tone` because `surface` already means
    *  solid-vs-glass (media context), which is an orthogonal question. */
@@ -208,18 +218,19 @@ export const PostCourseBand: React.FC<Props> = ({
   extra,
   surface = 'solid',
   tone = 'dark',
+  identityOnly = false,
 }) => {
   const { t } = useTranslation('common');
   const C = TONES[tone];
 
   const hasYourBest = (ctx?.your_rounds ?? 0) > 0 && ctx?.your_best != null;
-  const figure = pickCourseBandFigure(ctx, t, tone);
+  const figure = identityOnly ? null : pickCourseBandFigure(ctx, t, tone);
 
   // Prefer ctx: it is keyed off resolvePostCourseId (course_id, else the first
   // golf_club tag), which is the SAME course line 2's figures describe. The
   // courseRating prop comes from the feed payload's course_avg_overall_score,
   // joined via review_course_id-or-course_id, and is absent on tag-only posts.
-  const rating = ctx?.community_rating ?? courseRating ?? null;
+  const rating = identityOnly ? null : (ctx?.community_rating ?? courseRating ?? null);
 
   const tappable = !!figure && !!onOpenStats;
 
