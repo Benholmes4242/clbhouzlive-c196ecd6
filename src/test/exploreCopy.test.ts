@@ -47,10 +47,37 @@ describe('Explore round headline ownership', () => {
   it('speaks the to-par and keeps the course out of the sentence', () => {
     expect(headlineFor(round({}), translate)).toBe('henryd3737 went round in 68, four under.');
     expect(headlineFor(round({ facts: { gross: 70, birdies: 6 } }), translate)).toBe(
-      'six birdies in a round of 70.',
+      'Six birdies in a round of 70.',
     );
     expect(headlineFor(round({ facts: { gross: 86 } }), translate)).toBe('henryd3737 went round in 86.');
   });
+
+  /* BRIEF_EXPLORE_SECOND_PASS §4. A word-start headline is capitalised, a
+     name-start headline keeps the member's own casing, and every feat sentence
+     carries the spoken to-par where the round has one. */
+  it('capitalises a word-start feat headline and carries the to-par', () => {
+    expect(headlineFor(round({ facts: { gross: 68, to_par: -3, birdies: 6 } }), translate)).toBe(
+      'Six birdies in a round of 68, three under.',
+    );
+    expect(headlineFor(round({ facts: { gross: 71, to_par: 2, eagles: 1 } }), translate)).toBe(
+      'An eagle, in a round of 71, two over.',
+    );
+    expect(headlineFor(round({ facts: { gross: 72, to_par: 0, albatrosses: 1 } }), translate)).toBe(
+      'An albatross, in a round of 72, level par.',
+    );
+    expect(headlineFor(round({ facts: { gross: 74, to_par: 3, holes_in_one: 1 } }), translate)).toBe(
+      'A hole in one, in a round of 74, three over.',
+    );
+  });
+
+  it('never capitalises a username', () => {
+    const item = round({
+      who: { user_id: 'member', display_name: 'danny.akers1', photo_url: null, is_viewer: false },
+      facts: { gross: 104 },
+    });
+    expect(headlineFor(item, translate)).toBe('danny.akers1 went round in 104.');
+  });
+
 
   it('measures a standing against the field, not as a coordinate', () => {
     const item = round({
