@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import React, { type CSSProperties } from 'react';
 
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
