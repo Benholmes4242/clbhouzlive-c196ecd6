@@ -48,7 +48,10 @@ export const queryPersister = createAsyncStoragePersister({
     setItem: (key, value) => set(key, value),
     removeItem: (key) => del(key),
   },
-  key: 'clbhouz-query-cache-v2',
+  /* v3: v2 could hold entries dehydrated while PENDING (data undefined) under
+     infinite keys, which crashed react-query's optimistic result on hydrate.
+     The key is versioned so those bytes can never rehydrate again. */
+  key: 'clbhouz-query-cache-v3',
   throttleTime: 1000,
   // First-page trim for infinite queries — persist only pages[0]/pageParams[0]
   // so IDB stays in single-digit MB. Rest refetches on mount.
@@ -81,7 +84,11 @@ export const queryPersister = createAsyncStoragePersister({
         if (typeof root !== 'string') return true;
         if (!INFINITE_KEY_PREFIXES.some((p) => root.startsWith(p))) return true;
         const data = q?.state?.data;
-        if (data == null) return true; // nothing to misread
+        /* A MISSING PAYLOAD IS THE DANGEROUS ONE. An entry restored under an
+           infinite key with no data (e.g. dehydrated while still pending) is
+           handed to the observer, which reads `data.pages.length` and throws
+           during getOptimisticResult — a white screen at hydrate. Drop it. */
+        if (data == null) return false;
         if (isInfiniteShape(data)) return true;
         if (import.meta.env.DEV) {
           console.warn('[queryPersister] dropping non-infinite restored entry:', q.queryKey);
@@ -136,10 +143,20 @@ const PERSIST_PREFIXES = [
 
 const _skippedKeysLogged = new Set<string>();
 
-export const shouldPersistQuery = (query: { queryKey: readonly unknown[]; state?: { data?: unknown } }): boolean => {
+export const shouldPersistQuery = (query: {
+  queryKey: readonly unknown[];
+  state?: { data?: unknown; status?: string };
+}): boolean => {
   const root = query.queryKey?.[0];
   if (typeof root !== 'string') return false;
   if (!PERSIST_PREFIXES.some((p) => root.startsWith(p))) return false;
+
+  /* ONLY SETTLED SUCCESSES. This predicate REPLACES react-query's default
+     (which dehydrates successes only), so without this line a query still
+     in flight was persisted as pending — that is how an entry with no data
+     reached hydrate and crashed the infinite observer. */
+  if (query.state?.status !== 'success') return false;
+  if (query.state?.data === undefined) return false;
 
   // GUARDRAIL: skip any query whose data is a Map or Set — they don't
   // survive JSON round-tripping and rehydrate as plain objects, causing
@@ -163,6 +180,7 @@ export async function removePersistedQueryCache(): Promise<void> {
   try {
     await del('clbhouz-query-cache');
     await del('clbhouz-query-cache-v2');
+    await del('clbhouz-query-cache-v3');
   } catch {
     /* noop */
   }

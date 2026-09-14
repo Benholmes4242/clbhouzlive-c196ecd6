@@ -265,7 +265,15 @@ export function useExploreStream(
     /* A missing function is a permanent failure this session, not a flake. */
     retry: false,
     initialPageParam: null as Record<string, unknown> | null,
-    getNextPageParam: (last) => last.cursor ?? undefined,
+    /* NEVER THROW ON AN UNEXPECTED PAGE. This function consumes CACHED data —
+       restored from IndexedDB, written by an older version of this hook — so it
+       must treat the page as untrusted input. An unreadable page stops
+       pagination; it does not take the view down. */
+    getNextPageParam: (last) => {
+      if (!last || typeof last !== 'object') return undefined;
+      const cursor = (last as { cursor?: unknown }).cursor;
+      return cursor == null ? undefined : (cursor as Record<string, unknown>);
+    },
     queryFn: async ({ pageParam }) => {
       /* The RPC is newer than src/integrations/supabase/types.ts (regenerated
          from the project, never hand-edited), so the name is cast at this one
