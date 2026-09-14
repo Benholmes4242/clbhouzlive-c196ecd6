@@ -11,7 +11,7 @@ export interface CircleHandicapDisclosure {
 
 export interface CircleHandicapDisplay {
   index: string;
-  delta: { text: string; tone: string } | null;
+  delta: { text: string; arrow: string; tone: string } | null;
 }
 
 /**
@@ -22,6 +22,10 @@ export interface CircleHandicapDisplay {
  *
  * handicap_visibility and eg_visible currently live on user_profiles, while an
  * undeleted whs_connections row proves that the federation connection exists.
+ *
+ * The delta renders as an ARROW plus an UNSIGNED figure: a cut is the index
+ * going DOWN and is green; a rise is UP and is red. The arrow replaces the sign,
+ * so "↓0.2" never coexists with a minus.
  */
 export function circleHandicapDisplay(input: CircleHandicapDisclosure): CircleHandicapDisplay | null {
   if (
@@ -38,7 +42,8 @@ export function circleHandicapDisplay(input: CircleHandicapDisclosure): CircleHa
   const delta = rawDelta == null || !Number.isFinite(rawDelta) || Math.abs(rawDelta) < 0.05
     ? null
     : {
-        text: rawDelta < 0 ? `\u2212${Math.abs(rawDelta).toFixed(1)}` : `+${rawDelta.toFixed(1)}`,
+        arrow: rawDelta < 0 ? '\u2193' : '\u2191',
+        text: Math.abs(rawDelta).toFixed(1),
         tone: rawDelta < 0 ? INDEX_DELTA.dark.improved : INDEX_DELTA.dark.drifted,
       };
 
