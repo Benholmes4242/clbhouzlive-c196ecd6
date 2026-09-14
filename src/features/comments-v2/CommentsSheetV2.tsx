@@ -311,7 +311,7 @@ function CommentsSheetV2Inner({
 
             {/* Header - the count is stated ONCE; no kicker, no close button. */}
             <div className="px-5 pb-3 shrink-0">
-              {totalCountLoading ? (
+              {!totalCountFetched ? (
                 <div
                   className="rounded-sm"
                   style={{ width: 96, height: 21, background: SHIMMER }}
