@@ -16,3 +16,4 @@
 - [ ] BLOCKED (external Supabase auth): authenticated acceptance of the merged view - reviewer-name search, the circle scope, and the merged server pages.
 - [ ] UNAPPLIED, Ben's to run: `docs/sql/explore_courses_merged_search.sql` (server search path plus the one-pool merge for `get_explore_stream`).
 - [x] Align the liked-by line to the footer heart from shared actor/action geometry and add the quiet comment glyph on both post types.
+- [x] Match Your circle captions to the weekly club rail height while retaining fixed name and HCP rows.

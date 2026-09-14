@@ -226,9 +226,12 @@ export function CircleShelf({
                    Golf names and photo URLs and leaked once already. */
                 avatarUrl={row.profile_photo_url ?? null}
                 avatarUserId={row.user_id}
-                /* A LONG MEMBER NAME WRAPS RATHER THAN TRUNCATES (§2a), and the
-                   name box reserves both lines so the rail stays uniform. */
-                captionNameLines={2}
+                /* MATCH THE CLUB RAIL'S 35PX CAPTION. The name and HCP remain
+                   two distinct, tight rows; a long name ellipsizes on row one
+                   rather than adding a third row. The shared caption reserves
+                   the HCP row even when privacy leaves it empty, so every tile
+                   and its vertically centred avatar keep identical geometry. */
+                captionNameLines={1}
 
                 railCaptionLine={
                   handicap ? (
