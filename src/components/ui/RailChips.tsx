@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import React, { type CSSProperties } from 'react';
 
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -65,12 +65,20 @@ export interface RailChipsProps {
 
   /** ADDITIVE: centre a fitting choice group; overflow still starts at the leading edge. */
   align?: 'start' | 'center-when-fit';
+
+  /**
+   * ADDITIVE. An action rendered at the trailing edge of the scrollable row,
+   * separated from the last chip by the same gap the chips use. The caller owns
+   * the button styling and semantics; RailChips only guarantees it scrolls
+   * with the chips and stays reachable when the row overflows.
+   */
+  trailing?: React.ReactNode;
 }
 
 /** The applied-state ground: 6% white, stated once. */
 const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start' }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start', trailing }: RailChipsProps) {
   const filled = ground === 'filled';
   /* The selecting filled ground: a choice group, so tablist/tab semantics stay. */
   const filledSelection = ground === 'filled-selection';
@@ -126,6 +134,11 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
           </button>
         );
       })}
+      {trailing ? (
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+          {trailing}
+        </div>
+      ) : null}
     </div>
   );
 }

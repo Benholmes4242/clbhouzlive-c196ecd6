@@ -147,36 +147,46 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
         </p>
         {/* THE SAME INLINE SEARCH THE COURSES TAB CARRIES, one field component
             shared by both: a plain case-insensitive contains-match over the
-            list already selected by the region chips. No catalogue query. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <RailChips
-              options={LISTS}
-              value={selectedList}
-              onChange={(next) => { restored.current = true; setSelectedList(next); }}
-              ariaLabel="Top 100 region"
-              ground="outline"
-              align="center-when-fit"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (searchOpen) setNameQuery('');
-              setSearchOpen((prev) => !prev);
-            }}
-            aria-label="Search this list"
-            aria-expanded={searchOpen}
-            className="h-9 w-9 shrink-0 flex items-center justify-center"
-            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8 }}
-          >
-            {searchOpen ? (
-              <X className="h-4 w-4" style={{ color: A.INK }} aria-hidden />
-            ) : (
-              <Search className="h-4 w-4" style={{ color: A.INK }} aria-hidden />
-            )}
-          </button>
-        </div>
+            list already selected by the region chips. No catalogue query.
+            On Top 100 the search toggle is the last item in the chip row itself,
+            not a separate object pinned to the right edge: same gap, same height,
+            same radius as the scope chips. */}
+        <RailChips
+          options={LISTS}
+          value={selectedList}
+          onChange={(next) => { restored.current = true; setSelectedList(next); }}
+          ariaLabel="Top 100 region"
+          ground="outline"
+          align="center-when-fit"
+          trailing={(
+            <button
+              type="button"
+              onClick={() => {
+                if (searchOpen) setNameQuery('');
+                setSearchOpen((prev) => !prev);
+              }}
+              aria-label="Search this list"
+              aria-expanded={searchOpen}
+              style={{
+                padding: '6px 11px',
+                borderRadius: 11,
+                border: `1px solid ${searchOpen ? 'transparent' : A.BORDER}`,
+                background: searchOpen ? A.INK : 'transparent',
+                color: searchOpen ? A.CANVAS : A.MUTE,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {searchOpen ? (
+                <X className="h-4 w-4" style={{ color: 'currentColor' }} aria-hidden />
+              ) : (
+                <Search className="h-4 w-4" style={{ color: 'currentColor' }} aria-hidden />
+              )}
+            </button>
+          )}
+        />
         {searchOpen ? (
           <div style={{ marginTop: 10 }}>
             <CoursesSearchField
