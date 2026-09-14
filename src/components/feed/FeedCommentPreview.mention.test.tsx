@@ -79,22 +79,35 @@ describe('FeedCommentPreview mention integration', () => {
     expect(screen.getByText('Hi @[[Bad](u:bad)')).toBeInTheDocument();
   });
 
-  it('keeps the single-line clamp on a long comment with a trailing mention', () => {
+  it('keeps a two-line hanging indent on a long comment with a trailing mention', () => {
     const long =
       'This is a really long comment that would definitely wrap if the clamp were not in place ' +
       'and it ends with a mention at the very end @[@Alice](u:11111111-1111-1111-1111-111111111111) there.';
     const { container } = wrap(
       <FeedCommentPreview preview={{ ...preview, content: long }} commentCount={1} onOpenComments={() => {}} />,
     );
-    // Section C: the clamp moved from an inner span onto the comment row itself.
-    const clamp = container.querySelector('div[style*="white-space: nowrap"]');
+    const clamp = screen.getByText('Bob').parentElement;
 
     expect(clamp).toHaveStyle({
-      whiteSpace: 'nowrap',
+      display: '-webkit-box',
       overflow: 'hidden',
-      textOverflow: 'ellipsis',
     });
     expect(clamp).toContainElement(container.querySelector('[data-mention-type="user"]') as HTMLElement);
+    expect(clamp?.previousElementSibling).toHaveClass('lucide-message-circle');
+  });
+
+  it('renders the quiet comment glyph only when a real preview line exists', () => {
+    const { container, rerender } = wrap(
+      <FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} />,
+    );
+    expect(container.querySelector('svg.lucide-message-circle')).toBeInTheDocument();
+
+    rerender(
+      <MemoryRouter>
+        <FeedCommentPreview preview={null} commentCount={1} onOpenComments={() => {}} />
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('svg.lucide-message-circle')).not.toBeInTheDocument();
   });
 
   it('uses light-surface tones when surface is light', () => {

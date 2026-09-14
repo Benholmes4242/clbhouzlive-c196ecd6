@@ -30,7 +30,6 @@
  * Read and presentation only. No like write path, and no long-press gesture.
  */
 import { useState } from 'react';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { usePostLikers, likerFirstNames } from '@/hooks/usePostLikers';
 import { LikesSheet } from './LikesSheet';
 
@@ -92,6 +91,7 @@ export function LikedByRow({
         style={{
           display: 'block',
           width: '100%',
+          boxSizing: 'border-box',
           padding: 0,
           background: 'transparent',
           border: 'none',
@@ -101,9 +101,9 @@ export function LikedByRow({
       >
         <span
           style={{
-            fontSize: 12.5,
+            fontSize: 13,
             fontWeight: 500,
-            color: A.MUTE,
+            color: 'rgba(248,250,252,0.65)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
