@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
+import { invalidateHandicapPrivacyCaches } from '@/utils/invalidateHandicapPrivacyCaches';
 
 export type VisibilityLevel = 'public' | 'friends' | 'private';
 
@@ -55,6 +56,7 @@ export function usePrivacySettings(
         .eq('id', userId);
       if (error) throw error;
       invalidate();
+      invalidateHandicapPrivacyCaches(queryClient);
     } catch {
       setIsPublic(prev);
       toast.error('Could not update privacy setting.');
