@@ -224,7 +224,7 @@ export function CircleShelf({
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: 2,
-                            fontSize: 8,
+                            fontSize: 9,
                             fontWeight: 700,
                             lineHeight: 1,
                             color: handicap.delta.tone,
