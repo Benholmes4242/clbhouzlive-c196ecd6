@@ -60,7 +60,6 @@
       "thisCourse": "this course"
     },
     "scoringKey": {
-      "title": "Scoring key",
       "ace": "Hole-in-One geschlagen.",
       "albatross": "Einen Albatros gespielt.",
       "eagle": "Eagle",
@@ -181,7 +180,6 @@
     "hideHoleByHole": "Vollständige Scorekarte ausblenden",
     "holeByHole": "Vollständige Scorekarte",
     "legendNotPlayed": "Nicht gespielt",
-    "legendPar": "Par",
     "nineHoleTag": "9 holes",
     "rankHere": "Your {{ordinal}} best of {{count}} rounds here.",
     "rankHereNeutral": "{{ordinal}} best of {{count}} rounds here.",
@@ -228,7 +226,8 @@
     "noFieldLine_one": "Nur 1 weiterer Golfer hat hier gespielt, daher gibt es noch kein Feld zum Vergleich.",
     "noFieldLine_other": "Nur {{count}} weitere Golfer haben hier gespielt, daher gibt es noch kein Feld zum Vergleich.",
     "noFieldNobody": "Noch hat niemand anderes hier gespielt, daher gibt es kein Feld zum Vergleich.",
-    "fieldShort": "Feld"
+    "fieldShort": "Feld",
+    "swipeHint": "Wischen fuer die naechste Runde"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

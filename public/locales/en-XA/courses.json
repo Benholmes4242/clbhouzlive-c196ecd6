@@ -1359,8 +1359,7 @@
       "birdie": "[~~Ɓířđíé~~]",
       "bogey": "[~~Ɓőĝéý~~]",
       "doublePlus": "[~~Đƀļ+~~]",
-      "eagle": "[~~Éáĝļé~~]",
-      "title": "[~~Šĉőříñĝ ǩéý~~]"
+      "eagle": "[~~Éáĝļé~~]"
     },
     "shapeOfCourse": "[~~Ţĥé šĥáƥé őƒ ţĥé ĉőúřšé~~]",
     "sortAriaLabel": "[~~Šőřţ ĥőļéš~~]",
@@ -1735,14 +1734,7 @@
     "howItUnfolded": "[~~Ĥőŵ íţ úñƒőļđéđ~~]",
     "in": "[~~Íñ~~]",
     "inN": "[~~ÍÑ {{n}}~~]",
-    "legendAce": "[~~Áĉé~~]",
-    "legendAlbatross": "[~~Áłƀáťřóşş~~]",
-    "legendBirdie": "[~~Ɓířđíé~~]",
-    "legendBogey": "[~~Ɓőĝéý~~]",
-    "legendDouble": "[~~Đőúƀļé+~~]",
-    "legendEagle": "[~~Éáĝļé~~]",
     "legendNotPlayed": "[Ńöţ ƥĺåýéð]",
-    "legendPar": "Par",
     "nineHoleTag": "9 holes",
     "out": "[~~Őúţ~~]",
     "outN": "[~~ŐÚŢ {{n}}~~]",
@@ -1764,10 +1756,6 @@
     "roundsHere_other": "[~~{{count}} řőúñđš~~]",
     "scoreRow": "Score",
     "shareRound": "[~~Šĥářé ţĥíš řőúñđ~~]",
-    "splitBirdie": "[~~Ɓířđíé+~~]",
-    "splitBogey": "[~~Ɓőĝéý~~]",
-    "splitDouble": "[~~Đőúƀļé+~~]",
-    "splitPar": "[~~Ƥář~~]",
     "syncingBody": "[~~Ĥőļé-ƀý-ĥőļé đáţá íš šýñĉíñĝ ƒřőɱ Éñĝļáñđ Ĝőļƒ. Íţ úšúáļļý ļáñđš ŵíţĥíñ á ƒéŵ ĥőúřš.~~]",
     "syncingTitle": "[~~Šĉőřéĉářđ őñ ţĥé ŵáý~~]",
     "theCard": "[THE CARD]",
@@ -1817,7 +1805,8 @@
     "noFieldLine_one": "[Only 1 other golfer has played here, so there is no field to compare with yet.]",
     "noFieldLine_other": "[Only {{count}} other golfers have played here, so there is no field to compare with yet.]",
     "noFieldNobody": "[Nobody else has played here yet, so there is no field to compare with.]",
-    "fieldShort": "[Field]"
+    "fieldShort": "[Field]",
+    "swipeHint": "[~~Šŵíƥé főř ţĥé ñéxţ řőúñđ~~]"
   },
   "search": {
     "yourRounds": "[~~Ýőúř řőúñđš~~]"

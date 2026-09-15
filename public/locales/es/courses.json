@@ -60,7 +60,6 @@
       "thisCourse": "this course"
     },
     "scoringKey": {
-      "title": "Scoring key",
       "ace": "Emboco desde el tee.",
       "albatross": "Hizo un albatros.",
       "eagle": "Eagle",
@@ -181,7 +180,6 @@
     "hideHoleByHole": "Ocultar tarjeta de score completa",
     "holeByHole": "Tarjeta de score completa",
     "legendNotPlayed": "No jugado",
-    "legendPar": "Par",
     "nineHoleTag": "9 holes",
     "rankHere": "Your {{ordinal}} best of {{count}} rounds here.",
     "rankHereNeutral": "{{ordinal}} best of {{count}} rounds here.",
@@ -228,7 +226,8 @@
     "noFieldLine_one": "Solo 1 golfista mas ha jugado aqui, asi que todavia no hay un grupo con el que comparar.",
     "noFieldLine_other": "Solo {{count}} golfistas mas han jugado aqui, asi que todavia no hay un grupo con el que comparar.",
     "noFieldNobody": "Nadie mas ha jugado aqui todavia, asi que no hay un grupo con el que comparar.",
-    "fieldShort": "Campo"
+    "fieldShort": "Campo",
+    "swipeHint": "Desliza para la siguiente vuelta"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
