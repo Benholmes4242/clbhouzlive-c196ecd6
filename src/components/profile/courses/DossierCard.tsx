@@ -77,16 +77,19 @@ const DossierCard: React.FC<DossierCardProps> = ({
 
   const where = [course.sub_country, course.country].filter(Boolean)[0] ?? null;
 
-  const metaSegments = [
-    dateText || null,
-    where,
-    hasScoring
-      ? t('row.rounds', { count: rounds as number, defaultValue: '{{count}} rounds' })
-      : null,
-    hasScoring && avgToPar != null
-      ? t('row.avg', { avg: fmtSigned(avgToPar), defaultValue: '{{avg}} avg' })
-      : null,
-  ].filter(Boolean) as string[];
+  // Two fixed lines, never a wrap: line 1 is date · country, line 2 is
+  // rounds · average. Line 2 renders only when scoring exists (Ben, Sep 2026).
+  const line1 = [dateText || null, where].filter(Boolean).join(' · ');
+  const line2 = hasScoring
+    ? [
+        t('yourCourses.roundsCount', { count: rounds as number, defaultValue: '{{count}} rounds' }),
+        avgToPar != null
+          ? t('yourCourses.avgLabel', { avg: fmtSigned(avgToPar), defaultValue: '{{avg}} avg' })
+          : null,
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : '';
 
   return (
     <article
