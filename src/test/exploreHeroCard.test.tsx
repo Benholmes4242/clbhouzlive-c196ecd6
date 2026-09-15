@@ -3,15 +3,17 @@ import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
+import { fullWidthCardSize } from '@/features/explore-magazine/ExploreMagazine';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
 afterEach(cleanup);
 
 /**
  * BRIEF_EXPLORE_TWO_SHAPES §2 — SHAPE IS DECIDED BY KIND, NOTHING ELSE.
- * A REVIEW is text ON the photograph at every position; a ROUND is text UNDER it
- * at every position. There is no cardTreatment prop any more and position 0 is
- * not special, so these tests assert the shape from the KIND alone.
+ * A REVIEW is lead-sized text ON the photograph at every position; a ROUND is
+ * std-sized text UNDER it at every position. There is no cardTreatment prop any
+ * more and position 0 is not special, so these tests assert the shape and size
+ * from the KIND alone.
  */
 
 function round(isViewer = false): StreamItem {
@@ -82,44 +84,63 @@ function textSlots(container: HTMLElement, name: string) {
 }
 
 describe('Explore card shapes', () => {
-  it('renders a review ON the photo with lanes, a minimum height and a 16px no-trace bottom lane', () => {
+  it('renders a short review ON the photo at the lead minimum height with its reserved lanes', () => {
     const { container } = render(
-      <ExploreCard item={review()} size="std" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />,
     );
 
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
     const kicker = container.querySelector<HTMLElement>('[data-explore-hero-kicker="true"]');
+    const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
     const bottom = container.querySelector<HTMLElement>('[data-explore-hero-bottom-lane="true"]');
     const chip = container.querySelector<HTMLElement>('.standout-figure-chip');
 
-    expect(onPhoto?.style.minHeight).toBe('210px');
+    expect(onPhoto?.style.minHeight).toBe('340px');
     expect(onPhoto?.style.flexDirection).toBe('column');
     expect(kicker).not.toBeNull();
+    expect(headline?.style.fontSize).toBe('22px');
+    expect(headline?.style.lineHeight).toBe('1.12');
+    expect(headline?.style.letterSpacing).toBe('-0.02em');
+    expect(headline?.dataset.exploreLineClamp).toBe('3');
+    expect(headline?.style.fontStyle).toBe('italic');
     expect(bottom?.style.height).toBe('16px');
     expect(chip?.style.top).toBe('8px');
     expect(chip?.style.minHeight).toBe('28px');
     expect(chip?.style.whiteSpace).toBe('nowrap');
+    /* 8px top + 28px chip + 12px clearance = the reserved 48px lane. */
+    const chipLane = onPhoto?.firstElementChild as HTMLElement | null;
+    expect(chipLane?.style.flex).toBe('0 0 48px');
   });
 
-  it('renders a review on the photo at the first position too', () => {
-    const { container } = render(
-      <ExploreCard item={review()} size="std" shape={null} onTap={() => undefined} />,
-    );
-    expect(container.querySelector('[data-explore-hero="true"]')).not.toBeNull();
+  it.each([0, 5])('renders a review at position %i through the lead path', (position) => {
+    const item = { ...review(), id: `review-${position}` };
+    const size = fullWidthCardSize(item);
+    const { container } = render(<ExploreCard item={item} size={size} shape={null} onTap={() => undefined} />);
+    const hero = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
+    const image = container.querySelector<HTMLElement>('button > span > div');
+    expect(size).toBe('lead');
+    expect(hero?.style.minHeight).toBe('340px');
+    expect(image?.style.borderRadius).toBe('18px');
+  });
+
+  it('keeps a full-width round on the std path', () => {
+    expect(fullWidthCardSize(round())).toBe('std');
   });
 
   it('grows a long review quote while the photo keeps its minimum height', () => {
     const { container } = render(
-      <ExploreCard item={longReview()} size="std" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={longReview()} size="lead" shape={null} onTap={() => undefined} />,
     );
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
-    expect(onPhoto?.style.minHeight).toBe('210px');
+    const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
+    expect(onPhoto?.style.minHeight).toBe('340px');
     expect(onPhoto?.style.height).toBe('');
+    expect(headline?.dataset.exploreLineClamp).toBe('3');
   });
 
   it('uses the ruled on-photo colors and shadows for a review', () => {
     const { container, getByText } = render(
-      <ExploreCard item={review()} size="std" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />,
     );
 
     const kicker = container.querySelector<HTMLElement>('[data-explore-hero-kicker="true"] > div');
@@ -137,7 +158,7 @@ describe('Explore card shapes', () => {
 
   it('keeps the viewer name amber on a review', () => {
     const { getByText } = render(
-      <ExploreCard item={review(true)} size="std" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={review(true)} size="lead" shape={null} onTap={() => undefined} />,
     );
 
     expect(getByText('You').style.color).not.toBe('rgb(255, 255, 255)');
@@ -145,7 +166,7 @@ describe('Explore card shapes', () => {
 
   it('gives a review no REVIEW kicker prefix', () => {
     const { container } = render(
-      <ExploreCard item={review()} size="std" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />,
     );
     const kicker = container.querySelector<HTMLElement>('[data-explore-hero-kicker="true"]');
     expect(kicker?.textContent ?? '').not.toMatch(/review/i);
