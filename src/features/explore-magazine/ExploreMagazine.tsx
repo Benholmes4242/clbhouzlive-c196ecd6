@@ -60,7 +60,6 @@ import { CoursesSearchField } from './CoursesSearchField';
 import { RegionDropdown } from './RegionDropdown';
 
 import { useViewerCourseBests } from './useViewerCourseBests';
-import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
 
 /**
  * THE MAGAZINE (BRIEF_EXPLORE_MAGAZINE, PHASE A).
