@@ -1,7 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
+/* THE PANEL IS THE ANALYTICAL PANEL. Its ground and its muted ink come from the
+   analytical token file the brief names, not from the card module, so there is
+   one definition of this surface and not a second copy of it. */
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
 
 import type { AchievementCallout } from './cardTreatment';
