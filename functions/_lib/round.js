@@ -71,7 +71,7 @@ export function roundMeta(card) {
   const course = (card.course_name || '').trim();
   if (!player || !course) return null;
 
-  const par = Number(card.course_par);
+  const par = num(card.course_par);
   const label = toParLabel(gross, par);
   const score = label ? `${gross} (${label})` : `${gross}`;
 
