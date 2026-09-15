@@ -68,7 +68,7 @@ import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
 import { applyRankCardRule } from './rankCards';
-import { cardTreatments, earnsHeroTreatment } from './cardTreatment';
+import { isNotableRound } from './cardTreatment';
 import { shelfDueAt, shelfForOrdinal } from './shelfCadence';
 /* BRIEF_COURSES_MERGED — Courses and Reviews are ONE view. */
 import { useCourseCandidateIndex } from './useCourseCandidateIndex';
@@ -195,8 +195,11 @@ function buildBlocks(
      headline is a STABLE FACT. This is the SAME pairing path (sameKindPairs),
      narrowed by what the card has to say - not a second one. */
   const stableCourse = (item: StreamItem) => item.kind === 'course' && (item.facts.course_event ?? 'stable') === 'stable';
+  /* BRIEF_EXPLORE_TWO_SHAPES §3 A REVIEW NEVER PAIRS, ON ANY VIEW: its shape is
+     text on the photograph and a 124px tile cannot carry it. §2 a NOTABLE round
+     never pairs either — that predicate is all that survives of the earned hero. */
   const canPair = (item: StreamItem) =>
-    !earnsHeroTreatment(item) && (
+    item.kind !== 'review' && !isNotableRound(item) && (
       opts.mergedCourses === true
         ? stableCourse(item)
         : PAIRABLE.has(item.kind) || (opts.bareRoundPairs === true && pairableRound(item))
@@ -631,56 +634,19 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
        a single read for it. */
     { enabled: fallbackWanted && !indexPath && view !== 'watch' },
   );
-  /* BRIEF_EXPLORE_ALL_VIDEO — ONE LONG-FORM READ FOR THE WHOLE PAGE. The rail
-     (§1) and the stream candidates (§2) are the SAME rows, from the same read
-     Watch uses, under Watch's own 'latest' query key. Nothing new was written to
-     fetch video and nothing else on All reads long-form. */
+  /* VIDEO LIVES IN THE RAILS AND NOWHERE ELSE (BRIEF_EXPLORE_TWO_SHAPES §1).
+     ONE LONG-FORM READ still serves the whole page — the Videos rail reads the
+     same rows Watch reads, under Watch's own 'latest' query key, and nothing new
+     was written to fetch video. What is GONE is the merge into the All stream:
+     Clubhouse is people's posts, Explore is rounds, courses and records, and with
+     no feed-level video the two pages stay clearly apart. The stream-candidate
+     mapping (videoItems), its insertion and the 'watch' render branch are
+     deleted; the rail and ClipsShelf are untouched. */
   const allVideos = useWatchVideos({ userId: view === 'all' ? userId : undefined, mode: 'latest', search: null });
   const videoRows = useMemo(
     () => ((allVideos.data?.pages ?? []).flat() as HubRpcRow[]).filter((row) => !!row?.post_id),
     [allVideos.data],
   );
-  const videoPosts = useMemo(() => toFeedPosts(videoRows), [videoRows]);
-  /* §2 LONG-FORM AS CANDIDATES, SCORED BY THE ONE MODEL (scoreItem). REPORTED,
-     NOT PAPERED OVER: a video has no course, no score and no standing, so it
-     carries NO consequence, and the ring is 'own' only when the viewer is the
-     creator - a followed creator is a circle relationship, which this model
-     expresses as a round's consequence and NOT as a ring, so a video from your
-     circle gets no ring lift. It therefore ranks on FRESHNESS alone, exactly as
-     a clip does. No consequence was invented to lift it.
-     FOUR AT MOST. The rail is where video has volume; the stream takes a
-     page's worth so a fresh batch cannot turn All into a media page. */
-  const videoItems = useMemo<StreamItem[]>(() => {
-    if (view !== 'all') return [];
-    return videoRows.slice(0, 4).map((row) => {
-      const item: StreamItem = {
-        id: `watch:${row.post_id}`,
-        kind: 'watch',
-        ring: row.post_user_id && userId && row.post_user_id === userId ? 'own' : null,
-        lane: 'news',
-        score: 0,
-        consequence: null,
-        subject: null,
-        who: {
-          user_id: row.post_user_id ?? null,
-          display_name: row.creator_display_name ?? row.creator_username ?? null,
-          photo_url: row.creator_avatar_url ?? null,
-          is_viewer: !!userId && row.post_user_id === userId,
-        },
-        facts: {
-          post_id: row.post_id,
-          media_id: row.media_id ?? null,
-          duration_s: row.duration_seconds ?? null,
-          arrived_at: row.post_created_at ?? null,
-          published_at: row.post_created_at ?? null,
-        },
-        payload: { video: row },
-        seen: false,
-      };
-      item.score = scoreItem(item);
-      return item;
-    });
-  }, [view, videoRows, userId]);
 
   const scoresStanding = useViewerStanding(userId);
 
@@ -792,36 +758,17 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      RPC deliberately placed. */
   const visible = useMemo(() => {
     const base = serverOn ? source.items : source.items.slice(0, revealed);
-    if (videoItems.length === 0) {
-      const { items: uniqueBase, drops: baseDrops } = dedupeItems(base);
-      warnDuplicates('ExploreMagazine:visible', baseDrops);
-      return uniqueBase;
-    }
-    /* AN INSERTION, NOT A RE-SORT. The server's page is already ranked and
-       cadenced and the client re-sorts nothing: each video is placed at the
-       first position whose card scores below it, so every other card keeps the
-       order the ranker gave it. A row already on the page (the fallback's own
-       media pool) is never duplicated. */
-    const seen = new Set(base.map((entry) => entry.facts.post_id ?? entry.id));
-    const out = [...base];
-    for (const video of videoItems) {
-      if (seen.has(video.facts.post_id ?? video.id)) continue;
-      let at = out.findIndex((entry) => entry.score < video.score);
-      if (at < 0) at = out.length;
-      /* A VIDEO MAY LEAD, and only by out-scoring the current lead - which
-         freshness alone can do on a quiet page. Nothing here holds it back and
-         nothing here promotes it. */
-      out.splice(at, 0, video);
-    }
     /* BRIEF_ROUND_SHEET_TALL §2 — ONE ITEM, ONE CARD, whatever the source. The
        stream hook already dedupes its own pages; this is the last gate before
        anything is keyed by item.id (cardRefs, the ring, roundSeq), so a duplicate
-       arriving from the fallback pools or the video insertion cannot reach it
-       either. First occurrence wins, so the ranked order is untouched. */
-    const { items: unique, drops } = dedupeItems(out);
+       arriving from the fallback pools cannot reach it either. First occurrence
+       wins, so the ranked order is untouched. THE VIDEO INSERTION IS GONE (§1):
+       nothing is spliced into the page any more, so the ranker's cadence and its
+       per-author cap act on exactly the rows they scored. */
+    const { items: unique, drops } = dedupeItems(base);
     warnDuplicates('ExploreMagazine:visible', drops);
     return unique;
-  }, [serverOn, source.items, revealed, videoItems]);
+  }, [serverOn, source.items, revealed]);
 
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
      screen, and a card holds its whole shell until that resolver settles —
@@ -947,7 +894,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       }),
     [ranked, view, activeScope, shelves, singleType],
   );
-  const treatments = useMemo(() => cardTreatments(ranked), [ranked]);
+  /* §2 THE EARNED HERO IS RETIRED: cardTreatments(), its 1-in-4 cap and the lead
+     SIZE are gone. Shape is decided by kind inside the card and by nothing on
+     this page. */
+
 
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
@@ -1925,7 +1875,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     <ExploreCard
                       item={item}
                       size="pair"
-                      cardTreatment="standard"
+                      
                       onTap={() => tapCard(item, 'pair', base + offset)}
                       onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
                     />
