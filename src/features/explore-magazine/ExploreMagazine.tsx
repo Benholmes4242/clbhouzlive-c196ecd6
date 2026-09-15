@@ -1016,7 +1016,28 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [view],
   );
 
-  /* ==================================================================== §2
+  /*
+   * BRIEF_ROUND_SHEET_TALL §3 — ?cues=reset BRINGS THE CUES BACK.
+   *
+   * The cues retire for good once a member has paged, so anyone who has used the
+   * sheet can never see the nudge again — including whoever needs to check it.
+   * Opening Explore with ?cues=reset forgets this device's hint once and strips
+   * just that parameter from the URL, leaving every other one alone. Live in
+   * every environment, production included: it only resets a hint, and only for
+   * the viewer holding the device.
+   */
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('cues') !== 'reset') return;
+    resetHint();
+    url.searchParams.delete('cues');
+    window.history.replaceState(
+      window.history.state, '', `${url.pathname}${url.search}${url.hash}`,
+    );
+  }, []);
+
+
      SWIPE BETWEEN ROUNDS. THE SEQUENCE IS THIS PAGE'S ROUNDS, IN ITS ORDER.
 
      Rounds only, in the ranked order already on screen — a review, a course, a
