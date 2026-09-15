@@ -14,7 +14,7 @@ vi.mock('react-i18next', () => ({
       const parts = key.split('.');
       const root = parts[0];
       const leaf = parts.slice(1).join('.');
-      const ns = (enCourses as Record<string, Record<string, string>>)[root];
+      const ns = enCourses[root];
       const plural = opts?.count != null ? (opts.count === 1 ? '_one' : '_other') : '';
       let v = ns?.[`${leaf}${plural}`] ?? ns?.[leaf];
       if (v == null) v = opts?.defaultValue ?? key;
