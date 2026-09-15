@@ -45,7 +45,9 @@ export function readSkeletonShapeHint(): SkeletonShape | null {
     const raw = localStorage.getItem(KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as SkeletonShape;
-    if (parsed?.variant !== 'regular' && parsed?.variant !== 'review' && parsed?.variant !== 'round') {
+    // A stored 'round' from an older session falls here and returns null, so the
+    // caller uses COLD_START_SHAPE. No crash, no round shell.
+    if (parsed?.variant !== 'regular' && parsed?.variant !== 'review') {
       return null;
     }
     return parsed;
