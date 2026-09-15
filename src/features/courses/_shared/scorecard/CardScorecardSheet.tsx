@@ -324,6 +324,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   hint = null,
   pagePreview = null,
   midKey,
+  midDebug,
   paging = null,
 
 
