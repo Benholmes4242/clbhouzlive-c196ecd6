@@ -11,7 +11,14 @@ import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
-import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import {
+  RoundDetailSheet,
+  type RoundDetailSeed,
+} from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { useQueryClient } from '@tanstack/react-query';
+import { whsKeys } from '@/lib/whs/hooks';
+import { fetchRoundDetail } from '@/lib/whs/api';
+import { coursePlaceLine } from './placeLine';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
@@ -425,6 +432,43 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const { t, i18n } = useTranslation('courses');
   const navigate = useNavigate();
   const opener = useScorecardOpener();
+  const queryClient = useQueryClient();
+  /* BRIEF_ROUND_SHEET §1.2 — THE TAPPED CARD STAYS VISIBLE ABOVE THE SHEET.
+     One ref per rendered card, keyed on the stream item id, plus the id of the
+     card currently ringed. The ring goes on close. */
+  const cardRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  const chipBarRef = useRef<HTMLDivElement | null>(null);
+  const [ringId, setRingId] = useState<string | null>(null);
+  const [sheetSeed, setSheetSeed] = useState<RoundDetailSeed | null>(null);
+  /* §3 — the sheet's own session: when it opened, how deep it went, and whether
+     the depth section was read. rounds_viewed is 1 until paging lands (part 2). */
+  const sheetSession = useRef<{ at: number; maxDetent: 'mid' | 'full'; rounds: number; stats: boolean } | null>(null);
+
+  const revealCard = useCallback((id: string) => {
+    const el = cardRefs.current.get(id);
+    if (!el) return;
+    const bar = chipBarRef.current?.getBoundingClientRect();
+    const chrome = (bar?.height ?? 0) + (bar?.top ?? 0) + 8;
+    const top = window.scrollY + el.getBoundingClientRect().top - Math.max(56, chrome);
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }, []);
+
+  /* §1.2 — the ring is an OUTLINE, so it cannot move the card by a pixel. */
+  const ringStyle = (id: string): React.CSSProperties =>
+    ringId === id
+      ? { borderRadius: 14, outline: '2px solid rgba(248,250,252,0.55)', outlineOffset: 0 }
+      : {};
+
+  const prefetchRound = useCallback(
+    (scoreId: string | null | undefined) => {
+      if (!scoreId) return;
+      void queryClient.prefetchQuery({
+        queryKey: whsKeys.roundDetail(scoreId),
+        queryFn: () => fetchRoundDetail(scoreId),
+      });
+    },
+    [queryClient],
+  );
   /* THE SETTLED FOLLOW-SET READ behind the circle slot's two occupants. One
      definition (src/lib/social/circle.ts), so this gate and the circle shelf's
      own rows can never disagree. */
@@ -954,6 +998,46 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       });
 
       if (item.kind === 'round' && item.facts.score_id) {
+        /* BRIEF_ROUND_SHEET §1.2/§1.3 — the card is seeded from what this page
+           already read, the tapped card is ringed and scrolled clear of the
+           chip row, and the session's analytics clock starts here. */
+        const shape = item.facts.score_id ? shapesMap?.get(item.facts.score_id) ?? null : null;
+        const seedHoles = (shape?.holes ?? []).map((h) => ({
+          holeNo: h.holeNo, par: h.par, strokes: h.sheetStrokes,
+        }));
+        const seedGross = seedHoles.length > 0 && seedHoles.every((h) => h.strokes != null)
+          ? seedHoles.reduce((sum, h) => sum + (h.strokes ?? 0), 0)
+          : null;
+        const seedPar = seedHoles.every((h) => h.par != null)
+          ? seedHoles.reduce((sum, h) => sum + (h.par ?? 0), 0)
+          : null;
+        setSheetSeed(
+          seedHoles.length > 0 && item.subject?.course_name
+            ? {
+                scoreId: item.facts.score_id,
+                holes: seedHoles,
+                gross: seedGross,
+                toPar: seedGross != null && seedPar ? seedGross - seedPar : null,
+                courseName: item.subject.course_name,
+                placeLine: coursePlaceLine({
+                  region: item.subject.region,
+                  subCountry: item.subject.sub_country,
+                  country: item.subject.country ?? null,
+                }),
+                playerName: item.who?.display_name ?? null,
+                playerAvatarUrl: item.who?.photo_url ?? null,
+                playDate: item.facts.play_date ?? null,
+              }
+            : null,
+        );
+        setRingId(item.id);
+        revealCard(item.id);
+        sheetSession.current = { at: Date.now(), maxDetent: 'mid', rounds: 1, stats: false };
+        analyticsEvents.track('round_sheet_open', {
+          score_id: item.facts.score_id,
+          view,
+          seeded: seedHoles.length > 0,
+        });
         opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
         return;
       }
@@ -1005,7 +1089,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         });
       }
     },
-    [depart, navigate, openReview, opener, t],
+    [depart, navigate, openReview, opener, revealCard, shapesMap, t, view],
   );
 
   const tapWho = useCallback(
@@ -1239,6 +1323,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       <div ref={chipSentinelRef} style={{ height: 0 }} aria-hidden="true" />
       <StickySafeAreaScrim visible={chipsStuck} background={A.CANVAS} />
       <div
+        ref={chipBarRef}
         data-stuck={chipsStuck ? 'true' : 'false'}
         style={{
           position: 'sticky',
@@ -1501,14 +1586,21 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, paddingInline: CARD_INSET }}
               >
                 {block.items.map((item, offset) => (
-                  <ExploreCard
+                  /* §1.2 — a pair rings the CARD THAT WAS TAPPED, never both. */
+                  <div
                     key={item.id}
-                    item={item}
-                    size="pair"
-                    cardTreatment="standard"
-                    onTap={() => tapCard(item, 'pair', base + offset)}
-                    onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
-                  />
+                    ref={(el) => { cardRefs.current.set(item.id, el); }}
+                    onPointerDown={() => prefetchRound(item.facts.score_id)}
+                    style={{ minWidth: 0, ...ringStyle(item.id) }}
+                  >
+                    <ExploreCard
+                      item={item}
+                      size="pair"
+                      cardTreatment="standard"
+                      onTap={() => tapCard(item, 'pair', base + offset)}
+                      onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
+                    />
+                  </div>
                 ))}
               </div>
             );
@@ -1549,6 +1641,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>
+             <div
+               ref={(el) => { cardRefs.current.set(item.id, el); }}
+               onPointerDown={() => prefetchRound(item.facts.score_id)}
+               style={ringStyle(item.id)}
+             >
               <ExploreCard
                 item={item}
                 size={size}
@@ -1559,6 +1656,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 onTap={() => tapCard(item, size, pos)}
                 onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
               />
+             </div>
             </div>
           );
         })}
@@ -1583,10 +1681,36 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           this component's opener. */}
       <RoundDetailSheet
         open={!!opener.target}
-        onClose={opener.close}
+        onClose={() => {
+          /* §3 — one close event carries the session: how deep it went, whether
+             the depth section was read, and how long it was open. */
+          const session = sheetSession.current;
+          if (session) {
+            analyticsEvents.track('round_sheet_close', {
+              detent: session.maxDetent,
+              rounds_viewed: session.rounds,
+              reached_stats: session.stats,
+              dwell_ms: Date.now() - session.at,
+              view,
+            });
+            sheetSession.current = null;
+          }
+          setRingId(null);
+          setSheetSeed(null);
+          opener.close();
+        }}
         scoreId={opener.target?.scoreId ?? null}
         connectionId={opener.target?.connectionId ?? null}
         profileUserId={opener.target?.profileUserId ?? null}
+        seed={sheetSeed}
+        detents={['mid', 'full']}
+        onDetentChange={(detent) => {
+          if (detent === 'full' && sheetSession.current) sheetSession.current.maxDetent = 'full';
+          analyticsEvents.track('round_sheet_detent', { detent, view });
+        }}
+        onStatsSeen={() => {
+          if (sheetSession.current) sheetSession.current.stats = true;
+        }}
       />
     </div>
   );

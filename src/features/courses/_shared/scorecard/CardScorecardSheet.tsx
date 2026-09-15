@@ -204,6 +204,19 @@ export interface CardScorecardSheetProps {
    * all of them, and then nothing renders.
    */
   feat?: HonoursFeat | null;
+  /*
+   * BRIEF_ROUND_SHEET §1.1 — HALF-HEIGHT OPEN, OPT-IN AND PASSED THROUGH.
+   * Absent (the tour surface, /round) the sheet behaves exactly as before.
+   */
+  detents?: ['mid', 'full'];
+  onDetentChange?: (detent: 'mid' | 'full') => void;
+  onHorizontalDrag?: {
+    onStart: () => void;
+    onMove: (dx: number) => void;
+    onEnd: (dx: number, velocity: number) => void;
+  } | null;
+  /** §3 — fires once the "at this course" section is half visible. */
+  onStatsSeen?: () => void;
 }
 
 
@@ -270,12 +283,24 @@ const NINE_GRID = 'repeat(9, minmax(0, 1fr)) 32px';
  */
 
 
+/**
+ * BRIEF_ROUND_SHEET §1.4 — THE STROKES ROW IS THE LOUDEST ROW.
+ *
+ * The card's subject is what the player shot, so that row's total is white and
+ * bold at 15px, and the par row steps back to a quiet 11px at 42% ink. The hole
+ * numbers keep their existing quiet treatment and the ScoreMark shapes and
+ * colours are untouched — only the type weight of the two figure rows moves.
+ */
+const PAR_QUIET = 'rgba(248,250,252,0.42)';
+
 const CardRow: React.FC<{
   cells: React.ReactNode[];
   total: React.ReactNode;
   muted?: boolean;
   tone?: string;
-}> = ({ cells, total, muted, tone }) => (
+  /** 'par' = quiet row, 'strokes' = loud row, undefined = as before. */
+  emphasis?: 'par' | 'strokes';
+}> = ({ cells, total, muted, tone, emphasis }) => (
   /* CONTAINMENT, INDEPENDENT OF THE LABELS: every cell is minWidth 0 and clips
      its own box, so whatever ends up in a cell — a long field figure, a
      translated string, a future two-character mark — cannot paint over the
@@ -289,13 +314,24 @@ const CardRow: React.FC<{
     {cells.map((c, i) => (
       <span key={i} style={{ textAlign: 'center', minWidth: 0, overflow: 'hidden' }}>
         {typeof c === 'object' ? c : (
-          <span style={{ ...NUM, fontSize: 12, fontWeight: muted ? 500 : 700, color: tone ?? (muted ? A.MUTE : A.INK) }}>
+          <span style={{
+            ...NUM,
+            fontSize: emphasis === 'par' ? 11 : 12,
+            fontWeight: emphasis === 'par' ? 500 : (muted ? 500 : 700),
+            color: emphasis === 'par' ? PAR_QUIET : (tone ?? (muted ? A.MUTE : A.INK)),
+          }}>
             {c}
           </span>
         )}
       </span>
     ))}
-    <span style={{ ...NUM, fontSize: 13, color: A.INK, textAlign: 'center', minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap' }}>
+    <span style={{
+      ...NUM,
+      fontSize: emphasis === 'par' ? 11 : emphasis === 'strokes' ? 15 : 13,
+      fontWeight: emphasis === 'strokes' ? 800 : undefined,
+      color: emphasis === 'par' ? PAR_QUIET : A.INK,
+      textAlign: 'center', minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap',
+    }}>
       {total}
     </span>
   </div>
@@ -357,12 +393,13 @@ const Nine: React.FC<{
   return (
     <div>
       <CardRow cells={rows.map((h) => h.holeNo)} total={label} muted />
-      <CardRow cells={rows.map((h) => h.par ?? '\u2014')} total={parTotal} muted />
+      <CardRow cells={rows.map((h) => h.par ?? '\u2014')} total={parTotal} muted emphasis="par" />
       <CardRow
         cells={rows.map((h) => (
           <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="dark" />
         ))}
         total={strokesTotal}
+        emphasis="strokes"
       />
 
     </div>
@@ -659,6 +696,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   onViewProfile, onViewCourse, onShareRound, engagement = null,
   feat = null,
   sheetStyle,
+  detents,
+  onDetentChange,
+  onHorizontalDrag = null,
+  onStatsSeen,
 
 }) => {
   const { t } = useTranslation(['courses']);
@@ -906,6 +947,30 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
 
 
+  /* §1.4 — dead-listed with the removed sections above. Voided, not deleted. */
+  void split;
+  void Legend;
+  void RoundSplit;
+
+  /* §3 — reached_stats: the "at this course" section was 50% or more visible at
+     any point. Reported once per mount; the host owns the event. */
+  const statsRef = React.useRef<HTMLDivElement | null>(null);
+  const statsSeen = React.useRef(false);
+  useEffect(() => {
+    const el = statsRef.current;
+    if (!open || !el || !onStatsSeen || statsSeen.current) return;
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.intersectionRatio >= 0.5 && !statsSeen.current) {
+          statsSeen.current = true;
+          onStatsSeen();
+        }
+      }
+    }, { threshold: [0.5] });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [open, onStatsSeen, courseSection.length]);
+
   const out = holes.filter((h) => h.holeNo <= 9);
 
   const back = holes.filter((h) => h.holeNo > 9);
@@ -986,6 +1051,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       // set the surface to PANEL and the body to CANVAS, which is exactly the
       // seam that showed as a band behind the action strip at the foot. The
       // shared BottomSheet owns the one surface for chrome and body alike.
+      detents={detents}
+      onDetentChange={onDetentChange}
+      onHorizontalDrag={onHorizontalDrag}
       style={{ height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column', ...sheetStyle }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, flex: 1, minHeight: 0, ...FIGS }}>
@@ -997,16 +1065,25 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           thing on the sheet and it does not scroll: the card, the breakdown and
           the chart scroll beneath this block.
 
-          DISMISS IS SAFE. BottomSheet binds its touch drag handlers to the
-          GRABBER ROW ONLY, not to the sheet body, so a non-scrolling header
-          inside the sheet cannot capture the dismiss gesture. This block sits
-          BELOW that grabber and never sees those events.
+          DISMISS IS SAFE, AND NOW SO IS THE DETENT DRAG.
+
+          WITHOUT `detents` (the tour surface, /round): BottomSheet binds its
+          touch drag handlers to the GRABBER ROW ONLY, so this block never sees
+          those events and cannot capture the dismiss gesture.
+
+          WITH `detents` (BRIEF_ROUND_SHEET §1.1): at MID nothing in the sheet
+          scrolls, so a vertical drag ANYWHERE moves the sheet. At FULL the drag
+          is live on the grabber and on THIS fixed summary block — which does not
+          scroll, so there is no contention — while the scrolling body below
+          (marked `data-sheet-scroll`) keeps the finger for scrolling. Down past
+          70px returns to mid; a long or fast drag closes.
         */}
         {/* THE HONOURS BAND. Champagne for the albatross, bone for the ace —
             they separate by SATURATION, never by value. It sits above the
             summary because the feat is why this round is worth a look. */}
         {feat && (
           <div
+            data-sheet-drag="true"
             style={{
               flexShrink: 0,
               background: honoursGround(feat),
@@ -1160,6 +1237,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         </div>
 
         <div
+          data-sheet-scroll="true"
           style={{
             flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
             /* No fill — the sheet surface shows through
@@ -1219,6 +1297,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 the same screen as its own CTA. The scoring key stays with the
                 card, directly beneath it (S4.2).
               */}
+              {/* §1.1 — MID SHOWS THE WHOLE CARD. This marker is the last thing
+                  that must be visible at the half-height detent; BottomSheet
+                  measures to its bottom edge and caps the result at 62dvh. */}
+              <div data-sheet-mid-extent="true">
               <ScorecardSection kicker={t('courses:scorecard.theCard')} flat={!isTour}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <Nine rows={out} label={t('courses:scorecard.out')} />
@@ -1237,9 +1319,13 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   */}
 
 
-                  <Legend holes={played} hasUnplayed={!allHolesPlayed} />
+                  {/* §1.4 — THE SCORING KEY IS GONE. Circles and boxes are
+                      standard golf notation; a card does not carry its own
+                      glossary. `Legend` is DEAD-LISTED, not deleted, and its
+                      locale keys stay in all six files. */}
                 </div>
               </ScorecardSection>
+              </div>
 
               {/*
                 §C — AT THIS COURSE. ONE POOL: the member's own rounds at this
@@ -1253,6 +1339,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   count (INDEX THEN can resolve on its own) it falls back to the
                   bare title rather than claiming "your 0 rounds here". */}
               {courseSection.length > 0 && (
+                <div ref={statsRef}>
                 <ScorecardSection
                   kicker={t(isOwner ? 'courses:scorecard.atThisCourseSelf' : 'courses:scorecard.atThisCourseOther', {
                     name: playerName,
@@ -1277,12 +1364,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     </p>
                   )}
                 </ScorecardSection>
+                </div>
               )}
 
-              {/* HOW IT BROKE DOWN — the birdie+ figure keeps its RED (S4.3). */}
-              <ScorecardSection kicker={t('courses:scorecard.howItBrokeDown')} flat={!isTour}>
-                <RoundSplit split={split} />
-              </ScorecardSection>
+              {/* §1.4 — THE ROUND BREAKDOWN IS GONE. It recounted, as four
+                  figures and a bar, the card that sits directly above it.
+                  `RoundSplit` and the `split` derivation are DEAD-LISTED, not
+                  deleted, and `courses:scorecard.split*` keys stay in all six
+                  locale files. */}
 
               {isTour && (
                 <Panel kicker={t('courses:scorecard.howItUnfolded')}>
