@@ -281,7 +281,15 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
 
   return (
     <SectionShell padX={GUT} eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={goSchedule}>
-      <div style={{ margin: `0 ${GUT}px` }}>
+      <div>
+        {/* FULL-BLEED TRACK, PADDED PAGES (ghost-block fix). The date header
+            cancels the gutter with a negative margin so its tint reaches both
+            screen edges. When the TRACK was the inset element (margin 0 GUT)
+            each page was 40px narrower than its header, and the NEXT page's
+            header bled 20px into view at the right edge — the faint ghost
+            blocks seen beside rows. Now the track is full width and each PAGE
+            pays the gutter as padding: a page's header is exactly screen-wide
+            and the next page's header starts exactly at the screen edge. */}
         <div style={{ overflow: 'hidden' }}>
           <div
             ref={trackRef}
@@ -313,7 +321,7 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
                 ref={(el) => {
                   pageRefs.current[pi] = el;
                 }}
-                style={{ flex: '0 0 100%', width: '100%', scrollSnapAlign: 'start' }}
+                style={{ flex: '0 0 100%', width: '100%', scrollSnapAlign: 'start', boxSizing: 'border-box', padding: `0 ${GUT}px` }}
               >
 
                 {page.map((group, gi) => (
@@ -368,7 +376,8 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
               alignItems: 'center',
               justifyContent: 'space-between',
               width: '100%',
-              padding: '11px 0',
+              boxSizing: 'border-box',
+              padding: `11px ${GUT}px`,
               background: 'transparent',
               border: 'none',
               borderTop: `0.5px solid ${V4.hairline}`,
