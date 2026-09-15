@@ -4,6 +4,11 @@ import { Link2, ChevronDown, ChevronUp, Image as ImageIcon, MapPin, CheckCircle2
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { courseMatchLabel } from '../lib/geography';
+import {
+  CandidateCountryFlag,
+  CountryMismatchWarning,
+  WhsCountryChip,
+} from '../components/CountryMismatchWarning';
 import { adminTheme as t } from '../theme';
 import EmptyState from '../components/EmptyState';
 import StatusPill from '../components/StatusPill';
