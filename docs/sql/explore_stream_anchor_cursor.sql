@@ -284,17 +284,22 @@ SELECT md5(pg_get_functiondef(p.oid))                                      AS ne
 
 -- V2. NO OVERLAP between page 1 and page 2, and the cursor carries the anchors.
 -- The viewer is resolved by email, never by a pasted uuid.
+-- NOTE: SELECT s.* (not SELECT *) - the me CTE and the function both return an
+-- id column, so USING (id) on SELECT * is ambiguous.
+-- NOTE: page 1 and page 2 in ONE statement share one statement clock, so this
+-- shape would pass even without the patch. It proves the cursor plumbing and
+-- the overlap; it does NOT prove the anchor. V2b below proves the anchor.
 WITH me AS (
   SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'
 ),
 p1 AS (
-  SELECT * FROM me, public.get_explore_stream(me.id, 'all', 'world', NULL, 12) s
+  SELECT s.* FROM me, public.get_explore_stream(me.id, 'all', 'world', NULL, 12) s
 ),
 cur AS (
   SELECT (SELECT next_cursor FROM p1 WHERE next_cursor IS NOT NULL LIMIT 1) AS c
 ),
 p2 AS (
-  SELECT * FROM me, cur, public.get_explore_stream(me.id, 'all', 'world', cur.c, 12) s
+  SELECT s.* FROM me, cur, public.get_explore_stream(me.id, 'all', 'world', cur.c, 12) s
 )
 SELECT (SELECT count(*) FROM p1)                                        AS page1_rows,
        (SELECT count(*) FROM p2)                                        AS page2_rows,
@@ -302,6 +307,29 @@ SELECT (SELECT count(*) FROM p1)                                        AS page1
        (SELECT c ? 'at'   FROM cur)                                     AS cursor_has_at,
        (SELECT c ? 'seen' FROM cur)                                     AS cursor_has_seen,
        (SELECT c ->> 'at' FROM cur)                                     AS anchored_at;
+
+-- V2b. DRIFT CHECK (informational). Same page 1, but page 2 is called with the
+-- cursor's 'at' moved +12 hours - simulating a world where the anchor was NOT
+-- carried and 12 hours of freshness decay happened between pages. Before the
+-- patch this is roughly what real paging did (every page re-read the clock);
+-- after the patch the served cursor pins 'at', so this column shows what drift
+-- WOULD have produced. There is no hard expectation: any overlap here is the
+-- failure mode the patch removed from real paging.
+WITH me AS (
+  SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'
+),
+p1 AS (
+  SELECT s.* FROM me, public.get_explore_stream(me.id, 'all', 'world', NULL, 12) s
+),
+cur AS (
+  SELECT (SELECT next_cursor FROM p1 WHERE next_cursor IS NOT NULL LIMIT 1) AS c
+),
+p2_drifted AS (
+  SELECT s.* FROM me, cur,
+       public.get_explore_stream(me.id, 'all', 'world',
+         jsonb_set(cur.c, '{at}', to_jsonb((cur.c ->> 'at')::timestamptz + interval '12 hours')), 12) s
+)
+SELECT (SELECT count(*) FROM p1 JOIN p2_drifted USING (id)) AS overlap_if_12h_passed;
 
 -- V3. PAGE 2 USES THE CURSOR'S SEEN VALUE, NOT THE TABLE.
 -- Left: page 2 with the cursor exactly as served. Right: the same cursor with
