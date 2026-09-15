@@ -173,7 +173,7 @@ export interface HeadlineContext {
   /**
    * A CALLOUT IS RENDERING, so the headline STATES THE ROUND and not the
    * achievement (BRIEF_EXPLORE_TWO_SHAPES §6). "took the course record with a
-   * 69" becomes a Course record panel plus "Danny Robinson went round in 69, two
+   * 69" becomes a Course record panel plus "Danny Robinson shot a 69, two
    * under." Two statements of one fact is the fault this removes. Reviews are
    * untouched.
    */
@@ -443,7 +443,7 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
   }
 
   /* THE VIEWER'S OWN ROUND THAT MOVED NOTHING. No standing claim, no to-par
-     restatement of the chip: "You went round in 73." and the shape says the
+     restatement of the chip: "You shot a 73." and the shape says the
      rest. This is the retirement of both rank_hold and the old "unchanged"
      sentence, in one line. */
   if ((c == null || c.kind === 'played_nochange') && isOwn && gross != null) {
