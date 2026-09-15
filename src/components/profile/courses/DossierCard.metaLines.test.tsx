@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import enCourses from '../../../public/locales/en/courses.json';
+import { readFileSync } from 'node:fs';
+
+const enCourses = JSON.parse(
+  readFileSync(new URL('../../../public/locales/en/courses.json', import.meta.url), 'utf8'),
+) as Record<string, Record<string, string>>;
 
 // Real en translations with plural selection, so the "1 ROUNDS" regression
 // cannot hide behind a defaultValue fallback.
