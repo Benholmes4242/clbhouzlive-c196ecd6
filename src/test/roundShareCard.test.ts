@@ -6,7 +6,7 @@
  * to-par sign and the fail-closed rule, so those are what is tested.
  */
 import { describe, it, expect } from 'vitest';
-// @ts-expect-error - plain JS Function helper, no types
+// plain JS Function helper, no types
 import { roundMeta, toParLabel } from '../../functions/_lib/round.js';
 
 const card = {
