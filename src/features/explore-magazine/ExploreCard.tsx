@@ -323,16 +323,16 @@ function WhoLine({
               fontWeight: 600,
               color: subColor,
               whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              minWidth: 0,
-              flex: '0 1 auto',
+              /* THE DATE NEVER WRAPS AND NEVER TRUNCATES. A long username gives
+                 up its characters first; the day is short and is the fact. */
+              flex: '0 0 auto',
                textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
             }}
           >
             {who ? `\u00B7 ${sub}` : sub}
           </span>
         ) : null}
+
       </div>
     </div>
   );
