@@ -338,6 +338,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const [burstVisible, setBurstVisible] = useState(false);
   // Course stats sheet. Mounting it is what enables the detail RPC.
   const [statsOpen, setStatsOpen] = useState(false);
+  // The course name's own destination. The legacy `onCourse` prop is left
+  // exactly as shipped for its existing callers.
+  const navigate = useNavigate();
   const handleMediaDoubleTap = React.useCallback(() => {
     // Always show the burst (confirms even when already liked)…
     setBurstKey((k) => k + 1);
