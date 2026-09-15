@@ -313,10 +313,21 @@ export function useExploreStream(
 
 
   /* THE COURSE SENTENCE, IN THE MEMBER'S LANGUAGE. Only added where the row is a
-     course card and the server did not carry a headline of its own. */
+     course card and the server did not carry a headline of its own.
+
+     BRIEF_ROUND_SHEET_TALL §2 — AND ONE CARD PER ID. The pages were flattened
+     with no identity check, so two overlapping keyset pages from
+     get_explore_stream put the same row on the page twice: React warned about the
+     duplicate key, and cardRefs, the ring and roundSeq all keyed by that id. The
+     first occurrence wins, so the served ranking is untouched, and DEV names both
+     pages and both positions. */
   const items = useMemo(
-    () =>
-      (query.data?.pages ?? []).flatMap((p) => p.items).map((item) => {
+    () => {
+      const { items: unique, drops } = dedupePages(
+        (query.data?.pages ?? []).map((p) => p.items),
+      );
+      warnDuplicates(`useExploreStream:${view}`, drops);
+      return unique.map((item) => {
         if (item.kind !== 'course' || item.facts.headline) return item;
         const headline = courseHeadline(t, {
           event: item.facts.course_event ?? 'stable',
@@ -329,8 +340,9 @@ export function useExploreStream(
           ratingCount: item.facts.rating_n ?? null,
         });
         return headline ? { ...item, facts: { ...item.facts, headline } } : item;
-      }),
-    [query.data, t],
+      });
+    },
+    [query.data, t, view],
   );
   return {
     items,

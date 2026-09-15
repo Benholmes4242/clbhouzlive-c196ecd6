@@ -414,6 +414,9 @@ export const RoundDetailSheet: React.FC<Props> = ({
       hint={hint}
       pagePreview={pagePreview}
       midKey={midKey}
+      /* BRIEF_ROUND_SHEET_TALL §1 — DEV-only: which round, and whether the card
+         was drawn from the feed's seed or is waiting on the fetch. */
+      midDebug={{ scoreId: scoreId ?? null, seeded: usingSeed }}
       paging={paging}
     />
     {commentsOpen && postInfo && (
