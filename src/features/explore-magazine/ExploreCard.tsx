@@ -428,6 +428,7 @@ export function ExploreCard({
 
   const headlineNode = (
     <div
+      data-explore-headline="true"
       style={{
         marginTop: size === 'pair' ? 4 : 6,
         fontFamily: SANS,

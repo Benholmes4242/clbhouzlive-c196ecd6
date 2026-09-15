@@ -86,9 +86,15 @@ function singleHole(
 export function calloutFor(item: StreamItem, holes?: CalloutHole[]): AchievementCallout | null {
   if (item.kind !== 'round') return null;
   const { facts, consequence, lane } = item;
+  /* A BACKLOG ROUND NEVER CLAIMS THE BOARD: it is entered after the fact and the
+     standing it would announce is not news. */
   const boardClaimAllowed = lane !== 'backlog';
+  /* ONLY GOOD THINGS GET A CALLOUT. A round that LOST the record carries
+     is_course_record from the row it displaced, so the loss is checked FIRST and
+     no crown can be drawn on top of it. */
+  const lostIt = consequence?.kind === 'record_lost' || consequence?.kind === 'rank_down';
 
-  if (boardClaimAllowed && (consequence?.kind === 'record_taken' || facts.is_course_record === true)) {
+  if (boardClaimAllowed && !lostIt && (consequence?.kind === 'record_taken' || facts.is_course_record === true)) {
     return { kind: 'record' };
   }
   if (boardClaimAllowed && consequence?.kind === 'rank_up') {
