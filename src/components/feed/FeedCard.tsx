@@ -856,6 +856,18 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             <PostCourseBand
               courseName={post.courseName}
               /**
+               * THE COURSE NAME IS A DOOR. Routes to /courses/:courseId for the
+               * id the card ALREADY carries — review posts resolve through
+               * reviewCourseId (review.courseId, else courseId), every other
+               * kind through post.courseId. No id -> no prop -> plain text, and
+               * never a lookup by name.
+               */
+              onOpenCourse={
+                (post.isReview ? reviewCourseId : post.courseId)
+                  ? () => navigate(`/courses/${post.isReview ? reviewCourseId : post.courseId}`)
+                  : undefined
+              }
+              /**
                * BRIEF_ROUND_CARD_CONTEXT S2 — THE REGION IS PRINTED ONCE PER
                * CARD. On a round post PostRoundCard already states
                * "Kent, Britain & Ireland" under the course name 600px above, so
