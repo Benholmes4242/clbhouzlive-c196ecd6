@@ -136,23 +136,39 @@ type Block =
 /** §6d PAIRS carry no round shape, so only kinds that never draw one pair up. */
 const PAIRABLE = new Set(['review', 'course', 'story']);
 
-/** SCORES ONLY — A BARE ROUND MAY PAIR. DO NOT HARMONISE THIS WITH ALL.
+/** A PLAIN ROUND MAY PAIR — ON SCORES AND ON ALL.
  *
- *  On All, a round card's shape is often the point, so the rule above stands
- *  there unchanged. On the rounds-only view the failure mode is twelve
- *  identical full-width cards, and a round with NO CONSEQUENCE is exactly the
- *  card whose line was earned on travel with nothing to mark — a pair draws no
- *  trace anyway (SHAPE_W.pair is 0), so the trace is not the loss it looks
- *  like. Measured: an all-bare page of 12 falls from ~3,240px to a lead plus
- *  five pair rows at ~1,275px, and records and circle rounds keep full width
- *  so the strong cards read AS strong.
+ *  This is no longer a Scores-only concession. The rounds whose SHAPE is the
+ *  point — records, rank moves, an ace, an albatross, an eagle, five or more
+ *  birdies, a clean card, under par — are all hero-eligible now, and canPair()
+ *  already refuses a hero-eligible item. So a pair can only ever take a round
+ *  with nothing to mark, and the trace (SHAPE_W.pair is 0) is never lost where
+ *  it would have said something.
  *
- *  The test is CONSEQUENCE ALONE, not consequence-and-no-visual: the visual
- *  form of the test would have fired on about 3% of rounds and changed
- *  nothing. */
+ *  WHAT COUNTS AS PLAIN IS AN ALLOWLIST, NEVER A DENYLIST. On All most rounds
+ *  by other members carry circle_round or list_first (consequences.ts) — a
+ *  no-consequence test would pair almost nothing. Those two kinds say only
+ *  "someone you follow played" and "it is on your list", which is exactly the
+ *  quiet card. Every other kind — record_taken, record_lost, rank_up,
+ *  rank_down, platform_notable, and anything added later — keeps full width by
+ *  default, because a kind absent from this set is not plain. */
+const PLAIN_ROUND_CONSEQUENCES = new Set(['circle_round', 'list_first']);
+
 function pairableRound(item: StreamItem): boolean {
-  return item.kind === 'round' && item.consequence == null;
+  if (item.kind !== 'round') return false;
+  const kind = item.consequence?.kind ?? null;
+  return kind === null || PLAIN_ROUND_CONSEQUENCES.has(kind);
 }
+
+/** TWO ROUNDS AT THE SAME COURSE NEVER PAIR: the same photograph twice, side by
+ *  side, reads as one card duplicated. Both course ids must be known — an
+ *  unresolved course cannot be proved different, so it does not pair at all. */
+function differentCourses(a: StreamItem, b: StreamItem): boolean {
+  const left = a.subject?.course_id ?? null;
+  const right = b.subject?.course_id ?? null;
+  return left != null && right != null && left !== right;
+}
+
 
 /** §5 shelves are inserted after card positions 3, 7, 11 ... An empty source
  *  consumes its scheduled slot without moving the next shelf earlier.
@@ -162,7 +178,7 @@ function pairableRound(item: StreamItem): boolean {
  *  repeated card; the Courses and Reviews views are all one kind by definition
  *  and the brief allows pairs in both, so `sameKindPairs` opens that door for
  *  those two views only. */
-function buildBlocks(
+export function buildBlocks(
   items: StreamItem[],
   shelves: ShelfKind[],
   sameKindPairs = false,
@@ -197,7 +213,15 @@ function buildBlocks(
       next &&
       canPair(item) &&
       canPair(next) &&
-      (sameKindPairs || opts.mergedCourses === true || item.kind !== next.kind || (opts.bareRoundPairs === true && item.kind === 'round'))
+      (sameKindPairs || opts.mergedCourses === true || item.kind !== next.kind || (opts.bareRoundPairs === true && item.kind === 'round')) &&
+      /* A ROUND PAIRS WITH A ROUND AND NOTHING ELSE. Before rounds could pair
+         on All, the mixed-kind clause above made a round-plus-review row
+         impossible; now that it is possible it is still refused, because the two
+         cards carry different furniture. */
+      (item.kind === 'round') === (next.kind === 'round') &&
+      /* THE SAME-COURSE GUARD, rounds only. A blocked pair renders the first
+         card full width; the ranked order is never reordered to find a partner. */
+      (item.kind !== 'round' || next.kind !== 'round' || differentCourses(item, next))
     ) {
       blocks.push({ kind: 'pair', items: [item, next] });
       index += 2;
@@ -863,7 +887,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const blocks = useMemo(
     () =>
       buildBlocks(ranked, shelves, false, {
-        bareRoundPairs: view === 'scores',
+        /* PLAIN ROUNDS PAIR TWO-UP ON BOTH ROUND-BEARING VIEWS. All still
+           refuses same-kind pairs for every other kind. */
+        bareRoundPairs: view === 'scores' || view === 'all',
         repeatShelves: view === 'scores' || view === 'all',
         /* §3 THE MERGED VIEW'S RHYTHM: pairs are STABLE-FACT COURSE CARDS only,
            reviews and event cards always full width. */
