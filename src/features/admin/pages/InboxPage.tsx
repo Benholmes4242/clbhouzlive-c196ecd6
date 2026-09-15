@@ -711,6 +711,13 @@ function MatchInboxSheet({ row, onClose }: { row: MatchRequestRow | null; onClos
         <div style={{ fontSize: 12, color: t.inkMuted }}>
           Requester: <span style={{ color: t.ink, fontWeight: 600 }}>{row.requester_name ?? row.requester_username ?? row.user_id.slice(0, 8)}</span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <WhsCountryChip country={whsCountry} />
+          <span style={{ fontSize: 12, color: t.inkMuted }}>
+            catalogue: {row.course_sub_country ?? 'no recorded country'}
+          </span>
+        </div>
+        <CountryMismatchWarning whsCountry={whsCountry} subCountry={row.course_sub_country} />
         <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: t.inkFaint }}>
           WHS course name to alias
         </label>
