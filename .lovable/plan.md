@@ -6,6 +6,7 @@ Rebuild the Tour Hub Overview as one editorial stream using the same visual gram
 ## Page structure
 1. Replace the current hero-plus-eight-section stack in `OverviewPageV3` with a magazine stream in this order:
    - lead tournament card, including its existing live board and field figures beneath the editorial lead
+   - Tournament Intelligence card, only when a real scoped prediction exists
    - lead story
    - Coming up rail
    - second story
@@ -72,7 +73,7 @@ Use the established score formatters: spoken to-par in prose and symbolic true-m
 ## Course shape and Tournament Intelligence
 - Remove both collapsed accordions from the lead band.
 - **Course shape:** promote it into the flat tournament lead body only when real round/hole facts exist; otherwise omit it. It will not remain behind a disclosure control.
-- **Our picks:** Tournament Intelligence is active: `useAIPredictions(tournamentId)` has current consumers in the hero and picks surfaces, and returns scoped `topContenders`. Promote the top supported prediction into a stream card using the sentence rules above. Keep its deeper case/player destinations where data permits; omit it when no prediction exists.
+- **Our picks:** Tournament Intelligence is active: `useAIPredictions(tournamentId)` has current consumers in the hero and picks surfaces, and returns scoped `topContenders`. Promote the top supported prediction into a stream card directly beneath the tournament, using the sentence rules above. Keep its deeper case/player destinations where data permits; omit it when no current prediction exists, with no placeholder or coming-soon state.
 - This deliberately supersedes the current `HeroBoardSection` comments/ruling that permit two collapsed rows. The brief wins, and the contradiction will be recorded in code comments and the completion report.
 
 ## Retired files and compatibility
