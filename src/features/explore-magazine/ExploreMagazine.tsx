@@ -21,7 +21,7 @@ import { fetchRoundDetail } from '@/lib/whs/api';
 import { coursePlaceLine } from './placeLine';
 import {
   pageDecision, rubberBand, neighbours, shouldExtend, openCue, noteHintPaged,
-  dragNeighbour,
+  dragNeighbour, resetHint,
 } from './roundPaging';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
 import { runNudge } from './roundNudge';
