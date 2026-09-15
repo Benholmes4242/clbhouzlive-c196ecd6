@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 
 const enCourses = JSON.parse(
-  readFileSync(new URL('../../../../public/locales/en/courses.json', import.meta.url), 'utf8'),
+  readFileSync(process.cwd() + '/public/locales/en/courses.json', 'utf8'),
 ) as Record<string, Record<string, string>>;
 
 // Real en translations with plural selection, so the "1 ROUNDS" regression
