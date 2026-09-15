@@ -112,9 +112,10 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   // DEPLOYED-PAYLOAD LIMIT (reported, not hidden): only the new_post trigger
   // writes post_type / whs_score_id / is_round onto the notification. The like,
   // comment and mention triggers write neither, so TODAY those rows still fall
-  // through to /post/:id and PostDeepLinkPage redirects them. This branch fires
-  // the moment the payload carries the score id — see
-  // docs/sql/2026-09-15-round-notification-payloads.sql.
+  // through to /post/:id and PostDeepLinkPage redirects them (now before its
+  // guest preview, so no empty card). This branch fires the moment the like /
+  // comment / mention triggers carry post_type + whs_score_id, which is a
+  // server change awaiting a separate ruling.
   if (ROUND_REACTION_TYPES.has(type)) {
     const scoreId = data.whs_score_id ?? null;
     const isRound =
