@@ -104,6 +104,13 @@ interface BottomSheetProps {
    * keeps the single measurement at open.
    */
   midKey?: string | number;
+  /**
+   * BRIEF_ROUND_SHEET_TALL §1 — DEV-ONLY MEASUREMENT DIAGNOSTICS. Whatever the
+   * consumer knows about the content it is drawing (the score id, which middle
+   * state, whether it was seeded); logged beside markerFound and the mid this
+   * measurement produced. Never read in production.
+   */
+  midDebug?: Record<string, unknown>;
   /** Reported on every settled detent change (analytics + host state). */
   onDetentChange?: (detent: 'mid' | 'full') => void;
   /** Horizontal gesture hand-off (paging). Return true to claim the pointer. */
