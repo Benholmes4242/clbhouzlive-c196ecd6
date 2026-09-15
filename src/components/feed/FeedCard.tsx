@@ -52,13 +52,11 @@ import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } 
 import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
 import { PostCourseBand } from './PostCourseBand';
 import { CourseStatsSheet } from './CourseStatsSheet';
-import { PostRoundCard, fmtToPar } from './PostRoundCard';
+import { fmtToPar } from './fmtToPar';
 import { roundScore } from './roundGross';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
-import { PostRoundShell } from '@/components/feed/PostRoundShell';
-import { PostRoundDegraded } from '@/components/feed/PostRoundDegraded';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 
 
@@ -713,41 +711,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       />
 
 
-      {/* Attached round — scorecard block sits ABOVE media. Waiting posts
-          render the shell in the same space (no pop-in, no jump). */}
-      {!postRound && postRoundPending && <PostRoundShell />}
-      {!postRound && !postRoundPending && postRoundMissing && (
-        <PostRoundDegraded
-          postId={post.id}
-          hasScoreId
-          courseName={post.courseName ?? null}
-          courseRegion={[post.courseRegion || post.courseSubCountry, post.courseCountry].filter(Boolean).join(', ') || null}
-        />
-      )}
-      {postRound && (
-        <PostRoundCard
-          round={postRound}
-          postId={post.id}
-          notability={post.roundNotability ?? null}
-          courseName={post.courseName ?? null}
-          courseRegion={[post.courseRegion || post.courseSubCountry, post.courseCountry].filter(Boolean).join(', ') || null}
-          courseCtx={courseContext ?? null}
-          crown={
-            postRound.crown
-              ? {
-                  category: crownCategoryLabel(postRound.crown.category),
-                  previousHolderName: postRound.crown.previousHolderName,
-                  margin:
-                    postRound.crown.margin != null
-                      ? String(postRound.crown.margin)
-                      : null,
-                }
-              : null
-          }
-          onTap={onRoundTap ? () => onRoundTap(post, postRound) : undefined}
-        />
-
-      )}
+      {/* ROUND POSTS ARE NOT FEED CARDS. The attached-round block (PostRoundCard,
+          its shell and its degraded state) was deleted: no feed this card
+          renders in can contain a round post, so the branch was unreachable. A
+          round is read on its own page, /round/:whsScoreId. */}
 
       {/* Media */}
       <div style={{ position: 'relative', zIndex: 1 }}>

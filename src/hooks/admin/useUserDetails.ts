@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { ROUND_POST_TYPE } from '@/lib/posts/isRoundPost';
 import { useQuery } from '@tanstack/react-query';
 import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
 
@@ -58,7 +59,8 @@ export function useUserDetails(userId: string | null) {
 
       // Fetch stats in parallel
       const [postsResult, reviewsResult, followersResult, followingResult, xpResult] = await Promise.all([
-        supabase.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+        // Round posts excluded — auto-created, media-less, no feed home.
+        supabase.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', userId).neq('post_type', ROUND_POST_TYPE),
         supabase.from('course_ratings').select('id', { count: 'exact', head: true }).eq('user_id', userId),
         supabase.from('user_follows').select('id', { count: 'exact', head: true }).eq('following_id', userId),
         supabase.from('user_follows').select('id', { count: 'exact', head: true }).eq('follower_id', userId),

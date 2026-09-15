@@ -16,7 +16,13 @@
  * broken.
  */
 
-export type SkeletonCardVariant = 'regular' | 'review' | 'round';
+/**
+ * ROUND IS GONE. Round posts have no Clubhouse home, so no first card can be
+ * one and there is no round skeleton left to reserve. A 'round' value written by
+ * an older session is still IN localStorage on those devices, so the reader
+ * below treats it as no hint at all (callers fall back to COLD_START_SHAPE).
+ */
+export type SkeletonCardVariant = 'regular' | 'review';
 
 export interface SkeletonShape {
   variant: SkeletonCardVariant;
@@ -39,7 +45,9 @@ export function readSkeletonShapeHint(): SkeletonShape | null {
     const raw = localStorage.getItem(KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as SkeletonShape;
-    if (parsed?.variant !== 'regular' && parsed?.variant !== 'review' && parsed?.variant !== 'round') {
+    // A stored 'round' from an older session falls here and returns null, so the
+    // caller uses COLD_START_SHAPE. No crash, no round shell.
+    if (parsed?.variant !== 'regular' && parsed?.variant !== 'review') {
       return null;
     }
     return parsed;

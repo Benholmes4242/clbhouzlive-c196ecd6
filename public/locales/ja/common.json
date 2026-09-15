@@ -81,8 +81,8 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "ラウンドを自動的に投稿",
-      "subtitle": "記録したラウンドはクラブハウスに表示されます。特筆すべきラウンドのみ、フォロワー以外にも届きます。"
+      "title": "Share my rounds",
+      "subtitle": "Your followers are told when you log a round, and can like and comment on it. Your rounds show on Explore either way."
     }
   },
   "feed": {
@@ -96,10 +96,6 @@
       "most_birdies_all_time": "バーディー最多"
     },
     "roundCard": {
-      "fieldLine_one": "このコースの平均は {{field}}（{{count}} ラウンド）",
-      "fieldLine_other": "このコースの平均は {{field}}（{{count}} ラウンド）",
-      "slopeHarder": "{{pct}}% のコースより難しい",
-      "slopeEasier": "{{pct}}% のコースより易しい",
       "net": "ネット",
       "adjustedNotCompleted_one": "調整済み、未完了のホールが{{count}}",
       "adjustedNotCompleted_other": "調整済み、未完了のホールが{{count}}"

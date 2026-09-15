@@ -37,6 +37,27 @@
 import { getActorRouteByType } from '@/types/actor';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 
+/** Reaction notifications whose target can be a ROUND post. */
+const ROUND_REACTION_TYPES = new Set([
+  'like',
+  'like_post',
+  'comment',
+  'comment_post',
+  'comment_reply',
+  'comment_mention',
+  'mention',
+  'mention_post',
+  'tag',
+]);
+
+/** Of those, the ones that should land with the comments open. */
+const COMMENT_TYPES = new Set([
+  'comment',
+  'comment_post',
+  'comment_reply',
+  'comment_mention',
+]);
+
 const FOLLOW_TYPES = new Set([
   'follow',
   'friend_request',
@@ -80,6 +101,33 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   // score id; a legacy row without one still falls through to /post/.
   if (type === 'new_post' && (rawData as Record<string, unknown> | null)?.is_round === true && data.whs_score_id) {
     return `/round/${encodeURIComponent(data.whs_score_id)}`;
+  }
+
+  // A LIKE, COMMENT OR MENTION ON A ROUND OPENS THE ROUND. Same reasoning as
+  // the new_post branch above: a round post has no feed home and no media, so
+  // /post/:id can only redirect, flashing its own unavailable state on the way.
+  // Resolved here, ahead of every /post/ branch below, so no ordering change
+  // downstream can shadow it.
+  //
+  // DEPLOYED-PAYLOAD LIMIT (reported, not hidden): only the new_post trigger
+  // writes post_type / whs_score_id / is_round onto the notification. The like,
+  // comment and mention triggers write neither, so TODAY those rows still fall
+  // through to /post/:id and PostDeepLinkPage redirects them (now before its
+  // guest preview, so no empty card). This branch fires the moment the like /
+  // comment / mention triggers carry post_type + whs_score_id, which is a
+  // server change awaiting a separate ruling.
+  if (ROUND_REACTION_TYPES.has(type)) {
+    const scoreId = data.whs_score_id ?? null;
+    const isRound =
+      (rawData as Record<string, unknown> | null)?.is_round === true ||
+      data.post_type === 'round';
+    if (scoreId && isRound) {
+      const base = `/round/${encodeURIComponent(scoreId)}`;
+      // A comment notification opens the round WITH ITS COMMENTS, exactly as a
+      // comment on a normal post opens them (PostDeepLinkPage reads the same
+      // ?openComments=1 marker).
+      return COMMENT_TYPES.has(type) ? `${base}?openComments=1` : base;
+    }
   }
 
 

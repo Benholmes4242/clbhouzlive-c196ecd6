@@ -189,14 +189,6 @@
       "noBestToCompare": "No round of yours to compare"
     },
     "roundCard": {
-      "kicker": "Round posted",
-      "index": "Index",
-      "under": "Under",
-      "over": "Over",
-      "fieldLine_one": "the field averages {{field}} here, from {{count}} round",
-      "fieldLine_other": "the field averages {{field}} here, from {{count}} rounds",
-      "slopeHarder": "harder than {{pct}}%",
-      "slopeEasier": "easier than {{pct}}%",
       "net": "Net",
       "adjustedNotCompleted_one": "adjusted, {{count}} hole not completed",
       "adjustedNotCompleted_other": "adjusted, {{count}} holes not completed"
@@ -252,8 +244,8 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "Post my rounds automatically",
-      "subtitle": "Your rounds appear in the Clubhouse when you log them. Only standout rounds reach members who do not follow you."
+      "title": "Share my rounds",
+      "subtitle": "Your followers are told when you log a round, and can like and comment on it. Your rounds show on Explore either way."
     }
   },
   "map": {

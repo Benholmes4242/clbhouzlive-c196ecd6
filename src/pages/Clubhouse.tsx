@@ -60,8 +60,6 @@ import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 // ── Decomposed hooks ──
 import { useClubhouseLifecycle } from '@/components/clubhouse/hooks/useClubhouseLifecycle';
 import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
-import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
-import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
 import {
   readSkeletonShapeHint,
   writeSkeletonShapeHint,
@@ -69,7 +67,6 @@ import {
   COLD_START_SHAPE,
   type SkeletonShape,
 } from '@/lib/clubhouse/skeletonShapeHint';
-import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
@@ -220,30 +217,13 @@ const ClubhouseContent = () => {
   );
   const courseContextMap = usePostCourseContext(feedCourseIds, FEED_SCOPE);
 
-  // C3 — batched attached-round data. Two queries per page (score-id
-  // resolution + round stats/shape); never one per card.
-  const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
-  const postScoreIdMap = usePostScoreIds(feedPostIds, FEED_SCOPE);
-  const feedScoreIds = useMemo(
-    () => Array.from(postScoreIdMap.values()),
-    [postScoreIdMap],
-  );
-  const postRoundMap = usePostRounds(feedScoreIds, FEED_SCOPE);
-
-  // Round drill-in from a feed scorecard tap.
-  const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
-
-  // The round chain is TWO sequential reads that land after the posts do, so
-  // the feed's own loading state clears a round trip too early and a scorecard
-  // post paints without its scorecard. Hold the skeleton until both round
-  // queries have settled — capped, and never for a page whose rounds will
-  // never come (both hooks report a disabled query as settled).
-  const roundChainSettled = postScoreIdMap.settled && postRoundMap.settled;
-  // Page-level gate uses `settled` only, so a next-page fetch can never put the
-  // whole feed back into a skeleton mid-scroll. Cards get the finer signal:
-  // a round missing WHILE fetching still shows PostRoundShell.
-  const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
-  const roundsReady = useRoundChainGate(roundChainSettled, !activeFeed.isLoading && posts.length > 0);
+  // C3 — THE ROUND CHAIN IS GONE. Round posts are filtered out of every feed
+  // this page reads (get_suggested_feed_v3 excludes them; the media-backed RPCs
+  // exclude them structurally), so the two sequential reads that resolved a
+  // post's score id and then its scorecard could only ever resolve nothing —
+  // while the first-paint gate waited on them. Removed with the round card:
+  // usePostScoreIds / usePostRounds / useRoundChainGate and the drill-in sheet.
+  // Rounds are opened from their own page (/round/:whsScoreId).
 
   /* SKELETON SHAPE — reserve the shape of the card that is actually coming.
      Cold start has nothing to derive from, so it falls back to the SHORTEST
@@ -259,16 +239,13 @@ const ClubhouseContent = () => {
   const derivedShape = useMemo<SkeletonShape | null>(() => {
     const first = posts[0];
     if (!first) return null;
-    if (postScoreIdMap.has(first.id)) {
-      return { variant: 'round' };
-    }
     const m = first.mediaItems?.[0];
     return {
       variant: first.isReview ? 'review' : 'regular',
       mediaRatio: ratioFromDimensions(m?.width, m?.height) ?? COLD_START_SHAPE.mediaRatio,
       isVideo: m?.type === 'video',
     };
-  }, [posts, postScoreIdMap]);
+  }, [posts]);
 
   useEffect(() => {
     if (derivedShape) writeSkeletonShapeHint(derivedShape);
@@ -279,7 +256,7 @@ const ClubhouseContent = () => {
   // SETTLED IS NOT "NOT LOADING": useSuggestedFeed is gated on user?.id, so the
   // terminal-empty branches below must not fire before the query has run.
   const isLoading =
-    !activeFeed.isFetched || activeFeed.isLoading || (posts.length > 0 && !roundsReady);
+    !activeFeed.isFetched || activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
   
   // Skeleton timing — first-content-ready contract
@@ -570,12 +547,6 @@ const ClubhouseContent = () => {
                feedItems={feedItems}
               courseContextMap={courseContextMap}
               resolveCourseId={resolvePostCourseId}
-              postScoreIdMap={postScoreIdMap}
-              postRoundMap={postRoundMap}
-              postRoundsSettled={roundChainSettled && !roundChainFetching}
-              onRoundTap={(post, round) =>
-                setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
-              }
               topPadding={CHROME_CLEARANCE}
               onNearEnd={handleNearEnd}
               hasNextPage={hasNextPage}
@@ -661,16 +632,6 @@ const ClubhouseContent = () => {
           rewardTier={seasonRecap.rewardTier}
           seasonId={seasonRecap.seasonId}
           userId={user.id}
-        />
-      )}
-
-      {/* C3 — attached-round drill-in */}
-      {roundSheet && (
-        <RoundDetailSheet
-          open
-          onClose={() => setRoundSheet(null)}
-          scoreId={roundSheet.scoreId}
-          profileUserId={roundSheet.userId}
         />
       )}
 

@@ -137,6 +137,13 @@ const RoundPage: React.FC = () => {
     else navigate('/handicap', { replace: true });
   };
 
+  /**
+   * ?openComments=1 — a comment notification on a round lands with the comments
+   * already up, the same marker PostDeepLinkPage reads for a normal post.
+   */
+  const openCommentsRequested =
+    new URLSearchParams(location.search).get('openComments') === '1';
+
   const ownerQuery = useRoundOwner(whsScoreId);
   const ownerId = ownerQuery.data ?? null;
 
@@ -186,6 +193,7 @@ const RoundPage: React.FC = () => {
           onClose={goBack}
           scoreId={whsScoreId}
           profileUserId={ownerId}
+          initialCommentsOpen={openCommentsRequested}
         />
       </div>
     );

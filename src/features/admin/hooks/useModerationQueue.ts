@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { ROUND_POST_TYPE } from '@/lib/posts/isRoundPost';
 
 export type ReportKind = 'user' | 'post';
 export type ReportStatus = 'pending' | 'reviewing' | 'actioned' | 'dismissed';
@@ -121,6 +122,10 @@ export async function fetchModerationQueue(): Promise<ModerationQueueRow[]> {
     const { data: postData, error: postErr } = await supabase
       .from('posts')
       .select('id, user_id, content, created_at, auto_hidden, moderation_hidden')
+      // Round posts carry no member-written content to moderate (auto-created
+      // when a round syncs, no caption, no media), so a report against one
+      // never reaches the queue. Its reports stay in post_reports.
+      .neq('post_type', ROUND_POST_TYPE)
       .in('id', Array.from(new Set(postIds)));
     if (postErr) throw postErr;
     for (const p of postData ?? []) posts[p.id] = p as PostLite;
