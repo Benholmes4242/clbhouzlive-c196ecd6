@@ -882,7 +882,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const blocks = useMemo(
     () =>
       buildBlocks(ranked, shelves, false, {
-        bareRoundPairs: view === 'scores',
+        /* PLAIN ROUNDS PAIR TWO-UP ON BOTH ROUND-BEARING VIEWS. All still
+           refuses same-kind pairs for every other kind. */
+        bareRoundPairs: view === 'scores' || view === 'all',
         repeatShelves: view === 'scores' || view === 'all',
         /* §3 THE MERGED VIEW'S RHYTHM: pairs are STABLE-FACT COURSE CARDS only,
            reviews and event cards always full width. */

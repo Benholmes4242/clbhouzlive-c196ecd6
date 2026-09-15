@@ -434,6 +434,9 @@ export function ExploreCard({
         display: '-webkit-box',
         WebkitLineClamp: size === 'lead' ? 3 : 2,
         WebkitBoxOrient: 'vertical',
+        /* A PAIR RESERVES BOTH LINES whether or not it needs them, so the two
+           cards in a row keep their who-lines level. */
+        minHeight: size === 'pair' ? '2.48em' : undefined,
         overflow: 'hidden',
         /* §4a a long unbroken token WRAPS at the card edge — it never pushes
             the card wider. */
