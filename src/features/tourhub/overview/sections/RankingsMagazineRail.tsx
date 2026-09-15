@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useTourSelection } from '../../context/TourSelectionContext';
-import { useRankingsBoards, type RankingsBoard } from '../data/useRankingsBoards';
+import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
@@ -37,8 +37,9 @@ export function RankingsMagazineRail() {
         <button type="button" onClick={() => navigate('/tourhub?tab=leaderboards')} style={{ padding: 0, border: 0, background: 'transparent', color: A.DIM, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>{t('overview.rankings.linkLabel')} ›</button>
       </div>
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', overflowY: 'hidden', padding: '0 20px 4px', scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', willChange: 'transform', scrollbarWidth: 'none' }}>
-        {(isLoading && rows.length === 0 ? Array.from({ length: 4 }) : rows).map((row, index) => {
-          if (!('playerName' in row)) return <div key={index} style={{ flex: '0 0 144px', height: 150, borderRadius: r.md, background: A.PANEL }} />;
+        {isLoading && rows.length === 0
+          ? Array.from({ length: 4 }, (_, index) => <div key={index} style={{ flex: '0 0 144px', height: 150, borderRadius: r.md, background: A.PANEL }} />)
+          : rows.map((row: RankingsRow) => {
           return (
             <button key={`${row.rank}-${row.playerName}`} type="button" onClick={() => row.playerId && navigate(`/tourhub/player/${row.playerId}`)} disabled={!row.playerId} style={{ flex: '0 0 144px', minWidth: 0, scrollSnapAlign: 'start', padding: 14, border: `0.5px solid ${A.BORDER}`, borderRadius: r.md, background: A.PANEL, color: A.INK, textAlign: 'left', cursor: row.playerId ? 'pointer' : 'default' }}>
               <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -48,6 +49,7 @@ export function RankingsMagazineRail() {
               <span style={{ display: '-webkit-box', marginTop: 12, height: 38, fontSize: 15, fontWeight: 700, lineHeight: 1.25, WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{row.playerName}</span>
               <span style={{ display: 'block', marginTop: 7, fontSize: 11, fontWeight: 600, color: A.MUTE, fontVariantNumeric: 'tabular-nums' }}>{row.points != null ? Math.round(row.points).toLocaleString() : ''}</span>
             </button>
+          );
           );
         })}
       </div>

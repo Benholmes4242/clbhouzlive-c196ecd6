@@ -508,7 +508,9 @@
       "courseDiscover": "이번 주 주목할 코스.",
       "pickLive": "Our pick: {{player}}, {{score}} through {{rounds}}.",
       "pickPre": "Our pick: {{player}}, with a {{probability}}% win chance.",
-      "pickPlain": "우리의 선택: {{player}}."
+      "pickPlain": "우리의 선택: {{player}}.",
+      "courseKicker": "이번 주 코스",
+      "top100Link": "톱 100"
     }
   },
   "empty": {

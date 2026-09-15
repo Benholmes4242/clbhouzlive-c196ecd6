@@ -512,7 +512,9 @@
       "courseDiscover": "El campo de esta semana.",
       "pickLive": "Our pick: {{player}}, {{score}} through {{rounds}}.",
       "pickPre": "Our pick: {{player}}, with a {{probability}}% win chance.",
-      "pickPlain": "Nuestra elección: {{player}}."
+      "pickPlain": "Nuestra elección: {{player}}.",
+      "courseKicker": "Campo de la semana",
+      "top100Link": "Top 100"
     }
   },
   "empty": {

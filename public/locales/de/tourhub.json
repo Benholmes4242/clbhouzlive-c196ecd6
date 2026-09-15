@@ -512,7 +512,9 @@
       "courseDiscover": "Der Platz dieser Woche.",
       "pickLive": "Our pick: {{player}}, {{score}} through {{rounds}}.",
       "pickPre": "Our pick: {{player}}, with a {{probability}}% win chance.",
-      "pickPlain": "Unser Tipp: {{player}}."
+      "pickPlain": "Unser Tipp: {{player}}.",
+      "courseKicker": "Platz der Woche",
+      "top100Link": "Top 100"
     }
   },
   "empty": {

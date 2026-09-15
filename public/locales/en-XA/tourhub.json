@@ -510,7 +510,9 @@
       "courseDiscover": "[!! This week’s course to discover. !!]",
       "pickLive": "[!! Our pick: {{player}}, {{score}} through {{rounds}}. !!]",
       "pickPre": "[!! Our pick: {{player}}, with a {{probability}}% win chance. !!]",
-      "pickPlain": "[!! Our pick: {{player}}. !!]"
+      "pickPlain": "[!! Our pick: {{player}}. !!]",
+      "courseKicker": "[!! Çöürsë öf thë wëëk !!]",
+      "top100Link": "[!! Töp 100 !!]"
     }
   },
   "empty": {
