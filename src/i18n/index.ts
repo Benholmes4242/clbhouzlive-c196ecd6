@@ -122,12 +122,17 @@ if (!i18n.isInitialized) {
 }
 
 export function getActiveLocale(): string {
-  return i18n.resolvedLanguage || i18n.language || 'en';
+  const active = i18n.resolvedLanguage || i18n.language || 'en';
+  // Never hand a disabled locale to Intl formatters or copy lookups.
+  return isLocaleEnabled(active) ? active : 'en';
 }
 
 export function useLocale() {
   const { i18n: instance } = useTranslation();
   const setLocale = useCallback(async (next: SupportedLocale) => {
+    // Disabled locales are a no-op: the app stays English until the language
+    // is re-enabled in ENABLED_LOCALES.
+    if (!isLocaleEnabled(next)) return;
     try {
       window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
     } catch {
