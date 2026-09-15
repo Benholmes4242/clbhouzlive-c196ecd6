@@ -1694,7 +1694,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           left gutter and the place dropdown evenly. The dropdown keeps its own
           width at the right end and is not part of that distribution — it is a
           different kind of control. */}
-      {view === 'scores' && geography.isFetched && (geography.scope.primaryClubId || geography.scope.county) ? (
+      {/* THE PLACE DROPDOWN DOES NOT NEED A HOME CLUB. The row used to require a
+          club or a county, so a member with neither got no scope row at all and
+          no way to browse anywhere. The row now renders whenever geography has
+          settled; the CHIPS stand down when the member has no club, county or
+          country, exactly as the Courses row already does, because a lone World
+          chip is a control that cannot change what you see. */}
+      {view === 'scores' && geography.isFetched ? (
         <div
           style={{
             display: 'flex',
@@ -1707,9 +1713,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           }}
         >
           <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+          {geography.scope.primaryClubId || geography.scope.county || geography.scope.country ? (
           <RailChips
             options={[
               ...(geography.scope.primaryClubId ? [{ id: 'club', label: t('amateur.stream.scope.club', 'My club') }] : []),
+
               ...(geography.scope.county ? [{ id: 'county', label: geography.scope.county }] : []),
               ...(geography.scope.country ? [{ id: 'country', label: geography.scope.country }] : []),
               { id: 'world', label: t('amateur.stream.scope.world', 'World') },
