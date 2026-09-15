@@ -1,5 +1,5 @@
 import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -187,6 +187,24 @@ export interface CardScorecardSheetProps {
    * the content, so the two travel together. Absent for every other consumer.
    */
   pagePreview?: { node: React.ReactNode; side: 'next' | 'prev' } | null;
+  /** §1 — changes with the round, so BottomSheet remeasures mid after a page. */
+  midKey?: string | number;
+  /**
+   * BRIEF_ROUND_SHEET_CUES §3 — PAGING WITHOUT A FINGER.
+   * Swiping was the only way to change rounds. This adds two visually hidden but
+   * focusable controls, the arrow keys, and the polite announcement of whatever
+   * round arrived. Absent for every other consumer, which draws nothing extra.
+   */
+  paging?: {
+    onPrev: () => void;
+    onNext: () => void;
+    hasPrev: boolean;
+    hasNext: boolean;
+    prevLabel: string;
+    nextLabel: string;
+    /** "{player}, {course}, {gross}" — read after a page settles. */
+    announce: string;
+  } | null;
 }
 
 
@@ -302,10 +320,28 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   pageShift = null,
   hint = null,
   pagePreview = null,
+  midKey,
+  paging = null,
 
 
 }) => {
   const { t } = useTranslation(['courses']);
+  /* §3 — THE ARROW KEYS PAGE. Bound at the document while the sheet is open and
+     pageable, so the keys work wherever focus sits inside the sheet, and never
+     when there is no sequence. Escape stays BottomSheet's. */
+  const pagingRef = useRef(paging);
+  pagingRef.current = paging;
+  useEffect(() => {
+    if (!open || !paging) return;
+    const onKey = (e: KeyboardEvent) => {
+      const p = pagingRef.current;
+      if (!p) return;
+      if (e.key === 'ArrowRight' && p.hasNext) { e.preventDefault(); p.onNext(); }
+      if (e.key === 'ArrowLeft' && p.hasPrev) { e.preventDefault(); p.onPrev(); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open, !!paging]);
   void emptyMessage;
   void coursePar;
   void courseSlope;
@@ -627,6 +663,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    * takes the same explained state as a round with no rows at all.
    */
   const hasHoles = cardCause === 'ok' || cardCause === 'partial';
+  /* §1 — IS THERE ANYTHING TO REVEAL? The depth section, the tour trajectory or
+     the actions row. With none of them the card IS the end of the sheet, and a
+     peek would promise a section that does not exist. */
+  const hasSectionBelowCard = courseSection.length > 0
+    || isTour
+    || !!engagement || !!onViewProfile || !!onViewCourse || !!onShareRound;
 
   return (
     <BottomSheet
@@ -637,6 +679,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       // seam that showed as a band behind the action strip at the foot. The
       // shared BottomSheet owns the one surface for chrome and body alike.
       detents={detents}
+      midKey={midKey}
       onDetentChange={onDetentChange}
       onHorizontalDrag={onHorizontalDrag}
       style={{
@@ -726,6 +769,35 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </span>
           </div>
         )}
+        {/*
+          §3 — PAGING FOR A READER WHO IS NOT SWIPING. Two real buttons, hidden
+          from sight and not from focus or a screen reader, disabled at the ends;
+          plus the polite region that names the round that arrived. Nothing here
+          is drawn, so the sheet's look is unchanged.
+        */}
+        {paging && (
+          <div style={{ flexShrink: 0 }}>
+            <button
+              type="button"
+              className="sr-only focus:not-sr-only"
+              disabled={!paging.hasPrev}
+              onClick={paging.onPrev}
+            >
+              {paging.prevLabel}
+            </button>
+            <button
+              type="button"
+              className="sr-only focus:not-sr-only"
+              disabled={!paging.hasNext}
+              onClick={paging.onNext}
+            >
+              {paging.nextLabel}
+            </button>
+            <div className="sr-only" aria-live="polite" aria-atomic="true">
+              {paging.announce}
+            </div>
+          </div>
+        )}
         {/* S1 — THE FIXED SUMMARY, now the shared RoundSummaryHead so the sheet
             and the swipe preview draw the identical block (BRIEF_ROUND_SHEET_PEEK). */}
         <RoundSummaryHead
@@ -813,7 +885,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               {/* §1.1 — MID SHOWS THE WHOLE CARD. This marker is the last thing
                   that must be visible at the half-height detent; BottomSheet
                   measures to its bottom edge and caps the result at 62dvh. */}
-              <div data-sheet-mid-extent="true">
+              {/* §1 — MID SHOWS THE CARD PLUS 44px OF WHAT FOLLOWS, so the
+                  heading below it and the top of its first line are visible and
+                  the sheet cannot read as finished. With nothing below the card
+                  the peek is 0 and mid ends at the card, with no fade. */}
+              <div data-sheet-mid-extent="true" data-sheet-mid-peek={hasSectionBelowCard ? 44 : 0}>
               <ScorecardSection kicker={t('courses:scorecard.theCard')} flat={!isTour}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <Nine rows={out} label={t('courses:scorecard.out')} />

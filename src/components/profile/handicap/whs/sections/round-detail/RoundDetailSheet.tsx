@@ -96,12 +96,16 @@ interface Props {
   hint?: string | null;
   /** BRIEF_ROUND_SHEET_PEEK §1 — the neighbour drawn beside this page. */
   pagePreview?: { node: React.ReactNode; side: 'next' | 'prev' } | null;
+  /** BRIEF_ROUND_SHEET_CUES §1 — remeasure mid when the round changes. */
+  midKey?: string | number;
+  /** §3 — the hidden-but-focusable pager, the arrow keys and the announcement. */
+  paging?: React.ComponentProps<typeof CardScorecardSheet>['paging'];
 }
 
 export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId, sheetStyle,
   seed = null, detents, onDetentChange, onHorizontalDrag = null, onStatsSeen,
-  pageShift = null, hint = null, pagePreview = null,
+  pageShift = null, hint = null, pagePreview = null, midKey, paging = null,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
@@ -409,6 +413,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
       pageShift={pageShift}
       hint={hint}
       pagePreview={pagePreview}
+      midKey={midKey}
+      paging={paging}
     />
     {commentsOpen && postInfo && (
       <CommentsSheetV2

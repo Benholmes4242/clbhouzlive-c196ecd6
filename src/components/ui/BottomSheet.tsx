@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { midExtent } from './sheetMid';
 import { cn } from '@/lib/utils';
 import { pushSheetEntry, releaseSheetEntry } from './sheetHistory';
 
@@ -95,6 +96,14 @@ interface BottomSheetProps {
    * drag anywhere on the sheet moves the sheet and has no scroll to fight.
    */
   detents?: ['mid', 'full'];
+  /**
+   * BRIEF_ROUND_SHEET_CUES §1 — REMEASURE MID WHEN THE CONTENT CHANGES.
+   * Paging swaps one round for another and the card's height goes with it (a
+   * partial round is shorter, a two-line course name taller), so mid has to be
+   * measured again. Any value that changes with the content will do; absent
+   * keeps the single measurement at open.
+   */
+  midKey?: string | number;
   /** Reported on every settled detent change (analytics + host state). */
   onDetentChange?: (detent: 'mid' | 'full') => void;
   /** Horizontal gesture hand-off (paging). Return true to claim the pointer. */
@@ -108,7 +117,7 @@ interface BottomSheetProps {
 /** Detent spring. Reduced motion collapses it to an instant change. */
 const DETENT_MS = 380;
 const DETENT_EASE = 'cubic-bezier(.2,.8,.2,1)';
-const MID_CAP_DVH = 0.62;
+
 /** Axis lock: 8px of travel, horizontal only when clearly horizontal. */
 const AXIS_LOCK_PX = 8;
 const AXIS_RATIO = 1.2;
@@ -128,6 +137,7 @@ export function BottomSheet({
   grabberPadding = '10px 0 4px',
   scrollBody = false,
   detents,
+  midKey,
   onDetentChange,
   onHorizontalDrag = null,
 }: BottomSheetProps) {
@@ -145,6 +155,8 @@ export function BottomSheet({
   const offsetRef = useRef(0);
   const moveOffset = useCallback((v: number) => { offsetRef.current = v; setOffset(v); }, []);
   const [dragging, setDragging] = useState(false);
+  /** §1 — true only when mid actually hides something below the card. */
+  const [peeking, setPeeking] = useState(false);
   const fullH = useRef(0);
   const midOffset = useRef(0);
   const gesture = useRef<{
@@ -154,22 +166,38 @@ export function BottomSheet({
     && typeof window.matchMedia === 'function'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /** mid = summary + whole card, capped at 62dvh. Measured, never assumed. */
+  /**
+   * mid = summary + whole card + THE PEEK, capped at 62dvh. Measured, never
+   * assumed.
+   *
+   * BRIEF_ROUND_SHEET_CUES §1 — THE NEXT SECTION PEEKS. Mid used to end exactly
+   * under the card, so the sheet read as finished and nothing said it opened
+   * further. The consumer declares how much of the next section must show past
+   * the marker on `data-sheet-mid-peek` (44 on the round sheet); with nothing
+   * below the card it declares 0 and mid stays at the card's bottom edge, as
+   * before. The 62dvh cap is unchanged and still wins.
+   */
   const measure = useCallback(() => {
     const el = sheetRef.current;
     if (!el) return;
     const h = el.offsetHeight;
     if (!h) return;
     fullH.current = h;
-    const cap = Math.round(window.innerHeight * MID_CAP_DVH);
     const marker = el.querySelector('[data-sheet-mid-extent]') as HTMLElement | null;
-    let wanted = cap;
-    if (marker) {
-      const need = marker.getBoundingClientRect().bottom - el.getBoundingClientRect().top + 16;
-      wanted = Math.min(cap, Math.max(160, Math.round(need)));
-    }
-    const mid = Math.min(h, wanted);
-    midOffset.current = Math.max(0, h - mid);
+    const declared = Number(marker?.getAttribute('data-sheet-mid-peek') ?? 0);
+    const peek = Number.isFinite(declared) && declared > 0 ? declared : 0;
+    const { offset: midOff, peeking: p } = midExtent({
+      sheetHeight: h,
+      viewportHeight: window.innerHeight,
+      markerExtent: marker
+        ? marker.getBoundingClientRect().bottom - el.getBoundingClientRect().top
+        : null,
+      peek,
+    });
+    midOffset.current = midOff;
+    /* The fade is a cue over a cut. With nothing hidden below there is no cut,
+       so a fade would be a gradient over the end of the sheet. */
+    setPeeking(p);
   }, []);
 
   useEffect(() => {
@@ -183,6 +211,21 @@ export function BottomSheet({
     const timer = window.setTimeout(run, 220);
     return () => { cancelAnimationFrame(raf); window.clearTimeout(timer); };
   }, [open, detented, measure, moveOffset]);
+
+  /* §1 — A NEW ROUND IS A NEW MEASUREMENT. Mid is re-derived when the content
+     key changes, and the sheet is moved to it only while it is resting at mid:
+     a member who has pulled the sheet to full keeps full. */
+  useEffect(() => {
+    if (!open || !detented || midKey == null) return;
+    const run = () => {
+      measure();
+      if (detent === 'mid' && !dragging) moveOffset(midOffset.current);
+    };
+    const raf = requestAnimationFrame(() => requestAnimationFrame(run));
+    const timer = window.setTimeout(run, 200);
+    return () => { cancelAnimationFrame(raf); window.clearTimeout(timer); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [midKey]);
 
   const settle = useCallback(
     (next: 'mid' | 'full') => {
@@ -291,16 +334,41 @@ export function BottomSheet({
     }
   }, [open]);
 
-  // Scroll lock
+  /*
+   * BRIEF_ROUND_SHEET_CUES §5 — THE LOCK IS NOT THE BLOCKER, BUT IT IS STILL A
+   * BLOCKER. `body { overflow: hidden }` was set here for every sheet. On this
+   * app body is NOT the page scroller (#root is; see the report), so the lock
+   * never stopped the page by hand — and it never stopped a programmatic scroll
+   * either. It is kept EXACTLY AS BEFORE for every non-detented sheet, because
+   * that is a great many consumers and the brief changes only the detented case.
+   *
+   * DETENTED sheets do not lock. The host scrolls the feed under them to keep
+   * the tapped card visible, and a lock on the resolved scroller would fight it.
+   * Hand-scrolling the page behind is stopped at the backdrop instead (below),
+   * which is where the finger actually is.
+   */
   useEffect(() => {
-    if (!open) return;
+    if (!open || detented) return;
     const { body } = document;
     const prev = body.style.overflow;
     body.style.overflow = 'hidden';
     return () => {
       body.style.overflow = prev;
     };
-  }, [open]);
+  }, [open, detented]);
+
+  /* §5 — THE BACKDROP EATS THE FINGER, NOT THE PAGE. passive:false so the move
+     can be prevented; only for detented sheets, and only on the backdrop, so a
+     programmatic scroll of the real scroller still runs. */
+  const backdropRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open || !detented) return;
+    const el = backdropRef.current;
+    if (!el) return;
+    const stop = (e: TouchEvent) => e.preventDefault();
+    el.addEventListener('touchmove', stop, { passive: false });
+    return () => el.removeEventListener('touchmove', stop);
+  }, [open, detented]);
 
   // ESC key handling
   useEffect(() => {
@@ -356,11 +424,16 @@ export function BottomSheet({
   const detentTransition = dragging || reduceMotion
     ? 'none'
     : `transform ${DETENT_MS}ms ${DETENT_EASE}`;
+  /* §1 — the fade belongs to MID ONLY, and goes the instant the sheet is pulled
+     up toward full rather than waiting for the detent to settle. */
+  const fadeOn = detented && peeking && detent === 'mid' && isAnimating
+    && offset > 2 && !(dragging && offset < midOffset.current - 4);
 
   return createPortal(
     <>
       {/* Backdrop with fade animation */}
       <div
+        ref={backdropRef}
         className={cn(
           "fixed inset-0 transition-opacity duration-300",
           !detented && (isAnimating ? "opacity-100" : "opacity-0")
@@ -422,6 +495,27 @@ export function BottomSheet({
             a vertical drag anywhere moves the sheet with nothing to fight. */}
         {detented && (
           <style>{`[data-sheet-detent="mid"] [data-sheet-scroll]{overflow:hidden!important;touch-action:none!important;}`}</style>
+        )}
+        {/*
+          BRIEF_ROUND_SHEET_CUES §1 — THE FADE OVER THE CUT.
+          56px, transparent to the sheet surface, pinned to the VISIBLE bottom
+          edge. The sheet is laid out at full height and pushed down by `offset`,
+          so the edge the member sees is `offset` px up from the sheet's own
+          bottom — which is why the fade is placed there and not at bottom: 0.
+          It exists only while mid is hiding something (`peeking`), and it leaves
+          the moment the sheet is being pulled toward full: at full there is no
+          cut to soften.
+        */}
+        {fadeOn && (
+          <div
+            aria-hidden="true"
+            data-sheet-mid-fade="true"
+            style={{
+              position: 'absolute', left: 0, right: 0, bottom: offset, height: 56,
+              pointerEvents: 'none',
+              background: `linear-gradient(to bottom, rgba(21,23,31,0) 0%, ${SHEET_SURFACE} 100%)`,
+            }}
+          />
         )}
         {/* Draggable grabber area - larger and more visible */}
         <div

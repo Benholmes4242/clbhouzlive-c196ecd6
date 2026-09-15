@@ -130,6 +130,24 @@ export function nineSummary(rows: ScorecardHoleRow[]): {
   };
 }
 
+/**
+ * BRIEF_ROUND_SHEET_CUES §4 — THE MARK SIZE THE COLUMN CAN AFFORD.
+ *
+ * MEASURED IN A BROWSER, not calculated. The row sits inside the sheet body's
+ * 14px padding and the section's 2px, and nine minmax(0,1fr) columns share what
+ * is left after the 32px total column and ten 2px gaps:
+ *
+ *   viewport 320 -> row 288.0px, column 26.44px
+ *   viewport 360 -> row 328.0px, column 30.88px
+ *   viewport 390 -> row 358.0px, column 34.22px
+ *
+ * A 26px mark therefore CLEARS 320 (26.44 - 26 = 0.44px spare, no overflow of the
+ * row's scrollWidth), so the brief's 24px fallback below 360 is not needed and
+ * one size is drawn at every width. Reported.
+ */
+const MARK_SIZE = 26;
+const MARK_NUMERAL = 14;
+
 export const Nine: React.FC<{
   rows: ScorecardHoleRow[];
   label: string;
@@ -146,7 +164,19 @@ export const Nine: React.FC<{
       <CardRow cells={rows.map((h) => h.par ?? '\u2014')} total={parTotal} muted emphasis="par" />
       <CardRow
         cells={rows.map((h) => (
-          <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="dark" />
+          /* §4 — THE STROKES ROW IS THE LOUD ROW. A 14px numeral inside a 26px
+             mark, and a plain par numeral in INK rather than the
+             muted par ink. The shapes and colours are the shipped grammar,
+             unchanged, at the larger size. */
+          <ScoreMark
+            key={h.holeNo}
+            strokes={h.strokes}
+            par={h.par ?? 4}
+            size={MARK_SIZE}
+            numeralSize={MARK_NUMERAL}
+            parNumeralColor={A.INK}
+            surface="dark"
+          />
         ))}
         total={strokesTotal}
         emphasis="strokes"

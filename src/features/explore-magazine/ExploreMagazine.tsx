@@ -20,10 +20,12 @@ import { whsKeys } from '@/lib/whs/hooks';
 import { fetchRoundDetail } from '@/lib/whs/api';
 import { coursePlaceLine } from './placeLine';
 import {
-  pageDecision, rubberBand, neighbours, shouldExtend, noteHintOpen, noteHintPaged,
+  pageDecision, rubberBand, neighbours, shouldExtend, openCue, noteHintPaged,
   dragNeighbour,
 } from './roundPaging';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
+import { runNudge } from './roundNudge';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
@@ -449,13 +451,29 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      the depth section was read. rounds_viewed is 1 until paging lands (part 2). */
   const sheetSession = useRef<{ at: number; maxDetent: 'mid' | 'full'; rounds: number; stats: boolean } | null>(null);
 
+  /*
+   * BRIEF_ROUND_SHEET_CUES §5 — THE FEED FOLLOWS THE SHEET AGAIN.
+   *
+   * THE WINDOW IS NOT THE SCROLLER ON THIS APP. index.css gives html AND body
+   * `height: 100%`, and #root `height: 100dvh; overflow-y: auto`, so the element
+   * that actually scrolls the page is #root. Measured in the browser: with 3000px
+   * of content appended, `#root.scrollHeight` is 3774 while both
+   * `document.body.scrollHeight` and `document.documentElement.scrollHeight` stay
+   * at the viewport height and `window.scrollY` never leaves 0. So the old
+   * `window.scrollTo` here was a NO-OP on every open, first or not, which is
+   * exactly what the device screenshot showed: the sheet on a different round
+   * from the feed behind it, and no ring in view.
+   *
+   * Fixed at the cause, and with the resolver the app already owns
+   * (`getScrollParent`), so this cannot drift from the rest of the page's own
+   * scroll memory: it walks up from the card to the real scroll owner.
+   */
   const revealCard = useCallback((id: string) => {
     const el = cardRefs.current.get(id);
     if (!el) return;
     const bar = chipBarRef.current?.getBoundingClientRect();
     const chrome = (bar?.height ?? 0) + (bar?.top ?? 0) + 8;
-    const top = window.scrollY + el.getBoundingClientRect().top - Math.max(56, chrome);
-    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    scrollElementIntoView(el, { offset: Math.max(56, chrome), behavior: 'smooth' });
   }, []);
 
   /* §1.2 — the ring is an OUTLINE, so it cannot move the card by a pixel. */
@@ -1101,6 +1119,49 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [],
   );
 
+  /* ==================================================================== §2
+     BRIEF_ROUND_SHEET_CUES §2 — THE NUDGE REPLACES THE TEXT HINT.
+
+     The line retired after three opens, so for anyone who has used the sheet
+     there was nothing at all saying rounds page sideways. On the first three
+     PAGEABLE opens the sheet now shows it instead of saying it: once it has
+     settled at mid, the page walks 64px left so the NEXT round's preview shows
+     at the right edge, holds, and springs back. It is the SAME preview and the
+     SAME track a finger drives — nothing here draws a second thing.
+
+     The finger always wins: any touch or pointer down cancels it mid-flight.
+     Reduced motion gets no nudge and keeps the sentence (below). */
+  const nudgeCancel = useRef<(() => void) | null>(null);
+  const nudgeRelease = useRef<(() => void) | null>(null);
+
+  const cancelNudge = useCallback(() => {
+    nudgeCancel.current?.();
+    nudgeCancel.current = null;
+    nudgeRelease.current?.();
+    nudgeRelease.current = null;
+  }, []);
+  useEffect(() => () => cancelNudge(), [cancelNudge]);
+
+  const startNudge = useCallback((ix: number) => {
+    if (ix + 1 >= roundSeq.length) return;
+    cancelNudge();
+    /* THE FINGER ALWAYS WINS. Capture, so a touch anywhere over the sheet ends
+       the nudge before the gesture reads a single move. */
+    const bail = () => cancelNudge();
+    window.addEventListener('pointerdown', bail, true);
+    window.addEventListener('touchstart', bail, true);
+    nudgeRelease.current = () => {
+      window.removeEventListener('pointerdown', bail, true);
+      window.removeEventListener('touchstart', bail, true);
+    };
+    nudgeCancel.current = runNudge(ix + 1, {
+      setShift,
+      setPreview,
+      setTimeout: (fn, ms) => window.setTimeout(fn, ms),
+      clearTimeout: (id) => window.clearTimeout(id),
+    });
+  }, [roundSeq.length, cancelNudge]);
+
   const pageTo = useCallback((to: number, direction: 'next' | 'prev') => {
     const from = pageIxRef.current;
     const item = roundSeq[to];
@@ -1157,10 +1218,22 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     return { side: preview.side, node: <RoundPagePreview seed={seed} /> };
   }, [preview, roundSeq, previewSeedFor]);
 
+  /* §3 — WHAT THE SCREEN READER HEARS WHEN A ROUND ARRIVES: the member, the
+     course and the gross, in that order, from the seed this page already holds.
+     Empty while there is no page, so nothing is announced on open. */
+  const pageAnnounce = useMemo(() => {
+    if (pageIx == null) return '';
+    const seed = previewSeedFor(roundSeq[pageIx]);
+    if (!seed) return '';
+    return [seed.playerName, seed.courseName, seed.gross == null ? null : String(seed.gross)]
+      .filter(Boolean)
+      .join(', ');
+  }, [pageIx, roundSeq, previewSeedFor]);
+
   /* THE FINGER. The axis lock, the 8px and the 1.2 ratio live in BottomSheet;
      the thresholds and the end rubber-band live in roundPaging. */
   const pageDrag = useMemo(() => ({
-    onStart: () => { setShift({ dx: 0, animating: false }); setPreview(null); },
+    onStart: () => { cancelNudge(); setShift({ dx: 0, animating: false }); setPreview(null); },
     onMove: (dx: number) => {
       const ix = pageIxRef.current;
       if (ix == null) return;
@@ -1187,7 +1260,19 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       }
       pageTo(decision.to, decision.direction);
     },
-  }), [roundSeq.length, after, pageTo, prefersReducedMotion]);
+  }), [roundSeq.length, after, pageTo, prefersReducedMotion, cancelNudge]);
+
+  /* §3 — THE SAME PAGE STEP THE HIDDEN BUTTONS AND THE ARROW KEYS USE. It goes
+     through pageTo, so a keyboard page is the same movement, the same analytics
+     and the same hint retirement as a swipe. */
+  const pageStep = useCallback((direction: 'next' | 'prev') => {
+    const ix = pageIxRef.current;
+    if (ix == null) return;
+    const to = direction === 'next' ? ix + 1 : ix - 1;
+    if (to < 0 || to >= roundSeq.length) return;
+    cancelNudge();
+    pageTo(to, direction);
+  }, [roundSeq.length, cancelNudge, pageTo]);
 
   const tapCard = useCallback(
     (item: StreamItem, size: CardSize, pos: number) => {
@@ -1215,9 +1300,19 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           seeded: seed != null,
         });
         setShift(null);
-        setSwipeHintOn(roundSeq.length > 1 && noteHintOpen());
+        cancelNudge();
+        /* §2 — ONE COUNTER FOR BOTH CUES. noteHintOpen() is still the first-three
+           rule and still retires on the first page; what it now earns is a
+           MOVEMENT, and only a reduced-motion reader gets the sentence. */
+        const cue = openCue({
+          pageable: roundSeq.length > 1,
+          hasNext: ix >= 0 && ix + 1 < roundSeq.length,
+          reducedMotion: prefersReducedMotion(),
+        });
+        setSwipeHintOn(cue === 'line');
         if (ix >= 0) {
           showRound(item, ix);
+          if (cue === 'nudge') startNudge(ix);
         } else {
           setPageIx(null);
           pageIxRef.current = null;
@@ -1276,7 +1371,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         });
       }
     },
-    [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view],
+    [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view,
+      cancelNudge, startNudge, prefersReducedMotion],
   );
 
   const tapWho = useCallback(
@@ -1884,6 +1980,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           }
           /* §2.4 — BACK AND ESCAPE CLOSE. They never page, and the ring is left
              on the round the member was reading so the feed is where they were. */
+          cancelNudge();
           setRingId(null);
           setSheetSeed(null);
           setShift(null);
@@ -1918,6 +2015,20 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
            A round with no hole rows still shows its summary with the syncing
            middle rather than a blank panel. */
         pagePreview={pagePreview}
+        /* §1 — the card's height belongs to the round, so mid is measured again
+           whenever the round changes. */
+        midKey={opener.target?.scoreId ?? undefined}
+        /* §3 — PAGING WITHOUT A SWIPE: two hidden focusable controls, the arrow
+           keys, and the polite line that names the round that arrived. */
+        paging={pageIx != null && roundSeq.length > 1 ? {
+          onPrev: () => pageStep('prev'),
+          onNext: () => pageStep('next'),
+          hasPrev: pageIx > 0,
+          hasNext: pageIx < roundSeq.length - 1,
+          prevLabel: t('courses:scorecard.previousRound', 'Previous round'),
+          nextLabel: t('courses:scorecard.nextRound', 'Next round'),
+          announce: pageAnnounce,
+        } : null}
       />
     </div>
   );
