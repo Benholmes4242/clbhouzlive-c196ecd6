@@ -1339,7 +1339,8 @@ export async function fetchTrophyAggregates(
 export async function lookupWhsCourseId(
   whsName: string,
   countryCode?: string | null,
+  countryName?: string | null,
 ): Promise<string | null> {
   const { lookupCourseId: impl } = await import('./courseNameMatcher');
-  return impl(whsName, countryCode ?? null);
+  return impl(whsName, countryCode ?? null, countryName ?? null);
 }

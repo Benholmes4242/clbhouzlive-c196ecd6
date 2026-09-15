@@ -16,6 +16,10 @@ export const TRIAGE_VISIBLE_STATUSES: UnmatchedCourseStatus[] = ['open', 'needs_
 export interface UnmatchedCourseRow {
   whs_course_id: string;
   whs_course_name: string | null;
+  /** WHS-published country of the course. Hydrated from whs_courses by id - the
+   *  whs_unmatched_courses table does not carry it. Reviewers must see it before
+   *  approving a match (Ben, Sep 2026). */
+  whs_country_name: string | null;
   round_count: number;
   member_count: number;
   last_tier_tried: string | null;
@@ -30,7 +34,8 @@ export const UNMATCHED_COURSES_KEY = ['admin-unmatched-courses'] as const;
 const sb: any = supabase;
 
 // Plain select - no PostgREST embeds (the single FK to whs_courses is not
-// relied on here; the course name is denormalised onto the row).
+// relied on here; the course name is denormalised onto the row). The country is
+// hydrated in a second read by id.
 export async function fetchUnmatchedCourses(
   status: UnmatchedCourseStatus | UnmatchedCourseStatus[] = 'open',
 ): Promise<UnmatchedCourseRow[]> {
@@ -45,9 +50,22 @@ export async function fetchUnmatchedCourses(
     .order('first_seen_at', { ascending: true })
     .limit(200);
   if (error) throw error;
-  return ((data ?? []) as any[]).map((r) => ({
+  const rows = (data ?? []) as any[];
+
+  const countryById = new Map<string, string | null>();
+  const ids = Array.from(new Set(rows.map((r) => r.whs_course_id).filter(Boolean)));
+  if (ids.length > 0) {
+    const { data: courses } = await sb
+      .from('whs_courses')
+      .select('id, country_name')
+      .in('id', ids);
+    ((courses ?? []) as any[]).forEach((c) => countryById.set(c.id, c.country_name ?? null));
+  }
+
+  return rows.map((r) => ({
     whs_course_id: r.whs_course_id,
     whs_course_name: r.whs_course_name ?? null,
+    whs_country_name: countryById.get(r.whs_course_id) ?? null,
     round_count: r.round_count ?? 0,
     member_count: r.member_count ?? 0,
     last_tier_tried: r.last_tier_tried ?? null,
