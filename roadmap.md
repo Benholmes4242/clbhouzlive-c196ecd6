@@ -19,7 +19,7 @@
 - [x] Match Your circle captions to the weekly club rail height while retaining fixed name and HCP rows.
 - [x] Rebuild the member scorecard sheet with owner-aware copy, canonical course identity, flat sections, and footer actions.
 ## Tour overview magazine rebuild
-- [ ] Map current overview data, destinations, and shared Explore grammar
-- [ ] Rebuild the overview stream and localized sentence headlines
-- [ ] Preserve all destinations and record retired section importer counts
-- [ ] Verify tests/build plus 320px and 390px screenshots without horizontal overflow
+- [x] Map current overview data, destinations, and shared Explore grammar
+- [x] Rebuild the overview stream and localized sentence headlines
+- [x] Preserve all destinations and record retired section importer counts
+- [x] Verify tests/build plus 320px and 390px screenshots without horizontal overflow
