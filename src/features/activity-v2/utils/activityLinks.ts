@@ -82,6 +82,32 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     return `/round/${encodeURIComponent(data.whs_score_id)}`;
   }
 
+  // A LIKE, COMMENT OR MENTION ON A ROUND OPENS THE ROUND. Same reasoning as
+  // the new_post branch above: a round post has no feed home and no media, so
+  // /post/:id can only redirect, flashing its own unavailable state on the way.
+  // Resolved here, ahead of every /post/ branch below, so no ordering change
+  // downstream can shadow it.
+  //
+  // DEPLOYED-PAYLOAD LIMIT (reported, not hidden): only the new_post trigger
+  // writes post_type / whs_score_id / is_round onto the notification. The like,
+  // comment and mention triggers write neither, so TODAY those rows still fall
+  // through to /post/:id and PostDeepLinkPage redirects them. This branch fires
+  // the moment the payload carries the score id — see
+  // docs/sql/2026-09-15-round-notification-payloads.sql.
+  if (ROUND_REACTION_TYPES.has(type)) {
+    const scoreId = data.whs_score_id ?? null;
+    const isRound =
+      (rawData as Record<string, unknown> | null)?.is_round === true ||
+      data.post_type === 'round';
+    if (scoreId && isRound) {
+      const base = `/round/${encodeURIComponent(scoreId)}`;
+      // A comment notification opens the round WITH ITS COMMENTS, exactly as a
+      // comment on a normal post opens them (PostDeepLinkPage reads the same
+      // ?openComments=1 marker).
+      return COMMENT_TYPES.has(type) ? `${base}?openComments=1` : base;
+    }
+  }
+
 
 
   // --- game family (Crowns chip) ---------------------------------------
