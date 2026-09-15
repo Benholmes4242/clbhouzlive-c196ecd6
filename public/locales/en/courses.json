@@ -1802,8 +1802,7 @@
       "birdie": "Birdie",
       "bogey": "Bogey",
       "doublePlus": "Dbl+",
-      "eagle": "Eagle",
-      "title": "Scoring key"
+      "eagle": "Eagle"
     },
     "shapeOfCourse": "The shape of the course",
     "sortAriaLabel": "Sort holes",
@@ -2186,14 +2185,7 @@
     "howItUnfolded": "How it unfolded",
     "in": "In",
     "inN": "IN {{n}}",
-    "legendAce": "Ace",
-    "legendAlbatross": "Albatross",
-    "legendBirdie": "Birdie",
-    "legendBogey": "Bogey",
-    "legendDouble": "Double+",
-    "legendEagle": "Eagle",
     "legendNotPlayed": "Not played",
-    "legendPar": "Par",
     "nineHoleTag": "9 holes",
     "out": "Out",
     "outN": "OUT {{n}}",
@@ -2215,10 +2207,6 @@
     "roundsHere_other": "{{count}} rounds",
     "scoreRow": "Score",
     "shareRound": "Share this round",
-    "splitBirdie": "Birdie+",
-    "splitBogey": "Bogey",
-    "splitDouble": "Double+",
-    "splitPar": "Par",
     "syncingBody": "Hole-by-hole data is syncing from England Golf. It usually lands within a few hours.",
     "syncingTitle": "Scorecard on the way",
     "theCard": "THE CARD",
@@ -2268,7 +2256,8 @@
     "noFieldLine_one": "Only 1 other golfer has played here, so there is no field to compare with yet.",
     "noFieldLine_other": "Only {{count}} other golfers have played here, so there is no field to compare with yet.",
     "noFieldNobody": "Nobody else has played here yet, so there is no field to compare with.",
-    "fieldShort": "Field"
+    "fieldShort": "Field",
+    "swipeHint": "Swipe for the next round"
   },
   "search": {
     "yourRounds": "Your rounds"

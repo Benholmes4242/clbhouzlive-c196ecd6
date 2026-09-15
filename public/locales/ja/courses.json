@@ -60,7 +60,6 @@
       "thisCourse": "this course"
     },
     "scoringKey": {
-      "title": "Scoring key",
       "ace": "ホールインワンを達成。",
       "albatross": "アルバトロスを達成。",
       "eagle": "Eagle",
@@ -177,7 +176,6 @@
     "hideHoleByHole": "フルスコアカードを隠す",
     "holeByHole": "フルスコアカード",
     "legendNotPlayed": "未プレー",
-    "legendPar": "Par",
     "nineHoleTag": "9 holes",
     "rankHere": "Your {{ordinal}} best of {{count}} rounds here.",
     "rankHereNeutral": "{{ordinal}} best of {{count}} rounds here.",
@@ -224,7 +222,8 @@
     "noFieldLine_one": "ここでプレーした他のプレーヤーは 1 人だけなので、まだ比較できる平均がありません。",
     "noFieldLine_other": "ここでプレーした他のプレーヤーは {{count}} 人だけなので、まだ比較できる平均がありません。",
     "noFieldNobody": "まだ他にプレーした人がいないため、比較できる平均がありません。",
-    "fieldShort": "平均"
+    "fieldShort": "平均",
+    "swipeHint": "スワイプで次のラウンドへ"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

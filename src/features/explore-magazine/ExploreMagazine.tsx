@@ -19,6 +19,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { whsKeys } from '@/lib/whs/hooks';
 import { fetchRoundDetail } from '@/lib/whs/api';
 import { coursePlaceLine } from './placeLine';
+import {
+  pageDecision, rubberBand, neighbours, shouldExtend, noteHintOpen, noteHintPaged,
+} from './roundPaging';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
@@ -986,6 +989,136 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [view],
   );
 
+  /* ==================================================================== §2
+     SWIPE BETWEEN ROUNDS. THE SEQUENCE IS THIS PAGE'S ROUNDS, IN ITS ORDER.
+
+     Rounds only, in the ranked order already on screen — a review, a course, a
+     clip or a long-form video is a different sheet, so none of them is a page.
+     Paging exists HERE, on the stream, and nowhere else: every other consumer
+     of RoundDetailSheet passes no sequence and keeps today's single round. */
+  const roundSeq = useMemo(
+    () => ranked.filter((item) => item.kind === 'round' && !!item.facts.score_id),
+    [ranked],
+  );
+  const [pageIx, setPageIx] = useState<number | null>(null);
+  const pageIxRef = useRef<number | null>(null);
+  pageIxRef.current = pageIx;
+  const [shift, setShift] = useState<{ dx: number; opacity?: number; animating: boolean } | null>(null);
+  const [swipeHintOn, setSwipeHintOn] = useState(false);
+  const pageTimers = useRef<number[]>([]);
+  const after = useCallback((ms: number, fn: () => void) => {
+    pageTimers.current.push(window.setTimeout(fn, ms));
+  }, []);
+  useEffect(() => () => { pageTimers.current.forEach((id) => window.clearTimeout(id)); }, []);
+
+  const loadMoreStream = useCallback(() => {
+    if (!hasMore) return;
+    if (serverOn) server.fetchNextPage();
+    else setRevealed((n) => n + STREAM_PAGE_SIZE);
+  }, [hasMore, serverOn, server]);
+
+  /** §1.3 — one seed builder, used by the tap AND by every page after it. */
+  const seedFor = useCallback((item: StreamItem): RoundDetailSeed | null => {
+    if (!item.facts.score_id || !item.subject?.course_name) return null;
+    const shape = shapesMap?.get(item.facts.score_id) ?? null;
+    const seedHoles = (shape?.holes ?? []).map((h) => ({
+      holeNo: h.holeNo, par: h.par, strokes: h.sheetStrokes,
+    }));
+    if (seedHoles.length === 0) return null;
+    const gross = seedHoles.every((h) => h.strokes != null)
+      ? seedHoles.reduce((sum, h) => sum + (h.strokes ?? 0), 0)
+      : null;
+    const par = seedHoles.every((h) => h.par != null)
+      ? seedHoles.reduce((sum, h) => sum + (h.par ?? 0), 0)
+      : null;
+    return {
+      scoreId: item.facts.score_id,
+      holes: seedHoles,
+      gross,
+      toPar: gross != null && par ? gross - par : null,
+      courseName: item.subject.course_name,
+      placeLine: coursePlaceLine({
+        region: item.subject.region,
+        subCountry: item.subject.sub_country,
+        country: item.subject.country ?? null,
+      }),
+      playerName: item.who?.display_name ?? null,
+      playerAvatarUrl: item.who?.photo_url ?? null,
+      playDate: item.facts.play_date ?? null,
+    };
+  }, [shapesMap]);
+
+  /** Shows a round in the sheet: seed, ring, feed position and neighbours.
+   *  The DETENT is not touched — paging keeps the height the member chose. */
+  const showRound = useCallback((item: StreamItem, ix: number) => {
+    setPageIx(ix);
+    pageIxRef.current = ix;
+    setSheetSeed(seedFor(item));
+    setRingId(item.id);
+    revealCard(item.id);
+    opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
+    /* §2.3 — both neighbours are fetched once this page settles, so the next
+       swipe is a seeded card that fills in rather than a skeleton. */
+    for (const n of neighbours(ix, roundSeq.length)) prefetchRound(roundSeq[n]?.facts.score_id);
+    if (shouldExtend(ix, roundSeq.length)) loadMoreStream();
+  }, [seedFor, revealCard, opener, roundSeq, prefetchRound, loadMoreStream]);
+
+  const prefersReducedMotion = useCallback(
+    () => typeof window !== 'undefined'
+      && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    [],
+  );
+
+  const pageTo = useCallback((to: number, direction: 'next' | 'prev') => {
+    const from = pageIxRef.current;
+    const item = roundSeq[to];
+    if (from == null || !item) { setShift(null); return; }
+    noteHintPaged();
+    setSwipeHintOn(false);
+    if (sheetSession.current) sheetSession.current.rounds += 1;
+    analyticsEvents.track('round_sheet_page', { direction, index_from: from, index_to: to, view });
+
+    /* REDUCED MOTION IS A CROSSFADE, NEVER A SLIDE. */
+    if (prefersReducedMotion()) {
+      setShift({ dx: 0, opacity: 0, animating: true });
+      after(160, () => {
+        showRound(item, to);
+        setShift({ dx: 0, opacity: 1, animating: true });
+        after(200, () => setShift(null));
+      });
+      return;
+    }
+    const out = direction === 'next' ? -window.innerWidth : window.innerWidth;
+    setShift({ dx: out, animating: true });
+    after(180, () => {
+      showRound(item, to);
+      setShift({ dx: -out, animating: false });
+      window.requestAnimationFrame(() => setShift({ dx: 0, animating: true }));
+      after(240, () => setShift(null));
+    });
+  }, [roundSeq, view, prefersReducedMotion, after, showRound]);
+
+  /* THE FINGER. The axis lock, the 8px and the 1.2 ratio live in BottomSheet;
+     the thresholds and the end rubber-band live in roundPaging. */
+  const pageDrag = useMemo(() => ({
+    onStart: () => setShift({ dx: 0, animating: false }),
+    onMove: (dx: number) => {
+      const ix = pageIxRef.current;
+      if (ix == null) return;
+      setShift({ dx: rubberBand(ix, roundSeq.length, dx), animating: false });
+    },
+    onEnd: (dx: number, velocity: number) => {
+      const ix = pageIxRef.current;
+      const decision = ix == null ? null : pageDecision(ix, roundSeq.length, dx, velocity);
+      if (!decision) {
+        setShift({ dx: 0, animating: true });
+        after(220, () => setShift(null));
+        return;
+      }
+      pageTo(decision.to, decision.direction);
+    },
+  }), [roundSeq.length, after, pageTo]);
+
   const tapCard = useCallback(
     (item: StreamItem, size: CardSize, pos: number) => {
       analyticsEvents.track('amateur_card_tapped', {
@@ -1000,45 +1133,29 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       if (item.kind === 'round' && item.facts.score_id) {
         /* BRIEF_ROUND_SHEET §1.2/§1.3 — the card is seeded from what this page
            already read, the tapped card is ringed and scrolled clear of the
-           chip row, and the session's analytics clock starts here. */
-        const shape = item.facts.score_id ? shapesMap?.get(item.facts.score_id) ?? null : null;
-        const seedHoles = (shape?.holes ?? []).map((h) => ({
-          holeNo: h.holeNo, par: h.par, strokes: h.sheetStrokes,
-        }));
-        const seedGross = seedHoles.length > 0 && seedHoles.every((h) => h.strokes != null)
-          ? seedHoles.reduce((sum, h) => sum + (h.strokes ?? 0), 0)
-          : null;
-        const seedPar = seedHoles.every((h) => h.par != null)
-          ? seedHoles.reduce((sum, h) => sum + (h.par ?? 0), 0)
-          : null;
-        setSheetSeed(
-          seedHoles.length > 0 && item.subject?.course_name
-            ? {
-                scoreId: item.facts.score_id,
-                holes: seedHoles,
-                gross: seedGross,
-                toPar: seedGross != null && seedPar ? seedGross - seedPar : null,
-                courseName: item.subject.course_name,
-                placeLine: coursePlaceLine({
-                  region: item.subject.region,
-                  subCountry: item.subject.sub_country,
-                  country: item.subject.country ?? null,
-                }),
-                playerName: item.who?.display_name ?? null,
-                playerAvatarUrl: item.who?.photo_url ?? null,
-                playDate: item.facts.play_date ?? null,
-              }
-            : null,
-        );
-        setRingId(item.id);
-        revealCard(item.id);
+           chip row, and the session's analytics clock starts here.
+           §2.1 — the tap also fixes the member's PLACE IN THE SEQUENCE. A round
+           that somehow is not in the ranked list still opens, on its own. */
+        const ix = roundSeq.findIndex((r) => r.id === item.id);
+        const seed = seedFor(item);
         sheetSession.current = { at: Date.now(), maxDetent: 'mid', rounds: 1, stats: false };
         analyticsEvents.track('round_sheet_open', {
           score_id: item.facts.score_id,
           view,
-          seeded: seedHoles.length > 0,
+          seeded: seed != null,
         });
-        opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
+        setShift(null);
+        setSwipeHintOn(roundSeq.length > 1 && noteHintOpen());
+        if (ix >= 0) {
+          showRound(item, ix);
+        } else {
+          setPageIx(null);
+          pageIxRef.current = null;
+          setSheetSeed(seed);
+          setRingId(item.id);
+          revealCard(item.id);
+          opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
+        }
         return;
       }
       if (item.kind === 'review' && item.payload.review) {
@@ -1089,7 +1206,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         });
       }
     },
-    [depart, navigate, openReview, opener, revealCard, shapesMap, t, view],
+    [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view],
   );
 
   const tapWho = useCallback(
@@ -1695,10 +1812,20 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             });
             sheetSession.current = null;
           }
+          /* §2.4 — BACK AND ESCAPE CLOSE. They never page, and the ring is left
+             on the round the member was reading so the feed is where they were. */
           setRingId(null);
           setSheetSeed(null);
+          setShift(null);
+          setPageIx(null);
+          pageIxRef.current = null;
+          setSwipeHintOn(false);
           opener.close();
         }}
+        /* §2.4 — EVERY ACTION READS THE CURRENT PAGE. The score id, the
+           connection, the owner and the seed all come from the opener target
+           that showRound() rewrote, so likes, comments, view profile and view
+           course can never act on the round the member swiped away from. */
         scoreId={opener.target?.scoreId ?? null}
         connectionId={opener.target?.connectionId ?? null}
         profileUserId={opener.target?.profileUserId ?? null}
@@ -1711,6 +1838,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         onStatsSeen={() => {
           if (sheetSession.current) sheetSession.current.stats = true;
         }}
+        /* §2.2 — paging is live only while there IS a sequence to page. */
+        onHorizontalDrag={pageIx != null && roundSeq.length > 1 ? pageDrag : null}
+        pageShift={shift}
+        hint={swipeHintOn ? t('courses:scorecard.swipeHint', 'Swipe for the next round') : null}
       />
     </div>
   );
