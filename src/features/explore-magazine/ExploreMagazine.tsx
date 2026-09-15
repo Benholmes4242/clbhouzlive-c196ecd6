@@ -25,7 +25,7 @@ import {
 } from './roundPaging';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
 import { runNudge } from './roundNudge';
-import { scrollElementIntoView } from '@/lib/getScrollParent';
+import { scrollElementIntoView, scrollPageToTop } from '@/lib/getScrollParent';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
@@ -999,7 +999,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       setRevealed(STREAM_PAGE_SIZE);
       loggedRef.current = 0;
       /* A view is not a route: no history entry, no scroll animation. */
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      scrollPageToTop('auto');
     },
     [view],
   );

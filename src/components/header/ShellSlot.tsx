@@ -1,5 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTourHeroOverlay } from '@/hooks/useTourHeroOverlay';
+import { getPageScrollTop, getPrimaryScrollElement } from '@/lib/getScrollParent';
+
 
 interface ShellSlotProps {
   children: React.ReactNode;
@@ -76,15 +78,19 @@ export const ShellSlot: React.FC<ShellSlotProps> = ({ children, dark = false }) 
     };
   }, []);
 
-  // Soft shadow appears only after the body scrolls past 4px.
+  /* Soft shadow appears only after the PAGE scroller passes 4px. That scroller
+     is #root, not the window: window.scrollY is always 0 here, so the old
+     window listener never fired and the shadow never appeared. */
   useEffect(() => {
+    const scroller = getPrimaryScrollElement();
     const onScroll = () => {
-      setScrolled(window.scrollY > 4);
+      setScrolled(getPageScrollTop() > 4);
     };
     onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    scroller?.addEventListener('scroll', onScroll, { passive: true });
+    return () => scroller?.removeEventListener('scroll', onScroll);
   }, []);
+
 
   return (
     <div

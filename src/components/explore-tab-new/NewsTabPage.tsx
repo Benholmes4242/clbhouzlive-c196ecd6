@@ -19,6 +19,7 @@ import {
 } from '@/features/tourhub/news/StoryShapes';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 
 const WIRE_PAGE_SIZE = 10;
@@ -119,7 +120,7 @@ export function NewsTabPage({ onOpenStory }: { onOpenStory: (slug: string) => vo
                 onSelect={(key) => {
                   setCompetition(key);
                   setWireLimit(WIRE_PAGE_SIZE);
-                  window.scrollTo({ top: 0, behavior: 'auto' });
+                  scrollPageToTop('auto');
                 }}
               />
             )}

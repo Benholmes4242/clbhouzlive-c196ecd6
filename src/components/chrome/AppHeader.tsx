@@ -147,10 +147,11 @@ export function AppHeader({
   useLayoutEffect(() => {
     if (!overHero) return;
     let raf = 0;
-    /* THE PAGE SCROLLER IS NOT THE WINDOW. index.css puts overflow-y on html
-       AND body, so window.scrollY stays 0 and a window-only listener never
-       fired — the band sat transparent over the whole page. This reads the same
-       resolved scroller every other page-scroll consumer uses. */
+    /* THE PAGE SCROLLER IS NOT THE WINDOW. Page scroll happens on #root (body is
+       overflow-y:hidden), so window.scrollY stays 0 and a window-only listener
+       never fired - the band sat transparent over the whole page. This reads the
+       same resolved scroller every other page-scroll consumer uses. */
+
     const read = () => {
       raf = 0;
       const y = getPageScrollTop();
@@ -162,14 +163,15 @@ export function AppHeader({
       if (raf === 0) raf = window.requestAnimationFrame(read);
     };
     read();
+    /* One listener: the resolved page scroller (#root). The window listener that
+       used to sit beside it never fired for page scroll and only cost a frame. */
     const scroller = getPrimaryScrollElement();
     scroller?.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       scroller?.removeEventListener('scroll', onScroll);
-      window.removeEventListener('scroll', onScroll);
       if (raf) window.cancelAnimationFrame(raf);
     };
+
   }, [overHero, overHeroRange, overHeroStart]);
 
 

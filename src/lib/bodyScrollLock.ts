@@ -6,18 +6,21 @@
  * and leave the body stuck `position: fixed` (which freezes the whole page).
  */
 import { scrollPositions } from '@/components/ScrollRestoration';
-import { getDocumentScrollParent, scrollPageTo } from '@/lib/getScrollParent';
+import { getPageScrollTop, getPrimaryScrollElement, scrollPageTo } from '@/lib/getScrollParent';
 
+/* THE PAGE SCROLLER IS #root, NOT html. The saved/restored offset has to come
+   from and go back to that element, or closing a non-detented sheet opened
+   mid-page restored 0 onto a node that never scrolls and the page appeared to
+   jump/stick. */
 function getDocScrollTop(): number {
-  const doc = getDocumentScrollParent();
-  return doc?.scrollTop ?? window.scrollY ?? 0;
+  return getPageScrollTop();
 }
 
 function setDocScrollTop(top: number) {
-  const doc = getDocumentScrollParent();
-  if (doc) doc.scrollTop = Math.max(0, top);
-  else window.scrollTo(0, Math.max(0, top));
+  const scroller = getPrimaryScrollElement();
+  if (scroller) scroller.scrollTop = Math.max(0, top);
 }
+
 
 let lockCount = 0;
 let lockOwnerPath: string | null = null;
@@ -29,6 +32,7 @@ let saved: {
   right: string;
   width: string;
   scrollY: number;
+  scrollerOverflow: string | null;
 } | null = null;
 
 export function lockBodyScroll() {
@@ -39,6 +43,10 @@ export function lockBodyScroll() {
   const bodyIsFixed = document.body.style.position === 'fixed';
   if (lockCount === 0 || !bodyIsFixed) {
     const scrollY = getDocScrollTop();
+    const scroller = getPrimaryScrollElement();
+    /* The body styles below are kept exactly as shipped. They alone no longer
+       stop the page, because the page scrolls on #root - so the scroller's own
+       overflow is pinned too, and restored on the final unlock. */
     saved = {
       overflow: document.body.style.overflow,
       position: document.body.style.position,
@@ -47,6 +55,7 @@ export function lockBodyScroll() {
       right: document.body.style.right,
       width: document.body.style.width,
       scrollY,
+      scrollerOverflow: scroller && scroller !== document.body ? scroller.style.overflowY : null,
     };
     lockOwnerPath = (typeof window !== 'undefined')
       ? window.location.pathname + window.location.search
@@ -57,9 +66,11 @@ export function lockBodyScroll() {
     document.body.style.left = '0';
     document.body.style.right = '0';
     document.body.style.width = '100%';
+    if (scroller && scroller !== document.body) scroller.style.overflowY = 'hidden';
   }
   lockCount++;
 }
+
 
 /**
  * Re-anchor the saved scrollY that the final unlock will restore.
@@ -91,6 +102,11 @@ export function unlockBodyScroll() {
     document.body.style.left = saved.left;
     document.body.style.right = saved.right;
     document.body.style.width = saved.width;
+    if (saved.scrollerOverflow !== null) {
+      const scroller = getPrimaryScrollElement();
+      if (scroller) scroller.style.overflowY = saved.scrollerOverflow;
+    }
+
     const currentPath = (typeof window !== 'undefined')
       ? window.location.pathname + window.location.search
       : null;
@@ -124,14 +140,22 @@ export function forceUnlockBodyScroll() {
     document.body.style.left = saved.left;
     document.body.style.right = saved.right;
     document.body.style.width = saved.width;
+    if (saved.scrollerOverflow !== null) {
+      const scroller = getPrimaryScrollElement();
+      if (scroller) scroller.style.overflowY = saved.scrollerOverflow;
+    }
     saved = null;
   } else {
+
     document.body.style.overflow = '';
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.left = '';
     document.body.style.right = '';
     document.body.style.width = '';
+    const scroller = getPrimaryScrollElement();
+    if (scroller && scroller !== document.body) scroller.style.overflowY = '';
+
   }
   document.body.classList.remove('lightbox-open');
   document.documentElement.classList.remove('lightbox-open');

@@ -465,9 +465,49 @@ export default tseslint.config(
     rules: {
       "settled/no-not-loading-empty-check": "error",
     },
+  },
+  /* ─── THE PAGE SCROLLS ON #root, NOT THE WINDOW ────────────────────────────
+     Measured Sep 2026: body is overflow-y:hidden, #root owns page scrollHeight,
+     window.scrollY is always 0. Every window-scroll read or write is therefore a
+     silent no-op. Use the helpers in src/lib/getScrollParent.ts (that file is
+     the one place allowed to touch these, and it no longer needs to).
+     src/perf/** is exempt: its window.scrollY reads are diagnostics only. */
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/lib/getScrollParent.ts", "src/perf/**"],
+    rules: {
+      "no-restricted-properties": [
+        "error",
+        {
+          object: "window",
+          property: "scrollTo",
+          message:
+            "The page scrolls on #root, not the window. Use scrollPageTo / scrollPageToTop from @/lib/getScrollParent.",
+        },
+        {
+          object: "window",
+          property: "scrollBy",
+          message:
+            "The page scrolls on #root, not the window. Use scrollPageTo from @/lib/getScrollParent.",
+        },
+        {
+          object: "window",
+          property: "scrollY",
+          message:
+            "window.scrollY is always 0 here. Use getPageScrollTop from @/lib/getScrollParent.",
+        },
+        {
+          object: "window",
+          property: "pageYOffset",
+          message:
+            "window.pageYOffset is always 0 here. Use getPageScrollTop from @/lib/getScrollParent.",
+        },
+      ],
+    },
   }
 
 
 );
+
 
 
