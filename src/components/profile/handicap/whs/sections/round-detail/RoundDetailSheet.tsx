@@ -412,6 +412,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
       onDetentChange={onDetentChange}
       onHorizontalDrag={onHorizontalDrag}
       onStatsSeen={onStatsSeen}
+      pageShift={pageShift}
+      hint={hint}
     />
     {commentsOpen && postInfo && (
       <CommentsSheetV2
