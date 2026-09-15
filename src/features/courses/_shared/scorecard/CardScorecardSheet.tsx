@@ -861,6 +861,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    */
   const allHolesPlayed = holes.length > 0 && played.length === holes.length;
   const shownPar = allHolesPlayed ? cardTotalPar : totalPar;
+  /* FOLLOW-UP A — the not-played line is drawn from the SAME hole rows the card
+     draws, so the line and the marks on the grid can never disagree. */
+  const hasUnplayedHole = holes.length > 0 && !allHolesPlayed;
   /* §B — these gated the OUT / IN segments of the removed grand-totals row. The
      derivations are kept and voided rather than deleted: they are the sole
      record of the "a nine that has not started contributes NO segment" rule, and
