@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { ROUND_POST_TYPE } from '@/lib/posts/isRoundPost';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -421,10 +422,13 @@ async function fetchContent(period: AnalyticsPeriod): Promise<ContentAnalyticsDa
   const since = startOf(period).toISOString();
 
   const [posts, reviews, topRatingsRes, totalPostsRes, totalReviewsRes, videoPostsRes] = await Promise.all([
-    supabase.from('posts').select('created_at').gte('created_at', since).limit(10000),
+    // ROUND POSTS ARE NOT MEMBER CONTENT (see isRoundPost): auto-created when a
+    // round syncs, no caption, no media, no feed home. Counting them reported
+    // content volume nobody wrote.
+    supabase.from('posts').select('created_at').neq('post_type', ROUND_POST_TYPE).gte('created_at', since).limit(10000),
     supabase.from('course_ratings').select('created_at').gte('created_at', since).limit(10000),
     supabase.from('course_rating_aggregates' as any).select('course_id, review_count, avg_overall_score').order('review_count', { ascending: false }).limit(10),
-    supabase.from('posts').select('id', { count: 'exact', head: true }),
+    supabase.from('posts').select('id', { count: 'exact', head: true }).neq('post_type', ROUND_POST_TYPE),
     supabase.from('course_ratings').select('id', { count: 'exact', head: true }),
     supabase.from('post_media').select('post_id', { count: 'exact', head: true }).eq('media_type', 'video').gte('created_at', since),
   ]);

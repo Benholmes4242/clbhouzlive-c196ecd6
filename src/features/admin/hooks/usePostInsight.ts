@@ -16,6 +16,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { ROUND_POST_TYPE } from '@/lib/posts/isRoundPost';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 
 // Props keys verified against callsites:
@@ -55,8 +56,11 @@ export function usePostInsight(postId: string | null) {
       const [postRes, likesRes, sharesRes] = await Promise.all([
         supabase
           .from('posts')
-          .select('id, content, created_at, user_id, like_count, comment_count')
+          .select('id, content, created_at, user_id, like_count, comment_count, post_type')
           .eq('id', postId!)
+          // A round post is not member-authored content: it has no insight to
+          // show, so the sheet resolves to nothing rather than an empty card.
+          .neq('post_type', ROUND_POST_TYPE)
           .maybeSingle(),
         supabase
           .from('analytics_events')
