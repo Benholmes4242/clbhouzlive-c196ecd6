@@ -1902,7 +1902,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               <ExploreCard
                 item={item}
                 size={size}
-                cardTreatment={treatments.get(item.id) ?? 'standard'}
+                
                 shape={shapesMap === null ? undefined : item.facts.score_id ? shapesMap.get(item.facts.score_id) ?? null : null}
                 viewerBest={own?.gross ?? null}
                 viewerBestSince={monthLabel(own?.playDate ?? null, i18n.language || 'en')}
