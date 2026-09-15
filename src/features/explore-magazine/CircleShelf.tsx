@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreShelf } from './ExploreShelf';
-import { ShelfShell } from './ExploreShells';
+import { ShelfRetry, ShelfShell } from './ExploreShells';
 import { railCaptionDate, relativeDay, toParLabel } from './exploreCopy';
 import { circleHandicapDisplay } from './circleHandicap';
 
@@ -155,12 +155,34 @@ export function CircleShelf({
   };
 
   if (!viewerId) return null;
-  if (!circle.isFetched || !total.isFetched) {
+  /* ORDER MATTERS AND THIS IS WHY. The total read is DISABLED until the rail has
+     rows, and a disabled query never becomes isFetched, so gating on it before
+     the empty check left an empty circle staring at the shell forever. Each gate
+     now only asks about a read that can actually resolve:
+       circle unsettled  -> shell
+       circle errored    -> retry row (errored is not empty)
+       no rows           -> nothing at all
+       total unsettled   -> shell (only reachable once the rail has rows) */
+  if (!circle.isFetched) {
     return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
+  }
+  if (circle.isError) {
+    return (
+      <ShelfRetry
+        heading={t('amateur.stream.shelf.circle', 'Your circle')}
+        label={t('courseDetail.yourRoundsSheet.error', 'Your rounds could not be loaded.')}
+        action={t('amateur.stream.standing.retry', 'Try again')}
+        onRetry={() => circle.refetch()}
+      />
+    );
   }
   /* §4 A viewer who follows nobody, or whose circle has no tracked rounds, gets
      NO SHELF. Skipped; the next shelf takes the slot. */
   if (rows.length === 0) return null;
+  if (!total.isFetched) {
+    return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
+  }
+
 
   const shown = Math.max(total.data ?? 0, rows.length);
 

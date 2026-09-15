@@ -38,7 +38,9 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
+import { useHandicapHistory } from '@/lib/whs/hooks';
+import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
+
 import { safeGoBack } from '@/utils/navigation';
 import { r } from '@/lib/radius';
 import { subscribeIslandEdge, getIslandEdgeScrolled } from './islandEdge';
@@ -287,18 +289,22 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
   const isBusinessActor = activeActor?.type === 'business';
   const { data: profile, isFetched: profileFetched, isError: profileError } = useUserProfile(user?.id);
 
-  const { data: connection, isFetched: connFetched, isError: connError } = useWhsConnection(user?.id);
-  const { data: trendData, isFetched: trendFetched, isError: trendError } = useHandicapTrend(connection?.id);
+  // ONE DEFINITION, SHARED: useHandicapChipState owns "is this member connected"
+  // and "has that read settled", so the Explore Scores connect invitation and
+  // this chip can never disagree about it.
+  const hcp = useHandicapChipState(user?.id);
+  const connection = hcp.connection;
+  const trendData = hcp.trend;
   const { data: hcpHistory } = useHandicapHistory(connection?.id, 'all');
   const lastMove = lastIndexMove(hcpHistory as any);
 
   // An errored query must not hang the cell on nothing forever: treat error as
   // settled and fall through to the disconnected pill (mirrors WhsHandicapTab).
-  const anyError = profileError || connError || trendError;
+  const anyError = profileError || hcp.anyError;
   const settled =
     anyError ||
-    // eslint-disable-next-line settled/no-not-loading-empty-check -- the expression already requires profileFetched, connFetched and trendFetched.
-    (!sessionLoading && profileFetched && connFetched && (!connection || trendFetched));
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- the expression already requires profileFetched and the shared hook's own settled flag.
+    (!sessionLoading && profileFetched && hcp.settled);
 
   if (!user) return null;
   if (isBusinessActor) return null;
@@ -309,7 +315,8 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
   const body = (() => {
 
 
-    const disconnected = !connection || trendData?.current == null;
+    const disconnected = !hcp.connected;
+
 
     if (disconnected) {
       return (
