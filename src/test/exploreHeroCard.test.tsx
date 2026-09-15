@@ -72,11 +72,11 @@ describe('Explore hero card layout', () => {
       .find((node) => node.textContent?.includes('·'));
 
     expect(kicker?.style.color).toBe('rgb(255, 255, 255)');
-    expect(kicker?.style.textShadow).toBe('0 1px 2px rgba(0, 0, 0, 0.45)');
+    expect(kicker?.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
     expect(name.style.color).toBe('rgb(255, 255, 255)');
-    expect(name.style.textShadow).toBe('0 1px 2px rgba(0, 0, 0, 0.45)');
+    expect(name.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
     expect(date?.style.color).toBe('rgba(255, 255, 255, 0.85)');
-    expect(date?.style.textShadow).toBe('0 1px 2px rgba(0, 0, 0, 0.45)');
+    expect(date?.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
   });
 
   it('keeps the viewer name amber on a hero', () => {
