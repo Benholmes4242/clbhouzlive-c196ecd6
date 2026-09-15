@@ -66,6 +66,7 @@ export async function fetchMatchRequests(status: MatchRequestStatus): Promise<Ma
       created_at: r.created_at,
       resolved_at: r.resolved_at,
       course_name: courseMap.get(r.golf_course_id)?.name ?? null,
+      course_sub_country: courseMap.get(r.golf_course_id)?.sub_country ?? null,
       requester_name: p?.display_name ?? null,
       requester_username: p?.username ?? null,
     };
