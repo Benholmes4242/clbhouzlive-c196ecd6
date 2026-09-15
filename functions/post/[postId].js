@@ -8,6 +8,7 @@ import {
   isUuid,
   SUPABASE_URL,
 } from '../_lib/og.js';
+import { roundDocument } from '../_lib/round.js';
 
 /**
  * Deterministic public path for a round share card, or null when the card has
@@ -24,6 +25,7 @@ async function roundShareCardUrl(postId) {
     return null;
   }
 }
+
 
 
 function pickImage(media) {
@@ -65,6 +67,19 @@ export async function onRequest(context) {
   const post = rows[0];
   if (!post) return genericDocument(request);
 
+  // A ROUND POST IS A ROUND. It has no caption and no media, so the card built
+  // below could only ever say the course name and a date. The round builder is
+  // the same one /round/:id uses - it names the player, the gross and the
+  // to-par, and it serves the generic card when the round is not publicly
+  // viewable. The generated share-card image, when one exists, still leads the
+  // image chain.
+  if (post.whs_score_id) {
+    const generated = await roundShareCardUrl(post.id);
+    return roundDocument(request, post.whs_score_id, { image: generated });
+  }
+
+
+
 
   const [authors, courses] = await Promise.all([
     post.user_id
@@ -93,11 +108,10 @@ export async function onRequest(context) {
     else if (date) description = `Posted on clbhouz - ${date}`;
   }
 
-  // A round post with a generated share card leads the chain; anything else
-  // keeps the existing behaviour (first media, then the course thumbnail).
-  const roundCard = post.whs_score_id ? await roundShareCardUrl(post.id) : null;
-  const image =
-    roundCard || pickImage(post.post_media) || (course && course.thumbnail_image) || null;
+  // Round posts returned above, so this is the ordinary chain: first media,
+  // then the course thumbnail.
+  const image = pickImage(post.post_media) || (course && course.thumbnail_image) || null;
+
 
 
   if (!title && !description && !image) return genericDocument(request);
