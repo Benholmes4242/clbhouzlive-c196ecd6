@@ -98,7 +98,7 @@ describe('ShellSlot shadow follows the page scroller', () => {
     const { ShellSlot } = await import('@/components/header/ShellSlot');
 
     const root = mountRoot('auto');
-    render(React.createElement(ShellSlot, { dark: true }, 'tabs'), { container: root });
+    render(React.createElement(ShellSlot, { dark: true, children: 'tabs' }), { container: root });
 
     const band = root.querySelector('[data-chrome="shell-slot"]') as HTMLElement;
     expect(band.style.boxShadow).toBe('none');
