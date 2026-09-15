@@ -789,7 +789,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      RPC deliberately placed. */
   const visible = useMemo(() => {
     const base = serverOn ? source.items : source.items.slice(0, revealed);
-    if (videoItems.length === 0) return base;
+    if (videoItems.length === 0) {
+      const { items: uniqueBase, drops: baseDrops } = dedupeItems(base);
+      warnDuplicates('ExploreMagazine:visible', baseDrops);
+      return uniqueBase;
+    }
     /* AN INSERTION, NOT A RE-SORT. The server's page is already ranked and
        cadenced and the client re-sorts nothing: each video is placed at the
        first position whose card scores below it, so every other card keeps the
