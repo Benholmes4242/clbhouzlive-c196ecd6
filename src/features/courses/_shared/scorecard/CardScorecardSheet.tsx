@@ -674,6 +674,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     || isTour
     || !!engagement || !!onViewProfile || !!onViewCourse || !!onShareRound;
 
+  /* BRIEF_ROUND_SHEET_TALL §1 — WHICH MIDDLE IS ON SCREEN, named once and used
+     both by the marker below and by the DEV measurement log. */
+  const middleState: 'card' | 'skeleton' | 'unavailable' | 'nohbh' | 'syncing' = loading
+    ? 'skeleton'
+    : hasHoles
+      ? 'card'
+      : emptyVariant === 'unavailable'
+        ? 'unavailable'
+        : emptyVariant === 'nohbh'
+          ? 'nohbh'
+          : 'syncing';
+
   return (
     <BottomSheet
       open={open}
@@ -684,6 +696,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       // shared BottomSheet owns the one surface for chrome and body alike.
       detents={detents}
       midKey={midKey}
+      midDebug={{ ...(midDebug ?? {}), state: middleState }}
       onDetentChange={onDetentChange}
       onHorizontalDrag={onHorizontalDrag}
       style={{
