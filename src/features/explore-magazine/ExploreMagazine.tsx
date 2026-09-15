@@ -214,6 +214,11 @@ export function buildBlocks(
       canPair(item) &&
       canPair(next) &&
       (sameKindPairs || opts.mergedCourses === true || item.kind !== next.kind || (opts.bareRoundPairs === true && item.kind === 'round')) &&
+      /* A ROUND PAIRS WITH A ROUND AND NOTHING ELSE. Before rounds could pair
+         on All, the mixed-kind clause above made a round-plus-review row
+         impossible; now that it is possible it is still refused, because the two
+         cards carry different furniture. */
+      (item.kind === 'round') === (next.kind === 'round') &&
       /* THE SAME-COURSE GUARD, rounds only. A blocked pair renders the first
          card full width; the ranked order is never reordered to find a partner. */
       (item.kind !== 'round' || next.kind !== 'round' || differentCourses(item, next))
