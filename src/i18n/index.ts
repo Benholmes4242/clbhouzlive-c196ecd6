@@ -98,8 +98,11 @@ if (!i18n.isInitialized) {
       },
 
       detection: {
-        // Persisted user choice FIRST, then browser/OS, then fallbackLng.
-        order: ['localStorage', 'navigator'],
+        // ENGLISH ONLY: `navigator` is deliberately NOT in this list, so the
+        // device / OS / WebView language no longer selects a locale. Only an
+        // explicitly persisted, still-enabled value is honoured (dev QA of
+        // `en-XA`, and any language re-enabled in ENABLED_LOCALES).
+        order: ['localStorage'],
         lookupLocalStorage: LOCALE_STORAGE_KEY,
         caches: ['localStorage'],
       },
