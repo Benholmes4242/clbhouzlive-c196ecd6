@@ -520,19 +520,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     scoreScopeChosen.current = true;
   }, [view, geography.isFetched, geography.scope.primaryClubId, geography.scope.county]);
 
-  /* §5 MY CIRCLE IS THE DISCOVERY SCOPE. The chip is ABSENT for a member who
-     follows nobody - the same rule the club chip takes on Scores when no primary
-     club resolves - and the default then falls to the county. UNSETTLED IS NOT
-     ZERO: the default waits for the shared follow-set read to settle. */
+  /* §5 MY CIRCLE IS STILL OFFERED, WORLD IS THE LANDING SCOPE (Ben, Sep 2026).
+     Courses opens on World for every member and stays there until they pick
+     another chip - no effect switches it after the page has rendered, so there
+     is no scope jump on load. The chip is ABSENT for a member who follows
+     nobody (hasCircle keeps deciding that), leaving World, county and country.
+     Scores' own default is My club where it resolves, else the county. */
   const [coursesScope, setCoursesScope] = useState<ScoreScope>('world');
-  const coursesScopeChosen = useRef(false);
   const hasCircle = circleSize.isSuccess && !circleSize.isFetching && (circleSize.data ?? 0) > 0;
-  useEffect(() => {
-    if (view !== 'courses' || !geography.isFetched || coursesScopeChosen.current) return;
-    if (!circleSize.isSuccess || circleSize.isFetching) return;
-    setCoursesScope(hasCircle ? 'circle' : geography.scope.county ? 'county' : 'world');
-    coursesScopeChosen.current = true;
-  }, [view, geography.isFetched, geography.scope.county, circleSize.isSuccess, circleSize.isFetching, hasCircle]);
 
   /** The scope the VIEW ON SCREEN is looking at. */
   const activeScope: ScoreScope = view === 'courses' ? coursesScope : scoreScope;
@@ -1761,7 +1756,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               onChange={(next) => {
                 const value = next as ScoreScope;
                 analyticsEvents.track('amateur_scope_changed', { view, from: coursesScope, to: value });
-                coursesScopeChosen.current = true;
                 setCoursesScope(value);
                 setRevealed(STREAM_PAGE_SIZE);
                 loggedRef.current = 0;
@@ -1786,7 +1780,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               /* CHOOSING A PLACE MEANS EVERYONE IN IT (§5). Clearing it changes
                  nothing about scope. */
               if (next !== null) {
-                coursesScopeChosen.current = true;
                 setCoursesScope('world');
               }
               setRevealed(STREAM_PAGE_SIZE);
