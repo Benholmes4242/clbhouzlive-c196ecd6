@@ -976,6 +976,7 @@
     "roundsCount_other": "{{count}} rounds",
     "avgHere": "{{avg}} here",
     "avgHereOnAverage": "{{avg}} here on average",
+    "avgLabel": "{{avg}} im Schnitt",
     "pillEaglesLong": "eagles+",
     "pillEaglesShort": "EAG+",
     "pillBirdiesLong": "birdies",

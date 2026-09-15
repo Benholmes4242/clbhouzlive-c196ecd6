@@ -77,16 +77,19 @@ const DossierCard: React.FC<DossierCardProps> = ({
 
   const where = [course.sub_country, course.country].filter(Boolean)[0] ?? null;
 
-  const metaSegments = [
-    dateText || null,
-    where,
-    hasScoring
-      ? t('row.rounds', { count: rounds as number, defaultValue: '{{count}} rounds' })
-      : null,
-    hasScoring && avgToPar != null
-      ? t('row.avg', { avg: fmtSigned(avgToPar), defaultValue: '{{avg}} avg' })
-      : null,
-  ].filter(Boolean) as string[];
+  // Two fixed lines, never a wrap: line 1 is date · country, line 2 is
+  // rounds · average. Line 2 renders only when scoring exists (Ben, Sep 2026).
+  const line1 = [dateText || null, where].filter(Boolean).join(' \u00B7 ');
+  const line2 = hasScoring
+    ? [
+        t('yourCourses.roundsCount', { count: rounds as number, defaultValue: '{{count}} rounds' }),
+        avgToPar != null
+          ? t('yourCourses.avgLabel', { avg: fmtSigned(avgToPar), defaultValue: '{{avg}} avg' })
+          : null,
+      ]
+        .filter(Boolean)
+        .join(' \u00B7 ')
+    : '';
 
   return (
     <article
@@ -174,10 +177,19 @@ const DossierCard: React.FC<DossierCardProps> = ({
           >
             {course.name}
           </div>
-          {metaSegments.length > 0 && (
+          {line1.length > 0 && (
             <div style={{ ...LABEL, letterSpacing: '0.10em' }}>
-              {metaSegments.join(' \u00B7 ')}
+              {/* Segments stay unbreakable; the ONLY wrap point is the separator,
+                  so a long country drops intact beneath the date (measured: the
+                  identity column is ~176px at 390pt; "3 SEPT 2026 · NORTHERN
+                  IRELAND" is ~225px). Line 2 never wraps. */}
+              <span style={{ whiteSpace: 'nowrap' }}>{dateText}</span>
+              {dateText && where ? ' \u00B7 ' : ''}
+              <span style={{ whiteSpace: 'nowrap' }}>{where}</span>
             </div>
+          )}
+          {line2.length > 0 && (
+            <div style={{ ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
           )}
         </div>
 
