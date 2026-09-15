@@ -1,17 +1,32 @@
 /**
  * Course-name matcher for WHS-reported names → golf_courses rows.
  *
+ * COUNTRY GATE (Ben, Sep 2026): the candidate set is filtered by country BEFORE any
+ * name comparison can win. A cross-country candidate is unselectable no matter how
+ * well the strings match - that ordering is the whole fix. The old step 7 country
+ * predicate inside `match_whs_course_to_golf_course` was always pre-empted by an
+ * earlier name step, which is how "Centurion Club" (England) became a perfect
+ * normalised match for Centurion Country Club in South Africa.
+ *
+ * The gate reads `golf_courses.sub_country` (never `country`, which is a region
+ * grouping) and is built on the WHS `country_name` (never `country_code`, which mixes
+ * three schemes). See `countryVocabulary.ts` for the vocabulary and the fail-closed
+ * rules. When a caller supplies no country at all the gate cannot run and legacy
+ * behaviour is preserved.
+ *
  * Strategy:
  *   1. Canonicalise to a `whs_name_norm` form.
- *   2. Check the alias cache.
+ *   2. Check the alias cache (country-verified).
  *   3. Try exact match.
  *   4. Try normalised / suffix match against candidate rows.
  *   5. Try the dash-rewrite for "Foo-Bar Course" patterns.
  *   6. Try fuzzy ilike with the dash core.
- *   7. On success, persist into whs_course_aliases.
+ *   7. Server-side RPC fallback (country-verified on the way out).
+ *   8. On success, persist into whs_course_aliases.
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { makeCountryGate, whsCountryNameFromCode, type CountryGate } from './countryVocabulary';
 
 type GolfCourseLite = {
   id: string;
@@ -19,7 +34,11 @@ type GolfCourseLite = {
   thumbnail_image: string | null;
   region: string | null;
 };
+type CandidateRow = GolfCourseLite & { sub_country?: string | null };
 type MatchMethod = 'cache' | 'exact' | 'normalised' | 'dash' | 'suffix' | 'fuzzy' | 'rpc';
+
+/** Every candidate read carries sub_country so the gate can judge it. */
+const CANDIDATE_SELECT = 'id, name, thumbnail_image, region, sub_country';
 
 const COMMON_SUFFIXES = [
   'golf and country club',
@@ -92,59 +111,114 @@ async function persistAlias(
   }
 }
 
+/** Narrow a query to the allowed sub_country values when the gate is active. */
+function scopeToCountry<T>(query: T, gate: CountryGate): T {
+  if (!gate.active) return query;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (query as any).in('sub_country', gate.allowed as string[]) as T;
+}
+
+function rejected(gate: CountryGate, whsName: string, candidate: CandidateRow, step: string) {
+  // eslint-disable-next-line no-console
+  console.info('[courseNameMatcher] country gate rejected candidate', {
+    whsName,
+    whsCountry: gate.whsCountryName,
+    candidate: candidate.name,
+    candidateSubCountry: candidate.sub_country ?? null,
+    step,
+  });
+}
+
+function strip(row: CandidateRow): GolfCourseLite {
+  return {
+    id: row.id,
+    name: row.name,
+    thumbnail_image: row.thumbnail_image,
+    region: row.region,
+  };
+}
+
 export async function resolveCourseFromWhsName(
   whsName: string,
   countryCode?: string | null,
+  countryName?: string | null,
 ): Promise<GolfCourseLite | null> {
   if (!whsName || !whsName.trim()) return null;
 
+  // country_name is authoritative; the code is only a bridge for legacy callers.
+  const whsCountry = countryName?.trim() || whsCountryNameFromCode(countryCode);
+  const gate = makeCountryGate(whsCountry);
+
+  // Supplied but unrecognised country, or a country with no allowed targets: reject
+  // outright rather than let a name step win. Fail closed.
+  if (gate.active && gate.allowed.length === 0) {
+    // eslint-disable-next-line no-console
+    console.info('[courseNameMatcher] unknown WHS country - failing closed', {
+      whsName,
+      whsCountry: gate.whsCountryName,
+      countryCode: countryCode ?? null,
+    });
+    return null;
+  }
+
   const norm = normaliseCourseName(whsName);
 
-  // 1. Cache hit?
+  // 1. Cache hit? Still country-verified: the alias table holds rows that predate
+  //    the gate, at least 14 of which cross a border.
   const { data: aliasHit } = await supabase
     .from('whs_course_aliases')
-    .select('course_id, golf_courses!whs_course_aliases_course_id_fkey(id, name, thumbnail_image, region)')
+    .select(
+      'course_id, golf_courses!whs_course_aliases_course_id_fkey(id, name, thumbnail_image, region, sub_country)',
+    )
     .eq('whs_name_norm', norm)
     .maybeSingle();
 
-  if (aliasHit && (aliasHit as any).golf_courses) {
-    return (aliasHit as any).golf_courses as GolfCourseLite;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cached = (aliasHit as any)?.golf_courses as CandidateRow | undefined;
+  if (cached) {
+    if (gate.allows(cached.sub_country)) return strip(cached);
+    rejected(gate, whsName, cached, 'cache');
   }
 
   // 2. Exact case-insensitive match
   {
-    const { data } = await supabase
-      .from('golf_courses')
-      .select('id, name, thumbnail_image, region')
-      .ilike('name', whsName.trim())
-      .maybeSingle();
-    if (data) {
-      await persistAlias(whsName, norm, data.id, 'exact');
-      return data as GolfCourseLite;
+    const { data } = await scopeToCountry(
+      supabase.from('golf_courses').select(CANDIDATE_SELECT).ilike('name', whsName.trim()),
+      gate,
+    ).limit(1);
+    const hit = (data ?? [])[0] as CandidateRow | undefined;
+    if (hit && gate.allows(hit.sub_country)) {
+      await persistAlias(whsName, norm, hit.id, 'exact');
+      return strip(hit);
     }
   }
 
   // 3-4. Normalised / suffix match against candidate rows
   const baseWords = norm.split(' ').slice(0, 3).join(' ');
   if (baseWords.length >= 3) {
-    const { data: candidates } = await supabase
-      .from('golf_courses')
-      .select('id, name, thumbnail_image, region')
-      .ilike('name', `%${baseWords}%`)
-      .limit(20);
+    const { data: candidates } = await scopeToCountry(
+      supabase.from('golf_courses').select(CANDIDATE_SELECT).ilike('name', `%${baseWords}%`),
+      gate,
+    ).limit(20);
 
-    if (candidates && candidates.length > 0) {
-      for (const c of candidates) {
+    const rows = ((candidates ?? []) as CandidateRow[]).filter((c) => {
+      if (gate.allows(c.sub_country)) return true;
+      rejected(gate, whsName, c, 'normalised/suffix');
+      return false;
+    });
+
+    if (rows.length > 0) {
+      for (const c of rows) {
         if (normaliseCourseName(c.name) === norm) {
           await persistAlias(whsName, norm, c.id, 'normalised');
-          return c as GolfCourseLite;
+          return strip(c);
         }
       }
-      for (const c of candidates) {
+      for (const c of rows) {
         const cNorm = normaliseCourseName(c.name);
         if (cNorm.startsWith(norm + ' ') || norm.startsWith(cNorm + ' ')) {
           await persistAlias(whsName, norm, c.id, 'suffix');
-          return c as GolfCourseLite;
+          return strip(c);
         }
       }
     }
@@ -153,14 +227,14 @@ export async function resolveCourseFromWhsName(
   // 5. Dash variants
   for (const variant of dashVariants(whsName)) {
     if (variant === whsName.trim()) continue;
-    const { data } = await supabase
-      .from('golf_courses')
-      .select('id, name, thumbnail_image, region')
-      .ilike('name', variant)
-      .maybeSingle();
-    if (data) {
-      await persistAlias(whsName, norm, data.id, 'dash');
-      return data as GolfCourseLite;
+    const { data } = await scopeToCountry(
+      supabase.from('golf_courses').select(CANDIDATE_SELECT).ilike('name', variant),
+      gate,
+    ).limit(1);
+    const hit = (data ?? [])[0] as CandidateRow | undefined;
+    if (hit && gate.allows(hit.sub_country)) {
+      await persistAlias(whsName, norm, hit.id, 'dash');
+      return strip(hit);
     }
   }
 
@@ -169,14 +243,17 @@ export async function resolveCourseFromWhsName(
   if (dashMatch) {
     const [, base, suffix] = dashMatch;
     const suffixCore = suffix.replace(/\s*course\s*$/i, '').trim();
-    const { data } = await supabase
-      .from('golf_courses')
-      .select('id, name, thumbnail_image, region')
-      .ilike('name', `${base.trim()}%${suffixCore}%`)
-      .limit(1);
-    if (data && data.length > 0) {
-      await persistAlias(whsName, norm, data[0].id, 'fuzzy');
-      return data[0] as GolfCourseLite;
+    const { data } = await scopeToCountry(
+      supabase
+        .from('golf_courses')
+        .select(CANDIDATE_SELECT)
+        .ilike('name', `${base.trim()}%${suffixCore}%`),
+      gate,
+    ).limit(1);
+    const hit = (data ?? [])[0] as CandidateRow | undefined;
+    if (hit && gate.allows(hit.sub_country)) {
+      await persistAlias(whsName, norm, hit.id, 'fuzzy');
+      return strip(hit);
     }
   }
 
@@ -192,13 +269,22 @@ export async function resolveCourseFromWhsName(
       .rpc('match_whs_course_to_golf_course', rpcParams as any);
     if (!rpcErr && rpcMatch && Array.isArray(rpcMatch) && rpcMatch.length > 0) {
       const row = rpcMatch[0] as { id: string; name: string; thumbnail_image: string | null; region: string | null };
-      await persistAlias(whsName, norm, row.id, 'rpc');
-      return {
-        id: row.id,
-        name: row.name,
-        thumbnail_image: row.thumbnail_image,
-        region: row.region,
-      };
+      // The RPC's own country predicate sits behind its name steps, so verify here.
+      let subCountry: string | null = null;
+      if (gate.active) {
+        const { data: verify } = await supabase
+          .from('golf_courses')
+          .select('sub_country')
+          .eq('id', row.id)
+          .maybeSingle();
+        subCountry = (verify as { sub_country: string | null } | null)?.sub_country ?? null;
+      }
+      const candidate: CandidateRow = { ...row, sub_country: subCountry };
+      if (gate.allows(subCountry)) {
+        await persistAlias(whsName, norm, row.id, 'rpc');
+        return strip(candidate);
+      }
+      rejected(gate, whsName, candidate, 'rpc');
     }
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -206,15 +292,16 @@ export async function resolveCourseFromWhsName(
   }
 
   // eslint-disable-next-line no-console
-  console.info('[courseNameMatcher] miss', { whsName, norm });
+  console.info('[courseNameMatcher] miss', { whsName, norm, whsCountry: gate.whsCountryName });
   return null;
 }
 
 export async function lookupCourseThumbnailV2(
   whsName: string,
   countryCode?: string | null,
+  countryName?: string | null,
 ): Promise<string | null> {
-  const course = await resolveCourseFromWhsName(whsName, countryCode);
+  const course = await resolveCourseFromWhsName(whsName, countryCode, countryName);
   return course?.thumbnail_image ?? null;
 }
 
@@ -224,8 +311,9 @@ export async function lookupCourseThumbnailV2(
 export async function lookupCourseMetaV2(
   whsName: string,
   countryCode?: string | null,
+  countryName?: string | null,
 ): Promise<{ thumbnail_image: string | null; region: string | null } | null> {
-  const course = await resolveCourseFromWhsName(whsName, countryCode);
+  const course = await resolveCourseFromWhsName(whsName, countryCode, countryName);
   if (!course) return null;
   return { thumbnail_image: course.thumbnail_image, region: course.region };
 }
@@ -235,8 +323,8 @@ export async function lookupCourseMetaV2(
 export async function lookupCourseId(
   whsName: string,
   countryCode?: string | null,
+  countryName?: string | null,
 ): Promise<string | null> {
-  const course = await resolveCourseFromWhsName(whsName, countryCode ?? null);
+  const course = await resolveCourseFromWhsName(whsName, countryCode ?? null, countryName ?? null);
   return course?.id ?? null;
 }
-
