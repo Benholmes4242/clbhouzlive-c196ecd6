@@ -88,6 +88,7 @@ function FigureChip({
         padding: '4px 8px',
         minHeight: 28,
         boxSizing: 'border-box',
+        whiteSpace: 'nowrap',
         borderRadius: 8,
         color: '#FFFFFF',
         ...FIGS,
