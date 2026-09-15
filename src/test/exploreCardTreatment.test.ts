@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  cardTreatments,
-  earnsHeroTreatment,
-} from '@/features/explore-magazine/cardTreatment';
+import { calloutFor, isNotableRound } from '@/features/explore-magazine/cardTreatment';
 import { shelfDueAt, shelfForOrdinal } from '@/features/explore-magazine/shelfCadence';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
@@ -24,7 +21,8 @@ function item(id: string, patch: Partial<StreamItem> = {}): StreamItem {
   };
 }
 
-describe('earned Explore card treatment', () => {
+/** §2 THE PREDICATE THAT SURVIVED: it blocks PAIRING, nothing else. */
+describe('isNotableRound blocks pairing', () => {
   it.each([
     ['record taken', item('a', { consequence: { kind: 'record_taken' } })],
     ['record lost', item('a', { consequence: { kind: 'record_lost' } })],
@@ -36,57 +34,72 @@ describe('earned Explore card treatment', () => {
     ['five birdies', item('a', { facts: { birdies: 5 } })],
     ['clean card', item('a', { facts: { clean_card: true } })],
   ])('admits %s', (_label, candidate) => {
-    expect(earnsHeroTreatment(candidate)).toBe(true);
+    expect(isNotableRound(candidate)).toBe(true);
   });
 
-  it('rejects ordinary rounds and consequences outside the ruling', () => {
-    expect(earnsHeroTreatment(item('plain'))).toBe(false);
-    expect(earnsHeroTreatment(item('down', { consequence: { kind: 'rank_down' } }))).toBe(false);
-    expect(earnsHeroTreatment(item('four', { facts: { birdies: 4 } }))).toBe(false);
-    expect(earnsHeroTreatment(item('unknown', { facts: { clean_card: null } }))).toBe(false);
-    expect(earnsHeroTreatment(item('dirty', { facts: { clean_card: false } }))).toBe(false);
-    expect(earnsHeroTreatment(item('noeagle', { facts: { eagles: 0 } }))).toBe(false);
+  it('lets ordinary rounds pair', () => {
+    expect(isNotableRound(item('plain'))).toBe(false);
+    expect(isNotableRound(item('down', { consequence: { kind: 'rank_down' } }))).toBe(false);
+    expect(isNotableRound(item('four', { facts: { birdies: 4 } }))).toBe(false);
+    expect(isNotableRound(item('unknown', { facts: { clean_card: null } }))).toBe(false);
+    expect(isNotableRound(item('dirty', { facts: { clean_card: false } }))).toBe(false);
+    expect(isNotableRound(item('noeagle', { facts: { eagles: 0 } }))).toBe(false);
+  });
+});
+
+/** §5 THE ACHIEVEMENT CALLOUT: one per card, the highest priority, good news only. */
+describe('achievement callout', () => {
+  it('follows the ruled priority order', () => {
+    expect(
+      calloutFor(
+        item('all', {
+          consequence: { kind: 'record_taken' },
+          facts: { holes_in_one: 1, eagles: 2, birdies: 6, clean_card: true },
+        }),
+      ),
+    ).toEqual({ kind: 'record' });
+    expect(calloutFor(item('rank', { consequence: { kind: 'rank_up', n: 3 }, facts: { eagles: 1 } })))
+      .toEqual({ kind: 'rank_up', rank: 3 });
+    expect(calloutFor(item('ace', { facts: { holes_in_one: 1, eagles: 1, birdies: 5 } })))
+      .toEqual({ kind: 'ace', hole: null });
+    expect(calloutFor(item('alb', { facts: { albatrosses: 1, eagles: 1 } })))
+      .toEqual({ kind: 'albatross', hole: null });
+    expect(calloutFor(item('eagle', { facts: { eagles: 1, birdies: 6 } })))
+      .toEqual({ kind: 'eagle', hole: null });
+    expect(calloutFor(item('birdies', { facts: { birdies: 5, clean_card: true } })))
+      .toEqual({ kind: 'birdies', count: 5 });
+    expect(calloutFor(item('clean', { facts: { clean_card: true } }))).toEqual({ kind: 'clean' });
   });
 
-  it('caps four consecutive newly eligible rounds to one hero', () => {
-    const rows = [
-      item('lead'),
-      item('eagle', { facts: { eagles: 1 } }),
-      item('birdies', { facts: { birdies: 5 } }),
-      item('clean', { facts: { clean_card: true } }),
-      item('eagle-2', { facts: { eagles: 1 } }),
-      item('eagle-3', { facts: { eagles: 1 } }),
+  it('marks nothing for a loss, a drop, a plain round or under par alone', () => {
+    expect(calloutFor(item('lost', { consequence: { kind: 'record_lost' }, facts: { is_course_record: true } }))).toBeNull();
+    expect(calloutFor(item('down', { consequence: { kind: 'rank_down', n: 4 } }))).toBeNull();
+    expect(calloutFor(item('plain'))).toBeNull();
+    expect(calloutFor(item('under', { facts: { to_par: -1 } }))).toBeNull();
+    expect(calloutFor(item('review', { kind: 'review', facts: { rating: 9 } }))).toBeNull();
+  });
+
+  it('gives a backlog round no record or rank callout, but keeps its feats', () => {
+    expect(calloutFor(item('bl', { lane: 'backlog', consequence: { kind: 'record_taken' } }))).toBeNull();
+    expect(calloutFor(item('bl2', { lane: 'backlog', consequence: { kind: 'rank_up', n: 2 } }))).toBeNull();
+    expect(calloutFor(item('bl3', { lane: 'backlog', facts: { eagles: 1 } })))
+      .toEqual({ kind: 'eagle', hole: null });
+  });
+
+  it('names a hole only when exactly one hole carries the feat', () => {
+    const holes = [
+      { holeNo: 4, par: 4, strokes: 2 },
+      { holeNo: 7, par: 3, strokes: 1 },
+      { holeNo: 12, par: 5, strokes: 5 },
     ];
-    expect([...cardTreatments(rows).values()]).toEqual([
-      'hero',
-      'standard',
-      'standard',
-      'standard',
-      'hero',
-      'standard',
-    ]);
-  });
-
-  it('keeps the lead heroic and demotes eligible cards until three standards intervene', () => {
-    const rows = [
-      item('lead'),
-      item('eligible-2', { facts: { to_par: -1 } }),
-      item('plain-3'),
-      item('plain-4'),
-      item('eligible-5', { facts: { holes_in_one: 1 } }),
-    ];
-    expect([...cardTreatments(rows).values()]).toEqual([
-      'hero',
-      'standard',
-      'standard',
-      'standard',
-      'hero',
-    ]);
-  });
-
-  it('never reorders or omits an item when the cap binds', () => {
-    const rows = [item('a'), item('b', { facts: { to_par: -2 } }), item('c')];
-    expect([...cardTreatments(rows).keys()]).toEqual(rows.map((row) => row.id));
+    expect(calloutFor(item('ace', { facts: { holes_in_one: 1 } }), holes))
+      .toEqual({ kind: 'ace', hole: 7 });
+    /* The 7th is an ace AND two under its par, so the eagle hole is ambiguous:
+       two candidates means NO subline rather than an invented one. */
+    expect(calloutFor(item('eagle', { facts: { eagles: 1 } }), holes))
+      .toEqual({ kind: 'eagle', hole: null });
+    expect(calloutFor(item('rank', { consequence: { kind: 'rank_up' } })))
+      .toEqual({ kind: 'rank_up', rank: null });
   });
 });
 
