@@ -1812,8 +1812,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             });
             sheetSession.current = null;
           }
+          /* §2.4 — BACK AND ESCAPE CLOSE. They never page, and the ring is left
+             on the round the member was reading so the feed is where they were. */
           setRingId(null);
           setSheetSeed(null);
+          setShift(null);
+          setPageIx(null);
+          pageIxRef.current = null;
+          setSwipeHintOn(false);
           opener.close();
         }}
         /* §2.4 — EVERY ACTION READS THE CURRENT PAGE. The score id, the
@@ -1832,6 +1838,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         onStatsSeen={() => {
           if (sheetSession.current) sheetSession.current.stats = true;
         }}
+        /* §2.2 — paging is live only while there IS a sequence to page. */
+        onHorizontalDrag={pageIx != null && roundSeq.length > 1 ? pageDrag : null}
+        pageShift={shift}
+        hint={swipeHintOn ? t('courses:scorecard.swipeHint', 'Swipe for the next round') : null}
       />
     </div>
   );
