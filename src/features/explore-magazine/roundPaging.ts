@@ -144,7 +144,14 @@ export function openCue(opts: {
   return opts.hasNext ? 'nudge' : null;
 }
 
-/** Tests only. */
+/**
+ * BRIEF_ROUND_SHEET_TALL §3 — A WAY BACK TO THE CUES, without devtools.
+ *
+ * Forgets that this device has ever opened or paged a round, so the peek line and
+ * the nudge are offered again on the next pageable open. Used by tests and by
+ * `?cues=reset` on Explore in every environment, production included: it touches
+ * nothing but one key in the viewer's own localStorage.
+ */
 export function resetHint(): void {
   try {
     localStorage.removeItem(HINT_KEY);
