@@ -101,7 +101,7 @@ describe('Explore card shapes', () => {
     expect(headline?.style.fontSize).toBe('22px');
     expect(headline?.style.lineHeight).toBe('1.12');
     expect(headline?.style.letterSpacing).toBe('-0.02em');
-    expect(headline?.style.webkitLineClamp).toBe('3');
+    expect(headline?.getAttribute('style')).toContain('-webkit-line-clamp: 3');
     expect(headline?.style.fontStyle).toBe('italic');
     expect(bottom?.style.height).toBe('16px');
     expect(chip?.style.top).toBe('8px');
@@ -135,7 +135,7 @@ describe('Explore card shapes', () => {
     const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
     expect(onPhoto?.style.minHeight).toBe('340px');
     expect(onPhoto?.style.height).toBe('');
-    expect(headline?.style.webkitLineClamp).toBe('3');
+    expect(headline?.getAttribute('style')).toContain('-webkit-line-clamp: 3');
   });
 
   it('uses the ruled on-photo colors and shadows for a review', () => {
