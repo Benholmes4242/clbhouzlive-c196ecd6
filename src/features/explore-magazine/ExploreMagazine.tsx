@@ -897,9 +897,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       }),
     [ranked, view, activeScope, shelves, singleType],
   );
-  /* §2 THE EARNED HERO IS RETIRED: cardTreatments(), its 1-in-4 cap and the lead
-     SIZE are gone. Shape is decided by kind inside the card and by nothing on
-     this page. */
+  /* §2 THE EARNED HERO IS RETIRED: cardTreatments() and its 1-in-4 positional
+     cap are gone. Reviews alone retain the lead SIZE because their copy sits on
+     the photograph; every other full-width card remains std. */
 
 
 
@@ -1891,9 +1891,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const item = block.item;
           const pos = cardPos;
           cardPos += 1;
-          /* §2 THE LEAD SIZE IS GONE. Position 0 is not special: every full-width
-             card is the std size and the KIND decides where its text sits. */
-          const size: CardSize = 'std';
+          /* REVIEW HEIGHT IS KIND-OWNED, NOT POSITION-EARNED. A review at any
+             full-width position uses the real lead preset; every other kind is
+             std. Reviews are excluded from pairs by buildBlocks(). */
+          const size: CardSize = item.kind === 'review' ? 'lead' : 'std';
           const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>
