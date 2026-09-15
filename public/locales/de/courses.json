@@ -1667,7 +1667,6 @@
         "aroundRegion": "Rund um {{region}}",
         "aroundWorld": "Rund um die Welt",
         "backlog": "Aus {{month}}",
-        "review": "Bewertung",
         "news": "News",
         "clip": "Clip",
         "watch": "Langes Video",
@@ -1759,6 +1758,18 @@
         "level": "Par",
         "under": "{{n}} unter Par",
         "over": "{{n}} über Par"
+      },
+      "callout": {
+        "record": "Platzrekord",
+        "rankUpTo": "Auf {{ord}} hier",
+        "rankUp": "Im Ranking aufgestiegen",
+        "ace": "Hole-in-one",
+        "albatross": "Albatros",
+        "eagle": "Eagle",
+        "birdies": "{{n}} Birdies",
+        "bogeyFree": "Bogeyfrei",
+        "bogeyFreeSub": "Par oder besser auf jedem Loch",
+        "onHole": "an Loch {{ord}}"
       }
     },
     "shelf": {

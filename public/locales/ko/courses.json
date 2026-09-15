@@ -1610,7 +1610,6 @@
         "aroundRegion": "{{region}} 주변",
         "aroundWorld": "전 세계",
         "backlog": "{{month}}",
-        "review": "리뷰",
         "news": "뉴스",
         "clip": "클립",
         "watch": "긴 영상",
@@ -1702,6 +1701,18 @@
         "level": "이븐파",
         "under": "{{n}}언더",
         "over": "{{n}}오버"
+      },
+      "callout": {
+        "record": "코스 레코드",
+        "rankUpTo": "이곳에서 {{ord}}위로 상승",
+        "rankUp": "순위 상승",
+        "ace": "홀인원",
+        "albatross": "알바트로스",
+        "eagle": "이글",
+        "birdies": "버디 {{n}}개",
+        "bogeyFree": "보기 없음",
+        "bogeyFreeSub": "모든 홀에서 파 이상",
+        "onHole": "{{ord}}번 홀에서"
       }
     },
     "shelf": {

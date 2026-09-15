@@ -1667,7 +1667,6 @@
         "aroundRegion": "Por {{region}}",
         "aroundWorld": "Por el mundo",
         "backlog": "De {{month}}",
-        "review": "Resena",
         "news": "Noticias",
         "clip": "Clip",
         "watch": "Video largo",
@@ -1759,6 +1758,18 @@
         "level": "par del campo",
         "under": "{{n}} bajo par",
         "over": "{{n}} sobre par"
+      },
+      "callout": {
+        "record": "Record del campo",
+        "rankUpTo": "Hasta {{ord}} aqui",
+        "rankUp": "Subio en la tabla",
+        "ace": "Hoyo en uno",
+        "albatross": "Albatros",
+        "eagle": "Eagle",
+        "birdies": "{{n}} birdies",
+        "bogeyFree": "Sin bogeys",
+        "bogeyFreeSub": "Par o mejor en cada hoyo",
+        "onHole": "en el {{ord}}"
       }
     },
     "shelf": {

@@ -136,7 +136,6 @@
         "aroundCountry": "Around {{country}}",
         "aroundWorld": "Around the world",
         "backlog": "From {{month}}",
-        "review": "Review",
         "news": "News",
         "clip": "Clip",
         "watch": "Longer watch",
@@ -226,6 +225,18 @@
         "level": "level par",
         "under": "{{n}} under",
         "over": "{{n}} over"
+      },
+      "callout": {
+        "record": "Course record",
+        "rankUpTo": "Up to {{ord}} here",
+        "rankUp": "Moved up the board",
+        "ace": "Hole in one",
+        "albatross": "Albatross",
+        "eagle": "Eagle",
+        "birdies": "{{n}} birdies",
+        "bogeyFree": "Bogey-free",
+        "bogeyFreeSub": "Par or better on every hole",
+        "onHole": "on the {{ord}}"
       }
     },
     "shelf": {
