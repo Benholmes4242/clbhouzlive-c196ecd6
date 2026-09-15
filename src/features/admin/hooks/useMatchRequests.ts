@@ -12,6 +12,9 @@ export interface MatchRequestRow {
   created_at: string;
   resolved_at: string | null;
   course_name: string | null;
+  /** Country of the clbhouz course being matched to - shown so a reviewer can
+   *  compare it with the WHS country before approving (Ben, Sep 2026). */
+  course_sub_country: string | null;
   requester_name: string | null;
   requester_username: string | null;
 }
