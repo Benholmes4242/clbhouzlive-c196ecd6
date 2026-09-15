@@ -1133,45 +1133,29 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       if (item.kind === 'round' && item.facts.score_id) {
         /* BRIEF_ROUND_SHEET §1.2/§1.3 — the card is seeded from what this page
            already read, the tapped card is ringed and scrolled clear of the
-           chip row, and the session's analytics clock starts here. */
-        const shape = item.facts.score_id ? shapesMap?.get(item.facts.score_id) ?? null : null;
-        const seedHoles = (shape?.holes ?? []).map((h) => ({
-          holeNo: h.holeNo, par: h.par, strokes: h.sheetStrokes,
-        }));
-        const seedGross = seedHoles.length > 0 && seedHoles.every((h) => h.strokes != null)
-          ? seedHoles.reduce((sum, h) => sum + (h.strokes ?? 0), 0)
-          : null;
-        const seedPar = seedHoles.every((h) => h.par != null)
-          ? seedHoles.reduce((sum, h) => sum + (h.par ?? 0), 0)
-          : null;
-        setSheetSeed(
-          seedHoles.length > 0 && item.subject?.course_name
-            ? {
-                scoreId: item.facts.score_id,
-                holes: seedHoles,
-                gross: seedGross,
-                toPar: seedGross != null && seedPar ? seedGross - seedPar : null,
-                courseName: item.subject.course_name,
-                placeLine: coursePlaceLine({
-                  region: item.subject.region,
-                  subCountry: item.subject.sub_country,
-                  country: item.subject.country ?? null,
-                }),
-                playerName: item.who?.display_name ?? null,
-                playerAvatarUrl: item.who?.photo_url ?? null,
-                playDate: item.facts.play_date ?? null,
-              }
-            : null,
-        );
-        setRingId(item.id);
-        revealCard(item.id);
+           chip row, and the session's analytics clock starts here.
+           §2.1 — the tap also fixes the member's PLACE IN THE SEQUENCE. A round
+           that somehow is not in the ranked list still opens, on its own. */
+        const ix = roundSeq.findIndex((r) => r.id === item.id);
+        const seed = seedFor(item);
         sheetSession.current = { at: Date.now(), maxDetent: 'mid', rounds: 1, stats: false };
         analyticsEvents.track('round_sheet_open', {
           score_id: item.facts.score_id,
           view,
-          seeded: seedHoles.length > 0,
+          seeded: seed != null,
         });
-        opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
+        setShift(null);
+        setSwipeHintOn(roundSeq.length > 1 && noteHintOpen());
+        if (ix >= 0) {
+          showRound(item, ix);
+        } else {
+          setPageIx(null);
+          pageIxRef.current = null;
+          setSheetSeed(seed);
+          setRingId(item.id);
+          revealCard(item.id);
+          opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
+        }
         return;
       }
       if (item.kind === 'review' && item.payload.review) {
