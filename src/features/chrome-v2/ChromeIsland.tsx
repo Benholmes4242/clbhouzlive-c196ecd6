@@ -38,7 +38,9 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
+import { useHandicapHistory } from '@/lib/whs/hooks';
+import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
+
 import { safeGoBack } from '@/utils/navigation';
 import { r } from '@/lib/radius';
 import { subscribeIslandEdge, getIslandEdgeScrolled } from './islandEdge';
