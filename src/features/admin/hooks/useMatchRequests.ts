@@ -39,15 +39,17 @@ export async function fetchMatchRequests(status: MatchRequestStatus): Promise<Ma
 
   const [coursesRes, profilesRes] = await Promise.all([
     courseIds.length
-      ? supabase.from('golf_courses').select('id, name').in('id', courseIds)
+      ? supabase.from('golf_courses').select('id, name, sub_country').in('id', courseIds)
       : Promise.resolve({ data: [] as any[], error: null }),
     userIds.length
       ? supabase.from('user_profiles').select('id, display_name, username').in('id', userIds)
       : Promise.resolve({ data: [] as any[], error: null }),
   ]);
 
-  const courseMap = new Map<string, { name: string | null }>();
-  ((coursesRes.data ?? []) as any[]).forEach((c) => courseMap.set(c.id, { name: c.name ?? null }));
+  const courseMap = new Map<string, { name: string | null; sub_country: string | null }>();
+  ((coursesRes.data ?? []) as any[]).forEach((c) =>
+    courseMap.set(c.id, { name: c.name ?? null, sub_country: c.sub_country ?? null }),
+  );
   const profileMap = new Map<string, { display_name: string | null; username: string | null }>();
   ((profilesRes.data ?? []) as any[]).forEach((p) =>
     profileMap.set(p.id, { display_name: p.display_name ?? null, username: p.username ?? null }),
