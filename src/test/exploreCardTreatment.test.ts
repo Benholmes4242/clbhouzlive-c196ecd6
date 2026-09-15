@@ -32,6 +32,9 @@ describe('earned Explore card treatment', () => {
     ['ace', item('a', { facts: { holes_in_one: 1 } })],
     ['albatross', item('a', { facts: { albatrosses: 1 } })],
     ['under par', item('a', { facts: { to_par: -1 } })],
+    ['eagle', item('a', { facts: { eagles: 1 } })],
+    ['five birdies', item('a', { facts: { birdies: 5 } })],
+    ['clean card', item('a', { facts: { clean_card: true } })],
   ])('admits %s', (_label, candidate) => {
     expect(earnsHeroTreatment(candidate)).toBe(true);
   });
@@ -39,6 +42,29 @@ describe('earned Explore card treatment', () => {
   it('rejects ordinary rounds and consequences outside the ruling', () => {
     expect(earnsHeroTreatment(item('plain'))).toBe(false);
     expect(earnsHeroTreatment(item('down', { consequence: { kind: 'rank_down' } }))).toBe(false);
+    expect(earnsHeroTreatment(item('four', { facts: { birdies: 4 } }))).toBe(false);
+    expect(earnsHeroTreatment(item('unknown', { facts: { clean_card: null } }))).toBe(false);
+    expect(earnsHeroTreatment(item('dirty', { facts: { clean_card: false } }))).toBe(false);
+    expect(earnsHeroTreatment(item('noeagle', { facts: { eagles: 0 } }))).toBe(false);
+  });
+
+  it('caps four consecutive newly eligible rounds to one hero', () => {
+    const rows = [
+      item('lead'),
+      item('eagle', { facts: { eagles: 1 } }),
+      item('birdies', { facts: { birdies: 5 } }),
+      item('clean', { facts: { clean_card: true } }),
+      item('eagle-2', { facts: { eagles: 1 } }),
+      item('eagle-3', { facts: { eagles: 1 } }),
+    ];
+    expect([...cardTreatments(rows).values()]).toEqual([
+      'hero',
+      'standard',
+      'standard',
+      'standard',
+      'hero',
+      'standard',
+    ]);
   });
 
   it('keeps the lead heroic and demotes eligible cards until three standards intervene', () => {
