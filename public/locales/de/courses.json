@@ -1742,6 +1742,8 @@
         }
       },
       "ratingCount": "{{count}} Bewertungen",
+      "ratingCount_one": "{{count}} Bewertung",
+      "ratingCount_other": "{{count}} Bewertungen",
       "empty": {
         "courses": "Noch keine Platze in {{scope}}.",
         "reviews": "Noch keine Bewertungen in {{scope}}."

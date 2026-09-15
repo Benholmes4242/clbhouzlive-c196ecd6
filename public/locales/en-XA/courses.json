@@ -2326,6 +2326,8 @@
         }
       },
       "ratingCount": "[{{count}} rãtïñgs]",
+      "ratingCount_one": "[~~{{count}} řáţíñĝ~~]",
+      "ratingCount_other": "[~~{{count}} řáţíñĝš~~]",
       "empty": {
         "courses": "[No courses in {{scope}} yet.]",
         "reviews": "[No reviews in {{scope}} yet.]"

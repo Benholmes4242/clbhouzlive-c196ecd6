@@ -225,8 +225,10 @@ function WhoLine({
 }) {
   const { t } = useTranslation('courses');
   const who = item.who;
-  const nameColor = who?.is_viewer ? A.AMBER : onPhoto ? '#FFFFFF' : A.MUTE;
-  const subColor = onPhoto ? 'rgba(255,255,255,0.85)' : A.DIM;
+  /* THE THREE TEXT SLOTS SHARE ONE PALETTE whether they sit on the photograph
+     or the canvas. Only the photograph adds a shadow. */
+  const nameColor = who?.is_viewer ? A.AMBER : '#FFFFFF';
+  const subColor = 'rgba(255,255,255,0.85)';
 
   const name = who?.is_viewer
     ? t('amateur.stream.you', 'You')
@@ -370,6 +372,7 @@ export function ExploreCard({
   });
   const chips = chipsFor(item, t as never);
   const onPhoto = cardTreatment === 'hero' && size !== 'pair';
+  const isOwnRound = item.kind === 'round' && item.who?.is_viewer === true;
 
   /* ONE VISUAL: THE TREND LINE, with gold / red dots on the good holes. The
      ticks row and the distribution bar are retired — see roundTreatment.ts. */
@@ -381,13 +384,14 @@ export function ExploreCard({
 
   const kicker = (
     <div
+      data-explore-kicker="true"
       style={{
         fontFamily: SANS,
         fontSize: 9,
         fontWeight: 700,
         letterSpacing: '0.19em',
         textTransform: 'uppercase',
-         color: onPhoto ? '#FFFFFF' : A.DIM,
+         color: '#FFFFFF',
          textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
         display: 'flex',
         gap: 5,
@@ -398,7 +402,16 @@ export function ExploreCard({
       }}
     >
       {parts.map((part, index) => (
-        <span key={`${index}:${part}`} style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <span
+          key={`${index}:${part}`}
+          data-explore-kicker-part={index === 0 ? 'primary' : undefined}
+          style={{
+            minWidth: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            color: isOwnRound && index === 0 ? A.AMBER : undefined,
+          }}
+        >
           {index > 0 ? <span style={{ marginRight: 5 }}>{'\u00B7'}</span> : null}
           {part}
         </span>

@@ -1681,6 +1681,8 @@
         }
       },
       "ratingCount": "평가 {{count}}건",
+      "ratingCount_one": "평가 {{count}}건",
+      "ratingCount_other": "평가 {{count}}건",
       "empty": {
         "courses": "No courses in {{scope}} yet.",
         "reviews": "No reviews in {{scope}} yet."

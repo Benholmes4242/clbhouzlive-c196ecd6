@@ -1678,6 +1678,8 @@
         }
       },
       "ratingCount": "{{count}}件の評価",
+      "ratingCount_one": "{{count}}件の評価",
+      "ratingCount_other": "{{count}}件の評価",
       "empty": {
         "courses": "No courses in {{scope}} yet.",
         "reviews": "No reviews in {{scope}} yet."

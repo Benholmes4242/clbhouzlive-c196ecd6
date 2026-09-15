@@ -90,6 +90,8 @@
       },
       "scopes": "Scores scope",
       "roundCount": "{{count}} rounds",
+      "ratingCount_one": "{{count}} rating",
+      "ratingCount_other": "{{count}} ratings",
       "connect": {
         "body": "Connect a handicap and every round you play lands here, ranked against everyone who has played the same course.",
         "action": "Connect a handicap >"
