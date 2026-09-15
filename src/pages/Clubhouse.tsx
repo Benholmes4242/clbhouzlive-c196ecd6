@@ -259,16 +259,13 @@ const ClubhouseContent = () => {
   const derivedShape = useMemo<SkeletonShape | null>(() => {
     const first = posts[0];
     if (!first) return null;
-    if (postScoreIdMap.has(first.id)) {
-      return { variant: 'round' };
-    }
     const m = first.mediaItems?.[0];
     return {
       variant: first.isReview ? 'review' : 'regular',
       mediaRatio: ratioFromDimensions(m?.width, m?.height) ?? COLD_START_SHAPE.mediaRatio,
       isVideo: m?.type === 'video',
     };
-  }, [posts, postScoreIdMap]);
+  }, [posts]);
 
   useEffect(() => {
     if (derivedShape) writeSkeletonShapeHint(derivedShape);
