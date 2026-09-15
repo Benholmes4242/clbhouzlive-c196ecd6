@@ -24,7 +24,7 @@ const t = ((key: string, values?: Record<string, unknown>) => {
   if (typeof resolved !== 'string') return key;
   let value = resolved;
   for (const [name, replacement] of Object.entries(values ?? {})) {
-    value = value.replaceAll(`{{${name}}}`, String(replacement));
+    value = value.split(`{{${name}}}`).join(String(replacement));
   }
   return value;
 }) as any;
