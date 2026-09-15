@@ -80,3 +80,33 @@ describe('page scroller resolution', () => {
     expect(getPageScrollTop()).toBe(812);
   });
 });
+
+/**
+ * ShellSlot's "scrolled past 4px" shadow read window.scrollY and listened on
+ * window, so it never appeared. It listens on the page scroller now.
+ */
+describe('ShellSlot shadow follows the page scroller', () => {
+  beforeEach(() => __resetScrollerCache());
+  afterEach(() => {
+    document.body.innerHTML = '';
+    __resetScrollerCache();
+  });
+
+  it('turns the shadow on when #root scrolls past 4px', async () => {
+    const { render, act } = await import('@testing-library/react');
+    const React = (await import('react')).default;
+    const { ShellSlot } = await import('@/components/header/ShellSlot');
+
+    const root = mountRoot('auto');
+    render(React.createElement(ShellSlot, { dark: true }, 'tabs'), { container: root });
+
+    const band = root.querySelector('[data-chrome="shell-slot"]') as HTMLElement;
+    expect(band.style.boxShadow).toBe('none');
+
+    Object.defineProperty(root, 'scrollTop', { value: 120, configurable: true });
+    await act(async () => {
+      root.dispatchEvent(new Event('scroll'));
+    });
+    expect(band.style.boxShadow).not.toBe('none');
+  });
+});
