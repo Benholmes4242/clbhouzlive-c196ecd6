@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { headlineFor, kickerParts } from '@/features/explore-magazine/exploreCopy';
+import { indefiniteArticleForScore } from '@/features/explore-magazine/ordinal';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
 const translate = (_key: string, fallback = '', vars: Record<string, unknown> = {}) =>
@@ -45,11 +46,11 @@ describe('Explore round headline ownership', () => {
   });
 
   it('speaks the to-par and keeps the course out of the sentence', () => {
-    expect(headlineFor(round({}), translate)).toBe('henryd3737 went round in 68, four under.');
+    expect(headlineFor(round({}), translate)).toBe('henryd3737 shot a 68, four under par.');
     expect(headlineFor(round({ facts: { gross: 70, birdies: 6 } }), translate)).toBe(
       'Six birdies in a round of 70.',
     );
-    expect(headlineFor(round({ facts: { gross: 86 } }), translate)).toBe('henryd3737 went round in 86.');
+    expect(headlineFor(round({ facts: { gross: 86 } }), translate)).toBe('henryd3737 shot an 86.');
   });
 
   /* BRIEF_EXPLORE_SECOND_PASS §4. A word-start headline is capitalised, a
@@ -57,16 +58,16 @@ describe('Explore round headline ownership', () => {
      carries the spoken to-par where the round has one. */
   it('capitalises a word-start feat headline and carries the to-par', () => {
     expect(headlineFor(round({ facts: { gross: 68, to_par: -3, birdies: 6 } }), translate)).toBe(
-      'Six birdies in a round of 68, three under.',
+      'Six birdies in a round of 68, three under par.',
     );
     expect(headlineFor(round({ facts: { gross: 71, to_par: 2, eagles: 1 } }), translate)).toBe(
-      'An eagle, in a round of 71, two over.',
+      'An eagle, in a round of 71, two over par.',
     );
     expect(headlineFor(round({ facts: { gross: 72, to_par: 0, albatrosses: 1 } }), translate)).toBe(
       'An albatross, in a round of 72, level par.',
     );
     expect(headlineFor(round({ facts: { gross: 74, to_par: 3, holes_in_one: 1 } }), translate)).toBe(
-      'A hole in one, in a round of 74, three over.',
+      'A hole in one, in a round of 74, three over par.',
     );
   });
 
@@ -75,7 +76,7 @@ describe('Explore round headline ownership', () => {
       who: { user_id: 'member', display_name: 'danny.akers1', photo_url: null, is_viewer: false },
       facts: { gross: 104 },
     });
-    expect(headlineFor(item, translate)).toBe('danny.akers1 went round in 104.');
+    expect(headlineFor(item, translate)).toBe('danny.akers1 shot a 104.');
   });
 
 
@@ -94,7 +95,7 @@ describe('Explore round headline ownership', () => {
       who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true },
       consequence: { kind: 'played_nochange', n: 7, of: 41 },
     });
-    expect(headlineFor(item, translate, 'en-GB')).toBe('You went round in 68.');
+    expect(headlineFor(item, translate, 'en-GB')).toBe('You shot a 68.');
     expect(headlineFor(item, translate, 'en-GB')).not.toContain('still');
   });
 
@@ -151,5 +152,63 @@ describe('Explore round kicker ownership', () => {
     ['backlog', { ring: null, lane: 'backlog' as const }, 'From September'],
   ])('keeps the %s reason before the course', (_label, overrides, expected) => {
     expect(kickerParts(round(overrides as Partial<StreamItem>), translate)[0]).toBe(expected);
+  });
+});
+/* BRIEF_ROUND_HEADLINES §1. The article follows the SPOKEN score. */
+describe('the indefinite article for a score', () => {
+  it.each([
+    [8, 'an'],
+    [11, 'an'],
+    [18, 'an'],
+    [68, 'a'],
+    [71, 'a'],
+    [75, 'a'],
+    [79, 'a'],
+    [80, 'an'],
+    [83, 'an'],
+    [89, 'an'],
+    [90, 'a'],
+    [91, 'a'],
+    [100, 'a'],
+    [108, 'a'],
+  ])('gives %i the article "%s"', (score, expected) => {
+    expect(indefiniteArticleForScore(score as number)).toBe(expected);
+  });
+});
+
+describe('golf language in the round headline', () => {
+  it('speaks over, under and level par', () => {
+    expect(headlineFor(round({ facts: { gross: 75, to_par: 1 } }), translate)).toBe(
+      'henryd3737 shot a 75, one over par.',
+    );
+    expect(headlineFor(round({ facts: { gross: 69, to_par: -2 } }), translate)).toBe(
+      'henryd3737 shot a 69, two under par.',
+    );
+    expect(headlineFor(round({ facts: { gross: 71, to_par: 0 } }), translate)).toBe(
+      'henryd3737 shot a 71, level par.',
+    );
+    expect(headlineFor(round({ facts: { gross: 83, to_par: 13 } }), translate)).toBe(
+      'henryd3737 shot an 83, thirteen over par.',
+    );
+  });
+
+  it('says "You shot" for the viewer and keeps a username lowercase', () => {
+    const own = round({
+      who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true },
+      facts: { gross: 75, to_par: 1 },
+    });
+    expect(headlineFor(own, translate)).toBe('You shot a 75, one over par.');
+    expect(headlineFor(round({ facts: { gross: 71, to_par: 0 } }), translate)).toMatch(/^henryd3737 /);
+  });
+
+  it('uses the shot headline when a callout renders', () => {
+    const item = round({
+      consequence: { kind: 'record_taken' },
+      facts: { gross: 69, to_par: -2 },
+      who: { user_id: 'member', display_name: 'Danny Robinson', photo_url: null, is_viewer: false },
+    });
+    expect(headlineFor(item, translate, 'en', { plainRound: true })).toBe(
+      'Danny Robinson shot a 69, two under par.',
+    );
   });
 });
