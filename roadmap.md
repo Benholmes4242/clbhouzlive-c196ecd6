@@ -17,7 +17,7 @@
 - [ ] UNAPPLIED, Ben's to run: `docs/sql/explore_courses_merged_search.sql` (server search path plus the one-pool merge for `get_explore_stream`).
 - [x] Mirror the shared post footer: actions left, actor right, and both text lines flush left without extra glyphs.
 - [x] Match Your circle captions to the weekly club rail height while retaining fixed name and HCP rows.
-- [ ] Keep Your circle on Scores only, retain standing later in rotation, and remove every visible baseline label while preserving the dashed rule.
+- [x] Keep Your circle on Scores only, retain standing later in rotation, and remove every visible baseline label while preserving the dashed rule.
 - [x] Rebuild the member scorecard sheet with owner-aware copy, canonical course identity, flat sections, and footer actions.
 ## Tour overview magazine rebuild
 - [x] Map current overview data, destinations, and shared Explore grammar
