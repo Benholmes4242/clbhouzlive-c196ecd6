@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreShelf } from './ExploreShelf';
-import { ShelfShell } from './ExploreShells';
+import { ShelfRetry, ShelfShell } from './ExploreShells';
 import { railCaptionDate, relativeDay, toParLabel } from './exploreCopy';
 import { circleHandicapDisplay } from './circleHandicap';
 
@@ -170,7 +170,7 @@ export function CircleShelf({
     return (
       <ShelfRetry
         heading={t('amateur.stream.shelf.circle', 'Your circle')}
-        label={t('amateur.stream.shelf.unreadable', 'This could not be loaded.')}
+        label={t('courseDetail.yourRoundsSheet.error', 'Your rounds could not be loaded.')}
         action={t('amateur.stream.standing.retry', 'Try again')}
         onRetry={() => circle.refetch()}
       />
