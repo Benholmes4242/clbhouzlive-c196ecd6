@@ -59,14 +59,6 @@
       "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.",
       "thisCourse": "this course"
     },
-    "scoringKey": {
-      "ace": "Hole-in-One geschlagen.",
-      "albatross": "Einen Albatros gespielt.",
-      "eagle": "Eagle",
-      "birdie": "Birdie",
-      "bogey": "Bogey",
-      "doublePlus": "Dbl+"
-    },
     "yourNemesisTitle": "Your nemesis",
     "yourScoringHoleTitle": "Your scoring hole",
     "youPlayItTo": "You play it to {{playsTo}}",
@@ -189,7 +181,7 @@
     "roundBack": "Zurueck",
     "roundN": "Runde {{n}}",
     "roundShort": "R{{n}}",
-    "roundSignInBody": "Eine Scorekarte ist nur fuer angemeldete Mitglieder sichtbar.",
+    "roundSignInBody": "Eine Scorekarte ist nur für angemeldete Mitglieder sichtbar.",
     "roundSignInCta": "Anmelden",
     "roundSignInTitle": "Melde dich an, um diese Runde zu sehen",
     "scoreRow": "Score",
@@ -227,7 +219,7 @@
     "noFieldLine_other": "Nur {{count}} weitere Golfer haben hier gespielt, daher gibt es noch kein Feld zum Vergleich.",
     "noFieldNobody": "Noch hat niemand anderes hier gespielt, daher gibt es kein Feld zum Vergleich.",
     "fieldShort": "Feld",
-    "swipeHint": "Wischen fuer die naechste Runde"
+    "swipeHint": "Wischen für die nächste Runde"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
@@ -605,7 +597,7 @@
       },
       "draftRestored": {
         "title": "Nicht gespeicherte Aenderungen wiederhergestellt",
-        "body": "Du hast diese Bearbeitung unvollendet verlassen, also haben wir sie zurueckgeholt. Was du siehst, ist noch nicht veroeffentlicht.",
+        "body": "Du hast diese Bearbeitung unvollendet verlassen, also haben wir sie zurückgeholt. Was du siehst, ist noch nicht veroeffentlicht.",
         "discard": "Verwerfen und veroeffentlichte Version nutzen",
         "mediaLost": "Fotos und Videos konnten nicht behalten werden: {{subject}} waren angehaengt und muessen erneut hinzugefuegt werden.",
         "mediaPhoto": "1 Foto",
@@ -1693,9 +1685,9 @@
         "round": "{{player}} spielte eine Runde in {{gross}}.",
         "played": "Gespielt.",
         "recordLost": "{{player}} holte deinen Platzrekord mit {{gross}}.",
-        "recordLostGap": "Deinen Platzrekord mit {{gross}} uebernommen. Deine Bestleistung liegt {{delta}} dahinter.",
+        "recordLostGap": "Deinen Platzrekord mit {{gross}} übernommen. Deine Bestleistung liegt {{delta}} dahinter.",
         "rankDown": "{{player}} spielte eine Runde in {{gross}}. Du stehst hier jetzt auf {{ord}} von {{of}}.",
-        "rankDownBy": "Runde in {{gross}} und dich {{delta}} Plaetze zurueck auf {{n}} von {{of}} geschoben.",
+        "rankDownBy": "Runde in {{gross}} und dich {{delta}} Plaetze zurück auf {{n}} von {{of}} geschoben.",
         "rankUp": "Deine {{gross}} ist die {{ord}}-beste hier gespielte Runde.",
         "rankUpBy": "Deine {{gross}} ist die {{ord}}-beste hier gespielte Runde, {{n}} Plaetze nach vorn.",
         "rankHold": "Deine {{gross}} ist weiterhin die {{ord}}-beste Runde, die hier jemand gespielt hat.",
@@ -1720,7 +1712,7 @@
         "birdieHaulToPar": "{{count}} Birdies in einer Runde von {{gross}}, {{topar}}.",
         "listFirst": "{{player}} spielte eine Runde in {{gross}} - die niedrigste, die hier jemand gespielt hat.",
         "rankDownMoved": "{{player}} spielte eine Runde in {{gross}}. Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plaetze tiefer.",
-        "rankUpOthers": "Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plaetze hoeher.",
+        "rankUpOthers": "Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plaetze höher.",
         "rankUpOthersPlain": "Du stehst hier jetzt auf {{ord}} von {{of}}."
       },
       "standing": {
@@ -1765,7 +1757,7 @@
       "topar": {
         "level": "Par",
         "under": "{{n}} unter Par",
-        "over": "{{n}} ueber Par"
+        "over": "{{n}} über Par"
       }
     },
     "shelf": {
@@ -1812,7 +1804,7 @@
     "watch": {
       "searchPlaceholder": "Videos, Clips und Creator suchen",
       "filters": "Watch-Filter",
-      "noResults": "Keine Treffer fuer {{query}}.",
+      "noResults": "Keine Treffer für {{query}}.",
       "empty": "Hier gibt es noch nichts zu sehen.",
       "untitled": "Video ohne Titel",
       "chip": {
@@ -1835,7 +1827,7 @@
       "noMatch": "Nichts passt zu {{query}}.",
       "noPlaceMatch": "Nichts passt zu {{query}}.",
       "anywhere": "Ueberall",
-      "choosePlace": "Ort waehlen",
+      "choosePlace": "Ort wählen",
       "clearPlace": "Ortsfilter loeschen",
       "placeTitle": "Nach Ort suchen",
       "findPlace": "Land oder Region finden"

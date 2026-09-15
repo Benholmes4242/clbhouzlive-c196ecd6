@@ -1796,14 +1796,6 @@
       "vsLevel": "Level with the field",
       "vsWorse": "Worse than the field here"
     },
-    "scoringKey": {
-      "ace": "Ace",
-      "albatross": "Albatross",
-      "birdie": "Birdie",
-      "bogey": "Bogey",
-      "doublePlus": "Dbl+",
-      "eagle": "Eagle"
-    },
     "shapeOfCourse": "The shape of the course",
     "sortAriaLabel": "Sort holes",
     "sortByDifficulty": "By difficulty",

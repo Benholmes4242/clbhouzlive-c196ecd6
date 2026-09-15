@@ -1,13 +1,10 @@
 import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RefreshCw, Table } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { TrajectoryLine } from './TrajectoryLine';
-import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
 import {
   honoursGround,
@@ -18,74 +15,27 @@ import {
   type HonoursFeat,
 } from './honoursTreatment';
 
-import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
-import {
-  TREND_UP, TREND_DOWN,
-  TOPAR_EVEN_DARK,
-} from '@/features/tourhub/_shared/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
-  A, SANS, FIGS, NUM, KICKER, Panel, StatRow, Action, Hairline,
+  A, SANS, FIGS, Panel, Action,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/type';
-
 /**
- * Canonical scale (src/lib/tokens/type.ts) is colourless by design; this sheet
- * keeps its own palette, so ink is re-attached here and nowhere else.
+ * BRIEF_ROUND_SHEET_PEEK §1 — THE SHARED PARTS.
+ * The type roles, the to-par colouring, the card rows, the nines, the empty
+ * middles and the fixed summary now live in ./scorecardParts, imported by this
+ * sheet AND by the neighbour preview drawn during a swipe. The derivations and
+ * the values are the ones that were here; nothing about them moved.
  */
-const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.MUTE };
-const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
-/*
- * BRIEF_ROUND_SHEET_SPLIT §3.4 — SECTION TITLES ARE CAPS-TRACKED LABELS.
- * The sentence-case SECTION_TITLE role is gone: each panel passes `kicker`, the
- * app's caps-tracked panel label, so these sections read like every other
- * section in the app rather than like headings unique to this sheet.
- */
+import {
+  CAPTION, EVEN_GRAY, LABEL, LABEL_READ, RAIL_FIG,
+  NohbhMiddle, Nine, NotPlayedLine, RoundSummaryHead, ScorecardSection,
+  SkeletonMiddle, SyncingMiddle, UnavailableMiddle,
+  fmtRel, nineSummary, toParColor,
+} from './scorecardParts';
 
-/**
- * MICRO_BRIEF_SHEETS_TYPE_SCALE — TWO LOCAL LABEL ROLES.
- *
- * AXIS (10px) is the ONE STATED EXCEPTION to the app's 11px floor: a scorecard
- * axis label (HOLE / PAR / YOU row stubs) is a COORDINATE, not something read.
- * Lifting it to 11 would double the grid's weight beside 18 numerals.
- *
- * READ (11px) is for anything a member actually reads: the scoring-key title
- * and its entries, the TOTAL / OUT n / IN n / PAR n figures, the hcp chip.
- *
- * Size only — no tone moves. The quiet hole numbers stay quiet.
- */
-const LABEL_AXIS: React.CSSProperties = { ...LABEL, fontSize: 10 };
-const LABEL_READ: React.CSSProperties = { ...LABEL, fontSize: 11 };
-
-const CAPTION: React.CSSProperties = { fontSize: 12.5, lineHeight: 1.5, color: A.MUTE, margin: 0 };
-/**
- * BRIEF_ROUND_SHEET_SPLIT §2 — THE THREE SENTENCES BECAME THREE FIGURES.
- * The prose SENTENCE role is gone: nothing in this sheet names the member in a
- * sentence any more. The figure rail below the summary carries the same facts
- * as figure-over-label pairs, and every derivation behind them is unchanged.
- */
-const RAIL_FIG: React.CSSProperties = { ...NUM, fontSize: 15, lineHeight: 1.05 };
-const STAT_RAIL_ITEM_GAP = 20;
-
-
-/*
- * The chart legend keys and FIELD_LINE_SWATCH are GONE
- * (BRIEF_SCORECARD_TRAJECTORY_WHOOP §8): the field line is no longer drawn and
- * the round stroke is graded per hole, so neither key had anything to name.
- */
-
-
-/**
- * A PLAYER'S SCORE AGAINST PAR — under par is RED (good in golf), over par is
- * INK, even par is muted. One source of truth with the tour surfaces
- * (`tourhub/_shared/scoreColor`), so a member card and a tour card colour the
- * same score identically. Course DIFFICULTY (red harder / green easier) is a
- * different semantic surface and does not appear on a scorecard.
- */
-const EVEN_GRAY = TOPAR_EVEN_DARK;
 
 export interface CardScorecardHole {
   holeNo: number;
@@ -230,6 +180,13 @@ export interface CardScorecardSheetProps {
    * the host decides whether it has been earned and when it retires.
    */
   hint?: string | null;
+  /**
+   * BRIEF_ROUND_SHEET_PEEK §1 — THE NEIGHBOUR, DRAWN BESIDE THIS PAGE.
+   * `side` says which edge it sits on: 'next' to the right (a leftward drag
+   * brings it in), 'prev' to the left. It moves with the same `pageShift.dx` as
+   * the content, so the two travel together. Absent for every other consumer.
+   */
+  pagePreview?: { node: React.ReactNode; side: 'next' | 'prev' } | null;
 }
 
 
@@ -243,31 +200,7 @@ export interface CardScorecardEngagement {
   comment?: { count: number; label: string; onOpen: () => void } | null;
 }
 
-const ScorecardSection: React.FC<{
-  kicker: string;
-  flat: boolean;
-  children: React.ReactNode;
-}> = ({ kicker, flat, children }) => {
-  if (!flat) return <Panel kicker={kicker}>{children}</Panel>;
-  return (
-    <section style={{ padding: '8px 2px 12px' }}>
-      <div style={{ ...KICKER, color: A.MUTE, marginBottom: 14 }}>{kicker}</div>
-      {children}
-    </section>
-  );
-};
-
-/** Integer to-par: rounds first, then branches. Never `-0`. */
-function fmtRel(n: number | null): string {
-  if (n == null) return '\u2014';
-  const r = Math.round(n);
-  return r === 0 ? 'E' : r < 0 ? `\u2212${Math.abs(r)}` : `+${r}`;
-}
-
-function toParColor(n: number | null): string {
-  if (n == null || Math.round(n) === 0) return EVEN_GRAY;
-  return getScoreColor(Math.round(n), 'dark');
-}
+/* `ScorecardSection`, `fmtRel` and `toParColor` moved to scorecardParts. */
 
 /* --------------------------------------------------------------- the card */
 
@@ -287,68 +220,8 @@ function toParColor(n: number | null): string {
  * and loses them here too, because a tour card without them beside a member card
  * with them would be two grammars for the same object.
  */
-const NINE_GRID = 'repeat(9, minmax(0, 1fr)) 32px';
-
-/**
- * Result marks come from the shared ScoreMark renderer — one grammar across the
- * sheet, the feed card and the Holes legend. Par is unmarked on purpose:
- * marking every hole marks nothing.
- */
-
-
-/**
- * BRIEF_ROUND_SHEET §1.4 — THE STROKES ROW IS THE LOUDEST ROW.
- *
- * The card's subject is what the player shot, so that row's total is white and
- * bold at 15px, and the par row steps back to a quiet 11px at 42% ink. The hole
- * numbers keep their existing quiet treatment and the ScoreMark shapes and
- * colours are untouched — only the type weight of the two figure rows moves.
- */
-const PAR_QUIET = 'rgba(248,250,252,0.42)';
-
-const CardRow: React.FC<{
-  cells: React.ReactNode[];
-  total: React.ReactNode;
-  muted?: boolean;
-  tone?: string;
-  /** 'par' = quiet row, 'strokes' = loud row, undefined = as before. */
-  emphasis?: 'par' | 'strokes';
-}> = ({ cells, total, muted, tone, emphasis }) => (
-  /* CONTAINMENT, INDEPENDENT OF THE LABELS: every cell is minWidth 0 and clips
-     its own box, so whatever ends up in a cell — a long field figure, a
-     translated string, a future two-character mark — cannot paint over the
-     column beside it. */
-  <div
-    style={{
-      display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2,
-      padding: '3px 0', minWidth: 0, overflow: 'hidden',
-    }}
-  >
-    {cells.map((c, i) => (
-      <span key={i} style={{ textAlign: 'center', minWidth: 0, overflow: 'hidden' }}>
-        {typeof c === 'object' ? c : (
-          <span style={{
-            ...NUM,
-            fontSize: emphasis === 'par' ? 11 : 12,
-            fontWeight: emphasis === 'par' ? 500 : (muted ? 500 : 700),
-            color: emphasis === 'par' ? PAR_QUIET : (tone ?? (muted ? A.MUTE : A.INK)),
-          }}>
-            {c}
-          </span>
-        )}
-      </span>
-    ))}
-    <span style={{
-      ...NUM,
-      fontSize: emphasis === 'par' ? 11 : emphasis === 'strokes' ? 15 : 13,
-      fontWeight: emphasis === 'strokes' ? 800 : undefined,
-      color: emphasis === 'par' ? PAR_QUIET : A.INK,
-      textAlign: 'center', minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap',
-    }}>
-      {total}
-    </span>
-  </div>
-);
+/* The nine-column grid, the quiet par tone and `CardRow` live in
+   scorecardParts now — see the note above, which still governs them. */
 
 /**
  * ONE SOURCE FOR THE NINE FIGURES. The totals row now SHOWS its working
@@ -370,54 +243,11 @@ const CardRow: React.FC<{
  *    are compared against a par that covers the same holes (30 against 31 at
  *    eight holes, never 30 against 35).
  */
-function nineSummary(rows: CardScorecardHole[]): {
-  par: number;
-  strokes: number;
-  playedCount: number;
-  parPlayed: number;
-} {
-  const scored = rows.filter((h) => h.strokes != null && h.strokes > 0);
-  return {
-    par: rows.reduce((s, h) => s + (h.par ?? 0), 0),
-    strokes: scored.reduce((s, h) => s + (h.strokes as number), 0),
-    playedCount: scored.length,
-    parPlayed: scored.reduce((s, h) => s + (h.par ?? 0), 0),
-  };
-}
+/* `nineSummary` moved to scorecardParts, unchanged. */
 
 
-const Nine: React.FC<{
-  rows: CardScorecardHole[];
-  label: string;
-}> = ({ rows, label }) => {
-  const { par, strokes, playedCount, parPlayed } = nineSummary(rows);
-  /**
-   * S1.2 / S1.3 — the nine's two totals.
-   *  - No hole played: BOTH totals are absent (empty, not 0, not a dash).
-   *    A completed nine and a genuine nine-hole round are unaffected.
-   *  - Part played: par covers the holes played, so the strokes beside it mean
-   *    something. Fully played: the nine's par, exactly as before.
-   */
-  const started = playedCount > 0;
-  const partial = started && playedCount < rows.length;
-  const parTotal = !started ? '' : partial ? parPlayed : (par || '\u2014');
-  const strokesTotal = started ? strokes : '';
-
-  return (
-    <div>
-      <CardRow cells={rows.map((h) => h.holeNo)} total={label} muted />
-      <CardRow cells={rows.map((h) => h.par ?? '\u2014')} total={parTotal} muted emphasis="par" />
-      <CardRow
-        cells={rows.map((h) => (
-          <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="dark" />
-        ))}
-        total={strokesTotal}
-        emphasis="strokes"
-      />
-
-    </div>
-  );
-};
+/* `Nine` and `CardRow` moved to scorecardParts: the swipe preview draws the
+   same nines, so there is exactly one implementation of the card. */
 
 
 
@@ -445,126 +275,12 @@ const Nine: React.FC<{
 
 /* -------------------------------------------- loading and empty middles */
 
-const HandicapChip: React.FC<{ delta: number }> = ({ delta }) => {
-  const cut = delta < 0;
-  const color = cut ? TREND_UP : TREND_DOWN;
-  const arrow = cut ? '\u2193' : '\u2191';
-  return (
-    <span style={{ ...LABEL_READ, color, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-      <span aria-hidden="true">{arrow}</span>
-      {Math.abs(delta).toFixed(1)}
-    </span>
-  );
-};
+/* HandicapChip moved to scorecardParts with the summary that draws it. */
 
-const SKEL_BG = A.TRACK;
-const KEYFRAMES = `
-@keyframes cardsheetPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
-@keyframes cardsheetSpin { to { transform: rotate(360deg); } }
-`;
+/* The loading, syncing, unavailable and gross-only middles are the shared ones
+   (scorecardParts) — the preview shows the same syncing/unavailable middle when
+   a neighbour has no hole data, so they cannot be two implementations. */
 
-const SkeletonMiddle: React.FC = () => (
-  <div aria-hidden style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-    <style>{KEYFRAMES}</style>
-    {[168, 116].map((h, i) => (
-      <div
-        key={i}
-        style={{
-          height: h, borderRadius: 16, background: A.PANEL,
-          border: `1px solid ${A.BORDER}`, padding: 16,
-        }}
-      >
-        <div
-          style={{
-            height: '100%', borderRadius: 10, background: SKEL_BG,
-            animation: `cardsheetPulse 1.4s ease-in-out ${i * 0.12}s infinite`,
-          }}
-        />
-      </div>
-    ))}
-  </div>
-);
-
-const SyncingMiddle: React.FC = () => {
-  const { t } = useTranslation(['courses']);
-  return (
-    <Panel style={{ textAlign: 'center' }}>
-      <style>{KEYFRAMES}</style>
-      <div
-        style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          gap: 12, padding: '18px 0 6px',
-        }}
-      >
-        <div style={{ position: 'relative', width: 46, height: 46 }}>
-          <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `3px solid ${A.TRACK}` }} />
-          <div
-            style={{
-              position: 'absolute', inset: 0, borderRadius: '50%',
-              border: '3px solid transparent', borderTopColor: A.AMBER,
-              animation: 'cardsheetSpin 0.9s linear infinite',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute', inset: 0, display: 'flex',
-              alignItems: 'center', justifyContent: 'center', color: A.AMBER,
-            }}
-          >
-            <RefreshCw size={16} strokeWidth={2.2} />
-          </div>
-        </div>
-        <div style={TITLE}>{t('courses:scorecard.syncingTitle')}</div>
-        <div style={{ ...CAPTION, maxWidth: 250 }}>{t('courses:scorecard.syncingBody')}</div>
-      </div>
-    </Panel>
-  );
-};
-
-const UnavailableMiddle: React.FC = () => {
-  const { t } = useTranslation(['courses']);
-  return (
-    <Panel style={{ textAlign: 'center' }}>
-      <div
-        style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          gap: 10, padding: '18px 0 6px', color: A.MUTE,
-        }}
-      >
-        <Table size={22} strokeWidth={1.6} />
-        <div style={TITLE}>{t('courses:scorecard.unavailableTitle')}</div>
-        <div style={{ ...CAPTION, maxWidth: 250 }}>{t('courses:scorecard.unavailableBody')}</div>
-      </div>
-    </Panel>
-  );
-};
-
-const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({ gross, toPar }) => {
-  const { t } = useTranslation(['courses']);
-  return (
-    <Panel>
-      <div
-        style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          gap: 10, textAlign: 'center', color: A.MUTE,
-        }}
-      >
-        <Table size={22} strokeWidth={1.6} />
-        <div style={TITLE}>{t('courses:scorecard.grossOnlyTitle')}</div>
-        <div style={{ ...CAPTION, maxWidth: 250 }}>{t('courses:scorecard.grossOnlyBody')}</div>
-      </div>
-      {gross != null && (
-        <StatRow
-          style={{ marginTop: 18 }}
-          items={[
-            { label: t('courses:scorecard.gross'), value: gross },
-            { label: t('courses:scorecard.toPar'), value: fmtRel(toPar), tone: toParColor(toPar) },
-          ]}
-        />
-      )}
-    </Panel>
-  );
-};
 
 /* ------------------------------------------------------------- the sheet */
 
@@ -585,6 +301,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   onStatsSeen,
   pageShift = null,
   hint = null,
+  pagePreview = null,
+
 
 }) => {
   const { t } = useTranslation(['courses']);
@@ -1008,130 +726,28 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </span>
           </div>
         )}
-        <div
+        {/* S1 — THE FIXED SUMMARY, now the shared RoundSummaryHead so the sheet
+            and the swipe preview draw the identical block (BRIEF_ROUND_SHEET_PEEK). */}
+        <RoundSummaryHead
+          isTour={isTour}
+          kickerText={kickerText}
+          courseName={courseName}
+          courseLocation={courseLocation}
+          showScore={totals.played}
+          gross={totals.gross}
+          toPar={totals.toPar}
+          shownPar={shownPar}
+          coursePar={coursePar ?? null}
+          heroMuted={heroMuted}
+          playerName={playerName}
+          playerAvatarUrl={playerAvatarUrl}
+          playerUserId={playerUserId}
+          tourAvatarCandidates={tourAvatarCandidates}
+          isOwner={isOwner}
+          playerHcpDelta={playerHcpDelta}
+          rail={rail}
+        />
 
-          style={{
-            padding: '12px 16px 10px',
-            /* The summary band separates by HAIRLINE, not by a second fill
-               (BRIEF_SHEET_BACKGROUND_CANON). */
-            borderBottom: `1px solid ${A.BORDER}`,
-            flexShrink: 0,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-            {/* LEFT — date, course, member */}
-            <div style={{ flex: '1 1 auto', minWidth: 0 }}>
-              {/* §B — THE KICKER CARRIES THE FORMAT. A nine-hole round is 30 of
-                  3,554 rounds, and on those the card, the totals and the to-par
-                  are all read against nine holes; the kicker is where that is
-                  said once. Eighteen holes is the default and says nothing. */}
-              {!!kickerText && isTour && (
-                <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {kickerText}
-                </div>
-              )}
-              <div
-                style={{
-                  fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em',
-                  color: A.INK, marginTop: 3, lineHeight: 1.18,
-                  display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                }}
-              >
-                {courseName}
-              </div>
-              {/* §B — THE VENUE'S PLACE STEPS BACK ONE TONE. The course name
-                  went up to 20px, so the line beneath it has to drop from MUTE
-                  to DIM or the two read as one two-line title. */}
-              {courseLocation && (
-                <div style={{ fontSize: 12, color: A.DIM, marginTop: 2 }}>{courseLocation}</div>
-              )}
-              {/* MEMBER ROW. With NO NAME nothing renders — no avatar, no
-                  avatar-shaped hole. Amber marks the viewer's own round. */}
-              {showIdentity && isTour && (
-                <div style={{ display: 'flex', alignItems: 'center', marginTop: 8, minWidth: 0 }}>
-                  <span style={{ flexShrink: 0, marginRight: 8 }}>
-                    <SquircleAvatar
-                      {...(isTour
-                        ? { srcCandidates: tourAvatarCandidates }
-                        : { src: playerAvatarUrl ?? null })}
-                      alt={playerName}
-                      userId={playerUserId ?? undefined}
-                      size={22}
-                      hairlineRing
-                    />
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 12.5, fontWeight: 700,
-                      color: isOwner ? A.AMBER : A.INK,
-                       flex: '0 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    }}
-                    title={playerName}
-                  >
-                    {playerName}
-                  </span>
-                   {/* §B — THE ENGAGEMENT PAIR IS PUSHED TO THE RIGHT EDGE of the
-                       member row instead of hanging one gap off the end of the
-                       name. A short name no longer leaves the heart floating in
-                       the middle of the row. */}
-                  {showChip && <span style={{ marginLeft: 8, flexShrink: 0 }}><HandicapChip delta={playerHcpDelta as number} /></span>}
-                </div>
-              )}
-            </div>
-
-            {/* RIGHT — THE SCORE. Visible the moment the sheet opens. */}
-            {totals.played && (
-              <div style={{ flex: 'none', textAlign: 'right' }}>
-                <div
-                  style={{
-                    /* §B — 34, not 38. The course name went to 20 and the gross
-                       no longer competes with a second copy of itself in the
-                       totals block, so it can give back four points. */
-                    ...NUM, fontSize: 34, fontWeight: 800, lineHeight: 0.9,
-                    letterSpacing: '-0.05em',
-                    color: heroMuted ? EVEN_GRAY : A.INK,
-                  }}
-                >
-                  {totals.gross}
-                </div>
-                <div style={{ ...NUM, fontSize: 12, fontWeight: 700, marginTop: 6, color: A.MUTE, whiteSpace: 'nowrap' }}>
-                  <span style={{ color: heroMuted ? EVEN_GRAY : toParColor(totals.toPar) }}>{fmtRel(totals.toPar)}</span>
-                  {(shownPar > 0 || coursePar != null) && (
-                    <span> {'\u00B7'} {t('courses:scorecard.parN', { n: shownPar > 0 ? shownPar : coursePar })}</span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {!isTour && showIdentity && (
-            <div style={{ display: 'flex', alignItems: 'center', marginTop: 10, minWidth: 0 }}>
-              <span style={{ flexShrink: 0, marginRight: 8 }}>
-                <SquircleAvatar src={playerAvatarUrl ?? null} alt={playerName} userId={playerUserId ?? undefined} size={24} hairlineRing />
-              </span>
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: isOwner ? A.AMBER : A.INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {playerName}
-              </span>
-              {!!kickerText && <span style={{ ...LABEL_READ, marginLeft: 8, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kickerText}</span>}
-              {showChip && <span style={{ marginLeft: 8, flexShrink: 0 }}><HandicapChip delta={playerHcpDelta as number} /></span>}
-            </div>
-          )}
-
-          {/* S1.3 — THE RAIL. Nothing renders when no figure resolves. */}
-          {rail.length > 0 && (
-            <>
-              <Hairline style={{ margin: '12px 0 10px' }} />
-              <div style={{ display: 'flex', gap: STAT_RAIL_ITEM_GAP, flexWrap: 'wrap' }}>
-                {rail.map((it) => (
-                  <div key={it.key} style={{ minWidth: 0 }}>
-                    <div style={{ ...RAIL_FIG, color: it.tone ?? A.INK }}>{it.value}</div>
-                    <div style={{ ...LABEL, fontSize: 9.5, letterSpacing: '0.12em', marginTop: 3 }}>{it.label}</div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
 
         <div
           data-sheet-scroll="true"
@@ -1226,12 +842,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                       here instead, in the key's own quiet style, and ONLY while
                       the round has an unplayed hole: a complete card says
                       nothing. Every consumer of this sheet gets the line. */}
-                  {hasUnplayedHole && (
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5, lineHeight: 1 }}>
-                      <ScoreMark strokes={null} par={4} size={18} surface="dark" showStroke />
-                      <span style={LABEL_READ}>{t('courses:scorecard.legendNotPlayed')}</span>
-                    </div>
-                  )}
+                  {hasUnplayedHole && <NotPlayedLine />}
                   {/* §2.5 — ONE SENTENCE, ONCE. The host retires it after the
                       first page or the third open; there are no pager dots. */}
                   {hint && (
@@ -1317,6 +928,36 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           )}
         </div>
       </div>
+
+      {/*
+        BRIEF_ROUND_SHEET_PEEK §1 — THE NEIGHBOUR PEEK.
+
+        One extra element, mounted only while a horizontal drag or its commit is
+        in flight, and only for the neighbour in the drag's direction. It is
+        absolutely positioned against the sheet (which is `position: fixed`) and
+        offset a full sheet width to the side, then translated by the SAME dx as
+        the content, so finger, page and neighbour move as one.
+
+        TOP OFFSET 18px is the grabber row: padding 10 + 4 plus its 4px bar. The
+        preview starts where the current page's summary starts, so the two align
+        exactly and the commit swap shows no jump.
+      */}
+      {pagePreview && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute', top: 18, left: 0, right: 0, bottom: 0,
+            overflow: 'hidden', pointerEvents: 'none',
+            transform: `translate3d(calc(${pageShift?.dx ?? 0}px ${pagePreview.side === 'next' ? '+' : '-'} 100%), 0, 0)`,
+            transition: pageShift?.animating
+              ? 'transform 180ms cubic-bezier(.2,.8,.2,1)'
+              : 'none',
+            willChange: 'transform',
+          }}
+        >
+          {pagePreview.node}
+        </div>
+      )}
     </BottomSheet>
   );
 };

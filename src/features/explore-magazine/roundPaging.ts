@@ -48,6 +48,26 @@ export function rubberBand(index: number, length: number, dx: number): number {
   return atStart || atEnd ? dx * RUBBER : dx;
 }
 
+/**
+ * BRIEF_ROUND_SHEET_PEEK §1 — WHICH NEIGHBOUR THE FINGER IS BRINGING IN.
+ *
+ * ONE neighbour, in the drag's direction only: a leftward drag (negative dx)
+ * brings the NEXT round in from the right, a rightward drag brings the PREVIOUS
+ * one in from the left. At either end there is nothing to bring in, so this
+ * returns null and the sheet keeps the 30% resistance with nothing beside it.
+ */
+export function dragNeighbour(
+  index: number,
+  length: number,
+  dx: number,
+): { side: PageDirection; index: number } | null {
+  if (dx === 0 || length < 2) return null;
+  const forward = dx < 0;
+  const to = forward ? index + 1 : index - 1;
+  if (to < 0 || to >= length) return null;
+  return { side: forward ? 'next' : 'prev', index: to };
+}
+
 /** The neighbours worth prefetching once a page settles. */
 export function neighbours(index: number, length: number): number[] {
   return [index - 1, index + 1].filter((i) => i >= 0 && i < length);

@@ -67,7 +67,7 @@
     "countingKicker": "ZAEHLSTATISTIKEN",
     "countingComplete": "{{n}} VON {{total}} KOMPLETT",
     "allTiersReached": "Alle Stufen erreicht",
-    "tierProgress": "{{n}} mehr fuer Stufe {{next}} · Stufe {{reached}} von {{total}}",
+    "tierProgress": "{{n}} mehr für Stufe {{next}} · Stufe {{reached}} von {{total}}",
     "tierReached": "Stufe {{tier}} erreicht {{when}}",
     "top100Kicker": "TOP 100 LISTEN",
     "top100Basis": "GESPIELTE PLAETZE JE LISTE VON 100",

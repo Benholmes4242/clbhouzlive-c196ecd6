@@ -259,7 +259,7 @@
       "ourPicksProvenance": "Modellvertrauen {{confidence}}%",
       "ourPicksStale": "Wird aktualisiert",
       "figuresBasis": "Alle drei aus {{n}} abgeschlossenen Runden in Runde {{round}}.",
-      "figuresBasisLowOnly": "Beste Runde aus abgeschlossenen Runden in Runde {{round}}; zu wenige fuer einen Felddurchschnitt.",
+      "figuresBasisLowOnly": "Beste Runde aus abgeschlossenen Runden in Runde {{round}}; zu wenige für einen Felddurchschnitt.",
       "figuresBasisLow": "Beste Runde: {{names}}."
     },
     "tiPicks": {

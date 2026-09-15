@@ -230,7 +230,7 @@
       "audience": {
         "locked": "Gesperrt",
         "visitorsLabel": "Eindeutige Besucher bisher",
-        "body": "Handicap-Bereiche und Top-Standorte brauchen zuerst ein groesseres Publikum. Bei so wenigen Personen waere die Aufschluesselung zuordenbar, deshalb halten wir sie zurueck."
+        "body": "Handicap-Bereiche und Top-Standorte brauchen zuerst ein größeres Publikum. Bei so wenigen Personen waere die Aufschluesselung zuordenbar, deshalb halten wir sie zurück."
       },
       "followers": {
         "total": "Gesamt"
@@ -245,7 +245,7 @@
       "rate": {
         "from": "Aus {{n}} Impressionen",
         "none": "Veroeffentliche Beitraege und sammle Impressionen, um deine Interaktionsrate zu sehen.",
-        "tooFew": "Noch zu wenige Impressionen fuer einen Vergleich.",
+        "tooFew": "Noch zu wenige Impressionen für einen Vergleich.",
         "benchmark": "Likes und Kommentare im Verhaeltnis zu Impressionen. Ueber 2 Prozent ist stark."
       }
     },
@@ -274,9 +274,9 @@
     "nextRound": {
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
-      "lineHold": "Dein Handicap kann in der naechsten Runde nicht steigen.",
+      "lineHold": "Dein Handicap kann in der nächsten Runde nicht steigen.",
       "subHold": "Spiele besser als {{cut}} und es sinkt.",
-      "lineRise": "Dein Handicap steigt in der naechsten Runde auf {{settle}}",
+      "lineRise": "Dein Handicap steigt in der nächsten Runde auf {{settle}}",
       "subRise": "es sei denn, du spielst besser als {{cut}}.",
       "beatLabel": "{{count}} deiner letzten {{total}} Runden waren besser als {{cut}}",
       "scaleShoot": "Ergebnis",
