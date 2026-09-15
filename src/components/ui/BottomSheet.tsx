@@ -146,6 +146,7 @@ export function BottomSheet({
   detents,
   midKey,
   midDebug,
+  midDebug,
   onDetentChange,
   onHorizontalDrag = null,
 }: BottomSheetProps) {
