@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { getPrimaryScrollElement } from '@/lib/getScrollParent';
+
 
 export function useParallax(maxTranslate = 20) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -35,15 +37,20 @@ export function useParallax(maxTranslate = 20) {
       });
     };
 
+    /* Page scroll happens on #root, so a bubbling window listener never fired
+       and the parallax sat still. Listen on the resolved page scroller. */
+    const scroller = getPrimaryScrollElement();
+
     handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    scroller?.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
 
     return () => {
       if (frameId) cancelAnimationFrame(frameId);
-      window.removeEventListener('scroll', handleScroll);
+      scroller?.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
+
   }, [maxTranslate]);
 
   return { ref, offset };

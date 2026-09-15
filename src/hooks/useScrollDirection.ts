@@ -11,6 +11,8 @@
  */
 
 import { useSyncExternalStore } from 'react';
+import { getPageScrollTop } from '@/lib/getScrollParent';
+
 
 export type NavState = 'expanded' | 'condensed';
 
@@ -47,21 +49,15 @@ function setState(next: NavState) {
 
 function getScrollTop(target: HTMLElement | Window): number {
   if (target === window) {
-    // Read from whichever element the UA is actually scrolling. When body
-    // is styled with `height: 100%; overflow-y: auto` (our light routes),
-    // body — not documentElement — is the scrolling element, and window
-    // never receives scroll events for the document scroll. Fall through
-    // to body as a last resort.
-    return (
-      window.scrollY ||
-      document.scrollingElement?.scrollTop ||
-      document.documentElement.scrollTop ||
-      document.body.scrollTop ||
-      0
-    );
+    /* The page scroller is #root, resolved once and cached by the shared helper.
+       window.scrollY is always 0 in this app, so reading it here reported "at
+       the top" forever. (#root is registered as its own scroller too; this
+       branch only matters for the auto-registered window record.) */
+    return getPageScrollTop();
   }
   return (target as HTMLElement).scrollTop || 0;
 }
+
 
 function makeHandler(record: ScrollerRecord) {
   let raf = 0;

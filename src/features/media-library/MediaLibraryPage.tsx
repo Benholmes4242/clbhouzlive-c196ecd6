@@ -17,6 +17,7 @@ import { RailChips } from '@/components/ui/RailChips';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { MOSAIC_GAP, MOSAIC_RADIUS } from '@/lib/mosaicGeometry';
 import { useMergedLibraryTotal } from './libraryTotals';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 import {
   MERGED_SORTS,
   MERGED_SORT_LABELS,
@@ -123,7 +124,7 @@ export default function MediaLibraryPage() {
     setSort(next);
     setShown(PAGE);
     analyticsEvents.track('media_library_sort_changed', { sort: next });
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    scrollPageToTop('auto');
   }, []);
 
   const changeKind = useCallback(
@@ -149,7 +150,7 @@ export default function MediaLibraryPage() {
 
   useEffect(() => {
     setShown(PAGE);
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    scrollPageToTop('auto');
   }, [kind]);
 
   const clipTotal = hubCounts.data?.clip_count ?? null;

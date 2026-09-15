@@ -38,6 +38,7 @@ import {
 } from './StoryShapes';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import {
   FONT,
@@ -359,7 +360,7 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
                 onSelect={(key) => {
                   setTournament(key);
                   setWireLimit(WIRE_PAGE_SIZE);
-                  window.scrollTo({ top: 0, behavior: 'auto' });
+                  scrollPageToTop('auto');
                 }}
               />
             )}

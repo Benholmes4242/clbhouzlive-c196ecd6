@@ -28,6 +28,8 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { registerNavScroller } from '@/hooks/useScrollDirection';
+import { getPageScrollTop } from '@/lib/getScrollParent';
+
 
 import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
@@ -565,7 +567,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     let raf = 0;
     const onScroll = () => {
       // Signed scroll direction — reused as a directional tie-break in recheckActive.
-      const st = scrollerElRef.current?.scrollTop ?? window.scrollY;
+      const st = scrollerElRef.current?.scrollTop ?? getPageScrollTop();
       const now = performance.now();
       const dy = st - lastScrollTopRef.current;
       const dt = Math.max(1, now - (lastScrollTsRef.current || now));

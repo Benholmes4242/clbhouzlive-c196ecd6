@@ -6,7 +6,7 @@ import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/to
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
+import { getPageScrollTop, scrollPageTo, scrollPageToTop } from '@/lib/getScrollParent';
 
 import { DiscoverHeader, type DiscoverTab } from './DiscoverHeader';
 import { NewsTabPage } from './NewsTabPage';
@@ -105,7 +105,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       return next;
     });
     initialReturn.current = null;
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    scrollPageToTop('auto');
   }, []);
 
   const handleBoardRow = useCallback((row: BoardRow) => {

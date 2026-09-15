@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import { getProfileTabs } from '@/hooks/useProfileType';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
+import { getPageScrollTop } from '@/lib/getScrollParent';
+
 
 interface ProfileTabsNavProps {
   userType: string | null | undefined;
@@ -28,8 +30,11 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   const scrollSnapshotRef = useRef<number>(0);
 
   const handlePointerDown = () => {
-    scrollSnapshotRef.current = window.scrollY;
+    /* window.scrollY is always 0 (page scroll is #root) - the snapshot the tab
+       change restores must come from the page scroller. */
+    scrollSnapshotRef.current = getPageScrollTop();
   };
+
 
   const handleTabClick = (tabId: string) => {
     if (disabled) return;
