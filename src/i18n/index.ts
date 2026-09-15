@@ -153,14 +153,19 @@ export function useLocale() {
 export default i18n;
 
 // Dev-only pseudo-locale toggle. `en-XA` pads every key ~35% with brackets
-// and accents to expose text-expansion clipping. Because no copy is keyed
-// yet in Wave 0, only the smoke key visibly changes — the rest of the UI
-// stays byte-identical to `en`. Exposed as a window helper (behind the Vite
-// DEV gate) so QA can flip locales from the console without shipping a UI
-// affordance that would break the pixel-identical acceptance gate.
+// and accents to expose text-expansion clipping. Exposed as a window helper
+// (behind the Vite DEV gate) so QA can flip locales from the console without
+// shipping a UI affordance.
+// Disabled locales are refused here too, so a console call can't put a dev
+// build into half-translated German.
 if (import.meta.env.DEV && typeof window !== 'undefined') {
   (window as unknown as { __clbhouzSetLocale?: (l: SupportedLocale) => Promise<void> })
     .__clbhouzSetLocale = async (l: SupportedLocale) => {
+      if (!isLocaleEnabled(l)) {
+        // eslint-disable-next-line no-console
+        console.warn(`[i18n] locale "${l}" is disabled (see ENABLED_LOCALES).`);
+        return;
+      }
       try { window.localStorage.setItem(LOCALE_STORAGE_KEY, l); } catch { /* noop */ }
       await i18n.changeLanguage(l);
     };
