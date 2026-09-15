@@ -189,6 +189,9 @@ export interface CardScorecardSheetProps {
   pagePreview?: { node: React.ReactNode; side: 'next' | 'prev' } | null;
   /** §1 — changes with the round, so BottomSheet remeasures mid after a page. */
   midKey?: string | number;
+  /** BRIEF_ROUND_SHEET_TALL §1 — DEV-only measurement diagnostics (score id,
+   *  whether the card was seeded). The middle state is added here. */
+  midDebug?: Record<string, unknown>;
   /**
    * BRIEF_ROUND_SHEET_CUES §3 — PAGING WITHOUT A FINGER.
    * Swiping was the only way to change rounds. This adds two visually hidden but
