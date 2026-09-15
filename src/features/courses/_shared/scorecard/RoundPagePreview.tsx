@@ -99,6 +99,7 @@ export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
       </div>
     </div>
   );
-};
+});
+RoundPagePreview.displayName = 'RoundPagePreview';
 
 export default RoundPagePreview;
