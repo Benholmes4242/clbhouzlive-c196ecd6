@@ -65,7 +65,8 @@ if (!i18n.isInitialized) {
     .use(initReactI18next)
     .init({
       fallbackLng: 'en',
-      supportedLngs: SUPPORTED_LOCALES as unknown as string[],
+      // Only ENABLED locales are servable; a disabled value falls back to `en`.
+      supportedLngs: ENABLED_LOCALES as unknown as string[],
       nonExplicitSupportedLngs: true,
       partialBundledLanguages: true,
       resources: {
