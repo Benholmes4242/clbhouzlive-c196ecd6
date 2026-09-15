@@ -1037,7 +1037,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     );
   }, []);
 
-
+  /* ==================================================================== §2
      SWIPE BETWEEN ROUNDS. THE SEQUENCE IS THIS PAGE'S ROUNDS, IN ITS ORDER.
 
      Rounds only, in the ranked order already on screen — a review, a course, a
