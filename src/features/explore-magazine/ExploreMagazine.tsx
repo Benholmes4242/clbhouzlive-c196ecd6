@@ -51,7 +51,10 @@ import {
   writeExploreView,
   type ExploreView,
 } from './exploreViewMemory';
-import { STREAM_PAGE_SIZE, scoreItem, useExploreStreamClient } from './useExploreStreamClient';
+/* scoreItem is no longer imported here: the only client-scored items were the
+   video candidates, and video no longer enters the stream (§1). The helper stays
+   in useExploreStreamClient, which is where the ranker lives. */
+import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
 import { EXPLORE_SERVER_STREAM_ENABLED } from './serverStreamSwitch';
 import { WatchFeed } from './watch/WatchFeed';
 import { VideoCard } from './watch/videoUnit';
