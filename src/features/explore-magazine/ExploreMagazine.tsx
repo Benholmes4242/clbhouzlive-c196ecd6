@@ -40,6 +40,8 @@ import { useCircleSize } from '@/features/amateur/useCircleSize';
 
 import { CircleShelf } from './CircleShelf';
 import { StandingShelf } from './StandingShelf';
+import { ScoresStandingSlot } from './ConnectStandingInvite';
+
 import { LeadShell, PairShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
 import { listCourseEvents } from './listCourseEvents';
 import {
@@ -1508,7 +1510,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     <CircleShelf viewerId={userId} pos={pos} />
                   )
                 ) : shelf === 'standing' ? (
-                  <StandingShelf viewerId={userId} pos={pos} />
+                  /* SCORES ONLY: a viewer with no connected handicap gets the
+                     connect invitation IN THIS SLOT instead of the standing
+                     shelf (handoff 1.8). All never shows it. */
+                  view === 'scores' ? (
+                    <ScoresStandingSlot viewerId={userId} pos={pos} />
+                  ) : (
+                    <StandingShelf viewerId={userId} pos={pos} />
+                  )
+
                 ) : shelf === 'coursesCounty' ? (
                   <CourseShelf
                     heading={t('amateur.shelf.aroundCounty', 'Around {{county}}', {
