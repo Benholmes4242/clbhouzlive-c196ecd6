@@ -188,9 +188,9 @@ describe('Explore card shapes', () => {
     const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
 
     expect(callout).not.toBeNull();
-    expect(callout?.textContent).toContain('Course record');
+    expect(callout?.textContent).toContain('New course record');
     /* §6 THE HEADLINE STATES THE ROUND, not the achievement, whenever a callout renders. */
-    expect(headline?.textContent ?? '').toContain('went round in 70');
+    expect(headline?.textContent ?? '').toContain('shot a 70');
     expect(headline?.textContent ?? '').not.toMatch(/record/i);
   });
 

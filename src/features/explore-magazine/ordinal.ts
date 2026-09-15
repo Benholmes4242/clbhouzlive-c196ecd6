@@ -27,3 +27,19 @@ export function standingOrdinal(value: number, locale: string): string {
       return `${value}th`;
   }
 }
+/**
+ * "A 75" OR "AN 88" (BRIEF_ROUND_HEADLINES §1). The article follows the SPOKEN
+ * form of the score, not its spelling: eight, eleven, eighteen and every
+ * eighty-something open on a vowel sound and take "an"; everything else takes
+ * "a". A hundred-something is spoken "one hundred and eight", so the rule is
+ * decided by the LEADING word — 108 is "a", 800 would be "an".
+ *
+ * English only: the article exists in the English templates alone, and a locale
+ * without one simply never interpolates it.
+ */
+export function indefiniteArticleForScore(value: number): 'a' | 'an' {
+  const n = Math.abs(Math.trunc(value));
+  if (n >= 100) return Math.floor(n / 100) % 10 === 8 ? 'an' : 'a';
+  if (n === 8 || n === 11 || n === 18) return 'an';
+  return n >= 80 && n <= 89 ? 'an' : 'a';
+}
