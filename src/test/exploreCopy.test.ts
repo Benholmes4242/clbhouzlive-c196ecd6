@@ -197,7 +197,10 @@ describe('golf language in the round headline', () => {
       who: { user_id: 'viewer', display_name: 'Viewer', photo_url: null, is_viewer: true },
       facts: { gross: 75, to_par: 1 },
     });
-    expect(headlineFor(own, translate)).toBe('You shot a 75, one over par.');
+    /* An own round with no consequence keeps its established shortest form (the
+       chip already carries the to-par); with a callout it speaks the to-par. */
+    expect(headlineFor(own, translate)).toBe('You shot a 75.');
+    expect(headlineFor(own, translate, 'en', { plainRound: true })).toBe('You shot a 75, one over par.');
     expect(headlineFor(round({ facts: { gross: 71, to_par: 0 } }), translate)).toMatch(/^henryd3737 /);
   });
 
