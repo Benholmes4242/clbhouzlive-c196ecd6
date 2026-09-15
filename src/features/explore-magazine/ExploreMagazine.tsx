@@ -51,7 +51,7 @@ import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
 import { applyRankCardRule } from './rankCards';
-import { cardTreatments } from './cardTreatment';
+import { cardTreatments, earnsHeroTreatment } from './cardTreatment';
 import { shelfDueAt, shelfForOrdinal } from './shelfCadence';
 /* BRIEF_COURSES_MERGED — Courses and Reviews are ONE view. */
 import { useCourseCandidateIndex } from './useCourseCandidateIndex';
@@ -179,9 +179,11 @@ function buildBlocks(
      narrowed by what the card has to say - not a second one. */
   const stableCourse = (item: StreamItem) => item.kind === 'course' && (item.facts.course_event ?? 'stable') === 'stable';
   const canPair = (item: StreamItem) =>
-    opts.mergedCourses === true
-      ? stableCourse(item)
-      : PAIRABLE.has(item.kind) || (opts.bareRoundPairs === true && pairableRound(item));
+    !earnsHeroTreatment(item) && (
+      opts.mergedCourses === true
+        ? stableCourse(item)
+        : PAIRABLE.has(item.kind) || (opts.bareRoundPairs === true && pairableRound(item))
+    );
 
   while (index < items.length) {
     const item = items[index];
