@@ -7,25 +7,21 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
 import { CollegeFranchise } from '../../overview/sections/CollegeFranchise';
-import { VenueRecordBand } from '../../overview/sections/VenueRecordBand';
 import { CourseOfTheWeekSection } from '../../overview/sections/CourseOfTheWeekSection';
-import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { LazySection } from '../overview-v3/LazySection';
 
 import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
-import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
-import { WireOverviewSection } from '../../news/WireOverviewSection';
+import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
+import { TourStoryCard } from '../../overview/sections/TourStoryCard';
+import { TIPickMagazineCard } from '../../overview/sections/TIPickMagazineCard';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import { SPACE } from '@/lib/spacing';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
-import { OVERVIEW_GUTTER } from '../../overview/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 
@@ -33,9 +29,7 @@ import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 export function OverviewPageV3() {
   const { t } = useTranslation('tourhub');
   const { isOnline } = useNetworkStatus();
-  // READ-ONLY: keyed here purely to drive the OTC + Schedule synchronized fade so
-  // the hero-lensed unit visibly changes together. Must not write back.
-  const { viewingTournamentId, viewingIsLive, selectedTourSlug, setAppliedTourSlug } = useTourSelection();
+  const { selectedTourSlug, setAppliedTourSlug } = useTourSelection();
 
   // The overview's island label describes the lens used by its sections, not
   // the tour of whichever tournament happens to be visible in the hero.
@@ -86,61 +80,20 @@ export function OverviewPageV3() {
             See OverviewHero.tsx. */}
         <OverviewHero />
 
-        {/* SECTION TWO — THE VENUE ON CLBHOUZ (structural brief D). Out of the
-            hero cohesion unit entirely and standing as its own full section
-            directly beneath the hero: on a live tournament that is directly
-            beneath the board band, the hero's last band. Still keyed to
-            viewingTournamentId so it changes in step with the hero, and it
-            self-hides when the tournament has no linked course. */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`venue-${viewingTournamentId ?? 'none'}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            /* On a live slide the dark hero block ends with a straight edge
-               directly above this — the canvas must BREATHE, so the gap is
-               real (24), not the old 2px seam. */
-            style={{ paddingTop: viewingIsLive ? 24 : 12 }}
-          >
-            <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
-          </motion.div>
-        </AnimatePresence>
-
-        {/* The Schedule keeps its own keyed crossfade beneath the venue. */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={viewingTournamentId ?? 'none'}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: SPACE.sectionSection }}
-          >
-            <ComingUpSlot />
-          </motion.div>
-
-        </AnimatePresence>
-
-
         <div
           id="content-below-hero"
           className="relative z-10"
         >
-          <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: NAV_CLEARANCE }}>
-            <WireOverviewSection />
+          <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 24, paddingBottom: NAV_CLEARANCE }}>
+            <TIPickMagazineCard />
+            <TourStoryCard index={0} lead />
+            <ComingUpSlot />
+            <TourStoryCard index={1} />
+            <CourseOfTheWeekSection />
             <LazySection minHeight={400}>
               <WorldRankingsSlot />
             </LazySection>
-            <LazySection minHeight={400}>
-              <StatWatchSlot />
-            </LazySection>
-            <CourseOfTheWeekSection />
-            <LazySection minHeight={90}>
-              {/* flat: this page draws no bordered cards (structural brief A). */}
-              <ConnectHandicapCue variant="tour-venue" courseName="" flat />
-            </LazySection>
+            <TourStoryCard index={2} />
             <LazySection minHeight={350}>
               <CollegeFranchise />
             </LazySection>

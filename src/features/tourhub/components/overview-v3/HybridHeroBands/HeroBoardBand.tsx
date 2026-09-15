@@ -375,7 +375,7 @@ export function HeroBoardSection({
 
   /* §1 / ACCEPTANCE D — with neither a board nor picks there is nothing to
      render, and no reserved height for the absence. */
-  if (!hasBoard && picks.length === 0) return null;
+  if (!hasBoard) return null;
 
 
   return (

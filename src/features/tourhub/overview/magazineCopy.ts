@@ -93,9 +93,6 @@ export function tournamentHeadline({
       if (facts.margin != null && facts.margin > 0 && venue) {
         return t('overview.magazine.liveMarginVenueRemaining', { leader, count: facts.margin, venue, remaining });
       }
-      if (facts.margin != null && facts.margin > 0 && venue) {
-        return t('overview.magazine.liveMarginVenue', { leader, count: facts.margin, venue });
-      }
       if (venue) return t('overview.magazine.liveVenue', { leader, venue });
       if (facts.margin != null && facts.margin > 0) return t('overview.magazine.liveMargin', { leader, count: facts.margin });
       return t('overview.magazine.livePlain', { leader });
