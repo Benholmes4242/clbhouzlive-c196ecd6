@@ -373,7 +373,7 @@ SELECT a.id,
 -- The jwt claims resolve the viewer by email, never a pasted uuid. Page 2 uses
 -- the cursor V2 printed - paste it in place of the placeholder (the only
 -- placeholder in this file).
---   Turn timing on in your client first (psql: \timing on) or read the
+--   Turn timing on in your client first (in psql: timing on) or read the
 --   EXPLAIN ANALYZE total below. The EXPLAIN is the last statement in each
 --   block.
 BEGIN;
