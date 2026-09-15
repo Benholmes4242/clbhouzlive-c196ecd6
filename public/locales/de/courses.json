@@ -1647,7 +1647,9 @@
       "chip": {
         "rating": "Bewertung",
         "world": "Welt",
-        "gbi": "GB&I"
+        "gbi": "GB&I",
+        "net": "NET",
+        "hcp": "HCP"
       },
       "visual": {
         "ace": "HOLE-IN-ONE AN {{n}}",
@@ -1769,7 +1771,11 @@
         "birdies": "{{n}} Birdies",
         "bogeyFree": "Bogeyfrei",
         "bogeyFreeSub": "Par oder besser auf jedem Loch",
-        "onHole": "an Loch {{ord}}"
+        "onHole": "an Loch {{ord}}",
+        "netRecord": "New net course record",
+        "handicapCut": "Handicap cut",
+        "handicapCutSub": "{{from}} to {{to}}",
+        "beatHandicap": "Beat handicap by {{n}}"
       }
     },
     "shelf": {

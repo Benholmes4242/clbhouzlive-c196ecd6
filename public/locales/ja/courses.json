@@ -1587,7 +1587,9 @@
       "chip": {
         "rating": "評価",
         "world": "世界",
-        "gbi": "GB&I"
+        "gbi": "GB&I",
+        "net": "NET",
+        "hcp": "HCP"
       },
       "visual": {
         "ace": "HOLE IN ONE ON {{n}}",
@@ -1709,7 +1711,11 @@
         "birdies": "バーディー{{n}}個",
         "bogeyFree": "ボギーなし",
         "bogeyFreeSub": "全ホールでパー以上",
-        "onHole": "{{ord}}番ホールで"
+        "onHole": "{{ord}}番ホールで",
+        "netRecord": "New net course record",
+        "handicapCut": "Handicap cut",
+        "handicapCutSub": "{{from}} to {{to}}",
+        "beatHandicap": "Beat handicap by {{n}}"
       }
     },
     "shelf": {

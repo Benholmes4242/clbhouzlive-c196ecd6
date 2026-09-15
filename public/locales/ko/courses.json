@@ -1590,7 +1590,9 @@
       "chip": {
         "rating": "평점",
         "world": "세계",
-        "gbi": "GB&I"
+        "gbi": "GB&I",
+        "net": "NET",
+        "hcp": "HCP"
       },
       "visual": {
         "ace": "HOLE IN ONE ON {{n}}",
@@ -1712,7 +1714,11 @@
         "birdies": "버디 {{n}}개",
         "bogeyFree": "보기 없음",
         "bogeyFreeSub": "모든 홀에서 파 이상",
-        "onHole": "{{ord}}번 홀에서"
+        "onHole": "{{ord}}번 홀에서",
+        "netRecord": "New net course record",
+        "handicapCut": "Handicap cut",
+        "handicapCutSub": "{{from}} to {{to}}",
+        "beatHandicap": "Beat handicap by {{n}}"
       }
     },
     "shelf": {

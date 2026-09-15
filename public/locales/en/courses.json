@@ -115,7 +115,9 @@
       "chip": {
         "rating": "rating",
         "world": "world",
-        "gbi": "GB&I"
+        "gbi": "GB&I",
+        "net": "NET",
+        "hcp": "HCP"
       },
       "visual": {
         "ace": "Holed out from the tee.",
@@ -236,7 +238,11 @@
         "birdies": "{{n}} birdies",
         "bogeyFree": "Bogey-free",
         "bogeyFreeSub": "Par or better on every hole",
-        "onHole": "on the {{ord}}"
+        "onHole": "on the {{ord}}",
+        "netRecord": "New net course record",
+        "handicapCut": "Handicap cut",
+        "handicapCutSub": "{{from}} to {{to}}",
+        "beatHandicap": "Beat handicap by {{n}}"
       }
     },
     "shelf": {
