@@ -1,5 +1,5 @@
 import type { StreamItem } from './streamItem';
-import { standingOrdinal } from './ordinal';
+import { indefiniteArticleForScore, standingOrdinal } from './ordinal';
 
 /**
  * KICKER PARTS AND HEADLINES (BRIEF_EXPLORE_MAGAZINE §4c / §4d).
@@ -141,8 +141,8 @@ export function spokenToPar(toPar: number | null | undefined, t: T, locale: stri
   if (toPar === 0) return t('amateur.stream.topar.level', 'level par');
   const n = spokenNumber(Math.abs(toPar), locale);
   return toPar < 0
-    ? t('amateur.stream.topar.under', '{{n}} under', { n })
-    : t('amateur.stream.topar.over', '{{n}} over', { n });
+    ? t('amateur.stream.topar.under', '{{n}} under par', { n })
+    : t('amateur.stream.topar.over', '{{n}} over par', { n });
 }
 
 /** The hole a single notable score happened on, read from the round's own hole
@@ -214,6 +214,10 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
   const c = item.consequence;
   const ord = c?.n != null ? standingOrdinal(c.n, locale) : null;
   const isOwn = !!item.who?.is_viewer;
+  /* §1 GOLF LANGUAGE: "shot a 75", never "went round in 75". The article follows
+     the SPOKEN score from the one shared helper, so "an 88" and "a 75" can never
+     disagree between two sentences. */
+  const article = gross != null ? indefiniteArticleForScore(gross) : 'a';
   const player = isOwn
     ? t('amateur.stream.you', 'You')
     : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
@@ -223,12 +227,13 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
      forms below are the SAME two templates the ordinary round already uses. */
   if (ctx.plainRound && gross != null) {
     return topar
-      ? t('amateur.stream.headline.roundToPar', '{{player}} went round in {{gross}}, {{topar}}.', {
+      ? t('amateur.stream.headline.roundToPar', '{{player}} shot {{article}} {{gross}}, {{topar}}.', {
           player,
+          article,
           gross,
           topar,
         })
-      : t('amateur.stream.headline.round', '{{player}} went round in {{gross}}.', { player, gross });
+      : t('amateur.stream.headline.round', '{{player}} shot {{article}} {{gross}}.', { player, article, gross });
   }
 
 
@@ -261,14 +266,14 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
     if (c.delta != null && c.delta > 0) {
       return t(
         'amateur.stream.headline.rankDownMoved',
-        '{{player}} went round in {{gross}}. You are now {{ord}} of {{of}} here, down {{n}}.',
-        { player, gross, ord, of: c.of, n: c.delta },
+        '{{player}} shot {{article}} {{gross}}. You are now {{ord}} of {{of}} here, down {{n}}.',
+        { player, article, gross, ord, of: c.of, n: c.delta },
       );
     }
     return t(
       'amateur.stream.headline.rankDown',
-      '{{player}} went round in {{gross}}. You are now {{ord}} of {{of}} here.',
-      { player, gross, ord, of: c.of },
+      '{{player}} shot {{article}} {{gross}}. You are now {{ord}} of {{of}} here.',
+      { player, article, gross, ord, of: c.of },
     );
   }
   if (c?.kind === 'rank_up' && c.n != null) {
@@ -416,8 +421,8 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
   if ((c?.kind === 'list_new_low' || c?.kind === 'list_first') && gross != null) {
     return t(
       'amateur.stream.headline.listFirst',
-      '{{player}} went round in {{gross}} \u2014 the lowest anyone has played here.',
-      { player, gross },
+      '{{player}} shot {{article}} {{gross}} \u2014 the lowest anyone has played here.',
+      { player, article, gross },
     );
   }
   if (item.facts.clean_card && gross != null) {
@@ -442,11 +447,12 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
      rest. This is the retirement of both rank_hold and the old "unchanged"
      sentence, in one line. */
   if ((c == null || c.kind === 'played_nochange') && isOwn && gross != null) {
-    return t('amateur.stream.headline.round', '{{player}} went round in {{gross}}.', { player, gross });
+    return t('amateur.stream.headline.round', '{{player}} shot {{article}} {{gross}}.', { player, article, gross });
   }
   if (gross != null && topar) {
-    return t('amateur.stream.headline.roundToPar', '{{player}} went round in {{gross}}, {{topar}}.', {
+    return t('amateur.stream.headline.roundToPar', '{{player}} shot {{article}} {{gross}}, {{topar}}.', {
       player,
+      article,
       gross,
       topar,
     });
@@ -455,7 +461,7 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
     /* DELIBERATELY THE SHORTEST LINE ON THE PAGE. The chip already says +16;
        there is genuinely nothing to add, which is not the same fault as a
        sentence missing a fact. */
-    return t('amateur.stream.headline.round', '{{player}} went round in {{gross}}.', { player, gross });
+    return t('amateur.stream.headline.round', '{{player}} shot {{article}} {{gross}}.', { player, article, gross });
   }
   return t('amateur.stream.headline.played', 'Played.');
 }
