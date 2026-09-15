@@ -18,9 +18,9 @@
 - [x] Mirror the shared post footer: actions left, actor right, and both text lines flush left without extra glyphs.
 - [x] Match Your circle captions to the weekly club rail height while retaining fixed name and HCP rows.
 - [x] Keep Your circle on Scores only, retain standing later in rotation, and remove every visible baseline label while preserving the dashed rule.
-- [ ] Make Explore hero treatment consequence-earned with a one-in-four positional cap.
-- [ ] Add context-aware inset treatment to shared long-form video cards on All only.
-- [ ] Rebuild Scores rail cadence and reassess All using change frequency.
+- [x] Make Explore hero treatment consequence-earned with a one-in-four positional cap.
+- [x] Add context-aware inset treatment to shared long-form video cards on All only.
+- [x] Rebuild Scores rail cadence and keep All's change-balanced order while repairing repetition.
 - [x] Rebuild the member scorecard sheet with owner-aware copy, canonical course identity, flat sections, and footer actions.
 ## Tour overview magazine rebuild
 - [x] Map current overview data, destinations, and shared Explore grammar

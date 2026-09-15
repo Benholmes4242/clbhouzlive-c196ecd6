@@ -13,6 +13,7 @@ import { CHIP_GLASS_CLASS, PHOTO_FIG_GOOD, PHOTO_FIG_SHADOW, PHOTO_FIG_UNDER } f
 
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
+import type { ExploreCardTreatment } from './cardTreatment';
 import { dotsFor, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
@@ -329,6 +330,7 @@ function WhoLine({
 export function ExploreCard({
   item,
   size,
+  cardTreatment = size === 'lead' ? 'hero' : 'standard',
   shape,
   viewerBest,
   viewerBestSince,
@@ -337,6 +339,8 @@ export function ExploreCard({
 }: {
   item: StreamItem;
   size: CardSize;
+  /** Text placement is earned independently of physical card size. */
+  cardTreatment?: ExploreCardTreatment;
   /** Rounds only. A pair never draws a shape: at 124px it cannot be read. */
   /** undefined = unresolved; null = settled without usable hole detail. */
   shape?: HoleShape | null;
@@ -356,7 +360,7 @@ export function ExploreCard({
     viewerBestSince,
   });
   const chips = chipsFor(item, t as never);
-  const onPhoto = size === 'lead';
+  const onPhoto = cardTreatment === 'hero' && size !== 'pair';
 
   /* ONE VISUAL: THE TREND LINE, with gold / red dots on the good holes. The
      ticks row and the distribution bar are retired — see roundTreatment.ts. */
@@ -424,7 +428,7 @@ export function ExploreCard({
       courseName={item.subject?.course_name ?? null}
       imageUrl={item.subject?.image_url ?? null}
       pending={!!item.subject?.pending}
-      flatWhenEmpty={size === 'lead'}
+      flatWhenEmpty={onPhoto}
       initialsSize={size === 'pair' ? 18 : 26}
       style={{ height: PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }}
     >
