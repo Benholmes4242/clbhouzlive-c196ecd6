@@ -178,7 +178,7 @@ function differentCourses(a: StreamItem, b: StreamItem): boolean {
  *  repeated card; the Courses and Reviews views are all one kind by definition
  *  and the brief allows pairs in both, so `sameKindPairs` opens that door for
  *  those two views only. */
-function buildBlocks(
+export function buildBlocks(
   items: StreamItem[],
   shelves: ShelfKind[],
   sameKindPairs = false,
@@ -213,7 +213,10 @@ function buildBlocks(
       next &&
       canPair(item) &&
       canPair(next) &&
-      (sameKindPairs || opts.mergedCourses === true || item.kind !== next.kind || (opts.bareRoundPairs === true && item.kind === 'round'))
+      (sameKindPairs || opts.mergedCourses === true || item.kind !== next.kind || (opts.bareRoundPairs === true && item.kind === 'round')) &&
+      /* THE SAME-COURSE GUARD, rounds only. A blocked pair renders the first
+         card full width; the ranked order is never reordered to find a partner. */
+      (item.kind !== 'round' || next.kind !== 'round' || differentCourses(item, next))
     ) {
       blocks.push({ kind: 'pair', items: [item, next] });
       index += 2;
