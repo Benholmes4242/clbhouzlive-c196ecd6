@@ -1,13 +1,18 @@
 /**
- * i18n bootstrap — Wave 0 foundation.
- * No user-visible copy has been keyed yet; this file only wires machinery.
+ * i18n bootstrap.
  *
- * Detection order:
- *   1. Persisted user choice under `clbhouz.locale` (in-app setting).
- *   2. `navigator.language` (falls back to OS / WebView locale).
- *   3. `en`.
+ * ENGLISH ONLY (for now). `de`, `es`, `ja` and `ko` are keyed but only ~26%
+ * translated, so a device set to one of those languages used to render a
+ * half-English app. Until a locale has had native review it stays OFF:
+ *   - device / OS language is NOT detected any more,
+ *   - a previously cached `clbhouz.locale` that isn't enabled is cleared.
  *
- * The in-app persisted choice ALWAYS beats the OS / Median WebView locale.
+ * THE SWITCH: `ENABLED_LOCALES` below. Turning a language back on is a
+ * one-line change there; the locale JSON files are all still in place.
+ *
+ * Resolution order now:
+ *   1. Persisted `clbhouz.locale`, but only if it is in ENABLED_LOCALES.
+ *   2. `en`.
  */
 import i18n from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
@@ -17,8 +22,41 @@ import { useCallback } from 'react';
 import authEn from '../../public/locales/en/auth.json';
 
 export const LOCALE_STORAGE_KEY = 'clbhouz.locale';
+/** Every locale that HAS files on disk. Kept intact — nothing is deleted. */
 export const SUPPORTED_LOCALES = ['en', 'ja', 'ko', 'es', 'de', 'en-XA'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+
+/**
+ * THE SWITCH. Locales a member may actually be served.
+ * `en-XA` is the pseudo-locale for text-expansion QA: dev builds only, never
+ * production. To re-enable a reviewed language, add it to this array.
+ */
+export const ENABLED_LOCALES: readonly SupportedLocale[] = import.meta.env.DEV
+  ? (['en', 'en-XA'] as const)
+  : (['en'] as const);
+
+export function isLocaleEnabled(l: string | null | undefined): l is SupportedLocale {
+  return !!l && (ENABLED_LOCALES as readonly string[]).includes(l);
+}
+
+/**
+ * Drop a cached locale that is no longer enabled (e.g. a device that stored
+ * `de` before the cutover), so it can't pin the member to a disabled language.
+ */
+export function pruneStoredLocale(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+    if (stored && !isLocaleEnabled(stored)) {
+      window.localStorage.removeItem(LOCALE_STORAGE_KEY);
+    }
+  } catch {
+    // ignore quota / privacy-mode failures
+  }
+}
+
+pruneStoredLocale();
+
 
 if (!i18n.isInitialized) {
   i18n
