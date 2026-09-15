@@ -174,6 +174,11 @@ function pairableRound(item: StreamItem): boolean {
   return item.kind === 'round' && item.consequence == null;
 }
 
+/** Full-width review treatment is stable across views and positions. */
+export function fullWidthCardSize(item: StreamItem): CardSize {
+  return item.kind === 'review' ? 'lead' : 'std';
+}
+
 /** §5 shelves are inserted after card positions 3, 7, 11 ... An empty source
  *  consumes its scheduled slot without moving the next shelf earlier.
  *
@@ -1894,7 +1899,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           /* REVIEW HEIGHT IS KIND-OWNED, NOT POSITION-EARNED. A review at any
              full-width position uses the real lead preset; every other kind is
              std. Reviews are excluded from pairs by buildBlocks(). */
-          const size: CardSize = item.kind === 'review' ? 'lead' : 'std';
+          const size = fullWidthCardSize(item);
           const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>

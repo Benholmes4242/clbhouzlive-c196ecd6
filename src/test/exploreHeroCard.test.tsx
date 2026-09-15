@@ -3,6 +3,7 @@ import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
+import { fullWidthCardSize } from '@/features/explore-magazine/ExploreMagazine';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
 afterEach(cleanup);
@@ -111,12 +112,19 @@ describe('Explore card shapes', () => {
     expect(chipLane?.style.flex).toBe('0 0 48px');
   });
 
-  it.each([0, 5])('renders a review at position %i through the lead path', () => {
-    const { container } = render(<ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />);
+  it.each([0, 5])('renders a review at position %i through the lead path', (position) => {
+    const item = { ...review(), id: `review-${position}` };
+    const size = fullWidthCardSize(item);
+    const { container } = render(<ExploreCard item={item} size={size} shape={null} onTap={() => undefined} />);
     const hero = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
     const image = container.querySelector<HTMLElement>('button > span > div');
+    expect(size).toBe('lead');
     expect(hero?.style.minHeight).toBe('340px');
     expect(image?.style.borderRadius).toBe('18px');
+  });
+
+  it('keeps a full-width round on the std path', () => {
+    expect(fullWidthCardSize(round())).toBe('std');
   });
 
   it('grows a long review quote while the photo keeps its minimum height', () => {
