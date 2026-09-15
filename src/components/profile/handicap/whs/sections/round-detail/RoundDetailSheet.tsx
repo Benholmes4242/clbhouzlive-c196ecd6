@@ -98,11 +98,16 @@ interface Props {
     onEnd: (dx: number, velocity: number) => void;
   } | null;
   onStatsSeen?: () => void;
+  /** §2.2 — the host's page offset while swiping between rounds. */
+  pageShift?: { dx: number; opacity?: number; animating: boolean } | null;
+  /** §2.5 — the one-off swipe line, or nothing. */
+  hint?: string | null;
 }
 
 export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId, sheetStyle,
   seed = null, detents, onDetentChange, onHorizontalDrag = null, onStatsSeen,
+  pageShift = null, hint = null,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
