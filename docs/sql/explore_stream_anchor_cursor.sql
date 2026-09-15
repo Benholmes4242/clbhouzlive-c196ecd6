@@ -1,7 +1,20 @@
 -- ============================================================================
 -- ANCHOR get_explore_stream's CURSOR IN TIME
 --
--- Ben runs this as postgres. Nothing here has been applied.
+-- APPLIED 15 Sep 2026, deployed md5 e1ee958dd62fc7ea8ef71dc954563e12.
+-- Verified: now_count 1, volatility 's', anchor + seen anchor + both cursor
+-- keys present; page 1 x page 2 = 12 x 12 rows, overlap 0; member-role timing
+-- 830.7 ms / 142,713 buffers before, 831.6 ms / 142,691 buffers after.
+-- Any future patch to get_explore_stream must assert that md5 and the
+-- v_anchor fingerprint.
+--
+-- Ben runs this as postgres. The patch block (BEGIN ... COMMIT) and each
+-- VERIFY query below are SEPARATE runs in the SQL editor.
+--
+-- RULE FOR FUTURE PATCHES OF THIS SHAPE: an injected comment must never
+-- contain a string the patch counts. The first run of this file aborted on
+-- "expected exactly 1 now() after the patch, found 2" because the site-2
+-- comment contained the literal text "now()"; the count picked it up.
 --
 -- WHY. The keyset is (q.sc < v_cur_s OR (q.sc = v_cur_s AND q.cid > v_cur_i)),
 -- but sc is not stable between calls:
@@ -128,8 +141,8 @@ BEGIN
   v_from := 'BEGIN' || E'\n' || '  SELECT' || E'\n'
          || '    coalesce(max(value) FILTER (WHERE key = ''w_consequence''),  6),';
   v_to   := 'BEGIN' || E'\n'
-         || '  -- The ONLY now() left in this body. A cursor that carries ''at'' pins the' || E'\n'
-         || '  -- page to the moment page 1 was scored.' || E'\n'
+         || '  -- The ONLY clock read left in this body. A cursor that carries ''at''' || E'\n'
+         || '  -- pins the page to the moment page 1 was scored.' || E'\n'
          || '  v_anchor := coalesce((p_cursor ->> ''at'')::timestamptz, now());' || E'\n'
          || E'\n'
          || '  SELECT' || E'\n'
