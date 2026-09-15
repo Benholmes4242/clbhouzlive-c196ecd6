@@ -51,11 +51,14 @@ const SHAPE_W: Record<CardSize, number> = { lead: 350, std: 350, pair: 0 };
 /** The band the trace occupies at the foot of the photograph. */
 const SHAPE_BAND: Record<CardSize, number> = { lead: 56, std: 52, pair: 0 };
 
-/** §4f THE SCRIM IS A FUNCTION OF THE TEXT. It exists on the lead because a
- *  three-line headline sits on the photograph; std and pair carry their text
- *  BENEATH the photograph and therefore carry no scrim at all. */
-const LEAD_SCRIM =
-  'linear-gradient(to bottom, rgba(0,0,0,0) 34%, rgba(0,0,0,0.42) 68%, rgba(0,0,0,0.82) 100%)';
+/** The chip is 28px high at the canonical padding. 8 + 28 + 12 reserves the
+ *  ruled clearance before any hero copy, whether or not a chip is present. */
+const HERO_CHIP_LANE = 48;
+const HERO_TEXT_SHADOW = '0 1px 2px rgba(0,0,0,0.45)';
+/** Anchored to the copy rather than the variable-height photograph: clear at
+ *  the kicker, dark through the headline/who-line, and carried behind trace. */
+const HERO_COPY_SCRIM =
+  'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 32%, rgba(0,0,0,0.70) 66%, rgba(0,0,0,0.82) 100%)';
 
 function FigureChip({
   figure,
@@ -83,6 +86,8 @@ function FigureChip({
         alignItems: 'baseline',
         gap: 4,
         padding: '4px 8px',
+        minHeight: 28,
+        boxSizing: 'border-box',
         borderRadius: 8,
         color: '#FFFFFF',
         ...FIGS,
@@ -209,17 +214,18 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
 function WhoLine({
   item,
   size,
+  onPhoto,
   onWhoTap,
 }: {
   item: StreamItem;
   size: CardSize;
+  onPhoto: boolean;
   onWhoTap?: () => void;
 }) {
   const { t } = useTranslation('courses');
   const who = item.who;
-  const onPhoto = size === 'lead';
-  const nameColor = who?.is_viewer ? A.AMBER : onPhoto ? 'rgba(255,255,255,0.72)' : A.MUTE;
-  const subColor = onPhoto ? 'rgba(255,255,255,0.62)' : A.DIM;
+  const nameColor = who?.is_viewer ? A.AMBER : onPhoto ? '#FFFFFF' : A.MUTE;
+  const subColor = onPhoto ? 'rgba(255,255,255,0.85)' : A.DIM;
 
   const name = who?.is_viewer
     ? t('amateur.stream.you', 'You')
@@ -300,6 +306,7 @@ function WhoLine({
               textOverflow: 'ellipsis',
               minWidth: 0,
               flex: '1 1 auto',
+               textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
             }}
           >
             {name}
@@ -317,6 +324,7 @@ function WhoLine({
               textOverflow: 'ellipsis',
               minWidth: 0,
               flex: '0 1 auto',
+               textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
             }}
           >
             {who ? `\u00B7 ${sub}` : sub}
@@ -378,7 +386,8 @@ export function ExploreCard({
         fontWeight: 700,
         letterSpacing: '0.19em',
         textTransform: 'uppercase',
-        color: onPhoto ? 'rgba(255,255,255,0.66)' : A.DIM,
+         color: onPhoto ? '#FFFFFF' : A.DIM,
+         textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
         display: 'flex',
         gap: 5,
         minWidth: 0,
@@ -406,6 +415,7 @@ export function ExploreCard({
         letterSpacing: size === 'lead' ? '-0.02em' : size === 'std' ? '-0.01em' : '-0.005em',
         lineHeight: size === 'lead' ? 1.12 : 1.24,
         color: onPhoto ? '#FFFFFF' : A.INK,
+         textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
         fontStyle: item.kind === 'review' ? 'italic' : 'normal',
         display: '-webkit-box',
         WebkitLineClamp: size === 'lead' ? 3 : 2,
@@ -430,13 +440,60 @@ export function ExploreCard({
       pending={!!item.subject?.pending}
       flatWhenEmpty={onPhoto}
       initialsSize={size === 'pair' ? 18 : 26}
-      style={{ height: PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }}
+      style={onPhoto
+        ? { minHeight: PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }
+        : { height: PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }}
     >
-      {onPhoto ? (
-        <span aria-hidden style={{ position: 'absolute', inset: 0, background: LEAD_SCRIM, zIndex: 1 }} />
-      ) : null}
       {chips}
-      {hasVisual ? (
+      {onPhoto ? (
+        <span
+          data-explore-hero="true"
+          style={{
+            position: 'relative',
+            zIndex: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: PHOTO_H[size],
+          }}
+        >
+          <span aria-hidden style={{ flex: `0 0 ${HERO_CHIP_LANE}px` }} />
+          <span style={{ flex: '1 1 auto', minHeight: 0 }} />
+          <span style={{ position: 'relative', display: 'block' }}>
+            <span
+              aria-hidden
+              style={{ position: 'absolute', inset: 0, background: HERO_COPY_SCRIM, zIndex: 0 }}
+            />
+            <span
+              data-explore-hero-copy="true"
+              style={{ position: 'relative', zIndex: 1, display: 'block', paddingInline: 16 }}
+            >
+              <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
+              {headlineNode}
+              <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} />
+            </span>
+            <span
+              data-explore-hero-bottom-lane="true"
+              aria-hidden
+              style={{
+                position: 'relative',
+                zIndex: 1,
+                height: hasVisual ? band + 12 : 14,
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              }}
+            >
+              {hasVisual ? (
+                <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
+                  height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
+                  baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow
+                  exploreDots={dots} />
+              ) : null}
+            </span>
+          </span>
+        </span>
+      ) : hasVisual ? (
         <span
           aria-hidden
           style={{
@@ -456,23 +513,6 @@ export function ExploreCard({
             height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
             baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow
             exploreDots={dots} />
-
-        </span>
-      ) : null}
-      {onPhoto ? (
-        <span
-          style={{
-            position: 'absolute',
-            left: 16,
-            right: 16,
-             bottom: hasVisual ? band + 12 : 14,
-            zIndex: 2,
-            display: 'block',
-          }}
-        >
-          {kicker}
-          {headlineNode}
-          <WhoLine item={item} size={size} onWhoTap={onWhoTap} />
         </span>
       ) : null}
     </CourseImageFallback>
@@ -501,7 +541,7 @@ export function ExploreCard({
         <span style={{ display: 'block', paddingInline: 4, marginTop: 8 }}>
           {kicker}
           {headlineNode}
-          <WhoLine item={item} size={size} onWhoTap={onWhoTap} />
+           <WhoLine item={item} size={size} onPhoto={false} onWhoTap={onWhoTap} />
         </span>
       ) : null}
     </button>
