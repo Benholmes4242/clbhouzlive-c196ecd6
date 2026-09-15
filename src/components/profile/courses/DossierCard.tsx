@@ -79,7 +79,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
 
   // Two fixed lines, never a wrap: line 1 is date · country, line 2 is
   // rounds · average. Line 2 renders only when scoring exists (Ben, Sep 2026).
-  const line1 = [dateText || null, where].filter(Boolean).join(' · ');
+  const line1 = [dateText || null, where].filter(Boolean).join(' \u00B7 ');
   const line2 = hasScoring
     ? [
         t('yourCourses.roundsCount', { count: rounds as number, defaultValue: '{{count}} rounds' }),
@@ -88,7 +88,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
           : null,
       ]
         .filter(Boolean)
-        .join(' · ')
+        .join(' \u00B7 ')
     : '';
 
   return (
