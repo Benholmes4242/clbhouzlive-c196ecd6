@@ -6,6 +6,11 @@ import { ChevronRight, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { LABEL } from '@/lib/tokens/type';
 import { courseMatchLabel } from '../lib/geography';
+import {
+  CandidateCountryFlag,
+  CountryMismatchWarning,
+  WhsCountryChip,
+} from '../components/CountryMismatchWarning';
 import { adminTheme as t } from '../theme';
 import { useInboxFeed, type InboxItem, type InboxType } from '../hooks/useInboxFeed';
 import { useInboxOpsStats, formatDurationShort as formatDurationMs } from '../hooks/useInboxOpsStats';
