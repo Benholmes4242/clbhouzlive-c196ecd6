@@ -186,6 +186,7 @@ const RoundPage: React.FC = () => {
           onClose={goBack}
           scoreId={whsScoreId}
           profileUserId={ownerId}
+          initialCommentsOpen={openCommentsRequested}
         />
       </div>
     );
