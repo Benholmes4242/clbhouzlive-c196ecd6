@@ -19,6 +19,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { whsKeys } from '@/lib/whs/hooks';
 import { fetchRoundDetail } from '@/lib/whs/api';
 import { coursePlaceLine } from './placeLine';
+import {
+  pageDecision, rubberBand, neighbours, shouldExtend, noteHintOpen, noteHintPaged,
+} from './roundPaging';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
