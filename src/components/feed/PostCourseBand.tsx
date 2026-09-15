@@ -219,6 +219,7 @@ interface Props {
 
 export const PostCourseBand: React.FC<Props> = ({
   courseName,
+  onOpenCourse,
   courseLocation,
   courseRating,
   ctx,
