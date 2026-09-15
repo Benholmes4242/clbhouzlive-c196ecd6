@@ -227,7 +227,7 @@
         "over": "{{n}} over"
       },
       "callout": {
-        "record": "Course record",
+        "record": "New course record",
         "rankUpTo": "Up to {{ord}} here",
         "rankUp": "Moved up the board",
         "ace": "Hole in one",
