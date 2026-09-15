@@ -780,6 +780,22 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
             </div>
           )}
 
+          {/* The WHS country, in front of the reviewer before any decision. */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <WhsCountryChip country={row.whs_country_name} />
+            {chosen && (
+              <span style={{ fontSize: 12, color: t.inkMuted }}>
+                selected: {chosen.sub_country ?? 'no recorded country'}
+              </span>
+            )}
+          </div>
+          {chosen && (
+            <CountryMismatchWarning
+              whsCountry={row.whs_country_name}
+              subCountry={chosen.sub_country}
+            />
+          )}
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               Search golf_courses
