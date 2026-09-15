@@ -189,14 +189,6 @@
       "noBestToCompare": "[~~Ñő řőúñđ őƒ ýőúřš ţő ĉőɱƥářé~~]"
     },
     "roundCard": {
-      "kicker": "[~~Řőúñđ ƥőšţéđ~~]",
-      "index": "[~~Íñđéẋ~~]",
-      "under": "[~~Úñđéř~~]",
-      "over": "[~~Őṽéř~~]",
-      "fieldLine_one": "[~~ţĥé ƒíéļđ áṽéřáĝéš {{field}} ĥéřé, ƒřőm {{count}} řőúñđ~~]",
-      "fieldLine_other": "[~~ţĥé ƒíéļđ áṽéřáĝéš {{field}} ĥéřé, ƒřőm {{count}} řőúñđš~~]",
-      "slopeHarder": "[~~ĥářđéř ţĥáñ {{pct}}%~~]",
-      "slopeEasier": "[~~éášíéř ţĥáñ {{pct}}%~~]",
       "net": "Net",
       "adjustedNotCompleted_one": "adjusted, {{count}} hole not completed",
       "adjustedNotCompleted_other": "adjusted, {{count}} holes not completed"
@@ -252,8 +244,8 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "[~~Ƥőšţ ɱý řőúñđš áúţőɱáţíĉáļļý~~]",
-      "subtitle": "[~~Ýőúř řőúñđš áƥƥéář íñ ţĥé Ĉļúƀĥőúšé ŵĥéñ ýőú ļőĝ ţĥéɱ. Őñļý šţáñđőúţ řőúñđš řéáĉĥ ɱéɱƀéřš ŵĥő đő ñőţ ƒőļļőŵ ýőú.~~]"
+      "title": "Share my rounds",
+      "subtitle": "Your followers are told when you log a round, and can like and comment on it. Your rounds show on Explore either way."
     }
   },
   "map": {

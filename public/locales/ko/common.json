@@ -81,8 +81,8 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "라운드 자동 게시",
-      "subtitle": "라운드를 기록하면 클럽하우스에 표시됩니다. 눈에 띄는 라운드만 팔로워가 아닌 회원에게도 노출됩니다."
+      "title": "Share my rounds",
+      "subtitle": "Your followers are told when you log a round, and can like and comment on it. Your rounds show on Explore either way."
     }
   },
   "feed": {
@@ -96,10 +96,6 @@
       "most_birdies_all_time": "버디 최다"
     },
     "roundCard": {
-      "fieldLine_one": "이 코스 평균은 {{field}} ({{count}}라운드 기준)",
-      "fieldLine_other": "이 코스 평균은 {{field}} ({{count}}라운드 기준)",
-      "slopeHarder": "코스 {{pct}}%보다 어려움",
-      "slopeEasier": "코스 {{pct}}%보다 쉬움",
       "net": "네트",
       "adjustedNotCompleted_one": "조정됨, 미완료 홀 {{count}}개",
       "adjustedNotCompleted_other": "조정됨, 미완료 홀 {{count}}개"

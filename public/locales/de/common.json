@@ -81,8 +81,8 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "Meine Runden automatisch posten",
-      "subtitle": "Deine Runden erscheinen im Clubhouse, sobald du sie erfasst. Nur herausragende Runden erreichen Mitglieder, die dir nicht folgen."
+      "title": "Share my rounds",
+      "subtitle": "Your followers are told when you log a round, and can like and comment on it. Your rounds show on Explore either way."
     }
   },
   "feed": {
@@ -96,10 +96,6 @@
       "most_birdies_all_time": "Meiste Birdies"
     },
     "roundCard": {
-      "fieldLine_one": "das Feld spielt hier im Schnitt {{field}}, aus {{count}} Runde",
-      "fieldLine_other": "das Feld spielt hier im Schnitt {{field}}, aus {{count}} Runden",
-      "slopeHarder": "schwerer als {{pct}}%",
-      "slopeEasier": "leichter als {{pct}}%",
       "net": "Netto",
       "adjustedNotCompleted_one": "angepasst, {{count}} Loch nicht beendet",
       "adjustedNotCompleted_other": "angepasst, {{count}} Locher nicht beendet"
