@@ -806,7 +806,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
          nothing here promotes it. */
       out.splice(at, 0, video);
     }
-    return out;
+    /* BRIEF_ROUND_SHEET_TALL §2 — ONE ITEM, ONE CARD, whatever the source. The
+       stream hook already dedupes its own pages; this is the last gate before
+       anything is keyed by item.id (cardRefs, the ring, roundSeq), so a duplicate
+       arriving from the fallback pools or the video insertion cannot reach it
+       either. First occurrence wins, so the ranked order is untouched. */
+    const { items: unique, drops } = dedupeItems(out);
+    warnDuplicates('ExploreMagazine:visible', drops);
+    return unique;
   }, [serverOn, source.items, revealed, videoItems]);
 
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
