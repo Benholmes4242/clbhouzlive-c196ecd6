@@ -1735,7 +1735,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             ground="filled-selection"
             distribute
           />
+          ) : null}
           </div>
+
           {/* §3 THE PLACE FILTER COMES TO SCORES — the SAME component and the
               SAME data path as Courses, with the "has content" rule handed in as
               a PARAMETER: Scores is rounds, so a place qualifies on TRACKED
