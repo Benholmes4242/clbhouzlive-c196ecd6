@@ -21,6 +21,7 @@
 - [x] Make Explore hero treatment consequence-earned with a one-in-four positional cap.
 - [x] Add context-aware inset treatment to shared long-form video cards on All only.
 - [x] Rebuild Scores rail cadence and keep All's change-balanced order while repairing repetition.
+- [x] Prevent Explore hero chip/copy collisions and strengthen on-photo text contrast without changing standard or pair cards.
 - [x] Rebuild the member scorecard sheet with owner-aware copy, canonical course identity, flat sections, and footer actions.
 ## Tour overview magazine rebuild
 - [x] Map current overview data, destinations, and shared Explore grammar
