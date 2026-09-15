@@ -222,7 +222,11 @@ export async function fetchLastRound(connectionId: string): Promise<WhsLastRound
 
   let course_thumbnail_image: string | null = null;
   if (latest.course?.name) {
-    course_thumbnail_image = await lookupCourseThumbnail(latest.course.name, (latest.course as any)?.country_code ?? null);
+    course_thumbnail_image = await lookupCourseThumbnail(
+      latest.course.name,
+      (latest.course as any)?.country_code ?? null,
+      (latest.course as any)?.country_name ?? null,
+    );
   }
 
   return {
@@ -260,25 +264,30 @@ export async function fetchAllScores(connectionId: string): Promise<WhsScoreWith
   const rawRows = ((data as unknown as RawScoreRow[]) ?? []).map(normalizeScoreRow);
   if (rawRows.length === 0) return [];
 
-  // Build a map of name → country_code so each thumbnail lookup uses the right
-  // country context. Multiple rounds at the same course will share one country_code;
-  // if somehow a course name appears with two different country_codes, we use the first.
-  const nameToCountryCode: Record<string, string | null> = {};
+  // Build a map of name → country context so each thumbnail lookup carries the WHS
+  // country. country_name drives the country gate; country_code is passed for the RPC
+  // fallback only. Multiple rounds at the same course share one country; if a name
+  // appears with two, we use the first.
+  const nameToCountry: Record<string, { code: string | null; name: string | null }> = {};
   for (const r of rawRows) {
-    if (r.course?.name && !(r.course.name.toLowerCase() in nameToCountryCode)) {
-      nameToCountryCode[r.course.name.toLowerCase()] = (r.course as any)?.country_code ?? null;
+    if (r.course?.name && !(r.course.name.toLowerCase() in nameToCountry)) {
+      nameToCountry[r.course.name.toLowerCase()] = {
+        code: (r.course as any)?.country_code ?? null,
+        name: (r.course as any)?.country_name ?? null,
+      };
     }
   }
 
   const thumbsByName: Record<string, string | null> = {};
   await Promise.all(
-    Object.keys(nameToCountryCode).map(async (nameLower) => {
+    Object.keys(nameToCountry).map(async (nameLower) => {
       const originalName = rawRows.find(r => r.course?.name?.toLowerCase() === nameLower)?.course?.name;
       if (!originalName) {
         thumbsByName[nameLower] = null;
         return;
       }
-      thumbsByName[nameLower] = await lookupCourseThumbnail(originalName, nameToCountryCode[nameLower]);
+      const ctx = nameToCountry[nameLower];
+      thumbsByName[nameLower] = await lookupCourseThumbnail(originalName, ctx.code, ctx.name);
     }),
   );
 
@@ -716,7 +725,11 @@ export async function fetchRoundDetail(
   let courseHeaderImage: string | null = null;
   let courseThumbnailImage: string | null = null;
   if (r.course?.name) {
-    courseThumbnailImage = await lookupCourseThumbnail(r.course.name, r.course?.country_code ?? null);
+    courseThumbnailImage = await lookupCourseThumbnail(
+      r.course.name,
+      r.course?.country_code ?? null,
+      r.course?.country_name ?? null,
+    );
     courseHeaderImage = courseThumbnailImage;
   }
 
@@ -852,9 +865,10 @@ export async function callDeleteWhsData(): Promise<{ ok: boolean; message?: stri
 async function lookupCourseThumbnail(
   whsName: string,
   countryCode?: string | null,
+  countryName?: string | null,
 ): Promise<string | null> {
   const { lookupCourseThumbnailV2 } = await import('./courseNameMatcher');
-  return lookupCourseThumbnailV2(whsName, countryCode);
+  return lookupCourseThumbnailV2(whsName, countryCode, countryName);
 }
 
 // ─── Phase 0 (Friends Tab Redesign): Featured round + rivalries fetchers ──
