@@ -37,6 +37,27 @@
 import { getActorRouteByType } from '@/types/actor';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 
+/** Reaction notifications whose target can be a ROUND post. */
+const ROUND_REACTION_TYPES = new Set([
+  'like',
+  'like_post',
+  'comment',
+  'comment_post',
+  'comment_reply',
+  'comment_mention',
+  'mention',
+  'mention_post',
+  'tag',
+]);
+
+/** Of those, the ones that should land with the comments open. */
+const COMMENT_TYPES = new Set([
+  'comment',
+  'comment_post',
+  'comment_reply',
+  'comment_mention',
+]);
+
 const FOLLOW_TYPES = new Set([
   'follow',
   'friend_request',
