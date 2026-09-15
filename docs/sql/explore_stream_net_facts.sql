@@ -235,7 +235,7 @@ BEGIN
          || '    -- connection, which the score row names.'                           || E'\n'
          || '    SELECT pn.score_id, pn.arrived_at, s.observed_at, s.handicap_index'  || E'\n'
          || '      FROM page_net pn'                                                  || E'\n'
-         || '      JOIN public.whs_scores w ON w.id = pn.score_id'                    || E'\n'
+         || '      JOIN public.whs_scores w ON w.whs_score_id = pn.score_id'                    || E'\n'
          || '      JOIN public.whs_handicap_snapshots s'                              || E'\n'
          || '        ON s.connection_id = w.connection_id'                            || E'\n'
          || '  ),'                                                                    || E'\n'
