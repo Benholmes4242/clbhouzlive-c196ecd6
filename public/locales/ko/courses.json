@@ -420,6 +420,11 @@
     "emptyRecentOwnBody": "Play some courses in the last 30 days and they'll appear here",
     "emptyRecentOtherBody": "No courses played in the last 30 days"
   },
+  "yourCourses": {
+    "roundsCount_one": "{{count}}라운드",
+    "roundsCount_other": "{{count}}라운드",
+    "avgLabel": "평균 {{avg}}"
+  },
   "review": {
     "filter": {
       "title": "Filter by rating",
