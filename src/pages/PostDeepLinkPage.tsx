@@ -184,18 +184,27 @@ const PostDeepLinkPage: React.FC = () => {
       // SILENTLY for a media-less post, which is what left this page sitting on
       // its black scrim. So a media-less post is redirected, never opened:
       // a round goes to its scorecard, anything else to its author.
-      // Guests are never redirected — they keep the logged-out preview below.
 
       const mediaCount = Array.isArray(row.post_media)
         ? row.post_media.filter((m: any) => m.media_url || m.stream_id).length
         : 0;
+
+      // A ROUND IS REDIRECTED FOR EVERYONE, SIGNED IN OR NOT, and BEFORE the
+      // guest share-preview shape is built below. A round carries no media and
+      // no caption, so the logged-out preview could only ever render an empty
+      // card. /round/:id is a public ROUTE; RoundPage itself asks a guest to
+      // sign in (a scorecard is a member's own data under RLS), which is a real
+      // destination with a way forward instead of a blank card. There is no
+      // public round surface to send them to instead.
+      const roundScoreId = row.whs_score_id ?? null;
+      if (roundScoreId && mediaCount === 0) {
+        navigate(`/round/${encodeURIComponent(roundScoreId)}`, { replace: true });
+        return;
+      }
+
+      // Guests are never redirected past this point — they keep the logged-out
+      // preview below.
       if (user?.id && mediaCount === 0) {
-        const scoreId = row.whs_score_id ?? null;
-        if (scoreId) {
-          // BRIEF_ROUND_PAGE §3.2 — the round's own page, not the handicap page.
-          navigate(`/round/${encodeURIComponent(scoreId)}`, { replace: true });
-          return;
-        }
         // A text-only post has no viewer of its own; the author's profile is
         // the nearest true surface (its feed carries the post).
         const authorRoute = row.actor_type === 'business' && row.actor_id
