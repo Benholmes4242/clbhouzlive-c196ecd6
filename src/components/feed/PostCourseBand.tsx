@@ -175,6 +175,15 @@ export function pickCourseBandFigure(
 
 interface Props {
   courseName: string | null | undefined;
+  /**
+   * THE COURSE NAME IS A DOOR (Ben, 15 Sep 2026). Passed ONLY when the card
+   * carries a real course id: the name then routes to that course's page and
+   * stops the event so no host handler (media tap, band stats sheet, round
+   * sheet) also fires. Absent -> the name is plain text with no tap target.
+   * There is NO name lookup fallback; routing from a name string is the exact
+   * fault the course-matcher work removed.
+   */
+  onOpenCourse?: () => void;
   courseLocation?: string | null;
   courseRating?: number | null;
   ctx?: PostCourseContext | null;
