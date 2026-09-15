@@ -51,6 +51,8 @@ import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
 import { applyRankCardRule } from './rankCards';
+import { cardTreatments, earnsHeroTreatment } from './cardTreatment';
+import { shelfDueAt, shelfForOrdinal } from './shelfCadence';
 /* BRIEF_COURSES_MERGED — Courses and Reviews are ONE view. */
 import { useCourseCandidateIndex } from './useCourseCandidateIndex';
 import { useCourseResults } from './useCourseResults';
@@ -107,7 +109,7 @@ type ShelfKind =
   | 'videos'
   | 'clubWeek'
   /** BRIEF_EXPLORE_CIRCLE_SHELF — latest rounds from the people you follow,
-   *  newest first. Fixed at the top of All and Scores; absent from Courses and Watch. */
+   *  newest first. Fixed once at the top of Scores; absent from All, Courses and Watch. */
   | 'circle'
   | 'standing'
   | 'coursesCounty'
@@ -152,8 +154,8 @@ function pairableRound(item: StreamItem): boolean {
   return item.kind === 'round' && item.consequence == null;
 }
 
-/** §5 shelves are inserted after card positions 3, 7, 11 ... and an empty
- *  source means the next shelf takes the slot rather than a gap appearing.
+/** §5 shelves are inserted after card positions 3, 7, 11 ... An empty source
+ *  consumes its scheduled slot without moving the next shelf earlier.
  *
  *  §5b/§5c A SINGLE-TYPE VIEW PAIRS ITS OWN KIND. The mixed stream refuses two
  *  cards of the same kind side by side, because there it would read as one
@@ -164,7 +166,7 @@ function buildBlocks(
   items: StreamItem[],
   shelves: ShelfKind[],
   sameKindPairs = false,
-  opts: { bareRoundPairs?: boolean; shelfAt?: number[]; mergedCourses?: boolean } = {},
+  opts: { bareRoundPairs?: boolean; shelfAt?: number[]; mergedCourses?: boolean; repeatShelves?: boolean } = {},
 ): Block[] {
   const blocks: Block[] = [];
   let cards = 0;
@@ -177,9 +179,11 @@ function buildBlocks(
      narrowed by what the card has to say - not a second one. */
   const stableCourse = (item: StreamItem) => item.kind === 'course' && (item.facts.course_event ?? 'stable') === 'stable';
   const canPair = (item: StreamItem) =>
-    opts.mergedCourses === true
-      ? stableCourse(item)
-      : PAIRABLE.has(item.kind) || (opts.bareRoundPairs === true && pairableRound(item));
+    !earnsHeroTreatment(item) && (
+      opts.mergedCourses === true
+        ? stableCourse(item)
+        : PAIRABLE.has(item.kind) || (opts.bareRoundPairs === true && pairableRound(item))
+    );
 
   while (index < items.length) {
     const item = items[index];
@@ -204,11 +208,12 @@ function buildBlocks(
       cards += 1;
     }
 
-    /* Scores places its shelves at PAGE BOUNDARIES (opts.shelfAt); every other
-       view keeps the 3 / 7 / 11 cadence exactly as it shipped. */
-    const due = opts.shelfAt ? opts.shelfAt[nextShelf] : 3 + nextShelf * 4;
-    if (due != null && cards >= due && nextShelf < shelves.length) {
-      blocks.push({ kind: 'shelf', shelf: shelves[nextShelf] });
+    /* The standard rhythm is 3 / 7 / 11. A caller may supply finite custom
+       boundaries; repeating views wrap their declared shelf order. */
+    const shelf = shelfForOrdinal(shelves, nextShelf, opts.repeatShelves === true);
+    const due = opts.shelfAt ? opts.shelfAt[nextShelf] : shelfDueAt(nextShelf);
+    if (shelf != null && due != null && cards >= due) {
+      blocks.push({ kind: 'shelf', shelf });
       nextShelf += 1;
     }
   }
@@ -332,6 +337,7 @@ function VideosShelf({
           <VideoCard
             row={row}
             size="rail"
+            context="all"
             onPress={() => {
               analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'videos', pos });
               onDepart();
@@ -794,8 +800,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
 
   /* §3e THE ALL ORDER AFTER THE LEAD, in one place. Page 3+ restarts from
-     clips, which the modulo in the renderer does; an empty shelf is skipped by
-     the shelf itself and the next one takes its slot. */
+     clips through shelfForOrdinal; an empty shelf consumes its scheduled slot
+     and the next rail waits for the next four-card boundary. */
   /* BRIEF_EXPLORE_ALL_VIDEO §1 PLACEMENT: videos sit FOURTH, between standing
      and the county courses rail, so no two media rails are adjacent - clips is
      first, moments fifth, and videos has a non-media rail on either side. Two
@@ -828,18 +834,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     'coursesWorld',
     'coursesNew',
   ];
-  /* SCORES SHELVES — the four that are about the MEMBER'S OWN GOLF, inserted at
-     the page boundaries (12, 24, 36, 48) so the card rhythm reads first and a
-     shelf arrives as a change of pace rather than an interruption.
+  /* SCORES SHELVES — the four that are about the MEMBER'S OWN GOLF, inserted
+     after 3 cards and every 4 thereafter, then repeated without Your circle.
      WHY 'standing' IS A SHELF AND NOT A CARD: a shelf may show a position with
      no motion — that is a standing, and a standing is worth looking at. A CARD
      must announce a CHANGE, which is the same distinction that retired
      rank_hold; do not promote this shelf into the card ladder. */
-  /* ORDER IS SET BY WHAT SCORES ALREADY SHOWS ABOVE THE STREAM. Your circle is
-     fixed at the head of this view. County courses takes the first in-stream
-     slot, so Where you stand remains in the rotation but cannot immediately
-     follow the circle rail. Club week and people follow at 36 / 48. */
-  const SCORES_SHELVES: ShelfKind[] = ['coursesCounty', 'standing', 'clubWeek', 'people'];
+  /* CHANGE EARNS HEIGHT. The daily/weekly rail leads the repeating cycle;
+     slower standing and county rails follow; the growth prompt is last. */
+  const SCORES_SHELVES: ShelfKind[] = ['clubWeek', 'standing', 'coursesCounty', 'people'];
   const shelves: ShelfKind[] =
     view === 'watch'
       ? /* WATCH COMPOSES ITS OWN RAILS (BRIEF_WATCH_MIXED_FEED): windows into its
@@ -861,13 +864,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     () =>
       buildBlocks(ranked, shelves, false, {
         bareRoundPairs: view === 'scores',
-        shelfAt: view === 'scores' ? [12, 24, 36, 48] : undefined,
+        repeatShelves: view === 'scores' || view === 'all',
         /* §3 THE MERGED VIEW'S RHYTHM: pairs are STABLE-FACT COURSE CARDS only,
            reviews and event cards always full width. */
         mergedCourses: view === 'courses',
       }),
     [ranked, view, activeScope, shelves, singleType],
   );
+  const treatments = useMemo(() => cardTreatments(ranked), [ranked]);
 
 
   /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
@@ -1438,25 +1442,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
 
       {view === 'scores' ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP, marginBottom: BLOCK_GAP }}>
+        <div style={{ marginBottom: BLOCK_GAP }}>
           <CircleShelf viewerId={userId} pos={0} />
-          <WeeklyClubShelf
-            viewerId={userId}
-            clubId={geography.scope.primaryClubId}
-            clubName={geography.scope.primaryClubName}
-
-            enabled={(scoreScope === 'club' || scoreScope === 'county') && !!geography.scope.primaryClubId}
-            pos={0}
-          />
-          {/* §4 THE PEOPLE SHELF MOUNTS IN BOTH VIEWS. In Scores it belongs to
-              the club and county scopes, which are the scopes that have a club. */}
-          <PeopleShelf
-            viewerId={userId}
-            clubId={geography.scope.primaryClubId}
-            clubName={geography.scope.primaryClubName}
-            enabled={geography.isFetched && (scoreScope === 'club' || scoreScope === 'county')}
-            pos={0}
-          />
         </div>
       ) : null}
 
@@ -1502,7 +1489,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         {blocks.map((block, index) => {
           if (block.kind === 'shelf') {
             const pos = cardPos;
-            return <div key={`shelf:${block.shelf}:${index}`}>{renderShelf(block.shelf, pos)}</div>;
+            return <Fragment key={`shelf:${block.shelf}:${index}`}>{renderShelf(block.shelf, pos)}</Fragment>;
           }
 
           if (block.kind === 'pair') {
@@ -1518,6 +1505,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     key={item.id}
                     item={item}
                     size="pair"
+                    cardTreatment="standard"
                     onTap={() => tapCard(item, 'pair', base + offset)}
                     onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
                   />
@@ -1530,19 +1518,18 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const pos = cardPos;
           cardPos += 1;
           const size: CardSize = block.kind === 'lead' ? 'lead' : 'std';
-          /* §2 THE LONG-FORM CARD IS WATCH'S CARD. Full width, 16:9, duration
-             chip, title as the headline, creator and date on the who-line -
-             rendered by the SAME component Watch renders, so the two can never
-             drift and no second video card exists. It is NOT wrapped in the
-             12px card inset: a video row is full-bleed on Watch and reads as a
-             video row here for the same reason. */
+          /* §2 THE LONG-FORM CARD IS WATCH'S CARD. On All it wears the same
+             12px inset and 14px radius as its magazine neighbours; Watch keeps
+             the shared component's default full-bleed treatment. Duration,
+             title, creator and playback still come from the one shared unit. */
           if (item.kind === 'watch' && item.payload.video) {
             const row = item.payload.video;
             const index = videoRows.findIndex((entry) => entry.post_id === row.post_id);
             return (
-              <div key={item.id}>
+              <div key={item.id} style={{ paddingInline: CARD_INSET }}>
                 <VideoCard
                   row={row}
+                  context="all"
                   onPress={() => {
                     analyticsEvents.track('amateur_card_tapped', { kind: 'watch', size, pos });
                     depart();
@@ -1565,6 +1552,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               <ExploreCard
                 item={item}
                 size={size}
+                cardTreatment={treatments.get(item.id) ?? 'standard'}
                 shape={shapesMap === null ? undefined : item.facts.score_id ? shapesMap.get(item.facts.score_id) ?? null : null}
                 viewerBest={own?.gross ?? null}
                 viewerBestSince={monthLabel(own?.playDate ?? null, i18n.language || 'en')}

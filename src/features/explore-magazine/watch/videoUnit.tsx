@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { r } from '@/lib/radius';
 
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { autoplayBlocked } from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
@@ -182,11 +183,14 @@ export function VideoCard({
   row,
   onPress,
   size = 'full',
+  context = 'watch',
   autoplay = size === 'full',
 }: {
   row: HubRpcRow;
   onPress: () => void;
   size?: 'full' | 'rail';
+  /** Watch stays full-bleed; All wears the inset magazine-card geometry. */
+  context?: 'all' | 'watch';
   /** AUTOPLAY IS OPT-OUT ON THE CARD, OFF ON THE RAIL. A rail tile that played
    *  would compete with the full-width card for the page's one stream, and win
    *  it whenever the rail happened to be nearer the viewport centre. */
@@ -194,6 +198,7 @@ export function VideoCard({
 }) {
   const { t } = useTranslation('courses');
   const rail = size === 'rail';
+  const magazine = context === 'all';
   const title = videoTitle(row, t('amateur.watch.untitled', 'Untitled video'));
   const who = creatorName(row);
   const when = formatRelativeAgo(row.post_created_at ?? null);
@@ -226,7 +231,7 @@ export function VideoCard({
           width: '100%',
           aspectRatio: '16 / 9',
           overflow: 'hidden',
-          borderRadius: rail ? 10 : undefined,
+          borderRadius: magazine ? r.md : rail ? r.sm : undefined,
           background: A.PANEL,
         }}
       >
@@ -254,7 +259,7 @@ export function VideoCard({
         style={{
           display: 'flex',
           gap: rail ? 0 : 10,
-          padding: rail ? '7px 0 0' : `9px ${INSET}px 0`,
+          padding: magazine ? '8px 4px 0' : rail ? '7px 0 0' : `9px ${INSET}px 0`,
           alignItems: 'flex-start',
         }}
       >
