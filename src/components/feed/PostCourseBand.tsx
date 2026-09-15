@@ -175,6 +175,15 @@ export function pickCourseBandFigure(
 
 interface Props {
   courseName: string | null | undefined;
+  /**
+   * THE COURSE NAME IS A DOOR (Ben, 15 Sep 2026). Passed ONLY when the card
+   * carries a real course id: the name then routes to that course's page and
+   * stops the event so no host handler (media tap, band stats sheet, round
+   * sheet) also fires. Absent -> the name is plain text with no tap target.
+   * There is NO name lookup fallback; routing from a name string is the exact
+   * fault the course-matcher work removed.
+   */
+  onOpenCourse?: () => void;
   courseLocation?: string | null;
   courseRating?: number | null;
   ctx?: PostCourseContext | null;
@@ -210,6 +219,7 @@ interface Props {
 
 export const PostCourseBand: React.FC<Props> = ({
   courseName,
+  onOpenCourse,
   courseLocation,
   courseRating,
   ctx,
@@ -254,6 +264,11 @@ export const PostCourseBand: React.FC<Props> = ({
         lineHeight: 1.05,
       }}
     >
+      {/* THE NAME IS THE TAP TARGET, never the whole band and never the place
+          line. Rendered as a role="link" span rather than a <button> because
+          the band row itself may already BE a button when the stats sheet is
+          wired, and a nested button is invalid. The affordance is the small
+          chevron pinned to the name's own text, not an underline. */}
       <div
         style={{
           flex: 1,
@@ -268,7 +283,49 @@ export const PostCourseBand: React.FC<Props> = ({
           whiteSpace: 'nowrap',
         }}
       >
-        {courseName}
+        {onOpenCourse ? (
+          <span
+            role="link"
+            tabIndex={0}
+            className="active:opacity-60"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              analyticsEvents.track('course_name_tapped', {
+                course_id: ctx?.course_id ?? null,
+                surface: identityOnly ? 'review_post' : 'post',
+              });
+              onOpenCourse();
+            }}
+            onKeyDown={(e) => {
+              if (e.key !== 'Enter' && e.key !== ' ') return;
+              e.stopPropagation();
+              e.preventDefault();
+              onOpenCourse();
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+              maxWidth: '100%',
+              cursor: 'pointer',
+              color: C.ink,
+            }}
+          >
+            <span
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {courseName}
+            </span>
+            <ChevronRight size={13} color={C.mute} aria-hidden style={{ flexShrink: 0, marginLeft: -1 }} />
+          </span>
+        ) : (
+          courseName
+        )}
       </div>
       {rating != null ? (
         <span

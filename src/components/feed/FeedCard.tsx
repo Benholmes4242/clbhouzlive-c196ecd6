@@ -37,6 +37,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
+import { useNavigate } from 'react-router-dom';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 import { LikedByRow } from '@/components/likes/LikedByRow';
@@ -337,6 +338,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const [burstVisible, setBurstVisible] = useState(false);
   // Course stats sheet. Mounting it is what enables the detail RPC.
   const [statsOpen, setStatsOpen] = useState(false);
+  // The course name's own destination. The legacy `onCourse` prop is left
+  // exactly as shipped for its existing callers.
+  const navigate = useNavigate();
   const handleMediaDoubleTap = React.useCallback(() => {
     // Always show the burst (confirms even when already liked)…
     setBurstKey((k) => k + 1);
@@ -855,6 +859,18 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           <>
             <PostCourseBand
               courseName={post.courseName}
+              /**
+               * THE COURSE NAME IS A DOOR. Routes to /courses/:courseId for the
+               * id the card ALREADY carries — review posts resolve through
+               * reviewCourseId (review.courseId, else courseId), every other
+               * kind through post.courseId. No id -> no prop -> plain text, and
+               * never a lookup by name.
+               */
+              onOpenCourse={
+                (post.isReview ? reviewCourseId : post.courseId)
+                  ? () => navigate(`/courses/${post.isReview ? reviewCourseId : post.courseId}`)
+                  : undefined
+              }
               /**
                * BRIEF_ROUND_CARD_CONTEXT S2 — THE REGION IS PRINTED ONCE PER
                * CARD. On a round post PostRoundCard already states
