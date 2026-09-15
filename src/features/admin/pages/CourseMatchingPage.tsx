@@ -4,6 +4,11 @@ import { Link2, ChevronDown, ChevronUp, Image as ImageIcon, MapPin, CheckCircle2
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { courseMatchLabel } from '../lib/geography';
+import {
+  CandidateCountryFlag,
+  CountryMismatchWarning,
+  WhsCountryChip,
+} from '../components/CountryMismatchWarning';
 import { adminTheme as t } from '../theme';
 import EmptyState from '../components/EmptyState';
 import StatusPill from '../components/StatusPill';
@@ -32,6 +37,8 @@ type MatchMethod =
 interface QueueRow {
   whs_course_id: string;
   whs_name: string;
+  /** WHS-published country. Shown to the reviewer and compared with the candidate. */
+  whs_country_name: string | null;
   match_method: MatchMethod;
   match_confidence: number | null;
   echo_agreement_count: number | null;
@@ -65,7 +72,7 @@ async function fetchQueue(): Promise<QueueRow[]> {
     .select(
       `whs_course_id, match_method, match_confidence, echo_agreement_count,
        echo_reasoning, echo_suggested_golf_course_id, matched_at,
-       whs_courses:whs_course_id ( name )`
+       whs_courses:whs_course_id ( name, country_name )`
     )
     .is('golf_course_id', null)
     .limit(500);
@@ -130,6 +137,7 @@ async function fetchQueue(): Promise<QueueRow[]> {
     .map((r) => ({
       whs_course_id: r.whs_course_id,
       whs_name: r.whs_courses?.name ?? '(unknown)',
+      whs_country_name: r.whs_courses?.country_name ?? null,
       match_method: r.match_method,
       match_confidence: r.match_confidence,
       echo_agreement_count: r.echo_agreement_count,
@@ -438,6 +446,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
           <span style={{ fontWeight: 700, color: t.ink, fontSize: 14 }}>{row.whs_name}</span>
+          <WhsCountryChip country={row.whs_country_name} />
           <span
             style={{
               display: 'inline-flex', alignItems: 'center',
@@ -704,9 +713,10 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
               </span>
             )}
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: t.inkMuted, fontSize: 11 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: t.inkMuted, fontSize: 11, flexWrap: 'wrap' }}>
             <MapPin size={10} />
             {courseMatchLabel(hit) || '—'}
+            <CandidateCountryFlag whsCountry={row.whs_country_name} subCountry={hit.sub_country} />
           </span>
         </span>
       </button>
@@ -775,6 +785,22 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
             >
               Linked. Images and IDs appear in Discover after the next cache refresh (up to 6h).
             </div>
+          )}
+
+          {/* The WHS country, in front of the reviewer before any decision. */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <WhsCountryChip country={row.whs_country_name} />
+            {chosen && (
+              <span style={{ fontSize: 12, color: t.inkMuted }}>
+                selected: {chosen.sub_country ?? 'no recorded country'}
+              </span>
+            )}
+          </div>
+          {chosen && (
+            <CountryMismatchWarning
+              whsCountry={row.whs_country_name}
+              subCountry={chosen.sub_country}
+            />
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>

@@ -6,6 +6,11 @@ import { ChevronRight, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { LABEL } from '@/lib/tokens/type';
 import { courseMatchLabel } from '../lib/geography';
+import {
+  CandidateCountryFlag,
+  CountryMismatchWarning,
+  WhsCountryChip,
+} from '../components/CountryMismatchWarning';
 import { adminTheme as t } from '../theme';
 import { useInboxFeed, type InboxItem, type InboxType } from '../hooks/useInboxFeed';
 import { useInboxOpsStats, formatDurationShort as formatDurationMs } from '../hooks/useInboxOpsStats';
@@ -643,12 +648,31 @@ function MatchInboxSheet({ row, onClose }: { row: MatchRequestRow | null; onClos
   const [whs, setWhs] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // The WHS-published country for the name being aliased. Looked up by name because
+  // this path types a WHS name rather than picking a whs_courses row.
+  const [whsCountry, setWhsCountry] = useState<string | null>(null);
   const qc = useQueryClient();
 
   useEffect(() => {
     if (!row) { setWhs(''); setErr(null); return; }
     setWhs(row.whs_course_name ?? '');
   }, [row]);
+
+  useEffect(() => {
+    const name = whs.trim();
+    if (name.length < 2) { setWhsCountry(null); return; }
+    let cancel = false;
+    const handle = setTimeout(async () => {
+      const { data } = await supabase
+        .from('whs_courses')
+        .select('country_name')
+        .ilike('name', name)
+        .limit(1)
+        .maybeSingle();
+      if (!cancel) setWhsCountry((data as any)?.country_name ?? null);
+    }, 250);
+    return () => { cancel = true; clearTimeout(handle); };
+  }, [whs]);
 
   if (!row) return null;
 
@@ -687,6 +711,13 @@ function MatchInboxSheet({ row, onClose }: { row: MatchRequestRow | null; onClos
         <div style={{ fontSize: 12, color: t.inkMuted }}>
           Requester: <span style={{ color: t.ink, fontWeight: 600 }}>{row.requester_name ?? row.requester_username ?? row.user_id.slice(0, 8)}</span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <WhsCountryChip country={whsCountry} />
+          <span style={{ fontSize: 12, color: t.inkMuted }}>
+            catalogue: {row.course_sub_country ?? 'no recorded country'}
+          </span>
+        </div>
+        <CountryMismatchWarning whsCountry={whsCountry} subCountry={row.course_sub_country} />
         <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: t.inkFaint }}>
           WHS course name to alias
         </label>
@@ -840,6 +871,18 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
             Echo suggests: <span style={{ color: t.ink, fontWeight: 600 }}>{row.echo_suggestion}</span>
           </div>
         )}
+        {/* The WHS country, beside the WHS name, before any candidate is picked. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <WhsCountryChip country={row.whs_country_name} />
+          {chosen && (
+            <span style={{ fontSize: 12, color: t.inkMuted }}>
+              selected: {chosen.sub_country ?? 'no recorded country'}
+            </span>
+          )}
+        </div>
+        {chosen && (
+          <CountryMismatchWarning whsCountry={row.whs_country_name} subCountry={chosen.sub_country} />
+        )}
         <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: t.inkFaint }}>
           Search courses
         </label>
@@ -876,8 +919,9 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
                   }}
                 >
                   <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{h.name}</div>
-                  <div style={{ fontSize: 11, color: t.inkMuted }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 11, color: t.inkMuted }}>
                     {courseMatchLabel(h) || '-'}
+                    <CandidateCountryFlag whsCountry={row.whs_country_name} subCountry={h.sub_country} />
                   </div>
                 </button>
               );
