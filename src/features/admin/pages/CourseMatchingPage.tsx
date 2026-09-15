@@ -32,6 +32,8 @@ type MatchMethod =
 interface QueueRow {
   whs_course_id: string;
   whs_name: string;
+  /** WHS-published country. Shown to the reviewer and compared with the candidate. */
+  whs_country_name: string | null;
   match_method: MatchMethod;
   match_confidence: number | null;
   echo_agreement_count: number | null;
@@ -65,7 +67,7 @@ async function fetchQueue(): Promise<QueueRow[]> {
     .select(
       `whs_course_id, match_method, match_confidence, echo_agreement_count,
        echo_reasoning, echo_suggested_golf_course_id, matched_at,
-       whs_courses:whs_course_id ( name )`
+       whs_courses:whs_course_id ( name, country_name )`
     )
     .is('golf_course_id', null)
     .limit(500);
@@ -130,6 +132,7 @@ async function fetchQueue(): Promise<QueueRow[]> {
     .map((r) => ({
       whs_course_id: r.whs_course_id,
       whs_name: r.whs_courses?.name ?? '(unknown)',
+      whs_country_name: r.whs_courses?.country_name ?? null,
       match_method: r.match_method,
       match_confidence: r.match_confidence,
       echo_agreement_count: r.echo_agreement_count,
