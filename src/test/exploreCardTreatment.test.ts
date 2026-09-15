@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { calloutFor, isNotableRound } from '@/features/explore-magazine/cardTreatment';
+import { roundConsequence } from '@/features/explore-magazine/consequences';
 import { shelfDueAt, shelfForOrdinal } from '@/features/explore-magazine/shelfCadence';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
