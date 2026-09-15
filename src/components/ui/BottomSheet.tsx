@@ -190,6 +190,8 @@ export function BottomSheet({
   /** The live detent/drag, so a ResizeObserver callback cannot read a stale one. */
   const detentRef = useRef<'mid' | 'full'>('mid');
   const draggingRef = useRef(false);
+  detentRef.current = detent;
+  draggingRef.current = dragging;
 
   const measure = useCallback(() => {
     const el = sheetRef.current;
