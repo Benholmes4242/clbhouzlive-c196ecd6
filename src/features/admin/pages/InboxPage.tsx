@@ -840,6 +840,18 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
             Echo suggests: <span style={{ color: t.ink, fontWeight: 600 }}>{row.echo_suggestion}</span>
           </div>
         )}
+        {/* The WHS country, beside the WHS name, before any candidate is picked. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <WhsCountryChip country={row.whs_country_name} />
+          {chosen && (
+            <span style={{ fontSize: 12, color: t.inkMuted }}>
+              selected: {chosen.sub_country ?? 'no recorded country'}
+            </span>
+          )}
+        </div>
+        {chosen && (
+          <CountryMismatchWarning whsCountry={row.whs_country_name} subCountry={chosen.sub_country} />
+        )}
         <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: t.inkFaint }}>
           Search courses
         </label>
@@ -876,8 +888,9 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
                   }}
                 >
                   <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{h.name}</div>
-                  <div style={{ fontSize: 11, color: t.inkMuted }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 11, color: t.inkMuted }}>
                     {courseMatchLabel(h) || '-'}
+                    <CandidateCountryFlag whsCountry={row.whs_country_name} subCountry={h.sub_country} />
                   </div>
                 </button>
               );
