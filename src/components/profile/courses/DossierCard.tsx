@@ -177,10 +177,11 @@ const DossierCard: React.FC<DossierCardProps> = ({
           >
             {course.name}
           </div>
-          {metaSegments.length > 0 && (
-            <div style={{ ...LABEL, letterSpacing: '0.10em' }}>
-              {metaSegments.join(' \u00B7 ')}
-            </div>
+          {line1.length > 0 && (
+            <div style={{ ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line1}</div>
+          )}
+          {line2.length > 0 && (
+            <div style={{ ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
           )}
         </div>
 
