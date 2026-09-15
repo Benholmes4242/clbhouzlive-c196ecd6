@@ -1,7 +1,20 @@
 -- ============================================================================
 -- ANCHOR get_explore_stream's CURSOR IN TIME
 --
--- Ben runs this as postgres. Nothing here has been applied.
+-- APPLIED 15 Sep 2026, deployed md5 e1ee958dd62fc7ea8ef71dc954563e12.
+-- Verified: now_count 1, volatility 's', anchor + seen anchor + both cursor
+-- keys present; page 1 x page 2 = 12 x 12 rows, overlap 0; member-role timing
+-- 830.7 ms / 142,713 buffers before, 831.6 ms / 142,691 buffers after.
+-- Any future patch to get_explore_stream must assert that md5 and the
+-- v_anchor fingerprint.
+--
+-- Ben runs this as postgres. The patch block (BEGIN ... COMMIT) and each
+-- VERIFY query below are SEPARATE runs in the SQL editor.
+--
+-- RULE FOR FUTURE PATCHES OF THIS SHAPE: an injected comment must never
+-- contain a string the patch counts. The first run of this file aborted on
+-- "expected exactly 1 now() after the patch, found 2" because the site-2
+-- comment contained the literal text "now()"; the count picked it up.
 --
 -- WHY. The keyset is (q.sc < v_cur_s OR (q.sc = v_cur_s AND q.cid > v_cur_i)),
 -- but sc is not stable between calls:
@@ -128,8 +141,8 @@ BEGIN
   v_from := 'BEGIN' || E'\n' || '  SELECT' || E'\n'
          || '    coalesce(max(value) FILTER (WHERE key = ''w_consequence''),  6),';
   v_to   := 'BEGIN' || E'\n'
-         || '  -- The ONLY now() left in this body. A cursor that carries ''at'' pins the' || E'\n'
-         || '  -- page to the moment page 1 was scored.' || E'\n'
+         || '  -- The ONLY clock read left in this body. A cursor that carries ''at''' || E'\n'
+         || '  -- pins the page to the moment page 1 was scored.' || E'\n'
          || '  v_anchor := coalesce((p_cursor ->> ''at'')::timestamptz, now());' || E'\n'
          || E'\n'
          || '  SELECT' || E'\n'
@@ -271,17 +284,22 @@ SELECT md5(pg_get_functiondef(p.oid))                                      AS ne
 
 -- V2. NO OVERLAP between page 1 and page 2, and the cursor carries the anchors.
 -- The viewer is resolved by email, never by a pasted uuid.
+-- NOTE: SELECT s.* (not SELECT *) - the me CTE and the function both return an
+-- id column, so USING (id) on SELECT * is ambiguous.
+-- NOTE: page 1 and page 2 in ONE statement share one statement clock, so this
+-- shape would pass even without the patch. It proves the cursor plumbing and
+-- the overlap; it does NOT prove the anchor. V2b below proves the anchor.
 WITH me AS (
   SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'
 ),
 p1 AS (
-  SELECT * FROM me, public.get_explore_stream(me.id, 'all', 'world', NULL, 12) s
+  SELECT s.* FROM me, public.get_explore_stream(me.id, 'all', 'world', NULL, 12) s
 ),
 cur AS (
   SELECT (SELECT next_cursor FROM p1 WHERE next_cursor IS NOT NULL LIMIT 1) AS c
 ),
 p2 AS (
-  SELECT * FROM me, cur, public.get_explore_stream(me.id, 'all', 'world', cur.c, 12) s
+  SELECT s.* FROM me, cur, public.get_explore_stream(me.id, 'all', 'world', cur.c, 12) s
 )
 SELECT (SELECT count(*) FROM p1)                                        AS page1_rows,
        (SELECT count(*) FROM p2)                                        AS page2_rows,
@@ -289,6 +307,29 @@ SELECT (SELECT count(*) FROM p1)                                        AS page1
        (SELECT c ? 'at'   FROM cur)                                     AS cursor_has_at,
        (SELECT c ? 'seen' FROM cur)                                     AS cursor_has_seen,
        (SELECT c ->> 'at' FROM cur)                                     AS anchored_at;
+
+-- V2b. DRIFT CHECK (informational). Same page 1, but page 2 is called with the
+-- cursor's 'at' moved +12 hours - simulating a world where the anchor was NOT
+-- carried and 12 hours of freshness decay happened between pages. Before the
+-- patch this is roughly what real paging did (every page re-read the clock);
+-- after the patch the served cursor pins 'at', so this column shows what drift
+-- WOULD have produced. There is no hard expectation: any overlap here is the
+-- failure mode the patch removed from real paging.
+WITH me AS (
+  SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'
+),
+p1 AS (
+  SELECT s.* FROM me, public.get_explore_stream(me.id, 'all', 'world', NULL, 12) s
+),
+cur AS (
+  SELECT (SELECT next_cursor FROM p1 WHERE next_cursor IS NOT NULL LIMIT 1) AS c
+),
+p2_drifted AS (
+  SELECT s.* FROM me, cur,
+       public.get_explore_stream(me.id, 'all', 'world',
+         jsonb_set(cur.c, '{at}', to_jsonb((cur.c ->> 'at')::timestamptz + interval '12 hours')), 12) s
+)
+SELECT (SELECT count(*) FROM p1 JOIN p2_drifted USING (id)) AS overlap_if_12h_passed;
 
 -- V3. PAGE 2 USES THE CURSOR'S SEEN VALUE, NOT THE TABLE.
 -- Left: page 2 with the cursor exactly as served. Right: the same cursor with
@@ -325,25 +366,34 @@ SELECT a.id,
   FROM as_served a FULL JOIN forced f USING (id)
  ORDER BY a.id;
 
--- V4. MEMBER-ROLE TIMING. Run the block below BEFORE the patch and again
--- AFTER, and compare. Timing must be reported for the member role, not
--- postgres, because RLS on the pooled tables is part of the cost.
---   Turn timing on in your client first (psql: timing on) or read the
---   EXPLAIN ANALYZE total below.
+-- V4. MEMBER-ROLE TIMING. The baseline MUST be run BEFORE the patch block
+-- above (on the pre-patch body); run it again after, and compare. Timing must
+-- be reported for the member role, not postgres, because RLS on the pooled
+-- tables is part of the cost.
+-- The jwt claims resolve the viewer by email, never a pasted uuid. Page 2 uses
+-- the cursor V2 printed - paste it in place of the placeholder (the only
+-- placeholder in this file).
+--   Turn timing on in your client first (in psql: timing on) or read the
+--   EXPLAIN ANALYZE total below. The EXPLAIN is the last statement in each
+--   block.
 BEGIN;
+  SELECT set_config('request.jwt.claims',
+           json_build_object('sub', (SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'),
+                             'role', 'authenticated')::text, true);
   SET LOCAL role authenticated;
-  SET LOCAL request.jwt.claims = '{"role":"authenticated","sub":"REPLACE_WITH_THE_UUID_FROM_V2"}';
   EXPLAIN (ANALYZE, BUFFERS)
     SELECT * FROM public.get_explore_stream(
-      'REPLACE_WITH_THE_UUID_FROM_V2'::uuid, 'all', 'world', NULL, 12);
+      (SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'), 'all', 'world', NULL, 12);
 ROLLBACK;
 -- Page 2 timing, same session shape, using the cursor V2 printed:
 BEGIN;
+  SELECT set_config('request.jwt.claims',
+           json_build_object('sub', (SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'),
+                             'role', 'authenticated')::text, true);
   SET LOCAL role authenticated;
-  SET LOCAL request.jwt.claims = '{"role":"authenticated","sub":"REPLACE_WITH_THE_UUID_FROM_V2"}';
   EXPLAIN (ANALYZE, BUFFERS)
     SELECT * FROM public.get_explore_stream(
-      'REPLACE_WITH_THE_UUID_FROM_V2'::uuid, 'all', 'world',
+      (SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'), 'all', 'world',
       'REPLACE_WITH_THE_next_cursor_FROM_V2'::jsonb, 12);
 ROLLBACK;
 -- Expectation: unchanged within noise. The patch removes a per-page stamp read
