@@ -1888,35 +1888,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const item = block.item;
           const pos = cardPos;
           cardPos += 1;
-          const size: CardSize = block.kind === 'lead' ? 'lead' : 'std';
-          /* §2 THE LONG-FORM CARD IS WATCH'S CARD. On All it wears the same
-             12px inset and 14px radius as its magazine neighbours; Watch keeps
-             the shared component's default full-bleed treatment. Duration,
-             title, creator and playback still come from the one shared unit. */
-          if (item.kind === 'watch' && item.payload.video) {
-            const row = item.payload.video;
-            const index = videoRows.findIndex((entry) => entry.post_id === row.post_id);
-            return (
-              <div key={item.id} style={{ paddingInline: CARD_INSET }}>
-                <VideoCard
-                  row={row}
-                  context="all"
-                  onPress={() => {
-                    analyticsEvents.track('amateur_card_tapped', { kind: 'watch', size, pos });
-                    depart();
-                    openWithOrigin({
-                      posts: videoPosts,
-                      index: index < 0 ? 0 : index,
-                      originEl: null,
-                      posterUrl: row.poster_url ?? null,
-                      openedFrom: 'amateur-watch',
-                      forceStartAtZero: true,
-                    });
-                  }}
-                />
-              </div>
-            );
-          }
+          /* §2 THE LEAD SIZE IS GONE. Position 0 is not special: every full-width
+             card is the std size and the KIND decides where its text sits. */
+          const size: CardSize = 'std';
           const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>
