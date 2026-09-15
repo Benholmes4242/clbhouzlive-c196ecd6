@@ -50,7 +50,6 @@ export function RankingsMagazineRail() {
               <span style={{ display: 'block', marginTop: 7, fontSize: 11, fontWeight: 600, color: A.MUTE, fontVariantNumeric: 'tabular-nums' }}>{row.points != null ? Math.round(row.points).toLocaleString() : ''}</span>
             </button>
           );
-          );
         })}
       </div>
     </section>
