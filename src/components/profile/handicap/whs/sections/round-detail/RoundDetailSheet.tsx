@@ -20,7 +20,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import type { WhsScoreHole } from '@/lib/whs/types';
-import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
+import { fmtDateEyebrow } from './roundDateEyebrow';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -34,16 +34,8 @@ function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
 }
 
-function fmtDateEyebrow(iso: string | null | undefined): string {
-  if (!iso) return '';
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
-  const d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(iso);
-  if (isNaN(d.getTime())) return '';
-  const dow = formatWeekdayShortGB(d).toUpperCase();
-  const day = d.getDate();
-  const mon = formatMonthShortGB(d).toUpperCase();
-  return `${dow}, ${day} ${mon}`;
-}
+/* The date line moved to ./roundDateEyebrow so the swipe preview prints it
+   through the same function. Behaviour unchanged. */
 
 /**
  * BRIEF_ROUND_SHEET §1.3 — THE SEED.
@@ -102,12 +94,14 @@ interface Props {
   pageShift?: { dx: number; opacity?: number; animating: boolean } | null;
   /** §2.5 — the one-off swipe line, or nothing. */
   hint?: string | null;
+  /** BRIEF_ROUND_SHEET_PEEK §1 — the neighbour drawn beside this page. */
+  pagePreview?: { node: React.ReactNode; side: 'next' | 'prev' } | null;
 }
 
 export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId, sheetStyle,
   seed = null, detents, onDetentChange, onHorizontalDrag = null, onStatsSeen,
-  pageShift = null, hint = null,
+  pageShift = null, hint = null, pagePreview = null,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
@@ -414,6 +408,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       onStatsSeen={onStatsSeen}
       pageShift={pageShift}
       hint={hint}
+      pagePreview={pagePreview}
     />
     {commentsOpen && postInfo && (
       <CommentsSheetV2

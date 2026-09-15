@@ -21,7 +21,9 @@ import { fetchRoundDetail } from '@/lib/whs/api';
 import { coursePlaceLine } from './placeLine';
 import {
   pageDecision, rubberBand, neighbours, shouldExtend, noteHintOpen, noteHintPaged,
+  dragNeighbour,
 } from './roundPaging';
+import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
@@ -1005,6 +1007,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   pageIxRef.current = pageIx;
   const [shift, setShift] = useState<{ dx: number; opacity?: number; animating: boolean } | null>(null);
   const [swipeHintOn, setSwipeHintOn] = useState(false);
+  /* BRIEF_ROUND_SHEET_PEEK §1 — the neighbour drawn beside the current page
+     while a drag or its commit is in flight. One side only, and never at an end. */
+  const [preview, setPreview] = useState<{ side: 'next' | 'prev'; ix: number } | null>(null);
   const pageTimers = useRef<number[]>([]);
   const after = useCallback((ms: number, fn: () => void) => {
     pageTimers.current.push(window.setTimeout(fn, ms));
@@ -1048,6 +1053,33 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     };
   }, [shapesMap]);
 
+  /**
+   * §1 — THE PREVIEW'S SEED. seedFor() returns null when the feed holds no hole
+   * rows for a round; the preview still needs the course, the place, the member
+   * and the date so it can draw the summary with the syncing middle beneath it
+   * rather than a blank panel. Nothing here fetches.
+   */
+  const previewSeedFor = useCallback((item: StreamItem | undefined): RoundDetailSeed | null => {
+    if (!item?.facts.score_id) return null;
+    const seeded = seedFor(item);
+    if (seeded) return seeded;
+    return {
+      scoreId: item.facts.score_id,
+      holes: [],
+      gross: null,
+      toPar: null,
+      courseName: item.subject?.course_name ?? '',
+      placeLine: coursePlaceLine({
+        region: item.subject?.region ?? null,
+        subCountry: item.subject?.sub_country ?? null,
+        country: item.subject?.country ?? null,
+      }),
+      playerName: item.who?.display_name ?? null,
+      playerAvatarUrl: item.who?.photo_url ?? null,
+      playDate: item.facts.play_date ?? null,
+    };
+  }, [seedFor]);
+
   /** Shows a round in the sheet: seed, ring, feed position and neighbours.
    *  The DETENT is not touched — paging keeps the height the member chose. */
   const showRound = useCallback((item: StreamItem, ix: number) => {
@@ -1078,8 +1110,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     if (sheetSession.current) sheetSession.current.rounds += 1;
     analyticsEvents.track('round_sheet_page', { direction, index_from: from, index_to: to, view });
 
-    /* REDUCED MOTION IS A CROSSFADE, NEVER A SLIDE. */
+    /* REDUCED MOTION IS A CROSSFADE, NEVER A SLIDE — and it never drew a
+       neighbour, so there is nothing to peek at either. */
     if (prefersReducedMotion()) {
+      setPreview(null);
       setShift({ dx: 0, opacity: 0, animating: true });
       after(160, () => {
         showRound(item, to);
@@ -1088,36 +1122,72 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       });
       return;
     }
+    /*
+     * BRIEF_ROUND_SHEET_PEEK §1 — THE COMMIT.
+     *
+     * The current page travels out by one sheet width; the preview, offset a
+     * width to that same side, arrives at centre in the same movement. When it
+     * lands the real sheet is pointed at the new round WITH ITS SEED at dx 0 and
+     * the preview unmounts in the same commit — same summary, same nines, same
+     * position, so there is nothing to see at the swap. The seed/fetched stroke
+     * agreement (part 1) is what makes that safe, and its DEV mismatch log in
+     * RoundDetailSheet stays.
+     */
+    setPreview({ side: direction, ix: to });
     const out = direction === 'next' ? -window.innerWidth : window.innerWidth;
     setShift({ dx: out, animating: true });
     after(180, () => {
       showRound(item, to);
-      setShift({ dx: -out, animating: false });
-      window.requestAnimationFrame(() => setShift({ dx: 0, animating: true }));
-      after(240, () => setShift(null));
+      setShift(null);
+      setPreview(null);
     });
   }, [roundSeq, view, prefersReducedMotion, after, showRound]);
+
+  /*
+   * BRIEF_ROUND_SHEET_PEEK §1 — THE PREVIEW IS BUILT ONCE PER NEIGHBOUR, NOT
+   * ONCE PER FRAME. `shift` changes on every touchmove, so an inline element
+   * here would re-render the whole preview sixty times a second for a movement
+   * that is pure transform. Memoised on the neighbour alone, the drag costs one
+   * composited translate and nothing else.
+   */
+  const pagePreview = useMemo(() => {
+    if (!preview) return null;
+    const seed = previewSeedFor(roundSeq[preview.ix]);
+    if (!seed) return null;
+    return { side: preview.side, node: <RoundPagePreview seed={seed} /> };
+  }, [preview, roundSeq, previewSeedFor]);
 
   /* THE FINGER. The axis lock, the 8px and the 1.2 ratio live in BottomSheet;
      the thresholds and the end rubber-band live in roundPaging. */
   const pageDrag = useMemo(() => ({
-    onStart: () => setShift({ dx: 0, animating: false }),
+    onStart: () => { setShift({ dx: 0, animating: false }); setPreview(null); },
     onMove: (dx: number) => {
       const ix = pageIxRef.current;
       if (ix == null) return;
       setShift({ dx: rubberBand(ix, roundSeq.length, dx), animating: false });
+      /* §1 — ONE neighbour, on the side the finger is pulling from, and only
+         when there is one: at the ends the resistance is felt against nothing.
+         Reduced motion keeps the crossfade and never follows the finger. */
+      if (prefersReducedMotion()) return;
+      const n = dragNeighbour(ix, roundSeq.length, dx);
+      setPreview((cur) => (
+        n == null ? null
+          : cur && cur.side === n.side && cur.ix === n.index ? cur
+            : { side: n.side, ix: n.index }
+      ));
     },
     onEnd: (dx: number, velocity: number) => {
       const ix = pageIxRef.current;
       const decision = ix == null ? null : pageDecision(ix, roundSeq.length, dx, velocity);
       if (!decision) {
+        /* SPRING-BACK: the preview rides back out with the page and unmounts. */
         setShift({ dx: 0, animating: true });
-        after(220, () => setShift(null));
+        after(220, () => { setShift(null); setPreview(null); });
         return;
       }
       pageTo(decision.to, decision.direction);
     },
-  }), [roundSeq.length, after, pageTo]);
+  }), [roundSeq.length, after, pageTo, prefersReducedMotion]);
 
   const tapCard = useCallback(
     (item: StreamItem, size: CardSize, pos: number) => {
@@ -1817,6 +1887,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           setRingId(null);
           setSheetSeed(null);
           setShift(null);
+          setPreview(null);
           setPageIx(null);
           pageIxRef.current = null;
           setSwipeHintOn(false);
@@ -1842,6 +1913,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         onHorizontalDrag={pageIx != null && roundSeq.length > 1 ? pageDrag : null}
         pageShift={shift}
         hint={swipeHintOn ? t('courses:scorecard.swipeHint', 'Swipe for the next round') : null}
+        /* BRIEF_ROUND_SHEET_PEEK §1 — the neighbour, drawn from the seed this
+           page already holds. Query-free: no reactions, no comments, no stats.
+           A round with no hole rows still shows its summary with the syncing
+           middle rather than a blank panel. */
+        pagePreview={pagePreview}
       />
     </div>
   );

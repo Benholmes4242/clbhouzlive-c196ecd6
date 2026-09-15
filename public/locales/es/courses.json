@@ -59,14 +59,6 @@
       "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.",
       "thisCourse": "this course"
     },
-    "scoringKey": {
-      "ace": "Emboco desde el tee.",
-      "albatross": "Hizo un albatros.",
-      "eagle": "Eagle",
-      "birdie": "Birdie",
-      "bogey": "Bogey",
-      "doublePlus": "Dbl+"
-    },
     "yourNemesisTitle": "Your nemesis",
     "yourScoringHoleTitle": "Your scoring hole",
     "youPlayItTo": "You play it to {{playsTo}}",
