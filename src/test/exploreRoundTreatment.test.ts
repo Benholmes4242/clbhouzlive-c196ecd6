@@ -17,7 +17,7 @@ const item = (facts: StreamItem['facts']): StreamItem => ({
 const shape = (ds: number[]): HoleShape => ({
   series: [0, ...ds.reduce<number[]>((out, d) => [...out, (out.at(-1) ?? 0) + d], [])],
   beads: [], played: ds.length, birdies: ds.filter((d) => d < 0).length,
-  holes: ds.map((d, i) => ({ holeNo: i + 1, par: 4, strokes: 4 + d })),
+  holes: ds.map((d, i) => ({ holeNo: i + 1, par: 4, strokes: 4 + d, sheetStrokes: 4 + d })),
 });
 
 describe('treatmentFor', () => {
@@ -57,7 +57,7 @@ describe('dotsFor', () => {
   });
 
   it('marks an ace in gold whatever its par', () => {
-    const ace: HoleShape = { ...shape([0]), holes: [{ holeNo: 1, par: 3, strokes: 1 }] };
+    const ace: HoleShape = { ...shape([0]), holes: [{ holeNo: 1, par: 3, strokes: 1, sheetStrokes: 1 }] };
     expect(dotsFor(item({ holes_in_one: 1 }), ace)).toEqual([{ i: 1, tone: SC_FILL_GOLD }]);
   });
 

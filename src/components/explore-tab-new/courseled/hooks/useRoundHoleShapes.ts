@@ -36,6 +36,16 @@ interface Row {
   hole_no: number;
   par: number;
   actual_gross: number | null;
+  /**
+   * BRIEF_ROUND_SHEET §1.3 — READ, BUT NOT DRAWN.
+   *
+   * The tile curve still uses actual_gross: it says what happened on the course
+   * (see the note at the top of this file). The SHEET, however, prints
+   * `adjusted_gross ?? actual_gross`, so a seed built from this hook must use
+   * that rule or the number would change under the member when the fetch lands.
+   * It is carried alongside, never substituted into the curve.
+   */
+  adjusted_gross: number | null;
   played: boolean;
 }
 
@@ -64,7 +74,13 @@ export interface HoleShape {
    * SAME component the Clubhouse scorecard post and the scorecard sheet use
    * instead of a look-alike of its own.
    */
-  holes: { holeNo: number; par: number | null; strokes: number | null }[];
+  holes: {
+    holeNo: number;
+    par: number | null;
+    strokes: number | null;
+    /** §1.3 — the sheet's rule: adjusted_gross ?? actual_gross. */
+    sheetStrokes: number | null;
+  }[];
 }
 
 function buildShape(rows: Row[]): HoleShape | null {
@@ -92,7 +108,12 @@ function buildShape(rows: Row[]): HoleShape | null {
     beads,
     played: holes.length,
     birdies,
-    holes: holes.map((h) => ({ holeNo: h.hole_no, par: h.par, strokes: h.actual_gross })),
+    holes: holes.map((h) => ({
+      holeNo: h.hole_no,
+      par: h.par,
+      strokes: h.actual_gross,
+      sheetStrokes: h.adjusted_gross ?? h.actual_gross ?? null,
+    })),
   };
 }
 
@@ -112,7 +133,7 @@ export function useRoundHoleShapes(scoreIds: readonly (string | null | undefined
     queryFn: async () => {
       const { data: rows, error } = await supabase
         .from('whs_score_holes' as never)
-        .select('score_id, hole_no, par, actual_gross, played')
+        .select('score_id, hole_no, par, actual_gross, adjusted_gross, played')
         .in('score_id', ids as string[]);
       if (error) {
         if (MISSING_TABLE.has(String((error as { code?: string }).code ?? ''))) {

@@ -7,7 +7,7 @@
  * still compile. `variant` is IGNORED (light-only sheet).
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -45,6 +45,37 @@ function fmtDateEyebrow(iso: string | null | undefined): string {
   return `${dow}, ${day} ${mon}`;
 }
 
+/**
+ * BRIEF_ROUND_SHEET §1.3 — THE SEED.
+ *
+ * The feed has already read every hole of this round (useRoundHoleShapes), so
+ * the sheet has no reason to show a skeleton where the card goes. A seed is the
+ * feed's own copy of the round, and its strokes MUST be built with the sheet's
+ * rule (adjusted_gross ?? actual_gross) so the figure cannot change under the
+ * member when the fetch lands. Only the "at this course" section, which the
+ * feed genuinely does not have, keeps its skeleton.
+ */
+export interface RoundDetailSeed {
+  scoreId: string;
+  holes: { holeNo: number; par: number | null; strokes: number | null }[];
+  gross: number | null;
+  toPar: number | null;
+  courseName: string;
+  placeLine?: string | null;
+  playerName?: string | null;
+  playerAvatarUrl?: string | null;
+  playDate?: string | null;
+}
+
+/** A seed draws the card only when it is a WHOLE round: nine or eighteen holes,
+ *  every one of them scored. Anything less falls back to today's skeleton. */
+export function seedIsWhole(seed: RoundDetailSeed | null | undefined): boolean {
+  if (!seed) return false;
+  const n = seed.holes.length;
+  if (n !== 9 && n !== 18) return false;
+  return seed.holes.every((h) => h.strokes != null && h.strokes > 0 && h.par != null);
+}
+
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -56,10 +87,22 @@ interface Props {
   variant?: 'dark' | 'light';
   /** Optional BottomSheet surface style overrides (see CardScorecardSheet). */
   sheetStyle?: React.CSSProperties;
+  /** §1.3 — the feed's own copy of this round, so the card is instant. */
+  seed?: RoundDetailSeed | null;
+  /** §1.1 — half-height open. Absent keeps today's single-height behaviour. */
+  detents?: ['mid', 'full'];
+  onDetentChange?: (detent: 'mid' | 'full') => void;
+  onHorizontalDrag?: {
+    onStart: () => void;
+    onMove: (dx: number) => void;
+    onEnd: (dx: number, velocity: number) => void;
+  } | null;
+  onStatsSeen?: () => void;
 }
 
 export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId, sheetStyle,
+  seed = null, detents, onDetentChange, onHorizontalDrag = null, onStatsSeen,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
@@ -160,19 +203,53 @@ export const RoundDetailSheet: React.FC<Props> = ({
     [sortedHoles, fieldByHole],
   );
 
+  /**
+   * §1.3 — THE SEED DRAWS THE CARD WHILE THE QUERY IS UNSETTLED.
+   * It is used ONLY when the round has not answered yet AND the seed is a whole
+   * round for THIS score. Once the fetch lands the fetched holes take over — and
+   * because both sides use `adjusted_gross ?? actual_gross`, nothing visibly
+   * changes. In DEV a per-hole disagreement is logged with the score id.
+   */
+  const seedUsable = seedIsWhole(seed) && seed?.scoreId === scoreId;
+  const usingSeed = !roundSettled && seedUsable;
+  const seedCardHoles = useMemo(
+    () => (seedUsable && seed
+      ? seed.holes
+          .slice()
+          .sort((a, b) => a.holeNo - b.holeNo)
+          .map((h) => ({ holeNo: h.holeNo, par: h.par, strokes: h.strokes, fieldAvg: null }))
+      : []),
+    [seedUsable, seed],
+  );
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    if (!seedUsable || !seed || !roundSettled || cardHoles.length === 0) return;
+    const fetched = new Map(cardHoles.map((h) => [h.holeNo, h.strokes]));
+    for (const h of seed.holes) {
+      if (!fetched.has(h.holeNo)) continue;
+      if (fetched.get(h.holeNo) !== h.strokes) {
+        console.warn('[RoundDetailSheet] seed/fetched stroke mismatch', {
+          score_id: scoreId, hole_no: h.holeNo, seed: h.strokes, fetched: fetched.get(h.holeNo),
+        });
+      }
+    }
+  }, [seedUsable, seed, roundSettled, cardHoles, scoreId]);
+
+  const shownHoles = usingSeed ? seedCardHoles : cardHoles;
+
   /* THE FEAT IS READ FROM THE CARD, NOT PASSED IN (BRIEF_DISCOVER_FILTER_LED_BOARD
      S5.6). The holes already say whether this round holds an ace or an
      albatross, so every one of the sheet's callers gets the honours band without
      plumbing a prop through eight surfaces. Albatross outranks the ace. */
   const feat = useMemo<HonoursFeat | null>(() => {
     let ace = false;
-    for (const h of cardHoles) {
+    for (const h of shownHoles) {
       if (h.strokes == null) continue;
       if (h.par != null && h.strokes - h.par <= -3) return 'albatross';
       if (h.strokes === 1) ace = true;
     }
     return ace ? 'ace' : null;
-  }, [cardHoles]);
+  }, [shownHoles]);
 
 
   const totalPar = sortedHoles.reduce((a, h) => a + (h.par ?? 0), 0);
@@ -193,22 +270,23 @@ export const RoundDetailSheet: React.FC<Props> = ({
           : 'syncing';
 
 
-  const eyebrowText = fmtDateEyebrow(userData?.play_date);
+  const eyebrowText = fmtDateEyebrow(userData?.play_date ?? (usingSeed ? seed?.playDate : null));
   const canonicalCourse = canonicalCourseQuery.data ?? null;
-  const courseName = canonicalCourse?.name ?? userData?.course?.name ?? '';
+  const courseName = canonicalCourse?.name ?? userData?.course?.name ?? (usingSeed ? seed?.courseName ?? '' : '');
   const courseLocation = canonicalCourse
     ? coursePlaceLine({
         region: canonicalCourse.region,
         subCountry: canonicalCourse.sub_country,
         country: canonicalCourse.country,
       })
-    : (userData?.course as { country_name?: string | null } | null | undefined)?.country_name ?? null;
+    : (userData?.course as { country_name?: string | null } | null | undefined)?.country_name
+      ?? (usingSeed ? seed?.placeLine ?? null : null);
   const coursePar = totalPar > 0 ? totalPar : null;
   const courseSlope = (userData as { slope_rating?: number | null } | null | undefined)?.slope_rating ?? null;
 
 
 
-  const displayName = profile?.display_name ?? profile?.username ?? '';
+  const displayName = profile?.display_name ?? profile?.username ?? (usingSeed ? seed?.playerName ?? '' : '');
   const playerHcp = profile?.show_handicap === false
     ? null
     : resolveDisplayHandicap({
@@ -293,10 +371,12 @@ export const RoundDetailSheet: React.FC<Props> = ({
       courseLocation={courseLocation}
       coursePar={coursePar}
       courseSlope={courseSlope}
-      holes={cardHoles}
+      holes={shownHoles}
       feat={feat}
       nineHole={!!userData?.is_nine_hole}
-      loading={isRoundLoading || contextQuery.isLoading || analysisQuery.isLoading}
+      /* §1.3 — A SEEDED CARD NEVER SHOWS THE SKELETON. Without a seed the
+         behaviour is exactly today's. */
+      loading={!usingSeed && (isRoundLoading || contextQuery.isLoading || analysisQuery.isLoading)}
       surface="member"
       courseContext={ctx ? {
         yourAvgToPar: ctx.your_avg_to_par,
@@ -309,7 +389,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
         indexAtTime: userData?.handicap_index_at_time ?? null,
       } : null}
       playerName={displayName}
-      playerAvatarUrl={profile?.profile_photo_url ?? null}
+      playerAvatarUrl={profile?.profile_photo_url ?? (usingSeed ? seed?.playerAvatarUrl ?? null : null)}
       playerHcp={playerHcp}
       playerHcpDelta={handicapDelta ?? null}
       playerUserId={profileUserId ?? null}
@@ -323,6 +403,10 @@ export const RoundDetailSheet: React.FC<Props> = ({
       emptyToPar={toParVal}
       sheetStyle={sheetStyle}
       engagement={engagement}
+      detents={detents}
+      onDetentChange={onDetentChange}
+      onHorizontalDrag={onHorizontalDrag}
+      onStatsSeen={onStatsSeen}
     />
     {commentsOpen && postInfo && (
       <CommentsSheetV2

@@ -76,7 +76,42 @@ interface BottomSheetProps {
    * in the list and drag on the handle can never contend.
    */
   scrollBody?: boolean;
+  /*
+   * BRIEF_ROUND_SHEET §1.1 — DETENTS ARE OPT-IN.
+   *
+   * ABSENT (every existing consumer): behaviour is byte-identical to before —
+   * drag lives on the grabber only, down only, no detents, close past 100px.
+   *
+   * PRESENT (['mid','full']): the sheet opens at MID. Mid is measured at
+   * runtime from the element the consumer marks `data-sheet-mid-extent` (the
+   * last thing that must be visible at mid — the summary plus the whole card)
+   * and capped at 62dvh. With no marker the cap IS the height. Full is the
+   * existing maxHeight.
+   *
+   * The sheet is always laid out at its FULL height and translated down by the
+   * difference at mid, so a drag follows the finger with no relayout and the
+   * card cannot reflow between detents. At mid the body must not scroll: a
+   * scoped style rule freezes any `data-sheet-scroll` region, so a vertical
+   * drag anywhere on the sheet moves the sheet and has no scroll to fight.
+   */
+  detents?: ['mid', 'full'];
+  /** Reported on every settled detent change (analytics + host state). */
+  onDetentChange?: (detent: 'mid' | 'full') => void;
+  /** Horizontal gesture hand-off (paging). Return true to claim the pointer. */
+  onHorizontalDrag?: {
+    onStart: () => void;
+    onMove: (dx: number) => void;
+    onEnd: (dx: number, velocity: number) => void;
+  } | null;
 }
+
+/** Detent spring. Reduced motion collapses it to an instant change. */
+const DETENT_MS = 380;
+const DETENT_EASE = 'cubic-bezier(.2,.8,.2,1)';
+const MID_CAP_DVH = 0.62;
+/** Axis lock: 8px of travel, horizontal only when clearly horizontal. */
+const AXIS_LOCK_PX = 8;
+const AXIS_RATIO = 1.2;
 
 export function BottomSheet({
   open,
@@ -92,11 +127,144 @@ export function BottomSheet({
   grabberRadius = 2,
   grabberPadding = '10px 0 4px',
   scrollBody = false,
+  detents,
+  onDetentChange,
+  onHorizontalDrag = null,
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const currentTranslateY = useRef(0);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  /* ------------------------------------------------- detents (opt-in only) */
+  const detented = !!detents;
+  const [detent, setDetent] = useState<'mid' | 'full'>('mid');
+  /** How far the sheet is pushed down from full, in px. 0 === full. */
+  const [offset, setOffset] = useState(0);
+  /** The live value the gesture reads: state lags a fast finger by a frame. */
+  const offsetRef = useRef(0);
+  const moveOffset = useCallback((v: number) => { offsetRef.current = v; setOffset(v); }, []);
+  const [dragging, setDragging] = useState(false);
+  const fullH = useRef(0);
+  const midOffset = useRef(0);
+  const gesture = useRef<{
+    y: number; x: number; axis: 'none' | 'v' | 'h'; base: number; t: number; lastY: number; lastX: number; lastT: number;
+  } | null>(null);
+  const reduceMotion = typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /** mid = summary + whole card, capped at 62dvh. Measured, never assumed. */
+  const measure = useCallback(() => {
+    const el = sheetRef.current;
+    if (!el) return;
+    const h = el.offsetHeight;
+    if (!h) return;
+    fullH.current = h;
+    const cap = Math.round(window.innerHeight * MID_CAP_DVH);
+    const marker = el.querySelector('[data-sheet-mid-extent]') as HTMLElement | null;
+    let wanted = cap;
+    if (marker) {
+      const need = marker.getBoundingClientRect().bottom - el.getBoundingClientRect().top + 16;
+      wanted = Math.min(cap, Math.max(160, Math.round(need)));
+    }
+    const mid = Math.min(h, wanted);
+    midOffset.current = Math.max(0, h - mid);
+  }, []);
+
+  useEffect(() => {
+    if (!open || !detented) return;
+    setDetent('mid');
+    const run = () => {
+      measure();
+      moveOffset(midOffset.current);
+    };
+    const raf = requestAnimationFrame(() => requestAnimationFrame(run));
+    const timer = window.setTimeout(run, 220);
+    return () => { cancelAnimationFrame(raf); window.clearTimeout(timer); };
+  }, [open, detented, measure, moveOffset]);
+
+  const settle = useCallback(
+    (next: 'mid' | 'full') => {
+      measure();
+      moveOffset(next === 'mid' ? midOffset.current : 0);
+      setDetent((prev) => {
+        if (prev !== next) onDetentChange?.(next);
+        return next;
+      });
+    },
+    [measure, moveOffset, onDetentChange],
+  );
+
+  const scrollableAncestor = (target: EventTarget | null): boolean => {
+    let node = target as HTMLElement | null;
+    while (node && node !== sheetRef.current) {
+      if (node.hasAttribute?.('data-sheet-scroll')) return true;
+      node = node.parentElement;
+    }
+    return false;
+  };
+
+  const onDetentTouchStart = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0];
+    // At FULL the body scrolls, so only the grabber and the fixed summary
+    // (data-sheet-drag) may start a drag. At MID nothing scrolls, so anywhere
+    // is safe. Horizontal paging is allowed from anywhere at either detent.
+    gesture.current = {
+      y: t.clientY, x: t.clientX, axis: 'none',
+      base: offsetRef.current, t: Date.now(), lastY: t.clientY, lastX: t.clientX, lastT: Date.now(),
+    };
+  }, []);
+
+  const onDetentTouchMove = useCallback((e: React.TouchEvent) => {
+    const g = gesture.current;
+    if (!g) return;
+    const t = e.touches[0];
+    const dx = t.clientX - g.x;
+    const dy = t.clientY - g.y;
+    if (g.axis === 'none') {
+      if (Math.abs(dx) < AXIS_LOCK_PX && Math.abs(dy) < AXIS_LOCK_PX) return;
+      if (onHorizontalDrag && Math.abs(dx) > Math.abs(dy) * AXIS_RATIO) {
+        g.axis = 'h';
+        onHorizontalDrag.onStart();
+      } else {
+        const fromScroller = detent === 'full' && scrollableAncestor(e.target);
+        if (fromScroller) { gesture.current = null; return; }
+        g.axis = 'v';
+        setDragging(true);
+      }
+    }
+    if (g.axis === 'h') { g.lastX = t.clientX; g.lastT = Date.now(); onHorizontalDrag?.onMove(dx); return; }
+    g.lastY = t.clientY; g.lastT = Date.now();
+    moveOffset(Math.max(0, g.base + dy));
+  }, [detent, moveOffset, onHorizontalDrag]);
+
+  const onDetentTouchEnd = useCallback(() => {
+    const g = gesture.current;
+    gesture.current = null;
+    setDragging(false);
+    if (!g) return;
+    if (g.axis === 'h') {
+      /* The real travel and speed, so the host can decide page-or-return. */
+      const dx = g.lastX - g.x;
+      const dt = Math.max(1, g.lastT - g.t);
+      onHorizontalDrag?.onEnd(dx, dx / dt);
+      return;
+    }
+    if (g.axis !== 'v') return;
+    const dy = offsetRef.current - g.base;
+    const dt = Math.max(1, Date.now() - g.t);
+    const flick = Math.abs(dy) / dt > 0.6;
+    if (detent === 'mid') {
+      if (dy < -50 || (flick && dy < 0)) return settle('full');
+      if (dy > 90 || (flick && dy > 0)) return onClose();
+      return settle('mid');
+    }
+    if (dy > 160 || (flick && dy > 90)) return onClose();
+    if (dy > 70) return settle('mid');
+    return settle('full');
+  }, [detent, onClose, onHorizontalDrag, settle]);
+
 
   /* BRIEF_SHEET_BACK_BEHAVIOUR §2 — automatic registration with the stack, for
      every open sheet without exception (see the removed opt-out above).
@@ -180,27 +348,53 @@ export function BottomSheet({
 
   if (!open) return null;
 
+  /* The backdrop follows the sheet: at mid it is lighter than at full, and it
+     tracks the finger during a drag rather than jumping at release. */
+  const revealed = detented && fullH.current > 0
+    ? Math.max(0, Math.min(1, 1 - offset / fullH.current))
+    : 1;
+  const detentTransition = dragging || reduceMotion
+    ? 'none'
+    : `transform ${DETENT_MS}ms ${DETENT_EASE}`;
+
   return createPortal(
     <>
       {/* Backdrop with fade animation */}
       <div
         className={cn(
           "fixed inset-0 transition-opacity duration-300",
-          isAnimating ? "opacity-100" : "opacity-0"
+          !detented && (isAnimating ? "opacity-100" : "opacity-0")
         )}
-        style={{ zIndex: zIndexBase, backgroundColor: 'rgba(0,0,0,0.4)' }}
+        style={{
+          zIndex: zIndexBase,
+          backgroundColor: 'rgba(0,0,0,0.4)',
+          ...(detented
+            ? { opacity: isAnimating ? 0.35 + 0.65 * revealed : 0, transition: dragging ? 'none' : undefined }
+            : null),
+        }}
         onClick={onClose}
         aria-hidden="true"
       />
       {/* Sheet with slide-up animation */}
       <div
         ref={sheetRef}
+        data-sheet-detent={detented ? detent : undefined}
         className={cn(
-          "fixed bottom-0 left-0 right-0 transition-transform duration-300 ease-out",
-          isAnimating ? "translate-y-0" : "translate-y-full",
+          "fixed bottom-0 left-0 right-0",
+          !detented && "transition-transform duration-300 ease-out",
+          !detented && (isAnimating ? "translate-y-0" : "translate-y-full"),
           className
         )}
+        onTouchStart={detented ? onDetentTouchStart : undefined}
+        onTouchMove={detented ? onDetentTouchMove : undefined}
+        onTouchEnd={detented ? onDetentTouchEnd : undefined}
         style={{
+          ...(detented
+            ? {
+                transform: `translateY(${isAnimating ? offset : (fullH.current || 1000)}px)`,
+                transition: detentTransition,
+              }
+            : null),
           zIndex: zIndexBase + 1,
           maxHeight,
           minHeight: 0,
@@ -224,13 +418,18 @@ export function BottomSheet({
         aria-modal="true"
         aria-labelledby={ariaLabelledBy}
       >
+        {/* BRIEF_ROUND_SHEET §1.1 — at MID nothing inside the sheet scrolls, so
+            a vertical drag anywhere moves the sheet with nothing to fight. */}
+        {detented && (
+          <style>{`[data-sheet-detent="mid"] [data-sheet-scroll]{overflow:hidden!important;touch-action:none!important;}`}</style>
+        )}
         {/* Draggable grabber area - larger and more visible */}
         <div
           className="w-full cursor-grab active:cursor-grabbing touch-none"
           style={{ padding: grabberPadding }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          onTouchStart={detented ? undefined : handleTouchStart}
+          onTouchMove={detented ? undefined : handleTouchMove}
+          onTouchEnd={detented ? undefined : handleTouchEnd}
         >
           <div
             style={{
