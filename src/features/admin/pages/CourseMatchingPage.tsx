@@ -712,9 +712,10 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
               </span>
             )}
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: t.inkMuted, fontSize: 11 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: t.inkMuted, fontSize: 11, flexWrap: 'wrap' }}>
             <MapPin size={10} />
             {courseMatchLabel(hit) || '—'}
+            <CandidateCountryFlag whsCountry={row.whs_country_name} subCountry={hit.sub_country} />
           </span>
         </span>
       </button>
