@@ -648,12 +648,31 @@ function MatchInboxSheet({ row, onClose }: { row: MatchRequestRow | null; onClos
   const [whs, setWhs] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // The WHS-published country for the name being aliased. Looked up by name because
+  // this path types a WHS name rather than picking a whs_courses row.
+  const [whsCountry, setWhsCountry] = useState<string | null>(null);
   const qc = useQueryClient();
 
   useEffect(() => {
     if (!row) { setWhs(''); setErr(null); return; }
     setWhs(row.whs_course_name ?? '');
   }, [row]);
+
+  useEffect(() => {
+    const name = whs.trim();
+    if (name.length < 2) { setWhsCountry(null); return; }
+    let cancel = false;
+    const handle = setTimeout(async () => {
+      const { data } = await supabase
+        .from('whs_courses')
+        .select('country_name')
+        .ilike('name', name)
+        .limit(1)
+        .maybeSingle();
+      if (!cancel) setWhsCountry((data as any)?.country_name ?? null);
+    }, 250);
+    return () => { cancel = true; clearTimeout(handle); };
+  }, [whs]);
 
   if (!row) return null;
 
