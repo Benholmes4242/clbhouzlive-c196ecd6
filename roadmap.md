@@ -18,3 +18,8 @@
 - [x] Mirror the shared post footer: actions left, actor right, and both text lines flush left without extra glyphs.
 - [x] Match Your circle captions to the weekly club rail height while retaining fixed name and HCP rows.
 - [x] Rebuild the member scorecard sheet with owner-aware copy, canonical course identity, flat sections, and footer actions.
+## Tour overview magazine rebuild
+- [ ] Map current overview data, destinations, and shared Explore grammar
+- [ ] Rebuild the overview stream and localized sentence headlines
+- [ ] Preserve all destinations and record retired section importer counts
+- [ ] Verify tests/build plus 320px and 390px screenshots without horizontal overflow
