@@ -178,7 +178,15 @@ const DossierCard: React.FC<DossierCardProps> = ({
             {course.name}
           </div>
           {line1.length > 0 && (
-            <div style={{ ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line1}</div>
+            <div style={{ ...LABEL, letterSpacing: '0.10em' }}>
+              {/* Segments stay unbreakable; the ONLY wrap point is the separator,
+                  so a long country drops intact beneath the date (measured: the
+                  identity column is ~176px at 390pt; "3 SEPT 2026 · NORTHERN
+                  IRELAND" is ~225px). Line 2 never wraps. */}
+              <span style={{ whiteSpace: 'nowrap' }}>{dateText}</span>
+              {dateText && where ? ' \u00B7 ' : ''}
+              <span style={{ whiteSpace: 'nowrap' }}>{where}</span>
+            </div>
           )}
           {line2.length > 0 && (
             <div style={{ ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
