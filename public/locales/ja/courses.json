@@ -1594,7 +1594,7 @@
         "gbi": "GB&I"
       },
       "visual": {
-        "level": "LEVEL",
+        "level": "PAR",
         "ace": "HOLE IN ONE ON {{n}}",
         "albatross": "ALBATROSS ON {{n}}",
         "eagle": "EAGLE ON {{n}}",

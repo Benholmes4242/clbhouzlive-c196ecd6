@@ -116,7 +116,7 @@
         "gbi": "GB&I"
       },
       "visual": {
-        "level": "LEVEL",
+        "level": "PAR",
         "ace": "Holed out from the tee.",
         "albatross": "Made an albatross.",
         "eagle": "EAGLE ON {{n}}",

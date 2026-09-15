@@ -60,7 +60,6 @@ import { CoursesSearchField } from './CoursesSearchField';
 import { RegionDropdown } from './RegionDropdown';
 
 import { useViewerCourseBests } from './useViewerCourseBests';
-import { WHS_CONNECT_PATH } from '@/components/header/globalHeaderRules';
 
 /**
  * THE MAGAZINE (BRIEF_EXPLORE_MAGAZINE, PHASE A).
@@ -108,7 +107,7 @@ type ShelfKind =
   | 'videos'
   | 'clubWeek'
   /** BRIEF_EXPLORE_CIRCLE_SHELF — latest rounds from the people you follow,
-   *  newest first. ALL ONLY: it is absent from Scores, Courses, Reviews, Watch. */
+   *  newest first. Fixed at the top of All and Scores; absent from Courses and Watch. */
   | 'circle'
   | 'standing'
   | 'coursesCounty'
@@ -838,12 +837,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      no motion — that is a standing, and a standing is worth looking at. A CARD
      must announce a CHANGE, which is the same distinction that retired
      rank_hold; do not promote this shelf into the card ladder. */
-  /* ORDER IS SET BY WHAT SCORES ALREADY SHOWS ABOVE THE STREAM. The standing,
-     club-week and golfers shelves are all mounted at the head of this view, so
-     county courses -- the only one of the four that is NOT up there -- takes the
-     first in-stream slot. The other three follow at 24 / 36 / 48, which is far
-     enough down that the head of the page is long gone; a repeat there is a
-     return, not a duplicate. Nothing at position 12 repeats anything on screen. */
+  /* ORDER IS SET BY WHAT SCORES ALREADY SHOWS ABOVE THE STREAM. Your circle is
+     fixed at the head of this view. County courses takes the first in-stream
+     slot, so Where you stand remains in the rotation but cannot immediately
+     follow the circle rail. Club week and people follow at 36 / 48. */
   const SCORES_SHELVES: ShelfKind[] = ['coursesCounty', 'standing', 'clubWeek', 'people'];
   const shelves: ShelfKind[] =
     view === 'watch'
@@ -1444,28 +1441,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
       {view === 'scores' ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP, marginBottom: BLOCK_GAP }}>
-          {!scoresStanding.isFetched ? <ShelfShell tileW={206} tileH={118} /> : null}
-          {scoresStanding.isFetched && !scoresStanding.unresolved && scoresStanding.rows.length > 0 ? (
-            <StandingShelf viewerId={userId} pos={0} />
-          ) : null}
-          {scoresStanding.isFetched && !scoresStanding.unresolved && scoresStanding.rows.length === 0 ? (
-            <div style={{ paddingInline: 20 }}>
-              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
-                {t('amateur.stream.connect.body', 'Connect a handicap and every round you play lands here, ranked against everyone who has played the same course.')}
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  analyticsEvents.track('amateur_connect_tapped', { from: 'scores_sentence' });
-                  depart();
-                  navigate(WHS_CONNECT_PATH);
-                }}
-                style={{ border: 0, background: 'transparent', padding: '8px 0 0', color: A.INK, fontFamily: SANS, fontSize: 13, fontWeight: 700 }}
-              >
-                {t('amateur.stream.connect.action', 'Connect a handicap >')}
-              </button>
-            </div>
-          ) : null}
+          <CircleShelf viewerId={userId} pos={0} />
           <WeeklyClubShelf
             viewerId={userId}
             clubId={geography.scope.primaryClubId}

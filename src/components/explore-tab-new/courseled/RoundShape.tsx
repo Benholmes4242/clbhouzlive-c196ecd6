@@ -119,7 +119,7 @@ export function RoundShape({
   beadHoleLabels?: boolean;
   /** Explore-only line treatment. Defaults false, preserving every existing caller. */
   exploreLineOnly?: boolean;
-  /** Explore-only 1 / LEVEL / 18 footer. Defaults false for all shared consumers. */
+  /** Explore-only 1 / PAR / 18 footer. Defaults false for all shared consumers. */
   endLabels?: boolean;
   /** Explore-only layered-stroke depth. No filter; defaults off for shared callers. */
   exploreGlow?: boolean;
@@ -227,7 +227,7 @@ export function RoundShape({
           <g fill={A.MUTE} fontSize={END_LABEL_FONT_SIZE} fontFamily="Geist, sans-serif">
             <text x={END_LABEL_GUTTER} y={height} dominantBaseline="text-before-edge">1</text>
             <text x={width / 2} y={height} dominantBaseline="text-before-edge" textAnchor="middle">
-              {t('amateur.stream.visual.level', 'LEVEL')}
+              {t('amateur.stream.visual.level', 'PAR')}
             </text>
             <text x={width - END_LABEL_GUTTER} y={height} dominantBaseline="text-before-edge" textAnchor="end">18</text>
           </g>

@@ -1658,7 +1658,7 @@
         "gbi": "GB&I"
       },
       "visual": {
-        "level": "LEVEL",
+        "level": "PAR",
         "ace": "HOLE-IN-ONE AN {{n}}",
         "albatross": "ALBATROSS AN {{n}}",
         "eagle": "EAGLE AN {{n}}",
