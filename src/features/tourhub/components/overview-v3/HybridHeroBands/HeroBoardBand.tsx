@@ -504,156 +504,16 @@ export function HeroBoardSection({
         </div>
       )}
 
-      {/* COURSE SHAPE — collapsed by default; the only thing on this block that
-          opens and closes. */}
+      {/* The magazine brief supersedes both disclosure rows: real course-shape
+          facts are now flat in the tournament body, while Tournament
+          Intelligence is a separate conditional card immediately after it. */}
       {shape.usable && (
-      <button
-        type="button"
-        onClick={() => setShapeOpen((v) => !v)}
-        aria-expanded={shapeOpen}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-          padding: '10px 16px',
-          background: 'transparent',
-          border: 'none',
-          borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
-          fontFamily: FONT,
-          cursor: 'pointer',
-        }}
-        className="active:bg-white/[0.06] transition-colors"
-      >
-        <span
-          style={{
-            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            color: WHITE_ALPHA_65,
-            textTransform: 'uppercase',
-          }}
-        >
-          {t('overview.onTheCourse.courseShapeLabel')}
-        </span>
-        <ChevronDown
-          size={14}
-          color="#FFFFFF"
-          strokeWidth={2.5}
-          style={{ transform: shapeOpen ? 'rotate(180deg)' : 'none', transition: 'transform 160ms ease' }}
-        />
-      </button>
-      )}
-
-      {shape.usable && shapeOpen && <CourseShapePanel rows={shape.rows} />}
-
-      {/* ===================== OUR PICKS (§2, §3) =====================
-          A second disclosure row, DIRECTLY BELOW COURSE SHAPE, copied from the
-          course-shape control above so the two cannot drift. The label is "OUR
-          PICKS", never "OUR AI PICKS": isAIPowered can be FALSE, so a fixed AI
-          label would be untrue on those tournaments. The AI claim lives on the
-          provenance line inside the open panel, next to a confidence figure.
-          NO AMBER anywhere here — amber is the viewing member, and the pick
-          mark is the shipped ClbhouzPickMark, not a coloured glyph. */}
-      {closedFigure && (
-        <button
-          type="button"
-          onClick={() => setPicksOpen((v) => !v)}
-          aria-expanded={picksOpen}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 10,
-            width: '100%',
-            padding: '10px 16px',
-            background: 'transparent',
-            border: 'none',
-            borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
-            fontFamily: FONT,
-            cursor: 'pointer',
-          }}
-          className="active:bg-white/[0.06] transition-colors"
-        >
-          <span
-            style={{
-              fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              color: WHITE_ALPHA_65,
-              textTransform: 'uppercase',
-              flexShrink: 0,
-            }}
-          >
-            {t('overview.onTheCourse.ourPicksLabel')}
-          </span>
-          <span
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              minWidth: 0,
-              marginLeft: 'auto',
-            }}
-          >
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: '#FFFFFF',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {closedFigure.name}
-            </span>
-            {closedFigure.right && (
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: closedFigure.right === WON_LABEL ? 800 : 600,
-                  letterSpacing: closedFigure.right === WON_LABEL ? '0.08em' : undefined,
-                  color: closedFigure.rightColor,
-                  ...FIGS,
-                }}
-              >
-
-                {closedFigure.right}
-              </span>
-            )}
-            {closedFigure.figure && (
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: closedFigure.figureColor,
-                  ...FIGS,
-                }}
-              >
-                {closedFigure.figure}
-              </span>
-            )}
-          </span>
-          <ChevronDown
-            size={14}
-            color="#FFFFFF"
-            strokeWidth={2.5}
-            style={{ transform: picksOpen ? 'rotate(180deg)' : 'none', transition: 'transform 160ms ease' }}
-          />
-        </button>
-      )}
-
-      {closedFigure && picksOpen && (
-        <PicksPanel
-          picks={picks}
-          tourCode={pickTourCode}
-          phase={phase}
-          boardByPlayer={boardByPlayer}
-          predictions={predictions ?? null}
-        />
+        <div style={{ borderTop: `0.5px solid ${WHITE_ALPHA_12}` }}>
+          <div style={{ padding: '10px 16px 4px', fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: WHITE_ALPHA_65, textTransform: 'uppercase' }}>
+            {t('overview.onTheCourse.courseShapeLabel')}
+          </div>
+          <CourseShapePanel rows={shape.rows} />
+        </div>
       )}
     </div>
   );

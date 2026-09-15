@@ -45,6 +45,7 @@ import {
   roundLabel,
 } from './HybridHero.utils';
 import { getScoreColor } from '../../_shared/scoreColor';
+import { tournamentHeadline } from '../../overview/magazineCopy';
 import { BG, INK_15, OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 
 
@@ -569,6 +570,11 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     return out;
   }, [state, safeLeaderboard, tiedLeaders, champion, wasPlayoff, datesString, defendingChamp, purseFact, top10.length, t]);
 
+  const editorialHeadline = useMemo(
+    () => tournamentHeadline({ tournament, state, leaderboard: safeLeaderboard, t }),
+    [tournament, state, safeLeaderboard, t],
+  );
+
   if (!isCancelled) {
     return (
       <div
@@ -581,7 +587,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         }}
       >
         <PhotoBand
-          title={tournament.name}
+          title={editorialHeadline}
           venueName={tournament.venueName}
           venueCity={tournament.venueCity}
           venueImageUrl={venueImageUrl}
@@ -612,7 +618,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           /* Section B: fixed 300, a kicker line, three static facts, and no
              overlaid capsule (passing facts suppresses the moment chip). */
           heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
-          kicker={heroKicker}
+          kicker={`${heroKicker} · ${tournament.name}`}
           facts={heroFacts}
         />
         {/*

@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { useAIPredictions } from '../../hooks/useAIPredictions';
 import { usePickLiveState } from '../data/usePickLiveState';
-import { useTournamentPulse } from '../../components/overview-v3/useTournamentPulse';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { spokenToPar } from '../magazineCopy';
@@ -14,17 +13,16 @@ export function TIPickMagazineCard() {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
-  const { state } = useTournamentPulse(viewingTournamentId ?? undefined);
-  const { data } = useAIPredictions(viewingTournamentId);
+  const { data, tournamentPhase } = useAIPredictions(viewingTournamentId);
   const pick = useMemo(() => [...(data?.topContenders ?? [])].sort((a, b) => a.rank - b.rank)[0], [data]);
   const ids = useMemo(() => (pick?.playerId ? [pick.playerId] : []), [pick?.playerId]);
-  const { data: liveMap } = usePickLiveState(viewingTournamentId ?? undefined, ids, { live: state === 'live' });
+  const { data: liveMap } = usePickLiveState(viewingTournamentId ?? undefined, ids, { live: tournamentPhase === 'in-progress' });
 
   if (!viewingTournamentId || !pick) return null;
   const live = liveMap?.[pick.playerId];
-  const headline = state === 'live' && live?.score != null && live.thru != null
+  const headline = tournamentPhase === 'in-progress' && live?.score != null && live.thru != null
     ? t('overview.magazine.pickLive', { player: pick.playerName, score: spokenToPar(live.score, t), rounds: live.thru })
-    : state === 'upcoming' && pick.winProbability != null
+    : tournamentPhase === 'pre-tournament' && pick.winProbability != null
       ? t('overview.magazine.pickPre', { player: pick.playerName, probability: Math.round(pick.winProbability) })
       : t('overview.magazine.pickPlain', { player: pick.playerName });
 

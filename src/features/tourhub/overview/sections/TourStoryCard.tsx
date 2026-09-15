@@ -5,10 +5,16 @@ import { useTourSelection } from '../../context/TourSelectionContext';
 import { useTourStories } from '../../news/useTourStories';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
-import { relativeDay } from '@/features/explore-magazine/exploreCopy';
 import { StdShell } from '@/features/explore-magazine/ExploreShells';
 
 const NEWS_TOURS = new Set(['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv']);
+
+function storyDay(value: string | null): string {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(date);
+}
 
 export function TourStoryCard({ index, lead = false }: { index: number; lead?: boolean }) {
   const navigate = useNavigate();
@@ -33,7 +39,7 @@ export function TourStoryCard({ index, lead = false }: { index: number; lead?: b
         </span>
         <span style={{ display: 'block', paddingInline: 4, marginTop: 8 }}>
           <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {[story.kicker || t('news.masthead'), relativeDay(story.published_at)].filter(Boolean).join(' · ')}
+            {[story.kicker || t('news.masthead'), storyDay(story.published_at)].filter(Boolean).join(' · ')}
           </span>
           <span style={{ display: '-webkit-box', marginTop: 6, fontSize: lead ? 20 : 16, fontWeight: 700, lineHeight: 1.22, color: A.INK, WebkitLineClamp: lead ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'break-word' }}>
             {story.headline}
