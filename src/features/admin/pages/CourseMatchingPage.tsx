@@ -446,6 +446,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
           <span style={{ fontWeight: 700, color: t.ink, fontSize: 14 }}>{row.whs_name}</span>
+          <WhsCountryChip country={row.whs_country_name} />
           <span
             style={{
               display: 'inline-flex', alignItems: 'center',
