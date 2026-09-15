@@ -100,12 +100,19 @@ interface Props {
   midKey?: string | number;
   /** §3 — the hidden-but-focusable pager, the arrow keys and the announcement. */
   paging?: React.ComponentProps<typeof CardScorecardSheet>['paging'];
+  /**
+   * Open with the comments already up. A comment notification on a round has to
+   * land on the comment, exactly as a comment on a normal post does
+   * (?openComments=1 on /round/:whsScoreId). Absent keeps today's behaviour.
+   */
+  initialCommentsOpen?: boolean;
 }
 
 export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId, sheetStyle,
   seed = null, detents, onDetentChange, onHorizontalDrag = null, onStatsSeen,
   pageShift = null, hint = null, pagePreview = null, midKey, paging = null,
+  initialCommentsOpen = false,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
