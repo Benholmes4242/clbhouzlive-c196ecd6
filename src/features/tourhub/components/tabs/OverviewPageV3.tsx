@@ -11,10 +11,10 @@ import { CollegeFranchise } from '../../overview/sections/CollegeFranchise';
 import { CourseOfTheWeekSection } from '../../overview/sections/CourseOfTheWeekSection';
 import { LazySection } from '../overview-v3/LazySection';
 
-import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
 import { TourStoryCard } from '../../overview/sections/TourStoryCard';
 import { TIPickMagazineCard } from '../../overview/sections/TIPickMagazineCard';
+import { RankingsMagazineRail } from '../../overview/sections/RankingsMagazineRail';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
@@ -90,8 +90,8 @@ export function OverviewPageV3() {
             <ComingUpSlot />
             <TourStoryCard index={1} />
             <CourseOfTheWeekSection />
-            <LazySection minHeight={400}>
-              <WorldRankingsSlot />
+            <LazySection minHeight={170}>
+              <RankingsMagazineRail />
             </LazySection>
             <TourStoryCard index={2} />
             <LazySection minHeight={350}>

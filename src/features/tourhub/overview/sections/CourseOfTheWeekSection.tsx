@@ -46,6 +46,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useCourseOfTheWeek } from '../../hooks/useCourseOfTheWeek';
 import { useCourseFieldPlayers } from '@/hooks/gam/useCourseFieldPlayers';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { useTranslation } from 'react-i18next';
+import { courseHeadline } from '../magazineCopy';
+import { coursePlaceLine } from '@/features/explore-magazine/placeLine';
 
 /**
  * NOBODY IS EXCLUDED, DELIBERATELY. get_course_field_sizes takes an exclusion
@@ -119,6 +122,7 @@ export function clampToSentence(text: string, budget = QUOTE_BUDGET): { text: st
 }
 
 export function CourseOfTheWeekSection() {
+  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data, isLoading, isError } = useCourseOfTheWeek();
 
@@ -159,6 +163,7 @@ export function CourseOfTheWeekSection() {
   const {
     course_id,
     course_name,
+    country,
     region,
     thumbnail_image,
     list_label,
@@ -171,6 +176,8 @@ export function CourseOfTheWeekSection() {
      amber, the region at 50% white. The old glass pill is retired (dead list). */
   const hasRank = list_rank != null;
   const open = () => navigate(`/courses/${course_id}`);
+  const headline = courseHeadline({ rank: list_rank, list: list_label, played, rating: avg_rating, reviewCount: review_count, t });
+  const place = coursePlaceLine({ region, subCountry: null, country });
 
   return (
     <AnimatePresence initial={false}>
@@ -184,8 +191,8 @@ export function CourseOfTheWeekSection() {
       >
         <SectionShell
           padX={GUT}
-          eyebrow="COURSE OF THE WEEK"
-          linkLabel="Top 100"
+          eyebrow={t('overview.magazine.courseKicker')}
+          linkLabel={t('overview.magazine.top100Link')}
           onLinkClick={() => navigate('/courses?tab=top100')}
         >
           {/* THE WHOLE SECTION IS THE TAP TARGET; the terminal row is the
@@ -260,7 +267,7 @@ export function CourseOfTheWeekSection() {
                       </span>
                     ) : null}
                     {hasRank && region ? <span style={{ color: 'rgba(255,255,255,0.5)' }}>·</span> : null}
-                    {region ? <span style={{ color: 'rgba(255,255,255,0.5)' }}>{region}</span> : null}
+                    {place ? <span style={{ color: 'rgba(255,255,255,0.5)' }}>{place}</span> : null}
                   </div>
                 ) : null}
                 <div
@@ -281,6 +288,7 @@ export function CourseOfTheWeekSection() {
                 header: it renders only when a purpose-written sentence exists,
                 and that column does not exist yet. */}
             <div style={{ padding: `14px ${GUT}px 0` }}>
+              <div style={{ marginBottom: 12, fontSize: 18, fontWeight: 700, lineHeight: 1.28, color: A.INK }}>{headline}</div>
               {avg_rating != null && review_count > 0 ? (
                 <>
                   <div style={{ display: 'flex', gap: 32 }}>
