@@ -1,6 +1,25 @@
+-- ############################################################################
+-- NOT APPLIED / SUPERSEDED. DO NOT RUN THIS FILE.
+--
+-- This draft WAS applied on 15 September 2026 and BROKE the live Explore feed.
+-- It installed cleanly (new md5 c9c83e1a792a42ac579745237b1c73cf) and then
+-- every call failed:
+--   42703 column w.whs_score_id does not exist (HINT: perhaps w.whs_score_uid)
+--   at page_snaps:  JOIN public.whs_scores w ON w.whs_score_id = pn.score_id
+-- PL/pgSQL resolves column names only when a query runs, so the md5 guard, the
+-- fingerprint chain and the read-back all passed on a body that could not run.
+--
+-- Rolled back by an exact reverse; see explore_stream_net_facts_ROLLBACK.sql.
+-- SUPERSEDED BY: explore_stream_net_facts_v2.sql, which drops the handicap-cut
+-- CTEs entirely (and with them the broken join), asserts every column it
+-- touches, and CALLS the rebuilt function inside the same transaction.
+-- Kept only as the record of the fault. Nothing here should be copied without
+-- the column assertions and the in-transaction call.
+-- ############################################################################
 -- ============================================================================
 -- EXPLORE ROUND CARDS GAIN NET, PLAYING HANDICAP, A NET RECORD AND A CUT
 -- (BRIEF C4). Ben runs this as postgres. NOT APPLIED BY THE AGENT.
+
 --
 -- WHAT IT ADDS to facts, for kind 'round' ONLY:
 --   course_handicap  the player's playing handicap FOR THAT ROUND
