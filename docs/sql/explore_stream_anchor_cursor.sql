@@ -366,25 +366,34 @@ SELECT a.id,
   FROM as_served a FULL JOIN forced f USING (id)
  ORDER BY a.id;
 
--- V4. MEMBER-ROLE TIMING. Run the block below BEFORE the patch and again
--- AFTER, and compare. Timing must be reported for the member role, not
--- postgres, because RLS on the pooled tables is part of the cost.
---   Turn timing on in your client first (psql: timing on) or read the
---   EXPLAIN ANALYZE total below.
+-- V4. MEMBER-ROLE TIMING. The baseline MUST be run BEFORE the patch block
+-- above (on the pre-patch body); run it again after, and compare. Timing must
+-- be reported for the member role, not postgres, because RLS on the pooled
+-- tables is part of the cost.
+-- The jwt claims resolve the viewer by email, never a pasted uuid. Page 2 uses
+-- the cursor V2 printed - paste it in place of the placeholder (the only
+-- placeholder in this file).
+--   Turn timing on in your client first (psql: \timing on) or read the
+--   EXPLAIN ANALYZE total below. The EXPLAIN is the last statement in each
+--   block.
 BEGIN;
+  SELECT set_config('request.jwt.claims',
+           json_build_object('sub', (SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'),
+                             'role', 'authenticated')::text, true);
   SET LOCAL role authenticated;
-  SET LOCAL request.jwt.claims = '{"role":"authenticated","sub":"REPLACE_WITH_THE_UUID_FROM_V2"}';
   EXPLAIN (ANALYZE, BUFFERS)
     SELECT * FROM public.get_explore_stream(
-      'REPLACE_WITH_THE_UUID_FROM_V2'::uuid, 'all', 'world', NULL, 12);
+      (SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'), 'all', 'world', NULL, 12);
 ROLLBACK;
 -- Page 2 timing, same session shape, using the cursor V2 printed:
 BEGIN;
+  SELECT set_config('request.jwt.claims',
+           json_build_object('sub', (SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'),
+                             'role', 'authenticated')::text, true);
   SET LOCAL role authenticated;
-  SET LOCAL request.jwt.claims = '{"role":"authenticated","sub":"REPLACE_WITH_THE_UUID_FROM_V2"}';
   EXPLAIN (ANALYZE, BUFFERS)
     SELECT * FROM public.get_explore_stream(
-      'REPLACE_WITH_THE_UUID_FROM_V2'::uuid, 'all', 'world',
+      (SELECT id FROM auth.users WHERE email = 'benjamin@clbhouz.co.uk'), 'all', 'world',
       'REPLACE_WITH_THE_next_cursor_FROM_V2'::jsonb, 12);
 ROLLBACK;
 -- Expectation: unchanged within noise. The patch removes a per-page stamp read
