@@ -82,8 +82,11 @@ export function kickerParts(item: StreamItem, t: T): string[] {
     return withCourse(t('amateur.stream.kicker.backlog', 'From {{month}}', { month }));
   }
   switch (item.kind) {
-    case 'review':
-      return withCourse(t('amateur.stream.kicker.review', 'Review'));
+    /* NO "REVIEW ·" PREFIX (BRIEF_EXPLORE_TWO_SHAPES §3). Text on the photograph
+       plus a rating chip already say this is a review, so the prefix spent the
+       kicker's one line restating the shape. The kicker is the COURSE NAME. The
+       ring prefixes stay: a course name alone does not say why the card reached
+       you. amateur.stream.kicker.review is retired. */
     case 'story':
       return [t('amateur.stream.kicker.news', 'News')];
     case 'clip':
@@ -167,6 +170,14 @@ export interface HeadlineContext {
   viewerBest?: number | null;
   /** Month the viewer's best was set, e.g. "June 2025". */
   viewerBestSince?: string | null;
+  /**
+   * A CALLOUT IS RENDERING, so the headline STATES THE ROUND and not the
+   * achievement (BRIEF_EXPLORE_TWO_SHAPES §6). "took the course record with a
+   * 69" becomes a Course record panel plus "Danny Robinson went round in 69, two
+   * under." Two statements of one fact is the fault this removes. Reviews are
+   * untouched.
+   */
+  plainRound?: boolean;
 }
 
 /**
@@ -206,6 +217,21 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
   const player = isOwn
     ? t('amateur.stream.you', 'You')
     : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
+
+  /* §6 THE CALLOUT OWNS THE ACHIEVEMENT. When one renders, this states the round
+     and stops: no record sentence, no feat sentence, no rank sentence. The plain
+     forms below are the SAME two templates the ordinary round already uses. */
+  if (ctx.plainRound && gross != null) {
+    return topar
+      ? t('amateur.stream.headline.roundToPar', '{{player}} went round in {{gross}}, {{topar}}.', {
+          player,
+          gross,
+          topar,
+        })
+      : t('amateur.stream.headline.round', '{{player}} went round in {{gross}}.', { player, gross });
+  }
+
+
 
   if (c?.kind === 'record_lost' && gross != null) {
     const best = ctx.viewerBest ?? null;

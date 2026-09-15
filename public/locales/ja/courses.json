@@ -1607,7 +1607,6 @@
         "aroundRegion": "{{region}}周辺",
         "aroundWorld": "世界各地",
         "backlog": "{{month}}より",
-        "review": "レビュー",
         "news": "ニュース",
         "clip": "クリップ",
         "watch": "長編動画",
@@ -1699,6 +1698,18 @@
         "level": "イーブンパー",
         "under": "{{n}}アンダー",
         "over": "{{n}}オーバー"
+      },
+      "callout": {
+        "record": "コースレコード",
+        "rankUpTo": "ここで{{ord}}位に上昇",
+        "rankUp": "順位が上昇",
+        "ace": "ホールインワン",
+        "albatross": "アルバトロス",
+        "eagle": "イーグル",
+        "birdies": "バーディー{{n}}個",
+        "bogeyFree": "ボギーなし",
+        "bogeyFreeSub": "全ホールでパー以上",
+        "onHole": "{{ord}}番ホールで"
       }
     },
     "shelf": {

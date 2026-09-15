@@ -2240,7 +2240,6 @@
         "aroundRegion": "[Åröünd {{region}} one]",
         "aroundWorld": "[Åröünd thé wörld one]",
         "backlog": "[Fröm {{month}} one]",
-        "review": "[Révîéw one]",
         "news": "[Néws one]",
         "clip": "[Çlîp one]",
         "watch": "[Löngér wåtçh one]",
@@ -2332,6 +2331,18 @@
         "level": "[lévél pår one]",
         "under": "[{{n}} ündér one]",
         "over": "[{{n}} övér one]"
+      },
+      "callout": {
+        "record": "[Course record]",
+        "rankUpTo": "[Up to {{ord}} here]",
+        "rankUp": "[Moved up the board]",
+        "ace": "[Hole in one]",
+        "albatross": "[Albatross]",
+        "eagle": "[Eagle]",
+        "birdies": "[{{n}} birdies]",
+        "bogeyFree": "[Bogey-free]",
+        "bogeyFreeSub": "[Par or better on every hole]",
+        "onHole": "[on the {{ord}}]"
       }
     },
     "shelf": {

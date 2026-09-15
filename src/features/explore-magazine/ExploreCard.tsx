@@ -13,7 +13,8 @@ import { CHIP_GLASS_CLASS, PHOTO_FIG_GOOD, PHOTO_FIG_SHADOW, PHOTO_FIG_UNDER } f
 
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
-import type { ExploreCardTreatment } from './cardTreatment';
+import { calloutFor } from './cardTreatment';
+import { AchievementCalloutPanel } from './AchievementCallout';
 import { dotsFor, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
@@ -341,7 +342,6 @@ function WhoLine({
 export function ExploreCard({
   item,
   size,
-  cardTreatment = size === 'lead' ? 'hero' : 'standard',
   shape,
   viewerBest,
   viewerBestSince,
@@ -350,8 +350,6 @@ export function ExploreCard({
 }: {
   item: StreamItem;
   size: CardSize;
-  /** Text placement is earned independently of physical card size. */
-  cardTreatment?: ExploreCardTreatment;
   /** Rounds only. A pair never draws a shape: at 124px it cannot be read. */
   /** undefined = unresolved; null = settled without usable hole detail. */
   shape?: HoleShape | null;
@@ -364,14 +362,23 @@ export function ExploreCard({
   onWhoTap?: () => void;
 }) {
   const { t, i18n } = useTranslation('courses');
+  const locale = i18n.language || 'en';
   const parts = kickerParts(item, t as never);
-  const headline = headlineFor(item, t as never, i18n.language || 'en', {
+  /* §5 ROUNDS ONLY, and the callout is decided BEFORE the headline so §6 can
+     hand the headline its plain form. A pair is 124px of tile: no panel fits, so
+     a paired round carries none — pairs only ever hold PLAIN rounds anyway. */
+  const callout = size === 'pair' ? null : calloutFor(item, shape?.holes);
+  const headline = headlineFor(item, t as never, locale, {
     holes: shape?.holes,
     viewerBest,
     viewerBestSince,
+    plainRound: callout != null,
   });
   const chips = chipsFor(item, t as never);
-  const onPhoto = cardTreatment === 'hero' && size !== 'pair';
+  /* §2 SHAPE IS DECIDED BY KIND, NOTHING ELSE. A REVIEW is text ON the
+     photograph at every position; a ROUND is text UNDER it at every position.
+     There is no earned treatment and position 0 is not special. */
+  const onPhoto = item.kind === 'review' && size !== 'pair';
   const isOwnRound = item.kind === 'round' && item.who?.is_viewer === true;
 
   /* ONE VISUAL: THE TREND LINE, with gold / red dots on the good holes. The
@@ -421,6 +428,7 @@ export function ExploreCard({
 
   const headlineNode = (
     <div
+      data-explore-headline="true"
       style={{
         marginTop: size === 'pair' ? 4 : 6,
         fontFamily: SANS,
@@ -485,13 +493,16 @@ export function ExploreCard({
               {headlineNode}
               <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} />
             </span>
+            {/* §3 THE BOTTOM LANE IS 16px AND CARRIES NO TRACE. On-photo is now
+                the REVIEW shape, and a review has no round shape to draw; the
+                trace branch stays only because the lane is shared code. */}
             <span
               data-explore-hero-bottom-lane="true"
               aria-hidden
               style={{
                 position: 'relative',
                 zIndex: 1,
-                height: hasVisual ? band + 12 : 14,
+                height: hasVisual ? band + 12 : 16,
                 display: 'flex',
                 alignItems: 'flex-end',
                 justifyContent: 'center',
@@ -550,9 +561,12 @@ export function ExploreCard({
       }}
     >
       <span style={{ position: 'relative', display: 'block' }}>{photo}</span>
+      {/* §5 THE CALLOUT SITS BETWEEN THE PHOTOGRAPH AND THE KICKER, full card
+          width — outside the caption's 4px inset, which is for text. */}
+      {!onPhoto && callout ? <AchievementCalloutPanel callout={callout} locale={locale} /> : null}
       {!onPhoto ? (
         /* §3d text inside a card's caption area is inset a further 4px. */
-        <span style={{ display: 'block', paddingInline: 4, marginTop: 8 }}>
+        <span style={{ display: 'block', paddingInline: 4, marginTop: callout ? 0 : 8 }}>
           {kicker}
           {headlineNode}
            <WhoLine item={item} size={size} onPhoto={false} onWhoTap={onWhoTap} />
