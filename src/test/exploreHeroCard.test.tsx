@@ -148,7 +148,12 @@ describe('Explore hero card layout', () => {
   });
 
   it('renders a ring kicker white on canvas', () => {
-    const item = { ...round(), ring: 'county' as const, consequence: null };
+    const item = {
+      ...round(),
+      ring: 'county' as const,
+      consequence: null,
+      facts: { ...round().facts, is_course_record: false },
+    };
     const { container } = render(
       <ExploreCard item={item} size="std" cardTreatment="standard" shape={null} onTap={() => undefined} />,
     );

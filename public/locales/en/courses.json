@@ -133,6 +133,7 @@
         "onYourList": "On your list",
         "atYourClub": "At your club",
         "aroundRegion": "Around {{region}}",
+        "aroundCountry": "Around {{country}}",
         "aroundWorld": "Around the world",
         "backlog": "From {{month}}",
         "review": "Review",
