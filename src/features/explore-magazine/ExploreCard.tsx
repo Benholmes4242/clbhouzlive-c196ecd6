@@ -323,16 +323,16 @@ function WhoLine({
               fontWeight: 600,
               color: subColor,
               whiteSpace: 'nowrap',
-              /* THE DATE NEVER WRAPS AND NEVER TRUNCATES. A long username gives
-                 up its characters first; the day is short and is the fact. */
-              flex: '0 0 auto',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              minWidth: 0,
+              flex: '0 1 auto',
                textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
             }}
           >
             {who ? `\u00B7 ${sub}` : sub}
           </span>
         ) : null}
-
       </div>
     </div>
   );
@@ -434,9 +434,6 @@ export function ExploreCard({
         display: '-webkit-box',
         WebkitLineClamp: size === 'lead' ? 3 : 2,
         WebkitBoxOrient: 'vertical',
-        /* A PAIR RESERVES BOTH LINES whether or not it needs them, so the two
-           cards in a row keep their who-lines level. */
-        minHeight: size === 'pair' ? '2.48em' : undefined,
         overflow: 'hidden',
         /* §4a a long unbroken token WRAPS at the card edge — it never pushes
             the card wider. */
