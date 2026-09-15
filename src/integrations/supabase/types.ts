@@ -23311,6 +23311,17 @@ export type Database = {
         Returns: undefined
       }
       rotate_championship_seasons: { Args: never; Returns: undefined }
+      round_share_card: {
+        Args: { p_score_id: string }
+        Returns: {
+          course_image: string
+          course_name: string
+          course_par: number
+          gross_score: number
+          play_date: string
+          player_name: string
+        }[]
+      }
       rpc_explore_trending: {
         Args: { p_limit?: number; p_region_key?: string }
         Returns: {

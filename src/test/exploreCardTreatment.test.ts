@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { calloutFor, isNotableRound } from '@/features/explore-magazine/cardTreatment';
+import { roundConsequence } from '@/features/explore-magazine/consequences';
 import { shelfDueAt, shelfForOrdinal } from '@/features/explore-magazine/shelfCadence';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
@@ -84,6 +85,54 @@ describe('achievement callout', () => {
     expect(calloutFor(item('bl2', { lane: 'backlog', consequence: { kind: 'rank_up', n: 2 } }))).toBeNull();
     expect(calloutFor(item('bl3', { lane: 'backlog', facts: { eagles: 1 } })))
       .toEqual({ kind: 'eagle', hole: null });
+  });
+
+  /* "NEW COURSE RECORD" IS A CLAIM ABOUT NOW. A record that has since been
+     beaten must draw no crown, whoever beat it. */
+  it('draws no crown for a beaten record', () => {
+    /* Another member beat it later: the round's own stored flag is stale and is
+       no longer sufficient on its own. */
+    expect(calloutFor(item('stale', { facts: { is_course_record: true, gross: 69 } }))).toBeNull();
+    /* The stale flag cannot be rescued by a feat-free round of any kind. */
+    expect(calloutFor(item('stale2', { facts: { is_course_record: true, to_par: -3 } }))).toBeNull();
+    /* The viewer's own round that has since lost the record. */
+    expect(
+      calloutFor(item('mine', {
+        who: { user_id: 'v', display_name: 'You', photo_url: null, is_viewer: true },
+        consequence: { kind: 'record_lost' },
+        facts: { is_course_record: true },
+      })),
+    ).toBeNull();
+  });
+
+  it('draws the crown only from a live record consequence', () => {
+    expect(calloutFor(item('live', { consequence: { kind: 'record_taken', n: 69 } })))
+      .toEqual({ kind: 'record' });
+  });
+
+  /* THE CONSEQUENCE ENGINE IS THE CURRENCY CHECK: record_taken is emitted only
+     while this round still matches the CURRENT rank-1 row in the record book. */
+  it('the consequence engine stops emitting record_taken once the record moves', () => {
+    const input = {
+      courseId: 'c1', userId: 'u1', gross: 69, playDate: '2026-05-01',
+      isSelf: true, isCircle: false, isNotable: true,
+    };
+    const sources = (holderGross: number, holderId: string) => ({
+      standing: new Map(),
+      records: {
+        holders: new Map([['c1', { course_id: 'c1', user_id: holderId, value: holderGross, attained_on: '2026-05-01' }]]),
+        lostToViewer: new Set<string>(),
+        isFetched: true,
+      },
+      bests: new Map<string, number>(),
+      shortlist: new Set<string>(),
+    });
+    expect(roundConsequence(input, sources(69, 'u1'))?.kind).toBe('record_taken');
+    /* A later 67 by another member now holds the board: no record_taken, so no
+       crown on the older round. */
+    const beaten = roundConsequence(input, sources(67, 'u2'));
+    expect(beaten?.kind).not.toBe('record_taken');
+    expect(calloutFor(item('beaten', { consequence: beaten, facts: { is_course_record: true } }))).toBeNull();
   });
 
   it('names a hole only when exactly one hole carries the feat', () => {

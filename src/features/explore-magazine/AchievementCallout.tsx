@@ -52,7 +52,7 @@ export function AchievementCalloutPanel({
       case 'record':
         return {
           icon: <CrownIcon />,
-          title: t('amateur.stream.callout.record', 'Course record'),
+          title: t('amateur.stream.callout.record', 'New course record'),
           subline: null,
         };
       case 'rank_up':

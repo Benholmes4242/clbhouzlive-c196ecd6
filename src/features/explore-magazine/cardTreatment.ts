@@ -94,7 +94,14 @@ export function calloutFor(item: StreamItem, holes?: CalloutHole[]): Achievement
      no crown can be drawn on top of it. */
   const lostIt = consequence?.kind === 'record_lost' || consequence?.kind === 'rank_down';
 
-  if (boardClaimAllowed && !lostIt && (consequence?.kind === 'record_taken' || facts.is_course_record === true)) {
+  /* "NEW COURSE RECORD" IS A CLAIM ABOUT NOW, so it may only be drawn from the
+     consequence, which roundConsequence() emits ONLY when this round's identity
+     still matches the CURRENT rank-1 row in gam_course_legends. facts
+     .is_course_record is the round's own stored flag: it is not revoked when a
+     later round by another member beats it, so it is NEVER sufficient here. A
+     beaten record therefore draws no crown, and the round keeps its plain
+     headline. */
+  if (boardClaimAllowed && !lostIt && consequence?.kind === 'record_taken') {
     return { kind: 'record' };
   }
   if (boardClaimAllowed && consequence?.kind === 'rank_up') {
