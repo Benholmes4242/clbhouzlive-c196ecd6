@@ -918,9 +918,30 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       detents={detents}
       onDetentChange={onDetentChange}
       onHorizontalDrag={onHorizontalDrag}
-      style={{ height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column', ...sheetStyle }}
+      style={{
+        height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column',
+        /* §2.2 — a paged sheet clips its own content: the outgoing round must
+           leave through the sheet's edge, not across the screen. */
+        ...(pageShift ? { overflow: 'hidden' } : null),
+        ...sheetStyle,
+      }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, flex: 1, minHeight: 0, ...FIGS }}>
+      <div
+        style={{
+          display: 'flex', flexDirection: 'column', fontFamily: SANS, flex: 1, minHeight: 0, ...FIGS,
+          ...(pageShift
+            ? {
+                transform: `translate3d(${pageShift.dx}px, 0, 0)`,
+                opacity: pageShift.opacity ?? 1,
+                transition: pageShift.animating
+                  ? 'transform 180ms cubic-bezier(.2,.8,.2,1), opacity 180ms linear'
+                  : 'none',
+                willChange: 'transform',
+              }
+            : null),
+        }}
+      >
+
         {/*
           S1 — THE FIXED SUMMARY (BRIEF_ROUND_SHEET_SPLIT).
 
@@ -929,7 +950,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           thing on the sheet and it does not scroll: the card, the breakdown and
           the chart scroll beneath this block.
 
-          DISMISS IS SAFE, AND NOW SO IS THE DETENT DRAG.
+          DISMISS IS SAFE, AND SO ARE THE DETENT DRAG AND THE PAGE SWIPE.
 
           WITHOUT `detents` (the tour surface, /round): BottomSheet binds its
           touch drag handlers to the GRABBER ROW ONLY, so this block never sees
@@ -940,7 +961,16 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           is live on the grabber and on THIS fixed summary block — which does not
           scroll, so there is no contention — while the scrolling body below
           (marked `data-sheet-scroll`) keeps the finger for scrolling. Down past
-          70px returns to mid; a long or fast drag closes.
+          70px returns to mid; a long or fast drag closes. The card, the OUT/IN
+          nines and the round-shape trace are the whole of what MID must show;
+          the sections below it are FULL's business only.
+
+          §2.2 — A HORIZONTAL drag is read anywhere at either detent and pages
+          between rounds; the axis locks after 8px and only goes horizontal when
+          it is clearly horizontal, so neither the dismiss nor the body scroll
+          loses a gesture to it. This block does NOT print the breakdown any
+          more: the fixed summary is the gross, the to-par, the player and the
+          date, and nothing else.
         */}
         {/* THE HONOURS BAND. Champagne for the albatross, bone for the ace —
             they separate by SATURATION, never by value. It sits above the
@@ -1185,8 +1215,25 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
                   {/* §1.4 — THE SCORING KEY IS GONE. Circles and boxes are
                       standard golf notation; a card does not carry its own
-                      glossary. `Legend` is DEAD-LISTED, not deleted, and its
-                      locale keys stay in all six files. */}
+                      glossary. `Legend` is now DELETED (follow-up B).
+
+                      FOLLOW-UP A — THE ONE MARK THAT IS NOT NOTATION. The faint
+                      mid-dot for a hole the member never played was only ever
+                      explained inside the key, so it left with it. It is named
+                      here instead, in the key's own quiet style, and ONLY while
+                      the round has an unplayed hole: a complete card says
+                      nothing. Every consumer of this sheet gets the line. */}
+                  {hasUnplayedHole && (
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5, lineHeight: 1 }}>
+                      <ScoreMark strokes={null} par={4} size={18} surface="dark" showStroke />
+                      <span style={LABEL_READ}>{t('courses:scorecard.legendNotPlayed')}</span>
+                    </div>
+                  )}
+                  {/* §2.5 — ONE SENTENCE, ONCE. The host retires it after the
+                      first page or the third open; there are no pager dots. */}
+                  {hint && (
+                    <div style={{ ...LABEL_READ, textAlign: 'center' }}>{hint}</div>
+                  )}
                 </div>
               </ScorecardSection>
               </div>
