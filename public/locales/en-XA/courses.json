@@ -2329,8 +2329,8 @@
       "retry": "[Try ågåín one]",
       "topar": {
         "level": "[lévél pår one]",
-        "under": "[{{n}} ündér one]",
-        "over": "[{{n}} övér one]"
+        "under": "[{{n}} ündér pår one]",
+        "over": "[{{n}} övér pår one]"
       },
       "callout": {
         "record": "[New course record]",

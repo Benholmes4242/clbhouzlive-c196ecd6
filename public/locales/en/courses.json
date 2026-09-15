@@ -223,8 +223,8 @@
       "retry": "Try again",
       "topar": {
         "level": "level par",
-        "under": "{{n}} under",
-        "over": "{{n}} over"
+        "under": "{{n}} under par",
+        "over": "{{n}} over par"
       },
       "callout": {
         "record": "New course record",
