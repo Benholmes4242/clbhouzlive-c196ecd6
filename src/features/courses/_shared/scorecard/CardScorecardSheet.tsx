@@ -28,7 +28,7 @@ import { formatHcp } from '@/lib/formatHcp';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
-  A, SANS, FIGS, NUM, KICKER, Panel, StatRow, Action, Hairline, RAMP_TOPAR,
+  A, SANS, FIGS, NUM, KICKER, Panel, StatRow, Action, Hairline,
 } from '@/features/courses/components/holes/analytical/tokens';
 import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
@@ -217,6 +217,19 @@ export interface CardScorecardSheetProps {
   } | null;
   /** §3 — fires once the "at this course" section is half visible. */
   onStatsSeen?: () => void;
+  /**
+   * BRIEF_ROUND_SHEET §2.2 — THE PAGE THE HOST IS DRAWING.
+   * Explore owns the sequence, the thresholds and the spring; this component
+   * only offsets its own content so the card follows the finger and slides out.
+   * Absent for every other consumer, and then nothing about the layout changes.
+   * `opacity` carries the reduced-motion crossfade, which replaces the slide.
+   */
+  pageShift?: { dx: number; opacity?: number; animating: boolean } | null;
+  /**
+   * §2.5 — the one-off "swipe for the next round" line. A string or nothing;
+   * the host decides whether it has been earned and when it retires.
+   */
+  hint?: string | null;
 }
 
 
@@ -411,153 +424,23 @@ const Nine: React.FC<{
 
 
 /**
- * THE SCORING KEY IS A KEY, NOT A TALLY (BRIEF_SCORECARD_TRAJECTORY_WHOOP §9.1).
- * The key teaches the MARK, not an incidental stroke count. ScoreMark can hide
- * its numeral while preserving the fill, tone and magnitude/rarity ring, so the
- * examples still use real score/par pairs but cannot imply that (for example)
- * every 3 is a birdie. Labels carry the outcome names.
+ * BRIEF_ROUND_SHEET follow-up B — THE SCORING KEY AND ITS COMPONENT ARE GONE.
+ * `Legend` was dead-listed when §1.4 removed the key from the card, and nothing
+ * mounted it afterwards, so it is deleted here along with its KEY_MARK sizes.
+ * ONE line survives it: the unplayed-hole mark still needs explaining, and that
+ * explanation now sits under the card itself (`courses:scorecard.legendNotPlayed`,
+ * the only legend key still in the six locale files).
  */
-/**
- * MICRO_BRIEF_SCORING_KEY §1.2 — EACH ITEM'S MARK SITS IN A FIXED-WIDTH BOX.
- * ScoreMark is a fixed size x size box and centres its own contents, but in a
- * gapped flex row beside unringed siblings any optical difference between a
- * ringed and a bare mark reads as an alignment fault. A fixed MARK_BOX equal to
- * the largest mark's outer diameter, with the mark centred inside it, makes
- * every item occupy the same width and share one horizontal AND vertical
- * centreline. The fix is in the key: ScoreMark has four callers and is untouched.
- *
- * §2.2 — THE KEY SHOWS ONLY WHAT THE ROUND CONTAINS. Birdie, bogey and double+
- * are always shown because they teach the grammar a member reads while scanning.
- * Eagle, ace and albatross are conditional — never explain a mark this card does
- * not carry. Derived from the SAME hole data the card renders, so the key and
- * the card can never disagree.
- *
- * THE SCORING KEY IS A KEY, NOT A TALLY (BRIEF_SCORECARD_TRAJECTORY_WHOOP §9.1).
- * The key teaches the MARK, not an incidental stroke count. ScoreMark can hide
- * its numeral while preserving the fill, tone and magnitude/rarity ring, so the
- * examples still use real score/par pairs but cannot imply that (for example)
- * every 3 is a birdie. Labels carry the outcome names.
- */
-const KEY_MARK_SIZE = 22;
-/* The ring is drawn inset:0 inside the mark box, so outer diameter == size.
-   The box is the mark size exactly; it exists to equalise item widths. */
-const KEY_MARK_BOX = KEY_MARK_SIZE;
-
-const Legend: React.FC<{ holes: CardScorecardHole[]; hasUnplayed?: boolean }> = ({ holes, hasUnplayed }) => {
-  const { t } = useTranslation(['courses']);
-
-  const rarities = React.useMemo(() => {
-    let eagle = false, ace = false, alba = false;
-    for (const h of holes) {
-      const s = h.strokes;
-      const p = h.par;
-      if (s == null || s <= 0 || p == null) continue;
-      if (s === 1) { ace = true; continue; }
-      const d = s - p;
-      if (d <= -3) alba = true;
-      else if (d === -2) eagle = true;
-    }
-    return { eagle, ace, alba };
-  }, [holes]);
-
-  const keys: { strokes: number | null; label: string; showStroke?: boolean }[] = [
-    { strokes: 3, label: t('courses:scorecard.legendBirdie') },
-  ];
-  if (rarities.eagle) keys.push({ strokes: 2, label: t('courses:scorecard.legendEagle') });
-  // AN ALBATROSS AND AN ACE TAKE THE SAME MARK (GOLD-FILLED DISC, ringed —
-  // twice for an albatross, once for an eagle; the old note here said "solid
-  // red, gold ring" and was wrong about the fill): the
-  // grammar does not distinguish them. If a round contains both we show the
-  // RARER one once (albatross) rather than two identical entries.
-  if (rarities.alba) keys.push({ strokes: 1, label: t('courses:scorecard.legendAlbatross') });
-  else if (rarities.ace) keys.push({ strokes: 1, label: t('courses:scorecard.legendAce') });
-  /**
-   * §D5 — PAR IS NAMED. It is the most common cell on the card and was the only
-   * unexplained one on a completed round: a reader who sees a numeral with no
-   * mark had nothing telling them that absence of a mark IS the statement. The
-   * entry is a bare numeral (strokes === par), which is exactly what the card
-   * draws — the key stays generated from ScoreMark, never hand-drawn. It sits
-   * between the under-par marks and the over-par marks, in scoring order.
-   */
-  keys.push({ strokes: 4, label: t('courses:scorecard.legendPar'), showStroke: true });
-  keys.push({ strokes: 5, label: t('courses:scorecard.legendBogey') });
-  keys.push({ strokes: 6, label: t('courses:scorecard.legendDouble') });
-  /**
-   * S4 — THE FOURTH TREATMENT IS THE UNPLAYED HOLE, AND IT IS NOW NAMED.
-   * Par stays deliberately unmarked (marking every hole marks nothing), so the
-   * only unexplained cell on a live card was the empty one. ScoreMark already
-   * renders it as a faint mid-dot — no new glyph — and this entry appears ONLY
-   * while holes remain unplayed, so a completed card's key is unchanged.
-   */
-  if (hasUnplayed) {
-    keys.push({ strokes: null, label: t('courses:scorecard.legendNotPlayed'), showStroke: true });
-  }
-
-  return (
-    <div>
-      {/* THE KEY IS CENTRED UNDER THE CARD (BRIEF_SCORECARD_CHART_ALIGNMENT §4).
-          Centre justification also centres a trailing item under the ones that
-          wrapped above it, instead of leaving it hanging left. */}
-      <div style={{ ...LABEL_READ, color: A.INK, marginBottom: 8, textAlign: 'center' }}>
-        {t('courses:holes.scoringKey.title')}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 16, rowGap: 10, flexWrap: 'wrap' }}>
-        {keys.map((k) => (
-          <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
-            <span
-              style={{
-                width: KEY_MARK_BOX,
-                height: KEY_MARK_BOX,
-                flex: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <ScoreMark strokes={k.strokes} par={4} size={KEY_MARK_SIZE} surface="dark" showStroke={k.showStroke === true} />
-            </span>
-            <span style={{ ...LABEL_READ }}>{k.label}</span>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 
 
-/* ------------------------------------------------------ round breakdown */
+/* ---------------------------------------------- round breakdown: DELETED
 
-/**
- * THE BREAKDOWN BAR READS THE SHARED RAMP (BRIEF_SHEET_BACKGROUND_CANON_02 §4).
- * It no longer carries its own four colours. RAMP_TOPAR is the one distribution
- * palette app-wide — birdie+ RED, par GREY, bogey LIGHT BLUE, double+ DEEP BLUE
- * — and the same ramp draws How It Plays, All Holes, Your Holes, the member
- * hole rows and the round shape. RED still means UNDER par, agreeing with the
- * card's red circles inches below; it is not an error and must not be
- * "corrected" to green. Any future change belongs in the ramp, not here.
- *
- * A zero band renders NO segment (never a zero-width sliver) and its cell shows
- * 0 in quiet chrome rather than the band colour — a colour there would claim a score
- * that was not made.
- */
-const RoundSplit: React.FC<{ split: { label: string; n: number; tone: string }[] }> = ({ split }) => (
-  <div>
-    <div style={{ display: 'flex', gap: 3, marginBottom: 12 }}>
-      {split.filter((s) => s.n > 0).map((s) => (
-        <i key={s.label} style={{ height: 6, flex: s.n, background: s.tone, borderRadius: 3 }} />
-      ))}
-    </div>
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${split.length}, minmax(0, 1fr))` }}>
-      {split.map((s) => (
-        <div key={s.label} style={{ textAlign: 'center' }}>
-          <div style={LABEL_READ}>{s.label}</div>
-          <div style={{ ...NUM, fontSize: 18, color: s.n > 0 ? s.tone : A.MUTE, marginTop: 3 }}>{s.n}</div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+   `RoundSplit` and its `split` derivation went with the breakdown section in
+   §1.4 and were dead-listed then. Nothing has mounted them since, so they are
+   deleted (follow-up B). The distribution ramp itself is untouched: How It
+   Plays, All Holes, Your Holes and the round shape all still read RAMP_TOPAR
+   from the shared tokens. */
 
 
 /* -------------------------------------------- loading and empty middles */
@@ -700,6 +583,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   onDetentChange,
   onHorizontalDrag = null,
   onStatsSeen,
+  pageShift = null,
+  hint = null,
 
 }) => {
   const { t } = useTranslation(['courses']);
@@ -929,28 +814,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
 
 
-  const split = useMemo(() => {
-    const d = (h: CardScorecardHole) => (h.strokes as number) - (h.par as number);
-    return [
-      /* BRIEF_SHEET_BACKGROUND_CANON_02 §4 — ONE DISTRIBUTION PALETTE.
-         The private four colours (red / grey / A.MUTE grey / deep blue) are
-         retired: bogey was a second grey, so a reader could not tell bogeys
-         from pars in the bar. Every distribution now reads RAMP_TOPAR —
-         birdie+ RED, par GREY, bogey LIGHT BLUE, double+ DEEP BLUE. */
-      { label: t('courses:scorecard.splitBirdie'), n: played.filter((h) => d(h) <= -1).length, tone: RAMP_TOPAR.birdie },
-      { label: t('courses:scorecard.splitPar'), n: played.filter((h) => d(h) === 0).length, tone: RAMP_TOPAR.par },
-      { label: t('courses:scorecard.splitBogey'), n: played.filter((h) => d(h) === 1).length, tone: RAMP_TOPAR.bogey },
-      { label: t('courses:scorecard.splitDouble'), n: played.filter((h) => d(h) >= 2).length, tone: RAMP_TOPAR.double },
-    ];
-  }, [played, t]);
-
-
-
-
-  /* §1.4 — dead-listed with the removed sections above. Voided, not deleted. */
-  void split;
-  void Legend;
-  void RoundSplit;
+  /* follow-up B — the `split` derivation is deleted with RoundSplit. */
 
   /* §3 — reached_stats: the "at this course" section was 50% or more visible at
      any point. Reported once per mount; the host owns the event. */
