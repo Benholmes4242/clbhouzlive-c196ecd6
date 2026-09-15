@@ -7,6 +7,7 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
 import { courseHeadline } from './courseHeadline';
+import { dedupePages, warnDuplicates } from './dedupeStream';
 import { trackError } from '@/lib/errorTracking';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
