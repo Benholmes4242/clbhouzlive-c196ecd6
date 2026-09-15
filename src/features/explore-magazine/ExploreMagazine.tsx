@@ -1143,6 +1143,20 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     });
   }, [roundSeq, view, prefersReducedMotion, after, showRound]);
 
+  /*
+   * BRIEF_ROUND_SHEET_PEEK §1 — THE PREVIEW IS BUILT ONCE PER NEIGHBOUR, NOT
+   * ONCE PER FRAME. `shift` changes on every touchmove, so an inline element
+   * here would re-render the whole preview sixty times a second for a movement
+   * that is pure transform. Memoised on the neighbour alone, the drag costs one
+   * composited translate and nothing else.
+   */
+  const pagePreview = useMemo(() => {
+    if (!preview) return null;
+    const seed = previewSeedFor(roundSeq[preview.ix]);
+    if (!seed) return null;
+    return { side: preview.side, node: <RoundPagePreview seed={seed} /> };
+  }, [preview, roundSeq, previewSeedFor]);
+
   /* THE FINGER. The axis lock, the 8px and the 1.2 ratio live in BottomSheet;
      the thresholds and the end rubber-band live in roundPaging. */
   const pageDrag = useMemo(() => ({
@@ -1903,12 +1917,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
            page already holds. Query-free: no reactions, no comments, no stats.
            A round with no hole rows still shows its summary with the syncing
            middle rather than a blank panel. */
-        pagePreview={(() => {
-          if (!preview) return null;
-          const seed = previewSeedFor(roundSeq[preview.ix]);
-          if (!seed) return null;
-          return { side: preview.side, node: <RoundPagePreview seed={seed} /> };
-        })()}
+        pagePreview={pagePreview}
       />
     </div>
   );
