@@ -25,6 +25,12 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+// The real module boots the i18n singleton, which cannot init under jsdom.
+vi.mock('@/i18n/format', () => ({
+  formatDayMonthYearShortGB: (d: Date) =>
+    new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(d),
+}));
+
 import DossierCard from '@/components/profile/courses/DossierCard';
 import type { RatedCourseData } from '@/components/profile/courses/my-ratings/myRatingsTiers';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
