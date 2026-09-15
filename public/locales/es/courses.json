@@ -1742,6 +1742,8 @@
         }
       },
       "ratingCount": "{{count}} valoraciones",
+      "ratingCount_one": "{{count}} valoracion",
+      "ratingCount_other": "{{count}} valoraciones",
       "empty": {
         "courses": "Aun no hay campos en {{scope}}.",
         "reviews": "Aun no hay resenas en {{scope}}."

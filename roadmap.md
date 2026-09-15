@@ -28,4 +28,4 @@
 - [x] Rebuild the overview stream and localized sentence headlines
 - [x] Preserve all destinations and record retired section importer counts
 - [x] Verify tests/build plus 320px and 390px screenshots without horizontal overflow
-- [ ] Align Explore standard/pair text colors with heroes, fix six-locale rating plurals, audit fallbacks, and verify mobile states.
+- [x] Align Explore standard/pair text colors with heroes, fix six-locale rating plurals, audit fallbacks, and verify mobile states.
