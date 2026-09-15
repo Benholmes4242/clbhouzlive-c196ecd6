@@ -1206,7 +1206,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         });
       }
     },
-    [depart, navigate, openReview, opener, revealCard, shapesMap, t, view],
+    [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view],
   );
 
   const tapWho = useCallback(
@@ -1816,6 +1816,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           setSheetSeed(null);
           opener.close();
         }}
+        /* §2.4 — EVERY ACTION READS THE CURRENT PAGE. The score id, the
+           connection, the owner and the seed all come from the opener target
+           that showRound() rewrote, so likes, comments, view profile and view
+           course can never act on the round the member swiped away from. */
         scoreId={opener.target?.scoreId ?? null}
         connectionId={opener.target?.connectionId ?? null}
         profileUserId={opener.target?.profileUserId ?? null}
