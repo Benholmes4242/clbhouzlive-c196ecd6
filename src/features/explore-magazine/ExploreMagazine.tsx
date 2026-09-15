@@ -109,7 +109,7 @@ type ShelfKind =
   | 'videos'
   | 'clubWeek'
   /** BRIEF_EXPLORE_CIRCLE_SHELF — latest rounds from the people you follow,
-   *  newest first. Fixed at the top of All and Scores; absent from Courses and Watch. */
+   *  newest first. Fixed once at the top of Scores; absent from All, Courses and Watch. */
   | 'circle'
   | 'standing'
   | 'coursesCounty'
@@ -154,8 +154,8 @@ function pairableRound(item: StreamItem): boolean {
   return item.kind === 'round' && item.consequence == null;
 }
 
-/** §5 shelves are inserted after card positions 3, 7, 11 ... and an empty
- *  source means the next shelf takes the slot rather than a gap appearing.
+/** §5 shelves are inserted after card positions 3, 7, 11 ... An empty source
+ *  consumes its scheduled slot without moving the next shelf earlier.
  *
  *  §5b/§5c A SINGLE-TYPE VIEW PAIRS ITS OWN KIND. The mixed stream refuses two
  *  cards of the same kind side by side, because there it would read as one
@@ -208,8 +208,8 @@ function buildBlocks(
       cards += 1;
     }
 
-    /* Scores places its shelves at PAGE BOUNDARIES (opts.shelfAt); every other
-       view keeps the 3 / 7 / 11 cadence exactly as it shipped. */
+    /* The standard rhythm is 3 / 7 / 11. A caller may supply finite custom
+       boundaries; repeating views wrap their declared shelf order. */
     const shelf = shelfForOrdinal(shelves, nextShelf, opts.repeatShelves === true);
     const due = opts.shelfAt ? opts.shelfAt[nextShelf] : shelfDueAt(nextShelf);
     if (shelf != null && due != null && cards >= due) {
@@ -800,8 +800,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
 
   /* §3e THE ALL ORDER AFTER THE LEAD, in one place. Page 3+ restarts from
-     clips, which the modulo in the renderer does; an empty shelf is skipped by
-     the shelf itself and the next one takes its slot. */
+     clips through shelfForOrdinal; an empty shelf consumes its scheduled slot
+     and the next rail waits for the next four-card boundary. */
   /* BRIEF_EXPLORE_ALL_VIDEO §1 PLACEMENT: videos sit FOURTH, between standing
      and the county courses rail, so no two media rails are adjacent - clips is
      first, moments fifth, and videos has a non-media rail on either side. Two
@@ -1489,7 +1489,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         {blocks.map((block, index) => {
           if (block.kind === 'shelf') {
             const pos = cardPos;
-            return <div key={`shelf:${block.shelf}:${index}`}>{renderShelf(block.shelf, pos)}</div>;
+            return <Fragment key={`shelf:${block.shelf}:${index}`}>{renderShelf(block.shelf, pos)}</Fragment>;
           }
 
           if (block.kind === 'pair') {
@@ -1520,12 +1520,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const size: CardSize = block.kind === 'lead' ? 'lead' : 'std';
           /* §2 THE LONG-FORM CARD IS WATCH'S CARD. On All it wears the same
              12px inset and 14px radius as its magazine neighbours; Watch keeps
-             the shared component's default full-bleed treatment.
-             chip, title as the headline, creator and date on the who-line -
-             rendered by the SAME component Watch renders, so the two can never
-             drift and no second video card exists. It is NOT wrapped in the
-             12px card inset: a video row is full-bleed on Watch and reads as a
-             video row here for the same reason. */
+             the shared component's default full-bleed treatment. Duration,
+             title, creator and playback still come from the one shared unit. */
           if (item.kind === 'watch' && item.payload.video) {
             const row = item.payload.video;
             const index = videoRows.findIndex((entry) => entry.post_id === row.post_id);
