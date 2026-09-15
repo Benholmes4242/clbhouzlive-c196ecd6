@@ -189,6 +189,9 @@ export interface CardScorecardSheetProps {
   pagePreview?: { node: React.ReactNode; side: 'next' | 'prev' } | null;
   /** §1 — changes with the round, so BottomSheet remeasures mid after a page. */
   midKey?: string | number;
+  /** BRIEF_ROUND_SHEET_TALL §1 — DEV-only measurement diagnostics (score id,
+   *  whether the card was seeded). The middle state is added here. */
+  midDebug?: Record<string, unknown>;
   /**
    * BRIEF_ROUND_SHEET_CUES §3 — PAGING WITHOUT A FINGER.
    * Swiping was the only way to change rounds. This adds two visually hidden but
@@ -321,6 +324,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   hint = null,
   pagePreview = null,
   midKey,
+  midDebug,
   paging = null,
 
 
@@ -670,6 +674,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     || isTour
     || !!engagement || !!onViewProfile || !!onViewCourse || !!onShareRound;
 
+  /* BRIEF_ROUND_SHEET_TALL §1 — WHICH MIDDLE IS ON SCREEN, named once and used
+     both by the marker below and by the DEV measurement log. */
+  const middleState: 'card' | 'skeleton' | 'unavailable' | 'nohbh' | 'syncing' = loading
+    ? 'skeleton'
+    : hasHoles
+      ? 'card'
+      : emptyVariant === 'unavailable'
+        ? 'unavailable'
+        : emptyVariant === 'nohbh'
+          ? 'nohbh'
+          : 'syncing';
+
   return (
     <BottomSheet
       open={open}
@@ -680,6 +696,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       // shared BottomSheet owns the one surface for chrome and body alike.
       detents={detents}
       midKey={midKey}
+      midDebug={{ ...(midDebug ?? {}), state: middleState }}
       onDetentChange={onDetentChange}
       onHorizontalDrag={onHorizontalDrag}
       style={{
@@ -866,14 +883,29 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </div>
           )}
 
+          {/* BRIEF_ROUND_SHEET_TALL §1 — EVERY MIDDLE CARRIES THE MARKER. Mid was
+              measured two frames and 220ms after open, which on a slow round is
+              still the skeleton — and with no marker in the tree mid fell back to
+              the 62dvh cap, so the sheet opened tall. Each of these states
+              declares its own extent with peek 0 (there is nothing to reveal
+              below an explanation), so a no-card open lands at its real content
+              height. When the card arrives the ResizeObserver remeasures. */}
           {loading ? (
-            <SkeletonMiddle />
+            <div data-sheet-mid-extent="true" data-sheet-mid-peek={0}>
+              <SkeletonMiddle />
+            </div>
           ) : !hasHoles && emptyVariant === 'unavailable' ? (
-            <UnavailableMiddle />
+            <div data-sheet-mid-extent="true" data-sheet-mid-peek={0}>
+              <UnavailableMiddle />
+            </div>
           ) : !hasHoles && emptyVariant === 'nohbh' ? (
-            <NohbhMiddle gross={emptyGross ?? null} toPar={emptyToPar ?? null} />
+            <div data-sheet-mid-extent="true" data-sheet-mid-peek={0}>
+              <NohbhMiddle gross={emptyGross ?? null} toPar={emptyToPar ?? null} />
+            </div>
           ) : !hasHoles ? (
-            <SyncingMiddle />
+            <div data-sheet-mid-extent="true" data-sheet-mid-peek={0}>
+              <SyncingMiddle />
+            </div>
           ) : (
             <>
               {/*

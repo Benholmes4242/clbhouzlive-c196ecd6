@@ -21,7 +21,7 @@ import { fetchRoundDetail } from '@/lib/whs/api';
 import { coursePlaceLine } from './placeLine';
 import {
   pageDecision, rubberBand, neighbours, shouldExtend, openCue, noteHintPaged,
-  dragNeighbour,
+  dragNeighbour, resetHint,
 } from './roundPaging';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
 import { runNudge } from './roundNudge';
@@ -56,6 +56,7 @@ import { VideoCard } from './watch/videoUnit';
 import { useWatchVideos } from './watch/useWatchVideos';
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { useExploreStream } from './useExploreStream';
+import { dedupeItems, warnDuplicates } from './dedupeStream';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
 import { CourseShelf } from './CourseShelf';
@@ -789,7 +790,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      RPC deliberately placed. */
   const visible = useMemo(() => {
     const base = serverOn ? source.items : source.items.slice(0, revealed);
-    if (videoItems.length === 0) return base;
+    if (videoItems.length === 0) {
+      const { items: uniqueBase, drops: baseDrops } = dedupeItems(base);
+      warnDuplicates('ExploreMagazine:visible', baseDrops);
+      return uniqueBase;
+    }
     /* AN INSERTION, NOT A RE-SORT. The server's page is already ranked and
        cadenced and the client re-sorts nothing: each video is placed at the
        first position whose card scores below it, so every other card keeps the
@@ -806,7 +811,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
          nothing here promotes it. */
       out.splice(at, 0, video);
     }
-    return out;
+    /* BRIEF_ROUND_SHEET_TALL §2 — ONE ITEM, ONE CARD, whatever the source. The
+       stream hook already dedupes its own pages; this is the last gate before
+       anything is keyed by item.id (cardRefs, the ring, roundSeq), so a duplicate
+       arriving from the fallback pools or the video insertion cannot reach it
+       either. First occurrence wins, so the ranked order is untouched. */
+    const { items: unique, drops } = dedupeItems(out);
+    warnDuplicates('ExploreMagazine:visible', drops);
+    return unique;
   }, [serverOn, source.items, revealed, videoItems]);
 
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
@@ -1003,6 +1015,27 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     },
     [view],
   );
+
+  /*
+   * BRIEF_ROUND_SHEET_TALL §3 — ?cues=reset BRINGS THE CUES BACK.
+   *
+   * The cues retire for good once a member has paged, so anyone who has used the
+   * sheet can never see the nudge again — including whoever needs to check it.
+   * Opening Explore with ?cues=reset forgets this device's hint once and strips
+   * just that parameter from the URL, leaving every other one alone. Live in
+   * every environment, production included: it only resets a hint, and only for
+   * the viewer holding the device.
+   */
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('cues') !== 'reset') return;
+    resetHint();
+    url.searchParams.delete('cues');
+    window.history.replaceState(
+      window.history.state, '', `${url.pathname}${url.search}${url.hash}`,
+    );
+  }, []);
 
   /* ==================================================================== §2
      SWIPE BETWEEN ROUNDS. THE SEQUENCE IS THIS PAGE'S ROUNDS, IN ITS ORDER.

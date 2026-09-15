@@ -104,6 +104,13 @@ interface BottomSheetProps {
    * keeps the single measurement at open.
    */
   midKey?: string | number;
+  /**
+   * BRIEF_ROUND_SHEET_TALL §1 — DEV-ONLY MEASUREMENT DIAGNOSTICS. Whatever the
+   * consumer knows about the content it is drawing (the score id, which middle
+   * state, whether it was seeded); logged beside markerFound and the mid this
+   * measurement produced. Never read in production.
+   */
+  midDebug?: Record<string, unknown>;
   /** Reported on every settled detent change (analytics + host state). */
   onDetentChange?: (detent: 'mid' | 'full') => void;
   /** Horizontal gesture hand-off (paging). Return true to claim the pointer. */
@@ -138,6 +145,7 @@ export function BottomSheet({
   scrollBody = false,
   detents,
   midKey,
+  midDebug,
   onDetentChange,
   onHorizontalDrag = null,
 }: BottomSheetProps) {
@@ -177,6 +185,14 @@ export function BottomSheet({
    * below the card it declares 0 and mid stays at the card's bottom edge, as
    * before. The 62dvh cap is unchanged and still wins.
    */
+  const debugRef = useRef(midDebug);
+  debugRef.current = midDebug;
+  /** The live detent/drag, so a ResizeObserver callback cannot read a stale one. */
+  const detentRef = useRef<'mid' | 'full'>('mid');
+  const draggingRef = useRef(false);
+  detentRef.current = detent;
+  draggingRef.current = dragging;
+
   const measure = useCallback(() => {
     const el = sheetRef.current;
     if (!el) return;
@@ -186,7 +202,7 @@ export function BottomSheet({
     const marker = el.querySelector('[data-sheet-mid-extent]') as HTMLElement | null;
     const declared = Number(marker?.getAttribute('data-sheet-mid-peek') ?? 0);
     const peek = Number.isFinite(declared) && declared > 0 ? declared : 0;
-    const { offset: midOff, peeking: p } = midExtent({
+    const { mid, offset: midOff, peeking: p } = midExtent({
       sheetHeight: h,
       viewportHeight: window.innerHeight,
       markerExtent: marker
@@ -195,6 +211,17 @@ export function BottomSheet({
       peek,
     });
     midOffset.current = midOff;
+    /* BRIEF_ROUND_SHEET_TALL §1 — WHY A SHEET OPENED TALL, on the record. With no
+       marker in the tree mid falls back to the 62dvh cap, which is exactly what a
+       tall open looks like. DEV only. */
+    if (import.meta.env.DEV) {
+      console.debug('[BottomSheet] mid measured', {
+        ...(debugRef.current ?? {}),
+        markerFound: !!marker,
+        mid,
+        sheetHeight: h,
+      });
+    }
     /* The fade is a cue over a cut. With nothing hidden below there is no cut,
        so a fade would be a gradient over the end of the sheet. */
     setPeeking(p);
@@ -203,6 +230,7 @@ export function BottomSheet({
   useEffect(() => {
     if (!open || !detented) return;
     setDetent('mid');
+    detentRef.current = 'mid';
     const run = () => {
       measure();
       moveOffset(midOffset.current);
@@ -219,13 +247,54 @@ export function BottomSheet({
     if (!open || !detented || midKey == null) return;
     const run = () => {
       measure();
-      if (detent === 'mid' && !dragging) moveOffset(midOffset.current);
+      if (detentRef.current === 'mid' && !draggingRef.current) moveOffset(midOffset.current);
     };
     const raf = requestAnimationFrame(() => requestAnimationFrame(run));
     const timer = window.setTimeout(run, 200);
     return () => { cancelAnimationFrame(raf); window.clearTimeout(timer); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [midKey]);
+
+  /*
+   * BRIEF_ROUND_SHEET_TALL §1 — THE CONTENT CHANGING IS A NEW MEASUREMENT TOO.
+   *
+   * midKey is the ROUND, and the round does not change when a skeleton becomes a
+   * card. So a sheet measured while it still showed the skeleton, the syncing or
+   * the unavailable middle kept whatever mid that produced, and nothing ever
+   * measured again — which is how some rounds opened tall. A ResizeObserver on
+   * the sheet re-runs the marker lookup on every content change instead.
+   *
+   * IT ONLY MOVES A SHEET THAT IS RESTING AT MID AND NOT UNDER A FINGER. A member
+   * who has pulled the sheet to full keeps full, always.
+   */
+  useEffect(() => {
+    if (!open || !detented) return;
+    const el = sheetRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      /* Coalesced to one frame: a card arriving resizes several boxes at once. */
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const before = midOffset.current;
+        measure();
+        if (midOffset.current === before) return;
+        if (detentRef.current !== 'mid' || draggingRef.current) return;
+        /* The normal spring — `isAnimating` already owns the transition. */
+        moveOffset(midOffset.current);
+      });
+    });
+    observer.observe(el);
+    /* The scrolling body is the box that actually grows when the card lands. */
+    const body = el.querySelector('[data-sheet-scroll]');
+    if (body) observer.observe(body);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [open, detented, measure, moveOffset]);
+
 
   const settle = useCallback(
     (next: 'mid' | 'full') => {
