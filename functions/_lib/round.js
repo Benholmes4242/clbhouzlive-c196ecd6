@@ -55,9 +55,16 @@ function formatDate(value) {
  * Returns null whenever the row cannot honestly title a round, so the caller
  * serves the generic card rather than a half-empty one.
  */
+/** Number(), except that null / '' / undefined are NOT zero. */
+function num(value) {
+  if (value === null || value === undefined || value === '') return NaN;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : NaN;
+}
+
 export function roundMeta(card) {
   if (!card) return null;
-  const gross = Number(card.gross_score);
+  const gross = num(card.gross_score);
   if (!Number.isFinite(gross)) return null;
 
   const player = (card.player_name || '').trim();
