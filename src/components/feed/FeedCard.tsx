@@ -37,6 +37,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
+import { useNavigate } from 'react-router-dom';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 import { LikedByRow } from '@/components/likes/LikedByRow';
