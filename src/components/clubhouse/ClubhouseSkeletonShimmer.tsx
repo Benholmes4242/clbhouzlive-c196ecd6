@@ -15,7 +15,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { prefersReducedMotion } from '@/utils/env';
 import { useSkeletonShownWhenVisible } from '@/perf/usePageReady';
-import PostRoundShell from '@/components/feed/PostRoundShell';
 import { COLD_START_SHAPE, type SkeletonCardVariant } from '@/lib/clubhouse/skeletonShapeHint';
 
 interface ClubhouseSkeletonShimmerProps {
@@ -308,79 +307,17 @@ export const CardSkeleton: React.FC<{
   </div>
 );
 
-/**
- * Round-post skeleton — mirrors PostRoundCard's block order and heights.
- *
- * The scorecard block is PostRoundShell ITSELF, not a re-measurement of it:
- * that file already tracks PostRoundCard's element tree, paddings, font sizes
- * and trajectory viewBox, so its height tracks the real card at every width. A
- * second, hand-estimated copy of those heights is exactly the defect this
- * section fixes.
- */
-const RoundCardSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic = false }) => (
-  <div style={{ background: CARD_BG, overflow: 'hidden', marginInline: 0 }}>
-    {/* Header — identical to CardSkeleton's */}
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
-      <SkeletonBlock
-        isStatic={isStatic}
-        style={{ width: 34, height: 34, borderRadius: '34%', flexShrink: 0 }}
-      />
-      <div style={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 120, height: 13 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 80, height: 10 }} />
-      </div>
-    </div>
-
-    {/* Date / course / region / par-slope / trajectory / OUT / IN — real geometry. */}
-    <PostRoundShell />
-
-    {/* Course band row — PostRoundCard's band: 10px pad, 12.5px line. */}
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 10,
-        padding: '10px 14px',
-        borderTop: `1px solid ${HAIRLINE}`,
-      }}
-    >
-      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 140, height: 13 }} />
-      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 34, height: 12 }} />
-    </div>
-
-    {/* Action row — identical to CardSkeleton's footer */}
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '10px 14px 12px',
-        borderTop: `1px solid ${HAIRLINE}`,
-      }}
-    >
-      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 90, height: 12 }} />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-        <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 20, height: 20 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 20, height: 20 }} />
-        <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 20, height: 20 }} />
-      </div>
-    </div>
-  </div>
-);
-
 const CardFeedSkeleton: React.FC<{
   isStatic?: boolean;
   variant?: SkeletonCardVariant;
   mediaRatio?: string;
 }> = ({ isStatic = false, variant = 'regular', mediaRatio }) => {
   const topPad = 'calc(env(safe-area-inset-top, 0px) + 70px)';
-  const Card: React.FC<{ isStatic?: boolean }> = ({ isStatic: st }) =>
-    variant === 'round' ? (
-      <RoundCardSkeleton isStatic={st} />
-    ) : (
-      <CardSkeleton isStatic={st} variant={variant} mediaRatio={mediaRatio ?? COLD_START_SHAPE.mediaRatio} />
-    );
+  // ROUND POSTS HAVE NO CLUBHOUSE HOME, so no first card can be a round and
+  // there is no round skeleton to draw. Removed with PostRoundCard.
+  const Card: React.FC<{ isStatic?: boolean }> = ({ isStatic: st }) => (
+    <CardSkeleton isStatic={st} variant={variant} mediaRatio={mediaRatio ?? COLD_START_SHAPE.mediaRatio} />
+  );
   // No chrome placeholder here: the REAL ChromeIsland is mounted unconditionally
   // by GlobalHeader and already renders its own smallest settled state (logo
   // capsule + search glyph + 34px avatar placeholder). Any capsule drawn here
