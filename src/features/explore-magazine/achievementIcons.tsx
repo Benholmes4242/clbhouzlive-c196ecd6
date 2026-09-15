@@ -108,3 +108,63 @@ export function ShieldCheckIcon() {
     </Frame>
   );
 }
+
+/**
+ * THE NET ICONS (C4). Same 28px lane, same imported colours - nothing new is
+ * typed here either.
+ *   NET RECORD    a star OUTLINE with "NET" inside it, in the scorecard gold,
+ *                 so it reads as a sibling of the gross crown and never as it.
+ *   HANDICAP CUT  a DOWN arrow in the movement green. A cut is good news, which
+ *                 is the opposite polarity to standing movement - stated here
+ *                 because the two arrows sit on the same page.
+ *   BEAT HANDICAP a check in a circle, movement green.
+ */
+export function NetRecordIcon() {
+  return (
+    <Frame>
+      <path
+        d="M12 3.2l2.5 5.4 5.9.7-4.3 4.1 1.1 5.8-5.2-2.9-5.2 2.9 1.1-5.8L3.6 9.3l5.9-.7L12 3.2z"
+        fill="none"
+        stroke={CALLOUT_GOLD}
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <text
+        x="12"
+        y="13"
+        textAnchor="middle"
+        dominantBaseline="central"
+        fill={CALLOUT_GOLD}
+        fontSize="7"
+        fontWeight="700"
+        letterSpacing="0.4"
+        fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif"
+      >
+        NET
+      </text>
+    </Frame>
+  );
+}
+
+export function HandicapCutIcon() {
+  return (
+    <Frame>
+      <path d="M12 19.5l-6.5-7h4v-8h5v8h4l-6.5 7z" fill={CALLOUT_GREEN} />
+    </Frame>
+  );
+}
+
+export function BeatHandicapIcon() {
+  return (
+    <Frame>
+      <circle cx="12" cy="12" r="10" fill={CALLOUT_GREEN} />
+      <path
+        d="M7.6 12.2l3 3 5.8-6.2"
+        stroke="#0d0d0d"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Frame>
+  );
+}

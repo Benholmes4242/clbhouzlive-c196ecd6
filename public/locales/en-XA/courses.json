@@ -2220,7 +2220,9 @@
       "chip": {
         "rating": "[råtîng one]",
         "world": "[wörld one]",
-        "gbi": "[GB&Î one]"
+        "gbi": "[GB&Î one]",
+        "net": "NET",
+        "hcp": "HCP"
       },
       "visual": {
         "ace": "[HÖLÉ ÎN ÖNÉ ÖN {{n}} one]",
@@ -2342,7 +2344,11 @@
         "birdies": "[{{n}} birdies]",
         "bogeyFree": "[Bogey-free]",
         "bogeyFreeSub": "[Par or better on every hole]",
-        "onHole": "[on the {{ord}}]"
+        "onHole": "[on the {{ord}}]",
+        "netRecord": "New net course record",
+        "handicapCut": "Handicap cut",
+        "handicapCutSub": "{{from}} to {{to}}",
+        "beatHandicap": "Beat handicap by {{n}}"
       }
     },
     "shelf": {

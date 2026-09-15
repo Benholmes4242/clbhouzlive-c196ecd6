@@ -138,6 +138,13 @@ export interface StreamFacts {
   clean_card?: boolean | null;
   is_course_record?: boolean | null;
   hcp_at_time?: number | null;
+  /** C4 NET FACTS. All of these are VIEWER-GATED in the RPC: a player whose
+   *  handicap this viewer may not see carries none of them, because gross minus
+   *  net is the handicap. Absent until the SQL draft is applied, and the card
+   *  renders exactly as before when they are absent. */
+  course_handicap?: number | null;
+  net_record?: boolean | null;
+  handicap_cut?: { from: number; to: number } | null;
   /** COURSE-CARD FIGURES (D3). The RPC returns these and courseHeadline() turns
    *  them into the localized sentence; SQL cannot localise six locales. */
   rounds_tracked?: number | null;

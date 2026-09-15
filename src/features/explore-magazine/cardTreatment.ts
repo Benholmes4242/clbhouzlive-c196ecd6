@@ -47,10 +47,13 @@ export function isNotableRound(item: StreamItem): boolean {
  */
 export type AchievementCallout =
   | { kind: 'record' }
+  | { kind: 'net_record' }
   | { kind: 'rank_up'; rank: number | null }
   | { kind: 'ace'; hole: number | null }
   | { kind: 'albatross'; hole: number | null }
   | { kind: 'eagle'; hole: number | null }
+  | { kind: 'handicap_cut'; from: number; to: number }
+  | { kind: 'beat_handicap'; by: number }
   | { kind: 'birdies'; count: number }
   | { kind: 'clean' };
 
@@ -104,12 +107,34 @@ export function calloutFor(item: StreamItem, holes?: CalloutHole[]): Achievement
   if (boardClaimAllowed && !lostIt && consequence?.kind === 'record_taken') {
     return { kind: 'record' };
   }
+  /* THE NET CROWN (C4). net_record is the RPC's claim about the NET board at the
+     moment the round arrived, so it is trusted the same way the gross
+     consequence is - and refused on the same two grounds: a backlog round is
+     not news, and a round that lost something is not celebrated. A member with
+     no net facts (private handicap, or the SQL not applied) simply never has
+     the flag. */
+  if (boardClaimAllowed && !lostIt && facts.net_record === true) {
+    return { kind: 'net_record' };
+  }
   if (boardClaimAllowed && consequence?.kind === 'rank_up') {
     return { kind: 'rank_up', rank: consequence.n ?? null };
   }
   if ((facts.holes_in_one ?? 0) > 0) return { kind: 'ace', hole: singleHole(holes, 'ace') };
   if ((facts.albatrosses ?? 0) > 0) return { kind: 'albatross', hole: singleHole(holes, 'albatross') };
   if ((facts.eagles ?? 0) > 0) return { kind: 'eagle', hole: singleHole(holes, 'eagle') };
+  /* A CUT IS A FACT ABOUT THE PLAYER'S INDEX, not about a board, so the backlog
+     rule does not touch it: an index that went down went down whenever the card
+     arrived. Both figures must be present; nothing here computes a cut. */
+  const cut = facts.handicap_cut;
+  if (cut && typeof cut.from === 'number' && typeof cut.to === 'number' && cut.to < cut.from) {
+    return { kind: 'handicap_cut', from: cut.from, to: cut.to };
+  }
+  /* BEAT HANDICAP: net below the course's par, from the two gated facts and the
+     par. Absent facts mean no callout, never an assumed handicap. */
+  if (facts.net != null && facts.course_handicap != null && facts.course_par != null
+      && facts.net < facts.course_par) {
+    return { kind: 'beat_handicap', by: facts.course_par - facts.net };
+  }
   if ((facts.birdies ?? 0) >= NOTABLE_BIRDIES) return { kind: 'birdies', count: facts.birdies as number };
   if (facts.clean_card === true) return { kind: 'clean' };
   return null;

@@ -11,13 +11,17 @@ import { r } from '@/lib/radius';
 import type { AchievementCallout } from './cardTreatment';
 import { standingOrdinal } from './ordinal';
 import {
+  BeatHandicapIcon,
   BirdieCountIcon,
   CALLOUT_ICON,
   CrownIcon,
+  HandicapCutIcon,
+  NetRecordIcon,
   RankUpIcon,
   ShieldCheckIcon,
   StarIcon,
 } from './achievementIcons';
+import { fmtHcp } from '@/lib/whs/format';
 
 /**
  * THE ACHIEVEMENT CALLOUT PANEL (BRIEF_EXPLORE_TWO_SHAPES §5).
@@ -53,6 +57,34 @@ export function AchievementCalloutPanel({
         return {
           icon: <CrownIcon />,
           title: t('amateur.stream.callout.record', 'New course record'),
+          subline: null,
+        };
+      case 'net_record':
+        return {
+          icon: <NetRecordIcon />,
+          title: t('amateur.stream.callout.netRecord', 'New net course record'),
+          subline: null,
+        };
+      /* A CUT IS GOOD NEWS AND THE ARROW POINTS DOWN. The subline is the two
+         figures the fact carries, in the WHS convention (a plus player's index
+         reads "+1.2"), and nothing else. */
+      case 'handicap_cut':
+        return {
+          icon: <HandicapCutIcon />,
+          title: t('amateur.stream.callout.handicapCut', 'Handicap cut'),
+          subline: t('amateur.stream.callout.handicapCutSub', '{{from}} to {{to}}', {
+            from: fmtHcp(callout.from),
+            to: fmtHcp(callout.to),
+          }),
+        };
+      /* NO SUBLINE: the net chip on the photograph already states the score the
+         margin was measured from. */
+      case 'beat_handicap':
+        return {
+          icon: <BeatHandicapIcon />,
+          title: t('amateur.stream.callout.beatHandicap', 'Beat handicap by {{n}}', {
+            n: callout.by,
+          }),
           subline: null,
         };
       case 'rank_up':
