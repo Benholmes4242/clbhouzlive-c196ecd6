@@ -4,12 +4,18 @@ export type ExploreCardTreatment = 'hero' | 'standard';
 
 const HERO_CONSEQUENCES = new Set(['record_taken', 'record_lost', 'rank_up']);
 
+/** Five birdies is the server's notability threshold in get_explore_stream. */
+const HERO_BIRDIES = 5;
+
 /** A later card earns text-on-photo only for the explicitly ruled signals. */
 export function earnsHeroTreatment(item: StreamItem): boolean {
   return (
     HERO_CONSEQUENCES.has(item.consequence?.kind ?? '') ||
     (item.facts.holes_in_one ?? 0) > 0 ||
     (item.facts.albatrosses ?? 0) > 0 ||
+    (item.facts.eagles ?? 0) > 0 ||
+    (item.facts.birdies ?? 0) >= HERO_BIRDIES ||
+    item.facts.clean_card === true ||
     (item.facts.to_par ?? 0) < 0
   );
 }
