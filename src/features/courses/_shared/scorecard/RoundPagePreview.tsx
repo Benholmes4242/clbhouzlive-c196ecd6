@@ -37,7 +37,9 @@ export interface RoundPagePreviewProps {
   emptyVariant?: 'syncing' | 'unavailable';
 }
 
-export const RoundPagePreview: React.FC<RoundPagePreviewProps> = ({
+/* Memoised: the host translates this by the finger every frame, and a redraw
+   per frame for a movement that is pure transform would be wasted work. */
+export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
   seed, isOwner = false, emptyVariant = 'syncing',
 }) => {
   const { t } = useTranslation(['courses']);
