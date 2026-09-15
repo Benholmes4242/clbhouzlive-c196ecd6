@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import i18next from 'i18next';
 
 import { courseHeadline, spokenToPar, tournamentHeadline } from '@/features/tourhub/overview/magazineCopy';
 
@@ -17,7 +16,19 @@ const resources = {
   } },
 };
 
-const t = i18next.createInstance({ lng: 'en', resources: { en: { translation: resources } } }).t.bind(i18next);
+const lookup = resources.overview.magazine as Record<string, string>;
+const t = ((key: string, values?: Record<string, unknown>) => {
+  let value = key.split('.').reduce<unknown>((node, part) => {
+    if (!node || typeof node !== 'object') return undefined;
+    return (node as Record<string, unknown>)[part];
+  }, resources);
+  if (typeof value !== 'string') return key;
+  for (const [name, replacement] of Object.entries(values ?? {})) {
+    value = value.replaceAll(`{{${name}}}`, String(replacement));
+  }
+  return value;
+}) as any;
+void lookup;
 const tournament = { id: '1', name: 'The Open', venueName: 'Royal Portrush', defendingChampion: null } as any;
 const row = (name: string, score: number) => ({ score, player: { full_name: name } });
 
