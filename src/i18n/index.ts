@@ -142,7 +142,10 @@ export function useLocale() {
   }, [instance]);
 
   return {
-    locale: (instance.resolvedLanguage || instance.language || 'en') as SupportedLocale,
+    locale: ((): SupportedLocale => {
+      const active = instance.resolvedLanguage || instance.language || 'en';
+      return (isLocaleEnabled(active) ? active : 'en') as SupportedLocale;
+    })(),
     setLocale,
   };
 }
