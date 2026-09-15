@@ -793,11 +793,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
 
 
-  /* §3e THE ALL ORDER AFTER THE LEAD, in one place. The circle/suggestions
-     slot is deliberately outside this cadence now: it is the first All-view
-     content, above the lead. Page 3+ restarts from clips, which the modulo in
-     the renderer does; an empty shelf is skipped by the shelf itself and the
-     next one takes its slot. */
+  /* §3e THE ALL ORDER AFTER THE LEAD, in one place. Page 3+ restarts from
+     clips, which the modulo in the renderer does; an empty shelf is skipped by
+     the shelf itself and the next one takes its slot. */
   /* BRIEF_EXPLORE_ALL_VIDEO §1 PLACEMENT: videos sit FOURTH, between standing
      and the county courses rail, so no two media rails are adjacent - clips is
      first, moments fifth, and videos has a non-media rail on either side. Two
@@ -1494,14 +1492,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           the zero minimum a long course name widens the whole track past the
           viewport at 320px instead of clipping inside the card. */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
-        {/* THE FIRST ALL-VIEW CONTENT. It is a direct child of the same 26px
-            block stack as the lead, so the seam is position-independent and
-            identical whether CircleShelf or PeopleShelf occupies the slot.
-            The chip row remains in normal flow above, preserving its lead-in.
-            The settled-success gate inside renderShelf prevents a stale zero
-            from flashing suggestions before the current follow-set settles. */}
-        {view === 'all' ? renderShelf('circle', 0) : null}
-
         {!source.isFetched && ranked.length === 0 ? (
           <>
             <div style={{ paddingInline: CARD_INSET }}><StdShell /></div>
