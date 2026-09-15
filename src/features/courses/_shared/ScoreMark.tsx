@@ -82,6 +82,20 @@ export interface ScoreMarkProps {
   colourOverride?: string;
   /** Surface the mark lives on. Defaults to 'light'. */
   surface?: 'light' | 'dark';
+  /**
+   * BRIEF_ROUND_SHEET_CUES §4 — THE NUMERAL IS SIZED SEPARATELY FROM THE MARK.
+   * The mark tile carries the shape and the colour; the numeral inside it is the
+   * figure a reader actually reads, and on the scorecard it has to be loud
+   * without the disc growing to match. ABSENT keeps today's formula
+   * (size x 0.42) exactly, so every other caller is unchanged.
+   */
+  numeralSize?: number;
+  /**
+   * §4 — A PLAIN PAR NUMERAL ON THE STROKES ROW IS INK, NOT PAR-MUTED. Par has
+   * no mark, so with the muted par ink the loudest row on the card went quiet
+   * exactly where the member shot par. Absent keeps the muted par ink.
+   */
+  parNumeralColor?: string;
 }
 
 export const ScoreMark: React.FC<ScoreMarkProps> = ({
@@ -91,6 +105,8 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   showStroke = true,
   colourOverride,
   surface = 'light',
+  numeralSize,
+  parNumeralColor,
 }) => {
   const variant = variantFor(strokes, par);
 
@@ -101,7 +117,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   const goldRing = variant === 'alba';
 
   const overInk = OVER_INK_LIGHT;
-  const parInk = surface === 'dark' ? SC_PAR_DARK : SC_PAR;
+  const parInk = parNumeralColor ?? (surface === 'dark' ? SC_PAR_DARK : SC_PAR);
   const emptyInk = surface === 'dark' ? 'rgba(242,244,247,0.35)' : '#CBD5E1';
   const underRed = SC_FILL_BIRDIE;
   const overGround = variant === 'doub' || variant === 'triple'
@@ -209,7 +225,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
           <span
             style={{
               position: 'relative',
-              fontSize: Math.round(size * 0.42),
+              fontSize: numeralSize ?? Math.round(size * 0.42),
               fontWeight: numWeight,
               lineHeight: 1,
               letterSpacing: '-0.02em',
@@ -275,7 +291,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
         <span
           style={{
             position: 'relative',
-            fontSize: Math.round(size * 0.42),
+            fontSize: numeralSize ?? Math.round(size * 0.42),
             fontWeight: numWeight,
             lineHeight: 1,
             letterSpacing: '-0.02em',

@@ -122,6 +122,28 @@ export function noteHintPaged(): void {
   writeHint({ ...readHint(), paged: true });
 }
 
+/**
+ * BRIEF_ROUND_SHEET_CUES §2 — WHICH CUE THIS OPEN EARNS.
+ *
+ * One counter for both, so the rule that retired the sentence now retires the
+ * movement: the first three PAGEABLE opens, and never again once the member has
+ * paged. A reduced-motion reader gets no movement, so they keep the sentence.
+ * With nothing to page to there is nothing to show, so no cue at all.
+ *
+ * NOTE: this CONSUMES an open (noteHintOpen increments), so call it once per
+ * open, exactly where the sentence used to be decided.
+ */
+export function openCue(opts: {
+  pageable: boolean;
+  hasNext: boolean;
+  reducedMotion: boolean;
+}): 'nudge' | 'line' | null {
+  if (!opts.pageable) return null;
+  if (!noteHintOpen()) return null;
+  if (opts.reducedMotion) return 'line';
+  return opts.hasNext ? 'nudge' : null;
+}
+
 /** Tests only. */
 export function resetHint(): void {
   try {
