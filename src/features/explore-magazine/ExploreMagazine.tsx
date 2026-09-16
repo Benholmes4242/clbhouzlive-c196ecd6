@@ -8,6 +8,8 @@ import { useDiscoverMediaPreview } from '@/components/explore-tab-new/courseled/
 import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hooks/useRoundPostComments';
+import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
@@ -827,6 +829,18 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   }, [scoresStanding.rows]);
   const rankGate = useMemo(() => applyRankCardRule(enriched, standingByCourse), [enriched, standingByCourse]);
   const ranked = rankGate.items;
+  const roundScoreIds = useMemo(
+    () => ranked.filter((item) => item.kind === 'round').map((item) => item.facts.score_id),
+    [ranked],
+  );
+  const roundPosts = useRoundPostComments(roundScoreIds);
+  const roundReactions = useContentReactions(
+    useMemo(
+      () => roundScoreIds.filter((id): id is string => !!id).map((id) => ({ type: 'round' as const, id })),
+      [roundScoreIds],
+    ),
+    { postIdFor: (scoreId) => roundPosts.infoFor(scoreId)?.postId ?? null },
+  );
 
 
 
@@ -1009,6 +1023,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [ranked],
   );
   const [pageIx, setPageIx] = useState<number | null>(null);
+  const [openCommentsScoreId, setOpenCommentsScoreId] = useState<string | null>(null);
   const pageIxRef = useRef<number | null>(null);
   pageIxRef.current = pageIx;
   const [shift, setShift] = useState<{ dx: number; opacity?: number; animating: boolean } | null>(null);
@@ -1362,6 +1377,30 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view,
       cancelNudge, startNudge, prefersReducedMotion],
   );
+
+  const engagementFor = useCallback((item: StreamItem) => {
+    const scoreId = item.kind === 'round' ? item.facts.score_id : null;
+    if (!scoreId) return null;
+    const post = roundPosts.infoFor(scoreId);
+    const state = roundReactions.stateFor('round', scoreId);
+    const likeAvailable = !!roundReactions.viewerId && !roundReactions.unavailable;
+    return {
+      likeCount: state.count,
+      liked: state.mine,
+      likeAvailable,
+      commentCount: post?.commentCount ?? 0,
+      commentAvailable: !!post,
+      onToggleLike: likeAvailable ? () => {
+        analyticsEvents.track('explore_round_like_toggled', { score_id: scoreId, liked: !state.mine, view });
+        roundReactions.toggle('round', scoreId);
+      } : undefined,
+      onOpenComments: post ? () => {
+        analyticsEvents.track('explore_round_comments_opened', { score_id: scoreId, view });
+        setOpenCommentsScoreId(scoreId);
+        tapCard(item, 'std', ranked.indexOf(item));
+      } : undefined,
+    };
+  }, [ranked, roundPosts, roundReactions, tapCard, view]);
 
   const tapWho = useCallback(
     (item: StreamItem) => {
@@ -1886,6 +1925,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                       
                       onTap={() => tapCard(item, 'pair', base + offset)}
                       onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
+                      engagement={engagementFor(item)}
                     />
                   </div>
                 ))}
@@ -1917,6 +1957,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 viewerBestSince={monthLabel(own?.playDate ?? null, i18n.language || 'en')}
                 onTap={() => tapCard(item, size, pos)}
                 onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
+                 engagement={engagementFor(item)}
               />
              </div>
             </div>
@@ -1967,6 +2008,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           setPageIx(null);
           pageIxRef.current = null;
           setSwipeHintOn(false);
+          setOpenCommentsScoreId(null);
           opener.close();
         }}
         /* §2.4 — EVERY ACTION READS THE CURRENT PAGE. The score id, the
@@ -1976,6 +2018,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         scoreId={opener.target?.scoreId ?? null}
         connectionId={opener.target?.connectionId ?? null}
         profileUserId={opener.target?.profileUserId ?? null}
+        initialCommentsOpen={!!opener.target?.scoreId && opener.target.scoreId === openCommentsScoreId}
         seed={sheetSeed}
         detents={['mid', 'full']}
         onDetentChange={(detent) => {

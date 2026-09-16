@@ -93,7 +93,7 @@ export function useContentReactions(
     [ids],
   );
 
-  const { data } = useQuery<CacheShape>({
+  const { data, isError } = useQuery<CacheShape>({
     queryKey,
     enabled: ids.length > 0,
     staleTime: 30_000,
@@ -107,13 +107,14 @@ export function useContentReactions(
           console.warn('[reactions] content_reactions is unavailable; controls hidden');
           return { rows: [], unavailable: true };
         }
+        console.error('[reactions] batched content_reactions read failed; controls hidden', error);
         throw error;
       }
       return { rows: (rows ?? []) as unknown as Row[], unavailable: false };
     },
   });
 
-  const unavailable = data?.unavailable ?? false;
+  const unavailable = isError || (data?.unavailable ?? false);
 
   const map = useMemo(() => {
     const out = new Map<string, ReactionState>();

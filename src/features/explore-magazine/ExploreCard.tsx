@@ -6,6 +6,7 @@ import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Heart, MessageCircle } from 'lucide-react';
 import { A, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { r } from '@/lib/radius';
@@ -43,6 +44,16 @@ import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTo
  */
 
 export type CardSize = 'lead' | 'std' | 'pair';
+
+export interface RoundCardEngagement {
+  likeCount: number;
+  liked: boolean;
+  likeAvailable: boolean;
+  commentCount: number;
+  commentAvailable: boolean;
+  onToggleLike?: () => void;
+  onOpenComments?: () => void;
+}
 
 const PHOTO_H: Record<CardSize, number> = { lead: 340, std: 210, pair: 124 };
 /** The radius canon is a CSS length, not a number: r.lg '18px', r.md '14px'. */
@@ -216,11 +227,13 @@ function WhoLine({
   size,
   onPhoto,
   onWhoTap,
+  engagement,
 }: {
   item: StreamItem;
   size: CardSize;
   onPhoto: boolean;
   onWhoTap?: () => void;
+  engagement?: RoundCardEngagement | null;
 }) {
   const { t } = useTranslation('courses');
   const who = item.who;
@@ -251,7 +264,25 @@ function WhoLine({
     return null;
   })();
 
-  if (!who && !sub) return null;
+  if (!who && !sub && !engagement) return null;
+
+  const pair = size === 'pair';
+  const showPairLike = pair && !!engagement?.likeAvailable && engagement.likeCount > 0;
+  const showPairComment = pair && !!engagement?.commentAvailable && engagement.commentCount > 0;
+  const showActions = pair
+    ? showPairLike || showPairComment
+    : !!engagement && (engagement.likeAvailable || engagement.commentAvailable);
+  const countStyle: React.CSSProperties = {
+    fontFamily: SANS,
+    fontSize: pair ? 11 : 13,
+    fontWeight: 600,
+    fontVariantNumeric: 'tabular-nums lining-nums',
+    lineHeight: 1,
+  };
+  const stop = (event: React.SyntheticEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+  };
 
   return (
     <div
@@ -294,6 +325,7 @@ function WhoLine({
           gap: 4,
           minWidth: 0,
           overflow: 'hidden',
+          flex: '1 1 auto',
         }}
       >
         {who ? (
@@ -333,6 +365,69 @@ function WhoLine({
           </span>
         ) : null}
       </div>
+      {showActions ? (
+        <span
+          data-round-reactions={pair ? 'counts' : 'controls'}
+          style={{
+            marginLeft: 'auto',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: pair ? 8 : 14,
+            flex: '0 0 auto',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {engagement?.likeAvailable && (!pair || showPairLike) ? (
+            pair ? (
+              <span aria-label={`Like, ${engagement.likeCount} likes`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: engagement.liked ? A.AMBER : subColor }}>
+                <Heart size={14} strokeWidth={2} fill={engagement.liked ? A.AMBER : 'none'} aria-hidden />
+                <span style={countStyle}>{engagement.likeCount}</span>
+              </span>
+            ) : (
+              <span
+                role="button"
+                tabIndex={0}
+                aria-pressed={engagement.liked}
+                aria-label={`Like, ${engagement.likeCount} likes`}
+                onClick={(event) => { stop(event); engagement.onToggleLike?.(); }}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Enter' && event.key !== ' ') return;
+                  stop(event);
+                  engagement.onToggleLike?.();
+                }}
+                style={{ minWidth: 40, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? A.AMBER : subColor, cursor: 'pointer' }}
+              >
+                <Heart size={18} strokeWidth={2} fill={engagement.liked ? A.AMBER : 'none'} aria-hidden />
+                {engagement.likeCount > 0 ? <span style={countStyle}>{engagement.likeCount}</span> : null}
+              </span>
+            )
+          ) : null}
+          {engagement?.commentAvailable && (!pair || showPairComment) ? (
+            pair ? (
+              <span aria-label={`Comments, ${engagement.commentCount}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: subColor }}>
+                <MessageCircle size={14} strokeWidth={2} aria-hidden />
+                <span style={countStyle}>{engagement.commentCount}</span>
+              </span>
+            ) : (
+              <span
+                role="button"
+                tabIndex={0}
+                aria-label={`Comments, ${engagement.commentCount}`}
+                onClick={(event) => { stop(event); engagement.onOpenComments?.(); }}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Enter' && event.key !== ' ') return;
+                  stop(event);
+                  engagement.onOpenComments?.();
+                }}
+                style={{ minWidth: 40, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: subColor, cursor: 'pointer' }}
+              >
+                <MessageCircle size={18} strokeWidth={2} aria-hidden />
+                {engagement.commentCount > 0 ? <span style={countStyle}>{engagement.commentCount}</span> : null}
+              </span>
+            )
+          ) : null}
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -345,6 +440,7 @@ export function ExploreCard({
   viewerBestSince,
   onTap,
   onWhoTap,
+  engagement,
 }: {
   item: StreamItem;
   size: CardSize;
@@ -358,6 +454,7 @@ export function ExploreCard({
   viewerBestSince?: string | null;
   onTap: () => void;
   onWhoTap?: () => void;
+  engagement?: RoundCardEngagement | null;
 }) {
   const { t, i18n } = useTranslation('courses');
   const locale = i18n.language || 'en';
@@ -490,7 +587,7 @@ export function ExploreCard({
             >
               <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               {headlineNode}
-              <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} />
+              <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} />
             </span>
             {/* §3 THE BOTTOM LANE IS 16px AND CARRIES NO TRACE. On-photo is now
                 the REVIEW shape, and a review has no round shape to draw; the
@@ -573,7 +670,7 @@ export function ExploreCard({
         <span style={{ display: 'block', paddingInline: 4, marginTop: item.kind === 'round' && size !== 'pair' && (callout || (item.facts.net != null && item.facts.course_handicap != null && item.facts.course_par != null)) ? 0 : 8 }}>
           {kicker}
           {headlineNode}
-           <WhoLine item={item} size={size} onPhoto={false} onWhoTap={onWhoTap} />
+            <WhoLine item={item} size={size} onPhoto={false} onWhoTap={onWhoTap} engagement={engagement} />
         </span>
       ) : null}
     </button>

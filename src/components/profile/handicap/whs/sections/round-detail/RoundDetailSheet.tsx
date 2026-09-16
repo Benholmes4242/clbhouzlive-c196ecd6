@@ -353,6 +353,9 @@ export const RoundDetailSheet: React.FC<Props> = ({
     { postIdFor: () => postInfo?.postId ?? null },
   );
   const [commentsOpen, setCommentsOpen] = useState(initialCommentsOpen);
+  useEffect(() => {
+    if (open && initialCommentsOpen) setCommentsOpen(true);
+  }, [open, initialCommentsOpen, scoreId]);
 
   const engagement = scoreId
     ? {

@@ -32,3 +32,4 @@
 - [x] Restore every full-width Explore review to the 340px lead preset while keeping rounds standard.
 - [x] Replace Explore round NET/HCP photo chips and the achievement panel with the amended C3 PAR/NET/VS HCP strip.
 - [x] Add an opt-in under-par gradient fill to Explore round traces while preserving shared defaults.
+- [x] Add batched like and comment controls to Explore round-card who-lines and read-only pair counts.
