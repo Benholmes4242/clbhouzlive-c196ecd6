@@ -33,3 +33,4 @@
 - [x] Replace Explore round NET/HCP photo chips and the achievement panel with the amended C3 PAR/NET/VS HCP strip.
 - [x] Add an opt-in under-par gradient fill to Explore round traces while preserving shared defaults.
 - [x] Add batched like and comment controls to Explore round-card who-lines and read-only pair counts.
+- [x] Move round/review dates to the kicker row and make every round achievement label fully visible.

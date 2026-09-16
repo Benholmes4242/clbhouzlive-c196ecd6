@@ -28,7 +28,7 @@ describe('C3 round stat strip', () => {
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
     expect(Array.from(strip?.children ?? []).map((cell) => cell.getAttribute('data-explore-stat')))
       .toEqual(['achievement', 'par', 'net', 'vs-hcp']);
-    expect(strip?.style.gridTemplateColumns).toBe('1.6fr 0.8fr 0.8fr 0.8fr');
+    expect(strip?.style.gridTemplateColumns).toBe('minmax(0, 2.3fr) repeat(3, minmax(0, 0.7fr))');
   });
 
   it('uses equal thirds without an achievement and never prints a birdies figure label', () => {
@@ -90,5 +90,27 @@ describe('amended achievement priority', () => {
   it('keeps net record above rank-up and disables cut and beat-handicap callouts', () => {
     expect(calloutFor(round({ net_record: true }, { consequence: { kind: 'rank_up', n: 2 } }))?.kind).toBe('net_record');
     expect(calloutFor(round({ course_par: 71, net: 68, course_handicap: 8, handicap_cut: { from: 9, to: 8 } }))).toBeNull();
+  });
+});
+
+describe('achievement tag and label copy', () => {
+  it.each([
+    [{ consequence: { kind: 'record_taken' as const } }, 'NEW', 'Course record'],
+    [{ facts: { net_record: true } }, 'NEW', 'Net course record'],
+    [{ consequence: { kind: 'rank_up' as const, n: 2 } }, 'MOVED UP', 'Now 2nd'],
+    [{ consequence: { kind: 'rank_up' as const, n: null } }, null, 'Moved up the board'],
+    [{ facts: { holes_in_one: 1 } }, null, 'Hole in one'],
+    [{ facts: { albatrosses: 1 } }, null, 'Albatross'],
+    [{ facts: { eagles: 1 } }, null, 'Eagle'],
+    [{ facts: { birdies: 5 } }, null, '5 birdies'],
+    [{ facts: { clean_card: true } }, null, 'Bogey-free'],
+  ])('maps the requested tag and label', (variant, tag, label) => {
+    const facts = { gross: 70, course_par: 71, net: 67, course_handicap: 3, ...(variant.facts ?? {}) };
+    const container = renderCard(facts, variant.consequence ? { consequence: variant.consequence } : {});
+    expect(container.querySelector('[data-explore-achievement-tag="true"]')?.textContent ?? null).toBe(tag);
+    const labelNode = container.querySelector<HTMLElement>('[data-explore-achievement-label="true"]');
+    expect(labelNode?.textContent).toBe(label);
+    expect(labelNode?.style.textOverflow).not.toBe('ellipsis');
+    expect(labelNode?.style.whiteSpace).toBe('normal');
   });
 });

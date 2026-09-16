@@ -78,8 +78,7 @@ function textSlots(container: HTMLElement, name: string) {
   const kicker = container.querySelector<HTMLElement>('[data-explore-kicker="true"]');
   const person = Array.from(container.querySelectorAll<HTMLElement>('.explore-who-line span'))
     .find((node) => node.textContent === name);
-  const date = Array.from(container.querySelectorAll<HTMLElement>('.explore-who-line span'))
-    .find((node) => node.textContent?.includes('·'));
+  const date = container.querySelector<HTMLElement>('[data-explore-kicker-date="true"]');
   return { kicker, person, date };
 }
 
@@ -145,15 +144,15 @@ describe('Explore card shapes', () => {
 
     const kicker = container.querySelector<HTMLElement>('[data-explore-hero-kicker="true"] > div');
     const name = getByText('danny.akers1');
-    const date = Array.from(container.querySelectorAll<HTMLElement>('.explore-who-line span'))
-      .find((node) => node.textContent?.includes('·'));
+    const date = container.querySelector<HTMLElement>('[data-explore-kicker-date="true"]');
 
     expect(kicker?.style.color).toBe('rgb(255, 255, 255)');
     expect(kicker?.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
     expect(name.style.color).toBe('rgb(255, 255, 255)');
     expect(name.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
-    expect(date?.style.color).toBe('rgba(255, 255, 255, 0.85)');
+    expect(date?.style.color).toBe('rgb(255, 255, 255)');
     expect(date?.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
+    expect(container.querySelector('.explore-who-line')?.textContent).not.toContain(date?.textContent ?? 'Sep');
   });
 
   it('keeps the viewer name amber on a review', () => {
@@ -197,8 +196,9 @@ describe('Explore card shapes', () => {
     expect(kicker?.style.textShadow).toBe('');
     expect(person?.style.color).toBe('rgb(255, 255, 255)');
     expect(person?.style.textShadow).toBe('');
-    expect(date?.style.color).toBe('rgba(255, 255, 255, 0.85)');
+    expect(date?.style.color).toBe('rgb(255, 255, 255)');
     expect(date?.style.textShadow).toBe('');
+    expect(container.querySelector('.explore-who-line')?.textContent).not.toContain(date?.textContent ?? 'Sep');
   });
 
   it('marks a record round with a callout panel and a plain headline', () => {

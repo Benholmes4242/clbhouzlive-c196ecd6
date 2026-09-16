@@ -228,22 +228,32 @@ export function RoundStatStrip({
     : null;
   const achievement = callout ? (() => {
     switch (callout.kind) {
-      case 'record': return { icon: <CrownIcon />, title: t('amateur.stream.callout.record', 'New course record') };
-      case 'net_record': return { icon: <NetRecordIcon />, title: t('amateur.stream.callout.netRecord', 'New net course record') };
+      case 'record': return {
+        icon: <CrownIcon />,
+        tag: t('amateur.stream.callout.tagNew', 'NEW'),
+        label: t('amateur.stream.callout.courseRecord', 'Course record'),
+      };
+      case 'net_record': return {
+        icon: <NetRecordIcon />,
+        tag: t('amateur.stream.callout.tagNew', 'NEW'),
+        label: t('amateur.stream.callout.netCourseRecord', 'Net course record'),
+      };
       case 'rank_up': return {
         icon: <RankUpIcon />,
-        title: ord
-          ? t('amateur.stream.callout.rankUpTo', 'Up to {{ord}}', { ord })
-          : t('amateur.stream.callout.rankUp', 'Moved up'),
+        tag: ord ? t('amateur.stream.callout.tagMovedUp', 'MOVED UP') : null,
+        label: ord
+          ? t('amateur.stream.callout.nowRank', 'Now {{ord}}', { ord })
+          : t('amateur.stream.callout.movedUpBoard', 'Moved up the board'),
       };
-      case 'ace': return { icon: <StarIcon />, title: t('amateur.stream.callout.ace', 'Hole in one') };
-      case 'albatross': return { icon: <StarIcon />, title: t('amateur.stream.callout.albatross', 'Albatross') };
-      case 'eagle': return { icon: <StarIcon />, title: t('amateur.stream.callout.eagle', 'Eagle') };
+      case 'ace': return { icon: <StarIcon />, tag: null, label: t('amateur.stream.callout.ace', 'Hole in one') };
+      case 'albatross': return { icon: <StarIcon />, tag: null, label: t('amateur.stream.callout.albatross', 'Albatross') };
+      case 'eagle': return { icon: <StarIcon />, tag: null, label: t('amateur.stream.callout.eagle', 'Eagle') };
       case 'birdies': return {
         icon: <BirdieCountIcon count={callout.count} />,
-        title: t('amateur.stream.callout.birdies', '{{n}} birdies', { n: callout.count }),
+        tag: null,
+        label: t('amateur.stream.callout.birdies', '{{n}} birdies', { n: callout.count }),
       };
-      case 'clean': return { icon: <ShieldCheckIcon />, title: t('amateur.stream.callout.bogeyFree', 'Bogey-free') };
+      case 'clean': return { icon: <ShieldCheckIcon />, tag: null, label: t('amateur.stream.callout.bogeyFree', 'Bogey-free') };
     }
   })() : null;
 
@@ -253,7 +263,7 @@ export function RoundStatStrip({
       data-explore-stat-layout={achievement && hasNet ? 'achievement-and-figures' : achievement ? 'achievement-only' : 'figures-only'}
       style={{
         display: 'grid',
-        gridTemplateColumns: achievement && hasNet ? '1.6fr 0.8fr 0.8fr 0.8fr' : hasNet ? 'repeat(3, minmax(0, 1fr))' : 'minmax(0, 1fr)',
+        gridTemplateColumns: achievement && hasNet ? 'minmax(0, 2.3fr) repeat(3, minmax(0, 0.7fr))' : hasNet ? 'repeat(3, minmax(0, 1fr))' : 'minmax(0, 1fr)',
         width: '100%',
         minWidth: 0,
         marginTop: 10,
@@ -271,8 +281,21 @@ export function RoundStatStrip({
           style={{ display: 'flex', minWidth: 0, minHeight: 52, alignItems: 'center', gap: 8, padding: '8px 10px', boxSizing: 'border-box' }}
         >
           <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px` }}>{achievement.icon}</span>
-          <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: SANS, fontSize: 12, fontWeight: 700, color: A.INK }}>
-            {achievement.title}
+          <span style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, gap: 2 }}>
+            {achievement.tag ? (
+              <span
+                data-explore-achievement-tag="true"
+                style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap' }}
+              >
+                {achievement.tag}
+              </span>
+            ) : null}
+            <span
+              data-explore-achievement-label="true"
+              style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'break-word' }}
+            >
+              {achievement.label}
+            </span>
           </span>
         </span>
       ) : null}

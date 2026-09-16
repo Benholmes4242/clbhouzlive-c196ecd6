@@ -247,7 +247,9 @@ function WhoLine({
     : who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
 
   const sub = (() => {
-    if (item.kind === 'review' || item.kind === 'round') return relativeDay(item.facts.play_date ?? item.facts.arrived_at);
+    /* ROUND AND REVIEW DATES LIVE IN THE KICKER ROW. Keeping them here created
+       a loose second text group between the player and the reaction controls. */
+    if (item.kind === 'review' || item.kind === 'round') return null;
     if (item.kind === 'story') return relativeDay(item.facts.published_at);
     if (item.kind === 'clip' || item.kind === 'watch') {
       const label = item.facts.duration_s ? formatDuration(item.facts.duration_s) : null;
@@ -475,6 +477,9 @@ export function ExploreCard({
      There is no earned treatment and position 0 is not special. */
   const onPhoto = item.kind === 'review' && size !== 'pair';
   const isOwnRound = item.kind === 'round' && item.who?.is_viewer === true;
+  const kickerDate = item.kind === 'review' || item.kind === 'round'
+    ? relativeDay(item.facts.play_date ?? item.facts.arrived_at)
+    : null;
 
   /* ONE VISUAL: THE TREND LINE, with gold / red dots on the good holes. The
      ticks row and the distribution bar are retired — see roundTreatment.ts. */
@@ -496,28 +501,41 @@ export function ExploreCard({
          color: '#FFFFFF',
          textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
         display: 'flex',
-        gap: 5,
+        alignItems: 'baseline',
+        gap: 10,
         minWidth: 0,
         whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
       }}
     >
-      {parts.map((part, index) => (
+      <span
+        data-explore-kicker-course="true"
+        style={{ display: 'flex', gap: 5, flex: '1 1 auto', minWidth: 0, overflow: 'hidden' }}
+      >
+        {parts.map((part, index) => (
+          <span
+            key={`${index}:${part}`}
+            data-explore-kicker-part={index === 0 ? 'primary' : undefined}
+            style={{
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              color: isOwnRound && index === 0 ? A.AMBER : undefined,
+            }}
+          >
+            {index > 0 ? <span style={{ marginRight: 5 }}>{'\u00B7'}</span> : null}
+            {part}
+          </span>
+        ))}
+      </span>
+      {kickerDate ? (
         <span
-          key={`${index}:${part}`}
-          data-explore-kicker-part={index === 0 ? 'primary' : undefined}
-          style={{
-            minWidth: 0,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            color: isOwnRound && index === 0 ? A.AMBER : undefined,
-          }}
+          data-explore-kicker-date="true"
+          style={{ flex: '0 0 auto', whiteSpace: 'nowrap', color: '#FFFFFF' }}
         >
-          {index > 0 ? <span style={{ marginRight: 5 }}>{'\u00B7'}</span> : null}
-          {part}
+          {kickerDate}
         </span>
-      ))}
+      ) : null}
     </div>
   );
 
