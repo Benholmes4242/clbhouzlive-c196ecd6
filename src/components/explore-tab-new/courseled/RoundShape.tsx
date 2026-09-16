@@ -10,8 +10,9 @@ import {
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { TOPAR_EVEN_LIGHT, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
+import { PHOTO_FIG_UNDER } from '@/styles/photoScrim';
 
 import { A, CHIP_RADIUS } from './tokens';
 
@@ -223,8 +224,8 @@ export function RoundShape({
               <rect x={0} y={baselineY} width={width} height={Math.max(bottom - baselineY, 0)} />
             </clipPath>
             <linearGradient id={underGradientId} gradientUnits="userSpaceOnUse" x1={0} y1={baselineY} x2={0} y2={bottom}>
-              <stop offset="0%" stopColor={TOPAR_UNDER_DARK} stopOpacity={UNDER_FILL_TOP} />
-              <stop offset="100%" stopColor={TOPAR_UNDER_DARK} stopOpacity={UNDER_FILL_BOTTOM} />
+              <stop offset="0%" stopColor={PHOTO_FIG_UNDER} stopOpacity={UNDER_FILL_TOP} />
+              <stop offset="100%" stopColor={PHOTO_FIG_UNDER} stopOpacity={UNDER_FILL_BOTTOM} />
             </linearGradient>
           </defs>
         ) : null}
