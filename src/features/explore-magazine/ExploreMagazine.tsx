@@ -2011,7 +2011,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           setPageIx(null);
           pageIxRef.current = null;
           setSwipeHintOn(false);
-          setOpenCommentsScoreId(null);
           opener.close();
         }}
         /* §2.4 — EVERY ACTION READS THE CURRENT PAGE. The score id, the
@@ -2021,7 +2020,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         scoreId={opener.target?.scoreId ?? null}
         connectionId={opener.target?.connectionId ?? null}
         profileUserId={opener.target?.profileUserId ?? null}
-        initialCommentsOpen={!!opener.target?.scoreId && opener.target.scoreId === openCommentsScoreId}
+        
         seed={sheetSeed}
         detents={['mid', 'full']}
         onDetentChange={(detent) => {
