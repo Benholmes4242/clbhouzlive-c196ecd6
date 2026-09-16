@@ -6,8 +6,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hooks/useRoundPostComments';
 
-const from = vi.fn();
-const toastError = vi.fn();
+const { from, toastError } = vi.hoisted(() => ({
+  from: vi.fn(),
+  toastError: vi.fn(),
+}));
 
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
