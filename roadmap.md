@@ -30,3 +30,4 @@
 - [x] Verify tests/build plus 320px and 390px screenshots without horizontal overflow
 - [x] Align Explore standard/pair text colors with heroes, fix six-locale rating plurals, audit fallbacks, and verify mobile states.
 - [x] Restore every full-width Explore review to the 340px lead preset while keeping rounds standard.
+- [x] Replace Explore round NET/HCP photo chips and the achievement panel with the amended C3 PAR/NET/VS HCP strip.
