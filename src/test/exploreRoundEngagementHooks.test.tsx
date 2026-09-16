@@ -59,15 +59,12 @@ describe('Explore round engagement batching and optimistic state', () => {
   });
 
   it('updates immediately and rolls back with the existing toast when the write fails', async () => {
-    let rejectInsert = false;
+    let finishInsert: ((value: { error: { code: string } }) => void) | null = null;
     from.mockImplementation((table: string) => {
       if (table !== 'content_reactions') throw new Error(`unexpected table ${table}`);
       return {
         select: () => ({ in: async () => ({ data: [], error: null }) }),
-        insert: async () => {
-          await new Promise((resolve) => setTimeout(resolve, 20));
-          return { error: rejectInsert ? { code: 'XX000' } : null };
-        },
+        insert: () => new Promise<{ error: { code: string } }>((resolve) => { finishInsert = resolve; }),
       };
     });
     const qc = client();
@@ -76,9 +73,9 @@ describe('Explore round engagement batching and optimistic state', () => {
       { wrapper: wrapper(qc) },
     );
     await waitFor(() => expect(qc.getQueryData(['content-reactions', 'score-1'])).toBeTruthy());
-    rejectInsert = true;
     act(() => view.result.current.toggle('round', 'score-1'));
     await waitFor(() => expect(view.result.current.stateFor('round', 'score-1').mine).toBe(true));
+    act(() => finishInsert?.({ error: { code: 'XX000' } }));
     await waitFor(() => expect(view.result.current.stateFor('round', 'score-1').mine).toBe(false));
     expect(toastError).toHaveBeenCalledWith('Could not save that reaction. Please try again.');
   });
