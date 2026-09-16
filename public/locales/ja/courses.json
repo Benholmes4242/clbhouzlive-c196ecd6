@@ -1716,6 +1716,12 @@
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
         "beatHandicap": "Beat handicap by {{n}}"
+        ,"tagNew": "NEW"
+        ,"courseRecord": "コースレコード"
+        ,"netCourseRecord": "ネットコースレコード"
+        ,"tagMovedUp": "順位上昇"
+        ,"nowRank": "現在{{ord}}位"
+        ,"movedUpBoard": "順位が上昇"
       },
       "stat": {
         "par": "PAR",

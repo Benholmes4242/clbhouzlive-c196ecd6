@@ -28,7 +28,7 @@ describe('C3 round stat strip', () => {
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
     expect(Array.from(strip?.children ?? []).map((cell) => cell.getAttribute('data-explore-stat')))
       .toEqual(['achievement', 'par', 'net', 'vs-hcp']);
-    expect(strip?.style.gridTemplateColumns).toBe('1.6fr 0.8fr 0.8fr 0.8fr');
+    expect(strip?.style.gridTemplateColumns).toBe('minmax(0, 2.3fr) repeat(3, minmax(0, 0.7fr))');
   });
 
   it('uses equal thirds without an achievement and never prints a birdies figure label', () => {
@@ -90,5 +90,52 @@ describe('amended achievement priority', () => {
   it('keeps net record above rank-up and disables cut and beat-handicap callouts', () => {
     expect(calloutFor(round({ net_record: true }, { consequence: { kind: 'rank_up', n: 2 } }))?.kind).toBe('net_record');
     expect(calloutFor(round({ course_par: 71, net: 68, course_handicap: 8, handicap_cut: { from: 9, to: 8 } }))).toBeNull();
+  });
+});
+
+describe('achievement tag and label copy', () => {
+  const cases: Array<{
+    facts?: StreamItem['facts'];
+    consequence?: StreamItem['consequence'];
+    tag: string | null;
+    label: string;
+  }> = [
+    { consequence: { kind: 'record_taken' }, tag: 'NEW', label: 'Course record' },
+    { facts: { net_record: true }, tag: 'NEW', label: 'Net course record' },
+    { consequence: { kind: 'rank_up', n: 2 }, tag: 'MOVED UP', label: 'Now 2nd' },
+    { consequence: { kind: 'rank_up', n: null }, tag: null, label: 'Moved up the board' },
+    { facts: { holes_in_one: 1 }, tag: null, label: 'Hole in one' },
+    { facts: { albatrosses: 1 }, tag: null, label: 'Albatross' },
+    { facts: { eagles: 1 }, tag: null, label: 'Eagle' },
+    { facts: { birdies: 5 }, tag: null, label: '5 birdies' },
+    { facts: { clean_card: true }, tag: null, label: 'Bogey-free' },
+  ];
+
+  it.each(cases)('maps $label to its requested tag and label', ({ facts: factPatch, consequence, tag, label }) => {
+    const facts = { gross: 70, course_par: 71, net: 67, course_handicap: 3, ...(factPatch ?? {}) };
+    const container = renderCard(facts, consequence ? { consequence } : {});
+    expect(container.querySelector('[data-explore-achievement-tag="true"]')?.textContent ?? null).toBe(tag);
+    const labelNode = container.querySelector<HTMLElement>('[data-explore-achievement-label="true"]');
+    expect(labelNode?.textContent).toBe(label);
+    expect(labelNode?.style.textOverflow).not.toBe('ellipsis');
+    expect(labelNode?.style.whiteSpace).toBe('normal');
+  });
+
+  it.each([320, 390])('keeps every achievement label untruncated at %ipx', (width) => {
+    for (const { facts: factPatch, consequence } of cases) {
+      const facts = { gross: 70, course_par: 71, net: 67, course_handicap: 3, ...(factPatch ?? {}) };
+      const container = renderCard(facts, consequence ? { consequence } : {});
+      const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+      if (strip) strip.style.width = `${width}px`;
+      const cell = container.querySelector<HTMLElement>('[data-explore-stat="achievement"]');
+      const label = container.querySelector<HTMLElement>('[data-explore-achievement-label="true"]');
+      expect(cell).not.toBeNull();
+      expect(label?.style.textOverflow).not.toBe('ellipsis');
+      expect(label?.style.whiteSpace).toBe('normal');
+      expect(label?.style.webkitLineClamp).toBe('');
+      for (const element of Array.from(cell?.querySelectorAll<HTMLElement>('*') ?? [])) {
+        expect(element.style.textOverflow).not.toBe('ellipsis');
+      }
+    }
   });
 });

@@ -243,6 +243,12 @@
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
         "beatHandicap": "Beat handicap by {{n}}"
+        ,"tagNew": "NEW"
+        ,"courseRecord": "Course record"
+        ,"netCourseRecord": "Net course record"
+        ,"tagMovedUp": "MOVED UP"
+        ,"nowRank": "Now {{ord}}"
+        ,"movedUpBoard": "Moved up the board"
       },
       "stat": {
         "par": "PAR",

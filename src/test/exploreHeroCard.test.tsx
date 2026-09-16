@@ -78,8 +78,7 @@ function textSlots(container: HTMLElement, name: string) {
   const kicker = container.querySelector<HTMLElement>('[data-explore-kicker="true"]');
   const person = Array.from(container.querySelectorAll<HTMLElement>('.explore-who-line span'))
     .find((node) => node.textContent === name);
-  const date = Array.from(container.querySelectorAll<HTMLElement>('.explore-who-line span'))
-    .find((node) => node.textContent?.includes('·'));
+  const date = container.querySelector<HTMLElement>('[data-explore-kicker-date="true"]');
   return { kicker, person, date };
 }
 
@@ -145,15 +144,15 @@ describe('Explore card shapes', () => {
 
     const kicker = container.querySelector<HTMLElement>('[data-explore-hero-kicker="true"] > div');
     const name = getByText('danny.akers1');
-    const date = Array.from(container.querySelectorAll<HTMLElement>('.explore-who-line span'))
-      .find((node) => node.textContent?.includes('·'));
+    const date = container.querySelector<HTMLElement>('[data-explore-kicker-date="true"]');
 
     expect(kicker?.style.color).toBe('rgb(255, 255, 255)');
     expect(kicker?.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
     expect(name.style.color).toBe('rgb(255, 255, 255)');
     expect(name.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
-    expect(date?.style.color).toBe('rgba(255, 255, 255, 0.85)');
+    expect(date?.style.color).toBe('rgb(255, 255, 255)');
     expect(date?.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
+    expect(container.querySelector('.explore-who-line')?.textContent).not.toContain(date?.textContent ?? 'Sep');
   });
 
   it('keeps the viewer name amber on a review', () => {
@@ -171,6 +170,29 @@ describe('Explore card shapes', () => {
     const kicker = container.querySelector<HTMLElement>('[data-explore-hero-kicker="true"]');
     expect(kicker?.textContent ?? '').not.toMatch(/review/i);
     expect(kicker?.textContent ?? '').toContain('The Addington Golf Club');
+  });
+
+  it('moves the round and review date to a nonshrinking white kicker slot', () => {
+    for (const item of [round(), review()]) {
+      const longCourse = {
+        ...item,
+        subject: { ...item.subject, course_name: "Prince's Golf Club (Shore, Dunes & Himalayas)" },
+        facts: { ...item.facts, play_date: '2026-09-03' },
+      };
+      const { container, unmount } = render(
+        <ExploreCard item={longCourse} size={item.kind === 'review' ? 'lead' : 'std'} shape={null} onTap={() => undefined} />,
+      );
+      const course = container.querySelector<HTMLElement>('[data-explore-kicker-course="true"]');
+      const date = container.querySelector<HTMLElement>('[data-explore-kicker-date="true"]');
+      expect(course?.textContent).toContain("Prince's Golf Club");
+      expect(course?.style.overflow).toBe('hidden');
+      expect(course?.querySelector<HTMLElement>('[data-explore-kicker-part]')?.style.textOverflow).toBe('ellipsis');
+      expect(date?.style.flex).toBe('0 0 auto');
+      expect(date?.style.whiteSpace).toBe('nowrap');
+      expect(date?.style.color).toBe('rgb(255, 255, 255)');
+      expect(container.querySelector('.explore-who-line')?.textContent).not.toContain(date?.textContent ?? 'Sep');
+      unmount();
+    }
   });
 
   it('renders a round UNDER the photo at every position', () => {
@@ -197,8 +219,9 @@ describe('Explore card shapes', () => {
     expect(kicker?.style.textShadow).toBe('');
     expect(person?.style.color).toBe('rgb(255, 255, 255)');
     expect(person?.style.textShadow).toBe('');
-    expect(date?.style.color).toBe('rgba(255, 255, 255, 0.85)');
+    expect(date?.style.color).toBe('rgb(255, 255, 255)');
     expect(date?.style.textShadow).toBe('');
+    expect(container.querySelector('.explore-who-line')?.textContent).not.toContain(date?.textContent ?? 'Sep');
   });
 
   it('marks a record round with a callout panel and a plain headline', () => {
@@ -209,7 +232,8 @@ describe('Explore card shapes', () => {
     const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
 
     expect(callout).not.toBeNull();
-    expect(callout?.textContent).toContain('New course record');
+    expect(callout?.querySelector('[data-explore-achievement-tag="true"]')?.textContent).toBe('NEW');
+    expect(callout?.querySelector('[data-explore-achievement-label="true"]')?.textContent).toBe('Course record');
     /* §6 THE HEADLINE STATES THE ROUND, not the achievement, whenever a callout renders. */
     expect(headline?.textContent ?? '').toContain('shot a 70');
     expect(headline?.textContent ?? '').not.toMatch(/record/i);
@@ -241,6 +265,6 @@ describe('Explore card shapes', () => {
 
     expect(ownPart?.textContent).toContain('Around Surrey');
     expect(ownPart?.style.color).toBe('');
-    expect(ownPart?.parentElement?.style.color).toBe('rgb(255, 255, 255)');
+    expect(ownPart?.closest<HTMLElement>('[data-explore-kicker="true"]')?.style.color).toBe('rgb(255, 255, 255)');
   });
 });

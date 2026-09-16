@@ -1719,6 +1719,12 @@
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
         "beatHandicap": "Beat handicap by {{n}}"
+        ,"tagNew": "NEW"
+        ,"courseRecord": "코스 레코드"
+        ,"netCourseRecord": "네트 코스 레코드"
+        ,"tagMovedUp": "순위 상승"
+        ,"nowRank": "현재 {{ord}}위"
+        ,"movedUpBoard": "순위가 상승했습니다"
       },
       "stat": {
         "par": "PAR",
