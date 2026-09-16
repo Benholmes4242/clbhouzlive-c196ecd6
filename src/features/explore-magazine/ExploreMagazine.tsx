@@ -18,6 +18,7 @@ import {
   type RoundDetailSeed,
 } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { useQueryClient } from '@tanstack/react-query';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { whsKeys } from '@/lib/whs/hooks';
 import { fetchRoundDetail } from '@/lib/whs/api';
 import { coursePlaceLine } from './placeLine';
@@ -2054,6 +2055,21 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           announce: pageAnnounce,
         } : null}
       />
+      {/* BRIEF_EXPLORE_COMMENT_ICON §1/§2 — the comments sheet stands ALONE
+          above the feed. Closing it refetches the batched round-comments read
+          for this window (refetchType 'all', so a mounted-but-stale count can
+          never survive) and returns the member straight to the feed. */}
+      {openCommentsPostId && (
+        <CommentsSheetV2
+          isOpen
+          onClose={() => {
+            setOpenCommentsPostId(null);
+            queryClient.invalidateQueries({ queryKey: ['round-post-comments'], refetchType: 'all' });
+          }}
+          targetType="post"
+          targetId={openCommentsPostId}
+        />
+      )}
     </div>
   );
 }
