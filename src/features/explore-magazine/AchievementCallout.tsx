@@ -71,7 +71,7 @@ export function AchievementCalloutPanel({
               ? t('amateur.stream.callout.rankUpTo', 'Up to {{ord}}', {
                   ord: ordHole(callout.rank),
                 })
-              : t('amateur.stream.callout.rankUp', 'Moved up the board'),
+              : t('amateur.stream.callout.rankUp', 'Moved up'),
           subline: null,
         };
       case 'ace':
