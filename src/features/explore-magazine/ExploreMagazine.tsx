@@ -18,6 +18,7 @@ import {
   type RoundDetailSeed,
 } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { useQueryClient } from '@tanstack/react-query';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { whsKeys } from '@/lib/whs/hooks';
 import { fetchRoundDetail } from '@/lib/whs/api';
 import { coursePlaceLine } from './placeLine';
@@ -1023,7 +1024,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [ranked],
   );
   const [pageIx, setPageIx] = useState<number | null>(null);
-  const [openCommentsScoreId, setOpenCommentsScoreId] = useState<string | null>(null);
+  /* BRIEF_EXPLORE_COMMENT_ICON §1 — the comment control opens the COMMENTS
+     SHEET ALONE. This page mounts CommentsSheetV2 itself, exactly as
+     RoundDetailSheet does, so the round sheet is never involved and closing
+     returns straight to the feed. */
+  const [openCommentsPostId, setOpenCommentsPostId] = useState<string | null>(null);
   const pageIxRef = useRef<number | null>(null);
   pageIxRef.current = pageIx;
   const [shift, setShift] = useState<{ dx: number; opacity?: number; animating: boolean } | null>(null);
@@ -1396,11 +1401,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       } : undefined,
       onOpenComments: post ? () => {
         analyticsEvents.track('explore_round_comments_opened', { score_id: scoreId, view });
-        setOpenCommentsScoreId(scoreId);
-        tapCard(item, 'std', ranked.indexOf(item));
+        setOpenCommentsPostId(post.postId);
       } : undefined,
     };
-  }, [ranked, roundPosts, roundReactions, tapCard, view]);
+  }, [roundPosts, roundReactions, view]);
 
   const tapWho = useCallback(
     (item: StreamItem) => {
@@ -2008,7 +2012,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           setPageIx(null);
           pageIxRef.current = null;
           setSwipeHintOn(false);
-          setOpenCommentsScoreId(null);
           opener.close();
         }}
         /* §2.4 — EVERY ACTION READS THE CURRENT PAGE. The score id, the
@@ -2018,7 +2021,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         scoreId={opener.target?.scoreId ?? null}
         connectionId={opener.target?.connectionId ?? null}
         profileUserId={opener.target?.profileUserId ?? null}
-        initialCommentsOpen={!!opener.target?.scoreId && opener.target.scoreId === openCommentsScoreId}
+        
         seed={sheetSeed}
         detents={['mid', 'full']}
         onDetentChange={(detent) => {
@@ -2052,6 +2055,21 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           announce: pageAnnounce,
         } : null}
       />
+      {/* BRIEF_EXPLORE_COMMENT_ICON §1/§2 — the comments sheet stands ALONE
+          above the feed. Closing it refetches the batched round-comments read
+          for this window (refetchType 'all', so a mounted-but-stale count can
+          never survive) and returns the member straight to the feed. */}
+      {openCommentsPostId && (
+        <CommentsSheetV2
+          isOpen
+          onClose={() => {
+            setOpenCommentsPostId(null);
+            queryClient.invalidateQueries({ queryKey: ['round-post-comments'], refetchType: 'all' });
+          }}
+          targetType="post"
+          targetId={openCommentsPostId}
+        />
+      )}
     </div>
   );
 }
