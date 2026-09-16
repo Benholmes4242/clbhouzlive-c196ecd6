@@ -230,8 +230,8 @@
       },
       "callout": {
         "record": "New course record",
-        "rankUpTo": "Up to {{ord}} here",
-        "rankUp": "Moved up the board",
+        "rankUpTo": "Up to {{ord}}",
+        "rankUp": "Moved up",
         "ace": "Hole in one",
         "albatross": "Albatross",
         "eagle": "Eagle",
@@ -243,6 +243,11 @@
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
         "beatHandicap": "Beat handicap by {{n}}"
+      },
+      "stat": {
+        "par": "PAR",
+        "net": "NET",
+        "vsHcp": "VS HCP"
       }
     },
     "shelf": {

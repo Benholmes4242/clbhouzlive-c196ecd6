@@ -1763,8 +1763,8 @@
       },
       "callout": {
         "record": "Platzrekord",
-        "rankUpTo": "Auf {{ord}} hier",
-        "rankUp": "Im Ranking aufgestiegen",
+        "rankUpTo": "Auf {{ord}}",
+        "rankUp": "Aufgestiegen",
         "ace": "Hole-in-one",
         "albatross": "Albatros",
         "eagle": "Eagle",
@@ -1776,6 +1776,11 @@
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
         "beatHandicap": "Beat handicap by {{n}}"
+      },
+      "stat": {
+        "par": "PAR",
+        "net": "NET",
+        "vsHcp": "VS HCP"
       }
     },
     "shelf": {

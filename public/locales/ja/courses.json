@@ -1703,7 +1703,7 @@
       },
       "callout": {
         "record": "コースレコード",
-        "rankUpTo": "ここで{{ord}}位に上昇",
+        "rankUpTo": "{{ord}}位に上昇",
         "rankUp": "順位が上昇",
         "ace": "ホールインワン",
         "albatross": "アルバトロス",
@@ -1716,6 +1716,11 @@
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
         "beatHandicap": "Beat handicap by {{n}}"
+      },
+      "stat": {
+        "par": "PAR",
+        "net": "NET",
+        "vsHcp": "VS HCP"
       }
     },
     "shelf": {
