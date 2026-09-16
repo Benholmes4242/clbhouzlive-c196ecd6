@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useId, type CSSProperties, type ReactNode } from 'react';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import {
   SC_FILL_BIRDIE_DK,
@@ -10,7 +10,7 @@ import {
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_EVEN_LIGHT, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
 import { A, CHIP_RADIUS } from './tokens';
@@ -36,6 +36,10 @@ const END_LABEL_LINE_HEIGHT = Math.ceil(END_LABEL_FONT_SIZE * 1.3); // 10
 const END_LABEL_CLEARANCE = Math.ceil(END_LABEL_FONT_SIZE * 0.4); // 3
 export const EXPLORE_END_LABEL_BAND = END_LABEL_LINE_HEIGHT + END_LABEL_CLEARANCE; // 13
 const END_LABEL_GUTTER = 8;
+
+/** Explore photo-trace fill strength. Kept together for on-device tuning. */
+const UNDER_FILL_TOP = 0.12;
+const UNDER_FILL_BOTTOM = 0.5;
 
 const OVER_TONE = A.INK;
 const UNDER_TONE = TOPAR_RED;
@@ -91,6 +95,7 @@ export function RoundShape({
   exploreGlow = false,
   exploreDots,
   exploreDotCanvas = A.CANVAS,
+  underParFill = false,
 
 }: {
   row: CircleRoundRow;
@@ -130,8 +135,12 @@ export function RoundShape({
   /** Stroke colour ringing each dot so it reads against the line and the
    *  photograph. Defaults to the canvas token. */
   exploreDotCanvas?: string;
+  /** Explore-only fill between the trace and level par while cumulative gross
+   *  to-par is below zero. Defaults off for every shared consumer. */
+  underParFill?: boolean;
 
 }) {
+  const instanceId = useId().replace(/[^a-zA-Z0-9_-]/g, '');
 
   const front = row.front_nine_to_par;
   const back = row.back_nine_to_par;
@@ -191,6 +200,13 @@ export function RoundShape({
     const path = smoothPath(points);
     const baselineY = yFor(0);
     const last = points.at(-1);
+    const wentUnder = Math.min(...lineValues) < 0;
+    const showUnderFill = underParFill && wentUnder;
+    const underClipId = `round-under-clip-${instanceId}`;
+    const underGradientId = `round-under-gradient-${instanceId}`;
+    const underFillPath = last
+      ? `${path} L${last.x.toFixed(2)},${baselineY.toFixed(2)} L${points[0].x.toFixed(2)},${baselineY.toFixed(2)} Z`
+      : null;
     /* ONE WHITE TRACE, ABOVE AND BELOW LEVEL PAR. The red segment existed when
        the shape carried a FILL and the colour marked the under-par AREA. With
        the fill gone and the good holes marked by DOTS, red was a second and
@@ -201,6 +217,25 @@ export function RoundShape({
     const tone = A.INK;
     return (
       <svg width="100%" height={renderedHeight} viewBox={`0 0 ${width} ${renderedHeight}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
+        {showUnderFill ? (
+          <defs>
+            <clipPath id={underClipId}>
+              <rect x={0} y={baselineY} width={width} height={Math.max(bottom - baselineY, 0)} />
+            </clipPath>
+            <linearGradient id={underGradientId} gradientUnits="userSpaceOnUse" x1={0} y1={baselineY} x2={0} y2={bottom}>
+              <stop offset="0%" stopColor={TOPAR_UNDER_DARK} stopOpacity={UNDER_FILL_TOP} />
+              <stop offset="100%" stopColor={TOPAR_UNDER_DARK} stopOpacity={UNDER_FILL_BOTTOM} />
+            </linearGradient>
+          </defs>
+        ) : null}
+        {showUnderFill && underFillPath ? (
+          <path
+            data-round-under-par-fill="true"
+            d={underFillPath}
+            fill={`url(#${underGradientId})`}
+            clipPath={`url(#${underClipId})`}
+          />
+        ) : null}
         <line x1={SHAPE_PAD_X} x2={width - SHAPE_PAD_X} y1={baselineY} y2={baselineY}
           stroke={baselineColor ?? A.HAIRLINE} strokeWidth={1} strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
         {exploreGlow ? (

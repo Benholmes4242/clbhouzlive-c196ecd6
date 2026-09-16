@@ -512,7 +512,7 @@ export function ExploreCard({
                 <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
                   height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
                   baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow
-                  exploreDots={dots} />
+                  exploreDots={dots} underParFill />
               ) : null}
             </span>
           </span>
@@ -536,7 +536,7 @@ export function ExploreCard({
           <RoundShape row={item.payload.round} shape={shape} width={SHAPE_W[size]}
             height={band - EXPLORE_END_LABEL_BAND} showMeta={false} showBaseline
             baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2} exploreLineOnly endLabels exploreGlow
-            exploreDots={dots} />
+            exploreDots={dots} underParFill />
         </span>
       ) : null}
     </CourseImageFallback>
