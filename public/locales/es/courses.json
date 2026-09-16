@@ -1776,6 +1776,12 @@
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
         "beatHandicap": "Beat handicap by {{n}}"
+        ,"tagNew": "NUEVO"
+        ,"courseRecord": "Record del campo"
+        ,"netCourseRecord": "Record neto del campo"
+        ,"tagMovedUp": "SUBIO"
+        ,"nowRank": "Ahora {{ord}}"
+        ,"movedUpBoard": "Subio en la clasificacion"
       },
       "stat": {
         "par": "PAR",

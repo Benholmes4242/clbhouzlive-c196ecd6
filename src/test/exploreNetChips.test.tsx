@@ -94,19 +94,26 @@ describe('amended achievement priority', () => {
 });
 
 describe('achievement tag and label copy', () => {
-  it.each([
-    [{ consequence: { kind: 'record_taken' as const } }, 'NEW', 'Course record'],
-    [{ facts: { net_record: true } }, 'NEW', 'Net course record'],
-    [{ consequence: { kind: 'rank_up' as const, n: 2 } }, 'MOVED UP', 'Now 2nd'],
-    [{ consequence: { kind: 'rank_up' as const, n: null } }, null, 'Moved up the board'],
-    [{ facts: { holes_in_one: 1 } }, null, 'Hole in one'],
-    [{ facts: { albatrosses: 1 } }, null, 'Albatross'],
-    [{ facts: { eagles: 1 } }, null, 'Eagle'],
-    [{ facts: { birdies: 5 } }, null, '5 birdies'],
-    [{ facts: { clean_card: true } }, null, 'Bogey-free'],
-  ])('maps the requested tag and label', (variant, tag, label) => {
-    const facts = { gross: 70, course_par: 71, net: 67, course_handicap: 3, ...(variant.facts ?? {}) };
-    const container = renderCard(facts, variant.consequence ? { consequence: variant.consequence } : {});
+  const cases: Array<{
+    facts?: StreamItem['facts'];
+    consequence?: StreamItem['consequence'];
+    tag: string | null;
+    label: string;
+  }> = [
+    { consequence: { kind: 'record_taken' }, tag: 'NEW', label: 'Course record' },
+    { facts: { net_record: true }, tag: 'NEW', label: 'Net course record' },
+    { consequence: { kind: 'rank_up', n: 2 }, tag: 'MOVED UP', label: 'Now 2nd' },
+    { consequence: { kind: 'rank_up', n: null }, tag: null, label: 'Moved up the board' },
+    { facts: { holes_in_one: 1 }, tag: null, label: 'Hole in one' },
+    { facts: { albatrosses: 1 }, tag: null, label: 'Albatross' },
+    { facts: { eagles: 1 }, tag: null, label: 'Eagle' },
+    { facts: { birdies: 5 }, tag: null, label: '5 birdies' },
+    { facts: { clean_card: true }, tag: null, label: 'Bogey-free' },
+  ];
+
+  it.each(cases)('maps $label to its requested tag and label', ({ facts: factPatch, consequence, tag, label }) => {
+    const facts = { gross: 70, course_par: 71, net: 67, course_handicap: 3, ...(factPatch ?? {}) };
+    const container = renderCard(facts, consequence ? { consequence } : {});
     expect(container.querySelector('[data-explore-achievement-tag="true"]')?.textContent ?? null).toBe(tag);
     const labelNode = container.querySelector<HTMLElement>('[data-explore-achievement-label="true"]');
     expect(labelNode?.textContent).toBe(label);

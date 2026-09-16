@@ -172,6 +172,29 @@ describe('Explore card shapes', () => {
     expect(kicker?.textContent ?? '').toContain('The Addington Golf Club');
   });
 
+  it('moves the round and review date to a nonshrinking white kicker slot', () => {
+    for (const item of [round(), review()]) {
+      const longCourse = {
+        ...item,
+        subject: { ...item.subject, course_name: "Prince's Golf Club (Shore, Dunes & Himalayas)" },
+        facts: { ...item.facts, play_date: '2026-09-03' },
+      };
+      const { container, unmount } = render(
+        <ExploreCard item={longCourse} size={item.kind === 'review' ? 'lead' : 'std'} shape={null} onTap={() => undefined} />,
+      );
+      const course = container.querySelector<HTMLElement>('[data-explore-kicker-course="true"]');
+      const date = container.querySelector<HTMLElement>('[data-explore-kicker-date="true"]');
+      expect(course?.textContent).toContain("Prince's Golf Club");
+      expect(course?.style.overflow).toBe('hidden');
+      expect(course?.querySelector<HTMLElement>('[data-explore-kicker-part]')?.style.textOverflow).toBe('ellipsis');
+      expect(date?.style.flex).toBe('0 0 auto');
+      expect(date?.style.whiteSpace).toBe('nowrap');
+      expect(date?.style.color).toBe('rgb(255, 255, 255)');
+      expect(container.querySelector('.explore-who-line')?.textContent).not.toContain(date?.textContent ?? 'Sep');
+      unmount();
+    }
+  });
+
   it('renders a round UNDER the photo at every position', () => {
     const { container } = render(
       <ExploreCard item={round()} size="std" shape={null} onTap={() => undefined} />,

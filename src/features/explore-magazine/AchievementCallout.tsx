@@ -195,7 +195,7 @@ function FigureCell({ label, value, under }: { label: string; value: string; und
         borderLeft: `0.5px solid ${A.HAIRLINE}`,
       }}
     >
-      <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, color: A.MUTE, letterSpacing: '0.08em' }}>
+      <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, color: A.MUTE, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>
         {label}
       </span>
       <span
@@ -292,7 +292,7 @@ export function RoundStatStrip({
             ) : null}
             <span
               data-explore-achievement-label="true"
-              style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'break-word' }}
+              style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'normal' }}
             >
               {achievement.label}
             </span>
