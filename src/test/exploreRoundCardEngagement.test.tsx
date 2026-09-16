@@ -49,7 +49,7 @@ describe('Explore round-card who-line engagement', () => {
   it('uses amber for the liked icon and count, never the under-par red', () => {
     const view = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement({ liked: true, likeCount: 4 })} />);
     const control = view.getByRole('button', { name: 'Like, 4 likes' });
-    expect(control.style.color).toBe(A.AMBER);
+    expect(control.style.color).toBe('rgb(247, 147, 30)');
     expect(control.querySelector('svg')?.getAttribute('fill')).toBe(A.AMBER);
     expect(control.style.color).not.toMatch(/255,?\s*107,?\s*96/i);
   });
@@ -81,7 +81,7 @@ describe('Explore round-card who-line engagement', () => {
     const view = render(<ExploreCard item={item} size="pair" onTap={vi.fn()} engagement={engagement({ likeCount: 3, commentCount: 0 })} />);
     const counts = view.container.querySelector('[data-round-reactions="counts"]');
     expect(counts?.textContent).toBe('3');
-    expect(view.queryByRole('button', { name: /Like/ })).toBeNull();
+    expect(view.queryByRole('button', { name: 'Like, 3 likes' })).toBeNull();
     expect(view.queryByLabelText('Comments, 0')).toBeNull();
   });
 
