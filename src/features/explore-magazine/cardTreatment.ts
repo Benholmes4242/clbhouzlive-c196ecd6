@@ -52,8 +52,6 @@ export type AchievementCallout =
   | { kind: 'ace'; hole: number | null }
   | { kind: 'albatross'; hole: number | null }
   | { kind: 'eagle'; hole: number | null }
-  | { kind: 'handicap_cut'; from: number; to: number }
-  | { kind: 'beat_handicap'; by: number }
   | { kind: 'birdies'; count: number }
   | { kind: 'clean' };
 
@@ -122,19 +120,9 @@ export function calloutFor(item: StreamItem, holes?: CalloutHole[]): Achievement
   if ((facts.holes_in_one ?? 0) > 0) return { kind: 'ace', hole: singleHole(holes, 'ace') };
   if ((facts.albatrosses ?? 0) > 0) return { kind: 'albatross', hole: singleHole(holes, 'albatross') };
   if ((facts.eagles ?? 0) > 0) return { kind: 'eagle', hole: singleHole(holes, 'eagle') };
-  /* A CUT IS A FACT ABOUT THE PLAYER'S INDEX, not about a board, so the backlog
-     rule does not touch it: an index that went down went down whenever the card
-     arrived. Both figures must be present; nothing here computes a cut. */
-  const cut = facts.handicap_cut;
-  if (cut && typeof cut.from === 'number' && typeof cut.to === 'number' && cut.to < cut.from) {
-    return { kind: 'handicap_cut', from: cut.from, to: cut.to };
-  }
-  /* BEAT HANDICAP: net below the course's par, from the two gated facts and the
-     par. Absent facts mean no callout, never an assumed handicap. */
-  if (facts.net != null && facts.course_handicap != null && facts.course_par != null
-      && facts.net < facts.course_par) {
-    return { kind: 'beat_handicap', by: facts.course_par - facts.net };
-  }
+  /* FIVE BIRDIES RETURNS TO THE ACHIEVEMENT LANE. The C3 strip no longer has a
+     birdies figure cell, while VS HCP now carries the beat-handicap signal and
+     handicap cut remains disabled. */
   if ((facts.birdies ?? 0) >= NOTABLE_BIRDIES) return { kind: 'birdies', count: facts.birdies as number };
   if (facts.clean_card === true) return { kind: 'clean' };
   return null;

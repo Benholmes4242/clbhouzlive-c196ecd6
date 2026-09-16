@@ -1706,7 +1706,7 @@
       },
       "callout": {
         "record": "코스 레코드",
-        "rankUpTo": "이곳에서 {{ord}}위로 상승",
+        "rankUpTo": "{{ord}}위로 상승",
         "rankUp": "순위 상승",
         "ace": "홀인원",
         "albatross": "알바트로스",
@@ -1719,6 +1719,11 @@
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
         "beatHandicap": "Beat handicap by {{n}}"
+      },
+      "stat": {
+        "par": "PAR",
+        "net": "NET",
+        "vsHcp": "VS HCP"
       }
     },
     "shelf": {

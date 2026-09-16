@@ -1,197 +1,94 @@
 import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 
-import { ExploreCard, courseHandicapLabel } from '@/features/explore-magazine/ExploreCard';
+import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
+import { vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
 import { calloutFor } from '@/features/explore-magazine/cardTreatment';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
-/**
- * C4: NET AND PLAYING HANDICAP AS PHOTO CHIPS, AND THE NET ACHIEVEMENTS.
- *
- * THE POINT OF EVERY TEST HERE is that a card with no net facts renders exactly
- * as it did before - private handicap, missing data and un-applied SQL all look
- * the same to the card, and none of them may invent a figure.
- */
 function round(facts: StreamItem['facts'], patch: Partial<StreamItem> = {}): StreamItem {
   return {
-    id: 'round:1',
-    kind: 'round',
-    ring: 'own',
-    lane: 'news',
-    score: 1,
+    id: 'round:1', kind: 'round', ring: 'own', lane: 'news', score: 1,
     consequence: null,
     subject: { course_id: null, course_name: 'Sundridge Park', region: null, sub_country: null, image_url: null, pending: false },
     who: { user_id: 'u', display_name: 'A member', photo_url: null, is_viewer: false },
-    facts,
-    payload: {},
-    seen: false,
-    ...patch,
+    facts, payload: {}, seen: false, ...patch,
   };
 }
 
-function chipRow(facts: StreamItem['facts']) {
-  const { container } = render(<ExploreCard item={round(facts)} size="std" onTap={() => {}} />);
-  return container.querySelector('[data-explore-chip-row="round"]') as HTMLElement | null;
+function renderCard(facts: StreamItem['facts'], patch: Partial<StreamItem> = {}) {
+  return render(<ExploreCard item={round(facts, patch)} size="std" onTap={() => undefined} />).container;
 }
 
-describe('net and playing handicap chips', () => {
-  it('shows only the gross chip when either fact is missing', () => {
+describe('C3 round stat strip', () => {
+  it('orders achievement, par, net and vs hcp, with the ruled widths', () => {
+    const container = renderCard(
+      { gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 1 },
+    );
+    const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+    expect(Array.from(strip?.children ?? []).map((cell) => cell.getAttribute('data-explore-stat')))
+      .toEqual(['achievement', 'par', 'net', 'vs-hcp']);
+    expect(strip?.style.gridTemplateColumns).toBe('1.6fr 0.8fr 0.8fr 0.8fr');
+  });
+
+  it('uses equal thirds without an achievement and never prints a birdies figure label', () => {
+    const container = renderCard({ gross: 82, course_par: 71, net: 76, course_handicap: 6, birdies: 4 });
+    const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+    expect(Array.from(strip?.children ?? []).map((cell) => cell.getAttribute('data-explore-stat')))
+      .toEqual(['par', 'net', 'vs-hcp']);
+    expect(strip?.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
+    expect(strip?.textContent).not.toMatch(/BIRDIES/i);
+  });
+
+  it('renders achievement alone when net is unavailable, and no strip without either', () => {
+    const achievement = renderCard({ gross: 73, course_par: 71, net: null, course_handicap: null, eagles: 1 });
+    const strip = achievement.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+    expect(strip?.getAttribute('data-explore-stat-layout')).toBe('achievement-only');
+    expect(strip?.querySelectorAll('[data-explore-stat]')).toHaveLength(1);
+    expect(strip?.querySelector('[data-explore-stat="par"]')).toBeNull();
+
+    const plain = renderCard({ gross: 82, course_par: 71, net: null, course_handicap: null });
+    expect(plain.querySelector('[data-explore-stat-strip="round"]')).toBeNull();
+  });
+
+  it('never renders par when net or playing handicap is missing', () => {
     for (const facts of [
-      { gross: 82, course_par: 71, to_par: 11 },
-      { gross: 82, course_par: 71, to_par: 11, net: 76 },
-      { gross: 82, course_par: 71, to_par: 11, course_handicap: 6 },
-      { gross: 82, course_par: 71, to_par: 11, net: null, course_handicap: 6 },
+      { gross: 82, course_par: 71, net: 76 },
+      { gross: 82, course_par: 71, course_handicap: 6 },
+      { gross: 82, course_par: 71, net: null, course_handicap: 6 },
     ]) {
-      const row = chipRow(facts);
-      expect(row).not.toBeNull();
-      expect(row!.querySelectorAll('[data-explore-chip]')).toHaveLength(0);
-      expect(row!.textContent).toContain('82');
+      expect(renderCard(facts).querySelector('[data-explore-stat="par"]')).toBeNull();
     }
   });
 
-  it('shows both chips when both facts are present', () => {
-    const row = chipRow({ gross: 82, course_par: 71, to_par: 11, net: 76, course_handicap: 6 });
-    const chips = row!.querySelectorAll('[data-explore-chip]');
-    expect(chips).toHaveLength(2);
-    expect(chips[0].getAttribute('data-explore-chip')).toBe('net');
-    expect(chips[0].textContent).toBe('NET76');
-    expect(chips[1].textContent).toBe('HCP6');
+  it('formats and colours the three figures correctly', () => {
+    expect(vsHandicapLabel(70, 71)).toBe('\u22121');
+    expect(vsHandicapLabel(74, 71)).toBe('+3');
+    expect(vsHandicapLabel(71, 71)).toBe('Level');
+    const under = renderCard({ gross: 76, course_par: 71, net: 70, course_handicap: 6 });
+    expect((under.querySelector('[data-explore-stat-value="par"]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
+    expect((under.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color)
+      .toBe((under.querySelector('[data-explore-stat-value="vs-hcp"]') as HTMLElement).style.color);
+    const over = renderCard({ gross: 80, course_par: 71, net: 74, course_handicap: 6 });
+    expect((over.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
   });
 
-  it('writes a plus handicap the WHS way', () => {
-    expect(courseHandicapLabel(-1)).toBe('+1');
-    expect(courseHandicapLabel(0)).toBe('0');
-    expect(courseHandicapLabel(4)).toBe('4');
-    const row = chipRow({ gross: 71, course_par: 71, to_par: 0, net: 72, course_handicap: -1 });
-    expect(row!.querySelectorAll('[data-explore-chip]')[1].textContent).toBe('HCP+1');
-  });
-
-  it('never colours the net value, even under par', () => {
-    const row = chipRow({ gross: 68, course_par: 71, to_par: -3, net: 62, course_handicap: 6 });
-    const value = row!.querySelector('[data-explore-chip-value="net"]') as HTMLElement;
-    expect(value.style.color).toBe('rgb(255, 255, 255)');
-  });
-
-  it('keeps the three chips on one row with fixed gaps', () => {
-    const row = chipRow({ gross: 104, course_par: 72, to_par: 32, net: 76, course_handicap: -4 });
-    expect(row!.style.flexDirection).toBe('row');
-    expect(row!.style.flexWrap).toBe('nowrap');
-    expect(row!.style.gap).toBe('6px');
-    /* The longest realistic case at 320: "104 +32", "NET 76", "HCP +4". */
-    expect(row!.textContent).toBe('104+32NET76HCP+4');
+  it('keeps net and hcp off the photograph', () => {
+    const container = renderCard({ gross: 82, course_par: 71, to_par: 11, net: 76, course_handicap: 6 });
+    expect(container.querySelector('[data-explore-chip="net"]')).toBeNull();
+    expect(container.querySelector('[data-explore-chip="hcp"]')).toBeNull();
   });
 });
 
-describe('net achievements in the callout', () => {
-  const gross = round({ gross: 68 }, { consequence: { kind: 'record_taken' }, facts: { gross: 68, net_record: true } });
-
-  it('puts the gross record above the net record', () => {
-    expect(calloutFor(gross)?.kind).toBe('record');
+describe('amended achievement priority', () => {
+  it('puts five birdies below eagle and above bogey-free', () => {
+    expect(calloutFor(round({ eagles: 1, birdies: 6, clean_card: true }))?.kind).toBe('eagle');
+    expect(calloutFor(round({ birdies: 5, clean_card: true }))).toEqual({ kind: 'birdies', count: 5 });
+    expect(calloutFor(round({ birdies: 4, clean_card: true }))?.kind).toBe('clean');
   });
 
-  it('puts the net record above rank_up', () => {
-    const item = round({ gross: 82, net_record: true }, { consequence: { kind: 'rank_up', n: 3 } });
-    expect(calloutFor(item)?.kind).toBe('net_record');
-  });
-
-  it('refuses a net record on a backlog round or a lost board', () => {
-    expect(calloutFor(round({ gross: 82, net_record: true }, { lane: 'backlog' }))).toBeNull();
-    expect(
-      calloutFor(round({ gross: 82, net_record: true }, { consequence: { kind: 'record_lost' } }))?.kind,
-    ).not.toBe('net_record');
-  });
-
-  it('puts a handicap cut above beat handicap, and states both figures', () => {
-    const item = round({
-      gross: 78,
-      course_par: 71,
-      net: 68,
-      course_handicap: 10,
-      handicap_cut: { from: 11.2, to: 10.4 },
-    });
-    expect(calloutFor(item)).toEqual({ kind: 'handicap_cut', from: 11.2, to: 10.4 });
-  });
-
-  it('ignores a cut that is not a cut', () => {
-    const item = round({
-      gross: 78,
-      course_par: 71,
-      net: 72,
-      course_handicap: 6,
-      handicap_cut: { from: 10.4, to: 11.2 },
-    });
-    expect(calloutFor(item)).toBeNull();
-  });
-
-  it('shows beat handicap only when net is below par, with the right margin', () => {
-    expect(calloutFor(round({ gross: 78, course_par: 71, net: 68, course_handicap: 10 }))).toEqual({
-      kind: 'beat_handicap',
-      by: 3,
-    });
-    expect(calloutFor(round({ gross: 78, course_par: 71, net: 71, course_handicap: 7 }))).toBeNull();
-    expect(calloutFor(round({ gross: 78, course_par: 71, net: 74, course_handicap: 4 }))).toBeNull();
-    /* No handicap, no claim: net alone is never enough. */
-    expect(calloutFor(round({ gross: 78, course_par: 71, net: 68 }))).toBeNull();
-  });
-
-  it('keeps the whole ruled priority order', () => {
-    const facts = {
-      gross: 68,
-      course_par: 71,
-      net: 60,
-      course_handicap: 8,
-      net_record: true,
-      holes_in_one: 1,
-      albatrosses: 1,
-      eagles: 1,
-      birdies: 6,
-      clean_card: true,
-      handicap_cut: { from: 9.1, to: 8.4 },
-    };
-    const order = [
-      ['record', { consequence: { kind: 'record_taken' as const } }],
-      ['net_record', {}],
-      ['ace', { facts: { ...facts, net_record: false } }],
-    ] as const;
-    expect(calloutFor(round(facts, { consequence: { kind: 'record_taken' }, facts }))?.kind).toBe(order[0][0]);
-    expect(calloutFor(round(facts))?.kind).toBe('net_record');
-    expect(calloutFor(round({ ...facts, net_record: false }))?.kind).toBe('ace');
-    expect(calloutFor(round({ ...facts, net_record: false, holes_in_one: 0 }))?.kind).toBe('albatross');
-    expect(calloutFor(round({ ...facts, net_record: false, holes_in_one: 0, albatrosses: 0 }))?.kind).toBe('eagle');
-    expect(
-      calloutFor(round({ ...facts, net_record: false, holes_in_one: 0, albatrosses: 0, eagles: 0 }))?.kind,
-    ).toBe('handicap_cut');
-    expect(
-      calloutFor(
-        round({ ...facts, net_record: false, holes_in_one: 0, albatrosses: 0, eagles: 0, handicap_cut: null }),
-      )?.kind,
-    ).toBe('beat_handicap');
-    expect(
-      calloutFor(
-        round({
-          ...facts,
-          net: 74,
-          net_record: false,
-          holes_in_one: 0,
-          albatrosses: 0,
-          eagles: 0,
-          handicap_cut: null,
-        }),
-      )?.kind,
-    ).toBe('birdies');
-    expect(
-      calloutFor(
-        round({
-          ...facts,
-          net: 74,
-          net_record: false,
-          holes_in_one: 0,
-          albatrosses: 0,
-          eagles: 0,
-          birdies: 0,
-          handicap_cut: null,
-        }),
-      )?.kind,
-    ).toBe('clean');
+  it('keeps net record above rank-up and disables cut and beat-handicap callouts', () => {
+    expect(calloutFor(round({ net_record: true }, { consequence: { kind: 'rank_up', n: 2 } }))?.kind).toBe('net_record');
+    expect(calloutFor(round({ course_par: 71, net: 68, course_handicap: 8, handicap_cut: { from: 9, to: 8 } }))).toBeNull();
   });
 });

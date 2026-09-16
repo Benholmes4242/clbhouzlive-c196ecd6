@@ -14,7 +14,7 @@ import { CHIP_GLASS_CLASS, PHOTO_FIG_GOOD, PHOTO_FIG_SHADOW, PHOTO_FIG_UNDER } f
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
 import { calloutFor } from './cardTreatment';
-import { AchievementCalloutPanel } from './AchievementCallout';
+import { RoundStatStrip } from './AchievementCallout';
 import { dotsFor, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
@@ -153,55 +153,6 @@ function CourseRankChip({ item }: { item: StreamItem }) {
   return <FigureChip corner="right" figure={`#${rank}`} unit={scope ? RANK_SCOPE_LABEL[scope] : undefined} />;
 }
 
-/**
- * THE LABELLED CHIP (C4). NET and HCP name themselves, because a bare second
- * number beside a gross reads as another gross.
- *
- * THE VALUE IS ALWAYS WHITE. The score-chip rule is that ONLY the gross to-par
- * takes colour; a red net would claim a comparison against par that net does
- * not make.
- */
-function LabelledChip({ label, value }: { label: string; value: string }) {
-  return (
-    <span
-      className={CHIP_GLASS_CLASS}
-      data-explore-chip={label.toLowerCase()}
-      style={{
-        position: 'relative',
-        display: 'inline-flex',
-        alignItems: 'baseline',
-        gap: 4,
-        padding: '6px 8px',
-        boxSizing: 'border-box',
-        whiteSpace: 'nowrap',
-        borderRadius: 8,
-        color: '#FFFFFF',
-        ...FIGS,
-      }}
-    >
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: 'rgba(255,255,255,0.62)',
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-        }}
-      >
-        {label}
-      </span>
-      <span data-explore-chip-value={label.toLowerCase()} style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>
-        {value}
-      </span>
-    </span>
-  );
-}
-
-/** A PLAYING HANDICAP IS WRITTEN WHS-STYLE: a plus player's is "+1", never "-1". */
-export function courseHandicapLabel(value: number): string {
-  return value < 0 ? `+${Math.abs(value)}` : String(value);
-}
-
 /** §4b, by type. A story carries none; a moment carries none. */
 function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
   const out: React.ReactNode[] = [];
@@ -210,48 +161,9 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
   if (kind === 'round' && facts.gross != null) {
     const toPar = toParLabel(facts.to_par);
     const under = (facts.to_par ?? 0) < 0;
-    /* C4 NET AND PLAYING HANDICAP RIDE BESIDE THE GROSS, IN ONE ROW WITH FIXED
-       GAPS, so they cannot collide with each other or with the trace at the foot
-       of the photograph. Both facts are required: net without the handicap it
-       came from is a number a member cannot check, and either one absent means a
-       private handicap, no data, or the RPC not yet carrying them - in which
-       case the card is exactly what it is today. */
-    const showNet = facts.net != null && facts.course_handicap != null;
     out.push(
-      <span
-        key="round"
-        data-explore-chip-row="round"
-        style={{
-          position: 'absolute',
-          top: 8,
-          left: 8,
-          zIndex: 2,
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          gap: 6,
-          flexWrap: 'nowrap',
-          maxWidth: 'calc(100% - 16px)',
-        }}
-      >
-        <FigureChip
-          inRow
-          corner="left"
-          figure={String(facts.gross)}
-          unit={toPar ?? undefined}
-          tone="#FFFFFF"
-          unitTone={under ? PHOTO_FIG_UNDER : undefined}
-        />
-        {showNet ? (
-          <>
-            <LabelledChip label={t('amateur.stream.chip.net', 'NET')} value={String(facts.net)} />
-            <LabelledChip
-              label={t('amateur.stream.chip.hcp', 'HCP')}
-              value={courseHandicapLabel(facts.course_handicap as number)}
-            />
-          </>
-        ) : null}
-      </span>,
+      <FigureChip key="round" corner="left" figure={String(facts.gross)} unit={toPar ?? undefined}
+        tone="#FFFFFF" unitTone={under ? PHOTO_FIG_UNDER : undefined} />,
     );
   }
 
@@ -648,12 +560,17 @@ export function ExploreCard({
       }}
     >
       <span style={{ position: 'relative', display: 'block' }}>{photo}</span>
-      {/* §5 THE CALLOUT SITS BETWEEN THE PHOTOGRAPH AND THE KICKER, full card
-          width — outside the caption's 4px inset, which is for text. */}
-      {!onPhoto && callout ? <AchievementCalloutPanel callout={callout} locale={locale} /> : null}
+      {!onPhoto && item.kind === 'round' && size !== 'pair' ? (
+        <RoundStatStrip
+          callout={callout}
+          coursePar={item.facts.course_par ?? null}
+          net={item.facts.net != null && item.facts.course_handicap != null ? item.facts.net : null}
+          locale={locale}
+        />
+      ) : null}
       {!onPhoto ? (
         /* §3d text inside a card's caption area is inset a further 4px. */
-        <span style={{ display: 'block', paddingInline: 4, marginTop: callout ? 0 : 8 }}>
+        <span style={{ display: 'block', paddingInline: 4, marginTop: item.kind === 'round' && size !== 'pair' && (callout || (item.facts.net != null && item.facts.course_handicap != null && item.facts.course_par != null)) ? 0 : 8 }}>
           {kicker}
           {headlineNode}
            <WhoLine item={item} size={size} onPhoto={false} onWhoTap={onWhoTap} />
