@@ -531,7 +531,7 @@ export function ExploreCard({
       {kickerDate ? (
         <span
           data-explore-kicker-date="true"
-          style={{ flex: '0 0 auto', whiteSpace: 'nowrap', color: '#FFFFFF' }}
+          style={{ flex: '0 0 auto', whiteSpace: 'nowrap', color: '#FFFFFF', textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined }}
         >
           {kickerDate}
         </span>

@@ -120,4 +120,22 @@ describe('achievement tag and label copy', () => {
     expect(labelNode?.style.textOverflow).not.toBe('ellipsis');
     expect(labelNode?.style.whiteSpace).toBe('normal');
   });
+
+  it.each([320, 390])('keeps every achievement label untruncated at %ipx', (width) => {
+    for (const { facts: factPatch, consequence } of cases) {
+      const facts = { gross: 70, course_par: 71, net: 67, course_handicap: 3, ...(factPatch ?? {}) };
+      const container = renderCard(facts, consequence ? { consequence } : {});
+      const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+      if (strip) strip.style.width = `${width}px`;
+      const cell = container.querySelector<HTMLElement>('[data-explore-stat="achievement"]');
+      const label = container.querySelector<HTMLElement>('[data-explore-achievement-label="true"]');
+      expect(cell).not.toBeNull();
+      expect(label?.style.textOverflow).not.toBe('ellipsis');
+      expect(label?.style.whiteSpace).toBe('normal');
+      expect(label?.style.webkitLineClamp).toBe('');
+      for (const element of Array.from(cell?.querySelectorAll<HTMLElement>('*') ?? [])) {
+        expect(element.style.textOverflow).not.toBe('ellipsis');
+      }
+    }
+  });
 });

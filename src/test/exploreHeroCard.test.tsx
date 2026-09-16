@@ -232,7 +232,8 @@ describe('Explore card shapes', () => {
     const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
 
     expect(callout).not.toBeNull();
-    expect(callout?.textContent).toContain('New course record');
+    expect(callout?.querySelector('[data-explore-achievement-tag="true"]')?.textContent).toBe('NEW');
+    expect(callout?.querySelector('[data-explore-achievement-label="true"]')?.textContent).toBe('Course record');
     /* §6 THE HEADLINE STATES THE ROUND, not the achievement, whenever a callout renders. */
     expect(headline?.textContent ?? '').toContain('shot a 70');
     expect(headline?.textContent ?? '').not.toMatch(/record/i);
@@ -264,6 +265,6 @@ describe('Explore card shapes', () => {
 
     expect(ownPart?.textContent).toContain('Around Surrey');
     expect(ownPart?.style.color).toBe('');
-    expect(ownPart?.parentElement?.style.color).toBe('rgb(255, 255, 255)');
+    expect(ownPart?.closest<HTMLElement>('[data-explore-kicker="true"]')?.style.color).toBe('rgb(255, 255, 255)');
   });
 });
