@@ -1023,7 +1023,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [ranked],
   );
   const [pageIx, setPageIx] = useState<number | null>(null);
-  const [openCommentsScoreId, setOpenCommentsScoreId] = useState<string | null>(null);
+  /* BRIEF_EXPLORE_COMMENT_ICON §1 — the comment control opens the COMMENTS
+     SHEET ALONE. This page mounts CommentsSheetV2 itself, exactly as
+     RoundDetailSheet does, so the round sheet is never involved and closing
+     returns straight to the feed. */
+  const [openCommentsPostId, setOpenCommentsPostId] = useState<string | null>(null);
   const pageIxRef = useRef<number | null>(null);
   pageIxRef.current = pageIx;
   const [shift, setShift] = useState<{ dx: number; opacity?: number; animating: boolean } | null>(null);
@@ -1396,11 +1400,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       } : undefined,
       onOpenComments: post ? () => {
         analyticsEvents.track('explore_round_comments_opened', { score_id: scoreId, view });
-        setOpenCommentsScoreId(scoreId);
-        tapCard(item, 'std', ranked.indexOf(item));
+        setOpenCommentsPostId(post.postId);
       } : undefined,
     };
-  }, [ranked, roundPosts, roundReactions, tapCard, view]);
+  }, [roundPosts, roundReactions, view]);
 
   const tapWho = useCallback(
     (item: StreamItem) => {
