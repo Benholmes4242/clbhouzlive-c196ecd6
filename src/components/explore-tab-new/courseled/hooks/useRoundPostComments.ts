@@ -63,7 +63,10 @@ export function useRoundPostComments(scoreIds: readonly (string | null | undefin
         .from('posts')
         .select('id, whs_score_id, comment_count, user_id')
         .in('whs_score_id', ids);
-      if (error) throw error;
+      if (error) {
+        console.error('[round-comments] batched round-post read failed; controls hidden', error);
+        throw error;
+      }
       return (rows ?? []) as unknown as PostRow[];
     },
   });
