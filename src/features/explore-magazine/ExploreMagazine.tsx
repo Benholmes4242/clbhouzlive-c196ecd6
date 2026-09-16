@@ -1380,10 +1380,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
   const engagementFor = useCallback((item: StreamItem) => {
     const scoreId = item.kind === 'round' ? item.facts.score_id : null;
-    if (!scoreId) return null;
+    if (!scoreId || roundReactions.unavailable) return null;
     const post = roundPosts.infoFor(scoreId);
     const state = roundReactions.stateFor('round', scoreId);
-    const likeAvailable = !!roundReactions.viewerId && !roundReactions.unavailable;
+    const likeAvailable = !!roundReactions.viewerId;
     return {
       likeCount: state.count,
       liked: state.mine,
