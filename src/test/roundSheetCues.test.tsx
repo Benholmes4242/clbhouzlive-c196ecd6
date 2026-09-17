@@ -219,6 +219,44 @@ describe('the scorecard presentation split', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it('dismisses on a downward card swipe', () => {
+    const onClose = vi.fn();
+    render(<CardScorecardSheet {...props} onClose={onClose} />);
+    const card = document.querySelector('[data-scorecard-glass-card="true"]') as HTMLElement;
+    fireEvent.touchStart(card, { touches: [{ clientX: 100, clientY: 150 }] });
+    fireEvent.touchMove(card, { touches: [{ clientX: 102, clientY: 275 }] });
+    fireEvent.touchEnd(card);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('axis-locks a horizontal swipe and forwards its full-card drag', () => {
+    const onStart = vi.fn();
+    const onMove = vi.fn();
+    const onEnd = vi.fn();
+    render(
+      <CardScorecardSheet
+        {...props}
+        onHorizontalDrag={{ onStart, onMove, onEnd }}
+      />,
+    );
+    const card = document.querySelector('[data-scorecard-glass-card="true"]') as HTMLElement;
+    fireEvent.touchStart(card, { touches: [{ clientX: 240, clientY: 220 }] });
+    fireEvent.touchMove(card, { touches: [{ clientX: 180, clientY: 223 }] });
+    fireEvent.touchEnd(card);
+    expect(onStart).toHaveBeenCalledTimes(1);
+    expect(onMove).toHaveBeenLastCalledWith(-60);
+    expect(onEnd).toHaveBeenCalledWith(-60, expect.any(Number));
+  });
+
+  it('keeps an exit tappable without dismissing the card', () => {
+    const onClose = vi.fn();
+    const onViewCourse = vi.fn();
+    render(<CardScorecardSheet {...props} onClose={onClose} onViewCourse={onViewCourse} />);
+    fireEvent.click(screen.getByText('View course'));
+    expect(onViewCourse).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it('renders page mode without a backdrop or dialog', () => {
     render(<CardScorecardSheet {...props} presentation="page" />);
     expect(document.querySelector('[data-scorecard-page="true"]')).toBeTruthy();
