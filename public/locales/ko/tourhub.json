@@ -463,6 +463,7 @@
       "ratingFrom_one": "pyeongjeom {{count}}gae",
       "ratingFrom_other": "pyeongjeom {{count}}gae",
       "sectionKicker": "clbhouz: ibeon ju gyeongginjang",
+      "viewCourse": "Course bogi",
       "ratingLabel": "Member pyeongjeom",
       "basis_one": "Play han member {{count}}gae pyeongjeom.",
       "basis_other": "Play han member {{count}}gae pyeongjeom.",

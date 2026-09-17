@@ -49,6 +49,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
 import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
@@ -63,6 +64,7 @@ import { useTournamentTeeTimes } from '../../../hooks/useTournamentTeeTimes';
 import { useTournamentDefendingChamp } from '../../../hooks/useTournamentDefendingChamp';
 import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearTop4';
 import { useTournamentFieldStrength } from '../../../hooks/useTournamentFieldStrength';
+import { useTournamentVenueRecord } from '../../../overview/data/useTournamentVenueRecord';
 
 /**
  * SIX rows. It was five while the board occupied the photo band, because the
@@ -194,6 +196,12 @@ interface HeroBoardSectionProps {
   onRowTap?: (playerId: string) => void;
 }
 
+export function overviewTournamentDoorKey(phase: HeroBoardSectionProps['phase']): string {
+  if (phase === 'completed') return 'overview.ticker.fullResults';
+  if (phase === 'upcoming') return 'overview.leaderboardBand.ctaUpcoming';
+  return 'overview.ticker.fullLeaderboard';
+}
+
 export function HeroBoardSection({
   tournamentId,
   entries,
@@ -203,8 +211,10 @@ export function HeroBoardSection({
   onRowTap,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
+  const navigate = useNavigate();
   const [picksOpen, setPicksOpen] = useState(false);
   const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
+  const { data: venueRecord } = useTournamentVenueRecord(tournamentId);
 
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const pickTourCode = viewingTourSlug ?? 'pga';
@@ -267,8 +277,6 @@ export function HeroBoardSection({
   ].filter((cell): cell is { label: string; value: string; sub: string | null; color: string } => Boolean(cell));
   const hasThreeUp = threeUp.length > 0;
 
-  if (!hasBoard && !hasThreeUp && !hasPicks) return null;
-
   return (
     <div style={{ background: PAGE_CANVAS, fontFamily: FONT }}>
       {hasBoard ? (
@@ -285,9 +293,9 @@ export function HeroBoardSection({
       ) : null}
 
       {hasThreeUp ? (
-        <div style={{ display: 'grid', gridTemplateColumns: threeUp.length === 1 ? 'minmax(0, 1fr)' : `repeat(${threeUp.length}, minmax(0, 1fr))`, padding: '14px 24px 10px', borderBottom: `1px solid ${WHITE_ALPHA_06}` }}>
+        <div style={{ display: 'grid', gridTemplateColumns: threeUp.length === 1 ? 'minmax(0, 1fr)' : `repeat(${threeUp.length}, minmax(0, 1fr))`, padding: '14px 24px 10px' }}>
           {threeUp.map((cell, index) => (
-            <div key={cell.label} style={{ minWidth: 0, padding: threeUp.length === 1 ? 0 : '0 10px', textAlign: threeUp.length === 1 ? 'left' : 'center', borderLeft: index === 0 ? 'none' : `1px solid ${WHITE_ALPHA_08}` }}>
+            <div key={cell.label} style={{ minWidth: 0, padding: threeUp.length === 1 ? 0 : '0 10px', textAlign: threeUp.length === 1 ? 'left' : 'center' }}>
               <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{cell.label}</div>
               <div style={{ marginTop: 4, fontSize: 16, fontWeight: 700, color: cell.color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cell.value}</div>
               {cell.sub ? <div style={{ marginTop: 2, fontSize: 11, color: cell.color === TOPAR_UNDER_DARK ? TOPAR_UNDER_DARK : WHITE_ALPHA_65, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cell.sub}</div> : null}
@@ -313,17 +321,31 @@ export function HeroBoardSection({
         </>
       ) : null}
 
-      {(hasBoard || hasThreeUp) ? (
+      <div
+        data-overview-action-row
+        style={{ width: '100%', minHeight: 56, padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, borderTop: `1px solid ${WHITE_ALPHA_06}` }}
+      >
         <button
           type="button"
           onClick={onFullLeaderboard}
           data-overview-board-cta
-          style={{ width: '100%', minHeight: 44, margin: 0, padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4, border: 'none', borderTop: `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: WHITE_ALPHA_65, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'right' }}
+          style={{ minWidth: 0, minHeight: 44, margin: 0, padding: 0, display: 'inline-flex', alignItems: 'center', gap: 4, border: 'none', background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', textAlign: 'left', whiteSpace: 'nowrap' }}
         >
-          {phase === 'completed' ? t('overview.ticker.fullResults') : phase === 'upcoming' ? t('overview.leaderboardBand.ctaUpcoming') : t('overview.ticker.fullLeaderboard')}
+          {t(overviewTournamentDoorKey(phase))}
           <ChevronRight size={16} aria-hidden />
         </button>
-      ) : null}
+        {venueRecord?.courseId ? (
+          <button
+            type="button"
+            onClick={() => navigate(`/course/${venueRecord.courseId}`)}
+            data-overview-course-cta
+            style={{ minWidth: 0, minHeight: 44, margin: 0, padding: 0, display: 'inline-flex', alignItems: 'center', gap: 4, border: 'none', background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', textAlign: 'right', whiteSpace: 'nowrap' }}
+          >
+            {t('overview.venueRecord.viewCourse', 'View course')}
+            <ChevronRight size={16} aria-hidden />
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -367,7 +389,7 @@ function PicksPanel({
   const hasConfidence = predictions?.isAIPowered;
 
   return (
-    <div style={{ background: PAGE_CANVAS, borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
+    <div style={{ background: PAGE_CANVAS }}>
       {/* Editorial framing when populated — and NO empty row when it is not. */}
       {predictions?.editorialFraming ? (
         <div

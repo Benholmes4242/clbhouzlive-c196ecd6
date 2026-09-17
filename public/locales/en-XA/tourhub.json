@@ -465,6 +465,7 @@
       "ratingFrom_one": "[from {{count}} rating]",
       "ratingFrom_other": "[from {{count}} ratings]",
       "sectionKicker": "[This week's venue on clbhouz]",
+      "viewCourse": "[View course]",
       "ratingLabel": "[Members' rating]",
       "basis_one": "[From {{count}} rating by members who have played it.]",
       "basis_other": "[From {{count}} ratings by members who have played it.]",

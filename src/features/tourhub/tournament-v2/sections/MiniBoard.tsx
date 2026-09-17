@@ -130,7 +130,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     return (
       <>
         <div style={{ background: T.surface, fontFamily: FONT }}>
-          <div style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', minHeight: 32, padding: '4px 24px', borderBottom: `1px solid ${T.hairline}`, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', minHeight: 32, padding: '4px 24px', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div>{t('board.columns.player')}</div>
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
@@ -150,7 +150,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   playerId: r.player?.id ?? '', playerName: r.player?.full_name ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
                   position: r.position ?? null, positionTied: r.position_tied ?? null, total: r.score ?? null, today, thru: r.thru ?? null, status: r.status ?? null,
                 }); }}
-                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', width: '100%', minHeight: 44, padding: '8px 24px', border: 'none', borderBottom: `1px solid ${T.hairline}`, background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
+                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', width: '100%', minHeight: 44, padding: '8px 24px', border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
                 className={`${T.press} transition-colors`}
               >
                 {showOverviewPosition ? <div style={{ fontSize: 12, fontWeight: 700, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{posText}</div> : null}
