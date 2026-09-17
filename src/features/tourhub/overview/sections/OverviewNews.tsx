@@ -2,19 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TourStory } from '../../news/useTourStories';
+import { storyTime } from '../../news/storyTime';
 import { FONT, INK, INK_MUTE, WHITE_ALPHA_06 } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
 
-function relativeTime(value: string | null): string {
-  if (!value) return '';
-  const date = new Date(value); if (Number.isNaN(date.getTime())) return '';
-  const hours = Math.floor((Date.now() - date.getTime()) / 3_600_000);
-  if (hours < 24) return `${Math.max(0, hours)}H AGO`;
-  if (hours < 48) return 'YESTERDAY';
-  if (hours < 24 * 7) return new Intl.DateTimeFormat('en', { weekday: 'long' }).format(date).toUpperCase();
-  return new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short' }).format(date).toUpperCase();
-}
-function StoryMeta({ story }: { story: TourStory }) { return <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_MUTE }}>{[story.kicker, relativeTime(story.published_at)].filter(Boolean).join(' · ')}</span>; }
+function StoryMeta({ story }: { story: TourStory }) { return <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_MUTE }}>{[story.kicker, storyTime(story.published_at)].filter(Boolean).join(' · ')}</span>; }
 function NewsRow({ story, last, onOpen }: { story: TourStory; last: boolean; onOpen: () => void }) {
   const [failed, setFailed] = useState(false);
   return <button type="button" onClick={onOpen} style={{ width: '100%', minHeight: 72, padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 12, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>{story.image_url && !failed ? <img src={story.image_url} alt="" loading="lazy" onError={() => setFailed(true)} style={{ width: 72, height: 56, flex: 'none', borderRadius: 10, objectFit: 'cover' }} /> : null}<span style={{ minWidth: 0, flex: 1 }}><StoryMeta story={story} /><span style={{ display: '-webkit-box', marginTop: 4, overflow: 'hidden', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, fontSize: 14, lineHeight: 1.25, fontWeight: 700 }}>{story.headline}</span></span></button>;

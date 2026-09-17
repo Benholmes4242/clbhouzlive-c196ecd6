@@ -9,6 +9,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Heart, MessageCircle } from 'lucide-react';
 import { A, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import { storyTime } from '@/features/tourhub/news/storyTime';
 import { r } from '@/lib/radius';
 import { CHIP_GLASS_CLASS, PHOTO_FIG_GOOD, PHOTO_FIG_SHADOW, PHOTO_FIG_UNDER } from '@/styles/photoScrim';
 
@@ -250,7 +251,7 @@ function WhoLine({
     /* ROUND AND REVIEW DATES LIVE IN THE KICKER ROW. Keeping them here created
        a loose second text group between the player and the reaction controls. */
     if (item.kind === 'review' || item.kind === 'round') return null;
-    if (item.kind === 'story') return relativeDay(item.facts.published_at);
+    if (item.kind === 'story') return storyTime(item.facts.published_at);
     if (item.kind === 'clip' || item.kind === 'watch') {
       const label = item.facts.duration_s ? formatDuration(item.facts.duration_s) : null;
       return label;

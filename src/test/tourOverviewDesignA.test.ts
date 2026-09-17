@@ -9,6 +9,7 @@ import { fullTourLabel } from '@/features/tourhub/_shared/tourOrder';
 import { selectComingUpRail } from '@/features/tourhub/overview/sections/ComingUp';
 import { selectOverviewBandStory } from '@/features/tourhub/overview/sections/StoryBand';
 import { selectOverviewNews } from '@/features/tourhub/overview/sections/OverviewNews';
+import { storyTime } from '@/features/tourhub/news/storyTime';
 import type { TourStory } from '@/features/tourhub/news/useTourStories';
 import type { ComingUpRow } from '@/features/tourhub/overview/data/useComingUp';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
@@ -137,9 +138,9 @@ describe('Tour Overview H12 material breaks', () => {
     expect(selectOverviewBandStory(stories, 'hero', now)?.id).toBe('matched');
   });
 
-  it('uses the 48-hour fallback and withholds stale or unphotographed stories', () => {
-    expect(selectOverviewBandStory([story('fresh', '2026-09-15T20:00:00Z', null)], 'hero', now)?.id).toBe('fresh');
-    expect(selectOverviewBandStory([story('stale', '2026-09-15T19:59:59Z', null)], 'hero', now)).toBeNull();
+  it('uses the seven-day fallback and withholds older or unphotographed stories', () => {
+    expect(selectOverviewBandStory([story('fresh', '2026-09-15T12:00:00Z', null)], 'hero', now)?.id).toBe('fresh');
+    expect(selectOverviewBandStory([story('stale', '2026-09-10T19:59:59Z', null)], 'hero', now)).toBeNull();
     expect(selectOverviewBandStory([story('bare', '2026-09-17T19:00:00Z', 'hero', false)], 'hero', now)).toBeNull();
   });
 
@@ -154,5 +155,19 @@ describe('Tour Overview H12 material breaks', () => {
     const rows = Array.from({ length: 8 }, (_, index) => ({ id: `event-${index}` } as ComingUpRow));
     expect(selectComingUpRail(rows, 'event-1').map((row) => row.id)).toEqual(['event-0', 'event-2', 'event-3', 'event-4', 'event-5', 'event-6']);
     expect(selectComingUpRail(rows.slice(0, 2))).toHaveLength(2);
+  });
+});
+
+describe('story elapsed-time labels', () => {
+  const now = new Date('2026-09-17T20:00:00Z');
+  const hoursAgo = (hours: number) => new Date(now.getTime() - hours * 3_600_000).toISOString();
+
+  it('uses elapsed-hour boundaries rather than calendar days', () => {
+    expect(storyTime(hoursAgo(23), now)).toBe('23H AGO');
+    expect(storyTime(hoursAgo(25), now)).toBe('YESTERDAY');
+    expect(storyTime(hoursAgo(47), now)).toBe('YESTERDAY');
+    expect(storyTime(hoursAgo(49), now)).toBe('2 DAYS AGO');
+    expect(storyTime(hoursAgo(72), now)).toBe('3 DAYS AGO');
+    expect(storyTime(hoursAgo(192), now)).toBe('9 SEP');
   });
 });

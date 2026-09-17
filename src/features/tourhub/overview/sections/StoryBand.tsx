@@ -8,7 +8,7 @@ import { fullTourLabel } from '../../_shared/tourOrder';
 
 const DAY_MS = 86_400_000;
 const MATCH_MAX_AGE_MS = 7 * DAY_MS;
-const FALLBACK_MAX_AGE_MS = 48 * 3_600_000;
+const FALLBACK_MAX_AGE_MS = 7 * DAY_MS;
 
 function isFresh(story: TourStory, maxAge: number, now: Date): boolean {
   if (!story.image_url || !story.published_at) return false;

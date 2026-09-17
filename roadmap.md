@@ -63,11 +63,17 @@ Tour Overview Design A
 - [x] Verify 390/320, blocked flag host, delta-free boards, types, tests, and build
 
 ## Tour Overview H12
-- [x] Select a photographed, fresh hero-tournament story with a 48-hour fallback
+- [x] Select a photographed, fresh hero-tournament story with a seven-day fallback
 - [x] Insert the full-bleed story band and collapse it completely when absent
 - [x] Exclude the band story from the News lead and rows
 - [x] Replace weekly Coming Up rows with a six-event flat horizontal rail
 - [x] Verify full-page rhythm, forced story states, rail containment, types, tests, and build
+
+## Story freshness correction
+- [ ] Make story ages use elapsed-hour boundaries everywhere
+- [ ] Verify 23h, 25h, 47h, 49h, 3-day, and 8-day labels
+- [ ] Verify seven-day band fallback, stale collapse, and News deduplication
+- [ ] Run focused tests, types, and build
 
 ## Scorecard glass card S1
 - [x] Separate scorecard overlay and dedicated page presentations
