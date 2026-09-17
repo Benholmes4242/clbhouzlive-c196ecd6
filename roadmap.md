@@ -31,6 +31,12 @@ Tour Overview Design A
 - [x] Rebuild the gated venue destination with an optional course image
 - [x] Verify 320/390 states, venue bottom measurement, types, tests, and build
 
+## Tour Overview H8
+- [x] Unmount the H7 venue destination without deleting its component
+- [x] Remove overview-only board row rules
+- [x] Add equal tournament and conditional course doors
+- [ ] Verify one/two-door states, all lifecycle labels, row taps, 320 overflow, types, tests, and build
+
 ## Explore kicker and achievement marks
 - [x] Structure kicker copy as scope and course
 - [x] Render optional two-line kickers and one-line pair kickers
