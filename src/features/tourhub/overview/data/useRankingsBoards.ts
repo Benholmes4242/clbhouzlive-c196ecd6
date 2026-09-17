@@ -74,7 +74,66 @@ async function fetchOwgrStats(
   return out;
 }
 
-async function fetchOwgr(): Promise<RankingsRow[]> {
+/**
+ * H11.1 — the 90-day movement window.
+ *
+ * sr_world_rankings keeps real history (30 snapshots, 2026-01-29 -> 2026-09-14,
+ * 228 days covered), so the delta is measured at 90 days exactly: the most
+ * recent ranking_date on or before (latest - 90 days), NOT the oldest row.
+ * `basisDays` reports the window actually used so the basis line can never
+ * claim 90 days over a shorter span.
+ *
+ * tour_season_rankings carries no history at all (one scraped_at, one row per
+ * player), so the Race to Dubai / LPGA / Korn Ferry boards return
+ * basisDays = null and movement = null: no column, no basis line, no dashes.
+ */
+const MOVEMENT_WINDOW_DAYS = 90;
+
+export interface RankingsBoardResult {
+  rows: RankingsRow[];
+  /** Days between the compared snapshots, or null when this board has no history. */
+  basisDays: number | null;
+}
+
+function isoMinusDays(iso: string, days: number): string {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - days);
+  return d.toISOString().slice(0, 10);
+}
+
+function daysBetween(laterIso: string, earlierIso: string): number {
+  const ms =
+    new Date(`${laterIso}T00:00:00Z`).getTime() - new Date(`${earlierIso}T00:00:00Z`).getTime();
+  return Math.round(ms / 86_400_000);
+}
+
+/** The comparison snapshot: newest ranking_date on or before (latest - 90 days). */
+async function fetchComparisonSnapshot(
+  latestDate: string,
+): Promise<{ date: string; ranks: Map<string, number> } | null> {
+  const cutoff = isoMinusDays(latestDate, MOVEMENT_WINDOW_DAYS);
+  const { data: dateRows, error: dateErr } = await supabase
+    .from('sr_world_rankings')
+    .select('ranking_date')
+    .lte('ranking_date', cutoff)
+    .order('ranking_date', { ascending: false })
+    .limit(1);
+  if (dateErr) return null;
+  const date = (dateRows ?? [])[0]?.ranking_date ?? null;
+  if (!date) return null;
+  const { data, error } = await supabase
+    .from('sr_world_rankings')
+    .select('player_id, rank')
+    .eq('ranking_date', date);
+  if (error) return null;
+  const ranks = new Map<string, number>();
+  ((data ?? []) as any[]).forEach((r) => {
+    if (r.player_id && typeof r.rank === 'number' && r.rank >= 1) ranks.set(r.player_id, r.rank);
+  });
+  return { date, ranks };
+}
+
+async function fetchOwgr(): Promise<RankingsBoardResult> {
   const { data, error } = await supabase
     .from('sr_world_rankings')
     .select(`
@@ -92,26 +151,40 @@ async function fetchOwgr(): Promise<RankingsRow[]> {
     .filter((r: any) => r.ranking_date === latest)
     .filter((r: any) => r.player && r.rank > 0)
     .slice(0, 5);
-  const statsMap = await fetchOwgrStats(rows.map((r: any) => r.player.id));
-  return rows.map((r: any) => {
-    const s = statsMap.get(r.player.id);
-    return {
-      rank: r.rank,
-      priorRank: r.prior_rank ?? null,
-      playerId: r.player.id,
-      playerName: r.player.full_name,
-      country: r.player.country ?? null,
-      photoUrl: r.player.photo_url ?? null,
-      points: r.points ?? null,
-      movement: movementFrom(r.rank, r.prior_rank ?? null),
-      wins: s?.wins ?? null,
-      top10s: s?.top10s ?? null,
-    };
-  });
+  const [statsMap, comparison] = await Promise.all([
+    fetchOwgrStats(rows.map((r: any) => r.player.id)),
+    latest ? fetchComparisonSnapshot(latest) : Promise.resolve(null),
+  ]);
+  const basisDays =
+    comparison && latest ? daysBetween(latest, comparison.date) : null;
+  return {
+    basisDays,
+    rows: rows.map((r: any) => {
+      const s = statsMap.get(r.player.id);
+      const older = comparison?.ranks.get(r.player.id) ?? null;
+      return {
+        rank: r.rank,
+        priorRank: older,
+        playerId: r.player.id,
+        playerName: r.player.full_name,
+        country: r.player.country ?? null,
+        photoUrl: r.player.photo_url ?? null,
+        points: r.points ?? null,
+        // H11.4: rank delta over the 90-day window. Positive = climbed.
+        // This is member-analytics polarity (green up / red down) and it NEVER
+        // goes through getScoreColor, which carries the to-par polarity.
+        movement: comparison ? movementFrom(r.rank, older) : null,
+        wins: s?.wins ?? null,
+        top10s: s?.top10s ?? null,
+      };
+    }),
+  };
 }
 
 
-async function fetchSeasonBoard(tourCode: 'euro' | 'lpga' | 'liv' | 'pgad'): Promise<RankingsRow[]> {
+async function fetchSeasonBoard(
+  tourCode: 'euro' | 'lpga' | 'liv' | 'pgad',
+): Promise<RankingsBoardResult> {
   const year = new Date().getFullYear();
   const { data, error } = await supabase
     .from('tour_season_rankings' as any)
@@ -148,33 +221,37 @@ async function fetchSeasonBoard(tourCode: 'euro' | 'lpga' | 'liv' | 'pgad'): Pro
     }
   }
 
-  return rows.map((r) => {
-    const change = r.position_change ? parseInt(String(r.position_change), 10) : null;
-    const pid = r.player_id ?? r.manual_player_id ?? null;
-    const joined = pid ? playerMap.get(pid) : null;
-    return {
-      rank: r.position,
-      priorRank: change != null && !Number.isNaN(change) ? r.position + change : null,
-      playerId: pid,
-      playerName: joined?.full_name ?? r.player_name,
-      country: joined?.country ?? r.country ?? null,
-      photoUrl: joined?.photo_url ?? null,
-      points: r.points ?? null,
-      // position_change stores the feed's own convention: positive = climbed.
-      movement: change != null && !Number.isNaN(change) ? change : null,
-      wins: r.wins ?? null,
-      // tour_season_rankings has no top-10 column — genuinely absent, so the
-      // figure collapses on these boards rather than rendering "TOP 10 0".
-      top10s: null,
-
-    };
-  });
+  return {
+    // H11.1: tour_season_rankings has no history — one scraped_at, one row per
+    // player. Its position_change string has no snapshot behind it, so these
+    // boards carry NO delta at all rather than a week-shaped number sitting
+    // beside a 90-day one on the World board.
+    basisDays: null,
+    rows: rows.map((r) => {
+      const pid = r.player_id ?? r.manual_player_id ?? null;
+      const joined = pid ? playerMap.get(pid) : null;
+      return {
+        rank: r.position,
+        priorRank: null,
+        playerId: pid,
+        playerName: joined?.full_name ?? r.player_name,
+        country: joined?.country ?? r.country ?? null,
+        photoUrl: joined?.photo_url ?? null,
+        points: r.points ?? null,
+        movement: null,
+        wins: r.wins ?? null,
+        // tour_season_rankings has no top-10 column — genuinely absent, so the
+        // figure collapses on these boards rather than rendering "TOP 10 0".
+        top10s: null,
+      };
+    }),
+  };
 }
 
 export function useRankingsBoards(board: RankingsBoard) {
   return useQuery({
     queryKey: ['overview', 'rankings', board],
-    queryFn: async (): Promise<RankingsRow[]> => {
+    queryFn: async (): Promise<RankingsBoardResult> => {
       if (board === 'owgr') return fetchOwgr();
       if (board === 'r2d') return fetchSeasonBoard('euro');
       if (board === 'cme') return fetchSeasonBoard('lpga');
