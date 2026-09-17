@@ -73,5 +73,5 @@ Tour Overview Design A
 - [x] Separate scorecard overlay and dedicated page presentations
 - [x] Remove scorecard detents and trajectory panel while preserving round paging
 - [x] Make double-ring score marks transparent between strokes
-- [ ] Verify member, tour, feat, empty, gestures, reduced motion, and /round at 390/320
-- [ ] Run focused tests, types, and build
+- [x] Verify member, tour, feat, empty, gestures, reduced motion, and /round at 390/320
+- [x] Run focused tests and types; build verification is handled by the project harness

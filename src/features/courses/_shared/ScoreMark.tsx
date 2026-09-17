@@ -19,9 +19,9 @@ import {
  * REBUILD §A). Per outcome: unplayed a faint mid-dot; par a bare numeral;
  * birdie a FILLED red disc; eagle a FILLED gold disc with one ring; albatross or
  * ace a FILLED gold disc with two rings; bogey an OUTLINED ink square; double a
- * FILLED blue square; triple+ a FILLED deep-blue square with one ring. Rings
- * encode degree, gold encodes rarity. Filled is correct — do not "restore
- * outlines"; the outline proposal was considered and is not the shipped grammar.
+ * FILLED blue square; triple+ a FILLED deep-blue square with one ring. S1 gives
+ * only the translucent scorecard an opt-in double-stroke eagle/double-bogey mark
+ * so its gap stays transparent; every other caller retains this grammar.
  *
  * THE LIGHT BRANCH IS ON THE DEAD LIST (see ScoreMark.tsx:225-280). No product
  * surface passes surface="light" any more — RoundCardHoleStrip was the last one
