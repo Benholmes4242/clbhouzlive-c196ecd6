@@ -46,9 +46,8 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { OVERVIEW_GUTTER as GUT } from '../tokens';
-import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
+import { ChevronRight } from 'lucide-react';
+import { FONT, INK, INK_MUTE, SURFACE } from '../../_shared/tokens';
 import { useTournamentVenueRecord } from '../data/useTournamentVenueRecord';
 import { useCourseFieldPlayers } from '@/hooks/gam/useCourseFieldPlayers';
 
@@ -138,10 +137,7 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
   /* A failed or absent read renders nothing; and zero is NOT printed either,
      because get_course_field_sizes returns 0 both for a course nobody has
      played and for a course with no qualifying WHS mapping. */
-  const played =
-    field.data?.available && typeof playedRaw === 'number' && playedRaw > 0
-      ? playedRaw
-      : null;
+  void playedRaw;
 
   /**
    * THE LINK IS THE GATE. A row means we KNOW the course, so the section
@@ -171,83 +167,16 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
      third flag existed only to gate the whole section and is gone with it. */
 
   /* "#57 GB&I" — the published rank, on the heading baseline. */
-  const meta = hasRank
-    ? `#${data.listRank}${data.listLabel ? ` ${data.listLabel}` : ''}`
-    : null;
+  const rank = hasRank ? `#${data.listRank}${data.listLabel ? ` ${data.listLabel}` : ''}` : null;
+  const rating = hasRating ? `${Number(data.rating).toFixed(1)} from ${count} ratings` : null;
+  const line = [data.courseName, rank, rating].filter(Boolean).join(' · ');
+  const target = hasRating ? `/course/${data.courseId}` : `/courses/${data.courseId}/rate`;
 
   return (
-    <section style={{ padding: `0 ${GUT}px`, fontFamily: SANS }}>
-      <div style={{ marginBottom: 6 }}>
-        <span style={SECTION_KICKER}>{t('overview.venueRecord.sectionKicker')}</span>
-      </div>
-
-      <DiscoverSectionHeading title={data.courseName} right={meta} />
-
-      {data.coursePlace ? (
-        <div style={{ marginTop: -4, marginBottom: 2 }}>
-          <span style={{ fontSize: 12.5, fontWeight: 600, color: A.MUTE }}>{data.coursePlace}</span>
-        </div>
-      ) : null}
-
-      {hasRating ? (
-        <>
-          <div style={{ marginTop: 12, display: 'flex', gap: 32 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <span
-                className="tabular-nums lining-nums"
-                style={{ fontSize: 21, fontWeight: 700, color: A.INK, letterSpacing: '-0.03em', ...FIGS }}
-              >
-                {Number(data.rating).toFixed(1)}
-              </span>
-              <span style={FIGURE_KICKER}>{t('overview.venueRecord.ratingLabel')}</span>
-            </div>
-
-            {played != null ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <span
-                  className="tabular-nums lining-nums"
-                  style={{ fontSize: 21, fontWeight: 700, color: A.INK, letterSpacing: '-0.03em', ...FIGS }}
-                >
-                  {played}
-                </span>
-                <span style={FIGURE_KICKER}>{t('overview.venueRecord.playedLabel')}</span>
-              </div>
-            ) : null}
-          </div>
-
-          <div
-            className="tabular-nums lining-nums"
-            style={{ marginTop: 8, fontSize: 13, fontWeight: 600, lineHeight: '18px', color: A.BODY }}
-          >
-            {t('overview.venueRecord.basis', { count })}
-          </div>
-
-          <TerminalRow
-            label={t('overview.venueRecord.seeAction')}
-            onPress={() => navigate(`/course/${data.courseId}`)}
-          />
-        </>
-      ) : (
-        <>
-          <div style={{ marginTop: 10, fontSize: 13, fontWeight: 600, lineHeight: '18px', color: A.MUTE }}>
-            {t('overview.venueRecord.tooFewRatings')}
-          </div>
-
-          {/* THE BELOW-FLOOR STATE CARRIES AN ACTION. A tour venue in the week
-              it is on television, telling a member nobody has rated it, is the
-              strongest prompt to rate a course this app has — so it is a
-              control, not a dead sentence. Verified before building: rating
-              requires no played round (submit_course_review_v2 is SECURITY
-              DEFINER and checks only auth and value ranges), so any signed-in
-              member can complete it. At or above the floor there is NO ask — a
-              rated course does not need one. Routes to the existing composer;
-              no new entry point. */}
-          <TerminalRow
-            label={t('overview.venueRecord.rateAction')}
-            onPress={() => navigate(`/courses/${data.courseId}/rate`)}
-          />
-        </>
-      )}
+    <section style={{ margin: '0 10px', fontFamily: FONT }}>
+      <button type="button" onClick={() => navigate(target)} style={{ width: '100%', minHeight: 58, padding: '10px 14px', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', alignItems: 'center', gap: 12, border: 0, borderRadius: 14, background: SURFACE, color: INK, textAlign: 'left', cursor: 'pointer' }}>
+        <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: INK_MUTE }}>{t('overview.venueRecord.sectionKicker')}</span><span style={{ display: 'block', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 700 }}>{line}</span></span><ChevronRight size={17} aria-hidden />
+      </button>
     </section>
   );
 }
