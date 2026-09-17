@@ -90,6 +90,7 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
   /* A figure is only shown with a real count behind it. */
   const hasRating = data.rating != null && count >= RATING_FLOOR;
   const hasRank = data.listRank != null;
+  if (!hasRating && !hasRank) return null;
   /* Below the floor is simply NOT hasRating — count < RATING_FLOOR, whether the
      rating is null (nobody has rated it) or present but under-sampled. The old
      third flag existed only to gate the whole section and is gone with it. */

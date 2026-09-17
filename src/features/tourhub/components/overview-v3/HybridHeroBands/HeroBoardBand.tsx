@@ -71,6 +71,12 @@ import { useTournamentFieldStrength } from '../../../hooks/useTournamentFieldStr
  */
 export const HERO_BOARD_ROWS = 5;
 
+export function shouldShowOverviewBoard(entries: Array<{ position?: number | null; score?: number | null }>): boolean {
+  const rows = entries.slice(0, HERO_BOARD_ROWS);
+  if (rows.length === 0) return false;
+  return rows.some((row) => row.position != null || (row.score != null && row.score !== 0));
+}
+
 const FIGS = { fontVariantNumeric: 'tabular-nums' as const, fontFeatureSettings: '"kern" 1, "liga" 1' };
 const WON_LABEL = 'WON';
 
@@ -197,7 +203,7 @@ export function HeroBoardSection({
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
   const [picksOpen, setPicksOpen] = useState(false);
-  const hasBoard = phase !== 'upcoming' && entries.length > 0;
+  const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
 
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const pickTourCode = viewingTourSlug ?? 'pga';
@@ -243,11 +249,11 @@ export function HeroBoardSection({
     return placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', ');
   }, [boardByPlayer, hasPicks, phase, picks]);
 
-  const upcoming = phase === 'upcoming';
-  const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, upcoming);
-  const { data: defending } = useTournamentDefendingChamp(upcoming ? tournamentId : null);
-  const { data: lastYear } = useTournamentLastYearTop4(upcoming ? tournamentId : null);
-  const { data: fieldStrength } = useTournamentFieldStrength(upcoming ? tournamentId : null);
+  const showThreeUp = phase === 'upcoming' || !hasBoard;
+  const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showThreeUp);
+  const { data: defending } = useTournamentDefendingChamp(showThreeUp ? tournamentId : null);
+  const { data: lastYear } = useTournamentLastYearTop4(showThreeUp ? tournamentId : null);
+  const { data: fieldStrength } = useTournamentFieldStrength(showThreeUp ? tournamentId : null);
   const firstTeeCandidate = teeTimes[0] ?? null;
   const firstTee = firstTeeCandidate?.time && firstTeeCandidate.time !== '\u2014'
     ? firstTeeCandidate

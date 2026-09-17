@@ -9,12 +9,27 @@ import { fmtScore } from '../../components/overview-v3/HybridHero.utils';
 import { FONT, INK, INK_MUTE, SURFACE, TREND_UP, WHITE_ALPHA_06 } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
 
-function statusFor(slide: HeroSlide): string {
+export function statusFor(slide: HeroSlide, now = new Date()): string {
   if (slide.type === 'live') return `Live${slide.tournament.currentRound ? ` · Round ${slide.tournament.currentRound}` : ''}`;
   if (slide.type === 'completed') return 'Final';
   const start = new Date(slide.tournament.startDate);
   if (Number.isNaN(start.getTime())) return '';
-  return `Starts ${new Intl.DateTimeFormat('en', { weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).format(start)}`;
+  const hoursAway = (start.getTime() - now.getTime()) / 3_600_000;
+  const format = hoursAway > 24
+    ? new Intl.DateTimeFormat('en', { weekday: 'long' })
+    : new Intl.DateTimeFormat('en', { weekday: 'long', hour: '2-digit', minute: '2-digit', hour12: false });
+  return `Starts ${format.format(start)}`;
+}
+
+export function isAlsoThisWeek(slide: HeroSlide, now = new Date()): boolean {
+  if (slide.type === 'live') return true;
+  if (slide.type !== 'upcoming') return false;
+  const start = new Date(slide.tournament.startDate);
+  if (Number.isNaN(start.getTime()) || start.getTime() < now.getTime()) return false;
+  const sunday = new Date(now);
+  sunday.setDate(now.getDate() + ((7 - now.getDay()) % 7));
+  sunday.setHours(23, 59, 59, 999);
+  return start.getTime() <= sunday.getTime();
 }
 
 function OtherTournamentRow({ slide, last }: { slide: HeroSlide; last: boolean }) {
@@ -41,7 +56,10 @@ export function AlsoThisWeek() {
   const { t } = useTranslation('tourhub');
   const { data: slides = [] } = useHeroCarouselData();
   const { viewingTournamentId } = useTourSelection();
-  const others = useMemo(() => slides.filter((slide) => slide.tournament.id !== viewingTournamentId).slice(0, 4), [slides, viewingTournamentId]);
+  const others = useMemo(
+    () => slides.filter((slide) => slide.tournament.id !== viewingTournamentId && isAlsoThisWeek(slide)).slice(0, 4),
+    [slides, viewingTournamentId],
+  );
   if (others.length === 0) return null;
   return <section><OverviewSectionHead title={t('overview.alsoThisWeek.title')} /><div style={{ margin: '0 10px', overflow: 'hidden', borderRadius: 16, background: SURFACE }}>{others.map((slide, index) => <OtherTournamentRow key={slide.tournament.id} slide={slide} last={index === others.length - 1} />)}</div></section>;
 }
