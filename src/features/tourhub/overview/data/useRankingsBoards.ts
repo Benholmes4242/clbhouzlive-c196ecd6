@@ -151,26 +151,40 @@ async function fetchOwgr(): Promise<RankingsBoardResult> {
     .filter((r: any) => r.ranking_date === latest)
     .filter((r: any) => r.player && r.rank > 0)
     .slice(0, 5);
-  const statsMap = await fetchOwgrStats(rows.map((r: any) => r.player.id));
-  return rows.map((r: any) => {
-    const s = statsMap.get(r.player.id);
-    return {
-      rank: r.rank,
-      priorRank: r.prior_rank ?? null,
-      playerId: r.player.id,
-      playerName: r.player.full_name,
-      country: r.player.country ?? null,
-      photoUrl: r.player.photo_url ?? null,
-      points: r.points ?? null,
-      movement: movementFrom(r.rank, r.prior_rank ?? null),
-      wins: s?.wins ?? null,
-      top10s: s?.top10s ?? null,
-    };
-  });
+  const [statsMap, comparison] = await Promise.all([
+    fetchOwgrStats(rows.map((r: any) => r.player.id)),
+    latest ? fetchComparisonSnapshot(latest) : Promise.resolve(null),
+  ]);
+  const basisDays =
+    comparison && latest ? daysBetween(latest, comparison.date) : null;
+  return {
+    basisDays,
+    rows: rows.map((r: any) => {
+      const s = statsMap.get(r.player.id);
+      const older = comparison?.ranks.get(r.player.id) ?? null;
+      return {
+        rank: r.rank,
+        priorRank: older,
+        playerId: r.player.id,
+        playerName: r.player.full_name,
+        country: r.player.country ?? null,
+        photoUrl: r.player.photo_url ?? null,
+        points: r.points ?? null,
+        // H11.4: rank delta over the 90-day window. Positive = climbed.
+        // This is member-analytics polarity (green up / red down) and it NEVER
+        // goes through getScoreColor, which carries the to-par polarity.
+        movement: comparison ? movementFrom(r.rank, older) : null,
+        wins: s?.wins ?? null,
+        top10s: s?.top10s ?? null,
+      };
+    }),
+  };
 }
 
 
-async function fetchSeasonBoard(tourCode: 'euro' | 'lpga' | 'liv' | 'pgad'): Promise<RankingsRow[]> {
+async function fetchSeasonBoard(
+  tourCode: 'euro' | 'lpga' | 'liv' | 'pgad',
+): Promise<RankingsBoardResult> {
   const year = new Date().getFullYear();
   const { data, error } = await supabase
     .from('tour_season_rankings' as any)
