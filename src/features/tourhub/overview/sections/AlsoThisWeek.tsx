@@ -6,7 +6,7 @@ import { useTourSelection } from '../../context/TourSelectionContext';
 import { tournamentRoute } from '../../routes';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { fmtScore } from '../../components/overview-v3/HybridHero.utils';
-import { FONT, INK, INK_MUTE, SURFACE, TREND_UP, WHITE_ALPHA_06 } from '../../_shared/tokens';
+import { FONT, INK, INK_MUTE, TREND_UP, WHITE_ALPHA_06 } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
 
 const SHORT_TOUR_LABELS: Record<string, string> = {
@@ -46,7 +46,7 @@ function OtherTournamentRow({ slide, last }: { slide: HeroSlide; last: boolean }
   const status = statusFor(slide);
   const tourLabel = SHORT_TOUR_LABELS[slide.tournament.tourSlug] ?? slide.tournament.tourName.replace(/\s+TOUR$/i, '');
   return (
-    <button type="button" onClick={() => navigate(target.to, { state: target.state })} style={{ width: '100%', minHeight: 58, padding: '10px 14px', display: 'grid', gridTemplateColumns: '62px minmax(0,1fr) auto', alignItems: 'center', columnGap: 12, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>
+    <button type="button" onClick={() => navigate(target.to, { state: target.state })} style={{ width: '100%', minHeight: 58, padding: '10px 24px', display: 'grid', gridTemplateColumns: '62px minmax(0,1fr) auto', alignItems: 'center', columnGap: 12, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>
       <span style={{ display: '-webkit-box', overflow: 'hidden', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, fontSize: 9.5, lineHeight: 1.15, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_MUTE }}>{tourLabel}</span>
       <span style={{ minWidth: 0 }}>
         <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14, fontWeight: 700 }}>{slide.tournament.name}</span>
@@ -66,5 +66,5 @@ export function AlsoThisWeek() {
     [slides, viewingTournamentId],
   );
   if (others.length === 0) return null;
-  return <section><OverviewSectionHead title={t('overview.alsoThisWeek.title')} /><div style={{ margin: '0 10px', overflow: 'hidden', borderRadius: 16, background: SURFACE }}>{others.map((slide, index) => <OtherTournamentRow key={slide.tournament.id} slide={slide} last={index === others.length - 1} />)}</div></section>;
+  return <section><OverviewSectionHead title={t('overview.alsoThisWeek.title')} /><div>{others.map((slide, index) => <OtherTournamentRow key={slide.tournament.id} slide={slide} last={index === others.length - 1} />)}</div></section>;
 }

@@ -1,4 +1,4 @@
-/** The inset, tappable photograph used only by the Tour Overview carousel. */
+/** The full-bleed, tappable photograph used only by the Tour Overview carousel. */
 import { useTranslation } from 'react-i18next';
 import { heroCanonBackground } from '../../../_shared/heroGradient';
 import { getScoreColor } from '../../../_shared/scoreColor';
@@ -75,13 +75,13 @@ export function PhotoBand({
       style={{
         position: 'relative',
         display: 'block',
-        width: 'calc(100% - 20px)',
+        width: '100%',
         height: heightPx,
-        margin: '0 10px',
+        margin: 0,
         padding: 0,
         overflow: 'hidden',
         border: 'none',
-        borderRadius: 18,
+        borderRadius: 0,
         background: heroCanonBackground(venueImageUrl, COURSE_GRADIENT, '50% 55%'),
         color: INK,
         fontFamily: FONT,
@@ -92,8 +92,8 @@ export function PhotoBand({
       <div
         style={{
           position: 'absolute',
-          left: 16,
-          right: 16,
+          left: 24,
+          right: 24,
           bottom: 16,
           display: 'flex',
           alignItems: 'flex-end',

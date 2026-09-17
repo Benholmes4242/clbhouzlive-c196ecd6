@@ -25,7 +25,7 @@
 export const PHOTO_BAND_HEIGHT = 340;   // 360 -> 306 -> 260 -> 286 -> 244 -> 340
 
 /**
- * OVERVIEW PHOTO BAND HEIGHT — 300, and it is the OVERVIEW's alone.
+ * OVERVIEW PHOTO BAND HEIGHT — 360, and it is the OVERVIEW's alone.
  *
  * BRIEF_TOUR_OVERVIEW_STRUCTURAL section B fixes the overview hero at 300px in
  * every state. PHOTO_BAND_HEIGHT stays 340 because OVERVIEW_HERO_HEIGHT is
@@ -33,7 +33,7 @@ export const PHOTO_BAND_HEIGHT = 340;   // 360 -> 306 -> 260 -> 286 -> 244 -> 34
  * story and StoryPage's hero — which this brief does not touch. Lowering the
  * shared constant would silently shorten both.
  */
-export const OVERVIEW_PHOTO_BAND_HEIGHT = 300;
+export const OVERVIEW_PHOTO_BAND_HEIGHT = 360;
 
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;
