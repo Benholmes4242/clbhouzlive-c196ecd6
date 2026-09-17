@@ -1,7 +1,7 @@
 /**
  * TourSelectionContext — channels between the (scoped) tour picker and the hero.
  *
- * Scope is local: only the OverviewHero (+ downstream TISlot)
+ * Scope is local to the Overview hero and its tournament-aware sections.
  * read from these fields. Every other section moved to its own local lens
  * in Phase 3-4.
  *

@@ -1,7 +1,7 @@
 /**
  * OverviewPageV3 - Tour Hub Overview
  *
- * Hero: the self-contained Hero River carousel (OverviewHero). Editorial modules follow in lazy sections.
+ * Hero: the self-contained Hero River carousel. Five independently absent overview sections follow.
  */
 
 import { useEffect } from 'react';
@@ -88,15 +88,7 @@ export function OverviewPageV3() {
             <WorldRankings />
             <OverviewNews />
 
-            {/* THE PAGE ENDS AT ALL FRANCHISES (device-walk-2 F). The
-                provenance line ("Leaderboards and rankings from the tours.
-                Ratings from clbhouz members.") and the hairline above it are
-                gone by ruling, and its locale key is retired in all six files
-                rather than left rendering an empty line. The foot now reserves
-                only the measured bottom-control clearance (NAV_CLEARANCE) —
-                the old `var(--bottom-nav-height, 96px)` left close to a
-                screenful of nothing, which reads as content that failed to
-                load. */}
+            {/* The page ends after News and reserves only measured bottom-nav clearance. */}
           </div>
         </div>
         <ScrollToTopGlass />
