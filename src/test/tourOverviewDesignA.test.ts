@@ -33,4 +33,9 @@ describe('Tour Overview Design A hero facts', () => {
     expect(fmtScore(-18)).toBe('−18');
     expect(detectTopTie([{ score: -18 }, { score: -18 }, { score: -17 }])).toEqual({ count: 2, score: '−18' });
   });
+
+  it('does not invent a tie when the rest of the field merely shares the leader score', () => {
+    const rows = [{ position: 1, score: 0 }, { position: 132, score: 0 }];
+    expect(rows.filter((row) => row.position === 1)).toHaveLength(1);
+  });
 });

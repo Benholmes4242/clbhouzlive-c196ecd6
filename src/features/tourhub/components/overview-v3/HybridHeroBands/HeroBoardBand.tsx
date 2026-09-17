@@ -248,7 +248,10 @@ export function HeroBoardSection({
   const { data: defending } = useTournamentDefendingChamp(upcoming ? tournamentId : null);
   const { data: lastYear } = useTournamentLastYearTop4(upcoming ? tournamentId : null);
   const { data: fieldStrength } = useTournamentFieldStrength(upcoming ? tournamentId : null);
-  const firstTee = teeTimes[0] ?? null;
+  const firstTeeCandidate = teeTimes[0] ?? null;
+  const firstTee = firstTeeCandidate?.time && firstTeeCandidate.time !== '\u2014'
+    ? firstTeeCandidate
+    : null;
   const priorWinner = lastYear?.find((row) => row.rank === '1' || row.rank === 'T1') ?? null;
   const threeUp = [
     firstTee ? { label: t('overview.hero.firstTee'), value: firstTee.time, sub: 'Thu, BST', color: INK } : null,

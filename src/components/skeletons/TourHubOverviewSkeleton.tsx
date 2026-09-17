@@ -24,7 +24,8 @@ export const TourHubOverviewSkeleton = () => (
           <Bar width={18} /><Bar width={row === 2 ? '72%' : '58%'} /><Bar width={26} /><Bar width={22} />
         </div>
       ))}
-      <div style={{ margin: '10px 12px', height: 44, borderRadius: 12, border: `1px solid ${WHITE_ALPHA_08}` }} />
+      <div style={{ margin: '6px 12px 4px', height: 44, borderRadius: 12, background: INK_TINT_06 }} />
+      <div style={{ margin: '4px 12px 10px', height: 44, borderRadius: 12, border: `1px solid ${WHITE_ALPHA_08}` }} />
     </div>
   </div>
 );
