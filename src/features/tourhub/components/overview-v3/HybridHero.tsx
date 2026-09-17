@@ -1,4 +1,4 @@
-/** Tour Overview's single 300px, three-state photographic hero. */
+/** Tour Overview's single 360px, three-state photographic hero. */
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '@/styles/hybrid-hero.css';
