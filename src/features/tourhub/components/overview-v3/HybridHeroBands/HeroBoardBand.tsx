@@ -51,20 +51,17 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { FONT, GOLD, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, SURFACE, WHITE_ALPHA_04, WHITE_ALPHA_08, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
 import { PlayerAvatar } from '../../PlayerAvatar';
 import { ClbhouzPickMark } from '../../../_shared/ClbhouzPickMark';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
-import { CourseShapePanel, useCourseShapeRows } from './CourseShapePanel';
-import {
-  fieldAverageToday,
-  lowRoundToday,
-  formatToParAvg,
-  formatToPar,
-} from '../../../overview/data/liveRoundStats';
+import { formatToPar } from '../../../overview/data/liveRoundStats';
+import { useTournamentTeeTimes } from '../../../hooks/useTournamentTeeTimes';
+import { useTournamentDefendingChamp } from '../../../hooks/useTournamentDefendingChamp';
+import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearTop4';
+import { useTournamentFieldStrength } from '../../../hooks/useTournamentFieldStrength';
 
 /**
  * SIX rows. It was five while the board occupied the photo band, because the
@@ -72,7 +69,7 @@ import {
  * would have buried the leader. Extending downward removes that constraint —
  * no chrome clearance applies here.
  */
-export const HERO_BOARD_ROWS = 6;
+export const HERO_BOARD_ROWS = 5;
 
 const FIGS = { fontVariantNumeric: 'tabular-nums' as const, fontFeatureSettings: '"kern" 1, "liga" 1' };
 const WON_LABEL = 'WON';
@@ -199,322 +196,122 @@ export function HeroBoardSection({
   onRowTap,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
-  const [shapeOpen, setShapeOpen] = useState(false);
   const [picksOpen, setPicksOpen] = useState(false);
+  const hasBoard = phase !== 'upcoming' && entries.length > 0;
 
-  /**
-   * §1 — THE BOARD HALF OF THE BAND IS CONDITIONAL. With no entries there are
-   * no rows, no full-leaderboard row, no stat strip and no course shape, and
-   * nothing reserves height for them. The picks row is then the only content.
-   */
-  const hasBoard = currentRound != null && entries.length > 0;
-
-  /* Passing an empty id keeps the hole-averages query DISABLED on a slide with
-     no board, so widening the gate costs zero requests. */
-  const shape = useCourseShapeRows(hasBoard ? tournamentId : '', currentRound ?? 1);
-
-  const field = useMemo(
-    () => (hasBoard ? fieldAverageToday(entries as any, currentRound as number) : null),
-    [entries, currentRound, hasBoard],
-  );
-  const low = useMemo(
-    () => (hasBoard ? lowRoundToday(entries as any, currentRound as number) : null),
-    [entries, currentRound, hasBoard],
-  );
-
-  /**
-   * Tournament Intelligence picks. NO NEW QUERY — the overview already makes
-   * this call for TIPicksCarousel, so this is a cache read.
-   */
-  // BRIEF SAID useTournamentPredictions().data.topContenders — that type has no
-  // topContenders (it exposes `predictions`). The overview's TI picks come from
-  // useAIPredictions(tournamentId), which TIPicksCarousel already calls with the
-  // same key, so this is a cache read and not a new query.
-  /**
-   * ZERO NEW REQUESTS (§4) DEPENDS ON THE KEY MATCHING TISlot's EXACTLY. TISlot
-   * reads the DEBOUNCED viewing id from TourSelection, so the band reads the
-   * same id rather than the active slide's: with the active id the two
-   * components hold different keys for 250ms after a swipe and React Query
-   * fires a SECOND fetch for the same tournament (measured: 4 ai_predictions
-   * requests per slide instead of 2). The cost is that the picks row lags the
-   * photograph by the same 250ms as the rest of the reporting.
-   */
-  /* AMENDMENT 1 §CHANGE 2 — the TOUR CODE comes off the SAME selection context
-     this band already reads for the tournament id, exactly as TISlot derives it
-     (`viewingTourSlug ?? 'pga'`). No new prop, no new query. */
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const pickTourCode = viewingTourSlug ?? 'pga';
   const picksTid = viewingTournamentId ?? tournamentId;
   const { data: predictions } = useAIPredictions(picksTid);
+  const picks = (predictions?.topContenders ?? []) as AITopContender[];
+  const hasPicks = picks.length > 0;
   const pickPlayerIds = useMemo(() => {
     const ids = new Set<string>();
-    for (const p of (predictions?.topContenders ?? []) as any[]) {
-      if (p?.playerId) ids.add(String(p.playerId));
-    }
+    for (const p of picks) if (p?.playerId) ids.add(String(p.playerId));
     return ids.size > 0 ? ids : undefined;
-  }, [predictions]);
+  }, [picks]);
 
-  /**
-   * Surnames of everyone on the low round — one when outright, all when shared.
-   * Read off the same completed-round figures lowRoundToday used, so the set can
-   * never disagree with the figure above it.
-   */
-  const holders = useMemo(() => {
-    if (!low || currentRound == null) return [] as string[];
-    const key = ['round_1', 'round_2', 'round_3', 'round_4'][currentRound - 1];
-    if (!key) return [] as string[];
-    const names: string[] = [];
-    for (const e of entries as any[]) {
-      const v = e?.[key];
-      if (v == null || Number(v) !== low.toPar) continue;
-      if (e?.thru != null && e.thru < 18) continue;
-      const full = (e?.player?.full_name ?? '').trim();
-      if (!full) continue;
-      const parts = full.split(/\s+/);
-      names.push(parts[parts.length - 1]);
-    }
-    if (names.length === 0 && low.playerName) {
-      const parts = low.playerName.trim().split(/\s+/);
-      names.push(parts[parts.length - 1]);
-    }
-    return names;
-  }, [entries, currentRound, low]);
-
-  // The gate lives in fieldAverageToday (20 completed rounds). Below it there is
-  // no field average at all — the strip renders the cells it can and omits the
-  // rest rather than averaging six players.
-  const hasStrip = !!field || !!low;
-
-  /**
-   * §2 — THE CLOSED ROW'S FIGURE, FOR THE PHASE. Everything here comes from the
-   * predictions cache read above joined against `entries`, which is already a
-   * prop (§4). No fetch, no RPC change.
-   */
-  const picks = (predictions?.topContenders ?? []) as AITopContender[];
   const boardByPlayer = useMemo(() => {
-    const m = new Map<string, { position: number | null; tied: boolean; score: number | null }>();
-    for (const e of entries as any[]) {
-      const id = e?.player?.id;
+    const map = new Map<string, { position: number | null; tied: boolean; score: number | null }>();
+    for (const entry of entries as any[]) {
+      const id = entry?.player?.id;
       if (!id) continue;
-      m.set(String(id), {
-        position: e?.position ?? null,
-        tied: !!e?.position_tied,
-        score: e?.score ?? null,
-      });
+      map.set(String(id), { position: entry.position ?? null, tied: Boolean(entry.position_tied), score: entry.score ?? null });
     }
-    return m;
+    return map;
   }, [entries]);
 
   const closedFigure = useMemo(() => {
-    if (picks.length === 0) return null;
-
-    /* LIVE and COMPLETE — the BEST-PLACED pick. A pick with no board line
-       (withdrawn, missed cut, not in the field) simply cannot be the best-placed
-       one, so it is skipped; when NONE of the picks has a line the row falls
-       back to the PRE treatment rather than printing a blank figure.
-
-       AMENDMENT 1 §CHANGE 1 — THE LIVE ROW DROPS THE POSITION. The leaderboard
-       sits directly above this row, so -7 reads against a visible leader on -9
-       without repeating the position: two tokens scan in one beat, three do not.
-       COMPLETE IS THE EXCEPTION AND KEEPS IT — on a finished tournament the
-       position IS the receipt ("T4" says how the pick did; "-7" does not). */
-    if (phase === 'live' || phase === 'completed') {
-      let best: { pick: AITopContender; position: number; tied: boolean; score: number | null } | null = null;
-      for (const p of picks) {
-        const line = boardByPlayer.get(String(p.playerId));
-        if (!line || line.position == null) continue;
-        if (!best || line.position < best.position) {
-          best = { pick: p, position: line.position, tied: line.tied, score: line.score };
-        }
-      }
-      if (best) {
-        /* MICRO_BRIEF_PICKS_ROW_WINNER §2 — A WIN IS NOT AN ORDINAL. A pick that
-           finished 1st OUTRIGHT on a settled result reads WON in GOLD (the
-           celebratory token, same value as the majors numerals and the crown).
-           NOT amber — amber is the viewing member. A TIED FIRST IS NOT A WIN:
-           `T1` stays a numeral, and useHeroCarouselData re-buckets a tied top
-           with no confirmed winner into LIVE, so an unsettled playoff can never
-           reach this branch. */
-        const settled = phase === 'completed' ? settledFigureFor(best) : null;
-        return {
-          name: surnameOf(best.pick.playerName),
-          right: settled?.right ?? null,
-          rightColor: settled?.rightColor ?? WHITE_ALPHA_65,
-          figure: settled?.figure ?? (best.score == null ? null : formatToPar(best.score)),
-          figureColor: settled?.figureColor ?? tourFigColor(best.score),
-        };
-      }
-
-      /* MICRO_BRIEF_PICKS_ROW_WINNER §1 — NO WIN PROBABILITY ON A LIVE OR
-         COMPLETED SLIDE, IN ANY PATH. When no pick has a board line (withdrawn,
-         missed cut, not in the field) the row shows the top-ranked pick's NAME
-         ONLY. It never falls through to the PRE percentage. */
-      const ranked = [...picks].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))[0];
-      if (!ranked) return null;
-      return {
-        name: surnameOf(ranked.playerName),
-        right: null,
-        rightColor: WHITE_ALPHA_65,
-        figure: null,
-        figureColor: '#FFFFFF',
-      };
+    if (!hasPicks) return null;
+    const ranked = [...picks].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
+    if (phase === 'upcoming') {
+      const names = ranked.slice(0, 3).map((pick) => surnameOf(pick.playerName)).filter(Boolean);
+      return names.length > 0 ? `${names.join(', ')} to win` : null;
     }
+    const placed = ranked
+      .map((pick) => ({ pick, line: boardByPlayer.get(String(pick.playerId)) }))
+      .filter((item) => item.line?.position != null)
+      .sort((a, b) => (a.line?.position ?? 999) - (b.line?.position ?? 999));
+    if (placed.length === 0) return surnameOf(ranked[0]?.playerName) || null;
+    if (phase === 'completed') {
+      const best = placed[0];
+      const settled = settledFigureFor(best.line);
+      return settled?.right === WON_LABEL
+        ? `Picked ${surnameOf(best.pick.playerName)} to win · ${WON_LABEL}`
+        : `${surnameOf(best.pick.playerName)} ${settled?.right ?? ''}`.trim();
+    }
+    return placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', ');
+  }, [boardByPlayer, hasPicks, phase, picks]);
 
-    /* PRE ONLY — the TOP-RANKED pick and its win probability. Before a
-       tournament a probability is the only thing a pick can say. UNCHANGED. */
-    const top = [...picks].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))[0];
-    if (!top) return null;
-    return {
-      name: surnameOf(top.playerName),
-      right: null,
-      rightColor: WHITE_ALPHA_65,
-      figure: top.winProbability != null ? `${Math.round(top.winProbability)}%` : null,
-      figureColor: '#FFFFFF',
-    };
-  }, [picks, phase, boardByPlayer]);
+  const upcoming = phase === 'upcoming';
+  const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, upcoming);
+  const { data: defending } = useTournamentDefendingChamp(upcoming ? tournamentId : null);
+  const { data: lastYear } = useTournamentLastYearTop4(upcoming ? tournamentId : null);
+  const { data: fieldStrength } = useTournamentFieldStrength(upcoming ? tournamentId : null);
+  const firstTee = teeTimes[0] ?? null;
+  const priorWinner = lastYear?.find((row) => row.rank === '1' || row.rank === 'T1') ?? null;
+  const threeUp = [
+    firstTee ? { label: t('overview.hero.firstTee'), value: firstTee.time, sub: 'Thu, BST', color: INK } : null,
+    defending?.name ? { label: t('overview.hero.defending'), value: surnameOf(defending.name), sub: priorWinner?.score || defending.score || null, color: priorWinner?.score?.startsWith('-') ? TOPAR_UNDER_DARK : INK } : null,
+    fieldStrength?.topRanked != null ? { label: t('overview.hero.field'), value: `${fieldStrength.topRanked} of top 20`, sub: t('overview.hero.worldRanked'), color: INK } : null,
+  ].filter((cell): cell is { label: string; value: string; sub: string | null; color: string } => Boolean(cell));
+  const hasThreeUp = threeUp.length > 0;
 
-  /* §1 / ACCEPTANCE D — with neither a board nor picks there is nothing to
-     render, and no reserved height for the absence. */
-  if (!hasBoard) return null;
-
+  if (!hasBoard && !hasThreeUp && !hasPicks) return null;
 
   return (
-    <div
-      style={{
-        background: A.CANVAS,
-        fontFamily: FONT,
-        overflow: 'hidden',
-      }}
-    >
-      {hasBoard && (
+    <div style={{ margin: '10px 10px 0', borderRadius: 16, background: SURFACE, fontFamily: FONT, overflow: 'hidden' }}>
+      {hasBoard ? (
         <MiniBoard
           tournamentId={tournamentId}
           entries={entries}
-          limit={HERO_BOARD_ROWS}
-          currentRound={currentRound as number}
+          limit={5}
+          currentRound={currentRound}
           theme="heroBoard"
+          phase={phase === 'completed' ? 'completed' : 'live'}
           pickPlayerIds={pickPlayerIds}
           onRowTap={onRowTap}
         />
-      )}
+      ) : null}
 
-      {hasBoard && (
+      {hasThreeUp ? (
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${threeUp.length}, minmax(0, 1fr))`, padding: '14px 12px 10px' }}>
+          {threeUp.map((cell, index) => (
+            <div key={cell.label} style={{ minWidth: 0, padding: '0 10px', textAlign: 'center', borderLeft: index === 0 ? 'none' : `1px solid ${WHITE_ALPHA_08}` }}>
+              <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{cell.label}</div>
+              <div style={{ marginTop: 4, fontSize: 16, fontWeight: 700, color: cell.color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cell.value}</div>
+              {cell.sub ? <div style={{ marginTop: 2, fontSize: 11, color: cell.color === TOPAR_UNDER_DARK ? TOPAR_UNDER_DARK : WHITE_ALPHA_65, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cell.sub}</div> : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {hasPicks && closedFigure ? (
+        <>
+          <button
+            type="button"
+            onClick={() => setPicksOpen((open) => !open)}
+            aria-expanded={picksOpen}
+            style={{ width: 'calc(100% - 24px)', minHeight: 44, margin: '6px 12px 4px', padding: '11px 12px', display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr) auto', alignItems: 'center', gap: 10, border: 'none', borderRadius: 12, background: WHITE_ALPHA_04, color: INK, textAlign: 'left', cursor: 'pointer', fontFamily: FONT }}
+          >
+            {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
+            <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
+            <span style={{ minWidth: 0, fontSize: 13, color: 'rgba(248,250,252,0.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{closedFigure}</span>
+            <ChevronDown size={16} style={{ transform: picksOpen ? 'rotate(180deg)' : undefined }} />
+          </button>
+          {picksOpen ? <PicksPanel picks={picks} tourCode={pickTourCode} phase={phase} boardByPlayer={boardByPlayer} predictions={predictions ?? null} /> : null}
+        </>
+      ) : null}
+
+      {hasBoard ? (
         <button
           type="button"
           onClick={onFullLeaderboard}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: '100%',
-            padding: '10px 16px',
-            background: 'transparent',
-            border: 'none',
-            borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
-            fontFamily: FONT,
-            cursor: 'pointer',
-          }}
-          className="active:bg-white/[0.06] transition-colors"
+          style={{ width: 'calc(100% - 24px)', minHeight: 44, margin: '4px 12px 10px', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
         >
-          <span
-            style={{
-              fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              color: WHITE_ALPHA_65,
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('overview.ticker.fullLeaderboard')}
-          </span>
-          <ChevronRight size={14} color="#FFFFFF" strokeWidth={2.5} />
+          {phase === 'completed' ? t('overview.ticker.fullResults') : t('overview.ticker.fullLeaderboard')}
         </button>
-      )}
-
-      {hasStrip && (
-        <div
-          style={{
-            padding: '12px 16px 16px',
-            background: A.CANVAS,
-            borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
-          }}
-        >
-          <div style={{ display: 'flex', gap: 10 }}>
-            {field && (
-              <StatCell
-                align="left"
-                label={t('overview.onTheCourse.fieldAverageToday')}
-                value={formatToParAvg(field.avg)}
-                color={tourFigColor(field.avg)}
-              />
-            )}
-            {low && (
-              <StatCell
-                align="center"
-                label={t('overview.onTheCourse.lowRoundLabel')}
-                value={formatToPar(low.toPar)}
-                color={tourFigColor(low.toPar)}
-              />
-            )}
-            {field && field.count > 0 && (
-              <StatCell
-                align="right"
-                label={t('overview.onTheCourse.underParTodayLabel')}
-                value={t('overview.onTheCourse.underParTodayValue', {
-                  n: field.underPar,
-                })}
-              />
-            )}
-          </div>
-          {/*
-            ONE BASIS LINE FOR THE WHOLE STRIP (section C). Three per-cell
-            sub-labels were three ways of saying the same sample: every figure
-            here is derived from the SAME set of completed rounds in the same
-            round, so the sample is stated once, in full, beneath them. The rule
-            that every figure carries its sample is satisfied by one line
-            covering all three; it is not satisfied by dropping it.
-
-            The low round's HOLDERS stay on this line rather than being lost
-            with the sub-labels: a name is data, not a caption.
-          */}
-          <div
-            style={{
-              marginTop: 8,
-              fontSize: 11,
-              fontWeight: 600,
-              lineHeight: '15px',
-              color: WHITE_ALPHA_65,
-            }}
-          >
-            {field
-              ? t('overview.onTheCourse.figuresBasis', {
-                  n: field.count,
-                  round: currentRound ?? 1,
-                })
-              : /* BELOW THE 20-ROUND GATE there is no field average and no
-                   count to quote, so the line says what the low round is drawn
-                   from instead of inventing a sample size. */
-                t('overview.onTheCourse.figuresBasisLowOnly', {
-                  round: currentRound ?? 1,
-                })}
-            {low && holders.length > 0
-              ? ` ${t('overview.onTheCourse.figuresBasisLow', { names: holders.join(', ') })}`
-              : ''}
-          </div>
-        </div>
-      )}
-
-      {/* The magazine brief supersedes both disclosure rows: real course-shape
-          facts are now flat in the tournament body, while Tournament
-          Intelligence is a separate conditional card immediately after it. */}
-      {shape.usable && (
-        <div style={{ borderTop: `0.5px solid ${WHITE_ALPHA_12}` }}>
-          <div style={{ padding: '10px 16px 4px', fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: WHITE_ALPHA_65, textTransform: 'uppercase' }}>
-            {t('overview.onTheCourse.courseShapeLabel')}
-          </div>
-          <CourseShapePanel rows={shape.rows} />
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }
