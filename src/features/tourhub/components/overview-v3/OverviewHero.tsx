@@ -43,17 +43,7 @@ interface OverviewHeroProps {
 export const OVERVIEW_HERO_HEIGHT = `${PHOTO_BAND_HEIGHT}px`;
 
 /** Wire-ticker band height (kept in sync with HeroWireTicker). */
-export const OVERVIEW_HERO_TICKER_HEIGHT = 36;
-
-/**
- * Full hero container height = photo band + wire ticker.
- *
- * Section B: the OVERVIEW's photo band is 300 (OVERVIEW_PHOTO_BAND_HEIGHT), so
- * the container is 336. OVERVIEW_HERO_HEIGHT above stays 340 for the two news
- * surfaces that import it and are outside this brief.
- */
-export const OVERVIEW_HERO_TOTAL_HEIGHT =
-  `${OVERVIEW_PHOTO_BAND_HEIGHT + OVERVIEW_HERO_TICKER_HEIGHT}px`;
+export const OVERVIEW_HERO_TOTAL_HEIGHT = `${OVERVIEW_PHOTO_BAND_HEIGHT}px`;
 
 export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
@@ -203,6 +193,12 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
     }
   };
 
+  const openTournament = useCallback(() => {
+    if (!viewingTid || Math.abs(touchDeltaRef.current) > 10) return;
+    const target = tournamentRoute(viewingTid, { kind: 'overview' });
+    navigate(target.to, { state: target.state });
+  }, [navigate, viewingTid]);
+
   if (isLoading || count === 0) {
     return (
       <div
@@ -247,6 +243,7 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
             slide={active}
             activeTournamentId={active.tournament.id}
             onSelectTour={NOOP}
+            onOpenTournament={openTournament}
           />
         </motion.div>
       </AnimatePresence>
@@ -275,7 +272,7 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
         >
           <HeroBoardSection
             tournamentId={bandTournamentId}
-            entries={boardEntries as any[]}
+            entries={boardEntries}
             currentRound={boardRound}
             phase={bandPhase}
             onFullLeaderboard={() => {
