@@ -130,7 +130,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     return (
       <>
         <div style={{ background: T.surface, fontFamily: FONT }}>
-          <div style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', minHeight: 32, padding: '4px 24px', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
+          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', minHeight: 32, padding: '4px 24px', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div>{t('board.columns.player')}</div>
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>

@@ -10,10 +10,10 @@ import {
   LEADER_GOLD,
   STATUS_LIVE_ON_DARK,
   SURFACE,
-  WHITE_ALPHA_12,
 } from '../../../_shared/tokens';
 import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
 import { fmtScore, type HeroState } from '../HybridHero.utils';
+import { DARK_CHROME_GLASS_MATERIAL } from '@/features/chrome-v2/ChromeIsland';
 
 export interface OverviewCountdownUnit {
   value: number;
@@ -113,9 +113,8 @@ export function PhotoBand({
               minHeight: 28,
               marginBottom: 8,
               padding: '0 10px',
-              border: `1px solid ${WHITE_ALPHA_12}`,
               borderRadius: 999,
-              background: 'rgba(20,22,26,0.60)',
+              ...DARK_CHROME_GLASS_MATERIAL,
               ...CAPS,
             }}
           >
@@ -157,7 +156,7 @@ export function PhotoBand({
         {isUpcoming && countdown.length > 0 ? (
           <div style={{ display: 'flex', gap: 6, flex: 'none' }}>
             {countdown.map((unit) => (
-              <div key={unit.label} style={{ minWidth: 50, padding: '8px 10px', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, background: 'rgba(20,22,26,0.60)', textAlign: 'center' }}>
+              <div key={unit.label} style={{ minWidth: 50, padding: '8px 10px', borderRadius: 12, textAlign: 'center', ...DARK_CHROME_GLASS_MATERIAL }}>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 24, lineHeight: 1, fontWeight: 700 }}>{unit.value}</div>
                 <div style={{ ...CAPS, marginTop: 5, fontSize: 9 }}>{t(`overview.hero.${unit.label}`)}</div>
               </div>

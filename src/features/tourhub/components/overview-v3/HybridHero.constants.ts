@@ -25,15 +25,15 @@
 export const PHOTO_BAND_HEIGHT = 340;   // 360 -> 306 -> 260 -> 286 -> 244 -> 340
 
 /**
- * OVERVIEW PHOTO BAND HEIGHT — 360, and it is the OVERVIEW's alone.
+ * OVERVIEW PHOTO BAND HEIGHT — 386, and it is the OVERVIEW's alone.
  *
- * BRIEF_TOUR_OVERVIEW_FULL_BLEED H2 fixes the overview hero at 360px in
- * every state. PHOTO_BAND_HEIGHT stays 340 because OVERVIEW_HERO_HEIGHT is
+ * H9 extends the full-bleed overview photograph to close the measured seam at
+ * its foot. PHOTO_BAND_HEIGHT stays 340 because OVERVIEW_HERO_HEIGHT is
  * derived from it and read by TWO NEWS SURFACES — NewsTab's immersive lead
  * story and StoryPage's hero — which this brief does not touch. Lowering the
  * shared constant would silently shorten both.
  */
-export const OVERVIEW_PHOTO_BAND_HEIGHT = 360;
+export const OVERVIEW_PHOTO_BAND_HEIGHT = 386;
 
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;

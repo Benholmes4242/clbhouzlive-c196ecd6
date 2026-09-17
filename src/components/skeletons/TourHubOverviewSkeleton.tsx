@@ -2,7 +2,7 @@
  * Tour Overview loading silhouette.
  *
  * A skeleton block is updated in the same pass as its section, never later.
- * Only the two certain blocks render: the 360px hero and its flat board rows.
+ * Only the two certain blocks render: the 386px hero and its flat board rows.
  */
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { INK_TINT_06, WHITE_ALPHA_06 } from '@/features/tourhub/_shared/tokens';

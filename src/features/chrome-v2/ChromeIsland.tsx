@@ -56,6 +56,14 @@ const ISLAND_H = 44;
 const TOP_GAP = 10;
 const HEADER_H = 70; // 10 gap + 44 island + 16 canon islandClearance
 
+/** Shared dark glass material for controls that visually belong to the chrome islands. */
+export const DARK_CHROME_GLASS_MATERIAL: React.CSSProperties = {
+  background: 'rgba(20,22,28,0.72)',
+  border: '1px solid rgba(255,255,255,0.12)',
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
+};
+
 export const CHROME_LOGO_SRC = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 
 const HCP_IMPROVING = '#16a34a';
@@ -111,12 +119,12 @@ function glassStyle(tone: ChromeTone): React.CSSProperties {
   return {
     height: ISLAND_H,
     borderRadius: r.xl,
-    background: isLight ? 'rgba(255,255,255,0.72)' : 'rgba(20,22,28,0.72)',
-    border: isLight
-      ? '1px solid rgba(0,0,0,0.06)'
-      : '1px solid rgba(255,255,255,0.12)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
+    ...(isLight ? {
+      background: 'rgba(255,255,255,0.72)',
+      border: '1px solid rgba(0,0,0,0.06)',
+      backdropFilter: 'blur(16px)',
+      WebkitBackdropFilter: 'blur(16px)',
+    } : DARK_CHROME_GLASS_MATERIAL),
     boxShadow: '0 4px 20px rgba(0,0,0,0.10)',
     pointerEvents: 'auto',
     display: 'flex',
