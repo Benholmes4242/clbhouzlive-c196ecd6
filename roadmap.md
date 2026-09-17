@@ -29,7 +29,7 @@ Tour Overview Design A
 - [x] Wrap tied-leader labels without changing the LIVE badge
 - [x] Restyle tournament actions as right-aligned links
 - [x] Rebuild the gated venue destination with an optional course image
-- [ ] Verify 320/390 states, venue bottom measurement, types, tests, and build
+- [x] Verify 320/390 states, venue bottom measurement, types, tests, and build
 
 ## Explore kicker and achievement marks
 - [x] Structure kicker copy as scope and course
