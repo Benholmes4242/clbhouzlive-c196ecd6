@@ -52,5 +52,5 @@ Tour Overview Design A
 ## Tour Overview H10
 - [x] Replace Also This Week tour column with full-name kicker above a two-line tournament name
 - [x] Align Coming Up kickers to the same full tour-name grammar
-- [ ] Verify long names, absent score columns, two-line clamping, 320/390 overflow, types, tests, and build
+- [x] Verify long names, absent score columns, two-line clamping, 320/390 overflow, types, tests, and build
 
