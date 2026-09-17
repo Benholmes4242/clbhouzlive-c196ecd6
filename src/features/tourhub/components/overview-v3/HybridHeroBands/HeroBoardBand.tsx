@@ -355,7 +355,7 @@ function PicksPanel({
   const hasConfidence = predictions?.isAIPowered;
 
   return (
-    <div style={{ background: A.PANEL, borderTop: `0.5px solid ${WHITE_ALPHA_12}` }}>
+    <div style={{ background: SURFACE, borderTop: `0.5px solid ${WHITE_ALPHA_12}` }}>
       {/* Editorial framing when populated — and NO empty row when it is not. */}
       {predictions?.editorialFraming ? (
         <div
