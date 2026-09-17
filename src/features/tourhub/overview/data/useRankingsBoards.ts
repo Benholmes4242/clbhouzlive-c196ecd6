@@ -74,7 +74,66 @@ async function fetchOwgrStats(
   return out;
 }
 
-async function fetchOwgr(): Promise<RankingsRow[]> {
+/**
+ * H11.1 — the 90-day movement window.
+ *
+ * sr_world_rankings keeps real history (30 snapshots, 2026-01-29 -> 2026-09-14,
+ * 228 days covered), so the delta is measured at 90 days exactly: the most
+ * recent ranking_date on or before (latest - 90 days), NOT the oldest row.
+ * `basisDays` reports the window actually used so the basis line can never
+ * claim 90 days over a shorter span.
+ *
+ * tour_season_rankings carries no history at all (one scraped_at, one row per
+ * player), so the Race to Dubai / LPGA / Korn Ferry boards return
+ * basisDays = null and movement = null: no column, no basis line, no dashes.
+ */
+const MOVEMENT_WINDOW_DAYS = 90;
+
+export interface RankingsBoardResult {
+  rows: RankingsRow[];
+  /** Days between the compared snapshots, or null when this board has no history. */
+  basisDays: number | null;
+}
+
+function isoMinusDays(iso: string, days: number): string {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - days);
+  return d.toISOString().slice(0, 10);
+}
+
+function daysBetween(laterIso: string, earlierIso: string): number {
+  const ms =
+    new Date(`${laterIso}T00:00:00Z`).getTime() - new Date(`${earlierIso}T00:00:00Z`).getTime();
+  return Math.round(ms / 86_400_000);
+}
+
+/** The comparison snapshot: newest ranking_date on or before (latest - 90 days). */
+async function fetchComparisonSnapshot(
+  latestDate: string,
+): Promise<{ date: string; ranks: Map<string, number> } | null> {
+  const cutoff = isoMinusDays(latestDate, MOVEMENT_WINDOW_DAYS);
+  const { data: dateRows, error: dateErr } = await supabase
+    .from('sr_world_rankings')
+    .select('ranking_date')
+    .lte('ranking_date', cutoff)
+    .order('ranking_date', { ascending: false })
+    .limit(1);
+  if (dateErr) return null;
+  const date = (dateRows ?? [])[0]?.ranking_date ?? null;
+  if (!date) return null;
+  const { data, error } = await supabase
+    .from('sr_world_rankings')
+    .select('player_id, rank')
+    .eq('ranking_date', date);
+  if (error) return null;
+  const ranks = new Map<string, number>();
+  ((data ?? []) as any[]).forEach((r) => {
+    if (r.player_id && typeof r.rank === 'number' && r.rank >= 1) ranks.set(r.player_id, r.rank);
+  });
+  return { date, ranks };
+}
+
+async function fetchOwgr(): Promise<RankingsBoardResult> {
   const { data, error } = await supabase
     .from('sr_world_rankings')
     .select(`
