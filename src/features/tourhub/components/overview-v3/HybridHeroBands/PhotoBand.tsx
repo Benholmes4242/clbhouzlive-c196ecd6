@@ -72,6 +72,9 @@ export function PhotoBand({
       type="button"
       onClick={onOpen}
       aria-label={title}
+      data-overview-photo-band
+      data-overview-photo-state={state.kind}
+      data-overview-photo-fallback={venueImageUrl ? undefined : 'true'}
       style={{
         position: 'relative',
         display: 'block',

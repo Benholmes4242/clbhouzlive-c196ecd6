@@ -2,12 +2,20 @@ import { describe, expect, it } from 'vitest';
 import { formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
+import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
+import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 
 const NOW = new Date('2026-09-17T12:00:00Z');
 
 describe('Tour Overview Design A hero facts', () => {
+  it('keeps the overview at 360 without changing the shared news hero height', () => {
+    expect(OVERVIEW_PHOTO_BAND_HEIGHT).toBe(360);
+    expect(OVERVIEW_HERO_TOTAL_HEIGHT).toBe('360px');
+    expect(PHOTO_BAND_HEIGHT).toBe(340);
+    expect(OVERVIEW_HERO_HEIGHT).toBe('340px');
+  });
   it('uses days and hours under 48 hours out', () => {
     expect(getOverviewCountdown('2026-09-19T11:00:00Z', NOW)).toEqual([
       { value: 1, label: 'days' },

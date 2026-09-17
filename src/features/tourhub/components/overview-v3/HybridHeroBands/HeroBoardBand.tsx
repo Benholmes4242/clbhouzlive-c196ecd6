@@ -317,6 +317,7 @@ export function HeroBoardSection({
         <button
           type="button"
           onClick={onFullLeaderboard}
+          data-overview-board-cta
           style={{ width: '100%', minHeight: 44, margin: 0, padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, border: 'none', borderTop: `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
         >
           {phase === 'completed' ? t('overview.ticker.fullResults') : phase === 'upcoming' ? t('overview.leaderboardBand.ctaUpcoming') : t('overview.ticker.fullLeaderboard')}
