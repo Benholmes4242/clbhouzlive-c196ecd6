@@ -33,6 +33,10 @@ export function isAlsoThisWeek(slide: HeroSlide, now = new Date()): boolean {
   return start.getTime() <= sunday.getTime();
 }
 
+export function shouldShowAlsoThisWeekFigures(slide: Pick<HeroSlide, 'type' | 'tournament'>): boolean {
+  return slide.type !== 'upcoming' && slide.tournament.leaderScore != null && Boolean(slide.tournament.leaderName?.trim());
+}
+
 function OtherTournamentRow({ slide, last }: { slide: HeroSlide; last: boolean }) {
   const navigate = useNavigate();
   const score = slide.tournament.leaderScore;
@@ -42,7 +46,7 @@ function OtherTournamentRow({ slide, last }: { slide: HeroSlide; last: boolean }
   const target = tournamentRoute(slide.tournament.id, { kind: 'overview' });
   const status = statusFor(slide);
   const tourLabel = fullTourLabel(slide.tournament.tourSlug, slide.tournament.tourName);
-  const hasFigures = score != null && name != null;
+  const hasFigures = shouldShowAlsoThisWeekFigures(slide) && name != null;
   return (
     <button type="button" onClick={() => navigate(target.to, { state: target.state })} style={{ width: '100%', minHeight: 76, padding: '13px 24px', display: 'grid', gridTemplateColumns: hasFigures ? 'minmax(0,1fr) auto' : 'minmax(0,1fr)', alignItems: 'center', columnGap: 12, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>
       <span style={{ minWidth: 0 }}>

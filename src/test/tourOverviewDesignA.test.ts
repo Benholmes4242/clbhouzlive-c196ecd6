@@ -4,7 +4,7 @@ import { detectTopTie, fmtScore } from '@/features/tourhub/components/overview-v
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
-import { isAlsoThisWeek, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
+import { isAlsoThisWeek, shouldShowAlsoThisWeekFigures, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
 import { fullTourLabel } from '@/features/tourhub/_shared/tourOrder';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 
@@ -110,5 +110,12 @@ describe('Tour Overview correctness gates', () => {
     expect(['pga', 'euro', 'lpga', 'pgad', 'champ', 'liv'].map((tour) => fullTourLabel(tour))).toEqual([
       'PGA TOUR', 'DP WORLD TOUR', 'LPGA TOUR', 'KORN FERRY TOUR', 'CHAMPIONS TOUR', 'LIV GOLF',
     ]);
+  });
+
+  it('removes the entire figures column before a tournament starts', () => {
+    const tournament = { leaderScore: -8, leaderName: 'Maria Player' } as HeroSlide['tournament'];
+    expect(shouldShowAlsoThisWeekFigures({ type: 'upcoming', tournament })).toBe(false);
+    expect(shouldShowAlsoThisWeekFigures({ type: 'live', tournament })).toBe(true);
+    expect(shouldShowAlsoThisWeekFigures({ type: 'live', tournament: { ...tournament, leaderScore: null } })).toBe(false);
   });
 });
