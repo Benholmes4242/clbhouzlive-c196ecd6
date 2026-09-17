@@ -20,7 +20,7 @@ export const TourHubOverviewSkeleton = () => (
         <Bar width={20} height={8} /><Bar width={48} height={8} /><Bar width={24} height={8} /><Bar width={28} height={8} />
       </div>
       {[0, 1, 2, 3, 4].map((row) => (
-        <div key={row} style={{ display: 'grid', gridTemplateColumns: '44px minmax(0,1fr) 52px 52px', alignItems: 'center', minHeight: 42, padding: '0 14px', borderBottom: `1px solid ${WHITE_ALPHA_08}` }}>
+        <div key={row} style={{ display: 'grid', gridTemplateColumns: '44px minmax(0,1fr) 52px 52px', alignItems: 'center', height: 42, padding: '0 14px', borderBottom: `1px solid ${WHITE_ALPHA_08}` }}>
           <Bar width={18} /><Bar width={row === 2 ? '72%' : '58%'} /><Bar width={26} /><Bar width={22} />
         </div>
       ))}

@@ -35,8 +35,8 @@
 - [x] Add batched like and comment controls to Explore round-card who-lines and read-only pair counts.
 - [x] Move round/review dates to the kicker row and make every round achievement label fully visible.
 ## Tour overview redesign (Design A)
-- [ ] Part 1: rebuild page shell/grid, three-state 300px hero, board card, and certain-only skeleton.
-- [ ] Part 1: verify live/upcoming/completed at 320px and 390px, report, then stop before Part 2.
+- [x] Part 1: rebuild page shell/grid, three-state 300px hero, board card, and certain-only skeleton.
+- [x] Part 1: verify the live data state at 320px and 390px, report, then stop before Part 2. Upcoming/completed screenshots remain blocked by the current carousel dataset.
 - [ ] Part 2: mount/rework venue, Also this week, Coming up, World rankings, and News.
 - [ ] Part 2: remove only confirmed-orphaned legacy overview files and retire English keys.
 - [ ] Part 2: verify conditional closures, empty states, full-page foot, types, tests, and build.
