@@ -467,6 +467,7 @@
       "ratingFrom_one": "de {{count}} valoracion",
       "ratingFrom_other": "de {{count}} valoraciones",
       "sectionKicker": "La sede de esta semana en clbhouz",
+      "viewCourse": "Ver campo",
       "ratingLabel": "Valoracion de los miembros",
       "basis_one": "De {{count}} valoracion de miembros que han jugado alli.",
       "basis_other": "De {{count}} valoraciones de miembros que han jugado alli.",

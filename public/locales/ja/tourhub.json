@@ -463,6 +463,7 @@
       "ratingFrom_one": "{{count}} ken no hyoka",
       "ratingFrom_other": "{{count}} ken no hyoka",
       "sectionKicker": "clbhouz: konshu no kaijo",
+      "viewCourse": "Course wo miru",
       "ratingLabel": "Member hyoka",
       "basis_one": "Play shita member {{count}} ken no hyoka.",
       "basis_other": "Play shita member {{count}} ken no hyoka.",
