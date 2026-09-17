@@ -2,9 +2,8 @@ import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { BottomSheet } from '@/components/ui/BottomSheet';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
-import { TrajectoryLine } from './TrajectoryLine';
+import { ScorecardGlassOverlay } from './ScorecardGlassOverlay';
 import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
 import {
   honoursGround,
@@ -41,7 +40,7 @@ export interface CardScorecardHole {
   holeNo: number;
   par: number | null;
   strokes: number | null;
-  /** Optional field average for the trajectory comparison and scrub readout. */
+  /** Optional field average retained for course-context comparisons. */
   fieldAvg?: number | null;
 }
 
@@ -91,13 +90,8 @@ export interface CardScorecardSheetProps {
   emptyGross?: number | null;
   emptyToPar?: number | null;
 
-  /**
-   * Optional overrides merged into the BottomSheet surface style LAST. Used
-   * by the /round page to host the sheet full-height so its charcoal surface
-   * continues to the top of the viewport instead of stopping at 85dvh and
-   * leaving a backdrop-dimmed band above it.
-   */
-  sheetStyle?: React.CSSProperties;
+  /** Dedicated /round host. Every other caller uses the floating glass card. */
+  presentation?: 'overlay' | 'page';
 
   /** 'member' (default) or 'tour'. Changes copy and stat labels only. */
   surface?: 'member' | 'tour';
@@ -109,8 +103,7 @@ export interface CardScorecardSheetProps {
    * excluded). OPTIONAL AND DEFAULTING ABSENT: the tour caller never passes it.
    *
    * The per-hole FIELD row and its pool-basis / gate-fail copy were removed by
-   * decision. This count remains because the independent beat-the-field
-   * trajectory comparison still needs the five-player gate.
+   * decision. This count remains for the independent beat-the-field summary.
    */
   fieldPlayers?: number | null;
 
@@ -154,12 +147,6 @@ export interface CardScorecardSheetProps {
    * all of them, and then nothing renders.
    */
   feat?: HonoursFeat | null;
-  /*
-   * BRIEF_ROUND_SHEET §1.1 — HALF-HEIGHT OPEN, OPT-IN AND PASSED THROUGH.
-   * Absent (the tour surface, /round) the sheet behaves exactly as before.
-   */
-  detents?: ['mid', 'full'];
-  onDetentChange?: (detent: 'mid' | 'full') => void;
   onHorizontalDrag?: {
     onStart: () => void;
     onMove: (dx: number) => void;
@@ -187,11 +174,6 @@ export interface CardScorecardSheetProps {
    * the content, so the two travel together. Absent for every other consumer.
    */
   pagePreview?: { node: React.ReactNode; side: 'next' | 'prev' } | null;
-  /** §1 — changes with the round, so BottomSheet remeasures mid after a page. */
-  midKey?: string | number;
-  /** BRIEF_ROUND_SHEET_TALL §1 — DEV-only measurement diagnostics (score id,
-   *  whether the card was seeded). The middle state is added here. */
-  midDebug?: Record<string, unknown>;
   /**
    * BRIEF_ROUND_SHEET_CUES §3 — PAGING WITHOUT A FINGER.
    * Swiping was the only way to change rounds. This adds two visually hidden but
@@ -315,24 +297,20 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
   feat = null,
-  sheetStyle,
-  detents,
-  onDetentChange,
+  presentation = 'overlay',
   onHorizontalDrag = null,
   onStatsSeen,
   pageShift = null,
   hint = null,
   pagePreview = null,
-  midKey,
-  midDebug,
   paging = null,
 
 
 }) => {
   const { t } = useTranslation(['courses']);
-  /* §3 — THE ARROW KEYS PAGE. Bound at the document while the sheet is open and
+  /* §3 — THE ARROW KEYS PAGE. Bound at the document while the card is open and
      pageable, so the keys work wherever focus sits inside the sheet, and never
-     when there is no sequence. Escape stays BottomSheet's. */
+     when there is no sequence. Escape stays the presentation host's. */
   const pagingRef = useRef(paging);
   pagingRef.current = paging;
   useEffect(() => {
@@ -667,45 +645,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    * takes the same explained state as a round with no rows at all.
    */
   const hasHoles = cardCause === 'ok' || cardCause === 'partial';
-  /* §1 — IS THERE ANYTHING TO REVEAL? The depth section, the tour trajectory or
-     the actions row. With none of them the card IS the end of the sheet, and a
-     peek would promise a section that does not exist. */
-  const hasSectionBelowCard = courseSection.length > 0
-    || isTour
-    || !!engagement || !!onViewProfile || !!onViewCourse || !!onShareRound;
-
-  /* BRIEF_ROUND_SHEET_TALL §1 — WHICH MIDDLE IS ON SCREEN, named once and used
-     both by the marker below and by the DEV measurement log. */
-  const middleState: 'card' | 'skeleton' | 'unavailable' | 'nohbh' | 'syncing' = loading
-    ? 'skeleton'
-    : hasHoles
-      ? 'card'
-      : emptyVariant === 'unavailable'
-        ? 'unavailable'
-        : emptyVariant === 'nohbh'
-          ? 'nohbh'
-          : 'syncing';
-
   return (
-    <BottomSheet
+    <ScorecardGlassOverlay
       open={open}
       onClose={onClose}
-      // BRIEF_SHEET_BACKGROUND_CANON — this sheet paints NOTHING. It used to
-      // set the surface to PANEL and the body to CANVAS, which is exactly the
-      // seam that showed as a band behind the action strip at the foot. The
-      // shared BottomSheet owns the one surface for chrome and body alike.
-      detents={detents}
-      midKey={midKey}
-      midDebug={{ ...(midDebug ?? {}), state: middleState }}
-      onDetentChange={onDetentChange}
-      onHorizontalDrag={onHorizontalDrag}
-      style={{
-        height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column',
-        /* §2.2 — a paged sheet clips its own content: the outgoing round must
-           leave through the sheet's edge, not across the screen. */
-        ...(pageShift ? { overflow: 'hidden' } : null),
-        ...sheetStyle,
-      }}
+      onHorizontalDrag={presentation === 'overlay' ? onHorizontalDrag : null}
+      presentation={presentation}
     >
       <div
         style={{
@@ -729,24 +674,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           The score used to appear only at the FOOT of the expanded grid, after a
           date, a course, a handicap index and two links. It is now the first
           thing on the sheet and it does not scroll: the card, the breakdown and
-          the chart scroll beneath this block.
+          the card scroll beneath this block.
 
-          DISMISS IS SAFE, AND SO ARE THE DETENT DRAG AND THE PAGE SWIPE.
-
-          WITHOUT `detents` (the tour surface, /round): BottomSheet binds its
-          touch drag handlers to the GRABBER ROW ONLY, so this block never sees
-          those events and cannot capture the dismiss gesture.
-
-          WITH `detents` (BRIEF_ROUND_SHEET §1.1): at MID nothing in the sheet
-          scrolls, so a vertical drag ANYWHERE moves the sheet. At FULL the drag
-          is live on the grabber and on THIS fixed summary block — which does not
-          scroll, so there is no contention — while the scrolling body below
-          (marked `data-sheet-scroll`) keeps the finger for scrolling. Down past
-          70px returns to mid; a long or fast drag closes. The card, the OUT/IN
-          nines and the round-shape trace are the whole of what MID must show;
-          the sections below it are FULL's business only.
-
-          §2.2 — A HORIZONTAL drag is read anywhere at either detent and pages
+          §2.2 — A HORIZONTAL drag is read anywhere on the glass card and pages
           between rounds; the axis locks after 8px and only goes horizontal when
           it is clearly horizontal, so neither the dismiss nor the body scroll
           loses a gesture to it. This block does NOT print the breakdown any
@@ -758,7 +688,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             summary because the feat is why this round is worth a look. */}
         {feat && (
           <div
-            data-sheet-drag="true"
             style={{
               flexShrink: 0,
               background: honoursGround(feat),
@@ -839,7 +768,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
 
         <div
-          data-sheet-scroll="true"
+          data-scorecard-scroll="true"
           style={{
             flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
             /* No fill — the sheet surface shows through
@@ -883,27 +812,20 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </div>
           )}
 
-          {/* BRIEF_ROUND_SHEET_TALL §1 — EVERY MIDDLE CARRIES THE MARKER. Mid was
-              measured two frames and 220ms after open, which on a slow round is
-              still the skeleton — and with no marker in the tree mid fell back to
-              the 62dvh cap, so the sheet opened tall. Each of these states
-              declares its own extent with peek 0 (there is nothing to reveal
-              below an explanation), so a no-card open lands at its real content
-              height. When the card arrives the ResizeObserver remeasures. */}
           {loading ? (
-            <div data-sheet-mid-extent="true" data-sheet-mid-peek={0}>
+            <div>
               <SkeletonMiddle />
             </div>
           ) : !hasHoles && emptyVariant === 'unavailable' ? (
-            <div data-sheet-mid-extent="true" data-sheet-mid-peek={0}>
+            <div>
               <UnavailableMiddle />
             </div>
           ) : !hasHoles && emptyVariant === 'nohbh' ? (
-            <div data-sheet-mid-extent="true" data-sheet-mid-peek={0}>
+            <div>
               <NohbhMiddle gross={emptyGross ?? null} toPar={emptyToPar ?? null} />
             </div>
           ) : !hasHoles ? (
-            <div data-sheet-mid-extent="true" data-sheet-mid-peek={0}>
+            <div>
               <SyncingMiddle />
             </div>
           ) : (
@@ -914,14 +836,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 the same screen as its own CTA. The scoring key stays with the
                 card, directly beneath it (S4.2).
               */}
-              {/* §1.1 — MID SHOWS THE WHOLE CARD. This marker is the last thing
-                  that must be visible at the half-height detent; BottomSheet
-                  measures to its bottom edge and caps the result at 62dvh. */}
-              {/* §1 — MID SHOWS THE CARD PLUS 44px OF WHAT FOLLOWS, so the
-                  heading below it and the top of its first line are visible and
-                  the sheet cannot read as finished. With nothing below the card
-                  the peek is 0 and mid ends at the card, with no fade. */}
-              <div data-sheet-mid-extent="true" data-sheet-mid-peek={hasSectionBelowCard ? 44 : 0}>
+              <div>
               <ScorecardSection kicker={t('courses:scorecard.theCard')} flat={!isTour}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <Nine rows={out} label={t('courses:scorecard.out')} />
@@ -1006,11 +921,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   deleted, and `courses:scorecard.split*` keys stay in all six
                   locale files. */}
 
-              {isTour && (
-                <Panel kicker={t('courses:scorecard.howItUnfolded')}>
-                  <TrajectoryLine holes={holes} height={120} surface="dark" interactive showFieldComparison />
-                </Panel>
-              )}
             </>
           )}
 
@@ -1042,19 +952,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
         One extra element, mounted only while a horizontal drag or its commit is
         in flight, and only for the neighbour in the drag's direction. It is
-        absolutely positioned against the sheet (which is `position: fixed`) and
-        offset a full sheet width to the side, then translated by the SAME dx as
+        absolutely positioned against the card and offset a full card width to
+        the side, then translated by the SAME dx as
         the content, so finger, page and neighbour move as one.
 
-        TOP OFFSET 18px is the grabber row: padding 10 + 4 plus its 4px bar. The
-        preview starts where the current page's summary starts, so the two align
+        The preview starts where the current page's summary starts, so the two align
         exactly and the commit swap shows no jump.
       */}
       {pagePreview && (
         <div
           aria-hidden="true"
           style={{
-            position: 'absolute', top: 18, left: 0, right: 0, bottom: 0,
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
             overflow: 'hidden', pointerEvents: 'none',
             transform: `translate3d(calc(${pageShift?.dx ?? 0}px ${pagePreview.side === 'next' ? '+' : '-'} 100%), 0, 0)`,
             transition: pageShift?.animating
@@ -1066,7 +975,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           {pagePreview.node}
         </div>
       )}
-    </BottomSheet>
+    </ScorecardGlassOverlay>
   );
 };
 

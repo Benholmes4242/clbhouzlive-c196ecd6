@@ -1,22 +1,20 @@
 /**
- * BRIEF_ROUND_SHEET_CUES — THE SHEET HAS TO SHOW THERE IS MORE.
+ * BRIEF_ROUND_SHEET_CUES / SCORECARD GLASS CARD S1.
  *
  * Five rules, each tested where it is decided rather than through a sheet that
  * would drag the whole handicap read path in with it:
  *
- *  §1 mid keeps a 44px peek of the next section, and only when there IS one.
  *  §2 the nudge runs, holds, springs back, and a touch ends it mid-flight.
  *  §2 the first three pageable opens earn a movement, or a sentence with reduced
  *     motion, and nothing once the member has paged.
  *  §4 ScoreMark's numeral is unchanged for every existing caller.
- *  §5 the feed follows the sheet on the element that actually scrolls, and a
- *     detented sheet does not lock the body while every other sheet still does.
+ *  §5 the feed follows the sheet on the element that actually scrolls.
+ *  S1 the scorecard is glass over the page, while /round remains a page.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
-import { midExtent, MID_PAD_PX } from '@/components/ui/sheetMid';
 import {
   NUDGE_BACK_MS, NUDGE_HOLD_MS, NUDGE_PX, NUDGE_SETTLE_MS, NUDGE_TRAVEL_MS, runNudge,
 } from '@/features/explore-magazine/roundNudge';
@@ -24,40 +22,6 @@ import { openCue, noteHintPaged, resetHint } from '@/features/explore-magazine/r
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-
-/* ------------------------------------------------------------------ §1 mid */
-
-describe('mid leaves the next section peeking', () => {
-  const base = { sheetHeight: 900, viewportHeight: 1000 };
-
-  it('adds the declared peek past the card, so the heading below it shows', () => {
-    const withPeek = midExtent({ ...base, markerExtent: 400, peek: 44 });
-    const without = midExtent({ ...base, markerExtent: 400, peek: 0 });
-    expect(withPeek.mid).toBe(444);
-    expect(without.mid).toBe(400 + MID_PAD_PX);
-    expect(withPeek.mid - without.mid).toBe(44 - MID_PAD_PX);
-  });
-
-  it('fades only when mid genuinely hides something', () => {
-    expect(midExtent({ ...base, markerExtent: 400, peek: 44 }).peeking).toBe(true);
-    /* Nothing below the card: no peek declared, so no cut and no fade. */
-    expect(midExtent({ ...base, markerExtent: 400, peek: 0 }).peeking).toBe(false);
-    /* A round whose card already fills the sheet: mid IS full, nothing to hide. */
-    expect(midExtent({ sheetHeight: 400, viewportHeight: 1000, markerExtent: 400, peek: 44 }).peeking)
-      .toBe(false);
-  });
-
-  it('keeps the 62dvh cap above everything', () => {
-    expect(midExtent({ ...base, markerExtent: 880, peek: 44 }).mid).toBe(620);
-  });
-
-  it('is recomputed per round, so a shorter card gives a shorter mid', () => {
-    const full = midExtent({ ...base, markerExtent: 500, peek: 44 });
-    const partial = midExtent({ ...base, markerExtent: 320, peek: 44 });
-    expect(partial.mid).toBeLessThan(full.mid);
-    expect(partial.offset).toBeGreaterThan(full.offset);
-  });
-});
 
 /* ---------------------------------------------------------------- §2 nudge */
 
@@ -164,6 +128,18 @@ describe('ScoreMark sizing', () => {
     );
     expect(numeral(container)).toContain('14px');
   });
+
+  it('draws eagle and double-bogey gaps without an opaque canvas layer', () => {
+    const eagle = render(<ScoreMark strokes={2} par={4} size={26} surface="dark" glassDoubleRings />).container;
+    expect(eagle.querySelectorAll('[data-score-ring]').length).toBe(2);
+    expect(eagle.querySelector('[data-score-fill="eagle"]')).toBeNull();
+    expect(eagle.innerHTML).not.toContain('background: rgb(13, 13, 13)');
+
+    const doub = render(<ScoreMark strokes={6} par={4} size={26} surface="dark" glassDoubleRings />).container;
+    expect(doub.querySelectorAll('[data-score-ring]').length).toBe(2);
+    expect(doub.querySelector('[data-score-fill="doub"]')).toBeNull();
+    expect(doub.innerHTML).not.toContain('background: rgb(13, 13, 13)');
+  });
 });
 
 /* --------------------------------------------------------- §5 the follow */
@@ -210,6 +186,47 @@ describe('the body lock', () => {
   });
 });
 
+describe('the scorecard presentation split', () => {
+  const holes = Array.from({ length: 9 }, (_, i) => ({
+    holeNo: i + 1, par: 4, strokes: 4, fieldAvg: null,
+  }));
+  const props = {
+    open: true,
+    onClose: vi.fn(),
+    eyebrowText: 'Sat 11 Apr',
+    courseName: 'Machrihanish',
+    holes,
+    playerName: 'A Member',
+  };
+
+  it('renders the overlay as a glass dialog and a card tap does not dismiss it', () => {
+    const onClose = vi.fn();
+    render(<CardScorecardSheet {...props} onClose={onClose} />);
+    const card = document.querySelector('[data-scorecard-glass-card="true"]') as HTMLElement;
+    expect(card).toBeTruthy();
+    expect(card.style.maxHeight).toBe('82dvh');
+    fireEvent.click(card);
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(document.querySelector('[data-scorecard-overlay="true"]') as HTMLElement);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes on Escape and has no trajectory panel', () => {
+    const onClose = vi.fn();
+    render(<CardScorecardSheet {...props} onClose={onClose} surface="tour" />);
+    expect(screen.queryByText('How it unfolded')).toBeNull();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders page mode without a backdrop or dialog', () => {
+    render(<CardScorecardSheet {...props} presentation="page" />);
+    expect(document.querySelector('[data-scorecard-page="true"]')).toBeTruthy();
+    expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+  });
+});
+
 /* ------------------------------------------------------------- §3 the pager */
 
 describe('paging without a swipe', () => {
@@ -225,7 +242,6 @@ describe('paging without a swipe', () => {
         courseName="Machrihanish"
         holes={holes}
         playerName="A Member"
-        detents={['mid', 'full']}
         paging={paging}
       />,
     );

@@ -96,6 +96,8 @@ export interface ScoreMarkProps {
    * exactly where the member shot par. Absent keeps the muted par ink.
    */
   parNumeralColor?: string;
+  /** Scorecard-on-glass override: eagle/double bogey use two strokes, no fill. */
+  glassDoubleRings?: boolean;
 }
 
 export const ScoreMark: React.FC<ScoreMarkProps> = ({
@@ -107,6 +109,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   surface = 'light',
   numeralSize,
   parNumeralColor,
+  glassDoubleRings = false,
 }) => {
   const variant = variantFor(strokes, par);
 
@@ -142,7 +145,17 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   const numWeight = 700;
 
   if (surface === 'dark') {
-    const ringCount = variant === 'alba' ? 2 : variant === 'eagle' || variant === 'triple' ? 1 : 0;
+    /* S1.6 is opt-in because ScoreMark is shared by non-scorecard surfaces.
+       Eagle and double bogey on glass use two real concentric strokes; the gap
+       is transparency rather than a canvas-coloured layer. */
+    const transparentDouble = glassDoubleRings && (variant === 'eagle' || variant === 'doub');
+    const ringCount = transparentDouble
+      ? 2
+      : variant === 'alba'
+        ? 2
+        : variant === 'eagle' || variant === 'triple'
+          ? 1
+          : 0;
     const shape = over ? '0%' : '50%';
     const darkFill =
       variant === 'birdie'
@@ -161,7 +174,9 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
         ? emptyInk
         : variant === 'par'
           ? parInk
-          : variant === 'eagle' || variant === 'alba'
+          : transparentDouble
+            ? darkTone
+            : variant === 'eagle' || variant === 'alba'
             ? INK_ON_LIGHT
             : INK);
     const ringStep = STROKE + RING_GAP;
@@ -208,7 +223,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
             }}
           />
         )}
-        {hasMark && variant !== 'bogey' && (
+        {hasMark && variant !== 'bogey' && !transparentDouble && (
           <span
             aria-hidden="true"
             data-score-fill={variant}
