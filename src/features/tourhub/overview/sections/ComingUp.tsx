@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useComingUp, type ComingUpRow } from '../data/useComingUp';
 import type { TourId } from '../../hooks/useOverviewData';
-import { TOUR_LABEL } from '../../_shared/tourOrder';
+import { fullTourLabel } from '../../_shared/tourOrder';
 import { FONT, INK, INK_MUTE, LEADER_GOLD, WHITE_ALPHA_06 } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
 
@@ -45,7 +45,7 @@ function ComingUpRowView({ row, last, onOpen }: { row: ComingUpRow; last: boolea
   const defending = surnameOf(row.defending_champion); const date = new Date(row.start_date);
   return <button type="button" onClick={onOpen} style={{ width: '100%', minHeight: 68, padding: '8px 24px', display: 'grid', gridTemplateColumns: defending ? '44px minmax(0,1fr) 76px' : '44px minmax(0,1fr)', alignItems: 'center', gap: 10, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>
     <span style={{ width: 44, height: 48, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 10, background: WHITE_ALPHA_06 }}><span style={{ fontSize: 9, fontWeight: 800 }}>{new Intl.DateTimeFormat('en', { weekday: 'short' }).format(date).toUpperCase()}</span><span style={{ marginTop: 1, fontSize: 18, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{date.getDate()}</span></span>
-    <span style={{ minWidth: 0 }}><span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: INK_MUTE }}>{TOUR_LABEL[row.tour_slug] ?? row.tour_slug}</span>{row.isMajor ? <span style={{ fontSize: 9, fontWeight: 800, color: LEADER_GOLD }}>MAJOR</span> : null}</span><span style={{ display: 'block', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14, fontWeight: 700 }}>{displayEventName(row.name)}</span>{row.venue ? <span style={{ display: 'block', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: INK_MUTE }}>{row.venue}</span> : null}</span>
+    <span style={{ minWidth: 0 }}><span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ whiteSpace: 'nowrap', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: INK_MUTE }}>{fullTourLabel(row.tour_slug)}</span>{row.isMajor ? <span style={{ fontSize: 9, fontWeight: 800, color: LEADER_GOLD }}>MAJOR</span> : null}</span><span style={{ display: 'block', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14, fontWeight: 700 }}>{displayEventName(row.name)}</span>{row.venue ? <span style={{ display: 'block', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: INK_MUTE }}>{row.venue}</span> : null}</span>
     {defending ? <span style={{ minWidth: 0, textAlign: 'right' }}><span style={{ display: 'block', fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', color: INK_MUTE }}>DEFENDING</span><span style={{ display: 'block', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 600 }}>{defending}</span></span> : null}
   </button>;
 }

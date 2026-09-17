@@ -50,7 +50,7 @@ Tour Overview Design A
 - [x] Replace ambiguous marks in both achievement paths
 - [x] Verify fixtures at 320/390, focused tests, types, and build
 ## Tour Overview H10
-- [ ] Replace Also This Week tour column with full-name kicker above a two-line tournament name
-- [ ] Align Coming Up kickers to the same full tour-name grammar
-- [ ] Verify long names, absent score columns, two-line clamping, 320/390 overflow, types, tests, and build
+- [x] Replace Also This Week tour column with full-name kicker above a two-line tournament name
+- [x] Align Coming Up kickers to the same full tour-name grammar
+- [x] Verify long names, absent score columns, two-line clamping, 320/390 overflow, types, tests, and build
 
