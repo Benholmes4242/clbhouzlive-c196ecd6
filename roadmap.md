@@ -1,43 +1,13 @@
-# Roadmap
-
-- [x] Deduplicate Explore round headlines across six locales; report pair and catalogue truncation.
-- [x] Measure cumulative-span distribution and treatment mix from real round candidates.
-- [x] Gate shape treatment by selected cumulative-span threshold with fall-through precedence.
-- [x] Add opt-in layered-stroke glow to Explore shapes; preserve shared defaults.
-- [x] Verify bright/dark cards, LEVEL baseline, 320/390 geometry, and render cost; provide screenshots.
-- [x] Remove duplicated event categories from round kickers while preserving ring and age reasons.
-- [x] Gate tick rows on three off-par holes, with an explicit quiet-ace exception.
-- [x] Verify 390px width and no horizontal overflow; authenticated record/ace capture remains blocked by external auth.
-- [x] Scope "This week at {club}" to the club's courses (per-course board reads), not its members.
-- [x] Move standing and weekly-club dates from photos into consistently formatted caption rows.
-- [x] Verify the deployed standing functions and measure five-board qualification for Benjamin Holmes.
-- [x] Merge Explore Courses and Reviews into one four-chip view with seven rails, search and a place dropdown.
-- [x] Dead-list the retired Reviews view: `EXPLORE_VIEWS` drops the chip, `ExploreView` keeps 'reviews' (server pool and client composition still read it). Unused locale keys, kept: `amateur.stream.view.reviews`, `amateur.stream.empty.reviews`, `amateur.shelf.topRated`. `useRecentCourseRatings` is now called disabled and stays as the reference reader.
-- [ ] BLOCKED (external Supabase auth): authenticated acceptance of the merged view - reviewer-name search, the circle scope, and the merged server pages.
-- [ ] UNAPPLIED, Ben's to run: `docs/sql/explore_courses_merged_search.sql` (server search path plus the one-pool merge for `get_explore_stream`).
-- [x] Mirror the shared post footer: actions left, actor right, and both text lines flush left without extra glyphs.
-- [x] Match Your circle captions to the weekly club rail height while retaining fixed name and HCP rows.
-- [x] Keep Your circle on Scores only, retain standing later in rotation, and remove every visible baseline label while preserving the dashed rule.
-- [x] Make Explore hero treatment consequence-earned with a one-in-four positional cap.
-- [x] Add context-aware inset treatment to shared long-form video cards on All only.
-- [x] Rebuild Scores rail cadence and keep All's change-balanced order while repairing repetition.
-- [x] Prevent Explore hero chip/copy collisions and strengthen on-photo text contrast without changing standard or pair cards.
-- [x] Rebuild the member scorecard sheet with owner-aware copy, canonical course identity, flat sections, and footer actions.
-## Tour overview magazine rebuild
-- [x] Map current overview data, destinations, and shared Explore grammar
-- [x] Rebuild the overview stream and localized sentence headlines
-- [x] Preserve all destinations and record retired section importer counts
-- [x] Verify tests/build plus 320px and 390px screenshots without horizontal overflow
-- [x] Align Explore standard/pair text colors with heroes, fix six-locale rating plurals, audit fallbacks, and verify mobile states.
-- [x] Restore every full-width Explore review to the 340px lead preset while keeping rounds standard.
-- [x] Replace Explore round NET/HCP photo chips and the achievement panel with the amended C3 PAR/NET/VS HCP strip.
-- [x] Add an opt-in under-par gradient fill to Explore round traces while preserving shared defaults.
-- [x] Add batched like and comment controls to Explore round-card who-lines and read-only pair counts.
-- [x] Move round/review dates to the kicker row and make every round achievement label fully visible.
-## Tour overview redesign (Design A)
-- [x] Part 1: rebuild page shell/grid, three-state 300px hero, board card, and certain-only skeleton.
-- [x] Part 1: verify the live data state at 320px and 390px, report, then stop before Part 2. Upcoming/completed screenshots remain blocked by the current carousel dataset.
-- [ ] Part 2: mount/rework venue, Also this week, Coming up, World rankings, and News.
-- [ ] Part 2: remove only confirmed-orphaned legacy overview files and retire English keys.
-- [ ] Part 2: verify conditional closures, empty states, full-page foot, types, tests, and build.
-
+Tour Overview Design A
+- [x] Part 1 initial hero, board, spacing, loading state
+- [ ] C1 measure upcoming card at 390 and correct skeleton hold
+- [ ] C2 force and visually verify upcoming/completed, then revert fixtures
+- [ ] C3 leave stat strip/course shape uncalled and untouched
+- [ ] C4 verify constants and tap boundaries
+- [ ] Part 2 §5 venue band
+- [ ] Part 2 §6 Also This Week
+- [ ] Part 2 §7 weekly Coming Up without pagination
+- [ ] Part 2 §8 World Rankings with filters and movement
+- [ ] Part 2 §9 consolidated News
+- [ ] Part 2 §10 permitted deletions/report constraints
+- [ ] Verify all §12 empty states, types, tests, build, and responsive overflow

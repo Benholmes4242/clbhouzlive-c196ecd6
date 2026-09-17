@@ -264,7 +264,7 @@ export function HeroBoardSection({
 
   return (
     <div style={{ margin: '10px 10px 0', borderRadius: 16, background: SURFACE, fontFamily: FONT, overflow: 'hidden' }}>
-      {(hasBoard || hasThreeUp || hasPicks) ? (
+      {hasBoard ? (
         <MiniBoard
           tournamentId={tournamentId}
           entries={entries}
@@ -306,13 +306,13 @@ export function HeroBoardSection({
         </>
       ) : null}
 
-      {hasBoard ? (
+      {(hasBoard || hasThreeUp) ? (
         <button
           type="button"
           onClick={onFullLeaderboard}
           style={{ width: 'calc(100% - 24px)', minHeight: 44, margin: '4px 12px 10px', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
         >
-          {phase === 'completed' ? t('overview.ticker.fullResults') : t('overview.ticker.fullLeaderboard')}
+          {phase === 'completed' ? t('overview.ticker.fullResults') : phase === 'upcoming' ? t('overview.leaderboardBand.ctaUpcoming') : t('overview.ticker.fullLeaderboard')}
         </button>
       ) : null}
     </div>
@@ -334,7 +334,7 @@ function surnameOf(full: string | null | undefined): string {
  *
  * DEPENDENCY: This panel used to carry a mandatory "See all picks" route out.
  * That row was removed per AMENDMENT 2 to BRIEF_HERO_PICKS_ROW. The full picks
- * page is now reachable ONLY via the TIPicksCarousel rendered further down the
+ * page remains reachable through the overview picks row and panel
  * overview page (it has its own header chevron to the same destination). If
  * that carousel is ever removed, the full picks page becomes unreachable from
  * the overview entirely — re-add a route here or keep the carousel alive.
