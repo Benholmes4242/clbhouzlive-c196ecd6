@@ -252,7 +252,7 @@ describe('the scorecard presentation split', () => {
     const onClose = vi.fn();
     const onViewCourse = vi.fn();
     render(<CardScorecardSheet {...props} onClose={onClose} onViewCourse={onViewCourse} />);
-    fireEvent.click(screen.getByText('View course'));
+    fireEvent.click(screen.getByText(/viewCourse/));
     expect(onViewCourse).toHaveBeenCalledTimes(1);
     expect(onClose).not.toHaveBeenCalled();
   });
