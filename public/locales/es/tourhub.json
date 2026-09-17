@@ -124,7 +124,8 @@
         "r2d": "Race to Dubai",
         "rolex": "Rolex Rankings"
       },
-      "seasonNo1Label": "Season No. 1"
+      "seasonNo1Label": "Season No. 1",
+      "movementBasis": "Positions moved over {{days}} days"
     },
     "teamWinnerStrip": {
       "eyebrow": "TEAM WINNER",

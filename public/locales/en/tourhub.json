@@ -134,7 +134,8 @@
       "pointsLabel": "POINTS",
       "winsLabel": "Wins",
       "top10Label": "Top 10",
-      "seasonNo1Label": "Season No. 1"
+      "seasonNo1Label": "Season No. 1",
+      "movementBasis": "Positions moved over {{days}} days"
     },
     "alsoThisWeek": {
       "title": "Also this week"
