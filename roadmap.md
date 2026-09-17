@@ -25,6 +25,12 @@ Tour Overview Design A
 - [ ] Synchronize the 360px loading state
 - [ ] Verify 390x844 fold, 320px overflow, all hero states, fallback, types, tests, and build
 
+## Tour Overview live hero refinements
+- [x] Wrap tied-leader labels without changing the LIVE badge
+- [x] Restyle tournament actions as right-aligned links
+- [x] Rebuild the gated venue destination with an optional course image
+- [x] Verify 320/390 states, venue bottom measurement, types, tests, and build
+
 ## Explore kicker and achievement marks
 - [x] Structure kicker copy as scope and course
 - [x] Render optional two-line kickers and one-line pair kickers

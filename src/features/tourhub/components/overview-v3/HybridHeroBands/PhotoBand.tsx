@@ -148,9 +148,9 @@ export function PhotoBand({
         </div>
 
         {isLive && leader ? (
-          <div style={{ flex: 'none', maxWidth: 92, textAlign: 'right' }}>
+          <div style={{ flex: 'none', maxWidth: 92, alignSelf: 'flex-end', textAlign: 'right' }}>
             <div style={{ ...NUMERIC_STYLE, fontSize: 34, lineHeight: 1, fontWeight: 800, color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
-            {leader.name ? <div style={{ marginTop: 4, fontSize: 12, fontWeight: 600, color: INK_MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{leader.name}</div> : null}
+            {leader.name ? <div data-overview-leader-name style={{ width: 72, maxWidth: 92, marginTop: 4, marginLeft: 'auto', fontSize: 12, fontWeight: 600, lineHeight: 1.25, color: INK_MUTE, whiteSpace: 'normal', textAlign: 'right' }}>{leader.name}</div> : null}
           </div>
         ) : null}
 

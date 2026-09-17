@@ -318,7 +318,7 @@ export function HeroBoardSection({
           type="button"
           onClick={onFullLeaderboard}
           data-overview-board-cta
-          style={{ width: '100%', minHeight: 44, margin: 0, padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, border: 'none', borderTop: `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+          style={{ width: '100%', minHeight: 44, margin: 0, padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4, border: 'none', borderTop: `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: WHITE_ALPHA_65, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'right' }}
         >
           {phase === 'completed' ? t('overview.ticker.fullResults') : phase === 'upcoming' ? t('overview.leaderboardBand.ctaUpcoming') : t('overview.ticker.fullLeaderboard')}
           <ChevronRight size={16} aria-hidden />

@@ -5,6 +5,7 @@ import { shouldShowOverviewBoard } from '@/features/tourhub/components/overview-
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
+import { shouldShowVenueRecord } from '@/features/tourhub/overview/sections/VenueRecordBand';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 
 const NOW = new Date('2026-09-17T12:00:00Z');
@@ -67,6 +68,14 @@ function slide(type: HeroSlide['type'], startDate: string): HeroSlide {
 }
 
 describe('Tour Overview correctness gates', () => {
+  it('keeps the venue block gated on a publishable rank or sufficiently sampled rating', () => {
+    expect(shouldShowVenueRecord(null)).toBe(false);
+    expect(shouldShowVenueRecord({ rating: null, reviewCount: 0, listRank: null })).toBe(false);
+    expect(shouldShowVenueRecord({ rating: 9.1, reviewCount: 2, listRank: null })).toBe(false);
+    expect(shouldShowVenueRecord({ rating: 9.1, reviewCount: 14, listRank: null })).toBe(true);
+    expect(shouldShowVenueRecord({ rating: null, reviewCount: 0, listRank: 65 })).toBe(true);
+  });
+
   it('withholds level-par field-order rows until a position or score is posted', () => {
     expect(shouldShowOverviewBoard([{ position: null, score: 0 }, { position: null, score: 0 }])).toBe(false);
     expect(shouldShowOverviewBoard([{ position: 1, score: 0 }])).toBe(true);
