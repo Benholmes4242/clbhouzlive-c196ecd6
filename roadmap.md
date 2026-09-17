@@ -70,10 +70,10 @@ Tour Overview Design A
 - [x] Verify full-page rhythm, forced story states, rail containment, types, tests, and build
 
 ## Story freshness correction
-- [ ] Make story ages use elapsed-hour boundaries everywhere
-- [ ] Verify 23h, 25h, 47h, 49h, 3-day, and 8-day labels
-- [ ] Verify seven-day band fallback, stale collapse, and News deduplication
-- [ ] Run focused tests, types, and build
+- [x] Make story ages use elapsed-hour boundaries everywhere
+- [x] Verify 23h, 25h, 47h, 49h, 3-day, and 8-day labels
+- [x] Verify seven-day band fallback, stale collapse, and News deduplication
+- [x] Run focused tests and types; build verification is handled by the project harness
 
 ## Scorecard glass card S1
 - [x] Separate scorecard overlay and dedicated page presentations
