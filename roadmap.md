@@ -29,4 +29,4 @@ Tour Overview Design A
 - [x] Structure kicker copy as scope and course
 - [x] Render optional two-line kickers and one-line pair kickers
 - [x] Replace ambiguous marks in both achievement paths
-- [ ] Verify fixtures at 320/390, focused tests, types, and build
+- [x] Verify fixtures at 320/390, focused tests, types, and build
