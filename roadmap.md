@@ -13,8 +13,8 @@ Tour Overview Design A
 - [ ] Verify all §12 empty states, types, tests, build, and responsive overflow
 
 ## Tour Overview device pass
-- [ ] Group A correctness: C7-C10
-- [ ] Group A report
-- [ ] Group B/C: C11-C21
-- [ ] Confirm upcoming picks cause and top-five World movement values
-- [ ] Validate 320/390 overflow, empty-state collapse, types, tests, build
+- [x] Group A correctness: C7-C10
+- [x] Group A report
+- [x] Group B/C: C11-C21
+- [x] Confirm upcoming picks cause and top-five World movement values
+- [x] Validate 320/390 overflow, empty-state collapse, types, tests, build
