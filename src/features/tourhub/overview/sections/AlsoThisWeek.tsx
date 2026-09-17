@@ -6,7 +6,7 @@ import { useTourSelection } from '../../context/TourSelectionContext';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { tournamentRoute } from '../../routes';
 import { getScoreColor } from '../../_shared/scoreColor';
-import { fmtScore } from '../data/liveRoundStats';
+import { fmtScore } from '../../components/overview-v3/HybridHero.utils';
 import { FONT, INK, INK_MUTE, SURFACE, TREND_UP, WHITE_ALPHA_06 } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
 
