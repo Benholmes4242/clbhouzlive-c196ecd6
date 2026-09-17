@@ -18,7 +18,6 @@ import { useTourSelection } from '@/features/tourhub/context/TourSelectionContex
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 
@@ -81,14 +80,14 @@ export function OverviewPageV3() {
           id="content-below-hero"
           className="relative z-10"
         >
-          <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 32, paddingBottom: NAV_CLEARANCE }}>
+          <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 32 }}>
             <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
             <AlsoThisWeek />
             <ComingUpSlot />
             <WorldRankings />
             <OverviewNews />
 
-            {/* The page ends after News and reserves only measured bottom-nav clearance. */}
+            {/* The shared page shell reserves the measured bottom-nav clearance. */}
           </div>
         </div>
         <ScrollToTopGlass />

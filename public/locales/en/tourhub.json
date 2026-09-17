@@ -232,7 +232,7 @@
       "defending": "Defending",
       "field": "Field",
       "worldRanked": "world ranked",
-      "ourPicks": "Our picks"
+      "ourPicks": "OUR PICKS"
     },
     "leaderboardBand": {
       "ctaLive": "OPEN LIVE LEADERBOARD",
@@ -240,7 +240,7 @@
       "ctaAwaitingPlayoff": "VIEW LIVE PLAYOFF",
       "ctaResults": "VIEW FULL RESULTS",
       "ctaImminent": "VIEW ALL TEE TIMES",
-      "ctaUpcoming": "VIEW TOURNAMENT",
+      "ctaUpcoming": "View tournament",
       "inauguralPlaceholder": "INAUGURAL EVENT · NO PRIOR RESULTS",
       "previewUnavailable": "Tournament preview not available.",
       "fieldEyebrow": "Field",

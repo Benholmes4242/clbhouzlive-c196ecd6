@@ -92,27 +92,6 @@ export function PhotoBand({
       <div
         style={{
           position: 'absolute',
-          top: 62,
-          left: 14,
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 7,
-          minHeight: 28,
-          padding: '0 10px',
-          border: `1px solid ${WHITE_ALPHA_12}`,
-          borderRadius: 999,
-          background: 'rgba(20,22,26,0.60)',
-          ...CAPS,
-        }}
-      >
-        {isLive ? <span style={{ width: 7, height: 7, borderRadius: 999, background: STATUS_LIVE_ON_DARK }} /> : null}
-        <span>{stateLabel}</span>
-        {isLive ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {state.round}</span> : null}
-      </div>
-
-      <div
-        style={{
-          position: 'absolute',
           left: 16,
           right: 16,
           bottom: 16,
@@ -123,6 +102,24 @@ export function PhotoBand({
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 7,
+              minHeight: 28,
+              marginBottom: 8,
+              padding: '0 10px',
+              border: `1px solid ${WHITE_ALPHA_12}`,
+              borderRadius: 999,
+              background: 'rgba(20,22,26,0.60)',
+              ...CAPS,
+            }}
+          >
+            {isLive ? <span style={{ width: 7, height: 7, borderRadius: 999, background: STATUS_LIVE_ON_DARK }} /> : null}
+            <span>{stateLabel}</span>
+            {isLive ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {state.round}</span> : null}
+          </div>
           {tourLabel ? <div style={{ ...CAPS, color: INK_MUTE, letterSpacing: '0.14em' }}>{tourLabel}</div> : null}
           <h1
             style={{

@@ -79,7 +79,7 @@ interface Props {
 const THEME_TOKENS = {
   light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
   panel: { surface: SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
-  heroBoard: { surface: A.CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
+  heroBoard: { surface: SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
 } as const;
 
 
@@ -114,26 +114,26 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   // Dark grounds: an absent TODAY reads as an em dash (never a zero, never
   // the previous round). The light board keeps its blank-cell doctrine.
   const todayBlank = theme === 'light' ? BLANK : '\u2014';
-  const overviewGrid = phase === 'completed'
-    ? '44px minmax(0, 1fr) 52px 52px'
-    : '44px minmax(0, 1fr) 52px 52px';
+  const showOverviewPosition = rows.some((row) => row.position != null || ['MC', 'CUT', 'WD'].includes(row.status?.toUpperCase() ?? ''));
+  const showOverviewThru = phase === 'live' && rows.some((row) => thruLabel(row, todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound)) !== BLANK);
+  const overviewGrid = [
+    showOverviewPosition ? '44px' : null,
+    'minmax(0, 1fr)',
+    '52px',
+    phase === 'completed' || showOverviewThru ? '52px' : null,
+  ].filter(Boolean).join(' ');
 
-  const overviewName = (fullName: string | undefined): string => {
-    if (!fullName) return BLANK;
-    const parts = fullName.trim().split(/\s+/);
-    if (parts.length < 2) return fullName;
-    return `${parts[parts.length - 1]}, ${parts.slice(0, -1).join(' ')}`;
-  };
+  const overviewName = (fullName: string | undefined): string => fullName?.trim() || BLANK;
 
   if (theme === 'heroBoard') {
     return (
       <>
         <div style={{ background: T.surface, fontFamily: FONT }}>
           <div style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', padding: '8px 14px', borderBottom: `1px solid ${T.hairline}`, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
-            <div>{t('board.columns.pos')}</div>
+            {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div>{t('board.columns.player')}</div>
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
-            <div style={{ textAlign: 'right' }}>{phase === 'completed' ? t('board.columns.prize', 'Prize') : t('board.columns.thru')}</div>
+            {phase === 'completed' || showOverviewThru ? <div style={{ textAlign: 'right' }}>{phase === 'completed' ? t('board.columns.prize', 'Prize') : t('board.columns.thru')}</div> : null}
           </div>
           {rows.map((r) => {
             const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
@@ -152,13 +152,13 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', width: '100%', minHeight: 42, padding: '8px 14px', border: 'none', borderBottom: `1px solid ${T.hairline}`, background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
                 className={`${T.press} transition-colors`}
               >
-                <div style={{ fontSize: 12, fontWeight: 700, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{posText}</div>
+                {showOverviewPosition ? <div style={{ fontSize: 12, fontWeight: 700, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{posText}</div> : null}
                 <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 600 }}>{overviewName(r.player?.full_name)}</span>
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
                 <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
-                <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{phase === 'completed' ? (r.money != null && r.money > 0 ? formatEarnings(r.money) : BLANK) : thruLabel(r, today)}</div>
+                {phase === 'completed' || showOverviewThru ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{phase === 'completed' ? (r.money != null && r.money > 0 ? formatEarnings(r.money) : BLANK) : thruLabel(r, today)}</div> : null}
               </button>
             );
           })}
