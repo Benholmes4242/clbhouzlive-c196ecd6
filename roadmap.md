@@ -54,3 +54,10 @@ Tour Overview Design A
 - [x] Align Coming Up kickers to the same full tour-name grammar
 - [x] Verify long names, absent score columns, two-line clamping, 320/390 overflow, types, tests, and build
 
+
+## Tour Overview H11
+- [x] Measure ranking history and choose the movement window from the data
+- [x] Collapse the rankings row to one line with a flag replacing the country name
+- [x] Draw the rank delta over the measured window, in analytics polarity
+- [x] Render the basis line only alongside the delta column
+- [x] Verify 390/320, blocked flag host, delta-free boards, types, tests, and build
