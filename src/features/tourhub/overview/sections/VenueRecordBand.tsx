@@ -47,7 +47,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { FONT, INK, INK_MUTE, WHITE_ALPHA_06 } from '../../_shared/tokens';
+import { FONT, INK, INK_MUTE } from '../../_shared/tokens';
+import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
+import type { TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentVenueRecord } from '../data/useTournamentVenueRecord';
 
 /* Minimum ratings before the clubhouse figure may render at all. */
@@ -62,10 +64,19 @@ const RATING_FLOOR = 3;
  * nobody, which makes course_players a complete count. THIS IS NOT AN UNFILLED
  * PLACEHOLDER — do not substitute the viewing member's id.
  */
-export function VenueRecordBand({ tournamentId }: { tournamentId: string | undefined }) {
+export function shouldShowVenueRecord(data: { rating: number | null; reviewCount: number | null; listRank: number | null } | null | undefined): boolean {
+  if (!data) return false;
+  const count = data.reviewCount ?? 0;
+  return (data.rating != null && count >= RATING_FLOOR) || data.listRank != null;
+}
+
+export function VenueRecordBand({ tournamentId, venueName }: { tournamentId: string | undefined; venueName?: string | null }) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data } = useTournamentVenueRecord(tournamentId);
+  const venueAdapter: TourTournament[] = venueName ? [{ venue_name: venueName } as TourTournament] : [];
+  const { data: imageMap } = useBatchCourseImages(venueAdapter);
+  const imageUrl = venueName ? imageMap?.get(venueName) ?? null : null;
 
   /**
    * THE LINK IS THE GATE. A row means we KNOW the course, so the section
@@ -85,12 +96,11 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
    * hasRating and hasRank still decide WHAT renders inside — figure plus its
    * count, the published rank, or neither — never whether.
    */
-  if (!data) return null;
+  if (!data || !shouldShowVenueRecord(data)) return null;
   const count = data.reviewCount ?? 0;
   /* A figure is only shown with a real count behind it. */
   const hasRating = data.rating != null && count >= RATING_FLOOR;
   const hasRank = data.listRank != null;
-  if (!hasRating && !hasRank) return null;
   /* Below the floor is simply NOT hasRating — count < RATING_FLOOR, whether the
      rating is null (nobody has rated it) or present but under-sampled. The old
      third flag existed only to gate the whole section and is gone with it. */
@@ -98,13 +108,19 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
   /* "#57 GB&I" — the published rank, on the heading baseline. */
   const rank = hasRank ? `#${data.listRank}${data.listLabel ? ` ${data.listLabel}` : ''}` : null;
   const rating = hasRating ? `${Number(data.rating).toFixed(1)} from ${count} ratings` : null;
-  const line = [data.courseName, rank, rating].filter(Boolean).join(' · ');
+  const facts = [rank, rating].filter(Boolean).join(' · ');
   const target = hasRating ? `/course/${data.courseId}` : `/courses/${data.courseId}/rate`;
 
   return (
-    <section style={{ fontFamily: FONT }}>
-      <button type="button" onClick={() => navigate(target)} style={{ width: '100%', minHeight: 58, padding: '10px 24px', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', alignItems: 'center', gap: 12, border: 0, borderTop: `1px solid ${WHITE_ALPHA_06}`, borderBottom: `1px solid ${WHITE_ALPHA_06}`, borderRadius: 0, background: 'transparent', color: INK, textAlign: 'left', cursor: 'pointer' }}>
-        <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: INK_MUTE }}>{t('overview.venueRecord.sectionKicker')}</span><span style={{ display: 'block', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 700 }}>{line}</span></span><ChevronRight size={17} aria-hidden />
+    <section data-overview-venue-block style={{ margin: '18px 24px 0', fontFamily: FONT }}>
+      <button type="button" onClick={() => navigate(target)} style={{ width: '100%', minHeight: 76, padding: 0, display: 'flex', alignItems: 'center', gap: 13, border: 0, borderRadius: 0, background: 'transparent', color: INK, textAlign: 'left', cursor: 'pointer' }}>
+        {imageUrl ? <img data-overview-venue-image src={imageUrl} alt="" style={{ width: 76, height: 76, flex: '0 0 76px', borderRadius: 13, objectFit: 'cover' }} /> : null}
+        <span style={{ minWidth: 0, flex: '1 1 auto' }}>
+          <span style={{ display: 'block', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: INK_MUTE }}>{t('overview.venueRecord.sectionKicker')}</span>
+          <span style={{ display: 'block', marginTop: 5, fontSize: 17, lineHeight: 1.15, fontWeight: 700 }}>{data.courseName}</span>
+          <span style={{ display: 'block', marginTop: 4, fontSize: 12, lineHeight: 1.3, color: INK_MUTE }}>{facts}</span>
+        </span>
+        <ChevronRight size={17} aria-hidden style={{ flex: 'none' }} />
       </button>
     </section>
   );

@@ -14,6 +14,7 @@ import { WorldRankings } from '../../overview/sections/WorldRankings';
 import { OverviewNews } from '../../overview/sections/OverviewNews';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
+import { useHeroCarouselData } from '../../hooks/useHeroCarouselData';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
@@ -26,6 +27,8 @@ export function OverviewPageV3() {
   const { t } = useTranslation('tourhub');
   const { isOnline } = useNetworkStatus();
   const { selectedTourSlug, viewingTournamentId, setAppliedTourSlug } = useTourSelection();
+  const { data: heroSlides = [] } = useHeroCarouselData();
+  const viewingVenueName = heroSlides.find((slide) => slide.tournament.id === viewingTournamentId)?.tournament.venueName ?? null;
 
   // The overview's island label describes the lens used by its sections, not
   // the tour of whichever tournament happens to be visible in the hero.
@@ -80,14 +83,16 @@ export function OverviewPageV3() {
           id="content-below-hero"
           className="relative z-10"
         >
-          <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 32 }}>
-            <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
-            <AlsoThisWeek />
-            <ComingUpSlot />
-            <WorldRankings />
-            <OverviewNews />
+          <div style={{ background: PAGE_CANVAS }}>
+            <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} venueName={viewingVenueName} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 32 }}>
+              <AlsoThisWeek />
+              <ComingUpSlot />
+              <WorldRankings />
+              <OverviewNews />
 
-            {/* The shared page shell reserves the measured bottom-nav clearance. */}
+              {/* The shared page shell reserves the measured bottom-nav clearance. */}
+            </div>
           </div>
         </div>
         <ScrollToTopGlass />
