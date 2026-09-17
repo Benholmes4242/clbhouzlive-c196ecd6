@@ -79,7 +79,7 @@ interface Props {
 const THEME_TOKENS = {
   light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
   panel: { surface: SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
-  heroBoard: { surface: A.CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
+  heroBoard: { surface: SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
 } as const;
 
 
@@ -123,12 +123,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     phase === 'completed' || showOverviewThru ? '52px' : null,
   ].filter(Boolean).join(' ');
 
-  const overviewName = (fullName: string | undefined): string => {
-    if (!fullName) return BLANK;
-    const parts = fullName.trim().split(/\s+/);
-    if (parts.length < 2) return fullName;
-    return `${parts[parts.length - 1]}, ${parts.slice(0, -1).join(' ')}`;
-  };
+  const overviewName = (fullName: string | undefined): string => fullName?.trim() || BLANK;
 
   if (theme === 'heroBoard') {
     return (

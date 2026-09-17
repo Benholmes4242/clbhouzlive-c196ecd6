@@ -9,7 +9,6 @@ import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { PhotoBand, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
 import { deriveHeroState, detectTopTie } from './HybridHero.utils';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
-import { formatMonthDay } from '@/i18n/format';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 
 export interface HybridHeroProps {
@@ -30,10 +29,30 @@ export function getOverviewCountdown(startDate: string, now = new Date()): Overv
       { value: minutes % 60, label: 'minutes' },
     ];
   }
+  if (minutes < 2_880) {
+    return [
+      { value: Math.floor(minutes / 1_440), label: 'days' },
+      { value: Math.floor((minutes % 1_440) / 60), label: 'hours' },
+    ];
+  }
+  return [{ value: Math.floor(minutes / 1_440), label: 'days' }];
+}
+
+export function formatOverviewDateRange(startDate: string, endDate?: string | null): string | null {
+  const start = new Date(startDate);
+  if (Number.isNaN(start.getTime())) return null;
+  const day = (date: Date) => new Intl.DateTimeFormat('en', { day: 'numeric' }).format(date);
+  const month = (date: Date) => new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
+  if (!endDate) return `${day(start)} ${month(start)}`;
+  const end = new Date(endDate);
+  if (Number.isNaN(end.getTime())) return `${day(start)} ${month(start)}`;
+  if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+    return `${day(start)}–${day(end)} ${month(end)}`;
+  }
   return [
-    { value: Math.floor(minutes / 1_440), label: 'days' },
-    { value: Math.floor((minutes % 1_440) / 60), label: 'hours' },
-  ];
+    `${day(start)} ${month(start)}`,
+    `${day(end)} ${month(end)}`,
+  ].join(' – ');
 }
 
 export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
@@ -90,11 +109,7 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
     };
   }, [rows, state.kind, top?.score, tournament.winnerName]);
 
-  const dates = tournament.startDate && tournament.endDate
-    ? `${formatMonthDay(new Date(tournament.startDate)).toUpperCase()} - ${formatMonthDay(new Date(tournament.endDate)).toUpperCase()}`
-    : tournament.startDate
-      ? formatMonthDay(new Date(tournament.startDate)).toUpperCase()
-      : null;
+  const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
 
   const startDay = tournament.startDate
     ? new Intl.DateTimeFormat('en', { weekday: 'long' }).format(new Date(tournament.startDate))

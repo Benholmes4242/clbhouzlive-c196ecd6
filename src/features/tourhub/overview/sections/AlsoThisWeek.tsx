@@ -9,6 +9,10 @@ import { fmtScore } from '../../components/overview-v3/HybridHero.utils';
 import { FONT, INK, INK_MUTE, SURFACE, TREND_UP, WHITE_ALPHA_06 } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
 
+const SHORT_TOUR_LABELS: Record<string, string> = {
+  pga: 'PGA', euro: 'DP WORLD', lpga: 'LPGA', pgad: 'KORN FERRY', champ: 'CHAMPIONS', liv: 'LIV',
+};
+
 export function statusFor(slide: HeroSlide, now = new Date()): string {
   if (slide.type === 'live') return `Live${slide.tournament.currentRound ? ` · Round ${slide.tournament.currentRound}` : ''}`;
   if (slide.type === 'completed') return 'Final';
@@ -40,9 +44,10 @@ function OtherTournamentRow({ slide, last }: { slide: HeroSlide; last: boolean }
     : slide.tournament.leaderName?.trim().split(/\s+/).slice(-1)[0] ?? null;
   const target = tournamentRoute(slide.tournament.id, { kind: 'overview' });
   const status = statusFor(slide);
+  const tourLabel = SHORT_TOUR_LABELS[slide.tournament.tourSlug] ?? slide.tournament.tourName.replace(/\s+TOUR$/i, '');
   return (
-    <button type="button" onClick={() => navigate(target.to, { state: target.state })} style={{ width: '100%', minHeight: 58, padding: '10px 14px', display: 'grid', gridTemplateColumns: '62px minmax(0,1fr) auto', alignItems: 'center', gap: 10, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>
-      <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_MUTE }}>{slide.tournament.tourName}</span>
+    <button type="button" onClick={() => navigate(target.to, { state: target.state })} style={{ width: '100%', minHeight: 58, padding: '10px 14px', display: 'grid', gridTemplateColumns: '62px minmax(0,1fr) auto', alignItems: 'center', columnGap: 12, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>
+      <span style={{ display: '-webkit-box', overflow: 'hidden', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, fontSize: 9.5, lineHeight: 1.15, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_MUTE }}>{tourLabel}</span>
       <span style={{ minWidth: 0 }}>
         <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14, fontWeight: 700 }}>{slide.tournament.name}</span>
         {status ? <span style={{ display: 'block', marginTop: 2, fontSize: 12, color: slide.type === 'live' ? TREND_UP : INK_MUTE }}>{status}</span> : null}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { isAlsoThisWeek, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
@@ -8,10 +8,16 @@ import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 const NOW = new Date('2026-09-17T12:00:00Z');
 
 describe('Tour Overview Design A hero facts', () => {
-  it('uses days and hours at least 24 hours out', () => {
+  it('uses days and hours under 48 hours out', () => {
+    expect(getOverviewCountdown('2026-09-19T11:00:00Z', NOW)).toEqual([
+      { value: 1, label: 'days' },
+      { value: 23, label: 'hours' },
+    ]);
+  });
+
+  it('uses one days box at least 48 hours out', () => {
     expect(getOverviewCountdown('2026-09-19T15:00:00Z', NOW)).toEqual([
       { value: 2, label: 'days' },
-      { value: 3, label: 'hours' },
     ]);
   });
 
@@ -30,6 +36,11 @@ describe('Tour Overview Design A hero facts', () => {
 
   it('withholds an invalid countdown', () => {
     expect(getOverviewCountdown('', NOW)).toEqual([]);
+  });
+
+  it('formats compact same-month and cross-month date ranges', () => {
+    expect(formatOverviewDateRange('2026-09-17', '2026-09-20')).toBe('17–20 Sep');
+    expect(formatOverviewDateRange('2026-09-28', '2026-10-01')).toBe('28 Sep – 1 Oct');
   });
 
   it('formats true-minus scores and detects tied leaders', () => {

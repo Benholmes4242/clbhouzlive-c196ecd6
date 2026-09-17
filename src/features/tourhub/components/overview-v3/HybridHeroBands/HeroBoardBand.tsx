@@ -284,9 +284,9 @@ export function HeroBoardSection({
       ) : null}
 
       {hasThreeUp ? (
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${threeUp.length}, minmax(0, 1fr))`, padding: '14px 12px 10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: threeUp.length === 1 ? 'minmax(0, 1fr)' : `repeat(${threeUp.length}, minmax(0, 1fr))`, padding: '14px 14px 10px' }}>
           {threeUp.map((cell, index) => (
-            <div key={cell.label} style={{ minWidth: 0, padding: '0 10px', textAlign: 'center', borderLeft: index === 0 ? 'none' : `1px solid ${WHITE_ALPHA_08}` }}>
+            <div key={cell.label} style={{ minWidth: 0, padding: threeUp.length === 1 ? 0 : '0 10px', textAlign: threeUp.length === 1 ? 'left' : 'center', borderLeft: index === 0 ? 'none' : `1px solid ${WHITE_ALPHA_08}` }}>
               <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{cell.label}</div>
               <div style={{ marginTop: 4, fontSize: 16, fontWeight: 700, color: cell.color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cell.value}</div>
               {cell.sub ? <div style={{ marginTop: 2, fontSize: 11, color: cell.color === TOPAR_UNDER_DARK ? TOPAR_UNDER_DARK : WHITE_ALPHA_65, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cell.sub}</div> : null}
@@ -301,10 +301,10 @@ export function HeroBoardSection({
             type="button"
             onClick={() => setPicksOpen((open) => !open)}
             aria-expanded={picksOpen}
-            style={{ width: 'calc(100% - 24px)', minHeight: 44, margin: '6px 12px 4px', padding: '11px 12px', display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr) auto', alignItems: 'center', gap: 10, border: 'none', borderRadius: 12, background: WHITE_ALPHA_04, color: INK, textAlign: 'left', cursor: 'pointer', fontFamily: FONT }}
+            style={{ width: '100%', minHeight: 44, margin: '6px 0 4px', padding: '11px 14px', display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr) auto', alignItems: 'center', gap: 10, border: 'none', borderRadius: 12, background: WHITE_ALPHA_04, color: INK, textAlign: 'left', cursor: 'pointer', fontFamily: FONT }}
           >
             {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
-            <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
+            <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
             <span style={{ minWidth: 0, fontSize: 13, color: 'rgba(248,250,252,0.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{closedFigure}</span>
             <ChevronDown size={16} style={{ transform: picksOpen ? 'rotate(180deg)' : undefined }} />
           </button>
@@ -316,7 +316,7 @@ export function HeroBoardSection({
         <button
           type="button"
           onClick={onFullLeaderboard}
-          style={{ width: 'calc(100% - 24px)', minHeight: 44, margin: '4px 12px 10px', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+          style={{ width: 'calc(100% - 28px)', minHeight: 44, margin: '4px 14px 10px', padding: '12px 0', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
         >
           {phase === 'completed' ? t('overview.ticker.fullResults') : phase === 'upcoming' ? t('overview.leaderboardBand.ctaUpcoming') : t('overview.ticker.fullLeaderboard')}
         </button>
