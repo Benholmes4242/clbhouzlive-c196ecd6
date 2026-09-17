@@ -54,6 +54,7 @@ export function AchievementEmoji({ glyph }: { glyph: string }) {
         flex: `0 0 ${CALLOUT_ICON}px`,
         width: CALLOUT_ICON,
         height: CALLOUT_ICON,
+        fontFamily: "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
         fontSize: 22,
         lineHeight: 1,
       }}
