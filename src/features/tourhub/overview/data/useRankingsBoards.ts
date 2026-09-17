@@ -221,33 +221,37 @@ async function fetchSeasonBoard(
     }
   }
 
-  return rows.map((r) => {
-    const change = r.position_change ? parseInt(String(r.position_change), 10) : null;
-    const pid = r.player_id ?? r.manual_player_id ?? null;
-    const joined = pid ? playerMap.get(pid) : null;
-    return {
-      rank: r.position,
-      priorRank: change != null && !Number.isNaN(change) ? r.position + change : null,
-      playerId: pid,
-      playerName: joined?.full_name ?? r.player_name,
-      country: joined?.country ?? r.country ?? null,
-      photoUrl: joined?.photo_url ?? null,
-      points: r.points ?? null,
-      // position_change stores the feed's own convention: positive = climbed.
-      movement: change != null && !Number.isNaN(change) ? change : null,
-      wins: r.wins ?? null,
-      // tour_season_rankings has no top-10 column — genuinely absent, so the
-      // figure collapses on these boards rather than rendering "TOP 10 0".
-      top10s: null,
-
-    };
-  });
+  return {
+    // H11.1: tour_season_rankings has no history — one scraped_at, one row per
+    // player. Its position_change string has no snapshot behind it, so these
+    // boards carry NO delta at all rather than a week-shaped number sitting
+    // beside a 90-day one on the World board.
+    basisDays: null,
+    rows: rows.map((r) => {
+      const pid = r.player_id ?? r.manual_player_id ?? null;
+      const joined = pid ? playerMap.get(pid) : null;
+      return {
+        rank: r.position,
+        priorRank: null,
+        playerId: pid,
+        playerName: joined?.full_name ?? r.player_name,
+        country: joined?.country ?? r.country ?? null,
+        photoUrl: joined?.photo_url ?? null,
+        points: r.points ?? null,
+        movement: null,
+        wins: r.wins ?? null,
+        // tour_season_rankings has no top-10 column — genuinely absent, so the
+        // figure collapses on these boards rather than rendering "TOP 10 0".
+        top10s: null,
+      };
+    }),
+  };
 }
 
 export function useRankingsBoards(board: RankingsBoard) {
   return useQuery({
     queryKey: ['overview', 'rankings', board],
-    queryFn: async (): Promise<RankingsRow[]> => {
+    queryFn: async (): Promise<RankingsBoardResult> => {
       if (board === 'owgr') return fetchOwgr();
       if (board === 'r2d') return fetchSeasonBoard('euro');
       if (board === 'cme') return fetchSeasonBoard('lpga');
