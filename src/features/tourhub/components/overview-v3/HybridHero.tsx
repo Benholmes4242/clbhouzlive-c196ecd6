@@ -1,709 +1,117 @@
-/**
- * HybridHero — unified Tour Hub Overview hero (Lower-Third + Wire Ticker).
- *
- * Composition (all non-cancelled states):
- *   1. PhotoBand         — full-bleed venue image with bottom-anchored
- *                          editorial lower-third (state pill, insight line,
- *                          title, venue, moment chip, TOURNAMENT CTA).
- *   2. HeroWireTicker    — dark 36px marquee showing the top-10 (or T-1 tie).
- *
- * The legacy three-band path (PhotoBand + MiddleBand + LeaderboardBand) and
- * the CinematicHeroFullBleed / CinematicFrame surfaces are retained only for
- * the cancelled variant, which still wants the flat editorial column.
- */
-
-import React, { useEffect, useMemo, useState } from 'react';
+/** Tour Overview's single 300px, three-state photographic hero. */
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import '@/styles/hybrid-hero.css';
 
 import type { HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard, type TourTournament } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
-import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
-import { useTournamentLastYearTop4 } from '../../hooks/useTournamentLastYearTop4';
-import { useTournamentTeeTimes } from '../../hooks/useTournamentTeeTimes';
-import { useTournamentFieldStrength } from '../../hooks/useTournamentFieldStrength';
-import { useAIPredictions } from '../../hooks/useAIPredictions';
-
-import { useTournamentCourseStats } from '../../hooks/useTournamentCourseStats';
-import { tournamentRoute } from '../../routes';
-import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
-
-import { PhotoBand } from './HybridHeroBands/PhotoBand';
-import { MiddleBand } from './HybridHeroBands/MiddleBand';
-import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
-import { HeroWireTicker, type TickerFact } from './HybridHeroBands/HeroWireTicker';
-import { HERO_BOARD_ROWS } from './HybridHeroBands/HeroBoardBand';
+import { PhotoBand, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
+import { deriveHeroState, detectTopTie } from './HybridHero.utils';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { formatMonthDay } from '@/i18n/format';
-import {
-  deriveHeroState,
-  detectTopTie,
-  deriveTickerRows,
-  fmtScore,
-  roundLabel,
-} from './HybridHero.utils';
-import { getScoreColor } from '../../_shared/scoreColor';
-import { tournamentHeadline } from '../../overview/magazineCopy';
-import { BG, INK_15, OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
-
-
-import { SLATE_700, SLATE_800 } from '../../_shared/tokens';
-
-/**
- * The retired upcoming strip's "band absent" signal: zero rows AND zero facts
- * makes HeroWireTicker render nothing (device-check B). A shared frozen array
- * so the prop identity never changes between renders.
- */
-const EMPTY_FACTS: TickerFact[] = [];
-
-/**
- * SECTION F — THE TERMINAL ROW BENEATH THE PHOTOGRAPH. Standard uppercase
- * terminal treatment on the hero's dark ground, ON the 20px gutter, so the only
- * things over the image are the title block and its three facts.
- */
-function HeroTerminalRow({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onPress}
-      style={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '11px 20px',
-        background: BG,
-        border: 'none',
-        borderTop: `0.5px solid ${INK_15}`,
-        cursor: 'pointer',
-        textAlign: 'left',
-      }}
-    >
-      <span
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.72)',
-        }}
-      >
-        {label}
-      </span>
-      <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)' }} aria-hidden>
-        &rsaquo;
-      </span>
-    </button>
-  );
-}
-
-
-// ---------- Skeleton -------------------------------------------------------
-
-export function HybridHeroSkeleton() {
-  return (
-    <div style={{ background: BG, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div
-        style={{
-          height: 310,
-          background: `linear-gradient(180deg, ${SLATE_800} 0%, ${SLATE_700} 100%)`,
-          opacity: 0.6,
-        }}
-      />
-      <div style={{ height: 56, background: '#0F172A', opacity: 0.85 }} />
-      <div style={{ flex: 1, background: BG }}>
-        {[0, 1, 2, 3].map(i => (
-          <div
-            key={i}
-            style={{
-              height: i === 0 ? 64 : 48,
-              borderBottom: `0.5px solid ${INK_15}`,
-              background: 'linear-gradient(90deg, rgba(15,23,42,0.04) 0%, rgba(15,23,42,0.08) 50%, rgba(15,23,42,0.04) 100%)',
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-
-// ---------- Component ------------------------------------------------------
+import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
-  // Pass 5
   activeTournamentId: string | null;
   onSelectTour: (tournamentId: string) => void;
+  onOpenTournament: () => void;
 }
 
-export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHeroProps) {
+export function getOverviewCountdown(startDate: string, now = new Date()): OverviewCountdownUnit[] {
+  const start = new Date(startDate).getTime();
+  if (!Number.isFinite(start)) return [];
+  const minutes = Math.max(0, Math.floor((start - now.getTime()) / 60_000));
+  if (minutes < 60) return [{ value: minutes, label: 'minutes' }];
+  if (minutes < 1_440) {
+    return [
+      { value: Math.floor(minutes / 60), label: 'hours' },
+      { value: minutes % 60, label: 'minutes' },
+    ];
+  }
+  return [
+    { value: Math.floor(minutes / 1_440), label: 'days' },
+    { value: Math.floor((minutes % 1_440) / 60), label: 'hours' },
+  ];
+}
+
+export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
   const { tournament } = slide;
   const { t } = useTranslation('tourhub');
-  const navigate = useNavigate();
-
-  // 1-minute clock tick (suspended for live state — Sportradar polling drives those transitions)
   const [now, setNow] = useState(() => new Date());
-
-  // Preliminary state derive — drives data-fetch gating and tick cadence by
-  // the *visual* state (state.kind), NOT the carousel bucket (slide.type).
-  // This is the fix for the "UPCOMING badge over results card" bug: one
-  // source of truth (deriveHeroState) for everything visible.
-  const preliminaryState = useMemo(
-    () => deriveHeroState(tournament, now),
-    [tournament, now]
-  );
-  const kind = preliminaryState.kind;
+  const state = useMemo(() => deriveHeroState(tournament, now), [tournament, now]);
 
   useEffect(() => {
-    if (kind === 'live') return;
-    const id = setInterval(() => setNow(new Date()), 60_000);
-    return () => clearInterval(id);
-  }, [kind]);
+    if (state.kind === 'live') return;
+    const id = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(id);
+  }, [state.kind]);
 
-  // Course image
+  useEffect(() => {
+    setHeroFullBleed(true);
+    return () => setHeroFullBleed(false);
+  }, []);
+
   const venueAdapter: TourTournament[] = useMemo(
-    () =>
-      tournament.venueName
-        ? ([{ venue_name: tournament.venueName } as unknown as TourTournament])
-        : [],
-    [tournament.venueName]
+    () => tournament.venueName ? [{ venue_name: tournament.venueName } as TourTournament] : [],
+    [tournament.venueName],
   );
   const { data: imageMap } = useBatchCourseImages(venueAdapter);
-  const venueImageUrl = tournament.venueName
-    ? imageMap?.get(tournament.venueName) ?? null
+  const venueImageUrl = tournament.venueName ? imageMap?.get(tournament.venueName) ?? null : null;
+  const { data: leaderboard = [] } = useTourLeaderboard(state.kind === 'upcoming' ? '' : tournament.id);
+  const rows = Array.isArray(leaderboard) ? leaderboard : [];
+  const top = rows[0];
+  const tied = state.kind === 'live' ? detectTopTie(rows) : null;
+
+  const leader = state.kind === 'live' && top?.score != null
+    ? {
+        score: top.score,
+        name: tied
+          ? t('overview.leaderRow.tiedAtTop', { count: tied.count })
+          : top.player?.full_name?.trim().split(/\s+/).slice(-1)[0] ?? null,
+      }
     : null;
 
-  // Leaderboard (live + results states, top 4 + ticker)
-  const needsLeaderboard = kind !== 'upcoming';
-  const { data: leaderboard = [] } = useTourLeaderboard(needsLeaderboard ? tournament.id : '');
-  const safeLeaderboard = Array.isArray(leaderboard) ? leaderboard : [];
-
-  // Defending champion (Upcoming) + last-year top 4 + tee times
-  const isUpcoming = kind === 'upcoming';
-  const { data: defendingChamp } = useTournamentDefendingChamp(isUpcoming ? tournament.id : null);
-  const { data: lastYearTop4 } = useTournamentLastYearTop4(isUpcoming ? tournament.id : null);
-
-  const startMs = tournament.startDate ? new Date(tournament.startDate).getTime() : 0;
-  const hoursUntilStart = startMs ? (startMs - now.getTime()) / 3_600_000 : Infinity;
-  const teeTimesEnabled = isUpcoming && hoursUntilStart <= 48;
-  const { data: teeTimes = [] } = useTournamentTeeTimes(tournament.id, teeTimesEnabled);
-
-  // Upcoming · far fallback chain  +  Live pre-play fallback (empty leaderboard)
-  const isLive = kind === 'live';
-  const isLeaderboardEmpty = !Array.isArray(leaderboard) || leaderboard.length === 0;
-  const fallbackEnabled = (isUpcoming && !defendingChamp) || (isLive && isLeaderboardEmpty);
-  const { data: fieldStrength } = useTournamentFieldStrength(fallbackEnabled ? tournament.id : null);
-  const { data: courseStats } = useTournamentCourseStats(isUpcoming && !defendingChamp ? tournament.id : null);
-
-
-  // Refined state (now we know whether teeTimes are available)
-  const baseState = useMemo(
-    () => deriveHeroState(tournament, now, { teeTimesAvailable: teeTimes.length > 0 }),
-    [tournament, now, teeTimes.length]
-  );
-
-  // Detect team event from leaderboard shape — promote results.standard → results.team
-  const isTeamEvent = !!(safeLeaderboard[0] as any)?.team;
-  const state = useMemo(() => {
-    if (
-      baseState.kind === 'results' &&
-      isTeamEvent &&
-      baseState.variant !== 'cancelled' &&
-      baseState.variant !== 'awaiting-playoff'
-    ) {
-      return { ...baseState, variant: 'team' as const };
-    }
-    return baseState;
-  }, [baseState, isTeamEvent]);
-
-  // Ticker + tie detection
-  /**
-   * The board below the hero permanently shows positions 1-HERO_BOARD_ROWS, so
-   * the strip becomes the CONTINUATION of it, not a repeat: it starts at the
-   * first position the board does not show. Offset derived from the board's row
-   * count — never hardcoded twice.
-   */
-  const tickerOffset = kind === 'live' && safeLeaderboard.length > HERO_BOARD_ROWS ? HERO_BOARD_ROWS : 0;
-  const top10 = useMemo(
-    () => deriveTickerRows(safeLeaderboard, tickerOffset),
-    [safeLeaderboard, tickerOffset],
-  );
-  const tiedLeaders = useMemo(() => {
-    // Once a tournament is decided (winner known), never show a "tied for the lead"
-    // summary — a playoff/scorecard playoff has already broken the 72-hole tie.
-    if (state.kind === 'results' && tournament.winnerName) return null;
-    return detectTopTie(safeLeaderboard);
-  }, [safeLeaderboard, state.kind, tournament.winnerName]);
-
-  // A playoff happened if the winner's score was tied at the top of regulation.
-  const wasPlayoff = useMemo(() => {
-    if (state.kind !== 'results' || !tournament.winnerName) return false;
-    const tie = detectTopTie(safeLeaderboard);
-    return tie != null && tie.count >= 2;
-  }, [state.kind, tournament.winnerName, safeLeaderboard]);
-
-  // Champion data for results
   const champion = useMemo(() => {
-    if (state.kind !== 'results') return undefined;
-    const top: any = safeLeaderboard[0];
-    const winnerName = tournament.winnerName;
-
-    const resolveWinnerAvatarCandidates = (name?: string | null): string[] =>
-      resolvePlayerAvatarCandidates({
-        name: name ?? '',
-        photoUrl: tournament.winnerPhotoUrl ?? top?.player?.photo_url ?? null,
-        tourSlug: tournament.tourSlug ?? 'pga',
-      });
-
-    if (winnerName) {
-      return {
-        name: winnerName,
-        country: (top?.player?.country_code as string | undefined) ?? undefined,
-        score: tournament.winnerScore || (top ? fmtScore(top.score) : '—'),
-        avatarUrl: resolveWinnerAvatarCandidates(winnerName)[0] ?? null,
-        avatarCandidates: resolveWinnerAvatarCandidates(winnerName),
-        playoffWin: wasPlayoff,
-      };
-    }
-    if (!top) return undefined;
-    const topName =
-      top.player?.full_name ||
-      `${top.player?.first_name ?? ''} ${top.player?.last_name ?? ''}`.trim();
+    if (state.kind !== 'results' || !tournament.winnerName || top?.score == null) return null;
+    const runner = rows[1];
+    const margin = runner?.score != null ? runner.score - top.score : null;
+    const tiedAtTop = detectTopTie(rows);
     return {
-      name: topName,
-      country: top.player?.country_code,
-      score: fmtScore(top.score),
-      avatarUrl: resolveWinnerAvatarCandidates(topName)[0] ?? null,
-      avatarCandidates: resolveWinnerAvatarCandidates(topName),
-      playoffWin: wasPlayoff,
+      name: tournament.winnerName,
+      score: top.score,
+      margin: tiedAtTop ? null : margin != null && margin > 0 ? margin : null,
+      playoff: Boolean(tiedAtTop),
     };
-  }, [state, tournament, safeLeaderboard, wasPlayoff]);
+  }, [rows, state.kind, top?.score, tournament.winnerName]);
 
-  // Team winner detection
-  const teamWinner = useMemo(() => {
-    if (state.kind !== 'results') return null;
-    const top: any = safeLeaderboard[0];
-    const team = top?.team;
-    if (!team) return null;
-    const members = (team.members || [])
-      .filter((m: any) => m.player)
-      .sort((a: any, b: any) => (a.position_in_team ?? 0) - (b.position_in_team ?? 0))
-      .map((m: any) => ({
-        fullName:
-          m.player.full_name ||
-          `${m.player.first_name ?? ''} ${m.player.last_name ?? ''}`.trim(),
-        photoUrl: m.player.photo_url ?? null,
-      }));
-    return {
-      teamName: team.abbr_name || team.display_name || t('overview.hybridHero.teamFallback'),
-      members,
-      score: fmtScore(top.score),
-    };
-  }, [state, safeLeaderboard]);
+  const dates = tournament.startDate && tournament.endDate
+    ? `${formatMonthDay(new Date(tournament.startDate)).toUpperCase()} - ${formatMonthDay(new Date(tournament.endDate)).toUpperCase()}`
+    : tournament.startDate
+      ? formatMonthDay(new Date(tournament.startDate)).toUpperCase()
+      : null;
 
-  // Last year top 4 — kept for cancelled fallback path
-  const lastYearFinishers = useMemo(() => {
-    if (state.kind !== 'upcoming' || state.variant !== 'far') return undefined;
-    if (!lastYearTop4 || lastYearTop4.length === 0) return undefined;
-    return lastYearTop4.map(f => ({
-      rank: f.rank,
-      name: f.name,
-      country: f.country,
-      score: f.score,
-      year: f.year,
-      avatarUrl: f.photoUrl,
-      avatarCandidates: resolvePlayerAvatarCandidates({
-        name: f.name,
-        photoUrl: f.photoUrl ?? null,
-        tourSlug: tournament.tourSlug ?? 'pga',
-      }),
-    }));
-  }, [state, lastYearTop4, tournament.tourSlug]);
-
-  const showFirstYearPlaceholder =
-    state.kind === 'upcoming' &&
-    state.variant === 'far' &&
-    !lastYearFinishers &&
-    lastYearTop4 === null;
-
-  // CTA navigation
-  const onCtaTap = () => {
-    if (state.kind === 'results' && state.variant === 'cancelled') {
-      navigate('/tourhub');
-      return;
-    }
-    if (state.kind === 'live') {
-      navigate(`/tourhub/tournament/${tournament.id}`);
-      return;
-    }
-    const target = tournamentRoute(tournament.id);
-    navigate(target.to, { state: target.state });
-  };
-
-  // Dates string for legacy three-band path
-  const startD = tournament.startDate ? new Date(tournament.startDate) : null;
-  const endD = tournament.endDate ? new Date(tournament.endDate) : null;
-  const datesString =
-    startD && endD
-      ? `${formatMonthDay(startD).toUpperCase()} \u2013 ${endD.getDate()}`
-      : endD
-        ? formatMonthDay(endD).toUpperCase()
-        : null;
-  const isPseudoMajor = tournament.tourSlug === 'major';
-  const tourLabel = isPseudoMajor
-    ? t('overview.hybridHero.majorChampionship')
-    : tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
-  // Same-tour majors (Evian on LPGA, Senior PGA on CHAMP, etc.) get a small
-  // gold "MAJOR" tag next to the eyebrow — no relocation, cosmetic only.
-  const showMajorTag = !isPseudoMajor && tournament.isMajor;
-
-  // NEW composition (Lower-Third + Wire Ticker) — used for live/results/upcoming.
-  // Cancelled falls back to the legacy three-band editorial column below.
-  const isCancelled = state.kind === 'results' && state.variant === 'cancelled';
-
-  // Signal full-bleed chrome for any non-cancelled state.
-  const isFullBleedCinematic = !isCancelled;
-  useEffect(() => {
-    setHeroFullBleed(isFullBleedCinematic);
-    return () => setHeroFullBleed(false);
-  }, [isFullBleedCinematic]);
-
-  // AI insight — pulled quote surfaced in the lower-third.
-  const { data: aiPredictions } = useAIPredictions(tournament.id);
-  const aiInsight = aiPredictions?.courseAnalysis?.insight?.trim() || null;
-
-  // Compute insight line by state.
-  const insightLine: string | null = useMemo(() => {
-    if (state.kind === 'live') {
-      // Live: prefer AI insight; fall back to null (state pill already carries round label).
-      return aiInsight;
-    }
-    if (state.kind === 'results') {
-      // Results: derive the line from the actual leaderboard to avoid stale
-      // editorial strings contradicting the real outcome.
-      return buildResultLine() ?? aiInsight;
-    }
-    // Upcoming: AI course insight is the strongest tell.
-    return aiInsight;
-
-    function buildResultLine(): string | null {
-      if (!champion || isTeamEvent) return null;
-      const leader: any = safeLeaderboard[0];
-      if (!leader) return null;
-      const runner: any = safeLeaderboard[1];
-      const margin =
-        runner && leader && typeof runner.score === 'number' && typeof leader.score === 'number'
-          ? runner.score - leader.score
-          : null;
-      const name = champion.name;
-      const score = champion.score;
-      const runnerUp =
-        runner?.player?.full_name ||
-        `${runner?.player?.first_name ?? ''} ${runner?.player?.last_name ?? ''}`.trim() ||
-        null;
-
-      if (wasPlayoff) {
-        return t('overview.photoBand.resultPlayoff', { name, score });
-      }
-      if (margin !== null && margin >= 1) {
-        if (runnerUp) {
-          return t('overview.photoBand.resultWonBy', {
-            name,
-            score,
-            runnerUp,
-            count: margin,
-          });
-        }
-        return t('overview.photoBand.resultClosedAt', { name, score });
-      }
-      return t('overview.photoBand.resultClosedAt', { name, score });
-    }
-  }, [state, aiInsight, champion, isTeamEvent, safeLeaderboard, wasPlayoff, t]);
-
-  // Moment row content — hero name/score chip.
-  const moment: { label: string; name: string; score: string | null } | null = useMemo(() => {
-    if (state.kind === 'live') {
-      const top: any = safeLeaderboard[0];
-      if (!top) return null;
-      const name =
-        top.player?.full_name ||
-        `${top.player?.first_name ?? ''} ${top.player?.last_name ?? ''}`.trim();
-      if (!name) return null;
-      return {
-        label: t('overview.photoBand.leaderLabel'),
-        name: tiedLeaders ? t('overview.leaderRow.tiedAtTop', { count: tiedLeaders.count }) : name,
-        score: tiedLeaders ? tiedLeaders.score : fmtScore(top.score),
-      };
-    }
-    if (state.kind === 'results' && champion) {
-      return {
-        label: t('overview.photoBand.championLabel'),
-        name: champion.name,
-        score: champion.score,
-      };
-    }
-    if (state.kind === 'upcoming' && defendingChamp) {
-      return {
-        label: t('overview.photoBand.defendingLabel'),
-        name: defendingChamp.name,
-        score: defendingChamp.score || null,
-      };
-    }
-    return null;
-  }, [state, safeLeaderboard, tiedLeaders, champion, defendingChamp, t]);
-
-  /**
-   * THE UPCOMING STRIP IS RETIRED (device-check B) — leadFacts and
-   * emptyStateFacts are no longer built on this surface. They said everything
-   * twice: TEES OFF and VENUE in the static lead block above the hero facts
-   * that already carry TEES OFF, the venue already on the photograph's
-   * sub-line, and the purse again in the marquee below. The single thing they
-   * carried that the facts did not — the FIELD SOON state mark — is folded into
-   * the hero's third fact below. HeroWireTicker itself is untouched: the
-   * marquee, the lead block and the empty-state bar all remain for the news
-   * StoryLeaderboardStrip, its other consumer.
-   */
-
-  /**
-   * SECTION B — THE KICKER AND THE THREE FACTS.
-   *
-   * Three per state, all STATIC, all read off data this component already
-   * fetched: no new query, no rotation, nothing that changes while a member
-   * looks at it. Under par is RED here as on every tour surface (scoreColor is
-   * the broadcast convention and is fenced).
-   *
-   * Where a fact's datum is missing the fact is DROPPED rather than filled with
-   * a dash: an empty slot is honest and a dash pretends there is a figure.
-   *
-   * THE DROP IS SETTLED — NO FOURTH CANDIDATE FACT (structural brief C, closed).
-   * Measured against the live feed, 2026-09-11: of 37 upcoming events, purse is
-   * null on 2 (5%) and defending champion on 6 (16%), so 84% render three facts
-   * and six render two real ones. Of 67 events completed in the last 120 days,
-   * purse is null on 0 and defending champion on 3. Six events showing two true
-   * facts is an EDGE CASE, not a design fact, so no filler fact was added to
-   * pad the row. Do not re-open this on a hunch; re-measure first.
-   */
-
-  const heroKicker: string | null = useMemo(() => {
-    if (state.kind === 'live') return t('overview.hero.stateLive');
-    if (state.kind === 'results') return t('overview.hero.stateFinal');
-    return state.countdown || t('overview.hero.stateUpcoming');
-  }, [state, t]);
-
-  const purseFact = useMemo(() => {
-    if (typeof tournament.purse !== 'number' || tournament.purse <= 0) return null;
-    const m = tournament.purse / 1_000_000;
-    return { label: t('overview.hero.purse'), value: m >= 10 ? `$${Math.round(m)}M` : `$${m.toFixed(1)}M` };
-  }, [tournament.purse, t]);
-
-  const heroFacts = useMemo(() => {
-    const surname = (n?: string | null) => (n ? n.trim().split(/\s+/).slice(-1)[0] : null);
-    const out: Array<{ label: string; value: string; valueColor?: string }> = [];
-
-    if (state.kind === 'live') {
-      const top: any = safeLeaderboard[0];
-      const name = tiedLeaders
-        ? t('overview.leaderRow.tiedAtTop', { count: tiedLeaders.count })
-        : surname(top?.player?.full_name || `${top?.player?.first_name ?? ''} ${top?.player?.last_name ?? ''}`);
-      const scoreStr = tiedLeaders ? tiedLeaders.score : top ? fmtScore(top.score) : null;
-      if (name && scoreStr) {
-        out.push({
-          label: t('overview.photoBand.leaderLabel'),
-          value: `${name} ${scoreStr}`,
-          valueColor: getScoreColor(tiedLeaders ? -1 : (top?.score ?? 0), 'dark', 'standard'),
-        });
-      }
-      out.push({ label: t('overview.hero.factRound'), value: roundLabel(state.round, state.totalRounds) });
-      /* NOT THRU. state.thruLabel is the hardcoded literal 'F THRU' in
-         deriveHeroState (HybridHero.utils, live branch) — it is not read from
-         the feed and would say "F" through every round of every event. A fact
-         that is always the same is not a fact, so the third live slot takes the
-         purse, which is real. If num_rounds/thru ever arrives on
-         HeroTournament, this is where a true THRU belongs. */
-      if (purseFact) out.push(purseFact);
-      return out;
-    }
-
-    if (state.kind === 'results') {
-      if (champion) {
-        out.push({
-          label: t('overview.photoBand.championLabel'),
-          value: `${surname(champion.name) ?? champion.name} ${champion.score}`,
-        });
-      }
-      const leader: any = safeLeaderboard[0];
-      const runner: any = safeLeaderboard[1];
-      const margin =
-        typeof leader?.score === 'number' && typeof runner?.score === 'number' ? runner.score - leader.score : null;
-      if (wasPlayoff) {
-        out.push({ label: t('overview.hero.factMargin'), value: t('overview.hero.factPlayoff') });
-      } else if (margin != null && margin >= 0) {
-        out.push({ label: t('overview.hero.factMargin'), value: String(margin) });
-      }
-      if (purseFact) out.push(purseFact);
-      return out;
-    }
-
-    /* UPCOMING — TEES OFF, PURSE, and the third slot carrying the FIELD state
-       mark folded in from the retired strip (device-check B). With no field yet
-       (no rows on the board above) the third fact is FIELD / announced soon,
-       which is the one thing the strip said that the facts did not. Once the
-       field IS known the board itself says so, so the slot returns to the
-       defending champion. Still three, still static, still dropped rather than
-       dashed where the datum is missing. */
-    if (datesString) out.push({ label: t('overview.hero.teesOff'), value: datesString });
-    if (purseFact) out.push(purseFact);
-    if (top10.length === 0) {
-      out.push({
-        label: t('overview.leaderboardBand.fieldEyebrow').toUpperCase(),
-        value: t('overview.hero.fieldAnnouncedSoon'),
-      });
-    } else if (defendingChamp?.name) {
-      out.push({
-        label: t('overview.hero.defendsLabel'),
-        value: surname(defendingChamp.name) ?? defendingChamp.name,
-      });
-    }
-    return out;
-  }, [state, safeLeaderboard, tiedLeaders, champion, wasPlayoff, datesString, defendingChamp, purseFact, top10.length, t]);
-
-  const editorialHeadline = useMemo(
-    () => tournamentHeadline({ tournament, state, leaderboard: safeLeaderboard, t }),
-    [tournament, state, safeLeaderboard, t],
-  );
-
-  if (!isCancelled) {
-    return (
-      <div
-        style={{
-          background: BG,
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <PhotoBand
-          title={editorialHeadline}
-          venueName={tournament.venueName}
-          venueCity={tournament.venueCity}
-          venueImageUrl={venueImageUrl}
-          state={state}
-          tourLabel={tourLabel}
-          winnerName={tournament.winnerName}
-          isMajor={tournament.isMajor}
-          isSignature={tournament.isSignature}
-          datesString={datesString}
-          insight={insightLine}
-          insightKind={insightLine && insightLine === aiInsight ? 'course' : 'result'}
-          momentLabel={moment?.label ?? null}
-          momentName={moment?.name ?? null}
-          momentScore={moment?.score ?? null}
-          /* SECTION F — NOTHING OVERLAYS THE PHOTOGRAPH EXCEPT THE TITLE BLOCK
-             AND ITS FACTS. The TOURNAMENT link used to sit bottom-right ON the
-             image, level with the facts. The hero itself is NOT tappable (the
-             carousel wrapper binds touchstart/move/end for the swipe only, and
-             nothing navigates), so the link is the sole route to the tournament
-             from here and could not simply be dropped: it MOVES to a terminal
-             row beneath the photograph. */
-          venueCourseName={tournament.venueCourseName}
-          venueState={tournament.venueState}
-          venueCountry={tournament.venueCountry}
-          venuePar={tournament.venuePar}
-          venueYardage={tournament.venueYardage}
-          purse={tournament.purse}
-          /* Section B: fixed 300, a kicker line, three static facts, and no
-             overlaid capsule (passing facts suppresses the moment chip). */
-          heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
-          kicker={`${heroKicker} · ${tournament.name}`}
-          facts={heroFacts}
-        />
-        {/*
-          THE CONTINUATION IS A TABLE, NOT A TICKER (section C). Positions 7-10
-          continuing the board above render as four equal columns, surname over
-          score, with no ALSO OUT label: the cells carry their own positions, so
-          the label was chrome competing with names for width. Without a
-          continuation (no board above) the strip is the standalone top-10 and
-          keeps the labelled static treatment.
-
-          THE UPCOMING STATE STRIP IS RETIRED (device-check B). It said
-          everything twice: TEES OFF and VENUE both appeared in the hero facts
-          and the sub-line above them, and the marquee below repeated the purse.
-          leadFacts is no longer supplied and emptyStateFacts is an EMPTY ARRAY
-          on this surface, which is the ticker's own "band absent" signal — so
-          on an upcoming slide nothing renders here at all. The FIELD SOON state
-          mark, the one thing the strip carried that the facts did not, is folded
-          into the hero's third fact (see heroFacts, upcoming branch). The
-          marquee remains for the news StoryLeaderboardStrip, which is the other
-          consumer of this component and is untouched.
-        */}
-        <HeroWireTicker
-          rows={top10}
-          emptyStateFacts={top10.length === 0 ? EMPTY_FACTS : undefined}
-          labelKind={tickerOffset > 0 ? 'continuation' : 'top10'}
-          presentation={
-            top10.length === 0 ? 'marquee' : tickerOffset > 0 ? 'columns' : 'static'
-          }
-        />
-        {onCtaTap && <HeroTerminalRow label={t('overview.photoBand.tournamentCta')} onPress={onCtaTap} />}
-      </div>
-    );
-  }
-
-
+  const startDay = tournament.startDate
+    ? new Intl.DateTimeFormat('en', { weekday: 'long' }).format(new Date(tournament.startDate))
+    : null;
 
   return (
-    <div
-      style={{
-        background: BG,
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <PhotoBand
-        title={tournament.name}
-        venueName={tournament.venueName}
-        venueCity={tournament.venueCity}
-        venueImageUrl={venueImageUrl}
-        state={state}
-        tourLabel={tourLabel}
-        winnerName={tournament.winnerName}
-        isMajor={tournament.isMajor}
-        isSignature={tournament.isSignature}
-        datesString={datesString}
-      />
-
-      <MiddleBand
-        state={state}
-        top10={top10}
-        champion={champion}
-        tiedLeaders={tiedLeaders}
-        defendingChamp={defendingChamp}
-        fieldStrength={fieldStrength}
-        courseStats={courseStats}
-        teamWinner={teamWinner}
-        par={tournament.venuePar ?? undefined}
-        championNarrative={tournament.championNarrative}
-      />
-      <LeaderboardBand
-        state={state}
-        leaderboard={safeLeaderboard}
-        tiedLeaders={tiedLeaders}
-        champion={champion}
-        teeTimes={teeTimes}
-        lastYearFinishers={lastYearFinishers}
-        firstYearEvent={showFirstYearPlaceholder}
-        tourSlug={tournament.tourSlug}
-        par={tournament.venuePar ?? undefined}
-        defendingChampion={tournament.defendingChampion ?? null}
-        fieldSize={safeLeaderboard.length}
-        onCtaTap={onCtaTap}
-      />
-    </div>
+    <PhotoBand
+      title={tournament.name}
+      venueName={tournament.venueName}
+      datesString={dates}
+      venueImageUrl={venueImageUrl}
+      state={state}
+      tourLabel={tournament.tourName || tournament.tourSlug?.toUpperCase() || null}
+      leader={leader}
+      countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []}
+      startDay={startDay}
+      champion={champion}
+      heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
+      onOpen={onOpenTournament}
+    />
   );
 }
+
+export default HybridHero;

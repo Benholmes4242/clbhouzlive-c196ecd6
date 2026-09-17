@@ -1,430 +1,183 @@
-/**
- * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
- * The hero is a broadcast surface. Tracked-out caps over photography read
- * larger than their point size, so a ticker segment, a band label or a rank
- * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
- * same exception granted to the scorecard axis and the chart ticks. It covers
- * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
- * names, course names, scores, or any sentence: those are language and take
- * 11. Nothing goes below 10.
- */
-/**
- * PhotoBand — Tour Hub hero photo band (Lower-Third redesign).
- *
- * Full-bleed venue image with a bottom-anchored editorial lower-third that
- * collapses everything the old MiddleBand tried to carry (status, insight,
- * headline moment) into one legible stack over the image.
- *
- * Stack (bottom → up):
- *   1. TOURNAMENT link (right-aligned CTA, amber)
- *   2. Moment row      — leader / champion / defending champ chip
- *   3. Venue · Dates
- *   4. Title (2-line split — headline + subhead)
- *   5. Insight line    — labelled editorial line (AI course insight / winner narrative)
- *   6. State pill      — LIVE · FINAL · UPCOMING (with round/countdown)
- *
- * The lower-third stack now sits directly above the wire ticker; the removed
- * dots row freed the gap, so the title, venue, and moment chip move down.
- *
- * BRIEF_TOUR_OVERVIEW_STRUCTURAL section B — NOTHING OVERLAID, NOTHING MOVING.
- * The overview passes `heightPx` (300), a `kicker` and exactly three `facts`.
- * When facts are supplied the translucent blurred moment capsule is NOT drawn:
- * the leader, the round and the through-mark are set as plain type over the
- * photograph, because a frosted capsule is a second surface floating on a
- * surface, and the ramp under it is already doing the legibility work. Every
- * one of the three is a static fact; nothing in this band animates.
- *
- * The props are additive and default to today's values, so the results-state
- * CinematicFrame path and the InsightSheet caller are unchanged.
- */
-
-import React from 'react';
+/** The inset, tappable photograph used only by the Tour Overview carousel. */
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
-
-import {
-  PHOTO_BAND_HEIGHT,
-  COURSE_GRADIENT,
-  COURSE_GRADIENT_DUSK,
-  NUMERIC_STYLE,
-} from '../HybridHero.constants';
-import { FONT } from '../../../_shared/tokens';
 import { heroCanonBackground } from '../../../_shared/heroGradient';
 import { getScoreColor } from '../../../_shared/scoreColor';
+import {
+  AMBER,
+  FONT,
+  INK,
+  INK_MUTE,
+  LEADER_GOLD,
+  STATUS_LIVE_ON_DARK,
+  SURFACE,
+  WHITE_ALPHA_12,
+} from '../../../_shared/tokens';
+import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
+import { fmtScore, type HeroState } from '../HybridHero.utils';
 
-import { type HeroState } from '../HybridHero.utils';
-
-/** Score chip colour: canonical to-par grammar on dark (red under par). */
-function momentScoreColour(s: string): string {
-  if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'dark', 'standard');
-  if (s.startsWith('+')) return getScoreColor(1, 'dark', 'standard');
-  return getScoreColor(0, 'dark', 'standard');
+export interface OverviewCountdownUnit {
+  value: number;
+  label: 'days' | 'hours' | 'minutes';
 }
 
-
-export interface PhotoBandProps {
+interface PhotoBandProps {
   title: string;
   venueName: string | null;
-  venueCity: string | null;
+  datesString: string | null;
   venueImageUrl: string | null;
   state: HeroState;
-  tourLabel?: string | null;
-  winnerName?: string | null;
-  isMajor?: boolean;
-  isSignature?: boolean;
-  datesString?: string | null;
-  /** Editorial line — AI course insight (upcoming/live) or derived winner beat (results). */
-  insight?: string | null;
-  /** Which kind of line `insight` carries — drives the kicker label. */
-  insightKind?: 'course' | 'result';
-  /** Moment row: single chip surfacing the headline person. */
-  momentLabel?: string | null;
-  momentName?: string | null;
-  momentScore?: string | null;
-  /** Optional right-side CTA (TOURNAMENT ›) */
-  onCtaTap?: () => void;
-  ctaLabel?: string;
-  /** Extra venue data — surfaced by the enriched Insight sheet. All optional. */
-  venueCourseName?: string | null;
-  venueState?: string | null;
-  venueCountry?: string | null;
-  venuePar?: number | null;
-  venueYardage?: number | null;
-  purse?: number | null;
-  /**
-   * Band height. Defaults to PHOTO_BAND_HEIGHT (340), which is what the
-   * legacy/cancelled path and the News lead story render. The Tour Hub
-   * overview passes 300 per its structural brief.
-   */
+  tourLabel: string | null;
+  leader: { score: number; name: string | null } | null;
+  countdown: OverviewCountdownUnit[];
+  startDay: string | null;
+  champion: { name: string; score: number; margin: number | null; playoff: boolean } | null;
   heightPx?: number;
-  /** Small caps line above the title: LIVE / FINAL / TEES OFF IN ... */
-  kicker?: string | null;
-  /**
-   * Exactly three static facts, bottom of the stack, plain type. When present
-   * they REPLACE the moment capsule. Absent by default.
-   */
-  facts?: ReadonlyArray<{ label: string; value: string; valueColor?: string }>;
+  onOpen: () => void;
 }
 
-/** One static fact: caps label over its figure. No container. */
-function HeroFact({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) {
-  return (
-    <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <span
-        style={{
-          fontSize: 9.5 /* AXIS 10 - hero broadcast exception (see file header) */,
-          fontWeight: 700,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.62)',
-          textShadow: '0 1px 3px rgba(0,0,0,0.55)',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {label}
-      </span>
-      <span
-        style={{
-          ...NUMERIC_STYLE,
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: '-0.02em',
-          color: valueColor ?? 'white',
-          textShadow: '0 1px 3px rgba(0,0,0,0.55)',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
+const CAPS: React.CSSProperties = {
+  fontFamily: FONT,
+  fontSize: 10,
+  fontWeight: 800,
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase',
+};
 
 export function PhotoBand({
   title,
   venueName,
-  venueCity,
+  datesString,
   venueImageUrl,
   state,
   tourLabel,
-  datesString,
-  momentLabel,
-  momentName,
-  momentScore,
-  onCtaTap,
-  ctaLabel,
-  venueCourseName = null,
-  venueState = null,
-  venueCountry = null,
-  venuePar = null,
-  venueYardage = null,
-  purse = null,
-  heightPx = PHOTO_BAND_HEIGHT,
-  kicker = null,
-  facts,
+  leader,
+  countdown,
+  startDay,
+  champion,
+  heightPx = OVERVIEW_PHOTO_BAND_HEIGHT,
+  onOpen,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
-  const useDusk =
-    state.kind === 'results' && (state.variant === 'declared' || state.variant === 'cancelled');
-  const background = heroCanonBackground(
-    venueImageUrl,
-    useDusk ? COURSE_GRADIENT_DUSK : COURSE_GRADIENT,
-    '50% 55%',
-  );
+  const venueLine = [venueName, datesString].filter(Boolean).join(' · ');
+  const isLive = state.kind === 'live';
+  const isUpcoming = state.kind === 'upcoming';
+  const stateLabel = isLive
+    ? t('overview.hero.stateLive')
+    : isUpcoming && startDay
+      ? t('overview.hero.starts', { day: startDay })
+      : t('overview.hero.stateFinal');
 
   return (
-    <div
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label={title}
       style={{
         position: 'relative',
-        /* BRIEF_TOUR_HEADER_CORRECTION, Correction 2: the hero is FULL WIDTH,
-           not a tile. It lost its IMMERSIVE behaviour (nothing runs behind the
-           status bar), never its width — edge to edge, radius 0, zero top
-           margin, meeting the header's 1px border with no gap. */
-        width: '100%',
-        marginLeft: 0,
-        marginRight: 0,
-        borderRadius: 0,
-        // HARD height, not a floor. It ABSORBS the safe-area inset so the hero
-        // column (photo + 36px ticker) exactly fills OVERVIEW_HERO_TOTAL_HEIGHT
-        // — otherwise the inset showed as a white gap above the live board.
-        height: `${heightPx}px`,
-        // MICRO_BRIEF_TOUR_OVERVIEW_HERO_CANON_LAYERING took this hero's RAMP
-        // and LAYERING onto the canon but DELIBERATELY NOT its height: HERO_MIN_H
-        // ADDS the inset and is a floor, while PHOTO_BAND_HEIGHT is a term in
-        // TOTAL_HERO_HEIGHT_TARGET and must ABSORB the inset. Do not "finish the
-        // job" by swapping in HERO_MIN_H — it re-opens the white-gap bug.
-
-        flexGrow: 0,
+        display: 'block',
+        width: 'calc(100% - 20px)',
+        height: heightPx,
+        margin: '0 10px',
+        padding: 0,
         overflow: 'hidden',
-        flexShrink: 0,
-        background,
+        border: 'none',
+        borderRadius: 18,
+        background: heroCanonBackground(venueImageUrl, COURSE_GRADIENT, '50% 55%'),
+        color: INK,
+        fontFamily: FONT,
+        textAlign: 'left',
+        cursor: 'pointer',
       }}
     >
-      {/* The same single, full-frame canvas-ending scrim used by Course Detail
-          and the canonical Discover/Courses hero treatment. */}
-
-      {/* Top eyebrow removed per brief — tour name and dates no longer displayed on hero */}
-
-
-
-      {/* Lower-third stack — pulled down to the wire-ticker boundary now that
-          the carousel dots are removed. */}
       <div
         style={{
           position: 'absolute',
-          left: 20, right: 20, bottom: 8,
-          zIndex: 3,
-          display: 'flex', flexDirection: 'column', gap: 8,
+          top: 14,
+          left: 14,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 7,
+          minHeight: 28,
+          padding: '0 10px',
+          border: `1px solid ${WHITE_ALPHA_12}`,
+          borderRadius: 999,
+          background: 'rgba(20,22,26,0.60)',
+          ...CAPS,
         }}
       >
-        {/* Kicker — the state, as a line of type. Never a pill: a pill is a
-            container, and this band draws none (structural brief section B). */}
-        {kicker ? (
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.72)',
-              textShadow: '0 1px 3px rgba(0,0,0,0.55)',
-            }}
-          >
-            {kicker}
-          </span>
-        ) : null}
-
-        {/* Title — clamped to two lines; long sponsor-prefixed names step down
-            rather than clip mid-word (threshold from real sr_tournaments names). */}
-        <h1
-          style={{
-            margin: 0,
-            color: 'white',
-            fontFamily: FONT,
-            fontSize: 24,
-            fontWeight: 700,
-            lineHeight: 1.14,
-            letterSpacing: '-0.034em',
-            textShadow: '0 2px 12px rgba(0,0,0,0.55)',
-            textWrap: 'balance',
-            display: '-webkit-box',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-            overflow: 'hidden',
-          }}
-        >
-          {title}
-        </h1>
-
-        {/* Venue */}
-        {venueName && (
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 400,
-              color: 'rgba(255,255,255,0.75)',
-              textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-              letterSpacing: 0,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {venueName}
-            {venueCity ? ` · ${venueCity}` : ''}
-          </div>
-        )}
-
-        {/* THREE STATIC FACTS + CTA (structural brief section B). */}
-        {facts && facts.length > 0 ? (
-          <div
-            style={{
-              marginTop: 2,
-              display: 'flex',
-              alignItems: 'flex-end',
-              justifyContent: 'space-between',
-              gap: 12,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, minWidth: 0, flex: 1 }}>
-              {facts.map((f) => (
-                <HeroFact key={f.label} label={f.label} value={f.value} valueColor={f.valueColor} />
-              ))}
-            </div>
-            {onCtaTap && (
-              <button
-                type="button"
-                onClick={onCtaTap}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '6px 4px',
-                  margin: '-6px -4px',
-                  cursor: 'pointer',
-                  fontFamily: FONT,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  color: 'rgba(255,255,255,0.62)',
-                  textTransform: 'uppercase',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.55)',
-                  flexShrink: 0,
-                }}
-              >
-                {ctaLabel ?? t('overview.photoBand.tournamentCta')}
-                <ChevronRight size={14} strokeWidth={2.5} />
-              </button>
-            )}
-          </div>
-        ) : null}
-
-        {/* Moment row + CTA — legacy treatment, kept for callers that pass no facts. */}
-        {!facts && (momentName || onCtaTap) && (
-          <div
-            style={{
-              marginTop: 2,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-            }}
-          >
-            {momentName ? (
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'baseline',
-                  gap: 8,
-                  padding: '5px 9px',
-                  background: 'rgba(255,255,255,0.10)',
-                  border: '0.5px solid rgba(255,255,255,0.18)',
-                  borderRadius: 6,
-                  backdropFilter: 'blur(6px)',
-                  WebkitBackdropFilter: 'blur(6px)',
-                  minWidth: 0,
-                  maxWidth: '78%',
-                }}
-              >
-                {momentLabel && (
-                  <span
-                    style={{
-                      fontSize: 9.5 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
-                      fontWeight: 700,
-                      letterSpacing: '0.14em',
-                      color: 'rgba(255,255,255,0.65)',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {momentLabel}
-                  </span>
-                )}
-                <span
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: 'white',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    minWidth: 0,
-                  }}
-                >
-                  {momentName}
-                </span>
-                {momentScore && (
-                  <span
-                    style={{
-                      ...NUMERIC_STYLE,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: momentScoreColour(momentScore),
-                    }}
-                  >
-                    {momentScore}
-                  </span>
-                )}
-              </div>
-            ) : (
-              <span />
-            )}
-
-            {onCtaTap && (
-              <button
-                type="button"
-                onClick={onCtaTap}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '6px 4px',
-                  margin: '-6px -4px',
-                  cursor: 'pointer',
-                  fontFamily: FONT,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  // Quiet action on a dark hero band: white-62, never amber
-                  // (ACTION INK FLIP). Amber here stays only on the figure above.
-                  color: 'rgba(255,255,255,0.62)',
-                  textTransform: 'uppercase',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.55)',
-                  flexShrink: 0,
-                }}
-              >
-                {ctaLabel ?? t('overview.photoBand.tournamentCta')}
-                <ChevronRight size={14} strokeWidth={2.5} />
-              </button>
-            )}
-          </div>
-        )}
+        {isLive ? <span style={{ width: 7, height: 7, borderRadius: 999, background: STATUS_LIVE_ON_DARK }} /> : null}
+        <span>{stateLabel}</span>
+        {isLive ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {state.round}</span> : null}
       </div>
-    </div>
+
+      <div
+        style={{
+          position: 'absolute',
+          left: 16,
+          right: 16,
+          bottom: 16,
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 16,
+          minWidth: 0,
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {tourLabel ? <div style={{ ...CAPS, color: INK_MUTE, letterSpacing: '0.14em' }}>{tourLabel}</div> : null}
+          <h1
+            style={{
+              margin: '4px 0 0',
+              fontSize: 25,
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: 0,
+              color: INK,
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              overflow: 'hidden',
+            }}
+          >
+            {title}
+          </h1>
+          {venueLine ? (
+            <div style={{ marginTop: 5, fontSize: 13, color: 'rgba(248,250,252,0.82)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {venueLine}
+            </div>
+          ) : null}
+        </div>
+
+        {isLive && leader ? (
+          <div style={{ flex: 'none', maxWidth: 92, textAlign: 'right' }}>
+            <div style={{ ...NUMERIC_STYLE, fontSize: 34, lineHeight: 1, fontWeight: 800, color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
+            {leader.name ? <div style={{ marginTop: 4, fontSize: 12, fontWeight: 600, color: INK_MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{leader.name}</div> : null}
+          </div>
+        ) : null}
+
+        {isUpcoming && countdown.length > 0 ? (
+          <div style={{ display: 'flex', gap: 6, flex: 'none' }}>
+            {countdown.map((unit) => (
+              <div key={unit.label} style={{ minWidth: 50, padding: '8px 10px', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, background: 'rgba(20,22,26,0.60)', textAlign: 'center' }}>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 24, lineHeight: 1, fontWeight: 700 }}>{unit.value}</div>
+                <div style={{ ...CAPS, marginTop: 5, fontSize: 9 }}>{t(`overview.hero.${unit.label}`)}</div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {state.kind === 'results' && champion ? (
+          <div style={{ flex: 'none', maxWidth: 122, textAlign: 'right' }}>
+            <div style={{ ...CAPS, color: LEADER_GOLD, letterSpacing: '0.14em' }}>{t('overview.hero.champion')}</div>
+            <div style={{ marginTop: 3, fontSize: 17, lineHeight: 1.1, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{champion.name}</div>
+            <div style={{ ...NUMERIC_STYLE, marginTop: 4, fontSize: 13, fontWeight: 700, color: getScoreColor(champion.score, 'dark') }}>
+              {fmtScore(champion.score)}
+              {champion.playoff ? ` · ${t('overview.hero.playoff')}` : champion.margin != null ? ` · ${t('overview.hero.wonBy', { count: champion.margin })}` : ''}
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </button>
   );
 }
+
+export default PhotoBand;
