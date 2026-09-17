@@ -7,14 +7,11 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { CollegeFranchise } from '../../overview/sections/CollegeFranchise';
-import { CourseOfTheWeekSection } from '../../overview/sections/CourseOfTheWeekSection';
-import { LazySection } from '../overview-v3/LazySection';
-
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
-import { TourStoryCard } from '../../overview/sections/TourStoryCard';
-import { TIPickMagazineCard } from '../../overview/sections/TIPickMagazineCard';
-import { RankingsMagazineRail } from '../../overview/sections/RankingsMagazineRail';
+import { VenueRecordBand } from '../../overview/sections/VenueRecordBand';
+import { AlsoThisWeek } from '../../overview/sections/AlsoThisWeek';
+import { WorldRankings } from '../../overview/sections/WorldRankings';
+import { OverviewNews } from '../../overview/sections/OverviewNews';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
@@ -29,7 +26,7 @@ import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 export function OverviewPageV3() {
   const { t } = useTranslation('tourhub');
   const { isOnline } = useNetworkStatus();
-  const { selectedTourSlug, setAppliedTourSlug } = useTourSelection();
+  const { selectedTourSlug, viewingTournamentId, setAppliedTourSlug } = useTourSelection();
 
   // The overview's island label describes the lens used by its sections, not
   // the tour of whichever tournament happens to be visible in the hero.
@@ -85,18 +82,11 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 32, paddingBottom: NAV_CLEARANCE }}>
-            <TIPickMagazineCard />
-            <TourStoryCard index={0} lead />
+            <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
+            <AlsoThisWeek />
             <ComingUpSlot />
-            <TourStoryCard index={1} />
-            <CourseOfTheWeekSection />
-            <LazySection minHeight={170}>
-              <RankingsMagazineRail />
-            </LazySection>
-            <TourStoryCard index={2} />
-            <LazySection minHeight={350}>
-              <CollegeFranchise />
-            </LazySection>
+            <WorldRankings />
+            <OverviewNews />
 
             {/* THE PAGE ENDS AT ALL FRANCHISES (device-walk-2 F). The
                 provenance line ("Leaderboards and rankings from the tours.

@@ -65,64 +65,6 @@ const RATING_FLOOR = 3;
  */
 const EXCLUDE_NOBODY = '00000000-0000-0000-0000-000000000000';
 
-/** The section kicker: 9/700/0.19em uppercase, above the heading. */
-const SECTION_KICKER: React.CSSProperties = {
-  fontSize: 9,
-  fontWeight: 700,
-  letterSpacing: '0.19em',
-  textTransform: 'uppercase',
-  color: A.DIM,
-  fontFamily: SANS,
-};
-
-/** A figure kicker on the section's one stat: 9/700/0.12em, per the brief. */
-const FIGURE_KICKER: React.CSSProperties = {
-  fontSize: 9,
-  fontWeight: 700,
-  letterSpacing: '0.12em',
-  textTransform: 'uppercase',
-  color: A.DIM,
-  fontFamily: SANS,
-};
-
-function TerminalRow({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onPress}
-      style={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '11px 0 0',
-        marginTop: 12,
-        background: 'transparent',
-        border: 'none',
-        borderTop: `1px solid ${A.BORDER}`,
-        cursor: 'pointer',
-        textAlign: 'left',
-        fontFamily: SANS,
-      }}
-    >
-      <span
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: A.INK,
-        }}
-      >
-        {label}
-      </span>
-      <span style={{ fontSize: 12, fontWeight: 700, color: A.MUTE }} aria-hidden>
-        &rsaquo;
-      </span>
-    </button>
-  );
-}
-
 export function VenueRecordBand({ tournamentId }: { tournamentId: string | undefined }) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();

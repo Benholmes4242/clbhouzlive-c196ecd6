@@ -136,6 +136,13 @@
       "top10Label": "Top 10",
       "seasonNo1Label": "Season No. 1"
     },
+    "alsoThisWeek": {
+      "title": "Also this week"
+    },
+    "news": {
+      "title": "News",
+      "all": "All news"
+    },
     "teamWinnerStrip": {
       "eyebrow": "TEAM WINNER",
       "labelVsPar": "VS PAR",
@@ -248,7 +255,8 @@
       "fallbackSummary": "Course preview"
     },
     "comingUp": {
-      "eyebrow": "What's coming up",
+      "eyebrow": "Coming up",
+      "title": "Coming up",
       "linkLabel": "Full schedule",
       "chipPlayoffs": "Playoffs",
       "today": "Today",
