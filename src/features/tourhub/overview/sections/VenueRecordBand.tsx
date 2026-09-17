@@ -83,18 +83,9 @@ export function VenueRecordBand({ tournamentId, venueName }: { tournamentId: str
    * renders. No row means we do NOT know the course, so it is absent. Nothing
    * else decides WHETHER this section appears. UNRATED IS NOT UNKNOWN.
    *
-   * BOTH HALVES OF THIS FEATURE HAVE HAD THE RATED-OR-RANKED GATE REMOVED —
-   * DO NOT REINTRODUCE IT IN EITHER. get_tournament_venue_record's predicate
-   * was changed from rated-or-ranked to link-only for exactly this reason: it
-   * hid the venues where the rate prompt is most valuable. The client carried
-   * an identical gate, so the SQL fix was real and invisible — the worst of
-   * both. That is the second time the same mistake was made in this one
-   * feature, and the ninth instance of the state-collapse class: "we have
-   * nothing from members" and "we do not know this course" rendered
-   * identically, with the collapsed version reading as the ordinary case.
-   *
-   * hasRating and hasRank still decide WHAT renders inside — figure plus its
-   * count, the published rank, or neither — never whether.
+   * C10 keeps the presentation gate narrower than the link gate: the RPC may
+   * return a linked course with no member fact, but this overview block renders
+   * only when it can add a sufficiently sampled rating or a published rank.
    */
   if (!data || !shouldShowVenueRecord(data)) return null;
   const count = data.reviewCount ?? 0;
@@ -109,7 +100,7 @@ export function VenueRecordBand({ tournamentId, venueName }: { tournamentId: str
   const rank = hasRank ? `#${data.listRank}${data.listLabel ? ` ${data.listLabel}` : ''}` : null;
   const rating = hasRating ? `${Number(data.rating).toFixed(1)} from ${count} ratings` : null;
   const facts = [rank, rating].filter(Boolean).join(' · ');
-  const target = hasRating ? `/course/${data.courseId}` : `/courses/${data.courseId}/rate`;
+  const target = `/course/${data.courseId}`;
 
   return (
     <section data-overview-venue-block style={{ margin: '18px 24px 0', fontFamily: FONT }}>
