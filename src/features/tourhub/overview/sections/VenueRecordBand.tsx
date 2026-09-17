@@ -49,7 +49,6 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { FONT, INK, INK_MUTE, SURFACE } from '../../_shared/tokens';
 import { useTournamentVenueRecord } from '../data/useTournamentVenueRecord';
-import { useCourseFieldPlayers } from '@/hooks/gam/useCourseFieldPlayers';
 
 /* Minimum ratings before the clubhouse figure may render at all. */
 const RATING_FLOOR = 3;
@@ -63,23 +62,10 @@ const RATING_FLOOR = 3;
  * nobody, which makes course_players a complete count. THIS IS NOT AN UNFILLED
  * PLACEHOLDER — do not substitute the viewing member's id.
  */
-const EXCLUDE_NOBODY = '00000000-0000-0000-0000-000000000000';
-
 export function VenueRecordBand({ tournamentId }: { tournamentId: string | undefined }) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data } = useTournamentVenueRecord(tournamentId);
-
-  /* ONE call, one course id. See EXCLUDE_NOBODY above for the nil uuid. */
-  const field = useCourseFieldPlayers(
-    data?.courseId ? [data.courseId] : [],
-    EXCLUDE_NOBODY,
-  );
-  const playedRaw = data?.courseId ? field.data?.sizes.get(data.courseId) : undefined;
-  /* A failed or absent read renders nothing; and zero is NOT printed either,
-     because get_course_field_sizes returns 0 both for a course nobody has
-     played and for a course with no qualifying WHS mapping. */
-  void playedRaw;
 
   /**
    * THE LINK IS THE GATE. A row means we KNOW the course, so the section

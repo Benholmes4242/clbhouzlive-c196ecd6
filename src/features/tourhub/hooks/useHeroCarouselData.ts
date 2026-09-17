@@ -64,6 +64,8 @@ export interface HeroTournament {
   winnerPhotoUrl: string | null;
   winnerPgaTourId: string | null;
   winnerScore: string | null;
+  leaderScore: number | null;
+  leaderName: string | null;
   currentRound: number | null;
   currentRoundStatus: string | null;
   
@@ -311,6 +313,10 @@ export function useHeroCarouselData() {
           winnerPhotoUrl,
           winnerPgaTourId,
           winnerScore,
+          leaderScore: leaderboardMap[row.id]?.score ?? null,
+          leaderName: leaderboardMap[row.id]?.player
+            ? `${leaderboardMap[row.id].player.first_name || ''} ${leaderboardMap[row.id].player.last_name || ''}`.trim() || null
+            : null,
           currentRound: (row as any).current_round ?? null,
           currentRoundStatus: (row as any).current_round_status ?? null,
           

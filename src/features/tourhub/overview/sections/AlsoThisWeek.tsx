@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useTourSelection } from '../../context/TourSelectionContext';
-import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { tournamentRoute } from '../../routes';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { fmtScore } from '../../components/overview-v3/HybridHero.utils';
@@ -20,13 +19,10 @@ function statusFor(slide: HeroSlide): string {
 
 function OtherTournamentRow({ slide, last }: { slide: HeroSlide; last: boolean }) {
   const navigate = useNavigate();
-  const active = slide.type !== 'upcoming';
-  const { data = [] } = useTourLeaderboard(active ? slide.tournament.id : '');
-  const leader = data[0];
-  const score = leader?.score ?? null;
+  const score = slide.tournament.leaderScore;
   const name = slide.type === 'completed'
     ? slide.tournament.winnerName
-    : leader?.player?.full_name?.trim().split(/\s+/).slice(-1)[0] ?? null;
+    : slide.tournament.leaderName?.trim().split(/\s+/).slice(-1)[0] ?? null;
   const target = tournamentRoute(slide.tournament.id, { kind: 'overview' });
   const status = statusFor(slide);
   return (
