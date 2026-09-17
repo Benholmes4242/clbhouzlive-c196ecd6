@@ -490,6 +490,7 @@ export function ExploreCard({
 
 
   const showScope = size !== 'pair' && kickerPartsValue.scope != null;
+  const showCourseRow = kickerPartsValue.course != null || kickerDate != null || (size === 'pair' && kickerPartsValue.scope != null);
   const kicker = (
     <div
       data-explore-kicker="true"
@@ -518,10 +519,11 @@ export function ExploreCard({
           {kickerPartsValue.scope}
         </span>
       ) : null}
-      <span
-        data-explore-kicker-row="true"
-        style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0, marginTop: showScope ? 4 : 0 }}
-      >
+      {showCourseRow ? (
+        <span
+          data-explore-kicker-row="true"
+          style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0, marginTop: showScope ? 4 : 0 }}
+        >
         {kickerPartsValue.course ? (
           <span
             data-explore-kicker-course="true"
@@ -546,7 +548,8 @@ export function ExploreCard({
             {kickerDate}
           </span>
         ) : null}
-      </span>
+        </span>
+      ) : null}
     </div>
   );
 
