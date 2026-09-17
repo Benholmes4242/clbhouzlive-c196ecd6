@@ -7,6 +7,11 @@
 import { formatDayMonthShortGB } from '@/i18n/format';
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'] as const;
+
+function storyDate(date: Date): string {
+  return `${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`;
+}
 
 export function storyTime(iso: string | null | undefined, now = new Date()): string {
   if (!iso) return '';
@@ -18,5 +23,5 @@ export function storyTime(iso: string | null | undefined, now = new Date()): str
   if (elapsedHours < 24) return `${elapsedHours}H AGO`;
   if (elapsedHours < 48) return 'YESTERDAY';
   if (ageMs < WEEK_MS) return `${Math.floor(elapsedHours / 24)} DAYS AGO`;
-  return formatDayMonthShortGB(new Date(t)).toUpperCase();
+  return storyDate(new Date(t));
 }

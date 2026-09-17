@@ -159,7 +159,7 @@ describe('Tour Overview H12 material breaks', () => {
 });
 
 describe('story elapsed-time labels', () => {
-  const now = new Date('2026-09-17T20:00:00Z');
+  const now = new Date('2026-09-23T20:00:00Z');
   const hoursAgo = (hours: number) => new Date(now.getTime() - hours * 3_600_000).toISOString();
 
   it('uses elapsed-hour boundaries rather than calendar days', () => {
@@ -168,6 +168,13 @@ describe('story elapsed-time labels', () => {
     expect(storyTime(hoursAgo(47), now)).toBe('YESTERDAY');
     expect(storyTime(hoursAgo(49), now)).toBe('2 DAYS AGO');
     expect(storyTime(hoursAgo(72), now)).toBe('3 DAYS AGO');
-    expect(storyTime(hoursAgo(192), now)).toBe('9 SEP');
+    expect(storyTime(hoursAgo(192), now)).toBe('15 SEP');
+  });
+
+  it('labels today’s 15 Sep feed story honestly and selects it as the fallback', () => {
+    const feedNow = new Date('2026-09-17T21:16:00Z');
+    const feedStory = story('15-sep', '2026-09-15T13:15:00Z', null);
+    expect(storyTime(feedStory.published_at, feedNow)).toBe('2 DAYS AGO');
+    expect(selectOverviewBandStory([feedStory], 'unmatched-hero', feedNow)?.id).toBe('15-sep');
   });
 });
