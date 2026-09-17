@@ -4,8 +4,6 @@
  * Story freshness is elapsed-time based, never calendar-day based. In
  * particular, YESTERDAY means 24–48 real hours ago; it is not a date label.
  */
-import { formatDayMonthShortGB } from '@/i18n/format';
-
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'] as const;
 
