@@ -52,7 +52,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
@@ -202,6 +202,21 @@ export function overviewTournamentDoorKey(phase: HeroBoardSectionProps['phase'])
   return 'overview.ticker.fullLeaderboard';
 }
 
+export function shouldLoadUpcomingFacts(phase: HeroBoardSectionProps['phase']): boolean {
+  return phase === 'upcoming';
+}
+
+export interface UpcomingHeroFact {
+  label: string;
+  value: string;
+  trailing: string | null;
+  trailingColor: string;
+}
+
+export function compactUpcomingFacts(facts: Array<UpcomingHeroFact | null>): UpcomingHeroFact[] {
+  return facts.filter((fact): fact is UpcomingHeroFact => fact !== null);
+}
+
 export function HeroBoardSection({
   tournamentId,
   entries,
@@ -260,22 +275,23 @@ export function HeroBoardSection({
     return placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', ');
   }, [boardByPlayer, hasPicks, phase, picks]);
 
-  const showThreeUp = phase === 'upcoming' || !hasBoard;
-  const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showThreeUp);
-  const { data: defending } = useTournamentDefendingChamp(showThreeUp ? tournamentId : null);
-  const { data: lastYear } = useTournamentLastYearTop4(showThreeUp ? tournamentId : null);
-  const { data: fieldStrength } = useTournamentFieldStrength(showThreeUp ? tournamentId : null);
+  const showUpcomingFacts = shouldLoadUpcomingFacts(phase);
+  const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showUpcomingFacts);
+  const { data: defending } = useTournamentDefendingChamp(showUpcomingFacts ? tournamentId : null);
+  const { data: lastYear } = useTournamentLastYearTop4(showUpcomingFacts ? tournamentId : null);
+  const { data: fieldStrength } = useTournamentFieldStrength(showUpcomingFacts ? tournamentId : null);
   const firstTeeCandidate = teeTimes[0] ?? null;
   const firstTee = firstTeeCandidate?.time && firstTeeCandidate.time !== '\u2014'
     ? firstTeeCandidate
     : null;
   const priorWinner = lastYear?.find((row) => row.rank === '1' || row.rank === 'T1') ?? null;
-  const threeUp = [
-    firstTee ? { label: t('overview.hero.firstTee'), value: firstTee.time, sub: 'Thu, BST', color: INK } : null,
-    defending?.name ? { label: t('overview.hero.defending'), value: surnameOf(defending.name), sub: priorWinner?.score || defending.score || null, color: priorWinner?.score?.startsWith('-') ? TOPAR_UNDER_DARK : INK } : null,
-    fieldStrength?.topRanked != null ? { label: t('overview.hero.field'), value: `${fieldStrength.topRanked} of top 20`, sub: t('overview.hero.worldRanked'), color: INK } : null,
-  ].filter((cell): cell is { label: string; value: string; sub: string | null; color: string } => Boolean(cell));
-  const hasThreeUp = threeUp.length > 0;
+  const priorScore = priorWinner?.score || defending?.score || null;
+  const upcomingFacts = compactUpcomingFacts([
+    firstTee ? { label: t('overview.hero.firstTee'), value: firstTee.time, trailing: null, trailingColor: INK } : null,
+    defending?.name ? { label: t('overview.hero.defending'), value: surnameOf(defending.name), trailing: priorScore, trailingColor: priorScore && /^[-−]/.test(priorScore) ? TOPAR_UNDER_DARK : INK } : null,
+    fieldStrength?.topRanked != null ? { label: t('overview.hero.field'), value: `${fieldStrength.topRanked} of top 20`, trailing: null, trailingColor: INK } : null,
+  ]);
+  const hasUpcomingFacts = showUpcomingFacts && upcomingFacts.length > 0;
 
   return (
     <div style={{ background: PAGE_CANVAS, fontFamily: FONT }}>
@@ -292,14 +308,15 @@ export function HeroBoardSection({
         />
       ) : null}
 
-      {hasThreeUp ? (
-        <div style={{ display: 'grid', gridTemplateColumns: threeUp.length === 1 ? 'minmax(0, 1fr)' : `repeat(${threeUp.length}, minmax(0, 1fr))`, padding: '14px 24px 10px' }}>
-          {threeUp.map((cell, index) => (
-            <div key={cell.label} style={{ minWidth: 0, padding: threeUp.length === 1 ? 0 : '0 10px', textAlign: threeUp.length === 1 ? 'left' : 'center' }}>
-              <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{cell.label}</div>
-              <div style={{ marginTop: 4, fontSize: 16, fontWeight: 700, color: cell.color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cell.value}</div>
-              {cell.sub ? <div style={{ marginTop: 2, fontSize: 11, color: cell.color === TOPAR_UNDER_DARK ? TOPAR_UNDER_DARK : WHITE_ALPHA_65, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cell.sub}</div> : null}
-            </div>
+      {hasUpcomingFacts ? (
+        <div data-overview-facts style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px', padding: '13px 24px', lineHeight: 1.3 }}>
+          {upcomingFacts.map((fact, index) => (
+            <span key={fact.label} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{fact.label}</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: INK }}>{fact.value}</span>
+              {fact.trailing ? <span style={{ fontSize: 14, fontWeight: 700, color: fact.trailingColor }}>{fact.trailing}</span> : null}
+              {index < upcomingFacts.length - 1 ? <span aria-hidden style={{ marginLeft: 1, color: WHITE_ALPHA_65 }}>·</span> : null}
+            </span>
           ))}
         </div>
       ) : null}

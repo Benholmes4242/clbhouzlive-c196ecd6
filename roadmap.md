@@ -37,6 +37,13 @@ Tour Overview Design A
 - [x] Add equal tournament and conditional course doors
 - [x] Verify one/two-door states, all lifecycle labels, row taps, 320 overflow, types, tests, and build
 
+## Tour Overview H9
+- [x] Gate tee time and supporting facts to upcoming only
+- [x] Extend the overview-only photograph and synchronize the skeleton
+- [x] Reuse the Chrome Island glass for state and countdown controls
+- [x] Replace facts columns with one wrapping populated line
+- [x] Verify lifecycle fixtures, seam/fold measurements, overflow, types, tests, and build
+
 ## Explore kicker and achievement marks
 - [x] Structure kicker copy as scope and course
 - [x] Render optional two-line kickers and one-line pair kickers

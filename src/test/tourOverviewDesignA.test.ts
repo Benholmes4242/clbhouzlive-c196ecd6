@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
-import { overviewTournamentDoorKey, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
+import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
@@ -10,9 +10,9 @@ import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 const NOW = new Date('2026-09-17T12:00:00Z');
 
 describe('Tour Overview Design A hero facts', () => {
-  it('keeps the overview at 360 without changing the shared news hero height', () => {
-    expect(OVERVIEW_PHOTO_BAND_HEIGHT).toBe(360);
-    expect(OVERVIEW_HERO_TOTAL_HEIGHT).toBe('360px');
+  it('keeps the overview at 386 without changing the shared news hero height', () => {
+    expect(OVERVIEW_PHOTO_BAND_HEIGHT).toBe(386);
+    expect(OVERVIEW_HERO_TOTAL_HEIGHT).toBe('386px');
     expect(PHOTO_BAND_HEIGHT).toBe(340);
     expect(OVERVIEW_HERO_HEIGHT).toBe('340px');
   });
@@ -71,6 +71,21 @@ describe('Tour Overview correctness gates', () => {
     expect(overviewTournamentDoorKey('live')).toBe('overview.ticker.fullLeaderboard');
     expect(overviewTournamentDoorKey('completed')).toBe('overview.ticker.fullResults');
     expect(overviewTournamentDoorKey('upcoming')).toBe('overview.leaderboardBand.ctaUpcoming');
+  });
+
+  it('loads the facts line for upcoming tournaments only', () => {
+    expect(shouldLoadUpcomingFacts('upcoming')).toBe(true);
+    expect(shouldLoadUpcomingFacts('live')).toBe(false);
+    expect(shouldLoadUpcomingFacts('completed')).toBe(false);
+  });
+
+  it('closes the upcoming facts line around one, two, or three populated facts', () => {
+    const tee = { label: 'FIRST TEE', value: '3:00 PM', trailing: null, trailingColor: 'white' };
+    const defending = { label: 'DEFENDING', value: 'Barron', trailing: '−12', trailingColor: 'red' };
+    const field = { label: 'FIELD', value: '9 of top 20', trailing: null, trailingColor: 'white' };
+    expect(compactUpcomingFacts([null, defending, null])).toEqual([defending]);
+    expect(compactUpcomingFacts([tee, defending, null])).toEqual([tee, defending]);
+    expect(compactUpcomingFacts([tee, defending, field])).toEqual([tee, defending, field]);
   });
 
   it('withholds level-par field-order rows until a position or score is posted', () => {
