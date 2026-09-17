@@ -20,6 +20,20 @@ export const TOUR_LABEL: Record<TourId, string> = {
   liv: 'LIV',
 };
 
+/** Full display label for tournament-list kickers. */
+export const FULL_TOUR_LABEL: Record<TourId, string> = {
+  pga: 'PGA TOUR',
+  lpga: 'LPGA TOUR',
+  euro: 'DP WORLD TOUR',
+  pgad: 'KORN FERRY TOUR',
+  champ: 'CHAMPIONS TOUR',
+  liv: 'LIV GOLF',
+};
+
+export function fullTourLabel(slug: TourId | string | null | undefined, fallback?: string | null): string {
+  return FULL_TOUR_LABEL[slug as TourId] ?? fallback ?? slug ?? 'TOUR';
+}
+
 /** First distinctive word in a tournament name — used to disambiguate
  *  same-tour live pills (e.g. "PGA · Memorial"). Skips generic filler. */
 const SHORT_NAME_SKIP = new Set([

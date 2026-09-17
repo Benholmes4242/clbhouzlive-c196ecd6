@@ -5,6 +5,7 @@ import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFact
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
+import { fullTourLabel } from '@/features/tourhub/_shared/tourOrder';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 
 const NOW = new Date('2026-09-17T12:00:00Z');
@@ -103,5 +104,11 @@ describe('Tour Overview correctness gates', () => {
   it('shows weekday alone beyond 24 hours and adds time inside 24 hours', () => {
     expect(statusFor(slide('upcoming', '2026-09-19T15:00:00Z'), NOW)).toBe('Starts Saturday');
     expect(statusFor(slide('upcoming', '2026-09-17T15:42:00Z'), NOW)).toContain('15:42');
+  });
+
+  it('uses the same full tour kicker grammar in both tournament lists', () => {
+    expect(['pga', 'euro', 'lpga', 'pgad', 'champ', 'liv'].map((tour) => fullTourLabel(tour))).toEqual([
+      'PGA TOUR', 'DP WORLD TOUR', 'LPGA TOUR', 'KORN FERRY TOUR', 'CHAMPIONS TOUR', 'LIV GOLF',
+    ]);
   });
 });

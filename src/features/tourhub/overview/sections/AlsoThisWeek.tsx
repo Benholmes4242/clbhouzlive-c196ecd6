@@ -6,12 +6,9 @@ import { useTourSelection } from '../../context/TourSelectionContext';
 import { tournamentRoute } from '../../routes';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { fmtScore } from '../../components/overview-v3/HybridHero.utils';
+import { fullTourLabel } from '../../_shared/tourOrder';
 import { FONT, INK, INK_MUTE, TREND_UP, WHITE_ALPHA_06 } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
-
-const SHORT_TOUR_LABELS: Record<string, string> = {
-  pga: 'PGA', euro: 'DP WORLD', lpga: 'LPGA', pgad: 'KORN FERRY', champ: 'CHAMPIONS', liv: 'LIV',
-};
 
 export function statusFor(slide: HeroSlide, now = new Date()): string {
   if (slide.type === 'live') return `Live${slide.tournament.currentRound ? ` · Round ${slide.tournament.currentRound}` : ''}`;
@@ -44,15 +41,16 @@ function OtherTournamentRow({ slide, last }: { slide: HeroSlide; last: boolean }
     : slide.tournament.leaderName?.trim().split(/\s+/).slice(-1)[0] ?? null;
   const target = tournamentRoute(slide.tournament.id, { kind: 'overview' });
   const status = statusFor(slide);
-  const tourLabel = SHORT_TOUR_LABELS[slide.tournament.tourSlug] ?? slide.tournament.tourName.replace(/\s+TOUR$/i, '');
+  const tourLabel = fullTourLabel(slide.tournament.tourSlug, slide.tournament.tourName);
+  const hasFigures = score != null && name != null;
   return (
-    <button type="button" onClick={() => navigate(target.to, { state: target.state })} style={{ width: '100%', minHeight: 58, padding: '10px 24px', display: 'grid', gridTemplateColumns: '62px minmax(0,1fr) auto', alignItems: 'center', columnGap: 12, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>
-      <span style={{ display: '-webkit-box', overflow: 'hidden', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, fontSize: 9.5, lineHeight: 1.15, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_MUTE }}>{tourLabel}</span>
+    <button type="button" onClick={() => navigate(target.to, { state: target.state })} style={{ width: '100%', minHeight: 76, padding: '13px 24px', display: 'grid', gridTemplateColumns: hasFigures ? 'minmax(0,1fr) auto' : 'minmax(0,1fr)', alignItems: 'center', columnGap: 12, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>
       <span style={{ minWidth: 0 }}>
-        <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14, fontWeight: 700 }}>{slide.tournament.name}</span>
-        {status ? <span style={{ display: 'block', marginTop: 2, fontSize: 12, color: slide.type === 'live' ? TREND_UP : INK_MUTE }}>{status}</span> : null}
+        <span style={{ display: 'block', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: 9.5, lineHeight: 1.2, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: INK_MUTE }}>{tourLabel}</span>
+        <span style={{ display: '-webkit-box', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, fontSize: 14, fontWeight: 700, lineHeight: 1.28 }}>{slide.tournament.name}</span>
+        {status ? <span style={{ display: 'block', marginTop: 3, fontSize: 12, color: slide.type === 'live' ? TREND_UP : INK_MUTE }}>{status}</span> : null}
       </span>
-      {score != null && name ? <span style={{ minWidth: 48, textAlign: 'right' }}><span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: getScoreColor(score, 'dark'), fontVariantNumeric: 'tabular-nums' }}>{fmtScore(score)}</span><span style={{ display: 'block', marginTop: 2, maxWidth: 72, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: INK_MUTE }}>{name}</span></span> : null}
+      {hasFigures ? <span style={{ flex: 'none', textAlign: 'right' }}><span style={{ display: 'block', whiteSpace: 'nowrap', fontSize: 16, fontWeight: 800, color: getScoreColor(score, 'dark'), fontVariantNumeric: 'tabular-nums' }}>{fmtScore(score)}</span><span style={{ display: 'block', marginTop: 2, whiteSpace: 'nowrap', fontSize: 12, color: INK_MUTE }}>{name}</span></span> : null}
     </button>
   );
 }
