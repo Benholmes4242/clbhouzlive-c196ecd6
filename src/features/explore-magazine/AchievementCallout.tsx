@@ -14,11 +14,8 @@ import { standingOrdinal } from './ordinal';
 import {
   BirdieCountIcon,
   CALLOUT_ICON,
-  CrownIcon,
-  NetRecordIcon,
   RankUpIcon,
-  ShieldCheckIcon,
-  StarIcon,
+  AchievementEmoji,
 } from './achievementIcons';
 
 /**
@@ -53,13 +50,13 @@ export function AchievementCalloutPanel({
     switch (callout.kind) {
       case 'record':
         return {
-          icon: <CrownIcon />,
+          icon: <AchievementEmoji glyph="🏆" />,
           title: t('amateur.stream.callout.record', 'New course record'),
           subline: null,
         };
       case 'net_record':
         return {
-          icon: <NetRecordIcon />,
+          icon: <AchievementEmoji glyph="⭐" />,
           title: t('amateur.stream.callout.netRecord', 'New net course record'),
           subline: null,
         };
@@ -76,7 +73,7 @@ export function AchievementCalloutPanel({
         };
       case 'ace':
         return {
-          icon: <StarIcon />,
+          icon: <AchievementEmoji glyph="⛳" />,
           title: t('amateur.stream.callout.ace', 'Hole in one'),
           subline:
             callout.hole != null
@@ -85,7 +82,7 @@ export function AchievementCalloutPanel({
         };
       case 'albatross':
         return {
-          icon: <StarIcon />,
+          icon: <AchievementEmoji glyph="🔥" />,
           title: t('amateur.stream.callout.albatross', 'Albatross'),
           subline:
             callout.hole != null
@@ -94,7 +91,7 @@ export function AchievementCalloutPanel({
         };
       case 'eagle':
         return {
-          icon: <StarIcon />,
+          icon: <AchievementEmoji glyph="🦅" />,
           title: t('amateur.stream.callout.eagle', 'Eagle'),
           subline:
             callout.hole != null
@@ -109,7 +106,7 @@ export function AchievementCalloutPanel({
         };
       case 'clean':
         return {
-          icon: <ShieldCheckIcon />,
+          icon: <AchievementEmoji glyph="🛡️" />,
           title: t('amateur.stream.callout.bogeyFree', 'Bogey-free'),
           subline: t('amateur.stream.callout.bogeyFreeSub', 'Par or better on every hole'),
         };
@@ -229,12 +226,12 @@ export function RoundStatStrip({
   const achievement = callout ? (() => {
     switch (callout.kind) {
       case 'record': return {
-        icon: <CrownIcon />,
+        icon: <AchievementEmoji glyph="🏆" />,
         tag: t('amateur.stream.callout.tagNew', 'NEW'),
         label: t('amateur.stream.callout.courseRecord', 'Course record'),
       };
       case 'net_record': return {
-        icon: <NetRecordIcon />,
+        icon: <AchievementEmoji glyph="⭐" />,
         tag: t('amateur.stream.callout.tagNew', 'NEW'),
         label: t('amateur.stream.callout.netCourseRecord', 'Net course record'),
       };
@@ -245,15 +242,15 @@ export function RoundStatStrip({
           ? t('amateur.stream.callout.nowRank', 'Now {{ord}}', { ord })
           : t('amateur.stream.callout.movedUpBoard', 'Moved up the board'),
       };
-      case 'ace': return { icon: <StarIcon />, tag: null, label: t('amateur.stream.callout.ace', 'Hole in one') };
-      case 'albatross': return { icon: <StarIcon />, tag: null, label: t('amateur.stream.callout.albatross', 'Albatross') };
-      case 'eagle': return { icon: <StarIcon />, tag: null, label: t('amateur.stream.callout.eagle', 'Eagle') };
+      case 'ace': return { icon: <AchievementEmoji glyph="⛳" />, tag: null, label: t('amateur.stream.callout.ace', 'Hole in one') };
+      case 'albatross': return { icon: <AchievementEmoji glyph="🔥" />, tag: null, label: t('amateur.stream.callout.albatross', 'Albatross') };
+      case 'eagle': return { icon: <AchievementEmoji glyph="🦅" />, tag: null, label: t('amateur.stream.callout.eagle', 'Eagle') };
       case 'birdies': return {
         icon: <BirdieCountIcon count={callout.count} />,
         tag: null,
         label: t('amateur.stream.callout.birdies', '{{n}} birdies', { n: callout.count }),
       };
-      case 'clean': return { icon: <ShieldCheckIcon />, tag: null, label: t('amateur.stream.callout.bogeyFree', 'Bogey-free') };
+      case 'clean': return { icon: <AchievementEmoji glyph="🛡️" />, tag: null, label: t('amateur.stream.callout.bogeyFree', 'Bogey-free') };
     }
   })() : null;
 

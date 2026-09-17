@@ -1609,15 +1609,15 @@
         "courseRecord": "코스 레코드",
         "onYourList": "내 리스트",
         "atYourClub": "내 클럽",
-        "aroundRegion": "{{region}} 주변",
-        "aroundWorld": "전 세계",
+        "aroundRegion": "{{region}}",
+        "aroundWorld": "세계",
         "backlog": "{{month}}",
         "news": "뉴스",
         "clip": "클립",
         "watch": "긴 영상",
         "moment": "커뮤니티에서",
         "course": "코스",
-        "aroundCountry": "{{country}} 주변"
+        "aroundCountry": "{{country}}"
       },
       "headline": {
         "recordTaken": "{{player}}이(가) {{gross}}타로 코스 레코드를 세웠습니다.",
@@ -1718,13 +1718,13 @@
         "netRecord": "New net course record",
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
-        "beatHandicap": "Beat handicap by {{n}}"
-        ,"tagNew": "NEW"
-        ,"courseRecord": "코스 레코드"
-        ,"netCourseRecord": "네트 코스 레코드"
-        ,"tagMovedUp": "순위 상승"
-        ,"nowRank": "현재 {{ord}}위"
-        ,"movedUpBoard": "순위가 상승했습니다"
+        "beatHandicap": "Beat handicap by {{n}}",
+        "tagNew": "NEW",
+        "courseRecord": "코스 레코드",
+        "netCourseRecord": "네트 코스 레코드",
+        "tagMovedUp": "순위 상승",
+        "nowRank": "현재 {{ord}}위",
+        "movedUpBoard": "순위가 상승했습니다"
       },
       "stat": {
         "par": "PAR",

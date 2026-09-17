@@ -186,7 +186,7 @@ describe('Explore card shapes', () => {
       const date = container.querySelector<HTMLElement>('[data-explore-kicker-date="true"]');
       expect(course?.textContent).toContain("Prince's Golf Club");
       expect(course?.style.overflow).toBe('hidden');
-      expect(course?.querySelector<HTMLElement>('[data-explore-kicker-part]')?.style.textOverflow).toBe('ellipsis');
+      expect(course?.style.textOverflow).toBe('ellipsis');
       expect(date?.style.flex).toBe('0 0 auto');
       expect(date?.style.whiteSpace).toBe('nowrap');
       expect(date?.style.color).toBe('rgb(255, 255, 255)');
@@ -263,8 +263,29 @@ describe('Explore card shapes', () => {
     );
     const ownPart = container.querySelector<HTMLElement>('[data-explore-kicker-part="primary"]');
 
-    expect(ownPart?.textContent).toContain('Around Surrey');
-    expect(ownPart?.style.color).toBe('');
+    expect(ownPart?.textContent).toBe('Surrey');
+    expect(ownPart?.style.color).toBe('rgba(248, 250, 252, 0.62)');
     expect(ownPart?.closest<HTMLElement>('[data-explore-kicker="true"]')?.style.color).toBe('rgb(255, 255, 255)');
+  });
+
+  it('renders no scope element or gap for club-ring and record rounds', () => {
+    for (const item of [
+      { ...round(), ring: 'club' as const, consequence: null, facts: { ...round().facts, is_course_record: false } },
+      round(),
+    ]) {
+      const { container, unmount } = render(<ExploreCard item={item} size="std" shape={null} onTap={() => undefined} />);
+      expect(container.querySelector('[data-explore-kicker-scope="true"]')).toBeNull();
+      expect(container.querySelector<HTMLElement>('[data-explore-kicker-row="true"]')?.style.marginTop).toBe('0px');
+      unmount();
+    }
+  });
+
+  it('keeps pair cards to one course-and-date line', () => {
+    const item = { ...round(), ring: 'county' as const, consequence: null, facts: { ...round().facts, is_course_record: false } };
+    const { container } = render(<ExploreCard item={item} size="pair" shape={null} onTap={() => undefined} />);
+    expect(container.querySelector('[data-explore-kicker-scope="true"]')).toBeNull();
+    expect(container.querySelector('[data-explore-kicker-row="true"]')).not.toBeNull();
+    expect(container.querySelector('[data-explore-kicker-course="true"]')?.textContent).toBe('The Addington Golf Club');
+    expect(container.querySelector<HTMLElement>('[data-explore-kicker-row="true"]')?.style.marginTop).toBe('0px');
   });
 });

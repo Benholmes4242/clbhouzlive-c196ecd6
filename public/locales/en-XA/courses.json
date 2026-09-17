@@ -2239,15 +2239,15 @@
         "courseRecord": "[Çöürsé réçörd one]",
         "onYourList": "[Ön yöür lîst one]",
         "atYourClub": "[Åt yöür çlüb one]",
-        "aroundRegion": "[Åröünd {{region}} one]",
-        "aroundWorld": "[Åröünd thé wörld one]",
+        "aroundRegion": "[{{region}} one]",
+        "aroundWorld": "[Wörld one]",
         "backlog": "[Fröm {{month}} one]",
         "news": "[Néws one]",
         "clip": "[Çlîp one]",
         "watch": "[Löngér wåtçh one]",
         "moment": "[Fröm thé çömmünîty one]",
         "course": "[Çöürsé one]",
-        "aroundCountry": "[Ãrõũñd {{country}}]"
+        "aroundCountry": "[{{country}} one]"
       },
       "headline": {
         "recordTaken": "[{{player}} took the course record with a {{gross}}. one two]",
@@ -2348,13 +2348,13 @@
         "netRecord": "New net course record",
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
-        "beatHandicap": "Beat handicap by {{n}}"
-        ,"tagNew": "[NEW]"
-        ,"courseRecord": "[Course record]"
-        ,"netCourseRecord": "[Net course record]"
-        ,"tagMovedUp": "[MOVED UP]"
-        ,"nowRank": "[Now {{ord}}]"
-        ,"movedUpBoard": "[Moved up the board]"
+        "beatHandicap": "Beat handicap by {{n}}",
+        "tagNew": "[NEW]",
+        "courseRecord": "[Course record]",
+        "netCourseRecord": "[Net course record]",
+        "tagMovedUp": "[MOVED UP]",
+        "nowRank": "[Now {{ord}}]",
+        "movedUpBoard": "[Moved up the board]"
       },
       "stat": {
         "par": "[PAR]",

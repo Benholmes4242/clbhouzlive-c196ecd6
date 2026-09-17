@@ -9,9 +9,10 @@ import { indefiniteArticleForScore, standingOrdinal } from './ordinal';
  * headline is addressed to the viewer by definition ("your 71"), so "your" is
  * right here and "their" would be wrong. Do not "fix" it.
  *
- * INTERPUNCTS ARE NEVER IN A STRING. A kicker is a LIST OF PARTS and the card
- * joins them in JSX with {'\u00B7'}; locale files stay ASCII. The one non-ASCII
- * character composed in code is U+2212, the true minus, for a to-par figure.
+ * A kicker separates its scope from its course structurally. The card decides
+ * whether those fields occupy one or two lines; copy never inserts punctuation
+ * between them. The one non-ASCII character composed in code is U+2212, the
+ * true minus, for a to-par figure.
  */
 
 type T = (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
@@ -45,9 +46,14 @@ export function toParLabel(toPar: number | null | undefined): string | null {
  * Phase A can honestly reach ownRound, courseRecord, onYourList and the plain
  * types; the ring kickers arrive with geography in Phase C.
  */
-export function kickerParts(item: StreamItem, t: T): string[] {
+export interface KickerParts {
+  scope: string | null;
+  course: string | null;
+}
+
+export function kickerParts(item: StreamItem, t: T): KickerParts {
   const course = item.subject?.course_name?.trim() || null;
-  const withCourse = (label: string) => (course ? [label, course] : [label]);
+  const withCourse = (scope: string | null): KickerParts => ({ scope, course });
 
   if (item.kind === 'round' && item.who?.is_viewer) {
     return withCourse(t('amateur.stream.kicker.ownRound', 'Your round'));
@@ -55,7 +61,7 @@ export function kickerParts(item: StreamItem, t: T): string[] {
   if (item.facts.is_course_record) {
     // The headline owns the event. The kicker keeps only the course so the
     // adjacent lines never repeat "course record" or sacrifice its name.
-    return course ? [course] : [];
+    return withCourse(null);
   }
   if (item.consequence?.kind === 'review_on_list' || item.consequence?.kind === 'list_new_low' || item.consequence?.kind === 'list_first') {
     return withCourse(t('amateur.stream.kicker.onYourList', 'On your list'));
@@ -64,19 +70,19 @@ export function kickerParts(item: StreamItem, t: T): string[] {
      their own club, so the prefix states what the name already says — the same
      reasoning that removed "COURSE RECORD". The other ring prefixes STAY: a
      course name alone does not say why the card reached you. */
-  if (item.ring === 'club') return course ? [course] : [];
+  if (item.ring === 'club') return withCourse(null);
 
   if (item.ring === 'county' && item.subject?.region) {
-    return withCourse(t('amateur.stream.kicker.aroundRegion', 'Around {{region}}', { region: item.subject.region }));
+    return withCourse(t('amateur.stream.kicker.aroundRegion', '{{region}}', { region: item.subject.region }));
   }
   /* PHASE C §3d — the country ring wears its NATION, which is the sub_country
      the shared resolver matched on, never the macro area. */
   if (item.ring === 'country' && item.subject?.sub_country) {
     return withCourse(
-      t('amateur.stream.kicker.aroundCountry', 'Around {{country}}', { country: item.subject.sub_country }),
+      t('amateur.stream.kicker.aroundCountry', '{{country}}', { country: item.subject.sub_country }),
     );
   }
-  if (item.ring === 'world') return withCourse(t('amateur.stream.kicker.aroundWorld', 'Around the world'));
+  if (item.ring === 'world') return withCourse(t('amateur.stream.kicker.aroundWorld', 'World'));
   if (item.lane === 'backlog' && item.facts.play_date) {
     const month = new Date(item.facts.play_date).toLocaleDateString(undefined, { month: 'long' });
     return withCourse(t('amateur.stream.kicker.backlog', 'From {{month}}', { month }));
@@ -88,17 +94,17 @@ export function kickerParts(item: StreamItem, t: T): string[] {
        ring prefixes stay: a course name alone does not say why the card reached
        you. amateur.stream.kicker.review is retired. */
     case 'story':
-      return [t('amateur.stream.kicker.news', 'News')];
+      return { scope: t('amateur.stream.kicker.news', 'News'), course: null };
     case 'clip':
-      return [t('amateur.stream.kicker.clip', 'Clip')];
+      return { scope: t('amateur.stream.kicker.clip', 'Clip'), course: null };
     case 'watch':
-      return [t('amateur.stream.kicker.watch', 'Longer watch')];
+      return { scope: t('amateur.stream.kicker.watch', 'Longer watch'), course: null };
     case 'moment':
       return withCourse(t('amateur.stream.kicker.moment', 'From the community'));
     case 'course':
       return withCourse(t('amateur.stream.kicker.course', 'Course'));
     default:
-      return course ? [course] : [];
+      return withCourse(null);
   }
 }
 

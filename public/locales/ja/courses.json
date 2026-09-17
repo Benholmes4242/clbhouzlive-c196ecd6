@@ -1606,15 +1606,15 @@
         "courseRecord": "コースレコード",
         "onYourList": "あなたのリスト",
         "atYourClub": "あなたのクラブ",
-        "aroundRegion": "{{region}}周辺",
-        "aroundWorld": "世界各地",
+        "aroundRegion": "{{region}}",
+        "aroundWorld": "世界",
         "backlog": "{{month}}より",
         "news": "ニュース",
         "clip": "クリップ",
         "watch": "長編動画",
         "moment": "コミュニティから",
         "course": "コース",
-        "aroundCountry": "{{country}}周辺"
+        "aroundCountry": "{{country}}"
       },
       "headline": {
         "recordTaken": "{{player}}が{{gross}}でコースレコードを樹立。",
@@ -1715,13 +1715,13 @@
         "netRecord": "New net course record",
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
-        "beatHandicap": "Beat handicap by {{n}}"
-        ,"tagNew": "NEW"
-        ,"courseRecord": "コースレコード"
-        ,"netCourseRecord": "ネットコースレコード"
-        ,"tagMovedUp": "順位上昇"
-        ,"nowRank": "現在{{ord}}位"
-        ,"movedUpBoard": "順位が上昇"
+        "beatHandicap": "Beat handicap by {{n}}",
+        "tagNew": "NEW",
+        "courseRecord": "コースレコード",
+        "netCourseRecord": "ネットコースレコード",
+        "tagMovedUp": "順位上昇",
+        "nowRank": "現在{{ord}}位",
+        "movedUpBoard": "順位が上昇"
       },
       "stat": {
         "par": "PAR",

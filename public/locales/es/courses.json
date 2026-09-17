@@ -1666,15 +1666,15 @@
         "courseRecord": "Record del campo",
         "onYourList": "En tu lista",
         "atYourClub": "En tu club",
-        "aroundRegion": "Por {{region}}",
-        "aroundWorld": "Por el mundo",
+        "aroundRegion": "{{region}}",
+        "aroundWorld": "Mundo",
         "backlog": "De {{month}}",
         "news": "Noticias",
         "clip": "Clip",
         "watch": "Video largo",
         "moment": "De la comunidad",
         "course": "Campo",
-        "aroundCountry": "Por {{country}}"
+        "aroundCountry": "{{country}}"
       },
       "headline": {
         "recordTaken": "{{player}} batio el record del campo con {{gross}}.",
@@ -1775,13 +1775,13 @@
         "netRecord": "New net course record",
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
-        "beatHandicap": "Beat handicap by {{n}}"
-        ,"tagNew": "NUEVO"
-        ,"courseRecord": "Record del campo"
-        ,"netCourseRecord": "Record neto del campo"
-        ,"tagMovedUp": "SUBIO"
-        ,"nowRank": "Ahora {{ord}}"
-        ,"movedUpBoard": "Subio en la clasificacion"
+        "beatHandicap": "Beat handicap by {{n}}",
+        "tagNew": "NUEVO",
+        "courseRecord": "Record del campo",
+        "netCourseRecord": "Record neto del campo",
+        "tagMovedUp": "SUBIO",
+        "nowRank": "Ahora {{ord}}",
+        "movedUpBoard": "Subio en la clasificacion"
       },
       "stat": {
         "par": "PAR",
