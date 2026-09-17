@@ -261,7 +261,7 @@ export function HeroBoardSection({
 
   return (
     <div style={{ margin: '10px 10px 0', borderRadius: 16, background: SURFACE, fontFamily: FONT, overflow: 'hidden' }}>
-      {hasBoard ? (
+      {(hasBoard || hasThreeUp || hasPicks) ? (
         <MiniBoard
           tournamentId={tournamentId}
           entries={entries}

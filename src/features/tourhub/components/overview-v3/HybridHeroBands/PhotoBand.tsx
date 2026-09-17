@@ -92,7 +92,7 @@ export function PhotoBand({
       <div
         style={{
           position: 'absolute',
-          top: 14,
+          top: 62,
           left: 14,
           display: 'inline-flex',
           alignItems: 'center',

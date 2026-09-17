@@ -62,9 +62,13 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
   const { data: leaderboard = [] } = useTourLeaderboard(state.kind === 'upcoming' ? '' : tournament.id);
   const rows = Array.isArray(leaderboard) ? leaderboard : [];
   const top = rows[0];
-  const tied = state.kind === 'live' ? detectTopTie(rows) : null;
+  const topPosition = top?.position;
+  const tiedCount = topPosition === 1
+    ? rows.filter((entry) => entry.position === 1).length
+    : 0;
+  const tied = tiedCount > 1 ? { count: tiedCount } : null;
 
-  const leader = state.kind === 'live' && top?.score != null
+  const leader = state.kind === 'live' && topPosition === 1 && top?.score != null
     ? {
         score: top.score,
         name: tied
