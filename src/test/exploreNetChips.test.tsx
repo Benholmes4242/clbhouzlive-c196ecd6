@@ -121,6 +121,30 @@ describe('achievement tag and label copy', () => {
     expect(labelNode?.style.whiteSpace).toBe('normal');
   });
 
+  it.each([
+    [{ consequence: { kind: 'record_taken' as const } }, '🏆'],
+    [{ facts: { net_record: true } }, '⭐'],
+    [{ consequence: { kind: 'rank_up' as const, n: 2 } }, null],
+    [{ facts: { holes_in_one: 1 } }, '⛳'],
+    [{ facts: { albatrosses: 1 } }, '🔥'],
+    [{ facts: { eagles: 1 } }, '🦅'],
+    [{ facts: { birdies: 5 } }, null],
+    [{ facts: { clean_card: true } }, '🛡️'],
+  ])('renders the settled distinct achievement mark', (patch, emoji) => {
+    const container = renderCard(
+      { gross: 70, course_par: 71, net: 67, course_handicap: 3, ...(('facts' in patch && patch.facts) || {}) },
+      'consequence' in patch ? { consequence: patch.consequence } : {},
+    );
+    const node = container.querySelector<HTMLElement>('[data-explore-achievement-emoji]');
+    expect(node?.textContent ?? null).toBe(emoji);
+    if (node) {
+      expect(node.style.width).toBe('28px');
+      expect(node.style.height).toBe('28px');
+      expect(node.style.fontSize).toBe('22px');
+      expect(node.getAttribute('aria-hidden')).not.toBeNull();
+    }
+  });
+
   it.each([320, 390])('keeps every achievement label untruncated at %ipx', (width) => {
     for (const { facts: factPatch, consequence } of cases) {
       const facts = { gross: 70, course_par: 71, net: 67, course_handicap: 3, ...(factPatch ?? {}) };

@@ -137,7 +137,7 @@ describe('Explore round headline ownership', () => {
 describe('Explore round kicker ownership', () => {
   it('removes the record event category and leaves the course', () => {
     expect(kickerParts(round({ facts: { gross: 68, is_course_record: true } }), translate))
-      .toEqual(["Prince's Golf Club (Shore, Dunes & Himalayas)"]);
+      .toEqual({ scope: null, course: "Prince's Golf Club (Shore, Dunes & Himalayas)" });
   });
 
   it.each([
@@ -145,13 +145,20 @@ describe('Explore round kicker ownership', () => {
     ['list', { consequence: { kind: 'list_new_low' as const } }, 'On your list'],
     /* THE CLUB CARD WEARS ONLY ITS COURSE: "AT YOUR CLUB" was removed because
        the club's own name follows it. */
-    ['club', { ring: 'club' as const }, "Prince's Golf Club (Shore, Dunes & Himalayas)"],
-    ['county', { ring: 'county' as const }, 'Around Kent'],
-    ['country', { ring: 'country' as const }, 'Around England'],
-    ['world', { ring: 'world' as const }, 'Around the world'],
+    ['club', { ring: 'club' as const }, null],
+    ['county', { ring: 'county' as const }, 'Kent'],
+    ['country', { ring: 'country' as const }, 'England'],
+    ['world', { ring: 'world' as const }, 'World'],
     ['backlog', { ring: null, lane: 'backlog' as const }, 'From September'],
   ])('keeps the %s reason before the course', (_label, overrides, expected) => {
-    expect(kickerParts(round(overrides as Partial<StreamItem>), translate)[0]).toBe(expected);
+    expect(kickerParts(round(overrides as Partial<StreamItem>), translate).scope).toBe(expected);
+  });
+
+  it('returns the course separately from its scope', () => {
+    expect(kickerParts(round({ ring: 'county' }), translate)).toEqual({
+      scope: 'Kent',
+      course: "Prince's Golf Club (Shore, Dunes & Himalayas)",
+    });
   });
 });
 /* BRIEF_ROUND_HEADLINES §1. The article follows the SPOKEN score. */

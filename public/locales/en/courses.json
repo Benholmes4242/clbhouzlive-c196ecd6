@@ -134,9 +134,9 @@
         "courseRecord": "Course record",
         "onYourList": "On your list",
         "atYourClub": "At your club",
-        "aroundRegion": "Around {{region}}",
-        "aroundCountry": "Around {{country}}",
-        "aroundWorld": "Around the world",
+        "aroundRegion": "{{region}}",
+        "aroundCountry": "{{country}}",
+        "aroundWorld": "World",
         "backlog": "From {{month}}",
         "news": "News",
         "clip": "Clip",
@@ -242,13 +242,13 @@
         "netRecord": "New net course record",
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
-        "beatHandicap": "Beat handicap by {{n}}"
-        ,"tagNew": "NEW"
-        ,"courseRecord": "Course record"
-        ,"netCourseRecord": "Net course record"
-        ,"tagMovedUp": "MOVED UP"
-        ,"nowRank": "Now {{ord}}"
-        ,"movedUpBoard": "Moved up the board"
+        "beatHandicap": "Beat handicap by {{n}}",
+        "tagNew": "NEW",
+        "courseRecord": "Course record",
+        "netCourseRecord": "Net course record",
+        "tagMovedUp": "MOVED UP",
+        "nowRank": "Now {{ord}}",
+        "movedUpBoard": "Moved up the board"
       },
       "stat": {
         "par": "PAR",

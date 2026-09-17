@@ -24,3 +24,9 @@ Tour Overview Design A
 - [ ] Flatten hero, board, venue, weekly lists, rankings, and news
 - [ ] Synchronize the 360px loading state
 - [ ] Verify 390x844 fold, 320px overflow, all hero states, fallback, types, tests, and build
+
+## Explore kicker and achievement marks
+- [x] Structure kicker copy as scope and course
+- [x] Render optional two-line kickers and one-line pair kickers
+- [x] Replace ambiguous marks in both achievement paths
+- [x] Verify fixtures at 320/390, focused tests, types, and build

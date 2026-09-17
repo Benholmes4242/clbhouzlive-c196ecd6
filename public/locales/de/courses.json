@@ -1666,15 +1666,15 @@
         "courseRecord": "Platzrekord",
         "onYourList": "Auf deiner Liste",
         "atYourClub": "In deinem Club",
-        "aroundRegion": "Rund um {{region}}",
-        "aroundWorld": "Rund um die Welt",
+        "aroundRegion": "{{region}}",
+        "aroundWorld": "Welt",
         "backlog": "Aus {{month}}",
         "news": "News",
         "clip": "Clip",
         "watch": "Langes Video",
         "moment": "Aus der Community",
         "course": "Platz",
-        "aroundCountry": "Rund um {{country}}"
+        "aroundCountry": "{{country}}"
       },
       "headline": {
         "recordTaken": "{{player}} holte den Platzrekord mit {{gross}}.",
@@ -1775,13 +1775,13 @@
         "netRecord": "New net course record",
         "handicapCut": "Handicap cut",
         "handicapCutSub": "{{from}} to {{to}}",
-        "beatHandicap": "Beat handicap by {{n}}"
-        ,"tagNew": "NEU"
-        ,"courseRecord": "Platzrekord"
-        ,"netCourseRecord": "Netto-Platzrekord"
-        ,"tagMovedUp": "AUFGESTIEGEN"
-        ,"nowRank": "Jetzt {{ord}}"
-        ,"movedUpBoard": "In der Rangliste aufgestiegen"
+        "beatHandicap": "Beat handicap by {{n}}",
+        "tagNew": "NEU",
+        "courseRecord": "Platzrekord",
+        "netCourseRecord": "Netto-Platzrekord",
+        "tagMovedUp": "AUFGESTIEGEN",
+        "nowRank": "Jetzt {{ord}}",
+        "movedUpBoard": "In der Rangliste aufgestiegen"
       },
       "stat": {
         "par": "PAR",

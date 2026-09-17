@@ -460,7 +460,7 @@ export function ExploreCard({
 }) {
   const { t, i18n } = useTranslation('courses');
   const locale = i18n.language || 'en';
-  const parts = kickerParts(item, t as never);
+  const kickerPartsValue = kickerParts(item, t as never);
   /* §5 ROUNDS ONLY, and the callout is decided BEFORE the headline so §6 can
      hand the headline its plain form. A pair is 124px of tile: no panel fits, so
      a paired round carries none — pairs only ever hold PLAIN rounds anyway. */
@@ -489,6 +489,8 @@ export function ExploreCard({
   const band = hasVisual ? SHAPE_BAND[size] + EXPLORE_END_LABEL_BAND : 0;
 
 
+  const showScope = size !== 'pair' && kickerPartsValue.scope != null;
+  const showCourseRow = kickerPartsValue.course != null || kickerDate != null || (size === 'pair' && kickerPartsValue.scope != null);
   const kicker = (
     <div
       data-explore-kicker="true"
@@ -498,42 +500,54 @@ export function ExploreCard({
         fontWeight: 700,
         letterSpacing: '0.19em',
         textTransform: 'uppercase',
-         color: '#FFFFFF',
-         textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
-        display: 'flex',
-        alignItems: 'baseline',
-        gap: 10,
+        color: '#FFFFFF',
+        textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
+        display: 'block',
         minWidth: 0,
-        whiteSpace: 'nowrap',
       }}
     >
-      <span
-        data-explore-kicker-course="true"
-        style={{ display: 'flex', gap: 5, flex: '1 1 auto', minWidth: 0, overflow: 'hidden' }}
-      >
-        {parts.map((part, index) => (
-          <span
-            key={`${index}:${part}`}
-            data-explore-kicker-part={index === 0 ? 'primary' : undefined}
-            style={{
-              minWidth: 0,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              color: isOwnRound && index === 0 ? A.AMBER : undefined,
-            }}
-          >
-            {index > 0 ? <span style={{ marginRight: 5 }}>{'\u00B7'}</span> : null}
-            {part}
-          </span>
-        ))}
-      </span>
-      {kickerDate ? (
+      {showScope ? (
         <span
-          data-explore-kicker-date="true"
-          style={{ flex: '0 0 auto', whiteSpace: 'nowrap', color: '#FFFFFF', textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined }}
+          data-explore-kicker-scope="true"
+          data-explore-kicker-part="primary"
+          style={{
+            display: 'block',
+            whiteSpace: 'nowrap',
+            color: isOwnRound ? A.AMBER : 'rgba(248,250,252,0.62)',
+          }}
         >
-          {kickerDate}
+          {kickerPartsValue.scope}
+        </span>
+      ) : null}
+      {showCourseRow ? (
+        <span
+          data-explore-kicker-row="true"
+          style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0, marginTop: showScope ? 4 : 0 }}
+        >
+        {kickerPartsValue.course ? (
+          <span
+            data-explore-kicker-course="true"
+            style={{ display: 'block', flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#FFFFFF' }}
+          >
+            {kickerPartsValue.course}
+          </span>
+        ) : null}
+        {!kickerPartsValue.course && kickerPartsValue.scope && size === 'pair' ? (
+          <span
+            data-explore-kicker-course="true"
+            style={{ display: 'block', flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#FFFFFF' }}
+          >
+            {kickerPartsValue.scope}
+          </span>
+        ) : null}
+        {kickerDate ? (
+          <span
+            data-explore-kicker-date="true"
+            style={{ flex: '0 0 auto', whiteSpace: 'nowrap', color: '#FFFFFF', textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined }}
+          >
+            {kickerDate}
+          </span>
+        ) : null}
         </span>
       ) : null}
     </div>
