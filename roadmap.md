@@ -68,3 +68,10 @@ Tour Overview Design A
 - [x] Exclude the band story from the News lead and rows
 - [x] Replace weekly Coming Up rows with a six-event flat horizontal rail
 - [x] Verify full-page rhythm, forced story states, rail containment, types, tests, and build
+
+## Scorecard glass card S1
+- [x] Separate scorecard overlay and dedicated page presentations
+- [x] Remove scorecard detents and trajectory panel while preserving round paging
+- [x] Make double-ring score marks transparent between strokes
+- [x] Verify member, tour, feat, empty, gestures, reduced motion, and /round at 390/320
+- [x] Run focused tests and types; build verification is handled by the project harness

@@ -176,6 +176,7 @@ export const Nine: React.FC<{
             numeralSize={MARK_NUMERAL}
             parNumeralColor={A.INK}
             surface="dark"
+            glassDoubleRings
           />
         ))}
         total={strokesTotal}

@@ -466,7 +466,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const [sheetSeed, setSheetSeed] = useState<RoundDetailSeed | null>(null);
   /* §3 — the sheet's own session: when it opened, how deep it went, and whether
      the depth section was read. rounds_viewed is 1 until paging lands (part 2). */
-  const sheetSession = useRef<{ at: number; maxDetent: 'mid' | 'full'; rounds: number; stats: boolean } | null>(null);
+  const sheetSession = useRef<{ at: number; rounds: number; stats: boolean } | null>(null);
 
   /*
    * BRIEF_ROUND_SHEET_CUES §5 — THE FEED FOLLOWS THE SHEET AGAIN.
@@ -1301,7 +1301,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
            that somehow is not in the ranked list still opens, on its own. */
         const ix = roundSeq.findIndex((r) => r.id === item.id);
         const seed = seedFor(item);
-        sheetSession.current = { at: Date.now(), maxDetent: 'mid', rounds: 1, stats: false };
+        sheetSession.current = { at: Date.now(), rounds: 1, stats: false };
         analyticsEvents.track('round_sheet_open', {
           score_id: item.facts.score_id,
           view,
@@ -1994,7 +1994,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const session = sheetSession.current;
           if (session) {
             analyticsEvents.track('round_sheet_close', {
-              detent: session.maxDetent,
+              detent: 'card',
               rounds_viewed: session.rounds,
               reached_stats: session.stats,
               dwell_ms: Date.now() - session.at,
@@ -2023,11 +2023,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         profileUserId={opener.target?.profileUserId ?? null}
         
         seed={sheetSeed}
-        detents={['mid', 'full']}
-        onDetentChange={(detent) => {
-          if (detent === 'full' && sheetSession.current) sheetSession.current.maxDetent = 'full';
-          analyticsEvents.track('round_sheet_detent', { detent, view });
-        }}
         onStatsSeen={() => {
           if (sheetSession.current) sheetSession.current.stats = true;
         }}
@@ -2040,9 +2035,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
            A round with no hole rows still shows its summary with the syncing
            middle rather than a blank panel. */
         pagePreview={pagePreview}
-        /* §1 — the card's height belongs to the round, so mid is measured again
-           whenever the round changes. */
-        midKey={opener.target?.scoreId ?? undefined}
         /* §3 — PAGING WITHOUT A SWIPE: two hidden focusable controls, the arrow
            keys, and the polite line that names the round that arrived. */
         paging={pageIx != null && roundSeq.length > 1 ? {

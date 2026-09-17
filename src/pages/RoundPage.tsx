@@ -190,6 +190,7 @@ const RoundPage: React.FC = () => {
       <div style={{ minHeight: '100dvh', background: A.CANVAS }}>
         <RoundDetailSheet
           open
+          presentation="page"
           onClose={goBack}
           scoreId={whsScoreId}
           profileUserId={ownerId}

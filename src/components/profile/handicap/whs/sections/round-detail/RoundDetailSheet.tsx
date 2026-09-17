@@ -2,9 +2,8 @@
  * RoundDetailSheet — handicap round drill-in.
  *
  * Thin wrapper around the canonical CardScorecardSheet ("The Card").
- * Public Props unchanged (open, onClose, scoreId, handicapDelta,
- * connectionId, profileUserId, variant) so all 8 downstream consumers
- * still compile. `variant` is IGNORED (light-only sheet).
+ * The dedicated route opts into page presentation; all other callers use the
+ * floating glass overlay. `variant` remains ignored for compatibility.
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -77,13 +76,10 @@ interface Props {
   profileUserId?: string | null;
   /** IGNORED — sheet is always light. Kept for back-compat. */
   variant?: 'dark' | 'light';
-  /** Optional BottomSheet surface style overrides (see CardScorecardSheet). */
-  sheetStyle?: React.CSSProperties;
+  /** Dedicated route host; overlays remain the default. */
+  presentation?: 'overlay' | 'page';
   /** §1.3 — the feed's own copy of this round, so the card is instant. */
   seed?: RoundDetailSeed | null;
-  /** §1.1 — half-height open. Absent keeps today's single-height behaviour. */
-  detents?: ['mid', 'full'];
-  onDetentChange?: (detent: 'mid' | 'full') => void;
   onHorizontalDrag?: {
     onStart: () => void;
     onMove: (dx: number) => void;
@@ -96,8 +92,6 @@ interface Props {
   hint?: string | null;
   /** BRIEF_ROUND_SHEET_PEEK §1 — the neighbour drawn beside this page. */
   pagePreview?: { node: React.ReactNode; side: 'next' | 'prev' } | null;
-  /** BRIEF_ROUND_SHEET_CUES §1 — remeasure mid when the round changes. */
-  midKey?: string | number;
   /** §3 — the hidden-but-focusable pager, the arrow keys and the announcement. */
   paging?: React.ComponentProps<typeof CardScorecardSheet>['paging'];
   /**
@@ -109,9 +103,9 @@ interface Props {
 }
 
 export const RoundDetailSheet: React.FC<Props> = ({
-  open, onClose, scoreId, handicapDelta, profileUserId, sheetStyle,
-  seed = null, detents, onDetentChange, onHorizontalDrag = null, onStatsSeen,
-  pageShift = null, hint = null, pagePreview = null, midKey, paging = null,
+  open, onClose, scoreId, handicapDelta, profileUserId, presentation = 'overlay',
+  seed = null, onHorizontalDrag = null, onStatsSeen,
+  pageShift = null, hint = null, pagePreview = null, paging = null,
   initialCommentsOpen = false,
 }) => {
   const navigate = useNavigate();
@@ -414,19 +408,13 @@ export const RoundDetailSheet: React.FC<Props> = ({
       emptyVariant={emptyVariant}
       emptyGross={grossVal}
       emptyToPar={toParVal}
-      sheetStyle={sheetStyle}
+      presentation={presentation}
       engagement={engagement}
-      detents={detents}
-      onDetentChange={onDetentChange}
       onHorizontalDrag={onHorizontalDrag}
       onStatsSeen={onStatsSeen}
       pageShift={pageShift}
       hint={hint}
       pagePreview={pagePreview}
-      midKey={midKey}
-      /* BRIEF_ROUND_SHEET_TALL §1 — DEV-only: which round, and whether the card
-         was drawn from the feed's seed or is waiting on the fetch. */
-      midDebug={{ scoreId: scoreId ?? null, seeded: usingSeed }}
       paging={paging}
     />
     {commentsOpen && postInfo && (
