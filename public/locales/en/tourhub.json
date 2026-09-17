@@ -97,7 +97,8 @@
     "ticker": {
       "top10Label": "TOP 10",
       "alsoOutLabel": "ALSO OUT",
-      "fullLeaderboard": "Full leaderboard"
+      "fullLeaderboard": "Full leaderboard",
+      "fullResults": "Full results"
     },
     "fieldStrength": {
       "eyebrow": "FIELD",
@@ -212,7 +213,19 @@
       "factRound": "ROUND",
       "factThru": "THRU",
       "factMargin": "MARGIN",
-      "factPlayoff": "PLAYOFF"
+      "factPlayoff": "PLAYOFF",
+      "starts": "Starts {{day}}",
+      "days": "Days",
+      "hours": "Hrs",
+      "minutes": "Mins",
+      "champion": "Champion",
+      "wonBy": "by {{count}}",
+      "playoff": "playoff",
+      "firstTee": "First tee",
+      "defending": "Defending",
+      "field": "Field",
+      "worldRanked": "world ranked",
+      "ourPicks": "Our picks"
     },
     "leaderboardBand": {
       "ctaLive": "OPEN LIVE LEADERBOARD",

@@ -93,6 +93,7 @@ export interface BoardEntry {
   round_2?: number | null;
   round_3?: number | null;
   round_4?: number | null;
+  money?: number | null;
   raw_data?: unknown;
   player?: {
     id: string;

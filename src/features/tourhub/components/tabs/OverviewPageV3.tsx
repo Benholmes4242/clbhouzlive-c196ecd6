@@ -84,7 +84,7 @@ export function OverviewPageV3() {
           id="content-below-hero"
           className="relative z-10"
         >
-          <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 24, paddingBottom: NAV_CLEARANCE }}>
+          <div style={{ background: PAGE_CANVAS, display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 32, paddingBottom: NAV_CLEARANCE }}>
             <TIPickMagazineCard />
             <TourStoryCard index={0} lead />
             <ComingUpSlot />
