@@ -18,3 +18,9 @@ Tour Overview Design A
 - [x] Group B/C: C11-C21
 - [x] Confirm upcoming picks cause and top-five World movement values
 - [x] Validate 320/390 overflow, empty-state collapse, types, tests, build
+
+## Tour Overview full-bleed pass
+- [x] Approve H1-H5 implementation plan
+- [ ] Flatten hero, board, venue, weekly lists, rankings, and news
+- [ ] Synchronize the 360px loading state
+- [ ] Verify 390x844 fold, 320px overflow, all hero states, fallback, types, tests, and build

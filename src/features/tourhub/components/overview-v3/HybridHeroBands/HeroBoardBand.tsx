@@ -51,7 +51,8 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, SURFACE, WHITE_ALPHA_04, WHITE_ALPHA_08, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
 import { PlayerAvatar } from '../../PlayerAvatar';
@@ -269,7 +270,7 @@ export function HeroBoardSection({
   if (!hasBoard && !hasThreeUp && !hasPicks) return null;
 
   return (
-    <div style={{ margin: '10px 10px 0', borderRadius: 16, background: SURFACE, fontFamily: FONT, overflow: 'hidden' }}>
+    <div style={{ background: PAGE_CANVAS, fontFamily: FONT }}>
       {hasBoard ? (
         <MiniBoard
           tournamentId={tournamentId}
@@ -284,7 +285,7 @@ export function HeroBoardSection({
       ) : null}
 
       {hasThreeUp ? (
-        <div style={{ display: 'grid', gridTemplateColumns: threeUp.length === 1 ? 'minmax(0, 1fr)' : `repeat(${threeUp.length}, minmax(0, 1fr))`, padding: '14px 14px 10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: threeUp.length === 1 ? 'minmax(0, 1fr)' : `repeat(${threeUp.length}, minmax(0, 1fr))`, padding: '14px 24px 10px', borderBottom: `1px solid ${WHITE_ALPHA_06}` }}>
           {threeUp.map((cell, index) => (
             <div key={cell.label} style={{ minWidth: 0, padding: threeUp.length === 1 ? 0 : '0 10px', textAlign: threeUp.length === 1 ? 'left' : 'center', borderLeft: index === 0 ? 'none' : `1px solid ${WHITE_ALPHA_08}` }}>
               <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{cell.label}</div>
@@ -301,12 +302,12 @@ export function HeroBoardSection({
             type="button"
             onClick={() => setPicksOpen((open) => !open)}
             aria-expanded={picksOpen}
-            style={{ width: '100%', minHeight: 44, margin: '6px 0 4px', padding: '11px 14px', display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr) auto', alignItems: 'center', gap: 10, border: 'none', borderRadius: 12, background: WHITE_ALPHA_04, color: INK, textAlign: 'left', cursor: 'pointer', fontFamily: FONT }}
+            style={{ width: '100%', minHeight: 44, margin: 0, padding: '10px 24px', display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr) auto', alignItems: 'center', gap: 10, border: 'none', borderTop: `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', cursor: 'pointer', fontFamily: FONT }}
           >
             {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
             <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
             <span style={{ minWidth: 0, fontSize: 13, color: 'rgba(248,250,252,0.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{closedFigure}</span>
-            <ChevronDown size={16} style={{ transform: picksOpen ? 'rotate(180deg)' : undefined }} />
+            {picksOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
           {picksOpen ? <PicksPanel picks={picks} tourCode={pickTourCode} phase={phase} boardByPlayer={boardByPlayer} predictions={predictions ?? null} /> : null}
         </>
@@ -316,9 +317,11 @@ export function HeroBoardSection({
         <button
           type="button"
           onClick={onFullLeaderboard}
-          style={{ width: 'calc(100% - 28px)', minHeight: 44, margin: '4px 14px 10px', padding: '12px 0', border: `1px solid ${WHITE_ALPHA_12}`, borderRadius: 12, background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+          data-overview-board-cta
+          style={{ width: '100%', minHeight: 44, margin: 0, padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, border: 'none', borderTop: `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
         >
           {phase === 'completed' ? t('overview.ticker.fullResults') : phase === 'upcoming' ? t('overview.leaderboardBand.ctaUpcoming') : t('overview.ticker.fullLeaderboard')}
+          <ChevronRight size={16} aria-hidden />
         </button>
       ) : null}
     </div>
@@ -364,12 +367,12 @@ function PicksPanel({
   const hasConfidence = predictions?.isAIPowered;
 
   return (
-    <div style={{ background: SURFACE, borderTop: `0.5px solid ${WHITE_ALPHA_12}` }}>
+    <div style={{ background: PAGE_CANVAS, borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
       {/* Editorial framing when populated — and NO empty row when it is not. */}
       {predictions?.editorialFraming ? (
         <div
           style={{
-            padding: '10px 16px 0',
+            padding: '10px 24px 0',
             fontSize: 11,
             fontWeight: 500,
             lineHeight: 1.35,
@@ -382,7 +385,7 @@ function PicksPanel({
 
       <div
         style={{
-          padding: hasConfidence ? '10px 16px 0' : '10px 16px',
+          padding: hasConfidence ? '10px 24px 0' : '10px 24px',
           display: 'flex',
           flexDirection: 'column',
           gap: 10,
@@ -507,7 +510,7 @@ function PicksPanel({
       {hasConfidence && (
         <div
           style={{
-            padding: '10px 16px',
+            padding: '10px 24px',
             fontSize: 11,
             fontWeight: 600,
             letterSpacing: '0.06em',

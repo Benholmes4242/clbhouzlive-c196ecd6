@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useComingUp, type ComingUpRow } from '../data/useComingUp';
 import type { TourId } from '../../hooks/useOverviewData';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
-import { FONT, INK, INK_MUTE, LEADER_GOLD, SURFACE, WHITE_ALPHA_04, WHITE_ALPHA_06 } from '../../_shared/tokens';
+import { FONT, INK, INK_MUTE, LEADER_GOLD, WHITE_ALPHA_06 } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
 
 const SUFFIXES = new Set(['jr', 'jr.', 'sr', 'sr.', 'ii', 'iii', 'iv', 'v']);
@@ -36,14 +36,14 @@ export function ComingUp({ tour, excludeId }: { tour: TourId | null; excludeId?:
   const groups = useMemo(() => groupComingUpByWeek(data.filter((row) => row.id !== excludeId)), [data, excludeId]);
   if (groups.length === 0) return null;
   return <section><OverviewSectionHead title={t('overview.comingUp.title')} action={t('overview.comingUp.linkLabel')} onAction={() => navigate(`/tourhub?tab=schedule&tour=${tour ?? 'all'}`)} />
-    <div style={{ margin: '0 10px', overflow: 'hidden', borderRadius: 16, background: SURFACE }}>
-      {groups.map((group, groupIndex) => <div key={group.key}><div style={{ padding: groupIndex === 0 ? '12px 14px 7px' : '16px 14px 7px', borderTop: groupIndex === 0 ? 'none' : `1px solid ${WHITE_ALPHA_06}`, fontFamily: FONT, fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: INK_MUTE }}>{group.label}</div>{group.events.map((row, index) => <ComingUpRowView key={row.id} row={row} last={index === group.events.length - 1} onOpen={() => navigate(`/tourhub/tournament/${row.id}`)} />)}</div>)}
+    <div>
+      {groups.map((group, groupIndex) => <div key={group.key}><div style={{ padding: groupIndex === 0 ? '12px 24px 7px' : '16px 24px 7px', borderTop: groupIndex === 0 ? 'none' : `1px solid ${WHITE_ALPHA_06}`, fontFamily: FONT, fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: INK_MUTE }}>{group.label}</div>{group.events.map((row, index) => <ComingUpRowView key={row.id} row={row} last={index === group.events.length - 1} onOpen={() => navigate(`/tourhub/tournament/${row.id}`)} />)}</div>)}
     </div></section>;
 }
 
 function ComingUpRowView({ row, last, onOpen }: { row: ComingUpRow; last: boolean; onOpen: () => void }) {
   const defending = surnameOf(row.defending_champion); const date = new Date(row.start_date);
-  return <button type="button" onClick={onOpen} style={{ width: '100%', minHeight: 68, padding: '8px 14px', display: 'grid', gridTemplateColumns: defending ? '44px minmax(0,1fr) 76px' : '44px minmax(0,1fr)', alignItems: 'center', gap: 10, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>
+  return <button type="button" onClick={onOpen} style={{ width: '100%', minHeight: 68, padding: '8px 24px', display: 'grid', gridTemplateColumns: defending ? '44px minmax(0,1fr) 76px' : '44px minmax(0,1fr)', alignItems: 'center', gap: 10, border: 0, borderBottom: last ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}>
     <span style={{ width: 44, height: 48, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 10, background: WHITE_ALPHA_06 }}><span style={{ fontSize: 9, fontWeight: 800 }}>{new Intl.DateTimeFormat('en', { weekday: 'short' }).format(date).toUpperCase()}</span><span style={{ marginTop: 1, fontSize: 18, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{date.getDate()}</span></span>
     <span style={{ minWidth: 0 }}><span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: INK_MUTE }}>{TOUR_LABEL[row.tour_slug] ?? row.tour_slug}</span>{row.isMajor ? <span style={{ fontSize: 9, fontWeight: 800, color: LEADER_GOLD }}>MAJOR</span> : null}</span><span style={{ display: 'block', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14, fontWeight: 700 }}>{displayEventName(row.name)}</span>{row.venue ? <span style={{ display: 'block', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: INK_MUTE }}>{row.venue}</span> : null}</span>
     {defending ? <span style={{ minWidth: 0, textAlign: 'right' }}><span style={{ display: 'block', fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', color: INK_MUTE }}>DEFENDING</span><span style={{ display: 'block', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 600 }}>{defending}</span></span> : null}

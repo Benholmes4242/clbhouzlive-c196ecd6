@@ -35,10 +35,8 @@ interface OverviewHeroProps {
 }
 
 /**
- * Canonical PHOTO BAND height — matches the Courses Discover hero
- * (`CoursesPageHero`) and the Course Details cinematic hero
- * (`CinematicHeroFullBleed`). The wire ticker (36px) sits BELOW this,
- * so the full overview hero container is `OVERVIEW_HERO_TOTAL_HEIGHT`.
+ * Legacy shared news-hero height. The Tour Overview itself uses the separate
+ * `OVERVIEW_HERO_TOTAL_HEIGHT`; the two news surfaces remain at 340px.
  */
 export const OVERVIEW_HERO_HEIGHT = `${PHOTO_BAND_HEIGHT}px`;
 

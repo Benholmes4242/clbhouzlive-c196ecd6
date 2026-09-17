@@ -47,7 +47,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { FONT, INK, INK_MUTE, SURFACE } from '../../_shared/tokens';
+import { FONT, INK, INK_MUTE, WHITE_ALPHA_06 } from '../../_shared/tokens';
 import { useTournamentVenueRecord } from '../data/useTournamentVenueRecord';
 
 /* Minimum ratings before the clubhouse figure may render at all. */
@@ -102,8 +102,8 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
   const target = hasRating ? `/course/${data.courseId}` : `/courses/${data.courseId}/rate`;
 
   return (
-    <section style={{ margin: '0 10px', fontFamily: FONT }}>
-      <button type="button" onClick={() => navigate(target)} style={{ width: '100%', minHeight: 58, padding: '10px 14px', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', alignItems: 'center', gap: 12, border: 0, borderRadius: 14, background: SURFACE, color: INK, textAlign: 'left', cursor: 'pointer' }}>
+    <section style={{ fontFamily: FONT }}>
+      <button type="button" onClick={() => navigate(target)} style={{ width: '100%', minHeight: 58, padding: '10px 24px', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', alignItems: 'center', gap: 12, border: 0, borderTop: `1px solid ${WHITE_ALPHA_06}`, borderBottom: `1px solid ${WHITE_ALPHA_06}`, borderRadius: 0, background: 'transparent', color: INK, textAlign: 'left', cursor: 'pointer' }}>
         <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: INK_MUTE }}>{t('overview.venueRecord.sectionKicker')}</span><span style={{ display: 'block', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 700 }}>{line}</span></span><ChevronRight size={17} aria-hidden />
       </button>
     </section>

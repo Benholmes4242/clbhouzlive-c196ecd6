@@ -12,8 +12,9 @@ import { todayFromEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  WHITE_ALPHA_65, WHITE_ALPHA_12, AMBER,
+  WHITE_ALPHA_65, WHITE_ALPHA_12, WHITE_ALPHA_06, AMBER,
 } from '../../_shared/tokens';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
@@ -79,7 +80,7 @@ interface Props {
 const THEME_TOKENS = {
   light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
   panel: { surface: SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
-  heroBoard: { surface: SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
+  heroBoard: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_06, press: 'active:bg-white/[0.06]' },
 } as const;
 
 
@@ -129,7 +130,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     return (
       <>
         <div style={{ background: T.surface, fontFamily: FONT }}>
-          <div style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', padding: '8px 14px', borderBottom: `1px solid ${T.hairline}`, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', minHeight: 32, padding: '4px 24px', borderBottom: `1px solid ${T.hairline}`, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div>{t('board.columns.player')}</div>
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
@@ -149,7 +150,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   playerId: r.player?.id ?? '', playerName: r.player?.full_name ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
                   position: r.position ?? null, positionTied: r.position_tied ?? null, total: r.score ?? null, today, thru: r.thru ?? null, status: r.status ?? null,
                 }); }}
-                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', width: '100%', minHeight: 42, padding: '8px 14px', border: 'none', borderBottom: `1px solid ${T.hairline}`, background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
+                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', width: '100%', minHeight: 44, padding: '8px 24px', border: 'none', borderBottom: `1px solid ${T.hairline}`, background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
                 className={`${T.press} transition-colors`}
               >
                 {showOverviewPosition ? <div style={{ fontSize: 12, fontWeight: 700, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{posText}</div> : null}
