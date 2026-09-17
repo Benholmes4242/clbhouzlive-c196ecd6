@@ -61,3 +61,10 @@ Tour Overview Design A
 - [x] Draw the rank delta over the measured window, in analytics polarity
 - [x] Render the basis line only alongside the delta column
 - [x] Verify 390/320, blocked flag host, delta-free boards, types, tests, and build
+
+## Tour Overview H12
+- [x] Select a photographed, fresh hero-tournament story with a 48-hour fallback
+- [x] Insert the full-bleed story band and collapse it completely when absent
+- [x] Exclude the band story from the News lead and rows
+- [x] Replace weekly Coming Up rows with a six-event flat horizontal rail
+- [x] Verify full-page rhythm, forced story states, rail containment, types, tests, and build

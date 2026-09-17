@@ -6,6 +6,11 @@ import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhu
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, shouldShowAlsoThisWeekFigures, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
 import { fullTourLabel } from '@/features/tourhub/_shared/tourOrder';
+import { selectComingUpRail } from '@/features/tourhub/overview/sections/ComingUp';
+import { selectOverviewBandStory } from '@/features/tourhub/overview/sections/StoryBand';
+import { selectOverviewNews } from '@/features/tourhub/overview/sections/OverviewNews';
+import type { TourStory } from '@/features/tourhub/news/useTourStories';
+import type { ComingUpRow } from '@/features/tourhub/overview/data/useComingUp';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 
 const NOW = new Date('2026-09-17T12:00:00Z');
@@ -117,5 +122,37 @@ describe('Tour Overview correctness gates', () => {
     expect(shouldShowAlsoThisWeekFigures({ type: 'upcoming', tournament })).toBe(false);
     expect(shouldShowAlsoThisWeekFigures({ type: 'live', tournament })).toBe(true);
     expect(shouldShowAlsoThisWeekFigures({ type: 'live', tournament: { ...tournament, leaderScore: null } })).toBe(false);
+  });
+});
+
+function story(id: string, publishedAt: string, tournamentId: string | null, image = true): TourStory {
+  return { id, slug: id, kicker: 'DP WORLD TOUR', headline: id, standfirst: null, body_blocks: [], image_url: image ? `${id}.jpg` : null, image_credit: null, tour_slug: 'euro', tournament_id: tournamentId, published_at: publishedAt };
+}
+
+describe('Tour Overview H12 material breaks', () => {
+  const now = new Date('2026-09-17T20:00:00Z');
+
+  it('prefers a seven-day tournament story over a newer generic fallback', () => {
+    const stories = [story('generic', '2026-09-17T19:00:00Z', null), story('matched', '2026-09-12T12:00:00Z', 'hero')];
+    expect(selectOverviewBandStory(stories, 'hero', now)?.id).toBe('matched');
+  });
+
+  it('uses the 48-hour fallback and withholds stale or unphotographed stories', () => {
+    expect(selectOverviewBandStory([story('fresh', '2026-09-15T20:00:00Z', null)], 'hero', now)?.id).toBe('fresh');
+    expect(selectOverviewBandStory([story('stale', '2026-09-15T19:59:59Z', null)], 'hero', now)).toBeNull();
+    expect(selectOverviewBandStory([story('bare', '2026-09-17T19:00:00Z', 'hero', false)], 'hero', now)).toBeNull();
+  });
+
+  it('never repeats the band story in News', () => {
+    const stories = [story('band', '2026-09-17T19:00:00Z', 'hero'), story('lead', '2026-09-17T18:00:00Z', null), story('row', '2026-09-17T17:00:00Z', null)];
+    const news = selectOverviewNews(stories, 'band');
+    expect(news.lead?.id).toBe('lead');
+    expect([news.lead, ...news.rows].filter(Boolean).map((item) => item?.id)).not.toContain('band');
+  });
+
+  it('keeps the first six chronological events and does not stretch a two-event source', () => {
+    const rows = Array.from({ length: 8 }, (_, index) => ({ id: `event-${index}` } as ComingUpRow));
+    expect(selectComingUpRail(rows, 'event-1').map((row) => row.id)).toEqual(['event-0', 'event-2', 'event-3', 'event-4', 'event-5', 'event-6']);
+    expect(selectComingUpRail(rows.slice(0, 2))).toHaveLength(2);
   });
 });

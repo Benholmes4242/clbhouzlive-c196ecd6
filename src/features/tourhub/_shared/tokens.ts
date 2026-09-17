@@ -95,6 +95,12 @@ export const WHITE_ALPHA_30 = 'rgba(255,255,255,0.30)';      // separator dots, 
 export const WHITE_ALPHA_55 = 'rgba(255,255,255,0.55)';      // tertiary/disabled text on dark bg
 export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text on dark bg
 
+// Overview story/rail materials. Kept semantic so the full-bleed treatments do
+// not retype visual constants at their call sites.
+export const OVERVIEW_RAIL_HAIRLINE = 'rgba(255,255,255,0.07)';
+export const STORY_BAND_META_INK = 'rgba(248,250,252,0.72)';
+export const STORY_BAND_SCRIM = 'linear-gradient(to bottom, transparent 0%, rgba(10,12,16,0.92) 100%)';
+
 
 // ============================================================================
 // INK TINTS (faint backgrounds + borders on DARK bg — one step stronger than the light values)

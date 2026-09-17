@@ -11,6 +11,8 @@ import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
 import { AlsoThisWeek } from '../../overview/sections/AlsoThisWeek';
 import { WorldRankings } from '../../overview/sections/WorldRankings';
 import { OverviewNews } from '../../overview/sections/OverviewNews';
+import { StoryBand, selectOverviewBandStory } from '../../overview/sections/StoryBand';
+import { useTourStories } from '../../news/useTourStories';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
@@ -24,7 +26,15 @@ import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 export function OverviewPageV3() {
   const { t } = useTranslation('tourhub');
   const { isOnline } = useNetworkStatus();
-  const { selectedTourSlug, setAppliedTourSlug } = useTourSelection();
+  const { selectedTourSlug, viewingTournamentId, setAppliedTourSlug } = useTourSelection();
+  // The hero river crosses tours, so its tournament match and the explicit
+  // "any story" 48-hour fallback must read the unfiltered feed. News retains
+  // the overview's selected-tour lens from its previous implementation.
+  const { stories } = useTourStories(null);
+  const newsStories = selectedTourSlug && selectedTourSlug !== 'all'
+    ? stories.filter((story) => story.tour_slug == null || story.tour_slug === selectedTourSlug)
+    : stories;
+  const bandStory = selectOverviewBandStory(stories, viewingTournamentId);
 
   // The overview's island label describes the lens used by its sections, not
   // the tour of whichever tournament happens to be visible in the hero.
@@ -80,11 +90,12 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div style={{ background: PAGE_CANVAS }}>
+            {bandStory ? <StoryBand story={bandStory} /> : null}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 32 }}>
               <AlsoThisWeek />
               <ComingUpSlot />
               <WorldRankings />
-              <OverviewNews />
+              <OverviewNews stories={newsStories} excludeId={bandStory?.id} />
 
               {/* The shared page shell reserves the measured bottom-nav clearance. */}
             </div>
