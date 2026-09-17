@@ -1,16 +1,16 @@
 Tour Overview Design A
 - [x] Part 1 initial hero, board, spacing, loading state
-- [ ] C1 measure upcoming card at 390 and correct skeleton hold
-- [ ] C2 force and visually verify upcoming/completed, then revert fixtures
-- [ ] C3 leave stat strip/course shape uncalled and untouched
-- [ ] C4 verify constants and tap boundaries
-- [ ] Part 2 §5 venue band
-- [ ] Part 2 §6 Also This Week
-- [ ] Part 2 §7 weekly Coming Up without pagination
-- [ ] Part 2 §8 World Rankings with filters and movement
-- [ ] Part 2 §9 consolidated News
-- [ ] Part 2 §10 permitted deletions/report constraints
-- [ ] Verify all §12 empty states, types, tests, build, and responsive overflow
+- [x] C1 measure upcoming card at 390 and correct skeleton hold
+- [x] C2 force and visually verify upcoming/completed, then revert fixtures
+- [x] C3 leave stat strip/course shape uncalled and untouched
+- [x] C4 verify constants and tap boundaries
+- [x] Part 2 §5 venue band (later superseded and unmounted by H8)
+- [x] Part 2 §6 Also This Week
+- [x] Part 2 §7 weekly Coming Up without pagination
+- [x] Part 2 §8 World Rankings with filters and movement
+- [x] Part 2 §9 consolidated News
+- [x] Part 2 §10 permitted deletions/report constraints
+- [x] Verify all §12 empty states, types, tests, build, and responsive overflow
 
 ## Tour Overview device pass
 - [x] Group A correctness: C7-C10
@@ -21,9 +21,9 @@ Tour Overview Design A
 
 ## Tour Overview full-bleed pass
 - [x] Approve H1-H5 implementation plan
-- [ ] Flatten hero, board, venue, weekly lists, rankings, and news
-- [ ] Synchronize the 360px loading state
-- [ ] Verify 390x844 fold, 320px overflow, all hero states, fallback, types, tests, and build
+- [x] Flatten hero, board, venue, weekly lists, rankings, and news
+- [x] Synchronize the 360px loading state
+- [x] Verify 390x844 fold, 320px overflow, all hero states, fallback, types, tests, and build
 
 ## Tour Overview live hero refinements
 - [x] Wrap tied-leader labels without changing the LIVE badge
@@ -35,7 +35,7 @@ Tour Overview Design A
 - [x] Unmount the H7 venue destination without deleting its component
 - [x] Remove overview-only board row rules
 - [x] Add equal tournament and conditional course doors
-- [ ] Verify one/two-door states, all lifecycle labels, row taps, 320 overflow, types, tests, and build
+- [x] Verify one/two-door states, all lifecycle labels, row taps, 320 overflow, types, tests, and build
 
 ## Explore kicker and achievement marks
 - [x] Structure kicker copy as scope and course
