@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { SC_FILL_BIRDIE_DK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 /**
