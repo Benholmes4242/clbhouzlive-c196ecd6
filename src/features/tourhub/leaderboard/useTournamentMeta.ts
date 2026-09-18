@@ -17,6 +17,9 @@ export interface TournamentMeta {
   venue_course_name: string | null;
   venue_city: string | null;
   venue_country: string | null;
+  venue_state: string | null;
+  golf_course_id: string | null;
+  course_sub_country: string | null;
   venue_par: number | null;
   venue_yardage: number | null;
   start_date: string | null;
@@ -58,7 +61,7 @@ export function useTournamentMeta(
       const { data, error } = await supabase
         .from('sr_tournaments')
         .select(
-          'id, name, venue_name, venue_course_name, venue_city, venue_country, venue_par, venue_yardage, start_date, end_date, current_round, current_round_status, status, cutline, projected_cutline, cut_round, purse, defending_champion, timezone, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, tour_full_name)',
+          'id, name, venue_name, venue_course_name, venue_city, venue_country, venue_state, golf_course_id, venue_par, venue_yardage, start_date, end_date, current_round, current_round_status, status, cutline, projected_cutline, cut_round, purse, defending_champion, timezone, course:golf_courses!sr_tournaments_golf_course_id_fkey(sub_country), season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, tour_full_name)',
         )
         .eq('id', tournamentId as string)
         .maybeSingle();
@@ -66,14 +69,19 @@ export function useTournamentMeta(
       if (error) throw error;
       if (!data) return null;
       type SeasonJoin = { tour_name: string | null; tour_full_name: string | null } | null;
-      const row = data as Omit<TournamentMeta, 'tour_code' | 'tour_full_name'> & {
+      type CourseJoin = { sub_country: string | null } | null;
+      const row = data as Omit<TournamentMeta, 'tour_code' | 'tour_full_name' | 'course_sub_country'> & {
         season?: SeasonJoin | SeasonJoin[];
+        course?: CourseJoin | CourseJoin[];
       };
       const seasonRaw = row.season;
       const season: SeasonJoin = Array.isArray(seasonRaw) ? seasonRaw[0] ?? null : seasonRaw ?? null;
-      const { season: _season, ...rest } = row;
+      const courseRaw = row.course;
+      const course: CourseJoin = Array.isArray(courseRaw) ? courseRaw[0] ?? null : courseRaw ?? null;
+      const { season: _season, course: _course, ...rest } = row;
       return {
         ...rest,
+        course_sub_country: course?.sub_country ?? null,
         tour_code: season?.tour_name ?? null,
         tour_full_name: season?.tour_full_name ?? null,
       };

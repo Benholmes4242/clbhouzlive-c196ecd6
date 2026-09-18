@@ -1,4 +1,3 @@
-import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 /**
  * LeaderboardTab — Tour Book design (v1).
  *
@@ -30,6 +29,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
+import { SearchFieldBox } from '@/features/search-v2/components/SearchField';
+import { resolveVenuePlace } from './venuePlace';
 
 
 
@@ -355,13 +356,17 @@ export function LeaderboardTab() {
   // Order is fixed: par and yards before the field average (see the comment
   // on the meta line for why the volatile segment must come last).
   const venue = meta?.venue_name ?? selected.venue_name;
-  const city =
-    [meta?.venue_city ?? selected.venue_city, meta?.venue_country ?? selected.venue_country]
-      .filter(Boolean)
-      .join(', ') || null;
-  const metaSegments = [
+  const cityNation = resolveVenuePlace({
+    city: meta?.venue_city ?? selected.venue_city,
+    countryCode: meta?.venue_country ?? selected.venue_country,
+    stateCode: meta?.venue_state,
+    courseSubCountry: meta?.course_sub_country,
+  });
+  const placeSegments = [
     venue || null,
-    city,
+    cityNation,
+  ].filter(Boolean) as string[];
+  const figureSegments = [
     par != null ? t('tour.parValue', { par }) : null,
     yardage != null ? t('tour.yardsValue', { yards: yardage.toLocaleString() }) : null,
     field != null
@@ -452,7 +457,7 @@ export function LeaderboardTab() {
           </button>
         </div>
 
-        {/* META LINE - one broadcast line, dot separated, MUTE ink, tabular.
+        {/* META LINES - fixed place and figures lines, dot separated, MUTE ink, tabular.
             ORDERING IS LOAD-BEARING: par and yards ALWAYS precede the field
             average. The deleted stat tile used a FIXED grid rather than
             space-around so PAR could not move horizontally between a
@@ -462,7 +467,7 @@ export function LeaderboardTab() {
             means nothing after it can shift.
             These figures are NOT scores: they take MUTE ink, never a score
             colour. */}
-        {metaSegments.length > 0 && (
+        {placeSegments.length > 0 && (
           <div
             style={{
               marginTop: 5,
@@ -473,7 +478,21 @@ export function LeaderboardTab() {
               ...FIGS,
             }}
           >
-            {metaSegments.join(' \u00B7 ')}
+            {placeSegments.join(' \u00B7 ')}
+          </div>
+        )}
+        {figureSegments.length > 0 && (
+          <div
+            style={{
+              fontFamily: F,
+              fontSize: 12.5,
+              lineHeight: 1.42,
+              fontWeight: 500,
+              color: A.MUTE,
+              ...FIGS,
+            }}
+          >
+            {figureSegments.join(' \u00B7 ')}
           </div>
         )}
         {field != null && (
@@ -486,39 +505,14 @@ export function LeaderboardTab() {
 
 
 
-        {/* SEARCH - its own full-width row; the masthead stays legible. */}
-        {/* FIELD CANON paint + focus step. RADIUS EXCEPTION (8): compact
-            masthead control row, sized off the chips beside it, not 14.
-            HEIGHT EXCEPTION (~28px, padding-derived) for the same reason. */}
+        {/* SEARCH - the canonical box in its own full-width row. */}
         {searchOpen && (
-          <div
-            className={FIELD_PAINT_CLASS}
-            style={{
-              marginTop: 10,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              borderRadius: 8,
-              padding: '5px 8px',
-            }}
-          >
-            <Search size={13} color={MUTED} strokeWidth={2.5} />
-            <input
+          <div style={{ marginTop: 10, display: 'flex' }}>
+            <SearchFieldBox
               ref={searchInputRef}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={setSearchQuery}
               placeholder={t('board.search.placeholder')}
-              style={{
-                flex: 1,
-                border: 'none',
-                outline: 'none',
-                background: 'transparent',
-                fontFamily: F,
-                fontSize: 12.5,
-                color: INK,
-                minWidth: 0,
-              }}
-              className={FIELD_PLACEHOLDER_CLASS}
             />
           </div>
         )}
@@ -528,7 +522,7 @@ export function LeaderboardTab() {
             onto the meta line above. Dates dropped from the masthead - a
             live board tells you it is live; they remain on the tournament
             page and the schedule. To restore, append `dates` to
-            metaSegments. */}
+             figureSegments. */}
 
 
 
