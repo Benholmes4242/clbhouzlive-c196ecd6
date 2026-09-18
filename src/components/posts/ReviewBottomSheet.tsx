@@ -573,7 +573,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 minHeight: 0,
               }}
             >
-              {paragraphs.length === 0 ? (
+              {/* G2.5 — this line CLAIMS the review has no prose, so it may only
+                  speak once the prose query has settled. The subject gate makes
+                  that always true from the portal; the prop makes a lie
+                  impossible rather than merely unlikely. */}
+              {paragraphs.length === 0 && proseSettled ? (
                 <div
                   style={{
                     fontSize: 15,
