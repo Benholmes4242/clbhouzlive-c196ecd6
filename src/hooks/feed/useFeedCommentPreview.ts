@@ -6,8 +6,9 @@
  * LightCardFeed) and pass the resulting Map down.
  *
  * RULES BAKED IN HERE:
- *  - target_type = 'post' ALWAYS. comments_v2 is generic (posts, rounds,
- *    reviews); a round comment on a post card would be a data leak.
+ *  - target_type is the CALLER'S, defaulting to 'post' (G7.2(d)). comments_v2 is
+ *    generic (posts, rounds, reviews) and the type is part of the query key, so
+ *    a round's ids can never resolve against a post card's window.
  *  - parent_id IS NULL ALWAYS. A reply is a reply to a comment, not a comment
  *    on the post, and must never be the preview.
  *  - The preview is the source of truth for what is DISPLAYED. If no comment
@@ -66,7 +67,11 @@ type Row = {
   actor_id: string | null;
 };
 
-export function useFeedCommentPreview(postIds: string[], scope: string) {
+export function useFeedCommentPreview(
+  postIds: string[],
+  scope: string,
+  targetType: 'post' | 'round' | 'review' = 'post',
+) {
   const { user } = useSupabaseSession();
   const batch = useMergedBatch<FeedCommentPreview>();
   const seenRef = useRef<Set<string>>(new Set());
