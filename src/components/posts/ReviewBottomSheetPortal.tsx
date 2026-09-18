@@ -145,6 +145,8 @@ export const ReviewBottomSheetPortal: React.FC = () => {
       reactionMine={!!reactionState?.mine}
       onToggleReaction={payload.reviewId ? () => reactions.toggle('review', payload.reviewId!) : undefined}
       reactionHidden={!reactions.viewerId || reactions.unavailable}
+      commentCount={commentCount}
+      commentPreview={payload.reviewId ? commentPreviews.map.get(payload.reviewId) ?? null : null}
       proseSettled={subjectReady}
       reviewerStats={payload.reviewerStats ?? null}
     />
