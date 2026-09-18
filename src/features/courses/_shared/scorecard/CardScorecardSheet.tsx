@@ -933,7 +933,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             <div
               data-scorecard-interactive="true"
               onClick={(event) => event.stopPropagation()}
-              style={{ display: 'flex', alignItems: 'center', columnGap: 18, rowGap: 4, flexWrap: 'wrap', paddingTop: 2 }}
+              style={{ display: 'flex', alignItems: 'center', columnGap: 8, rowGap: 4, flexWrap: 'wrap', paddingTop: 2 }}
             >
               {engagement && (
                 <span style={{ flex: 'none' }}>
@@ -952,7 +952,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               <div
                 data-scorecard-exit-links="true"
                 style={{
-                  flex: '1 0 200px', minWidth: 0, display: 'flex', alignItems: 'center',
+                  flex: '1 0 260px', minWidth: 0, display: 'flex', alignItems: 'center',
                   justifyContent: 'space-evenly', whiteSpace: 'nowrap',
                 }}
               >
