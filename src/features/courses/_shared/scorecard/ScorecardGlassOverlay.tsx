@@ -24,6 +24,12 @@ interface ScorecardGlassOverlayProps {
   } | null;
   /** Changes only when a horizontal round page commits. */
   pageKey?: string | null;
+  /**
+   * G2.4 — ONE SETTLE. Changes once per coalesced arrival of late SUPPORTING
+   * blocks; the same measured 220ms height animation as paging drives it, so the
+   * card moves once rather than three times. There is no idle observer.
+   */
+  settleKey?: string | null;
   presentation?: 'overlay' | 'page';
   children: React.ReactNode;
 }
@@ -35,6 +41,7 @@ export function ScorecardGlassOverlay({
   contentReady = true,
   onHorizontalDrag = null,
   pageKey = null,
+  settleKey = null,
   presentation = 'overlay',
   children,
 }: ScorecardGlassOverlayProps) {
