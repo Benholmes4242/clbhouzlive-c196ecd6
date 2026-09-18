@@ -12,7 +12,8 @@ import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
  * two greens once shipped side by side. The tokens are:
  *   gold  SC_FILL_GOLD      retained as the canonical achievement gold
  *   green A.GREEN           the one analytical / movement green (rank up)
- *   red   TOPAR_UNDER_DARK  the canonical under-par red (birdie count)
+ *   red   SC_FILL_BIRDIE_DK the one birdie ring red, shared with the card
+ *         (CALLOUT_RED = TOPAR_UNDER_DARK remains the tour under-par token)
  *   white A.INK             retained as the canonical achievement ink
  */
 
