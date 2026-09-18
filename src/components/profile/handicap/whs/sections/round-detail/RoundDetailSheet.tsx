@@ -368,10 +368,18 @@ export const RoundDetailSheet: React.FC<Props> = ({
       context: !scoreId || contextQuery.isFetched,
       reactions: reactions.isSettled,
       comments: roundPosts.isSettled,
-      commentPreview: !postInfo?.postId || commentPreviews.isSettled(postInfo.postId),
+      /**
+       * G4.1(b) — A READINESS KEY MUST BE HONEST. The preview read is disabled
+       * when the post has no comments, so that id never enters settledIds; a
+       * key that can never become true holds the cap open on every open. A
+       * query that is not asked is trivially SETTLED.
+       */
+      commentPreview: !postInfo?.postId
+        || postInfo.commentCount === 0
+        || commentPreviews.isSettled(postInfo.postId),
       field: !analysisCourseId || analysisQuery.isFetched,
     }),
-    [scoreId, contextQuery.isFetched, reactions.isSettled, roundPosts.isSettled, postInfo?.postId, commentPreviews, analysisCourseId, analysisQuery.isFetched],
+    [scoreId, contextQuery.isFetched, reactions.isSettled, roundPosts.isSettled, postInfo?.postId, postInfo?.commentCount, commentPreviews, analysisCourseId, analysisQuery.isFetched],
   );
   const overlayGate = useCardOpenGate('scorecard', open && presentation === 'overlay', {
     subject: shownHoles.length > 0 || roundSettled,
