@@ -53,6 +53,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 import { GlassCardFootAction } from '@/features/courses/_shared/scorecard/GlassCardFootAction';
 import { LikedByRow } from '@/components/likes/LikedByRow';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from '@/lib/toast';
 
@@ -111,6 +112,10 @@ export interface ReviewBottomSheetProps {
   /** G2.5 — false while the prose read is still open; the empty-state line stays silent. */
   proseSettled?: boolean;
   reactionCount?: number;
+  /** G4.3 — the review's heart. Same content_reactions row LatestReviews toggles. */
+  reactionMine?: boolean;
+  onToggleReaction?: () => void;
+  reactionHidden?: boolean;
 }
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
@@ -157,6 +162,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   resolvedAggregate,
   proseSettled = true,
   reactionCount = 0,
+  reactionMine = false,
+  onToggleReaction,
+  reactionHidden = false,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
@@ -730,6 +738,22 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               }}
 
             >
+              {/* G4.3 — HEART FIRST, a bare glyph at zero, so a review with no
+                  likes can still receive its first one. No comment glyph:
+                  comments_v2 has no 'review' target type. */}
+              {reviewId && onToggleReaction && (
+                <div style={{ marginBottom: 2 }}>
+                  <ReactionAction
+                    count={reactionCount}
+                    reacted={reactionMine}
+                    onToggle={onToggleReaction}
+                    label={t('scorecard.likeReview', 'Like this review')}
+                    tone="glass"
+                    hidden={reactionHidden}
+                    size={15}
+                  />
+                </div>
+              )}
               {reviewId && reactionCount > 0 && (
                 <LikedByRow postId={reviewId} count={reactionCount} source="review" style={{ marginBottom: 8 }} />
               )}
