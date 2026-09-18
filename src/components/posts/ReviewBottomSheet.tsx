@@ -539,7 +539,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   }}
                 >
                   {t('reviewSheet.communityAverage', {
-                    average: communityAvg!.toFixed(1),
+                    average: communityAvg?.toFixed(1) ?? '',
                     count: ratingCount,
                   })}
                 </div>

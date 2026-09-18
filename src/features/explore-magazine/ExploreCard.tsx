@@ -554,14 +554,12 @@ export function ExploreCard({
     </div>
   );
 
+  const leadReview = size === 'lead' && item.kind === 'review';
+  const headlineLineClamp = size === 'lead' ? 3 : 2;
   const headlineNode = (
-    (() => {
-      const leadReview = size === 'lead' && item.kind === 'review';
-      const lineClamp = size === 'lead' ? 3 : 2;
-      return (
     <div
       data-explore-headline="true"
-      data-explore-line-clamp={lineClamp}
+      data-explore-line-clamp={headlineLineClamp}
       style={{
         marginTop: size === 'pair' ? 4 : 6,
         fontFamily: SANS,
@@ -573,7 +571,7 @@ export function ExploreCard({
          textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
         fontStyle: item.kind === 'review' ? 'italic' : 'normal',
         display: '-webkit-box',
-        WebkitLineClamp: lineClamp,
+        WebkitLineClamp: headlineLineClamp,
         WebkitBoxOrient: 'vertical',
         overflow: 'hidden',
         /* §4a a long unbroken token WRAPS at the card edge — it never pushes
@@ -585,8 +583,6 @@ export function ExploreCard({
     >
       {headline}
     </div>
-      );
-    })()
   );
 
   const photo = (
