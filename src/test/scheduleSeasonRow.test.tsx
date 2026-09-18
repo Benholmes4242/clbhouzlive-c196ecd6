@@ -4,7 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SeasonRow } from '@/features/tourhub/schedule-v2/SeasonRow';
 import type { SeasonEvent } from '@/features/tourhub/schedule-v2/useSeasonTimeline';
 
-vi.mock('react-i18next', () => ({
+vi.mock('react-i18next', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('react-i18next')>()),
   useTranslation: () => ({
     t: (key: string, values?: { count?: number }) => ({
       'schedule.badge.champion': 'CHAMPION',
