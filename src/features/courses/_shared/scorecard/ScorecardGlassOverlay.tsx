@@ -91,7 +91,7 @@ export function ScorecardGlassOverlay({
     if (pagingTimerRef.current != null) window.clearTimeout(pagingTimerRef.current);
     pagingTimerRef.current = window.setTimeout(() => setPagingHeight(null), 220);
     return () => cancelAnimationFrame(frame);
-  }, [children, mounted, pageKey, presentation]);
+  }, [children, mounted, pageKey, settleKey, presentation]);
 
   useEffect(() => {
     if (presentation === 'page') return;
