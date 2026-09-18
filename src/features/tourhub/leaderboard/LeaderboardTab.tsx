@@ -702,10 +702,9 @@ function LeaderboardSkeleton({ variant = 'board' }: { variant?: 'page' | 'board'
   if (variant === 'board') return rows;
 
   // 'page': initial load before any event is selected — header block + column
-  // strip above the rows. NO safe-area clearance: TourPageShell owns the inset
-  // (TourPageShell.tsx:147 paddingTop, :149 minHeight) and its header is in
-  // normal flow, so paying it here would double the band. The skeleton must not
-  // reproduce it.
+  // strip above the rows. NO safe-area clearance: TourPageShell selects the
+  // single owner for exact versus pushed Tour routes, so paying it here would
+  // double the band. The skeleton must not reproduce it.
   return (
     <div style={{ background: SURFACE, minHeight: '100dvh' }}>
       <div style={{ padding: '12px 16px 8px' }}>

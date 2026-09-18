@@ -308,7 +308,7 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
   };
 
   return (
-    <div style={{ fontFamily: FONT, paddingBottom: 24 }}>
+    <div style={{ fontFamily: FONT }}>
       {isLoading ? (
         <div>
           <Skeleton style={{ height: 340, width: '100%', borderRadius: 0 }} />

@@ -13,21 +13,23 @@
  * Discover's cluster, identically. The hub's tour-menu button moved to the left
  * slot as the burger; nothing else ever passed `right`.
  *
- * WHO PAYS THE SAFE AREA. Nobody here. Tour routes are out of
- * IMMERSIVE_ROUTE_PREFIXES, so `.app-shell` pays var(--sat) once and the header
- * sticks directly beneath it (`inset="shell"`). A page that also paid it would
- * open the gap the brief calls out above the hero.
+ * WHO PAYS THE SAFE AREA. On the exact `/tourhub` route, `.app-shell` pays
+ * nothing because the overview is deliberately immersive; this header uses
+ * `inset="self"` and owns the safe area for query-param sub-tabs. On pushed
+ * `/tourhub/*` routes, `.app-shell` pays once and this header uses
+ * `inset="shell"`. Never combine the two payments.
  *
  * Sticky rows inside `children` lock to `var(--tour-header-h)`, published by
  * the shared header.
  */
 import { ReactNode, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { AppHeader, type AppHeaderTab } from '@/components/chrome/AppHeader';
 import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { safeGoBack } from '@/utils/navigation';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -57,6 +59,10 @@ interface Props {
   background?: string;
 }
 
+export function tourHeaderInset(pathname: string): 'self' | 'shell' {
+  return pathname === '/tourhub' ? 'self' : 'shell';
+}
+
 export function TourPageShell({
   title: _title,
   subtitle: _subtitle,
@@ -75,6 +81,8 @@ export function TourPageShell({
   background = A.CANVAS,
 }: Props) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const headerInset = tourHeaderInset(location.pathname);
 
   // One chrome only: the global island stands down while this shell is mounted.
   useSetChromeSuppressed(true);
@@ -112,18 +120,19 @@ export function TourPageShell({
   );
 
   return (
-    <div style={{ background, minHeight: '100vh', fontFamily: SF_STACK, position: 'relative' }}>
+    <div style={{ background, fontFamily: SF_STACK, position: 'relative' }}>
       <AppHeader
         left={left}
         tabs={tabs}
         active={activeTab}
         onTabChange={onTabChange}
         tabsAriaLabel="Tour sections"
-        inset="shell"
+        inset={headerInset}
         heightVar="--tour-header-h"
       />
       {belowTitle}
       {children}
+      <ScrollToTopGlass />
     </div>
   );
 }

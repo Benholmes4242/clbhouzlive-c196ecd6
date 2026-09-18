@@ -165,7 +165,7 @@ export function TourHubMainPage() {
       case 'overview':
         return <OverviewTab />;
       case 'news':
-        return <NewsTab />;
+        return <NewsTab immersiveHero={false} />;
       case 'live':
         return <LeaderboardTab />;
       case 'schedule':
@@ -245,7 +245,7 @@ export function TourHubMainPage() {
           /* Route immersion is path-based, so query-param tabs share the
              overview's y=0 shell. Their own opaque header therefore becomes
              the single safe-area owner while the overview remains full bleed. */
-          <div style={{ paddingTop: 'var(--sat, 0px)' }}>
+          <div style={{ paddingTop: 'var(--tour-header-h, 0px)' }}>
             <TourPageShell
               title={tabTitle}
               showBack
