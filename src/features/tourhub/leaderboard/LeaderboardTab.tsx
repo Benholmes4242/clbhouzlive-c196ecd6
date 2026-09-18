@@ -473,6 +473,7 @@ export function LeaderboardTab() {
               marginTop: 5,
               fontFamily: F,
               fontSize: 12.5,
+              lineHeight: 1.42,
               fontWeight: 500,
               color: A.MUTE,
               ...FIGS,
