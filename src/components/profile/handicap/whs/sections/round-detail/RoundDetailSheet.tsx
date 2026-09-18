@@ -398,7 +398,12 @@ export const RoundDetailSheet: React.FC<Props> = ({
           : null,
       }
     : null;
+  /* G2.3 — the engagement pair is never dropped; it only arrives with the settle. */
   const stableEngagement = include.reactions && include.comments ? engagement : null;
+  const settleKey = Object.keys(include)
+    .sort()
+    .map((key) => `${key}:${(include as Record<string, boolean>)[key] ? 1 : 0}`)
+    .join(',');
 
   return (
     <>
