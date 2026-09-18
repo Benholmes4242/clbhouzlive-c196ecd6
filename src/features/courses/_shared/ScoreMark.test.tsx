@@ -16,7 +16,6 @@ const sameColor = (left: string, right: string) =>
 
 describe('ScoreMark dark scorecard convention', () => {
   it.each([
-    { name: 'birdie', strokes: 3, par: 4, fill: '#C8372B', radius: '50%', rings: 0 },
     { name: 'eagle', strokes: 3, par: 5, fill: '#FFD200', radius: '50%', rings: 1 },
     { name: 'albatross', strokes: 2, par: 5, fill: '#FFD200', radius: '50%', rings: 2 },
     { name: 'double', strokes: 6, par: 4, fill: '#2F63A8', radius: '0%', rings: 0 },
@@ -29,6 +28,16 @@ describe('ScoreMark dark scorecard convention', () => {
     expect(fillLayer).toBeDefined();
     expect(fillLayer?.style.borderRadius).toBe(radius);
     expect(container.querySelectorAll('[data-score-ring]')).toHaveLength(rings);
+  });
+
+  it.each([20, 26])('renders the app-wide birdie as a %dpx transparent red circle', (size) => {
+    const { container } = render(<ScoreMark strokes={3} par={4} size={size} surface="dark" />);
+    const outline = container.querySelector('[data-score-outline="birdie"]') as HTMLElement | null;
+    expect(outline).toBeTruthy();
+    expect(outline?.style.borderRadius).toBe('50%');
+    expect(outline?.style.borderWidth).toBe('1.6px');
+    expect(outline?.style.background).toBe('');
+    expect(container.querySelector('[data-score-fill="birdie"]')).toBeNull();
   });
 
   it('renders bogey as an unfilled outlined square and par as plain ink', () => {

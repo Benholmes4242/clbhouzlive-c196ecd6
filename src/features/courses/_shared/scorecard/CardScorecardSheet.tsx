@@ -649,6 +649,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     <ScorecardGlassOverlay
       open={open}
       onClose={onClose}
+      contentReady={!loading}
       onHorizontalDrag={presentation === 'overlay' ? onHorizontalDrag : null}
       presentation={presentation}
     >
@@ -722,7 +723,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           is drawn, so the sheet's look is unchanged.
         */}
         {paging && (
-          <div style={{ flexShrink: 0 }}>
+          <div onClick={(event) => event.stopPropagation()} style={{ flexShrink: 0 }}>
             <button
               type="button"
               className="sr-only focus:not-sr-only"
@@ -773,13 +774,16 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
             /* No fill — the sheet surface shows through
                (BRIEF_SHEET_BACKGROUND_CANON). */
-            padding: '12px 14px calc(env(safe-area-inset-bottom, 0px) + 24px)',
+            padding: '12px 14px calc(env(safe-area-inset-bottom, 0px) + 14px)',
             display: 'flex', flexDirection: 'column', gap: 12,
           }}
         >
           {/* ROUND SELECTOR */}
           {rounds && rounds.available.length > 1 && (
-            <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
+            <div
+              onClick={(event) => event.stopPropagation()}
+              style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}
+            >
               {rounds.available.map((r) => {
                 const active = r === rounds.active;
                 return (
@@ -926,7 +930,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
           {/* S3.3 — EXITS BELONG AT THE END. */}
           {(engagement || onViewProfile || onViewCourse || onShareRound) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', paddingTop: 2 }}>
+            <div
+              data-scorecard-interactive="true"
+              onClick={(event) => event.stopPropagation()}
+              style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', paddingTop: 2 }}
+            >
               {engagement && (
                 <RoundEngagementActions
                   comment={engagement.comment ?? null}
@@ -942,6 +950,21 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} align="left" />}
               {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} align="left" />}
               {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} align="left" />}
+            </div>
+          )}
+          {presentation === 'overlay' && (
+            <div
+              data-scorecard-close-hint="true"
+              style={{
+                flexShrink: 0,
+                paddingTop: 2,
+                textAlign: 'center',
+                fontSize: 11,
+                lineHeight: 1,
+                color: 'rgba(248,250,252,0.38)',
+              }}
+            >
+              {t('courses:scorecard.tapAnywhereToClose')}
             </div>
           )}
         </div>

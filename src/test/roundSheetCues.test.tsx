@@ -12,7 +12,7 @@
  *  S1 the scorecard is glass over the page, while /round remains a page.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import {
@@ -199,16 +199,16 @@ describe('the scorecard presentation split', () => {
     playerName: 'A Member',
   };
 
-  it('renders the overlay as a glass dialog and a card tap does not dismiss it', () => {
+  it('renders the overlay as a glass dialog and a card tap dismisses it', async () => {
     const onClose = vi.fn();
     render(<CardScorecardSheet {...props} onClose={onClose} />);
     const card = document.querySelector('[data-scorecard-glass-card="true"]') as HTMLElement;
     expect(card).toBeTruthy();
     expect(card.style.maxHeight).toBe('82dvh');
     fireEvent.click(card);
-    expect(onClose).not.toHaveBeenCalled();
-    fireEvent.click(document.querySelector('[data-scorecard-overlay="true"]') as HTMLElement);
     expect(onClose).toHaveBeenCalledTimes(1);
+    fireEvent.click(document.querySelector('[data-scorecard-overlay="true"]') as HTMLElement);
+    expect(onClose).toHaveBeenCalledTimes(2);
   });
 
   it('closes on Escape and has no trajectory panel', () => {
@@ -230,12 +230,14 @@ describe('the scorecard presentation split', () => {
   });
 
   it('axis-locks a horizontal swipe and forwards its full-card drag', () => {
+    const onClose = vi.fn();
     const onStart = vi.fn();
     const onMove = vi.fn();
     const onEnd = vi.fn();
     render(
       <CardScorecardSheet
         {...props}
+        onClose={onClose}
         onHorizontalDrag={{ onStart, onMove, onEnd }}
       />,
     );
@@ -243,9 +245,11 @@ describe('the scorecard presentation split', () => {
     fireEvent.touchStart(card, { touches: [{ clientX: 240, clientY: 220 }] });
     fireEvent.touchMove(card, { touches: [{ clientX: 180, clientY: 223 }] });
     fireEvent.touchEnd(card);
+    fireEvent.click(card);
     expect(onStart).toHaveBeenCalledTimes(1);
     expect(onMove).toHaveBeenLastCalledWith(-60);
     expect(onEnd).toHaveBeenCalledWith(-60, expect.any(Number));
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it('keeps an exit tappable without dismissing the card', () => {
@@ -255,6 +259,33 @@ describe('the scorecard presentation split', () => {
     fireEvent.click(screen.getByText(/viewCourse/));
     expect(onViewCourse).toHaveBeenCalledTimes(1);
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('holds a cold open for 150ms and then mounts the full-height skeleton', () => {
+    vi.useFakeTimers();
+    const { rerender } = render(<CardScorecardSheet {...props} loading />);
+    expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeNull();
+    act(() => vi.advanceTimersByTime(149));
+    expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeNull();
+    act(() => vi.advanceTimersByTime(1));
+    expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeTruthy();
+    expect(document.querySelector('[data-scorecard-skeleton="true"]')).toBeTruthy();
+    const card = document.querySelector('[data-scorecard-glass-card="true"]') as HTMLElement;
+    expect(card.style.transition).not.toContain('height');
+    rerender(<CardScorecardSheet {...props} loading={false} />);
+    expect(card.style.transition).not.toContain('height');
+    vi.useRealTimers();
+  });
+
+  it('skips the hold when the content is already ready and guards the exits', () => {
+    const onClose = vi.fn();
+    const onViewCourse = vi.fn();
+    render(<CardScorecardSheet {...props} onClose={onClose} onViewCourse={onViewCourse} />);
+    expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeTruthy();
+    fireEvent.click(screen.getByText(/viewCourse/));
+    expect(onViewCourse).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByText(/tapAnywhereToClose/)).toBeTruthy();
   });
 
   it('renders page mode without a backdrop or dialog', () => {

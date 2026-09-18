@@ -209,9 +209,13 @@ export const KEYFRAMES = `
 `;
 
 export const SkeletonMiddle: React.FC = () => (
-  <div aria-hidden style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+  <div
+    aria-hidden
+    data-scorecard-skeleton="true"
+    style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 394 }}
+  >
     <style>{KEYFRAMES}</style>
-    {[168, 116].map((h, i) => (
+    {[214, 168].map((h, i) => (
       <div
         key={i}
         style={{

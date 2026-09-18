@@ -1,0 +1,2 @@
+import { defineConfig } from 'vite'; import react from '@vitejs/plugin-react-swc'; import path from 'path';
+export default defineConfig({root:'/tmp/s2-harness',plugins:[react()],resolve:{alias:{'@':path.resolve('/dev-server/src'),'@/hooks/useSupabaseSession':path.resolve('/tmp/s2-harness/session.ts')}},define:{__BUILD_ID__:JSON.stringify('s2'),__BUILD_STAMP__:JSON.stringify('s2')},server:{port:4174,host:'127.0.0.1'}});
