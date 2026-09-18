@@ -53,7 +53,8 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 import { GlassCardFootAction } from '@/features/courses/_shared/scorecard/GlassCardFootAction';
 import { LikedByRow } from '@/components/likes/LikedByRow';
-import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+/* ReactionAction is now reached through RoundEngagementActions, which owns the
+   canonical comment+heart pair; the direct import is gone, the module is not. */
 import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
 import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
