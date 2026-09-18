@@ -175,7 +175,7 @@
       "counter": "{{current}} / {{total}}",
       "stateLive": "EN VIVO",
       "stateFinal": "FINAL",
-      "stateUpcoming": "PROXIMO",
+      "stateUpcoming": "PRÓXIMO",
       "factRound": "RONDA",
       "factThru": "HASTA",
       "factMargin": "MARGEN",
@@ -208,7 +208,7 @@
       "daysLabel": "DAYS",
       "venueDefendsSep": " · {{name}} defends",
       "subline": "El calendario del tour",
-      "pageAria": "Pagina {{page}} de {{total}}"
+      "pageAria": "Página {{page}} de {{total}}"
     },
     "onTheCourse": {
       "eyebrow": "On the course",
@@ -469,7 +469,7 @@
       "ratingFrom_other": "de {{count}} valoraciones",
       "sectionKicker": "La sede de esta semana en clbhouz",
       "viewCourse": "Ver campo",
-      "ratingLabel": "Valoracion de los miembros",
+      "ratingLabel": "Valoración de los miembros",
       "basis_one": "De {{count}} valoración de miembros que han jugado allí.",
       "basis_other": "De {{count}} valoraciones de miembros que han jugado allí.",
       "seeAction": "VER EL CAMPO",

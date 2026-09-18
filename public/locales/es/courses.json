@@ -1131,7 +1131,7 @@
       "birdies_other": "{{count}} birdies"
     },
     "tour": {
-      "round": "Completo la vuelta en {{gross}}.",
+      "round": "Completó la vuelta en {{gross}}.",
       "thru": "Thru",
       "thruF": "F",
       "second": "Second",
@@ -1284,8 +1284,8 @@
         "birdiesOff_other": "{{count}} BIRDIES ATRAS",
         "off_one": "{{count}} ATRAS",
         "off_other": "{{count}} ATRAS",
-        "cutOff_one": "{{count}} DEL LIDER",
-        "cutOff_other": "{{count}} DEL LIDER",
+        "cutOff_one": "{{count}} DEL LÍDER",
+        "cutOff_other": "{{count}} DEL LÍDER",
         "roundsAgo_one": "HACE {{count}} RONDA",
         "roundsAgo_other": "HACE {{count}} RONDAS"
       },
@@ -1306,7 +1306,7 @@
         "figure": {
           "hole": "HOYO {n}",
           "holes": "{n} HOYOS LIMPIOS",
-          "inThree": "{n} EN LOS TRES ULTIMOS",
+          "inThree": "{n} EN LOS TRES ÚLTIMOS",
           "inARow": "{n} PARS SEGUIDOS",
           "birdies": "{n} BIRDIES"
         },
@@ -1400,8 +1400,8 @@
     "mostPlayedPlaysTo": "JUEGA A",
     "mostPlayedRoundsLabel": "VUELTAS",
     "mostPlayedBestScore": "MEJOR RESULTADO",
-    "mostPlayedBestRoundsHere": "MEJORES VUELTAS AQUI",
-    "mostPlayedAllRoundsHere": "LAS {{count}} VUELTAS AQUI",
+    "mostPlayedBestRoundsHere": "MEJORES VUELTAS AQUÍ",
+    "mostPlayedAllRoundsHere": "LAS {{count}} VUELTAS AQUÍ",
     "mostPlayedOneRoundLine": "Una vuelta aquí: {{name}} hizo {{gross}}.",
     "mostPlayedOneRoundLine_other": "Solo {{name}} ha jugado aquí, mejor {{gross}}.",
     "comments": {
@@ -1503,11 +1503,11 @@
     "titleBreakdowns": "Anadir detalles",
     "subline": "Jugados pero sin valorar - más recientes primero.",
     "sublineBreakdowns": "Faltan valoraciones detalladas - más recientes primero.",
-    "bandThisYear": "ESTE ANO",
-    "bandLastYear": "ANO PASADO",
+    "bandThisYear": "ESTE AÑO",
+    "bandLastYear": "AÑO PASADO",
     "bandEarlier": "ANTERIOR",
     "railCourses": "CAMPOS",
-    "railYears": "ANOS",
+    "railYears": "AÑOS",
     "rate": "VALORAR",
     "close": "Cerrar"
   },
@@ -1554,10 +1554,10 @@
         "lowestNet": "MEJOR NETO",
         "bestStableford": "MEJOR STABLEFORD",
         "vsHandicap": "MEJOR CONTRA HANDICAP",
-        "mostBirdies": "MAS BIRDIES",
-        "mostEagles": "MAS EAGLES",
-        "mostRounds": "MAS VUELTAS",
-        "mostCourses": "MAS CAMPOS"
+        "mostBirdies": "MÁS BIRDIES",
+        "mostEagles": "MÁS EAGLES",
+        "mostRounds": "MÁS VUELTAS",
+        "mostCourses": "MÁS CAMPOS"
       },
       "window": {
         "d14": "14 DIAS",
@@ -1610,7 +1610,7 @@
         "scores": "Resultados",
         "watch": "Ver",
         "courses": "Campos",
-        "reviews": "Resenas"
+        "reviews": "Reseñas"
       },
       "shelf": {
         "clips": "Clips",
@@ -1695,7 +1695,7 @@
         "recordLost": "{{player}} te quitó el récord del campo con {{gross}}.",
         "recordLostGap": "Te quitó el récord del campo con {{gross}}. Tu mejor vuelta queda a {{delta}}.",
         "rankDown": "{{player}} completó la vuelta en {{gross}}. Ahora estás {{ord}} de {{of}} aquí.",
-        "rankDownBy": "Completo la vuelta en {{gross}} y te bajo {{delta}} puestos hasta {{n}} de {{of}}.",
+        "rankDownBy": "Completó la vuelta en {{gross}} y te bajo {{delta}} puestos hasta {{n}} de {{of}}.",
         "rankUp": "Tu {{gross}} es la {{ord}} mejor vuelta jugada aquí.",
         "rankUpBy": "Tu {{gross}} es la {{ord}} mejor vuelta jugada aquí, {{n}} puestos más arriba.",
         "rankHold": "Tu {{gross}} sigue siendo la {{ord}} mejor vuelta que se ha jugado aquí.",
@@ -1785,7 +1785,7 @@
         "tagNew": "NUEVO",
         "courseRecord": "Récord del campo",
         "netCourseRecord": "Récord neto del campo",
-        "tagMovedUp": "SUBIO",
+        "tagMovedUp": "SUBIÓ",
         "nowRank": "Ahora {{ord}}",
         "movedUpBoard": "Subió en la clasificación"
       },
@@ -1824,7 +1824,7 @@
       "golfersToFollow": "Golfistas para seguir",
       "playsAtClub": "Juega en {{club}}",
       "roundsThisMonth": "{{count}} vueltas este mes",
-      "alsoPlays": "Tambien juega {{course}}",
+      "alsoPlays": "También juega {{course}}",
       "highestRatedMonth": "Mejor valorados este mes",
       "highestRatedYear": "Mejor valorados este año",
       "circlePlays": "Donde juega tu círculo",

@@ -103,7 +103,7 @@
   },
   "business": {
     "hero": {
-      "communityRating": "Valoracion de la comunidad",
+      "communityRating": "Valoración de la comunidad",
       "ratings": "{{count}} valoraciones",
       "ratings_one": "{{count}} valoración",
       "edit": "Editar",
@@ -124,8 +124,8 @@
       "reach": {
         "courses": "CAMPOS",
         "rounds": "RONDAS",
-        "reviews": "RESENAS",
-        "footnote": "LAS CIFRAS VERDES SON LOS ULTIMOS 30 DIAS",
+        "reviews": "RESEÑAS",
+        "footnote": "LAS CIFRAS VERDES SON LOS ÚLTIMOS 30 DIAS",
         "up": "más {{count}} en los últimos 30 días"
       },
       "benefits": {
@@ -208,7 +208,7 @@
       "actions": {
         "edit": "Editar perfil",
         "insights": "Estadisticas",
-        "reviews": "Resenas",
+        "reviews": "Reseñas",
         "team": "Gestionar equipo",
         "viewProfile": "Ver perfil público"
       }
@@ -255,7 +255,7 @@
         "hidden": "Oculto",
         "members": "Miembros",
         "pendingInvites": "Invitaciones pendientes",
-        "public": "Publico"
+        "public": "Público"
       }
     }
   },
@@ -358,7 +358,7 @@
         "emptyHeading": "No one here yet",
         "emptyBody": "Your circle is the golfers you've played with who are also on clbhouz. Connect with a few and this becomes a live table.",
         "findGolfers": "Find golfers",
-        "flameLegend": "Mejoro medio golpe o más en los últimos 30 días."
+        "flameLegend": "Mejoró medio golpe o más en los últimos 30 días."
       }
     },
     "friendsRounds": {
@@ -573,7 +573,7 @@
     "figures": {
       "courses": "Campos",
       "rounds": "Vueltas registradas",
-      "reviews": "Resenas de campos",
+      "reviews": "Reseñas de campos",
       "note": "En directo desde la plataforma. El verde son los últimos 30 días."
     },
     "appStore": "Descarga clbhouz en el App Store",
