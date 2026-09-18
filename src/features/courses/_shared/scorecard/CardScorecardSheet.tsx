@@ -1,11 +1,15 @@
 import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Share, User, type LucideIcon } from 'lucide-react';
+import { MapPin, Share, User } from 'lucide-react';
 
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { ScorecardGlassOverlay } from './ScorecardGlassOverlay';
 import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
+import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
+import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
+import { LikedByRow } from '@/components/likes/LikedByRow';
+import { GlassCardFootAction } from './GlassCardFootAction';
 import {
   honoursGround,
   METAL_GOLD,
@@ -212,15 +216,8 @@ export interface CardScorecardEngagement {
   likeLabel: string;
   /** Absent when the round has no post — no comment affordance at all (§1.6). */
   comment?: { count: number; label: string; onOpen: () => void } | null;
-}
-
-function FootAction({ label, onClick, icon: Icon }: { label: string; onClick: () => void; icon: LucideIcon }) {
-  return (
-    <button type="button" onClick={onClick} style={{ width: '100%', minHeight: 44, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'none', border: 0, padding: 2, color: A.INK, cursor: 'pointer', fontFamily: SANS }}>
-      <Icon size={17} strokeWidth={1.75} />
-      <span style={{ maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.MUTE }}>{label}</span>
-    </button>
-  );
+  postId?: string | null;
+  commentPreview?: FeedCommentPreviewData | null;
 }
 
 /* `ScorecardSection`, `fmtRel` and `toParColor` moved to scorecardParts. */
@@ -971,7 +968,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               style={{ paddingTop: 2 }}
             >
               {engagement && (
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                   <RoundEngagementActions
                     comment={engagement.comment ?? null}
                     like={{
@@ -984,16 +981,35 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   />
                 </div>
               )}
+              {engagement?.postId && engagement.likeCount > 0 && (
+                <LikedByRow
+                  postId={engagement.postId}
+                  count={engagement.likeCount}
+                  style={{ marginTop: 8 }}
+                />
+              )}
+              {engagement?.comment && engagement.comment.count > 0 && engagement.commentPreview && (
+                <div style={{ marginTop: 8 }}>
+                  <FeedCommentPreview
+                    preview={engagement.commentPreview}
+                    commentCount={engagement.comment.count}
+                    onOpenComments={engagement.comment.onOpen}
+                    topRule={false}
+                    padding="0"
+                  />
+                </div>
+              )}
               <div
                 data-scorecard-exit-links="true"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: `repeat(${[onViewProfile, onViewCourse, onShareRound].filter(Boolean).length}, minmax(0, 1fr))`,
+                  marginTop: 14,
                 }}
               >
-                {onViewProfile && <FootAction label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} icon={User} />}
-                {onViewCourse && <FootAction label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} icon={MapPin} />}
-                {onShareRound && <FootAction label={t('courses:scorecard.shareRound')} onClick={onShareRound} icon={Share} />}
+                {onViewProfile && <GlassCardFootAction label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} icon={User} />}
+                {onViewCourse && <GlassCardFootAction label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} icon={MapPin} />}
+                {onShareRound && <GlassCardFootAction label={t('courses:scorecard.shareRound')} onClick={onShareRound} icon={Share} />}
               </div>
             </div>
           )}

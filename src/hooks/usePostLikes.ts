@@ -18,12 +18,15 @@ interface RawLike {
   actor_id?: string | null;
 }
 
-export function usePostLikes(postId: string | null, enabled: boolean, source: 'post' | 'editorial' = 'post') {
+export type LikeSource = 'post' | 'editorial' | 'review';
+
+export function usePostLikes(postId: string | null, enabled: boolean, source: LikeSource = 'post') {
   return useQuery({
     queryKey: ['post-likes', postId, source],
     enabled: !!postId && enabled,
     staleTime: 30_000,
     queryFn: async () => {
+      if (!postId) return [] as PostLiker[];
       let likes: RawLike[] = [];
 
       if (source === 'editorial') {
@@ -31,19 +34,31 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: 'p
         const { data, error: likesError } = await supabase
           .from('editorial_card_likes')
           .select('user_id')
-          .eq('card_id', postId!)
+          .eq('card_id', postId)
           .order('created_at', { ascending: false })
           .limit(200);
 
         if (likesError) throw likesError;
         if (!data || data.length === 0) return [] as PostLiker[];
         likes = data.map(l => ({ user_id: l.user_id }));
+      } else if (source === 'review') {
+        const { data, error: likesError } = await supabase
+          .from('content_reactions')
+          .select('user_id')
+          .eq('target_type', 'review')
+          .eq('target_id', postId)
+          .order('created_at', { ascending: false })
+          .limit(200);
+
+        if (likesError) throw likesError;
+        if (!data || data.length === 0) return [] as PostLiker[];
+        likes = data.map((like) => ({ user_id: like.user_id }));
       } else {
         // Post likes — include actor info so business likers route correctly.
         const { data, error: likesError } = await supabase
           .from('post_likes')
           .select('user_id, actor_type, actor_id')
-          .eq('post_id', postId!)
+          .eq('post_id', postId)
           .order('created_at', { ascending: false })
           .limit(200);
 
@@ -55,7 +70,7 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: 'p
         const { data: post } = await supabase
           .from('posts')
           .select('whs_score_id')
-          .eq('id', postId!)
+          .eq('id', postId)
           .maybeSingle();
 
         if (post?.whs_score_id) {

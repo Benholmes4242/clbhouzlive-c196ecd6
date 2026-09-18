@@ -7,7 +7,8 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { useReviewMedia } from './useReviewMedia';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { useCardOpenGate } from '@/hooks/useCardOpenGate';
+import { useCardOpenGate, useCoalescedBlocks } from '@/hooks/useCardOpenGate';
+import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 
 /**
  * Single root-level mount for ReviewBottomSheet.
@@ -32,6 +33,11 @@ export const ReviewBottomSheetPortal: React.FC = () => {
   const fallbackQuery = useReviewFallback({ reviewId: payload?.reviewId ?? null, enabled: isOpen, hasText, hasBreakdown });
   const mediaQuery = useReviewMedia(payload?.reviewId ?? null, isOpen);
   const aggregateQuery = useCourseRatingAggregates(isOpen ? payload?.courseId : undefined);
+  const reactionTargets = React.useMemo(
+    () => (payload?.reviewId ? [{ type: 'review' as const, id: payload.reviewId }] : []),
+    [payload?.reviewId],
+  );
+  const reactions = useContentReactions(reactionTargets);
   /**
    * G2.2 — THE SUBJECT IS THE PROSE AND THE BREAKDOWN. The sheet does not open
    * until they are in hand, uncapped. G2.3 — the photographs and the course
@@ -44,8 +50,15 @@ export const ReviewBottomSheetPortal: React.FC = () => {
     supporting: {
       media: !payload?.reviewId || mediaQuery.isFetched,
       aggregate: !payload?.courseId || aggregateQuery.isFetched,
+      reactions: !payload?.reviewId || reactions.isSettled,
     },
   });
+  const supporting = useCoalescedBlocks({
+    media: !payload?.reviewId || mediaQuery.isFetched,
+    aggregate: !payload?.courseId || aggregateQuery.isFetched,
+    reactions: !payload?.reviewId || reactions.isSettled,
+  }, gate.visible);
+  const reactionState = payload?.reviewId ? reactions.stateFor('review', payload.reviewId) : null;
 
   // Pause every engine lane when the sheet opens. Null-caller = engine-wide
   // pause, which also passes the borrow-guard so a borrowed feed lane stops.
@@ -99,8 +112,9 @@ export const ReviewBottomSheetPortal: React.FC = () => {
       breakdown={payload.breakdown ?? null}
       resolvedReviewText={payload.reviewText ?? fallbackQuery.data?.reviewText ?? null}
       resolvedBreakdown={payload.breakdown ?? fallbackQuery.data?.breakdown ?? null}
-      resolvedMedia={mediaQuery.data ?? []}
-      resolvedAggregate={aggregateQuery.data ?? null}
+      resolvedMedia={supporting.media ? mediaQuery.data ?? [] : undefined}
+      resolvedAggregate={supporting.aggregate ? aggregateQuery.data ?? null : undefined}
+      reactionCount={supporting.reactions ? reactionState?.count ?? 0 : 0}
       proseSettled={subjectReady}
       reviewerStats={payload.reviewerStats ?? null}
     />

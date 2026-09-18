@@ -97,7 +97,7 @@ describe('Explore card shapes', () => {
     expect(onPhoto?.style.minHeight).toBe('340px');
     expect(onPhoto?.style.flexDirection).toBe('column');
     expect(kicker).not.toBeNull();
-    expect(headline?.style.fontSize).toBe('22px');
+    expect(headline?.style.fontSize).toBe('20px');
     expect(headline?.style.lineHeight).toBe('1.12');
     expect(headline?.style.letterSpacing).toBe('-0.02em');
     expect(headline?.dataset.exploreLineClamp).toBe('3');

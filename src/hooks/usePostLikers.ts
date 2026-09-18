@@ -24,7 +24,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { usePostLikes, type PostLiker } from '@/hooks/usePostLikes';
+import { usePostLikes, type LikeSource, type PostLiker } from '@/hooks/usePostLikes';
 import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
 
 export interface PostLikerEnriched extends PostLiker {
@@ -50,7 +50,7 @@ export function likerFirstNames(likers: PostLikerEnriched[], take: number): stri
 export function usePostLikers(
   postId: string | null,
   enabled: boolean,
-  source: 'post' | 'editorial' = 'post',
+  source: LikeSource = 'post',
 ) {
   const { user } = useSupabaseSession();
   const blockedIds = useBlockedUserIds(user?.id ?? null);

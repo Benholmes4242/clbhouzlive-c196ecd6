@@ -554,14 +554,16 @@ export function ExploreCard({
     </div>
   );
 
+  const leadReview = size === 'lead' && item.kind === 'review';
+  const headlineLineClamp = size === 'lead' ? 3 : 2;
   const headlineNode = (
     <div
       data-explore-headline="true"
-      data-explore-line-clamp={size === 'lead' ? 3 : 2}
+      data-explore-line-clamp={headlineLineClamp}
       style={{
         marginTop: size === 'pair' ? 4 : 6,
         fontFamily: SANS,
-        fontSize: size === 'lead' ? 22 : size === 'std' ? 16 : 13,
+        fontSize: leadReview ? 20 : size === 'lead' ? 22 : size === 'std' ? 16 : 13,
         fontWeight: 700,
         letterSpacing: size === 'lead' ? '-0.02em' : size === 'std' ? '-0.01em' : '-0.005em',
         lineHeight: size === 'lead' ? 1.12 : 1.24,
@@ -569,7 +571,7 @@ export function ExploreCard({
          textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
         fontStyle: item.kind === 'review' ? 'italic' : 'normal',
         display: '-webkit-box',
-        WebkitLineClamp: size === 'lead' ? 3 : 2,
+        WebkitLineClamp: headlineLineClamp,
         WebkitBoxOrient: 'vertical',
         overflow: 'hidden',
         /* §4a a long unbroken token WRAPS at the card edge — it never pushes

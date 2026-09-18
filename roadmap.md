@@ -136,8 +136,8 @@ Tour Overview Design A
 - [x] Remove the Explore tile outline and confirm no tap highlight replaces it
 
 ## Glass cards G3
-- [ ] Add scorecard liked-by and comment-preview blocks as coalesced supporting content
-- [ ] Match the review footer with reviewer identity in the header, review likes, and native URL sharing
-- [ ] Keep review comments out and report current review-like adoption
-- [ ] Set lead review quotes to 20px while retaining the three-line clamp
-- [ ] Verify card and tile measurements, focused tests, and types
+- [x] Add scorecard liked-by and comment-preview blocks as coalesced supporting content
+- [x] Match the review footer with reviewer identity in the header, review likes, and native URL sharing
+- [x] Keep review comments out and report current review-like adoption
+- [x] Set lead review quotes to 20px while retaining the three-line clamp
+- [x] Verify focused tests and types; authenticated device card measurements remain unavailable in this environment

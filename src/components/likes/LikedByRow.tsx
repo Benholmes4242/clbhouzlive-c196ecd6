@@ -31,6 +31,7 @@
  */
 import { useState } from 'react';
 import { usePostLikers, likerFirstNames } from '@/hooks/usePostLikers';
+import type { LikeSource } from '@/hooks/usePostLikes';
 import { LikesSheet } from './LikesSheet';
 
 export interface LikedByRowProps {
@@ -43,7 +44,7 @@ export interface LikedByRowProps {
    * renders unchanged and recorded on the dead-code list.
    */
   surfaceColor?: string;
-  source?: 'post' | 'editorial';
+  source?: LikeSource;
   style?: React.CSSProperties;
 }
 
