@@ -24,7 +24,7 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
-import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hooks/useRoundPostComments';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { supabase } from '@/integrations/supabase/client';
 import { coursePlaceLine } from '@/features/explore-magazine/placeLine';
@@ -472,12 +472,12 @@ export const RoundDetailSheet: React.FC<Props> = ({
       pagePreview={pagePreview}
       paging={paging}
     />
-    {commentsOpen && postInfo && (
+    {commentsOpen && scoreId && (
       <CommentsSheetV2
         isOpen
         onClose={() => setCommentsOpen(false)}
-        targetType="post"
-        targetId={postInfo.postId}
+        targetType="round"
+        targetId={scoreId}
       />
     )}
     </>
