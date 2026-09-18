@@ -9,6 +9,8 @@ import { useReviewMedia } from './useReviewMedia';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCardOpenGate, useCoalescedBlocks } from '@/hooks/useCardOpenGate';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
+import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 
 /**
  * Single root-level mount for ReviewBottomSheet.
@@ -38,6 +40,23 @@ export const ReviewBottomSheetPortal: React.FC = () => {
     [payload?.reviewId],
   );
   const reactions = useContentReactions(reactionTargets);
+  /**
+   * G7.2(c) — THE REVIEW HAS COMMENTS NOW. comments_v2 carries target_type
+   * 'review' on the review id, counted by get_story_engagement (the same counter
+   * the likes use) and previewed by the batched comment read. This reverses
+   * G3.2(d)/G3.3, which were right only while the target did not exist.
+   */
+  const reviewIdList = React.useMemo(
+    () => (payload?.reviewId ? [payload.reviewId] : []),
+    [payload?.reviewId],
+  );
+  const reviewEngagement = useStoryEngagement('review', reviewIdList);
+  const commentCount = reviewEngagement.engagementFor(payload?.reviewId).commentCount;
+  const previewIds = React.useMemo(
+    () => (payload?.reviewId && commentCount > 0 ? [payload.reviewId] : []),
+    [payload?.reviewId, commentCount],
+  );
+  const commentPreviews = useFeedCommentPreview(previewIds, 'review-card', 'review');
   /**
    * G2.2 — THE SUBJECT IS THE PROSE AND THE BREAKDOWN. The sheet does not open
    * until they are in hand, uncapped. G2.3 — the photographs and the course
