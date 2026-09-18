@@ -111,4 +111,4 @@ Tour Overview Design A
 - [x] Replace the bespoke overview News markup with the shared hero, two-up, and row shapes
 - [x] Add backward-compatible gutter and engagement controls without moving the News tab
 - [x] Preserve Story Band exclusion and exact-two feature grouping
-- [ ] Verify 390/320 layouts, sparse/no-image states, page-height delta, tests, and types
+- [x] Verify 390/320 layouts, sparse/no-image states, page-height delta, tests, and types
