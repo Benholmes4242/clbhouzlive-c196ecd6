@@ -590,16 +590,64 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     exitGuard.requestClose();
   }, [step, composer, exitGuard]);
 
+  /**
+   * R1 §1.1 — the submit bar tells the truth about which half of the work is
+   * running: photographs are moving, then the review is being posted. It is
+   * one press; the member should not have to guess why it is taking time.
+   */
+  const [mediaUploading, setMediaUploading] = useState(false);
+
+
+  /**
+   * R1 §1.1 — THE ORDER IS INVERTED, AND THAT IS THE WHOLE FIX.
+   *
+   * WAS (and this is what lost photographs): RPC -> receipt -> upload -> rows.
+   * The bytes moved after the member had been navigated away and the composer
+   * unmounted; in the native shell a background or a discard killed the
+   * in-flight invoke and the insert behind it. Measured: a review submitted
+   * 18 Sep 2026 14:16 UTC reporting media_count 2, zero rows written, and no
+   * word of it to the member.
+   *
+   * IS: upload (foreground, member watching) -> RPC -> rows (milliseconds) ->
+   * receipt. Nothing slow survives the navigation, because nothing slow is
+   * left. If an upload fails the member STAYS HERE with their files intact and
+   * a working Retry, and NOTHING is submitted — the opposite of the old
+   * behaviour, where the review existed and the photographs did not.
+   *
+   * ORPHANS ARE ACCEPTED (brief, explicit): abandoning after an upload leaves
+   * a file in R2 with no row. Cheap, sweepable, and the right side of the
+   * trade against losing a member's photographs.
+   */
   const handleSubmit = useCallback(async () => {
     try {
+      // 1. BYTES FIRST, while this page is alive and on screen.
+      setMediaUploading(true);
+      const up = await media.uploadPendingMedia();
+      setMediaUploading(false);
+      if (!up.ok) {
+        // R1 §1.3b — a failure is said in words, not only drawn on a tile.
+        // No RPC runs: there is no review, so there is nothing to be missing
+        // media from, and the files are still here to retry.
+        toast.error(t('review.toast.mediaUploadFailed'));
+        return;
+      }
+
+      // 2. THE RECORD.
       const { ratingId, shareToFeed } = await submit.submit({
         courseId: course.id,
         state: composer.state,
       });
       submittedRef.current = true;
       composer.clearDraft();
-      media.flushToReview(ratingId, { caption: composer.state.reviewText, queryClient: qc }).catch(() => { /* per-item errors surfaced in tray */ });
+
+      // 3. THE ROWS — milliseconds, because the bytes are already at rest.
+      // Awaited: a receipt must not render in front of outstanding work.
+      const attached = await media.attachToReview(ratingId, { queryClient: qc });
+      if (attached.failed > 0) toast.error(t('review.toast.mediaAttachFailed'));
+
       invalidateCourseRatingCaches(qc);
+
+      // 4. THE RECEIPT, last, with nothing behind it.
       onSuccess({
         ratingId,
         shareToFeed,
@@ -631,6 +679,9 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         facilities: composer.state.scores.facilities ?? undefined,
       });
     } catch (e) {
+      // R1 §1.3a — the silent `.catch(() => {})` that used to swallow the whole
+      // flush is gone. Every failure in this function now ends in a sentence.
+      setMediaUploading(false);
       toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -697,7 +748,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const remaining = 4 - composer.catsSet;
 
   let buttonLabel: string;
-  if (submit.submitting) {
+  if (mediaUploading) {
+    // R1 §1.1a — the sending state names the half that is running.
+    buttonLabel = t('review.wizard.uploadingMedia');
+  } else if (submit.submitting) {
     buttonLabel = isEditMode ? t('review.wizard.saving') : t('review.wizard.posting');
   } else if (step === 2) {
     buttonLabel = isEditMode ? t('review.wizard.save') : t('review.wizard.post');
@@ -1183,10 +1237,14 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
           <section style={{ padding: '0 16px 16px' }}>
             <Eyebrow>{t('review.wizard.step2.photosEyebrow')}</Eyebrow>
+            {/* R1 §1.3c — onRetry was never passed, so a failed tile's Retry
+                was a button that did nothing. Wired: with no reviewId the item
+                returns to pending and the pending set re-uploads. */}
             <MediaTray
               items={media.items}
               onPick={media.addFiles}
               onRemove={media.removeItem}
+              onRetry={(id) => { void media.retryItem(id); }}
               pickerError={media.pickerError}
               onClearError={media.clearPickerError}
             />
@@ -1236,7 +1294,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
       <SubmitBar
         label={buttonLabel}
-        enabled={gateMet && !submit.submitting}
+        enabled={gateMet && !submit.submitting && !mediaUploading}
         onPress={handlePrimary}
       />
 

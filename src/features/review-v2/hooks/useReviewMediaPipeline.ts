@@ -23,10 +23,19 @@ import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloud
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { usePendingPostsStore, type PendingPost } from '@/uploads/pendingPostsStore';
 import { reviewRetryRegistry } from '@/uploads/reviewRetryRegistry';
+import { startReviewUpload } from '../lib/reviewUploadController';
 import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
 
-const REVIEW_R2_BUCKET = 'clbhouz-review-images';
+/*
+ * R1 §1.4a — there is no bucket constant here any more. The client used to
+ * append `bucketName: 'clbhouz-review-images'` while the edge function reads
+ * `bucketType`, so the name was decorative: every review image has always
+ * landed in bucket clbhouz-media under <user>/course-media/, which the 468
+ * live urls confirm. The parameter and the constant are gone; the function's
+ * own `bucketType || 'course-media'` fallback preserves today's destination
+ * exactly. Moving existing files is a separate, unauthorised migration.
+ */
 
 /** Per-item cache sweeps are throttled to at most one every 2s. */
 const SWEEP_THROTTLE_MS = 2000;
@@ -302,7 +311,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
         const formData = new FormData();
         formData.append('file', item.file);
         formData.append('fileName', fileName);
-        formData.append('bucketName', REVIEW_R2_BUCKET);
+        // No bucket parameter — see the note at the top of this file.
 
         // No native progress from supabase.functions.invoke; simulate a bump.
         updateItem(item.id, { progress: 30 });
@@ -460,13 +469,145 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
     [userId, uploadOne],
   );
 
+  /* ---------------------------------------------------------------------
+   * R1 §1.1 — THE INVERTED ORDER. uploadPendingMedia() then attachToReview().
+   *
+   * The old order was: RPC -> receipt -> upload (20s) -> insert rows, which
+   * made the member's photographs depend on the composer's page surviving
+   * twenty seconds it had already navigated away from. The new order is:
+   * upload (foreground, visible) -> RPC -> insert rows (milliseconds) ->
+   * receipt. Nothing slow happens after navigation.
+   *
+   * flushToReview() below is KEPT, unchanged, and is no longer called by the
+   * composer. It remains the only code path that registers a pending card and
+   * the reviewRetryRegistry entry, so it is not deleted while those surfaces
+   * exist; if it is ever removed, the card and the registry go with it.
+   * ------------------------------------------------------------------- */
+
+  /** One stable key per composer instance, so a remount joins its own run. */
+  const uploadKeyRef = useRef<string>(`rv2-${nid()}`);
+
+  const insertMediaRow = useCallback(
+    async (reviewId: string, item: MediaItem): Promise<string | null> => {
+      const dims = item.type === 'image' && item.width && item.height
+        ? { width: item.width, height: item.height, aspect_ratio: parseFloat((item.width / item.height).toFixed(4)) }
+        : {};
+      const { data: row, error } = await supabase
+        .from('course_review_media')
+        .insert({
+          review_id: reviewId,
+          media_url: item.uploadedUrl ?? '',
+          media_type: item.type,
+          stream_id: item.streamId ?? null,
+          poster_url: item.posterUrl ?? null,
+          file_name: item.file?.name ?? null,
+          file_size: item.file?.size ?? null,
+          status: 'attached',
+          owner_user_id: userId,
+          duration_seconds: item.type === 'video' ? (item.durationSeconds ?? null) : null,
+          ...dims,
+        })
+        .select('id')
+        .single();
+      if (error) throw error;
+      return row?.id ?? null;
+    },
+    [userId],
+  );
+
+  /**
+   * Move the bytes for every pending/failed item, in the foreground, and
+   * report the outcome to the CALLER — which is what makes a failure sayable
+   * in words instead of a silent tile (R1 §1.3b). Resolves { ok, failed }.
+   */
+  const uploadPendingMedia = useCallback(async (): Promise<{ ok: boolean; failed: number }> => {
+    const pending = itemsRef.current.filter(
+      (i) => (i.status === 'pending' || i.status === 'failed') && !!i.file,
+    );
+    if (pending.length === 0) return { ok: true, failed: 0 };
+    if (!userId) return { ok: false, failed: pending.length };
+
+    for (const it of pending) {
+      updateItem(it.id, { status: 'uploading', progress: 0, error: undefined });
+    }
+
+    const results = await startReviewUpload(
+      uploadKeyRef.current,
+      userId,
+      pending.map((i) => ({ id: i.id, type: i.type, file: i.file as File })),
+    );
+
+    let failed = 0;
+    for (const r of results) {
+      if (r.ok) {
+        updateItem(r.id, {
+          status: 'uploaded',
+          progress: 100,
+          uploadedUrl: r.uploadedUrl ?? null,
+          streamId: r.streamId ?? null,
+          posterUrl: r.posterUrl ?? null,
+          error: undefined,
+        });
+      } else {
+        failed += 1;
+        updateItem(r.id, { status: 'failed', error: r.error || 'Upload failed' });
+      }
+    }
+    return { ok: failed === 0, failed };
+  }, [userId, updateItem]);
+
+  /**
+   * Write one course_review_media row per already-uploaded item. Runs after
+   * the RPC and takes milliseconds — the bytes are already at rest.
+   */
+  const attachToReview = useCallback(
+    async (
+      reviewId: string,
+      opts?: { queryClient?: QueryClient },
+    ): Promise<{ inserted: number; failed: number }> => {
+      const uploaded = itemsRef.current.filter((i) => i.status === 'uploaded' && !i.dbRowId);
+      if (uploaded.length === 0) return { inserted: 0, failed: 0 };
+
+      let inserted = 0;
+      let failed = 0;
+      for (const it of uploaded) {
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const rowId = await insertMediaRow(reviewId, it);
+          updateItem(it.id, { status: 'ready', progress: 100, dbRowId: rowId });
+          inserted += 1;
+        } catch (e) {
+          failed += 1;
+          updateItem(it.id, {
+            status: 'failed',
+            error: e instanceof Error ? e.message : 'Could not attach media',
+          });
+        }
+      }
+      if (opts?.queryClient) invalidateCourseRatingCaches(opts.queryClient);
+      return { inserted, failed };
+    },
+    [insertMediaRow, updateItem],
+  );
+
+  /**
+   * Retry one failed tile. With no reviewId (the R1 order) the item goes back
+   * to pending and the whole pending set is re-uploaded — items that already
+   * succeeded are 'uploaded' and are not touched. The two-argument form is
+   * the legacy flushToReview retry and is preserved for the pending card.
+   */
   const retryItem = useCallback(
-    async (id: string, reviewId: string) => {
+    async (id: string, reviewId?: string) => {
       const it = itemsRef.current.find((i) => i.id === id);
       if (!it) return;
-      await uploadOne(it, reviewId);
+      if (reviewId) {
+        await uploadOne(it, reviewId);
+        return;
+      }
+      updateItem(id, { status: 'pending', progress: 0, error: undefined });
+      await uploadPendingMedia();
     },
-    [uploadOne],
+    [uploadOne, updateItem, uploadPendingMedia],
   );
 
   const hasNewMedia = useCallback(() => items.some((i) => !i.isExisting), [items]);
@@ -475,6 +616,8 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
     items,
     addFiles,
     removeItem,
+    uploadPendingMedia,
+    attachToReview,
     flushToReview,
     retryItem,
     pickerError,

@@ -531,7 +531,9 @@
     "toast": {
       "signInRequired": "Sign in required",
       "voteBody": "Please sign in to vote on reviews",
-      "rateBody": "Please sign in to rate courses"
+      "rateBody": "Please sign in to rate courses",
+      "mediaUploadFailed": "사진을 업로드할 수 없어 아무것도 게시되지 않았습니다. 사진의 다시 시도를 누른 뒤 다시 게시해 주세요.",
+      "mediaAttachFailed": "리뷰는 게시되었지만 사진을 첨부할 수 없습니다. 리뷰를 편집해 다시 추가해 주세요."
     },
     "wizard": {
       "rail": {
@@ -612,7 +614,8 @@
         "mediaVideos": "동영상 {{count}}개",
         "mediaJoin": ", ",
         "mediaDismiss": "확인"
-      }
+      },
+      "uploadingMedia": "사진 업로드 중..."
     }
   },
   "courseDetail": {

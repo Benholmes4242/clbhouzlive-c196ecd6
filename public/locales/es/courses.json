@@ -531,7 +531,9 @@
     "toast": {
       "signInRequired": "Sign in required",
       "voteBody": "Please sign in to vote on reviews",
-      "rateBody": "Please sign in to rate courses"
+      "rateBody": "Please sign in to rate courses",
+      "mediaUploadFailed": "No se pudieron subir tus fotos, así que no se ha publicado nada. Toca Reintentar en la foto y vuelve a pulsar Publicar.",
+      "mediaAttachFailed": "Tu reseña se publicó, pero no se pudo adjuntar una foto. Edita la reseña para añadirla de nuevo."
     },
     "wizard": {
       "rail": {
@@ -612,7 +614,8 @@
         "mediaVideos": "{{count}} videos",
         "mediaJoin": " y ",
         "mediaDismiss": "Entendido"
-      }
+      },
+      "uploadingMedia": "Subiendo fotos..."
     }
   },
   "courseDetail": {

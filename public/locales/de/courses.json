@@ -531,7 +531,9 @@
     "toast": {
       "signInRequired": "Sign in required",
       "voteBody": "Please sign in to vote on reviews",
-      "rateBody": "Please sign in to rate courses"
+      "rateBody": "Please sign in to rate courses",
+      "mediaUploadFailed": "Deine Fotos konnten nicht hochgeladen werden, daher wurde nichts gepostet. Tippe beim Foto auf Erneut versuchen und poste dann noch einmal.",
+      "mediaAttachFailed": "Deine Bewertung wurde gepostet, aber ein Foto konnte nicht angehängt werden. Bearbeite die Bewertung, um es erneut hinzuzufügen."
     },
     "wizard": {
       "rail": {
@@ -612,7 +614,8 @@
         "mediaVideos": "{{count}} Videos",
         "mediaJoin": " und ",
         "mediaDismiss": "Verstanden"
-      }
+      },
+      "uploadingMedia": "Fotos werden hochgeladen ..."
     }
   },
   "courseDetail": {
