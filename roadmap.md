@@ -141,3 +141,9 @@ Tour Overview Design A
 - [x] Keep review comments out and report current review-like adoption
 - [x] Set lead review quotes to 20px while retaining the three-line clamp
 - [x] Verify focused tests and types; authenticated device card measurements remain unavailable in this environment
+
+## G4 (done)
+- G4.1 stable* drops removed; commentPreview key reports settled when the preview read is disabled (commentCount 0).
+- G4.2 overlay height reads offsetHeight, only after the 240ms entrance, clamped to 82dvh.
+- G4.3 review foot gains ReactionAction (size 15) above LikedByRow; no comment glyph. Locale key scorecard.likeReview in six locales.
+- Authenticated device/cold-warm measurements still unavailable (Supabase external_unmanaged).
