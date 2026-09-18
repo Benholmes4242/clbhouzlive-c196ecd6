@@ -127,3 +127,10 @@ Tour Overview Design A
 - [x] Remove the redundant shell minimum height and News bottom padding
 - [x] Share one scroll-to-top control without duplicating the Overview or Schedule instance
 - [x] Verify notch coverage, foot clearance, short-page canvas, focused tests, and types (native notch remains device-only)
+
+## Glass cards G2
+- [x] Replace the frozen gate with an uncapped subject gate and a cap that only defers support
+- [x] Stop dropping supporting blocks on the scorecard and the review sheet
+- [x] Coalesce late arrivals into one 220ms eased settle, never during the entrance
+- [x] Gate the scorecard and review empty-state copy on settled data, with a DEV warning
+- [x] Remove the Explore tile outline and confirm no tap highlight replaces it
