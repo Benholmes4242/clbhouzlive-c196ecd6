@@ -13,8 +13,8 @@
  *  mention (post/comment/review/top_ten)   -> source-typed permalink
  *  mention_post / tag / comment_mention    -> /post/:post_id
  *  top_ten_comment / top_ten_reply         -> /profile/:target?tab=courses&...
- *  friend_course_review / course_review*   -> /courses/:course_id?tab=reviews&review=:review_id
- *  review_response_posted                  -> /courses/:course_id?tab=reviews&review=:review_id
+ *  friend_course_review / course_review*   -> /courses/:course_id?tab=reviews&review=:review_id / rating_id
+ *  review_response_posted                  -> /courses/:course_id?tab=reviews&review=:review_id / rating_id
  *  follow / friend_*                       -> /profile/:actor (or /business/:id when follower is business)
  *  new_post (round)                        -> /round/:whs_score_id
  *  new_post                                -> /post/:entity_id (fallback /profile/:actor)
@@ -238,7 +238,11 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     }
     if (src === 'review') {
       const cid = data.course_id;
-      const rid = data.review_id ?? (entity_type === 'review' ? entity_id : null);
+      // rating_id is the legacy key notify_friends_on_course_review() wrote, kept
+      // as a fallback so notifications already in the table resolve without a
+      // backfill. This branch guards on entity_type, so it was never wrong here,
+      // only incomplete.
+      const rid = data.review_id ?? data.rating_id ?? (entity_type === 'review' ? entity_id : null);
       if (cid && rid) return `/courses/${cid}?tab=reviews&review=${rid}`;
       if (cid) return `/courses/${cid}?tab=reviews`;
     }
@@ -265,7 +269,14 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     type === 'review_response_posted'
   ) {
     const cid = data.course_id;
-    const rid = data.review_id ?? entity_id;
+    // entity_id on these rows is the COURSE, never the review. Falling back to it
+    // built /courses/{cid}?tab=reviews&review={cid} — an id that can never match,
+    // so the tab opened and nothing happened. rating_id is kept as a fallback so
+    // notifications ALREADY in the table resolve correctly without a backfill.
+    const rid =
+      data.review_id ??
+      data.rating_id ??
+      (entity_type === 'review' ? entity_id : null);
     if (cid && rid) return `/courses/${cid}?tab=reviews&review=${rid}`;
     if (cid) return `/courses/${cid}?tab=reviews`;
   }
