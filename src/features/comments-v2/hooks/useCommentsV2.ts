@@ -367,6 +367,15 @@ export function useCommentsV2({
    * comment the member just wrote instead of the old line for up to 60s.
    */
   const invalidateFeedPreviews = useCallback(() => {
+    if (targetType === 'round' || targetType === 'review') {
+      /* G7 — A ROUND AND A REVIEW HAVE NO DENORMALISED COUNT. Their count comes
+         from get_story_engagement, cached for 60s under 'story-engagement', so
+         the card's glyph would keep the old number after a write unless the
+         family is marked stale alongside the preview. */
+      qc.invalidateQueries({ queryKey: ['story-engagement'] });
+      qc.invalidateQueries({ queryKey: ['post-comment-preview'] });
+      return;
+    }
     if (targetType !== 'post') return;
     qc.invalidateQueries({ queryKey: ['post-comment-preview'] });
   }, [qc, targetType]);
