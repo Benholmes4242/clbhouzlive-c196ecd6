@@ -134,3 +134,10 @@ Tour Overview Design A
 - [x] Coalesce late arrivals into one 220ms eased settle, never during the entrance
 - [x] Gate the scorecard and review empty-state copy on settled data, with a DEV warning
 - [x] Remove the Explore tile outline and confirm no tap highlight replaces it
+
+## Glass cards G3
+- [ ] Add scorecard liked-by and comment-preview blocks as coalesced supporting content
+- [ ] Match the review footer with reviewer identity in the header, review likes, and native URL sharing
+- [ ] Keep review comments out and report current review-like adoption
+- [ ] Set lead review quotes to 20px while retaining the three-line clamp
+- [ ] Verify card and tile measurements, focused tests, and types
