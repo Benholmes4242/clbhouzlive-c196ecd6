@@ -272,8 +272,10 @@ describe('the scorecard presentation split', () => {
     expect(document.querySelector('[data-scorecard-skeleton="true"]')).toBeTruthy();
     const card = document.querySelector('[data-scorecard-glass-card="true"]') as HTMLElement;
     expect(card.style.transition).not.toContain('height');
+    expect(card.style.height).toBe('auto');
     rerender(<CardScorecardSheet {...props} loading={false} />);
     expect(card.style.transition).not.toContain('height');
+    expect(card.style.height).toBe('auto');
     vi.useRealTimers();
   });
 
@@ -285,7 +287,7 @@ describe('the scorecard presentation split', () => {
     fireEvent.click(screen.getByText(/viewCourse/));
     expect(onViewCourse).toHaveBeenCalledTimes(1);
     expect(onClose).not.toHaveBeenCalled();
-    expect(screen.getByText(/tapAnywhereToClose/)).toBeTruthy();
+    expect(document.querySelector('[data-scorecard-close-hint="true"]')).toBeNull();
   });
 
   it('renders page mode without a backdrop or dialog', () => {
