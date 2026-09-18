@@ -41,7 +41,7 @@ export const ReviewBottomSheetPortal: React.FC = () => {
   /**
    * G2.2 — THE SUBJECT IS THE PROSE AND THE BREAKDOWN. The sheet does not open
    * until they are in hand, uncapped. G2.3 — the photographs and the course
-   * aggregate are SUPPORTING: never dropped, only late, and the 350ms cap only
+   * aggregate are SUPPORTING: never dropped, only late, and the 900ms cap only
    * decides whether the card waits for them before opening.
    */
   const subjectReady = !payload?.reviewId || (hasText && hasBreakdown) || fallbackQuery.isFetched;

@@ -358,7 +358,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
    * only waits where there is no seed, which is where waiting is correct.
    *
    * G2.3 — everything else is SUPPORTING. It is never excluded, only late: the
-   * 350ms cap decides whether the card waits for it before opening, and
+   * 900ms cap decides whether the card waits for it before opening, and
    * useCoalescedBlocks applies whatever arrives afterwards in ONE settle.
    */
   const supporting = useMemo(
