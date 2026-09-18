@@ -224,7 +224,8 @@
     "noFieldNobody": "Nadie más ha jugado aquí todavía, así que no hay un grupo con el que comparar.",
     "fieldShort": "Campo",
     "shareRound": "Compartir",
-    "likeReview": "Me gusta esta reseña"
+    "likeReview": "Me gusta esta reseña",
+    "commentReview": "Comentar esta reseña"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

@@ -2282,7 +2282,8 @@
     "fieldShort": "Field",
     "previousRound": "Previous round",
     "nextRound": "Next round",
-    "likeReview": "Like this review"
+    "likeReview": "Like this review",
+    "commentReview": "Comment on this review"
   },
   "search": {
     "yourRounds": "Your rounds"

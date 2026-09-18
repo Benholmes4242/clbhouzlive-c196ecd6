@@ -748,23 +748,41 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               }}
 
             >
-              {/* G4.3 — HEART FIRST, a bare glyph at zero, so a review with no
-                  likes can still receive its first one. No comment glyph:
-                  comments_v2 has no 'review' target type. */}
+              {/* G7.2(c) — THE SAME PAIR THE ROUND CARRIES, through the same
+                  component, so the two feet read as one object. Both glyphs are
+                  bare at zero, so a review with nothing on it can still take its
+                  first like and its first comment. */}
               {reviewId && onToggleReaction && (
                 <div style={{ marginBottom: 2 }}>
-                  <ReactionAction
-                    count={reactionCount}
-                    reacted={reactionMine}
-                    onToggle={onToggleReaction}
-                    label={t('scorecard.likeReview', 'Like this review')}
-                    hidden={reactionHidden}
-                    size={15}
+                  <RoundEngagementActions
+                    comment={{
+                      count: commentCount,
+                      label: t('scorecard.commentReview', 'Comment on this review'),
+                      onOpen: () => setCommentsOpen(true),
+                    }}
+                    like={{
+                      count: reactionCount,
+                      reacted: reactionMine,
+                      onToggle: onToggleReaction,
+                      label: t('scorecard.likeReview', 'Like this review'),
+                      hidden: reactionHidden,
+                    }}
                   />
                 </div>
               )}
               {reviewId && reactionCount > 0 && (
                 <LikedByRow postId={reviewId} count={reactionCount} source="review" style={{ marginBottom: 8 }} />
+              )}
+              {reviewId && commentCount > 0 && commentPreview && (
+                <div style={{ marginBottom: 8 }}>
+                  <FeedCommentPreview
+                    preview={commentPreview}
+                    commentCount={commentCount}
+                    onOpenComments={() => setCommentsOpen(true)}
+                    topRule={false}
+                    padding="0"
+                  />
+                </div>
               )}
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${reviewId && courseId ? 3 : 2}, minmax(0, 1fr))` }}>
                 <GlassCardFootAction label={t('scorecard.viewProfile')} onClick={handleGoToProfile} icon={User} disabled={!user.id} />
