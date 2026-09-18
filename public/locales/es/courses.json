@@ -153,6 +153,14 @@
     }
   },
   "scorecard": {
+    "feat": {
+      "ace": { "label": "HOYO EN UNO" },
+      "albatross": { "label": "ALBATROS" },
+      "eagle": { "label": "EAGLE" },
+      "birdies": { "label": "BIRDIES", "sub": "en una ronda" },
+      "clean": { "label": "RONDA LIMPIA", "sub": "sin ceder un golpe" },
+      "onHole": "en el {{hole}}"
+    },
     "atThisCourseBare": "En este campo",
     "atThisCourseSelf": "Tu en este campo",
     "atThisCourseOther": "{{name}} en este campo",

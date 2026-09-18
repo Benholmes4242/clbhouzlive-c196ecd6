@@ -1704,6 +1704,14 @@
     "writePromptInline": "[~~⭐ Ŵříţé ýőúř řéṽíéŵ~~]"
   },
   "scorecard": {
+    "feat": {
+      "ace": { "label": "[~~ĤŐĻÉ ÍŃ ŐŃÉ~~]" },
+      "albatross": { "label": "[~~ÁĻƁÁŢŘŐŠŠ~~]" },
+      "eagle": { "label": "[~~ÉÁĜĻÉ~~]" },
+      "birdies": { "label": "[~~ƁÍŘĐÍÉŠ~~]", "sub": "[~~íñ őñé řőúñđ~~]" },
+      "clean": { "label": "[~~ĈĻÉÁŃ ĈÁŘĐ~~]", "sub": "[~~ñőţ á šĥőţ đřőƥƥéđ~~]" },
+      "onHole": "[~~őñ ţĥé {{hole}}~~]"
+    },
     "atThisCourseBare": "At this course",
     "atThisCourseSelf": "[~~Ýőú áţ ţĥíš ĉőúřšé~~]",
     "atThisCourseOther": "[~~{{name}} áţ ţĥíš ĉőúřšé~~]",

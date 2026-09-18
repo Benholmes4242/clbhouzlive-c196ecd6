@@ -11,14 +11,7 @@ import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/
 import { LikedByRow } from '@/components/likes/LikedByRow';
 import type { LikeSource } from '@/hooks/usePostLikes';
 import { GlassCardFootAction } from './GlassCardFootAction';
-import {
-  honoursGround,
-  METAL_GOLD,
-  METAL_HAIRLINE,
-  METAL_INK,
-  METAL_TOP_EDGE,
-  type HonoursFeat,
-} from './honoursTreatment';
+import { FEAT_BAND_STYLE, scorecardFeatFor } from './scorecardFeat';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
@@ -156,13 +149,6 @@ export interface CardScorecardSheetProps {
    * draws nothing when the prop is absent, so the tour surface is untouched.
    */
   engagement?: CardScorecardEngagement | null;
-  /**
-   * THE HONOURS TREATMENT (BRIEF_DISCOVER_FILTER_LED_BOARD S5.6/S8.3). The
-   * honours board rail is deleted; its metal survives HERE, on the one surface
-   * that shows a single feat round. Null for an ordinary round, which is nearly
-   * all of them, and then nothing renders.
-   */
-  feat?: HonoursFeat | null;
   onHorizontalDrag?: {
     onStart: () => void;
     onMove: (dx: number) => void;
@@ -313,7 +299,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
-  feat = null,
   presentation = 'overlay',
   onHorizontalDrag = null,
   onStatsSeen,
@@ -388,6 +373,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const played = useMemo(
     () => holes.filter((h) => h.strokes != null && h.strokes > 0 && h.par != null),
     [holes],
+  );
+  /* S7 — THE BAND READS THE SAME ROWS AS THE GRID. No host prop and no standing
+     can make the band disagree with the marks below it. */
+  const feat = useMemo(
+    () => scorecardFeatFor(holes, !!nineHole, surface),
+    [holes, nineHole, surface],
   );
 
   const totals = useMemo(() => {
@@ -715,36 +706,62 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           more: the fixed summary is the gross, the to-par, the player and the
           date, and nothing else.
         */}
-        {/* THE HONOURS BAND. Champagne for the albatross, bone for the ace —
-            they separate by SATURATION, never by value. It sits above the
-            summary because the feat is why this round is worth a look. */}
+        {/* S7 — ONE FLAT MEMBER BAND. Metal and its rarity separation retired
+            18 Sep 2026 when this widened from two permanent facts to five. */}
         {feat && (
-          <div
-            style={{
-              flexShrink: 0,
-              background: honoursGround(feat),
-              borderTop: `1px solid ${METAL_TOP_EDGE}`,
-              borderBottom: `1px solid ${METAL_HAIRLINE}`,
-              padding: '8px 16px',
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 8,
-            }}
-          >
+          <div data-scorecard-feat={feat.kind} style={FEAT_BAND_STYLE}>
+            {feat.kind === 'birdies' ? (
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                aria-hidden="true"
+                style={{ display: 'block', flex: '0 0 14px', alignSelf: 'center' }}
+              >
+                <circle cx="7" cy="7" r="6" stroke={A.AMBER} strokeWidth="1" />
+                <text
+                  x="7"
+                  y="7"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill={A.AMBER}
+                  fontSize="7"
+                  fontWeight="700"
+                  fontFamily={SANS}
+                >
+                  {feat.count}
+                </text>
+              </svg>
+            ) : (
+              <span
+                aria-hidden="true"
+                style={{
+                  flex: '0 0 14px', width: 14, fontSize: 14, lineHeight: 1,
+                  fontFamily: "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
+                }}
+              >
+                {feat.kind === 'ace' ? '⛳' : feat.kind === 'albatross' ? '🔥' : feat.kind === 'eagle' ? '🦅' : '🛡️'}
+              </span>
+            )}
             <span
               style={{
                 fontSize: 10,
                 fontWeight: 700,
-                letterSpacing: '0.1em',
+                letterSpacing: '0.13em',
                 textTransform: 'uppercase',
-                color: METAL_GOLD,
+                color: A.AMBER,
               }}
             >
-              {feat === 'ace' ? 'Hole in one' : 'Albatross'}
+              {t(`courses:scorecard.feat.${feat.kind}.label`)}
             </span>
-            <span style={{ fontSize: 11.5, fontWeight: 600, color: METAL_INK, opacity: 0.62 }}>
-              {feat === 'ace' ? 'Honours' : 'Honours · rarest of all'}
-            </span>
+            {(feat.hole != null || feat.kind === 'birdies' || feat.kind === 'clean') && (
+              <span style={{ fontSize: 11.5, fontWeight: 600, color: A.MUTE }}>
+                {feat.hole != null
+                  ? t('courses:scorecard.feat.onHole', { hole: formatOrdinal(feat.hole) })
+                  : t(`courses:scorecard.feat.${feat.kind}.sub`)}
+              </span>
+            )}
           </div>
         )}
         {/*
