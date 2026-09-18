@@ -96,11 +96,12 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
         if (likesError) throw likesError;
         likes = (data ?? []) as RawLike[];
 
-        // Round-backed posts keep their personal hearts in content_reactions
-        // (canonical). Mirror of public.viewer_liked_post — keep in step.
+        // Round-backed AND review-backed posts keep their personal hearts in
+        // content_reactions (canonical). ONE lookup carries both keys.
+        // Mirror of public.viewer_liked_post — keep in step.
         const { data: post } = await supabase
           .from('posts')
-          .select('whs_score_id')
+          .select('whs_score_id, source_review_id')
           .eq('id', postId)
           .maybeSingle();
 
