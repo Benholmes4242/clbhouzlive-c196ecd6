@@ -63,9 +63,8 @@ const INK = '#F8FAFC';
 const BODY = 'rgba(248,250,252,0.72)';
 const MUTE = 'rgba(248,250,252,0.62)';
 const GRABBER = 'rgba(255,255,255,0.18)';
-/* BORDER doubles as a fill in two places (sub-score tracks, photo placeholder).
-   A hairline alpha reads as nothing when it becomes a surface on dark, so those
-   sites take one step up — the fills are NOT brightened to compensate. */
+/* The photo placeholder needs one step more fill than a hairline border; the
+   fill is not brightened to compensate for the dark surface. */
 const TRACK = 'rgba(255,255,255,0.14)';
 const FONT_SF =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
