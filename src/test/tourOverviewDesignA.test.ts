@@ -147,8 +147,30 @@ describe('Tour Overview H12 material breaks', () => {
   it('never repeats the band story in News', () => {
     const stories = [story('band', '2026-09-17T19:00:00Z', 'hero'), story('lead', '2026-09-17T18:00:00Z', null), story('row', '2026-09-17T17:00:00Z', null)];
     const news = selectOverviewNews(stories, 'band');
-    expect(news.lead?.id).toBe('lead');
-    expect([news.lead, ...news.rows].filter(Boolean).map((item) => item?.id)).not.toContain('band');
+    expect(news.hero?.id).toBe('lead');
+    expect([news.hero, ...news.features, ...news.rows].filter(Boolean).map((item) => item?.id)).not.toContain('band');
+  });
+
+  it('builds one hero, an exact two-up, and three rows from six stories', () => {
+    const stories = Array.from({ length: 7 }, (_, index) => story(`story-${index + 1}`, `2026-09-17T${19 - index}:00:00Z`, null));
+    const news = selectOverviewNews(stories);
+    expect(news.hero?.id).toBe('story-1');
+    expect(news.features.map((item) => item.id)).toEqual(['story-2', 'story-3']);
+    expect(news.rows.map((item) => item.id)).toEqual(['story-4', 'story-5', 'story-6']);
+  });
+
+  it('falls a lone feature candidate through to rows', () => {
+    const two = [story('hero', '2026-09-17T19:00:00Z', null), story('row', '2026-09-17T18:00:00Z', null)];
+    const news = selectOverviewNews(two);
+    expect(news.features).toEqual([]);
+    expect(news.rows.map((item) => item.id)).toEqual(['row']);
+  });
+
+  it('uses a complete two-up and one row when four stories remain', () => {
+    const four = Array.from({ length: 4 }, (_, index) => story(`story-${index + 1}`, `2026-09-17T${19 - index}:00:00Z`, null));
+    const news = selectOverviewNews(four);
+    expect(news.features.map((item) => item.id)).toEqual(['story-2', 'story-3']);
+    expect(news.rows.map((item) => item.id)).toEqual(['story-4']);
   });
 
   it('keeps the first six chronological events and does not stretch a two-event source', () => {
