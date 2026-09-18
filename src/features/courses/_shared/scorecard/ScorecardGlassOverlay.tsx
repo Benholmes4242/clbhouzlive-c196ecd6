@@ -257,7 +257,7 @@ export function ScorecardGlassOverlay({
         backdropFilter: 'blur(3px)',
         WebkitBackdropFilter: 'blur(3px)',
         opacity: entered ? 1 : 0,
-        transition: `opacity ${entered ? ENTER_OPACITY_MS : EXIT_MS}ms ${entered ? 'ease-out' : 'ease-in'}`,
+        transition: `opacity ${open ? ENTER_OPACITY_MS : EXIT_MS}ms ${open ? 'ease-out' : 'ease-in'}`,
       }}
       onClick={() => closeRef.current()}
     >
@@ -289,17 +289,17 @@ export function ScorecardGlassOverlay({
           borderRadius: 24,
           boxShadow: '0 28px 70px rgba(0,0,0,0.55)',
           opacity: entered ? 1 : 0,
-          transform: `translateY(calc(-50% + ${dragY}px)) scale(${entered ? 1 : 0.97})`,
+          transform: `translateY(calc(-50% + ${dragY}px)) scale(${entered ? 1 : open ? 0.96 : 0.97})`,
           transition: dragY > 0
             ? 'none'
-            : entered
+            : open
               ? `opacity ${ENTER_OPACITY_MS}ms ease-out, transform ${ENTER_TRANSFORM_MS}ms cubic-bezier(.32,.72,0,1)`
               : `opacity ${EXIT_MS}ms ease-in, transform ${EXIT_MS}ms ease-in`,
           willChange: animating ? 'transform, opacity' : 'auto',
           zIndex: Z.sheet,
         }}
       >
-        <style>{`@media (prefers-reduced-motion: reduce) { [data-scorecard-glass-card="true"] { transform: translateY(calc(-50% + ${dragY}px)) !important; transition: opacity ${entered ? ENTER_OPACITY_MS : EXIT_MS}ms ${entered ? 'ease-out' : 'ease-in'} !important; } }`}</style>
+        <style>{`@media (prefers-reduced-motion: reduce) { [data-scorecard-glass-card="true"] { transform: translateY(calc(-50% + ${dragY}px)) !important; transition: opacity ${open ? ENTER_OPACITY_MS : EXIT_MS}ms ${open ? 'ease-out' : 'ease-in'} !important; } }`}</style>
         {children}
       </div>
     </div>,

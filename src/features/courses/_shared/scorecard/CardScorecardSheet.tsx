@@ -952,19 +952,21 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} align="left" />}
             </div>
           )}
-          <div
-            data-scorecard-close-hint="true"
-            style={{
-              flexShrink: 0,
-              paddingTop: 2,
-              textAlign: 'center',
-              fontSize: 11,
-              lineHeight: 1,
-              color: 'rgba(248,250,252,0.38)',
-            }}
-          >
-            {t('courses:scorecard.tapAnywhereToClose')}
-          </div>
+          {presentation === 'overlay' && (
+            <div
+              data-scorecard-close-hint="true"
+              style={{
+                flexShrink: 0,
+                paddingTop: 2,
+                textAlign: 'center',
+                fontSize: 11,
+                lineHeight: 1,
+                color: 'rgba(248,250,252,0.38)',
+              }}
+            >
+              {t('courses:scorecard.tapAnywhereToClose')}
+            </div>
+          )}
         </div>
       </div>
 

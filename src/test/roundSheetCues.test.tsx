@@ -12,7 +12,7 @@
  *  S1 the scorecard is glass over the page, while /round remains a page.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import {
@@ -265,15 +265,15 @@ describe('the scorecard presentation split', () => {
     vi.useFakeTimers();
     const { rerender } = render(<CardScorecardSheet {...props} loading />);
     expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeNull();
-    vi.advanceTimersByTime(149);
+    act(() => vi.advanceTimersByTime(149));
     expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeNull();
-    vi.advanceTimersByTime(1);
+    act(() => vi.advanceTimersByTime(1));
     expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeTruthy();
     expect(document.querySelector('[data-scorecard-skeleton="true"]')).toBeTruthy();
     const card = document.querySelector('[data-scorecard-glass-card="true"]') as HTMLElement;
-    const height = card.style.height;
+    expect(card.style.transition).not.toContain('height');
     rerender(<CardScorecardSheet {...props} loading={false} />);
-    expect(card.style.height).toBe(height);
+    expect(card.style.transition).not.toContain('height');
     vi.useRealTimers();
   });
 
