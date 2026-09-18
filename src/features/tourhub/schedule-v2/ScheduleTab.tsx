@@ -1,9 +1,9 @@
 /**
  * schedule-v2/ScheduleTab — "The Season" open-ledger schedule view.
  *
- * Analytical grammar: no row rules, a load-bearing column grid, one filled
- * (INK) jump control, and a three-up figures header. Amber appears in exactly
- * two places on this surface: the KICKER and the anchor row's day numeral.
+ * Analytical grammar: overview-matched row hairlines, one filled (INK) jump
+ * control, and a three-up figures header. The one app amber appears in three
+ * places: the KICKER, completed-row CHAMPION labels, and deliberate controls.
  *
  * The tour chip row is this page's ONLY tour control by design —
  * TourSelectionContext is scoped to the overview hero. ?tour= is honoured once
@@ -319,7 +319,7 @@ export function ScheduleTab() {
 
       {/* HEADER */}
 
-      <div style={{ padding: '16px 16px 12px' }}>
+      <div style={{ padding: '16px 24px 12px' }}>
         <div
           style={{
             display: 'flex',
@@ -391,7 +391,7 @@ export function ScheduleTab() {
       {/* BODY — page owns the scroll (no inner scroller). */}
       <div style={{ position: 'relative' }}>
         {isLoading ? (
-          <div style={{ padding: '0 16px' }}>
+          <div style={{ padding: '0 24px' }}>
             {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="w-full mb-2" style={{ height: 68, borderRadius: 8 }} />
             ))}
@@ -443,7 +443,7 @@ export function ScheduleTab() {
                       top: 'calc(var(--tour-header-h, 0px) + var(--tour-chips-h, 0px) - 1px)',
                       zIndex: 2,
                       background: SLATE_50,
-                      padding: '14px 16px 6px',
+                      padding: '14px 24px 6px',
                       // READ 11: the month group heading is language.
                       fontSize: 11,
                       fontWeight: 700,
@@ -455,13 +455,14 @@ export function ScheduleTab() {
                     {group.label}
                   </div>
                   <div>
-                    {group.events.map((evt) => {
+                    {group.events.map((evt, eventIndex) => {
                       const isAnchor = evt.id === timeline!.anchorEventId;
                       return (
                         <div key={evt.id} id={`sv2-row-${evt.id}`}>
                           <SeasonRow
                             event={evt}
                             isAnchor={isAnchor}
+                            last={eventIndex === group.events.length - 1}
                             onSelect={onSelectEvent}
                           />
                         </div>
