@@ -28,6 +28,11 @@ export function OverviewPageV3() {
   const { t } = useTranslation('tourhub');
   const { isOnline } = useNetworkStatus();
   const { selectedTourSlug, viewingTournamentId, setAppliedTourSlug } = useTourSelection();
+  /* T1 — safe-area scrim. The route stays immersive after the hero scrolls
+     away, so the fixed var(--sat) strip is painted by the shared scrim once
+     the sentinel below the hero passes the notch. It never owns inset
+     spacing: at rest the hero stays full-bleed. */
+  const { sentinelRef, stuck } = useStickySafeAreaState();
   // The hero river crosses tours, so its tournament match and the explicit
   // "any story" 48-hour fallback must read the unfiltered feed. News retains
   // the overview's selected-tour lens from its previous implementation.
