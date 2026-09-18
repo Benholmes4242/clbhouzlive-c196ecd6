@@ -115,17 +115,17 @@
       "readLess": "Weniger lesen"
     },
     "emptyState": {
-      "kicker": "FUER UNTERNEHMEN",
+      "kicker": "FÜR UNTERNEHMEN",
       "title": "Bringen Sie Ihr Unternehmen auf clbhouz",
       "body": "Erreichen Sie Golfer dort, wo sie bereits sind.",
       "cta": "Unternehmensprofil erstellen",
       "footnote": "Kostenlos. Dauert etwa eine Minute.",
       "guidanceHeading": "DAS ERHALTEN SIE",
       "reach": {
-        "courses": "PLAETZE",
+        "courses": "PLÄTZE",
         "rounds": "RUNDEN",
         "reviews": "BEWERTUNGEN",
-        "footnote": "GRUENE ZAHLEN SIND DIE LETZTEN 30 TAGE",
+        "footnote": "GRÜNE ZAHLEN SIND DIE LETZTEN 30 TAGE",
         "up": "plus {{count}} in den letzten 30 Tagen"
       },
       "benefits": {
@@ -192,7 +192,7 @@
     },
     "card": {
       "manage": "VERWALTEN",
-      "addAnother": "Weiteres Unternehmen hinzufuegen",
+      "addAnother": "Weiteres Unternehmen hinzufügen",
       "metrics": {
         "visits": "Besuche",
         "followers": "Follower",
@@ -222,11 +222,11 @@
         "newFollowers": "Neue Follower",
         "messageClicks": "Nachrichten-Klicks"
       },
-      "deltaCaption": "Veraenderung zu den vorherigen {{range}}",
+      "deltaCaption": "Veränderung zu den vorherigen {{range}}",
       "audience": {
         "locked": "Gesperrt",
         "visitorsLabel": "Eindeutige Besucher bisher",
-        "body": "Handicap-Bereiche und Top-Standorte brauchen zuerst ein größeres Publikum. Bei so wenigen Personen waere die Aufschluesselung zuordenbar, deshalb halten wir sie zurück."
+        "body": "Handicap-Bereiche und Top-Standorte brauchen zuerst ein größeres Publikum. Bei so wenigen Personen wäre die Aufschlüsselung zuordenbar, deshalb halten wir sie zurück."
       },
       "followers": {
         "total": "Gesamt"
@@ -235,27 +235,27 @@
         "visits": "In diesem Zeitraum noch keine Besuche.",
         "discovery": "In diesem Zeitraum noch keine Daten zur Auffindbarkeit.",
         "followersTitle": "Follower-Wachstum",
-        "followersBody": "Follower-Aktivitaet erscheint hier, sobald sie passiert.",
-        "posts": "In diesem Zeitraum keine Beitraege veroeffentlicht."
+        "followersBody": "Follower-Aktivität erscheint hier, sobald sie passiert.",
+        "posts": "In diesem Zeitraum keine Beiträge veröffentlicht."
       },
       "rate": {
         "from": "Aus {{n}} Impressionen",
-        "none": "Veroeffentliche Beitraege und sammle Impressionen, um deine Interaktionsrate zu sehen.",
+        "none": "Veröffentliche Beiträge und sammle Impressionen, um deine Interaktionsrate zu sehen.",
         "tooFew": "Noch zu wenige Impressionen für einen Vergleich.",
-        "benchmark": "Likes und Kommentare im Verhaeltnis zu Impressionen. Ueber 2 Prozent ist stark."
+        "benchmark": "Likes und Kommentare im Verhältnis zu Impressionen. Über 2 Prozent ist stark."
       }
     },
     "team": {
       "member": "Team member",
       "manage": {
         "accessRequests": "Zugriffsanfragen",
-        "addJobTitle": "Position hinzufuegen",
-        "addJobTitleAria": "Position hinzufuegen",
+        "addJobTitle": "Position hinzufügen",
+        "addJobTitleAria": "Position hinzufügen",
         "editJobTitleAria": "Position bearbeiten",
         "hidden": "Verborgen",
         "members": "Mitglieder",
         "pendingInvites": "Offene Einladungen",
-        "public": "Oeffentlich"
+        "public": "Öffentlich"
       }
     }
   },
@@ -277,7 +277,7 @@
       "beatLabel": "{{count}} deiner letzten {{total}} Runden waren besser als {{cut}}",
       "scaleShoot": "Ergebnis",
       "scaleBecomes": "Handicap wird",
-      "noChange": "keine Aenderung",
+      "noChange": "keine Änderung",
       "yourBest": "dein bestes",
       "withheldHeading": "Every round still counts.",
       "withheldBody": "With {{count}} rounds on record every one of them counts toward your index, so there's no target to beat yet. This starts telling you something once you have twenty.",
@@ -385,11 +385,11 @@
       "you": "Du",
       "tiedCount_one": "{{count}} geteilt",
       "tiedCount_other": "{{count}} geteilt",
-      "oldest": "Aelteste",
+      "oldest": "Älteste",
       "formSample_one": "{{count}} gemeinsame Runde",
       "formSample_other": "{{count}} gemeinsame Runden",
       "formTruncated": "Letzte {{shown}} von {{total}}",
-      "youLeadOf": "Du fuehrst {{n}} von {{total}}",
+      "youLeadOf": "Du führst {{n}} von {{total}}",
       "group": {
         "volume": "UMFANG",
         "scoring": "SCORING",
