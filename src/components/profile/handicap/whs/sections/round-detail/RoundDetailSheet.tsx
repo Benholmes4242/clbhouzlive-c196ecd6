@@ -90,8 +90,6 @@ interface Props {
   onStatsSeen?: () => void;
   /** §2.2 — the host's page offset while swiping between rounds. */
   pageShift?: { dx: number; opacity?: number; animating: boolean } | null;
-  /** §2.5 — the one-off swipe line, or nothing. */
-  hint?: string | null;
   /** BRIEF_ROUND_SHEET_PEEK §1 — the neighbour drawn beside this page. */
   pagePreview?: { node: React.ReactNode; side: 'next' | 'prev' } | null;
   /** §3 — the hidden-but-focusable pager, the arrow keys and the announcement. */
@@ -107,7 +105,7 @@ interface Props {
 export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId, presentation = 'overlay',
   seed = null, onHorizontalDrag = null, onStatsSeen,
-  pageShift = null, hint = null, pagePreview = null, paging = null,
+  pageShift = null, pagePreview = null, paging = null,
   initialCommentsOpen = false,
 }) => {
   const navigate = useNavigate();
@@ -472,7 +470,6 @@ export const RoundDetailSheet: React.FC<Props> = ({
       onHorizontalDrag={onHorizontalDrag}
       onStatsSeen={onStatsSeen}
       pageShift={pageShift}
-      hint={hint}
       pagePreview={pagePreview}
       paging={paging}
     />
