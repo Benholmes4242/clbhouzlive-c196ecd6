@@ -132,6 +132,7 @@ interface ReviewVerdictLabelProps {
   fontSize?: number;
   /** Optional click handler — wraps the label in a bare button when provided. */
   onClick?: (e: React.MouseEvent) => void;
+  onPointerDown?: (e: React.PointerEvent) => void;
   ariaLabel?: string;
   /** Host surface. Default 'dark'. Selects the band palette (see
    *  `reviewLabelColor`) — same thresholds, per-surface values. */
@@ -147,6 +148,7 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
   rating,
   fontSize = 12.5,
   onClick,
+  onPointerDown,
   ariaLabel,
   surface = 'dark',
 }) => {
@@ -171,6 +173,7 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
     <button
       type="button"
       onClick={onClick}
+      onPointerDown={onPointerDown}
       style={{
         position: 'relative',
         zIndex: 3,

@@ -112,3 +112,11 @@ Tour Overview Design A
 - [x] Add backward-compatible gutter and engagement controls without moving the News tab
 - [x] Preserve Story Band exclusion and exact-two feature grouping
 - [x] Verify 390/320 layouts, sparse/no-image states, page-height delta, tests, and types
+
+## Glass cards G1
+- [x] Gate scorecard and review entry on host-owned settled data with a frozen 350ms cap
+- [x] Prefetch exact scorecard and review queries from shared pointer-press paths
+- [x] Replace the scorecard foot with engagement plus a fixed three-icon action band
+- [x] Shorten and translate the action labels in all six locales
+- [x] Remove shared story-button scale feedback without changing shared Button
+- [x] Add cap-hit session counters and verify focused tests, locale JSON, and types

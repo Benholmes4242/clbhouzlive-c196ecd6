@@ -33,6 +33,7 @@ export interface InlineReviewCardProps {
   };
   isVisible: boolean;
   onTap: () => void;
+  onPressStart?: () => void;
 
   breakdown?: {
     design?: number | null;
@@ -58,6 +59,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   reviewer,
   isVisible,
   onTap,
+  onPressStart,
   reviewerStats,
   courseSubtitle,
   whiteReadReview = false,
@@ -92,6 +94,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         e.stopPropagation();
         onTap();
       }}
+      onPointerDown={onPressStart}
       initial={false}
       animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 8 }}
       whileTap={{ scale: 0.98 }}
