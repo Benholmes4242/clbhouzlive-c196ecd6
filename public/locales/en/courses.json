@@ -1502,7 +1502,9 @@
       "underPar": "Round under par"
     },
     "scores": {
+      "beTheFirst": "Play it and you will be the first.",
       "clearCourse": "Back to the board",
+      "noOnePlayed": "No one has played {{course}} yet.",
       "noCourseMatch": "No course by that name.",
       "searchAnyCourse": "Search any course for analytics",
       "searchCourseForAnalytics": "Search a course for analytics",

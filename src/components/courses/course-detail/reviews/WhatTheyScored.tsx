@@ -1,9 +1,9 @@
 /**
  * BRIEF_REVIEWS_TAB_REBUILD §3.2 — WHAT THEY SCORED. Kicker, no heading.
  *
- * The four AGGREGATE category scores. They arrived here from the Course tab in
- * the last change and this is their home. Same gate as before
- * (t100_subscore_min_ratings). Amber fill, proportional to the score out of 10.
+ * The four AGGREGATE category scores also render on the Course tab. They show
+ * from the first rating onward; only the overall tier word is sample-gated.
+ * Category figures use the shared binary rule: green at 9+, muted otherwise.
  */
 import React from 'react';
 import { A, SANS, FIGS, BAR_RADIUS } from '@/features/courses/components/holes/analytical/tokens';
@@ -23,8 +23,8 @@ interface WhatTheyScoredProps {
 const ORDER: { key: keyof CategoryAggregates; label: string }[] = [
   { key: 'design', label: 'Design' },
   { key: 'condition', label: 'Condition' },
-  { key: 'facilities', label: 'Facilities' },
   { key: 'clubhouse', label: 'Clubhouse' },
+  { key: 'facilities', label: 'Facilities' },
 ];
 
 export const WhatTheyScored: React.FC<WhatTheyScoredProps> = ({ aggregates }) => {
@@ -46,12 +46,12 @@ export const WhatTheyScored: React.FC<WhatTheyScoredProps> = ({ aggregates }) =>
                   display: 'block',
                   height: '100%',
                   width: `${Math.max(0, Math.min(100, (row.value / 10) * 100))}%`,
-                  background: A.AMBER,
+                  background: row.value >= 9 ? A.GREEN : A.MUTE,
                   borderRadius: BAR_RADIUS,
                 }}
               />
             </span>
-            <span style={{ width: 30, flexShrink: 0, textAlign: 'right', fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>
+            <span style={{ width: 30, flexShrink: 0, textAlign: 'right', fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', color: row.value >= 9 ? A.GREEN : A.MUTE, ...FIGS }}>
               {row.value.toFixed(1)}
             </span>
           </div>

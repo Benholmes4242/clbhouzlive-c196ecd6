@@ -40,7 +40,6 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview } from '@/hooks/useCourseReviews';
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
-import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 
@@ -92,7 +91,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { data: reviewResponses } = useReviewResponses(courseId);
   const submitResponseMutation = useSubmitReviewResponse(courseId);
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
-  const { subscoreMinRatings } = useTop100Config();
 
   const [sortBy, setSortBy] = useState<ReviewsSortBy>('recent');
   const [sortOpen, setSortOpen] = useState(false);
@@ -392,7 +390,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     facilities: ratingAggregates?.avg_facilities_score,
     clubhouse: ratingAggregates?.avg_clubhouse_score,
   }), [ratingAggregates]);
-  const showCategories = ratingCount >= subscoreMinRatings;
 
   const voteFor = (reviewId: string) =>
     userVotes?.find((v) => v.rating_id === reviewId)?.vote_type === 'helpful';
@@ -472,7 +469,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             <TheScore score={communityScore} ratingCount={ratingCount} />
 
             {/* §3.2 */}
-            {showCategories && <WhatTheyScored aggregates={categoryAggregates} />}
+            <WhatTheyScored aggregates={categoryAggregates} />
 
             {/* §3.3 — only when the member has reviewed */}
             {myReview && (

@@ -13,6 +13,7 @@
  */
 import React from 'react';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { GUTTER } from '../about/AboutSection';
 
@@ -25,16 +26,19 @@ export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount }) => {
   const tier = getScoreTier(score);
   const settled = ratingCount >= 5;
   const count = `${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'}`;
+  const scoreColor = bandColorOnDark(score);
 
   return (
     <section style={{ padding: `0 ${GUTTER}px`, fontFamily: SANS }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-        <span style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: A.INK, ...FIGS }}>
+        <span style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: scoreColor, ...FIGS }}>
           {score.toFixed(1)}
         </span>
-        <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em', color: A.INK }}>
-          {tier.label}
-        </span>
+        {settled ? (
+          <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em', color: scoreColor }}>
+            {tier.label}
+          </span>
+        ) : null}
       </div>
       <div style={{ fontSize: 11, color: A.DIM, marginTop: 6 }}>
         {settled ? count : `${count} — too few to be settled.`}
