@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
-import type { HonoursFeat } from '@/features/courses/_shared/scorecard/honoursTreatment';
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
 import { useRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
@@ -241,21 +240,6 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
   const shownHoles = usingSeed ? seedCardHoles : cardHoles;
 
-  /* THE FEAT IS READ FROM THE CARD, NOT PASSED IN (BRIEF_DISCOVER_FILTER_LED_BOARD
-     S5.6). The holes already say whether this round holds an ace or an
-     albatross, so every one of the sheet's callers gets the honours band without
-     plumbing a prop through eight surfaces. Albatross outranks the ace. */
-  const feat = useMemo<HonoursFeat | null>(() => {
-    let ace = false;
-    for (const h of shownHoles) {
-      if (h.strokes == null) continue;
-      if (h.par != null && h.strokes - h.par <= -3) return 'albatross';
-      if (h.strokes === 1) ace = true;
-    }
-    return ace ? 'ace' : null;
-  }, [shownHoles]);
-
-
   const totalPar = sortedHoles.reduce((a, h) => a + (h.par ?? 0), 0);
 
   const grossVal = userData
@@ -435,7 +419,6 @@ export const RoundDetailSheet: React.FC<Props> = ({
       holes={shownHoles}
       holesSettled={shownHoles.length > 0 || roundSettled}
       settleKey={settleKey}
-      feat={feat}
       nineHole={!!userData?.is_nine_hole}
       /* §1.3 — A SEEDED CARD NEVER SHOWS THE SKELETON. Without a seed the
          behaviour is exactly today's. */
