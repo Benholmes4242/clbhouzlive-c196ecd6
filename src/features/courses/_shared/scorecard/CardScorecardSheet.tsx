@@ -87,6 +87,14 @@ export interface CardScorecardSheetProps {
   heroMuted?: boolean;
   emptyMessage?: string;
   loading?: boolean;
+  /**
+   * G2.5 — THE EXPLAINED STATES MAY NOT SPEAK BEFORE THE DATA HAS. While this is
+   * false the card may not draw any state that makes a claim about the round's
+   * contents ("logged as a total, without hole-by-hole scores"). With G2.2's
+   * subject gate this is unreachable, which is the point: a card that tells a
+   * member their round has no hole scores when it does must be IMPOSSIBLE.
+   */
+  holesSettled?: boolean;
   emptyVariant?: 'syncing' | 'nohbh' | 'unavailable';
   emptyGross?: number | null;
   emptyToPar?: number | null;
@@ -300,7 +308,7 @@ function FootAction({ label, onClick, icon: Icon }: { label: string; onClick: ()
 export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   open, onClose, eyebrowText,
   courseName, courseLocation, coursePar, courseSlope,
-  holes, nineHole, rounds, heroMuted, emptyMessage, loading,
+  holes, holesSettled = true, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
@@ -432,11 +440,24 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    * The cause is derived once, here, and used both by the render gate and by the
    * event, so what a member saw and what we recorded cannot disagree.
    */
-  const cardCause: 'ok' | 'partial' | 'unscored' | 'norows' = useMemo(() => {
-    if (holes.length === 0) return 'norows';
-    if (played.length === 0) return 'unscored';
+  /* G2.5 — 'unscored' and 'norows' are CLAIMS about the round's contents, so
+     they may only be reached once the hole data has settled. Unsettled resolves
+     to 'pending', which says nothing. */
+  const cardCause: 'ok' | 'partial' | 'unscored' | 'norows' | 'pending' = useMemo(() => {
+    if (holes.length === 0) return holesSettled ? 'norows' : 'pending';
+    if (played.length === 0) return holesSettled ? 'unscored' : 'pending';
     return played.length === holes.length ? 'ok' : 'partial';
-  }, [holes.length, played.length]);
+  }, [holes.length, played.length, holesSettled]);
+
+  /* It shouts rather than lies: the subject gate means an open card always has
+     settled holes, so a mount without them is a wiring fault. */
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    if (open && !holesSettled) {
+      // eslint-disable-next-line no-console
+      console.warn('[CardScorecardSheet] mounted with holesSettled=false — the subject gate was bypassed');
+    }
+  }, [open, holesSettled]);
 
   // scorecard_opened — has_field_data is the evidence for whether the
   // enrichment is reaching members at all; card_cause is the evidence for how
@@ -827,7 +848,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </div>
           )}
 
-          {loading ? (
+          {loading || cardCause === 'pending' ? (
             <div>
               <SkeletonMiddle />
             </div>

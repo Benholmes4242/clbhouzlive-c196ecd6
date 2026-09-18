@@ -7,7 +7,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { useReviewMedia } from './useReviewMedia';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { useFrozenOpenGate } from '@/hooks/useFrozenOpenGate';
+import { useCardOpenGate } from '@/hooks/useCardOpenGate';
 
 /**
  * Single root-level mount for ReviewBottomSheet.
@@ -32,10 +32,19 @@ export const ReviewBottomSheetPortal: React.FC = () => {
   const fallbackQuery = useReviewFallback({ reviewId: payload?.reviewId ?? null, enabled: isOpen, hasText, hasBreakdown });
   const mediaQuery = useReviewMedia(payload?.reviewId ?? null, isOpen);
   const aggregateQuery = useCourseRatingAggregates(isOpen ? payload?.courseId : undefined);
-  const gate = useFrozenOpenGate('review', isOpen, {
-    fallback: !payload?.reviewId || (hasText && hasBreakdown) || fallbackQuery.isFetched,
-    media: !payload?.reviewId || mediaQuery.isFetched,
-    aggregate: !payload?.courseId || aggregateQuery.isFetched,
+  /**
+   * G2.2 — THE SUBJECT IS THE PROSE AND THE BREAKDOWN. The sheet does not open
+   * until they are in hand, uncapped. G2.3 — the photographs and the course
+   * aggregate are SUPPORTING: never dropped, only late, and the 350ms cap only
+   * decides whether the card waits for them before opening.
+   */
+  const subjectReady = !payload?.reviewId || (hasText && hasBreakdown) || fallbackQuery.isFetched;
+  const gate = useCardOpenGate('review', isOpen, {
+    subject: subjectReady,
+    supporting: {
+      media: !payload?.reviewId || mediaQuery.isFetched,
+      aggregate: !payload?.courseId || aggregateQuery.isFetched,
+    },
   });
 
   // Pause every engine lane when the sheet opens. Null-caller = engine-wide
@@ -88,10 +97,10 @@ export const ReviewBottomSheetPortal: React.FC = () => {
       courseSubCountry={payload.courseSubCountry}
       reviewText={payload.reviewText}
       breakdown={payload.breakdown ?? null}
-      resolvedReviewText={payload.reviewText ?? (gate.included.fallback ? fallbackQuery.data?.reviewText : null) ?? null}
-      resolvedBreakdown={payload.breakdown ?? (gate.included.fallback ? fallbackQuery.data?.breakdown : null) ?? null}
-      resolvedMedia={gate.included.media ? (mediaQuery.data ?? []) : []}
-      resolvedAggregate={gate.included.aggregate ? (aggregateQuery.data ?? null) : null}
+      resolvedReviewText={payload.reviewText ?? fallbackQuery.data?.reviewText ?? null}
+      resolvedBreakdown={payload.breakdown ?? fallbackQuery.data?.breakdown ?? null}
+      resolvedMedia={mediaQuery.data ?? []}
+      resolvedAggregate={aggregateQuery.data ?? null}
       reviewerStats={payload.reviewerStats ?? null}
     />
   );
