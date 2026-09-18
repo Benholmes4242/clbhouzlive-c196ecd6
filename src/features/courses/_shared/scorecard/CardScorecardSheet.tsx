@@ -933,38 +933,33 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             <div
               data-scorecard-interactive="true"
               onClick={(event) => event.stopPropagation()}
-              style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', paddingTop: 2 }}
+              style={{ display: 'flex', alignItems: 'center', columnGap: 8, rowGap: 4, flexWrap: 'wrap', paddingTop: 2 }}
             >
               {engagement && (
-                <RoundEngagementActions
-                  comment={engagement.comment ?? null}
-                  like={{
-                    hidden: engagement.likeHidden,
-                    count: engagement.likeCount,
-                    reacted: engagement.likeMine,
-                    onToggle: engagement.onToggleLike,
-                    label: engagement.likeLabel,
-                  }}
-                />
+                <span style={{ flex: 'none' }}>
+                  <RoundEngagementActions
+                    comment={engagement.comment ?? null}
+                    like={{
+                      hidden: engagement.likeHidden,
+                      count: engagement.likeCount,
+                      reacted: engagement.likeMine,
+                      onToggle: engagement.onToggleLike,
+                      label: engagement.likeLabel,
+                    }}
+                  />
+                </span>
               )}
-              {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} align="left" />}
-              {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} align="left" />}
-              {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} align="left" />}
-            </div>
-          )}
-          {presentation === 'overlay' && (
-            <div
-              data-scorecard-close-hint="true"
-              style={{
-                flexShrink: 0,
-                paddingTop: 2,
-                textAlign: 'center',
-                fontSize: 11,
-                lineHeight: 1,
-                color: 'rgba(248,250,252,0.38)',
-              }}
-            >
-              {t('courses:scorecard.tapAnywhereToClose')}
+              <div
+                data-scorecard-exit-links="true"
+                style={{
+                  flex: '1 0 260px', minWidth: 0, display: 'flex', alignItems: 'center',
+                  justifyContent: 'space-evenly', whiteSpace: 'nowrap',
+                }}
+              >
+                {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
+                {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
+                {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
+              </div>
             </div>
           )}
         </div>

@@ -172,7 +172,6 @@
     "hideHoleByHole": "フルスコアカードを隠す",
     "holeByHole": "フルスコアカード",
     "legendNotPlayed": "未プレー",
-    "tapAnywhereToClose": "Tap anywhere to close",
     "nineHoleTag": "9 holes",
     "rankHere": "Your {{ordinal}} best of {{count}} rounds here.",
     "rankHereNeutral": "{{ordinal}} best of {{count}} rounds here.",
@@ -220,7 +219,8 @@
     "noFieldLine_other": "ここでプレーした他のプレーヤーは {{count}} 人だけなので、まだ比較できる平均がありません。",
     "noFieldNobody": "まだ他にプレーした人がいないため、比較できる平均がありません。",
     "fieldShort": "平均",
-    "swipeHint": "スワイプで次のラウンドへ"
+    "swipeHint": "スワイプで次のラウンドへ",
+    "shareRound": "共有"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

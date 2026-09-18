@@ -176,7 +176,6 @@
     "hideHoleByHole": "Ocultar tarjeta de score completa",
     "holeByHole": "Tarjeta de score completa",
     "legendNotPlayed": "No jugado",
-    "tapAnywhereToClose": "Toca cualquier lugar para cerrar",
     "nineHoleTag": "9 holes",
     "rankHere": "Your {{ordinal}} best of {{count}} rounds here.",
     "rankHereNeutral": "{{ordinal}} best of {{count}} rounds here.",
@@ -224,7 +223,8 @@
     "noFieldLine_other": "Solo {{count}} golfistas mas han jugado aqui, asi que todavia no hay un grupo con el que comparar.",
     "noFieldNobody": "Nadie mas ha jugado aqui todavia, asi que no hay un grupo con el que comparar.",
     "fieldShort": "Campo",
-    "swipeHint": "Desliza para la siguiente vuelta"
+    "swipeHint": "Desliza para la siguiente vuelta",
+    "shareRound": "Compartir"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

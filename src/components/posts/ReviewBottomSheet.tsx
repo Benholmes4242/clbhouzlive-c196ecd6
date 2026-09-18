@@ -1,5 +1,5 @@
 /**
- * ReviewBottomSheet — DARK bottom sheet (solid canvas).
+ * ReviewBottomSheet — DARK floating glass review card.
  *
  * Single overlay used from both entry points:
  *   1. Clubhouse "Read review" card CTA
@@ -20,21 +20,19 @@
  * Both overlays portal to document.body, so this panel's translateZ(0) and the
  * scroller's -webkit-overflow-scrolling cannot clamp either of them.
  *
- * No blur anywhere: the panel is OPAQUE (#15171F canvas, #1B1E27 insets) for
- * the same reason it was opaque when it was light — the original conversion
- * (Aug 5) replaced rgba(24,28,24,0.62) + blur(14px) with a solid panel because
- * a translucent sheet over a busy page muddies. That reasoning is surface-
- * agnostic and still holds. Only the hue changed: the panel was light between
- * Aug 5 and the dark migration. The scrim stays a plain rgba dim.
- * Reconsidered 18 Sep 2026 and rejected again: review prose must stay legible
- * over a busy page, long reviews scroll, and the fullscreen photograph remains
- * mounted beneath this sheet. The scorecard's glass treatment does not apply.
+ * SURFACE HISTORY. This began translucent with rgba(24,28,24,0.62) and a 14px
+ * blur. It became opaque on 5 Aug because review prose over a busy page muddied.
+ * Glass was reconsidered and rejected on 18 Sep 2026, then overturned by
+ * decision later the same day so review and scorecard read as one family. It is
+ * now glass with a deliberately denser fill than the scorecard: prose needs more
+ * separation from the full-bleed photograph or paused video that may remain
+ * mounted beneath it. Blur stays 30px; density, not heavier blur, does the work.
  */
 
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Play } from 'lucide-react';
@@ -62,7 +60,6 @@ const BORDER = 'rgba(255,255,255,0.10)';
 const INK = '#F8FAFC';
 const BODY = 'rgba(248,250,252,0.72)';
 const MUTE = 'rgba(248,250,252,0.62)';
-const GRABBER = 'rgba(255,255,255,0.18)';
 /* The photo placeholder needs one step more fill than a hairline border; the
    fill is not brightened to compensate for the dark surface. */
 const TRACK = 'rgba(255,255,255,0.14)';
@@ -179,8 +176,41 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     });
   }
 
-  // Scope drag to header only so the middle scrolls without dismissing.
-  const dragControls = useDragControls();
+  const swipeStartRef = useRef<{ y: number; lastY: number; startedAt: number; active: boolean } | null>(null);
+  const [dragY, setDragY] = useState(0);
+  const [cardAnimating, setCardAnimating] = useState(true);
+  const onCardTouchStart = useCallback((event: React.TouchEvent) => {
+    const touch = event.touches[0];
+    let node = event.target as HTMLElement | null;
+    let bodyAtTop = true;
+    while (node) {
+      if (node.hasAttribute('data-review-scroll')) {
+        bodyAtTop = node.scrollTop <= 0;
+        break;
+      }
+      node = node.parentElement;
+    }
+    swipeStartRef.current = { y: touch.clientY, lastY: touch.clientY, startedAt: Date.now(), active: bodyAtTop };
+  }, []);
+  const onCardTouchMove = useCallback((event: React.TouchEvent) => {
+    const current = swipeStartRef.current;
+    if (!current?.active) return;
+    const touch = event.touches[0];
+    const dy = touch.clientY - current.y;
+    current.lastY = touch.clientY;
+    if (dy <= 8) return;
+    event.preventDefault();
+    setDragY(dy);
+  }, []);
+  const onCardTouchEnd = useCallback(() => {
+    const current = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!current?.active) return;
+    const dy = current.lastY - current.y;
+    const elapsed = Math.max(1, Date.now() - current.startedAt);
+    if (dy > 120 || dy / elapsed > 0.6) onClose();
+    else setDragY(0);
+  }, [onClose]);
 
   /* FOOTER TAP PROBE (D2) — flag-gated on-device hit-test drift logger.
      Raw pointer coords vs. the button's rect, plus ms-since-open so a cluster
@@ -315,19 +345,21 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Scrim — plain dim, no blur (single blur surface = panel only). */}
+          {/* Scrim stays below REVIEW_SHEET_Z; the fullscreen viewer remains mounted beneath it. */}
           <motion.div
             key="review-scrim"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: isOpen ? 0.18 : 0.14, ease: isOpen ? 'easeOut' : 'easeIn' }}
             onClick={onClose}
             style={{
               position: 'fixed',
               inset: 0,
               zIndex: REVIEW_SHEET_Z,
-              background: 'rgba(0,0,0,0.35)',
+              background: 'rgba(6,8,11,0.5)',
+              backdropFilter: 'blur(3px)',
+              WebkitBackdropFilter: 'blur(3px)',
             }}
           />
 
@@ -337,60 +369,51 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             role="dialog"
             aria-modal="true"
             aria-labelledby="review-sheet-title"
-            drag="y"
-            dragListener={false}
-            dragControls={dragControls}
-            dragConstraints={{ top: 0 }}
-            dragElastic={{ top: 0, bottom: 0.3 }}
-            onDragEnd={(_, info) => {
-              if (info.velocity.y > 300 || info.offset.y > 120) onClose();
-            }}
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            data-review-glass-card="true"
+            onAnimationStart={() => setCardAnimating(true)}
+            onAnimationComplete={() => setCardAnimating(false)}
+            onTouchStart={onCardTouchStart}
+            onTouchMove={onCardTouchMove}
+            onTouchEnd={onCardTouchEnd}
+            onTouchCancel={() => { swipeStartRef.current = null; setDragY(0); }}
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={{ opacity: { duration: isOpen ? 0.18 : 0.14, ease: isOpen ? 'easeOut' : 'easeIn' }, scale: { duration: isOpen ? 0.24 : 0.14, ease: isOpen ? [0.32, 0.72, 0, 1] : 'easeIn' } }}
             style={{
               position: 'fixed',
-              insetInline: 0,
-              bottom: 0,
+              top: '50%',
+              left: 14,
+              right: 14,
               zIndex: REVIEW_SHEET_Z + 1,
-              width: '100%',
-              maxHeight: '85dvh',
+              width: 'auto',
+              height: 'auto',
+              maxHeight: '82dvh',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
-              borderRadius: '18px 18px 0 0',
-              background: CANVAS,
-              borderTop: `1px solid ${BORDER}`,
+              borderRadius: 24,
+              background: 'rgba(24,27,35,0.88)',
+              backdropFilter: 'blur(30px) saturate(160%)',
+              WebkitBackdropFilter: 'blur(30px) saturate(160%)',
+              border: '1px solid rgba(255,255,255,0.14)',
+              boxShadow: '0 28px 70px rgba(0,0,0,0.55)',
               color: INK,
-
               fontFamily: FONT_SF,
-              transform: 'translateZ(0)',
+              translate: `0 calc(-50% + ${dragY}px)`,
+              willChange: cardAnimating ? 'transform, opacity' : 'auto',
             }}
           >
+            <style>{`@media (prefers-reduced-motion: reduce) { [data-review-glass-card="true"] { transform: none !important; } }`}</style>
             {/* ─── PINNED HEADER ─────────────────────────────── */}
             <div
-              onPointerDown={(e) => dragControls.start(e)}
               style={{
                 flex: '0 0 auto',
-                padding: '0 18px 14px',
+                padding: '14px 18px',
                 position: 'relative',
-                touchAction: 'none',
                 overflow: 'hidden',
               }}
             >
-              {/* Drag handle */}
-              <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 10, position: 'relative', zIndex: 2 }}>
-                <div
-                  style={{
-                    width: 32,
-                    height: 4,
-                    borderRadius: 2,
-                    background: GRABBER,
-                  }}
-                />
-              </div>
-
               {/* Scorecard-shaped head: identity left, primary figure right. */}
               <div data-review-sheet-header="true" style={{ display: 'flex', alignItems: 'flex-start', gap: 14, position: 'relative', zIndex: 2 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -529,6 +552,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
             {/* ─── SCROLL REGION ──────────────────────────────── */}
             <div
+              data-review-scroll="true"
               style={{
                 flex: '1 1 auto',
                 overflowY: 'auto',

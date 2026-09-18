@@ -96,13 +96,13 @@ Tour Overview Design A
 - [x] Verify entry paths, content variants, narrow widths, tests, and types
 
 ## Scorecard glass card S3
-- [ ] Remove the first-frame pixel height lock while preserving the readiness hold
-- [ ] Remove the close hint while preserving card-tap dismissal
-- [ ] Group and evenly space scorecard exits at 390px and 320px
-- [ ] Verify cold and warm opens, scrolling, dismissal, tests, and types
+- [x] Remove the first-frame pixel height lock while preserving the readiness hold
+- [x] Remove the close hint while preserving card-tap dismissal
+- [x] Group and evenly space scorecard exits at 390px and 320px
+- [x] Verify cold and warm opens, scrolling, dismissal, tests, and types
 
 ## Review sheet glass card R2
-- [ ] Preserve the completed R1 restraint pass and correct the decision-history note
-- [ ] Convert the review bottom sheet to the shared floating-card geometry with a denser glass fill
-- [ ] Preserve non-tap dismissal, intrinsic height, internal scrolling, and viewer stacking
-- [ ] Verify feed and fullscreen-viewer paths at 390px and 320px, tests, and types
+- [x] Preserve the completed R1 restraint pass and correct the decision-history note
+- [x] Convert the review bottom sheet to the shared floating-card geometry with a denser glass fill
+- [x] Preserve non-tap dismissal, intrinsic height, internal scrolling, and viewer stacking
+- [x] Verify feed and fullscreen-viewer paths at 390px and 320px, tests, and types

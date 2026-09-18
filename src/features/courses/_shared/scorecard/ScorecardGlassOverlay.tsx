@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { pushSheetEntry, releaseSheetEntry } from '@/components/ui/sheetHistory';
@@ -40,7 +40,6 @@ export function ScorecardGlassOverlay({
   const [entered, setEntered] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [dragY, setDragY] = useState(0);
-  const [lockedHeight, setLockedHeight] = useState<number | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
   const horizontalRef = useRef(onHorizontalDrag);
@@ -69,7 +68,6 @@ export function ScorecardGlassOverlay({
       if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);
       closeTimerRef.current = window.setTimeout(() => {
         setMounted(false);
-        setLockedHeight(null);
         setAnimating(false);
       }, EXIT_MS);
       return () => {
@@ -85,14 +83,8 @@ export function ScorecardGlassOverlay({
     return () => window.clearTimeout(hold);
   }, [open, contentReady, presentation]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!mounted || !open || presentation === 'page') return;
-    const card = cardRef.current;
-    if (!card) return;
-    // offsetHeight is the pre-transform layout height. Measuring the entry's
-    // 0.96-scaled bounding box would lock a cold skeleton about 4% too short.
-    const measuredHeight = card.offsetHeight;
-    if (measuredHeight > 0) setLockedHeight(measuredHeight);
     setAnimating(true);
     const frame = requestAnimationFrame(() => setEntered(true));
     if (animationTimerRef.current != null) window.clearTimeout(animationTimerRef.current);
@@ -279,7 +271,7 @@ export function ScorecardGlassOverlay({
           left: 14,
           right: 14,
           maxHeight: '82dvh',
-          height: lockedHeight == null ? undefined : lockedHeight,
+          height: 'auto',
           minHeight: 0,
           display: 'flex',
           flexDirection: 'column',

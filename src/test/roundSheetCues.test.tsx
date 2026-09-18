@@ -272,8 +272,10 @@ describe('the scorecard presentation split', () => {
     expect(document.querySelector('[data-scorecard-skeleton="true"]')).toBeTruthy();
     const card = document.querySelector('[data-scorecard-glass-card="true"]') as HTMLElement;
     expect(card.style.transition).not.toContain('height');
+    expect(card.style.height).toBe('auto');
     rerender(<CardScorecardSheet {...props} loading={false} />);
     expect(card.style.transition).not.toContain('height');
+    expect(card.style.height).toBe('auto');
     vi.useRealTimers();
   });
 
@@ -285,7 +287,32 @@ describe('the scorecard presentation split', () => {
     fireEvent.click(screen.getByText(/viewCourse/));
     expect(onViewCourse).toHaveBeenCalledTimes(1);
     expect(onClose).not.toHaveBeenCalled();
-    expect(screen.getByText(/tapAnywhereToClose/)).toBeTruthy();
+    expect(document.querySelector('[data-scorecard-close-hint="true"]')).toBeNull();
+  });
+
+  it('keeps the links in one evenly spaced group beside engagement', () => {
+    render(
+      <CardScorecardSheet
+        {...props}
+        engagement={{
+          comment: { count: 2, label: 'Comments', onOpen: vi.fn() },
+          likeCount: 3,
+          likeMine: false,
+          likeHidden: false,
+          likeLabel: 'Like',
+          onToggleLike: vi.fn(),
+        }}
+        onViewProfile={vi.fn()}
+        onViewCourse={vi.fn()}
+        onShareRound={vi.fn()}
+      />,
+    );
+    const engagement = document.querySelector('[data-round-engagement="comment-heart"]') as HTMLElement;
+    const links = document.querySelector('[data-scorecard-exit-links="true"]') as HTMLElement;
+    expect(engagement).toBeTruthy();
+    expect(links.style.justifyContent).toBe('space-evenly');
+    expect(links.style.whiteSpace).toBe('nowrap');
+    expect(links.children).toHaveLength(3);
   });
 
   it('renders page mode without a backdrop or dialog', () => {
