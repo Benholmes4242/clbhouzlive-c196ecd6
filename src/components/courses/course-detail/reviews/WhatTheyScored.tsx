@@ -23,8 +23,8 @@ interface WhatTheyScoredProps {
 const ORDER: { key: keyof CategoryAggregates; label: string }[] = [
   { key: 'design', label: 'Design' },
   { key: 'condition', label: 'Condition' },
-  { key: 'facilities', label: 'Facilities' },
   { key: 'clubhouse', label: 'Clubhouse' },
+  { key: 'facilities', label: 'Facilities' },
 ];
 
 export const WhatTheyScored: React.FC<WhatTheyScoredProps> = ({ aggregates }) => {

@@ -25,6 +25,16 @@ describe('C1 course rating consistency', () => {
     expect(file).not.toContain('subscoreMinRatings');
   });
 
+  it('keeps the requested category order on both tabs', () => {
+    const course = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
+    const reviews = src('src/components/courses/course-detail/reviews/WhatTheyScored.tsx');
+    for (const file of [course, reviews]) {
+      expect(file.indexOf("label: 'Design'")).toBeLessThan(file.indexOf("label: 'Condition'"));
+      expect(file.indexOf("label: 'Condition'")).toBeLessThan(file.indexOf("label: 'Clubhouse'"));
+      expect(file.indexOf("label: 'Clubhouse'")).toBeLessThan(file.indexOf("label: 'Facilities'"));
+    }
+  });
+
   it('uses the dark score band for all three headline surfaces', () => {
     const course = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const reviews = src('src/components/courses/course-detail/reviews/TheScore.tsx');

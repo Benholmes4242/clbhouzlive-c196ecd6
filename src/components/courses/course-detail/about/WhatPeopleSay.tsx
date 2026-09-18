@@ -35,7 +35,7 @@ interface WhatPeopleSayProps {
   courseId: string;
   courseName: string;
   onRateClick: () => void;
-  /** Opens the Reviews tab, where the histogram and category scores live. */
+  /** Opens the Reviews tab, where the category scores also live beside reviews. */
   onSeeAllReviews?: () => void;
 }
 
