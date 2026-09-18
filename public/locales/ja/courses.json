@@ -149,6 +149,14 @@
     }
   },
   "scorecard": {
+    "feat": {
+      "ace": { "label": "ホールインワン" },
+      "albatross": { "label": "アルバトロス" },
+      "eagle": { "label": "イーグル" },
+      "birdies": { "label": "バーディー", "sub": "1ラウンドで達成" },
+      "clean": { "label": "ノーボギー", "sub": "一打も落とさず" },
+      "onHole": "{{hole}}ホールで"
+    },
     "atThisCourseBare": "このコースで",
     "atThisCourseSelf": "このコースでのあなた",
     "atThisCourseOther": "このコースでの{{name}}",

@@ -1704,6 +1704,14 @@
     "writePromptInline": "[~~⭐ Ŵříţé ýőúř řéṽíéŵ~~]"
   },
   "scorecard": {
+    "feat": {
+      "ace": { "label": "[HOLE IN ONE]" },
+      "albatross": { "label": "[ALBATROSS]" },
+      "eagle": { "label": "[EAGLE]" },
+      "birdies": { "label": "[BIRDIES]", "sub": "[in one round]" },
+      "clean": { "label": "[CLEAN CARD]", "sub": "[not a shot dropped]" },
+      "onHole": "[on the {{hole}}]"
+    },
     "atThisCourseBare": "At this course",
     "atThisCourseSelf": "[~~Ýőú áţ ţĥíš ĉőúřšé~~]",
     "atThisCourseOther": "[~~{{name}} áţ ţĥíš ĉőúřšé~~]",
