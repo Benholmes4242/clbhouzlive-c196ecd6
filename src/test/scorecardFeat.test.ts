@@ -19,7 +19,7 @@ const round = (deltas: number[], pars: number[] = deltas.map(() => 4)): Scorecar
 describe('scorecardFeatFor', () => {
   it('finds each of the five permanent feats', () => {
     expect(scorecardFeatFor(round([0], [1]), false, 'member')).toMatchObject({ kind: 'ace', hole: 1 });
-    expect(scorecardFeatFor(round([-3]), false, 'member')).toMatchObject({ kind: 'albatross', hole: 1 });
+    expect(scorecardFeatFor(round([-3], [5]), false, 'member')).toMatchObject({ kind: 'albatross', hole: 1 });
     expect(scorecardFeatFor(round([-2]), false, 'member')).toMatchObject({ kind: 'eagle', hole: 1 });
     expect(scorecardFeatFor(round([-1, -1, -1, -1, -1]), false, 'member')).toEqual({ kind: 'birdies', count: 5, hole: null });
     expect(scorecardFeatFor(round(Array(18).fill(0)), false, 'member')).toEqual({ kind: 'clean', count: 18, hole: null });
