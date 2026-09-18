@@ -590,16 +590,56 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     exitGuard.requestClose();
   }, [step, composer, exitGuard]);
 
+  /**
+   * R1 §1.1 — THE ORDER IS INVERTED, AND THAT IS THE WHOLE FIX.
+   *
+   * WAS (and this is what lost photographs): RPC -> receipt -> upload -> rows.
+   * The bytes moved after the member had been navigated away and the composer
+   * unmounted; in the native shell a background or a discard killed the
+   * in-flight invoke and the insert behind it. Measured: a review submitted
+   * 18 Sep 2026 14:16 UTC reporting media_count 2, zero rows written, and no
+   * word of it to the member.
+   *
+   * IS: upload (foreground, member watching) -> RPC -> rows (milliseconds) ->
+   * receipt. Nothing slow survives the navigation, because nothing slow is
+   * left. If an upload fails the member STAYS HERE with their files intact and
+   * a working Retry, and NOTHING is submitted — the opposite of the old
+   * behaviour, where the review existed and the photographs did not.
+   *
+   * ORPHANS ARE ACCEPTED (brief, explicit): abandoning after an upload leaves
+   * a file in R2 with no row. Cheap, sweepable, and the right side of the
+   * trade against losing a member's photographs.
+   */
   const handleSubmit = useCallback(async () => {
     try {
+      // 1. BYTES FIRST, while this page is alive and on screen.
+      setMediaUploading(true);
+      const up = await media.uploadPendingMedia();
+      setMediaUploading(false);
+      if (!up.ok) {
+        // R1 §1.3b — a failure is said in words, not only drawn on a tile.
+        // No RPC runs: there is no review, so there is nothing to be missing
+        // media from, and the files are still here to retry.
+        toast.error(t('review.toast.mediaUploadFailed'));
+        return;
+      }
+
+      // 2. THE RECORD.
       const { ratingId, shareToFeed } = await submit.submit({
         courseId: course.id,
         state: composer.state,
       });
       submittedRef.current = true;
       composer.clearDraft();
-      media.flushToReview(ratingId, { caption: composer.state.reviewText, queryClient: qc }).catch(() => { /* per-item errors surfaced in tray */ });
+
+      // 3. THE ROWS — milliseconds, because the bytes are already at rest.
+      // Awaited: a receipt must not render in front of outstanding work.
+      const attached = await media.attachToReview(ratingId, { queryClient: qc });
+      if (attached.failed > 0) toast.error(t('review.toast.mediaAttachFailed'));
+
       invalidateCourseRatingCaches(qc);
+
+      // 4. THE RECEIPT, last, with nothing behind it.
       onSuccess({
         ratingId,
         shareToFeed,

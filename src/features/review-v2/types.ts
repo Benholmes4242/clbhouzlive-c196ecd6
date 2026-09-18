@@ -43,7 +43,14 @@ export interface ReviewComposerState {
   teeLabel: string | null;
 }
 
-export type MediaItemStatus = 'pending' | 'uploading' | 'ready' | 'failed' | 'existing';
+/**
+ * 'uploaded' (BRIEF_R1 §1.1, 18 Sep 2026) — the bytes are at rest in R2 or
+ * Cloudflare Stream but no course_review_media row exists yet, because the
+ * review record itself does not exist yet. It is the state every new item
+ * passes through now that uploading happens BEFORE submit; 'ready' continues
+ * to mean "uploaded AND a row points at it".
+ */
+export type MediaItemStatus = 'pending' | 'uploading' | 'uploaded' | 'ready' | 'failed' | 'existing';
 
 export interface MediaItem {
   id: string;             // client id
