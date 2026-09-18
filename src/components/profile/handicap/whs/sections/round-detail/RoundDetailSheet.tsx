@@ -390,8 +390,11 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const include = presentation === 'page'
     ? { context: true, reactions: true, comments: true, commentPreview: true, field: true }
     : coalesced;
-  const stableContext = include.context ? ctx : null;
-  const stableFieldPlayers = include.field ? fieldPlayers : null;
+  /**
+   * G4.1(a) — NOTHING IS DROPPED. `include` drives settleKey only, so the
+   * height animation knows when a coalesced arrival happened; every block
+   * renders from live data the moment it is in hand.
+   */
   const [commentsOpen, setCommentsOpen] = useState(initialCommentsOpen);
   useEffect(() => {
     if (open) setCommentsOpen(initialCommentsOpen);
@@ -405,7 +408,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
         onToggleLike: () => reactions.toggle('round', scoreId),
         likeLabel: t('discover.reactions.action', 'Like this round'),
         postId: postInfo?.postId ?? null,
-        commentPreview: include.commentPreview && postInfo?.postId
+        commentPreview: postInfo?.postId
           ? commentPreviews.map.get(postInfo.postId) ?? null
           : null,
         comment: postInfo
@@ -417,8 +420,6 @@ export const RoundDetailSheet: React.FC<Props> = ({
           : null,
       }
     : null;
-  /* G2.3 — the engagement pair is never dropped; it only arrives with the settle. */
-  const stableEngagement = include.reactions && include.comments && include.commentPreview ? engagement : null;
   const settleKey = Object.keys(include)
     .sort()
     .map((key) => `${key}:${(include as Record<string, boolean>)[key] ? 1 : 0}`)
@@ -443,11 +444,11 @@ export const RoundDetailSheet: React.FC<Props> = ({
          behaviour is exactly today's. */
       loading={false}
       surface="member"
-      courseContext={stableContext ? {
-        yourAvgToPar: stableContext.your_avg_to_par,
-        avgToParOthers: stableContext.avg_to_par_others,
-        roundsHere: stableContext.rounds_here,
-        rankHere: stableContext.rank_here,
+      courseContext={ctx ? {
+        yourAvgToPar: ctx.your_avg_to_par,
+        avgToParOthers: ctx.avg_to_par_others,
+        roundsHere: ctx.rounds_here,
+        rankHere: ctx.rank_here,
         /* §C — the index this round was played off, straight from the provider's
            score record. No new query: userQuery already carries it. Null stays
            null; the sheet omits the figure rather than showing today's index. */
@@ -459,7 +460,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       playerHcpDelta={handicapDelta ?? null}
       playerUserId={profileUserId ?? null}
       subjectIsViewer={isOwnRound}
-      fieldPlayers={stableFieldPlayers}
+      fieldPlayers={fieldPlayers}
       onViewProfile={onViewProfile}
       onViewCourse={onViewCourse}
       onShareRound={onShareRound}
@@ -467,7 +468,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       emptyGross={grossVal}
       emptyToPar={toParVal}
       presentation={presentation}
-      engagement={stableEngagement}
+      engagement={engagement}
       onHorizontalDrag={onHorizontalDrag}
       onStatsSeen={onStatsSeen}
       pageShift={pageShift}
