@@ -26,6 +26,9 @@
  * a translucent sheet over a busy page muddies. That reasoning is surface-
  * agnostic and still holds. Only the hue changed: the panel was light between
  * Aug 5 and the dark migration. The scrim stays a plain rgba dim.
+ * Reconsidered 18 Sep 2026 and rejected again: review prose must stay legible
+ * over a busy page, long reviews scroll, and the fullscreen photograph remains
+ * mounted beneath this sheet. The scorecard's glass treatment does not apply.
  */
 
 
@@ -35,7 +38,7 @@ import { formatMonthYearShort } from '@/i18n/format';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
@@ -47,17 +50,15 @@ import { REVIEW_SHEET_Z } from '@/lib/zLayers';
 import { footerTapProbeEnabled, recordFooterTap } from './footerTapProbe';
 import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
-import { ReviewGhostNumeral, ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
+import { getRatingTierLabel } from '@/lib/ratingTier';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { TITLE } from '@/lib/tokens/type';
 import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
    a caption would take: this sheet's payload is three paragraphs of member
    prose, and body copy needs more separation than a label does. */
 const CANVAS = SHEET_SURFACE;
-const PANEL = '#1B1E27';
 const BORDER = 'rgba(255,255,255,0.10)';
 const INK = '#F8FAFC';
 const BODY = 'rgba(248,250,252,0.72)';
@@ -126,51 +127,6 @@ function relativeMonths(iso?: string | null): string | null {
   if (d < 365) return `${Math.floor(d / 30)}mo`;
   return `${Math.floor(d / 365)}y`;
 }
-
-function formatMonthLabel(iso?: string | null): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '';
-  return formatMonthYearShort(d).toUpperCase();
-}
-
-
-/** One cell of the reference block: figure over a small caps label. */
-const RefCell: React.FC<{
-  figure: string;
-  figureSize: number;
-  color: string;
-  label: string;
-}> = ({ figure, figureSize, color, label }) => (
-  <div style={{ minWidth: 0 }}>
-    <div
-      style={{
-        fontSize: figureSize,
-        fontWeight: 300,
-        lineHeight: 1,
-        color,
-        fontVariantNumeric: 'tabular-nums',
-      }}
-    >
-      {figure}
-    </div>
-    <div
-      style={{
-        marginTop: 5,
-        fontSize: 11,
-        fontWeight: 600,
-        letterSpacing: '0.1em',
-        color: MUTE,
-        textTransform: 'uppercase',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-      }}
-    >
-      {label}
-    </div>
-  </div>
-);
 
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
@@ -291,8 +247,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
         .join(''),
     [user.name],
   );
-
-  const monthLabel = formatMonthLabel(reviewDate ?? null);
 
   // REFERENCE POINT (§3a) — reuses the shared aggregates hook, so on a page
   // that already read them (course detail, discover) React Query dedupes and
@@ -426,11 +380,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 overflow: 'hidden',
               }}
             >
-              {/* Ghost numeral — huge watermark, top-right, clipped by header edge */}
-              {rating != null && (
-                <ReviewGhostNumeral rating={rating} fontSize={110} right={-10} top={40} surface="dark" />
-              )}
-
               {/* Drag handle */}
               <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 10, position: 'relative', zIndex: 2 }}>
                 <div
@@ -443,41 +392,17 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 />
               </div>
 
-              {/* Top row: eyebrow + course info (left) | verdict label (right) */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, position: 'relative', zIndex: 2 }}>
+              {/* Scorecard-shaped head: identity left, primary figure right. */}
+              <div data-review-sheet-header="true" style={{ display: 'flex', alignItems: 'flex-start', gap: 14, position: 'relative', zIndex: 2 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  {/* Ink eyebrow */}
-                  <div
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      letterSpacing: '0.14em',
-                      color: INK,
-                      textTransform: 'uppercase',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                    }}
-                  >
-                    <span>REVIEW</span>
-                    {monthLabel ? (
-                      <>
-                        <span style={{ opacity: 0.5 }}>·</span>
-                        <span>{monthLabel}</span>
-                      </>
-                    ) : (
-                      <span aria-hidden style={{ opacity: 0.5, letterSpacing: '-0.02em' }}>
-                        ────
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Course name */}
                   <h1
                     id="review-sheet-title"
                     style={{
-                      ...TITLE,
-                      margin: '6px 0 0',
+                      margin: 0,
+                      fontSize: 19,
+                      fontWeight: 800,
+                      letterSpacing: '-0.01em',
+                      lineHeight: 1.08,
                       color: INK,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -487,75 +412,72 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     {courseName}
                   </h1>
 
-                  {/* Location */}
                   {locationStr && (
                     <div
                       style={{
-                        marginTop: 5,
-                        fontSize: 13,
+                        marginTop: 2,
+                        fontSize: 12,
+                        lineHeight: 1.2,
                         color: MUTE,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 4,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
-
-                      <MapPin size={12} strokeWidth={2} />
-                      <span
-                        style={{
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {locationStr}
-                      </span>
+                      {locationStr}
                     </div>
                   )}
                 </div>
 
-                {/* Verdict label — tier word over the ghost numeral, top-right */}
                 {rating != null && (
-                  <ReviewVerdictLabel rating={rating} surface="dark" />
+                  <div style={{ flex: '0 0 auto', minWidth: 62, textAlign: 'right' }}>
+                    <div
+                      data-review-rating="true"
+                      style={{
+                        fontSize: 34,
+                        fontWeight: 800,
+                        lineHeight: 0.95,
+                        color: INK,
+                        fontVariantNumeric: 'tabular-nums lining-nums',
+                      }}
+                    >
+                      {rating.toFixed(1)}
+                    </div>
+                    <div
+                      style={{
+                        marginTop: 3,
+                        fontSize: 10,
+                        fontWeight: 800,
+                        lineHeight: 1,
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        whiteSpace: 'nowrap',
+                        color: '#F7931E',
+                      }}
+                    >
+                      {getRatingTierLabel(rating)}
+                    </div>
+                  </div>
                 )}
-
               </div>
 
-              {/* REFERENCE BLOCK — their score against the community (§3a).
-                  Omitted below three ratings: an average of one is not a
-                  reference point. */}
+              {/* Community reference, without repeating the primary rating. */}
               {showReference && (
                 <div
+                  data-review-community-reference="true"
                   style={{
                     marginTop: 12,
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr 1fr',
-                    gap: 8,
-                    alignItems: 'end',
+                    fontSize: 11.5,
+                    lineHeight: 1.35,
+                    color: MUTE,
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >
-                  <RefCell
-                    figure={rating.toFixed(1)}
-                    figureSize={40}
-                    color={reviewLabelColor(rating, 'dark')}
-                    label="THEIR SCORE"
-                  />
-                  <RefCell
-                    figure={communityAvg!.toFixed(1)}
-                    figureSize={19}
-                    color={INK}
-                    label={`${ratingCount} RATINGS`}
-                  />
-                  <RefCell
-                    figure={Math.abs(rating - communityAvg!).toFixed(1)}
-                    figureSize={19}
-                    color={INK}
-                    label={rating >= communityAvg! ? 'ABOVE' : 'BELOW'}
-                  />
+                  {`Community average ${communityAvg!.toFixed(1)}, from ${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'}`}
                 </div>
               )}
 
-              {/* THE SPREAD — one row of four: figure, bar out of ten, label.
+              {/* THE SPREAD — one row of four: figure over label.
                   A null category omits its column and the row rebalances. */}
               {breakdownEntries.length > 0 && (
                 <div
@@ -567,16 +489,15 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   }}
                 >
                   {breakdownEntries.map(({ key, label, value }) => {
-                    const c = reviewLabelColor(value, 'dark');
                     return (
-                      <div key={key} style={{ minWidth: 0 }}>
+                      <div key={key} data-review-subscore={key} style={{ minWidth: 0, textAlign: 'center' }}>
                         <div
                           style={{
-                            fontSize: 17,
-                            fontWeight: 300,
-                            color: c,
+                            fontSize: 15,
+                            fontWeight: 800,
+                            color: INK,
                             fontVariantNumeric: 'tabular-nums',
-                            lineHeight: 1.1,
+                            lineHeight: 1,
                           }}
                         >
                           {value.toFixed(1)}
@@ -584,25 +505,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         <div
                           style={{
                             marginTop: 5,
-                            height: 3,
-                            borderRadius: 2,
-                            background: TRACK,
-                            overflow: 'hidden',
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: `${Math.max(0, Math.min(100, (value / 10) * 100))}%`,
-                              height: '100%',
-                              background: c,
-                            }}
-                          />
-                        </div>
-                        <div
-                          style={{
-                            marginTop: 5,
-                            fontSize: 12,
-                            fontWeight: 600,
+                            fontSize: 9,
+                            fontWeight: 800,
                             letterSpacing: '0.1em',
                             color: MUTE,
                             textTransform: 'uppercase',
