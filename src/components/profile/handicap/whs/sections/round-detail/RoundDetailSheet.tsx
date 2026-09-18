@@ -365,19 +365,19 @@ export const RoundDetailSheet: React.FC<Props> = ({
     () => ({
       context: !scoreId || contextQuery.isFetched,
       reactions: reactions.isSettled,
-      comments: roundPosts.isSettled,
+      comments: roundEngagement.isSettled,
       /**
        * G4.1(b) — A READINESS KEY MUST BE HONEST. The preview read is disabled
-       * when the post has no comments, so that id never enters settledIds; a
+       * when the round has no comments, so that id never enters settledIds; a
        * key that can never become true holds the cap open on every open. A
        * query that is not asked is trivially SETTLED.
        */
-      commentPreview: !postInfo?.postId
-        || postInfo.commentCount === 0
-        || commentPreviews.isSettled(postInfo.postId),
+      commentPreview: !scoreId
+        || commentCount === 0
+        || commentPreviews.isSettled(scoreId),
       field: !analysisCourseId || analysisQuery.isFetched,
     }),
-    [scoreId, contextQuery.isFetched, reactions.isSettled, roundPosts.isSettled, postInfo?.postId, postInfo?.commentCount, commentPreviews, analysisCourseId, analysisQuery.isFetched],
+    [scoreId, contextQuery.isFetched, reactions.isSettled, roundEngagement.isSettled, commentCount, commentPreviews, analysisCourseId, analysisQuery.isFetched],
   );
   const overlayGate = useCardOpenGate('scorecard', open && presentation === 'overlay', {
     subject: shownHoles.length > 0 || roundSettled,
@@ -405,17 +405,16 @@ export const RoundDetailSheet: React.FC<Props> = ({
         likeMine: reactions.stateFor('round', scoreId).mine,
         onToggleLike: () => reactions.toggle('round', scoreId),
         likeLabel: t('discover.reactions.action', 'Like this round'),
-        postId: postInfo?.postId ?? null,
-        commentPreview: postInfo?.postId
-          ? commentPreviews.map.get(postInfo.postId) ?? null
-          : null,
-        comment: postInfo
-          ? {
-              count: postInfo.commentCount,
-              label: t('discover.comments.action', 'Comment on this round'),
-              onOpen: () => setCommentsOpen(true),
-            }
-          : null,
+        /* G7.3(b) — the liked-by line reads the SCORE's reactions, so a round
+           with likes and no post finally shows who left them. */
+        postId: scoreId,
+        likeSource: 'round' as const,
+        commentPreview: commentPreviews.map.get(scoreId) ?? null,
+        comment: {
+          count: commentCount,
+          label: t('discover.comments.action', 'Comment on this round'),
+          onOpen: () => setCommentsOpen(true),
+        },
       }
     : null;
   const settleKey = Object.keys(include)
