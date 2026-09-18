@@ -2,8 +2,8 @@
  * schedule-v2/ScheduleTab — "The Season" open-ledger schedule view.
  *
  * Analytical grammar: overview-matched row hairlines, one filled (INK) jump
- * control, and a three-up figures header. The one app amber appears in three
- * places: the KICKER, completed-row CHAMPION labels, and deliberate controls.
+ * control, and a three-up figures header. The one app amber marks completed-row
+ * CHAMPION labels; the KICKER and deliberate controls retain their INK treatment.
  *
  * The tour chip row is this page's ONLY tour control by design —
  * TourSelectionContext is scoped to the overview hero. ?tour= is honoured once
