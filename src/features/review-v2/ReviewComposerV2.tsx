@@ -679,6 +679,9 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         facilities: composer.state.scores.facilities ?? undefined,
       });
     } catch (e) {
+      // R1 §1.3a — the silent `.catch(() => {})` that used to swallow the whole
+      // flush is gone. Every failure in this function now ends in a sentence.
+      setMediaUploading(false);
       toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
