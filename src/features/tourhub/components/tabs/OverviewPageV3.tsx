@@ -19,6 +19,7 @@ import { useTourSelection } from '@/features/tourhub/context/TourSelectionContex
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { StickySafeAreaScrim, useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 
