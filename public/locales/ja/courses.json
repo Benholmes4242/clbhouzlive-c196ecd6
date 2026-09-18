@@ -531,7 +531,9 @@
     "toast": {
       "signInRequired": "Sign in required",
       "voteBody": "Please sign in to vote on reviews",
-      "rateBody": "Please sign in to rate courses"
+      "rateBody": "Please sign in to rate courses",
+      "mediaUploadFailed": "写真をアップロードできなかったため、何も投稿されていません。写真の再試行をタップしてから、もう一度投稿してください。",
+      "mediaAttachFailed": "レビューは投稿されましたが、写真を添付できませんでした。レビューを編集してもう一度追加してください。"
     },
     "wizard": {
       "rail": {
@@ -612,7 +614,8 @@
         "mediaVideos": "動画{{count}}件",
         "mediaJoin": "と",
         "mediaDismiss": "わかりました"
-      }
+      },
+      "uploadingMedia": "写真をアップロード中..."
     }
   },
   "courseDetail": {

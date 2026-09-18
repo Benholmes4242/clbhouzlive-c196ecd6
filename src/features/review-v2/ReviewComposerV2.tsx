@@ -1294,7 +1294,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
       <SubmitBar
         label={buttonLabel}
-        enabled={gateMet && !submit.submitting}
+        enabled={gateMet && !submit.submitting && !mediaUploading}
         onPress={handlePrimary}
       />
 
