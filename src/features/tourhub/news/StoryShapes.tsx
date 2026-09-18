@@ -96,11 +96,14 @@ export function HeroStory({
   onOpen,
   engagement,
   topOffset = 13,
+  gutter = GUTTER,
   showEngagement = true,
   engagementAction,
   attachedContent,
 }: StoryShapeProps & {
   topOffset?: number | string;
+  /** Horizontal type inset; the News tabs retain the canonical 14px default. */
+  gutter?: number;
   showEngagement?: boolean;
   /** Live controls render outside the story button, so presses never navigate. */
   engagementAction?: React.ReactNode;
@@ -115,10 +118,10 @@ export function HeroStory({
             <img src={story.image_url} alt="" loading="eager" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           )}
           <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,.05) 34%, rgba(0,0,0,.86))' }} />
-          <div style={{ ...COLUMN, position: 'absolute', top: topOffset, left: GUTTER, right: GUTTER, color: 'rgba(248,250,252,0.82)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ ...COLUMN, position: 'absolute', top: topOffset, left: gutter, right: gutter, color: 'rgba(248,250,252,0.82)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {tagFor(story)}{relativeDate(story) ? ` · ${relativeDate(story)}` : ''}
           </div>
-          <div style={{ position: 'absolute', left: GUTTER, right: GUTTER, bottom: 14 }}>
+          <div style={{ position: 'absolute', left: gutter, right: gutter, bottom: 14 }}>
             <h1 style={{ margin: 0, fontSize: 25, fontWeight: 800, lineHeight: 1.13, letterSpacing: '-0.01em', color: A.INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 4, overflow: 'hidden', overflowWrap: 'anywhere' }}>
               {story.headline}
             </h1>
@@ -132,7 +135,7 @@ export function HeroStory({
       </Button>
       {attachedContent}
       {showEngagement && (
-        <div style={{ margin: `11px ${GUTTER}px 0` }}>
+        <div style={{ margin: `11px ${gutter}px 0` }}>
           {engagementAction ?? <StoryRowEngagement engagement={engagement} inkColor={A.DIM} />}
         </div>
       )}
@@ -141,7 +144,7 @@ export function HeroStory({
 }
 
 /** THE TWO-UP. Needs exactly two; one remainder falls through to the rows. */
-export function FeatureStory({ story, onOpen, engagement, engagementAction }: StoryShapeProps) {
+export function FeatureStory({ story, onOpen, engagement, engagementAction, showEngagement = true }: StoryShapeProps & { showEngagement?: boolean }) {
   return (
     <article style={{ height: 199 }}>
       <Button variant="ghost" onClick={onOpen} style={{ ...tapReset, display: 'block' }} aria-label={`Read ${story.headline}`}>
@@ -154,14 +157,14 @@ export function FeatureStory({ story, onOpen, engagement, engagementAction }: St
       </Button>
       <div style={{ marginTop: 7, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
         <span style={{ ...COLUMN, color: A.DIM, letterSpacing: 0, whiteSpace: 'nowrap' }}>{relativeDate(story)}</span>
-        {engagementAction ?? <StoryRowEngagement engagement={engagement} inkColor={A.DIM} size={13} />}
+        {showEngagement ? (engagementAction ?? <StoryRowEngagement engagement={engagement} inkColor={A.DIM} size={13} />) : null}
       </div>
     </article>
   );
 }
 
 /** THE ROW. The workhorse: kicker and date, 14.5 headline, 74px thumbnail. */
-export function WorkhorseRow({ story, onOpen, engagement, engagementAction }: StoryShapeProps) {
+export function WorkhorseRow({ story, onOpen, engagement, engagementAction, showEngagement = true }: StoryShapeProps & { showEngagement?: boolean }) {
   return (
     <article style={{ position: 'relative', width: '100%', height: 119, boxSizing: 'border-box', padding: '13px 0' }}>
       <Button variant="ghost" onClick={onOpen} style={{ ...tapReset, display: 'flex', gap: 12 }} aria-label={`Read ${story.headline}`}>
@@ -171,9 +174,11 @@ export function WorkhorseRow({ story, onOpen, engagement, engagementAction }: St
         </div>
         {story.image_url && <img src={story.image_url} alt="" loading="lazy" decoding="async" style={{ width: 74, height: 74, borderRadius: r.sm, objectFit: 'cover', flexShrink: 0, background: A.PANEL }} />}
       </Button>
-      <div style={{ position: 'absolute', left: 0, bottom: 13 }}>
-        {engagementAction ?? <StoryRowEngagement engagement={engagement} inkColor={A.DIM} size={13} />}
-      </div>
+      {showEngagement ? (
+        <div style={{ position: 'absolute', left: 0, bottom: 13 }}>
+          {engagementAction ?? <StoryRowEngagement engagement={engagement} inkColor={A.DIM} size={13} />}
+        </div>
+      ) : null}
     </article>
   );
 }

@@ -106,3 +106,9 @@ Tour Overview Design A
 - [x] Convert the review bottom sheet to the shared floating-card geometry with a denser glass fill
 - [x] Preserve non-tap dismissal, intrinsic height, internal scrolling, and viewer stacking
 - [x] Verify feed and fullscreen-viewer paths at 390px and 320px, tests, and types
+
+## Tour Overview N1
+- [x] Replace the bespoke overview News markup with the shared hero, two-up, and row shapes
+- [x] Add backward-compatible gutter and engagement controls without moving the News tab
+- [x] Preserve Story Band exclusion and exact-two feature grouping
+- [ ] Verify 390/320 layouts, sparse/no-image states, page-height delta, tests, and types
