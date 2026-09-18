@@ -91,6 +91,12 @@ export function OverviewPageV3() {
             See OverviewHero.tsx. */}
         <OverviewHero />
 
+        {/* T1 sentinel — first ordinary content, immediately below the hero.
+            Full-bleed is acceptable above this point only; once it passes the
+            notch the scrim paints var(--sat) in the page canvas. */}
+        <div ref={sentinelRef} style={{ height: 0 }} aria-hidden />
+        <StickySafeAreaScrim visible={stuck} background={PAGE_CANVAS} />
+
         <div
           id="content-below-hero"
           className="relative z-10"
