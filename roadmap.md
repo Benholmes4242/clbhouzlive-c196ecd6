@@ -126,4 +126,4 @@ Tour Overview Design A
 - [x] Offset query-param tabs by the measured fixed-header height
 - [x] Remove the redundant shell minimum height and News bottom padding
 - [x] Share one scroll-to-top control without duplicating the Overview or Schedule instance
-- [ ] Verify notch coverage, matching foot clearance, short-page canvas, focused tests, and types
+- [x] Verify notch coverage, foot clearance, short-page canvas, focused tests, and types (native notch remains device-only)
