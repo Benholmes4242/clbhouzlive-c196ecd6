@@ -81,11 +81,8 @@ export function scorecardFeatFor(
   if (birdies.length >= 5) return { kind: 'birdies', count: birdies.length, hole: null };
 
   const expectedHoles = nineHole ? 9 : 18;
-  const completeHoleNumbers = new Set(scored.map((hole) => hole.holeNo));
-  const clean = completeHoleNumbers.size === expectedHoles
+  const clean = holes.length === expectedHoles
     && scored.length === expectedHoles
-    && Array.from({ length: expectedHoles }, (_, index) => index + 1)
-      .every((holeNo) => completeHoleNumbers.has(holeNo))
     && scored.every((hole) => hole.strokes <= hole.par);
   return clean ? { kind: 'clean', count: scored.length, hole: null } : null;
 }
