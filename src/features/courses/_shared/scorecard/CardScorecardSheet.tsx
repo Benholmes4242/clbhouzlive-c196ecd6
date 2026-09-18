@@ -9,6 +9,7 @@ import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/R
 import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 import { LikedByRow } from '@/components/likes/LikedByRow';
+import type { LikeSource } from '@/hooks/usePostLikes';
 import { GlassCardFootAction } from './GlassCardFootAction';
 import {
   honoursGround,
