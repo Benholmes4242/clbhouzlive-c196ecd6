@@ -661,6 +661,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       onClose={onClose}
       contentReady={!loading}
       onHorizontalDrag={presentation === 'overlay' ? onHorizontalDrag : null}
+      pageKey={paging?.announce ?? null}
       presentation={presentation}
     >
       <div

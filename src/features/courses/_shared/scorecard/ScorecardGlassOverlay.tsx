@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { pushSheetEntry, releaseSheetEntry } from '@/components/ui/sheetHistory';
@@ -22,6 +22,8 @@ interface ScorecardGlassOverlayProps {
     onMove: (dx: number) => void;
     onEnd: (dx: number, velocity: number) => void;
   } | null;
+  /** Changes only when a horizontal round page commits. */
+  pageKey?: string | null;
   presentation?: 'overlay' | 'page';
   children: React.ReactNode;
 }
@@ -32,6 +34,7 @@ export function ScorecardGlassOverlay({
   onClose,
   contentReady = true,
   onHorizontalDrag = null,
+  pageKey = null,
   presentation = 'overlay',
   children,
 }: ScorecardGlassOverlayProps) {
@@ -46,6 +49,10 @@ export function ScorecardGlassOverlay({
   const closeTimerRef = useRef<number | null>(null);
   const animationTimerRef = useRef<number | null>(null);
   const clickResetTimerRef = useRef<number | null>(null);
+  const pagingTimerRef = useRef<number | null>(null);
+  const previousPageKeyRef = useRef<string | null>(pageKey);
+  const previousHeightRef = useRef<number | null>(null);
+  const [pagingHeight, setPagingHeight] = useState<number | null>(null);
   const gesture = useRef<{
     x: number;
     y: number;
@@ -57,6 +64,22 @@ export function ScorecardGlassOverlay({
   } | null>(null);
   closeRef.current = onClose;
   horizontalRef.current = onHorizontalDrag;
+
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (!card || presentation !== 'overlay' || !mounted) return;
+    const nextHeight = card.getBoundingClientRect().height;
+    const previousHeight = previousHeightRef.current;
+    const pageChanged = previousPageKeyRef.current != null && previousPageKeyRef.current !== pageKey;
+    previousPageKeyRef.current = pageKey;
+    previousHeightRef.current = nextHeight;
+    if (!pageChanged || previousHeight == null || Math.abs(previousHeight - nextHeight) < 1) return;
+    setPagingHeight(previousHeight);
+    const frame = requestAnimationFrame(() => setPagingHeight(nextHeight));
+    if (pagingTimerRef.current != null) window.clearTimeout(pagingTimerRef.current);
+    pagingTimerRef.current = window.setTimeout(() => setPagingHeight(null), 220);
+    return () => cancelAnimationFrame(frame);
+  }, [children, mounted, pageKey, presentation]);
 
   useEffect(() => {
     if (presentation === 'page') return;
@@ -200,6 +223,7 @@ export function ScorecardGlassOverlay({
 
   useEffect(() => () => {
     if (clickResetTimerRef.current != null) window.clearTimeout(clickResetTimerRef.current);
+    if (pagingTimerRef.current != null) window.clearTimeout(pagingTimerRef.current);
   }, []);
 
   const onCardClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
@@ -265,7 +289,7 @@ export function ScorecardGlassOverlay({
           left: 14,
           right: 14,
           maxHeight: '82dvh',
-          height: 'auto',
+          height: pagingHeight == null ? 'auto' : pagingHeight,
           minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
@@ -281,7 +305,7 @@ export function ScorecardGlassOverlay({
           transition: dragY > 0
             ? 'none'
             : open
-              ? `opacity ${ENTER_OPACITY_MS}ms ease-out, transform ${ENTER_TRANSFORM_MS}ms cubic-bezier(.32,.72,0,1)`
+              ? `opacity ${ENTER_OPACITY_MS}ms ease-out, transform ${ENTER_TRANSFORM_MS}ms cubic-bezier(.32,.72,0,1)${pagingHeight == null ? '' : ', height 220ms cubic-bezier(.32,.72,0,1)'}`
               : `opacity ${EXIT_MS}ms ease-in, transform ${EXIT_MS}ms ease-in`,
           willChange: animating ? 'transform, opacity' : 'auto',
           zIndex: Z.sheet,
