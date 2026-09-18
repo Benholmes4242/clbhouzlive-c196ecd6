@@ -58,6 +58,7 @@ export function ScorecardGlassOverlay({
   const clickResetTimerRef = useRef<number | null>(null);
   const pagingTimerRef = useRef<number | null>(null);
   const previousPageKeyRef = useRef<string | null>(pageKey);
+  const previousSettleKeyRef = useRef<string | null>(settleKey);
   const previousHeightRef = useRef<number | null>(null);
   const [pagingHeight, setPagingHeight] = useState<number | null>(null);
   const gesture = useRef<{
@@ -78,9 +79,13 @@ export function ScorecardGlassOverlay({
     const nextHeight = card.getBoundingClientRect().height;
     const previousHeight = previousHeightRef.current;
     const pageChanged = previousPageKeyRef.current != null && previousPageKeyRef.current !== pageKey;
+    const settleChanged = previousSettleKeyRef.current !== settleKey;
     previousPageKeyRef.current = pageKey;
+    previousSettleKeyRef.current = settleKey;
     previousHeightRef.current = nextHeight;
-    if (!pageChanged || previousHeight == null || Math.abs(previousHeight - nextHeight) < 1) return;
+    if ((!pageChanged && !settleChanged) || previousHeight == null || Math.abs(previousHeight - nextHeight) < 1) return;
+    /* G2.4(d) — reduced motion applies the new height instantly. */
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
     setPagingHeight(previousHeight);
     const frame = requestAnimationFrame(() => setPagingHeight(nextHeight));
     if (pagingTimerRef.current != null) window.clearTimeout(pagingTimerRef.current);
