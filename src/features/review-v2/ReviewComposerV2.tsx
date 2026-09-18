@@ -591,6 +591,14 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   }, [step, composer, exitGuard]);
 
   /**
+   * R1 §1.1 — the submit bar tells the truth about which half of the work is
+   * running: photographs are moving, then the review is being posted. It is
+   * one press; the member should not have to guess why it is taking time.
+   */
+  const [mediaUploading, setMediaUploading] = useState(false);
+
+
+  /**
    * R1 §1.1 — THE ORDER IS INVERTED, AND THAT IS THE WHOLE FIX.
    *
    * WAS (and this is what lost photographs): RPC -> receipt -> upload -> rows.
