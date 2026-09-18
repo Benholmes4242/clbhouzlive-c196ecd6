@@ -35,6 +35,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -144,6 +145,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   media,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
 
   // Live reviewer stats (React Query dedupes with earlier fetches).
   const { data: liveStats } = useReviewerStats(user?.id);
@@ -471,7 +473,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >
-                  {`Community average ${communityAvg!.toFixed(1)}, from ${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'}`}
+                  {t('reviewSheet.communityAverage', {
+                    average: communityAvg!.toFixed(1),
+                    count: ratingCount,
+                  })}
                 </div>
               )}
 

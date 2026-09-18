@@ -1,4 +1,8 @@
 {
+  "reviewSheet": {
+    "communityAverage_one": "[!! Community average {{average}}, from {{count}} rating !!]",
+    "communityAverage_other": "[!! Community average {{average}}, from {{count}} ratings !!]"
+  },
   "amateurNews": {
     "all": "All",
     "allStories": "ALL STORIES",
