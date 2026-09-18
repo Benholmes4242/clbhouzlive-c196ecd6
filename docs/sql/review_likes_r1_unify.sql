@@ -173,11 +173,13 @@ BEGIN
 END;
 $function$;
 
--- 3c. post_likes sync for BUSINESS actors: was round-only. CHANGED to also
---     recount a review-backed post, so a business like still lands in the
---     column now that the column is owned by the recount functions.
---     (Renaming the function would break trg_post_likes_sync_round_like_count,
---     so the name stays and the body widens.)
+-- 3c. post_likes sync. THE NAME IS HISTORICAL: `..._round_...` no longer
+--     describes the body. This trigger recounts BOTH round-backed posts
+--     (whs_score_id) AND review-backed posts (source_review_id) for business
+--     actors — the column is owned by the recount functions, and a like on
+--     either kind of post must land in it. (Renaming the function would break
+--     trg_post_likes_sync_round_like_count, so the name stays.) Do not trust
+--     the name when reading this function; trust this comment.
 CREATE OR REPLACE FUNCTION public.post_likes_sync_round_like_count()
  RETURNS trigger
  LANGUAGE plpgsql
