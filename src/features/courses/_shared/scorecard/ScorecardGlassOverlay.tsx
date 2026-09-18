@@ -47,6 +47,7 @@ export function ScorecardGlassOverlay({
   const suppressClickRef = useRef(false);
   const closeTimerRef = useRef<number | null>(null);
   const animationTimerRef = useRef<number | null>(null);
+  const clickResetTimerRef = useRef<number | null>(null);
   const gesture = useRef<{
     x: number;
     y: number;
@@ -181,6 +182,8 @@ export function ScorecardGlassOverlay({
     if (!current) return;
     if (current.axis === 'horizontal') {
       suppressClickRef.current = true;
+      if (clickResetTimerRef.current != null) window.clearTimeout(clickResetTimerRef.current);
+      clickResetTimerRef.current = window.setTimeout(() => { suppressClickRef.current = false; }, 0);
       const dx = current.lastX - current.x;
       const elapsed = Math.max(1, current.lastAt - current.startedAt);
       horizontalRef.current?.onEnd(dx, dx / elapsed);
@@ -188,6 +191,8 @@ export function ScorecardGlassOverlay({
     }
     if (current.axis !== 'vertical') return;
     suppressClickRef.current = true;
+    if (clickResetTimerRef.current != null) window.clearTimeout(clickResetTimerRef.current);
+    clickResetTimerRef.current = window.setTimeout(() => { suppressClickRef.current = false; }, 0);
     const dy = current.lastY - current.y;
     const elapsed = Math.max(1, current.lastAt - current.startedAt);
     if (dy > CLOSE_DISTANCE_PX || dy / elapsed > CLOSE_VELOCITY) {
@@ -202,6 +207,10 @@ export function ScorecardGlassOverlay({
     gesture.current = null;
     if (current?.axis === 'horizontal') horizontalRef.current?.onEnd(0, 0);
     setDragY(0);
+  }, []);
+
+  useEffect(() => () => {
+    if (clickResetTimerRef.current != null) window.clearTimeout(clickResetTimerRef.current);
   }, []);
 
   const onCardClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {

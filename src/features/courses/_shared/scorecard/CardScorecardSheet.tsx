@@ -723,7 +723,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           is drawn, so the sheet's look is unchanged.
         */}
         {paging && (
-          <div style={{ flexShrink: 0 }}>
+          <div onClick={(event) => event.stopPropagation()} style={{ flexShrink: 0 }}>
             <button
               type="button"
               className="sr-only focus:not-sr-only"
@@ -774,7 +774,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
             /* No fill — the sheet surface shows through
                (BRIEF_SHEET_BACKGROUND_CANON). */
-            padding: '12px 14px calc(env(safe-area-inset-bottom, 0px) + 24px)',
+            padding: '12px 14px calc(env(safe-area-inset-bottom, 0px) + 14px)',
             display: 'flex', flexDirection: 'column', gap: 12,
           }}
         >
