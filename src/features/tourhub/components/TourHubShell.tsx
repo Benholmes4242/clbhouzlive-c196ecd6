@@ -5,10 +5,13 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface TourHubShellProps {
   children: ReactNode;
-  /** @deprecated BRIEF_TOUR_FIXED_HEADER S4 — no Tour surface bleeds any more.
-   *  Accepted and ignored so the callers keep compiling. */
+  /** Accepted and ignored (caller compat). No shield is installed here:
+   *  the exact /tourhub overview is immersive BY DESIGN — its hero runs
+   *  full-bleed under the status bar at rest — and paints its own var(--sat)
+   *  scrim via StickySafeAreaScrim once its below-hero sentinel is passed
+   *  (see OverviewPageV3). */
   immersive?: boolean;
-  /** @deprecated as above: the safe-area shield stays opaque on Tour. */
+  /** Accepted and ignored (caller compat), as above. */
   immersiveStatusBar?: boolean;
   /** @deprecated Back button now lives in CompactHeader. Kept for caller compat. */
   showBack?: boolean;

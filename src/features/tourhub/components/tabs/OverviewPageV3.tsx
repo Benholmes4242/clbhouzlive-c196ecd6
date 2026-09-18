@@ -19,6 +19,7 @@ import { useTourSelection } from '@/features/tourhub/context/TourSelectionContex
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { StickySafeAreaScrim, useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 
@@ -27,6 +28,11 @@ export function OverviewPageV3() {
   const { t } = useTranslation('tourhub');
   const { isOnline } = useNetworkStatus();
   const { selectedTourSlug, viewingTournamentId, setAppliedTourSlug } = useTourSelection();
+  /* T1 — safe-area scrim. The route stays immersive after the hero scrolls
+     away, so the fixed var(--sat) strip is painted by the shared scrim once
+     the sentinel below the hero passes the notch. It never owns inset
+     spacing: at rest the hero stays full-bleed. */
+  const { sentinelRef, stuck } = useStickySafeAreaState();
   // The hero river crosses tours, so its tournament match and the explicit
   // "any story" 48-hour fallback must read the unfiltered feed. News retains
   // the overview's selected-tour lens from its previous implementation.
@@ -84,6 +90,12 @@ export function OverviewPageV3() {
         {/* Tour Hub Hero River — self-contained carousel crossing all tours.
             See OverviewHero.tsx. */}
         <OverviewHero />
+
+        {/* T1 sentinel — first ordinary content, immediately below the hero.
+            Full-bleed is acceptable above this point only; once it passes the
+            notch the scrim paints var(--sat) in the page canvas. */}
+        <div ref={sentinelRef} style={{ height: 0 }} aria-hidden />
+        <StickySafeAreaScrim visible={stuck} background={PAGE_CANVAS} />
 
         <div
           id="content-below-hero"
