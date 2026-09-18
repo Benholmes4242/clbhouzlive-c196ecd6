@@ -64,19 +64,27 @@ export const ReviewBottomSheetPortal: React.FC = () => {
    * decides whether the card waits for them before opening.
    */
   const subjectReady = !payload?.reviewId || (hasText && hasBreakdown) || fallbackQuery.isFetched;
-  const gate = useCardOpenGate('review', isOpen, {
-    subject: subjectReady,
-    supporting: {
+  /* ONE SET OF KEYS, BOTH CONSUMERS. The gate and the coalescer read the same
+     object, so a key can never be honest for one and stale for the other.
+     G4.1(b) — a read that is not asked for is trivially SETTLED. */
+  const supportingKeys = React.useMemo(
+    () => ({
       media: !payload?.reviewId || mediaQuery.isFetched,
       aggregate: !payload?.courseId || aggregateQuery.isFetched,
       reactions: !payload?.reviewId || reactions.isSettled,
-    },
+      comments: !payload?.reviewId || reviewEngagement.isSettled,
+      commentPreview: !payload?.reviewId
+        || commentCount === 0
+        || commentPreviews.isSettled(payload.reviewId),
+    }),
+    [payload?.reviewId, payload?.courseId, mediaQuery.isFetched, aggregateQuery.isFetched,
+     reactions.isSettled, reviewEngagement.isSettled, commentCount, commentPreviews],
+  );
+  const gate = useCardOpenGate('review', isOpen, {
+    subject: subjectReady,
+    supporting: supportingKeys,
   });
-  const supporting = useCoalescedBlocks({
-    media: !payload?.reviewId || mediaQuery.isFetched,
-    aggregate: !payload?.courseId || aggregateQuery.isFetched,
-    reactions: !payload?.reviewId || reactions.isSettled,
-  }, gate.visible);
+  const supporting = useCoalescedBlocks(supportingKeys, gate.visible);
   const reactionState = payload?.reviewId ? reactions.stateFor('review', payload.reviewId) : null;
 
   // Pause every engine lane when the sheet opens. Null-caller = engine-wide
