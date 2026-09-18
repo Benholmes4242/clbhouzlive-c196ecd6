@@ -642,8 +642,20 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
       // 3. THE ROWS — milliseconds, because the bytes are already at rest.
       // Awaited: a receipt must not render in front of outstanding work.
-      const attached = await media.attachToReview(ratingId, { queryClient: qc });
+      //
+      // R1.2 §1 — three outcomes, three different sentences, because they are
+      // three different situations for the member:
+      //   held > 0   the photo is uploaded and a Retry is waiting on it; it
+      //              does NOT need re-attaching by hand.
+      //   failed > 0 a genuine dead end — nowhere to hold the retry — so the
+      //              member is asked to add it again. Should be rare.
+      //   neither    silence, which is correct.
+      const attached = await media.attachToReview(ratingId, {
+        queryClient: qc,
+        caption: composer.state.reviewText,
+      });
       if (attached.failed > 0) toast.error(t('review.toast.mediaAttachFailed'));
+      else if (attached.held > 0) toast.error(t('review.toast.mediaAttachHeld'));
 
       invalidateCourseRatingCaches(qc);
 

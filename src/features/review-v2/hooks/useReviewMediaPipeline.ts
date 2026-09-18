@@ -560,34 +560,140 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
    * Write one course_review_media row per already-uploaded item. Runs after
    * the RPC and takes milliseconds — the bytes are already at rest.
    */
+  /**
+   * THE PARTIAL-ATTACH WINDOW (R1.2 §1, 18 Sep 2026).
+   *
+   * After R1 the only remaining way work can be lost is here: the bytes are in
+   * R2, the review exists, and the INSERT fails. Telling the member to edit the
+   * review and add the photo again would ask them to re-upload a file that is
+   * already uploaded, so this window is closed in two stages before any such
+   * sentence is shown.
+   *
+   *  a. RETRY THE INSERT. Three attempts with a short backoff. A failed insert
+   *     after a successful upload is almost always transient (a dropped socket,
+   *     a token refresh mid-flight), so most of this window closes itself.
+   *  b. HOLD THE PAIR. If it still fails, the uploaded url and the review id
+   *     are both known, so the item stays 'uploaded' — NOT 'failed', because
+   *     the bytes are safe — and a retry is registered in reviewRetryRegistry
+   *     that re-attempts the INSERT ONLY. Nothing is re-uploaded.
+   *  c. Only when there is no home for that pair (no identity wired, so no
+   *     pending card can carry the Retry) does the caller show the dead-end
+   *     message. It is the right sentence for a genuine dead end; it should be
+   *     far rarer than one failed insert.
+   */
+  const INSERT_ATTEMPTS = 3;
+  const INSERT_BACKOFF_MS = [400, 1200];
+
+  const insertMediaRowWithRetry = useCallback(
+    async (reviewId: string, item: MediaItem): Promise<string | null> => {
+      let lastErr: unknown = null;
+      for (let attempt = 0; attempt < INSERT_ATTEMPTS; attempt += 1) {
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          return await insertMediaRow(reviewId, item);
+        } catch (e) {
+          lastErr = e;
+          const wait = INSERT_BACKOFF_MS[attempt];
+          if (wait == null) break;
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((r) => setTimeout(r, wait));
+        }
+      }
+      throw lastErr instanceof Error ? lastErr : new Error('Could not attach media');
+    },
+    [insertMediaRow],
+  );
+
   const attachToReview = useCallback(
     async (
       reviewId: string,
-      opts?: { queryClient?: QueryClient },
-    ): Promise<{ inserted: number; failed: number }> => {
+      opts?: { queryClient?: QueryClient; caption?: string },
+    ): Promise<{ inserted: number; failed: number; held: number }> => {
       const uploaded = itemsRef.current.filter((i) => i.status === 'uploaded' && !i.dbRowId);
-      if (uploaded.length === 0) return { inserted: 0, failed: 0 };
+      if (uploaded.length === 0) return { inserted: 0, failed: 0, held: 0 };
 
       let inserted = 0;
-      let failed = 0;
+      const stillUnattached: MediaItem[] = [];
       for (const it of uploaded) {
         try {
           // eslint-disable-next-line no-await-in-loop
-          const rowId = await insertMediaRow(reviewId, it);
-          updateItem(it.id, { status: 'ready', progress: 100, dbRowId: rowId });
+          const rowId = await insertMediaRowWithRetry(reviewId, it);
+          updateItem(it.id, { status: 'ready', progress: 100, dbRowId: rowId, error: undefined });
           inserted += 1;
         } catch (e) {
-          failed += 1;
+          // Status stays 'uploaded': the file is at rest and must never be
+          // re-uploaded to fix this. Only the row is missing.
+          stillUnattached.push(it);
           updateItem(it.id, {
-            status: 'failed',
             error: e instanceof Error ? e.message : 'Could not attach media',
           });
         }
       }
+
+      // (b) HOLD THE (url, reviewId) PAIR so a retry attaches without uploading.
+      let held = 0;
+      const ident = identityRef.current;
+      if (stillUnattached.length > 0 && ident && userId) {
+        const jobId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : `rv2-attach-${nid()}`;
+        const entry: PendingPost = {
+          jobId,
+          kind: 'review',
+          postId: null,
+          reviewId,
+          actorType: ident.actorType,
+          actorId: ident.actorId,
+          userId,
+          viewerActorType: ident.viewerActorType,
+          viewerActorId: ident.viewerActorId,
+          authorName: ident.authorName,
+          authorAvatarUrl: ident.authorAvatarUrl,
+          authorUsername: ident.authorUsername,
+          caption: (opts?.caption ?? '').trim()
+            || (ident.courseName ? `Review · ${ident.courseName}` : 'New review'),
+          media: stillUnattached.map((it) => ({ id: it.id, kind: it.type, previewUrl: it.previewUrl })),
+          courseId: ident.courseId,
+          courseName: ident.courseName,
+          totalFiles: stillUnattached.length,
+          fileProgress: {},
+          status: 'uploading',
+          files: [],
+          createdAt: new Date().toISOString(),
+        };
+        usePendingPostsStore.getState().addPending(entry);
+        usePendingPostsStore.getState().markFailed(jobId, 'Could not attach media to the review');
+
+        // The retry re-attempts the INSERT only — the url is already known.
+        reviewRetryRegistry.register(jobId, async () => {
+          const pendingRows = itemsRef.current.filter(
+            (i) => i.status === 'uploaded' && !i.dbRowId && !!i.uploadedUrl,
+          );
+          let ok = 0;
+          for (const it of pendingRows) {
+            try {
+              // eslint-disable-next-line no-await-in-loop
+              const rowId = await insertMediaRowWithRetry(reviewId, it);
+              updateItem(it.id, { status: 'ready', progress: 100, dbRowId: rowId, error: undefined });
+              ok += 1;
+            } catch {
+              /* stays held; the card keeps its Retry */
+            }
+          }
+          if (ok === pendingRows.length) {
+            usePendingPostsStore.getState().removeJob(jobId);
+            reviewRetryRegistry.unregister(jobId);
+            if (opts?.queryClient) invalidateCourseRatingCaches(opts.queryClient);
+          }
+        });
+        held = stillUnattached.length;
+      }
+
       if (opts?.queryClient) invalidateCourseRatingCaches(opts.queryClient);
-      return { inserted, failed };
+      // 'failed' now means ONLY the dead end: unattached with nowhere to retry.
+      return { inserted, failed: stillUnattached.length - held, held };
     },
-    [insertMediaRow, updateItem],
+    [insertMediaRowWithRetry, updateItem, userId],
   );
 
   /**
