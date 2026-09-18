@@ -1,37 +1,32 @@
-# Glass scorecard S3
+# Scorecard S3 and review card R2
 
-## Confirmed cause
+## Confirmed before changing code
 
-- `ScorecardGlassOverlay` measures the first mounted frame with `card.offsetHeight`, stores it in `lockedHeight`, and writes that value back to the card's inline `height`.
-- On a cold first open, that frame contains the skeleton. When hole data arrives, the resolved scorecard is constrained to the skeleton's pixel height, producing the clipping that disappears on a warm second open.
-- The 150ms data-readiness hold is separate and remains useful for smooth entry; it must not be used as the correctness guarantee.
+- The scorecard first-open clipping is caused by S2's `lockedHeight`: the overlay measures `card.offsetHeight` on its first mounted frame and writes that skeleton-era pixel value back as inline `height`. Later content is therefore trapped inside the first-frame box. This is not the retired shared-sheet `ResizeObserver`.
+- The scorecard's 150ms readiness hold is still useful for smoothness, but intrinsic sizing and internal scrolling must provide correctness if data arrives later.
+- Review R1 has landed: the ghost numeral and eyebrow are gone, the header mirrors the scorecard, the reference no longer repeats the rating, and sub-score bars are gone.
+- Review stacking remains intentionally split: the review is above the mounted fullscreen feed, while its media viewer portals above the review and preserves its scroll position.
 
-## Implementation
+## Scorecard S3
 
-1. **Restore intrinsic card sizing**
-   - Remove `lockedHeight`, the first-frame measurement, and the computed `height` style entirely.
-   - Keep the card at intrinsic `height: auto`, bounded only by `max-height: 82dvh`.
-   - Preserve the fixed honours/summary regions and the existing body contract: `flex: 1`, `min-height: 0`, `overflow-y: auto`.
-   - Keep the 150ms unresolved-data hold and opacity/transform-only entry and exit motion unchanged.
+1. Remove `lockedHeight`, first-frame measurement, and all computed height styling. Keep intrinsic `height: auto`, `max-height: 82dvh`, fixed summary, and the body at `flex: 1; min-height: 0; overflow-y: auto`.
+2. Preserve the 150ms unresolved-data hold and opacity/transform-only motion.
+3. Remove the “Tap anywhere to close” line and retire its six locale entries. Preserve card-background dismissal, the guarded controls, backdrop, downward swipe, Escape, and horizontal-swipe click suppression.
+4. Split the exits into a fixed comment-then-heart cluster and one indivisible links group. Give the links group the remaining width with equal spacing, change “Share this round” to “Share”, and move the whole links group to a full-width second row when narrow.
 
-2. **Remove the close instruction, not the behaviour**
-   - Remove the visible “Tap anywhere to close” footer.
-   - Remove its key from all six locale files after confirming it has no other reader.
-   - Preserve card-background dismissal, guarded interactive controls, backdrop dismissal, downward swipe, Escape, and horizontal-swipe click suppression.
+## Review card R2
 
-3. **Restructure the exits row**
-   - Keep one guarded outer container.
-   - Render comment then heart as a fixed engagement cluster with its existing internal spacing.
-   - Render View profile, View course, and Share as one indivisible links group using `flex: 1` and `justify-content: space-evenly`.
-   - Shorten the scorecard share label to “Share” in all six locales.
-   - At narrow widths, move the complete links group to a full-width second line; never allow individual links to wrap onto separate rows.
+1. Correct the file history: translucent 14px blur originally, opaque from 5 August, glass rejected then overturned on 18 September, now denser glass for prose legibility.
+2. Replace the bottom-sheet presentation with the scorecard family's centred geometry: 14px side insets, 82dvh ceiling, 24px radius, matching border/shadow/30px blur, and the same backdrop.
+3. Start at the requested review fill `rgba(24,27,35,0.88)`. Inspect it over a bright fullscreen photograph; increase opacity only if prose is muddy, leaving blur at 30px.
+4. Remove the drag handle. Use the scorecard's asymmetric opacity/scale timing and reduced-motion fade-only behavior.
+5. Keep card taps inert. Preserve only backdrop, downward swipe, and Escape dismissal. Keep intrinsic auto height and the existing internal scroller between the fixed header and footer.
+6. Preserve the completed R1 content, all entry points, and the load-bearing viewer/media stacking behavior and comments.
 
 ## Verification
 
-- Cold-cache first open: confirm the fully resolved card is complete on its first appearance, with no clipped content.
-- Warm second-round open: compare card geometry and content with the cold result.
-- Verify a deliberately tall late-content state grows to `82dvh` and scrolls only inside the body.
-- Capture the exits row at 390px and 320px; confirm equal link spacing and group-only wrapping at 320px.
-- Confirm card-background dismissal still works and every guarded action leaves the card open.
-- Recheck backdrop, downward swipe, Escape, and horizontal paging dismissal behavior.
-- Run focused scorecard tests and TypeScript checks; the project harness performs build validation.
+- Scorecard: cold first open and warm second open; compare complete content and geometry. Force late tall content and confirm it grows to the ceiling then scrolls without clipping.
+- Scorecard exits: capture 390px and 320px, confirming even spacing and group-only wrapping. Verify guarded actions and every dismissal/paging path.
+- Review: capture directly after the scorecard to compare shape and density; test a cold 190-word review, feed entry, and fullscreen-viewer entry over a bright photograph.
+- Review interactions: card taps do not close; backdrop, downward swipe, and Escape do; media opens above the retained review and returns to the same scroll position.
+- Check both cards at 390px and 320px for overflow, run focused tests and TypeScript checks, and rely on the project harness for build validation.
