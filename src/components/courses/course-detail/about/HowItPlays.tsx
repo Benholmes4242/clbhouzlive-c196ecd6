@@ -295,12 +295,14 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
       <>
         <AboutSection heading={heading}>
           <Sentence>
-            {t('discover.scores.noOnePlayed', { course: courseName ?? '\u2014' })}
+            {t('discover.scores.noOnePlayed', 'No one has played {{course}} yet.', {
+              course: courseName ?? '\u2014',
+            })}
           </Sentence>
           <div style={{ marginTop: 6 }}>
             <Sentence quiet>
               {connection
-                ? t('discover.scores.beTheFirst')
+                ? t('discover.scores.beTheFirst', 'Play it and you will be the first.')
                 : t('discover.scores.connectToAppear')}
             </Sentence>
           </div>

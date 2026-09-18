@@ -1,16 +1,10 @@
 /**
- * BRIEF_COURSE_TAB_REBUILD §3.6 — WHAT PEOPLE SAY, flat.
+ * BRIEF_C1.2 (18 Sep 2026) — WHAT PEOPLE SAY, flat.
  *
- * TWO MOVES IN ONE SECTION:
- *
- *   STAYS HERE — the community score and the viewing member's own score. That
- *   is the whole of it. On a tab a member reads to decide whether to play here,
- *   one figure and their own figure is the answer.
- *
- *   MOVES TO THE REVIEWS TAB — the five-bar histogram and the four category
- *   scores. Neither is deleted: the histogram already renders on that tab as a
- *   tappable filter, and the category scores render there now too. A histogram
- *   whose bars filter a list belongs beside the list, not two tabs away.
+ * The four aggregate category scores live on BOTH the Course and Reviews tabs.
+ * They render from the first rating onward because an aggregate from one rating
+ * is still factual; the thin-sample caveat does the honest qualification. Only
+ * the tier word stays gated below five ratings because it makes a verdict.
  *
  *   NOT HERE AT ALL — the friends average. It was a third headline figure on a
  *   section that is meant to carry two; the friends strip below already names
@@ -30,7 +24,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { getRatingTier, TIER_LABEL_STYLE } from '@/lib/ratingTier';
-import { bandColor } from '@/features/courses/_shared/scoreBands';
+import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
 
@@ -61,6 +55,13 @@ const Figure: React.FC<{
   </div>
 );
 
+const CATEGORY_FIGURES = [
+  { key: 'avg_design_score', label: 'Design' },
+  { key: 'avg_condition_score', label: 'Condition' },
+  { key: 'avg_clubhouse_score', label: 'Clubhouse' },
+  { key: 'avg_facilities_score', label: 'Facilities' },
+] as const;
+
 const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   courseId,
   courseName,
@@ -76,6 +77,10 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   const total = aggregates?.review_count ?? 0;
   const score = aggregates?.avg_overall_score ?? 0;
   const yours = userRating?.rating ?? null;
+  const categoryFigures = CATEGORY_FIGURES.flatMap(({ key, label }) => {
+    const value = aggregates?.[key];
+    return value == null ? [] : [{ key, label, value }];
+  });
 
   const rateAction = (
     <button
@@ -122,7 +127,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
         <Figure
           label={t('courseDetail.rating.overall')}
           value={score.toFixed(1)}
-          tone={bandColor(score)}
+          tone={bandColorOnDark(score)}
           tier={settled ? getRatingTier(score) : null}
         />
         {yours != null ? (
@@ -134,6 +139,26 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
           />
         ) : null}
       </div>
+
+      {categoryFigures.length > 0 ? (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${categoryFigures.length}, minmax(0, 1fr))`,
+            gap: 12,
+            marginTop: 16,
+          }}
+        >
+          {categoryFigures.map(({ key, label, value }) => (
+            <div key={key} style={{ minWidth: 0 }}>
+              <div style={{ ...aboutFig(15, value >= 9 ? A.GREEN : A.MUTE), lineHeight: 1 }}>
+                {value.toFixed(1)}
+              </div>
+              <div style={{ ...ABOUT_KICKER, marginTop: 5 }}>{label}</div>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       {/* THE THIN SENTENCE — the sample is named and its limit stated. */}
       {!settled ? (

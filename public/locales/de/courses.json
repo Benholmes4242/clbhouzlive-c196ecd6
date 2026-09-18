@@ -1003,6 +1003,10 @@
     }
   },
   "discover": {
+    "scores": {
+      "noOnePlayed": "Noch niemand hat {{course}} gespielt.",
+      "beTheFirst": "Spiele den Platz und du wirst der Erste sein."
+    },
     "friendsRounds": {
       "overline": "DEIN KREIS",
       "viewAll": "Alle ansehen",

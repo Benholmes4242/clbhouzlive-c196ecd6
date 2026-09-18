@@ -978,6 +978,10 @@
     "courseMomentAlt": "Course moment"
   },
   "discover": {
+    "scores": {
+      "noOnePlayed": "{{course}}에서 아직 아무도 플레이하지 않았습니다.",
+      "beTheFirst": "플레이하면 첫 번째가 됩니다."
+    },
     "heroStory": {
       "beat": "Beat {{name}} by {{by}}.",
       "beatSelf": "Lowered their own record by {{by}}.",
