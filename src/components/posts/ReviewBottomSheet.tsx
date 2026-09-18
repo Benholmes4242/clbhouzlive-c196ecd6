@@ -54,6 +54,10 @@ import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 import { GlassCardFootAction } from '@/features/courses/_shared/scorecard/GlassCardFootAction';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
+import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
+import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from '@/lib/toast';
 
