@@ -22,6 +22,23 @@ interface RawLike {
  * G7.3(a) — 'round' keys on the WHS SCORE ID, 'review' on the review id: the
  * two content_reactions subjects, read identically. A round no longer needs a
  * post to show who liked it.
+ *
+ * THE 'post' SOURCE HAS TWO BACKED CASES, and both take their PERSONAL hearts
+ * from content_reactions rather than post_likes:
+ *
+ *   - posts.whs_score_id IS NOT NULL  — a ROUND post. Personal hearts live in
+ *     content_reactions (target_type='round', target_id = whs_score_id).
+ *   - posts.source_review_id IS NOT NULL — a REVIEW post. Personal hearts live
+ *     in content_reactions (target_type='review', target_id = source_review_id).
+ *     R1 (18 Sep 2026) migrated the 283 personal post_likes that had accumulated
+ *     on review posts into content_reactions, so this branch is the whole story;
+ *     the review branch DEDUPES BY user_id because a member who hearted in both
+ *     Explore and Clubhouse before the migration must appear once.
+ *
+ * In both cases BUSINESS-actor likes stay in post_likes (content_reactions has
+ * no actor columns) and are folded back in.
+ *
+ * Mirror of public.viewer_liked_post — keep both branches in step with it.
  */
 export type LikeSource = 'post' | 'editorial' | 'review' | 'round';
 
