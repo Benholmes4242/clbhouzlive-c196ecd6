@@ -22,7 +22,7 @@
  *
  * Panel, tokens.tsx and DiscoverSectionHeading are NOT modified.
  */
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -126,48 +126,87 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         p.delete('reviewId');
         return p;
       }, { replace: true });
+      // The highlight clock starts when the sheet is DISMISSED (see below), not
+      // now — under the sheet nobody can see it expire.
+      return;
     }
     const timeout = setTimeout(() => setHighlightedReviewId(null), 3000);
     return () => clearTimeout(timeout);
   }, [location.search, location.pathname]);
 
   const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const sheetIsOpen = useReviewSheetStore((s) => s.isOpen);
+  const deepLinkPending = useRef(false);
+  const [deepLinkArmed, setDeepLinkArmed] = useState(false);
+
   useEffect(() => {
     if (!pendingSheetReviewId || isLoading) return;
     const target = reviews.find((r) => r.id === pendingSheetReviewId);
     setPendingSheetReviewId(null);
-    if (!target) return;
+    if (!target) {
+      // Unknown review id (deleted, or a stale notification). Stay on the tab,
+      // no sheet, and drop the highlight rather than leaving it stuck on.
+      setHighlightedReviewId(null);
+      return;
+    }
+
+    // ORDER MATTERS. ScorecardGlassOverlay puts overflow:hidden on #root and
+    // body while the sheet is mounted, so the page cannot be scrolled once it is
+    // up. Position first, instantly, then open on the next frame.
+    document
+      .querySelector(`[data-review-id="${target.id}"]`)
+      ?.scrollIntoView({ behavior: 'auto', block: 'center' });
+
     const profile = target.user_profiles;
-    openReviewSheet({
-      user: {
-        id: target.user_id ?? '',
-        name: profile?.display_name || profile?.username || 'Anonymous',
-        username: profile?.username ?? undefined,
-        avatar: profile?.profile_photo_url ?? null,
-      },
-      courseId,
-      courseName: courseName ?? '',
-      rating: target.rating ?? 0,
-      reviewId: target.id,
-      reviewText: target.review ?? null,
-      breakdown: {
-        design: target.design_score ?? null,
-        conditions: target.condition_score ?? null,
-        clubhouse: target.clubhouse_score ?? null,
-        facilities: target.facilities_score ?? null,
-      },
+    deepLinkPending.current = true;
+    const frame = requestAnimationFrame(() => {
+      openReviewSheet({
+        user: {
+          id: target.user_id ?? '',
+          name: profile?.display_name || profile?.username || 'Anonymous',
+          username: profile?.username ?? undefined,
+          avatar: profile?.profile_photo_url ?? null,
+        },
+        courseId,
+        courseName: courseName ?? '',
+        rating: target.rating ?? 0,
+        reviewId: target.id,
+        reviewText: target.review ?? null,
+        breakdown: {
+          design: target.design_score ?? null,
+          conditions: target.condition_score ?? null,
+          clubhouse: target.clubhouse_score ?? null,
+          facilities: target.facilities_score ?? null,
+        },
+      });
     });
+    return () => cancelAnimationFrame(frame);
   }, [pendingSheetReviewId, isLoading, reviews, courseId, courseName, openReviewSheet]);
 
+  /* Arm only once the sheet is genuinely open — isOpen is still false on the
+     frame open() is called, and the dismissal effect would otherwise fire
+     against a sheet that had not opened yet. */
   useEffect(() => {
-    if (!highlightedReviewId || !reviewsData) return;
-    const timeout = setTimeout(() => {
+    if (!sheetIsOpen || !deepLinkPending.current) return;
+    deepLinkPending.current = false;
+    setDeepLinkArmed(true);
+  }, [sheetIsOpen]);
+
+  useEffect(() => {
+    if (!deepLinkArmed || sheetIsOpen) return;
+    setDeepLinkArmed(false);
+    // Re-assert, not a jump: the overflow lock preserves scrollTop, so this only
+    // does work if the row moved while the sheet was up (a photo finishing, a
+    // reflow). One frame after unmount, when overflow is restored.
+    const frame = requestAnimationFrame(() => {
       document
         .querySelector(`[data-review-id="${highlightedReviewId}"]`)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [highlightedReviewId, reviewsData]);
+        ?.scrollIntoView({ behavior: 'auto', block: 'center' });
+    });
+    // NOW the highlight clock starts — this is the first moment it is visible.
+    const timeout = setTimeout(() => setHighlightedReviewId(null), 3000);
+    return () => { cancelAnimationFrame(frame); clearTimeout(timeout); };
+  }, [deepLinkArmed, sheetIsOpen, highlightedReviewId]);
 
   const [isJustSubmittedOrUpdated, setIsJustSubmittedOrUpdated] = useState(() => {
     const fromLocationState = Boolean(location.state?.highlightMyReview);
