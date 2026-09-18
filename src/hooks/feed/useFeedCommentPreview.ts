@@ -83,7 +83,7 @@ export function useFeedCommentPreview(
   }, [postIds]);
 
   const query = useQuery({
-    queryKey: feedKeys.postCommentPreview(scope, viewerId(user?.id), batchDigest(ids)),
+    queryKey: feedKeys.postCommentPreview(`${scope}:${targetType}`, viewerId(user?.id), batchDigest(ids)),
     placeholderData: keepPreviousData,
     enabled: ids.length > 0,
     staleTime: 60 * 1000,
@@ -92,7 +92,7 @@ export function useFeedCommentPreview(
       const { data, error } = await supabase
         .from('comments_v2')
         .select('id, target_id, content, created_at, user_id, actor_type, actor_id')
-        .eq('target_type', 'post')
+        .eq('target_type', targetType)
         .in('target_id', ids)
         .is('parent_id', null)
         .order('created_at', { ascending: false })
