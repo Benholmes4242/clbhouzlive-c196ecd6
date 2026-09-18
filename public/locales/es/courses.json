@@ -1694,12 +1694,12 @@
         "played": "Jugó.",
         "recordLost": "{{player}} te quitó el récord del campo con {{gross}}.",
         "recordLostGap": "Te quitó el récord del campo con {{gross}}. Tu mejor vuelta queda a {{delta}}.",
-        "rankDown": "{{player}} completo la vuelta en {{gross}}. Ahora estas {{ord}} de {{of}} aqui.",
+        "rankDown": "{{player}} completó la vuelta en {{gross}}. Ahora estás {{ord}} de {{of}} aquí.",
         "rankDownBy": "Completo la vuelta en {{gross}} y te bajo {{delta}} puestos hasta {{n}} de {{of}}.",
         "rankUp": "Tu {{gross}} es la {{ord}} mejor vuelta jugada aquí.",
         "rankUpBy": "Tu {{gross}} es la {{ord}} mejor vuelta jugada aquí, {{n}} puestos más arriba.",
         "rankHold": "Tu {{gross}} sigue siendo la {{ord}} mejor vuelta que se ha jugado aquí.",
-        "playedNoChange": "{{player}} completo la vuelta en {{gross}}. Tu {{ord}} de {{of}} aqui no cambia.",
+        "playedNoChange": "{{player}} completó la vuelta en {{gross}}. Tu {{ord}} de {{of}} aquí no cambia.",
         "recordTakenBest": "{{player}} batió el récord del campo con {{gross}}, {{topar}}. Tu mejor vuelta aquí es {{best}}.",
         "recordTakenToPar": "{{player}} batió el récord del campo con {{gross}}, {{topar}}.",
         "recordOwnToPar": "Batiste el récord del campo con {{gross}}, {{topar}}.",
@@ -1719,9 +1719,9 @@
         "albatrossHoleToPar": "Un albatros en el hoyo {{ordHole}}, en una vuelta de {{gross}}, {{topar}}.",
         "birdieHaulToPar": "{{count}} birdies en una vuelta de {{gross}}, {{topar}}.",
         "listFirst": "{{player}} completó la vuelta en {{gross}}: la más baja que se ha jugado aquí.",
-        "rankDownMoved": "{{player}} completo la vuelta en {{gross}}. Ahora estas {{ord}} de {{of}} aqui, {{n}} puestos abajo.",
-        "rankUpOthers": "Ahora estas {{ord}} de {{of}} aqui, {{n}} puestos arriba.",
-        "rankUpOthersPlain": "Ahora estas {{ord}} de {{of}} aqui."
+        "rankDownMoved": "{{player}} completó la vuelta en {{gross}}. Ahora estás {{ord}} de {{of}} aquí, {{n}} puestos abajo.",
+        "rankUpOthers": "Ahora estás {{ord}} de {{of}} aquí, {{n}} puestos arriba.",
+        "rankUpOthersPlain": "Ahora estás {{ord}} de {{of}} aquí."
       },
       "standing": {
         "board": "Golpes brutos más bajos",
