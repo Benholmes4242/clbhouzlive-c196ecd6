@@ -93,4 +93,4 @@ Tour Overview Design A
 - [x] Preserve opaque sheet, stacking, scrolling, footer, handle, and dismissal
 - [x] Mirror the scorecard header and remove sheet-only ornament
 - [x] Simplify the community reference and sub-score spread
-- [ ] Verify entry paths, content variants, narrow widths, tests, and types
+- [x] Verify entry paths, content variants, narrow widths, tests, and types
