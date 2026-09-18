@@ -1,4 +1,8 @@
 {
+  "reviewSheet": {
+    "communityAverage_one": "커뮤니티 평균 {{average}}, 평가 {{count}}개",
+    "communityAverage_other": "커뮤니티 평균 {{average}}, 평가 {{count}}개"
+  },
   "media": {
     "signInTitle": "Sign in to view media",
     "signInBody": "See photos and videos from golfers who've played here.",

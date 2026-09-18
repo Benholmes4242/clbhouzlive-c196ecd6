@@ -88,3 +88,9 @@ Tour Overview Design A
 - [x] Make guarded card taps dismiss and add the close hint in six locales
 - [x] Change the shared birdie to a transparent red outline
 - [x] Verify gestures, exits, cached/cold opens, marks, reduced motion, page mode, tests, and types
+
+## Review sheet R1 restraint pass
+- [x] Preserve opaque sheet, stacking, scrolling, footer, handle, and dismissal
+- [x] Mirror the scorecard header and remove sheet-only ornament
+- [x] Simplify the community reference and sub-score spread
+- [x] Verify entry paths, content variants, narrow widths, tests, and types

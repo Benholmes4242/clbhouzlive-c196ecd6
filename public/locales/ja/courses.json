@@ -1,4 +1,8 @@
 {
+  "reviewSheet": {
+    "communityAverage_one": "コミュニティ平均 {{average}}、{{count}}件の評価",
+    "communityAverage_other": "コミュニティ平均 {{average}}、{{count}}件の評価"
+  },
   "media": {
     "signInTitle": "Sign in to view media",
     "signInBody": "See photos and videos from golfers who've played here.",
