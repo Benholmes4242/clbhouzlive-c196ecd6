@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { readStoredTour } from '../hooks/useTourSelection';
@@ -479,9 +478,6 @@ export function ScheduleTab() {
           </>
         )}
       </div>
-
-      {/* Back-to-top FAB (canonical grey chevron, portaled) */}
-      <ScrollToTopGlass />
 
       {/* Jump control — the one filled button on this surface, and it is INK. */}
       {anchorId && anchorFar && createPortal(

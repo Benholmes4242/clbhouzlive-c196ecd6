@@ -24,9 +24,9 @@ export function TourHubShell({ children }: TourHubShellProps) {
     return () => setVariant('solid-light');
   }, [setVariant]);
 
-  /* Dark-only baseline, and flatly NON-immersive: `.app-shell` pays the safe
-     area once and TourPageShell's opaque 42px row sits in normal flow beneath
-     the shield. No negative margins, no transparent status bar. */
+  /* Dark-only baseline. The exact `/tourhub` route remains immersive for the
+     overview hero; TourPageShell's fixed header owns the safe area on its
+     query-param sub-tabs. Pushed Tour routes remain shell-inset. */
   return (
     <PageRoot className="min-h-screen w-full" style={{ background: A.CANVAS }}>
       {children}

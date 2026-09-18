@@ -120,3 +120,10 @@ Tour Overview Design A
 - [x] Shorten and translate the action labels in all six locales
 - [x] Remove shared story-button scale feedback without changing shared Button
 - [x] Add cap-hit session counters and verify focused tests, locale JSON, and types
+
+## Tour Hub N2
+- [x] Make the shared sub-tab header own the safe area only on exact `/tourhub`
+- [x] Offset query-param tabs by the measured fixed-header height
+- [x] Remove the redundant shell minimum height and News bottom padding
+- [x] Share one scroll-to-top control without duplicating the Overview or Schedule instance
+- [ ] Verify notch coverage, matching foot clearance, short-page canvas, focused tests, and types
