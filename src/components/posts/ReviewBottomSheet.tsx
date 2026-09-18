@@ -178,6 +178,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
   const swipeStartRef = useRef<{ y: number; lastY: number; startedAt: number; active: boolean } | null>(null);
   const [dragY, setDragY] = useState(0);
+  const [cardAnimating, setCardAnimating] = useState(true);
   const onCardTouchStart = useCallback((event: React.TouchEvent) => {
     const touch = event.touches[0];
     let node = event.target as HTMLElement | null;
@@ -369,6 +370,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             aria-modal="true"
             aria-labelledby="review-sheet-title"
             data-review-glass-card="true"
+            onAnimationStart={() => setCardAnimating(true)}
+            onAnimationComplete={() => setCardAnimating(false)}
             onTouchStart={onCardTouchStart}
             onTouchMove={onCardTouchMove}
             onTouchEnd={onCardTouchEnd}
@@ -397,10 +400,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               boxShadow: '0 28px 70px rgba(0,0,0,0.55)',
               color: INK,
               fontFamily: FONT_SF,
-              transform: `translateY(calc(-50% + ${dragY}px))`,
+              translate: `0 calc(-50% + ${dragY}px)`,
+              willChange: cardAnimating ? 'transform, opacity' : 'auto',
             }}
           >
-            <style>{`@media (prefers-reduced-motion: reduce) { [data-review-glass-card="true"] { transform: translateY(calc(-50% + ${dragY}px)) !important; } }`}</style>
+            <style>{`@media (prefers-reduced-motion: reduce) { [data-review-glass-card="true"] { transform: none !important; } }`}</style>
             {/* ─── PINNED HEADER ─────────────────────────────── */}
             <div
               style={{
