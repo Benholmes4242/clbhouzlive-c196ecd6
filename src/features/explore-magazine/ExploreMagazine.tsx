@@ -462,7 +462,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      card currently ringed. The ring goes on close. */
   const cardRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
   const chipBarRef = useRef<HTMLDivElement | null>(null);
-  const [ringId, setRingId] = useState<string | null>(null);
   const [sheetSeed, setSheetSeed] = useState<RoundDetailSeed | null>(null);
   /* §3 — the sheet's own session: when it opened, how deep it went, and whether
      the depth section was read. rounds_viewed is 1 until paging lands (part 2). */
@@ -1111,7 +1110,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     setPageIx(ix);
     pageIxRef.current = ix;
     setSheetSeed(seedFor(item));
-    setRingId(item.id);
     revealCard(item.id);
     opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
     /* §2.3 — both neighbours are fetched once this page settles, so the next
@@ -1324,7 +1322,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           setPageIx(null);
           pageIxRef.current = null;
           setSheetSeed(seed);
-          setRingId(item.id);
           revealCard(item.id);
           opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
         }
@@ -2001,10 +1998,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             });
             sheetSession.current = null;
           }
-          /* §2.4 — BACK AND ESCAPE CLOSE. They never page, and the ring is left
-             on the round the member was reading so the feed is where they were. */
+          /* §2.4 — BACK AND ESCAPE CLOSE. They never page; revealCard has
+             already put the feed back where the member was. */
           cancelNudge();
-          setRingId(null);
           setSheetSeed(null);
           setShift(null);
           setPreview(null);
