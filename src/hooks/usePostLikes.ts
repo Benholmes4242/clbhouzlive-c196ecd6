@@ -26,6 +26,7 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
     enabled: !!postId && enabled,
     staleTime: 30_000,
     queryFn: async () => {
+      if (!postId) return [] as PostLiker[];
       let likes: RawLike[] = [];
 
       if (source === 'editorial') {
@@ -33,7 +34,7 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
         const { data, error: likesError } = await supabase
           .from('editorial_card_likes')
           .select('user_id')
-          .eq('card_id', postId!)
+          .eq('card_id', postId)
           .order('created_at', { ascending: false })
           .limit(200);
 
@@ -45,7 +46,7 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
           .from('content_reactions')
           .select('user_id')
           .eq('target_type', 'review')
-          .eq('target_id', postId!)
+          .eq('target_id', postId)
           .order('created_at', { ascending: false })
           .limit(200);
 
@@ -57,7 +58,7 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
         const { data, error: likesError } = await supabase
           .from('post_likes')
           .select('user_id, actor_type, actor_id')
-          .eq('post_id', postId!)
+          .eq('post_id', postId)
           .order('created_at', { ascending: false })
           .limit(200);
 
@@ -69,7 +70,7 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
         const { data: post } = await supabase
           .from('posts')
           .select('whs_score_id')
-          .eq('id', postId!)
+          .eq('id', postId)
           .maybeSingle();
 
         if (post?.whs_score_id) {

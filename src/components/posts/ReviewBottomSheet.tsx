@@ -35,7 +35,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Play } from 'lucide-react';
+import { MapPin, Play, Share, User } from 'lucide-react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
@@ -51,6 +51,10 @@ import { getRatingTierLabel } from '@/lib/ratingTier';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
+import { GlassCardFootAction } from '@/features/courses/_shared/scorecard/GlassCardFootAction';
+import { LikedByRow } from '@/components/likes/LikedByRow';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { toast } from '@/lib/toast';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
    a caption would take: this sheet's payload is three paragraphs of member
@@ -106,6 +110,7 @@ export interface ReviewBottomSheetProps {
   resolvedAggregate?: { avg_overall_score?: number | null; review_count?: number | null } | null;
   /** G2.5 — false while the prose read is still open; the empty-state line stays silent. */
   proseSettled?: boolean;
+  reactionCount?: number;
 }
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
@@ -151,6 +156,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   resolvedMedia,
   resolvedAggregate,
   proseSettled = true,
+  reactionCount = 0,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
@@ -273,6 +279,22 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
       : `/courses/${courseId}?tab=reviews`;
     navigate(url);
   }, [courseId, reviewId, navigate, onClose, closeFullscreen]);
+
+  const handleShare = useCallback(() => {
+    if (!reviewId || !courseId) return;
+    const shareUrl = `${window.location.origin}/courses/${courseId}?tab=reviews&review=${reviewId}`;
+    analyticsEvents.track('review_share_opened', { review_id: reviewId, course_id: courseId });
+    if (navigator.share) {
+      navigator.share({
+        title: courseName,
+        text: `${user.name}'s review of ${courseName}`,
+        url: shareUrl,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied');
+    }
+  }, [courseId, courseName, reviewId, user.name]);
 
   const locationStr = [courseSubCountry || courseRegion, courseCountry]
     .filter(Boolean)
@@ -496,6 +518,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 )}
               </div>
 
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
+                <SquircleAvatar size={28} src={user.avatar} alt={user.name} userId={user.id} fallback={initials} hairlineRing ringColor={DARK_HAIRLINE} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
+                  {metaSeg && <div style={{ marginTop: 2, fontSize: 12, color: BODY, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{metaSeg}</div>}
+                </div>
+              </div>
+
               {/* Community reference, without repeating the primary rating. */}
               {showReference && (
                 <div
@@ -700,104 +730,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               }}
 
             >
-              {/* Reviewer row */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  marginBottom: 10,
-                }}
-              >
-                <SquircleAvatar
-                  size={28}
-                  src={user.avatar}
-                  alt={user.name}
-                  userId={user.id}
-                  fallback={initials}
-                  hairlineRing
-                  ringColor={DARK_HAIRLINE}
-                />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 600,
-                      color: INK,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {user.name}
-                  </div>
-                  {metaSeg && (
-                    <div
-                      style={{
-                        marginTop: 2,
-                        fontSize: 12,
-                        color: BODY,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {metaSeg}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Two buttons */}
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button
-                  type="button"
-                  onClick={handleGoToReview}
-                  disabled={!courseId}
-                  style={{
-                    flex: 1,
-                    minHeight: 48,
-                    padding: '14px 12px',
-                    borderRadius: 10,
-                    background: INK,
-                    border: 'none',
-                    /* INK fill takes a CANVAS label. It was PANEL (#FFFFFF)
-                       before the flip, which would have been white-on-white. */
-                    color: CANVAS,
-                    /* CAPS BUTTON: two points down, caps at 0.10em, height unchanged. */
-                    fontSize: 13,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    cursor: courseId ? 'pointer' : 'default',
-                    opacity: courseId ? 1 : 0.5,
-                    fontFamily: 'inherit',
-                    letterSpacing: '0.10em',
-                  }}
-                >
-                  Go to review
-                </button>
-                <button
-                  type="button"
-                  onClick={handleGoToProfile}
-                  style={{
-                    flex: 1,
-                    minHeight: 48,
-                    padding: '14px 12px',
-                    borderRadius: 10,
-                    background: 'rgba(255,255,255,0.06)',
-                    border: `1px solid ${BORDER}`,
-                    color: INK,
-                    /* CAPS BUTTON: two points down, caps at 0.10em, height unchanged. */
-                    fontSize: 13,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    letterSpacing: '0.10em',
-                  }}
-                >
-                  Go to profile
-                </button>
+              {reviewId && reactionCount > 0 && (
+                <LikedByRow postId={reviewId} count={reactionCount} source="review" style={{ marginBottom: 8 }} />
+              )}
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${reviewId && courseId ? 3 : 2}, minmax(0, 1fr))` }}>
+                <GlassCardFootAction label={t('scorecard.viewProfile')} onClick={handleGoToProfile} icon={User} disabled={!user.id} />
+                <GlassCardFootAction label={t('scorecard.viewCourse')} onClick={handleGoToReview} icon={MapPin} disabled={!courseId} />
+                {reviewId && courseId && <GlassCardFootAction label={t('scorecard.shareRound')} onClick={handleShare} icon={Share} />}
               </div>
             </div>
           </motion.div>
