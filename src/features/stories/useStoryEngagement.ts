@@ -64,7 +64,7 @@ export function useStoryEngagement(
     return [...seen].sort();
   }, [storyIds]);
 
-  const { data } = useQuery<Row[]>({
+  const { data, isFetched } = useQuery<Row[]>({
     queryKey: ['story-engagement', targetType, ids.join(',')],
     enabled: ids.length > 0,
     staleTime: 60_000,
@@ -97,7 +97,9 @@ export function useStoryEngagement(
     [map],
   );
 
-  return { engagementFor };
+  /** SETTLED IS NOT "NOT LOADING": an id-gated query reports not-loading before
+   *  it has ever run, so readiness keys must read `isFetched` (or no ids at all). */
+  return { engagementFor, isSettled: ids.length === 0 || isFetched };
 }
 
 export default useStoryEngagement;
