@@ -981,21 +981,23 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   />
                 </div>
               )}
-              {engagement && engagement.likeCount > 0 && (
+              {engagement?.postId && engagement.likeCount > 0 && (
                 <LikedByRow
-                  postId={engagement.postId ?? null}
+                  postId={engagement.postId}
                   count={engagement.likeCount}
                   style={{ marginTop: 8 }}
                 />
               )}
               {engagement?.comment && engagement.comment.count > 0 && engagement.commentPreview && (
-                <FeedCommentPreview
-                  preview={engagement.commentPreview}
-                  commentCount={engagement.comment.count}
-                  onOpenComments={engagement.comment.onOpen}
-                  topRule={false}
-                  padding="0"
-                />
+                <div style={{ marginTop: 8 }}>
+                  <FeedCommentPreview
+                    preview={engagement.commentPreview}
+                    commentCount={engagement.comment.count}
+                    onOpenComments={engagement.comment.onOpen}
+                    topRule={false}
+                    padding="0"
+                  />
+                </div>
               )}
               <div
                 data-scorecard-exit-links="true"
