@@ -61,7 +61,10 @@ export function routeForNotif(input: NotifRouteInput): string {
     }
     if (src === 'review') {
       const cid = data.course_id;
-      const rid = data.review_id ?? (entity_type === 'review' ? entity_id : null);
+      // rating_id is the legacy key notify_friends_on_course_review() wrote, kept
+      // as a fallback so notifications already in the table resolve without a
+      // backfill.
+      const rid = data.review_id ?? data.rating_id ?? (entity_type === 'review' ? entity_id : null);
       if (cid && rid) return `/courses/${cid}?tab=reviews&review=${rid}`;
       if (cid) return `/courses/${cid}?tab=reviews`;
     }
@@ -101,7 +104,14 @@ export function routeForNotif(input: NotifRouteInput): string {
     type === 'review_response_posted'
   ) {
     const cid = data.course_id;
-    const rid = data.review_id ?? entity_id;
+    // entity_id on these rows is the COURSE, never the review — falling back to
+    // it built a review id that can never match, so the push tap was broken in
+    // exactly the same way as the in-app row. rating_id resolves rows already in
+    // the table without a backfill.
+    const rid =
+      data.review_id ??
+      data.rating_id ??
+      (entity_type === 'review' ? entity_id : null);
     if (cid && rid) return `/courses/${cid}?tab=reviews&review=${rid}`;
     if (cid) return `/courses/${cid}?tab=reviews`;
   }
