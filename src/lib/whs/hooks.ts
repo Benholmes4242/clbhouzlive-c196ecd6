@@ -67,6 +67,14 @@ export function useRoundDetail(
   });
 }
 
+export function prefetchRoundDetail(queryClient: ReturnType<typeof useQueryClient>, scoreId: string) {
+  return queryClient.prefetchQuery({
+    queryKey: whsKeys.roundDetail(scoreId),
+    queryFn: () => fetchRoundDetail(scoreId),
+    staleTime: 60_000,
+  });
+}
+
 export function useFriendRoundDetail(
   scoreId: string | null | undefined,
   enabled: boolean = true,

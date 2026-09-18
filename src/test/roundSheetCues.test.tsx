@@ -261,21 +261,12 @@ describe('the scorecard presentation split', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it('holds a cold open for 150ms and then mounts the full-height skeleton', () => {
+  it('leaves cold-open timing to the host readiness gate', () => {
     vi.useFakeTimers();
     const { rerender } = render(<CardScorecardSheet {...props} loading />);
     expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeNull();
-    act(() => vi.advanceTimersByTime(149));
-    expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeNull();
-    act(() => vi.advanceTimersByTime(1));
-    expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeTruthy();
-    expect(document.querySelector('[data-scorecard-skeleton="true"]')).toBeTruthy();
-    const card = document.querySelector('[data-scorecard-glass-card="true"]') as HTMLElement;
-    expect(card.style.transition).not.toContain('height');
-    expect(card.style.height).toBe('auto');
     rerender(<CardScorecardSheet {...props} loading={false} />);
-    expect(card.style.transition).not.toContain('height');
-    expect(card.style.height).toBe('auto');
+    expect(document.querySelector('[data-scorecard-overlay="true"]')).toBeTruthy();
     vi.useRealTimers();
   });
 
@@ -310,8 +301,7 @@ describe('the scorecard presentation split', () => {
     const engagement = document.querySelector('[data-round-engagement="comment-heart"]') as HTMLElement;
     const links = document.querySelector('[data-scorecard-exit-links="true"]') as HTMLElement;
     expect(engagement).toBeTruthy();
-    expect(links.style.justifyContent).toBe('space-evenly');
-    expect(links.style.whiteSpace).toBe('nowrap');
+    expect(links.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
     expect(links.children).toHaveLength(3);
   });
 

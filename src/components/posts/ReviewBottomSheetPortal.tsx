@@ -4,6 +4,10 @@ import { ReviewBottomSheet } from './ReviewBottomSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useCreationOverlayStore } from '@/stores/creationOverlayStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { useReviewFallback } from '@/hooks/useReviewFallback';
+import { useReviewMedia } from './useReviewMedia';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import { useFrozenOpenGate } from '@/hooks/useFrozenOpenGate';
 
 /**
  * Single root-level mount for ReviewBottomSheet.
@@ -23,6 +27,16 @@ export const ReviewBottomSheetPortal: React.FC = () => {
   const payload = useReviewSheetStore((s) => s.payload);
   const close = useReviewSheetStore((s) => s.close);
   const location = useLocation();
+  const hasText = !!payload?.reviewText;
+  const hasBreakdown = !!payload?.breakdown && Object.values(payload.breakdown).some((value) => value != null);
+  const fallbackQuery = useReviewFallback({ reviewId: payload?.reviewId ?? null, enabled: isOpen, hasText, hasBreakdown });
+  const mediaQuery = useReviewMedia(payload?.reviewId ?? null, isOpen);
+  const aggregateQuery = useCourseRatingAggregates(isOpen ? payload?.courseId : undefined);
+  const gate = useFrozenOpenGate('review', isOpen, {
+    fallback: !payload?.reviewId || (hasText && hasBreakdown) || fallbackQuery.isFetched,
+    media: !payload?.reviewId || mediaQuery.isFetched,
+    aggregate: !payload?.courseId || aggregateQuery.isFetched,
+  });
 
   // Pause every engine lane when the sheet opens. Null-caller = engine-wide
   // pause, which also passes the borrow-guard so a borrowed feed lane stops.
@@ -62,7 +76,7 @@ export const ReviewBottomSheetPortal: React.FC = () => {
 
   return (
     <ReviewBottomSheet
-      isOpen={isOpen}
+      isOpen={isOpen && gate.visible}
       onClose={close}
       user={payload.user}
       courseId={payload.courseId}
@@ -74,6 +88,10 @@ export const ReviewBottomSheetPortal: React.FC = () => {
       courseSubCountry={payload.courseSubCountry}
       reviewText={payload.reviewText}
       breakdown={payload.breakdown ?? null}
+      resolvedReviewText={payload.reviewText ?? (gate.included.fallback ? fallbackQuery.data?.reviewText : null) ?? null}
+      resolvedBreakdown={payload.breakdown ?? (gate.included.fallback ? fallbackQuery.data?.breakdown : null) ?? null}
+      resolvedMedia={gate.included.media ? (mediaQuery.data ?? []) : []}
+      resolvedAggregate={gate.included.aggregate ? (aggregateQuery.data ?? null) : null}
       reviewerStats={payload.reviewerStats ?? null}
     />
   );

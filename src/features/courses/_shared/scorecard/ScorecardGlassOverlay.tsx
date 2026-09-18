@@ -8,7 +8,6 @@ const AXIS_LOCK_PX = 8;
 const AXIS_RATIO = 1.2;
 const CLOSE_DISTANCE_PX = 100;
 const CLOSE_VELOCITY = 0.6;
-const OPEN_HOLD_MS = 150;
 const ENTER_OPACITY_MS = 180;
 const ENTER_TRANSFORM_MS = 240;
 const EXIT_MS = 140;
@@ -16,7 +15,7 @@ const EXIT_MS = 140;
 interface ScorecardGlassOverlayProps {
   open: boolean;
   onClose: () => void;
-  /** Hole data is ready. A cold overlay waits at most 150ms before showing. */
+  /** Host-owned readiness gate. Retained for additive caller compatibility. */
   contentReady?: boolean;
   onHorizontalDrag?: {
     onStart: () => void;
@@ -75,12 +74,7 @@ export function ScorecardGlassOverlay({
       };
     }
     if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);
-    if (contentReady) {
-      setMounted(true);
-      return;
-    }
-    const hold = window.setTimeout(() => setMounted(true), OPEN_HOLD_MS);
-    return () => window.clearTimeout(hold);
+    if (contentReady) setMounted(true);
   }, [open, contentReady, presentation]);
 
   useEffect(() => {

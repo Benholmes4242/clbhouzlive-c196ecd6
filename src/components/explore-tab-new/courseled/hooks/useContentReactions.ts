@@ -93,7 +93,7 @@ export function useContentReactions(
     [ids],
   );
 
-  const { data, isError } = useQuery<CacheShape>({
+  const { data, isError, isFetched } = useQuery<CacheShape>({
     queryKey,
     enabled: ids.length > 0,
     staleTime: 30_000,
@@ -212,6 +212,7 @@ export function useContentReactions(
     unavailable,
     /** Null when signed out; the whole layer is inert. */
     viewerId,
+    isSettled: ids.length === 0 || isFetched,
     stateFor,
     toggle,
   };

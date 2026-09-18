@@ -99,6 +99,11 @@ export interface ReviewBottomSheetProps {
   courseSubtitle?: string | null;
   /** Optional review media, when the calling surface already holds it. */
   media?: ReviewMediaItem[] | null;
+  /** Host-resolved values freeze at the readiness gate for this open. */
+  resolvedReviewText?: string | null;
+  resolvedBreakdown?: ReviewBottomSheetProps['breakdown'];
+  resolvedMedia?: ReviewMediaItem[] | null;
+  resolvedAggregate?: { avg_overall_score?: number | null; review_count?: number | null } | null;
 }
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
@@ -139,6 +144,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   reviewerStats,
   reviewDate,
   media,
+  resolvedReviewText,
+  resolvedBreakdown,
+  resolvedMedia,
+  resolvedAggregate,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
@@ -164,8 +173,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     hasText,
     hasBreakdown,
   });
-  const effectiveReviewText = reviewText ?? fallback?.reviewText ?? null;
-  const effectiveBreakdown = hasBreakdown ? breakdown : (fallback?.breakdown ?? breakdown ?? null);
+  const effectiveReviewText = resolvedReviewText !== undefined ? resolvedReviewText : (reviewText ?? fallback?.reviewText ?? null);
+  const effectiveBreakdown = resolvedBreakdown !== undefined ? resolvedBreakdown : (hasBreakdown ? breakdown : (fallback?.breakdown ?? breakdown ?? null));
   if (isOpen) {
     // eslint-disable-next-line no-console
     console.debug('[review-sheet] state', {
@@ -281,14 +290,15 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   // that already read them (course detail, discover) React Query dedupes and
   // no extra network call happens. No SQL was needed.
   const { data: agg } = useCourseRatingAggregates(isOpen ? courseId : undefined);
-  const communityAvg = agg?.avg_overall_score ?? null;
-  const ratingCount = agg?.review_count ?? 0;
+  const effectiveAggregate = resolvedAggregate !== undefined ? resolvedAggregate : agg;
+  const communityAvg = effectiveAggregate?.avg_overall_score ?? null;
+  const ratingCount = effectiveAggregate?.review_count ?? 0;
   const showReference =
     rating != null && communityAvg != null && ratingCount >= 3;
 
   // MEDIA (§3c) — prop when a caller has it, otherwise a lazy read.
   const { data: fetchedMedia } = useReviewMedia(reviewId ?? null, isOpen && !media?.length);
-  const allMedia = (media?.length ? media : fetchedMedia) ?? [];
+  const allMedia = (resolvedMedia !== undefined ? resolvedMedia : (media?.length ? media : fetchedMedia)) ?? [];
   const mediaTotal = allMedia.length;
   const mediaStrip = allMedia.slice(0, 3);
 

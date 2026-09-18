@@ -13,7 +13,7 @@
  * The hook is a no-op when `reviewId` is null, the sheet is closed, or every
  * field is already populated.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, type QueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface ReviewFallbackFields {
@@ -24,6 +24,31 @@ export interface ReviewFallbackFields {
     clubhouse: number | null;
     facilities: number | null;
   } | null;
+}
+
+export const reviewFallbackKey = (reviewId: string) => ['review-fallback', reviewId] as const;
+
+export async function fetchReviewFallback(reviewId: string): Promise<ReviewFallbackFields | null> {
+  const { data, error } = await supabase
+    .from('course_ratings')
+    .select('review, design_score, condition_score, clubhouse_score, facilities_score')
+    .eq('id', reviewId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    reviewText: (data.review as string | null) ?? null,
+    breakdown: {
+      design: data.design_score != null ? Number(data.design_score) : null,
+      conditions: data.condition_score != null ? Number(data.condition_score) : null,
+      clubhouse: data.clubhouse_score != null ? Number(data.clubhouse_score) : null,
+      facilities: data.facilities_score != null ? Number(data.facilities_score) : null,
+    },
+  };
+}
+
+export function prefetchReviewFallback(queryClient: QueryClient, reviewId: string) {
+  return queryClient.prefetchQuery({ queryKey: reviewFallbackKey(reviewId), queryFn: () => fetchReviewFallback(reviewId), staleTime: 5 * 60 * 1000 });
 }
 
 interface Params {
@@ -37,40 +62,13 @@ export function useReviewFallback({ reviewId, enabled, hasText, hasBreakdown }: 
   const needsFetch = enabled && !!reviewId && (!hasText || !hasBreakdown);
 
   return useQuery<ReviewFallbackFields | null>({
-    queryKey: ['review-fallback', reviewId],
+    queryKey: reviewFallbackKey(reviewId ?? ''),
     enabled: needsFetch,
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     queryFn: async () => {
       if (!reviewId) return null;
-      // eslint-disable-next-line no-console
-      console.debug('[review-fallback] fetching', { reviewId, hasText, hasBreakdown });
-      const { data, error } = await supabase
-        .from('course_ratings')
-        .select('review, design_score, condition_score, clubhouse_score, facilities_score')
-        .eq('id', reviewId)
-        .maybeSingle();
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.error('[review-fallback] error', error);
-        throw error;
-      }
-      // eslint-disable-next-line no-console
-      console.debug('[review-fallback] result', {
-        reviewId,
-        hasReview: !!data?.review,
-        len: data?.review?.length ?? 0,
-      });
-      if (!data) return null;
-      return {
-        reviewText: (data.review as string | null) ?? null,
-        breakdown: {
-          design: data.design_score != null ? Number(data.design_score) : null,
-          conditions: data.condition_score != null ? Number(data.condition_score) : null,
-          clubhouse: data.clubhouse_score != null ? Number(data.clubhouse_score) : null,
-          facilities: data.facilities_score != null ? Number(data.facilities_score) : null,
-        },
-      };
+      return fetchReviewFallback(reviewId);
     },
   });
 }

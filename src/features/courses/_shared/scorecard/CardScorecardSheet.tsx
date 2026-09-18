@@ -1,6 +1,7 @@
 import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MapPin, Share, User, type LucideIcon } from 'lucide-react';
 
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { ScorecardGlassOverlay } from './ScorecardGlassOverlay';
@@ -19,7 +20,7 @@ import { formatHcp } from '@/lib/formatHcp';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
-  A, SANS, FIGS, Panel, Action,
+  A, SANS, FIGS, Panel,
 } from '@/features/courses/components/holes/analytical/tokens';
 /**
  * BRIEF_ROUND_SHEET_PEEK §1 — THE SHARED PARTS.
@@ -201,6 +202,15 @@ export interface CardScorecardEngagement {
   likeLabel: string;
   /** Absent when the round has no post — no comment affordance at all (§1.6). */
   comment?: { count: number; label: string; onOpen: () => void } | null;
+}
+
+function FootAction({ label, onClick, icon: Icon }: { label: string; onClick: () => void; icon: LucideIcon }) {
+  return (
+    <button type="button" onClick={onClick} style={{ width: '100%', minHeight: 44, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'none', border: 0, padding: 2, color: A.INK, cursor: 'pointer', fontFamily: SANS }}>
+      <Icon size={17} strokeWidth={1.75} />
+      <span style={{ maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.MUTE }}>{label}</span>
+    </button>
+  );
 }
 
 /* `ScorecardSection`, `fmtRel` and `toParColor` moved to scorecardParts. */
@@ -933,10 +943,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             <div
               data-scorecard-interactive="true"
               onClick={(event) => event.stopPropagation()}
-              style={{ display: 'flex', alignItems: 'center', columnGap: 8, rowGap: 4, flexWrap: 'wrap', paddingTop: 2 }}
+              style={{ paddingTop: 2 }}
             >
               {engagement && (
-                <span style={{ flex: 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
                   <RoundEngagementActions
                     comment={engagement.comment ?? null}
                     like={{
@@ -947,18 +957,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                       label: engagement.likeLabel,
                     }}
                   />
-                </span>
+                </div>
               )}
               <div
                 data-scorecard-exit-links="true"
                 style={{
-                  flex: '1 0 260px', minWidth: 0, display: 'flex', alignItems: 'center',
-                  justifyContent: 'space-evenly', whiteSpace: 'nowrap',
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${[onViewProfile, onViewCourse, onShareRound].filter(Boolean).length}, minmax(0, 1fr))`,
                 }}
               >
-                {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
-                {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
-                {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
+                {onViewProfile && <FootAction label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} icon={User} />}
+                {onViewCourse && <FootAction label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} icon={MapPin} />}
+                {onShareRound && <FootAction label={t('courses:scorecard.shareRound')} onClick={onShareRound} icon={Share} />}
               </div>
             </div>
           )}

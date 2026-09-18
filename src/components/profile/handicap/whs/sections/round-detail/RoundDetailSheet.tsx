@@ -28,6 +28,7 @@ import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hoo
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { supabase } from '@/integrations/supabase/client';
 import { coursePlaceLine } from '@/features/explore-magazine/placeLine';
+import { useFrozenOpenGate } from '@/hooks/useFrozenOpenGate';
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
@@ -346,6 +347,20 @@ export const RoundDetailSheet: React.FC<Props> = ({
     ),
     { postIdFor: () => postInfo?.postId ?? null },
   );
+  const overlayGate = useFrozenOpenGate('scorecard', open && presentation === 'overlay', {
+    round: roundSettled,
+    context: !scoreId || contextQuery.isFetched,
+    reactions: reactions.isSettled,
+    comments: roundPosts.isSettled,
+    field: !analysisCourseId || analysisQuery.isFetched,
+  });
+  const cardOpen = presentation === 'page' ? open : open && overlayGate.visible;
+  const include = presentation === 'page'
+    ? { round: true, context: true, reactions: true, comments: true, field: true }
+    : overlayGate.included;
+  const stableHoles = include.round ? shownHoles : [];
+  const stableContext = include.context ? ctx : null;
+  const stableFieldPlayers = include.field ? fieldPlayers : null;
   const [commentsOpen, setCommentsOpen] = useState(initialCommentsOpen);
   useEffect(() => {
     if (open) setCommentsOpen(initialCommentsOpen);
@@ -367,29 +382,30 @@ export const RoundDetailSheet: React.FC<Props> = ({
           : null,
       }
     : null;
+  const stableEngagement = include.reactions && include.comments ? engagement : null;
 
   return (
     <>
     <CardScorecardSheet
-      open={open}
+      open={cardOpen}
       onClose={onClose}
       eyebrowText={eyebrowText}
       courseName={courseName}
       courseLocation={courseLocation}
       coursePar={coursePar}
       courseSlope={courseSlope}
-      holes={shownHoles}
-      feat={feat}
+      holes={stableHoles}
+      feat={include.round ? feat : null}
       nineHole={!!userData?.is_nine_hole}
       /* §1.3 — A SEEDED CARD NEVER SHOWS THE SKELETON. Without a seed the
          behaviour is exactly today's. */
-      loading={!usingSeed && isRoundLoading}
+      loading={false}
       surface="member"
-      courseContext={ctx ? {
-        yourAvgToPar: ctx.your_avg_to_par,
-        avgToParOthers: ctx.avg_to_par_others,
-        roundsHere: ctx.rounds_here,
-        rankHere: ctx.rank_here,
+      courseContext={stableContext ? {
+        yourAvgToPar: stableContext.your_avg_to_par,
+        avgToParOthers: stableContext.avg_to_par_others,
+        roundsHere: stableContext.rounds_here,
+        rankHere: stableContext.rank_here,
         /* §C — the index this round was played off, straight from the provider's
            score record. No new query: userQuery already carries it. Null stays
            null; the sheet omits the figure rather than showing today's index. */
@@ -401,7 +417,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       playerHcpDelta={handicapDelta ?? null}
       playerUserId={profileUserId ?? null}
       subjectIsViewer={isOwnRound}
-      fieldPlayers={fieldPlayers}
+      fieldPlayers={stableFieldPlayers}
       onViewProfile={onViewProfile}
       onViewCourse={onViewCourse}
       onShareRound={onShareRound}
@@ -409,7 +425,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       emptyGross={grossVal}
       emptyToPar={toParVal}
       presentation={presentation}
-      engagement={engagement}
+      engagement={stableEngagement}
       onHorizontalDrag={onHorizontalDrag}
       onStatsSeen={onStatsSeen}
       pageShift={pageShift}

@@ -56,7 +56,10 @@ export const tapReset: React.CSSProperties = {
   padding: 0,
   color: 'inherit',
   fontFamily: SANS,
+  cursor: 'pointer',
 };
+
+const storyButtonClass = 'opacity-100 active:opacity-80 transition-opacity duration-100';
 
 export function tagFor(story: NewsStory) {
   return (
@@ -112,7 +115,7 @@ export function HeroStory({
 }) {
   return (
     <>
-      <Button variant="ghost" onClick={onOpen} style={{ ...tapReset, display: 'block' }} aria-label={`Read ${story.headline}`}>
+      <button type="button" className={storyButtonClass} onClick={onOpen} style={{ ...tapReset, display: 'block' }} aria-label={`Read ${story.headline}`}>
         <article style={{ position: 'relative', height: 340, overflow: 'hidden', background: A.PANEL }}>
           {story.image_url && (
             <img src={story.image_url} alt="" loading="eager" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -132,7 +135,7 @@ export function HeroStory({
             )}
           </div>
         </article>
-      </Button>
+      </button>
       {attachedContent}
       {showEngagement && (
         <div style={{ margin: `11px ${gutter}px 0` }}>
@@ -147,14 +150,14 @@ export function HeroStory({
 export function FeatureStory({ story, onOpen, engagement, engagementAction, showEngagement = true }: StoryShapeProps & { showEngagement?: boolean }) {
   return (
     <article style={{ height: 199 }}>
-      <Button variant="ghost" onClick={onOpen} style={{ ...tapReset, display: 'block' }} aria-label={`Read ${story.headline}`}>
+      <button type="button" className={storyButtonClass} onClick={onOpen} style={{ ...tapReset, display: 'block' }} aria-label={`Read ${story.headline}`}>
         <div style={{ position: 'relative', width: '100%', height: 112, minHeight: 112, maxHeight: 112, flex: 'none', borderRadius: r.sm, overflow: 'hidden', background: A.PANEL }}>
           {story.image_url && <img src={story.image_url} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: 112, minHeight: 112, maxHeight: 112, objectFit: 'cover', display: 'block', flex: 'none' }} />}
           <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.76))' }} />
           <div style={{ ...COLUMN, position: 'absolute', left: 9, right: 9, bottom: 8, color: 'rgba(248,250,252,0.82)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tagFor(story)}</div>
         </div>
         <h2 style={{ margin: '9px 0 0', height: '53.76px', fontSize: 14, fontWeight: 700, lineHeight: 1.28, letterSpacing: 0, color: A.INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden', textOverflow: 'ellipsis', overflowWrap: 'anywhere' }}>{story.headline}</h2>
-      </Button>
+      </button>
       <div style={{ marginTop: 7, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
         <span style={{ ...COLUMN, color: A.DIM, letterSpacing: 0, whiteSpace: 'nowrap' }}>{relativeDate(story)}</span>
         {showEngagement ? (engagementAction ?? <StoryRowEngagement engagement={engagement} inkColor={A.DIM} size={13} />) : null}
@@ -167,13 +170,13 @@ export function FeatureStory({ story, onOpen, engagement, engagementAction, show
 export function WorkhorseRow({ story, onOpen, engagement, engagementAction, showEngagement = true }: StoryShapeProps & { showEngagement?: boolean }) {
   return (
     <article style={{ position: 'relative', width: '100%', height: 119, boxSizing: 'border-box', padding: '13px 0' }}>
-      <Button variant="ghost" onClick={onOpen} style={{ ...tapReset, display: 'flex', gap: 12 }} aria-label={`Read ${story.headline}`}>
+      <button type="button" className={storyButtonClass} onClick={onOpen} style={{ ...tapReset, display: 'flex', gap: 12 }} aria-label={`Read ${story.headline}`}>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ ...COLUMN, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tagFor(story)}{relativeDate(story) ? ` · ${relativeDate(story)}` : ''}</div>
           <h2 style={{ margin: '5px 0 0', height: '56.55px', fontSize: 14.5, fontWeight: 700, lineHeight: 1.3, letterSpacing: 0, color: A.INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden', textOverflow: 'ellipsis', overflowWrap: 'anywhere' }}>{story.headline}</h2>
         </div>
         {story.image_url && <img src={story.image_url} alt="" loading="lazy" decoding="async" style={{ width: 74, height: 74, borderRadius: r.sm, objectFit: 'cover', flexShrink: 0, background: A.PANEL }} />}
-      </Button>
+      </button>
       {showEngagement ? (
         <div style={{ position: 'absolute', left: 0, bottom: 13 }}>
           {engagementAction ?? <StoryRowEngagement engagement={engagement} inkColor={A.DIM} size={13} />}
