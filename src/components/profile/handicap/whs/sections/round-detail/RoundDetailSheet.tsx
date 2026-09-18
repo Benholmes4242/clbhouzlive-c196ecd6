@@ -330,26 +330,26 @@ export const RoundDetailSheet: React.FC<Props> = ({
     : undefined;
 
   /**
-   * ENGAGEMENT (BRIEF_ROUND_COMMENTS_EVERYWHERE §S2.2). The like is the SAME
-   * content_reactions row Discover writes — the hook patches every cache window
-   * holding this score id, so the heart agrees the moment either surface moves.
-   * The comment target is the round's post, resolved through the one-to-one
-   * whs_score_id mapping; with no post there is no comment control.
+   * ENGAGEMENT (G7 — THE CARD STOPS DEPENDING ON A POST). Both halves key on the
+   * SCORE ID: the like is the content_reactions row Discover writes, and the
+   * comment is now a comments_v2 row with target_type 'round' on the same id. No
+   * post is read, so a round without one keeps every affordance. The count comes
+   * from get_story_engagement — the same counter the reactions use, never a
+   * denormalised column that can disagree.
    */
   const scoreIdList = useMemo(() => (scoreId ? [scoreId] : []), [scoreId]);
-  const roundPosts = useRoundPostComments(scoreIdList);
-  const postInfo = roundPosts.infoFor(scoreId);
-  const previewPostIds = useMemo(
-    () => (postInfo?.postId && postInfo.commentCount > 0 ? [postInfo.postId] : []),
-    [postInfo?.postId, postInfo?.commentCount],
+  const roundEngagement = useStoryEngagement('round', scoreIdList);
+  const commentCount = roundEngagement.engagementFor(scoreId).commentCount;
+  const previewIds = useMemo(
+    () => (scoreId && commentCount > 0 ? [scoreId] : []),
+    [scoreId, commentCount],
   );
-  const commentPreviews = useFeedCommentPreview(previewPostIds, 'round-scorecard');
+  const commentPreviews = useFeedCommentPreview(previewIds, 'round-scorecard', 'round');
   const reactions = useContentReactions(
     useMemo(
       () => (scoreId ? [{ type: 'round' as const, id: scoreId }] : []),
       [scoreId],
     ),
-    { postIdFor: () => postInfo?.postId ?? null },
   );
   /**
    * G2.2 — THE SUBJECT GATE. The hole rows ARE the scorecard, so the card does
