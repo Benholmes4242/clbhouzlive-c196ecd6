@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { SC_FILL_BIRDIE_DK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 /**
@@ -12,7 +12,8 @@ import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
  * two greens once shipped side by side. The tokens are:
  *   gold  SC_FILL_GOLD      retained as the canonical achievement gold
  *   green A.GREEN           the one analytical / movement green (rank up)
- *   red   TOPAR_UNDER_DARK  the canonical under-par red (birdie count)
+ *   red   SC_FILL_BIRDIE_DK the one birdie ring red, shared with the card
+ *         (CALLOUT_RED = TOPAR_UNDER_DARK remains the tour under-par token)
  *   white A.INK             retained as the canonical achievement ink
  */
 
@@ -75,11 +76,13 @@ export function RankUpIcon() {
   );
 }
 
-/** The birdie haul wears its own count: a red disc with a white numeral. */
+/** The birdie haul wears its own count: a red outline ring with a white
+ * numeral, matching the scorecard card's birdie mark (1.4 user units on the
+ * 24-unit box at 28px renders the card's 1.6px stroke). */
 export function BirdieCountIcon({ count }: { count: number }) {
   return (
     <Frame>
-      <circle cx="12" cy="12" r="10" fill={CALLOUT_RED} />
+      <circle cx="12" cy="12" r="10" fill="none" stroke={SC_FILL_BIRDIE_DK} strokeWidth="1.4" />
       <text
         x="12"
         y="12"
