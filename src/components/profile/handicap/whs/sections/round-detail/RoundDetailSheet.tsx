@@ -24,7 +24,7 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
-import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hooks/useRoundPostComments';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { supabase } from '@/integrations/supabase/client';
 import { coursePlaceLine } from '@/features/explore-magazine/placeLine';
@@ -330,26 +330,26 @@ export const RoundDetailSheet: React.FC<Props> = ({
     : undefined;
 
   /**
-   * ENGAGEMENT (BRIEF_ROUND_COMMENTS_EVERYWHERE §S2.2). The like is the SAME
-   * content_reactions row Discover writes — the hook patches every cache window
-   * holding this score id, so the heart agrees the moment either surface moves.
-   * The comment target is the round's post, resolved through the one-to-one
-   * whs_score_id mapping; with no post there is no comment control.
+   * ENGAGEMENT (G7 — THE CARD STOPS DEPENDING ON A POST). Both halves key on the
+   * SCORE ID: the like is the content_reactions row Discover writes, and the
+   * comment is now a comments_v2 row with target_type 'round' on the same id. No
+   * post is read, so a round without one keeps every affordance. The count comes
+   * from get_story_engagement — the same counter the reactions use, never a
+   * denormalised column that can disagree.
    */
   const scoreIdList = useMemo(() => (scoreId ? [scoreId] : []), [scoreId]);
-  const roundPosts = useRoundPostComments(scoreIdList);
-  const postInfo = roundPosts.infoFor(scoreId);
-  const previewPostIds = useMemo(
-    () => (postInfo?.postId && postInfo.commentCount > 0 ? [postInfo.postId] : []),
-    [postInfo?.postId, postInfo?.commentCount],
+  const roundEngagement = useStoryEngagement('round', scoreIdList);
+  const commentCount = roundEngagement.engagementFor(scoreId).commentCount;
+  const previewIds = useMemo(
+    () => (scoreId && commentCount > 0 ? [scoreId] : []),
+    [scoreId, commentCount],
   );
-  const commentPreviews = useFeedCommentPreview(previewPostIds, 'round-scorecard');
+  const commentPreviews = useFeedCommentPreview(previewIds, 'round-scorecard', 'round');
   const reactions = useContentReactions(
     useMemo(
       () => (scoreId ? [{ type: 'round' as const, id: scoreId }] : []),
       [scoreId],
     ),
-    { postIdFor: () => postInfo?.postId ?? null },
   );
   /**
    * G2.2 — THE SUBJECT GATE. The hole rows ARE the scorecard, so the card does
@@ -365,19 +365,19 @@ export const RoundDetailSheet: React.FC<Props> = ({
     () => ({
       context: !scoreId || contextQuery.isFetched,
       reactions: reactions.isSettled,
-      comments: roundPosts.isSettled,
+      comments: roundEngagement.isSettled,
       /**
        * G4.1(b) — A READINESS KEY MUST BE HONEST. The preview read is disabled
-       * when the post has no comments, so that id never enters settledIds; a
+       * when the round has no comments, so that id never enters settledIds; a
        * key that can never become true holds the cap open on every open. A
        * query that is not asked is trivially SETTLED.
        */
-      commentPreview: !postInfo?.postId
-        || postInfo.commentCount === 0
-        || commentPreviews.isSettled(postInfo.postId),
+      commentPreview: !scoreId
+        || commentCount === 0
+        || commentPreviews.isSettled(scoreId),
       field: !analysisCourseId || analysisQuery.isFetched,
     }),
-    [scoreId, contextQuery.isFetched, reactions.isSettled, roundPosts.isSettled, postInfo?.postId, postInfo?.commentCount, commentPreviews, analysisCourseId, analysisQuery.isFetched],
+    [scoreId, contextQuery.isFetched, reactions.isSettled, roundEngagement.isSettled, commentCount, commentPreviews, analysisCourseId, analysisQuery.isFetched],
   );
   const overlayGate = useCardOpenGate('scorecard', open && presentation === 'overlay', {
     subject: shownHoles.length > 0 || roundSettled,
@@ -405,17 +405,16 @@ export const RoundDetailSheet: React.FC<Props> = ({
         likeMine: reactions.stateFor('round', scoreId).mine,
         onToggleLike: () => reactions.toggle('round', scoreId),
         likeLabel: t('discover.reactions.action', 'Like this round'),
-        postId: postInfo?.postId ?? null,
-        commentPreview: postInfo?.postId
-          ? commentPreviews.map.get(postInfo.postId) ?? null
-          : null,
-        comment: postInfo
-          ? {
-              count: postInfo.commentCount,
-              label: t('discover.comments.action', 'Comment on this round'),
-              onOpen: () => setCommentsOpen(true),
-            }
-          : null,
+        /* G7.3(b) — the liked-by line reads the SCORE's reactions, so a round
+           with likes and no post finally shows who left them. */
+        postId: scoreId,
+        likeSource: 'round' as const,
+        commentPreview: commentPreviews.map.get(scoreId) ?? null,
+        comment: {
+          count: commentCount,
+          label: t('discover.comments.action', 'Comment on this round'),
+          onOpen: () => setCommentsOpen(true),
+        },
       }
     : null;
   const settleKey = Object.keys(include)
@@ -473,12 +472,12 @@ export const RoundDetailSheet: React.FC<Props> = ({
       pagePreview={pagePreview}
       paging={paging}
     />
-    {commentsOpen && postInfo && (
+    {commentsOpen && scoreId && (
       <CommentsSheetV2
         isOpen
         onClose={() => setCommentsOpen(false)}
-        targetType="post"
-        targetId={postInfo.postId}
+        targetType="round"
+        targetId={scoreId}
       />
     )}
     </>

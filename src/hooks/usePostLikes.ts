@@ -18,7 +18,12 @@ interface RawLike {
   actor_id?: string | null;
 }
 
-export type LikeSource = 'post' | 'editorial' | 'review';
+/**
+ * G7.3(a) — 'round' keys on the WHS SCORE ID, 'review' on the review id: the
+ * two content_reactions subjects, read identically. A round no longer needs a
+ * post to show who liked it.
+ */
+export type LikeSource = 'post' | 'editorial' | 'review' | 'round';
 
 export function usePostLikes(postId: string | null, enabled: boolean, source: LikeSource = 'post') {
   return useQuery({
@@ -41,11 +46,12 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
         if (likesError) throw likesError;
         if (!data || data.length === 0) return [] as PostLiker[];
         likes = data.map(l => ({ user_id: l.user_id }));
-      } else if (source === 'review') {
+      } else if (source === 'review' || source === 'round') {
+        // content_reactions has no actor columns — always personal.
         const { data, error: likesError } = await supabase
           .from('content_reactions')
           .select('user_id')
-          .eq('target_type', 'review')
+          .eq('target_type', source)
           .eq('target_id', postId)
           .order('created_at', { ascending: false })
           .limit(200);

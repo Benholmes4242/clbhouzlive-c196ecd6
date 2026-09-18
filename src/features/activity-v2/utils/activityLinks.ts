@@ -201,6 +201,22 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
 
   // --- comment / reply -------------------------------------------------
   if (type === 'comment' || type === 'comment_post' || type === 'comment_reply') {
+    /* G7.2(e) — A COMMENT ON A ROUND OR A REVIEW GOES WHERE ITS LIKE GOES. The
+       same two destinations the `reaction` branch above resolves, from the same
+       payload keys the widened comments_v2_notify writes. No new routes. */
+    const targetType = data.target_type;
+    const targetId = data.target_id ?? null;
+    if (targetType === 'round') {
+      const scoreId = data.score_id ?? data.whs_score_id ?? targetId;
+      return scoreId ? `/handicap?score=${encodeURIComponent(scoreId)}` : '/handicap';
+    }
+    if (targetType === 'review') {
+      const cid = data.course_id;
+      const rid = data.review_id ?? targetId;
+      if (cid && rid) return `/courses/${cid}?tab=reviews&review=${rid}`;
+      if (cid) return `/courses/${cid}?tab=reviews`;
+      return '';
+    }
     const postId = data.post_id ?? (entity_type === 'post' ? entity_id : null);
     const commentId = data.comment_id ?? (entity_type === 'comment' ? entity_id : null);
     if (postId && commentId) return `/post/${postId}/comment/${commentId}`;

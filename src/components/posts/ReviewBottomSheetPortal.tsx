@@ -9,6 +9,8 @@ import { useReviewMedia } from './useReviewMedia';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCardOpenGate, useCoalescedBlocks } from '@/hooks/useCardOpenGate';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
+import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 
 /**
  * Single root-level mount for ReviewBottomSheet.
@@ -39,25 +41,50 @@ export const ReviewBottomSheetPortal: React.FC = () => {
   );
   const reactions = useContentReactions(reactionTargets);
   /**
+   * G7.2(c) — THE REVIEW HAS COMMENTS NOW. comments_v2 carries target_type
+   * 'review' on the review id, counted by get_story_engagement (the same counter
+   * the likes use) and previewed by the batched comment read. This reverses
+   * G3.2(d)/G3.3, which were right only while the target did not exist.
+   */
+  const reviewIdList = React.useMemo(
+    () => (payload?.reviewId ? [payload.reviewId] : []),
+    [payload?.reviewId],
+  );
+  const reviewEngagement = useStoryEngagement('review', reviewIdList);
+  const commentCount = reviewEngagement.engagementFor(payload?.reviewId).commentCount;
+  const previewIds = React.useMemo(
+    () => (payload?.reviewId && commentCount > 0 ? [payload.reviewId] : []),
+    [payload?.reviewId, commentCount],
+  );
+  const commentPreviews = useFeedCommentPreview(previewIds, 'review-card', 'review');
+  /**
    * G2.2 — THE SUBJECT IS THE PROSE AND THE BREAKDOWN. The sheet does not open
    * until they are in hand, uncapped. G2.3 — the photographs and the course
    * aggregate are SUPPORTING: never dropped, only late, and the 900ms cap only
    * decides whether the card waits for them before opening.
    */
   const subjectReady = !payload?.reviewId || (hasText && hasBreakdown) || fallbackQuery.isFetched;
-  const gate = useCardOpenGate('review', isOpen, {
-    subject: subjectReady,
-    supporting: {
+  /* ONE SET OF KEYS, BOTH CONSUMERS. The gate and the coalescer read the same
+     object, so a key can never be honest for one and stale for the other.
+     G4.1(b) — a read that is not asked for is trivially SETTLED. */
+  const supportingKeys = React.useMemo(
+    () => ({
       media: !payload?.reviewId || mediaQuery.isFetched,
       aggregate: !payload?.courseId || aggregateQuery.isFetched,
       reactions: !payload?.reviewId || reactions.isSettled,
-    },
+      comments: !payload?.reviewId || reviewEngagement.isSettled,
+      commentPreview: !payload?.reviewId
+        || commentCount === 0
+        || commentPreviews.isSettled(payload.reviewId),
+    }),
+    [payload?.reviewId, payload?.courseId, mediaQuery.isFetched, aggregateQuery.isFetched,
+     reactions.isSettled, reviewEngagement.isSettled, commentCount, commentPreviews],
+  );
+  const gate = useCardOpenGate('review', isOpen, {
+    subject: subjectReady,
+    supporting: supportingKeys,
   });
-  const supporting = useCoalescedBlocks({
-    media: !payload?.reviewId || mediaQuery.isFetched,
-    aggregate: !payload?.courseId || aggregateQuery.isFetched,
-    reactions: !payload?.reviewId || reactions.isSettled,
-  }, gate.visible);
+  const supporting = useCoalescedBlocks(supportingKeys, gate.visible);
   const reactionState = payload?.reviewId ? reactions.stateFor('review', payload.reviewId) : null;
 
   // Pause every engine lane when the sheet opens. Null-caller = engine-wide
@@ -118,6 +145,8 @@ export const ReviewBottomSheetPortal: React.FC = () => {
       reactionMine={!!reactionState?.mine}
       onToggleReaction={payload.reviewId ? () => reactions.toggle('review', payload.reviewId!) : undefined}
       reactionHidden={!reactions.viewerId || reactions.unavailable}
+      commentCount={commentCount}
+      commentPreview={payload.reviewId ? commentPreviews.map.get(payload.reviewId) ?? null : null}
       proseSettled={subjectReady}
       reviewerStats={payload.reviewerStats ?? null}
     />

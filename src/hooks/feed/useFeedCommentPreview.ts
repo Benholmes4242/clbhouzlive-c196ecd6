@@ -6,8 +6,9 @@
  * LightCardFeed) and pass the resulting Map down.
  *
  * RULES BAKED IN HERE:
- *  - target_type = 'post' ALWAYS. comments_v2 is generic (posts, rounds,
- *    reviews); a round comment on a post card would be a data leak.
+ *  - target_type is the CALLER'S, defaulting to 'post' (G7.2(d)). comments_v2 is
+ *    generic (posts, rounds, reviews) and the type is part of the query key, so
+ *    a round's ids can never resolve against a post card's window.
  *  - parent_id IS NULL ALWAYS. A reply is a reply to a comment, not a comment
  *    on the post, and must never be the preview.
  *  - The preview is the source of truth for what is DISPLAYED. If no comment
@@ -66,7 +67,11 @@ type Row = {
   actor_id: string | null;
 };
 
-export function useFeedCommentPreview(postIds: string[], scope: string) {
+export function useFeedCommentPreview(
+  postIds: string[],
+  scope: string,
+  targetType: 'post' | 'round' | 'review' = 'post',
+) {
   const { user } = useSupabaseSession();
   const batch = useMergedBatch<FeedCommentPreview>();
   const seenRef = useRef<Set<string>>(new Set());
@@ -78,7 +83,7 @@ export function useFeedCommentPreview(postIds: string[], scope: string) {
   }, [postIds]);
 
   const query = useQuery({
-    queryKey: feedKeys.postCommentPreview(scope, viewerId(user?.id), batchDigest(ids)),
+    queryKey: feedKeys.postCommentPreview(`${scope}:${targetType}`, viewerId(user?.id), batchDigest(ids)),
     placeholderData: keepPreviousData,
     enabled: ids.length > 0,
     staleTime: 60 * 1000,
@@ -87,7 +92,7 @@ export function useFeedCommentPreview(postIds: string[], scope: string) {
       const { data, error } = await supabase
         .from('comments_v2')
         .select('id, target_id, content, created_at, user_id, actor_type, actor_id')
-        .eq('target_type', 'post')
+        .eq('target_type', targetType)
         .in('target_id', ids)
         .is('parent_id', null)
         .order('created_at', { ascending: false })

@@ -26,6 +26,14 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export type StoryTargetType = 'tour_story' | 'amateur_story';
 
+/**
+ * G7.1(c) — THE SAME COUNTER SERVES THE ROUND AND THE REVIEW. get_story_engagement
+ * counts content_reactions and comments_v2 for ANY target type, so a round and a
+ * review read their comment count here rather than through a post's denormalised
+ * column. No second counter: a second counter is a second thing that can disagree.
+ */
+export type EngagementTargetType = StoryTargetType | 'round' | 'review';
+
 export interface StoryEngagement {
   likeCount: number;
   commentCount: number;
@@ -46,7 +54,7 @@ interface Row {
 }
 
 export function useStoryEngagement(
-  targetType: StoryTargetType,
+  targetType: EngagementTargetType,
   storyIds: readonly (string | null | undefined)[],
 ) {
   // Stable key: the sorted set of ids in the visible window.
@@ -56,7 +64,7 @@ export function useStoryEngagement(
     return [...seen].sort();
   }, [storyIds]);
 
-  const { data } = useQuery<Row[]>({
+  const { data, isFetched } = useQuery<Row[]>({
     queryKey: ['story-engagement', targetType, ids.join(',')],
     enabled: ids.length > 0,
     staleTime: 60_000,
@@ -89,7 +97,9 @@ export function useStoryEngagement(
     [map],
   );
 
-  return { engagementFor };
+  /** SETTLED IS NOT "NOT LOADING": an id-gated query reports not-loading before
+   *  it has ever run, so readiness keys must read `isFetched` (or no ids at all). */
+  return { engagementFor, isSettled: ids.length === 0 || isFetched };
 }
 
 export default useStoryEngagement;
