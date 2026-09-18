@@ -89,7 +89,9 @@ export function ScorecardGlassOverlay({
     if (!mounted || !open || presentation === 'page') return;
     const card = cardRef.current;
     if (!card) return;
-    const measuredHeight = Math.ceil(card.getBoundingClientRect().height);
+    // offsetHeight is the pre-transform layout height. Measuring the entry's
+    // 0.96-scaled bounding box would lock a cold skeleton about 4% too short.
+    const measuredHeight = card.offsetHeight;
     if (measuredHeight > 0) setLockedHeight(measuredHeight);
     setAnimating(true);
     const frame = requestAnimationFrame(() => setEntered(true));
