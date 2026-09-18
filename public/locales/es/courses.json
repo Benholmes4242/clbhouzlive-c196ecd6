@@ -224,7 +224,8 @@
     "noFieldNobody": "Nadie mas ha jugado aqui todavia, asi que no hay un grupo con el que comparar.",
     "fieldShort": "Campo",
     "swipeHint": "Desliza para la siguiente vuelta",
-    "shareRound": "Compartir"
+    "shareRound": "Compartir",
+    "likeReview": "Me gusta esta resena"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

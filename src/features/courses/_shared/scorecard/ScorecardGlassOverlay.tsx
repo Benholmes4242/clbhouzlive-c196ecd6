@@ -61,6 +61,8 @@ export function ScorecardGlassOverlay({
   const previousSettleKeyRef = useRef<string | null>(settleKey);
   const previousHeightRef = useRef<number | null>(null);
   const [pagingHeight, setPagingHeight] = useState<number | null>(null);
+  /** True once the entrance transform has finished; no height is read before it. */
+  const [entranceDone, setEntranceDone] = useState(false);
   const gesture = useRef<{
     x: number;
     y: number;
@@ -76,7 +78,15 @@ export function ScorecardGlassOverlay({
   useLayoutEffect(() => {
     const card = cardRef.current;
     if (!card || presentation !== 'overlay' || !mounted) return;
-    const nextHeight = card.getBoundingClientRect().height;
+    /**
+     * G4.2 — MEASURE LAYOUT, NOT THE TRANSFORM. getBoundingClientRect returns
+     * the transformed box, so a measurement taken during the 240ms entrance
+     * reads the card 4% small and every settle then animated up from a height
+     * no content produced. offsetHeight is the layout height, and nothing is
+     * measured until the entrance has finished.
+     */
+    if (!entranceDone) return;
+    const nextHeight = card.offsetHeight;
     const previousHeight = previousHeightRef.current;
     const pageChanged = previousPageKeyRef.current != null && previousPageKeyRef.current !== pageKey;
     const settleChanged = previousSettleKeyRef.current !== settleKey;
@@ -86,17 +96,21 @@ export function ScorecardGlassOverlay({
     if ((!pageChanged && !settleChanged) || previousHeight == null || Math.abs(previousHeight - nextHeight) < 1) return;
     /* G2.4(d) — reduced motion applies the new height instantly. */
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    setPagingHeight(previousHeight);
-    const frame = requestAnimationFrame(() => setPagingHeight(nextHeight));
+    /* G4.2(c) — an explicit height may never exceed the card's own ceiling. */
+    const ceiling = window.innerHeight * 0.82;
+    const clamp = (value: number) => Math.min(value, ceiling);
+    setPagingHeight(clamp(previousHeight));
+    const frame = requestAnimationFrame(() => setPagingHeight(clamp(nextHeight)));
     if (pagingTimerRef.current != null) window.clearTimeout(pagingTimerRef.current);
     pagingTimerRef.current = window.setTimeout(() => setPagingHeight(null), 220);
     return () => cancelAnimationFrame(frame);
-  }, [children, mounted, pageKey, settleKey, presentation]);
+  }, [children, mounted, pageKey, settleKey, presentation, entranceDone]);
 
   useEffect(() => {
     if (presentation === 'page') return;
     if (!open) {
       setEntered(false);
+      setEntranceDone(false);
       setDragY(0);
       setAnimating(true);
       if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);
@@ -115,9 +129,13 @@ export function ScorecardGlassOverlay({
   useEffect(() => {
     if (!mounted || !open || presentation === 'page') return;
     setAnimating(true);
+    setEntranceDone(false);
     const frame = requestAnimationFrame(() => setEntered(true));
     if (animationTimerRef.current != null) window.clearTimeout(animationTimerRef.current);
-    animationTimerRef.current = window.setTimeout(() => setAnimating(false), ENTER_TRANSFORM_MS);
+    animationTimerRef.current = window.setTimeout(() => {
+      setAnimating(false);
+      setEntranceDone(true);
+    }, ENTER_TRANSFORM_MS);
     return () => {
       cancelAnimationFrame(frame);
       if (animationTimerRef.current != null) window.clearTimeout(animationTimerRef.current);

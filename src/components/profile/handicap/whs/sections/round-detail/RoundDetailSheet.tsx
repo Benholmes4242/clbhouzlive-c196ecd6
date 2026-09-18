@@ -368,10 +368,18 @@ export const RoundDetailSheet: React.FC<Props> = ({
       context: !scoreId || contextQuery.isFetched,
       reactions: reactions.isSettled,
       comments: roundPosts.isSettled,
-      commentPreview: !postInfo?.postId || commentPreviews.isSettled(postInfo.postId),
+      /**
+       * G4.1(b) — A READINESS KEY MUST BE HONEST. The preview read is disabled
+       * when the post has no comments, so that id never enters settledIds; a
+       * key that can never become true holds the cap open on every open. A
+       * query that is not asked is trivially SETTLED.
+       */
+      commentPreview: !postInfo?.postId
+        || postInfo.commentCount === 0
+        || commentPreviews.isSettled(postInfo.postId),
       field: !analysisCourseId || analysisQuery.isFetched,
     }),
-    [scoreId, contextQuery.isFetched, reactions.isSettled, roundPosts.isSettled, postInfo?.postId, commentPreviews, analysisCourseId, analysisQuery.isFetched],
+    [scoreId, contextQuery.isFetched, reactions.isSettled, roundPosts.isSettled, postInfo?.postId, postInfo?.commentCount, commentPreviews, analysisCourseId, analysisQuery.isFetched],
   );
   const overlayGate = useCardOpenGate('scorecard', open && presentation === 'overlay', {
     subject: shownHoles.length > 0 || roundSettled,
@@ -382,8 +390,11 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const include = presentation === 'page'
     ? { context: true, reactions: true, comments: true, commentPreview: true, field: true }
     : coalesced;
-  const stableContext = include.context ? ctx : null;
-  const stableFieldPlayers = include.field ? fieldPlayers : null;
+  /**
+   * G4.1(a) — NOTHING IS DROPPED. `include` drives settleKey only, so the
+   * height animation knows when a coalesced arrival happened; every block
+   * renders from live data the moment it is in hand.
+   */
   const [commentsOpen, setCommentsOpen] = useState(initialCommentsOpen);
   useEffect(() => {
     if (open) setCommentsOpen(initialCommentsOpen);
@@ -397,7 +408,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
         onToggleLike: () => reactions.toggle('round', scoreId),
         likeLabel: t('discover.reactions.action', 'Like this round'),
         postId: postInfo?.postId ?? null,
-        commentPreview: include.commentPreview && postInfo?.postId
+        commentPreview: postInfo?.postId
           ? commentPreviews.map.get(postInfo.postId) ?? null
           : null,
         comment: postInfo
@@ -409,8 +420,6 @@ export const RoundDetailSheet: React.FC<Props> = ({
           : null,
       }
     : null;
-  /* G2.3 — the engagement pair is never dropped; it only arrives with the settle. */
-  const stableEngagement = include.reactions && include.comments && include.commentPreview ? engagement : null;
   const settleKey = Object.keys(include)
     .sort()
     .map((key) => `${key}:${(include as Record<string, boolean>)[key] ? 1 : 0}`)
@@ -435,11 +444,11 @@ export const RoundDetailSheet: React.FC<Props> = ({
          behaviour is exactly today's. */
       loading={false}
       surface="member"
-      courseContext={stableContext ? {
-        yourAvgToPar: stableContext.your_avg_to_par,
-        avgToParOthers: stableContext.avg_to_par_others,
-        roundsHere: stableContext.rounds_here,
-        rankHere: stableContext.rank_here,
+      courseContext={ctx ? {
+        yourAvgToPar: ctx.your_avg_to_par,
+        avgToParOthers: ctx.avg_to_par_others,
+        roundsHere: ctx.rounds_here,
+        rankHere: ctx.rank_here,
         /* §C — the index this round was played off, straight from the provider's
            score record. No new query: userQuery already carries it. Null stays
            null; the sheet omits the figure rather than showing today's index. */
@@ -451,7 +460,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       playerHcpDelta={handicapDelta ?? null}
       playerUserId={profileUserId ?? null}
       subjectIsViewer={isOwnRound}
-      fieldPlayers={stableFieldPlayers}
+      fieldPlayers={fieldPlayers}
       onViewProfile={onViewProfile}
       onViewCourse={onViewCourse}
       onShareRound={onShareRound}
@@ -459,7 +468,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       emptyGross={grossVal}
       emptyToPar={toParVal}
       presentation={presentation}
-      engagement={stableEngagement}
+      engagement={engagement}
       onHorizontalDrag={onHorizontalDrag}
       onStatsSeen={onStatsSeen}
       pageShift={pageShift}

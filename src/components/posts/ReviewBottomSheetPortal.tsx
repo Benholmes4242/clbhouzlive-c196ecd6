@@ -114,7 +114,10 @@ export const ReviewBottomSheetPortal: React.FC = () => {
       resolvedBreakdown={payload.breakdown ?? fallbackQuery.data?.breakdown ?? null}
       resolvedMedia={supporting.media ? mediaQuery.data ?? [] : undefined}
       resolvedAggregate={supporting.aggregate ? aggregateQuery.data ?? null : undefined}
-      reactionCount={supporting.reactions ? reactionState?.count ?? 0 : 0}
+      reactionCount={reactionState?.count ?? 0}
+      reactionMine={!!reactionState?.mine}
+      onToggleReaction={payload.reviewId ? () => reactions.toggle('review', payload.reviewId!) : undefined}
+      reactionHidden={!reactions.viewerId || reactions.unavailable}
       proseSettled={subjectReady}
       reviewerStats={payload.reviewerStats ?? null}
     />
