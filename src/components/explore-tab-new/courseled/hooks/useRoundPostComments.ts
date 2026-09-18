@@ -53,7 +53,7 @@ export function useRoundPostComments(scoreIds: readonly (string | null | undefin
     [ids],
   );
 
-  const { data } = useQuery<PostRow[]>({
+  const { data, isFetched } = useQuery<PostRow[]>({
     queryKey,
     enabled: ids.length > 0,
     staleTime: 30_000,
@@ -120,7 +120,7 @@ export function useRoundPostComments(scoreIds: readonly (string | null | undefin
     [map],
   );
 
-  return { infoFor };
+  return { infoFor, isSettled: ids.length === 0 || isFetched };
 }
 
 export default useRoundPostComments;

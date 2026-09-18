@@ -13,13 +13,15 @@ export interface CourseRatingAggregate {
   text_review_count: number;
 }
 
+export const courseRatingAggregatesKey = (courseId: string) => ['course-rating-aggregates', courseId] as const;
+
 /**
  * Single source of truth for community rating aggregates.
  * Uses course_rating_aggregates view which filters out mock reviews.
  */
 export function useCourseRatingAggregates(courseId: string | undefined) {
   return useQuery({
-    queryKey: ['course-rating-aggregates', courseId],
+    queryKey: courseRatingAggregatesKey(courseId ?? ''),
     enabled: !!courseId,
     queryFn: async () => {
       if (!courseId) return null;

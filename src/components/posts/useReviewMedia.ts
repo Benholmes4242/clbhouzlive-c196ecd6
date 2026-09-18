@@ -9,7 +9,7 @@
  * gated on `open`, and skips the read entirely when a caller does supply them.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, type QueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface ReviewMediaItem {
@@ -20,30 +20,38 @@ export interface ReviewMediaItem {
   isCover: boolean;
 }
 
+export const reviewMediaKey = (reviewId: string) => ['review-media', reviewId] as const;
+
+export async function fetchReviewMedia(reviewId: string): Promise<ReviewMediaItem[]> {
+  const { data, error } = await supabase
+    .from('course_review_media' as any)
+    .select('id, media_type, media_url, poster_url, is_cover, created_at')
+    .eq('review_id', reviewId)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return ((data ?? []) as any[])
+    .filter((m) => !!m.media_url)
+    .map((m) => ({
+      id: String(m.id),
+      mediaType: String(m.media_type ?? '').toLowerCase().includes('video') ? ('video' as const) : ('image' as const),
+      mediaUrl: String(m.media_url),
+      posterUrl: m.poster_url ?? null,
+      isCover: !!m.is_cover,
+    }))
+    .sort((a, b) => Number(b.isCover) - Number(a.isCover));
+}
+
+export function prefetchReviewMedia(queryClient: QueryClient, reviewId: string) {
+  return queryClient.prefetchQuery({ queryKey: reviewMediaKey(reviewId), queryFn: () => fetchReviewMedia(reviewId), staleTime: 5 * 60 * 1000 });
+}
+
 export function useReviewMedia(reviewId: string | null | undefined, enabled: boolean) {
   return useQuery({
-    queryKey: ['review-media', reviewId],
+    queryKey: reviewMediaKey(reviewId ?? ''),
     enabled: !!reviewId && enabled,
     staleTime: 5 * 60 * 1000,
     queryFn: async (): Promise<ReviewMediaItem[]> => {
-      const { data, error } = await supabase
-        .from('course_review_media' as any)
-        .select('id, media_type, media_url, poster_url, is_cover, created_at')
-        .eq('review_id', reviewId as string)
-        .order('created_at', { ascending: true });
-      if (error) throw error;
-      return ((data ?? []) as any[])
-        .filter((m) => !!m.media_url)
-        .map((m) => ({
-          id: String(m.id),
-          mediaType: String(m.media_type ?? '').toLowerCase().includes('video')
-            ? ('video' as const)
-            : ('image' as const),
-          mediaUrl: String(m.media_url),
-          posterUrl: m.poster_url ?? null,
-          isCover: !!m.is_cover,
-        }))
-        .sort((a, b) => Number(b.isCover) - Number(a.isCover));
+      return fetchReviewMedia(reviewId as string);
     },
   });
 }

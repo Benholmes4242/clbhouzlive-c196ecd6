@@ -19,8 +19,8 @@ import {
 } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { useQueryClient } from '@tanstack/react-query';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
-import { whsKeys } from '@/lib/whs/hooks';
-import { fetchRoundDetail } from '@/lib/whs/api';
+import { prefetchRoundDetail } from '@/lib/whs/hooks';
+import { prefetchRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import { coursePlaceLine } from './placeLine';
 import {
   pageDecision, rubberBand, neighbours, shouldExtend, openCue, noteHintPaged,
@@ -502,10 +502,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const prefetchRound = useCallback(
     (scoreId: string | null | undefined) => {
       if (!scoreId) return;
-      void queryClient.prefetchQuery({
-        queryKey: whsKeys.roundDetail(scoreId),
-        queryFn: () => fetchRoundDetail(scoreId),
-      });
+      void Promise.all([
+        prefetchRoundDetail(queryClient, scoreId),
+        prefetchRoundCourseContext(queryClient, scoreId),
+      ]);
     },
     [queryClient],
   );

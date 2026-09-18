@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import { useTournamentMeta } from './useTournamentMeta';
 import { formatVenueLabel } from '../lib/venueLabel';
+import { useFrozenOpenGate } from '@/hooks/useFrozenOpenGate';
 
 interface ScorecardRow {
   round_number: number;
@@ -78,6 +79,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
   const navigate = useNavigate();
   const { data: scRows = [], isFetched: scFetched } = useScorecard(tournamentId, target?.playerId ?? null);
   const scLoading = !!tournamentId && !!target?.playerId && !scFetched;
+  const overlayGate = useFrozenOpenGate('tour-scorecard', open, { round: !scLoading });
   const meta = useTournamentMeta(tournamentId);
 
   const availableRounds = useMemo(() => {
@@ -110,13 +112,13 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
   if (!target) {
     return (
       <CardScorecardSheet
-        open={open}
+        open={open && overlayGate.visible}
         onClose={onClose}
         eyebrowText=""
         courseName=""
         holes={[]}
         playerName=""
-        loading={scLoading}
+        loading={false}
       />
     );
   }
@@ -153,15 +155,15 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
 
   return (
     <CardScorecardSheet
-      open={open}
+      open={open && overlayGate.visible}
       onClose={onClose}
       eyebrowText={eyebrowText}
       courseName={courseName}
       courseLocation={courseLocation}
       coursePar={coursePar}
       courseSlope={null}
-      holes={roundHoles}
-      loading={scLoading}
+      holes={overlayGate.included.round ? roundHoles : []}
+      loading={false}
       surface="tour"
 
       heroMuted={demoted}

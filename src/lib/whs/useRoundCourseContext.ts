@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, type QueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -18,13 +18,11 @@ export interface RoundCourseContext {
   best_here: number | null;
 }
 
-export function useRoundCourseContext(scoreId: string | null | undefined, enabled = true) {
-  return useQuery({
+export function roundCourseContextQueryOptions(scoreId: string) {
+  return {
     queryKey: ['round-course-context', scoreId],
-    enabled: !!scoreId && enabled,
     staleTime: 60_000,
     queryFn: async (): Promise<RoundCourseContext | null> => {
-      if (!scoreId) return null;
       const { data, error } = await supabase.rpc('get_round_course_context', {
         p_whs_score_id: scoreId,
       });
@@ -35,5 +33,16 @@ export function useRoundCourseContext(scoreId: string | null | undefined, enable
       const row = (data ?? [])[0] as RoundCourseContext | undefined;
       return row ?? null;
     },
+  };
+}
+
+export function useRoundCourseContext(scoreId: string | null | undefined, enabled = true) {
+  return useQuery({
+    ...roundCourseContextQueryOptions(scoreId ?? ''),
+    enabled: !!scoreId && enabled,
   });
+}
+
+export function prefetchRoundCourseContext(queryClient: QueryClient, scoreId: string) {
+  return queryClient.prefetchQuery(roundCourseContextQueryOptions(scoreId));
 }

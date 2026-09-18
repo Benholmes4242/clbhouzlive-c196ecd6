@@ -19,6 +19,8 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { useTranslation } from 'react-i18next';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
+import { useQueryClient } from '@tanstack/react-query';
+import { prefetchReviewSheet } from '@/components/posts/prefetchReviewSheet';
 import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
 import { Heart, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
@@ -354,7 +356,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
   const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const queryClient = useQueryClient();
   const { data: reviewerStats } = useReviewerStats(post.userId);
+  const prefetchReview = () => prefetchReviewSheet(queryClient, buildReviewSheetPayload(post, reviewerStats ?? null));
   const handleReadReview = (e: React.MouseEvent) => {
     e.stopPropagation();
     const payload = buildReviewSheetPayload(post, reviewerStats ?? null);
@@ -473,6 +477,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   return (
     <article
       ref={articleRef}
+      onPointerDown={post.isReview ? prefetchReview : undefined}
       style={{
         background: CARD,
         overflow: 'hidden',
@@ -688,6 +693,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             <ReviewVerdictLabel
               rating={reviewRating}
               onClick={handleReadReview}
+              onPointerDown={prefetchReview}
               ariaLabel={`Your review: ${formatRatingValue(reviewRating)} ${getRatingTierLabel(reviewRating)}`}
             />
           )}

@@ -2,6 +2,9 @@ import React from 'react';
 import { InlineReviewCard } from './InlineReviewCard';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useQueryClient } from '@tanstack/react-query';
+import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
+import { prefetchReviewSheet } from '@/components/posts/prefetchReviewSheet';
 
 interface ReviewOverlaySlotProps {
   activePost: FeedPost;
@@ -23,6 +26,7 @@ export const ReviewOverlaySlot: React.FC<ReviewOverlaySlotProps> = ({
   whiteReadReview,
 }) => {
   const { data: reviewerStats } = useReviewerStats(activePost.userId);
+  const queryClient = useQueryClient();
 
   if (!activePost.review) return null;
 
@@ -44,6 +48,7 @@ export const ReviewOverlaySlot: React.FC<ReviewOverlaySlotProps> = ({
       }}
       isVisible={isVisible}
       onTap={onReviewTap}
+      onPressStart={() => prefetchReviewSheet(queryClient, buildReviewSheetPayload(activePost, reviewerStats ?? null))}
       breakdown={review.breakdown ?? null}
       reviewerStats={reviewerStats ?? null}
       reviewDate={activePost.createdAt}
