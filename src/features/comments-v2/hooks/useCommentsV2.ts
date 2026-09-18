@@ -22,7 +22,15 @@ import { commentsKeys, commentsScope, viewerId } from '@/lib/queryKeys';
  * comments_v2_notify falls through to its no-recipient ELSE for a top-level
  * story comment while still notifying the parent author on a REPLY.
  */
-export type TargetType = 'post' | 'top_ten' | 'editorial' | 'tour_story' | 'amateur_story';
+/**
+ * G7.2(a) — 'round' | 'review'. A round keys on the WHS SCORE ID and a review on
+ * the review id: the same identifiers their likes already use, so one subject now
+ * carries one id for both. The post-only branches below (the engagement-cache
+ * patches) are correctly skipped for both, exactly as for the story types; the
+ * DB's comments_v2_notify has its own round and review branches and tells the
+ * round's owner / the review's author.
+ */
+export type TargetType = 'post' | 'top_ten' | 'editorial' | 'tour_story' | 'amateur_story' | 'round' | 'review';
 
 export interface CommentActorInfo {
   actor_type: 'personal' | 'business';
