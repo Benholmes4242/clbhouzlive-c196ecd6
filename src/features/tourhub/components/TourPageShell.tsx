@@ -59,6 +59,10 @@ interface Props {
   background?: string;
 }
 
+export function tourHeaderInset(pathname: string): 'self' | 'shell' {
+  return pathname === '/tourhub' ? 'self' : 'shell';
+}
+
 export function TourPageShell({
   title: _title,
   subtitle: _subtitle,
@@ -78,7 +82,7 @@ export function TourPageShell({
 }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
-  const headerInset = location.pathname === '/tourhub' ? 'self' : 'shell';
+  const headerInset = tourHeaderInset(location.pathname);
 
   // One chrome only: the global island stands down while this shell is mounted.
   useSetChromeSuppressed(true);
