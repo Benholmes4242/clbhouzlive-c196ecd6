@@ -220,7 +220,8 @@
     "noFieldNobody": "아직 이곳에서 플레이한 다른 사람이 없어 바교할 필드가 없습니다.",
     "fieldShort": "필드",
     "swipeHint": "스와이프하여 다음 라운드로",
-    "shareRound": "공유"
+    "shareRound": "공유",
+    "likeReview": "이 리뷰에 좋아요"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

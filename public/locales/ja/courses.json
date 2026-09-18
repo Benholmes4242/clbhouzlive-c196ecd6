@@ -220,7 +220,8 @@
     "noFieldNobody": "まだ他にプレーした人がいないため、比較できる平均がありません。",
     "fieldShort": "平均",
     "swipeHint": "スワイプで次のラウンドへ",
-    "shareRound": "共有"
+    "shareRound": "共有",
+    "likeReview": "このレビューにいいね"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
