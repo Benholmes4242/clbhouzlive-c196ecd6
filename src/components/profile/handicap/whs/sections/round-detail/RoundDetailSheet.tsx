@@ -341,7 +341,10 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const scoreIdList = useMemo(() => (scoreId ? [scoreId] : []), [scoreId]);
   const roundPosts = useRoundPostComments(scoreIdList);
   const postInfo = roundPosts.infoFor(scoreId);
-  const previewPostIds = useMemo(() => (postInfo?.postId ? [postInfo.postId] : []), [postInfo?.postId]);
+  const previewPostIds = useMemo(
+    () => (postInfo?.postId && postInfo.commentCount > 0 ? [postInfo.postId] : []),
+    [postInfo?.postId, postInfo?.commentCount],
+  );
   const commentPreviews = useFeedCommentPreview(previewPostIds, 'round-scorecard');
   const reactions = useContentReactions(
     useMemo(

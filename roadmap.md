@@ -140,4 +140,4 @@ Tour Overview Design A
 - [x] Match the review footer with reviewer identity in the header, review likes, and native URL sharing
 - [x] Keep review comments out and report current review-like adoption
 - [x] Set lead review quotes to 20px while retaining the three-line clamp
-- [ ] Verify card and tile measurements, focused tests, and types
+- [x] Verify focused tests and types; authenticated device card measurements remain unavailable in this environment
