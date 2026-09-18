@@ -12,10 +12,10 @@ import { AppLog } from '@/lib/logger';
  *  - THE SUBJECT GATE: the card does not open until the thing it exists to show
  *    is in hand. No cap, no timer, no fallback. With a feed seed the subject is
  *    ready in the same tick, so this never waits where a seed exists.
- *  - THE CAP: 350ms, and it only decides whether the card waits for the
+ *  - THE CAP: 900ms, and it only decides whether the card waits for the
  *    SUPPORTING blocks before opening. It can no longer drop one.
  */
-export const CARD_OPEN_CAP_MS = 350;
+export const CARD_OPEN_CAP_MS = 900;
 /** The collection window a late supporting block opens. One movement, not three. */
 export const SETTLE_WINDOW_MS = 120;
 /** The card's entrance transform. A settle may never overlap it. */
