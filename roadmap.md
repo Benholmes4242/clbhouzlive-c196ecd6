@@ -94,3 +94,15 @@ Tour Overview Design A
 - [x] Mirror the scorecard header and remove sheet-only ornament
 - [x] Simplify the community reference and sub-score spread
 - [x] Verify entry paths, content variants, narrow widths, tests, and types
+
+## Scorecard glass card S3
+- [ ] Remove the first-frame pixel height lock while preserving the readiness hold
+- [ ] Remove the close hint while preserving card-tap dismissal
+- [ ] Group and evenly space scorecard exits at 390px and 320px
+- [ ] Verify cold and warm opens, scrolling, dismissal, tests, and types
+
+## Review sheet glass card R2
+- [ ] Preserve the completed R1 restraint pass and correct the decision-history note
+- [ ] Convert the review bottom sheet to the shared floating-card geometry with a denser glass fill
+- [ ] Preserve non-tap dismissal, intrinsic height, internal scrolling, and viewer stacking
+- [ ] Verify feed and fullscreen-viewer paths at 390px and 320px, tests, and types
