@@ -3,8 +3,7 @@
  *
  * Pure so the thresholds are testable without a sheet, a finger or a DOM. The
  * host owns the animation and the analytics; this file owns WHETHER a swipe
- * pages, HOW FAR the sheet may follow a finger at either end, and whether the
- * one-off hint still has anything to say.
+ * pages and HOW FAR the sheet may follow a finger at either end.
  *
  * Paging exists ONLY for a sheet opened from an Explore stream card. Every
  * other consumer of the sheet never passes a sequence, so none of this runs.
@@ -78,84 +77,5 @@ export function shouldExtend(index: number, length: number): boolean {
   return length - 1 - index <= PREFETCH_WITHIN;
 }
 
-/* ------------------------------------------------------------------ the hint */
-
-/**
- * §2.5 — ONE SENTENCE, THEN NEVER AGAIN. It goes after the first page or after
- * three opens, whichever comes first. localStorage is wrapped because Safari in
- * private mode throws on read as well as write, and a hint is never worth an
- * exception on the way into a sheet.
- */
-const HINT_KEY = 'clbhouz.roundSheet.swipeHint';
-
-interface HintState { opens: number; paged: boolean }
-
-function readHint(): HintState {
-  try {
-    const raw = localStorage.getItem(HINT_KEY);
-    if (!raw) return { opens: 0, paged: false };
-    const parsed = JSON.parse(raw) as Partial<HintState>;
-    return { opens: Number(parsed.opens) || 0, paged: parsed.paged === true };
-  } catch {
-    return { opens: 0, paged: false };
-  }
-}
-
-function writeHint(next: HintState): void {
-  try {
-    localStorage.setItem(HINT_KEY, JSON.stringify(next));
-  } catch {
-    /* A hint that cannot be remembered is shown again. Never a thrown error. */
-  }
-}
-
-/** Counts this open and reports whether the line should show. */
-export function noteHintOpen(): boolean {
-  const state = readHint();
-  const next = { ...state, opens: state.opens + 1 };
-  writeHint(next);
-  return !next.paged && next.opens <= 3;
-}
-
-/** Called once the member pages. The line never returns. */
-export function noteHintPaged(): void {
-  writeHint({ ...readHint(), paged: true });
-}
-
-/**
- * BRIEF_ROUND_SHEET_CUES §2 — WHICH CUE THIS OPEN EARNS.
- *
- * One counter for both, so the rule that retired the sentence now retires the
- * movement: the first three PAGEABLE opens, and never again once the member has
- * paged. A reduced-motion reader gets no movement, so they keep the sentence.
- * With nothing to page to there is nothing to show, so no cue at all.
- *
- * NOTE: this CONSUMES an open (noteHintOpen increments), so call it once per
- * open, exactly where the sentence used to be decided.
- */
-export function openCue(opts: {
-  pageable: boolean;
-  hasNext: boolean;
-  reducedMotion: boolean;
-}): 'nudge' | 'line' | null {
-  if (!opts.pageable) return null;
-  if (!noteHintOpen()) return null;
-  if (opts.reducedMotion) return 'line';
-  return opts.hasNext ? 'nudge' : null;
-}
-
-/**
- * BRIEF_ROUND_SHEET_TALL §3 — A WAY BACK TO THE CUES, without devtools.
- *
- * Forgets that this device has ever opened or paged a round, so the peek line and
- * the nudge are offered again on the next pageable open. Used by tests and by
- * `?cues=reset` on Explore in every environment, production included: it touches
- * nothing but one key in the viewer's own localStorage.
- */
-export function resetHint(): void {
-  try {
-    localStorage.removeItem(HINT_KEY);
-  } catch {
-    /* nothing to reset */
-  }
-}
+/* The one-off open cue (the text line, the nudge and the three-opens counter)
+   was removed by BRIEF G5. Paging itself is above and unchanged. */

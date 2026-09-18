@@ -23,11 +23,10 @@ import { prefetchRoundDetail } from '@/lib/whs/hooks';
 import { prefetchRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import { coursePlaceLine } from './placeLine';
 import {
-  pageDecision, rubberBand, neighbours, shouldExtend, openCue, noteHintPaged,
-  dragNeighbour, resetHint,
+  pageDecision, rubberBand, neighbours, shouldExtend,
+  dragNeighbour,
 } from './roundPaging';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
-import { runNudge } from './roundNudge';
 import { scrollElementIntoView, scrollPageToTop } from '@/lib/getScrollParent';
 import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
@@ -989,26 +988,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [view],
   );
 
-  /*
-   * BRIEF_ROUND_SHEET_TALL §3 — ?cues=reset BRINGS THE CUES BACK.
-   *
-   * The cues retire for good once a member has paged, so anyone who has used the
-   * sheet can never see the nudge again — including whoever needs to check it.
-   * Opening Explore with ?cues=reset forgets this device's hint once and strips
-   * just that parameter from the URL, leaving every other one alone. Live in
-   * every environment, production included: it only resets a hint, and only for
-   * the viewer holding the device.
-   */
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const url = new URL(window.location.href);
-    if (url.searchParams.get('cues') !== 'reset') return;
-    resetHint();
-    url.searchParams.delete('cues');
-    window.history.replaceState(
-      window.history.state, '', `${url.pathname}${url.search}${url.hash}`,
-    );
-  }, []);
 
   /* ==================================================================== §2
      SWIPE BETWEEN ROUNDS. THE SEQUENCE IS THIS PAGE'S ROUNDS, IN ITS ORDER.
@@ -1030,7 +1009,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const pageIxRef = useRef<number | null>(null);
   pageIxRef.current = pageIx;
   const [shift, setShift] = useState<{ dx: number; opacity?: number; animating: boolean } | null>(null);
-  const [swipeHintOn, setSwipeHintOn] = useState(false);
   /* BRIEF_ROUND_SHEET_PEEK §1 — the neighbour drawn beside the current page
      while a drag or its commit is in flight. One side only, and never at an end. */
   const [preview, setPreview] = useState<{ side: 'next' | 'prev'; ix: number } | null>(null);
@@ -1124,55 +1102,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [],
   );
 
-  /* ==================================================================== §2
-     BRIEF_ROUND_SHEET_CUES §2 — THE NUDGE REPLACES THE TEXT HINT.
-
-     The line retired after three opens, so for anyone who has used the sheet
-     there was nothing at all saying rounds page sideways. On the first three
-     PAGEABLE opens the sheet now shows it instead of saying it: once it has
-     settled at mid, the page walks 64px left so the NEXT round's preview shows
-     at the right edge, holds, and springs back. It is the SAME preview and the
-     SAME track a finger drives — nothing here draws a second thing.
-
-     The finger always wins: any touch or pointer down cancels it mid-flight.
-     Reduced motion gets no nudge and keeps the sentence (below). */
-  const nudgeCancel = useRef<(() => void) | null>(null);
-  const nudgeRelease = useRef<(() => void) | null>(null);
-
-  const cancelNudge = useCallback(() => {
-    nudgeCancel.current?.();
-    nudgeCancel.current = null;
-    nudgeRelease.current?.();
-    nudgeRelease.current = null;
-  }, []);
-  useEffect(() => () => cancelNudge(), [cancelNudge]);
-
-  const startNudge = useCallback((ix: number) => {
-    if (ix + 1 >= roundSeq.length) return;
-    cancelNudge();
-    /* THE FINGER ALWAYS WINS. Capture, so a touch anywhere over the sheet ends
-       the nudge before the gesture reads a single move. */
-    const bail = () => cancelNudge();
-    window.addEventListener('pointerdown', bail, true);
-    window.addEventListener('touchstart', bail, true);
-    nudgeRelease.current = () => {
-      window.removeEventListener('pointerdown', bail, true);
-      window.removeEventListener('touchstart', bail, true);
-    };
-    nudgeCancel.current = runNudge(ix + 1, {
-      setShift,
-      setPreview,
-      setTimeout: (fn, ms) => window.setTimeout(fn, ms),
-      clearTimeout: (id) => window.clearTimeout(id),
-    });
-  }, [roundSeq.length, cancelNudge]);
 
   const pageTo = useCallback((to: number, direction: 'next' | 'prev') => {
     const from = pageIxRef.current;
     const item = roundSeq[to];
     if (from == null || !item) { setShift(null); return; }
-    noteHintPaged();
-    setSwipeHintOn(false);
     if (sheetSession.current) sheetSession.current.rounds += 1;
     analyticsEvents.track('round_sheet_page', { direction, index_from: from, index_to: to, view });
 
@@ -1238,7 +1172,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   /* THE FINGER. The axis lock, the 8px and the 1.2 ratio live in BottomSheet;
      the thresholds and the end rubber-band live in roundPaging. */
   const pageDrag = useMemo(() => ({
-    onStart: () => { cancelNudge(); setShift({ dx: 0, animating: false }); setPreview(null); },
+    onStart: () => { setShift({ dx: 0, animating: false }); setPreview(null); },
     onMove: (dx: number) => {
       const ix = pageIxRef.current;
       if (ix == null) return;
@@ -1265,19 +1199,18 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       }
       pageTo(decision.to, decision.direction);
     },
-  }), [roundSeq.length, after, pageTo, prefersReducedMotion, cancelNudge]);
+  }), [roundSeq.length, after, pageTo, prefersReducedMotion]);
 
   /* §3 — THE SAME PAGE STEP THE HIDDEN BUTTONS AND THE ARROW KEYS USE. It goes
-     through pageTo, so a keyboard page is the same movement, the same analytics
-     and the same hint retirement as a swipe. */
+     through pageTo, so a keyboard page is the same movement and the same
+     analytics as a swipe. */
   const pageStep = useCallback((direction: 'next' | 'prev') => {
     const ix = pageIxRef.current;
     if (ix == null) return;
     const to = direction === 'next' ? ix + 1 : ix - 1;
     if (to < 0 || to >= roundSeq.length) return;
-    cancelNudge();
     pageTo(to, direction);
-  }, [roundSeq.length, cancelNudge, pageTo]);
+  }, [roundSeq.length, pageTo]);
 
   const tapCard = useCallback(
     (item: StreamItem, size: CardSize, pos: number) => {
@@ -1305,19 +1238,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           seeded: seed != null,
         });
         setShift(null);
-        cancelNudge();
-        /* §2 — ONE COUNTER FOR BOTH CUES. noteHintOpen() is still the first-three
-           rule and still retires on the first page; what it now earns is a
-           MOVEMENT, and only a reduced-motion reader gets the sentence. */
-        const cue = openCue({
-          pageable: roundSeq.length > 1,
-          hasNext: ix >= 0 && ix + 1 < roundSeq.length,
-          reducedMotion: prefersReducedMotion(),
-        });
-        setSwipeHintOn(cue === 'line');
         if (ix >= 0) {
           showRound(item, ix);
-          if (cue === 'nudge') startNudge(ix);
         } else {
           setPageIx(null);
           pageIxRef.current = null;
@@ -1375,8 +1297,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         });
       }
     },
-    [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view,
-      cancelNudge, startNudge, prefersReducedMotion],
+    [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view],
   );
 
   const engagementFor = useCallback((item: StreamItem) => {
@@ -2000,13 +1921,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           }
           /* §2.4 — BACK AND ESCAPE CLOSE. They never page; revealCard has
              already put the feed back where the member was. */
-          cancelNudge();
           setSheetSeed(null);
           setShift(null);
           setPreview(null);
           setPageIx(null);
           pageIxRef.current = null;
-          setSwipeHintOn(false);
           opener.close();
         }}
         /* §2.4 — EVERY ACTION READS THE CURRENT PAGE. The score id, the
@@ -2024,7 +1943,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         /* §2.2 — paging is live only while there IS a sequence to page. */
         onHorizontalDrag={pageIx != null && roundSeq.length > 1 ? pageDrag : null}
         pageShift={shift}
-        hint={swipeHintOn ? t('courses:scorecard.swipeHint', 'Swipe for the next round') : null}
         /* BRIEF_ROUND_SHEET_PEEK §1 — the neighbour, drawn from the seed this
            page already holds. Query-free: no reactions, no comments, no stats.
            A round with no hole rows still shows its summary with the syncing

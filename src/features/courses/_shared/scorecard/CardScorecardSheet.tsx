@@ -178,11 +178,6 @@ export interface CardScorecardSheetProps {
    */
   pageShift?: { dx: number; opacity?: number; animating: boolean } | null;
   /**
-   * §2.5 — the one-off "swipe for the next round" line. A string or nothing;
-   * the host decides whether it has been earned and when it retires.
-   */
-  hint?: string | null;
-  /**
    * BRIEF_ROUND_SHEET_PEEK §1 — THE NEIGHBOUR, DRAWN BESIDE THIS PAGE.
    * `side` says which edge it sits on: 'next' to the right (a leftward drag
    * brings it in), 'prev' to the left. It moves with the same `pageShift.dx` as
@@ -318,7 +313,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   onHorizontalDrag = null,
   onStatsSeen,
   pageShift = null,
-  hint = null,
   pagePreview = null,
   paging = null,
 
@@ -902,11 +896,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                       the round has an unplayed hole: a complete card says
                       nothing. Every consumer of this sheet gets the line. */}
                   {hasUnplayedHole && <NotPlayedLine />}
-                  {/* §2.5 — ONE SENTENCE, ONCE. The host retires it after the
-                      first page or the third open; there are no pager dots. */}
-                  {hint && (
-                    <div style={{ ...LABEL_READ, textAlign: 'center' }}>{hint}</div>
-                  )}
                 </div>
               </ScorecardSection>
               </div>

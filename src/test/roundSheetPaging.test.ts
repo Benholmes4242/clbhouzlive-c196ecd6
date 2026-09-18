@@ -1,13 +1,13 @@
 /**
  * BRIEF_ROUND_SHEET §2 — THE PAGING DECISIONS.
  *
- * The thresholds, the end rubber-band and the one-off hint, tested without a
- * finger. Paging is Explore's alone; a sheet with no sequence never asks.
+ * The thresholds and the end rubber-band, tested without a finger. Paging is
+ * Explore's alone; a sheet with no sequence never asks.
  */
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  PAGE_COMMIT_PX, RUBBER, neighbours, noteHintOpen, noteHintPaged, pageDecision,
-  resetHint, rubberBand, shouldExtend,
+  PAGE_COMMIT_PX, RUBBER, neighbours, pageDecision,
+  rubberBand, shouldExtend,
 } from '@/features/explore-magazine/roundPaging';
 
 describe('pageDecision', () => {
@@ -62,19 +62,3 @@ describe('neighbours and extension', () => {
   });
 });
 
-describe('the swipe hint', () => {
-  beforeEach(() => resetHint());
-
-  it('shows for the first three opens, then stops', () => {
-    expect(noteHintOpen()).toBe(true);
-    expect(noteHintOpen()).toBe(true);
-    expect(noteHintOpen()).toBe(true);
-    expect(noteHintOpen()).toBe(false);
-  });
-
-  it('never returns once the member has paged', () => {
-    expect(noteHintOpen()).toBe(true);
-    noteHintPaged();
-    expect(noteHintOpen()).toBe(false);
-  });
-});
