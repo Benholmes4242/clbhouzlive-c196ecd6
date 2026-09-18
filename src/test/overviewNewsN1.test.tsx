@@ -6,10 +6,6 @@ import { OverviewNews } from '@/features/tourhub/overview/sections/OverviewNews'
 import { FeatureStory, GUTTER, HeroStory, WorkhorseRow } from '@/features/tourhub/news/StoryShapes';
 import type { TourStory } from '@/features/tourhub/news/useTourStories';
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key === 'overview.news.title' ? 'News' : 'All news' }),
-}));
-
 vi.mock('@/hooks/useSupabaseSession', () => ({
   useSupabaseSession: () => ({ user: { id: 'viewer' } }),
 }));
