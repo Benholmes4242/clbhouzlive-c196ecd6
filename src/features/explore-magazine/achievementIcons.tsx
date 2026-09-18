@@ -75,11 +75,13 @@ export function RankUpIcon() {
   );
 }
 
-/** The birdie haul wears its own count: a red disc with a white numeral. */
+/** The birdie haul wears its own count: a red outline ring with a white
+ * numeral, matching the scorecard card's birdie mark (1.4 user units on the
+ * 24-unit box at 28px renders the card's 1.6px stroke). */
 export function BirdieCountIcon({ count }: { count: number }) {
   return (
     <Frame>
-      <circle cx="12" cy="12" r="10" fill={CALLOUT_RED} />
+      <circle cx="12" cy="12" r="10" fill="none" stroke={SC_FILL_BIRDIE_DK} strokeWidth="1.4" />
       <text
         x="12"
         y="12"
