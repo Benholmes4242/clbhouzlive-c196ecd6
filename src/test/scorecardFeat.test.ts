@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import React from 'react';
+import { render } from '@testing-library/react';
 
 import {
   FEAT_BAND_STYLE,
   scorecardFeatFor,
   type ScorecardFeatHole,
 } from '@/features/courses/_shared/scorecard/scorecardFeat';
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 
 const round = (deltas: number[], pars: number[] = deltas.map(() => 4)): ScorecardFeatHole[] =>
   deltas.map((delta, index) => ({
@@ -50,5 +53,15 @@ describe('scorecardFeatFor', () => {
       alignItems: 'baseline',
       gap: 7,
     });
+  });
+
+  it('keeps the scorecard eagle as the existing double-ring grid mark', () => {
+    const { container } = render(React.createElement(ScoreMark, {
+      strokes: 2,
+      par: 4,
+      surface: 'dark',
+      glassDoubleRings: true,
+    }));
+    expect(container.querySelectorAll('[data-score-ring]')).toHaveLength(2);
   });
 });

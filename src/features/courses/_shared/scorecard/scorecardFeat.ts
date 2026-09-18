@@ -1,4 +1,5 @@
 import type React from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
  * THE SCORECARD FEAT BAND (BRIEF S7, 18 Sep 2026).
@@ -34,7 +35,7 @@ export const FEAT_BAND_STYLE: React.CSSProperties = {
   minHeight: 37,
   boxSizing: 'border-box',
   background: 'none',
-  borderBottom: '1px solid rgba(255,255,255,0.10)',
+  borderBottom: `1px solid ${A.HAIRLINE}`,
   padding: '9px 16px',
   display: 'flex',
   alignItems: 'baseline',
@@ -83,6 +84,8 @@ export function scorecardFeatFor(
   const completeHoleNumbers = new Set(scored.map((hole) => hole.holeNo));
   const clean = completeHoleNumbers.size === expectedHoles
     && scored.length === expectedHoles
+    && Array.from({ length: expectedHoles }, (_, index) => index + 1)
+      .every((holeNo) => completeHoleNumbers.has(holeNo))
     && scored.every((hole) => hole.strokes <= hole.par);
   return clean ? { kind: 'clean', count: scored.length, hole: null } : null;
 }
