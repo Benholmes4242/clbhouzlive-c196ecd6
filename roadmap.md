@@ -81,3 +81,10 @@ Tour Overview Design A
 - [x] Make double-ring score marks transparent between strokes
 - [x] Verify member, tour, feat, empty, gestures, reduced motion, and /round at 390/320
 - [x] Run focused tests and types; build verification is handled by the project harness
+
+## Scorecard glass card S2
+- [ ] Hold unresolved opens for 150ms and keep visible card height stable
+- [ ] Add asymmetric enter/exit motion with temporary layer promotion
+- [ ] Make guarded card taps dismiss and add the close hint in six locales
+- [ ] Change the shared birdie to a transparent red outline
+- [ ] Verify gestures, exits, cached/cold opens, marks, reduced motion, page mode, tests, and types

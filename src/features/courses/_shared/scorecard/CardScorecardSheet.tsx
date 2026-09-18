@@ -649,6 +649,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     <ScorecardGlassOverlay
       open={open}
       onClose={onClose}
+      contentReady={!loading}
       onHorizontalDrag={presentation === 'overlay' ? onHorizontalDrag : null}
       presentation={presentation}
     >
@@ -779,7 +780,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         >
           {/* ROUND SELECTOR */}
           {rounds && rounds.available.length > 1 && (
-            <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
+            <div
+              onClick={(event) => event.stopPropagation()}
+              style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}
+            >
               {rounds.available.map((r) => {
                 const active = r === rounds.active;
                 return (
@@ -926,7 +930,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
           {/* S3.3 — EXITS BELONG AT THE END. */}
           {(engagement || onViewProfile || onViewCourse || onShareRound) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', paddingTop: 2 }}>
+            <div
+              data-scorecard-interactive="true"
+              onClick={(event) => event.stopPropagation()}
+              style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', paddingTop: 2 }}
+            >
               {engagement && (
                 <RoundEngagementActions
                   comment={engagement.comment ?? null}
@@ -944,6 +952,19 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} align="left" />}
             </div>
           )}
+          <div
+            data-scorecard-close-hint="true"
+            style={{
+              flexShrink: 0,
+              paddingTop: 2,
+              textAlign: 'center',
+              fontSize: 11,
+              lineHeight: 1,
+              color: 'rgba(248,250,252,0.38)',
+            }}
+          >
+            {t('courses:scorecard.tapAnywhereToClose')}
+          </div>
         </div>
       </div>
 

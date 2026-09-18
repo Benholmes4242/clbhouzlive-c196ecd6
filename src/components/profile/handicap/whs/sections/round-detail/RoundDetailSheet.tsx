@@ -383,7 +383,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       nineHole={!!userData?.is_nine_hole}
       /* §1.3 — A SEEDED CARD NEVER SHOWS THE SKELETON. Without a seed the
          behaviour is exactly today's. */
-      loading={!usingSeed && (isRoundLoading || contextQuery.isLoading || analysisQuery.isLoading)}
+      loading={!usingSeed && isRoundLoading}
       surface="member"
       courseContext={ctx ? {
         yourAvgToPar: ctx.your_avg_to_par,

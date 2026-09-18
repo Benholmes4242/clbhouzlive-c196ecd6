@@ -17,11 +17,11 @@ import {
  *
  * THE DARK GRAMMAR IS THE GRAMMAR (ratified 4 Sep 2026, BRIEF_ROUND_SCORECARD_
  * REBUILD §A). Per outcome: unplayed a faint mid-dot; par a bare numeral;
- * birdie a FILLED red disc; eagle a FILLED gold disc with one ring; albatross or
+ * birdie a red OUTLINE circle; eagle a FILLED gold disc with one ring; albatross or
  * ace a FILLED gold disc with two rings; bogey an OUTLINED ink square; double a
  * FILLED blue square; triple+ a FILLED deep-blue square with one ring. S1 gives
- * only the translucent scorecard an opt-in double-stroke eagle/double-bogey mark
- * so its gap stays transparent; every other caller retains this grammar.
+ * the translucent scorecard an opt-in double-stroke eagle/double-bogey mark so
+ * its gap stays transparent. Birdie is outlined app-wide on every dark surface.
  *
  * THE LIGHT BRANCH IS ON THE DEAD LIST (see ScoreMark.tsx:225-280). No product
  * surface passes surface="light" any more — RoundCardHoleStrip was the last one
@@ -168,6 +168,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
               ? SC_FILL_TRIPLE_DK
               : 'transparent';
     const darkTone = variant === 'bogey' ? SC_FILL_BOGEY_DK : darkFill;
+    const birdieOutline = variant === 'birdie';
     const darkNumeral =
       colourOverride ??
       (variant === 'empty'
@@ -210,20 +211,20 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
             }}
           />
         ))}
-        {variant === 'bogey' && (
+        {(variant === 'bogey' || birdieOutline) && (
           <span
             aria-hidden="true"
-            data-score-outline="bogey"
+            data-score-outline={variant}
             style={{
               position: 'absolute',
               inset: 0,
-              borderRadius: 0,
-              border: `${STROKE}px solid ${SC_FILL_BOGEY_DK}`,
+              borderRadius: birdieOutline ? '50%' : 0,
+              border: `${birdieOutline ? 1.6 : STROKE}px solid ${birdieOutline ? SC_FILL_BIRDIE_DK : SC_FILL_BOGEY_DK}`,
               pointerEvents: 'none',
             }}
           />
         )}
-        {hasMark && variant !== 'bogey' && !transparentDouble && (
+        {hasMark && variant !== 'bogey' && !birdieOutline && !transparentDouble && (
           <span
             aria-hidden="true"
             data-score-fill={variant}
