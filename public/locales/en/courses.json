@@ -2089,7 +2089,8 @@
       "voteBody": "Please sign in to vote on reviews",
       "voteFailed": "Couldn't save your vote",
       "mediaUploadFailed": "Your photos could not be uploaded, so nothing has been posted. Tap Retry on the photo, then press Post again.",
-      "mediaAttachFailed": "Your review was posted, but a photo could not be attached. Edit the review to add it again."
+      "mediaAttachFailed": "Your review was posted, but a photo could not be attached. Edit the review to add it again.",
+      "mediaAttachHeld": "Your review was posted. One photo is still attaching - you will find a Retry on your profile if it does not finish."
     },
     "wizard": {
       "a11yStep": "Step {{n}} of 3, {{label}}",

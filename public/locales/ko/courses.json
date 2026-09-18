@@ -533,7 +533,8 @@
       "voteBody": "Please sign in to vote on reviews",
       "rateBody": "Please sign in to rate courses",
       "mediaUploadFailed": "사진을 업로드할 수 없어 아무것도 게시되지 않았습니다. 사진의 다시 시도를 누른 뒤 다시 게시해 주세요.",
-      "mediaAttachFailed": "리뷰는 게시되었지만 사진을 첨부할 수 없습니다. 리뷰를 편집해 다시 추가해 주세요."
+      "mediaAttachFailed": "리뷰는 게시되었지만 사진을 첨부할 수 없습니다. 리뷰를 편집해 다시 추가해 주세요.",
+      "mediaAttachHeld": "리뷰를 게시했습니다. 사진은 아직 첨부 중입니다. 완료되지 않으면 프로필에서 다시 시도를 찾을 수 있습니다."
     },
     "wizard": {
       "rail": {

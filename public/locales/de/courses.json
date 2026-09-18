@@ -533,7 +533,8 @@
       "voteBody": "Please sign in to vote on reviews",
       "rateBody": "Please sign in to rate courses",
       "mediaUploadFailed": "Deine Fotos konnten nicht hochgeladen werden, daher wurde nichts gepostet. Tippe beim Foto auf Erneut versuchen und poste dann noch einmal.",
-      "mediaAttachFailed": "Deine Bewertung wurde gepostet, aber ein Foto konnte nicht angehängt werden. Bearbeite die Bewertung, um es erneut hinzuzufügen."
+      "mediaAttachFailed": "Deine Bewertung wurde gepostet, aber ein Foto konnte nicht angehängt werden. Bearbeite die Bewertung, um es erneut hinzuzufügen.",
+      "mediaAttachHeld": "Deine Bewertung wurde gepostet. Ein Foto wird noch angehängt - falls es nicht fertig wird, findest du auf deinem Profil eine Schaltfläche zum erneuten Versuchen."
     },
     "wizard": {
       "rail": {

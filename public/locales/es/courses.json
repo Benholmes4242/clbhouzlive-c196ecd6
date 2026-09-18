@@ -533,7 +533,8 @@
       "voteBody": "Please sign in to vote on reviews",
       "rateBody": "Please sign in to rate courses",
       "mediaUploadFailed": "No se pudieron subir tus fotos, así que no se ha publicado nada. Toca Reintentar en la foto y vuelve a pulsar Publicar.",
-      "mediaAttachFailed": "Tu reseña se publicó, pero no se pudo adjuntar una foto. Edita la reseña para añadirla de nuevo."
+      "mediaAttachFailed": "Tu reseña se publicó, pero no se pudo adjuntar una foto. Edita la reseña para añadirla de nuevo.",
+      "mediaAttachHeld": "Tu reseña se publicó. Una foto todavía se está adjuntando; si no termina, encontrarás la opción de reintentar en tu perfil."
     },
     "wizard": {
       "rail": {

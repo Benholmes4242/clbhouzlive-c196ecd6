@@ -533,7 +533,8 @@
       "voteBody": "Please sign in to vote on reviews",
       "rateBody": "Please sign in to rate courses",
       "mediaUploadFailed": "写真をアップロードできなかったため、何も投稿されていません。写真の再試行をタップしてから、もう一度投稿してください。",
-      "mediaAttachFailed": "レビューは投稿されましたが、写真を添付できませんでした。レビューを編集してもう一度追加してください。"
+      "mediaAttachFailed": "レビューは投稿されましたが、写真を添付できませんでした。レビューを編集してもう一度追加してください。",
+      "mediaAttachHeld": "レビューを投稿しました。写真の添付はまだ進行中です。完了しない場合は、プロフィールに再試行が表示されます。"
     },
     "wizard": {
       "rail": {
