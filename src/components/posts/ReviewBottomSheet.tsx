@@ -104,6 +104,8 @@ export interface ReviewBottomSheetProps {
   resolvedBreakdown?: ReviewBottomSheetProps['breakdown'];
   resolvedMedia?: ReviewMediaItem[] | null;
   resolvedAggregate?: { avg_overall_score?: number | null; review_count?: number | null } | null;
+  /** G2.5 — false while the prose read is still open; the empty-state line stays silent. */
+  proseSettled?: boolean;
 }
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
@@ -148,6 +150,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   resolvedBreakdown,
   resolvedMedia,
   resolvedAggregate,
+  proseSettled = true,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
