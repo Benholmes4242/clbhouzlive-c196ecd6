@@ -803,6 +803,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               onClose={() => setViewerIndex(null)}
             />
           )}
+          {commentsOpen && reviewId && (
+            <CommentsSheetV2
+              isOpen
+              onClose={() => setCommentsOpen(false)}
+              targetType="review"
+              targetId={reviewId}
+            />
+          )}
         </>
       )}
     </AnimatePresence>
