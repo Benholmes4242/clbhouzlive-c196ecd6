@@ -209,9 +209,13 @@ export interface CardScorecardEngagement {
   likeMine: boolean;
   onToggleLike: () => void;
   likeLabel: string;
-  /** Absent when the round has no post — no comment affordance at all (§1.6). */
+  /** G7.2(b) — EVERY ROUND HAS A COMMENT AFFORDANCE. The target is the score id,
+   *  never a post, so this is absent only when there is no round at all. */
   comment?: { count: number; label: string; onOpen: () => void } | null;
+  /** The like subject's id: the SCORE ID under likeSource 'round'. */
   postId?: string | null;
+  /** G7.3(b) — which table the likers come from. Defaults to 'post'. */
+  likeSource?: LikeSource;
   commentPreview?: FeedCommentPreviewData | null;
 }
 
@@ -974,6 +978,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 <LikedByRow
                   postId={engagement.postId}
                   count={engagement.likeCount}
+                  source={engagement.likeSource ?? 'post'}
                   style={{ marginTop: 8 }}
                 />
               )}
