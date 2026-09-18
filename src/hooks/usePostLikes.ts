@@ -126,7 +126,42 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
             // Business likes on round posts still live in post_likes.
             ...likes.filter((l) => (l.actor_type ?? 'personal') === 'business'),
           ];
+        } else if (post?.source_review_id) {
+          // R1 — the review's hearts are canonical in content_reactions
+          // (target_type='review'). Same shape as the round branch above, with
+          // one difference: DEDUPE BY user_id, because a member who hearted the
+          // review in Explore AND in Clubhouse before the R1 migration has a
+          // row on both sides and must appear once.
+          const { data: reactions, error: reactionsError } = await supabase
+            .from('content_reactions')
+            .select('user_id')
+            .eq('target_type', 'review')
+            .eq('target_id', post.source_review_id)
+            .order('created_at', { ascending: false })
+            .limit(200);
+
+          if (reactionsError) throw reactionsError;
+
+          const reactionUserIds = new Set((reactions ?? []).map((r) => r.user_id));
+
+          likes = [
+            ...(reactions ?? []).map((r) => ({
+              user_id: r.user_id,
+              actor_type: 'personal' as const,
+              actor_id: r.user_id,
+            })),
+            // Business likes on review posts still live in post_likes.
+            ...likes.filter((l) => (l.actor_type ?? 'personal') === 'business'),
+            // Any personal post_likes row not yet migrated: kept so no like
+            // ever disappears, deduped by user_id against the reactions above.
+            ...likes.filter(
+              (l) =>
+                (l.actor_type ?? 'personal') !== 'business' &&
+                !reactionUserIds.has(l.user_id),
+            ),
+          ];
         }
+
 
         if (likes.length === 0) return [] as PostLiker[];
       }
