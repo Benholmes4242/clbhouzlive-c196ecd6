@@ -116,6 +116,9 @@ export interface ReviewBottomSheetProps {
   reactionMine?: boolean;
   onToggleReaction?: () => void;
   reactionHidden?: boolean;
+  /** G7.2(c) — comments_v2 target_type 'review', keyed on the review id. */
+  commentCount?: number;
+  commentPreview?: FeedCommentPreviewData | null;
 }
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
@@ -165,7 +168,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   reactionMine = false,
   onToggleReaction,
   reactionHidden = false,
+  commentCount = 0,
+  commentPreview = null,
 }) => {
+  const [commentsOpen, setCommentsOpen] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
 
