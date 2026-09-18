@@ -417,6 +417,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       courseSlope={courseSlope}
       holes={shownHoles}
       holesSettled={shownHoles.length > 0 || roundSettled}
+      settleKey={settleKey}
       feat={feat}
       nineHole={!!userData?.is_nine_hole}
       /* §1.3 — A SEEDED CARD NEVER SHOWS THE SKELETON. Without a seed the
