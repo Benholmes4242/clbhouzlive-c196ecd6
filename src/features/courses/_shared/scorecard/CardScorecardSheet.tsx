@@ -95,6 +95,8 @@ export interface CardScorecardSheetProps {
    * member their round has no hole scores when it does must be IMPOSSIBLE.
    */
   holesSettled?: boolean;
+  /** G2.4 — changes once per coalesced arrival of late supporting blocks. */
+  settleKey?: string | null;
   emptyVariant?: 'syncing' | 'nohbh' | 'unavailable';
   emptyGross?: number | null;
   emptyToPar?: number | null;
@@ -308,7 +310,7 @@ function FootAction({ label, onClick, icon: Icon }: { label: string; onClick: ()
 export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   open, onClose, eyebrowText,
   courseName, courseLocation, coursePar, courseSlope,
-  holes, holesSettled = true, nineHole, rounds, heroMuted, emptyMessage, loading,
+  holes, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
@@ -683,6 +685,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       contentReady={!loading}
       onHorizontalDrag={presentation === 'overlay' ? onHorizontalDrag : null}
       pageKey={paging?.announce ?? null}
+      settleKey={settleKey}
       presentation={presentation}
     >
       <div

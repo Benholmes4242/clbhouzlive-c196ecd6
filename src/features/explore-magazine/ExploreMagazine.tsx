@@ -493,11 +493,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     scrollElementIntoView(el, { offset: Math.max(56, chrome), behavior: 'smooth' });
   }, []);
 
-  /* §1.2 — the ring is an OUTLINE, so it cannot move the card by a pixel. */
-  const ringStyle = (id: string): React.CSSProperties =>
-    ringId === id
-      ? { borderRadius: 14, outline: '2px solid rgba(248,250,252,0.55)', outlineOffset: 0 }
-      : {};
+  /* G2.6 — THE RING IS GONE. It only ever showed in the gap between the tap and
+     the card covering the tile, since close cleared it. revealCard is what
+     actually returns the member to their place, and it needs no outline. */
+
 
   const prefetchRound = useCallback(
     (scoreId: string | null | undefined) => {
