@@ -1920,7 +1920,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     key={item.id}
                     ref={(el) => { cardRefs.current.set(item.id, el); }}
                     onPointerDown={() => prefetchRound(item.facts.score_id)}
-                    style={{ minWidth: 0, ...ringStyle(item.id) }}
+                    style={{ minWidth: 0, WebkitTapHighlightColor: 'transparent' }}
                   >
                     <ExploreCard
                       item={item}
@@ -1949,7 +1949,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
              <div
                ref={(el) => { cardRefs.current.set(item.id, el); }}
                onPointerDown={() => prefetchRound(item.facts.score_id)}
-               style={ringStyle(item.id)}
+               style={{ WebkitTapHighlightColor: 'transparent' }}
              >
               <ExploreCard
                 item={item}
