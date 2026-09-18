@@ -28,7 +28,7 @@ import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hoo
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { supabase } from '@/integrations/supabase/client';
 import { coursePlaceLine } from '@/features/explore-magazine/placeLine';
-import { useFrozenOpenGate } from '@/hooks/useFrozenOpenGate';
+import { useCardOpenGate, useCoalescedBlocks } from '@/hooks/useCardOpenGate';
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
@@ -347,18 +347,34 @@ export const RoundDetailSheet: React.FC<Props> = ({
     ),
     { postIdFor: () => postInfo?.postId ?? null },
   );
-  const overlayGate = useFrozenOpenGate('scorecard', open && presentation === 'overlay', {
-    round: roundSettled,
-    context: !scoreId || contextQuery.isFetched,
-    reactions: reactions.isSettled,
-    comments: roundPosts.isSettled,
-    field: !analysisCourseId || analysisQuery.isFetched,
+  /**
+   * G2.2 — THE SUBJECT GATE. The hole rows ARE the scorecard, so the card does
+   * not open without them and no cap can drop them. With a whole seed from the
+   * feed the subject is ready in the same tick, so this never waits there; it
+   * only waits where there is no seed, which is where waiting is correct.
+   *
+   * G2.3 — everything else is SUPPORTING. It is never excluded, only late: the
+   * 350ms cap decides whether the card waits for it before opening, and
+   * useCoalescedBlocks applies whatever arrives afterwards in ONE settle.
+   */
+  const supporting = useMemo(
+    () => ({
+      context: !scoreId || contextQuery.isFetched,
+      reactions: reactions.isSettled,
+      comments: roundPosts.isSettled,
+      field: !analysisCourseId || analysisQuery.isFetched,
+    }),
+    [scoreId, contextQuery.isFetched, reactions.isSettled, roundPosts.isSettled, analysisCourseId, analysisQuery.isFetched],
+  );
+  const overlayGate = useCardOpenGate('scorecard', open && presentation === 'overlay', {
+    subject: shownHoles.length > 0 || roundSettled,
+    supporting,
   });
   const cardOpen = presentation === 'page' ? open : open && overlayGate.visible;
+  const coalesced = useCoalescedBlocks(supporting, overlayGate.visible);
   const include = presentation === 'page'
-    ? { round: true, context: true, reactions: true, comments: true, field: true }
-    : overlayGate.included;
-  const stableHoles = include.round ? shownHoles : [];
+    ? { context: true, reactions: true, comments: true, field: true }
+    : coalesced;
   const stableContext = include.context ? ctx : null;
   const stableFieldPlayers = include.field ? fieldPlayers : null;
   const [commentsOpen, setCommentsOpen] = useState(initialCommentsOpen);
@@ -382,7 +398,12 @@ export const RoundDetailSheet: React.FC<Props> = ({
           : null,
       }
     : null;
+  /* G2.3 — the engagement pair is never dropped; it only arrives with the settle. */
   const stableEngagement = include.reactions && include.comments ? engagement : null;
+  const settleKey = Object.keys(include)
+    .sort()
+    .map((key) => `${key}:${(include as Record<string, boolean>)[key] ? 1 : 0}`)
+    .join(',');
 
   return (
     <>
@@ -394,8 +415,10 @@ export const RoundDetailSheet: React.FC<Props> = ({
       courseLocation={courseLocation}
       coursePar={coursePar}
       courseSlope={courseSlope}
-      holes={stableHoles}
-      feat={include.round ? feat : null}
+      holes={shownHoles}
+      holesSettled={shownHoles.length > 0 || roundSettled}
+      settleKey={settleKey}
+      feat={feat}
       nineHole={!!userData?.is_nine_hole}
       /* §1.3 — A SEEDED CARD NEVER SHOWS THE SKELETON. Without a seed the
          behaviour is exactly today's. */

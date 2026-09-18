@@ -462,7 +462,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      card currently ringed. The ring goes on close. */
   const cardRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
   const chipBarRef = useRef<HTMLDivElement | null>(null);
-  const [ringId, setRingId] = useState<string | null>(null);
   const [sheetSeed, setSheetSeed] = useState<RoundDetailSeed | null>(null);
   /* §3 — the sheet's own session: when it opened, how deep it went, and whether
      the depth section was read. rounds_viewed is 1 until paging lands (part 2). */
@@ -493,11 +492,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     scrollElementIntoView(el, { offset: Math.max(56, chrome), behavior: 'smooth' });
   }, []);
 
-  /* §1.2 — the ring is an OUTLINE, so it cannot move the card by a pixel. */
-  const ringStyle = (id: string): React.CSSProperties =>
-    ringId === id
-      ? { borderRadius: 14, outline: '2px solid rgba(248,250,252,0.55)', outlineOffset: 0 }
-      : {};
+  /* G2.6 — THE RING IS GONE. It only ever showed in the gap between the tap and
+     the card covering the tile, since close cleared it. revealCard is what
+     actually returns the member to their place, and it needs no outline. */
+
 
   const prefetchRound = useCallback(
     (scoreId: string | null | undefined) => {
@@ -1112,7 +1110,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     setPageIx(ix);
     pageIxRef.current = ix;
     setSheetSeed(seedFor(item));
-    setRingId(item.id);
     revealCard(item.id);
     opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
     /* §2.3 — both neighbours are fetched once this page settles, so the next
@@ -1325,7 +1322,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           setPageIx(null);
           pageIxRef.current = null;
           setSheetSeed(seed);
-          setRingId(item.id);
           revealCard(item.id);
           opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
         }
@@ -1921,7 +1917,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     key={item.id}
                     ref={(el) => { cardRefs.current.set(item.id, el); }}
                     onPointerDown={() => prefetchRound(item.facts.score_id)}
-                    style={{ minWidth: 0, ...ringStyle(item.id) }}
+                    style={{ minWidth: 0, WebkitTapHighlightColor: 'transparent' }}
                   >
                     <ExploreCard
                       item={item}
@@ -1950,7 +1946,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
              <div
                ref={(el) => { cardRefs.current.set(item.id, el); }}
                onPointerDown={() => prefetchRound(item.facts.score_id)}
-               style={ringStyle(item.id)}
+               style={{ WebkitTapHighlightColor: 'transparent' }}
              >
               <ExploreCard
                 item={item}
@@ -2002,10 +1998,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             });
             sheetSession.current = null;
           }
-          /* §2.4 — BACK AND ESCAPE CLOSE. They never page, and the ring is left
-             on the round the member was reading so the feed is where they were. */
+          /* §2.4 — BACK AND ESCAPE CLOSE. They never page; revealCard has
+             already put the feed back where the member was. */
           cancelNudge();
-          setRingId(null);
           setSheetSeed(null);
           setShift(null);
           setPreview(null);

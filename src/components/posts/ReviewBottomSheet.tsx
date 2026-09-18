@@ -104,6 +104,8 @@ export interface ReviewBottomSheetProps {
   resolvedBreakdown?: ReviewBottomSheetProps['breakdown'];
   resolvedMedia?: ReviewMediaItem[] | null;
   resolvedAggregate?: { avg_overall_score?: number | null; review_count?: number | null } | null;
+  /** G2.5 — false while the prose read is still open; the empty-state line stays silent. */
+  proseSettled?: boolean;
 }
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
@@ -148,6 +150,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   resolvedBreakdown,
   resolvedMedia,
   resolvedAggregate,
+  proseSettled = true,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
@@ -573,7 +576,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 minHeight: 0,
               }}
             >
-              {paragraphs.length === 0 ? (
+              {/* G2.5 — this line CLAIMS the review has no prose, so it may only
+                  speak once the prose query has settled. The subject gate makes
+                  that always true from the portal; the prop makes a lie
+                  impossible rather than merely unlikely. */}
+              {paragraphs.length === 0 && proseSettled ? (
                 <div
                   style={{
                     fontSize: 15,

@@ -24,6 +24,12 @@ interface ScorecardGlassOverlayProps {
   } | null;
   /** Changes only when a horizontal round page commits. */
   pageKey?: string | null;
+  /**
+   * G2.4 — ONE SETTLE. Changes once per coalesced arrival of late SUPPORTING
+   * blocks; the same measured 220ms height animation as paging drives it, so the
+   * card moves once rather than three times. There is no idle observer.
+   */
+  settleKey?: string | null;
   presentation?: 'overlay' | 'page';
   children: React.ReactNode;
 }
@@ -35,6 +41,7 @@ export function ScorecardGlassOverlay({
   contentReady = true,
   onHorizontalDrag = null,
   pageKey = null,
+  settleKey = null,
   presentation = 'overlay',
   children,
 }: ScorecardGlassOverlayProps) {
@@ -51,6 +58,7 @@ export function ScorecardGlassOverlay({
   const clickResetTimerRef = useRef<number | null>(null);
   const pagingTimerRef = useRef<number | null>(null);
   const previousPageKeyRef = useRef<string | null>(pageKey);
+  const previousSettleKeyRef = useRef<string | null>(settleKey);
   const previousHeightRef = useRef<number | null>(null);
   const [pagingHeight, setPagingHeight] = useState<number | null>(null);
   const gesture = useRef<{
@@ -71,15 +79,19 @@ export function ScorecardGlassOverlay({
     const nextHeight = card.getBoundingClientRect().height;
     const previousHeight = previousHeightRef.current;
     const pageChanged = previousPageKeyRef.current != null && previousPageKeyRef.current !== pageKey;
+    const settleChanged = previousSettleKeyRef.current !== settleKey;
     previousPageKeyRef.current = pageKey;
+    previousSettleKeyRef.current = settleKey;
     previousHeightRef.current = nextHeight;
-    if (!pageChanged || previousHeight == null || Math.abs(previousHeight - nextHeight) < 1) return;
+    if ((!pageChanged && !settleChanged) || previousHeight == null || Math.abs(previousHeight - nextHeight) < 1) return;
+    /* G2.4(d) — reduced motion applies the new height instantly. */
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
     setPagingHeight(previousHeight);
     const frame = requestAnimationFrame(() => setPagingHeight(nextHeight));
     if (pagingTimerRef.current != null) window.clearTimeout(pagingTimerRef.current);
     pagingTimerRef.current = window.setTimeout(() => setPagingHeight(null), 220);
     return () => cancelAnimationFrame(frame);
-  }, [children, mounted, pageKey, presentation]);
+  }, [children, mounted, pageKey, settleKey, presentation]);
 
   useEffect(() => {
     if (presentation === 'page') return;

@@ -15,7 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import { useTournamentMeta } from './useTournamentMeta';
 import { formatVenueLabel } from '../lib/venueLabel';
-import { useFrozenOpenGate } from '@/hooks/useFrozenOpenGate';
+import { useCardOpenGate } from '@/hooks/useCardOpenGate';
 
 interface ScorecardRow {
   round_number: number;
@@ -79,7 +79,8 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
   const navigate = useNavigate();
   const { data: scRows = [], isFetched: scFetched } = useScorecard(tournamentId, target?.playerId ?? null);
   const scLoading = !!tournamentId && !!target?.playerId && !scFetched;
-  const overlayGate = useFrozenOpenGate('tour-scorecard', open, { round: !scLoading });
+  /* G2.2 — the hole rows are the subject: the card waits for them, uncapped. */
+  const overlayGate = useCardOpenGate('tour-scorecard', open, { subject: !scLoading, supporting: {} });
   const meta = useTournamentMeta(tournamentId);
 
   const availableRounds = useMemo(() => {
@@ -162,7 +163,8 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
       courseLocation={courseLocation}
       coursePar={coursePar}
       courseSlope={null}
-      holes={overlayGate.included.round ? roundHoles : []}
+      holes={roundHoles}
+      holesSettled={!scLoading}
       loading={false}
       surface="tour"
 
