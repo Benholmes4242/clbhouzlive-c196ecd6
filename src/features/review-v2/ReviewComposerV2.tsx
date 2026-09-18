@@ -748,7 +748,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const remaining = 4 - composer.catsSet;
 
   let buttonLabel: string;
-  if (submit.submitting) {
+  if (mediaUploading) {
+    // R1 §1.1a — the sending state names the half that is running.
+    buttonLabel = t('review.wizard.uploadingMedia');
+  } else if (submit.submitting) {
     buttonLabel = isEditMode ? t('review.wizard.saving') : t('review.wizard.posting');
   } else if (step === 2) {
     buttonLabel = isEditMode ? t('review.wizard.save') : t('review.wizard.post');
@@ -1234,10 +1237,14 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
           <section style={{ padding: '0 16px 16px' }}>
             <Eyebrow>{t('review.wizard.step2.photosEyebrow')}</Eyebrow>
+            {/* R1 §1.3c — onRetry was never passed, so a failed tile's Retry
+                was a button that did nothing. Wired: with no reviewId the item
+                returns to pending and the pending set re-uploads. */}
             <MediaTray
               items={media.items}
               onPick={media.addFiles}
               onRemove={media.removeItem}
+              onRetry={(id) => { void media.retryItem(id); }}
               pickerError={media.pickerError}
               onClearError={media.clearPickerError}
             />
