@@ -101,6 +101,7 @@ export const ReviewBottomSheetPortal: React.FC = () => {
       resolvedBreakdown={payload.breakdown ?? fallbackQuery.data?.breakdown ?? null}
       resolvedMedia={mediaQuery.data ?? []}
       resolvedAggregate={aggregateQuery.data ?? null}
+      proseSettled={subjectReady}
       reviewerStats={payload.reviewerStats ?? null}
     />
   );
