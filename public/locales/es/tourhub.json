@@ -175,7 +175,7 @@
       "counter": "{{current}} / {{total}}",
       "stateLive": "EN VIVO",
       "stateFinal": "FINAL",
-      "stateUpcoming": "PROXIMO",
+      "stateUpcoming": "PRÓXIMO",
       "factRound": "RONDA",
       "factThru": "HASTA",
       "factMargin": "MARGEN",
@@ -197,8 +197,8 @@
     "courseStats": {
       "eyebrow": "COURSE",
       "parLabel": "PAR",
-      "recordLabel": "Record: {{value}}",
-      "recordLabelWithHolder": "Record: {{value}} · {{holder}}",
+      "recordLabel": "Récord: {{value}}",
+      "recordLabelWithHolder": "Récord: {{value}} · {{holder}}",
       "fallbackSummary": "Course preview"
     },
     "comingUp": {
@@ -208,7 +208,7 @@
       "daysLabel": "DAYS",
       "venueDefendsSep": " · {{name}} defends",
       "subline": "El calendario del tour",
-      "pageAria": "Pagina {{page}} de {{total}}"
+      "pageAria": "Página {{page}} de {{total}}"
     },
     "onTheCourse": {
       "eyebrow": "On the course",
@@ -242,15 +242,15 @@
       "awaitingPlayers": "{{range}} pendientes",
       "nShare_one": "{{count}} jugador",
       "nShare_other": "{{count}} jugadores",
-      "playingHardest": "Mas dificil",
-      "playingEasiest": "Mas facil",
+      "playingHardest": "Más difícil",
+      "playingEasiest": "Más fácil",
       "parShort": "Par {{par}}",
       "featuredGroupLabel": "Grupo destacado",
       "underParTodayLabel": "HOY BAJO PAR",
       "underParTodayValue": "{{n}} de {{m}}",
       "underParTodaySub": "jugadores hasta ahora",
-      "axisEasier": "Mas facil",
-      "axisHarder": "Mas dificil",
+      "axisEasier": "Más fácil",
+      "axisHarder": "Más difícil",
       "finishedLabel": "Finalizado",
       "todaySuffix": "{{value}} hoy",
       "fieldAverageWaiting": "Promedio del campo cuando haya {{n}} rondas",
@@ -463,15 +463,15 @@
       "clubhouseRating": "Club",
       "reviews": "Valoraciones",
       "top100": "Top 100",
-      "tooFewRatings": "Muy pocos miembros han valorado este campo todavia.",
+      "tooFewRatings": "Muy pocos miembros han valorado este campo todavía.",
       "rateAction": "VALORAR ESTE CAMPO",
-      "ratingFrom_one": "de {{count}} valoracion",
+      "ratingFrom_one": "de {{count}} valoración",
       "ratingFrom_other": "de {{count}} valoraciones",
       "sectionKicker": "La sede de esta semana en clbhouz",
       "viewCourse": "Ver campo",
-      "ratingLabel": "Valoracion de los miembros",
-      "basis_one": "De {{count}} valoracion de miembros que han jugado alli.",
-      "basis_other": "De {{count}} valoraciones de miembros que han jugado alli.",
+      "ratingLabel": "Valoración de los miembros",
+      "basis_one": "De {{count}} valoración de miembros que han jugado allí.",
+      "basis_other": "De {{count}} valoraciones de miembros que han jugado allí.",
       "seeAction": "VER EL CAMPO",
       "playedLabel": "Lo han jugado"
     },
@@ -823,13 +823,13 @@
         "drive_avg": "Distancia de drive",
         "drive_acc": "Precision de drive",
         "gir_pct": "Greens en regulacion",
-        "sand_saves_pct": "Salvadas de bunker",
+        "sand_saves_pct": "Salvadas de búnker",
         "strokes_gained_tee_green": "Golpes ganados tee a green",
         "strokes_gained_putting": "Golpes ganados con el putt",
         "scoring_avg": "Promedio de score",
         "putt_avg": "Promedio de putts",
-        "wins": "Mas victorias",
-        "top_10": "Mas top 10"
+        "wins": "Más victorias",
+        "top_10": "Más top 10"
       }
     }
   },

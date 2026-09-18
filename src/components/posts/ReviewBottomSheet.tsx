@@ -748,7 +748,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     reacted={reactionMine}
                     onToggle={onToggleReaction}
                     label={t('scorecard.likeReview', 'Like this review')}
-                    tone="glass"
                     hidden={reactionHidden}
                     size={15}
                   />

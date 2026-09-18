@@ -87,13 +87,13 @@
   },
   "feed": {
     "crownCategory": {
-      "lowest_gross_all_time": "Golpes brutos mas bajos",
+      "lowest_gross_all_time": "Golpes brutos más bajos",
       "best_score_diff_all_time": "Mejor diferencial de score",
       "best_stableford_all_time": "Mejor stableford",
-      "most_aces_all_time": "Mas hoyos en uno",
-      "most_albatrosses_all_time": "Mas albatros",
-      "most_eagles_all_time": "Mas eagles",
-      "most_birdies_all_time": "Mas birdies"
+      "most_aces_all_time": "Más hoyos en uno",
+      "most_albatrosses_all_time": "Más albatros",
+      "most_eagles_all_time": "Más eagles",
+      "most_birdies_all_time": "Más birdies"
     },
     "roundCard": {
       "net": "Neto",
@@ -103,30 +103,30 @@
   },
   "business": {
     "hero": {
-      "communityRating": "Valoracion de la comunidad",
+      "communityRating": "Valoración de la comunidad",
       "ratings": "{{count}} valoraciones",
-      "ratings_one": "{{count}} valoracion",
+      "ratings_one": "{{count}} valoración",
       "edit": "Editar",
       "follow": "Seguir",
       "following": "Siguiendo",
       "manage": "Gestionar",
       "verified": "Verificado",
-      "readMore": "Leer mas",
+      "readMore": "Leer más",
       "readLess": "Leer menos"
     },
     "emptyState": {
       "kicker": "PARA EMPRESAS",
       "title": "Pon tu negocio en clbhouz",
-      "body": "Llega a los golfistas donde ya estan.",
+      "body": "Llega a los golfistas donde ya están.",
       "cta": "Crear perfil de empresa",
       "footnote": "Gratis. Se tarda un minuto.",
       "guidanceHeading": "QUE OBTIENES",
       "reach": {
         "courses": "CAMPOS",
         "rounds": "RONDAS",
-        "reviews": "RESENAS",
-        "footnote": "LAS CIFRAS VERDES SON LOS ULTIMOS 30 DIAS",
-        "up": "mas {{count}} en los ultimos 30 dias"
+        "reviews": "RESEÑAS",
+        "footnote": "LAS CIFRAS VERDES SON LOS ÚLTIMOS 30 DIAS",
+        "up": "más {{count}} en los últimos 30 días"
       },
       "benefits": {
         "discoverable": {
@@ -135,7 +135,7 @@
         },
         "trust": {
           "claim": "Genera confianza",
-          "tail": "con resenas de golfistas reales"
+          "tail": "con reseñas de golfistas reales"
         },
         "reach": {
           "claim": "Mide tu alcance",
@@ -197,7 +197,7 @@
         "visits": "Visitas",
         "followers": "Seguidores",
         "impressions": "Impresiones",
-        "last7Days": "Ultimos 7 dias",
+        "last7Days": "Últimos 7 días",
         "allTime": "Total"
       },
       "verify": {
@@ -208,15 +208,15 @@
       "actions": {
         "edit": "Editar perfil",
         "insights": "Estadisticas",
-        "reviews": "Resenas",
+        "reviews": "Reseñas",
         "team": "Gestionar equipo",
-        "viewProfile": "Ver perfil publico"
+        "viewProfile": "Ver perfil público"
       }
     },
     "insights": {
       "metric": {
         "profileViews": "Visitas al perfil",
-        "uniqueVisitors": "Visitantes unicos",
+        "uniqueVisitors": "Visitantes únicos",
         "directoryImpressions": "Impresiones en el directorio",
         "clickOuts": "Clics salientes",
         "newFollowers": "Nuevos seguidores",
@@ -225,24 +225,24 @@
       "deltaCaption": "Cambio frente a los {{range}} anteriores",
       "audience": {
         "locked": "Bloqueado",
-        "visitorsLabel": "Visitantes unicos hasta ahora",
-        "body": "Los rangos de handicap y las ubicaciones principales necesitan mas audiencia. Con tan pocas personas el desglose las identificaria, asi que lo reservamos."
+        "visitorsLabel": "Visitantes únicos hasta ahora",
+        "body": "Los rangos de handicap y las ubicaciones principales necesitan más audiencia. Con tan pocas personas el desglose las identificaría, así que lo reservamos."
       },
       "followers": {
         "total": "Total"
       },
       "empty": {
-        "visits": "Aun no hay visitas en este periodo.",
-        "discovery": "Aun no hay datos de descubrimiento en este periodo.",
+        "visits": "Aún no hay visitas en este periodo.",
+        "discovery": "Aún no hay datos de descubrimiento en este periodo.",
         "followersTitle": "Crecimiento de seguidores",
-        "followersBody": "La actividad de seguidores aparecera aqui cuando ocurra.",
+        "followersBody": "La actividad de seguidores aparecerá aquí cuando ocurra.",
         "posts": "No se publicaron publicaciones en este periodo."
       },
       "rate": {
         "from": "De {{n}} impresiones",
         "none": "Publica y acumula impresiones para ver tu tasa de interaccion.",
         "tooFew": "Aun hay muy pocas impresiones para comparar.",
-        "benchmark": "Me gusta y comentarios sobre las impresiones. Mas del 2 por ciento es fuerte."
+        "benchmark": "Me gusta y comentarios sobre las impresiones. Más del 2 por ciento es fuerte."
       }
     },
     "team": {
@@ -255,7 +255,7 @@
         "hidden": "Oculto",
         "members": "Miembros",
         "pendingInvites": "Invitaciones pendientes",
-        "public": "Publico"
+        "public": "Público"
       }
     }
   },
@@ -265,16 +265,16 @@
       "levelKicker": "Igualado con el #1",
       "chaseLine": "por detras de {{name}} en {{course}}",
       "levelLine": "Igualado con {{name}} en {{course}}",
-      "leaderFallback": "el lider"
+      "leaderFallback": "el líder"
     },
     "nextRound": {
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
-      "lineHold": "Tu handicap no puede subir en la proxima vuelta.",
-      "subHold": "Supera {{cut}} y bajara.",
-      "lineRise": "Tu handicap subira a {{settle}} en la proxima vuelta",
+      "lineHold": "Tu handicap no puede subir en la próxima vuelta.",
+      "subHold": "Supera {{cut}} y bajará.",
+      "lineRise": "Tu handicap subirá a {{settle}} en la próxima vuelta",
       "subRise": "salvo que superes {{cut}}.",
-      "beatLabel": "{{count}} de tus ultimas {{total}} superan {{cut}}",
+      "beatLabel": "{{count}} de tus últimas {{total}} superan {{cut}}",
       "scaleShoot": "Resultado",
       "scaleBecomes": "El handicap pasa a",
       "noChange": "sin cambio",
@@ -296,7 +296,7 @@
       "stableford": "Stableford",
       "index": "Handicap",
       "indexHeldAt": "El handicap se mantiene en",
-      "notBest8": "no esta entre tus 8 mejores",
+      "notBest8": "no está entre tus 8 mejores",
       "eyebrow": "Last round",
       "nineHoles": "9 holes",
       "unknownCourse": "Unknown course",
@@ -305,7 +305,7 @@
       "theyFallback": "they"
     },
     "records": {
-      "emptyHint": "Tus records apareceran aqui cuando publiques rondas."
+      "emptyHint": "Tus récords aparecerán aquí cuando publiques rondas."
     },
     "form": {
       "archive": {
@@ -358,7 +358,7 @@
         "emptyHeading": "No one here yet",
         "emptyBody": "Your circle is the golfers you've played with who are also on clbhouz. Connect with a few and this becomes a live table.",
         "findGolfers": "Find golfers",
-        "flameLegend": "Mejoro medio golpe o mas en los ultimos 30 dias."
+        "flameLegend": "Mejoró medio golpe o más en los últimos 30 días."
       }
     },
     "friendsRounds": {
@@ -385,10 +385,10 @@
       "you": "Tu",
       "tiedCount_one": "{{count}} empatada",
       "tiedCount_other": "{{count}} empatadas",
-      "oldest": "Mas antigua",
+      "oldest": "Más antigua",
       "formSample_one": "{{count}} ronda compartida",
       "formSample_other": "{{count}} rondas compartidas",
-      "formTruncated": "Ultimas {{shown}} de {{total}}",
+      "formTruncated": "Últimas {{shown}} de {{total}}",
       "youLeadOf": "Lideras {{n}} de {{total}}",
       "group": {
         "volume": "VOLUMEN",
@@ -573,8 +573,8 @@
     "figures": {
       "courses": "Campos",
       "rounds": "Vueltas registradas",
-      "reviews": "Resenas de campos",
-      "note": "En directo desde la plataforma. El verde son los ultimos 30 dias."
+      "reviews": "Reseñas de campos",
+      "note": "En directo desde la plataforma. El verde son los últimos 30 días."
     },
     "appStore": "Descarga clbhouz en el App Store",
     "playSoon": "Pronto en Google Play",
