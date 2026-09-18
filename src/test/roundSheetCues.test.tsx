@@ -230,12 +230,14 @@ describe('the scorecard presentation split', () => {
   });
 
   it('axis-locks a horizontal swipe and forwards its full-card drag', () => {
+    const onClose = vi.fn();
     const onStart = vi.fn();
     const onMove = vi.fn();
     const onEnd = vi.fn();
     render(
       <CardScorecardSheet
         {...props}
+        onClose={onClose}
         onHorizontalDrag={{ onStart, onMove, onEnd }}
       />,
     );
@@ -247,7 +249,7 @@ describe('the scorecard presentation split', () => {
     expect(onStart).toHaveBeenCalledTimes(1);
     expect(onMove).toHaveBeenLastCalledWith(-60);
     expect(onEnd).toHaveBeenCalledWith(-60, expect.any(Number));
-    expect(props.onClose).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it('keeps an exit tappable without dismissing the card', () => {

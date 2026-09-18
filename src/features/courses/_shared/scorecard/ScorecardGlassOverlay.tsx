@@ -89,7 +89,8 @@ export function ScorecardGlassOverlay({
     if (!mounted || !open || presentation === 'page') return;
     const card = cardRef.current;
     if (!card) return;
-    setLockedHeight(Math.ceil(card.getBoundingClientRect().height));
+    const measuredHeight = Math.ceil(card.getBoundingClientRect().height);
+    if (measuredHeight > 0) setLockedHeight(measuredHeight);
     setAnimating(true);
     const frame = requestAnimationFrame(() => setEntered(true));
     if (animationTimerRef.current != null) window.clearTimeout(animationTimerRef.current);
