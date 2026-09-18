@@ -56,7 +56,7 @@ describe('SeasonRow overview grammar', () => {
   it('renders the completed kicker and one score/name figure stack without avatars', () => {
     const { container } = render(<SeasonRow event={event()} onSelect={() => {}} />);
     expect(screen.getByText(/Korn Ferry · 10 Sep/i)).toBeInTheDocument();
-    expect(screen.getByText('CHAMPION')).toBeInTheDocument();
+    expect(screen.getByText(/CHAMPION/)).toBeInTheDocument();
     expect(screen.getByText('−26')).toBeInTheDocument();
     expect(screen.getByText('A. Ortiz')).toBeInTheDocument();
     expect(container.querySelector('img')).toBeNull();
@@ -88,8 +88,10 @@ describe('SeasonRow overview grammar', () => {
         tiedCount: 3,
       },
     })} onSelect={() => {}} />);
-    expect(screen.getByText('Live').style.color).toBe('rgb(22, 163, 74)');
-    expect(screen.getByText('Trump International Golf Links (Ireland) · Clare').style.color).toBe('');
+    const live = screen.getByText('Live');
+    expect(live.style.color).toBe('rgb(22, 163, 74)');
+    expect(live.parentElement?.textContent).toContain('Trump International Golf Links (Ireland) · Clare');
+    expect(live.parentElement?.style.color).toBe('');
     expect(screen.getByText('3 tied')).toBeInTheDocument();
   });
 
