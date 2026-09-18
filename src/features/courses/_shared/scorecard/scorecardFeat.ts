@@ -1,7 +1,5 @@
 import type React from 'react';
 
-import type { CardScorecardHole } from './CardScorecardSheet';
-
 /**
  * THE SCORECARD FEAT BAND (BRIEF S7, 18 Sep 2026).
  *
@@ -25,6 +23,12 @@ export interface ScorecardFeat {
   hole: number | null;
 }
 
+export interface ScorecardFeatHole {
+  holeNo: number;
+  par: number | null;
+  strokes: number | null;
+}
+
 export const FEAT_BAND_STYLE: React.CSSProperties = {
   flexShrink: 0,
   minHeight: 37,
@@ -39,7 +43,7 @@ export const FEAT_BAND_STYLE: React.CSSProperties = {
 
 /** First match wins: this order is shared with Explore's permanent callouts. */
 export function scorecardFeatFor(
-  holes: CardScorecardHole[],
+  holes: ScorecardFeatHole[],
   nineHole: boolean,
   surface: 'member' | 'tour',
 ): ScorecardFeat | null {
@@ -48,7 +52,7 @@ export function scorecardFeatFor(
   if (surface !== 'member') return null;
 
   const scored = holes.filter(
-    (hole): hole is CardScorecardHole & { par: number; strokes: number } =>
+    (hole): hole is ScorecardFeatHole & { par: number; strokes: number } =>
       hole.par != null && hole.strokes != null && hole.strokes > 0,
   );
   if (scored.length === 0) return null;
@@ -76,7 +80,8 @@ export function scorecardFeatFor(
   if (birdies.length >= 5) return { kind: 'birdies', count: birdies.length, hole: null };
 
   const expectedHoles = nineHole ? 9 : 18;
-  const clean = holes.length === expectedHoles
+  const completeHoleNumbers = new Set(scored.map((hole) => hole.holeNo));
+  const clean = completeHoleNumbers.size === expectedHoles
     && scored.length === expectedHoles
     && scored.every((hole) => hole.strokes <= hole.par);
   return clean ? { kind: 'clean', count: scored.length, hole: null } : null;
