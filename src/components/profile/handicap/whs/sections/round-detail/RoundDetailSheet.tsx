@@ -29,6 +29,7 @@ import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { supabase } from '@/integrations/supabase/client';
 import { coursePlaceLine } from '@/features/explore-magazine/placeLine';
 import { useCardOpenGate, useCoalescedBlocks } from '@/hooks/useCardOpenGate';
+import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
@@ -340,6 +341,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const scoreIdList = useMemo(() => (scoreId ? [scoreId] : []), [scoreId]);
   const roundPosts = useRoundPostComments(scoreIdList);
   const postInfo = roundPosts.infoFor(scoreId);
+  const previewPostIds = useMemo(() => (postInfo?.postId ? [postInfo.postId] : []), [postInfo?.postId]);
+  const commentPreviews = useFeedCommentPreview(previewPostIds, 'round-scorecard');
   const reactions = useContentReactions(
     useMemo(
       () => (scoreId ? [{ type: 'round' as const, id: scoreId }] : []),
@@ -362,9 +365,10 @@ export const RoundDetailSheet: React.FC<Props> = ({
       context: !scoreId || contextQuery.isFetched,
       reactions: reactions.isSettled,
       comments: roundPosts.isSettled,
+      commentPreview: !postInfo?.postId || commentPreviews.isSettled(postInfo.postId),
       field: !analysisCourseId || analysisQuery.isFetched,
     }),
-    [scoreId, contextQuery.isFetched, reactions.isSettled, roundPosts.isSettled, analysisCourseId, analysisQuery.isFetched],
+    [scoreId, contextQuery.isFetched, reactions.isSettled, roundPosts.isSettled, postInfo?.postId, commentPreviews, analysisCourseId, analysisQuery.isFetched],
   );
   const overlayGate = useCardOpenGate('scorecard', open && presentation === 'overlay', {
     subject: shownHoles.length > 0 || roundSettled,
@@ -373,7 +377,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const cardOpen = presentation === 'page' ? open : open && overlayGate.visible;
   const coalesced = useCoalescedBlocks(supporting, overlayGate.visible);
   const include = presentation === 'page'
-    ? { context: true, reactions: true, comments: true, field: true }
+    ? { context: true, reactions: true, comments: true, commentPreview: true, field: true }
     : coalesced;
   const stableContext = include.context ? ctx : null;
   const stableFieldPlayers = include.field ? fieldPlayers : null;
@@ -389,6 +393,10 @@ export const RoundDetailSheet: React.FC<Props> = ({
         likeMine: reactions.stateFor('round', scoreId).mine,
         onToggleLike: () => reactions.toggle('round', scoreId),
         likeLabel: t('discover.reactions.action', 'Like this round'),
+        postId: postInfo?.postId ?? null,
+        commentPreview: include.commentPreview && postInfo?.postId
+          ? commentPreviews.map.get(postInfo.postId) ?? null
+          : null,
         comment: postInfo
           ? {
               count: postInfo.commentCount,

@@ -21,6 +21,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { LIKES_SHEET_Z } from '@/lib/zLayers';
 import { formatHcp } from '@/lib/formatHcp';
 import { usePostLikers } from '@/hooks/usePostLikers';
+import type { LikeSource } from '@/hooks/usePostLikes';
 
 const PAGE = 30;
 
@@ -35,7 +36,7 @@ export interface LikesSheetProps {
   postId: string | null;
   /** The surface's own like count — never the list length. */
   count: number;
-  source?: 'post' | 'editorial';
+  source?: LikeSource;
 }
 
 export function LikesSheet({ open, onClose, postId, count, source = 'post' }: LikesSheetProps) {
