@@ -26,6 +26,14 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export type StoryTargetType = 'tour_story' | 'amateur_story';
 
+/**
+ * G7.1(c) — THE SAME COUNTER SERVES THE ROUND AND THE REVIEW. get_story_engagement
+ * counts content_reactions and comments_v2 for ANY target type, so a round and a
+ * review read their comment count here rather than through a post's denormalised
+ * column. No second counter: a second counter is a second thing that can disagree.
+ */
+export type EngagementTargetType = StoryTargetType | 'round' | 'review';
+
 export interface StoryEngagement {
   likeCount: number;
   commentCount: number;
@@ -46,7 +54,7 @@ interface Row {
 }
 
 export function useStoryEngagement(
-  targetType: StoryTargetType,
+  targetType: EngagementTargetType,
   storyIds: readonly (string | null | undefined)[],
 ) {
   // Stable key: the sorted set of ids in the visible window.
