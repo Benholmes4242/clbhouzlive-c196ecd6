@@ -48,6 +48,14 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
         likes = data.map(l => ({ user_id: l.user_id }));
       } else if (source === 'review' || source === 'round') {
         // content_reactions has no actor columns — always personal.
+        //
+        // KNOWN, PRE-EXISTING, ONE ROW (18 Sep 2026): business-actor likes on a
+        // round live in post_likes against the backing POST, not here, so the
+        // scorecard card cannot see them. Card count and card names agree with
+        // each other because both read content_reactions on the round — but a
+        // business like shows in the Clubhouse feed and nowhere on the card.
+        // If a like count disagrees between the feed and the card, this is why.
+        // The 'post' source's round branch below is what still reads those rows.
         const { data, error: likesError } = await supabase
           .from('content_reactions')
           .select('user_id')
