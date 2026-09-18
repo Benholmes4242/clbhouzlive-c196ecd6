@@ -120,6 +120,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     setHighlightedReviewId(reviewIdToHighlight);
     if (reviewIdFromUrl) {
       setPendingSheetReviewId(reviewIdFromUrl);
+      // Reset the phase so a second deep link into the same mounted page works.
+      deepLinkPhase.current = 'idle';
       setSearchParams((prev) => {
         const p = new URLSearchParams(prev);
         p.delete('review');
@@ -136,8 +138,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const openReviewSheet = useReviewSheetStore((s) => s.open);
   const sheetIsOpen = useReviewSheetStore((s) => s.isOpen);
-  const deepLinkPending = useRef(false);
-  const [deepLinkArmed, setDeepLinkArmed] = useState(false);
+  /* Deep-link phase. A ref, not state: nothing here should re-render, and the
+     settle effect must not write to its own dependency — doing so is what
+     destroyed the re-assert frame and the highlight timer. */
+  const deepLinkPhase  = useRef<'idle' | 'opening' | 'open' | 'settled'>('idle');
+  const landedReviewId = useRef<string | null>(null);
 
   useEffect(() => {
     if (!pendingSheetReviewId || isLoading) return;
@@ -150,63 +155,66 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       return;
     }
 
-    // ORDER MATTERS. ScorecardGlassOverlay puts overflow:hidden on #root and
-    // body while the sheet is mounted, so the page cannot be scrolled once it is
-    // up. Position first, instantly, then open on the next frame.
+    // scrollIntoView with behavior:'auto' sets scroll offsets synchronously, and
+    // ScorecardGlassOverlay applies its overflow lock in its own effect a render
+    // later — so the page is already in position before the lock lands. No frame
+    // needed, and no frame means nothing for this effect's cleanup to cancel when
+    // setPendingSheetReviewId(null) changes its own dependency.
     document
       .querySelector(`[data-review-id="${target.id}"]`)
       ?.scrollIntoView({ behavior: 'auto', block: 'center' });
 
     const profile = target.user_profiles;
-    deepLinkPending.current = true;
-    const frame = requestAnimationFrame(() => {
-      openReviewSheet({
-        user: {
-          id: target.user_id ?? '',
-          name: profile?.display_name || profile?.username || 'Anonymous',
-          username: profile?.username ?? undefined,
-          avatar: profile?.profile_photo_url ?? null,
-        },
-        courseId,
-        courseName: courseName ?? '',
-        rating: target.rating ?? 0,
-        reviewId: target.id,
-        reviewText: target.review ?? null,
-        breakdown: {
-          design: target.design_score ?? null,
-          conditions: target.condition_score ?? null,
-          clubhouse: target.clubhouse_score ?? null,
-          facilities: target.facilities_score ?? null,
-        },
-      });
+    landedReviewId.current = target.id;
+    deepLinkPhase.current = 'opening';
+    openReviewSheet({
+      user: {
+        id: target.user_id ?? '',
+        name: profile?.display_name || profile?.username || 'Anonymous',
+        username: profile?.username ?? undefined,
+        avatar: profile?.profile_photo_url ?? null,
+      },
+      courseId,
+      courseName: courseName ?? '',
+      rating: target.rating ?? 0,
+      reviewId: target.id,
+      reviewText: target.review ?? null,
+      breakdown: {
+        design:     target.design_score ?? null,
+        conditions: target.condition_score ?? null,
+        clubhouse:  target.clubhouse_score ?? null,
+        facilities: target.facilities_score ?? null,
+      },
     });
-    return () => cancelAnimationFrame(frame);
+    // no cleanup — nothing pending
   }, [pendingSheetReviewId, isLoading, reviews, courseId, courseName, openReviewSheet]);
 
-  /* Arm only once the sheet is genuinely open — isOpen is still false on the
-     frame open() is called, and the dismissal effect would otherwise fire
-     against a sheet that had not opened yet. */
   useEffect(() => {
-    if (!sheetIsOpen || !deepLinkPending.current) return;
-    deepLinkPending.current = false;
-    setDeepLinkArmed(true);
-  }, [sheetIsOpen]);
+    // The sheet is genuinely up. Not set at open() time — isOpen is still false
+    // on that frame, and the dismissal branch below would fire against a sheet
+    // that had not opened yet.
+    if (sheetIsOpen && deepLinkPhase.current === 'opening') {
+      deepLinkPhase.current = 'open';
+      return;
+    }
 
-  useEffect(() => {
-    if (!deepLinkArmed || sheetIsOpen) return;
-    setDeepLinkArmed(false);
-    // Re-assert, not a jump: the overflow lock preserves scrollTop, so this only
-    // does work if the row moved while the sheet was up (a photo finishing, a
-    // reflow). One frame after unmount, when overflow is restored.
-    const frame = requestAnimationFrame(() => {
-      document
-        .querySelector(`[data-review-id="${highlightedReviewId}"]`)
-        ?.scrollIntoView({ behavior: 'auto', block: 'center' });
-    });
-    // NOW the highlight clock starts — this is the first moment it is visible.
-    const timeout = setTimeout(() => setHighlightedReviewId(null), 3000);
-    return () => { cancelAnimationFrame(frame); clearTimeout(timeout); };
-  }, [deepLinkArmed, sheetIsOpen, highlightedReviewId]);
+    if (!sheetIsOpen && deepLinkPhase.current === 'open') {
+      deepLinkPhase.current = 'settled';
+      const id = landedReviewId.current;
+      // Re-assert, not a jump: the overlay's overflow lock preserves scrollTop,
+      // so this only does work if the row moved while the sheet was up (a photo
+      // finishing, a reflow). One frame after unmount, when overflow is restored.
+      const frame = requestAnimationFrame(() => {
+        if (!id) return;
+        document
+          .querySelector(`[data-review-id="${id}"]`)
+          ?.scrollIntoView({ behavior: 'auto', block: 'center' });
+      });
+      // NOW the highlight clock starts — this is the first moment it is visible.
+      const timeout = setTimeout(() => setHighlightedReviewId(null), 3000);
+      return () => { cancelAnimationFrame(frame); clearTimeout(timeout); };
+    }
+  }, [sheetIsOpen]);
 
   const [isJustSubmittedOrUpdated, setIsJustSubmittedOrUpdated] = useState(() => {
     const fromLocationState = Boolean(location.state?.highlightMyReview);
@@ -451,7 +459,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         onReadMore={(expanded) =>
           analyticsEvents.track('review_read_more', { course_id: courseId, review_id: review.id, expanded })
         }
-        isHighlighted={isMine ? isJustSubmittedOrUpdated : review.id === highlightedReviewId}
+        isHighlighted={
+          isMine
+            ? (isJustSubmittedOrUpdated || review.id === highlightedReviewId)
+            : review.id === highlightedReviewId
+        }
       />
     );
   };
