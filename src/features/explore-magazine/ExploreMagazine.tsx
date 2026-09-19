@@ -1917,6 +1917,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           min-content, and the kicker/who-line are single-line nowrap — without
           the zero minimum a long course name widens the whole track past the
           viewport at 320px instead of clipping inside the card. */}
+      {!scoresBoardActive ? (
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
         {!source.isFetched && ranked.length === 0 ? (
           <>
