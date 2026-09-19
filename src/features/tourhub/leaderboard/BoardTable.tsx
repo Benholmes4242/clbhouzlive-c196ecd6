@@ -128,9 +128,9 @@ interface Props {
   movementEntries?: BoardEntry[];
 }
 
-function houseColor(score: number | null | undefined): string {
+function houseColor(score: number | null | undefined, emphasis: 'standard' | 'leader' = 'standard'): string {
   if (score == null) return INK;
-  return getScoreColor(score, 'dark');
+  return getScoreColor(score, 'dark', emphasis);
 }
 
 /** Absent figures render NOTHING — the grid holds the column. */
@@ -546,7 +546,7 @@ export function BoardTable({
       ? ''
       : `${e.position_tied ? 'T' : ''}${e.position}`;
     const isLeader = !demotedRow && e.position === 1;
-    const totColor = demotedRow ? SECONDARY : houseColor(e.score);
+    const totColor = demotedRow ? SECONDARY : houseColor(e.score, isLeader ? 'leader' : 'standard');
     const totalDisplay = fmtScore(e.score);
     const todayVal = todayFromEntry(e, currentRound);
     // THRU must agree with the live round: if the active round has not started
