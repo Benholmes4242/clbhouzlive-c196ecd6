@@ -1849,9 +1849,40 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       ) : null}
 
 
-      {view === 'scores' ? (
+      {view === 'scores' && !scoresBoardActive ? (
         <div style={{ marginBottom: BLOCK_GAP }}>
           <CircleShelf viewerId={userId} pos={0} />
+        </div>
+      ) : null}
+
+      {/* P1 — A PICKED BOARD REPLACES THE RANKED STREAM. The block is the same
+          one the old page rendered (same RPC, same rows, same count line and
+          widening sentence); the way back is STATED above it, because a member
+          who cannot find the stream again will think the app broke. */}
+      {scoresBoardActive ? (
+        <div style={{ marginBottom: BLOCK_GAP }}>
+          <div style={{ padding: '0 20px 6px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                analyticsEvents.track('amateur_board_cleared', { board: boardPick });
+                setBoardPick(null);
+              }}
+              style={{
+                padding: 0,
+                border: 'none',
+                background: 'transparent',
+                color: A.MUTE,
+                fontFamily: SANS,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              ‹ {t('amateur.board.backToStream', 'Back to the stream')}
+            </button>
+          </div>
+          <AmateurLeaderboardBlock userId={userId} state={boardState} onRowPress={boardRowPress} />
         </div>
       ) : null}
 
