@@ -63,12 +63,25 @@ describe('SeasonRow overview grammar', () => {
     expect(screen.getByRole('button').style.gridTemplateColumns).toBe('minmax(0,1fr) auto');
   });
 
-  it('pins the purse separately from the truncating venue line', () => {
-    render(<SeasonRow event={event()} onSelect={() => {}} />);
-    const purse = screen.getByText('$6M');
-    expect(purse.style.flex).toBe('0 0 auto');
-    expect(purse.style.whiteSpace).toBe('nowrap');
+  it('never renders the purse and still ellipsises the venue line', () => {
+    const { container } = render(<SeasonRow event={event()} onSelect={() => {}} />);
+    expect(screen.queryByText('$6M')).toBeNull();
+    expect(screen.queryByText('6,000,000')).toBeNull();
+    expect(container.textContent).not.toContain('$');
     expect(screen.getByText('Trump International Golf Links (Ireland) · Clare').style.textOverflow).toBe('ellipsis');
+  });
+
+  it('renders no meta line for an event with no live marker and no venue', () => {
+    const { container } = render(
+      <SeasonRow
+        event={event({ venueName: null, venueCity: null, status: 'closed', state: 'completed' })}
+        onSelect={() => {}}
+      />,
+    );
+    expect(screen.queryByText(/CHAMPION/)).toBeInTheDocument();
+    const textColumn = container.querySelector('button > span') as HTMLElement;
+    // Kicker, name, and nothing else — no empty meta row.
+    expect(textColumn.children.length).toBe(2);
   });
 
   it('keeps only Live green and renders a tied leader in the figure stack', () => {
