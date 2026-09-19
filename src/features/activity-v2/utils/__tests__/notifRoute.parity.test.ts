@@ -109,12 +109,6 @@ const FIXTURES: Fixture[] = [
   { name: 'top_ten_reply', row: { notif_type: 'top_ten_reply', entity_type: 'top_ten', data: { target_user_id: 'u2', top_ten_comment_id: 'tc1', parent_comment_id: 'tc0' } } },
 
   // course surfaces
-  // ORDERING SHADOW (reported, not fixed here): the client resolves these two
-  // types BELOW its generic `entity_type === 'course'` fallback, so a row that
-  // also carries entity_type 'course' returns /courses/:id in-app while the push
-  // returns the intended deep link. The fixtures carry the course id in data
-  // only, which is what both routers read first. Fixing the client's order is a
-  // client change and outside N3.
   { name: 'rate_course_prompt', row: { notif_type: 'rate_course_prompt', entity_id: CID, data: { course_id: CID } } },
   { name: 'course_analytics_updated', row: { notif_type: 'course_analytics_updated', data: { course_id: CID } } },
   { name: 'friend_course_review', row: { notif_type: 'friend_course_review', entity_type: 'course', entity_id: CID, data: { course_id: CID, review_id: RID } } },
