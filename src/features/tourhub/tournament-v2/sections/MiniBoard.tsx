@@ -137,7 +137,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div>{t('board.columns.player')}</div>
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
-            {phase === 'completed' || showOverviewThru ? <div style={{ textAlign: 'right' }}>{phase === 'completed' ? t('board.columns.prize', 'Prize') : t('board.columns.thru')}</div> : null}
+            {phase === 'completed' || showOverviewToday ? <div style={{ textAlign: 'right' }}>{phase === 'completed' ? t('board.columns.prize', 'Prize') : t('board.columns.today')}</div> : null}
           </div>
           {rows.map((r) => {
             const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
@@ -162,7 +162,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
                 <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
-                {phase === 'completed' || showOverviewThru ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{phase === 'completed' ? (r.money != null && r.money > 0 ? formatEarnings(r.money) : BLANK) : thruLabel(r, today)}</div> : null}
+                {phase === 'completed' || showOverviewToday ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: phase === 'completed' ? T.mute : getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{phase === 'completed' ? (r.money != null && r.money > 0 ? formatEarnings(r.money) : BLANK) : today == null ? todayBlank : fmtScore(today)}</div> : null}
               </button>
             );
           })}
