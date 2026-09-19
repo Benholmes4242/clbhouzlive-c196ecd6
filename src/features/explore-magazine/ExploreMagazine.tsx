@@ -1630,9 +1630,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           stay put. */}
       {view === 'courses' ? <CoursesSearchField value={search} onChange={setSearch} /> : null}
 
-      {/* §1 THE SAME SCOPE ROW, THE SAME COMPONENT, for Scores and the merged
-          Courses view. Scores does not render it at all where neither a club nor
-          a county resolves, and the view is then World.
+      {/* §1 THE SAME SCOPE CHIPS, THE SAME COMPONENT, for Scores and the merged
+          Courses view. Scores does not render them at all where neither a club
+          nor a county resolves, and the view is then World.
 
           BRIEF_EXPLORE_SECOND_PASS §1 REVERSES THE 'sm' RULING. Every secondary
           row in Explore is now ONE size — the Watch filter row's, which is the
@@ -1640,16 +1640,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           the reference. The hierarchy is carried by position and by the primary
           row being CENTRED, not by shrinking the filter.
 
-          §2 EQUAL WIDTH, DISTRIBUTED: the four chips share the run between the
-          left gutter and the place dropdown evenly. The dropdown keeps its own
-          width at the right end and is not part of that distribution — it is a
-          different kind of control. */}
-      {/* THE PLACE DROPDOWN DOES NOT NEED A HOME CLUB. The row used to require a
-          club or a county, so a member with neither got no scope row at all and
-          no way to browse anywhere. The row now renders whenever geography has
-          settled; the CHIPS stand down when the member has no club, county or
-          country, exactly as the Courses row already does, because a lone World
-          chip is a control that cannot change what you see. */}
+          P2 — SCORES HAS ONE PINNED CONTROL, NOT TWO. Place/course are open-list
+          board filters and stay inside BoardFilterPanel, where their facet counts
+          already live. The scope chips alone scroll; the board picker alone pins. */}
       {view === 'scores' && geography.isFetched ? (
         <div
           style={{
@@ -1658,70 +1651,71 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             gap: 8,
             padding: '0 12px 14px',
             minWidth: 0,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
+            overflow: 'hidden',
           }}
         >
-          <div style={{ minWidth: 0, flex: '1 1 auto' }}>
-          {geography.scope.primaryClubId || geography.scope.county || geography.scope.country ? (
-          <RailChips
-            options={[
-              ...(geography.scope.primaryClubId ? [{ id: 'club', label: t('amateur.stream.scope.club', 'My club') }] : []),
-
-              ...(geography.scope.county ? [{ id: 'county', label: geography.scope.county }] : []),
-              ...(geography.scope.country ? [{ id: 'country', label: geography.scope.country }] : []),
-              { id: 'world', label: t('amateur.stream.scope.world', 'World') },
-            ]}
-            value={scoreScope}
-            onChange={(next) => {
-              const value = next as ScoreScope;
-              analyticsEvents.track('amateur_scope_changed', { view, from: scoreScope, to: value });
-              scoreScopeChosen.current = true;
-              setScoreScope(value);
-              setRevealed(STREAM_PAGE_SIZE);
-              loggedRef.current = 0;
+          <div
+            data-scores-scope-track
+            style={{
+              position: 'relative',
+              minWidth: 0,
+              flex: '1 1 auto',
+              overflow: 'hidden',
             }}
-            ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
-            ground="filled-selection"
-            distribute
-          />
-          ) : null}
+          >
+            {geography.scope.primaryClubId || geography.scope.county || geography.scope.country ? (
+              <RailChips
+                options={[
+                  ...(geography.scope.primaryClubId ? [{ id: 'club', label: t('amateur.stream.scope.club', 'My club') }] : []),
+                  ...(geography.scope.county ? [{ id: 'county', label: geography.scope.county }] : []),
+                  ...(geography.scope.country ? [{ id: 'country', label: geography.scope.country }] : []),
+                  { id: 'world', label: t('amateur.stream.scope.world', 'World') },
+                ]}
+                value={scoreScope}
+                onChange={(next) => {
+                  const value = next as ScoreScope;
+                  analyticsEvents.track('amateur_scope_changed', { view, from: scoreScope, to: value });
+                  scoreScopeChosen.current = true;
+                  setScoreScope(value);
+                  setRevealed(STREAM_PAGE_SIZE);
+                  loggedRef.current = 0;
+                }}
+                ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
+                ground="filled-selection"
+                distribute
+                style={{ paddingRight: 26, flexWrap: 'nowrap' }}
+              />
+            ) : null}
+            <div
+              data-scores-scope-fade
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: 26,
+                pointerEvents: 'none',
+                background: `linear-gradient(90deg, transparent, ${A.CANVAS})`,
+              }}
+            />
           </div>
 
-          {/* §3 THE PLACE FILTER COMES TO SCORES — the SAME component and the
-              SAME data path as Courses, with the "has content" rule handed in as
-              a PARAMETER: Scores is rounds, so a place qualifies on TRACKED
-              ROUNDS, which is a strict subset of the Courses rule (rounds OR
-              ratings). Picking a place resets scope to World, exactly as on
-              Courses; clearing it leaves scope where the member left it. */}
-          <RegionDropdown
-            tree={places}
-            choice={place}
-            onChoose={(next) => {
-              analyticsEvents.track('amateur_place_changed', {
-                view,
-                country: next?.country ?? null,
-                region: next?.region ?? null,
-                scope_reset: next !== null && scoreScope !== 'world',
-              });
-              setPlace(next);
-              if (next !== null) {
-                scoreScopeChosen.current = true;
-                setScoreScope('world');
-              }
-              setRevealed(STREAM_PAGE_SIZE);
-              loggedRef.current = 0;
+          <div
+            data-scores-scope-separator
+            aria-hidden="true"
+            style={{
+              flex: '0 0 1px',
+              alignSelf: 'stretch',
+              marginBlock: 5,
+              background: A.BORDER,
             }}
           />
 
-          {/* P1 — THE BOARD PICKER, pinned flex:none at the row's end so the
-              scope chips scroll beside it and it never leaves reach (a third
-              chrome row is not acceptable — the 320px bleed is why Reviews
-              folded into Courses). The trigger names the board the panel opens
-              on, and it ONLY opens the panel: the way back to the ranked stream
-              is the stated action above the board list, not a second meaning
-              hidden on this chip. Same geometry as the place trigger beside it. */}
+          {/* P2 — THE ONLY PINNED CONTROL. Its full board label is never
+              truncated; the scope track yields and scrolls instead. */}
           <button
+            data-scores-board-picker
             type="button"
             onClick={() => {
               analyticsEvents.track('amateur_board_picker_opened', {
@@ -1735,7 +1729,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: 6,
-              flexShrink: 0,
+              flex: '0 0 auto',
               height: 32,
               padding: '0 12px',
               borderRadius: 999,
@@ -1743,13 +1737,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               background: scoresBoardActive ? 'rgba(255,255,255,0.10)' : 'transparent',
               color: A.INK,
               fontFamily: SANS,
-              fontSize: 13,
+              fontSize: 12.5,
               fontWeight: 700,
-              maxWidth: 180,
               whiteSpace: 'nowrap',
             }}
           >
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
+            <span>
               {t(
                 BOARD_LABELS[boardPick ?? ENTRY_BOARD].i18n,
                 BOARD_LABELS[boardPick ?? ENTRY_BOARD].label,
