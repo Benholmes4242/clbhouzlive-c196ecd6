@@ -5,7 +5,17 @@
  *
  * Fallback: '/notificationmessages' so unmapped taps land on the activity
  * list rather than a dead Clubhouse stop.
+ *
+ * N3 — PORTING CONTRACT. The client returns '' to mean "inert, do not
+ * navigate" (its row guards on !url). A push has no such contract: the worker
+ * builds `${APP_ORIGIN}${route}`, so '' sends the tap to the bare origin, i.e.
+ * the home screen. Every client branch returning '' returns FALLBACK here.
+ * The client's dev-only unhandled-type console.warn is intentionally dropped —
+ * import.meta.env.DEV does not exist in Deno.
  */
+
+/** The client's '' (inert) and its actor/'/' unknown fallback both land here. */
+const FALLBACK = '/notificationmessages';
 
 export interface NotifRouteInput {
   notif_type?: string | null;
@@ -25,6 +35,27 @@ const FOLLOW_TYPES = new Set([
   'friend_cancelled',
 ]);
 
+/** Reaction notifications whose target can be a ROUND post. */
+const ROUND_REACTION_TYPES = new Set([
+  'like',
+  'like_post',
+  'comment',
+  'comment_post',
+  'comment_reply',
+  'comment_mention',
+  'mention',
+  'mention_post',
+  'tag',
+]);
+
+/** Of those, the ones that should land with the comments open. */
+const COMMENT_TYPES = new Set([
+  'comment',
+  'comment_post',
+  'comment_reply',
+  'comment_mention',
+]);
+
 export function routeForNotif(input: NotifRouteInput): string {
   const type = String(input.notif_type ?? '');
   const entity_type = input.entity_type ?? null;
@@ -32,14 +63,118 @@ export function routeForNotif(input: NotifRouteInput): string {
   const actor_user_id = input.actor_user_id ?? null;
   const data: any = input.data && typeof input.data === 'object' ? input.data : {};
 
+  // --- rounds win outright (MICRO_BRIEF_ROUND_LINK_FLASH S1.2) -----------
+  // A round notification carries entity_type 'post', so without this the
+  // generic entity fallback below returns /post/:id and PostDeepLinkPage
+  // flashes its unavailable state before redirecting. is_round is only true
+  // when the trigger also wrote a score id.
+  if (type === 'new_post' && data.is_round === true && data.whs_score_id) {
+    return `/round/${encodeURIComponent(data.whs_score_id)}`;
+  }
+
+  // A LIKE, COMMENT OR MENTION ON A ROUND OPENS THE ROUND. Same reasoning:
+  // a round post has no feed home and no media, so /post/:id can only
+  // redirect. DEPLOYED-PAYLOAD LIMIT: only the new_post trigger writes
+  // post_type / whs_score_id / is_round today, so like/comment/mention rows
+  // still fall through to /post/:id until those triggers carry them.
+  if (ROUND_REACTION_TYPES.has(type)) {
+    const scoreId = data.whs_score_id ?? null;
+    const isRound = data.is_round === true || data.post_type === 'round';
+    if (scoreId && isRound) {
+      const base = `/round/${encodeURIComponent(scoreId)}`;
+      return COMMENT_TYPES.has(type) ? `${base}?openComments=1` : base;
+    }
+  }
+
+  // --- game family (Crowns chip) ---------------------------------------
+  if (
+    type === 'crown_taken' || type === 'crown_lost' ||
+    type === 'legend_earned' || type === 'legend_lost' ||
+    type === 'course_record_beaten' || type === 'rival_played'
+  ) {
+    const courseId = data.course_id ?? (entity_type === 'course' ? entity_id : null);
+    // Client returns '' (inert row) here; a push must still land somewhere.
+    if (!courseId) return FALLBACK;
+    const cat = data.category as string | undefined;
+    return `/courses/${courseId}?tab=legends${cat ? `&cat=${encodeURIComponent(cat)}` : ''}`;
+  }
+
+  if (
+    type === 'streak_broken' || type === 'streak_at_risk' ||
+    type === 'streak_freeze_applied'
+  ) {
+    // Streaks have their own sheet, opened by ?gam=streaks — a broken-streak
+    // notification landing on the career record is the wrong destination.
+    return '/handicap?gam=streaks';
+  }
+
+  if (
+    type === 'level_up' || type === 'level_near' ||
+    type === 'status_at_risk' || type === 'status_reclaimed' ||
+    type === 'badge_earned'
+  ) {
+    // The career record sheet lives on /handicap, opened by ?gam=trophies.
+    // badge= opens the record ON THAT BADGE.
+    const badgeId = type === 'badge_earned' ? (data.badge_id as string | undefined) : null;
+    return `/handicap?gam=trophies${badgeId ? `&badge=${encodeURIComponent(badgeId)}` : ''}`;
+  }
+
+  // --- discover reactions ---------------------------------------------
+  // The trigger writes { actor_id, target_type, target_id } plus course_id
+  // (both types, ABSENT when the round's course is unmapped) and score_id
+  // (rounds only). A round opens the scorecard over /handicap; a review opens
+  // the course review permalink.
+  if (type === 'reaction') {
+    const targetType = data.target_type;
+    const targetId = data.target_id ?? entity_id ?? null;
+    if (targetType === 'round') {
+      const scoreId = data.score_id ?? (entity_type === 'score' ? entity_id : null) ?? targetId;
+      return scoreId ? `/handicap?score=${encodeURIComponent(scoreId)}` : '/handicap';
+    }
+    if (targetType === 'review') {
+      const cid = data.course_id;
+      if (cid && targetId) return `/courses/${cid}?tab=reviews&review=${targetId}`;
+      if (cid) return `/courses/${cid}?tab=reviews`;
+      return FALLBACK; // client returns '' (inert); a push cannot.
+    }
+  }
+
   // like
   if (type === 'like' || type === 'like_post') {
+    /* R3.3 — A LIKE ON A REVIEW GOES WHERE ITS COMMENT GOES. A PERSONAL like on
+       a review-backed post writes content_reactions and arrives as `reaction`
+       (above); a BUSINESS like still writes post_likes and arrives as `like`,
+       carrying target_type 'review' plus the review and course ids. Rows
+       predating R3.3 carry no target_type and fall through to /post/:id. */
+    const targetType = data.target_type;
+    if (targetType === 'review') {
+      const cid = data.course_id;
+      const rid = data.review_id ?? data.target_id ?? null;
+      if (cid && rid) return `/courses/${cid}?tab=reviews&review=${rid}`;
+      if (cid) return `/courses/${cid}?tab=reviews`;
+    }
     const postId = data.post_id ?? (entity_type === 'post' ? entity_id : null);
     if (postId) return `/post/${postId}`;
   }
 
   // comment / reply
   if (type === 'comment' || type === 'comment_post' || type === 'comment_reply') {
+    /* G7.2(e) — A COMMENT ON A ROUND OR A REVIEW GOES WHERE ITS LIKE GOES. The
+       same two destinations the `reaction` branch resolves, from the same
+       payload keys the widened comments_v2_notify writes. */
+    const targetType = data.target_type;
+    const targetId = data.target_id ?? null;
+    if (targetType === 'round') {
+      const scoreId = data.score_id ?? data.whs_score_id ?? targetId;
+      return scoreId ? `/handicap?score=${encodeURIComponent(scoreId)}` : '/handicap';
+    }
+    if (targetType === 'review') {
+      const cid = data.course_id;
+      const rid = data.review_id ?? targetId;
+      if (cid && rid) return `/courses/${cid}?tab=reviews&review=${rid}`;
+      if (cid) return `/courses/${cid}?tab=reviews`;
+      return FALLBACK; // client returns '' (inert); a push cannot.
+    }
     const postId = data.post_id ?? (entity_type === 'post' ? entity_id : null);
     const commentId = data.comment_id ?? (entity_type === 'comment' ? entity_id : null);
     if (postId && commentId) return `/post/${postId}/comment/${commentId}`;
@@ -116,6 +251,23 @@ export function routeForNotif(input: NotifRouteInput): string {
     if (cid) return `/courses/${cid}?tab=reviews`;
   }
 
+  // video ready (system-authored). Payload carries { post_id, stream_id };
+  // no usable target -> the member's OWN profile, never Clubhouse.
+  if (type === 'video_ready') {
+    const pid = data.post_id ?? (entity_type === 'post' ? entity_id : null);
+    if (pid) return `/post/${pid}`;
+    return '/profile';
+  }
+
+  // service announcement (app-wide, from clbhouz). These carry
+  // { campaign, route } and nothing else. A route of '/' is Clubhouse, i.e.
+  // NOT a destination. Route only to a REAL carried target.
+  if (type === 'service_announcement') {
+    const target = data.route ?? data.url ?? null;
+    if (target && target !== '/' && target.startsWith('/')) return target;
+    return FALLBACK; // client returns '' (inert row); a push cannot.
+  }
+
   // record-beaten / legends family
   if (
     type === 'top_100_record_beaten' ||
@@ -153,6 +305,9 @@ export function routeForNotif(input: NotifRouteInput): string {
 
   // new_post
   if (type === 'new_post') {
+    const isRound = data.is_round === true;
+    const scoreId = data.whs_score_id as string | undefined;
+    if (isRound && scoreId) return `/round/${encodeURIComponent(scoreId)}`;
     const pid = data.post_id ?? (entity_type === 'post' ? entity_id : null);
     if (pid) return `/post/${pid}`;
     if (actor_user_id) return `/profile/${actor_user_id}`;
@@ -221,10 +376,31 @@ export function routeForNotif(input: NotifRouteInput): string {
     if (threadId) return `/messages/${threadId}`;
     return '/messages';
   }
+
+  // Onboarding nudge: the row's whole job is the setup step it names, so it
+  // routes to that step's own screen, carrying the ?src marker the arrival
+  // tracker reads. The gap is authoritative; data.link is only a display echo.
+  if (type === 'onboarding_nudge') {
+    const gap = data.gap;
+    if (gap === 'whs') return '/handicap?src=nudge_whs';
+    if (gap === 'club') return '/edit-profile?src=nudge_club';
+    if (gap === 'username') return '/edit-profile?src=nudge_username';
+    return '/edit-profile';
+  }
   if (type === 'handicap_authority_live') return '/handicap';
 
+  // golfer verified (system-authored)
+  if (type === 'golfer_verified') return '/profile';
+
+  // tour digests (system-authored, NO actor, NO target). Each digest summarises
+  // several stories, so there is nothing single to deep-link to — they land on
+  // the wire, not on a hub with a leaderboard at the top.
+  if (type === 'tour_preview' || type === 'tour_roundup') {
+    return '/tour/news';
+  }
+
   // unknown -> activity list
-  return '/notificationmessages';
+  return FALLBACK;
 }
 
 function buildTopTenLink(actor_user_id: string | null, data: any): string {
@@ -236,5 +412,5 @@ function buildTopTenLink(actor_user_id: string | null, data: any): string {
   if (courseId) parts.push(`course=${courseId}`);
   if (commentId) parts.push(`top_ten_comment=${commentId}`);
   if (parentId) parts.push(`top_ten_parent=${parentId}`);
-  return targetId ? `/profile/${targetId}?${parts.join('&')}` : '/notificationmessages';
+  return targetId ? `/profile/${targetId}?${parts.join('&')}` : FALLBACK;
 }
