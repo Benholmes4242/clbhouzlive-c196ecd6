@@ -2,7 +2,7 @@ import React from 'react';
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
+import { ExploreCard, strongestReviewArea } from '@/features/explore-magazine/ExploreCard';
 import { fullWidthCardSize } from '@/features/explore-magazine/ExploreMagazine';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
@@ -83,6 +83,41 @@ function textSlots(container: HTMLElement, name: string) {
 }
 
 describe('Explore card shapes', () => {
+  it('uses the score tier word and reserves enrichment space before details resolve', () => {
+    const { container, getByText } = render(
+      <ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />,
+    );
+    expect(getByText('Excellent')).toBeInTheDocument();
+    const lane = container.querySelector<HTMLElement>('[data-review-enrichment-lane="true"]');
+    expect(lane?.style.height).toBe('18px');
+    expect(lane?.textContent).toBe('');
+  });
+
+  it('shows image-only photo copy and a clear strongest category without changing reserved geometry', () => {
+    const enriched = {
+      ...review(),
+      facts: {
+        ...review().facts,
+        photoCount: 3,
+        breakdown: { design: 9.2, conditions: 8.7, clubhouse: 8.1, facilities: 7.9 },
+      },
+    };
+    const { container, getByText } = render(
+      <ExploreCard item={enriched} size="lead" shape={null} onTap={() => undefined} />,
+    );
+    const lane = container.querySelector<HTMLElement>('[data-review-enrichment-lane="true"]');
+    expect(lane?.style.height).toBe('18px');
+    expect(getByText('Strongest on design')).toBeInTheDocument();
+    expect(getByText('3 photos')).toBeInTheDocument();
+  });
+
+  it('requires all four scores and a 0.5 lead for strongest on', () => {
+    expect(strongestReviewArea({ design: 9, conditions: 8.5, clubhouse: 8.4, facilities: 8 })).toBe('design');
+    expect(strongestReviewArea({ design: 9, conditions: 8.6, clubhouse: 8.4, facilities: 8 })).toBeNull();
+    expect(strongestReviewArea({ design: 9, conditions: 8.5, clubhouse: 9, facilities: 8 })).toBeNull();
+    expect(strongestReviewArea({ design: 9, conditions: 8.5, clubhouse: null, facilities: 8 })).toBeNull();
+  });
+
   it('renders a short review ON the photo at the lead minimum height with its reserved lanes', () => {
     const { container } = render(
       <ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />,
