@@ -35,8 +35,23 @@ export const analyticsEvents = {
         user_id: user?.id ?? null,
         props: {
           ...params,
+          /* RESERVED ENVELOPE KEYS — session_id, page, path, build, ua.
+             These are applied AFTER the caller's spread, so they overwrite a
+             caller prop of the same name silently: the event still writes,
+             nothing errors, and the caller's value is simply gone. Callers
+             must NOT use these names. What it cost when one did: Explore sent
+             `page` as a scroll-depth number and the envelope replaced it with
+             the route, so amateur_stream_page_loaded depth was unrecorded for
+             the life of the event (renamed to stream_page, Sep 2026). The
+             spread must never move after these keys either — letting callers
+             win would hand route analytics a number the moment any caller
+             sends `page`.
+             `page` is the route key read by admin analytics; `path` is the
+             same value under the key newer consumers prefer — both are
+             written until the older readers migrate. */
           session_id: getSessionId(),
           page: window.location.pathname,
+          path: window.location.pathname,
           build: __BUILD_ID__,
           ua: getUserAgent(),
         },

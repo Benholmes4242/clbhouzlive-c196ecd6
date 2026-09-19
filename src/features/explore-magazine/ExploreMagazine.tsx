@@ -931,7 +931,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
        the client fallback is all news, the RPC splits rounds into news/backlog. */
     const backlog = visible.reduce((n, item) => n + (item.lane === 'backlog' ? 1 : 0), 0);
     analyticsEvents.track('amateur_stream_page_loaded', {
-      page,
+      stream_page: page,
       returned: visible.length,
       lane_mix: `news:${visible.length - backlog},backlog:${backlog}`,
       backlog_count: backlog,
