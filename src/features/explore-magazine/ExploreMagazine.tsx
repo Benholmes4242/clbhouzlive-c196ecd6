@@ -2084,6 +2084,25 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           targetId={openCommentsPostId}
         />
       )}
+
+      {/* P1 — THE BOARD'S PANEL, mounted against the same state the block reads,
+          so the panel's count and the page's rows can never disagree. Picking a
+          board applies it live (boardPick), and the footer's "Show N rounds"
+          closes onto a body that has already swapped. */}
+      <BoardFilterPanel
+        open={boardPanelOpen}
+        onClose={() => setBoardPanelOpen(false)}
+        userId={userId}
+        board={boardState.board}
+        onBoardChange={(next) => {
+          boardState.changeBoard(next);
+          setBoardPick(next);
+        }}
+        resultCount={boardState.total}
+        filters={boardState.filters}
+        onChange={boardState.changeFilters}
+        facets={boardState.facets}
+      />
     </div>
   );
 }
