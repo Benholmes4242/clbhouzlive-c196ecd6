@@ -39,6 +39,12 @@ import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
 import { ExploreShelf } from './ExploreShelf';
 import { useCircleSize } from '@/features/amateur/useCircleSize';
+import { ENTRY_BOARD, useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
+import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBlock';
+import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
+import { BOARD_LABELS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
+import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
+import { ChevronDown } from 'lucide-react';
 
 import { CircleShelf } from './CircleShelf';
 import { StandingShelf } from './StandingShelf';

@@ -34,6 +34,11 @@ import { useCircleSize } from './useCircleSize';
  *
  * NOTHING NEW REACHES THE DATABASE — get_board_page / get_board_facets /
  * get_board_courses are untouched.
+ *
+ * PHASE B (BRIEF_EXPLORE_MAGAZINE P1, Sep 2026) — LIVE AGAIN. ExploreMagazine's
+ * Scores view consumes this hook: the ranked stream is the default and a board
+ * renders only once the member picks one. `active` gates BOTH board reads, so
+ * All, Courses, Watch and an untouched Scores view issue nothing.
  */
 /** One read serves the visible cut, the pinned own row and the panel's count. */
 const PAGE_FETCH = 200;
@@ -47,7 +52,7 @@ export const ENTRY_FILTERS: BoardFilters = normalizeFilters({
   courses: 'any',
 });
 
-export function useAmateurBoardState(userId: string | undefined) {
+export function useAmateurBoardState(userId: string | undefined, active = true) {
   const [filters, setFilters] = useState<BoardFilters>(ENTRY_FILTERS);
   const [board, setBoard] = useState<BoardKey>(ENTRY_BOARD);
   const [courseBoard, setCourseBoard] = useState<CourseBoardKey>('played');
@@ -63,11 +68,11 @@ export function useAmateurBoardState(userId: string | undefined) {
   const circle = useCircleSize(userId, !!userId);
   const hasCircle = circle.data == null ? null : circle.data > 0;
 
-  const facets = useBoardFacets(userId, board, filters, { enabled: true });
+  const facets = useBoardFacets(userId, board, filters, { enabled: active });
   /* ONE READ, TWO READERS. The leaderboard block renders these rows and the
      filter panel states their count; react-query serves both from the same key,
      so the count in the panel can never disagree with the rows on the page. */
-  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: true });
+  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: active });
 
   /* D — NO CIRCLE, NO CIRCLE FILTER. The entry state resolves to Everyone
      before any board read lands on an empty circle, so a member who follows
