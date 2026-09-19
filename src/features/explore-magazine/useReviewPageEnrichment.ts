@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -28,13 +28,19 @@ function normaliseIds(reviewIds: string[]): string[] {
   return Array.from(new Set(reviewIds.filter(Boolean))).sort();
 }
 
+/** A loaded review is never fetched again as later stream pages append IDs. */
+const resolved = new Map<string, ReviewPageEnrichment>();
+
 export function useReviewPageEnrichment(reviewIds: string[]): Map<string, ReviewPageEnrichment> {
   const ids = useMemo(() => normaliseIds(reviewIds), [reviewIds]);
   const idKey = ids.join('|');
+  const [, setVersion] = useState(0);
+  const missing = ids.filter((id) => !resolved.has(id));
+  const missingKey = missing.join('|');
 
   const query = useQuery({
-    queryKey: ['explore', 'review-page-enrichment-v1', idKey],
-    enabled: ids.length > 0,
+    queryKey: ['explore', 'review-page-enrichment-v1', missingKey],
+    enabled: missing.length > 0,
     staleTime: Infinity,
     gcTime: 60 * 60_000,
     queryFn: async (): Promise<Map<string, ReviewPageEnrichment>> => {
@@ -49,7 +55,7 @@ export function useReviewPageEnrichment(reviewIds: string[]): Map<string, Review
           facilities_score,
           course_review_media!left(id)
         `)
-        .in('id', ids)
+        .in('id', missing)
         .eq('course_review_media.media_type', 'image');
       if (error) throw error;
 
@@ -66,7 +72,7 @@ export function useReviewPageEnrichment(reviewIds: string[]): Map<string, Review
       }
       /* A requested ID with no visible row is resolved as absent. This prevents
          repeated reads on every render while preserving the card's empty state. */
-      for (const id of ids) {
+      for (const id of missing) {
         if (!out.has(id)) {
           out.set(id, {
             breakdown: { design: null, conditions: null, clubhouse: null, facilities: null },
@@ -78,5 +84,18 @@ export function useReviewPageEnrichment(reviewIds: string[]): Map<string, Review
     },
   });
 
-  return query.data ?? new Map<string, ReviewPageEnrichment>();
+  useEffect(() => {
+    if (!query.data) return;
+    for (const [id, value] of query.data) resolved.set(id, value);
+    setVersion((value) => value + 1);
+  }, [query.data]);
+
+  return useMemo(() => {
+    const out = new Map<string, ReviewPageEnrichment>();
+    for (const id of ids) {
+      const value = resolved.get(id);
+      if (value) out.set(id, value);
+    }
+    return out;
+  }, [idKey, query.data]);
 }
