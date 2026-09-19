@@ -10,7 +10,9 @@
       "orBeyond": "Or look beyond your circle.",
       "seeEveryone": "See everyone",
       "thinCircle": "Only {{count}} rounds in your circle this fortnight.",
-      "widenedToEveryone": "Nobody in your circle has posted a round in the last fortnight, so this is everyone."
+      "widenedToEveryone": "Nobody in your circle has posted a round in the last fortnight, so this is everyone.",
+      "backToStream": "Back to the stream",
+      "openPicker": "Choose a board"
     },
     "hero": {
       "metric": {
@@ -2184,11 +2186,23 @@
   },
   "scorecard": {
     "feat": {
-      "ace": { "label": "HOLE IN ONE" },
-      "albatross": { "label": "ALBATROSS" },
-      "eagle": { "label": "EAGLE" },
-      "birdies": { "label": "BIRDIES", "sub": "in one round" },
-      "clean": { "label": "CLEAN CARD", "sub": "not a shot dropped" },
+      "ace": {
+        "label": "HOLE IN ONE"
+      },
+      "albatross": {
+        "label": "ALBATROSS"
+      },
+      "eagle": {
+        "label": "EAGLE"
+      },
+      "birdies": {
+        "label": "BIRDIES",
+        "sub": "in one round"
+      },
+      "clean": {
+        "label": "CLEAN CARD",
+        "sub": "not a shot dropped"
+      },
       "onHole": "on the {{hole}}"
     },
     "atThisCourseBare": "At this course",

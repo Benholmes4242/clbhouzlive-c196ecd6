@@ -39,6 +39,12 @@ import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
 import { ExploreShelf } from './ExploreShelf';
 import { useCircleSize } from '@/features/amateur/useCircleSize';
+import { ENTRY_BOARD, useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
+import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBlock';
+import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
+import { BOARD_LABELS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
+import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
+import { ChevronDown } from 'lucide-react';
 
 import { CircleShelf } from './CircleShelf';
 import { StandingShelf } from './StandingShelf';
@@ -553,6 +559,21 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const [place, setPlace] = useState<PlaceChoice | null>(null);
   const query = search.trim();
   const filtering = view === 'courses' && (query.length >= 2 || place !== null);
+
+  /* PHASE B (BRIEF_EXPLORE_MAGAZINE P1) — SCORES IS A CHIP THAT CAN CHANGE WHAT
+     YOU SEE. The ranked stream is the default and stays the landing experience;
+     no board is applied until the member picks one, so `boardPick === null` IS
+     the stream. Board state is page-local by design (useAmateurBoardState §1):
+     nothing here is persisted or put in the URL, so leaving Explore resets it.
+     `active` keeps every board read quiet on the other three views and on an
+     untouched Scores view. */
+  const [boardPick, setBoardPick] = useState<BoardKey | null>(null);
+  const [boardPanelOpen, setBoardPanelOpen] = useState(false);
+  const scoresBoardActive = view === 'scores' && boardPick !== null;
+  const boardState = useAmateurBoardState(
+    view === 'scores' ? userId : undefined,
+    scoresBoardActive || boardPanelOpen,
+  );
 
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
   /* §5c THE CLIENT RANKER IS OFF THE PAGE PATH. It is DEAD-LISTED, not deleted:
@@ -1331,6 +1352,17 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [opener],
   );
 
+  /* P1 — a board row opens the round it ranks in the same sheet the stream
+     cards use; a row with no round id (a member-only ranking row) opens the
+     member. */
+  const boardRowPress = useCallback(
+    (row: BoardRow) => {
+      if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
+      else opener.openProfile(row.user_id);
+    },
+    [opener],
+  );
+
   const chips = useMemo(
     () =>
       EXPLORE_VIEWS.map((key) => ({
@@ -1681,6 +1713,50 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               loggedRef.current = 0;
             }}
           />
+
+          {/* P1 — THE BOARD PICKER, pinned flex:none at the row's end so the
+              scope chips scroll beside it and it never leaves reach (a third
+              chrome row is not acceptable — the 320px bleed is why Reviews
+              folded into Courses). The trigger names the board the panel opens
+              on, and it ONLY opens the panel: the way back to the ranked stream
+              is the stated action above the board list, not a second meaning
+              hidden on this chip. Same geometry as the place trigger beside it. */}
+          <button
+            type="button"
+            onClick={() => {
+              analyticsEvents.track('amateur_board_picker_opened', {
+                board: boardPick ?? ENTRY_BOARD,
+                board_active: scoresBoardActive,
+              });
+              setBoardPanelOpen(true);
+            }}
+            aria-label={t('amateur.board.openPicker', 'Choose a board')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              flexShrink: 0,
+              height: 32,
+              padding: '0 12px',
+              borderRadius: 999,
+              border: `1px solid ${scoresBoardActive ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.16)'}`,
+              background: scoresBoardActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+              color: A.INK,
+              fontFamily: SANS,
+              fontSize: 13,
+              fontWeight: 700,
+              maxWidth: 180,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
+              {t(
+                BOARD_LABELS[boardPick ?? ENTRY_BOARD].i18n,
+                BOARD_LABELS[boardPick ?? ENTRY_BOARD].label,
+              )}
+            </span>
+            <ChevronDown className="w-3 h-3 shrink-0" strokeWidth={2.5} />
+          </button>
         </div>
       ) : null}
 
@@ -1773,9 +1849,40 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       ) : null}
 
 
-      {view === 'scores' ? (
+      {view === 'scores' && !scoresBoardActive ? (
         <div style={{ marginBottom: BLOCK_GAP }}>
           <CircleShelf viewerId={userId} pos={0} />
+        </div>
+      ) : null}
+
+      {/* P1 — A PICKED BOARD REPLACES THE RANKED STREAM. The block is the same
+          one the old page rendered (same RPC, same rows, same count line and
+          widening sentence); the way back is STATED above it, because a member
+          who cannot find the stream again will think the app broke. */}
+      {scoresBoardActive ? (
+        <div style={{ marginBottom: BLOCK_GAP }}>
+          <div style={{ padding: '0 20px 6px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                analyticsEvents.track('amateur_board_cleared', { board: boardPick });
+                setBoardPick(null);
+              }}
+              style={{
+                padding: 0,
+                border: 'none',
+                background: 'transparent',
+                color: A.MUTE,
+                fontFamily: SANS,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              ‹ {t('amateur.board.backToStream', 'Back to the stream')}
+            </button>
+          </div>
+          <AmateurLeaderboardBlock userId={userId} state={boardState} onRowPress={boardRowPress} />
         </div>
       ) : null}
 
@@ -1810,6 +1917,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           min-content, and the kicker/who-line are single-line nowrap — without
           the zero minimum a long course name widens the whole track past the
           viewport at 320px instead of clipping inside the card. */}
+      {!scoresBoardActive ? (
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
         {!source.isFetched && ranked.length === 0 ? (
           <>
@@ -1892,6 +2000,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           </div>
         ) : null}
       </div>
+      ) : null}
 
       {/* The lead shell exists for the case the brief names — a lead arriving
           after a std has already rendered — and is exported from the shells file
@@ -1975,6 +2084,25 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           targetId={openCommentsPostId}
         />
       )}
+
+      {/* P1 — THE BOARD'S PANEL, mounted against the same state the block reads,
+          so the panel's count and the page's rows can never disagree. Picking a
+          board applies it live (boardPick), and the footer's "Show N rounds"
+          closes onto a body that has already swapped. */}
+      <BoardFilterPanel
+        open={boardPanelOpen}
+        onClose={() => setBoardPanelOpen(false)}
+        userId={userId}
+        board={boardState.board}
+        onBoardChange={(next) => {
+          boardState.changeBoard(next);
+          setBoardPick(next);
+        }}
+        resultCount={boardState.total}
+        filters={boardState.filters}
+        onChange={boardState.changeFilters}
+        facets={boardState.facets}
+      />
     </div>
   );
 }
