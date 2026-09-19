@@ -1761,6 +1761,16 @@
         "par": "PAR",
         "net": "NET",
         "vsHcp": "VS HCP"
+      },
+      "enrichment": {
+        "strongest": "最高評価: {{area}}",
+        "photos": "写真{{count}}枚",
+        "area": {
+          "design": "設計",
+          "conditions": "コンディション",
+          "clubhouse": "クラブハウス",
+          "facilities": "施設"
+        }
       }
     },
     "shelf": {

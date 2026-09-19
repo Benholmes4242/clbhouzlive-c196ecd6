@@ -2390,6 +2390,16 @@
         "par": "[PAR]",
         "net": "[NET]",
         "vsHcp": "[VS HCP]"
+      },
+      "enrichment": {
+        "strongest": "[~~Šţřőñĝéšţ őñ {{area}}~~]",
+        "photos": "[~~{{count}} ƥĥőţőš~~]",
+        "area": {
+          "design": "[~~đéšíĝñ~~]",
+          "conditions": "[~~ĉőñđíţíőñ~~]",
+          "clubhouse": "[~~ĉļúƀĥőúšé~~]",
+          "facilities": "[~~ƒáĉíļíţíéš~~]"
+        }
       }
     },
     "shelf": {

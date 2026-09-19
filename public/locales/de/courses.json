@@ -1821,6 +1821,16 @@
         "par": "PAR",
         "net": "NET",
         "vsHcp": "VS HCP"
+      },
+      "enrichment": {
+        "strongest": "Am stärksten bei {{area}}",
+        "photos": "{{count}} Fotos",
+        "area": {
+          "design": "Design",
+          "conditions": "Zustand",
+          "clubhouse": "Clubhaus",
+          "facilities": "Anlagen"
+        }
       }
     },
     "shelf": {

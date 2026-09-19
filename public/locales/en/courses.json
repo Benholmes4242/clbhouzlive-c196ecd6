@@ -260,6 +260,16 @@
         "par": "PAR",
         "net": "NET",
         "vsHcp": "VS HCP"
+      },
+      "enrichment": {
+        "strongest": "Strongest on {{area}}",
+        "photos": "{{count}} photos",
+        "area": {
+          "design": "design",
+          "conditions": "condition",
+          "clubhouse": "clubhouse",
+          "facilities": "facilities"
+        }
       }
     },
     "shelf": {

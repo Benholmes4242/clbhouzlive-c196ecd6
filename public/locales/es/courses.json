@@ -1821,6 +1821,16 @@
         "par": "PAR",
         "net": "NET",
         "vsHcp": "VS HCP"
+      },
+      "enrichment": {
+        "strongest": "Destaca en {{area}}",
+        "photos": "{{count}} fotos",
+        "area": {
+          "design": "diseño",
+          "conditions": "condición",
+          "clubhouse": "club social",
+          "facilities": "instalaciones"
+        }
       }
     },
     "shelf": {
