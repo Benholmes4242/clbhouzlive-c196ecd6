@@ -12,7 +12,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatMonthShort } from '@/i18n/format';
 import { getScoreColor } from '../_shared/scoreColor';
-import { formatPurse } from '../_shared/formatPurse';
 import type { SeasonEvent } from './useSeasonTimeline';
 import { TOUR_LABEL } from '../_shared/tourOrder';
 import {
@@ -96,7 +95,6 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
   };
 
   const venueLine = [event.venueName, event.venueCity].filter(Boolean).join(' · ');
-  const purseText = event.purse ? formatPurse(event.purse) : null;
   const tourLabel = event.tourSlug ? (TOUR_LABEL[event.tourSlug] ?? event.tourSlug) : null;
 
   return (
@@ -112,13 +110,12 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           <span style={{ display: '-webkit-box', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, fontSize: 14, fontWeight: 700, lineHeight: 1.28 }}>
             {event.name}
           </span>
-          {(isLive || venueLine || purseText) ? (
+          {(isLive || venueLine) ? (
             <span style={{ display: 'flex', gap: 8, alignItems: 'baseline', marginTop: 3, fontSize: 12, color: INK_MUTE }}>
               <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                 {isLive ? <><span style={{ color: TREND_UP, fontWeight: 700 }}>{t('status.live')}</span>{venueLine ? ' · ' : ''}</> : null}
                 {venueLine}
               </span>
-              {purseText ? <span style={{ flex: 'none', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{purseText}</span> : null}
             </span>
           ) : null}
         </span>
