@@ -218,7 +218,7 @@ export function routeForNotif(input: NotifRouteInput): string {
     return buildTopTenLink(actor_user_id, data);
   }
 
-  // rate-course prompt (must come before generic course cases)
+  // rate-course prompt
   if (type === 'rate_course_prompt') {
     const cid = (data.course_id as string | undefined) ?? (entity_type === 'course' ? entity_id : null);
     if (cid) return `/rate-course-v2/${cid}`;
@@ -282,15 +282,6 @@ export function routeForNotif(input: NotifRouteInput): string {
     if (cid) return `/courses/${cid}?tab=legends${cat ? `&cat=${encodeURIComponent(cat)}` : ''}`;
   }
 
-
-  // entity fallbacks
-  if (entity_type === 'post' && entity_id) return `/post/${entity_id}`;
-  if (entity_type === 'comment' && data.post_id) {
-    const cid = data.comment_id;
-    return cid ? `/post/${data.post_id}/comment/${cid}` : `/post/${data.post_id}`;
-  }
-  if (entity_type === 'course' && entity_id) return `/courses/${entity_id}`;
-  if (entity_type === 'club' && entity_id) return `/clubs/${entity_id}`;
 
   // follow / friend
   if (FOLLOW_TYPES.has(type)) {
