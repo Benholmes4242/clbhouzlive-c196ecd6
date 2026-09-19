@@ -154,11 +154,23 @@
   },
   "scorecard": {
     "feat": {
-      "ace": { "label": "HOLE-IN-ONE" },
-      "albatross": { "label": "ALBATROSS" },
-      "eagle": { "label": "EAGLE" },
-      "birdies": { "label": "BIRDIES", "sub": "in einer Runde" },
-      "clean": { "label": "FEHLERFREIE RUNDE", "sub": "kein Schlag verloren" },
+      "ace": {
+        "label": "HOLE-IN-ONE"
+      },
+      "albatross": {
+        "label": "ALBATROSS"
+      },
+      "eagle": {
+        "label": "EAGLE"
+      },
+      "birdies": {
+        "label": "BIRDIES",
+        "sub": "in einer Runde"
+      },
+      "clean": {
+        "label": "FEHLERFREIE RUNDE",
+        "sub": "kein Schlag verloren"
+      },
       "onHole": "an der {{hole}}"
     },
     "atThisCourseBare": "Auf diesem Platz",
@@ -1885,6 +1897,10 @@
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
+    },
+    "board": {
+      "backToStream": "Zurück zum Stream",
+      "openPicker": "Bestenliste wählen"
     }
   }
 }

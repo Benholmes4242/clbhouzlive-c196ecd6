@@ -150,11 +150,23 @@
   },
   "scorecard": {
     "feat": {
-      "ace": { "label": "홀인원" },
-      "albatross": { "label": "알바트로스" },
-      "eagle": { "label": "이글" },
-      "birdies": { "label": "버디", "sub": "한 라운드에서" },
-      "clean": { "label": "클린 카드", "sub": "한 타도 잃지 않음" },
+      "ace": {
+        "label": "홀인원"
+      },
+      "albatross": {
+        "label": "알바트로스"
+      },
+      "eagle": {
+        "label": "이글"
+      },
+      "birdies": {
+        "label": "버디",
+        "sub": "한 라운드에서"
+      },
+      "clean": {
+        "label": "클린 카드",
+        "sub": "한 타도 잃지 않음"
+      },
       "onHole": "{{hole}}번 홀에서"
     },
     "atThisCourseBare": "이 코스에서",
@@ -1828,6 +1840,10 @@
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
+    },
+    "board": {
+      "backToStream": "스트림으로 돌아가기",
+      "openPicker": "보드 선택"
     }
   }
 }

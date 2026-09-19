@@ -150,11 +150,23 @@
   },
   "scorecard": {
     "feat": {
-      "ace": { "label": "ホールインワン" },
-      "albatross": { "label": "アルバトロス" },
-      "eagle": { "label": "イーグル" },
-      "birdies": { "label": "バーディー", "sub": "1ラウンドで達成" },
-      "clean": { "label": "ノーボギー", "sub": "一打も落とさず" },
+      "ace": {
+        "label": "ホールインワン"
+      },
+      "albatross": {
+        "label": "アルバトロス"
+      },
+      "eagle": {
+        "label": "イーグル"
+      },
+      "birdies": {
+        "label": "バーディー",
+        "sub": "1ラウンドで達成"
+      },
+      "clean": {
+        "label": "ノーボギー",
+        "sub": "一打も落とさず"
+      },
       "onHole": "{{hole}}ホールで"
     },
     "atThisCourseBare": "このコースで",
@@ -1825,6 +1837,10 @@
     },
     "place": {
       "pair": "{{place}}、{{nation}}"
+    },
+    "board": {
+      "backToStream": "ストリームに戻る",
+      "openPicker": "ボードを選択"
     }
   }
 }

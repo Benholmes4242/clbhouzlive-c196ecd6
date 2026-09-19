@@ -1705,11 +1705,23 @@
   },
   "scorecard": {
     "feat": {
-      "ace": { "label": "[~~ĤŐĻÉ ÍŃ ŐŃÉ~~]" },
-      "albatross": { "label": "[~~ÁĻƁÁŢŘŐŠŠ~~]" },
-      "eagle": { "label": "[~~ÉÁĜĻÉ~~]" },
-      "birdies": { "label": "[~~ƁÍŘĐÍÉŠ~~]", "sub": "[~~íñ őñé řőúñđ~~]" },
-      "clean": { "label": "[~~ĈĻÉÁŃ ĈÁŘĐ~~]", "sub": "[~~ñőţ á šĥőţ đřőƥƥéđ~~]" },
+      "ace": {
+        "label": "[~~ĤŐĻÉ ÍŃ ŐŃÉ~~]"
+      },
+      "albatross": {
+        "label": "[~~ÁĻƁÁŢŘŐŠŠ~~]"
+      },
+      "eagle": {
+        "label": "[~~ÉÁĜĻÉ~~]"
+      },
+      "birdies": {
+        "label": "[~~ƁÍŘĐÍÉŠ~~]",
+        "sub": "[~~íñ őñé řőúñđ~~]"
+      },
+      "clean": {
+        "label": "[~~ĈĻÉÁŃ ĈÁŘĐ~~]",
+        "sub": "[~~ñőţ á šĥőţ đřőƥƥéđ~~]"
+      },
       "onHole": "[~~őñ ţĥé {{hole}}~~]"
     },
     "atThisCourseBare": "At this course",
@@ -2454,6 +2466,10 @@
     },
     "place": {
       "pair": "[{{place}}, {{nation}}]"
+    },
+    "board": {
+      "backToStream": "[Back to the stream]",
+      "openPicker": "[Choose a board]"
     }
   }
 }

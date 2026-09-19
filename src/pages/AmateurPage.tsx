@@ -22,9 +22,12 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
  * here. NOTHING WAS DELETED: `AmateurHero`, `AmateurFilterRail`,
  * `AmateurLeaderboardBlock`, `AmateurCoursesBlock`, `AmateurNewsBlock`,
  * `AmateurMediaBlock`, `useAmateurBoardState` and `BoardFilterPanel` remain on
- * disk, and the board state and filter panel are the parts Phase B draws back
- * in when Scores becomes a chip that can change what you see. They are DEAD
- * FROM THIS PAGE ONLY, and the retirement pass is Phase E.
+ * disk. PHASE B (P1, Sep 2026) HAS DRAWN THE BOARD BACK IN: Scores is now a
+ * chip that can change what you see — `useAmateurBoardState`,
+ * `AmateurLeaderboardBlock` and `BoardFilterPanel` are LIVE on the Scores view
+ * of ExploreMagazine, behind a picker pinned to the scope row. The ranked
+ * stream stays the default; board state is page-local. The remaining blocks
+ * are DEAD FROM THIS PAGE ONLY, and the retirement pass is Phase E.
  *
  * WHAT SURVIVES UNCHANGED: the route ('/amateur'), the `amateur_*` event prefix
  * (an event name is not a label, and the Discover baseline comparison depends on
