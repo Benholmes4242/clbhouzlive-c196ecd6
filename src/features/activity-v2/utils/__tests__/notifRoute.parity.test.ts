@@ -109,12 +109,6 @@ const FIXTURES: Fixture[] = [
   { name: 'top_ten_reply', row: { notif_type: 'top_ten_reply', entity_type: 'top_ten', data: { target_user_id: 'u2', top_ten_comment_id: 'tc1', parent_comment_id: 'tc0' } } },
 
   // course surfaces
-  // ORDERING SHADOW (reported, not fixed here): the client resolves these two
-  // types BELOW its generic `entity_type === 'course'` fallback, so a row that
-  // also carries entity_type 'course' returns /courses/:id in-app while the push
-  // returns the intended deep link. The fixtures carry the course id in data
-  // only, which is what both routers read first. Fixing the client's order is a
-  // client change and outside N3.
   { name: 'rate_course_prompt', row: { notif_type: 'rate_course_prompt', entity_id: CID, data: { course_id: CID } } },
   { name: 'course_analytics_updated', row: { notif_type: 'course_analytics_updated', data: { course_id: CID } } },
   { name: 'friend_course_review', row: { notif_type: 'friend_course_review', entity_type: 'course', entity_id: CID, data: { course_id: CID, review_id: RID } } },
@@ -197,6 +191,79 @@ describe('notifRoute parity with activityLinks', () => {
         actor_user_id: r.actor_user_id,
       }),
     ).toBe(FALLBACK);
+  });
+});
+
+/**
+ * N4 — THE ENTITY FALLBACKS MUST NOT SHADOW A TYPE BRANCH. These rows carry an
+ * entity_type that matches a generic fallback; their type branch must win in
+ * BOTH routers. Before the client fix, all three failed: the client returned
+ * the entity fallback (/courses/:id) while the port returned the deep link.
+ * The claim fixture gives entity_id and data.course_id DIFFERENT values so the
+ * assertion can tell "claim branch read data.course_id" apart from "fallback
+ * read entity_id".
+ */
+const N4_SHADOW_FIXTURES: Array<Fixture & { route: string }> = [
+  {
+    // All 35 live rate_course_prompt rows carry entity_type 'course',
+    // entity_id = the course id AND data.course_id — this is that shape.
+    name: 'rate_course_prompt with entity_type course',
+    row: { notif_type: 'rate_course_prompt', entity_type: 'course', entity_id: CID, data: { course_id: CID } },
+    route: `/rate-course-v2/${CID}`,
+  },
+  {
+    name: 'course_analytics_updated with entity_type course',
+    row: { notif_type: 'course_analytics_updated', entity_type: 'course', entity_id: CID, data: { course_id: CID } },
+    route: `/courses/${CID}?tab=holes`,
+  },
+];
+
+describe('entity fallbacks never shadow a type branch (N4)', () => {
+  it.each(N4_SHADOW_FIXTURES)('$name resolves to its type-branch route in both routers', ({ row: partial, route }) => {
+    const r = row(partial);
+    expect(getActivityLink(r)).toBe(route);
+    expect(
+      routeForNotif({
+        notif_type: r.notif_type,
+        entity_type: r.entity_type,
+        entity_id: r.entity_id,
+        data: r.data as Record<string, unknown> | null,
+        actor_user_id: r.actor_user_id,
+      }),
+    ).toBe(route);
+  });
+
+  it('course_claim_approved with entity_type course reaches the claim destination on the client', () => {
+    // entity_id differs from data.course_id so the assertion can tell
+    // "claim branch read data.course_id" apart from "fallback read entity_id".
+    // PORT DIVERGENCE (reported in N4, not fixed here — the port is out of
+    // scope): the port's own entity fallbacks sit ABOVE its course_claim
+    // branch, so the same row resolves to /courses/{entity_id} on push. The
+    // port needs its fallback block moved too; until then this asserts the
+    // client side only.
+    const r = row({
+      notif_type: 'course_claim_approved',
+      entity_type: 'course',
+      entity_id: 'course-shadow',
+      data: { course_id: CID },
+    });
+    expect(getActivityLink(r)).toBe(`/courses/${CID}`);
+  });
+
+  it('the entity-fallback block sits BELOW every type branch in the client source', () => {
+    const src = readFileSync(
+      path.join(ROOT, 'src/features/activity-v2/utils/activityLinks.ts'),
+      'utf8',
+    );
+    const blockPos = src.indexOf('// --- entity fallbacks');
+    expect(blockPos).toBeGreaterThan(-1);
+    // `(?<!entity_)` — the block's own `entity_type === '...'` lines are not
+    // type branches and must not count.
+    const branchPositions = [
+      ...src.matchAll(/(?<!entity_)type === '|(?<!entity_)type\.startsWith\('/g),
+    ].map((m) => m.index as number);
+    expect(branchPositions.length).toBeGreaterThan(0);
+    expect(Math.max(...branchPositions)).toBeLessThan(blockPos);
   });
 });
 

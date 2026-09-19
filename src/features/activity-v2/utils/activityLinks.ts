@@ -316,15 +316,6 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     return '';
   }
 
-  // --- entity fallbacks ------------------------------------------------
-  if (entity_type === 'post' && entity_id) return `/post/${entity_id}`;
-  if (entity_type === 'comment' && data.post_id) {
-    const cid = data.comment_id;
-    return cid ? `/post/${data.post_id}/comment/${cid}` : `/post/${data.post_id}`;
-  }
-  if (entity_type === 'course' && entity_id) return `/courses/${entity_id}`;
-  if (entity_type === 'club' && entity_id) return `/clubs/${entity_id}`;
-
   // --- follow / friend -------------------------------------------------
   if (FOLLOW_TYPES.has(type)) {
     if (type === 'follow') {
@@ -461,6 +452,21 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   if (type === 'tour_preview' || type === 'tour_roundup') {
     return '/tour/news';
   }
+
+  // --- entity fallbacks ------------------------------------------------
+  // LAST RESORT ONLY. These match on entity_type alone, so any type branch
+  // below them would be unreachable for a row carrying a matching entity_type
+  // (all 35 live rate_course_prompt rows carried entity_type 'course' and
+  // opened the course page instead of /rate-course-v2/:id — N4). The block
+  // stays immediately above the unknown-type fallback, after EVERY type
+  // branch; the parity test asserts that ordering structurally.
+  if (entity_type === 'post' && entity_id) return `/post/${entity_id}`;
+  if (entity_type === 'comment' && data.post_id) {
+    const cid = data.comment_id;
+    return cid ? `/post/${data.post_id}/comment/${cid}` : `/post/${data.post_id}`;
+  }
+  if (entity_type === 'course' && entity_id) return `/courses/${entity_id}`;
+  if (entity_type === 'club' && entity_id) return `/clubs/${entity_id}`;
 
   // --- unknown ---------------------------------------------------------
   if (import.meta.env.DEV) {
