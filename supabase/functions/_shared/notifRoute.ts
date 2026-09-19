@@ -218,7 +218,7 @@ export function routeForNotif(input: NotifRouteInput): string {
     return buildTopTenLink(actor_user_id, data);
   }
 
-  // rate-course prompt (must come before generic course cases)
+  // rate-course prompt
   if (type === 'rate_course_prompt') {
     const cid = (data.course_id as string | undefined) ?? (entity_type === 'course' ? entity_id : null);
     if (cid) return `/rate-course-v2/${cid}`;
@@ -283,14 +283,7 @@ export function routeForNotif(input: NotifRouteInput): string {
   }
 
 
-  // entity fallbacks
-  if (entity_type === 'post' && entity_id) return `/post/${entity_id}`;
-  if (entity_type === 'comment' && data.post_id) {
-    const cid = data.comment_id;
-    return cid ? `/post/${data.post_id}/comment/${cid}` : `/post/${data.post_id}`;
-  }
-  if (entity_type === 'course' && entity_id) return `/courses/${entity_id}`;
-  if (entity_type === 'club' && entity_id) return `/clubs/${entity_id}`;
+
 
   // follow / friend
   if (FOLLOW_TYPES.has(type)) {
@@ -398,6 +391,25 @@ export function routeForNotif(input: NotifRouteInput): string {
   if (type === 'tour_preview' || type === 'tour_roundup') {
     return '/tour/news';
   }
+
+
+
+  // --- entity fallbacks ------------------------------------------------
+  // LAST RESORT ONLY. These match on entity_type alone, so any type branch
+  // below them is unreachable for a row carrying a matching entity_type —
+  // course_claim_* sat below this block and a claim push carrying
+  // entity_type 'course' opened /courses/{entity_id} instead of the claim
+  // surface (N5; N4 fixed the same shadow on the client for
+  // rate_course_prompt). The block stays immediately above the final
+  // FALLBACK return, after EVERY type branch; the parity test asserts that
+  // ordering structurally in both routers.
+  if (entity_type === 'post' && entity_id) return `/post/${entity_id}`;
+  if (entity_type === 'comment' && data.post_id) {
+    const cid = data.comment_id;
+    return cid ? `/post/${data.post_id}/comment/${cid}` : `/post/${data.post_id}`;
+  }
+  if (entity_type === 'course' && entity_id) return `/courses/${entity_id}`;
+  if (entity_type === 'club' && entity_id) return `/clubs/${entity_id}`;
 
   // unknown -> activity list
   return FALLBACK;

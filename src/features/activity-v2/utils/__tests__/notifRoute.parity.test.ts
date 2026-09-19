@@ -216,9 +216,18 @@ const N4_SHADOW_FIXTURES: Array<Fixture & { route: string }> = [
     row: { notif_type: 'course_analytics_updated', entity_type: 'course', entity_id: CID, data: { course_id: CID } },
     route: `/courses/${CID}?tab=holes`,
   },
+  {
+    // entity_id differs from data.course_id so the assertion can tell
+    // "claim branch read data.course_id" apart from "fallback read entity_id".
+    // N5 moved the port's fallback block below its course_claim branch, so
+    // both routers now reach the claim destination.
+    name: 'course_claim_approved with entity_type course',
+    row: { notif_type: 'course_claim_approved', entity_type: 'course', entity_id: 'course-shadow', data: { course_id: CID } },
+    route: `/courses/${CID}`,
+  },
 ];
 
-describe('entity fallbacks never shadow a type branch (N4)', () => {
+describe('entity fallbacks never shadow a type branch (N4/N5)', () => {
   it.each(N4_SHADOW_FIXTURES)('$name resolves to its type-branch route in both routers', ({ row: partial, route }) => {
     const r = row(partial);
     expect(getActivityLink(r)).toBe(route);
@@ -233,32 +242,21 @@ describe('entity fallbacks never shadow a type branch (N4)', () => {
     ).toBe(route);
   });
 
-  it('course_claim_approved with entity_type course reaches the claim destination on the client', () => {
-    // entity_id differs from data.course_id so the assertion can tell
-    // "claim branch read data.course_id" apart from "fallback read entity_id".
-    // PORT DIVERGENCE (reported in N4, not fixed here — the port is out of
-    // scope): the port's own entity fallbacks sit ABOVE its course_claim
-    // branch, so the same row resolves to /courses/{entity_id} on push. The
-    // port needs its fallback block moved too; until then this asserts the
-    // client side only.
-    const r = row({
-      notif_type: 'course_claim_approved',
-      entity_type: 'course',
-      entity_id: 'course-shadow',
-      data: { course_id: CID },
-    });
-    expect(getActivityLink(r)).toBe(`/courses/${CID}`);
-  });
+  /**
+   * N5 — the fallback block goes LAST in both routers. The same position
+   * check runs over each file from one table; a file added here with its
+   * block in the wrong place fails. `(?<!entity_)` stops the block's own
+   * `entity_type === '...'` lines self-matching as type branches.
+   */
+  const ROUTER_SOURCES = [
+    { file: 'src/features/activity-v2/utils/activityLinks.ts', marker: '// --- entity fallbacks' },
+    { file: 'supabase/functions/_shared/notifRoute.ts', marker: '// --- entity fallbacks' },
+  ];
 
-  it('the entity-fallback block sits BELOW every type branch in the client source', () => {
-    const src = readFileSync(
-      path.join(ROOT, 'src/features/activity-v2/utils/activityLinks.ts'),
-      'utf8',
-    );
-    const blockPos = src.indexOf('// --- entity fallbacks');
+  it.each(ROUTER_SOURCES)('$file: the entity-fallback block sits BELOW every type branch', ({ file, marker }) => {
+    const src = readFileSync(path.join(ROOT, file), 'utf8');
+    const blockPos = src.indexOf(marker);
     expect(blockPos).toBeGreaterThan(-1);
-    // `(?<!entity_)` — the block's own `entity_type === '...'` lines are not
-    // type branches and must not count.
     const branchPositions = [
       ...src.matchAll(/(?<!entity_)type === '|(?<!entity_)type\.startsWith\('/g),
     ].map((m) => m.index as number);
