@@ -116,12 +116,15 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   // the previous round). The light board keeps its blank-cell doctrine.
   const todayBlank = theme === 'light' ? BLANK : '\u2014';
   const showOverviewPosition = rows.some((row) => row.position != null || ['MC', 'CUT', 'WD'].includes(row.status?.toUpperCase() ?? ''));
-  const showOverviewThru = phase === 'live' && rows.some((row) => thruLabel(row, todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound)) !== BLANK);
+  // The live hero board carries TODAY, not THRU: the current round is the story
+  // and the swap is what keeps the name column wide enough for real names.
+  // Gate shape matches the old THRU gate: render only when a visible row has one.
+  const showOverviewToday = phase === 'live' && rows.some((row) => todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound) != null);
   const overviewGrid = [
     showOverviewPosition ? '44px' : null,
     'minmax(0, 1fr)',
     '52px',
-    phase === 'completed' || showOverviewThru ? '52px' : null,
+    phase === 'completed' ? '52px' : showOverviewToday ? '40px' : null,
   ].filter(Boolean).join(' ');
 
   const overviewName = (fullName: string | undefined): string => fullName?.trim() || BLANK;
