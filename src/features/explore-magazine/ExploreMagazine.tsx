@@ -1713,6 +1713,50 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               loggedRef.current = 0;
             }}
           />
+
+          {/* P1 — THE BOARD PICKER, pinned flex:none at the row's end so the
+              scope chips scroll beside it and it never leaves reach (a third
+              chrome row is not acceptable — the 320px bleed is why Reviews
+              folded into Courses). The trigger names the board the panel opens
+              on, and it ONLY opens the panel: the way back to the ranked stream
+              is the stated action above the board list, not a second meaning
+              hidden on this chip. Same geometry as the place trigger beside it. */}
+          <button
+            type="button"
+            onClick={() => {
+              analyticsEvents.track('amateur_board_picker_opened', {
+                board: boardPick ?? ENTRY_BOARD,
+                board_active: scoresBoardActive,
+              });
+              setBoardPanelOpen(true);
+            }}
+            aria-label={t('amateur.board.openPicker', 'Choose a board')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              flexShrink: 0,
+              height: 32,
+              padding: '0 12px',
+              borderRadius: 999,
+              border: `1px solid ${scoresBoardActive ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.16)'}`,
+              background: scoresBoardActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+              color: A.INK,
+              fontFamily: SANS,
+              fontSize: 13,
+              fontWeight: 700,
+              maxWidth: 180,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
+              {t(
+                BOARD_LABELS[boardPick ?? ENTRY_BOARD].i18n,
+                BOARD_LABELS[boardPick ?? ENTRY_BOARD].label,
+              )}
+            </span>
+            <ChevronDown className="w-3 h-3 shrink-0" strokeWidth={2.5} />
+          </button>
         </div>
       ) : null}
 
