@@ -1764,6 +1764,16 @@
         "par": "PAR",
         "net": "NET",
         "vsHcp": "VS HCP"
+      },
+      "enrichment": {
+        "strongest": "최고 평가: {{area}}",
+        "photos": "사진 {{count}}장",
+        "area": {
+          "design": "설계",
+          "conditions": "코스 상태",
+          "clubhouse": "클럽하우스",
+          "facilities": "시설"
+        }
       }
     },
     "shelf": {
