@@ -560,6 +560,21 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const query = search.trim();
   const filtering = view === 'courses' && (query.length >= 2 || place !== null);
 
+  /* PHASE B (BRIEF_EXPLORE_MAGAZINE P1) — SCORES IS A CHIP THAT CAN CHANGE WHAT
+     YOU SEE. The ranked stream is the default and stays the landing experience;
+     no board is applied until the member picks one, so `boardPick === null` IS
+     the stream. Board state is page-local by design (useAmateurBoardState §1):
+     nothing here is persisted or put in the URL, so leaving Explore resets it.
+     `active` keeps every board read quiet on the other three views and on an
+     untouched Scores view. */
+  const [boardPick, setBoardPick] = useState<BoardKey | null>(null);
+  const [boardPanelOpen, setBoardPanelOpen] = useState(false);
+  const scoresBoardActive = view === 'scores' && boardPick !== null;
+  const boardState = useAmateurBoardState(
+    view === 'scores' ? userId : undefined,
+    scoresBoardActive || boardPanelOpen,
+  );
+
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
   /* §5c THE CLIENT RANKER IS OFF THE PAGE PATH. It is DEAD-LISTED, not deleted:
      it stays as the reference model for the scoring the RPC ports, and as the
@@ -1333,6 +1348,17 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     (item: StreamItem) => {
       analyticsEvents.track('amateur_card_who_tapped', { kind: item.kind });
       if (item.who?.user_id) opener.openProfile(item.who.user_id);
+    },
+    [opener],
+  );
+
+  /* P1 — a board row opens the round it ranks in the same sheet the stream
+     cards use; a row with no round id (a member-only ranking row) opens the
+     member. */
+  const boardRowPress = useCallback(
+    (row: BoardRow) => {
+      if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
+      else opener.openProfile(row.user_id);
     },
     [opener],
   );
