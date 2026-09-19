@@ -117,6 +117,14 @@ export interface StreamFacts {
   rating_n?: number | null;
   review_id?: string | null;
   first_sentence?: string | null;
+  /** Presentation-only review enrichment, resolved outside the stream ranker. */
+  breakdown?: {
+    design: number | null;
+    conditions: number | null;
+    clubhouse: number | null;
+    facilities: number | null;
+  };
+  photoCount?: number;
   top100_world?: number | null;
   top100_regional?: number | null;
   /** THE LIST THE RANK CAME FROM ('global' | 'gb-i' | 'usa' | 'europe'). The

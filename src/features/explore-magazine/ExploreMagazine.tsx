@@ -89,6 +89,7 @@ import { searchCourses, placeTree, placeCourseIds, type PlaceChoice } from './co
 import { CoursesSearchField } from './CoursesSearchField';
 import { RegionDropdown } from './RegionDropdown';
 import { ScopeControlSeparator } from './ScopeControlSeparator';
+import { useReviewPageEnrichment } from './useReviewPageEnrichment';
 
 import { useViewerCourseBests } from './useViewerCourseBests';
 
@@ -800,6 +801,25 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     return unique;
   }, [serverOn, source.items, revealed]);
 
+  /* R2.5 — ORDER AND IDENTITY STAY WITH THE STREAM. This one page-level read
+     decorates only the review IDs already present; it never enters the ranker. */
+  const visibleReviewIds = useMemo(
+    () => visible
+      .filter((item) => item.kind === 'review')
+      .map((item) => item.facts.review_id)
+      .filter((id): id is string => !!id),
+    [visible],
+  );
+  const reviewEnrichment = useReviewPageEnrichment(visibleReviewIds);
+  const displayItems = useMemo(
+    () => visible.map((item) => {
+      if (item.kind !== 'review' || !item.facts.review_id) return item;
+      const detail = reviewEnrichment.get(item.facts.review_id);
+      return detail ? { ...item, facts: { ...item.facts, ...detail } } : item;
+    }),
+    [visible, reviewEnrichment],
+  );
+
   /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
      screen, and a card holds its whole shell until that resolver settles —
      `pending` is never a gradient standing in for an unknown. */
@@ -819,7 +839,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
   const enriched = useMemo(
     () =>
-      visible.map((item) => {
+      displayItems.map((item) => {
         const subject = item.subject;
         if (!subject?.course_id) return item;
         const row = meta.data?.get(subject.course_id);
@@ -835,7 +855,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           },
         };
       }),
-    [visible, meta.data, meta.isFetched],
+    [displayItems, meta.data, meta.isFetched],
   );
 
   /* ONE RANK CARD PER COURSE PER CHANGE. The gate sits HERE, after enrichment

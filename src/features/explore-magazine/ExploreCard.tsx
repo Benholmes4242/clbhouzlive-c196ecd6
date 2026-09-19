@@ -20,6 +20,8 @@ import { RoundStatStrip } from './AchievementCallout';
 import { dotsFor, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
+import { getScoreTier } from '@/utils/getScoreTier';
+import type { ReviewBreakdown } from './useReviewPageEnrichment';
 
 
 /**
@@ -185,7 +187,7 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
         key="review"
         corner="left"
         figure={facts.rating.toFixed(1)}
-        unit={t('amateur.stream.chip.rating', 'rating')}
+        unit={getScoreTier(facts.rating).label}
         tone={facts.rating >= 9 ? PHOTO_FIG_GOOD : '#FFFFFF'}
       />,
     );
@@ -221,6 +223,16 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
   }
 
   return out;
+}
+
+export function strongestReviewArea(breakdown: ReviewBreakdown | undefined): keyof ReviewBreakdown | null {
+  if (!breakdown) return null;
+  const entries = Object.entries(breakdown) as Array<[keyof ReviewBreakdown, number | null]>;
+  if (entries.some(([, score]) => score == null)) return null;
+  const ordered = entries
+    .map(([area, score]) => [area, score as number] as const)
+    .sort((a, b) => b[1] - a[1]);
+  return ordered[0][1] - ordered[1][1] >= 0.5 ? ordered[0][0] : null;
 }
 
 function WhoLine({
@@ -584,6 +596,41 @@ export function ExploreCard({
       {headline}
     </div>
   );
+  const strongestArea = item.kind === 'review' ? strongestReviewArea(item.facts.breakdown) : null;
+  const enrichmentNode = item.kind === 'review' ? (
+    <div
+      data-review-enrichment-lane="true"
+      style={{
+        height: 18,
+        marginTop: 4,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        minWidth: 0,
+        overflow: 'hidden',
+        color: 'rgba(248,250,252,0.76)',
+        fontFamily: SANS,
+        fontSize: 11,
+        fontWeight: 650,
+        lineHeight: '18px',
+        whiteSpace: 'nowrap',
+        textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
+      }}
+    >
+      {strongestArea ? (
+        <span data-review-strongest="true" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {t('amateur.stream.enrichment.strongest', {
+            area: t(`amateur.stream.enrichment.area.${strongestArea}`),
+          })}
+        </span>
+      ) : null}
+      {(item.facts.photoCount ?? 0) > 1 ? (
+        <span data-review-photo-count="true" style={{ marginLeft: 'auto', flex: '0 0 auto' }}>
+          {t('amateur.stream.enrichment.photos', { count: item.facts.photoCount })}
+        </span>
+      ) : null}
+    </div>
+  ) : null;
 
   const photo = (
     <CourseImageFallback
@@ -622,6 +669,7 @@ export function ExploreCard({
             >
               <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               {headlineNode}
+               {enrichmentNode}
               <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} />
             </span>
             {/* §3 THE BOTTOM LANE IS 16px AND CARRIES NO TRACE. On-photo is now
@@ -705,6 +753,7 @@ export function ExploreCard({
         <span style={{ display: 'block', paddingInline: 4, marginTop: item.kind === 'round' && size !== 'pair' && (callout || (item.facts.net != null && item.facts.course_handicap != null && item.facts.course_par != null)) ? 0 : 8 }}>
           {kicker}
           {headlineNode}
+           {enrichmentNode}
             <WhoLine item={item} size={size} onPhoto={false} onWhoTap={onWhoTap} engagement={engagement} />
         </span>
       ) : null}
