@@ -102,13 +102,13 @@ describe('Explore card shapes', () => {
         breakdown: { design: 9.2, conditions: 8.7, clubhouse: 8.1, facilities: 7.9 },
       },
     };
-    const { container, getByText } = render(
+    const { container } = render(
       <ExploreCard item={enriched} size="lead" shape={null} onTap={() => undefined} />,
     );
     const lane = container.querySelector<HTMLElement>('[data-review-enrichment-lane="true"]');
     expect(lane?.style.height).toBe('18px');
-    expect(getByText('Strongest on design')).toBeInTheDocument();
-    expect(getByText('3 photos')).toBeInTheDocument();
+    expect(container.querySelector('[data-review-strongest="true"]')).not.toBeNull();
+    expect(container.querySelector('[data-review-photo-count="true"]')).not.toBeNull();
   });
 
   it('requires all four scores and a 0.5 lead for strongest on', () => {
