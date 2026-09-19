@@ -50,6 +50,7 @@ import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import { getScoreColor } from '../_shared/scoreColor';
 import { shortenName } from '../components/overview-v3/HybridHero.utils';
+import { surnameOf } from '../_shared/playerName';
 import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -270,11 +271,6 @@ export function boardGridTemplate(c: BoardColumns): string {
 // ---------------------------------------------------------------------------
 
 type NameTier = 'full' | 'short' | 'surname';
-
-function surnameOf(fullName: string): string {
-  const parts = fullName.trim().split(/\s+/);
-  return parts.length === 1 ? parts[0] : parts[parts.length - 1];
-}
 
 function nameAtTier(fullName: string, tier: NameTier): string {
   if (tier === 'full') return fullName;

@@ -13,8 +13,23 @@ import { storyTime } from '@/features/tourhub/news/storyTime';
 import type { TourStory } from '@/features/tourhub/news/useTourStories';
 import type { ComingUpRow } from '@/features/tourhub/overview/data/useComingUp';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
+import { surnameOf } from '@/features/tourhub/_shared/playerName';
 
 const NOW = new Date('2026-09-17T12:00:00Z');
+
+describe('tour player surnames', () => {
+  it.each([
+    ['Alejandro Del Rey', 'Del Rey'],
+    ['Erik van Rooyen', 'van Rooyen'],
+    ['Michael Van der Valk', 'Van der Valk'],
+    ['J.J. Spaun', 'Spaun'],
+    ['Adam Scott', 'Scott'],
+    ['Scheffler', 'Scheffler'],
+    ['', ''],
+  ])('extracts %s as %s', (fullName, expected) => {
+    expect(surnameOf(fullName)).toBe(expected);
+  });
+});
 
 describe('Tour Overview Design A hero facts', () => {
   it('keeps the overview at 386 without changing the shared news hero height', () => {

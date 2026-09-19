@@ -65,6 +65,7 @@ import { useTournamentDefendingChamp } from '../../../hooks/useTournamentDefendi
 import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearTop4';
 import { useTournamentFieldStrength } from '../../../hooks/useTournamentFieldStrength';
 import { useTournamentVenueRecord } from '../../../overview/data/useTournamentVenueRecord';
+import { surnameOf } from '../../../_shared/playerName';
 
 /**
  * SIX rows. It was five while the board occupied the photo band, because the
@@ -365,14 +366,6 @@ export function HeroBoardSection({
       </div>
     </div>
   );
-}
-
-/** Surname only — the closed row and the panel figures both read this way. */
-function surnameOf(full: string | null | undefined): string {
-  const s = (full ?? '').trim();
-  if (!s) return '';
-  const parts = s.split(/\s+/);
-  return parts[parts.length - 1];
 }
 
 /**
