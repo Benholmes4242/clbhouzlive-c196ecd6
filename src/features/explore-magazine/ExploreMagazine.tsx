@@ -1684,7 +1684,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 ground="filled-selection"
                 distribute
                 style={{ flexWrap: 'nowrap' }}
-                trailing={<span aria-hidden="true" style={{ display: 'block', width: 20 }} />}
+                trailing={<span aria-hidden="true" style={{ display: 'block', width: 21 }} />}
               />
             ) : null}
             <div
