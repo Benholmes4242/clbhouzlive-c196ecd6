@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
-import { detectTopTie, fmtScore } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
+import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
@@ -28,6 +28,11 @@ describe('tour player surnames', () => {
     ['', ''],
   ])('extracts %s as %s', (fullName, expected) => {
     expect(surnameOf(fullName)).toBe(expected);
+  });
+
+  it('keeps a compound surname intact in the ticker fallback', () => {
+    expect(shortenName('Alejandro Del Rey')).toBe('A. Del Rey');
+    expect(shortenName('Erik van Rooyen')).toBe('E. van Rooyen');
   });
 });
 

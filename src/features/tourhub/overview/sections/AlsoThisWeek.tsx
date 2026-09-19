@@ -8,6 +8,7 @@ import { getScoreColor } from '../../_shared/scoreColor';
 import { fmtScore } from '../../components/overview-v3/HybridHero.utils';
 import { fullTourLabel } from '../../_shared/tourOrder';
 import { FONT, INK, INK_MUTE, TREND_UP, WHITE_ALPHA_06 } from '../../_shared/tokens';
+import { surnameOf } from '../../_shared/playerName';
 import { OverviewSectionHead } from './OverviewSectionHead';
 
 export function statusFor(slide: HeroSlide, now = new Date()): string {
@@ -42,7 +43,7 @@ function OtherTournamentRow({ slide, last }: { slide: HeroSlide; last: boolean }
   const score = slide.tournament.leaderScore;
   const name = slide.type === 'completed'
     ? slide.tournament.winnerName
-    : slide.tournament.leaderName?.trim().split(/\s+/).slice(-1)[0] ?? null;
+    : surnameOf(slide.tournament.leaderName) || null;
   const target = tournamentRoute(slide.tournament.id, { kind: 'overview' });
   const status = statusFor(slide);
   const tourLabel = fullTourLabel(slide.tournament.tourSlug, slide.tournament.tourName);

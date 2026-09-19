@@ -6,6 +6,7 @@
 import { formatMonthDay } from '@/i18n/format';
 import type { HeroTournament } from '../../hooks/useHeroCarouselData';
 import { getScoreColor } from '../../_shared/scoreColor';
+import { surnameOf } from '../../_shared/playerName';
 
 // ---------- Types -----------------------------------------------------------
 
@@ -128,9 +129,10 @@ export function shortenName(fullName?: string | null): string {
   if (!fullName) return '';
   const parts = fullName.trim().split(/\s+/);
   if (parts.length === 1) return parts[0];
-  const last = parts[parts.length - 1];
-  const initials = parts.slice(0, -1).map(p => p[0]).join('.');
-  return `${initials}. ${last}`;
+  const surname = surnameOf(fullName);
+  const surnameParts = surname.split(/\s+/).length;
+  const initials = parts.slice(0, -surnameParts).map((part) => part[0]).join('.');
+  return initials ? `${initials}. ${surname}` : surname;
 }
 
 // ---------- Rank formatting -------------------------------------------------
