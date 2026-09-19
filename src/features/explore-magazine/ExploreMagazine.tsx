@@ -88,6 +88,7 @@ import { useCircleCourseIds, circleCourseIds, useMergedCourseShelves } from './u
 import { searchCourses, placeTree, placeCourseIds, type PlaceChoice } from './coursesSearch';
 import { CoursesSearchField } from './CoursesSearchField';
 import { RegionDropdown } from './RegionDropdown';
+import { ScopeControlSeparator } from './ScopeControlSeparator';
 
 import { useViewerCourseBests } from './useViewerCourseBests';
 
@@ -1702,16 +1703,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             />
           </div>
 
-          <div
-            data-scores-scope-separator
-            aria-hidden="true"
-            style={{
-              flex: '0 0 1px',
-              alignSelf: 'stretch',
-              marginBlock: 5,
-              background: A.BORDER,
-            }}
-          />
+          <ScopeControlSeparator />
 
           {/* P2 — THE ONLY PINNED CONTROL. Its full board label is never
               truncated; the scope track yields and scrolls instead. */}
@@ -1807,6 +1799,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             />
             ) : null}
           </div>
+          <ScopeControlSeparator />
           <RegionDropdown
             tree={places}
             choice={place}
