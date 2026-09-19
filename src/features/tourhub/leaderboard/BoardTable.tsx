@@ -692,7 +692,11 @@ export function BoardTable({
                     textAlign: 'center',
                     fontSize: 12,
                     fontWeight: settled ? 600 : 700,
-                    opacity: val == null ? 1 : settled ? 0.6 : 1,
+                    // A played round is a played round: no opacity drop. The
+                    // current round is marked by its amber header, which is a
+                    // stronger signal than 40% fade. An empty cell is a
+                    // different thing and keeps A.DIM at full strength.
+                    opacity: 1,
                     color: val == null ? A.DIM : houseColor(val),
                     fontVariantNumeric: 'tabular-nums lining-nums',
                     whiteSpace: 'nowrap',
