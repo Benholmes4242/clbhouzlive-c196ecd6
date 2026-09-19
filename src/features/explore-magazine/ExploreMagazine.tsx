@@ -2000,6 +2000,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           </div>
         ) : null}
       </div>
+      ) : null}
 
       {/* The lead shell exists for the case the brief names — a lead arriving
           after a std has already rendered — and is exported from the shells file
