@@ -30,6 +30,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { MovementFigure } from '../../_shared/movement';
+import { surnameOf } from '../../_shared/playerName';
 import {
   FONT,
   INK,
@@ -304,11 +305,6 @@ function StatBoardRowsInner({
 export const StatBoardRows = memo(StatBoardRowsInner);
 
 // == WinnersCircle =====================================================
-function surname(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  return parts.length > 1 ? parts[parts.length - 1] : name;
-}
-
 function WinnersCircleInner({ category, onOpen, onPlayerTap }: BoardBaseProps) {
   const { t } = useTranslation('tourhub');
   const chips = category.rows.filter((r) => (r.value ?? 0) >= 1);
@@ -368,7 +364,7 @@ function WinnersCircleInner({ category, onOpen, onPlayerTap }: BoardBaseProps) {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {surname(r.name)}
+                {surnameOf(r.name)}
               </span>
               <span
                 style={{

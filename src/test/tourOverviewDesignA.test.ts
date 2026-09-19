@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
-import { detectTopTie, fmtScore } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
+import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
@@ -13,8 +13,28 @@ import { storyTime } from '@/features/tourhub/news/storyTime';
 import type { TourStory } from '@/features/tourhub/news/useTourStories';
 import type { ComingUpRow } from '@/features/tourhub/overview/data/useComingUp';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
+import { surnameOf } from '@/features/tourhub/_shared/playerName';
 
 const NOW = new Date('2026-09-17T12:00:00Z');
+
+describe('tour player surnames', () => {
+  it.each([
+    ['Alejandro Del Rey', 'Del Rey'],
+    ['Erik van Rooyen', 'van Rooyen'],
+    ['Michael Van der Valk', 'Van der Valk'],
+    ['J.J. Spaun', 'Spaun'],
+    ['Adam Scott', 'Scott'],
+    ['Scheffler', 'Scheffler'],
+    ['', ''],
+  ])('extracts %s as %s', (fullName, expected) => {
+    expect(surnameOf(fullName)).toBe(expected);
+  });
+
+  it('keeps a compound surname intact in the ticker fallback', () => {
+    expect(shortenName('Alejandro Del Rey')).toBe('A. Del Rey');
+    expect(shortenName('Erik van Rooyen')).toBe('E. van Rooyen');
+  });
+});
 
 describe('Tour Overview Design A hero facts', () => {
   it('keeps the overview at 386 without changing the shared news hero height', () => {

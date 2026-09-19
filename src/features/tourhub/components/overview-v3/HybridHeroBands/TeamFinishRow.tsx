@@ -8,6 +8,7 @@ import React from 'react';
 import { INK, INK_45, INK_15, GOLD_DARK, NUMERIC_STYLE } from '../HybridHero.constants';
 
 import { SLATE_700, SLATE_800 } from '../../../_shared/tokens';
+import { surnameOf } from '../../../_shared/playerName';
 
 export interface TeamFinishRowProps {
   rank: string;                    // "1" / "T2" / etc
@@ -20,11 +21,6 @@ export interface TeamFinishRowProps {
   isResults?: boolean;
   isLast?: boolean;
   isChampion?: boolean;
-}
-
-function surnameOnly(fullName: string): string {
-  const parts = fullName.trim().split(/\s+/);
-  return parts[parts.length - 1];
 }
 
 function TeamCrestTile({
@@ -115,7 +111,7 @@ export function TeamFinishRow({
   const hideThru = isResults;
   const memberSubtext =
     members && members.length > 0
-      ? members.slice(0, 2).map(m => surnameOnly(m.fullName)).filter(Boolean).join(' · ')
+      ? members.slice(0, 2).map(m => surnameOf(m.fullName)).filter(Boolean).join(' · ')
       : null;
 
   const height = isChampion ? 64 : 48;

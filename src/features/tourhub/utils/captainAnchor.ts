@@ -18,6 +18,7 @@
 
 import type { FranchiseCaptain } from '../hooks/useFranchiseCaptains';
 import { formatCurrencyUsdCompact } from '@/i18n/format';
+import { surnameOf } from '../_shared/playerName';
 
 const MARGIN_THRESHOLD = 0.20;
 
@@ -43,6 +44,5 @@ export function formatCaptainEarnings(n: number): string {
 
 /** Last-name shortener for tight pill copy ("Scottie Scheffler" → "Scheffler"). */
 export function captainShortName(fullName: string): string {
-  const parts = fullName.trim().split(/\s+/);
-  return parts.length >= 2 ? parts[parts.length - 1] : fullName;
+  return surnameOf(fullName);
 }

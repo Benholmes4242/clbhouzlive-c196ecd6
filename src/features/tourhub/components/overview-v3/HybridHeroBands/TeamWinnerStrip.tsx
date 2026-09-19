@@ -21,6 +21,7 @@ import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 
 import { SLATE_800, WHITE_ALPHA_55 } from '../../../_shared/tokens';
+import { surnameOf } from '../../../_shared/playerName';
 
 export interface TeamWinnerStripProps {
   teamName: string;
@@ -31,11 +32,6 @@ export interface TeamWinnerStripProps {
   eyebrowIcon?: LucideIcon;
   teamColor?: string;
   teamCrestUrl?: string | null;
-}
-
-function surnameOnly(fullName: string): string {
-  const parts = fullName.trim().split(/\s+/);
-  return parts[parts.length - 1];
 }
 
 function TeamCrestTile({
@@ -108,7 +104,7 @@ export function TeamWinnerStrip({
   const eyebrowText = eyebrow ?? t('overview.teamWinnerStrip.eyebrow');
   const membersDisplay = members
     .slice(0, 4)
-    .map(m => surnameOnly(m.fullName))
+    .map(m => surnameOf(m.fullName))
     .filter(Boolean)
     .join(' · ');
 
