@@ -1683,7 +1683,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
                 ground="filled-selection"
                 distribute
-                style={{ paddingRight: 26, flexWrap: 'nowrap' }}
+                style={{ flexWrap: 'nowrap' }}
+                trailing={<span aria-hidden="true" style={{ display: 'block', width: 20 }} />}
               />
             ) : null}
             <div
