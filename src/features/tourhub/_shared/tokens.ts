@@ -243,7 +243,7 @@ export const BAR_NEUTRAL = 'rgba(255,255,255,0.18)';                        // l
 /**
  * Canonical hero height for every tour surface EXCEPT the tour overview hero,
  * which is deliberately taller (cinematic carousel, signed off separately at
- * clamp(380px, 44dvh, 460px) — see overview-v3/OverviewHero + CinematicHeroFullBleed).
+ * clamp(380px, 44dvh, 460px) — see overview-v3/OverviewHero + HybridHero).
  *
  * The Tour Overview photo band is the same 244px; its 36px wire ticker makes the
  * full carousel container 280px. Source of truth: the course detail hero,

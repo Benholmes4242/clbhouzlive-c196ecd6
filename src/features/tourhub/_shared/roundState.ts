@@ -3,7 +3,7 @@
 // both must stay in lockstep. See the edge-side file for rationale.
 //
 // "Round started" = at least one hole played by this competitor.
-// Used by CinematicFrame.liveRoundFor and FullLeaderboard.getLiveRoundData
+// Used by MiniBoard (heroBoard variant) and FullLeaderboard.getLiveRoundData
 // so the hero and the leaderboard agree on when to show TODAY data.
 export function roundStarted(r: { thru?: number | null; strokes?: number | null } | null | undefined): boolean {
   if (!r) return false;
