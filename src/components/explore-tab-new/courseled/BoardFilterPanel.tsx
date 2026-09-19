@@ -65,7 +65,7 @@ import {
  * board and nothing else. A selected chip is A.INK.
  */
 
-type Screen = 'root' | 'where' | 'courses';
+type Screen = 'root' | 'handicap' | 'where' | 'courses';
 
 /** S3.5 — a search field appears only past this many individual course rows. */
 const COURSE_SEARCH_THRESHOLD = 60;
@@ -169,32 +169,27 @@ function PanelRow({
 }
 
 /**
- * THE CHIP AND ITS FIVE STATES (S3).
+ * THE CHIP AND ITS STATES (P4).
  *
- * S3.2 vs S3.3 is the settled "defaults recede, changed values come forward"
- * rule expressed as a chip: SELECTED-AND-DEFAULT keeps the panel fill and takes
- * an ink OUTLINE; SELECTED-AND-CHANGED takes the ink FILL. Do not collapse them:
- * together they are how the member sees which axes they have actually moved.
+ * Every selected option uses the same 14% ink wash. Defaults explain their
+ * unfiltered meaning in their labels; they do not need a second visual state.
  */
 function Chip({
   label,
   count,
   selected,
-  isDefault,
+  showCount = true,
   onClick,
 }: {
   label: string;
   count: number | null;
   selected: boolean;
-  /** True when this option IS the axis default. */
-  isDefault: boolean;
+  showCount?: boolean;
   onClick: () => void;
 }) {
   /* S3.5 — a REAL zero on a fixed list greys and disables. S3.6 — a null is
      UNRESOLVED and greys nothing. */
   const disabled = count === 0 && !selected;
-  const filled = selected && !isDefault;
-
   return (
     <button
       type="button"
@@ -208,8 +203,8 @@ function Chip({
         gap: 7,
         padding: '8px 11px',
         borderRadius: 8,
-        border: `1px solid ${selected ? A.INK : A.BORDER}`,
-        background: filled ? A.INK : A.PANEL,
+        border: `1px solid ${A.BORDER}`,
+        background: selected ? 'rgba(255,255,255,0.14)' : A.PANEL,
         fontFamily: SANS,
         opacity: disabled ? 0.35 : 1,
         cursor: disabled ? 'default' : 'pointer',
@@ -219,16 +214,16 @@ function Chip({
         style={{
           fontSize: 12.5,
           fontWeight: 700,
-          color: filled ? A.CANVAS : A.INK,
+          color: A.INK,
           whiteSpace: 'nowrap',
         }}
       >
         {label}
       </span>
-      {count == null ? null : (
+      {!showCount || count == null ? null : (
         <span
           className="tabular-nums"
-          style={{ fontSize: 11, fontWeight: 700, color: filled ? A.CANVAS : A.MUTE }}
+          style={{ fontSize: 11, fontWeight: 700, color: A.MUTE }}
         >
           {count}
         </span>
@@ -297,6 +292,10 @@ export function BoardFilterPanel({
     const o = COURSES_SET_OPTIONS.find((x) => x.key === filters.courses);
     return o ? label(o) : label(COURSES_SET_OPTIONS[0]);
   })();
+  const bandLabel = (() => {
+    const option = BAND_OPTIONS.find((item) => item.key === filters.band);
+    return option ? label(option) : label(BAND_OPTIONS[0]);
+  })();
 
   /* S1.2 — ONE SOURCE FOR THE FIGURE. The header and the footer button read the
      SAME prop, so feedback and commitment can never disagree. */
@@ -325,6 +324,8 @@ export function BoardFilterPanel({
     switch (screen) {
       case 'where':
         return t('discover.filterBoard.axis.where', 'Where');
+      case 'handicap':
+        return t('discover.filterBoard.axis.handicap', 'Handicap');
       case 'courses':
         return t('discover.filterBoard.axis.courses', 'Courses');
       default:
@@ -457,7 +458,6 @@ export function BoardFilterPanel({
                   label={label(o)}
                   count={facets.countFor('window', o.key)}
                   selected={filters.window === o.key}
-                  isDefault={o.key === DEFAULT_FILTERS.window}
                   onClick={() => set({ window: o.key as WindowKey })}
                 />
               ))}
@@ -471,7 +471,6 @@ export function BoardFilterPanel({
                   label={label(o)}
                   count={facets.countFor('scope', o.key)}
                   selected={filters.scope === o.key}
-                  isDefault={o.key === DEFAULT_FILTERS.scope}
                   onClick={() => set({ scope: o.key })}
                 />
               ))}
@@ -488,7 +487,7 @@ export function BoardFilterPanel({
                   label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
                   count={facets.countFor('board', key)}
                   selected={board === key}
-                  isDefault={key === 'topar'}
+                  showCount={false}
                   onClick={() => onBoardChange(key)}
                 />
               ))}
@@ -501,22 +500,8 @@ export function BoardFilterPanel({
                   label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
                   count={facets.countFor('board', key)}
                   selected={board === key}
-                  isDefault={false}
+                  showCount={false}
                   onClick={() => onBoardChange(key)}
-                />
-              ))}
-            </ChipWrap>
-
-            <SectionLabel>{t('discover.filterBoard.axis.handicap', 'Handicap')}</SectionLabel>
-            <ChipWrap>
-              {BAND_OPTIONS.filter((o) => (o.key === 'near' ? nearApplies : true)).map((o) => (
-                <Chip
-                  key={o.key}
-                  label={label(o)}
-                  count={facets.countFor('band', o.key)}
-                  selected={filters.band === o.key}
-                  isDefault={o.key === DEFAULT_FILTERS.band}
-                  onClick={() => set({ band: o.key as BandKey })}
                 />
               ))}
             </ChipWrap>
@@ -532,16 +517,20 @@ export function BoardFilterPanel({
                   label={label(o)}
                   count={facets.countFor('competition', o.key)}
                   selected={filters.competition === o.key}
-                  isDefault={o.key === DEFAULT_FILTERS.competition}
                   onClick={() => set({ competition: o.key as CompetitionKey })}
                 />
               ))}
             </ChipWrap>
 
-            {/* S2.1 — THE TWO OPEN LISTS ARE THE ONLY THINGS THAT STILL DRILL IN:
-                5 countries with 14 sub-countries, and 254 courses out of a
-                23,295 catalogue. Neither can be a chip row. */}
+            {/* P4 — heavy and open-list axes drill in, keeping the root scannable. */}
             <div style={{ marginTop: 22, borderTop: `1px solid ${A.BORDER}` }}>
+              <PanelRow
+                label={t('discover.filterBoard.axis.handicap', 'Handicap')}
+                value={bandLabel}
+                valueChanged={filters.band !== DEFAULT_FILTERS.band}
+                chevron
+                onClick={() => setScreen('handicap')}
+              />
               <PanelRow
                 label={t('discover.filterBoard.axis.where', 'Where')}
                 value={whereLabel}
@@ -559,6 +548,23 @@ export function BoardFilterPanel({
             </div>
             <div style={{ height: 24 }} />
           </>
+        )}
+
+        {screen === 'handicap' && (
+          <ChipWrap>
+            {BAND_OPTIONS.filter((o) => (o.key === 'near' ? nearApplies : true)).map((o) => (
+              <Chip
+                key={o.key}
+                label={label(o)}
+                count={facets.countFor('band', o.key)}
+                selected={filters.band === o.key}
+                onClick={() => {
+                  set({ band: o.key as BandKey });
+                  setScreen('root');
+                }}
+              />
+            ))}
+          </ChipWrap>
         )}
 
         {screen === 'where' && (
