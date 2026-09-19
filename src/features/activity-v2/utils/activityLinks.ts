@@ -316,15 +316,6 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     return '';
   }
 
-  // --- entity fallbacks ------------------------------------------------
-  if (entity_type === 'post' && entity_id) return `/post/${entity_id}`;
-  if (entity_type === 'comment' && data.post_id) {
-    const cid = data.comment_id;
-    return cid ? `/post/${data.post_id}/comment/${cid}` : `/post/${data.post_id}`;
-  }
-  if (entity_type === 'course' && entity_id) return `/courses/${entity_id}`;
-  if (entity_type === 'club' && entity_id) return `/clubs/${entity_id}`;
-
   // --- follow / friend -------------------------------------------------
   if (FOLLOW_TYPES.has(type)) {
     if (type === 'follow') {
