@@ -1,6 +1,6 @@
 /**
  * Shared resolver for tour player avatar candidates.
- * Single source of truth used by the hero (CinematicFrame) and the
+ * Single source of truth used by the hero (MiniBoard heroBoard variant) and the
  * PlayerScorecardSheet so both surfaces share one ordered candidate chain.
  */
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';

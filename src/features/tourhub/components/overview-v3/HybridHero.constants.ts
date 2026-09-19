@@ -86,7 +86,7 @@ export const HERO_TOP_SCRIM =
 
 
 /**
- * CinematicFrame scrim (Direction A) — heavy at base for capsule+title legibility,
+ * Hero scrim (Direction A, MiniBoard heroBoard variant) — heavy at base for capsule+title legibility,
  * lets photo breathe in the upper third.
  */
 export const CINEMATIC_SCRIM =

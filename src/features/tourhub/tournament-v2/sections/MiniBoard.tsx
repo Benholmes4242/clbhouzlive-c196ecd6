@@ -116,12 +116,15 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   // the previous round). The light board keeps its blank-cell doctrine.
   const todayBlank = theme === 'light' ? BLANK : '\u2014';
   const showOverviewPosition = rows.some((row) => row.position != null || ['MC', 'CUT', 'WD'].includes(row.status?.toUpperCase() ?? ''));
-  const showOverviewThru = phase === 'live' && rows.some((row) => thruLabel(row, todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound)) !== BLANK);
+  // The live hero board carries TODAY, not THRU: the current round is the story
+  // and the swap is what keeps the name column wide enough for real names.
+  // Gate shape matches the old THRU gate: render only when a visible row has one.
+  const showOverviewToday = phase === 'live' && rows.some((row) => todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound) != null);
   const overviewGrid = [
     showOverviewPosition ? '44px' : null,
     'minmax(0, 1fr)',
     '52px',
-    phase === 'completed' || showOverviewThru ? '52px' : null,
+    phase === 'completed' ? '52px' : showOverviewToday ? '40px' : null,
   ].filter(Boolean).join(' ');
 
   const overviewName = (fullName: string | undefined): string => fullName?.trim() || BLANK;
@@ -134,7 +137,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div>{t('board.columns.player')}</div>
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
-            {phase === 'completed' || showOverviewThru ? <div style={{ textAlign: 'right' }}>{phase === 'completed' ? t('board.columns.prize', 'Prize') : t('board.columns.thru')}</div> : null}
+            {phase === 'completed' || showOverviewToday ? <div style={{ textAlign: 'right' }}>{phase === 'completed' ? t('board.columns.prize', 'Prize') : t('board.columns.today')}</div> : null}
           </div>
           {rows.map((r) => {
             const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
@@ -159,7 +162,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
                 <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
-                {phase === 'completed' || showOverviewThru ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{phase === 'completed' ? (r.money != null && r.money > 0 ? formatEarnings(r.money) : BLANK) : thruLabel(r, today)}</div> : null}
+                {phase === 'completed' || showOverviewToday ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: phase === 'completed' ? T.mute : getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{phase === 'completed' ? (r.money != null && r.money > 0 ? formatEarnings(r.money) : BLANK) : today == null ? todayBlank : fmtScore(today)}</div> : null}
               </button>
             );
           })}

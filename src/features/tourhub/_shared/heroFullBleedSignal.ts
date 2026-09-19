@@ -1,6 +1,6 @@
 /**
  * heroFullBleedSignal — module-level signal so HybridHero can tell the
- * surrounding TourHubMainPage when it is rendering CinematicHeroFullBleed
+ * surrounding TourHubMainPage when it is rendering a full-bleed hero
  * (live / results). Lets the page lift chrome padding + engage the
  * transparent-chrome overlay without prop-drilling.
  */
