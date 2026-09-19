@@ -195,6 +195,20 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
 
   // --- like ------------------------------------------------------------
   if (type === 'like' || type === 'like_post') {
+    /* R3.3 — A LIKE ON A REVIEW GOES WHERE ITS COMMENT GOES. After R3.1 a
+       PERSONAL like on a review-backed post writes content_reactions and
+       arrives as `reaction` (resolved above); a BUSINESS like still writes
+       post_likes and arrives as `like`, now carrying target_type 'review' plus
+       the review and course ids. Same destination, same payload keys as the
+       comment branch below. No new routes. Rows predating R3.3 carry no
+       target_type and fall through to /post/:id exactly as before. */
+    const targetType = data.target_type;
+    if (targetType === 'review') {
+      const cid = data.course_id;
+      const rid = data.review_id ?? data.target_id ?? null;
+      if (cid && rid) return `/courses/${cid}?tab=reviews&review=${rid}`;
+      if (cid) return `/courses/${cid}?tab=reviews`;
+    }
     const postId = data.post_id ?? (entity_type === 'post' ? entity_id : null);
     if (postId) return `/post/${postId}`;
   }
