@@ -195,6 +195,65 @@ describe('notifRoute parity with activityLinks', () => {
 });
 
 /**
+ * N4 — THE ENTITY FALLBACKS MUST NOT SHADOW A TYPE BRANCH. These rows carry an
+ * entity_type that matches a generic fallback; their type branch must win in
+ * BOTH routers. Before the client fix, all three failed: the client returned
+ * the entity fallback (/courses/:id) while the port returned the deep link.
+ * The claim fixture gives entity_id and data.course_id DIFFERENT values so the
+ * assertion can tell "claim branch read data.course_id" apart from "fallback
+ * read entity_id".
+ */
+const N4_SHADOW_FIXTURES: Array<Fixture & { route: string }> = [
+  {
+    // All 35 live rate_course_prompt rows carry entity_type 'course',
+    // entity_id = the course id AND data.course_id — this is that shape.
+    name: 'rate_course_prompt with entity_type course',
+    row: { notif_type: 'rate_course_prompt', entity_type: 'course', entity_id: CID, data: { course_id: CID } },
+    route: `/rate-course-v2/${CID}`,
+  },
+  {
+    name: 'course_analytics_updated with entity_type course',
+    row: { notif_type: 'course_analytics_updated', entity_type: 'course', entity_id: CID, data: { course_id: CID } },
+    route: `/courses/${CID}?tab=holes`,
+  },
+  {
+    name: 'course_claim_approved with entity_type course',
+    row: { notif_type: 'course_claim_approved', entity_type: 'course', entity_id: 'course-shadow', data: { course_id: CID } },
+    route: `/courses/${CID}`,
+  },
+];
+
+describe('entity fallbacks never shadow a type branch (N4)', () => {
+  it.each(N4_SHADOW_FIXTURES)('$name resolves to its type-branch route in both routers', ({ row: partial, route }) => {
+    const r = row(partial);
+    expect(getActivityLink(r)).toBe(route);
+    expect(
+      routeForNotif({
+        notif_type: r.notif_type,
+        entity_type: r.entity_type,
+        entity_id: r.entity_id,
+        data: r.data as Record<string, unknown> | null,
+        actor_user_id: r.actor_user_id,
+      }),
+    ).toBe(route);
+  });
+
+  it('the entity-fallback block sits BELOW every type branch in the client source', () => {
+    const src = readFileSync(
+      path.join(ROOT, 'src/features/activity-v2/utils/activityLinks.ts'),
+      'utf8',
+    );
+    const blockPos = src.indexOf('// --- entity fallbacks');
+    expect(blockPos).toBeGreaterThan(-1);
+    const branchPositions = [...src.matchAll(/type === '|type\.startsWith\('/g)].map(
+      (m) => m.index as number,
+    );
+    expect(branchPositions.length).toBeGreaterThan(0);
+    expect(Math.max(...branchPositions)).toBeLessThan(blockPos);
+  });
+});
+
+/**
  * A type handled by one file and not the other must fail. Both files name their
  * handled types the same way (`type === '...'` / `type.startsWith('...')`), so
  * the two sets are compared directly.
