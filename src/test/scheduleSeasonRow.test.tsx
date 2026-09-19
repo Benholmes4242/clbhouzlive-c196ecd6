@@ -79,9 +79,9 @@ describe('SeasonRow overview grammar', () => {
       />,
     );
     expect(screen.queryByText(/CHAMPION/)).toBeInTheDocument();
-    const spans = container.querySelectorAll('button > span > span');
+    const textColumn = container.querySelector('button > span') as HTMLElement;
     // Kicker, name, and nothing else — no empty meta row.
-    expect(spans.length).toBe(2);
+    expect(textColumn.children.length).toBe(2);
   });
 
   it('keeps only Live green and renders a tied leader in the figure stack', () => {
