@@ -50,7 +50,7 @@ import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import { getScoreColor } from '../_shared/scoreColor';
 import { shortenName } from '../components/overview-v3/HybridHero.utils';
-import { TREND_UP, TREND_DOWN, AMBER, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
+import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 // Dark ramp, imported so the board follows the tour token file (was four pinned light literals).
@@ -60,9 +60,6 @@ const MUTED = TOUR_INK_FAINT;
 const HAIRLINE = 'rgba(255,255,255,0.12)';
 
 const CANVAS = TOUR_SLATE_50;
-/** Leader wash — the only per-row emphasis left on the board. */
-const LEADER_WASH = 'rgba(255,255,255,0.05)';
-
 /** TIGHTENED GEOMETRY (2.4). */
 const MOV_W = 24;
 const POS_W = 24;

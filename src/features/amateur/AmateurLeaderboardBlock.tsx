@@ -12,8 +12,8 @@ import {
   filtersAreDefault,
   type BoardKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
-import { DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { FindGolfersSheet } from '@/components/explore-tab-new/FindGolfersSheet';
@@ -34,7 +34,7 @@ import type { AmateurBoardState } from './useAmateurBoardState';
  * CAPPED, WITH A SEE-ALL. Eight positions on the page and the rest behind the
  * sheet - a page of four blocks cannot spend two screens on one of them. The
  * member's own row is PINNED beneath the cut when it falls outside it, with the
- * gap to the leader stated, and that row is the ONLY amber on this block.
+ * gap to the leader stated. Amber remains identity; the leader wash states rank.
  */
 
 /** Eight positions on the page; the see-all sheet holds the remainder. */
