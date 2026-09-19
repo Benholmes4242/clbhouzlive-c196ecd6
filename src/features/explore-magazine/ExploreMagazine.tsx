@@ -1855,28 +1855,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           who cannot find the stream again will think the app broke. */}
       {scoresBoardActive ? (
         <div style={{ marginBottom: BLOCK_GAP }}>
-          <div style={{ padding: '0 20px 6px' }}>
-            <button
-              type="button"
-              onClick={() => {
+          <AmateurLeaderboardBlock
+            userId={userId}
+            state={boardState}
+            onRowPress={boardRowPress}
+            onBack={() => {
                 analyticsEvents.track('amateur_board_cleared', { board: boardPick });
                 setBoardPick(null);
-              }}
-              style={{
-                padding: 0,
-                border: 'none',
-                background: 'transparent',
-                color: A.MUTE,
-                fontFamily: SANS,
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              ‹ {t('amateur.board.backToStream', 'Back to the stream')}
-            </button>
-          </div>
-          <AmateurLeaderboardBlock userId={userId} state={boardState} onRowPress={boardRowPress} />
+            }}
+          />
         </div>
       ) : null}
 

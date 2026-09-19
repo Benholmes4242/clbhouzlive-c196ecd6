@@ -50,7 +50,7 @@ import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import { getScoreColor } from '../_shared/scoreColor';
 import { shortenName } from '../components/overview-v3/HybridHero.utils';
-import { TREND_UP, TREND_DOWN, AMBER, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
+import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 // Dark ramp, imported so the board follows the tour token file (was four pinned light literals).
@@ -60,9 +60,6 @@ const MUTED = TOUR_INK_FAINT;
 const HAIRLINE = 'rgba(255,255,255,0.12)';
 
 const CANVAS = TOUR_SLATE_50;
-/** Leader wash — the only per-row emphasis left on the board. */
-const LEADER_WASH = 'rgba(255,255,255,0.05)';
-
 /** TIGHTENED GEOMETRY (2.4). */
 const MOV_W = 24;
 const POS_W = 24;
@@ -128,9 +125,9 @@ interface Props {
   movementEntries?: BoardEntry[];
 }
 
-function houseColor(score: number | null | undefined): string {
+function houseColor(score: number | null | undefined, emphasis: 'standard' | 'leader' = 'standard'): string {
   if (score == null) return INK;
-  return getScoreColor(score, 'dark');
+  return getScoreColor(score, 'dark', emphasis);
 }
 
 /** Absent figures render NOTHING — the grid holds the column. */
@@ -546,7 +543,7 @@ export function BoardTable({
       ? ''
       : `${e.position_tied ? 'T' : ''}${e.position}`;
     const isLeader = !demotedRow && e.position === 1;
-    const totColor = demotedRow ? SECONDARY : houseColor(e.score);
+    const totColor = demotedRow ? SECONDARY : houseColor(e.score, isLeader ? 'leader' : 'standard');
     const totalDisplay = fmtScore(e.score);
     const todayVal = todayFromEntry(e, currentRound);
     // THRU must agree with the live round: if the active round has not started

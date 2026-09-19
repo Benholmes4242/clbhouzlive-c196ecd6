@@ -6,6 +6,7 @@ import { A, SANS } from './tokens';
 import { relativeDayCompact } from './discoverWhen';
 import { boardCountsRounds, isFeatBoard, type BoardKey } from './boardFilters';
 import type { BoardRow as Row } from './hooks/useBoardPage';
+import { INK_TINT_04 as LEADER_WASH } from '@/features/tourhub/_shared/tokens';
 
 /**
  * THE BOARD'S ROW (BRIEF_DISCOVER_FILTER_LED_BOARD S4/S5), shared by the board
@@ -336,9 +337,8 @@ export function BoardRowView({
         alignItems: 'center',
         gap: 10,
         padding: '6px 2px',
-        /* BRIEF_EXPLORE_REFINEMENT §3 — AMBER TEXT ONLY, matching Champions.
-           No tinted band, no highlight box: the amber is the statement. */
-        background: 'transparent',
+        /* The wash states rank; amber remains the viewing member's identity. */
+        background: row.pos === 1 ? LEADER_WASH : 'transparent',
         border: 'none',
         textAlign: 'left',
         fontFamily: SANS,
