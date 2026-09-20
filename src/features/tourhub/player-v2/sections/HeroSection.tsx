@@ -164,7 +164,7 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
                     });
                   }}
                 />
-              </>
+              </span>
             )}
           </div>
 
