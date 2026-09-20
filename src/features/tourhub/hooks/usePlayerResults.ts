@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatCurrencyUsd } from '@/i18n/format';
+import { currentSeasonYear } from '../leaders-v2/data/useLeaderCategories';
 import { isMissedCut, isNonStarter, isWithdrawn, normalizeStatus } from '../_shared/resultStatus';
 
 export interface PlayerTournamentResult {
