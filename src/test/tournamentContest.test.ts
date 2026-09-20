@@ -10,7 +10,7 @@ describe('selectTournamentContest', () => {
   it('derives a single lead, margin, pack and non-leader move', () => {
     const result = selectTournamentContest([row('leader', -12, 1, -2), row('second', -11, 2, -6), row('third', -9, 3)], meta, 'live');
     expect(result.margin).toBe(1);
-    expect(result.withinFour).toBe(3);
+    expect(result.chasersWithinFour).toBe(2);
     expect(result.holesLeft).toBe(6);
     expect(result.mover?.id).toBe('second');
     expect(result.leadForm).toBe('figure');
@@ -20,6 +20,7 @@ describe('selectTournamentContest', () => {
     const board = Array.from({ length: 5 }, (_, i) => row(String(i), -10, 1, i === 0 ? -4 : -2));
     const result = selectTournamentContest(board, meta, 'live');
     expect(result.sharedLead).toBe(true);
+    expect(result.chasersWithinFour).toBe(0);
     expect(result.pack.every((p) => p.gap === 0)).toBe(true);
     expect(result.leadForm).toBe('word');
   });
