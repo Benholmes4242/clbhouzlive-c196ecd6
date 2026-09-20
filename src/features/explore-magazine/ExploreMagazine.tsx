@@ -10,6 +10,7 @@ import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hooks/useRoundPostComments';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
+import { FeatRarityProvider } from '@/hooks/gam/useFeatRarity';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
