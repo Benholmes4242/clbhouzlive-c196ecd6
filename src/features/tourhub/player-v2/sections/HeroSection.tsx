@@ -142,7 +142,11 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
                 row today, so the stamp carries the name alone; pass `year`
                 once a year field lands. */}
             {player.college && (
-              <>
+              /* Separator and stamp wrap together, so the eyebrow never leaves
+                 a hanging dot at the end of its first line. */
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
+              >
                 <span aria-hidden style={{ opacity: 0.6 }}>
                   {'\u00b7'}
                 </span>
