@@ -12,8 +12,7 @@
  * fixes the scale, and a second glyph beside the figure only competes with it.
  */
 import React from 'react';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
+import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { GUTTER } from '../about/AboutSection';
 
@@ -26,7 +25,7 @@ export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount }) => {
   const tier = getScoreTier(score);
   const settled = ratingCount >= 5;
   const count = `${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'}`;
-  const scoreColor = bandColorOnDark(score);
+  const scoreColor = courseSubScoreTone(score);
 
   return (
     <section style={{ padding: `0 ${GUTTER}px`, fontFamily: SANS }}>

@@ -11,8 +11,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
+import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HeroShell, W_55 } from '@/components/profile/hero/HeroShell';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -158,7 +157,7 @@ export const BusinessProfileHero: React.FC<Props> = ({
               label: t('business.hero.communityRating', 'Community rating'),
               ariaLabel: t('business.hero.communityRating', 'Community rating'),
               value: (avgRating as number).toFixed(1),
-              color: bandColorOnDark(avgRating),
+              color: courseSubScoreTone(avgRating),
               aside: (
                 <span
                   style={{

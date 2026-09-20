@@ -15,9 +15,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { bandColorOnDark, SubScoreStack } from '@/features/courses/_shared/scoreBands';
+import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
 import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
-import { A, LABEL  } from '@/features/courses/components/holes/analytical/tokens';
+import { A, LABEL, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 
@@ -62,7 +62,7 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
               fontWeight: 700,
               lineHeight: 1,
               letterSpacing: '-0.03em',
-              color: bandColorOnDark(r.rating),
+              color: courseSubScoreTone(r.rating),
             }}
           >
             {r.rating.toFixed(1)}

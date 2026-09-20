@@ -159,3 +159,9 @@ Tour Overview Design A
 - [x] Refactor three course-detail callers without visual changes
 - [x] Apply per-score bar and figure tones to BrowseCourseCard
 - [x] Document the intentionally collapsed milestone themes
+
+## Course rating colour systems C3
+- [x] Route named rating displays and shared sub-score bars through the canonical helper
+- [x] Preserve composer bands and viewing-member amber treatments
+- [x] Normalize photographic near-misses with documented white fallbacks
+- [x] Verify focused tests, TypeScript, rail tones, and Tralee tones

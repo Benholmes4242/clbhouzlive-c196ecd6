@@ -11,7 +11,8 @@ import { A, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { storyTime } from '@/features/tourhub/news/storyTime';
 import { r } from '@/lib/radius';
-import { CHIP_GLASS_CLASS, PHOTO_FIG_GOOD, PHOTO_FIG_SHADOW, PHOTO_FIG_UNDER } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS, PHOTO_FIG_SHADOW, PHOTO_FIG_UNDER } from '@/styles/photoScrim';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
@@ -188,7 +189,8 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
         corner="left"
         figure={facts.rating.toFixed(1)}
         unit={getScoreTier(facts.rating).label}
-        tone={facts.rating >= 9 ? PHOTO_FIG_GOOD : '#FFFFFF'}
+        /* Neutral stays white because this figure sits on variable photography. */
+        tone={facts.rating >= 9 ? courseSubScoreTone(facts.rating) : '#FFFFFF'}
       />,
     );
   }
@@ -203,7 +205,8 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
           /* RATING + LABEL, never the count — a bare "2" reads as a second
              score, and the count already lives in the headline. */
           unit={t('amateur.stream.chip.rating', 'rating')}
-          tone={facts.rating >= 9 ? PHOTO_FIG_GOOD : '#FFFFFF'}
+          /* Neutral stays white because this figure sits on variable photography. */
+          tone={facts.rating >= 9 ? courseSubScoreTone(facts.rating) : '#FFFFFF'}
         />,
       );
     }

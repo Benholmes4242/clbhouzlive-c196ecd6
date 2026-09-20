@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { formatRatingValue } from '@/utils/formatters';
-import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 
 interface CourseCommunityRatingProps {
@@ -20,10 +20,7 @@ interface CourseCommunityRatingProps {
  * Displays the community rating score.
  * This is the SINGLE source of truth for rating display in course cards.
  *
- * Colour comes from the one member-score band scale (scoreBands):
- * - >= 9.0  BAND_GREEN  #047857
- * - >= 5.0  BAND_AMBER  #F7931E
- * -  < 5.0  BAND_RED    #DC2626
+ * Display colour comes from the canonical green-or-muted course score rule.
  *
  * `forceNeutral` overrides the band entirely: foreground on light, near-white
  * when `onDark` is also set. Banded ratings always use the lifted dark-surface
@@ -70,7 +67,7 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
             ? onDark
               ? { color: 'rgba(255,255,255,0.95)' }
               : undefined
-            : { color: bandColorOnDark(rating) }
+             : { color: courseSubScoreTone(rating) }
         }
       >
         {formatRatingValue(rating)}

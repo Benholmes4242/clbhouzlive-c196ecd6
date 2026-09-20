@@ -5,7 +5,7 @@ import { StandoutTile } from '@/components/explore-tab-new/courseled/StandoutTil
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreShelf } from './ExploreShelf';
-import { PHOTO_FIG_GOOD } from '@/styles/photoScrim';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 import type { ListEvent } from './listCourseEvents';
 import { ShelfShell } from './ExploreShells';
@@ -24,10 +24,6 @@ import { RANK_SCOPE_LABEL } from './useTop100RankIndex';
  */
 
 const TILE = { w: 180, h: 118 };
-/** #4ADE80 survives a bright course photograph; the darker band green does not.
- *  SOURCED, NOT REDECLARED (BRIEF_EXPLORE_FIGURE_CHIP_CONTRAST §4): the same
- *  value now has a name, so the figure chip and this shelf cannot drift. */
-const GREEN = PHOTO_FIG_GOOD;
 
 export function CourseShelf({
   heading,
@@ -94,7 +90,8 @@ export function CourseShelf({
                shows the rank alone — "#3" is honest, "#3 GB&I" on a New Jersey
                course is not. */
             unit={row.rank != null && row.rankScope ? RANK_SCOPE_LABEL[row.rankScope] : undefined}
-            figureTone={row.rank == null && row.rating != null && row.rating >= 9 ? GREEN : undefined}
+            /* Neutral keeps the component's white default over photography. */
+            figureTone={row.rank == null && row.rating != null && row.rating >= 9 ? courseSubScoreTone(row.rating) : undefined}
             whenLabel=""
             who=""
             isOwn={false}

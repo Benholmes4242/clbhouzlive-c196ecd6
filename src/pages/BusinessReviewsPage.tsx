@@ -33,13 +33,9 @@ import {
    RED stays — it is DANGER, used by the 1000-char warning and the delete/error
    blocks, a different quantity on a different scale. */
 import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, DANGER as RED } from '@/components/manage/ui';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { BIZ } from '@/components/business/businessTokens';
 import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
-/* THE score-band canon (0-10 member scores only). This page previously carried
-   three private scales — bars at 7/5, chip at 8/6, and its own green/red hexes.
-   Every band colour here now comes from bandColorOnDark and nowhere else. */
-import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 
 const AMBER = A.AMBER;
 const AMBER_SOFT = BIZ.amberTint;
@@ -53,12 +49,9 @@ const CHIPS: Array<{ key: ChipKey; label: string; filter: BusinessReviewFilter; 
   { key: 'lowest', label: 'Lowest rated', filter: 'all', sort: 'lowest' },
 ];
 
-/* Foreground from the canon; the two washes are the canon's dark green and dark
-   red at the SAME 0.16 the amber tint already uses, so all three chips carry
-   equal presence. The thresholds below only pick a wash — the colour they wash
-   is decided by bandColorOnDark, so a canon change reaches this chip. */
+/* Rating figures follow the canonical display tone; the wash stays structural. */
 function ratingTone(rating: number): { bg: string; fg: string } {
-  const fg = bandColorOnDark(rating);
+  const fg = courseSubScoreTone(rating);
   if (rating >= 9) return { bg: 'rgba(52,211,153,0.16)', fg };
   if (rating >= 5) return { bg: AMBER_SOFT, fg };
   return { bg: 'rgba(255,107,107,0.16)', fg };
@@ -267,7 +260,7 @@ function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }>
                 className="h-full rounded-full"
                 style={{
                   width: `${pct}%`,
-                  background: bandColorOnDark(BUCKET_REP_SCORE[b]),
+                  background: courseSubScoreTone(BUCKET_REP_SCORE[b]),
                   transition: 'width 300ms ease',
                 }}
               />

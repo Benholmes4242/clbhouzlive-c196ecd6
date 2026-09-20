@@ -24,7 +24,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { getRatingTier, TIER_LABEL_STYLE } from '@/lib/ratingTier';
-import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import { A, SANS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
 
@@ -127,13 +126,14 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
         <Figure
           label={t('courseDetail.rating.overall')}
           value={score.toFixed(1)}
-          tone={bandColorOnDark(score)}
+          tone={courseSubScoreTone(score)}
           tier={settled ? getRatingTier(score) : null}
         />
         {yours != null ? (
           <Figure
             label={t('courseDetail.rating.yours')}
             value={yours.toFixed(1)}
+            // Amber here means "yours", not a score band.
             tone={A.AMBER_DEEP}
             size={22}
           />
