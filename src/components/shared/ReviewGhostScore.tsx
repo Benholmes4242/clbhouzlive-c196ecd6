@@ -22,9 +22,16 @@ export type ReviewGhostSurface = 'dark' | 'light';
  *  Dark = paper-white at 16%; light = ink at 10% (a quiet grey watermark). */
 export const REVIEW_GHOST_COLOR_NEUTRAL = 'rgba(248,250,252,0.16)';
 export const REVIEW_GHOST_COLOR_NEUTRAL_LIGHT = 'rgba(14,18,22,0.10)';
-export const REVIEW_GHOST_COLOR_GREEN = 'rgba(52,211,153,0.16)';
-export const REVIEW_GHOST_COLOR_GREEN_LIGHT = 'rgba(4,120,87,0.10)';
 export const REVIEW_LABEL_COLOR_NEUTRAL_LIGHT = 'var(--rating-bar-fill-neutral)';
+
+function hexAtAlpha(hex: string, alpha: number): string {
+  const channels = hex.match(/[a-f\d]{2}/gi)?.map((channel) => Number.parseInt(channel, 16));
+  if (!channels || channels.length !== 3) return hex;
+  return `rgba(${channels[0]},${channels[1]},${channels[2]},${alpha})`;
+}
+
+export const REVIEW_GHOST_COLOR_GREEN = hexAtAlpha(A.GREEN, 0.16);
+export const REVIEW_GHOST_COLOR_GREEN_LIGHT = hexAtAlpha(BAND_GREEN, 0.10);
 
 export function reviewGhostColor(
   rating: number,
