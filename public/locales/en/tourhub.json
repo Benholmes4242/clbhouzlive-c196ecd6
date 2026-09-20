@@ -877,7 +877,7 @@
         "label": "Strokes Gained Putting",
         "short": "SG PUTT",
         "unit": "SG",
-        "description": "The measured season standings for this category."
+        "description": "Measures shots gained or lost on the greens against the field average per round."
       },
       "world_rank": {
         "label": "World Ranking",

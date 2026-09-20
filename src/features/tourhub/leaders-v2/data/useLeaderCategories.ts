@@ -184,6 +184,8 @@ export interface LeaderCategoryDef {
   meaningfulBehind: boolean;
   picturableGap: boolean;
   duelGapLimit: number;
+  /** Set only when movement compares points after consecutive measured events. */
+  movementSource?: 'per_event_points';
 }
 
 /**

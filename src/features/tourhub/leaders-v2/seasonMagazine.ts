@@ -15,11 +15,15 @@ export type SeasonSubject =
 export interface SeasonMagazineSelection {
   subject: SeasonSubject;
   race: LeaderCategoryDef;
+  showMovement: boolean;
   oneNumber: LeaderCategoryDef | null;
   duel: LeaderCategoryDef | null;
   tiedList: LeaderCategoryDef | null;
-  reduced: boolean;
+  moduleCount: number;
+  useReducedLayout: boolean;
 }
+
+const NOTABLE_TIED_CATEGORIES = new Set(['wins', 'top_10', 'top_25']);
 
 function normalizedGap(category: LeaderCategoryDef): number {
   const [first, second] = category.rows;
@@ -47,6 +51,9 @@ export function selectSeasonMagazine(categories: LeaderCategoryDef[]): SeasonMag
   if (!race || race.rows.length < 2) return null;
 
   const subject = resolveSeasonSubject(race);
+  // 2-ALT stays dormant until points carry a measured per-event comparison.
+  const showMovement = race.movementSource === 'per_event_points'
+    && race.rows.filter((row) => row.movement != null).length >= 4;
   const appearances = new Map<string, number>();
   const reserve = (rows: LeaderRow[]): boolean => {
     const ids = [...new Set(rows.map((row) => row.playerId).filter(Boolean))];
@@ -75,12 +82,13 @@ export function selectSeasonMagazine(categories: LeaderCategoryDef[]): SeasonMag
   const duel = duelCandidates.find((category) => reserve(category.rows.slice(0, 2))) ?? null;
 
   const tiedCandidates = categories
+    .filter((category) => NOTABLE_TIED_CATEGORIES.has(category.key))
     .filter((category) => category.rows.filter((row) => row.rank === 1).length >= 2)
-    .filter((category) => category.key !== 'earnings');
+    .filter((category) => !['events_played', 'cuts_made', 'rounds_played'].includes(category.key));
   const tiedList = tiedCandidates.find((category) => reserve(category.rows.slice(0, 3))) ?? null;
 
-  const moduleCount = 2 + Number(Boolean(oneNumber)) + Number(Boolean(duel)) + Number(Boolean(tiedList));
-  return { subject, race, oneNumber, duel, tiedList, reduced: moduleCount < 3 };
+  const moduleCount = 1 + Number(showMovement) + Number(Boolean(oneNumber)) + Number(Boolean(duel)) + Number(Boolean(tiedList));
+  return { subject, race, showMovement, oneNumber, duel, tiedList, moduleCount, useReducedLayout: moduleCount < 3 };
 }
 
 export function playerAppearanceCounts(selection: SeasonMagazineSelection): Map<string, number> {
