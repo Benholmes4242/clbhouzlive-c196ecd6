@@ -7,7 +7,7 @@
  * course page's row family minus the member marker and the SI column. "See all 18 holes" opens the 75dvh sheet.
  * Section self-hides when the RPC reports unavailable coverage.
  */
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -17,9 +17,7 @@ import {
   type TournamentHole,
 } from '../data/useTournamentHoleAnalysis';
 import { FONT, SLATE_50 } from '../../_shared/tokens';
-import {
-  A, CAPTION, KICKER, LABEL, NUM, Panel, toParParts,
-} from '@/features/courses/components/holes/analytical/tokens';
+import { A, CAPTION, KICKER, LABEL, Panel } from '@/features/courses/components/holes/analytical/tokens';
 import {
   TournamentHoleRow,
   TourHoleRampLegend,
@@ -107,11 +105,10 @@ export function CourseSection({ tournamentId }: Props) {
         footer={t('tournament.course.seeAllHoles', { ns: 'tourhub', defaultValue: 'See all 18 holes' })}
         onOpen={openSheet}
       >
-        {hardest.hole_no !== easiest.hole_no && (
-          <FeaturePair hardest={hardest} easiest={easiest} />
-        )}
-        {previewShares && <DistributionStrip shares={previewShares} />}
+        {hardest.hole_no !== easiest.hole_no && <CourseComparison hardest={hardest} easiest={easiest} />}
+        {previewShares && <><SectionKicker text={t('tournament.course.distributionKicker', { ns: 'tourhub' })} /><DistributionStrip shares={previewShares} /></>}
         <TourHoleRampLegend />
+        <SectionKicker text={t('tournament.course.rowsKicker', { ns: 'tourhub' })} />
         {preview.map((h, i) => (
           <TournamentHoleRow
             key={h.hole_no}
@@ -268,12 +265,10 @@ function HolesSheet({
             </div>
           ) : (
             <>
-              {hardest.hole_no !== easiest.hole_no && (
-                <FeaturePair hardest={hardest} easiest={easiest} />
-              )}
-
-              {sheetShares && <DistributionStrip shares={sheetShares} />}
+              {hardest.hole_no !== easiest.hole_no && <CourseComparison hardest={hardest} easiest={easiest} />}
+              {sheetShares && <><SectionKicker text={t('tournament.course.distributionKicker', { ns: 'tourhub' })} /><DistributionStrip shares={sheetShares} /></>}
               <TourHoleRampLegend />
+              <SectionKicker text={t('tournament.course.rowsKicker', { ns: 'tourhub' })} />
               {played.map((h, i) => (
                 <TournamentHoleRow
                   key={h.hole_no}
@@ -294,48 +289,20 @@ function HolesSheet({
 }
 
 
-/**
- * FeaturePair - HARDEST / EASIEST as a bare flex row the parent Panel places.
- *
- * Correctness: the figure is the hole's scoring average RELATIVE TO PAR
- * (canonical toParParts), never the gross average - a par 3 that plays to
- * 3.4 is "+0.4", and that is the only number that compares across holes.
- * Difficulty takes NEUTRAL INK. Hardest and easiest describe COURSE
- * DIFFICULTY, not anybody's score, so the member green/red convention does not
- * apply here and amber (the viewing member) has no meaning on a tour surface.
- * Emphasis comes from position and weight, not hue.
- */
-const FeatureHalf: React.FC<{ label: string; h: TournamentHole }> = ({ label, h }) => {
-  const { t } = useTranslation(['tourhub', 'courses']);
-  const parts = toParParts(h.avg_to_par, 1);
-  return (
-    <div style={{ minWidth: 0, flex: 1 }}>
-      <div style={{ ...LABEL }}>{label}</div>
-      <div style={{ ...NUM, fontSize: 17, color: A.INK, marginTop: 6, lineHeight: 1.1 }}>
-        {t('tournament.course.holeN', { ns: 'tourhub', n: h.hole_no, defaultValue: 'Hole {{n}}' })}
-      </div>
-      {parts && (
-        <div style={{ ...NUM, fontSize: 22, color: A.INK, marginTop: 4, lineHeight: 1.1 }}>
-          {parts.text}
-        </div>
-      )}
-      <div style={{ ...LABEL, marginTop: 6 }}>
-        {t('board.meta.par', { ns: 'tourhub', par: h.par })}
-        {h.yards != null
-          ? ` \u00B7 ${t('courses:courseDetail.holes.yards')} ${formatNumber(h.yards)}`
-          : ''}
-      </div>
-    </div>
-  );
-};
+function SectionKicker({ text }: { text: string }) {
+  const { i18n } = useTranslation();
+  const cjk = /^(ja|ko)/.test(i18n.language);
+  return <div style={{ ...LABEL, fontSize: 10, letterSpacing: cjk ? 0 : '0.12em', textTransform: cjk ? 'none' : 'uppercase', margin: '14px 0 8px' }}>{text}</div>;
+}
 
-const FeaturePair: React.FC<{ hardest: TournamentHole; easiest: TournamentHole }> = ({ hardest, easiest }) => {
+function CourseComparison({ hardest, easiest }: { hardest: TournamentHole; easiest: TournamentHole }) {
   const { t } = useTranslation(['tourhub', 'courses']);
+  const tenths = Math.round(Math.abs(hardest.avg_to_par - easiest.avg_to_par) * 10);
+  const gap = tenths % 10 === 0 ? String(tenths / 10) : `${Math.floor(tenths / 10)}.${tenths % 10}`;
+  const key = tenths > 0 && tenths < 10 ? 'tournament.course.comparisonTenths' : 'tournament.course.comparison';
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 18 }}>
-      <FeatureHalf label={t('holes.hardest', { ns: 'courses' })} h={hardest} />
-      <div style={{ width: 1, alignSelf: 'stretch', background: A.BORDER }} aria-hidden="true" />
-      <FeatureHalf label={t('holes.easiest', { ns: 'courses' })} h={easiest} />
+    <div style={{ fontSize: 14, fontWeight: 400, color: A.BODY, lineHeight: 1.5, marginBottom: 8 }}>
+      {t(key, { ns: 'tourhub', hardest: t('tournament.course.holeN', { ns: 'tourhub', n: hardest.hole_no }), easiest: t('tournament.course.holeN', { ns: 'tourhub', n: easiest.hole_no }), gap, tenths })}
     </div>
   );
-};
+}

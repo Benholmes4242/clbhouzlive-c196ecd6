@@ -320,7 +320,8 @@
       "ourPicksStale": "Being refreshed",
       "figuresBasis": "All three from {{n}} completed rounds in round {{round}}.",
       "figuresBasisLowOnly": "Low round from completed rounds in round {{round}}; too few for a field average.",
-      "figuresBasisLow": "Low round: {{names}}."
+      "figuresBasisLow": "Low round: {{names}}.",
+      "rightMeta": "{{count}} groups"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -718,7 +719,18 @@
       "tbdPlayer": "TBD",
       "championFallback": "Champion",
       "winningLabel": "Winning score",
-      "marginLabel": "Margin"
+      "marginLabel": "Margin",
+      "fieldLabel": "Field",
+      "verdict": {
+        "liveContest": "{{leader}} leads by {{margin}} — and {{count}} players are inside four shots with {{holes}} to play.",
+        "liveShared": "{{count}} players share the lead with {{holes}} to play.",
+        "liveClear": "{{leader}} leads by {{margin}}.",
+        "liveScore": "{{leader}} leads on {{score}}.",
+        "completedMargin": "{{winner}} won by {{margin}}.",
+        "completedPlayoff": "{{winner}} won a playoff.",
+        "upcomingDefender": "{{field}} players for {{purse}}, and the defending champion is back.",
+        "upcomingField": "{{field}} players for {{purse}}."
+      }
     },
     "story": {
       "eyebrow": "The Story",
@@ -729,7 +741,9 @@
       "emptyBody": "Moments from this tournament will appear here as members share them.",
       "shareCta": "Share a moment",
       "allAction": "All moments",
-      "sheetTitle": "All Moments"
+      "sheetTitle": "All Moments",
+      "emptyShort": "No moments yet",
+      "shareShort": "Share one ›"
     },
     "fullBoard": {
       "title": "Full Board"
@@ -742,7 +756,9 @@
       "teeTimes": "Tee times",
       "round": "Round {{round}}",
       "yardageShort": "{{yardage}} yds",
-      "eyebrow": "Event Info"
+      "eyebrow": "Event Info",
+      "yardage": "Yardage",
+      "defendingChampion": "DEFENDING CHAMP"
     },
     "course": {
       "title": "The Course",
@@ -761,7 +777,11 @@
       "colDist": "DISTRIBUTION",
       "colField": "FIELD",
       "colPlayers": "PLAYERS",
-      "roundEmptyBody": "No scoring data for this round yet."
+      "roundEmptyBody": "No scoring data for this round yet.",
+      "comparison": "{{hardest}} is playing {{gap}} shots harder than {{easiest}} — the widest gap on the course.",
+      "comparisonTenths": "{{hardest}} is playing {{tenths}} tenths of a shot harder than {{easiest}} — the widest gap on the course.",
+      "distributionKicker": "All 18 holes · every round",
+      "rowsKicker": "Playing hardest, and easiest"
     },
     "featuredGroups": {
       "eyebrow": "On the Course",
@@ -783,8 +803,35 @@
     },
     "teeTimesBand": {
       "title": "Tee times",
-      "subline": "Round {{round}} · {{count}} groups",
+      "subline": "{{count}} groups",
       "notReleased": "Draw not yet released"
+    },
+    "contest": {
+      "liveEyebrow": "The contest",
+      "completedEyebrow": "The margin",
+      "shotLead": "Shot lead",
+      "shotsLead": "Shots lead",
+      "shotsClear": "Shots clear",
+      "sharedLead": "{{count}} share the lead",
+      "playoff": "Won a playoff",
+      "withToPlay": "With {{holes}} to play",
+      "decidedInPlayoff": "Decided in a playoff",
+      "sublineSecondThird": "{{second}} is second, with {{third}} next.",
+      "sublineSecond": "{{second}} is second.",
+      "leader": "Leader",
+      "back": "{{gap}} back",
+      "allLevel": "All level",
+      "packAria": "The pack by shots behind"
+    },
+    "move": {
+      "liveEyebrow": "The move",
+      "completedEyebrow": "Round of the day",
+      "subline": "Through {{thru}} · {{position}}, {{total}}",
+      "today": "Today"
+    },
+    "teeTimesRail": {
+      "eyebrow": "Tee times",
+      "action": "All tee times"
     }
   },
   "leaders": {

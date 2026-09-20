@@ -46,38 +46,15 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
 
   const list = moments ?? [];
 
-  // Empty: invite panel — the one section where emptiness invites.
+  // Empty: one quiet action row, not a card competing with real content.
   if (list.length === 0) {
     return (
       <>
         <SectionEyebrow kicker={t('tournament.moments.eyebrow')} />
-        <div style={{ padding: '0 16px 8px', fontFamily: FONT }}>
-          <div style={{
-            background: SURFACE, border: `0.5px solid ${HAIRLINE_INK_8}`,
-            borderRadius: 16, padding: 16,
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
-            textAlign: 'center',
-          }}>
-            <div style={{
-              fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.45,
-            }}>
-              {t('tournament.moments.emptyBody')}
-            </div>
-            <button
-              type="button"
-              onClick={() => navigate('/post-v2')}
-              style={{
-                background: INK, color: SLATE_50,
-                fontSize: 12, fontWeight: 700, fontFamily: FONT,
-                border: 'none', borderRadius: 14,
-                padding: '10px 16px', cursor: 'pointer',
-              }}
-              className="active:opacity-80 transition-opacity"
-            >
-              {t('tournament.moments.shareCta')}
-            </button>
-          </div>
-        </div>
+        <button type="button" onClick={() => navigate('/post-v2')} style={{ width: '100%', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', background: SURFACE, border: 'none', borderTop: `0.5px solid ${HAIRLINE_INK_8}`, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`, fontFamily: FONT, fontSize: 12.5, textAlign: 'left', cursor: 'pointer' }}>
+          <span style={{ color: INK_FAINT }}>{t('tournament.moments.emptyShort')}</span>
+          <span style={{ color: INK }}>{t('tournament.moments.shareShort')}</span>
+        </button>
       </>
     );
   }

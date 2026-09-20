@@ -220,7 +220,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 display: 'flex', alignItems: 'center', width: '100%',
                 padding: '10px 16px',
                 borderBottom: `0.5px solid ${T.hairline}`,
-                background: 'transparent', border: 'none',
+                background: r.position === 1 ? 'rgba(251,188,46,0.05)' : 'transparent', border: 'none',
                 borderLeft: 'none', borderRight: 'none', borderTop: 'none',
                 textAlign: 'left', cursor: 'pointer', fontFamily: FONT,
               }}

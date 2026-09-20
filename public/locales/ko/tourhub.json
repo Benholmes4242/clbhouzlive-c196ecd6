@@ -256,7 +256,8 @@
       "ourPicksStale": "업데이트 중",
       "figuresBasis": "세 수치 모두 {{round}}라운드의 완료된 {{n}}개 라운드 기준입니다.",
       "figuresBasisLowOnly": "최저 라운드는 {{round}}라운드의 완료된 라운드 기준이며, 필드 평균에는 표본이 부족합니다.",
-      "figuresBasisLow": "최저 라운드: {{names}}."
+      "figuresBasisLow": "최저 라운드: {{names}}.",
+      "rightMeta": "{{count}}개 조"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -612,7 +613,18 @@
       "tbdPlayer": "TBD",
       "championFallback": "Champion",
       "winningLabel": "우승 스코어",
-      "marginLabel": "차이"
+      "marginLabel": "차이",
+      "fieldLabel": "출전 선수",
+      "verdict": {
+        "liveContest": "{{leader}}가 {{margin}}타 차 선두이며, {{holes}}홀을 남기고 {{count}}명이 4타 차 안에 있습니다.",
+        "liveShared": "{{holes}}홀을 남기고 {{count}}명이 공동 선두입니다.",
+        "liveClear": "{{leader}}가 {{margin}}타 차로 선두입니다.",
+        "liveScore": "{{leader}}가 {{score}}로 선두입니다.",
+        "completedMargin": "{{winner}}가 {{margin}}타 차로 우승했습니다.",
+        "completedPlayoff": "{{winner}}가 연장전에서 우승했습니다.",
+        "upcomingDefender": "{{field}}명이 {{purse}}를 놓고 경쟁하며 디펜딩 챔피언도 돌아옵니다.",
+        "upcomingField": "{{field}}명이 {{purse}}를 놓고 경쟁합니다."
+      }
     },
     "story": {
       "eyebrow": "The Story",
@@ -623,7 +635,9 @@
       "emptyBody": "Moments from this tournament will appear here as members share them.",
       "shareCta": "Share a moment",
       "allAction": "All moments",
-      "sheetTitle": "All Moments"
+      "sheetTitle": "All Moments",
+      "emptyShort": "아직 모먼트가 없습니다",
+      "shareShort": "하나 공유하기 ›"
     },
     "fullBoard": {
       "title": "Full Board"
@@ -636,14 +650,20 @@
       "teeTimes": "Tee times",
       "round": "Round {{round}}",
       "yardageShort": "{{yardage}} yds",
-      "eyebrow": "Event Info"
+      "eyebrow": "Event Info",
+      "yardage": "야드",
+      "defendingChampion": "디펜딩 챔피언"
     },
     "course": {
       "title": "The Course",
       "allHolesAction": "All 18 holes",
       "allHolesTitle": "All 18 Holes",
       "avgVsPar": "Avg vs par",
-      "fieldScoringSuffix": " · field scoring"
+      "fieldScoringSuffix": " · field scoring",
+      "comparison": "{{hardest}}은 {{easiest}}보다 {{gap}}타 어렵게 플레이되며 코스에서 가장 큰 차이입니다.",
+      "comparisonTenths": "{{hardest}}은 {{easiest}}보다 0.{{tenths}}타 어렵게 플레이되며 코스에서 가장 큰 차이입니다.",
+      "distributionKicker": "18홀 전체 · 모든 라운드",
+      "rowsKicker": "가장 어려운 홀과 쉬운 홀"
     },
     "featuredGroups": {
       "eyebrow": "On the Course",
@@ -662,8 +682,35 @@
     },
     "teeTimesBand": {
       "title": "Tee times",
-      "subline": "Round {{round}} · {{count}} groups",
+      "subline": "{{count}}개 조",
       "notReleased": "Draw not yet released"
+    },
+    "contest": {
+      "liveEyebrow": "우승 경쟁",
+      "completedEyebrow": "승부의 격차",
+      "shotLead": "타 차 선두",
+      "shotsLead": "타 차 선두",
+      "shotsClear": "타 차",
+      "sharedLead": "{{count}}명 공동 선두",
+      "playoff": "연장전 우승",
+      "withToPlay": "{{holes}}홀 남음",
+      "decidedInPlayoff": "연장전에서 결정",
+      "sublineSecondThird": "{{second}}가 2위, {{third}}가 뒤를 잇습니다.",
+      "sublineSecond": "{{second}}가 2위입니다.",
+      "leader": "선두",
+      "back": "{{gap}}타 차",
+      "allLevel": "모두 동률",
+      "packAria": "선두와의 타수 차"
+    },
+    "move": {
+      "liveEyebrow": "오늘의 도약",
+      "completedEyebrow": "오늘의 라운드",
+      "subline": "{{thru}}홀까지 · {{position}}위, {{total}}",
+      "today": "오늘"
+    },
+    "teeTimesRail": {
+      "eyebrow": "티 타임",
+      "action": "전체 티 타임"
     }
   },
   "leaders": {

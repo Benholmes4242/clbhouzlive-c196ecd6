@@ -48,12 +48,9 @@ function pickGroups(all: TeeGroup[]): TeeGroup[] {
   return chosen.slice(0, MAX_CARDS);
 }
 
-export function TeeTimesRail({ groups, round, onOpenAll }: Props) {
+export function TeeTimesRail({ groups, round: _round, onOpenAll }: Props) {
   const { t } = useTranslation('tourhub');
-  const kicker = t('tournament.teeTimesRail.eyebrow', {
-    round,
-    defaultValue: `Tee times · R${round}`,
-  });
+  const kicker = t('tournament.teeTimesRail.eyebrow', { defaultValue: 'Tee times' });
   const actionLabel = t('tournament.teeTimesRail.action', {
     defaultValue: 'All tee times',
   });

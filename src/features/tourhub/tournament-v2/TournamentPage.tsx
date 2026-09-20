@@ -23,8 +23,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { differenceInCalendarDays } from 'date-fns';
-import { formatWeekdayShort, formatTimeHm } from '@/i18n/format';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourPageShell } from '../components/TourPageShell';
 
@@ -38,10 +36,11 @@ import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtim
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 
 import { HeroSection } from './sections/HeroSection';
+import { ContestSection } from './sections/ContestSection';
+import { MoveSection } from './sections/MoveSection';
 import { SectionEyebrow } from './sections/SectionEyebrow';
 import { MiniBoard } from './sections/MiniBoard';
 import { OnTheCourse } from '../_shared/OnTheCourse';
-import { TeeTimesFirstGroups } from './sections/TeeTimesFirstGroups';
 import { AllTeeTimesSheet } from './sections/AllTeeTimesSheet';
 import { TeeTimesRail } from './sections/TeeTimesRail';
 import { CourseSection } from './sections/CourseSection';
@@ -52,10 +51,10 @@ import { StorySection } from './sections/StorySection';
 import { FullBoardSheet } from './sections/FullBoardSheet';
 
 import { useTeeTimesAll } from './data/useTeeTimesAll';
-import { useFieldTop3 } from './data/useFieldTop3';
 import { useTournamentStory } from './data/useTournamentStory';
+import { useTournamentHoleAnalysis } from './data/useTournamentHoleAnalysis';
+import { selectTournamentContest } from './data/tournamentContest';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
-import { Skeleton } from '@/components/ui/skeleton';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 
 import {
@@ -76,6 +75,7 @@ export function TournamentPage() {
   const { data: meta, isLoading, isError: isMetaError, refetch: refetchMeta } =
     useTournamentMeta(tournamentId, { live: pulse.state === 'live' });
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
+  const { data: holeAnalysis } = useTournamentHoleAnalysis(tournamentId, null);
   const { data: liveList = [] } = useLiveTournaments();
 
   // Realtime (equivalent to legacy TournamentDetailPage): board + status.
@@ -106,8 +106,7 @@ export function TournamentPage() {
   // the tab=tee-times deep link is present (Brief F-TD-3 §4).
   const teeTimesRequested = searchParams.get('tab') === 'tee-times';
   const teeGroupsEnabled = pulse.state !== 'completed' || teeTimesRequested;
-  const { data: teeGroups = [], isLoading: teesLoading } = useTeeTimesAll(tournamentId, currentRound, { enabled: teeGroupsEnabled });
-  const { data: field, isLoading: fieldLoading } = useFieldTop3(pulse.state === 'upcoming' ? tournamentId : null);
+  const { data: teeGroups = [] } = useTeeTimesAll(tournamentId, currentRound, { enabled: teeGroupsEnabled });
 
   const [teeTimesOpen, setTeeTimesOpen] = useState(false);
   const [fullBoardOpen, setFullBoardOpen] = useState(false);
@@ -197,6 +196,8 @@ export function TournamentPage() {
 
   const leaderboardRows = leaderboard ?? [];
   const hasBoard = leaderboardRows.length > 0;
+  const contest = selectTournamentContest(leaderboardRows, meta, pulse.state);
+  const fieldCount = leaderboardRows.length > 0 ? leaderboardRows.length : (holeAnalysis?.total_players || null);
 
   // Live: deep-link to the richer Leaderboards tab when this event is in
   // the live list; otherwise fall back to the house full-board sheet.
@@ -229,8 +230,12 @@ export function TournamentPage() {
           state={pulse.state}
           imageUrl={courseImage?.imageUrl ?? null}
           tourCode={tourCode}
-          leaderboard={leaderboard}
+          contest={contest}
+          fieldCount={fieldCount}
         />
+
+        <ContestSection contest={contest} state={pulse.state} />
+        <MoveSection contest={contest} state={pulse.state} tourCode={tourCode} />
 
         {/* THE ACT */}
         <section id="the-act">
@@ -242,20 +247,7 @@ export function TournamentPage() {
                   <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} currentRound={meta?.current_round ?? null} />
                 </>
               )}
-              {/* Shared OnTheCourse — featured groups + FULL FIELD expander,
-                  live-score-joined. Self-hides when no featured groups. */}
-              <OnTheCourse tournamentId={tournamentId!} live tourCode={tourCode} />
             </>
-          )}
-
-          {pulse.state === 'upcoming' && (
-            <UpcomingAct
-              meta={meta}
-              field={field ?? null}
-              teeGroups={teeGroups}
-              loading={Boolean(fieldLoading || teesLoading)}
-              onOpenAllTimes={() => setTeeTimesOpen(true)}
-            />
           )}
 
           {pulse.state === 'completed' && hasBoard && (
@@ -269,6 +261,8 @@ export function TournamentPage() {
         {/* THE STORY — completed events only, self-hides w/o text */}
         {pulse.state === 'completed' && <StorySection story={story?.story ?? null} />}
 
+        {pulse.state === 'live' && <OnTheCourse tournamentId={tournamentId!} live tourCode={tourCode} />}
+
         {/* TEE TIMES BAND — promoted entry point to the round-by-round
             sheet. Renders for live + upcoming states only. */}
         {(pulse.state === 'live' || pulse.state === 'upcoming') && (
@@ -279,12 +273,11 @@ export function TournamentPage() {
           />
         )}
 
-        {/* EVENT INFO — always-on. */}
-        <EventInfoSection meta={meta} broadcast={story?.broadcast ?? null} />
-
-
         {/* THE COURSE */}
         <CourseSection tournamentId={tournamentId!} />
+
+        {/* EVENT INFO — always-on. */}
+        <EventInfoSection meta={meta} broadcast={story?.broadcast ?? null} purseShownInHero={meta.purse != null} />
 
         {/* MOMENTS */}
         <MomentsSection tournamentId={tournamentId!} tourCode={tourCode} />
@@ -312,87 +305,6 @@ export function TournamentPage() {
       />
       </TourPageShell>
     </TourHubShell>
-  );
-}
-
-function UpcomingAct({
-  meta, field, teeGroups, loading, onOpenAllTimes,
-}: {
-  meta: NonNullable<ReturnType<typeof useTournamentMeta>['data']>;
-  field: { fieldCount: number; topPlayers: { id: string; name: string; rank: number }[]; firstTeeTime: string | null } | null;
-  teeGroups: import('./data/useTeeTimesAll').TeeGroup[];
-  loading: boolean;
-  onOpenAllTimes: () => void;
-}) {
-  const { t } = useTranslation('tourhub');
-  const hasField = field && field.fieldCount > 0;
-  const hasTimes = teeGroups.length > 0;
-  const firstTee = field?.firstTeeTime ?? teeGroups[0]?.teeTime ?? null;
-  const daysToStart = meta.start_date
-    ? Math.max(0, differenceInCalendarDays(new Date(meta.start_date), new Date()))
-    : 0;
-
-  return (
-    <>
-      {hasField && (
-        <>
-          <SectionEyebrow kicker={t('tournament.shell.field.eyebrow')} />
-          <div style={{ padding: '0 16px 8px' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: INK, lineHeight: 1.55 }}>
-              <span style={{ fontWeight: 700 }}>{field!.fieldCount}</span>
-              <span style={{ color: INK_MUTE }}>{t('tournament.shell.field.playersSuffix')}</span>
-              {field!.topPlayers.length > 0 && (
-                <>
-                  <span style={{ color: INK_MUTE }}>{t('tournament.shell.field.headlinedBySep')}</span>
-                  <span style={{ fontWeight: 700 }}>
-                    {field!.topPlayers.map((p) => p.name).join(', ')}
-                  </span>
-                </>
-              )}
-              {firstTee && (
-                <>
-                  <span style={{ color: INK_MUTE }}>{t('tournament.shell.field.firstTeeSep')}</span>
-                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                    {`${formatWeekdayShort(new Date(firstTee))} ${formatTimeHm(new Date(firstTee))}`}
-                  </span>
-                </>
-              )}
-              {!firstTee && meta.start_date && (
-                <>
-                  <span style={{ color: INK_MUTE }}>{t('tournament.shell.field.startsInSep')}</span>
-                  <span style={{ fontWeight: 700 }}>
-                    {daysToStart}{t('tournament.shell.field.daysSuffix', { count: daysToStart })}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-        </>
-      )}
-
-      {hasTimes && (
-        <>
-          <SectionEyebrow kicker={t('tournament.shell.teeTimes.eyebrow')} actionLabel={t('tournament.shell.teeTimes.allAction')} onAction={onOpenAllTimes} />
-          <TeeTimesFirstGroups groups={teeGroups} limit={5} />
-        </>
-      )}
-
-      {/* Empty fallback (Brief F-TD-3 §2): pre-sync upcoming events (no
-          field yet, no tee times yet) get one always-on line so the act
-          isn't silent under the hero. */}
-      {loading && !hasField && !hasTimes ? (
-        <div style={{ padding: '8px 16px 4px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <Skeleton style={{ width: '85%', height: 12, borderRadius: 4 }} />
-          <Skeleton style={{ width: '60%', height: 12, borderRadius: 4 }} />
-        </div>
-      ) : !hasField && !hasTimes ? (
-        <div style={{ padding: '8px 16px 4px' }}>
-          <div style={{ fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.5 }}>
-            {t('tournament.shell.field.emptyFallback')}
-          </div>
-        </div>
-      ) : null}
-    </>
   );
 }
 

@@ -8,4 +8,4 @@
 - [x] Weight wins in tournament rows and normalize residence display.
 - [x] Add all new copy across six locales with CJK-safe casing.
 - [x] Verify representative PGA, no-photo, and non-PGA players at 320px, 390px, and 430px.
-- [ ] Rebuild tournament detail around one contest narrative, unique figures, and state-specific evidence.
+- [x] Rebuild tournament detail around one contest narrative, unique figures, and state-specific evidence.

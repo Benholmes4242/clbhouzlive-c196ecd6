@@ -24,7 +24,7 @@ interface PlayerAvatarProps {
   tourCode?: string;
   /** Optional DB photo_url — tried FIRST before the name-based candidate chain. */
   photoUrl?: string | null;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | number;
   className?: string;
   /** Traced hairline colour. Defaults to DARK_HAIRLINE (white @ 22%), the one
    *  canonical hairline. Override only for an achievement or accent ring — the
@@ -48,7 +48,7 @@ export function PlayerAvatar({
   const candidates = photoUrl ? [photoUrl, ...nameCandidates] : nameCandidates;
   return (
     <SquircleAvatar
-      size={SIZE_PX[size]}
+      size={typeof size === 'number' ? size : SIZE_PX[size]}
       srcCandidates={candidates}
       alt={playerName}
       userId={playerId || playerName}
