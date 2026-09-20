@@ -158,7 +158,7 @@ export function selectPlayerSeason(
   const winsCategory = categoryMap.get('wins');
   const rankedWins = winsCategory?.rows.find((row) => row.playerId === playerId)?.value;
   const resultWins = results.filter((result) => result.position === 1).length;
-  const effectiveWins = wins ?? rankedWins ?? (pointsRank ? resultWins : null);
+  const effectiveWins = Math.max(wins ?? 0, rankedWins ?? 0, resultWins);
   const raceLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour] ?? LEADER_STAT_LABELS.points.labelKey;
   const raceLabel = t(raceLabelKey);
   let verdict: PlayerVerdict | null = null;
@@ -166,9 +166,9 @@ export function selectPlayerSeason(
     verdict = { key: 'player.hero.verdict.winsRanked', values: { wins, top10s, rank: String(worldRank) } };
   } else if (wins === 0 && top10s != null && top10s >= 1 && worldRank) {
     verdict = { key: 'player.hero.verdict.noWin', values: { top10s, rank: String(worldRank) } };
-  } else if (!worldRank && effectiveWins != null && pointsRank) {
+  } else if (!worldRank && pointsRank) {
     verdict = {
-      key: 'player.hero.verdict.pointsRanked',
+      key: effectiveWins === 1 ? 'player.hero.verdict.pointsRanked_one' : 'player.hero.verdict.pointsRanked_other',
       values: { wins: effectiveWins, rank: pointsRank.tied ? `T${pointsRank.rank}` : playerOrdinal(t, pointsRank), raceLabel },
     };
   } else {
@@ -190,7 +190,7 @@ export function selectPlayerSeason(
     raceProof: !worldRank && pointsRank
       ? {
           points: { ...pointsRank, label: raceLabel },
-          wins: effectiveWins != null && effectiveWins >= 1 && winsRank ? winsRank : null,
+          wins: effectiveWins >= 1 && winsRank ? winsRank : null,
         }
       : null,
   };

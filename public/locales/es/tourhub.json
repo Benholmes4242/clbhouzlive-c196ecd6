@@ -970,7 +970,8 @@
       "verdict": {
         "winsRanked": "{{wins}} victorias y {{top10s}} top diez lo han llevado al número {{rank}} del mundo.",
         "noWin": "Aún busca la victoria, con {{top10s}} top diez y el número {{rank}} del mundo.",
-        "pointsRanked": "{{wins}} victorias lo sitúan {{rank}} en la carrera de {{raceLabel}}.",
+        "pointsRanked_one": "{{wins}} victoria lo sitúa {{rank}} en la carrera de {{raceLabel}}.",
+        "pointsRanked_other": "{{wins}} victorias lo sitúan {{rank}} en la carrera de {{raceLabel}}.",
         "resultsOnly": "{{events}} participaciones esta temporada, con {{best}} como mejor resultado."
       }
     },

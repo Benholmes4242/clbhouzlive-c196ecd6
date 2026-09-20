@@ -56,7 +56,7 @@ describe('selectPlayerSeason', () => {
     ];
     const selected = selectPlayerSeason('p1', 'euro', null, [], rankMaps, categories, t);
     expect(selected.verdict).toEqual({
-      key: 'player.hero.verdict.pointsRanked',
+      key: 'player.hero.verdict.pointsRanked_one',
       values: { wins: 1, rank: 'T87', raceLabel: 'leaders.pointsBrand.euro' },
     });
     expect(selected.raceProof).toEqual({
@@ -80,7 +80,7 @@ describe('selectPlayerSeason', () => {
       t,
     );
     expect(selected.verdict).toEqual({
-      key: 'player.hero.verdict.pointsRanked',
+      key: 'player.hero.verdict.pointsRanked_one',
       values: { wins: 1, rank: 'player.stats.ordinal.nd', raceLabel: 'leaders.pointsBrand.pgad' },
     });
     expect(selected.raceProof?.wins).toBeNull();

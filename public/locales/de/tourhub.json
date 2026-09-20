@@ -970,7 +970,8 @@
       "verdict": {
         "winsRanked": "{{wins}} Siege und {{top10s}} Top-Ten-Platzierungen brachten ihn auf Weltrang {{rank}}.",
         "noWin": "Noch ohne Sieg, aber mit {{top10s}} Top-Ten-Platzierungen und Weltrang {{rank}}.",
-        "pointsRanked": "{{wins}} Siege bringen ihn auf Rang {{rank}} im {{raceLabel}}.",
+        "pointsRanked_one": "{{wins}} Sieg bringt ihn auf Rang {{rank}} im {{raceLabel}}.",
+        "pointsRanked_other": "{{wins}} Siege bringen ihn auf Rang {{rank}} im {{raceLabel}}.",
         "resultsOnly": "{{events}} Starts in dieser Saison, mit {{best}} als bestem Ergebnis."
       }
     },

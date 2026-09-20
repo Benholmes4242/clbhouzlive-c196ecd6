@@ -966,7 +966,8 @@
       "verdict": {
         "winsRanked": "{{wins}}勝、トップ10入り{{top10s}}回で世界{{rank}}位。",
         "noWin": "初勝利を追いながら、トップ10入り{{top10s}}回、世界{{rank}}位。",
-        "pointsRanked": "{{wins}}勝で{{raceLabel}}ランキング{{rank}}位。",
+        "pointsRanked_one": "{{wins}}勝で{{raceLabel}}ランキング{{rank}}位。",
+        "pointsRanked_other": "{{wins}}勝で{{raceLabel}}ランキング{{rank}}位。",
         "resultsOnly": "今季{{events}}試合に出場し、最高成績は{{best}}。"
       }
     },
