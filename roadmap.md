@@ -9,3 +9,4 @@
 - [x] Add all new copy across six locales with CJK-safe casing.
 - [x] Verify representative PGA, no-photo, and non-PGA players at 320px, 390px, and 430px.
 - [x] Rebuild tournament detail around one contest narrative, unique figures, and state-specific evidence.
+- [x] Exclude leaders from the tournament contention count and verify forced contest states.

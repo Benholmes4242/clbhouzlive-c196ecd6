@@ -54,7 +54,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
 
   let verdict: string | null = null;
   if (state === 'live' && leaderName) {
-    if (!contest.sharedLead && contest.margin != null && contest.holesLeft != null && contest.withinFour >= 3) verdict = t('tournament.hero.verdict.liveContest', { leader: leaderName, margin: contest.margin, count: contest.withinFour, holes: contest.holesLeft });
+    if (!contest.sharedLead && contest.margin != null && contest.holesLeft != null && contest.chasersWithinFour >= 2) verdict = t('tournament.hero.verdict.liveContest', { leader: leaderName, margin: contest.margin, count: contest.chasersWithinFour, holes: contest.holesLeft });
     else if (contest.sharedLead && contest.holesLeft != null) verdict = t('tournament.hero.verdict.liveShared', { count: contest.leaders.length, holes: contest.holesLeft });
     else if (!contest.sharedLead && contest.margin != null && contest.margin >= 5) verdict = t('tournament.hero.verdict.liveClear', { leader: leaderName, margin: contest.margin });
     else if (score != null) verdict = t('tournament.hero.verdict.liveScore', { leader: leaderName, score });

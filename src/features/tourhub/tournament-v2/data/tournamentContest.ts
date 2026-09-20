@@ -17,7 +17,7 @@ export interface TournamentContest {
   leader: BoardEntry | null;
   margin: number | null;
   sharedLead: boolean;
-  withinFour: number;
+  chasersWithinFour: number;
   holesLeft: number | null;
   pack: PackEntry[];
   mover: BoardEntry | null;
@@ -45,7 +45,12 @@ export function selectTournamentContest(
     : bestScore == null || nextScore == null
       ? null
       : Math.max(0, nextScore - bestScore);
-  const withinFour = bestScore == null ? 0 : scored.filter((row) => (row.score as number) - bestScore <= CONTENTION_GAP).length;
+  const chasersWithinFour = bestScore == null
+    ? 0
+    : scored.filter((row) =>
+        !leaders.some((leaderRow) => leaderRow.id === row.id) &&
+        (row.score as number) - bestScore <= CONTENTION_GAP
+      ).length;
   const holesLeft = leader?.thru == null ? null : Math.max(0, 18 - leader.thru);
   const pack = bestScore == null
     ? []
@@ -73,5 +78,5 @@ export function selectTournamentContest(
         ? 'figure'
         : null;
 
-  return { leaders, leader, margin, sharedLead, withinFour, holesLeft, pack, mover, moverToday, leadForm };
+  return { leaders, leader, margin, sharedLead, chasersWithinFour, holesLeft, pack, mover, moverToday, leadForm };
 }
