@@ -27,7 +27,7 @@ describe('RankedPlayerRow overview grammar', () => {
     first.unmount();
 
     render(<RankedPlayerRow rank={2} player={player} stat={950} kicker="FedEx 2" sub="World 7" unit="Pts" last />);
-    expect(screen.getByRole('button').style.borderBottom).toBe('none');
+    expect(screen.getByRole('button').style.borderBottom).toBe('');
   });
 
   it('renders ellipsising text lanes without an avatar', () => {
