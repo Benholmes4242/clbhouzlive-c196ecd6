@@ -199,7 +199,6 @@ export interface LeaderCategoriesResult {
   year: number;
   /** Additive. Empty object off the PGA Tour. */
   rankMaps?: LeaderRankMaps;
-  remainingEvents: number;
 }
 
 
@@ -528,9 +527,8 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
       const brandLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour];
       categories.push({
         key: 'points',
+        ...pointsBase,
         labelKey: brandLabelKey ?? pointsBase.labelKey,
-        shortKey: pointsBase.shortKey,
-        unitKey: pointsBase.unitKey,
         rows: applyBehind(pointsRows, 'desc', fmtPoints),
         poolSize: pointsPool.length,
       });
