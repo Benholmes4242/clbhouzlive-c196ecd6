@@ -5,7 +5,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
-export const FUNCTION_VERSION = '2026-08-29T00:00:00Z-v8-crown-coalescing';
+export const FUNCTION_VERSION = '2026-09-20T00:00:00Z-v9-feat-rarity-lines';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
 const BATCH_SIZE = 15;
@@ -3100,13 +3100,20 @@ function featPredicate(q: any, kind: RarityKind) {
 async function recordFeatRarity(stats: any) {
   const whsScoreId: string | null = stats?.whs_score_id ?? null;
   const playDate: string | null = stats?.play_date ?? null;
-  if (!whsScoreId || !playDate) return;
+  // Every call emits exactly one line: wrote, skipped, or (at the call site) failed.
+  if (!whsScoreId || !playDate) {
+    console.log("[feat_rarity] skipped", whsScoreId, "reason=missing_fields");
+    return;
+  }
 
   const kinds: RarityKind[] = [];
   if (Number(stats.holes_in_one ?? 0) > 0) kinds.push("ace");
   if (Number(stats.albatrosses ?? 0) > 0) kinds.push("albatross");
   if (Number(stats.eagles ?? 0) >= 2) kinds.push("eagle_brace");
-  if (kinds.length === 0) return;
+  if (kinds.length === 0) {
+    console.log("[feat_rarity] skipped", whsScoreId, "reason=no_kinds");
+    return;
+  }
 
   // total_rounds_at_detection — every round played on or before this play_date.
   const { count: totalRounds, error: totalErr } = await supabase
@@ -3155,4 +3162,5 @@ async function recordFeatRarity(stats: any) {
       );
     if (insErr) throw insErr;
   }
+  console.log("[feat_rarity] wrote", kinds.length, "rows", whsScoreId, kinds.join(","));
 }
