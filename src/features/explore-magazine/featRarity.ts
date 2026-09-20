@@ -150,8 +150,8 @@ export function featRarityLines({
   const ordinal = row.global_ordinal;
   const rounds = row.total_rounds_at_detection;
   const viewerLine = ordinal != null && ordinal > 0 && rounds != null && rounds > 0
-    ? t('featRarity.viewer', 'The {{ordinal}} {{feat}} in {{rounds}} rounds.', {
-        ordinal: rarityOrdinal(ordinal, locale, t),
+    ? t('featRarity.viewer', 'The {{ord}} {{feat}} in {{rounds}} rounds.', {
+        ord: rarityOrdinal(ordinal, locale, t),
         feat,
         rounds: num(rounds),
       })
@@ -166,8 +166,8 @@ export function featRarityLines({
     const repeat = mine.member_ordinal != null && mine.member_ordinal > 1;
     const when = repeat && mine.member_prev_at ? rarityWhen(mine.member_prev_at, locale, now) : null;
     if (repeat && when) {
-      ownerLine = t('featRarity.ownerRepeat', 'Your {{ordinal}} {{feat}} - first since {{when}}.', {
-        ordinal: rarityOrdinal(mine.member_ordinal as number, locale, t),
+      ownerLine = t('featRarity.ownerRepeat', 'Your {{ord}} {{feat}} - first since {{when}}.', {
+        ord: rarityOrdinal(mine.member_ordinal as number, locale, t),
         feat,
         when,
       });
