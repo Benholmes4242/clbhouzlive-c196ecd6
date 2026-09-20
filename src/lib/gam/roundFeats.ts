@@ -31,8 +31,8 @@ export interface RoundFeatStats {
 
 /**
  * Priority order (Ben, round 3): hole in one, albatross, under par, eagle,
- * birdie haul, clean card. Capped at two per row; surfaces may show fewer via
- * RoundFeatChips maxChips.
+ * birdie haul, clean card. Capped at two per row; surfaces may show fewer by
+ * slicing the returned list.
  */
 export function deriveRoundFeats(r: RoundFeatStats | null | undefined): RoundFeat[] {
   if (!r) return [];
