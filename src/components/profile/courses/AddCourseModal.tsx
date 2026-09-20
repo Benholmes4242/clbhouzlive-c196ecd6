@@ -252,7 +252,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
               {ratingNum != null && (
                 <>
                   <span style={{ color: INK_SUBTLE }}>·</span>
-                  <PlainScore value={ratingNum} size={13} color={reviewLabelColor(ratingNum, 'light')} />
+                  <PlainScore value={ratingNum} size={13} color={reviewLabelColor(ratingNum, 'dark')} />
                 </>
               )}
             </div>
@@ -394,7 +394,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
         {course.has_rating && course.rating_value != null && (
           <>
             <span style={{ color: INK_SUBTLE }}>·</span>
-            <PlainScore value={course.rating_value} size={13} color={reviewLabelColor(course.rating_value, 'light')} />
+            <PlainScore value={course.rating_value} size={13} color={reviewLabelColor(course.rating_value, 'dark')} />
           </>
         )}
       </div>
