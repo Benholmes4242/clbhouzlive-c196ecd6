@@ -4,6 +4,7 @@ import type { TournamentContest } from '../data/tournamentContest';
 import { SectionEyebrow } from './SectionEyebrow';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { FONT, INK, INK_FAINT, INK_SOFT, SURFACE, WHITE_ALPHA_10 } from '../../_shared/tokens';
+import { formatToPar } from '../../overview/data/liveRoundStats';
 
 interface Props { contest: TournamentContest; state: EventState }
 
@@ -11,11 +12,45 @@ export function ContestSection({ contest, state }: Props) {
   const { t, i18n } = useTranslation('tourhub');
   if (state === 'upcoming' || !contest.leader || !contest.leadForm) return null;
   const cjk = /^(ja|ko)/.test(i18n.language);
-  const second = contest.pack.find((row) => row.gap > 0)?.entry.player?.full_name ?? null;
-  const third = contest.pack.filter((row) => row.gap > 0)[1]?.entry.player?.full_name ?? null;
-  const subline = second && third
-    ? t('tournament.contest.sublineSecondThird', { second, third })
-    : second ? t('tournament.contest.sublineSecond', { second }) : null;
+  // Standings are never stated as ordinal words here: the board owns rank labels,
+  // prose states names and gaps only.
+  const chasers = contest.pack.filter((row) => row.gap > 0);
+  const nextName = chasers[0]?.entry.player?.full_name ?? null;
+  const thirdName = chasers[1]?.entry.player?.full_name ?? null;
+  const gapPhrase = (shots: number) => t('tournament.contest.gapShots', { count: shots });
+  const leaderNames = contest.leaders.map((row) => row.player?.full_name ?? '').filter(Boolean);
+  const levelScore = contest.leader?.score == null ? null : formatToPar(contest.leader.score);
+
+  let subline: string | null = null;
+  if (contest.sharedLead || contest.leadForm === 'word') {
+    const past = state === 'completed';
+    const chaserGap = chasers[0] ? gapPhrase(chasers[0].gap) : null;
+    const withChaser = !past && nextName && chaserGap;
+    const vars: Record<string, string | number> = {
+      a: leaderNames[0] ?? '',
+      b: leaderNames[1] ?? '',
+      c: leaderNames[2] ?? '',
+      count: Math.max(0, leaderNames.length - 2),
+      score: levelScore ?? '',
+      next: nextName ?? '',
+      gap: chaserGap ?? '',
+    };
+    const form = leaderNames.length >= 4 ? 'Many' : leaderNames.length === 3 ? 'Three' : 'Two';
+    if (leaderNames.length >= 2 && levelScore) {
+      const suffix = past ? 'Past' : withChaser ? 'Chaser' : '';
+      subline = t(`tournament.contest.sublineLevel${form}${suffix}`, vars);
+    }
+  } else if (nextName && contest.leader) {
+    const leaderName = contest.leader.player?.full_name ?? '';
+    subline = thirdName && chasers[1]
+      ? t('tournament.contest.sublineSingleThird', {
+          leader: leaderName,
+          next: nextName,
+          third: thirdName,
+          gap: gapPhrase(Math.max(1, chasers[1].gap - chasers[0].gap)),
+        })
+      : t('tournament.contest.sublineSingle', { leader: leaderName, next: nextName });
+  }
   const maxGap = contest.pack.length ? Math.max(...contest.pack.map((row) => row.gap)) : 0;
   const showTrack = contest.pack.length >= 5;
   const word = contest.sharedLead
