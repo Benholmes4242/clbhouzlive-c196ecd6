@@ -25,7 +25,6 @@ import {
   CALLOUT_ICON,
   RankUpIcon,
   AchievementEmoji,
-  RarityFeatIcon,
 } from './achievementIcons';
 
 /**
@@ -160,7 +159,7 @@ export function AchievementCalloutPanel({
         };
       case 'ace':
         return {
-          icon: <RarityFeatIcon kind="ace" />,
+          icon: <AchievementEmoji glyph="⛳" />,
           title: featTitle(callout.feats),
           subline:
             callout.hole != null
@@ -169,7 +168,7 @@ export function AchievementCalloutPanel({
         };
       case 'albatross':
         return {
-          icon: <RarityFeatIcon kind="albatross" />,
+          icon: <AchievementEmoji glyph="🔥" />,
           title: featTitle(callout.feats),
           subline:
             callout.hole != null
@@ -178,7 +177,7 @@ export function AchievementCalloutPanel({
         };
       case 'eagle':
         return {
-          icon: <RarityFeatIcon kind="eagle" />,
+          icon: <AchievementEmoji glyph="🦅" />,
           title: featTitle(callout.feats),
           subline:
             callout.hole != null
@@ -359,9 +358,9 @@ export function RoundStatStrip({
           ? t('amateur.stream.callout.nowRank', 'Now {{ord}}', { ord })
           : t('amateur.stream.callout.movedUpBoard', 'Moved up the board'),
       };
-      case 'ace': return { icon: <RarityFeatIcon kind="ace" />, tag: null, label: featLabelFor(callout.feats) };
-      case 'albatross': return { icon: <RarityFeatIcon kind="albatross" />, tag: null, label: featLabelFor(callout.feats) };
-      case 'eagle': return { icon: <RarityFeatIcon kind="eagle" />, tag: null, label: featLabelFor(callout.feats) };
+      case 'ace': return { icon: <AchievementEmoji glyph="⛳" />, tag: null, label: featLabelFor(callout.feats) };
+      case 'albatross': return { icon: <AchievementEmoji glyph="🔥" />, tag: null, label: featLabelFor(callout.feats) };
+      case 'eagle': return { icon: <AchievementEmoji glyph="🦅" />, tag: null, label: featLabelFor(callout.feats) };
       case 'birdies': return {
         icon: <BirdieCountIcon count={callout.count} />,
         tag: null,
