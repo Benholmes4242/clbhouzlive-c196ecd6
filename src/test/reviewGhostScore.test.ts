@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import React from 'react';
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   REVIEW_GHOST_COLOR_GREEN,
@@ -6,12 +8,16 @@ import {
   REVIEW_GHOST_COLOR_NEUTRAL,
   REVIEW_GHOST_COLOR_NEUTRAL_LIGHT,
   REVIEW_LABEL_COLOR_NEUTRAL_LIGHT,
+  ReviewGhostNumeral,
+  ReviewVerdictLabel,
   reviewGhostColor,
   reviewLabelColor,
   reviewTierColor,
 } from '@/components/shared/ReviewGhostScore';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { BAND_GREEN } from '@/features/courses/_shared/scoreBandTokens';
+
+afterEach(cleanup);
 
 describe('shared displayed review score tones', () => {
   it('uses the canonical dark display rule for verdict labels', () => {
@@ -40,5 +46,26 @@ describe('shared displayed review score tones', () => {
     expect(reviewTierColor('GOOD', 'dark')).toBe(A.MUTE);
     expect(reviewTierColor('FAIR', 'dark')).toBe(A.MUTE);
     expect(reviewTierColor('POOR', 'dark')).toBe(A.MUTE);
+  });
+
+  it('renders the two reported cards through the shared components', () => {
+    const exceptional = render(
+      <div>
+        <ReviewGhostNumeral rating={9} />
+        <ReviewVerdictLabel rating={9} />
+      </div>,
+    );
+    expect(screen.getByText('EXCEPTIONAL')).toHaveStyle({ color: A.GREEN });
+    expect(screen.getByText('9.0')).toHaveStyle({ color: REVIEW_GHOST_COLOR_GREEN });
+    exceptional.unmount();
+
+    render(
+      <div>
+        <ReviewGhostNumeral rating={8.3} />
+        <ReviewVerdictLabel rating={8.3} />
+      </div>,
+    );
+    expect(screen.getByText('EXCELLENT')).toHaveStyle({ color: A.MUTE });
+    expect(screen.getByText('8.3')).toHaveStyle({ color: REVIEW_GHOST_COLOR_NEUTRAL });
   });
 });
