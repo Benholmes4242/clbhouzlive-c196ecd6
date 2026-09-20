@@ -202,12 +202,6 @@ export function TourHubMainPage() {
   }, []);
 
   const handleSelectTab = (id: string) => {
-    if (id === 'college') {
-      /* College is a route, not a tab: page_view on /tourhub/college-golf
-         already measures it, so no tab event here. */
-      navigate('/tourhub/college-golf');
-      return;
-    }
     const tab = id as TourHubTab;
     if (tab !== activeTab) {
       analyticsEvents.track('tourhub_tab_changed', { tab, from: activeTab });

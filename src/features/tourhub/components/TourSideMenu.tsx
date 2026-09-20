@@ -22,7 +22,6 @@ import {
   CalendarDays,
   Users,
   BarChart3,
-  GraduationCap,
   Settings,
   User,
   LogOut,
@@ -57,7 +56,6 @@ const DESTINATIONS: { id: string; labelKey: string; Icon: LucideIcon }[] = [
   { id: 'schedule',     labelKey: 'nav.schedule',     Icon: CalendarDays },
   { id: 'players',      labelKey: 'nav.players',      Icon: Users },
   { id: 'leaderboards', labelKey: 'nav.leaders',      Icon: BarChart3 },
-  { id: 'college',      labelKey: 'nav.college',      Icon: GraduationCap },
 ];
 
 

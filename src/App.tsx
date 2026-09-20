@@ -89,7 +89,6 @@ import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton'
 import StageLoadingShell from '@/features/post-v2/StageLoadingShell';
 import { PlayerPageSkeleton } from '@/components/skeletons/PlayerPageSkeleton';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
-import { CollegeHubSkeleton } from '@/components/skeletons/CollegeHubSkeleton';
 import { TourHubOverviewSkeleton } from '@/components/skeletons/TourHubOverviewSkeleton';
 import { WatchHubSkeleton, WatchClipsSkeleton, WatchVideosSkeleton } from '@/components/skeletons/WatchSkeletons';
 import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
@@ -318,9 +317,6 @@ const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => 
 const TournamentDetailPage = lazy(() => import("./features/tourhub/tournament-v2/TournamentPage").then(m => ({ default: m.TournamentPage })));
 const PlayerProfilePage = lazy(() => import("./features/tourhub/player-v2/PlayerPage").then(m => ({ default: m.PlayerPage })));
 const SeasonStatsIndex = lazy(() => import("./features/tourhub/leaders-v2/SeasonStatsIndex"));
-const CollegeGolfHubPage = lazy(() => import("./features/tourhub/college-v2/hub/CollegeHubPage").then(m => ({ default: m.CollegeHubPage })));
-const CollegeProfilePage = lazy(() => import("./features/tourhub/college-v2/profile/CollegeProfilePage").then(m => ({ default: m.CollegeProfilePage })));
-const CollegeComparePage = lazy(() => import("./features/tourhub/college-v2/compare/ComparePage").then(m => ({ default: m.ComparePage })));
 
 
 // Continue Watching mini-player (queue drawer + full-screen modal deleted in PR-5).
@@ -741,9 +737,12 @@ function AppRoutes() {
         
         <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<PlayerPageSkeleton />}><PlayerProfilePage /></Suspense>} />
         <Route path="/tourhub/season-stats" element={<Suspense fallback={<GenericPageSkeleton />}><SeasonStatsIndex /></Suspense>} />
-        <Route path="/tourhub/college-golf" element={<Suspense fallback={<CollegeHubSkeleton />}><CollegeGolfHubPage /></Suspense>} />
-        <Route path="/tourhub/college-golf/compare" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeComparePage /></Suspense>} />
-        <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<CollegeHubSkeleton />}><CollegeProfilePage /></Suspense>} />
+        {/* TC1 (2026-09-20): the college hub, yearbook, profile and compare pages
+            were retired for lack of use. Shared and bookmarked college URLs must
+            still resolve, so every /tourhub/college-golf* path lands on Tour Hub
+            rather than a 404 or a blank page. */}
+        <Route path="/tourhub/college-golf" element={<Navigate to="/tourhub" replace />} />
+        <Route path="/tourhub/college-golf/*" element={<Navigate to="/tourhub" replace />} />
         
         {/* Hub routes removed — redirects to clubhouse */}
         <Route path="/hub" element={<Navigate to="/clubhouse" replace />} />

@@ -48,26 +48,9 @@ export function AboutSection({ player }: AboutSectionProps) {
   const height = fmtHeight(player.height);
   if (height) fields.push({ label: t('player.about.field.height'), value: height });
   if (player.college) {
-    fields.push({
-      label: t('player.about.field.college'),
-      value: player.college_normalized ? (
-        <Link
-          to={`/tourhub/college-golf/${player.college_normalized}`}
-          onClick={() => {
-            void analyticsEvents.track('tour_player_college_tapped', {
-              player_id: player.id,
-              college_slug: player.college_normalized,
-            });
-          }}
-          style={{ color: INK, textDecoration: 'none' }}
-          className="active:opacity-60 transition-opacity"
-        >
-          {player.college}
-        </Link>
-      ) : (
-        player.college
-      ),
-    });
+    /* TC1 (2026-09-20): the college pages were retired, so this is a plain
+       fact, not a link. The tappable college now lives on the hero stamp. */
+    fields.push({ label: t('player.about.field.college'), value: player.college });
   }
   if (player.residence) fields.push({ label: t('player.about.field.residence'), value: player.residence });
 

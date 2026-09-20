@@ -12,6 +12,8 @@
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import CountryFlag from '@/components/ui/country-flag';
+import CollegeStamp from '@/components/profile/CollegeStamp';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
@@ -132,6 +134,32 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
                 </span>
                 <CountryFlag country={player.country_code || player.country} size="sm" />
                 <span>{country}</span>
+              </>
+            )}
+            {/* TC1: the college is a player attribute, stamped where it is read.
+                Renders nothing at all when no college is on record - no
+                placeholder, no "unknown". No class year exists on the player
+                row today, so the stamp carries the name alone; pass `year`
+                once a year field lands. */}
+            {player.college && (
+              <>
+                <span aria-hidden style={{ opacity: 0.6 }}>
+                  {'\u00b7'}
+                </span>
+                <CollegeStamp
+                  normalizedName={player.college_normalized ?? ''}
+                  fallbackName={player.college}
+                  variant="player"
+                  tone="dark"
+                  onActivate={(mode) => {
+                    void analyticsEvents.track('tour_player_college_stamp_activated', {
+                      player_id: player.id,
+                      college: player.college,
+                      college_slug: player.college_normalized,
+                      mode,
+                    });
+                  }}
+                />
               </>
             )}
           </div>
