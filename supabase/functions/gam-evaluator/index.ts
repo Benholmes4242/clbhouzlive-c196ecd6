@@ -383,6 +383,23 @@ async function processSingle(whsScoreId: string) {
     .upsert(stats, { onConflict: "whs_score_id" });
   if (upErr) throw upErr;
 
+  // FEAT RARITY — the frozen figures the rarity lines read. GOLD/TOP feats only
+  // (an ace, an albatross, two or more eagles); INK feats get no row, because
+  // "the 248th clean card" tells a member they are ordinary.
+  //
+  // THE ORDERING IS play_date, TIE-BROKEN BY whs_score_id, NEVER detection time,
+  // so a historical round synced late still takes its true place in the
+  // sequence. This MUST match the backfill already in the table.
+  //
+  // Frozen means frozen: the insert never overwrites an existing row.
+  try {
+    await recordFeatRarity(stats as RoundStatsRow);
+  } catch (e) {
+    console.warn("[feat_rarity] write failed", (stats as any).whs_score_id, (e as Error).message);
+  }
+
+
+
 
   // PREVIOUS-ROUND BACKFILL. The round being evaluated usually has no next
   // score yet, so its own movement is unknowable on this pass. But the round
