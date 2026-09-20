@@ -19,6 +19,7 @@ import { formatNumber, formatTournamentDateRange } from '@/i18n/format';
 interface Props {
   meta: TournamentMeta;
   broadcast?: string | null;
+  purseShownInHero?: boolean;
 }
 
 function fmtRange(start: string | null, end: string | null): string | null {
@@ -26,30 +27,17 @@ function fmtRange(start: string | null, end: string | null): string | null {
 }
 
 
-export function EventInfoSection({ meta, broadcast }: Props) {
+export function EventInfoSection({ meta, broadcast, purseShownInHero = false }: Props) {
   const { t } = useTranslation('tourhub');
   const rows: Array<[string, string]> = [];
 
   const dates = fmtRange(meta.start_date, meta.end_date);
   if (dates) rows.push([t('tournament.eventInfo.dates'), dates]);
 
-  const venue = [
-    meta.venue_name,
-    [meta.venue_city, meta.venue_country].filter(Boolean).join(', ') || null,
-  ].filter(Boolean).join(' · ');
-  if (venue) rows.push([t('tournament.eventInfo.venue'), venue]);
-
-  const py = [
-    meta.venue_par != null ? t('board.meta.par', { par: meta.venue_par }) : null,
-    meta.venue_yardage != null
-      ? t('tournament.eventInfo.yardageShort', { yardage: formatNumber(meta.venue_yardage) })
-      : null,
-  ].filter(Boolean).join(' · ');
-  if (py) rows.push([t('tournament.eventInfo.parYardageLabel'), py]);
-
-  if (meta.purse != null) rows.push([t('tournament.hero.purseLabel'), formatPurse(meta.purse)]);
+  if (meta.venue_yardage != null) rows.push([t('tournament.eventInfo.yardage'), t('tournament.eventInfo.yardageShort', { yardage: formatNumber(meta.venue_yardage) })]);
   if (meta.defending_champion) rows.push([t('tournament.hero.defendingLabel'), meta.defending_champion]);
   if (broadcast) rows.push([t('tournament.eventInfo.tv'), broadcast]);
+  if (meta.purse != null && !purseShownInHero) rows.push([t('tournament.hero.purseLabel'), formatPurse(meta.purse)]);
 
   return (
     <section style={{ fontFamily: FONT }}>

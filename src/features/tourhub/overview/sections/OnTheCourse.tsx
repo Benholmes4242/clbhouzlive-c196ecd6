@@ -269,8 +269,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   const moreCount = totalKnown != null ? Math.max(0, totalKnown - featuredCount) : null;
 
   const rightMeta = totalKnown != null
-    ? t('overview.onTheCourse.rightMetaWithRound', { count: totalKnown, round })
-    : (round != null ? t('overview.onTheCourse.roundShort', { round }) : undefined);
+    ? t('overview.onTheCourse.rightMeta', { count: totalKnown })
+    : undefined;
 
   return (
     <div style={{ marginTop: SPACE.sectionSection }}>

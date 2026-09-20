@@ -18,15 +18,14 @@ interface Props {
   onTap: () => void;
 }
 
-export function TeeTimesBand({ round, groupCount, onTap }: Props) {
+export function TeeTimesBand({ round: _round, groupCount, onTap }: Props) {
   const { t } = useTranslation('tourhub');
   const disabled = groupCount <= 0;
   const subline = disabled
     ? t('tournament.teeTimesBand.notReleased', { defaultValue: 'Draw not yet released' })
     : t('tournament.teeTimesBand.subline', {
-        round,
         count: groupCount,
-        defaultValue: `Round ${round} · ${groupCount} groups`,
+        defaultValue: `${groupCount} groups`,
       });
 
   return (
