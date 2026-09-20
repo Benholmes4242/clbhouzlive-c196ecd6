@@ -17,72 +17,33 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { StatsSheet } from '../StatsSheet';
-import { formatEarnings } from '../../_shared/formatEarnings';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { mapTourSlug } from '../../_shared/tourOrder';
 import { INK, INK_FAINT, SLATE_50 } from '../../_shared/tokens';
+import type { PlayerSeasonSelection } from '../playerSeason';
+import { playerOrdinal } from '../playerOrdinal';
 
 interface SeasonCardsProps {
   playerStats: TourPlayerStatistics | null;
   results: PlayerTournamentResult[];
   player: TourPlayer;
+  selection: PlayerSeasonSelection;
 }
 
-interface Card {
-  key: string;
-  label: string;
-  value: string;
-}
-
-function fromStats(s: TourPlayerStatistics, t: TFunction): Card[] {
-  const cards: Card[] = [];
-  if (typeof s.top_10s === 'number' && s.top_10s >= 0)
-    cards.push({ key: 'top10', label: t('player.season.card.top10s'), value: String(s.top_10s) });
-  if (typeof s.wins === 'number' && s.wins >= 0)
-    cards.push({ key: 'wins', label: t('player.season.card.wins'), value: String(s.wins) });
-  if (typeof s.scoring_average === 'number' && s.scoring_average > 0)
-    cards.push({ key: 'scoring', label: t('player.season.card.scoring'), value: s.scoring_average.toFixed(1) });
-  if (typeof s.earnings === 'number' && s.earnings > 0)
-    cards.push({ key: 'earnings', label: t('player.season.card.earnings'), value: formatEarnings(s.earnings) });
-  return cards;
-}
-
-function fromResults(r: PlayerTournamentResult[], t: TFunction): Card[] {
-  const cards: Card[] = [];
-  if (r.length > 0) cards.push({ key: 'events', label: t('player.season.card.events'), value: String(r.length) });
-
-  const finishes = r
-    .filter((x) => {
-      const st = x.status?.toUpperCase();
-      return typeof x.position === 'number' && st !== 'WD' && st !== 'CUT' && st !== 'MC' && st !== 'DQ';
-    })
-    .map((x) => x.position as number)
-    .sort((a, b) => a - b);
-  if (finishes.length > 0) {
-    const best = finishes[0];
-    cards.push({ key: 'best', label: t('player.season.card.bestFinish'), value: best === 1 ? '1' : `T${best}` });
-  }
-
-  const madeCuts = r.filter((x) => {
-    const st = x.status?.toUpperCase();
-    return st !== 'CUT' && st !== 'MC' && st !== 'WD' && st !== 'DQ' && x.position !== null;
-  }).length;
-  if (madeCuts > 0) cards.push({ key: 'cuts', label: t('player.season.card.madeCuts'), value: String(madeCuts) });
-
-  return cards;
-}
-
-export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) {
+export function SeasonCards({ playerStats, results, player, selection }: SeasonCardsProps) {
   const { t } = useTranslation('tourhub');
   const [sheetOpen, setSheetOpen] = useState(false);
   const hasStats = !!playerStats;
-  const cards = hasStats ? fromStats(playerStats!, t) : fromResults(results, t);
-
-  if (cards.length === 0) return null;
+  const counts = [
+    { key: 'events', label: t('player.season.card.events'), value: playerStats?.events_played ?? results.length },
+    { key: 'wins', label: t('player.season.card.wins'), value: playerStats?.wins },
+    { key: 'top10', label: t('player.season.card.top10s'), value: playerStats?.top_10s },
+    { key: 'cuts', label: t('player.season.card.madeCuts'), value: playerStats?.cuts_made },
+  ].filter((item) => typeof item.value === 'number').slice(0, 4);
+  if (!selection.headline && counts.length === 0) return null;
 
   const openSheet = () => {
     setSheetOpen(true);
@@ -141,21 +102,22 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
         )}
       </div>
 
-      {/* Stat group */}
-      <div
-        style={{
-          padding: '0 16px',
-          display: 'grid',
-          gridTemplateColumns: `repeat(${Math.min(cards.length, 4)}, 1fr)`,
-          gap: 8,
-        }}
-      >
-        {cards.map((c) => (
-          <div key={c.key} style={{ minWidth: 0, textAlign: 'center' as const }}>
+      {selection.headline && (
+        <div style={{ padding: '2px 16px 18px' }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: INK_FAINT }}>{selection.headline.label}</div>
+          <div style={{ marginTop: 6, display: 'flex', alignItems: 'baseline', gap: 10 }}>
+            <span style={{ fontSize: 46, lineHeight: 0.95, fontWeight: 760, color: INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>{selection.headline.valueFormatted}</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: INK_FAINT }}>{playerOrdinal(t, selection.headline)}</span>
+          </div>
+        </div>
+      )}
+      <div style={{ padding: '0 16px', display: 'grid', gridTemplateColumns: `repeat(${Math.max(counts.length, 1)}, 1fr)`, gap: 8 }}>
+        {counts.map((c) => (
+          <div key={c.key} style={{ minWidth: 0 }}>
             <div
               style={{
                 // Stat labels (TOP 10S, WINS, SCORING, EARNINGS) — READ 11.
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: 700,
                 color: INK_FAINT,
                 letterSpacing: '0.11em',
@@ -166,8 +128,8 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
             </div>
             <div
               style={{
-                marginTop: 6,
-                fontSize: 21,
+                marginTop: 5,
+                fontSize: 18,
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
                 color: INK,
@@ -175,7 +137,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
                 fontVariantNumeric: 'tabular-nums lining-nums',
               }}
             >
-              {c.value}
+              {String(c.value)}
             </div>
           </div>
         ))}

@@ -27,6 +27,7 @@ import {
 } from '../leaders-v2/data/useLeaderCategories';
 import { INK, INK_FAINT, INK_MUTE, SURFACE } from '../_shared/tokens';
 import { TITLE, FIGS } from '@/lib/tokens/type';
+import { playerOrdinal } from './playerOrdinal';
 
 interface StatsSheetProps {
   open: boolean;
@@ -186,23 +187,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
     return hit ? { rank: hit.rank, tied: hit.tied } : undefined;
   };
 
-  const ordinal = (r: RankRef): string => {
-    const n = r.rank;
-    const mod100 = n % 100;
-    // 11th / 12th / 13th take "th" - the classic ordinal bug.
-    const suffixKey =
-      mod100 >= 11 && mod100 <= 13
-        ? 'th'
-        : n % 10 === 1
-          ? 'st'
-          : n % 10 === 2
-            ? 'nd'
-            : n % 10 === 3
-              ? 'rd'
-              : 'th';
-    const ord = t(`player.stats.ordinal.${suffixKey}`, { n });
-    return r.tied ? t('player.stats.ordinalTied', { ordinal: ord }) : ord;
-  };
+  const ordinal = (r: RankRef): string => playerOrdinal(t, r);
 
   // OVERVIEW
   const overview: Row[] = [];

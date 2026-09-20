@@ -9,7 +9,7 @@ import { titleCaseCountry } from '../../utils/countryFlags';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import type { PlayerSeasonSelection } from '../playerSeason';
-import { DARK, TOUR_HERO_PHOTO_H, WHITE_ALPHA_18 } from '../../_shared/tokens';
+import { INK_DEEP, TOUR_HERO_PHOTO_H, WHITE_ALPHA_18 } from '../../_shared/tokens';
 
 interface HeroSectionProps {
   player: TourPlayer;
@@ -55,7 +55,7 @@ export function HeroSection({ player, playerStats, selection }: HeroSectionProps
   const nameSize = player.full_name.length > 25 ? 27 : player.full_name.length > 18 ? 31 : 35;
 
   return (
-    <section style={{ position: 'relative', height: TOUR_HERO_PHOTO_H, overflow: 'hidden', background: DARK }}>
+    <section style={{ position: 'relative', height: TOUR_HERO_PHOTO_H, overflow: 'hidden', background: INK_DEEP }}>
       {photo && (
         <img
           key={photo}
