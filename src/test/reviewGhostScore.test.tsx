@@ -53,7 +53,8 @@ describe('shared displayed review score tones', () => {
         <ReviewVerdictLabel rating={9} />
       </div>,
     );
-    expect(exceptional).toContain('EXCEPTIONAL');
+    expect(exceptional).toContain('Exceptional');
+    expect(exceptional).toContain('text-transform:uppercase');
     expect(exceptional).toContain(`color:${A.GREEN}`);
     expect(exceptional).toContain(`color:${REVIEW_GHOST_COLOR_GREEN}`);
 
@@ -63,7 +64,8 @@ describe('shared displayed review score tones', () => {
         <ReviewVerdictLabel rating={8.3} />
       </div>,
     );
-    expect(excellent).toContain('EXCELLENT');
+    expect(excellent).toContain('Excellent');
+    expect(excellent).toContain('text-transform:uppercase');
     expect(excellent).toContain(`color:${A.MUTE}`);
     expect(excellent).toContain(`color:${REVIEW_GHOST_COLOR_NEUTRAL}`);
   });
