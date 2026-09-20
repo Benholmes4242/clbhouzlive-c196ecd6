@@ -45,7 +45,7 @@ export interface PlayerSeasonStat {
 export type PlayerVerdict =
   | { key: 'player.hero.verdict.winsRanked'; values: { wins: number; top10s: number; rank: string } }
   | { key: 'player.hero.verdict.noWin'; values: { top10s: number; rank: string } }
-  | { key: 'player.hero.verdict.pointsRanked'; values: { wins: number; rank: string; raceLabel: string } }
+  | { key: 'player.hero.verdict.pointsRanked_one' | 'player.hero.verdict.pointsRanked_other'; values: { wins: number; rank: string; raceLabel: string } }
   | { key: 'player.hero.verdict.resultsOnly'; values: { events: number; best: string } };
 
 export interface PlayerSeasonSelection {
