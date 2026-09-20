@@ -290,7 +290,9 @@ function HolesSheet({
 
 
 function SectionKicker({ text }: { text: string }) {
-  return <div style={{ ...LABEL, fontSize: 10, letterSpacing: '0.12em', margin: '14px 0 8px' }}>{text}</div>;
+  const { i18n } = useTranslation();
+  const cjk = /^(ja|ko)/.test(i18n.language);
+  return <div style={{ ...LABEL, fontSize: 10, letterSpacing: cjk ? 0 : '0.12em', textTransform: cjk ? 'none' : 'uppercase', margin: '14px 0 8px' }}>{text}</div>;
 }
 
 function CourseComparison({ hardest, easiest }: { hardest: TournamentHole; easiest: TournamentHole }) {

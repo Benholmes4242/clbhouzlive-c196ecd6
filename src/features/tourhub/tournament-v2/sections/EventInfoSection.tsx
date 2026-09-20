@@ -28,7 +28,8 @@ function fmtRange(start: string | null, end: string | null): string | null {
 
 
 export function EventInfoSection({ meta, broadcast, purseShownInHero = false }: Props) {
-  const { t } = useTranslation('tourhub');
+  const { t, i18n } = useTranslation('tourhub');
+  const cjk = /^(ja|ko)/.test(i18n.language);
   const rows: Array<[string, string]> = [];
 
   const dates = fmtRange(meta.start_date, meta.end_date);
@@ -60,7 +61,7 @@ export function EventInfoSection({ meta, broadcast, purseShownInHero = false }: 
                 fontSize: 11, fontWeight: 700, color: INK_FAINT,
                 // 0.10em, not 0.14em: PAR / YARDAGE measures 105.6px at 0.14em and
                 // wraps in the 104px label column; 0.10em brings it to 99.9px.
-                letterSpacing: '0.10em', textTransform: 'uppercase',
+                 letterSpacing: cjk ? 0 : '0.10em', textTransform: cjk ? 'none' : 'uppercase',
               }}
             >
               {label}

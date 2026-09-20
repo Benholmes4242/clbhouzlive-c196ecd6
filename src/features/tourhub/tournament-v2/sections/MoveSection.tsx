@@ -10,7 +10,8 @@ import { FONT, INK, INK_FAINT, SURFACE } from '../../_shared/tokens';
 interface Props { contest: TournamentContest; state: EventState; tourCode: string }
 
 export function MoveSection({ contest, state, tourCode }: Props) {
-  const { t } = useTranslation('tourhub');
+  const { t, i18n } = useTranslation('tourhub');
+  const cjk = /^(ja|ko)/.test(i18n.language);
   const row = contest.mover;
   if (state === 'upcoming' || !row || contest.moverToday == null) return null;
   const name = row.player?.full_name ?? '';
@@ -21,14 +22,14 @@ export function MoveSection({ contest, state, tourCode }: Props) {
     <section style={{ fontFamily: FONT }}>
       <SectionEyebrow kicker={t(state === 'live' ? 'tournament.move.liveEyebrow' : 'tournament.move.completedEyebrow')} />
       <div style={{ display: 'grid', gridTemplateColumns: '40px minmax(0,1fr) auto', alignItems: 'center', gap: 12, padding: '14px 16px', background: SURFACE }}>
-        <PlayerAvatar playerId={row.player?.id ?? row.id} playerName={name} photoUrl={row.player?.photo_url ?? null} tourCode={tourCode} size="md" />
+        <PlayerAvatar playerId={row.player?.id ?? row.id} playerName={name} photoUrl={row.player?.photo_url ?? null} tourCode={tourCode} size={40} />
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 15.5, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
           <div style={{ marginTop: 2, fontSize: 12, color: INK_FAINT, fontVariantNumeric: 'tabular-nums lining-nums' }}>{t('tournament.move.subline', { thru, position, total })}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: 26, fontWeight: 800, color: getScoreColor(contest.moverToday, 'dark'), fontVariantNumeric: 'tabular-nums lining-nums', lineHeight: 1 }}>{fmtScore(contest.moverToday)}</div>
-          <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_FAINT }}>{t('tournament.move.today')}</div>
+          <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: cjk ? 0 : '0.12em', textTransform: cjk ? 'none' : 'uppercase', color: INK_FAINT }}>{t('tournament.move.today')}</div>
         </div>
       </div>
     </section>
