@@ -777,8 +777,8 @@
       "colField": "FIELD",
       "colPlayers": "PLAYERS",
       "roundEmptyBody": "No scoring data for this round yet.",
-      "comparison": "The {{hardest}} is playing {{gap}} shots harder than the {{easiest}} — the widest gap on the course.",
-      "comparisonTenths": "The {{hardest}} is playing {{tenths}} tenths of a shot harder than the {{easiest}} — the widest gap on the course.",
+      "comparison": "{{hardest}} is playing {{gap}} shots harder than {{easiest}} — the widest gap on the course.",
+      "comparisonTenths": "{{hardest}} is playing {{tenths}} tenths of a shot harder than {{easiest}} — the widest gap on the course.",
       "distributionKicker": "All 18 holes · every round",
       "rowsKicker": "Playing hardest, and easiest"
     },
