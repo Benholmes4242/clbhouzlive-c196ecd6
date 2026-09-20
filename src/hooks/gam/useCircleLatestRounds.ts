@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { FeatRarityRow } from '@/features/explore-magazine/featRarity';
 import { deriveRoundFeats, type RoundFeat } from '@/lib/gam/roundFeats';
 import { fetchCircleIds } from '@/lib/social/circle';
 
@@ -85,6 +86,12 @@ export interface CircleRoundRow {
   has_active_whs_connection: boolean;
   /** Up to two feats, rarest first. */
   feats: RoundFeat[];
+  /**
+   * FROZEN RARITY ROWS for this round, one per GOLD/TOP feat, exactly as stored
+   * by gam-evaluator. Empty when the round holds no rare feat. Never recomputed
+   * on render.
+   */
+  feat_rarity: FeatRarityRow[];
 
   // ---- INSIGHT SET (BRIEF_FRIENDS_INSIGHT_SET, part 1) -------------------
   /** Raw stats the insight states read; nulls simply fail their state. */
@@ -272,10 +279,13 @@ export function useCircleLatestRounds(
         sub_80: boolean | null;
         delta_index: number | string | null;
         stableford_points: number | string | null;
+        /* FEAT RARITY, EMBEDDED — the frozen figures ride along with the round
+           they belong to, so the rarity lines cost no extra round trip. */
+        gam_round_feat_rarity?: FeatRarityRow[] | null;
       };
 
       const ROUND_COLS =
-        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80, delta_index, stableford_points';
+        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80, delta_index, stableford_points, gam_round_feat_rarity(feat_kind, global_ordinal, total_rounds_at_detection, distinct_members_at_detection)';
 
       // 2. Circle rounds — windowDays lookback, ordered newest first.
       const windowStartIso = new Date(Date.now() - windowDays * DAY_MS).toISOString().slice(0, 10);
@@ -696,6 +706,7 @@ export function useCircleLatestRounds(
           eg_visible: profile?.eg_visible === true,
           has_active_whs_connection: activeConnectionUsers.has(r.user_id),
           feats: featsForRound(r),
+          feat_rarity: (r.gam_round_feat_rarity ?? []) as FeatRarityRow[],
 
           birdies: r.birdies,
           eagles: r.eagles,
