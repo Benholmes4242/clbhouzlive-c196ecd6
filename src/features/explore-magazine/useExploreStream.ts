@@ -103,6 +103,9 @@ function roundPayload(row: StreamRow): CircleRoundRow | undefined {
     display_name: row.who?.display_name ?? '',
     profile_photo_url: row.who?.photo_url ?? null,
     player_club_id: null,
+    /* The server stream does not carry the frozen rarity rows, so this payload
+       honestly carries none and the rarity lines simply do not draw. */
+    feat_rarity: [],
     play_date: f.play_date ?? '',
     course_name: row.subject?.course_name ?? null,
     course_id: row.subject?.course_id ?? null,

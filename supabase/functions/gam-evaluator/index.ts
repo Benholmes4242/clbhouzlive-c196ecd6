@@ -383,6 +383,23 @@ async function processSingle(whsScoreId: string) {
     .upsert(stats, { onConflict: "whs_score_id" });
   if (upErr) throw upErr;
 
+  // FEAT RARITY — the frozen figures the rarity lines read. GOLD/TOP feats only
+  // (an ace, an albatross, two or more eagles); INK feats get no row, because
+  // "the 248th clean card" tells a member they are ordinary.
+  //
+  // THE ORDERING IS play_date, TIE-BROKEN BY whs_score_id, NEVER detection time,
+  // so a historical round synced late still takes its true place in the
+  // sequence. This MUST match the backfill already in the table.
+  //
+  // Frozen means frozen: the insert never overwrites an existing row.
+  try {
+    await recordFeatRarity(stats as any);
+  } catch (e) {
+    console.warn("[feat_rarity] write failed", (stats as any).whs_score_id, (e as Error).message);
+  }
+
+
+
 
   // PREVIOUS-ROUND BACKFILL. The round being evaluated usually has no next
   // score yet, so its own movement is unknowable on this pass. But the round
@@ -3054,4 +3071,88 @@ async function evaluateSeasonMedal(
 
   const did = await upsertBadgeEarned(userId, badgeId, whsScoreId);
   return did ? badgeId : null;
+}
+
+/**
+ * FEAT RARITY (frozen figures for the rarity lines).
+ *
+ * One row per (round, feat) in public.gam_round_feat_rarity, written only here
+ * under the service role. GOLD/TOP feats only: an ace, an albatross, two or more
+ * eagles. The ordering is play_date, tie-broken by whs_score_id — never
+ * detection time — and matches the backfilled rows exactly:
+ *
+ *   global_ordinal                = position of this round among rounds holding
+ *                                   that feat, in that ordering
+ *   total_rounds_at_detection     = gam_round_stats rows with play_date <= this
+ *   distinct_members_at_detection = distinct owners of that feat up to and
+ *                                   including this round
+ *
+ * Frozen means frozen: existing rows are never overwritten.
+ */
+type RarityKind = "ace" | "albatross" | "eagle_brace";
+
+function featPredicate(q: any, kind: RarityKind) {
+  if (kind === "ace") return q.gt("holes_in_one", 0);
+  if (kind === "albatross") return q.gt("albatrosses", 0);
+  return q.gte("eagles", 2);
+}
+
+async function recordFeatRarity(stats: any) {
+  const whsScoreId: string | null = stats?.whs_score_id ?? null;
+  const playDate: string | null = stats?.play_date ?? null;
+  if (!whsScoreId || !playDate) return;
+
+  const kinds: RarityKind[] = [];
+  if (Number(stats.holes_in_one ?? 0) > 0) kinds.push("ace");
+  if (Number(stats.albatrosses ?? 0) > 0) kinds.push("albatross");
+  if (Number(stats.eagles ?? 0) >= 2) kinds.push("eagle_brace");
+  if (kinds.length === 0) return;
+
+  // total_rounds_at_detection — every round played on or before this play_date.
+  const { count: totalRounds, error: totalErr } = await supabase
+    .from("gam_round_stats")
+    .select("whs_score_id", { count: "exact", head: true })
+    .lte("play_date", playDate);
+  if (totalErr) throw totalErr;
+
+  for (const kind of kinds) {
+    // global_ordinal — earlier play dates, plus same-date rounds whose id sorts
+    // at or before this one. Identical to the backfill's row_number().
+    const { count: ordinal, error: ordErr } = await featPredicate(
+      supabase
+        .from("gam_round_stats")
+        .select("whs_score_id", { count: "exact", head: true }),
+      kind,
+    ).or(
+      `play_date.lt.${playDate},and(play_date.eq.${playDate},whs_score_id.lte.${whsScoreId})`,
+    );
+    if (ordErr) throw ordErr;
+
+    // distinct_members_at_detection — distinct owners over the same ordering.
+    const { data: holders, error: holdersErr } = await featPredicate(
+      supabase.from("gam_round_stats").select("user_id, play_date, whs_score_id"),
+      kind,
+    ).or(
+      `play_date.lt.${playDate},and(play_date.eq.${playDate},whs_score_id.lte.${whsScoreId})`,
+    );
+    if (holdersErr) throw holdersErr;
+    const members = new Set<string>();
+    for (const row of (holders ?? []) as any[]) {
+      if (row?.user_id) members.add(row.user_id as string);
+    }
+
+    const { error: insErr } = await supabase
+      .from("gam_round_feat_rarity")
+      .upsert(
+        {
+          whs_score_id: whsScoreId,
+          feat_kind: kind,
+          global_ordinal: ordinal ?? null,
+          total_rounds_at_detection: totalRounds ?? null,
+          distinct_members_at_detection: members.size || null,
+        },
+        { onConflict: "whs_score_id,feat_kind", ignoreDuplicates: true },
+      );
+    if (insErr) throw insErr;
+  }
 }

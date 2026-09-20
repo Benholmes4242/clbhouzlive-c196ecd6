@@ -1,7 +1,362 @@
 {
-  "reviewSheet": {
-    "communityAverage_one": "[!! Community average {{average}}, from {{count}} rating !!]",
-    "communityAverage_other": "[!! Community average {{average}}, from {{count}} ratings !!]"
+  "amateur": {
+    "board": {
+      "backToStream": "[Back to the stream]",
+      "openPicker": "[Choose a board]"
+    },
+    "courses": {
+      "anywhere": "[Anywhere]",
+      "choosePlace": "[Choose a place]",
+      "clearPlace": "[Clear place filter]",
+      "findPlace": "[Find a country or region]",
+      "noMatch": "[Nothing matches {{query}}.]",
+      "noPlaceMatch": "[Nothing matches {{query}}.]",
+      "placeTitle": "[Browse by place]",
+      "searchClear": "[Clear search]",
+      "searchPlaceholder": "[Search courses, regions and reviews]"
+    },
+    "hero": {
+      "context": {
+        "busiestCircle": "[The busiest {{span}} in your circle.]",
+        "clear": "[{{margin}} clear of the next best.]",
+        "nobody": "[Nobody else made more than {{runnerUp}}.]",
+        "offGross": "[Off {{hcp}}, gross {{gross}}.]",
+        "poolCircleLong": "[Best of {{rounds}} rounds in your circle {{span}}.]",
+        "poolCircleShort": "[Best of {{rounds}} in your circle.]",
+        "poolEveryoneLong": "[Best of {{rounds}} rounds across clbhouz {{span}}.]",
+        "poolEveryoneShort": "[Best of {{rounds}} across clbhouz.]"
+      },
+      "metric": {
+        "bestStableford": "[BEST STABLEFORD]",
+        "lowestGross": "[LOWEST GROSS]",
+        "lowestNet": "[LOWEST NET]",
+        "mostBirdies": "[MOST BIRDIES]",
+        "mostCourses": "[MOST COURSES]",
+        "mostEagles": "[MOST EAGLES]",
+        "mostRounds": "[MOST ROUNDS]",
+        "vsHandicap": "[BEST VS HANDICAP]"
+      },
+      "span": {
+        "d14": "[this fortnight]",
+        "d30": "[this month]",
+        "d90": "[this quarter]"
+      },
+      "spanNoun": {
+        "d14": "[fortnight]",
+        "d30": "[month]",
+        "d90": "[quarter]"
+      },
+      "spread": {
+        "both": "[Across {{rounds}}, {{courses}}.]",
+        "courses": "[{{count}} courses]",
+        "courses_one": "[{{count}} course]",
+        "courses_other": "[{{count}} courses]",
+        "rounds": "[{{count}} rounds]",
+        "roundsOnly": "[Across {{rounds}}.]",
+        "rounds_one": "[{{count}} round]",
+        "rounds_other": "[{{count}} rounds]"
+      },
+      "unit": {
+        "birdies": "[birdies]",
+        "courses": "[courses]",
+        "eagles": "[eagles]",
+        "net": "[net]",
+        "points": "[points]",
+        "rounds": "[rounds]",
+        "underPar": "[under par]"
+      },
+      "window": {
+        "d14": "[14 DAYS]",
+        "d30": "[30 DAYS]",
+        "d90": "[90 DAYS]"
+      }
+    },
+    "place": {
+      "pair": "[{{place}}, {{nation}}]"
+    },
+    "shelf": {
+      "alsoPlays": "[Álsõ pläys {{course}}]",
+      "aroundCounty": "[Ãrõũñd {{county}}]",
+      "aroundWorld": "[Ãrõũñd thé wõrld]",
+      "circlePlays": "[Where your circle plays]",
+      "circlePlaysSub": "[Courses the people you follow have played]",
+      "follow": "[Fõllõw]",
+      "following": "[Fõllõwïñg]",
+      "golfersAtClub": "[Gõlférs ãt {{club}}]",
+      "golfersToFollow": "[Gõlférs tõ fõllów]",
+      "highestRatedMonth": "[Highest rated this month]",
+      "highestRatedYear": "[Highest rated this year]",
+      "holdsCourseRecord": "[Hõlds thé kõũrsé rékõrd]",
+      "holdsCourseRecords_one": "[Hõlds ã kõũrsé rékõrd]",
+      "holdsCourseRecords_other": "[Hõlds {{count}} kõũrsé rékõrds]",
+      "newOnClbhouz": "[New on clbhouz]",
+      "newOnClbhouzSub": "[Courses rated here for the first time]",
+      "newThisMonth": "[Néw thïs mõñth]",
+      "onYourList": "[Õñ ýõũr lïst]",
+      "playsAtClub": "[Pläys ãt {{club}}]",
+      "recordReason": {
+        "allTimeAceLeader": "[Ãll-tïmé ãcé léãdér]",
+        "allTimeAlbatrossHolder": "[Ãll-tïmé ãlbãtrõss hõldér]",
+        "allTimeBirdieLeader": "[Ãll-tïmé bïrdïé léãdér]",
+        "allTimeEagleLeader": "[Ãll-tïmé éãglé léãdér]",
+        "allTimeStablefordLeader": "[Ãll-tïmé stãbléfõrd léãdér]",
+        "bestScoreToParHere": "[Bést scõré-tõ-pãr héré]",
+        "courseRecordHolder": "[Cõũrsé récõrd hõldér]",
+        "mostRoundsHere": "[Mõst rõũñds héré]",
+        "womensCourseRecordHolder": "[Wõmén's cõũrsé récõrd hõldér]"
+      },
+      "roundsHere_one": "[{{count}} rõũñd héré]",
+      "roundsHere_other": "[{{count}} rõũñds héré]",
+      "roundsThisMonth": "[{{count}} rõünds thís mõnth]",
+      "topRated": "[Best rated lately]",
+      "worldsBest": "[The world's best]",
+      "worldsBestSub": "[Top 100 by rank]",
+      "worthTheDrive": "[Worth the drive]",
+      "worthTheDriveSub": "[Rated highly by the few who have played them]",
+      "yourClub": "[ýõũr člũb]"
+    },
+    "stream": {
+      "aCourse": "[å çöürsé one]",
+      "aMember": "[Å mémbér one]",
+      "allRounds": "[Áļļ řőúñđš]",
+      "callout": {
+        "ace": "[Hole in one]",
+        "aceCount_one": "[Ĥőļé íñ őñé]",
+        "aceCount_other": "[{{count}} ĥőļéš íñ őñé]",
+        "albatross": "[Albatross]",
+        "albatrossCount_one": "[Áļƀáţřőšš]",
+        "albatrossCount_other": "[{{count}} áļƀáţřőššéš]",
+        "beatHandicap": "Beat handicap by {{n}}",
+        "birdies": "[{{n}} birdies]",
+        "bogeyFree": "[Bogey-free]",
+        "bogeyFreeSub": "[Par or better on every hole]",
+        "courseRecord": "[Course record]",
+        "eagle": "[Eagle]",
+        "eagleCount_one": "[Éáĝļé]",
+        "eagleCount_other": "[Éáĝļé ƀŕáçé]",
+        "featJoin": "[{{first}} + {{second}}]",
+        "handicapCut": "Handicap cut",
+        "handicapCutSub": "{{from}} to {{to}}",
+        "movedUpBoard": "[Moved up the board]",
+        "netCourseRecord": "[Net course record]",
+        "netRecord": "New net course record",
+        "nowRank": "[Now {{ord}}]",
+        "onHole": "[on the {{ord}}]",
+        "rankUp": "[Moved up]",
+        "rankUpTo": "[Up to {{ord}}]",
+        "record": "[New course record]",
+        "tagMovedUp": "[MOVED UP]",
+        "tagNew": "[NEW]"
+      },
+      "chip": {
+        "gbi": "[GB&Î one]",
+        "hcp": "HCP",
+        "net": "NET",
+        "rating": "[råtîng one]",
+        "world": "[wörld one]"
+      },
+      "connect": {
+        "action": "[Çönnéçt å håndîçåp > one two]",
+        "body": "[Çönnéçt å håndîçåp ånd évérý röünd yöü plåý lånds héré, rånkéd ågåînst évérýöné whö hås plåýéd thé såmé çöürsé. one two three four]"
+      },
+      "course": {
+        "eventLow": "[{{name}}'s {{gross}} îs thé löw héré thîs mönth. one two]",
+        "eventLowAnon": "[{{gross}} îs thé löw héré thîs mönth. one]",
+        "eventRatings": "[{{count}} råtîngs thîs mönth, åvéråging {{mean}}. one two]",
+        "factRated": "[{{rounds}} röünds tråçkéd, råtéd {{rating}} fröm {{count}}. one two]",
+        "factRatedOnly": "[Råtéd {{rating}} fröm {{count}}. one]",
+        "factRounds": "[{{rounds}} röünds tråçkéd héré. one]"
+      },
+      "empty": {
+        "courses": "[No courses in {{scope}} yet.]",
+        "reviews": "[No reviews in {{scope}} yet.]"
+      },
+      "enrichment": {
+        "area": {
+          "clubhouse": "[~~ĉļúƀĥőúšé~~]",
+          "conditions": "[~~ĉőñđíţíőñ~~]",
+          "design": "[~~đéšíĝñ~~]",
+          "facilities": "[~~ƒáĉíļíţíéš~~]"
+        },
+        "photos": "[~~{{count}} ƥĥőţőš~~]",
+        "strongest": "[~~Šţřőñĝéšţ őñ {{area}}~~]"
+      },
+      "failed": "[Thís díd nöt löåd. one]",
+      "headline": {
+        "ace": "[A hole in one. one two]",
+        "aceHole": "[A hole in one on the {{ordHole}}. one two]",
+        "aceHoleToPar": "[A hole in one on the {{ordHole}}, in a round of {{gross}}, {{topar}}. one two]",
+        "aceToPar": "[A hole in one, in a round of {{gross}}, {{topar}}. one two]",
+        "albatross": "[An albatross. one two]",
+        "albatrossHole": "[An albatross on the {{ordHole}}, in a round of {{gross}}. one two]",
+        "albatrossHoleToPar": "[An albatross on the {{ordHole}}, in a round of {{gross}}, {{topar}}. one two]",
+        "albatrossRound": "[An albatross, in a round of {{gross}}. one two]",
+        "albatrossRoundToPar": "[An albatross, in a round of {{gross}}, {{topar}}. one two]",
+        "birdieHaul": "[{{count}} birdies in a round of {{gross}}. one two]",
+        "birdieHaulToPar": "[{{count}} birdies in a round of {{gross}}, {{topar}}. one two]",
+        "bogeyFree": "[Wént bögéy fréé för {{gross}}. one two]",
+        "eagle": "[An eagle, in a round of {{gross}}. one two]",
+        "eagleHole": "[An eagle on the {{ordHole}}, in a round of {{gross}}. one two]",
+        "eagleHoleToPar": "[An eagle on the {{ordHole}}, in a round of {{gross}}, {{topar}}. one two]",
+        "eagleToPar": "[An eagle, in a round of {{gross}}, {{topar}}. one two]",
+        "featAce_one": "[á ĥőļé íñ őñé]",
+        "featAce_other": "[{{spokenCount}} ĥőļéš íñ őñé]",
+        "featAlbatross_one": "[áñ áļƀáţřőšš]",
+        "featAlbatross_other": "[{{spokenCount}} áļƀáţřőššéš]",
+        "featBirdies_one": "[{{spokenCount}} ƀířđíé]",
+        "featBirdies_other": "[{{spokenCount}} ƀířđíéš]",
+        "featClean_one": "[á ƀőĝéý-ƒřéé ĉářđ]",
+        "featClean_other": "[á ƀőĝéý-ƒřéé ĉářđ]",
+        "featEagle_one": "[áñ éáĝļé]",
+        "featEagle_other": "[áñ éáĝļé ƀŕáçé]",
+        "featJoin": "[{{first}} áñđ {{second}}]",
+        "featsOnly": "[{{feats}}.]",
+        "featsRound": "[{{feats}}, íñ á řőúñđ őƒ {{gross}}.]",
+        "featsRoundToPar": "[{{feats}}, íñ á řőúñđ őƒ {{gross}}, {{topar}}.]",
+        "listFirst": "[{{player}} shot {{article}} {{gross}} — the lowest anyone has played here. one two]",
+        "listNewLow": "[{{gross}}, å néw löw ön yöür lîst. one two]",
+        "played": "[Plåyéd. one]",
+        "playedNoChange": "[{{player}} went round in {{gross}}. Your {{ord}} of {{of}} here is unchanged. one two]",
+        "rankDown": "[{{player}} shot {{article}} {{gross}}. You are now {{ord}} of {{of}} here. one two]",
+        "rankDownBy": "[Wént röünd în {{gross}} ånd püshéd yöü döwn {{delta}} tö {{n}} öf {{of}}. one two three]",
+        "rankDownMoved": "[{{player}} shot {{article}} {{gross}}. You are now {{ord}} of {{of}} here, down {{n}}. one two]",
+        "rankHold": "[Your {{gross}} is still the {{ord}} best round anyone has played here. one two]",
+        "rankUp": "[Your {{gross}} is the {{ord}} best round played here. one two]",
+        "rankUpBy": "[Your {{gross}} is the {{ord}} best round played here, up {{n}} places. one two]",
+        "rankUpOthers": "[You are now {{ord}} of {{of}} here, up {{n}}. one two]",
+        "rankUpOthersPlain": "[You are now {{ord}} of {{of}} here. one two]",
+        "recordLost": "[{{player}} took your course record with a {{gross}}. one two]",
+        "recordLostBest": "[{{player}} took your course record with a {{gross}}. Your best here is {{best}}. one two]",
+        "recordLostGap": "[Töök yöür cöürsé récörd wîth å {{gross}}. Yöür bést îs {{delta}} béhînd. one two three]",
+        "recordLostSince": "[{{player}} took your course record with a {{gross}}. Your {{best}} had stood since {{month}}. one two]",
+        "recordOwn": "[You took the course record with a {{gross}}. one two]",
+        "recordOwnToPar": "[You took the course record with a {{gross}}, {{topar}}. one two]",
+        "recordTaken": "[{{player}} took the course record with a {{gross}}. one two]",
+        "recordTakenBest": "[{{player}} took the course record with a {{gross}}, {{topar}}. Your best here is {{best}}. one two]",
+        "recordTakenToPar": "[{{player}} took the course record with a {{gross}}, {{topar}}. one two]",
+        "round": "[{{player}} shot {{article}} {{gross}}. one two]",
+        "roundToPar": "[{{player}} shot {{article}} {{gross}}, {{topar}}. one two]"
+      },
+      "kicker": {
+        "aroundCountry": "[{{country}} one]",
+        "aroundRegion": "[{{region}} one]",
+        "aroundWorld": "[Wörld one]",
+        "atYourClub": "[Åt yöür çlüb one]",
+        "backlog": "[Fröm {{month}} one]",
+        "clip": "[Çlîp one]",
+        "course": "[Çöürsé one]",
+        "courseRecord": "[Çöürsé réçörd one]",
+        "moment": "[Fröm thé çömmünîty one]",
+        "news": "[Néws one]",
+        "onYourList": "[Ön yöür lîst one]",
+        "ownRound": "[Yöür röünd one]",
+        "watch": "[Löngér wåtçh one]"
+      },
+      "list": {
+        "eventLow": "[Néw löw öf {{gross}} one]",
+        "eventRating": "[Néwly råtéd {{rating}} one]",
+        "eventRecord": "[Néw çöürsé réçörd one]"
+      },
+      "nothingYet": "[Nöthîng héré töüçhés yöür çöürsés yét. Föllöw å çöürsé ör çönnéçt å håndîçåp ånd thîs pågé béçömés yöürs. one two three four five]",
+      "ratingCount": "[{{count}} rãtïñgs]",
+      "ratingCount_one": "[~~{{count}} řáţíñĝ~~]",
+      "ratingCount_other": "[~~{{count}} řáţíñĝš~~]",
+      "retry": "[Try ågåín one]",
+      "roundCount": "[{{count}} röünds one]",
+      "scope": {
+        "circle": "[My circle]",
+        "club": "[Mý çlüb one]",
+        "theWorld": "[the world]",
+        "world": "[Wörld one]",
+        "yourCircle": "[your circle]",
+        "yourClub": "[your club]"
+      },
+      "scopes": "[Sçörés sçöpé one]",
+      "seeAll": "[Séé åll {{count}} one two]",
+      "seeAllClips_one": "[Šéé áļļ {{count}} ĉļíƥ]",
+      "seeAllClips_other": "[Šéé áļļ {{count}} ĉļíƥš]",
+      "seeAllCourses_one": "[Šéé áļļ {{count}} ĉőúřšé]",
+      "seeAllCourses_other": "[Šéé áļļ {{count}} ĉőúřšéš]",
+      "seeAllMoments_one": "[Šéé áļļ {{count}} ɱőɱéñţ]",
+      "seeAllMoments_other": "[Šéé áļļ {{count}} ɱőɱéñţš]",
+      "seeAllRoundsPlain": "[Šéé áļļ řőúñđš]",
+      "seeAllRounds_one": "[Šéé áļļ {{count}} řőúñđ]",
+      "seeAllRounds_other": "[Šéé áļļ {{count}} řőúñđš]",
+      "shelf": {
+        "circle": "[Yóür çîrçlé one two]",
+        "clips": "[Çlîps one]",
+        "clubWeek": "[Thîs wéék åt {{club}} one two]",
+        "moments": "[Fröm thé çömmünîty one]",
+        "standing": "[Where you stand]",
+        "videos": "[Videos]"
+      },
+      "standing": {
+        "board": "[Lowest gross]",
+        "boardGross": "[Gröss one]",
+        "boardNet": "[Nét one]",
+        "boards": {
+          "birdies": "[Möst bîrdîés în å röünd one two three]",
+          "improved": "[Bîggést håndîçåp çüt one two]",
+          "net": "[Löwést nét röünd one two]",
+          "stableford": "[Bést ståbléförd röünd one two]",
+          "topar": "[Löwést gröss röünd one two]"
+        },
+        "lastChange": "[last change {{when}}]",
+        "of": "[of {{count}}]",
+        "pickBoard": "[Chånge böård one two]",
+        "retry": "[Trý ågåîn one]",
+        "unreadable": "[Yöür ståndîng çöüld nöt bé löådéd. one two three]"
+      },
+      "stat": {
+        "net": "[NET]",
+        "par": "[PAR]",
+        "vsHcp": "[VS HCP]"
+      },
+      "topar": {
+        "level": "[lévél pår one]",
+        "over": "[{{n}} övér pår one]",
+        "under": "[{{n}} ündér pår one]"
+      },
+      "view": {
+        "all": "[Åll one]",
+        "courses": "[Courses]",
+        "reviews": "[Reviews]",
+        "scores": "[Sçörés one]",
+        "watch": "[Wåtçh one]"
+      },
+      "views": "[Éxplöré vîéws one]",
+      "visual": {
+        "ace": "[HÖLÉ ÎN ÖNÉ ÖN {{n}} one]",
+        "albatross": "[ÅLBÅTRÖSS ÖN {{n}} one]",
+        "birdie": "[BÎRDÎÉ one]",
+        "bogey": "[BÖGÉÝ one]",
+        "double": "[DÖÜBLÉ ÖN {{n}} one]",
+        "eagle": "[ÉÅGLÉ ÖN {{n}} one]",
+        "par": "[PÅR one]",
+        "triple": "[TRÎPLÉ ÖN {{n}} one]"
+      },
+      "you": "[Yöü one]"
+    },
+    "watch": {
+      "chip": {
+        "all": "[!! All !!]",
+        "clips": "[!! Clips !!]",
+        "forYou": "[!! For you !!]",
+        "friends": "[!! Friends !!]",
+        "videos": "[!! Videos !!]",
+        "yourCourses": "[!! Your courses !!]"
+      },
+      "empty": "[!! Nothing to watch here yet. !!]",
+      "filters": "[!! Watch filters !!]",
+      "noResults": "[!! Nothing matches {{query}}. !!]",
+      "rail": {
+        "clips": "[!! Clips !!]",
+        "community": "[!! From the community !!]",
+        "videos": "[!! Videos !!]"
+      },
+      "searchPlaceholder": "[!! Search videos, clips and creators !!]",
+      "untitled": "[!! Untitled video !!]"
+    }
   },
   "amateurNews": {
     "all": "All",
@@ -126,57 +481,6 @@
     "subline": "Everything members have filmed and photographed"
   },
   "courseDetail": {
-    "allHolesSheet": {
-      "title": "All 18 holes",
-      "holes": "Hole by hole",
-      "pars": "How each par plays",
-      "ladder": "Stroke index against how it plays",
-      "outOfStep_one": "1 out of step",
-      "outOfStep_other": "{{count}} out of step",
-      "si": "SI",
-      "plays": "Plays",
-      "indexedPlays": "indexed {{index}}, plays {{plays}}",
-      "explainer": "A hole is marked when it sits at least four places out and at least 0.07 of a shot from what its index should return, scaled to this course's own spread."
-    },
-    "yourRoundsSheet": {
-      "title": "Your rounds",
-      "best": "Best",
-      "average": "Average",
-      "field": "Field",
-      "mostRecent": "Most recent",
-      "lowestFirst": "Lowest first",
-      "sortA11y": "Sort your rounds",
-      "loading": "Loading your rounds...",
-      "error": "Your rounds could not be loaded.",
-      "empty": "No rounds are available here yet."
-    },
-    "yourHolesSheet": {
-      "title": "Your 18 holes",
-      "field": "Field",
-      "byHole": "By hole",
-      "worstFirst": "Worst first",
-      "sortA11y": "Sort your holes",
-      "loading": "Loading your holes...",
-      "empty": "Your hole-by-hole record is not available yet.",
-      "distribution": "Your distribution",
-      "birdie": "Birdie+",
-      "par": "Par",
-      "bogey": "Bogey",
-      "double": "Double+",
-      "doublesLine": "You make {{count}} doubles or worse a round here.",
-      "holes": "Hole by hole",
-      "costliestBetter": "Hole {{hole}} costs you most, but you still beat the field there.",
-      "costliestWorse": "Hole {{hole}} costs you most, {{difference}} more than the field.",
-      "costliestNoField": "Hole {{hole}} costs you most here.",
-      "pars": "How each par plays for you",
-      "parsMeta": "Shots over par a round",
-      "thirds": "How your round unfolds",
-      "thirdsMeta": "Shots dropped by third",
-      "thirdsEven": "You drop shots evenly across the three parts of the round.",
-      "thirdsDifference": "You drop {{difference}} shots more over the {{worst}} than the {{best}}."
-    },
-    "whoPlaysHereMeta_one": "1 golfer",
-    "whoPlaysHereMeta_other": "{{count}} golfers",
     "a11y": {
       "openMediaTab": "[~~Őƥéñ Ṁéđíá ţáƀ~~]",
       "sections": "[~~Ĉőúřšé Đéţáíļ Šéĉţíőñš~~]"
@@ -188,6 +492,18 @@
       "readMore": "[~~Řéáđ ɱőřé~~]",
       "showLess": "[~~Šĥőŵ ļéšš~~]",
       "top100Label": "[~~Ţőƥ 100~~]"
+    },
+    "allHolesSheet": {
+      "explainer": "A hole is marked when it sits at least four places out and at least 0.07 of a shot from what its index should return, scaled to this course's own spread.",
+      "holes": "Hole by hole",
+      "indexedPlays": "indexed {{index}}, plays {{plays}}",
+      "ladder": "Stroke index against how it plays",
+      "outOfStep_one": "1 out of step",
+      "outOfStep_other": "{{count}} out of step",
+      "pars": "How each par plays",
+      "plays": "Plays",
+      "si": "SI",
+      "title": "All 18 holes"
     },
     "blocks": {
       "aboutThisPlace": "[~~ÁƁŐÚŢ ŢĤÍŠ ƤĻÁĈÉ~~]",
@@ -290,9 +606,9 @@
     },
     "friends": {
       "kicker": "[~~ƑŘÍÉÑĐŠ ŴĤŐ ƤĻÁÝÉĐ ĤÉŘÉ~~]",
-      "namesAndMore": "[~~{{names}} áñđ {{count}} ɱőřé~~]",
       "meta_one": "[1 îñ ýöûŕ çîŕçļé]",
-      "meta_other": "[{{count}} îñ ýöûŕ çîŕçļé]"
+      "meta_other": "[{{count}} îñ ýöûŕ çîŕçļé]",
+      "namesAndMore": "[~~{{names}} áñđ {{count}} ɱőřé~~]"
     },
     "handicapCue": {
       "bannerAction": "[~~Ĉőññéĉţ →~~]",
@@ -381,12 +697,22 @@
     },
     "mediaStrip": {
       "helpDiscover": "[~~Ĥéļƥ ƒéļļőŵ ĝőļƒéřš đíšĉőṽéř ţĥíš ĉőúřšé — šĥářé ýőúř éẋƥéříéñĉé.~~]",
-      "seeAll": "[~~Šéé áļļ~~]",
-      "share": "[~~Šĥářé ýőúř éẋƥéříéñĉé~~]",
       "photoCount_one": "[1 рĥöţö]",
       "photoCount_other": "[{{count}} рĥöţöş]",
+      "seeAll": "[~~Šéé áļļ~~]",
+      "share": "[~~Šĥářé ýőúř éẋƥéříéñĉé~~]",
       "videoCount_one": "[1 νîðéö]",
       "videoCount_other": "[{{count}} νîðéöş]"
+    },
+    "members": {
+      "havePlayed_one": "[1 member has played here",
+      "havePlayed_other": "[{{count}} members have played here",
+      "meta_one": "[1 member",
+      "meta_other": "[{{count}} members",
+      "namesAndOthers_one": "[{{names}} and 1 other",
+      "namesAndOthers_other": "[{{names}} and {{count}} others",
+      "noneInCircle_one": "[1 member, none in your circle yet",
+      "noneInCircle_other": "[{{count}} members, none in your circle yet"
     },
     "nearby": {
       "kicker": "[~~ÑÉÁŘƁÝ~~]",
@@ -441,13 +767,13 @@
       "prosSub": "[~~Ĥóŵ ţĥé ƥŕóƒéššíóñáļ ƒíéļď ƥļáýéđ íť~~]"
     },
     "rating": {
+      "allReviewsSub": "[Éνéŕý ŕéνîéŵ, ţĥé şçöŕé şрŕéåð åñð ţĥé çåţéĝöŕý şçöŕéş.]",
       "friends": "[~~ƑŘÍÉÑĐŠ ÁṼĜ~~]",
       "kicker": "[~~ĈŐṀṀÚÑÍŢÝ ŘÁŢÍÑĜ~~]",
       "overall": "[~~ŐṼÉŘÁĻĻ~~]",
-      "yours": "[~~ÝŐÚŘ ŘÁŢÍÑĜ~~]",
       "tooFew_one": "[Ƒŕöm 1 ŕåţîñĝ — ţöö ƒéŵ ţö ъé şéţţļéð.]",
       "tooFew_other": "[Ƒŕöm {{count}} ŕåţîñĝş — ţöö ƒéŵ ţö ъé şéţţļéð.]",
-      "allReviewsSub": "[Éνéŕý ŕéνîéŵ, ţĥé şçöŕé şрŕéåð åñð ţĥé çåţéĝöŕý şçöŕéş.]"
+      "yours": "[~~ÝŐÚŘ ŘÁŢÍÑĜ~~]"
     },
     "records": {
       "allBoards": "All boards",
@@ -477,12 +803,12 @@
     "sections": {
       "aboutThisPlace": "[[Àbóút thís plãçé]]",
       "howItPlays": "[Ĥôŵ îţ þļåŷś]",
+      "keepExploring": "[Keep exploring",
+      "photos": "[Рĥöţöş]",
       "recordBook": "The record book",
       "whatPeopleSay": "[Ŵĥåţ рéöрļé şåý]",
-      "whoPlaysHere": "[Ŵĥö рļåýş ĥéŕé]",
-      "photos": "[Рĥöţöş]",
       "whereItIs": "[Ŵĥéŕé îţ îş]",
-      "keepExploring": "[Keep exploring"
+      "whoPlaysHere": "[Ŵĥö рļåýş ĥéŕé]"
     },
     "suggestEdit": {
       "cancel": "[~~Ĉáñĉéļ~~]",
@@ -507,6 +833,8 @@
       "reviews": "[~~Řéṽíéŵš~~]",
       "you": "[~~Ýőú~~]"
     },
+    "whoPlaysHereMeta_one": "1 golfer",
+    "whoPlaysHereMeta_other": "{{count}} golfers",
     "you": {
       "aRound": "[~~á řőúñđ~~]",
       "avgGross": "[~~Áṽĝ ĝřőšš~~]",
@@ -561,15 +889,42 @@
       "yourRating": "[~~Ýőúř řáţíñĝ~~]",
       "yours": "[~~Ýőúřš~~]"
     },
-    "members": {
-      "meta_one": "[1 member",
-      "meta_other": "[{{count}} members",
-      "namesAndOthers_one": "[{{names}} and 1 other",
-      "namesAndOthers_other": "[{{names}} and {{count}} others",
-      "noneInCircle_one": "[1 member, none in your circle yet",
-      "noneInCircle_other": "[{{count}} members, none in your circle yet",
-      "havePlayed_one": "[1 member has played here",
-      "havePlayed_other": "[{{count}} members have played here"
+    "yourHolesSheet": {
+      "birdie": "Birdie+",
+      "bogey": "Bogey",
+      "byHole": "By hole",
+      "costliestBetter": "Hole {{hole}} costs you most, but you still beat the field there.",
+      "costliestNoField": "Hole {{hole}} costs you most here.",
+      "costliestWorse": "Hole {{hole}} costs you most, {{difference}} more than the field.",
+      "distribution": "Your distribution",
+      "double": "Double+",
+      "doublesLine": "You make {{count}} doubles or worse a round here.",
+      "empty": "Your hole-by-hole record is not available yet.",
+      "field": "Field",
+      "holes": "Hole by hole",
+      "loading": "Loading your holes...",
+      "par": "Par",
+      "pars": "How each par plays for you",
+      "parsMeta": "Shots over par a round",
+      "sortA11y": "Sort your holes",
+      "thirds": "How your round unfolds",
+      "thirdsDifference": "You drop {{difference}} shots more over the {{worst}} than the {{best}}.",
+      "thirdsEven": "You drop shots evenly across the three parts of the round.",
+      "thirdsMeta": "Shots dropped by third",
+      "title": "Your 18 holes",
+      "worstFirst": "Worst first"
+    },
+    "yourRoundsSheet": {
+      "average": "Average",
+      "best": "Best",
+      "empty": "No rounds are available here yet.",
+      "error": "Your rounds could not be loaded.",
+      "field": "Field",
+      "loading": "Loading your rounds...",
+      "lowestFirst": "Lowest first",
+      "mostRecent": "Most recent",
+      "sortA11y": "Sort your rounds",
+      "title": "Your rounds"
     }
   },
   "courseHero": {
@@ -638,6 +993,16 @@
       }
     },
     "filterBoard": {
+      "featAce_one": "[ĤŐĻÉ ÍÑ ŐÑÉ]",
+      "featAce_other": "[{{count}} ĤŐĻÉŠ ÍÑ ŐÑÉ]",
+      "featAlbatross_one": "[ÁĻƀÁŢŘŐŠŠ]",
+      "featAlbatross_other": "[{{count}} ÁĻƀÁŢŘŐŠŠÉŠ]",
+      "featBirdies_one": "[{{count}} ƀÍŘĐÍÉ]",
+      "featBirdies_other": "[{{count}} ƀÍŘĐÍÉŠ]",
+      "featClean": "[ƀŐĜÉÝ-ƑŘÉÉ]",
+      "featEagle_one": "[ÉÁĜĻÉ]",
+      "featEagle_other": "[ÉÁĜĻÉ ƀŔÁÇÉ]",
+      "featJoin": "[{{first}} + {{second}}]",
       "railCourses_one": "[~~ĈŐŮŔŠÉ~~]",
       "railCourses_other": "[~~ĈŐŮŔŠÉŠ~~]",
       "railDays_one": "[~~ĐÁÝ~~]",
@@ -645,17 +1010,7 @@
       "railMembers_one": "[~~ṀÉṀƁÉŔ~~]",
       "railMembers_other": "[~~ṀÉṀƁÉŔŠ~~]",
       "railRounds_one": "[~~ŔŐŮŃĐ~~]",
-      "railRounds_other": "[~~ŔŐŮŃĐŠ~~]",
-      "featAce_one": "[ĤŐĻÉ ÍÑ ŐÑÉ]",
-      "featAce_other": "[{{count}} ĤŐĻÉŠ ÍÑ ŐÑÉ]",
-      "featAlbatross_one": "[ÁĻƀÁŢŘŐŠŠ]",
-      "featAlbatross_other": "[{{count}} ÁĻƀÁŢŘŐŠŠÉŠ]",
-      "featEagle_one": "[ÉÁĜĻÉ]",
-      "featEagle_other": "[{{count}} ÉÁĜĻÉŠ]",
-      "featBirdies_one": "[{{count}} ƀÍŘĐÍÉ]",
-      "featBirdies_other": "[{{count}} ƀÍŘĐÍÉŠ]",
-      "featClean": "[ƀŐĜÉÝ-ƑŘÉÉ]",
-      "featJoin": "[{{first}} + {{second}}]"
+      "railRounds_other": "[~~ŔŐŮŃĐŠ~~]"
     },
     "findGolfers": {
       "addFriend": "[~~Áđđ ƒříéñđ~~]",
@@ -1055,8 +1410,8 @@
     "scores": {
       "beTheFirst": "[~~Ƥļáý íţ áñđ ýőú ŵíļļ ƀé ţĥé ƒířšţ.~~]",
       "clearCourse": "[~~ßáĉǩ ţő ţĥé ƀőáŕđ~~]",
-      "noOnePlayed": "[~~Ñő őñé ĥáš ƥļáýéđ {{course}} ýéţ.~~]",
       "noCourseMatch": "[~~Ñő ĉőúřšé ƀý ţĥáţ ñáɱé.~~]",
+      "noOnePlayed": "[~~Ñő őñé ĥáš ƥļáýéđ {{course}} ýéţ.~~]",
       "searchAnyCourse": "[~~Šéářĉĥ áñý ĉőúřšé ƒőř áñáļýťíĉš~~]",
       "searchCourseForAnalytics": "[~~Šéářĉĥ á ĉőúřšé ƒőř áñáļýťíĉš~~]",
       "searching": "[~~Šéářĉĥíñĝ~~]"
@@ -1186,6 +1541,31 @@
     "subRegionA11y": "[~~Šéļéĉţ šúƀ-řéĝíőñ~~]",
     "unableToLoadBody": "[~~Ŵé ĉőúļđñ'ţ ƒéţĉĥ ţĥé ĉőúřšéš. Ƥļéášé ĉĥéĉǩ ýőúř ĉőññéĉţíőñ áñđ ţřý áĝáíñ.~~]",
     "unableToLoadTitle": "[~~Úñáƀļé ţő ļőáđ ĉőúřšéš~~]"
+  },
+  "featRarity": {
+    "name": {
+      "ace": "[áçé]",
+      "albatross": "[áļƀáţŕóšš]",
+      "eagleBrace": "[éáĝļé ƀŕáçé]"
+    },
+    "ord": {
+      "1": "[fíŕšţ]",
+      "10": "[ţéñţĥ]",
+      "2": "[šéçóñđ]",
+      "3": "[ţĥíŕđ]",
+      "4": "[fóúŕţĥ]",
+      "5": "[fífţĥ]",
+      "6": "[šíхţĥ]",
+      "7": "[šéνéñţĥ]",
+      "8": "[éíĝĥţĥ]",
+      "9": "[ñíñţĥ]"
+    },
+    "ownerFirst": "[Ýóúŕ fíŕšţ {{feat}}. {{rounds}} ŕóúñđš íñ.]",
+    "ownerRareThree": "[Óñé óf ţĥé fíŕšţ ţĥŕéé ɱéɱƀéŕš ţó đó ţĥíš.]",
+    "ownerRareTwo": "[Óñé óf ţĥé fíŕšţ ţŵó ɱéɱƀéŕš ţó đó ţĥíš.]",
+    "ownerRepeat": "[Ýóúŕ {{ord}} {{feat}} - fíŕšţ šíñçé {{when}}.]",
+    "ownerSole": "[Ţĥé fíŕšţ ɱéɱƀéŕ éνéŕ ţó đó ţĥíš.]",
+    "viewer": "[Ţĥé {{ord}} {{feat}} íñ {{rounds}} ŕóúñđš.]"
   },
   "friends": {
     "signIn": "[~~Šíĝñ íñ~~]",
@@ -1615,19 +1995,31 @@
       "eyebrow": "[~~ŢÉÉŠ ƤĻÁÝÉĐ (ŐƤŢÍŐÑÁĻ)~~]"
     },
     "toast": {
+      "mediaAttachFailed": "[~~Ýőúř řéṽíéŵ ŵáš ƥőšţéđ, ƀúţ á ƥĥőţő čőúļđ ñőţ ƀé áţţáčĥéđ. Éđíţ ţĥé řéṽíéŵ ţő áđđ íţ áĝáíñ.~~]",
+      "mediaAttachHeld": "[~~Ýőúř řéṽíéŵ ŵáš ƥőšţéđ. Őñé ƥĥőţő íš šţíļļ áţţáčĥíñĝ - ýőú ŵíļļ ƒíñđ á Řéţřý őñ ýőúř ƥřőƒíļé íƒ íţ đőéš ñőţ ƒíñíšĥ.~~]",
+      "mediaUploadFailed": "[~~Ýőúř ƥĥőţőš čőúļđ ñőţ ƀé úƥļőáđéđ, šő ñőţĥíñĝ ĥáš ƀééñ ƥőšţéđ. Ţáƥ Řéţřý őñ ţĥé ƥĥőţő, ţĥéñ ƥřéšš Ƥőšţ áĝáíñ.~~]",
       "rateBody": "[~~Ƥļéášé šíĝñ íñ ţő řáţé ĉőúřšéš~~]",
       "signInRequired": "[~~Šíĝñ íñ řéʠúířéđ~~]",
       "voteBody": "[~~Ƥļéášé šíĝñ íñ ţő ṽőţé őñ řéṽíéŵš~~]",
-      "voteFailed": "[~~Ĉőúļđñ'ţ šáṽé ýőúř ṽőţé~~]",
-      "mediaUploadFailed": "[~~Ýőúř ƥĥőţőš čőúļđ ñőţ ƀé úƥļőáđéđ, šő ñőţĥíñĝ ĥáš ƀééñ ƥőšţéđ. Ţáƥ Řéţřý őñ ţĥé ƥĥőţő, ţĥéñ ƥřéšš Ƥőšţ áĝáíñ.~~]",
-      "mediaAttachFailed": "[~~Ýőúř řéṽíéŵ ŵáš ƥőšţéđ, ƀúţ á ƥĥőţő čőúļđ ñőţ ƀé áţţáčĥéđ. Éđíţ ţĥé řéṽíéŵ ţő áđđ íţ áĝáíñ.~~]",
-      "mediaAttachHeld": "[~~Ýőúř řéṽíéŵ ŵáš ƥőšţéđ. Őñé ƥĥőţő íš šţíļļ áţţáčĥíñĝ - ýőú ŵíļļ ƒíñđ á Řéţřý őñ ýőúř ƥřőƒíļé íƒ íţ đőéš ñőţ ƒíñíšĥ.~~]"
+      "voteFailed": "[~~Ĉőúļđñ'ţ šáṽé ýőúř ṽőţé~~]"
     },
     "wizard": {
       "a11yStep": "[~~Šţéƥ {{n}} őƒ 3, {{label}}~~]",
       "backA11y": "[~~Ɓáĉǩ~~]",
       "continue": "[~~Ĉőñţíñúé~~]",
       "deleteA11y": "[~~Řéɱőṽé řéṽíéŵ~~]",
+      "draftRestored": {
+        "body": "[~~Ýőú ļéƒţ ţĥíš éđíţ ƥářţ-ƒíñíšĥéđ, šő ŵé ƀřőúĝĥţ íţ ƀáčǩ. Ŵĥáţ ýőú šéé íš ñőţ ŵĥáţ íš ƥúƀļíšĥéđ ýéţ.~~]",
+        "discard": "[~~Đíščářđ áñđ úšé ƥúƀļíšĥéđ ṽéřšíőñ~~]",
+        "mediaDismiss": "[~~Ĝőţ íţ~~]",
+        "mediaJoin": " áñđ ",
+        "mediaLost": "[~~Ƥĥőţőš áñđ ṽíđéő čőúļđ ñőţ ƀé ǩéƥţ: {{subject}} ŵéřé áţţáčĥéđ ƀéƒőřé áñđ ñééđ řé-áţţáčĥíñĝ.~~]",
+        "mediaPhoto": "[~~1 ƥĥőţő~~]",
+        "mediaPhotos": "[~~{{count}} ƥĥőţőš~~]",
+        "mediaVideo": "[~~1 ṽíđéő~~]",
+        "mediaVideos": "[~~{{count}} ṽíđéőš~~]",
+        "title": "[~~Ůñšáṽéđ čĥáñĝéš řéšţóřéđ~~]"
+      },
       "hint": {
         "clubhouse": "[~~Ŵéļĉőɱé, ƒőőđ, áţɱőšƥĥéřé~~]",
         "condition": "[~~Ĝřééñš, ƒáířŵáýš, ƀúñǩéřš őñ ţĥé đáý~~]",
@@ -1691,18 +2083,6 @@
         "teesEyebrow": "[~~Ţééš ƥļáýéđ~~]",
         "wordsEyebrow": "[~~Ýőúř ŵőřđš~~]"
       },
-      "draftRestored": {
-        "title": "[~~Ůñšáṽéđ čĥáñĝéš řéšţóřéđ~~]",
-        "body": "[~~Ýőú ļéƒţ ţĥíš éđíţ ƥářţ-ƒíñíšĥéđ, šő ŵé ƀřőúĝĥţ íţ ƀáčǩ. Ŵĥáţ ýőú šéé íš ñőţ ŵĥáţ íš ƥúƀļíšĥéđ ýéţ.~~]",
-        "discard": "[~~Đíščářđ áñđ úšé ƥúƀļíšĥéđ ṽéřšíőñ~~]",
-        "mediaLost": "[~~Ƥĥőţőš áñđ ṽíđéő čőúļđ ñőţ ƀé ǩéƥţ: {{subject}} ŵéřé áţţáčĥéđ ƀéƒőřé áñđ ñééđ řé-áţţáčĥíñĝ.~~]",
-        "mediaPhoto": "[~~1 ƥĥőţő~~]",
-        "mediaPhotos": "[~~{{count}} ƥĥőţőš~~]",
-        "mediaVideo": "[~~1 ṽíđéő~~]",
-        "mediaVideos": "[~~{{count}} ṽíđéőš~~]",
-        "mediaJoin": " áñđ ",
-        "mediaDismiss": "[~~Ĝőţ íţ~~]"
-      },
       "uploadingMedia": "[~~Ůƥļőáđíñĝ ƥĥőţőš...~~]"
     },
     "write": {
@@ -1713,16 +2093,35 @@
     },
     "writePromptInline": "[~~⭐ Ŵříţé ýőúř řéṽíéŵ~~]"
   },
+  "reviewSheet": {
+    "communityAverage_one": "[!! Community average {{average}}, from {{count}} rating !!]",
+    "communityAverage_other": "[!! Community average {{average}}, from {{count}} ratings !!]"
+  },
   "scorecard": {
+    "atThisCourseBare": "At this course",
+    "atThisCourseOther": "[~~{{name}} áţ ţĥíš ĉőúřšé~~]",
+    "atThisCourseSelf": "[~~Ýőú áţ ţĥíš ĉőúřšé~~]",
+    "atThisCourse_one": "At this course · your {{count}} round here",
+    "atThisCourse_other": "At this course · your {{count}} rounds here",
+    "avgHereNeutral": "[~~Áṽĝ ĥéřé~~]",
+    "avgHereOther": "[~~{{whose}} áṽĝ~~]",
+    "beatFieldBasis_one": "[Based on 1 other golfer who has played here.]",
+    "beatFieldBasis_other": "[Based on {{count}} other golfers who have played here.]",
+    "beatFieldOn": "[~~Ýőú ɱáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ {{scored}} ĥőļéš.~~]",
+    "beatFieldOnPartial": "[~~Ýőú ɱáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ ţĥé {{scored}} ĥőļéš ŵíţĥ ƒíéļđ đáţá.~~]",
+    "beatFieldOnTour": "[~~Ṁáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ {{scored}} ĥőļéš.~~]",
+    "beatFieldOnTourPartial": "[~~Ṁáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ ţĥé {{scored}} ĥőļéš ŵíţĥ ƒíéļđ đáţá.~~]",
+    "beatFieldOther": "[~~{{name}} ƀéáţ ţĥé field áṽéřáĝé őñ {{n}} őƒ {{m}} ĥőļéš.~~]",
+    "beatFieldSelf": "[~~Ýőú ƀéáţ ţĥé field áṽéřáĝé őñ {{n}} őƒ {{m}} ĥőļéš.~~]",
+    "beatFieldVoice": "[~~{{who}} ɱáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ {{scored}} ĥőļéš.~~]",
+    "beatFieldVoicePartial": "[~~{{who}} ɱáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ ţĥé {{scored}} ĥőļéš ŵíţĥ ƒíéļđ đáţá.~~]",
+    "commentReview": "[Comment on this review]",
     "feat": {
       "ace": {
         "label": "[~~ĤŐĻÉ ÍŃ ŐŃÉ~~]"
       },
       "albatross": {
         "label": "[~~ÁĻƁÁŢŘŐŠŠ~~]"
-      },
-      "eagle": {
-        "label": "[~~ÉÁĜĻÉ~~]"
       },
       "birdies": {
         "label": "[~~ƁÍŘĐÍÉŠ~~]",
@@ -1732,23 +2131,17 @@
         "label": "[~~ĈĻÉÁŃ ĈÁŘĐ~~]",
         "sub": "[~~ñőţ á šĥőţ đřőƥƥéđ~~]"
       },
+      "eagle": {
+        "label": "[~~ÉÁĜĻÉ~~]"
+      },
+      "eagleBrace": {
+        "label": "[~~ÉÁĜĻÉ ƀŔÁÇÉ~~]"
+      },
       "onHole": "[~~őñ ţĥé {{hole}}~~]"
     },
-    "atThisCourseBare": "At this course",
-    "atThisCourseSelf": "[~~Ýőú áţ ţĥíš ĉőúřšé~~]",
-    "atThisCourseOther": "[~~{{name}} áţ ţĥíš ĉőúřšé~~]",
-    "atThisCourse_one": "At this course · your {{count}} round here",
-    "atThisCourse_other": "At this course · your {{count}} rounds here",
-    "avgHereNeutral": "[~~Áṽĝ ĥéřé~~]",
-    "avgHereOther": "[~~{{whose}} áṽĝ~~]",
-    "beatFieldOn": "[~~Ýőú ɱáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ {{scored}} ĥőļéš.~~]",
-    "beatFieldOnPartial": "[~~Ýőú ɱáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ ţĥé {{scored}} ĥőļéš ŵíţĥ ƒíéļđ đáţá.~~]",
-    "beatFieldOnTour": "[~~Ṁáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ {{scored}} ĥőļéš.~~]",
-    "beatFieldOnTourPartial": "[~~Ṁáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ ţĥé {{scored}} ĥőļéš ŵíţĥ ƒíéļđ đáţá.~~]",
-    "beatFieldVoice": "[~~{{who}} ɱáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ {{scored}} ĥőļéš.~~]",
-    "beatFieldVoicePartial": "[~~{{who}} ɱáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ ţĥé {{scored}} ĥőļéš ŵíţĥ ƒíéļđ đáţá.~~]",
     "field": "[~~Ƒíéļđ~~]",
     "fieldAvg": "[~~Ƒíéļđ áṽĝ~~]",
+    "fieldShort": "[Field]",
     "figBeatField": "[BEAT FIELD]",
     "figBest": "[BEST]",
     "figHcpAtTime": "[~~ĤĈƤ áţ ţĥé ţíɱé~~]",
@@ -1766,7 +2159,11 @@
     "in": "[~~Íñ~~]",
     "inN": "[~~ÍÑ {{n}}~~]",
     "legendNotPlayed": "[Ńöţ ƥĺåýéð]",
+    "likeReview": "[Like this review]",
     "nineHoleTag": "9 holes",
+    "noFieldLine_one": "[Only 1 other golfer has played here, so there is no field to compare with yet.]",
+    "noFieldLine_other": "[Only {{count}} other golfers have played here, so there is no field to compare with yet.]",
+    "noFieldNobody": "[Nobody else has played here yet, so there is no field to compare with.]",
     "out": "[~~Őúţ~~]",
     "outN": "[~~ŐÚŢ {{n}}~~]",
     "par": "[~~Ƥář~~]",
@@ -1828,17 +2225,7 @@
     "vsYourAvgLevel": "[~~Říĝĥţ őñ ýőúř áṽéřáĝé ĥéřé.~~]",
     "vsYourAvgWorse": "[~~{{n}} šĥőţš ŵőřšé ţĥáñ ýőúř áṽéřáĝé ĥéřé.~~]",
     "you": "[~~Ýőú~~]",
-    "yourAvgHere": "[~~Ýőúř áṽĝ ĥéřé~~]",
-    "beatFieldSelf": "[~~Ýőú ƀéáţ ţĥé field áṽéřáĝé őñ {{n}} őƒ {{m}} ĥőļéš.~~]",
-    "beatFieldOther": "[~~{{name}} ƀéáţ ţĥé field áṽéřáĝé őñ {{n}} őƒ {{m}} ĥőļéš.~~]",
-    "beatFieldBasis_one": "[Based on 1 other golfer who has played here.]",
-    "beatFieldBasis_other": "[Based on {{count}} other golfers who have played here.]",
-    "noFieldLine_one": "[Only 1 other golfer has played here, so there is no field to compare with yet.]",
-    "noFieldLine_other": "[Only {{count}} other golfers have played here, so there is no field to compare with yet.]",
-    "noFieldNobody": "[Nobody else has played here yet, so there is no field to compare with.]",
-    "fieldShort": "[Field]",
-    "likeReview": "[Like this review]",
-    "commentReview": "[Comment on this review]"
+    "yourAvgHere": "[~~Ýőúř áṽĝ ĥéřé~~]"
   },
   "search": {
     "yourRounds": "[~~Ýőúř řőúñđš~~]"
@@ -2153,364 +2540,5 @@
     "sheetSubNoAvg": "[~~{{courses}} ĉőúřšéš . {{rounds}} řőúñđš~~]",
     "sheetTitle": "[~~Ýőúř ĉőúřšé áñáļýţíĉš~~]",
     "vsYou": "[~~ṼŠ ÝŐÚ~~]"
-  },
-  "amateur": {
-    "hero": {
-      "metric": {
-        "lowestGross": "[LOWEST GROSS]",
-        "lowestNet": "[LOWEST NET]",
-        "bestStableford": "[BEST STABLEFORD]",
-        "vsHandicap": "[BEST VS HANDICAP]",
-        "mostBirdies": "[MOST BIRDIES]",
-        "mostEagles": "[MOST EAGLES]",
-        "mostRounds": "[MOST ROUNDS]",
-        "mostCourses": "[MOST COURSES]"
-      },
-      "window": {
-        "d14": "[14 DAYS]",
-        "d30": "[30 DAYS]",
-        "d90": "[90 DAYS]"
-      },
-      "span": {
-        "d14": "[this fortnight]",
-        "d30": "[this month]",
-        "d90": "[this quarter]"
-      },
-      "spanNoun": {
-        "d14": "[fortnight]",
-        "d30": "[month]",
-        "d90": "[quarter]"
-      },
-      "unit": {
-        "net": "[net]",
-        "points": "[points]",
-        "underPar": "[under par]",
-        "birdies": "[birdies]",
-        "eagles": "[eagles]",
-        "rounds": "[rounds]",
-        "courses": "[courses]"
-      },
-      "context": {
-        "clear": "[{{margin}} clear of the next best.]",
-        "offGross": "[Off {{hcp}}, gross {{gross}}.]",
-        "nobody": "[Nobody else made more than {{runnerUp}}.]",
-        "busiestCircle": "[The busiest {{span}} in your circle.]",
-        "poolCircleLong": "[Best of {{rounds}} rounds in your circle {{span}}.]",
-        "poolCircleShort": "[Best of {{rounds}} in your circle.]",
-        "poolEveryoneLong": "[Best of {{rounds}} rounds across clbhouz {{span}}.]",
-        "poolEveryoneShort": "[Best of {{rounds}} across clbhouz.]"
-      },
-      "spread": {
-        "rounds": "[{{count}} rounds]",
-        "rounds_one": "[{{count}} round]",
-        "rounds_other": "[{{count}} rounds]",
-        "courses": "[{{count}} courses]",
-        "courses_one": "[{{count}} course]",
-        "courses_other": "[{{count}} courses]",
-        "both": "[Across {{rounds}}, {{courses}}.]",
-        "roundsOnly": "[Across {{rounds}}.]"
-      }
-    },
-    "stream": {
-      "view": {
-        "all": "[Åll one]",
-        "scores": "[Sçörés one]",
-        "watch": "[Wåtçh one]",
-        "courses": "[Courses]",
-        "reviews": "[Reviews]"
-      },
-      "shelf": {
-        "clips": "[Çlîps one]",
-        "moments": "[Fröm thé çömmünîty one]",
-        "standing": "[Where you stand]",
-        "clubWeek": "[Thîs wéék åt {{club}} one two]",
-        "circle": "[Yóür çîrçlé one two]",
-        "videos": "[Videos]"
-      },
-      "scope": {
-        "club": "[Mý çlüb one]",
-        "world": "[Wörld one]",
-        "yourClub": "[your club]",
-        "theWorld": "[the world]",
-        "circle": "[My circle]",
-        "yourCircle": "[your circle]"
-      },
-      "scopes": "[Sçörés sçöpé one]",
-      "roundCount": "[{{count}} röünds one]",
-      "connect": {
-        "body": "[Çönnéçt å håndîçåp ånd évérý röünd yöü plåý lånds héré, rånkéd ågåînst évérýöné whö hås plåýéd thé såmé çöürsé. one two three four]",
-        "action": "[Çönnéçt å håndîçåp > one two]"
-      },
-      "seeAll": "[Séé åll {{count}} one two]",
-      "seeAllRounds_one": "[Šéé áļļ {{count}} řőúñđ]",
-      "seeAllRounds_other": "[Šéé áļļ {{count}} řőúñđš]",
-      "seeAllRoundsPlain": "[Šéé áļļ řőúñđš]",
-      "allRounds": "[Áļļ řőúñđš]",
-      "seeAllClips_one": "[Šéé áļļ {{count}} ĉļíƥ]",
-      "seeAllClips_other": "[Šéé áļļ {{count}} ĉļíƥš]",
-      "seeAllMoments_one": "[Šéé áļļ {{count}} ɱőɱéñţ]",
-      "seeAllMoments_other": "[Šéé áļļ {{count}} ɱőɱéñţš]",
-      "seeAllCourses_one": "[Šéé áļļ {{count}} ĉőúřšé]",
-      "seeAllCourses_other": "[Šéé áļļ {{count}} ĉőúřšéš]",
-      "views": "[Éxplöré vîéws one]",
-      "aMember": "[Å mémbér one]",
-      "nothingYet": "[Nöthîng héré töüçhés yöür çöürsés yét. Föllöw å çöürsé ör çönnéçt å håndîçåp ånd thîs pågé béçömés yöürs. one two three four five]",
-      "you": "[Yöü one]",
-      "aCourse": "[å çöürsé one]",
-      "chip": {
-        "rating": "[råtîng one]",
-        "world": "[wörld one]",
-        "gbi": "[GB&Î one]",
-        "net": "NET",
-        "hcp": "HCP"
-      },
-      "visual": {
-        "ace": "[HÖLÉ ÎN ÖNÉ ÖN {{n}} one]",
-        "albatross": "[ÅLBÅTRÖSS ÖN {{n}} one]",
-        "eagle": "[ÉÅGLÉ ÖN {{n}} one]",
-        "triple": "[TRÎPLÉ ÖN {{n}} one]",
-        "double": "[DÖÜBLÉ ÖN {{n}} one]",
-        "birdie": "[BÎRDÎÉ one]",
-        "par": "[PÅR one]",
-        "bogey": "[BÖGÉÝ one]"
-      },
-      "kicker": {
-        "ownRound": "[Yöür röünd one]",
-        "courseRecord": "[Çöürsé réçörd one]",
-        "onYourList": "[Ön yöür lîst one]",
-        "atYourClub": "[Åt yöür çlüb one]",
-        "aroundRegion": "[{{region}} one]",
-        "aroundWorld": "[Wörld one]",
-        "backlog": "[Fröm {{month}} one]",
-        "news": "[Néws one]",
-        "clip": "[Çlîp one]",
-        "watch": "[Löngér wåtçh one]",
-        "moment": "[Fröm thé çömmünîty one]",
-        "course": "[Çöürsé one]",
-        "aroundCountry": "[{{country}} one]"
-      },
-      "headline": {
-        "recordTaken": "[{{player}} took the course record with a {{gross}}. one two]",
-        "ace": "[A hole in one. one two]",
-        "albatross": "[An albatross. one two]",
-        "listNewLow": "[{{gross}}, å néw löw ön yöür lîst. one two]",
-        "bogeyFree": "[Wént bögéy fréé för {{gross}}. one two]",
-        "birdieHaul": "[{{count}} birdies in a round of {{gross}}. one two]",
-        "roundToPar": "[{{player}} shot {{article}} {{gross}}, {{topar}}. one two]",
-        "round": "[{{player}} shot {{article}} {{gross}}. one two]",
-        "played": "[Plåyéd. one]",
-        "recordLost": "[{{player}} took your course record with a {{gross}}. one two]",
-        "recordLostGap": "[Töök yöür cöürsé récörd wîth å {{gross}}. Yöür bést îs {{delta}} béhînd. one two three]",
-        "rankDown": "[{{player}} shot {{article}} {{gross}}. You are now {{ord}} of {{of}} here. one two]",
-        "rankDownBy": "[Wént röünd în {{gross}} ånd püshéd yöü döwn {{delta}} tö {{n}} öf {{of}}. one two three]",
-        "rankUp": "[Your {{gross}} is the {{ord}} best round played here. one two]",
-        "rankUpBy": "[Your {{gross}} is the {{ord}} best round played here, up {{n}} places. one two]",
-        "rankHold": "[Your {{gross}} is still the {{ord}} best round anyone has played here. one two]",
-        "playedNoChange": "[{{player}} went round in {{gross}}. Your {{ord}} of {{of}} here is unchanged. one two]",
-        "recordTakenBest": "[{{player}} took the course record with a {{gross}}, {{topar}}. Your best here is {{best}}. one two]",
-        "recordTakenToPar": "[{{player}} took the course record with a {{gross}}, {{topar}}. one two]",
-        "recordOwnToPar": "[You took the course record with a {{gross}}, {{topar}}. one two]",
-        "recordOwn": "[You took the course record with a {{gross}}. one two]",
-        "recordLostSince": "[{{player}} took your course record with a {{gross}}. Your {{best}} had stood since {{month}}. one two]",
-        "recordLostBest": "[{{player}} took your course record with a {{gross}}. Your best here is {{best}}. one two]",
-        "eagleHole": "[An eagle on the {{ordHole}}, in a round of {{gross}}. one two]",
-        "eagle": "[An eagle, in a round of {{gross}}. one two]",
-        "aceHole": "[A hole in one on the {{ordHole}}. one two]",
-        "albatrossHole": "[An albatross on the {{ordHole}}, in a round of {{gross}}. one two]",
-        "albatrossRound": "[An albatross, in a round of {{gross}}. one two]",
-        "aceToPar": "[A hole in one, in a round of {{gross}}, {{topar}}. one two]",
-        "aceHoleToPar": "[A hole in one on the {{ordHole}}, in a round of {{gross}}, {{topar}}. one two]",
-        "eagleToPar": "[An eagle, in a round of {{gross}}, {{topar}}. one two]",
-        "eagleHoleToPar": "[An eagle on the {{ordHole}}, in a round of {{gross}}, {{topar}}. one two]",
-        "albatrossRoundToPar": "[An albatross, in a round of {{gross}}, {{topar}}. one two]",
-        "albatrossHoleToPar": "[An albatross on the {{ordHole}}, in a round of {{gross}}, {{topar}}. one two]",
-        "birdieHaulToPar": "[{{count}} birdies in a round of {{gross}}, {{topar}}. one two]",
-        "listFirst": "[{{player}} shot {{article}} {{gross}} — the lowest anyone has played here. one two]",
-        "rankDownMoved": "[{{player}} shot {{article}} {{gross}}. You are now {{ord}} of {{of}} here, down {{n}}. one two]",
-        "rankUpOthers": "[You are now {{ord}} of {{of}} here, up {{n}}. one two]",
-        "rankUpOthersPlain": "[You are now {{ord}} of {{of}} here. one two]",
-        "featAce_one": "[á ĥőļé íñ őñé]",
-        "featAce_other": "[{{spokenCount}} ĥőļéš íñ őñé]",
-        "featAlbatross_one": "[áñ áļƀáţřőšš]",
-        "featAlbatross_other": "[{{spokenCount}} áļƀáţřőššéš]",
-        "featEagle_one": "[áñ éáĝļé]",
-        "featEagle_other": "[{{spokenCount}} éáĝļéš]",
-        "featBirdies_one": "[{{spokenCount}} ƀířđíé]",
-        "featBirdies_other": "[{{spokenCount}} ƀířđíéš]",
-        "featClean_one": "[á ƀőĝéý-ƒřéé ĉářđ]",
-        "featClean_other": "[á ƀőĝéý-ƒřéé ĉářđ]",
-        "featJoin": "[{{first}} áñđ {{second}}]",
-        "featsRound": "[{{feats}}, íñ á řőúñđ őƒ {{gross}}.]",
-        "featsRoundToPar": "[{{feats}}, íñ á řőúñđ őƒ {{gross}}, {{topar}}.]",
-        "featsOnly": "[{{feats}}.]"
-      },
-      "standing": {
-        "board": "[Lowest gross]",
-        "of": "[of {{count}}]",
-        "lastChange": "[last change {{when}}]",
-        "boardNet": "[Nét one]",
-        "boardGross": "[Gröss one]",
-        "pickBoard": "[Chånge böård one two]",
-        "unreadable": "[Yöür ståndîng çöüld nöt bé löådéd. one two three]",
-        "retry": "[Trý ågåîn one]",
-        "boards": {
-          "net": "[Löwést nét röünd one two]",
-          "topar": "[Löwést gröss röünd one two]",
-          "stableford": "[Bést ståbléförd röünd one two]",
-          "birdies": "[Möst bîrdîés în å röünd one two three]",
-          "improved": "[Bîggést håndîçåp çüt one two]"
-        }
-      },
-      "ratingCount": "[{{count}} rãtïñgs]",
-      "ratingCount_one": "[~~{{count}} řáţíñĝ~~]",
-      "ratingCount_other": "[~~{{count}} řáţíñĝš~~]",
-      "empty": {
-        "courses": "[No courses in {{scope}} yet.]",
-        "reviews": "[No reviews in {{scope}} yet.]"
-      },
-      "course": {
-        "eventRatings": "[{{count}} råtîngs thîs mönth, åvéråging {{mean}}. one two]",
-        "eventLow": "[{{name}}'s {{gross}} îs thé löw héré thîs mönth. one two]",
-        "eventLowAnon": "[{{gross}} îs thé löw héré thîs mönth. one]",
-        "factRated": "[{{rounds}} röünds tråçkéd, råtéd {{rating}} fröm {{count}}. one two]",
-        "factRounds": "[{{rounds}} röünds tråçkéd héré. one]",
-        "factRatedOnly": "[Råtéd {{rating}} fröm {{count}}. one]"
-      },
-      "list": {
-        "eventRecord": "[Néw çöürsé réçörd one]",
-        "eventLow": "[Néw löw öf {{gross}} one]",
-        "eventRating": "[Néwly råtéd {{rating}} one]"
-      },
-      "failed": "[Thís díd nöt löåd. one]",
-      "retry": "[Try ågåín one]",
-      "topar": {
-        "level": "[lévél pår one]",
-        "under": "[{{n}} ündér pår one]",
-        "over": "[{{n}} övér pår one]"
-      },
-      "callout": {
-        "record": "[New course record]",
-        "rankUpTo": "[Up to {{ord}}]",
-        "rankUp": "[Moved up]",
-        "ace": "[Hole in one]",
-        "albatross": "[Albatross]",
-        "eagle": "[Eagle]",
-        "birdies": "[{{n}} birdies]",
-        "bogeyFree": "[Bogey-free]",
-        "bogeyFreeSub": "[Par or better on every hole]",
-        "onHole": "[on the {{ord}}]",
-        "netRecord": "New net course record",
-        "handicapCut": "Handicap cut",
-        "handicapCutSub": "{{from}} to {{to}}",
-        "beatHandicap": "Beat handicap by {{n}}",
-        "tagNew": "[NEW]",
-        "courseRecord": "[Course record]",
-        "netCourseRecord": "[Net course record]",
-        "tagMovedUp": "[MOVED UP]",
-        "nowRank": "[Now {{ord}}]",
-        "movedUpBoard": "[Moved up the board]",
-        "aceCount_one": "[Ĥőļé íñ őñé]",
-        "aceCount_other": "[{{count}} ĥőļéš íñ őñé]",
-        "albatrossCount_one": "[Áļƀáţřőšš]",
-        "albatrossCount_other": "[{{count}} áļƀáţřőššéš]",
-        "eagleCount_one": "[Éáĝļé]",
-        "eagleCount_other": "[{{count}} éáĝļéš]",
-        "featJoin": "[{{first}} + {{second}}]"
-      },
-      "stat": {
-        "par": "[PAR]",
-        "net": "[NET]",
-        "vsHcp": "[VS HCP]"
-      },
-      "enrichment": {
-        "strongest": "[~~Šţřőñĝéšţ őñ {{area}}~~]",
-        "photos": "[~~{{count}} ƥĥőţőš~~]",
-        "area": {
-          "design": "[~~đéšíĝñ~~]",
-          "conditions": "[~~ĉőñđíţíőñ~~]",
-          "clubhouse": "[~~ĉļúƀĥőúšé~~]",
-          "facilities": "[~~ƒáĉíļíţíéš~~]"
-        }
-      }
-    },
-    "shelf": {
-      "aroundCounty": "[Ãrõũñd {{county}}]",
-      "aroundWorld": "[Ãrõũñd thé wõrld]",
-      "onYourList": "[Õñ ýõũr lïst]",
-      "golfersAtClub": "[Gõlférs ãt {{club}}]",
-      "yourClub": "[ýõũr člũb]",
-      "holdsCourseRecord": "[Hõlds thé kõũrsé rékõrd]",
-      "holdsCourseRecords_one": "[Hõlds ã kõũrsé rékõrd]",
-      "holdsCourseRecords_other": "[Hõlds {{count}} kõũrsé rékõrds]",
-      "recordReason": {
-        "courseRecordHolder": "[Cõũrsé récõrd hõldér]",
-        "womensCourseRecordHolder": "[Wõmén's cõũrsé récõrd hõldér]",
-        "allTimeBirdieLeader": "[Ãll-tïmé bïrdïé léãdér]",
-        "allTimeEagleLeader": "[Ãll-tïmé éãglé léãdér]",
-        "allTimeAceLeader": "[Ãll-tïmé ãcé léãdér]",
-        "allTimeStablefordLeader": "[Ãll-tïmé stãbléfõrd léãdér]",
-        "allTimeAlbatrossHolder": "[Ãll-tïmé ãlbãtrõss hõldér]",
-        "mostRoundsHere": "[Mõst rõũñds héré]",
-        "bestScoreToParHere": "[Bést scõré-tõ-pãr héré]"
-      },
-      "roundsHere_one": "[{{count}} rõũñd héré]",
-      "roundsHere_other": "[{{count}} rõũñds héré]",
-      "newThisMonth": "[Néw thïs mõñth]",
-      "follow": "[Fõllõw]",
-      "following": "[Fõllõwïñg]",
-      "topRated": "[Best rated lately]",
-      "golfersToFollow": "[Gõlférs tõ fõllów]",
-      "playsAtClub": "[Pläys ãt {{club}}]",
-      "roundsThisMonth": "[{{count}} rõünds thís mõnth]",
-      "alsoPlays": "[Álsõ pläys {{course}}]",
-      "highestRatedMonth": "[Highest rated this month]",
-      "highestRatedYear": "[Highest rated this year]",
-      "circlePlays": "[Where your circle plays]",
-      "circlePlaysSub": "[Courses the people you follow have played]",
-      "worthTheDrive": "[Worth the drive]",
-      "worthTheDriveSub": "[Rated highly by the few who have played them]",
-      "worldsBest": "[The world's best]",
-      "worldsBestSub": "[Top 100 by rank]",
-      "newOnClbhouz": "[New on clbhouz]",
-      "newOnClbhouzSub": "[Courses rated here for the first time]"
-    },
-    "watch": {
-      "searchPlaceholder": "[!! Search videos, clips and creators !!]",
-      "filters": "[!! Watch filters !!]",
-      "noResults": "[!! Nothing matches {{query}}. !!]",
-      "empty": "[!! Nothing to watch here yet. !!]",
-      "untitled": "[!! Untitled video !!]",
-      "chip": {
-        "all": "[!! All !!]",
-        "forYou": "[!! For you !!]",
-        "friends": "[!! Friends !!]",
-        "yourCourses": "[!! Your courses !!]",
-        "clips": "[!! Clips !!]",
-        "videos": "[!! Videos !!]"
-      },
-      "rail": {
-        "clips": "[!! Clips !!]",
-        "community": "[!! From the community !!]",
-        "videos": "[!! Videos !!]"
-      }
-    },
-    "courses": {
-      "searchPlaceholder": "[Search courses, regions and reviews]",
-      "searchClear": "[Clear search]",
-      "noMatch": "[Nothing matches {{query}}.]",
-      "noPlaceMatch": "[Nothing matches {{query}}.]",
-      "anywhere": "[Anywhere]",
-      "choosePlace": "[Choose a place]",
-      "clearPlace": "[Clear place filter]",
-      "placeTitle": "[Browse by place]",
-      "findPlace": "[Find a country or region]"
-    },
-    "place": {
-      "pair": "[{{place}}, {{nation}}]"
-    },
-    "board": {
-      "backToStream": "[Back to the stream]",
-      "openPicker": "[Choose a board]"
-    }
   }
 }

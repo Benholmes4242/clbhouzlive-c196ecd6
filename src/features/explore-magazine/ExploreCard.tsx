@@ -767,6 +767,13 @@ export function ExploreCard({
       {!onPhoto && item.kind === 'round' && size !== 'pair' ? (
         <RoundStatStrip
           callout={callout}
+          scoreId={item.facts.score_id ?? null}
+          featRarity={item.facts.feat_rarity ?? null}
+          featCounts={{
+            aces: item.facts.holes_in_one ?? null,
+            albatrosses: item.facts.albatrosses ?? null,
+            eagles: item.facts.eagles ?? null,
+          }}
           coursePar={item.facts.course_par ?? null}
           net={item.facts.net != null && item.facts.course_handicap != null ? item.facts.net : null}
           locale={locale}

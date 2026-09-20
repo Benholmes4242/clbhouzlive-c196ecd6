@@ -10,6 +10,13 @@ import { r } from '@/lib/radius';
 import { GOLD_BORDER, GOLD_TINT, GOLD_TINT_10, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 import type { AchievementCallout } from './cardTreatment';
+import {
+  featRarityLines,
+  type FeatOwnerRow,
+  type FeatRarityRow,
+  type RarityFeatCounts,
+} from './featRarity';
+import { useFeatOwnerRowsFor } from '@/hooks/gam/useFeatRarity';
 import type { ExploreRoundFeat } from './roundFeatCollection';
 import { standingOrdinal } from './ordinal';
 import {
@@ -33,12 +40,78 @@ import {
  * the fact that produces it; there is no branch that invents a hole, a previous
  * holder or a margin.
  */
+
+/**
+ * THE RARITY LINES (FEAT RARITY LINES §2/§4).
+ *
+ * The VIEWER line is a full-width headline lane everyone sees. The OWNER strip
+ * sits under it and is drawn only for the round's owner, whose member_* fields
+ * arrive NULL from SQL for everybody else. Both read frozen figures; neither is
+ * recomputed here, and nothing renders when a figure is missing — no partial
+ * sentence, no reserved space.
+ */
+export function FeatRarityLines({
+  scoreId,
+  rows,
+  counts,
+  locale,
+  align = 'panel',
+}: {
+  scoreId: string | null | undefined;
+  rows: FeatRarityRow[] | null | undefined;
+  counts?: RarityFeatCounts;
+  locale: string;
+  align?: 'panel' | 'card';
+}) {
+  const { t } = useTranslation('courses');
+  const owner: FeatOwnerRow[] | null = useFeatOwnerRowsFor(scoreId);
+  const { viewerLine, ownerLine } = featRarityLines({ rows, owner, counts, t, locale });
+  if (!viewerLine && !ownerLine) return null;
+  return (
+    <span
+      data-feat-rarity-lines="true"
+      style={{
+        display: 'block',
+        width: '100%',
+        boxSizing: 'border-box',
+        paddingInline: align === 'card' ? 4 : 0,
+        marginTop: 2,
+        marginBottom: 8,
+      }}
+    >
+      {viewerLine ? (
+        <span
+          data-feat-rarity-viewer="true"
+          style={{ display: 'block', fontFamily: SANS, fontSize: 12.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE }}
+        >
+          {viewerLine}
+        </span>
+      ) : null}
+      {ownerLine ? (
+        <span
+          data-feat-rarity-owner="true"
+          style={{ display: 'block', marginTop: 3, fontFamily: SANS, fontSize: 12.5, fontWeight: 700, lineHeight: 1.3, color: A.AMBER }}
+        >
+          {ownerLine}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
 export function AchievementCalloutPanel({
   callout,
   locale,
+  scoreId = null,
+  featRarity = null,
+  featCounts,
 }: {
   callout: AchievementCallout;
   locale: string;
+  /** The round's whs_score_id — the key the owner lines came back under. */
+  scoreId?: string | null;
+  featRarity?: FeatRarityRow[] | null;
+  featCounts?: RarityFeatCounts;
 }) {
   const { t } = useTranslation('courses');
   const ordHole = (hole: number) => standingOrdinal(hole, locale);
@@ -132,6 +205,7 @@ export function AchievementCalloutPanel({
   const tier = 'tier' in callout ? callout.tier : 'ink';
 
   return (
+    <>
     <span
       data-explore-callout={callout.kind}
       data-explore-callout-tier={tier}
@@ -186,6 +260,8 @@ export function AchievementCalloutPanel({
         ) : null}
       </span>
     </span>
+    <FeatRarityLines scoreId={scoreId} rows={featRarity} counts={featCounts} locale={locale} />
+    </>
   );
 }
 
@@ -230,15 +306,23 @@ export function RoundStatStrip({
   coursePar,
   net,
   locale,
+  scoreId = null,
+  featRarity = null,
+  featCounts,
 }: {
   callout: AchievementCallout | null;
   coursePar: number | null;
   net: number | null;
   locale: string;
+  /** The round's whs_score_id — the key the owner lines came back under. */
+  scoreId?: string | null;
+  featRarity?: FeatRarityRow[] | null;
+  featCounts?: RarityFeatCounts;
 }) {
   const { t } = useTranslation('courses');
   const hasNet = coursePar != null && net != null;
-  if (!callout && !hasNet) return null;
+  const rarity = <FeatRarityLines scoreId={scoreId} rows={featRarity} counts={featCounts} locale={locale} align="card" />;
+  if (!callout && !hasNet) return rarity;
 
   const ord = callout?.kind === 'rank_up' && callout.rank != null
     ? standingOrdinal(callout.rank, locale)
@@ -291,6 +375,7 @@ export function RoundStatStrip({
   })() : null;
 
   return (
+    <>
     <span
       data-explore-stat-strip="round"
       data-explore-callout-tier={achievement ? tier : undefined}
@@ -342,5 +427,7 @@ export function RoundStatStrip({
         </>
       ) : null}
     </span>
+    {rarity}
+    </>
   );
 }

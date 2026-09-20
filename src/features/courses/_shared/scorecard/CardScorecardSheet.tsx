@@ -12,6 +12,11 @@ import { LikedByRow } from '@/components/likes/LikedByRow';
 import type { LikeSource } from '@/hooks/usePostLikes';
 import { GlassCardFootAction } from './GlassCardFootAction';
 import { FEAT_BAND_STYLE, scorecardFeatFor } from './scorecardFeat';
+import {
+  featRarityLines,
+  type FeatOwnerRow,
+  type FeatRarityRow,
+} from '@/features/explore-magazine/featRarity';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
@@ -149,6 +154,13 @@ export interface CardScorecardSheetProps {
    * draws nothing when the prop is absent, so the tour surface is untouched.
    */
   engagement?: CardScorecardEngagement | null;
+  /**
+   * FEAT RARITY LINES §2/§4 — the frozen rows for this round and the owner
+   * fields from get_round_feat_owner_lines (NULLed in SQL for anyone else).
+   * Absent for the tour surface and for hosts that do not read them, and then
+   * no line and no reserved space is drawn.
+   */
+  featRarity?: { rows: FeatRarityRow[]; owner: FeatOwnerRow[] } | null;
   onHorizontalDrag?: {
     onStart: () => void;
     onMove: (dx: number) => void;
@@ -302,13 +314,22 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   presentation = 'overlay',
   onHorizontalDrag = null,
   onStatsSeen,
+  featRarity = null,
   pageShift = null,
   pagePreview = null,
   paging = null,
 
 
 }) => {
-  const { t } = useTranslation(['courses']);
+  const { t, i18n } = useTranslation(['courses']);
+  /* FEAT RARITY LINES §2/§5 — read from the frozen rows the host passed in and
+     never recomputed here. Missing figures produce no line at all. */
+  const rarity = featRarityLines({
+    rows: featRarity?.rows ?? null,
+    owner: featRarity?.owner ?? null,
+    t,
+    locale: i18n.language,
+  });
   /* §3 — THE ARROW KEYS PAGE. Bound at the document while the card is open and
      pageable, so the keys work wherever focus sits inside the sheet, and never
      when there is no sequence. Escape stays the presentation host's. */
@@ -753,7 +774,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 color: A.AMBER,
               }}
             >
-              {t(`courses:scorecard.feat.${feat.kind}.label`)}
+              {t(
+                feat.kind === 'eagle' && feat.count >= 2
+                  ? 'courses:scorecard.feat.eagleBrace.label'
+                  : `courses:scorecard.feat.${feat.kind}.label`,
+              )}
             </span>
             {(feat.hole != null || feat.kind === 'birdies' || feat.kind === 'clean') && (
               <span style={{ fontSize: 11.5, fontWeight: 600, color: A.MUTE }}>
@@ -761,6 +786,28 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   ? t('courses:scorecard.feat.onHole', { hole: formatOrdinal(feat.hole) })
                   : t(`courses:scorecard.feat.${feat.kind}.sub`)}
               </span>
+            )}
+          </div>
+        )}
+        {surface === 'member' && (rarity.viewerLine || rarity.ownerLine) && (
+          <div
+            data-feat-rarity-lines="true"
+            style={{
+              flexShrink: 0,
+              boxSizing: 'border-box',
+              padding: '8px 16px 9px',
+              borderBottom: `1px solid ${A.HAIRLINE}`,
+            }}
+          >
+            {rarity.viewerLine && (
+              <div data-feat-rarity-viewer="true" style={{ fontSize: 12.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE }}>
+                {rarity.viewerLine}
+              </div>
+            )}
+            {rarity.ownerLine && (
+              <div data-feat-rarity-owner="true" style={{ marginTop: 3, fontSize: 12.5, fontWeight: 700, lineHeight: 1.3, color: A.AMBER }}>
+                {rarity.ownerLine}
+              </div>
             )}
           </div>
         )}

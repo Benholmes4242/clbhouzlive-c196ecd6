@@ -5954,6 +5954,48 @@ export type Database = {
           },
         ]
       }
+      gam_round_feat_rarity: {
+        Row: {
+          detected_at: string
+          distinct_members_at_detection: number
+          feat_kind: string
+          global_ordinal: number
+          total_rounds_at_detection: number
+          whs_score_id: string
+        }
+        Insert: {
+          detected_at?: string
+          distinct_members_at_detection: number
+          feat_kind: string
+          global_ordinal: number
+          total_rounds_at_detection: number
+          whs_score_id: string
+        }
+        Update: {
+          detected_at?: string
+          distinct_members_at_detection?: number
+          feat_kind?: string
+          global_ordinal?: number
+          total_rounds_at_detection?: number
+          whs_score_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_round_feat_rarity_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "gam_round_net"
+            referencedColumns: ["whs_score_id"]
+          },
+          {
+            foreignKeyName: "gam_round_feat_rarity_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "gam_round_stats"
+            referencedColumns: ["whs_score_id"]
+          },
+        ]
+      }
       gam_round_stats: {
         Row: {
           albatrosses: number
@@ -21377,6 +21419,17 @@ export type Database = {
           category: string
           margin: number
           previous_holder_name: string
+          whs_score_id: string
+        }[]
+      }
+      get_round_feat_owner_lines: {
+        Args: { p_round_ids: string[] }
+        Returns: {
+          feat_kind: string
+          is_owner: boolean
+          member_ordinal: number
+          member_prev_at: string
+          member_rounds: number
           whs_score_id: string
         }[]
       }
