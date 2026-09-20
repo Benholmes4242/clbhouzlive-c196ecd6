@@ -38,6 +38,8 @@ import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtim
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 
 import { HeroSection } from './sections/HeroSection';
+import { ContestSection } from './sections/ContestSection';
+import { MoveSection } from './sections/MoveSection';
 import { SectionEyebrow } from './sections/SectionEyebrow';
 import { MiniBoard } from './sections/MiniBoard';
 import { OnTheCourse } from '../_shared/OnTheCourse';
@@ -54,6 +56,8 @@ import { FullBoardSheet } from './sections/FullBoardSheet';
 import { useTeeTimesAll } from './data/useTeeTimesAll';
 import { useFieldTop3 } from './data/useFieldTop3';
 import { useTournamentStory } from './data/useTournamentStory';
+import { useTournamentHoleAnalysis } from './data/useTournamentHoleAnalysis';
+import { selectTournamentContest } from './data/tournamentContest';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
@@ -76,6 +80,7 @@ export function TournamentPage() {
   const { data: meta, isLoading, isError: isMetaError, refetch: refetchMeta } =
     useTournamentMeta(tournamentId, { live: pulse.state === 'live' });
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
+  const { data: holeAnalysis } = useTournamentHoleAnalysis(tournamentId, null);
   const { data: liveList = [] } = useLiveTournaments();
 
   // Realtime (equivalent to legacy TournamentDetailPage): board + status.
@@ -197,6 +202,8 @@ export function TournamentPage() {
 
   const leaderboardRows = leaderboard ?? [];
   const hasBoard = leaderboardRows.length > 0;
+  const contest = selectTournamentContest(leaderboardRows, meta, pulse.state);
+  const fieldCount = leaderboardRows.length > 0 ? leaderboardRows.length : (holeAnalysis?.total_players || null);
 
   // Live: deep-link to the richer Leaderboards tab when this event is in
   // the live list; otherwise fall back to the house full-board sheet.
@@ -229,8 +236,12 @@ export function TournamentPage() {
           state={pulse.state}
           imageUrl={courseImage?.imageUrl ?? null}
           tourCode={tourCode}
-          leaderboard={leaderboard}
+          contest={contest}
+          fieldCount={fieldCount}
         />
+
+        <ContestSection contest={contest} state={pulse.state} />
+        <MoveSection contest={contest} state={pulse.state} tourCode={tourCode} />
 
         {/* THE ACT */}
         <section id="the-act">
@@ -242,9 +253,6 @@ export function TournamentPage() {
                   <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} currentRound={meta?.current_round ?? null} />
                 </>
               )}
-              {/* Shared OnTheCourse — featured groups + FULL FIELD expander,
-                  live-score-joined. Self-hides when no featured groups. */}
-              <OnTheCourse tournamentId={tournamentId!} live tourCode={tourCode} />
             </>
           )}
 
@@ -269,6 +277,8 @@ export function TournamentPage() {
         {/* THE STORY — completed events only, self-hides w/o text */}
         {pulse.state === 'completed' && <StorySection story={story?.story ?? null} />}
 
+        {pulse.state === 'live' && <OnTheCourse tournamentId={tournamentId!} live tourCode={tourCode} />}
+
         {/* TEE TIMES BAND — promoted entry point to the round-by-round
             sheet. Renders for live + upcoming states only. */}
         {(pulse.state === 'live' || pulse.state === 'upcoming') && (
@@ -279,12 +289,11 @@ export function TournamentPage() {
           />
         )}
 
-        {/* EVENT INFO — always-on. */}
-        <EventInfoSection meta={meta} broadcast={story?.broadcast ?? null} />
-
-
         {/* THE COURSE */}
         <CourseSection tournamentId={tournamentId!} />
+
+        {/* EVENT INFO — always-on. */}
+        <EventInfoSection meta={meta} broadcast={story?.broadcast ?? null} purseShownInHero={meta.purse != null} />
 
         {/* MOMENTS */}
         <MomentsSection tournamentId={tournamentId!} tourCode={tourCode} />
