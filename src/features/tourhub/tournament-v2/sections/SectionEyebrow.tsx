@@ -13,6 +13,7 @@
  * Action - never a filled pill, never a raw chevron glyph.
  */
 import { A, KICKER, LABEL, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   kicker: string;
@@ -21,6 +22,8 @@ interface Props {
 }
 
 export function SectionEyebrow({ kicker, actionLabel, onAction }: Props) {
+  const { i18n } = useTranslation();
+  const cjk = /^(ja|ko)/.test(i18n.language);
   return (
     <div
       style={{
@@ -28,7 +31,7 @@ export function SectionEyebrow({ kicker, actionLabel, onAction }: Props) {
         padding: '16px 16px 12px', fontFamily: SANS,
       }}
     >
-      <span style={KICKER}>{kicker}</span>
+      <span style={{ ...KICKER, letterSpacing: cjk ? 0 : KICKER.letterSpacing, textTransform: cjk ? 'none' : KICKER.textTransform }}>{kicker}</span>
       {actionLabel && onAction && (
         <button
           type="button"
@@ -48,7 +51,7 @@ export function SectionEyebrow({ kicker, actionLabel, onAction }: Props) {
           className="active:opacity-70 transition-opacity"
         >
           {/* CAPS BUTTON: two points below the READ floor, 0.10em, height unchanged. */}
-          <span style={{ ...LABEL, fontSize: 9, letterSpacing: '0.10em', color: A.INK }}>{actionLabel}</span>
+          <span style={{ ...LABEL, fontSize: 9, letterSpacing: cjk ? 0 : '0.10em', textTransform: cjk ? 'none' : LABEL.textTransform, color: A.INK }}>{actionLabel}</span>
           <span style={{ fontSize: 12, color: A.INK, fontWeight: 700 }} aria-hidden="true">
             {'\u203A'}
           </span>

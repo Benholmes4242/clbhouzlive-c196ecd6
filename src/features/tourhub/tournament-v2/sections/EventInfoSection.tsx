@@ -36,7 +36,7 @@ export function EventInfoSection({ meta, broadcast, purseShownInHero = false }: 
   if (dates) rows.push([t('tournament.eventInfo.dates'), dates]);
 
   if (meta.venue_yardage != null) rows.push([t('tournament.eventInfo.yardage'), t('tournament.eventInfo.yardageShort', { yardage: formatNumber(meta.venue_yardage) })]);
-  if (meta.defending_champion) rows.push([t('tournament.hero.defendingLabel'), meta.defending_champion]);
+  if (meta.defending_champion) rows.push([t('tournament.eventInfo.defendingChampion'), meta.defending_champion]);
   if (broadcast) rows.push([t('tournament.eventInfo.tv'), broadcast]);
   if (meta.purse != null && !purseShownInHero) rows.push([t('tournament.hero.purseLabel'), formatPurse(meta.purse)]);
 
