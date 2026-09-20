@@ -1,5 +1,11 @@
 import type { LeaderCategoryDef, LeaderRow } from './data/useLeaderCategories';
 
+/**
+ * Unverified fallback permitted by L2.1: the database does not yet contain at
+ * least three comparable prior completed seasons from which to derive this
+ * ratio. Replace it with the measured five-season threshold once that history
+ * exists. It has never been validated against a real contested season.
+ */
 export const SEASON_SUBJECT_THRESHOLD = 0.25;
 
 export type SeasonSubject =
