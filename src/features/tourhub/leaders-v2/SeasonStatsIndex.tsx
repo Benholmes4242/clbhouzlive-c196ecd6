@@ -30,7 +30,8 @@ export function SeasonStatsIndex() {
   const { data, isLoading } = useLeaderCategories(tour);
   const [query, setQuery] = useState('');
   const [openKey, setOpenKey] = useState<string | null>(null);
-  const categories = useMemo(() => (data?.categories ?? []).filter((category) => category.key !== 'earnings'), [data?.categories]);
+  // Earnings is excluded from magazine-module selection, not from this measured index.
+  const categories = useMemo(() => data?.categories ?? [], [data?.categories]);
   const visible = useMemo(() => {
     const search = query.trim().toLowerCase();
     return search ? categories.filter((category) => `${t(category.labelKey)} ${category.rows[0]?.name ?? ''}`.toLowerCase().includes(search)) : categories;
