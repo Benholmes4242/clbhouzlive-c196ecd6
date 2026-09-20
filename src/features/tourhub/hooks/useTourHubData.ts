@@ -859,6 +859,8 @@ export function useSinglePlayerStatistics(playerId: string | undefined) {
         strokes_gained: rawExtracted.strokes_gained ?? null,
         // Column, not raw_data.
         strokes_gained_putting: data.strokes_gained_putting ?? null,
+        // Always the current season by construction; carried so callers can assert.
+        season_year: seasonYear,
       } as TourPlayerStatistics;
     },
     enabled: !!playerId,
