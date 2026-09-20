@@ -25,11 +25,22 @@ describe('season magazine selection', () => {
     expect(Math.max(...(result ? playerAppearanceCounts(result).values() : [0]))).toBeLessThanOrEqual(2);
   });
 
-  it('returns a reduced edition rather than blank modules', () => {
+  it('returns an explicit module count and reduced-layout decision', () => {
     const result = selectSeasonMagazine([category('points', [row('a', 100, 1), row('b', 90, 2), row('c', 80, 3)])]);
-    expect(result?.reduced).toBe(true);
+    expect(result?.moduleCount).toBe(1);
+    expect(result?.useReducedLayout).toBe(true);
+    expect(result?.showMovement).toBe(false);
     expect(result?.oneNumber).toBeNull();
     expect(result?.duel).toBeNull();
     expect(result?.tiedList).toBeNull();
+  });
+
+  it('limits tied lists to notable performance categories', () => {
+    const result = selectSeasonMagazine([
+      category('points', [row('a', 100, 1), row('b', 90, 2), row('c', 80, 3)]),
+      category('events_played', [row('d', 20, 1), row('e', 20, 1), row('f', 19, 3)]),
+      category('top_10', [row('g', 8, 1), row('h', 8, 1), row('i', 7, 3)]),
+    ]);
+    expect(result?.tiedList?.key).toBe('top_10');
   });
 });

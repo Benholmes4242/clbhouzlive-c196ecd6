@@ -47,8 +47,9 @@ export function LeadModule({ category, subjectName }: { category: LeaderCategory
 
 export function MovementModule({ category, onPlayerClick }: { category: LeaderCategoryDef; onPlayerClick: (row: LeaderRow) => void }) {
   const { t } = useTranslation('tourhub');
-  const movers = category.rows.filter((row) => row.movement != null).sort((a, b) => Math.abs(b.movement ?? 0) - Math.abs(a.movement ?? 0)).slice(0, 2);
-  if (!movers.length) return null;
+  if (category.movementSource !== 'per_event_points') return null;
+  const movers = category.rows.filter((row) => row.movement != null).sort((a, b) => Math.abs(b.movement ?? 0) - Math.abs(a.movement ?? 0)).slice(0, 4);
+  if (movers.length < 4) return null;
   return <section style={{ padding: '24px', borderBottom: `1px solid ${WHITE_ALPHA_06}` }}><p style={eyebrow}>{t('leaders.season.movement')}</p><h2 style={{ ...title, marginTop: 7 }}>{t('leaders.season.movementTitle')}</h2><div style={{ marginTop: 18, display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: 8 }}>{movers.map((row) => <button type="button" key={row.playerId || row.name} onClick={() => onPlayerClick(row)} style={{ minWidth: 0, minHeight: 112, padding: 14, border: `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', textAlign: 'left', cursor: 'pointer' }}><span style={{ display: 'block', fontSize: 20, fontWeight: 900 }}><Movement value={row.movement} /></span><span style={{ display: 'block', marginTop: 16, color: A.INK, fontSize: 13, fontWeight: 750, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</span><span style={{ display: 'block', marginTop: 4, color: INK_MUTE, fontSize: 10, fontWeight: 750 }}>{row.valueFormatted}</span></button>)}</div></section>;
 }
 
@@ -56,7 +57,7 @@ export function NumberModule({ category, onPlayerClick }: { category: LeaderCate
   const { t } = useTranslation('tourhub');
   const leader = category.rows[0];
   if (!leader) return null;
-  return <section style={{ padding: '28px 24px', borderBottom: `1px solid ${WHITE_ALPHA_06}`, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', gap: 20, alignItems: 'end' }}><div style={{ minWidth: 0 }}><p style={eyebrow}>{t('leaders.season.oneNumber')}</p><h2 style={{ ...title, marginTop: 7 }}>{t(category.labelKey)}</h2><button type="button" onClick={() => onPlayerClick(leader)} style={{ border: 0, padding: 0, marginTop: 12, color: INK_MUTE, background: 'transparent', fontSize: 13, fontWeight: 750, cursor: 'pointer' }}>{leader.name}</button></div><div style={{ color: A.INK, fontSize: 42, lineHeight: 0.9, fontWeight: 900, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{leader.valueFormatted}<span style={{ display: 'block', marginTop: 8, color: INK_MUTE, fontSize: 9, fontWeight: 800 }}>{t(category.unitKey)}</span></div></section>;
+  return <section style={{ padding: '28px 24px', borderBottom: `1px solid ${WHITE_ALPHA_06}`, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', gap: 20, alignItems: 'end' }}><div style={{ minWidth: 0 }}><p style={eyebrow}>{t('leaders.season.oneNumber')}</p><h2 style={{ ...title, marginTop: 7 }}>{t(category.labelKey)}</h2><p style={{ ...copy, marginTop: 8, maxWidth: 300 }}>{t(category.descriptionKey)}</p><button type="button" onClick={() => onPlayerClick(leader)} style={{ border: 0, padding: 0, marginTop: 12, color: INK_MUTE, background: 'transparent', fontSize: 13, fontWeight: 750, cursor: 'pointer' }}>{leader.name}</button></div><div style={{ color: A.INK, fontSize: 42, lineHeight: 0.9, fontWeight: 900, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{leader.valueFormatted}<span style={{ display: 'block', marginTop: 8, color: INK_MUTE, fontSize: 9, fontWeight: 800 }}>{t(category.unitKey)}</span></div></section>;
 }
 
 export function DuelModule({ category, onPlayerClick }: { category: LeaderCategoryDef; onPlayerClick: (row: LeaderRow) => void }) {
