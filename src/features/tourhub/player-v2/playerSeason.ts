@@ -8,6 +8,7 @@ import {
   type LeaderRankMaps,
 } from '../leaders-v2/data/useLeaderCategories';
 import type { TourId } from '../hooks/useOverviewData';
+import { playerOrdinal } from './playerOrdinal';
 
 export const PLAYER_SKILL_KEYS = [
   'scoring_avg',
@@ -156,7 +157,7 @@ export function selectPlayerSeason(
   const winsRank = rankMaps?.wins?.[playerId];
   const winsCategory = categoryMap.get('wins');
   const rankedWins = winsCategory?.rows.find((row) => row.playerId === playerId)?.value;
-  const effectiveWins = wins ?? rankedWins ?? (winsRank ? 1 : null);
+  const effectiveWins = wins ?? rankedWins ?? (pointsRank ? 0 : null);
   const raceLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour] ?? LEADER_STAT_LABELS.points.labelKey;
   const raceLabel = t(raceLabelKey);
   let verdict: PlayerVerdict | null = null;
@@ -167,7 +168,7 @@ export function selectPlayerSeason(
   } else if (!worldRank && effectiveWins != null && pointsRank) {
     verdict = {
       key: 'player.hero.verdict.pointsRanked',
-      values: { wins: effectiveWins, rank: pointsRank.tied ? `T${pointsRank.rank}` : String(pointsRank.rank), raceLabel },
+      values: { wins: effectiveWins, rank: pointsRank.tied ? `T${pointsRank.rank}` : playerOrdinal(t, pointsRank), raceLabel },
     };
   } else {
     const best = bestFinish(results);

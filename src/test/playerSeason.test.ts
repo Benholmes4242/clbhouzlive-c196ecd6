@@ -67,4 +67,21 @@ describe('selectPlayerSeason', () => {
     expect(selected.strengths).toEqual([]);
     expect(selected.weaknesses).toEqual([]);
   });
+
+  it('uses zero wins in the points-ranked verdict when no wins row exists', () => {
+    const selected = selectPlayerSeason(
+      'p1',
+      'pgad',
+      null,
+      [],
+      { points: { p1: { rank: 42, tied: false } } },
+      [category('points')],
+      t,
+    );
+    expect(selected.verdict).toEqual({
+      key: 'player.hero.verdict.pointsRanked',
+      values: { wins: 0, rank: 'player.stats.ordinal.nd', raceLabel: 'leaders.pointsBrand.pgad' },
+    });
+    expect(selected.raceProof?.wins).toBeNull();
+  });
 });
