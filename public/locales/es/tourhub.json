@@ -260,7 +260,8 @@
       "ourPicksStale": "Actualizándose",
       "figuresBasis": "Los tres de {{n}} rondas completadas en la ronda {{round}}.",
       "figuresBasisLowOnly": "Mejor ronda de las rondas completadas en la ronda {{round}}; muy pocas para un promedio del campo.",
-      "figuresBasisLow": "Mejor ronda: {{names}}."
+      "figuresBasisLow": "Mejor ronda: {{names}}.",
+      "rightMeta": "{{count}} grupos"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -616,7 +617,18 @@
       "tbdPlayer": "TBD",
       "championFallback": "Champion",
       "winningLabel": "Resultado ganador",
-      "marginLabel": "Ventaja"
+      "marginLabel": "Ventaja",
+      "fieldLabel": "Campo",
+      "verdict": {
+        "liveContest": "{{leader}} lidera por {{margin}} — y {{count}} jugadores están a cuatro golpes con {{holes}} por jugar.",
+        "liveShared": "{{count}} jugadores comparten el liderato con {{holes}} por jugar.",
+        "liveClear": "{{leader}} lidera por {{margin}}.",
+        "liveScore": "{{leader}} lidera con {{score}}.",
+        "completedMargin": "{{winner}} ganó por {{margin}}.",
+        "completedPlayoff": "{{winner}} ganó un desempate.",
+        "upcomingDefender": "{{field}} jugadores por {{purse}}, y vuelve el campeón defensor.",
+        "upcomingField": "{{field}} jugadores por {{purse}}."
+      }
     },
     "story": {
       "eyebrow": "The Story",
@@ -627,7 +639,9 @@
       "emptyBody": "Moments from this tournament will appear here as members share them.",
       "shareCta": "Share a moment",
       "allAction": "All moments",
-      "sheetTitle": "All Moments"
+      "sheetTitle": "All Moments",
+      "emptyShort": "Aún no hay momentos",
+      "shareShort": "Comparte uno ›"
     },
     "fullBoard": {
       "title": "Full Board"
@@ -640,14 +654,19 @@
       "teeTimes": "Tee times",
       "round": "Round {{round}}",
       "yardageShort": "{{yardage}} yds",
-      "eyebrow": "Event Info"
+      "eyebrow": "Event Info",
+      "yardage": "Distancia"
     },
     "course": {
       "title": "The Course",
       "allHolesAction": "All 18 holes",
       "allHolesTitle": "All 18 Holes",
       "avgVsPar": "Avg vs par",
-      "fieldScoringSuffix": " · field scoring"
+      "fieldScoringSuffix": " · field scoring",
+      "comparison": "El {{hardest}} juega {{gap}} golpes más difícil que el {{easiest}} — la mayor diferencia del campo.",
+      "comparisonTenths": "El {{hardest}} juega {{tenths}} décimas de golpe más difícil que el {{easiest}} — la mayor diferencia del campo.",
+      "distributionKicker": "Los 18 hoyos · todas las rondas",
+      "rowsKicker": "Los más difíciles y fáciles"
     },
     "featuredGroups": {
       "eyebrow": "On the Course",
@@ -666,8 +685,35 @@
     },
     "teeTimesBand": {
       "title": "Tee times",
-      "subline": "Round {{round}} · {{count}} groups",
+      "subline": "{{count}} grupos",
       "notReleased": "Draw not yet released"
+    },
+    "contest": {
+      "liveEyebrow": "La lucha",
+      "completedEyebrow": "El margen",
+      "shotLead": "Golpe de ventaja",
+      "shotsLead": "Golpes de ventaja",
+      "shotsClear": "Golpes de ventaja",
+      "sharedLead": "{{count}} comparten el liderato",
+      "playoff": "Victoria en desempate",
+      "withToPlay": "Con {{holes}} por jugar",
+      "decidedInPlayoff": "Decidido en desempate",
+      "sublineSecondThird": "{{second}} es segundo, con {{third}} detrás.",
+      "sublineSecond": "{{second}} es segundo.",
+      "leader": "Líder",
+      "back": "A {{gap}}",
+      "allLevel": "Todos igualados",
+      "packAria": "El grupo por golpes de distancia"
+    },
+    "move": {
+      "liveEyebrow": "La remontada",
+      "completedEyebrow": "Ronda del día",
+      "subline": "Tras {{thru}} · {{position}}, {{total}}",
+      "today": "Hoy"
+    },
+    "teeTimesRail": {
+      "eyebrow": "Horarios de salida",
+      "action": "Todos los horarios"
     }
   },
   "leaders": {

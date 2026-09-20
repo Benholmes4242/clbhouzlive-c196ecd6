@@ -39,8 +39,12 @@ export function selectTournamentContest(
   const leaders = bestScore == null ? [] : scored.filter((row) => row.score === bestScore);
   const leader = leaders[0] ?? null;
   const nextScore = bestScore == null ? null : scored.find((row) => (row.score as number) > bestScore)?.score ?? null;
-  const margin = bestScore == null || nextScore == null ? null : Math.max(0, nextScore - bestScore);
   const sharedLead = leaders.length > 1;
+  const margin = sharedLead && state === 'completed'
+    ? 0
+    : bestScore == null || nextScore == null
+      ? null
+      : Math.max(0, nextScore - bestScore);
   const withinFour = bestScore == null ? 0 : scored.filter((row) => (row.score as number) - bestScore <= CONTENTION_GAP).length;
   const holesLeft = leader?.thru == null ? null : Math.max(0, 18 - leader.thru);
   const pack = bestScore == null

@@ -256,7 +256,8 @@
       "ourPicksStale": "[Being refreshed]",
       "figuresBasis": "[ALL THREE FROM {{n}} COMPLETED ROUNDS IN ROUND {{round}}.]",
       "figuresBasisLowOnly": "[LOW ROUND FROM COMPLETED ROUNDS IN ROUND {{round}}; TOO FEW FOR A FIELD AVERAGE.]",
-      "figuresBasisLow": "[LOW ROUND: {{names}}.]"
+      "figuresBasisLow": "[LOW ROUND: {{names}}.]",
+      "rightMeta": "[~~{{count}} ĝřőúƥš~~]"
     },
     "tiPicks": {
       "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",
@@ -614,7 +615,18 @@
       "tbdPlayer": "[~~ŢƁĐ~~]",
       "championFallback": "[~~Ĉĥáɱƥíőñ~~]",
       "winningLabel": "[Winning score]",
-      "marginLabel": "[Margin]"
+      "marginLabel": "[Margin]",
+      "fieldLabel": "[~~Fíéld~~]",
+      "verdict": {
+        "liveContest": "[~~{{leader}} léádš bý {{margin}} — ánd {{count}} ƥláýérš áré ínšídé fóúr šhótš ŵíth {{holes}} tó ƥláý.~~]",
+        "liveShared": "[~~{{count}} ƥláýérš šháré thé léád ŵíth {{holes}} tó ƥláý.~~]",
+        "liveClear": "[~~{{leader}} léádš bý {{margin}}.~~]",
+        "liveScore": "[~~{{leader}} léádš ón {{score}}.~~]",
+        "completedMargin": "[~~{{winner}} ŵón bý {{margin}}.~~]",
+        "completedPlayoff": "[~~{{winner}} ŵón á ƥláýóff.~~]",
+        "upcomingDefender": "[~~{{field}} ƥláýérš fór {{purse}}, ánd thé déféndíng chámpíón íš báck.~~]",
+        "upcomingField": "[~~{{field}} ƥláýérš fór {{purse}}.~~]"
+      }
     },
     "story": {
       "eyebrow": "[~~Ţĥé Šţőřý~~]",
@@ -625,7 +637,9 @@
       "emptyBody": "[~~Ṁőɱéñţš ƒřőɱ ţĥíš ţőúřñáɱéñţ ŵíļļ áƥƥéář ĥéřé áš ɱéɱƀéřš šĥářé ţĥéɱ.~~]",
       "shareCta": "[~~Šĥářé á ɱőɱéñţ~~]",
       "allAction": "[~~Áļļ ɱőɱéñţš~~]",
-      "sheetTitle": "[~~Áļļ Ṁőɱéñţš~~]"
+      "sheetTitle": "[~~Áļļ Ṁőɱéñţš~~]",
+      "emptyShort": "[~~Nó mó méntš ýét~~]",
+      "shareShort": "[~~Šháré óné ›~~]"
     },
     "fullBoard": {
       "title": "[~~Ƒúļļ Ɓőářđ~~]"
@@ -638,14 +652,19 @@
       "teeTimes": "[~~Ţéé ţíɱéš~~]",
       "round": "[~~Řőúñđ {{round}}~~]",
       "yardageShort": "[~~{{yardage}} ýđš~~]",
-      "eyebrow": "[~~Éṽéñţ Íñƒő~~]"
+      "eyebrow": "[~~Éṽéñţ Íñƒő~~]",
+      "yardage": "[~~Ýárdágé~~]"
     },
     "course": {
       "title": "[~~Ţĥé Ĉőúřšé~~]",
       "allHolesAction": "[~~Áļļ 18 ĥőļéš~~]",
       "allHolesTitle": "[~~Áļļ 18 Ĥőļéš~~]",
       "avgVsPar": "[~~Áṽĝ ṽš ƥář~~]",
-      "fieldScoringSuffix": "[~~ · ƒíéļđ šĉőříñĝ~~]"
+      "fieldScoringSuffix": "[~~ · ƒíéļđ šĉőříñĝ~~]",
+      "comparison": "[~~Thé {{hardest}} íš ƥláýíng {{gap}} šhótš hárdér thán thé {{easiest}} — thé ŵídéšt gáƥ ón thé cóúršé.~~]",
+      "comparisonTenths": "[~~Thé {{hardest}} íš ƥláýíng {{tenths}} ténthš óf á šhót hárdér thán thé {{easiest}} — thé ŵídéšt gáƥ ón thé cóúršé.~~]",
+      "distributionKicker": "[~~Áll 18 hóléš · évérý róúnd~~]",
+      "rowsKicker": "[~~Pláýíng hárdéšt, ánd éášíéšt~~]"
     },
     "featuredGroups": {
       "eyebrow": "[~~Őñ ţĥé Ĉőúřšé~~]",
@@ -664,8 +683,35 @@
     },
     "teeTimesBand": {
       "title": "Tee times",
-      "subline": "Round {{round}} · {{count}} groups",
+      "subline": "[~~{{count}} ĝřőúƥš~~]",
       "notReleased": "Draw not yet released"
+    },
+    "contest": {
+      "liveEyebrow": "[~~Thé cóntéšt~~]",
+      "completedEyebrow": "[~~Thé márgín~~]",
+      "shotLead": "[~~Šhót léád~~]",
+      "shotsLead": "[~~Šhótš léád~~]",
+      "shotsClear": "[~~Šhótš cléár~~]",
+      "sharedLead": "[~~{{count}} šháré thé léád~~]",
+      "playoff": "[~~Ŵón á ƥláýóff~~]",
+      "withToPlay": "[~~Ŵíth {{holes}} tó ƥláý~~]",
+      "decidedInPlayoff": "[~~Décídéd ín á ƥláýóff~~]",
+      "sublineSecondThird": "[~~{{second}} íš šécónd, ŵíth {{third}} néxt.~~]",
+      "sublineSecond": "[~~{{second}} íš šécónd.~~]",
+      "leader": "[~~Léádér~~]",
+      "back": "[~~{{gap}} báck~~]",
+      "allLevel": "[~~Áll lévél~~]",
+      "packAria": "[~~Thé ƥáck bý šhótš béhínd~~]"
+    },
+    "move": {
+      "liveEyebrow": "[~~Thé móvé~~]",
+      "completedEyebrow": "[~~Róúnd óf thé dáý~~]",
+      "subline": "[~~Thróúgh {{thru}} · {{position}}, {{total}}~~]",
+      "today": "[~~Tódáý~~]"
+    },
+    "teeTimesRail": {
+      "eyebrow": "[~~Téé tíméš~~]",
+      "action": "[~~Áll téé tíméš~~]"
     }
   },
   "leaders": {

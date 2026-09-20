@@ -256,7 +256,8 @@
       "ourPicksStale": "更新中",
       "figuresBasis": "3つの数値はすべてラウンド{{round}}の終了済み{{n}}ラウンドに基づきます。",
       "figuresBasisLowOnly": "ベストスコアはラウンド{{round}}の終了済みラウンドに基づきます。フィールド平均には数が足りません。",
-      "figuresBasisLow": "ベストスコア: {{names}}。"
+      "figuresBasisLow": "ベストスコア: {{names}}。",
+      "rightMeta": "{{count}}組"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -612,7 +613,18 @@
       "tbdPlayer": "TBD",
       "championFallback": "Champion",
       "winningLabel": "優勝スコア",
-      "marginLabel": "差"
+      "marginLabel": "差",
+      "fieldLabel": "出場選手",
+      "verdict": {
+        "liveContest": "{{leader}}が{{margin}}打差で首位。残り{{holes}}ホールで{{count}}人が4打差以内です。",
+        "liveShared": "残り{{holes}}ホールで{{count}}人が首位タイです。",
+        "liveClear": "{{leader}}が{{margin}}打差で首位です。",
+        "liveScore": "{{leader}}が{{score}}で首位です。",
+        "completedMargin": "{{winner}}が{{margin}}打差で優勝しました。",
+        "completedPlayoff": "{{winner}}がプレーオフを制しました。",
+        "upcomingDefender": "{{field}}人が{{purse}}を争い、前年王者も出場します。",
+        "upcomingField": "{{field}}人が{{purse}}を争います。"
+      }
     },
     "story": {
       "eyebrow": "The Story",
@@ -623,7 +635,9 @@
       "emptyBody": "Moments from this tournament will appear here as members share them.",
       "shareCta": "Share a moment",
       "allAction": "All moments",
-      "sheetTitle": "All Moments"
+      "sheetTitle": "All Moments",
+      "emptyShort": "まだモーメントはありません",
+      "shareShort": "投稿する ›"
     },
     "fullBoard": {
       "title": "Full Board"
@@ -636,14 +650,19 @@
       "teeTimes": "Tee times",
       "round": "Round {{round}}",
       "yardageShort": "{{yardage}} yds",
-      "eyebrow": "Event Info"
+      "eyebrow": "Event Info",
+      "yardage": "ヤーデージ"
     },
     "course": {
       "title": "The Course",
       "allHolesAction": "All 18 holes",
       "allHolesTitle": "All 18 Holes",
       "avgVsPar": "Avg vs par",
-      "fieldScoringSuffix": " · field scoring"
+      "fieldScoringSuffix": " · field scoring",
+      "comparison": "{{hardest}}は{{easiest}}より{{gap}}打難しく、コース最大の差です。",
+      "comparisonTenths": "{{hardest}}は{{easiest}}より0.{{tenths}}打難しく、コース最大の差です。",
+      "distributionKicker": "全18ホール · 全ラウンド",
+      "rowsKicker": "最難関と最易ホール"
     },
     "featuredGroups": {
       "eyebrow": "On the Course",
@@ -662,8 +681,35 @@
     },
     "teeTimesBand": {
       "title": "Tee times",
-      "subline": "Round {{round}} · {{count}} groups",
+      "subline": "{{count}}組",
       "notReleased": "Draw not yet released"
+    },
+    "contest": {
+      "liveEyebrow": "優勝争い",
+      "completedEyebrow": "勝敗を分けた差",
+      "shotLead": "リード",
+      "shotsLead": "リード",
+      "shotsClear": "打差",
+      "sharedLead": "{{count}}人が首位タイ",
+      "playoff": "プレーオフ決着",
+      "withToPlay": "残り{{holes}}ホール",
+      "decidedInPlayoff": "プレーオフで決着",
+      "sublineSecondThird": "{{second}}が2位、{{third}}が続きます。",
+      "sublineSecond": "{{second}}が2位です。",
+      "leader": "首位",
+      "back": "{{gap}}打差",
+      "allLevel": "全員並ぶ",
+      "packAria": "首位との差"
+    },
+    "move": {
+      "liveEyebrow": "今日の躍進",
+      "completedEyebrow": "今日のベストラウンド",
+      "subline": "{{thru}}終了 · {{position}}位、{{total}}",
+      "today": "今日"
+    },
+    "teeTimesRail": {
+      "eyebrow": "ティータイム",
+      "action": "すべてのティータイム"
     }
   },
   "leaders": {
