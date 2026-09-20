@@ -482,7 +482,9 @@ export function ExploreCard({
     holes: shape?.holes,
     viewerBest,
     viewerBestSince,
-    plainRound: callout != null,
+    /* Record/rank panels own their event copy. A feat panel does not suppress
+       the richer multi-feat sentence: rarer rounds must never say less. */
+    plainRound: callout?.kind === 'record' || callout?.kind === 'net_record' || callout?.kind === 'rank_up',
   });
   const chips = chipsFor(item, t as never);
   /* §2 SHAPE IS DECIDED BY KIND, NOTHING ELSE. A REVIEW is text ON the

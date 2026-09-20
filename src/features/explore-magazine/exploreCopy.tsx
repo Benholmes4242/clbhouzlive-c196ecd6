@@ -1,5 +1,6 @@
 import type { StreamItem } from './streamItem';
 import { indefiniteArticleForScore, standingOrdinal } from './ordinal';
+import { topRoundFeats, type ExploreRoundFeat } from './roundFeatCollection';
 
 /**
  * KICKER PARTS AND HEADLINES (BRIEF_EXPLORE_MAGAZINE §4c / §4d).
@@ -156,15 +157,43 @@ export function spokenToPar(toPar: number | null | undefined, t: T, locale: stri
  *  than naming one. */
 function holeFor(holes: HoleRow[] | undefined, kind: 'ace' | 'albatross' | 'eagle'): number | null {
   if (!holes || holes.length === 0) return null;
+  const hits: number[] = [];
   for (const h of holes) {
     if (h.strokes == null) continue;
-    if (kind === 'ace' && h.strokes === 1) return h.holeNo;
+    if (kind === 'ace') {
+      if (h.strokes === 1) hits.push(h.holeNo);
+      continue;
+    }
     if (h.par == null) continue;
     const diff = h.strokes - h.par;
-    if (kind === 'albatross' && diff === -3) return h.holeNo;
-    if (kind === 'eagle' && diff === -2) return h.holeNo;
+    if (kind === 'albatross' && diff === -3) hits.push(h.holeNo);
+    if (kind === 'eagle' && diff === -2) hits.push(h.holeNo);
   }
-  return null;
+  return hits.length === 1 ? hits[0] : null;
+}
+
+function featPhrase(feat: ExploreRoundFeat, t: T, locale: string): string {
+  const spokenCount = spokenNumber(feat.count, locale);
+  switch (feat.kind) {
+    case 'ace':
+      return t('amateur.stream.headline.featAce', '{{spokenCount}} holes in one', { count: feat.count, spokenCount });
+    case 'albatross':
+      return t('amateur.stream.headline.featAlbatross', '{{spokenCount}} albatrosses', { count: feat.count, spokenCount });
+    case 'eagle':
+      return t('amateur.stream.headline.featEagle', '{{spokenCount}} eagles', { count: feat.count, spokenCount });
+    case 'birdies':
+      return t('amateur.stream.headline.featBirdies', '{{spokenCount}} birdies', { count: feat.count, spokenCount });
+    case 'clean':
+      return t('amateur.stream.headline.featClean', 'a bogey-free card', { count: 1, spokenCount: 'one' });
+  }
+}
+
+function joinedFeatPhrase(feats: ExploreRoundFeat[], t: T, locale: string): string {
+  const phrases = feats.map((feat) => featPhrase(feat, t, locale));
+  const joined = phrases.length > 1
+    ? t('amateur.stream.headline.featJoin', '{{first}} and {{second}}', { first: phrases[0], second: phrases[1] })
+    : phrases[0] ?? '';
+  return capitaliseFirst(joined);
 }
 
 interface HoleRow { holeNo: number; par: number | null; strokes: number | null }
@@ -365,6 +394,17 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
      form from spokenToPar, never the symbolic +2 the chip already wears. Where
      the to-par is unknown the shorter sentence stands rather than a sentence
      with a hole in it. */
+  const roundFeats = topRoundFeats(item.facts);
+  const needsCountedSentence = roundFeats.length > 1 || (roundFeats[0]?.count ?? 0) > 1;
+  if (needsCountedSentence) {
+    const feats = joinedFeatPhrase(roundFeats, t, locale);
+    if (gross != null) {
+      return topar
+        ? t('amateur.stream.headline.featsRoundToPar', '{{feats}}, in a round of {{gross}}, {{topar}}.', { feats, gross, topar })
+        : t('amateur.stream.headline.featsRound', '{{feats}}, in a round of {{gross}}.', { feats, gross });
+    }
+    return t('amateur.stream.headline.featsOnly', '{{feats}}.', { feats });
+  }
   if (item.facts.holes_in_one && item.facts.holes_in_one > 0) {
     const hole = holeFor(ctx.holes, 'ace');
     if (hole != null) {
