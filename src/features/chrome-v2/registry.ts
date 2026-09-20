@@ -239,40 +239,6 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.'
     },
   },
-  {
-    match: { exact: '/tourhub/college-golf' },
-    spec: {
-      chrome: 'none',
-      tone: 'dark',
-      bleed: true,
-      hideSearch: true,
-      note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.'
-    },
-  },
-  {
-    match: { exact: '/tourhub/college-golf/compare' },
-    spec: {
-      chrome: 'none',
-      tone: 'dark',
-      bleed: true,
-      note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.'
-    },
-  },
-  {
-    match: {
-      test: (p) =>
-        p.startsWith('/tourhub/college-golf/') &&
-        p !== '/tourhub/college-golf' &&
-        p !== '/tourhub/college-golf/compare',
-    },
-    spec: {
-      chrome: 'none',
-      tone: 'dark',
-      bleed: true,
-      note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.'
-    },
-
-  },
 
   // Tour Hub overview: the page-provided left slot carries burger + tour picker;
   // the standard controls remain in the right island over the full-bleed hero.
