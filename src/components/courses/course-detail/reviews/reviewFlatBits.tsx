@@ -156,6 +156,7 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
   const [expanded, setExpanded] = useState(false);
   const name = isMine ? 'You' : displayName;
   const score = review.rating ?? 0;
+  // Amber here means “yours”, not a score band.
   const scoreColor = isMine ? A.AMBER : bandColorOnDark(score);
   const helpfulCount = review.helpful_count ?? 0;
 

@@ -61,8 +61,7 @@ import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from '@/lib/toast';
-import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
    a caption would take: this sheet's payload is three paragraphs of member
@@ -341,7 +340,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const ratingCount = effectiveAggregate?.review_count ?? 0;
   const showReference =
     rating != null && communityAvg != null && ratingCount >= 3;
-  const ratingColor = bandColorOnDark(rating);
+  const ratingColor = courseSubScoreTone(rating);
 
   // MEDIA (§3c) — prop when a caller has it, otherwise a lazy read.
   const { data: fetchedMedia } = useReviewMedia(reviewId ?? null, isOpen && !media?.length);
@@ -585,7 +584,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                           style={{
                             fontSize: 15,
                             fontWeight: 800,
-                            color: value >= 9 ? A.GREEN : A.MUTE,
+                            color: courseSubScoreTone(value),
                             fontVariantNumeric: 'tabular-nums',
                             lineHeight: 1,
                           }}

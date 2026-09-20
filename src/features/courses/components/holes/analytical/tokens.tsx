@@ -27,7 +27,7 @@ import React from 'react';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { SC_BOGEY_DARK, SC_DOUBLE_DARK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
-import { BAND_GREEN_DARK } from '@/features/courses/_shared/scoreBands';
+import { BAND_GREEN_DARK } from '@/features/courses/_shared/scoreBandTokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 /**

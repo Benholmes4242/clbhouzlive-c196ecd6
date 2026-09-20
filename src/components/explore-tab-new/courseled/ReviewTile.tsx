@@ -9,7 +9,8 @@ import { ReactionAction } from './ReactionAction';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 import { A, SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
-import { bandColor, bandColorOnDark, SubScoreBar } from '@/features/courses/_shared/scoreBands';
+import { SubScoreBar } from '@/features/courses/_shared/scoreBands';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import type { LatestReview } from './hooks/useLatestReviews';
 
@@ -35,10 +36,8 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * reviewVideoAutoplay.ts, never by InlineVideo/VideoEngine: those are bound to
  * the three physical feed lanes and do not map onto a two-column grid.
  *
- * The score figure and the bars carry the app-wide member-score scale from
- * src/features/courses/_shared/scoreBands.tsx (bandColor / SubScoreBar) — the
- * same scale as the review composer, Top 100 stats and course detail. Do not
- * re-declare those hexes here. The "/10" stays white.
+ * The score figure and bars use the canonical display tone. The "/10" stays
+ * white for legibility over photography.
  *
  * The chip states its scale with a "/10" suffix; it carries no clbhouz mark
  * (a figure on a review tile can only be a rating).
@@ -356,7 +355,7 @@ export function ReviewTile({
             style={{
               fontSize: 16,
               fontWeight: 700,
-              color: bandColorOnDark(r.rating),
+              color: courseSubScoreTone(r.rating),
               letterSpacing: '-0.02em',
               lineHeight: 1,
               ...FIGS,

@@ -1,16 +1,29 @@
 /**
- * The one colour scale for member score values (0-10), app-wide.
- * Used by the review composer, the Top 100 stats panel and course detail.
- * Do not re-declare these hexes anywhere else.
+ * The three-band colour scale for scores a member is actively CHOOSING in the
+ * review composer. Display surfaces use `courseSubScoreTone` instead, so the
+ * next caller must choose by interaction mode rather than by surface colour.
  *
  * NOTE: this is NOT the difficulty band scale (#C8372B / #0F8F4A) — that
  * measures a different quantity and lives in Top100CourseStatsPanel.
  */
 import React from 'react';
-
-export const BAND_GREEN = '#047857';
-export const BAND_AMBER = '#F7931E';
-export const BAND_RED = '#DC2626';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+export {
+  BAND_GREEN,
+  BAND_AMBER,
+  BAND_RED,
+  BAND_GREEN_DARK,
+  BAND_AMBER_DARK,
+  BAND_RED_DARK,
+} from './scoreBandTokens';
+import {
+  BAND_GREEN,
+  BAND_AMBER,
+  BAND_RED,
+  BAND_GREEN_DARK,
+  BAND_AMBER_DARK,
+  BAND_RED_DARK,
+} from './scoreBandTokens';
 
 /**
  * DARK-SURFACE VARIANTS (CORRECTION_REVIEW_TILE_FINISHING §1.3). BAND_GREEN and
@@ -20,10 +33,6 @@ export const BAND_RED = '#DC2626';
  * course meta block and the verdict band. Amber needs no lift — it already
  * clears the glass — so it is deliberately the same hex in both scales.
  */
-export const BAND_GREEN_DARK = '#34D399';
-export const BAND_AMBER_DARK = BAND_AMBER;
-export const BAND_RED_DARK = '#FF6B6B';
-
 /** >= 9.0 green, >= 5.0 amber, below 5.0 red. */
 export function bandColor(score: number | null | undefined): string {
   if (score == null) return '#AEB4BC';
@@ -83,11 +92,11 @@ export const SubScoreBar: React.FC<{ label: string; score: number }> = ({ label,
           width: `${Math.max(0, Math.min(100, (score / 10) * 100))}%`,
           height: '100%',
           borderRadius: 2,
-          background: bandColorOnDark(score),
+          background: courseSubScoreTone(score),
         }}
       />
     </div>
-    <span style={{ ...barFigureStyle, color: bandColorOnDark(score) }}>{score.toFixed(1)}</span>
+    <span style={{ ...barFigureStyle, color: courseSubScoreTone(score) }}>{score.toFixed(1)}</span>
   </div>
 );
 
@@ -104,7 +113,7 @@ export const SubScoreStack: React.FC<{ label: string; score: number }> = ({ labe
           width: `${Math.max(0, Math.min(100, (score / 10) * 100))}%`,
           height: '100%',
           borderRadius: 2,
-          background: bandColorOnDark(score),
+          background: courseSubScoreTone(score),
         }}
       />
     </div>
@@ -118,7 +127,7 @@ export const SubScoreStack: React.FC<{ label: string; score: number }> = ({ labe
         minWidth: 0,
       }}
     >
-      <span style={{ ...barFigureStyle, color: bandColorOnDark(score) }}>{score.toFixed(1)}</span>
+      <span style={{ ...barFigureStyle, color: courseSubScoreTone(score) }}>{score.toFixed(1)}</span>
       <span
         style={{
           ...barLabelStyle,

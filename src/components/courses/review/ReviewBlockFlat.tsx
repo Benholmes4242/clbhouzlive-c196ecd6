@@ -5,7 +5,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatRatingValue } from '@/utils/formatters';
-import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
@@ -65,8 +65,7 @@ const formatDate = (dateString: string) => {
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
 };
 
-/** Local formatting helper only — colours themselves always come from
- * bandColorOnDark() in the canonical scoreBands module, never redeclared here. */
+/** Local formatting helper only — colours come from the canonical display tone. */
 const hexToRgba = (color: string, alpha: number): string => {
   if (color.startsWith('rgba') || color.startsWith('rgb(')) return color;
   const hex = color.replace('#', '');
@@ -175,7 +174,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               letterSpacing: '-0.03em',
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums lining-nums',
-              color: bandColorOnDark(score),
+              color: courseSubScoreTone(score),
             }}
           >
             {formatRatingValue(score)}
@@ -208,7 +207,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       {subscores.length > 0 && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
           {subscores.map((s) => {
-            const chipColor = bandColorOnDark(Number(s.value));
+            const chipColor = courseSubScoreTone(Number(s.value));
             return (
               <div
                 key={s.label}
