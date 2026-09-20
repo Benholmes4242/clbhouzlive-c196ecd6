@@ -1,41 +1,24 @@
-/**
- * HeroSection - dark cinematic identity band.
- *
- * Height is HERO_MIN_H from _shared/tokens - the canonical tour hero height,
- * sourced from the course detail hero. FIXED in all cases; it does not vary
- * on whether a photo is present. The identity IS the image - no course photo.
- * 74px avatar squircle w/ white-alpha ring, LABEL eyebrow
- * "{TOUR} . {flag} {COUNTRY}", name 26/800, then a two-figure rank row
- * (WORLD / FEDEX) that surfaces only what actually exists on the DB row.
- */
-
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import CountryFlag from '@/components/ui/country-flag';
 import CollegeStamp from '@/components/profile/CollegeStamp';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
-import { TOUR_LABEL, mapTourSlug } from '../../_shared/tourOrder';
+import { TOUR_LABEL } from '../../_shared/tourOrder';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { TOUR_EYEBROW, TOUR_HERO_BAND_H, WHITE_ALPHA_18 } from '../../_shared/tokens';
-import { heroTintGradient } from '../../_shared/heroGradient';
-import { TOUR_CONFIG } from '../../hooks/useOverviewData';
+import type { PlayerSeasonSelection } from '../playerSeason';
+import { DARK, TOUR_HERO_PHOTO_H, WHITE_ALPHA_18 } from '../../_shared/tokens';
 
 interface HeroSectionProps {
   player: TourPlayer;
   playerStats: TourPlayerStatistics | null;
+  selection: PlayerSeasonSelection;
 }
 
-/* HERO EXCEPTION.
-   This is the same immersive/broadcast register as the tour overview hero:
-   tracked caps over photography read materially larger than their point size.
-   So the hero's band labels and markers take AXIS 10, while its names,
-   tournament titles and sentences take READ 11. LABEL_ON_DARK carries only
-   band labels (the RankFigure captions) and the eyebrow markers, so it is AXIS. */
-const LABEL_ON_DARK = {
-  fontSize: 10, // AXIS floor — hero band labels and eyebrow markers.
+const LABEL = {
+  fontSize: 10,
   fontWeight: 700 as const,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,
@@ -43,165 +26,70 @@ const LABEL_ON_DARK = {
 
 function tourLabel(codes: string[] | null, t: TFunction): string {
   const first = codes?.[0] as keyof typeof TOUR_LABEL | undefined;
-  return first
-    ? t('player.hero.tourSuffix', { tour: TOUR_LABEL[first] ?? first.toUpperCase() })
-    : t('player.hero.fallback');
+  return first ? t('player.hero.tourSuffix', { tour: TOUR_LABEL[first] ?? first.toUpperCase() }) : t('player.hero.fallback');
 }
 
 function RankFigure({ label, value }: { label: string; value: number }) {
   return (
     <div style={{ minWidth: 0 }}>
-      <div style={{ ...LABEL_ON_DARK, color: 'rgba(255,255,255,0.42)' }}>{label}</div>
-      <div
-        style={{
-          marginTop: 4,
-          fontSize: 22,
-          fontWeight: 700,
-          letterSpacing: '-0.02em',
-          lineHeight: 1,
-          color: '#FFFFFF',
-          fontVariantNumeric: 'tabular-nums lining-nums',
-        }}
-      >
+      <div style={{ ...LABEL, color: 'rgba(255,255,255,0.56)' }}>{label}</div>
+      <div style={{ marginTop: 4, fontSize: 24, fontWeight: 750, lineHeight: 1, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums lining-nums' }}>
         {value}
       </div>
     </div>
   );
 }
 
-export function HeroSection({ player, playerStats }: HeroSectionProps) {
+export function HeroSection({ player, playerStats, selection }: HeroSectionProps) {
   const { t } = useTranslation('tourhub');
-  const avatarCandidates = resolvePlayerAvatarCandidates({
+  const candidates = resolvePlayerAvatarCandidates({
     name: player.full_name,
     photoUrl: player.photo_url ?? null,
     tourSlug: player.tour_codes?.[0] ?? 'pga',
   });
-
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const photo = candidates[photoIndex] ?? null;
   const country = player.country ? titleCaseCountry(player.country) : null;
-  const worldRank =
-    playerStats?.world_rank && playerStats.world_rank > 0 ? playerStats.world_rank : null;
-  const fedexRank =
-    playerStats?.fedex_rank && playerStats.fedex_rank > 0 ? playerStats.fedex_rank : null;
-  const isPga = player.tour_codes?.includes('pga') ?? false;
-  const showFedex = isPga && !!fedexRank;
-  const showRankRow = !!worldRank || showFedex;
-
-  const tourId = mapTourSlug(player.tour_codes?.[0] ?? 'pga');
-  const tourColor = TOUR_CONFIG[tourId]?.color ?? null;
-  const heroBg = heroTintGradient(tourColor, 0.3);
+  const worldRank = playerStats?.world_rank && playerStats.world_rank > 0 ? playerStats.world_rank : null;
+  const fedexRank = playerStats?.fedex_rank && playerStats.fedex_rank > 0 && player.tour_codes?.includes('pga') ? playerStats.fedex_rank : null;
+  const nameSize = player.full_name.length > 25 ? 27 : player.full_name.length > 18 ? 31 : 35;
 
   return (
-    <div
-      style={{
-        background: heroBg,
-        minHeight: TOUR_HERO_BAND_H,
-        paddingTop: 20,
-        paddingBottom: 16,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-end',
-      }}
-    >
-      <div style={{ padding: '10px 16px 0', display: 'flex', gap: 16, alignItems: 'flex-end' }}>
-        <SquircleAvatar
-          size={74}
-          srcCandidates={avatarCandidates}
-          alt={player.full_name}
-          userId={player.id ?? player.full_name}
-          ringColor={WHITE_ALPHA_18}
-          hairlineRing
+    <section style={{ position: 'relative', height: TOUR_HERO_PHOTO_H, overflow: 'hidden', background: DARK }}>
+      {photo && (
+        <img
+          key={photo}
+          src={photo}
+          alt=""
+          onError={() => setPhotoIndex((index) => index + 1)}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: '76% bottom' }}
         />
-
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Eyebrow */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              /* S5: Watch eyebrow treatment. */
-              ...TOUR_EYEBROW,
-              marginBottom: 6,
-              minHeight: 14,
-              flexWrap: 'wrap',
-            }}
-          >
-            <span>{tourLabel(player.tour_codes, t)}</span>
-            {country && (
-              <>
-                <span aria-hidden style={{ opacity: 0.6 }}>
-                  {'\u00b7'}
-                </span>
-                <CountryFlag country={player.country_code || player.country} size="sm" />
-                <span>{country}</span>
-              </>
-            )}
-            {/* TC1: the college is a player attribute, stamped where it is read.
-                Renders nothing at all when no college is on record - no
-                placeholder, no "unknown". No class year exists on the player
-                row today, so the stamp carries the name alone; pass `year`
-                once a year field lands. */}
-            {player.college && (
-              /* Separator and stamp wrap together, so the eyebrow never leaves
-                 a hanging dot at the end of its first line. */
-              <span
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
-              >
-                <span aria-hidden style={{ opacity: 0.6 }}>
-                  {'\u00b7'}
-                </span>
-                <CollegeStamp
-                  normalizedName={player.college_normalized ?? ''}
-                  fallbackName={player.college}
-                  variant="player"
-                  tone="dark"
-                  onActivate={(mode) => {
-                    void analyticsEvents.track('tour_player_college_stamp_activated', {
-                      player_id: player.id,
-                      college: player.college,
-                      college_slug: player.college_normalized,
-                      mode,
-                    });
-                  }}
-                />
-              </span>
-            )}
-          </div>
-
-          {/* Name */}
-          <h1
-            style={{
-              margin: 0,
-              fontSize: 26,
-              fontWeight: 700,
-              letterSpacing: '-0.01em',
-              lineHeight: 1.1,
-              color: '#FFFFFF',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {player.full_name}
-          </h1>
-        </div>
-      </div>
-
-      {/* Two-figure rank row. Group boundary rule is permitted here. */}
-      {showRankRow && (
-        <div
-          style={{
-            margin: '14px 16px 0',
-            paddingTop: 12,
-            borderTop: '1px solid rgba(255,255,255,0.10)',
-            display: 'flex',
-            gap: 32,
-          }}
-        >
-          {worldRank && <RankFigure label={t('player.hero.worldLabel')} value={worldRank} />}
-          {showFedex && <RankFigure label={t('player.hero.fedexLabel')} value={fedexRank!} />}
-        </div>
       )}
-    </div>
+      <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(13,13,13,0.98) 0%, rgba(13,13,13,0.84) 43%, rgba(13,13,13,0.12) 78%), linear-gradient(0deg, rgba(13,13,13,0.96) 0%, transparent 58%)' }} />
+      <div style={{ position: 'relative', height: '100%', padding: '24px 16px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, maxWidth: '88%', ...LABEL, color: 'rgba(255,255,255,0.68)' }}>
+          <span>{tourLabel(player.tour_codes, t)}</span>
+          {country && <><span aria-hidden>{'\u00b7'}</span><CountryFlag country={player.country_code || player.country} size="sm" /><span>{country}</span></>}
+          {player.college && (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
+              <span aria-hidden>{'\u00b7'}</span>
+              <CollegeStamp normalizedName={player.college_normalized ?? ''} fallbackName={player.college} variant="player" tone="dark" onActivate={(mode) => void analyticsEvents.track('tour_player_college_stamp_activated', { player_id: player.id, college: player.college, college_slug: player.college_normalized, mode })} />
+            </span>
+          )}
+        </div>
+        <h1 style={{ margin: '10px 0 0', maxWidth: '82%', fontSize: nameSize, lineHeight: 0.98, fontWeight: 780, color: '#FFFFFF' }}>{player.full_name}</h1>
+        {selection.verdict && (
+          <p style={{ margin: '10px 0 0', maxWidth: 310, fontSize: 13, lineHeight: 1.42, fontWeight: 520, color: 'rgba(255,255,255,0.72)' }}>
+            {t(selection.verdict.key, selection.verdict.values)}
+          </p>
+        )}
+        {(worldRank || fedexRank) && (
+          <div style={{ marginTop: 16, paddingTop: 12, borderTop: `1px solid ${WHITE_ALPHA_18}`, display: 'flex', gap: 32 }}>
+            {worldRank && <RankFigure label={t('player.hero.worldLabel')} value={worldRank} />}
+            {fedexRank && <RankFigure label={t('player.hero.fedexLabel')} value={fedexRank} />}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

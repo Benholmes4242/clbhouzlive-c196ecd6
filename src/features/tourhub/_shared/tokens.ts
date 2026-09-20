@@ -266,8 +266,8 @@ export const TOUR_HERO_BAND_H = '244px';
 /**
  * BRIEF_TOUR_HEADER_CORRECTION Correction 2 — the PHOTOGRAPHIC hero height.
  * 340px, matching the News lead story, because the two are now the same object
- * at the same size. The gradient mastheads (player, college, duel) keep
- * TOUR_HERO_BAND_H: they carry no photograph and are not that object.
+ * at the same size. The player masthead is photographic at this height and
+ * falls back to the same-height neutral gradient when no headshot resolves.
  */
 export const TOUR_HERO_PHOTO_H = '340px';
 
