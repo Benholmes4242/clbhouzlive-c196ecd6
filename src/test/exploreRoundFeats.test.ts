@@ -5,7 +5,8 @@ import { calloutFor } from '@/features/explore-magazine/cardTreatment';
 import { notability } from '@/features/explore-magazine/useExploreStreamClient';
 import type { StreamFacts, StreamItem } from '@/features/explore-magazine/streamItem';
 
-const t = (_key: string, options?: Record<string, unknown>) => {
+const t = (_key: string, fallbackOrOptions?: string | Record<string, unknown>, vars?: Record<string, unknown>) => {
+  const options = typeof fallbackOrOptions === 'string' ? vars : fallbackOrOptions;
   const count = Number(options?.count ?? 0);
   const first = String(options?.first ?? '');
   const second = String(options?.second ?? '');

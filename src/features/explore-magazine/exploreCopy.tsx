@@ -404,7 +404,10 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
      the to-par is unknown the shorter sentence stands rather than a sentence
      with a hole in it. */
   const roundFeats = topRoundFeats(item.facts);
-  const needsCountedSentence = roundFeats.length > 1 || (roundFeats[0]?.count ?? 0) > 1;
+  const firstFeat = roundFeats[0];
+  const needsCountedSentence = roundFeats.length > 1 || (
+    (firstFeat?.kind === 'ace' || firstFeat?.kind === 'albatross' || firstFeat?.kind === 'eagle') && firstFeat.count > 1
+  );
   if (needsCountedSentence) {
     const feats = joinedFeatPhrase(roundFeats, t, locale);
     if (gross != null) {
