@@ -86,12 +86,11 @@ export interface CircleRoundRow {
   has_active_whs_connection: boolean;
   /** Up to two feats, rarest first. */
   feats: RoundFeat[];
-  /**
-   * FROZEN RARITY ROWS for this round, one per GOLD/TOP feat, exactly as stored
-   * by gam-evaluator. Empty when the round holds no rare feat. Never recomputed
-   * on render.
-   */
-  feat_rarity: FeatRarityRow[];
+  /* THE FROZEN RARITY FIGURES ARE NOT READ HERE. They arrive through
+     get_round_feat_lines, batched once per page, so every path renders the same
+     lines. Do not re-embed them in this select: two sources for one fact is the
+     bug this replaced. */
+
 
   // ---- INSIGHT SET (BRIEF_FRIENDS_INSIGHT_SET, part 1) -------------------
   /** Raw stats the insight states read; nulls simply fail their state. */
@@ -279,13 +278,10 @@ export function useCircleLatestRounds(
         sub_80: boolean | null;
         delta_index: number | string | null;
         stableford_points: number | string | null;
-        /* FEAT RARITY, EMBEDDED — the frozen figures ride along with the round
-           they belong to, so the rarity lines cost no extra round trip. */
-        gam_round_feat_rarity?: FeatRarityRow[] | null;
       };
 
       const ROUND_COLS =
-        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80, delta_index, stableford_points, gam_round_feat_rarity(feat_kind, global_ordinal, total_rounds_at_detection, distinct_members_at_detection)';
+        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80, delta_index, stableford_points';
 
       // 2. Circle rounds — windowDays lookback, ordered newest first.
       const windowStartIso = new Date(Date.now() - windowDays * DAY_MS).toISOString().slice(0, 10);
