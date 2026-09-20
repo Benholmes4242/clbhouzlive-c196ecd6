@@ -12,6 +12,11 @@ import { LikedByRow } from '@/components/likes/LikedByRow';
 import type { LikeSource } from '@/hooks/usePostLikes';
 import { GlassCardFootAction } from './GlassCardFootAction';
 import { FEAT_BAND_STYLE, scorecardFeatFor } from './scorecardFeat';
+import {
+  featRarityLines,
+  type FeatOwnerRow,
+  type FeatRarityRow,
+} from '@/features/explore-magazine/featRarity';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
@@ -149,6 +154,13 @@ export interface CardScorecardSheetProps {
    * draws nothing when the prop is absent, so the tour surface is untouched.
    */
   engagement?: CardScorecardEngagement | null;
+  /**
+   * FEAT RARITY LINES §2/§4 — the frozen rows for this round and the owner
+   * fields from get_round_feat_owner_lines (NULLed in SQL for anyone else).
+   * Absent for the tour surface and for hosts that do not read them, and then
+   * no line and no reserved space is drawn.
+   */
+  featRarity?: { rows: FeatRarityRow[]; owner: FeatOwnerRow[] } | null;
   onHorizontalDrag?: {
     onStart: () => void;
     onMove: (dx: number) => void;
@@ -753,7 +765,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 color: A.AMBER,
               }}
             >
-              {t(`courses:scorecard.feat.${feat.kind}.label`)}
+              {t(
+                feat.kind === 'eagle' && feat.count >= 2
+                  ? 'courses:scorecard.feat.eagleBrace.label'
+                  : `courses:scorecard.feat.${feat.kind}.label`,
+              )}
             </span>
             {(feat.hole != null || feat.kind === 'birdies' || feat.kind === 'clean') && (
               <span style={{ fontSize: 11.5, fontWeight: 600, color: A.MUTE }}>
