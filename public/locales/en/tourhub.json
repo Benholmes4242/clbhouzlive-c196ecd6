@@ -986,6 +986,8 @@
       "raceStandfirst": "No one owns this season yet. The points race remains the story.",
       "movement": "Movement",
       "movementTitle": "Who is moving",
+      "race": "The race",
+      "raceTableStandfirst": "The five players setting the pace in the season points race.",
       "oneNumber": "One number",
       "duel": "Fine margins",
       "sharedLead": "Shared lead",

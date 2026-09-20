@@ -27,9 +27,10 @@ describe('season magazine selection', () => {
 
   it('returns an explicit module count and reduced-layout decision', () => {
     const result = selectSeasonMagazine([category('points', [row('a', 100, 1), row('b', 90, 2), row('c', 80, 3)])]);
-    expect(result?.moduleCount).toBe(1);
+    expect(result?.moduleCount).toBe(2);
     expect(result?.useReducedLayout).toBe(true);
     expect(result?.showMovement).toBe(false);
+    expect(result?.showRaceStandings).toBe(true);
     expect(result?.oneNumber).toBeNull();
     expect(result?.duel).toBeNull();
     expect(result?.tiedList).toBeNull();
@@ -42,5 +43,20 @@ describe('season magazine selection', () => {
       category('top_10', [row('g', 8, 1), row('h', 8, 1), row('i', 7, 3)]),
     ]);
     expect(result?.tiedList?.key).toBe('top_10');
+  });
+
+  it('does not count race rows or tied-list membership as featured roles', () => {
+    const result = selectSeasonMagazine([
+      category('points', [row('leader', 100, 1), row('second', 70, 2), row('third', 60, 3), row('fourth', 50, 4), row('fifth', 40, 5)]),
+      category('special', [row('number', 10, 1), row('other', 5, 2)], { picturableGap: false }),
+      category('drive_avg', [row('leader', 320, 1), row('duelist', 319, 2)], { group: 'tee' }),
+      category('wins', [row('leader', 3, 1), row('winner-two', 3, 1), row('winner-three', 3, 1)]),
+    ]);
+    expect(result?.showRaceStandings).toBe(true);
+    expect(result?.tiedList?.key).toBe('wins');
+    expect(result?.moduleCount).toBe(5);
+    expect(result ? playerAppearanceCounts(result).get('leader') : null).toBe(2);
+    expect(result ? playerAppearanceCounts(result).has('second') : true).toBe(false);
+    expect(result ? playerAppearanceCounts(result).has('winner-two') : true).toBe(false);
   });
 });

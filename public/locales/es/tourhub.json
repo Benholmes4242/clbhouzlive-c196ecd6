@@ -859,6 +859,8 @@
       "raceStandfirst": "Nadie domina aún la temporada. La carrera de puntos sigue siendo la historia.",
       "movement": "Movimiento",
       "movementTitle": "Quién está avanzando",
+      "race": "La carrera",
+      "raceTableStandfirst": "Los cinco jugadores que marcan el ritmo en la carrera de puntos de la temporada.",
       "oneNumber": "Una cifra",
       "duel": "Margen mínimo",
       "sharedLead": "Liderato compartido",
