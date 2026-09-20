@@ -435,7 +435,9 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
     .eq('season_id', seasonId)
     .order('snapshot_month', { ascending: false })
     .limit(1000);
-  const latestMonth = snapshots?.[0]?.snapshot_month ?? null;
+  const snapshotMonths = [...new Set((snapshots ?? []).map((snapshot) => snapshot.snapshot_month))];
+  // The current table is reading one; use the preceding measured snapshot as reading two.
+  const latestMonth = snapshotMonths[1] ?? snapshotMonths[0] ?? null;
   const priorPoints = (snapshots ?? [])
     .filter((snapshot) => snapshot.snapshot_month === latestMonth && snapshot.player_id)
     .map((snapshot) => {
