@@ -30,7 +30,7 @@ describe('selectPlayerSeason', () => {
       strokes_gained_tee_green: { p1: { rank: 3, tied: false } },
       drive_avg: { p1: { rank: 7, tied: false } },
     };
-    const selected = selectPlayerSeason(stats, [], rankMaps, Object.keys(rankMaps).map(category), t);
+    const selected = selectPlayerSeason('p1', 'pga', stats, [], rankMaps, Object.keys(rankMaps).map(category), t);
     expect(selected.headline?.key).toBe('scoring_avg');
     expect(selected.strengths.map((row) => row.key)).toEqual(['strokes_gained_tee_green', 'drive_avg']);
   });
@@ -40,8 +40,31 @@ describe('selectPlayerSeason', () => {
       ['drive_avg', 'drive_acc', 'gir_pct', 'sand_saves_pct', 'putt_avg', 'birdies_per_round'].map((key, index) => [key, { p1: { rank: index < 4 ? index + 1 : 70 + index, tied: false } }]),
     );
     const richStats = { ...stats, scoring_average: null, driving_accuracy: 70, greens_in_reg: 72, sand_saves: 60, putting_average: 1.7, birdies_per_round: 4 } as TourPlayerStatistics;
-    const selected = selectPlayerSeason(richStats, [], rankMaps, Object.keys(rankMaps).map(category), t);
+    const selected = selectPlayerSeason('p1', 'pga', richStats, [], rankMaps, Object.keys(rankMaps).map(category), t);
     expect(selected.strengths.length).toBeLessThanOrEqual(3);
     expect(selected.weaknesses.length).toBeLessThanOrEqual(2);
+  });
+
+  it('uses the same branded non-PGA points rank for verdict and hero proof', () => {
+    const rankMaps: LeaderRankMaps = {
+      points: { p1: { rank: 87, tied: true } },
+      wins: { p1: { rank: 4, tied: false } },
+    };
+    const categories = [
+      { ...category('points'), rows: [] },
+      { ...category('wins'), rows: [{ playerId: 'p1', value: 1 } as LeaderCategoryDef['rows'][number]] },
+    ];
+    const selected = selectPlayerSeason('p1', 'euro', null, [], rankMaps, categories, t);
+    expect(selected.verdict).toEqual({
+      key: 'player.hero.verdict.pointsRanked',
+      values: { wins: 1, rank: 'T87', raceLabel: 'leaders.pointsBrand.euro' },
+    });
+    expect(selected.raceProof).toEqual({
+      points: { rank: 87, tied: true, label: 'leaders.pointsBrand.euro' },
+      wins: { rank: 4, tied: false },
+    });
+    expect(selected.headline).toBeNull();
+    expect(selected.strengths).toEqual([]);
+    expect(selected.weaknesses).toEqual([]);
   });
 });

@@ -3,9 +3,11 @@ import type { PlayerTournamentResult } from '../hooks/usePlayerResults';
 import type { TourPlayerStatistics } from '../hooks/useTourHubData';
 import {
   LEADER_STAT_LABELS,
+  POINTS_LABEL_KEY_BY_TOUR,
   type LeaderCategoryDef,
   type LeaderRankMaps,
 } from '../leaders-v2/data/useLeaderCategories';
+import type { TourId } from '../hooks/useOverviewData';
 
 export const PLAYER_SKILL_KEYS = [
   'scoring_avg',
@@ -51,6 +53,10 @@ export interface PlayerSeasonSelection {
   strengths: PlayerSeasonStat[];
   weaknesses: PlayerSeasonStat[];
   moduleCount: number;
+  raceProof: {
+    points: { rank: number; tied: boolean; label: string };
+    wins: { rank: number; tied: boolean } | null;
+  } | null;
 }
 
 const valueFor = (stats: TourPlayerStatistics, key: PlayerSkillKey): number | null => {
@@ -101,6 +107,8 @@ function bestFinish(results: PlayerTournamentResult[]): PlayerTournamentResult |
 }
 
 export function selectPlayerSeason(
+  playerId: string,
+  tour: TourId,
   stats: TourPlayerStatistics | null,
   results: PlayerTournamentResult[],
   rankMaps: LeaderRankMaps | undefined,
@@ -144,16 +152,22 @@ export function selectPlayerSeason(
   const worldRank = stats?.world_rank && stats.world_rank > 0 ? stats.world_rank : null;
   const wins = stats?.wins;
   const top10s = stats?.top_10s;
-  const pointsRank = stats ? rankMaps?.points?.[stats.player_id] : undefined;
+  const pointsRank = rankMaps?.points?.[playerId];
+  const winsRank = rankMaps?.wins?.[playerId];
+  const winsCategory = categoryMap.get('wins');
+  const rankedWins = winsCategory?.rows.find((row) => row.playerId === playerId)?.value;
+  const effectiveWins = wins ?? rankedWins ?? (winsRank ? 1 : null);
+  const raceLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour] ?? LEADER_STAT_LABELS.points.labelKey;
+  const raceLabel = t(raceLabelKey);
   let verdict: PlayerVerdict | null = null;
   if (wins != null && wins >= 1 && top10s != null && worldRank) {
     verdict = { key: 'player.hero.verdict.winsRanked', values: { wins, top10s, rank: String(worldRank) } };
   } else if (wins === 0 && top10s != null && top10s >= 1 && worldRank) {
     verdict = { key: 'player.hero.verdict.noWin', values: { top10s, rank: String(worldRank) } };
-  } else if (!worldRank && wins != null && pointsRank) {
+  } else if (!worldRank && effectiveWins != null && pointsRank) {
     verdict = {
       key: 'player.hero.verdict.pointsRanked',
-      values: { wins, rank: String(pointsRank.rank), raceLabel: t('leaders.stat.points.label') },
+      values: { wins: effectiveWins, rank: pointsRank.tied ? `T${pointsRank.rank}` : String(pointsRank.rank), raceLabel },
     };
   } else {
     const best = bestFinish(results);
@@ -171,5 +185,11 @@ export function selectPlayerSeason(
     strengths,
     weaknesses,
     moduleCount: Number(Boolean(headline)) + Number(strengths.length > 0 || weaknesses.length > 0),
+    raceProof: !worldRank && pointsRank
+      ? {
+          points: { ...pointsRank, label: raceLabel },
+          wins: effectiveWins != null && effectiveWins >= 1 && winsRank ? winsRank : null,
+        }
+      : null,
   };
 }

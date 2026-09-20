@@ -9,6 +9,7 @@ import { titleCaseCountry } from '../../utils/countryFlags';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import type { PlayerSeasonSelection } from '../playerSeason';
+import { playerOrdinal } from '../playerOrdinal';
 import { INK_DEEP, TOUR_HERO_PHOTO_H, WHITE_ALPHA_18 } from '../../_shared/tokens';
 
 interface HeroSectionProps {
@@ -29,13 +30,13 @@ function tourLabel(codes: string[] | null, t: TFunction): string {
   return first ? t('player.hero.tourSuffix', { tour: TOUR_LABEL[first] ?? first.toUpperCase() }) : t('player.hero.fallback');
 }
 
-function RankFigure({ label, value }: { label: string; value: number }) {
+function RankFigure({ label, value }: { label: string; value: string | number }) {
   return (
     <div style={{ minWidth: 0 }}>
-      <div style={{ ...LABEL, color: 'rgba(255,255,255,0.56)' }}>{label}</div>
-      <div style={{ marginTop: 4, fontSize: 24, fontWeight: 750, lineHeight: 1, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+      <div style={{ fontSize: 21, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em', color: '#FFFFFF', fontVariantNumeric: 'tabular-nums lining-nums' }}>
         {value}
       </div>
+      <div style={{ ...LABEL, marginTop: 4, color: 'rgba(255,255,255,0.42)' }}>{label}</div>
     </div>
   );
 }
@@ -52,6 +53,7 @@ export function HeroSection({ player, playerStats, selection }: HeroSectionProps
   const country = player.country ? titleCaseCountry(player.country) : null;
   const worldRank = playerStats?.world_rank && playerStats.world_rank > 0 ? playerStats.world_rank : null;
   const fedexRank = playerStats?.fedex_rank && playerStats.fedex_rank > 0 && player.tour_codes?.includes('pga') ? playerStats.fedex_rank : null;
+  const raceProof = !worldRank && !fedexRank ? selection.raceProof : null;
   const nameSize = player.full_name.length > 25 ? 27 : player.full_name.length > 18 ? 31 : 35;
 
   return (
@@ -85,10 +87,12 @@ export function HeroSection({ player, playerStats, selection }: HeroSectionProps
             {t(selection.verdict.key, selection.verdict.values)}
           </p>
         )}
-        {(worldRank || fedexRank) && (
+        {(worldRank || fedexRank || raceProof) && (
           <div style={{ marginTop: 16, paddingTop: 12, borderTop: `1px solid ${WHITE_ALPHA_18}`, display: 'flex', gap: 32 }}>
             {worldRank && <RankFigure label={t('player.hero.worldLabel')} value={worldRank} />}
             {fedexRank && <RankFigure label={t('player.hero.fedexLabel')} value={fedexRank} />}
+            {raceProof && <RankFigure label={raceProof.points.label} value={raceProof.points.tied ? `T${raceProof.points.rank}` : playerOrdinal(t, raceProof.points)} />}
+            {raceProof?.wins && <RankFigure label={t('leaders.stat.wins.label')} value={raceProof.wins.tied ? `T${raceProof.wins.rank}` : playerOrdinal(t, raceProof.wins)} />}
           </div>
         )}
       </div>

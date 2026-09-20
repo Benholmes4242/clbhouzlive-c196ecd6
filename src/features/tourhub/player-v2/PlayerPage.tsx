@@ -85,7 +85,7 @@ export function PlayerPage() {
 
   const liveTournamentId =
     playerState.state === 'live' ? playerState.liveData?.tournamentId ?? null : null;
-  const selection = selectPlayerSeason(playerStats ?? null, results ?? [], leaders?.rankMaps, leaders?.categories ?? [], t);
+  const selection = selectPlayerSeason(player.id, tour, playerStats ?? null, results ?? [], leaders?.rankMaps, leaders?.categories ?? [], t);
 
   return (
     <TourHubShell>
