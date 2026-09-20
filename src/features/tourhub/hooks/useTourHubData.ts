@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { BoardEntry } from '../leaderboard/BoardTable';
+// Single definition of which season is current; do not re-derive it here.
+import { currentSeasonYear } from '../leaders-v2/data/useLeaderCategories';
 
 // Major tour code override — Sportradar stores Grand Slams under EURO season
 const MAJOR_NAMES_TO_PGA: string[] = [
@@ -162,6 +164,8 @@ export interface TourPlayerStatistics {
   // From the sr_player_statistics COLUMN, never raw_data (raw_data.strokes_gained
   // is null on all 220 live 2026 PGA rows). Measured 2026-09-20: 220/220 populated.
   strokes_gained_putting: number | null;
+  // Season the figures belong to, so a caller can assert value and rank agree.
+  season_year?: number | null;
   // Joined player data
   player?: TourPlayer;
 }
