@@ -16,6 +16,7 @@
  */
 
 import { useState } from 'react';
+import { currentSeasonYear } from '../../leaders-v2/data/useLeaderCategories';
 import { isFinish, isMissedCut, isNonStarter, isWithdrawn, normalizeStatus } from '../../_shared/resultStatus';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -101,6 +102,12 @@ export function PlayerResultRow({
   const dt = r.tournament_end_date ? new Date(r.tournament_end_date) : null;
   const day = dt ? String(dt.getDate()) : '';
   const month = dt ? formatMonthShort(dt).toUpperCase() : '';
+  // The list is a HISTORY and spans seasons. Rows outside the current season
+  // carry a two-digit year so no row can be read as this season's; rows inside
+  // it carry none, because a year on every row is noise on the common case.
+  // Season resolution is currentSeasonYear() — the one definition.
+  const outOfSeason = r.season_year != null && r.season_year !== currentSeasonYear();
+  const monthLabel = outOfSeason ? `${month} '${String(r.season_year).slice(-2)}` : month;
   const scoreStr = typeof r.score === 'number' ? fmtScore(r.score) : '';
   // Missed cut keeps its INK_FAINT override: no meaningful score-to-par.
   const scoreColor = isMissed ? INK_FAINT : getScoreColor(r.score, 'dark');
@@ -142,7 +149,7 @@ export function PlayerResultRow({
         >
           {day}
         </div>
-        <div style={{ marginTop: 3, ...LABEL, color: INK_MUTE }}>{month}</div>
+        <div style={{ marginTop: 3, ...LABEL, color: INK_MUTE }}>{monthLabel}</div>
       </div>
 
       {/* Name + status label */}
