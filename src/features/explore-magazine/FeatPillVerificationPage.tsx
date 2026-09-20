@@ -20,7 +20,7 @@ export function FeatPillVerificationPage() {
     <main style={{ minHeight: '100vh', background: A.CANVAS, color: A.INK, fontFamily: SANS, padding: '24px 14px', boxSizing: 'border-box' }}>
       {fixtures.map((fixture) => {
         const instance = i18next.createInstance();
-        void instance.init({ lng: fixture.lng, resources: { en: { courses: en }, de: { courses: de } }, ns: ['courses'], defaultNS: 'courses', initImmediate: false });
+        void instance.init({ lng: fixture.lng, resources: { en: { courses: en }, de: { courses: de } }, ns: ['courses'], defaultNS: 'courses' });
         return (
           <section key={fixture.id} data-feat-pill-case={fixture.id} style={{ marginBottom: 28 }}>
             <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 700, color: A.MUTE }}>{fixture.label}</div>
