@@ -678,7 +678,10 @@
       "searchPlaceholder": "[~~Šéářĉĥ ţĥíš ƀőářđ~~]",
       "noMatch": "[~~Ñő ɱáţĉĥ íñ ţĥíš ƀőářđ.~~]",
       "gapBack": "[~~{{delta}} {{unit}} ƀáĉǩ~~]",
-      "gapUnits": { "shots": "[~~šĥőţš~~]", "yards": "[~~ýářđš~~]" }
+      "gapUnits": {
+        "shots": "[~~šĥőţš~~]",
+        "yards": "[~~ýářđš~~]"
+      }
     },
     "tourChip": {
       "pga": "[~~ƤĜÁ~~]",
@@ -854,7 +857,11 @@
         "player": "[{{wins}} ŵīńş, {{topTens}} ţōp-ţēńş, āńđ ā {{scoring}} şċōŕīńĝ āvēŕāĝē şēţ ţĥē mēāşūŕē ōf ţĥē şēāşōń.]",
         "race": "[{{leader}} ļēāđş ōń {{points}} pōīńţş, ƀūţ ţĥē şēāşōń ŕēmāīńş īń pļāў.]"
       },
-      "proof": { "topFour": "[ŢŌP FŌŪŔ ĜĀP]", "winners": "[ŴĪŃŃĒŔŞ]", "remaining": "[ĒVĒŃŢŞ ĻĒFŢ]" },
+      "proof": {
+        "topFour": "[ŢŌP FŌŪŔ ĜĀP]",
+        "winners": "[ŴĪŃŃĒŔŞ]",
+        "remaining": "[ĒVĒŃŢŞ ĻĒFŢ]"
+      },
       "sectionTitle": {
         "generic": "[Ţĥē şēāşōń'ş đēfīńīńĝ {{category}} ńūmbēŕ]",
         "putting": "[Ţĥē şūŕēşţ pūţţēŕ ōń ţōūŕ īş māķīńĝ ēvēŕў ĝŕēēń ċōūńţ]",
@@ -942,7 +949,15 @@
       "tourSuffix": "[~~{{tour}} ŢŐÚŘ~~]",
       "fallback": "[~~ƤĻÁÝÉŘ~~]",
       "worldNo": "[~~Ŵőřļđ Ñő. {{rank}}~~]",
-      "fedexNo": "[~~ƑéđÉẋ Ñő. {{rank}}~~]"
+      "fedexNo": "[~~ƑéđÉẋ Ñő. {{rank}}~~]",
+      "worldLabel": "WORLD",
+      "fedexLabel": "FEDEX",
+      "verdict": {
+        "winsRanked": "[{{wins}} ŵïñš åñð {{top10s}} ţöþ ţëñš håvë çårrïëð hïm ţö ŵörlð Ñö. {{rank}}.]",
+        "noWin": "[Šţïll çhåšïñg å ŵïñ, ŵïţh {{top10s}} ţöþ ţëñš åñð å ŵörlð råñkïñg öf {{rank}}.]",
+        "pointsRanked": "[{{wins}} ŵïñš þlåçë hïm {{rank}} ïñ ţhë {{raceLabel}} råçë.]",
+        "resultsOnly": "[{{events}} šţårţš ţhïš šëåšöñ, ŵïţh å bëšţ fïñïšh öf {{best}}.]"
+      }
     },
     "live": {
       "badge": "[~~ĻÍṼÉ~~]",
@@ -951,13 +966,17 @@
       "finished": "[~~Ƒ~~]"
     },
     "form": {
-      "eyebrow": "[~~Ļášţ 6 · Ṁőšţ Řéĉéñţ Ƒířšţ~~]",
+      "eyebrow": "[Šëåšöñ förm]",
       "status": {
         "mc": "[~~ṀĈ~~]",
         "wd": "[~~ŴĐ~~]",
         "dq": "[~~ĐǪ~~]",
         "noResult": "[~~—~~]"
-      }
+      },
+      "caption": "[Ëvërÿ šţårţ, ölðëšţ ţö ñëŵëšţ]",
+      "chartLabel": "[Füll-šëåšöñ fïñïšhïñg þöšïţïöñ þlöţ]",
+      "seasonStart": "[Šëåšöñ šţårţ]",
+      "latest": "[Låţëšţ]"
     },
     "tournaments": {
       "eyebrow": "[~~Ţőúřñáɱéñţš~~]",
@@ -1003,6 +1022,11 @@
         "shortGame": "[~~Šĥőřţ Ĝáɱé~~]",
         "strokesGained": "[~~Šţřőǩéš Ĝáíñéđ~~]"
       }
+    },
+    "field": {
+      "eyebrow": "[Ågåïñšţ ţhë fïëlð]",
+      "strength": "[Å ðëfïñïñg šţrëñgţh]",
+      "watch": "[Ŵhërë gröüñð çåñ bë måðë]"
     }
   },
   "tour": {

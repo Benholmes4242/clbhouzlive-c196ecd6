@@ -803,7 +803,10 @@
       "searchPlaceholder": "Search this board",
       "noMatch": "No match in the top {{shown}}. This board ranks the top {{shown}} of {{pool}}.",
       "gapBack": "{{delta}} {{unit}} back",
-      "gapUnits": { "shots": "shots", "yards": "yards" }
+      "gapUnits": {
+        "shots": "shots",
+        "yards": "yards"
+      }
     },
     "tourChip": {
       "pga": "PGA",
@@ -1119,7 +1122,13 @@
       "worldNo": "World No. {{rank}}",
       "fedexNo": "FedEx No. {{rank}}",
       "worldLabel": "World",
-      "fedexLabel": "FedEx"
+      "fedexLabel": "FedEx",
+      "verdict": {
+        "winsRanked": "{{wins}} wins and {{top10s}} top tens have carried him to world No. {{rank}}.",
+        "noWin": "Still chasing a win, with {{top10s}} top tens and a world ranking of {{rank}}.",
+        "pointsRanked": "{{wins}} wins place him {{rank}} in the {{raceLabel}} race.",
+        "resultsOnly": "{{events}} starts this season, with a best finish of {{best}}."
+      }
     },
     "live": {
       "badge": "LIVE",
@@ -1128,13 +1137,17 @@
       "finished": "F"
     },
     "form": {
-      "eyebrow": "Last 6 · Most Recent First",
+      "eyebrow": "Season form",
       "status": {
         "mc": "MC",
         "wd": "WD",
         "dq": "DQ",
         "noResult": "—"
-      }
+      },
+      "caption": "Every start, oldest to newest",
+      "chartLabel": "Full-season finishing position plot",
+      "seasonStart": "Season start",
+      "latest": "Latest"
     },
     "tournaments": {
       "eyebrow": "Tournaments",
@@ -1194,6 +1207,11 @@
     "seasonSheet": {
       "kicker": "Season",
       "sub": "{{count}} tournaments"
+    },
+    "field": {
+      "eyebrow": "Against the field",
+      "strength": "A defining strength",
+      "watch": "Where ground can be made"
     }
   },
   "tour": {

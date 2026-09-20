@@ -680,7 +680,10 @@
       "searchPlaceholder": "Dieses Feld durchsuchen",
       "noMatch": "Kein Treffer in diesem Feld.",
       "gapBack": "{{delta}} {{unit}} zurück",
-      "gapUnits": { "shots": "Schläge", "yards": "Yards" }
+      "gapUnits": {
+        "shots": "Schläge",
+        "yards": "Yards"
+      }
     },
     "tourChip": {
       "pga": "PGA",
@@ -869,7 +872,11 @@
         "player": "{{wins}} Siege, {{topTens}} Top-Ten-Platzierungen und ein Score-Schnitt von {{scoring}} geben den Maßstab vor.",
         "race": "{{leader}} führt mit {{points}} Punkten, doch die Saison bleibt offen."
       },
-      "proof": { "topFour": "ABSTAND TOP VIER", "winners": "SIEGER", "remaining": "TURNIERE OFFEN" },
+      "proof": {
+        "topFour": "ABSTAND TOP VIER",
+        "winners": "SIEGER",
+        "remaining": "TURNIERE OFFEN"
+      },
       "sectionTitle": {
         "generic": "Die prägende {{category}}-Zahl der Saison",
         "putting": "Der sicherste Putter der Tour nutzt jedes Grün",
@@ -957,7 +964,15 @@
       "tourSuffix": "{{tour}} TOUR",
       "fallback": "PLAYER",
       "worldNo": "World No. {{rank}}",
-      "fedexNo": "FedEx No. {{rank}}"
+      "fedexNo": "FedEx No. {{rank}}",
+      "worldLabel": "WORLD",
+      "fedexLabel": "FEDEX",
+      "verdict": {
+        "winsRanked": "{{wins}} Siege und {{top10s}} Top-Ten-Platzierungen brachten ihn auf Weltrang {{rank}}.",
+        "noWin": "Noch ohne Sieg, aber mit {{top10s}} Top-Ten-Platzierungen und Weltrang {{rank}}.",
+        "pointsRanked": "{{wins}} Siege bringen ihn auf Rang {{rank}} im {{raceLabel}}.",
+        "resultsOnly": "{{events}} Starts in dieser Saison, mit {{best}} als bestem Ergebnis."
+      }
     },
     "live": {
       "badge": "LIVE",
@@ -966,13 +981,17 @@
       "finished": "F"
     },
     "form": {
-      "eyebrow": "Last 6 · Most Recent First",
+      "eyebrow": "Saisonform",
       "status": {
         "mc": "MC",
         "wd": "WD",
         "dq": "DQ",
         "noResult": "—"
-      }
+      },
+      "caption": "Alle Starts, vom ältesten zum neuesten",
+      "chartLabel": "Saisonverlauf der Platzierungen",
+      "seasonStart": "Saisonstart",
+      "latest": "Aktuell"
     },
     "tournaments": {
       "eyebrow": "Tournaments",
@@ -1018,6 +1037,11 @@
         "shortGame": "Short Game",
         "strokesGained": "Strokes Gained"
       }
+    },
+    "field": {
+      "eyebrow": "Im Feldvergleich",
+      "strength": "Eine klare Stärke",
+      "watch": "Hier ist Boden gutzumachen"
     }
   },
   "tour": {

@@ -676,7 +676,10 @@
       "searchPlaceholder": "このランキングを検索",
       "noMatch": "一致する選手はいません。",
       "gapBack": "{{delta}} {{unit}}差",
-      "gapUnits": { "shots": "打", "yards": "ヤード" }
+      "gapUnits": {
+        "shots": "打",
+        "yards": "ヤード"
+      }
     },
     "tourChip": {
       "pga": "PGA",
@@ -865,7 +868,11 @@
         "player": "{{wins}}勝、トップ10が{{topTens}}回、平均{{scoring}}が今季の基準を作っています。",
         "race": "{{leader}}が{{points}}ポイントで首位ですが、今季の行方はまだ決まっていません。"
       },
-      "proof": { "topFour": "上位4人の差", "winners": "優勝者", "remaining": "残り大会" },
+      "proof": {
+        "topFour": "上位4人の差",
+        "winners": "優勝者",
+        "remaining": "残り大会"
+      },
       "sectionTitle": {
         "generic": "今季を象徴する{{category}}の数字",
         "putting": "最も確かなパターがグリーンを支配する",
@@ -953,7 +960,15 @@
       "tourSuffix": "{{tour}} TOUR",
       "fallback": "PLAYER",
       "worldNo": "World No. {{rank}}",
-      "fedexNo": "FedEx No. {{rank}}"
+      "fedexNo": "FedEx No. {{rank}}",
+      "worldLabel": "WORLD",
+      "fedexLabel": "FEDEX",
+      "verdict": {
+        "winsRanked": "{{wins}}勝、トップ10入り{{top10s}}回で世界{{rank}}位。",
+        "noWin": "初勝利を追いながら、トップ10入り{{top10s}}回、世界{{rank}}位。",
+        "pointsRanked": "{{wins}}勝で{{raceLabel}}ランキング{{rank}}位。",
+        "resultsOnly": "今季{{events}}試合に出場し、最高成績は{{best}}。"
+      }
     },
     "live": {
       "badge": "LIVE",
@@ -962,13 +977,17 @@
       "finished": "F"
     },
     "form": {
-      "eyebrow": "Last 6 · Most Recent First",
+      "eyebrow": "シーズンの流れ",
       "status": {
         "mc": "MC",
         "wd": "WD",
         "dq": "DQ",
         "noResult": "—"
-      }
+      },
+      "caption": "開幕から直近までの全試合",
+      "chartLabel": "シーズン全体の順位推移",
+      "seasonStart": "開幕",
+      "latest": "直近"
     },
     "tournaments": {
       "eyebrow": "Tournaments",
@@ -1014,6 +1033,11 @@
         "shortGame": "Short Game",
         "strokesGained": "Strokes Gained"
       }
+    },
+    "field": {
+      "eyebrow": "フィールドとの比較",
+      "strength": "明確な強み",
+      "watch": "伸ばせる領域"
     }
   },
   "tour": {

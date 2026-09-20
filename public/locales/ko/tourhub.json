@@ -676,7 +676,10 @@
       "searchPlaceholder": "이 순위 검색",
       "noMatch": "일치하는 선수가 없습니다.",
       "gapBack": "{{delta}} {{unit}} 뒤",
-      "gapUnits": { "shots": "타", "yards": "야드" }
+      "gapUnits": {
+        "shots": "타",
+        "yards": "야드"
+      }
     },
     "tourChip": {
       "pga": "PGA",
@@ -865,7 +868,11 @@
         "player": "{{wins}}승, 톱10 {{topTens}}회, 평균 {{scoring}}타가 이번 시즌의 기준을 세웠습니다.",
         "race": "{{leader}}이 {{points}}포인트로 선두지만 시즌은 아직 열려 있습니다."
       },
-      "proof": { "topFour": "상위 4명 차이", "winners": "우승자", "remaining": "남은 대회" },
+      "proof": {
+        "topFour": "상위 4명 차이",
+        "winners": "우승자",
+        "remaining": "남은 대회"
+      },
       "sectionTitle": {
         "generic": "시즌을 정의하는 {{category}} 수치",
         "putting": "투어 최고의 퍼터가 모든 그린을 살린다",
@@ -953,7 +960,15 @@
       "tourSuffix": "{{tour}} TOUR",
       "fallback": "PLAYER",
       "worldNo": "World No. {{rank}}",
-      "fedexNo": "FedEx No. {{rank}}"
+      "fedexNo": "FedEx No. {{rank}}",
+      "worldLabel": "WORLD",
+      "fedexLabel": "FEDEX",
+      "verdict": {
+        "winsRanked": "{{wins}}승과 톱10 {{top10s}}회로 세계 {{rank}}위에 올랐습니다.",
+        "noWin": "첫 우승을 노리며 톱10 {{top10s}}회, 세계 {{rank}}위를 기록했습니다.",
+        "pointsRanked": "{{wins}}승으로 {{raceLabel}} 레이스 {{rank}}위입니다.",
+        "resultsOnly": "이번 시즌 {{events}}회 출전, 최고 성적은 {{best}}입니다."
+      }
     },
     "live": {
       "badge": "LIVE",
@@ -962,13 +977,17 @@
       "finished": "F"
     },
     "form": {
-      "eyebrow": "Last 6 · Most Recent First",
+      "eyebrow": "시즌 흐름",
       "status": {
         "mc": "MC",
         "wd": "WD",
         "dq": "DQ",
         "noResult": "—"
-      }
+      },
+      "caption": "시즌 첫 경기부터 최근 경기까지",
+      "chartLabel": "전체 시즌 순위 변화",
+      "seasonStart": "시즌 시작",
+      "latest": "최근"
     },
     "tournaments": {
       "eyebrow": "Tournaments",
@@ -1014,6 +1033,11 @@
         "shortGame": "Short Game",
         "strokesGained": "Strokes Gained"
       }
+    },
+    "field": {
+      "eyebrow": "필드 대비",
+      "strength": "뚜렷한 강점",
+      "watch": "개선할 영역"
     }
   },
   "tour": {
