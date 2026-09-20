@@ -1,5 +1,4 @@
 import React from 'react';
-import { Bird, Flag, Flame } from 'lucide-react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SC_FILL_BIRDIE_DK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
@@ -64,13 +63,6 @@ export function AchievementEmoji({ glyph }: { glyph: string }) {
       {glyph}
     </span>
   );
-}
-
-/** Rare feat mark: one monochrome family so the owner state can use the
- * canonical scorecard yellow rather than an operating-system emoji colour. */
-export function RarityFeatIcon({ kind, size = CALLOUT_ICON }: { kind: 'ace' | 'albatross' | 'eagle'; size?: number }) {
-  const Icon = kind === 'ace' ? Flag : kind === 'albatross' ? Flame : Bird;
-  return <Icon aria-hidden="true" focusable="false" size={size} strokeWidth={1.8} color={SC_FILL_GOLD} />;
 }
 
 export function RankUpIcon() {
