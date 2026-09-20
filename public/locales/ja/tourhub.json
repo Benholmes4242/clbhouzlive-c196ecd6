@@ -687,102 +687,122 @@
       "earnings": {
         "label": "Season Earnings",
         "short": "EARNINGS",
-        "unit": "USD"
+        "unit": "USD",
+        "description": "この部門の実測シーズン順位です。"
       },
       "scoring_avg": {
         "label": "Scoring Average",
         "short": "SCORING",
-        "unit": "AVG"
+        "unit": "AVG",
+        "description": "この部門の実測シーズン順位です。"
       },
       "wins": {
         "label": "Wins",
         "short": "WINS",
-        "unit": "WINS"
+        "unit": "WINS",
+        "description": "この部門の実測シーズン順位です。"
       },
       "top_10": {
         "label": "Top 10 Finishes",
         "short": "TOP 10",
-        "unit": "TOP 10"
+        "unit": "TOP 10",
+        "description": "この部門の実測シーズン順位です。"
       },
       "drive_avg": {
         "label": "Driving Distance",
         "short": "DRIVING",
-        "unit": "YDS"
+        "unit": "YDS",
+        "description": "この部門の実測シーズン順位です。"
       },
       "drive_acc": {
         "label": "Driving Accuracy",
         "short": "ACCURACY",
-        "unit": "%"
+        "unit": "%",
+        "description": "この部門の実測シーズン順位です。"
       },
       "gir_pct": {
         "label": "Greens in Regulation",
         "short": "GIR",
-        "unit": "%"
+        "unit": "%",
+        "description": "この部門の実測シーズン順位です。"
       },
       "sand_saves_pct": {
         "label": "Sand Saves",
         "short": "SAND SAVES",
-        "unit": "%"
+        "unit": "%",
+        "description": "この部門の実測シーズン順位です。"
       },
       "putt_avg": {
         "label": "Putting Average",
         "short": "PUTTING",
-        "unit": "PUTTS"
+        "unit": "PUTTS",
+        "description": "この部門の実測シーズン順位です。"
       },
       "strokes_gained_tee_green": {
         "label": "Strokes Gained T2G",
         "short": "SG T2G",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "この部門の実測シーズン順位です。"
       },
       "strokes_gained_putting": {
         "label": "Strokes Gained Putting",
         "short": "SG PUTT",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "この部門の実測シーズン順位です。"
       },
       "world_rank": {
         "label": "World Ranking",
         "short": "WORLD",
-        "unit": "OWGR"
+        "unit": "OWGR",
+        "description": "この部門の実測シーズン順位です。"
       },
       "points": {
         "label": "Season Points",
         "short": "POINTS",
-        "unit": "PTS"
+        "unit": "PTS",
+        "description": "この部門の実測シーズン順位です。"
       },
       "events_played": {
         "label": "Events Played",
         "short": "EVENTS",
-        "unit": "EVENTS"
+        "unit": "EVENTS",
+        "description": "この部門の実測シーズン順位です。"
       },
       "top_25": {
         "label": "Top 25 Finishes",
         "short": "TOP 25",
-        "unit": "TOP 25"
+        "unit": "TOP 25",
+        "description": "この部門の実測シーズン順位です。"
       },
       "cuts_made": {
         "label": "Cuts Made",
         "short": "CUTS MADE",
-        "unit": "CUTS"
+        "unit": "CUTS",
+        "description": "この部門の実測シーズン順位です。"
       },
       "birdies_per_round": {
         "label": "Birdies Per Round",
         "short": "BIRDIES / RD",
-        "unit": "AVG"
+        "unit": "AVG",
+        "description": "この部門の実測シーズン順位です。"
       },
       "scrambling": {
         "label": "Scrambling",
         "short": "SCRAMBLING",
-        "unit": "%"
+        "unit": "%",
+        "description": "この部門の実測シーズン順位です。"
       },
       "strokes_gained_total": {
         "label": "Strokes Gained Total",
         "short": "SG: TOTAL",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "この部門の実測シーズン順位です。"
       },
       "strokes_gained_around_green": {
         "label": "Strokes Gained Around Green",
         "short": "SG: AROUND",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "この部門の実測シーズン順位です。"
       }
     },
     "pointsBrand": {
@@ -826,6 +846,35 @@
         "putt_avg": "平均パット数",
         "wins": "最多優勝",
         "top_10": "最多トップ10"
+      }
+    },
+    "season": {
+      "kicker": "今シーズン",
+      "raceTitle": "混戦のシーズン",
+      "playerStandfirst": "{{name}}が今季をリード。実測データがその強さを示します。",
+      "raceStandfirst": "今季はまだ誰のものでもありません。ポイント争いが続きます。",
+      "movement": "順位変動",
+      "movementTitle": "伸びている選手",
+      "oneNumber": "注目の数字",
+      "duel": "僅差の争い",
+      "sharedLead": "首位タイ",
+      "steady": "変動なし",
+      "categoryDescription": "この部門の実測シーズン順位です。"
+    },
+    "index": {
+      "title": "シーズン全成績",
+      "kicker": "シーズン索引",
+      "standfirst": "実測された全リーダーを部門別に比較できます。",
+      "search": "成績または選手を検索",
+      "loading": "シーズン成績を読み込み中",
+      "groups": {
+        "season": "シーズン",
+        "scoring": "スコア",
+        "tee": "ティーショット",
+        "approach": "アプローチ",
+        "putting": "パッティング",
+        "strokesGained": "ストロークゲインド",
+        "ranking": "ランキング"
       }
     }
   },

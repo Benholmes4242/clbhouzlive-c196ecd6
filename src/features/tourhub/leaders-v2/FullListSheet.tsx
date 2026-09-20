@@ -1,353 +1,48 @@
-/**
- * FullListSheet - the deep almanac for a single Boards category.
- *
- * 75dvh, SLATE_50 surface, flat ranked ledger: no alternating fill, no rule
- * between rows, no gold or amber on any row. The gap to the leader sits
- * beneath each value; the leader's own row shows nothing there.
- *
- * Ranks are competition ranks (T3 / T3 / 5) computed upstream in
- * useLeaderCategories. Filtering never re-ranks: a filtered row keeps its
- * original rank label, value and gap, because the member is looking up where
- * somebody sits.
- */
-
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
-/* RAISED field set: the list sheet paints SURFACE #1B1E27, a ground LIGHTER than the
-   canvas, where 6% stops reading as a well. Explicit import by design — the
-   canon never computes this from context. See lib/tokens/field.ts. */
-import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
-
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import CountryFlag from '@/components/ui/country-flag';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
-import {
-  FONT,
-  HAIRLINE_INK_10,
-  INK,
-  INK_FAINT,
-  INK_MUTE,
-  SLATE_50 } from '../_shared/tokens';
-import { TITLE } from '@/lib/tokens/type';
-
+import { FIELD_PAINT_RAISED_CLASS } from '@/lib/tokens/field';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { AMBER, FONT, INK, INK_MUTE, SLATE_50, WHITE_ALPHA_06 } from '../_shared/tokens';
 import type { LeaderCategoryDef } from './data/useLeaderCategories';
 import type { LivePlayerMap } from '../players-v2/data/useLivePlayerIds';
 
-const LIVE_GREEN = '#10B981';
-/** Below this the list is short enough to read; a filter would be noise. */
-const SEARCH_MIN_ROWS = 12;
+export interface FullListSheetProps { open: boolean; onClose: () => void; category: LeaderCategoryDef | null; liveMap: LivePlayerMap; tourLabel: string; year: number; }
 
-export interface FullListSheetProps {
-  open: boolean;
-  onClose: () => void;
-  category: LeaderCategoryDef | null;
-  liveMap: LivePlayerMap;
-  tourLabel: string;
-  year: number;
-}
-
-export function FullListSheet({
-  open,
-  onClose,
-  category,
-  liveMap,
-  tourLabel,
-  year,
-}: FullListSheetProps) {
+export function FullListSheet({ open, onClose, category, tourLabel, year }: FullListSheetProps) {
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
-
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebouncedValue(query, 200);
-
-  const categoryKey = category?.key ?? null;
+  const debounced = useDebouncedValue(query, 200);
   const rows = category?.rows ?? [];
-  const total = rows.length;
-  const poolSize = category?.poolSize ?? total;
-
-  // A new category is a new list: never carry a stale filter into it.
-  useEffect(() => {
-    setQuery('');
-  }, [categoryKey]);
-
+  useEffect(() => setQuery(''), [category?.key]);
   const filtered = useMemo(() => {
-    const q = debouncedQuery.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((r) => r.name.toLowerCase().includes(q));
-  }, [rows, debouncedQuery]);
-
-  useEffect(() => {
-    const q = debouncedQuery.trim();
-    if (!open || !categoryKey || !q) return;
-    analyticsEvents.track('tour_leaders_sheet_searched', {
-      category: categoryKey,
-      query_length: q.length,
-      results: filtered.length,
-    });
-    // Debounced value only - not per keystroke, and never the query text.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuery, categoryKey, open]);
-
-  const handleRowTap = useCallback(
-    (playerId: string, rank: number, tied: boolean) => {
-      if (!playerId) return;
-      if (categoryKey) {
-        analyticsEvents.track('tour_leaders_sheet_player_tapped', {
-          category: categoryKey,
-          player_id: playerId,
-          rank,
-          tied,
-          tour: tourLabel,
-        });
-      }
-      onClose();
-      setTimeout(() => navigate(`/tourhub/player/${playerId}`), 60);
-    },
-    [navigate, onClose, categoryKey, tourLabel],
-  );
-
+    const value = debounced.trim().toLowerCase();
+    return value ? rows.filter((row) => row.name.toLowerCase().includes(value)) : rows;
+  }, [debounced, rows]);
+  const selectPlayer = useCallback((playerId: string, rank: number, tied: boolean) => {
+    if (!playerId || !category) return;
+    analyticsEvents.track('tour_leaders_sheet_player_tapped', { category: category.key, player_id: playerId, rank, tied, tour: tourLabel });
+    onClose();
+    setTimeout(() => navigate(`/tourhub/player/${playerId}`), 60);
+  }, [category, navigate, onClose, tourLabel]);
   if (!category) return null;
-
-  const sliced = poolSize > total;
-  const eyebrow = sliced
-    ? t('leaders.sheet.eyebrowSliced', { tourLabel, year, shown: total, pool: poolSize })
-    : t('leaders.sheet.eyebrow', { tourLabel, year, count: poolSize });
-  const showSearch = total > SEARCH_MIN_ROWS;
-
-  return (
-    <BottomSheet
-      open={open}
-      onClose={onClose}
-      ariaLabelledBy="tour-leaders-full-sheet-title"
-      style={{
-        height: 'auto',
-        maxHeight: '85dvh',
-        display: 'flex',
-        flexDirection: 'column',
-        fontFamily: FONT,
-        background: SLATE_50,
-      }}
-    >
-      {/* Header */}
-      <div style={{ padding: '10px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_10}`, background: SLATE_50, flexShrink: 0 }}>
-        <div style={{ minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              color: INK,
-              marginBottom: 5,
-              fontVariantNumeric: 'tabular-nums lining-nums',
-            }}
-          >
-            {eyebrow}
-          </div>
-          <div
-            id="tour-leaders-full-sheet-title"
-            style={{
-              ...TITLE,
-              color: INK,
-            }}
-          >
-            {t(category.labelKey)}
-          </div>
-        </div>
-
-        {showSearch && (
-          <div
-            style={{
-              marginTop: 10,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '6px 12px',
-            }}
-            /* FIELD CANON (lib/tokens/field.ts). HEIGHT EXCEPTION (~33px,
-               padding-derived): sheet header above the leaders list. */
-            className={FIELD_PAINT_RAISED_CLASS}
-          >
-            <Search size={13} color={INK_MUTE} strokeWidth={2.25} />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('leaders.sheet.searchPlaceholder')}
-              style={{
-                flex: 1,
-                minWidth: 0,
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                fontFamily: FONT,
-                fontSize: 13,
-                color: INK,
-              }}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Body */}
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          background: SLATE_50,
-          padding: '12px 0',
-        }}
-      >
-        {total === 0 ? (
-          <div style={{ padding: '28px 16px', textAlign: 'center', color: INK_MUTE, fontSize: 12, fontWeight: 600 }}>
-            {t('leaders.sheet.empty')}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div
-            style={{
-              padding: '28px 24px',
-              textAlign: 'center',
-              color: INK_MUTE,
-              fontSize: 12,
-              fontWeight: 500,
-              lineHeight: 1.5,
-            }}
-          >
-            {t('leaders.sheet.noMatch', { shown: total, pool: poolSize })}
-          </div>
-        ) : (
-          <div style={{ padding: '0 4px' }}>
-            {filtered.map((r) => {
-              const live = !!liveMap[r.playerId];
-              return (
-                <button
-                  key={r.playerId || `l-${r.rank}`}
-                  type="button"
-                  onClick={() => handleRowTap(r.playerId, r.rank, r.tied)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 11,
-                    width: '100%',
-                    padding: '11px 12px',
-                    background: 'transparent',
-                    border: 'none',
-                    fontFamily: FONT,
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 30,
-                      flex: '0 0 30px',
-                      textAlign: 'right',
-                      fontSize: 12,
-                      fontWeight: 500,
-                      fontVariantNumeric: 'tabular-nums lining-nums',
-                      color: INK_MUTE,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {r.rankLabel}
-                  </div>
-                  <div style={{ flexShrink: 0, position: 'relative' }}>
-                    <SquircleAvatar
-                      size={34}
-                      srcCandidates={resolvePlayerAvatarCandidates({
-                        name: r.name,
-                        photoUrl: r.photoUrl,
-                        tourSlug: r.tourCode ?? 'pga',
-                      })}
-                      alt={r.name}
-                      userId={r.playerId}
-                      hairlineRing
-                    />
-                    {live && (
-                      <span
-                        style={{
-                          position: 'absolute',
-                          top: 1,
-                          right: 1,
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          background: LIVE_GREEN,
-                          boxShadow: `0 0 0 2px ${SLATE_50}`,
-                        }}
-                      />
-                    )}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: INK,
-                        lineHeight: 1.2,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        minWidth: 0,
-                      }}
-                    >
-                      {r.name}
-                    </div>
-                    <CountryFlag country={r.country} size="sm" />
-                  </div>
-                  <div
-                    style={{
-                      width: 112,
-                      flex: '0 0 112px',
-                      textAlign: 'right',
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: INK,
-                        lineHeight: 1,
-                        fontVariantNumeric: 'tabular-nums lining-nums',
-                      }}
-                    >
-                      {r.valueFormatted}
-                    </div>
-                    {/* Leader row renders nothing here: rank 1 already says it. */}
-                    {r.behindFormatted && (
-                      <div
-                        style={{
-                          marginTop: 4,
-                          fontSize: 11,
-                          fontWeight: 700,
-                          letterSpacing: '0.10em',
-                          textTransform: 'uppercase',
-                          color: INK_FAINT,
-                          whiteSpace: 'nowrap',
-                          lineHeight: 1,
-                          fontVariantNumeric: 'tabular-nums lining-nums',
-                        }}
-                      >
-                        {t('leaders.behind', { gap: r.behindFormatted })}
-                      </div>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        )}
-        <div style={{ height: 24 }} />
-      </div>
-    </BottomSheet>
-  );
+  const leader = rows[0];
+  return <BottomSheet open={open} onClose={onClose} ariaLabelledBy="tour-leaders-full-sheet-title" style={{ maxHeight: '85dvh', display: 'flex', flexDirection: 'column', background: SLATE_50, fontFamily: FONT }}>
+    <header style={{ flexShrink: 0, padding: '12px 24px 16px', borderBottom: `1px solid ${WHITE_ALPHA_06}` }}>
+      <p style={{ margin: 0, color: INK_MUTE, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{tourLabel} · {year}</p>
+      <h2 id="tour-leaders-full-sheet-title" style={{ margin: '6px 0 0', color: INK, fontSize: 25, lineHeight: 1.05, fontWeight: 850 }}>{t(category.labelKey)}</h2>
+      <p style={{ margin: '8px 0 0', color: INK_MUTE, fontSize: 12, lineHeight: 1.45 }}>{t(category.descriptionKey, { defaultValue: t('leaders.season.categoryDescription') })}</p>
+      {leader ? <div style={{ marginTop: 16, padding: '13px 16px', background: 'rgba(247,147,30,0.10)', borderLeft: `3px solid ${AMBER}`, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', gap: 12, alignItems: 'center' }}><span style={{ minWidth: 0, color: A.INK, fontSize: 14, fontWeight: 800, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{leader.name}</span><span style={{ color: AMBER, fontSize: 18, fontWeight: 900, fontVariantNumeric: 'tabular-nums' }}>{leader.valueFormatted}</span></div> : null}
+      {rows.length > 12 ? <label className={FIELD_PAINT_RAISED_CLASS} style={{ marginTop: 12, height: 36, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 8 }}><Search size={14} color={INK_MUTE} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t('leaders.sheet.searchPlaceholder')} style={{ flex: 1, minWidth: 0, border: 0, outline: 0, background: 'transparent', color: INK, fontSize: 13 }} /></label> : null}
+    </header>
+    <div style={{ overflowY: 'auto', minHeight: 0 }}>
+      {filtered.map((row, index) => <button key={row.playerId || `${row.name}-${row.rank}`} type="button" onClick={() => selectPlayer(row.playerId, row.rank, row.tied)} style={{ width: '100%', minHeight: 76, padding: '13px 24px', display: 'grid', gridTemplateColumns: '28px minmax(0,1fr) auto', alignItems: 'center', gap: 10, border: 0, borderBottom: index === filtered.length - 1 ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', textAlign: 'left', cursor: 'pointer' }}><span style={{ color: INK_MUTE, fontSize: 11, fontWeight: 800 }}>{row.rankLabel}</span><span style={{ minWidth: 0, color: INK, fontSize: 14, fontWeight: 750, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{row.name}</span><span style={{ textAlign: 'right' }}><span style={{ display: 'block', color: INK, fontSize: 17, fontWeight: 850 }}>{row.valueFormatted}</span>{category.meaningfulBehind && row.behindFormatted ? <span style={{ color: INK_MUTE, fontSize: 9, fontWeight: 750 }}>+{row.behindFormatted}</span> : null}</span></button>)}
+      {!filtered.length ? <p style={{ padding: 28, color: INK_MUTE, textAlign: 'center', fontSize: 12 }}>{t('leaders.sheet.noMatch', { shown: rows.length, pool: category.poolSize })}</p> : null}
+    </div>
+  </BottomSheet>;
 }
-
-export default FullListSheet;

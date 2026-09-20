@@ -53,7 +53,7 @@ export interface LeaderRow {
   tourCode: string | null;
   value: number;
   valueFormatted: string;
-  /** prior_rank - rank. Populated for world_rank only; null everywhere else. */
+  /** Prior standing minus current standing, only when a measured prior standing exists. */
   movement: number | null;
   /** Gap to the leader, formatted with the category's OWN formatter, always as
    *  a positive quantity. null on the leader row and on exact ties. */
@@ -122,29 +122,46 @@ export interface LeaderStatLabelSet {
   labelKey: string;
   shortKey: string;
   unitKey: string;
+  descriptionKey: string;
+  group: LeaderCategoryGroup;
+  meaningfulBehind: boolean;
+  picturableGap: boolean;
+  duelGapLimit: number;
 }
+export type LeaderCategoryGroup = 'season' | 'scoring' | 'tee' | 'approach' | 'putting' | 'strokesGained' | 'ranking';
+
+const stat = (key: string, group: LeaderCategoryGroup, meaningfulBehind: boolean, picturableGap: boolean, duelGapLimit = 0.02): LeaderStatLabelSet => ({
+  labelKey: `leaders.stat.${key}.label`,
+  shortKey: `leaders.stat.${key}.short`,
+  unitKey: `leaders.stat.${key}.unit`,
+  descriptionKey: `leaders.stat.${key}.description`,
+  group,
+  meaningfulBehind,
+  picturableGap,
+  duelGapLimit,
+});
 export const LEADER_STAT_LABELS: Record<string, LeaderStatLabelSet> = {
-  earnings:                    { labelKey: 'leaders.stat.earnings.label',                    shortKey: 'leaders.stat.earnings.short',                    unitKey: 'leaders.stat.earnings.unit' },
-  scoring_avg:                 { labelKey: 'leaders.stat.scoring_avg.label',                 shortKey: 'leaders.stat.scoring_avg.short',                 unitKey: 'leaders.stat.scoring_avg.unit' },
-  wins:                        { labelKey: 'leaders.stat.wins.label',                        shortKey: 'leaders.stat.wins.short',                        unitKey: 'leaders.stat.wins.unit' },
-  top_10:                      { labelKey: 'leaders.stat.top_10.label',                      shortKey: 'leaders.stat.top_10.short',                      unitKey: 'leaders.stat.top_10.unit' },
-  drive_avg:                   { labelKey: 'leaders.stat.drive_avg.label',                   shortKey: 'leaders.stat.drive_avg.short',                   unitKey: 'leaders.stat.drive_avg.unit' },
-  drive_acc:                   { labelKey: 'leaders.stat.drive_acc.label',                   shortKey: 'leaders.stat.drive_acc.short',                   unitKey: 'leaders.stat.drive_acc.unit' },
-  gir_pct:                     { labelKey: 'leaders.stat.gir_pct.label',                     shortKey: 'leaders.stat.gir_pct.short',                     unitKey: 'leaders.stat.gir_pct.unit' },
-  sand_saves_pct:              { labelKey: 'leaders.stat.sand_saves_pct.label',              shortKey: 'leaders.stat.sand_saves_pct.short',              unitKey: 'leaders.stat.sand_saves_pct.unit' },
-  putt_avg:                    { labelKey: 'leaders.stat.putt_avg.label',                    shortKey: 'leaders.stat.putt_avg.short',                    unitKey: 'leaders.stat.putt_avg.unit' },
-  strokes_gained_tee_green:    { labelKey: 'leaders.stat.strokes_gained_tee_green.label',    shortKey: 'leaders.stat.strokes_gained_tee_green.short',    unitKey: 'leaders.stat.strokes_gained_tee_green.unit' },
-  strokes_gained_putting:      { labelKey: 'leaders.stat.strokes_gained_putting.label',      shortKey: 'leaders.stat.strokes_gained_putting.short',      unitKey: 'leaders.stat.strokes_gained_putting.unit' },
-  world_rank:                  { labelKey: 'leaders.stat.world_rank.label',                  shortKey: 'leaders.stat.world_rank.short',                  unitKey: 'leaders.stat.world_rank.unit' },
-  points:                      { labelKey: 'leaders.stat.points.label',                      shortKey: 'leaders.stat.points.short',                      unitKey: 'leaders.stat.points.unit' },
+  earnings: stat('earnings', 'season', false, false),
+  scoring_avg: stat('scoring_avg', 'scoring', true, true, 0.01),
+  wins: stat('wins', 'season', false, false),
+  top_10: stat('top_10', 'season', false, false),
+  drive_avg: stat('drive_avg', 'tee', true, true),
+  drive_acc: stat('drive_acc', 'tee', true, true, 0.03),
+  gir_pct: stat('gir_pct', 'approach', true, true, 0.03),
+  sand_saves_pct: stat('sand_saves_pct', 'approach', true, true, 0.05),
+  putt_avg: stat('putt_avg', 'putting', true, true),
+  strokes_gained_tee_green: stat('strokes_gained_tee_green', 'strokesGained', true, true, 0.2),
+  strokes_gained_putting: stat('strokes_gained_putting', 'strokesGained', true, true, 0.2),
+  world_rank: stat('world_rank', 'ranking', false, false),
+  points: stat('points', 'season', false, false),
   // Wave 3e.iv Turn C.3 extensions - consumed by player-v2/StatsSheet.
-  events_played:               { labelKey: 'leaders.stat.events_played.label',               shortKey: 'leaders.stat.events_played.short',               unitKey: 'leaders.stat.events_played.unit' },
-  top_25:                      { labelKey: 'leaders.stat.top_25.label',                      shortKey: 'leaders.stat.top_25.short',                      unitKey: 'leaders.stat.top_25.unit' },
-  cuts_made:                   { labelKey: 'leaders.stat.cuts_made.label',                   shortKey: 'leaders.stat.cuts_made.short',                   unitKey: 'leaders.stat.cuts_made.unit' },
-  birdies_per_round:           { labelKey: 'leaders.stat.birdies_per_round.label',           shortKey: 'leaders.stat.birdies_per_round.short',           unitKey: 'leaders.stat.birdies_per_round.unit' },
-  scrambling:                  { labelKey: 'leaders.stat.scrambling.label',                  shortKey: 'leaders.stat.scrambling.short',                  unitKey: 'leaders.stat.scrambling.unit' },
-  strokes_gained_total:        { labelKey: 'leaders.stat.strokes_gained_total.label',        shortKey: 'leaders.stat.strokes_gained_total.short',        unitKey: 'leaders.stat.strokes_gained_total.unit' },
-  strokes_gained_around_green: { labelKey: 'leaders.stat.strokes_gained_around_green.label', shortKey: 'leaders.stat.strokes_gained_around_green.short', unitKey: 'leaders.stat.strokes_gained_around_green.unit' },
+  events_played: stat('events_played', 'season', false, false),
+  top_25: stat('top_25', 'season', false, false),
+  cuts_made: stat('cuts_made', 'season', false, false),
+  birdies_per_round: stat('birdies_per_round', 'scoring', true, true, 0.05),
+  scrambling: stat('scrambling', 'approach', true, true, 0.05),
+  strokes_gained_total: stat('strokes_gained_total', 'strokesGained', true, true, 0.2),
+  strokes_gained_around_green: stat('strokes_gained_around_green', 'strokesGained', true, true, 0.2),
 };
 
 // Per-tour override for the points category display label (brand names).
@@ -162,6 +179,11 @@ export interface LeaderCategoryDef {
   unitKey: string;       // t() -> right-column subtitle in the sheet header
   rows: LeaderRow[];     // top 50
   poolSize: number;      // players in the category pool BEFORE the top-50 slice
+  descriptionKey: string;
+  group: LeaderCategoryGroup;
+  meaningfulBehind: boolean;
+  picturableGap: boolean;
+  duelGapLimit: number;
 }
 
 /**
@@ -238,7 +260,11 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 // LEADER_STAT_LABELS[key] at render - no display strings live here.
 type PgaStatRow = {
   player_id: string | null;
+  fedex_points: number | null;
   earnings: number | null;
+  events_played: number | null;
+  cuts_made: number | null;
+  top_25s: number | null;
   scoring_average: number | null;
   wins: number | null;
   top_10s: number | null;
@@ -249,7 +275,21 @@ type PgaStatRow = {
   putting_average: number | null;
   strokes_gained_tee_green: number | null;
   strokes_gained_putting: number | null;
+  raw_data: unknown;
 };
+
+function rawStat(row: PgaStatRow, ...keys: string[]): number | null {
+  if (!row.raw_data || typeof row.raw_data !== 'object') return null;
+  const raw = row.raw_data as Record<string, unknown>;
+  const nested = raw.statistics && typeof raw.statistics === 'object'
+    ? raw.statistics as Record<string, unknown>
+    : raw;
+  for (const key of keys) {
+    const value = Number(nested[key]);
+    if (Number.isFinite(value) && value !== 0) return value;
+  }
+  return null;
+}
 
 type TourSeasonRankingRow = {
   player_id: string | null;
@@ -260,7 +300,18 @@ type TourSeasonRankingRow = {
   wins: number | null;
   country: string | null;
   tour_code: string | null;
+  position_change: string | null;
 };
+
+function parseMovement(value: string | null): number | null {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  if (!normalized || normalized === '-' || normalized === 'same') return 0;
+  const amount = Number(normalized.replace(/[^0-9.-]/g, ''));
+  if (!Number.isFinite(amount)) return null;
+  if (normalized.startsWith('-') || normalized.includes('down')) return -Math.abs(amount);
+  return Math.abs(amount);
+}
 
 interface PgaCatSpec {
   key: string;
@@ -270,6 +321,7 @@ interface PgaCatSpec {
 }
 
 const PGA_CATS: PgaCatSpec[] = [
+  { key: 'points',                   dir: 'desc', accessor: (s) => s.fedex_points,              format: fmtInt },
   { key: 'earnings',                 dir: 'desc', accessor: (s) => s.earnings,                 format: fmtMoneyCompact },
   { key: 'scoring_avg',              dir: 'asc',  accessor: (s) => s.scoring_average,          format: fmtAvg3 },
   { key: 'wins',                     dir: 'desc', accessor: (s) => s.wins,                     format: fmtInt },
@@ -281,6 +333,12 @@ const PGA_CATS: PgaCatSpec[] = [
   { key: 'putt_avg',                 dir: 'asc',  accessor: (s) => s.putting_average,          format: fmtAvg3 },
   { key: 'strokes_gained_tee_green', dir: 'desc', accessor: (s) => s.strokes_gained_tee_green, format: fmtSG },
   { key: 'strokes_gained_putting',   dir: 'desc', accessor: (s) => s.strokes_gained_putting,   format: fmtSG },
+  { key: 'events_played',             dir: 'desc', accessor: (s) => s.events_played,              format: fmtInt },
+  { key: 'top_25',                    dir: 'desc', accessor: (s) => s.top_25s,                     format: fmtInt },
+  { key: 'cuts_made',                 dir: 'desc', accessor: (s) => s.cuts_made,                   format: fmtInt },
+  { key: 'birdies_per_round',         dir: 'desc', accessor: (s) => rawStat(s, 'birdies_per_round', 'birdiesPerRound'), format: fmtAvg },
+  { key: 'scrambling',                dir: 'desc', accessor: (s) => rawStat(s, 'scrambling', 'scrambling_pct'), format: fmtPct },
+  { key: 'strokes_gained_total',      dir: 'desc', accessor: (s) => rawStat(s, 'strokes_gained_total', 'strokesGainedTotal'), format: fmtSG },
 ];
 
 type PlayerRec = {
@@ -364,13 +422,32 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
   const { data: stats, error: statsErr } = await supabase
     .from('sr_player_statistics')
     .select(
-      'player_id, earnings, scoring_average, wins, top_10s, driving_distance, driving_accuracy, greens_in_reg, sand_saves, putting_average, strokes_gained_tee_green, strokes_gained_putting'
+      'player_id, fedex_points, earnings, events_played, cuts_made, top_25s, scoring_average, wins, top_10s, driving_distance, driving_accuracy, greens_in_reg, sand_saves, putting_average, strokes_gained_tee_green, strokes_gained_putting, raw_data'
     )
     .eq('season_id', seasonId)
     .limit(500);
   if (statsErr) throw statsErr;
 
   const pool = (stats ?? []) as PgaStatRow[];
+  const { data: snapshots } = await supabase
+    .from('sr_player_statistics_snapshots')
+    .select('player_id, snapshot_month, stats')
+    .eq('season_id', seasonId)
+    .order('snapshot_month', { ascending: false })
+    .limit(1000);
+  const snapshotMonths = [...new Set((snapshots ?? []).map((snapshot) => snapshot.snapshot_month))];
+  // The current table is reading one; use the preceding measured snapshot as reading two.
+  const latestMonth = snapshotMonths[1] ?? snapshotMonths[0] ?? null;
+  const priorPoints = (snapshots ?? [])
+    .filter((snapshot) => snapshot.snapshot_month === latestMonth && snapshot.player_id)
+    .map((snapshot) => {
+      const source = snapshot.stats && typeof snapshot.stats === 'object' ? snapshot.stats as Record<string, unknown> : {};
+      const value = Number(source.fedex_points ?? source.points ?? 0);
+      return { playerId: snapshot.player_id ?? '', value };
+    })
+    .filter((entry) => entry.value > 0)
+    .sort((a, b) => b.value - a.value);
+  const priorRank = new Map(priorPoints.map((entry, index) => [entry.playerId, index + 1]));
   const playerIds = [...new Set(pool.map((s) => s.player_id).filter((v): v is string => !!v))];
   const pmap = await fetchPlayers(playerIds);
 
@@ -409,7 +486,7 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
           tourCode: p.tour_codes?.[0] ?? 'pga',
           value: r.value,
           valueFormatted: cat.format(r.value),
-          movement: null,
+          movement: cat.key === 'points' && priorRank.has(r.pid) ? (priorRank.get(r.pid) ?? r.rank) - r.rank : null,
           behindFormatted: null,
         };
       });
@@ -434,7 +511,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
   const year = currentSeasonYear();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const primary = await (supabase.from('tour_season_rankings' as any) as any)
-    .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
+    .select('player_id, manual_player_id, player_name, position, position_change, points, wins, country, tour_code')
     .eq('tour_code', tour)
     .eq('season_year', year)
     .order('position', { ascending: true })
@@ -444,7 +521,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
   if (!rankings.length) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const alt = await (supabase.from('tour_season_rankings' as any) as any)
-      .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
+      .select('player_id, manual_player_id, player_name, position, position_change, points, wins, country, tour_code')
       .eq('tour_code', tour)
       .eq('season_year', year - 1)
       .order('position', { ascending: true })
@@ -481,7 +558,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         tourCode: p?.tour_codes?.[0] ?? tour,
         value: 0,
         valueFormatted: '',
-        movement: null,
+        movement: parseMovement(r.position_change),
         behindFormatted: null,
       };
     };
@@ -505,9 +582,8 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
       const brandLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour];
       categories.push({
         key: 'points',
+        ...pointsBase,
         labelKey: brandLabelKey ?? pointsBase.labelKey,
-        shortKey: pointsBase.shortKey,
-        unitKey: pointsBase.unitKey,
         rows: applyBehind(pointsRows, 'desc', fmtPoints),
         poolSize: pointsPool.length,
       });
