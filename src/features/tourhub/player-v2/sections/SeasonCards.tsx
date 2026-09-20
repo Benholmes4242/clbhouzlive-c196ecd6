@@ -60,6 +60,8 @@ export function SeasonCards({ playerStats, results, player, selection }: SeasonC
         { key: 'top10', label: t('player.season.card.top10s'), value: playerStats.top_10s },
         { key: 'cuts', label: t('player.season.card.madeCuts'), value: playerStats.cuts_made },
       ].filter((item) => typeof item.value === 'number').slice(0, 4)
+    : entered.length === 0
+    ? []
     : [
         { key: 'events', label: t('player.season.card.events'), value: entered.length },
         { key: 'best', label: t('player.season.card.bestFinish'), value: best ? formatPositionShort(best.position, best.position_tied, best.status) : null },
