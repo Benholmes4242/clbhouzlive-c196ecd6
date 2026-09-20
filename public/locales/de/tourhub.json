@@ -655,7 +655,8 @@
       "round": "Round {{round}}",
       "yardageShort": "{{yardage}} yds",
       "eyebrow": "Event Info",
-      "yardage": "Länge"
+      "yardage": "Länge",
+      "defendingChampion": "TITELVERTEIDIGUNG"
     },
     "course": {
       "title": "The Course",

@@ -651,7 +651,8 @@
       "round": "Round {{round}}",
       "yardageShort": "{{yardage}} yds",
       "eyebrow": "Event Info",
-      "yardage": "야드"
+      "yardage": "야드",
+      "defendingChampion": "디펜딩 챔피언"
     },
     "course": {
       "title": "The Course",
