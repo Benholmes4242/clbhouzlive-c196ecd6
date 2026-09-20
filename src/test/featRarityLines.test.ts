@@ -152,7 +152,7 @@ describe('feat rarity lines against the live backfilled rows', () => {
   it('drops the year for a previous occurrence inside the current calendar year', () => {
     const lines = featRarityLines({
       rows: [{ feat_kind: 'eagle_brace', global_ordinal: 4, total_rounds_at_detection: 3600, distinct_members_at_detection: 2 }],
-      owner: { 0: null } && [{ feat_kind: 'eagle_brace', is_owner: true, member_ordinal: 2, member_rounds: 230, member_prev_at: '2026-03-08' }],
+      owner: [{ feat_kind: 'eagle_brace', is_owner: true, member_ordinal: 2, member_rounds: 230, member_prev_at: '2026-03-08' }],
       t,
       locale: 'en-GB',
       now: NOW,
