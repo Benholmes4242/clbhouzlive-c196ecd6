@@ -265,7 +265,7 @@ function boardFeatLabel(feat: ExploreRoundFeat, t: BoardT): string {
     case 'albatross':
       return t('discover.filterBoard.featAlbatross', { count: feat.count, defaultValue_one: 'ALBATROSS', defaultValue_other: '{{count}} ALBATROSSES' });
     case 'eagle':
-      return t('discover.filterBoard.featEagle', { count: feat.count, defaultValue_one: 'EAGLE', defaultValue_other: '{{count}} EAGLES' });
+      return t('discover.filterBoard.featEagle', { count: feat.count, defaultValue_one: 'EAGLE', defaultValue_other: 'EAGLE BRACE' });
     case 'birdies':
       return t('discover.filterBoard.featBirdies', { count: feat.count, defaultValue_one: '{{count}} BIRDIE', defaultValue_other: '{{count}} BIRDIES' });
     case 'clean':
