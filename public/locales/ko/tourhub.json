@@ -687,102 +687,122 @@
       "earnings": {
         "label": "Season Earnings",
         "short": "EARNINGS",
-        "unit": "USD"
+        "unit": "USD",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "scoring_avg": {
         "label": "Scoring Average",
         "short": "SCORING",
-        "unit": "AVG"
+        "unit": "AVG",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "wins": {
         "label": "Wins",
         "short": "WINS",
-        "unit": "WINS"
+        "unit": "WINS",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "top_10": {
         "label": "Top 10 Finishes",
         "short": "TOP 10",
-        "unit": "TOP 10"
+        "unit": "TOP 10",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "drive_avg": {
         "label": "Driving Distance",
         "short": "DRIVING",
-        "unit": "YDS"
+        "unit": "YDS",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "drive_acc": {
         "label": "Driving Accuracy",
         "short": "ACCURACY",
-        "unit": "%"
+        "unit": "%",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "gir_pct": {
         "label": "Greens in Regulation",
         "short": "GIR",
-        "unit": "%"
+        "unit": "%",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "sand_saves_pct": {
         "label": "Sand Saves",
         "short": "SAND SAVES",
-        "unit": "%"
+        "unit": "%",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "putt_avg": {
         "label": "Putting Average",
         "short": "PUTTING",
-        "unit": "PUTTS"
+        "unit": "PUTTS",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "strokes_gained_tee_green": {
         "label": "Strokes Gained T2G",
         "short": "SG T2G",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "strokes_gained_putting": {
         "label": "Strokes Gained Putting",
         "short": "SG PUTT",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "world_rank": {
         "label": "World Ranking",
         "short": "WORLD",
-        "unit": "OWGR"
+        "unit": "OWGR",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "points": {
         "label": "Season Points",
         "short": "POINTS",
-        "unit": "PTS"
+        "unit": "PTS",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "events_played": {
         "label": "Events Played",
         "short": "EVENTS",
-        "unit": "EVENTS"
+        "unit": "EVENTS",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "top_25": {
         "label": "Top 25 Finishes",
         "short": "TOP 25",
-        "unit": "TOP 25"
+        "unit": "TOP 25",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "cuts_made": {
         "label": "Cuts Made",
         "short": "CUTS MADE",
-        "unit": "CUTS"
+        "unit": "CUTS",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "birdies_per_round": {
         "label": "Birdies Per Round",
         "short": "BIRDIES / RD",
-        "unit": "AVG"
+        "unit": "AVG",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "scrambling": {
         "label": "Scrambling",
         "short": "SCRAMBLING",
-        "unit": "%"
+        "unit": "%",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "strokes_gained_total": {
         "label": "Strokes Gained Total",
         "short": "SG: TOTAL",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       },
       "strokes_gained_around_green": {
         "label": "Strokes Gained Around Green",
         "short": "SG: AROUND",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "이 부문의 측정된 시즌 순위입니다."
       }
     },
     "pointsBrand": {
@@ -826,6 +846,35 @@
         "putt_avg": "평균 퍼팅",
         "wins": "최다 우승",
         "top_10": "최다 톱10"
+      }
+    },
+    "season": {
+      "kicker": "이번 시즌",
+      "raceTitle": "열린 우승 경쟁",
+      "playerStandfirst": "{{name}} 선수가 시즌을 이끌고 있습니다. 측정된 수치가 그 이유를 보여줍니다.",
+      "raceStandfirst": "아직 시즌을 지배한 선수는 없습니다. 포인트 경쟁이 계속됩니다.",
+      "movement": "순위 변화",
+      "movementTitle": "상승 중인 선수",
+      "oneNumber": "주목할 수치",
+      "duel": "박빙의 승부",
+      "sharedLead": "공동 선두",
+      "steady": "변동 없음",
+      "categoryDescription": "이 부문의 측정된 시즌 순위입니다."
+    },
+    "index": {
+      "title": "전체 시즌 통계",
+      "kicker": "시즌 색인",
+      "standfirst": "측정된 모든 선두 기록을 부문별로 비교하세요.",
+      "search": "통계 또는 선두 선수 검색",
+      "loading": "시즌 통계 불러오는 중",
+      "groups": {
+        "season": "시즌",
+        "scoring": "스코어",
+        "tee": "티샷",
+        "approach": "어프로치",
+        "putting": "퍼팅",
+        "strokesGained": "스트로크 게인드",
+        "ranking": "랭킹"
       }
     }
   },

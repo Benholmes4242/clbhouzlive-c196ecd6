@@ -691,102 +691,122 @@
       "earnings": {
         "label": "Season Earnings",
         "short": "EARNINGS",
-        "unit": "USD"
+        "unit": "USD",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "scoring_avg": {
         "label": "Scoring Average",
         "short": "SCORING",
-        "unit": "AVG"
+        "unit": "AVG",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "wins": {
         "label": "Wins",
         "short": "WINS",
-        "unit": "WINS"
+        "unit": "WINS",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "top_10": {
         "label": "Top 10 Finishes",
         "short": "TOP 10",
-        "unit": "TOP 10"
+        "unit": "TOP 10",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "drive_avg": {
         "label": "Driving Distance",
         "short": "DRIVING",
-        "unit": "YDS"
+        "unit": "YDS",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "drive_acc": {
         "label": "Driving Accuracy",
         "short": "ACCURACY",
-        "unit": "%"
+        "unit": "%",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "gir_pct": {
         "label": "Greens in Regulation",
         "short": "GIR",
-        "unit": "%"
+        "unit": "%",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "sand_saves_pct": {
         "label": "Sand Saves",
         "short": "SAND SAVES",
-        "unit": "%"
+        "unit": "%",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "putt_avg": {
         "label": "Putting Average",
         "short": "PUTTING",
-        "unit": "PUTTS"
+        "unit": "PUTTS",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "strokes_gained_tee_green": {
         "label": "Strokes Gained T2G",
         "short": "SG T2G",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "strokes_gained_putting": {
         "label": "Strokes Gained Putting",
         "short": "SG PUTT",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "world_rank": {
         "label": "World Ranking",
         "short": "WORLD",
-        "unit": "OWGR"
+        "unit": "OWGR",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "points": {
         "label": "Season Points",
         "short": "POINTS",
-        "unit": "PTS"
+        "unit": "PTS",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "events_played": {
         "label": "Events Played",
         "short": "EVENTS",
-        "unit": "EVENTS"
+        "unit": "EVENTS",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "top_25": {
         "label": "Top 25 Finishes",
         "short": "TOP 25",
-        "unit": "TOP 25"
+        "unit": "TOP 25",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "cuts_made": {
         "label": "Cuts Made",
         "short": "CUTS MADE",
-        "unit": "CUTS"
+        "unit": "CUTS",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "birdies_per_round": {
         "label": "Birdies Per Round",
         "short": "BIRDIES / RD",
-        "unit": "AVG"
+        "unit": "AVG",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "scrambling": {
         "label": "Scrambling",
         "short": "SCRAMBLING",
-        "unit": "%"
+        "unit": "%",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "strokes_gained_total": {
         "label": "Strokes Gained Total",
         "short": "SG: TOTAL",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       },
       "strokes_gained_around_green": {
         "label": "Strokes Gained Around Green",
         "short": "SG: AROUND",
-        "unit": "SG"
+        "unit": "SG",
+        "description": "Die gemessene Saisonwertung in dieser Kategorie."
       }
     },
     "pointsBrand": {
@@ -830,6 +850,35 @@
         "putt_avg": "Putt-Durchschnitt",
         "wins": "Meiste Siege",
         "top_10": "Meiste Top-10"
+      }
+    },
+    "season": {
+      "kicker": "Die Saison",
+      "raceTitle": "Das Rennen ist offen",
+      "playerStandfirst": "{{name}} prägt diese Saison. Die gemessenen Zahlen zeigen, wie.",
+      "raceStandfirst": "Noch gehört die Saison niemandem. Das Punkterennen bleibt die Geschichte.",
+      "movement": "Bewegung",
+      "movementTitle": "Wer sich verbessert",
+      "oneNumber": "Eine Zahl",
+      "duel": "Knapper Abstand",
+      "sharedLead": "Geteilte Führung",
+      "steady": "Unverändert",
+      "categoryDescription": "Die gemessene Saisonwertung in dieser Kategorie."
+    },
+    "index": {
+      "title": "Alle Saisonstatistiken",
+      "kicker": "Saisonindex",
+      "standfirst": "Alle gemessenen Führenden, gruppiert für den schnellen Vergleich.",
+      "search": "Statistik oder Führenden suchen",
+      "loading": "Saisonstatistiken werden geladen",
+      "groups": {
+        "season": "Saison",
+        "scoring": "Scoring",
+        "tee": "Vom Abschlag",
+        "approach": "Annäherung",
+        "putting": "Putten",
+        "strokesGained": "Strokes Gained",
+        "ranking": "Weltrangliste"
       }
     }
   },
