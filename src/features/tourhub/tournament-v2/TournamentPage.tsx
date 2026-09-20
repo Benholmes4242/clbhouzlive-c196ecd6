@@ -106,7 +106,7 @@ export function TournamentPage() {
   // the tab=tee-times deep link is present (Brief F-TD-3 §4).
   const teeTimesRequested = searchParams.get('tab') === 'tee-times';
   const teeGroupsEnabled = pulse.state !== 'completed' || teeTimesRequested;
-  const { data: teeGroups = [], isLoading: teesLoading } = useTeeTimesAll(tournamentId, currentRound, { enabled: teeGroupsEnabled });
+  const { data: teeGroups = [] } = useTeeTimesAll(tournamentId, currentRound, { enabled: teeGroupsEnabled });
 
   const [teeTimesOpen, setTeeTimesOpen] = useState(false);
   const [fullBoardOpen, setFullBoardOpen] = useState(false);
