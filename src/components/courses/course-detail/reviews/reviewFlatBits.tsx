@@ -20,7 +20,7 @@
  */
 import React, { useState } from 'react';
 import { Heart, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import { formatRatingValue } from '@/utils/formatters';
@@ -88,7 +88,7 @@ const CategoryLine: React.FC<{ review: CourseReview }> = ({ review }) => {
             {i > 0 && <span aria-hidden="true" style={{ color: A.DIM }}>·</span>}
             <span>
               {item.label}{' '}
-              <span style={{ ...FIGS, color: value >= 9 ? A.GREEN : A.MUTE, fontWeight: 700 }}>
+              <span style={{ ...FIGS, color: courseSubScoreTone(value), fontWeight: 700 }}>
                 {formatRatingValue(value)}
               </span>
             </span>

@@ -153,3 +153,9 @@ Tour Overview Design A
 - [x] Two-feat board markers and three strictly gated callout tiers
 - [x] Count-aware bounded client notability bands
 - [x] Six fixtures, focused regression tests, typecheck, and 320px row measurement
+
+## Course sub-score tones C2
+- [x] Centralize the existing 9.0 green-or-muted analytical rule
+- [x] Refactor three course-detail callers without visual changes
+- [x] Apply per-score bar and figure tones to BrowseCourseCard
+- [x] Document the intentionally collapsed milestone themes

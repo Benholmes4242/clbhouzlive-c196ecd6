@@ -70,6 +70,15 @@ export const A = {
   HAIRLINE: 'rgba(255,255,255,0.10)',
 } as const;
 
+/**
+ * A course sub-score is GREEN at 9.0 and above, and MUTE below or when absent.
+ * Green is reserved for this standout signal: it is the one place that colour
+ * earns its keep here, so nothing else on a course card may use it.
+ */
+export function courseSubScoreTone(score: number | null | undefined): string {
+  return score != null && score >= 9 ? A.GREEN : A.MUTE;
+}
+
 /** Every analytical bar, track and segment. A measurement, not a pill. */
 export const BAR_RADIUS = 2;
 

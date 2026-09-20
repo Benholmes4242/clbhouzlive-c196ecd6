@@ -6,7 +6,7 @@
  * Category figures use the shared binary rule: green at 9+, muted otherwise.
  */
 import React from 'react';
-import { A, SANS, FIGS, BAR_RADIUS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, FIGS, BAR_RADIUS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { AboutSection } from '../about/AboutSection';
 
 export interface CategoryAggregates {
@@ -46,12 +46,12 @@ export const WhatTheyScored: React.FC<WhatTheyScoredProps> = ({ aggregates }) =>
                   display: 'block',
                   height: '100%',
                   width: `${Math.max(0, Math.min(100, (row.value / 10) * 100))}%`,
-                  background: row.value >= 9 ? A.GREEN : A.MUTE,
+                   background: courseSubScoreTone(row.value),
                   borderRadius: BAR_RADIUS,
                 }}
               />
             </span>
-            <span style={{ width: 30, flexShrink: 0, textAlign: 'right', fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', color: row.value >= 9 ? A.GREEN : A.MUTE, ...FIGS }}>
+             <span style={{ width: 30, flexShrink: 0, textAlign: 'right', fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', color: courseSubScoreTone(row.value), ...FIGS }}>
               {row.value.toFixed(1)}
             </span>
           </div>

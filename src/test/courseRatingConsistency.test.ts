@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 const src = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8');
 const locales = ['en', 'de', 'es', 'ja', 'ko', 'en-XA'] as const;
@@ -44,13 +45,33 @@ describe('C1 course rating consistency', () => {
     expect(card).toContain('const ratingColor = bandColorOnDark(rating)');
   });
 
-  it('keeps category figures binary green-or-muted and omits missing values', () => {
+  it('keeps category figures binary green-or-muted through one helper', () => {
     const course = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const reviews = src('src/components/courses/course-detail/reviews/WhatTheyScored.tsx');
-    const card = src('src/components/posts/ReviewBottomSheet.tsx');
+    const row = src('src/components/courses/course-detail/reviews/reviewFlatBits.tsx');
+    const browse = src('src/components/courses/BrowseCourseCard.tsx');
     expect(course).toContain('value == null ? []');
-    expect(course).toContain('value >= 9 ? A.GREEN : A.MUTE');
-    expect(reviews).toContain('row.value >= 9 ? A.GREEN : A.MUTE');
-    expect(card).toContain('value >= 9 ? A.GREEN : A.MUTE');
+    expect(course).toContain('courseSubScoreTone(value)');
+    expect(reviews.match(/courseSubScoreTone\(row\.value\)/g)).toHaveLength(2);
+    expect(row).toContain('courseSubScoreTone(value)');
+    expect(browse.match(/courseSubScoreTone\(score\)/g)).toHaveLength(1);
+    expect(browse).not.toContain('COURSE_RATING_THEMES');
+    expect(browse).not.toContain('getRatingTier');
+  });
+
+  it('uses the exact 9.0 threshold and muted absent state', () => {
+    expect(courseSubScoreTone(undefined)).toBe(A.MUTE);
+    expect(courseSubScoreTone(null)).toBe(A.MUTE);
+    expect(courseSubScoreTone(8.99)).toBe(A.MUTE);
+    expect(courseSubScoreTone(9)).toBe(A.GREEN);
+  });
+
+  it('renders Berkshire category tones green, muted, green, muted', () => {
+    expect([9.3, 8.3, 9.8, 7.1].map(courseSubScoreTone)).toEqual([
+      A.GREEN,
+      A.MUTE,
+      A.GREEN,
+      A.MUTE,
+    ]);
   });
 });
