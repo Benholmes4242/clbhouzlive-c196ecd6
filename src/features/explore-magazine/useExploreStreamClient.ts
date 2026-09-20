@@ -79,8 +79,10 @@ function freshness(iso: string | null | undefined): number {
 export function notability(item: StreamItem): number {
   const f = item.facts;
   const extra = (count: number, cap = 3) => Math.min(Math.max(count - 1, 0), cap);
-  if (f.holes_in_one && f.holes_in_one > 0) return 5 + 0.1 * extra(f.holes_in_one);
-  if (f.albatrosses && f.albatrosses > 0) return 4.5 + 0.1 * extra(f.albatrosses);
+  const aces = Math.max(0, f.holes_in_one ?? 0);
+  const albatrosses = Math.max(0, f.albatrosses ?? 0);
+  if (aces > 0) return 5 + 0.1 * extra(aces) + (albatrosses > 0 ? 0.05 : 0);
+  if (albatrosses > 0) return 4.5 + 0.1 * extra(albatrosses);
   if (f.is_course_record) return 4;
   if (f.stableford != null && f.stableford >= 45) return 3.5;
   if (f.to_par != null && f.to_par < 0) return 3;

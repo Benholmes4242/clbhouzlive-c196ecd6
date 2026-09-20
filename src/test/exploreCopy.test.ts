@@ -7,6 +7,15 @@ import type { StreamItem } from '@/features/explore-magazine/streamItem';
 const translate = (_key: string, fallback = '', vars: Record<string, unknown> = {}) =>
   Object.entries(vars).reduce((copy, [key, value]) => copy.split(`{{${key}}}`).join(String(value)), fallback);
 
+const E2_FIXTURES = [
+  ['one eagle', { eagles: 1 }, 'An eagle, in a round of 68, four under par.'],
+  ['two eagles', { eagles: 2 }, 'Two eagles, in a round of 68, four under par.'],
+  ['one ace', { holes_in_one: 1 }, 'A hole in one, in a round of 68, four under par.'],
+  ['two aces', { holes_in_one: 2 }, 'Two holes in one, in a round of 68, four under par.'],
+  ['ace and albatross', { holes_in_one: 1, albatrosses: 1 }, 'A hole in one and an albatross, in a round of 68, four under par.'],
+  ['ace, albatross and two eagles', { holes_in_one: 1, albatrosses: 1, eagles: 2 }, 'A hole in one and an albatross, in a round of 68, four under par.'],
+] as const;
+
 function round(overrides: Partial<StreamItem>): StreamItem {
   return {
     id: 'round',
@@ -69,6 +78,18 @@ describe('Explore round headline ownership', () => {
     expect(headlineFor(round({ facts: { gross: 74, to_par: 3, holes_in_one: 1 } }), translate)).toBe(
       'A hole in one, in a round of 74, three over par.',
     );
+  });
+
+  it.each(E2_FIXTURES)('renders the E2 fixture: %s', (_name, feats, expected) => {
+    expect(headlineFor(round({ facts: { gross: 68, to_par: -4, ...feats } }), translate)).toBe(expected);
+  });
+
+  it('never shortens a richer version of the same feat', () => {
+    const oneAce = headlineFor(round({ facts: { gross: 68, to_par: -4, holes_in_one: 1 } }), translate);
+    const twoAces = headlineFor(round({ facts: { gross: 68, to_par: -4, holes_in_one: 2 } }), translate);
+    const combined = headlineFor(round({ facts: { gross: 68, to_par: -4, holes_in_one: 1, albatrosses: 1 } }), translate);
+    expect(twoAces.length).toBeGreaterThanOrEqual(oneAce.length);
+    expect(combined.length).toBeGreaterThanOrEqual(oneAce.length);
   });
 
   it('never capitalises a username', () => {

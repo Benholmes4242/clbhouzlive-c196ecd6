@@ -83,7 +83,7 @@ describe('C3 round stat strip', () => {
 describe('amended achievement priority', () => {
   it('puts five birdies below eagle and above bogey-free', () => {
     expect(calloutFor(round({ eagles: 1, birdies: 6, clean_card: true }))?.kind).toBe('eagle');
-    expect(calloutFor(round({ birdies: 5, clean_card: true }))).toEqual({ kind: 'birdies', count: 5 });
+    expect(calloutFor(round({ birdies: 5, clean_card: true }))).toMatchObject({ kind: 'birdies', count: 5, tier: 'ink' });
     expect(calloutFor(round({ birdies: 4, clean_card: true }))?.kind).toBe('clean');
   });
 
