@@ -68,19 +68,20 @@ describe('selectPlayerSeason', () => {
     expect(selected.weaknesses).toEqual([]);
   });
 
-  it('uses zero wins in the points-ranked verdict when no wins row exists', () => {
+  it('derives a non-PGA win from the full result set when no wins row exists', () => {
+    const win = { id: 'r1', tournament_id: 't1', tournament_name: 'Event', tournament_start_date: '2025-02-06', tournament_end_date: '2025-02-09', position: 1, position_tied: false, score: -12, strokes: 268, money: null, status: 'active' };
     const selected = selectPlayerSeason(
       'p1',
       'pgad',
       null,
-      [],
+      [win],
       { points: { p1: { rank: 42, tied: false } } },
       [category('points')],
       t,
     );
     expect(selected.verdict).toEqual({
       key: 'player.hero.verdict.pointsRanked',
-      values: { wins: 0, rank: 'player.stats.ordinal.nd', raceLabel: 'leaders.pointsBrand.pgad' },
+      values: { wins: 1, rank: 'player.stats.ordinal.nd', raceLabel: 'leaders.pointsBrand.pgad' },
     });
     expect(selected.raceProof?.wins).toBeNull();
   });

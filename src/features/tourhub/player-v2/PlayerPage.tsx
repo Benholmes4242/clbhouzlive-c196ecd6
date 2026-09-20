@@ -39,7 +39,7 @@ export function PlayerPage() {
 
   const { data: player, isLoading: playerLoading, isError: playerError, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats, isLoading: statsLoading, isError: statsError, refetch: refetchStats } = useSinglePlayerStatistics(playerId);
-  const { data: results, isLoading: resultsLoading, isError: resultsError, refetch: refetchResults } = usePlayerResults(playerId, 30);
+  const { data: results, isLoading: resultsLoading, isError: resultsError, refetch: refetchResults } = usePlayerResults(playerId, 200);
   const playerState = usePlayerState(playerId);
   const tour = mapTourSlug(player?.tour_codes?.[0] ?? 'pga');
   const { data: leaders, isLoading: leadersLoading } = useLeaderCategories(tour);
