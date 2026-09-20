@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { isNonStarter } from '../_shared/resultStatus';
 
 export interface SeasonResultsSummary {
   wins: number;
@@ -48,7 +49,11 @@ export function useSeasonResultsSummary(
       for (const row of data ?? []) {
         const status = (row as { status: string | null }).status;
         const position = (row as { position: number | null }).position;
-        if (status === 'cut' || status === 'MC' || status === 'WD' || status === 'DQ') continue;
+        // `starts` means EVENTS ENTERED: a missed cut IS a start, and so is a
+        // withdrawal. Only a non-starter (DNS) never teed off, so only DNS is
+        // skipped. wins/top10s are position-gated below and no CUT row is
+        // better than 35th, so nothing missed can reach them.
+        if (isNonStarter(status)) continue;
         if (position === null) continue;
         starts++;
         if (position === 1) wins++;

@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TournamentPhase, NextTournamentPreview } from './aiPredictionTypes';
 import { PREDICTION_LOGIC_VERSION } from '../lib/predictionLogicVersion';
+import { isWithdrawn } from '../_shared/resultStatus';
 
 // =============================================
 // TYPES
@@ -630,7 +631,8 @@ async function validatePicksAgainstField(
 
   for (const p of contenders) {
     const status = statusMap.get(p.playerId);
-    if (status === 'wd' || status === 'dsq') {
+    // 'dsq' never existed in the table; the real value is DQ. See _shared/resultStatus.ts.
+    if (isWithdrawn(status)) {
       withdrawnPicks.push({ ...p, withdrawnStatus: status });
     } else {
       validContenders.push(p);
@@ -642,7 +644,7 @@ async function validatePicksAgainstField(
   for (const alt of alternates) {
     if (validContenders.length >= 5) break;
     const altStatus = statusMap.get(alt.playerId);
-    if (altStatus !== 'wd' && altStatus !== 'dsq') {
+    if (!isWithdrawn(altStatus)) {
       validContenders.push({
         ...alt,
         rank: validContenders.length + 1,

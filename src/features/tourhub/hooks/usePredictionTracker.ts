@@ -14,6 +14,7 @@ import type {
 } from './aiPredictionTypes';
 import type { AIPredictionData } from './useAIPredictions';
 import { getCurrentRound } from '../utils/formatThruDisplay';
+import { isMissedCut, isWithdrawn } from '../_shared/resultStatus';
 
 export function usePredictionTracker(
   tournamentId: string | null,
@@ -121,9 +122,10 @@ function buildTrackedPrediction(
   let performanceStatus: TrackedPrediction['performanceStatus'] = 'not-started';
   let positionDelta: number | null = null;
 
-  if (status === 'cut') {
+  // Stored statuses are UPPER CASE — compare through _shared/resultStatus.ts.
+  if (isMissedCut(status)) {
     performanceStatus = 'cut';
-  } else if (status === 'wd') {
+  } else if (isWithdrawn(status)) {
     performanceStatus = 'withdrawn';
   } else if (lb === undefined) {
     performanceStatus = fieldCompletionPct > 0.5 ? 'withdrawn' : 'not-started';
