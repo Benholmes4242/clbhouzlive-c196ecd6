@@ -375,6 +375,7 @@ export function RoundStatStrip({
   })() : null;
 
   return (
+    <>
     <span
       data-explore-stat-strip="round"
       data-explore-callout-tier={achievement ? tier : undefined}
@@ -426,5 +427,7 @@ export function RoundStatStrip({
         </>
       ) : null}
     </span>
+    {rarity}
+    </>
   );
 }
