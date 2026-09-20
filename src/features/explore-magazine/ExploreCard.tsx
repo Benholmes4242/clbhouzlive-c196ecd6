@@ -83,6 +83,8 @@ function FigureChip({
   unitTone,
   corner,
   inRow,
+  stacked,
+  locale,
 }: {
   figure: string;
   unit?: string | null;
@@ -92,10 +94,15 @@ function FigureChip({
   /** C4: the round chips sit in ONE row, so the row owns the position and the
    *  chip inside it is a plain flex child. Every other chip is unchanged. */
   inRow?: boolean;
+  /** Review ratings alone stack the verdict beneath the figure. */
+  stacked?: boolean;
+  locale?: string;
 }) {
+  const cjkUnit = locale?.toLowerCase().startsWith('ja') || locale?.toLowerCase().startsWith('ko');
   return (
     <span
       className={CHIP_GLASS_CLASS}
+      data-figure-chip={stacked ? 'review-stacked' : 'inline'}
       style={{
         position: inRow ? 'relative' : 'absolute',
         top: inRow ? undefined : 8,
@@ -103,9 +110,10 @@ function FigureChip({
         right: inRow ? undefined : corner === 'right' ? 8 : 'auto',
         zIndex: 2,
         display: 'inline-flex',
-        alignItems: 'baseline',
-        gap: 4,
-        padding: '4px 8px',
+        flexDirection: stacked ? 'column' : 'row',
+        alignItems: stacked ? 'center' : 'baseline',
+        gap: stacked ? 1 : 4,
+        padding: stacked ? '5px 9px' : '4px 8px',
         minHeight: 28,
         boxSizing: 'border-box',
         whiteSpace: 'nowrap',
@@ -115,11 +123,12 @@ function FigureChip({
       }}
     >
       {/* THE SHADOW IS FOR COLOUR ONLY (§2b fallback). White has the headroom to
-          sit on any ground; a hue does not, so a coloured figure — and only a
-          coloured figure — takes the tight dark shadow. */}
+          sit on any ground; a hue does not, so a coloured figure or unit takes
+          the tight dark shadow. */}
       <span
+        data-figure-chip-figure="true"
         style={{
-          fontSize: 15,
+          fontSize: stacked ? 19 : 15,
           fontWeight: 700,
           color: tone ?? '#FFFFFF',
           textShadow: tone && tone !== '#FFFFFF' ? PHOTO_FIG_SHADOW : undefined,
@@ -129,11 +138,14 @@ function FigureChip({
       </span>
       {unit ? (
         <span
+          data-figure-chip-unit="true"
           style={{
-            fontSize: 10,
-            fontWeight: 700,
+            fontSize: stacked ? 8.5 : 10,
+            fontWeight: stacked ? 800 : 700,
+            letterSpacing: stacked ? (cjkUnit ? 0 : '0.12em') : undefined,
+            textTransform: stacked ? (cjkUnit ? 'none' : 'uppercase') : undefined,
             color: unitTone ?? 'rgba(255,255,255,0.72)',
-            textShadow: unitTone ? PHOTO_FIG_SHADOW : undefined,
+            textShadow: unitTone && unitTone !== '#FFFFFF' ? PHOTO_FIG_SHADOW : undefined,
           }}
         >
           {unit}
@@ -169,7 +181,7 @@ function CourseRankChip({ item }: { item: StreamItem }) {
 }
 
 /** §4b, by type. A story carries none; a moment carries none. */
-function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
+function chipsFor(item: StreamItem, t: (k: string, f?: string) => string, locale: string) {
   const out: React.ReactNode[] = [];
   const { facts, kind } = item;
 
@@ -183,14 +195,21 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string) {
   }
 
   if (kind === 'review' && facts.rating != null) {
+    const tier = getScoreTier(facts.rating);
+    /* Tier owns the Exceptional gate; the analytical helper owns colour. Both
+       intentionally meet at the canonical 9.0 threshold. */
+    const exceptionalTone = tier.isExceptional ? courseSubScoreTone(facts.rating) : undefined;
     out.push(
       <FigureChip
         key="review"
         corner="left"
         figure={facts.rating.toFixed(1)}
-        unit={getScoreTier(facts.rating).label}
+        unit={tier.isExceptional ? tier.label : undefined}
+        unitTone={exceptionalTone}
         /* Neutral stays white because this figure sits on variable photography. */
-        tone={facts.rating >= 9 ? courseSubScoreTone(facts.rating) : '#FFFFFF'}
+        tone={exceptionalTone ?? '#FFFFFF'}
+        stacked
+        locale={locale}
       />,
     );
   }
@@ -489,7 +508,7 @@ export function ExploreCard({
        the richer multi-feat sentence: rarer rounds must never say less. */
     plainRound: callout?.kind === 'record' || callout?.kind === 'net_record' || callout?.kind === 'rank_up',
   });
-  const chips = chipsFor(item, t as never);
+  const chips = chipsFor(item, t as never, locale);
   /* §2 SHAPE IS DECIDED BY KIND, NOTHING ELSE. A REVIEW is text ON the
      photograph at every position; a ROUND is text UNDER it at every position.
      There is no earned treatment and position 0 is not special. */
