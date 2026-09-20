@@ -1033,7 +1033,17 @@
       "railMembers_one": "メンバー",
       "railMembers_other": "メンバー",
       "railDays_one": "日",
-      "railDays_other": "日"
+      "railDays_other": "日",
+      "featAce_one": "ホールインワン",
+      "featAce_other": "ホールインワン {{count}}回",
+      "featAlbatross_one": "アルバトロス",
+      "featAlbatross_other": "アルバトロス {{count}}回",
+      "featEagle_one": "イーグル",
+      "featEagle_other": "イーグル {{count}}回",
+      "featBirdies_one": "バーディー {{count}}回",
+      "featBirdies_other": "バーディー {{count}}回",
+      "featClean": "ボギーなし",
+      "featJoin": "{{first}}・{{second}}"
     },
     "lens": {
       "suggested": "Suggested",
@@ -1689,7 +1699,21 @@
         "listFirst": "{{player}}が{{gross}}でラウンド。ここでの最少ストロークです。",
         "rankDownMoved": "{{player}}が{{gross}}でラウンド。あなたはここで{{of}}人中{{ord}}番目、{{n}}つ下がりました。",
         "rankUpOthers": "あなたはここで{{of}}人中{{ord}}番目、{{n}}つ上がりました。",
-        "rankUpOthersPlain": "あなたはここで{{of}}人中{{ord}}番目です。"
+        "rankUpOthersPlain": "あなたはここで{{of}}人中{{ord}}番目です。",
+        "featAce_one": "ホールインワン",
+        "featAce_other": "{{spokenCount}}回のホールインワン",
+        "featAlbatross_one": "アルバトロス",
+        "featAlbatross_other": "{{spokenCount}}回のアルバトロス",
+        "featEagle_one": "イーグル",
+        "featEagle_other": "{{spokenCount}}回のイーグル",
+        "featBirdies_one": "{{spokenCount}}回のバーディー",
+        "featBirdies_other": "{{spokenCount}}回のバーディー",
+        "featClean_one": "ボギーなし",
+        "featClean_other": "ボギーなし",
+        "featJoin": "{{first}}と{{second}}",
+        "featsRound": "{{gross}}のラウンドで{{feats}}。",
+        "featsRoundToPar": "{{gross}}（{{topar}}）のラウンドで{{feats}}。",
+        "featsOnly": "{{feats}}。"
       },
       "standing": {
         "board": "ベストグロス",
@@ -1755,7 +1779,14 @@
         "netCourseRecord": "ネットコースレコード",
         "tagMovedUp": "順位上昇",
         "nowRank": "現在{{ord}}位",
-        "movedUpBoard": "順位が上昇"
+        "movedUpBoard": "順位が上昇",
+        "aceCount_one": "ホールインワン",
+        "aceCount_other": "ホールインワン {{count}}回",
+        "albatrossCount_one": "アルバトロス",
+        "albatrossCount_other": "アルバトロス {{count}}回",
+        "eagleCount_one": "イーグル",
+        "eagleCount_other": "イーグル {{count}}回",
+        "featJoin": "{{first}}・{{second}}"
       },
       "stat": {
         "par": "PAR",

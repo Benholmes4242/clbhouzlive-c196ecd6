@@ -147,3 +147,9 @@ Tour Overview Design A
 - G4.2 overlay height reads offsetHeight, only after the 240ms entrance, clamped to 82dvh.
 - G4.3 review foot gains ReactionAction (size 15) above LikedByRow; no comment glyph. Locale key scorecard.likeReview in six locales.
 - Authenticated device/cold-warm measurements still unavailable (Supabase external_unmanaged).
+
+## Explore multi-feat rounds E2
+- [x] Count-aware, top-two feat headlines with localized plural and joiner copy
+- [x] Two-feat board markers and three strictly gated callout tiers
+- [x] Count-aware bounded client notability bands
+- [x] Six fixtures, focused regression tests, typecheck, and 320px row measurement

@@ -62,14 +62,14 @@ describe('achievement callout', () => {
     expect(calloutFor(item('rank', { consequence: { kind: 'rank_up', n: 3 }, facts: { eagles: 1 } })))
       .toEqual({ kind: 'rank_up', rank: 3 });
     expect(calloutFor(item('ace', { facts: { holes_in_one: 1, eagles: 1, birdies: 5 } })))
-      .toEqual({ kind: 'ace', hole: null });
+      .toMatchObject({ kind: 'ace', hole: null, count: 1, tier: 'gold', feats: [{ kind: 'ace', count: 1 }, { kind: 'eagle', count: 1 }] });
     expect(calloutFor(item('alb', { facts: { albatrosses: 1, eagles: 1 } })))
-      .toEqual({ kind: 'albatross', hole: null });
+      .toMatchObject({ kind: 'albatross', hole: null, count: 1, tier: 'gold' });
     expect(calloutFor(item('eagle', { facts: { eagles: 1, birdies: 6 } })))
-      .toEqual({ kind: 'eagle', hole: null });
+      .toMatchObject({ kind: 'eagle', hole: null, count: 1, tier: 'ink' });
     expect(calloutFor(item('birdies', { facts: { birdies: 5, clean_card: true } })))
-      .toEqual({ kind: 'birdies', count: 5 });
-    expect(calloutFor(item('clean', { facts: { clean_card: true } }))).toEqual({ kind: 'clean' });
+      .toMatchObject({ kind: 'birdies', count: 5, tier: 'ink' });
+    expect(calloutFor(item('clean', { facts: { clean_card: true } }))).toMatchObject({ kind: 'clean', tier: 'ink' });
   });
 
   it('marks nothing for a loss, a drop, a plain round or under par alone', () => {
@@ -84,7 +84,7 @@ describe('achievement callout', () => {
     expect(calloutFor(item('bl', { lane: 'backlog', consequence: { kind: 'record_taken' } }))).toBeNull();
     expect(calloutFor(item('bl2', { lane: 'backlog', consequence: { kind: 'rank_up', n: 2 } }))).toBeNull();
     expect(calloutFor(item('bl3', { lane: 'backlog', facts: { eagles: 1 } })))
-      .toEqual({ kind: 'eagle', hole: null });
+      .toMatchObject({ kind: 'eagle', hole: null, count: 1, tier: 'ink' });
   });
 
   /* "NEW COURSE RECORD" IS A CLAIM ABOUT NOW. A record that has since been
@@ -142,11 +142,11 @@ describe('achievement callout', () => {
       { holeNo: 12, par: 5, strokes: 5 },
     ];
     expect(calloutFor(item('ace', { facts: { holes_in_one: 1 } }), holes))
-      .toEqual({ kind: 'ace', hole: 7 });
+      .toMatchObject({ kind: 'ace', hole: 7, count: 1, tier: 'gold' });
     /* The 7th is an ace AND two under its par, so the eagle hole is ambiguous:
        two candidates means NO subline rather than an invented one. */
     expect(calloutFor(item('eagle', { facts: { eagles: 1 } }), holes))
-      .toEqual({ kind: 'eagle', hole: null });
+      .toMatchObject({ kind: 'eagle', hole: null, count: 1, tier: 'ink' });
     expect(calloutFor(item('rank', { consequence: { kind: 'rank_up' } })))
       .toEqual({ kind: 'rank_up', rank: null });
   });

@@ -37,7 +37,7 @@ export interface RoundConsequenceInput {
   isSelf: boolean;
   /** True only when the row came from the shared personal-circle source. */
   isCircle: boolean;
-  /** Settled notable feat, never a substitute for a geographic consequence. */
+  /** Settled notable feat, including eagle, never a substitute for geography. */
   isNotable: boolean;
 }
 

@@ -1033,7 +1033,17 @@
       "railMembers_one": "멤버",
       "railMembers_other": "멤버",
       "railDays_one": "일",
-      "railDays_other": "일"
+      "railDays_other": "일",
+      "featAce_one": "홀인원",
+      "featAce_other": "홀인원 {{count}}개",
+      "featAlbatross_one": "알바트로스",
+      "featAlbatross_other": "알바트로스 {{count}}개",
+      "featEagle_one": "이글",
+      "featEagle_other": "이글 {{count}}개",
+      "featBirdies_one": "버디 {{count}}개",
+      "featBirdies_other": "버디 {{count}}개",
+      "featClean": "보기 없음",
+      "featJoin": "{{first}} · {{second}}"
     },
     "lens": {
       "suggested": "Suggested",
@@ -1692,7 +1702,21 @@
         "listFirst": "{{player}}이(가) {{gross}}타로 돌았습니다. 이곳에서 가장 낮은 기록입니다.",
         "rankDownMoved": "{{player}}이(가) {{gross}}타로 돌았습니다. 당신은 이곳에서 {{of}}명 중 {{ord}}위로 {{n}}계단 내려갔습니다.",
         "rankUpOthers": "당신은 이곳에서 {{of}}명 중 {{ord}}위로 {{n}}계단 올라갔습니다.",
-        "rankUpOthersPlain": "당신은 이곳에서 {{of}}명 중 {{ord}}위입니다."
+        "rankUpOthersPlain": "당신은 이곳에서 {{of}}명 중 {{ord}}위입니다.",
+        "featAce_one": "홀인원",
+        "featAce_other": "홀인원 {{spokenCount}}개",
+        "featAlbatross_one": "알바트로스",
+        "featAlbatross_other": "알바트로스 {{spokenCount}}개",
+        "featEagle_one": "이글",
+        "featEagle_other": "이글 {{spokenCount}}개",
+        "featBirdies_one": "버디 {{spokenCount}}개",
+        "featBirdies_other": "버디 {{spokenCount}}개",
+        "featClean_one": "보기 없는 라운드",
+        "featClean_other": "보기 없는 라운드",
+        "featJoin": "{{first}}과 {{second}}",
+        "featsRound": "{{gross}}타 라운드에서 {{feats}}.",
+        "featsRoundToPar": "{{gross}}타({{topar}}) 라운드에서 {{feats}}.",
+        "featsOnly": "{{feats}}."
       },
       "standing": {
         "board": "베스트 그로스",
@@ -1758,7 +1782,14 @@
         "netCourseRecord": "네트 코스 레코드",
         "tagMovedUp": "순위 상승",
         "nowRank": "현재 {{ord}}위",
-        "movedUpBoard": "순위가 상승했습니다"
+        "movedUpBoard": "순위가 상승했습니다",
+        "aceCount_one": "홀인원",
+        "aceCount_other": "홀인원 {{count}}개",
+        "albatrossCount_one": "알바트로스",
+        "albatrossCount_other": "알바트로스 {{count}}개",
+        "eagleCount_one": "이글",
+        "eagleCount_other": "이글 {{count}}개",
+        "featJoin": "{{first}} · {{second}}"
       },
       "stat": {
         "par": "PAR",

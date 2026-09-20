@@ -74,17 +74,21 @@ function freshness(iso: string | null | undefined): number {
   return 0.5 ** (hours / HALF_LIFE_H);
 }
 
-/** The settled achievement order: ace > albatross > record > 45pts > under par
- *  > bogey free > birdie haul. Reviews at 9.0+ are notable. */
-function notability(item: StreamItem): number {
+/** Repeat feats lift within bounded bands. No amount of a lower feat crosses a
+ * rarer feat's floor, and the 0.3 cap prevents counts overpowering records. */
+export function notability(item: StreamItem): number {
   const f = item.facts;
-  if (f.holes_in_one && f.holes_in_one > 0) return 5;
-  if (f.albatrosses && f.albatrosses > 0) return 4.5;
+  const extra = (count: number, cap = 3) => Math.min(Math.max(count - 1, 0), cap);
+  const aces = Math.max(0, f.holes_in_one ?? 0);
+  const albatrosses = Math.max(0, f.albatrosses ?? 0);
+  if (aces > 0) return 5 + 0.1 * extra(aces) + (albatrosses > 0 ? 0.05 : 0);
+  if (albatrosses > 0) return 4.5 + 0.1 * extra(albatrosses);
   if (f.is_course_record) return 4;
   if (f.stableford != null && f.stableford >= 45) return 3.5;
   if (f.to_par != null && f.to_par < 0) return 3;
+  if (f.eagles && f.eagles > 0) return 2.6 + 0.1 * extra(f.eagles);
   if (f.clean_card) return 2.5;
-  if (f.birdies != null && f.birdies >= 5) return 2;
+  if (f.birdies != null && f.birdies >= 5) return 2 + 0.05 * Math.min(f.birdies - 5, 6);
   if (item.kind === 'review' && f.rating != null && f.rating >= 9) return 2;
   return 0;
 }
@@ -319,7 +323,7 @@ export function useExploreStreamClient(
             playDate: row.play_date,
             isSelf: row.is_self,
             isCircle: !!row.score_id && circleScoreIds.has(row.score_id),
-            isNotable: row.holes_in_one > 0 || row.albatrosses > 0 || row.is_course_record
+            isNotable: row.holes_in_one > 0 || row.albatrosses > 0 || (row.eagles ?? 0) > 0 || row.is_course_record
               || (row.stableford_points ?? 0) >= 45 || toPar != null && toPar < 0
               || row.clean_card || (row.birdies ?? 0) >= 5,
           },

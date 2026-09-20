@@ -645,7 +645,17 @@
       "railMembers_one": "[~~ṀÉṀƁÉŔ~~]",
       "railMembers_other": "[~~ṀÉṀƁÉŔŠ~~]",
       "railRounds_one": "[~~ŔŐŮŃĐ~~]",
-      "railRounds_other": "[~~ŔŐŮŃĐŠ~~]"
+      "railRounds_other": "[~~ŔŐŮŃĐŠ~~]",
+      "featAce_one": "[ĤŐĻÉ ÍÑ ŐÑÉ]",
+      "featAce_other": "[{{count}} ĤŐĻÉŠ ÍÑ ŐÑÉ]",
+      "featAlbatross_one": "[ÁĻƀÁŢŘŐŠŠ]",
+      "featAlbatross_other": "[{{count}} ÁĻƀÁŢŘŐŠŠÉŠ]",
+      "featEagle_one": "[ÉÁĜĻÉ]",
+      "featEagle_other": "[{{count}} ÉÁĜĻÉŠ]",
+      "featBirdies_one": "[{{count}} ƀÍŘĐÍÉ]",
+      "featBirdies_other": "[{{count}} ƀÍŘĐÍÉŠ]",
+      "featClean": "[ƀŐĜÉÝ-ƑŘÉÉ]",
+      "featJoin": "[{{first}} + {{second}}]"
     },
     "findGolfers": {
       "addFriend": "[~~Áđđ ƒříéñđ~~]",
@@ -2318,7 +2328,21 @@
         "listFirst": "[{{player}} shot {{article}} {{gross}} — the lowest anyone has played here. one two]",
         "rankDownMoved": "[{{player}} shot {{article}} {{gross}}. You are now {{ord}} of {{of}} here, down {{n}}. one two]",
         "rankUpOthers": "[You are now {{ord}} of {{of}} here, up {{n}}. one two]",
-        "rankUpOthersPlain": "[You are now {{ord}} of {{of}} here. one two]"
+        "rankUpOthersPlain": "[You are now {{ord}} of {{of}} here. one two]",
+        "featAce_one": "[á ĥőļé íñ őñé]",
+        "featAce_other": "[{{spokenCount}} ĥőļéš íñ őñé]",
+        "featAlbatross_one": "[áñ áļƀáţřőšš]",
+        "featAlbatross_other": "[{{spokenCount}} áļƀáţřőššéš]",
+        "featEagle_one": "[áñ éáĝļé]",
+        "featEagle_other": "[{{spokenCount}} éáĝļéš]",
+        "featBirdies_one": "[{{spokenCount}} ƀířđíé]",
+        "featBirdies_other": "[{{spokenCount}} ƀířđíéš]",
+        "featClean_one": "[á ƀőĝéý-ƒřéé ĉářđ]",
+        "featClean_other": "[á ƀőĝéý-ƒřéé ĉářđ]",
+        "featJoin": "[{{first}} áñđ {{second}}]",
+        "featsRound": "[{{feats}}, íñ á řőúñđ őƒ {{gross}}.]",
+        "featsRoundToPar": "[{{feats}}, íñ á řőúñđ őƒ {{gross}}, {{topar}}.]",
+        "featsOnly": "[{{feats}}.]"
       },
       "standing": {
         "board": "[Lowest gross]",
@@ -2384,7 +2408,14 @@
         "netCourseRecord": "[Net course record]",
         "tagMovedUp": "[MOVED UP]",
         "nowRank": "[Now {{ord}}]",
-        "movedUpBoard": "[Moved up the board]"
+        "movedUpBoard": "[Moved up the board]",
+        "aceCount_one": "[Ĥőļé íñ őñé]",
+        "aceCount_other": "[{{count}} ĥőļéš íñ őñé]",
+        "albatrossCount_one": "[Áļƀáţřőšš]",
+        "albatrossCount_other": "[{{count}} áļƀáţřőššéš]",
+        "eagleCount_one": "[Éáĝļé]",
+        "eagleCount_other": "[{{count}} éáĝļéš]",
+        "featJoin": "[{{first}} + {{second}}]"
       },
       "stat": {
         "par": "[PAR]",

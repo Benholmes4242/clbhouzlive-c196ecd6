@@ -1,4 +1,10 @@
 import type { StreamItem } from './streamItem';
+import {
+  roundFeatTier,
+  topRoundFeats,
+  type ExploreFeatTier,
+  type ExploreRoundFeat,
+} from './roundFeatCollection';
 
 /**
  * SHAPE IS DECIDED BY KIND, NOTHING ELSE (BRIEF_EXPLORE_TWO_SHAPES §2).
@@ -49,11 +55,9 @@ export type AchievementCallout =
   | { kind: 'record' }
   | { kind: 'net_record' }
   | { kind: 'rank_up'; rank: number | null }
-  | { kind: 'ace'; hole: number | null }
-  | { kind: 'albatross'; hole: number | null }
-  | { kind: 'eagle'; hole: number | null }
-  | { kind: 'birdies'; count: number }
-  | { kind: 'clean' };
+  | { kind: 'ace' | 'albatross' | 'eagle'; hole: number | null; count: number; feats: ExploreRoundFeat[]; tier: ExploreFeatTier }
+  | { kind: 'birdies'; count: number; feats: ExploreRoundFeat[]; tier: ExploreFeatTier }
+  | { kind: 'clean'; feats: ExploreRoundFeat[]; tier: ExploreFeatTier };
 
 export interface CalloutHole {
   holeNo: number;
@@ -117,13 +121,20 @@ export function calloutFor(item: StreamItem, holes?: CalloutHole[]): Achievement
   if (boardClaimAllowed && consequence?.kind === 'rank_up') {
     return { kind: 'rank_up', rank: consequence.n ?? null };
   }
-  if ((facts.holes_in_one ?? 0) > 0) return { kind: 'ace', hole: singleHole(holes, 'ace') };
-  if ((facts.albatrosses ?? 0) > 0) return { kind: 'albatross', hole: singleHole(holes, 'albatross') };
-  if ((facts.eagles ?? 0) > 0) return { kind: 'eagle', hole: singleHole(holes, 'eagle') };
-  /* FIVE BIRDIES RETURNS TO THE ACHIEVEMENT LANE. The C3 strip no longer has a
-     birdies figure cell, while VS HCP now carries the beat-handicap signal and
-     handicap cut remains disabled. */
-  if ((facts.birdies ?? 0) >= NOTABLE_BIRDIES) return { kind: 'birdies', count: facts.birdies as number };
-  if (facts.clean_card === true) return { kind: 'clean' };
+  const feats = topRoundFeats(facts);
+  const first = feats[0];
+  if (!first) return null;
+  const tier = roundFeatTier(facts);
+  if (first.kind === 'ace' || first.kind === 'albatross' || first.kind === 'eagle') {
+    return {
+      kind: first.kind,
+      count: first.count,
+      hole: first.count === 1 ? singleHole(holes, first.kind) : null,
+      feats,
+      tier,
+    };
+  }
+  if (first.kind === 'birdies') return { kind: 'birdies', count: first.count, feats, tier };
+  if (first.kind === 'clean') return { kind: 'clean', feats, tier };
   return null;
 }
