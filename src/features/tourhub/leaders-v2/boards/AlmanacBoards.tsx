@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
+import { OVERVIEW_HERO_HEIGHT } from '../../components/overview-v3/OverviewHero';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { surnameOf } from '../../_shared/playerName';
 import { AMBER, INK_FAINT, INK_MUTE, SLATE_600, STATUS_LIVE, TREND_DOWN, TREND_UP, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_30 } from '../../_shared/tokens';
@@ -21,7 +22,7 @@ function PlayerPortrait({ row, variant }: { row: LeaderRow; variant: 'lead' | 'n
   useEffect(() => { setCandidateIndex(0); setFailed(candidates.length === 0); }, [candidates]);
   const src = candidates[candidateIndex] ? getDirectImageUrl(candidates[candidateIndex]) : null;
   const frame: CSSProperties = variant === 'lead'
-    ? { position: 'absolute', zIndex: 1, right: -18, bottom: 0, width: 300, height: 390, overflow: 'hidden' }
+    ? { position: 'absolute', zIndex: 1, right: -14, bottom: 0, width: 235, height: 306, overflow: 'hidden' }
     : variant === 'number'
       ? { position: 'absolute', zIndex: 1, right: 16, top: '50%', width: 104, height: 104, borderRadius: 26, transform: 'translateY(-50%)', overflow: 'hidden' }
       : { width: 44, height: 44, borderRadius: 14, overflow: 'hidden', flex: '0 0 auto' };
@@ -29,7 +30,7 @@ function PlayerPortrait({ row, variant }: { row: LeaderRow; variant: 'lead' | 'n
     {!failed && src ? <img src={src} alt="" aria-hidden="true" loading={variant === 'lead' ? 'eager' : 'lazy'} onError={() => {
       if (candidateIndex + 1 < candidates.length) setCandidateIndex((current) => current + 1);
       else setFailed(true);
-    }} style={{ width: '100%', height: '100%', display: 'block', objectFit: variant === 'lead' ? 'contain' : 'cover', objectPosition: variant === 'lead' ? 'right bottom' : 'center 20%' }} /> : null}
+    }} style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover', objectPosition: variant === 'lead' ? 'right bottom' : 'center 20%' }} /> : null}
   </div>;
 }
 
@@ -47,7 +48,7 @@ function Movement({ value }: { value: number | null }) {
 function SectionHead({ category, titleKey = 'leaders.season.sectionTitle.generic' }: { category: LeaderCategoryDef; titleKey?: string }) {
   const { t } = useTranslation('tourhub');
   return <header style={{ padding: '22px 24px 10px' }}>
-    <p style={sectionKicker}>{t(category.shortKey)}</p>
+    <p style={sectionKicker}>{t(category.labelKey)}</p>
     <h2 style={sectionTitle}>{t(titleKey, { category: t(category.labelKey) })}</h2>
   </header>;
 }
@@ -77,7 +78,7 @@ export function LeadModule({ category, subject, categories }: { category: Leader
   const proofs = isPlayer
     ? [{ value: leader.valueFormatted, label: t(category.unitKey) }, { value: wins?.valueFormatted ?? '−', label: t('leaders.stat.wins.short') }, { value: scoring?.valueFormatted ?? '−', label: t('leaders.stat.scoring_avg.short') }]
     : [{ value: category.rows[3]?.behindFormatted ?? '−', label: t('leaders.season.proof.topFour') }, { value: String(categories.find((item) => item.key === 'wins')?.rows.filter((row) => row.value > 0).length ?? 0), label: t('leaders.season.proof.winners') }, { value: '−', label: t('leaders.season.proof.remaining') }];
-  return <section data-season-module="lead" style={{ height: 430, position: 'relative', overflow: 'hidden', background: SLATE_600, borderBottom: `1px solid ${WHITE_ALPHA_06}` }}>
+  return <section data-season-module="lead" style={{ height: OVERVIEW_HERO_HEIGHT, position: 'relative', overflow: 'hidden', background: SLATE_600, borderBottom: `1px solid ${WHITE_ALPHA_06}` }}>
     <PlayerPortrait row={leader} variant="lead" />
     <div aria-hidden="true" style={{ position: 'absolute', zIndex: 2, inset: 0, background: 'radial-gradient(120% 70% at 68% 12%, rgba(255,255,255,0.30), transparent 62%)' }} />
     <div aria-hidden="true" style={{ position: 'absolute', zIndex: 3, inset: 0, background: 'linear-gradient(to top, rgba(8,12,16,0.97) 6%, rgba(8,12,16,0.72) 38%, rgba(8,12,16,0.12) 72%, transparent 100%)' }} />
@@ -102,14 +103,14 @@ export function RaceStandingsModule({ category, onPlayerClick }: { category: Lea
   const { t } = useTranslation('tourhub');
   const rows = category.rows.slice(0, 5);
   if (rows.length < 2) return null;
-  return <section style={{ borderBottom: `1px solid ${WHITE_ALPHA_06}` }}><SectionHead category={category} titleKey="leaders.season.raceTableTitle" /><p style={{ ...copy, padding: '0 24px' }}>{t('leaders.season.raceTableStandfirst')}</p><div style={{ margin: '18px 24px 30px', borderTop: `3px solid ${STATUS_LIVE}` }}>{rows.map((row, index) => <button type="button" key={row.playerId || row.name} onClick={() => onPlayerClick(row)} style={{ width: '100%', minHeight: 72, padding: '12px 0', border: 0, borderBottom: index === rows.length - 1 ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', display: 'grid', gridTemplateColumns: '28px minmax(0,1fr) auto', alignItems: 'center', columnGap: 12, textAlign: 'left', cursor: 'pointer' }}><span style={{ color: index === 0 ? STATUS_LIVE : INK_MUTE, fontSize: 12, fontWeight: 800, ...figure }}>{row.rankLabel}</span><span style={{ minWidth: 0, color: A.INK, fontSize: 15, fontWeight: index === 0 ? 800 : 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</span><span style={{ textAlign: 'right' }}><span style={{ display: 'block', color: index === 0 ? STATUS_LIVE : A.INK, fontSize: 18, fontWeight: 800, ...figure }}>{row.valueFormatted}</span>{category.meaningfulBehind && row.behindFormatted ? <span style={{ display: 'block', marginTop: 3, color: INK_MUTE, fontSize: 9, fontWeight: 700 }}>+{row.behindFormatted}</span> : null}</span></button>)}</div></section>;
+  return <section style={{ borderBottom: `1px solid ${WHITE_ALPHA_06}` }}><SectionHead category={category} titleKey="leaders.season.raceTableTitle" /><p style={{ ...copy, padding: '0 24px' }}>{t('leaders.season.raceTableStandfirst')}</p><div style={{ margin: '18px 24px 30px' }}>{rows.map((row, index) => <button type="button" key={row.playerId || row.name} onClick={() => onPlayerClick(row)} style={{ width: '100%', minHeight: 72, padding: '12px 0', border: 0, borderBottom: index === rows.length - 1 ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', display: 'grid', gridTemplateColumns: '28px minmax(0,1fr) auto', alignItems: 'center', columnGap: 12, textAlign: 'left', cursor: 'pointer' }}><span style={{ color: index === 0 ? STATUS_LIVE : INK_MUTE, fontSize: 12, fontWeight: 800, ...figure }}>{row.rankLabel}</span><span style={{ minWidth: 0, color: A.INK, fontSize: 15, fontWeight: index === 0 ? 800 : 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</span><span style={{ textAlign: 'right' }}><span style={{ display: 'block', color: index === 0 ? STATUS_LIVE : A.INK, fontSize: 18, fontWeight: 800, ...figure }}>{row.valueFormatted}</span>{category.meaningfulBehind && row.behindFormatted ? <span style={{ display: 'block', marginTop: 3, color: INK_MUTE, fontSize: 9, fontWeight: 700 }}>+{row.behindFormatted}</span> : null}</span></button>)}</div></section>;
 }
 
 export function NumberModule({ category, onPlayerClick }: { category: LeaderCategoryDef; onPlayerClick: (row: LeaderRow) => void }) {
   const { t } = useTranslation('tourhub');
   const leader = category.rows[0];
   if (!leader) return null;
-  return <section data-season-module="number" style={{ position: 'relative', overflow: 'hidden', borderBottom: `1px solid ${WHITE_ALPHA_06}` }}><SectionHead category={category} titleKey={category.key === 'strokes_gained_putting' ? 'leaders.season.sectionTitle.putting' : undefined} /><div style={{ position: 'relative', minHeight: 188, padding: '6px 24px 24px', overflow: 'hidden' }}><div style={{ position: 'relative', zIndex: 2, maxWidth: 'calc(100% - 120px)' }}><div style={{ color: AMBER, fontSize: 62, fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 0.9, ...figure }}>{leader.valueFormatted}</div><div style={{ marginTop: 8, color: INK_FAINT, fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase' }}>{t(category.unitKey)}</div><button type="button" onClick={() => onPlayerClick(leader)} style={{ display: 'block', border: 0, padding: 0, marginTop: 12, color: A.INK, background: 'transparent', fontSize: 17, fontWeight: 700, letterSpacing: '-0.015em', cursor: 'pointer', textAlign: 'left' }}>{leader.name}</button><p style={{ ...copy, marginTop: 7, maxWidth: 200 }}>{t(category.descriptionKey)}</p></div><PlayerPortrait row={leader} variant="number" /></div></section>;
+  return <section data-season-module="number" style={{ position: 'relative', overflow: 'hidden', borderBottom: `1px solid ${WHITE_ALPHA_06}` }}><SectionHead category={category} titleKey={category.key === 'strokes_gained_putting' ? 'leaders.season.sectionTitle.putting' : undefined} /><div style={{ position: 'relative', minHeight: 188, padding: '6px 24px 24px', overflow: 'hidden' }}><div style={{ position: 'relative', zIndex: 2, maxWidth: 'calc(100% - 120px)' }}><div style={{ display: 'flex', alignItems: 'baseline', gap: 10, whiteSpace: 'nowrap' }}><span style={{ color: AMBER, fontSize: 62, fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 0.9, ...figure }}>{leader.valueFormatted}</span><span style={{ color: INK_FAINT, fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase' }}>{t(category.unitKey)}</span></div><button type="button" onClick={() => onPlayerClick(leader)} style={{ display: 'block', border: 0, padding: 0, marginTop: 12, color: A.INK, background: 'transparent', fontSize: 17, fontWeight: 700, letterSpacing: '-0.015em', cursor: 'pointer', textAlign: 'left' }}>{leader.name}</button><p style={{ ...copy, marginTop: 7, maxWidth: 200 }}>{t(category.descriptionKey)}</p></div><PlayerPortrait row={leader} variant="number" /></div></section>;
 }
 
 function duelSentenceKey(category: LeaderCategoryDef): string {
@@ -136,7 +137,7 @@ export function TiedListModule({ category, onPlayerClick }: { category: LeaderCa
 
 export function SeasonIndexLink({ onClick }: { onClick: () => void }) {
   const { t } = useTranslation('tourhub');
-  return <button type="button" onClick={onClick} style={{ width: '100%', minHeight: 76, padding: '13px 24px', border: 0, background: 'transparent', color: A.INK, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}><span style={{ fontSize: 14, fontWeight: 800 }}>{t('leaders.index.title')}</span><ChevronRight size={18} color={STATUS_LIVE} /></button>;
+  return <button type="button" onClick={onClick} style={{ width: '100%', minHeight: 76, padding: '13px 24px', border: 0, background: 'transparent', color: A.INK, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}><span style={{ fontSize: 14, fontWeight: 800 }}>{t('leaders.index.title')}</span><ChevronRight size={18} color={A.INK} /></button>;
 }
 
 export const StatBoardRows = TiedListModule;
