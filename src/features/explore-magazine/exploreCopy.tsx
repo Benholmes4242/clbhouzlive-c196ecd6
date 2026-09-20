@@ -16,10 +16,7 @@ import { topRoundFeats, type ExploreRoundFeat } from './roundFeatCollection';
  * true minus, for a to-par figure.
  */
 
-type T = {
-  (key: string, fallback?: string, vars?: Record<string, unknown>): string;
-  (key: string, options: Record<string, unknown>): string;
-};
+type T = (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
 
 export const MINUS = '\u2212';
 
@@ -177,17 +174,26 @@ function holeFor(holes: HoleRow[] | undefined, kind: 'ace' | 'albatross' | 'eagl
 
 function featPhrase(feat: ExploreRoundFeat, t: T, locale: string): string {
   const spokenCount = spokenNumber(feat.count, locale);
+  const plural = (key: string, one: string, other: string): string => {
+    let suffix: 'one' | 'other' = 'other';
+    try {
+      suffix = new Intl.PluralRules(locale).select(feat.count) === 'one' ? 'one' : 'other';
+    } catch {
+      suffix = feat.count === 1 ? 'one' : 'other';
+    }
+    return t(`${key}_${suffix}`, suffix === 'one' ? one : other, { count: feat.count, spokenCount });
+  };
   switch (feat.kind) {
     case 'ace':
-      return t('amateur.stream.headline.featAce', { count: feat.count, spokenCount, defaultValue_one: 'a hole in one', defaultValue_other: '{{spokenCount}} holes in one' });
+      return plural('amateur.stream.headline.featAce', 'a hole in one', '{{spokenCount}} holes in one');
     case 'albatross':
-      return t('amateur.stream.headline.featAlbatross', { count: feat.count, spokenCount, defaultValue_one: 'an albatross', defaultValue_other: '{{spokenCount}} albatrosses' });
+      return plural('amateur.stream.headline.featAlbatross', 'an albatross', '{{spokenCount}} albatrosses');
     case 'eagle':
-      return t('amateur.stream.headline.featEagle', { count: feat.count, spokenCount, defaultValue_one: 'an eagle', defaultValue_other: '{{spokenCount}} eagles' });
+      return plural('amateur.stream.headline.featEagle', 'an eagle', '{{spokenCount}} eagles');
     case 'birdies':
-      return t('amateur.stream.headline.featBirdies', { count: feat.count, spokenCount, defaultValue_one: '{{spokenCount}} birdie', defaultValue_other: '{{spokenCount}} birdies' });
+      return plural('amateur.stream.headline.featBirdies', '{{spokenCount}} birdie', '{{spokenCount}} birdies');
     case 'clean':
-      return t('amateur.stream.headline.featClean', { count: 1, spokenCount: 'one', defaultValue_one: 'a bogey-free card', defaultValue_other: 'bogey-free cards' });
+      return plural('amateur.stream.headline.featClean', 'a bogey-free card', 'bogey-free cards');
   }
 }
 
