@@ -852,6 +852,29 @@
       "raceTitle": "混戦のシーズン",
       "playerStandfirst": "{{name}}が今季をリード。実測データがその強さを示します。",
       "raceStandfirst": "今季はまだ誰のものでもありません。ポイント争いが続きます。",
+      "headline": {
+        "runaway": "{{name}}が今季を独走に変えた",
+        "contested": "今季はまだ誰のものでもない",
+        "changed": "{{name}}が今季の主導権を握った"
+      },
+      "evidence": {
+        "player": "{{wins}}勝、トップ10が{{topTens}}回、平均{{scoring}}が今季の基準を作っています。",
+        "race": "{{leader}}が{{points}}ポイントで首位ですが、今季の行方はまだ決まっていません。"
+      },
+      "proof": { "topFour": "上位4人の差", "winners": "優勝者", "remaining": "残り大会" },
+      "sectionTitle": {
+        "generic": "今季を象徴する{{category}}の数字",
+        "putting": "最も確かなパターがグリーンを支配する",
+        "driving": "ツアー最長の飛ばし屋は意外な選手",
+        "tied": "3人の勝者が頂点を分け合う"
+      },
+      "raceTableTitle": "ポイントレースを動かす5人",
+      "vs": "VS",
+      "duelEvidence": {
+        "distance": "シーズン平均の差はわずか{{gap}}ヤードです。",
+        "scoring": "差は{{gap}}打で、約{{rounds}}ラウンドに1打です。",
+        "default": "実測差は{{gap}}{{unit}}です。"
+      },
       "movement": "順位変動",
       "movementTitle": "伸びている選手",
       "race": "ポイント争い",

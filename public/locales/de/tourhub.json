@@ -856,6 +856,29 @@
       "raceTitle": "Das Rennen ist offen",
       "playerStandfirst": "{{name}} prägt diese Saison. Die gemessenen Zahlen zeigen, wie.",
       "raceStandfirst": "Noch gehört die Saison niemandem. Das Punkterennen bleibt die Geschichte.",
+      "headline": {
+        "runaway": "{{name}} macht aus der Saison einen Alleingang",
+        "contested": "Noch hat niemand diese Saison im Griff",
+        "changed": "{{name}} hat die Saison an sich gerissen"
+      },
+      "evidence": {
+        "player": "{{wins}} Siege, {{topTens}} Top-Ten-Platzierungen und ein Score-Schnitt von {{scoring}} geben den Maßstab vor.",
+        "race": "{{leader}} führt mit {{points}} Punkten, doch die Saison bleibt offen."
+      },
+      "proof": { "topFour": "ABSTAND TOP VIER", "winners": "SIEGER", "remaining": "TURNIERE OFFEN" },
+      "sectionTitle": {
+        "generic": "Die prägende {{category}}-Zahl der Saison",
+        "putting": "Der sicherste Putter der Tour nutzt jedes Grün",
+        "driving": "Der längste Spieler der Tour ist nicht der Erwartete",
+        "tied": "Drei Sieger teilen sich die Spitze"
+      },
+      "raceTableTitle": "Die fünf Spieler, denen das Rennen gehört",
+      "vs": "VS",
+      "duelEvidence": {
+        "distance": "Nur {{gap}} Yards trennen ihre Saisondurchschnitte.",
+        "scoring": "Der Abstand beträgt {{gap}} Schläge, etwa einen Schlag alle {{rounds}} Runden.",
+        "default": "Der gemessene Abstand beträgt {{gap}} {{unit}}."
+      },
       "movement": "Bewegung",
       "movementTitle": "Wer sich verbessert",
       "race": "Das Rennen",

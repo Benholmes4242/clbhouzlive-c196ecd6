@@ -856,6 +856,29 @@
       "raceTitle": "La carrera sigue abierta",
       "playerStandfirst": "{{name}} está marcando la temporada. Los datos medidos muestran cómo.",
       "raceStandfirst": "Nadie domina aún la temporada. La carrera de puntos sigue siendo la historia.",
+      "headline": {
+        "runaway": "{{name}} ha convertido la temporada en una procesión",
+        "contested": "Nadie ha tomado el control de esta temporada",
+        "changed": "{{name}} se ha apoderado de la temporada"
+      },
+      "evidence": {
+        "player": "{{wins}} victorias, {{topTens}} top diez y un promedio de {{scoring}} marcan la medida de la temporada.",
+        "race": "{{leader}} lidera con {{points}} puntos, pero la temporada sigue abierta."
+      },
+      "proof": { "topFour": "BRECHA TOP CUATRO", "winners": "GANADORES", "remaining": "TORNEOS RESTANTES" },
+      "sectionTitle": {
+        "generic": "La cifra de {{category}} que define la temporada",
+        "putting": "El putter más seguro del tour aprovecha cada green",
+        "driving": "El pegador más largo del tour no es quien imaginas",
+        "tied": "Tres ganadores comparten la cima"
+      },
+      "raceTableTitle": "Los cinco jugadores que dominan la carrera",
+      "vs": "VS",
+      "duelEvidence": {
+        "distance": "Solo {{gap}} yardas separan sus promedios de la temporada.",
+        "scoring": "La diferencia es de {{gap}} golpes, aproximadamente uno cada {{rounds}} rondas.",
+        "default": "La diferencia medida es de {{gap}} {{unit}}."
+      },
       "movement": "Movimiento",
       "movementTitle": "Quién está avanzando",
       "race": "La carrera",

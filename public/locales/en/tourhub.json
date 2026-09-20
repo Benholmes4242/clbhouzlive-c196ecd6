@@ -983,6 +983,33 @@
       "raceTitle": "The race is on",
       "playerStandfirst": "{{name}} has made the season theirs. The measured numbers show how.",
       "raceStandfirst": "No one owns this season yet. The points race remains the story.",
+      "headline": {
+        "runaway": "{{name}} has turned it into a procession",
+        "contested": "Nobody has taken hold of this season",
+        "changed": "{{name}} has seized the season"
+      },
+      "evidence": {
+        "player": "{{wins}} wins, {{topTens}} top-tens, and a {{scoring}} scoring average set the measure of the season.",
+        "race": "{{leader}} leads on {{points}} points, but the season remains in play."
+      },
+      "proof": {
+        "topFour": "TOP FOUR GAP",
+        "winners": "WINNERS",
+        "remaining": "EVENTS LEFT"
+      },
+      "sectionTitle": {
+        "generic": "The season's defining {{category}} number",
+        "putting": "The surest putter on tour is making every green count",
+        "driving": "The longest hitter on tour is not who you think",
+        "tied": "Three winners have made the summit their own"
+      },
+      "raceTableTitle": "The five players who own the race",
+      "vs": "VS",
+      "duelEvidence": {
+        "distance": "Only {{gap}} yards separate them on the season average.",
+        "scoring": "The gap is {{gap}} of a shot, about one stroke every {{rounds}} rounds.",
+        "default": "The measured gap is {{gap}} {{unit}}."
+      },
       "movement": "Movement",
       "movementTitle": "Who is moving",
       "race": "The race",
