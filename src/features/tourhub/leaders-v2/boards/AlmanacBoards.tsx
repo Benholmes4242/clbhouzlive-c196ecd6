@@ -30,7 +30,7 @@ function PlayerPortrait({ row, variant }: { row: LeaderRow; variant: 'lead' | 'n
     {!failed && src ? <img src={src} alt="" aria-hidden="true" loading={variant === 'lead' ? 'eager' : 'lazy'} onError={() => {
       if (candidateIndex + 1 < candidates.length) setCandidateIndex((current) => current + 1);
       else setFailed(true);
-    }} style={{ width: '100%', height: '100%', display: 'block', objectFit: variant === 'lead' ? 'contain' : 'cover', objectPosition: variant === 'lead' ? 'right bottom' : 'center 20%' }} /> : null}
+    }} style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover', objectPosition: variant === 'lead' ? 'right bottom' : 'center 20%' }} /> : null}
   </div>;
 }
 
