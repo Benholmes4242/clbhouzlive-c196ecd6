@@ -125,6 +125,8 @@ export interface CardScorecardSheetProps {
 
   // IDENTITY BLOCK (below scorecard)
   playerName: string;
+  /** Owner's actual display name for feat congratulations; never a username fallback. */
+  ownerDisplayName?: string | null;
   playerAvatarUrl?: string | null;
   playerHcp?: number | null;
   playerHcpDelta?: number | null;
@@ -310,7 +312,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   holes, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
-  playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
+  playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
   presentation = 'overlay',
@@ -331,7 +333,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     owner: featRarity?.owner ?? null,
     t,
     locale: i18n.language,
-    ownerDisplayName: playerName,
+    ownerDisplayName,
   });
   /* §3 — THE ARROW KEYS PAGE. Bound at the document while the card is open and
      pageable, so the keys work wherever focus sits inside the sheet, and never
