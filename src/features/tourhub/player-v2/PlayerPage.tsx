@@ -39,6 +39,12 @@ export function PlayerPage() {
 
   const { data: player, isLoading: playerLoading, isError: playerError, refetch } = useTourPlayer(playerId || '');
   const { data: playerStats, isLoading: statsLoading, isError: statsError, refetch: refetchStats } = useSinglePlayerStatistics(playerId);
+  // Two reads, deliberately. The counting row, the verdict's events/best-finish
+  // shape and the season shape all sit under a heading that says "the season",
+  // so they take current-season results only. The tournaments list is a HISTORY
+  // and takes everything — it is the one place a player with no current-season
+  // play still shows something, and it labels the out-of-season rows with a year.
+  const { data: seasonResults, isLoading: seasonResultsLoading, isError: seasonResultsError, refetch: refetchSeasonResults } = usePlayerResults(playerId, 200, { season: 'current' });
   const { data: results, isLoading: resultsLoading, isError: resultsError, refetch: refetchResults } = usePlayerResults(playerId, 200);
   const playerState = usePlayerState(playerId);
   const tour = mapTourSlug(player?.tour_codes?.[0] ?? 'pga');
@@ -49,7 +55,7 @@ export function PlayerPage() {
     scrollPageToTop('auto');
   }, [playerId]);
 
-  if (playerLoading || statsLoading || resultsLoading || leadersLoading) {
+  if (playerLoading || statsLoading || resultsLoading || seasonResultsLoading || leadersLoading) {
     return (
       <TourHubShell>
         <PlayerPageSkeleton />
@@ -85,7 +91,7 @@ export function PlayerPage() {
 
   const liveTournamentId =
     playerState.state === 'live' ? playerState.liveData?.tournamentId ?? null : null;
-  const selection = selectPlayerSeason(player.id, tour, playerStats ?? null, results ?? [], leaders?.rankMaps, leaders?.categories ?? [], t);
+  const selection = selectPlayerSeason(player.id, tour, playerStats ?? null, seasonResults ?? [], leaders?.rankMaps, leaders?.categories ?? [], t);
 
   return (
     <TourHubShell>
@@ -98,7 +104,7 @@ export function PlayerPage() {
       <div style={{ background: SLATE_50, minHeight: '100vh' }}>
         <HeroSection player={player} playerStats={playerStats ?? null} selection={selection} />
 
-        {(statsError || resultsError) && (
+        {(statsError || resultsError || seasonResultsError) && (
           <div
             style={{
               margin: '12px 16px 0',
@@ -119,6 +125,7 @@ export function PlayerPage() {
               onClick={() => {
                 if (statsError) refetchStats();
                 if (resultsError) refetchResults();
+                if (seasonResultsError) refetchSeasonResults();
               }}
               style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 12.5, fontWeight: 700, color: '#B91C1C', cursor: 'pointer', textDecoration: 'underline' }}
             >
@@ -144,14 +151,14 @@ export function PlayerPage() {
 
         <SeasonCards
           playerStats={playerStats ?? null}
-          results={results ?? []}
+          results={seasonResults ?? []}
           player={player}
           selection={selection}
         />
 
         <AgainstTheFieldSection selection={selection} />
 
-        <FormSection results={results ?? []} />
+        <FormSection results={seasonResults ?? []} />
 
         <TournamentsSection
           results={results ?? []}
