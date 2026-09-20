@@ -23,6 +23,7 @@ import { standingOrdinal } from './ordinal';
 import {
   BirdieCountIcon,
   CALLOUT_ICON,
+  CALLOUT_GOLD,
   RankUpIcon,
   AchievementEmoji,
   RarityFeatIcon,
@@ -425,5 +426,45 @@ export function RoundStatStrip({
       ) : null}
     </span>
     </>
+  );
+}
+
+/** Production-geometry harness used only by the 393px screenshot check. */
+export function FeatPillVerificationFixture({
+  mode,
+  displayName,
+  locale = 'en-GB',
+}: {
+  mode: 'rare-owner' | 'rare-viewer' | 'repeat-owner';
+  displayName?: string | null;
+  locale?: string;
+}) {
+  const { t } = useTranslation('courses');
+  const owner: FeatOwnerRow[] = mode === 'rare-viewer'
+    ? [{ feat_kind: 'eagle_brace', is_owner: false, member_ordinal: null, member_rounds: null, member_prev_at: null }]
+    : mode === 'repeat-owner'
+      ? [{ feat_kind: 'eagle_brace', is_owner: true, member_ordinal: 2, member_rounds: 101, member_prev_at: '2021-08-14' }]
+      : [{ feat_kind: 'eagle_brace', is_owner: true, member_ordinal: 1, member_rounds: 221, member_prev_at: null }];
+  const rows: FeatRarityRow[] = [{
+    feat_kind: 'eagle_brace',
+    global_ordinal: mode === 'repeat-owner' ? 2 : 3,
+    total_rounds_at_detection: mode === 'repeat-owner' ? 1905 : 3563,
+    distinct_members_at_detection: mode === 'repeat-owner' ? 1 : 2,
+  }];
+  const rarity = featRarityLines({ rows, owner, counts: { eagles: 2 }, t, locale, ownerDisplayName: displayName, now: new Date('2026-09-20T00:00:00Z') });
+  const ownerLine = rarity.ownerLine;
+  const line = ownerLine ?? rarity.viewerLine;
+  return (
+    <span data-explore-stat-strip="round" data-feat-pill-fixture={mode} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) repeat(2, 72px)', width: '100%', minWidth: 0, borderRadius: r.md, background: GOLD_TINT, border: `0.5px solid ${GOLD_BORDER}`, overflow: 'hidden', boxSizing: 'border-box' }}>
+      <span style={{ display: 'flex', minWidth: 0, minHeight: 52, alignItems: 'center', gap: 8, padding: '8px 10px', boxSizing: 'border-box' }}>
+        <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px` }}><RarityFeatIcon kind="eagle" /></span>
+        <span style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, gap: 3 }}>
+          <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK }}>Eagle brace</span>
+          <span data-feat-rarity-owner={ownerLine ? 'true' : undefined} data-feat-rarity-viewer={ownerLine ? undefined : 'true'} style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: ownerLine ? 700 : 600, lineHeight: 1.3, color: ownerLine ? CALLOUT_GOLD : A.MUTE, whiteSpace: 'normal', overflowWrap: 'break-word' }}>{line}</span>
+        </span>
+      </span>
+      <FigureCell label="PAR" value="72" />
+      <FigureCell label="NET" value="69" under />
+    </span>
   );
 }
