@@ -748,7 +748,7 @@
         "label": "Strokes Gained Putting",
         "short": "SG PUTT",
         "unit": "SG",
-        "description": "この部門の実測シーズン順位です。"
+        "description": "1ラウンドあたり、グリーン上でフィールド平均に対して得た、または失った打数を示します。"
       },
       "world_rank": {
         "label": "World Ranking",

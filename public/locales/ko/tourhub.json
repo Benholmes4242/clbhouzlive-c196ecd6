@@ -748,7 +748,7 @@
         "label": "Strokes Gained Putting",
         "short": "SG PUTT",
         "unit": "SG",
-        "description": "이 부문의 측정된 시즌 순위입니다."
+        "description": "라운드당 그린에서 필드 평균 대비 얻거나 잃은 타수를 측정합니다."
       },
       "world_rank": {
         "label": "World Ranking",

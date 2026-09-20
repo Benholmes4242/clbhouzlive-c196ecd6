@@ -752,7 +752,7 @@
         "label": "Strokes Gained Putting",
         "short": "SG PUTT",
         "unit": "SG",
-        "description": "Die gemessene Saisonwertung in dieser Kategorie."
+        "description": "Misst pro Runde die auf den Grüns gegenüber dem Felddurchschnitt gewonnenen oder verlorenen Schläge."
       },
       "world_rank": {
         "label": "World Ranking",
