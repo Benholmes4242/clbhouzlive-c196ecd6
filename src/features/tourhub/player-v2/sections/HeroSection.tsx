@@ -92,7 +92,10 @@ export function HeroSection({ player, playerStats, selection }: HeroSectionProps
             {worldRank && <RankFigure label={t('player.hero.worldLabel')} value={worldRank} />}
             {fedexRank && <RankFigure label={t('player.hero.fedexLabel')} value={fedexRank} />}
             {raceProof && <RankFigure label={raceProof.points.label} value={raceProof.points.tied ? `T${raceProof.points.rank}` : playerOrdinal(t, raceProof.points)} />}
-            {raceProof?.wins && <RankFigure label={t('leaders.stat.wins.label')} value={raceProof.wins.tied ? `T${raceProof.wins.rank}` : playerOrdinal(t, raceProof.wins)} />}
+            {/* Correction 6 (2026-09-20): the wins figure is deliberately NOT rendered here —
+                it is a rank ("T5") and reads as a win count under a WINS label, contradicting
+                the verdict sentence above. One proof cell is acceptable on its own; raceProof.wins
+                stays on the selection type for other consumers. */}
           </div>
         )}
       </div>
