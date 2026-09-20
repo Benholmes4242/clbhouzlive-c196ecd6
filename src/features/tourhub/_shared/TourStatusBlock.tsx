@@ -12,6 +12,7 @@
  */
 import { useTranslation } from 'react-i18next';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { isDemotedStatus } from './resultStatus';
 
 /** Broadcast red — under par on every tour surface. */
 export const TOUR_UNDER = '#C0392B';
@@ -38,7 +39,7 @@ interface Props {
   align?: 'left' | 'right';
 }
 
-const DEMOTED = new Set(['CUT', 'MC', 'MDF', 'WD', 'DQ', 'DNS']);
+
 
 export function TourStatusBlock({
   score,
@@ -50,7 +51,7 @@ export function TourStatusBlock({
 }: Props) {
   const { t } = useTranslation('tourhub');
   const s = (status ?? '').toUpperCase();
-  const demoted = DEMOTED.has(s);
+  const demoted = isDemotedStatus(s);
 
   const scoreText = demoted ? (s === 'CUT' ? 'MC' : s) : formatTourScore(score);
   if (scoreText == null && position == null) return null;

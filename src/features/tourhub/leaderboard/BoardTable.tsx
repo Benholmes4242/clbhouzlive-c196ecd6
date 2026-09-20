@@ -53,6 +53,7 @@ import { shortenName } from '../components/overview-v3/HybridHero.utils';
 import { surnameOf } from '../_shared/playerName';
 import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import { isDemotedStatus } from '../_shared/resultStatus';
 
 // Dark ramp, imported so the board follows the tour token file (was four pinned light literals).
 const INK = TOUR_INK;
@@ -340,11 +341,8 @@ function resolveLayout(
   return { columns: { ...base, cellW: CELL_W_FLOOR }, tier: 'surname' };
 }
 
-function isDemoted(s?: string | null): boolean {
-  if (!s) return false;
-  const u = s.toUpperCase();
-  return u === 'MC' || u === 'CUT' || u === 'WD' || u === 'DQ' || u === 'MDF' || u === 'DNS';
-}
+/* Status vocabulary lives in _shared/resultStatus.ts — see MDF note there. */
+const isDemoted = isDemotedStatus;
 
 function statusWord(s?: string | null): string {
   const u = (s || '').toUpperCase();
