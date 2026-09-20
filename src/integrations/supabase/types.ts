@@ -21422,6 +21422,20 @@ export type Database = {
           whs_score_id: string
         }[]
       }
+      get_round_feat_lines: {
+        Args: { p_round_ids: string[] }
+        Returns: {
+          distinct_members_at_detection: number
+          feat_kind: string
+          global_ordinal: number
+          is_owner: boolean
+          member_ordinal: number
+          member_prev_at: string
+          member_rounds: number
+          total_rounds_at_detection: number
+          whs_score_id: string
+        }[]
+      }
       get_round_feat_owner_lines: {
         Args: { p_round_ids: string[] }
         Returns: {
