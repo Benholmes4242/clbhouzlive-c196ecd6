@@ -156,7 +156,7 @@ export interface CardScorecardSheetProps {
   engagement?: CardScorecardEngagement | null;
   /**
    * FEAT RARITY LINES §2/§4 — the frozen rows for this round and the owner
-   * fields from get_round_feat_owner_lines (NULLed in SQL for anyone else).
+   * fields from get_round_feat_lines (NULLed in SQL for anyone else).
    * Absent for the tour surface and for hosts that do not read them, and then
    * no line and no reserved space is drawn.
    */
