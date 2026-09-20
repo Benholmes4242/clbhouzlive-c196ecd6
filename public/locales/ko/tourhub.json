@@ -852,6 +852,29 @@
       "raceTitle": "열린 우승 경쟁",
       "playerStandfirst": "{{name}} 선수가 시즌을 이끌고 있습니다. 측정된 수치가 그 이유를 보여줍니다.",
       "raceStandfirst": "아직 시즌을 지배한 선수는 없습니다. 포인트 경쟁이 계속됩니다.",
+      "headline": {
+        "runaway": "{{name}}이 시즌을 독주로 바꿨다",
+        "contested": "아직 누구도 이번 시즌을 장악하지 못했다",
+        "changed": "{{name}}이 시즌의 주도권을 잡았다"
+      },
+      "evidence": {
+        "player": "{{wins}}승, 톱10 {{topTens}}회, 평균 {{scoring}}타가 이번 시즌의 기준을 세웠습니다.",
+        "race": "{{leader}}이 {{points}}포인트로 선두지만 시즌은 아직 열려 있습니다."
+      },
+      "proof": { "topFour": "상위 4명 차이", "winners": "우승자", "remaining": "남은 대회" },
+      "sectionTitle": {
+        "generic": "시즌을 정의하는 {{category}} 수치",
+        "putting": "투어 최고의 퍼터가 모든 그린을 살린다",
+        "driving": "투어 최장타자는 예상 밖의 선수다",
+        "tied": "세 명의 우승자가 정상을 나눴다"
+      },
+      "raceTableTitle": "포인트 경쟁을 이끄는 다섯 선수",
+      "vs": "VS",
+      "duelEvidence": {
+        "distance": "시즌 평균 차이는 단 {{gap}}야드입니다.",
+        "scoring": "차이는 {{gap}}타로, 약 {{rounds}}라운드마다 한 타입니다.",
+        "default": "측정된 차이는 {{gap}}{{unit}}입니다."
+      },
       "movement": "순위 변화",
       "movementTitle": "상승 중인 선수",
       "race": "포인트 경쟁",
