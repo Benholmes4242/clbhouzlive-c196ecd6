@@ -48,6 +48,11 @@ export function SeasonCards({ playerStats, results, player, selection }: SeasonC
     .filter((result) => result.position != null && isFinish(result.status))
     .sort((a, b) => (a.position ?? Number.POSITIVE_INFINITY) - (b.position ?? Number.POSITIVE_INFINITY))[0];
   const derivedCuts = entered.filter((result) => isFinish(result.status) && result.position != null).length;
+  // `results` are CURRENT-SEASON results only (PlayerPage passes the
+  // season-scoped read). No current-season result means there is nothing to
+  // count under a heading that says "the season", so the derived cells resolve
+  // to none and the section hides itself on the rule below. A mid-season player
+  // with two results still shows two events.
   const counts = playerStats
     ? [
         { key: 'events', label: t('player.season.card.events'), value: playerStats.events_played ?? results.length },
