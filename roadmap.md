@@ -7,4 +7,4 @@
 - [x] Replace form chips with the full-season result-shape plot.
 - [x] Weight wins in tournament rows and normalize residence display.
 - [x] Add all new copy across six locales with CJK-safe casing.
-- [ ] Verify representative PGA, no-photo, and non-PGA players at 320px, 390px, and 430px.
+- [x] Verify representative PGA, no-photo, and non-PGA players at 320px, 390px, and 430px.
