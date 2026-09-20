@@ -50,7 +50,7 @@ describe('season magazine selection', () => {
       category('points', [row('leader', 100, 1), row('second', 70, 2), row('third', 60, 3), row('fourth', 50, 4), row('fifth', 40, 5)]),
       category('special', [row('number', 10, 1), row('other', 5, 2)], { picturableGap: false }),
       category('drive_avg', [row('leader', 320, 1), row('duelist', 319, 2)], { group: 'tee' }),
-      category('wins', [row('leader', 3, 1), row('winner-two', 3, 1), row('winner-three', 3, 1)]),
+      category('wins', [row('leader', 3, 1), row('winner-two', 3, 1), row('winner-three', 3, 1)], { picturableGap: false }),
     ]);
     expect(result?.showRaceStandings).toBe(true);
     expect(result?.tiedList?.key).toBe('wins');
