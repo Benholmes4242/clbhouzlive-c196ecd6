@@ -1076,7 +1076,17 @@
       "railMembers_one": "MITGLIED",
       "railMembers_other": "MITGLIEDER",
       "railDays_one": "TAG",
-      "railDays_other": "TAGE"
+      "railDays_other": "TAGE",
+      "featAce_one": "HOLE-IN-ONE",
+      "featAce_other": "{{count}} HOLE-IN-ONES",
+      "featAlbatross_one": "ALBATROS",
+      "featAlbatross_other": "{{count}} ALBATROSSE",
+      "featEagle_one": "EAGLE",
+      "featEagle_other": "{{count}} EAGLES",
+      "featBirdies_one": "{{count}} BIRDIE",
+      "featBirdies_other": "{{count}} BIRDIES",
+      "featClean": "BOGEYFREI",
+      "featJoin": "{{first}} + {{second}}"
     },
     "lens": {
       "suggested": "Suggested",
@@ -1749,7 +1759,21 @@
         "listFirst": "{{player}} spielte eine Runde in {{gross}} - die niedrigste, die hier jemand gespielt hat.",
         "rankDownMoved": "{{player}} spielte eine Runde in {{gross}}. Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plätze tiefer.",
         "rankUpOthers": "Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plätze höher.",
-        "rankUpOthersPlain": "Du stehst hier jetzt auf {{ord}} von {{of}}."
+        "rankUpOthersPlain": "Du stehst hier jetzt auf {{ord}} von {{of}}.",
+        "featAce_one": "ein Hole-in-one",
+        "featAce_other": "{{spokenCount}} Hole-in-ones",
+        "featAlbatross_one": "ein Albatros",
+        "featAlbatross_other": "{{spokenCount}} Albatrosse",
+        "featEagle_one": "ein Eagle",
+        "featEagle_other": "{{spokenCount}} Eagles",
+        "featBirdies_one": "{{spokenCount}} Birdie",
+        "featBirdies_other": "{{spokenCount}} Birdies",
+        "featClean_one": "eine bogeyfreie Runde",
+        "featClean_other": "eine bogeyfreie Runde",
+        "featJoin": "{{first}} und {{second}}",
+        "featsRound": "{{feats}}, in einer Runde von {{gross}}.",
+        "featsRoundToPar": "{{feats}}, in einer Runde von {{gross}}, {{topar}}.",
+        "featsOnly": "{{feats}}."
       },
       "standing": {
         "board": "Niedrigster Brutto",
@@ -1815,7 +1839,14 @@
         "netCourseRecord": "Netto-Platzrekord",
         "tagMovedUp": "AUFGESTIEGEN",
         "nowRank": "Jetzt {{ord}}",
-        "movedUpBoard": "In der Rangliste aufgestiegen"
+        "movedUpBoard": "In der Rangliste aufgestiegen",
+        "aceCount_one": "Hole-in-one",
+        "aceCount_other": "{{count}} Hole-in-ones",
+        "albatrossCount_one": "Albatros",
+        "albatrossCount_other": "{{count}} Albatrosse",
+        "eagleCount_one": "Eagle",
+        "eagleCount_other": "{{count}} Eagles",
+        "featJoin": "{{first}} + {{second}}"
       },
       "stat": {
         "par": "PAR",

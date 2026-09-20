@@ -191,7 +191,21 @@
         "listFirst": "{{player}} shot {{article}} {{gross}} — the lowest anyone has played here.",
         "rankDownMoved": "{{player}} shot {{article}} {{gross}}. You are now {{ord}} of {{of}} here, down {{n}}.",
         "rankUpOthers": "You are now {{ord}} of {{of}} here, up {{n}}.",
-        "rankUpOthersPlain": "You are now {{ord}} of {{of}} here."
+        "rankUpOthersPlain": "You are now {{ord}} of {{of}} here.",
+        "featAce_one": "a hole in one",
+        "featAce_other": "{{spokenCount}} holes in one",
+        "featAlbatross_one": "an albatross",
+        "featAlbatross_other": "{{spokenCount}} albatrosses",
+        "featEagle_one": "an eagle",
+        "featEagle_other": "{{spokenCount}} eagles",
+        "featBirdies_one": "{{spokenCount}} birdie",
+        "featBirdies_other": "{{spokenCount}} birdies",
+        "featClean_one": "a bogey-free card",
+        "featClean_other": "a bogey-free card",
+        "featJoin": "{{first}} and {{second}}",
+        "featsRound": "{{feats}}, in a round of {{gross}}.",
+        "featsRoundToPar": "{{feats}}, in a round of {{gross}}, {{topar}}.",
+        "featsOnly": "{{feats}}."
       },
       "standing": {
         "board": "Lowest gross",
@@ -254,7 +268,14 @@
         "netCourseRecord": "Net course record",
         "tagMovedUp": "MOVED UP",
         "nowRank": "Now {{ord}}",
-        "movedUpBoard": "Moved up the board"
+        "movedUpBoard": "Moved up the board",
+        "aceCount_one": "Hole in one",
+        "aceCount_other": "{{count}} holes in one",
+        "albatrossCount_one": "Albatross",
+        "albatrossCount_other": "{{count}} albatrosses",
+        "eagleCount_one": "Eagle",
+        "eagleCount_other": "{{count}} eagles",
+        "featJoin": "{{first}} + {{second}}"
       },
       "stat": {
         "par": "PAR",
@@ -1102,7 +1123,17 @@
       "railMembers_one": "MEMBER",
       "railMembers_other": "MEMBERS",
       "railRounds_one": "ROUND",
-      "railRounds_other": "ROUNDS"
+      "railRounds_other": "ROUNDS",
+      "featAce_one": "HOLE IN ONE",
+      "featAce_other": "{{count}} HOLES IN ONE",
+      "featAlbatross_one": "ALBATROSS",
+      "featAlbatross_other": "{{count}} ALBATROSSES",
+      "featEagle_one": "EAGLE",
+      "featEagle_other": "{{count}} EAGLES",
+      "featBirdies_one": "{{count}} BIRDIE",
+      "featBirdies_other": "{{count}} BIRDIES",
+      "featClean": "BOGEY-FREE",
+      "featJoin": "{{first}} + {{second}}"
     },
     "findGolfers": {
       "addFriend": "Add friend",

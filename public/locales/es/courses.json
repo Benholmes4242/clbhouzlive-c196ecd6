@@ -1076,7 +1076,17 @@
       "railMembers_one": "MIEMBRO",
       "railMembers_other": "MIEMBROS",
       "railDays_one": "DÍA",
-      "railDays_other": "DÍAS"
+      "railDays_other": "DÍAS",
+      "featAce_one": "HOYO EN UNO",
+      "featAce_other": "{{count}} HOYOS EN UNO",
+      "featAlbatross_one": "ALBATROS",
+      "featAlbatross_other": "{{count}} ALBATROSES",
+      "featEagle_one": "EAGLE",
+      "featEagle_other": "{{count}} EAGLES",
+      "featBirdies_one": "{{count}} BIRDIE",
+      "featBirdies_other": "{{count}} BIRDIES",
+      "featClean": "SIN BOGEYS",
+      "featJoin": "{{first}} + {{second}}"
     },
     "lens": {
       "suggested": "Suggested",
@@ -1749,7 +1759,21 @@
         "listFirst": "{{player}} completó la vuelta en {{gross}}: la más baja que se ha jugado aquí.",
         "rankDownMoved": "{{player}} completó la vuelta en {{gross}}. Ahora estás {{ord}} de {{of}} aquí, {{n}} puestos abajo.",
         "rankUpOthers": "Ahora estás {{ord}} de {{of}} aquí, {{n}} puestos arriba.",
-        "rankUpOthersPlain": "Ahora estás {{ord}} de {{of}} aquí."
+        "rankUpOthersPlain": "Ahora estás {{ord}} de {{of}} aquí.",
+        "featAce_one": "un hoyo en uno",
+        "featAce_other": "{{spokenCount}} hoyos en uno",
+        "featAlbatross_one": "un albatros",
+        "featAlbatross_other": "{{spokenCount}} albatroses",
+        "featEagle_one": "un eagle",
+        "featEagle_other": "{{spokenCount}} eagles",
+        "featBirdies_one": "{{spokenCount}} birdie",
+        "featBirdies_other": "{{spokenCount}} birdies",
+        "featClean_one": "una tarjeta sin bogeys",
+        "featClean_other": "una tarjeta sin bogeys",
+        "featJoin": "{{first}} y {{second}}",
+        "featsRound": "{{feats}}, en una ronda de {{gross}}.",
+        "featsRoundToPar": "{{feats}}, en una ronda de {{gross}}, {{topar}}.",
+        "featsOnly": "{{feats}}."
       },
       "standing": {
         "board": "Golpes brutos más bajos",
@@ -1815,7 +1839,14 @@
         "netCourseRecord": "Récord neto del campo",
         "tagMovedUp": "SUBIÓ",
         "nowRank": "Ahora {{ord}}",
-        "movedUpBoard": "Subió en la clasificación"
+        "movedUpBoard": "Subió en la clasificación",
+        "aceCount_one": "Hoyo en uno",
+        "aceCount_other": "{{count}} hoyos en uno",
+        "albatrossCount_one": "Albatros",
+        "albatrossCount_other": "{{count}} albatroses",
+        "eagleCount_one": "Eagle",
+        "eagleCount_other": "{{count}} eagles",
+        "featJoin": "{{first}} + {{second}}"
       },
       "stat": {
         "par": "PAR",
