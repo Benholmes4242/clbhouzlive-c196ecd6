@@ -680,7 +680,10 @@
       "searchPlaceholder": "Buscar en esta clasificación",
       "noMatch": "No hay coincidencias en esta clasificación.",
       "gapBack": "{{delta}} {{unit}} por detrás",
-      "gapUnits": { "shots": "golpes", "yards": "yardas" }
+      "gapUnits": {
+        "shots": "golpes",
+        "yards": "yardas"
+      }
     },
     "tourChip": {
       "pga": "PGA",
@@ -869,7 +872,11 @@
         "player": "{{wins}} victorias, {{topTens}} top diez y un promedio de {{scoring}} marcan la medida de la temporada.",
         "race": "{{leader}} lidera con {{points}} puntos, pero la temporada sigue abierta."
       },
-      "proof": { "topFour": "BRECHA TOP CUATRO", "winners": "GANADORES", "remaining": "TORNEOS RESTANTES" },
+      "proof": {
+        "topFour": "BRECHA TOP CUATRO",
+        "winners": "GANADORES",
+        "remaining": "TORNEOS RESTANTES"
+      },
       "sectionTitle": {
         "generic": "La cifra de {{category}} que define la temporada",
         "putting": "El putter más seguro del tour aprovecha cada green",
@@ -957,7 +964,15 @@
       "tourSuffix": "{{tour}} TOUR",
       "fallback": "PLAYER",
       "worldNo": "World No. {{rank}}",
-      "fedexNo": "FedEx No. {{rank}}"
+      "fedexNo": "FedEx No. {{rank}}",
+      "worldLabel": "WORLD",
+      "fedexLabel": "FEDEX",
+      "verdict": {
+        "winsRanked": "{{wins}} victorias y {{top10s}} top diez lo han llevado al número {{rank}} del mundo.",
+        "noWin": "Aún busca la victoria, con {{top10s}} top diez y el número {{rank}} del mundo.",
+        "pointsRanked": "{{wins}} victorias lo sitúan {{rank}} en la carrera de {{raceLabel}}.",
+        "resultsOnly": "{{events}} participaciones esta temporada, con {{best}} como mejor resultado."
+      }
     },
     "live": {
       "badge": "LIVE",
@@ -966,13 +981,17 @@
       "finished": "F"
     },
     "form": {
-      "eyebrow": "Last 6 · Most Recent First",
+      "eyebrow": "Forma de la temporada",
       "status": {
         "mc": "MC",
         "wd": "WD",
         "dq": "DQ",
         "noResult": "—"
-      }
+      },
+      "caption": "Todas las salidas, de la más antigua a la más reciente",
+      "chartLabel": "Gráfico de posiciones de toda la temporada",
+      "seasonStart": "Inicio",
+      "latest": "Último"
     },
     "tournaments": {
       "eyebrow": "Tournaments",
@@ -1018,6 +1037,11 @@
         "shortGame": "Short Game",
         "strokesGained": "Strokes Gained"
       }
+    },
+    "field": {
+      "eyebrow": "Frente al resto",
+      "strength": "Una fortaleza definida",
+      "watch": "Donde puede ganar terreno"
     }
   },
   "tour": {

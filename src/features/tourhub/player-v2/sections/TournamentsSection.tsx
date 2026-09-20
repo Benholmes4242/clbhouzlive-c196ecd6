@@ -29,6 +29,7 @@ import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import {
   AMBER_DEEP,
+  AMBER_TINT_08,
   INK,
   INK_FAINT,
   INK_MUTE,
@@ -122,6 +123,7 @@ export function PlayerResultRow({
         padding: '13px 16px',
         textDecoration: 'none',
         color: INK,
+        background: isWin ? AMBER_TINT_08 : 'transparent',
       }}
       className="active:bg-black/[0.02] transition-colors"
     >

@@ -25,6 +25,10 @@ import { SeasonCards } from './sections/SeasonCards';
 import { FormSection } from './sections/FormSection';
 import { TournamentsSection } from './sections/TournamentsSection';
 import { AboutSection } from './sections/AboutSection';
+import { AgainstTheFieldSection } from './sections/AgainstTheFieldSection';
+import { selectPlayerSeason } from './playerSeason';
+import { useLeaderCategories } from '../leaders-v2/data/useLeaderCategories';
+import { mapTourSlug } from '../_shared/tourOrder';
 import { PlayerPageSkeleton } from '@/components/skeletons/PlayerPageSkeleton';
 import { SLATE_50 } from '../_shared/tokens';
 import { scrollPageToTop } from '@/lib/getScrollParent';
@@ -37,13 +41,15 @@ export function PlayerPage() {
   const { data: playerStats, isLoading: statsLoading, isError: statsError, refetch: refetchStats } = useSinglePlayerStatistics(playerId);
   const { data: results, isLoading: resultsLoading, isError: resultsError, refetch: refetchResults } = usePlayerResults(playerId, 30);
   const playerState = usePlayerState(playerId);
+  const tour = mapTourSlug(player?.tour_codes?.[0] ?? 'pga');
+  const { data: leaders, isLoading: leadersLoading } = useLeaderCategories(tour);
 
   // Scroll-to-top on player switch (ported from PlayerProfilePage).
   useEffect(() => {
     scrollPageToTop('auto');
   }, [playerId]);
 
-  if (playerLoading || statsLoading || resultsLoading) {
+  if (playerLoading || statsLoading || resultsLoading || leadersLoading) {
     return (
       <TourHubShell>
         <PlayerPageSkeleton />
@@ -79,6 +85,7 @@ export function PlayerPage() {
 
   const liveTournamentId =
     playerState.state === 'live' ? playerState.liveData?.tournamentId ?? null : null;
+  const selection = selectPlayerSeason(playerStats ?? null, results ?? [], leaders?.rankMaps, leaders?.categories ?? [], t);
 
   return (
     <TourHubShell>
@@ -89,7 +96,7 @@ export function PlayerPage() {
         backFallback="/tourhub?tab=players"
       >
       <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-        <HeroSection player={player} playerStats={playerStats ?? null} />
+        <HeroSection player={player} playerStats={playerStats ?? null} selection={selection} />
 
         {(statsError || resultsError) && (
           <div
@@ -139,7 +146,10 @@ export function PlayerPage() {
           playerStats={playerStats ?? null}
           results={results ?? []}
           player={player}
+          selection={selection}
         />
+
+        <AgainstTheFieldSection selection={selection} />
 
         <FormSection results={results ?? []} />
 

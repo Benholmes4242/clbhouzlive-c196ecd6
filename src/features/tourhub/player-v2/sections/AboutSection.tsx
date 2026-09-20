@@ -15,6 +15,7 @@ import type { TourPlayer } from '../../hooks/useTourHubData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { INK, INK_FAINT, SURFACE } from '../../_shared/tokens';
 import { FIGS } from '@/lib/tokens/type';
+import { titleCaseCountry } from '../../utils/countryFlags';
 
 interface AboutSectionProps {
   player: TourPlayer;
@@ -52,7 +53,14 @@ export function AboutSection({ player }: AboutSectionProps) {
        fact, not a link. The tappable college now lives on the hero stamp. */
     fields.push({ label: t('player.about.field.college'), value: player.college });
   }
-  if (player.residence) fields.push({ label: t('player.about.field.residence'), value: player.residence });
+  if (player.residence) {
+    const canonicalCountry = player.country ? titleCaseCountry(player.country) : null;
+    const countryTokens = [player.country, player.country_code, canonicalCountry].filter(Boolean).map((value) => String(value).trim().toUpperCase());
+    const residenceParts = player.residence.split(',').map((part) => part.trim()).filter(Boolean);
+    while (residenceParts.length > 0 && countryTokens.includes(residenceParts[residenceParts.length - 1].toUpperCase())) residenceParts.pop();
+    const normalizedResidence = [...residenceParts, canonicalCountry].filter(Boolean).join(', ');
+    if (normalizedResidence) fields.push({ label: t('player.about.field.residence'), value: normalizedResidence });
+  }
 
   if (fields.length < 2) return null;
 
