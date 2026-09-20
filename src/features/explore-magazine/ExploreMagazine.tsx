@@ -1604,6 +1604,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   let cardPos = 0;
 
   return (
+    /* FEAT RARITY LINES §1 — THE OWNER FIELDS ARE READ ONCE FOR THE WHOLE PAGE.
+       get_round_feat_owner_lines takes every round id currently in the stream in
+       a single call; each card reads its own row out of that response. */
+    <FeatRarityProvider ids={roundScoreIds.filter((id): id is string => !!id)}>
     <div style={{ fontFamily: SANS }}>
       {/* §3b THE VIEW CHIP ROW starts below the islands because AmateurPage's
           shell pays CHROME_CLEARANCE. On scroll, the shared islands ride away
@@ -2098,6 +2102,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         facets={boardState.facets}
       />
     </div>
+    </FeatRarityProvider>
   );
 }
 
