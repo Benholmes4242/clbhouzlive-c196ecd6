@@ -203,8 +203,9 @@ export function featRarityLines({
 
   const firstName = congratulationName(ownerDisplayName);
   if (ownerLine && ownerBranch && firstName) {
+    const congratulationLine = ownerLine.replace(/[.!。]$/, '');
     ownerLine = t(`featRarity.owner${ownerBranch}Congrats` as never, '{{line}} — congrats, {{name}}', {
-      line: ownerLine,
+      line: congratulationLine,
       name: firstName,
     });
   }

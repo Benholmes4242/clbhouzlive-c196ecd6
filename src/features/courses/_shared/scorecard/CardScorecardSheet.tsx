@@ -18,6 +18,7 @@ import {
   type FeatRarityRow,
 } from '@/features/explore-magazine/featRarity';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { RarityFeatIcon } from '@/features/explore-magazine/achievementIcons';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
@@ -757,15 +758,21 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 </text>
               </svg>
             ) : (
-              <span
-                aria-hidden="true"
-                style={{
-                  flex: '0 0 14px', width: 14, fontSize: 14, lineHeight: 1,
-                  fontFamily: "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
-                }}
-              >
-                {feat.kind === 'ace' ? '⛳' : feat.kind === 'albatross' ? '🔥' : feat.kind === 'eagle' ? '🦅' : '🛡️'}
-              </span>
+              feat.kind === 'ace' || feat.kind === 'albatross' || feat.kind === 'eagle' ? (
+                <span aria-hidden="true" style={{ display: 'flex', flex: '0 0 14px', width: 14 }}>
+                  <RarityFeatIcon kind={feat.kind} size={14} />
+                </span>
+              ) : (
+                <span
+                  aria-hidden="true"
+                  style={{
+                    flex: '0 0 14px', width: 14, fontSize: 14, lineHeight: 1,
+                    fontFamily: "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
+                  }}
+                >
+                  🛡️
+                </span>
+              )
             )}
             <span style={{ display: 'flex', minWidth: 0, flexDirection: 'column', gap: 3 }}>
               <span
