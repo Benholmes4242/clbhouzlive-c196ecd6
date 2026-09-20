@@ -26,9 +26,12 @@ import {
   FONT,
   HAIRLINE_INK_10,
   INK,
+  INK_FAINT,
   INK_MUTE,
   SLATE_50,
   SURFACE,
+  TREND_UP,
+  WHITE_ALPHA_06,
 } from '../_shared/tokens';
 import { getScoreColor } from '../_shared/scoreColor';
 import { MovementFigure } from '../_shared/movement';
@@ -43,7 +46,7 @@ import { FIGS } from '@/lib/tokens/type';
 
 type SortKey = 'ranking' | 'live';
 
-const SEP = ' . ';
+const SEP = ' · ';
 
 export function PlayersTab() {
   const { t } = useTranslation('tourhub');
@@ -227,13 +230,10 @@ export function PlayersTab() {
       {/* S4 — the search magnifier no longer owns a header row of its own; it
           sits inline with the field/sort row below, matching LeaderboardTab's
           treatment (icon in line with the page title, expand to input). */}
-      {/* THE FIELD. The kicker is the only amber on this page: there is no
-          viewing member on a tour surface, so nothing else earns brand colour.
-          With the stat lens present the pills need a full scrollable row of
-          their own; with two pills they stay inline beside the kicker. */}
+      {/* THE FIELD and its scope controls share the overview's 24px gutter. */}
       <div
         style={{
-          padding: '12px 16px 4px',
+          padding: '12px 24px 4px',
           display: 'flex',
           alignItems: 'baseline',
           justifyContent: 'space-between',
@@ -319,9 +319,9 @@ export function PlayersTab() {
                 style={{
                   padding: '5px 10px',
                   borderRadius: 10,
-                  border: active ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: active ? INK : SURFACE,
-                  color: active ? SLATE_50 : INK_MUTE,
+                   border: active ? '0.5px solid transparent' : `0.5px solid ${HAIRLINE_INK_10}`,
+                   background: active ? WHITE_ALPHA_06 : 'transparent',
+                   color: active ? INK : INK_MUTE,
                   fontFamily: 'inherit',
                   // CAPS BUTTON: two points down from the 13 button base, 0.10em.
                   fontSize: 11,
@@ -359,7 +359,7 @@ export function PlayersTab() {
       </div>
 
       {rankingLoading ? (
-        <div style={{ padding: '0 16px' }}>
+        <div style={{ padding: '0 24px' }}>
           {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton key={i} className="w-full mb-1" style={{ height: 58, borderRadius: 6 }} />
           ))}
@@ -401,68 +401,39 @@ export function PlayersTab() {
           <RankedPlayerHeader
             rankLabel={t('players.header.rank')}
             playerLabel={t('players.header.player')}
-            statLabel={synced ? statLabel : null}
+            statLabel={synced ? t('players.header.points', { defaultValue: 'Pts' }) : null}
           />
-          {orderedRows.map((r) => {
+          {orderedRows.map((r, index) => {
             const live = (liveMap ?? {})[r.playerId];
             const isLive = !!live;
-            let sub: React.ReactNode = null;
-
-            if (isLive && live) {
-              const posStr =
-                live.position != null ? `${live.positionTied ? 'T' : ''}${live.position}` : '';
-              const segments: React.ReactNode[] = [];
-              if (posStr) segments.push(<span key="pos">{posStr}</span>);
-              if (live.score != null) {
-                segments.push(
-                  <span key="score" style={{ color: getScoreColor(live.score, 'dark') }}>
-                    {fmtScore(live.score)}
-                  </span>,
-                );
-              }
-              if (live.tournamentName) segments.push(<span key="tn">{live.tournamentName}</span>);
-              sub = segments.length ? (
-                <span style={{ color: INK_MUTE }}>
-                  {segments.map((node, i) => (
-                    <span key={i}>
-                      {i > 0 ? SEP : ''}
-                      {node}
-                    </span>
-                  ))}
-                </span>
-              ) : null;
-            } else {
-              const wr = (worldRanks ?? {})[r.playerId];
-              const segments: React.ReactNode[] = [];
-              if (wr) {
-                segments.push(
-                  <span key="wr">
-                    {t('players.sub.worldRank', { rank: wr.rank })}{' '}
-                    <MovementFigure
-                      movement={wr.movement}
-                      nullPlaceholder="none"
-                      variant="inline"
-                    />
-                  </span>,
-                );
-              }
-              if (synced && r.wins) {
-                segments.push(<span key="w">{t('players.sub.wins', { count: r.wins })}</span>);
-              }
-              if (synced && r.top10s) {
-                segments.push(<span key="t10">{t('players.sub.top10s', { count: r.top10s })}</span>);
-              }
-              sub = segments.length ? (
-                <span style={{ color: INK_MUTE }}>
-                  {segments.map((node, i) => (
-                    <span key={i}>
-                      {i > 0 ? SEP : ''}
-                      {node}
-                    </span>
-                  ))}
-                </span>
-              ) : null;
+            const wr = (worldRanks ?? {})[r.playerId];
+            const careerSegments: React.ReactNode[] = [];
+            if (wr) {
+              careerSegments.push(
+                <span key="wr">
+                  {t('players.sub.worldRank', { rank: wr.rank })}{' '}
+                  <MovementFigure movement={wr.movement} nullPlaceholder="none" variant="inline" />
+                </span>,
+              );
             }
+            if (synced && r.wins) careerSegments.push(<span key="w">{t('players.sub.wins', { count: r.wins })}</span>);
+            if (synced && r.top10s) careerSegments.push(<span key="t10">{t('players.sub.top10s', { count: r.top10s })}</span>);
+            const sub = careerSegments.length ? careerSegments.map((node, i) => (
+              <span key={i}>{i > 0 ? SEP : ''}{node}</span>
+            )) : null;
+            const posStr = live?.position != null ? `${live.positionTied ? 'T' : ''}${live.position}` : '';
+            const kicker = isLive && live ? (
+              <><span style={{ color: TREND_UP }}>{t('status.live')}</span>{live.tournamentName ? `${SEP}${live.tournamentName}` : ''}</>
+            ) : (
+              t('players.sub.fedexRank', {
+                defaultValue: '{{label}} {{rank}}',
+                label: (statLabel ?? t('players.header.points', { defaultValue: 'Pts' })).replace(/\s*PTS$/i, ''),
+                rank: r.rank,
+              })
+            );
+            const unit = isLive && live ? (
+              <>{posStr ? <span style={{ color: INK_FAINT }}>{posStr}</span> : null}{posStr && live.score != null ? SEP : ''}{live.score != null ? <span style={{ color: getScoreColor(live.score, 'dark') }}>{fmtScore(live.score)}</span> : null}</>
+            ) : t('players.header.points', { defaultValue: 'Pts' });
 
             return (
               <RankedPlayerRow
@@ -477,8 +448,10 @@ export function PlayersTab() {
                   tourCode: r.tourCode,
                 }}
                 stat={synced ? r.stat : undefined}
-                live={isLive}
+                kicker={kicker}
                 sub={sub}
+                unit={unit}
+                last={index === orderedRows.length - 1}
                 interactive={!!r.playerId}
                 onClick={() => goPlayer(r)}
               />
