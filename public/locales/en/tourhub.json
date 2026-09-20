@@ -942,7 +942,7 @@
       "euro": "Race to Dubai",
       "lpga": "CME Points",
       "liv": "LIV Points",
-      "pgad": "Korn Ferry Points"
+      "pgad": "Season Points"
     },
     "almanac": {
       "world": {
@@ -1126,7 +1126,8 @@
       "verdict": {
         "winsRanked": "{{wins}} wins and {{top10s}} top tens have carried him to world No. {{rank}}.",
         "noWin": "Still chasing a win, with {{top10s}} top tens and a world ranking of {{rank}}.",
-        "pointsRanked": "{{wins}} wins place him {{rank}} in the {{raceLabel}} race.",
+        "pointsRanked_one": "{{wins}} win places him {{rank}} in the {{raceLabel}} race.",
+        "pointsRanked_other": "{{wins}} wins place him {{rank}} in the {{raceLabel}} race.",
         "resultsOnly": "{{events}} starts this season, with a best finish of {{best}}."
       }
     },

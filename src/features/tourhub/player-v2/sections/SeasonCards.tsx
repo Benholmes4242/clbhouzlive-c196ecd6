@@ -25,6 +25,7 @@ import { mapTourSlug } from '../../_shared/tourOrder';
 import { INK, INK_FAINT, SLATE_50 } from '../../_shared/tokens';
 import type { PlayerSeasonSelection } from '../playerSeason';
 import { playerOrdinal } from '../playerOrdinal';
+import { formatPositionShort } from '../../hooks/usePlayerResults';
 
 interface SeasonCardsProps {
   playerStats: TourPlayerStatistics | null;
@@ -37,12 +38,23 @@ export function SeasonCards({ playerStats, results, player, selection }: SeasonC
   const { t } = useTranslation('tourhub');
   const [sheetOpen, setSheetOpen] = useState(false);
   const hasStats = !!playerStats;
-  const counts = [
-    { key: 'events', label: t('player.season.card.events'), value: playerStats?.events_played ?? results.length },
-    { key: 'wins', label: t('player.season.card.wins'), value: playerStats?.wins },
-    { key: 'top10', label: t('player.season.card.top10s'), value: playerStats?.top_10s },
-    { key: 'cuts', label: t('player.season.card.madeCuts'), value: playerStats?.cuts_made },
-  ].filter((item) => typeof item.value === 'number').slice(0, 4);
+  const settled = results.filter((result) => result.status !== 'WD' && result.status !== 'DQ');
+  const best = settled
+    .filter((result) => result.position != null)
+    .sort((a, b) => (a.position ?? Number.POSITIVE_INFINITY) - (b.position ?? Number.POSITIVE_INFINITY))[0];
+  const derivedCuts = settled.filter((result) => result.status !== 'cut' && result.status !== 'MC' && result.position != null).length;
+  const counts = playerStats
+    ? [
+        { key: 'events', label: t('player.season.card.events'), value: playerStats.events_played ?? results.length },
+        { key: 'wins', label: t('player.season.card.wins'), value: playerStats.wins },
+        { key: 'top10', label: t('player.season.card.top10s'), value: playerStats.top_10s },
+        { key: 'cuts', label: t('player.season.card.madeCuts'), value: playerStats.cuts_made },
+      ].filter((item) => typeof item.value === 'number').slice(0, 4)
+    : [
+        { key: 'events', label: t('player.season.card.events'), value: results.length },
+        { key: 'best', label: t('player.season.card.bestFinish'), value: best ? formatPositionShort(best.position, best.position_tied, best.status) : null },
+        { key: 'cuts', label: t('player.season.card.madeCuts'), value: derivedCuts },
+      ].filter((item) => item.value != null);
   if (!selection.headline && counts.length === 0) return null;
 
   const openSheet = () => {
@@ -147,7 +159,7 @@ export function SeasonCards({ playerStats, results, player, selection }: SeasonC
         <StatsSheet
           open={sheetOpen}
           onClose={() => setSheetOpen(false)}
-          playerStats={playerStats!}
+          playerStats={playerStats}
           playerName={player.full_name}
           tour={mapTourSlug(player.tour_codes?.[0] ?? 'pga')}
         />

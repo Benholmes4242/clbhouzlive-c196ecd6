@@ -815,7 +815,7 @@
       "euro": "Race to Dubai",
       "lpga": "CME Points",
       "liv": "LIV Points",
-      "pgad": "Korn Ferry Points"
+      "pgad": "Season Points"
     },
     "almanac": {
       "world": {
@@ -966,7 +966,8 @@
       "verdict": {
         "winsRanked": "{{wins}}승과 톱10 {{top10s}}회로 세계 {{rank}}위에 올랐습니다.",
         "noWin": "첫 우승을 노리며 톱10 {{top10s}}회, 세계 {{rank}}위를 기록했습니다.",
-        "pointsRanked": "{{wins}}승으로 {{raceLabel}} 레이스 {{rank}}위입니다.",
+        "pointsRanked_one": "{{wins}}승으로 {{raceLabel}} 레이스 {{rank}}위입니다.",
+        "pointsRanked_other": "{{wins}}승으로 {{raceLabel}} 레이스 {{rank}}위입니다.",
         "resultsOnly": "이번 시즌 {{events}}회 출전, 최고 성적은 {{best}}입니다."
       }
     },

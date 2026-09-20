@@ -166,10 +166,11 @@ export const LEADER_STAT_LABELS: Record<string, LeaderStatLabelSet> = {
 
 // Per-tour override for the points category display label (brand names).
 // shortKey/unitKey stay on the generic points entry above.
-const POINTS_LABEL_KEY_BY_TOUR: Partial<Record<TourId, string>> = {
+export const POINTS_LABEL_KEY_BY_TOUR: Partial<Record<TourId, string>> = {
   euro: 'leaders.pointsBrand.euro',
   lpga: 'leaders.pointsBrand.lpga',
   liv:  'leaders.pointsBrand.liv',
+  pgad: 'leaders.pointsBrand.pgad',
 };
 
 export interface LeaderCategoryDef {
@@ -190,8 +191,8 @@ export interface LeaderCategoryDef {
 
 /**
  * ADDITIVE (player-v2/StatsSheet): category key -> player_id -> rank.
- * Built over the FULL ranked pool, not the top-50 slice. Empty on every
- * non-PGA tour, where tour_season_rankings carries no stat columns.
+ * Built over the FULL ranked pool, not the top-50 slice. Non-PGA tours carry
+ * points and wins maps from tour_season_rankings; PGA also carries skill stats.
  */
 export type LeaderRankMaps = Record<string, Record<string, { rank: number; tied: boolean }>>;
 
@@ -199,7 +200,7 @@ export interface LeaderCategoriesResult {
   synced: boolean;
   categories: LeaderCategoryDef[];
   year: number;
-  /** Additive. Empty object off the PGA Tour. */
+  /** Additive full-pool rank lookup for every available category. */
   rankMaps?: LeaderRankMaps;
 }
 
@@ -533,6 +534,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
   }
 
   const categories: LeaderCategoryDef[] = [];
+  const rankMaps: LeaderRankMaps = {};
 
   if (rankings.length) {
     const pool = rankings;
@@ -571,7 +573,6 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
     const pointsRows = pointsPool
       .slice()
       .sort((a, b) => Number(b.points) - Number(a.points))
-      .slice(0, 50)
       .map((r) => {
         const base = resolve(r);
         base.value = Number(r.points);
@@ -579,6 +580,11 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         return base;
       });
     applyCompetitionRanks(pointsRows, fmtPoints);
+    rankMaps.points = Object.fromEntries(
+      pointsRows
+        .filter((row) => row.playerId)
+        .map((row) => [row.playerId, { rank: row.rank, tied: row.tied }]),
+    );
     if (pointsRows.length >= 3) {
       const pointsBase = LEADER_STAT_LABELS.points;
       const brandLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour];
@@ -586,7 +592,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         key: 'points',
         ...pointsBase,
         labelKey: brandLabelKey ?? pointsBase.labelKey,
-        rows: applyBehind(pointsRows, 'desc', fmtPoints),
+        rows: applyBehind(pointsRows.slice(0, 50), 'desc', fmtPoints),
         poolSize: pointsPool.length,
       });
     }
@@ -596,7 +602,6 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
     const winsRows = winsPool
       .slice()
       .sort((a, b) => Number(b.wins) - Number(a.wins))
-      .slice(0, 50)
       .map((r) => {
         const base = resolve(r);
         base.value = Number(r.wins);
@@ -604,11 +609,16 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         return base;
       });
     applyCompetitionRanks(winsRows, fmtInt);
+    rankMaps.wins = Object.fromEntries(
+      winsRows
+        .filter((row) => row.playerId)
+        .map((row) => [row.playerId, { rank: row.rank, tied: row.tied }]),
+    );
     if (winsRows.length >= 3) {
       categories.push({
         key: 'wins',
         ...LEADER_STAT_LABELS.wins,
-        rows: applyBehind(winsRows, 'desc', fmtInt),
+        rows: applyBehind(winsRows.slice(0, 50), 'desc', fmtInt),
         poolSize: winsPool.length,
       });
     }
@@ -617,7 +627,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
 
   // World ranking is PGA-only per editorial policy - not appended to other tours.
 
-  return { synced: categories.length > 0, categories, year };
+  return { synced: categories.length > 0, categories, year, rankMaps };
 }
 
 export function useLeaderCategories(tour: TourId, options?: { enabled?: boolean }) {

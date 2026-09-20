@@ -817,7 +817,7 @@
       "euro": "[~~Řáĉé ţő Đúƀáí~~]",
       "lpga": "[~~ĈṀÉ Ƥőíñţš~~]",
       "liv": "[~~ĻÍṼ Ƥőíñţš~~]",
-      "pgad": "Korn Ferry Points"
+      "pgad": "Season Points"
     },
     "almanac": {
       "world": {
@@ -955,7 +955,8 @@
       "verdict": {
         "winsRanked": "[{{wins}} ŵïñš åñð {{top10s}} ţöþ ţëñš håvë çårrïëð hïm ţö ŵörlð Ñö. {{rank}}.]",
         "noWin": "[Šţïll çhåšïñg å ŵïñ, ŵïţh {{top10s}} ţöþ ţëñš åñð å ŵörlð råñkïñg öf {{rank}}.]",
-        "pointsRanked": "[{{wins}} ŵïñš þlåçë hïm {{rank}} ïñ ţhë {{raceLabel}} råçë.]",
+        "pointsRanked_one": "[{{wins}} ŵïñ þlåçëš hïm {{rank}} ïñ ţhë {{raceLabel}} råçë.]",
+        "pointsRanked_other": "[{{wins}} ŵïñš þlåçë hïm {{rank}} ïñ ţhë {{raceLabel}} råçë.]",
         "resultsOnly": "[{{events}} šţårţš ţhïš šëåšöñ, ŵïţh å bëšţ fïñïšh öf {{best}}.]"
       }
     },
