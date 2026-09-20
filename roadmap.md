@@ -172,3 +172,10 @@ Tour Overview Design A
 - [x] Preserve composer bands and viewing-member amber treatments
 - [x] Normalize photographic near-misses with documented white fallbacks
 - [x] Verify focused tests, TypeScript, rail tones, and Tralee tones
+
+## Review score colour C4
+- [ ] Canonicalize shared verdict labels and tint Exceptional ghost numerals without changing alpha.
+- [ ] Keep the true light-ground rating neutral at #64748B; correct stale dark-ground caller metadata.
+- [ ] Preserve reviewTierColor and report its three dependent displays.
+- [ ] Measure overlap contrast on dark/light grounds and verify 9.0/8.3 shared surfaces.
+- [ ] Report unrelated FeedCard DEAL green and dormant postHelpers without changing them.
