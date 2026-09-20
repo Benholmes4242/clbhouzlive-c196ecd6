@@ -164,4 +164,4 @@ Tour Overview Design A
 - [x] Route named rating displays and shared sub-score bars through the canonical helper
 - [x] Preserve composer bands and viewing-member amber treatments
 - [x] Normalize photographic near-misses with documented white fallbacks
-- [ ] Verify focused tests, TypeScript, rail tones, and Tralee tones
+- [x] Verify focused tests, TypeScript, rail tones, and Tralee tones
