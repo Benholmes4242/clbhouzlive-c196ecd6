@@ -429,6 +429,23 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
   if (statsErr) throw statsErr;
 
   const pool = (stats ?? []) as PgaStatRow[];
+  const { data: snapshots } = await supabase
+    .from('sr_player_statistics_snapshots')
+    .select('player_id, snapshot_month, stats')
+    .eq('season_id', seasonId)
+    .order('snapshot_month', { ascending: false })
+    .limit(1000);
+  const latestMonth = snapshots?.[0]?.snapshot_month ?? null;
+  const priorPoints = (snapshots ?? [])
+    .filter((snapshot) => snapshot.snapshot_month === latestMonth && snapshot.player_id)
+    .map((snapshot) => {
+      const source = snapshot.stats && typeof snapshot.stats === 'object' ? snapshot.stats as Record<string, unknown> : {};
+      const value = Number(source.fedex_points ?? source.points ?? 0);
+      return { playerId: snapshot.player_id ?? '', value };
+    })
+    .filter((entry) => entry.value > 0)
+    .sort((a, b) => b.value - a.value);
+  const priorRank = new Map(priorPoints.map((entry, index) => [entry.playerId, index + 1]));
   const playerIds = [...new Set(pool.map((s) => s.player_id).filter((v): v is string => !!v))];
   const pmap = await fetchPlayers(playerIds);
 
@@ -467,7 +484,7 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
           tourCode: p.tour_codes?.[0] ?? 'pga',
           value: r.value,
           valueFormatted: cat.format(r.value),
-          movement: null,
+          movement: cat.key === 'points' && priorRank.has(r.pid) ? (priorRank.get(r.pid) ?? r.rank) - r.rank : null,
           behindFormatted: null,
         };
       });
