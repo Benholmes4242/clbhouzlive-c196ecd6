@@ -260,7 +260,11 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 // LEADER_STAT_LABELS[key] at render - no display strings live here.
 type PgaStatRow = {
   player_id: string | null;
+  fedex_points: number | null;
   earnings: number | null;
+  events_played: number | null;
+  cuts_made: number | null;
+  top_25s: number | null;
   scoring_average: number | null;
   wins: number | null;
   top_10s: number | null;
@@ -271,7 +275,21 @@ type PgaStatRow = {
   putting_average: number | null;
   strokes_gained_tee_green: number | null;
   strokes_gained_putting: number | null;
+  raw_data: unknown;
 };
+
+function rawStat(row: PgaStatRow, ...keys: string[]): number | null {
+  if (!row.raw_data || typeof row.raw_data !== 'object') return null;
+  const raw = row.raw_data as Record<string, unknown>;
+  const nested = raw.statistics && typeof raw.statistics === 'object'
+    ? raw.statistics as Record<string, unknown>
+    : raw;
+  for (const key of keys) {
+    const value = Number(nested[key]);
+    if (Number.isFinite(value) && value !== 0) return value;
+  }
+  return null;
+}
 
 type TourSeasonRankingRow = {
   player_id: string | null;
@@ -292,6 +310,7 @@ interface PgaCatSpec {
 }
 
 const PGA_CATS: PgaCatSpec[] = [
+  { key: 'points',                   dir: 'desc', accessor: (s) => s.fedex_points,              format: fmtInt },
   { key: 'earnings',                 dir: 'desc', accessor: (s) => s.earnings,                 format: fmtMoneyCompact },
   { key: 'scoring_avg',              dir: 'asc',  accessor: (s) => s.scoring_average,          format: fmtAvg3 },
   { key: 'wins',                     dir: 'desc', accessor: (s) => s.wins,                     format: fmtInt },
@@ -303,6 +322,12 @@ const PGA_CATS: PgaCatSpec[] = [
   { key: 'putt_avg',                 dir: 'asc',  accessor: (s) => s.putting_average,          format: fmtAvg3 },
   { key: 'strokes_gained_tee_green', dir: 'desc', accessor: (s) => s.strokes_gained_tee_green, format: fmtSG },
   { key: 'strokes_gained_putting',   dir: 'desc', accessor: (s) => s.strokes_gained_putting,   format: fmtSG },
+  { key: 'events_played',             dir: 'desc', accessor: (s) => s.events_played,              format: fmtInt },
+  { key: 'top_25',                    dir: 'desc', accessor: (s) => s.top_25s,                     format: fmtInt },
+  { key: 'cuts_made',                 dir: 'desc', accessor: (s) => s.cuts_made,                   format: fmtInt },
+  { key: 'birdies_per_round',         dir: 'desc', accessor: (s) => rawStat(s, 'birdies_per_round', 'birdiesPerRound'), format: fmtAvg },
+  { key: 'scrambling',                dir: 'desc', accessor: (s) => rawStat(s, 'scrambling', 'scrambling_pct'), format: fmtPct },
+  { key: 'strokes_gained_total',      dir: 'desc', accessor: (s) => rawStat(s, 'strokes_gained_total', 'strokesGainedTotal'), format: fmtSG },
 ];
 
 type PlayerRec = {
@@ -386,7 +411,7 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
   const { data: stats, error: statsErr } = await supabase
     .from('sr_player_statistics')
     .select(
-      'player_id, earnings, scoring_average, wins, top_10s, driving_distance, driving_accuracy, greens_in_reg, sand_saves, putting_average, strokes_gained_tee_green, strokes_gained_putting'
+      'player_id, fedex_points, earnings, events_played, cuts_made, top_25s, scoring_average, wins, top_10s, driving_distance, driving_accuracy, greens_in_reg, sand_saves, putting_average, strokes_gained_tee_green, strokes_gained_putting, raw_data'
     )
     .eq('season_id', seasonId)
     .limit(500);
