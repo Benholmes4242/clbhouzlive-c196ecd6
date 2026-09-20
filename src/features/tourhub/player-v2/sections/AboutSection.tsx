@@ -55,7 +55,7 @@ export function AboutSection({ player }: AboutSectionProps) {
   }
   if (player.residence) {
     const canonicalCountry = player.country ? titleCaseCountry(player.country) : null;
-    const countryTokens = [player.country, player.country_code].filter(Boolean).map((value) => String(value).trim().toUpperCase());
+    const countryTokens = [player.country, player.country_code, canonicalCountry].filter(Boolean).map((value) => String(value).trim().toUpperCase());
     const residenceParts = player.residence.split(',').map((part) => part.trim()).filter(Boolean);
     while (residenceParts.length > 0 && countryTokens.includes(residenceParts[residenceParts.length - 1].toUpperCase())) residenceParts.pop();
     const normalizedResidence = [...residenceParts, canonicalCountry].filter(Boolean).join(', ');
