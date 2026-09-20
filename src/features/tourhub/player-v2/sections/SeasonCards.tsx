@@ -38,11 +38,17 @@ export function SeasonCards({ playerStats, results, player, selection }: SeasonC
   const { t } = useTranslation('tourhub');
   const [sheetOpen, setSheetOpen] = useState(false);
   const hasStats = !!playerStats;
-  const settled = results.filter((result) => result.status !== 'WD' && result.status !== 'DQ');
+  // sr_leaderboards.status is not case-consistent: measured 2026-09-20 it stores
+  // 'CUT' upper case while this file compared against 'cut'. Missed cuts were
+  // therefore counted as made cuts and could win BEST FINISH (Stuard read
+  // "T69 / 3 made cuts" from three starts, two of them missed cuts).
+  const statusOf = (result: { status: string | null }) => (result.status ?? '').toUpperCase();
+  const missedCut = (result: { status: string | null }) => statusOf(result) === 'CUT' || statusOf(result) === 'MC';
+  const settled = results.filter((result) => statusOf(result) !== 'WD' && statusOf(result) !== 'DQ');
   const best = settled
-    .filter((result) => result.position != null)
+    .filter((result) => result.position != null && !missedCut(result))
     .sort((a, b) => (a.position ?? Number.POSITIVE_INFINITY) - (b.position ?? Number.POSITIVE_INFINITY))[0];
-  const derivedCuts = settled.filter((result) => result.status !== 'cut' && result.status !== 'MC' && result.position != null).length;
+  const derivedCuts = settled.filter((result) => !missedCut(result) && result.position != null).length;
   const counts = playerStats
     ? [
         { key: 'events', label: t('player.season.card.events'), value: playerStats.events_played ?? results.length },

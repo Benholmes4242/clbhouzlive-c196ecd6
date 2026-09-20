@@ -108,8 +108,14 @@ function dedupe(rows: PlayerSeasonStat[]): PlayerSeasonStat[] {
 }
 
 function bestFinish(results: PlayerTournamentResult[]): PlayerTournamentResult | null {
+  // A missed cut is not a finish. sr_leaderboards stores it as 'CUT' upper case
+  // (measured 2026-09-20), so compare case-insensitively.
+  const missedCut = (result: PlayerTournamentResult) => {
+    const status = (result.status ?? '').toUpperCase();
+    return status === 'CUT' || status === 'MC' || status === 'WD' || status === 'DQ';
+  };
   return results
-    .filter((result) => typeof result.position === 'number')
+    .filter((result) => typeof result.position === 'number' && !missedCut(result))
     .sort((a, b) => (a.position ?? Number.POSITIVE_INFINITY) - (b.position ?? Number.POSITIVE_INFINITY))[0] ?? null;
 }
 

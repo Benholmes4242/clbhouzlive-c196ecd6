@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { BoardEntry } from '../leaderboard/BoardTable';
+// Single definition of which season is current; do not re-derive it here.
+import { currentSeasonYear } from '../leaders-v2/data/useLeaderCategories';
 
 // Major tour code override — Sportradar stores Grand Slams under EURO season
 const MAJOR_NAMES_TO_PGA: string[] = [
@@ -162,6 +164,8 @@ export interface TourPlayerStatistics {
   // From the sr_player_statistics COLUMN, never raw_data (raw_data.strokes_gained
   // is null on all 220 live 2026 PGA rows). Measured 2026-09-20: 220/220 populated.
   strokes_gained_putting: number | null;
+  // Season the figures belong to, so a caller can assert value and rank agree.
+  season_year?: number | null;
   // Joined player data
   player?: TourPlayer;
 }
@@ -794,24 +798,40 @@ export function useTournamentScoringStats(tournamentId: string) {
   });
 }
 
-// Hook: Get single player's statistics (optimized - 1 row instead of 236)
+// Hook: Get single player's statistics for the CURRENT season only.
+//
+// SEASON FILTER (2026-09-20): this read used to order by created_at and take one
+// row with no season filter, so it returned the most recently INSERTED row - a
+// prior season's figures for the 56 of 276 players with no current-season row,
+// shown under a heading that says "the season" and with no ranks beside them
+// (rankMaps IS season-filtered). Insertion order and season order are
+// independent, so created_at is wrong in every case.
+//
+// There is deliberately NO fallback to an earlier season: null is correct and
+// the page already renders the no-stats shape (no headline figure, counting row
+// derived from results, Against the field hidden). currentSeasonYear() from
+// leaders-v2 is the single definition of which season is current.
 export function useSinglePlayerStatistics(playerId: string | undefined) {
+  const seasonYear = currentSeasonYear();
   return useQuery({
-    queryKey: ['tourhub', 'single-player-statistics', playerId],
+    // Season is part of the key so a rollover cannot serve a cached prior-season row.
+    queryKey: ['tourhub', 'single-player-statistics', playerId, seasonYear],
     queryFn: async () => {
       if (!playerId) return null;
-      
+
       const { data, error } = await supabase
         .from('sr_player_statistics')
-        .select('*')
+        .select('*, sr_seasons!inner(year)')
         .eq('player_id', playerId)
-        .order('created_at', { ascending: false })
+        .eq('sr_seasons.year', seasonYear)
+        .order('year', { referencedTable: 'sr_seasons', ascending: false })
         .limit(1)
         .maybeSingle();
-      
+
       if (error) throw error;
-      
+
       if (!data) return null;
+      
       
       // Extract raw stats same way as bulk hook
       const rawExtracted = extractRawStats(data.raw_data as { statistics?: RawStatistics } | null);
@@ -839,6 +859,8 @@ export function useSinglePlayerStatistics(playerId: string | undefined) {
         strokes_gained: rawExtracted.strokes_gained ?? null,
         // Column, not raw_data.
         strokes_gained_putting: data.strokes_gained_putting ?? null,
+        // Always the current season by construction; carried so callers can assert.
+        season_year: seasonYear,
       } as TourPlayerStatistics;
     },
     enabled: !!playerId,
