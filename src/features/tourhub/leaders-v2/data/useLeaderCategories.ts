@@ -122,29 +122,46 @@ export interface LeaderStatLabelSet {
   labelKey: string;
   shortKey: string;
   unitKey: string;
+  descriptionKey: string;
+  group: LeaderCategoryGroup;
+  meaningfulBehind: boolean;
+  picturableGap: boolean;
+  duelGapLimit: number;
 }
+export type LeaderCategoryGroup = 'season' | 'scoring' | 'tee' | 'approach' | 'putting' | 'strokesGained' | 'ranking';
+
+const stat = (key: string, group: LeaderCategoryGroup, meaningfulBehind: boolean, picturableGap: boolean, duelGapLimit = 0.02): LeaderStatLabelSet => ({
+  labelKey: `leaders.stat.${key}.label`,
+  shortKey: `leaders.stat.${key}.short`,
+  unitKey: `leaders.stat.${key}.unit`,
+  descriptionKey: `leaders.stat.${key}.description`,
+  group,
+  meaningfulBehind,
+  picturableGap,
+  duelGapLimit,
+});
 export const LEADER_STAT_LABELS: Record<string, LeaderStatLabelSet> = {
-  earnings:                    { labelKey: 'leaders.stat.earnings.label',                    shortKey: 'leaders.stat.earnings.short',                    unitKey: 'leaders.stat.earnings.unit' },
-  scoring_avg:                 { labelKey: 'leaders.stat.scoring_avg.label',                 shortKey: 'leaders.stat.scoring_avg.short',                 unitKey: 'leaders.stat.scoring_avg.unit' },
-  wins:                        { labelKey: 'leaders.stat.wins.label',                        shortKey: 'leaders.stat.wins.short',                        unitKey: 'leaders.stat.wins.unit' },
-  top_10:                      { labelKey: 'leaders.stat.top_10.label',                      shortKey: 'leaders.stat.top_10.short',                      unitKey: 'leaders.stat.top_10.unit' },
-  drive_avg:                   { labelKey: 'leaders.stat.drive_avg.label',                   shortKey: 'leaders.stat.drive_avg.short',                   unitKey: 'leaders.stat.drive_avg.unit' },
-  drive_acc:                   { labelKey: 'leaders.stat.drive_acc.label',                   shortKey: 'leaders.stat.drive_acc.short',                   unitKey: 'leaders.stat.drive_acc.unit' },
-  gir_pct:                     { labelKey: 'leaders.stat.gir_pct.label',                     shortKey: 'leaders.stat.gir_pct.short',                     unitKey: 'leaders.stat.gir_pct.unit' },
-  sand_saves_pct:              { labelKey: 'leaders.stat.sand_saves_pct.label',              shortKey: 'leaders.stat.sand_saves_pct.short',              unitKey: 'leaders.stat.sand_saves_pct.unit' },
-  putt_avg:                    { labelKey: 'leaders.stat.putt_avg.label',                    shortKey: 'leaders.stat.putt_avg.short',                    unitKey: 'leaders.stat.putt_avg.unit' },
-  strokes_gained_tee_green:    { labelKey: 'leaders.stat.strokes_gained_tee_green.label',    shortKey: 'leaders.stat.strokes_gained_tee_green.short',    unitKey: 'leaders.stat.strokes_gained_tee_green.unit' },
-  strokes_gained_putting:      { labelKey: 'leaders.stat.strokes_gained_putting.label',      shortKey: 'leaders.stat.strokes_gained_putting.short',      unitKey: 'leaders.stat.strokes_gained_putting.unit' },
-  world_rank:                  { labelKey: 'leaders.stat.world_rank.label',                  shortKey: 'leaders.stat.world_rank.short',                  unitKey: 'leaders.stat.world_rank.unit' },
-  points:                      { labelKey: 'leaders.stat.points.label',                      shortKey: 'leaders.stat.points.short',                      unitKey: 'leaders.stat.points.unit' },
+  earnings: stat('earnings', 'season', false, false),
+  scoring_avg: stat('scoring_avg', 'scoring', true, true, 0.01),
+  wins: stat('wins', 'season', false, false),
+  top_10: stat('top_10', 'season', false, false),
+  drive_avg: stat('drive_avg', 'tee', true, true),
+  drive_acc: stat('drive_acc', 'tee', true, true, 0.03),
+  gir_pct: stat('gir_pct', 'approach', true, true, 0.03),
+  sand_saves_pct: stat('sand_saves_pct', 'approach', true, true, 0.05),
+  putt_avg: stat('putt_avg', 'putting', true, true),
+  strokes_gained_tee_green: stat('strokes_gained_tee_green', 'strokesGained', true, true, 0.2),
+  strokes_gained_putting: stat('strokes_gained_putting', 'strokesGained', true, true, 0.2),
+  world_rank: stat('world_rank', 'ranking', false, false),
+  points: stat('points', 'season', false, false),
   // Wave 3e.iv Turn C.3 extensions - consumed by player-v2/StatsSheet.
-  events_played:               { labelKey: 'leaders.stat.events_played.label',               shortKey: 'leaders.stat.events_played.short',               unitKey: 'leaders.stat.events_played.unit' },
-  top_25:                      { labelKey: 'leaders.stat.top_25.label',                      shortKey: 'leaders.stat.top_25.short',                      unitKey: 'leaders.stat.top_25.unit' },
-  cuts_made:                   { labelKey: 'leaders.stat.cuts_made.label',                   shortKey: 'leaders.stat.cuts_made.short',                   unitKey: 'leaders.stat.cuts_made.unit' },
-  birdies_per_round:           { labelKey: 'leaders.stat.birdies_per_round.label',           shortKey: 'leaders.stat.birdies_per_round.short',           unitKey: 'leaders.stat.birdies_per_round.unit' },
-  scrambling:                  { labelKey: 'leaders.stat.scrambling.label',                  shortKey: 'leaders.stat.scrambling.short',                  unitKey: 'leaders.stat.scrambling.unit' },
-  strokes_gained_total:        { labelKey: 'leaders.stat.strokes_gained_total.label',        shortKey: 'leaders.stat.strokes_gained_total.short',        unitKey: 'leaders.stat.strokes_gained_total.unit' },
-  strokes_gained_around_green: { labelKey: 'leaders.stat.strokes_gained_around_green.label', shortKey: 'leaders.stat.strokes_gained_around_green.short', unitKey: 'leaders.stat.strokes_gained_around_green.unit' },
+  events_played: stat('events_played', 'season', false, false),
+  top_25: stat('top_25', 'season', false, false),
+  cuts_made: stat('cuts_made', 'season', false, false),
+  birdies_per_round: stat('birdies_per_round', 'scoring', true, true, 0.05),
+  scrambling: stat('scrambling', 'approach', true, true, 0.05),
+  strokes_gained_total: stat('strokes_gained_total', 'strokesGained', true, true, 0.2),
+  strokes_gained_around_green: stat('strokes_gained_around_green', 'strokesGained', true, true, 0.2),
 };
 
 // Per-tour override for the points category display label (brand names).
@@ -162,6 +179,11 @@ export interface LeaderCategoryDef {
   unitKey: string;       // t() -> right-column subtitle in the sheet header
   rows: LeaderRow[];     // top 50
   poolSize: number;      // players in the category pool BEFORE the top-50 slice
+  descriptionKey: string;
+  group: LeaderCategoryGroup;
+  meaningfulBehind: boolean;
+  picturableGap: boolean;
+  duelGapLimit: number;
 }
 
 /**
@@ -177,6 +199,7 @@ export interface LeaderCategoriesResult {
   year: number;
   /** Additive. Empty object off the PGA Tour. */
   rankMaps?: LeaderRankMaps;
+  remainingEvents: number;
 }
 
 
