@@ -9,6 +9,7 @@ import {
 } from '../leaders-v2/data/useLeaderCategories';
 import type { TourId } from '../hooks/useOverviewData';
 import { playerOrdinal } from './playerOrdinal';
+import { isFinish } from '../_shared/resultStatus';
 
 /**
  * Eligible skill pool. Measured 2026-09-20 against the live 2026 PGA season
@@ -108,14 +109,11 @@ function dedupe(rows: PlayerSeasonStat[]): PlayerSeasonStat[] {
 }
 
 function bestFinish(results: PlayerTournamentResult[]): PlayerTournamentResult | null {
-  // A missed cut is not a finish. sr_leaderboards stores it as 'CUT' upper case
-  // (measured 2026-09-20), so compare case-insensitively.
-  const missedCut = (result: PlayerTournamentResult) => {
-    const status = (result.status ?? '').toUpperCase();
-    return status === 'CUT' || status === 'MC' || status === 'WD' || status === 'DQ';
-  };
+  // A finish is a real finishing position: MDF counts (made the 36-hole cut,
+  // eliminated at a secondary one), CUT/MC/WD/DQ/DNS do not. Vocabulary and
+  // reasoning: _shared/resultStatus.ts.
   return results
-    .filter((result) => typeof result.position === 'number' && !missedCut(result))
+    .filter((result) => typeof result.position === 'number' && isFinish(result.status))
     .sort((a, b) => (a.position ?? Number.POSITIVE_INFINITY) - (b.position ?? Number.POSITIVE_INFINITY))[0] ?? null;
 }
 

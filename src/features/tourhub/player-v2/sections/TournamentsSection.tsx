@@ -16,6 +16,7 @@
  */
 
 import { useState } from 'react';
+import { isFinish, isMissedCut, isNonStarter, isWithdrawn, normalizeStatus } from '../../_shared/resultStatus';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -66,10 +67,11 @@ const LABEL = {
 };
 
 function fmtPosition(r: PlayerTournamentResult, t: TFunction): string {
-  const st = r.status?.toUpperCase();
-  if (st === 'CUT' || st === 'MC') return t('player.tournaments.status.mc');
-  if (st === 'WD') return t('player.tournaments.status.wd');
-  if (st === 'DQ') return t('player.tournaments.status.dq');
+  // Vocabulary: _shared/resultStatus.ts. MDF holds a real position and renders
+  // as that position; DNS gets its own token.
+  if (isMissedCut(r.status)) return t('player.tournaments.status.mc');
+  if (isWithdrawn(r.status)) return normalizeStatus(r.status) === 'DQ' ? t('player.tournaments.status.dq') : t('player.tournaments.status.wd');
+  if (isNonStarter(r.status)) return t('player.tournaments.status.dns');
   if (r.position === null) return t('player.tournaments.status.noResult');
   if (r.position === 1) return '1';
   return `${r.position_tied ? 'T' : ''}${r.position}`;
@@ -92,8 +94,7 @@ export function PlayerResultRow({
 }: PlayerResultRowProps) {
   const { t } = useTranslation('tourhub');
   const target = tournamentRoute(r.tournament_id, { kind: 'player', playerName });
-  const status = r.status?.toUpperCase();
-  const isMissed = status === 'WD' || status === 'CUT' || status === 'MC' || status === 'DQ';
+  const isMissed = !isFinish(r.status);
   const isWin = r.position === 1 && !isMissed;
   const isMajor = r.tournament_name ? isAnyMajor(r.tournament_name) : false;
   const pos = fmtPosition(r, t);
