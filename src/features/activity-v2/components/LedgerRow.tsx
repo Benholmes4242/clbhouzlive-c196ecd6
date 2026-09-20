@@ -380,7 +380,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         style={{
           ...FIGURE,
           fontSize: 15,
-          color: reviewLabelColor(row.target_review_rating, 'light'),
+          color: reviewLabelColor(row.target_review_rating, 'dark'),
           fontFamily: SF_STACK,
         }}
       >
