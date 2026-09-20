@@ -801,7 +801,9 @@
       "empty": "No players ranked in this category.",
       "eyebrowSliced": "{{tourLabel}} · {{year}} · TOP {{shown}} OF {{pool}}",
       "searchPlaceholder": "Search this board",
-      "noMatch": "No match in the top {{shown}}. This board ranks the top {{shown}} of {{pool}}."
+      "noMatch": "No match in the top {{shown}}. This board ranks the top {{shown}} of {{pool}}.",
+      "gapBack": "{{delta}} {{unit}} back",
+      "gapUnits": { "shots": "shots", "yards": "yards" }
     },
     "tourChip": {
       "pga": "PGA",

@@ -19,12 +19,12 @@ export function FullListSheet({ open, onClose, category, tourLabel, year }: Full
   const [query, setQuery] = useState('');
   const debounced = useDebouncedValue(query, 200);
   const rows = category?.rows ?? [];
-  const fieldRows = rows.slice(1);
   useEffect(() => setQuery(''), [category?.key]);
   const filtered = useMemo(() => {
+    const fieldRows = rows.slice(1);
     const value = debounced.trim().toLowerCase();
     return value ? fieldRows.filter((row) => row.name.toLowerCase().includes(value)) : fieldRows;
-  }, [debounced, fieldRows]);
+  }, [debounced, rows]);
   const selectPlayer = useCallback((playerId: string, rank: number, tied: boolean) => {
     if (!playerId || !category) return;
     analyticsEvents.track('tour_leaders_sheet_player_tapped', { category: category.key, player_id: playerId, rank, tied, tour: tourLabel });
@@ -33,8 +33,12 @@ export function FullListSheet({ open, onClose, category, tourLabel, year }: Full
   }, [category, navigate, onClose, tourLabel]);
   if (!category) return null;
   const leader = rows[0];
-  const unit = t(category.unitKey).toLowerCase();
-  const gapUnit = unit === 'avg' || unit === 'sg' ? 'shots' : unit === 'yds' ? 'yards' : unit;
+  const registeredUnit = t(category.unitKey);
+  const gapUnit = category.key === 'scoring_avg' || category.key.startsWith('strokes_gained_')
+    ? t('leaders.sheet.gapUnits.shots')
+    : category.key === 'drive_avg'
+      ? t('leaders.sheet.gapUnits.yards')
+      : registeredUnit;
   return <BottomSheet open={open} onClose={onClose} ariaLabelledBy="tour-leaders-full-sheet-title" style={{ maxHeight: '85dvh', display: 'flex', flexDirection: 'column', background: SLATE_50, fontFamily: FONT }}>
     <header style={{ flexShrink: 0, padding: '12px 24px 16px', borderBottom: `1px solid ${WHITE_ALPHA_06}` }}>
       <p style={{ margin: 0, color: INK_MUTE, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{tourLabel} · {year}</p>
@@ -44,7 +48,7 @@ export function FullListSheet({ open, onClose, category, tourLabel, year }: Full
       {rows.length > 12 ? <div style={{ marginTop: 12 }}><CatalogueSearchField value={query} onChange={setQuery} placeholder={t('leaders.sheet.searchPlaceholder')} /></div> : null}
     </header>
     <div style={{ overflowY: 'auto', minHeight: 0 }}>
-      {filtered.map((row, index) => <button key={row.playerId || `${row.name}-${row.rank}`} type="button" onClick={() => selectPlayer(row.playerId, row.rank, row.tied)} style={{ width: '100%', minHeight: 76, padding: '13px 24px', display: 'grid', gridTemplateColumns: '28px minmax(0,1fr) auto', alignItems: 'center', gap: 10, border: 0, borderBottom: index === filtered.length - 1 ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', textAlign: 'left', cursor: 'pointer' }}><span style={{ color: INK_MUTE, fontSize: 11, fontWeight: 800 }}>{row.rankLabel}</span><span style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ minWidth: 0, color: INK, fontSize: 14, fontWeight: 750, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{row.name}</span>{row.countryCode || row.country ? <CountryFlag country={row.countryCode || row.country} size="sm" /> : null}</span><span style={{ textAlign: 'right' }}><span style={{ display: 'block', color: INK, fontSize: 17, fontWeight: 850 }}>{row.valueFormatted}</span>{category.meaningfulBehind && row.behindFormatted ? <span style={{ color: INK_MUTE, fontSize: 9, fontWeight: 750 }}>{row.behindFormatted} {gapUnit} back</span> : null}</span></button>)}
+      {filtered.map((row, index) => <button key={row.playerId || `${row.name}-${row.rank}`} type="button" onClick={() => selectPlayer(row.playerId, row.rank, row.tied)} style={{ width: '100%', minHeight: 76, padding: '13px 24px', display: 'grid', gridTemplateColumns: '28px minmax(0,1fr) auto', alignItems: 'center', gap: 10, border: 0, borderBottom: index === filtered.length - 1 ? 'none' : `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', textAlign: 'left', cursor: 'pointer' }}><span style={{ color: INK_MUTE, fontSize: 11, fontWeight: 800 }}>{row.rankLabel}</span><span style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ minWidth: 0, color: INK, fontSize: 14, fontWeight: 750, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{row.name}</span>{row.countryCode || row.country ? <CountryFlag country={row.countryCode || row.country} size="sm" /> : null}</span><span style={{ textAlign: 'right' }}><span style={{ display: 'block', color: INK, fontSize: 17, fontWeight: 850 }}>{row.valueFormatted}</span>{category.meaningfulBehind && row.behindFormatted ? <span style={{ color: INK_MUTE, fontSize: 9, fontWeight: 750 }}>{t('leaders.sheet.gapBack', { delta: row.behindFormatted, unit: gapUnit })}</span> : null}</span></button>)}
       {!filtered.length ? <p style={{ padding: 28, color: INK_MUTE, textAlign: 'center', fontSize: 12 }}>{t('leaders.sheet.noMatch', { shown: rows.length, pool: category.poolSize })}</p> : null}
     </div>
   </BottomSheet>;

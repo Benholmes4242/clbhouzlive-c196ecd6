@@ -672,7 +672,11 @@
     "sheet": {
       "eyebrow_one": "{{tourLabel}} · {{year}} · {{count}} PLAYER",
       "eyebrow_other": "{{tourLabel}} · {{year}} · {{count}} PLAYERS",
-      "empty": "No players ranked in this category."
+      "empty": "이 부문에 순위가 있는 선수가 없습니다.",
+      "searchPlaceholder": "이 순위 검색",
+      "noMatch": "일치하는 선수가 없습니다.",
+      "gapBack": "{{delta}} {{unit}} 뒤",
+      "gapUnits": { "shots": "타", "yards": "야드" }
     },
     "tourChip": {
       "pga": "PGA",
