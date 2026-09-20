@@ -31,6 +31,7 @@ const copy: Record<string, string> = {
 };
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, options: Record<string, unknown> = {}) => {
       let value = copy[key] ?? key;
