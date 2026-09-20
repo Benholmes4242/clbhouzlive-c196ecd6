@@ -7,6 +7,7 @@ import { relativeDayCompact } from './discoverWhen';
 import { boardCountsRounds, isFeatBoard, type BoardKey } from './boardFilters';
 import type { BoardRow as Row } from './hooks/useBoardPage';
 import { INK_TINT_04 as LEADER_WASH } from '@/features/tourhub/_shared/tokens';
+import { topRoundFeats, type ExploreRoundFeat } from '@/features/explore-magazine/roundFeatCollection';
 
 /**
  * THE BOARD'S ROW (BRIEF_DISCOVER_FILTER_LED_BOARD S4/S5), shared by the board
@@ -254,6 +255,31 @@ const POS_W = 28;
 const VALUE_W = 58;
 const SECOND_W = 46;
 
+type BoardT = ReturnType<typeof useTranslation<'courses'>>['t'];
+
+function boardFeatLabel(feat: ExploreRoundFeat, t: BoardT): string {
+  switch (feat.kind) {
+    case 'ace':
+      return t('discover.filterBoard.featAce', { count: feat.count, defaultValue_one: 'HOLE IN ONE', defaultValue_other: '{{count}} HOLES IN ONE' });
+    case 'albatross':
+      return t('discover.filterBoard.featAlbatross', { count: feat.count, defaultValue_one: 'ALBATROSS', defaultValue_other: '{{count}} ALBATROSSES' });
+    case 'eagle':
+      return t('discover.filterBoard.featEagle', { count: feat.count, defaultValue_one: 'EAGLE', defaultValue_other: '{{count}} EAGLES' });
+    case 'birdies':
+      return t('discover.filterBoard.featBirdies', { count: feat.count, defaultValue_one: '{{count}} BIRDIE', defaultValue_other: '{{count}} BIRDIES' });
+    case 'clean':
+      return t('discover.filterBoard.featClean', 'BOGEY-FREE');
+  }
+}
+
+export function boardFeatMarker(row: Row, t: BoardT): string | null {
+  const labels = topRoundFeats(row).map((feat) => boardFeatLabel(feat, t));
+  if (labels.length === 0) return null;
+  return labels.length > 1
+    ? t('discover.filterBoard.featJoin', '{{first}} + {{second}}', { first: labels[0], second: labels[1] })
+    : labels[0];
+}
+
 export function BoardHeaderRow({ board, hideValue }: { board: BoardKey; hideValue?: boolean }) {
   const { t } = useTranslation('courses');
   const cols = boardColumns(board);
@@ -320,12 +346,7 @@ export function BoardRowView({
   /* B4.3 — the column, not the row, decides whether the value is words. */
   const valueIsText = boardColumns(board).valueIsText;
   const ink = isSelf ? A.AMBER : A.INK;
-  const feat =
-    (row.holes_in_one ?? 0) > 0
-      ? t('discover.filterBoard.featAce', 'HOLE IN ONE')
-      : (row.albatrosses ?? 0) > 0
-        ? t('discover.filterBoard.featAlbatross', 'ALBATROSS')
-        : null;
+  const feat = boardFeatMarker(row, t);
 
   return (
     <button
