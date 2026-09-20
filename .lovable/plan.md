@@ -3,8 +3,8 @@
 ## Data findings that shape the build
 
 - **Subject threshold:** the database has comparable PGA points standings for only **2025 and 2026**, not five completed prior seasons. That is fewer than the required three, so the implementation will use the brief's stated **0.25 placeholder** rather than claim a derived threshold. The available ratios are **2025: 0.506** and **2026: 0.305**; older season records contain no player-stat rows. The current 2026 ratio therefore selects a **player subject: Scottie Scheffler**.
-- **Race-module gate:** measured per-event point awards exist in `sr_leaderboards.points`, keyed by `player_id` and `tournament_id`; event order comes from `sr_tournaments.end_date`. The line module will use those recorded awards only. It will render only when the selected tour/season has enough dated events to form a real series; otherwise it will use **2-ALT**, using `tour_season_rankings.position_change` where available and omitting the band when neither measured series nor movement exists. No interpolation.
-- **Twenty categories:** the current PGA payload contains all values needed for the twenty-category registry except strokes-gained-around-the-green. Existing columns plus provider `raw_data.statistics` supply points, events, top-25s, cuts, birdies per round, scrambling, and strokes gained total. Categories with no measured values will not render as empty bands.
+- **Race-module gate:** per-event awards exist in `sr_leaderboards.points`, but current-season coverage is incomplete (PGA and European Tour: two dated events; LIV: one; LPGA and Korn Ferry: none) while the standings are current through September. A line would therefore present a partial year as the season. The build will take **2-ALT**: `tour_season_rankings.position_change` for non-PGA tours and the latest measured `sr_player_statistics_snapshots` rank change for PGA. No interpolation.
+- **Measured categories only:** PGA currently has **19** measured categories; strokes-gained-around-the-green has no measured value. Other tours expose only their measured points and wins categories. The index title and door both read **“All season stats”** without a number. Empty categories and empty groups never render; a tour with no measured categories gets one plain-language empty state.
 
 ## Build
 
@@ -12,22 +12,24 @@
    - Add category group, direction, formatter, description key, and `meaningfulBehind` metadata.
    - Populate the complete available category set without changing any calculation.
    - Make every display read the category-owned delta rule; money, ranking points, and counts never show a behind delta.
-   - Add season subject facts, recorded race-series data, movement fallback data, remaining-event count, and recent-leader-change state.
+   - Add season subject facts, measured standings-movement data, remaining-event count, and recent-leader-change state.
 
 2. **Replace equal boards with a deterministic season-magazine selector**
    - Compute player-versus-race subject from the points margin and the 0.25 placeholder.
    - Select one-number, duel, and tied-list categories by the stated rules.
    - Enforce the two-module player cap and expose selection decisions for tests/reporting.
    - Exclude earnings from magazine modules.
+   - When fewer than three magazine modules qualify, use a named reduced edition: lead plus a full standings treatment of the race. Keep the two-appearances-per-player cap.
 
 3. **Build the five magazine shapes**
    - Full-bleed portrait lead with neutral-ground fallback, bottom scrim, templated localized copy, and three proofs.
-   - Recorded four-line cumulative points race when data qualifies; otherwise the non-ranked four-row movement block.
+   - Use the non-ranked four-row movement block because the current per-event award series is incomplete.
    - One-number feature, optional close duel, and tied top-three list using the specified geometry.
    - One final “All 20 season stats” door; remove every per-module full-list action and all live dots.
 
 4. **Add the full-page season-stat index**
    - Add a pushed Tour route with back navigation and the existing tour lens.
+   - Render only the selected tour’s measured categories and only non-empty groups; the title is “All season stats”.
    - Group available categories under the seven requested headings.
    - Every row includes its current leader (or localized tied-player count), figure, and unit.
    - Search matches category names and leading-player names; the data shape will retain full rows so a later “all categories a player ranks in” search can attach without redesign.
