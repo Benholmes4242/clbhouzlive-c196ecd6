@@ -25,7 +25,6 @@ try { ManifestWarmer.warmOnStartup(); } catch {}
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
-import { FeatPillVerificationPage } from './features/explore-magazine/FeatPillVerificationPage.tsx'
 import './index.css'
 import './styles/theme.css'
 import './styles/theme-tokens.css'
@@ -96,7 +95,7 @@ import('@/perf/telemetry').then((m) => m.installVideoPerfTelemetry()).catch(() =
 const root = createRoot(container);
 
 // Render without StrictMode for better performance
-root.render(window.location.pathname === '/__verify/feat-pill' ? <FeatPillVerificationPage /> : <App />);
+root.render(<App />);
 
 // Register media segment cache service worker (non-fatal if it fails)
 if ('serviceWorker' in navigator) {
