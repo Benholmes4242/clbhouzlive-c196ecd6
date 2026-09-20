@@ -157,7 +157,8 @@ export function selectPlayerSeason(
   const winsRank = rankMaps?.wins?.[playerId];
   const winsCategory = categoryMap.get('wins');
   const rankedWins = winsCategory?.rows.find((row) => row.playerId === playerId)?.value;
-  const effectiveWins = wins ?? rankedWins ?? (pointsRank ? 0 : null);
+  const resultWins = results.filter((result) => result.position === 1).length;
+  const effectiveWins = wins ?? rankedWins ?? (pointsRank ? resultWins : null);
   const raceLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour] ?? LEADER_STAT_LABELS.points.labelKey;
   const raceLabel = t(raceLabelKey);
   let verdict: PlayerVerdict | null = null;
