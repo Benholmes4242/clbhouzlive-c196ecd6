@@ -1,3 +1,10 @@
+# R4 Explore review chip
+- [x] Add an opt-in stacked FigureChip used only by reviews.
+- [x] Show and tint the tier word only for Exceptional ratings.
+- [x] Suppress Latin capitalization and tracking for Japanese and Korean.
+- [ ] Measure 9.4 and 7.1 before/after at 320px and inspect all six locales.
+- [ ] Run focused tests and TypeScript validation.
+
 Tour Overview Design A
 - [x] Part 1 initial hero, board, spacing, loading state
 - [x] C1 measure upcoming card at 390 and correct skeleton hold

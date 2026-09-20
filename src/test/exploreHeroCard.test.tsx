@@ -83,14 +83,53 @@ function textSlots(container: HTMLElement, name: string) {
 }
 
 describe('Explore card shapes', () => {
-  it('uses the score tier word and reserves enrichment space before details resolve', () => {
+  it('gates the stacked review tier word to Exceptional and reserves enrichment space', () => {
     const { container, getByText } = render(
-      <ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={{ ...review(), facts: { ...review().facts, rating: 9.4 } }} size="lead" shape={null} onTap={() => undefined} />,
     );
-    expect(getByText('Excellent')).toBeInTheDocument();
+    expect(getByText('Exceptional')).toBeInTheDocument();
+    const chip = container.querySelector<HTMLElement>('[data-figure-chip="review-stacked"]');
+    const figure = chip?.querySelector<HTMLElement>('[data-figure-chip-figure="true"]');
+    const unit = chip?.querySelector<HTMLElement>('[data-figure-chip-unit="true"]');
+    expect(chip?.style.flexDirection).toBe('column');
+    expect(chip?.style.alignItems).toBe('center');
+    expect(chip?.style.gap).toBe('1px');
+    expect(chip?.style.padding).toBe('5px 9px');
+    expect(figure?.style.fontSize).toBe('19px');
+    expect(unit?.style.fontSize).toBe('8.5px');
+    expect(unit?.style.fontWeight).toBe('800');
+    expect(unit?.style.letterSpacing).toBe('0.12em');
+    expect(unit?.style.textTransform).toBe('uppercase');
+    expect(unit?.style.color).toBe(figure?.style.color);
+    expect(unit?.style.textShadow).toBe(figure?.style.textShadow);
     const lane = container.querySelector<HTMLElement>('[data-review-enrichment-lane="true"]');
     expect(lane?.style.height).toBe('18px');
     expect(lane?.textContent).toBe('');
+  });
+
+  it('renders a below-Exceptional review as a stacked white figure with no unit', () => {
+    const { container } = render(
+      <ExploreCard item={{ ...review(), facts: { ...review().facts, rating: 7.1 } }} size="lead" shape={null} onTap={() => undefined} />,
+    );
+    const chip = container.querySelector<HTMLElement>('[data-figure-chip="review-stacked"]');
+    expect(chip?.textContent).toBe('7.1');
+    expect(chip?.querySelector('[data-figure-chip-unit="true"]')).toBeNull();
+    expect(chip?.querySelector<HTMLElement>('[data-figure-chip-figure="true"]')?.style.color).toBe('rgb(255, 255, 255)');
+  });
+
+  it('keeps every non-review FigureChip on the unchanged inline geometry', () => {
+    const { container } = render(
+      <ExploreCard item={round()} size="std" shape={null} onTap={() => undefined} />,
+    );
+    const chip = container.querySelector<HTMLElement>('[data-figure-chip="inline"]');
+    expect(chip?.style.flexDirection).toBe('row');
+    expect(chip?.style.alignItems).toBe('baseline');
+    expect(chip?.style.gap).toBe('4px');
+    expect(chip?.style.padding).toBe('4px 8px');
+    expect(chip?.style.minHeight).toBe('28px');
+    expect(chip?.style.borderRadius).toBe('8px');
+    expect(chip?.querySelector<HTMLElement>('[data-figure-chip-figure="true"]')?.style.fontSize).toBe('15px');
+    expect(chip?.querySelector<HTMLElement>('[data-figure-chip-unit="true"]')?.style.fontSize).toBe('10px');
   });
 
   it('shows image-only photo copy and a clear strongest category without changing reserved geometry', () => {
