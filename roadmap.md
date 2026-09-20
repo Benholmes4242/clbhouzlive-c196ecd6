@@ -10,3 +10,4 @@
 - [x] Verify representative PGA, no-photo, and non-PGA players at 320px, 390px, and 430px.
 - [x] Rebuild tournament detail around one contest narrative, unique figures, and state-specific evidence.
 - [x] Exclude leaders from the tournament contention count and verify forced contest states.
+- [ ] Rebuild the feat pill with two figures, one in-pill rarity line, localized owner congratulations, and yellow owner emphasis.

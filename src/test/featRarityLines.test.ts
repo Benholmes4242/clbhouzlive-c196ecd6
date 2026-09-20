@@ -5,6 +5,7 @@ import type { TFunction } from 'i18next';
 import en from '../../public/locales/en/courses.json';
 import {
   chooseRarityFeat,
+  congratulationName,
   featRarityLines,
   type FeatOwnerRow,
   type FeatRarityRow,
@@ -158,5 +159,25 @@ describe('feat rarity lines against the live backfilled rows', () => {
       now: NOW,
     });
     expect(lines.ownerLine).toBe('Your second eagle brace. First since March.');
+  });
+
+  it('replaces the public line with a localized owner congratulations when the first name is safe', () => {
+    const c = live[7];
+    const lines = featRarityLines({ rows: [c.row], owner: [c.owner], t, locale: 'en-GB', ownerDisplayName: 'Lennon Hill', now: NOW });
+    expect(lines.ownerLine).toBe('One of the first two members to do this. — congrats, Lennon');
+  });
+
+  it.each(['j.edge1994', 'golf_1', '@golfer', 'X'])(
+    'falls back to the plain owner branch for handle-like name %s',
+    (displayName) => {
+      const c = live[7];
+      const lines = featRarityLines({ rows: [c.row], owner: [c.owner], t, locale: 'en-GB', ownerDisplayName: displayName, now: NOW });
+      expect(lines.ownerLine).toBe(c.ownerLine);
+    },
+  );
+
+  it('extracts only a valid first token for congratulations', () => {
+    expect(congratulationName('  Lennon Hill ')).toBe('Lennon');
+    expect(congratulationName('j.edge1994')).toBeNull();
   });
 });
