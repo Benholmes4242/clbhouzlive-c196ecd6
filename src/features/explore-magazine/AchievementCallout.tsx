@@ -205,6 +205,7 @@ export function AchievementCalloutPanel({
   const tier = 'tier' in callout ? callout.tier : 'ink';
 
   return (
+    <>
     <span
       data-explore-callout={callout.kind}
       data-explore-callout-tier={tier}
@@ -259,6 +260,8 @@ export function AchievementCalloutPanel({
         ) : null}
       </span>
     </span>
+    <FeatRarityLines scoreId={scoreId} rows={featRarity} counts={featCounts} locale={locale} />
+    </>
   );
 }
 
