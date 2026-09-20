@@ -36,7 +36,7 @@ describe('selectTournamentContest', () => {
 
   it('uses word form for a completed playoff', () => {
     const result = selectTournamentContest([row('winner', -12, 1, -4, 18), row('runner', -12, 2, -3, 18)], meta, 'completed');
-    expect(result.margin).toBeNull();
+    expect(result.margin).toBe(0);
     expect(result.leadForm).toBe('word');
   });
 });
