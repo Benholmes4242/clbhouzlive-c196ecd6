@@ -15,22 +15,46 @@ export interface PlayerTournamentResult {
   strokes: number | null;
   money: number | null;
   status: string | null;
+  /** The season the tournament belongs to (sr_tournaments -> sr_seasons.year). */
+  season_year: number | null;
+}
+
+export interface PlayerResultsOptions {
+  /**
+   * 'current' returns only the current season's results (the season resolution
+   * is currentSeasonYear(), the single definition shared with the statistics
+   * read — do not add another). 'all' is the default so existing callers keep
+   * their history behaviour.
+   *
+   * Anything rendered under a heading that says "the season" must ask for
+   * 'current': results carry no season of their own downstream, so an
+   * unfiltered read silently presents last season's numbers as this season's.
+   */
+  season?: 'current' | 'all';
 }
 
 /**
  * Hook to fetch a player's tournament results from sr_leaderboards
  * Returns the player's finish positions, scores, and earnings for recent tournaments
  */
-export function usePlayerResults(playerId: string | undefined, limit = 10) {
+export function usePlayerResults(
+  playerId: string | undefined,
+  limit = 10,
+  options: PlayerResultsOptions = {},
+) {
+  const season = options.season ?? 'all';
+  const seasonYear = currentSeasonYear();
   return useQuery({
-    queryKey: ['tourhub', 'player-results', playerId, limit],
+    queryKey: ['tourhub', 'player-results', playerId, limit, season, seasonYear],
     queryFn: async () => {
       if (!playerId) return [];
-      
+
       // Query leaderboards for this player, joined with tournament info.
       // We fetch generously so the limit doesn't cut off genuinely-recent
       // tournaments before we sort client-side.
-      const { data, error } = await supabase
+      const join = season === 'current' ? 'sr_tournaments!inner' : 'sr_tournaments';
+      const seasonJoin = season === 'current' ? 'sr_seasons!inner' : 'sr_seasons';
+      let query = supabase
         .from('sr_leaderboards')
         .select(`
           id,
@@ -41,14 +65,18 @@ export function usePlayerResults(playerId: string | undefined, limit = 10) {
           strokes,
           money,
           status,
-          tournament:sr_tournaments(
+          tournament:${join}(
             name,
             start_date,
-            end_date
+            end_date,
+            season:${seasonJoin}(year)
           )
         `)
-        .eq('player_id', playerId)
-        .limit(Math.max(limit * 3, 60));
+        .eq('player_id', playerId);
+      if (season === 'current') {
+        query = query.eq('tournament.season.year', seasonYear);
+      }
+      const { data, error } = await query.limit(Math.max(limit * 3, 60));
 
       if (error) throw error;
 
@@ -64,6 +92,7 @@ export function usePlayerResults(playerId: string | undefined, limit = 10) {
         strokes: row.strokes,
         money: row.money,
         status: row.status,
+        season_year: (row.tournament as any)?.season?.year ?? null,
       })) as PlayerTournamentResult[];
 
       return mapped
