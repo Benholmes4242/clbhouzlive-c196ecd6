@@ -61,11 +61,13 @@ export function HeroSection({ player, playerStats, selection }: HeroSectionProps
           key={photo}
           src={photo}
           alt=""
+          loading="eager"
+          fetchPriority="high"
           onError={() => setPhotoIndex((index) => index + 1)}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: '76% bottom' }}
         />
       )}
-      <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(13,13,13,0.98) 0%, rgba(13,13,13,0.84) 43%, rgba(13,13,13,0.12) 78%), linear-gradient(0deg, rgba(13,13,13,0.96) 0%, transparent 58%)' }} />
+      <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 76% 35%, rgba(255,255,255,0.12), transparent 38%), linear-gradient(90deg, rgba(13,13,13,0.98) 0%, rgba(13,13,13,0.84) 43%, rgba(13,13,13,0.12) 78%), linear-gradient(0deg, rgba(13,13,13,0.96) 0%, transparent 58%)' }} />
       <div style={{ position: 'relative', height: '100%', padding: '24px 16px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, maxWidth: '88%', ...LABEL, color: 'rgba(255,255,255,0.68)' }}>
           <span>{tourLabel(player.tour_codes, t)}</span>
