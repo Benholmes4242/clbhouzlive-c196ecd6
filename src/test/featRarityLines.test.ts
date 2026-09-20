@@ -62,7 +62,7 @@ const live: Live[] = [
     row: { feat_kind: 'ace', global_ordinal: 4, total_rounds_at_detection: 1139, distinct_members_at_detection: 3 },
     owner: { feat_kind: 'ace', is_owner: true, member_ordinal: 2, member_rounds: 71, member_prev_at: '2022-12-04' },
     viewer: 'The fourth ace in 1,139 rounds.',
-    ownerLine: 'Your second ace . first since December 2022.',
+    ownerLine: 'Your second ace. First since December 2022.',
   },
   {
     name: 'PERSONAL FIRST - ace #5, 2024-06-12',
@@ -83,7 +83,7 @@ const live: Live[] = [
     row: { feat_kind: 'eagle_brace', global_ordinal: 2, total_rounds_at_detection: 1905, distinct_members_at_detection: 1 },
     owner: { feat_kind: 'eagle_brace', is_owner: true, member_ordinal: 2, member_rounds: 101, member_prev_at: '2021-08-14' },
     viewer: 'The second eagle brace in 1,905 rounds.',
-    ownerLine: 'Your second eagle brace . first since August 2021.',
+    ownerLine: 'Your second eagle brace. First since August 2021.',
   },
   {
     name: 'RARE (two) - eagle brace #3, 2026-09-19',
@@ -157,6 +157,6 @@ describe('feat rarity lines against the live backfilled rows', () => {
       locale: 'en-GB',
       now: NOW,
     });
-    expect(lines.ownerLine).toBe('Your second eagle brace . first since March.');
+    expect(lines.ownerLine).toBe('Your second eagle brace. First since March.');
   });
 });
