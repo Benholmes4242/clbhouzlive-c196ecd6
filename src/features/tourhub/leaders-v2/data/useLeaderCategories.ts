@@ -53,7 +53,7 @@ export interface LeaderRow {
   tourCode: string | null;
   value: number;
   valueFormatted: string;
-  /** prior_rank - rank. Populated for world_rank only; null everywhere else. */
+  /** Prior standing minus current standing, only when a measured prior standing exists. */
   movement: number | null;
   /** Gap to the leader, formatted with the category's OWN formatter, always as
    *  a positive quantity. null on the leader row and on exact ties. */
@@ -300,7 +300,18 @@ type TourSeasonRankingRow = {
   wins: number | null;
   country: string | null;
   tour_code: string | null;
+  position_change: string | null;
 };
+
+function parseMovement(value: string | null): number | null {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  if (!normalized || normalized === '-' || normalized === 'same') return 0;
+  const amount = Number(normalized.replace(/[^0-9.-]/g, ''));
+  if (!Number.isFinite(amount)) return null;
+  if (normalized.startsWith('-') || normalized.includes('down')) return -Math.abs(amount);
+  return Math.abs(amount);
+}
 
 interface PgaCatSpec {
   key: string;
@@ -481,7 +492,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
   const year = currentSeasonYear();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const primary = await (supabase.from('tour_season_rankings' as any) as any)
-    .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
+    .select('player_id, manual_player_id, player_name, position, position_change, points, wins, country, tour_code')
     .eq('tour_code', tour)
     .eq('season_year', year)
     .order('position', { ascending: true })
@@ -491,7 +502,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
   if (!rankings.length) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const alt = await (supabase.from('tour_season_rankings' as any) as any)
-      .select('player_id, manual_player_id, player_name, position, points, wins, country, tour_code')
+      .select('player_id, manual_player_id, player_name, position, position_change, points, wins, country, tour_code')
       .eq('tour_code', tour)
       .eq('season_year', year - 1)
       .order('position', { ascending: true })
@@ -528,7 +539,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         tourCode: p?.tour_codes?.[0] ?? tour,
         value: 0,
         valueFormatted: '',
-        movement: null,
+        movement: parseMovement(r.position_change),
         behindFormatted: null,
       };
     };
