@@ -21,8 +21,16 @@ const copy: Record<string, string> = {
   'tournament.contest.completedEyebrow': 'The margin',
   'tournament.contest.sharedLead': '{{count}} share the lead',
   'tournament.contest.withToPlay': 'With {{holes}} to play',
-  'tournament.contest.sublineSecondThird': '{{second}} is second, with {{third}} next.',
-  'tournament.contest.sublineSecond': '{{second}} is second.',
+  'tournament.contest.gapShots_one': 'a shot',
+  'tournament.contest.gapShots_other': '{{count}} shots',
+  'tournament.contest.sublineSingle': '{{leader}} from {{next}}.',
+  'tournament.contest.sublineSingleThird': '{{leader}} from {{next}}, with {{third}} {{gap}} further back.',
+  'tournament.contest.sublineLevelTwoChaser': '{{a}} and {{b}}, level at {{score}}, with {{next}} {{gap}} back.',
+  'tournament.contest.sublineLevelThreeChaser': '{{a}}, {{b}} and {{c}}, level at {{score}}, with {{next}} {{gap}} back.',
+  'tournament.contest.sublineLevelMany': '{{a}}, {{b}} and {{count}} others, level at {{score}}.',
+  'tournament.contest.sublineLevelManyChaser': '{{a}}, {{b}} and {{count}} others, level at {{score}}, with {{next}} {{gap}} back.',
+  'tournament.contest.sublineLevelThree': '{{a}}, {{b}} and {{c}}, level at {{score}}.',
+  'tournament.contest.sublineLevelTwo': '{{a}} and {{b}}, level at {{score}}.',
   'tournament.contest.leader': 'Leader',
   'tournament.contest.back': '{{gap}} back',
   'tournament.contest.allLevel': 'All level',
@@ -34,7 +42,10 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, options: Record<string, unknown> = {}) => {
-      let value = copy[key] ?? key;
+      const plural = typeof options.count === 'number'
+        ? copy[`${key}_${options.count === 1 ? 'one' : 'other'}`]
+        : undefined;
+      let value = copy[key] ?? plural ?? key;
       for (const [name, replacement] of Object.entries(options)) {
         if (name !== 'defaultValue') value = value.split(`{{${name}}}`).join(String(replacement));
       }
@@ -134,5 +145,33 @@ describe('tournament contest sections', () => {
     expect(contest.chasersWithinFour).toBe(1);
     expect(screen.getByText('Leader leads on -12.')).toBeInTheDocument();
     expect(screen.queryByText(/inside four shots/)).not.toBeInTheDocument();
+  });
+
+  it('names players and gaps, never an ordinal word, with a single leader and two chasers', () => {
+    const contest = selectTournamentContest([
+      row('Castillo', -12, 1),
+      row('Shipley', -11, 2),
+      row('James', -9, 3),
+    ], meta, 'live');
+
+    render(<ContestSection contest={contest} state="live" />);
+
+    expect(screen.getByText('Castillo from Shipley, with James 2 shots further back.')).toBeInTheDocument();
+    expect(screen.queryByText(/second|third|runner/i)).not.toBeInTheDocument();
+  });
+
+  it('uses the "and n others" form for a four-way tie', () => {
+    const contest = selectTournamentContest([
+      row('A', -12, 1),
+      row('B', -12, 1),
+      row('C', -12, 1),
+      row('D', -12, 1),
+      row('E', -11, 5),
+    ], meta, 'live');
+
+    render(<ContestSection contest={contest} state="live" />);
+
+    expect(screen.getByText('A, B and 2 others, level at -12, with E a shot back.')).toBeInTheDocument();
+    expect(screen.queryByText(/second/i)).not.toBeInTheDocument();
   });
 });
