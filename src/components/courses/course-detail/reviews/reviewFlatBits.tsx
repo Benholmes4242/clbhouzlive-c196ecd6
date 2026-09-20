@@ -22,7 +22,6 @@ import React, { useState } from 'react';
 import { Heart, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import { formatRatingValue } from '@/utils/formatters';
 import { MentionText } from '@/components/mentions/MentionText';
 import { ReviewMediaStrip } from '@/components/courses/review/ReviewMediaStrip';
@@ -156,8 +155,8 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
   const [expanded, setExpanded] = useState(false);
   const name = isMine ? 'You' : displayName;
   const score = review.rating ?? 0;
-  // Amber here means “yours”, not a score band.
-  const scoreColor = isMine ? A.AMBER : bandColorOnDark(score);
+  // Amber here means "yours", not a score band.
+  const scoreColor = isMine ? A.AMBER : courseSubScoreTone(score);
   const helpfulCount = review.helpful_count ?? 0;
 
   const stripped = review.review ? stripMentionMarkup(review.review) : '';

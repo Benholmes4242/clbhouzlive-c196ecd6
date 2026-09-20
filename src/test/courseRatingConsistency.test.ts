@@ -36,13 +36,13 @@ describe('C1 course rating consistency', () => {
     }
   });
 
-  it('uses the dark score band for all three headline surfaces', () => {
+  it('uses the canonical display tone for all three headline surfaces', () => {
     const course = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const reviews = src('src/components/courses/course-detail/reviews/TheScore.tsx');
     const card = src('src/components/posts/ReviewBottomSheet.tsx');
-    expect(course).toContain('tone={bandColorOnDark(score)}');
-    expect(reviews).toContain('const scoreColor = bandColorOnDark(score)');
-    expect(card).toContain('const ratingColor = bandColorOnDark(rating)');
+    expect(course).toContain('tone={courseSubScoreTone(score)}');
+    expect(reviews).toContain('const scoreColor = courseSubScoreTone(score)');
+    expect(card).toContain('const ratingColor = courseSubScoreTone(rating)');
   });
 
   it('keeps category figures binary green-or-muted through one helper', () => {
@@ -70,6 +70,82 @@ describe('C1 course rating consistency', () => {
     expect([9.3, 8.3, 9.8, 7.1].map(courseSubScoreTone)).toEqual([
       A.GREEN,
       A.MUTE,
+      A.GREEN,
+      A.MUTE,
+    ]);
+  });
+
+  it('routes every C3 display caller through the canonical helper', () => {
+    const files = [
+      'src/components/courses/ReviewRailSlot.tsx',
+      'src/components/courses/ReviewFeaturedSlot.tsx',
+      'src/components/courses/CourseCommunityRating.tsx',
+      'src/components/courses/CourseSearchSheet.tsx',
+      'src/components/business/hero/BusinessProfileHero.tsx',
+      'src/components/courses/course-detail/reviews/TheScore.tsx',
+      'src/components/courses/course-detail/about/WhatPeopleSay.tsx',
+      'src/components/courses/phase5/PersonalReviewCard.tsx',
+      'src/components/courses/review/ReviewBlockFlat.tsx',
+      'src/components/explore-tab-new/courseled/ReviewTile.tsx',
+      'src/components/posts/ReviewBottomSheet.tsx',
+      'src/components/top100/Top100CourseStatsPanel.tsx',
+      'src/pages/BusinessReviewsPage.tsx',
+    ].map(src);
+
+    for (const file of files) {
+      expect(file).toContain('courseSubScoreTone');
+      expect(file).not.toContain('bandColorOnDark(');
+    }
+  });
+
+  it('uses the canonical tone for shared display bars without changing geometry', () => {
+    const bands = src('src/features/courses/_shared/scoreBands.tsx');
+    expect(bands.match(/courseSubScoreTone\(score\)/g)).toHaveLength(4);
+    expect(bands).toContain("height: 3");
+    expect(bands).toContain('(score / 10) * 100');
+    expect(bands).toContain('actively CHOOSING');
+    expect(bands).toContain('Display surfaces use `courseSubScoreTone`');
+  });
+
+  it('preserves viewing-member amber and composer three-band feedback', () => {
+    const about = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
+    const rows = src('src/components/courses/course-detail/reviews/reviewFlatBits.tsx');
+    expect(about).toContain('tone={A.AMBER_DEEP}');
+    expect(rows).toContain('isMine ? A.AMBER : courseSubScoreTone(score)');
+
+    const composerFiles = [
+      'src/features/review-v2/components/OverallScrubber.tsx',
+      'src/features/review-v2/components/CategoryGrid.tsx',
+      'src/features/review-v2/components/ReviewReceipt.tsx',
+    ].map(src);
+    for (const file of composerFiles) expect(file).toContain('bandColor');
+    expect(src('src/features/review-v2/bandColor.ts')).toContain('bandColorOnDark');
+  });
+
+  it('keeps photography neutral white while sourcing 9+ green from the helper', () => {
+    const card = src('src/features/explore-magazine/ExploreCard.tsx');
+    const shelf = src('src/features/explore-magazine/CourseShelf.tsx');
+    expect(card.match(/courseSubScoreTone\(facts\.rating\)/g)).toHaveLength(2);
+    expect(card).toContain(" : '#FFFFFF'");
+    expect(shelf).toContain('courseSubScoreTone(row.rating) : undefined');
+    expect(card).toContain('variable photography');
+    expect(shelf).toContain("white default over photography");
+  });
+
+  it('leaves the independent amber sources unchanged for follow-up', () => {
+    const pill = src('src/components/ui/RatingPill.tsx');
+    const posts = src('src/lib/postHelpers.ts');
+    expect(pill).toContain('ratingTextColor(resolvedScore)');
+    expect(posts).toContain('COURSE_RATING_THEMES.EXCEPTIONAL');
+    expect(posts).toContain('tierOverlayThemes[key]');
+  });
+
+  it('renders rail and Tralee tones at the canonical threshold', () => {
+    expect(courseSubScoreTone(8.3)).toBe(A.MUTE);
+    expect(courseSubScoreTone(9)).toBe(A.GREEN);
+    expect([9.8, 9.3, 9.1, 8.7].map(courseSubScoreTone)).toEqual([
+      A.GREEN,
+      A.GREEN,
       A.GREEN,
       A.MUTE,
     ]);

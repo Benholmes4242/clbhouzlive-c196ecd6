@@ -133,7 +133,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
           <Figure
             label={t('courseDetail.rating.yours')}
             value={yours.toFixed(1)}
-            // Amber here means “yours”, not a score band.
+            // Amber here means "yours", not a score band.
             tone={A.AMBER_DEEP}
             size={22}
           />
