@@ -674,7 +674,11 @@
     "sheet": {
       "eyebrow_one": "[~~{{tourLabel}} · {{year}} · {{count}} ƤĻÁÝÉŘ~~]",
       "eyebrow_other": "[~~{{tourLabel}} · {{year}} · {{count}} ƤĻÁÝÉŘŠ~~]",
-      "empty": "[~~Ñő ƥļáýéřš řáñǩéđ íñ ţĥíš ĉáţéĝőřý.~~]"
+      "empty": "[~~Ñő ƥļáýéřš řáñǩéđ íñ ţĥíš ĉáţéĝőřý.~~]",
+      "searchPlaceholder": "[~~Šéářĉĥ ţĥíš ƀőářđ~~]",
+      "noMatch": "[~~Ñő ɱáţĉĥ íñ ţĥíš ƀőářđ.~~]",
+      "gapBack": "[~~{{delta}} {{unit}} ƀáĉǩ~~]",
+      "gapUnits": { "shots": "[~~šĥőţš~~]", "yards": "[~~ýářđš~~]" }
     },
     "tourChip": {
       "pga": "[~~ƤĜÁ~~]",

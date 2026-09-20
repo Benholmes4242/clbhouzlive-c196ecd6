@@ -676,7 +676,11 @@
     "sheet": {
       "eyebrow_one": "{{tourLabel}} · {{year}} · {{count}} PLAYER",
       "eyebrow_other": "{{tourLabel}} · {{year}} · {{count}} PLAYERS",
-      "empty": "No players ranked in this category."
+      "empty": "Keine Spieler in dieser Kategorie.",
+      "searchPlaceholder": "Dieses Feld durchsuchen",
+      "noMatch": "Kein Treffer in diesem Feld.",
+      "gapBack": "{{delta}} {{unit}} zurück",
+      "gapUnits": { "shots": "Schläge", "yards": "Yards" }
     },
     "tourChip": {
       "pga": "PGA",

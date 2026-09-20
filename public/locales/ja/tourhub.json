@@ -672,7 +672,11 @@
     "sheet": {
       "eyebrow_one": "{{tourLabel}} · {{year}} · {{count}} PLAYER",
       "eyebrow_other": "{{tourLabel}} · {{year}} · {{count}} PLAYERS",
-      "empty": "No players ranked in this category."
+      "empty": "この部門にランク入りした選手はいません。",
+      "searchPlaceholder": "このランキングを検索",
+      "noMatch": "一致する選手はいません。",
+      "gapBack": "{{delta}} {{unit}}差",
+      "gapUnits": { "shots": "打", "yards": "ヤード" }
     },
     "tourChip": {
       "pga": "PGA",
