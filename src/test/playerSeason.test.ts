@@ -80,7 +80,7 @@ describe('selectPlayerSeason', () => {
   });
 
   it('derives a non-PGA win from the full result set when no wins row exists', () => {
-    const win = { id: 'r1', tournament_id: 't1', tournament_name: 'Event', tournament_start_date: '2025-02-06', tournament_end_date: '2025-02-09', position: 1, position_tied: false, score: -12, strokes: 268, money: null, status: 'active' };
+    const win = { id: 'r1', tournament_id: 't1', tournament_name: 'Event', tournament_start_date: '2025-02-06', tournament_end_date: '2025-02-09', position: 1, position_tied: false, score: -12, strokes: 268, money: null, status: 'active', season_year: 2026 };
     const selected = selectPlayerSeason(
       'p1',
       'pgad',

@@ -9,6 +9,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { currentSeasonYear } from '../../leaders-v2/data/useLeaderCategories';
 import { supabase } from '@/integrations/supabase/client';
 import { movementFrom } from '../../_shared/movement';
 
@@ -34,11 +35,8 @@ export interface RankingsRow {
   top10s: number | null;
 }
 
-/** Season-year convention shared with players-v2: the season flips in October. */
-function currentSeasonYear(): number {
-  const now = new Date();
-  return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
-}
+/* Season resolution: currentSeasonYear() in leaders-v2/data/useLeaderCategories
+   is the ONE definition. This file had an identical local copy; it is gone. */
 
 /**
  * Wins / top-10s are NOT on sr_world_rankings — that table carries points and
