@@ -21,6 +21,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { currentSeasonYear } from '../../leaders-v2/data/useLeaderCategories';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import type { TourId } from '../../hooks/useOverviewData';
@@ -65,10 +66,8 @@ const STAT_LABEL_KEY: Record<PlayersTourId, string> = {
  */
 const MIN_RANKING_ROWS = 5;
 
-function currentSeasonYear(): number {
-  const now = new Date();
-  return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
-}
+/* Season resolution: currentSeasonYear() in leaders-v2/data/useLeaderCategories
+   is the ONE definition. This file had an identical local copy; it is gone. */
 
 async function resolvePgaSeasonId(): Promise<string | null> {
   const year = currentSeasonYear();
