@@ -16,7 +16,7 @@ import {
   type FeatRarityRow,
   type RarityFeatCounts,
 } from './featRarity';
-import { useFeatOwnerRowsFor } from '@/hooks/gam/useFeatRarity';
+import { useFeatLinesFor } from '@/hooks/gam/useFeatRarity';
 import type { ExploreRoundFeat } from './roundFeatCollection';
 import { standingOrdinal } from './ordinal';
 import {
@@ -52,19 +52,21 @@ import {
  */
 export function FeatRarityLines({
   scoreId,
-  rows,
   counts,
   locale,
   align = 'panel',
 }: {
   scoreId: string | null | undefined;
-  rows: FeatRarityRow[] | null | undefined;
   counts?: RarityFeatCounts;
   locale: string;
   align?: 'panel' | 'card';
 }) {
   const { t } = useTranslation('courses');
-  const owner: FeatOwnerRow[] | null = useFeatOwnerRowsFor(scoreId);
+  /* ONE SOURCE: the batched get_round_feat_lines response carries the frozen
+     figures and, for the owner only, the member_* fields. */
+  const lines = useFeatLinesFor(scoreId);
+  const rows: FeatRarityRow[] | null = lines;
+  const owner: FeatOwnerRow[] | null = lines;
   const { viewerLine, ownerLine } = featRarityLines({ rows, owner, counts, t, locale });
   if (!viewerLine && !ownerLine) return null;
   return (
@@ -103,14 +105,12 @@ export function AchievementCalloutPanel({
   callout,
   locale,
   scoreId = null,
-  featRarity = null,
   featCounts,
 }: {
   callout: AchievementCallout;
   locale: string;
-  /** The round's whs_score_id — the key the owner lines came back under. */
+  /** The round's whs_score_id — the key the rarity rows came back under. */
   scoreId?: string | null;
-  featRarity?: FeatRarityRow[] | null;
   featCounts?: RarityFeatCounts;
 }) {
   const { t } = useTranslation('courses');
@@ -260,7 +260,7 @@ export function AchievementCalloutPanel({
         ) : null}
       </span>
     </span>
-    <FeatRarityLines scoreId={scoreId} rows={featRarity} counts={featCounts} locale={locale} />
+    <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} />
     </>
   );
 }
@@ -307,21 +307,19 @@ export function RoundStatStrip({
   net,
   locale,
   scoreId = null,
-  featRarity = null,
   featCounts,
 }: {
   callout: AchievementCallout | null;
   coursePar: number | null;
   net: number | null;
   locale: string;
-  /** The round's whs_score_id — the key the owner lines came back under. */
+  /** The round's whs_score_id — the key the rarity rows came back under. */
   scoreId?: string | null;
-  featRarity?: FeatRarityRow[] | null;
   featCounts?: RarityFeatCounts;
 }) {
   const { t } = useTranslation('courses');
   const hasNet = coursePar != null && net != null;
-  const rarity = <FeatRarityLines scoreId={scoreId} rows={featRarity} counts={featCounts} locale={locale} align="card" />;
+  const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} align="card" />;
   if (!callout && !hasNet) return rarity;
 
   const ord = callout?.kind === 'rank_up' && callout.rank != null

@@ -768,7 +768,6 @@ export function ExploreCard({
         <RoundStatStrip
           callout={callout}
           scoreId={item.facts.score_id ?? null}
-          featRarity={item.facts.feat_rarity ?? null}
           featCounts={{
             aces: item.facts.holes_in_one ?? null,
             albatrosses: item.facts.albatrosses ?? null,

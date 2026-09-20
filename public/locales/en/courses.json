@@ -1703,7 +1703,7 @@
     "ownerFirst": "Your first {{feat}}. {{rounds}} rounds in.",
     "ownerRareThree": "One of the first three members to do this.",
     "ownerRareTwo": "One of the first two members to do this.",
-    "ownerRepeat": "Your {{ord}} {{feat}} - first since {{when}}.",
+    "ownerRepeat": "Your {{ord}} {{feat}}. First since {{when}}.",
     "ownerSole": "The first member ever to do this.",
     "viewer": "The {{ord}} {{feat}} in {{rounds}} rounds."
   },

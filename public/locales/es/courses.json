@@ -1256,7 +1256,7 @@
     "ownerFirst": "Tu primer {{feat}}. {{rounds}} rondas después.",
     "ownerRareThree": "Uno de los tres primeros miembros en lograrlo.",
     "ownerRareTwo": "Uno de los dos primeros miembros en lograrlo.",
-    "ownerRepeat": "Tu {{ord}} {{feat}} - el primero desde {{when}}.",
+    "ownerRepeat": "Tu {{ord}} {{feat}}. El primero desde {{when}}.",
     "ownerSole": "El primer miembro en lograrlo.",
     "viewer": "El {{ord}} {{feat}} en {{rounds}} rondas."
   },

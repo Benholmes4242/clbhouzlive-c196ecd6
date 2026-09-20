@@ -8,8 +8,9 @@ import { standingOrdinal } from './ordinal';
  *
  * The frozen figures come from public.gam_round_feat_rarity, written ONLY by
  * gam-evaluator under the service role. The three member_* figures come from
- * get_round_feat_owner_lines, which NULLs them for anyone who is not the round's
- * owner in SQL. Nothing here recomputes either set, and nothing here invents a
+ * get_round_feat_lines, which NULLs them for anyone who is not the round's owner
+ * in SQL; the frozen figures on that same function are ungated, because the
+ * viewer line is public. Nothing here recomputes either set, and nothing here invents a
  * count so that a line renders in development: no data, no line.
  *
  * ONLY GOLD AND TOP FEATS GET LINES. The tier comes from roundFeatTier, the
@@ -32,7 +33,7 @@ export interface FeatRarityRow {
   distinct_members_at_detection: number | null;
 }
 
-/** A row of get_round_feat_owner_lines. member_* are NULL for non-owners. */
+/** The member half of get_round_feat_lines. NULL for non-owners. */
 export interface FeatOwnerRow {
   whs_score_id?: string;
   feat_kind: string;
@@ -166,7 +167,7 @@ export function featRarityLines({
     const repeat = mine.member_ordinal != null && mine.member_ordinal > 1;
     const when = repeat && mine.member_prev_at ? rarityWhen(mine.member_prev_at, locale, now) : null;
     if (repeat && when) {
-      ownerLine = t('featRarity.ownerRepeat', 'Your {{ord}} {{feat}} - first since {{when}}.', {
+      ownerLine = t('featRarity.ownerRepeat', 'Your {{ord}} {{feat}}. First since {{when}}.', {
         ord: rarityOrdinal(mine.member_ordinal as number, locale, t),
         feat,
         when,

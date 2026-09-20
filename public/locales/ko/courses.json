@@ -1218,7 +1218,7 @@
     "ownerFirst": "첫 {{feat}}. {{rounds}}라운드 만에.",
     "ownerRareThree": "이것을 달성한 첫 세 멤버 중 한 명입니다.",
     "ownerRareTwo": "이것을 달성한 첫 두 멤버 중 한 명입니다.",
-    "ownerRepeat": "당신의 {{ord}}번째 {{feat}} - {{when}} 이후 처음.",
+    "ownerRepeat": "당신의 {{ord}}번째 {{feat}}. {{when}} 이후 처음.",
     "ownerSole": "이것을 달성한 최초의 멤버입니다.",
     "viewer": "{{rounds}}라운드 중 {{ord}}번째 {{feat}}."
   },

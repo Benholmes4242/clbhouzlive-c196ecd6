@@ -1563,7 +1563,7 @@
     "ownerFirst": "[Ýóúŕ fíŕšţ {{feat}}. {{rounds}} ŕóúñđš íñ.]",
     "ownerRareThree": "[Óñé óf ţĥé fíŕšţ ţĥŕéé ɱéɱƀéŕš ţó đó ţĥíš.]",
     "ownerRareTwo": "[Óñé óf ţĥé fíŕšţ ţŵó ɱéɱƀéŕš ţó đó ţĥíš.]",
-    "ownerRepeat": "[Ýóúŕ {{ord}} {{feat}} - fíŕšţ šíñçé {{when}}.]",
+    "ownerRepeat": "[Ýóúŕ {{ord}} {{feat}}. Fíŕšţ šíñçé {{when}}.]",
     "ownerSole": "[Ţĥé fíŕšţ ɱéɱƀéŕ éνéŕ ţó đó ţĥíš.]",
     "viewer": "[Ţĥé {{ord}} {{feat}} íñ {{rounds}} ŕóúñđš.]"
   },
