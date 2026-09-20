@@ -35,7 +35,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string, options: Record<string, unknown> = {}) => {
       let value = copy[key] ?? key;
       for (const [name, replacement] of Object.entries(options)) {
-        if (name !== 'defaultValue') value = value.replaceAll(`{{${name}}}`, String(replacement));
+        if (name !== 'defaultValue') value = value.split(`{{${name}}}`).join(String(replacement));
       }
       return value;
     },
