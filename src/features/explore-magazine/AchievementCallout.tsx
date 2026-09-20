@@ -7,9 +7,10 @@ import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
-import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+import { GOLD_BORDER, GOLD_TINT, GOLD_TINT_10, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 import type { AchievementCallout } from './cardTreatment';
+import type { ExploreRoundFeat } from './roundFeatCollection';
 import { standingOrdinal } from './ordinal';
 import {
   BirdieCountIcon,
@@ -41,6 +42,22 @@ export function AchievementCalloutPanel({
 }) {
   const { t } = useTranslation('courses');
   const ordHole = (hole: number) => standingOrdinal(hole, locale);
+
+  const featLabel = (feat: ExploreRoundFeat): string => {
+    switch (feat.kind) {
+      case 'ace': return t('amateur.stream.callout.aceCount', { count: feat.count, defaultValue_one: 'Hole in one', defaultValue_other: '{{count}} holes in one' });
+      case 'albatross': return t('amateur.stream.callout.albatrossCount', { count: feat.count, defaultValue_one: 'Albatross', defaultValue_other: '{{count}} albatrosses' });
+      case 'eagle': return t('amateur.stream.callout.eagleCount', { count: feat.count, defaultValue_one: 'Eagle', defaultValue_other: '{{count}} eagles' });
+      case 'birdies': return t('amateur.stream.callout.birdies', '{{n}} birdies', { n: feat.count });
+      case 'clean': return t('amateur.stream.callout.bogeyFree', 'Bogey-free');
+    }
+  };
+  const featTitle = (feats: ExploreRoundFeat[]): string => {
+    const labels = feats.map(featLabel);
+    return labels.length > 1
+      ? t('amateur.stream.callout.featJoin', '{{first}} + {{second}}', { first: labels[0], second: labels[1] })
+      : labels[0] ?? '';
+  };
 
   const { icon, title, subline } = ((): {
     icon: React.ReactNode;
@@ -74,7 +91,7 @@ export function AchievementCalloutPanel({
       case 'ace':
         return {
           icon: <AchievementEmoji glyph="⛳" />,
-          title: t('amateur.stream.callout.ace', 'Hole in one'),
+          title: featTitle(callout.feats),
           subline:
             callout.hole != null
               ? t('amateur.stream.callout.onHole', 'on the {{ord}}', { ord: ordHole(callout.hole) })
@@ -83,7 +100,7 @@ export function AchievementCalloutPanel({
       case 'albatross':
         return {
           icon: <AchievementEmoji glyph="🔥" />,
-          title: t('amateur.stream.callout.albatross', 'Albatross'),
+          title: featTitle(callout.feats),
           subline:
             callout.hole != null
               ? t('amateur.stream.callout.onHole', 'on the {{ord}}', { ord: ordHole(callout.hole) })
@@ -92,7 +109,7 @@ export function AchievementCalloutPanel({
       case 'eagle':
         return {
           icon: <AchievementEmoji glyph="🦅" />,
-          title: t('amateur.stream.callout.eagle', 'Eagle'),
+          title: featTitle(callout.feats),
           subline:
             callout.hole != null
               ? t('amateur.stream.callout.onHole', 'on the {{ord}}', { ord: ordHole(callout.hole) })
@@ -101,21 +118,23 @@ export function AchievementCalloutPanel({
       case 'birdies':
         return {
           icon: <BirdieCountIcon count={callout.count} />,
-          title: t('amateur.stream.callout.birdies', '{{n}} birdies', { n: callout.count }),
+          title: featTitle(callout.feats),
           subline: null,
         };
       case 'clean':
         return {
           icon: <AchievementEmoji glyph="🛡️" />,
-          title: t('amateur.stream.callout.bogeyFree', 'Bogey-free'),
+          title: featTitle(callout.feats),
           subline: t('amateur.stream.callout.bogeyFreeSub', 'Par or better on every hole'),
         };
     }
   })();
+  const tier = 'tier' in callout ? callout.tier : 'ink';
 
   return (
     <span
       data-explore-callout={callout.kind}
+      data-explore-callout-tier={tier}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -126,7 +145,8 @@ export function AchievementCalloutPanel({
         marginBottom: 10,
         padding: '10px 12px',
         borderRadius: r.md,
-        background: A.PANEL,
+        background: tier === 'top' ? GOLD_TINT_10 : tier === 'gold' ? GOLD_TINT : A.PANEL,
+        border: tier === 'top' ? `1px solid ${GOLD_BORDER}` : tier === 'gold' ? `0.5px solid ${GOLD_BORDER}` : 'none',
         minWidth: 0,
       }}
     >
@@ -223,6 +243,22 @@ export function RoundStatStrip({
   const ord = callout?.kind === 'rank_up' && callout.rank != null
     ? standingOrdinal(callout.rank, locale)
     : null;
+  const tier = callout && 'tier' in callout ? callout.tier : 'ink';
+  const featLabel = (feat: ExploreRoundFeat): string => {
+    switch (feat.kind) {
+      case 'ace': return t('amateur.stream.callout.aceCount', { count: feat.count, defaultValue_one: 'Hole in one', defaultValue_other: '{{count}} holes in one' });
+      case 'albatross': return t('amateur.stream.callout.albatrossCount', { count: feat.count, defaultValue_one: 'Albatross', defaultValue_other: '{{count}} albatrosses' });
+      case 'eagle': return t('amateur.stream.callout.eagleCount', { count: feat.count, defaultValue_one: 'Eagle', defaultValue_other: '{{count}} eagles' });
+      case 'birdies': return t('amateur.stream.callout.birdies', '{{n}} birdies', { n: feat.count });
+      case 'clean': return t('amateur.stream.callout.bogeyFree', 'Bogey-free');
+    }
+  };
+  const featLabelFor = (feats: ExploreRoundFeat[]): string => {
+    const labels = feats.map(featLabel);
+    return labels.length > 1
+      ? t('amateur.stream.callout.featJoin', '{{first}} + {{second}}', { first: labels[0], second: labels[1] })
+      : labels[0] ?? '';
+  };
   const achievement = callout ? (() => {
     switch (callout.kind) {
       case 'record': return {
@@ -242,21 +278,22 @@ export function RoundStatStrip({
           ? t('amateur.stream.callout.nowRank', 'Now {{ord}}', { ord })
           : t('amateur.stream.callout.movedUpBoard', 'Moved up the board'),
       };
-      case 'ace': return { icon: <AchievementEmoji glyph="⛳" />, tag: null, label: t('amateur.stream.callout.ace', 'Hole in one') };
-      case 'albatross': return { icon: <AchievementEmoji glyph="🔥" />, tag: null, label: t('amateur.stream.callout.albatross', 'Albatross') };
-      case 'eagle': return { icon: <AchievementEmoji glyph="🦅" />, tag: null, label: t('amateur.stream.callout.eagle', 'Eagle') };
+      case 'ace': return { icon: <AchievementEmoji glyph="⛳" />, tag: null, label: featLabelFor(callout.feats) };
+      case 'albatross': return { icon: <AchievementEmoji glyph="🔥" />, tag: null, label: featLabelFor(callout.feats) };
+      case 'eagle': return { icon: <AchievementEmoji glyph="🦅" />, tag: null, label: featLabelFor(callout.feats) };
       case 'birdies': return {
         icon: <BirdieCountIcon count={callout.count} />,
         tag: null,
-        label: t('amateur.stream.callout.birdies', '{{n}} birdies', { n: callout.count }),
+        label: featLabelFor(callout.feats),
       };
-      case 'clean': return { icon: <AchievementEmoji glyph="🛡️" />, tag: null, label: t('amateur.stream.callout.bogeyFree', 'Bogey-free') };
+      case 'clean': return { icon: <AchievementEmoji glyph="🛡️" />, tag: null, label: featLabelFor(callout.feats) };
     }
   })() : null;
 
   return (
     <span
       data-explore-stat-strip="round"
+      data-explore-callout-tier={achievement ? tier : undefined}
       data-explore-stat-layout={achievement && hasNet ? 'achievement-and-figures' : achievement ? 'achievement-only' : 'figures-only'}
       style={{
         display: 'grid',
@@ -266,7 +303,8 @@ export function RoundStatStrip({
         marginTop: 10,
         marginBottom: 10,
         borderRadius: r.md,
-        background: A.PANEL,
+        background: achievement && tier === 'top' ? GOLD_TINT_10 : achievement && tier === 'gold' ? GOLD_TINT : A.PANEL,
+        border: achievement && tier === 'top' ? `1px solid ${GOLD_BORDER}` : achievement && tier === 'gold' ? `0.5px solid ${GOLD_BORDER}` : 'none',
         overflow: 'hidden',
         boxSizing: 'border-box',
       }}

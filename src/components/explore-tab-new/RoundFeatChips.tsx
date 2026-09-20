@@ -65,11 +65,13 @@ const INK_STYLE: CSSProperties = {
   border: '1px solid rgba(14,18,22,0.12)',
 };
 
-function tierStyle(key: RoundFeat['key']): CSSProperties {
-  switch (key) {
+function tierStyle(feat: RoundFeat): CSSProperties {
+  switch (feat.key) {
     case 'holes_in_one':
     case 'albatrosses':
       return GOLD_STYLE;
+    case 'eagles':
+      return feat.count >= 2 ? GOLD_STYLE : INK_STYLE;
     case 'beat_par':
     case 'clean_card':
       return GREEN_STYLE;
@@ -135,7 +137,7 @@ export function RoundFeatChips({ feats, maxChips = 2 }: Props) {
             key={f.key}
             style={{
               ...badgeBase,
-              ...tierStyle(f.key),
+              ...tierStyle(f),
               fontVariantNumeric: 'tabular-nums',
             }}
             title={label}
