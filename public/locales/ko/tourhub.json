@@ -855,6 +855,8 @@
       "raceStandfirst": "아직 시즌을 지배한 선수는 없습니다. 포인트 경쟁이 계속됩니다.",
       "movement": "순위 변화",
       "movementTitle": "상승 중인 선수",
+      "race": "포인트 경쟁",
+      "raceTableStandfirst": "시즌 포인트 경쟁을 이끄는 상위 5명입니다.",
       "oneNumber": "주목할 수치",
       "duel": "박빙의 승부",
       "sharedLead": "공동 선두",

@@ -855,6 +855,8 @@
       "raceStandfirst": "今季はまだ誰のものでもありません。ポイント争いが続きます。",
       "movement": "順位変動",
       "movementTitle": "伸びている選手",
+      "race": "ポイント争い",
+      "raceTableStandfirst": "シーズンのポイント争いをリードする上位5選手です。",
       "oneNumber": "注目の数字",
       "duel": "僅差の争い",
       "sharedLead": "首位タイ",

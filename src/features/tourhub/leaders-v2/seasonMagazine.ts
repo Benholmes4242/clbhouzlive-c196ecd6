@@ -16,6 +16,7 @@ export interface SeasonMagazineSelection {
   subject: SeasonSubject;
   race: LeaderCategoryDef;
   showMovement: boolean;
+  showRaceStandings: boolean;
   oneNumber: LeaderCategoryDef | null;
   duel: LeaderCategoryDef | null;
   tiedList: LeaderCategoryDef | null;
@@ -43,8 +44,9 @@ export function resolveSeasonSubject(points: LeaderCategoryDef): SeasonSubject {
 }
 
 /**
- * Selects the evidence modules from measured categories only. Player appearances
- * are reserved in page order, so no player can be named in more than two modules.
+ * Selects the evidence modules from measured categories only. Featured player
+ * appearances are reserved in page order, so no player can hold more than two
+ * featured roles. Standings and tied-list membership are deliberately excluded.
  */
 export function selectSeasonMagazine(categories: LeaderCategoryDef[]): SeasonMagazineSelection | null {
   const race = categories.find((category) => category.key === 'points');
@@ -54,6 +56,7 @@ export function selectSeasonMagazine(categories: LeaderCategoryDef[]): SeasonMag
   // 2-ALT stays dormant until points carry a measured per-event comparison.
   const showMovement = race.movementSource === 'per_event_points'
     && race.rows.filter((row) => row.movement != null).length >= 4;
+  const showRaceStandings = !showMovement;
   const appearances = new Map<string, number>();
   const reserve = (rows: LeaderRow[]): boolean => {
     const ids = [...new Set(rows.map((row) => row.playerId).filter(Boolean))];
@@ -63,7 +66,6 @@ export function selectSeasonMagazine(categories: LeaderCategoryDef[]): SeasonMag
   };
 
   if (subject.kind === 'player') reserve([subject.player]);
-  reserve(race.rows.slice(0, 4));
 
   const oneNumberCandidates = categories
     .filter((category) => !['points', 'earnings', 'wins', 'world_rank'].includes(category.key))
@@ -85,10 +87,10 @@ export function selectSeasonMagazine(categories: LeaderCategoryDef[]): SeasonMag
     .filter((category) => NOTABLE_TIED_CATEGORIES.has(category.key))
     .filter((category) => category.rows.filter((row) => row.rank === 1).length >= 2)
     .filter((category) => !['events_played', 'cuts_made', 'rounds_played'].includes(category.key));
-  const tiedList = tiedCandidates.find((category) => reserve(category.rows.slice(0, 3))) ?? null;
+  const tiedList = tiedCandidates[0] ?? null;
 
-  const moduleCount = 1 + Number(showMovement) + Number(Boolean(oneNumber)) + Number(Boolean(duel)) + Number(Boolean(tiedList));
-  return { subject, race, showMovement, oneNumber, duel, tiedList, moduleCount, useReducedLayout: moduleCount < 3 };
+  const moduleCount = 1 + Number(showMovement || showRaceStandings) + Number(Boolean(oneNumber)) + Number(Boolean(duel)) + Number(Boolean(tiedList));
+  return { subject, race, showMovement, showRaceStandings, oneNumber, duel, tiedList, moduleCount, useReducedLayout: moduleCount < 3 };
 }
 
 export function playerAppearanceCounts(selection: SeasonMagazineSelection): Map<string, number> {
@@ -97,9 +99,7 @@ export function playerAppearanceCounts(selection: SeasonMagazineSelection): Map<
     if (row.playerId) counts.set(row.playerId, (counts.get(row.playerId) ?? 0) + 1);
   });
   if (selection.subject.kind === 'player') add([selection.subject.player]);
-  add(selection.race.rows.slice(0, 4));
   if (selection.oneNumber) add(selection.oneNumber.rows.slice(0, 1));
   if (selection.duel) add(selection.duel.rows.slice(0, 2));
-  if (selection.tiedList) add(selection.tiedList.rows.slice(0, 3));
   return counts;
 }
