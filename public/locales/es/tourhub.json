@@ -706,16 +706,16 @@
       "gapShots_one": "un golpe",
       "gapShots_other": "{{count}} golpes",
       "sublineSingle": "{{leader}} por delante de {{next}}.",
-      "sublineSingleThird": "{{leader}} por delante de {{next}}, con {{third}} a {{gap}} mas.",
+      "sublineSingleThird": "{{leader}} por delante de {{next}}, con {{third}} a {{gap}} más.",
       "sublineLevelTwo": "{{a}} y {{b}}, igualados en {{score}}.",
       "sublineLevelThree": "{{a}}, {{b}} y {{c}}, igualados en {{score}}.",
-      "sublineLevelMany": "{{a}}, {{b}} y {{count}} mas, igualados en {{score}}.",
+      "sublineLevelMany": "{{a}}, {{b}} y {{count}} más, igualados en {{score}}.",
       "sublineLevelTwoChaser": "{{a}} y {{b}}, igualados en {{score}}, con {{next}} a {{gap}}.",
       "sublineLevelThreeChaser": "{{a}}, {{b}} y {{c}}, igualados en {{score}}, con {{next}} a {{gap}}.",
-      "sublineLevelManyChaser": "{{a}}, {{b}} y {{count}} mas, igualados en {{score}}, con {{next}} a {{gap}}.",
+      "sublineLevelManyChaser": "{{a}}, {{b}} y {{count}} más, igualados en {{score}}, con {{next}} a {{gap}}.",
       "sublineLevelTwoPast": "{{a}} y {{b}} acabaron igualados en {{score}}.",
       "sublineLevelThreePast": "{{a}}, {{b}} y {{c}} acabaron igualados en {{score}}.",
-      "sublineLevelManyPast": "{{a}}, {{b}} y {{count}} mas acabaron igualados en {{score}}."
+      "sublineLevelManyPast": "{{a}}, {{b}} y {{count}} más acabaron igualados en {{score}}."
     },
     "move": {
       "liveEyebrow": "La remontada",
