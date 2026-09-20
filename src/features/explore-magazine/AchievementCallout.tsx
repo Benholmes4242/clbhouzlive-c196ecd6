@@ -8,6 +8,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
 import { GOLD_BORDER, GOLD_TINT, GOLD_TINT_10, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 
 import type { AchievementCallout } from './cardTreatment';
 import {
@@ -24,6 +25,7 @@ import {
   CALLOUT_ICON,
   RankUpIcon,
   AchievementEmoji,
+  RarityFeatIcon,
 } from './achievementIcons';
 
 /**
@@ -54,11 +56,13 @@ export function FeatRarityLines({
   scoreId,
   counts,
   locale,
+  ownerDisplayName,
   align = 'panel',
 }: {
   scoreId: string | null | undefined;
   counts?: RarityFeatCounts;
   locale: string;
+  ownerDisplayName?: string | null;
   align?: 'panel' | 'card';
 }) {
   const { t } = useTranslation('courses');
@@ -67,8 +71,9 @@ export function FeatRarityLines({
   const lines = useFeatLinesFor(scoreId);
   const rows: FeatRarityRow[] | null = lines;
   const owner: FeatOwnerRow[] | null = lines;
-  const { viewerLine, ownerLine } = featRarityLines({ rows, owner, counts, t, locale });
-  if (!viewerLine && !ownerLine) return null;
+  const { viewerLine, ownerLine } = featRarityLines({ rows, owner, counts, t, locale, ownerDisplayName });
+  const line = ownerLine ?? viewerLine;
+  if (!line) return null;
   return (
     <span
       data-feat-rarity-lines="true"
@@ -76,27 +81,17 @@ export function FeatRarityLines({
         display: 'block',
         width: '100%',
         boxSizing: 'border-box',
-        paddingInline: align === 'card' ? 4 : 0,
-        marginTop: 2,
-        marginBottom: 8,
+        paddingInline: align === 'card' ? 0 : 0,
+        marginTop: 3,
       }}
     >
-      {viewerLine ? (
-        <span
-          data-feat-rarity-viewer="true"
-          style={{ display: 'block', fontFamily: SANS, fontSize: 12.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE }}
-        >
-          {viewerLine}
-        </span>
-      ) : null}
-      {ownerLine ? (
-        <span
-          data-feat-rarity-owner="true"
-          style={{ display: 'block', marginTop: 3, fontFamily: SANS, fontSize: 12.5, fontWeight: 700, lineHeight: 1.3, color: A.AMBER }}
-        >
-          {ownerLine}
-        </span>
-      ) : null}
+      <span
+        data-feat-rarity-viewer={ownerLine ? undefined : 'true'}
+        data-feat-rarity-owner={ownerLine ? 'true' : undefined}
+        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: ownerLine ? 700 : 600, lineHeight: 1.3, color: ownerLine ? SC_FILL_GOLD : A.MUTE, whiteSpace: 'normal', overflowWrap: 'break-word' }}
+      >
+        {line}
+      </span>
     </span>
   );
 }
@@ -106,12 +101,14 @@ export function AchievementCalloutPanel({
   locale,
   scoreId = null,
   featCounts,
+  ownerDisplayName,
 }: {
   callout: AchievementCallout;
   locale: string;
   /** The round's whs_score_id — the key the rarity rows came back under. */
   scoreId?: string | null;
   featCounts?: RarityFeatCounts;
+  ownerDisplayName?: string | null;
 }) {
   const { t } = useTranslation('courses');
   const ordHole = (hole: number) => standingOrdinal(hole, locale);
@@ -163,7 +160,7 @@ export function AchievementCalloutPanel({
         };
       case 'ace':
         return {
-          icon: <AchievementEmoji glyph="⛳" />,
+          icon: <RarityFeatIcon kind="ace" />,
           title: featTitle(callout.feats),
           subline:
             callout.hole != null
@@ -172,7 +169,7 @@ export function AchievementCalloutPanel({
         };
       case 'albatross':
         return {
-          icon: <AchievementEmoji glyph="🔥" />,
+          icon: <RarityFeatIcon kind="albatross" />,
           title: featTitle(callout.feats),
           subline:
             callout.hole != null
@@ -181,7 +178,7 @@ export function AchievementCalloutPanel({
         };
       case 'eagle':
         return {
-          icon: <AchievementEmoji glyph="🦅" />,
+          icon: <RarityFeatIcon kind="eagle" />,
           title: featTitle(callout.feats),
           subline:
             callout.hole != null
@@ -224,7 +221,7 @@ export function AchievementCalloutPanel({
         minWidth: 0,
       }}
     >
-      <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px` }}>
+      <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px`, color: SC_FILL_GOLD }}>
         {icon}
       </span>
       <span style={{ display: 'block', minWidth: 0 }}>
@@ -258,9 +255,9 @@ export function AchievementCalloutPanel({
             {subline}
           </span>
         ) : null}
+        <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} />
       </span>
     </span>
-    <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} />
     </>
   );
 }
@@ -308,6 +305,7 @@ export function RoundStatStrip({
   locale,
   scoreId = null,
   featCounts,
+  ownerDisplayName,
 }: {
   callout: AchievementCallout | null;
   coursePar: number | null;
@@ -316,10 +314,11 @@ export function RoundStatStrip({
   /** The round's whs_score_id — the key the rarity rows came back under. */
   scoreId?: string | null;
   featCounts?: RarityFeatCounts;
+  ownerDisplayName?: string | null;
 }) {
   const { t } = useTranslation('courses');
   const hasNet = coursePar != null && net != null;
-  const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} align="card" />;
+  const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} align="card" />;
   if (!callout && !hasNet) return rarity;
 
   const ord = callout?.kind === 'rank_up' && callout.rank != null
@@ -360,9 +359,9 @@ export function RoundStatStrip({
           ? t('amateur.stream.callout.nowRank', 'Now {{ord}}', { ord })
           : t('amateur.stream.callout.movedUpBoard', 'Moved up the board'),
       };
-      case 'ace': return { icon: <AchievementEmoji glyph="⛳" />, tag: null, label: featLabelFor(callout.feats) };
-      case 'albatross': return { icon: <AchievementEmoji glyph="🔥" />, tag: null, label: featLabelFor(callout.feats) };
-      case 'eagle': return { icon: <AchievementEmoji glyph="🦅" />, tag: null, label: featLabelFor(callout.feats) };
+      case 'ace': return { icon: <RarityFeatIcon kind="ace" />, tag: null, label: featLabelFor(callout.feats) };
+      case 'albatross': return { icon: <RarityFeatIcon kind="albatross" />, tag: null, label: featLabelFor(callout.feats) };
+      case 'eagle': return { icon: <RarityFeatIcon kind="eagle" />, tag: null, label: featLabelFor(callout.feats) };
       case 'birdies': return {
         icon: <BirdieCountIcon count={callout.count} />,
         tag: null,
@@ -380,7 +379,7 @@ export function RoundStatStrip({
       data-explore-stat-layout={achievement && hasNet ? 'achievement-and-figures' : achievement ? 'achievement-only' : 'figures-only'}
       style={{
         display: 'grid',
-        gridTemplateColumns: achievement && hasNet ? 'minmax(0, 2.3fr) repeat(3, minmax(0, 0.7fr))' : hasNet ? 'repeat(3, minmax(0, 1fr))' : 'minmax(0, 1fr)',
+        gridTemplateColumns: achievement && hasNet ? 'minmax(0, 1fr) repeat(2, 72px)' : hasNet ? 'repeat(2, minmax(0, 1fr))' : 'minmax(0, 1fr)',
         width: '100%',
         minWidth: 0,
         marginTop: 10,
@@ -398,7 +397,7 @@ export function RoundStatStrip({
           data-explore-callout={callout?.kind}
           style={{ display: 'flex', minWidth: 0, minHeight: 52, alignItems: 'center', gap: 8, padding: '8px 10px', boxSizing: 'border-box' }}
         >
-          <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px` }}>{achievement.icon}</span>
+          <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px`, color: SC_FILL_GOLD }}>{achievement.icon}</span>
           <span style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, gap: 2 }}>
             {achievement.tag ? (
               <span
@@ -414,6 +413,7 @@ export function RoundStatStrip({
             >
               {achievement.label}
             </span>
+            {rarity}
           </span>
         </span>
       ) : null}
@@ -421,11 +421,9 @@ export function RoundStatStrip({
         <>
           <FigureCell label={t('amateur.stream.stat.par', 'PAR')} value={String(coursePar)} />
           <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(net)} under={(net as number) < (coursePar as number)} />
-          <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(net as number, coursePar as number)} under={(net as number) < (coursePar as number)} />
         </>
       ) : null}
     </span>
-    {rarity}
     </>
   );
 }

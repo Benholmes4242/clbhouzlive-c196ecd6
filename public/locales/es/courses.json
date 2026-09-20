@@ -1254,10 +1254,15 @@
       "9": "noveno"
     },
     "ownerFirst": "Tu primer {{feat}}. {{rounds}} rondas después.",
+    "ownerFirstCongrats": "{{line}} — enhorabuena, {{name}}",
     "ownerRareThree": "Uno de los tres primeros miembros en lograrlo.",
+    "ownerRareThreeCongrats": "{{line}} — enhorabuena, {{name}}",
     "ownerRareTwo": "Uno de los dos primeros miembros en lograrlo.",
+    "ownerRareTwoCongrats": "{{line}} — enhorabuena, {{name}}",
     "ownerRepeat": "Tu {{ord}} {{feat}}. El primero desde {{when}}.",
+    "ownerRepeatCongrats": "{{line}} — enhorabuena, {{name}}",
     "ownerSole": "El primer miembro en lograrlo.",
+    "ownerSoleCongrats": "{{line}} — enhorabuena, {{name}}",
     "viewer": "El {{ord}} {{feat}} en {{rounds}} rondas."
   },
   "friends": {

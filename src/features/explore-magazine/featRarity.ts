@@ -126,12 +126,20 @@ export interface FeatRarityLines {
 
 export const NO_FEAT_RARITY_LINES: FeatRarityLines = { viewerLine: null, ownerLine: null, kind: null };
 
+/** A congratulations name must read as a human first name, never a handle. */
+export function congratulationName(displayName: string | null | undefined): string | null {
+  const first = (displayName ?? '').trim().split(/\s+/)[0] ?? '';
+  if (first.length <= 1 || /[\d._@]/.test(first)) return null;
+  return first;
+}
+
 export function featRarityLines({
   rows,
   owner,
   counts,
   t,
   locale,
+  ownerDisplayName,
   now,
 }: {
   rows: FeatRarityRow[] | null | undefined;
@@ -139,6 +147,7 @@ export function featRarityLines({
   counts?: RarityFeatCounts;
   t: TFunction<'courses'>;
   locale: string;
+  ownerDisplayName?: string | null;
   now?: Date;
 }): FeatRarityLines {
   const row = chooseRarityFeat(rows, counts);
@@ -163,27 +172,42 @@ export function featRarityLines({
   const mine = (owner ?? []).find((o) => o.feat_kind === row.feat_kind && o.is_owner === true) ?? null;
   const members = row.distinct_members_at_detection;
   let ownerLine: string | null = null;
+  let ownerBranch: 'Repeat' | 'RareTwo' | 'RareThree' | 'Sole' | 'First' | null = null;
   if (mine) {
     const repeat = mine.member_ordinal != null && mine.member_ordinal > 1;
     const when = repeat && mine.member_prev_at ? rarityWhen(mine.member_prev_at, locale, now) : null;
     if (repeat && when) {
+      ownerBranch = 'Repeat';
       ownerLine = t('featRarity.ownerRepeat', 'Your {{ord}} {{feat}}. First since {{when}}.', {
         ord: rarityOrdinal(mine.member_ordinal as number, locale, t),
         feat,
         when,
       });
     } else if (!repeat && members === 2) {
+      ownerBranch = 'RareTwo';
       ownerLine = t('featRarity.ownerRareTwo', 'One of the first two members to do this.');
     } else if (!repeat && members === 3) {
+      ownerBranch = 'RareThree';
       ownerLine = t('featRarity.ownerRareThree', 'One of the first three members to do this.');
     } else if (!repeat && members === 1) {
+      ownerBranch = 'Sole';
       ownerLine = t('featRarity.ownerSole', 'The first member ever to do this.');
     } else if (!repeat && members != null && members >= 4 && mine.member_rounds != null && mine.member_rounds > 0) {
+      ownerBranch = 'First';
       ownerLine = t('featRarity.ownerFirst', 'Your first {{feat}}. {{rounds}} rounds in.', {
         feat,
         rounds: num(mine.member_rounds),
       });
     }
+  }
+
+  const firstName = congratulationName(ownerDisplayName);
+  if (ownerLine && ownerBranch && firstName) {
+    const congratulationLine = ownerLine.replace(/[.!。]$/, '');
+    ownerLine = t(`featRarity.owner${ownerBranch}Congrats` as never, '{{line}} — congrats, {{name}}', {
+      line: congratulationLine,
+      name: firstName,
+    });
   }
 
   return { viewerLine, ownerLine, kind };

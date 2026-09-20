@@ -1213,10 +1213,15 @@
       "9": "9"
     },
     "ownerFirst": "初めての{{feat}}。{{rounds}}ラウンド目。",
+    "ownerFirstCongrats": "{{line}} — {{name}}さん、おめでとうございます",
     "ownerRareThree": "これを達成した最初の3人のメンバーの1人です。",
+    "ownerRareThreeCongrats": "{{line}} — {{name}}さん、おめでとうございます",
     "ownerRareTwo": "これを達成した最初の2人のメンバーの1人です。",
+    "ownerRareTwoCongrats": "{{line}} — {{name}}さん、おめでとうございます",
     "ownerRepeat": "あなたの{{ord}}回目の{{feat}}。{{when}}以来。",
+    "ownerRepeatCongrats": "{{line}} — {{name}}さん、おめでとうございます",
     "ownerSole": "これを達成した史上初のメンバーです。",
+    "ownerSoleCongrats": "{{line}} — {{name}}さん、おめでとうございます",
     "viewer": "{{rounds}}ラウンドで{{ord}}回目の{{feat}}。"
   },
   "friends": {

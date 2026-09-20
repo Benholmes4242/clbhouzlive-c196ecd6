@@ -1561,10 +1561,15 @@
       "9": "[ñíñţĥ]"
     },
     "ownerFirst": "[Ýóúŕ fíŕšţ {{feat}}. {{rounds}} ŕóúñđš íñ.]",
+    "ownerFirstCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
     "ownerRareThree": "[Óñé óf ţĥé fíŕšţ ţĥŕéé ɱéɱƀéŕš ţó đó ţĥíš.]",
+    "ownerRareThreeCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
     "ownerRareTwo": "[Óñé óf ţĥé fíŕšţ ţŵó ɱéɱƀéŕš ţó đó ţĥíš.]",
+    "ownerRareTwoCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
     "ownerRepeat": "[Ýóúŕ {{ord}} {{feat}}. Fíŕšţ šíñçé {{when}}.]",
+    "ownerRepeatCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
     "ownerSole": "[Ţĥé fíŕšţ ɱéɱƀéŕ éνéŕ ţó đó ţĥíš.]",
+    "ownerSoleCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
     "viewer": "[Ţĥé {{ord}} {{feat}} íñ {{rounds}} ŕóúñđš.]"
   },
   "friends": {
