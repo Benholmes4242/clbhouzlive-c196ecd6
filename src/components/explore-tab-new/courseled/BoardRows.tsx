@@ -8,6 +8,7 @@ import { boardCountsRounds, isFeatBoard, type BoardKey } from './boardFilters';
 import type { BoardRow as Row } from './hooks/useBoardPage';
 import { INK_TINT_04 as LEADER_WASH } from '@/features/tourhub/_shared/tokens';
 import { topRoundFeats, type ExploreRoundFeat } from '@/features/explore-magazine/roundFeatCollection';
+import type { TFunction } from 'i18next';
 
 /**
  * THE BOARD'S ROW (BRIEF_DISCOVER_FILTER_LED_BOARD S4/S5), shared by the board
@@ -255,7 +256,7 @@ const POS_W = 28;
 const VALUE_W = 58;
 const SECOND_W = 46;
 
-type BoardT = ReturnType<typeof useTranslation<'courses'>>['t'];
+type BoardT = TFunction<'courses'>;
 
 function boardFeatLabel(feat: ExploreRoundFeat, t: BoardT): string {
   switch (feat.kind) {

@@ -16,7 +16,10 @@ import { topRoundFeats, type ExploreRoundFeat } from './roundFeatCollection';
  * true minus, for a to-par figure.
  */
 
-type T = (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
+type T = {
+  (key: string, fallback?: string, vars?: Record<string, unknown>): string;
+  (key: string, options: Record<string, unknown>): string;
+};
 
 export const MINUS = '\u2212';
 
@@ -176,15 +179,15 @@ function featPhrase(feat: ExploreRoundFeat, t: T, locale: string): string {
   const spokenCount = spokenNumber(feat.count, locale);
   switch (feat.kind) {
     case 'ace':
-      return t('amateur.stream.headline.featAce', '{{spokenCount}} holes in one', { count: feat.count, spokenCount });
+      return t('amateur.stream.headline.featAce', { count: feat.count, spokenCount, defaultValue_one: 'a hole in one', defaultValue_other: '{{spokenCount}} holes in one' });
     case 'albatross':
-      return t('amateur.stream.headline.featAlbatross', '{{spokenCount}} albatrosses', { count: feat.count, spokenCount });
+      return t('amateur.stream.headline.featAlbatross', { count: feat.count, spokenCount, defaultValue_one: 'an albatross', defaultValue_other: '{{spokenCount}} albatrosses' });
     case 'eagle':
-      return t('amateur.stream.headline.featEagle', '{{spokenCount}} eagles', { count: feat.count, spokenCount });
+      return t('amateur.stream.headline.featEagle', { count: feat.count, spokenCount, defaultValue_one: 'an eagle', defaultValue_other: '{{spokenCount}} eagles' });
     case 'birdies':
-      return t('amateur.stream.headline.featBirdies', '{{spokenCount}} birdies', { count: feat.count, spokenCount });
+      return t('amateur.stream.headline.featBirdies', { count: feat.count, spokenCount, defaultValue_one: '{{spokenCount}} birdie', defaultValue_other: '{{spokenCount}} birdies' });
     case 'clean':
-      return t('amateur.stream.headline.featClean', 'a bogey-free card', { count: 1, spokenCount: 'one' });
+      return t('amateur.stream.headline.featClean', { count: 1, spokenCount: 'one', defaultValue_one: 'a bogey-free card', defaultValue_other: 'bogey-free cards' });
   }
 }
 
