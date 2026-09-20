@@ -42,7 +42,10 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, options: Record<string, unknown> = {}) => {
-      let value = copy[key] ?? key;
+      const plural = typeof options.count === 'number'
+        ? copy[`${key}_${options.count === 1 ? 'one' : 'other'}`]
+        : undefined;
+      let value = copy[key] ?? plural ?? key;
       for (const [name, replacement] of Object.entries(options)) {
         if (name !== 'defaultValue') value = value.split(`{{${name}}}`).join(String(replacement));
       }
