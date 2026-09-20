@@ -1,15 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
+import { isFinish, isNonStarter } from '../../_shared/resultStatus';
 import { AMBER, HAIRLINE_INK_8, INK, INK_FAINT, SLATE_50 } from '../../_shared/tokens';
 
-const positionOf = (result: PlayerTournamentResult) => {
-  const status = result.status?.toUpperCase();
-  return status === 'MC' || status === 'CUT' || status === 'WD' || status === 'DQ' ? null : result.position;
-};
+// A position on the shape means a real finish: MDF plots normally, CUT/MC/WD/DQ
+// plot on the floor line. DNS is filtered out entirely before plotting — a
+// player who never teed off has no result. See _shared/resultStatus.ts.
+const positionOf = (result: PlayerTournamentResult) => (isFinish(result.status) ? result.position : null);
 
 export function FormSection({ results }: { results: PlayerTournamentResult[] }) {
   const { t } = useTranslation('tourhub');
-  const season = [...results].reverse();
+  const season = [...results].filter((result) => !isNonStarter(result.status)).reverse();
   if (season.length < 2) return null;
   const width = 600;
   const height = 120;

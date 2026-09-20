@@ -25,6 +25,7 @@ import { mapTourSlug } from '../../_shared/tourOrder';
 import { INK, INK_FAINT, SLATE_50 } from '../../_shared/tokens';
 import type { PlayerSeasonSelection } from '../playerSeason';
 import { playerOrdinal } from '../playerOrdinal';
+import { isFinish, isNonStarter } from '../../_shared/resultStatus';
 import { formatPositionShort } from '../../hooks/usePlayerResults';
 
 interface SeasonCardsProps {
@@ -38,17 +39,15 @@ export function SeasonCards({ playerStats, results, player, selection }: SeasonC
   const { t } = useTranslation('tourhub');
   const [sheetOpen, setSheetOpen] = useState(false);
   const hasStats = !!playerStats;
-  // sr_leaderboards.status is not case-consistent: measured 2026-09-20 it stores
-  // 'CUT' upper case while this file compared against 'cut'. Missed cuts were
-  // therefore counted as made cuts and could win BEST FINISH (Stuard read
-  // "T69 / 3 made cuts" from three starts, two of them missed cuts).
-  const statusOf = (result: { status: string | null }) => (result.status ?? '').toUpperCase();
-  const missedCut = (result: { status: string | null }) => statusOf(result) === 'CUT' || statusOf(result) === 'MC';
-  const settled = results.filter((result) => statusOf(result) !== 'WD' && statusOf(result) !== 'DQ');
-  const best = settled
-    .filter((result) => result.position != null && !missedCut(result))
+  // sr_leaderboards.status is stored UPPER CASE throughout — the full vocabulary
+  // is CUT / MC / MDF / WD / DQ / DNS, and every comparison must upper-case its
+  // input. Compare only through _shared/resultStatus.ts, which also records why
+  // MDF counts as a made cut here and is demoted on the leaderboard.
+  const entered = results.filter((result) => !isNonStarter(result.status));
+  const best = entered
+    .filter((result) => result.position != null && isFinish(result.status))
     .sort((a, b) => (a.position ?? Number.POSITIVE_INFINITY) - (b.position ?? Number.POSITIVE_INFINITY))[0];
-  const derivedCuts = settled.filter((result) => !missedCut(result) && result.position != null).length;
+  const derivedCuts = entered.filter((result) => isFinish(result.status) && result.position != null).length;
   const counts = playerStats
     ? [
         { key: 'events', label: t('player.season.card.events'), value: playerStats.events_played ?? results.length },
@@ -57,7 +56,7 @@ export function SeasonCards({ playerStats, results, player, selection }: SeasonC
         { key: 'cuts', label: t('player.season.card.madeCuts'), value: playerStats.cuts_made },
       ].filter((item) => typeof item.value === 'number').slice(0, 4)
     : [
-        { key: 'events', label: t('player.season.card.events'), value: results.length },
+        { key: 'events', label: t('player.season.card.events'), value: entered.length },
         { key: 'best', label: t('player.season.card.bestFinish'), value: best ? formatPositionShort(best.position, best.position_tied, best.status) : null },
         { key: 'cuts', label: t('player.season.card.madeCuts'), value: derivedCuts },
       ].filter((item) => item.value != null);

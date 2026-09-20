@@ -12,6 +12,8 @@
  * Determine which round a player has completed and what's next.
  * Returns lastCompletedRound (null if none) and currentRound (next to play).
  */
+import { isMissedCut, normalizeStatus } from '../_shared/resultStatus';
+
 export function getCurrentRound(
   r1: number | null | undefined,
   r2: number | null | undefined,
@@ -63,13 +65,13 @@ export function formatThruDisplay(
   tournamentTimezone?: string | null | undefined,
 ): string {
   // 1. Status overrides (unchanged)
-  if (status) {
-    const s = status.toLowerCase();
-    if (s === 'cut') return 'MC';
-    if (s === 'wd') return 'WD';
-    if (s === 'dq') return 'DQ';
-    if (s === 'mdf') return 'MDF';
-    if (s === 'dns') return 'DNS';
+  // Vocabulary: _shared/resultStatus.ts. This site lower-cased its input first
+  // so it was never broken, but it omitted MC; normalizeStatus covers the whole
+  // set including MDF and DNS.
+  const normalized = normalizeStatus(status);
+  if (normalized) {
+    if (isMissedCut(normalized)) return 'MC';
+    if (normalized === 'WD' || normalized === 'DQ' || normalized === 'MDF' || normalized === 'DNS') return normalized;
   }
 
   const tz = tournamentTimezone || 'America/New_York';

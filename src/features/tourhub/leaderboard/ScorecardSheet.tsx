@@ -16,6 +16,7 @@ import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardSco
 import { useTournamentMeta } from './useTournamentMeta';
 import { formatVenueLabel } from '../lib/venueLabel';
 import { useCardOpenGate } from '@/hooks/useCardOpenGate';
+import { isDemotedStatus } from '../_shared/resultStatus';
 
 interface ScorecardRow {
   round_number: number;
@@ -68,11 +69,7 @@ interface Props {
   target: ScorecardSheetTarget | null;
 }
 
-function isDemotedStatus(s?: string | null): boolean {
-  if (!s) return false;
-  const u = s.toUpperCase();
-  return u === 'MC' || u === 'CUT' || u === 'WD' || u === 'DQ' || u === 'MDF' || u === 'DNS';
-}
+
 
 export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
   const { t } = useTranslation('tourhub');

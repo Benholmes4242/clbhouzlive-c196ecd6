@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatCurrencyUsd } from '@/i18n/format';
+import { isMissedCut, isNonStarter, isWithdrawn, normalizeStatus } from '../_shared/resultStatus';
 
 export interface PlayerTournamentResult {
   id: string;
@@ -83,9 +84,12 @@ export function usePlayerResults(playerId: string | undefined, limit = 10) {
  * Format position for display (e.g., "1st", "T3", "MC")
  */
 export function formatPosition(position: number | null, tied: boolean | null, status: string | null): string {
-  if (status === 'cut' || status === 'MC') return 'MC';
-  if (status === 'WD') return 'WD';
-  if (status === 'DQ') return 'DQ';
+  // Status vocabulary: _shared/resultStatus.ts. Stored values are UPPER CASE;
+  // the old lower-case 'cut' comparison matched nothing and fell through to the
+  // numeric position, so a missed cut at 69 read as a 69th-place finish.
+  if (isMissedCut(status)) return 'MC';
+  if (isWithdrawn(status)) return normalizeStatus(status) === 'DQ' ? 'DQ' : 'WD';
+  if (isNonStarter(status)) return 'DNS';
   if (position === null) return '—';
   
   const prefix = tied ? 'T' : '';
@@ -105,9 +109,9 @@ export function formatPosition(position: number | null, tied: boolean | null, st
  * `position === 1` directly instead.
  */
 export function formatPositionShort(position: number | null, tied: boolean | null, status: string | null): string {
-  if (status === 'cut' || status === 'MC') return 'MC';
-  if (status === 'WD') return 'WD';
-  if (status === 'DQ') return 'DQ';
+  if (isMissedCut(status)) return 'MC';
+  if (isWithdrawn(status)) return normalizeStatus(status) === 'DQ' ? 'DQ' : 'WD';
+  if (isNonStarter(status)) return 'DNS';
   if (position === null) return '—';
   const prefix = tied ? 'T' : '';
   return `${prefix}${position}`;
