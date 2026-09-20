@@ -781,7 +781,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   fontWeight: 700,
                   letterSpacing: '0.13em',
                   textTransform: 'uppercase',
-                  color: rarity.ownerLine ? SC_FILL_GOLD : A.AMBER,
+                  color: A.AMBER,
                 }}
               >
                 {t(

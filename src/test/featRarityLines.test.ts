@@ -164,7 +164,7 @@ describe('feat rarity lines against the live backfilled rows', () => {
   it('replaces the public line with a localized owner congratulations when the first name is safe', () => {
     const c = live[7];
     const lines = featRarityLines({ rows: [c.row], owner: [c.owner], t, locale: 'en-GB', ownerDisplayName: 'Lennon Hill', now: NOW });
-    expect(lines.ownerLine).toBe('One of the first two members to do this. — congrats, Lennon');
+    expect(lines.ownerLine).toBe('One of the first two members to do this — congrats, Lennon');
   });
 
   it.each(['j.edge1994', 'golf_1', '@golfer', 'X'])(
