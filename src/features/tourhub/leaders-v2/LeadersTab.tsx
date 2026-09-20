@@ -72,7 +72,7 @@ export function LeadersTab() {
 
   return <div style={{ minHeight: '100vh', background: SLATE_50, fontFamily: FONT }}>
     {isLoading ? loading : isError ? <div style={{ padding: '56px 24px', textAlign: 'center' }}><p style={{ color: INK, fontSize: 15, fontWeight: 800 }}>{t('leaders.error.title')}</p><p style={{ color: INK_MUTE, fontSize: 13 }}>{t('leaders.error.body')}</p><button type="button" onClick={() => refetch()} style={{ marginTop: 12, border: 0, padding: '10px 20px', background: INK, color: SLATE_50, fontWeight: 750 }}>{t('leaders.error.retry')}</button></div> : !magazine ? <TourHubEmptyState variant="leaderboard" /> : <main style={{ paddingBottom: 88 }}>
-      <LeadModule category={magazine.race} subjectName={magazine.subject.kind === 'player' ? magazine.subject.player.name : null} />
+      <LeadModule category={magazine.race} subject={magazine.subject} categories={categories} />
       {magazine.showMovement ? <MovementModule category={magazine.race} onPlayerClick={(row) => onPlayerClick(magazine.race.key, row)} /> : null}
       {magazine.showRaceStandings ? <RaceStandingsModule category={magazine.race} onPlayerClick={(row) => onPlayerClick(magazine.race.key, row)} /> : null}
       {magazine.oneNumber ? <NumberModule category={magazine.oneNumber} onPlayerClick={(row) => onPlayerClick(magazine.oneNumber?.key ?? '', row)} /> : null}
