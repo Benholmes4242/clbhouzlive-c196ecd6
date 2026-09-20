@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { FeatRarityRow } from '@/features/explore-magazine/featRarity';
 import { deriveRoundFeats, type RoundFeat } from '@/lib/gam/roundFeats';
 import { fetchCircleIds } from '@/lib/social/circle';
 
@@ -702,7 +701,6 @@ export function useCircleLatestRounds(
           eg_visible: profile?.eg_visible === true,
           has_active_whs_connection: activeConnectionUsers.has(r.user_id),
           feats: featsForRound(r),
-          feat_rarity: (r.gam_round_feat_rarity ?? []) as FeatRarityRow[],
 
           birdies: r.birdies,
           eagles: r.eagles,

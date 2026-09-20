@@ -378,7 +378,6 @@ export function useExploreStreamClient(
             albatrosses: row.albatrosses,
             holes_in_one: row.holes_in_one,
             clean_card: row.clean_card,
-            feat_rarity: row.feat_rarity ?? null,
             is_course_record: row.is_course_record,
             hcp_at_time: row.hcp_at_time,
           },

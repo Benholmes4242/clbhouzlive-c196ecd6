@@ -1,4 +1,3 @@
-import type { FeatRarityRow } from './featRarity';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
@@ -146,7 +145,6 @@ export interface StreamFacts {
   holes_in_one?: number | null;
   clean_card?: boolean | null;
   /** FROZEN feat-rarity rows carried with the round; never recomputed on render. */
-  feat_rarity?: FeatRarityRow[] | null;
   is_course_record?: boolean | null;
   hcp_at_time?: number | null;
   /** C4 NET FACTS. All of these are VIEWER-GATED in the RPC: a player whose
