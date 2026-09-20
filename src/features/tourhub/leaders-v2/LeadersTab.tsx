@@ -1,268 +1,86 @@
-/**
- * leaders-v2/LeadersTab - "The Boards" - category cards + deep sheets.
- * Overview grammar; no framer-motion; no shell-row dependency.
- *
- * Wiring:
- *   - Tour: TourSelectionContext (selectTour); ?tour= honored once on mount.
- *   - ?category= auto-opens the FullListSheet for that key (Overview deep-links).
- *   - Data: useLeaderCategories(tour) + useLivePlayerIds().
- *   - Sheet nav: closes first, then navigates - no stuck overlay.
- */
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { analyticsEvents } from '@/utils/analyticsEvents';
-
 import { Skeleton } from '@/components/ui/skeleton';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { readStoredTour } from '../hooks/useTourSelection';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
-
-import { useLivePlayerIds } from '../players-v2/data/useLivePlayerIds';
-import {
-  FONT,
-  INK,
-  INK_MUTE,
-  SLATE_50,
-} from '../_shared/tokens';
-
-import { useLeaderCategories } from './data/useLeaderCategories';
-import {
-  StatBoardRows,
-  WinnersCircle,
-  ANATOMY_BY_KEY,
-  type Anatomy,
-} from './boards/AlmanacBoards';
+import { FONT, INK, INK_MUTE, SLATE_50 } from '../_shared/tokens';
+import { useLeaderCategories, type LeaderRow } from './data/useLeaderCategories';
+import { selectSeasonMagazine } from './seasonMagazine';
+import { DuelModule, LeadModule, MovementModule, NumberModule, SeasonIndexLink, TiedListModule } from './boards/AlmanacBoards';
 import { FullListSheet } from './FullListSheet';
-import { FIGS } from '@/lib/tokens/type';
 
-// Compact tour-eyebrow chip labels resolved via i18n. Keys are the stable
-// TourId enum; the values live under leaders.tourChip.<tour>.
 const CHIP_LABEL_KEY: Record<TourId, string> = {
-  pga:   'leaders.tourChip.pga',
-  lpga:  'leaders.tourChip.lpga',
-  euro:  'leaders.tourChip.euro',
-  pgad:  'leaders.tourChip.pgad',
-  champ: 'leaders.tourChip.champ',
-  liv:   'leaders.tourChip.liv',
+  pga: 'leaders.tourChip.pga', lpga: 'leaders.tourChip.lpga', euro: 'leaders.tourChip.euro',
+  pgad: 'leaders.tourChip.pgad', champ: 'leaders.tourChip.champ', liv: 'leaders.tourChip.liv',
 };
-
 
 export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
-
-  // Per-section tour lens (local state, NO All Tours, PGA default).
-  // Champions is intentionally omitted here (insufficient stat coverage);
-  // if the URL passes ?tour=champ we fall through to PGA.
   const inboundTour = searchParams.get('tour');
   const storedTour = readStoredTour();
-  const initialTour: TourId =
-    inboundTour && inboundTour in TOUR_CONFIG && inboundTour !== 'champ'
-      ? (inboundTour as TourId)
-      : storedTour && storedTour in TOUR_CONFIG && storedTour !== 'champ'
-        ? (storedTour as TourId)
-        : 'pga';
+  const initialTour: TourId = inboundTour && inboundTour in TOUR_CONFIG && inboundTour !== 'champ'
+    ? inboundTour as TourId
+    : storedTour && storedTour in TOUR_CONFIG && storedTour !== 'champ' ? storedTour as TourId : 'pga';
   const [activeTour, setActiveTour] = useState<TourId>(initialTour);
-
-
   const { data: result, isLoading, isError, refetch } = useLeaderCategories(activeTour);
-  const { data: liveMap } = useLivePlayerIds();
-
   const categories = result?.categories ?? [];
-  const year = result?.year ?? new Date().getFullYear();
-
-  // Deep-link ?category=
+  const magazine = useMemo(() => selectSeasonMagazine(categories), [categories]);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const inboundCatRef = useRef(false);
+
   useEffect(() => {
-    if (inboundCatRef.current) return;
-    if (!categories.length) return;
+    if (inboundCatRef.current || !categories.length) return;
     inboundCatRef.current = true;
     const inbound = searchParams.get('category');
-    if (inbound && categories.some((c) => c.key === inbound)) {
-      setOpenKey(inbound);
-    }
+    if (inbound && categories.some((category) => category.key === inbound)) setOpenKey(inbound);
   }, [categories, searchParams]);
 
-  // If tour changes and the currently open sheet is not in the new tour, close it.
-  useEffect(() => {
-    if (!openKey) return;
-    if (!categories.length) return;
-    if (!categories.some((c) => c.key === openKey)) setOpenKey(null);
-  }, [openKey, categories]);
+  useTourLensFromPicker<TourId>((slug) => slug !== 'champ' && slug in TOUR_CONFIG ? slug as TourId : undefined, setActiveTour, activeTour);
 
-  const openCategory = useCallback(
-    (key: string) => {
-      analyticsEvents.track('tour_leaders_full_list_opened', { tour: activeTour, category: key });
-      setOpenKey(key);
-      const p = new URLSearchParams(searchParams);
-      p.set('tab', 'leaderboards');
-      p.set('category', key);
-      setSearchParams(p, { replace: true });
-    },
-    [searchParams, setSearchParams, activeTour],
-  );
-
-  // Shared board tap handler: track, then navigate.
-  const onPlayerTap = useCallback(
-    (category: string, playerId: string, rank: number) => {
-      if (!playerId) return;
-      analyticsEvents.track('tour_leaders_player_tapped', {
-        tour: activeTour,
-        category,
-        player_id: playerId,
-        rank,
-      });
-      navigate(`/tourhub/player/${playerId}`);
-    },
-    [navigate, activeTour],
-  );
-
-  // Analytics: viewed once per mount, after the categories resolve.
-  const viewedRef = useRef(false);
-  useEffect(() => {
-    if (viewedRef.current) return;
-    if (isLoading || isError || !categories.length) return;
-    viewedRef.current = true;
-    analyticsEvents.track('tour_leaders_viewed', {
-      tour: activeTour,
-      category_count: categories.length,
-      pool_size: categories.reduce((n, c) => n + (c.poolSize ?? 0), 0),
-    });
-  }, [categories, isLoading, isError, activeTour]);
-
-  /* The island's TourPickerSheet replaces the deleted pills row. This page's
-     lens had showAllTours={false} and ignored CHAMP, so the sheet's All-tours
-     row ('all'), 'major' and 'champ' are ignored here rather than substituted. */
-  useTourLensFromPicker<TourId>(
-    (slug) => (slug !== 'champ' && slug in TOUR_CONFIG ? (slug as TourId) : undefined),
-    setActiveTour,
-    activeTour,
-  );
+  const openCategory = useCallback((key: string) => {
+    analyticsEvents.track('tour_leaders_full_list_opened', { tour: activeTour, category: key });
+    setOpenKey(key);
+    setSearchParams((previous) => { const next = new URLSearchParams(previous); next.set('tab', 'leaderboards'); next.set('category', key); return next; }, { replace: true });
+  }, [activeTour, setSearchParams]);
 
   const closeCategory = useCallback(() => {
     setOpenKey(null);
-    const p = new URLSearchParams(searchParams);
-    if (p.get('category')) {
-      p.delete('category');
-      setSearchParams(p, { replace: true });
-    }
-  }, [searchParams, setSearchParams]);
+    setSearchParams((previous) => { const next = new URLSearchParams(previous); next.delete('category'); return next; }, { replace: true });
+  }, [setSearchParams]);
 
-  const activeCategory = useMemo(
-    () => categories.find((c) => c.key === openKey) ?? null,
-    [categories, openKey],
-  );
+  const onPlayerClick = useCallback((category: string, row: LeaderRow) => {
+    if (!row.playerId) return;
+    analyticsEvents.track('tour_leaders_player_tapped', { tour: activeTour, category, player_id: row.playerId, rank: row.rank });
+    navigate(`/tourhub/player/${row.playerId}`);
+  }, [activeTour, navigate]);
 
-  const tourLabel = t(CHIP_LABEL_KEY[activeTour]);
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current || isLoading || isError || !categories.length) return;
+    viewedRef.current = true;
+    analyticsEvents.track('tour_leaders_viewed', { tour: activeTour, category_count: categories.length, pool_size: categories.reduce((sum, category) => sum + category.poolSize, 0) });
+  }, [activeTour, categories, isError, isLoading]);
 
-  return (
-    <div
-      style={{
-        background: SLATE_50,
-        minHeight: '100vh',
-        fontFamily: FONT,
-      }}
-    >
+  const activeCategory = categories.find((category) => category.key === openKey) ?? null;
+  const loading = <div style={{ padding: '24px', display: 'grid', gap: 16 }}>{[190, 250, 160].map((height) => <Skeleton key={height} style={{ height }} />)}</div>;
 
-      {/* No tour-pills row: the island's left capsule owns the tour control
-          (BRIEF_TOUR_HEADER_ONE_ROW). CHAMP still has no board coverage. */}
-
-      {/* Boards feed */}
-      {isLoading ? (
-        <div style={{ padding: '16px 0 88px', display: 'flex', flexDirection: 'column', gap: 22 }}>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton
-              key={i}
-              style={{ height: i === 0 ? 320 : 168, borderRadius: 16, margin: '0 16px' }}
-            />
-          ))}
-        </div>
-
-      ) : isError ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
-          <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
-            {t('leaders.error.title', { defaultValue: "Couldn't load the boards" })}
-          </div>
-          <div style={{ fontFamily: FONT, fontSize: 13, color: INK_MUTE, maxWidth: 280 }}>
-            {t('leaders.error.body', { defaultValue: 'Check your connection and try again.' })}
-          </div>
-          <button
-            type="button"
-            onClick={() => refetch()}
-            style={{ background: INK, color: SLATE_50, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
-          >
-            {t('leaders.error.retry', { defaultValue: 'Retry' })}
-          </button>
-        </div>
-      ) : categories.length === 0 ? (
-        <TourHubEmptyState variant="leaderboard" />
-      ) : (
-        <div style={{ padding: '16px 0 88px', display: 'flex', flexDirection: 'column', gap: 22 }}>
-          {categories.map((cat) => {
-            // No marquee: every board uses the anatomy its key maps to. The
-            // first board is first because it is the most important stat.
-            const anatomy: Anatomy = ANATOMY_BY_KEY[cat.key] ?? 'stat';
-            const onOpen = () => openCategory(cat.key);
-            const key = cat.key;
-
-            if (anatomy === 'winners') {
-              return (
-                <WinnersCircle
-                  key={key}
-                  category={cat}
-                  liveMap={liveMap ?? {}}
-                  onOpen={onOpen}
-                  onPlayerTap={(pid, rank) => onPlayerTap(cat.key, pid, rank)}
-                />
-              );
-            }
-            const overline =
-              cat.key === 'world_rank'
-                ? t('leaders.almanac.world.overline')
-                : t(cat.shortKey);
-            return (
-              <StatBoardRows
-                key={key}
-                category={cat}
-                liveMap={liveMap ?? {}}
-                onOpen={onOpen}
-                onPlayerTap={(pid, rank) => onPlayerTap(cat.key, pid, rank)}
-                overline={overline}
-                showMovement={cat.key === 'world_rank'}
-              />
-            );
-          })}
-          <div
-            style={{
-              padding: '4px 16px 0',
-              fontSize: 11,
-              fontWeight: 500,
-              color: INK_MUTE,
-              letterSpacing: '0.04em',
-              textAlign: 'center',
-              ...FIGS,
-            }}
-          >
-            {t('leaders.footer')}
-          </div>
-        </div>
-      )}
-
-      <FullListSheet
-        open={!!activeCategory}
-        onClose={closeCategory}
-        category={activeCategory}
-        liveMap={liveMap ?? {}}
-        tourLabel={tourLabel}
-        year={year}
-      />
-    </div>
-  );
+  return <div style={{ minHeight: '100vh', background: SLATE_50, fontFamily: FONT }}>
+    {isLoading ? loading : isError ? <div style={{ padding: '56px 24px', textAlign: 'center' }}><p style={{ color: INK, fontSize: 15, fontWeight: 800 }}>{t('leaders.error.title')}</p><p style={{ color: INK_MUTE, fontSize: 13 }}>{t('leaders.error.body')}</p><button type="button" onClick={() => refetch()} style={{ marginTop: 12, border: 0, padding: '10px 20px', background: INK, color: SLATE_50, fontWeight: 750 }}>{t('leaders.error.retry')}</button></div> : !magazine ? <TourHubEmptyState variant="leaderboard" /> : <main style={{ paddingBottom: 88 }}>
+      <LeadModule category={magazine.race} subjectName={magazine.subject.kind === 'player' ? magazine.subject.player.name : null} />
+      <MovementModule category={magazine.race} onPlayerClick={(row) => onPlayerClick(magazine.race.key, row)} />
+      {magazine.oneNumber ? <NumberModule category={magazine.oneNumber} onPlayerClick={(row) => onPlayerClick(magazine.oneNumber?.key ?? '', row)} /> : null}
+      {magazine.duel ? <DuelModule category={magazine.duel} onPlayerClick={(row) => onPlayerClick(magazine.duel?.key ?? '', row)} /> : null}
+      {magazine.tiedList ? <TiedListModule category={magazine.tiedList} onPlayerClick={(row) => onPlayerClick(magazine.tiedList?.key ?? '', row)} /> : null}
+      <SeasonIndexLink onClick={() => navigate(`/tourhub/season-stats?tour=${activeTour}`)} />
+    </main>}
+    <FullListSheet open={Boolean(activeCategory)} onClose={closeCategory} category={activeCategory} liveMap={{}} tourLabel={t(CHIP_LABEL_KEY[activeTour])} year={result?.year ?? new Date().getFullYear()} />
+  </div>;
 }
 
 export default LeadersTab;
