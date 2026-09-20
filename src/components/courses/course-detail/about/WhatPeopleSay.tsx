@@ -25,7 +25,7 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { getRatingTier, TIER_LABEL_STYLE } from '@/lib/ratingTier';
 import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
-import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
 
 /** Below this the score is shown but not called settled. */
@@ -151,7 +151,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
         >
           {categoryFigures.map(({ key, label, value }) => (
             <div key={key} style={{ minWidth: 0 }}>
-              <div style={{ ...aboutFig(15, value >= 9 ? A.GREEN : A.MUTE), lineHeight: 1 }}>
+              <div style={{ ...aboutFig(15, courseSubScoreTone(value)), lineHeight: 1 }}>
                 {value.toFixed(1)}
               </div>
               <div style={{ ...ABOUT_KICKER, marginTop: 5 }}>{label}</div>

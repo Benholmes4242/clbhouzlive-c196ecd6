@@ -1,9 +1,7 @@
 import React from 'react';
 
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
-import { COURSE_RATING_THEMES } from '@/lib/globalAchievementMilestoneSystem';
-import { getRatingTier } from '@/lib/ratingTier';
-import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS, SANS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { StatBrowseRow } from './useStatBrowse';
 
 const PHOTO_H = 196;
@@ -59,17 +57,17 @@ function CategoryBreakdown({ row }: { row: StatBrowseRow }) {
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 12, marginTop: 13 }}>
       {scores.map(({ label, score }) => {
         const fill = Math.max(0, Math.min(100, ((score - 6) / 4) * 100));
-        const tier = getRatingTier(score);
+        const tone = courseSubScoreTone(score);
         return (
           <div key={label} style={{ minWidth: 0 }}>
             <div style={{ height: 3, borderRadius: 2, background: TRACK, overflow: 'hidden' }}>
               <div
                 data-category-score={score.toFixed(1)}
-                style={{ height: '100%', width: `${fill}%`, borderRadius: 2, background: COURSE_RATING_THEMES[tier].accent }}
+                style={{ height: '100%', width: `${fill}%`, borderRadius: 2, background: tone }}
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 6, minWidth: 0, whiteSpace: 'nowrap' }}>
-              <span style={{ ...FIGS, fontSize: 13, fontWeight: 700, letterSpacing: '-0.04em', color: A.INK }}>
+              <span style={{ ...FIGS, fontSize: 13, fontWeight: 700, letterSpacing: '-0.04em', color: tone }}>
                 {score.toFixed(1)}
               </span>
               <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: 11, color: A.DIM }}>

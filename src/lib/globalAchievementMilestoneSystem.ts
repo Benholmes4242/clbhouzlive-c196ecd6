@@ -136,6 +136,8 @@ const amberTheme = {
   gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)',
 };
 
+// All five rating tiers currently resolve to the same amber; never use a
+// COURSE_RATING_THEMES[tier] lookup where a per-score colour is intended.
 const poorTheme = amberTheme;
 const fairTheme = amberTheme;
 const goodTheme = amberTheme;

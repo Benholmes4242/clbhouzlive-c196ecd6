@@ -48,6 +48,8 @@ export const isGoldTier = (tier: ScoreTier | undefined): boolean =>
 /**
  * Get the score tier data for a given rating score.
  * Only Exceptional renders with amber styling; all others use gray.
+ * Courses analytical surfaces instead use green at the same 9.0 threshold via
+ * `courseSubScoreTone`; review-post surfaces continue to rely on this amber.
  */
 export function getScoreTier(score: number): ScoreTierData {
   const theme = getRatingTheme(score);
