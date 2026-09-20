@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { readStoredTour } from '../hooks/useTourSelection';
@@ -71,7 +72,7 @@ export function LeadersTab() {
   const loading = <div style={{ padding: '24px', display: 'grid', gap: 16 }}>{[190, 250, 160].map((height) => <Skeleton key={height} style={{ height }} />)}</div>;
 
   return <div style={{ minHeight: '100vh', background: SLATE_50, fontFamily: FONT }}>
-    {isLoading ? loading : isError ? <div style={{ padding: '56px 24px', textAlign: 'center' }}><p style={{ color: INK, fontSize: 15, fontWeight: 800 }}>{t('leaders.error.title')}</p><p style={{ color: INK_MUTE, fontSize: 13 }}>{t('leaders.error.body')}</p><button type="button" onClick={() => refetch()} style={{ marginTop: 12, border: 0, padding: '10px 20px', background: INK, color: SLATE_50, fontWeight: 750 }}>{t('leaders.error.retry')}</button></div> : !magazine ? <TourHubEmptyState variant="leaderboard" /> : <main style={{ paddingBottom: 88 }}>
+    {isLoading ? loading : isError ? <div style={{ padding: '56px 24px', textAlign: 'center' }}><p style={{ color: INK, fontSize: 15, fontWeight: 800 }}>{t('leaders.error.title')}</p><p style={{ color: INK_MUTE, fontSize: 13 }}>{t('leaders.error.body')}</p><button type="button" onClick={() => refetch()} style={{ marginTop: 12, border: 0, padding: '10px 20px', background: INK, color: SLATE_50, fontWeight: 750 }}>{t('leaders.error.retry')}</button></div> : !magazine ? <TourHubEmptyState variant="leaderboard" /> : <main style={{ paddingBottom: NAV_CLEARANCE }}>
       <LeadModule category={magazine.race} subject={magazine.subject} categories={categories} />
       {magazine.showMovement ? <MovementModule category={magazine.race} onPlayerClick={(row) => onPlayerClick(magazine.race.key, row)} /> : null}
       {magazine.showRaceStandings ? <RaceStandingsModule category={magazine.race} onPlayerClick={(row) => onPlayerClick(magazine.race.key, row)} /> : null}
