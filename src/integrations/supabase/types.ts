@@ -21436,17 +21436,6 @@ export type Database = {
           whs_score_id: string
         }[]
       }
-      get_round_feat_owner_lines: {
-        Args: { p_round_ids: string[] }
-        Returns: {
-          feat_kind: string
-          is_owner: boolean
-          member_ordinal: number
-          member_prev_at: string
-          member_rounds: number
-          whs_score_id: string
-        }[]
-      }
       get_screen_analytics: {
         Args: { p_days?: number }
         Returns: {
