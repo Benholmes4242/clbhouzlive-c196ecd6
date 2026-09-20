@@ -33,7 +33,7 @@ export interface FeatRarityRow {
   distinct_members_at_detection: number | null;
 }
 
-/** A row of get_round_feat_owner_lines. member_* are NULL for non-owners. */
+/** The member half of get_round_feat_lines. NULL for non-owners. */
 export interface FeatOwnerRow {
   whs_score_id?: string;
   feat_kind: string;
