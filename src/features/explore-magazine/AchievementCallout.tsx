@@ -306,15 +306,23 @@ export function RoundStatStrip({
   coursePar,
   net,
   locale,
+  scoreId = null,
+  featRarity = null,
+  featCounts,
 }: {
   callout: AchievementCallout | null;
   coursePar: number | null;
   net: number | null;
   locale: string;
+  /** The round's whs_score_id — the key the owner lines came back under. */
+  scoreId?: string | null;
+  featRarity?: FeatRarityRow[] | null;
+  featCounts?: RarityFeatCounts;
 }) {
   const { t } = useTranslation('courses');
   const hasNet = coursePar != null && net != null;
-  if (!callout && !hasNet) return null;
+  const rarity = <FeatRarityLines scoreId={scoreId} rows={featRarity} counts={featCounts} locale={locale} align="card" />;
+  if (!callout && !hasNet) return rarity;
 
   const ord = callout?.kind === 'rank_up' && callout.rank != null
     ? standingOrdinal(callout.rank, locale)
