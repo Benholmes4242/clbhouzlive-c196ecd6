@@ -86,6 +86,7 @@ function RankedPlayerRowInner({
         </div>
         <div style={{ minWidth: 0 }}>
           <span
+            data-player-kicker
             style={{
               display: 'block',
               overflow: 'hidden',
@@ -103,6 +104,7 @@ function RankedPlayerRowInner({
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, marginTop: 3 }}>
             <span
+              data-player-name
               style={{
                 minWidth: 0,
                 fontSize: 15,
@@ -128,9 +130,9 @@ function RankedPlayerRowInner({
                 letterSpacing: '0.13em',
                 textTransform: 'uppercase',
                 color: INK_MUTE,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
               {sub}
@@ -150,11 +152,11 @@ function RankedPlayerRowInner({
   );
 
   if (!interactive) {
-    return <div style={shellStyle}>{body}</div>;
+    return <div data-ranked-player-row style={shellStyle}>{body}</div>;
   }
 
   return (
-    <button type="button" onClick={onClick} style={{ ...shellStyle, cursor: 'pointer' }}>
+    <button data-ranked-player-row type="button" onClick={onClick} style={{ ...shellStyle, cursor: 'pointer' }}>
       {body}
     </button>
   );
