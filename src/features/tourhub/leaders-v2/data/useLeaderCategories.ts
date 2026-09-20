@@ -339,6 +339,11 @@ const PGA_CATS: PgaCatSpec[] = [
   { key: 'events_played',             dir: 'desc', accessor: (s) => s.events_played,              format: fmtInt },
   { key: 'top_25',                    dir: 'desc', accessor: (s) => s.top_25s,                     format: fmtInt },
   { key: 'cuts_made',                 dir: 'desc', accessor: (s) => s.cuts_made,                   format: fmtInt },
+  // DORMANT (measured 2026-09-20): the next three keys are absent from raw_data
+  // on all 220 live 2026 PGA statistics rows, so they produce zero rows and the
+  // `rows.length >= 3` guard drops them - the board has never shown them. The
+  // definitions stay so they light up on their own if ingestion starts supplying
+  // the keys. Do NOT change the guard.
   { key: 'birdies_per_round',         dir: 'desc', accessor: (s) => rawStat(s, 'birdies_per_round', 'birdiesPerRound'), format: fmtAvg },
   { key: 'scrambling',                dir: 'desc', accessor: (s) => rawStat(s, 'scrambling', 'scrambling_pct'), format: fmtPct },
   { key: 'strokes_gained_total',      dir: 'desc', accessor: (s) => rawStat(s, 'strokes_gained_total', 'strokesGainedTotal'), format: fmtSG },

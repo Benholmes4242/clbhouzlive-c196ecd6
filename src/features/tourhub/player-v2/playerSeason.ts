@@ -10,6 +10,15 @@ import {
 import type { TourId } from '../hooks/useOverviewData';
 import { playerOrdinal } from './playerOrdinal';
 
+/**
+ * Eligible skill pool. Measured 2026-09-20 against the live 2026 PGA season
+ * (220 statistics rows): each of these eight resolves on 220/220 rows.
+ *
+ * REMOVED 2026-09-20: 'scrambling', 'birdies_per_round', 'strokes_gained_total'.
+ * raw_data is present and non-empty on all 220 rows but contains none of those
+ * three keys - they are never supplied, not sometimes missing. Restore them here
+ * if ingestion ever starts writing them.
+ */
 export const PLAYER_SKILL_KEYS = [
   'scoring_avg',
   'drive_avg',
@@ -19,9 +28,6 @@ export const PLAYER_SKILL_KEYS = [
   'putt_avg',
   'strokes_gained_tee_green',
   'strokes_gained_putting',
-  'birdies_per_round',
-  'scrambling',
-  'strokes_gained_total',
 ] as const;
 
 export type PlayerSkillKey = (typeof PLAYER_SKILL_KEYS)[number];
@@ -69,16 +75,15 @@ const valueFor = (stats: TourPlayerStatistics, key: PlayerSkillKey): number | nu
     sand_saves_pct: stats.sand_saves,
     putt_avg: stats.putting_average,
     strokes_gained_tee_green: stats.strokes_gained_tee_green,
-    strokes_gained_putting: stats.strokes_gained,
-    birdies_per_round: stats.birdies_per_round,
-    scrambling: stats.scrambling,
-    strokes_gained_total: stats.strokes_gained_total,
+    // COLUMN. raw_data.strokes_gained is always null, and pairing it with the
+    // putting rank described two different stats.
+    strokes_gained_putting: stats.strokes_gained_putting,
   };
   return values[key];
 };
 
 const formatValue = (key: PlayerSkillKey, value: number): string => {
-  if (['drive_acc', 'gir_pct', 'sand_saves_pct', 'scrambling'].includes(key)) return `${value.toFixed(1)}%`;
+  if (['drive_acc', 'gir_pct', 'sand_saves_pct'].includes(key)) return `${value.toFixed(1)}%`;
   if (key === 'drive_avg') return value.toFixed(1);
   if (key === 'scoring_avg' || key === 'putt_avg') return value.toFixed(3);
   if (key.startsWith('strokes_gained_')) {
@@ -96,8 +101,9 @@ function dedupe(rows: PlayerSeasonStat[]): PlayerSeasonStat[] {
     if (!first || !second) return;
     byKey.delete(first.rank <= second.rank ? b : a);
   };
-  keepBetter('strokes_gained_total', 'strokes_gained_tee_green');
-  keepBetter('scoring_avg', 'strokes_gained_total');
+  // Putting average and strokes gained putting measure the same skill: keep the
+  // better-ranked one so the module does not say "he putts well" twice.
+  keepBetter('putt_avg', 'strokes_gained_putting');
   return rows.filter((row) => byKey.has(row.key));
 }
 
@@ -134,13 +140,16 @@ export function selectPlayerSeason(
       })
     : [];
 
-  const rawStrengths = ranked
+  // Overlapping measures collapse BEFORE the headline is chosen, so a headline
+  // cannot be shadowed by its own duplicate lower down the module.
+  // (The scoring_avg vs strokes_gained_total rule was dead: that stat is never
+  // supplied by ingestion. See PLAYER_SKILL_KEYS.)
+  const deduped = dedupe(ranked);
+  const rawStrengths = deduped
     .filter((row) => row.rank <= Math.ceil(row.poolSize * PLAYER_STRENGTH_SHARE))
     .sort((a, b) => a.rank - b.rank);
   const headline = rawStrengths.find((row) => row.key === 'scoring_avg') ?? rawStrengths[0] ?? null;
-  let remaining = ranked.filter((row) => row.key !== headline?.key);
-  if (headline?.key === 'scoring_avg') remaining = remaining.filter((row) => row.key !== 'strokes_gained_total');
-  remaining = dedupe(remaining);
+  const remaining = deduped.filter((row) => row.key !== headline?.key);
   const strengths = remaining
     .filter((row) => row.rank <= Math.ceil(row.poolSize * PLAYER_STRENGTH_SHARE))
     .sort((a, b) => a.rank - b.rank)

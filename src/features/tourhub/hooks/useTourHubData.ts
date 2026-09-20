@@ -159,6 +159,9 @@ export interface TourPlayerStatistics {
   strokes_gained_total: number | null;
   strokes_gained_tee_green: number | null;
   strokes_gained: number | null;
+  // From the sr_player_statistics COLUMN, never raw_data (raw_data.strokes_gained
+  // is null on all 220 live 2026 PGA rows). Measured 2026-09-20: 220/220 populated.
+  strokes_gained_putting: number | null;
   // Joined player data
   player?: TourPlayer;
 }
@@ -523,6 +526,8 @@ export function useTourPlayerStatistics(seasonId?: string) {
           strokes_gained_total: rawExtracted.strokes_gained_total ?? null,
           strokes_gained_tee_green: rawExtracted.strokes_gained_tee_green ?? null,
           strokes_gained: rawExtracted.strokes_gained ?? null,
+          // Column, not raw_data.
+          strokes_gained_putting: stat.strokes_gained_putting ?? null,
           player: playerMap.get(stat.player_id),
         } as TourPlayerStatistics;
       });
@@ -832,6 +837,8 @@ export function useSinglePlayerStatistics(playerId: string | undefined) {
         strokes_gained_total: rawExtracted.strokes_gained_total ?? null,
         strokes_gained_tee_green: rawExtracted.strokes_gained_tee_green ?? null,
         strokes_gained: rawExtracted.strokes_gained ?? null,
+        // Column, not raw_data.
+        strokes_gained_putting: data.strokes_gained_putting ?? null,
       } as TourPlayerStatistics;
     },
     enabled: !!playerId,

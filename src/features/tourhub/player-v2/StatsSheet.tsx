@@ -194,8 +194,10 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
   const push = (l: string, v: string | null, rank?: RankRef) => {
     if (v !== null) overview.push({ label: l, value: v, rank });
   };
-  // UNRANKED: events_played, top_25s, cuts_made, birdies_per_round, scrambling
-  // and strokes_gained_total have no ranked category in useLeaderCategories.
+  // UNRANKED: events_played, top_25s and cuts_made have no ranked category in
+  // useLeaderCategories. birdies_per_round, scrambling and strokes_gained_total
+  // have no DATA at all - measured 2026-09-20, those keys are absent from
+  // raw_data on all 220 live 2026 PGA rows, so their rows never render.
   // They deliberately render a figure and nothing else. An uneven sheet that
   // is true beats an even one that is not - do NOT invent ranks for these.
   push(label('events_played'), fmtInt(playerStats.events_played));
@@ -228,23 +230,21 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
   // +/-3.00 ceiling that silently clipped the best players, and coloured
   // "above zero" amber. The sign plus the rank say more.
   const hasSG =
-    playerStats.strokes_gained_total !== null ||
     playerStats.strokes_gained_tee_green !== null ||
-    playerStats.strokes_gained !== null;
+    playerStats.strokes_gained_putting !== null;
 
   const sg: Row[] = [];
   const pushSG = (l: string, v: string | null, rank?: RankRef) => {
     if (v !== null) sg.push({ label: l, value: v, rank });
   };
-  pushSG(label('strokes_gained_total'), fmtSG(playerStats.strokes_gained_total));
   pushSG(
     label('strokes_gained_tee_green'),
     fmtSG(playerStats.strokes_gained_tee_green),
     rankOf('strokes_gained_tee_green'),
   );
   pushSG(
-    label('strokes_gained_around_green'),
-    fmtSG(playerStats.strokes_gained),
+    label('strokes_gained_putting'),
+    fmtSG(playerStats.strokes_gained_putting),
     rankOf('strokes_gained_putting'),
   );
 
