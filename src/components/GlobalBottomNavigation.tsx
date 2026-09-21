@@ -150,22 +150,66 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
      handoff record is ARMED only once we have actually left step 1 — the review
      handoff navigates through afterSheetHistorySettled, so at the moment it is
      written neither the path nor the overlay has changed yet, and an unarmed
-     rule would reopen step 1 over its own handoff. */
+     rule would reopen step 1 over its own handoff.
+
+     THE REOPEN IS BOUNDED. It fires ONLY for a BACK navigation that lands
+     straight back on the page step 1 was opened from, with the composer closed.
+     It is disarmed immediately and permanently by: completing a post or review
+     (notifyComposerCompleted, called by the composers), navigating anywhere
+     other than that page, closing the composer by anything other than back,
+     backgrounding the app, or firing once — it is one-shot. Path equality alone
+     must NEVER be the trigger: a member who posts, carries on, and comes back
+     to the Clubhouse an hour later would get the sheet on its own. The record
+     is in memory only (see composerFlowStore) so a cold launch starts clean. */
   const studioOpen = usePostStudioStore((s) => s.isOpen);
   const handoff = useComposerFlowStore((s) => s.handoff);
   const armHandoff = useComposerFlowStore((s) => s.arm);
   const clearHandoff = useComposerFlowStore((s) => s.clearHandoff);
+
+  /* Was the navigation we are reacting to a BACK? popstate fires before the
+     router commits the location, so the effect below reads this flag and
+     immediately spends it. */
+  const navWasBackRef = useRef(false);
+  useEffect(() => {
+    const onPop = () => {
+      navWasBackRef.current = true;
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  /* Backgrounded and restored → the handoff is stale intent; forget it. */
+  useEffect(() => {
+    const onHidden = () => {
+      if (document.visibilityState === 'hidden') useComposerFlowStore.getState().clearHandoff();
+    };
+    document.addEventListener('visibilitychange', onHidden);
+    return () => document.removeEventListener('visibilitychange', onHidden);
+  }, []);
+
   useEffect(() => {
     if (!handoff) return;
-    const left = studioOpen || location.pathname !== handoff.returnPath;
+    const onReturnPath = location.pathname === handoff.returnPath;
+    const left = studioOpen || !onReturnPath;
+
     if (!handoff.armed) {
-      if (left) armHandoff();
+      if (left) armHandoff(location.pathname);
       return;
     }
-    if (!left) {
+
+    const wasBack = navWasBackRef.current;
+    navWasBackRef.current = false;
+
+    // Moved on somewhere else entirely → this is no longer a return.
+    if (!onReturnPath && location.pathname !== handoff.awayPath) {
       clearHandoff();
-      setCreateOpen(true);
+      return;
     }
+    if (left) return; // still inside the composer
+
+    // Back on the page step 1 was opened from with the composer closed.
+    clearHandoff(); // one-shot either way: it fires or it expires
+    if (wasBack) setCreateOpen(true);
   }, [handoff, studioOpen, location.pathname, armHandoff, clearHandoff]);
 
   // Drawer / sheet active → force expanded (pill sits below sheet scrim).
