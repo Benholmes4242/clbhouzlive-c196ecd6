@@ -55,7 +55,7 @@ import { surnameOf } from '../_shared/playerName';
 import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
-import { resolveBoardEntity, teamNamesNeedInitials } from '../_shared/boardEntity';
+import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../_shared/boardEntity';
 
 // Dark ramp, imported so the board follows the tour token file (was four pinned light literals).
 const INK = TOUR_INK;
@@ -309,7 +309,7 @@ export function boardGridTemplate(c: BoardColumns): string {
 // NAME LADDER (2.5)
 // ---------------------------------------------------------------------------
 
-type NameTier = 'full' | 'short' | 'surname';
+type NameTier = BoardNameTier;
 
 function nameAtTier(fullName: string, tier: NameTier): string {
   if (tier === 'full') return fullName;
@@ -334,7 +334,8 @@ let warnedOverflow = false;
  * if no tier fits take width from the round cells (26 -> 22 floor).
  */
 function resolveLayout(
-  names: string[],
+  entries: BoardEntry[],
+  teamInitials: boolean,
   base: BoardColumns,
   containerW: number,
 ): { columns: BoardColumns; tier: NameTier } {
@@ -350,24 +351,32 @@ function resolveLayout(
     (base.showPrize ? PRIZE_W : 0) +
     (trackCount - 1) * base.gap;
 
-  const widest = (tier: NameTier) =>
-    names.reduce((m, n) => Math.max(m, measureText(nameAtTier(n, tier), font)), 0);
+  const widest = (tier: NameTier) => entries.reduce((maximum, entry) => {
+    const entity = resolveBoardEntity(entry, teamInitials, tier);
+    const lines = entity.kind === 'team'
+      ? entity.lines
+      : [nameAtTier(entity.lines[0] ?? '', tier)];
+    return Math.max(maximum, ...lines.map((line) => measureText(line, font)));
+  }, 0);
 
-  const tiers: NameTier[] = ['full', 'short', 'surname'];
+  // A collision board may never descend to bare surnames: Kim / Kim and
+  // Iwai / Iwai are not compact labels, they are the wrong names.
+  const tiers: NameTier[] = teamInitials ? ['full', 'short'] : ['full', 'short', 'surname'];
   for (const tier of tiers) {
     const need = Math.ceil(widest(tier)) + 2; // 2px optical breathing room
     const avail = containerW - fixed - boardRoundsWidth(base);
     if (need <= avail) return { columns: base, tier };
   }
 
-  // Surname alone still overflows: take the shortfall from the ROUND CELLS.
-  const need = Math.ceil(widest('surname')) + 2;
+  // The safe floor still overflows: take the shortfall from the ROUND CELLS.
+  const floorTier: NameTier = teamInitials ? 'short' : 'surname';
+  const need = Math.ceil(widest(floorTier)) + 2;
   const n = base.rounds.length;
   let cellW = base.cellW;
   while (cellW > CELL_W_FLOOR) {
     cellW -= 1;
     const avail = containerW - fixed - (n * cellW + Math.max(0, n - 1) * base.gap);
-    if (need <= avail) return { columns: { ...base, cellW }, tier: 'surname' };
+    if (need <= avail) return { columns: { ...base, cellW }, tier: floorTier };
   }
   if (!warnedOverflow) {
     warnedOverflow = true;
@@ -377,7 +386,7 @@ function resolveLayout(
       `[BoardTable] name column exhausted: surname needs ${need}px, round cells at the ${CELL_W_FLOOR}px floor at container ${containerW}px.`,
     );
   }
-  return { columns: { ...base, cellW: CELL_W_FLOOR }, tier: 'surname' };
+  return { columns: { ...base, cellW: CELL_W_FLOOR }, tier: floorTier };
 }
 
 /* Status vocabulary lives in _shared/resultStatus.ts — see MDF note there. */
@@ -426,16 +435,11 @@ export function BoardTable({
     () => teamInitials ?? teamNamesNeedInitials(entries),
     [teamInitials, entries],
   );
-  const names = useMemo(
-    () => entries
-      .filter((e) => !isDemoted(e.status) && !e.team)
-      .map((e) => resolveBoardEntity(e, resolvedTeamInitials).lines[0] ?? ''),
-    [entries, resolvedTeamInitials],
-  );
+  const layoutEntries = useMemo(() => entries.filter((e) => !isDemoted(e.status)), [entries]);
 
   const { columns, tier } = useMemo(
-    () => resolveLayout(names, base, containerW),
-    [names, base, containerW],
+    () => resolveLayout(layoutEntries, resolvedTeamInitials, base, containerW),
+    [layoutEntries, resolvedTeamInitials, base, containerW],
   );
 
   const template = boardGridTemplate(columns);
@@ -596,7 +600,7 @@ export function BoardTable({
     const roundVals = [e.round_1, e.round_2, e.round_3, e.round_4];
     const pid = e.player?.id;
     const mov = !demotedRow ? movementMap.get(pid ?? e.team?.id ?? e.id) : undefined;
-    const entity = resolveBoardEntity(e, resolvedTeamInitials);
+    const entity = resolveBoardEntity(e, resolvedTeamInitials, tier);
     const fullName = entity.lines[0] ?? '';
     const nameText = columns.preTournament ? fullName : nameAtTier(fullName, tier);
     const accessibleName = entity.lines.filter(Boolean).join(' / ');
@@ -825,7 +829,7 @@ export function BoardTable({
   demoted.forEach((e) => parts.push(renderRow(e, { demoted: true })));
 
   return (
-    <div ref={rootRef}>
+    <div ref={rootRef} data-board-name-tier={tier}>
       {renderHeader()}
       {parts}
     </div>
