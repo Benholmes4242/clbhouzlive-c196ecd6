@@ -794,16 +794,12 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
 // have succeeded. A re-queued round must never count its attempts twice.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Awards are only judged on rounds played recently; older rounds still fold
- *  into the bests. A round synced months late would otherwise be measured
- *  against a bests table that already holds rounds played AFTER it, and take a
- *  gold it never earned. The bests survive that because they are order-free
- *  aggregates; awards are not. Same shape as the two-day legend gate. */
 /* THE AGE GATE IS LEGEND_NOTIFY_MAX_AGE_DAYS — two days, on play_date, never
    created_at. History is sealed by awards_evaluated_at, so the only rounds that
-   reach this code are new ones and the gate's job is to catch a round that
-   arrives days after it was played. The awards gate and the notification gate
-   are the SAME gate: a round too old to be told about is too old to be
+   reach this code are new ones, and the gate's job is to catch a round that
+   arrives days after it was played: it still folds into the bests and still
+   gets marked, it simply earns nothing. The awards gate and the notification
+   gate are the SAME gate — a round too old to be told about is too old to be
    celebrated. One constant, one meaning. */
 
 type UnitCandidate = {
