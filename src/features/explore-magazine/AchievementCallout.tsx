@@ -324,13 +324,13 @@ export function RoundStatStrip({
 }) {
   const { t } = useTranslation('courses');
   const hasNet = coursePar != null && net != null;
+  const tier = callout && 'tier' in callout ? callout.tier : 'ink';
   const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} tier={tier} align="card" />;
   if (!callout && !hasNet) return rarity;
 
   const ord = callout?.kind === 'rank_up' && callout.rank != null
     ? standingOrdinal(callout.rank, locale)
     : null;
-  const tier = callout && 'tier' in callout ? callout.tier : 'ink';
   const featLabel = (feat: ExploreRoundFeat): string => {
     switch (feat.kind) {
       case 'ace': return t('amateur.stream.callout.aceCount', { count: feat.count, defaultValue_one: 'Hole in one', defaultValue_other: '{{count}} holes in one' });
