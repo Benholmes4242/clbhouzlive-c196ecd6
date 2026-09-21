@@ -175,14 +175,7 @@
     "reviews": "No reviews in {{scope}} yet."
    },
    "enrichment": {
-    "area": {
-     "clubhouse": "clubhouse",
-     "conditions": "condition",
-     "design": "design",
-     "facilities": "facilities"
-    },
-    "photos": "{{count}} photos",
-    "strongest": "Strongest on {{area}}"
+    "photos": "{{count}} photos"
    },
    "failed": "This did not load.",
    "headline": {

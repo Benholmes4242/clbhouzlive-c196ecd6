@@ -7,11 +7,18 @@ import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/use
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Heart, MessageCircle } from 'lucide-react';
-import { A, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { storyTime } from '@/features/tourhub/news/storyTime';
 import { r } from '@/lib/radius';
-import { CHIP_GLASS_CLASS, PHOTO_FIG_SHADOW, PHOTO_FIG_UNDER } from '@/styles/photoScrim';
+import {
+  CHIP_GLASS_CLASS,
+  PHOTO_FIG_SHADOW,
+  PHOTO_FIG_UNDER,
+  PHOTO_REVIEW_FILL,
+  PHOTO_REVIEW_LABEL,
+  PHOTO_REVIEW_TRACK,
+} from '@/styles/photoScrim';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
@@ -181,7 +188,7 @@ function CourseRankChip({ item }: { item: StreamItem }) {
 }
 
 /** §4b, by type. A story carries none; a moment carries none. */
-function chipsFor(item: StreamItem, t: (k: string, f?: string) => string, locale: string) {
+function chipsFor(item: StreamItem, t: (k: string, f?: string | Record<string, unknown>) => string, locale: string) {
   const out: React.ReactNode[] = [];
   const { facts, kind } = item;
 
@@ -211,6 +218,35 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string, locale
         stacked
         locale={locale}
       />,
+    );
+  }
+
+  if (kind === 'review' && (facts.photoCount ?? 0) > 1) {
+    out.push(
+      <span
+        key="review-photos"
+        className={CHIP_GLASS_CLASS}
+        data-review-photo-count="true"
+        style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          zIndex: 2,
+          display: 'inline-flex',
+          alignItems: 'center',
+          minHeight: 28,
+          padding: '4px 8px',
+          boxSizing: 'border-box',
+          borderRadius: 8,
+          color: DISCOVER_FACT,
+          fontFamily: SANS,
+          fontSize: 10,
+          fontWeight: 700,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {t('amateur.stream.enrichment.photos', { count: facts.photoCount })}
+      </span>,
     );
   }
 
@@ -247,28 +283,20 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string, locale
   return out;
 }
 
-export function strongestReviewArea(breakdown: ReviewBreakdown | undefined): keyof ReviewBreakdown | null {
-  if (!breakdown) return null;
-  const entries = Object.entries(breakdown) as Array<[keyof ReviewBreakdown, number | null]>;
-  if (entries.some(([, score]) => score == null)) return null;
-  const ordered = entries
-    .map(([area, score]) => [area, score as number] as const)
-    .sort((a, b) => b[1] - a[1]);
-  return ordered[0][1] - ordered[1][1] >= 0.5 ? ordered[0][0] : null;
-}
-
 function WhoLine({
   item,
   size,
   onPhoto,
   onWhoTap,
   engagement,
+  reviewIdentity,
 }: {
   item: StreamItem;
   size: CardSize;
   onPhoto: boolean;
   onWhoTap?: () => void;
   engagement?: RoundCardEngagement | null;
+  reviewIdentity?: { course: string | null; scope: string | null; date: string | null };
 }) {
   const { t } = useTranslation('courses');
   const who = item.who;
@@ -321,6 +349,73 @@ function WhoLine({
     event.preventDefault();
   };
 
+  const avatar = who?.user_id ? (
+    <span
+      role={onWhoTap ? 'button' : undefined}
+      tabIndex={onWhoTap ? 0 : undefined}
+      onClick={(event) => {
+        if (!onWhoTap) return;
+        event.stopPropagation();
+        onWhoTap();
+      }}
+      onKeyDown={(event) => {
+        if (!onWhoTap || (event.key !== 'Enter' && event.key !== ' ')) return;
+        event.preventDefault();
+        event.stopPropagation();
+        onWhoTap();
+      }}
+      style={{ display: 'inline-flex', flexShrink: 0, cursor: onWhoTap ? 'pointer' : 'default' }}
+    >
+      <SquircleAvatar size={20} src={who.photo_url} alt={name} userId={who.user_id} hairlineRing hideRing={false} />
+    </span>
+  ) : null;
+
+  if (reviewIdentity) {
+    const right = [reviewIdentity.scope, reviewIdentity.date].filter(Boolean).join(' · ');
+    return (
+      <div
+        className="explore-who-line"
+        data-review-identity="true"
+        style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, overflow: 'hidden' }}
+      >
+        {avatar}
+        <span
+          data-review-member-name="true"
+          style={{
+            flex: '0 1 auto', maxWidth: '28%', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, textShadow: HERO_TEXT_SHADOW,
+          }}
+        >
+          {name}
+        </span>
+        {who && reviewIdentity.course ? <span aria-hidden style={{ flex: '0 0 auto', color: subColor }}>·</span> : null}
+        {reviewIdentity.course ? (
+          <span
+            data-review-course-name="true"
+            style={{
+              flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: SANS, fontSize: 12,
+              fontWeight: 600, color: subColor, textShadow: HERO_TEXT_SHADOW,
+            }}
+          >
+            {reviewIdentity.course}
+          </span>
+        ) : null}
+        {right ? (
+          <span
+            data-review-identity-right="true"
+            style={{
+              marginLeft: 'auto', flex: '0 0 auto', whiteSpace: 'nowrap', fontFamily: SANS,
+              fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase',
+              color: PHOTO_REVIEW_LABEL, textShadow: HERO_TEXT_SHADOW,
+            }}
+          >
+            {right}
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
     <div
       className="explore-who-line"
@@ -333,28 +428,7 @@ function WhoLine({
         overflow: 'hidden',
       }}
     >
-      {who?.user_id ? (
-        <span
-          role={onWhoTap ? 'button' : undefined}
-          tabIndex={onWhoTap ? 0 : undefined}
-          onClick={(event) => {
-            if (!onWhoTap) return;
-            /* §4g THE WHO-LINE IS A SECOND TARGET. */
-            event.stopPropagation();
-            onWhoTap();
-          }}
-          style={{ display: 'inline-flex', flexShrink: 0, cursor: onWhoTap ? 'pointer' : 'default' }}
-        >
-          <SquircleAvatar
-            size={20}
-            src={who.photo_url}
-            alt={name}
-            userId={who.user_id}
-            hairlineRing
-            hideRing={false}
-          />
-        </span>
-      ) : null}
+      {avatar}
       <div
         style={{
           display: 'flex',
@@ -466,6 +540,53 @@ function WhoLine({
         </span>
       ) : null}
     </div>
+  );
+}
+
+const REVIEW_BREAKDOWN_AREAS = [
+  ['design', 'design'],
+  ['conditions', 'condition'],
+  ['clubhouse', 'clubhouse'],
+  ['facilities', 'facilities'],
+] as const;
+
+function ReviewBreakdownRail({ breakdown }: { breakdown: ReviewBreakdown | undefined }) {
+  const { t } = useTranslation('courses');
+  if (!breakdown || REVIEW_BREAKDOWN_AREAS.some(([field]) => breakdown[field] == null)) return null;
+
+  return (
+    <ul
+      data-review-breakdown-rail="true"
+      style={{ listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, margin: 0, padding: 0 }}
+    >
+      {REVIEW_BREAKDOWN_AREAS.map(([field, labelKey]) => {
+        const score = breakdown[field] as number;
+        const label = t(`review.subscore.${labelKey}`);
+        const outOfTen = t('statBrowse.reviews.outOfTen');
+        const tone = courseSubScoreTone(score);
+        return (
+          <li key={field} aria-label={`${label} ${score.toFixed(1)} ${outOfTen}`} style={{ minWidth: 0 }}>
+            <span
+              aria-hidden="true"
+              title={label}
+              style={{
+                display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                color: PHOTO_REVIEW_LABEL, fontFamily: SANS, fontSize: 8, fontWeight: 700,
+                letterSpacing: '0.10em', textTransform: 'uppercase', textShadow: HERO_TEXT_SHADOW,
+              }}
+            >
+              {label}
+            </span>
+            <span aria-hidden style={{ display: 'block', height: 3, marginTop: 5, borderRadius: 2, background: PHOTO_REVIEW_TRACK }}>
+              <span
+                data-review-breakdown-fill={field}
+                style={{ display: 'block', width: `${Math.max(0, Math.min(100, score * 10))}%`, height: '100%', borderRadius: 2, background: tone === A.GREEN ? A.GREEN : PHOTO_REVIEW_FILL }}
+              />
+            </span>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -593,13 +714,13 @@ export function ExploreCard({
   );
 
   const leadReview = size === 'lead' && item.kind === 'review';
-  const headlineLineClamp = size === 'lead' ? 3 : 2;
+  const headlineLineClamp = leadReview ? 2 : size === 'lead' ? 3 : 2;
   const headlineNode = (
     <div
       data-explore-headline="true"
       data-explore-line-clamp={headlineLineClamp}
       style={{
-        marginTop: size === 'pair' ? 4 : 6,
+        marginTop: leadReview ? 0 : size === 'pair' ? 4 : 6,
         fontFamily: SANS,
         fontSize: leadReview ? 20 : size === 'lead' ? 22 : size === 'std' ? 16 : 13,
         fontWeight: 700,
@@ -650,41 +771,9 @@ export function ExploreCard({
       {storyStandfirst}
     </div>
   ) : null;
-  const strongestArea = item.kind === 'review' ? strongestReviewArea(item.facts.breakdown) : null;
-  const enrichmentNode = item.kind === 'review' ? (
-    <div
-      data-review-enrichment-lane="true"
-      style={{
-        height: 18,
-        marginTop: 4,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-        minWidth: 0,
-        overflow: 'hidden',
-        color: 'rgba(248,250,252,0.76)',
-        fontFamily: SANS,
-        fontSize: 11,
-        fontWeight: 650,
-        lineHeight: '18px',
-        whiteSpace: 'nowrap',
-        textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
-      }}
-    >
-      {strongestArea ? (
-        <span data-review-strongest="true" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {t('amateur.stream.enrichment.strongest', {
-            area: t(`amateur.stream.enrichment.area.${strongestArea}`),
-          })}
-        </span>
-      ) : null}
-      {(item.facts.photoCount ?? 0) > 1 ? (
-        <span data-review-photo-count="true" style={{ marginLeft: 'auto', flex: '0 0 auto' }}>
-          {t('amateur.stream.enrichment.photos', { count: item.facts.photoCount })}
-        </span>
-      ) : null}
-    </div>
-  ) : null;
+  const reviewIdentity = leadReview
+    ? { course: kickerPartsValue.course, scope: kickerPartsValue.scope, date: kickerDate }
+    : null;
 
   const photo = (
     <CourseImageFallback
@@ -719,13 +808,19 @@ export function ExploreCard({
             />
             <span
               data-explore-hero-copy="true"
-              style={{ position: 'relative', zIndex: 1, display: 'block', paddingInline: 16 }}
+              style={leadReview
+                ? { position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px 16px' }
+                : { position: 'relative', zIndex: 1, display: 'block', paddingInline: 16 }}
             >
-              <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
+              {leadReview ? (
+                <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} reviewIdentity={reviewIdentity ?? undefined} />
+              ) : (
+                <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
+              )}
               {headlineNode}
               {standfirstNode}
-               {enrichmentNode}
-              <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} />
+              {leadReview ? <ReviewBreakdownRail breakdown={item.facts.breakdown} /> : null}
+              {!leadReview ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
             </span>
             {/* §3 THE BOTTOM LANE IS 16px AND CARRIES NO TRACE. On-photo is now
                 the REVIEW shape, and a review has no round shape to draw; the
@@ -814,8 +909,7 @@ export function ExploreCard({
         /* §3d text inside a card's caption area is inset a further 4px. */
         <span style={{ display: 'block', paddingInline: 4, marginTop: item.kind === 'round' && size !== 'pair' && (callout || (item.facts.net != null && item.facts.course_handicap != null && item.facts.course_par != null)) ? 0 : 8 }}>
           {kicker}
-          {headlineNode}
-           {enrichmentNode}
+           {headlineNode}
             <WhoLine item={item} size={size} onPhoto={false} onWhoTap={onWhoTap} engagement={engagement} />
         </span>
       ) : null}

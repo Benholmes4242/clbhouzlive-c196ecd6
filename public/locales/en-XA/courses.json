@@ -172,14 +172,7 @@
     "reviews": "[No reviews in {{scope}} yet.]"
    },
    "enrichment": {
-    "area": {
-     "clubhouse": "[~~ĉļúƀĥőúšé~~]",
-     "conditions": "[~~ĉőñđíţíőñ~~]",
-     "design": "[~~đéšíĝñ~~]",
-     "facilities": "[~~ƒáĉíļíţíéš~~]"
-    },
-    "photos": "[~~{{count}} ƥĥőţőš~~]",
-    "strongest": "[~~Šţřőñĝéšţ őñ {{area}}~~]"
+    "photos": "[~~{{count}} ƥĥőţőš~~]"
    },
    "failed": "[Thís díd nöt löåd. one]",
    "headline": {

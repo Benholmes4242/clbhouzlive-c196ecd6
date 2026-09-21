@@ -2,7 +2,7 @@ import React from 'react';
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { ExploreCard, strongestReviewArea } from '@/features/explore-magazine/ExploreCard';
+import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import { fullWidthCardSize } from '@/features/explore-magazine/ExploreMagazine';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
@@ -83,7 +83,7 @@ function textSlots(container: HTMLElement, name: string) {
 }
 
 describe('Explore card shapes', () => {
-  it('gates the stacked review tier word to Exceptional and reserves enrichment space', () => {
+  it('gates the stacked review tier word to Exceptional without an enrichment lane', () => {
     const { container, getByText } = render(
       <ExploreCard item={{ ...review(), facts: { ...review().facts, rating: 9.4 } }} size="lead" shape={null} onTap={() => undefined} />,
     );
@@ -102,9 +102,7 @@ describe('Explore card shapes', () => {
     expect(unit?.style.textTransform).toBe('uppercase');
     expect(unit?.style.color).toBe(figure?.style.color);
     expect(unit?.style.textShadow).toBe(figure?.style.textShadow);
-    const lane = container.querySelector<HTMLElement>('[data-review-enrichment-lane="true"]');
-    expect(lane?.style.height).toBe('18px');
-    expect(lane?.textContent).toBe('');
+    expect(container.querySelector('[data-review-enrichment-lane="true"]')).toBeNull();
   });
 
   it('renders a below-Exceptional review as a stacked white figure with no unit', () => {
@@ -132,7 +130,7 @@ describe('Explore card shapes', () => {
     expect(chip?.querySelector<HTMLElement>('[data-figure-chip-unit="true"]')?.style.fontSize).toBe('10px');
   });
 
-  it('shows image-only photo copy and a clear strongest category without changing reserved geometry', () => {
+  it('moves a multiple-photo count into the top-right glass chip and renders all four breakdowns', () => {
     const enriched = {
       ...review(),
       facts: {
@@ -144,17 +142,32 @@ describe('Explore card shapes', () => {
     const { container } = render(
       <ExploreCard item={enriched} size="lead" shape={null} onTap={() => undefined} />,
     );
-    const lane = container.querySelector<HTMLElement>('[data-review-enrichment-lane="true"]');
-    expect(lane?.style.height).toBe('18px');
-    expect(container.querySelector('[data-review-strongest="true"]')).not.toBeNull();
-    expect(container.querySelector('[data-review-photo-count="true"]')).not.toBeNull();
+    const rail = container.querySelector<HTMLElement>('[data-review-breakdown-rail="true"]');
+    const photoChip = container.querySelector<HTMLElement>('[data-review-photo-count="true"]');
+    expect(rail?.tagName).toBe('UL');
+    expect(rail?.children).toHaveLength(4);
+    expect(rail?.children[0]?.getAttribute('aria-label')).toContain('9.2');
+    expect(rail?.children[0]?.getAttribute('aria-label')).toContain('outOfTen');
+    expect(container.querySelector<HTMLElement>('[data-review-breakdown-fill="design"]')?.style.width).toBe('92%');
+    expect(container.querySelector<HTMLElement>('[data-review-breakdown-fill="design"]')?.style.background).toBe('rgb(52, 211, 153)');
+    expect(container.querySelector<HTMLElement>('[data-review-breakdown-fill="conditions"]')?.style.background).toBe('rgba(255, 255, 255, 0.72)');
+    expect(photoChip?.textContent).toContain('photos');
+    expect(photoChip?.style.right).toBe('8px');
+    expect(photoChip?.style.whiteSpace).toBe('nowrap');
   });
 
-  it('requires all four scores and a 0.5 lead for strongest on', () => {
-    expect(strongestReviewArea({ design: 9, conditions: 8.5, clubhouse: 8.4, facilities: 8 })).toBe('design');
-    expect(strongestReviewArea({ design: 9, conditions: 8.6, clubhouse: 8.4, facilities: 8 })).toBeNull();
-    expect(strongestReviewArea({ design: 9, conditions: 8.5, clubhouse: 9, facilities: 8 })).toBeNull();
-    expect(strongestReviewArea({ design: 9, conditions: 8.5, clubhouse: null, facilities: 8 })).toBeNull();
+  it('renders the breakdown rail all-or-none without reserving a gap', () => {
+    for (const breakdown of [
+      undefined,
+      { design: 9, conditions: 8.5, clubhouse: null, facilities: 8 },
+    ]) {
+      const { container, unmount } = render(
+        <ExploreCard item={{ ...review(), facts: { ...review().facts, breakdown } }} size="lead" shape={null} onTap={() => undefined} />,
+      );
+      expect(container.querySelector('[data-review-breakdown-rail="true"]')).toBeNull();
+      expect(container.querySelector<HTMLElement>('[data-explore-hero-copy="true"]')?.style.gap).toBe('12px');
+      unmount();
+    }
   });
 
   it('renders a short review ON the photo at the lead minimum height with its reserved lanes', () => {
@@ -163,18 +176,18 @@ describe('Explore card shapes', () => {
     );
 
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
-    const kicker = container.querySelector<HTMLElement>('[data-explore-hero-kicker="true"]');
+    const identity = container.querySelector<HTMLElement>('[data-review-identity="true"]');
     const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
     const bottom = container.querySelector<HTMLElement>('[data-explore-hero-bottom-lane="true"]');
     const chip = container.querySelector<HTMLElement>('.standout-figure-chip');
 
     expect(onPhoto?.style.minHeight).toBe('340px');
     expect(onPhoto?.style.flexDirection).toBe('column');
-    expect(kicker).not.toBeNull();
+    expect(identity).not.toBeNull();
     expect(headline?.style.fontSize).toBe('20px');
     expect(headline?.style.lineHeight).toBe('1.12');
     expect(headline?.style.letterSpacing).toBe('-0.02em');
-    expect(headline?.dataset.exploreLineClamp).toBe('3');
+    expect(headline?.dataset.exploreLineClamp).toBe('2');
     expect(headline?.style.fontStyle).toBe('italic');
     expect(bottom?.style.height).toBe('16px');
     expect(chip?.style.top).toBe('8px');
@@ -208,7 +221,7 @@ describe('Explore card shapes', () => {
     const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
     expect(onPhoto?.style.minHeight).toBe('340px');
     expect(onPhoto?.style.height).toBe('');
-    expect(headline?.dataset.exploreLineClamp).toBe('3');
+    expect(headline?.dataset.exploreLineClamp).toBe('2');
   });
 
   it('uses the ruled on-photo colors and shadows for a review', () => {
@@ -216,17 +229,16 @@ describe('Explore card shapes', () => {
       <ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />,
     );
 
-    const kicker = container.querySelector<HTMLElement>('[data-explore-hero-kicker="true"] > div');
+    const identity = container.querySelector<HTMLElement>('[data-review-identity="true"]');
     const name = getByText('danny.akers1');
-    const date = container.querySelector<HTMLElement>('[data-explore-kicker-date="true"]');
+    const right = container.querySelector<HTMLElement>('[data-review-identity-right="true"]');
 
-    expect(kicker?.style.color).toBe('rgb(255, 255, 255)');
-    expect(kicker?.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
+    expect(identity).not.toBeNull();
+    expect(container.querySelector('[data-explore-hero-kicker="true"]')).toBeNull();
     expect(name.style.color).toBe('rgb(255, 255, 255)');
     expect(name.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
-    expect(date?.style.color).toBe('rgb(255, 255, 255)');
-    expect(date?.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
-    expect(container.querySelector('.explore-who-line')?.textContent).not.toContain(date?.textContent ?? 'Sep');
+    expect(right?.style.flex).toBe('0 0 auto');
+    expect(right?.style.whiteSpace).toBe('nowrap');
   });
 
   it('keeps the viewer name amber on a review', () => {
@@ -237,36 +249,47 @@ describe('Explore card shapes', () => {
     expect(getByText('You').style.color).not.toBe('rgb(255, 255, 255)');
   });
 
-  it('gives a review no REVIEW kicker prefix', () => {
+  it('puts the member and course first with the scope and date pushed right', () => {
     const { container } = render(
-      <ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={{ ...review(), ring: 'world' }} size="lead" shape={null} onTap={() => undefined} />,
     );
-    const kicker = container.querySelector<HTMLElement>('[data-explore-hero-kicker="true"]');
-    expect(kicker?.textContent ?? '').not.toMatch(/review/i);
-    expect(kicker?.textContent ?? '').toContain('The Addington Golf Club');
+    const identity = container.querySelector<HTMLElement>('[data-review-identity="true"]');
+    expect(identity?.textContent).toContain('danny.akers1·The Addington Golf Club');
+    expect(container.querySelector('[data-review-identity-right="true"]')?.textContent).toContain('World ·');
   });
 
-  it('moves the round and review date to a nonshrinking white kicker slot', () => {
-    for (const item of [round(), review()]) {
+  it('keeps review course and right group while the member name yields first', () => {
+    for (const item of [review(), { ...review(), ring: 'club' as const }]) {
       const longCourse = {
         ...item,
+        who: { ...item.who, display_name: 'A member with an exceptionally long display name' },
         subject: { ...item.subject, course_name: "Prince's Golf Club (Shore, Dunes & Himalayas)" },
         facts: { ...item.facts, play_date: '2026-09-03' },
       };
       const { container, unmount } = render(
-        <ExploreCard item={longCourse} size={item.kind === 'review' ? 'lead' : 'std'} shape={null} onTap={() => undefined} />,
+        <ExploreCard item={longCourse} size="lead" shape={null} onTap={() => undefined} />,
       );
-      const course = container.querySelector<HTMLElement>('[data-explore-kicker-course="true"]');
-      const date = container.querySelector<HTMLElement>('[data-explore-kicker-date="true"]');
+      const member = container.querySelector<HTMLElement>('[data-review-member-name="true"]');
+      const course = container.querySelector<HTMLElement>('[data-review-course-name="true"]');
+      const right = container.querySelector<HTMLElement>('[data-review-identity-right="true"]');
       expect(course?.textContent).toContain("Prince's Golf Club");
-      expect(course?.style.overflow).toBe('hidden');
+      expect(course?.style.flex).toBe('1 1 auto');
       expect(course?.style.textOverflow).toBe('ellipsis');
-      expect(date?.style.flex).toBe('0 0 auto');
-      expect(date?.style.whiteSpace).toBe('nowrap');
-      expect(date?.style.color).toBe('rgb(255, 255, 255)');
-      expect(container.querySelector('.explore-who-line')?.textContent).not.toContain(date?.textContent ?? 'Sep');
+      expect(member?.style.overflow).toBe('hidden');
+      expect(member?.style.textOverflow).toBe('ellipsis');
+      expect(member?.style.maxWidth).toBe('28%');
+      expect(right?.style.flex).toBe('0 0 auto');
+      expect(right?.style.whiteSpace).toBe('nowrap');
+      if (item.ring === 'club') expect(right?.textContent).not.toContain('·');
       unmount();
     }
+  });
+
+  it.each([1, 5])('shows the review photo chip only above one photo (%i)', (photoCount) => {
+    const { container } = render(
+      <ExploreCard item={{ ...review(), facts: { ...review().facts, photoCount } }} size="lead" shape={null} onTap={() => undefined} />,
+    );
+    expect(container.querySelector('[data-review-photo-count="true"]') != null).toBe(photoCount > 1);
   });
 
   it('renders a round UNDER the photo at every position', () => {
