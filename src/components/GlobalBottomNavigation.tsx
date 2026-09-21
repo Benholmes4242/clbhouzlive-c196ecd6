@@ -17,7 +17,8 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 import { r } from '@/lib/radius';
 import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
 import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
-import CreateSheetV3 from '@/features/post-v2/components/CreateSheetV3';
+import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
+import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
 import { NAV_CLEARANCE, NAV_PILL_H_FALLBACK, NAV_PILL_H_VAR } from '@/lib/navClearance';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
