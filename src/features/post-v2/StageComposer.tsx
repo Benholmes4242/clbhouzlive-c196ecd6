@@ -27,6 +27,7 @@ import { POST_COMPOSER_Z } from '@/lib/zLayers';
 import { useStageComposer, MAX_MEDIA, type StageMediaItem } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { notifyComposerCompleted } from '@/features/composer-flow/composerFlowStore';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
@@ -403,6 +404,9 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         authorUsername,
       });
       submittedRef.current = true;
+      // A finished job is not a change of mind: the composer-flow step 1 must
+      // never come back on top of the success screen.
+      notifyComposerCompleted();
       // Analytics callsite: post_submitted
       analyticsEvents.track('post_submitted', {
         mode,

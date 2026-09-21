@@ -9,6 +9,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { notifyComposerCompleted } from '@/features/composer-flow/composerFlowStore';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -638,6 +639,9 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         state: composer.state,
       });
       submittedRef.current = true;
+      // A finished job is not a change of mind: the composer-flow step 1 must
+      // never come back on top of the receipt.
+      notifyComposerCompleted();
       composer.clearDraft();
 
       // 3. THE ROWS — milliseconds, because the bytes are already at rest.
