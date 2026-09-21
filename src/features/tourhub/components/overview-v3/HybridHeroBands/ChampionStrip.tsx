@@ -155,7 +155,10 @@ export function ChampionStrip({
             style={{
               ...NUMERIC_STYLE,
               fontSize: 26,
-              fontWeight: 300,
+              // Weight matches the board's TOT figures below (700) — the
+              // champion's score must not read lighter than the same figure
+              // in row 1 of the board.
+              fontWeight: 700,
               // CORRECTION 1 (BRIEF_TOUR_OVERVIEW_CHAMPION): the score takes the
               // canonical to-par ramp — red under par, muted even — never gold.
               // Gold stays on the eyebrow, trophy glyph and avatar ring only.
