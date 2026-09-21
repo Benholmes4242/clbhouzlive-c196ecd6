@@ -147,6 +147,8 @@ export interface StreamFacts {
   holes_in_one?: number | null;
   clean_card?: boolean | null;
   is_course_record?: boolean | null;
+  /** Strokes between the current gross record and rank 2. No rank 2 means null. */
+  record_margin?: number | null;
   hcp_at_time?: number | null;
   /** C4 NET FACTS. All of these are VIEWER-GATED in the RPC: a player whose
    *  handicap this viewer may not see carries none of them, because gross minus

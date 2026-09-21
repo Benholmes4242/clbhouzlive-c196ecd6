@@ -9,6 +9,7 @@ import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
 import { FEAT_GOLD_WASH, FEAT_RARITY_GOLD_INK, FEAT_TOP_WASH, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { INK_FAINT } from '@/features/courses/_shared/tokens';
 
 import type { AchievementCallout } from './cardTreatment';
 import {
@@ -149,13 +150,25 @@ export function AchievementCalloutPanel({
         return {
           icon: <AchievementEmoji glyph="🏆" tier={tier} />,
           title: t('amateur.stream.callout.record', 'New course record'),
-          subline: null,
+          subline: callout.margin != null && callout.margin > 0
+            ? t('amateur.stream.callout.recordMargin', {
+                count: callout.margin,
+                defaultValue_one: '{{count}} shot better',
+                defaultValue_other: '{{count}} shots better',
+              })
+            : null,
         };
       case 'net_record':
         return {
           icon: <AchievementEmoji glyph="⭐" tier={tier} />,
           title: t('amateur.stream.callout.netRecord', 'New net course record'),
-          subline: null,
+          subline: callout.delta != null && callout.delta > 0
+            ? t('amateur.stream.callout.rankUpBy', {
+                count: callout.delta,
+                defaultValue_one: 'Up one place',
+                defaultValue_other: 'Up {{count}} places',
+              })
+            : null,
         };
       case 'rank_up':
         return {
@@ -252,9 +265,9 @@ export function AchievementCalloutPanel({
             style={{
               display: 'block',
               fontFamily: SANS,
-              fontSize: 12,
+              fontSize: 11.5,
               fontWeight: 600,
-              color: A.MUTE,
+              color: INK_FAINT,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -354,11 +367,19 @@ export function RoundStatStrip({
         icon: <AchievementEmoji glyph="🏆" tier={tier} />,
         tag: t('amateur.stream.callout.tagNew', 'NEW'),
         label: t('amateur.stream.callout.courseRecord', 'Course record'),
+        subline: callout.margin != null && callout.margin > 0
+          ? t('amateur.stream.callout.recordMargin', {
+              count: callout.margin,
+              defaultValue_one: '{{count}} shot better',
+              defaultValue_other: '{{count}} shots better',
+            })
+          : null,
       };
       case 'net_record': return {
         icon: <AchievementEmoji glyph="⭐" tier={tier} />,
         tag: t('amateur.stream.callout.tagNew', 'NEW'),
         label: t('amateur.stream.callout.netCourseRecord', 'Net course record'),
+        subline: null,
       };
       case 'rank_up': return {
         icon: <RankUpIcon />,
@@ -366,16 +387,24 @@ export function RoundStatStrip({
         label: ord
           ? t('amateur.stream.callout.nowRank', 'Now {{ord}}', { ord })
           : t('amateur.stream.callout.movedUpBoard', 'Moved up the board'),
+        subline: callout.delta != null && callout.delta > 0
+          ? t('amateur.stream.callout.rankUpBy', {
+              count: callout.delta,
+              defaultValue_one: 'Up one place',
+              defaultValue_other: 'Up {{count}} places',
+            })
+          : null,
       };
-      case 'ace': return { icon: <AchievementEmoji glyph="⛳" tier={tier} />, tag: null, label: featLabelFor(callout.feats) };
-      case 'albatross': return { icon: <AchievementEmoji glyph="🔥" tier={tier} />, tag: null, label: featLabelFor(callout.feats) };
-      case 'eagle': return { icon: <AchievementEmoji glyph="🦅" tier={tier} />, tag: null, label: featLabelFor(callout.feats) };
+      case 'ace': return { icon: <AchievementEmoji glyph="⛳" tier={tier} />, tag: null, label: featLabelFor(callout.feats), subline: null };
+      case 'albatross': return { icon: <AchievementEmoji glyph="🔥" tier={tier} />, tag: null, label: featLabelFor(callout.feats), subline: null };
+      case 'eagle': return { icon: <AchievementEmoji glyph="🦅" tier={tier} />, tag: null, label: featLabelFor(callout.feats), subline: null };
       case 'birdies': return {
         icon: <BirdieCountIcon count={callout.count} />,
         tag: null,
         label: featLabelFor(callout.feats),
+        subline: null,
       };
-      case 'clean': return { icon: <AchievementEmoji glyph="🛡️" tier={tier} />, tag: null, label: featLabelFor(callout.feats) };
+      case 'clean': return { icon: <AchievementEmoji glyph="🛡️" tier={tier} />, tag: null, label: featLabelFor(callout.feats), subline: null };
     }
   })() : null;
 
@@ -421,6 +450,14 @@ export function RoundStatStrip({
             >
               {achievement.label}
             </span>
+            {achievement.subline ? (
+              <span
+                data-explore-achievement-subline="true"
+                style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: INK_FAINT, whiteSpace: 'normal' }}
+              >
+                {achievement.subline}
+              </span>
+            ) : null}
           </span>
         </span>
       ) : null}

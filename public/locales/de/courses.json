@@ -143,8 +143,12 @@
     "nowRank": "Jetzt {{ord}}",
     "onHole": "an Loch {{ord}}",
     "rankUp": "Aufgestiegen",
+    "rankUpBy_one": "Um einen Platz gestiegen",
+    "rankUpBy_other": "Um {{count}} Plätze gestiegen",
     "rankUpTo": "Auf {{ord}}",
     "record": "Platzrekord",
+    "recordMargin_one": "{{count}} Schlag besser",
+    "recordMargin_other": "{{count}} Schläge besser",
     "tagMovedUp": "AUFGESTIEGEN",
     "tagNew": "NEU"
    },

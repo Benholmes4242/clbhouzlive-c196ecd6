@@ -38,6 +38,8 @@ export interface RecordHolder {
   user_id: string;
   /** The record gross. */
   value: number;
+  /** The previous record, now sitting at rank 2. Null until another score exists. */
+  runner_up_value: number | null;
   /** Date the record was attained (a date, venue-agnostic). */
   attained_on: string | null;
 }
@@ -57,6 +59,36 @@ interface LegendRow {
   user_id: string | null;
   value: number | string | null;
   attained_at: string | null;
+  rank: number | null;
+}
+
+export function recordHoldersFromRows(rows: LegendRow[]): Map<string, RecordHolder> {
+  const grouped = new Map<string, { leaders: LegendRow[]; runners: LegendRow[] }>();
+  for (const row of rows) {
+    if (!row.course_id || row.value == null || (row.rank !== 1 && row.rank !== 2)) continue;
+    const course = grouped.get(row.course_id) ?? { leaders: [], runners: [] };
+    if (row.rank === 1) course.leaders.push(row);
+    else course.runners.push(row);
+    grouped.set(row.course_id, course);
+  }
+
+  const out = new Map<string, RecordHolder>();
+  for (const [courseId, course] of grouped) {
+    /* The existing safety rule survives: an absent or ambiguous rank 1 names no
+       holder. A missing/ambiguous rank 2 names no margin rather than inventing 0. */
+    if (course.leaders.length !== 1) continue;
+    const leader = course.leaders[0];
+    if (!leader.user_id) continue;
+    const runner = course.runners.length === 1 ? course.runners[0] : null;
+    out.set(courseId, {
+      course_id: courseId,
+      user_id: leader.user_id,
+      value: Number(leader.value),
+      runner_up_value: runner?.value == null ? null : Number(runner.value),
+      attained_on: leader.attained_at ? leader.attained_at.slice(0, 10) : null,
+    });
+  }
+  return out;
 }
 
 interface LostRow {
@@ -78,32 +110,13 @@ export function useCourseRecordSignal(
     queryFn: async () => {
       const { data, error } = await supabase
         .from('gam_course_legends' as never)
-        .select('course_id, user_id, value, attained_at')
+        .select('course_id, user_id, value, attained_at, rank')
         .eq('is_current', true)
         .eq('category', RECORD_CATEGORY)
-        .eq('rank', 1)
+        .in('rank', [1, 2])
         .in('course_id', ids);
       if (error) throw error;
-
-      /* AMBIGUITY IS REJECTED, NOT RESOLVED: two current rank-1 rows for one
-         course means the record book itself is not naming one holder. */
-      const seen = new Map<string, RecordHolder | null>();
-      for (const row of ((data ?? []) as unknown as LegendRow[])) {
-        if (!row.course_id || !row.user_id || row.value == null) continue;
-        if (seen.has(row.course_id)) {
-          seen.set(row.course_id, null);
-          continue;
-        }
-        seen.set(row.course_id, {
-          course_id: row.course_id,
-          user_id: row.user_id,
-          value: Number(row.value),
-          attained_on: row.attained_at ? row.attained_at.slice(0, 10) : null,
-        });
-      }
-      const out = new Map<string, RecordHolder>();
-      for (const [courseId, holder] of seen) if (holder) out.set(courseId, holder);
-      return out;
+      return recordHoldersFromRows((data ?? []) as unknown as LegendRow[]);
     },
   });
 

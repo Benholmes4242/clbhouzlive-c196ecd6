@@ -329,6 +329,10 @@ export function useExploreStreamClient(
           },
           { standing: standingMap, records, bests: bests.bests, shortlist: context.shortlist },
         );
+        const recordHolder = row.course_id ? records.holders.get(row.course_id) ?? null : null;
+        const recordMargin = recordHolder?.runner_up_value != null
+          ? recordHolder.runner_up_value - recordHolder.value
+          : null;
         /* §3d NO CONSEQUENCE, NO CARD — UNLESS IT IS AN OUTER RING. A county /
            country / world round at a course the viewer has never played carries
            NO invented consequence: it is admitted as a plain "someone played
@@ -379,6 +383,7 @@ export function useExploreStreamClient(
             holes_in_one: row.holes_in_one,
             clean_card: row.clean_card,
             is_course_record: row.is_course_record,
+            record_margin: recordMargin,
             hcp_at_time: row.hcp_at_time,
           },
           payload: { round: row },

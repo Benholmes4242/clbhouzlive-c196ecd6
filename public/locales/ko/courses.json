@@ -143,8 +143,12 @@
     "nowRank": "현재 {{ord}}위",
     "onHole": "{{ord}}번 홀에서",
     "rankUp": "순위 상승",
+    "rankUpBy_one": "1계단 상승",
+    "rankUpBy_other": "{{count}}계단 상승",
     "rankUpTo": "{{ord}}위로 상승",
     "record": "코스 레코드",
+    "recordMargin_one": "{{count}}타 향상",
+    "recordMargin_other": "{{count}}타 향상",
     "tagMovedUp": "순위 상승",
     "tagNew": "NEW"
    },

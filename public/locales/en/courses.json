@@ -146,8 +146,12 @@
     "nowRank": "Now {{ord}}",
     "onHole": "on the {{ord}}",
     "rankUp": "Moved up",
+    "rankUpBy_one": "Up one place",
+    "rankUpBy_other": "Up {{count}} places",
     "rankUpTo": "Up to {{ord}}",
     "record": "New course record",
+    "recordMargin_one": "{{count}} shot better",
+    "recordMargin_other": "{{count}} shots better",
     "tagMovedUp": "MOVED UP",
     "tagNew": "NEW"
    },
