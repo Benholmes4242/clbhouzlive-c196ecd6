@@ -172,14 +172,7 @@
     "reviews": "No reviews in {{scope}} yet."
    },
    "enrichment": {
-    "area": {
-     "clubhouse": "クラブハウス",
-     "conditions": "コンディション",
-     "design": "設計",
-     "facilities": "施設"
-    },
-    "photos": "写真{{count}}枚",
-    "strongest": "最高評価: {{area}}"
+    "photos": "写真{{count}}枚"
    },
    "failed": "読み込めませんでした。",
    "headline": {

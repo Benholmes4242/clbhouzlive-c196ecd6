@@ -172,14 +172,7 @@
     "reviews": "Aún no hay reseñas en {{scope}}."
    },
    "enrichment": {
-    "area": {
-     "clubhouse": "club social",
-     "conditions": "condición",
-     "design": "diseño",
-     "facilities": "instalaciones"
-    },
-    "photos": "{{count}} fotos",
-    "strongest": "Destaca en {{area}}"
+    "photos": "{{count}} fotos"
    },
    "failed": "Esto no se cargo.",
    "headline": {

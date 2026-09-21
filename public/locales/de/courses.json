@@ -172,14 +172,7 @@
     "reviews": "Noch keine Bewertungen in {{scope}}."
    },
    "enrichment": {
-    "area": {
-     "clubhouse": "Clubhaus",
-     "conditions": "Zustand",
-     "design": "Design",
-     "facilities": "Anlagen"
-    },
-    "photos": "{{count}} Fotos",
-    "strongest": "Am stärksten bei {{area}}"
+    "photos": "{{count}} Fotos"
    },
    "failed": "Das wurde nicht geladen.",
    "headline": {
