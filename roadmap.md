@@ -14,3 +14,4 @@
 - [x] Restore every feat's fixed artwork after the temporary monochrome icon substitution.
 - [x] Move the selected GOLD/TOP rarity sentence into one full-width pill row and scope rare owner copy to clbhouz.
 - [x] Restore VS HCP to the feat pill and use member-position public rarity copy through three members.
+- [ ] Replace the withdrawn GOLD/TOP tile tint and border with tokenized emblem lighting, then verify contrast and scroll painting.
