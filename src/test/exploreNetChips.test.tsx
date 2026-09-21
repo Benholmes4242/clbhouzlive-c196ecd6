@@ -29,6 +29,8 @@ describe('C3 round stat strip', () => {
     expect(Array.from(strip?.children ?? []).map((cell) => cell.getAttribute('data-explore-stat')))
       .toEqual(['achievement', 'par', 'net', 'vs-hcp']);
     expect(strip?.style.gridTemplateColumns).toBe('minmax(0, 2.3fr) repeat(3, minmax(0, 0.7fr))');
+    expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
+    expect(strip?.style.border).toBe('');
   });
 
   it('uses equal thirds without an achievement and never prints a birdies figure label', () => {
@@ -140,7 +142,7 @@ describe('achievement tag and label copy', () => {
     if (node) {
       expect(node.style.width).toBe('28px');
       expect(node.style.height).toBe('28px');
-      expect(node.style.fontSize).toBe('22px');
+      expect(node.style.fontSize).toBe(emoji && ['⛳', '🔥', '🦅'].includes(emoji) ? '26px' : '22px');
       expect(node.getAttribute('aria-hidden')).not.toBeNull();
     }
   });

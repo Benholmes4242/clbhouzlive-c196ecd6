@@ -7,8 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
-import { GOLD_BORDER, GOLD_TINT, GOLD_TINT_10, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { FEAT_GOLD_WASH, FEAT_RARITY_GOLD_INK, FEAT_TOP_WASH, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 import type { AchievementCallout } from './cardTreatment';
 import {
@@ -36,8 +35,9 @@ import {
  *
  * THE PANEL IS THE EXISTING ANALYTICAL PANEL TOKEN (A.PANEL), slightly lighter
  * than the canvas, with NO border: separation is a panel edge, not a rule.
- * GOLD and TOP are the single analytical-rule exception: their achievement
- * significance is communicated by a tokenized edge as well as the panel fill.
+   * GOLD and TOP are the single analytical-rule exception: their achievement
+   * significance is communicated by tokenized light around the fixed artwork,
+   * while the panel remains the same neutral A.PANEL surface as its neighbours.
  * TOP has never rendered. Zero platform rounds have held 2+ aces,
  * 2+ albatrosses, or an ace and an albatross. Its first qualifying round is
  * therefore the treatment's first real-world test.
@@ -96,7 +96,7 @@ export function FeatRarityLines({
       <span
         data-feat-rarity-viewer={ownerLine ? undefined : 'true'}
         data-feat-rarity-owner={ownerLine ? 'true' : undefined}
-        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: ownerLine ? SC_FILL_GOLD : tier === 'ink' ? A.MUTE : A.INK, opacity: ownerLine || tier === 'ink' ? 1 : 0.73, whiteSpace: 'normal', overflowWrap: 'break-word' }}
+        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: tier === 'ink' ? A.MUTE : FEAT_RARITY_GOLD_INK, whiteSpace: 'normal', overflowWrap: 'break-word' }}
       >
         {line}
       </span>
@@ -120,6 +120,7 @@ export function AchievementCalloutPanel({
 }) {
   const { t } = useTranslation('courses');
   const ordHole = (hole: number) => standingOrdinal(hole, locale);
+  const tier = 'tier' in callout ? callout.tier : 'ink';
 
   const featLabel = (feat: ExploreRoundFeat): string => {
     switch (feat.kind) {
@@ -145,13 +146,13 @@ export function AchievementCalloutPanel({
     switch (callout.kind) {
       case 'record':
         return {
-          icon: <AchievementEmoji glyph="🏆" />,
+          icon: <AchievementEmoji glyph="🏆" tier={tier} />,
           title: t('amateur.stream.callout.record', 'New course record'),
           subline: null,
         };
       case 'net_record':
         return {
-          icon: <AchievementEmoji glyph="⭐" />,
+          icon: <AchievementEmoji glyph="⭐" tier={tier} />,
           title: t('amateur.stream.callout.netRecord', 'New net course record'),
           subline: null,
         };
@@ -168,7 +169,7 @@ export function AchievementCalloutPanel({
         };
       case 'ace':
         return {
-          icon: <AchievementEmoji glyph="⛳" />,
+          icon: <AchievementEmoji glyph="⛳" tier={tier} />,
           title: featTitle(callout.feats),
           subline:
             callout.hole != null
@@ -177,7 +178,7 @@ export function AchievementCalloutPanel({
         };
       case 'albatross':
         return {
-          icon: <AchievementEmoji glyph="🔥" />,
+          icon: <AchievementEmoji glyph="🔥" tier={tier} />,
           title: featTitle(callout.feats),
           subline:
             callout.hole != null
@@ -186,7 +187,7 @@ export function AchievementCalloutPanel({
         };
       case 'eagle':
         return {
-          icon: <AchievementEmoji glyph="🦅" />,
+          icon: <AchievementEmoji glyph="🦅" tier={tier} />,
           title: featTitle(callout.feats),
           subline:
             callout.hole != null
@@ -201,14 +202,12 @@ export function AchievementCalloutPanel({
         };
       case 'clean':
         return {
-          icon: <AchievementEmoji glyph="🛡️" />,
+          icon: <AchievementEmoji glyph="🛡️" tier={tier} />,
           title: featTitle(callout.feats),
           subline: t('amateur.stream.callout.bogeyFreeSub', 'Par or better on every hole'),
         };
     }
   })();
-  const tier = 'tier' in callout ? callout.tier : 'ink';
-
   return (
     <>
     <span
@@ -224,8 +223,8 @@ export function AchievementCalloutPanel({
         marginBottom: 10,
         padding: '10px 12px',
         borderRadius: r.md,
-        background: tier === 'top' ? GOLD_TINT_10 : tier === 'gold' ? GOLD_TINT : A.PANEL,
-        border: tier === 'top' ? `2px solid ${GOLD_BORDER}` : tier === 'gold' ? `1px solid ${GOLD_BORDER}` : 'none',
+        backgroundColor: A.PANEL,
+        backgroundImage: tier === 'top' ? FEAT_TOP_WASH : tier === 'gold' ? FEAT_GOLD_WASH : 'none',
         minWidth: 0,
       }}
     >
@@ -351,12 +350,12 @@ export function RoundStatStrip({
   const achievement = callout ? (() => {
     switch (callout.kind) {
       case 'record': return {
-        icon: <AchievementEmoji glyph="🏆" />,
+        icon: <AchievementEmoji glyph="🏆" tier={tier} />,
         tag: t('amateur.stream.callout.tagNew', 'NEW'),
         label: t('amateur.stream.callout.courseRecord', 'Course record'),
       };
       case 'net_record': return {
-        icon: <AchievementEmoji glyph="⭐" />,
+        icon: <AchievementEmoji glyph="⭐" tier={tier} />,
         tag: t('amateur.stream.callout.tagNew', 'NEW'),
         label: t('amateur.stream.callout.netCourseRecord', 'Net course record'),
       };
@@ -367,15 +366,15 @@ export function RoundStatStrip({
           ? t('amateur.stream.callout.nowRank', 'Now {{ord}}', { ord })
           : t('amateur.stream.callout.movedUpBoard', 'Moved up the board'),
       };
-      case 'ace': return { icon: <AchievementEmoji glyph="⛳" />, tag: null, label: featLabelFor(callout.feats) };
-      case 'albatross': return { icon: <AchievementEmoji glyph="🔥" />, tag: null, label: featLabelFor(callout.feats) };
-      case 'eagle': return { icon: <AchievementEmoji glyph="🦅" />, tag: null, label: featLabelFor(callout.feats) };
+      case 'ace': return { icon: <AchievementEmoji glyph="⛳" tier={tier} />, tag: null, label: featLabelFor(callout.feats) };
+      case 'albatross': return { icon: <AchievementEmoji glyph="🔥" tier={tier} />, tag: null, label: featLabelFor(callout.feats) };
+      case 'eagle': return { icon: <AchievementEmoji glyph="🦅" tier={tier} />, tag: null, label: featLabelFor(callout.feats) };
       case 'birdies': return {
         icon: <BirdieCountIcon count={callout.count} />,
         tag: null,
         label: featLabelFor(callout.feats),
       };
-      case 'clean': return { icon: <AchievementEmoji glyph="🛡️" />, tag: null, label: featLabelFor(callout.feats) };
+      case 'clean': return { icon: <AchievementEmoji glyph="🛡️" tier={tier} />, tag: null, label: featLabelFor(callout.feats) };
     }
   })() : null;
 
@@ -393,8 +392,8 @@ export function RoundStatStrip({
         marginTop: 10,
         marginBottom: 10,
         borderRadius: r.md,
-        background: achievement && tier === 'top' ? GOLD_TINT_10 : achievement && tier === 'gold' ? GOLD_TINT : A.PANEL,
-        border: achievement && tier === 'top' ? `2px solid ${GOLD_BORDER}` : achievement && tier === 'gold' ? `1px solid ${GOLD_BORDER}` : 'none',
+        backgroundColor: A.PANEL,
+        backgroundImage: achievement && tier === 'top' ? FEAT_TOP_WASH : achievement && tier === 'gold' ? FEAT_GOLD_WASH : 'none',
         overflow: 'hidden',
         boxSizing: 'border-box',
       }}
