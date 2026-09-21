@@ -55,7 +55,7 @@ import { surnameOf } from '../_shared/playerName';
 import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
-import { ambiguousTeamSurnames, resolveBoardEntity } from '../_shared/boardEntity';
+import { resolveBoardEntity, teamNamesNeedInitials } from '../_shared/boardEntity';
 
 // Dark ramp, imported so the board follows the tour token file (was four pinned light literals).
 const INK = TOUR_INK;
@@ -150,8 +150,8 @@ interface Props {
   /** Optional complete field used only to calculate movement when `entries`
    * is a truncated inline board. No additional query is required. */
   movementEntries?: BoardEntry[];
-  /** Event-level surname collisions, computed by the parent when shared. */
-  ambiguousSurnames?: Set<string>;
+  /** Event-level team-name convention, computed by the parent when shared. */
+  teamInitials?: boolean;
 }
 
 function houseColor(score: number | null | undefined, emphasis: 'standard' | 'leader' = 'standard'): string {
@@ -400,7 +400,7 @@ export function BoardTable({
   surface = CANVAS,
   teeTimes,
   movementEntries,
-  ambiguousSurnames,
+  teamInitials,
 }: Props) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
@@ -422,13 +422,13 @@ export function BoardTable({
     [entries, currentRound],
   );
 
-  const resolvedAmbiguous = useMemo(
-    () => ambiguousSurnames ?? ambiguousTeamSurnames(entries),
-    [ambiguousSurnames, entries],
+  const resolvedTeamInitials = useMemo(
+    () => teamInitials ?? teamNamesNeedInitials(entries),
+    [teamInitials, entries],
   );
   const names = useMemo(
-    () => entries.filter((e) => !isDemoted(e.status)).map((e) => resolveBoardEntity(e, resolvedAmbiguous).label),
-    [entries, resolvedAmbiguous],
+    () => entries.filter((e) => !isDemoted(e.status)).map((e) => resolveBoardEntity(e, resolvedTeamInitials).label),
+    [entries, resolvedTeamInitials],
   );
 
   const { columns, tier } = useMemo(
@@ -594,7 +594,7 @@ export function BoardTable({
     const roundVals = [e.round_1, e.round_2, e.round_3, e.round_4];
     const pid = e.player?.id;
     const mov = !demotedRow ? movementMap.get(pid ?? e.team?.id ?? e.id) : undefined;
-    const entity = resolveBoardEntity(e, resolvedAmbiguous);
+    const entity = resolveBoardEntity(e, resolvedTeamInitials);
     const fullName = entity.label;
     // Team labels are already provider-authored compact forms. Applying the
     // player-name shortening ladder would split them incorrectly.

@@ -19,7 +19,7 @@ import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
 import { formatEarnings } from '../../_shared/formatEarnings';
-import { ambiguousTeamSurnames, resolveBoardEntity } from '../../_shared/boardEntity';
+import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
 
 type Row = BoardEntry;
 
@@ -114,7 +114,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
-  const ambiguous = useMemo(() => ambiguousTeamSurnames(entries), [entries]);
+  const needsInitials = useMemo(() => teamNamesNeedInitials(entries), [entries]);
   const T = THEME_TOKENS[theme];
   /** getScoreColor knows two ramps only; both dark grounds take the dark ramp. */
   const scoreTheme = theme === 'light' ? 'light' : 'dark';
@@ -148,7 +148,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             {showOverviewPrize ? <div style={{ textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div> : null}
           </div>
           {rows.map((r) => {
-            const entity = resolveBoardEntity(r, ambiguous);
+            const entity = resolveBoardEntity(r, needsInitials);
             const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
               : r.status === 'WD' ? 'WD'
               : r.position == null ? BLANK
@@ -207,7 +207,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
 
         </div>
         {rows.map((r) => {
-          const entity = resolveBoardEntity(r, ambiguous);
+          const entity = resolveBoardEntity(r, needsInitials);
           const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
             : r.status === 'WD' ? 'WD'
             : r.position == null ? BLANK

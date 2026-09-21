@@ -3,7 +3,7 @@ import type { BoardEntry } from '../leaderboard/BoardTable';
 export interface BoardEntity {
   kind: 'player' | 'team';
   /** Row label. Player: "Alex Smalley". Team: "Smalley / Springer",
-   * or "G. Kim / Y. Wilson" when a surname is ambiguous in this event. */
+   * or "G. Kim / Y. Wilson" when the board needs initials. */
   label: string;
   /** Prose form. Player: "Alex Smalley".
    * Team: "Gina Kim and Yana Wilson" — always full names. */
@@ -25,11 +25,13 @@ function orderedMemberNames(entry: BoardEntry): string[] {
 }
 
 /**
- * Surnames that belong to more than one distinct person in this event.
- * The feed's abbr_name supplies the surname forms; its ordered members supply
- * person identity, so compound surnames and CJK ordering are never re-parsed.
+ * True when any surname on this board belongs to more than one distinct
+ * person. Dow 2026 has three Kims and the Iwai twins; Zurich 2026 has
+ * Brown, Fitzpatrick, Griffin, Kim and Svensson. When it fires, EVERY row
+ * takes the initial form — a board that switches naming convention between
+ * adjacent rows reads as a defect.
  */
-export function ambiguousTeamSurnames(board: BoardEntry[]): Set<string> {
+export function teamNamesNeedInitials(board: BoardEntry[]): boolean {
   const peopleBySurname = new Map<string, Set<string>>();
   for (const entry of board) {
     const surnames = teamSegments(entry);
@@ -42,11 +44,7 @@ export function ambiguousTeamSurnames(board: BoardEntry[]): Set<string> {
       peopleBySurname.set(surname, people);
     });
   }
-  return new Set(
-    [...peopleBySurname.entries()]
-      .filter(([, people]) => people.size >= 2)
-      .map(([surname]) => surname),
-  );
+  return [...peopleBySurname.values()].some((people) => people.size >= 2);
 }
 
 function readableDisplayName(value: string): string {
@@ -57,18 +55,16 @@ function readableDisplayName(value: string): string {
     .trim();
 }
 
-export function resolveBoardEntity(entry: BoardEntry, ambiguous: Set<string>): BoardEntity {
+export function resolveBoardEntity(entry: BoardEntry, needsInitials: boolean): BoardEntity {
   const playerName = entry.player?.full_name?.trim() ?? '';
   if (!entry.team) return { kind: 'player', label: playerName, prose: playerName };
 
   const abbrName = entry.team?.abbr_name?.trim() ?? '';
   const displayName = entry.team?.display_name?.trim() ?? '';
   const memberNames = orderedMemberNames(entry);
-  const hasAmbiguity = teamSegments(entry).some((surname) => ambiguous.has(surname));
-  const label = hasAmbiguity && displayName
+  const label = needsInitials && displayName
     ? readableDisplayName(displayName)
     : abbrName || (displayName ? readableDisplayName(displayName) : '') || playerName;
-  const prose = memberNames.join(' and ') || label;
 
   return { kind: 'team', label: label || playerName, prose: memberNames.join(' and ') || label || playerName };
 }
