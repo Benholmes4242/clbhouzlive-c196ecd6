@@ -7,7 +7,13 @@
 //  - Draft restore (draftId): fetch the draft row and hydrate the composer
 //    the same way the in-composer Drafts sheet does.
 //
-// Owns: header, media stage + frame pills, media tray, caption field,
+// ONE SCREEN (phase 3 of BRIEF_THE_UNIFIED_COMPOSER). The post path used to be
+// two pages inside this file - media (dark) then words - each drawing its own
+// "1 / 2" and "2 / 2" counter beside step 1's "Step 1 of 2". It is now a single
+// step 2 under the shared ComposerStepHeader, and page 1's contents live on in
+// THE MEDIA SHEET (openMediaIndex): nothing there was rewritten, it was moved.
+//
+// Owns: header, media rail + media sheet, caption field,
 // detail rows, and orchestrates opening / closing every sheet.
 // Delegates: state -> useStageComposer, submit -> usePostSubmit,
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
@@ -27,12 +33,15 @@ import { POST_COMPOSER_Z } from '@/lib/zLayers';
 import { useStageComposer, MAX_MEDIA, type StageMediaItem } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { notifyComposerCompleted } from '@/features/composer-flow/composerFlowStore';
+import { notifyComposerCompleted, useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
+import { postLeadingControl } from '@/features/composer-flow/handoffRules';
+import ComposerStepHeader from '@/features/composer-flow/components/ComposerStepHeader';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
 import { useEditablePost } from '@/hooks/useEditablePost';
 import { startPostUpload } from './lib/postUploadController';
+import { postContentGate } from './lib/postGate';
 
 import MediaStageV2 from './components/MediaStageV2';
 import FramePills from './components/FramePills';
@@ -62,15 +71,13 @@ interface Props {
   onPosted?: () => void;
   /** Files already chosen by the nav picker before the composer opened. */
   initialMedia?: File[];
-  /** True while the native picker is still up: page 1 shows its awaiting state. */
-  awaitingMedia?: boolean;
   /** Edit mode: existing post id (owner-scoped). */
   editPostId?: string | null;
   /** Draft deep-link: hydrate the composer from this draft. */
   draftId?: string | null;
 }
 
-export default function StageComposer({ onClose, onPosted, initialMedia = [], awaitingMedia = false, editPostId, draftId }: Props) {
+export default function StageComposer({ onClose, onPosted, initialMedia = [], editPostId, draftId }: Props) {
   const { profile } = useProfileData();
   const { t } = useTranslation('composer');
 
@@ -91,10 +98,12 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   const captionStartedRef = useRef(false);
   // Read once at mount: a deep-linked open (edit / draft / share-a-round)
   // vs the create sheet.
-  const entryRef = useRef<'create_sheet' | 'deep_link' | 'unknown'>('unknown');
+  const entryRef = useRef<'create_sheet' | 'deep_link' | 'review_skip' | 'unknown'>('unknown');
   if (entryRef.current === 'unknown') {
     const st = usePostStudioStore.getState();
-    if (editPostId || draftId || st.prefillCourse) entryRef.current = 'deep_link';
+    // The store's own entry wins: only the review path's skip link sets it.
+    if (st.entry === 'review_skip') entryRef.current = 'review_skip';
+    else if (editPostId || draftId || st.prefillCourse) entryRef.current = 'deep_link';
     else if (st.isOpen) entryRef.current = 'create_sheet';
   }
 
@@ -234,6 +243,16 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   // C3 "Share this round" — open the composer pre-filled with the course and
   // the round the member tapped share on.
   const prefillCourse = usePostStudioStore((st) => st.prefillCourse);
+  /* WORDS CARRIED IN FROM THE REVIEW PATH (§6). Seeded ONCE, on mount only, so
+     it can never overwrite what the member has since typed. */
+  const prefillCaptionRef = useRef(usePostStudioStore.getState().prefillCaption);
+  const captionSeededRef = useRef(false);
+  useEffect(() => {
+    if (captionSeededRef.current) return;
+    captionSeededRef.current = true;
+    const text = prefillCaptionRef.current;
+    if (text) setCaption(text);
+  }, [setCaption]);
   const prefillAppliedRef = useRef(false);
 
   useEffect(() => {
@@ -251,29 +270,23 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     });
   }, [isEditMode, draftId, prefillCourse, hydrate]);
 
-  // Two-page wizard. Page 1 = media (dark), page 2 = words (light).
-  // Tapping Post opens page 1 immediately in its AWAITING state while the OS
-  // source menu floats above it. Files chosen -> page 1 comes alive; picker
-  // CANCELLED -> the member stays on the page-1 EMPTY STATE and can pick again
-  // or close. There is no route to page 2 without media on a fresh create.
-  // Edit / draft / course-prefill entries land straight on page 2.
+  /* THE MEDIA SHEET. Null = closed; a number = open on that slide.
+     Everything page 1 used to own - the preview with its aspect handling and
+     56vh cap, the slide counter, the Edit chip, FramePills, "+ Add" and the
+     filmstrip - lives inside it, unchanged. It is a SHEET rather than a page
+     because this screen carries the caption, the course card and the detail
+     rows as well, and a media surface that big as a SECTION is what made the
+     one-page version too much. */
+  const [openMediaIndex, setOpenMediaIndex] = useState<number | null>(null);
+  const mediaSheetOpen = openMediaIndex !== null;
 
-  const isFreshCreate = !editPostId && !draftId;
-  const [page, setPage] = useState<1 | 2>(
-    isFreshCreate && (initialMedia.length > 0 || awaitingMedia) ? 1 : 2,
-  );
-
-  // Both pages share one dark canvas now (A.CANVAS #15171F on page 1 and
-  // page 2), so the status bar keeps light icons and the notch
-  // bleeds the page colour instead of the legacy light-mode white (FFF8FAFC).
+  // One dark canvas, so the status bar keeps light icons and the notch bleeds
+  // the page colour instead of the legacy light-mode white (FFF8FAFC).
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
   // Watch light, profile immersive, etc.) because overlay close is not a route change.
   useEffect(() => {
-    try {
-      if (page === 1) setStatusBarStyleColor('light', 'FF0B0F14');
-      else setStatusBarStyleColor('light', STATUS_BAR_CANVAS);
-    } catch { /* status bar best-effort */ }
-  }, [page]);
+    try { setStatusBarStyleColor('light', STATUS_BAR_CANVAS); } catch { /* status bar best-effort */ }
+  }, []);
 
   // Files chosen by the bottom-nav picker are injected whenever the store's
   // initialMedia array changes. The nav opens the composer immediately (even on
@@ -290,19 +303,16 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     const isNew = files.length !== prev.length || files.some((f, i) => f !== prev[i]);
     if (!isNew) return;
     lastInitialMediaRef.current = files;
-    if (files.length > 0) {
-      void addFiles(files);
-      setPage(1);
-    }
+    if (files.length > 0) void addFiles(files);
   }, [isEditMode, hydrated, draftId, initialMedia, addFiles]);
 
-  // Page 1 with no media renders the designed empty state, which owns the two
-  // pick paths - camera and library - and NOTHING ELSE. A wizard post requires
-  // media, so there is no words-only escape and no fallthrough to page 2 on
-  // picker cancel: the member stays here until they choose files or close.
-
+  /* THE RAIL'S TWO STATES. No media: the two pick buttons, each over its own
+     anchored input. Media: a strip of thumbnails plus a "+" tile. */
   const emptyStage = state.media.length === 0;
 
+
+  const handoff = useComposerFlowStore((st) => st.handoff);
+  const requestReopen = useComposerFlowStore((st) => st.requestReopen);
 
   const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard' | 'more'>(null);
 
@@ -356,17 +366,29 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
   // Post button vs Save button gating.
 
-  // CREATE requires media: a wizard post must carry at least one photo or video.
-  // The caption stays OPTIONAL (11% of posts have none).
-  // EDIT is deliberately exempt - posts published before this rule, and round
-  // posts, have no media and must still be saveable.
-  const canSubmit = !submitting && !saving && (isEditMode || state.media.length > 0) && !!activeActor;
+  /* THE CONTENT GATE. A post needs ONE of media or words — see the commit-B
+     note below; COMMIT A still requires media.
+     EDIT is deliberately exempt: posts published before the media rule, and
+     round posts, have no media and must still be saveable. */
+  const hasWords = state.caption.trim().length > 0;
+  const hasContent = postContentGate({
+    isEditMode,
+    mediaCount: state.media.length,
+    caption: state.caption,
+  });
+  const canSubmit = !submitting && !saving && hasContent && !!activeActor;
 
 
   // Edit-mode: schedule row visible only for still-scheduled posts.
   const showScheduleRow = !isEditMode || editStatus?.status === 'scheduled';
 
-  const primaryLabel = isEditMode ? 'Save changes' : (state.scheduledAt ? 'Schedule' : 'Share');
+  /* THE EMPTY-EVERYTHING LABEL names what is missing rather than sitting dead,
+     in the same register as the review path's SET YOUR SCORE. */
+  const primaryLabel = isEditMode
+    ? t('stage.saveChanges')
+    : (!state.media.length && !hasWords)
+      ? t('stage.emptyGate')
+      : (state.scheduledAt ? t('stage.schedule') : t('stage.share'));
   const primaryStyle: React.CSSProperties = {
     flex: 1,
     minWidth: 0,
@@ -411,6 +433,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
       analyticsEvents.track('post_submitted', {
         mode,
         media_count: state.media.length,
+        has_media: state.media.length > 0,
         has_caption: state.caption.trim().length > 0,
         caption_len: state.caption.trim().length,
         course_tagged: !!state.course,
@@ -520,6 +543,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
       analyticsEvents.track('post_submitted', {
         mode,
         media_count: state.media.length,
+        has_media: state.media.length > 0,
         has_caption: state.caption.trim().length > 0,
         caption_len: state.caption.trim().length,
         course_tagged: !!state.course,
@@ -553,6 +577,27 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   const handleClose = () => {
     if (state.dirty) {
       setSheet('close-guard');
+      return;
+    }
+    onClose();
+  };
+
+  /* THE LEADING CONTROL (§1.4). ← only when the member came from step 1, which
+     is the only entry with a previous step to return to; every other entry
+     (course prefill, edit, draft, deep link) closes instead. EITHER WAY a dirty
+     composer meets the close guard first — ← does not bypass it. */
+  const leadingControl = postLeadingControl(handoff);
+  const handleLeading = () => {
+    if (state.dirty) {
+      setSheet('close-guard');
+      return;
+    }
+    if (leadingControl === 'back') {
+      // The composer is an overlay, so there is no back navigation to observe:
+      // step 1 is asked back explicitly, and the request clears the handoff.
+      requestReopen();
+      reset();
+      onClose();
       return;
     }
     onClose();
@@ -612,12 +657,6 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   }
 
   const handleStageAdd = () => stageAddInputRef.current?.click();
-  // autoFocus is unreliable in the WebView, so the Next tap chains focus onto
-  // the caption itself - the tap is still the user activation the keyboard needs.
-  const focusCaption = () => {
-    if (isEditMode) return;
-    requestAnimationFrame(() => { try { captionElRef.current?.focus(); } catch { /* focus best-effort */ } });
-  };
   const handleStageAddFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     if (files.length) void handleAddFiles(files);
@@ -628,7 +667,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   // post is being fetched for editing. Shared with the /post-v2 route
   // fallback so the two silhouettes cannot drift.
   if (isEditMode && !hydrated && (editable.isLoading || (editable.data && editable.data.canManage))) {
-    return <StageLoadingShell title="Edit post" onClose={onClose} />;
+    return <StageLoadingShell title={t('stage.editPost')} onClose={onClose} />;
   }
 
   // Edit target failed to load or does not exist.
@@ -728,7 +767,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                 onClick={() => setSheet('drafts')}
                 style={moreRowStyle}
               >
-                <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Drafts</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>{t('stage.drafts')}</span>
                 {drafts.drafts.length > 0 && <span style={{ fontSize: 12, color: CT_DARK.mute }}>{drafts.drafts.length}</span>}
               </button>
             )}
@@ -783,260 +822,198 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
   const frameRatio: Record<string, string> = { original: '4 / 5', '4:5': '4 / 5', '1:1': '1 / 1', '9:16': '9 / 16' };
   const stageAspect = active ? (frameRatio[active.frame] ?? '4 / 5') : '4 / 5';
-  const firstItem = state.media[0] ?? null;
 
-  // ---- PAGE 1 — MEDIA, DARK -------------------------------------------------
-  if (page === 1) {
-    // Canvas matches page 2 (PAGE2.canvas) — both steps sit on the same
-    // surface so there is no colour step between them.
-    return (
-      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
-        {/* Top bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: PAGE2.canvas, flex: 'none' }}>
-          <button onClick={handleClose} aria-label="Close" style={closeButtonStyle}>
-            {/* SVG GLYPH, NOT A TEXT GLYPH. A "\u00d7" character sits on the text
-                baseline inside its line box, so flex centring centres the LINE
-                BOX and the mark itself reads high and left of centre. The lucide
-                icon is centred in its own square viewBox, so the button centres
-                the mark. */}
-            <X size={18} strokeWidth={2.2} />
-          </button>
-          {/* Fixed 22px = the 16/800 title's line box, so the bar height and
-              position are identical with or without the title. */}
-          <div style={{ minWidth: 0, flex: 1, height: 22, display: 'flex', alignItems: 'center' }}>
-
-            {/* Title is CONDITIONAL on page 1: the empty state has no other
-                context so it earns its place; with media present the
-                photograph is the context and the title is not rendered.
-                The bar keeps its height either way. */}
-            {emptyStage && (
-              <div style={{ fontSize: 16, fontWeight: 700, color: CT_DARK.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {isEditMode ? 'Edit post' : 'New post'}
-              </div>
-            )}
-          </div>
-
-          <div style={{ fontSize: 12, fontWeight: 700, color: CT_DARK.mute, fontVariantNumeric: 'tabular-nums' }}>1 / 2</div>
+  /* ---- THE MEDIA SHEET — PAGE 1, MOVED ------------------------------------
+     Page 1's contents, unchanged: the preview with its frame-driven aspect and
+     56vh cap, the slide counter chip, the Edit chip, FramePills, the "+ Add"
+     pill and the filmstrip. Opened by tapping a rail thumbnail (seeded to that
+     slide) or the rail's "+" when media already exists. AdjustSheet and
+     CoverFrameSheet open from inside it exactly as they did from page 1 — they
+     are BottomSheets at Z.sheet (12003), so they land above this surface
+     without either of them naming the other. */
+  const mediaSheet = !mediaSheetOpen ? null : (
+    <div
+      role="dialog"
+      aria-label={t('stage.mediaSheet.title')}
+      style={{
+        position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas,
+        display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        zIndex: POST_COMPOSER_Z + 1,
+      }}
+    >
+      {/* Grabber + title */}
+      <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top), 10px)' }}>
+        <div style={{ width: 36, height: 4, borderRadius: 999, background: PAGE2.dim, margin: '0 auto' }} />
+        <div style={{ padding: '12px 16px 10px', fontSize: 16, fontWeight: 700, color: PAGE2.ink, letterSpacing: '-0.015em' }}>
+          {t('stage.mediaSheet.title')}
         </div>
+      </div>
 
-        <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
+      {/* Media preview — aspect follows the frame pill, capped at 56vh */}
+      <div style={{ position: 'relative', width: '100%', aspectRatio: stageAspect, maxHeight: '56vh', flex: 'none', background: CT_DARK.surface, display: 'flex', overflow: 'hidden', transition: 'aspect-ratio 200ms ease' }}>
+        <MediaStageV2
+          item={active}
+          index={state.activeIndex}
+          total={1}
+          onOpenAdjust={() => setSheet('adjust')}
+          onOpenCover={() => setSheet('cover')}
+          onRequestAdd={handleStageAdd}
+        />
 
-        {emptyStage ? (
-          /* EMPTY STAGE — bottom-anchored and left-aligned, matching the
-             uploading and success screens. Both inputs live HERE, each one
-             anchored EXACTLY OVER ITS OWN BUTTON so the OS chooser opens from
-             the control that was tapped. Scrolls rather than clipping when a
-             long headline meets a short viewport. */
-          <div
-            style={{
-              flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column',
-              justifyContent: 'flex-end', padding: '0 28px 30px',
-              background: PAGE2.canvas, overflowY: 'auto',
-            }}
-          >
-            <div style={{ ...LABEL, color: CT_DARK.dim }}>
-              {t('emptyState.limitKicker', { count: MAX_MEDIA })}
-            </div>
-            <div style={{ marginTop: 10, fontSize: 26, fontWeight: 700, letterSpacing: DISPLAY_TRACKING, lineHeight: 1.15, color: CT_DARK.ink }}>
-              {isEditMode ? t('emptyState.promptEdit') : t('emptyState.prompt')}
-            </div>
-            <div
-              style={{
-                marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(248,250,252,0.10)',
-                fontSize: 13, fontWeight: 600, lineHeight: 1.45, color: CT_DARK.mute,
-              }}
-            >
-              {t('emptyState.nextStep')}
-            </div>
-
-            <div style={{ marginTop: 24, width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ position: 'relative' }}>
-                <button
-                  onClick={() => emptyLibraryInputRef.current?.click()}
-                  style={emptyPrimaryButtonStyle}
-                >
-                  Choose from library
-                </button>
-                <input
-                  ref={emptyLibraryInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  onChange={handleStageAddFiles}
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  style={anchoredInputStyle}
-                />
-              </div>
-              <div style={{ position: 'relative' }}>
-                <button
-                  onClick={() => emptyCameraInputRef.current?.click()}
-                  style={emptySecondaryButtonStyle}
-                >
-                  Take photo or video
-                </button>
-                <input
-                  ref={emptyCameraInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  capture="environment"
-                  onChange={handleStageAddFiles}
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  style={anchoredInputStyle}
-                />
-              </div>
-            </div>
+        {/* Slide counter — glass chip, top-right */}
+        {state.media.length > 1 && (
+          <div className={CHIP_GLASS_CLASS} style={{ position: 'absolute', right: 12, top: 12, padding: '4px 9px', borderRadius: 999, fontSize: 11, fontWeight: 700, color: CT_DARK.ink, fontVariantNumeric: 'tabular-nums' }}>
+            {state.activeIndex + 1}/{state.media.length}
           </div>
-
-        ) : (
-          <>
-            {/* Media preview — aspect follows the frame pill, capped at 56vh */}
-            <div style={{ position: 'relative', width: '100%', aspectRatio: stageAspect, maxHeight: '56vh', flex: 'none', background: CT_DARK.surface, display: 'flex', overflow: 'hidden', transition: 'aspect-ratio 200ms ease' }}>
-              <MediaStageV2
-                item={active}
-                index={state.activeIndex}
-                total={1}
-                onOpenAdjust={() => setSheet('adjust')}
-                onOpenCover={() => setSheet('cover')}
-                onRequestAdd={handleStageAdd}
-              />
-
-              {/* Slide counter — glass chip, top-right */}
-              {state.media.length > 1 && (
-                <div className={CHIP_GLASS_CLASS} style={{ position: 'absolute', right: 12, top: 12, padding: '4px 9px', borderRadius: 999, fontSize: 11, fontWeight: 700, color: CT_DARK.ink, fontVariantNumeric: 'tabular-nums' }}>
-                  {state.activeIndex + 1}/{state.media.length}
-                </div>
-              )}
-
-              {/* Edit chip — bottom-left glass pill */}
-              {active && !active.existingId && (
-                <button
-                  onClick={() => setSheet(active.type === 'video' ? 'cover' : 'adjust')}
-                  style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12, padding: '9px 13px', fontWeight: 700, gap: 6 }}
-                >
-                  <Pencil size={13} />
-                  Edit
-                </button>
-              )}
-            </div>
-
-            {/* Frame pills row (+ Add pill when there is exactly one slide) */}
-            {active && !active.existingId && (
-              <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, padding: '12px 16px 0', background: PAGE2.canvas }}>
-                <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
-                {state.media.length === 1 && (
-                  <button
-                    onClick={handleStageAdd}
-                    style={{
-                      marginLeft: 'auto',
-                      background: 'transparent',
-                      border: `1px dashed ${CT_DARK.dim}`,
-                      color: CT_DARK.mute,
-                      borderRadius: 999,
-                      padding: '8px 13px',
-                      fontSize: 11,
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      flex: 'none',
-                    }}
-                  >+ Add</button>
-                )}
-              </div>
-            )}
-
-            {/* Filmstrip — only when there is more than one slide, centred in the gap */}
-            {state.media.length > 1 ? (
-              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 16px', background: PAGE2.canvas }}>
-                <MediaTray
-                  media={state.media}
-                  activeIndex={state.activeIndex}
-                  onSelect={setActiveIndex}
-                  onRemove={handleRemoveAt}
-                  onReorder={reorder}
-                  onAddFiles={handleAddFiles}
-                />
-              </div>
-            ) : (
-              <div style={{ flex: 1, minHeight: 0, background: PAGE2.canvas }} />
-            )}
-          </>
         )}
 
-        {/* Next */}
-        <div style={{ flex: 'none', background: PAGE2.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
+        {/* Edit chip — bottom-left glass pill */}
+        {active && !active.existingId && (
           <button
-            onClick={() => { setPage(2); focusCaption(); }}
-            disabled={emptyStage}
-            style={{
-              width: '100%',
-              padding: '15px 20px',
-              borderRadius: 999,
-              border: 'none',
-              /* CAPS ACTION. */
-              fontSize: 13,
-              fontWeight: 700,
-              textTransform: 'uppercase', letterSpacing: '0.10em',
-              background: emptyStage ? 'rgba(248,250,252,0.10)' : CT_DARK.ink,
-              color: emptyStage ? CT_DARK.dim : '#11131A',
-              cursor: emptyStage ? 'default' : 'pointer',
-            }}
+            onClick={() => setSheet(active.type === 'video' ? 'cover' : 'adjust')}
+            style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12, padding: '9px 13px', fontWeight: 700, gap: 6 }}
           >
-            Next
+            <Pencil size={13} />
+            {t('stage.edit')}
           </button>
-        </div>
-
-
-        {sheets}
+        )}
       </div>
-    );
-  }
 
-  // ---- PAGE 2 — WORDS, DARK ----------------------------------------------
+      {/* Frame pills row (+ Add pill when there is exactly one slide) */}
+      {active && !active.existingId && (
+        <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, padding: '12px 16px 0', background: PAGE2.canvas }}>
+          <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
+          {state.media.length === 1 && (
+            <button
+              onClick={handleStageAdd}
+              style={{
+                marginLeft: 'auto',
+                background: 'transparent',
+                border: `1px dashed ${CT_DARK.dim}`,
+                color: CT_DARK.mute,
+                borderRadius: 999,
+                padding: '8px 13px',
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: 'pointer',
+                flex: 'none',
+              }}
+            >{t('stage.addShort')}</button>
+          )}
+        </div>
+      )}
+
+      {/* Filmstrip — only when there is more than one slide, centred in the gap */}
+      {state.media.length > 1 ? (
+        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 16px', background: PAGE2.canvas }}>
+          <MediaTray
+            media={state.media}
+            activeIndex={state.activeIndex}
+            onSelect={setActiveIndex}
+            onRemove={handleRemoveAt}
+            onReorder={reorder}
+            onAddFiles={handleAddFiles}
+          />
+        </div>
+      ) : (
+        <div style={{ flex: 1, minHeight: 0, background: PAGE2.canvas }} />
+      )}
+
+      {/* Done — one full-width INK bar, closes the sheet and nothing else. */}
+      <div style={{ flex: 'none', background: PAGE2.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
+        <button
+          onClick={() => setOpenMediaIndex(null)}
+          style={{
+            width: '100%',
+            padding: '15px 20px',
+            borderRadius: 999,
+            border: 'none',
+            /* CAPS ACTION. */
+            fontSize: 13,
+            fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: '0.10em',
+            background: PAGE2.ink,
+            color: PAGE2.canvas,
+            cursor: 'pointer',
+          }}
+        >
+          {t('stage.mediaSheet.done')}
+        </button>
+      </div>
+    </div>
+  );
+
+  // ---- STEP 2 — ONE SCREEN --------------------------------------------------
   return (
     <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
-      {/* Top bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: PAGE2.canvas, flex: 'none' }}>
-        <button
-          onClick={() => (state.media.length > 0 ? setPage(1) : handleClose())}
-          aria-label={state.media.length > 0 ? 'Back' : 'Close'}
-          style={page2IconButtonStyle}
-        >
-          {/* SVG GLYPHS, NOT TEXT GLYPHS - same reason as page 1's close. The
-              "\u2039" was the worse of the two: it carries asymmetric side
-              bearing, so it read both high and right inside the circle. */}
-          {state.media.length > 0
-            ? <ChevronLeft size={18} strokeWidth={2.2} />
-            : <X size={18} strokeWidth={2.2} />}
-        </button>
-        <div style={{ minWidth: 0, flex: 1 }} />
-        <div style={{ fontSize: 12, fontWeight: 700, color: PAGE2.mute, fontVariantNumeric: 'tabular-nums' }}>2 / 2</div>
+      {/* THE SHARED HEADER, on both paths. No local counter: there is no
+          "1 / 2" or "2 / 2" text left in this file. */}
+      <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top), 12px)' }}>
+        <ComposerStepHeader step={2} total={2} left={leadingControl} onLeft={handleLeading} />
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2px 0 16px', display: 'flex', flexDirection: 'column' }}>
-        {/* Media strip — every slide, tap one to go back and edit it */}
-        {state.media.length > 0 && (
+        {/* THE MEDIA RAIL. Nothing here auto-fires a picker: no effect opens a
+            file input on mount. That behaviour was deleted in August and must
+            not come back. */}
+        {emptyStage ? (
+          /* Both inputs live HERE, each one anchored EXACTLY OVER ITS OWN
+             BUTTON so the iOS chooser menu opens from the control that was
+             tapped rather than over the footer. Do not consolidate them. */
+          <div style={{ padding: '4px 16px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => emptyLibraryInputRef.current?.click()} style={emptyPrimaryButtonStyle}>
+                {t('stage.chooseFromLibrary')}
+              </button>
+              <input
+                ref={emptyLibraryInputRef}
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                onChange={handleStageAddFiles}
+                tabIndex={-1}
+                aria-hidden="true"
+                style={anchoredInputStyle}
+              />
+            </div>
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => emptyCameraInputRef.current?.click()} style={emptySecondaryButtonStyle}>
+                {t('stage.takePhotoOrVideo')}
+              </button>
+              <input
+                ref={emptyCameraInputRef}
+                type="file"
+                accept="image/*,video/*"
+                capture="environment"
+                onChange={handleStageAddFiles}
+                tabIndex={-1}
+                aria-hidden="true"
+                style={anchoredInputStyle}
+              />
+            </div>
+          </div>
+        ) : (
           <>
             <div style={{ display: 'flex', gap: 6, padding: '2px 16px 0', overflowX: 'auto' }}>
               {state.media.map((m, i) => (
                 <button
                   key={m.id}
-                  onClick={() => { setActiveIndex(i); setPage(1); }}
-                  aria-label={`Edit item ${i + 1}`}
-                  style={{ position: 'relative', width: 56, height: 70, borderRadius: 10, overflow: 'hidden', flex: 'none', border: `1px solid ${PAGE2.line}`, padding: 0, background: PAGE2.panel, cursor: 'pointer' }}
+                  onClick={() => { setActiveIndex(i); setOpenMediaIndex(i); }}
+                  aria-label={t('stage.editItem', { n: i + 1 })}
+                  style={{ position: 'relative', width: 72, height: 72, borderRadius: 10, overflow: 'hidden', flex: 'none', border: `1px solid ${PAGE2.line}`, padding: 0, background: PAGE2.panel, cursor: 'pointer' }}
                 >
                   <SlideThumb item={m} glyph={20} />
                 </button>
               ))}
               <button
                 onClick={handleStageAdd}
-                aria-label="Add photos or video"
-                style={{ width: 56, height: 70, borderRadius: 10, flex: 'none', border: `1px dashed ${PAGE2.dim}`, background: 'transparent', color: PAGE2.mute, fontSize: 18, cursor: 'pointer' }}
+                aria-label={t('stage.addMedia')}
+                style={{ width: 72, height: 72, borderRadius: 10, flex: 'none', border: `1px dashed ${PAGE2.dim}`, background: 'transparent', color: PAGE2.mute, fontSize: 18, cursor: 'pointer' }}
               >+</button>
             </div>
-            <div style={{ padding: '6px 18px 0', fontSize: 11, color: PAGE2.dim }}>Tap a photo to go back and edit</div>
+            <div style={{ padding: '6px 18px 0', fontSize: 11, color: PAGE2.dim }}>{t('stage.tapToEdit')}</div>
           </>
         )}
 
@@ -1048,23 +1025,23 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
             currentUserId={profile?.id ?? null}
             variant="dark"
             minHeight={96}
-            placeholder="What's on your mind"
+            placeholder={t('stage.captionPlaceholder')}
             autoFocus={!isEditMode}
             inputRef={(el) => { captionElRef.current = el; }}
           />
-          <div style={{ fontSize: 11, color: PAGE2.dim, marginTop: 2 }}>@mention friends and businesses</div>
+          <div style={{ fontSize: 11, color: PAGE2.dim, marginTop: 2 }}>{t('stage.mentionHint')}</div>
         </div>
 
         {/* Tag a course — suggestion-first, Search is the fallback */}
         <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
           <div style={{ padding: '14px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>Tag a course</span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.tagCourse')}</span>
               <button
                 onClick={() => { openDetail('course'); setSheet('course'); }}
                 style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: PAGE2.ink, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
               >
-                Search
+                {t('stage.search')}
                 <ChevronRight size={12} strokeWidth={2.5} />
               </button>
             </div>
@@ -1078,7 +1055,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                   <button
                     key={`tagged-${c.id}`}
                     onClick={() => setCourses(state.courses.filter((x) => x.id !== c.id))}
-                    aria-label={`Untag ${c.name}`}
+                    aria-label={t('stage.untag', { name: c.name })}
                     style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${PAGE2.ink}`, background: PAGE2.ink, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: PAGE2.canvas }}
                   >
                     {c.name}
@@ -1093,7 +1070,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         {/* Detail rows — Drafts appears only when drafts exist */}
         <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '12px 16px 0', overflow: 'hidden' }}>
           <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={page2RowStyle(false)}>
-            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>Posting as</span>
+            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.postingAs')}</span>
             <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 13, color: PAGE2.mute, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
               <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={DARK_HAIRLINE} />
@@ -1102,16 +1079,16 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
           </button>
           {showScheduleRow && (
             <button onClick={() => { openDetail('schedule'); setSheet('schedule'); }} style={page2RowStyle(true)}>
-              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>Schedule for later</span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.scheduleForLater')}</span>
               <span style={{ marginLeft: 'auto', fontSize: 13, color: state.scheduledAt ? PAGE2.ink : PAGE2.mute }}>
-                {state.scheduledAt ? state.scheduledAt.toLocaleString() : 'Off'}
+                {state.scheduledAt ? state.scheduledAt.toLocaleString() : t('stage.off')}
               </span>
               <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
             </button>
           )}
           {!isEditMode && drafts.drafts.length > 0 && (
             <button onClick={() => setSheet('drafts')} style={page2RowStyle(true)}>
-              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>Drafts</span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.drafts')}</span>
               <span style={{ marginLeft: 'auto', fontSize: 13, color: PAGE2.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>
               <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
             </button>
@@ -1145,6 +1122,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         </button>
       </div>
 
+      {mediaSheet}
       {sheets}
     </div>
   );

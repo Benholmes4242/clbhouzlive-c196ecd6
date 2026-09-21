@@ -104,7 +104,7 @@ export default function CreateSheetV3({ open, onClose, returnPath }: Props) {
     if (round.courseId) {
       openPostStudioForCourse({ course: { id: round.courseId, name: round.courseName }, returnPath });
     } else {
-      openPostStudio({ awaitingMedia: true, returnPath });
+      openPostStudio({ returnPath });
     }
     onClose();
   };
@@ -139,7 +139,7 @@ export default function CreateSheetV3({ open, onClose, returnPath }: Props) {
             sub="Photos or video, from anywhere"
             onPick={() => {
               analyticsEvents.track('create_sheet_action', { action: 'new_post' });
-              openPostStudio({ awaitingMedia: true, returnPath });
+              openPostStudio({ returnPath });
               onClose();
             }}
           />

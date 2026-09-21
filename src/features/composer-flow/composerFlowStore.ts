@@ -46,18 +46,42 @@ interface Handoff {
 
 interface ComposerFlowState {
   handoff: Handoff | null;
+  /**
+   * Set by requestReopen(); consumed by GlobalBottomNavigation, which opens
+   * step 1 and spends the flag. Separate from the handoff on purpose — see
+   * requestReopen below.
+   */
+  reopenRequested: boolean;
   /** Called by step 1 as it hands off to a composer. */
   beginHandoff: (returnPath: string) => void;
   arm: (awayPath: string) => void;
   clearHandoff: () => void;
+  /**
+   * THE POST COMPOSER'S ← (phase 3 §1.4). The post composer is an OVERLAY, so
+   * closing it is not a navigation and the popstate path in nextHandoffAction
+   * cannot serve this return: there is no back event to observe. This is an
+   * EXPLICIT request instead, and nextHandoffAction's rules are left exactly as
+   * they are — they are tested and correct for the review path, which is a
+   * route.
+   *
+   * ONE-SHOT, LIKE EVERYTHING ELSE HERE: the handoff is cleared as the flag is
+   * raised, so a second call with no handoff left does nothing at all.
+   */
+  requestReopen: () => void;
+  /** GlobalBottomNavigation spends the flag once it has opened step 1. */
+  consumeReopen: () => void;
 }
 
 export const useComposerFlowStore = create<ComposerFlowState>((set) => ({
   handoff: null,
+  reopenRequested: false,
   beginHandoff: (returnPath) => set({ handoff: { returnPath, armed: false, awayPath: null } }),
   arm: (awayPath) =>
     set((s) => (s.handoff ? { handoff: { ...s.handoff, armed: true, awayPath } } : s)),
   clearHandoff: () => set({ handoff: null }),
+  requestReopen: () =>
+    set((s) => (s.handoff ? { handoff: null, reopenRequested: true } : s)),
+  consumeReopen: () => set({ reopenRequested: false }),
 }));
 
 /**

@@ -57,5 +57,32 @@
  },
  "detailRows": {
   "optional": "Optional"
+ },
+ "stage": {
+  "mediaSheet": {
+   "title": "Edit photos",
+   "done": "DONE"
+  },
+  "tapToEdit": "Tap a photo to edit it",
+  "editItem": "Edit item {{n}}",
+  "addMedia": "Add photos or video",
+  "addShort": "+ Add",
+  "edit": "Edit",
+  "emptyGate": "ADD A PHOTO OR A FEW WORDS",
+  "chooseFromLibrary": "Choose from library",
+  "takePhotoOrVideo": "Take photo or video",
+  "captionPlaceholder": "What's on your mind",
+  "mentionHint": "@mention friends and businesses",
+  "tagCourse": "Tag a course",
+  "search": "Search",
+  "untag": "Untag {{name}}",
+  "postingAs": "Posting as",
+  "scheduleForLater": "Schedule for later",
+  "off": "Off",
+  "drafts": "Drafts",
+  "saveChanges": "Save changes",
+  "schedule": "Schedule",
+  "share": "Share",
+  "editPost": "Edit post"
  }
 }

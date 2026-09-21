@@ -65,6 +65,7 @@ import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSke
 import ComposerStepHeader from '@/features/composer-flow/components/ComposerStepHeader';
 import { courseShortName } from '@/features/composer-flow/courseShortName';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 
 /**
@@ -443,6 +444,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
      course page, or an edit has no step behind them, so their leading control
      is a CLOSE, not a back arrow that would go somewhere they never were. */
   const cameFromStepOne = useComposerFlowStore((st) => st.handoff != null);
+  const handoffReturnPath = useComposerFlowStore((st) => st.handoff?.returnPath ?? null);
+  const openPostStudio = usePostStudioStore((st) => st.openPostStudio);
   const leadingIsClose = step === FIRST_STEP && !cameFromStepOne;
 
   /* THE THRESHOLD LINE'S TWO FACTS: how many ratings this course already has,
@@ -815,11 +818,43 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
       ? t('review.wizard.step3.threshold', { ordinal: ordinal(existingRatings + 1) })
       : null;
 
-  /* THE SKIP LINK. Step 2 only: it can be passed with nothing, and the link says
-     what the member gets. Step 3's "post without rating it" needs the POST
-     engine, which phase 3 wires; it is not half-wired here. */
-  const skipLabel =
-    step === FIRST_STEP && !hasMedia && !hasWords ? t('review.wizard.step2.skip') : null;
+  /* THE TWO SKIP LINKS.
+     STEP 2: shown only when the member has attached nothing and typed nothing —
+     passing with nothing is deliberate, so the link names what they get.
+     STEP 3: "post without rating it" changes PATH rather than skipping a field,
+     so it is never offered in EDIT MODE — a member editing a review they have
+     already published is not choosing between a review and a post. */
+  const step3Skip = step === LAST_STEP && !isEditMode;
+  const skipLabel = step3Skip
+    ? t('review.wizard.step3.skipToPost')
+    : step === FIRST_STEP && !hasMedia && !hasWords
+      ? t('review.wizard.step2.skip')
+      : null;
+
+  /* CARRYING THE WORK ACROSS (§6). The local Files go over INTACT — the same
+     File objects the pipeline is holding, not copies and not re-encodes — so the
+     post composer's own pipeline receives exactly what the member picked. Items
+     WITHOUT a `file` are server media, which exist only in edit mode, and this
+     link is not offered there.
+     The review draft for this course is cleared: a member who chose not to write
+     a review must not be offered a restore of one later. */
+  const handleSkipToPost = useCallback(() => {
+    const files = media.items.map((it) => it.file).filter((f): f is File => !!f);
+    // Analytics callsite: review_skipped_to_post
+    analyticsEvents.track('review_skipped_to_post', {
+      media_count: files.length,
+      text_len: composer.state.reviewText.trim().length,
+    });
+    composer.clearDraft();
+    openPostStudio({
+      media: files,
+      caption: composer.state.reviewText,
+      entry: 'review_skip',
+      // The page step 1 was opened from, so closing the post composer lands
+      // where the flow began rather than back on the rate route.
+      returnPath: handoffReturnPath ?? '/',
+    });
+  }, [media.items, composer, openPostStudio, handoffReturnPath]);
 
   const cats: CategoryCopy[] = [
     { key: 'design', label: t('review.subscore.design'), hint: t('review.wizard.hint.design') },
@@ -1345,7 +1380,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         onPress={handlePrimary}
         summary={footerSummary}
         skipLabel={skipLabel}
-        onSkip={skipLabel ? handlePrimary : undefined}
+        onSkip={!skipLabel ? undefined : step3Skip ? handleSkipToPost : handlePrimary}
       />
 
       {/* §1a: the one question before several paragraphs are thrown away. */}

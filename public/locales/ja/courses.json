@@ -1690,7 +1690,8 @@
     "submit": "レビューを送る",
     "summary": "{{course}} を {{score}} で採点",
     "summaryShare": "、クラブハウスに投稿",
-    "threshold": "あなたが{{ordinal}}件目の評価になります — コースパージのバーが公開されます。"
+    "threshold": "あなたが{{ordinal}}件目の評価になります — コースパージのバーが公開されます。",
+    "skipToPost": "Post without rating it"
    },
    "uploadingMedia": "写真をアップロード中..."
   },

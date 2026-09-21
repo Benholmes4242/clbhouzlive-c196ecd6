@@ -7,8 +7,14 @@ import type { StudioActorType } from '@/components/post-composer/types';
 interface PostStudioStoreState {
   isOpen: boolean;
   initialMedia: File[];
-  /** True while the native picker is up: the composer opens dark and awaiting. */
-  awaitingMedia: boolean;
+  /**
+   * Caption the composer opens with. Written only by the review path's
+   * "post without rating it" link (phase 3 §6), which carries the member's
+   * words across when they change path.
+   */
+  prefillCaption: string | null;
+  /** How the composer was opened, for post_composer_opened's entry prop. */
+  entry: 'review_skip' | null;
   initialActorType: StudioActorType;
   initialActorId: string | null;
   returnPath: string;
@@ -22,8 +28,9 @@ interface PostStudioStoreState {
   /** Open the studio (optionally with pre-selected media or actor) */
   openPostStudio: (opts?: {
     media?: File[];
-    /** Open page 1 in its awaiting-media state (picker about to be fired). */
-    awaitingMedia?: boolean;
+    /** Words carried in from the review path's skip link. */
+    caption?: string;
+    entry?: 'review_skip';
     actorType?: StudioActorType;
     actorId?: string | null;
     returnPath?: string;
@@ -59,7 +66,8 @@ interface PostStudioStoreState {
 export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
   isOpen: false,
   initialMedia: [],
-  awaitingMedia: false,
+  prefillCaption: null,
+  entry: null,
   initialActorType: 'personal',
   initialActorId: null,
   returnPath: '/',
@@ -71,7 +79,8 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
     set({
       isOpen: true,
       initialMedia: opts?.media ?? [],
-      awaitingMedia: opts?.awaitingMedia ?? false,
+      prefillCaption: opts?.caption ?? null,
+      entry: opts?.entry ?? null,
       initialActorType: opts?.actorType ?? 'personal',
       initialActorId: opts?.actorId ?? null,
       returnPath: opts?.returnPath ?? window.location.pathname,
@@ -84,7 +93,8 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
     set({
       isOpen: true,
       initialMedia: opts.media ?? [],
-      awaitingMedia: false,
+      prefillCaption: null,
+      entry: null,
       initialActorType: 'personal',
       initialActorId: null,
       returnPath: opts.returnPath ?? window.location.pathname,
@@ -97,7 +107,8 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
     set({
       isOpen: true,
       initialMedia: [],
-      awaitingMedia: false,
+      prefillCaption: null,
+      entry: null,
       initialActorType: 'personal',
       initialActorId: null,
       returnPath: opts.returnPath ?? window.location.pathname,
@@ -110,7 +121,8 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
     set({
       isOpen: true,
       initialMedia: [],
-      awaitingMedia: false,
+      prefillCaption: null,
+      entry: null,
       initialActorType: 'personal',
       initialActorId: null,
       returnPath: opts.returnPath ?? window.location.pathname,
@@ -127,7 +139,8 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
     set({
       isOpen: false,
       initialMedia: [],
-      awaitingMedia: false,
+      prefillCaption: null,
+      entry: null,
       initialActorType: 'personal',
       initialActorId: null,
       returnPath: '/',

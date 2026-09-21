@@ -120,7 +120,7 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
     if (!canAdvance) return;
     beginHandoff(returnPath ?? window.location.pathname);
     if (kind === 'post') {
-      openPostStudio({ awaitingMedia: true, returnPath });
+      openPostStudio({ returnPath });
       onClose();
       return;
     }
