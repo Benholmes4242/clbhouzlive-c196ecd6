@@ -33,6 +33,29 @@ describe('C3 round stat strip', () => {
     expect(strip?.style.border).toBe('');
   });
 
+  it('keeps every tier on the neutral panel and derives TOP lighting above GOLD', () => {
+    const gold = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 2 });
+    const top = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, holes_in_one: 2 });
+    const ink = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 1 });
+    const goldStrip = gold.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+    const topStrip = top.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+    const inkStrip = ink.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+    const goldEmblem = gold.querySelector<HTMLElement>('[data-explore-achievement-emoji]');
+    const topEmblem = top.querySelector<HTMLElement>('[data-explore-achievement-emoji]');
+
+    for (const strip of [goldStrip, topStrip, inkStrip]) {
+      expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
+      expect(strip?.style.border).toBe('');
+    }
+    expect(goldStrip?.style.backgroundImage).toContain('radial-gradient(120px 60px');
+    expect(topStrip?.style.backgroundImage).toContain('radial-gradient(142px 71px');
+    expect(inkStrip?.style.backgroundImage).toBe('none');
+    expect(goldEmblem?.style.fontSize).toBe('26px');
+    expect(topEmblem?.style.fontSize).toBe('28px');
+    expect(goldEmblem?.style.boxShadow).toContain('14px');
+    expect(topEmblem?.style.boxShadow).toContain('17px');
+  });
+
   it('uses equal thirds without an achievement and never prints a birdies figure label', () => {
     const container = renderCard({ gross: 82, course_par: 71, net: 76, course_handicap: 6, birdies: 4 });
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
