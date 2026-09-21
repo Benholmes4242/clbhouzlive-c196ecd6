@@ -136,6 +136,20 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
 
   const overviewName = (fullName: string | undefined): string => fullName?.trim() || BLANK;
 
+  const renderEntityName = (entity: ReturnType<typeof resolveBoardEntity>, ink: string) => entity.kind === 'team' ? (
+    // A team row names two people, not one. Both lines take full ink because
+    // neither player is a supporting credit.
+    <div style={{ minWidth: 0 }}>
+      {entity.lines.map((line, index) => (
+        <span key={`${line}-${index}`} style={{ display: 'block', fontSize: 12.5, fontWeight: 600, lineHeight: 1.28, color: ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {line}
+        </span>
+      ))}
+    </div>
+  ) : (
+    <span style={{ minWidth: 0, whiteSpace: 'normal', lineHeight: 1.15, fontSize: 13, fontWeight: 600, color: ink }}>{overviewName(entity.lines[0])}</span>
+  );
+
   if (theme === 'heroBoard') {
     return (
       <>
@@ -159,15 +173,15 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 key={r.id}
                 type="button"
                 onClick={() => { if (!r.player?.id) return; onRowTap?.(r.player.id); setTarget({
-                  playerId: r.player.id, playerName: entity.label, countryCode: r.player?.country_code ?? r.player?.country ?? null,
+                  playerId: r.player.id, playerName: entity.lines[0] ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
                   position: r.position ?? null, positionTied: r.position_tied ?? null, total: r.score ?? null, today, thru: r.thru ?? null, status: r.status ?? null,
                 }); }}
-                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', width: '100%', minHeight: 44, padding: '8px 24px', border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
+                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', width: '100%', minHeight: 44, padding: `${entity.kind === 'team' ? 9 : 8}px 24px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
                 className={`${T.press} transition-colors`}
               >
                 {showOverviewPosition ? <div style={{ fontSize: 12, fontWeight: 700, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{posText}</div> : null}
                 <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <span style={{ minWidth: 0, whiteSpace: 'normal', lineHeight: 1.15, fontSize: 13, fontWeight: 600 }}>{overviewName(entity.label)}</span>
+                  {renderEntityName(entity, T.ink)}
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
                 {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{today == null ? todayBlank : fmtScore(today)}</div> : null}
@@ -221,7 +235,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               type="button"
               onClick={() => { if (!r.player?.id) return; onRowTap?.(r.player.id); setTarget({
                 playerId: r.player.id,
-                playerName: entity.label,
+                playerName: entity.lines[0] ?? '',
                 countryCode: cc,
                 position: r.position ?? null,
                 positionTied: r.position_tied ?? null,
@@ -232,7 +246,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               }); }}
               style={{
                 display: 'flex', alignItems: 'center', width: '100%',
-                padding: '10px 16px',
+                padding: `${entity.kind === 'team' ? 9 : 10}px 16px`,
                 borderBottom: `0.5px solid ${T.hairline}`,
                 background: r.position === 1 ? 'rgba(251,188,46,0.05)' : 'transparent', border: 'none',
                 borderLeft: 'none', borderRight: 'none', borderTop: 'none',
@@ -245,9 +259,11 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               </div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 8 }}>
                 {cc ? <CountryFlag country={cc} size="sm" /> : null}
-                <span style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: T.ink, whiteSpace: 'normal' }}>
-                  {entity.label}
-                </span>
+                {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
+                  <span style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: T.ink, whiteSpace: 'normal' }}>
+                    {entity.lines[0] ?? ''}
+                  </span>
+                )}
                 {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) && (
                   <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />
                 )}

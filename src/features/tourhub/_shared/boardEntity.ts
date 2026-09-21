@@ -2,9 +2,8 @@ import type { BoardEntry } from '../leaderboard/BoardTable';
 
 export interface BoardEntity {
   kind: 'player' | 'team';
-  /** Row label. Player: "Alex Smalley". Team: "Smalley / Springer",
-   * or "G. Kim / Y. Wilson" when the board needs initials. */
-  label: string;
+  /** One entry per line. A player row has one; a team row has two. */
+  lines: string[];
   /** Prose form. Player: "Alex Smalley".
    * Team: "Gina Kim and Yana Wilson" — always full names. */
   prose: string;
@@ -55,9 +54,16 @@ function readableDisplayName(value: string): string {
     .trim();
 }
 
+function teamLines(value: string): string[] {
+  return value
+    .split('/')
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
 export function resolveBoardEntity(entry: BoardEntry, needsInitials: boolean): BoardEntity {
   const playerName = entry.player?.full_name?.trim() ?? '';
-  if (!entry.team) return { kind: 'player', label: playerName, prose: playerName };
+  if (!entry.team) return { kind: 'player', lines: [playerName], prose: playerName };
 
   const abbrName = entry.team?.abbr_name?.trim() ?? '';
   const displayName = entry.team?.display_name?.trim() ?? '';
@@ -65,6 +71,11 @@ export function resolveBoardEntity(entry: BoardEntry, needsInitials: boolean): B
   const label = needsInitials && displayName
     ? readableDisplayName(displayName)
     : abbrName || (displayName ? readableDisplayName(displayName) : '') || playerName;
+  const lines = teamLines(label);
 
-  return { kind: 'team', label: label || playerName, prose: memberNames.join(' and ') || label || playerName };
+  return {
+    kind: 'team',
+    lines: lines.length > 0 ? lines : ['', ''],
+    prose: memberNames.join(' and ') || label || playerName,
+  };
 }

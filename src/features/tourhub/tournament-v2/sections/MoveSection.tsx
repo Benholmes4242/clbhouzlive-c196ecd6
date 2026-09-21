@@ -15,7 +15,7 @@ export function MoveSection({ contest, state, tourCode }: Props) {
   const cjk = /^(ja|ko)/.test(i18n.language);
   const row = contest.mover;
   if (state === 'upcoming' || !row || contest.moverToday == null) return null;
-  const name = resolveBoardEntity(row, teamNamesNeedInitials(contest.pack.map((item) => item.entry))).label;
+  const name = resolveBoardEntity(row, teamNamesNeedInitials(contest.pack.map((item) => item.entry))).lines.join(' / ');
   const thru = row.thru != null && row.thru >= 18 ? 'F' : row.thru;
   const position = row.position == null ? '' : `${row.position_tied ? 'T' : ''}${row.position}`;
   const total = row.score == null ? '' : fmtScore(row.score);

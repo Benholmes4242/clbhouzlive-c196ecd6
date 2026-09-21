@@ -120,10 +120,10 @@ describe('selectTournamentContest', () => {
     const needsInitials = teamNamesNeedInitials(board);
 
     expect(needsInitials).toBe(true);
-    expect(resolveBoardEntity(board[0], needsInitials)).toEqual({ kind: 'team', label: 'G. Kim / Y. Wilson', prose: 'Gina Kim and Yana Wilson' });
-    expect(resolveBoardEntity(board[1], needsInitials).label).toBe('H. J. Kim / H. J. Choi');
-    expect(resolveBoardEntity(board[2], needsInitials).label).toBe('A. Iwai / C. Iwai');
-    expect(resolveBoardEntity(board[3], needsInitials).label).toBe('A. Smalley / B. Springer');
+    expect(resolveBoardEntity(board[0], needsInitials)).toEqual({ kind: 'team', lines: ['G. Kim', 'Y. Wilson'], prose: 'Gina Kim and Yana Wilson' });
+    expect(resolveBoardEntity(board[1], needsInitials).lines).toEqual(['H. J. Kim', 'H. J. Choi']);
+    expect(resolveBoardEntity(board[2], needsInitials).lines).toEqual(['A. Iwai', 'C. Iwai']);
+    expect(resolveBoardEntity(board[3], needsInitials).lines).toEqual(['A. Smalley', 'B. Springer']);
   });
 
   it('uses surname forms for every team when the board has no ambiguous surname', () => {
@@ -134,14 +134,14 @@ describe('selectTournamentContest', () => {
     const needsInitials = teamNamesNeedInitials(board);
 
     expect(needsInitials).toBe(false);
-    expect(resolveBoardEntity(board[0], needsInitials).label).toBe('Smalley / Springer');
-    expect(resolveBoardEntity(board[1], needsInitials).label).toBe('Cantlay / Schauffele');
+    expect(resolveBoardEntity(board[0], needsInitials).lines).toEqual(['Smalley', 'Springer']);
+    expect(resolveBoardEntity(board[1], needsInitials).lines).toEqual(['Cantlay', 'Schauffele']);
   });
 
   it('uses the honest team-name fallback order without null text', () => {
     const displayOnly = teamRow('display', -1, 1, null, 'A.Smith/B.Jones', []);
     const empty = teamRow('empty', 0, 2, null, null, []);
-    expect(resolveBoardEntity(displayOnly, false).label).toBe('A. Smith / B. Jones');
-    expect(resolveBoardEntity(empty, false)).toEqual({ kind: 'team', label: '', prose: '' });
+    expect(resolveBoardEntity(displayOnly, false).lines).toEqual(['A. Smith', 'B. Jones']);
+    expect(resolveBoardEntity(empty, false)).toEqual({ kind: 'team', lines: ['', ''], prose: '' });
   });
 });

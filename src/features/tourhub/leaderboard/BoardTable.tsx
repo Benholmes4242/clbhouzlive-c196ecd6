@@ -427,7 +427,9 @@ export function BoardTable({
     [teamInitials, entries],
   );
   const names = useMemo(
-    () => entries.filter((e) => !isDemoted(e.status)).map((e) => resolveBoardEntity(e, resolvedTeamInitials).label),
+    () => entries
+      .filter((e) => !isDemoted(e.status) && !e.team)
+      .map((e) => resolveBoardEntity(e, resolvedTeamInitials).lines[0] ?? ''),
     [entries, resolvedTeamInitials],
   );
 
@@ -595,10 +597,9 @@ export function BoardTable({
     const pid = e.player?.id;
     const mov = !demotedRow ? movementMap.get(pid ?? e.team?.id ?? e.id) : undefined;
     const entity = resolveBoardEntity(e, resolvedTeamInitials);
-    const fullName = entity.label;
-    // Team labels are already provider-authored compact forms. Applying the
-    // player-name shortening ladder would split them incorrectly.
-    const nameText = columns.preTournament || entity.kind === 'team' ? fullName : nameAtTier(fullName, tier);
+    const fullName = entity.lines[0] ?? '';
+    const nameText = columns.preTournament ? fullName : nameAtTier(fullName, tier);
+    const accessibleName = entity.lines.filter(Boolean).join(' / ');
 
     const open = () => {
       if (onRowClick) return onRowClick(e);
@@ -610,7 +611,7 @@ export function BoardTable({
         key={e.id}
         role="button"
         tabIndex={0}
-        aria-label={fullName || undefined}
+        aria-label={accessibleName || undefined}
         onClick={open}
         onKeyDown={(k) => {
           if (k.key === 'Enter' || k.key === ' ') open();
@@ -620,7 +621,7 @@ export function BoardTable({
           gridTemplateColumns: template,
           gap: columns.gap,
           alignItems: 'center',
-          padding: `10px ${ROW_PAD_X}px`,
+          padding: `${entity.kind === 'team' ? 9 : 10}px ${ROW_PAD_X}px`,
           background: isLeader ? LEADER_WASH : surface,
           opacity: demotedRow ? 0.55 : 1,
           cursor: 'pointer',
@@ -709,21 +710,27 @@ export function BoardTable({
               {posText}
             </div>
 
-            {/* PLAYER — never ellipsised, never a truncated surname. The tier
-                was resolved at table level so every row matches. */}
-            <div style={{ minWidth: 0 }}>
-              <span
-                style={{
-                  fontSize: NAME_SIZE,
-                  fontWeight: 700,
-                  letterSpacing: '-0.015em',
-                  color: A.INK,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {nameText}
-              </span>
-            </div>
+            {entity.kind === 'team' ? (
+              // A team row names two people, not one. The field's longest pair
+              // needs 254px on one line against a 194px name track at 320, so
+              // the pair stacks. Both lines take full INK: neither player is a
+              // supporting credit.
+              <div style={{ minWidth: 0 }}>
+                {entity.lines.map((line, index) => (
+                  <span key={`${e.id}-team-name-${index}`} style={{ display: 'block', fontSize: 12.5, fontWeight: 600, lineHeight: 1.28, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {line}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              /* PLAYER — never ellipsised, never a truncated surname. The tier
+                 was resolved at table level so every row matches. */
+              <div style={{ minWidth: 0 }}>
+                <span style={{ fontSize: NAME_SIZE, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK, whiteSpace: 'nowrap' }}>
+                  {nameText}
+                </span>
+              </div>
+            )}
 
             {columns.rounds.map((r) => {
               const isLive = columns.liveRound === r;
