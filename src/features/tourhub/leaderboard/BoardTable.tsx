@@ -630,19 +630,21 @@ export function BoardTable({
       >
         {columns.preTournament ? (
           <>
-            <div style={{ minWidth: 0 }}>
-              <span
-                style={{
-                  fontSize: PRE_NAME_SIZE,
-                  fontWeight: 700,
-                  letterSpacing: '-0.015em',
-                  color: A.INK,
-                  overflowWrap: 'anywhere',
-                }}
-              >
-                {nameText}
-              </span>
-            </div>
+            {entity.kind === 'team' ? (
+              <div style={{ minWidth: 0 }}>
+                {entity.lines.map((line, index) => (
+                  <span key={`${e.id}-pre-team-name-${index}`} style={{ display: 'block', fontSize: 12.5, fontWeight: 600, lineHeight: 1.28, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {line}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div style={{ minWidth: 0 }}>
+                <span style={{ fontSize: PRE_NAME_SIZE, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK, overflowWrap: 'anywhere' }}>
+                  {nameText}
+                </span>
+              </div>
+            )}
             <div
               style={{
                 textAlign: 'right',
