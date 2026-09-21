@@ -7,9 +7,11 @@ import type { HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard, type TourTournament } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { PhotoBand, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
-import { deriveHeroState, detectTopTie } from './HybridHero.utils';
+import { deriveHeroState, detectTopTie, fmtScore } from './HybridHero.utils';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
+import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -53,6 +55,18 @@ export function formatOverviewDateRange(startDate: string, endDate?: string | nu
     `${day(start)} ${month(start)}`,
     `${day(end)} ${month(end)}`,
   ].join(' – ');
+}
+
+export function formatOverviewChampionScore(
+  score: number,
+  playoff: boolean,
+  margin: number | null,
+  t: (key: string, options?: { count: number }) => string,
+): string {
+  const result = fmtScore(score);
+  if (playoff) return `${result} · ${t('overview.hero.playoff')}`;
+  if (margin != null) return `${result} · ${t('overview.hero.wonBy', { count: margin })}`;
+  return result;
 }
 
 export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
@@ -109,6 +123,14 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
     };
   }, [rows, state.kind, top?.score, tournament.winnerName]);
 
+  const championAvatarUrl = champion
+    ? resolvePlayerAvatarCandidates({
+        name: champion.name,
+        photoUrl: tournament.winnerPhotoUrl,
+        tourSlug: tournament.tourSlug,
+      })[0] ?? null
+    : null;
+
   const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
 
   const startDay = tournament.startDate
@@ -116,20 +138,29 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
     : null;
 
   return (
-    <PhotoBand
-      title={tournament.name}
-      venueName={tournament.venueName}
-      datesString={dates}
-      venueImageUrl={venueImageUrl}
-      state={state}
-      tourLabel={tournament.tourName || tournament.tourSlug?.toUpperCase() || null}
-      leader={leader}
-      countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []}
-      startDay={startDay}
-      champion={champion}
-      heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
-      onOpen={onOpenTournament}
-    />
+    <>
+      <PhotoBand
+        title={tournament.name}
+        venueName={tournament.venueName}
+        datesString={dates}
+        venueImageUrl={venueImageUrl}
+        state={state}
+        tourLabel={tournament.tourName || tournament.tourSlug?.toUpperCase() || null}
+        leader={leader}
+        countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []}
+        startDay={startDay}
+        heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
+        onOpen={onOpenTournament}
+      />
+      {state.kind === 'results' && champion ? (
+        <ChampionStrip
+          name={champion.name}
+          score={formatOverviewChampionScore(champion.score, champion.playoff, champion.margin, t)}
+          eyebrow={t('overview.hero.champion')}
+          avatarUrl={championAvatarUrl}
+        />
+      ) : null}
+    </>
   );
 }
 

@@ -7,9 +7,7 @@ import {
   FONT,
   INK,
   INK_MUTE,
-  LEADER_GOLD,
   STATUS_LIVE_ON_DARK,
-  SURFACE,
 } from '../../../_shared/tokens';
 import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
 import { fmtScore, type HeroState } from '../HybridHero.utils';
@@ -30,7 +28,6 @@ interface PhotoBandProps {
   leader: { score: number; name: string | null } | null;
   countdown: OverviewCountdownUnit[];
   startDay: string | null;
-  champion: { name: string; score: number; margin: number | null; playoff: boolean } | null;
   heightPx?: number;
   onOpen: () => void;
 }
@@ -53,7 +50,6 @@ export function PhotoBand({
   leader,
   countdown,
   startDay,
-  champion,
   heightPx = OVERVIEW_PHOTO_BAND_HEIGHT,
   onOpen,
 }: PhotoBandProps) {
@@ -161,17 +157,6 @@ export function PhotoBand({
                 <div style={{ ...CAPS, marginTop: 5, fontSize: 9 }}>{t(`overview.hero.${unit.label}`)}</div>
               </div>
             ))}
-          </div>
-        ) : null}
-
-        {state.kind === 'results' && champion ? (
-          <div style={{ flex: 'none', maxWidth: 122, textAlign: 'right' }}>
-            <div style={{ ...CAPS, color: LEADER_GOLD, letterSpacing: '0.14em' }}>{t('overview.hero.champion')}</div>
-            <div style={{ marginTop: 3, fontSize: 17, lineHeight: 1.1, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{champion.name}</div>
-            <div style={{ ...NUMERIC_STYLE, marginTop: 4, fontSize: 13, fontWeight: 700, color: getScoreColor(champion.score, 'dark') }}>
-              {fmtScore(champion.score)}
-              {champion.playoff ? ` · ${t('overview.hero.playoff')}` : champion.margin != null ? ` · ${t('overview.hero.wonBy', { count: champion.margin })}` : ''}
-            </div>
           </div>
         ) : null}
       </div>

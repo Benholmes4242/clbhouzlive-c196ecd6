@@ -94,6 +94,11 @@ const THEME_TOKENS = {
  * a tabular column and reads as data the field does not have.
  */
 const BLANK = '';
+export function shouldShowOverviewPrize(entries: Row[], limit = 5): boolean {
+  const displayedRows = entries.slice(0, limit);
+  return displayedRows.length > 0 && displayedRows.every((row) => row.money != null);
+}
+
 function thruLabel(row: Row, today: number | null): string {
   const s = row.status?.toUpperCase();
   if (s === 'MC' || s === 'CUT') return 'MC';
@@ -116,12 +121,16 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   // the previous round). The light board keeps its blank-cell doctrine.
   const todayBlank = theme === 'light' ? BLANK : '\u2014';
   const showOverviewPosition = rows.some((row) => row.position != null || ['MC', 'CUT', 'WD'].includes(row.status?.toUpperCase() ?? ''));
+  // Two completed events on the same tour in the same season can legitimately
+  // differ here. Prize coverage is event data, not a UI inconsistency: show the
+  // column only when every currently displayed row has a money value.
+  const showOverviewPrize = phase === 'completed' && shouldShowOverviewPrize(entries, limit);
   // The live hero board carries TODAY, not THRU: the current round is the story
   // and the swap is what keeps the name column wide enough for real names.
   // Gate shape matches the old THRU gate: render only when a visible row has one.
   const showOverviewToday = phase === 'live' && rows.some((row) => todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound) != null);
   const overviewGrid = phase === 'completed'
-    ? [showOverviewPosition ? '44px' : null, 'minmax(0, 1fr)', '52px', '52px'].filter(Boolean).join(' ')
+    ? [showOverviewPosition ? '44px' : null, 'minmax(0, 1fr)', '52px', showOverviewPrize ? '52px' : null].filter(Boolean).join(' ')
     : [showOverviewPosition ? '44px' : null, 'minmax(0, 1fr)', showOverviewToday ? '40px' : null, '52px'].filter(Boolean).join(' ');
 
   const overviewName = (fullName: string | undefined): string => fullName?.trim() || BLANK;
@@ -135,7 +144,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             <div>{t('board.columns.player')}</div>
             {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right' }}>{t('board.columns.today')}</div> : null}
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
-            {phase === 'completed' ? <div style={{ textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div> : null}
+            {showOverviewPrize ? <div style={{ textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div> : null}
           </div>
           {rows.map((r) => {
             const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
@@ -161,7 +170,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 </div>
                 {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{today == null ? todayBlank : fmtScore(today)}</div> : null}
                 <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
-                {phase === 'completed' ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{r.money != null && r.money > 0 ? formatEarnings(r.money) : BLANK}</div> : null}
+                {showOverviewPrize ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{formatEarnings(r.money)}</div> : null}
               </button>
             );
           })}

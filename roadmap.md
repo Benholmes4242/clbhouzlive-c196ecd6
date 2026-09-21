@@ -16,3 +16,4 @@
 - [x] Restore VS HCP to the feat pill and use member-position public rarity copy through three members.
 - [x] Replace the withdrawn GOLD/TOP tile tint and border with tokenized emblem lighting, then verify contrast and scroll painting.
 - [x] Replace the box-tracing emblem shadow with a silhouette-tracing drop-shadow and remove wrapper geometry.
+- [x] Move completed champions beneath the Tour Overview photo and gate PRIZE on complete displayed-row coverage.
