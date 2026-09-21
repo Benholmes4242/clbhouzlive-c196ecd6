@@ -66,8 +66,7 @@ export function AchievementEmoji({ glyph, tier = 'ink' }: { glyph: string; tier?
         fontFamily: "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
         fontSize: emblemSize,
         lineHeight: 1,
-        borderRadius: '50%',
-        boxShadow: emblemGlow,
+        filter: emblemGlow,
       }}
     >
       {glyph}

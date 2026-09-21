@@ -58,8 +58,14 @@ describe('C3 round stat strip', () => {
     expect(inkStrip?.style.backgroundImage).toBe('none');
     expect(goldEmblem?.style.fontSize).toBe('26px');
     expect(topEmblem?.style.fontSize).toBe('28px');
-    expect(FEAT_GOLD_EMBLEM_GLOW).toContain('14px');
-    expect(FEAT_TOP_EMBLEM_GLOW).toContain('17px');
+    expect(goldEmblem?.style.filter).toBe(FEAT_GOLD_EMBLEM_GLOW);
+    expect(topEmblem?.style.filter).toBe(FEAT_TOP_EMBLEM_GLOW);
+    expect(goldEmblem?.style.boxShadow).toBe('');
+    expect(topEmblem?.style.boxShadow).toBe('');
+    expect(goldEmblem?.style.borderRadius).toBe('');
+    expect(topEmblem?.style.borderRadius).toBe('');
+    expect(FEAT_GOLD_EMBLEM_GLOW).toContain('drop-shadow(0 0 10px');
+    expect(FEAT_TOP_EMBLEM_GLOW).toContain('drop-shadow(0 0 12px');
   });
 
   it('uses equal thirds without an achievement and never prints a birdies figure label', () => {
