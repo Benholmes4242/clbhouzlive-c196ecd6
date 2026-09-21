@@ -52,7 +52,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronDown, Trophy } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, OVERVIEW_PICKS_TEXT_INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
@@ -96,8 +96,8 @@ type SettledFigure = {
  * level/over is INK — which on this dark surface is white.
  */
 function tourFigColor(v: number | null | undefined): string {
-  if (v == null || v === 0) return INK;
-  return v < 0 ? TOPAR_UNDER_DARK : INK;
+  if (v == null || v === 0) return '#FFFFFF';
+  return v < 0 ? TOPAR_UNDER_DARK : '#FFFFFF';
 }
 
 function settledFigureFor(
@@ -154,7 +154,7 @@ function StatCell({
           letterSpacing: '-0.01em',
           lineHeight: 1.05,
           marginTop: 2,
-          color: color ?? INK,
+          color: color ?? '#FFFFFF',
           ...FIGS,
         }}
       >
@@ -201,8 +201,6 @@ interface HeroBoardSectionProps {
    * loser is not the champion).
    */
   championSrId?: string | null;
-  /** Team-event champions have no tournament winner_id, so members are matched by player id. */
-  championPlayerIds?: string[];
   onFullLeaderboard: () => void;
   onRowTap?: (playerId: string) => void;
 }
@@ -230,11 +228,8 @@ export function resolveChampionPlayerId(
 export function pickWonTournament(
   pickPlayerId: string | null | undefined,
   championPlayerId: string | null,
-  championPlayerIds: string[] = [],
 ): boolean {
-  if (!pickPlayerId) return false;
-  if (championPlayerId && String(pickPlayerId) === championPlayerId) return true;
-  return championPlayerIds.some((id) => String(pickPlayerId) === String(id));
+  return Boolean(pickPlayerId && championPlayerId && String(pickPlayerId) === championPlayerId);
 }
 
 export function overviewTournamentDoorKey(phase: HeroBoardSectionProps['phase']): string {
@@ -264,7 +259,6 @@ export function HeroBoardSection({
   currentRound,
   phase,
   championSrId,
-  championPlayerIds = [],
   onFullLeaderboard,
   onRowTap,
 }: HeroBoardSectionProps) {
@@ -289,16 +283,9 @@ export function HeroBoardSection({
   const boardByPlayer = useMemo(() => {
     const map = new Map<string, { position: number | null; tied: boolean; score: number | null }>();
     for (const entry of entries as any[]) {
-      const line = { position: entry.position ?? null, tied: Boolean(entry.position_tied), score: entry.score ?? null };
       const id = entry?.player?.id;
-      if (id) {
-        map.set(String(id), line);
-        continue;
-      }
-      for (const member of entry?.team?.members ?? []) {
-        const memberId = member?.player?.id;
-        if (memberId) map.set(String(memberId), line);
-      }
+      if (!id) continue;
+      map.set(String(id), { position: entry.position ?? null, tied: Boolean(entry.position_tied), score: entry.score ?? null });
     }
     return map;
   }, [entries]);
@@ -327,7 +314,7 @@ export function HeroBoardSection({
       const best = placed[0];
       const settled = settledFigureFor(best.line);
       // The trophy marks the CHAMPION, never a position: T1 playoff losers get none.
-      const trophy = pickWonTournament(best.pick.playerId, championPlayerId, championPlayerIds);
+      const trophy = pickWonTournament(best.pick.playerId, championPlayerId);
       const text = settled?.right === WON_LABEL
         ? `Picked ${surnameOf(best.pick.playerName)} to win · ${WON_LABEL}`
         : `${surnameOf(best.pick.playerName)} ${settled?.right ?? ''}`.trim();
@@ -337,7 +324,7 @@ export function HeroBoardSection({
       text: placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', '),
       trophy: false,
     };
-  }, [boardByPlayer, championPlayerId, championPlayerIds, hasPicks, phase, picks]);
+  }, [boardByPlayer, championPlayerId, hasPicks, phase, picks]);
 
   const showUpcomingFacts = shouldLoadUpcomingFacts(phase);
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showUpcomingFacts);
@@ -395,7 +382,7 @@ export function HeroBoardSection({
           >
             {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
             <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
-            <span style={{ minWidth: 0, fontSize: 13, color: OVERVIEW_PICKS_TEXT_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span style={{ minWidth: 0, fontSize: 13, color: 'rgba(248,250,252,0.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {closedRow.trophy ? (
                 <Trophy
                   data-pick-trophy
@@ -512,7 +499,7 @@ function PicksPanel({
             ? settled.figureColor
             : liveLine
               ? tourFigColor(liveLine.score)
-              : INK;
+              : '#FFFFFF';
           const pull = p.pulledQuote || p.reasons?.[0] || null;
 
           return (
@@ -551,7 +538,7 @@ function PicksPanel({
                     style={{
                       fontSize: 12,
                       fontWeight: 700,
-                      color: INK,
+                      color: '#FFFFFF',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',

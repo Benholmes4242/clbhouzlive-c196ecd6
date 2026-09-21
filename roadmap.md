@@ -25,4 +25,3 @@
 - [x] Stack team partners on equal-weight lines across tournament boards and verify responsive row geometry.
 - [x] Extend the measured board name ladder to stacked team partners with a collision-safe short-name floor.
 - [x] Let the full board drop PRIZE after the name ladder and cell-width floor are exhausted.
-- [ ] Let resolved team champions back onto Tour Overview/live surfaces, delete requested dead hooks/components, and align detail hero type with the overview.

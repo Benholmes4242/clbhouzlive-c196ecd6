@@ -8,11 +8,9 @@
  *           where HIGHER wins. Taking min(score) names the losing side.
  *   match — player rows with no scores at all
  *
- * Any surface that names a leader or renders a board of to-par scores must gate
- * on hasStrokeBoard. Champion assertions must resolve via resolveChampion: stroke
- * uses winner_id, team uses one untied position-1 team row, and cup/match name
- * nobody. Schedules, listings, news and admin must NOT gate — the Ryder Cup
- * belongs in a schedule.
+ * Any surface that names a leader, names a champion, or renders a board of
+ * to-par scores must gate on isStrokeEvent. Schedules, listings, news and
+ * admin must NOT gate — the Ryder Cup belongs in a schedule.
  */
 export type EventFormat = 'stroke' | 'team' | 'cup' | 'match';
 
@@ -27,8 +25,10 @@ export function isStrokeEvent(raw: string | null | undefined): boolean {
 /**
  * stroke and team boards both carry to-par scores where lower is better,
  * with real positions. cup (match points, no positions) and match (no
- * scores at all) do not. Surfaces that RENDER A BOARD gate on this; surfaces
- * that NAME A CHAMPION call resolveChampion so tied team tops remain nameless.
+ * scores at all) do not. Surfaces that RENDER A BOARD gate on this;
+ * surfaces that NAME A CHAMPION still gate on isStrokeEvent, because
+ * sr_tournaments.winner_id holds a player sr_id and is null for every
+ * team event.
  */
 export function hasStrokeBoard(raw: string | null | undefined): boolean {
   const format = eventFormat(raw);

@@ -10,8 +10,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { resolveBoardEntity, teamNamesNeedInitials } from '../_shared/boardEntity';
-import type { BoardEntry } from '../leaderboard/BoardTable';
 
 export interface LiveArenaPlayer {
   id: string;
@@ -159,7 +157,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
     .from('sr_tournaments')
     .select('*')
     .eq('status', 'inprogress')
-    .in('event_type', ['stroke', 'team'])
+    .eq('event_type', 'stroke')
     .order('start_date', { ascending: true });
 
   if (tournamentsError) throw tournamentsError;
@@ -225,22 +223,20 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
   for (const tournament of tournaments) {
     const leaderboard = leaderboardByTournament[tournament.id] || [];
 
-    const needsInitials = teamNamesNeedInitials(leaderboard as BoardEntry[]);
-
     // Transform leaderboard data — synthesize player from team for team events
     const players: LiveArenaPlayer[] = leaderboard.map((entry: any) => {
       let p = entry.player;
       if (!p && entry.team) {
-        const entity = resolveBoardEntity(entry as BoardEntry, needsInitials);
         const members = (entry.team.members || [])
           .filter((m: any) => m.player)
           .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
         const primary = members[0]?.player;
+        const teamName = entry.team.abbr_name || entry.team.display_name || 'Team';
         p = {
           id: entry.team.id,
           first_name: '',
           last_name: '',
-          full_name: entity.prose || entry.team.abbr_name || entry.team.display_name || 'Team',
+          full_name: teamName,
           photo_url: primary?.photo_url ?? null,
           headshot_override: null,
           tour_codes: null,
@@ -310,7 +306,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
 
     // Fetch leader scorecard stats
     let leaderStats: LiveArenaTournament['leaderStats'] = null;
-    if (leader && tournament.event_type !== 'team') {
+    if (leader) {
       const { data: scorecardData } = await supabase
         .from('sr_scorecards')
         .select('birdies, eagles, bogeys, pars, round_score, round_number')

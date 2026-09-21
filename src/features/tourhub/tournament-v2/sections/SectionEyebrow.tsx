@@ -9,7 +9,7 @@
  * SectionEyebrow - TD1 section header: kicker + optional right action.
  *
  * Analytical grammar (BRIEF_TOUR_TOURNAMENT_PAGE): the kicker is the canonical
- * KICKER token (A.INK, 0.16em) and the action is the canonical quiet
+ * KICKER token (amber-deep, 0.16em) and the action is the canonical quiet
  * Action - never a filled pill, never a raw chevron glyph.
  */
 import { A, KICKER, LABEL, SANS } from '@/features/courses/components/holes/analytical/tokens';

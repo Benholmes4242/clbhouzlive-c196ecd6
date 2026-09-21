@@ -19,7 +19,7 @@ import {
 
 // Union of all fields needed by any consumer hook
 const CACHE_SELECT = `
-  id, name, status, event_type, start_date, end_date, purse, currency, winning_share,
+  id, name, status, start_date, end_date, purse, currency, winning_share,
   venue_id, venue_name, venue_course_name, venue_city, venue_state, venue_country, venue_par, venue_yardage,
   winner_id, defending_champion, champion_narrative, season_id,
   current_round, current_round_status,
@@ -30,7 +30,6 @@ export interface CachedTournament {
   id: string;
   name: string;
   status: string;
-  event_type: string | null;
   start_date: string;
   end_date: string;
   purse: number | null;
@@ -89,13 +88,11 @@ export async function fetchTournamentsCache(): Promise<TournamentsCache> {
     supabase
       .from('sr_tournaments')
       .select(CACHE_SELECT)
-      // BRIEF_TOURHUB_TIDY_AND_TYPE §1 — stroke and team have board semantics;
-      // cup/match stay excluded because they cannot assert to-par leaders.
       // BRIEF_NON_STROKE_GATE_2 §2 — all three buckets are leader-asserting: this
       // cache feeds HybridHero.utils, HeroBoardBand, useActiveMensMajor,
       // useUpcomingTournaments and TourPickerSheet (the overview hero's second
       // route). Cups/match play never carry a leader here.
-      .in('event_type', ['stroke', 'team'])
+      .eq('event_type', 'stroke')
       .in('status', [
         'inprogress', 'in_progress',
         'playoff', 'inplayoff', 'in_playoff',
@@ -108,10 +105,9 @@ export async function fetchTournamentsCache(): Promise<TournamentsCache> {
     supabase
       .from('sr_tournaments')
       .select(CACHE_SELECT)
-      .in('event_type', ['stroke', 'team'])
+      .eq('event_type', 'stroke')
       .in('status', ['closed', 'complete'])
       .gte('end_date', completedFromDate)
-      .lte('end_date', today)
       .order('end_date', { ascending: false })
       .order('purse', { ascending: false }),
 
@@ -119,7 +115,7 @@ export async function fetchTournamentsCache(): Promise<TournamentsCache> {
     supabase
       .from('sr_tournaments')
       .select(CACHE_SELECT)
-      .in('event_type', ['stroke', 'team'])
+      .eq('event_type', 'stroke')
       .in('status', ['scheduled', 'created'])
       .gt('start_date', today)
       .order('start_date', { ascending: true })

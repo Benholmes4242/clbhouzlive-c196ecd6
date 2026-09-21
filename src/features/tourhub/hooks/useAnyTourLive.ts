@@ -45,7 +45,7 @@ export function useAnyTourLive(): boolean {
         .from('sr_tournaments')
         .select('id, current_round_status')
         .eq('status', 'inprogress')
-        .in('event_type', ['stroke', 'team'])
+        .eq('event_type', 'stroke')
         .limit(50);
       if (error) return false;      // fail closed
       const rows = data ?? [];
