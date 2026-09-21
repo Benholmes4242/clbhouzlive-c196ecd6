@@ -42,21 +42,21 @@ const live: Live[] = [
     row: { feat_kind: 'ace', global_ordinal: 1, total_rounds_at_detection: 706, distinct_members_at_detection: 1 },
     owner: { feat_kind: 'ace', is_owner: true, member_ordinal: 1, member_rounds: 49, member_prev_at: null },
     viewer: 'The first ace in 706 rounds.',
-    ownerLine: 'The first member ever to do this.',
+    ownerLine: 'The first clbhouz member ever to achieve this.',
   },
   {
     name: 'RARE (two) - ace #2, 2022-12-04',
     row: { feat_kind: 'ace', global_ordinal: 2, total_rounds_at_detection: 1096, distinct_members_at_detection: 2 },
     owner: { feat_kind: 'ace', is_owner: true, member_ordinal: 1, member_rounds: 62, member_prev_at: null },
     viewer: 'The second ace in 1,096 rounds.',
-    ownerLine: 'One of the first two members to do this.',
+    ownerLine: 'Only the second clbhouz member to achieve this.',
   },
   {
     name: 'RARE (three) - ace #3, 2023-01-29',
     row: { feat_kind: 'ace', global_ordinal: 3, total_rounds_at_detection: 1117, distinct_members_at_detection: 3 },
     owner: { feat_kind: 'ace', is_owner: true, member_ordinal: 1, member_rounds: 42, member_prev_at: null },
     viewer: 'The third ace in 1,117 rounds.',
-    ownerLine: 'One of the first three members to do this.',
+    ownerLine: 'Only the third clbhouz member to achieve this.',
   },
   {
     name: 'REPEAT - ace #4, 2023-02-28',
@@ -77,7 +77,7 @@ const live: Live[] = [
     row: { feat_kind: 'albatross', global_ordinal: 1, total_rounds_at_detection: 2625, distinct_members_at_detection: 1 },
     owner: { feat_kind: 'albatross', is_owner: true, member_ordinal: 1, member_rounds: 122, member_prev_at: null },
     viewer: 'The first albatross in 2,625 rounds.',
-    ownerLine: 'The first member ever to do this.',
+    ownerLine: 'The first clbhouz member ever to achieve this.',
   },
   {
     name: 'REPEAT - eagle brace #2, 2024-06-15',
@@ -91,7 +91,7 @@ const live: Live[] = [
     row: { feat_kind: 'eagle_brace', global_ordinal: 3, total_rounds_at_detection: 3563, distinct_members_at_detection: 2 },
     owner: { feat_kind: 'eagle_brace', is_owner: true, member_ordinal: 1, member_rounds: 221, member_prev_at: null },
     viewer: 'The third eagle brace in 3,563 rounds.',
-    ownerLine: 'One of the first two members to do this.',
+    ownerLine: 'Only the second clbhouz member to achieve this.',
   },
 ];
 
@@ -164,7 +164,7 @@ describe('feat rarity lines against the live backfilled rows', () => {
   it('replaces the public line with a localized owner congratulations when the first name is safe', () => {
     const c = live[7];
     const lines = featRarityLines({ rows: [c.row], owner: [c.owner], t, locale: 'en-GB', ownerDisplayName: 'Lennon Hill', now: NOW });
-    expect(lines.ownerLine).toBe('One of the first two members to do this — congrats, Lennon');
+    expect(lines.ownerLine).toBe('Only the second clbhouz member to achieve this — congrats, Lennon');
   });
 
   it.each(['j.edge1994', 'golf_1', '@golfer', 'X'])(

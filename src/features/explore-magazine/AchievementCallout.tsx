@@ -87,14 +87,16 @@ export function FeatRarityLines({
         display: 'block',
         width: '100%',
         boxSizing: 'border-box',
-        paddingInline: align === 'card' ? 0 : 0,
-        marginTop: 3,
+        gridColumn: align === 'card' ? '1 / -1' : undefined,
+        borderTop: align === 'card' ? `1px solid ${A.HAIRLINE}` : undefined,
+        padding: align === 'card' ? '8px 10px' : 0,
+        marginTop: align === 'card' ? 0 : 3,
       }}
     >
       <span
         data-feat-rarity-viewer={ownerLine ? undefined : 'true'}
         data-feat-rarity-owner={ownerLine ? 'true' : undefined}
-        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: ownerLine ? 700 : 600, lineHeight: 1.3, color: ownerLine ? SC_FILL_GOLD : tier === 'ink' ? A.MUTE : A.INK, opacity: ownerLine || tier === 'ink' ? 1 : 0.73, whiteSpace: 'normal', overflowWrap: 'break-word' }}
+        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: ownerLine ? SC_FILL_GOLD : tier === 'ink' ? A.MUTE : A.INK, opacity: ownerLine || tier === 'ink' ? 1 : 0.73, whiteSpace: 'normal', overflowWrap: 'break-word' }}
       >
         {line}
       </span>
@@ -419,7 +421,6 @@ export function RoundStatStrip({
             >
               {achievement.label}
             </span>
-            {rarity}
           </span>
         </span>
       ) : null}
@@ -429,6 +430,7 @@ export function RoundStatStrip({
           <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(net)} under={(net as number) < (coursePar as number)} />
         </>
       ) : null}
+      {achievement && tier !== 'ink' ? rarity : null}
     </span>
     </>
   );
