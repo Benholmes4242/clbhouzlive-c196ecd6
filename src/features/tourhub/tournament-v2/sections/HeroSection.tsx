@@ -49,7 +49,9 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
       ? { label: t('tournament.hero.chip.roundN', { round: meta.current_round ?? 1 }), color: INK, border: 'rgba(255,255,255,0.42)', bg: 'rgba(255,255,255,0.10)' }
       : { label: `${t('status.live')} · R${meta.current_round ?? 1}`, color: GREEN_LIVE, border: 'rgba(110,231,183,0.55)', bg: 'rgba(16,185,129,0.14)' }
     : state === 'completed'
-      ? { label: `${t('status.final')}${tourLabel ? ` · ${tourLabel}` : ''}`, color: GOLD, border: 'rgba(251,188,46,0.55)', bg: 'rgba(251,188,46,0.12)' }
+      // CORRECTION 3: the completed chip reads RESULTS, matching the tour
+      // overview's own completed chip. status.final is retained for StatusChip.
+      ? { label: `${t('status.results')}${tourLabel ? ` · ${tourLabel}` : ''}`, color: GOLD, border: 'rgba(251,188,46,0.55)', bg: 'rgba(251,188,46,0.12)' }
       : { label: t('tournament.hero.chip.upcomingTour', { tour: tourLabel, defaultValue: tourLabel ? `UPCOMING · ${tourLabel}` : 'UPCOMING' }), color: INK, border: 'rgba(255,255,255,0.42)', bg: 'rgba(255,255,255,0.10)' };
 
   let verdict: string | null = null;
