@@ -7,7 +7,7 @@
  * accepts words alone. One function means the change is one line in one diff
  * rather than a condition to find inside a 1,200-line screen.
  *
- * EDIT IS EXEMT OF BOTH RULES, DELIBERATELY: round posts and everything
+ * EDIT IS EXEMPT OF BOTH RULES, DELIBERATELY: round posts and everything
  * published before the media rule carry no media and must still be saveable.
  */
 export interface PostContentGateInput {
