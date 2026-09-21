@@ -2231,7 +2231,19 @@ function isTriggerFreshForCrownNotice(trigger: LegendTrigger | undefined, course
   return true;
 }
 
+// BRIEF_LEGENDS_RUNAWAY §1. The identity of a board: the ordered list of
+// (user_id, rank, value). The FULL field, never capped — useCourseFieldSizes /
+// get_course_field_sizes count the rows on a board to derive "Won against n
+// other golfers here", so a cap would silently cap that count.
+// Value is normalised to 6 decimals so floating-point noise is not a change.
+function legendBoardSignature(rows: Array<{ user_id: string; rank: number; value: unknown }>): string {
+  return rows
+    .map((r) => `${r.user_id}:${r.rank}:${Number(r.value).toFixed(6)}`)
+    .join("|");
+}
+
 async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: LegendTrigger) {
+
   // Current stored board — the FULL field for this course/category, no cap.
   // rank is selected as well as ordered by: the skip test below compares the
   // ordered list of (user_id, rank, value), so rank is read, never assumed from
