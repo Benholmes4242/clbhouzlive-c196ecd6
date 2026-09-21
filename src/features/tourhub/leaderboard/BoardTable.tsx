@@ -67,6 +67,7 @@ const MOV_W = 24;
 const POS_W = 24;
 const TOT_W = 40;
 const THRU_W = 26;
+const PRIZE_W = 52;
 const CELL_W = 26;
 const CELL_W_FLOOR = 22;
 const GRID_GAP = 4;
@@ -76,6 +77,8 @@ const PRE_NAME_SIZE = 15;
 const PRE_TEE_W = 76;
 /** MOVEMENT only: zero or unavailable movement is a STATEMENT, so it gets a mark. */
 const MOV_DASH = '\u2013';
+/** PRIZE: a row that earned nothing states it with an em dash, never a blank. */
+const PRIZE_DASH = '\u2014';
 
 const F = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -188,6 +191,14 @@ export interface BoardColumns {
   liveRound: number | null;
   /** THRU only occupies a track while a round is in progress. */
   showThru: boolean;
+  /**
+   * PRIZE is a property of the TOURNAMENT, not of any row slice: shown when
+   * ANY row has a money value, hidden — header included — when none do, so
+   * the column is stable across expand, sort and scroll. Two completed events
+   * on the same tour in the same season can legitimately differ; that is the
+   * data (~40% of events carry no prize data), not a UI inconsistency.
+   */
+  showPrize: boolean;
   /** Nothing has been played: PLAYER | R1 TEE board. */
   preTournament: boolean;
 }
