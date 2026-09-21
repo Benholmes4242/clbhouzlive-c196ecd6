@@ -3,10 +3,10 @@ import { formatNumber } from '@/i18n/format';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { formatPurse } from '../../_shared/formatPurse';
 import { fmtScore } from '../../utils/fmtScore';
-import { AMBER, FONT, INK, INK_FAINT, INK_MUTE, STATUS_LIVE_ON_DARK, TOUR_HERO_PHOTO_H } from '../../_shared/tokens';
+import { AMBER, CAPS_10, FONT, HERO_VENUE_INK, INK, INK_FAINT, INK_MUTE, STATUS_LIVE_ON_DARK, TOUR_HERO_PHOTO_H } from '../../_shared/tokens';
 import { heroCanonBackground } from '../../_shared/heroGradient';
-import { hasStrokeBoard, isStrokeEvent } from '../../_shared/eventFormat';
-import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
+import { hasStrokeBoard } from '../../_shared/eventFormat';
+import { resolveBoardEntity, resolveChampion, teamNamesNeedInitials } from '../../_shared/boardEntity';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
@@ -42,6 +42,10 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
   const purse = meta.purse != null ? formatPurse(meta.purse) : null;
   const needsInitials = teamNamesNeedInitials(contest.pack.map((row) => row.entry));
   const leaderName = contest.leader ? resolveBoardEntity(contest.leader, needsInitials).prose : null;
+  const completedChampion = state === 'completed'
+    ? resolveChampion(contest.pack.map((row) => row.entry), meta)
+    : null;
+  const completedChampionName = completedChampion?.prose ?? null;
   const score = contest.leader?.score == null ? null : fmtScore(contest.leader.score);
   const cityCountry = [meta.venue_city, meta.venue_country].filter(Boolean).join(', ');
   const venueLine = [meta.venue_name, cityCountry || null].filter(Boolean).join(' · ');
@@ -57,21 +61,20 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
       : t('status.upcoming');
   const showLiveDot = state === 'live' && !roundScheduled;
 
-  // The verdict is a claim about who is winning. Non-stroke formats (team /
-  // cup / match) cannot support one, so no sentence is substituted.
+  // The verdict is a claim about who is winning. Stroke/team boards support it;
+  // cup/match do not, and a tied team top names nobody.
   const strokeBoard = hasStrokeBoard(meta.event_type);
-  const championResolvable = isStrokeEvent(meta.event_type);
   let verdict: string | null = null;
-  if (!strokeBoard || (state === 'completed' && !championResolvable)) {
+  if (!strokeBoard || (state === 'completed' && !completedChampionName)) {
     verdict = null;
   } else if (state === 'live' && leaderName) {
     if (!contest.sharedLead && contest.margin != null && contest.holesLeft != null && contest.chasersWithinFour >= 2) verdict = t('tournament.hero.verdict.liveContest', { leader: leaderName, margin: contest.margin, count: contest.chasersWithinFour, holes: contest.holesLeft });
     else if (contest.sharedLead && contest.holesLeft != null) verdict = t('tournament.hero.verdict.liveShared', { count: contest.leaders.length, holes: contest.holesLeft });
     else if (!contest.sharedLead && contest.margin != null && contest.margin >= 5) verdict = t('tournament.hero.verdict.liveClear', { leader: leaderName, margin: contest.margin });
     else if (score != null) verdict = t('tournament.hero.verdict.liveScore', { leader: leaderName, score });
-  } else if (state === 'completed' && leaderName) {
-    if (contest.sharedLead) verdict = t('tournament.hero.verdict.completedPlayoff', { winner: leaderName });
-    else if (contest.margin != null && contest.margin >= 1) verdict = t('tournament.hero.verdict.completedMargin', { winner: leaderName, margin: contest.margin });
+  } else if (state === 'completed' && completedChampionName) {
+    if (contest.sharedLead) verdict = t('tournament.hero.verdict.completedPlayoff', { winner: completedChampionName });
+    else if (contest.margin != null && contest.margin >= 1) verdict = t('tournament.hero.verdict.completedMargin', { winner: completedChampionName, margin: contest.margin });
   } else if (state === 'upcoming' && fieldCount != null && purse) {
     verdict = defending
       ? t('tournament.hero.verdict.upcomingDefender', { field: fieldCount, purse, champion: defending })
@@ -88,14 +91,15 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
     <div style={{ fontFamily: FONT, color: INK }}>
       <div style={{ position: 'relative', minHeight: TOUR_HERO_PHOTO_H, margin: 0, borderRadius: 0, overflow: 'hidden', paddingTop: 20, background: heroCanonBackground(imageUrl, FALLBACK_BG, IMAGE_FOCAL), display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         <div style={{ padding: '8px 14px 14px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, minHeight: 28, padding: '0 10px', borderRadius: 999, ...DARK_CHROME_GLASS_MATERIAL, fontSize: 10, fontWeight: 800, color: INK, letterSpacing: cjk ? 0 : '0.12em', textTransform: cjk ? 'none' : 'uppercase' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, minHeight: 28, padding: '0 10px', borderRadius: 999, ...DARK_CHROME_GLASS_MATERIAL, ...CAPS_10, color: INK, letterSpacing: cjk ? 0 : CAPS_10.letterSpacing, textTransform: cjk ? 'none' : CAPS_10.textTransform }}>
             {showLiveDot ? <span style={{ width: 7, height: 7, borderRadius: 999, background: STATUS_LIVE_ON_DARK }} /> : null}
             <span>{chipLabel}</span>
             {showLiveDot ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {meta.current_round ?? 1}</span> : null}
           </div>
-          {tourLabel ? <div style={{ marginTop: 8, fontSize: 10, fontWeight: 800, color: INK_MUTE, letterSpacing: cjk ? 0 : '0.14em', textTransform: cjk ? 'none' : 'uppercase' }}>{tourLabel}</div> : null}
-          <h1 style={{ fontSize: 'clamp(20px, 6.4vw, 25px)', fontWeight: 700, color: INK, lineHeight: 1.04, letterSpacing: '-0.02em', margin: '4px 0 0', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{meta.name}</h1>
-          {venueLine && <div style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.65)', marginTop: 3 }}>{venueLine}</div>}
+          {tourLabel ? <div style={{ marginTop: 8, ...CAPS_10, color: INK_MUTE, letterSpacing: cjk ? 0 : '0.14em', textTransform: cjk ? 'none' : CAPS_10.textTransform }}>{tourLabel}</div> : null}
+          {/* Detail deliberately keeps the two-line clamp and clamp(20px, 6.4vw, 25px); weight, tracking and leading match PhotoBand. */}
+          <h1 style={{ fontSize: 'clamp(20px, 6.4vw, 25px)', fontWeight: 800, color: INK, lineHeight: 1.1, letterSpacing: 0, margin: '4px 0 0', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{meta.name}</h1>
+          {venueLine && <div style={{ marginTop: 5, fontSize: 13, fontWeight: 500, color: HERO_VENUE_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{venueLine}</div>}
           {verdict && <div style={{ maxWidth: 320, marginTop: 10, fontSize: 15, fontWeight: 600, color: INK, lineHeight: 1.42, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>{verdict}</div>}
         </div>
       </div>

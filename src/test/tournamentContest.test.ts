@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import type { TournamentMeta } from '@/features/tourhub/leaderboard/useTournamentMeta';
 import { selectTournamentContest } from '@/features/tourhub/tournament-v2/data/tournamentContest';
-import { resolveBoardEntity, teamNamesNeedInitials } from '@/features/tourhub/_shared/boardEntity';
+import { resolveBoardEntity, resolveChampion, teamNamesNeedInitials } from '@/features/tourhub/_shared/boardEntity';
 
 const meta = { current_round: 4, winner_id: null } as TournamentMeta;
 const row = (id: string, score: number, position: number, today = -1, thru = 12, positionTied = false): BoardEntry => ({ id, score, position, position_tied: positionTied, today, thru, player: { id, sr_id: `sr-${id}`, full_name: id } });
@@ -101,7 +101,7 @@ describe('selectTournamentContest', () => {
 
   it('selects a team-event leader using stroke-board scoring', () => {
     const board = [
-      teamRow('leaders', -18, 1, 'Smalley / Springer', 'A.Smalley/B.Springer', ['Alex Smalley', 'Ben Springer']),
+      teamRow('leaders', -18, 1, 'Smalley / Springer', 'A.Smalley/H.Springer', ['Alex Smalley', 'Hayden Springer']),
       teamRow('chasers', -16, 2, 'Cantlay / Schauffele', 'P.Cantlay/X.Schauffele', ['Patrick Cantlay', 'Xander Schauffele']),
     ];
     const result = selectTournamentContest(board, { ...meta, event_type: 'team' } as TournamentMeta, 'completed');
@@ -145,5 +145,21 @@ describe('selectTournamentContest', () => {
     const empty = teamRow('empty', 0, 2, null, null, []);
     expect(resolveBoardEntity(displayOnly, false).lines).toEqual(['A. Smith', 'B. Jones']);
     expect(resolveBoardEntity(empty, false)).toEqual({ kind: 'team', lines: ['', ''], prose: '' });
+  });
+
+  it('resolves a team champion only from one untied position-1 team row', () => {
+    const board = [
+      teamRow('zurich-winners', -27, 1, 'Smalley / Springer', 'A.Smalley/H.Springer', ['Alex Smalley', 'Hayden Springer']),
+      teamRow('zurich-runners', -25, 2, 'Hardy / Riley', 'N.Hardy/D.Riley', ['Nick Hardy', 'Davis Riley']),
+    ];
+    expect(resolveChampion(board, { ...meta, event_type: 'team' })?.prose).toBe('Alex Smalley and Hayden Springer');
+  });
+
+  it('names nobody for a tied team top', () => {
+    const tiedWinner = teamRow('a', -20, 1, 'Kim / Wilson', 'G.Kim/Y.Wilson', ['Gina Kim', 'Yana Wilson']);
+    const tiedOther = teamRow('b', -20, 1, 'Kim / Choi', 'H.J.Kim/H.J.Choi', ['Hyo Joo Kim', 'Hye Jin Choi']);
+    tiedWinner.position_tied = true;
+    tiedOther.position_tied = true;
+    expect(resolveChampion([tiedWinner, tiedOther], { ...meta, event_type: 'team' })).toBeNull();
   });
 });

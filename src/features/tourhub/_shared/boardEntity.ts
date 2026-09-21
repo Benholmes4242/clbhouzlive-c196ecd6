@@ -1,4 +1,6 @@
 import type { BoardEntry } from '../leaderboard/BoardTable';
+import type { TournamentMeta } from '../leaderboard/useTournamentMeta';
+import { eventFormat } from './eventFormat';
 
 export interface BoardEntity {
   kind: 'player' | 'team';
@@ -89,4 +91,37 @@ export function resolveBoardEntity(
     lines: lines.length > 0 ? lines : ['', ''],
     prose: memberNames.join(' and ') || label || playerName,
   };
+}
+
+/**
+ * A stroke champion comes from winner_id: the board cannot be trusted,
+ * because playoff participants are all marked T1 (see PURE 2026).
+ * A team champion comes from the board: there is no team winner_id, and
+ * the feed does separate the winning team on position 1, untied.
+ * A tie with no separation names nobody — never infer from row order.
+ */
+export function resolveChampionEntry(board: BoardEntry[], meta: Pick<TournamentMeta, 'winner_id' | 'event_type'>): BoardEntry | null {
+  const format = eventFormat(meta.event_type);
+
+  if (format === 'stroke') {
+    const winnerSrId = meta.winner_id?.trim();
+    if (!winnerSrId) return null;
+    return board.find((entry) => entry.player?.sr_id === winnerSrId) ?? null;
+  }
+
+  if (format === 'team') {
+    const separatedTop = board.filter((entry) => entry.position === 1);
+    if (separatedTop.length !== 1) return null;
+    const winner = separatedTop[0];
+    if (winner.position_tied || !winner.team || winner.score == null) return null;
+    return winner;
+  }
+
+  return null;
+}
+
+export function resolveChampion(board: BoardEntry[], meta: Pick<TournamentMeta, 'winner_id' | 'event_type'>): BoardEntity | null {
+  const entry = resolveChampionEntry(board, meta);
+  if (!entry) return null;
+  return resolveBoardEntity(entry, teamNamesNeedInitials(board));
 }
