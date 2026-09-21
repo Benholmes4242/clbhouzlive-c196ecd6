@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
-import { CHAMPION_STRIP_WASH, INK, STATUS_NEGATIVE, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { CHAMPION_STRIP_WASH, STATUS_NEGATIVE, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { TrajectorySparkline } from './TrajectorySparkline';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -119,7 +119,7 @@ export function ChampionStrip({
                 style={{
                   fontSize: 11,
                   fontWeight: 600,
-                  color: WHITE_ALPHA_55,
+                  color: 'rgba(255,255,255,0.50)',
                   letterSpacing: '0.04em',
                 }}
               >
@@ -131,7 +131,7 @@ export function ChampionStrip({
             style={{
               fontSize: 17,
               fontWeight: 700,
-              color: INK,
+              color: 'white',
               letterSpacing: '-0.01em',
               display: 'block',
               whiteSpace: 'normal',
@@ -171,7 +171,7 @@ export function ChampionStrip({
               style={{
                 fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                 fontWeight: 700,
-                color: WHITE_ALPHA_55,
+                color: 'rgba(255,255,255,0.50)',
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
                 marginTop: 2,
@@ -239,7 +239,7 @@ export function CancelledStrip({ reason }: { reason: string }) {
           style={{
             fontSize: 14,
             fontWeight: 700,
-            color: INK,
+            color: 'white',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -311,7 +311,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
           <Trophy size={10} color={GOLD} strokeWidth={2.5} />
           {t('overview.playoff.eyebrow')}
         </div>
-        <div style={{ fontSize: 17, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: 'white', letterSpacing: '-0.01em' }}>
           {t('overview.playoff.tiedAtTop', { count })}
         </div>
       </div>
@@ -328,7 +328,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
         >
           {score}
         </div>
-        <div style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, color: WHITE_ALPHA_55, letterSpacing: '0.16em', marginTop: 2 }}>
+        <div style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.16em', marginTop: 2 }}>
           {t('overview.champion.scoreLabelToPar')}
         </div>
       </div>
