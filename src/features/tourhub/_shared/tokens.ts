@@ -100,6 +100,7 @@ export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text o
 export const OVERVIEW_RAIL_HAIRLINE = 'rgba(255,255,255,0.07)';
 export const STORY_BAND_META_INK = 'rgba(248,250,252,0.72)';
 export const STORY_BAND_SCRIM = 'linear-gradient(to bottom, transparent 0%, rgba(10,12,16,0.92) 100%)';
+export const OVERVIEW_PICKS_TEXT_INK = 'rgba(248,250,252,0.85)';
 
 
 // ============================================================================
@@ -114,6 +115,7 @@ export const INK_TINT_04 = 'rgba(255,255,255,0.05)';            // very-faint in
 export const INK_TINT_05 = 'rgba(255,255,255,0.06)';            // ultra-faint inline pill/skeleton bg — 11 cross-app files
 export const INK_TINT_06 = 'rgba(255,255,255,0.08)';            // faint white-alpha bg (name historical) — placeholder containers, faint surfaces
 export const INK_TINT_07 = 'rgba(255,255,255,0.10)';            // faint white-alpha border — hairline dividers on DARK bg (name historical)
+export const OVERVIEW_HERO_LOADING_BG = `linear-gradient(135deg, ${INK_TINT_06}, rgba(15,23,42,0.02))`;
 
 // ============================================================================
 // AMBER (brand)
@@ -180,6 +182,7 @@ export const LEADER_GOLD = '#FBBC2E';                        // hero leader-row 
 export const LEADER_GOLD_DARK = '#D4A017';                   // text/icon-readable variant
 export const LEADER_GOLD_TINT_7 = 'rgba(251,188,46,0.07)';   // soft leader tint (live state)
 export const LEADER_GOLD_TINT_10 = 'rgba(251,188,46,0.10)';  // medium leader tint (results state)
+export const CHAMPION_STRIP_WASH = `radial-gradient(ellipse 50% 100% at 0% 50%, ${LEADER_GOLD_TINT_10} 0%, transparent 60%)`;
 
 // ============================================================================
 // TO-PAR (verdict — under/over par; theme-aware)
@@ -254,6 +257,16 @@ export const CHARCOAL = PAGE_CANVAS;
 // ============================================================================
 export const FONT =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
+export const CAPS_10 = {
+  fontFamily: FONT,
+  fontSize: 10,
+  fontWeight: 800,
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase' as const,
+};
+
+export const HERO_VENUE_INK = 'rgba(248,250,252,0.82)';
 
 // ============================================================================
 // BAR (proportional tug/track fills on DARK surfaces)

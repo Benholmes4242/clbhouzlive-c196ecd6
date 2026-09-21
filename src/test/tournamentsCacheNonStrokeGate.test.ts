@@ -6,7 +6,8 @@
  * Cup happens on Thursday. So the fabricated dataset below contains an
  * inprogress cup row, and the assertion is that the bucket-splitting fetch
  * never returns it — because a cup's score column holds match points (higher
- * wins), so any leader taken from it is the losing side.
+ * wins), so any leader taken from it is the losing side. Team rows are admitted:
+ * those boards still carry lower-is-better to-par scores and separated positions.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -22,11 +23,14 @@ interface Row {
 const ROWS: Row[] = [
   { id: 'cup-live', name: 'Presidents Cup', status: 'inprogress', event_type: 'cup', start_date: '2026-09-24', end_date: '2026-09-27' },
   { id: 'stroke-live', name: 'Procore Championship', status: 'inprogress', event_type: 'stroke', start_date: '2026-09-24', end_date: '2026-09-27' },
+  { id: 'team-live', name: 'Zurich Classic', status: 'inprogress', event_type: 'team', start_date: '2026-09-24', end_date: '2026-09-27' },
   { id: 'match-live', name: 'T-Mobile Match Play', status: 'inprogress', event_type: 'match', start_date: '2026-09-24', end_date: '2026-09-27' },
   { id: 'cup-closed', name: 'Ryder Cup', status: 'closed', event_type: 'cup', start_date: '2026-09-10', end_date: '2026-09-13' },
   { id: 'stroke-closed', name: 'Tour Championship', status: 'closed', event_type: 'stroke', start_date: '2026-09-10', end_date: '2026-09-13' },
+  { id: 'team-closed', name: 'Dow Championship', status: 'closed', event_type: 'team', start_date: '2026-09-10', end_date: '2026-09-13' },
   { id: 'cup-scheduled', name: 'Solheim Cup', status: 'scheduled', event_type: 'cup', start_date: '2099-01-01', end_date: '2099-01-04' },
   { id: 'stroke-scheduled', name: 'Sanderson Farms', status: 'scheduled', event_type: 'stroke', start_date: '2099-01-01', end_date: '2099-01-04' },
+  { id: 'team-scheduled', name: 'Grant Thornton Invitational', status: 'scheduled', event_type: 'team', start_date: '2099-01-01', end_date: '2099-01-04' },
 ];
 
 function makeQuery() {
@@ -36,6 +40,7 @@ function makeQuery() {
     eq: (col: string, val: unknown) => { filters.push((r) => (r as any)[col] === val); return chain; },
     in: (col: string, vals: unknown[]) => { filters.push((r) => vals.includes((r as any)[col])); return chain; },
     gte: (col: string, val: string) => { filters.push((r) => String((r as any)[col]) >= val); return chain; },
+    lte: (col: string, val: string) => { filters.push((r) => String((r as any)[col]) <= val); return chain; },
     gt: (col: string, val: string) => { filters.push((r) => String((r as any)[col]) > val); return chain; },
     limit: () => chain,
     order: () => chain,
@@ -54,24 +59,25 @@ import { fetchTournamentsCache } from '@/hooks/useTournamentsCache';
 describe('useTournamentsCache — non-stroke gate', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('excludes an inprogress cup from the LIVE bucket', async () => {
+  it('excludes an inprogress cup but keeps team stroke-board events in the LIVE bucket', async () => {
     const cache = await fetchTournamentsCache();
     const ids = cache.live.map((t) => t.id);
     expect(ids).toContain('stroke-live');
+    expect(ids).toContain('team-live');
     expect(ids).not.toContain('cup-live');
     expect(ids).not.toContain('match-live');
   });
 
-  it('excludes cups from the completed and upcoming buckets', async () => {
+  it('excludes cups from the completed and upcoming buckets while keeping team events', async () => {
     const cache = await fetchTournamentsCache();
-    expect(cache.completed.map((t) => t.id)).toEqual(['stroke-closed']);
-    expect(cache.upcoming.map((t) => t.id)).toEqual(['stroke-scheduled']);
+    expect(cache.completed.map((t) => t.id)).toEqual(['stroke-closed', 'team-closed']);
+    expect(cache.upcoming.map((t) => t.id)).toEqual(['stroke-scheduled', 'team-scheduled']);
   });
 
-  it('every event_type present in the fixture is non-stroke except the stroke rows', async () => {
+  it('only stroke-board event types enter the shared cache', async () => {
     const cache = await fetchTournamentsCache();
     const all = [...cache.live, ...cache.completed, ...cache.upcoming] as unknown as Row[];
     expect(all.length).toBeGreaterThan(0);
-    expect(all.every((t) => t.event_type === 'stroke')).toBe(true);
+    expect(all.every((t) => t.event_type === 'stroke' || t.event_type === 'team')).toBe(true);
   });
 });
