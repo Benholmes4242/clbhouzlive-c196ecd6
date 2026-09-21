@@ -667,7 +667,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   // post is being fetched for editing. Shared with the /post-v2 route
   // fallback so the two silhouettes cannot drift.
   if (isEditMode && !hydrated && (editable.isLoading || (editable.data && editable.data.canManage))) {
-    return <StageLoadingShell title="Edit post" onClose={onClose} />;
+    return <StageLoadingShell title={t('stage.editPost')} onClose={onClose} />;
   }
 
   // Edit target failed to load or does not exist.
@@ -767,7 +767,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
                 onClick={() => setSheet('drafts')}
                 style={moreRowStyle}
               >
-                <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Drafts</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>{t('stage.drafts')}</span>
                 {drafts.drafts.length > 0 && <span style={{ fontSize: 12, color: CT_DARK.mute }}>{drafts.drafts.length}</span>}
               </button>
             )}
