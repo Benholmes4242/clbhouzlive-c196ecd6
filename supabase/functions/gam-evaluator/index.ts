@@ -1026,9 +1026,10 @@ async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
   const priorByKey = new Map<string, BestsRow>();
   for (const r of (bestsRows ?? []) as BestsRow[]) priorByKey.set(`${r.unit_kind}:${r.unit_key}`, r);
 
-  // Historic rounds earn no medals — bests only.
+  // A round that arrives days after it was played updates the bests and earns
+  // nothing. Same gate as the legend notifications, on play_date, never created_at.
   const ageDays = (Date.now() - new Date(playDate + "T12:00:00Z").getTime()) / 86400000;
-  const awardsAllowed = ageDays <= AWARD_MAX_AGE_DAYS;
+  const awardsAllowed = ageDays <= LEGEND_NOTIFY_MAX_AGE_DAYS;
 
   const awardRows: any[] = [];
   const pendingAwards: Array<{ u: UnitCandidate; a: ResolvedAward; attempts: number }> = [];
@@ -1037,61 +1038,6 @@ async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
     if (!awardsAllowed) continue;
     for (const a of resolveAwards(u, prior)) {
       pendingAwards.push({ u, a, attempts: prior?.attempts ?? 0 });
-    }
-  }
-
-  // rank_here — this round's placing in that member's history at that unit,
-  // counted from the rounds themselves rather than from the four stored markers
-  // (which cannot express 4th–9th). Two queries, and only when something was
-  // actually earned, so an ordinary round pays nothing for this.
-  const rankByUnit = new Map<string, number>();
-  if (pendingAwards.length > 0) {
-    try {
-      const { data: history, error: histErr } = await supabase
-        .from("gam_round_stats")
-        .select(
-          "whs_score_id, play_date, gross_score, score_diff, stableford_points, front_nine_to_par, back_nine_to_par, finish_six_to_par",
-        )
-        .eq("user_id", userId)
-        .eq("course_id", courseId)
-        .neq("whs_score_id", whsScoreId);
-      if (histErr) throw histErr;
-      const priorRounds = (history ?? []) as any[];
-
-      const needsHoles = pendingAwards.some((p) => p.u.unit_kind === "hole");
-      let holeHistory: any[] = [];
-      if (needsHoles && priorRounds.length > 0) {
-        const { data: hh, error: hhErr } = await supabase
-          .from("whs_score_holes")
-          .select("score_id, hole_no, par, actual_gross, played")
-          .in("score_id", priorRounds.map((r) => r.whs_score_id));
-        if (hhErr) throw hhErr;
-        holeHistory = (hh ?? []) as any[];
-      }
-
-      for (const { u } of pendingAwards) {
-        const key = `${u.unit_kind}:${u.unit_key}`;
-        if (rankByUnit.has(key)) continue;
-        let betterCount = 0;
-        if (u.unit_kind === "hole") {
-          for (const h of holeHistory) {
-            if (Number(h.hole_no) !== u.unit_key) continue;
-            if (h.played !== true || h.actual_gross == null || h.par == null) continue;
-            if (unitBetter(Number(h.actual_gross) - Number(h.par), u.value, u.lowerBetter)) betterCount++;
-          }
-        } else {
-          const col = COARSE_UNIT_COLUMN[u.unit_kind];
-          for (const r of priorRounds) {
-            const pv = r?.[col];
-            if (pv == null) continue;
-            if (unitBetter(Number(pv), u.value, u.lowerBetter)) betterCount++;
-          }
-        }
-        rankByUnit.set(key, betterCount + 1);
-      }
-    } catch (e) {
-      // A rank we cannot measure is NULL, never a guess. The award still stands.
-      console.warn("[unit_awards] rank_here unavailable", whsScoreId, (e as Error).message);
     }
   }
 
@@ -1109,7 +1055,8 @@ async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
       // The margin, always positive. NULL when there was nothing to beat —
       // never zero, never a dash.
       delta: prev == null ? null : Math.abs(u.value - prev) || null,
-      rank_here: rankByUnit.get(`${u.unit_kind}:${u.unit_key}`) ?? null,
+      // From the bests row the tier was read from. No second source.
+      rank_here: a.rank_here,
       attempts_at_detection: attempts,
     });
   }
