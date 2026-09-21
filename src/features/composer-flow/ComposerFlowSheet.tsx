@@ -7,8 +7,9 @@
  * composer then shows its own three-step strip. That is the phasing, not a bug,
  * and it resolves when the shared header takes over steps 2 and 3.
  *
- * NAVIGATING AWAY FROM THIS SHEET — ORDER AND OWNERSHIP. Carried over from
- * CreateSheetV3 verbatim, because the August incident lived here: this sheet
+ * NAVIGATING AWAY FROM THIS SHEET — ORDER AND OWNERSHIP. This is the August
+ * incident, and the rule below is carried over verbatim from the create sheet
+ * this screen replaced, because the incident lived there first: this sheet
  * holds a sheet-history marker and closing it unwinds that marker with
  * history.back(). A handler that closed and navigated in the same tick pushed
  * its route BEFORE the back landed, so the back ate the push and the member was
