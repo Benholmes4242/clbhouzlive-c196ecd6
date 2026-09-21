@@ -79,7 +79,7 @@ function AwardRow({ award }: { award: RoundAwardRow }) {
     : award.rank_here === 1
       ? t('roundResults.placing.best')
       : t('roundResults.placing.ordinal', { place: formatOrdinal(award.rank_here), count: award.attempts_at_detection ?? 0 });
-  const subline = [previous, placing].filter(Boolean).join(' · ');
+  const subline = [previous, placing].filter(Boolean).join(' - ');
   const delta = award.delta == null ? null : formatValue(award.unit_kind, award.value);
 
   return (
