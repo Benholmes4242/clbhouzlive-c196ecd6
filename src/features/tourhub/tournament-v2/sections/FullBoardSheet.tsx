@@ -20,6 +20,7 @@ import { resolveCutDisplay } from '../../_shared/cutDisplay';
 import { FONT, INK_MUTE, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
+import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 
 interface Props {
   open: boolean;
@@ -113,7 +114,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
             onRowClick={handleRow}
             teamInitials={needsInitials}
             headerTop={0}
-            surface={A.PANEL}
+            surface={SHEET_SURFACE}
           />
         </div>
       </div>

@@ -12,6 +12,7 @@ import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
 import type { TournamentContest } from '../data/tournamentContest';
 import { DARK_CHROME_GLASS_MATERIAL } from '@/features/chrome-v2/ChromeIsland';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const FALLBACK_BG = `linear-gradient(180deg, ${A.PANEL} 0%, ${A.CANVAS} 100%)`;
 const IMAGE_FOCAL = '50% 72%';
@@ -103,7 +104,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
           {verdict && <div style={{ maxWidth: 320, marginTop: 10, fontSize: 15, fontWeight: 600, color: INK, lineHeight: 1.42, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>{verdict}</div>}
         </div>
       </div>
-      {figures.length > 0 && <div style={{ background: A.PANEL, padding: '12px 16px 14px', display: 'flex', alignItems: 'flex-start', gap: 8 }}>{figures.map((figure) => <Figure key={figure.label} {...figure} cjk={cjk} />)}</div>}
+      {figures.length > 0 && <div style={{ background: PAGE_CANVAS, padding: '12px 16px 14px', display: 'flex', alignItems: 'flex-start', gap: 8 }}>{figures.map((figure) => <Figure key={figure.label} {...figure} cjk={cjk} />)}</div>}
     </div>
   );
 }
