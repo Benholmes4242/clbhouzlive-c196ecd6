@@ -59,7 +59,7 @@ function readableDisplayName(value: string): string {
 
 export function resolveBoardEntity(entry: BoardEntry, ambiguous: Set<string>): BoardEntity {
   const playerName = entry.player?.full_name?.trim() ?? '';
-  if (playerName) return { kind: 'player', label: playerName, prose: playerName };
+  if (!entry.team) return { kind: 'player', label: playerName, prose: playerName };
 
   const abbrName = entry.team?.abbr_name?.trim() ?? '';
   const displayName = entry.team?.display_name?.trim() ?? '';
@@ -70,5 +70,5 @@ export function resolveBoardEntity(entry: BoardEntry, ambiguous: Set<string>): B
     : abbrName || (displayName ? readableDisplayName(displayName) : '') || playerName;
   const prose = memberNames.join(' and ') || label;
 
-  return { kind: 'team', label, prose };
+  return { kind: 'team', label: label || playerName, prose: memberNames.join(' and ') || label || playerName };
 }
