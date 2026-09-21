@@ -137,9 +137,10 @@ export const AMBER_SOFT_BG = 'rgba(247,147,30,0.12)';
 // ============================================================================
 export const GOLD = '#FFB800';
 export const GOLD_DEEP = '#D97706';
-export const GOLD_TINT = 'rgba(255,184,0,0.04)';
-export const GOLD_BORDER = 'rgba(255,184,0,0.32)';
-export const GOLD_TINT_10 = 'rgba(255,184,0,0.10)';          // medium gold tint — 7 cross-app files (hero card gradients, leader pills)
+export const GOLD_TINT = '#3B3719';
+export const GOLD_BORDER = '#E8C547';
+/** TOP is GOLD plus one escalation, never an independent palette that can drift quieter. */
+export const GOLD_TINT_10 = `color-mix(in srgb, ${GOLD_TINT}, ${GOLD_BORDER} 8%)`;
 export const GOLD_GLOW = '0 0 24px rgba(255,184,0,0.10), 0 1px 3px rgba(0,0,0,0.04)';
 export const GOLD_GLOW_DROP = '0 4px 12px rgba(255,184,0,0.20)';  // tighter gold drop shadow — champion-treatment photo/logo tiles — 4 cross-app surfaces
 
