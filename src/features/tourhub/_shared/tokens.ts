@@ -137,10 +137,32 @@ export const AMBER_SOFT_BG = 'rgba(247,147,30,0.12)';
 // ============================================================================
 export const GOLD = '#FFB800';
 export const GOLD_DEEP = '#D97706';
-export const GOLD_TINT = '#3B3719';
-export const GOLD_BORDER = '#E8C547';
-/** TOP is GOLD plus one escalation, never an independent palette that can drift quieter. */
-export const GOLD_TINT_10 = `color-mix(in srgb, ${GOLD_TINT}, ${GOLD_BORDER} 8%)`;
+/**
+ * FEAT LIGHTING. GOLD is the only authored treatment; TOP derives by increasing
+ * its radius, alpha, blur and emblem size so it can never render quieter.
+ * These are static paint tokens: tune here after daylight device review, never
+ * at a scrolling-feed call site. The artwork asset itself remains untouched.
+ */
+export const FEAT_LIGHT_RGB = '232,197,71';
+export const FEAT_GOLD_WASH_WIDTH = 120;
+export const FEAT_GOLD_WASH_HEIGHT = 60;
+export const FEAT_GOLD_WASH_ALPHA = 0.20;
+export const FEAT_GOLD_GLOW_BLUR = 14;
+export const FEAT_GOLD_GLOW_ALPHA = 0.35;
+export const FEAT_GOLD_EMBLEM_SIZE = 26;
+export const FEAT_TOP_SCALE = 1.18;
+export const FEAT_TOP_ALPHA_LIFT = 1.2;
+export const FEAT_TOP_WASH_WIDTH = Math.round(FEAT_GOLD_WASH_WIDTH * FEAT_TOP_SCALE);
+export const FEAT_TOP_WASH_HEIGHT = Math.round(FEAT_GOLD_WASH_HEIGHT * FEAT_TOP_SCALE);
+export const FEAT_TOP_WASH_ALPHA = FEAT_GOLD_WASH_ALPHA * FEAT_TOP_ALPHA_LIFT;
+export const FEAT_TOP_GLOW_BLUR = Math.round(FEAT_GOLD_GLOW_BLUR * FEAT_TOP_SCALE);
+export const FEAT_TOP_GLOW_ALPHA = FEAT_GOLD_GLOW_ALPHA * FEAT_TOP_ALPHA_LIFT;
+export const FEAT_TOP_EMBLEM_SIZE = FEAT_GOLD_EMBLEM_SIZE + 2;
+export const FEAT_RARITY_GOLD_INK = '#E3C878';
+export const FEAT_GOLD_WASH = `radial-gradient(${FEAT_GOLD_WASH_WIDTH}px ${FEAT_GOLD_WASH_HEIGHT}px at 30px 40%, rgba(${FEAT_LIGHT_RGB},${FEAT_GOLD_WASH_ALPHA}), rgba(${FEAT_LIGHT_RGB},0) 70%)`;
+export const FEAT_TOP_WASH = `radial-gradient(${FEAT_TOP_WASH_WIDTH}px ${FEAT_TOP_WASH_HEIGHT}px at 30px 40%, rgba(${FEAT_LIGHT_RGB},${FEAT_TOP_WASH_ALPHA}), rgba(${FEAT_LIGHT_RGB},0) 70%)`;
+export const FEAT_GOLD_EMBLEM_GLOW = `0 0 ${FEAT_GOLD_GLOW_BLUR}px rgba(${FEAT_LIGHT_RGB},${FEAT_GOLD_GLOW_ALPHA})`;
+export const FEAT_TOP_EMBLEM_GLOW = `0 0 ${FEAT_TOP_GLOW_BLUR}px rgba(${FEAT_LIGHT_RGB},${FEAT_TOP_GLOW_ALPHA})`;
 export const GOLD_GLOW = '0 0 24px rgba(255,184,0,0.10), 0 1px 3px rgba(0,0,0,0.04)';
 export const GOLD_GLOW_DROP = '0 4px 12px rgba(255,184,0,0.20)';  // tighter gold drop shadow — champion-treatment photo/logo tiles — 4 cross-app surfaces
 

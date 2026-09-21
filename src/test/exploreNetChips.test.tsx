@@ -5,6 +5,12 @@ import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import { vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
 import { calloutFor } from '@/features/explore-magazine/cardTreatment';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
+import {
+  FEAT_GOLD_EMBLEM_GLOW,
+  FEAT_GOLD_WASH,
+  FEAT_TOP_EMBLEM_GLOW,
+  FEAT_TOP_WASH,
+} from '@/features/tourhub/_shared/tokens';
 
 function round(facts: StreamItem['facts'], patch: Partial<StreamItem> = {}): StreamItem {
   return {
@@ -29,6 +35,31 @@ describe('C3 round stat strip', () => {
     expect(Array.from(strip?.children ?? []).map((cell) => cell.getAttribute('data-explore-stat')))
       .toEqual(['achievement', 'par', 'net', 'vs-hcp']);
     expect(strip?.style.gridTemplateColumns).toBe('minmax(0, 2.3fr) repeat(3, minmax(0, 0.7fr))');
+    expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
+    expect(strip?.style.border).toBe('');
+  });
+
+  it('keeps every tier on the neutral panel and derives TOP lighting above GOLD', () => {
+    const gold = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 2 });
+    const top = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, holes_in_one: 2 });
+    const ink = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 1 });
+    const goldStrip = gold.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+    const topStrip = top.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+    const inkStrip = ink.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+    const goldEmblem = gold.querySelector<HTMLElement>('[data-explore-achievement-emoji]');
+    const topEmblem = top.querySelector<HTMLElement>('[data-explore-achievement-emoji]');
+
+    for (const strip of [goldStrip, topStrip, inkStrip]) {
+      expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
+      expect(strip?.style.border).toBe('');
+    }
+    expect(FEAT_GOLD_WASH).toContain('radial-gradient(120px 60px');
+    expect(FEAT_TOP_WASH).toContain('radial-gradient(142px 71px');
+    expect(inkStrip?.style.backgroundImage).toBe('none');
+    expect(goldEmblem?.style.fontSize).toBe('26px');
+    expect(topEmblem?.style.fontSize).toBe('28px');
+    expect(FEAT_GOLD_EMBLEM_GLOW).toContain('14px');
+    expect(FEAT_TOP_EMBLEM_GLOW).toContain('17px');
   });
 
   it('uses equal thirds without an achievement and never prints a birdies figure label', () => {
@@ -140,7 +171,7 @@ describe('achievement tag and label copy', () => {
     if (node) {
       expect(node.style.width).toBe('28px');
       expect(node.style.height).toBe('28px');
-      expect(node.style.fontSize).toBe('22px');
+      expect(node.style.fontSize).toBe(emoji && ['⛳', '🔥'].includes(emoji) ? '26px' : '22px');
       expect(node.getAttribute('aria-hidden')).not.toBeNull();
     }
   });
