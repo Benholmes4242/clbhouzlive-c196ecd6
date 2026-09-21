@@ -54,6 +54,7 @@ import { useTeeTimesAll } from './data/useTeeTimesAll';
 import { useTournamentStory } from './data/useTournamentStory';
 import { useTournamentHoleAnalysis } from './data/useTournamentHoleAnalysis';
 import { selectTournamentContest } from './data/tournamentContest';
+import { isStrokeEvent } from '../_shared/eventFormat';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 
@@ -194,7 +195,11 @@ export function TournamentPage() {
     );
   }
 
-  const leaderboardRows = leaderboard ?? [];
+  // Non-stroke formats (team / cup / match) break stroke-play grammar, so no
+  // surface that asserts a leader, a champion or a board of to-par scores is
+  // mounted. The event's own facts — hero, info, course — still render.
+  const stroke = isStrokeEvent(meta.event_type);
+  const leaderboardRows = stroke ? (leaderboard ?? []) : [];
   const hasBoard = leaderboardRows.length > 0;
   const contest = selectTournamentContest(leaderboardRows, meta, pulse.state);
   const fieldCount = leaderboardRows.length > 0 ? leaderboardRows.length : (holeAnalysis?.total_players || null);
@@ -234,8 +239,12 @@ export function TournamentPage() {
           fieldCount={fieldCount}
         />
 
-        <ContestSection contest={contest} state={pulse.state} />
-        <MoveSection contest={contest} state={pulse.state} tourCode={tourCode} />
+        {stroke && (
+          <>
+            <ContestSection contest={contest} state={pulse.state} />
+            <MoveSection contest={contest} state={pulse.state} tourCode={tourCode} />
+          </>
+        )}
 
         {/* THE ACT */}
         <section id="the-act">
@@ -265,7 +274,7 @@ export function TournamentPage() {
 
         {/* TEE TIMES BAND — promoted entry point to the round-by-round
             sheet. Renders for live + upcoming states only. */}
-        {(pulse.state === 'live' || pulse.state === 'upcoming') && (
+        {stroke && (pulse.state === 'live' || pulse.state === 'upcoming') && (
           <TeeTimesRail
             groups={teeGroups}
             round={currentRound}
@@ -285,6 +294,7 @@ export function TournamentPage() {
         <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }} />
       </div>
 
+      {stroke && (
       <AllTeeTimesSheet
         open={teeTimesOpen}
         onClose={() => setTeeTimesOpen(false)}
@@ -296,6 +306,8 @@ export function TournamentPage() {
         entries={leaderboardRows}
 
       />
+      )}
+      {stroke && (
       <FullBoardSheet
         open={fullBoardOpen}
         onClose={() => setFullBoardOpen(false)}
@@ -303,6 +315,7 @@ export function TournamentPage() {
         meta={meta}
         entries={leaderboardRows}
       />
+      )}
       </TourPageShell>
     </TourHubShell>
   );

@@ -45,6 +45,7 @@ export function useLiveTournaments() {
         .select(
           'id, name, status, start_date, end_date, venue_name, venue_course_name, venue_city, venue_country, venue_yardage, venue_par, defending_champion, current_round, purse, season:sr_seasons(tour_name)'
         )
+        .eq('event_type', 'stroke')
         .or(`status.eq.inprogress,and(status.in.(scheduled,created),start_date.eq.${todayStr})`)
         .order('purse', { ascending: false, nullsFirst: false });
 

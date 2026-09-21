@@ -32,6 +32,8 @@ export interface TournamentMeta {
   cut_round: number | null;
   purse: number | null;
   winner_id: string | null;
+  /** sr_tournaments.event_type — stroke | team | cup | match. See _shared/eventFormat. */
+  event_type: string | null;
   defending_champion: string | null;
   timezone: string | null;
   tour_code: string | null;
@@ -62,7 +64,7 @@ export function useTournamentMeta(
       const { data, error } = await supabase
         .from('sr_tournaments')
         .select(
-          'id, name, venue_name, venue_course_name, venue_city, venue_country, venue_state, golf_course_id, venue_par, venue_yardage, start_date, end_date, current_round, current_round_status, status, cutline, projected_cutline, cut_round, purse, winner_id, defending_champion, timezone, course:golf_courses!sr_tournaments_golf_course_id_fkey(sub_country), season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, tour_full_name)',
+          'id, name, venue_name, venue_course_name, venue_city, venue_country, venue_state, golf_course_id, venue_par, venue_yardage, start_date, end_date, current_round, current_round_status, status, cutline, projected_cutline, cut_round, purse, winner_id, event_type, defending_champion, timezone, course:golf_courses!sr_tournaments_golf_course_id_fkey(sub_country), season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, tour_full_name)',
         )
         .eq('id', tournamentId as string)
         .maybeSingle();

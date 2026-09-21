@@ -157,6 +157,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
     .from('sr_tournaments')
     .select('*')
     .eq('status', 'inprogress')
+    .eq('event_type', 'stroke')
     .order('start_date', { ascending: true });
 
   if (tournamentsError) throw tournamentsError;

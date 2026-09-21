@@ -45,6 +45,20 @@ describe('selectTournamentContest', () => {
     expect(result.holesLeft).toBeNull();
   });
 
+  it('asserts no leader on a cup: score holds match points, so min(score) is the losing side', () => {
+    const cupMeta = { ...meta, event_type: 'cup' } as TournamentMeta;
+    const board = [
+      { id: 'usa', score: 15, position: null, position_tied: false, today: null, thru: null, player: null },
+      { id: 'int', score: 13, position: null, position_tied: false, today: null, thru: null, player: null },
+    ] as unknown as BoardEntry[];
+    const result = selectTournamentContest(board, cupMeta, 'completed');
+    expect(result.leader).toBeNull();
+    expect(result.leaders).toEqual([]);
+    expect(result.margin).toBeNull();
+    expect(result.pack).toEqual([]);
+    expect(result.leadForm).toBeNull();
+  });
+
   it('keeps a completed tied leader on the finished-level path', () => {
     const result = selectTournamentContest([row('a', -12, 1, -4, 13, true), row('b', -12, 1, -3, 13, true)], meta, 'completed');
     expect(result.playoffDecided).toBe(false);

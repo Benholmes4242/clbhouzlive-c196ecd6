@@ -163,6 +163,7 @@ export function useUpcomingTournaments(days: number = 14) {
             tour_name
           )
         `)
+        .eq('event_type', 'stroke')
         .in('status', ['scheduled', 'created'])
         .gte('start_date', today)
         .lte('start_date', futureDateStr)
@@ -239,6 +240,7 @@ export function useRecentlyCompletedTournaments() {
             tour_name
           )
         `)
+        .eq('event_type', 'stroke')
         .in('status', ['closed', 'complete'])
         .gte('end_date', twoDaysAgoStr)
         .order('end_date', { ascending: false })
@@ -434,6 +436,7 @@ export function useTournamentsByTour() {
             year
           )
         `)
+        .eq('event_type', 'stroke')
         .in('status', ['scheduled', 'created'])
         .gte('start_date', new Date().toISOString().split('T')[0])
         .eq('sr_seasons.year', currentYear)

@@ -3,6 +3,7 @@ import type { BoardEntry } from '../../leaderboard/BoardTable';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
 import { todayFromEntry } from '../../leaderboard/BoardTable';
+import { isStrokeEvent } from '../../_shared/eventFormat';
 
 /** UNVERIFIED editorial threshold: within four shots is judged to be in contention. */
 export const CONTENTION_GAP = 4;
@@ -37,6 +38,15 @@ export function selectTournamentContest(
   meta: TournamentMeta,
   state: EventState,
 ): TournamentContest {
+  // Non-stroke formats (team / cup / match) do not carry stroke-play grammar:
+  // a cup's `score` holds match points where HIGHER wins, so min(score) would
+  // name the losing side. No leader, no margin, no pack.
+  if (!isStrokeEvent(meta.event_type)) {
+    return {
+      leaders: [], leader: null, margin: null, sharedLead: false, playoffDecided: false,
+      chasersWithinFour: 0, holesLeft: null, pack: [], mover: null, moverToday: null, leadForm: null,
+    };
+  }
   const scored = board.filter((row) => row.score != null).sort((a, b) => (a.score as number) - (b.score as number) || byPosition(a, b));
   const bestScore = scored[0]?.score ?? null;
   const leaders = bestScore == null ? [] : scored.filter((row) => row.score === bestScore);
