@@ -18,3 +18,5 @@
 - [x] Replace the box-tracing emblem shadow with a silhouette-tracing drop-shadow and remove wrapper geometry.
 - [x] Move completed champions beneath the Tour Overview photo and gate PRIZE on complete displayed-row coverage.
 - [x] Align the tournament hero chip with Tour Overview and correct completed-playoff narration.
+- [x] Exclude cup and match-play events from every Tour Hub surface that asserts a leader or champion.
+- [x] Close the second leader-asserting list: this-week card, tournaments cache (all three buckets), generic fetch, last-year lookups and predictions guard.

@@ -94,6 +94,11 @@ export function useTourThisWeek(limit = 8) {
            status, current_round,
            season:sr_seasons(tour_name)`,
         )
+        // BRIEF_NON_STROKE_GATE_2 §1 — this card crowns board.positions[0] as the
+        // winner, which is the LOSING side on a cup (score holds match points,
+        // higher wins). Cups and match play are excluded from every surface that
+        // asserts a leader; they remain in schedules and listings.
+        .eq('event_type', 'stroke')
         .gte('end_date', today)
         .lte('start_date', horizon)
         .order('start_date', { ascending: true })

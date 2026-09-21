@@ -66,7 +66,7 @@ export interface TournamentsCache {
   all: CachedTournament[];
 }
 
-async function fetchTournamentsCache(): Promise<TournamentsCache> {
+export async function fetchTournamentsCache(): Promise<TournamentsCache> {
   const today = new Date().toISOString().split('T')[0];
   // Completed bucket window — measured in DAYS against end_date (a `date`
   // column), deliberately WIDER than the hero's RESULTS_CAP_DAYS display cap so
@@ -88,6 +88,11 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
     supabase
       .from('sr_tournaments')
       .select(CACHE_SELECT)
+      // BRIEF_NON_STROKE_GATE_2 §2 — all three buckets are leader-asserting: this
+      // cache feeds HybridHero.utils, HeroBoardBand, useActiveMensMajor,
+      // useUpcomingTournaments and TourPickerSheet (the overview hero's second
+      // route). Cups/match play never carry a leader here.
+      .eq('event_type', 'stroke')
       .in('status', [
         'inprogress', 'in_progress',
         'playoff', 'inplayoff', 'in_playoff',
@@ -100,6 +105,7 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
     supabase
       .from('sr_tournaments')
       .select(CACHE_SELECT)
+      .eq('event_type', 'stroke')
       .in('status', ['closed', 'complete'])
       .gte('end_date', completedFromDate)
       .order('end_date', { ascending: false })
@@ -109,6 +115,7 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
     supabase
       .from('sr_tournaments')
       .select(CACHE_SELECT)
+      .eq('event_type', 'stroke')
       .in('status', ['scheduled', 'created'])
       .gt('start_date', today)
       .order('start_date', { ascending: true })
