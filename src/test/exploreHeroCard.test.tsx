@@ -74,6 +74,27 @@ function longReview(): StreamItem {
   };
 }
 
+function story(): StreamItem {
+  return {
+    ...round(),
+    id: 'shape-story',
+    kind: 'story',
+    who: {
+      user_id: 'author',
+      display_name: 'A member',
+      photo_url: null,
+      is_viewer: false,
+    },
+    consequence: null,
+    facts: {
+      source: null,
+      headline: 'A championship story',
+      standfirst: 'The supporting detail follows beneath the title.',
+      published_at: new Date().toISOString(),
+    },
+  };
+}
+
 function textSlots(container: HTMLElement, name: string) {
   const kicker = container.querySelector<HTMLElement>('[data-explore-kicker="true"]');
   const person = Array.from(container.querySelectorAll<HTMLElement>('.explore-who-line span'))
@@ -83,6 +104,20 @@ function textSlots(container: HTMLElement, name: string) {
 }
 
 describe('Explore card shapes', () => {
+  it('uses the Tour Overview hierarchy for photo-led news without member attribution', () => {
+    const { container, getByText, queryByText } = render(
+      <ExploreCard item={story()} size="lead" shape={null} onTap={() => undefined} />,
+    );
+    const meta = container.querySelector<HTMLElement>('[data-explore-story-meta="true"]');
+    expect(meta).not.toBeNull();
+    expect(meta?.firstElementChild?.textContent).toBe('Amateur News');
+    expect(getByText('A championship story')).toBeInTheDocument();
+    expect(getByText('The supporting detail follows beneath the title.')).toBeInTheDocument();
+    expect(queryByText('A member')).toBeNull();
+    expect(container.querySelector('[data-explore-hero-kicker="true"]')).toBeNull();
+    expect(container.querySelector('.explore-who-line')).toBeNull();
+  });
+
   it('gates the stacked review tier word to Exceptional without an enrichment lane', () => {
     const { container, getByText } = render(
       <ExploreCard item={{ ...review(), facts: { ...review().facts, rating: 9.4 } }} size="lead" shape={null} onTap={() => undefined} />,
