@@ -622,6 +622,34 @@ export function ExploreCard({
       {headline}
     </div>
   );
+  /* §3 THE STANDFIRST, IN THE CARD'S OWN PALETTE, not the tour's. It sits on a
+     photograph, so it takes the same shadow the headline does. Absent renders
+     NOTHING: no empty paragraph and no reserved space, so the tile is 340
+     either way. */
+  const storyStandfirst = item.kind === 'story' ? item.facts.standfirst?.trim() || null : null;
+  const standfirstNode = storyStandfirst ? (
+    <div
+      data-explore-standfirst="true"
+      style={{
+        marginTop: 8,
+        fontFamily: SANS,
+        fontSize: 13.5,
+        fontWeight: 500,
+        lineHeight: 1.48,
+        color: 'rgba(255,255,255,0.85)',
+        textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        overflowWrap: 'break-word',
+        wordBreak: 'break-word',
+        minWidth: 0,
+      }}
+    >
+      {storyStandfirst}
+    </div>
+  ) : null;
   const strongestArea = item.kind === 'review' ? strongestReviewArea(item.facts.breakdown) : null;
   const enrichmentNode = item.kind === 'review' ? (
     <div
