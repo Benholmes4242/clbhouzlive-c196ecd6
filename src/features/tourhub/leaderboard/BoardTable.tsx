@@ -100,6 +100,7 @@ export interface BoardEntry {
   raw_data?: unknown;
   player?: {
     id: string;
+    sr_id?: string | null;
     full_name: string;
     country_code?: string | null;
     country?: string | null;
