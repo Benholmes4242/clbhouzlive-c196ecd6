@@ -122,7 +122,9 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
   const champion = useMemo(() => {
     if (state.kind !== 'results' || top?.score == null) return null;
     const championEntry = !tournament.winnerName
-      ? resolveChampionEntry(rows, { winner_id: tournament.winnerId, event_type: top?.team && !top?.player ? 'team' : 'stroke' })
+      // event_type comes from sr_tournaments via the slide — never inferred
+      // from the shape of the top board row.
+      ? resolveChampionEntry(rows, { winner_id: tournament.winnerId, event_type: tournament.eventType })
       : null;
     const teamChampion = championEntry ? resolveBoardEntity(championEntry, needsInitials) : null;
     const championName = tournament.winnerName ?? teamChampion?.prose ?? null;
