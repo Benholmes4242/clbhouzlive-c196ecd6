@@ -128,6 +128,40 @@ describe('amended achievement priority', () => {
     expect(calloutFor(round({ net_record: true }, { consequence: { kind: 'rank_up', n: 2 } }))?.kind).toBe('net_record');
     expect(calloutFor(round({ course_par: 71, net: 68, course_handicap: 8, handicap_cut: { from: 9, to: 8 } }))).toBeNull();
   });
+
+  it('renders record and movement margins from their carried facts, with singular grammar and no empty line', () => {
+    const record = renderCard(
+      { gross: 66, record_margin: 2 },
+      { consequence: { kind: 'record_taken', n: 66 } },
+    );
+    expect(record.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('2 shots better');
+
+    const singular = renderCard(
+      { gross: 67, record_margin: 1 },
+      { consequence: { kind: 'record_taken', n: 67 } },
+    );
+    expect(singular.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('1 shot better');
+
+    const noRunnerUp = renderCard(
+      { gross: 66, record_margin: null },
+      { consequence: { kind: 'record_taken', n: 66 } },
+    );
+    expect(noRunnerUp.querySelector('[data-explore-achievement-subline="true"]')).toBeNull();
+
+    const movement = renderCard(
+      { gross: 70 },
+      { consequence: { kind: 'rank_up', n: 3, delta: 2 } },
+    );
+    expect(movement.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('Up 2 places');
+    expect(calloutFor(round({ gross: 70 }, { consequence: { kind: 'rank_up', n: 3, delta: 2 } })))
+      .toEqual({ kind: 'rank_up', rank: 3, delta: 2 });
+  });
+
+  it('keeps net record without a subline', () => {
+    const container = renderCard({ gross: 66, net_record: true, record_margin: 2 });
+    expect(container.querySelector('[data-explore-achievement-label="true"]')?.textContent).toBe('Net course record');
+    expect(container.querySelector('[data-explore-achievement-subline="true"]')).toBeNull();
+  });
 });
 
 describe('achievement tag and label copy', () => {

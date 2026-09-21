@@ -162,13 +162,7 @@ export function AchievementCalloutPanel({
         return {
           icon: <AchievementEmoji glyph="⭐" tier={tier} />,
           title: t('amateur.stream.callout.netRecord', 'New net course record'),
-          subline: callout.delta != null && callout.delta > 0
-            ? t('amateur.stream.callout.rankUpBy', {
-                count: callout.delta,
-                defaultValue_one: 'Up one place',
-                defaultValue_other: 'Up {{count}} places',
-              })
-            : null,
+          subline: null,
         };
       case 'rank_up':
         return {
@@ -179,7 +173,13 @@ export function AchievementCalloutPanel({
                   ord: ordHole(callout.rank),
                 })
               : t('amateur.stream.callout.rankUp', 'Moved up'),
-          subline: null,
+          subline: callout.delta != null && callout.delta > 0
+            ? t('amateur.stream.callout.rankUpBy', {
+                count: callout.delta,
+                defaultValue_one: 'Up one place',
+                defaultValue_other: 'Up {{count}} places',
+              })
+            : null,
         };
       case 'ace':
         return {

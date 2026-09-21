@@ -12,6 +12,7 @@ import { trackError } from '@/lib/errorTracking';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { exploreKeys } from './exploreKeys';
+import { useCourseRecordSignal } from './useCourseRecordSignal';
 import type { ExploreView } from './exploreViewMemory';
 import { STREAM_PAGE_SIZE } from './useExploreStreamClient';
 import type {
@@ -308,6 +309,17 @@ export function useExploreStream(
     },
   });
 
+  const recordCourseIds = useMemo(
+    () => (query.data?.pages ?? []).flatMap((page) =>
+      page.items
+        .filter((item) => item.kind === 'round' && item.facts.is_course_record === true)
+        .map((item) => item.subject?.course_id)
+        .filter((id): id is string => !!id),
+    ),
+    [query.data],
+  );
+  const records = useCourseRecordSignal(viewerId, recordCourseIds);
+
   /* AUDIT RULING 2 — report the failure, once, when it transitions to set. */
   useEffect(() => {
     if (query.error) reportStreamFailure(view, scope, query.error);
@@ -331,6 +343,13 @@ export function useExploreStream(
       );
       warnDuplicates(`useExploreStream:${view}`, drops);
       return unique.map((item) => {
+        if (item.kind === 'round' && item.facts.is_course_record && item.subject?.course_id) {
+          const holder = records.holders.get(item.subject.course_id) ?? null;
+          const recordMargin = holder?.runner_up_value != null
+            ? holder.runner_up_value - holder.value
+            : null;
+          item = { ...item, facts: { ...item.facts, record_margin: recordMargin } };
+        }
         if (item.kind !== 'course' || item.facts.headline) return item;
         const headline = courseHeadline(t, {
           event: item.facts.course_event ?? 'stable',
@@ -345,7 +364,7 @@ export function useExploreStream(
         return headline ? { ...item, facts: { ...item.facts, headline } } : item;
       });
     },
-    [query.data, t, view],
+    [query.data, records.holders, t, view],
   );
   return {
     items,
