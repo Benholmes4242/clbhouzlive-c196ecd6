@@ -58,6 +58,9 @@ export interface HeroTournament {
   isPseudoMajorTour?: boolean;
   /** For pseudo-major slides only: which major type this slide represents. */
   majorGender?: 'mens' | 'womens';
+  /** sr_tournaments.event_type — the only authority on format. Carried so
+   *  champion resolution never infers 'team' from the shape of a board row. */
+  eventType: string | null;
   // Winner info (for completed)
   winnerId: string | null;
   winnerName: string | null;
