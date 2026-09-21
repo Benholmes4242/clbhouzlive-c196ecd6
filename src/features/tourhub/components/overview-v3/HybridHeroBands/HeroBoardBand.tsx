@@ -96,8 +96,8 @@ type SettledFigure = {
  * level/over is INK — which on this dark surface is white.
  */
 function tourFigColor(v: number | null | undefined): string {
-  if (v == null || v === 0) return INK;
-  return v < 0 ? TOPAR_UNDER_DARK : INK;
+  if (v == null || v === 0) return '#FFFFFF';
+  return v < 0 ? TOPAR_UNDER_DARK : '#FFFFFF';
 }
 
 function settledFigureFor(
@@ -154,7 +154,7 @@ function StatCell({
           letterSpacing: '-0.01em',
           lineHeight: 1.05,
           marginTop: 2,
-          color: color ?? INK,
+          color: color ?? '#FFFFFF',
           ...FIGS,
         }}
       >
@@ -512,7 +512,7 @@ function PicksPanel({
             ? settled.figureColor
             : liveLine
               ? tourFigColor(liveLine.score)
-              : INK;
+              : '#FFFFFF';
           const pull = p.pulledQuote || p.reasons?.[0] || null;
 
           return (
@@ -551,7 +551,7 @@ function PicksPanel({
                     style={{
                       fontSize: 12,
                       fontWeight: 700,
-                      color: INK,
+                      color: '#FFFFFF',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
