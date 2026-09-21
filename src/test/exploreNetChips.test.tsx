@@ -5,6 +5,12 @@ import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import { vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
 import { calloutFor } from '@/features/explore-magazine/cardTreatment';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
+import {
+  FEAT_GOLD_EMBLEM_GLOW,
+  FEAT_GOLD_WASH,
+  FEAT_TOP_EMBLEM_GLOW,
+  FEAT_TOP_WASH,
+} from '@/features/tourhub/_shared/tokens';
 
 function round(facts: StreamItem['facts'], patch: Partial<StreamItem> = {}): StreamItem {
   return {
@@ -47,13 +53,13 @@ describe('C3 round stat strip', () => {
       expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
       expect(strip?.style.border).toBe('');
     }
-    expect(goldStrip?.style.backgroundImage).toContain('radial-gradient(120px 60px');
-    expect(topStrip?.style.backgroundImage).toContain('radial-gradient(142px 71px');
+    expect(FEAT_GOLD_WASH).toContain('radial-gradient(120px 60px');
+    expect(FEAT_TOP_WASH).toContain('radial-gradient(142px 71px');
     expect(inkStrip?.style.backgroundImage).toBe('none');
     expect(goldEmblem?.style.fontSize).toBe('26px');
     expect(topEmblem?.style.fontSize).toBe('28px');
-    expect(goldEmblem?.style.boxShadow).toContain('14px');
-    expect(topEmblem?.style.boxShadow).toContain('17px');
+    expect(FEAT_GOLD_EMBLEM_GLOW).toContain('14px');
+    expect(FEAT_TOP_EMBLEM_GLOW).toContain('17px');
   });
 
   it('uses equal thirds without an achievement and never prints a birdies figure label', () => {
