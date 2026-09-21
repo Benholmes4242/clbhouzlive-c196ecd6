@@ -20,6 +20,24 @@ import {
  * 124px tile beside another.
  */
 
+/**
+ * TEXT ON THE PHOTOGRAPH — ONE PREDICATE, TWO CALLERS.
+ *
+ * ExploreCard decides the layout with it and ExploreMagazine decides the size
+ * with it (on-photo means 'lead'). Written twice, the two would drift, which is
+ * exactly what happened before this predicate existed.
+ *
+ * A REVIEW at any size but pair, OR A STORY THAT HAS AN IMAGE. The image test is
+ * load-bearing: the story loop leaves `subject` null when a story has no
+ * image_url, and a 340px flat panel with text on it reads worse than the 210px
+ * below-photo card it would replace. An image-less story keeps today's layout.
+ */
+export function rendersOnPhoto(item: StreamItem, size: string): boolean {
+  if (size === 'pair') return false;
+  if (item.kind === 'review') return true;
+  return item.kind === 'story' && !!item.subject?.image_url;
+}
+
 const NOTABLE_CONSEQUENCES = new Set(['record_taken', 'record_lost', 'rank_up']);
 
 /** Five birdies is the server's notability threshold in get_explore_stream. */
