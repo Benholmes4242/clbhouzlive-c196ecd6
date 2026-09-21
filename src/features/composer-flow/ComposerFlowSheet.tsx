@@ -132,6 +132,10 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
   return (
     <>
       <BottomSheet open={open && !courseOpen} onClose={onClose} fullHeight>
+        {/* BottomSheet hands its children ONE scrolling box. Step 1 needs a
+            pinned footer, so the flow owns the column here and only its middle
+            band scrolls — the header and the footer never move. */}
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
         <ComposerStepHeader step={1} total={total} onLeft={onClose} />
 
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2px 16px 18px' }}>
@@ -254,6 +258,7 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
           >
             {t('footer.next')}
           </button>
+        </div>
         </div>
       </BottomSheet>
 
