@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
  *
  * Who holds a course record is answered by ONE place: gam_course_legends, the
  * row the evaluator writes, with is_current true, category
- * 'lowest_gross_all_time' and rank 1. This file reads that row. It does not
+ * 'lowest_gross_all_time' and ranks 1-2. This file reads those rows. It does not
  * scan rounds and decide who is top, because that recomputation is the
  * record-book drift the app has already been bitten by.
  *
@@ -50,6 +50,10 @@ export interface CourseRecordSignal {
   /** `${course_id}:${taken_by}` for records the VIEWER lost to that member. */
   lostToViewer: Set<string>;
   isFetched: boolean;
+}
+
+export function courseRecordMargin(holder: RecordHolder | null | undefined): number | null {
+  return holder?.runner_up_value == null ? null : holder.runner_up_value - holder.value;
 }
 
 const EMPTY: CourseRecordSignal = { holders: new Map(), lostToViewer: new Set(), isFetched: true };

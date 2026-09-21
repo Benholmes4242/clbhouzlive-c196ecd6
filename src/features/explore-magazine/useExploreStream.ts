@@ -12,7 +12,7 @@ import { trackError } from '@/lib/errorTracking';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { exploreKeys } from './exploreKeys';
-import { useCourseRecordSignal } from './useCourseRecordSignal';
+import { courseRecordMargin, useCourseRecordSignal } from './useCourseRecordSignal';
 import type { ExploreView } from './exploreViewMemory';
 import { STREAM_PAGE_SIZE } from './useExploreStreamClient';
 import type {
@@ -345,9 +345,7 @@ export function useExploreStream(
       return unique.map((item) => {
         if (item.kind === 'round' && item.facts.is_course_record && item.subject?.course_id) {
           const holder = records.holders.get(item.subject.course_id) ?? null;
-          const recordMargin = holder?.runner_up_value != null
-            ? holder.runner_up_value - holder.value
-            : null;
+          const recordMargin = courseRecordMargin(holder);
           item = { ...item, facts: { ...item.facts, record_margin: recordMargin } };
         }
         if (item.kind !== 'course' || item.facts.headline) return item;
