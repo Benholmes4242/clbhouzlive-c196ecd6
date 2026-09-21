@@ -1,8 +1,25 @@
 /**
- * ReviewComposerV2 - the three-step review wizard shell.
+ * ReviewComposerV2 - steps 2 and 3 of the unified composer's review path.
  *
- * Step 0 Score, step 1 Breakdown, step 2 Words, then the confirmation
- * receipt. All writes flow through the v2 RPCs - the client never touches
+ * THE ORDER, AND WHY IT IS THIS ORDER (phase 2 of BRIEF_THE_UNIFIED_COMPOSER):
+ *   Step 1 of 3  What are you sharing? + which course   (a sheet, not this file)
+ *   Step 2 of 3  Photos and a few words                 (here)
+ *   Step 3 of 3  How good is it? - dial AND breakdown   (here, one screen)
+ *   then         the receipt                            (rendered by the parent)
+ *
+ * The old order was Score -> Breakdown -> Words, and the measured funnel says
+ * the crowded optional screen at the END was the leak: the old Words step lost
+ * 44% of everyone who reached it with every mandatory field already filled,
+ * while the Breakdown lost 21%. So words move IN FRONT of the score, the
+ * breakdown joins the dial on one screen, and the rating - the thing the flow
+ * exists for - is the last thing asked rather than the first.
+ *
+ * THE COUNTER IS SHARED. ComposerStepHeader draws "Step N of 3" and the
+ * segmented bar on every step of the flow, including these two; this file no
+ * longer draws a step strip of its own, so a member crossing the sheet/route
+ * boundary mid-flow cannot tell.
+ *
+ * All writes flow through the v2 RPCs - the client never touches
  * course_ratings, posts, notifications, user_courses, or
  * user_top10_exclusions directly.
  */
@@ -25,7 +42,12 @@ import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
 import { useTranslation } from 'react-i18next';
 
 import { RV2 } from './tokens';
-import { useReviewComposer, type WizardStep } from './hooks/useReviewComposer';
+import {
+  useReviewComposer,
+  FIRST_STEP,
+  LAST_STEP,
+  REVIEW_TOTAL_STEPS,
+} from './hooks/useReviewComposer';
 import { useReviewSubmit } from './hooks/useReviewSubmit';
 import { useReviewMediaPipeline } from './hooks/useReviewMediaPipeline';
 import { VoiceDictateButton } from './components/VoiceDictateButton';
@@ -40,7 +62,10 @@ import { useMyRatedScores, calibrationRank } from './hooks/useMyRatedScores';
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
 import type { CategoryKey, ExistingMedia, ExistingReview, ReviewV2Course } from './types';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
-import { useCourseTeeSets, type TeeSet } from '@/features/courses/hooks/useCourseTeeSets';
+import ComposerStepHeader from '@/features/composer-flow/components/ComposerStepHeader';
+import { courseShortName } from '@/features/composer-flow/courseShortName';
+import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
+import { useTop100Config } from '@/hooks/top100/useTop100Config';
 
 /**
  * THE HEADER'S OWN GEOMETRY — one expression, two consumers.
@@ -80,87 +105,23 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Optional tee chip row. Renders only when at least one colour tee exists.
-function TeeChipRow({
-  courseId,
-  value,
-  onChange,
-}: {
-  courseId: string;
-  value: string | null;
-  onChange: (label: string | null) => void;
-}) {
-  const { t } = useTranslation('courses');
-  const { data } = useCourseTeeSets(courseId);
-  const colourTees = useMemo<TeeSet[]>(
-    () => (data ?? []).filter((tee) => tee.label_kind === 'colour'),
-    [data],
-  );
-
-  const preseededRef = useRef(false);
-  useEffect(() => {
-    if (preseededRef.current) return;
-    if (colourTees.length === 0) return;
-    if (value != null) { preseededRef.current = true; return; }
-    let stored: string | null = null;
-    try {
-      stored = typeof window !== 'undefined'
-        ? window.localStorage.getItem(`tee-card:${courseId}`)
-        : null;
-    } catch {
-      stored = null;
-    }
-    if (stored && colourTees.some((tee) => tee.tee_label === stored)) {
-      onChange(stored);
-    }
-    preseededRef.current = true;
-  }, [colourTees, courseId, value, onChange]);
-
-  if (colourTees.length === 0) return null;
-
-  return (
-    <section style={{ padding: '0 16px 16px' }}>
-      <Eyebrow>{t('review.wizard.step2.teesEyebrow')}</Eyebrow>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {colourTees.map((tee) => {
-          const selected = value === tee.tee_label;
-          return (
-            <button
-              key={tee.tee_label}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => {
-                if (selected) {
-                  onChange(null);
-                } else {
-                  onChange(tee.tee_label);
-                  // review_tee_selected - composer chip select
-                  analyticsEvents.track('review_tee_selected', {
-                    course_id: courseId,
-                    tee_label: tee.tee_label,
-                  });
-                }
-              }}
-              style={{
-                padding: '6px 12px',
-                borderRadius: 999,
-                border: selected ? `1px solid ${RV2.ink}` : `1px solid ${RV2.hairlineStrong}`,
-                background: selected ? RV2.ink : RV2.ghost,
-                color: selected ? RV2.canvas : RV2.ink,
-                fontSize: 13,
-                fontWeight: 700,
-                letterSpacing: '0.01em',
-                cursor: 'pointer',
-              }}
-            >
-              {tee.tee_label}
-            </button>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
+/* THE TEE ROW IS GONE FROM THE COMPOSER (phase 2 §7).
+ *
+ * A tee is a fact about the ROUND, not part of a review, and no screen in the
+ * flow asks for one any more. `p_tee_label` and the `teeLabel` state stay: the
+ * RPC parameter is unchanged and an EDIT still carries forward whatever label
+ * the published review already holds, so editing a review never silently drops
+ * its tee.
+ *
+ * THE DERIVATION IS NOT WIRED, DELIBERATELY. The brief has it resolved at
+ * submit from the member's most recent gam_round_stats row at the course, read
+ * from tee_marker - and tee_marker is NULL on all 3,563 rows in that table, so
+ * the derivation would be a guaranteed null dressed up as a lookup. Reported
+ * rather than shipped; see the reply accompanying this phase.
+ *
+ * review_tee_selected stays registered in eventLabels and stops firing. Its flat
+ * line from this date is this removal, not a regression.
+ */
 
 interface ReceiptState {
   ratingId: string;
@@ -462,21 +423,41 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
 
   const step = composer.step;
-  const stepLabels = [
-    t('review.wizard.rail.score'),
-    t('review.wizard.rail.breakdown'),
-    t('review.wizard.rail.words'),
-  ];
+  const shortName = courseShortName(course.name);
+
+  /* DID STEP 1 PUT US HERE? A member who came through the tiles has a step to
+     go BACK to, and backing out returns them to it (the phase 1 handoff record
+     reopens the sheet). A member who arrived through /courses/:id/rate, a
+     course page, or an edit has no step behind them, so their leading control
+     is a CLOSE, not a back arrow that would go somewhere they never were. */
+  const cameFromStepOne = useComposerFlowStore((st) => st.handoff != null);
+  const leadingIsClose = step === FIRST_STEP && !cameFromStepOne;
+
+  /* THE THRESHOLD LINE'S TWO FACTS: how many ratings this course already has,
+     and how many it needs before the course page prints the four bars. Both are
+     reads; neither gates anything. */
+  const { subscoreMinRatings } = useTop100Config();
+  const ratingCountQ = useQuery({
+    queryKey: ['rv2-rating-count', course.id],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('course_ratings')
+        .select('id', { count: 'exact', head: true })
+        .eq('course_id', course.id);
+      return count ?? 0;
+    },
+  });
 
   // ---- instrumentation -------------------------------------------------
   const mountedAtRef = useRef(Date.now());
   const stepEnteredAtRef = useRef(Date.now());
   // submittedRef comes from the parent - it must survive this instance.
 
-  const abandonRef = useRef({ step: 0, hasOverall: false, catsSet: 0 });
+  const abandonRef = useRef({ step: FIRST_STEP as number, hasOverall: false, catsSet: 0 });
   abandonRef.current = {
     step,
-    hasOverall: composer.state.overall != null,
+    hasOverall: composer.overallTouched,
     catsSet: composer.catsSet,
   };
 
@@ -571,7 +552,9 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
    */
 
   const draftDirty =
-    composer.state.overall != null ||
+    /* The dial DISPLAYS 9.0 from the moment step 3 opens, so "there is a score"
+       is no longer evidence the member put anything in. The touched flag is. */
+    composer.overallTouched ||
     composer.catsSet > 0 ||
     composer.state.reviewText.trim().length > 0 ||
     media.count > 0;
@@ -584,8 +567,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const exitGuard = useDraftDismissGuard(draftDirty, exitForReal);
 
   const handleBack = useCallback(() => {
-    if (step > 0) {
-      composer.setStep((step - 1) as WizardStep);
+    if (step === LAST_STEP) {
+      composer.setStep(FIRST_STEP);
       return;
     }
     exitGuard.requestClose();
@@ -704,14 +687,14 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   }, [submit, media, composer, course.id, course.name, qc, isEditMode, mode]);
 
   const handlePrimary = useCallback(() => {
-    if (step < 2) {
+    if (step === FIRST_STEP) {
       // review_step_completed
       analyticsEvents.track('review_step_completed', {
         course_id: course.id,
         step,
         ms_on_step: Math.round(Date.now() - stepEnteredAtRef.current),
       });
-      composer.setStep((step + 1) as WizardStep);
+      composer.setStep(LAST_STEP);
       return;
     }
     analyticsEvents.track('review_step_completed', {
@@ -760,24 +743,71 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
 
   // ---- gates and label -------------------------------------------------
-  const gateMet = step === 0 ? composer.step0Gate : step === 1 ? composer.step1Gate : true;
+  const gateMet = step === FIRST_STEP ? composer.wordsGate : composer.ratingGate;
   const remaining = 4 - composer.catsSet;
 
+  /* THE THREE LABELS OF THE RATING GATE, IN ORDER: an untouched dial asks for a
+     score, a touched dial with categories outstanding counts them, and only a
+     complete screen offers to submit. */
   let buttonLabel: string;
   if (mediaUploading) {
     // R1 §1.1a — the sending state names the half that is running.
     buttonLabel = t('review.wizard.uploadingMedia');
   } else if (submit.submitting) {
     buttonLabel = isEditMode ? t('review.wizard.saving') : t('review.wizard.posting');
-  } else if (step === 2) {
-    buttonLabel = isEditMode ? t('review.wizard.save') : t('review.wizard.post');
-  } else if (!gateMet) {
-    buttonLabel = step === 0
-      ? t('review.wizard.step0.gate')
-      : t('review.wizard.step1.gate', { count: remaining });
-  } else {
+  } else if (step === FIRST_STEP) {
     buttonLabel = t('review.wizard.continue');
+  } else if (!composer.overallTouched) {
+    buttonLabel = t('review.wizard.step3.gate');
+  } else if (remaining > 0) {
+    buttonLabel = t('review.wizard.step3.catsGate', { count: remaining });
+  } else {
+    buttonLabel = isEditMode ? t('review.wizard.save') : t('review.wizard.step3.submit');
   }
+
+  /* THE FOOTER SUMMARY names what is actually there, and is omitted - never a
+     placeholder - when there is nothing to name. */
+  const hasWords = composer.state.reviewText.trim().length > 0;
+  const hasMedia = media.count > 0;
+
+  let footerSummary: string | null = null;
+  if (step === FIRST_STEP) {
+    const parts: string[] = [];
+    if (hasMedia) {
+      parts.push(
+        media.count === 1
+          ? t('review.wizard.step2.summaryPhoto', { count: 1 })
+          : t('review.wizard.step2.summaryPhotos', { count: media.count }),
+      );
+    }
+    if (hasWords) parts.push(t('review.wizard.step2.summaryWords'));
+    if (parts.length > 0) {
+      footerSummary = t('review.wizard.step2.summary', {
+        what: parts.join(t('review.wizard.step2.summaryJoin')),
+      });
+    }
+  } else if (composer.state.overall != null) {
+    footerSummary =
+      t('review.wizard.step3.summary', {
+        course: shortName,
+        score: composer.state.overall.toFixed(1),
+      }) + (composer.state.shareToFeed ? t('review.wizard.step3.summaryShare') : '');
+  }
+
+  /* THE THRESHOLD LINE. Shown only while this course is still short of
+     t100_subscore_min_ratings, naming where the member's rating lands and what
+     it unlocks. Never a placeholder: no count, no line. */
+  const existingRatings = ratingCountQ.data;
+  const thresholdLine =
+    existingRatings != null && existingRatings < subscoreMinRatings
+      ? t('review.wizard.step3.threshold', { ordinal: ordinal(existingRatings + 1) })
+      : null;
+
+  /* THE SKIP LINK. Step 2 only: it can be passed with nothing, and the link says
+     what the member gets. Step 3's "post without rating it" needs the POST
+     engine, which phase 3 wires; it is not half-wired here. */
+  const skipLabel =
+    step === FIRST_STEP && !hasMedia && !hasWords ? t('review.wizard.step2.skip') : null;
 
   const cats: CategoryCopy[] = [
     { key: 'design', label: t('review.subscore.design'), hint: t('review.wizard.hint.design') },
@@ -851,7 +881,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           <button
             type="button"
             onClick={handleBack}
-            aria-label={t('review.wizard.backA11y')}
+            aria-label={leadingIsClose ? t('review.wizard.closeA11y') : t('review.wizard.backA11y')}
             style={{
               width: 44,
               height: 44,
@@ -867,7 +897,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
               color: RV2.ink,
             }}
           >
-            {'\u2039'}
+            {leadingIsClose ? '\u00D7' : '\u2039'}
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
@@ -944,36 +974,14 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
 
 
-      {/* Step rail */}
-      <div
-        aria-hidden="true"
-        style={{ display: 'flex', gap: 6, padding: '14px 16px 18px' }}
-      >
-        {stepLabels.map((label, i) => (
-          <div key={label} style={{ flex: 1 }}>
-            <div
-              style={{
-                height: 3,
-                borderRadius: 999,
-                marginBottom: 6,
-                background: i <= step ? RV2.ink : RV2.track,
-              }}
-            />
-            <div
-              style={{
-                /* READ floor — step labels are language. 9 -> 11. */
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.10em',
-                textTransform: 'uppercase',
-                color: i <= step ? RV2.ink : RV2.secondary,
-              }}
-            >
-              {label}
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* THE SHARED COUNTER (phase 2 §3). The composer's own three-step strip -
+          SCORE / BREAKDOWN / WORDS - is gone: it numbered a different flow and
+          disagreed with step 1's counter at the boundary. ComposerStepHeader is
+          the one implementation of "Step N of 3" and the segmented bar for the
+          whole flow. left="none": the fixed header above already owns the one
+          leading control (back arrow, or × when nothing is behind us), and two
+          back buttons on one screen is a worse answer than a counter beneath. */}
+      <ComposerStepHeader step={step} total={REVIEW_TOTAL_STEPS} left="none" />
 
       {/* RESTORED EDIT DRAFT (_04 §1). Says so out loud, and offers the way back
           to the published version. Not amber: amber means the viewing member. */}
@@ -1079,94 +1087,54 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           whiteSpace: 'nowrap',
         }}
       >
-        {t('review.wizard.a11yStep', { n: step + 1, label: stepLabels[step] })}
+        {t('review.wizard.a11yStepNumber', { n: step, m: REVIEW_TOTAL_STEPS })}
       </div>
 
-      {/* Step 0 - Score */}
-      {step === 0 && (
-        <section style={{ padding: '0 16px 16px' }}>
-          <h1
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              marginBottom: 16,
-              color: RV2.ink,
-            }}
-          >
-            {t('review.wizard.step0.heading')}
-          </h1>
-          <div
-            style={{
-              background: RV2.cardBg,
-              borderRadius: RV2.cardRadius,
-              border: `1px solid ${RV2.hairline}`,
-              padding: '18px 18px 16px',
-            }}
-          >
-            <OverallScrubber
-              value={composer.state.overall}
-              onChange={composer.setOverall}
-              caption={
-                composer.state.overall == null
-                  ? t('review.wizard.step0.captionEmpty')
-                  : t('review.wizard.step0.captionSet')
-              }
-              ariaLabel={t('review.wizard.step0.a11y')}
-              bandLabels={{
-                low: t('review.wizard.step0.bandLow'),
-                mid: t('review.wizard.step0.bandMid'),
-                high: t('review.wizard.step0.bandHigh'),
-              }}
-              calibration={
-                calibration
-                  ? t('review.wizard.step0.calibration', {
-                      ordinal: ordinal(calibration.ordinal),
-                      count: calibration.total,
-                    })
-                  : null
-              }
-            />
+      {/* ================= STEP 2 of 3 - PHOTOS AND A FEW WORDS =================
+          TWO BLOCKS, NOT FOUR: the media tray, then the words. The tee row is
+          gone (§7) and the share toggle has moved to step 3 (§6), where the
+          footer can name it on the same screen as the button that sends it.
 
-          </div>
-        </section>
-      )}
-
-      {/* Step 1 - Breakdown */}
-      {step === 1 && (
-        <section style={{ padding: '0 16px 16px' }}>
-          <h1
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              marginBottom: 4,
-              color: RV2.ink,
-            }}
-          >
-            {t('review.wizard.step1.heading')}
-          </h1>
-          <p
-            style={{
-              fontSize: 13,
-              color: RV2.secondary,
-              lineHeight: 1.55,
-              marginBottom: 16,
-            }}
-          >
-            {t('review.wizard.step1.body')}
-          </p>
-          <CategoryGrid
-            values={composer.state.scores}
-            onChange={composer.setCategory}
-            cats={cats}
-          />
-        </section>
-      )}
-
-      {/* Step 2 - Words */}
-      {step === 2 && (
+          THE PIPELINE IS PATH-SPECIFIC AND THE SHELL IS NOT. This layout is
+          shared with the post path; its ENGINE is not. The review path renders
+          review-v2's MediaTray over useReviewMediaPipeline /
+          reviewUploadController, and the post path keeps its own tray and
+          postUploadController. Different upload semantics, different retry
+          behaviour, different cache sweeps - not to be unified or adapted. */}
+      {step === FIRST_STEP && (
         <>
+          <section style={{ padding: '0 16px 16px' }}>
+            <h1
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                marginBottom: 4,
+                color: RV2.ink,
+              }}
+            >
+              {t('review.wizard.step2.heading')}
+            </h1>
+            <p style={{ fontSize: 14, color: RV2.secondary, lineHeight: 1.5, margin: 0 }}>
+              {t('review.wizard.step2.lede', { course: shortName })}
+            </p>
+          </section>
+
+          <section style={{ padding: '0 16px 16px' }}>
+            <Eyebrow>{t('review.wizard.step2.photosEyebrow')}</Eyebrow>
+            {/* R1 §1.3c — onRetry was never passed, so a failed tile's Retry
+                was a button that did nothing. Wired: with no reviewId the item
+                returns to pending and the pending set re-uploads. */}
+            <MediaTray
+              items={media.items}
+              onPick={media.addFiles}
+              onRemove={media.removeItem}
+              onRetry={(id) => { void media.retryItem(id); }}
+              pickerError={media.pickerError}
+              onClearError={media.clearPickerError}
+            />
+          </section>
+
           <section style={{ padding: '0 16px 16px' }}>
             <div
               style={{
@@ -1243,66 +1211,117 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                      state it (MICRO_BRIEF_MENTIONS_COMPOSER_BROKEN §4). */
                   placeholderColor: 'rgba(255,255,255,0.38)',
                 }}
-
               />
             </div>
-            <div style={{ fontSize: 11, color: RV2.secondary, marginTop: 8 }}>
-              {t('review.wizard.step2.optionalNote')}
+          </section>
+        </>
+      )}
+
+      {/* ================= STEP 3 of 3 - THE RATING =================
+          The dial and the breakdown are ONE screen now, with the live feedback
+          between them and the share row at the foot. */}
+      {step === LAST_STEP && (
+        <>
+          <section style={{ padding: '0 16px 16px' }}>
+            <h1
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                marginBottom: 4,
+                color: RV2.ink,
+              }}
+            >
+              {t('review.wizard.step3.heading')}
+            </h1>
+            <p style={{ fontSize: 14, color: RV2.secondary, lineHeight: 1.5, margin: '0 0 16px' }}>
+              {t('review.wizard.step3.lede', { course: shortName })}
+            </p>
+            <div
+              style={{
+                background: RV2.cardBg,
+                borderRadius: RV2.cardRadius,
+                border: `1px solid ${RV2.hairline}`,
+                padding: '18px 18px 16px',
+              }}
+            >
+              <OverallScrubber
+                value={composer.state.overall}
+                onChange={composer.setOverall}
+                caption={t('review.wizard.step3.caption')}
+                ariaLabel={t('review.wizard.step0.a11y')}
+              />
+
+              {/* LIVE FEEDBACK — both conditional, neither invented. A hairline
+                  separates it from the dial; nothing renders at all when neither
+                  condition is met. */}
+              {(calibration || thresholdLine) && (
+                <div
+                  style={{
+                    marginTop: 16,
+                    paddingTop: 14,
+                    borderTop: `1px solid ${RV2.hairline}`,
+                    display: 'grid',
+                    gap: 6,
+                  }}
+                >
+                  {calibration && (
+                    <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.success }}>
+                      {t('review.wizard.step0.calibration', {
+                        ordinal: ordinal(calibration.ordinal),
+                        count: calibration.total,
+                      })}
+                    </div>
+                  )}
+                  {thresholdLine && (
+                    <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.success }}>
+                      {thresholdLine}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </section>
 
           <section style={{ padding: '0 16px 16px' }}>
-            <Eyebrow>{t('review.wizard.step2.photosEyebrow')}</Eyebrow>
-            {/* R1 §1.3c — onRetry was never passed, so a failed tile's Retry
-                was a button that did nothing. Wired: with no reviewId the item
-                returns to pending and the pending set re-uploads. */}
-            <MediaTray
-              items={media.items}
-              onPick={media.addFiles}
-              onRemove={media.removeItem}
-              onRetry={(id) => { void media.retryItem(id); }}
-              pickerError={media.pickerError}
-              onClearError={media.clearPickerError}
+            <Eyebrow>{t('review.wizard.step3.breakdownLabel')}</Eyebrow>
+            <p
+              style={{
+                fontSize: 13,
+                color: RV2.secondary,
+                lineHeight: 1.55,
+                margin: '0 0 16px',
+              }}
+            >
+              {t('review.wizard.step3.breakdownBody')}
+            </p>
+            <CategoryGrid
+              values={composer.state.scores}
+              onChange={composer.setCategory}
+              cats={cats}
             />
           </section>
 
-          <TeeChipRow
-            courseId={course.id}
-            value={composer.state.teeLabel}
-            onChange={composer.setTeeLabel}
-          />
-
-          <div style={{ padding: '0 16px 16px' }}>
-            <div
-              style={{
-                background: RV2.cardBg,
-                borderRadius: 14,
-                border: `1px solid ${RV2.hairline}`,
-                padding: '13px 14px',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 12,
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: RV2.ink }}>
-                    {t('review.wizard.step2.shareTitle')}
-                  </div>
-                  <div style={{ fontSize: 12, color: RV2.secondary }}>
-                    {t('review.wizard.step2.shareSub')}
-                  </div>
-                </div>
-              </div>
-              <div style={{ marginTop: 10 }}>
-                <ShareToggle value={composer.state.shareToFeed} onChange={composer.setShareToFeed} />
-              </div>
+          {/* SHARE — ONE ROW, not a card, and the sub-line says what will
+              actually appear: a review when there are words or photographs, a
+              bare rating when there are neither. Default ON: 38% of all posts on
+              the platform come from this toggle. It is no longer a surprise
+              because the footer names it and the button says SUBMIT REVIEW. */}
+          <section style={{ padding: '0 16px 8px' }}>
+            <div style={{ borderTop: `1px solid ${RV2.hairline}` }}>
+              <ShareToggle
+                value={composer.state.shareToFeed}
+                onChange={composer.setShareToFeed}
+                bare
+                title={t('review.wizard.step3.shareTitle')}
+                sub={
+                  hasWords || hasMedia
+                    ? t('review.wizard.step3.shareSubReview')
+                    : t('review.wizard.step3.shareSubRatingOnly')
+                }
+              />
             </div>
-          </div>
+          </section>
         </>
       )}
 
@@ -1312,6 +1331,9 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         label={buttonLabel}
         enabled={gateMet && !submit.submitting && !mediaUploading}
         onPress={handlePrimary}
+        summary={footerSummary}
+        skipLabel={skipLabel}
+        onSkip={skipLabel ? handlePrimary : undefined}
       />
 
       {/* §1a: the one question before several paragraphs are thrown away. */}

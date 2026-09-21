@@ -5,15 +5,18 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RV2 } from '../tokens';
 import { FIGURE } from '@/lib/tokens/type';
-import { bandColorOnDark as bandColor } from '../bandColor';
+/* THE COMPOSER PREVIEWS THE COURSE PAGE, so it takes the COURSE PAGE'S RULE:
+   9.0 and above is green, everything else is mute. One implementation, imported
+   — the three-band composer scale (bandColorOnDark) is no longer used here
+   because a score shown at 8.4 in amber while the course page shows it mute was
+   the composer promising something the ranking does not print. */
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   value: number | null;
   onChange: (v: number) => void;
   caption: string;
   ariaLabel: string;
-  /** Band markers for the axis, e.g. "Below 5.0" / "5.0 to 8.9" / "9.0 and up". */
-  bandLabels: { low: string; mid: string; high: string };
   /** Live calibration against the member's OWN rated courses. Null hides it. */
   calibration?: string | null;
 }
@@ -28,12 +31,12 @@ const toPct = (v: number) => ((v - MIN) / (MAX - MIN)) * 100;
 const MARK_5 = toPct(5);
 const MARK_9 = toPct(9);
 
-export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabels, calibration }: Props) {
+export function OverallScrubber({ value, onChange, caption, ariaLabel, calibration }: Props) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [dragging, setDragging] = useState(false);
   const ghostDragRef = useRef(false);
   const movedRef = useRef(false);
-  const color = bandColor(value);
+  const color = courseSubScoreTone(value);
   const fillPct = value == null ? 0 : toPct(value);
 
   const pointerToValue = useCallback((clientX: number) => {
@@ -169,8 +172,8 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
             off-white fill, same shadow. A hollow ring read as unloaded content
             on device. The unset state is carried by the EMPTY TRACK and the
             BLANK NUMERAL, not by a weaker handle.
-            bandColor(null) is the neutral grey, so no band colour leaks in
-            before the member has scored. */}
+            courseSubScoreTone(null) is the MUTE tier, so no green leaks in
+            before the member has scored 9.0 or above. */}
         <div
           aria-hidden
           onPointerDown={value == null ? (e) => {
@@ -207,19 +210,24 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
         style={{
           display: 'flex',
           marginTop: 9,
-          /* AXIS — STATED EXCEPTION. These are the three band tick labels
-             under the track (POOR / GOOD / GREAT): coordinates on the scale,
-             not language, and they sit in fixed percentage-width slots that a
-             READ lift would collide. Floor 10. */
+          /* AXIS — STATED EXCEPTION. Coordinates on the scale, not language,
+             sitting in fixed percentage-width slots that a READ lift would
+             collide. Floor 10.
+             THESE USED TO NAME BANDS (POOR / GOOD / GREAT) in three band
+             colours. Under the course page's two-tone rule the first two colours
+             become identical and a three-colour legend reads as broken, so the
+             row now MARKS THE TRACK with three plain numerals in one quiet
+             tone — 1, 5 and 10 sit exactly over the track's own two tick
+             marks and its end. */
           fontSize: 10,
           ...FIGURE,
           letterSpacing: '0.10em',
-          textTransform: 'uppercase',
+          color: RV2.muted,
         }}
       >
-        <span style={{ width: `${MARK_5}%`, color: bandColor(1) }}>{bandLabels.low}</span>
-        <span style={{ width: `${MARK_9 - MARK_5}%`, color: bandColor(5) }}>{bandLabels.mid}</span>
-        <span style={{ flex: 1, color: bandColor(9) }}>{bandLabels.high}</span>
+        <span style={{ width: `${MARK_5}%` }}>1</span>
+        <span style={{ width: `${MARK_9 - MARK_5}%` }}>5</span>
+        <span style={{ flex: 1 }}>10</span>
       </div>
 
       {calibration && (

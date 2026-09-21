@@ -1,7 +1,13 @@
 /**
- * ShareToggle — "Share to your feed" true toggle.
+ * ShareToggle — the share-to-the-Clubhouse true toggle.
  * Ink (near-white) track when on, quiet track when off, on the dark composer
  * canvas. The knob inverts against the track so both states stay legible.
+ *
+ * TWO SHAPES, ONE KNOB. The default is the bordered card. `bare` strips the
+ * card chrome so the control reads as ONE ROW at the foot of step 3, which is
+ * what the rating screen asks for: it is a switch on a screen, not a panel of
+ * its own. The copy is supplied by the host because the sub-line changes with
+ * what is actually being shared.
  */
 
 import React from 'react';
@@ -10,11 +16,17 @@ import { RV2 } from '../tokens';
 interface Props {
   value: boolean;
   onChange: (v: boolean) => void;
+  /** Row title. Defaults to the historical card copy. */
+  title?: string;
+  /** Row sub-line. Defaults to the historical card copy. */
+  sub?: string;
+  /** True: no card background, border or radius — one row. */
+  bare?: boolean;
 }
 
 const TRACK_ON = RV2.ink;
 
-export function ShareToggle({ value, onChange }: Props) {
+export function ShareToggle({ value, onChange, title, sub, bare }: Props) {
   return (
     <button
       type="button"
@@ -26,20 +38,20 @@ export function ShareToggle({ value, onChange }: Props) {
         alignItems: 'center',
         gap: 12,
         width: '100%',
-        padding: '12px 16px',
-        background: RV2.cardBg,
-        border: `1px solid ${RV2.hairline}`,
-        borderRadius: RV2.panelRadius,
+        padding: bare ? '14px 0' : '12px 16px',
+        background: bare ? 'transparent' : RV2.cardBg,
+        border: bare ? 'none' : `1px solid ${RV2.hairline}`,
+        borderRadius: bare ? 0 : RV2.panelRadius,
         cursor: 'pointer',
         textAlign: 'left',
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: RV2.ink, letterSpacing: '-0.005em' }}>
-          Share to your feed
+        <div style={{ fontSize: 14, fontWeight: 600, color: RV2.ink, letterSpacing: '-0.005em' }}>
+          {title ?? 'Share to your feed'}
         </div>
         <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 2 }}>
-          {value ? 'Friends will see this review' : 'Course page only'}
+          {sub ?? (value ? 'Friends will see this review' : 'Course page only')}
         </div>
       </div>
       <div

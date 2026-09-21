@@ -10,6 +10,11 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { RV2 } from '../tokens';
 import { FIGURE } from '@/lib/tokens/type';
 import { bandColorOnDark as bandColor } from '../bandColor';
+/* THE BREAKDOWN BARS ONLY (BRIEF phase 2 §8): the four category values and
+   their fills take the course page's two-tone rule so the receipt shows what
+   the course page will show. The hero overall and the community average keep
+   the three-band composer scale; the brief scopes the change to the breakdown. */
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { useReviewReceipt } from '../hooks/useReviewReceipt';
 import type { CategoryKey, ReviewV2Course } from '../types';
 
@@ -192,7 +197,7 @@ export function ReviewReceipt({
           >
             {CAT_ORDER.map((key) => {
               const v = scores[key];
-              const c = bandColor(v);
+              const c = courseSubScoreTone(v);
               return (
                 <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                   <span style={{ fontSize: 12, color: RV2.secondary, width: 66, flexShrink: 0 }}>

@@ -6,7 +6,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RV2 } from '../tokens';
 import { FIGURE } from '@/lib/tokens/type';
-import { bandColorOnDark as bandColor } from '../bandColor';
+/* The course page's rule, imported — see OverallScrubber. The category values
+   and their bar fills preview exactly what the course page will print. */
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { CategoryKey } from '../types';
 
 export interface CategoryCopy {
@@ -44,7 +46,7 @@ function CategoryRow({
   const [dragging, setDragging] = useState(false);
   const ghostDragRef = useRef(false);
   const movedRef = useRef(false);
-  const color = bandColor(value);
+  const color = courseSubScoreTone(value);
   const fillPct = value == null ? 0 : toPct(value);
 
   const pointerToValue = useCallback((clientX: number) => {
