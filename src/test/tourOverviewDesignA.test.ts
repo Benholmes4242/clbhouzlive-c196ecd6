@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { createElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { formatOverviewChampionScore, formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { formatOverviewDateRange, getOverviewCountdown, overviewChampionScoreLabel } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { MiniBoard, shouldShowOverviewPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
@@ -88,11 +88,11 @@ describe('Tour Overview Design A hero facts', () => {
     expect(detectTopTie([{ score: -18 }, { score: -18 }, { score: -17 }])).toEqual({ count: 2, score: '−18' });
   });
 
-  it('keeps the established playoff and winning-margin copy in the champion strip score', () => {
+  it('keeps the wonBy/playoff qualifier in the separate scoreLabel register', () => {
     const t = (key: string, options?: { count: number }) => key.endsWith('playoff') ? 'playoff' : `by ${options?.count}`;
-    expect(formatOverviewChampionScore(-26, false, 2, t)).toBe('−26 · by 2');
-    expect(formatOverviewChampionScore(-18, true, null, t)).toBe('−18 · playoff');
-    expect(formatOverviewChampionScore(-12, false, null, t)).toBe('−12');
+    expect(overviewChampionScoreLabel(false, 2, t)).toBe('by 2');
+    expect(overviewChampionScoreLabel(true, null, t)).toBe('playoff');
+    expect(overviewChampionScoreLabel(false, null, t)).toBeUndefined();
   });
 
   it('does not invent a tie when the rest of the field merely shares the leader score', () => {
