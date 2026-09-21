@@ -392,6 +392,8 @@ function resolveLayout(
       (prizeFreeTrackCount - 1) * prizeFree.gap;
     const prizeFreeAvail = containerW - prizeFreeFixed - boardRoundsWidth(prizeFree);
     if (need <= prizeFreeAvail) return { columns: prizeFree, tier: floorTier };
+
+    return { columns: prizeFree, tier: floorTier };
   }
 
   if (!warnedOverflow) {
@@ -845,7 +847,7 @@ export function BoardTable({
   demoted.forEach((e) => parts.push(renderRow(e, { demoted: true })));
 
   return (
-    <div ref={rootRef} data-board-name-tier={tier}>
+    <div ref={rootRef} data-board-name-tier={tier} data-board-show-prize={columns.showPrize ? 'true' : 'false'}>
       {renderHeader()}
       {parts}
     </div>
