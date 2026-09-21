@@ -21549,6 +21549,7 @@ export type Database = {
           user_wins: number
         }[]
       }
+      get_round_awards: { Args: { p_score_id: string }; Returns: Json }
       get_round_course_context: {
         Args: { p_whs_score_id: string }
         Returns: {
