@@ -2315,7 +2315,48 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       return a.user_id < b.user_id ? -1 : 1;
     });
 
+  // BRIEF_LEGENDS_RUNAWAY §1 — SKIP THE WRITE WHEN NOTHING CHANGED.
+  //
+  // recomputeLegend used to stale-mark and re-insert the full field on EVERY
+  // evaluation, including re-enqueued scores, whether or not the board moved.
+  // Measured over the stale history: 38,195 of 45,178 board versions were
+  // byte-identical to the one they replaced (84.5%). 242,204 rows / 51 MB for
+  // 22 members came from that, and 124,398 gam_legend_pulse_events with it,
+  // because gam_emit_legend_pulse_event fires on every rank-1 INSERT.
+  //
+  // So: compare the ordered (user_id, rank, value) list and return before
+  // touching anything if it is the same board. No stale-marking, no insert, no
+  // pulse event, no notification — and none was due, since an identical board
+  // has the same holder.
+  //
+  // Value comparison is at the stored precision, not by float identity:
+  // `value` is unconstrained numeric and arrives back through PostgREST as a
+  // JSON number, so a value that differs only in floating-point noise must not
+  // read as a change. legendBoardSignature() fixes both sides at 6 decimals,
+  // well past anything golf produces (score_diff is 1 dp).
+  const prevSig = legendBoardSignature(
+    (prev ?? []).map((r: any) => ({ user_id: r.user_id, rank: r.rank, value: r.value })),
+  );
+  const nextSig = legendBoardSignature(
+    arr.map((r, i) => ({ user_id: r.user_id, rank: i + 1, value: r.value })),
+  );
+  if (prevSig === nextSig) {
+    console.log("[gam-evaluator] legend board unchanged — write skipped", {
+      courseId,
+      category: cfg.category,
+      fieldSize: arr.length,
+    });
+    return;
+  }
+  console.log("[gam-evaluator] legend board changed — rewriting", {
+    courseId,
+    category: cfg.category,
+    prevFieldSize: prev?.length ?? 0,
+    fieldSize: arr.length,
+  });
+
   // Mark old as not current
+
   await supabase
     .from("gam_course_legends")
     .update({ is_current: false, updated_at: new Date().toISOString() })
