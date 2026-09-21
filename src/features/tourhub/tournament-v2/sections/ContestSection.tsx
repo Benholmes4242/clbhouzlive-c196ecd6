@@ -37,8 +37,9 @@ export function ContestSection({ contest, state }: Props) {
     };
     const form = leaderNames.length >= 4 ? 'Many' : leaderNames.length === 3 ? 'Three' : 'Two';
     if (leaderNames.length >= 2 && levelScore) {
-      const suffix = past ? 'Past' : withChaser ? 'Chaser' : '';
-      subline = t(`tournament.contest.sublineLevel${form}${suffix}`, vars);
+      subline = past && contest.playoffDecided
+        ? t(`tournament.contest.sublinePlayoff${form}`, vars)
+        : t(`tournament.contest.sublineLevel${form}${past ? 'Past' : withChaser ? 'Chaser' : ''}`, vars);
     }
   } else if (nextName && contest.leader) {
     const leaderName = contest.leader.player?.full_name ?? '';
@@ -53,12 +54,17 @@ export function ContestSection({ contest, state }: Props) {
   }
   const maxGap = contest.pack.length ? Math.max(...contest.pack.map((row) => row.gap)) : 0;
   const showTrack = contest.pack.length >= 5;
-  const word = contest.sharedLead
-    ? t('tournament.contest.sharedLead', { count: contest.leaders.length })
-    : t('tournament.contest.playoff');
-  const qualifier = contest.sharedLead && contest.holesLeft != null
-    ? t('tournament.contest.withToPlay', { holes: contest.holesLeft })
-    : state === 'completed' ? t('tournament.contest.decidedInPlayoff') : null;
+  const past = state === 'completed';
+  const word = past
+    ? contest.playoffDecided
+      ? t('tournament.contest.playoff')
+      : t('tournament.contest.finishedLevel')
+    : t('tournament.contest.sharedLead', { count: contest.leaders.length });
+  const qualifier = past
+    ? null
+    : contest.holesLeft != null
+      ? t('tournament.contest.withToPlay', { holes: contest.holesLeft })
+      : null;
 
   return (
     <section style={{ fontFamily: FONT }}>

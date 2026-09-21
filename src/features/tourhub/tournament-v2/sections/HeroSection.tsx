@@ -3,17 +3,16 @@ import { formatNumber } from '@/i18n/format';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { formatPurse } from '../../_shared/formatPurse';
 import { fmtScore } from '../../utils/fmtScore';
-import { FONT, INK, INK_FAINT, TOUR_HERO_PHOTO_H } from '../../_shared/tokens';
+import { AMBER, FONT, INK, INK_FAINT, INK_MUTE, STATUS_LIVE_ON_DARK, TOUR_HERO_PHOTO_H } from '../../_shared/tokens';
 import { heroCanonBackground } from '../../_shared/heroGradient';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
 import type { TournamentContest } from '../data/tournamentContest';
+import { DARK_CHROME_GLASS_MATERIAL } from '@/features/chrome-v2/ChromeIsland';
 
 const FALLBACK_BG = `linear-gradient(180deg, ${A.PANEL} 0%, ${A.CANVAS} 100%)`;
 const IMAGE_FOCAL = '50% 72%';
-const GOLD = '#FBBC2E';
-const GREEN_LIVE = '#6EE7B7';
 
 interface Props {
   meta: TournamentMeta;
@@ -43,16 +42,17 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
   const score = contest.leader?.score == null ? null : fmtScore(contest.leader.score);
   const cityCountry = [meta.venue_city, meta.venue_country].filter(Boolean).join(', ');
   const venueLine = [meta.venue_name, cityCountry || null].filter(Boolean).join(' · ');
-  const tourLabel = (meta.tour_full_name ?? tourCode ?? '').toUpperCase();
-  const chip = state === 'live'
-    ? meta.current_round_status === 'scheduled'
-      ? { label: t('tournament.hero.chip.roundN', { round: meta.current_round ?? 1 }), color: INK, border: 'rgba(255,255,255,0.42)', bg: 'rgba(255,255,255,0.10)' }
-      : { label: `${t('status.live')} · R${meta.current_round ?? 1}`, color: GREEN_LIVE, border: 'rgba(110,231,183,0.55)', bg: 'rgba(16,185,129,0.14)' }
+  const tourRaw = meta.tour_full_name ?? tourCode ?? '';
+  const tourLabel = cjk ? tourRaw : tourRaw.toUpperCase();
+  const roundScheduled = state === 'live' && meta.current_round_status === 'scheduled';
+  const chipLabel = state === 'live'
+    ? roundScheduled
+      ? t('tournament.hero.chip.roundN', { round: meta.current_round ?? 1 })
+      : t('status.live')
     : state === 'completed'
-      // CORRECTION 3: the completed chip reads RESULTS, matching the tour
-      // overview's own completed chip. status.final is retained for StatusChip.
-      ? { label: `${t('status.results')}${tourLabel ? ` · ${tourLabel}` : ''}`, color: GOLD, border: 'rgba(251,188,46,0.55)', bg: 'rgba(251,188,46,0.12)' }
-      : { label: t('tournament.hero.chip.upcomingTour', { tour: tourLabel, defaultValue: tourLabel ? `UPCOMING · ${tourLabel}` : 'UPCOMING' }), color: INK, border: 'rgba(255,255,255,0.42)', bg: 'rgba(255,255,255,0.10)' };
+      ? t('status.results')
+      : t('status.upcoming');
+  const showLiveDot = state === 'live' && !roundScheduled;
 
   let verdict: string | null = null;
   if (state === 'live' && leaderName) {
@@ -79,8 +79,13 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
     <div style={{ fontFamily: FONT, color: INK }}>
       <div style={{ position: 'relative', minHeight: TOUR_HERO_PHOTO_H, margin: 0, borderRadius: 0, overflow: 'hidden', paddingTop: 20, background: heroCanonBackground(imageUrl, FALLBACK_BG, IMAGE_FOCAL), display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         <div style={{ padding: '8px 14px 14px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', padding: '3px 7px', borderRadius: 4, background: chip.bg, border: `1px solid ${chip.border}`, fontSize: 10, fontWeight: 700, color: chip.color, letterSpacing: cjk ? 0 : '0.10em', textTransform: cjk ? 'none' : 'uppercase', marginBottom: 6 }}>{chip.label}</div>
-          <h1 style={{ fontSize: 'clamp(20px, 6.4vw, 25px)', fontWeight: 700, color: INK, lineHeight: 1.04, letterSpacing: '-0.02em', margin: 0, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{meta.name}</h1>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, minHeight: 28, padding: '0 10px', borderRadius: 999, ...DARK_CHROME_GLASS_MATERIAL, fontSize: 10, fontWeight: 800, color: INK, letterSpacing: cjk ? 0 : '0.12em', textTransform: cjk ? 'none' : 'uppercase' }}>
+            {showLiveDot ? <span style={{ width: 7, height: 7, borderRadius: 999, background: STATUS_LIVE_ON_DARK }} /> : null}
+            <span>{chipLabel}</span>
+            {showLiveDot ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {meta.current_round ?? 1}</span> : null}
+          </div>
+          {tourLabel ? <div style={{ marginTop: 8, fontSize: 10, fontWeight: 800, color: INK_MUTE, letterSpacing: cjk ? 0 : '0.14em', textTransform: cjk ? 'none' : 'uppercase' }}>{tourLabel}</div> : null}
+          <h1 style={{ fontSize: 'clamp(20px, 6.4vw, 25px)', fontWeight: 700, color: INK, lineHeight: 1.04, letterSpacing: '-0.02em', margin: '4px 0 0', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{meta.name}</h1>
           {venueLine && <div style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.65)', marginTop: 3 }}>{venueLine}</div>}
           {verdict && <div style={{ maxWidth: 320, marginTop: 10, fontSize: 15, fontWeight: 600, color: INK, lineHeight: 1.42, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>{verdict}</div>}
         </div>

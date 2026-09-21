@@ -17,6 +17,9 @@ export interface TournamentContest {
   leader: BoardEntry | null;
   margin: number | null;
   sharedLead: boolean;
+  /** A completed event with a shared top score is a playoff. It is decided
+   * when the board separates the leaders — winner on position 1, untied. */
+  playoffDecided: boolean;
   chasersWithinFour: number;
   holesLeft: number | null;
   pack: PackEntry[];
@@ -40,6 +43,8 @@ export function selectTournamentContest(
   const leader = leaders[0] ?? null;
   const nextScore = bestScore == null ? null : scored.find((row) => (row.score as number) > bestScore)?.score ?? null;
   const sharedLead = leaders.length > 1;
+  const playoffDecided = state === 'completed' && sharedLead
+    && leader?.position === 1 && !leader?.position_tied;
   const margin = sharedLead && state === 'completed'
     ? 0
     : bestScore == null || nextScore == null
@@ -51,7 +56,9 @@ export function selectTournamentContest(
         !leaders.some((leaderRow) => leaderRow.id === row.id) &&
         (row.score as number) - bestScore <= CONTENTION_GAP
       ).length;
-  const holesLeft = leader?.thru == null ? null : Math.max(0, 18 - leader.thru);
+  // Holes remaining is a live-only fact: on a finished event `thru` is stale
+  // feed residue and 18 - thru is meaningless.
+  const holesLeft = state === 'live' && leader?.thru != null ? Math.max(0, 18 - leader.thru) : null;
   const pack = bestScore == null
     ? []
     : [...scored].sort(byPosition).slice(0, 10).map((entry) => ({ entry, gap: Math.max(0, (entry.score as number) - bestScore) }));
@@ -78,5 +85,5 @@ export function selectTournamentContest(
         ? 'figure'
         : null;
 
-  return { leaders, leader, margin, sharedLead, chasersWithinFour, holesLeft, pack, mover, moverToday, leadForm };
+  return { leaders, leader, margin, sharedLead, playoffDecided, chasersWithinFour, holesLeft, pack, mover, moverToday, leadForm };
 }

@@ -4,7 +4,7 @@ import type { TournamentMeta } from '@/features/tourhub/leaderboard/useTournamen
 import { selectTournamentContest } from '@/features/tourhub/tournament-v2/data/tournamentContest';
 
 const meta = { current_round: 4 } as TournamentMeta;
-const row = (id: string, score: number, position: number, today = -1, thru = 12): BoardEntry => ({ id, score, position, today, thru, player: { id, full_name: id } });
+const row = (id: string, score: number, position: number, today = -1, thru = 12, positionTied = false): BoardEntry => ({ id, score, position, position_tied: positionTied, today, thru, player: { id, full_name: id } });
 
 describe('selectTournamentContest', () => {
   it('derives a single lead, margin, pack and non-leader move', () => {
@@ -39,5 +39,21 @@ describe('selectTournamentContest', () => {
     const result = selectTournamentContest([row('winner', -12, 1, -4, 18), row('runner', -12, 2, -3, 18)], meta, 'completed');
     expect(result.margin).toBe(0);
     expect(result.leadForm).toBe('word');
+    expect(result.playoffDecided).toBe(true);
+    expect(result.holesLeft).toBeNull();
+  });
+
+  it('keeps a completed tied leader on the finished-level path', () => {
+    const result = selectTournamentContest([row('a', -12, 1, -4, 13, true), row('b', -12, 1, -3, 13, true)], meta, 'completed');
+    expect(result.playoffDecided).toBe(false);
+    expect(result.holesLeft).toBeNull();
+    expect(result.leadForm).toBe('word');
+  });
+
+  it('keeps the completed non-playoff margin in figure form', () => {
+    const result = selectTournamentContest([row('winner', -12, 1, -4, 18), row('runner', -10, 2, -3, 18)], meta, 'completed');
+    expect(result.margin).toBe(2);
+    expect(result.playoffDecided).toBe(false);
+    expect(result.leadForm).toBe('figure');
   });
 });
