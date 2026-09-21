@@ -1,0 +1,31 @@
+{
+  "step": "Paso {{n}} de {{m}}",
+  "close": "Cerrar",
+  "back": "Atrás",
+  "step1": {
+    "title": "¿Qué quieres compartir?"
+  },
+  "tiles": {
+    "review": {
+      "title": "Una reseña de campo",
+      "sub": "Puntúa un campo de golf y comparte tu experiencia"
+    },
+    "post": {
+      "title": "Una publicación",
+      "sub": "Fotos o unas palabras para tu círculo"
+    }
+  },
+  "course": {
+    "which": "¿Qué campo?",
+    "searchAll": "Buscar entre 23.000 campos",
+    "pickerTitle": "Elige un campo",
+    "recent": "Jugados recientemente",
+    "played": "Jugado {{when}}",
+    "emptyTitle": "Aún no hay vueltas",
+    "emptyBody": "Cuando conectes tu hándicap, los campos que juegues apareceran aquí por su cuenta. Hasta entonces, busca uno arriba."
+  },
+  "footer": {
+    "pickCourse": "Elige un campo para continuar",
+    "next": "SIGUIENTE"
+  }
+}

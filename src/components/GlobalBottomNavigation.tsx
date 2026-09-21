@@ -17,7 +17,8 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 import { r } from '@/lib/radius';
 import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
 import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
-import CreateSheetV3 from '@/features/post-v2/components/CreateSheetV3';
+import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
+import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
 import { NAV_CLEARANCE, NAV_PILL_H_FALLBACK, NAV_PILL_H_VAR } from '@/lib/navClearance';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
@@ -142,6 +143,30 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   useEffect(() => {
     resetToExpanded();
   }, [location.pathname]);
+
+  /* BACK OUT OF A COMPOSER RETURNS TO STEP 1, NOT TO THE PAGE UNDERNEATH.
+     Step 1 is a sheet; the composers are an overlay (post) and a route
+     (review), so the sheet stack cannot express this return on its own. The
+     handoff record is ARMED only once we have actually left step 1 — the review
+     handoff navigates through afterSheetHistorySettled, so at the moment it is
+     written neither the path nor the overlay has changed yet, and an unarmed
+     rule would reopen step 1 over its own handoff. */
+  const studioOpen = usePostStudioStore((s) => s.isOpen);
+  const handoff = useComposerFlowStore((s) => s.handoff);
+  const armHandoff = useComposerFlowStore((s) => s.arm);
+  const clearHandoff = useComposerFlowStore((s) => s.clearHandoff);
+  useEffect(() => {
+    if (!handoff) return;
+    const left = studioOpen || location.pathname !== handoff.returnPath;
+    if (!handoff.armed) {
+      if (left) armHandoff();
+      return;
+    }
+    if (!left) {
+      clearHandoff();
+      setCreateOpen(true);
+    }
+  }, [handoff, studioOpen, location.pathname, armHandoff, clearHandoff]);
 
   // Drawer / sheet active → force expanded (pill sits below sheet scrim).
   const [isDrawerActive, setIsDrawerActive] = useState(false);
@@ -458,7 +483,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
           </motion.div>
         )}
       </AnimatePresence>
-      <CreateSheetV3
+      <ComposerFlowSheet
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         returnPath={location.pathname}

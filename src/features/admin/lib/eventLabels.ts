@@ -70,6 +70,11 @@ export const EVENT_LABELS: Record<string, string> = {
   post_round_detached: 'Post round detached',
 
   // ─── Post composer funnel ─────────────────────────────────────
+  // ─── Unified composer (step 1) ────────────────────────────────
+  composer_kind_selected: 'Composer kind selected',
+  composer_course_source: 'Composer course source',
+  composer_empty_courses: 'Composer no-rounds card shown',
+
   post_composer_opened: 'Post composer opened',
   post_media_added: 'Post media added',
   post_caption_started: 'Post caption started',

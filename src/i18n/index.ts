@@ -77,6 +77,7 @@ if (!i18n.isInitialized) {
         'common',
         'auth',
         'composer',
+        'composerFlow',
         'messaging',
         'achievements',
         'courses',

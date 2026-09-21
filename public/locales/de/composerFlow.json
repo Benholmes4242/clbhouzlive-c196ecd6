@@ -1,0 +1,31 @@
+{
+  "step": "Schritt {{n}} von {{m}}",
+  "close": "Schließen",
+  "back": "Zurück",
+  "step1": {
+    "title": "Was möchtest du teilen?"
+  },
+  "tiles": {
+    "review": {
+      "title": "Eine Platzbewertung",
+      "sub": "Bewerte einen Golfplatz und teile deine Erfahrung"
+    },
+    "post": {
+      "title": "Ein Beitrag",
+      "sub": "Fotos oder ein paar Worte für deinen Kreis"
+    }
+  },
+  "course": {
+    "which": "Welcher Platz?",
+    "searchAll": "Alle 23.000 Plätze durchsuchen",
+    "pickerTitle": "Platz auswählen",
+    "recent": "Zuletzt gespielt",
+    "played": "Gespielt {{when}}",
+    "emptyTitle": "Noch keine Runden",
+    "emptyBody": "Sobald dein Handicap verbunden ist, erscheinen die von dir gespielten Plätze hier automatisch. Bis dahin suche oben nach einem Platz."
+  },
+  "footer": {
+    "pickCourse": "Wähle einen Platz, um weiterzumachen",
+    "next": "WEITER"
+  }
+}
