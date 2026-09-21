@@ -342,7 +342,8 @@ function resolveLayout(
   containerW: number,
 ): { columns: BoardColumns; tier: NameTier } {
   if (base.preTournament || !containerW) return { columns: base, tier: 'full' };
-  const font = `700 ${NAME_SIZE}px ${F}`;
+  const playerFont = `700 ${NAME_SIZE}px ${F}`;
+  const teamFont = `600 12.5px ${F}`;
   const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1 + (base.showPrize ? 1 : 0);
   const fixed =
     ROW_PAD_X * 2 +
@@ -358,6 +359,7 @@ function resolveLayout(
     const lines = entity.kind === 'team'
       ? entity.lines
       : [nameAtTier(entity.lines[0] ?? '', tier)];
+    const font = entity.kind === 'team' ? teamFont : playerFont;
     return Math.max(maximum, ...lines.map((line) => measureText(line, font)));
   }, 0);
 
