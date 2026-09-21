@@ -76,5 +76,37 @@
     "milestonesReached": "{{n}} OF {{total}} REACHED",
     "milestoneReachedAt": "Reached {{when}}",
     "milestonesSeeAll": "SEE ALL {{n}}"
+  },
+  "roundResults": {
+    "sections": {
+      "awards": "Awards",
+      "holes": "Holes",
+      "efforts": "Best efforts"
+    },
+    "units": {
+      "round_gross": "Round",
+      "round_diff": "Score differential",
+      "round_stableford": "Stableford",
+      "front_nine": "Front nine",
+      "back_nine": "Back nine",
+      "finish_six": "The finish",
+      "hole": "Hole"
+    },
+    "award": {
+      "best": "Best {{unit}} here",
+      "matchedBest": "Matched your best {{unit}} here",
+      "topThree": "Top-three {{unit}} here",
+      "topTen": "Top-ten {{unit}} here",
+      "bestHole": "Best on the {{hole}}",
+      "firstBirdie": "First birdie on the {{hole}}"
+    },
+    "previous": "Previous best {{value}}",
+    "placing": {
+      "best": "Best here",
+      "second": "2nd here",
+      "third": "3rd here",
+      "topTen": "Top ten here",
+      "ordinal": "{{place}} of {{count}}"
+    }
   }
 }
