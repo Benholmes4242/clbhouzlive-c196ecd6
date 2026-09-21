@@ -5,7 +5,7 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { SectionEyebrow } from './SectionEyebrow';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
-import { FONT, INK, INK_FAINT } from '../../_shared/tokens';
+import { FONT, INK, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
 import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
@@ -23,7 +23,7 @@ export function MoveSection({ contest, state, tourCode }: Props) {
   return (
     <section style={{ fontFamily: FONT }}>
       <SectionEyebrow kicker={t(state === 'live' ? 'tournament.move.liveEyebrow' : 'tournament.move.completedEyebrow')} />
-      <div style={{ display: 'grid', gridTemplateColumns: '40px minmax(0,1fr) auto', alignItems: 'center', gap: 12, padding: '14px 16px', background: PAGE_CANVAS }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '40px minmax(0,1fr) auto', alignItems: 'center', gap: 12, padding: '14px 16px', background: PAGE_CANVAS, borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
         <PlayerAvatar playerId={row.player?.id ?? row.id} playerName={name} photoUrl={row.player?.photo_url ?? null} tourCode={tourCode} size={40} />
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 15.5, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
