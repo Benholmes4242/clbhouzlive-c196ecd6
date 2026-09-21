@@ -94,9 +94,22 @@ const THEME_TOKENS = {
  * a tabular column and reads as data the field does not have.
  */
 const BLANK = '';
-export function shouldShowOverviewPrize(entries: Row[], limit = 5): boolean {
-  const displayedRows = entries.slice(0, limit);
-  return displayedRows.length > 0 && displayedRows.every((row) => row.money != null);
+/**
+ * THE PRIZE RULE — a property of the TOURNAMENT, never of the visible slice.
+ * Render the PRIZE column when ANY row has a money value; hide it, header
+ * included, when none do. Because the condition reads the whole field, the
+ * column is STABLE: expanding, sorting or scrolling the board never flips it.
+ *
+ * Within a rendered column a row with no money shows an em dash — never a
+ * blank, never a zero. A missed cut, a withdrawal, a DQ and a non-starter
+ * earn nothing, and a dash is how every leaderboard in the sport states that.
+ *
+ * Two completed events on the same tour in the same season can legitimately
+ * differ here (measured: ~40% of events have no prize data at all). That is
+ * the data, not a UI inconsistency — do not "fix" it per event.
+ */
+export function shouldShowPrize(entries: Array<{ money?: number | null }>): boolean {
+  return entries.some((row) => row.money != null);
 }
 
 function thruLabel(row: Row, today: number | null): string {
