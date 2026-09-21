@@ -521,6 +521,17 @@ async function processSingle(whsScoreId: string) {
   // changes, so the women's course record updates promptly in both directions).
   await applyCourseLegends(stats);
 
+  // UNIT AWARDS (BRIEF_APPLY_UNIT_AWARDS). Runs AFTER the legends step and after
+  // gam_round_stats is persisted, because it reads awards_evaluated_at off the
+  // stored row. Own try/catch: a failure here must never fail the evaluation,
+  // and because awards_evaluated_at is written last, a failed pass leaves the
+  // round unmarked and the next enqueue judges it cleanly.
+  try {
+    await applyUnitAwards(stats, scoreRow, holes);
+  } catch (e) {
+    console.warn("[unit_awards] failed", whsScoreId, (e as Error).message);
+  }
+
   // DERIVED STREAKS (ADDENDUM B). Runs OUTSIDE the version guard: it is a pure
   // re-walk of stored gam_round_stats in play-date order, so running it twice on
   // the same round produces the same rows. Owns sub_80, sub_par, birdie_round,
