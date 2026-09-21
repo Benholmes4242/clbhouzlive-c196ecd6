@@ -27,9 +27,9 @@ interface Props {
 
 function Figure({ value, label, cjk }: { value: string; label: string; cjk: boolean }) {
   return (
-    <div style={{ flex: 1, minWidth: 0 }}>
+    <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
       <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>{value}</div>
-      <div style={{ marginTop: 5, fontSize: 10, fontWeight: 700, letterSpacing: cjk ? 0 : '0.13em', textTransform: cjk ? 'none' : 'uppercase', color: INK_FAINT }}>{label}</div>
+      <div style={{ marginTop: 5, fontSize: 10, fontWeight: 700, letterSpacing: cjk ? 0 : '0.13em', marginRight: cjk ? 0 : '-0.13em', textTransform: cjk ? 'none' : 'uppercase', color: INK_FAINT }}>{label}</div>
     </div>
   );
 }
