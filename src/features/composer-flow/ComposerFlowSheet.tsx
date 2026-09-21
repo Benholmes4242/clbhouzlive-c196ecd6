@@ -1,11 +1,9 @@
 /**
  * ComposerFlowSheet — STEP 1 of the unified composer, and what the (+) opens.
  *
- * PHASE 1 of BRIEF_THE_UNIFIED_COMPOSER. This screen is new; both tiles hand
- * off to the EXISTING composers untouched. So during phase 1 the step counter
- * is deliberately inconsistent — step 1 says "Step 1 of 3" and the old review
- * composer then shows its own three-step strip. That is the phasing, not a bug,
- * and it resolves when the shared header takes over steps 2 and 3.
+ * BRIEF_THE_UNIFIED_COMPOSER, complete. Both tiles hand off to composers that
+ * share ComposerStepHeader with this sheet — one header and one counter across
+ * every step of both paths (1–2 on the post path, 1–3 on the review path).
  *
  * NAVIGATING AWAY FROM THIS SHEET — ORDER AND OWNERSHIP. This is the August
  * incident, and the rule below is carried over verbatim from the create sheet

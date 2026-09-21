@@ -11,9 +11,12 @@
  *      feature, flashing white before the dark full-bleed stage mounted.
  *   2. Edit mode hydration, while the post being edited is fetched.
  *
- * Geometry mirrors StageComposer: header row (close glyph + title) over a 1px
- * rule, the stage filling the remaining height at padding 12 / radius 16, and
- * the tray's 46px thumbs above the caption lines.
+ * Geometry mirrors step 2 of StageComposer as it exists after phase 3 of the
+ * unified composer: the shared header, a 72px media rail row at the top, a
+ * caption block, then the two stacked cards (tag-a-course, detail rows), and
+ * the full-width primary pill pinned to the foot. The rule is that a skeleton
+ * expands outwards into the real thing and never rearranges, so every block
+ * here sits where its real counterpart lands.
  */
 import React from 'react';
 import { CT_DARK } from '@/features/_shared/composerTokens';
@@ -26,6 +29,23 @@ function Bar({ style }: { style?: React.CSSProperties }) {
       className="clb-shimmer-dark"
       style={{ backgroundColor: FILL, borderRadius: 6, ...style }}
     />
+  );
+}
+
+function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <div
+      style={{
+        background: CT_DARK.elev,
+        border: `1px solid ${CT_DARK.line}`,
+        borderRadius: 16,
+        margin: '12px 16px 0',
+        padding: '14px 16px',
+        ...style,
+      }}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -103,28 +123,46 @@ export const StageLoadingShell: React.FC<{
       </div>
     </div>
 
-    {/* Stage block */}
-    <div style={{ flex: '1 1 0', minHeight: 0, padding: 12 }}>
-      <Bar style={{ width: '100%', height: '100%', borderRadius: 16 }} />
-    </div>
-
-    {/* Tray thumbs + caption lines */}
+    {/* Body — mirrors step 2's stack, top to bottom */}
     <div
       style={{
-        flex: 'none',
-        padding: '8px 12px 16px',
+        flex: 1,
+        minHeight: 0,
+        overflow: 'hidden',
+        padding: '2px 0 16px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
       }}
     >
-      <div style={{ display: 'flex', gap: 8 }}>
+      {/* Media rail — 72px thumbs, no-media state draws nothing here */}
+      <div style={{ display: 'flex', gap: 6, padding: '6px 16px 0', flex: 'none' }}>
         {[0, 1, 2].map((i) => (
-          <Bar key={i} style={{ width: 46, height: 46, borderRadius: 10 }} />
+          <Bar key={i} style={{ width: 72, height: 72, borderRadius: 10 }} />
         ))}
       </div>
-      <Bar style={{ height: 14, width: '80%' }} />
-      <Bar style={{ height: 14, width: '55%' }} />
+
+      {/* Caption */}
+      <div style={{ padding: '14px 16px 0', flex: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <Bar style={{ height: 14, width: '80%' }} />
+        <Bar style={{ height: 14, width: '55%' }} />
+        <Bar style={{ height: 14, width: '68%' }} />
+      </div>
+
+      {/* Tag-a-course card */}
+      <Card style={{ marginTop: 18, flex: 'none' }}>
+        <Bar style={{ height: 12, width: 110 }} />
+      </Card>
+
+      {/* Detail rows card */}
+      <Card style={{ flex: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <Bar style={{ height: 12, width: '45%' }} />
+        <Bar style={{ height: 12, width: '60%' }} />
+      </Card>
+    </div>
+
+    {/* Primary pill, pinned to the foot like the real one */}
+    <div style={{ flex: 'none', padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
+      <Bar style={{ width: '100%', height: 47, borderRadius: 999 }} />
     </div>
   </div>
 );
