@@ -10,6 +10,9 @@ import { MoveSection } from '@/features/tourhub/tournament-v2/sections/MoveSecti
 
 const copy: Record<string, string> = {
   'status.live': 'LIVE',
+  'status.results': 'RESULTS',
+  'status.upcoming': 'UPCOMING',
+  'overview.hero.factRound': 'ROUND',
   'tour.par': 'PAR',
   'tournament.hero.fieldLabel': 'FIELD',
   'tournament.hero.purseLabel': 'PURSE',
@@ -20,6 +23,8 @@ const copy: Record<string, string> = {
   'tournament.contest.liveEyebrow': 'The contest',
   'tournament.contest.completedEyebrow': 'The margin',
   'tournament.contest.sharedLead': '{{count}} share the lead',
+  'tournament.contest.playoff': 'Won a playoff',
+  'tournament.contest.finishedLevel': 'Finished level',
   'tournament.contest.withToPlay': 'With {{holes}} to play',
   'tournament.contest.gapShots_one': 'a shot',
   'tournament.contest.gapShots_other': '{{count}} shots',
@@ -31,6 +36,8 @@ const copy: Record<string, string> = {
   'tournament.contest.sublineLevelManyChaser': '{{a}}, {{b}} and {{count}} others, level at {{score}}, with {{next}} {{gap}} back.',
   'tournament.contest.sublineLevelThree': '{{a}}, {{b}} and {{c}}, level at {{score}}.',
   'tournament.contest.sublineLevelTwo': '{{a}} and {{b}}, level at {{score}}.',
+  'tournament.contest.sublineLevelTwoPast': '{{a}} and {{b}} were level at {{score}}.',
+  'tournament.contest.sublinePlayoffTwo': '{{a}} beat {{b}} after both finished on {{score}}.',
   'tournament.contest.leader': 'Leader',
   'tournament.contest.back': '{{gap}} back',
   'tournament.contest.allLevel': 'All level',
@@ -78,10 +85,11 @@ const meta = {
   tour_full_name: 'PGA Tour',
 } as TournamentMeta;
 
-const row = (id: string, score: number, position: number, today = -1, thru = 12): BoardEntry => ({
+const row = (id: string, score: number, position: number, today = -1, thru = 12, positionTied = false): BoardEntry => ({
   id,
   score,
   position,
+  position_tied: positionTied,
   today,
   thru,
   player: { id, full_name: id },
@@ -173,5 +181,34 @@ describe('tournament contest sections', () => {
 
     expect(screen.getByText('A, B and 2 others, level at -12, with E a shot back.')).toBeInTheDocument();
     expect(screen.queryByText(/second/i)).not.toBeInTheDocument();
+  });
+
+  it('states a decided completed playoff without a stale holes caption', () => {
+    const contest = selectTournamentContest([
+      row('Zach Johnson', -12, 1, -4, 13),
+      row('Rory Sabbatini', -12, 2, -3, 13),
+      row('Ryan Armour', -10, 3, -2, 13),
+      row('Steven Alker', -10, 3, -1, 13),
+      row('Henrik Stenson', -10, 3, -1, 13),
+    ], meta, 'completed');
+
+    render(<ContestSection contest={contest} state="completed" />);
+
+    expect(screen.getByText('Won a playoff')).toBeInTheDocument();
+    expect(screen.getByText('Zach Johnson beat Rory Sabbatini after both finished on -12.')).toBeInTheDocument();
+    expect(screen.queryByText(/to play/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps an unresolved completed tie on the finished-level path', () => {
+    const contest = selectTournamentContest([
+      row('A', -12, 1, -4, 13, true),
+      row('B', -12, 1, -3, 13, true),
+    ], meta, 'completed');
+
+    render(<ContestSection contest={contest} state="completed" />);
+
+    expect(screen.getByText('Finished level')).toBeInTheDocument();
+    expect(screen.getByText('A and B were level at -12.')).toBeInTheDocument();
+    expect(screen.queryByText(/to play/i)).not.toBeInTheDocument();
   });
 });

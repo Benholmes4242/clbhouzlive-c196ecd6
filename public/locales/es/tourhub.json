@@ -697,6 +697,7 @@
       "shotsClear": "Golpes de ventaja",
       "sharedLead": "{{count}} comparten el liderato",
       "playoff": "Victoria en desempate",
+      "finishedLevel": "Final igualado",
       "withToPlay": "Con {{holes}} por jugar",
       "decidedInPlayoff": "Decidido en desempate",
       "leader": "Líder",
@@ -715,7 +716,10 @@
       "sublineLevelManyChaser": "{{a}}, {{b}} y {{count}} más, igualados en {{score}}, con {{next}} a {{gap}}.",
       "sublineLevelTwoPast": "{{a}} y {{b}} acabaron igualados en {{score}}.",
       "sublineLevelThreePast": "{{a}}, {{b}} y {{c}} acabaron igualados en {{score}}.",
-      "sublineLevelManyPast": "{{a}}, {{b}} y {{count}} más acabaron igualados en {{score}}."
+      "sublineLevelManyPast": "{{a}}, {{b}} y {{count}} más acabaron igualados en {{score}}.",
+      "sublinePlayoffTwo": "{{a}} venció a {{b}} después de que ambos terminaran con {{score}}.",
+      "sublinePlayoffThree": "{{a}} venció a {{b}} y {{c}} después de que los tres terminaran con {{score}}.",
+      "sublinePlayoffMany": "{{a}} venció a {{b}} y a {{count}} más después de que terminaran igualados con {{score}}."
     },
     "move": {
       "liveEyebrow": "La remontada",
