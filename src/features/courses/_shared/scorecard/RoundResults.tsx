@@ -35,6 +35,10 @@ function unitKey(unit: RoundAwardUnitKind): string {
   return `roundResults.units.${unit}`;
 }
 
+function awardUnitKey(unit: RoundAwardUnitKind): string {
+  return `roundResults.awardUnits.${unit}`;
+}
+
 function medalTone(tier: RoundAwardRow['tier']): string {
   if (tier === 'gold') return MEDAL_GOLD;
   if (tier === 'silver') return MEDAL_SILVER;
@@ -56,7 +60,7 @@ function awardTitle(award: RoundAwardRow, t: (key: string, options?: Record<stri
       { hole: formatOrdinal(award.unit_key) },
     );
   }
-  const unit = t(unitKey(award.unit_kind));
+  const unit = t(awardUnitKey(award.unit_kind));
   if (award.award_kind === 'matched_best') return t('roundResults.award.matchedBest', { unit });
   if (award.award_kind === 'top_three') return t('roundResults.award.topThree', { unit });
   if (award.award_kind === 'top_ten') return t('roundResults.award.topTen', { unit });

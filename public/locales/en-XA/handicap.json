@@ -92,6 +92,15 @@
       "finish_six": "[The finish]",
       "hole": "[Hole]"
     },
+    "awardUnits": {
+      "round_gross": "[round]",
+      "round_diff": "[score differential]",
+      "round_stableford": "[Stableford score]",
+      "front_nine": "[front nine]",
+      "back_nine": "[back nine]",
+      "finish_six": "[finish]",
+      "hole": "[hole]"
+    },
     "award": {
       "best": "[Best {{unit}} here]",
       "matchedBest": "[Matched your best {{unit}} here]",
