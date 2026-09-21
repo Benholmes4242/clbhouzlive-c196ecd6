@@ -372,7 +372,7 @@ export function HeroBoardSection({
         </div>
       ) : null}
 
-      {hasPicks && closedFigure ? (
+      {hasPicks && closedRow ? (
         <>
           <button
             type="button"
@@ -382,7 +382,18 @@ export function HeroBoardSection({
           >
             {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
             <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
-            <span style={{ minWidth: 0, fontSize: 13, color: 'rgba(248,250,252,0.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{closedFigure}</span>
+            <span style={{ minWidth: 0, fontSize: 13, color: 'rgba(248,250,252,0.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {closedRow.trophy ? (
+                <Trophy
+                  data-pick-trophy
+                  size={12}
+                  color={GOLD}
+                  strokeWidth={2.5}
+                  style={{ display: 'inline-block', verticalAlign: '-1px', marginRight: 4, flexShrink: 0 }}
+                />
+              ) : null}
+              {closedRow.text}
+            </span>
             {picksOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
           {picksOpen ? <PicksPanel picks={picks} tourCode={pickTourCode} phase={phase} boardByPlayer={boardByPlayer} predictions={predictions ?? null} /> : null}
