@@ -799,9 +799,12 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
  *  against a bests table that already holds rounds played AFTER it, and take a
  *  gold it never earned. The bests survive that because they are order-free
  *  aggregates; awards are not. Same shape as the two-day legend gate. */
-const AWARD_MAX_AGE_DAYS = 30;
-/** The notification is only worth sending about a round the member just played. */
-const AWARD_NOTIFY_MAX_AGE_DAYS = 2;
+/* THE AGE GATE IS LEGEND_NOTIFY_MAX_AGE_DAYS — two days, on play_date, never
+   created_at. History is sealed by awards_evaluated_at, so the only rounds that
+   reach this code are new ones and the gate's job is to catch a round that
+   arrives days after it was played. The awards gate and the notification gate
+   are the SAME gate: a round too old to be told about is too old to be
+   celebrated. One constant, one meaning. */
 
 type UnitCandidate = {
   unit_kind: string;
@@ -883,6 +886,8 @@ type ResolvedAward = {
   award_kind: string;
   tier: "gold" | "silver" | "bronze";
   previous_value: number | null;
+  /** NULL means "somewhere in the top ten and not knowable from here". */
+  rank_here: number | null;
 };
 
 /**
@@ -896,29 +901,45 @@ type ResolvedAward = {
  *
  * Equalling your best is a SILVER with its own kind (matched_best) so the copy
  * can say "Matched your best here" rather than "second best here".
+ *
+ * RANK COMES FROM THIS ROW AND NOWHERE ELSE. The tier and the rank are two
+ * readings of one comparison, so they are taken from one source; derived from
+ * the round history instead, they disagreed — a −3 came back as rank 1 when it
+ * was not the best. The row holds four reference values, so 4th–9th is
+ * genuinely unknown and the honest answer is NULL, which the UI reads as
+ * "top ten". It is never estimated, interpolated, or looked up again.
  */
 function resolveAwards(u: UnitCandidate, prior: BestsRow | null): ResolvedAward[] {
   const attempts = prior?.attempts ?? 0;
   const best = prior?.best_value == null ? null : Number(prior.best_value);
+  const second = prior?.second_value == null ? null : Number(prior.second_value);
   const third = prior?.third_value == null ? null : Number(prior.third_value);
   const tenth = prior?.tenth_value == null ? null : Number(prior.tenth_value);
   const out: ResolvedAward[] = [];
 
+  /* One placing, read off the same four markers the tiers are read from. */
+  const rankFromBests = (): number | null => {
+    if (best != null && (unitBetter(u.value, best, u.lowerBetter) || u.value === best)) return 1;
+    if (second != null && unitBetter(u.value, second, u.lowerBetter)) return 2;
+    if (third != null && unitBetter(u.value, third, u.lowerBetter)) return 3;
+    return null;
+  };
+
   if (best != null && unitBetter(u.value, best, u.lowerBetter) && attempts >= 2) {
-    out.push({ award_kind: "new_best", tier: "gold", previous_value: best });
+    out.push({ award_kind: "new_best", tier: "gold", previous_value: best, rank_here: rankFromBests() });
   } else if (best != null && u.value === best && attempts >= 5) {
-    out.push({ award_kind: "matched_best", tier: "silver", previous_value: best });
+    out.push({ award_kind: "matched_best", tier: "silver", previous_value: best, rank_here: rankFromBests() });
   } else if (third != null && unitBetter(u.value, third, u.lowerBetter) && attempts >= 5) {
-    out.push({ award_kind: "top_three", tier: "silver", previous_value: third });
+    out.push({ award_kind: "top_three", tier: "silver", previous_value: third, rank_here: rankFromBests() });
   } else if (tenth != null && unitBetter(u.value, tenth, u.lowerBetter) && attempts >= 10) {
-    out.push({ award_kind: "top_ten", tier: "bronze", previous_value: tenth });
+    out.push({ award_kind: "top_ten", tier: "bronze", previous_value: tenth, rank_here: rankFromBests() });
   }
 
   // NO ATTEMPT FLOOR, AND IT NEVER GETS ONE. Without it nothing can fire before
   // a member's third visit to a course; it was the first award 18 of 22 members
   // ever earned. If scope is ever cut, this is the last thing to go.
   if (u.unit_kind === "hole" && u.holeToPar != null && u.holeToPar <= -1 && prior?.birdied !== true) {
-    out.push({ award_kind: "first_birdie", tier: "bronze", previous_value: null });
+    out.push({ award_kind: "first_birdie", tier: "bronze", previous_value: null, rank_here: rankFromBests() });
   }
 
   return out;
@@ -946,7 +967,7 @@ function foldBests(u: UnitCandidate, prior: BestsRow | null, playDate: string, w
     // tenth_value is a MOVING FLOOR, not a true tenth place: 4th–9th are not
     // stored, so a value that beats the stored tenth replaces it here. This is
     // the re-derivation the brief specifies (new value against the stored ones)
-    // and it is why rank_here is measured from the round history, not from here.
+    // and it is why rank_here is NULL past third — unknowable, not missing.
     tenth = v;
   }
 
@@ -967,14 +988,6 @@ function foldBests(u: UnitCandidate, prior: BestsRow | null, playDate: string, w
   };
 }
 
-const COARSE_UNIT_COLUMN: Record<string, string> = {
-  round_gross: "gross_score",
-  round_diff: "score_diff",
-  round_stableford: "stableford_points",
-  front_nine: "front_nine_to_par",
-  back_nine: "back_nine_to_par",
-  finish_six: "finish_six_to_par",
-};
 
 async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
   const whsScoreId: string | null = stats?.whs_score_id ?? null;
@@ -1013,9 +1026,10 @@ async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
   const priorByKey = new Map<string, BestsRow>();
   for (const r of (bestsRows ?? []) as BestsRow[]) priorByKey.set(`${r.unit_kind}:${r.unit_key}`, r);
 
-  // Historic rounds earn no medals — bests only.
+  // A round that arrives days after it was played updates the bests and earns
+  // nothing. Same gate as the legend notifications, on play_date, never created_at.
   const ageDays = (Date.now() - new Date(playDate + "T12:00:00Z").getTime()) / 86400000;
-  const awardsAllowed = ageDays <= AWARD_MAX_AGE_DAYS;
+  const awardsAllowed = ageDays <= LEGEND_NOTIFY_MAX_AGE_DAYS;
 
   const awardRows: any[] = [];
   const pendingAwards: Array<{ u: UnitCandidate; a: ResolvedAward; attempts: number }> = [];
@@ -1024,61 +1038,6 @@ async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
     if (!awardsAllowed) continue;
     for (const a of resolveAwards(u, prior)) {
       pendingAwards.push({ u, a, attempts: prior?.attempts ?? 0 });
-    }
-  }
-
-  // rank_here — this round's placing in that member's history at that unit,
-  // counted from the rounds themselves rather than from the four stored markers
-  // (which cannot express 4th–9th). Two queries, and only when something was
-  // actually earned, so an ordinary round pays nothing for this.
-  const rankByUnit = new Map<string, number>();
-  if (pendingAwards.length > 0) {
-    try {
-      const { data: history, error: histErr } = await supabase
-        .from("gam_round_stats")
-        .select(
-          "whs_score_id, play_date, gross_score, score_diff, stableford_points, front_nine_to_par, back_nine_to_par, finish_six_to_par",
-        )
-        .eq("user_id", userId)
-        .eq("course_id", courseId)
-        .neq("whs_score_id", whsScoreId);
-      if (histErr) throw histErr;
-      const priorRounds = (history ?? []) as any[];
-
-      const needsHoles = pendingAwards.some((p) => p.u.unit_kind === "hole");
-      let holeHistory: any[] = [];
-      if (needsHoles && priorRounds.length > 0) {
-        const { data: hh, error: hhErr } = await supabase
-          .from("whs_score_holes")
-          .select("score_id, hole_no, par, actual_gross, played")
-          .in("score_id", priorRounds.map((r) => r.whs_score_id));
-        if (hhErr) throw hhErr;
-        holeHistory = (hh ?? []) as any[];
-      }
-
-      for (const { u } of pendingAwards) {
-        const key = `${u.unit_kind}:${u.unit_key}`;
-        if (rankByUnit.has(key)) continue;
-        let betterCount = 0;
-        if (u.unit_kind === "hole") {
-          for (const h of holeHistory) {
-            if (Number(h.hole_no) !== u.unit_key) continue;
-            if (h.played !== true || h.actual_gross == null || h.par == null) continue;
-            if (unitBetter(Number(h.actual_gross) - Number(h.par), u.value, u.lowerBetter)) betterCount++;
-          }
-        } else {
-          const col = COARSE_UNIT_COLUMN[u.unit_kind];
-          for (const r of priorRounds) {
-            const pv = r?.[col];
-            if (pv == null) continue;
-            if (unitBetter(Number(pv), u.value, u.lowerBetter)) betterCount++;
-          }
-        }
-        rankByUnit.set(key, betterCount + 1);
-      }
-    } catch (e) {
-      // A rank we cannot measure is NULL, never a guess. The award still stands.
-      console.warn("[unit_awards] rank_here unavailable", whsScoreId, (e as Error).message);
     }
   }
 
@@ -1096,7 +1055,8 @@ async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
       // The margin, always positive. NULL when there was nothing to beat —
       // never zero, never a dash.
       delta: prev == null ? null : Math.abs(u.value - prev) || null,
-      rank_here: rankByUnit.get(`${u.unit_kind}:${u.unit_key}`) ?? null,
+      // From the bests row the tier was read from. No second source.
+      rank_here: a.rank_here,
       attempts_at_detection: attempts,
     });
   }
@@ -1128,7 +1088,7 @@ async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
   if (bpErr) throw bpErr;
 
   // ONE notification per round, never one per award.
-  if (awardRows.length > 0 && ageDays <= AWARD_NOTIFY_MAX_AGE_DAYS) {
+  if (awardRows.length > 0 && ageDays <= LEGEND_NOTIFY_MAX_AGE_DAYS) {
     const rank = { gold: 0, silver: 1, bronze: 2 } as Record<string, number>;
     const top = [...awardRows].sort((a, b) => rank[a.tier] - rank[b.tier])[0];
     await enqueueNotification(userId, "award_earned", {
