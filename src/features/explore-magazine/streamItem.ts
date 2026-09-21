@@ -136,6 +136,8 @@ export interface StreamFacts {
   duration_s?: number | null;
   story_slug?: string | null;
   headline?: string | null;
+  /** A story's subtext. Absent renders nothing — never an empty line. */
+  standfirst?: string | null;
   source?: string | null;
   published_at?: string | null;
   /** Notable facts a round carries; the headline reads them, never a feat string. */

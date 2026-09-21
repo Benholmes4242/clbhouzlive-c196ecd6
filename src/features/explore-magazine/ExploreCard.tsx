@@ -16,7 +16,7 @@ import { courseSubScoreTone } from '@/features/courses/components/holes/analytic
 
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
-import { calloutFor } from './cardTreatment';
+import { calloutFor, rendersOnPhoto } from './cardTreatment';
 import { RoundStatStrip } from './AchievementCallout';
 import { dotsFor, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
@@ -509,10 +509,12 @@ export function ExploreCard({
     plainRound: callout?.kind === 'record' || callout?.kind === 'net_record' || callout?.kind === 'rank_up',
   });
   const chips = chipsFor(item, t as never, locale);
-  /* §2 SHAPE IS DECIDED BY KIND, NOTHING ELSE. A REVIEW is text ON the
-     photograph at every position; a ROUND is text UNDER it at every position.
-     There is no earned treatment and position 0 is not special. */
-  const onPhoto = item.kind === 'review' && size !== 'pair';
+  /* §2 SHAPE IS DECIDED BY KIND, NOTHING ELSE. A REVIEW and an ILLUSTRATED
+     STORY are text ON the photograph at every position; a ROUND is text UNDER
+     it at every position. There is no earned treatment and position 0 is not
+     special. The predicate lives in cardTreatment.ts because ExploreMagazine
+     sizes the card from the same answer. */
+  const onPhoto = rendersOnPhoto(item, size);
   const isOwnRound = item.kind === 'round' && item.who?.is_viewer === true;
   const kickerDate = item.kind === 'review' || item.kind === 'round'
     ? relativeDay(item.facts.play_date ?? item.facts.arrived_at)
@@ -620,6 +622,34 @@ export function ExploreCard({
       {headline}
     </div>
   );
+  /* §3 THE STANDFIRST, IN THE CARD'S OWN PALETTE, not the tour's. It sits on a
+     photograph, so it takes the same shadow the headline does. Absent renders
+     NOTHING: no empty paragraph and no reserved space, so the tile is 340
+     either way. */
+  const storyStandfirst = item.kind === 'story' ? item.facts.standfirst?.trim() || null : null;
+  const standfirstNode = storyStandfirst ? (
+    <div
+      data-explore-standfirst="true"
+      style={{
+        marginTop: 8,
+        fontFamily: SANS,
+        fontSize: 13.5,
+        fontWeight: 500,
+        lineHeight: 1.48,
+        color: 'rgba(255,255,255,0.85)',
+        textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        overflowWrap: 'break-word',
+        wordBreak: 'break-word',
+        minWidth: 0,
+      }}
+    >
+      {storyStandfirst}
+    </div>
+  ) : null;
   const strongestArea = item.kind === 'review' ? strongestReviewArea(item.facts.breakdown) : null;
   const enrichmentNode = item.kind === 'review' ? (
     <div
@@ -693,6 +723,7 @@ export function ExploreCard({
             >
               <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               {headlineNode}
+              {standfirstNode}
                {enrichmentNode}
               <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} />
             </span>

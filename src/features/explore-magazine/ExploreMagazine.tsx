@@ -80,7 +80,7 @@ import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
 import { applyRankCardRule } from './rankCards';
-import { isNotableRound } from './cardTreatment';
+import { isNotableRound, rendersOnPhoto } from './cardTreatment';
 import { shelfDueAt, shelfForOrdinal } from './shelfCadence';
 /* BRIEF_COURSES_MERGED — Courses and Reviews are ONE view. */
 import { useCourseCandidateIndex } from './useCourseCandidateIndex';
@@ -185,9 +185,10 @@ function pairableRound(item: StreamItem): boolean {
   return item.kind === 'round' && item.consequence == null;
 }
 
-/** Full-width review treatment is stable across views and positions. */
+/** Full-width photo-led treatment is stable across views and positions, and
+ *  asks the SAME predicate ExploreCard uses to put the text on the image. */
 export function fullWidthCardSize(item: StreamItem): CardSize {
-  return item.kind === 'review' ? 'lead' : 'std';
+  return rendersOnPhoto(item, 'lead') ? 'lead' : 'std';
 }
 
 /** §5 shelves are inserted after card positions 3, 7, 11 ... An empty source
