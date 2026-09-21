@@ -20,12 +20,13 @@ import type { TourPlayerStatistics } from '../hooks/useTourHubData';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 import { formatEarnings } from '../_shared/formatEarnings';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import {
   LEADER_STAT_LABELS,
   currentSeasonYear,
   useLeaderCategories,
 } from '../leaders-v2/data/useLeaderCategories';
-import { INK, INK_FAINT, INK_MUTE, SURFACE } from '../_shared/tokens';
+import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, SURFACE } from '../_shared/tokens';
 import { TITLE, FIGS } from '@/lib/tokens/type';
 import { playerOrdinal } from './playerOrdinal';
 
@@ -79,51 +80,54 @@ interface Row {
   rank?: RankRef;
 }
 
-function Cell({ row, ordinal }: { row: Row; ordinal: (r: RankRef) => string }) {
+function StatRow({ row, ordinal, first }: { row: Row; ordinal: (r: RankRef) => string; first: boolean }) {
   return (
-    <div>
+    <div
+      style={{
+        minHeight: 54,
+        padding: '11px 16px',
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0,1fr) auto',
+        alignItems: 'center',
+        gap: 16,
+        borderTop: first ? 'none' : `0.5px solid ${HAIRLINE_INK_8}`,
+      }}
+    >
       <div
         style={{
-          // Stat label (EVENTS, WINS, DRIVING, ACCURACY, GIR) — READ 11.
-          fontSize: 11,
-          fontWeight: 700,
-          color: INK_FAINT,
-          letterSpacing: '0.11em',
-          textTransform: 'uppercase',
+          minWidth: 0,
+          fontSize: 13.5,
+          fontWeight: 600,
+          color: INK,
         }}
       >
         {row.label}
       </div>
-      <div
-        style={{
-          marginTop: 4,
-          fontSize: 19,
-          fontWeight: 700,
-          color: INK,
-          letterSpacing: '-0.02em',
-          lineHeight: 1.1,
-          fontVariantNumeric: 'tabular-nums lining-nums',
-        }}
-      >
-        {row.value}
-      </div>
-      {row.rank && (
+      <div style={{ minHeight: 32, textAlign: 'right', fontVariantNumeric: 'tabular-nums lining-nums' }}>
         <div
           style={{
-            marginTop: 3,
-            // Rank footnote (1ST, T3RD, 52ND) — AXIS 10 floor: a rank marker
-            // under a figure, not language.
-            fontSize: 10,
+            fontSize: 15,
             fontWeight: 700,
-            color: INK_FAINT,
-            letterSpacing: '0.13em',
-            textTransform: 'uppercase',
-            fontVariantNumeric: 'tabular-nums lining-nums',
+            color: INK,
           }}
         >
-          {ordinal(row.rank)}
+          {row.value}
         </div>
-      )}
+        {row.rank && (
+          <div
+            style={{
+              marginTop: 2,
+              fontSize: 10,
+              fontWeight: 700,
+              color: row.rank.rank <= 10 ? A.GREEN : INK_FAINT,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {ordinal(row.rank)}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -132,11 +136,11 @@ function Kicker({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        margin: '0 0 6px',
-        fontSize: 11,
-        fontWeight: 700,
-        color: INK,
-        letterSpacing: '0.16em',
+        margin: '16px 16px 6px',
+        fontSize: 10,
+        fontWeight: 800,
+        color: INK_FAINT,
+        letterSpacing: '0.14em',
         textTransform: 'uppercase',
       }}
     >
@@ -156,18 +160,11 @@ function SubSection({
 }) {
   if (rows.length === 0) return null;
   return (
-    <div style={{ marginTop: 24 }}>
+    <div>
       <Kicker>{label}</Kicker>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          columnGap: 20,
-          rowGap: 20,
-        }}
-      >
-        {rows.map((r) => (
-          <Cell key={r.label} row={r} ordinal={ordinal} />
+      <div>
+        {rows.map((r, index) => (
+          <StatRow key={r.label} row={r} ordinal={ordinal} first={index === 0} />
         ))}
       </div>
     </div>
@@ -346,7 +343,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
             minHeight: 0,
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
-            padding: '0 16px 24px',
+            padding: '0 0 24px',
           }}
         >
           <SubSection label={t('player.stats.section.overview')} rows={overview} ordinal={ordinal} />

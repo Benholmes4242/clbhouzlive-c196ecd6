@@ -169,11 +169,6 @@ export function PlayerPage() {
 
         <AboutSection player={player} />
 
-        <div
-          style={{
-            paddingBottom: 'var(--bottom-nav-height, 96px)',
-          }}
-        />
       </div>
       </TourPageShell>
     </TourHubShell>
