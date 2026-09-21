@@ -27,6 +27,7 @@ import { POST_COMPOSER_Z } from '@/lib/zLayers';
 import { useStageComposer, MAX_MEDIA, type StageMediaItem } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { notifyComposerCompleted } from '@/features/composer-flow/composerFlowStore';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
