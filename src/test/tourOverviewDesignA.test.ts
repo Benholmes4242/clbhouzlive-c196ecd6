@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { render } from '@testing-library/react';
 import { formatOverviewChampionScore, formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
-import { shouldShowOverviewPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
+import { MiniBoard, shouldShowOverviewPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, shouldShowAlsoThisWeekFigures, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
@@ -136,6 +137,25 @@ describe('Tour Overview correctness gates', () => {
     expect(shouldShowOverviewPrize([row('paid', 1_000), row('missing', null)], 5)).toBe(false);
     expect(shouldShowOverviewPrize([...paid.slice(0, 5), row('outside-slice', null)], 5)).toBe(true);
     expect(shouldShowOverviewPrize([], 5)).toBe(false);
+  });
+
+  it('renders a complete prize column and returns its width to player when coverage has a hole', () => {
+    const row = (id: string, money: number | null) => ({
+      id, position: Number(id), score: -10, money,
+      player: { id: `player-${id}`, full_name: `Player ${id}` },
+    });
+    const paid = render(<MiniBoard tournamentId="event" entries={[row('1', 2_500_000), row('2', 1_000)]} limit={5} phase="completed" theme="heroBoard" />);
+    const paidHeader = paid.container.querySelector<HTMLElement>('[data-overview-board-header]');
+    expect(paidHeader?.textContent).toContain('Prize');
+    expect(paidHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px 52px');
+    expect(paid.container.textContent).toContain('$2.5M');
+    expect(paid.container.textContent).toContain('$1K');
+    paid.unmount();
+
+    const partial = render(<MiniBoard tournamentId="event" entries={[row('1', 2_500_000), row('2', null)]} limit={5} phase="completed" theme="heroBoard" />);
+    const partialHeader = partial.container.querySelector<HTMLElement>('[data-overview-board-header]');
+    expect(partialHeader?.textContent).not.toContain('Prize');
+    expect(partialHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px');
   });
 
   it('keeps Also This Week inside the coming Sunday', () => {
