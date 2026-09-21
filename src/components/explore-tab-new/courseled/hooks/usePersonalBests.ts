@@ -10,9 +10,8 @@ import { discoverKeys, viewerId } from '@/lib/queryKeys';
  * re-sorts, re-ranks, filters by course or friendship, or invents copy:
  * `headline` and `reference_line` render verbatim, and the returned order is
  * the render order.
- *
- * OVER-FETCH BY DESIGN: 30 rows for at most 8 tiles, because the member budget
- * (§4) is applied client-side and eats candidates.
+ * The RPC owns the complete dedup ladder and graduated widening. The client
+ * applies no cross-section member budget and preserves the returned order.
  */
 
 export interface PersonalBestRow {
@@ -51,7 +50,7 @@ export interface PersonalBestRow {
 
 
 export const PERSONAL_BESTS_DAYS = 90;
-/** Deliberate over-fetch — see above. */
+/** The deployed RPC uses this room to complete its graduated widening passes. */
 export const PERSONAL_BESTS_FETCH = 30;
 export const PERSONAL_BESTS_PER_MEMBER = 2;
 

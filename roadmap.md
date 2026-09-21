@@ -11,7 +11,7 @@
 - [x] Verify focused Explore tests and typecheck.
 
 ## Personal Bests restore
-- [ ] Prove `get_personal_bests(90, 30, 2)` returns rows under authenticated claims; blocked because the external read role cannot assume `authenticated` or execute `can_view_handicap`.
-- [ ] Build and mount `PersonalBestsShelf` in Explore Magazine using the existing hook and `StandoutTile`.
-- [ ] Preserve server copy and server-side dedup/widening; add no cross-section member budget or empty state.
+- [x] Accept Ben's authenticated proof: 24 rows, 13 members, six feat kinds.
+- [x] Build and mount `PersonalBestsShelf` in Explore Magazine using the existing hook and `StandoutTile`.
+- [x] Preserve server copy and server-side dedup/widening; add no cross-section member budget or empty state.
 - [ ] Verify 320/390/430, screenshot, focused tests, and typecheck.
