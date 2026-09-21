@@ -748,6 +748,36 @@ export function ExploreCard({
      NOTHING: no empty paragraph and no reserved space, so the tile is 340
      either way. */
   const storyStandfirst = item.kind === 'story' ? item.facts.standfirst?.trim() || null : null;
+  const storySource = item.kind === 'story'
+    ? item.facts.source?.trim() || t('amateurNews.label', 'Amateur News')
+    : null;
+  const storyAge = item.kind === 'story'
+    ? storyTime(item.facts.published_at ?? item.facts.arrived_at ?? null)
+    : null;
+  const storyMetaNode = item.kind === 'story' ? (
+    <div
+      data-explore-story-meta="true"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        marginBottom: 8,
+        color: PHOTO_REVIEW_LABEL,
+        fontFamily: SANS,
+        fontSize: 10,
+        fontWeight: 700,
+        lineHeight: 1.2,
+        textTransform: 'uppercase',
+        textShadow: HERO_TEXT_SHADOW,
+      }}
+    >
+      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {storySource}
+      </span>
+      {storyAge ? <span style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>{storyAge}</span> : null}
+    </div>
+  ) : null;
   const standfirstNode = storyStandfirst ? (
     <div
       data-explore-standfirst="true"
@@ -812,15 +842,17 @@ export function ExploreCard({
                 ? { position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px 16px' }
                 : { position: 'relative', zIndex: 1, display: 'block', paddingInline: 16 }}
             >
-              {leadReview ? (
+               {leadReview ? (
                 <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} reviewIdentity={reviewIdentity ?? undefined} />
+               ) : item.kind === 'story' ? (
+                 storyMetaNode
               ) : (
                 <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               )}
               {headlineNode}
               {standfirstNode}
               {leadReview ? <ReviewBreakdownRail breakdown={item.facts.breakdown} /> : null}
-              {!leadReview ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
+               {!leadReview && item.kind !== 'story' ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
             </span>
             {/* §3 THE BOTTOM LANE IS 16px AND CARRIES NO TRACE. On-photo is now
                 the REVIEW shape, and a review has no round shape to draw; the
