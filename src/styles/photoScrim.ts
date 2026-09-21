@@ -76,6 +76,11 @@ export const CHIP_GLASS: CSSProperties = {
    ========================================================================== */
 export const PHOTO_FIG_UNDER = '#FF8A80';
 export const PHOTO_FIG_GOOD = '#4ADE80';
+/** Review-breakdown bars sit directly on variable photography. These are
+ * intentionally brighter than the analytical canvas ramp. */
+export const PHOTO_REVIEW_LABEL = 'rgba(255,255,255,0.62)';
+export const PHOTO_REVIEW_TRACK = 'rgba(255,255,255,0.20)';
+export const PHOTO_REVIEW_FILL = 'rgba(255,255,255,0.72)';
 /** A tight dark shadow, not a glow: separates a coloured figure from a lifted
  *  ground without adding a second fill. Neutral white figures do not need it. */
 export const PHOTO_FIG_SHADOW = '0 1px 2px rgba(0,0,0,0.62)';
