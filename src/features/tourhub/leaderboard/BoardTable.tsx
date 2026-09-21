@@ -20,8 +20,9 @@
  * table so the grid stays square: full name -> initial+surname (shortenName
  * from overview-v3/HybridHero.utils) -> surname alone. If even the surname
  * does not fit, width is taken from the ROUND CELLS (26 -> 22 floor), never
- * from the name. If the 22px floor is reached and the name still overflows the
- * component warns once — it does not ellipsise and it does not shrink type.
+ * from the name. If the 22px floor is reached and the name still overflows,
+ * PRIZE yields before the name does. Only after that can ellipsis be the last
+ * resort.
  *
  * PRE-TOURNAMENT. With no rounds played there is no POS, no score and no TOT,
  * so the board renders PLAYER | R1 TEE (name back at 15px) instead of a grid of
@@ -331,7 +332,8 @@ let warnedOverflow = false;
 
 /**
  * Table-level layout resolution: pick the widest name tier that fits, and only
- * if no tier fits take width from the round cells (26 -> 22 floor).
+ * if no tier fits take width from the round cells (26 -> 22 floor). If the
+ * floor still cannot carry the name, PRIZE yields before any name is clipped.
  */
 function resolveLayout(
   entries: BoardEntry[],
@@ -340,7 +342,8 @@ function resolveLayout(
   containerW: number,
 ): { columns: BoardColumns; tier: NameTier } {
   if (base.preTournament || !containerW) return { columns: base, tier: 'full' };
-  const font = `700 ${NAME_SIZE}px ${F}`;
+  const playerFont = `700 ${NAME_SIZE}px ${F}`;
+  const teamFont = `600 12.5px ${F}`;
   const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1 + (base.showPrize ? 1 : 0);
   const fixed =
     ROW_PAD_X * 2 +
@@ -356,6 +359,7 @@ function resolveLayout(
     const lines = entity.kind === 'team'
       ? entity.lines
       : [nameAtTier(entity.lines[0] ?? '', tier)];
+    const font = entity.kind === 'team' ? teamFont : playerFont;
     return Math.max(maximum, ...lines.map((line) => measureText(line, font)));
   }, 0);
 
@@ -378,12 +382,29 @@ function resolveLayout(
     const avail = containerW - fixed - (n * cellW + Math.max(0, n - 1) * base.gap);
     if (need <= avail) return { columns: { ...base, cellW }, tier: floorTier };
   }
+
+  if (base.showPrize) {
+    const prizeFree = { ...base, cellW: CELL_W_FLOOR, showPrize: false };
+    const prizeFreeTrackCount = 3 + prizeFree.rounds.length + (prizeFree.showThru ? 1 : 0) + 1;
+    const prizeFreeFixed =
+      ROW_PAD_X * 2 +
+      MOV_W +
+      POS_W +
+      TOT_W +
+      (prizeFree.showThru ? THRU_W : 0) +
+      (prizeFreeTrackCount - 1) * prizeFree.gap;
+    const prizeFreeAvail = containerW - prizeFreeFixed - boardRoundsWidth(prizeFree);
+    if (need <= prizeFreeAvail) return { columns: prizeFree, tier: floorTier };
+
+    return { columns: prizeFree, tier: floorTier };
+  }
+
   if (!warnedOverflow) {
     warnedOverflow = true;
     // STOP CONDITION (2.5): the layout has run out. No clip, no ellipsis, no
-    // type shrink — reported instead.
+    // type shrink. PRIZE has already yielded if it could.
     console.warn(
-      `[BoardTable] name column exhausted: surname needs ${need}px, round cells at the ${CELL_W_FLOOR}px floor at container ${containerW}px.`,
+      `[BoardTable] name column exhausted: ${floorTier} needs ${need}px, round cells at the ${CELL_W_FLOOR}px floor at container ${containerW}px.`,
     );
   }
   return { columns: { ...base, cellW: CELL_W_FLOOR }, tier: floorTier };
@@ -829,7 +850,7 @@ export function BoardTable({
   demoted.forEach((e) => parts.push(renderRow(e, { demoted: true })));
 
   return (
-    <div ref={rootRef} data-board-name-tier={tier}>
+    <div ref={rootRef} data-board-name-tier={tier} data-board-show-prize={columns.showPrize ? 'true' : 'false'}>
       {renderHeader()}
       {parts}
     </div>
