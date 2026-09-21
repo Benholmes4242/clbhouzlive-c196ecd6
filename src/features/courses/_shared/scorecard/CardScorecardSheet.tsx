@@ -18,6 +18,8 @@ import {
   type FeatRarityRow,
 } from '@/features/explore-magazine/featRarity';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { RoundResults } from './RoundResults';
+import type { RoundAwardsResult } from '@/hooks/gam/useRoundAwards';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
@@ -164,6 +166,8 @@ export interface CardScorecardSheetProps {
    * no line and no reserved space is drawn.
    */
   featRarity?: { rows: FeatRarityRow[]; owner: FeatOwnerRow[] } | null;
+  /** Member-only frozen awards and five best-effort facts for this round. */
+  roundResults?: RoundAwardsResult | null;
   onHorizontalDrag?: {
     onStart: () => void;
     onMove: (dx: number) => void;
@@ -318,6 +322,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   onHorizontalDrag = null,
   onStatsSeen,
   featRarity = null,
+  roundResults = null,
   pageShift = null,
   pagePreview = null,
   paging = null,
@@ -961,6 +966,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 </div>
               </ScorecardSection>
               </div>
+
+              {!isTour && <RoundResults result={roundResults} />}
 
               {/*
                 §C — AT THIS COURSE. ONE POOL: the member's own rounds at this

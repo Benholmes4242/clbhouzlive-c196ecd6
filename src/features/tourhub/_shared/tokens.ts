@@ -137,6 +137,9 @@ export const AMBER_SOFT_BG = 'rgba(247,147,30,0.12)';
 // ============================================================================
 export const GOLD = '#FFB800';
 export const GOLD_DEEP = '#D97706';
+export const MEDAL_GOLD = '#D6A84B';
+export const MEDAL_SILVER = '#8E99A8';
+export const MEDAL_BRONZE = '#A9683A';
 /**
  * FEAT LIGHTING. GOLD is the only authored treatment; TOP derives by increasing
  * its radius, alpha, blur and emblem size so it can never render quieter.
