@@ -26,4 +26,4 @@
 - [x] Extend the measured board name ladder to stacked team partners with a collision-safe short-name floor.
 - [x] Let the full board drop PRIZE after the name ladder and cell-width floor are exhausted.
 - [ ] Let resolved team champions back onto Tour Overview/live surfaces, delete requested dead hooks/components, and align detail hero type with the overview.
-- [ ] Unify full-width tournament detail and full-board sheet sections onto the canonical page ground, preserving raised cards.
+- [x] Unify full-width tournament detail and full-board sheet sections onto the canonical page ground, preserving raised cards.
