@@ -193,8 +193,43 @@ interface HeroBoardSectionProps {
    * carousel already knows.
    */
   phase: 'live' | 'upcoming' | 'completed';
+  /**
+   * The champion's Sportradar id (sr_tournaments.winner_id), i.e. the same
+   * champion the hero's ChampionStrip crowns. NULL on live/upcoming slides and
+   * whenever the winner could not be resolved authoritatively — in which case
+   * no trophy renders. Never compared by name or by position (a T1 playoff
+   * loser is not the champion).
+   */
+  championSrId?: string | null;
   onFullLeaderboard: () => void;
   onRowTap?: (playerId: string) => void;
+}
+
+/**
+ * The champion's BOARD player id, resolved by id alone: the leaderboard row
+ * whose player carries the champion's sr_id. Position is never consulted.
+ */
+export function resolveChampionPlayerId(
+  entries: Array<{ player?: { id?: string | null; sr_id?: string | null } | null }>,
+  championSrId: string | null | undefined,
+  phase: HeroBoardSectionProps['phase'],
+): string | null {
+  if (phase !== 'completed' || !championSrId) return null;
+  for (const entry of entries) {
+    const player = entry?.player;
+    if (player?.sr_id && String(player.sr_id) === String(championSrId) && player.id) {
+      return String(player.id);
+    }
+  }
+  return null;
+}
+
+/** A pick earns the trophy only when the pick IS the champion, by player id. */
+export function pickWonTournament(
+  pickPlayerId: string | null | undefined,
+  championPlayerId: string | null,
+): boolean {
+  return Boolean(pickPlayerId && championPlayerId && String(pickPlayerId) === championPlayerId);
 }
 
 export function overviewTournamentDoorKey(phase: HeroBoardSectionProps['phase']): string {
