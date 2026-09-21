@@ -19,11 +19,11 @@ import { postContentGate } from '../lib/postGate';
 
 const SRC = readFileSync(join(process.cwd(), 'src/features/post-v2/StageComposer.tsx'), 'utf8');
 
-describe('post content gate (commit A: media required)', () => {
+describe('post content gate (commit B: media OR words)', () => {
   const cases: Array<[string, boolean, number, string, boolean]> = [
     ['media and words', false, 2, 'two sentences', true],
     ['media only', false, 1, '', true],
-    ['words only', false, 0, 'two sentences', false],
+    ['words only', false, 0, 'two sentences', true],
     ['neither', false, 0, '', false],
     ['edit mode with nothing', true, 0, '', true],
   ];

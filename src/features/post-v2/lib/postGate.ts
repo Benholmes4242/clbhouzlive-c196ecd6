@@ -16,10 +16,9 @@ export interface PostContentGateInput {
   caption: string;
 }
 
-export function postContentGate({ isEditMode, mediaCount }: PostContentGateInput): boolean {
-  // COMMIT A: media is still required. A text-only post against the CURRENT
-  // create_post_v2 raises a bare exception, which the member would see as a
-  // failure with no explanation, so the client gate holds the line until the
-  // server function has been replaced.
-  return isEditMode || mediaCount > 0;
+export function postContentGate({ isEditMode, mediaCount, caption }: PostContentGateInput): boolean {
+  // A post needs ONE of the two, not both: 11% of posts carry no caption, and
+  // requiring a photograph in front of a member who wants to write two
+  // sentences is the wall this phase removes.
+  return isEditMode || mediaCount > 0 || caption.trim().length > 0;
 }
