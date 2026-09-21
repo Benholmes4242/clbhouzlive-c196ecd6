@@ -77,3 +77,40 @@ describe('story cards on photo', () => {
     expect(row?.textContent ?? '').not.toContain('member');
   });
 });
+
+function review(): StreamItem {
+  return {
+    id: 'review:1', kind: 'review', ring: null, lane: 'news', score: 1, consequence: null,
+    subject: { course_id: 'c', course_name: 'Addington', region: 'Surrey', sub_country: 'England', country: 'Britain & Ireland', image_url: 'https://example.test/b.jpg', pending: false },
+    who: { user_id: 'd', display_name: 'danny', photo_url: null, is_viewer: false },
+    facts: { rating: 8.4, review_id: 'r', first_sentence: 'Wonderful.', arrived_at: new Date().toISOString(), play_date: new Date().toISOString() },
+    payload: {}, seen: null,
+  } as unknown as StreamItem;
+}
+
+describe('lead story and lead review share one geometry', () => {
+  it('same minHeight, radius, chip lane and copy inset', () => {
+    const geom = (item: StreamItem) => {
+      const { container } = render(<ExploreCard item={item} size="lead" onTap={() => {}} />);
+      const hero = container.querySelector('[data-explore-hero]') as HTMLElement;
+      const copy = container.querySelector('[data-explore-hero-copy]') as HTMLElement;
+      const lane = hero.firstElementChild as HTMLElement;
+      const scrim = container.querySelector('[data-explore-hero-copy]')!.previousElementSibling as HTMLElement;
+      const img = container.querySelector('[data-explore-hero]')!.parentElement as HTMLElement;
+      return {
+        minHeight: hero.style.minHeight,
+        lane: lane.style.flex,
+        paddingInline: copy.style.paddingInline,
+        scrim: scrim.style.background,
+        radius: (img.style.borderRadius || (img.parentElement as HTMLElement).style.borderRadius),
+      };
+    };
+    const s = geom(story());
+    cleanup();
+    const r = geom(review());
+    expect(s).toEqual(r);
+    expect(s.minHeight).toBe('340px');
+    expect(s.paddingInline).toBe('16px');
+    expect(s.lane).toBe('0 0 48px');
+  });
+});
