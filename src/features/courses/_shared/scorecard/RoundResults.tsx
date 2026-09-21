@@ -74,9 +74,7 @@ function AwardRow({ award }: { award: RoundAwardRow }) {
       ? t('roundResults.placing.best')
       : t('roundResults.placing.ordinal', { place: formatOrdinal(award.rank_here), count: award.attempts_at_detection ?? 0 });
   const subline = [previous, placing].filter(Boolean).join(' · ');
-  const delta = award.delta == null
-    ? null
-    : `${award.unit_kind === 'round_stableford' ? '+' : '−'}${award.delta}`;
+  const delta = award.delta == null ? null : formatValue(award.unit_kind, award.value);
 
   return (
     <div data-round-award={award.unit_kind} style={{ minWidth: 0, display: 'grid', gridTemplateColumns: '22px minmax(0,1fr) auto', alignItems: 'center', gap: 10, padding: '10px 0' }}>

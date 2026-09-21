@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useRoundFeatRarity } from '@/hooks/gam/useFeatRarity';
+import { useRoundAwards } from '@/hooks/gam/useRoundAwards';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
 import { useRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
@@ -327,6 +328,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
      the frozen rows plus the owner fields, which arrive NULL for anyone who is
      not the round's owner. */
   const featRarity = useRoundFeatRarity(open ? scoreId : null);
+  const roundAwardsQuery = useRoundAwards(scoreId, open);
   const roundEngagement = useStoryEngagement('round', scoreIdList);
   const commentCount = roundEngagement.engagementFor(scoreId).commentCount;
   const previewIds = useMemo(
@@ -415,6 +417,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
     <>
     <CardScorecardSheet
       featRarity={featRarity}
+      roundResults={roundAwardsQuery.data ?? null}
       open={cardOpen}
       onClose={onClose}
       eyebrowText={eyebrowText}
