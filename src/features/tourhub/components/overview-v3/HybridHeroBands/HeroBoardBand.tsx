@@ -50,9 +50,9 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Trophy } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, OVERVIEW_PICKS_TEXT_INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
@@ -96,8 +96,8 @@ type SettledFigure = {
  * level/over is INK — which on this dark surface is white.
  */
 function tourFigColor(v: number | null | undefined): string {
-  if (v == null || v === 0) return INK;
-  return v < 0 ? TOPAR_UNDER_DARK : INK;
+  if (v == null || v === 0) return '#FFFFFF';
+  return v < 0 ? TOPAR_UNDER_DARK : '#FFFFFF';
 }
 
 function settledFigureFor(
@@ -154,7 +154,7 @@ function StatCell({
           letterSpacing: '-0.01em',
           lineHeight: 1.05,
           marginTop: 2,
-          color: color ?? INK,
+          color: color ?? '#FFFFFF',
           ...FIGS,
         }}
       >
@@ -193,48 +193,8 @@ interface HeroBoardSectionProps {
    * carousel already knows.
    */
   phase: 'live' | 'upcoming' | 'completed';
-  /**
-   * The champion's Sportradar id (sr_tournaments.winner_id), i.e. the same
-   * champion the hero's ChampionStrip crowns. NULL on live/upcoming slides and
-   * whenever the winner could not be resolved authoritatively — in which case
-   * no trophy renders. Never compared by name or by position (a T1 playoff
-   * loser is not the champion).
-   */
-  championSrId?: string | null;
-  /** Team-event champions have no tournament winner_id, so members are matched by player id. */
-  championPlayerIds?: string[];
   onFullLeaderboard: () => void;
   onRowTap?: (playerId: string) => void;
-}
-
-/**
- * The champion's BOARD player id, resolved by id alone: the leaderboard row
- * whose player carries the champion's sr_id. Position is never consulted.
- */
-export function resolveChampionPlayerId(
-  entries: Array<{ player?: { id?: string | null; sr_id?: string | null } | null }>,
-  championSrId: string | null | undefined,
-  phase: HeroBoardSectionProps['phase'],
-): string | null {
-  if (phase !== 'completed' || !championSrId) return null;
-  for (const entry of entries) {
-    const player = entry?.player;
-    if (player?.sr_id && String(player.sr_id) === String(championSrId) && player.id) {
-      return String(player.id);
-    }
-  }
-  return null;
-}
-
-/** A pick earns the trophy only when the pick IS the champion, by player id. */
-export function pickWonTournament(
-  pickPlayerId: string | null | undefined,
-  championPlayerId: string | null,
-  championPlayerIds: string[] = [],
-): boolean {
-  if (!pickPlayerId) return false;
-  if (championPlayerId && String(pickPlayerId) === championPlayerId) return true;
-  return championPlayerIds.some((id) => String(pickPlayerId) === String(id));
 }
 
 export function overviewTournamentDoorKey(phase: HeroBoardSectionProps['phase']): string {
@@ -263,8 +223,6 @@ export function HeroBoardSection({
   entries,
   currentRound,
   phase,
-  championSrId,
-  championPlayerIds = [],
   onFullLeaderboard,
   onRowTap,
 }: HeroBoardSectionProps) {
@@ -289,55 +247,34 @@ export function HeroBoardSection({
   const boardByPlayer = useMemo(() => {
     const map = new Map<string, { position: number | null; tied: boolean; score: number | null }>();
     for (const entry of entries as any[]) {
-      const line = { position: entry.position ?? null, tied: Boolean(entry.position_tied), score: entry.score ?? null };
       const id = entry?.player?.id;
-      if (id) {
-        map.set(String(id), line);
-        continue;
-      }
-      for (const member of entry?.team?.members ?? []) {
-        const memberId = member?.player?.id;
-        if (memberId) map.set(String(memberId), line);
-      }
+      if (!id) continue;
+      map.set(String(id), { position: entry.position ?? null, tied: Boolean(entry.position_tied), score: entry.score ?? null });
     }
     return map;
   }, [entries]);
 
-  const championPlayerId = useMemo(
-    () => resolveChampionPlayerId(entries as any[], championSrId, phase),
-    [championSrId, entries, phase],
-  );
-
-  const closedRow = useMemo<{ text: string; trophy: boolean } | null>(() => {
+  const closedFigure = useMemo(() => {
     if (!hasPicks) return null;
     const ranked = [...picks].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
     if (phase === 'upcoming') {
       const names = ranked.slice(0, 3).map((pick) => surnameOf(pick.playerName)).filter(Boolean);
-      return names.length > 0 ? { text: `${names.join(', ')} to win`, trophy: false } : null;
+      return names.length > 0 ? `${names.join(', ')} to win` : null;
     }
     const placed = ranked
       .map((pick) => ({ pick, line: boardByPlayer.get(String(pick.playerId)) }))
       .filter((item) => item.line?.position != null)
       .sort((a, b) => (a.line?.position ?? 999) - (b.line?.position ?? 999));
-    if (placed.length === 0) {
-      const fallback = surnameOf(ranked[0]?.playerName);
-      return fallback ? { text: fallback, trophy: false } : null;
-    }
+    if (placed.length === 0) return surnameOf(ranked[0]?.playerName) || null;
     if (phase === 'completed') {
       const best = placed[0];
       const settled = settledFigureFor(best.line);
-      // The trophy marks the CHAMPION, never a position: T1 playoff losers get none.
-      const trophy = pickWonTournament(best.pick.playerId, championPlayerId, championPlayerIds);
-      const text = settled?.right === WON_LABEL
+      return settled?.right === WON_LABEL
         ? `Picked ${surnameOf(best.pick.playerName)} to win · ${WON_LABEL}`
         : `${surnameOf(best.pick.playerName)} ${settled?.right ?? ''}`.trim();
-      return { text, trophy };
     }
-    return {
-      text: placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', '),
-      trophy: false,
-    };
-  }, [boardByPlayer, championPlayerId, championPlayerIds, hasPicks, phase, picks]);
+    return placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', ');
+  }, [boardByPlayer, hasPicks, phase, picks]);
 
   const showUpcomingFacts = shouldLoadUpcomingFacts(phase);
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showUpcomingFacts);
@@ -385,7 +322,7 @@ export function HeroBoardSection({
         </div>
       ) : null}
 
-      {hasPicks && closedRow ? (
+      {hasPicks && closedFigure ? (
         <>
           <button
             type="button"
@@ -395,18 +332,7 @@ export function HeroBoardSection({
           >
             {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
             <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
-            <span style={{ minWidth: 0, fontSize: 13, color: OVERVIEW_PICKS_TEXT_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {closedRow.trophy ? (
-                <Trophy
-                  data-pick-trophy
-                  size={12}
-                  color={GOLD}
-                  strokeWidth={2.5}
-                  style={{ display: 'inline-block', verticalAlign: '-1px', marginRight: 4, flexShrink: 0 }}
-                />
-              ) : null}
-              {closedRow.text}
-            </span>
+            <span style={{ minWidth: 0, fontSize: 13, color: 'rgba(248,250,252,0.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{closedFigure}</span>
             {picksOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
           {picksOpen ? <PicksPanel picks={picks} tourCode={pickTourCode} phase={phase} boardByPlayer={boardByPlayer} predictions={predictions ?? null} /> : null}
@@ -429,7 +355,7 @@ export function HeroBoardSection({
         {venueRecord?.courseId ? (
           <button
             type="button"
-            onClick={() => navigate(`/courses/${venueRecord.courseId}`)}
+            onClick={() => navigate(`/course/${venueRecord.courseId}`)}
             data-overview-course-cta
             style={{ minWidth: 0, minHeight: 44, margin: 0, padding: 0, display: 'inline-flex', alignItems: 'center', gap: 4, border: 'none', background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', textAlign: 'right', whiteSpace: 'nowrap' }}
           >
@@ -512,7 +438,7 @@ function PicksPanel({
             ? settled.figureColor
             : liveLine
               ? tourFigColor(liveLine.score)
-              : INK;
+              : '#FFFFFF';
           const pull = p.pulledQuote || p.reasons?.[0] || null;
 
           return (
@@ -551,7 +477,7 @@ function PicksPanel({
                     style={{
                       fontSize: 12,
                       fontWeight: 700,
-                      color: INK,
+                      color: '#FFFFFF',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',

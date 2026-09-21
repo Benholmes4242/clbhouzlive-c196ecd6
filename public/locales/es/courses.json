@@ -1254,19 +1254,11 @@
       "9": "noveno"
     },
     "ownerFirst": "Tu primer {{feat}}. {{rounds}} rondas después.",
-    "ownerFirstCongrats": "{{line}} — enhorabuena, {{name}}",
-    "ownerRareThree": "Solo el tercer miembro de clbhouz en lograrlo.",
-    "ownerRareThreeCongrats": "{{line}} — enhorabuena, {{name}}",
-    "ownerRareTwo": "Solo el segundo miembro de clbhouz en lograrlo.",
-    "ownerRareTwoCongrats": "{{line}} — enhorabuena, {{name}}",
+    "ownerRareThree": "Uno de los tres primeros miembros en lograrlo.",
+    "ownerRareTwo": "Uno de los dos primeros miembros en lograrlo.",
     "ownerRepeat": "Tu {{ord}} {{feat}}. El primero desde {{when}}.",
-    "ownerRepeatCongrats": "{{line}} — enhorabuena, {{name}}",
-    "ownerSole": "El primer miembro de clbhouz en lograrlo.",
-    "ownerSoleCongrats": "{{line}} — enhorabuena, {{name}}",
-    "viewer": "El {{ord}} {{feat}} en {{rounds}} rondas.",
-    "viewerRareThree": "Solo el tercer miembro de clbhouz en lograrlo.",
-    "viewerRareTwo": "Solo el segundo miembro de clbhouz en lograrlo.",
-    "viewerSole": "El primer miembro de clbhouz en lograrlo."
+    "ownerSole": "El primer miembro en lograrlo.",
+    "viewer": "El {{ord}} {{feat}} en {{rounds}} rondas."
   },
   "friends": {
     "signIn": "Sign in",

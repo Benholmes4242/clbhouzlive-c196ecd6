@@ -100,7 +100,6 @@ export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text o
 export const OVERVIEW_RAIL_HAIRLINE = 'rgba(255,255,255,0.07)';
 export const STORY_BAND_META_INK = 'rgba(248,250,252,0.72)';
 export const STORY_BAND_SCRIM = 'linear-gradient(to bottom, transparent 0%, rgba(10,12,16,0.92) 100%)';
-export const OVERVIEW_PICKS_TEXT_INK = 'rgba(248,250,252,0.85)';
 
 
 // ============================================================================
@@ -115,7 +114,6 @@ export const INK_TINT_04 = 'rgba(255,255,255,0.05)';            // very-faint in
 export const INK_TINT_05 = 'rgba(255,255,255,0.06)';            // ultra-faint inline pill/skeleton bg — 11 cross-app files
 export const INK_TINT_06 = 'rgba(255,255,255,0.08)';            // faint white-alpha bg (name historical) — placeholder containers, faint surfaces
 export const INK_TINT_07 = 'rgba(255,255,255,0.10)';            // faint white-alpha border — hairline dividers on DARK bg (name historical)
-export const OVERVIEW_HERO_LOADING_BG = `linear-gradient(135deg, ${INK_TINT_06}, rgba(15,23,42,0.02))`;
 
 // ============================================================================
 // AMBER (brand)
@@ -139,32 +137,9 @@ export const AMBER_SOFT_BG = 'rgba(247,147,30,0.12)';
 // ============================================================================
 export const GOLD = '#FFB800';
 export const GOLD_DEEP = '#D97706';
-/**
- * FEAT LIGHTING. GOLD is the only authored treatment; TOP derives by increasing
- * its radius, alpha, blur and emblem size so it can never render quieter.
- * These are static paint tokens: tune here after daylight device review, never
- * at a scrolling-feed call site. The artwork asset itself remains untouched.
- */
-export const FEAT_LIGHT_RGB = '232,197,71';
-export const FEAT_GOLD_WASH_WIDTH = 120;
-export const FEAT_GOLD_WASH_HEIGHT = 60;
-export const FEAT_GOLD_WASH_ALPHA = 0.20;
-export const FEAT_GOLD_GLOW_BLUR = 10;
-export const FEAT_GOLD_GLOW_ALPHA = 0.45;
-export const FEAT_GOLD_EMBLEM_SIZE = 26;
-export const FEAT_TOP_SCALE = 1.18;
-export const FEAT_TOP_ALPHA_LIFT = 1.2;
-export const FEAT_TOP_WASH_WIDTH = Math.round(FEAT_GOLD_WASH_WIDTH * FEAT_TOP_SCALE);
-export const FEAT_TOP_WASH_HEIGHT = Math.round(FEAT_GOLD_WASH_HEIGHT * FEAT_TOP_SCALE);
-export const FEAT_TOP_WASH_ALPHA = FEAT_GOLD_WASH_ALPHA * FEAT_TOP_ALPHA_LIFT;
-export const FEAT_TOP_GLOW_BLUR = Math.round(FEAT_GOLD_GLOW_BLUR * FEAT_TOP_SCALE);
-export const FEAT_TOP_GLOW_ALPHA = FEAT_GOLD_GLOW_ALPHA * FEAT_TOP_ALPHA_LIFT;
-export const FEAT_TOP_EMBLEM_SIZE = FEAT_GOLD_EMBLEM_SIZE + 2;
-export const FEAT_RARITY_GOLD_INK = '#E3C878';
-export const FEAT_GOLD_WASH = `radial-gradient(${FEAT_GOLD_WASH_WIDTH}px ${FEAT_GOLD_WASH_HEIGHT}px at 30px 40%, rgba(${FEAT_LIGHT_RGB},${FEAT_GOLD_WASH_ALPHA}), rgba(${FEAT_LIGHT_RGB},0) 70%)`;
-export const FEAT_TOP_WASH = `radial-gradient(${FEAT_TOP_WASH_WIDTH}px ${FEAT_TOP_WASH_HEIGHT}px at 30px 40%, rgba(${FEAT_LIGHT_RGB},${FEAT_TOP_WASH_ALPHA}), rgba(${FEAT_LIGHT_RGB},0) 70%)`;
-export const FEAT_GOLD_EMBLEM_GLOW = `drop-shadow(0 0 ${FEAT_GOLD_GLOW_BLUR}px rgba(${FEAT_LIGHT_RGB},${FEAT_GOLD_GLOW_ALPHA}))`;
-export const FEAT_TOP_EMBLEM_GLOW = `drop-shadow(0 0 ${FEAT_TOP_GLOW_BLUR}px rgba(${FEAT_LIGHT_RGB},${FEAT_TOP_GLOW_ALPHA}))`;
+export const GOLD_TINT = 'rgba(255,184,0,0.04)';
+export const GOLD_BORDER = 'rgba(255,184,0,0.32)';
+export const GOLD_TINT_10 = 'rgba(255,184,0,0.10)';          // medium gold tint — 7 cross-app files (hero card gradients, leader pills)
 export const GOLD_GLOW = '0 0 24px rgba(255,184,0,0.10), 0 1px 3px rgba(0,0,0,0.04)';
 export const GOLD_GLOW_DROP = '0 4px 12px rgba(255,184,0,0.20)';  // tighter gold drop shadow — champion-treatment photo/logo tiles — 4 cross-app surfaces
 
@@ -182,7 +157,6 @@ export const LEADER_GOLD = '#FBBC2E';                        // hero leader-row 
 export const LEADER_GOLD_DARK = '#D4A017';                   // text/icon-readable variant
 export const LEADER_GOLD_TINT_7 = 'rgba(251,188,46,0.07)';   // soft leader tint (live state)
 export const LEADER_GOLD_TINT_10 = 'rgba(251,188,46,0.10)';  // medium leader tint (results state)
-export const CHAMPION_STRIP_WASH = `radial-gradient(ellipse 50% 100% at 0% 50%, ${LEADER_GOLD_TINT_10} 0%, transparent 60%)`;
 
 // ============================================================================
 // TO-PAR (verdict — under/over par; theme-aware)
@@ -257,16 +231,6 @@ export const CHARCOAL = PAGE_CANVAS;
 // ============================================================================
 export const FONT =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-
-export const CAPS_10 = {
-  fontFamily: FONT,
-  fontSize: 10,
-  fontWeight: 800,
-  letterSpacing: '0.12em',
-  textTransform: 'uppercase' as const,
-};
-
-export const HERO_VENUE_INK = 'rgba(248,250,252,0.82)';
 
 // ============================================================================
 // BAR (proportional tug/track fills on DARK surfaces)

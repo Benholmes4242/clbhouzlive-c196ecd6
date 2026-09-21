@@ -17,7 +17,6 @@ import {
   type FeatOwnerRow,
   type FeatRarityRow,
 } from '@/features/explore-magazine/featRarity';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
@@ -124,8 +123,6 @@ export interface CardScorecardSheetProps {
 
   // IDENTITY BLOCK (below scorecard)
   playerName: string;
-  /** Owner's actual display name for feat congratulations; never a username fallback. */
-  ownerDisplayName?: string | null;
   playerAvatarUrl?: string | null;
   playerHcp?: number | null;
   playerHcpDelta?: number | null;
@@ -311,7 +308,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   holes, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
-  playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
+  playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
   presentation = 'overlay',
@@ -332,7 +329,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     owner: featRarity?.owner ?? null,
     t,
     locale: i18n.language,
-    ownerDisplayName,
   });
   /* §3 — THE ARROW KEYS PAGE. Bound at the document while the card is open and
      pageable, so the keys work wherever focus sits inside the sheet, and never
@@ -734,7 +730,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         {/* S7 — ONE FLAT MEMBER BAND. Metal and its rarity separation retired
             18 Sep 2026 when this widened from two permanent facts to five. */}
         {feat && (
-          <div data-scorecard-feat={feat.kind} style={{ ...FEAT_BAND_STYLE, alignItems: 'center' }}>
+          <div data-scorecard-feat={feat.kind} style={FEAT_BAND_STYLE}>
             {feat.kind === 'birdies' ? (
               <svg
                 width="14"
@@ -769,39 +765,50 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 {feat.kind === 'ace' ? '⛳' : feat.kind === 'albatross' ? '🔥' : feat.kind === 'eagle' ? '🦅' : '🛡️'}
               </span>
             )}
-            <span style={{ display: 'flex', minWidth: 0, flexDirection: 'column', gap: 3 }}>
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.13em',
-                  textTransform: 'uppercase',
-                  color: A.AMBER,
-                }}
-              >
-                {t(
-                  feat.kind === 'eagle' && feat.count >= 2
-                    ? 'courses:scorecard.feat.eagleBrace.label'
-                    : `courses:scorecard.feat.${feat.kind}.label`,
-                )}
-              </span>
-              {surface === 'member' && (rarity.ownerLine ?? rarity.viewerLine) ? (
-                <span
-                  data-feat-rarity-lines="true"
-                  data-feat-rarity-owner={rarity.ownerLine ? 'true' : undefined}
-                  data-feat-rarity-viewer={rarity.ownerLine ? undefined : 'true'}
-                  style={{ fontSize: 11.5, fontWeight: rarity.ownerLine ? 700 : 600, lineHeight: 1.3, color: rarity.ownerLine ? SC_FILL_GOLD : A.MUTE, whiteSpace: 'normal', overflowWrap: 'break-word' }}
-                >
-                  {rarity.ownerLine ?? rarity.viewerLine}
-                </span>
-              ) : (feat.hole != null || feat.kind === 'birdies' || feat.kind === 'clean') ? (
-                <span style={{ fontSize: 11.5, fontWeight: 600, color: A.MUTE }}>
-                  {feat.hole != null
-                    ? t('courses:scorecard.feat.onHole', { hole: formatOrdinal(feat.hole) })
-                    : t(`courses:scorecard.feat.${feat.kind}.sub`)}
-                </span>
-              ) : null}
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.13em',
+                textTransform: 'uppercase',
+                color: A.AMBER,
+              }}
+            >
+              {t(
+                feat.kind === 'eagle' && feat.count >= 2
+                  ? 'courses:scorecard.feat.eagleBrace.label'
+                  : `courses:scorecard.feat.${feat.kind}.label`,
+              )}
             </span>
+            {(feat.hole != null || feat.kind === 'birdies' || feat.kind === 'clean') && (
+              <span style={{ fontSize: 11.5, fontWeight: 600, color: A.MUTE }}>
+                {feat.hole != null
+                  ? t('courses:scorecard.feat.onHole', { hole: formatOrdinal(feat.hole) })
+                  : t(`courses:scorecard.feat.${feat.kind}.sub`)}
+              </span>
+            )}
+          </div>
+        )}
+        {surface === 'member' && (rarity.viewerLine || rarity.ownerLine) && (
+          <div
+            data-feat-rarity-lines="true"
+            style={{
+              flexShrink: 0,
+              boxSizing: 'border-box',
+              padding: '8px 16px 9px',
+              borderBottom: `1px solid ${A.HAIRLINE}`,
+            }}
+          >
+            {rarity.viewerLine && (
+              <div data-feat-rarity-viewer="true" style={{ fontSize: 12.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE }}>
+                {rarity.viewerLine}
+              </div>
+            )}
+            {rarity.ownerLine && (
+              <div data-feat-rarity-owner="true" style={{ marginTop: 3, fontSize: 12.5, fontWeight: 700, lineHeight: 1.3, color: A.AMBER }}>
+                {rarity.ownerLine}
+              </div>
+            )}
           </div>
         )}
         {/*

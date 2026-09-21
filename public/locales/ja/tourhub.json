@@ -169,7 +169,7 @@
       "nextAria": "Next tournament",
       "counter": "{{current}} / {{total}}",
       "stateLive": "ライブ",
-      "stateFinal": "結果",
+      "stateFinal": "終了",
       "stateUpcoming": "予定",
       "factRound": "ラウンド",
       "factThru": "経過",
@@ -693,7 +693,6 @@
       "shotsClear": "打差",
       "sharedLead": "{{count}}人が首位タイ",
       "playoff": "プレーオフ決着",
-      "finishedLevel": "同スコアで終了",
       "withToPlay": "残り{{holes}}ホール",
       "decidedInPlayoff": "プレーオフで決着",
       "leader": "首位",
@@ -712,10 +711,7 @@
       "sublineLevelManyChaser": "{{a}}、{{b}}ほか{{count}}人が{{score}}で並び、{{next}}が{{gap}}差。",
       "sublineLevelTwoPast": "{{a}}と{{b}}が{{score}}で並んだ。",
       "sublineLevelThreePast": "{{a}}、{{b}}、{{c}}が{{score}}で並んだ。",
-      "sublineLevelManyPast": "{{a}}、{{b}}ほか{{count}}人が{{score}}で並んだ。",
-      "sublinePlayoffTwo": "{{a}}が、ともに{{score}}で終えた{{b}}を破った。",
-      "sublinePlayoffThree": "{{a}}が、3人とも{{score}}で終えた{{b}}と{{c}}を破った。",
-      "sublinePlayoffMany": "{{a}}が、{{score}}で並んだ{{b}}ほか{{count}}人を破った。"
+      "sublineLevelManyPast": "{{a}}、{{b}}ほか{{count}}人が{{score}}で並んだ。"
     },
     "move": {
       "liveEyebrow": "今日の躍進",

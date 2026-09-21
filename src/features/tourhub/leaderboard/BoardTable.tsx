@@ -20,9 +20,8 @@
  * table so the grid stays square: full name -> initial+surname (shortenName
  * from overview-v3/HybridHero.utils) -> surname alone. If even the surname
  * does not fit, width is taken from the ROUND CELLS (26 -> 22 floor), never
- * from the name. If the 22px floor is reached and the name still overflows,
- * PRIZE yields before the name does. Only after that can ellipsis be the last
- * resort.
+ * from the name. If the 22px floor is reached and the name still overflows the
+ * component warns once — it does not ellipsise and it does not shrink type.
  *
  * PRE-TOURNAMENT. With no rounds played there is no POS, no score and no TOT,
  * so the board renders PLAYER | R1 TEE (name back at 15px) instead of a grid of
@@ -50,13 +49,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import { getScoreColor } from '../_shared/scoreColor';
-import { formatEarnings } from '../_shared/formatEarnings';
 import { shortenName } from '../components/overview-v3/HybridHero.utils';
 import { surnameOf } from '../_shared/playerName';
 import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
-import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../_shared/boardEntity';
 
 // Dark ramp, imported so the board follows the tour token file (was four pinned light literals).
 const INK = TOUR_INK;
@@ -70,7 +67,6 @@ const MOV_W = 24;
 const POS_W = 24;
 const TOT_W = 40;
 const THRU_W = 26;
-const PRIZE_W = 52;
 const CELL_W = 26;
 const CELL_W_FLOOR = 22;
 const GRID_GAP = 4;
@@ -80,8 +76,6 @@ const PRE_NAME_SIZE = 15;
 const PRE_TEE_W = 76;
 /** MOVEMENT only: zero or unavailable movement is a STATEMENT, so it gets a mark. */
 const MOV_DASH = '\u2013';
-/** PRIZE: a row that earned nothing states it with an em dash, never a blank. */
-const PRIZE_DASH = '\u2014';
 
 const F = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -90,7 +84,7 @@ export interface BoardEntry {
   position: number | null;
   position_tied?: boolean | null;
   score: number | null;
-  thru?: number | null;
+  thru: number | null;
   today?: number | null;
   today_round?: number | null;
   status?: string | null;
@@ -102,30 +96,10 @@ export interface BoardEntry {
   raw_data?: unknown;
   player?: {
     id: string;
-    sr_id?: string | null; // Sportradar id — matches sr_tournaments.winner_id
     full_name: string;
     country_code?: string | null;
     country?: string | null;
     photo_url?: string | null;
-  } | null;
-  team?: {
-    id?: string | null;
-    sr_id?: string | null;
-    display_name?: string | null;
-    abbr_name?: string | null;
-    country?: string | null;
-    members?: Array<{
-      position_in_team?: number | null;
-      player?: {
-        id?: string | null;
-        sr_id?: string | null;
-        first_name?: string | null;
-        last_name?: string | null;
-        full_name?: string | null;
-        photo_url?: string | null;
-        country?: string | null;
-      } | null;
-    }> | null;
   } | null;
 }
 
@@ -151,8 +125,6 @@ interface Props {
   /** Optional complete field used only to calculate movement when `entries`
    * is a truncated inline board. No additional query is required. */
   movementEntries?: BoardEntry[];
-  /** Event-level team-name convention, computed by the parent when shared. */
-  teamInitials?: boolean;
 }
 
 function houseColor(score: number | null | undefined, emphasis: 'standard' | 'leader' = 'standard'): string {
@@ -216,14 +188,6 @@ export interface BoardColumns {
   liveRound: number | null;
   /** THRU only occupies a track while a round is in progress. */
   showThru: boolean;
-  /**
-   * PRIZE is a property of the TOURNAMENT, not of any row slice: shown when
-   * ANY row has a money value, hidden — header included — when none do, so
-   * the column is stable across expand, sort and scroll. Two completed events
-   * on the same tour in the same season can legitimately differ; that is the
-   * data (~40% of events carry no prize data), not a UI inconsistency.
-   */
-  showPrize: boolean;
   /** Nothing has been played: PLAYER | R1 TEE board. */
   preTournament: boolean;
 }
@@ -260,9 +224,7 @@ export function computeBoardColumns(
     entries.length > 0 &&
     highest === 0 &&
     entries.every((e) => e.score == null && e.position == null);
-  // ANY row with a money value turns the column on for the whole tournament.
-  const showPrize = entries.some((e) => e.money != null);
-  return { rounds, cellW: CELL_W, gap: GRID_GAP, liveRound: started ? currentRound! : null, showThru, showPrize, preTournament };
+  return { rounds, cellW: CELL_W, gap: GRID_GAP, liveRound: started ? currentRound! : null, showThru, preTournament };
 }
 
 /** Shared movement source for both the column spec and the row renderer. */
@@ -270,7 +232,7 @@ export function boardMovementMap(entries: BoardEntry[], currentRound: number | n
   return movementFromRounds(
     entries.map((e) => ({
       id: e.id,
-      playerId: e.player?.id ?? e.team?.id ?? e.id,
+      playerId: e.player?.id ?? null,
       position: e.position,
       status: e.status ?? null,
       round_1: e.round_1 ?? null,
@@ -300,7 +262,6 @@ export function boardGridTemplate(c: BoardColumns): string {
     rounds,
     c.showThru ? `${THRU_W}px` : '',
     `${TOT_W}px`,
-    c.showPrize ? `${PRIZE_W}px` : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -310,7 +271,7 @@ export function boardGridTemplate(c: BoardColumns): string {
 // NAME LADDER (2.5)
 // ---------------------------------------------------------------------------
 
-type NameTier = BoardNameTier;
+type NameTier = 'full' | 'short' | 'surname';
 
 function nameAtTier(fullName: string, tier: NameTier): string {
   if (tier === 'full') return fullName;
@@ -332,82 +293,52 @@ let warnedOverflow = false;
 
 /**
  * Table-level layout resolution: pick the widest name tier that fits, and only
- * if no tier fits take width from the round cells (26 -> 22 floor). If the
- * floor still cannot carry the name, PRIZE yields before any name is clipped.
+ * if no tier fits take width from the round cells (26 -> 22 floor).
  */
 function resolveLayout(
-  entries: BoardEntry[],
-  teamInitials: boolean,
+  names: string[],
   base: BoardColumns,
   containerW: number,
 ): { columns: BoardColumns; tier: NameTier } {
   if (base.preTournament || !containerW) return { columns: base, tier: 'full' };
-  const playerFont = `700 ${NAME_SIZE}px ${F}`;
-  const teamFont = `600 12.5px ${F}`;
-  const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1 + (base.showPrize ? 1 : 0);
+  const font = `700 ${NAME_SIZE}px ${F}`;
+  const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1;
   const fixed =
     ROW_PAD_X * 2 +
     MOV_W +
     POS_W +
     TOT_W +
     (base.showThru ? THRU_W : 0) +
-    (base.showPrize ? PRIZE_W : 0) +
     (trackCount - 1) * base.gap;
 
-  const widest = (tier: NameTier) => entries.reduce((maximum, entry) => {
-    const entity = resolveBoardEntity(entry, teamInitials, tier);
-    const lines = entity.kind === 'team'
-      ? entity.lines
-      : [nameAtTier(entity.lines[0] ?? '', tier)];
-    const font = entity.kind === 'team' ? teamFont : playerFont;
-    return Math.max(maximum, ...lines.map((line) => measureText(line, font)));
-  }, 0);
+  const widest = (tier: NameTier) =>
+    names.reduce((m, n) => Math.max(m, measureText(nameAtTier(n, tier), font)), 0);
 
-  // A collision board may never descend to bare surnames: Kim / Kim and
-  // Iwai / Iwai are not compact labels, they are the wrong names.
-  const tiers: NameTier[] = teamInitials ? ['full', 'short'] : ['full', 'short', 'surname'];
+  const tiers: NameTier[] = ['full', 'short', 'surname'];
   for (const tier of tiers) {
     const need = Math.ceil(widest(tier)) + 2; // 2px optical breathing room
     const avail = containerW - fixed - boardRoundsWidth(base);
     if (need <= avail) return { columns: base, tier };
   }
 
-  // The safe floor still overflows: take the shortfall from the ROUND CELLS.
-  const floorTier: NameTier = teamInitials ? 'short' : 'surname';
-  const need = Math.ceil(widest(floorTier)) + 2;
+  // Surname alone still overflows: take the shortfall from the ROUND CELLS.
+  const need = Math.ceil(widest('surname')) + 2;
   const n = base.rounds.length;
   let cellW = base.cellW;
   while (cellW > CELL_W_FLOOR) {
     cellW -= 1;
     const avail = containerW - fixed - (n * cellW + Math.max(0, n - 1) * base.gap);
-    if (need <= avail) return { columns: { ...base, cellW }, tier: floorTier };
+    if (need <= avail) return { columns: { ...base, cellW }, tier: 'surname' };
   }
-
-  if (base.showPrize) {
-    const prizeFree = { ...base, cellW: CELL_W_FLOOR, showPrize: false };
-    const prizeFreeTrackCount = 3 + prizeFree.rounds.length + (prizeFree.showThru ? 1 : 0) + 1;
-    const prizeFreeFixed =
-      ROW_PAD_X * 2 +
-      MOV_W +
-      POS_W +
-      TOT_W +
-      (prizeFree.showThru ? THRU_W : 0) +
-      (prizeFreeTrackCount - 1) * prizeFree.gap;
-    const prizeFreeAvail = containerW - prizeFreeFixed - boardRoundsWidth(prizeFree);
-    if (need <= prizeFreeAvail) return { columns: prizeFree, tier: floorTier };
-
-    return { columns: prizeFree, tier: floorTier };
-  }
-
   if (!warnedOverflow) {
     warnedOverflow = true;
     // STOP CONDITION (2.5): the layout has run out. No clip, no ellipsis, no
-    // type shrink. PRIZE has already yielded if it could.
+    // type shrink — reported instead.
     console.warn(
-      `[BoardTable] name column exhausted: ${floorTier} needs ${need}px, round cells at the ${CELL_W_FLOOR}px floor at container ${containerW}px.`,
+      `[BoardTable] name column exhausted: surname needs ${need}px, round cells at the ${CELL_W_FLOOR}px floor at container ${containerW}px.`,
     );
   }
-  return { columns: { ...base, cellW: CELL_W_FLOOR }, tier: floorTier };
+  return { columns: { ...base, cellW: CELL_W_FLOOR }, tier: 'surname' };
 }
 
 /* Status vocabulary lives in _shared/resultStatus.ts — see MDF note there. */
@@ -430,7 +361,6 @@ export function BoardTable({
   surface = CANVAS,
   teeTimes,
   movementEntries,
-  teamInitials,
 }: Props) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
@@ -452,15 +382,14 @@ export function BoardTable({
     [entries, currentRound],
   );
 
-  const resolvedTeamInitials = useMemo(
-    () => teamInitials ?? teamNamesNeedInitials(entries),
-    [teamInitials, entries],
+  const names = useMemo(
+    () => entries.filter((e) => !isDemoted(e.status)).map((e) => e.player?.full_name || ''),
+    [entries],
   );
-  const layoutEntries = useMemo(() => entries.filter((e) => !isDemoted(e.status)), [entries]);
 
   const { columns, tier } = useMemo(
-    () => resolveLayout(layoutEntries, resolvedTeamInitials, base, containerW),
-    [layoutEntries, resolvedTeamInitials, base, containerW],
+    () => resolveLayout(names, base, containerW),
+    [names, base, containerW],
   );
 
   const template = boardGridTemplate(columns);
@@ -594,9 +523,6 @@ export function BoardTable({
               <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.thru')}</div>
             )}
             <div style={{ ...labelStyle, textAlign: 'right' }}>{t('board.columns.tot')}</div>
-            {columns.showPrize && (
-              <div style={{ ...labelStyle, textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div>
-            )}
           </>
         )}
       </div>
@@ -620,11 +546,9 @@ export function BoardTable({
     const thruDisplay = thruEmpty ? '' : fmtThru(e.thru);
     const roundVals = [e.round_1, e.round_2, e.round_3, e.round_4];
     const pid = e.player?.id;
-    const mov = !demotedRow ? movementMap.get(pid ?? e.team?.id ?? e.id) : undefined;
-    const entity = resolveBoardEntity(e, resolvedTeamInitials, tier);
-    const fullName = entity.lines[0] ?? '';
+    const mov = !demotedRow && pid ? movementMap.get(pid) : undefined;
+    const fullName = e.player?.full_name || t('board.unknownPlayer');
     const nameText = columns.preTournament ? fullName : nameAtTier(fullName, tier);
-    const accessibleName = entity.lines.filter(Boolean).join(' / ');
 
     const open = () => {
       if (onRowClick) return onRowClick(e);
@@ -636,7 +560,7 @@ export function BoardTable({
         key={e.id}
         role="button"
         tabIndex={0}
-        aria-label={accessibleName || undefined}
+        aria-label={fullName}
         onClick={open}
         onKeyDown={(k) => {
           if (k.key === 'Enter' || k.key === ' ') open();
@@ -646,7 +570,7 @@ export function BoardTable({
           gridTemplateColumns: template,
           gap: columns.gap,
           alignItems: 'center',
-          padding: `${entity.kind === 'team' ? 9 : 10}px ${ROW_PAD_X}px`,
+          padding: `10px ${ROW_PAD_X}px`,
           background: isLeader ? LEADER_WASH : surface,
           opacity: demotedRow ? 0.55 : 1,
           cursor: 'pointer',
@@ -655,21 +579,19 @@ export function BoardTable({
       >
         {columns.preTournament ? (
           <>
-            {entity.kind === 'team' ? (
-              <div style={{ minWidth: 0 }}>
-                {entity.lines.map((line, index) => (
-                  <span key={`${e.id}-pre-team-name-${index}`} style={{ display: 'block', fontSize: 12.5, fontWeight: 600, lineHeight: 1.28, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {line}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <div style={{ minWidth: 0 }}>
-                <span style={{ fontSize: PRE_NAME_SIZE, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK, overflowWrap: 'anywhere' }}>
-                  {nameText}
-                </span>
-              </div>
-            )}
+            <div style={{ minWidth: 0 }}>
+              <span
+                style={{
+                  fontSize: PRE_NAME_SIZE,
+                  fontWeight: 700,
+                  letterSpacing: '-0.015em',
+                  color: A.INK,
+                  overflowWrap: 'anywhere',
+                }}
+              >
+                {nameText}
+              </span>
+            </div>
             <div
               style={{
                 textAlign: 'right',
@@ -737,27 +659,21 @@ export function BoardTable({
               {posText}
             </div>
 
-            {entity.kind === 'team' ? (
-              // A team row names two people, not one. The field's longest pair
-              // needs 254px on one line against a 194px name track at 320, so
-              // the pair stacks. Both lines take full INK: neither player is a
-              // supporting credit.
-              <div style={{ minWidth: 0 }}>
-                {entity.lines.map((line, index) => (
-                  <span key={`${e.id}-team-name-${index}`} style={{ display: 'block', fontSize: 12.5, fontWeight: 600, lineHeight: 1.28, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {line}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              /* PLAYER — never ellipsised, never a truncated surname. The tier
-                 was resolved at table level so every row matches. */
-              <div style={{ minWidth: 0 }}>
-                <span style={{ fontSize: NAME_SIZE, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK, whiteSpace: 'nowrap' }}>
-                  {nameText}
-                </span>
-              </div>
-            )}
+            {/* PLAYER — never ellipsised, never a truncated surname. The tier
+                was resolved at table level so every row matches. */}
+            <div style={{ minWidth: 0 }}>
+              <span
+                style={{
+                  fontSize: NAME_SIZE,
+                  fontWeight: 700,
+                  letterSpacing: '-0.015em',
+                  color: A.INK,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {nameText}
+              </span>
+            </div>
 
             {columns.rounds.map((r) => {
               const isLive = columns.liveRound === r;
@@ -815,24 +731,6 @@ export function BoardTable({
             >
               {totalDisplay}
             </div>
-
-            {/* PRIZE — earned nothing is stated with an em dash in the faint
-                slot, never a blank and never a zero. MC/WD/DQ/DNS rows earn
-                nothing, so they dash too. */}
-            {columns.showPrize && (
-              <div
-                style={{
-                  textAlign: 'right',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: e.money != null ? SECONDARY : MUTED,
-                  fontVariantNumeric: 'tabular-nums lining-nums',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {e.money != null ? formatEarnings(e.money) : PRIZE_DASH}
-              </div>
-            )}
           </>
         )}
       </div>
@@ -850,7 +748,7 @@ export function BoardTable({
   demoted.forEach((e) => parts.push(renderRow(e, { demoted: true })));
 
   return (
-    <div ref={rootRef} data-board-name-tier={tier} data-board-show-prize={columns.showPrize ? 'true' : 'false'}>
+    <div ref={rootRef}>
       {renderHeader()}
       {parts}
     </div>

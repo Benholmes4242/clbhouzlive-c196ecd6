@@ -169,7 +169,7 @@
       "nextAria": "[~~Ñéẋţ ţőúřñáɱéñţ~~]",
       "counter": "[~~{{current}} / {{total}}~~]",
       "stateLive": "[LIVE]",
-      "stateFinal": "[~~ŘÉŠÚĻŢŠ~~]",
+      "stateFinal": "[FINAL]",
       "stateUpcoming": "[UPCOMING]",
       "factRound": "[ROUND]",
       "factThru": "[THRU]",
@@ -695,7 +695,6 @@
       "shotsClear": "[~~Šhótš cléár~~]",
       "sharedLead": "[~~{{count}} šháré thé léád~~]",
       "playoff": "[~~Ŵón á ƥláýóff~~]",
-      "finishedLevel": "[~~Fíníšhéd lévél~~]",
       "withToPlay": "[~~Ŵíth {{holes}} tó ƥláý~~]",
       "decidedInPlayoff": "[~~Décídéd ín á ƥláýóff~~]",
       "leader": "[~~Léádér~~]",
@@ -714,10 +713,7 @@
       "sublineLevelManyChaser": "[~~{{a}}, {{b}} and {{count}} others, level at {{score}}, with {{next}} {{gap}} back.~~]",
       "sublineLevelTwoPast": "[~~{{a}} and {{b}} were level at {{score}}.~~]",
       "sublineLevelThreePast": "[~~{{a}}, {{b}} and {{c}} were level at {{score}}.~~]",
-      "sublineLevelManyPast": "[~~{{a}}, {{b}} and {{count}} others were level at {{score}}.~~]",
-      "sublinePlayoffTwo": "[~~{{a}} béát {{b}} áftér bóth fíníšhéd ón {{score}}.~~]",
-      "sublinePlayoffThree": "[~~{{a}} béát {{b}} ánd {{c}} áftér áll thréé fíníšhéd ón {{score}}.~~]",
-      "sublinePlayoffMany": "[~~{{a}} béát {{b}} ánd {{count}} óthérš áftér théý fíníšhéd lévél ón {{score}}.~~]"
+      "sublineLevelManyPast": "[~~{{a}}, {{b}} and {{count}} others were level at {{score}}.~~]"
     },
     "move": {
       "liveEyebrow": "[~~Thé móvé~~]",

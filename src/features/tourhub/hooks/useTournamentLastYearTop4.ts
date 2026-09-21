@@ -9,7 +9,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { fmtScore } from '../utils/fmtScore';
-import { isStrokeEvent } from '../_shared/eventFormat';
 
 export interface LastYearFinisher {
   rank: string;       // "1", "T2" — preserves tie notation
@@ -42,14 +41,11 @@ export function useTournamentLastYearTop4(tournamentId: string | null | undefine
       // 1. Resolve current tournament name + tour + year
       const { data: current, error: currentErr } = await supabase
         .from('sr_tournaments')
-        .select('id, name, start_date, event_type, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, year)')
+        .select('id, name, start_date, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, year)')
         .eq('id', tournamentId)
         .maybeSingle();
 
       if (currentErr || !current) return null;
-
-      // BRIEF_NON_STROKE_GATE_2 §4 — same exposure as useTournamentDefendingChamp.
-      if (!isStrokeEvent((current as any).event_type)) return null;
 
       const currentYear = new Date(current.start_date).getFullYear();
       const tourName = (current as any).season?.tour_name;

@@ -192,8 +192,6 @@ async function fetchScopedTournamentPredictions(
 ): Promise<ActiveTournamentResult> {
   const { data: tournament } = await supabase
     .from('sr_tournaments')
-    // select('*') is LOAD-BEARING: the non-stroke guard reads tournament.event_type
-    // and would fail open, silently, if this became a column list.
     .select('*')
     .eq('id', tournamentId)
     .maybeSingle();
@@ -257,8 +255,6 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
   if (Date.now() < ZURICH_OVERRIDE_UNTIL.getTime()) {
     const { data: rbc } = await supabase
       .from('sr_tournaments')
-      // select('*') is LOAD-BEARING: the non-stroke guard reads tournament.event_type
-      // and would fail open, silently, if this became a column list.
       .select('*')
       .eq('id', RBC_HERITAGE_2026_ID)
       .maybeSingle();
@@ -278,8 +274,6 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
   // may be stored under a different tour/season e.g. EURO)
   const { data: allActiveTournaments } = await supabase
     .from('sr_tournaments')
-    // select('*') is LOAD-BEARING: the non-stroke guard reads tournament.event_type
-    // and would fail open, silently, if this became a column list.
     .select('*')
     .eq('status', 'inprogress')
     .order('purse', { ascending: false })
@@ -303,8 +297,6 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
   const threeDaysAgo = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
   const { data: allCompletedTournaments } = await supabase
     .from('sr_tournaments')
-    // select('*') is LOAD-BEARING: the non-stroke guard reads tournament.event_type
-    // and would fail open, silently, if this became a column list.
     .select('*')
     .in('status', ['closed', 'complete'])
     .gte('end_date', threeDaysAgo)
@@ -331,8 +323,6 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
   const now = new Date().toISOString();
   const { data: nextPgaTournament } = await supabase
     .from('sr_tournaments')
-    // select('*') is LOAD-BEARING: the non-stroke guard reads tournament.event_type
-    // and would fail open, silently, if this became a column list.
     .select('*')
     .eq('season_id', pgaSeasonId)
     .in('status', ['scheduled', 'created'])
@@ -395,8 +385,6 @@ async function fetchNextTournamentPreview(): Promise<NextTournamentResult> {
   const now = new Date().toISOString();
   const { data: nextPgaTournament } = await supabase
     .from('sr_tournaments')
-    // select('*') is LOAD-BEARING: the non-stroke guard reads tournament.event_type
-    // and would fail open, silently, if this became a column list.
     .select('*')
     .eq('season_id', pgaSeasonId)
     .in('status', ['scheduled', 'created'])

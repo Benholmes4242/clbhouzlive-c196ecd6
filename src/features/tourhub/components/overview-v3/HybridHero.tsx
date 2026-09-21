@@ -7,12 +7,9 @@ import type { HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard, type TourTournament } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { PhotoBand, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
-import { deriveHeroState, detectTopTie, fmtScore } from './HybridHero.utils';
+import { deriveHeroState, detectTopTie } from './HybridHero.utils';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
-import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
-import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
-import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from '../../_shared/boardEntity';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -58,23 +55,6 @@ export function formatOverviewDateRange(startDate: string, endDate?: string | nu
   ].join(' – ');
 }
 
-/**
- * CORRECTION 1 (BRIEF_TOUR_OVERVIEW_CHAMPION): score and margin are separate
- * registers. `score` is the bare fmtScore figure (coloured by getScoreColor in
- * ChampionStrip); the wonBy/playoff qualifier travels in `scoreLabel` and
- * renders beneath the score in muted caps. formatOverviewChampionScore's
- * single-string "−17 · by 2" form is withdrawn.
- */
-export function overviewChampionScoreLabel(
-  playoff: boolean,
-  margin: number | null,
-  t: (key: string, options?: { count: number }) => string,
-): string | undefined {
-  if (playoff) return t('overview.hero.playoff');
-  if (margin != null) return t('overview.hero.wonBy', { count: margin });
-  return undefined;
-}
-
 export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
   const { tournament } = slide;
   const { t } = useTranslation('tourhub');
@@ -106,51 +86,28 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
     ? rows.filter((entry) => entry.position === 1).length
     : 0;
   const tied = tiedCount > 1 ? { count: tiedCount } : null;
-  const needsInitials = useMemo(() => teamNamesNeedInitials(rows), [rows]);
 
   const leader = state.kind === 'live' && topPosition === 1 && top?.score != null
     ? {
         score: top.score,
         name: tied
           ? t('overview.leaderRow.tiedAtTop', { count: tied.count })
-          : top.team
-            ? resolveBoardEntity(top, needsInitials).prose || null
-            : top.player?.full_name?.trim().split(/\s+/).slice(-1)[0] ?? null,
+          : top.player?.full_name?.trim().split(/\s+/).slice(-1)[0] ?? null,
       }
     : null;
 
   const champion = useMemo(() => {
-    if (state.kind !== 'results' || top?.score == null) return null;
-    const championEntry = !tournament.winnerName
-      // event_type comes from sr_tournaments via the slide — never inferred
-      // from the shape of the top board row.
-      ? resolveChampionEntry(rows, { winner_id: tournament.winnerId, event_type: tournament.eventType })
-      : null;
-    const teamChampion = championEntry ? resolveBoardEntity(championEntry, needsInitials) : null;
-    const championName = tournament.winnerName ?? teamChampion?.prose ?? null;
-    if (!championName) return null;
-    const championScore = championEntry?.score ?? top.score;
-    const runner = rows
-      .filter((row) => row.id !== championEntry?.id && row.score != null && row.score > championScore)
-      .sort((a, b) => (a.score ?? Number.POSITIVE_INFINITY) - (b.score ?? Number.POSITIVE_INFINITY))[0]
-      ?? rows.find((row) => row.id !== championEntry?.id && row.score != null);
-    const margin = runner?.score != null ? runner.score - championScore : null;
+    if (state.kind !== 'results' || !tournament.winnerName || top?.score == null) return null;
+    const runner = rows[1];
+    const margin = runner?.score != null ? runner.score - top.score : null;
     const tiedAtTop = detectTopTie(rows);
     return {
-      name: championName,
-      score: championScore,
+      name: tournament.winnerName,
+      score: top.score,
       margin: tiedAtTop ? null : margin != null && margin > 0 ? margin : null,
       playoff: Boolean(tiedAtTop),
     };
-  }, [needsInitials, rows, state.kind, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName]);
-
-  const championAvatarUrl = champion
-    ? resolvePlayerAvatarCandidates({
-        name: champion.name,
-        photoUrl: tournament.winnerPhotoUrl,
-        tourSlug: tournament.tourSlug,
-      })[0] ?? null
-    : null;
+  }, [rows, state.kind, top?.score, tournament.winnerName]);
 
   const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
 
@@ -159,31 +116,20 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
     : null;
 
   return (
-    <>
-      <PhotoBand
-        title={tournament.name}
-        venueName={tournament.venueName}
-        datesString={dates}
-        venueImageUrl={venueImageUrl}
-        state={state}
-        tourLabel={tournament.tourName || tournament.tourSlug?.toUpperCase() || null}
-        leader={leader}
-        countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []}
-        startDay={startDay}
-        heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
-        onOpen={onOpenTournament}
-      />
-      {state.kind === 'results' && champion ? (
-        <ChampionStrip
-          name={champion.name}
-          score={fmtScore(champion.score)}
-          scoreValue={champion.score}
-          scoreLabel={overviewChampionScoreLabel(champion.playoff, champion.margin, t)}
-          eyebrow={t('overview.hero.champion')}
-          avatarUrl={championAvatarUrl}
-        />
-      ) : null}
-    </>
+    <PhotoBand
+      title={tournament.name}
+      venueName={tournament.venueName}
+      datesString={dates}
+      venueImageUrl={venueImageUrl}
+      state={state}
+      tourLabel={tournament.tourName || tournament.tourSlug?.toUpperCase() || null}
+      leader={leader}
+      countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []}
+      startDay={startDay}
+      champion={champion}
+      heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
+      onOpen={onOpenTournament}
+    />
   );
 }
 

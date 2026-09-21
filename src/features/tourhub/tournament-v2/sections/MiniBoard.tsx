@@ -3,12 +3,12 @@
  * Grammar: POS | PLAYER + flag | THRU | TODAY | TOT
  * Row tap opens ScorecardSheet.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
+import { todayFromEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
@@ -19,9 +19,22 @@ import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
 import { formatEarnings } from '../../_shared/formatEarnings';
-import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../../_shared/boardEntity';
 
-type Row = BoardEntry;
+interface Row {
+  id: string;
+  position: number | null;
+  position_tied?: boolean | null;
+  score: number | null;
+  today?: number | null;
+  thru?: number | null;
+  status?: string | null;
+  round_1?: number | null;
+  round_2?: number | null;
+  round_3?: number | null;
+  round_4?: number | null;
+  money?: number | null;
+  player?: { id?: string; full_name?: string; country?: string | null; country_code?: string | null } | null;
+}
 
 interface Props {
   tournamentId: string;
@@ -81,24 +94,6 @@ const THEME_TOKENS = {
  * a tabular column and reads as data the field does not have.
  */
 const BLANK = '';
-/**
- * THE PRIZE RULE — a property of the TOURNAMENT, never of the visible slice.
- * Render the PRIZE column when ANY row has a money value; hide it, header
- * included, when none do. Because the condition reads the whole field, the
- * column is STABLE: expanding, sorting or scrolling the board never flips it.
- *
- * Within a rendered column a row with no money shows an em dash — never a
- * blank, never a zero. A missed cut, a withdrawal, a DQ and a non-starter
- * earn nothing, and a dash is how every leaderboard in the sport states that.
- *
- * Two completed events on the same tour in the same season can legitimately
- * differ here (measured: ~40% of events have no prize data at all). That is
- * the data, not a UI inconsistency — do not "fix" it per event.
- */
-export function shouldShowPrize(entries: Array<{ money?: number | null }>): boolean {
-  return entries.some((row) => row.money != null);
-}
-
 function thruLabel(row: Row, today: number | null): string {
   const s = row.status?.toUpperCase();
   if (s === 'MC' || s === 'CUT') return 'MC';
@@ -114,9 +109,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
-  const needsInitials = useMemo(() => teamNamesNeedInitials(entries), [entries]);
-  const nameTrackRef = useRef<HTMLDivElement>(null);
-  const [nameTrackWidth, setNameTrackWidth] = useState(0);
   const T = THEME_TOKENS[theme];
   /** getScoreColor knows two ramps only; both dark grounds take the dark ramp. */
   const scoreTheme = theme === 'light' ? 'light' : 'dark';
@@ -124,53 +116,15 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   // the previous round). The light board keeps its blank-cell doctrine.
   const todayBlank = theme === 'light' ? BLANK : '\u2014';
   const showOverviewPosition = rows.some((row) => row.position != null || ['MC', 'CUT', 'WD'].includes(row.status?.toUpperCase() ?? ''));
-  // PRIZE is decided over the WHOLE FIELD (entries), not the rendered slice,
-  // so the column cannot appear or vanish as the board is expanded or scrolled.
-  const showPrize = shouldShowPrize(entries);
-  const showOverviewPrize = phase === 'completed' && showPrize;
   // The live hero board carries TODAY, not THRU: the current round is the story
   // and the swap is what keeps the name column wide enough for real names.
   // Gate shape matches the old THRU gate: render only when a visible row has one.
   const showOverviewToday = phase === 'live' && rows.some((row) => todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound) != null);
   const overviewGrid = phase === 'completed'
-    ? [showOverviewPosition ? '44px' : null, 'minmax(0, 1fr)', '52px', showOverviewPrize ? '52px' : null].filter(Boolean).join(' ')
+    ? [showOverviewPosition ? '44px' : null, 'minmax(0, 1fr)', '52px', '52px'].filter(Boolean).join(' ')
     : [showOverviewPosition ? '44px' : null, 'minmax(0, 1fr)', showOverviewToday ? '40px' : null, '52px'].filter(Boolean).join(' ');
 
-  useEffect(() => {
-    const element = nameTrackRef.current;
-    if (!element) return;
-    const measure = () => setNameTrackWidth(element.getBoundingClientRect().width);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [theme, showPrize, overviewGrid]);
-
-  const nameTier = useMemo<BoardNameTier>(() => {
-    const teamRows = entries.filter((entry) => entry.team);
-    if (teamRows.length === 0 || nameTrackWidth <= 0 || typeof document === 'undefined') return needsInitials ? 'short' : 'surname';
-    const context = document.createElement('canvas').getContext('2d');
-    if (!context) return needsInitials ? 'short' : 'surname';
-    context.font = `600 12.5px ${FONT}`;
-    const tiers: BoardNameTier[] = needsInitials ? ['full', 'short'] : ['full', 'short', 'surname'];
-    return tiers.find((candidate) => teamRows.every((entry) => resolveBoardEntity(entry, needsInitials, candidate).lines.every((line) => context.measureText(line).width <= nameTrackWidth))) ?? tiers[tiers.length - 1];
-  }, [entries, nameTrackWidth, needsInitials]);
-
   const overviewName = (fullName: string | undefined): string => fullName?.trim() || BLANK;
-
-  const renderEntityName = (entity: ReturnType<typeof resolveBoardEntity>, ink: string) => entity.kind === 'team' ? (
-    // A team row names two people, not one. Both lines take full ink because
-    // neither player is a supporting credit.
-    <div style={{ minWidth: 0 }}>
-      {entity.lines.map((line, index) => (
-        <span key={`${line}-${index}`} style={{ display: 'block', fontSize: 12.5, fontWeight: 600, lineHeight: 1.28, color: ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {line}
-        </span>
-      ))}
-    </div>
-  ) : (
-    <span style={{ minWidth: 0, whiteSpace: 'normal', lineHeight: 1.15, fontSize: 13, fontWeight: 600, color: ink }}>{overviewName(entity.lines[0])}</span>
-  );
 
   if (theme === 'heroBoard') {
     return (
@@ -178,13 +132,12 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
         <div style={{ background: T.surface, fontFamily: FONT }}>
           <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', minHeight: 32, padding: '4px 24px', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
-            <div ref={nameTrackRef}>{t('board.columns.player')}</div>
+            <div>{t('board.columns.player')}</div>
             {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right' }}>{t('board.columns.today')}</div> : null}
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
-            {showOverviewPrize ? <div style={{ textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div> : null}
+            {phase === 'completed' ? <div style={{ textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div> : null}
           </div>
           {rows.map((r) => {
-            const entity = resolveBoardEntity(r, needsInitials, nameTier);
             const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
               : r.status === 'WD' ? 'WD'
               : r.position == null ? BLANK
@@ -194,21 +147,21 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               <button
                 key={r.id}
                 type="button"
-                onClick={() => { if (!r.player?.id) return; onRowTap?.(r.player.id); setTarget({
-                  playerId: r.player.id, playerName: entity.lines[0] ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
+                onClick={() => { onRowTap?.(r.player?.id ?? ''); setTarget({
+                  playerId: r.player?.id ?? '', playerName: r.player?.full_name ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
                   position: r.position ?? null, positionTied: r.position_tied ?? null, total: r.score ?? null, today, thru: r.thru ?? null, status: r.status ?? null,
                 }); }}
-                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', width: '100%', minHeight: 44, padding: `${entity.kind === 'team' ? 9 : 8}px 24px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
+                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', width: '100%', minHeight: 44, padding: '8px 24px', border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
                 className={`${T.press} transition-colors`}
               >
                 {showOverviewPosition ? <div style={{ fontSize: 12, fontWeight: 700, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{posText}</div> : null}
                 <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  {renderEntityName(entity, T.ink)}
+                  <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 600 }}>{overviewName(r.player?.full_name)}</span>
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
                 {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{today == null ? todayBlank : fmtScore(today)}</div> : null}
                 <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
-                {showOverviewPrize ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: r.money != null ? T.mute : T.faint, fontVariantNumeric: 'tabular-nums' }}>{r.money != null ? formatEarnings(r.money) : '—'}</div> : null}
+                {phase === 'completed' ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{r.money != null && r.money > 0 ? formatEarnings(r.money) : BLANK}</div> : null}
               </button>
             );
           })}
@@ -222,7 +175,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
 
   return (
     <>
-        <div style={{ background: T.surface, fontFamily: FONT }} data-board-name-tier={nameTier}>
+      <div style={{ background: T.surface, fontFamily: FONT }}>
         <div
           style={{
             display: 'flex', alignItems: 'center',
@@ -234,16 +187,13 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
           }}
         >
           <div style={{ width: 34, flexShrink: 0 }}>{t('board.columns.pos')}</div>
-          <div ref={nameTrackRef} style={{ flex: 1, minWidth: 0 }}>{t('board.columns.player')}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>{t('board.columns.player')}</div>
           <div style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.thru')}</div>
           <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.today')}</div>
           <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.tot')}</div>
-          {showPrize ? <div style={{ width: 52, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.prize', 'Prize')}</div> : null}
-
 
         </div>
         {rows.map((r) => {
-          const entity = resolveBoardEntity(r, needsInitials, nameTier);
           const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
             : r.status === 'WD' ? 'WD'
             : r.position == null ? BLANK
@@ -255,9 +205,9 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             <button
               key={r.id}
               type="button"
-              onClick={() => { if (!r.player?.id) return; onRowTap?.(r.player.id); setTarget({
-                playerId: r.player.id,
-                playerName: entity.lines[0] ?? '',
+              onClick={() => { onRowTap?.(r.player?.id ?? ''); setTarget({
+                playerId: r.player?.id ?? '',
+                playerName: r.player?.full_name ?? '',
                 countryCode: cc,
                 position: r.position ?? null,
                 positionTied: r.position_tied ?? null,
@@ -268,7 +218,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               }); }}
               style={{
                 display: 'flex', alignItems: 'center', width: '100%',
-                padding: `${entity.kind === 'team' ? 9 : 10}px 16px`,
+                padding: '10px 16px',
                 borderBottom: `0.5px solid ${T.hairline}`,
                 background: r.position === 1 ? 'rgba(251,188,46,0.05)' : 'transparent', border: 'none',
                 borderLeft: 'none', borderRight: 'none', borderTop: 'none',
@@ -281,11 +231,9 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               </div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 8 }}>
                 {cc ? <CountryFlag country={cc} size="sm" /> : null}
-                {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
-                  <span style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: T.ink, whiteSpace: 'normal' }}>
-                    {entity.lines[0] ?? ''}
-                  </span>
-                )}
+                <span style={{ fontSize: 13, fontWeight: 700, color: T.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {r.player?.full_name ?? BLANK}
+                </span>
                 {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) && (
                   <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />
                 )}
@@ -299,14 +247,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {r.score == null ? BLANK : fmtScore(r.score)}
               </div>
-              {/* No money earned is a VALUE: an em dash in the faint slot, never
-                  a blank, never a zero. Column presence is a tournament-level
-                  decision (showPrize) so it cannot flicker per row. */}
-              {showPrize ? (
-                <div style={{ width: 52, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: r.money != null ? T.mute : T.faint, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                  {r.money != null ? formatEarnings(r.money) : '—'}
-                </div>
-              ) : null}
             </button>
           );
         })}

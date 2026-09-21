@@ -1254,19 +1254,11 @@
       "9": "neunte"
     },
     "ownerFirst": "Dein erstes {{feat}}. Nach {{rounds}} Runden.",
-    "ownerFirstCongrats": "Glückwunsch, {{name}} — {{line}}",
-    "ownerRareThree": "Erst das dritte clbhouz-Mitglied, das dies erreicht hat.",
-    "ownerRareThreeCongrats": "Glückwunsch, {{name}} — {{line}}",
-    "ownerRareTwo": "Erst das zweite clbhouz-Mitglied, das dies erreicht hat.",
-    "ownerRareTwoCongrats": "Glückwunsch, {{name}} — {{line}}",
+    "ownerRareThree": "Eines der ersten drei Mitglieder, dem das gelang.",
+    "ownerRareTwo": "Eines der ersten zwei Mitglieder, dem das gelang.",
     "ownerRepeat": "Dein {{ord}} {{feat}}. Das erste seit {{when}}.",
-    "ownerRepeatCongrats": "Glückwunsch, {{name}} — {{line}}",
-    "ownerSole": "Das erste clbhouz-Mitglied überhaupt, das dies erreicht hat.",
-    "ownerSoleCongrats": "Glückwunsch, {{name}} — {{line}}",
-    "viewer": "Das {{ord}} {{feat}} in {{rounds}} Runden.",
-    "viewerRareThree": "Erst das dritte clbhouz-Mitglied, das dies erreicht hat.",
-    "viewerRareTwo": "Erst das zweite clbhouz-Mitglied, das dies erreicht hat.",
-    "viewerSole": "Das erste clbhouz-Mitglied überhaupt, das dies erreicht hat."
+    "ownerSole": "Das erste Mitglied überhaupt, dem das gelang.",
+    "viewer": "Das {{ord}} {{feat}} in {{rounds}} Runden."
   },
   "friends": {
     "signIn": "Sign in",

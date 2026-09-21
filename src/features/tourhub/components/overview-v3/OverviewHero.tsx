@@ -26,8 +26,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HybridHero } from './HybridHero';
 import { PHOTO_BAND_HEIGHT, OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { useTourSelection } from '../../context/TourSelectionContext';
-import { OVERVIEW_HERO_LOADING_BG } from '../../_shared/tokens';
-import { resolveChampionEntry } from '../../_shared/boardEntity';
+import { INK_TINT_06 } from '../../_shared/tokens';
 
 const NOOP = () => {};
 
@@ -44,7 +43,7 @@ export const OVERVIEW_HERO_HEIGHT = `${PHOTO_BAND_HEIGHT}px`;
 /** Wire-ticker band height (kept in sync with HeroWireTicker). */
 export const OVERVIEW_HERO_TOTAL_HEIGHT = `${OVERVIEW_PHOTO_BAND_HEIGHT}px`;
 
-export function OverviewHero({ height }: OverviewHeroProps) {
+export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
@@ -204,7 +203,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         style={{
           height,
           borderRadius: 20,
-          background: OVERVIEW_HERO_LOADING_BG,
+          background: `linear-gradient(135deg, ${INK_TINT_06}, rgba(15,23,42,0.02))`,
         }}
         aria-busy={isLoading}
       />
@@ -212,21 +211,6 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   }
 
   const active = slides[Math.min(activeIndex, count - 1)];
-  const activeChampionEntry = active.type === 'completed' && !active.tournament.winnerName
-    ? resolveChampionEntry(boardEntries as any[], {
-        winner_id: active.tournament.winnerId,
-        // sr_tournaments.event_type, carried on the slide — never inferred from rows.
-        event_type: active.tournament.eventType,
-      })
-    : null;
-  const activeChampionMemberIds = activeChampionEntry?.team?.members
-    ?.map((member: any) => member.player?.id)
-    .filter((id: unknown): id is string => typeof id === 'string' && id.length > 0) ?? [];
-  // A wrapped champion name may grow beyond STRIP_HEIGHT, so the completed
-  // frame follows its content rather than clipping against a guessed height.
-  const activeHeroHeight = height ?? (active.type === 'completed' && (active.tournament.winnerName || activeChampionEntry)
-    ? 'auto'
-    : OVERVIEW_HERO_TOTAL_HEIGHT);
 
   // Chevron UI removed per micro-brief; swipe is the sole gesture and
   // goPrev/goNext are retained for keyboard/a11y and COMMAND-jump paths.
@@ -238,7 +222,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   return (
     <>
     <div
-      style={{ position: 'relative', width: '100%', height: activeHeroHeight }}
+      style={{ position: 'relative', width: '100%', height }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -251,7 +235,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          style={{ height: activeHeroHeight === 'auto' ? 'auto' : '100%' }}
+          style={{ height: '100%' }}
         >
           <HybridHero
             slide={active}
@@ -289,14 +273,6 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             entries={boardEntries}
             currentRound={boardRound}
             phase={bandPhase}
-            /* The SAME champion the strip crowns: only passed once the winner
-               gate has resolved a name, so a pending playoff marks nobody. */
-            championSrId={
-              activeSlide?.type === 'completed' && activeSlide.tournament.winnerName
-                ? activeSlide.tournament.winnerId
-                : null
-            }
-            championPlayerIds={activeSlide?.type === 'completed' ? activeChampionMemberIds : []}
             onFullLeaderboard={() => {
               const target = tournamentRoute(bandTournamentId, { kind: 'overview' });
               navigate(target.to, { state: target.state });

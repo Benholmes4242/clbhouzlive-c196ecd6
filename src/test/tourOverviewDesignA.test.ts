@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { resolveChampionPlayerId, pickWonTournament } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
-import { render } from '@testing-library/react';
-import { createElement } from 'react';
-import { MemoryRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { formatOverviewDateRange, getOverviewCountdown, overviewChampionScoreLabel } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
-import { MiniBoard, shouldShowPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, shouldShowAlsoThisWeekFigures, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
@@ -89,13 +83,6 @@ describe('Tour Overview Design A hero facts', () => {
     expect(detectTopTie([{ score: -18 }, { score: -18 }, { score: -17 }])).toEqual({ count: 2, score: '−18' });
   });
 
-  it('keeps the wonBy/playoff qualifier in the separate scoreLabel register', () => {
-    const t = (key: string, options?: { count: number }) => key.endsWith('playoff') ? 'playoff' : `by ${options?.count}`;
-    expect(overviewChampionScoreLabel(false, 2, t)).toBe('by 2');
-    expect(overviewChampionScoreLabel(true, null, t)).toBe('playoff');
-    expect(overviewChampionScoreLabel(false, null, t)).toBeUndefined();
-  });
-
   it('does not invent a tie when the rest of the field merely shares the leader score', () => {
     const rows = [{ position: 1, score: 0 }, { position: 132, score: 0 }];
     expect(rows.filter((row) => row.position === 1)).toHaveLength(1);
@@ -132,56 +119,6 @@ describe('Tour Overview correctness gates', () => {
     expect(shouldShowOverviewBoard([{ position: null, score: 0 }, { position: null, score: 0 }])).toBe(false);
     expect(shouldShowOverviewBoard([{ position: 1, score: 0 }])).toBe(true);
     expect(shouldShowOverviewBoard([{ position: null, score: -1 }])).toBe(true);
-  });
-
-  it('shows prize when ANY row in the tournament has money, whatever the slice', () => {
-    const row = (id: string, money: number | null) => ({ id, position: 1, score: -10, money });
-    const paid = Array.from({ length: 6 }, (_, index) => row(String(index), 1_000 + index));
-    expect(shouldShowPrize(paid)).toBe(true);
-    // A hole inside the slice no longer kills the column — the rule is the
-    // tournament, not the visible rows.
-    expect(shouldShowPrize([row('paid', 1_000), row('missing', null)])).toBe(true);
-    // A hole beyond the slice is irrelevant either way.
-    expect(shouldShowPrize([...paid.slice(0, 5), row('outside-slice', null)])).toBe(true);
-    expect(shouldShowPrize([row('a', null), row('b', null)])).toBe(false);
-    expect(shouldShowPrize([])).toBe(false);
-  });
-
-  it('renders a stable prize column with em dashes, and reclaims its width when the event has no money', () => {
-    const row = (id: string, money: number | null) => ({
-      id, position: Number(id), score: -10, money,
-      player: { id: `player-${id}`, full_name: `Player ${id}` },
-    });
-    const board = (entries: ReturnType<typeof row>[]) => createElement(
-      QueryClientProvider,
-      { client: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
-      createElement(
-        MemoryRouter,
-        null,
-        createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, phase: 'completed', theme: 'heroBoard' }),
-      ),
-    );
-    const paid = render(board([row('1', 2_500_000), row('2', 1_000)]));
-    const paidHeader = paid.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(paidHeader?.textContent).toContain('Prize');
-    expect(paidHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px 52px');
-    expect(paid.container.textContent).toContain('$2.5M');
-    expect(paid.container.textContent).toContain('$1K');
-    paid.unmount();
-
-    // Partial coverage: the column STAYS, and the unpaid row states an em dash.
-    const partial = render(board([row('1', 2_500_000), row('2', null)]));
-    const partialHeader = partial.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(partialHeader?.textContent).toContain('Prize');
-    expect(partialHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px 52px');
-    expect(partial.container.textContent).toContain('\u2014');
-    partial.unmount();
-
-    // No money anywhere in the field: no column, header included.
-    const unpaid = render(board([row('1', null), row('2', null)]));
-    const unpaidHeader = unpaid.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(unpaidHeader?.textContent).not.toContain('Prize');
-    expect(unpaidHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px');
   });
 
   it('keeps Also This Week inside the coming Sunday', () => {
@@ -281,31 +218,5 @@ describe('story elapsed-time labels', () => {
     const feedStory = story('15-sep', '2026-09-15T13:15:00Z', null);
     expect(storyTime(feedStory.published_at, feedNow)).toBe('2 DAYS AGO');
     expect(selectOverviewBandStory([feedStory], 'unmatched-hero', feedNow)?.id).toBe('15-sep');
-  });
-});
-
-// CORRECTION 3 — the trophy marks the CHAMPION, not position 1 and not "T1".
-describe('our picks trophy', () => {
-  const entries = [
-    { player: { id: 'zj-uuid', sr_id: 'zj-sr' }, position: 1, position_tied: true, score: -12 },
-    { player: { id: 'rs-uuid', sr_id: 'rs-sr' }, position: 1, position_tied: true, score: -12 },
-    { player: { id: 'ra-uuid', sr_id: 'ra-sr' }, position: 3, position_tied: true, score: -10 },
-  ];
-
-  it('resolves the champion by sr_id on a completed event only', () => {
-    expect(resolveChampionPlayerId(entries, 'zj-sr', 'completed')).toBe('zj-uuid');
-    expect(resolveChampionPlayerId(entries, 'zj-sr', 'live')).toBeNull();
-    expect(resolveChampionPlayerId(entries, 'zj-sr', 'upcoming')).toBeNull();
-    expect(resolveChampionPlayerId(entries, null, 'completed')).toBeNull();
-    expect(resolveChampionPlayerId(entries, 'nobody-sr', 'completed')).toBeNull();
-  });
-
-  it('gives the trophy to the playoff winner and not to the T1 loser', () => {
-    const champion = resolveChampionPlayerId(entries, 'zj-sr', 'completed');
-    expect(pickWonTournament('zj-uuid', champion)).toBe(true);
-    expect(pickWonTournament('rs-uuid', champion)).toBe(false);
-    expect(pickWonTournament('ra-uuid', champion)).toBe(false);
-    expect(pickWonTournament('zj-uuid', null)).toBe(false);
-    expect(pickWonTournament(null, champion)).toBe(false);
   });
 });

@@ -173,7 +173,7 @@
       "nextAria": "Next tournament",
       "counter": "{{current}} / {{total}}",
       "stateLive": "LIVE",
-      "stateFinal": "ERGEBNISSE",
+      "stateFinal": "ENDSTAND",
       "stateUpcoming": "BEVORSTEHEND",
       "factRound": "RUNDE",
       "factThru": "BIS",
@@ -697,7 +697,6 @@
       "shotsClear": "Schläge voraus",
       "sharedLead": "{{count}} teilen die Führung",
       "playoff": "Sieg im Stechen",
-      "finishedLevel": "Gleichauf beendet",
       "withToPlay": "Noch {{holes}} Löcher",
       "decidedInPlayoff": "Im Stechen entschieden",
       "leader": "Führung",
@@ -716,10 +715,7 @@
       "sublineLevelManyChaser": "{{a}}, {{b}} und {{count}} weitere, gleichauf bei {{score}}, {{next}} liegt {{gap}} zurück.",
       "sublineLevelTwoPast": "{{a}} und {{b}} lagen gleichauf bei {{score}}.",
       "sublineLevelThreePast": "{{a}}, {{b}} und {{c}} lagen gleichauf bei {{score}}.",
-      "sublineLevelManyPast": "{{a}}, {{b}} und {{count}} weitere lagen gleichauf bei {{score}}.",
-      "sublinePlayoffTwo": "{{a}} besiegte {{b}}, nachdem beide mit {{score}} abgeschlossen hatten.",
-      "sublinePlayoffThree": "{{a}} besiegte {{b}} und {{c}}, nachdem alle drei mit {{score}} abgeschlossen hatten.",
-      "sublinePlayoffMany": "{{a}} besiegte {{b}} und {{count}} weitere, nachdem sie mit {{score}} gleichauf abgeschlossen hatten."
+      "sublineLevelManyPast": "{{a}}, {{b}} und {{count}} weitere lagen gleichauf bei {{score}}."
     },
     "move": {
       "liveEyebrow": "Der Lauf",

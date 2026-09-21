@@ -4,12 +4,12 @@ import { heroCanonBackground } from '../../../_shared/heroGradient';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import {
   AMBER,
-  CAPS_10,
   FONT,
-  HERO_VENUE_INK,
   INK,
   INK_MUTE,
+  LEADER_GOLD,
   STATUS_LIVE_ON_DARK,
+  SURFACE,
 } from '../../../_shared/tokens';
 import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
 import { fmtScore, type HeroState } from '../HybridHero.utils';
@@ -30,9 +30,18 @@ interface PhotoBandProps {
   leader: { score: number; name: string | null } | null;
   countdown: OverviewCountdownUnit[];
   startDay: string | null;
+  champion: { name: string; score: number; margin: number | null; playoff: boolean } | null;
   heightPx?: number;
   onOpen: () => void;
 }
+
+const CAPS: React.CSSProperties = {
+  fontFamily: FONT,
+  fontSize: 10,
+  fontWeight: 800,
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase',
+};
 
 export function PhotoBand({
   title,
@@ -44,6 +53,7 @@ export function PhotoBand({
   leader,
   countdown,
   startDay,
+  champion,
   heightPx = OVERVIEW_PHOTO_BAND_HEIGHT,
   onOpen,
 }: PhotoBandProps) {
@@ -105,14 +115,14 @@ export function PhotoBand({
               padding: '0 10px',
               borderRadius: 999,
               ...DARK_CHROME_GLASS_MATERIAL,
-              ...CAPS_10,
+              ...CAPS,
             }}
           >
             {isLive ? <span style={{ width: 7, height: 7, borderRadius: 999, background: STATUS_LIVE_ON_DARK }} /> : null}
             <span>{stateLabel}</span>
             {isLive ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {state.round}</span> : null}
           </div>
-          {tourLabel ? <div style={{ ...CAPS_10, color: INK_MUTE, letterSpacing: '0.14em' }}>{tourLabel}</div> : null}
+          {tourLabel ? <div style={{ ...CAPS, color: INK_MUTE, letterSpacing: '0.14em' }}>{tourLabel}</div> : null}
           <h1
             style={{
               margin: '4px 0 0',
@@ -123,14 +133,14 @@ export function PhotoBand({
               color: INK,
               display: '-webkit-box',
               WebkitBoxOrient: 'vertical',
-              WebkitLineClamp: 3,
+              WebkitLineClamp: 2,
               overflow: 'hidden',
             }}
           >
             {title}
           </h1>
           {venueLine ? (
-            <div style={{ marginTop: 5, fontSize: 13, color: HERO_VENUE_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ marginTop: 5, fontSize: 13, color: 'rgba(248,250,252,0.82)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {venueLine}
             </div>
           ) : null}
@@ -148,9 +158,20 @@ export function PhotoBand({
             {countdown.map((unit) => (
               <div key={unit.label} style={{ minWidth: 50, padding: '8px 10px', borderRadius: 12, textAlign: 'center', ...DARK_CHROME_GLASS_MATERIAL }}>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 24, lineHeight: 1, fontWeight: 700 }}>{unit.value}</div>
-                <div style={{ ...CAPS_10, marginTop: 5, fontSize: 9 }}>{t(`overview.hero.${unit.label}`)}</div>
+                <div style={{ ...CAPS, marginTop: 5, fontSize: 9 }}>{t(`overview.hero.${unit.label}`)}</div>
               </div>
             ))}
+          </div>
+        ) : null}
+
+        {state.kind === 'results' && champion ? (
+          <div style={{ flex: 'none', maxWidth: 122, textAlign: 'right' }}>
+            <div style={{ ...CAPS, color: LEADER_GOLD, letterSpacing: '0.14em' }}>{t('overview.hero.champion')}</div>
+            <div style={{ marginTop: 3, fontSize: 17, lineHeight: 1.1, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{champion.name}</div>
+            <div style={{ ...NUMERIC_STYLE, marginTop: 4, fontSize: 13, fontWeight: 700, color: getScoreColor(champion.score, 'dark') }}>
+              {fmtScore(champion.score)}
+              {champion.playoff ? ` · ${t('overview.hero.playoff')}` : champion.margin != null ? ` · ${t('overview.hero.wonBy', { count: champion.margin })}` : ''}
+            </div>
           </div>
         ) : null}
       </div>

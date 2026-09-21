@@ -776,7 +776,6 @@ export function ExploreCard({
           coursePar={item.facts.course_par ?? null}
           net={item.facts.net != null && item.facts.course_handicap != null ? item.facts.net : null}
           locale={locale}
-          ownerDisplayName={item.who?.display_name ?? null}
         />
       ) : null}
       {!onPhoto ? (

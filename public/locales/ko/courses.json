@@ -1216,19 +1216,11 @@
       "9": "9"
     },
     "ownerFirst": "첫 {{feat}}. {{rounds}}라운드 만에.",
-    "ownerFirstCongrats": "{{line}} — {{name}}님, 축하합니다",
-    "ownerRareThree": "이를 달성한 clbhouz의 세 번째 멤버입니다.",
-    "ownerRareThreeCongrats": "{{line}} — {{name}}님, 축하합니다",
-    "ownerRareTwo": "이를 달성한 clbhouz의 두 번째 멤버입니다.",
-    "ownerRareTwoCongrats": "{{line}} — {{name}}님, 축하합니다",
+    "ownerRareThree": "이것을 달성한 첫 세 멤버 중 한 명입니다.",
+    "ownerRareTwo": "이것을 달성한 첫 두 멤버 중 한 명입니다.",
     "ownerRepeat": "당신의 {{ord}}번째 {{feat}}. {{when}} 이후 처음.",
-    "ownerRepeatCongrats": "{{line}} — {{name}}님, 축하합니다",
-    "ownerSole": "이를 달성한 clbhouz 최초의 멤버입니다.",
-    "ownerSoleCongrats": "{{line}} — {{name}}님, 축하합니다",
-    "viewer": "{{rounds}}라운드 중 {{ord}}번째 {{feat}}.",
-    "viewerRareThree": "이를 달성한 clbhouz의 세 번째 멤버입니다.",
-    "viewerRareTwo": "이를 달성한 clbhouz의 두 번째 멤버입니다.",
-    "viewerSole": "이를 달성한 clbhouz 최초의 멤버입니다."
+    "ownerSole": "이것을 달성한 최초의 멤버입니다.",
+    "viewer": "{{rounds}}라운드 중 {{ord}}번째 {{feat}}."
   },
   "friends": {
     "signIn": "Sign in",

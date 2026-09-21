@@ -7,7 +7,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { isStrokeEvent } from '../_shared/eventFormat';
 
 // ============= Types =============
 
@@ -616,7 +615,6 @@ export function useTournamentPredictions(tournamentId?: string) {
           venue_par,
           venue_yardage,
           raw_data,
-          event_type,
           season:sr_seasons!inner(tour_name, year)
         `)
         .eq('status', 'scheduled')
@@ -635,13 +633,6 @@ export function useTournamentPredictions(tournamentId?: string) {
       }
       
       const tournament = tournaments[0];
-
-      // BRIEF_NON_STROKE_GATE_2 §4 — this hook predicts a winner from to-par
-      // scoring. A cup's score column holds match points (higher wins) and match
-      // play carries no score at all, so neither can be predicted here.
-      if (!isStrokeEvent((tournament as any).event_type)) {
-        return null;
-      }
       const rawData = tournament.raw_data as Record<string, unknown> | null;
       const courseData = (rawData?.venue as Record<string, unknown>)?.courses as Array<Record<string, unknown>> | undefined;
       const firstCourse = courseData?.[0] || {};
