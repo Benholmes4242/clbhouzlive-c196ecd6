@@ -94,9 +94,22 @@ const THEME_TOKENS = {
  * a tabular column and reads as data the field does not have.
  */
 const BLANK = '';
-export function shouldShowOverviewPrize(entries: Row[], limit = 5): boolean {
-  const displayedRows = entries.slice(0, limit);
-  return displayedRows.length > 0 && displayedRows.every((row) => row.money != null);
+/**
+ * THE PRIZE RULE — a property of the TOURNAMENT, never of the visible slice.
+ * Render the PRIZE column when ANY row has a money value; hide it, header
+ * included, when none do. Because the condition reads the whole field, the
+ * column is STABLE: expanding, sorting or scrolling the board never flips it.
+ *
+ * Within a rendered column a row with no money shows an em dash — never a
+ * blank, never a zero. A missed cut, a withdrawal, a DQ and a non-starter
+ * earn nothing, and a dash is how every leaderboard in the sport states that.
+ *
+ * Two completed events on the same tour in the same season can legitimately
+ * differ here (measured: ~40% of events have no prize data at all). That is
+ * the data, not a UI inconsistency — do not "fix" it per event.
+ */
+export function shouldShowPrize(entries: Array<{ money?: number | null }>): boolean {
+  return entries.some((row) => row.money != null);
 }
 
 function thruLabel(row: Row, today: number | null): string {
@@ -121,10 +134,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   // the previous round). The light board keeps its blank-cell doctrine.
   const todayBlank = theme === 'light' ? BLANK : '\u2014';
   const showOverviewPosition = rows.some((row) => row.position != null || ['MC', 'CUT', 'WD'].includes(row.status?.toUpperCase() ?? ''));
-  // Two completed events on the same tour in the same season can legitimately
-  // differ here. Prize coverage is event data, not a UI inconsistency: show the
-  // column only when every currently displayed row has a money value.
-  const showOverviewPrize = phase === 'completed' && shouldShowOverviewPrize(entries, limit);
+  // PRIZE is decided over the WHOLE FIELD (entries), not the rendered slice,
+  // so the column cannot appear or vanish as the board is expanded or scrolled.
+  const showPrize = shouldShowPrize(entries);
+  const showOverviewPrize = phase === 'completed' && showPrize;
   // The live hero board carries TODAY, not THRU: the current round is the story
   // and the swap is what keeps the name column wide enough for real names.
   // Gate shape matches the old THRU gate: render only when a visible row has one.
@@ -170,7 +183,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 </div>
                 {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{today == null ? todayBlank : fmtScore(today)}</div> : null}
                 <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
-                {showOverviewPrize ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{formatEarnings(r.money)}</div> : null}
+                {showOverviewPrize ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: r.money != null ? T.mute : T.faint, fontVariantNumeric: 'tabular-nums' }}>{r.money != null ? formatEarnings(r.money) : '—'}</div> : null}
               </button>
             );
           })}
@@ -200,6 +213,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
           <div style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.thru')}</div>
           <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.today')}</div>
           <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.tot')}</div>
+          {showPrize ? <div style={{ width: 52, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.prize', 'Prize')}</div> : null}
+
 
         </div>
         {rows.map((r) => {
@@ -256,6 +271,14 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {r.score == null ? BLANK : fmtScore(r.score)}
               </div>
+              {/* No money earned is a VALUE: an em dash in the faint slot, never
+                  a blank, never a zero. Column presence is a tournament-level
+                  decision (showPrize) so it cannot flicker per row. */}
+              {showPrize ? (
+                <div style={{ width: 52, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: r.money != null ? T.mute : T.faint, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  {r.money != null ? formatEarnings(r.money) : '—'}
+                </div>
+              ) : null}
             </button>
           );
         })}

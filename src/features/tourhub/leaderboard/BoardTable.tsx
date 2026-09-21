@@ -49,6 +49,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import { getScoreColor } from '../_shared/scoreColor';
+import { formatEarnings } from '../_shared/formatEarnings';
 import { shortenName } from '../components/overview-v3/HybridHero.utils';
 import { surnameOf } from '../_shared/playerName';
 import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
@@ -67,6 +68,7 @@ const MOV_W = 24;
 const POS_W = 24;
 const TOT_W = 40;
 const THRU_W = 26;
+const PRIZE_W = 52;
 const CELL_W = 26;
 const CELL_W_FLOOR = 22;
 const GRID_GAP = 4;
@@ -76,6 +78,8 @@ const PRE_NAME_SIZE = 15;
 const PRE_TEE_W = 76;
 /** MOVEMENT only: zero or unavailable movement is a STATEMENT, so it gets a mark. */
 const MOV_DASH = '\u2013';
+/** PRIZE: a row that earned nothing states it with an em dash, never a blank. */
+const PRIZE_DASH = '\u2014';
 
 const F = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -188,6 +192,14 @@ export interface BoardColumns {
   liveRound: number | null;
   /** THRU only occupies a track while a round is in progress. */
   showThru: boolean;
+  /**
+   * PRIZE is a property of the TOURNAMENT, not of any row slice: shown when
+   * ANY row has a money value, hidden — header included — when none do, so
+   * the column is stable across expand, sort and scroll. Two completed events
+   * on the same tour in the same season can legitimately differ; that is the
+   * data (~40% of events carry no prize data), not a UI inconsistency.
+   */
+  showPrize: boolean;
   /** Nothing has been played: PLAYER | R1 TEE board. */
   preTournament: boolean;
 }
@@ -224,7 +236,9 @@ export function computeBoardColumns(
     entries.length > 0 &&
     highest === 0 &&
     entries.every((e) => e.score == null && e.position == null);
-  return { rounds, cellW: CELL_W, gap: GRID_GAP, liveRound: started ? currentRound! : null, showThru, preTournament };
+  // ANY row with a money value turns the column on for the whole tournament.
+  const showPrize = entries.some((e) => e.money != null);
+  return { rounds, cellW: CELL_W, gap: GRID_GAP, liveRound: started ? currentRound! : null, showThru, showPrize, preTournament };
 }
 
 /** Shared movement source for both the column spec and the row renderer. */
@@ -262,6 +276,7 @@ export function boardGridTemplate(c: BoardColumns): string {
     rounds,
     c.showThru ? `${THRU_W}px` : '',
     `${TOT_W}px`,
+    c.showPrize ? `${PRIZE_W}px` : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -302,13 +317,14 @@ function resolveLayout(
 ): { columns: BoardColumns; tier: NameTier } {
   if (base.preTournament || !containerW) return { columns: base, tier: 'full' };
   const font = `700 ${NAME_SIZE}px ${F}`;
-  const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1;
+  const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1 + (base.showPrize ? 1 : 0);
   const fixed =
     ROW_PAD_X * 2 +
     MOV_W +
     POS_W +
     TOT_W +
     (base.showThru ? THRU_W : 0) +
+    (base.showPrize ? PRIZE_W : 0) +
     (trackCount - 1) * base.gap;
 
   const widest = (tier: NameTier) =>
@@ -523,6 +539,9 @@ export function BoardTable({
               <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.thru')}</div>
             )}
             <div style={{ ...labelStyle, textAlign: 'right' }}>{t('board.columns.tot')}</div>
+            {columns.showPrize && (
+              <div style={{ ...labelStyle, textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div>
+            )}
           </>
         )}
       </div>
@@ -731,6 +750,24 @@ export function BoardTable({
             >
               {totalDisplay}
             </div>
+
+            {/* PRIZE — earned nothing is stated with an em dash in the faint
+                slot, never a blank and never a zero. MC/WD/DQ/DNS rows earn
+                nothing, so they dash too. */}
+            {columns.showPrize && (
+              <div
+                style={{
+                  textAlign: 'right',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: e.money != null ? SECONDARY : MUTED,
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {e.money != null ? formatEarnings(e.money) : PRIZE_DASH}
+              </div>
+            )}
           </>
         )}
       </div>

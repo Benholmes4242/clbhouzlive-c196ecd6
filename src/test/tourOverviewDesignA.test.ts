@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { formatOverviewDateRange, getOverviewCountdown, overviewChampionScoreLabel } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
-import { MiniBoard, shouldShowOverviewPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
+import { MiniBoard, shouldShowPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, shouldShowAlsoThisWeekFigures, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
@@ -133,16 +133,20 @@ describe('Tour Overview correctness gates', () => {
     expect(shouldShowOverviewBoard([{ position: null, score: -1 }])).toBe(true);
   });
 
-  it('shows prize only when every displayed completed row has money', () => {
+  it('shows prize when ANY row in the tournament has money, whatever the slice', () => {
     const row = (id: string, money: number | null) => ({ id, position: 1, score: -10, money });
     const paid = Array.from({ length: 6 }, (_, index) => row(String(index), 1_000 + index));
-    expect(shouldShowOverviewPrize(paid, 5)).toBe(true);
-    expect(shouldShowOverviewPrize([row('paid', 1_000), row('missing', null)], 5)).toBe(false);
-    expect(shouldShowOverviewPrize([...paid.slice(0, 5), row('outside-slice', null)], 5)).toBe(true);
-    expect(shouldShowOverviewPrize([], 5)).toBe(false);
+    expect(shouldShowPrize(paid)).toBe(true);
+    // A hole inside the slice no longer kills the column — the rule is the
+    // tournament, not the visible rows.
+    expect(shouldShowPrize([row('paid', 1_000), row('missing', null)])).toBe(true);
+    // A hole beyond the slice is irrelevant either way.
+    expect(shouldShowPrize([...paid.slice(0, 5), row('outside-slice', null)])).toBe(true);
+    expect(shouldShowPrize([row('a', null), row('b', null)])).toBe(false);
+    expect(shouldShowPrize([])).toBe(false);
   });
 
-  it('renders a complete prize column and returns its width to player when coverage has a hole', () => {
+  it('renders a stable prize column with em dashes, and reclaims its width when the event has no money', () => {
     const row = (id: string, money: number | null) => ({
       id, position: Number(id), score: -10, money,
       player: { id: `player-${id}`, full_name: `Player ${id}` },
@@ -164,10 +168,19 @@ describe('Tour Overview correctness gates', () => {
     expect(paid.container.textContent).toContain('$1K');
     paid.unmount();
 
+    // Partial coverage: the column STAYS, and the unpaid row states an em dash.
     const partial = render(board([row('1', 2_500_000), row('2', null)]));
     const partialHeader = partial.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(partialHeader?.textContent).not.toContain('Prize');
-    expect(partialHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px');
+    expect(partialHeader?.textContent).toContain('Prize');
+    expect(partialHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px 52px');
+    expect(partial.container.textContent).toContain('\u2014');
+    partial.unmount();
+
+    // No money anywhere in the field: no column, header included.
+    const unpaid = render(board([row('1', null), row('2', null)]));
+    const unpaidHeader = unpaid.container.querySelector<HTMLElement>('[data-overview-board-header]');
+    expect(unpaidHeader?.textContent).not.toContain('Prize');
+    expect(unpaidHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px');
   });
 
   it('keeps Also This Week inside the coming Sunday', () => {
