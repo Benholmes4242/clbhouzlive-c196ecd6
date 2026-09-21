@@ -116,7 +116,7 @@ export function useHeroCarouselData() {
 
       // Fetch winner details, leaderboard data, defending champion photos,
       // AND confirmed event_winners rows in parallel.
-      const [winnersResult, leaderboardResult, defendingChampionResult, eventWinnersResult] = await Promise.all([
+      const [winnersResult, leaderboardResult, defendingChampionResult, eventWinnersResult, strokeFormatsResult] = await Promise.all([
         winnerSrIds.length > 0
           ? supabase
               .from('sr_players')
@@ -158,6 +158,17 @@ export function useHeroCarouselData() {
               .select('tournament_id, player_id')
               .in('tournament_id', allTournamentIds)
               .not('player_id', 'is', null)
+          : Promise.resolve({ data: [] }),
+        // event_winners carries non-stroke events (2 team + 1 cup today) and its
+        // score_to_par holds match POINTS for a cup, which would render as a to-par
+        // score. The view has no event_type column and we are not re-issuing its
+        // definition — see the security_invoker work — so the format gate happens here.
+        allTournamentIds.length > 0
+          ? supabase
+              .from('sr_tournaments')
+              .select('id')
+              .in('id', allTournamentIds)
+              .eq('event_type', 'stroke')
           : Promise.resolve({ data: [] }),
       ]);
 
@@ -217,10 +228,11 @@ export function useHeroCarouselData() {
         }
       });
 
-      // Build confirmed-winner map from event_winners (authoritative).
+      // Build confirmed-winner map from event_winners (authoritative), gated to stroke events.
+      const strokeIds = new Set<string>(((strokeFormatsResult as any).data || []).map((row: any) => row.id));
       const confirmedWinnerSet = new Set<string>();
       ((eventWinnersResult as any).data || []).forEach((w: any) => {
-        if (w.tournament_id) confirmedWinnerSet.add(w.tournament_id);
+        if (w.tournament_id && strokeIds.has(w.tournament_id)) confirmedWinnerSet.add(w.tournament_id);
       });
 
       // Build defending champion map
