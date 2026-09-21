@@ -235,7 +235,9 @@ export function computeBoardColumns(
     entries.length > 0 &&
     highest === 0 &&
     entries.every((e) => e.score == null && e.position == null);
-  return { rounds, cellW: CELL_W, gap: GRID_GAP, liveRound: started ? currentRound! : null, showThru, preTournament };
+  // ANY row with a money value turns the column on for the whole tournament.
+  const showPrize = entries.some((e) => e.money != null);
+  return { rounds, cellW: CELL_W, gap: GRID_GAP, liveRound: started ? currentRound! : null, showThru, showPrize, preTournament };
 }
 
 /** Shared movement source for both the column spec and the row renderer. */
@@ -273,6 +275,7 @@ export function boardGridTemplate(c: BoardColumns): string {
     rounds,
     c.showThru ? `${THRU_W}px` : '',
     `${TOT_W}px`,
+    c.showPrize ? `${PRIZE_W}px` : '',
   ]
     .filter(Boolean)
     .join(' ');
