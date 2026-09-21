@@ -1,59 +1,62 @@
 {
- "schedule": {
-  "today": "Today",
-  "tomorrow": "Tomorrow"
- },
- "success": {
-  "posted": "Posted",
-  "postedBody": "It is live. Pull to refresh if you don't see it yet.",
-  "posting": "Posting...",
-  "scheduled": "Scheduled",
-  "scheduledBody": "It is queued and will go out on time.",
-  "scheduledFor": "Scheduled for {{when}}",
-  "uploadFailed": "Upload failed",
-  "uploadFailedFallback": "Something went wrong - your post was not published.",
-  "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
-  "liveKicker": "클럽하우스에 게시됨",
-  "stagePreparing": "준비 중",
-  "stageUploading": "업로드 중",
-  "stagePublishing": "게시 중",
-  "timeLeftSeconds": "{{n}}초 남음",
-  "timeLeftMinutes": "{{m}}분 {{s}}초 남음"
- },
- "drafts": {
-  "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
- },
- "closeGuard": {
-  "saveDraftKeepsNothingElse": "임시 저장 · 글과 태그만",
-  "saveDraftLosesMedia": "사진과 동영상은 저장되지 않습니다",
-  "saveDraftLosesSchedule": "예약 시간은 저장되지 않습니다",
-  "saveDraftLosesBoth": "사진, 동영상, 예약 시간은 저장되지 않습니다"
- },
- "stage": {
-  "mediaSheet": {
-   "title": "Edit photos",
-   "done": "DONE"
+  "schedule": {
+    "today": "Today",
+    "tomorrow": "Tomorrow"
   },
-  "tapToEdit": "Tap a photo to edit it",
-  "editItem": "Edit item {{n}}",
-  "addMedia": "Add photos or video",
-  "addShort": "+ Add",
-  "edit": "Edit",
-  "emptyGate": "ADD A PHOTO OR A FEW WORDS",
-  "chooseFromLibrary": "Choose from library",
-  "takePhotoOrVideo": "Take photo or video",
-  "captionPlaceholder": "What's on your mind",
-  "mentionHint": "@mention friends and businesses",
-  "tagCourse": "Tag a course",
-  "search": "Search",
-  "untag": "Untag {{name}}",
-  "postingAs": "Posting as",
-  "scheduleForLater": "Schedule for later",
-  "off": "Off",
-  "drafts": "Drafts",
-  "saveChanges": "Save changes",
-  "schedule": "Schedule",
-  "share": "Share",
-  "editPost": "Edit post"
- }
+  "success": {
+    "posted": "Posted",
+    "postedBody": "It is live. Pull to refresh if you don't see it yet.",
+    "posting": "Posting...",
+    "scheduled": "Scheduled",
+    "scheduledBody": "It is queued and will go out on time.",
+    "scheduledFor": "Scheduled for {{when}}",
+    "uploadFailed": "Upload failed",
+    "uploadFailedFallback": "Something went wrong - your post was not published.",
+    "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
+    "liveKicker": "클럽하우스에 게시됨",
+    "uploadingSimple": "Uploading",
+    "keepUsing": "You can keep using the app",
+    "keepUsingSub": "We'll finish this in the background.",
+    "stagePreparing": "준비 중",
+    "stageUploading": "업로드 중",
+    "stagePublishing": "게시 중",
+    "timeLeftSeconds": "{{n}}초 남음",
+    "timeLeftMinutes": "{{m}}분 {{s}}초 남음"
+  },
+  "drafts": {
+    "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
+  },
+  "closeGuard": {
+    "saveDraftKeepsNothingElse": "임시 저장 · 글과 태그만",
+    "saveDraftLosesMedia": "사진과 동영상은 저장되지 않습니다",
+    "saveDraftLosesSchedule": "예약 시간은 저장되지 않습니다",
+    "saveDraftLosesBoth": "사진, 동영상, 예약 시간은 저장되지 않습니다"
+  },
+  "stage": {
+    "mediaSheet": {
+      "title": "Edit photos",
+      "done": "DONE"
+    },
+    "tapToEdit": "Tap a photo to edit it",
+    "editItem": "Edit item {{n}}",
+    "addMedia": "Add photos or video",
+    "addShort": "+ Add",
+    "edit": "Edit",
+    "emptyGate": "ADD A PHOTO OR A FEW WORDS",
+    "chooseFromLibrary": "Choose from library",
+    "takePhotoOrVideo": "Take photo or video",
+    "captionPlaceholder": "What's on your mind",
+    "mentionHint": "@mention friends and businesses",
+    "tagCourse": "Tag a course",
+    "search": "Search",
+    "untag": "Untag {{name}}",
+    "postingAs": "Posting as",
+    "scheduleForLater": "Schedule for later",
+    "off": "Off",
+    "drafts": "Drafts",
+    "saveChanges": "Save changes",
+    "schedule": "Schedule",
+    "share": "Share",
+    "editPost": "Edit post"
+  }
 }

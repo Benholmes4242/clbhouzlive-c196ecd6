@@ -1,59 +1,62 @@
 {
- "schedule": {
-  "today": "Today",
-  "tomorrow": "Tomorrow"
- },
- "success": {
-  "posted": "Posted",
-  "postedBody": "It is live. Pull to refresh if you don't see it yet.",
-  "posting": "Posting...",
-  "scheduled": "Scheduled",
-  "scheduledBody": "It is queued and will go out on time.",
-  "scheduledFor": "Scheduled for {{when}}",
-  "uploadFailed": "Upload failed",
-  "uploadFailedFallback": "Something went wrong - your post was not published.",
-  "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
-  "liveKicker": "En directo en el clubhouse",
-  "stagePreparing": "Preparando",
-  "stageUploading": "Subiendo",
-  "stagePublishing": "Publicando",
-  "timeLeftSeconds": "quedan {{n}}s",
-  "timeLeftMinutes": "quedan {{m}}m {{s}}s"
- },
- "drafts": {
-  "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
- },
- "closeGuard": {
-  "saveDraftKeepsNothingElse": "Guardar borrador · solo texto y etiquetas",
-  "saveDraftLosesMedia": "Las fotos y los videos no se guardaran",
-  "saveDraftLosesSchedule": "La hora programada no se guardará",
-  "saveDraftLosesBoth": "Las fotos, los videos y la hora programada no se guardaran"
- },
- "stage": {
-  "mediaSheet": {
-   "title": "Edit photos",
-   "done": "DONE"
+  "schedule": {
+    "today": "Today",
+    "tomorrow": "Tomorrow"
   },
-  "tapToEdit": "Tap a photo to edit it",
-  "editItem": "Edit item {{n}}",
-  "addMedia": "Add photos or video",
-  "addShort": "+ Add",
-  "edit": "Edit",
-  "emptyGate": "ADD A PHOTO OR A FEW WORDS",
-  "chooseFromLibrary": "Choose from library",
-  "takePhotoOrVideo": "Take photo or video",
-  "captionPlaceholder": "What's on your mind",
-  "mentionHint": "@mention friends and businesses",
-  "tagCourse": "Tag a course",
-  "search": "Search",
-  "untag": "Untag {{name}}",
-  "postingAs": "Posting as",
-  "scheduleForLater": "Schedule for later",
-  "off": "Off",
-  "drafts": "Drafts",
-  "saveChanges": "Save changes",
-  "schedule": "Schedule",
-  "share": "Share",
-  "editPost": "Edit post"
- }
+  "success": {
+    "posted": "Posted",
+    "postedBody": "It is live. Pull to refresh if you don't see it yet.",
+    "posting": "Posting...",
+    "scheduled": "Scheduled",
+    "scheduledBody": "It is queued and will go out on time.",
+    "scheduledFor": "Scheduled for {{when}}",
+    "uploadFailed": "Upload failed",
+    "uploadFailedFallback": "Something went wrong - your post was not published.",
+    "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
+    "liveKicker": "En directo en el clubhouse",
+    "uploadingSimple": "Uploading",
+    "keepUsing": "You can keep using the app",
+    "keepUsingSub": "We'll finish this in the background.",
+    "stagePreparing": "Preparando",
+    "stageUploading": "Subiendo",
+    "stagePublishing": "Publicando",
+    "timeLeftSeconds": "quedan {{n}}s",
+    "timeLeftMinutes": "quedan {{m}}m {{s}}s"
+  },
+  "drafts": {
+    "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
+  },
+  "closeGuard": {
+    "saveDraftKeepsNothingElse": "Guardar borrador · solo texto y etiquetas",
+    "saveDraftLosesMedia": "Las fotos y los videos no se guardaran",
+    "saveDraftLosesSchedule": "La hora programada no se guardará",
+    "saveDraftLosesBoth": "Las fotos, los videos y la hora programada no se guardaran"
+  },
+  "stage": {
+    "mediaSheet": {
+      "title": "Edit photos",
+      "done": "DONE"
+    },
+    "tapToEdit": "Tap a photo to edit it",
+    "editItem": "Edit item {{n}}",
+    "addMedia": "Add photos or video",
+    "addShort": "+ Add",
+    "edit": "Edit",
+    "emptyGate": "ADD A PHOTO OR A FEW WORDS",
+    "chooseFromLibrary": "Choose from library",
+    "takePhotoOrVideo": "Take photo or video",
+    "captionPlaceholder": "What's on your mind",
+    "mentionHint": "@mention friends and businesses",
+    "tagCourse": "Tag a course",
+    "search": "Search",
+    "untag": "Untag {{name}}",
+    "postingAs": "Posting as",
+    "scheduleForLater": "Schedule for later",
+    "off": "Off",
+    "drafts": "Drafts",
+    "saveChanges": "Save changes",
+    "schedule": "Schedule",
+    "share": "Share",
+    "editPost": "Edit post"
+  }
 }
