@@ -188,7 +188,7 @@ function CourseRankChip({ item }: { item: StreamItem }) {
 }
 
 /** §4b, by type. A story carries none; a moment carries none. */
-function chipsFor(item: StreamItem, t: (k: string, f?: string) => string, locale: string) {
+function chipsFor(item: StreamItem, t: (k: string, f?: string | Record<string, unknown>) => string, locale: string) {
   const out: React.ReactNode[] = [];
   const { facts, kind } = item;
 
@@ -245,7 +245,7 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string) => string, locale
           whiteSpace: 'nowrap',
         }}
       >
-        {t('amateur.stream.enrichment.photos', { count: facts.photoCount } as never)}
+        {t('amateur.stream.enrichment.photos', { count: facts.photoCount })}
       </span>,
     );
   }
