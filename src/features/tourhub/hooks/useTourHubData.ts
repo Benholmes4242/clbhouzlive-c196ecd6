@@ -256,9 +256,9 @@ export function useTourTournaments(seasonId?: string, options?: UseTourTournamen
       let query = supabase
         .from('sr_tournaments')
         .select('*, season:sr_seasons(tour_name, tour_full_name)')
-        // BRIEF_NON_STROKE_GATE_2 §3 — generic fetch behind leaderboard/board
-        // surfaces; cups and match play must never reach a leader-asserting read.
-        .eq('event_type', 'stroke')
+        // BRIEF_TEAM_EVENTS — generic fetch behind leaderboard/board surfaces.
+        // Stroke and team carry to-par boards; cups/match do not.
+        .in('event_type', ['stroke', 'team'])
         .order('start_date', { ascending: true });
       
       // Only filter by season if explicitly provided AND we want season-specific
@@ -326,8 +326,8 @@ export function useTourTournament(tournamentId: string) {
       const { data, error } = await supabase
         .from('sr_tournaments')
         .select('*, season:sr_seasons(tour_name, tour_full_name)')
-        // BRIEF_NON_STROKE_GATE_2 §3 — see the list query above.
-        .eq('event_type', 'stroke')
+        // BRIEF_TEAM_EVENTS — see the list query above.
+        .in('event_type', ['stroke', 'team'])
         .eq('id', tournamentId)
         .single();
       

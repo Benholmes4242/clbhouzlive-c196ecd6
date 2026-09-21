@@ -12,6 +12,7 @@ import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
+import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from '../../_shared/boardEntity';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -105,28 +106,41 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
     ? rows.filter((entry) => entry.position === 1).length
     : 0;
   const tied = tiedCount > 1 ? { count: tiedCount } : null;
+  const needsInitials = useMemo(() => teamNamesNeedInitials(rows), [rows]);
 
   const leader = state.kind === 'live' && topPosition === 1 && top?.score != null
     ? {
         score: top.score,
         name: tied
           ? t('overview.leaderRow.tiedAtTop', { count: tied.count })
-          : top.player?.full_name?.trim().split(/\s+/).slice(-1)[0] ?? null,
+          : top.team
+            ? resolveBoardEntity(top, needsInitials).prose || null
+            : top.player?.full_name?.trim().split(/\s+/).slice(-1)[0] ?? null,
       }
     : null;
 
   const champion = useMemo(() => {
-    if (state.kind !== 'results' || !tournament.winnerName || top?.score == null) return null;
-    const runner = rows[1];
-    const margin = runner?.score != null ? runner.score - top.score : null;
+    if (state.kind !== 'results' || top?.score == null) return null;
+    const championEntry = !tournament.winnerName
+      ? resolveChampionEntry(rows, { winner_id: tournament.winnerId, event_type: top?.team && !top?.player ? 'team' : 'stroke' })
+      : null;
+    const teamChampion = championEntry ? resolveBoardEntity(championEntry, needsInitials) : null;
+    const championName = tournament.winnerName ?? teamChampion?.prose ?? null;
+    if (!championName) return null;
+    const championScore = championEntry?.score ?? top.score;
+    const runner = rows
+      .filter((row) => row.id !== championEntry?.id && row.score != null && row.score > championScore)
+      .sort((a, b) => (a.score ?? Number.POSITIVE_INFINITY) - (b.score ?? Number.POSITIVE_INFINITY))[0]
+      ?? rows.find((row) => row.id !== championEntry?.id && row.score != null);
+    const margin = runner?.score != null ? runner.score - championScore : null;
     const tiedAtTop = detectTopTie(rows);
     return {
-      name: tournament.winnerName,
-      score: top.score,
+      name: championName,
+      score: championScore,
       margin: tiedAtTop ? null : margin != null && margin > 0 ? margin : null,
       playoff: Boolean(tiedAtTop),
     };
-  }, [rows, state.kind, top?.score, tournament.winnerName]);
+  }, [needsInitials, rows, state.kind, top?.player, top?.score, top?.team, tournament.winnerId, tournament.winnerName]);
 
   const championAvatarUrl = champion
     ? resolvePlayerAvatarCandidates({
