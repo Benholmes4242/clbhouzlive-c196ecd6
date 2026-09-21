@@ -290,27 +290,41 @@ export function HeroBoardSection({
     return map;
   }, [entries]);
 
-  const closedFigure = useMemo(() => {
+  const championPlayerId = useMemo(
+    () => resolveChampionPlayerId(entries as any[], championSrId, phase),
+    [championSrId, entries, phase],
+  );
+
+  const closedRow = useMemo<{ text: string; trophy: boolean } | null>(() => {
     if (!hasPicks) return null;
     const ranked = [...picks].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
     if (phase === 'upcoming') {
       const names = ranked.slice(0, 3).map((pick) => surnameOf(pick.playerName)).filter(Boolean);
-      return names.length > 0 ? `${names.join(', ')} to win` : null;
+      return names.length > 0 ? { text: `${names.join(', ')} to win`, trophy: false } : null;
     }
     const placed = ranked
       .map((pick) => ({ pick, line: boardByPlayer.get(String(pick.playerId)) }))
       .filter((item) => item.line?.position != null)
       .sort((a, b) => (a.line?.position ?? 999) - (b.line?.position ?? 999));
-    if (placed.length === 0) return surnameOf(ranked[0]?.playerName) || null;
+    if (placed.length === 0) {
+      const fallback = surnameOf(ranked[0]?.playerName);
+      return fallback ? { text: fallback, trophy: false } : null;
+    }
     if (phase === 'completed') {
       const best = placed[0];
       const settled = settledFigureFor(best.line);
-      return settled?.right === WON_LABEL
+      // The trophy marks the CHAMPION, never a position: T1 playoff losers get none.
+      const trophy = pickWonTournament(best.pick.playerId, championPlayerId);
+      const text = settled?.right === WON_LABEL
         ? `Picked ${surnameOf(best.pick.playerName)} to win · ${WON_LABEL}`
         : `${surnameOf(best.pick.playerName)} ${settled?.right ?? ''}`.trim();
+      return { text, trophy };
     }
-    return placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', ');
-  }, [boardByPlayer, hasPicks, phase, picks]);
+    return {
+      text: placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', '),
+      trophy: false,
+    };
+  }, [boardByPlayer, championPlayerId, hasPicks, phase, picks]);
 
   const showUpcomingFacts = shouldLoadUpcomingFacts(phase);
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showUpcomingFacts);
