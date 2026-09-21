@@ -1570,7 +1570,10 @@
     "ownerRepeatCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
     "ownerSole": "[Ţĥé fíŕšţ clbhouz ɱéɱƀéŕ éνéŕ ţó áçĥíéνé ţĥíš.]",
     "ownerSoleCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
-    "viewer": "[Ţĥé {{ord}} {{feat}} íñ {{rounds}} ŕóúñđš.]"
+    "viewer": "[Ţĥé {{ord}} {{feat}} íñ {{rounds}} ŕóúñđš.]",
+    "viewerRareThree": "[Óñļý ţĥé ţĥíŕđ clbhouz ɱéɱƀéŕ ţó áçĥíéνé ţĥíš.]",
+    "viewerRareTwo": "[Óñļý ţĥé šéçóñđ clbhouz ɱéɱƀéŕ ţó áçĥíéνé ţĥíš.]",
+    "viewerSole": "[Ţĥé fíŕšţ clbhouz ɱéɱƀéŕ éνéŕ ţó áçĥíéνé ţĥíš.]"
   },
   "friends": {
     "signIn": "[~~Šíĝñ íñ~~]",

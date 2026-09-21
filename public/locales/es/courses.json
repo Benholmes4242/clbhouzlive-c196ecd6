@@ -1263,7 +1263,10 @@
     "ownerRepeatCongrats": "{{line}} — enhorabuena, {{name}}",
     "ownerSole": "El primer miembro de clbhouz en lograrlo.",
     "ownerSoleCongrats": "{{line}} — enhorabuena, {{name}}",
-    "viewer": "El {{ord}} {{feat}} en {{rounds}} rondas."
+    "viewer": "El {{ord}} {{feat}} en {{rounds}} rondas.",
+    "viewerRareThree": "Solo el tercer miembro de clbhouz en lograrlo.",
+    "viewerRareTwo": "Solo el segundo miembro de clbhouz en lograrlo.",
+    "viewerSole": "El primer miembro de clbhouz en lograrlo."
   },
   "friends": {
     "signIn": "Sign in",
