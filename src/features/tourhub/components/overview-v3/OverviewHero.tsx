@@ -215,7 +215,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   const activeChampionEntry = active.type === 'completed' && !active.tournament.winnerName
     ? resolveChampionEntry(boardEntries as any[], {
         winner_id: active.tournament.winnerId,
-        event_type: boardEntries.some((entry: any) => entry?.team && !entry?.player) ? 'team' : 'stroke',
+        // sr_tournaments.event_type, carried on the slide — never inferred from rows.
+        event_type: active.tournament.eventType,
       })
     : null;
   const activeChampionMemberIds = activeChampionEntry?.team?.members

@@ -58,6 +58,9 @@ export interface HeroTournament {
   isPseudoMajorTour?: boolean;
   /** For pseudo-major slides only: which major type this slide represents. */
   majorGender?: 'mens' | 'womens';
+  /** sr_tournaments.event_type — the only authority on format. Carried so
+   *  champion resolution never infers 'team' from the shape of a board row. */
+  eventType: string | null;
   // Winner info (for completed)
   winnerId: string | null;
   winnerName: string | null;
@@ -320,6 +323,7 @@ export function useHeroCarouselData() {
           championNarrative: row.champion_narrative || null,
           isMajor: contextLabel === 'MAJOR CHAMPIONSHIP' || isAnyMajor(row.name || ''),
           isSignature: contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES',
+          eventType: row.event_type ?? null,
           winnerId: row.winner_id,
           winnerName,
           winnerPhotoUrl,
