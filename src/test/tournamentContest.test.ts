@@ -3,8 +3,8 @@ import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import type { TournamentMeta } from '@/features/tourhub/leaderboard/useTournamentMeta';
 import { selectTournamentContest } from '@/features/tourhub/tournament-v2/data/tournamentContest';
 
-const meta = { current_round: 4 } as TournamentMeta;
-const row = (id: string, score: number, position: number, today = -1, thru = 12, positionTied = false): BoardEntry => ({ id, score, position, position_tied: positionTied, today, thru, player: { id, full_name: id } });
+const meta = { current_round: 4, winner_id: null } as TournamentMeta;
+const row = (id: string, score: number, position: number, today = -1, thru = 12, positionTied = false): BoardEntry => ({ id, score, position, position_tied: positionTied, today, thru, player: { id, sr_id: `sr-${id}`, full_name: id } });
 
 describe('selectTournamentContest', () => {
   it('derives a single lead, margin, pack and non-leader move', () => {
@@ -36,10 +36,12 @@ describe('selectTournamentContest', () => {
   });
 
   it('uses word form for a completed playoff', () => {
-    const result = selectTournamentContest([row('winner', -12, 1, -4, 18), row('runner', -12, 2, -3, 18)], meta, 'completed');
+    const result = selectTournamentContest([row('runner', -12, 1, -3, 18, true), row('winner', -12, 1, -4, 18, true)], { ...meta, winner_id: 'sr-winner' }, 'completed');
     expect(result.margin).toBe(0);
     expect(result.leadForm).toBe('word');
     expect(result.playoffDecided).toBe(true);
+    expect(result.leader?.id).toBe('winner');
+    expect(result.leaders.map((entry) => entry.id)).toEqual(['winner', 'runner']);
     expect(result.holesLeft).toBeNull();
   });
 

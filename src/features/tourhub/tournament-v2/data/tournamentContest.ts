@@ -18,7 +18,7 @@ export interface TournamentContest {
   margin: number | null;
   sharedLead: boolean;
   /** A completed event with a shared top score is a playoff. It is decided
-   * when the board separates the leaders — winner on position 1, untied. */
+   * when the tournament winner resolves to one of those tied leaders. */
   playoffDecided: boolean;
   chasersWithinFour: number;
   holesLeft: number | null;
@@ -40,11 +40,19 @@ export function selectTournamentContest(
   const scored = board.filter((row) => row.score != null).sort((a, b) => (a.score as number) - (b.score as number) || byPosition(a, b));
   const bestScore = scored[0]?.score ?? null;
   const leaders = bestScore == null ? [] : scored.filter((row) => row.score === bestScore);
-  const leader = leaders[0] ?? null;
   const nextScore = bestScore == null ? null : scored.find((row) => (row.score as number) > bestScore)?.score ?? null;
   const sharedLead = leaders.length > 1;
-  const playoffDecided = state === 'completed' && sharedLead
-    && leader?.position === 1 && !leader?.position_tied;
+  // A completed event with a shared top score was decided in a playoff. The
+  // board cannot tell us who won it — every participant is legitimately T1 —
+  // so the winner comes from sr_tournaments.winner_id, which stores sr_id.
+  const winnerEntry = state === 'completed' && sharedLead && meta.winner_id
+    ? leaders.find((row) => row.player?.sr_id === meta.winner_id) ?? null
+    : null;
+  const playoffDecided = winnerEntry != null;
+  const orderedLeaders = winnerEntry
+    ? [winnerEntry, ...leaders.filter((row) => row.id !== winnerEntry.id)]
+    : leaders;
+  const leader = orderedLeaders[0] ?? null;
   const margin = sharedLead && state === 'completed'
     ? 0
     : bestScore == null || nextScore == null
@@ -85,5 +93,5 @@ export function selectTournamentContest(
         ? 'figure'
         : null;
 
-  return { leaders, leader, margin, sharedLead, playoffDecided, chasersWithinFour, holesLeft, pack, mover, moverToday, leadForm };
+  return { leaders: orderedLeaders, leader, margin, sharedLead, playoffDecided, chasersWithinFour, holesLeft, pack, mover, moverToday, leadForm };
 }

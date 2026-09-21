@@ -26,6 +26,7 @@ const copy: Record<string, string> = {
   'tournament.contest.playoff': 'Won a playoff',
   'tournament.contest.finishedLevel': 'Finished level',
   'tournament.contest.withToPlay': 'With {{holes}} to play',
+  'tournament.contest.shotsClear': 'Shots clear',
   'tournament.contest.gapShots_one': 'a shot',
   'tournament.contest.gapShots_other': '{{count}} shots',
   'tournament.contest.sublineSingle': '{{leader}} from {{next}}.',
@@ -83,6 +84,7 @@ const meta = {
   current_round: 4,
   current_round_status: 'inprogress',
   tour_full_name: 'PGA Tour',
+  winner_id: null,
 } as TournamentMeta;
 
 const row = (id: string, score: number, position: number, today = -1, thru = 12, positionTied = false): BoardEntry => ({
@@ -92,7 +94,7 @@ const row = (id: string, score: number, position: number, today = -1, thru = 12,
   position_tied: positionTied,
   today,
   thru,
-  player: { id, full_name: id },
+  player: { id, sr_id: `sr-${id}`, full_name: id },
 });
 
 describe('tournament contest sections', () => {
@@ -185,12 +187,12 @@ describe('tournament contest sections', () => {
 
   it('states a decided completed playoff without a stale holes caption', () => {
     const contest = selectTournamentContest([
-      row('Zach Johnson', -12, 1, -4, 13),
-      row('Rory Sabbatini', -12, 2, -3, 13),
+      row('Rory Sabbatini', -12, 1, -3, 13, true),
+      row('Zach Johnson', -12, 1, -4, 13, true),
       row('Ryan Armour', -10, 3, -2, 13),
       row('Steven Alker', -10, 3, -1, 13),
       row('Henrik Stenson', -10, 3, -1, 13),
-    ], meta, 'completed');
+    ], { ...meta, winner_id: 'sr-Zach Johnson' }, 'completed');
 
     render(<ContestSection contest={contest} state="completed" />);
 
@@ -210,5 +212,18 @@ describe('tournament contest sections', () => {
     expect(screen.getByText('Finished level')).toBeInTheDocument();
     expect(screen.getByText('A and B were level at -12.')).toBeInTheDocument();
     expect(screen.queryByText(/to play/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps a completed non-playoff event in the margin figure branch', () => {
+    const contest = selectTournamentContest([
+      row('Winner', -12, 1, -4, 18),
+      row('Runner', -10, 2, -3, 18),
+    ], meta, 'completed');
+
+    render(<ContestSection contest={contest} state="completed" />);
+
+    expect(screen.getByText('2')).toBeInTheDocument();
+    expect(screen.getByText('Shots clear')).toBeInTheDocument();
+    expect(screen.queryByText('Won a playoff')).not.toBeInTheDocument();
   });
 });
