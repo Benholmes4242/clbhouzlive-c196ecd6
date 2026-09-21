@@ -6134,6 +6134,7 @@ export type Database = {
       gam_round_stats: {
         Row: {
           albatrosses: number
+          awards_evaluated_at: string | null
           back_nine_to_par: number | null
           beat_par: boolean
           birdies: number
@@ -6179,6 +6180,7 @@ export type Database = {
         }
         Insert: {
           albatrosses?: number
+          awards_evaluated_at?: string | null
           back_nine_to_par?: number | null
           beat_par?: boolean
           birdies?: number
@@ -6224,6 +6226,7 @@ export type Database = {
         }
         Update: {
           albatrosses?: number
+          awards_evaluated_at?: string | null
           back_nine_to_par?: number | null
           beat_par?: boolean
           birdies?: number
