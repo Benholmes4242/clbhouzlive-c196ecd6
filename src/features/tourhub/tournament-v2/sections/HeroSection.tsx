@@ -5,6 +5,7 @@ import { formatPurse } from '../../_shared/formatPurse';
 import { fmtScore } from '../../utils/fmtScore';
 import { AMBER, FONT, INK, INK_FAINT, INK_MUTE, STATUS_LIVE_ON_DARK, TOUR_HERO_PHOTO_H } from '../../_shared/tokens';
 import { heroCanonBackground } from '../../_shared/heroGradient';
+import { isStrokeEvent } from '../../_shared/eventFormat';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
