@@ -32,64 +32,31 @@ export function selectOverviewBandStory(
   return stories.find((story) => isFresh(story, FALLBACK_MAX_AGE_MS, now)) ?? null;
 }
 
+/**
+ * The band IS the News hero, at the overview's 24px gutter. It renders
+ * HeroStory rather than restating its shape: two copies of a news card is how
+ * two surfaces drift (see StoryShapes.tsx). topOffset stays at its default —
+ * the band sits mid-page, not under the immersive island.
+ *
+ * The wording is deliberately NOT the hero's: fullTourLabel keeps the line on
+ * the tour ("DP WORLD TOUR") where tagFor would prefer the event name.
+ */
 export function StoryBand({ story }: { story: TourStory | null }) {
   const navigate = useNavigate();
   const [failedStoryId, setFailedStoryId] = useState<string | null>(null);
   if (!story?.image_url || failedStoryId === story.id) return null;
 
   const tourKicker = story.tour_slug ? fullTourLabel(story.tour_slug) : story.kicker;
-  const meta = [tourKicker, storyTime(story.published_at)].filter(Boolean).join(' · ').toUpperCase();
   return (
-    <button
-      type="button"
-      data-overview-story-band={story.id}
-      onClick={() => navigate(`/tour/news/${story.slug}`)}
-      style={{
-        position: 'relative',
-        display: 'block',
-        width: '100%',
-        height: 230,
-        marginTop: 26,
-        padding: 0,
-        border: 0,
-        overflow: 'hidden',
-        background: 'transparent',
-        color: INK,
-        fontFamily: FONT,
-        textAlign: 'left',
-        cursor: 'pointer',
-      }}
-    >
-      <img
-        src={story.image_url}
-        alt=""
-        loading="lazy"
-        onError={() => setFailedStoryId(story.id)}
-        style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
+    <div data-overview-story-band={story.id} style={{ marginTop: 26, fontFamily: FONT, color: INK }}>
+      <HeroStory
+        story={story}
+        onOpen={() => navigate(`/tour/news/${story.slug}`)}
+        gutter={24}
+        showEngagement={false}
+        kicker={tourKicker ? tourKicker.toUpperCase() : undefined}
+        onImageError={() => setFailedStoryId(story.id)}
       />
-      <span aria-hidden style={{ position: 'absolute', inset: 0, background: STORY_BAND_SCRIM }} />
-      <span style={{ position: 'absolute', left: 24, right: 24, bottom: 18 }}>
-        {meta ? (
-          <span style={{ display: 'block', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: STORY_BAND_META_INK }}>
-            {meta}
-          </span>
-        ) : null}
-        <span
-          style={{
-            display: '-webkit-box',
-            marginTop: 5,
-            overflow: 'hidden',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-            fontSize: 21,
-            lineHeight: 1.2,
-            fontWeight: 800,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {story.headline}
-        </span>
-      </span>
-    </button>
+    </div>
   );
 }
