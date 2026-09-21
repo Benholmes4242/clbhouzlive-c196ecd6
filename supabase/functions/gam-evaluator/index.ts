@@ -988,14 +988,6 @@ function foldBests(u: UnitCandidate, prior: BestsRow | null, playDate: string, w
   };
 }
 
-const COARSE_UNIT_COLUMN: Record<string, string> = {
-  round_gross: "gross_score",
-  round_diff: "score_diff",
-  round_stableford: "stableford_points",
-  front_nine: "front_nine_to_par",
-  back_nine: "back_nine_to_par",
-  finish_six: "finish_six_to_par",
-};
 
 async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
   const whsScoreId: string | null = stats?.whs_score_id ?? null;
