@@ -18,8 +18,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
-import { STATUS_NEGATIVE, SLATE_800, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
+import { STATUS_NEGATIVE, SLATE_800, SURFACE, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -75,7 +75,7 @@ export function ChampionStrip({
   return (
     <div
       style={{
-        background: INK,
+        background: SURFACE,
         padding: hasNarrative ? '12px 20px 14px' : '10px 20px',
         minHeight: hasNarrative ? undefined : STRIP_HEIGHT,
         display: 'flex',
@@ -193,7 +193,7 @@ export function CancelledStrip({ reason }: { reason: string }) {
   return (
     <div
       style={{
-        background: INK,
+        background: SURFACE,
         padding: '14px 20px',
         minHeight: STRIP_HEIGHT,
         display: 'flex',
@@ -246,7 +246,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
   return (
     <div
       style={{
-        background: INK,
+        background: SURFACE,
         padding: '10px 20px',
         minHeight: STRIP_HEIGHT,
         display: 'flex',

@@ -355,7 +355,7 @@ export function HeroBoardSection({
         {venueRecord?.courseId ? (
           <button
             type="button"
-            onClick={() => navigate(`/course/${venueRecord.courseId}`)}
+            onClick={() => navigate(`/courses/${venueRecord.courseId}`)}
             data-overview-course-cta
             style={{ minWidth: 0, minHeight: 44, margin: 0, padding: 0, display: 'inline-flex', alignItems: 'center', gap: 4, border: 'none', background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', textAlign: 'right', whiteSpace: 'nowrap' }}
           >
