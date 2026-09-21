@@ -6,7 +6,7 @@ import { SectionEyebrow } from './SectionEyebrow';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { FONT, INK, INK_FAINT, SURFACE } from '../../_shared/tokens';
-import { ambiguousTeamSurnames, resolveBoardEntity } from '../../_shared/boardEntity';
+import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
 
 interface Props { contest: TournamentContest; state: EventState; tourCode: string }
 
@@ -15,7 +15,7 @@ export function MoveSection({ contest, state, tourCode }: Props) {
   const cjk = /^(ja|ko)/.test(i18n.language);
   const row = contest.mover;
   if (state === 'upcoming' || !row || contest.moverToday == null) return null;
-  const name = resolveBoardEntity(row, ambiguousTeamSurnames(contest.pack.map((item) => item.entry))).label;
+  const name = resolveBoardEntity(row, teamNamesNeedInitials(contest.pack.map((item) => item.entry))).label;
   const thru = row.thru != null && row.thru >= 18 ? 'F' : row.thru;
   const position = row.position == null ? '' : `${row.position_tied ? 'T' : ''}${row.position}`;
   const total = row.score == null ? '' : fmtScore(row.score);
