@@ -58,9 +58,9 @@ describe('achievement callout', () => {
           facts: { holes_in_one: 1, eagles: 2, birdies: 6, clean_card: true },
         }),
       ),
-    ).toEqual({ kind: 'record' });
+    ).toEqual({ kind: 'record', margin: null });
     expect(calloutFor(item('rank', { consequence: { kind: 'rank_up', n: 3 }, facts: { eagles: 1 } })))
-      .toEqual({ kind: 'rank_up', rank: 3 });
+      .toEqual({ kind: 'rank_up', rank: 3, delta: null });
     expect(calloutFor(item('ace', { facts: { holes_in_one: 1, eagles: 1, birdies: 5 } })))
       .toMatchObject({ kind: 'ace', hole: null, count: 1, tier: 'gold', feats: [{ kind: 'ace', count: 1 }, { kind: 'eagle', count: 1 }] });
     expect(calloutFor(item('alb', { facts: { albatrosses: 1, eagles: 1 } })))
@@ -107,7 +107,11 @@ describe('achievement callout', () => {
 
   it('draws the crown only from a live record consequence', () => {
     expect(calloutFor(item('live', { consequence: { kind: 'record_taken', n: 69 } })))
-      .toEqual({ kind: 'record' });
+      .toEqual({ kind: 'record', margin: null });
+    expect(calloutFor(item('margin', {
+      consequence: { kind: 'record_taken', n: 66 },
+      facts: { record_margin: 2 },
+    }))).toEqual({ kind: 'record', margin: 2 });
   });
 
   /* THE CONSEQUENCE ENGINE IS THE CURRENCY CHECK: record_taken is emitted only
@@ -120,7 +124,7 @@ describe('achievement callout', () => {
     const sources = (holderGross: number, holderId: string) => ({
       standing: new Map(),
       records: {
-        holders: new Map([['c1', { course_id: 'c1', user_id: holderId, value: holderGross, attained_on: '2026-05-01' }]]),
+        holders: new Map([['c1', { course_id: 'c1', user_id: holderId, value: holderGross, runner_up_value: null, attained_on: '2026-05-01' }]]),
         lostToViewer: new Set<string>(),
         isFetched: true,
       },
@@ -148,7 +152,7 @@ describe('achievement callout', () => {
     expect(calloutFor(item('eagle', { facts: { eagles: 1 } }), holes))
       .toMatchObject({ kind: 'eagle', hole: null, count: 1, tier: 'ink' });
     expect(calloutFor(item('rank', { consequence: { kind: 'rank_up' } })))
-      .toEqual({ kind: 'rank_up', rank: null });
+      .toEqual({ kind: 'rank_up', rank: null, delta: null });
   });
 });
 

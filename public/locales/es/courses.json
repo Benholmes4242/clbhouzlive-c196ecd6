@@ -143,8 +143,12 @@
     "nowRank": "Ahora {{ord}}",
     "onHole": "en el {{ord}}",
     "rankUp": "Subió",
+    "rankUpBy_one": "Subió un puesto",
+    "rankUpBy_other": "Subió {{count}} puestos",
     "rankUpTo": "Hasta {{ord}}",
     "record": "Récord del campo",
+    "recordMargin_one": "{{count}} golpe mejor",
+    "recordMargin_other": "{{count}} golpes mejor",
     "tagMovedUp": "SUBIÓ",
     "tagNew": "NUEVO"
    },

@@ -143,8 +143,12 @@
     "nowRank": "現在{{ord}}位",
     "onHole": "{{ord}}番ホールで",
     "rankUp": "順位が上昇",
+    "rankUpBy_one": "1つ順位上昇",
+    "rankUpBy_other": "{{count}}つ順位上昇",
     "rankUpTo": "{{ord}}位に上昇",
     "record": "コースレコード",
+    "recordMargin_one": "{{count}}打更新",
+    "recordMargin_other": "{{count}}打更新",
     "tagMovedUp": "順位上昇",
     "tagNew": "NEW"
    },

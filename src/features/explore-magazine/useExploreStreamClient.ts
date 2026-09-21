@@ -11,7 +11,7 @@ import type { ExploreView } from './exploreViewMemory';
 import { RING_WEIGHT, consequenceWeight, type Consequence, type StreamItem } from './streamItem';
 import { useViewerCourseContext, type ViewerCourseContext } from './useViewerCourseContext';
 import { roundConsequence as consequenceFor } from './consequences';
-import { useCourseRecordSignal } from './useCourseRecordSignal';
+import { courseRecordMargin, useCourseRecordSignal } from './useCourseRecordSignal';
 import { useViewerCourseBests } from './useViewerCourseBests';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
@@ -329,6 +329,8 @@ export function useExploreStreamClient(
           },
           { standing: standingMap, records, bests: bests.bests, shortlist: context.shortlist },
         );
+        const recordHolder = row.course_id ? records.holders.get(row.course_id) ?? null : null;
+        const recordMargin = courseRecordMargin(recordHolder);
         /* §3d NO CONSEQUENCE, NO CARD — UNLESS IT IS AN OUTER RING. A county /
            country / world round at a course the viewer has never played carries
            NO invented consequence: it is admitted as a plain "someone played
@@ -379,6 +381,7 @@ export function useExploreStreamClient(
             holes_in_one: row.holes_in_one,
             clean_card: row.clean_card,
             is_course_record: row.is_course_record,
+            record_margin: recordMargin,
             hcp_at_time: row.hcp_at_time,
           },
           payload: { round: row },

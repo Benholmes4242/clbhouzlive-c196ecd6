@@ -15,3 +15,8 @@
 - [x] Build and mount `PersonalBestsShelf` in Explore Magazine using the existing hook and `StandoutTile`.
 - [x] Preserve server copy and server-side dedup/widening; add no cross-section member budget or empty state.
 - [x] Verify 320/390/430, screenshot, focused tests, and typecheck.
+
+## Record margins
+- [x] Read gross-record ranks 1 and 2 together and carry the rank-2 margin to record cards.
+- [x] Reuse the existing board-movement delta for the callout subline.
+- [x] Verify margin/no-margin cards at 390, focused tests, typecheck, and unchanged net record.

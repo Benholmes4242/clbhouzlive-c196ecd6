@@ -70,9 +70,9 @@ export function isNotableRound(item: StreamItem): boolean {
  * unknown the title stands alone; nothing here guesses one.
  */
 export type AchievementCallout =
-  | { kind: 'record' }
+  | { kind: 'record'; margin: number | null }
   | { kind: 'net_record' }
-  | { kind: 'rank_up'; rank: number | null }
+  | { kind: 'rank_up'; rank: number | null; delta: number | null }
   | { kind: 'ace' | 'albatross' | 'eagle'; hole: number | null; count: number; feats: ExploreRoundFeat[]; tier: ExploreFeatTier }
   | { kind: 'birdies'; count: number; feats: ExploreRoundFeat[]; tier: ExploreFeatTier }
   | { kind: 'clean'; feats: ExploreRoundFeat[]; tier: ExploreFeatTier };
@@ -125,7 +125,7 @@ export function calloutFor(item: StreamItem, holes?: CalloutHole[]): Achievement
      beaten record therefore draws no crown, and the round keeps its plain
      headline. */
   if (boardClaimAllowed && !lostIt && consequence?.kind === 'record_taken') {
-    return { kind: 'record' };
+    return { kind: 'record', margin: facts.record_margin ?? null };
   }
   /* THE NET CROWN (C4). net_record is the RPC's claim about the NET board at the
      moment the round arrived, so it is trusted the same way the gross
@@ -137,7 +137,7 @@ export function calloutFor(item: StreamItem, holes?: CalloutHole[]): Achievement
     return { kind: 'net_record' };
   }
   if (boardClaimAllowed && consequence?.kind === 'rank_up') {
-    return { kind: 'rank_up', rank: consequence.n ?? null };
+    return { kind: 'rank_up', rank: consequence.n ?? null, delta: consequence.delta ?? null };
   }
   const feats = topRoundFeats(facts);
   const first = feats[0];
