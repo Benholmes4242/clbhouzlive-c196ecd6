@@ -14,4 +14,4 @@
 - [x] Accept Ben's authenticated proof: 24 rows, 13 members, six feat kinds.
 - [x] Build and mount `PersonalBestsShelf` in Explore Magazine using the existing hook and `StandoutTile`.
 - [x] Preserve server copy and server-side dedup/widening; add no cross-section member budget or empty state.
-- [ ] Verify 320/390/430, screenshot, focused tests, and typecheck.
+- [x] Verify 320/390/430, screenshot, focused tests, and typecheck.
