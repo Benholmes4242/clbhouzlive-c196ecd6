@@ -9,6 +9,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { notifyComposerCompleted } from '@/features/composer-flow/composerFlowStore';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
