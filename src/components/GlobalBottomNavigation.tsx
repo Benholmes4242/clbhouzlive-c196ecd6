@@ -189,27 +189,20 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
   useEffect(() => {
     if (!handoff) return;
-    const onReturnPath = location.pathname === handoff.returnPath;
-    const left = studioOpen || !onReturnPath;
-
-    if (!handoff.armed) {
-      if (left) armHandoff(location.pathname);
-      return;
+    const navWasBack = navWasBackRef.current;
+    const action = nextHandoffAction({
+      handoff,
+      pathname: location.pathname,
+      studioOpen,
+      navWasBack,
+    });
+    if (handoff.armed) navWasBackRef.current = false; // the back is spent
+    if (action.type === 'arm') armHandoff(action.awayPath);
+    else if (action.type === 'clear') clearHandoff();
+    else if (action.type === 'reopen') {
+      clearHandoff(); // one-shot: it fires or it expires
+      setCreateOpen(true);
     }
-
-    const wasBack = navWasBackRef.current;
-    navWasBackRef.current = false;
-
-    // Moved on somewhere else entirely → this is no longer a return.
-    if (!onReturnPath && location.pathname !== handoff.awayPath) {
-      clearHandoff();
-      return;
-    }
-    if (left) return; // still inside the composer
-
-    // Back on the page step 1 was opened from with the composer closed.
-    clearHandoff(); // one-shot either way: it fires or it expires
-    if (wasBack) setCreateOpen(true);
   }, [handoff, studioOpen, location.pathname, armHandoff, clearHandoff]);
 
   // Drawer / sheet active → force expanded (pill sits below sheet scrim).
