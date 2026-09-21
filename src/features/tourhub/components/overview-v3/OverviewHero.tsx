@@ -278,6 +278,13 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             entries={boardEntries}
             currentRound={boardRound}
             phase={bandPhase}
+            /* The SAME champion the strip crowns: only passed once the winner
+               gate has resolved a name, so a pending playoff marks nobody. */
+            championSrId={
+              activeSlide?.type === 'completed' && activeSlide.tournament.winnerName
+                ? activeSlide.tournament.winnerId
+                : null
+            }
             onFullLeaderboard={() => {
               const target = tournamentRoute(bandTournamentId, { kind: 'overview' });
               navigate(target.to, { state: target.state });

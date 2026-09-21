@@ -50,7 +50,7 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown, Trophy } from 'lucide-react';
 
 import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
@@ -193,8 +193,43 @@ interface HeroBoardSectionProps {
    * carousel already knows.
    */
   phase: 'live' | 'upcoming' | 'completed';
+  /**
+   * The champion's Sportradar id (sr_tournaments.winner_id), i.e. the same
+   * champion the hero's ChampionStrip crowns. NULL on live/upcoming slides and
+   * whenever the winner could not be resolved authoritatively — in which case
+   * no trophy renders. Never compared by name or by position (a T1 playoff
+   * loser is not the champion).
+   */
+  championSrId?: string | null;
   onFullLeaderboard: () => void;
   onRowTap?: (playerId: string) => void;
+}
+
+/**
+ * The champion's BOARD player id, resolved by id alone: the leaderboard row
+ * whose player carries the champion's sr_id. Position is never consulted.
+ */
+export function resolveChampionPlayerId(
+  entries: Array<{ player?: { id?: string | null; sr_id?: string | null } | null }>,
+  championSrId: string | null | undefined,
+  phase: HeroBoardSectionProps['phase'],
+): string | null {
+  if (phase !== 'completed' || !championSrId) return null;
+  for (const entry of entries) {
+    const player = entry?.player;
+    if (player?.sr_id && String(player.sr_id) === String(championSrId) && player.id) {
+      return String(player.id);
+    }
+  }
+  return null;
+}
+
+/** A pick earns the trophy only when the pick IS the champion, by player id. */
+export function pickWonTournament(
+  pickPlayerId: string | null | undefined,
+  championPlayerId: string | null,
+): boolean {
+  return Boolean(pickPlayerId && championPlayerId && String(pickPlayerId) === championPlayerId);
 }
 
 export function overviewTournamentDoorKey(phase: HeroBoardSectionProps['phase']): string {
@@ -223,6 +258,7 @@ export function HeroBoardSection({
   entries,
   currentRound,
   phase,
+  championSrId,
   onFullLeaderboard,
   onRowTap,
 }: HeroBoardSectionProps) {
@@ -254,27 +290,41 @@ export function HeroBoardSection({
     return map;
   }, [entries]);
 
-  const closedFigure = useMemo(() => {
+  const championPlayerId = useMemo(
+    () => resolveChampionPlayerId(entries as any[], championSrId, phase),
+    [championSrId, entries, phase],
+  );
+
+  const closedRow = useMemo<{ text: string; trophy: boolean } | null>(() => {
     if (!hasPicks) return null;
     const ranked = [...picks].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
     if (phase === 'upcoming') {
       const names = ranked.slice(0, 3).map((pick) => surnameOf(pick.playerName)).filter(Boolean);
-      return names.length > 0 ? `${names.join(', ')} to win` : null;
+      return names.length > 0 ? { text: `${names.join(', ')} to win`, trophy: false } : null;
     }
     const placed = ranked
       .map((pick) => ({ pick, line: boardByPlayer.get(String(pick.playerId)) }))
       .filter((item) => item.line?.position != null)
       .sort((a, b) => (a.line?.position ?? 999) - (b.line?.position ?? 999));
-    if (placed.length === 0) return surnameOf(ranked[0]?.playerName) || null;
+    if (placed.length === 0) {
+      const fallback = surnameOf(ranked[0]?.playerName);
+      return fallback ? { text: fallback, trophy: false } : null;
+    }
     if (phase === 'completed') {
       const best = placed[0];
       const settled = settledFigureFor(best.line);
-      return settled?.right === WON_LABEL
+      // The trophy marks the CHAMPION, never a position: T1 playoff losers get none.
+      const trophy = pickWonTournament(best.pick.playerId, championPlayerId);
+      const text = settled?.right === WON_LABEL
         ? `Picked ${surnameOf(best.pick.playerName)} to win · ${WON_LABEL}`
         : `${surnameOf(best.pick.playerName)} ${settled?.right ?? ''}`.trim();
+      return { text, trophy };
     }
-    return placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', ');
-  }, [boardByPlayer, hasPicks, phase, picks]);
+    return {
+      text: placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', '),
+      trophy: false,
+    };
+  }, [boardByPlayer, championPlayerId, hasPicks, phase, picks]);
 
   const showUpcomingFacts = shouldLoadUpcomingFacts(phase);
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showUpcomingFacts);
@@ -322,7 +372,7 @@ export function HeroBoardSection({
         </div>
       ) : null}
 
-      {hasPicks && closedFigure ? (
+      {hasPicks && closedRow ? (
         <>
           <button
             type="button"
@@ -332,7 +382,18 @@ export function HeroBoardSection({
           >
             {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
             <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
-            <span style={{ minWidth: 0, fontSize: 13, color: 'rgba(248,250,252,0.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{closedFigure}</span>
+            <span style={{ minWidth: 0, fontSize: 13, color: 'rgba(248,250,252,0.85)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {closedRow.trophy ? (
+                <Trophy
+                  data-pick-trophy
+                  size={12}
+                  color={GOLD}
+                  strokeWidth={2.5}
+                  style={{ display: 'inline-block', verticalAlign: '-1px', marginRight: 4, flexShrink: 0 }}
+                />
+              ) : null}
+              {closedRow.text}
+            </span>
             {picksOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
           {picksOpen ? <PicksPanel picks={picks} tourCode={pickTourCode} phase={phase} boardByPlayer={boardByPlayer} predictions={predictions ?? null} /> : null}

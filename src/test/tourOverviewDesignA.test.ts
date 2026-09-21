@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { resolveChampionPlayerId, pickWonTournament } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { render } from '@testing-library/react';
 import { createElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -280,5 +281,31 @@ describe('story elapsed-time labels', () => {
     const feedStory = story('15-sep', '2026-09-15T13:15:00Z', null);
     expect(storyTime(feedStory.published_at, feedNow)).toBe('2 DAYS AGO');
     expect(selectOverviewBandStory([feedStory], 'unmatched-hero', feedNow)?.id).toBe('15-sep');
+  });
+});
+
+// CORRECTION 3 — the trophy marks the CHAMPION, not position 1 and not "T1".
+describe('our picks trophy', () => {
+  const entries = [
+    { player: { id: 'zj-uuid', sr_id: 'zj-sr' }, position: 1, position_tied: true, score: -12 },
+    { player: { id: 'rs-uuid', sr_id: 'rs-sr' }, position: 1, position_tied: true, score: -12 },
+    { player: { id: 'ra-uuid', sr_id: 'ra-sr' }, position: 3, position_tied: true, score: -10 },
+  ];
+
+  it('resolves the champion by sr_id on a completed event only', () => {
+    expect(resolveChampionPlayerId(entries, 'zj-sr', 'completed')).toBe('zj-uuid');
+    expect(resolveChampionPlayerId(entries, 'zj-sr', 'live')).toBeNull();
+    expect(resolveChampionPlayerId(entries, 'zj-sr', 'upcoming')).toBeNull();
+    expect(resolveChampionPlayerId(entries, null, 'completed')).toBeNull();
+    expect(resolveChampionPlayerId(entries, 'nobody-sr', 'completed')).toBeNull();
+  });
+
+  it('gives the trophy to the playoff winner and not to the T1 loser', () => {
+    const champion = resolveChampionPlayerId(entries, 'zj-sr', 'completed');
+    expect(pickWonTournament('zj-uuid', champion)).toBe(true);
+    expect(pickWonTournament('rs-uuid', champion)).toBe(false);
+    expect(pickWonTournament('ra-uuid', champion)).toBe(false);
+    expect(pickWonTournament('zj-uuid', null)).toBe(false);
+    expect(pickWonTournament(null, champion)).toBe(false);
   });
 });
