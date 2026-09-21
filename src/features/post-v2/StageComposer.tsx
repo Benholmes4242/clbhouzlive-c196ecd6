@@ -403,6 +403,9 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         authorUsername,
       });
       submittedRef.current = true;
+      // A finished job is not a change of mind: the composer-flow step 1 must
+      // never come back on top of the success screen.
+      notifyComposerCompleted();
       // Analytics callsite: post_submitted
       analyticsEvents.track('post_submitted', {
         mode,
