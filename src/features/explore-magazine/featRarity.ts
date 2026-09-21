@@ -156,16 +156,27 @@ export function featRarityLines({
   const feat = nameOf(kind, t);
   const num = (n: number) => n.toLocaleString(locale);
 
-  /* THE VIEWER LINE. Both figures or nothing — never a partial sentence. */
+  /* THE VIEWER LINE. The first three distinct members get the stronger,
+     platform-scoped member wording. From the fourth member onward, retain the
+     frozen ordinal-and-rounds sentence as the fallback. All three frozen
+     figures must be present — never render a partial claim. */
   const ordinal = row.global_ordinal;
   const rounds = row.total_rounds_at_detection;
-  const viewerLine = ordinal != null && ordinal > 0 && rounds != null && rounds > 0
-    ? t('featRarity.viewer', 'The {{ord}} {{feat}} in {{rounds}} rounds.', {
-        ord: rarityOrdinal(ordinal, locale, t),
-        feat,
-        rounds: num(rounds),
-      })
-    : null;
+  const members = row.distinct_members_at_detection;
+  const hasFrozenFigures = ordinal != null && ordinal > 0 && rounds != null && rounds > 0 && members != null && members > 0;
+  const viewerLine = !hasFrozenFigures
+    ? null
+    : members === 1
+      ? t('featRarity.viewerSole', 'The first clbhouz member ever to achieve this.')
+      : members === 2
+        ? t('featRarity.viewerRareTwo', 'Only the second clbhouz member to achieve this.')
+        : members === 3
+          ? t('featRarity.viewerRareThree', 'Only the third clbhouz member to achieve this.')
+          : t('featRarity.viewer', 'The {{ord}} {{feat}} in {{rounds}} rounds.', {
+              ord: rarityOrdinal(ordinal, locale, t),
+              feat,
+              rounds: num(rounds),
+            });
 
   /* THE OWNER STRIP. FIRST MATCH WINS, and REPEAT outranks everything: a member
      who has done it twice is never told again that they were the first.
@@ -175,7 +186,6 @@ export function featRarityLines({
      this platform, replaces a vague bracket with the known sequence position,
      and remains permanently true as more members achieve the feat. */
   const mine = (owner ?? []).find((o) => o.feat_kind === row.feat_kind && o.is_owner === true) ?? null;
-  const members = row.distinct_members_at_detection;
   let ownerLine: string | null = null;
   let ownerBranch: 'Repeat' | 'RareTwo' | 'RareThree' | 'Sole' | 'First' | null = null;
   if (mine) {

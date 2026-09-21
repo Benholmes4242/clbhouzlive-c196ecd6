@@ -1710,7 +1710,10 @@
     "ownerRepeatCongrats": "{{line}} — congrats, {{name}}",
     "ownerSole": "The first clbhouz member ever to achieve this.",
     "ownerSoleCongrats": "{{line}} — congrats, {{name}}",
-    "viewer": "The {{ord}} {{feat}} in {{rounds}} rounds."
+    "viewer": "The {{ord}} {{feat}} in {{rounds}} rounds.",
+    "viewerRareThree": "Only the third clbhouz member to achieve this.",
+    "viewerRareTwo": "Only the second clbhouz member to achieve this.",
+    "viewerSole": "The first clbhouz member ever to achieve this."
   },
   "friends": {
     "signIn": "Sign in",

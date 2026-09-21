@@ -387,7 +387,7 @@ export function RoundStatStrip({
       data-explore-stat-layout={achievement && hasNet ? 'achievement-and-figures' : achievement ? 'achievement-only' : 'figures-only'}
       style={{
         display: 'grid',
-        gridTemplateColumns: achievement && hasNet ? 'minmax(0, 1fr) repeat(2, 72px)' : hasNet ? 'repeat(2, minmax(0, 1fr))' : 'minmax(0, 1fr)',
+        gridTemplateColumns: achievement && hasNet ? 'minmax(0, 2.3fr) repeat(3, minmax(0, 0.7fr))' : hasNet ? 'repeat(3, minmax(0, 1fr))' : 'minmax(0, 1fr)',
         width: '100%',
         minWidth: 0,
         marginTop: 10,
@@ -428,6 +428,7 @@ export function RoundStatStrip({
         <>
           <FigureCell label={t('amateur.stream.stat.par', 'PAR')} value={String(coursePar)} />
           <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(net)} under={(net as number) < (coursePar as number)} />
+           <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(net as number, coursePar as number)} under={(net as number) < (coursePar as number)} />
         </>
       ) : null}
       {achievement && tier !== 'ink' ? rarity : null}

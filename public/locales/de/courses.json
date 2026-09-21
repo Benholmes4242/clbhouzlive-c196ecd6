@@ -1263,7 +1263,10 @@
     "ownerRepeatCongrats": "Glückwunsch, {{name}} — {{line}}",
     "ownerSole": "Das erste clbhouz-Mitglied überhaupt, das dies erreicht hat.",
     "ownerSoleCongrats": "Glückwunsch, {{name}} — {{line}}",
-    "viewer": "Das {{ord}} {{feat}} in {{rounds}} Runden."
+    "viewer": "Das {{ord}} {{feat}} in {{rounds}} Runden.",
+    "viewerRareThree": "Erst das dritte clbhouz-Mitglied, das dies erreicht hat.",
+    "viewerRareTwo": "Erst das zweite clbhouz-Mitglied, das dies erreicht hat.",
+    "viewerSole": "Das erste clbhouz-Mitglied überhaupt, das dies erreicht hat."
   },
   "friends": {
     "signIn": "Sign in",

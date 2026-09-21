@@ -1222,7 +1222,10 @@
     "ownerRepeatCongrats": "{{line}} — {{name}}さん、おめでとうございます",
     "ownerSole": "これを達成したclbhouz史上初のメンバーです。",
     "ownerSoleCongrats": "{{line}} — {{name}}さん、おめでとうございます",
-    "viewer": "{{rounds}}ラウンドで{{ord}}回目の{{feat}}。"
+    "viewer": "{{rounds}}ラウンドで{{ord}}回目の{{feat}}。",
+    "viewerRareThree": "これを達成したclbhouz史上3人目のメンバーです。",
+    "viewerRareTwo": "これを達成したclbhouz史上2人目のメンバーです。",
+    "viewerSole": "これを達成したclbhouz史上初のメンバーです。"
   },
   "friends": {
     "signIn": "Sign in",

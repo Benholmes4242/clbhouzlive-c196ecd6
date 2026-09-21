@@ -1225,7 +1225,10 @@
     "ownerRepeatCongrats": "{{line}} — {{name}}님, 축하합니다",
     "ownerSole": "이를 달성한 clbhouz 최초의 멤버입니다.",
     "ownerSoleCongrats": "{{line}} — {{name}}님, 축하합니다",
-    "viewer": "{{rounds}}라운드 중 {{ord}}번째 {{feat}}."
+    "viewer": "{{rounds}}라운드 중 {{ord}}번째 {{feat}}.",
+    "viewerRareThree": "이를 달성한 clbhouz의 세 번째 멤버입니다.",
+    "viewerRareTwo": "이를 달성한 clbhouz의 두 번째 멤버입니다.",
+    "viewerSole": "이를 달성한 clbhouz 최초의 멤버입니다."
   },
   "friends": {
     "signIn": "Sign in",
