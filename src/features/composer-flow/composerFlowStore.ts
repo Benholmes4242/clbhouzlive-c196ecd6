@@ -3,9 +3,18 @@
  * composer that step 1 opens (an overlay for the post path, a route for the
  * review path).
  *
- * WHY THIS EXISTS: back out of the composer must land on STEP 1, not on the
- * page underneath it. Step 1 is a sheet and the composers are not, so nothing
- * in the sheet stack can express that return on its own.
+ * WHY THIS EXISTS: backing out of the composer must land on STEP 1, not on the
+ * page underneath it — a member who opened the post composer and then realised
+ * they meant to rate the course should land back on the tiles. Step 1 is a
+ * sheet and the composers are not, so nothing in the sheet stack can express
+ * that return on its own.
+ *
+ * IN MEMORY ONLY — NEVER PERSISTED. This record must not touch sessionStorage,
+ * localStorage or the URL. A persisted record can resurrect on a cold launch
+ * and open the composer over whatever the member opened the app to do; that is
+ * the worst version of this bug and the hardest to reproduce. Zustand without
+ * `persist` means the record starts null on every fresh JS context, so a cold
+ * launch cannot reopen step 1 under any circumstance.
  *
  * ARMING IS THE WHOLE TRICK. The review handoff navigates through
  * afterSheetHistorySettled, so at the moment the record is written the route
@@ -14,6 +23,15 @@
  * re-open step 1 over its own handoff. The record is only ARMED once we have
  * actually left — either the path changed or the studio opened — and only an
  * armed record can reopen step 1.
+ *
+ * DISARMED IMMEDIATELY AND PERMANENTLY BY ANY OF (enforced in
+ * GlobalBottomNavigation's reopen effect, except completion which is reported
+ * by the composers themselves through notifyComposerCompleted):
+ *   - the member completing a post or a review
+ *   - navigating anywhere that is not the page step 1 was opened from
+ *   - step 1 reopening once — it is one-shot: it fires or it expires
+ *   - the app being backgrounded and restored
+ *   - the composer being closed by anything other than back
  */
 import { create } from 'zustand';
 
@@ -22,19 +40,31 @@ interface Handoff {
   returnPath: string;
   /** True once we have actually left step 1. Only then may it reopen. */
   armed: boolean;
+  /** The path we left step 1 for, captured at the moment of arming. */
+  awayPath: string | null;
 }
 
 interface ComposerFlowState {
   handoff: Handoff | null;
   /** Called by step 1 as it hands off to a composer. */
   beginHandoff: (returnPath: string) => void;
-  arm: () => void;
+  arm: (awayPath: string) => void;
   clearHandoff: () => void;
 }
 
 export const useComposerFlowStore = create<ComposerFlowState>((set) => ({
   handoff: null,
-  beginHandoff: (returnPath) => set({ handoff: { returnPath, armed: false } }),
-  arm: () => set((s) => (s.handoff ? { handoff: { ...s.handoff, armed: true } } : s)),
+  beginHandoff: (returnPath) => set({ handoff: { returnPath, armed: false, awayPath: null } }),
+  arm: (awayPath) =>
+    set((s) => (s.handoff ? { handoff: { ...s.handoff, armed: true, awayPath } } : s)),
   clearHandoff: () => set({ handoff: null }),
 }));
+
+/**
+ * Called by a composer the moment a post or review is actually submitted.
+ * Completion is a finished job, not a change of mind — step 1 must never come
+ * back on top of the success screen or the receipt.
+ */
+export function notifyComposerCompleted(): void {
+  useComposerFlowStore.getState().clearHandoff();
+}
