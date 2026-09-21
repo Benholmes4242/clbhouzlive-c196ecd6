@@ -7,7 +7,7 @@ import type { HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard, type TourTournament } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { PhotoBand, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
-import { deriveHeroState, detectTopTie } from './HybridHero.utils';
+import { deriveHeroState, detectTopTie, fmtScore } from './HybridHero.utils';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';

@@ -130,10 +130,11 @@ describe('Tour Overview correctness gates', () => {
   });
 
   it('shows prize only when every displayed completed row has money', () => {
-    const paid = Array.from({ length: 6 }, (_, index) => ({ money: 1_000 + index }));
+    const row = (id: string, money: number | null) => ({ id, position: 1, score: -10, money });
+    const paid = Array.from({ length: 6 }, (_, index) => row(String(index), 1_000 + index));
     expect(shouldShowOverviewPrize(paid, 5)).toBe(true);
-    expect(shouldShowOverviewPrize([{ money: 1_000 }, { money: null }], 5)).toBe(false);
-    expect(shouldShowOverviewPrize([...paid.slice(0, 5), { money: null }], 5)).toBe(true);
+    expect(shouldShowOverviewPrize([row('paid', 1_000), row('missing', null)], 5)).toBe(false);
+    expect(shouldShowOverviewPrize([...paid.slice(0, 5), row('outside-slice', null)], 5)).toBe(true);
     expect(shouldShowOverviewPrize([], 5)).toBe(false);
   });
 
