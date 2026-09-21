@@ -19,4 +19,4 @@
 ## Record margins
 - [x] Read gross-record ranks 1 and 2 together and carry the rank-2 margin to record cards.
 - [x] Reuse the existing board-movement delta for the callout subline.
-- [ ] Verify margin/no-margin cards at 390, focused tests, typecheck, and unchanged net record.
+- [x] Verify margin/no-margin cards at 390, focused tests, typecheck, and unchanged net record.
