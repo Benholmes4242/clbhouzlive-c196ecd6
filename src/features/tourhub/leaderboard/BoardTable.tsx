@@ -596,7 +596,9 @@ export function BoardTable({
     const mov = !demotedRow ? movementMap.get(pid ?? e.team?.id ?? e.id) : undefined;
     const entity = resolveBoardEntity(e, resolvedAmbiguous);
     const fullName = entity.label;
-    const nameText = columns.preTournament ? fullName : nameAtTier(fullName, tier);
+    // Team labels are already provider-authored compact forms. Applying the
+    // player-name shortening ladder would split them incorrectly.
+    const nameText = columns.preTournament || entity.kind === 'team' ? fullName : nameAtTier(fullName, tier);
 
     const open = () => {
       if (onRowClick) return onRowClick(e);
