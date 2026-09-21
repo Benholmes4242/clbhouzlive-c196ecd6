@@ -98,8 +98,6 @@ export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text o
 // Overview story/rail materials. Kept semantic so the full-bleed treatments do
 // not retype visual constants at their call sites.
 export const OVERVIEW_RAIL_HAIRLINE = 'rgba(255,255,255,0.07)';
-export const STORY_BAND_META_INK = 'rgba(248,250,252,0.72)';
-export const STORY_BAND_SCRIM = 'linear-gradient(to bottom, transparent 0%, rgba(10,12,16,0.92) 100%)';
 export const OVERVIEW_PICKS_TEXT_INK = 'rgba(248,250,252,0.85)';
 
 

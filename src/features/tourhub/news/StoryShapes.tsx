@@ -103,6 +103,8 @@ export function HeroStory({
   showEngagement = true,
   engagementAction,
   attachedContent,
+  kicker,
+  onImageError,
 }: StoryShapeProps & {
   topOffset?: number | string;
   /** Horizontal type inset; the News tabs retain the canonical 14px default. */
@@ -112,17 +114,30 @@ export function HeroStory({
   engagementAction?: React.ReactNode;
   /** Story-owned context, such as its tournament ticker, attaches to the hero. */
   attachedContent?: React.ReactNode;
+  /**
+   * Replaces tagFor(story) in the top line. The overview band labels by TOUR
+   * ("DP WORLD TOUR") where tagFor prefers the event name; undefined keeps
+   * today's wording for every other caller. The relative date and the " · "
+   * join stay here, so the line still reads "DP WORLD TOUR · 7H AGO".
+   */
+  kicker?: string;
+  /**
+   * The hero renders A.PANEL behind a broken <img>, which is fine in a news
+   * list and wrong mid-page: the overview band hides itself instead of leaving
+   * a 340px grey rectangle. Undefined by default — no existing caller changes.
+   */
+  onImageError?: () => void;
 }) {
   return (
     <>
       <button type="button" className={storyButtonClass} onClick={onOpen} style={{ ...tapReset, display: 'block' }} aria-label={`Read ${story.headline}`}>
         <article style={{ position: 'relative', height: 340, overflow: 'hidden', background: A.PANEL }}>
           {story.image_url && (
-            <img src={story.image_url} alt="" loading="eager" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img src={story.image_url} alt="" loading="eager" decoding="async" onError={onImageError} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           )}
           <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,.05) 34%, rgba(0,0,0,.86))' }} />
           <div style={{ ...COLUMN, position: 'absolute', top: topOffset, left: gutter, right: gutter, color: 'rgba(248,250,252,0.82)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {tagFor(story)}{relativeDate(story) ? ` · ${relativeDate(story)}` : ''}
+            {kicker ?? tagFor(story)}{relativeDate(story) ? ` · ${relativeDate(story)}` : ''}
           </div>
           <div style={{ position: 'absolute', left: gutter, right: gutter, bottom: 14 }}>
             <h1 style={{ margin: 0, fontSize: 25, fontWeight: 800, lineHeight: 1.13, letterSpacing: '-0.01em', color: A.INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 4, overflow: 'hidden', overflowWrap: 'anywhere' }}>
