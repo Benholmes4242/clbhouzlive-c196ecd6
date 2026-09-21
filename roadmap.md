@@ -1,29 +1,7 @@
-# Roadmap
+# BRIEF_ROUND_RESULTS
 
-- [x] Add pure player-season selection logic and focused tests.
-- [x] Rebuild the player hero with candidate-walk photography, verdict prose, and proof figures.
-- [x] Recompose season statistics into one ranked headline and a subordinate counting row.
-- [x] Add the Against the field strengths and weaknesses module.
-- [x] Replace form chips with the full-season result-shape plot.
-- [x] Weight wins in tournament rows and normalize residence display.
-- [x] Add all new copy across six locales with CJK-safe casing.
-- [x] Verify representative PGA, no-photo, and non-PGA players at 320px, 390px, and 430px.
-- [x] Rebuild tournament detail around one contest narrative, unique figures, and state-specific evidence.
-- [x] Exclude leaders from the tournament contention count and verify forced contest states.
-- [x] Rebuild the feat pill with two figures, one in-pill rarity line, localized owner congratulations, and derived GOLD/TOP tier treatments.
-- [x] Restore every feat's fixed artwork after the temporary monochrome icon substitution.
-- [x] Move the selected GOLD/TOP rarity sentence into one full-width pill row and scope rare owner copy to clbhouz.
-- [x] Restore VS HCP to the feat pill and use member-position public rarity copy through three members.
-- [x] Replace the withdrawn GOLD/TOP tile tint and border with tokenized emblem lighting, then verify contrast and scroll painting.
-- [x] Replace the box-tracing emblem shadow with a silhouette-tracing drop-shadow and remove wrapper geometry.
-- [x] Move completed champions beneath the Tour Overview photo and gate PRIZE on complete displayed-row coverage.
-- [x] Align the tournament hero chip with Tour Overview and correct completed-playoff narration.
-- [x] Exclude cup and match-play events from every Tour Hub surface that asserts a leader or champion.
-- [x] Close the second leader-asserting list: this-week card, tournaments cache (all three buckets), generic fetch, last-year lookups and predictions guard.
-- [x] Render feed-native team identities throughout team tournament detail pages and verify Zurich/Dow responsively.
-- [x] Make team tournament board names uniform per event and measure every team label at 320px.
-- [x] Stack team partners on equal-weight lines across tournament boards and verify responsive row geometry.
-- [x] Extend the measured board name ladder to stacked team partners with a collision-safe short-name floor.
-- [x] Let the full board drop PRIZE after the name ladder and cell-width floor are exhausted.
-- [ ] Let resolved team champions back onto Tour Overview/live surfaces, delete requested dead hooks/components, and align detail hero type with the overview.
-- [x] Unify full-width tournament detail and full-board sheet sections onto the canonical page ground, preserving raised cards.
+- [ ] Inspect round detail, RPC precedent, formatters, tokens, and translations
+- [ ] Build awards hook and three conditional result blocks
+- [ ] Add medal tokens and all handicap translations
+- [ ] Verify tests, typecheck, empty states, and 320/390 layouts
+- [ ] Capture 390px screenshots for the specified round
