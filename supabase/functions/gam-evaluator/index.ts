@@ -634,6 +634,26 @@ function deltaAtLadderIndex(ladder: ScoreLadderRow[], i: number): number | null 
 
 
 
+/**
+ * BRIEF_STRETCH_FIGURES — sum of (actual_gross - par) over holes [from..to].
+ *
+ * Returns null unless EVERY hole in the range is present exactly once, has
+ * played === true, and carries a non-null actual_gross and a non-null par.
+ * Deliberately uses actual_gross, never adjusted_gross: these figures are what
+ * was scored, not what counts for handicap.
+ */
+function rangeToPar(holes: any[], from: number, to: number): number | null {
+  let sum = 0;
+  for (let n = from; n <= to; n++) {
+    const h = holes.find((r: any) => Number(r.hole_no) === n);
+    if (!h) return null;
+    if (h.played !== true) return null;
+    if (h.actual_gross == null || h.par == null) return null;
+    sum += Number(h.actual_gross) - Number(h.par);
+  }
+  return sum;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // compute_round_stats
 // ─────────────────────────────────────────────────────────────────────────────
@@ -701,6 +721,16 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     // guard rejecting an administrative recalculation. A round that moved
     // nothing stores 0.0, which is a fact about the round, not missing data.
     delta_index: meta.delta_index ?? null,
+    // BRIEF_STRETCH_FIGURES — stretch to-par figures, actual_gross only.
+    // NULL unless every hole in the range is present, played, and carries both
+    // an actual_gross and a par. A missing hole nulls the whole figure; it does
+    // not contribute zero and does not shorten the range. Precedent:
+    // useCircleLatestRounds — "both nines must be complete, or the split says
+    // nothing true". 18-hole rounds only: nothing records which physical nine a
+    // nine-hole card covered, so a 1-9 card cannot be trusted as the front nine.
+    front_nine_to_par: is18 ? rangeToPar(holes, 1, 9) : null,
+    back_nine_to_par: is18 ? rangeToPar(holes, 10, 18) : null,
+    finish_six_to_par: is18 ? rangeToPar(holes, 13, 18) : null,
     evaluator_version: EVALUATOR_VERSION,
   };
 
@@ -1061,6 +1091,7 @@ const HOLE_DERIVED_STAT_FIELDS = new Set([
   "pars", "bogeys", "double_bogeys", "triple_plus",
   "clean_card", "longest_birdie_run", "longest_par_or_better_run",
   "max_birdie_streak",
+  "front_nine_to_par", "back_nine_to_par", "finish_six_to_par",
 ]);
 
 // Binary badge ids whose condition reads a hole-derived stat.
