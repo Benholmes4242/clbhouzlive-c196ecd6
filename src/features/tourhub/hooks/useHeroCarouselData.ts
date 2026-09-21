@@ -228,10 +228,11 @@ export function useHeroCarouselData() {
         }
       });
 
-      // Build confirmed-winner map from event_winners (authoritative).
+      // Build confirmed-winner map from event_winners (authoritative), gated to stroke events.
+      const strokeIds = new Set<string>(((strokeFormatsResult as any).data || []).map((row: any) => row.id));
       const confirmedWinnerSet = new Set<string>();
       ((eventWinnersResult as any).data || []).forEach((w: any) => {
-        if (w.tournament_id) confirmedWinnerSet.add(w.tournament_id);
+        if (w.tournament_id && strokeIds.has(w.tournament_id)) confirmedWinnerSet.add(w.tournament_id);
       });
 
       // Build defending champion map
