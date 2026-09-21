@@ -142,7 +142,7 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
       margin: tiedAtTop ? null : margin != null && margin > 0 ? margin : null,
       playoff: Boolean(tiedAtTop),
     };
-  }, [needsInitials, rows, state.kind, top?.player, top?.score, top?.team, tournament.winnerId, tournament.winnerName]);
+  }, [needsInitials, rows, state.kind, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName]);
 
   const championAvatarUrl = champion
     ? resolvePlayerAvatarCandidates({
