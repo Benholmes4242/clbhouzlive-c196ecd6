@@ -1,4 +1,4 @@
-# PHASE 3 COMMIT B — HELD. DO NOT APPLY UNTIL create_post_v2 HAS BEEN REPLACED.
+# PHASE 3 COMMIT B — APPLIED 2026-09-21 19:47 UTC. create_post_v2 was replaced the same day (media guard removed, server now enforces media OR words; the unreachable 'scheduled' branch was removed with it, scheduled_at still written). Kept for the record of what changed and why.
 
 Commit A is in the branch. This file is the whole of commit B, written out and
 deliberately NOT applied.
