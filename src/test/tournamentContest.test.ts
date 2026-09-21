@@ -124,6 +124,8 @@ describe('selectTournamentContest', () => {
     expect(resolveBoardEntity(board[1], needsInitials).lines).toEqual(['H. J. Kim', 'H. J. Choi']);
     expect(resolveBoardEntity(board[2], needsInitials).lines).toEqual(['A. Iwai', 'C. Iwai']);
     expect(resolveBoardEntity(board[3], needsInitials).lines).toEqual(['A. Smalley', 'B. Springer']);
+    expect(resolveBoardEntity(board[0], needsInitials, 'surname').lines).toEqual(['G. Kim', 'Y. Wilson']);
+    expect(resolveBoardEntity(board[0], needsInitials, 'full').lines).toEqual(['Gina Kim', 'Yana Wilson']);
   });
 
   it('uses surname forms for every team when the board has no ambiguous surname', () => {

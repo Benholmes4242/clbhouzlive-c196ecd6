@@ -3,7 +3,7 @@
  * Grammar: POS | PLAYER + flag | THRU | TODAY | TOT
  * Row tap opens ScorecardSheet.
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
@@ -19,7 +19,7 @@ import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
 import { formatEarnings } from '../../_shared/formatEarnings';
-import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
+import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../../_shared/boardEntity';
 
 type Row = BoardEntry;
 
@@ -115,6 +115,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
   const needsInitials = useMemo(() => teamNamesNeedInitials(entries), [entries]);
+  const nameTrackRef = useRef<HTMLDivElement>(null);
+  const [nameTrackWidth, setNameTrackWidth] = useState(0);
   const T = THEME_TOKENS[theme];
   /** getScoreColor knows two ramps only; both dark grounds take the dark ramp. */
   const scoreTheme = theme === 'light' ? 'light' : 'dark';
@@ -133,6 +135,26 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const overviewGrid = phase === 'completed'
     ? [showOverviewPosition ? '44px' : null, 'minmax(0, 1fr)', '52px', showOverviewPrize ? '52px' : null].filter(Boolean).join(' ')
     : [showOverviewPosition ? '44px' : null, 'minmax(0, 1fr)', showOverviewToday ? '40px' : null, '52px'].filter(Boolean).join(' ');
+
+  useEffect(() => {
+    const element = nameTrackRef.current;
+    if (!element) return;
+    const measure = () => setNameTrackWidth(element.getBoundingClientRect().width);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [theme, showPrize, overviewGrid]);
+
+  const nameTier = useMemo<BoardNameTier>(() => {
+    const teamRows = entries.filter((entry) => entry.team);
+    if (teamRows.length === 0 || nameTrackWidth <= 0 || typeof document === 'undefined') return needsInitials ? 'short' : 'surname';
+    const context = document.createElement('canvas').getContext('2d');
+    if (!context) return needsInitials ? 'short' : 'surname';
+    context.font = `600 12.5px ${FONT}`;
+    const tiers: BoardNameTier[] = needsInitials ? ['full', 'short'] : ['full', 'short', 'surname'];
+    return tiers.find((candidate) => teamRows.every((entry) => resolveBoardEntity(entry, needsInitials, candidate).lines.every((line) => context.measureText(line).width <= nameTrackWidth))) ?? tiers[tiers.length - 1];
+  }, [entries, nameTrackWidth, needsInitials]);
 
   const overviewName = (fullName: string | undefined): string => fullName?.trim() || BLANK;
 
@@ -156,13 +178,13 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
         <div style={{ background: T.surface, fontFamily: FONT }}>
           <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', minHeight: 32, padding: '4px 24px', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
-            <div>{t('board.columns.player')}</div>
+            <div ref={nameTrackRef}>{t('board.columns.player')}</div>
             {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right' }}>{t('board.columns.today')}</div> : null}
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
             {showOverviewPrize ? <div style={{ textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div> : null}
           </div>
           {rows.map((r) => {
-            const entity = resolveBoardEntity(r, needsInitials);
+            const entity = resolveBoardEntity(r, needsInitials, nameTier);
             const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
               : r.status === 'WD' ? 'WD'
               : r.position == null ? BLANK
@@ -200,7 +222,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
 
   return (
     <>
-      <div style={{ background: T.surface, fontFamily: FONT }}>
+        <div style={{ background: T.surface, fontFamily: FONT }} data-board-name-tier={nameTier}>
         <div
           style={{
             display: 'flex', alignItems: 'center',
@@ -212,7 +234,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
           }}
         >
           <div style={{ width: 34, flexShrink: 0 }}>{t('board.columns.pos')}</div>
-          <div style={{ flex: 1, minWidth: 0 }}>{t('board.columns.player')}</div>
+          <div ref={nameTrackRef} style={{ flex: 1, minWidth: 0 }}>{t('board.columns.player')}</div>
           <div style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.thru')}</div>
           <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.today')}</div>
           <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.tot')}</div>
@@ -221,7 +243,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
 
         </div>
         {rows.map((r) => {
-          const entity = resolveBoardEntity(r, needsInitials);
+          const entity = resolveBoardEntity(r, needsInitials, nameTier);
           const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
             : r.status === 'WD' ? 'WD'
             : r.position == null ? BLANK

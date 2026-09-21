@@ -9,6 +9,8 @@ export interface BoardEntity {
   prose: string;
 }
 
+export type BoardNameTier = 'full' | 'short' | 'surname';
+
 function teamSegments(entry: BoardEntry): string[] {
   return (entry.team?.abbr_name ?? '')
     .split('/')
@@ -61,16 +63,25 @@ function teamLines(value: string): string[] {
     .filter(Boolean);
 }
 
-export function resolveBoardEntity(entry: BoardEntry, needsInitials: boolean): BoardEntity {
+export function resolveBoardEntity(
+  entry: BoardEntry,
+  needsInitials: boolean,
+  tier: BoardNameTier = needsInitials ? 'short' : 'surname',
+): BoardEntity {
   const playerName = entry.player?.full_name?.trim() ?? '';
   if (!entry.team) return { kind: 'player', lines: [playerName], prose: playerName };
 
   const abbrName = entry.team?.abbr_name?.trim() ?? '';
   const displayName = entry.team?.display_name?.trim() ?? '';
   const memberNames = orderedMemberNames(entry);
-  const label = needsInitials && displayName
-    ? readableDisplayName(displayName)
-    : abbrName || (displayName ? readableDisplayName(displayName) : '') || playerName;
+  const safeTier = needsInitials && tier === 'surname' ? 'short' : tier;
+  const fullLabel = memberNames.join(' / ');
+  const shortLabel = displayName ? readableDisplayName(displayName) : '';
+  const label = safeTier === 'full'
+    ? fullLabel || shortLabel || abbrName || playerName
+    : safeTier === 'short'
+      ? shortLabel || abbrName || playerName
+      : abbrName || shortLabel || playerName;
   const lines = teamLines(label);
 
   return {
