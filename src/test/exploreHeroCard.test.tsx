@@ -146,7 +146,8 @@ describe('Explore card shapes', () => {
     const photoChip = container.querySelector<HTMLElement>('[data-review-photo-count="true"]');
     expect(rail?.tagName).toBe('UL');
     expect(rail?.children).toHaveLength(4);
-    expect(rail?.children[0]?.getAttribute('aria-label')).toBe('Design 9.2 out of 10');
+    expect(rail?.children[0]?.getAttribute('aria-label')).toContain('9.2');
+    expect(rail?.children[0]?.getAttribute('aria-label')).toContain('outOfTen');
     expect(container.querySelector<HTMLElement>('[data-review-breakdown-fill="design"]')?.style.width).toBe('92%');
     expect(photoChip?.textContent).toBe('3 photos');
     expect(photoChip?.style.right).toBe('8px');
@@ -270,9 +271,11 @@ describe('Explore card shapes', () => {
       const course = container.querySelector<HTMLElement>('[data-review-course-name="true"]');
       const right = container.querySelector<HTMLElement>('[data-review-identity-right="true"]');
       expect(course?.textContent).toContain("Prince's Golf Club");
-      expect(course?.style.flex).toBe('1 0 auto');
+      expect(course?.style.flex).toBe('1 1 auto');
+      expect(course?.style.textOverflow).toBe('ellipsis');
       expect(member?.style.overflow).toBe('hidden');
       expect(member?.style.textOverflow).toBe('ellipsis');
+      expect(member?.style.maxWidth).toBe('28%');
       expect(right?.style.flex).toBe('0 0 auto');
       expect(right?.style.whiteSpace).toBe('nowrap');
       if (item.ring === 'club') expect(right?.textContent).not.toContain('·');

@@ -382,7 +382,7 @@ function WhoLine({
         <span
           data-review-member-name="true"
           style={{
-            flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            flex: '0 1 auto', maxWidth: '28%', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, textShadow: HERO_TEXT_SHADOW,
           }}
         >
@@ -393,7 +393,7 @@ function WhoLine({
           <span
             data-review-course-name="true"
             style={{
-              flex: '1 0 auto', minWidth: 0, whiteSpace: 'nowrap', fontFamily: SANS, fontSize: 12,
+              flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: SANS, fontSize: 12,
               fontWeight: 600, color: subColor, textShadow: HERO_TEXT_SHADOW,
             }}
           >
@@ -562,9 +562,10 @@ function ReviewBreakdownRail({ breakdown }: { breakdown: ReviewBreakdown | undef
       {REVIEW_BREAKDOWN_AREAS.map(([field, labelKey]) => {
         const score = breakdown[field] as number;
         const label = t(`review.subscore.${labelKey}`);
+        const outOfTen = t('statBrowse.reviews.outOfTen');
         const tone = courseSubScoreTone(score);
         return (
-          <li key={field} aria-label={`${label} ${score.toFixed(1)} out of 10`} style={{ minWidth: 0 }}>
+          <li key={field} aria-label={`${label} ${score.toFixed(1)} ${outOfTen}`} style={{ minWidth: 0 }}>
             <span
               aria-hidden="true"
               title={label}
