@@ -5729,6 +5729,45 @@ export type Database = {
           },
         ]
       }
+      gam_course_legends_pre_purge: {
+        Row: {
+          attained_at: string | null
+          category: string | null
+          course_id: string | null
+          id: string | null
+          is_current: boolean | null
+          rank: number | null
+          trigger_whs_score_id: string | null
+          updated_at: string | null
+          user_id: string | null
+          value: number | null
+        }
+        Insert: {
+          attained_at?: string | null
+          category?: string | null
+          course_id?: string | null
+          id?: string | null
+          is_current?: boolean | null
+          rank?: number | null
+          trigger_whs_score_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          value?: number | null
+        }
+        Update: {
+          attained_at?: string | null
+          category?: string | null
+          course_id?: string | null
+          id?: string | null
+          is_current?: boolean | null
+          rank?: number | null
+          trigger_whs_score_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          value?: number | null
+        }
+        Relationships: []
+      }
       gam_evaluation_queue: {
         Row: {
           attempts: number
@@ -5866,6 +5905,57 @@ export type Database = {
           },
         ]
       }
+      gam_member_unit_bests: {
+        Row: {
+          attempts: number
+          best_attained_at: string | null
+          best_score_id: string | null
+          best_value: number | null
+          birdied: boolean
+          first_birdie_at: string | null
+          golf_course_id: string
+          second_value: number | null
+          tenth_value: number | null
+          third_value: number | null
+          unit_key: number
+          unit_kind: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          best_attained_at?: string | null
+          best_score_id?: string | null
+          best_value?: number | null
+          birdied?: boolean
+          first_birdie_at?: string | null
+          golf_course_id: string
+          second_value?: number | null
+          tenth_value?: number | null
+          third_value?: number | null
+          unit_key?: number
+          unit_kind: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          best_attained_at?: string | null
+          best_score_id?: string | null
+          best_value?: number | null
+          birdied?: boolean
+          first_birdie_at?: string | null
+          golf_course_id?: string
+          second_value?: number | null
+          tenth_value?: number | null
+          third_value?: number | null
+          unit_key?: number
+          unit_kind?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       gam_notification_outbox: {
         Row: {
           created_at: string
@@ -5954,6 +6044,51 @@ export type Database = {
           },
         ]
       }
+      gam_round_awards: {
+        Row: {
+          attempts_at_detection: number | null
+          award_kind: string
+          delta: number | null
+          detected_at: string
+          previous_value: number | null
+          rank_here: number | null
+          tier: string
+          unit_key: number
+          unit_kind: string
+          user_id: string
+          value: number | null
+          whs_score_id: string
+        }
+        Insert: {
+          attempts_at_detection?: number | null
+          award_kind: string
+          delta?: number | null
+          detected_at?: string
+          previous_value?: number | null
+          rank_here?: number | null
+          tier: string
+          unit_key?: number
+          unit_kind: string
+          user_id: string
+          value?: number | null
+          whs_score_id: string
+        }
+        Update: {
+          attempts_at_detection?: number | null
+          award_kind?: string
+          delta?: number | null
+          detected_at?: string
+          previous_value?: number | null
+          rank_here?: number | null
+          tier?: string
+          unit_key?: number
+          unit_kind?: string
+          user_id?: string
+          value?: number | null
+          whs_score_id?: string
+        }
+        Relationships: []
+      }
       gam_round_feat_rarity: {
         Row: {
           detected_at: string
@@ -5999,6 +6134,7 @@ export type Database = {
       gam_round_stats: {
         Row: {
           albatrosses: number
+          back_nine_to_par: number | null
           beat_par: boolean
           birdies: number
           bogeys: number
@@ -6013,6 +6149,8 @@ export type Database = {
           double_bogeys: number
           eagles: number
           evaluator_version: number
+          finish_six_to_par: number | null
+          front_nine_to_par: number | null
           gross_score: number | null
           hcp_at_time: number | null
           hole_detail_present: boolean | null
@@ -6041,6 +6179,7 @@ export type Database = {
         }
         Insert: {
           albatrosses?: number
+          back_nine_to_par?: number | null
           beat_par?: boolean
           birdies?: number
           bogeys?: number
@@ -6055,6 +6194,8 @@ export type Database = {
           double_bogeys?: number
           eagles?: number
           evaluator_version?: number
+          finish_six_to_par?: number | null
+          front_nine_to_par?: number | null
           gross_score?: number | null
           hcp_at_time?: number | null
           hole_detail_present?: boolean | null
@@ -6083,6 +6224,7 @@ export type Database = {
         }
         Update: {
           albatrosses?: number
+          back_nine_to_par?: number | null
           beat_par?: boolean
           birdies?: number
           bogeys?: number
@@ -6097,6 +6239,8 @@ export type Database = {
           double_bogeys?: number
           eagles?: number
           evaluator_version?: number
+          finish_six_to_par?: number | null
+          front_nine_to_par?: number | null
           gross_score?: number | null
           hcp_at_time?: number | null
           hole_detail_present?: boolean | null
