@@ -173,7 +173,7 @@
       "nextAria": "Next tournament",
       "counter": "{{current}} / {{total}}",
       "stateLive": "LIVE",
-      "stateFinal": "ENDSTAND",
+      "stateFinal": "ERGEBNISSE",
       "stateUpcoming": "BEVORSTEHEND",
       "factRound": "RUNDE",
       "factThru": "BIS",
