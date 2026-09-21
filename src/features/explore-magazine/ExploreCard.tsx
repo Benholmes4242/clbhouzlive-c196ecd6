@@ -16,7 +16,7 @@ import { courseSubScoreTone } from '@/features/courses/components/holes/analytic
 
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
-import { calloutFor } from './cardTreatment';
+import { calloutFor, rendersOnPhoto } from './cardTreatment';
 import { RoundStatStrip } from './AchievementCallout';
 import { dotsFor, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
@@ -509,10 +509,12 @@ export function ExploreCard({
     plainRound: callout?.kind === 'record' || callout?.kind === 'net_record' || callout?.kind === 'rank_up',
   });
   const chips = chipsFor(item, t as never, locale);
-  /* §2 SHAPE IS DECIDED BY KIND, NOTHING ELSE. A REVIEW is text ON the
-     photograph at every position; a ROUND is text UNDER it at every position.
-     There is no earned treatment and position 0 is not special. */
-  const onPhoto = item.kind === 'review' && size !== 'pair';
+  /* §2 SHAPE IS DECIDED BY KIND, NOTHING ELSE. A REVIEW and an ILLUSTRATED
+     STORY are text ON the photograph at every position; a ROUND is text UNDER
+     it at every position. There is no earned treatment and position 0 is not
+     special. The predicate lives in cardTreatment.ts because ExploreMagazine
+     sizes the card from the same answer. */
+  const onPhoto = rendersOnPhoto(item, size);
   const isOwnRound = item.kind === 'round' && item.who?.is_viewer === true;
   const kickerDate = item.kind === 'review' || item.kind === 'round'
     ? relativeDay(item.facts.play_date ?? item.facts.arrived_at)

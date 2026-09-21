@@ -80,7 +80,7 @@ import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
 import { applyRankCardRule } from './rankCards';
-import { isNotableRound } from './cardTreatment';
+import { isNotableRound, rendersOnPhoto } from './cardTreatment';
 import { shelfDueAt, shelfForOrdinal } from './shelfCadence';
 /* BRIEF_COURSES_MERGED — Courses and Reviews are ONE view. */
 import { useCourseCandidateIndex } from './useCourseCandidateIndex';
