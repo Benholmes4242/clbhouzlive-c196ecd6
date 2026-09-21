@@ -31,7 +31,19 @@ export function useEventWinner(tournamentId: string | undefined) {
     queryKey: ['tourhub', 'event-winner', tournamentId],
     queryFn: async () => {
       if (!tournamentId) return null;
-      
+
+      // event_winners carries non-stroke events (2 team + 1 cup today) and its
+      // score_to_par holds match POINTS for a cup, which would render as a to-par
+      // score. The view has no event_type column and we are not re-issuing its
+      // definition — see the security_invoker work — so the format gate happens here.
+      const { data: tournament } = await supabase
+        .from('sr_tournaments')
+        .select('id')
+        .eq('id', tournamentId)
+        .eq('event_type', 'stroke')
+        .maybeSingle();
+      if (!tournament) return null;
+
       const { data, error } = await supabase
         .from('event_winners')
         .select(`
@@ -62,7 +74,16 @@ export function useEventWinners(tournamentIds: string[]) {
     queryKey: ['tourhub', 'event-winners', tournamentIds.sort().join(',')],
     queryFn: async () => {
       if (!tournamentIds.length) return new Map<string, EventWinner>();
-      
+
+      // Same gate as useEventWinner: the view has no event_type column, so filter
+      // to stroke events here (match points must never render as a to-par score).
+      const { data: formats } = await supabase
+        .from('sr_tournaments')
+        .select('id')
+        .in('id', tournamentIds)
+        .eq('event_type', 'stroke');
+      const strokeIds = new Set((formats ?? []).map((row) => row.id));
+
       const { data, error } = await supabase
         .from('event_winners')
         .select(`
@@ -78,6 +99,7 @@ export function useEventWinners(tournamentIds: string[]) {
       
       const winnerMap = new Map<string, EventWinner>();
       data?.forEach(item => {
+        if (!strokeIds.has(item.tournament_id)) return;
         winnerMap.set(item.tournament_id, item as EventWinner);
       });
       
