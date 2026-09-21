@@ -3082,6 +3082,7 @@ const URGENCY: Record<string, string> = {
   level_near: "low",
   crown_taken: "medium",   // gainer side — welcome, not urgent
   crown_lost: "high",      // loss event, same tier as legend_lost
+  award_earned: "medium",  // one per round, welcome but not urgent
 };
 
 
@@ -3114,6 +3115,9 @@ function dedupKey(type: string, userId: string, payload: any): string {
     case "level_near": return `level_near:${userId}:${payload.level}`;
     case "crown_taken": return `crown_taken:${userId}:${payload.course_id}:${new Date().toISOString().slice(0, 10)}`;
     case "crown_lost": return `crown_lost:${userId}:${payload.course_id}:${new Date().toISOString().slice(0, 10)}`;
+    // ONE notification per ROUND, never one per award — the key carries the
+    // round, so the 2nd..nth award of the same round is absorbed.
+    case "award_earned": return `award:${userId}:${payload.whs_score_id}`;
 
     default: return `${type}:${userId}`;
   }
