@@ -206,6 +206,18 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     }
   }, [handoff, studioOpen, location.pathname, armHandoff, clearHandoff]);
 
+  /* THE POST COMPOSER'S ← ASKS FOR STEP 1 EXPLICITLY (phase 3 §1.4). The
+     composer is an overlay, so closing it is not a navigation and the popstate
+     rule above cannot see it. requestReopen() raises this flag and clears the
+     handoff in one move; here it is spent. */
+  const reopenRequested = useComposerFlowStore((s) => s.reopenRequested);
+  const consumeReopen = useComposerFlowStore((s) => s.consumeReopen);
+  useEffect(() => {
+    if (!reopenRequested) return;
+    consumeReopen();
+    setCreateOpen(true);
+  }, [reopenRequested, consumeReopen]);
+
   // Drawer / sheet active → force expanded (pill sits below sheet scrim).
   const [isDrawerActive, setIsDrawerActive] = useState(false);
   useEffect(() => {
