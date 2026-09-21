@@ -723,6 +723,7 @@ export function ExploreCard({
             >
               <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               {headlineNode}
+              {standfirstNode}
                {enrichmentNode}
               <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} />
             </span>
