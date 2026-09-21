@@ -99,7 +99,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
           {tourLabel ? <div style={{ marginTop: 8, ...CAPS_10, color: INK_MUTE, letterSpacing: cjk ? 0 : '0.14em', textTransform: cjk ? 'none' : CAPS_10.textTransform }}>{tourLabel}</div> : null}
           {/* Detail deliberately keeps the two-line clamp and clamp(20px, 6.4vw, 25px); weight, tracking and leading match PhotoBand. */}
           <h1 style={{ fontSize: 'clamp(20px, 6.4vw, 25px)', fontWeight: 800, color: INK, lineHeight: 1.1, letterSpacing: 0, margin: '4px 0 0', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{meta.name}</h1>
-          {venueLine && <div style={{ marginTop: 5, fontSize: 13, fontWeight: 500, color: HERO_VENUE_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{venueLine}</div>}
+          {venueLine && <div style={{ marginTop: 5, fontSize: 13, color: HERO_VENUE_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{venueLine}</div>}
           {verdict && <div style={{ maxWidth: 320, marginTop: 10, fontSize: 15, fontWeight: 600, color: INK, lineHeight: 1.42, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>{verdict}</div>}
         </div>
       </div>
