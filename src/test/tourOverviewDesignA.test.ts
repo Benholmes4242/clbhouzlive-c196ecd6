@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
+import { createElement } from 'react';
 import { formatOverviewChampionScore, formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
@@ -144,7 +145,7 @@ describe('Tour Overview correctness gates', () => {
       id, position: Number(id), score: -10, money,
       player: { id: `player-${id}`, full_name: `Player ${id}` },
     });
-    const paid = render(<MiniBoard tournamentId="event" entries={[row('1', 2_500_000), row('2', 1_000)]} limit={5} phase="completed" theme="heroBoard" />);
+    const paid = render(createElement(MiniBoard, { tournamentId: 'event', entries: [row('1', 2_500_000), row('2', 1_000)], limit: 5, phase: 'completed', theme: 'heroBoard' }));
     const paidHeader = paid.container.querySelector<HTMLElement>('[data-overview-board-header]');
     expect(paidHeader?.textContent).toContain('Prize');
     expect(paidHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px 52px');
@@ -152,7 +153,7 @@ describe('Tour Overview correctness gates', () => {
     expect(paid.container.textContent).toContain('$1K');
     paid.unmount();
 
-    const partial = render(<MiniBoard tournamentId="event" entries={[row('1', 2_500_000), row('2', null)]} limit={5} phase="completed" theme="heroBoard" />);
+    const partial = render(createElement(MiniBoard, { tournamentId: 'event', entries: [row('1', 2_500_000), row('2', null)], limit: 5, phase: 'completed', theme: 'heroBoard' }));
     const partialHeader = partial.container.querySelector<HTMLElement>('[data-overview-board-header]');
     expect(partialHeader?.textContent).not.toContain('Prize');
     expect(partialHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px');
