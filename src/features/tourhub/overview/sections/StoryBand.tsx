@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import type { TourStory } from '../../news/useTourStories';
-import { storyTime } from '../../news/storyTime';
-import { FONT, INK, STORY_BAND_META_INK, STORY_BAND_SCRIM } from '../../_shared/tokens';
+import { HeroStory } from '../../news/StoryShapes';
+import { FONT, INK } from '../../_shared/tokens';
 import { fullTourLabel } from '../../_shared/tourOrder';
 
 const DAY_MS = 86_400_000;
