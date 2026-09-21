@@ -1,0 +1,31 @@
+{
+ "step": "Step {{n}} of {{m}}",
+ "close": "Close",
+ "back": "Back",
+ "step1": {
+  "title": "What are you sharing?"
+ },
+ "tiles": {
+  "review": {
+   "title": "A course review",
+   "sub": "Rate, review and submit your experience of a golf course"
+  },
+  "post": {
+   "title": "A post",
+   "sub": "Photos or a few words, shared with your circle"
+  }
+ },
+ "course": {
+  "which": "Which course?",
+  "searchAll": "Search all 23,000 courses",
+  "pickerTitle": "Choose a course",
+  "recent": "Recently played",
+  "played": "Played {{when}}",
+  "emptyTitle": "No rounds yet",
+  "emptyBody": "Once your handicap is connected, the courses you play show up here on their own. Until then, search for one above."
+ },
+ "footer": {
+  "pickCourse": "Pick a course to carry on",
+  "next": "NEXT"
+ }
+}
