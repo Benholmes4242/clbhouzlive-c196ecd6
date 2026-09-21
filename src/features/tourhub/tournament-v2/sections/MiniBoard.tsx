@@ -134,10 +134,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   // the previous round). The light board keeps its blank-cell doctrine.
   const todayBlank = theme === 'light' ? BLANK : '\u2014';
   const showOverviewPosition = rows.some((row) => row.position != null || ['MC', 'CUT', 'WD'].includes(row.status?.toUpperCase() ?? ''));
-  // Two completed events on the same tour in the same season can legitimately
-  // differ here. Prize coverage is event data, not a UI inconsistency: show the
-  // column only when every currently displayed row has a money value.
-  const showOverviewPrize = phase === 'completed' && shouldShowOverviewPrize(entries, limit);
+  // PRIZE is decided over the WHOLE FIELD (entries), not the rendered slice,
+  // so the column cannot appear or vanish as the board is expanded or scrolled.
+  const showPrize = shouldShowPrize(entries);
+  const showOverviewPrize = phase === 'completed' && showPrize;
   // The live hero board carries TODAY, not THRU: the current round is the story
   // and the swap is what keeps the name column wide enough for real names.
   // Gate shape matches the old THRU gate: render only when a visible row has one.
@@ -183,7 +183,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 </div>
                 {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{today == null ? todayBlank : fmtScore(today)}</div> : null}
                 <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
-                {showOverviewPrize ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{formatEarnings(r.money)}</div> : null}
+                {showOverviewPrize ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: r.money != null ? T.mute : T.faint, fontVariantNumeric: 'tabular-nums' }}>{r.money != null ? formatEarnings(r.money) : '—'}</div> : null}
               </button>
             );
           })}
