@@ -294,9 +294,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      // The + only ever opens the chooser. The native picker is fired from
-      // the action pill inside CreateSheetV3 so the tap that opens the OS menu
-      // is its own user activation (iOS WKWebView requirement).
+      // The + only ever opens step 1 of the composer (ComposerFlowSheet).
+      // Nothing here fires a native picker: the file inputs live in
+      // StageComposer's media rail, each one anchored over the control that
+      // opens it, so the tap that opens the OS menu is its own user
+      // activation (iOS WKWebView requirement).
       setCreateOpen(true);
       return;
     }
