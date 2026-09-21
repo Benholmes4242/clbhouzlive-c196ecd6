@@ -142,7 +142,7 @@ describe('achievement tag and label copy', () => {
     if (node) {
       expect(node.style.width).toBe('28px');
       expect(node.style.height).toBe('28px');
-      expect(node.style.fontSize).toBe(emoji && ['⛳', '🔥', '🦅'].includes(emoji) ? '26px' : '22px');
+      expect(node.style.fontSize).toBe(emoji && ['⛳', '🔥'].includes(emoji) ? '26px' : '22px');
       expect(node.getAttribute('aria-hidden')).not.toBeNull();
     }
   });
