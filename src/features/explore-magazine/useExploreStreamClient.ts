@@ -471,6 +471,7 @@ export function useExploreStreamClient(
           who: null,
           facts: {
             headline: story.headline,
+            standfirst: story.standfirst ?? null,
             story_slug: story.slug,
             /* amateur_stories carries no source column; the kicker is the nearest
                honest thing and is absent rather than invented when null. */
