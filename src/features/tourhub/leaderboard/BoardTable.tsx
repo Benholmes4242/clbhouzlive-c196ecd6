@@ -49,6 +49,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import { getScoreColor } from '../_shared/scoreColor';
+import { formatEarnings } from '../_shared/formatEarnings';
 import { shortenName } from '../components/overview-v3/HybridHero.utils';
 import { surnameOf } from '../_shared/playerName';
 import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
@@ -316,13 +317,14 @@ function resolveLayout(
 ): { columns: BoardColumns; tier: NameTier } {
   if (base.preTournament || !containerW) return { columns: base, tier: 'full' };
   const font = `700 ${NAME_SIZE}px ${F}`;
-  const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1;
+  const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1 + (base.showPrize ? 1 : 0);
   const fixed =
     ROW_PAD_X * 2 +
     MOV_W +
     POS_W +
     TOT_W +
     (base.showThru ? THRU_W : 0) +
+    (base.showPrize ? PRIZE_W : 0) +
     (trackCount - 1) * base.gap;
 
   const widest = (tier: NameTier) =>
@@ -537,6 +539,9 @@ export function BoardTable({
               <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.thru')}</div>
             )}
             <div style={{ ...labelStyle, textAlign: 'right' }}>{t('board.columns.tot')}</div>
+            {columns.showPrize && (
+              <div style={{ ...labelStyle, textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div>
+            )}
           </>
         )}
       </div>
@@ -745,6 +750,24 @@ export function BoardTable({
             >
               {totalDisplay}
             </div>
+
+            {/* PRIZE — earned nothing is stated with an em dash in the faint
+                slot, never a blank and never a zero. MC/WD/DQ/DNS rows earn
+                nothing, so they dash too. */}
+            {columns.showPrize && (
+              <div
+                style={{
+                  textAlign: 'right',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: e.money != null ? SECONDARY : MUTED,
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {e.money != null ? formatEarnings(e.money) : PRIZE_DASH}
+              </div>
+            )}
           </>
         )}
       </div>
