@@ -26,6 +26,7 @@ const copy: Record<string, string> = {
   'tournament.contest.playoff': 'Won a playoff',
   'tournament.contest.finishedLevel': 'Finished level',
   'tournament.contest.withToPlay': 'With {{holes}} to play',
+  'tournament.contest.shotsClear': 'Shots clear',
   'tournament.contest.gapShots_one': 'a shot',
   'tournament.contest.gapShots_other': '{{count}} shots',
   'tournament.contest.sublineSingle': '{{leader}} from {{next}}.',
@@ -211,5 +212,18 @@ describe('tournament contest sections', () => {
     expect(screen.getByText('Finished level')).toBeInTheDocument();
     expect(screen.getByText('A and B were level at -12.')).toBeInTheDocument();
     expect(screen.queryByText(/to play/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps a completed non-playoff event in the margin figure branch', () => {
+    const contest = selectTournamentContest([
+      row('Winner', -12, 1, -4, 18),
+      row('Runner', -10, 2, -3, 18),
+    ], meta, 'completed');
+
+    render(<ContestSection contest={contest} state="completed" />);
+
+    expect(screen.getByText('2')).toBeInTheDocument();
+    expect(screen.getByText('Shots clear')).toBeInTheDocument();
+    expect(screen.queryByText('Won a playoff')).not.toBeInTheDocument();
   });
 });

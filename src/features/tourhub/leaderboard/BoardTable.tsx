@@ -100,7 +100,7 @@ export interface BoardEntry {
   raw_data?: unknown;
   player?: {
     id: string;
-    sr_id?: string | null;
+    sr_id?: string | null; // Sportradar id — matches sr_tournaments.winner_id
     full_name: string;
     country_code?: string | null;
     country?: string | null;
