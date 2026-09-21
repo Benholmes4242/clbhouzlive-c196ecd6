@@ -6,6 +6,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { FONT, INK, INK_FAINT, INK_SOFT, SURFACE, WHITE_ALPHA_10 } from '../../_shared/tokens';
 import { formatToPar } from '../../overview/data/liveRoundStats';
 import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface Props { contest: TournamentContest; state: EventState }
 
@@ -73,7 +74,7 @@ export function ContestSection({ contest, state }: Props) {
   return (
     <section style={{ fontFamily: FONT }}>
       <SectionEyebrow kicker={t(state === 'live' ? 'tournament.contest.liveEyebrow' : 'tournament.contest.completedEyebrow')} />
-      <div style={{ background: SURFACE, padding: '4px 16px 16px' }}>
+      <div style={{ background: PAGE_CANVAS, padding: '4px 16px 16px' }}>
         {contest.leadForm === 'figure' ? (
           <>
             <div style={{ fontSize: 66, fontWeight: 800, letterSpacing: '-0.055em', lineHeight: 0.84, color: INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>{contest.margin}</div>

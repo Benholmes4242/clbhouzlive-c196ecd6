@@ -7,8 +7,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SectionEyebrow } from './SectionEyebrow';
-import { FONT, INK, SURFACE, HAIRLINE_INK_8 } from '../../_shared/tokens';
+import { FONT, INK, HAIRLINE_INK_8 } from '../../_shared/tokens';
 import { Action } from '@/features/courses/components/holes/analytical/tokens';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface Props {
   story: string | null;
@@ -24,7 +25,7 @@ export function StorySection({ story }: Props) {
       <SectionEyebrow kicker={t('tournament.story.eyebrow')} />
       <div
         style={{
-          background: SURFACE,
+          background: PAGE_CANVAS,
           padding: '4px 16px 16px',
           borderTop: `0.5px solid ${HAIRLINE_INK_8}`,
           borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,

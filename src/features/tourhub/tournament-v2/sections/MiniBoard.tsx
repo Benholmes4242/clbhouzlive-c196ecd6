@@ -31,9 +31,8 @@ interface Props {
   currentRound?: number | null;
   /**
    * THE GROUND THE BOARD SITS ON. One component, two real grounds:
-   *  - 'panel' (default): the tournament page (TournamentPage:233 live board and
-   *    :255 final board). Its ground is the #15171F app canvas, so the board is
-   *    a PANEL that must read as a step UP — SURFACE (#1B1E27).
+   *  - 'panel' (default): the tournament page live/final board. It is a
+   *    full-width square-corner page block, so it resolves onto PAGE_CANVAS.
    *  - 'heroBoard': the Tour Overview hybrid hero (HeroBoardBand). Its board
    *    resolves onto A.CANVAS and is continuous with the page around it.
    *  - 'light': legacy light chrome islands. No live callsite; retained because
@@ -60,13 +59,12 @@ interface Props {
 /**
  * Surface tokens per ground. INK has no named dark counterpart — plain white.
  *
- * 'panel' and 'heroBoard' share the ink ramp and differ ONLY in surface: the
- * panel rises above the app canvas while the hero board resolves into it. Same
- * component on two grounds — the ground is passed in, never guessed.
+ * 'panel' and 'heroBoard' share the page ground and ink ramp. They remain
+ * separate themes because their hairline treatments differ by context.
  */
 const THEME_TOKENS = {
   light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
-  panel: { surface: SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
+  panel: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
   heroBoard: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_06, press: 'active:bg-white/[0.06]' },
 } as const;
 

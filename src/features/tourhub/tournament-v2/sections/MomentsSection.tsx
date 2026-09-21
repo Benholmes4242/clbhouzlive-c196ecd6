@@ -15,6 +15,7 @@ import {
   FONT, INK, INK_MUTE, INK_FAINT, SURFACE, SLATE_50, HAIRLINE_INK_8,
 } from '../../_shared/tokens';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface Props {
   tournamentId: string;
@@ -51,7 +52,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
     return (
       <>
         <SectionEyebrow kicker={t('tournament.moments.eyebrow')} />
-        <button type="button" onClick={() => navigate('/post-v2')} style={{ width: '100%', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', background: SURFACE, border: 'none', borderTop: `0.5px solid ${HAIRLINE_INK_8}`, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`, fontFamily: FONT, fontSize: 12.5, textAlign: 'left', cursor: 'pointer' }}>
+        <button type="button" onClick={() => navigate('/post-v2')} style={{ width: '100%', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', background: PAGE_CANVAS, border: 'none', borderTop: `0.5px solid ${HAIRLINE_INK_8}`, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`, fontFamily: FONT, fontSize: 12.5, textAlign: 'left', cursor: 'pointer' }}>
           <span style={{ color: INK_FAINT }}>{t('tournament.moments.emptyShort')}</span>
           <span style={{ color: INK }}>{t('tournament.moments.shareShort')}</span>
         </button>
@@ -93,7 +94,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
               {t('tournament.moments.sheetTitle')}
             </h2>
           </div>
-          <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, background: SURFACE, borderTop: `1px solid ${HAIRLINE_INK_8}`, borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
+          <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, background: PAGE_CANVAS, borderTop: `1px solid ${HAIRLINE_INK_8}`, borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
             {list.map((m, i) => {
               const cfg = MOMENT_TYPE_CONFIG[m.moment_type as MomentType] ?? MOMENT_TYPE_CONFIG.highlight;
               return (

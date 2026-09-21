@@ -12,8 +12,9 @@ import { useTranslation } from 'react-i18next';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { formatPurse } from '../../_shared/formatPurse';
 import { SectionEyebrow } from './SectionEyebrow';
-import { FONT, INK, INK_FAINT, HAIRLINE_INK_8, SURFACE } from '../../_shared/tokens';
+import { FONT, INK, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
 import { formatNumber, formatTournamentDateRange } from '@/i18n/format';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 
 interface Props {
@@ -43,7 +44,7 @@ export function EventInfoSection({ meta, broadcast, purseShownInHero = false }: 
   return (
     <section style={{ fontFamily: FONT }}>
       <SectionEyebrow kicker={t('tournament.eventInfo.eyebrow')} />
-      <div style={{ background: SURFACE }}>
+      <div style={{ background: PAGE_CANVAS }}>
         {rows.map(([label, value], i) => (
           <div
             key={label}
