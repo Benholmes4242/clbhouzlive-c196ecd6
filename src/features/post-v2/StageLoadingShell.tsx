@@ -2,10 +2,9 @@
  * StageLoadingShell — the composer's ONLY loading silhouette.
  *
  * A fresh compose has NO loading state: media is local (object URLs from the
- * OS picker), page 1 renders its designed empty state immediately, and page 2's
- * state is already in memory when the wizard advances. So nothing here
- * shimmers for a normal post. This shell exists for the two moments that do
- * wait on the network:
+ * OS picker) and everything else is already in memory, so step 2 renders its
+ * designed empty state immediately. Nothing here shimmers for a normal post.
+ * This shell exists for the two moments that do wait on the network:
  *
  *   1. /post-v2 route chunk load (App.tsx Suspense fallback) — previously
  *      GenericPageSkeleton, a LIGHT page silhouette borrowed from another
