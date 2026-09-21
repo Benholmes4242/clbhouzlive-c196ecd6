@@ -301,6 +301,29 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
           : `Top of the ${legendLabel(p.category)} board.`,
         data: { route: `/courses/${p.course_id}?tab=legends`, course_id: p.course_id },
       };
+    // BRIEF_APPLY_UNIT_AWARDS. Without a case here the row is rendered by the
+    // default arm, or worse marked sent and dropped — the documented failure
+    // mode of this file. One push per round; the count covers the rest.
+    case "award_earned": {
+      const unit = typeof p.top_unit_label === "string" ? p.top_unit_label : "round";
+      const where = typeof p.course_name === "string" && p.course_name.trim()
+        ? ` at ${p.course_name.trim()}`
+        : "";
+      const lead = p.top_award_kind === "new_best"
+        ? `Best ${unit}${where}`
+        : p.top_award_kind === "matched_best"
+          ? `Matched your best ${unit}${where}`
+          : p.top_award_kind === "first_birdie"
+            ? `First birdie on ${unit}${where}`
+            : `Top ${unit}${where}`;
+      const extra = Number(p.award_count ?? 1) - 1;
+      const more = extra > 0 ? `, and ${spellCount(extra)} more award${extra === 1 ? "" : "s"}.` : ".";
+      return {
+        title: "🎖️ New award",
+        body: `${lead}${more}`,
+        data: { route: `/round/${p.whs_score_id}`, whs_score_id: p.whs_score_id },
+      };
+    }
     case "streak_at_risk": {
       const s = streakLabel(p.streak_type);
       return {
