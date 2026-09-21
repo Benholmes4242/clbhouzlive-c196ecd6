@@ -21,7 +21,8 @@
  * from overview-v3/HybridHero.utils) -> surname alone. If even the surname
  * does not fit, width is taken from the ROUND CELLS (26 -> 22 floor), never
  * from the name. If the 22px floor is reached and the name still overflows,
- * PRIZE yields before the name does. Only after that does the component warn.
+ * PRIZE yields before the name does. Only after that can ellipsis be the last
+ * resort.
  *
  * PRE-TOURNAMENT. With no rounds played there is no POS, no score and no TOT,
  * so the board renders PLAYER | R1 TEE (name back at 15px) instead of a grid of
@@ -401,7 +402,7 @@ function resolveLayout(
     // STOP CONDITION (2.5): the layout has run out. No clip, no ellipsis, no
     // type shrink. PRIZE has already yielded if it could.
     console.warn(
-      `[BoardTable] name column exhausted: surname needs ${need}px, round cells at the ${CELL_W_FLOOR}px floor at container ${containerW}px.`,
+      `[BoardTable] name column exhausted: ${floorTier} needs ${need}px, round cells at the ${CELL_W_FLOOR}px floor at container ${containerW}px.`,
     );
   }
   return { columns: { ...base, cellW: CELL_W_FLOOR }, tier: floorTier };
