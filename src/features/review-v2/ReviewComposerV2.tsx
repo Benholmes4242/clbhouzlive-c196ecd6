@@ -349,6 +349,18 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const qc = useQueryClient();
   const { activeActor } = useActiveActor();
 
+  /* WHY THE PIPELINE IS MOUNTED HERE AND NOT INSIDE STEP 2.
+     `step` is state in THIS component, and the media pipeline and the composer
+     state sit above the step branches, so crossing between step 2 and step 3
+     re-renders one component - it does not remount anything that holds the
+     member's work. MediaTray itself carries no state but a ref to its hidden
+     input, and every preview URL belongs to the pipeline's items, so the tray
+     unmounting on step 3 costs nothing: back from the dial restores the words
+     and the attached files from LIVE state, never from the draft (which cannot
+     carry media at all - it only counts it).
+     DO NOT move this hook, or the composer state, inside a step block, and do
+     not key the step bodies. Either would look like tidying and would silently
+     lose a member's photographs the moment they went back to change a word. */
   const media = useReviewMediaPipeline({
     userId,
     existingMedia,

@@ -81,6 +81,21 @@ describe('what came off the composer', () => {
     expect(composer).not.toContain('stepLabels');
   });
 
+  it('keeps the words and the media alive across a step change', () => {
+    // The pipeline and the composer state must be created ABOVE the step
+    // branches: going to the dial and back must restore from live state, not
+    // from the draft, which cannot carry media.
+    const pipeline = composer.indexOf('useReviewMediaPipeline({');
+    const firstBranch = composer.indexOf('{step === FIRST_STEP && (');
+    expect(pipeline).toBeGreaterThan(-1);
+    expect(firstBranch).toBeGreaterThan(pipeline);
+    // ...and neither step body may be keyed, which would remount it.
+    expect(composer).not.toMatch(/\{step === (FIRST|LAST)_STEP && \(\s*<\w+ key=/);
+    // The tray holds nothing of its own to lose.
+    const tray = src('src/features/review-v2/components/MediaTray.tsx');
+    expect(tray).not.toContain('useState');
+  });
+
   it('marks the dial axis with numerals, not three band names', () => {
     const scrubber = src('src/features/review-v2/components/OverallScrubber.tsx');
     expect(scrubber).not.toContain('bandLabels');
