@@ -17,7 +17,7 @@
   },
   "course": {
     "which": "Welcher Platz?",
-    "searchAll": "Alle 23.000 Plätze durchsuchen",
+    "searchAll": "Alle Plätze durchsuchen",
     "pickerTitle": "Platz auswählen",
     "recent": "Zuletzt gespielt",
     "played": "Gespielt {{when}}",

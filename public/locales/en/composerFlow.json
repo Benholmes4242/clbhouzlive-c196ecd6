@@ -17,7 +17,7 @@
  },
  "course": {
   "which": "Which course?",
-  "searchAll": "Search all 23,000 courses",
+  "searchAll": "Search all courses",
   "pickerTitle": "Choose a course",
   "recent": "Recently played",
   "played": "Played {{when}}",

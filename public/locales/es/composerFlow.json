@@ -17,7 +17,7 @@
   },
   "course": {
     "which": "¿Qué campo?",
-    "searchAll": "Buscar entre 23.000 campos",
+    "searchAll": "Buscar todos los campos",
     "pickerTitle": "Elige un campo",
     "recent": "Jugados recientemente",
     "played": "Jugado {{when}}",

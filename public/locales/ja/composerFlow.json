@@ -17,7 +17,7 @@
  },
  "course": {
   "which": "どのコース？",
-  "searchAll": "23,000コースを検索",
+  "searchAll": "すべてのコースを検索",
   "pickerTitle": "コースを選ぶ",
   "recent": "最近プレーしたコース",
   "played": "{{when}}にプレー",

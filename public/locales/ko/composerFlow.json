@@ -17,7 +17,7 @@
  },
  "course": {
   "which": "어느 코스인가요?",
-  "searchAll": "23,000개 코스 검색",
+  "searchAll": "모든 코스 검색",
   "pickerTitle": "코스 선택",
   "recent": "최근 플레이한 코스",
   "played": "{{when}} 플레이",
