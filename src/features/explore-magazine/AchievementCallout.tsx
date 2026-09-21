@@ -36,6 +36,11 @@ import {
  *
  * THE PANEL IS THE EXISTING ANALYTICAL PANEL TOKEN (A.PANEL), slightly lighter
  * than the canvas, with NO border: separation is a panel edge, not a rule.
+ * GOLD and TOP are the single analytical-rule exception: their achievement
+ * significance is communicated by a tokenized edge as well as the panel fill.
+ * TOP has never rendered. Zero platform rounds have held 2+ aces,
+ * 2+ albatrosses, or an ace and an albatross. Its first qualifying round is
+ * therefore the treatment's first real-world test.
  *
  * SUBLINES ONLY FROM FACTS THE ITEM CARRIES. Every subline below is guarded on
  * the fact that produces it; there is no branch that invents a hole, a previous
@@ -56,12 +61,14 @@ export function FeatRarityLines({
   counts,
   locale,
   ownerDisplayName,
+  tier = 'ink',
   align = 'panel',
 }: {
   scoreId: string | null | undefined;
   counts?: RarityFeatCounts;
   locale: string;
   ownerDisplayName?: string | null;
+  tier?: 'ink' | 'gold' | 'top';
   align?: 'panel' | 'card';
 }) {
   const { t } = useTranslation('courses');
@@ -87,7 +94,7 @@ export function FeatRarityLines({
       <span
         data-feat-rarity-viewer={ownerLine ? undefined : 'true'}
         data-feat-rarity-owner={ownerLine ? 'true' : undefined}
-        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: ownerLine ? 700 : 600, lineHeight: 1.3, color: ownerLine ? SC_FILL_GOLD : A.MUTE, whiteSpace: 'normal', overflowWrap: 'break-word' }}
+        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: ownerLine ? 700 : 600, lineHeight: 1.3, color: ownerLine ? SC_FILL_GOLD : tier === 'ink' ? A.MUTE : A.BODY, whiteSpace: 'normal', overflowWrap: 'break-word' }}
       >
         {line}
       </span>
@@ -216,7 +223,7 @@ export function AchievementCalloutPanel({
         padding: '10px 12px',
         borderRadius: r.md,
         background: tier === 'top' ? GOLD_TINT_10 : tier === 'gold' ? GOLD_TINT : A.PANEL,
-        border: tier === 'top' ? `1px solid ${GOLD_BORDER}` : tier === 'gold' ? `0.5px solid ${GOLD_BORDER}` : 'none',
+        border: tier === 'top' ? `2px solid ${GOLD_BORDER}` : tier === 'gold' ? `1px solid ${GOLD_BORDER}` : 'none',
         minWidth: 0,
       }}
     >
@@ -254,7 +261,7 @@ export function AchievementCalloutPanel({
             {subline}
           </span>
         ) : null}
-        <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} />
+        <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} tier={tier} />
       </span>
     </span>
     </>
@@ -317,7 +324,7 @@ export function RoundStatStrip({
 }) {
   const { t } = useTranslation('courses');
   const hasNet = coursePar != null && net != null;
-  const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} align="card" />;
+  const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} tier={tier} align="card" />;
   if (!callout && !hasNet) return rarity;
 
   const ord = callout?.kind === 'rank_up' && callout.rank != null
@@ -385,7 +392,7 @@ export function RoundStatStrip({
         marginBottom: 10,
         borderRadius: r.md,
         background: achievement && tier === 'top' ? GOLD_TINT_10 : achievement && tier === 'gold' ? GOLD_TINT : A.PANEL,
-        border: achievement && tier === 'top' ? `1px solid ${GOLD_BORDER}` : achievement && tier === 'gold' ? `0.5px solid ${GOLD_BORDER}` : 'none',
+        border: achievement && tier === 'top' ? `2px solid ${GOLD_BORDER}` : achievement && tier === 'gold' ? `1px solid ${GOLD_BORDER}` : 'none',
         overflow: 'hidden',
         boxSizing: 'border-box',
       }}
