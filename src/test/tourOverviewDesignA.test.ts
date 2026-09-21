@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 import { createElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { formatOverviewChampionScore, formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
@@ -147,9 +148,13 @@ describe('Tour Overview correctness gates', () => {
       player: { id: `player-${id}`, full_name: `Player ${id}` },
     });
     const board = (entries: ReturnType<typeof row>[]) => createElement(
-      MemoryRouter,
-      null,
-      createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, phase: 'completed', theme: 'heroBoard' }),
+      QueryClientProvider,
+      { client: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
+      createElement(
+        MemoryRouter,
+        null,
+        createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, phase: 'completed', theme: 'heroBoard' }),
+      ),
     );
     const paid = render(board([row('1', 2_500_000), row('2', 1_000)]));
     const paidHeader = paid.container.querySelector<HTMLElement>('[data-overview-board-header]');
