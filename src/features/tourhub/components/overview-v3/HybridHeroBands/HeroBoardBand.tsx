@@ -258,6 +258,7 @@ export function HeroBoardSection({
   entries,
   currentRound,
   phase,
+  championSrId,
   onFullLeaderboard,
   onRowTap,
 }: HeroBoardSectionProps) {
