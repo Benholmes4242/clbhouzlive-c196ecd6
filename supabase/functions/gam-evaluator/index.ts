@@ -967,7 +967,7 @@ function foldBests(u: UnitCandidate, prior: BestsRow | null, playDate: string, w
     // tenth_value is a MOVING FLOOR, not a true tenth place: 4th–9th are not
     // stored, so a value that beats the stored tenth replaces it here. This is
     // the re-derivation the brief specifies (new value against the stored ones)
-    // and it is why rank_here is measured from the round history, not from here.
+    // and it is why rank_here is NULL past third — unknowable, not missing.
     tenth = v;
   }
 
