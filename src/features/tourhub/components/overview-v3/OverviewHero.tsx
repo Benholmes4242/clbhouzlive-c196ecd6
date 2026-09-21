@@ -24,7 +24,7 @@ import { HeroBoardSection } from './HybridHeroBands/HeroBoardBand';
 import { tournamentRoute } from '../../routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HybridHero } from './HybridHero';
-import { PHOTO_BAND_HEIGHT, OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
+import { PHOTO_BAND_HEIGHT, OVERVIEW_PHOTO_BAND_HEIGHT, STRIP_HEIGHT } from './HybridHero.constants';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { INK_TINT_06 } from '../../_shared/tokens';
 
@@ -43,7 +43,7 @@ export const OVERVIEW_HERO_HEIGHT = `${PHOTO_BAND_HEIGHT}px`;
 /** Wire-ticker band height (kept in sync with HeroWireTicker). */
 export const OVERVIEW_HERO_TOTAL_HEIGHT = `${OVERVIEW_PHOTO_BAND_HEIGHT}px`;
 
-export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHeroProps) {
+export function OverviewHero({ height }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
@@ -211,6 +211,9 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
   }
 
   const active = slides[Math.min(activeIndex, count - 1)];
+  const activeHeroHeight = height ?? (active.type === 'completed' && active.tournament.winnerName
+    ? `${OVERVIEW_PHOTO_BAND_HEIGHT + STRIP_HEIGHT}px`
+    : OVERVIEW_HERO_TOTAL_HEIGHT);
 
   // Chevron UI removed per micro-brief; swipe is the sole gesture and
   // goPrev/goNext are retained for keyboard/a11y and COMMAND-jump paths.
@@ -222,7 +225,7 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
   return (
     <>
     <div
-      style={{ position: 'relative', width: '100%', height }}
+      style={{ position: 'relative', width: '100%', height: activeHeroHeight }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}

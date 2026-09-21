@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { formatOverviewChampionScore, formatOverviewDateRange, getOverviewCountdown } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
+import { shouldShowOverviewPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, shouldShowAlsoThisWeekFigures, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
@@ -83,6 +84,13 @@ describe('Tour Overview Design A hero facts', () => {
     expect(detectTopTie([{ score: -18 }, { score: -18 }, { score: -17 }])).toEqual({ count: 2, score: '−18' });
   });
 
+  it('keeps the established playoff and winning-margin copy in the champion strip score', () => {
+    const t = (key: string, options?: { count: number }) => key.endsWith('playoff') ? 'playoff' : `by ${options?.count}`;
+    expect(formatOverviewChampionScore(-26, false, 2, t)).toBe('−26 · by 2');
+    expect(formatOverviewChampionScore(-18, true, null, t)).toBe('−18 · playoff');
+    expect(formatOverviewChampionScore(-12, false, null, t)).toBe('−12');
+  });
+
   it('does not invent a tie when the rest of the field merely shares the leader score', () => {
     const rows = [{ position: 1, score: 0 }, { position: 132, score: 0 }];
     expect(rows.filter((row) => row.position === 1)).toHaveLength(1);
@@ -119,6 +127,14 @@ describe('Tour Overview correctness gates', () => {
     expect(shouldShowOverviewBoard([{ position: null, score: 0 }, { position: null, score: 0 }])).toBe(false);
     expect(shouldShowOverviewBoard([{ position: 1, score: 0 }])).toBe(true);
     expect(shouldShowOverviewBoard([{ position: null, score: -1 }])).toBe(true);
+  });
+
+  it('shows prize only when every displayed completed row has money', () => {
+    const paid = Array.from({ length: 6 }, (_, index) => ({ money: 1_000 + index }));
+    expect(shouldShowOverviewPrize(paid, 5)).toBe(true);
+    expect(shouldShowOverviewPrize([{ money: 1_000 }, { money: null }], 5)).toBe(false);
+    expect(shouldShowOverviewPrize([...paid.slice(0, 5), { money: null }], 5)).toBe(true);
+    expect(shouldShowOverviewPrize([], 5)).toBe(false);
   });
 
   it('keeps Also This Week inside the coming Sunday', () => {
