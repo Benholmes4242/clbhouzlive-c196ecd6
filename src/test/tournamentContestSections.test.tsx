@@ -97,6 +97,22 @@ const row = (id: string, score: number, position: number, today = -1, thru = 12,
   player: { id, sr_id: `sr-${id}`, full_name: id },
 });
 
+const teamRow = (id: string, score: number, position: number, abbrName: string, displayName: string, members: string[]): BoardEntry => ({
+  id,
+  score,
+  position,
+  position_tied: false,
+  today: null,
+  thru: 18,
+  player: null,
+  team: {
+    id: `team-${id}`,
+    abbr_name: abbrName,
+    display_name: displayName,
+    members: members.map((fullName, index) => ({ position_in_team: index + 1, player: { id: `${id}-${index}`, full_name: fullName } })),
+  },
+});
+
 describe('tournament contest sections', () => {
   it('counts four chasers, not the leader plus four chasers', () => {
     const contest = selectTournamentContest([
@@ -225,5 +241,26 @@ describe('tournament contest sections', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
     expect(screen.getByText('Shots clear')).toBeInTheDocument();
     expect(screen.queryByText('Won a playoff')).not.toBeInTheDocument();
+  });
+
+  it('renders team prose in the contest and suppresses the empty move section', () => {
+    const teamMeta = { ...meta, event_type: 'team' } as TournamentMeta;
+    const contest = selectTournamentContest([
+      teamRow('leaders', -18, 1, 'Kim / Wilson', 'G.Kim/Y.Wilson', ['Gina Kim', 'Yana Wilson']),
+      teamRow('chasers', -17, 2, 'Kim / Choi', 'H.J.Kim/H.J.Choi', ['Hyo Joo Kim', 'Hye Jin Choi']),
+    ], teamMeta, 'live');
+
+    const { container } = render(
+      <>
+        <HeroSection meta={teamMeta} state="live" imageUrl={null} tourCode="lpga" contest={contest} fieldCount={2} />
+        <ContestSection contest={contest} state="live" />
+        <div data-testid="move"><MoveSection contest={contest} state="live" tourCode="lpga" /></div>
+      </>,
+    );
+
+    expect(screen.getByText('Gina Kim and Yana Wilson leads on -18.')).toBeInTheDocument();
+    expect(screen.getByText('Gina Kim and Yana Wilson from Hyo Joo Kim and Hye Jin Choi.')).toBeInTheDocument();
+    expect(screen.getByTestId('move')).toBeEmptyDOMElement();
+    expect(container.textContent).not.toContain('undefined');
   });
 });
