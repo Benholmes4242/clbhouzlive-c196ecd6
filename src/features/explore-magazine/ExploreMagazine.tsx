@@ -73,6 +73,7 @@ import { useExploreStream } from './useExploreStream';
 import { dedupeItems, warnDuplicates } from './dedupeStream';
 import type { StreamItem } from './streamItem';
 import { WeeklyClubShelf } from './WeeklyClubShelf';
+import { PersonalBestsShelf } from './PersonalBestsShelf';
 import { CourseShelf } from './CourseShelf';
 import { PeopleShelf } from './PeopleShelf';
 import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCourseShelves';
@@ -143,6 +144,7 @@ type ShelfKind =
    *  newest first. Fixed once at the top of Scores; absent from All, Courses and Watch. */
   | 'circle'
   | 'standing'
+  | 'personalBests'
   | 'coursesCounty'
   | 'moments'
   | 'people'
@@ -897,6 +899,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     'clips',
     'clubWeek',
     'standing',
+    'personalBests',
     'videos',
     'coursesCounty',
     'moments',
@@ -929,7 +932,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      rank_hold; do not promote this shelf into the card ladder. */
   /* CHANGE EARNS HEIGHT. The daily/weekly rail leads the repeating cycle;
      slower standing and county rails follow; the growth prompt is last. */
-  const SCORES_SHELVES: ShelfKind[] = ['clubWeek', 'standing', 'coursesCounty', 'people'];
+  const SCORES_SHELVES: ShelfKind[] = ['clubWeek', 'standing', 'personalBests', 'coursesCounty', 'people'];
   const shelves: ShelfKind[] =
     view === 'watch'
       ? /* WATCH COMPOSES ITS OWN RAILS (BRIEF_WATCH_MIXED_FEED): windows into its
@@ -1491,6 +1494,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                   ) : (
                     <StandingShelf viewerId={userId} pos={pos} />
                   )
+
+                ) : shelf === 'personalBests' ? (
+                  <PersonalBestsShelf viewerId={userId} pos={pos} />
 
                 ) : shelf === 'coursesCounty' ? (
                   <CourseShelf
