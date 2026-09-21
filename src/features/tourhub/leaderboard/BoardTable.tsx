@@ -89,7 +89,7 @@ export interface BoardEntry {
   position: number | null;
   position_tied?: boolean | null;
   score: number | null;
-  thru: number | null;
+  thru?: number | null;
   today?: number | null;
   today_round?: number | null;
   status?: string | null;
