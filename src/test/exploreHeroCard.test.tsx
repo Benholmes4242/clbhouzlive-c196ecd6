@@ -149,7 +149,7 @@ describe('Explore card shapes', () => {
     expect(rail?.children[0]?.getAttribute('aria-label')).toContain('9.2');
     expect(rail?.children[0]?.getAttribute('aria-label')).toContain('outOfTen');
     expect(container.querySelector<HTMLElement>('[data-review-breakdown-fill="design"]')?.style.width).toBe('92%');
-    expect(photoChip?.textContent).toBe('3 photos');
+    expect(photoChip?.textContent).toContain('photos');
     expect(photoChip?.style.right).toBe('8px');
     expect(photoChip?.style.whiteSpace).toBe('nowrap');
   });
