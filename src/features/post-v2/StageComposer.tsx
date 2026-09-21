@@ -41,6 +41,7 @@ import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
 import { useEditablePost } from '@/hooks/useEditablePost';
 import { startPostUpload } from './lib/postUploadController';
+import { postContentGate } from './lib/postGate';
 
 import MediaStageV2 from './components/MediaStageV2';
 import FramePills from './components/FramePills';
@@ -370,7 +371,11 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
      EDIT is deliberately exempt: posts published before the media rule, and
      round posts, have no media and must still be saveable. */
   const hasWords = state.caption.trim().length > 0;
-  const hasContent = isEditMode || state.media.length > 0;
+  const hasContent = postContentGate({
+    isEditMode,
+    mediaCount: state.media.length,
+    caption: state.caption,
+  });
   const canSubmit = !submitting && !saving && hasContent && !!activeActor;
 
 
