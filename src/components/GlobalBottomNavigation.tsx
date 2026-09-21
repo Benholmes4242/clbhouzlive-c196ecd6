@@ -19,6 +19,7 @@ import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
 import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
 import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
+import { nextHandoffAction } from '@/features/composer-flow/handoffRules';
 import { NAV_CLEARANCE, NAV_PILL_H_FALLBACK, NAV_PILL_H_VAR } from '@/lib/navClearance';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
