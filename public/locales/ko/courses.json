@@ -1693,7 +1693,8 @@
     "submit": "리뷰 등록",
     "summary": "{{course}} 점수 {{score}}",
     "summaryShare": ", 클럽하우스에 게시",
-    "threshold": "당신이 {{ordinal}}번째 평가가 됩니다 — 코스 페이지의 마대가 공개됩니다."
+    "threshold": "당신이 {{ordinal}}번째 평가가 됩니다 — 코스 페이지의 마대가 공개됩니다.",
+    "skipToPost": "Post without rating it"
    },
    "uploadingMedia": "사진 업로드 중..."
   },

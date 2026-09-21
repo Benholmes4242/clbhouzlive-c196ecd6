@@ -1736,7 +1736,8 @@
     "submit": "Bewertung abschicken",
     "summary": "{{course}} mit {{score}} bewertet",
     "summaryShare": ", wird im Clubhaus geteilt",
-    "threshold": "Deine wäre die {{ordinal}} Bewertung hier – danach gehen die Balken auf der Platzseite live."
+    "threshold": "Deine wäre die {{ordinal}} Bewertung hier – danach gehen die Balken auf der Platzseite live.",
+    "skipToPost": "Post without rating it"
    },
    "uploadingMedia": "Fotos werden hochgeladen ..."
   },

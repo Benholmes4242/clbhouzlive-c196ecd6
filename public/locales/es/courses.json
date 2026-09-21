@@ -1736,7 +1736,8 @@
     "submit": "Enviar reseña",
     "summary": "Puntúas {{course}} con {{score}}",
     "summaryShare": ", se publica en el Clubhouse",
-    "threshold": "La tuya sería la {{ordinal}} valoración aquí: las barras se activan en la página del campo."
+    "threshold": "La tuya sería la {{ordinal}} valoración aquí: las barras se activan en la página del campo.",
+    "skipToPost": "Post without rating it"
    },
    "uploadingMedia": "Subiendo fotos..."
   },

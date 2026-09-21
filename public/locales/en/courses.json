@@ -2269,7 +2269,8 @@
     "submit": "Submit review",
     "summary": "Rating {{course}} at {{score}}",
     "summaryShare": ", posting to the Clubhouse",
-    "threshold": "Yours would be the {{ordinal}} rating here — the breakdown bars go live on the course page."
+    "threshold": "Yours would be the {{ordinal}} rating here — the breakdown bars go live on the course page.",
+    "skipToPost": "Post without rating it"
    },
    "uploadingMedia": "Uploading photos..."
   },
