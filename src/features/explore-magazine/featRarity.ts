@@ -168,7 +168,12 @@ export function featRarityLines({
     : null;
 
   /* THE OWNER STRIP. FIRST MATCH WINS, and REPEAT outranks everything: a member
-     who has done it twice is never told again that they were the first. */
+     who has done it twice is never told again that they were the first.
+
+     The rare branches name the member's exact frozen position and explicitly
+     scope the claim to clbhouz. That avoids implying a claim about golf beyond
+     this platform, replaces a vague bracket with the known sequence position,
+     and remains permanently true as more members achieve the feat. */
   const mine = (owner ?? []).find((o) => o.feat_kind === row.feat_kind && o.is_owner === true) ?? null;
   const members = row.distinct_members_at_detection;
   let ownerLine: string | null = null;
@@ -185,13 +190,13 @@ export function featRarityLines({
       });
     } else if (!repeat && members === 2) {
       ownerBranch = 'RareTwo';
-      ownerLine = t('featRarity.ownerRareTwo', 'One of the first two members to do this.');
+      ownerLine = t('featRarity.ownerRareTwo', 'Only the second clbhouz member to achieve this.');
     } else if (!repeat && members === 3) {
       ownerBranch = 'RareThree';
-      ownerLine = t('featRarity.ownerRareThree', 'One of the first three members to do this.');
+      ownerLine = t('featRarity.ownerRareThree', 'Only the third clbhouz member to achieve this.');
     } else if (!repeat && members === 1) {
       ownerBranch = 'Sole';
-      ownerLine = t('featRarity.ownerSole', 'The first member ever to do this.');
+      ownerLine = t('featRarity.ownerSole', 'The first clbhouz member ever to achieve this.');
     } else if (!repeat && members != null && members >= 4 && mine.member_rounds != null && mine.member_rounds > 0) {
       ownerBranch = 'First';
       ownerLine = t('featRarity.ownerFirst', 'Your first {{feat}}. {{rounds}} rounds in.', {
