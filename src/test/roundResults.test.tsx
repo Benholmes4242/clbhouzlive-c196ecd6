@@ -26,8 +26,8 @@ describe('round results', () => {
     expect(container.querySelector('[data-round-results-block="awards"]')).toBeNull();
     expect(container.querySelector('[data-round-results-block="holes"]')).toBeNull();
     expect(container.querySelector('[data-round-results-block="efforts"]')).not.toBeNull();
-    expect(container.querySelector('[data-round-effort="front_nine"]')?.textContent).toContain('3rd here');
-    expect(container.querySelector('[data-round-effort="back_nine"]')?.textContent).not.toMatch(/here/i);
+    expect(container.querySelector('[data-round-effort="front_nine"] [data-round-effort-placing]')?.getAttribute('data-round-effort-placing')).toBe('roundResults.placing.third');
+    expect(container.querySelector('[data-round-effort="back_nine"] [data-round-effort-placing]')?.getAttribute('data-round-effort-placing')).toBeNull();
     expect(container.querySelector('[data-round-effort="finish_six"]')?.textContent).toContain('E');
   });
 
@@ -43,7 +43,7 @@ describe('round results', () => {
     expect(container.querySelectorAll('[data-round-results-block]')).toHaveLength(2);
     expect(container.querySelector('[data-round-results-block="awards"] [data-round-award="front_nine"]')).not.toBeNull();
     const hole = container.querySelector('[data-round-results-block="holes"] [data-round-award="hole"]');
-    expect(hole?.textContent).toContain('First birdie on the 7th');
+    expect(hole?.textContent).toContain('roundResults.award.firstBirdie');
     expect(hole?.children).toHaveLength(2);
   });
 });

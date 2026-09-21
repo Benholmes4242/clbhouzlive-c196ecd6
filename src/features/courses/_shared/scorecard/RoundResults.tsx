@@ -28,7 +28,9 @@ const effortOrder: RoundEffortRow['unit_kind'][] = [
 
 function formatValue(unit: RoundAwardUnitKind, value: number | null): string {
   if (value == null) return '';
-  return TO_PAR_UNITS.has(unit) ? fmtToPar(value) : String(Math.round(value));
+  if (TO_PAR_UNITS.has(unit)) return fmtToPar(value);
+  if (unit === 'round_gross' || unit === 'round_stableford') return String(Math.round(value));
+  return String(value);
 }
 
 function unitKey(unit: RoundAwardUnitKind): string {
@@ -139,7 +141,7 @@ export function RoundResults({ result }: { result: RoundAwardsResult | null | un
                 <div key={effort.unit_kind} data-round-effort={effort.unit_kind} style={{ minHeight: 38, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 52px minmax(78px,auto)', alignItems: 'center', gap: 8 }}>
                   <span style={{ minWidth: 0, color: INK, fontSize: 13, fontWeight: 600, lineHeight: 1.2 }}>{t(unitKey(effort.unit_kind))}</span>
                   <span style={{ color: INK, fontSize: 15, fontWeight: 700, lineHeight: 1, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatValue(effort.unit_kind, effort.value)}</span>
-                  <span style={{ color: INK_FAINT, fontSize: 11.5, lineHeight: 1.2, textAlign: 'right', whiteSpace: 'nowrap' }}>{placing}</span>
+                  <span data-round-effort-placing={placing ?? undefined} style={{ color: INK_FAINT, fontSize: 11.5, lineHeight: 1.2, textAlign: 'right', whiteSpace: 'nowrap' }}>{placing}</span>
                 </div>
               );
             })}
