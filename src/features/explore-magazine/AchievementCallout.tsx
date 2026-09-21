@@ -94,7 +94,7 @@ export function FeatRarityLines({
       <span
         data-feat-rarity-viewer={ownerLine ? undefined : 'true'}
         data-feat-rarity-owner={ownerLine ? 'true' : undefined}
-        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: ownerLine ? 700 : 600, lineHeight: 1.3, color: ownerLine ? SC_FILL_GOLD : tier === 'ink' ? A.MUTE : A.BODY, whiteSpace: 'normal', overflowWrap: 'break-word' }}
+        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: ownerLine ? 700 : 600, lineHeight: 1.3, color: ownerLine ? SC_FILL_GOLD : tier === 'ink' ? A.MUTE : A.INK, opacity: ownerLine || tier === 'ink' ? 1 : 0.73, whiteSpace: 'normal', overflowWrap: 'break-word' }}
       >
         {line}
       </span>
