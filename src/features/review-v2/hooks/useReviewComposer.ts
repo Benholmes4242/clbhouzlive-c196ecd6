@@ -12,9 +12,23 @@ import type {
 } from '../types';
 import type { VerdictSlug } from '../tokens';
 
+/**
+ * THE DIAL OPENS AT 9.0 — AND THE TOUCHED FLAG IS WHY THAT IS SAFE.
+ *
+ * The step-3 dial shows a figure from the moment it opens (an em-dash read as
+ * unloaded content on device), but an untouched default and a deliberate 9.0
+ * must not write identical rows: the platform median is 8.8, so a default
+ * nobody moved would anchor the whole scale upward. `overallTouched` records
+ * whether the member has moved it; until they have, the primary button reads
+ * "Set your score" and is disabled. One drag satisfies it, including a drag
+ * that ends back on 9.0. EDIT MODE starts SATISFIED — they already have a
+ * score and must not re-drag it to fix a typo.
+ */
+export const DEFAULT_OVERALL = 9.0;
+
 const EMPTY_STATE: ReviewComposerState = {
   verdict: null,
-  overall: null,
+  overall: DEFAULT_OVERALL,
   scores: {
     design: null,
     condition: null,
@@ -26,7 +40,21 @@ const EMPTY_STATE: ReviewComposerState = {
   teeLabel: null,
 };
 
-export type WizardStep = 0 | 1 | 2;
+/**
+ * THE STEP NUMBERS ARE THE MEMBER'S STEP NUMBERS.
+ *
+ * The unified composer's step 1 ("What are you sharing?") is a sheet this
+ * composer never renders, so the composer owns steps 2 and 3 and uses those
+ * very numbers — no second numbering to translate for the counter, the
+ * segmented bar or the analytics indices.
+ *
+ * 2 = photos and a few words. 3 = the dial and the breakdown.
+ */
+export type WizardStep = 2 | 3;
+export const FIRST_STEP: WizardStep = 2;
+export const LAST_STEP: WizardStep = 3;
+/** Total steps in the review path, including step 1's tiles. */
+export const REVIEW_TOTAL_STEPS = 3;
 
 const DRAFT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
@@ -46,8 +74,27 @@ function draftKey(courseId: string | null | undefined, reviewId?: string | null)
     : `review-draft:${courseId ?? 'unknown'}`;
 }
 
+/* DRAFT VERSION — THE ONE THAT WOULD HAVE BITTEN ON SHIP DAY.
+ *
+ * The stored `step` index changed MEANING when the review path was reordered:
+ * 1 used to be Breakdown and is now Words, 2 used to be Words and is now the
+ * rating. A draft written before the reorder therefore restores onto the wrong
+ * screen with the member's work intact and the flow scrambled.
+ *
+ * A draft whose version is not the current one is DISCARDED SILENTLY — not
+ * migrated, not partially restored. Drafts live 24 hours, so the problem
+ * disappears within a day of shipping, and a missing draft is a smaller harm
+ * than a wrong-screen restore. BUMP THIS whenever the step indices or the
+ * shape's meaning change again.
+ */
+export const DRAFT_VERSION = 2;
+
 interface DraftShape {
+  /** DRAFT_VERSION at write time. Absent or stale means discard. */
+  v?: number;
   step: WizardStep;
+  /** Whether the member had moved the dial when the draft was written. */
+  overallTouched?: boolean;
   overall: number | null;
   scores: Record<CategoryKey, number | null>;
   reviewText: string;
@@ -87,6 +134,7 @@ function readDraft(
     if (!raw) return null;
     const parsed = JSON.parse(raw) as DraftShape;
     if (!parsed || typeof parsed.savedAt !== 'number') return null;
+    if (parsed.v !== DRAFT_VERSION) return null; // pre-reorder draft: discard
     if (Date.now() - parsed.savedAt > DRAFT_MAX_AGE_MS) return null;
     return parsed;
   } catch {
@@ -122,10 +170,11 @@ export function clearReviewDraft(
 
 function seedFromExisting(existing: ExistingReview | null | undefined): ReviewComposerState {
   if (!existing) return EMPTY_STATE;
+  // Edit mode opens on the EXISTING score, never on the 9.0 default.
   const asVerdict = (existing.verdict ?? null) as VerdictSlug | null;
   return {
     verdict: asVerdict,
-    overall: existing.rating ?? null,
+    overall: existing.rating ?? DEFAULT_OVERALL,
     scores: {
       design: existing.design_score ?? null,
       condition: existing.condition_score ?? null,
@@ -191,7 +240,7 @@ export function useReviewComposer(
     if (!restored) return base;
     return {
       ...base,
-      overall: restored.overall ?? null,
+      overall: restored.overall ?? base.overall,
       scores: { ...base.scores, ...(restored.scores ?? {}) },
       reviewText: restored.reviewText ?? '',
       shareToFeed: restored.shareToFeed !== false,
@@ -216,7 +265,16 @@ export function useReviewComposer(
   });
 
 
-  const [step, setStepRaw] = useState<WizardStep>(() => (restored?.step ?? 0) as WizardStep);
+  /* THE TOUCHED FLAG. Edit mode starts satisfied; a create starts unsatisfied
+     even though the dial already displays 9.0. A restored draft carries the
+     member's own answer forward. */
+  const [overallTouched, setOverallTouched] = useState<boolean>(
+    () => isEditMode || restored?.overallTouched === true,
+  );
+
+  const [step, setStepRaw] = useState<WizardStep>(
+    () => (restored?.step === LAST_STEP ? LAST_STEP : FIRST_STEP),
+  );
   const setStep = useCallback((n: WizardStep) => setStepRaw(n), []);
 
   const setVerdict = useCallback((slug: VerdictSlug) => {
@@ -224,6 +282,7 @@ export function useReviewComposer(
   }, []);
 
   const setOverall = useCallback((v: number) => {
+    setOverallTouched(true);
     setState((s) => ({ ...s, overall: Math.round(v * 10) / 10 }));
   }, []);
 
@@ -258,7 +317,9 @@ export function useReviewComposer(
       writeDraft(
         courseId,
         {
+          v: DRAFT_VERSION,
           step,
+          overallTouched,
           overall: state.overall,
           scores: state.scores,
           reviewText: state.reviewText,
@@ -274,7 +335,7 @@ export function useReviewComposer(
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [courseId, reviewId, step, state, photoCount, videoCount]);
+  }, [courseId, reviewId, step, state, photoCount, videoCount, overallTouched]);
 
   const clearDraft = useCallback(
     () => clearReviewDraft(courseId, reviewId),
@@ -288,10 +349,11 @@ export function useReviewComposer(
     if (timerRef.current) clearTimeout(timerRef.current);
     clearReviewDraft(courseId, reviewId);
     setState(seedFromExisting(existing));
+    setOverallTouched(isEditMode);
     setRestoredFromDraft(false);
     setRestoredMediaCounts(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, reviewId, existing]);
+  }, [courseId, reviewId, existing, isEditMode]);
 
   /* Dismissing the media sentence alone, without discarding the restored work:
      the member has read it and re-attached, or decided not to. */
@@ -310,12 +372,16 @@ export function useReviewComposer(
   );
 
   const allCategoriesSet = catsSet === 4;
-  const step0Gate = state.overall != null;
-  const step1Gate = allCategoriesSet;
+  /* STEP 2 (words and photos) can be passed with nothing: the rating is what
+     the flow exists for, and a score with no words is still worth having. */
+  const wordsGate = true;
+  /* STEP 3 needs a dial the member actually moved AND all four categories.
+     Ben's July decision that all four are required is not reopened here. */
+  const ratingGate = overallTouched && allCategoriesSet;
 
   const canSubmit = useMemo(
-    () => step0Gate && step1Gate,
-    [step0Gate, step1Gate],
+    () => ratingGate,
+    [ratingGate],
   );
 
   return {
@@ -328,6 +394,7 @@ export function useReviewComposer(
     acknowledgeRestoredMedia,
 
 
+    overallTouched,
     setVerdict,
     setOverall,
     setCategory,
@@ -337,8 +404,8 @@ export function useReviewComposer(
     canSubmit,
     allCategoriesSet,
     catsSet,
-    step0Gate,
-    step1Gate,
+    wordsGate,
+    ratingGate,
     clearDraft,
   };
 }

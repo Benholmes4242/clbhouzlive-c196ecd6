@@ -16,10 +16,12 @@ function handleOf(container: HTMLElement): HTMLElement {
   return track.lastElementChild as HTMLElement;
 }
 
+/* The three band LABELS are gone: under the course page's two-tone rule the
+   first two colours are identical and a three-colour legend reads as broken, so
+   the axis now marks the track with 1 / 5 / 10 in one quiet tone. */
 const props = {
   caption: '',
   ariaLabel: 'Overall',
-  bandLabels: { low: 'POOR', mid: 'GOOD', high: 'GREAT' },
 };
 
 describe('OverallScrubber empty state', () => {

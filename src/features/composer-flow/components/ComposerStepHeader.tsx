@@ -7,7 +7,11 @@
  * header would drift and the handoff would read as two different apps.
  *
  * LEFT SLOT: × on step 1 (closes the flow), ← on every later step (returns to
- * the previous step with state intact).
+ * the previous step with state intact). `left="none"` is for a host that
+ * already owns its own leading control — the review composer's fixed header
+ * carries the course name, the delete action and the one back/close glyph, and
+ * two back buttons on one screen would be a worse answer than a counter that
+ * sits under it.
  */
 import { ArrowLeft, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -20,13 +24,19 @@ interface Props {
   step: number;
   /** 3 on the review path, 2 on the post path. */
   total: number;
-  /** Step 1 shows ×; later steps show ←. */
-  onLeft: () => void;
+  /** Step 1 shows ×; later steps show ←. Ignored when left is 'none'. */
+  onLeft?: () => void;
+  /**
+   * Which leading control to draw. Defaults to the step-derived one: 'close'
+   * on step 1, 'back' after it. 'none' draws no button at all.
+   */
+  left?: 'close' | 'back' | 'none';
 }
 
-export default function ComposerStepHeader({ step, total, onLeft }: Props) {
+export default function ComposerStepHeader({ step, total, onLeft, left }: Props) {
   const { t } = useTranslation('composerFlow');
-  const isFirst = step <= 1;
+  const resolved = left ?? (step <= 1 ? 'close' : 'back');
+  const isFirst = resolved === 'close';
 
   return (
     <div>
@@ -39,6 +49,7 @@ export default function ComposerStepHeader({ step, total, onLeft }: Props) {
           padding: '0 12px',
         }}
       >
+        {resolved !== 'none' && (
         <button
           type="button"
           onClick={onLeft}
@@ -57,6 +68,7 @@ export default function ComposerStepHeader({ step, total, onLeft }: Props) {
         >
           {isFirst ? <X size={20} strokeWidth={2.2} /> : <ArrowLeft size={20} strokeWidth={2.2} />}
         </button>
+        )}
         <span style={{ fontSize: 12, fontWeight: 700, color: CT.muted }}>
           {t('step', { n: step, m: total })}
         </span>
