@@ -268,6 +268,10 @@ const STREAK_LABELS: Record<string, string> = {
 // Returns "" for unknown so copy can degrade gracefully to "Your streak".
 const streakLabel = (s?: string) => (s && STREAK_LABELS[s]) || "";
 
+/** Small counts read as words in a sentence: "and three more awards". */
+const COUNT_WORDS = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+const spellCount = (n: number) => (n >= 1 && n <= 10 ? COUNT_WORDS[n] : String(n));
+
 function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
   const p = r.template_payload ?? {};
   switch (r.notification_type) {
