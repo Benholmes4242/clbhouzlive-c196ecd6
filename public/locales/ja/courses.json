@@ -1213,11 +1213,19 @@
       "9": "9"
     },
     "ownerFirst": "初めての{{feat}}。{{rounds}}ラウンド目。",
-    "ownerRareThree": "これを達成した最初の3人のメンバーの1人です。",
-    "ownerRareTwo": "これを達成した最初の2人のメンバーの1人です。",
+    "ownerFirstCongrats": "{{line}} — {{name}}さん、おめでとうございます",
+    "ownerRareThree": "これを達成したclbhouz史上3人目のメンバーです。",
+    "ownerRareThreeCongrats": "{{line}} — {{name}}さん、おめでとうございます",
+    "ownerRareTwo": "これを達成したclbhouz史上2人目のメンバーです。",
+    "ownerRareTwoCongrats": "{{line}} — {{name}}さん、おめでとうございます",
     "ownerRepeat": "あなたの{{ord}}回目の{{feat}}。{{when}}以来。",
-    "ownerSole": "これを達成した史上初のメンバーです。",
-    "viewer": "{{rounds}}ラウンドで{{ord}}回目の{{feat}}。"
+    "ownerRepeatCongrats": "{{line}} — {{name}}さん、おめでとうございます",
+    "ownerSole": "これを達成したclbhouz史上初のメンバーです。",
+    "ownerSoleCongrats": "{{line}} — {{name}}さん、おめでとうございます",
+    "viewer": "{{rounds}}ラウンドで{{ord}}回目の{{feat}}。",
+    "viewerRareThree": "これを達成したclbhouz史上3人目のメンバーです。",
+    "viewerRareTwo": "これを達成したclbhouz史上2人目のメンバーです。",
+    "viewerSole": "これを達成したclbhouz史上初のメンバーです。"
   },
   "friends": {
     "signIn": "Sign in",

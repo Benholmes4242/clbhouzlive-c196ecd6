@@ -5,6 +5,7 @@ import { SectionEyebrow } from './SectionEyebrow';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { FONT, INK, INK_FAINT, INK_SOFT, SURFACE, WHITE_ALPHA_10 } from '../../_shared/tokens';
 import { formatToPar } from '../../overview/data/liveRoundStats';
+import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
 
 interface Props { contest: TournamentContest; state: EventState }
 
@@ -14,11 +15,14 @@ export function ContestSection({ contest, state }: Props) {
   const cjk = /^(ja|ko)/.test(i18n.language);
   // Standings are never stated as ordinal words here: the board owns rank labels,
   // prose states names and gaps only.
+  const board = contest.pack.map((row) => row.entry);
+  const needsInitials = teamNamesNeedInitials(board);
+  const prose = (entry: (typeof board)[number] | undefined) => entry ? resolveBoardEntity(entry, needsInitials).prose : null;
   const chasers = contest.pack.filter((row) => row.gap > 0);
-  const nextName = chasers[0]?.entry.player?.full_name ?? null;
-  const thirdName = chasers[1]?.entry.player?.full_name ?? null;
+  const nextName = prose(chasers[0]?.entry);
+  const thirdName = prose(chasers[1]?.entry);
   const gapPhrase = (shots: number) => t('tournament.contest.gapShots', { count: shots });
-  const leaderNames = contest.leaders.map((row) => row.player?.full_name ?? '').filter(Boolean);
+  const leaderNames = contest.leaders.map((row) => resolveBoardEntity(row, needsInitials).prose).filter(Boolean);
   const levelScore = contest.leader?.score == null ? null : formatToPar(contest.leader.score);
 
   let subline: string | null = null;
@@ -37,11 +41,12 @@ export function ContestSection({ contest, state }: Props) {
     };
     const form = leaderNames.length >= 4 ? 'Many' : leaderNames.length === 3 ? 'Three' : 'Two';
     if (leaderNames.length >= 2 && levelScore) {
-      const suffix = past ? 'Past' : withChaser ? 'Chaser' : '';
-      subline = t(`tournament.contest.sublineLevel${form}${suffix}`, vars);
+      subline = past && contest.playoffDecided
+        ? t(`tournament.contest.sublinePlayoff${form}`, vars)
+        : t(`tournament.contest.sublineLevel${form}${past ? 'Past' : withChaser ? 'Chaser' : ''}`, vars);
     }
   } else if (nextName && contest.leader) {
-    const leaderName = contest.leader.player?.full_name ?? '';
+    const leaderName = resolveBoardEntity(contest.leader, needsInitials).prose;
     subline = thirdName && chasers[1]
       ? t('tournament.contest.sublineSingleThird', {
           leader: leaderName,
@@ -53,12 +58,17 @@ export function ContestSection({ contest, state }: Props) {
   }
   const maxGap = contest.pack.length ? Math.max(...contest.pack.map((row) => row.gap)) : 0;
   const showTrack = contest.pack.length >= 5;
-  const word = contest.sharedLead
-    ? t('tournament.contest.sharedLead', { count: contest.leaders.length })
-    : t('tournament.contest.playoff');
-  const qualifier = contest.sharedLead && contest.holesLeft != null
-    ? t('tournament.contest.withToPlay', { holes: contest.holesLeft })
-    : state === 'completed' ? t('tournament.contest.decidedInPlayoff') : null;
+  const past = state === 'completed';
+  const word = past
+    ? contest.playoffDecided
+      ? t('tournament.contest.playoff')
+      : t('tournament.contest.finishedLevel')
+    : t('tournament.contest.sharedLead', { count: contest.leaders.length });
+  const qualifier = past
+    ? null
+    : contest.holesLeft != null
+      ? t('tournament.contest.withToPlay', { holes: contest.holesLeft })
+      : null;
 
   return (
     <section style={{ fontFamily: FONT }}>

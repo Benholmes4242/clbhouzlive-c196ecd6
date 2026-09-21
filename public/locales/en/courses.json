@@ -1701,11 +1701,19 @@
       "9": "ninth"
     },
     "ownerFirst": "Your first {{feat}}. {{rounds}} rounds in.",
-    "ownerRareThree": "One of the first three members to do this.",
-    "ownerRareTwo": "One of the first two members to do this.",
+    "ownerFirstCongrats": "{{line}} — congrats, {{name}}",
+    "ownerRareThree": "Only the third clbhouz member to achieve this.",
+    "ownerRareThreeCongrats": "{{line}} — congrats, {{name}}",
+    "ownerRareTwo": "Only the second clbhouz member to achieve this.",
+    "ownerRareTwoCongrats": "{{line}} — congrats, {{name}}",
     "ownerRepeat": "Your {{ord}} {{feat}}. First since {{when}}.",
-    "ownerSole": "The first member ever to do this.",
-    "viewer": "The {{ord}} {{feat}} in {{rounds}} rounds."
+    "ownerRepeatCongrats": "{{line}} — congrats, {{name}}",
+    "ownerSole": "The first clbhouz member ever to achieve this.",
+    "ownerSoleCongrats": "{{line}} — congrats, {{name}}",
+    "viewer": "The {{ord}} {{feat}} in {{rounds}} rounds.",
+    "viewerRareThree": "Only the third clbhouz member to achieve this.",
+    "viewerRareTwo": "Only the second clbhouz member to achieve this.",
+    "viewerSole": "The first clbhouz member ever to achieve this."
   },
   "friends": {
     "signIn": "Sign in",

@@ -10,3 +10,19 @@
 - [x] Verify representative PGA, no-photo, and non-PGA players at 320px, 390px, and 430px.
 - [x] Rebuild tournament detail around one contest narrative, unique figures, and state-specific evidence.
 - [x] Exclude leaders from the tournament contention count and verify forced contest states.
+- [x] Rebuild the feat pill with two figures, one in-pill rarity line, localized owner congratulations, and derived GOLD/TOP tier treatments.
+- [x] Restore every feat's fixed artwork after the temporary monochrome icon substitution.
+- [x] Move the selected GOLD/TOP rarity sentence into one full-width pill row and scope rare owner copy to clbhouz.
+- [x] Restore VS HCP to the feat pill and use member-position public rarity copy through three members.
+- [x] Replace the withdrawn GOLD/TOP tile tint and border with tokenized emblem lighting, then verify contrast and scroll painting.
+- [x] Replace the box-tracing emblem shadow with a silhouette-tracing drop-shadow and remove wrapper geometry.
+- [x] Move completed champions beneath the Tour Overview photo and gate PRIZE on complete displayed-row coverage.
+- [x] Align the tournament hero chip with Tour Overview and correct completed-playoff narration.
+- [x] Exclude cup and match-play events from every Tour Hub surface that asserts a leader or champion.
+- [x] Close the second leader-asserting list: this-week card, tournaments cache (all three buckets), generic fetch, last-year lookups and predictions guard.
+- [x] Render feed-native team identities throughout team tournament detail pages and verify Zurich/Dow responsively.
+- [x] Make team tournament board names uniform per event and measure every team label at 320px.
+- [x] Stack team partners on equal-weight lines across tournament boards and verify responsive row geometry.
+- [x] Extend the measured board name ladder to stacked team partners with a collision-safe short-name floor.
+- [x] Let the full board drop PRIZE after the name ladder and cell-width floor are exhausted.
+- [ ] Let resolved team champions back onto Tour Overview/live surfaces, delete requested dead hooks/components, and align detail hero type with the overview.

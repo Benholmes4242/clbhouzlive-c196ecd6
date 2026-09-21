@@ -100,7 +100,7 @@ export function VenueRecordBand({ tournamentId, venueName }: { tournamentId: str
   const rank = hasRank ? `#${data.listRank}${data.listLabel ? ` ${data.listLabel}` : ''}` : null;
   const rating = hasRating ? `${Number(data.rating).toFixed(1)} from ${count} ratings` : null;
   const facts = [rank, rating].filter(Boolean).join(' · ');
-  const target = `/course/${data.courseId}`;
+  const target = `/courses/${data.courseId}`;
 
   return (
     <section data-overview-venue-block style={{ margin: '18px 24px 0', fontFamily: FONT }}>

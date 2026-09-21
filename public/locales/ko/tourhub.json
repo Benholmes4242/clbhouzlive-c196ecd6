@@ -169,7 +169,7 @@
       "nextAria": "Next tournament",
       "counter": "{{current}} / {{total}}",
       "stateLive": "라이부",
-      "stateFinal": "종료",
+      "stateFinal": "결과",
       "stateUpcoming": "예정",
       "factRound": "라운드",
       "factThru": "진행",
@@ -693,6 +693,7 @@
       "shotsClear": "타 차",
       "sharedLead": "{{count}}명 공동 선두",
       "playoff": "연장전 우승",
+      "finishedLevel": "공동 성적으로 종료",
       "withToPlay": "{{holes}}홀 남음",
       "decidedInPlayoff": "연장전에서 결정",
       "leader": "선두",
@@ -711,7 +712,10 @@
       "sublineLevelManyChaser": "{{a}}, {{b}} 외 {{count}}명이 {{score}}로 나란히 있고 {{next}}가 {{gap}} 뒤입니다.",
       "sublineLevelTwoPast": "{{a}}와 {{b}}가 {{score}}로 나란히 마쳤습니다.",
       "sublineLevelThreePast": "{{a}}, {{b}}, {{c}}가 {{score}}로 나란히 마쳤습니다.",
-      "sublineLevelManyPast": "{{a}}, {{b}} 외 {{count}}명이 {{score}}로 나란히 마쳤습니다."
+      "sublineLevelManyPast": "{{a}}, {{b}} 외 {{count}}명이 {{score}}로 나란히 마쳤습니다.",
+      "sublinePlayoffTwo": "{{a}}가 {{score}}로 함께 마친 {{b}}를 꺾었습니다.",
+      "sublinePlayoffThree": "{{a}}가 세 선수 모두 {{score}}로 마친 뒤 {{b}}와 {{c}}를 꺾었습니다.",
+      "sublinePlayoffMany": "{{a}}가 {{score}}로 동률을 이룬 {{b}}와 다른 {{count}}명을 꺾었습니다."
     },
     "move": {
       "liveEyebrow": "오늘의 도약",

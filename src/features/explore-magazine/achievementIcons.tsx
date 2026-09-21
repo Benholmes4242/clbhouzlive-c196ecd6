@@ -2,7 +2,13 @@ import React from 'react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SC_FILL_BIRDIE_DK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
-import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+import {
+  FEAT_GOLD_EMBLEM_GLOW,
+  FEAT_GOLD_EMBLEM_SIZE,
+  FEAT_TOP_EMBLEM_GLOW,
+  FEAT_TOP_EMBLEM_SIZE,
+  TOPAR_UNDER_DARK,
+} from '@/features/tourhub/_shared/tokens';
 
 /**
  * THE ACHIEVEMENT ICONS (BRIEF_EXPLORE_TWO_SHAPES §5).
@@ -43,7 +49,9 @@ function Frame({ children }: { children: React.ReactNode }) {
 
 /** Emoji mark for a feat. Drawn figures keep using Frame; every mark occupies
  * the same fixed lane so mixed rows share one optical baseline. */
-export function AchievementEmoji({ glyph }: { glyph: string }) {
+export function AchievementEmoji({ glyph, tier = 'ink' }: { glyph: string; tier?: 'ink' | 'gold' | 'top' }) {
+  const emblemSize = tier === 'top' ? FEAT_TOP_EMBLEM_SIZE : tier === 'gold' ? FEAT_GOLD_EMBLEM_SIZE : 22;
+  const emblemGlow = tier === 'top' ? FEAT_TOP_EMBLEM_GLOW : tier === 'gold' ? FEAT_GOLD_EMBLEM_GLOW : 'none';
   return (
     <span
       data-explore-achievement-emoji={glyph}
@@ -56,8 +64,9 @@ export function AchievementEmoji({ glyph }: { glyph: string }) {
         width: CALLOUT_ICON,
         height: CALLOUT_ICON,
         fontFamily: "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
-        fontSize: 22,
+        fontSize: emblemSize,
         lineHeight: 1,
+        filter: emblemGlow,
       }}
     >
       {glyph}

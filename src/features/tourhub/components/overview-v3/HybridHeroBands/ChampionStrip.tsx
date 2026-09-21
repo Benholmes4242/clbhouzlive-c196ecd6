@@ -18,8 +18,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
-import { STATUS_NEGATIVE, SLATE_800, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
+import { CHAMPION_STRIP_WASH, INK, STATUS_NEGATIVE, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { getScoreColor } from '../../../_shared/scoreColor';
 import { TrajectorySparkline } from './TrajectorySparkline';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -27,6 +28,8 @@ interface ChampionStripProps {
   name: string;
   country?: string;
   score: string;
+  /** Numeric to-par behind `score` — drives the canonical getScoreColor treatment (CORRECTION 1: score is to-par colour, never gold). */
+  scoreValue?: number | null;
   scoreLabel?: string;
   eyebrow?: string;
   eyebrowIcon?: LucideIcon;
@@ -56,6 +59,7 @@ export function ChampionStrip({
   name,
   country,
   score,
+  scoreValue,
   scoreLabel,
   eyebrow,
   eyebrowIcon: EyebrowIcon = Trophy,
@@ -65,23 +69,19 @@ export function ChampionStrip({
   narrative,
 }: ChampionStripProps) {
   const { t } = useTranslation('tourhub');
-  // Note: scoreLabel prop is retained on the interface but not rendered in this
-  // strip variant (kept for compatibility with MiddleBand callers). Only the
-  // eyebrow default is user-visible here.
-  void scoreLabel;
   const resolvedEyebrow = eyebrow ?? t('overview.champion.eyebrow');
   const hasNarrative = !!(narrative && narrative.trim().length > 0);
 
   return (
     <div
       style={{
-        background: INK,
+        background: SURFACE,
         padding: hasNarrative ? '12px 20px 14px' : '10px 20px',
         minHeight: hasNarrative ? undefined : STRIP_HEIGHT,
         display: 'flex',
         flexDirection: 'column',
         gap: hasNarrative ? 8 : 0,
-        borderTop: '0.5px solid rgba(255,255,255,0.06)',
+        borderTop: `0.5px solid ${WHITE_ALPHA_06}`,
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -91,8 +91,7 @@ export function ChampionStrip({
         style={{
           position: 'absolute',
           inset: 0,
-          background:
-            'radial-gradient(ellipse 50% 100% at 0% 50%, rgba(251,188,46,0.10) 0%, transparent 60%)',
+          background: CHAMPION_STRIP_WASH,
           pointerEvents: 'none',
         }}
       />
@@ -120,7 +119,7 @@ export function ChampionStrip({
                 style={{
                   fontSize: 11,
                   fontWeight: 600,
-                  color: 'rgba(255,255,255,0.50)',
+                  color: WHITE_ALPHA_55,
                   letterSpacing: '0.04em',
                 }}
               >
@@ -132,11 +131,10 @@ export function ChampionStrip({
             style={{
               fontSize: 17,
               fontWeight: 700,
-              color: 'white',
+              color: INK,
               letterSpacing: '-0.01em',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              display: 'block',
+              whiteSpace: 'normal',
               lineHeight: 1.1,
             }}
           >
@@ -148,13 +146,19 @@ export function ChampionStrip({
             <TrajectorySparkline rounds={rounds} par={par} variant="champion" totalRounds={4} />
           </div>
         ) : null}
-        <div style={{ textAlign: 'right' }}>
+        <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
           <div
             style={{
               ...NUMERIC_STYLE,
               fontSize: 26,
-              fontWeight: 300,
-              color: GOLD,
+              // Weight matches the board's TOT figures below (700) — the
+              // champion's score must not read lighter than the same figure
+              // in row 1 of the board.
+              fontWeight: 700,
+              // CORRECTION 1 (BRIEF_TOUR_OVERVIEW_CHAMPION): the score takes the
+              // canonical to-par ramp — red under par, muted even — never gold.
+              // Gold stays on the eyebrow, trophy glyph and avatar ring only.
+              color: getScoreColor(scoreValue ?? null, 'dark'),
               letterSpacing: '-0.03em',
               lineHeight: 1,
               fontFeatureSettings: '"tnum" 1, "kern" 1',
@@ -162,6 +166,20 @@ export function ChampionStrip({
           >
             {score}
           </div>
+          {scoreLabel && (
+            <div
+              style={{
+                fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+                fontWeight: 700,
+                color: WHITE_ALPHA_55,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                marginTop: 2,
+              }}
+            >
+              {scoreLabel}
+            </div>
+          )}
         </div>
       </div>
 
@@ -191,13 +209,13 @@ export function CancelledStrip({ reason }: { reason: string }) {
   return (
     <div
       style={{
-        background: INK,
+        background: SURFACE,
         padding: '14px 20px',
         minHeight: STRIP_HEIGHT,
         display: 'flex',
         alignItems: 'center',
         gap: 14,
-        borderTop: '0.5px solid rgba(255,255,255,0.06)',
+        borderTop: `0.5px solid ${WHITE_ALPHA_06}`,
       }}
     >
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -221,7 +239,7 @@ export function CancelledStrip({ reason }: { reason: string }) {
           style={{
             fontSize: 14,
             fontWeight: 700,
-            color: 'white',
+            color: INK,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -244,13 +262,13 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
   return (
     <div
       style={{
-        background: INK,
+        background: SURFACE,
         padding: '10px 20px',
         minHeight: STRIP_HEIGHT,
         display: 'flex',
         alignItems: 'center',
         gap: 14,
-        borderTop: '0.5px solid rgba(255,255,255,0.06)',
+        borderTop: `0.5px solid ${WHITE_ALPHA_06}`,
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -260,8 +278,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
         style={{
           position: 'absolute',
           inset: 0,
-          background:
-            'radial-gradient(ellipse 50% 100% at 0% 50%, rgba(251,188,46,0.10) 0%, transparent 60%)',
+          background: CHAMPION_STRIP_WASH,
           pointerEvents: 'none',
         }}
       />
@@ -294,7 +311,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
           <Trophy size={10} color={GOLD} strokeWidth={2.5} />
           {t('overview.playoff.eyebrow')}
         </div>
-        <div style={{ fontSize: 17, fontWeight: 700, color: 'white', letterSpacing: '-0.01em' }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
           {t('overview.playoff.tiedAtTop', { count })}
         </div>
       </div>
@@ -311,7 +328,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
         >
           {score}
         </div>
-        <div style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.16em', marginTop: 2 }}>
+        <div style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, color: WHITE_ALPHA_55, letterSpacing: '0.16em', marginTop: 2 }}>
           {t('overview.champion.scoreLabelToPar')}
         </div>
       </div>

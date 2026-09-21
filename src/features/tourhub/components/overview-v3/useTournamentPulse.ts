@@ -64,6 +64,12 @@ export interface TournamentPulse {
   isLive: boolean;
 }
 
+/**
+ * Deliberately NOT gated on event_type (BRIEF_NON_STROKE_GATE_2 §4): this hook
+ * reads one tournament by id and returns a lifecycle state only — it asserts no
+ * leader. The CONSUMER gates, not the hook: the tournament detail page checks
+ * meta.event_type before mounting any leader-asserting section.
+ */
 export function useTournamentPulse(tournamentId: string | null | undefined): TournamentPulse {
   const id = tournamentId ?? undefined;
 

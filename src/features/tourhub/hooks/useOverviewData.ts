@@ -5,6 +5,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from '../_shared/boardEntity';
+import type { BoardEntry } from '../leaderboard/BoardTable';
 
 // Tour configuration with colors and icons
 export const TOUR_CONFIG = {
@@ -163,6 +165,7 @@ export function useUpcomingTournaments(days: number = 14) {
             tour_name
           )
         `)
+        .in('event_type', ['stroke', 'team'])
         .in('status', ['scheduled', 'created'])
         .gte('start_date', today)
         .lte('start_date', futureDateStr)
@@ -214,6 +217,7 @@ export function useRecentlyCompletedTournaments() {
       const twoDaysAgo = new Date();
       twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
       const twoDaysAgoStr = twoDaysAgo.toISOString().split('T')[0];
+      const todayStr = new Date().toISOString().split('T')[0];
 
       // Fetch tournaments first
       const { data: tournaments, error } = await supabase
@@ -234,13 +238,16 @@ export function useRecentlyCompletedTournaments() {
           currency,
           defending_champion,
           winner_id,
+          event_type,
           season:sr_seasons!inner(
             tour_id,
             tour_name
           )
         `)
+        .in('event_type', ['stroke', 'team'])
         .in('status', ['closed', 'complete'])
         .gte('end_date', twoDaysAgoStr)
+        .lte('end_date', todayStr)
         .order('end_date', { ascending: false })
         .order('purse', { ascending: false });
 
@@ -264,15 +271,19 @@ export function useRecentlyCompletedTournaments() {
               .select('sr_id, first_name, last_name, photo_url')
               .in('sr_id', winnerSrIds)
           : Promise.resolve({ data: [] }),
-        // Fetch position 1 entries from leaderboards for these tournaments
+        // Fetch full boards for these tournaments. Team champion prose depends on
+        // event-wide surname-collision detection, so position-1-only data is not
+        // enough even though the winner row itself is still resolved from P1.
         supabase
           .from('sr_leaderboards')
           .select(`
+            id,
             tournament_id,
             position,
+            position_tied,
             score,
             player:sr_players!sr_leaderboards_player_id_fkey(
-              id, sr_id, first_name, last_name, photo_url
+              id, sr_id, first_name, last_name, full_name, photo_url
             ),
             team:sr_teams!sr_leaderboards_team_id_fkey(
               id, sr_id, display_name, abbr_name,
@@ -283,7 +294,8 @@ export function useRecentlyCompletedTournaments() {
             )
           `)
           .in('tournament_id', tournamentIds)
-          .eq('position', 1),
+          .not('position', 'is', null)
+          .order('position', { ascending: true }),
       ]);
 
       // Build winner map from sr_players query
@@ -300,54 +312,88 @@ export function useRecentlyCompletedTournaments() {
         });
       }
 
-      // Build leaderboard map for winner scores (and as fallback for winner info)
-      const leaderboardMap: Record<string, { 
-        score: number | null; 
-        player: { sr_id: string; first_name: string; last_name: string; photo_url: string | null } 
-      }> = {};
+      // Build leaderboard groups for winner scores (and as fallback for winner info).
+      // Team names are resolved after the full event board is known so surname
+      // collisions apply uniformly across the event.
+      const leaderboardByTournament: Record<string, BoardEntry[]> = {};
       if (leaderboardResult.data) {
         leaderboardResult.data.forEach((entry: any) => {
-          let player = entry.player;
-          if (!player && entry.team) {
-            const members = (entry.team.members || [])
-              .filter((m: any) => m.player)
-              .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
-            const teamName = entry.team.abbr_name || entry.team.display_name || 'Team';
-            player = {
-              sr_id: entry.team.sr_id,
-              first_name: '',
-              last_name: teamName,
-              photo_url: members[0]?.player?.photo_url ?? null,
-            };
-          }
-          if (player) {
-            leaderboardMap[entry.tournament_id] = {
-              score: entry.score,
-              player: {
-                sr_id: player.sr_id,
-                first_name: player.first_name || '',
-                last_name: player.last_name || '',
-                photo_url: player.photo_url,
-              },
-            };
-          }
+          const boardEntry: BoardEntry = {
+            id: entry.id ?? `${entry.tournament_id}:${entry.player?.id ?? entry.team?.id ?? entry.position}`,
+            position: entry.position ?? null,
+            position_tied: entry.position_tied ?? null,
+            score: entry.score ?? null,
+            player: entry.player
+              ? {
+                  id: entry.player.id,
+                  sr_id: entry.player.sr_id ?? null,
+                  full_name: entry.player.full_name || [entry.player.first_name, entry.player.last_name].filter(Boolean).join(' '),
+                  photo_url: entry.player.photo_url ?? null,
+                }
+              : null,
+            team: entry.team
+              ? {
+                  id: entry.team.id,
+                  sr_id: entry.team.sr_id ?? null,
+                  display_name: entry.team.display_name ?? null,
+                  abbr_name: entry.team.abbr_name ?? null,
+                  members: entry.team.members ?? [],
+                }
+              : null,
+          };
+          const list = leaderboardByTournament[entry.tournament_id] ?? [];
+          list.push(boardEntry);
+          leaderboardByTournament[entry.tournament_id] = list;
         });
       }
+
+      const leaderboardMap: Record<string, {
+        score: number | null;
+        name: string | null;
+        photo_url: string | null;
+        sr_id: string | null;
+      }> = {};
+      Object.entries(leaderboardByTournament).forEach(([tournamentId, board]) => {
+        const top = board[0];
+        if (!top) return;
+        const entity = resolveBoardEntity(top, teamNamesNeedInitials(board));
+        const firstMemberPhoto = top.team?.members
+          ?.slice()
+          .sort((a, b) => (a.position_in_team ?? 0) - (b.position_in_team ?? 0))[0]?.player?.photo_url ?? null;
+        leaderboardMap[tournamentId] = {
+          score: top.score,
+          name: entity.prose || null,
+          photo_url: top.player?.photo_url ?? firstMemberPhoto,
+          sr_id: top.player?.sr_id ?? top.team?.sr_id ?? null,
+        };
+      });
 
       return tournaments.map((row: any): TourTournamentWithWinner => {
         // Try to get winner from winner_id first, then fall back to leaderboard position 1
         const winnerFromId = row.winner_id ? winnerMap[row.winner_id] : null;
-        const leaderboardEntry = leaderboardMap[row.id];
+        const board = leaderboardByTournament[row.id] ?? [];
+        const championEntry = resolveChampionEntry(board, { winner_id: row.winner_id ?? null, event_type: row.event_type ?? null });
+        const championEntity = championEntry ? resolveBoardEntity(championEntry, teamNamesNeedInitials(board)) : null;
+        const leaderboardEntry = championEntry
+          ? {
+              score: championEntry.score,
+              name: championEntity?.prose || null,
+              photo_url: championEntry.player?.photo_url ?? championEntry.team?.members
+                ?.slice()
+                .sort((a: any, b: any) => (a.position_in_team ?? 0) - (b.position_in_team ?? 0))[0]?.player?.photo_url ?? null,
+              sr_id: championEntry.player?.sr_id ?? championEntry.team?.sr_id ?? null,
+            }
+          : null;
         
         // Use winner_id data if available, otherwise use leaderboard position 1
         const winnerName = winnerFromId 
           ? `${winnerFromId.first_name} ${winnerFromId.last_name}`.trim()
-          : leaderboardEntry?.player
-            ? `${leaderboardEntry.player.first_name} ${leaderboardEntry.player.last_name}`.trim()
+          : leaderboardEntry?.name
+            ? leaderboardEntry.name
             : null;
         
         const winnerPhotoUrl = winnerFromId?.photo_url 
-          || leaderboardEntry?.player?.photo_url 
+          || leaderboardEntry?.photo_url 
           || null;
 
         // Format score as string (e.g., "-23" or "+5")
@@ -406,6 +452,9 @@ export function useTournamentsByTour() {
             year
           )
         `)
+        // Tour overview stats sit beside leader/champion surfaces; count only
+        // formats whose boards support to-par standings.
+        .in('event_type', ['stroke', 'team'])
         .eq('sr_seasons.year', currentYear);
 
       if (countError) throw countError;
@@ -434,6 +483,7 @@ export function useTournamentsByTour() {
             year
           )
         `)
+        .in('event_type', ['stroke', 'team'])
         .in('status', ['scheduled', 'created'])
         .gte('start_date', new Date().toISOString().split('T')[0])
         .eq('sr_seasons.year', currentYear)
@@ -637,12 +687,12 @@ export function useTournamentLeader(tournamentId: string | undefined) {
         scoreDisplay,
         thru: data.thru,
         player: {
-          id: (data.player as any).id,
-          firstName: (data.player as any).first_name,
-          lastName: (data.player as any).last_name,
-          fullName: `${(data.player as any).first_name} ${(data.player as any).last_name}`,
-          country: (data.player as any).country,
-          photoUrl: (data.player as any).photo_url,
+          id: player.id,
+          firstName: player.first_name ?? '',
+          lastName: player.last_name ?? '',
+          fullName: player._teamName ?? player.full_name ?? `${player.first_name ?? ''} ${player.last_name ?? ''}`.trim(),
+          country: player.country,
+          photoUrl: player.photo_url,
         },
       };
     },

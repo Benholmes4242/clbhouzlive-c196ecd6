@@ -10,6 +10,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { fmtScore } from '../utils/fmtScore';
+import { isStrokeEvent } from '../_shared/eventFormat';
 
 export interface DefendingChampData {
   name: string;
@@ -39,11 +40,16 @@ export function useTournamentDefendingChamp(tournamentId: string | null | undefi
       // 1. Resolve current tournament to get tour + name + year
       const { data: current, error: currentErr } = await supabase
         .from('sr_tournaments')
-        .select('id, name, start_date, defending_champion, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, year)')
+        .select('id, name, start_date, defending_champion, event_type, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, year)')
         .eq('id', tournamentId)
         .maybeSingle();
 
       if (currentErr || !current) return null;
+
+      // BRIEF_NON_STROKE_GATE_2 §4 — reachable for a cup via the tournament
+      // detail hero (an upcoming cup keeps its hero), so the gate lives here.
+      // A cup's prior-year "winner" is a points total, not a to-par score.
+      if (!isStrokeEvent((current as any).event_type)) return null;
 
       const currentYear = new Date(current.start_date).getFullYear();
       const tourName = (current as any).season?.tour_name;

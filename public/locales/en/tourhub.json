@@ -215,7 +215,7 @@
       "purse": "PURSE",
       "fieldAnnouncedSoon": "Announced soon",
       "stateLive": "LIVE",
-      "stateFinal": "FINAL",
+      "stateFinal": "RESULTS",
       "stateUpcoming": "UPCOMING",
       "factRound": "ROUND",
       "factThru": "THRU",
@@ -814,6 +814,7 @@
       "shotsClear": "Shots clear",
       "sharedLead": "{{count}} share the lead",
       "playoff": "Won a playoff",
+      "finishedLevel": "Finished level",
       "withToPlay": "With {{holes}} to play",
       "decidedInPlayoff": "Decided in a playoff",
       "leader": "Leader",
@@ -832,7 +833,10 @@
       "sublineLevelManyChaser": "{{a}}, {{b}} and {{count}} others, level at {{score}}, with {{next}} {{gap}} back.",
       "sublineLevelTwoPast": "{{a}} and {{b}} were level at {{score}}.",
       "sublineLevelThreePast": "{{a}}, {{b}} and {{c}} were level at {{score}}.",
-      "sublineLevelManyPast": "{{a}}, {{b}} and {{count}} others were level at {{score}}."
+      "sublineLevelManyPast": "{{a}}, {{b}} and {{count}} others were level at {{score}}.",
+      "sublinePlayoffTwo": "{{a}} beat {{b}} after both finished on {{score}}.",
+      "sublinePlayoffThree": "{{a}} beat {{b}} and {{c}} after all three finished on {{score}}.",
+      "sublinePlayoffMany": "{{a}} beat {{b}} and {{count}} others after they finished level on {{score}}."
     },
     "move": {
       "liveEyebrow": "The move",

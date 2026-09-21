@@ -441,6 +441,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
         indexAtTime: userData?.handicap_index_at_time ?? null,
       } : null}
       playerName={displayName}
+      ownerDisplayName={profile?.display_name ?? null}
       playerAvatarUrl={profile?.profile_photo_url ?? (usingSeed ? seed?.playerAvatarUrl ?? null : null)}
       playerHcp={playerHcp}
       playerHcpDelta={handicapDelta ?? null}

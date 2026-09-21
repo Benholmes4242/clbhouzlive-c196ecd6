@@ -209,7 +209,7 @@ async function notifyContributor(
       data: {
         course_id: row.course_id,
         hole_no: row.hole_no,
-        link: `/course/${row.course_id}?tab=course&hole=${row.hole_no}`,
+        link: `/courses/${row.course_id}?tab=course&hole=${row.hole_no}`,
       },
     });
   } catch (e) {

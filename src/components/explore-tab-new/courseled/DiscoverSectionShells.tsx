@@ -8,7 +8,7 @@ import { CARD_SHELL, CHIP_RADIUS } from './tokens';
  * BRIEF_DISCOVER_SKELETON_REBUILD S2.1: Discover's own skeleton no longer
  * models any of the sections below — they were unmounted from that page long
  * ago. They STAY because the components that own them (FriendsPlayedRail,
- * OnTourThisWeek, LatestReviews, MomentsOfTheWeek) still render them as their
+ * LatestReviews, MomentsOfTheWeek) still render them as their
  * own pending shells on other routes, and a shell deleted out from under a live
  * component is a worse problem than an unreached one. They live here rather
  * than inside Discover's skeleton so that file can be what the brief asks: a

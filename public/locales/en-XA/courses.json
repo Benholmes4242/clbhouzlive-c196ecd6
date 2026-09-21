@@ -1561,11 +1561,19 @@
       "9": "[ñíñţĥ]"
     },
     "ownerFirst": "[Ýóúŕ fíŕšţ {{feat}}. {{rounds}} ŕóúñđš íñ.]",
-    "ownerRareThree": "[Óñé óf ţĥé fíŕšţ ţĥŕéé ɱéɱƀéŕš ţó đó ţĥíš.]",
-    "ownerRareTwo": "[Óñé óf ţĥé fíŕšţ ţŵó ɱéɱƀéŕš ţó đó ţĥíš.]",
+    "ownerFirstCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
+    "ownerRareThree": "[Óñļý ţĥé ţĥíŕđ clbhouz ɱéɱƀéŕ ţó áçĥíéνé ţĥíš.]",
+    "ownerRareThreeCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
+    "ownerRareTwo": "[Óñļý ţĥé šéçóñđ clbhouz ɱéɱƀéŕ ţó áçĥíéνé ţĥíš.]",
+    "ownerRareTwoCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
     "ownerRepeat": "[Ýóúŕ {{ord}} {{feat}}. Fíŕšţ šíñçé {{when}}.]",
-    "ownerSole": "[Ţĥé fíŕšţ ɱéɱƀéŕ éνéŕ ţó đó ţĥíš.]",
-    "viewer": "[Ţĥé {{ord}} {{feat}} íñ {{rounds}} ŕóúñđš.]"
+    "ownerRepeatCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
+    "ownerSole": "[Ţĥé fíŕšţ clbhouz ɱéɱƀéŕ éνéŕ ţó áçĥíéνé ţĥíš.]",
+    "ownerSoleCongrats": "[{{line}} — çóñĝŕáţš, {{name}}]",
+    "viewer": "[Ţĥé {{ord}} {{feat}} íñ {{rounds}} ŕóúñđš.]",
+    "viewerRareThree": "[Óñļý ţĥé ţĥíŕđ clbhouz ɱéɱƀéŕ ţó áçĥíéνé ţĥíš.]",
+    "viewerRareTwo": "[Óñļý ţĥé šéçóñđ clbhouz ɱéɱƀéŕ ţó áçĥíéνé ţĥíš.]",
+    "viewerSole": "[Ţĥé fíŕšţ clbhouz ɱéɱƀéŕ éνéŕ ţó áçĥíéνé ţĥíš.]"
   },
   "friends": {
     "signIn": "[~~Šíĝñ íñ~~]",
