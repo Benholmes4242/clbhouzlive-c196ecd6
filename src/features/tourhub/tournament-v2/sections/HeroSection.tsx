@@ -5,7 +5,8 @@ import { formatPurse } from '../../_shared/formatPurse';
 import { fmtScore } from '../../utils/fmtScore';
 import { AMBER, FONT, INK, INK_FAINT, INK_MUTE, STATUS_LIVE_ON_DARK, TOUR_HERO_PHOTO_H } from '../../_shared/tokens';
 import { heroCanonBackground } from '../../_shared/heroGradient';
-import { isStrokeEvent } from '../../_shared/eventFormat';
+import { hasStrokeBoard, isStrokeEvent } from '../../_shared/eventFormat';
+import { ambiguousTeamSurnames, resolveBoardEntity } from '../../_shared/boardEntity';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
@@ -39,7 +40,8 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
   const { data: defendingChamp } = useTournamentDefendingChamp(state === 'upcoming' ? meta.id : null);
   const defending = defendingChamp?.name ?? meta.defending_champion ?? null;
   const purse = meta.purse != null ? formatPurse(meta.purse) : null;
-  const leaderName = contest.leader?.player?.full_name ?? null;
+  const ambiguous = ambiguousTeamSurnames(contest.pack.map((row) => row.entry));
+  const leaderName = contest.leader ? resolveBoardEntity(contest.leader, ambiguous).prose : null;
   const score = contest.leader?.score == null ? null : fmtScore(contest.leader.score);
   const cityCountry = [meta.venue_city, meta.venue_country].filter(Boolean).join(', ');
   const venueLine = [meta.venue_name, cityCountry || null].filter(Boolean).join(' · ');
@@ -57,9 +59,10 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
 
   // The verdict is a claim about who is winning. Non-stroke formats (team /
   // cup / match) cannot support one, so no sentence is substituted.
-  const stroke = isStrokeEvent(meta.event_type);
+  const strokeBoard = hasStrokeBoard(meta.event_type);
+  const championResolvable = isStrokeEvent(meta.event_type);
   let verdict: string | null = null;
-  if (!stroke) {
+  if (!strokeBoard || (state === 'completed' && !championResolvable)) {
     verdict = null;
   } else if (state === 'live' && leaderName) {
     if (!contest.sharedLead && contest.margin != null && contest.holesLeft != null && contest.chasersWithinFour >= 2) verdict = t('tournament.hero.verdict.liveContest', { leader: leaderName, margin: contest.margin, count: contest.chasersWithinFour, holes: contest.holesLeft });

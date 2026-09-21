@@ -54,7 +54,7 @@ import { useTeeTimesAll } from './data/useTeeTimesAll';
 import { useTournamentStory } from './data/useTournamentStory';
 import { useTournamentHoleAnalysis } from './data/useTournamentHoleAnalysis';
 import { selectTournamentContest } from './data/tournamentContest';
-import { isStrokeEvent } from '../_shared/eventFormat';
+import { hasStrokeBoard } from '../_shared/eventFormat';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 
@@ -195,11 +195,10 @@ export function TournamentPage() {
     );
   }
 
-  // Non-stroke formats (team / cup / match) break stroke-play grammar, so no
-  // surface that asserts a leader, a champion or a board of to-par scores is
-  // mounted. The event's own facts — hero, info, course — still render.
-  const stroke = isStrokeEvent(meta.event_type);
-  const leaderboardRows = stroke ? (leaderboard ?? []) : [];
+  // Stroke and team events carry real positions and lower-is-better to-par
+  // boards. Cup and match retain the facts-only treatment.
+  const strokeBoard = hasStrokeBoard(meta.event_type);
+  const leaderboardRows = strokeBoard ? (leaderboard ?? []) : [];
   const hasBoard = leaderboardRows.length > 0;
   const contest = selectTournamentContest(leaderboardRows, meta, pulse.state);
   const fieldCount = leaderboardRows.length > 0 ? leaderboardRows.length : (holeAnalysis?.total_players || null);
@@ -239,7 +238,7 @@ export function TournamentPage() {
           fieldCount={fieldCount}
         />
 
-        {stroke && (
+        {strokeBoard && (
           <>
             <ContestSection contest={contest} state={pulse.state} />
             <MoveSection contest={contest} state={pulse.state} tourCode={tourCode} />
@@ -274,7 +273,7 @@ export function TournamentPage() {
 
         {/* TEE TIMES BAND — promoted entry point to the round-by-round
             sheet. Renders for live + upcoming states only. */}
-        {stroke && (pulse.state === 'live' || pulse.state === 'upcoming') && (
+        {strokeBoard && (pulse.state === 'live' || pulse.state === 'upcoming') && (
           <TeeTimesRail
             groups={teeGroups}
             round={currentRound}
@@ -294,7 +293,7 @@ export function TournamentPage() {
         <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }} />
       </div>
 
-      {stroke && (
+      {strokeBoard && (
       <AllTeeTimesSheet
         open={teeTimesOpen}
         onClose={() => setTeeTimesOpen(false)}
@@ -307,7 +306,7 @@ export function TournamentPage() {
 
       />
       )}
-      {stroke && (
+      {strokeBoard && (
       <FullBoardSheet
         open={fullBoardOpen}
         onClose={() => setFullBoardOpen(false)}

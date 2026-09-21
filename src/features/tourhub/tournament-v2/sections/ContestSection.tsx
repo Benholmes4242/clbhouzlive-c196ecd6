@@ -5,6 +5,7 @@ import { SectionEyebrow } from './SectionEyebrow';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { FONT, INK, INK_FAINT, INK_SOFT, SURFACE, WHITE_ALPHA_10 } from '../../_shared/tokens';
 import { formatToPar } from '../../overview/data/liveRoundStats';
+import { ambiguousTeamSurnames, resolveBoardEntity } from '../../_shared/boardEntity';
 
 interface Props { contest: TournamentContest; state: EventState }
 
@@ -14,11 +15,14 @@ export function ContestSection({ contest, state }: Props) {
   const cjk = /^(ja|ko)/.test(i18n.language);
   // Standings are never stated as ordinal words here: the board owns rank labels,
   // prose states names and gaps only.
+  const board = contest.pack.map((row) => row.entry);
+  const ambiguous = ambiguousTeamSurnames(board);
+  const prose = (entry: (typeof board)[number] | undefined) => entry ? resolveBoardEntity(entry, ambiguous).prose : null;
   const chasers = contest.pack.filter((row) => row.gap > 0);
-  const nextName = chasers[0]?.entry.player?.full_name ?? null;
-  const thirdName = chasers[1]?.entry.player?.full_name ?? null;
+  const nextName = prose(chasers[0]?.entry);
+  const thirdName = prose(chasers[1]?.entry);
   const gapPhrase = (shots: number) => t('tournament.contest.gapShots', { count: shots });
-  const leaderNames = contest.leaders.map((row) => row.player?.full_name ?? '').filter(Boolean);
+  const leaderNames = contest.leaders.map((row) => resolveBoardEntity(row, ambiguous).prose).filter(Boolean);
   const levelScore = contest.leader?.score == null ? null : formatToPar(contest.leader.score);
 
   let subline: string | null = null;
@@ -42,7 +46,7 @@ export function ContestSection({ contest, state }: Props) {
         : t(`tournament.contest.sublineLevel${form}${past ? 'Past' : withChaser ? 'Chaser' : ''}`, vars);
     }
   } else if (nextName && contest.leader) {
-    const leaderName = contest.leader.player?.full_name ?? '';
+    const leaderName = resolveBoardEntity(contest.leader, ambiguous).prose;
     subline = thirdName && chasers[1]
       ? t('tournament.contest.sublineSingleThird', {
           leader: leaderName,

@@ -3,12 +3,12 @@
  * Grammar: POS | PLAYER + flag | THRU | TODAY | TOT
  * Row tap opens ScorecardSheet.
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { todayFromEntry } from '../../leaderboard/BoardTable';
+import { todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
@@ -19,22 +19,9 @@ import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
 import { formatEarnings } from '../../_shared/formatEarnings';
+import { ambiguousTeamSurnames, resolveBoardEntity } from '../../_shared/boardEntity';
 
-interface Row {
-  id: string;
-  position: number | null;
-  position_tied?: boolean | null;
-  score: number | null;
-  today?: number | null;
-  thru?: number | null;
-  status?: string | null;
-  round_1?: number | null;
-  round_2?: number | null;
-  round_3?: number | null;
-  round_4?: number | null;
-  money?: number | null;
-  player?: { id?: string; full_name?: string; country?: string | null; country_code?: string | null } | null;
-}
+type Row = BoardEntry;
 
 interface Props {
   tournamentId: string;
@@ -127,6 +114,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
+  const ambiguous = useMemo(() => ambiguousTeamSurnames(entries), [entries]);
   const T = THEME_TOKENS[theme];
   /** getScoreColor knows two ramps only; both dark grounds take the dark ramp. */
   const scoreTheme = theme === 'light' ? 'light' : 'dark';
@@ -160,6 +148,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             {showOverviewPrize ? <div style={{ textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div> : null}
           </div>
           {rows.map((r) => {
+            const entity = resolveBoardEntity(r, ambiguous);
             const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
               : r.status === 'WD' ? 'WD'
               : r.position == null ? BLANK
@@ -169,8 +158,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               <button
                 key={r.id}
                 type="button"
-                onClick={() => { onRowTap?.(r.player?.id ?? ''); setTarget({
-                  playerId: r.player?.id ?? '', playerName: r.player?.full_name ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
+                onClick={() => { if (!r.player?.id) return; onRowTap?.(r.player.id); setTarget({
+                  playerId: r.player.id, playerName: entity.label, countryCode: r.player?.country_code ?? r.player?.country ?? null,
                   position: r.position ?? null, positionTied: r.position_tied ?? null, total: r.score ?? null, today, thru: r.thru ?? null, status: r.status ?? null,
                 }); }}
                 style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', width: '100%', minHeight: 44, padding: '8px 24px', border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
@@ -178,7 +167,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               >
                 {showOverviewPosition ? <div style={{ fontSize: 12, fontWeight: 700, color: T.mute, fontVariantNumeric: 'tabular-nums' }}>{posText}</div> : null}
                 <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 600 }}>{overviewName(r.player?.full_name)}</span>
+                  <span style={{ minWidth: 0, whiteSpace: 'normal', lineHeight: 1.15, fontSize: 13, fontWeight: 600 }}>{overviewName(entity.label)}</span>
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
                 {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{today == null ? todayBlank : fmtScore(today)}</div> : null}
@@ -218,6 +207,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
 
         </div>
         {rows.map((r) => {
+          const entity = resolveBoardEntity(r, ambiguous);
           const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
             : r.status === 'WD' ? 'WD'
             : r.position == null ? BLANK
@@ -229,9 +219,9 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             <button
               key={r.id}
               type="button"
-              onClick={() => { onRowTap?.(r.player?.id ?? ''); setTarget({
-                playerId: r.player?.id ?? '',
-                playerName: r.player?.full_name ?? '',
+              onClick={() => { if (!r.player?.id) return; onRowTap?.(r.player.id); setTarget({
+                playerId: r.player.id,
+                playerName: entity.label,
                 countryCode: cc,
                 position: r.position ?? null,
                 positionTied: r.position_tied ?? null,
@@ -255,8 +245,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               </div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 8 }}>
                 {cc ? <CountryFlag country={cc} size="sm" /> : null}
-                <span style={{ fontSize: 13, fontWeight: 700, color: T.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {r.player?.full_name ?? BLANK}
+                <span style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: T.ink, whiteSpace: 'normal' }}>
+                  {entity.label}
                 </span>
                 {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) && (
                   <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />

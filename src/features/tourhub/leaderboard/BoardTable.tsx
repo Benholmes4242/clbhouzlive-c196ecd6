@@ -55,6 +55,7 @@ import { surnameOf } from '../_shared/playerName';
 import { TREND_UP, TREND_DOWN, AMBER, INK_TINT_04 as LEADER_WASH, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { isDemotedStatus } from '../_shared/resultStatus';
+import { ambiguousTeamSurnames, resolveBoardEntity } from '../_shared/boardEntity';
 
 // Dark ramp, imported so the board follows the tour token file (was four pinned light literals).
 const INK = TOUR_INK;
@@ -88,7 +89,7 @@ export interface BoardEntry {
   position: number | null;
   position_tied?: boolean | null;
   score: number | null;
-  thru: number | null;
+  thru?: number | null;
   today?: number | null;
   today_round?: number | null;
   status?: string | null;
@@ -105,6 +106,25 @@ export interface BoardEntry {
     country_code?: string | null;
     country?: string | null;
     photo_url?: string | null;
+  } | null;
+  team?: {
+    id?: string | null;
+    sr_id?: string | null;
+    display_name?: string | null;
+    abbr_name?: string | null;
+    country?: string | null;
+    members?: Array<{
+      position_in_team?: number | null;
+      player?: {
+        id?: string | null;
+        sr_id?: string | null;
+        first_name?: string | null;
+        last_name?: string | null;
+        full_name?: string | null;
+        photo_url?: string | null;
+        country?: string | null;
+      } | null;
+    }> | null;
   } | null;
 }
 
@@ -130,6 +150,8 @@ interface Props {
   /** Optional complete field used only to calculate movement when `entries`
    * is a truncated inline board. No additional query is required. */
   movementEntries?: BoardEntry[];
+  /** Event-level surname collisions, computed by the parent when shared. */
+  ambiguousSurnames?: Set<string>;
 }
 
 function houseColor(score: number | null | undefined, emphasis: 'standard' | 'leader' = 'standard'): string {
@@ -247,7 +269,7 @@ export function boardMovementMap(entries: BoardEntry[], currentRound: number | n
   return movementFromRounds(
     entries.map((e) => ({
       id: e.id,
-      playerId: e.player?.id ?? null,
+      playerId: e.player?.id ?? e.team?.id ?? e.id,
       position: e.position,
       status: e.status ?? null,
       round_1: e.round_1 ?? null,
@@ -378,6 +400,7 @@ export function BoardTable({
   surface = CANVAS,
   teeTimes,
   movementEntries,
+  ambiguousSurnames,
 }: Props) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
@@ -399,9 +422,13 @@ export function BoardTable({
     [entries, currentRound],
   );
 
+  const resolvedAmbiguous = useMemo(
+    () => ambiguousSurnames ?? ambiguousTeamSurnames(entries),
+    [ambiguousSurnames, entries],
+  );
   const names = useMemo(
-    () => entries.filter((e) => !isDemoted(e.status)).map((e) => e.player?.full_name || ''),
-    [entries],
+    () => entries.filter((e) => !isDemoted(e.status)).map((e) => resolveBoardEntity(e, resolvedAmbiguous).label),
+    [entries, resolvedAmbiguous],
   );
 
   const { columns, tier } = useMemo(
@@ -566,9 +593,12 @@ export function BoardTable({
     const thruDisplay = thruEmpty ? '' : fmtThru(e.thru);
     const roundVals = [e.round_1, e.round_2, e.round_3, e.round_4];
     const pid = e.player?.id;
-    const mov = !demotedRow && pid ? movementMap.get(pid) : undefined;
-    const fullName = e.player?.full_name || t('board.unknownPlayer');
-    const nameText = columns.preTournament ? fullName : nameAtTier(fullName, tier);
+    const mov = !demotedRow ? movementMap.get(pid ?? e.team?.id ?? e.id) : undefined;
+    const entity = resolveBoardEntity(e, resolvedAmbiguous);
+    const fullName = entity.label;
+    // Team labels are already provider-authored compact forms. Applying the
+    // player-name shortening ladder would split them incorrectly.
+    const nameText = columns.preTournament || entity.kind === 'team' ? fullName : nameAtTier(fullName, tier);
 
     const open = () => {
       if (onRowClick) return onRowClick(e);
@@ -580,7 +610,7 @@ export function BoardTable({
         key={e.id}
         role="button"
         tabIndex={0}
-        aria-label={fullName}
+        aria-label={fullName || undefined}
         onClick={open}
         onKeyDown={(k) => {
           if (k.key === 'Enter' || k.key === ' ') open();
