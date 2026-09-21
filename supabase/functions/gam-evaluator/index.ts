@@ -2231,14 +2231,35 @@ function isTriggerFreshForCrownNotice(trigger: LegendTrigger | undefined, course
   return true;
 }
 
+// BRIEF_LEGENDS_RUNAWAY §1. The identity of a board: the ordered list of
+// (user_id, rank, value). The FULL field, never capped — useCourseFieldSizes /
+// get_course_field_sizes count the rows on a board to derive "Won against n
+// other golfers here", so a cap would silently cap that count.
+// Value is normalised to 6 decimals so floating-point noise is not a change.
+function legendBoardSignature(rows: Array<{ user_id: string; rank: number; value: unknown }>): string {
+  return rows
+    .map((r) => `${r.user_id}:${r.rank}:${Number(r.value).toFixed(6)}`)
+    .join("|");
+}
+
 async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: LegendTrigger) {
+
   // Current stored board — the FULL field for this course/category, no cap.
+  // rank is selected as well as ordered by: the skip test below compares the
+  // ordered list of (user_id, rank, value), so rank is read, never assumed from
+  // array position.
   const { data: prev } = await supabase
     .from("gam_course_legends")
-    .select("user_id, value")
+    .select("user_id, rank, value")
     .eq("course_id", courseId).eq("category", cfg.category).eq("is_current", true)
     .order("rank", { ascending: true });
+  // BRIEF_LEGENDS_RUNAWAY — prevTopUser is read HERE, before the skip return
+  // below, so the crown path's arr[0].user_id !== prevTopUser test is computed
+  // from the same snapshot whether or not a write happens. A skipped write
+  // means the board is identical, so the top user is unchanged by definition
+  // and no notification was due.
   const prevTopUser = prev?.[0]?.user_id ?? null;
+
 
   // Build the new FULL board client-side — every qualifying player, ranked from
   // 1, with no cap (BRIEF_CHAMPIONS_FULL_LEADERBOARD).
@@ -2306,7 +2327,48 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       return a.user_id < b.user_id ? -1 : 1;
     });
 
+  // BRIEF_LEGENDS_RUNAWAY §1 — SKIP THE WRITE WHEN NOTHING CHANGED.
+  //
+  // recomputeLegend used to stale-mark and re-insert the full field on EVERY
+  // evaluation, including re-enqueued scores, whether or not the board moved.
+  // Measured over the stale history: 38,195 of 45,178 board versions were
+  // byte-identical to the one they replaced (84.5%). 242,204 rows / 51 MB for
+  // 22 members came from that, and 124,398 gam_legend_pulse_events with it,
+  // because gam_emit_legend_pulse_event fires on every rank-1 INSERT.
+  //
+  // So: compare the ordered (user_id, rank, value) list and return before
+  // touching anything if it is the same board. No stale-marking, no insert, no
+  // pulse event, no notification — and none was due, since an identical board
+  // has the same holder.
+  //
+  // Value comparison is at the stored precision, not by float identity:
+  // `value` is unconstrained numeric and arrives back through PostgREST as a
+  // JSON number, so a value that differs only in floating-point noise must not
+  // read as a change. legendBoardSignature() fixes both sides at 6 decimals,
+  // well past anything golf produces (score_diff is 1 dp).
+  const prevSig = legendBoardSignature(
+    (prev ?? []).map((r: any) => ({ user_id: r.user_id, rank: r.rank, value: r.value })),
+  );
+  const nextSig = legendBoardSignature(
+    arr.map((r, i) => ({ user_id: r.user_id, rank: i + 1, value: r.value })),
+  );
+  if (prevSig === nextSig) {
+    console.log("[gam-evaluator] legend board unchanged — write skipped", {
+      courseId,
+      category: cfg.category,
+      fieldSize: arr.length,
+    });
+    return;
+  }
+  console.log("[gam-evaluator] legend board changed — rewriting", {
+    courseId,
+    category: cfg.category,
+    prevFieldSize: prev?.length ?? 0,
+    fieldSize: arr.length,
+  });
+
   // Mark old as not current
+
   await supabase
     .from("gam_course_legends")
     .update({ is_current: false, updated_at: new Date().toISOString() })
