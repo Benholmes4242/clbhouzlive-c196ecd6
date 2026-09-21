@@ -1088,7 +1088,7 @@ async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
   if (bpErr) throw bpErr;
 
   // ONE notification per round, never one per award.
-  if (awardRows.length > 0 && ageDays <= AWARD_NOTIFY_MAX_AGE_DAYS) {
+  if (awardRows.length > 0 && ageDays <= LEGEND_NOTIFY_MAX_AGE_DAYS) {
     const rank = { gold: 0, silver: 1, bronze: 2 } as Record<string, number>;
     const top = [...awardRows].sort((a, b) => rank[a.tier] - rank[b.tier])[0];
     await enqueueNotification(userId, "award_earned", {
