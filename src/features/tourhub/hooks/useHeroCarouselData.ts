@@ -323,6 +323,7 @@ export function useHeroCarouselData() {
           championNarrative: row.champion_narrative || null,
           isMajor: contextLabel === 'MAJOR CHAMPIONSHIP' || isAnyMajor(row.name || ''),
           isSignature: contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES',
+          eventType: row.event_type ?? null,
           winnerId: row.winner_id,
           winnerName,
           winnerPhotoUrl,
