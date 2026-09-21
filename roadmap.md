@@ -22,3 +22,4 @@
 - [x] Close the second leader-asserting list: this-week card, tournaments cache (all three buckets), generic fetch, last-year lookups and predictions guard.
 - [x] Render feed-native team identities throughout team tournament detail pages and verify Zurich/Dow responsively.
 - [x] Make team tournament board names uniform per event and measure every team label at 320px.
+- [x] Stack team partners on equal-weight lines across tournament boards and verify responsive row geometry.

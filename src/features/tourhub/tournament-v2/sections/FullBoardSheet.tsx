@@ -62,7 +62,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
     if (!e.player?.id) return;
     setTarget({
       playerId: e.player.id,
-      playerName: resolveBoardEntity(e, needsInitials).label,
+      playerName: resolveBoardEntity(e, needsInitials).lines[0] ?? '',
       countryCode: e.player?.country_code ?? e.player?.country ?? null,
       position: e.position ?? null,
       positionTied: e.position_tied ?? null,
