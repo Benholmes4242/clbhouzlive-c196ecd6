@@ -83,3 +83,12 @@ export const useComposerFlowStore = create<ComposerFlowState>((set) => ({
     set((s) => (s.handoff ? { handoff: null, reopenRequested: true } : s)),
   consumeReopen: () => set({ reopenRequested: false }),
 }));
+
+/**
+ * Called by a composer the moment a post or review is actually submitted.
+ * Completion is a finished job, not a change of mind — step 1 must never come
+ * back on top of the success screen or the receipt.
+ */
+export function notifyComposerCompleted(): void {
+  useComposerFlowStore.getState().clearHandoff();
+}
