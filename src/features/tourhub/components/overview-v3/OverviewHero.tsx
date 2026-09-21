@@ -24,7 +24,7 @@ import { HeroBoardSection } from './HybridHeroBands/HeroBoardBand';
 import { tournamentRoute } from '../../routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HybridHero } from './HybridHero';
-import { PHOTO_BAND_HEIGHT, OVERVIEW_PHOTO_BAND_HEIGHT, STRIP_HEIGHT } from './HybridHero.constants';
+import { PHOTO_BAND_HEIGHT, OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { INK_TINT_06 } from '../../_shared/tokens';
 
@@ -211,8 +211,10 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   }
 
   const active = slides[Math.min(activeIndex, count - 1)];
+  // A wrapped champion name may grow beyond STRIP_HEIGHT, so the completed
+  // frame follows its content rather than clipping against a guessed height.
   const activeHeroHeight = height ?? (active.type === 'completed' && active.tournament.winnerName
-    ? `${OVERVIEW_PHOTO_BAND_HEIGHT + STRIP_HEIGHT}px`
+    ? 'auto'
     : OVERVIEW_HERO_TOTAL_HEIGHT);
 
   // Chevron UI removed per micro-brief; swipe is the sole gesture and
@@ -238,7 +240,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          style={{ height: '100%' }}
+          style={{ height: activeHeroHeight === 'auto' ? 'auto' : '100%' }}
         >
           <HybridHero
             slide={active}

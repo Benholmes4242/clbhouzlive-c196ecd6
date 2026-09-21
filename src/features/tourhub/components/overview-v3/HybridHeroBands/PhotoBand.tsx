@@ -129,7 +129,7 @@ export function PhotoBand({
               color: INK,
               display: '-webkit-box',
               WebkitBoxOrient: 'vertical',
-              WebkitLineClamp: 2,
+              WebkitLineClamp: 3,
               overflow: 'hidden',
             }}
           >

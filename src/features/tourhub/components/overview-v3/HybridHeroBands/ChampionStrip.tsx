@@ -134,9 +134,11 @@ export function ChampionStrip({
               fontWeight: 700,
               color: 'white',
               letterSpacing: '-0.01em',
-              whiteSpace: 'nowrap',
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              whiteSpace: 'normal',
               overflow: 'hidden',
-              textOverflow: 'ellipsis',
               lineHeight: 1.1,
             }}
           >
@@ -148,7 +150,7 @@ export function ChampionStrip({
             <TrajectorySparkline rounds={rounds} par={par} variant="champion" totalRounds={4} />
           </div>
         ) : null}
-        <div style={{ textAlign: 'right' }}>
+        <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
           <div
             style={{
               ...NUMERIC_STYLE,
