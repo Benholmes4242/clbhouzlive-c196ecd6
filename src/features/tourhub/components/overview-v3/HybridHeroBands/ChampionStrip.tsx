@@ -19,7 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
-import { STATUS_NEGATIVE, SLATE_800, SURFACE, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { STATUS_NEGATIVE, SURFACE, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { getScoreColor } from '../../../_shared/scoreColor';
 import { TrajectorySparkline } from './TrajectorySparkline';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -27,6 +28,8 @@ interface ChampionStripProps {
   name: string;
   country?: string;
   score: string;
+  /** Numeric to-par behind `score` — drives the canonical getScoreColor treatment (CORRECTION 1: score is to-par colour, never gold). */
+  scoreValue?: number | null;
   scoreLabel?: string;
   eyebrow?: string;
   eyebrowIcon?: LucideIcon;
@@ -56,6 +59,7 @@ export function ChampionStrip({
   name,
   country,
   score,
+  scoreValue,
   scoreLabel,
   eyebrow,
   eyebrowIcon: EyebrowIcon = Trophy,
@@ -65,10 +69,6 @@ export function ChampionStrip({
   narrative,
 }: ChampionStripProps) {
   const { t } = useTranslation('tourhub');
-  // Note: scoreLabel prop is retained on the interface but not rendered in this
-  // strip variant (kept for compatibility with MiddleBand callers). Only the
-  // eyebrow default is user-visible here.
-  void scoreLabel;
   const resolvedEyebrow = eyebrow ?? t('overview.champion.eyebrow');
   const hasNarrative = !!(narrative && narrative.trim().length > 0);
 
@@ -156,7 +156,10 @@ export function ChampionStrip({
               ...NUMERIC_STYLE,
               fontSize: 26,
               fontWeight: 300,
-              color: GOLD,
+              // CORRECTION 1 (BRIEF_TOUR_OVERVIEW_CHAMPION): the score takes the
+              // canonical to-par ramp — red under par, muted even — never gold.
+              // Gold stays on the eyebrow, trophy glyph and avatar ring only.
+              color: getScoreColor(scoreValue ?? null, 'dark'),
               letterSpacing: '-0.03em',
               lineHeight: 1,
               fontFeatureSettings: '"tnum" 1, "kern" 1',
@@ -164,6 +167,20 @@ export function ChampionStrip({
           >
             {score}
           </div>
+          {scoreLabel && (
+            <div
+              style={{
+                fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+                fontWeight: 700,
+                color: 'rgba(255,255,255,0.50)',
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                marginTop: 2,
+              }}
+            >
+              {scoreLabel}
+            </div>
+          )}
         </div>
       </div>
 

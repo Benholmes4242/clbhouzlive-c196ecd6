@@ -57,16 +57,21 @@ export function formatOverviewDateRange(startDate: string, endDate?: string | nu
   ].join(' – ');
 }
 
-export function formatOverviewChampionScore(
-  score: number,
+/**
+ * CORRECTION 1 (BRIEF_TOUR_OVERVIEW_CHAMPION): score and margin are separate
+ * registers. `score` is the bare fmtScore figure (coloured by getScoreColor in
+ * ChampionStrip); the wonBy/playoff qualifier travels in `scoreLabel` and
+ * renders beneath the score in muted caps. formatOverviewChampionScore's
+ * single-string "−17 · by 2" form is withdrawn.
+ */
+export function overviewChampionScoreLabel(
   playoff: boolean,
   margin: number | null,
   t: (key: string, options?: { count: number }) => string,
-): string {
-  const result = fmtScore(score);
-  if (playoff) return `${result} · ${t('overview.hero.playoff')}`;
-  if (margin != null) return `${result} · ${t('overview.hero.wonBy', { count: margin })}`;
-  return result;
+): string | undefined {
+  if (playoff) return t('overview.hero.playoff');
+  if (margin != null) return t('overview.hero.wonBy', { count: margin });
+  return undefined;
 }
 
 export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
@@ -155,7 +160,9 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
       {state.kind === 'results' && champion ? (
         <ChampionStrip
           name={champion.name}
-          score={formatOverviewChampionScore(champion.score, champion.playoff, champion.margin, t)}
+          score={fmtScore(champion.score)}
+          scoreValue={champion.score}
+          scoreLabel={overviewChampionScoreLabel(champion.playoff, champion.margin, t)}
           eyebrow={t('overview.hero.champion')}
           avatarUrl={championAvatarUrl}
         />
