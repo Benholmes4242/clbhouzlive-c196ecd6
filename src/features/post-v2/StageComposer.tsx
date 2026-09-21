@@ -7,7 +7,13 @@
 //  - Draft restore (draftId): fetch the draft row and hydrate the composer
 //    the same way the in-composer Drafts sheet does.
 //
-// Owns: header, media stage + frame pills, media tray, caption field,
+// ONE SCREEN (phase 3 of BRIEF_THE_UNIFIED_COMPOSER). The post path used to be
+// two pages inside this file - media (dark) then words - each drawing its own
+// "1 / 2" and "2 / 2" counter beside step 1's "Step 1 of 2". It is now a single
+// step 2 under the shared ComposerStepHeader, and page 1's contents live on in
+// THE MEDIA SHEET (openMediaIndex): nothing there was rewritten, it was moved.
+//
+// Owns: header, media rail + media sheet, caption field,
 // detail rows, and orchestrates opening / closing every sheet.
 // Delegates: state -> useStageComposer, submit -> usePostSubmit,
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
@@ -62,15 +68,13 @@ interface Props {
   onPosted?: () => void;
   /** Files already chosen by the nav picker before the composer opened. */
   initialMedia?: File[];
-  /** True while the native picker is still up: page 1 shows its awaiting state. */
-  awaitingMedia?: boolean;
   /** Edit mode: existing post id (owner-scoped). */
   editPostId?: string | null;
   /** Draft deep-link: hydrate the composer from this draft. */
   draftId?: string | null;
 }
 
-export default function StageComposer({ onClose, onPosted, initialMedia = [], awaitingMedia = false, editPostId, draftId }: Props) {
+export default function StageComposer({ onClose, onPosted, initialMedia = [], editPostId, draftId }: Props) {
   const { profile } = useProfileData();
   const { t } = useTranslation('composer');
 
@@ -251,29 +255,23 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     });
   }, [isEditMode, draftId, prefillCourse, hydrate]);
 
-  // Two-page wizard. Page 1 = media (dark), page 2 = words (light).
-  // Tapping Post opens page 1 immediately in its AWAITING state while the OS
-  // source menu floats above it. Files chosen -> page 1 comes alive; picker
-  // CANCELLED -> the member stays on the page-1 EMPTY STATE and can pick again
-  // or close. There is no route to page 2 without media on a fresh create.
-  // Edit / draft / course-prefill entries land straight on page 2.
+  /* THE MEDIA SHEET. Null = closed; a number = open on that slide.
+     Everything page 1 used to own - the preview with its aspect handling and
+     56vh cap, the slide counter, the Edit chip, FramePills, "+ Add" and the
+     filmstrip - lives inside it, unchanged. It is a SHEET rather than a page
+     because this screen carries the caption, the course card and the detail
+     rows as well, and a media surface that big as a SECTION is what made the
+     one-page version too much. */
+  const [openMediaIndex, setOpenMediaIndex] = useState<number | null>(null);
+  const mediaSheetOpen = openMediaIndex !== null;
 
-  const isFreshCreate = !editPostId && !draftId;
-  const [page, setPage] = useState<1 | 2>(
-    isFreshCreate && (initialMedia.length > 0 || awaitingMedia) ? 1 : 2,
-  );
-
-  // Both pages share one dark canvas now (A.CANVAS #15171F on page 1 and
-  // page 2), so the status bar keeps light icons and the notch
-  // bleeds the page colour instead of the legacy light-mode white (FFF8FAFC).
+  // One dark canvas, so the status bar keeps light icons and the notch bleeds
+  // the page colour instead of the legacy light-mode white (FFF8FAFC).
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
   // Watch light, profile immersive, etc.) because overlay close is not a route change.
   useEffect(() => {
-    try {
-      if (page === 1) setStatusBarStyleColor('light', 'FF0B0F14');
-      else setStatusBarStyleColor('light', STATUS_BAR_CANVAS);
-    } catch { /* status bar best-effort */ }
-  }, [page]);
+    try { setStatusBarStyleColor('light', STATUS_BAR_CANVAS); } catch { /* status bar best-effort */ }
+  }, []);
 
   // Files chosen by the bottom-nav picker are injected whenever the store's
   // initialMedia array changes. The nav opens the composer immediately (even on
@@ -290,17 +288,11 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     const isNew = files.length !== prev.length || files.some((f, i) => f !== prev[i]);
     if (!isNew) return;
     lastInitialMediaRef.current = files;
-    if (files.length > 0) {
-      void addFiles(files);
-      setPage(1);
-    }
+    if (files.length > 0) void addFiles(files);
   }, [isEditMode, hydrated, draftId, initialMedia, addFiles]);
 
-  // Page 1 with no media renders the designed empty state, which owns the two
-  // pick paths - camera and library - and NOTHING ELSE. A wizard post requires
-  // media, so there is no words-only escape and no fallthrough to page 2 on
-  // picker cancel: the member stays here until they choose files or close.
-
+  /* THE RAIL'S TWO STATES. No media: the two pick buttons, each over its own
+     anchored input. Media: a strip of thumbnails plus a "+" tile. */
   const emptyStage = state.media.length === 0;
 
 
