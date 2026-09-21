@@ -33,7 +33,9 @@ import { POST_COMPOSER_Z } from '@/lib/zLayers';
 import { useStageComposer, MAX_MEDIA, type StageMediaItem } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { notifyComposerCompleted } from '@/features/composer-flow/composerFlowStore';
+import { notifyComposerCompleted, useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
+import { postLeadingControl } from '@/features/composer-flow/handoffRules';
+import ComposerStepHeader from '@/features/composer-flow/components/ComposerStepHeader';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
@@ -95,10 +97,12 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   const captionStartedRef = useRef(false);
   // Read once at mount: a deep-linked open (edit / draft / share-a-round)
   // vs the create sheet.
-  const entryRef = useRef<'create_sheet' | 'deep_link' | 'unknown'>('unknown');
+  const entryRef = useRef<'create_sheet' | 'deep_link' | 'review_skip' | 'unknown'>('unknown');
   if (entryRef.current === 'unknown') {
     const st = usePostStudioStore.getState();
-    if (editPostId || draftId || st.prefillCourse) entryRef.current = 'deep_link';
+    // The store's own entry wins: only the review path's skip link sets it.
+    if (st.entry === 'review_skip') entryRef.current = 'review_skip';
+    else if (editPostId || draftId || st.prefillCourse) entryRef.current = 'deep_link';
     else if (st.isOpen) entryRef.current = 'create_sheet';
   }
 
@@ -238,6 +242,16 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   // C3 "Share this round" — open the composer pre-filled with the course and
   // the round the member tapped share on.
   const prefillCourse = usePostStudioStore((st) => st.prefillCourse);
+  /* WORDS CARRIED IN FROM THE REVIEW PATH (§6). Seeded ONCE, on mount only, so
+     it can never overwrite what the member has since typed. */
+  const prefillCaptionRef = useRef(usePostStudioStore.getState().prefillCaption);
+  const captionSeededRef = useRef(false);
+  useEffect(() => {
+    if (captionSeededRef.current) return;
+    captionSeededRef.current = true;
+    const text = prefillCaptionRef.current;
+    if (text) setCaption(text);
+  }, [setCaption]);
   const prefillAppliedRef = useRef(false);
 
   useEffect(() => {
@@ -296,6 +310,9 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   const emptyStage = state.media.length === 0;
 
 
+  const handoff = useComposerFlowStore((st) => st.handoff);
+  const requestReopen = useComposerFlowStore((st) => st.requestReopen);
+
   const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard' | 'more'>(null);
 
   const [success, setSuccess] = useState<SubmitResult | null>(null);
@@ -348,17 +365,25 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
 
   // Post button vs Save button gating.
 
-  // CREATE requires media: a wizard post must carry at least one photo or video.
-  // The caption stays OPTIONAL (11% of posts have none).
-  // EDIT is deliberately exempt - posts published before this rule, and round
-  // posts, have no media and must still be saveable.
-  const canSubmit = !submitting && !saving && (isEditMode || state.media.length > 0) && !!activeActor;
+  /* THE CONTENT GATE. A post needs ONE of media or words — see the commit-B
+     note below; COMMIT A still requires media.
+     EDIT is deliberately exempt: posts published before the media rule, and
+     round posts, have no media and must still be saveable. */
+  const hasWords = state.caption.trim().length > 0;
+  const hasContent = isEditMode || state.media.length > 0;
+  const canSubmit = !submitting && !saving && hasContent && !!activeActor;
 
 
   // Edit-mode: schedule row visible only for still-scheduled posts.
   const showScheduleRow = !isEditMode || editStatus?.status === 'scheduled';
 
-  const primaryLabel = isEditMode ? 'Save changes' : (state.scheduledAt ? 'Schedule' : 'Share');
+  /* THE EMPTY-EVERYTHING LABEL names what is missing rather than sitting dead,
+     in the same register as the review path's SET YOUR SCORE. */
+  const primaryLabel = isEditMode
+    ? t('stage.saveChanges')
+    : (!state.media.length && !hasWords)
+      ? t('stage.emptyGate')
+      : (state.scheduledAt ? t('stage.schedule') : t('stage.share'));
   const primaryStyle: React.CSSProperties = {
     flex: 1,
     minWidth: 0,
@@ -403,6 +428,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
       analyticsEvents.track('post_submitted', {
         mode,
         media_count: state.media.length,
+        has_media: state.media.length > 0,
         has_caption: state.caption.trim().length > 0,
         caption_len: state.caption.trim().length,
         course_tagged: !!state.course,
@@ -512,6 +538,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
       analyticsEvents.track('post_submitted', {
         mode,
         media_count: state.media.length,
+        has_media: state.media.length > 0,
         has_caption: state.caption.trim().length > 0,
         caption_len: state.caption.trim().length,
         course_tagged: !!state.course,
@@ -545,6 +572,27 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   const handleClose = () => {
     if (state.dirty) {
       setSheet('close-guard');
+      return;
+    }
+    onClose();
+  };
+
+  /* THE LEADING CONTROL (§1.4). ← only when the member came from step 1, which
+     is the only entry with a previous step to return to; every other entry
+     (course prefill, edit, draft, deep link) closes instead. EITHER WAY a dirty
+     composer meets the close guard first — ← does not bypass it. */
+  const leadingControl = postLeadingControl(handoff);
+  const handleLeading = () => {
+    if (state.dirty) {
+      setSheet('close-guard');
+      return;
+    }
+    if (leadingControl === 'back') {
+      // The composer is an overlay, so there is no back navigation to observe:
+      // step 1 is asked back explicitly, and the request clears the handoff.
+      requestReopen();
+      reset();
+      onClose();
       return;
     }
     onClose();
@@ -769,7 +817,6 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
 
   const frameRatio: Record<string, string> = { original: '4 / 5', '4:5': '4 / 5', '1:1': '1 / 1', '9:16': '9 / 16' };
   const stageAspect = active ? (frameRatio[active.frame] ?? '4 / 5') : '4 / 5';
-  const firstItem = state.media[0] ?? null;
 
   /* ---- THE MEDIA SHEET — PAGE 1, MOVED ------------------------------------
      Page 1's contents, unchanged: the preview with its frame-driven aspect and
