@@ -5,6 +5,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
+import { assignCompetitionRanks, crownSetDelta } from './legendRanks.ts';
 export const FUNCTION_VERSION = '2026-09-20T00:00:00Z-v9-feat-rarity-lines';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
@@ -2656,12 +2657,11 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
     .select("user_id, rank, value")
     .eq("course_id", courseId).eq("category", cfg.category).eq("is_current", true)
     .order("rank", { ascending: true });
-  // BRIEF_LEGENDS_RUNAWAY — prevTopUser is read HERE, before the skip return
-  // below, so the crown path's arr[0].user_id !== prevTopUser test is computed
-  // from the same snapshot whether or not a write happens. A skipped write
-  // means the board is identical, so the top user is unchanged by definition
-  // and no notification was due.
-  const prevTopUser = prev?.[0]?.user_id ?? null;
+  // BRIEF_LEGENDS_RUNAWAY / BRIEF_LEGEND_JOINT_RANKS — `prev` is read HERE,
+  // before the skip return below, so the crown diff is computed from the same
+  // snapshot whether or not a write happens. A skipped write means the board is
+  // identical, so the rank-1 set is unchanged by definition and no notification
+  // was due. The set (not a single top row) is derived by crownSetDelta.
 
 
   // Build the new FULL board client-side — every qualifying player, ranked from
@@ -2752,8 +2752,11 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
   const prevSig = legendBoardSignature(
     (prev ?? []).map((r: any) => ({ user_id: r.user_id, rank: r.rank, value: r.value })),
   );
+  // BRIEF_LEGEND_JOINT_RANKS §1 — standard competition ranking ("1224"),
+  // computed ONCE and reused by the signature, the insert and the crown diff.
+  const ranked = assignCompetitionRanks(arr);
   const nextSig = legendBoardSignature(
-    arr.map((r, i) => ({ user_id: r.user_id, rank: i + 1, value: r.value })),
+    ranked.map((r) => ({ user_id: r.user_id, rank: r.rank, value: r.value })),
   );
   if (prevSig === nextSig) {
     console.log("[gam-evaluator] legend board unchanged — write skipped", {
@@ -2780,11 +2783,14 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
   // Insert the FULL field, ranked from 1 with no cap. One insert; at this scale
   // (largest course ~17 players) chunking is unnecessary.
   if (arr.length > 0) {
-    const rows = arr.map((r, i) => ({
+    // BRIEF_LEGEND_JOINT_RANKS §1 — ranks come from the SAME assignCompetitionRanks
+    // result the signature above used, so the signature and the stored board can
+    // never disagree about what rank a row has.
+    const rows = ranked.map((r) => ({
       user_id: r.user_id,
       course_id: courseId,
       category: cfg.category,
-      rank: i + 1,
+      rank: r.rank,
       value: r.value,
       attained_at: r.attained_at,
       is_current: true,
@@ -2806,8 +2812,18 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
     }
   }
 
-  const newTopUser = arr[0]?.user_id ?? null;
-  if (newTopUser !== prevTopUser) {
+  // BRIEF_LEGEND_JOINT_RANKS §2 — THE CROWN PATH IS SET-BASED.
+  // With joint ranks a board can carry several rank-1 holders, so a single
+  // element cannot represent the top of the board. Compare the SETS:
+  //   in new, not old -> legend_earned
+  //   in old, not new -> legend_lost
+  //   in both         -> NOTHING. Keeping a share of a record is neither
+  //                      earning nor losing, and the member is told neither.
+  const { earned: crownEarned, lost: crownLost } = crownSetDelta(
+    (prev ?? []).map((r: any) => ({ user_id: r.user_id, rank: r.rank })),
+    ranked,
+  );
+  if (crownEarned.length > 0 || crownLost.length > 0) {
     // §3 — computed once for both sides. The board write above has ALREADY
     // happened, so a suppressed notice never changes what is true, only who is
     // told. This sits BEFORE enqueueNotification, so a suppressed row never
@@ -2847,30 +2863,36 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       courseName = course?.name?.trim() || null;
     } catch { /* non-fatal */ }
 
-    if (prevTopUser) {
-      if (newTopUser && notify) {
-        // Look up taker display name from user_profiles ONLY. Same PII rule as
-        // above; degrades to null. Loser side only — meaningless to the gainer.
-        let takerName: string | null = null;
-        try {
-          const { data: takerProfile } = await supabase
-            .from('user_profiles')
-            .select('display_name, username')
-            .eq('id', newTopUser)
-            .maybeSingle();
-          takerName = (takerProfile?.display_name?.trim() || takerProfile?.username?.trim() || null);
-        } catch { /* non-fatal */ }
+    // The taker named on the loser's push is a member who ENTERED the rank-1
+    // set. With joint ranks there can be more than one; the first is named,
+    // exactly as the single-holder path named the one there was.
+    const takerId = crownEarned[0] ?? null;
+    let takerName: string | null = null;
+    if (crownLost.length > 0 && takerId && notify) {
+      // Look up taker display name from user_profiles ONLY. Same PII rule as
+      // above; degrades to null. Loser side only — meaningless to the gainer.
+      try {
+        const { data: takerProfile } = await supabase
+          .from('user_profiles')
+          .select('display_name, username')
+          .eq('id', takerId)
+          .maybeSingle();
+        takerName = (takerProfile?.display_name?.trim() || takerProfile?.username?.trim() || null);
+      } catch { /* non-fatal */ }
+    }
 
+    for (const lostUser of crownLost) {
+      if (takerId && notify) {
         // NOTE: the DB trigger gam_legend_pulse_emit (on gam_course_legends
         // INSERT) already enqueued this exact legend_lost row a few lines up,
         // with the SAME deduplication_key. So this upsert always no-ops and
         // returns zero rows, which means writeActivityRow() never runs here —
         // the Activity mirror for legend_lost lives in that trigger. Keep the
         // two copies identical; do not "fix" the missing ledger row here.
-        await enqueueNotification(prevTopUser, "legend_lost", {
+        await enqueueNotification(lostUser, "legend_lost", {
           course_id: courseId,
           category: cfg.category,
-          taken_by: newTopUser,
+          taken_by: takerId,
           taker_name: takerName,
           course_name: courseName,
           // §2 — enqueueNotification reads trigger_whs_score_id from here.
@@ -2881,11 +2903,12 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       }
       // Loser side: their rank-1 count went down — recompute authoritatively.
       // Runs regardless of the notification gate: titles are truth, not telling.
-      await recomputeLegendTitles(prevTopUser);
+      await recomputeLegendTitles(lostUser);
     }
-    if (newTopUser) {
+
+    for (const earnedUser of crownEarned) {
       if (notify) {
-        await enqueueNotification(newTopUser, "legend_earned", {
+        await enqueueNotification(earnedUser, "legend_earned", {
           course_id: courseId,
           category: cfg.category,
           course_name: courseName,
@@ -2894,7 +2917,7 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       }
 
       // Gainer side: single code path for the tiered badge + milestone.
-      await recomputeLegendTitles(newTopUser);
+      await recomputeLegendTitles(earnedUser);
     }
   }
 }
