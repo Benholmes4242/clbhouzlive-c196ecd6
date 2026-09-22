@@ -21065,6 +21065,26 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_member_standings: {
+        Args: { p_limit?: number; p_user_id: string }
+        Returns: {
+          ahead_count: number
+          attained_at: string
+          behind_count: number
+          better_value: number
+          category: string
+          course_id: string
+          course_name: string
+          field_size: number
+          is_tenure: boolean
+          leader_value: number
+          lower_is_better: boolean
+          medal_earned: boolean
+          next_value: number
+          rank: number
+          value: number
+        }[]
+      }
       get_my_course_best: {
         Args: { p_course_id: string }
         Returns: {
