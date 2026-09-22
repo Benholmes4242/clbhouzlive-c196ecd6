@@ -20093,6 +20093,23 @@ export type Database = {
         }[]
       }
       get_course_meta: { Args: { p_course_id: string }; Returns: Json }
+      get_course_net_board: {
+        Args: { p_course_id: string; p_viewer_id?: string }
+        Returns: {
+          attained_at: string
+          category: string
+          delta: number
+          is_self: boolean
+          rank: number
+          rank_30d: number
+          total_count_in_category: number
+          user_display_name: string
+          user_home_club: string
+          user_id: string
+          user_photo_url: string
+          value: number
+        }[]
+      }
       get_course_of_the_week: {
         Args: never
         Returns: {
