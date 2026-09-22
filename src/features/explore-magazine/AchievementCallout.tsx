@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
-import { FEAT_GOLD_WASH, FEAT_RARITY_GOLD_INK, FEAT_TOP_WASH, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { INK_FAINT } from '@/features/courses/_shared/tokens';
 
@@ -37,10 +37,11 @@ import {
  *
  * THE PANEL IS THE EXISTING ANALYTICAL PANEL TOKEN (A.PANEL), slightly lighter
  * than the canvas, with NO border: separation is a panel edge, not a rule.
-   * GOLD and TOP are the single analytical-rule exception: their achievement
-   * significance is communicated by tokenized light around the fixed artwork,
-   * while the panel remains the same neutral A.PANEL surface as its neighbours.
- * TOP has never rendered. Zero platform rounds have held 2+ aces,
+   * GOLD and TOP significance is carried by the fixed artwork's emblem lighting
+   * and, on the score pill, by the RARE tag (BRIEF_FEED_SCORE_PILL §2) — the
+   * panel itself is always the same neutral A.PANEL surface as its neighbours;
+   * the rarity wash is deleted, not hidden.
+   * TOP has never rendered. Zero platform rounds have held 2+ aces,
  * 2+ albatrosses, or an ace and an albatross. Its first qualifying round is
  * therefore the treatment's first real-world test.
  *
@@ -63,14 +64,12 @@ export function FeatRarityLines({
   counts,
   locale,
   ownerDisplayName,
-  tier = 'ink',
   align = 'panel',
 }: {
   scoreId: string | null | undefined;
   counts?: RarityFeatCounts;
   locale: string;
   ownerDisplayName?: string | null;
-  tier?: 'ink' | 'gold' | 'top';
   align?: 'panel' | 'card';
 }) {
   const { t } = useTranslation('courses');
@@ -82,6 +81,9 @@ export function FeatRarityLines({
   const { viewerLine, ownerLine } = featRarityLines({ rows, owner, counts, t, locale, ownerDisplayName });
   const line = ownerLine ?? viewerLine;
   if (!line) return null;
+  /* BRIEF_FEED_SCORE_PILL §1/§3 — NO DIVIDERS, and the qualifier sentence is
+     MUTED on every pill: the RARE tag is the one accent, so this line can never
+     be gold or amber. ONE LINE, full card width; spacing separates, no rule. */
   return (
     <span
       data-feat-rarity-lines="true"
@@ -90,15 +92,13 @@ export function FeatRarityLines({
         width: '100%',
         boxSizing: 'border-box',
         gridColumn: align === 'card' ? '1 / -1' : undefined,
-        borderTop: align === 'card' ? `1px solid ${A.HAIRLINE}` : undefined,
-        padding: align === 'card' ? '8px 10px' : 0,
         marginTop: align === 'card' ? 0 : 3,
       }}
     >
       <span
         data-feat-rarity-viewer={ownerLine ? undefined : 'true'}
         data-feat-rarity-owner={ownerLine ? 'true' : undefined}
-        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: tier === 'ink' ? A.MUTE : FEAT_RARITY_GOLD_INK, whiteSpace: 'normal', overflowWrap: 'break-word' }}
+        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
       >
         {line}
       </span>
@@ -238,7 +238,6 @@ export function AchievementCalloutPanel({
         padding: '10px 12px',
         borderRadius: r.md,
         backgroundColor: A.PANEL,
-        backgroundImage: tier === 'top' ? FEAT_TOP_WASH : tier === 'gold' ? FEAT_GOLD_WASH : 'none',
         minWidth: 0,
       }}
     >
@@ -276,7 +275,7 @@ export function AchievementCalloutPanel({
             {subline}
           </span>
         ) : null}
-        <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} tier={tier} />
+        <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} />
       </span>
     </span>
     </>
@@ -303,7 +302,6 @@ function FigureCell({ label, value, under }: { label: string; value: string; und
         alignItems: 'center',
         justifyContent: 'center',
         gap: 3,
-        borderLeft: `0.5px solid ${A.HAIRLINE}`,
       }}
     >
       <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, color: A.MUTE, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>
@@ -340,7 +338,7 @@ export function RoundStatStrip({
   const { t } = useTranslation('courses');
   const hasNet = coursePar != null && net != null;
   const tier = callout && 'tier' in callout ? callout.tier : 'ink';
-  const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} tier={tier} align="card" />;
+  const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} align="card" />;
   if (!callout && !hasNet) return rarity;
 
   const ord = callout?.kind === 'rank_up' && callout.rank != null
@@ -408,6 +406,22 @@ export function RoundStatStrip({
     }
   })() : null;
 
+  /* BRIEF_FEED_SCORE_PILL §2 — the rarity glow is REPLACED BY A TAG. RARE sits
+     in the exact tag slot the NEW tag uses, in the same amber, size, weight and
+     letter-spacing. One accent per pill: a pill that already carries a worded
+     tag (NEW / MOVED UP) keeps it and does not also print RARE. */
+  const rareTag = achievement && !achievement.tag && tier !== 'ink'
+    ? t('amateur.stream.callout.tagRare', 'RARE')
+    : null;
+  const tag = achievement?.tag ?? rareTag;
+
+  /* §3 — THE QUALIFIER SENTENCE GETS ITS OWN ROW, full card width, directly
+     beneath the label row, muted, one line, NO divider above it, on EVERY pill
+     that has one. The subline ("11 shots better") and the rarity sentence
+     ("Only the second clbhouz member to achieve this.") both live here, never
+     inside the label cell and never under a rule. */
+  const hasSentence = Boolean(achievement?.subline) || (achievement != null && tier !== 'ink');
+
   return (
     <>
     <span
@@ -415,60 +429,70 @@ export function RoundStatStrip({
       data-explore-callout-tier={achievement ? tier : undefined}
       data-explore-stat-layout={achievement && hasNet ? 'achievement-and-figures' : achievement ? 'achievement-only' : 'figures-only'}
       style={{
-        display: 'grid',
-        gridTemplateColumns: achievement && hasNet ? 'minmax(0, 2.3fr) repeat(3, minmax(0, 0.7fr))' : hasNet ? 'repeat(3, minmax(0, 1fr))' : 'minmax(0, 1fr)',
+        display: 'flex',
+        flexDirection: 'column',
         width: '100%',
         minWidth: 0,
         marginTop: 10,
         marginBottom: 10,
         borderRadius: r.md,
         backgroundColor: A.PANEL,
-        backgroundImage: achievement && tier === 'top' ? FEAT_TOP_WASH : achievement && tier === 'gold' ? FEAT_GOLD_WASH : 'none',
         overflow: 'hidden',
         boxSizing: 'border-box',
       }}
     >
-      {achievement ? (
-        <span
-          data-explore-stat="achievement"
-          data-explore-callout={callout?.kind}
-          style={{ display: 'flex', minWidth: 0, minHeight: 52, alignItems: 'center', gap: 8, padding: '8px 10px', boxSizing: 'border-box' }}
-        >
-          <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px`, color: SC_FILL_GOLD }}>{achievement.icon}</span>
-          <span style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, gap: 2 }}>
-            {achievement.tag ? (
+      <span style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0, boxSizing: 'border-box' }}>
+        {achievement ? (
+          <span
+            data-explore-stat="achievement"
+            data-explore-callout={callout?.kind}
+            style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 52, alignItems: 'center', gap: 8, padding: '8px 10px', boxSizing: 'border-box' }}
+          >
+            <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px`, color: SC_FILL_GOLD }}>{achievement.icon}</span>
+            <span style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, gap: 2 }}>
+              {tag ? (
+                <span
+                  data-explore-achievement-tag="true"
+                  style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap' }}
+                >
+                  {tag}
+                </span>
+              ) : null}
               <span
-                data-explore-achievement-tag="true"
-                style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap' }}
+                data-explore-achievement-label="true"
+                style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'normal' }}
               >
-                {achievement.tag}
+                {achievement.label}
               </span>
-            ) : null}
-            <span
-              data-explore-achievement-label="true"
-              style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'normal' }}
-            >
-              {achievement.label}
             </span>
-            {achievement.subline ? (
-              <span
-                data-explore-achievement-subline="true"
-                style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: INK_FAINT, whiteSpace: 'normal' }}
-              >
-                {achievement.subline}
-              </span>
-            ) : null}
           </span>
+        ) : null}
+        {hasNet ? (
+          /* §1/§4 — TWO figures, NET then VS HCP, right-aligned, separated by
+             spacing alone. PAR is removed: the chip over the photo already
+             shows gross and to-par, and par is derivable from that pair. */
+          <span style={{ display: 'flex', flex: achievement ? '0 0 auto' : '1 1 auto', justifyContent: 'flex-end', alignItems: 'center', gap: 18, padding: '8px 10px', boxSizing: 'border-box' }}>
+            <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(net)} under={(net as number) < (coursePar as number)} />
+            <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(net as number, coursePar as number)} under={(net as number) < (coursePar as number)} />
+          </span>
+        ) : null}
+      </span>
+      {hasSentence ? (
+        <span
+          data-explore-achievement-sentence="true"
+          style={{ display: 'block', width: '100%', boxSizing: 'border-box', padding: '0 10px 8px', marginTop: -2 }}
+        >
+          {achievement?.subline ? (
+            <span
+              data-explore-achievement-subline="true"
+              style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
+              {achievement.subline}
+            </span>
+          ) : null}
+          {rarity}
         </span>
       ) : null}
-      {hasNet ? (
-        <>
-          <FigureCell label={t('amateur.stream.stat.par', 'PAR')} value={String(coursePar)} />
-          <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(net)} under={(net as number) < (coursePar as number)} />
-           <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(net as number, coursePar as number)} under={(net as number) < (coursePar as number)} />
-        </>
-      ) : null}
-      {achievement && tier !== 'ink' ? rarity : null}
     </span>
     </>
   );
