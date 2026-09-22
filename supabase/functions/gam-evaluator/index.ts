@@ -2697,32 +2697,14 @@ type LegendTrigger = { whs_score_id: string | null; play_date: string | null };
 // news to the member. A round from March is not. The test is play_date, never
 // created_at — a row created today and played in 2021 is indistinguishable
 // from a fresh one by sync time alone.
-const LEGEND_NOTIFY_MAX_AGE_DAYS = 2;
+// The constant and the test now live in noticeFreshness.ts so badges share them
+// verbatim (BRIEF_BADGE_HISTORY_GATE) — one gate, one meaning.
 
 function isTriggerFreshForCrownNotice(trigger: LegendTrigger | undefined, courseId: string, category: string): boolean {
   const playDate = trigger?.play_date ?? null;
-  if (!playDate) {
-    // §5 — an unknown date is not a fresh one. Board still updated above.
-    console.log('[gam-evaluator] crown notice suppressed — trigger play_date missing', {
-      courseId,
-      category,
-      whs_score_id: trigger?.whs_score_id ?? null,
-    });
-    return false;
-  }
-  const played = Date.parse(`${String(playDate).slice(0, 10)}T00:00:00Z`);
-  if (!Number.isFinite(played)) {
-    console.log('[gam-evaluator] crown notice suppressed — trigger play_date unparseable', {
-      courseId,
-      category,
-      play_date: playDate,
-    });
-    return false;
-  }
-  const todayUtc = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`);
-  const ageDays = Math.floor((todayUtc - played) / 86400_000);
-  if (ageDays > LEGEND_NOTIFY_MAX_AGE_DAYS) {
-    console.log('[gam-evaluator] crown notice suppressed — historic round', {
+  const { fresh, reason, ageDays } = playDateFreshness(playDate);
+  if (!fresh) {
+    console.log(`[gam-evaluator] crown notice suppressed — ${reason === 'stale' ? 'historic round' : `trigger play_date ${reason}`}`, {
       courseId,
       category,
       play_date: playDate,
