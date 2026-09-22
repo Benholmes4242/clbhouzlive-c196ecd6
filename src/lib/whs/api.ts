@@ -1344,3 +1344,24 @@ export async function lookupWhsCourseId(
   const { lookupCourseId: impl } = await import('./courseNameMatcher');
   return impl(whsName, countryCode ?? null, countryName ?? null);
 }
+
+/**
+ * BRIEF_ROUND_PAR_COMPLETENESS_CLIENT — THE ONE CLIENT RULE FOR A ROUND PAR.
+ *
+ * Identical to the evaluator's course_par rule: a par summed from an incomplete
+ * card is not a par. The round par is the sum of hole pars ONLY IF every hole of
+ * the round's declared length (whs_scores.total_holes) is present, played
+ * (strict `played === true`) and carries a non-null par. Otherwise NULL.
+ *
+ * No nine-hole floor, no partial sum fallback, no course-level par lookup.
+ */
+export function roundCoursePar(
+  holes: Array<{ par: number | null; played?: boolean | null }>,
+  totalHoles: number | null | undefined,
+): number | null {
+  const declared = Number(totalHoles);
+  if (!Number.isFinite(declared) || declared <= 0) return null;
+  const complete = holes.filter((h) => h.played === true && h.par != null);
+  if (complete.length !== declared) return null;
+  return complete.reduce((sum, h) => sum + (h.par as number), 0);
+}
