@@ -8,7 +8,7 @@ import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Heart, MessageCircle } from 'lucide-react';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { MomentPlayGlyph } from '@/components/explore-tab-new/courseled/MomentTile';
+import { ReviewVideoLayer } from './ReviewVideoLayer';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { storyTime } from '@/features/tourhub/news/storyTime';
 import { r } from '@/lib/radius';
