@@ -79,8 +79,13 @@ const THEME_TOKENS = {
    three at 13/700 (~24px). Right-aligned (see the header and row
    below), so the five figures land on one ladder and the eye reads
    down a column instead of across a gappy strip. Fixed widths, never
-   content-sized: a grid of scores must align down the page. */
-const HERO_ROUND_CELL_W = 24;
+   content-sized: a grid of scores must align down the page.
+   28 is the floor for clean adjacency: the gap between two right-
+   aligned cells is 28 minus the RIGHT-HAND figure's width, and
+   under-par double digits ("-10", ~20px) are routine on a low-scoring
+   week — 28 keeps the worst-case gap at 8px. 24 gave 4px, which read
+   as one number. */
+const HERO_ROUND_CELL_W = 28;
 const HERO_TOT_W = 40;
 
 

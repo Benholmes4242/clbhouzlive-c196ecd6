@@ -171,7 +171,7 @@ describe('Tour Overview correctness gates', () => {
     expect(playedHeader?.textContent).toContain('R1');
     expect(playedHeader?.textContent).toContain('R2');
     expect(playedHeader?.textContent).toContain('R3');
-    expect(playedHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 24px 24px 24px 40px');
+    expect(playedHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 28px 28px 28px 40px');
     played.unmount();
 
     const totalsOnly = render(board([row('1', {}), row('2', {})]));
