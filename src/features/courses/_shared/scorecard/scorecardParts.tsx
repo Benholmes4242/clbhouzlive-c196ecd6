@@ -446,8 +446,8 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
             </div>
             <div style={{ ...NUM, fontSize: 12, fontWeight: 700, marginTop: 6, color: A.MUTE, whiteSpace: 'nowrap' }}>
               <span style={{ color: heroMuted ? EVEN_GRAY : toParColor(toPar) }}>{fmtRel(toPar)}</span>
-              {(shownPar > 0 || coursePar != null) && (
-                <span> {'\u00B7'} {t('courses:scorecard.parN', { n: shownPar > 0 ? shownPar : coursePar })}</span>
+              {((shownPar != null && shownPar > 0) || coursePar != null) && (
+                <span> {'\u00B7'} {t('courses:scorecard.parN', { n: shownPar != null && shownPar > 0 ? shownPar : coursePar })}</span>
               )}
             </div>
           </div>
