@@ -47,4 +47,4 @@
 - [x] Replace the clips rail with a paged, full-bleed three-column 9:16 wall using the shared tile additively.
 - [x] Add the dedicated 16:9 long-form page card while leaving Amateur `VideoRow` untouched.
 - [x] Keep the community mosaic, count sources, URL contract, analytics, and viewer origins unchanged.
-- [ ] Verify 320/390/430 geometry, Amateur rail parity, autoplay behavior, focused tests, and typecheck.
+- [x] Verify 320/390/430 geometry, Amateur rail parity, autoplay behavior, focused tests, and typecheck.
