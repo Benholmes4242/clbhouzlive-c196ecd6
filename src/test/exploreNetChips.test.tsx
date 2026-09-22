@@ -7,9 +7,7 @@ import { calloutFor } from '@/features/explore-magazine/cardTreatment';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 import {
   FEAT_GOLD_EMBLEM_GLOW,
-  FEAT_GOLD_WASH,
   FEAT_TOP_EMBLEM_GLOW,
-  FEAT_TOP_WASH,
 } from '@/features/tourhub/_shared/tokens';
 
 function round(facts: StreamItem['facts'], patch: Partial<StreamItem> = {}): StreamItem {
@@ -26,54 +24,68 @@ function renderCard(facts: StreamItem['facts'], patch: Partial<StreamItem> = {})
   return render(<ExploreCard item={round(facts, patch)} size="std" onTap={() => undefined} />).container;
 }
 
-describe('C3 round stat strip', () => {
-  it('orders achievement, par, net and vs hcp, with the ruled widths', () => {
+function statKinds(container: HTMLElement): string[] {
+  const strip = container.querySelector('[data-explore-stat-strip="round"]');
+  return Array.from(strip?.querySelectorAll('[data-explore-stat]') ?? []).map((cell) => cell.getAttribute('data-explore-stat') ?? '');
+}
+
+describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
+  it('carries the achievement, then NET and VS HCP only, on one neutral panel', () => {
     const container = renderCard(
       { gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 1 },
     );
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
-    expect(Array.from(strip?.children ?? []).map((cell) => cell.getAttribute('data-explore-stat')))
-      .toEqual(['achievement', 'par', 'net', 'vs-hcp']);
-    expect(strip?.style.gridTemplateColumns).toBe('minmax(0, 2.3fr) repeat(3, minmax(0, 0.7fr))');
+    expect(statKinds(container)).toEqual(['achievement']);
+    expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('67');
+    expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')?.textContent).toBe('−4');
+    expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
     expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
+    expect(strip?.style.backgroundImage).toBe('none');
     expect(strip?.style.border).toBe('');
   });
 
-  it('keeps every tier on the neutral panel and derives TOP lighting above GOLD', () => {
+  it('shows no horizontal or vertical rule anywhere in the pill, on any tier', () => {
     const gold = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 2 });
     const top = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, holes_in_one: 2 });
     const ink = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 1 });
-    const goldStrip = gold.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
-    const topStrip = top.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
-    const inkStrip = ink.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+    for (const container of [gold, top, ink]) {
+      const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
+      expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
+      expect(strip?.style.backgroundImage).toBe('none');
+      expect(strip?.style.border).toBe('');
+      for (const el of Array.from(strip?.querySelectorAll<HTMLElement>('*') ?? [])) {
+        expect(el.style.borderTop).toBe('');
+        expect(el.style.borderLeft).toBe('');
+        expect(el.style.borderRight).toBe('');
+        expect(el.style.borderBottom).toBe('');
+        expect(el.tagName).not.toBe('HR');
+      }
+    }
+  });
+
+  it('keeps the emblem lighting on the fixed artwork while the glow wash is gone', () => {
+    const gold = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 2 });
+    const top = renderCard({ gross: 70, course_par: 71, net: 67, course_handicap: 3, holes_in_one: 2 });
     const goldEmblem = gold.querySelector<HTMLElement>('[data-explore-achievement-emoji]');
     const topEmblem = top.querySelector<HTMLElement>('[data-explore-achievement-emoji]');
-
-    for (const strip of [goldStrip, topStrip, inkStrip]) {
-      expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
-      expect(strip?.style.border).toBe('');
-    }
-    expect(FEAT_GOLD_WASH).toContain('radial-gradient(120px 60px');
-    expect(FEAT_TOP_WASH).toContain('radial-gradient(142px 71px');
-    expect(inkStrip?.style.backgroundImage).toBe('none');
     expect(goldEmblem?.style.fontSize).toBe('26px');
     expect(topEmblem?.style.fontSize).toBe('28px');
     expect(goldEmblem?.style.filter).toBe(FEAT_GOLD_EMBLEM_GLOW);
     expect(topEmblem?.style.filter).toBe(FEAT_TOP_EMBLEM_GLOW);
     expect(goldEmblem?.style.boxShadow).toBe('');
     expect(topEmblem?.style.boxShadow).toBe('');
-    expect(goldEmblem?.style.borderRadius).toBe('');
-    expect(topEmblem?.style.borderRadius).toBe('');
     expect(FEAT_GOLD_EMBLEM_GLOW).toContain('drop-shadow(0 0 10px');
     expect(FEAT_TOP_EMBLEM_GLOW).toContain('drop-shadow(0 0 12px');
   });
 
-  it('uses equal thirds without an achievement and never prints a birdies figure label', () => {
+  it('renders NET and VS HCP without an achievement and never prints a par or birdies figure', () => {
     const container = renderCard({ gross: 82, course_par: 71, net: 76, course_handicap: 6, birdies: 4 });
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
-    expect(Array.from(strip?.children ?? []).map((cell) => cell.getAttribute('data-explore-stat')))
-      .toEqual(['par', 'net', 'vs-hcp']);
-    expect(strip?.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
+    expect(strip?.getAttribute('data-explore-stat-layout')).toBe('figures-only');
+    expect(statKinds(container)).toEqual([]);
+    expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
+    expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('76');
+    expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')?.textContent).toBe('+5');
     expect(strip?.textContent).not.toMatch(/BIRDIES/i);
   });
 
@@ -82,28 +94,16 @@ describe('C3 round stat strip', () => {
     const strip = achievement.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
     expect(strip?.getAttribute('data-explore-stat-layout')).toBe('achievement-only');
     expect(strip?.querySelectorAll('[data-explore-stat]')).toHaveLength(1);
-    expect(strip?.querySelector('[data-explore-stat="par"]')).toBeNull();
 
     const plain = renderCard({ gross: 82, course_par: 71, net: null, course_handicap: null });
     expect(plain.querySelector('[data-explore-stat-strip="round"]')).toBeNull();
   });
 
-  it('never renders par when net or playing handicap is missing', () => {
-    for (const facts of [
-      { gross: 82, course_par: 71, net: 76 },
-      { gross: 82, course_par: 71, course_handicap: 6 },
-      { gross: 82, course_par: 71, net: null, course_handicap: 6 },
-    ]) {
-      expect(renderCard(facts).querySelector('[data-explore-stat="par"]')).toBeNull();
-    }
-  });
-
-  it('formats and colours the three figures correctly', () => {
-    expect(vsHandicapLabel(70, 71)).toBe('\u22121');
+  it('formats and colours the figures correctly', () => {
+    expect(vsHandicapLabel(70, 71)).toBe('−1');
     expect(vsHandicapLabel(74, 71)).toBe('+3');
     expect(vsHandicapLabel(71, 71)).toBe('Level');
     const under = renderCard({ gross: 76, course_par: 71, net: 70, course_handicap: 6 });
-    expect((under.querySelector('[data-explore-stat-value="par"]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
     expect((under.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color)
       .toBe((under.querySelector('[data-explore-stat-value="vs-hcp"]') as HTMLElement).style.color);
     const over = renderCard({ gross: 80, course_par: 71, net: 74, course_handicap: 6 });
@@ -114,6 +114,23 @@ describe('C3 round stat strip', () => {
     const container = renderCard({ gross: 82, course_par: 71, to_par: 11, net: 76, course_handicap: 6 });
     expect(container.querySelector('[data-explore-chip="net"]')).toBeNull();
     expect(container.querySelector('[data-explore-chip="hcp"]')).toBeNull();
+  });
+
+  it('gives the qualifier sentence its own muted full-width row beneath the label row', () => {
+    const container = renderCard(
+      { gross: 66, record_margin: 2 },
+      { consequence: { kind: 'record_taken', n: 66 } },
+    );
+    const sentence = container.querySelector<HTMLElement>('[data-explore-achievement-sentence="true"]');
+    expect(sentence).not.toBeNull();
+    const subline = container.querySelector<HTMLElement>('[data-explore-achievement-subline="true"]');
+    expect(subline?.textContent).toBe('2 shots better');
+    expect(subline?.style.color).toBe('rgb(106, 114, 128)');
+    expect(subline?.style.whiteSpace).toBe('nowrap');
+    expect(subline?.style.borderTop).toBe('');
+    // The sentence must not live inside the achievement label cell any more.
+    const cell = container.querySelector('[data-explore-stat="achievement"]');
+    expect(cell?.querySelector('[data-explore-achievement-subline="true"]')).toBeNull();
   });
 });
 
@@ -138,15 +155,9 @@ describe('amended achievement priority', () => {
 
     const singular = renderCard(
       { gross: 67, record_margin: 1 },
-      { consequence: { kind: 'record_taken', n: 67 } },
-    );
-    expect(singular.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('1 shot better');
-
-    const noRunnerUp = renderCard(
-      { gross: 66, record_margin: null },
       { consequence: { kind: 'record_taken', n: 66 } },
     );
-    expect(noRunnerUp.querySelector('[data-explore-achievement-subline="true"]')).toBeNull();
+    expect(singular.querySelector('[data-explore-achievement-subline="true"]')).toBeNull();
 
     const movement = renderCard(
       { gross: 70 },
@@ -175,8 +186,11 @@ describe('achievement tag and label copy', () => {
     { facts: { net_record: true }, tag: 'NEW', label: 'Net course record' },
     { consequence: { kind: 'rank_up', n: 2 }, tag: 'MOVED UP', label: 'Now 2nd' },
     { consequence: { kind: 'rank_up', n: null }, tag: null, label: 'Moved up the board' },
-    { facts: { holes_in_one: 1 }, tag: null, label: 'Hole in one' },
-    { facts: { albatrosses: 1 }, tag: null, label: 'Albatross' },
+    // BRIEF_FEED_SCORE_PILL §2 — rare feats carry RARE in the NEW tag slot;
+    // a worded tag (NEW/MOVED UP) always wins, one accent per pill.
+    { facts: { holes_in_one: 1 }, tag: 'RARE', label: 'Hole in one' },
+    { facts: { albatrosses: 1 }, tag: 'RARE', label: 'Albatross' },
+    { facts: { eagles: 2 }, tag: 'RARE', label: '2 eagles' },
     { facts: { eagles: 1 }, tag: null, label: 'Eagle' },
     { facts: { birdies: 5 }, tag: null, label: '5 birdies' },
     { facts: { clean_card: true }, tag: null, label: 'Bogey-free' },
@@ -185,7 +199,15 @@ describe('achievement tag and label copy', () => {
   it.each(cases)('maps $label to its requested tag and label', ({ facts: factPatch, consequence, tag, label }) => {
     const facts = { gross: 70, course_par: 71, net: 67, course_handicap: 3, ...(factPatch ?? {}) };
     const container = renderCard(facts, consequence ? { consequence } : {});
-    expect(container.querySelector('[data-explore-achievement-tag="true"]')?.textContent ?? null).toBe(tag);
+    const tagNode = container.querySelector<HTMLElement>('[data-explore-achievement-tag="true"]');
+    expect(tagNode?.textContent ?? null).toBe(tag);
+    if (tagNode) {
+      // RARE is the exact NEW treatment: same amber, size, weight, spacing, slot.
+      expect(tagNode.style.color).toBe('rgb(247, 147, 30)');
+      expect(tagNode.style.fontSize).toBe('9px');
+      expect(tagNode.style.fontWeight).toBe('800');
+      expect(tagNode.style.letterSpacing).toBe('0.12em');
+    }
     const labelNode = container.querySelector<HTMLElement>('[data-explore-achievement-label="true"]');
     expect(labelNode?.textContent).toBe(label);
     expect(labelNode?.style.textOverflow).not.toBe('ellipsis');
