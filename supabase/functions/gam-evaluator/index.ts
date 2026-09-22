@@ -329,16 +329,22 @@ async function processSingle(whsScoreId: string) {
   // still false and course_par would be stored null forever (the round is never
   // re-evaluated on its own). Read the hole pars directly — the rows may exist
   // even when the flag says otherwise — and sum them. Non-fatal.
+  //
+  // BRIEF_COURSE_PAR_COMPLETENESS — THE SAME COMPLETENESS RULE AS computeRoundStats.
+  // A par summed from an incomplete card is not a par: the sum is only taken when
+  // every hole of the round's DECLARED length (whs_scores.total_holes) is present,
+  // played and carries a par. Otherwise NULL, which is the honest value.
   if (clbhouzCoursePar == null && holes.length === 0) {
     try {
       const { data: parRows } = await supabase
         .from("whs_score_holes")
         .select("par, played")
         .eq("score_id", whsScoreId);
+      const declared = Number(scoreRow.total_holes);
       const pars = (parRows ?? [])
-        .filter((r: any) => r.played !== false && r.par != null)
+        .filter((r: any) => r.played === true && r.par != null)
         .map((r: any) => Number(r.par));
-      if (pars.length >= 9) {
+      if (Number.isFinite(declared) && declared > 0 && pars.length === declared) {
         clbhouzCoursePar = pars.reduce((a, b) => a + b, 0);
       }
     } catch (e) {
