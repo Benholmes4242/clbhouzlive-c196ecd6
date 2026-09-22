@@ -1039,10 +1039,10 @@ export function ExploreCard({
           }}
         >
           <span
-            aria-hidden={item.kind !== 'story'}
+            aria-hidden={item.kind !== 'story' && !leadReview}
             style={{ flex: `0 0 ${HERO_CHIP_LANE}px`, minWidth: 0, overflow: 'hidden' }}
           >
-            {item.kind === 'story' ? storyMetaNode : null}
+            {item.kind === 'story' ? storyMetaNode : leadReview ? reviewTopLine : null}
           </span>
           <span style={{ flex: '1 1 auto', minHeight: 0 }} />
           <span style={{ position: 'relative', display: 'block' }}>
@@ -1056,17 +1056,17 @@ export function ExploreCard({
             <span
               data-explore-hero-copy="true"
               style={leadReview
-                ? { position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px 16px' }
+                ? { position: 'relative', zIndex: 1, display: 'block', padding: '0 16px 16px' }
                 : { position: 'relative', zIndex: 1, display: 'block', paddingInline: 16 }}
             >
-               {leadReview ? (
-                <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} reviewIdentity={reviewIdentity ?? undefined} />
-               ) : item.kind === 'story' ? null : (
+               {leadReview ? null : item.kind === 'story' ? null : (
                 <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               )}
-              {headlineNode}
+              {/* §4.3 THE QUOTE IS GONE for a lead review — the words live on the
+                  review page. Every other kind keeps its headline. */}
+              {leadReview ? null : headlineNode}
               {standfirstNode}
-              {leadReview ? <ReviewBreakdownRail breakdown={item.facts.breakdown} /> : null}
+              {reviewFoot}
                {!leadReview && item.kind !== 'story' ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
             </span>
             {/* §3 THE BOTTOM LANE IS 16px AND CARRIES NO TRACE. On-photo is now
