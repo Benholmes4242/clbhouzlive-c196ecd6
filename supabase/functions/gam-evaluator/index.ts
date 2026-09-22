@@ -1772,17 +1772,50 @@ async function upsertBadgeTiered(userId: string, badgeId: string, counterValue: 
   }
 }
 
-// Authoritative recompute of a single user's current rank-1 legend count.
+// Authoritative recompute of a single user's CONTESTED rank-1 legend count.
 // Writes to gam_user_milestones (metric='legend_titles') — this is the value
 // the trophy card reads via get_user_achievements_for_viewer's COALESCE on
 // counter_metric — and keeps the gam_user_badges row's tier in sync. Called
 // on BOTH the gain and loss sides of every rank-1 change so counts never drift.
-async function recomputeLegendTitles(userId: string) {
-  const { count: rawCount } = await supabase
+//
+// BRIEF_CONTESTED_TITLES: a rank-1 row only counts when its board has more than
+// one current claimant. See legendTitles.ts for the rule. The milestone count and
+// the badge tier both read the SINGLE `count` binding below — they cannot disagree.
+async function computeContestedTitleCount(userId: string): Promise<number> {
+  const { data: mine } = await supabase
     .from("gam_course_legends")
-    .select("*", { count: "exact", head: true })
+    .select("course_id, category")
     .eq("user_id", userId).eq("rank", 1).eq("is_current", true);
-  const count = rawCount ?? 0;
+  const myBoards = (mine ?? []) as BoardKeyRow[];
+  if (myBoards.length === 0) return 0;
+
+  // PostgREST has no correlated subquery: fetch every current claimant on the
+  // courses in play and let contestedBoardKeys filter per (course, category).
+  const courseIds = [...new Set(myBoards.map((b) => b.course_id))];
+  const claimants: BoardKeyRow[] = [];
+  const CHUNK = 100;
+  for (let i = 0; i < courseIds.length; i += CHUNK) {
+    const { data } = await supabase
+      .from("gam_course_legends")
+      .select("course_id, category")
+      .in("course_id", courseIds.slice(i, i + CHUNK))
+      .eq("is_current", true);
+    claimants.push(...((data ?? []) as BoardKeyRow[]));
+  }
+  return countContestedTitles(myBoards, claimants);
+}
+
+async function legendTitleTier(count: number): Promise<number> {
+  const { data: badge } = await supabase
+    .from("gam_badge_catalogue")
+    .select("counter_tiers")
+    .eq("id", "legend_at_course").maybeSingle();
+  const tiers = badge?.counter_tiers ?? null;
+  return tiers ? computeTier(count, tiers) : 0;
+}
+
+async function recomputeLegendTitles(userId: string) {
+  const count = await computeContestedTitleCount(userId);
   const nowIso = new Date().toISOString();
 
   // Milestone is the source of truth for the card.
@@ -1798,24 +1831,81 @@ async function recomputeLegendTitles(userId: string) {
   );
 
   // Keep the badge row's tier in sync — never gate on tier > 0, always reflect
-  // current state.
-  const { data: badge } = await supabase
-    .from("gam_badge_catalogue")
-    .select("counter_tiers")
-    .eq("id", "legend_at_course").maybeSingle();
-  const tiers = badge?.counter_tiers ?? null;
-  const tier = tiers ? computeTier(count, tiers) : 0;
+  // current state. Same `count` as the milestone above.
+  const tier = await legendTitleTier(count);
 
   if (count > 0) {
     // upsertBadgeTiered handles the row + tier progression + notification.
     await upsertBadgeTiered(userId, "legend_at_course", count, tier, null);
   } else {
-    // count === 0: user holds no rank-1 legends. Remove any stale badge row
-    // so the trophy card falls back to the locked state cleanly.
+    // count === 0: user holds no contested rank-1 legends. Remove any stale badge
+    // row so the trophy card falls back to the locked state cleanly.
     await supabase
       .from("gam_user_badges")
       .delete()
       .eq("user_id", userId).eq("badge_id", "legend_at_course");
+  }
+}
+
+// ONE-OFF CONTESTED-TITLE BACKFILL (BRIEF_CONTESTED_TITLES item 3).
+// Every member's count drops and several change tier, so the whole pass runs
+// under REBUILD_SUPPRESS: enqueueNotification() no-ops while it is true, and
+// upsertBadgeTiered's ONLY notification path is enqueueNotification. Tier drops
+// were already silent (isNewTier requires the tier to RISE). Dry run unless
+// apply === true — the dry run writes nothing at all.
+async function recomputeAllLegendTitles(opts: { apply: boolean }) {
+  const startedAt = Date.now();
+  REBUILD_SUPPRESS = true;
+  try {
+    const holders = new Set<string>();
+    const page = 1000;
+    for (let from = 0; ; from += page) {
+      const { data, error } = await supabase
+        .from("gam_course_legends")
+        .select("user_id")
+        .eq("rank", 1).eq("is_current", true)
+        .range(from, from + page - 1);
+      if (error) throw error;
+      const rows = (data ?? []) as { user_id: string }[];
+      for (const r of rows) holders.add(r.user_id);
+      if (rows.length < page) break;
+    }
+
+    const members: any[] = [];
+    for (const userId of [...holders].sort()) {
+      const { data: before } = await supabase
+        .from("gam_user_milestones")
+        .select("count")
+        .eq("user_id", userId).eq("metric", "legend_titles").maybeSingle();
+      const { data: beforeBadge } = await supabase
+        .from("gam_user_badges")
+        .select("counter_tier")
+        .eq("user_id", userId).eq("badge_id", "legend_at_course").maybeSingle();
+
+      const after = await computeContestedTitleCount(userId);
+      const afterTier = await legendTitleTier(after);
+
+      members.push({
+        user_id: userId,
+        before: { count: before?.count ?? 0, tier: beforeBadge?.counter_tier ?? 0 },
+        after: { count: after, tier: afterTier },
+      });
+
+      if (opts.apply) await recomputeLegendTitles(userId);
+    }
+
+    members.sort((a, b) => b.after.count - a.after.count);
+    return {
+      ok: true,
+      mode: opts.apply ? "apply" : "dry_run",
+      wrote_nothing: !opts.apply,
+      notifications_suppressed: true,
+      members_total: members.length,
+      members,
+      duration_ms: Date.now() - startedAt,
+    };
+  } finally {
+    REBUILD_SUPPRESS = false;
   }
 }
 
