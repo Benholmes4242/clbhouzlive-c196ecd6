@@ -1751,7 +1751,20 @@ async function upsertBadgeEarned(userId: string, badgeId: string, whsScoreId: st
   return true;
 }
 
-async function upsertBadgeTiered(userId: string, badgeId: string, counterValue: number, tier: number, whsScoreId: string | null) {
+// BRIEF_BADGE_HISTORY_GATE. triggerPlayDate is the play_date of the round that
+// caused this evaluation, or null where there is no trigger round (a recompute,
+// a scheduled pass). THE ROW ALWAYS WRITES — tier, counter_value and earned_at
+// update exactly as before, so a requeue still corrects a badge. Only the
+// NOTIFICATION is gated, by the same helper and the same constant the crown
+// notices use: stale, missing, unparseable or absent → no notice.
+async function upsertBadgeTiered(
+  userId: string,
+  badgeId: string,
+  counterValue: number,
+  tier: number,
+  whsScoreId: string | null,
+  triggerPlayDate: string | null,
+) {
   const { data: existing } = await supabase
     .from("gam_user_badges")
     .select("counter_tier, seen_by_user")
