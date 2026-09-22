@@ -340,7 +340,7 @@ export function RoundStatStrip({
   const { t } = useTranslation('courses');
   const hasNet = coursePar != null && net != null;
   const tier = callout && 'tier' in callout ? callout.tier : 'ink';
-  const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} tier={tier} align="card" />;
+  const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} align="card" />;
   if (!callout && !hasNet) return rarity;
 
   const ord = callout?.kind === 'rank_up' && callout.rank != null
