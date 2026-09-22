@@ -40,8 +40,17 @@ import type { ReviewBreakdown } from './useReviewPageEnrichment';
  * unit changes.
  *
  * WHAT MAKES IT A MAGAZINE is the headline — the consequence for the viewer,
- * the review's own words, the story's headline — not the photograph. A round
- * card whose headline is a course name and a number is the page this replaces.
+ * the story's headline — not the photograph. A round card whose headline is a
+ * course name and a number is the page this replaces.
+ *
+ * ONE DELIBERATE EXCEPTION, AND IT REVERSES THAT PRINCIPLE FOR ONE KIND
+ * (BRIEF_EXPLORE_REVIEW_TILE_C5 §0). A LEAD REVIEW no longer carries the
+ * review's own words. It is an INSTRUMENT: the member's identity at the top,
+ * their OWN PHOTOGRAPH or VIDEO as the ground (the course thumbnail is now the
+ * fallback — §1), the score as a 40px figure and the four areas as a stat
+ * strip. The words live on the review page, which the tap opens. This was
+ * decided with the alternatives in front of us; it is not an oversight, and the
+ * principle above still governs every other kind at every size.
  *
  * TWO DEPARTURES FROM THE MOCK, both because the live app wins on shared
  * treatments (§0):
