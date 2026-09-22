@@ -867,10 +867,18 @@ const UNIT_LABELS: Record<string, string> = {
   round_stableford: "stableford",
   front_nine: "front nine",
   back_nine: "back nine",
+  // Retired unit — kept so historical awards still read as they were written.
   finish_six: "finishing six",
+  finish_four: "finishing four",
 };
 const unitLabel = (kind: string, key: number) =>
   kind === "hole" ? `hole ${key}` : (UNIT_LABELS[kind] ?? kind);
+
+// BRIEF_FINISH_FOUR_UNIT — the finish unit folds into the bests but awards
+// nothing until the bests backfill has run. With no history every round would
+// look like a personal best, the fault sealed by awards_evaluated_at on 22 Sep.
+// Flip to true once the backfill has run.
+const FINISH_FOUR_AWARDS_ENABLED = false;
 
 /** The four coarse units plus the 18 hole units, in the order they are judged. */
 function buildUnitCandidates(stats: any, holes: any[]): UnitCandidate[] {
