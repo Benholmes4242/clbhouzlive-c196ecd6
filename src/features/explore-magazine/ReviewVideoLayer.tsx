@@ -2,10 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { autoplayBlocked, registerReviewVideo } from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
 import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
-import { PlayingBars } from '@/components/feed/InlineVideo';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
-import '@/styles/media-rail-bars.css';
 
 /**
  * THE REVIEW TILE'S VIDEO LAYER (BRIEF_EXPLORE_REVIEW_TILE_VIDEO).

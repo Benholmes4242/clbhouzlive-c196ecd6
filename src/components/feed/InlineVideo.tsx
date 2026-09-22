@@ -28,7 +28,6 @@ import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteButton } from '@/audio/MuteButton';
 import { formatDuration, formatRemaining } from '@/features/watch-v2/utils/formatDuration';
-import '@/styles/media-rail-bars.css';
 import { VideoProcessingCard } from './VideoProcessingCard';
 import {
   vperfMarkEarlyStarted,
@@ -42,18 +41,6 @@ import {
 } from '@/perf/vperf';
 import { isPerfEnabled } from '@/perf/navTiming';
 
-/** Three animated bars — the playing marker, shared with the Discover rails.
-    EXPORTED for the Explore lead-review tile, whose duration badge is this
-    badge (InlineVideo's) verbatim — same chip, same bars, same countdown. */
-export function PlayingBars() {
-  return (
-    <span className="media-rail-bars" aria-hidden>
-      <i />
-      <i />
-      <i />
-    </span>
-  );
-}
 
 interface Props {
   item: MediaItem;
