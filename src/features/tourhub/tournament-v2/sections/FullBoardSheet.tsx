@@ -16,7 +16,7 @@ import { TITLE, FIGS as TFIGS } from '@/lib/tokens/type';
 import { BoardTable, todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
-import { resolveCutDisplay } from '../../_shared/cutDisplay';
+import { resolveCutDisplay, tournamentIsFinished } from '../../_shared/cutDisplay';
 import { FONT, INK_MUTE, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
@@ -111,6 +111,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
             entries={entries}
             cutState={cutState}
             currentRound={meta?.current_round ?? null}
+            complete={tournamentIsFinished(meta?.status)}
             onRowClick={handleRow}
             teamInitials={needsInitials}
             headerTop={0}

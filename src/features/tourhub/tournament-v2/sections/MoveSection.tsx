@@ -9,9 +9,17 @@ import { FONT, INK, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
 import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
-interface Props { contest: TournamentContest; state: EventState; tourCode: string }
+interface Props {
+  contest: TournamentContest;
+  state: EventState;
+  tourCode: string;
+  /** The round the figure belongs to. Names the label once the event
+   * is over — there is no "today" after the last putt. Optional, so
+   * a caller without it keeps today's wording. */
+  currentRound?: number | null;
+}
 
-export function MoveSection({ contest, state, tourCode }: Props) {
+export function MoveSection({ contest, state, tourCode, currentRound }: Props) {
   const { t, i18n } = useTranslation('tourhub');
   const cjk = /^(ja|ko)/.test(i18n.language);
   const row = contest.mover;
@@ -20,6 +28,13 @@ export function MoveSection({ contest, state, tourCode }: Props) {
   const thru = row.thru != null && row.thru >= 18 ? 'F' : row.thru;
   const position = row.position == null ? '' : `${row.position_tied ? 'T' : ''}${row.position}`;
   const total = row.score == null ? '' : fmtScore(row.score);
+  /* TODAY only while there is a today. Afterwards the figure is round
+     N's, so it takes round N's name — the same swap the final board
+     makes. No new locale key: R-labels are template literals across the
+     tour boards and are not translated in any locale. */
+  const figureLabel = state !== 'live' && currentRound != null
+    ? `R${currentRound}`
+    : t('tournament.move.today');
   return (
     <section style={{ fontFamily: FONT }}>
       <SectionEyebrow kicker={t(state === 'live' ? 'tournament.move.liveEyebrow' : 'tournament.move.completedEyebrow')} />
@@ -31,7 +46,7 @@ export function MoveSection({ contest, state, tourCode }: Props) {
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: 26, fontWeight: 800, color: getScoreColor(contest.moverToday, 'dark'), fontVariantNumeric: 'tabular-nums lining-nums', lineHeight: 1 }}>{fmtScore(contest.moverToday)}</div>
-          <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: cjk ? 0 : '0.12em', textTransform: cjk ? 'none' : 'uppercase', color: INK_FAINT }}>{t('tournament.move.today')}</div>
+          <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: cjk ? 0 : '0.12em', textTransform: cjk ? 'none' : 'uppercase', color: INK_FAINT }}>{figureLabel}</div>
         </div>
       </div>
     </section>

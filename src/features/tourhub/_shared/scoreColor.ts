@@ -9,8 +9,13 @@
  * - Over-par  (score > 0) → INK / muted white on dark
  * - Even par / null       → neutral muted (ink-faint on light, white-alpha on dark)
  *
- * Leader emphasis variant: replaces under-par red with maximum-contrast monochrome
- * (white on dark, ink on light) for the #1 leader row.
+ * Leader emphasis variant: replaces under-par red with maximum-contrast
+ * monochrome. RETAINED BUT UNUSED — the Full Board's leader row took it until
+ * Sept 2026, when it was removed: on a dark ground, white beside a column of
+ * red reads as muted rather than emphasised, and it made the Full Board the
+ * only surface whose leader total differed from the hero and tournament-page
+ * boards. The leader row is marked by its wash and its brighter name, not by
+ * inverting its number.
  *
  * For HOLE-BY-HOLE scoring (eagle/birdie/par/bogey/etc.) see the SC_* World
  * Feed tokens in features/courses/components/holes/_constants — that's a

@@ -44,6 +44,8 @@ const copy: Record<string, string> = {
   'tournament.contest.allLevel': 'All level',
   'tournament.contest.packAria': 'The pack by shots behind',
   'tournament.move.liveEyebrow': 'The move',
+  'tournament.move.completedEyebrow': 'Round of the day',
+  'tournament.move.today': 'TODAY',
 };
 
 vi.mock('react-i18next', () => ({
@@ -241,6 +243,19 @@ describe('tournament contest sections', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
     expect(screen.getByText('Shots clear')).toBeInTheDocument();
     expect(screen.queryByText('Won a playoff')).not.toBeInTheDocument();
+  });
+
+  it('names the completed move figure for its round instead of today', () => {
+    const contest = selectTournamentContest([
+      row('Winner', -12, 1, -4, 18),
+      row('Round mover', -10, 2, -7, 18),
+      row('Third', -8, 3, -2, 18),
+    ], meta, 'completed');
+
+    render(<MoveSection contest={contest} state="completed" tourCode="pga" currentRound={4} />);
+
+    expect(screen.getByText('R4')).toBeInTheDocument();
+    expect(screen.queryByText('TODAY')).not.toBeInTheDocument();
   });
 
   it('renders team prose in the contest and suppresses the empty move section', () => {

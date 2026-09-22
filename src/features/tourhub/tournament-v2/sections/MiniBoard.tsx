@@ -290,7 +290,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
           <div style={{ width: 34, flexShrink: 0 }}>{t('board.columns.pos')}</div>
           <div ref={nameTrackRef} style={{ flex: 1, minWidth: 0 }}>{t('board.columns.player')}</div>
           {showPanelThru ? <div style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.thru')}</div> : null}
-          <div style={{ width: 46, textAlign: 'right', flexShrink: 0, color: panelRoundNamed ? AMBER : undefined }}>{panelScoreLabel}</div>
+          <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{panelScoreLabel}</div>
           <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.tot')}</div>
           {showPrize ? <div style={{ width: 52, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.prize', 'Prize')}</div> : null}
 
