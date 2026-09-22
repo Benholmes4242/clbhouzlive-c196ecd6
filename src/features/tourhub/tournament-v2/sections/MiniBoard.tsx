@@ -232,11 +232,11 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
             {heroRounds.map((rd) => (
-              <div key={rd} style={{ textAlign: 'right', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
+              <div key={rd} style={{ textAlign: 'center', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
                 {`R${rd}`}
               </div>
             ))}
-            <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
+            <div style={{ textAlign: 'center' }}>{t('board.columns.tot')}</div>
           </div>
           {rows.map((r) => {
             const entity = resolveBoardEntity(r, needsInitials, nameTier);
@@ -266,12 +266,12 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     ? today
                     : ([r.round_1, r.round_2, r.round_3, r.round_4][rd - 1] ?? null);
                   return (
-                    <div key={rd} style={{ textAlign: 'right', fontSize: 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: getScoreColor(val, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>
+                    <div key={rd} style={{ textAlign: 'center', fontSize: 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: getScoreColor(val, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>
                       {val == null ? BLANK : fmtScore(val)}
                     </div>
                   );
                 })}
-                <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
+                <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
               </button>
             );
           })}
