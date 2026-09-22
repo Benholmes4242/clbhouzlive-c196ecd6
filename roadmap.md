@@ -60,3 +60,10 @@
 - [x] Keep hole marks, gross totals, and complete-nine rendering unchanged.
 - [x] Verify partial eighteen, complete eighteen, complete nine, focused tests, full suite, and typecheck.
 - [x] Report the par source for the seven named unchanged to-par sites.
+
+## BRIEF_FEED_PARTIAL_ROUND_THRU
+- [ ] Carry `whs_scores.total_holes` through the existing batched feed-round read.
+- [ ] Preserve hole arithmetic while exposing `thru` only for provably partial scored cards.
+- [ ] Render lowercase `· thru N` beside partial feed scores; leave complete and WHS fallback output unchanged.
+- [ ] Prove partial eighteen, complete eighteen, complete nine, and picked-up fallback behavior.
+- [ ] Report every other `roundScore` consumer without changing it; run the full suite and typecheck.
