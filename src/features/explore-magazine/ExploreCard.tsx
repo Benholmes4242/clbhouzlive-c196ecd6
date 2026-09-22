@@ -8,7 +8,7 @@ import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Heart, MessageCircle } from 'lucide-react';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { MomentPlayGlyph } from '@/components/explore-tab-new/courseled/MomentTile';
+import { ReviewVideoLayer } from './ReviewVideoLayer';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { storyTime } from '@/features/tourhub/news/storyTime';
 import { r } from '@/lib/radius';
@@ -319,6 +319,21 @@ function chipsFor(
   }
 
   return out;
+}
+
+/**
+ * §4.1 — the count badge's stacked-layers glyph, 11px, inline stroke, currentColor
+ * so it inherits GlassBadge's white. Never an emoji.
+ */
+function StackedLayersGlyph() {
+  return (
+    <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden
+      style={{ alignSelf: 'center', flexShrink: 0 }}>
+      <rect x="8" y="3" width="13" height="13" rx="2" />
+      <path d="M16 19.5A1.5 1.5 0 0 1 14.5 21H5a2 2 0 0 1-2-2V8.5A1.5 1.5 0 0 1 4.5 7" />
+    </svg>
+  );
 }
 
 function WhoLine({
@@ -1034,24 +1049,28 @@ export function ExploreCard({
           style={{ position: 'absolute', inset: 0, background: HERO_REVIEW_SCRIM, zIndex: 1 }}
         />
       ) : null}
-      {/* §6 NO AUTOPLAY, AND IT IS A DECISION: the clips wall owns this page's
-          motion budget, so a review video renders its POSTER with a play
-          affordance and its duration. The tap opens the review, which plays it
-          properly. */}
+      {/* BRIEF_EXPLORE_REVIEW_TILE_VIDEO §3 — A REVIEW VIDEO AUTOPLAYS, muted and
+          looping, elected by the page's ONE existing budget. This reverses the
+          previous brief's no-autoplay line; it was Ben's call, not a drift.
+          §3.5 there is NO play glyph in any state: a tap opens the review, and
+          the duration badge alone says "this is a video".
+          ONE BADGE SLOT, TOP RIGHT (§4): a video shows its duration; otherwise
+          more than one photo shows a bare count; one photo or the course
+          fallback shows nothing. Dots are deliberately absent — the card does
+          not swipe. */}
       {reviewMedia?.kind === 'video' ? (
-        <>
-          <span data-review-play="true" style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
-            <MomentPlayGlyph />
-          </span>
-          {reviewMedia.durationS ? (
-            /* The 48px top lane is free now that §4.2 removed the photo-count
-               chip, so the duration sits where that chip used to — clear of the
-               score and the strip at the foot. */
-            <GlassBadge style={{ position: 'absolute', top: 8, right: 8, zIndex: 3 }}>
-              {formatDuration(reviewMedia.durationS)}
-            </GlassBadge>
-          ) : null}
-        </>
+        <ReviewVideoLayer
+          hlsUrl={reviewMedia.url}
+          posterUrl={reviewMedia.posterUrl}
+          durationS={reviewMedia.durationS}
+        />
+      ) : leadReview && (item.facts.photoCount ?? 0) > 1 ? (
+        <GlassBadge style={{ position: 'absolute', top: 8, right: 8, left: 'auto', bottom: 'auto', zIndex: 3 }}>
+          <StackedLayersGlyph />
+          {/* §4.1 THE FIGURE ONLY — the wordy "3 photos" chip was removed on
+              purpose; this is the quiet form of the same fact. */}
+          <span data-review-photo-figure="true">{item.facts.photoCount}</span>
+        </GlassBadge>
       ) : null}
       {onPhoto && item.kind === 'story' ? (
         <span

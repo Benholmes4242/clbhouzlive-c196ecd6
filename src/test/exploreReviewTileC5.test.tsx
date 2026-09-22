@@ -1,5 +1,5 @@
 import React from 'react';
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
@@ -133,15 +133,39 @@ describe('C5 §1/§6 the card takes that one answer', () => {
     expect(container.querySelector('[data-review-play="true"]')).toBeNull();
   });
 
-  it('§6 renders a video as its poster with a play affordance and a duration, and never autoplays', () => {
+  /* BRIEF_EXPLORE_REVIEW_TILE_VIDEO reverses C5 §6: a review video AUTOPLAYS
+     muted on loop, and the play glyph is deleted in every state. */
+  it('mounts a muted looping video over its poster, with the duration and NO play glyph', () => {
     const item = review({
       reviewMedia: { mediaId: 'vid', kind: 'video', url: 'https://example.test/v.m3u8', posterUrl: 'https://example.test/poster.jpg', streamId: 'st', durationS: 95 },
     });
     const { container } = render(<ExploreCard item={item} size="lead" shape={null} onTap={() => undefined} />);
     expect(container.innerHTML).toContain('example.test/poster.jpg');
-    expect(container.querySelector('video')).toBeNull();
-    expect(container.querySelector('[data-review-play="true"]')).not.toBeNull();
+    const video = container.querySelector('video');
+    expect(video).not.toBeNull();
+    expect(video?.hasAttribute('loop')).toBe(true);
+    expect(video?.hasAttribute('muted') || (video as HTMLVideoElement).muted).toBe(true);
+    expect(container.querySelector('[data-review-play="true"]')).toBeNull();
     expect(container.textContent).toContain('1:35');
+  });
+
+  it('§4 ONE badge slot: a video shows the duration and never a photo count', () => {
+    const item = review({
+      photoCount: 2,
+      reviewMedia: { mediaId: 'vid', kind: 'video', url: 'https://example.test/v.m3u8', posterUrl: 'https://example.test/poster.jpg', streamId: 'st', durationS: 95 },
+    });
+    const { container } = render(<ExploreCard item={item} size="lead" shape={null} onTap={() => undefined} />);
+    expect(container.textContent).toContain('1:35');
+    expect(container.querySelector('[data-review-photo-figure="true"]')).toBeNull();
+  });
+
+  it('§4 more than one image shows the bare figure; one image shows nothing', () => {
+    const media = { mediaId: 'img', kind: 'image' as const, url: 'https://example.test/mine.jpg', posterUrl: null, streamId: null, durationS: null };
+    const three = render(<ExploreCard item={review({ photoCount: 3, reviewMedia: media })} size="lead" shape={null} onTap={() => undefined} />);
+    expect(three.container.querySelector('[data-review-photo-figure="true"]')?.textContent).toBe('3');
+    expect(three.container.textContent).not.toMatch(/photo/i);
+    const one = render(<ExploreCard item={review({ photoCount: 1, reviewMedia: media })} size="lead" shape={null} onTap={() => undefined} />);
+    expect(one.container.querySelector('[data-review-photo-figure="true"]')).toBeNull();
   });
 
   it('draws none of the instrument on a std review', () => {
@@ -154,5 +178,32 @@ describe('C5 §1/§6 the card takes that one answer', () => {
     expect(container.querySelector('[data-review-play="true"]')).toBeNull();
     /* The course photo stays the std review's ground: §1 is a LEAD rule. */
     expect(container.innerHTML).toContain('example.test/course.jpg');
+  });
+});
+
+/**
+ * BRIEF_EXPLORE_REVIEW_TILE_VIDEO §2 — the CALLER does the countdown arithmetic,
+ * throttled to whole seconds and CLAMPED AT ONE so a looping video never blinks
+ * the badge out at zero.
+ */
+describe('the review video badge counts down', () => {
+  it('shows the remaining whole seconds while playing, never below one', () => {
+    const item = review({
+      reviewMedia: { mediaId: 'vid', kind: 'video', url: 'https://example.test/v.m3u8', posterUrl: 'https://example.test/poster.jpg', streamId: 'st', durationS: 95 },
+    });
+    const { container } = render(<ExploreCard item={item} size="lead" shape={null} onTap={() => undefined} />);
+    const video = container.querySelector('video') as HTMLVideoElement;
+    fireEvent.playing(video);
+    Object.defineProperty(video, 'currentTime', { value: 35, configurable: true });
+    fireEvent.timeUpdate(video);
+    expect(container.textContent).toContain('1:00');
+    /* The last fraction of the lap clamps to one, not zero. */
+    Object.defineProperty(video, 'currentTime', { value: 94.8, configurable: true });
+    fireEvent.timeUpdate(video);
+    expect(container.textContent).toContain('0:01');
+    /* A loop restart returns the count to the full duration — no special case. */
+    Object.defineProperty(video, 'currentTime', { value: 0, configurable: true });
+    fireEvent.timeUpdate(video);
+    expect(container.textContent).toContain('1:35');
   });
 });
