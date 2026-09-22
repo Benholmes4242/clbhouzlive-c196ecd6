@@ -153,7 +153,9 @@
     "recordMargin_one": "{{count}} Schlag besser als der vorherige Platzrekord",
     "recordMargin_other": "{{count}} Schläge besser als der vorherige Platzrekord",
     "tagMovedUp": "AUFGESTIEGEN",
-    "tagNew": "NEU"
+    "tagNew": "NEU",
+     "tagRare": "SELTEN"
+    "tagRare": ""
    },
    "chip": {
     "gbi": "GB&I",

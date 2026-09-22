@@ -153,7 +153,9 @@
     "recordMargin_one": "{{count}} golpe mejor que el récord anterior del campo",
     "recordMargin_other": "{{count}} golpes mejor que el récord anterior del campo",
     "tagMovedUp": "SUBIÓ",
-    "tagNew": "NUEVO"
+    "tagNew": "NUEVO",
+     "tagRare": "RARO"
+    "tagRare": ""
    },
    "chip": {
     "gbi": "GB&I",

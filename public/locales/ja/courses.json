@@ -153,7 +153,9 @@
     "recordMargin_one": "以前のコースレコードを{{count}}打更新",
     "recordMargin_other": "以前のコースレコードを{{count}}打更新",
     "tagMovedUp": "順位上昇",
-    "tagNew": "NEW"
+    "tagNew": "NEW",
+     "tagRare": "RARE"
+    "tagRare": ""
    },
    "chip": {
     "gbi": "GB&I",
