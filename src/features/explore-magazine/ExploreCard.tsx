@@ -803,6 +803,7 @@ export function ExploreCard({
   const standfirstNode = storyStandfirst ? (
     <div
       data-explore-standfirst="true"
+      data-explore-standfirst-clamp={3}
       style={{
         marginTop: 8,
         fontFamily: SANS,
