@@ -900,7 +900,9 @@ function buildUnitCandidates(stats: any, holes: any[]): UnitCandidate[] {
   if (stats.hole_detail_present !== false) {
     push("front_nine", 0, stats.front_nine_to_par, true);
     push("back_nine", 0, stats.back_nine_to_par, true);
-    push("finish_six", 0, stats.finish_six_to_par, true);
+    // BRIEF_FINISH_FOUR_UNIT — 'finish_six' is retired: it is no longer a unit
+    // candidate at all, so it neither earns awards nor grows its bests rows.
+    push("finish_four", 0, stats.finish_four_to_par, true);
 
     for (const h of holes ?? []) {
       const n = Number(h?.hole_no);
