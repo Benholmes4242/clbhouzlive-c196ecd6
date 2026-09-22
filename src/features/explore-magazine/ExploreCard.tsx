@@ -8,6 +8,7 @@ import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Heart, MessageCircle } from 'lucide-react';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { MomentPlayGlyph } from '@/components/explore-tab-new/courseled/MomentTile';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { storyTime } from '@/features/tourhub/news/storyTime';
 import { r } from '@/lib/radius';
@@ -15,9 +16,7 @@ import {
   CHIP_GLASS_CLASS,
   PHOTO_FIG_SHADOW,
   PHOTO_FIG_UNDER,
-  PHOTO_REVIEW_FILL,
   PHOTO_REVIEW_LABEL,
-  PHOTO_REVIEW_TRACK,
 } from '@/styles/photoScrim';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -104,6 +103,14 @@ const HERO_STORY_SCRIM =
 /** The story meta's own colour. NOT PHOTO_REVIEW_LABEL — the review card's
  *  identity line and breakdown rail read that token and must not shift. */
 const HERO_STORY_META_COLOR = 'rgba(248,250,252,0.82)';
+/** C5 §3.1 — THE REVIEW'S FULL-TILE GROUND. The instrument puts identity at the
+ *  TOP of the frame, which the copy-anchored HERO_COPY_SCRIM does not reach, so
+ *  a lead review adds this ramp across the whole tile: ground at the top, the
+ *  photograph reading through the middle, and NOTHING added at the foot — the
+ *  foot is still HERO_COPY_SCRIM's, whose value and every other use are
+ *  unchanged. Stacking two dark feet would double-darken the score. */
+const HERO_REVIEW_SCRIM =
+  'linear-gradient(180deg, rgba(0,0,0,0.34), rgba(0,0,0,0.04) 38%, rgba(0,0,0,0.04))';
 
 function FigureChip({
   figure,
@@ -1020,6 +1027,27 @@ export function ExploreCard({
         : { height: PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }}
     >
       {chips}
+      {leadReview ? (
+        <span
+          aria-hidden
+          data-explore-review-scrim="true"
+          style={{ position: 'absolute', inset: 0, background: HERO_REVIEW_SCRIM, zIndex: 1 }}
+        />
+      ) : null}
+      {/* §6 NO AUTOPLAY, AND IT IS A DECISION: the clips wall owns this page's
+          motion budget, so a review video renders its POSTER with a play
+          affordance and its duration. The tap opens the review, which plays it
+          properly. */}
+      {reviewMedia?.kind === 'video' ? (
+        <>
+          <MomentPlayGlyph />
+          {reviewMedia.durationS ? (
+            <GlassBadge style={{ position: 'absolute', top: 'auto', bottom: 8, right: 8, left: 'auto', zIndex: 3 }}>
+              {formatDuration(reviewMedia.durationS)}
+            </GlassBadge>
+          ) : null}
+        </>
+      ) : null}
       {onPhoto && item.kind === 'story' ? (
         <span
           aria-hidden
