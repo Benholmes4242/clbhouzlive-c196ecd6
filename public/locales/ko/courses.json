@@ -153,7 +153,8 @@
     "recordMargin_one": "이전 코스 레코드보다 {{count}}타 향상",
     "recordMargin_other": "이전 코스 레코드보다 {{count}}타 향상",
     "tagMovedUp": "순위 상승",
-    "tagNew": "NEW"
+    "tagNew": "NEW",
+     "tagRare": "RARE"
    },
    "chip": {
     "gbi": "GB&I",

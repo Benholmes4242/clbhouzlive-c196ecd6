@@ -156,7 +156,8 @@
     "recordMargin_one": "{{count}} shot better than the previous course record",
     "recordMargin_other": "{{count}} shots better than the previous course record",
     "tagMovedUp": "MOVED UP",
-    "tagNew": "NEW"
+    "tagNew": "NEW",
+     "tagRare": "RARE"
    },
    "chip": {
     "gbi": "GB&I",
