@@ -234,3 +234,35 @@ describe('Trophy Room · where you stand', () => {
     expect(c.querySelector('[data-standing-disc]')).toBeNull();
   });
 });
+
+describe('BRIEF_STANDINGS_FOLLOWUPS · the empty branch', () => {
+  const SHEET_USER = '11111111-1111-1111-1111-111111111111';
+
+  function mountSheet() {
+    return render(<CareerRecordSheet userId={SHEET_USER} />);
+  }
+
+  it('a member with standings and no badges sees standings, never "Nothing on the record yet"', async () => {
+    standingsState.rows = [SUNDRIDGE_STABLEFORD];
+    mountSheet();
+    await act(async () => {
+      openGamAchievements();
+    });
+    await waitFor(() => {
+      expect(screen.getByText('Where you stand')).toBeTruthy();
+    });
+    expect(screen.queryByText(/Nothing on the record yet/)).toBeNull();
+    expect(screen.getByText('Sundridge Park Golf Club (East Course)')).toBeTruthy();
+  });
+
+  it('a member with nothing at all still sees the honest empty line', async () => {
+    standingsState.rows = [];
+    mountSheet();
+    await act(async () => {
+      openGamAchievements();
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/Nothing on the record yet/)).toBeTruthy();
+    });
+  });
+});
