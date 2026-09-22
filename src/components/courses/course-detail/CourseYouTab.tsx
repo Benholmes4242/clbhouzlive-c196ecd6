@@ -131,6 +131,9 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   const settled =
     Boolean(user) && !statusLoading && Boolean(status) && !connectionLoading && roundsSettled;
 
+  /* Scoped to this course; only read once the member is known to have played. */
+  const { data: standings } = useMemberStandings(user?.id, settled && hasTrackedRounds, courseId);
+
   /* §7 — one view event per mount, carrying the round count so we can see which
      state members actually land in. */
   const viewFired = React.useRef(false);
