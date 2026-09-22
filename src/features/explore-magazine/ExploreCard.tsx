@@ -1044,7 +1044,10 @@ export function ExploreCard({
             <MomentPlayGlyph />
           </span>
           {reviewMedia.durationS ? (
-            <GlassBadge style={{ position: 'absolute', top: 'auto', bottom: 8, right: 8, left: 'auto', zIndex: 3 }}>
+            /* The 48px top lane is free now that §4.2 removed the photo-count
+               chip, so the duration sits where that chip used to — clear of the
+               score and the strip at the foot. */
+            <GlassBadge style={{ position: 'absolute', top: 8, right: 8, zIndex: 3 }}>
               {formatDuration(reviewMedia.durationS)}
             </GlassBadge>
           ) : null}
