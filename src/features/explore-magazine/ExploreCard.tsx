@@ -727,7 +727,13 @@ export function ExploreCard({
   );
 
   const leadReview = size === 'lead' && item.kind === 'review';
-  const headlineLineClamp = leadReview ? 2 : size === 'lead' ? 3 : 2;
+  /* §3 A STORY CLAMPS AT FOUR, like the tour hero. Every other branch is
+     untouched: the review stays at 2, other leads at 3. */
+  const headlineLineClamp = leadReview
+    ? 2
+    : size === 'lead'
+      ? (item.kind === 'story' ? 4 : 3)
+      : 2;
   const headlineNode = (
     <div
       data-explore-headline="true"
