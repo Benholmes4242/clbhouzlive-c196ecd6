@@ -765,7 +765,11 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     // nine-hole card covered, so a 1-9 card cannot be trusted as the front nine.
     front_nine_to_par: is18 ? rangeToPar(holes, 1, 9) : null,
     back_nine_to_par: is18 ? rangeToPar(holes, 10, 18) : null,
+    // BRIEF_FINISH_FOUR_UNIT — "the finish" is holes 15–18. finish_six_to_par
+    // is still written so the retired six-hole unit stays reversible until the
+    // column is dropped; nothing judges it any more.
     finish_six_to_par: is18 ? rangeToPar(holes, 13, 18) : null,
+    finish_four_to_par: is18 ? rangeToPar(holes, 15, 18) : null,
     evaluator_version: EVALUATOR_VERSION,
   };
 
@@ -863,10 +867,18 @@ const UNIT_LABELS: Record<string, string> = {
   round_stableford: "stableford",
   front_nine: "front nine",
   back_nine: "back nine",
+  // Retired unit — kept so historical awards still read as they were written.
   finish_six: "finishing six",
+  finish_four: "finishing four",
 };
 const unitLabel = (kind: string, key: number) =>
   kind === "hole" ? `hole ${key}` : (UNIT_LABELS[kind] ?? kind);
+
+// BRIEF_FINISH_FOUR_UNIT — the finish unit folds into the bests but awards
+// nothing until the bests backfill has run. With no history every round would
+// look like a personal best, the fault sealed by awards_evaluated_at on 22 Sep.
+// Flip to true once the backfill has run.
+const FINISH_FOUR_AWARDS_ENABLED = false;
 
 /** The four coarse units plus the 18 hole units, in the order they are judged. */
 function buildUnitCandidates(stats: any, holes: any[]): UnitCandidate[] {
@@ -888,7 +900,9 @@ function buildUnitCandidates(stats: any, holes: any[]): UnitCandidate[] {
   if (stats.hole_detail_present !== false) {
     push("front_nine", 0, stats.front_nine_to_par, true);
     push("back_nine", 0, stats.back_nine_to_par, true);
-    push("finish_six", 0, stats.finish_six_to_par, true);
+    // BRIEF_FINISH_FOUR_UNIT — 'finish_six' is retired: it is no longer a unit
+    // candidate at all, so it neither earns awards nor grows its bests rows.
+    push("finish_four", 0, stats.finish_four_to_par, true);
 
     for (const h of holes ?? []) {
       const n = Number(h?.hole_no);
@@ -1056,6 +1070,8 @@ async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
   for (const u of units) {
     const prior = priorByKey.get(`${u.unit_kind}:${u.unit_key}`) ?? null;
     if (!awardsAllowed) continue;
+    // BRIEF_FINISH_FOUR_UNIT — the bests fold below still runs for this unit.
+    if (u.unit_kind === "finish_four" && !FINISH_FOUR_AWARDS_ENABLED) continue;
     for (const a of resolveAwards(u, prior)) {
       pendingAwards.push({ u, a, attempts: prior?.attempts ?? 0 });
     }
@@ -1462,7 +1478,7 @@ const HOLE_DERIVED_STAT_FIELDS = new Set([
   "pars", "bogeys", "double_bogeys", "triple_plus",
   "clean_card", "longest_birdie_run", "longest_par_or_better_run",
   "max_birdie_streak",
-  "front_nine_to_par", "back_nine_to_par", "finish_six_to_par",
+  "front_nine_to_par", "back_nine_to_par", "finish_six_to_par", "finish_four_to_par",
 ]);
 
 // Binary badge ids whose condition reads a hole-derived stat.

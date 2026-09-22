@@ -6150,6 +6150,7 @@ export type Database = {
           double_bogeys: number
           eagles: number
           evaluator_version: number
+          finish_four_to_par: number | null
           finish_six_to_par: number | null
           front_nine_to_par: number | null
           gross_score: number | null
@@ -6196,6 +6197,7 @@ export type Database = {
           double_bogeys?: number
           eagles?: number
           evaluator_version?: number
+          finish_four_to_par?: number | null
           finish_six_to_par?: number | null
           front_nine_to_par?: number | null
           gross_score?: number | null
@@ -6242,6 +6244,7 @@ export type Database = {
           double_bogeys?: number
           eagles?: number
           evaluator_version?: number
+          finish_four_to_par?: number | null
           finish_six_to_par?: number | null
           front_nine_to_par?: number | null
           gross_score?: number | null
