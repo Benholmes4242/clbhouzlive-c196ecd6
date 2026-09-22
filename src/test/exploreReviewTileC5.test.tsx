@@ -133,15 +133,39 @@ describe('C5 §1/§6 the card takes that one answer', () => {
     expect(container.querySelector('[data-review-play="true"]')).toBeNull();
   });
 
-  it('§6 renders a video as its poster with a play affordance and a duration, and never autoplays', () => {
+  /* BRIEF_EXPLORE_REVIEW_TILE_VIDEO reverses C5 §6: a review video AUTOPLAYS
+     muted on loop, and the play glyph is deleted in every state. */
+  it('mounts a muted looping video over its poster, with the duration and NO play glyph', () => {
     const item = review({
       reviewMedia: { mediaId: 'vid', kind: 'video', url: 'https://example.test/v.m3u8', posterUrl: 'https://example.test/poster.jpg', streamId: 'st', durationS: 95 },
     });
     const { container } = render(<ExploreCard item={item} size="lead" shape={null} onTap={() => undefined} />);
     expect(container.innerHTML).toContain('example.test/poster.jpg');
-    expect(container.querySelector('video')).toBeNull();
-    expect(container.querySelector('[data-review-play="true"]')).not.toBeNull();
+    const video = container.querySelector('video');
+    expect(video).not.toBeNull();
+    expect(video?.hasAttribute('loop')).toBe(true);
+    expect(video?.hasAttribute('muted') || (video as HTMLVideoElement).muted).toBe(true);
+    expect(container.querySelector('[data-review-play="true"]')).toBeNull();
     expect(container.textContent).toContain('1:35');
+  });
+
+  it('§4 ONE badge slot: a video shows the duration and never a photo count', () => {
+    const item = review({
+      photoCount: 2,
+      reviewMedia: { mediaId: 'vid', kind: 'video', url: 'https://example.test/v.m3u8', posterUrl: 'https://example.test/poster.jpg', streamId: 'st', durationS: 95 },
+    });
+    const { container } = render(<ExploreCard item={item} size="lead" shape={null} onTap={() => undefined} />);
+    expect(container.textContent).toContain('1:35');
+    expect(container.querySelector('[data-review-photo-count="true"]')).toBeNull();
+  });
+
+  it('§4 more than one image shows the bare figure; one image shows nothing', () => {
+    const media = { mediaId: 'img', kind: 'image' as const, url: 'https://example.test/mine.jpg', posterUrl: null, streamId: null, durationS: null };
+    const three = render(<ExploreCard item={review({ photoCount: 3, reviewMedia: media })} size="lead" shape={null} onTap={() => undefined} />);
+    expect(three.container.querySelector('[data-review-photo-count="true"]')?.textContent).toBe('3');
+    expect(three.container.textContent).not.toMatch(/photo/i);
+    const one = render(<ExploreCard item={review({ photoCount: 1, reviewMedia: media })} size="lead" shape={null} onTap={() => undefined} />);
+    expect(one.container.querySelector('[data-review-photo-count="true"]')).toBeNull();
   });
 
   it('draws none of the instrument on a std review', () => {
