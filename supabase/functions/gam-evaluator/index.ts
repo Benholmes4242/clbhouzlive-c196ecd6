@@ -678,14 +678,33 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
   // WHS leaves actual_gross null on most rounds; the playable gross lives
   // in adjusted_gross. Prefer adjusted_gross, fall back to actual_gross.
   const grossScore = score.adjusted_gross ?? score.actual_gross ?? null;
-  // golf_courses has no `par` column; fall back to summing hole pars when
-  // the round has hole-by-hole data, otherwise leave null.
+  // golf_courses has no `par` column, and there is NO course-level par to fall
+  // back to — the hole rows are the only source, and they stay the only source.
+  //
+  // BRIEF_COURSE_PAR_COMPLETENESS — A PAR SUMMED FROM AN INCOMPLETE CARD IS NOT
+  // A PAR. The old ">= 9 holes with a par" floor gave a round walked in after
+  // ten holes a course_par of 40 against a real par of 72, and every to-par
+  // figure derived from it was wrong by thirty-two shots.
+  //
+  // THE RULE: the sum of par over the round's holes ONLY IF every hole of the
+  // round's DECLARED length (whs_scores.total_holes — the same field beat_par
+  // and the sub_N flags gate on) is present, played and carries a non-null par.
+  // Otherwise NULL. 18-hole round -> 18 complete holes; 9-hole round -> 9
+  // complete holes, giving a correct ~35. A different layout or tee still has
+  // all its pars and KEEPS its par; only incomplete cards are nulled. Identical
+  // to the stretch columns below, and to useCircleLatestRounds' "both nines must
+  // be complete, or the split says nothing true".
   let par: number | null = meta.course_par ?? null;
   if (par == null && holes.length > 0) {
+    const declaredHoles = Number(score.total_holes);
     const holePars = holes
-      .filter((h: any) => h.played !== false && h.par != null)
+      .filter((h: any) => h.played === true && h.par != null)
       .map((h: any) => Number(h.par));
-    if (holePars.length >= 9) {
+    if (
+      Number.isFinite(declaredHoles) &&
+      declaredHoles > 0 &&
+      holePars.length === declaredHoles
+    ) {
       par = holePars.reduce((a, b) => a + b, 0);
     }
   }
