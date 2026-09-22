@@ -35,7 +35,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
       { gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 1 },
     );
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
-    expect(statKinds(container)).toEqual(['achievement']);
+    expect(statKinds(container)).toEqual(['achievement', 'net', 'vs-hcp']);
     expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('67');
     expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')?.textContent).toBe('−4');
     expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
@@ -51,7 +51,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     for (const container of [gold, top, ink]) {
       const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
       expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
-      expect(strip?.style.backgroundImage).toBe('none');
+      expect(strip?.style.backgroundImage).toBe('');
       expect(strip?.style.border).toBe('');
       for (const el of Array.from(strip?.querySelectorAll<HTMLElement>('*') ?? [])) {
         expect(el.style.borderTop).toBe('');
@@ -82,7 +82,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     const container = renderCard({ gross: 82, course_par: 71, net: 76, course_handicap: 6, birdies: 4 });
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
     expect(strip?.getAttribute('data-explore-stat-layout')).toBe('figures-only');
-    expect(statKinds(container)).toEqual([]);
+    expect(statKinds(container)).toEqual(['net', 'vs-hcp']);
     expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
     expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('76');
     expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')?.textContent).toBe('+5');
@@ -125,7 +125,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(sentence).not.toBeNull();
     const subline = container.querySelector<HTMLElement>('[data-explore-achievement-subline="true"]');
     expect(subline?.textContent).toBe('2 shots better');
-    expect(subline?.style.color).toBe('rgb(106, 114, 128)');
+    expect(subline?.style.color).toBe('rgba(248, 250, 252, 0.62)');
     expect(subline?.style.whiteSpace).toBe('nowrap');
     expect(subline?.style.borderTop).toBe('');
     // The sentence must not live inside the achievement label cell any more.
