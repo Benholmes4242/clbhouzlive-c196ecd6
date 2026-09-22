@@ -811,7 +811,7 @@ export function ExploreCard({
         color: 'rgba(248,250,252,0.80)',
         textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
         display: '-webkit-box',
-        WebkitLineClamp: 2,
+        WebkitLineClamp: 3,
         WebkitBoxOrient: 'vertical',
         overflow: 'hidden',
         overflowWrap: 'break-word',
