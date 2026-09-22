@@ -395,7 +395,7 @@ describe('Explore card shapes', () => {
     expect(container.textContent?.match(/You/g)).toHaveLength(1);
   });
 
-  it('moves a round course and date into the identity second line', () => {
+  it('moves a round course and date into separate identity lines', () => {
     const item = {
       ...round(),
       ring: 'county' as const,
@@ -406,7 +406,9 @@ describe('Explore card shapes', () => {
       <ExploreCard item={item} size="std" shape={null} onTap={() => undefined} />,
     );
     expect(container.querySelector('[data-explore-kicker="true"]')).toBeNull();
-    expect(container.querySelector('[data-round-identity-meta="true"]')?.textContent).toContain('The Addington Golf Club');
+    expect(container.querySelector('[data-round-identity-meta="true"]')).toBeNull();
+    expect(container.querySelector('[data-round-identity-course="true"]')?.textContent).toBe('The Addington Golf Club');
+    expect(container.querySelector('[data-round-identity-date="true"]')?.textContent).toBeTruthy();
   });
 
   it('renders no standalone kicker for club-ring and record rounds', () => {

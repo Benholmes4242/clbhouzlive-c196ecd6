@@ -363,8 +363,8 @@ export function RoundStatStrip({
         subline: callout.margin != null && callout.margin > 0
           ? t('amateur.stream.callout.recordMargin', {
               count: callout.margin,
-              defaultValue_one: '{{count}} shot better',
-              defaultValue_other: '{{count}} shots better',
+              defaultValue_one: '{{count}} shot better than the previous course record',
+              defaultValue_other: '{{count}} shots better than the previous course record',
             })
           : null,
       };
@@ -383,8 +383,8 @@ export function RoundStatStrip({
         subline: callout.delta != null && callout.delta > 0
           ? t('amateur.stream.callout.rankUpBy', {
               count: callout.delta,
-              defaultValue_one: 'Up one place',
-              defaultValue_other: 'Up {{count}} places',
+              defaultValue_one: 'Up one place on the course leaderboard',
+              defaultValue_other: 'Up {{count}} places on the course leaderboard',
             })
           : null,
       };
@@ -394,10 +394,23 @@ export function RoundStatStrip({
       case 'birdies': return {
         icon: <BirdieCountIcon count={callout.count} />,
         tag: null,
-        label: featLabelFor(callout.feats),
-        subline: null,
+        label: callout.feats.length > 1
+          ? featLabelFor(callout.feats)
+          : t('amateur.stream.callout.birdieRun', 'Birdie run'),
+        subline: callout.feats.length > 1
+          ? null
+          : t('amateur.stream.callout.birdiesSub', {
+              count: callout.count,
+              defaultValue_one: 'One birdie in a single round',
+              defaultValue_other: '{{count}} birdies in a single round',
+            }),
       };
-      case 'clean': return { icon: <AchievementEmoji glyph="🛡️" tier={tier} />, tag: null, label: featLabelFor(callout.feats), subline: null };
+      case 'clean': return {
+        icon: <AchievementEmoji glyph="🛡️" tier={tier} />,
+        tag: null,
+        label: featLabelFor(callout.feats),
+        subline: t('amateur.stream.callout.bogeyFreeSub', 'Par or better on every hole'),
+      };
     }
   })();
 
@@ -410,15 +423,11 @@ export function RoundStatStrip({
     : null;
   const tag = achievement?.tag ?? rareTag;
 
-  /* §3 — THE QUALIFIER SENTENCE GETS ITS OWN ROW, full card width, directly
-     beneath the label row, muted, one line, NO divider above it, on EVERY pill
-     that has one. The subline ("11 shots better") and the rarity sentence
-     ("Only the second clbhouz member to achieve this.") both live here, never
-     inside the label cell and never under a rule. */
+  /* The qualifier and rarity copy sit beneath the label, sharing its left edge.
+     They wrap naturally rather than clipping on narrow cards. */
   const hasSentence = Boolean(achievement.subline) || tier !== 'ink';
 
   return (
-    <>
     <span
       data-explore-stat-strip="round"
       data-explore-callout-tier={tier}
@@ -436,48 +445,42 @@ export function RoundStatStrip({
         boxSizing: 'border-box',
       }}
     >
-      <span style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0, boxSizing: 'border-box' }}>
-          <span
-            data-explore-stat="achievement"
-            data-explore-callout={callout?.kind}
-            style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 52, alignItems: 'center', gap: 8, padding: '8px 10px', boxSizing: 'border-box' }}
-          >
-            <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px`, color: SC_FILL_GOLD }}>{achievement.icon}</span>
-            <span style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 7 }}>
-              <span
-                data-explore-achievement-label="true"
-                style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'normal' }}
-              >
-                {achievement.label}
-              </span>
-              {tag ? (
-                <span
-                  data-explore-achievement-tag="true"
-                  style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap' }}
-                >
-                  {tag}
-                </span>
-              ) : null}
-            </span>
-          </span>
-      </span>
-      {hasSentence ? (
-        <span
-          data-explore-achievement-sentence="true"
-          style={{ display: 'block', width: '100%', boxSizing: 'border-box', padding: '0 10px 8px', marginTop: -2 }}
-        >
-          {achievement.subline ? (
+      <span
+        data-explore-stat="achievement"
+        data-explore-callout={callout.kind}
+        style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, alignItems: 'center', gap: 8, padding: '8px 10px', boxSizing: 'border-box' }}
+      >
+        <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px`, color: SC_FILL_GOLD }}>{achievement.icon}</span>
+        <span style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0, alignItems: 'flex-start' }}>
+          {tag ? (
             <span
-              data-explore-achievement-subline="true"
-              style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap' }}
+              data-explore-achievement-tag="true"
+              style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap', marginBottom: 5 }}
             >
-              {achievement.subline}
+              {tag}
             </span>
           ) : null}
-          {rarity}
+          <span
+            data-explore-achievement-label="true"
+            style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'normal' }}
+          >
+            {achievement.label}
+          </span>
+          {hasSentence ? (
+            <span data-explore-achievement-sentence="true" style={{ display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 5 }}>
+              {achievement.subline ? (
+              <span
+                  data-explore-achievement-subline="true"
+                  style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE }}
+              >
+                  {achievement.subline}
+              </span>
+              ) : null}
+              {rarity}
+            </span>
+          ) : null}
         </span>
-      ) : null}
+      </span>
     </span>
-    </>
   );
 }

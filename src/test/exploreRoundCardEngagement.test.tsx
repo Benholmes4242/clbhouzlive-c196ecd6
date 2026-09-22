@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ExploreCard, type RoundCardEngagement } from '@/features/explore-magazine/ExploreCard';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
+import { playDateFull } from '@/features/explore-magazine/exploreCopy';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
 afterEach(cleanup);
@@ -35,11 +36,27 @@ describe('Explore round-card who-line engagement', () => {
     const view = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement()} />);
     expect(view.container.querySelector('[data-explore-stat-strip="round"]')).toBeNull();
     expect(view.container.querySelector('[data-round-identity-row="true"]')).not.toBeNull();
-    expect(view.container.querySelector('[data-round-identity-meta="true"]')?.textContent).toContain('Test Course');
+    expect(view.container.querySelector('[data-round-identity-meta="true"]')).toBeNull();
+    expect(view.container.querySelector('[data-round-identity-course="true"]')?.textContent).toBe('Test Course');
+    expect(view.container.querySelector('[data-round-identity-date="true"]')?.textContent).toBe(playDateFull('2026-09-15'));
     expect(view.container.querySelector('[data-round-identity-figures="true"]')?.textContent).toContain('NET76VS HCP+4');
     expect(view.container.querySelector('[data-round-reactions-row="true"] [data-round-reactions="controls"]')).not.toBeNull();
     expect(view.container.querySelector('[data-explore-headline="true"]')).toBeNull();
     expect(view.container.querySelector('[data-explore-kicker="true"]')).toBeNull();
+  });
+
+  it('keeps course and full play date on separate lines and includes a prior year', () => {
+    const priorYear = `${new Date().getFullYear() - 1}-09-13`;
+    const view = render(
+      <ExploreCard item={{ ...item, facts: { ...item.facts, play_date: priorYear } }} size="std" onTap={vi.fn()} engagement={engagement()} />,
+    );
+    const course = view.container.querySelector<HTMLElement>('[data-round-identity-course="true"]');
+    const date = view.container.querySelector<HTMLElement>('[data-round-identity-date="true"]');
+    expect(course?.textContent).toBe('Test Course');
+    expect(course?.style.textOverflow).toBe('ellipsis');
+    expect(date?.textContent).toBe(playDateFull(priorYear));
+    expect(date?.textContent).toContain(String(new Date().getFullYear() - 1));
+    expect(date?.style.textOverflow).toBe('');
   });
 
   it('shows both controls with a post and only the available subset without one', () => {

@@ -105,8 +105,8 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(vsHandicapLabel(74, 71)).toBe('+3');
     expect(vsHandicapLabel(71, 71)).toBe('Level');
     const under = renderCard({ gross: 76, course_par: 71, net: 70, course_handicap: 6 });
-    expect((under.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color)
-      .toBe((under.querySelector('[data-explore-stat-value="vs-hcp"]') as HTMLElement).style.color);
+    expect((under.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
+    expect((under.querySelector('[data-explore-stat-value="vs-hcp"]') as HTMLElement).style.color).not.toBe('rgb(248, 250, 252)');
     const over = renderCard({ gross: 80, course_par: 71, net: 74, course_handicap: 6 });
     expect((over.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
   });
@@ -117,7 +117,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(container.querySelector('[data-explore-chip="hcp"]')).toBeNull();
   });
 
-  it('gives the qualifier sentence its own muted full-width row beneath the label row', () => {
+  it('aligns the tag, label and wrapping qualifier in one column beside the icon', () => {
     const container = renderCard(
       { gross: 66, record_margin: 2 },
       { consequence: { kind: 'record_taken', n: 66 } },
@@ -125,15 +125,19 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     const sentence = container.querySelector<HTMLElement>('[data-explore-achievement-sentence="true"]');
     expect(sentence).not.toBeNull();
     const subline = container.querySelector<HTMLElement>('[data-explore-achievement-subline="true"]');
-    expect(subline?.textContent).toBe('2 shots better');
+    expect(subline?.textContent).toBe('2 shots better than the previous course record');
     expect(subline?.style.color).toBe('rgba(248, 250, 252, 0.62)');
-    expect(subline?.style.whiteSpace).toBe('nowrap');
+    expect(subline?.style.whiteSpace).toBe('');
     expect(subline?.style.overflow).toBe('');
     expect(subline?.style.textOverflow).toBe('');
     expect(subline?.style.borderTop).toBe('');
-    // The sentence must not live inside the achievement label cell any more.
     const cell = container.querySelector('[data-explore-stat="achievement"]');
-    expect(cell?.querySelector('[data-explore-achievement-subline="true"]')).toBeNull();
+    const tag = cell?.querySelector('[data-explore-achievement-tag="true"]');
+    const label = cell?.querySelector('[data-explore-achievement-label="true"]');
+    expect(cell?.querySelector('[data-explore-achievement-subline="true"]')).not.toBeNull();
+    expect(tag?.compareDocumentPosition(label as Node) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(label?.compareDocumentPosition(subline as Node) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect((cell as HTMLElement).style.minHeight).toBe('');
   });
 });
 
@@ -154,13 +158,13 @@ describe('amended achievement priority', () => {
       { gross: 66, record_margin: 2 },
       { consequence: { kind: 'record_taken', n: 66 } },
     );
-    expect(record.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('2 shots better');
+    expect(record.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('2 shots better than the previous course record');
 
     const singular = renderCard(
       { gross: 67, record_margin: 1 },
       { consequence: { kind: 'record_taken', n: 67 } },
     );
-    expect(singular.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('1 shot better');
+    expect(singular.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('1 shot better than the previous course record');
 
     const noRunnerUp = renderCard(
       { gross: 66, record_margin: null },
@@ -172,7 +176,7 @@ describe('amended achievement priority', () => {
       { gross: 70 },
       { consequence: { kind: 'rank_up', n: 3, delta: 2 } },
     );
-    expect(movement.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('Up 2 places');
+    expect(movement.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('Up 2 places on the course leaderboard');
     expect(calloutFor(round({ gross: 70 }, { consequence: { kind: 'rank_up', n: 3, delta: 2 } })))
       .toEqual({ kind: 'rank_up', rank: 3, delta: 2 });
   });
@@ -201,7 +205,7 @@ describe('achievement tag and label copy', () => {
     { facts: { albatrosses: 1 }, tag: 'RARE', label: 'Albatross' },
     { facts: { eagles: 2 }, tag: 'RARE', label: '2 eagles' },
     { facts: { eagles: 1 }, tag: null, label: 'Eagle' },
-    { facts: { birdies: 5 }, tag: null, label: '5 birdies' },
+    { facts: { birdies: 5 }, tag: null, label: 'Birdie run' },
     { facts: { clean_card: true }, tag: null, label: 'Bogey-free' },
   ];
 
@@ -221,6 +225,19 @@ describe('achievement tag and label copy', () => {
     expect(labelNode?.textContent).toBe(label);
     expect(labelNode?.style.textOverflow).not.toBe('ellipsis');
     expect(labelNode?.style.whiteSpace).toBe('normal');
+  });
+
+  it('adds the clean-card and single birdie qualifiers but preserves a multi-feat label', () => {
+    const clean = renderCard({ gross: 70, clean_card: true });
+    expect(clean.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('Par or better on every hole');
+
+    const birdies = renderCard({ gross: 70, birdies: 5 });
+    expect(birdies.querySelector('[data-explore-achievement-label="true"]')?.textContent).toBe('Birdie run');
+    expect(birdies.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('5 birdies in a single round');
+
+    const multi = renderCard({ gross: 70, eagles: 1, birdies: 5 });
+    expect(multi.querySelector('[data-explore-achievement-label="true"]')?.textContent).toBe('Eagle + 5 birdies');
+    expect(multi.querySelector('[data-explore-achievement-subline="true"]')).toBeNull();
   });
 
   it.each([
