@@ -2806,8 +2806,18 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
     }
   }
 
-  const newTopUser = arr[0]?.user_id ?? null;
-  if (newTopUser !== prevTopUser) {
+  // BRIEF_LEGEND_JOINT_RANKS §2 — THE CROWN PATH IS SET-BASED.
+  // With joint ranks a board can carry several rank-1 holders, so a single
+  // element cannot represent the top of the board. Compare the SETS:
+  //   in new, not old -> legend_earned
+  //   in old, not new -> legend_lost
+  //   in both         -> NOTHING. Keeping a share of a record is neither
+  //                      earning nor losing, and the member is told neither.
+  const { earned: crownEarned, lost: crownLost } = crownSetDelta(
+    (prev ?? []).map((r: any) => ({ user_id: r.user_id, rank: r.rank })),
+    ranked,
+  );
+  if (crownEarned.length > 0 || crownLost.length > 0) {
     // §3 — computed once for both sides. The board write above has ALREADY
     // happened, so a suppressed notice never changes what is true, only who is
     // told. This sits BEFORE enqueueNotification, so a suppressed row never
@@ -2847,30 +2857,36 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       courseName = course?.name?.trim() || null;
     } catch { /* non-fatal */ }
 
-    if (prevTopUser) {
-      if (newTopUser && notify) {
-        // Look up taker display name from user_profiles ONLY. Same PII rule as
-        // above; degrades to null. Loser side only — meaningless to the gainer.
-        let takerName: string | null = null;
-        try {
-          const { data: takerProfile } = await supabase
-            .from('user_profiles')
-            .select('display_name, username')
-            .eq('id', newTopUser)
-            .maybeSingle();
-          takerName = (takerProfile?.display_name?.trim() || takerProfile?.username?.trim() || null);
-        } catch { /* non-fatal */ }
+    // The taker named on the loser's push is a member who ENTERED the rank-1
+    // set. With joint ranks there can be more than one; the first is named,
+    // exactly as the single-holder path named the one there was.
+    const takerId = crownEarned[0] ?? null;
+    let takerName: string | null = null;
+    if (crownLost.length > 0 && takerId && notify) {
+      // Look up taker display name from user_profiles ONLY. Same PII rule as
+      // above; degrades to null. Loser side only — meaningless to the gainer.
+      try {
+        const { data: takerProfile } = await supabase
+          .from('user_profiles')
+          .select('display_name, username')
+          .eq('id', takerId)
+          .maybeSingle();
+        takerName = (takerProfile?.display_name?.trim() || takerProfile?.username?.trim() || null);
+      } catch { /* non-fatal */ }
+    }
 
+    for (const lostUser of crownLost) {
+      if (takerId && notify) {
         // NOTE: the DB trigger gam_legend_pulse_emit (on gam_course_legends
         // INSERT) already enqueued this exact legend_lost row a few lines up,
         // with the SAME deduplication_key. So this upsert always no-ops and
         // returns zero rows, which means writeActivityRow() never runs here —
         // the Activity mirror for legend_lost lives in that trigger. Keep the
         // two copies identical; do not "fix" the missing ledger row here.
-        await enqueueNotification(prevTopUser, "legend_lost", {
+        await enqueueNotification(lostUser, "legend_lost", {
           course_id: courseId,
           category: cfg.category,
-          taken_by: newTopUser,
+          taken_by: takerId,
           taker_name: takerName,
           course_name: courseName,
           // §2 — enqueueNotification reads trigger_whs_score_id from here.
@@ -2881,11 +2897,12 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       }
       // Loser side: their rank-1 count went down — recompute authoritatively.
       // Runs regardless of the notification gate: titles are truth, not telling.
-      await recomputeLegendTitles(prevTopUser);
+      await recomputeLegendTitles(lostUser);
     }
-    if (newTopUser) {
+
+    for (const earnedUser of crownEarned) {
       if (notify) {
-        await enqueueNotification(newTopUser, "legend_earned", {
+        await enqueueNotification(earnedUser, "legend_earned", {
           course_id: courseId,
           category: cfg.category,
           course_name: courseName,
@@ -2894,7 +2911,7 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       }
 
       // Gainer side: single code path for the tiered badge + milestone.
-      await recomputeLegendTitles(newTopUser);
+      await recomputeLegendTitles(earnedUser);
     }
   }
 }
