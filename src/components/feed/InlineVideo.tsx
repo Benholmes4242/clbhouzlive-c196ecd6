@@ -42,8 +42,10 @@ import {
 } from '@/perf/vperf';
 import { isPerfEnabled } from '@/perf/navTiming';
 
-/** Three animated bars — the playing marker, shared with the Discover rails. */
-function PlayingBars() {
+/** Three animated bars — the playing marker, shared with the Discover rails.
+    EXPORTED for the Explore lead-review tile, whose duration badge is this
+    badge (InlineVideo's) verbatim — same chip, same bars, same countdown. */
+export function PlayingBars() {
   return (
     <span className="media-rail-bars" aria-hidden>
       <i />
