@@ -357,6 +357,23 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: '/explore' }, tone: 'light', bleed: false },
   },
 
+  // ── /round/:whsScoreId — a round's own address (BRIEF_ROUND_PAGE).
+  // Reached by a shared link, a push tap into a cold app, or a
+  // notification when the overlay route is not in play. The logo
+  // default was wrong twice over: it offered no way back, and it sent
+  // a tap to /clubhouse. Back, with the same fallback RoundPage's own
+  // goBack() uses, so the island and the page agree.
+  {
+    match: { prefix: '/round/' },
+    spec: {
+      chrome: 'island',
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/handicap' },
+      tone: 'dark',
+      bleed: false,
+      hideHcp: true,
+    },
+  },
+
   // Discover landing / other discover routes.
   { match: { prefix: '/discover' },               spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: false } },
 ];
