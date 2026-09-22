@@ -581,38 +581,67 @@ const REVIEW_BREAKDOWN_AREAS = [
   ['facilities', 'facilities'],
 ] as const;
 
-function ReviewBreakdownRail({ breakdown }: { breakdown: ReviewBreakdown | undefined }) {
+/**
+ * C5 §3.3 GROUP TWO — THE STAT STRIP, and it is NOT A NEW SHAPE: it is the
+ * object the round card already draws for PAR / NET / VS HCP (RoundStatStrip's
+ * FigureCell), in the on-photo palette this card needs. Only the bars are gone.
+ *
+ * The all-or-none guard, the label keys and the aria-labels carry over from the
+ * retired breakdown rail unchanged (§3.4, §4.4): the numerals are visible now,
+ * but each item's label still carries the unit.
+ */
+function ReviewStatStrip({ breakdown }: { breakdown: ReviewBreakdown | undefined }) {
   const { t } = useTranslation('courses');
   if (!breakdown || REVIEW_BREAKDOWN_AREAS.some(([field]) => breakdown[field] == null)) return null;
 
   return (
     <ul
-      data-review-breakdown-rail="true"
-      style={{ listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, margin: 0, padding: 0 }}
+      data-review-stat-strip="true"
+      style={{
+        listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+        gap: 0, margin: 0, marginTop: 11, padding: '11px 0 0',
+        borderTop: '1px solid rgba(255,255,255,0.20)',
+      }}
     >
-      {REVIEW_BREAKDOWN_AREAS.map(([field, labelKey]) => {
+      {REVIEW_BREAKDOWN_AREAS.map(([field, labelKey], index) => {
         const score = breakdown[field] as number;
         const label = t(`review.subscore.${labelKey}`);
         const outOfTen = t('statBrowse.reviews.outOfTen');
-        const tone = courseSubScoreTone(score);
+        /* ONE HOME FOR THE 9.0 THRESHOLD (§5): the helper decides, never this
+           card. Below it the numeral takes the on-photo light ink, because
+           A.MUTE is a dark-canvas token and this sits on a photograph. */
+        const tone = courseSubScoreTone(score) === A.GREEN ? A.GREEN : 'rgba(255,255,255,0.92)';
         return (
-          <li key={field} aria-label={`${label} ${score.toFixed(1)} ${outOfTen}`} style={{ minWidth: 0 }}>
+          <li
+            key={field}
+            aria-label={`${label} ${score.toFixed(1)} ${outOfTen}`}
+            style={{
+              minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+              borderLeft: index === 0 ? undefined : '1px solid rgba(255,255,255,0.16)',
+            }}
+          >
             <span
               aria-hidden="true"
               title={label}
               style={{
-                display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                display: 'block', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 color: PHOTO_REVIEW_LABEL, fontFamily: SANS, fontSize: 8, fontWeight: 700,
                 letterSpacing: '0.10em', textTransform: 'uppercase', textShadow: HERO_TEXT_SHADOW,
               }}
             >
               {label}
             </span>
-            <span aria-hidden style={{ display: 'block', height: 3, marginTop: 5, borderRadius: 2, background: PHOTO_REVIEW_TRACK }}>
-              <span
-                data-review-breakdown-fill={field}
-                style={{ display: 'block', width: `${Math.max(0, Math.min(100, score * 10))}%`, height: '100%', borderRadius: 2, background: tone === A.GREEN ? A.GREEN : PHOTO_REVIEW_FILL }}
-              />
+            <span
+              aria-hidden="true"
+              data-review-stat-value={field}
+              style={{
+                fontFamily: SANS, fontSize: 17, fontWeight: 800, lineHeight: 1, color: tone,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                fontFeatureSettings: '"tnum" 1, "zero" 1',
+                textShadow: HERO_TEXT_SHADOW,
+              }}
+            >
+              {score.toFixed(1)}
             </span>
           </li>
         );
