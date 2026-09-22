@@ -67,3 +67,9 @@
 - [x] Render lowercase `· thru N` beside partial feed scores; leave complete and WHS fallback output unchanged.
 - [x] Prove partial eighteen, complete eighteen, complete nine, and picked-up fallback behavior.
 - [x] Report every other `roundScore` consumer without changing it; run the full suite and typecheck.
+
+## BRIEF_LEGEND_JOINT_RANKS — done
+- `legendRanks.ts`: `assignCompetitionRanks` (1224, equality on `Number(value).toFixed(6)`, never `===`) + `crownSetDelta` (rank-1 set diff). Sort order untouched.
+- `recomputeLegend`: one `ranked` array feeds the write-skip signature AND the insert; crown path is set-based — enter = legend_earned, leave = legend_lost, in both = nothing; `recomputeLegendTitles` runs for every entering or leaving user.
+- Historic silence: `isTriggerFreshForCrownNotice` (LEGEND_NOTIFY_MAX_AGE_DAYS = 2 on play_date) + all-time-only gate. No new suppression added.
+- [ ] Ben runs the backfill requeue after deploy (read-only survey: 174 boards, 325 rows change rank, 99 become joint first).
