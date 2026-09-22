@@ -1,4 +1,5 @@
 import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
+import { roundCoursePar } from '@/lib/whs/api';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MapPin, Share, User } from 'lucide-react';
@@ -49,6 +50,12 @@ export interface CardScorecardHole {
   strokes: number | null;
   /** Optional field average retained for course-context comparisons. */
   fieldAvg?: number | null;
+  /**
+   * BRIEF_SCORECARD_HEAD_PAR — `whs_score_holes.played`, as the evaluator reads
+   * it. Only `played === true` counts towards the round par; absent or null is
+   * NOT complete. Never substituted by a truthiness test on strokes.
+   */
+  played?: boolean | null;
 }
 
 export interface CardScorecardRounds {
@@ -88,6 +95,13 @@ export interface CardScorecardSheetProps {
   courseSlope?: number | null;
   // MIDDLE
   holes: CardScorecardHole[];
+  /**
+   * BRIEF_SCORECARD_HEAD_PAR — the round's DECLARED length
+   * (whs_scores.total_holes). The head's round par is only summed when every
+   * hole of this length is present, played and carries a par. ABSENT MEANS NO
+   * PAR: it is never inferred from the number of hole rows.
+   */
+  totalHoles?: number | null;
   nineHole?: boolean;
   rounds?: CardScorecardRounds;
   heroMuted?: boolean;
@@ -312,7 +326,7 @@ export interface CardScorecardEngagement {
 export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   open, onClose, eyebrowText,
   courseName, courseLocation, coursePar, courseSlope,
-  holes, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
+  holes, totalHoles = null, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
   playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
@@ -636,17 +650,19 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const backSummary = back.length > 0 ? nineSummary(back) : null;
   const cardGross = outSummary.strokes + (backSummary?.strokes ?? 0);
   const cardTotalPar = outSummary.par + (backSummary?.par ?? 0);
-  const totalPar = played.reduce((s, h) => s + (h.par as number), 0);
   /**
-   * S1.3 — WHICH PAR THE ROUND IS SHOWN AGAINST. A completed card (18 or a
-   * genuine nine) reads against the card's own par, exactly as before. A round
-   * still in progress reads against the par of the holes played — the same par
-   * totals.toPar is measured against — so the figures agree with each other.
-   * cardGross and cardTotalPar are untouched: the invariant and the DEV warning
-   * above keep their original inputs.
+   * BRIEF_SCORECARD_HEAD_PAR — THE ROUND PAR HAS ONE SOURCE, roundCoursePar.
+   * A par summed from an incomplete card is not a par: every hole of the
+   * round's DECLARED length (whs_scores.total_holes, threaded in as totalHoles)
+   * must be present, played and carry a par, or the par is NULL and the head
+   * prints none. The declared length is never inferred from holes.length — an
+   * incomplete card has fewer rows, so that inference always agrees with
+   * itself and is always wrong. cardGross, cardTotalPar and the per-nine
+   * OUT / IN figures are untouched: only the ROUND par changed.
    */
+  const roundPar = roundCoursePar(holes.map((h) => ({ par: h.par, played: h.played })), totalHoles ?? null);
   const allHolesPlayed = holes.length > 0 && played.length === holes.length;
-  const shownPar = allHolesPlayed ? cardTotalPar : totalPar;
+  const shownPar = roundPar;
   /* FOLLOW-UP A — the not-played line is drawn from the SAME hole rows the card
      draws, so the line and the marks on the grid can never disagree. */
   const hasUnplayedHole = holes.length > 0 && !allHolesPlayed;
@@ -664,11 +680,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     if (totals.played && cardGross !== totals.gross) {
       console.warn('[CardScorecardSheet] gross mismatch', { cardGross, gross: totals.gross });
     }
-    // Par can legitimately differ mid-round: cardTotalPar counts every hole on
-    // the card, totalPar only the holes played (which is what to-par is measured
-    // against). Flag it so a full-round disagreement is not mistaken for that.
-    if (totals.played && cardTotalPar !== totalPar && played.length === holes.length) {
-      console.warn('[CardScorecardSheet] par mismatch', { cardTotalPar, totalPar });
+    // A complete card's round par and the sum of the two nines must agree. A
+    // NULL round par is not a disagreement — it is an incomplete card, which is
+    // exactly what the rule is for.
+    if (totals.played && roundPar != null && cardTotalPar !== roundPar) {
+      console.warn('[CardScorecardSheet] par mismatch', { cardTotalPar, roundPar });
     }
   }
 

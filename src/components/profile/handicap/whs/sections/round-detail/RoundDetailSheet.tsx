@@ -52,7 +52,13 @@ function strokesOf(h: WhsScoreHole): number | null {
  */
 export interface RoundDetailSeed {
   scoreId: string;
-  holes: { holeNo: number; par: number | null; strokes: number | null }[];
+  holes: { holeNo: number; par: number | null; strokes: number | null; played?: boolean | null }[];
+  /**
+   * BRIEF_SCORECARD_HEAD_PAR — the round's declared length
+   * (whs_scores.total_holes) when the seeding path knows it. ABSENT MEANS THE
+   * PREVIEW SHOWS NO ROUND PAR; it is never inferred from the seeded rows.
+   */
+  totalHoles?: number | null;
   gross: number | null;
   toPar: number | null;
   courseName: string;
@@ -205,6 +211,9 @@ export const RoundDetailSheet: React.FC<Props> = ({
       par: h.par ?? null,
       strokes: strokesOf(h),
       fieldAvg: fieldByHole.get(h.hole_no) ?? null,
+      /* BRIEF_SCORECARD_HEAD_PAR — the head's round par counts played === true
+         holes only, the evaluator's strict identity check. */
+      played: h.played ?? null,
     })),
     [sortedHoles, fieldByHole],
   );
@@ -223,7 +232,10 @@ export const RoundDetailSheet: React.FC<Props> = ({
       ? seed.holes
           .slice()
           .sort((a, b) => a.holeNo - b.holeNo)
-          .map((h) => ({ holeNo: h.holeNo, par: h.par, strokes: h.strokes, fieldAvg: null }))
+          .map((h) => ({
+            holeNo: h.holeNo, par: h.par, strokes: h.strokes, fieldAvg: null,
+            played: h.played ?? null,
+          }))
       : []),
     [seedUsable, seed],
   );
@@ -429,6 +441,10 @@ export const RoundDetailSheet: React.FC<Props> = ({
       coursePar={coursePar}
       courseSlope={courseSlope}
       holes={shownHoles}
+      /* BRIEF_SCORECARD_HEAD_PAR — the declared length the head's par is gated
+         on. While a seed draws the card the fetch has not landed, so there is
+         no declared length and the head shows no round par. */
+      totalHoles={usingSeed ? (seed?.totalHoles ?? null) : (userData?.total_holes ?? null)}
       holesSettled={shownHoles.length > 0 || roundSettled}
       settleKey={settleKey}
       nineHole={!!userData?.is_nine_hole}

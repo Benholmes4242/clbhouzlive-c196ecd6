@@ -15,6 +15,8 @@
  */
 
 import React from 'react';
+
+import { roundCoursePar } from '@/lib/whs/api';
 import { useTranslation } from 'react-i18next';
 
 import type { RoundDetailSeed } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
@@ -47,13 +49,26 @@ export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
   const holes = (seed?.holes ?? [])
     .slice()
     .sort((a, b) => a.holeNo - b.holeNo)
-    .map((h) => ({ holeNo: h.holeNo, par: h.par, strokes: h.strokes, fieldAvg: null }));
+    .map((h) => ({
+      holeNo: h.holeNo, par: h.par, strokes: h.strokes, fieldAvg: null,
+      played: h.played ?? null,
+    }));
   const played = holes.filter((h) => h.strokes != null && h.strokes > 0 && h.par != null);
   const hasCard = played.length > 0;
   const out = holes.filter((h) => h.holeNo <= 9);
   const back = holes.filter((h) => h.holeNo > 9);
   const hasUnplayedHole = holes.length > 0 && played.length !== holes.length;
-  const shownPar = played.reduce((s, h) => s + (h.par as number), 0);
+  /**
+   * BRIEF_SCORECARD_HEAD_PAR — ONE SOURCE FOR THE ROUND PAR, roundCoursePar.
+   * The seed carries no declared length (whs_scores.total_holes) and its rows
+   * carry no `played`, so the preview's par is NULL and the head prints none.
+   * That is deliberate: inferring the length from the number of seeded rows is
+   * the exact fault this rule exists to prevent.
+   */
+  const shownPar = roundCoursePar(
+    holes.map((h) => ({ par: h.par, played: h.played })),
+    seed?.totalHoles ?? null,
+  );
 
   return (
     <div
