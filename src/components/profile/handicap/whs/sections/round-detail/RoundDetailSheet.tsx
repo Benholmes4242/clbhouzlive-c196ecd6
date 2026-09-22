@@ -242,12 +242,14 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
   const shownHoles = usingSeed ? seedCardHoles : cardHoles;
 
-  const totalPar = sortedHoles.reduce((a, h) => a + (h.par ?? 0), 0);
+  /* A par summed from an incomplete card is not a par — ONE rule, shared with
+     the evaluator (roundCoursePar). Null par means no to-par, never a wrong one. */
+  const totalPar = roundCoursePar(sortedHoles, userData?.total_holes ?? null);
 
   const grossVal = userData
     ? (userData.adjusted_gross ?? userData.actual_gross ?? null)
     : null;
-  const toParVal = (grossVal != null && totalPar > 0) ? grossVal - totalPar : null;
+  const toParVal = (grossVal != null && totalPar != null) ? grossVal - totalPar : null;
   // 'unavailable' stays reachable — but only once the query HAS run and
   // returned nothing (deleted score, or RLS-blocked for this viewer).
   const emptyVariant: 'syncing' | 'nohbh' | 'unavailable' =
