@@ -88,8 +88,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   const { data: myRounds } = useMyRoundsAtCourse(courseId);
   const { data: rating } = useUserCourseRating(courseId, user?.id);
   const { courseRecord, unclaimedCount } = useCourseRecordSummary(courseId, user?.id ?? null);
-  /* Scoped to this course; only read once the member is known to have played. */
-  const { data: standings } = useMemberStandings(user?.id, settled && hasTrackedRounds, courseId);
 
   const [openRoundId, setOpenRoundId] = React.useState<string | null>(null);
 
