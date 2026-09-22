@@ -416,9 +416,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const isOwner = !isTour && (subjectIsViewer ?? (!!playerUserId && !!user?.id && playerUserId === user.id));
   const scopeVoice = useMemo(() => {
     if (isOwner) return { subjectName: t('courses:scorecard.scopeYou'), subject: t('courses:scorecard.scopeYou'), possessive: t('courses:scorecard.scopeYour'), verb: t('courses:scorecard.scopeHave') };
-    if (playerGender === 'male') return { subjectName: playerName, subject: t('courses:scorecard.scopeHe'), possessive: t('courses:scorecard.scopeHis'), verb: t('courses:scorecard.scopeHas') };
-    if (playerGender === 'female') return { subjectName: playerName, subject: t('courses:scorecard.scopeShe'), possessive: t('courses:scorecard.scopeHer'), verb: t('courses:scorecard.scopeHas') };
-    return { subjectName: playerName, subject: t('courses:scorecard.scopeThey'), possessive: t('courses:scorecard.scopeTheir'), verb: t('courses:scorecard.scopeHave') };
+    const namedPossessive = playerName.endsWith('s') ? `${playerName}'` : `${playerName}'s`;
+    if (playerGender === 'male') return { subjectName: namedPossessive, subject: t('courses:scorecard.scopeHe'), possessive: t('courses:scorecard.scopeHis'), verb: t('courses:scorecard.scopeHas') };
+    if (playerGender === 'female') return { subjectName: namedPossessive, subject: t('courses:scorecard.scopeShe'), possessive: t('courses:scorecard.scopeHer'), verb: t('courses:scorecard.scopeHas') };
+    return { subjectName: namedPossessive, subject: t('courses:scorecard.scopeThey'), possessive: t('courses:scorecard.scopeTheir'), verb: t('courses:scorecard.scopeHave') };
   }, [isOwner, playerGender, playerName, t]);
 
 

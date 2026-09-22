@@ -114,7 +114,7 @@
    "best": "Best here",
    "second": "2nd here",
    "third": "3rd here",
-   "topTen": "Top ten here",
+      "topTen": "Top ten",
    "ordinal": "{{place}} of {{count}}"
   },
   "columns": {
