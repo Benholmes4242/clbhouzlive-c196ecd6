@@ -1849,7 +1849,10 @@ async function legendTitleTier(count: number): Promise<number> {
   return tiers ? computeTier(count, tiers) : 0;
 }
 
-async function recomputeLegendTitles(userId: string) {
+// triggerPlayDate: the play_date of the round that caused this recompute, when
+// there is one (applyCourseLegends' LegendTrigger). Callers with no triggering
+// round — the recompute action, one-off rebuilds — pass null and stay silent.
+async function recomputeLegendTitles(userId: string, triggerPlayDate: string | null = null) {
   const count = await computeContestedTitleCount(userId);
   const nowIso = new Date().toISOString();
 
@@ -1871,8 +1874,9 @@ async function recomputeLegendTitles(userId: string) {
 
   if (count > 0) {
     // upsertBadgeTiered handles the row + tier progression + notification.
-    // Recompute, not a round: no trigger play_date, so no notification.
-    await upsertBadgeTiered(userId, "legend_at_course", count, tier, null, null);
+    // The badge_earned notice is freshness-gated on triggerPlayDate: a live
+    // round played today announces; a recompute or historic requeue stays silent.
+    await upsertBadgeTiered(userId, "legend_at_course", count, tier, null, triggerPlayDate);
   } else {
     // count === 0: user holds no contested rank-1 legends. Remove any stale badge
     // row so the trophy card falls back to the locked state cleanly.
