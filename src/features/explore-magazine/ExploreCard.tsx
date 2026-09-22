@@ -605,7 +605,7 @@ const REVIEW_BREAKDOWN_AREAS = [
 
 /**
  * C5 §3.3 GROUP TWO — THE STAT STRIP, and it is NOT A NEW SHAPE: it is the
- * object the round card already draws for PAR / NET / VS HCP (RoundStatStrip's
+ * object the round card already draws for NET / VS HCP (RoundStatStrip's
  * FigureCell), in the on-photo palette this card needs. Only the bars are gone.
  *
  * The all-or-none guard, the label keys and the aria-labels carry over from the
