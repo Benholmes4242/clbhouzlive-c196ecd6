@@ -19,6 +19,7 @@ import { render } from '@testing-library/react';
 import { roundCoursePar } from '@/lib/whs/api';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
 import { NohbhMiddle, nineSummary } from '@/features/courses/_shared/scorecard/scorecardParts';
+import { RoundCardHoleStrip } from '@/components/profile/handicap/whs/sections/round-card/RoundCardHoleStrip';
 
 const rows = (n: number, playedTo = n) =>
   Array.from({ length: n }, (_, i) => ({
@@ -40,6 +41,21 @@ const seed = (holes: ReturnType<typeof rows>, totalHoles: number | null) => ({
   playerAvatarUrl: null,
   playDate: '2026-04-11',
 });
+
+const stripRows = (source: ReturnType<typeof rows>) => source.map((hole) => ({
+  hole_no: hole.holeNo,
+  par: hole.par,
+  actual_gross: hole.strokes,
+  adjusted_gross: null,
+  played: hole.played,
+}));
+
+function stripSummary(container: HTMLElement, label: 'OUT' | 'IN'): string {
+  const labelNode = Array.from(container.querySelectorAll('div')).find(
+    (node) => node.textContent === label,
+  );
+  return labelNode?.parentElement?.lastElementChild?.textContent ?? '';
+}
 
 describe('the round par the head is shown against', () => {
   it('is 72 on a complete eighteen', () => {
@@ -70,10 +86,13 @@ const THRU_SUFFIX = 'scorecard.thruN';
 describe('the preview head prints the par only when the card is whole', () => {
   it('prints the par suffix on a complete eighteen and keeps OUT / IN at 36 each', () => {
     const { container } = render(<RoundPagePreview seed={seed(rows(18), 18)} />);
+    const strip = render(<RoundCardHoleStrip holes={stripRows(rows(18))} />);
     expect(container.textContent).toContain(PAR_SUFFIX);
     expect(roundCoursePar(rows(18), 18)).toBe(72);
     expect(nineSummary(rows(18).slice(0, 9)).par).toBe(36);
     expect(nineSummary(rows(18).slice(9)).par).toBe(36);
+    expect(stripSummary(strip.container, 'OUT')).toBe('45+9');
+    expect(stripSummary(strip.container, 'IN')).toBe('45+9');
   });
 
   it('prints thru 10 but NO par on ten of eighteen, and the front nine still reads 36', () => {
@@ -84,6 +103,9 @@ describe('the preview head prints the par only when the card is whole', () => {
     expect(container.textContent).toContain('10');
     expect(container.textContent).toContain('+2');
     expect(nineSummary(partial.holes.slice(0, 9)).par).toBe(36);
+    const strip = render(<RoundCardHoleStrip holes={stripRows(partial.holes)} />);
+    expect(stripSummary(strip.container, 'OUT')).toBe('45+9');
+    expect(stripSummary(strip.container, 'IN')).toBe('5');
   });
 
   it('prints the par on a complete nine, whose own par is 35', () => {
@@ -93,6 +115,9 @@ describe('the preview head prints the par only when the card is whole', () => {
     expect(container.textContent).not.toContain(THRU_SUFFIX);
     expect(roundCoursePar(nine, 9)).toBe(35);
     expect(nineSummary(nine).par).toBe(35);
+    const strip = render(<RoundCardHoleStrip holes={stripRows(nine)} />);
+    expect(stripSummary(strip.container, 'OUT')).toBe('45+10');
+    expect(strip.container.textContent).not.toContain('IN');
   });
 
   it('prints no par when the seed carries no declared length', () => {
