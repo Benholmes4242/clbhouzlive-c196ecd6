@@ -40,7 +40,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')?.textContent).toBe('−4');
     expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
     expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
-    expect(strip?.style.backgroundImage).toBe('none');
+    expect(strip?.style.backgroundImage).toBe('');
     expect(strip?.style.border).toBe('');
   });
 
