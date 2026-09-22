@@ -14,7 +14,7 @@
  * a par of 36 and keeps it, whatever the round par does.
  */
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 import { roundCoursePar } from '@/lib/whs/api';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
