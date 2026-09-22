@@ -870,15 +870,148 @@ export function ExploreCard({
       {storyStandfirst}
     </div>
   ) : null;
-  const reviewIdentity = leadReview
-    ? { course: kickerPartsValue.course, scope: kickerPartsValue.scope, date: kickerDate }
+  /* C5 §1 — THE MEMBER'S OWN MEDIA IS THE GROUND, the course thumbnail the
+     fallback. The order (video with a poster, then image, then course photo) is
+     resolved ONCE in useReviewPageEnrichment; this card takes one answer. */
+  const reviewMedia = leadReview ? item.facts.reviewMedia ?? null : null;
+  const reviewGround = reviewMedia
+    ? (reviewMedia.kind === 'video' ? reviewMedia.posterUrl : reviewMedia.url)
     : null;
+  const reviewName = item.who?.is_viewer
+    ? t('amateur.stream.you', 'You')
+    : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
+  const reviewRegion = leadReview
+    ? coursePlaceLine({
+        region: item.subject?.region,
+        subCountry: item.subject?.sub_country,
+        country: item.subject?.country,
+      })
+    : null;
+  /* §3.2 THE TOP LINE — identity, which the instrument layout would otherwise
+     lose. It REPLACES the who-line at the foot: a review does not carry its
+     identity twice. It sits in the 48px lane at top 12, inset 14. */
+  const reviewTopLine = leadReview ? (
+    <span
+      data-review-top-line="true"
+      style={{
+        display: 'flex', alignItems: 'center', gap: 7, minWidth: 0,
+        padding: '12px 14px 0',
+      }}
+    >
+      {item.who?.user_id ? (
+        <span
+          role={onWhoTap ? 'button' : undefined}
+          tabIndex={onWhoTap ? 0 : undefined}
+          onClick={(event) => {
+            if (!onWhoTap) return;
+            event.stopPropagation();
+            onWhoTap();
+          }}
+          onKeyDown={(event) => {
+            if (!onWhoTap || (event.key !== 'Enter' && event.key !== ' ')) return;
+            event.preventDefault();
+            event.stopPropagation();
+            onWhoTap();
+          }}
+          style={{ display: 'inline-flex', flexShrink: 0, cursor: onWhoTap ? 'pointer' : 'default' }}
+        >
+          <SquircleAvatar size={26} src={item.who.photo_url} alt={reviewName} userId={item.who.user_id} hairlineRing hideRing={false} />
+        </span>
+      ) : null}
+      <span
+        data-review-member-name="true"
+        style={{
+          flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          fontFamily: SANS, fontSize: 13, fontWeight: 700,
+          color: item.who?.is_viewer ? A.AMBER : '#FFFFFF', textShadow: HERO_TEXT_SHADOW,
+        }}
+      >
+        {reviewName}
+      </span>
+      {kickerDate ? (
+        <span
+          data-review-date="true"
+          style={{
+            marginLeft: 'auto', flex: '0 0 auto', whiteSpace: 'nowrap', fontFamily: SANS,
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.72)', textShadow: HERO_TEXT_SHADOW,
+          }}
+        >
+          {kickerDate}
+        </span>
+      ) : null}
+    </span>
+  ) : null;
+  /* §3.3 GROUP ONE — the score as a figure with its verdict, and the course with
+     its region, on ONE row. The 9.0 threshold is the helper's, never this
+     card's; below it the figure takes on-photo light ink because A.MUTE is a
+     dark-canvas token and this sits on a photograph. */
+  const reviewScoreTone = item.facts.rating != null && courseSubScoreTone(item.facts.rating) === A.GREEN
+    ? A.GREEN
+    : 'rgba(255,255,255,0.94)';
+  const reviewFoot = leadReview ? (
+    <span data-review-instrument="true" style={{ display: 'block', minWidth: 0 }}>
+      <span style={{ display: 'flex', alignItems: 'flex-end', gap: 12, minWidth: 0 }}>
+        {item.facts.rating != null ? (
+          <span style={{ display: 'flex', flexDirection: 'column', flex: '0 0 auto' }}>
+            <span
+              data-review-score="true"
+              style={{
+                fontFamily: SANS, fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
+                color: reviewScoreTone, textShadow: HERO_TEXT_SHADOW,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                fontFeatureSettings: '"tnum" 1, "zero" 1',
+              }}
+            >
+              {item.facts.rating.toFixed(1)}
+            </span>
+            <span
+              data-review-verdict="true"
+              style={{
+                marginTop: 3, fontFamily: SANS, fontSize: 8, fontWeight: 800, letterSpacing: '0.14em',
+                textTransform: 'uppercase', color: reviewScoreTone, textShadow: HERO_TEXT_SHADOW,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {getScoreTier(item.facts.rating).label}
+            </span>
+          </span>
+        ) : null}
+        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'auto', minWidth: 0, textAlign: 'right' }}>
+          {kickerPartsValue.course ? (
+            <span
+              data-review-course-name="true"
+              style={{
+                maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                fontFamily: SANS, fontSize: 16, fontWeight: 700, color: '#FFFFFF', textShadow: HERO_TEXT_SHADOW,
+              }}
+            >
+              {kickerPartsValue.course}
+            </span>
+          ) : null}
+          {reviewRegion ? (
+            <span
+              data-review-region="true"
+              style={{
+                marginTop: 3, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                fontFamily: SANS, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.62)', textShadow: HERO_TEXT_SHADOW,
+              }}
+            >
+              {reviewRegion}
+            </span>
+          ) : null}
+        </span>
+      </span>
+      <ReviewStatStrip breakdown={item.facts.breakdown} />
+    </span>
+  ) : null;
 
   const photo = (
     <CourseImageFallback
       courseId={item.subject?.course_id ?? null}
       courseName={item.subject?.course_name ?? null}
-      imageUrl={item.subject?.image_url ?? null}
+      imageUrl={reviewGround ?? item.subject?.image_url ?? null}
       pending={!!item.subject?.pending}
       flatWhenEmpty={onPhoto}
       initialsSize={size === 'pair' ? 18 : 26}
