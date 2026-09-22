@@ -50,6 +50,8 @@ import { useCourseRecordSummary } from './useCourseRecordSummary';
 import AboutSection from './about/AboutSection';
 import { YouButton, YouSentence } from './you/youBits';
 import YourRecordHere from './you/YourRecordHere';
+import WhereYouStandHere from './you/WhereYouStandHere';
+import { useMemberStandings } from '@/hooks/gam/useMemberStandings';
 import YourRoundsHere, { type YouRound } from './you/YourRoundsHere';
 import WhereYourShotsGo from './you/WhereYourShotsGo';
 import YourFormHere from './you/YourFormHere';
@@ -128,6 +130,9 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
 
   const settled =
     Boolean(user) && !statusLoading && Boolean(status) && !connectionLoading && roundsSettled;
+
+  /* Scoped to this course; only read once the member is known to have played. */
+  const { data: standings } = useMemberStandings(user?.id, settled && hasTrackedRounds, courseId);
 
   /* §7 — one view event per mount, carrying the round count so we can see which
      state members actually land in. */
@@ -295,6 +300,10 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
       {/* §3.5 — ONCE. It used to render inside the shots block and again as its
           own card. */}
       <WithinReach mine={mine} />
+
+      {/* BRIEF_YOU_TAB_STANDINGS — compact standings, same RPC and rules as the
+          Trophy Room. Renders only when the course-scoped read returns rows. */}
+      <WhereYouStandHere rows={standings ?? []} />
 
       <YourRatingSection
         rating={rating ?? null}

@@ -39,15 +39,28 @@ function isStandingRow(value: unknown): value is MemberStandingRow {
   );
 }
 
-export function useMemberStandings(userId: string | null | undefined, enabled = true) {
+/**
+ * BRIEF_YOU_TAB_STANDINGS — an optional course scope. When courseId is present
+ * the RPC is passed p_course_id and the rows are computed within that course's
+ * boards only; the query keys on (userId, courseId) so the scoped and unscoped
+ * reads never share a cache entry.
+ */
+export function useMemberStandings(
+  userId: string | null | undefined,
+  enabled = true,
+  courseId?: string | null,
+) {
   return useQuery({
-    queryKey: ['member-standings', userId],
+    queryKey: ['member-standings', userId, courseId ?? null],
     enabled: enabled && !!userId,
     staleTime: 5 * 60_000,
     retry: false,
     queryFn: async (): Promise<MemberStandingRow[]> => {
       if (!userId) return [];
-      const { data, error } = await supabase.rpc('get_member_standings', { p_user_id: userId });
+      const { data, error } = await supabase.rpc('get_member_standings', {
+        p_user_id: userId,
+        ...(courseId ? { p_course_id: courseId } : {}),
+      });
       if (error || !Array.isArray(data)) return [];
       return data.filter(isStandingRow);
     },
