@@ -6,7 +6,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
 import { assignCompetitionRanks, crownSetDelta } from './legendRanks.ts';
-import { countContestedTitles, type BoardKeyRow } from './legendTitles.ts';
+import { countContestedTitles, isTenureCategory, type BoardKeyRow } from './legendTitles.ts';
 import { LEGEND_NOTIFY_MAX_AGE_DAYS, playDateFreshness } from './noticeFreshness.ts';
 export const FUNCTION_VERSION = '2026-09-20T00:00:00Z-v9-feat-rarity-lines';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
@@ -2951,8 +2951,22 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
     //   NEW.category LIKE '%\_all\_time'
     // because the trigger has no access to LEGEND_CATS. These two tests are a
     // PAIR — change one, change the other.
+    //
+    // BRIEF_TENURE_DOES_NOT_AWARD (2026-09-22). The two ALL-TIME TENURE
+    // categories do not notify either side — nobody is told they are "the
+    // legend" for having played somewhere more often than anyone else. The
+    // board still recomputes and the rows still store; only the notice stops.
+    // The list lives once, in legendTitles.ts, shared with the title count.
     const isAllTimeCategory = cfg.windowDays === null;
-    const notify = isAllTimeCategory && isTriggerFreshForCrownNotice(trigger, courseId, cfg.category);
+    const isTenure = isTenureCategory(cfg.category);
+    const notify = isAllTimeCategory && !isTenure &&
+      isTriggerFreshForCrownNotice(trigger, courseId, cfg.category);
+    if (isTenure) {
+      console.log('[gam-evaluator] crown notice suppressed — tenure category', {
+        courseId,
+        category: cfg.category,
+      });
+    }
     if (!isAllTimeCategory) {
       console.log('[gam-evaluator] crown notice suppressed — 90-day window', {
         courseId,
