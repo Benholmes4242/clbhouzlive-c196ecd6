@@ -62,8 +62,8 @@
 - [x] Report the par source for the seven named unchanged to-par sites.
 
 ## BRIEF_FEED_PARTIAL_ROUND_THRU
-- [ ] Carry `whs_scores.total_holes` through the existing batched feed-round read.
-- [ ] Preserve hole arithmetic while exposing `thru` only for provably partial scored cards.
-- [ ] Render lowercase `· thru N` beside partial feed scores; leave complete and WHS fallback output unchanged.
-- [ ] Prove partial eighteen, complete eighteen, complete nine, and picked-up fallback behavior.
-- [ ] Report every other `roundScore` consumer without changing it; run the full suite and typecheck.
+- [x] Carry `whs_scores.total_holes` through the existing batched feed-round read.
+- [x] Preserve hole arithmetic while exposing `thru` only for provably partial scored cards.
+- [x] Render lowercase `· thru N` beside partial feed scores; leave complete and WHS fallback output unchanged.
+- [x] Prove partial eighteen, complete eighteen, complete nine, and picked-up fallback behavior.
+- [x] Report every other `roundScore` consumer without changing it; run the full suite and typecheck.
