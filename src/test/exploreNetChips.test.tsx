@@ -106,8 +106,8 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(vsHandicapLabel(74, 71)).toBe('+3');
     expect(vsHandicapLabel(71, 71)).toBe('Level');
     const under = renderCard({ gross: 76, course_par: 71, net: 70, course_handicap: 6 });
-    expect((under.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color).toBe(A.INK);
-    expect((under.querySelector('[data-explore-stat-value="vs-hcp"]') as HTMLElement).style.color).not.toBe(A.INK);
+    expect((under.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
+    expect((under.querySelector('[data-explore-stat-value="vs-hcp"]') as HTMLElement).style.color).not.toBe('rgb(248, 250, 252)');
     const over = renderCard({ gross: 80, course_par: 71, net: 74, course_handicap: 6 });
     expect((over.querySelector('[data-explore-stat-value="net"]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
   });
