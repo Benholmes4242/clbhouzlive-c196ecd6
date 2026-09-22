@@ -1,6 +1,6 @@
 import React from 'react';
-import { cleanup, render } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { StandingsPanel } from '@/components/profile/handicap/whs/gam/trophy-room/career/panels/StandingsPanel';
 import {
@@ -10,6 +10,42 @@ import {
   groupStandings,
 } from '@/components/profile/handicap/whs/gam/trophy-room/career/standings';
 import type { MemberStandingRow } from '@/hooks/gam/useMemberStandings';
+import CareerRecordSheet from '@/components/profile/handicap/whs/gam/trophy-room/career/CareerRecordSheet';
+import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+
+/* BRIEF_STANDINGS_FOLLOWUPS — the empty branch reads these through the hook. */
+const standingsState = vi.hoisted(() => ({ rows: [] as unknown[] }));
+vi.mock('@/hooks/gam/useMemberStandings', () => ({
+  useMemberStandings: () => ({ data: standingsState.rows }),
+}));
+vi.mock('@/hooks/gam/useUserAchievements', () => ({
+  useUserAchievements: () => ({ data: [], isLoading: false }),
+}));
+vi.mock('@/hooks/gam/useUserTopLegends', () => ({
+  useUserTopLegends: () => ({ data: [], isLoading: false }),
+}));
+vi.mock('@/hooks/gam/useUserStreaks', () => ({
+  useUserStreaks: () => ({ data: [] }),
+}));
+vi.mock('@/hooks/gam/useCareerRounds', () => ({
+  useCareerRounds: () => ({ data: [] }),
+}));
+vi.mock('@/hooks/gam/useBadgePopulationShare', () => ({
+  useBadgePopulationShare: () => ({ data: undefined }),
+}));
+vi.mock('@/hooks/gam/useTop100Distribution', () => ({
+  useTop100Distribution: () => ({ data: [] }),
+}));
+vi.mock('@/hooks/gam/useGamRecordConfig', () => ({
+  useGamRecordConfig: () => ({ data: undefined }),
+  RECORD_CONFIG_DEFAULTS: {},
+}));
+vi.mock('@/hooks/gam/useCourseFieldSizes', () => ({
+  useCourseFieldSizes: () => ({ data: undefined }),
+}));
+vi.mock('@/hooks/gam/useCourseFieldPlayers', () => ({
+  useCourseFieldPlayers: () => ({ data: undefined }),
+}));
 
 afterEach(cleanup);
 
@@ -110,7 +146,7 @@ describe('Trophy Room · where you stand', () => {
     expect(disc?.dataset.standingDisc).toBe('gold');
     expect(disc?.textContent).toBe('1of 17');
     expect(c.querySelector('[data-standing-line="true"]')?.textContent).toBe(
-      'Shared with 3 · clear by 1 pts',
+      'Shared with 3 · clear by 1',
     );
     expect(tiedWith(SUNDRIDGE_STABLEFORD)).toBe(3);
   });
@@ -145,7 +181,7 @@ describe('Trophy Room · where you stand', () => {
     expect(discState({ ...HANKLEY, rank: 3 })).toBe('bronze');
     expect(discState({ ...HANKLEY, medal_earned: false })).toBe('plain');
     expect(c.querySelector('[data-standing-line="true"]')?.textContent).toBe(
-      '1 pts off the player above · 6 pts off the lead',
+      '1 off the player above · 6 off the lead',
     );
   });
 
@@ -154,16 +190,16 @@ describe('Trophy Room · where you stand', () => {
     expect(standingLine(row({ ahead_count: 0, behind_count: 0, field_size: 4 }))).toBe(
       'Level with everyone here',
     );
-    /* ahead 0, no ties: clear by the next value. */
+    /* ahead 0, no ties: clear by the next value — bare number, no unit. */
     expect(standingLine(row({ field_size: 4, behind_count: 3, next_value: 36 }))).toBe(
-      'Clear by 4 pts',
+      'Clear by 4',
     );
     /* Behind: no lead clause when the leader IS the player above. */
     expect(
       standingLine(
         row({ rank: 2, field_size: 4, ahead_count: 1, behind_count: 2, value: 33, better_value: 34, leader_value: 34 }),
       ),
-    ).toBe('1 pts off the player above');
+    ).toBe('1 off the player above');
     /* Differentials keep one decimal and take no unit. */
     expect(
       standingLine(
@@ -196,5 +232,37 @@ describe('Trophy Room · where you stand', () => {
       'No course standings yet — they start once someone else has played a course you have.',
     );
     expect(c.querySelector('[data-standing-disc]')).toBeNull();
+  });
+});
+
+describe('BRIEF_STANDINGS_FOLLOWUPS · the empty branch', () => {
+  const SHEET_USER = '11111111-1111-1111-1111-111111111111';
+
+  function mountSheet() {
+    return render(<CareerRecordSheet userId={SHEET_USER} />);
+  }
+
+  it('a member with standings and no badges sees standings, never "Nothing on the record yet"', async () => {
+    standingsState.rows = [SUNDRIDGE_STABLEFORD];
+    mountSheet();
+    await act(async () => {
+      openGamAchievements();
+    });
+    await waitFor(() => {
+      expect(screen.getByText('Where you stand')).toBeTruthy();
+    });
+    expect(screen.queryByText(/Nothing on the record yet/)).toBeNull();
+    expect(screen.getByText('Sundridge Park Golf Club (East Course)')).toBeTruthy();
+  });
+
+  it('a member with nothing at all still sees the honest empty line', async () => {
+    standingsState.rows = [];
+    mountSheet();
+    await act(async () => {
+      openGamAchievements();
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/Nothing on the record yet/)).toBeTruthy();
+    });
   });
 });

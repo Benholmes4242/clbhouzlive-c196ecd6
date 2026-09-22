@@ -45,10 +45,14 @@ export function formatValue(row: MemberStandingRow): string {
   return `${row.value.toFixed(decimals(row.category))}${unit(row.category)}`;
 }
 
-/** A gap is a difference between two returned columns, at the value's own precision. */
+/**
+ * A gap is a difference between two returned columns, at the value's own
+ * precision. BARE NUMBER — the VALUE above already carries its unit, and the
+ * margin never does.
+ */
 function gap(row: MemberStandingRow, other: number | null): string | null {
   if (row.value == null || other == null) return null;
-  return `${Math.abs(row.value - other).toFixed(decimals(row.category))}${unit(row.category)}`;
+  return Math.abs(row.value - other).toFixed(decimals(row.category));
 }
 
 /**
