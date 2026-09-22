@@ -10,10 +10,11 @@ afterEach(cleanup);
 
 /**
  * BRIEF_EXPLORE_STORY_TILE_MATCH_THE_TOUR_HERO — the story tile keeps its
- * rounded frame and takes the tour overview hero's internals: one meta line at
- * the top of the frame, a four-line headline, a three-line standfirst, and ONE
- * scrim across the whole tile. The review card is untouched in every respect,
- * and several values below are shared with it.
+ * rounded frame and takes the tour overview hero's internals. Reversed by
+ * BRIEF_EXPLORE_AMATEUR_NEWS_TILE: the meta row is now a two-part split (fixed
+ * "Amateur News" label hard left, age hard right), the story's own source
+ * became a white eyebrow above the headline, and the standfirst is gone from
+ * this card entirely (NOTE 1 — the surfaces diverge on purpose).
  */
 
 const IMAGE = 'https://example.test/links.jpg';
@@ -77,14 +78,18 @@ describe('Explore story tile matches the tour hero', () => {
     expect(c.querySelector('[data-explore-copy-scrim="true"]')).toBeNull();
   });
 
-  it('§2 renders one meta line inside the unchanged 48px lane, at the tour hero type', () => {
+  it('§2 renders a two-part meta row in the unchanged 48px lane: label left, age pinned right', () => {
     const c = draw(story());
     const hero = c.querySelector<HTMLElement>('[data-explore-hero="true"]');
     const lane = hero?.firstElementChild as HTMLElement | null;
     const meta = c.querySelector<HTMLElement>('[data-explore-story-meta="true"]');
     expect(lane?.style.flex).toBe('0 0 48px');
     expect(meta?.parentElement).toBe(lane);
-    expect(meta?.textContent).toMatch(/^Bunkered · /);
+    /* TWO PARTS ON ONE LINE: the label takes the space, the age never shrinks. */
+    expect(meta?.style.display).toBe('flex');
+    expect(meta?.style.alignItems).toBe('baseline');
+    expect(meta?.style.gap).toBe('10px');
+    expect(meta?.style.minWidth).toBe('0px');
     expect(meta?.style.padding).toBe('13px 16px 0px');
     expect(meta?.style.fontSize).toBe('9px');
     expect(meta?.style.fontWeight).toBe('700');
@@ -92,37 +97,61 @@ describe('Explore story tile matches the tour hero', () => {
     expect(meta?.style.lineHeight).toBe('1.2');
     expect(meta?.style.textTransform).toBe('uppercase');
     expect(meta?.style.color).toBe('rgba(248, 250, 252, 0.82)');
-    /* ONE LINE, ALWAYS: it truncates, it never wraps. */
-    expect(meta?.style.whiteSpace).toBe('nowrap');
-    expect(meta?.style.overflow).toBe('hidden');
-    expect(meta?.style.textOverflow).toBe('ellipsis');
+    /* THE SECTION LABEL IS FIXED — it names the section, never the story. */
+    const section = meta?.querySelector<HTMLElement>('[data-explore-story-section="true"]');
+    expect(section?.textContent).toBe('Amateur News');
+    expect(section?.style.flex).toBe('1 1 auto');
+    expect(section?.style.whiteSpace).toBe('nowrap');
+    expect(section?.style.textOverflow).toBe('ellipsis');
+    const age = meta?.querySelector<HTMLElement>('[data-explore-story-age="true"]');
+    expect(age?.style.flex).toBe('0 0 auto');
+    expect(age?.style.whiteSpace).toBe('nowrap');
+    expect(age?.textContent).not.toBe('');
+    /* The " · " separator is gone; the gap does that job. */
+    expect(meta?.textContent).not.toContain('·');
     /* §2.3 the story meta does NOT read the review token. */
     expect(meta?.style.color).not.toBe(PHOTO_REVIEW_LABEL);
     expect(PHOTO_REVIEW_LABEL).toBe('rgba(255,255,255,0.62)');
   });
 
-  it('§2.1 drops the separator when there is no age, and keeps the source fallback', () => {
+  it('§2.1 a story with no source keeps the fixed label, renders no eyebrow, and stays 340', () => {
     const c = draw(story({ source: null, published_at: null, arrived_at: null }));
     const meta = c.querySelector<HTMLElement>('[data-explore-story-meta="true"]');
-    expect(meta?.textContent).toBe('Amateur News');
+    expect(meta?.querySelector('[data-explore-story-section="true"]')?.textContent).toBe('Amateur News');
+    /* Absent renders NOTHING — no empty line, no reserved space. */
+    expect(c.querySelector('[data-explore-story-eyebrow="true"]')).toBeNull();
+    expect(c.querySelector<HTMLElement>('[data-explore-hero="true"]')?.style.minHeight).toBe('340px');
   });
 
-  it('§3/§4 clamps the headline at four and the standfirst at three', () => {
+  it('§3/§4 clamps the headline at four and carries NO standfirst', () => {
     const c = draw(story({
       headline: 'A very long amateur headline that runs on and on across the whole tile at 390px',
     }));
     const headline = c.querySelector<HTMLElement>('[data-explore-headline="true"]');
-    const standfirst = c.querySelector<HTMLElement>('[data-explore-standfirst="true"]');
     expect(headline?.dataset.exploreLineClamp).toBe('4');
-    expect(standfirst?.dataset.exploreStandfirstClamp).toBe('3');
-    expect(standfirst?.style.color).toBe('rgba(248, 250, 252, 0.8)');
-    expect(standfirst?.style.fontWeight).toBe('');
+    expect(c.querySelector('[data-explore-standfirst="true"]')).toBeNull();
   });
 
-  it('§4 an absent standfirst renders nothing and the tile stays 340', () => {
-    const c = draw(story({ standfirst: null }));
-    expect(c.querySelector('[data-explore-standfirst="true"]')).toBeNull();
-    expect(c.querySelector<HTMLElement>('[data-explore-hero="true"]')?.style.minHeight).toBe('340px');
+  it('§4 the eyebrow is white caps above the headline, one truncating line, kicker still suppressed', () => {
+    const c = draw(story());
+    const copy = c.querySelector<HTMLElement>('[data-explore-hero-copy="true"]');
+    const eyebrow = c.querySelector<HTMLElement>('[data-explore-story-eyebrow="true"]');
+    expect(eyebrow?.textContent).toBe('Bunkered');
+    expect(eyebrow?.style.color).toBe('#FFFFFF');
+    expect(eyebrow?.style.textTransform).toBe('uppercase');
+    expect(eyebrow?.style.letterSpacing).toBe('0.19em');
+    expect(eyebrow?.style.lineHeight).toBe('1.2');
+    expect(eyebrow?.style.whiteSpace).toBe('nowrap');
+    expect(eyebrow?.style.overflow).toBe('hidden');
+    expect(eyebrow?.style.textOverflow).toBe('ellipsis');
+    /* It sits in the copy block, directly above the headline. */
+    expect(eyebrow?.parentElement).toBe(copy);
+    const siblings = Array.from(copy?.children ?? []);
+    const eyebrowAt = siblings.findIndex((s) => s === eyebrow);
+    const headlineAt = siblings.findIndex((s) => s.getAttribute('data-explore-headline') === 'true');
+    expect(eyebrowAt).toBe(headlineAt - 1);
+    /* kickerParts describes a ROUND — the story branch never renders it. */
+    expect(c.querySelector('[data-explore-hero-kicker="true"]')).toBeNull();
   });
 
   it('§5 keeps the rounded frame and the 16px bottom lane', () => {
