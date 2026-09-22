@@ -156,7 +156,7 @@ describe('C5 §1/§6 the card takes that one answer', () => {
     });
     const { container } = render(<ExploreCard item={item} size="lead" shape={null} onTap={() => undefined} />);
     expect(container.textContent).toContain('1:35');
-    expect(container.querySelector('[data-review-photo-count="true"]')).toBeNull();
+    expect(container.querySelector('[data-review-photo-figure="true"]')).toBeNull();
   });
 
   it('§4 more than one image shows the bare figure; one image shows nothing', () => {
@@ -165,7 +165,7 @@ describe('C5 §1/§6 the card takes that one answer', () => {
     expect(three.container.querySelector('[data-review-photo-figure="true"]')?.textContent).toBe('3');
     expect(three.container.textContent).not.toMatch(/photo/i);
     const one = render(<ExploreCard item={review({ photoCount: 1, reviewMedia: media })} size="lead" shape={null} onTap={() => undefined} />);
-    expect(one.container.querySelector('[data-review-photo-count="true"]')).toBeNull();
+    expect(one.container.querySelector('[data-review-photo-figure="true"]')).toBeNull();
   });
 
   it('draws none of the instrument on a std review', () => {
