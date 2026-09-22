@@ -21066,7 +21066,7 @@ export type Database = {
         }[]
       }
       get_member_standings: {
-        Args: { p_limit?: number; p_user_id: string }
+        Args: { p_course_id?: string; p_limit?: number; p_user_id: string }
         Returns: {
           ahead_count: number
           attained_at: string
