@@ -148,6 +148,8 @@ export interface CardScorecardSheetProps {
   playerUserId?: string | null;
   /** Member sheet subject. Resolved by the wrapper from viewer and round owner. */
   subjectIsViewer?: boolean;
+  /** Owner gender, used only for third-person scope copy. */
+  playerGender?: string | null;
   /**
    * S3 — TOUR ONLY. sr_players.photo_url is populated for 2 of 2,879 players, so
    * reading it alone showed initials for nearly every tour player. With these two
@@ -329,7 +331,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   holes, totalHoles = null, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
-  playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
+  playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, playerGender = null, identityStat,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
   presentation = 'overlay',
@@ -412,6 +414,13 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    * playerName can no longer produce a bare apostrophe anywhere.
    */
   const isOwner = !isTour && (subjectIsViewer ?? (!!playerUserId && !!user?.id && playerUserId === user.id));
+  const scopeVoice = useMemo(() => {
+    if (isOwner) return { subjectName: t('courses:scorecard.scopeYou'), subject: t('courses:scorecard.scopeYou'), possessive: t('courses:scorecard.scopeYour'), verb: t('courses:scorecard.scopeHave') };
+    const namedPossessive = playerName.endsWith('s') ? `${playerName}'` : `${playerName}'s`;
+    if (playerGender === 'male') return { subjectName: namedPossessive, subject: t('courses:scorecard.scopeHe'), possessive: t('courses:scorecard.scopeHis'), verb: t('courses:scorecard.scopeHas') };
+    if (playerGender === 'female') return { subjectName: namedPossessive, subject: t('courses:scorecard.scopeShe'), possessive: t('courses:scorecard.scopeHer'), verb: t('courses:scorecard.scopeHas') };
+    return { subjectName: namedPossessive, subject: t('courses:scorecard.scopeThey'), possessive: t('courses:scorecard.scopeTheir'), verb: t('courses:scorecard.scopeHave') };
+  }, [isOwner, playerGender, playerName, t]);
 
 
   const played = useMemo(
@@ -557,7 +566,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         value: courseContext.rankHere === 1
           ? t('courses:scorecard.figBest')
           : formatOrdinal(courseContext.rankHere),
-        label: t('courses:scorecard.figOfRounds', { count: roundsHere }),
+        label: t(isOwner ? 'courses:scorecard.figOfRoundsSelf' : 'courses:scorecard.figOfRoundsOther', { count: roundsHere, possessive: scopeVoice.possessive }),
       });
     }
     const avgOthers = courseContext.avgToParOthers;
@@ -570,7 +579,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           : diff < 0
             ? `\u2212${Math.abs(diff).toFixed(1)}`
             : `+${diff.toFixed(1)}`,
-        label: t(isOwner ? 'courses:scorecard.figVsYourAvg' : 'courses:scorecard.figVsTheirAvg'),
+        label: t(isOwner ? 'courses:scorecard.figVsYourAvgHere' : 'courses:scorecard.figVsTheirAvgHere', { possessive: scopeVoice.possessive }),
         tone: Math.abs(diff) < 0.05 ? EVEN_GRAY : toParColor(diff < 0 ? -1 : 1),
       });
     }
@@ -582,7 +591,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       });
     }
     return items;
-  }, [isTour, courseContext, totals, isOwner, t]);
+  }, [isTour, courseContext, totals, isOwner, scopeVoice.possessive, t]);
 
   const rail = useMemo(() => {
     const items: { key: string; value: string; label: string; tone?: string }[] = [];
@@ -985,7 +994,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               </ScorecardSection>
               </div>
 
-              {!isTour && <RoundResults result={roundResults} />}
+              {!isTour && <RoundResults result={roundResults} scope={courseContext?.roundsHere != null ? {
+                courseName,
+                roundsHere: courseContext.roundsHere,
+                ...scopeVoice,
+              } : null} />}
 
               {/*
                 §C — AT THIS COURSE. ONE POOL: the member's own rounds at this
@@ -1000,12 +1013,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   bare title rather than claiming "your 0 rounds here". */}
               {courseSection.length > 0 && (
                 <div ref={statsRef}>
-                <ScorecardSection
-                  kicker={t(isOwner ? 'courses:scorecard.atThisCourseSelf' : 'courses:scorecard.atThisCourseOther', {
-                    name: playerName,
-                  })}
-                  flat={!isTour}
-                >
+                <div data-scorecard-course-figures="true">
                   <div style={{ display: 'grid', gridTemplateColumns: `repeat(${courseSection.length}, minmax(0, 1fr))`, alignItems: 'start' }}>
                     {courseSection.map((it) => (
                       <div key={it.key} style={{ minWidth: 0, textAlign: 'center', padding: '0 4px' }}>
@@ -1023,7 +1031,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                       })}
                     </p>
                   )}
-                </ScorecardSection>
+                </div>
                 </div>
               )}
 

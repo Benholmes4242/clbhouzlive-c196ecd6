@@ -1,121 +1,139 @@
 {
-  "whsConnect": {
-    "intro": {
-      "headline": "Your game, in numbers you can use.",
-      "sub": "Connect your official record once. We read every round you have ever posted and show you where the shots actually go.",
-      "cta": "Choose your country",
-      "decline": "I don't hold an official handicap",
-      "kicker": "Your record, read properly"
-    },
-    "rings": {
-      "label": "Which holes cost you",
-      "caption": "Average score over par, by hole type",
-      "par3": "Par 3s",
-      "par4": "Par 4s",
-      "par5": "Par 5s",
-      "holes": "{{n}} holes",
-      "example": "Example profile - {{rounds}} rounds"
-    },
-    "country": {
-      "sub": "We connect to your governing body directly."
-    },
-    "sync": {
-      "kicker": "Connecting",
-      "headline": "Pulling your record.",
-      "sub": "Under a minute for most accounts. It finishes on our servers either way.",
-      "step1": "Reading every round on your record",
-      "step2": "Working out where your shots go",
-      "step3": "Ranking the holes that cost you most",
-      "step4": "Comparing you to the field at each course",
-      "note": "Steps are what the server is doing, in order"
-    },
-    "done": {
-      "kicker": "Connected",
-      "headline": "Your record is all here.",
-      "headlineYears": "{{years}} years of golf, all here.",
-      "headlinePending": "Your rounds are landing.",
-      "sub": "Nothing else to do - your index and your rounds move on their own from here.",
-      "subPending": "Your index is live. The rounds finish arriving on our servers - you can carry on either way.",
-      "indexLabel": "Handicap index",
-      "coursesSince": "{{courses}} courses - since {{year}}",
-      "span": "12 months",
-      "shotsLabel": "Where your shots go",
-      "damagingLabel": "Your most damaging holes",
-      "damagingAside": "By shots lost",
-      "holeNo": "Hole {{n}}",
-      "parCourse": "Par {{par}} - {{course}}",
-      "courseUnknown": "Unmapped course",
-      "floor": "Your scoring breakdown builds as you post rounds.",
-      "cta": "See your full record",
-      "headlineRounds": "{{rounds}} rounds, all here.",
-      "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
-    }
+ "whsConnect": {
+  "intro": {
+   "headline": "Your game, in numbers you can use.",
+   "sub": "Connect your official record once. We read every round you have ever posted and show you where the shots actually go.",
+   "cta": "Choose your country",
+   "decline": "I don't hold an official handicap",
+   "kicker": "Your record, read properly"
   },
-  "career": {
-    "seasonBestScoped": "BEST {{year}}",
-    "recordsKicker": "COURSE RECORDS",
-    "recordsCourses": "{{n}} COURSES",
-    "recordsWon": "WON",
-    "recordsUncontested": "UNCONTESTED",
-    "recordsHeld": "RECORDS HELD",
-    "recordsDefinition": "A record is won where someone else has played the course too. The rest are held because nobody has been there yet.",
-    "recordsNoFieldData": "Course records held. How many were won against a field is not measured yet.",
-    "recordsWonAgainst": "Won against {{n}} other golfers here",
-    "recordsOneOther": "Won against 1 other golfer here",
-    "recordsNobodyElse": "Nobody else has played here yet",
-    "recordsSeeAll": "SEE ALL {{n}} COURSES",
-    "countingKicker": "COUNTING STATS",
-    "countingComplete": "{{n}} OF {{total}} COMPLETE",
-    "allTiersReached": "All tiers reached",
-    "tierProgress": "{{n}} more for tier {{next}} · tier {{reached}} of {{total}}",
-    "tierReached": "Tier {{tier}} reached {{when}}",
-    "top100Kicker": "TOP 100 LISTS",
-    "top100Basis": "COURSES PLAYED OF EACH LIST OF 100",
-    "top100NotStarted": "Not started",
-    "milestonesKicker": "MILESTONES",
-    "milestonesReached": "{{n}} OF {{total}} REACHED",
-    "milestoneReachedAt": "Reached {{when}}",
-    "milestonesSeeAll": "SEE ALL {{n}}"
+  "rings": {
+   "label": "Which holes cost you",
+   "caption": "Average score over par, by hole type",
+   "par3": "Par 3s",
+   "par4": "Par 4s",
+   "par5": "Par 5s",
+   "holes": "{{n}} holes",
+   "example": "Example profile - {{rounds}} rounds"
   },
-  "roundResults": {
-    "sections": {
-      "awards": "Awards",
-      "holes": "Holes",
-      "efforts": "Best efforts"
-    },
-    "units": {
-      "round_gross": "Round",
-      "round_diff": "Score differential",
-      "round_stableford": "Stableford",
-      "front_nine": "Front nine",
-      "back_nine": "Back nine",
-      "finish_six": "The finish",
-      "hole": "Hole"
-    },
-    "awardUnits": {
-      "round_gross": "round",
-      "round_diff": "score differential",
-      "round_stableford": "Stableford score",
-      "front_nine": "front nine",
-      "back_nine": "back nine",
-      "finish_six": "finish",
-      "hole": "hole"
-    },
-    "award": {
-      "best": "Best {{unit}} here",
-      "matchedBest": "Matched your best {{unit}} here",
-      "topThree": "Top-three {{unit}} here",
-      "topTen": "Top-ten {{unit}} here",
-      "bestHole": "Best on the {{hole}}",
-      "firstBirdie": "First birdie on the {{hole}}"
-    },
-    "previous": "Previous best {{value}}",
-    "placing": {
-      "best": "Best here",
-      "second": "2nd here",
-      "third": "3rd here",
-      "topTen": "Top ten here",
-      "ordinal": "{{place}} of {{count}}"
-    }
+  "country": {
+   "sub": "We connect to your governing body directly."
+  },
+  "sync": {
+   "kicker": "Connecting",
+   "headline": "Pulling your record.",
+   "sub": "Under a minute for most accounts. It finishes on our servers either way.",
+   "step1": "Reading every round on your record",
+   "step2": "Working out where your shots go",
+   "step3": "Ranking the holes that cost you most",
+   "step4": "Comparing you to the field at each course",
+   "note": "Steps are what the server is doing, in order"
+  },
+  "done": {
+   "kicker": "Connected",
+   "headline": "Your record is all here.",
+   "headlineYears": "{{years}} years of golf, all here.",
+   "headlinePending": "Your rounds are landing.",
+   "sub": "Nothing else to do - your index and your rounds move on their own from here.",
+   "subPending": "Your index is live. The rounds finish arriving on our servers - you can carry on either way.",
+   "indexLabel": "Handicap index",
+   "coursesSince": "{{courses}} courses - since {{year}}",
+   "span": "12 months",
+   "shotsLabel": "Where your shots go",
+   "damagingLabel": "Your most damaging holes",
+   "damagingAside": "By shots lost",
+   "holeNo": "Hole {{n}}",
+   "parCourse": "Par {{par}} - {{course}}",
+   "courseUnknown": "Unmapped course",
+   "floor": "Your scoring breakdown builds as you post rounds.",
+   "cta": "See your full record",
+   "headlineRounds": "{{rounds}} rounds, all here.",
+   "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
   }
+ },
+ "career": {
+  "seasonBestScoped": "BEST {{year}}",
+  "recordsKicker": "COURSE RECORDS",
+  "recordsCourses": "{{n}} COURSES",
+  "recordsWon": "WON",
+  "recordsUncontested": "UNCONTESTED",
+  "recordsHeld": "RECORDS HELD",
+  "recordsDefinition": "A record is won where someone else has played the course too. The rest are held because nobody has been there yet.",
+  "recordsNoFieldData": "Course records held. How many were won against a field is not measured yet.",
+  "recordsWonAgainst": "Won against {{n}} other golfers here",
+  "recordsOneOther": "Won against 1 other golfer here",
+  "recordsNobodyElse": "Nobody else has played here yet",
+  "recordsSeeAll": "SEE ALL {{n}} COURSES",
+  "countingKicker": "COUNTING STATS",
+  "countingComplete": "{{n}} OF {{total}} COMPLETE",
+  "allTiersReached": "All tiers reached",
+  "tierProgress": "{{n}} more for tier {{next}} · tier {{reached}} of {{total}}",
+  "tierReached": "Tier {{tier}} reached {{when}}",
+  "top100Kicker": "TOP 100 LISTS",
+  "top100Basis": "COURSES PLAYED OF EACH LIST OF 100",
+  "top100NotStarted": "Not started",
+  "milestonesKicker": "MILESTONES",
+  "milestonesReached": "{{n}} OF {{total}} REACHED",
+  "milestoneReachedAt": "Reached {{when}}",
+  "milestonesSeeAll": "SEE ALL {{n}}"
+ },
+ "roundResults": {
+  "sections": {
+   "awards": "Awards",
+   "holes": "Holes",
+   "efforts": "Best efforts"
+  },
+  "units": {
+   "round_gross": "Round",
+   "round_diff": "Score differential",
+   "round_stableford": "Stableford",
+   "front_nine": "Front nine",
+   "back_nine": "Back nine",
+   "finish_six": "The finish",
+   "hole": "Hole"
+  },
+  "awardUnits": {
+   "round_gross": "round",
+   "round_diff": "score differential",
+   "round_stableford": "Stableford score",
+   "front_nine": "front nine",
+   "back_nine": "back nine",
+   "finish_six": "finish",
+   "hole": "hole"
+  },
+  "award": {
+   "best": "Best {{unit}} here",
+   "matchedBest": "Matched your best {{unit}} here",
+   "topThree": "Top-three {{unit}} here",
+   "topTen": "Top-ten {{unit}} here",
+   "bestHole": "Best on the {{hole}}",
+   "firstBirdie": "First birdie on the {{hole}}"
+  },
+  "previous": "Previous best {{value}}",
+  "placing": {
+   "best": "Best here",
+   "second": "2nd here",
+   "third": "3rd here",
+      "topTen": "Top ten",
+   "ordinal": "{{place}} of {{count}}"
+  },
+  "columns": {
+   "round": "THIS ROUND",
+   "score": "SCORE",
+   "best": "VS {{possessive}} BEST HERE"
+  },
+  "scope": {
+   "kicker": "MEASURED AGAINST",
+   "heading": "{{name}} own rounds at {{course}}",
+   "line": "{{subject}} {{verb}} played here {{count}} times. Every comparison below is to those rounds — not to other members, and not to {{possessive}} golf anywhere else.",
+   "their": "THEIR"
+  },
+  "spans": {
+   "round_gross": "All 18 holes",
+   "front_nine": "Holes 1–9",
+   "back_nine": "Holes 10–18",
+   "finish_six": "Holes 13–18",
+   "round_stableford": "Points, 18 holes"
+  }
+ }
 }

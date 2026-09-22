@@ -17,6 +17,15 @@ import {
 import { SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatOrdinal } from '@/i18n/format';
 
+export interface RoundResultsScope {
+  courseName: string;
+  roundsHere: number;
+  subjectName: string;
+  subject: string;
+  possessive: string;
+  verb: string;
+}
+
 const COARSE_UNITS = new Set<RoundAwardUnitKind>([
   'round_gross', 'round_stableford', 'round_diff', 'front_nine', 'back_nine', 'finish_six',
 ]);
@@ -37,6 +46,10 @@ function unitKey(unit: RoundAwardUnitKind): string {
   return `roundResults.units.${unit}`;
 }
 
+function spanKey(unit: RoundEffortRow['unit_kind']): string {
+  return `roundResults.spans.${unit}`;
+}
+
 function awardUnitKey(unit: RoundAwardUnitKind): string {
   return `roundResults.awardUnits.${unit}`;
 }
@@ -48,9 +61,7 @@ function medalTone(tier: RoundAwardRow['tier']): string {
 }
 
 function placingText(rank: number | null, topTen: boolean, t: (key: string, options?: Record<string, unknown>) => string): string | null {
-  if (rank === 1) return t('roundResults.placing.best');
-  if (rank === 2) return t('roundResults.placing.second');
-  if (rank === 3) return t('roundResults.placing.third');
+  if (rank != null) return formatOrdinal(rank);
   if (topTen) return t('roundResults.placing.topTen');
   return null;
 }
@@ -109,7 +120,7 @@ function Block({ title, children, testId }: { title: string; children: React.Rea
   );
 }
 
-export function RoundResults({ result }: { result: RoundAwardsResult | null | undefined }) {
+export function RoundResults({ result, scope }: { result: RoundAwardsResult | null | undefined; scope?: RoundResultsScope | null }) {
   const { t } = useTranslation('handicap');
   if (!result) return null;
 
@@ -119,6 +130,56 @@ export function RoundResults({ result }: { result: RoundAwardsResult | null | un
     .map((kind) => result.efforts.find((effort) => effort.unit_kind === kind))
     .filter((effort): effort is RoundEffortRow => !!effort);
   if (awards.length === 0 && holes.length === 0 && efforts.length === 0) return null;
+
+  const resultsTable = efforts.length > 0 ? (
+    <>
+      {scope && (
+        <div data-round-results-scope="true" style={{ margin: '4px 0 4px', minWidth: 0 }}>
+          <div style={{ color: INK_FAINT, fontSize: 9.5, fontWeight: 700, lineHeight: 1.2, textTransform: 'uppercase' }}>
+            {t('roundResults.scope.kicker')}
+          </div>
+          <h4 style={{ margin: '5px 0 0', color: INK, fontSize: 16, fontWeight: 700, lineHeight: 1.25 }}>
+            {t('roundResults.scope.heading', { name: scope.subjectName, course: scope.courseName })}
+          </h4>
+          <p style={{ margin: '6px 0 0', color: INK_FAINT, fontSize: 11.5, lineHeight: 1.45 }}>
+            {t('roundResults.scope.line', {
+              subject: scope.subject,
+              verb: scope.verb,
+              count: scope.roundsHere,
+              possessive: scope.possessive,
+            })}
+          </p>
+        </div>
+      )}
+      <Block title={t('roundResults.sections.efforts')} testId="efforts">
+      <div data-round-efforts-table="true" style={{ minWidth: 0, overflowX: 'clip' }}>
+        <div
+          data-round-efforts-header="true"
+          style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 48px minmax(96px,112px)', alignItems: 'end', gap: 8, paddingBottom: 7 }}
+        >
+          <span style={{ color: INK_FAINT, fontSize: 8.5, fontWeight: 700, lineHeight: 1.2, textTransform: 'uppercase' }}>{t('roundResults.columns.round')}</span>
+          <span style={{ color: INK_FAINT, fontSize: 8.5, fontWeight: 700, lineHeight: 1.2, textAlign: 'right', textTransform: 'uppercase' }}>{t('roundResults.columns.score')}</span>
+          <span style={{ color: INK_FAINT, fontSize: 8.5, fontWeight: 700, lineHeight: 1.2, textAlign: 'right', textTransform: 'uppercase' }}>
+            {t('roundResults.columns.best', { possessive: scope?.possessive ?? t('roundResults.scope.their') })}
+          </span>
+        </div>
+        {efforts.map((effort) => {
+          const placing = placingText(effort.rank_here, effort.top_ten, t);
+          return (
+            <div key={effort.unit_kind} data-round-effort={effort.unit_kind} style={{ minHeight: 46, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 48px minmax(96px,112px)', alignItems: 'center', gap: 8 }}>
+              <span style={{ minWidth: 0 }}>
+                <span style={{ display: 'block', color: INK, fontSize: 13, fontWeight: 600, lineHeight: 1.2 }}>{t(unitKey(effort.unit_kind))}</span>
+                <span data-round-effort-span="true" style={{ display: 'block', color: INK_FAINT, fontSize: 10.5, lineHeight: 1.2, marginTop: 3 }}>{t(spanKey(effort.unit_kind))}</span>
+              </span>
+              <span style={{ color: INK, fontSize: 15, fontWeight: 700, lineHeight: 1, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatValue(effort.unit_kind, effort.value)}</span>
+              <span data-round-effort-placing={placing ?? undefined} style={{ color: placing ? LIVE_INK : INK_FAINT, fontSize: 11.5, fontWeight: placing ? 700 : 500, lineHeight: 1.2, textAlign: 'right', whiteSpace: 'nowrap' }}>{placing ?? '—'}</span>
+            </div>
+          );
+        })}
+      </div>
+      </Block>
+    </>
+  ) : null;
 
   return (
     <div data-round-results="true" style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS }}>
@@ -132,22 +193,7 @@ export function RoundResults({ result }: { result: RoundAwardsResult | null | un
           {holes.map((award, index) => <AwardRow key={`${award.unit_key}:${award.award_kind}:${index}`} award={award} />)}
         </Block>
       )}
-      {efforts.length > 0 && (
-        <Block title={t('roundResults.sections.efforts')} testId="efforts">
-          <div>
-            {efforts.map((effort) => {
-              const placing = placingText(effort.rank_here, effort.top_ten, t);
-              return (
-                <div key={effort.unit_kind} data-round-effort={effort.unit_kind} style={{ minHeight: 38, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 52px minmax(78px,auto)', alignItems: 'center', gap: 8 }}>
-                  <span style={{ minWidth: 0, color: INK, fontSize: 13, fontWeight: 600, lineHeight: 1.2 }}>{t(unitKey(effort.unit_kind))}</span>
-                  <span style={{ color: INK, fontSize: 15, fontWeight: 700, lineHeight: 1, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatValue(effort.unit_kind, effort.value)}</span>
-                  <span data-round-effort-placing={placing ?? undefined} style={{ color: INK_FAINT, fontSize: 11.5, lineHeight: 1.2, textAlign: 'right', whiteSpace: 'nowrap' }}>{placing}</span>
-                </div>
-              );
-            })}
-          </div>
-        </Block>
-      )}
+      {resultsTable}
     </div>
   );
 }

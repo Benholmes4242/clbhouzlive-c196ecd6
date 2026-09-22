@@ -1847,7 +1847,21 @@
   "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
   "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here.",
   "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
-  "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here."
+  "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
+  "figOfRoundsSelf": "von deinen {{count}} Runden hier",
+  "figOfRoundsOther": "von {{possessive}} {{count}} Runden hier",
+  "figVsYourAvgHere": "Schläge besser als dein Durchschnitt hier",
+  "figVsTheirAvgHere": "Schläge besser als {{possessive}} Durchschnitt hier",
+  "scopeYou": "Du",
+  "scopeYour": "deinen",
+  "scopeHe": "Er",
+  "scopeHis": "seinen",
+  "scopeShe": "Sie",
+  "scopeHer": "ihren",
+  "scopeThey": "Die Person",
+  "scopeTheir": "deren",
+  "scopeHave": "hast",
+  "scopeHas": "hat"
  },
  "searchSheet": {
   "added": "Added",

@@ -1801,7 +1801,21 @@
   "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
   "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here.",
   "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
-  "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here."
+  "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
+  "figOfRoundsSelf": "ここでのあなたの{{count}}ラウンド中",
+  "figOfRoundsOther": "ここでの{{count}}ラウンド中",
+  "figVsYourAvgHere": "ここでのあなたの平均より良い打数",
+  "figVsTheirAvgHere": "ここでの本人の平均より良い打数",
+  "scopeYou": "あなた",
+  "scopeYour": "あなたの",
+  "scopeHe": "彼",
+  "scopeHis": "彼の",
+  "scopeShe": "彼女",
+  "scopeHer": "彼女の",
+  "scopeThey": "本人",
+  "scopeTheir": "本人の",
+  "scopeHave": "は",
+  "scopeHas": "は"
  },
  "searchSheet": {
   "added": "Added",
