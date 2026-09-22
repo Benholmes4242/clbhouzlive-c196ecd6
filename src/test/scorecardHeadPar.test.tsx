@@ -20,6 +20,8 @@ import { roundCoursePar } from '@/lib/whs/api';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
 import { NohbhMiddle, nineSummary } from '@/features/courses/_shared/scorecard/scorecardParts';
 import { RoundCardHoleStrip } from '@/components/profile/handicap/whs/sections/round-card/RoundCardHoleStrip';
+import { roundScore } from '@/components/feed/roundGross';
+import type { PostRound, PostRoundHole } from '@/hooks/feed/usePostRounds';
 
 const rows = (n: number, playedTo = n) =>
   Array.from({ length: n }, (_, i) => ({
@@ -42,6 +44,27 @@ const seed = (holes: ReturnType<typeof rows>, totalHoles: number | null) => ({
   playDate: '2026-04-11',
 });
 
+const feedHoles = (count: number, playedTo = count): PostRoundHole[] =>
+  Array.from({ length: count }, (_, index) => ({
+    holeNo: index + 1,
+    par: 4,
+    gross: index + 1 <= playedTo ? (index === 9 ? 2 : 5) : null,
+    lineGross: index + 1 <= playedTo ? (index === 9 ? 2 : 5) : null,
+    adjGross: index + 1 <= playedTo ? (index === 9 ? 2 : 5) : null,
+    played: index + 1 <= playedTo,
+  }));
+
+const feedRound = (
+  holeShape: PostRoundHole[] | null,
+  totalHoles: number | null,
+  overrides: Partial<Pick<PostRound, 'grossScore' | 'coursePar'>> = {},
+): Pick<PostRound, 'grossScore' | 'coursePar' | 'holeShape' | 'totalHoles'> => ({
+  grossScore: overrides.grossScore ?? 72,
+  coursePar: overrides.coursePar ?? 72,
+  holeShape,
+  totalHoles,
+});
+
 const stripRows = (source: ReturnType<typeof rows>) => source.map((hole) => ({
   hole_no: hole.holeNo,
   par: hole.par,
@@ -60,21 +83,33 @@ function stripSummary(container: HTMLElement, label: 'OUT' | 'IN'): string {
 describe('the round par the head is shown against', () => {
   it('is 72 on a complete eighteen', () => {
     expect(roundCoursePar(rows(18), 18)).toBe(72);
+    expect(roundScore(feedRound(feedHoles(18), 18))).toMatchObject({
+      gross: 87, toPar: 15, thru: null, source: 'holes',
+    });
   });
 
   it('is NULL on ten holes of a declared eighteen — no par, not 40', () => {
     expect(roundCoursePar(rows(10), 18)).toBeNull();
     /* And on a card whose last eight rows exist but were never played. */
     expect(roundCoursePar(rows(18, 10), 18)).toBeNull();
+    expect(roundScore(feedRound(feedHoles(18, 10), 18))).toMatchObject({
+      gross: 47, toPar: 7, thru: 10, source: 'holes',
+    });
   });
 
   it('is the real ~35 on a complete nine', () => {
     const nine = rows(9).map((h) => ({ ...h, par: h.holeNo === 9 ? 3 : 4 }));
     expect(roundCoursePar(nine, 9)).toBe(35);
+    expect(roundScore(feedRound(feedHoles(9), 9))).toMatchObject({
+      gross: 45, toPar: 9, thru: null, source: 'holes',
+    });
   });
 
   it('is NULL when the declared length is not available on the path', () => {
     expect(roundCoursePar(rows(18), null)).toBeNull();
+    expect(roundScore(feedRound(feedHoles(10), null))).toMatchObject({
+      gross: 47, toPar: null, thru: null, source: 'holes',
+    });
   });
 });
 
@@ -132,5 +167,15 @@ describe('the gross-only stat row', () => {
     expect(container.textContent).toContain('84');
     expect(container.textContent).not.toContain('scorecard.toPar');
     expect(container.textContent).not.toContain('\u2014');
+
+    const pickedUp = feedHoles(18);
+    pickedUp[7] = { ...pickedUp[7], gross: null, lineGross: 5, adjGross: 5, played: true };
+    expect(roundScore(feedRound(pickedUp, 18, { grossScore: 88, coursePar: 72 }))).toEqual({
+      gross: 88,
+      toPar: 16,
+      thru: null,
+      source: 'whs',
+      unscoredHoles: 1,
+    });
   });
 });

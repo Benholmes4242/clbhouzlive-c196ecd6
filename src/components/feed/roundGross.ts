@@ -9,17 +9,17 @@
  *
  * THE RULE:
  *   - every played hole carries a gross -> the score IS the sum of the holes,
- *     and its to-par is that sum against the round's par. Header, nines, cells
- *     and trajectory then agree BY CONSTRUCTION, not by a reconciliation test.
+ *     and its to-par is that sum against the played par. A partial card keeps
+ *     that honest figure but qualifies it with its played-hole count.
  *   - any played hole has no gross (picked up, not returned) -> THERE IS NO
  *     ACTUAL GROSS. The WHS figure is shown and LABELLED as adjusted.
  *
  * NOTHING IS COMPUTED HERE beyond a sum of stored values. A net double bogey cap
  * depends on strokes received at that hole and is NEVER derived client-side.
  *
- * The to-par is the sum against the PLAYED par (the par of the holes summed),
- * falling back to the round's course par when the shape is absent, so a card can
- * never state a to-par against holes it did not include.
+ * The hole-sum to-par exists only when the round's DECLARED length is known. A
+ * complete card is unqualified; a partial card says how many holes it is through.
+ * The WHS fallback remains the adjusted gross against stored course par.
  */
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 
