@@ -765,7 +765,11 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     // nine-hole card covered, so a 1-9 card cannot be trusted as the front nine.
     front_nine_to_par: is18 ? rangeToPar(holes, 1, 9) : null,
     back_nine_to_par: is18 ? rangeToPar(holes, 10, 18) : null,
+    // BRIEF_FINISH_FOUR_UNIT — "the finish" is holes 15–18. finish_six_to_par
+    // is still written so the retired six-hole unit stays reversible until the
+    // column is dropped; nothing judges it any more.
     finish_six_to_par: is18 ? rangeToPar(holes, 13, 18) : null,
+    finish_four_to_par: is18 ? rangeToPar(holes, 15, 18) : null,
     evaluator_version: EVALUATOR_VERSION,
   };
 
