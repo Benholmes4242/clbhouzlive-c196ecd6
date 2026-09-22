@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { GamSheet } from '../../../../gam/_shared/GamSheet';
 import { gamAchievementsBus } from '../../events';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
+import { useMarkBadgeSeen } from '@/hooks/gam/useMarkBadgeSeen';
 import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
 import { useUserStreaks } from '@/hooks/gam/useUserStreaks';
 import { useBadgePopulationShare } from '@/hooks/gam/useBadgePopulationShare';
