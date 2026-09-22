@@ -1,6 +1,6 @@
 import React from 'react';
-import { cleanup, render } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { StandingsPanel } from '@/components/profile/handicap/whs/gam/trophy-room/career/panels/StandingsPanel';
 import {
@@ -10,6 +10,42 @@ import {
   groupStandings,
 } from '@/components/profile/handicap/whs/gam/trophy-room/career/standings';
 import type { MemberStandingRow } from '@/hooks/gam/useMemberStandings';
+import CareerRecordSheet from '@/components/profile/handicap/whs/gam/trophy-room/career/CareerRecordSheet';
+import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+
+/* BRIEF_STANDINGS_FOLLOWUPS — the empty branch reads these through the hook. */
+const standingsState = vi.hoisted(() => ({ rows: [] as unknown[] }));
+vi.mock('@/hooks/gam/useMemberStandings', () => ({
+  useMemberStandings: () => ({ data: standingsState.rows }),
+}));
+vi.mock('@/hooks/gam/useUserAchievements', () => ({
+  useUserAchievements: () => ({ data: [], isLoading: false }),
+}));
+vi.mock('@/hooks/gam/useUserTopLegends', () => ({
+  useUserTopLegends: () => ({ data: [], isLoading: false }),
+}));
+vi.mock('@/hooks/gam/useUserStreaks', () => ({
+  useUserStreaks: () => ({ data: [] }),
+}));
+vi.mock('@/hooks/gam/useCareerRounds', () => ({
+  useCareerRounds: () => ({ data: [] }),
+}));
+vi.mock('@/hooks/gam/useBadgePopulationShare', () => ({
+  useBadgePopulationShare: () => ({ data: undefined }),
+}));
+vi.mock('@/hooks/gam/useTop100Distribution', () => ({
+  useTop100Distribution: () => ({ data: [] }),
+}));
+vi.mock('@/hooks/gam/useGamRecordConfig', () => ({
+  useGamRecordConfig: () => ({ data: undefined }),
+  RECORD_CONFIG_DEFAULTS: {},
+}));
+vi.mock('@/hooks/gam/useCourseFieldSizes', () => ({
+  useCourseFieldSizes: () => ({ data: undefined }),
+}));
+vi.mock('@/hooks/gam/useCourseFieldPlayers', () => ({
+  useCourseFieldPlayers: () => ({ data: undefined }),
+}));
 
 afterEach(cleanup);
 
