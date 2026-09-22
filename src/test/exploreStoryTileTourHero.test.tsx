@@ -89,7 +89,7 @@ describe('Explore story tile matches the tour hero', () => {
     expect(meta?.style.display).toBe('flex');
     expect(meta?.style.alignItems).toBe('baseline');
     expect(meta?.style.gap).toBe('10px');
-    expect(meta?.style.minWidth).toBe('0px');
+    expect(meta?.style.minWidth).toBe('0');
     expect(meta?.style.padding).toBe('13px 16px 0px');
     expect(meta?.style.fontSize).toBe('9px');
     expect(meta?.style.fontWeight).toBe('700');
@@ -137,7 +137,7 @@ describe('Explore story tile matches the tour hero', () => {
     const copy = c.querySelector<HTMLElement>('[data-explore-hero-copy="true"]');
     const eyebrow = c.querySelector<HTMLElement>('[data-explore-story-eyebrow="true"]');
     expect(eyebrow?.textContent).toBe('Bunkered');
-    expect(eyebrow?.style.color).toBe('#FFFFFF');
+    expect(eyebrow?.style.color).toBe('rgb(255, 255, 255)');
     expect(eyebrow?.style.textTransform).toBe('uppercase');
     expect(eyebrow?.style.letterSpacing).toBe('0.19em');
     expect(eyebrow?.style.lineHeight).toBe('1.2');
