@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { GamSheet } from '../../../../gam/_shared/GamSheet';
 import { gamAchievementsBus } from '../../events';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
+import { useMarkBadgeSeen } from '@/hooks/gam/useMarkBadgeSeen';
 import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
 import { useUserStreaks } from '@/hooks/gam/useUserStreaks';
 import { useBadgePopulationShare } from '@/hooks/gam/useBadgePopulationShare';
@@ -199,6 +200,20 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
 
   const isLoading = badgesLoading || legendsLoading;
   const back = () => setView({ kind: 'room' });
+
+  /**
+   * A badge is marked seen when the member opens THAT badge's detail, never
+   * when the room opens and never in bulk. Own room only -- a friend opening
+   * your badge must not touch your marker. Optimistic and non-blocking; a
+   * failure only means the marker returns on next load.
+   */
+  const { mutate: markBadgeSeen } = useMarkBadgeSeen();
+  useEffect(() => {
+    if (isFriendView) return;
+    if (view.kind === 'counting' || view.kind === 'milestone' || view.kind === 'top100') {
+      markBadgeSeen(view.badgeId);
+    }
+  }, [view, isFriendView, markBadgeSeen]);
 
   /**
    * SPARSE: the typical member, not the edge case. With no crowns, no Top 100
