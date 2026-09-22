@@ -48,3 +48,9 @@
 - [x] Add the dedicated 16:9 long-form page card while leaving Amateur `VideoRow` untouched.
 - [x] Keep the community mosaic, count sources, URL contract, analytics, and viewer origins unchanged.
 - [x] Verify 320/390/430 geometry, Amateur rail parity, autoplay behavior, focused tests, and typecheck.
+
+## BRIEF_PARTIAL_CARD_COPY
+- [ ] Add the shared head’s `· thru N` suffix only when round par is null and played holes exist.
+- [ ] Remove the empty to-par stat from gross-only rounds when its value is null.
+- [ ] Verify partial eighteen, complete eighteen, complete nine, gross-only, focused tests, and typecheck.
+- [ ] Report every other nullable-par round to-par renderer without changing it.
