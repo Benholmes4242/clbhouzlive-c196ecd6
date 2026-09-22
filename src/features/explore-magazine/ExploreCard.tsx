@@ -831,27 +831,35 @@ export function ExploreCard({
       {headline}
     </div>
   );
-  /* §3 THE STANDFIRST, IN THE CARD'S OWN PALETTE, not the tour's. It sits on a
-     photograph, so it takes the same shadow the headline does. Absent renders
-     NOTHING: no empty paragraph and no reserved space, so the tile is 340
-     either way. */
-  const storyStandfirst = item.kind === 'story' ? item.facts.standfirst?.trim() || null : null;
-  const storySource = item.kind === 'story'
-    ? item.facts.source?.trim() || t('amateurNews.label', 'Amateur News')
+  /* THE SECTION LABEL IS FIXED. It names the section, not the story, so
+     it no longer falls back out of the story's own kicker: the kicker
+     now has its own slot above the headline and a card must
+     never print the same string twice. */
+  const storySectionLabel = item.kind === 'story'
+    ? t('amateurNews.label', 'Amateur News')
+    : null;
+  /* THE EVENT. Absent renders NOTHING — no empty line, no reserved
+     space — so a story published without a kicker simply leads with its
+     headline and the tile height is unchanged. */
+  const storyEyebrow = item.kind === 'story'
+    ? item.facts.source?.trim() || null
     : null;
   const storyAge = item.kind === 'story'
     ? storyTime(item.facts.published_at ?? item.facts.arrived_at ?? null)
     : null;
-  /* §2 ONE LINE AT THE TOP OF THE FRAME, not a split row inside the copy. One
-     string — the separator exists only when there is an age — rendered inside
-     the 48px chip lane a story never uses, so the column geometry is unchanged.
-     It truncates; it never wraps, because a second line would change the lane
-     height and push the photograph down. */
+  /* TWO PARTS ON ONE LINE: the section label takes the space and
+     truncates, the age is pinned right and never shrinks. Still one
+     line, still inside the 48px chip lane a story never otherwise uses,
+     so the column geometry and the 340px tile height are unchanged. It
+     must never wrap: a second line changes the lane height and pushes
+     the photograph down. */
   const storyMetaNode = item.kind === 'story' ? (
     <span
       data-explore-story-meta="true"
       style={{
-        display: 'block',
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: 10,
         padding: '13px 16px 0',
         color: HERO_STORY_META_COLOR,
         fontFamily: SANS,
@@ -861,36 +869,54 @@ export function ExploreCard({
         lineHeight: 1.2,
         textTransform: 'uppercase',
         textShadow: HERO_TEXT_SHADOW,
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-      }}
-    >
-      {`${storySource}${storyAge ? ` · ${storyAge}` : ''}`}
-    </span>
-  ) : null;
-  const standfirstNode = storyStandfirst ? (
-    <div
-      data-explore-standfirst="true"
-      data-explore-standfirst-clamp={3}
-      style={{
-        marginTop: 8,
-        fontFamily: SANS,
-        fontSize: 13.5,
-        lineHeight: 1.48,
-        color: 'rgba(248,250,252,0.80)',
-        textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
-        display: '-webkit-box',
-        WebkitLineClamp: 3,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden',
-        overflowWrap: 'break-word',
-        wordBreak: 'break-word',
         minWidth: 0,
       }}
     >
-      {storyStandfirst}
-    </div>
+      <span
+        data-explore-story-section="true"
+        style={{ flex: '1 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+      >
+        {storySectionLabel}
+      </span>
+      {storyAge ? (
+        <span
+          data-explore-story-age="true"
+          style={{ flex: '0 0 auto', whiteSpace: 'nowrap' }}
+        >
+          {storyAge}
+        </span>
+      ) : null}
+    </span>
+  ) : null;
+  /* THE EVENT, ABOVE THE HEADLINE. It is WHITE, not amber. The colour
+     law on this surface (courseled/tokens.tsx) is that amber means
+     is_viewer and nothing else, so an amber eyebrow on a news story
+     would read as "yours" to anyone who has learned the pattern. Full
+     white against the meta row's 0.82 is the separation, the same way
+     data-explore-kicker-course is white against a 0.62 scope line.
+     One line, truncating: a wrapped eyebrow steals a headline line. */
+  const storyEyebrowNode = storyEyebrow ? (
+    <span
+      data-explore-story-eyebrow="true"
+      style={{
+        display: 'block',
+        marginBottom: 7,
+        fontFamily: SANS,
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: '0.19em',
+        textTransform: 'uppercase',
+        lineHeight: 1.2,
+        color: '#FFFFFF',
+        textShadow: HERO_TEXT_SHADOW,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        minWidth: 0,
+      }}
+    >
+      {storyEyebrow}
+    </span>
   ) : null;
   /* C5 §1 — THE MEMBER'S OWN MEDIA IS THE GROUND, the course thumbnail the
      fallback. The order (video with a poster, then image, then course photo) is
@@ -1111,13 +1137,12 @@ export function ExploreCard({
                 ? { position: 'relative', zIndex: 1, display: 'block', padding: '0 16px 16px' }
                 : { position: 'relative', zIndex: 1, display: 'block', paddingInline: 16 }}
             >
-               {leadReview ? null : item.kind === 'story' ? null : (
+               {leadReview ? null : item.kind === 'story' ? storyEyebrowNode : (
                 <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               )}
               {/* §4.3 THE QUOTE IS GONE for a lead review — the words live on the
                   review page. Every other kind keeps its headline. */}
               {leadReview ? null : headlineNode}
-              {standfirstNode}
               {reviewFoot}
                {!leadReview && item.kind !== 'story' ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
             </span>
