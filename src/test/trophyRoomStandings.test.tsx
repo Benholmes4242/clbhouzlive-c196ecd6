@@ -21,6 +21,9 @@ vi.mock('@/hooks/gam/useMemberStandings', () => ({
 vi.mock('@/hooks/gam/useUserAchievements', () => ({
   useUserAchievements: () => ({ data: [], isLoading: false }),
 }));
+vi.mock('@/hooks/gam/useMarkBadgeSeen', () => ({
+  useMarkBadgeSeen: () => ({ mutate: vi.fn() }),
+}));
 vi.mock('@/hooks/gam/useUserTopLegends', () => ({
   useUserTopLegends: () => ({ data: [], isLoading: false }),
 }));
