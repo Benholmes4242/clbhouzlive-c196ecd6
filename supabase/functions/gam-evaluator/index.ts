@@ -2656,12 +2656,11 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
     .select("user_id, rank, value")
     .eq("course_id", courseId).eq("category", cfg.category).eq("is_current", true)
     .order("rank", { ascending: true });
-  // BRIEF_LEGENDS_RUNAWAY — prevTopUser is read HERE, before the skip return
-  // below, so the crown path's arr[0].user_id !== prevTopUser test is computed
-  // from the same snapshot whether or not a write happens. A skipped write
-  // means the board is identical, so the top user is unchanged by definition
-  // and no notification was due.
-  const prevTopUser = prev?.[0]?.user_id ?? null;
+  // BRIEF_LEGENDS_RUNAWAY / BRIEF_LEGEND_JOINT_RANKS — `prev` is read HERE,
+  // before the skip return below, so the crown diff is computed from the same
+  // snapshot whether or not a write happens. A skipped write means the board is
+  // identical, so the rank-1 set is unchanged by definition and no notification
+  // was due. The set (not a single top row) is derived by crownSetDelta.
 
 
   // Build the new FULL board client-side — every qualifying player, ranked from
