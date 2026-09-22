@@ -49,6 +49,12 @@ export interface CardScorecardHole {
   strokes: number | null;
   /** Optional field average retained for course-context comparisons. */
   fieldAvg?: number | null;
+  /**
+   * BRIEF_SCORECARD_HEAD_PAR — `whs_score_holes.played`, as the evaluator reads
+   * it. Only `played === true` counts towards the round par; absent or null is
+   * NOT complete. Never substituted by a truthiness test on strokes.
+   */
+  played?: boolean | null;
 }
 
 export interface CardScorecardRounds {
