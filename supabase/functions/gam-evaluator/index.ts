@@ -1784,6 +1784,17 @@ async function upsertBadgeTiered(
     { onConflict: "user_id,badge_id" }
   );
   if (isNewTier) {
+    const { fresh, reason, ageDays } = playDateFreshness(triggerPlayDate);
+    if (!fresh) {
+      console.log(`[gam-evaluator] badge notice suppressed — ${reason === 'stale' ? 'historic round' : `trigger play_date ${reason}`}`, {
+        badge_id: badgeId,
+        tier,
+        play_date: triggerPlayDate,
+        ageDays,
+        whs_score_id: whsScoreId,
+      });
+      return;
+    }
     await enqueueNotification(userId, "badge_earned", {
       badge_id: badgeId,
       badge_title: await fetchBadgeTitle(badgeId),
