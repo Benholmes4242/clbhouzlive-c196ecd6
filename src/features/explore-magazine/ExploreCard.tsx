@@ -20,7 +20,7 @@ import {
 } from '@/styles/photoScrim';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
-import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
+import { headlineFor, kickerParts, playDateFull, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
 import { calloutFor, rendersOnPhoto } from './cardTreatment';
 import { FigureCell, RoundStatStrip, vsHandicapLabel } from './AchievementCallout';
@@ -473,7 +473,6 @@ function WhoLine({
   ) : null;
 
   if (roundIdentity && !pair) {
-    const meta = [roundIdentity.course, roundIdentity.date].filter(Boolean).join(' · ');
     const hasFigures = roundIdentity.net != null && roundIdentity.par != null;
     const under = hasFigures && roundIdentity.net < roundIdentity.par;
     return (
@@ -482,11 +481,12 @@ function WhoLine({
           {avatar}
           <span style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0, gap: 3 }}>
             <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
-            {meta ? <span data-round-identity-meta="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{meta}</span> : null}
+            {roundIdentity.course ? <span data-round-identity-course="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{roundIdentity.course}</span> : null}
+            {roundIdentity.date ? <span data-round-identity-date="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap' }}>{roundIdentity.date}</span> : null}
           </span>
           {hasFigures ? (
             <span data-round-identity-figures="true" style={{ display: 'flex', flex: '0 0 auto', alignItems: 'center', justifyContent: 'flex-end', gap: 18 }}>
-              <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(roundIdentity.net)} under={under} />
+              <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(roundIdentity.net)} />
               <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(roundIdentity.net, roundIdentity.par)} under={under} />
             </span>
           ) : null}
@@ -1250,7 +1250,7 @@ export function ExploreCard({
             onWhoTap={onWhoTap}
             engagement={engagement}
             roundIdentity={item.kind === 'round' && size !== 'pair'
-              ? { course: kickerPartsValue.course, date: kickerDate, net: item.facts.net ?? null, par: item.facts.course_par ?? null }
+              ? { course: kickerPartsValue.course, date: playDateFull(item.facts.play_date ?? item.facts.arrived_at), net: item.facts.net ?? null, par: item.facts.course_par ?? null }
               : undefined}
           />
         </span>

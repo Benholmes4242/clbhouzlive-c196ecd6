@@ -536,6 +536,20 @@ export function relativeDay(iso: string | null | undefined): string | null {
   return then.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
 }
 
+/** Full play date for the round card identity. The year is shown only when it
+ * differs from the current year. */
+export function playDateFull(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const then = new Date(iso);
+  if (Number.isNaN(then.getTime())) return null;
+  return then.toLocaleDateString(undefined, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    ...(then.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' as const } : null),
+  });
+}
+
 /**
  * A RAIL CAPTION DATE IS A DATE, NOT AN AGE BUCKET. Unlike relativeDay, this
  * never changes from "Sun" to "Sun 6 Sep" at an arbitrary seven-day boundary,
