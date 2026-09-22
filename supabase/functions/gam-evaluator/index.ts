@@ -2780,11 +2780,14 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
   // Insert the FULL field, ranked from 1 with no cap. One insert; at this scale
   // (largest course ~17 players) chunking is unnecessary.
   if (arr.length > 0) {
-    const rows = arr.map((r, i) => ({
+    // BRIEF_LEGEND_JOINT_RANKS §1 — ranks come from the SAME assignCompetitionRanks
+    // result the signature above used, so the signature and the stored board can
+    // never disagree about what rank a row has.
+    const rows = ranked.map((r) => ({
       user_id: r.user_id,
       course_id: courseId,
       category: cfg.category,
-      rank: i + 1,
+      rank: r.rank,
       value: r.value,
       attained_at: r.attained_at,
       is_current: true,
