@@ -14,6 +14,7 @@ import { useRoundFeatRarity } from '@/hooks/gam/useFeatRarity';
 import { useRoundAwards } from '@/hooks/gam/useRoundAwards';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
+import { roundCoursePar } from '@/lib/whs/api';
 import { useRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
 import { useUserProfile } from '@/hooks/useUserProfile';
