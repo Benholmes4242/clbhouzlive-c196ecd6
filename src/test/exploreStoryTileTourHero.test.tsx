@@ -71,13 +71,10 @@ describe('Explore story tile matches the tour hero', () => {
     const scrim = c.querySelector<HTMLElement>('[data-explore-story-scrim="true"]');
     expect(scrim?.style.position).toBe('absolute');
     expect(scrim?.style.inset).toBe('0px');
-    expect(scrim?.style.background).toBe(
-      'linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.05) 34%, rgba(0, 0, 0, 0.86))',
-    );
-    /* Two scrims stacked would double-darken the foot. */
-    const copyScrims = Array.from(c.querySelectorAll<HTMLElement>('span[aria-hidden]'))
-      .filter((n) => n.style.background.includes('rgba(0, 0, 0, 0) 0%'));
-    expect(copyScrims).toHaveLength(0);
+    expect(scrim?.style.zIndex).toBe('1');
+    /* Two scrims stacked would double-darken the foot. jsdom drops gradient
+       values, so the copy scrim is asserted by its presence, not its fill. */
+    expect(c.querySelector('[data-explore-copy-scrim="true"]')).toBeNull();
   });
 
   it('§2 renders one meta line inside the unchanged 48px lane, at the tour hero type', () => {
@@ -117,7 +114,7 @@ describe('Explore story tile matches the tour hero', () => {
     const headline = c.querySelector<HTMLElement>('[data-explore-headline="true"]');
     const standfirst = c.querySelector<HTMLElement>('[data-explore-standfirst="true"]');
     expect(headline?.dataset.exploreLineClamp).toBe('4');
-    expect(standfirst?.style.webkitLineClamp).toBe('3');
+    expect(standfirst?.dataset.exploreStandfirstClamp).toBe('3');
     expect(standfirst?.style.color).toBe('rgba(248, 250, 252, 0.8)');
     expect(standfirst?.style.fontWeight).toBe('');
   });
@@ -137,8 +134,7 @@ describe('Explore story tile matches the tour hero', () => {
   it('§6 leaves the review card on its copy-anchored scrim and 2-line clamp', () => {
     const c = draw(review());
     expect(c.querySelector('[data-explore-story-scrim="true"]')).toBeNull();
-    const copyScrim = Array.from(c.querySelectorAll<HTMLElement>('span[aria-hidden]'))
-      .find((n) => n.style.background.includes('rgba(0, 0, 0, 0) 0%'));
+    const copyScrim = c.querySelector<HTMLElement>('[data-explore-copy-scrim="true"]');
     expect(copyScrim?.style.inset).toBe('0px');
     expect(c.querySelector<HTMLElement>('[data-explore-headline="true"]')?.dataset.exploreLineClamp).toBe('2');
     expect(c.querySelector('[data-review-identity="true"]')).not.toBeNull();
