@@ -406,7 +406,7 @@ describe('Explore card shapes', () => {
       <ExploreCard item={item} size="std" shape={null} onTap={() => undefined} />,
     );
     expect(container.querySelector('[data-explore-kicker="true"]')).toBeNull();
-    expect(container.querySelector('[data-round-identity-meta="true"]')?.textContent).toContain('Royal County Down');
+    expect(container.querySelector('[data-round-identity-meta="true"]')?.textContent).toContain('The Addington Golf Club');
   });
 
   it('renders no standalone kicker for club-ring and record rounds', () => {

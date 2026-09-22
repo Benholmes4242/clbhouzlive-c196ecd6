@@ -98,7 +98,7 @@ export function FeatRarityLines({
       <span
         data-feat-rarity-viewer={ownerLine ? undefined : 'true'}
         data-feat-rarity-owner={ownerLine ? 'true' : undefined}
-        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap' }}
       >
         {line}
       </span>
