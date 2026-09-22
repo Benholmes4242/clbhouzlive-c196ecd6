@@ -54,3 +54,9 @@
 - [x] Remove the empty to-par stat from gross-only rounds when its value is null.
 - [x] Verify partial eighteen, complete eighteen, complete nine, gross-only, focused tests, and typecheck.
 - [x] Report every other nullable-par round to-par renderer without changing it.
+
+## BRIEF_HOLE_STRIP_NINE_COMPLETENESS
+- [x] Require exactly nine strictly played holes with non-null par before rendering a nine's delta.
+- [x] Keep hole marks, gross totals, and complete-nine rendering unchanged.
+- [x] Verify partial eighteen, complete eighteen, complete nine, focused tests, full suite, and typecheck.
+- [x] Report the par source for the seven named unchanged to-par sites.

@@ -41,16 +41,19 @@ const HoleCell: React.FC<{
 
 
 const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }) => {
+  const complete = holes.length === 9 && holes.every(
+    (h) => h.played === true && h.par != null,
+  );
   const total = holes.reduce(
     (s, h) => s + (h.played ? (h.adjusted_gross ?? h.actual_gross ?? 0) : 0),
     0,
   );
-  const parTotal = holes.reduce((s, h) => s + (h.par ?? 0), 0);
+  const parTotal = complete ? holes.reduce((s, h) => s + (h.par ?? 0), 0) : null;
   const anyPlayed = holes.some(
     (h) => h.played && (h.adjusted_gross != null || h.actual_gross != null),
   );
-  const delta = anyPlayed ? total - parTotal : 0;
-  const deltaStr = anyPlayed
+  const delta = parTotal != null && anyPlayed ? total - parTotal : null;
+  const deltaStr = delta != null
     ? delta === 0 ? 'E' : delta > 0 ? `+${delta}` : `${delta}`
     : '';
 
@@ -102,7 +105,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
         <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--hcp-t-100)' }}>
           {anyPlayed ? total : '\u2014'}
         </span>
-        {anyPlayed && (
+        {delta != null && (
           <span
             style={{
               fontSize: 11,
