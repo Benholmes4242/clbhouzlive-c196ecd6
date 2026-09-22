@@ -218,7 +218,7 @@ export default function MediaLibraryPage() {
           {/* 2. LONGER WATCH — page-scale cards, not the Amateur shelf row. */}
           {kind === 'longer' && videos.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 22, padding: `0 ${GUTTER}px` }}>
-              {videos.map((item, index) => (
+              {videos.map((item) => (
                 <LibraryVideoCard
                   key={item.key}
                   item={item}
