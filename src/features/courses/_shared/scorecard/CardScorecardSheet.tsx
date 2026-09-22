@@ -88,6 +88,13 @@ export interface CardScorecardSheetProps {
   courseSlope?: number | null;
   // MIDDLE
   holes: CardScorecardHole[];
+  /**
+   * BRIEF_SCORECARD_HEAD_PAR — the round's DECLARED length
+   * (whs_scores.total_holes). The head's round par is only summed when every
+   * hole of this length is present, played and carries a par. ABSENT MEANS NO
+   * PAR: it is never inferred from the number of hole rows.
+   */
+  totalHoles?: number | null;
   nineHole?: boolean;
   rounds?: CardScorecardRounds;
   heroMuted?: boolean;
@@ -312,7 +319,7 @@ export interface CardScorecardEngagement {
 export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   open, onClose, eyebrowText,
   courseName, courseLocation, coursePar, courseSlope,
-  holes, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
+  holes, totalHoles = null, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext, fieldPlayers = null,
   playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, identityStat,
