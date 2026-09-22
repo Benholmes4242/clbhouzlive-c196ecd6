@@ -28,3 +28,10 @@
 ## Round par completeness (client) — 2026-09-22
 - Done: `roundCoursePar` in `src/lib/whs/api.ts` (strict `played === true`, must equal `total_holes`, else NULL); RoundDetailSheet now uses it for `coursePar` and `toParVal`.
 - Reported, not fixed (Ben to sequence): CardScorecardSheet `totals.toPar` + `totalPar`/`shownPar`, RoundPagePreview `shownPar`, scorecardParts `nineSummary.parPlayed`, ExploreMagazine seed par, roundGross `roundScore`, RoundCardHoleStrip nine deltas, CourseYouTab field par.
+
+## BRIEF_SCORECARD_HEAD_PAR — done
+- Round par in the scorecard head now comes only from `roundCoursePar`.
+- `CardScorecardSheet` takes `totalHoles` + per-hole `played`; local sum deleted.
+- `RoundPagePreview` uses the same rule; `RoundDetailSeed` gained optional `totalHoles`/`played`.
+- NULL declared length -> no par. Seed/preview paths have no declared length today (see report).
+- Out of scope, untouched: per-nine OUT/IN, totals.toPar, ExploreMagazine:1086, roundGross.ts, RoundCardHoleStrip.
