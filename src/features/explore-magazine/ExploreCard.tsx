@@ -1137,13 +1137,12 @@ export function ExploreCard({
                 ? { position: 'relative', zIndex: 1, display: 'block', padding: '0 16px 16px' }
                 : { position: 'relative', zIndex: 1, display: 'block', paddingInline: 16 }}
             >
-               {leadReview ? null : item.kind === 'story' ? null : (
+               {leadReview ? null : item.kind === 'story' ? storyEyebrowNode : (
                 <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               )}
               {/* §4.3 THE QUOTE IS GONE for a lead review — the words live on the
                   review page. Every other kind keeps its headline. */}
               {leadReview ? null : headlineNode}
-              {standfirstNode}
               {reviewFoot}
                {!leadReview && item.kind !== 'story' ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
             </span>
