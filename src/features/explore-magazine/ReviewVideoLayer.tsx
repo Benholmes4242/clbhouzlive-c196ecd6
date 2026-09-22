@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { autoplayBlocked, registerReviewVideo } from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
 import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
-import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 /**
