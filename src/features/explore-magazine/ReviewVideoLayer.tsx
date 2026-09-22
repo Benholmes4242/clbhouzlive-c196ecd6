@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { autoplayBlocked, registerReviewVideo } from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
 import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
-import { GlassBadge } from '@/components/media/GlassDurationBadge';
-import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 /**
@@ -84,7 +83,6 @@ export function ReviewVideoLayer({
   };
 
   const shown = playing && remaining != null ? remaining : durationS;
-  const label = shown ? formatDuration(shown) : null;
 
   return (
     <>
@@ -124,13 +122,11 @@ export function ReviewVideoLayer({
           />
         )}
       </span>
-      {label ? (
-        /* §1.3 TOP RIGHT, not GlassDurationBadge's settled bottom-right: on this
-           card the foot is the stat strip and the score. Do not "fix" it. */
-        <GlassBadge style={{ position: 'absolute', top: 8, right: 8, left: 'auto', bottom: 'auto', zIndex: 3 }}>
-          {label}
-        </GlassBadge>
-      ) : null}
+      {/* BOTTOM RIGHT, the Clubhouse feed card's exact badge: same
+          GlassDurationBadge, same fontSize 9.5, same 6px inset (its defaults).
+          The countdown comes from this caller's `seconds` — the badge itself
+          is untouched. (Supersedes §1.3's top-right; Ben's call.) */}
+      <GlassDurationBadge seconds={shown} fontSize={9.5} />
     </>
   );
 }
