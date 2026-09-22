@@ -773,29 +773,32 @@ export function ExploreCard({
   const storyAge = item.kind === 'story'
     ? storyTime(item.facts.published_at ?? item.facts.arrived_at ?? null)
     : null;
+  /* §2 ONE LINE AT THE TOP OF THE FRAME, not a split row inside the copy. One
+     string — the separator exists only when there is an age — rendered inside
+     the 48px chip lane a story never uses, so the column geometry is unchanged.
+     It truncates; it never wraps, because a second line would change the lane
+     height and push the photograph down. */
   const storyMetaNode = item.kind === 'story' ? (
-    <div
+    <span
       data-explore-story-meta="true"
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-        marginBottom: 8,
-        color: PHOTO_REVIEW_LABEL,
+        display: 'block',
+        padding: '13px 16px 0',
+        color: HERO_STORY_META_COLOR,
         fontFamily: SANS,
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 700,
+        letterSpacing: '0.16em',
         lineHeight: 1.2,
         textTransform: 'uppercase',
         textShadow: HERO_TEXT_SHADOW,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
       }}
     >
-      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {storySource}
-      </span>
-      {storyAge ? <span style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>{storyAge}</span> : null}
-    </div>
+      {`${storySource}${storyAge ? ` · ${storyAge}` : ''}`}
+    </span>
   ) : null;
   const standfirstNode = storyStandfirst ? (
     <div
@@ -804,9 +807,8 @@ export function ExploreCard({
         marginTop: 8,
         fontFamily: SANS,
         fontSize: 13.5,
-        fontWeight: 500,
         lineHeight: 1.48,
-        color: 'rgba(255,255,255,0.85)',
+        color: 'rgba(248,250,252,0.80)',
         textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
         display: '-webkit-box',
         WebkitLineClamp: 2,
