@@ -353,7 +353,16 @@ function WhoLine({
   roundIdentity?: { course: string | null; date: string | null; net: number | null; par: number | null };
 }) {
   const { t } = useTranslation('courses');
-  const who = item.who;
+  /* AN OBJECT IS NOT AN IDENTITY. get_explore_stream builds its `who`
+     with jsonb_build_object on every branch, but only rounds and
+     reviews select a display_name — a course and a story arrive as an
+     object of nulls, which is truthy, which rendered "A member" under
+     a card that has no member. A who without a user_id or a name is
+     absent, whatever shape it arrived in. */
+  const rawWho = item.who;
+  const who = rawWho && (rawWho.user_id || rawWho.display_name?.trim())
+    ? rawWho
+    : null;
   /* THE THREE TEXT SLOTS SHARE ONE PALETTE whether they sit on the photograph
      or the canvas. Only the photograph adds a shadow. */
   const nameColor = who?.is_viewer ? A.AMBER : '#FFFFFF';
