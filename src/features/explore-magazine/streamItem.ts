@@ -125,6 +125,10 @@ export interface StreamFacts {
     facilities: number | null;
   };
   photoCount?: number;
+  /** BRIEF_EXPLORE_REVIEW_TILE_C5 §1 — the MEMBER'S own chosen media for the
+   *  lead review tile, resolved once by the enrichment hook. Null means the card
+   *  falls back to the course thumbnail, exactly as before. */
+  reviewMedia?: ReviewCardMedia | null;
   top100_world?: number | null;
   top100_regional?: number | null;
   /** THE LIST THE RANK CAME FROM ('global' | 'gb-i' | 'usa' | 'europe'). The
