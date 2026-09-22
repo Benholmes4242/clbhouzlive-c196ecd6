@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
-import { FEAT_GOLD_WASH, FEAT_RARITY_GOLD_INK, FEAT_TOP_WASH, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { INK_FAINT } from '@/features/courses/_shared/tokens';
 
