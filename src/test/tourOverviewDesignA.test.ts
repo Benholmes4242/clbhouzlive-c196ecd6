@@ -4,6 +4,7 @@ import { render } from '@testing-library/react';
 import { createElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { computeBoardColumns, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import { formatOverviewDateRange, getOverviewCountdown, overviewChampionScoreLabel } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
@@ -177,6 +178,19 @@ describe('Tour Overview correctness gates', () => {
     const totalsHeader = totalsOnly.container.querySelector<HTMLElement>('[data-overview-board-header]');
     expect(totalsHeader?.textContent).not.toContain('R1');
     expect(totalsHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px');
+  });
+
+  it('marks the current round live only until the tournament is complete', () => {
+    const entries: BoardEntry[] = [{
+      id: 'leader',
+      position: 1,
+      score: -26,
+      round_4: -10,
+      player: { id: 'leader', full_name: 'Jacob Bridgeman' },
+    }];
+
+    expect(computeBoardColumns(entries, 4).liveRound).toBe(4);
+    expect(computeBoardColumns(entries, 4, true).liveRound).toBeNull();
   });
 
   it('keeps Also This Week inside the coming Sunday', () => {
