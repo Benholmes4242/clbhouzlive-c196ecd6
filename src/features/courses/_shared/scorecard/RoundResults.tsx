@@ -183,7 +183,7 @@ export function RoundResults({ result, scope }: { result: RoundAwardsResult | nu
                     <span data-round-effort-span="true" style={{ display: 'block', color: INK_FAINT, fontSize: 10.5, lineHeight: 1.2, marginTop: 3 }}>{t(spanKey(effort.unit_kind))}</span>
                   </span>
                   <span style={{ color: INK, fontSize: 15, fontWeight: 700, lineHeight: 1, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatValue(effort.unit_kind, effort.value)}</span>
-                  <span data-round-effort-placing={placing ?? undefined} style={{ color: placing ? LIVE_INK : INK_FAINT, fontSize: 11.5, fontWeight: placing ? 700 : 500, lineHeight: 1.2, textAlign: 'right', whiteSpace: 'nowrap' }}>{placing ?? ''}</span>
+                  <span data-round-effort-placing={placing ?? undefined} style={{ color: placing ? LIVE_INK : INK_FAINT, fontSize: 11.5, fontWeight: placing ? 700 : 500, lineHeight: 1.2, textAlign: 'right', whiteSpace: 'nowrap' }}>{placing ?? '—'}</span>
                 </div>
               );
             })}

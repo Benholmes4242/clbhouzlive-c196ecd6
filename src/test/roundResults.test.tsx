@@ -22,7 +22,14 @@ describe('round results', () => {
   });
 
   it('renders the sealed historic round as best efforts only', () => {
-    const { container } = render(<RoundResults result={{ awards: [], efforts }} />);
+    const { container } = render(<RoundResults result={{ awards: [], efforts }} scope={{
+      courseName: 'Royal Birkdale',
+      roundsHere: 71,
+      subjectName: 'Your',
+      subject: 'You',
+      possessive: 'your',
+      verb: 'have',
+    }} />);
     expect(container.querySelector('[data-round-results-block="awards"]')).toBeNull();
     expect(container.querySelector('[data-round-results-block="holes"]')).toBeNull();
     expect(container.querySelector('[data-round-results-block="efforts"]')).not.toBeNull();
@@ -31,6 +38,9 @@ describe('round results', () => {
     expect(container.querySelector('[data-round-effort="finish_six"]')?.textContent).toContain('E');
     expect(container.querySelector('[data-round-effort="finish_six"] [data-round-effort-span]')?.textContent).toBe('roundResults.spans.finish_six');
     expect(container.querySelector('[data-round-effort="front_nine"] [data-round-effort-placing]')?.getAttribute('style')).toContain('color');
+    expect(container.querySelector('[data-round-results-scope]')?.textContent).toContain('roundResults.scope.heading');
+    expect(container.querySelector('[data-round-efforts-header]')?.textContent).toContain('roundResults.columns.best');
+    expect(container.querySelector('[data-round-efforts-table]')?.getAttribute('style')).toContain('overflow-x: clip');
   });
 
   it('keeps coarse and hole awards in separate blocks and omits a null delta chip', () => {
