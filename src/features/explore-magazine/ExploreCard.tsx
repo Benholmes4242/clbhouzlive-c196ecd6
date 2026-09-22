@@ -1040,7 +1040,9 @@ export function ExploreCard({
           properly. */}
       {reviewMedia?.kind === 'video' ? (
         <>
-          <MomentPlayGlyph />
+          <span data-review-play="true" style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
+            <MomentPlayGlyph />
+          </span>
           {reviewMedia.durationS ? (
             <GlassBadge style={{ position: 'absolute', top: 'auto', bottom: 8, right: 8, left: 'auto', zIndex: 3 }}>
               {formatDuration(reviewMedia.durationS)}
