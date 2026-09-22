@@ -270,12 +270,16 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
                   />
                 ))}
               </div>
-            ) : achievements.length === 0 && crownGroups.length === 0 ? (
+            ) : achievements.length === 0 && crownGroups.length === 0 && standings.length === 0 ? (
               <Caption>
                 {isFriendView
                   ? 'Nothing on the record yet.'
                   : 'Nothing on the record yet. Post a round and it starts here.'}
               </Caption>
+            ) : achievements.length === 0 && crownGroups.length === 0 ? (
+              /* Standings present, badges and crowns absent: show the standings,
+                 never "Nothing on the record yet" above real course records. */
+              <StandingsPanel rows={standings} />
             ) : (
               <>
                 <SeasonCutPanel rounds={rounds} />
