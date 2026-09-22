@@ -1082,12 +1082,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     const gross = seedHoles.every((h) => h.strokes != null)
       ? seedHoles.reduce((sum, h) => sum + (h.strokes ?? 0), 0)
       : null;
-    const par = seedHoles.every((h) => h.par != null)
-      ? seedHoles.reduce((sum, h) => sum + (h.par ?? 0), 0)
-      : null;
+    /* BRIEF_ROUND_SHAPE_CARRIES_PAR §3 — the STORED round par from the shapes
+       hook. The old "sum the seeded pars" derivation printed a to-par against
+       par 40 on a ten-hole card; a null par renders no to-par at all. */
+    const par = shape?.coursePar ?? null;
     return {
       scoreId: item.facts.score_id,
       holes: seedHoles,
+      par,
       gross,
       toPar: gross != null && par ? gross - par : null,
       courseName: item.subject.course_name,

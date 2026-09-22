@@ -59,6 +59,15 @@ export interface RoundDetailSeed {
    * PREVIEW SHOWS NO ROUND PAR; it is never inferred from the seeded rows.
    */
   totalHoles?: number | null;
+  /**
+   * BRIEF_ROUND_SHAPE_CARRIES_PAR §3 — THE STORED ROUND PAR, READ NOT DERIVED.
+   *
+   * gam_round_stats.course_par, carried by the seeding read. It is already NULL
+   * on an incomplete card, so a seeded preview prints the same figure the
+   * settled sheet does. When it is absent the preview falls back to the ONE
+   * client rule (roundCoursePar + totalHoles); when both are absent, no par.
+   */
+  par?: number | null;
   gross: number | null;
   toPar: number | null;
   courseName: string;
