@@ -98,6 +98,13 @@ Deno.serve(async (req) => {
       return json(res);
     }
 
+    // ONE-OFF CONTESTED-TITLE BACKFILL. Dry run unless apply === true.
+    // Runs entirely under REBUILD_SUPPRESS — see recomputeAllLegendTitles.
+    if (body?.action === "recompute_legend_titles") {
+      const res = await recomputeAllLegendTitles({ apply: body?.apply === true });
+      return json(res);
+    }
+
     // Cron drain
 
     await reapStaleLocks();
