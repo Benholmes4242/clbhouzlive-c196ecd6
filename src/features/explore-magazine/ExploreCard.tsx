@@ -210,9 +210,18 @@ function CourseRankChip({ item }: { item: StreamItem }) {
 }
 
 /** §4b, by type. A story carries none; a moment carries none. */
-function chipsFor(item: StreamItem, t: (k: string, f?: string | Record<string, unknown>) => string, locale: string) {
+function chipsFor(
+  item: StreamItem,
+  t: (k: string, f?: string | Record<string, unknown>) => string,
+  locale: string,
+  size: CardSize,
+) {
   const out: React.ReactNode[] = [];
   const { facts, kind } = item;
+  /* C5 §4.1/§4.2 — THE LEAD REVIEW CARRIES NEITHER CHIP any more: the score is
+     the 40px figure in the foot, and the photo count is gone. Reviews at std and
+     pair are untouched, so the gate is the SIZE, not the kind. */
+  const leadReviewChips = kind === 'review' && size === 'lead';
 
   if (kind === 'round' && facts.gross != null) {
     const toPar = toParLabel(facts.to_par);
