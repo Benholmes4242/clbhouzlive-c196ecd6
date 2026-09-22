@@ -771,6 +771,7 @@ function AppRoutes() {
         <Routes>
           <Route path="/courses/:courseId/rate" element={<ReviewComposerOverlay />} />
           <Route path="/rate-course-v2/:courseId" element={<ReviewComposerOverlay />} />
+          <Route path="/round/:whsScoreId" element={<Suspense fallback={<RoundPageSkeleton />}><RoundPage /></Suspense>} />
         </Routes>
       )}
 

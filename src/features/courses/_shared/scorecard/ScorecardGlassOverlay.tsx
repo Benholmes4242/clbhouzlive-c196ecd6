@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 
 import { pushSheetEntry, releaseSheetEntry } from '@/components/ui/sheetHistory';
 import { Z } from '@/config/zIndex';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 
 const AXIS_LOCK_PX = 8;
 const AXIS_RATIO = 1.2;
@@ -279,6 +280,12 @@ export function ScorecardGlassOverlay({
           flexDirection: 'column',
           overflow: 'hidden',
           background: 'var(--page-canvas, #0d0d0d)',
+          /* THE PAGE WEARS THE SHARED ISLANDS, so it starts below them. The
+             first child of this branch is the scorecard's FEAT BAND, which
+             was rendering underneath the island. CHROME_CLEARANCE resolves
+             to 0px on routes with no chrome, so the overlay presentation and
+             any future chrome:'none' host are unaffected. */
+          paddingTop: CHROME_CLEARANCE,
         }}
       >
         {children}

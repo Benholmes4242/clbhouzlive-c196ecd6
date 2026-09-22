@@ -293,7 +293,15 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
     const url = getActivityLink(row);
     if (!url) return;
     const opensReviewWizard = url.startsWith('/rate-course-v2/') || /^\/courses\/[^/]+\/rate\/?$/.test(url.split('?')[0]);
-    if (opensReviewWizard) {
+    /* A ROUND OPENS OVER THE LIST, NOT INSTEAD OF IT. Every round
+       destination in activityLinks — new_post, and a like / comment /
+       mention on a round — resolves to /round/:id, so one test covers
+       them all. The URL still changes, so the back gesture closes the
+       card and Activity is never re-fetched or re-scrolled. A cold
+       arrival at the same URL (shared link, push into a cold app) has
+       no backgroundLocation and still gets the full page. */
+    const opensOverList = opensReviewWizard || url.startsWith('/round/');
+    if (opensOverList) {
       navigate(url, { state: { backgroundLocation: location } });
       return;
     }

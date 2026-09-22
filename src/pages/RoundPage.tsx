@@ -132,6 +132,17 @@ const RoundPage: React.FC = () => {
    * goes back where it came from.
    */
   const hasHistory = location.key !== 'default';
+  /**
+   * OVERLAY OR PAGE, DECIDED BY HOW IT WAS ENTERED. App.tsx mounts this
+   * same component in its backgroundLocation block, where the origin
+   * page is still rendered beneath us — so the sheet takes its normal
+   * overlay presentation and rises over it, exactly as a score tile
+   * does on Explore. A cold arrival has no backgroundLocation and keeps
+   * the full-page presentation this route was built for.
+   */
+  const asOverlay = Boolean(
+    (location.state as { backgroundLocation?: unknown } | null)?.backgroundLocation,
+  );
   const goBack = () => {
     if (hasHistory) navigate(-1);
     else navigate('/handicap', { replace: true });
@@ -159,7 +170,7 @@ const RoundPage: React.FC = () => {
   usePageReady(!pending);
 
   const content = useMemo(() => {
-    if (pending) return <RoundPageSkeleton />;
+    if (pending) return asOverlay ? null : <RoundPageSkeleton />;
 
     if (missingId) {
 
@@ -186,20 +197,25 @@ const RoundPage: React.FC = () => {
     // The sheet owns every remaining outcome: it shows a syncing state while the
     // score resolves, and its 'unavailable' state for a deleted score or one
     // this viewer cannot see under RLS. Nothing here can end in a blank screen.
-    return (
+    const sheet = (
+      <RoundDetailSheet
+        open
+        presentation={asOverlay ? 'overlay' : 'page'}
+        onClose={goBack}
+        scoreId={whsScoreId}
+        profileUserId={ownerId}
+        initialCommentsOpen={openCommentsRequested}
+      />
+    );
+    /* The canvas is the PAGE's, not the overlay's: an opaque 100dvh
+       backdrop over Activity would defeat the point. */
+    return asOverlay ? sheet : (
       <div style={{ minHeight: '100dvh', background: A.CANVAS }}>
-        <RoundDetailSheet
-          open
-          presentation="page"
-          onClose={goBack}
-          scoreId={whsScoreId}
-          profileUserId={ownerId}
-          initialCommentsOpen={openCommentsRequested}
-        />
+        {sheet}
       </div>
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pending, missingId, signedOut, whsScoreId, ownerId, t, hasHistory, authLoading]);
+  }, [pending, missingId, signedOut, whsScoreId, ownerId, t, hasHistory, authLoading, asOverlay]);
 
   return content;
 };
