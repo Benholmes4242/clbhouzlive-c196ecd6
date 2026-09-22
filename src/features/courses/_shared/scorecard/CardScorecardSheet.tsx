@@ -1,4 +1,5 @@
 import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
+import { roundCoursePar } from '@/lib/whs/api';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MapPin, Share, User } from 'lucide-react';

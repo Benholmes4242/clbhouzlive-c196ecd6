@@ -345,8 +345,12 @@ export interface RoundSummaryHeadProps {
   showScore: boolean;
   gross: number | null;
   toPar: number | null;
-  /** Par the to-par is measured against; 0 falls back to coursePar. */
-  shownPar?: number;
+  /**
+   * The ROUND par the to-par is measured against, from roundCoursePar and
+   * nowhere else. NULL or 0 falls back to coursePar, and with neither the
+   * "· par N" suffix is dropped — the correct outcome for an incomplete card.
+   */
+  shownPar?: number | null;
   coursePar?: number | null;
   heroMuted?: boolean;
   playerName?: string | null;
