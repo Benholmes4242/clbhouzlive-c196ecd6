@@ -62,28 +62,35 @@ describe('the round par the head is shown against', () => {
   });
 });
 
+/* The harness prints the i18n KEY rather than the English line, so the par
+   suffix is asserted on `scorecard.parN` and the figure itself on the rule. */
+const PAR_SUFFIX = 'scorecard.parN';
+
 describe('the preview head prints the par only when the card is whole', () => {
-  it('shows par 72 on a complete eighteen and keeps OUT / IN at 36 each', () => {
-    render(<RoundPagePreview seed={seed(rows(18), 18)} />);
-    expect(screen.getByText(/par 72/i)).toBeTruthy();
+  it('prints the par suffix on a complete eighteen and keeps OUT / IN at 36 each', () => {
+    const { container } = render(<RoundPagePreview seed={seed(rows(18), 18)} />);
+    expect(container.textContent).toContain(PAR_SUFFIX);
+    expect(roundCoursePar(rows(18), 18)).toBe(72);
     expect(nineSummary(rows(18).slice(0, 9)).par).toBe(36);
     expect(nineSummary(rows(18).slice(9)).par).toBe(36);
   });
 
-  it('shows NO par on ten of eighteen, and the front nine still reads 36', () => {
-    render(<RoundPagePreview seed={seed(rows(10), 18)} />);
-    expect(screen.queryByText(/par \d+/i)).toBeNull();
+  it('prints NO par on ten of eighteen, and the front nine still reads 36', () => {
+    const { container } = render(<RoundPagePreview seed={seed(rows(10), 18)} />);
+    expect(container.textContent).not.toContain(PAR_SUFFIX);
     expect(nineSummary(rows(10).slice(0, 9)).par).toBe(36);
   });
 
-  it('shows the nine-hole round its own par', () => {
+  it('prints the par on a complete nine, whose own par is 35', () => {
     const nine = rows(9).map((h) => ({ ...h, par: h.holeNo === 9 ? 3 : 4 }));
-    render(<RoundPagePreview seed={seed(nine, 9)} />);
-    expect(screen.getByText(/par 35/i)).toBeTruthy();
+    const { container } = render(<RoundPagePreview seed={seed(nine, 9)} />);
+    expect(container.textContent).toContain(PAR_SUFFIX);
+    expect(roundCoursePar(nine, 9)).toBe(35);
+    expect(nineSummary(nine).par).toBe(35);
   });
 
-  it('shows no par when the seed carries no declared length', () => {
-    render(<RoundPagePreview seed={seed(rows(18), null)} />);
-    expect(screen.queryByText(/par \d+/i)).toBeNull();
+  it('prints no par when the seed carries no declared length', () => {
+    const { container } = render(<RoundPagePreview seed={seed(rows(18), null)} />);
+    expect(container.textContent).not.toContain(PAR_SUFFIX);
   });
 });
