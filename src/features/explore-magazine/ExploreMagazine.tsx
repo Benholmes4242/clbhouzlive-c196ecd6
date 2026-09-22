@@ -1076,7 +1076,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     if (!item.facts.score_id || !item.subject?.course_name) return null;
     const shape = shapesMap?.get(item.facts.score_id) ?? null;
     const seedHoles = (shape?.holes ?? []).map((h) => ({
-      holeNo: h.holeNo, par: h.par, strokes: h.sheetStrokes,
+      holeNo: h.holeNo, par: h.par, strokes: h.sheetStrokes, played: true,
     }));
     if (seedHoles.length === 0) return null;
     const gross = seedHoles.every((h) => h.strokes != null)

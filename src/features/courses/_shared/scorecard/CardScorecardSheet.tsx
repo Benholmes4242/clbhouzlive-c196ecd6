@@ -663,6 +663,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const roundPar = roundCoursePar(holes.map((h) => ({ par: h.par, played: h.played })), totalHoles ?? null);
   const allHolesPlayed = holes.length > 0 && played.length === holes.length;
   const shownPar = roundPar;
+  const playedHolesForHead = holes.filter((h) => h.played === true && h.par != null).length;
   /* FOLLOW-UP A — the not-played line is drawn from the SAME hole rows the card
      draws, so the line and the marks on the grid can never disagree. */
   const hasUnplayedHole = holes.length > 0 && !allHolesPlayed;
@@ -865,6 +866,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           gross={totals.gross}
           toPar={totals.toPar}
           shownPar={shownPar}
+          playedHoles={playedHolesForHead}
           coursePar={coursePar ?? null}
           heroMuted={heroMuted}
           playerName={playerName}

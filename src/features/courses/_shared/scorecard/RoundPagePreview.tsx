@@ -70,6 +70,7 @@ export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
     holes.map((h) => ({ par: h.par, played: h.played })),
     seed?.totalHoles ?? null,
   );
+  const playedHolesForHead = holes.filter((h) => h.played === true && h.par != null).length;
 
   return (
     <div
@@ -88,6 +89,7 @@ export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
         gross={seed?.gross ?? null}
         toPar={seed?.toPar ?? null}
         shownPar={shownPar}
+        playedHoles={playedHolesForHead}
         playerName={seed?.playerName ?? null}
         playerAvatarUrl={seed?.playerAvatarUrl ?? null}
         isOwner={isOwner}

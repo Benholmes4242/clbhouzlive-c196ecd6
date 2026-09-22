@@ -18,7 +18,7 @@ import { render } from '@testing-library/react';
 
 import { roundCoursePar } from '@/lib/whs/api';
 import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
-import { nineSummary } from '@/features/courses/_shared/scorecard/scorecardParts';
+import { NohbhMiddle, nineSummary } from '@/features/courses/_shared/scorecard/scorecardParts';
 
 const rows = (n: number, playedTo = n) =>
   Array.from({ length: n }, (_, i) => ({
@@ -65,6 +65,7 @@ describe('the round par the head is shown against', () => {
 /* The harness prints the i18n KEY rather than the English line, so the par
    suffix is asserted on `scorecard.parN` and the figure itself on the rule. */
 const PAR_SUFFIX = 'scorecard.parN';
+const THRU_SUFFIX = 'scorecard.thruN';
 
 describe('the preview head prints the par only when the card is whole', () => {
   it('prints the par suffix on a complete eighteen and keeps OUT / IN at 36 each', () => {
@@ -75,16 +76,21 @@ describe('the preview head prints the par only when the card is whole', () => {
     expect(nineSummary(rows(18).slice(9)).par).toBe(36);
   });
 
-  it('prints NO par on ten of eighteen, and the front nine still reads 36', () => {
-    const { container } = render(<RoundPagePreview seed={seed(rows(10), 18)} />);
+  it('prints thru 10 but NO par on ten of eighteen, and the front nine still reads 36', () => {
+    const partial = { ...seed(rows(18, 10), 18), toPar: 2 };
+    const { container } = render(<RoundPagePreview seed={partial} />);
     expect(container.textContent).not.toContain(PAR_SUFFIX);
-    expect(nineSummary(rows(10).slice(0, 9)).par).toBe(36);
+    expect(container.textContent).toContain(THRU_SUFFIX);
+    expect(container.textContent).toContain('10');
+    expect(container.textContent).toContain('+2');
+    expect(nineSummary(partial.holes.slice(0, 9)).par).toBe(36);
   });
 
   it('prints the par on a complete nine, whose own par is 35', () => {
     const nine = rows(9).map((h) => ({ ...h, par: h.holeNo === 9 ? 3 : 4 }));
     const { container } = render(<RoundPagePreview seed={seed(nine, 9)} />);
     expect(container.textContent).toContain(PAR_SUFFIX);
+    expect(container.textContent).not.toContain(THRU_SUFFIX);
     expect(roundCoursePar(nine, 9)).toBe(35);
     expect(nineSummary(nine).par).toBe(35);
   });
@@ -92,5 +98,14 @@ describe('the preview head prints the par only when the card is whole', () => {
   it('prints no par when the seed carries no declared length', () => {
     const { container } = render(<RoundPagePreview seed={seed(rows(18), null)} />);
     expect(container.textContent).not.toContain(PAR_SUFFIX);
+  });
+});
+
+describe('the gross-only stat row', () => {
+  it('shows gross alone when to-par cannot exist', () => {
+    const { container } = render(<NohbhMiddle gross={84} toPar={null} />);
+    expect(container.textContent).toContain('84');
+    expect(container.textContent).not.toContain('scorecard.toPar');
+    expect(container.textContent).not.toContain('\u2014');
   });
 });
