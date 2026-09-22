@@ -12,6 +12,26 @@
 // Pure helpers so the count and the badge tier can be derived from one number in
 // one place, and so the rule is provable without a database.
 
+// BRIEF_TENURE_DOES_NOT_AWARD — attendance is not golf.
+//
+// most_rounds_all_time and most_birdies_all_time measure turning up: an all-time
+// attendance board is winnable only by whoever arrived first. They still COMPUTE,
+// still store, and still display on the Champions board and the Course Record
+// Book — they simply do not award a title and do not notify a crown.
+//
+// most_rounds_90d is NOT here and keeps its award status: a rolling ninety-day
+// window is winnable by anyone who plays.
+//
+// ONE list, exported, read by the title count AND the crown notification gate.
+export const TENURE_CATEGORIES = [
+  'most_rounds_all_time',
+  'most_birdies_all_time',
+] as const;
+
+export function isTenureCategory(category: string): boolean {
+  return (TENURE_CATEGORIES as readonly string[]).includes(category);
+}
+
 export interface BoardKeyRow {
   course_id: string;
   category: string;
@@ -52,6 +72,8 @@ export function countContestedTitles(
   const contested = contestedBoardKeys(claimantRows);
   const seen = new Set<string>();
   for (const row of userRankOneBoards) {
+    // BRIEF_TENURE_DOES_NOT_AWARD — attendance boards never award a title.
+    if (isTenureCategory(row.category)) continue;
     const key = boardKey(row);
     if (contested.has(key)) seen.add(key);
   }
