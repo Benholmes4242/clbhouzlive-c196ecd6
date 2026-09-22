@@ -16,6 +16,7 @@ const item = (facts: StreamItem['facts']): StreamItem => ({
 });
 const shape = (ds: number[]): HoleShape => ({
   series: [0, ...ds.reduce<number[]>((out, d) => [...out, (out.at(-1) ?? 0) + d], [])],
+  coursePar: null,
   beads: [], played: ds.length, birdies: ds.filter((d) => d < 0).length,
   holes: ds.map((d, i) => ({ holeNo: i + 1, par: 4, strokes: 4 + d, sheetStrokes: 4 + d })),
 });

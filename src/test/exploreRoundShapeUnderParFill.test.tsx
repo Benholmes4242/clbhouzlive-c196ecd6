@@ -13,6 +13,7 @@ const row = {
 
 function shape(series: number[]): HoleShape {
   return {
+    coursePar: null,
     series,
     beads: [],
     played: series.length - 1,

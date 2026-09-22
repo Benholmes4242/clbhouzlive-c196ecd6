@@ -95,7 +95,9 @@ export interface HoleShape {
   }[];
 }
 
-function buildShape(rows: Row[]): HoleShape | null {
+/** THE CURVE DOES NOT CHANGE (§2): the played filter, MIN_PLAYED_HOLES and
+ *  actual_gross are untouched. The round par is attached BESIDE the shape. */
+function buildShape(rows: Row[]): Omit<HoleShape, 'coursePar'> | null {
   const holes = rows
     .filter((r) => r.played && r.actual_gross != null && Number.isFinite(r.actual_gross))
     .sort((a, b) => a.hole_no - b.hole_no);
