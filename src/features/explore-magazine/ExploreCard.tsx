@@ -82,6 +82,19 @@ const HERO_TEXT_SHADOW = '0 1px 2px rgba(0,0,0,0.45)';
  *  the kicker, dark through the headline/who-line, and carried behind trace. */
 const HERO_COPY_SCRIM =
   'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 32%, rgba(0,0,0,0.70) 66%, rgba(0,0,0,0.82) 100%)';
+/** THE STORY SCRIM (BRIEF_EXPLORE_STORY_TILE_MATCH_THE_TOUR_HERO §1) — the tour
+ *  overview hero's ramp, applied to the WHOLE tile rather than the copy block,
+ *  because a story's meta line sits at the top of the frame and needs ground.
+ *  Three stops, each doing a job: 0.30 is that ground, 0.05 at 34% is where the
+ *  photograph reads through, 0.86 at the foot carries the headline. A story's
+ *  copy wrapper therefore renders NO scrim of its own — stacking the two would
+ *  double-darken the foot. HERO_COPY_SCRIM stays exactly as it is: the review
+ *  card's scrim is deliberately anchored to its copy. */
+const HERO_STORY_SCRIM =
+  'linear-gradient(180deg, rgba(0,0,0,0.30), rgba(0,0,0,0.05) 34%, rgba(0,0,0,0.86))';
+/** The story meta's own colour. NOT PHOTO_REVIEW_LABEL — the review card's
+ *  identity line and breakdown rail read that token and must not shift. */
+const HERO_STORY_META_COLOR = 'rgba(248,250,252,0.82)';
 
 function FigureChip({
   figure,
