@@ -232,7 +232,7 @@ function chipsFor(
     );
   }
 
-  if (kind === 'review' && facts.rating != null) {
+  if (kind === 'review' && !leadReviewChips && facts.rating != null) {
     const tier = getScoreTier(facts.rating);
     /* Tier owns the Exceptional gate; the analytical helper owns colour. Both
        intentionally meet at the canonical 9.0 threshold. */
@@ -252,7 +252,7 @@ function chipsFor(
     );
   }
 
-  if (kind === 'review' && (facts.photoCount ?? 0) > 1) {
+  if (kind === 'review' && !leadReviewChips && (facts.photoCount ?? 0) > 1) {
     out.push(
       <span
         key="review-photos"
@@ -660,7 +660,7 @@ export function ExploreCard({
        the richer multi-feat sentence: rarer rounds must never say less. */
     plainRound: callout?.kind === 'record' || callout?.kind === 'net_record' || callout?.kind === 'rank_up',
   });
-  const chips = chipsFor(item, t as never, locale);
+  const chips = chipsFor(item, t as never, locale, size);
   /* §2 SHAPE IS DECIDED BY KIND, NOTHING ELSE. A REVIEW and an ILLUSTRATED
      STORY are text ON the photograph at every position; a ROUND is text UNDER
      it at every position. There is no earned treatment and position 0 is not
