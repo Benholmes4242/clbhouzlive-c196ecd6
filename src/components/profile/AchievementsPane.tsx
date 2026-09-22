@@ -2,7 +2,7 @@
  * AchievementsPane — the achievements tab on ProfilePageV2.
  *
  * BRIEF_PROFILE_ACHIEVEMENTS_REAL — WHAT THIS PANE USED TO BE.
- * It shipped an XP system: `const totalXP = 2500`, a 10,000 XP milestone, four
+ * It shipped an XP system: a hardcoded 2,500 point constant, a 10,000 goal, four
  * named "rings", two progress rings, a tier ladder, a celebration effect and
  * dozens of hardcoded achievement rows with invented progress strings
  * ("23 / 50 rounds", "Best: 16 pars"). Every member saw the same numbers. There
