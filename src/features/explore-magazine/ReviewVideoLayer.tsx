@@ -126,8 +126,8 @@ export function ReviewVideoLayer({
       </span>
       {/* THE CLUBHOUSE INLINE-VIDEO BADGE, verbatim (InlineVideo.tsx): the dark
           chip, not the glass pill — same colours, same radius/padding/weight,
-          same 6px bottom-right inset, the same three animated PlayingBars while
-          the video plays, and the same floored countdown. Supersedes both §1.3
+          same 6px bottom-right inset, and the same floored countdown — no
+          playing bars, here or in Clubhouse (Ben's call). Supersedes both §1.3
           (top right) and the GlassDurationBadge match; Ben's call, twice. */}
       {!!label && (
         <span
