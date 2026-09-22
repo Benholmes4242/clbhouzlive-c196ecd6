@@ -3015,7 +3015,8 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       }
       // Loser side: their rank-1 count went down — recompute authoritatively.
       // Runs regardless of the notification gate: titles are truth, not telling.
-      await recomputeLegendTitles(lostUser);
+      // The trigger's play_date threads through so a live round can announce.
+      await recomputeLegendTitles(lostUser, trigger?.play_date ?? null);
     }
 
     for (const earnedUser of crownEarned) {
@@ -3029,7 +3030,8 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       }
 
       // Gainer side: single code path for the tiered badge + milestone.
-      await recomputeLegendTitles(earnedUser);
+      // The trigger's play_date threads through so a live round can announce.
+      await recomputeLegendTitles(earnedUser, trigger?.play_date ?? null);
     }
   }
 }
