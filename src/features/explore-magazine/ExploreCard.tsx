@@ -321,6 +321,21 @@ function chipsFor(
   return out;
 }
 
+/**
+ * §4.1 — the count badge's stacked-layers glyph, 11px, inline stroke, currentColor
+ * so it inherits GlassBadge's white. Never an emoji.
+ */
+function StackedLayersGlyph() {
+  return (
+    <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden
+      style={{ alignSelf: 'center', flexShrink: 0 }}>
+      <rect x="8" y="3" width="13" height="13" rx="2" />
+      <path d="M16 19.5A1.5 1.5 0 0 1 14.5 21H5a2 2 0 0 1-2-2V8.5A1.5 1.5 0 0 1 4.5 7" />
+    </svg>
+  );
+}
+
 function WhoLine({
   item,
   size,
