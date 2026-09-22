@@ -52,7 +52,13 @@ function strokesOf(h: WhsScoreHole): number | null {
  */
 export interface RoundDetailSeed {
   scoreId: string;
-  holes: { holeNo: number; par: number | null; strokes: number | null }[];
+  holes: { holeNo: number; par: number | null; strokes: number | null; played?: boolean | null }[];
+  /**
+   * BRIEF_SCORECARD_HEAD_PAR — the round's declared length
+   * (whs_scores.total_holes) when the seeding path knows it. ABSENT MEANS THE
+   * PREVIEW SHOWS NO ROUND PAR; it is never inferred from the seeded rows.
+   */
+  totalHoles?: number | null;
   gross: number | null;
   toPar: number | null;
   courseName: string;

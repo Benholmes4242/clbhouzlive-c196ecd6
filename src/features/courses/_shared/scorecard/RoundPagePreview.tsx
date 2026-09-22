@@ -15,6 +15,8 @@
  */
 
 import React from 'react';
+
+import { roundCoursePar } from '@/lib/whs/api';
 import { useTranslation } from 'react-i18next';
 
 import type { RoundDetailSeed } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
@@ -47,7 +49,10 @@ export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
   const holes = (seed?.holes ?? [])
     .slice()
     .sort((a, b) => a.holeNo - b.holeNo)
-    .map((h) => ({ holeNo: h.holeNo, par: h.par, strokes: h.strokes, fieldAvg: null }));
+    .map((h) => ({
+      holeNo: h.holeNo, par: h.par, strokes: h.strokes, fieldAvg: null,
+      played: h.played ?? null,
+    }));
   const played = holes.filter((h) => h.strokes != null && h.strokes > 0 && h.par != null);
   const hasCard = played.length > 0;
   const out = holes.filter((h) => h.holeNo <= 9);
