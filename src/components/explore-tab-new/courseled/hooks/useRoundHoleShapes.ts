@@ -49,6 +49,12 @@ interface Row {
   played: boolean;
 }
 
+/** §1(a) — the stored round par, already NULL on an incomplete card. */
+interface ParRow {
+  whs_score_id: string;
+  course_par: number | null;
+}
+
 /** A bead on the tile curve. Tone and radius come from the SHARED
  *  beadForScore rule (BRIEF_UNIFY_ROUND_CURVE_BEADS) — the tile no longer has
  *  a rule of its own, so an ace draws gold and an eagle draws larger than a
@@ -145,16 +151,36 @@ export function useRoundHoleShapes(scoreIds: readonly (string | null | undefined
     enabled: ids.length > 0,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const { data: rows, error } = await supabase
-        .from('whs_score_holes' as never)
-        .select('score_id, hole_no, par, actual_gross, adjusted_gross, played')
-        .in('score_id', ids as string[]);
+      /* TWO batched reads for the WHOLE rail, keyed on the SAME ids — never a
+         per-card round trip. §1(a): the par is READ from gam_round_stats. */
+      const [holesRes, parsRes] = await Promise.all([
+        supabase
+          .from('whs_score_holes' as never)
+          .select('score_id, hole_no, par, actual_gross, adjusted_gross, played')
+          .in('score_id', ids as string[]),
+        supabase
+          .from('gam_round_stats' as never)
+          .select('whs_score_id, course_par')
+          .in('whs_score_id', ids as string[]),
+      ]);
+      const { data: rows, error } = holesRes;
       if (error) {
         if (MISSING_TABLE.has(String((error as { code?: string }).code ?? ''))) {
           console.warn('[hole shapes] whs_score_holes unavailable; tiles use the 3-point curve');
           return new Map();
         }
         throw error;
+      }
+      /* An unreadable or absent stats row leaves the par NULL — the honest
+         answer. It NEVER throws and never blocks the curve. */
+      const parById = new Map<string, number | null>();
+      if (parsRes.error) {
+        console.warn('[hole shapes] gam_round_stats unavailable; tiles show no round par');
+      } else {
+        for (const r of (parsRes.data ?? []) as unknown as ParRow[]) {
+          const par = Number(r.course_par);
+          parById.set(r.whs_score_id, Number.isFinite(par) && par > 0 ? par : null);
+        }
       }
       const grouped = new Map<string, Row[]>();
       for (const r of (rows ?? []) as unknown as Row[]) {
@@ -165,7 +191,7 @@ export function useRoundHoleShapes(scoreIds: readonly (string | null | undefined
       const out = new Map<string, HoleShape>();
       for (const [id, list] of grouped) {
         const shape = buildShape(list);
-        if (shape) out.set(id, shape);
+        if (shape) out.set(id, { ...shape, coursePar: parById.get(id) ?? null });
       }
       return out;
     },
