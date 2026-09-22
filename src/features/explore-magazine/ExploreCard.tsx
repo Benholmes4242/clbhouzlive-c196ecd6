@@ -15,7 +15,6 @@ import { r } from '@/lib/radius';
 import {
   CHIP_GLASS_CLASS,
   PHOTO_FIG_SHADOW,
-  PHOTO_FIG_UNDER,
   PHOTO_REVIEW_LABEL,
 } from '@/styles/photoScrim';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
@@ -235,7 +234,7 @@ function chipsFor(
     const under = (facts.to_par ?? 0) < 0;
     out.push(
       <FigureChip key="round" corner="left" figure={String(facts.gross)} unit={toPar ?? undefined}
-        tone="#FFFFFF" unitTone={under ? PHOTO_FIG_UNDER : undefined} />,
+        tone="#FFFFFF" unitTone={under ? A.RED : undefined} />,
     );
   }
 

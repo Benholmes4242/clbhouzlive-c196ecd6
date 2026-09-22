@@ -57,10 +57,17 @@ export const CHIP_GLASS: CSSProperties = {
    NOT NEW COLOURS. Both values are already shipping, as unnamed local
    constants, on surfaces that solved this exact problem earlier:
 
-     PHOTO_FIG_UNDER  #FF8A80  = FriendsPlayedRail's GLASS_UNDER, the lighter
-                                 under-par red its chip adopted because
-                                 TOPAR_UNDER_LIGHT / _DARK are too deep to read
-                                 on glass over a photograph.
+     PHOTO_FIG_UNDER  #FF8A80  = the lighter under-par red for large
+                                 TRANSLUCENT fills on a photograph
+                                 (RoundShape's under-par gradient).
+                                 TOPAR_UNDER_DARK is too deep to read as
+                                 10px type through glass, which is why
+                                 this exists — but the Explore round
+                                 chip now takes TOPAR_UNDER_DARK
+                                 anyway, by decision, so that the chip
+                                 and the card's VS HCP figure are one
+                                 red. See the measurement below.
+
      PHOTO_FIG_GOOD   #4ADE80  = the green StandoutTile's delta chip and the
                                  Explore course shelves already use, chosen
                                  because BAND_GREEN / BAND_GREEN_DARK die on a
@@ -72,7 +79,15 @@ export const CHIP_GLASS: CSSProperties = {
    MEASURED LIMIT, REPORTED: over the brightest ground in the catalogue no
    mid-tone hue reaches 4.5:1 through translucent glass — only white has that
    headroom. These tints plus the 0.62 fill plus PHOTO_FIG_SHADOW are the
-   readable ceiling that still leaves the chip glass; see the brief report.
+    readable ceiling that still leaves the chip glass; see the brief report.
+
+   MEASURED, AND ACCEPTED: over the brightest ground in the catalogue
+   the chip's glass resolves to about #70736F. Against that,
+   PHOTO_FIG_UNDER is 2.10:1 and TOPAR_UNDER_DARK is 1.21:1. The round
+   chip's unit takes the deeper red regardless, because one card
+   showing two reds for the same fact read as a fault. The figure
+   itself (the gross score) stays WHITE and carries the reading; the
+   unit is the smaller mark beside it.
    ========================================================================== */
 export const PHOTO_FIG_UNDER = '#FF8A80';
 export const PHOTO_FIG_GOOD = '#4ADE80';
