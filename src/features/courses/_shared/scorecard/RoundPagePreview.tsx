@@ -59,13 +59,14 @@ export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
   const back = holes.filter((h) => h.holeNo > 9);
   const hasUnplayedHole = holes.length > 0 && played.length !== holes.length;
   /**
-   * BRIEF_SCORECARD_HEAD_PAR — ONE SOURCE FOR THE ROUND PAR, roundCoursePar.
-   * The seed carries no declared length (whs_scores.total_holes) and its rows
-   * carry no `played`, so the preview's par is NULL and the head prints none.
-   * That is deliberate: inferring the length from the number of seeded rows is
-   * the exact fault this rule exists to prevent.
+   * BRIEF_ROUND_SHAPE_CARRIES_PAR §3 — READ THE PAR, DO NOT DERIVE IT AGAIN.
+   * The seed carries the STORED round par (gam_round_stats.course_par), already
+   * NULL on an incomplete card, so a complete eighteen shows the same figure
+   * here as in the settled sheet. Without it the preview falls back to the one
+   * client rule; with neither a par nor a declared length the head prints none —
+   * inferring the length from the number of seeded rows stays forbidden.
    */
-  const shownPar = roundCoursePar(
+  const shownPar = seed?.par ?? roundCoursePar(
     holes.map((h) => ({ par: h.par, played: h.played })),
     seed?.totalHoles ?? null,
   );
