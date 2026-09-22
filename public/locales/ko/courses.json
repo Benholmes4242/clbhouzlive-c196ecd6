@@ -1804,7 +1804,21 @@
   "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
   "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here.",
   "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
-  "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here."
+  "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
+  "figOfRoundsSelf": "이곳에서 플레이한 내 {{count}}라운드 중",
+  "figOfRoundsOther": "이곳에서 플레이한 {{count}}라운드 중",
+  "figVsYourAvgHere": "이곳에서의 내 평균보다 적은 타수",
+  "figVsTheirAvgHere": "이곳에서의 본인 평균보다 적은 타수",
+  "scopeYou": "회원님",
+  "scopeYour": "회원님의",
+  "scopeHe": "그는",
+  "scopeHis": "그의",
+  "scopeShe": "그녀는",
+  "scopeHer": "그녀의",
+  "scopeThey": "회원은",
+  "scopeTheir": "회원의",
+  "scopeHave": "플레이했습니다",
+  "scopeHas": "플레이했습니다"
  },
  "searchSheet": {
   "added": "Added",

@@ -2415,7 +2415,21 @@
   "vsYourAvgLevel": "Right on your average here.",
   "vsYourAvgWorse": "{{n}} shots worse than your average here.",
   "you": "You",
-  "yourAvgHere": "Your avg here"
+  "yourAvgHere": "Your avg here",
+  "figOfRoundsSelf": "of your {{count}} rounds here",
+  "figOfRoundsOther": "of {{possessive}} {{count}} rounds here",
+  "figVsYourAvgHere": "shots better than your average here",
+  "figVsTheirAvgHere": "shots better than {{possessive}} average here",
+  "scopeYou": "You",
+  "scopeYour": "your",
+  "scopeHe": "He",
+  "scopeHis": "his",
+  "scopeShe": "She",
+  "scopeHer": "her",
+  "scopeThey": "They",
+  "scopeTheir": "their",
+  "scopeHave": "have",
+  "scopeHas": "has"
  },
  "search": {
   "yourRounds": "Your rounds"

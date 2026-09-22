@@ -2259,7 +2259,21 @@
   "vsYourAvgLevel": "[~~Říĝĥţ őñ ýőúř áṽéřáĝé ĥéřé.~~]",
   "vsYourAvgWorse": "[~~{{n}} šĥőţš ŵőřšé ţĥáñ ýőúř áṽéřáĝé ĥéřé.~~]",
   "you": "[~~Ýőú~~]",
-  "yourAvgHere": "[~~Ýőúř áṽĝ ĥéřé~~]"
+  "yourAvgHere": "[~~Ýőúř áṽĝ ĥéřé~~]",
+  "figOfRoundsSelf": "[~~őƒ ýőúř {{count}} řőúñđš ĥéřé~~]",
+  "figOfRoundsOther": "[~~őƒ {{possessive}} {{count}} řőúñđš ĥéřé~~]",
+  "figVsYourAvgHere": "[~~šĥőţš ƀéţţéř ţĥáñ ýőúř áṽéřáĝé ĥéřé~~]",
+  "figVsTheirAvgHere": "[~~šĥőţš ƀéţţéř ţĥáñ {{possessive}} áṽéřáĝé ĥéřé~~]",
+  "scopeYou": "[~~Ýőú~~]",
+  "scopeYour": "[~~ýőúř~~]",
+  "scopeHe": "[~~Ĥé~~]",
+  "scopeHis": "[~~ĥíš~~]",
+  "scopeShe": "[~~Šĥé~~]",
+  "scopeHer": "[~~ĥéř~~]",
+  "scopeThey": "[~~Ţĥéý~~]",
+  "scopeTheir": "[~~ţĥéíř~~]",
+  "scopeHave": "[~~ĥáṽé~~]",
+  "scopeHas": "[~~ĥáš~~]"
  },
  "search": {
   "yourRounds": "[~~Ýőúř řőúñđš~~]"
