@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 supabase/.temp/
+
+# Env files - local env stays untracked; .example files are documentation and stay tracked
+.env
+.env.local
+.env.*.local
