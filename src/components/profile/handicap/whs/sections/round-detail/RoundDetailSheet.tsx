@@ -274,7 +274,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       })
     : (userData?.course as { country_name?: string | null } | null | undefined)?.country_name
       ?? (usingSeed ? seed?.placeLine ?? null : null);
-  const coursePar = totalPar > 0 ? totalPar : null;
+  const coursePar = totalPar;
   const courseSlope = (userData as { slope_rating?: number | null } | null | undefined)?.slope_rating ?? null;
 
 
