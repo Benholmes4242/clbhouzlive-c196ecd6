@@ -36,7 +36,7 @@ export function LibraryVideoCard({ item, onPress }: { item: CommunityLibraryItem
             {title}
           </div>
           {creator && (
-            <div style={{ marginTop: 3, color: A.MUTE, fontSize: 12, fontWeight: 600, lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div data-library-video-creator style={{ marginTop: 3, color: A.MUTE, fontSize: 12, fontWeight: 600, lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {creator}
             </div>
           )}
