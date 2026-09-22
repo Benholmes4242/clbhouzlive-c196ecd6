@@ -17,6 +17,7 @@ export interface UserProfile {
   eg_handicap_index: number | null;
   manual_handicap_index?: number | null;
   show_handicap?: boolean;
+  gender?: string | null;
   // Social handles (personal profiles)
   instagram_handle?: string | null;
   twitter_handle?: string | null;

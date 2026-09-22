@@ -27,8 +27,10 @@ describe('round results', () => {
     expect(container.querySelector('[data-round-results-block="holes"]')).toBeNull();
     expect(container.querySelector('[data-round-results-block="efforts"]')).not.toBeNull();
     expect(container.querySelector('[data-round-effort="front_nine"] [data-round-effort-placing]')?.getAttribute('data-round-effort-placing')).toBe('roundResults.placing.third');
-    expect(container.querySelector('[data-round-effort="back_nine"] [data-round-effort-placing]')).toBeNull();
+    expect(container.querySelector('[data-round-effort="back_nine"] [data-round-effort-placing]')?.textContent).toBe('—');
     expect(container.querySelector('[data-round-effort="finish_six"]')?.textContent).toContain('E');
+    expect(container.querySelector('[data-round-effort="finish_six"] [data-round-effort-span]')?.textContent).toBe('roundResults.spans.finish_six');
+    expect(container.querySelector('[data-round-effort="front_nine"] [data-round-effort-placing]')?.getAttribute('style')).toContain('color');
   });
 
   it('keeps coarse and hole awards in separate blocks and omits a null delta chip', () => {

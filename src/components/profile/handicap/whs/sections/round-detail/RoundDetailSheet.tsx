@@ -478,6 +478,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       playerHcpDelta={handicapDelta ?? null}
       playerUserId={profileUserId ?? null}
       subjectIsViewer={isOwnRound}
+      playerGender={profile?.gender ?? null}
       fieldPlayers={fieldPlayers}
       onViewProfile={onViewProfile}
       onViewCourse={onViewCourse}
