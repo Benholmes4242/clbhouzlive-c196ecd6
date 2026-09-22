@@ -301,6 +301,10 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           own card. */}
       <WithinReach mine={mine} />
 
+      {/* BRIEF_YOU_TAB_STANDINGS — compact standings, same RPC and rules as the
+          Trophy Room. Renders only when the course-scoped read returns rows. */}
+      <WhereYouStandHere rows={standings ?? []} />
+
       <YourRatingSection
         rating={rating ?? null}
         onEdit={() => {
