@@ -1070,6 +1070,8 @@ async function applyUnitAwards(stats: any, scoreRow: any, holes: any[]) {
   for (const u of units) {
     const prior = priorByKey.get(`${u.unit_kind}:${u.unit_key}`) ?? null;
     if (!awardsAllowed) continue;
+    // BRIEF_FINISH_FOUR_UNIT — the bests fold below still runs for this unit.
+    if (u.unit_kind === "finish_four" && !FINISH_FOUR_AWARDS_ENABLED) continue;
     for (const a of resolveAwards(u, prior)) {
       pendingAwards.push({ u, a, attempts: prior?.attempts ?? 0 });
     }
