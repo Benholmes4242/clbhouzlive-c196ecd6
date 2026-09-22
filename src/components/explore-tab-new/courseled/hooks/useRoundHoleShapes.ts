@@ -61,6 +61,18 @@ export interface ShapeBead {
 }
 
 export interface HoleShape {
+  /**
+   * BRIEF_ROUND_SHAPE_CARRIES_PAR §1 — THE ROUND PAR, READ, NOT DERIVED AGAIN.
+   *
+   * public.gam_round_stats.course_par for this score, read in the SAME batch as
+   * the hole rows. It is already stored under the completeness rule, so it is
+   * NULL on an incomplete card by construction — the preview, Discover and the
+   * settled sheet therefore agree without any of them summing pars.
+   *
+   * NULL means NO round par and NO round to-par. Never substitute a sum of the
+   * played rows, never default the declared length to eighteen.
+   */
+  coursePar: number | null;
   /** Cumulative strokes over par, INCLUDING the leading 0 before the first tee. */
   series: number[];
   /** Beads from the shared rule, positioned on the cumulative value AFTER the hole. */
