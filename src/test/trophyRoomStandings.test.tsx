@@ -190,16 +190,16 @@ describe('Trophy Room · where you stand', () => {
     expect(standingLine(row({ ahead_count: 0, behind_count: 0, field_size: 4 }))).toBe(
       'Level with everyone here',
     );
-    /* ahead 0, no ties: clear by the next value. */
+    /* ahead 0, no ties: clear by the next value — bare number, no unit. */
     expect(standingLine(row({ field_size: 4, behind_count: 3, next_value: 36 }))).toBe(
-      'Clear by 4 pts',
+      'Clear by 4',
     );
     /* Behind: no lead clause when the leader IS the player above. */
     expect(
       standingLine(
         row({ rank: 2, field_size: 4, ahead_count: 1, behind_count: 2, value: 33, better_value: 34, leader_value: 34 }),
       ),
-    ).toBe('1 pts off the player above');
+    ).toBe('1 off the player above');
     /* Differentials keep one decimal and take no unit. */
     expect(
       standingLine(
