@@ -638,6 +638,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                     {headerScore.toPar < 0
                       ? `\u2212${Math.abs(headerScore.toPar)}`
                       : fmtToPar(headerScore.toPar)}
+                    {headerScore.thru != null && (
+                      <span> {'\u00B7'} {t('feed.roundCard.thruN', { n: headerScore.thru })}</span>
+                    )}
                   </span>
                 )}
               </span>

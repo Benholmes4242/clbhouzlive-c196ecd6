@@ -66,6 +66,8 @@ export interface PostRoundHole {
 
 export interface PostRound {
   whsScoreId: string;
+  /** The card's declared length from whs_scores.total_holes; never inferred from shape rows. */
+  totalHoles: number | null;
   /**
    * whs adjusted gross (net double bogey applied). NOT the header figure any
    * more — see roundGross.ts. Kept because it is the round of record and the
@@ -234,15 +236,19 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async (): Promise<PostRoundMap> => {
-      // Three reads for the whole page, run together: the round counters, the
-      // hole-by-hole shape, and the crowns taken, all for the same score ids.
-      const [statsRes, holesRes, crownsRes, netRes] = await Promise.all([
+      // Batched reads for the whole page, run together: round counters, declared
+      // lengths, hole shapes, crowns and net scores for the same score ids.
+      const [statsRes, scoresRes, holesRes, crownsRes, netRes] = await Promise.all([
         supabase
           .from('gam_round_stats')
           .select(
             'whs_score_id, gross_score, course_par, delta_index, play_date, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, slope_rating, longest_birdie_run',
           )
           .in('whs_score_id', ids),
+        supabase
+          .from('whs_scores')
+          .select('id, total_holes')
+          .in('id', ids),
         supabase
           .from('whs_score_holes')
           .select('score_id, hole_no, par, actual_gross, adjusted_gross, played')
@@ -257,6 +263,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
       ]);
 
       if (statsRes.error) throw statsRes.error;
+      if (scoresRes.error) throw scoresRes.error;
       if (holesRes.error) throw holesRes.error;
       if (crownsRes.error) throw crownsRes.error;
       // A missing/unreachable view must not take the whole round batch down:
@@ -267,6 +274,13 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
       for (const n of ((netRes.data ?? []) as unknown) as { whs_score_id: string; net_score: number | null }[]) {
         if (n.whs_score_id && n.net_score != null && Number.isFinite(Number(n.net_score))) {
           nets.set(n.whs_score_id, Number(n.net_score));
+        }
+      }
+
+      const declaredLengths = new Map<string, number>();
+      for (const score of (scoresRes.data ?? []) as { id: string; total_holes: number | null }[]) {
+        if (score.id && score.total_holes != null && Number.isFinite(Number(score.total_holes))) {
+          declaredLengths.set(score.id, Number(score.total_holes));
         }
       }
 
@@ -318,6 +332,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
         const shape = shapes.get(id) ?? null;
         map.set(id, {
           whsScoreId: id,
+          totalHoles: declaredLengths.get(id) ?? null,
           grossScore: (r.gross_score as number | null) ?? null,
           netScore: nets.get(id) ?? null,
           coursePar: (r.course_par as number | null) ?? null,

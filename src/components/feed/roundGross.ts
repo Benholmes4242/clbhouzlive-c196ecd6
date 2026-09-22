@@ -28,6 +28,8 @@ export interface RoundScore {
   gross: number | null;
   /** Its to-par, or null when no par is known. */
   toPar: number | null;
+  /** Played-hole count when this is a provably partial card; null when complete or unknown. */
+  thru: number | null;
   /**
    * 'holes' -> the actual gross, summed from the member's own cells.
    * 'whs'   -> the adjusted gross, because the round was not completed.
@@ -38,7 +40,7 @@ export interface RoundScore {
 }
 
 export function roundScore(
-  round: Pick<PostRound, 'grossScore' | 'coursePar' | 'holeShape'>,
+  round: Pick<PostRound, 'grossScore' | 'coursePar' | 'holeShape' | 'totalHoles'>,
 ): RoundScore {
   const holes = round.holeShape ?? [];
   const par = round.coursePar ?? null;
@@ -59,13 +61,22 @@ export function roundScore(
   }
 
   if (scored > 0 && unscored === 0) {
-    return { gross: sum, toPar: sumPar > 0 ? sum - sumPar : null, source: 'holes', unscoredHoles: 0 };
+    const declared = round.totalHoles ?? null;
+    const hasDeclaredLength = declared != null && declared > 0;
+    return {
+      gross: sum,
+      toPar: hasDeclaredLength && sumPar > 0 ? sum - sumPar : null,
+      thru: hasDeclaredLength && scored < declared ? scored : null,
+      source: 'holes',
+      unscoredHoles: 0,
+    };
   }
 
   const whs = round.grossScore ?? null;
   return {
     gross: whs,
     toPar: whs != null && par != null ? whs - par : null,
+    thru: null,
     source: whs != null ? 'whs' : null,
     unscoredHoles: unscored,
   };
