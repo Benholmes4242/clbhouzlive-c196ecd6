@@ -58,5 +58,5 @@
 ## BRIEF_HOLE_STRIP_NINE_COMPLETENESS
 - [x] Require exactly nine strictly played holes with non-null par before rendering a nine's delta.
 - [x] Keep hole marks, gross totals, and complete-nine rendering unchanged.
-- [ ] Verify partial eighteen, complete eighteen, complete nine, focused tests, full suite, and typecheck.
+- [x] Verify partial eighteen, complete eighteen, complete nine, focused tests, full suite, and typecheck.
 - [x] Report the par source for the seven named unchanged to-par sites.
