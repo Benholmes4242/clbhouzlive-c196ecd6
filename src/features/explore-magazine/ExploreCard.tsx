@@ -839,6 +839,13 @@ export function ExploreCard({
         : { height: PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }}
     >
       {chips}
+      {onPhoto && item.kind === 'story' ? (
+        <span
+          aria-hidden
+          data-explore-story-scrim="true"
+          style={{ position: 'absolute', inset: 0, background: HERO_STORY_SCRIM, zIndex: 1 }}
+        />
+      ) : null}
       {onPhoto ? (
         <span
           data-explore-hero="true"
@@ -850,13 +857,20 @@ export function ExploreCard({
             minHeight: PHOTO_H[size],
           }}
         >
-          <span aria-hidden style={{ flex: `0 0 ${HERO_CHIP_LANE}px` }} />
+          <span
+            aria-hidden={item.kind !== 'story'}
+            style={{ flex: `0 0 ${HERO_CHIP_LANE}px`, minWidth: 0, overflow: 'hidden' }}
+          >
+            {item.kind === 'story' ? storyMetaNode : null}
+          </span>
           <span style={{ flex: '1 1 auto', minHeight: 0 }} />
           <span style={{ position: 'relative', display: 'block' }}>
-            <span
-              aria-hidden
-              style={{ position: 'absolute', inset: 0, background: HERO_COPY_SCRIM, zIndex: 0 }}
-            />
+            {item.kind === 'story' ? null : (
+              <span
+                aria-hidden
+                style={{ position: 'absolute', inset: 0, background: HERO_COPY_SCRIM, zIndex: 0 }}
+              />
+            )}
             <span
               data-explore-hero-copy="true"
               style={leadReview
@@ -865,9 +879,7 @@ export function ExploreCard({
             >
                {leadReview ? (
                 <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} reviewIdentity={reviewIdentity ?? undefined} />
-               ) : item.kind === 'story' ? (
-                 storyMetaNode
-              ) : (
+               ) : item.kind === 'story' ? null : (
                 <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               )}
               {headlineNode}
