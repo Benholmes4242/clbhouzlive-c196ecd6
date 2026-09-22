@@ -59,3 +59,33 @@ Deno.test("a duplicated rank-1 row cannot inflate the count", () => {
 Deno.test("a member with no rank-1 rows counts zero", () => {
   assertEquals(countContestedTitles([], [row("c1", "a"), row("c1", "a")]), 0);
 });
+
+// BRIEF_TENURE_DOES_NOT_AWARD — attendance boards do not award.
+Deno.test("tenure: contested rank 1 in most_rounds_all_time gains no title", () => {
+  const mine = [row("c1", "most_rounds_all_time")];
+  const claimants = [row("c1", "most_rounds_all_time"), row("c1", "most_rounds_all_time")];
+  assertEquals(countContestedTitles(mine, claimants), 0);
+});
+
+Deno.test("tenure: most_rounds_90d still awards", () => {
+  const mine = [row("c1", "most_rounds_90d")];
+  const claimants = [row("c1", "most_rounds_90d"), row("c1", "most_rounds_90d")];
+  assertEquals(countContestedTitles(mine, claimants), 1);
+});
+
+Deno.test("tenure: most_birdies_all_time excluded, competitive board still counts", () => {
+  const mine = [row("c1", "most_birdies_all_time"), row("c1", "lowest_gross_all_time")];
+  const claimants = [
+    row("c1", "most_birdies_all_time"), row("c1", "most_birdies_all_time"),
+    row("c1", "lowest_gross_all_time"), row("c1", "lowest_gross_all_time"),
+  ];
+  assertEquals(countContestedTitles(mine, claimants), 1);
+});
+
+Deno.test("tenure: the exclusion list is the shared constant", () => {
+  assertEquals([...TENURE_CATEGORIES], ["most_rounds_all_time", "most_birdies_all_time"]);
+  assertEquals(isTenureCategory("most_rounds_all_time"), true);
+  assertEquals(isTenureCategory("most_birdies_all_time"), true);
+  assertEquals(isTenureCategory("most_rounds_90d"), false);
+  assertEquals(isTenureCategory("lowest_gross_all_time"), false);
+});
