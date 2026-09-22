@@ -1478,7 +1478,7 @@ const HOLE_DERIVED_STAT_FIELDS = new Set([
   "pars", "bogeys", "double_bogeys", "triple_plus",
   "clean_card", "longest_birdie_run", "longest_par_or_better_run",
   "max_birdie_streak",
-  "front_nine_to_par", "back_nine_to_par", "finish_six_to_par",
+  "front_nine_to_par", "back_nine_to_par", "finish_six_to_par", "finish_four_to_par",
 ]);
 
 // Binary badge ids whose condition reads a hole-derived stat.
