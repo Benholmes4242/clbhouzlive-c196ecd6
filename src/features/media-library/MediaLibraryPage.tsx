@@ -7,8 +7,6 @@ import type { Moment } from '@/components/explore-tab-new/courseled/hooks/useMom
 import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
 import { useCommunityLibrary } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
 import { useWatchHubCounts } from '@/features/watch-v2/hooks/useWatchHubCounts';
-import { VideoRow } from '@/features/amateur/AmateurMediaBlock';
-import AboutSection from '@/components/courses/course-detail/about/AboutSection';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -18,6 +16,7 @@ import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { MOSAIC_GAP, MOSAIC_RADIUS } from '@/lib/mosaicGeometry';
 import { useMergedLibraryTotal } from './libraryTotals';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { LibraryVideoCard } from './LibraryVideoCard';
 import {
   MERGED_SORTS,
   MERGED_SORT_LABELS,
@@ -31,16 +30,12 @@ const PAGE = 36;
 const AUTOPLAY_GROUP = 'media-library';
 
 /**
- * /media — the ONE media destination, in THREE SECTIONS (BRIEF_MEDIA_TAB §2):
- * Clips, Longer watch, From the community. Each carries a real section heading
- * in the treatment now standard across the five course tabs (AboutSection over
- * DiscoverSectionHeading), and each meta figure is the LIBRARY TOTAL from a
- * count query — never the length of the loaded array, which is the fault that
- * bit us twice today.
+ * /media — the ONE media destination, with one heading and THREE WALLS:
+ * Clips, Longer watch, From the community. The kind chips name each wall and
+ * carry the LIBRARY TOTAL from a count query — never the loaded array length.
  *
- * The three shapes are the deployed ones, not new ones: the clips rail and the
- * long-form row are the SAME components the Amateur media block renders, and
- * the mosaic is MomentsGrid in the one mosaic geometry (2px gutter, r.xs).
+ * Clips reuse MediaRailTile in the community wall's full-bleed geometry;
+ * long-form has a page-scale card; MomentsGrid retains its deployed geometry.
  */
 /** THE THREE KINDS /media can be scoped to (BRIEF_EXPLORE_REFINEMENT §1).
  *  A see-all shows ALL OF ONE THING; the chips move between the three without
@@ -69,6 +64,7 @@ export default function MediaLibraryPage() {
   const library = useCommunityLibrary();
   const clips = useMemo(() => library.data?.clips ?? [], [library.data]);
   const videos = useMemo(() => library.data?.videos ?? [], [library.data]);
+  const visibleClips = useMemo(() => clips.slice(0, shown), [clips, shown]);
 
   const visible = useMemo(() => tiles.slice(0, shown), [tiles, shown]);
   const moments = useMemo(() => visible.map((tile) => tile.moment), [visible]);
@@ -167,15 +163,12 @@ export default function MediaLibraryPage() {
       <main style={{ paddingTop: 'var(--island-clearance, calc(env(safe-area-inset-top, 0px) + 70px))' }}>
 
         <div style={{ padding: `0 ${GUTTER}px` }}>
-          <LibraryHead
-            total={kind === 'clips' ? clipTotal : kind === 'longer' ? videoTotal : mergedTotal}
-            title="Media"
-          />
+          <LibraryHead title="Media" />
         </div>
 
         {/* THE KIND RAIL — the canonical chip, each carrying its count. One wall
             or list at a time; the heading and meta below follow the active kind. */}
-        <div style={{ padding: `0 ${GUTTER}px 4px` }}>
+        <div style={{ padding: `0 ${GUTTER}px ${kind === 'community' ? 12 : 14}px` }}>
           <RailChips
             options={KINDS.map((id) => ({
               id,
@@ -192,54 +185,52 @@ export default function MediaLibraryPage() {
         </div>
 
         <div style={{ paddingBottom: NAV_CLEARANCE }}>
-          {/* 1. CLIPS — the 9:16 rail, its own deployed tile size. */}
+          {/* 1. CLIPS — the full-bleed 9:16 wall, paged like community. */}
           {kind === 'clips' && clips.length > 0 && (
-            <AboutSection
-              heading="Clips"
-              meta={clipTotal == null ? null : String(clipTotal)}
-              first
-              bleed
-            >
+            <>
               <div
-                className="scrollbar-hide"
-                style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: `0 20px`, willChange: 'transform' }}
+                style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: MOSAIC_GAP, willChange: 'transform' }}
               >
-                {clips.map((item, index) => (
+                {visibleClips.map((item, index) => (
                   <MediaRailTile
                     key={item.key}
                     item={item}
                     index={index}
                     width={176}
+                    fill
+                    aspect={9 / 16}
+                    radius={MOSAIC_RADIUS}
+                    showCaption={false}
                     autoplayGroup={AUTOPLAY_GROUP}
+                    maxPlaying={2}
                     onPress={() => openPost(clips, item, 'clip')}
                   />
                 ))}
               </div>
-            </AboutSection>
+              {clips.length > shown && (
+                <div style={{ padding: `0 ${GUTTER}px` }}>
+                  <LoadMore busy={false} onPress={() => setShown((value) => value + PAGE)} />
+                </div>
+              )}
+            </>
           )}
 
-          {/* 2. LONGER WATCH — the shared long-form row, text-led. */}
+          {/* 2. LONGER WATCH — page-scale cards, not the Amateur shelf row. */}
           {kind === 'longer' && videos.length > 0 && (
-            <AboutSection heading="Longer watch" meta={videoTotal == null ? null : String(videoTotal)} first>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 22, padding: `0 ${GUTTER}px` }}>
               {videos.map((item, index) => (
-                <VideoRow
+                <LibraryVideoCard
                   key={item.key}
                   item={item}
-                  first={index === 0}
                   onPress={() => openPost(videos, item, 'video')}
                 />
               ))}
-            </AboutSection>
+            </div>
           )}
 
           {/* 3. FROM THE COMMUNITY — the merged mosaic, full bleed. */}
           {kind === 'community' && (
-          <AboutSection
-            heading="From the community"
-            meta={mergedTotal == null ? null : String(mergedTotal)}
-            first
-            bleed
-          >
+          <>
             <div style={{ padding: '0 20px' }}>
               <SortRail
                 options={MERGED_SORTS.map((id) => ({ id, label: MERGED_SORT_LABELS[id] }))}
@@ -268,7 +259,7 @@ export default function MediaLibraryPage() {
                 )}
               </>
             )}
-          </AboutSection>
+          </>
           )}
         </div>
       </main>

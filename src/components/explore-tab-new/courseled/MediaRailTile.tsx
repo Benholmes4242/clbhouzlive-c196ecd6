@@ -21,7 +21,10 @@ export function MediaRailTile({
   item,
   index,
   width,
+  fill = false,
   aspect,
+  radius = r.sm,
+  showCaption = true,
   autoplayGroup,
   maxPlaying = 2,
   onPress,
@@ -29,6 +32,8 @@ export function MediaRailTile({
   item: CommunityLibraryItem;
   index: number;
   width: number;
+  /** ADDITIVE. Fill a fluid grid cell; omitted leaves every fixed-width rail unchanged. */
+  fill?: boolean;
   /**
    * ADDITIVE. The tile's frame ratio, where the caller knows it. Width used to
    * IMPLY the ratio (176 meant portrait, anything else landscape), which meant a
@@ -36,7 +41,11 @@ export function MediaRailTile({
    * (BRIEF_EXPLORE_DEVICE_PASS §2b). Omitted, the old width rule still applies,
    * so every existing caller is unchanged.
    */
-  aspect?: string;
+  aspect?: string | number;
+  /** ADDITIVE. Omitted preserves the rail's settled r.sm frame. */
+  radius?: string | number;
+  /** ADDITIVE. Rails keep creator captions; image walls may suppress them. */
+  showCaption?: boolean;
   autoplayGroup: string;
   maxPlaying?: number;
   onPress: () => void;
@@ -78,9 +87,9 @@ export function MediaRailTile({
       data-gallery-video-index={index}
       type="button"
       onClick={onPress}
-      style={{ width, flex: `0 0 ${width}px`, padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}
+      style={{ width: fill ? '100%' : width, flex: fill ? undefined : `0 0 ${width}px`, minWidth: 0, padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}
     >
-      <div style={{ position: 'relative', width, aspectRatio: aspect ?? (width === 176 ? '3 / 4' : '16 / 10'), overflow: 'hidden', borderRadius: r.sm, background: A.PANEL }}>
+      <div style={{ position: 'relative', width: fill ? '100%' : width, aspectRatio: aspect ?? (width === 176 ? '3 / 4' : '16 / 10'), overflow: 'hidden', borderRadius: radius, background: A.PANEL }}>
         {item.thumbnail && <img src={item.thumbnail} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
         {mountVideo && (
           <video
@@ -103,7 +112,7 @@ export function MediaRailTile({
         )}
         <GlassDurationBadge seconds={item.duration} />
       </div>
-      <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.displayName}</div>
+      {showCaption && <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.displayName}</div>}
     </button>
   );
 }

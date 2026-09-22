@@ -41,3 +41,10 @@
 - `RoundDetailSeed.par` added and supplied by ExploreMagazine `seedFor`; the local "sum the seeded pars" derivation is gone, so a ten-hole card no longer prints a to-par against par 40.
 - `RoundPagePreview`: `seed.par ?? roundCoursePar(holes, totalHoles)` — never inferred from row count.
 - Out of scope, untouched: roundGross.ts (its `coursePar` comes from `usePostRounds` reading `gam_round_stats.course_par`), RoundCardHoleStrip, CardScorecardSheet totals.toPar, per-nine OUT/IN, edge functions, SQL.
+
+## BRIEF_MEDIA_PAGE_THREE_WALLS
+- [x] Remove duplicate section wrappers and header count; compact the title/chip/content stack.
+- [x] Replace the clips rail with a paged, full-bleed three-column 9:16 wall using the shared tile additively.
+- [x] Add the dedicated 16:9 long-form page card while leaving Amateur `VideoRow` untouched.
+- [x] Keep the community mosaic, count sources, URL contract, analytics, and viewer origins unchanged.
+- [ ] Verify 320/390/430 geometry, Amateur rail parity, autoplay behavior, focused tests, and typecheck.
