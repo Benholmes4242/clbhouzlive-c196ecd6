@@ -146,7 +146,7 @@ describe('Trophy Room · where you stand', () => {
     expect(disc?.dataset.standingDisc).toBe('gold');
     expect(disc?.textContent).toBe('1of 17');
     expect(c.querySelector('[data-standing-line="true"]')?.textContent).toBe(
-      'Shared with 3 · clear by 1 pts',
+      'Shared with 3 · clear by 1',
     );
     expect(tiedWith(SUNDRIDGE_STABLEFORD)).toBe(3);
   });
@@ -181,7 +181,7 @@ describe('Trophy Room · where you stand', () => {
     expect(discState({ ...HANKLEY, rank: 3 })).toBe('bronze');
     expect(discState({ ...HANKLEY, medal_earned: false })).toBe('plain');
     expect(c.querySelector('[data-standing-line="true"]')?.textContent).toBe(
-      '1 pts off the player above · 6 pts off the lead',
+      '1 off the player above · 6 off the lead',
     );
   });
 
