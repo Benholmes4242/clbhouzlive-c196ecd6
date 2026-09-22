@@ -365,8 +365,8 @@ export const InlineVideo: React.FC<Props> = ({
             pointerEvents: 'none',
           }}
         >
-          {showVideo && <PlayingBars />}
-          {/* THE BADGE COUNTS DOWN WHILE THIS MEDIA IS PLAYING, and shows total
+          {/* NO PLAYING BARS (Ben's call) — the countdown alone says "playing".
+              THE BADGE COUNTS DOWN WHILE THIS MEDIA IS PLAYING, and shows total
               length otherwise. Broadcast-golf convention, chosen deliberately —
               do not "correct" it to elapsed. The lane snapshot is already the
               re-render source (VideoEngine emits on every timeupdate); the
