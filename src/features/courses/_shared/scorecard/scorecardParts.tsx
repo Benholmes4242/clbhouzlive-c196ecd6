@@ -290,6 +290,12 @@ export const UnavailableMiddle: React.FC = () => {
 
 export const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null }> = ({ gross, toPar }) => {
   const { t } = useTranslation(['courses']);
+  const items = [
+    { label: t('courses:scorecard.gross'), value: gross },
+    ...(toPar == null
+      ? []
+      : [{ label: t('courses:scorecard.toPar'), value: fmtRel(toPar), tone: toParColor(toPar) }]),
+  ];
   return (
     <Panel>
       <div
@@ -305,10 +311,7 @@ export const NohbhMiddle: React.FC<{ gross: number | null; toPar: number | null 
       {gross != null && (
         <StatRow
           style={{ marginTop: 18 }}
-          items={[
-            { label: t('courses:scorecard.gross'), value: gross },
-            { label: t('courses:scorecard.toPar'), value: fmtRel(toPar), tone: toParColor(toPar) },
-          ]}
+          items={items}
         />
       )}
     </Panel>
@@ -351,6 +354,8 @@ export interface RoundSummaryHeadProps {
    * "· par N" suffix is dropped — the correct outcome for an incomplete card.
    */
   shownPar?: number | null;
+  /** Strict count of rows with `played === true && par != null`. */
+  playedHoles?: number;
   coursePar?: number | null;
   heroMuted?: boolean;
   playerName?: string | null;
@@ -370,7 +375,7 @@ export interface RoundSummaryHeadProps {
  */
 export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
   isTour = false, kickerText, courseName, courseLocation,
-  showScore, gross, toPar, shownPar = 0, coursePar,
+  showScore, gross, toPar, shownPar = 0, playedHoles = 0, coursePar,
   heroMuted, playerName, playerAvatarUrl, playerUserId,
   tourAvatarCandidates = [], isOwner = false, playerHcpDelta, rail = [],
 }) => {
@@ -448,6 +453,9 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
               <span style={{ color: heroMuted ? EVEN_GRAY : toParColor(toPar) }}>{fmtRel(toPar)}</span>
               {((shownPar != null && shownPar > 0) || coursePar != null) && (
                 <span> {'\u00B7'} {t('courses:scorecard.parN', { n: shownPar != null && shownPar > 0 ? shownPar : coursePar })}</span>
+              )}
+              {shownPar == null && coursePar == null && playedHoles > 0 && (
+                <span> {'\u00B7'} {t('courses:scorecard.thruN', { n: playedHoles })}</span>
               )}
             </div>
           </div>

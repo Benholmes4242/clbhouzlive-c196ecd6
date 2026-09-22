@@ -50,7 +50,7 @@
 - [x] Verify 320/390/430 geometry, Amateur rail parity, autoplay behavior, focused tests, and typecheck.
 
 ## BRIEF_PARTIAL_CARD_COPY
-- [ ] Add the shared head’s `· thru N` suffix only when round par is null and played holes exist.
-- [ ] Remove the empty to-par stat from gross-only rounds when its value is null.
-- [ ] Verify partial eighteen, complete eighteen, complete nine, gross-only, focused tests, and typecheck.
-- [ ] Report every other nullable-par round to-par renderer without changing it.
+- [x] Add the shared head’s `· thru N` suffix only when round par is null and played holes exist.
+- [x] Remove the empty to-par stat from gross-only rounds when its value is null.
+- [x] Verify partial eighteen, complete eighteen, complete nine, gross-only, focused tests, and typecheck.
+- [x] Report every other nullable-par round to-par renderer without changing it.
