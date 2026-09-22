@@ -414,7 +414,7 @@ export function HeroBoardSection({
             </span>
             {picksOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
-          {picksOpen ? <PicksPanel picks={picks} tourCode={pickTourCode} phase={phase} boardByPlayer={boardByPlayer} predictions={predictions ?? null} /> : null}
+          {picksOpen ? <PicksPanel picks={picks} tourCode={pickTourCode} phase={phase} boardByPlayer={boardByPlayer} predictions={predictions ?? null} championPlayerId={championPlayerId} championPlayerIds={championPlayerIds} /> : null}
         </>
       ) : null}
 
@@ -465,6 +465,8 @@ function PicksPanel({
   phase,
   boardByPlayer,
   predictions,
+  championPlayerId,
+  championPlayerIds,
 }: {
   picks: AITopContender[];
   /** §CHANGE 2 — the event's tour, for the shared headshot resolver. */
@@ -472,6 +474,11 @@ function PicksPanel({
   phase: 'live' | 'upcoming' | 'completed';
   boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null }>;
   predictions: { isAIPowered?: boolean; isStale?: boolean; confidence?: number; editorialFraming?: string | null } | null;
+  /** The champion, by player id — the same pair the trophy is derived
+   *  from. settledFigureFor can only see a POSITION, and a playoff
+   *  winner's position is T1, so identity has to come in separately. */
+  championPlayerId: string | null;
+  championPlayerIds: string[];
 }) {
   const { t } = useTranslation('tourhub');
   const rows = picks.slice(0, 3);
@@ -504,7 +511,18 @@ function PicksPanel({
       >
         {rows.map((p, i) => {
           const line = boardByPlayer.get(String(p.playerId));
-          const settled = phase === 'completed' ? settledFigureFor(line) : null;
+          const settledRaw = phase === 'completed' ? settledFigureFor(line) : null;
+          /* THE CHAMPION WEARS THE WIN, WHATEVER THE BOARD SAYS. A playoff
+             winner ties on strokes, so settledFigureFor — which can only read
+             a position — returns "T1". It is RIGHT to do that for everyone
+             else, the playoff LOSER included, who is also T1 and must never
+             read as a win. Identity is the only thing that separates them, and
+             pickWonTournament is the same test the trophy already uses. */
+          const isChampion = phase === 'completed'
+            && pickWonTournament(p.playerId, championPlayerId, championPlayerIds);
+          const settled = settledRaw && isChampion
+            ? { ...settledRaw, right: WON_LABEL, rightColor: GOLD }
+            : settledRaw;
           const liveLine = phase === 'live' && line && line.position != null ? line : null;
           const figure = settled
             ? settled.figure
