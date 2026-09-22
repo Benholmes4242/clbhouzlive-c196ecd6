@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
+import { computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
@@ -52,7 +52,12 @@ interface Props {
   pickPlayerIds?: Set<string>;
   /** Row tap hook (analytics). Fires before the scorecard sheet opens. */
   onRowTap?: (playerId: string) => void;
-  /** Overview-only lifecycle treatment. Tournament-page callers omit it. */
+  /**
+   * Lifecycle. The tournament page passes 'completed' on its final
+   * board so the score column can be named for its round and the dead
+   * THRU column dropped. The hero no longer reads it — its columns are
+   * decided by the round data itself (see heroHasRoundData).
+   */
   phase?: 'live' | 'completed';
 }
 
@@ -67,6 +72,12 @@ const THEME_TOKENS = {
   panel: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
   heroBoard: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_06, press: 'active:bg-white/[0.06]' },
 } as const;
+
+/* The hero's round cell. 30px = the full board's 26px cell plus its
+   4px gap, folded into one track, because the hero grid carries no
+   column gap of its own. Fixed, never content-sized: a grid of
+   scores must align down the page. */
+const HERO_ROUND_CELL_W = 30;
 
 
 /**
@@ -125,14 +136,48 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   // PRIZE is decided over the WHOLE FIELD (entries), not the rendered slice,
   // so the column cannot appear or vanish as the board is expanded or scrolled.
   const showPrize = shouldShowPrize(entries);
-  const showOverviewPrize = phase === 'completed' && showPrize;
-  // The live hero board carries TODAY, not THRU: the current round is the story
-  // and the swap is what keeps the name column wide enough for real names.
-  // Gate shape matches the old THRU gate: render only when a visible row has one.
-  const showOverviewToday = phase === 'live' && rows.some((row) => todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound) != null);
-  const overviewGrid = phase === 'completed'
-    ? [showOverviewPosition ? '44px' : null, 'minmax(0, 1fr)', '52px', showOverviewPrize ? '52px' : null].filter(Boolean).join(' ')
-    : [showOverviewPosition ? '44px' : null, 'minmax(0, 1fr)', showOverviewToday ? '40px' : null, '52px'].filter(Boolean).join(' ');
+  /* OVER THE WHOLE FIELD, never `rows`. Column presence is a property
+     of the TOURNAMENT — the same doctrine that governs showPrize — so
+     expanding or re-sorting the board can never add or drop a column. */
+  const heroCols = useMemo(
+    () => computeBoardColumns(entries, currentRound ?? null),
+    [entries, currentRound],
+  );
+  /* THE GUARD IS ROUND DATA, NOT LIFECYCLE. computeBoardColumns floors
+     `rounds` at [1] so it always has a track to draw, and preTournament
+     is too narrow to lean on: it also requires every score and position
+     to be null, so a board carrying TOTALS BUT NO ROUND BREAKDOWN would
+     otherwise render one empty R1 column. */
+  const heroHasRoundData = useMemo(
+    () => entries.some((e) => e.round_1 != null || e.round_2 != null || e.round_3 != null || e.round_4 != null),
+    [entries],
+  );
+  const showHeroRounds = theme === 'heroBoard' && heroHasRoundData;
+  const heroRounds = showHeroRounds ? heroCols.rounds : [];
+  /* ONE GRID FOR BOTH PHASES. The live/completed split that used to
+     live here is gone with the two columns it switched. */
+  const heroRoundTracks = heroRounds.map(() => `${HERO_ROUND_CELL_W}px`).join(' ');
+  const overviewGrid = [
+    showOverviewPosition ? '44px' : null,
+    'minmax(0, 1fr)',
+    heroRoundTracks || null,
+    '52px',
+  ].filter(Boolean).join(' ');
+
+  /* A ROUND IN PROGRESS IS WHAT THRU IS FOR. Decided over `entries`,
+     not the five visible rows, so the column cannot appear when the
+     board is expanded. Mirrors computeBoardColumns' own showThru rule. */
+  const roundInProgress = entries.some((row) => {
+    const s = row.status?.toUpperCase();
+    if (s === 'MC' || s === 'CUT' || s === 'WD') return false;
+    if (todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound) == null) return false;
+    return row.thru != null && row.thru < 18;
+  });
+  const showPanelThru = theme !== 'heroBoard' && phase !== 'completed' && roundInProgress;
+  /* WHEN NOTHING IS IN PROGRESS, "TODAY" IS A LIE — the column is
+     already showing round N's score, so it takes round N's name. */
+  const panelRoundNamed = phase === 'completed' && currentRound != null;
+  const panelScoreLabel = panelRoundNamed ? `R${currentRound}` : t('board.columns.today');
 
   useEffect(() => {
     const element = nameTrackRef.current;
@@ -142,7 +187,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [theme, showPrize, overviewGrid]);
+  }, [theme, heroRounds.length, overviewGrid]);
 
   const nameTier = useMemo<BoardNameTier>(() => {
     const teamRows = entries.filter((entry) => entry.team);
@@ -177,9 +222,12 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
           <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', minHeight: 32, padding: '4px 24px', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
-            {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right' }}>{t('board.columns.today')}</div> : null}
+            {heroRounds.map((rd) => (
+              <div key={rd} style={{ textAlign: 'center', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
+                {`R${rd}`}
+              </div>
+            ))}
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
-            {showOverviewPrize ? <div style={{ textAlign: 'right' }}>{t('board.columns.prize', 'Prize')}</div> : null}
           </div>
           {rows.map((r) => {
             const entity = resolveBoardEntity(r, needsInitials, nameTier);
@@ -204,9 +252,17 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   {renderEntityName(entity, T.ink)}
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
-                {phase === 'live' && showOverviewToday ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{today == null ? todayBlank : fmtScore(today)}</div> : null}
+                {heroRounds.map((rd) => {
+                  const val = rd === currentRound
+                    ? today
+                    : ([r.round_1, r.round_2, r.round_3, r.round_4][rd - 1] ?? null);
+                  return (
+                    <div key={rd} style={{ textAlign: 'center', fontSize: 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: getScoreColor(val, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>
+                      {val == null ? BLANK : fmtScore(val)}
+                    </div>
+                  );
+                })}
                 <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
-                {showOverviewPrize ? <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: r.money != null ? T.mute : T.faint, fontVariantNumeric: 'tabular-nums' }}>{r.money != null ? formatEarnings(r.money) : '—'}</div> : null}
               </button>
             );
           })}
@@ -233,8 +289,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
         >
           <div style={{ width: 34, flexShrink: 0 }}>{t('board.columns.pos')}</div>
           <div ref={nameTrackRef} style={{ flex: 1, minWidth: 0 }}>{t('board.columns.player')}</div>
-          <div style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.thru')}</div>
-          <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.today')}</div>
+          {showPanelThru ? <div style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.thru')}</div> : null}
+          <div style={{ width: 46, textAlign: 'right', flexShrink: 0, color: panelRoundNamed ? AMBER : undefined }}>{panelScoreLabel}</div>
           <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.tot')}</div>
           {showPrize ? <div style={{ width: 52, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.prize', 'Prize')}</div> : null}
 
@@ -288,9 +344,11 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />
                 )}
               </div>
-              <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                {thruLabel(r, today)}
-              </div>
+              {showPanelThru ? (
+                <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  {thruLabel(r, today)}
+                </div>
+              ) : null}
               <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {today == null ? todayBlank : fmtScore(today)}
               </div>
