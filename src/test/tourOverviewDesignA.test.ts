@@ -147,10 +147,11 @@ describe('Tour Overview correctness gates', () => {
     expect(shouldShowPrize([])).toBe(false);
   });
 
-  it('renders a stable prize column with em dashes, and reclaims its width when the event has no money', () => {
-    const row = (id: string, money: number | null) => ({
-      id, position: Number(id), score: -10, money,
+  it('draws a round column per played round, and none at all when the board carries totals with no round breakdown', () => {
+    const row = (id: string, rounds: Partial<{ round_1: number; round_2: number; round_3: number }>) => ({
+      id, position: Number(id), score: -10,
       player: { id: `player-${id}`, full_name: `Player ${id}` },
+      ...rounds,
     });
     const board = (entries: ReturnType<typeof row>[]) => createElement(
       QueryClientProvider,
@@ -161,27 +162,21 @@ describe('Tour Overview correctness gates', () => {
         createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, phase: 'completed', theme: 'heroBoard' }),
       ),
     );
-    const paid = render(board([row('1', 2_500_000), row('2', 1_000)]));
-    const paidHeader = paid.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(paidHeader?.textContent).toContain('Prize');
-    expect(paidHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px 52px');
-    expect(paid.container.textContent).toContain('$2.5M');
-    expect(paid.container.textContent).toContain('$1K');
-    paid.unmount();
+    const played = render(board([
+      row('1', { round_1: -2, round_2: -3, round_3: -5 }),
+      row('2', { round_1: -1, round_2: -4, round_3: -5 }),
+    ]));
+    const playedHeader = played.container.querySelector<HTMLElement>('[data-overview-board-header]');
+    expect(playedHeader?.textContent).toContain('R1');
+    expect(playedHeader?.textContent).toContain('R2');
+    expect(playedHeader?.textContent).toContain('R3');
+    expect(playedHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 30px 30px 30px 52px');
+    played.unmount();
 
-    // Partial coverage: the column STAYS, and the unpaid row states an em dash.
-    const partial = render(board([row('1', 2_500_000), row('2', null)]));
-    const partialHeader = partial.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(partialHeader?.textContent).toContain('Prize');
-    expect(partialHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px 52px');
-    expect(partial.container.textContent).toContain('\u2014');
-    partial.unmount();
-
-    // No money anywhere in the field: no column, header included.
-    const unpaid = render(board([row('1', null), row('2', null)]));
-    const unpaidHeader = unpaid.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(unpaidHeader?.textContent).not.toContain('Prize');
-    expect(unpaidHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px');
+    const totalsOnly = render(board([row('1', {}), row('2', {})]));
+    const totalsHeader = totalsOnly.container.querySelector<HTMLElement>('[data-overview-board-header]');
+    expect(totalsHeader?.textContent).not.toContain('R1');
+    expect(totalsHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px');
   });
 
   it('keeps Also This Week inside the coming Sunday', () => {
