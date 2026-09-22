@@ -869,6 +869,7 @@ export function ExploreCard({
             {item.kind === 'story' ? null : (
               <span
                 aria-hidden
+                data-explore-copy-scrim="true"
                 style={{ position: 'absolute', inset: 0, background: HERO_COPY_SCRIM, zIndex: 0 }}
               />
             )}
