@@ -155,9 +155,15 @@ describe('amended achievement priority', () => {
 
     const singular = renderCard(
       { gross: 67, record_margin: 1 },
+      { consequence: { kind: 'record_taken', n: 67 } },
+    );
+    expect(singular.querySelector('[data-explore-achievement-subline="true"]')?.textContent).toBe('1 shot better');
+
+    const noRunnerUp = renderCard(
+      { gross: 66, record_margin: null },
       { consequence: { kind: 'record_taken', n: 66 } },
     );
-    expect(singular.querySelector('[data-explore-achievement-subline="true"]')).toBeNull();
+    expect(noRunnerUp.querySelector('[data-explore-achievement-subline="true"]')).toBeNull();
 
     const movement = renderCard(
       { gross: 70 },
