@@ -119,7 +119,7 @@ function thruLabel(row: Row, today: number | null): string {
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase: _phase = 'live' }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live' }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
@@ -173,10 +173,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     if (todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound) == null) return false;
     return row.thru != null && row.thru < 18;
   });
-  const showPanelThru = theme !== 'heroBoard' && roundInProgress;
+  const showPanelThru = theme !== 'heroBoard' && phase !== 'completed' && roundInProgress;
   /* WHEN NOTHING IS IN PROGRESS, "TODAY" IS A LIE — the column is
      already showing round N's score, so it takes round N's name. */
-  const panelRoundNamed = !roundInProgress && currentRound != null;
+  const panelRoundNamed = phase === 'completed' && currentRound != null;
   const panelScoreLabel = panelRoundNamed ? `R${currentRound}` : t('board.columns.today');
 
   useEffect(() => {
