@@ -2752,8 +2752,11 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
   const prevSig = legendBoardSignature(
     (prev ?? []).map((r: any) => ({ user_id: r.user_id, rank: r.rank, value: r.value })),
   );
+  // BRIEF_LEGEND_JOINT_RANKS §1 — standard competition ranking ("1224"),
+  // computed ONCE and reused by the signature, the insert and the crown diff.
+  const ranked = assignCompetitionRanks(arr);
   const nextSig = legendBoardSignature(
-    arr.map((r, i) => ({ user_id: r.user_id, rank: i + 1, value: r.value })),
+    ranked.map((r) => ({ user_id: r.user_id, rank: r.rank, value: r.value })),
   );
   if (prevSig === nextSig) {
     console.log("[gam-evaluator] legend board unchanged — write skipped", {
