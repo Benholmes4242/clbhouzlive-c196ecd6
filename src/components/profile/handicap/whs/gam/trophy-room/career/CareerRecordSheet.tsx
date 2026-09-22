@@ -26,6 +26,7 @@ import { useGamRecordConfig, RECORD_CONFIG_DEFAULTS } from '@/hooks/gam/useGamRe
 import { useCareerRounds } from '@/hooks/gam/useCareerRounds';
 import { useCourseFieldSizes } from '@/hooks/gam/useCourseFieldSizes';
 import { useCourseFieldPlayers } from '@/hooks/gam/useCourseFieldPlayers';
+import { useMemberStandings } from '@/hooks/gam/useMemberStandings';
 import { Skeleton } from '@/components/ui/skeleton';
 import { normalizeBadge, normalizeLegend } from '../_shared/normalizeTrophyItem';
 import { isTop100Achievement } from '../_shared/showpieces';
@@ -37,6 +38,7 @@ import { SeasonCutPanel } from './panels/SeasonCutPanel';
 import { Top100Panel } from './panels/Top100Panel';
 import { groupCrowns } from './panels/CrownsPanel';
 import { CourseRecordsPanel } from './panels/CourseRecordsPanel';
+import { StandingsPanel } from './panels/StandingsPanel';
 import { StreaksPanel } from './panels/StreaksPanel';
 import { MilestonesPanel } from './panels/MilestonesPanel';
 import { CountingStatDetail } from './details/CountingStatDetail';
@@ -54,6 +56,9 @@ interface Props {
 
 export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFirstName }) => {
   const [open, setOpen] = useState(false);
+  /* Where you stand: one call, opened with the sheet. */
+  const { data: standingsRows } = useMemberStandings(userId, open);
+  const standings = standingsRows ?? [];
   const [view, setView] = useState<CareerView>({ kind: 'room' });
 
   // A badgeId in the payload must land on that badge's detail, not the room.
@@ -277,6 +282,7 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
                 <CountingStatsPanel data={data} items={counting} sparse={sparse} />
                 <Top100Panel data={data} items={top100} />
                 <CourseRecordsPanel data={data} groups={crownGroups} />
+                <StandingsPanel rows={standings} />
                 <StreaksPanel streaks={streaks} />
                 <MilestonesPanel data={data} items={milestones} />
               </>
