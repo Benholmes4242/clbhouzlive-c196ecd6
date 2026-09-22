@@ -21,8 +21,8 @@ Deno.test("JOINT rank 1 on a board of three gains a title", () => {
 });
 
 Deno.test("exactly two claimants is contested — > 1, no larger floor", () => {
-  const mine = [row("c1", "most_birdies_all_time")];
-  const claimants = [row("c1", "most_birdies_all_time"), row("c1", "most_birdies_all_time")];
+  const mine = [row("c1", "best_stableford_all_time")];
+  const claimants = [row("c1", "best_stableford_all_time"), row("c1", "best_stableford_all_time")];
   assertEquals(countContestedTitles(mine, claimants), 1);
 });
 
