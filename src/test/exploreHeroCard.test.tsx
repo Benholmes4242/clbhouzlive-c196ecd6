@@ -352,10 +352,9 @@ describe('Explore card shapes', () => {
     expect(image?.style.minHeight).toBe('');
   });
 
-  it.each([
-    ['round', round(), 'std'],
-    ['pair', round(), 'pair'],
-  ] as const)('uses the shared canvas palette without a shadow on a %s', (_label, item, size) => {
+  it('keeps pair cards on the shared canvas text treatment', () => {
+    const item = round();
+    const size = 'pair' as const;
     const { container } = render(
       <ExploreCard item={item} size={size} shape={null} onTap={() => undefined} />,
     );
@@ -370,7 +369,7 @@ describe('Explore card shapes', () => {
     expect(container.querySelector('.explore-who-line')?.textContent).not.toContain(date?.textContent ?? 'Sep');
   });
 
-  it('marks a record round with a callout panel and a plain headline', () => {
+  it('marks a record round with a callout panel and no score-restatement headline', () => {
     const { container } = render(
       <ExploreCard item={round()} size="std" shape={null} onTap={() => undefined} />,
     );
@@ -380,24 +379,23 @@ describe('Explore card shapes', () => {
     expect(callout).not.toBeNull();
     expect(callout?.querySelector('[data-explore-achievement-tag="true"]')?.textContent).toBe('NEW');
     expect(callout?.querySelector('[data-explore-achievement-label="true"]')?.textContent).toBe('Course record');
-    /* §6 THE HEADLINE STATES THE ROUND, not the achievement, whenever a callout renders. */
-    expect(headline?.textContent ?? '').toContain('shot a 70');
-    expect(headline?.textContent ?? '').not.toMatch(/record/i);
+    expect(headline).toBeNull();
   });
 
-  it('keeps only the YOUR ROUND kicker part and viewer name amber on canvas', () => {
+  it('shows You once on an own round and removes the YOUR ROUND kicker', () => {
     const { container, getByText } = render(
       <ExploreCard item={round(true)} size="std" shape={null} onTap={() => undefined} />,
     );
     const kicker = container.querySelector<HTMLElement>('[data-explore-kicker="true"]');
     const ownPart = container.querySelector<HTMLElement>('[data-explore-kicker-part="primary"]');
 
-    expect(kicker?.style.color).toBe('rgb(255, 255, 255)');
-    expect(ownPart?.style.color).not.toBe('rgb(255, 255, 255)');
+    expect(kicker).toBeNull();
+    expect(ownPart).toBeNull();
     expect(getByText('You').style.color).not.toBe('rgb(255, 255, 255)');
+    expect(container.textContent?.match(/You/g)).toHaveLength(1);
   });
 
-  it('renders a ring kicker white on canvas', () => {
+  it('moves a round course and date into the identity second line', () => {
     const item = {
       ...round(),
       ring: 'county' as const,
@@ -407,21 +405,18 @@ describe('Explore card shapes', () => {
     const { container } = render(
       <ExploreCard item={item} size="std" shape={null} onTap={() => undefined} />,
     );
-    const ownPart = container.querySelector<HTMLElement>('[data-explore-kicker-part="primary"]');
-
-    expect(ownPart?.textContent).toBe('Surrey');
-    expect(ownPart?.style.color).toBe('rgba(248, 250, 252, 0.62)');
-    expect(ownPart?.closest<HTMLElement>('[data-explore-kicker="true"]')?.style.color).toBe('rgb(255, 255, 255)');
+    expect(container.querySelector('[data-explore-kicker="true"]')).toBeNull();
+    expect(container.querySelector('[data-round-identity-meta="true"]')?.textContent).toContain('Royal County Down');
   });
 
-  it('renders no scope element or gap for club-ring and record rounds', () => {
+  it('renders no standalone kicker for club-ring and record rounds', () => {
     for (const item of [
       { ...round(), ring: 'club' as const, consequence: null, facts: { ...round().facts, is_course_record: false } },
       round(),
     ]) {
       const { container, unmount } = render(<ExploreCard item={item} size="std" shape={null} onTap={() => undefined} />);
       expect(container.querySelector('[data-explore-kicker-scope="true"]')).toBeNull();
-      expect(container.querySelector<HTMLElement>('[data-explore-kicker-row="true"]')?.style.marginTop).toBe('0px');
+      expect(container.querySelector('[data-explore-kicker-row="true"]')).toBeNull();
       unmount();
     }
   });

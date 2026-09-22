@@ -30,18 +30,19 @@ function statKinds(container: HTMLElement): string[] {
 }
 
 describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
-  it('carries the achievement, then NET and VS HCP only, on one neutral panel', () => {
+  it('keeps the optional achievement in its own neutral block and moves figures to identity', () => {
     const container = renderCard(
       { gross: 70, course_par: 71, net: 67, course_handicap: 3, eagles: 1 },
     );
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
-    expect(statKinds(container)).toEqual(['achievement', 'net', 'vs-hcp']);
+    expect(statKinds(container)).toEqual(['achievement']);
     expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('67');
     expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')?.textContent).toBe('−4');
     expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
     expect(strip?.style.backgroundColor).toBe('rgb(27, 30, 39)');
     expect(strip?.style.backgroundImage).toBe('');
     expect(strip?.style.border).toBe('');
+    expect(container.querySelector('[data-round-identity-figures="true"]')).not.toBeNull();
   });
 
   it('shows no horizontal or vertical rule anywhere in the pill, on any tier', () => {
@@ -78,15 +79,15 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(FEAT_TOP_EMBLEM_GLOW).toContain('drop-shadow(0 0 12px');
   });
 
-  it('renders NET and VS HCP without an achievement and never prints a par or birdies figure', () => {
+  it('renders NET and VS HCP in identity without an achievement and no empty feat block', () => {
     const container = renderCard({ gross: 82, course_par: 71, net: 76, course_handicap: 6, birdies: 4 });
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
-    expect(strip?.getAttribute('data-explore-stat-layout')).toBe('figures-only');
-    expect(statKinds(container)).toEqual(['net', 'vs-hcp']);
+    expect(strip).toBeNull();
+    expect(container.querySelector('[data-round-identity-figures="true"]')).not.toBeNull();
     expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
     expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('76');
     expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')?.textContent).toBe('+5');
-    expect(strip?.textContent).not.toMatch(/BIRDIES/i);
+    expect(container.textContent).not.toMatch(/BIRDIES/i);
   });
 
   it('renders achievement alone when net is unavailable, and no strip without either', () => {

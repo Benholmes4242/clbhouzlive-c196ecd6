@@ -351,7 +351,7 @@ function WhoLine({
   onWhoTap?: () => void;
   engagement?: RoundCardEngagement | null;
   reviewIdentity?: { course: string | null; scope: string | null; date: string | null };
-  roundIdentity?: { course: string | null; date: string | null; net: number; par: number };
+  roundIdentity?: { course: string | null; date: string | null; net: number | null; par: number | null };
 }) {
   const { t } = useTranslation('courses');
   const who = item.who;
@@ -474,7 +474,8 @@ function WhoLine({
 
   if (roundIdentity && !pair) {
     const meta = [roundIdentity.course, roundIdentity.date].filter(Boolean).join(' · ');
-    const under = roundIdentity.net < roundIdentity.par;
+    const hasFigures = roundIdentity.net != null && roundIdentity.par != null;
+    const under = hasFigures && roundIdentity.net < roundIdentity.par;
     return (
       <div data-round-under-tile="true" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <div data-round-identity-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 8 }}>
@@ -483,10 +484,12 @@ function WhoLine({
             <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
             {meta ? <span data-round-identity-meta="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{meta}</span> : null}
           </span>
-          <span data-round-identity-figures="true" style={{ display: 'flex', flex: '0 0 auto', alignItems: 'center', justifyContent: 'flex-end', gap: 18 }}>
-            <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(roundIdentity.net)} under={under} />
-            <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(roundIdentity.net, roundIdentity.par)} under={under} />
-          </span>
+          {hasFigures ? (
+            <span data-round-identity-figures="true" style={{ display: 'flex', flex: '0 0 auto', alignItems: 'center', justifyContent: 'flex-end', gap: 18 }}>
+              <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(roundIdentity.net)} under={under} />
+              <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(roundIdentity.net, roundIdentity.par)} under={under} />
+            </span>
+          ) : null}
         </div>
         {reactions ? <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minHeight: 32, marginTop: 4 }}>{reactions}</div> : null}
       </div>
@@ -1246,8 +1249,8 @@ export function ExploreCard({
             onPhoto={false}
             onWhoTap={onWhoTap}
             engagement={engagement}
-            roundIdentity={item.kind === 'round' && size !== 'pair' && item.facts.net != null && item.facts.course_par != null
-              ? { course: kickerPartsValue.course, date: kickerDate, net: item.facts.net, par: item.facts.course_par }
+            roundIdentity={item.kind === 'round' && size !== 'pair'
+              ? { course: kickerPartsValue.course, date: kickerDate, net: item.facts.net ?? null, par: item.facts.course_par ?? null }
               : undefined}
           />
         </span>

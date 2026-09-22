@@ -13,7 +13,7 @@ const item: StreamItem = {
   consequence: null,
   subject: { course_id: null, course_name: 'Test Course', region: null, sub_country: null, image_url: null, pending: false },
   who: { user_id: 'player', display_name: 'A player name long enough to require ellipsis', photo_url: null, is_viewer: false },
-  facts: { score_id: 'score-1', gross: 80, to_par: 8, play_date: '2026-09-15' },
+  facts: { score_id: 'score-1', gross: 80, to_par: 8, net: 76, course_par: 72, course_handicap: 4, play_date: '2026-09-15' },
   payload: {}, seen: false,
 };
 
@@ -31,6 +31,17 @@ function engagement(patch: Partial<RoundCardEngagement> = {}): RoundCardEngageme
 }
 
 describe('Explore round-card who-line engagement', () => {
+  it('uses identity and figures as the always-present row with reactions beneath', () => {
+    const view = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement()} />);
+    expect(view.container.querySelector('[data-explore-stat-strip="round"]')).toBeNull();
+    expect(view.container.querySelector('[data-round-identity-row="true"]')).not.toBeNull();
+    expect(view.container.querySelector('[data-round-identity-meta="true"]')?.textContent).toContain('Test Course');
+    expect(view.container.querySelector('[data-round-identity-figures="true"]')?.textContent).toContain('NET76VS HCP+4');
+    expect(view.container.querySelector('[data-round-reactions-row="true"] [data-round-reactions="controls"]')).not.toBeNull();
+    expect(view.container.querySelector('[data-explore-headline="true"]')).toBeNull();
+    expect(view.container.querySelector('[data-explore-kicker="true"]')).toBeNull();
+  });
+
   it('shows both controls with a post and only the available subset without one', () => {
     const both = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement()} />);
     expect(both.getByRole('button', { name: 'Like, 0 likes' })).toBeTruthy();
