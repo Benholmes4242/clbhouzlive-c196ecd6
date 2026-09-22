@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 
 import { autoplayBlocked, registerReviewVideo } from '@/components/explore-tab-new/courseled/reviewVideoAutoplay';
 import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
-import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
+import { PlayingBars } from '@/components/feed/InlineVideo';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import '@/styles/media-rail-bars.css';
 
 /**
  * THE REVIEW TILE'S VIDEO LAYER (BRIEF_EXPLORE_REVIEW_TILE_VIDEO).
@@ -70,19 +72,21 @@ export function ReviewVideoLayer({
     };
   }, [active, hlsUrl]);
 
-  /* §2.3/§2.4 — CLAMPED AT ONE because the badge returns null on a falsy value
-     and the video LOOPS: an unclamped count would hit 0 and the badge would
-     blink out and back on every lap. Set state only when the whole second
-     changes, or `timeupdate` re-renders the card several times a second. */
+  /* §2.3/§2.4 — FLOORED like the Clubhouse badge's formatRemaining, so the
+     displayed integer changes exactly once per second, then CLAMPED AT ONE
+     because this video LOOPS and a 0 would blink at every lap. Set state only
+     when the whole second changes, or `timeupdate` re-renders the card several
+     times a second. */
   const onTimeUpdate = (event: React.SyntheticEvent<HTMLVideoElement>) => {
     const video = event.currentTarget;
     const total = durationS ?? video.duration;
     if (!total || !Number.isFinite(total)) return;
-    const next = Math.max(1, Math.ceil(total - video.currentTime));
+    const next = Math.max(1, Math.floor(total - video.currentTime));
     setRemaining((prev) => (prev === next ? prev : next));
   };
 
   const shown = playing && remaining != null ? remaining : durationS;
+  const label = formatDuration(shown ?? null);
 
   return (
     <>
@@ -122,11 +126,38 @@ export function ReviewVideoLayer({
           />
         )}
       </span>
-      {/* BOTTOM RIGHT, the Clubhouse feed card's exact badge: same
-          GlassDurationBadge, same fontSize 9.5, same 6px inset (its defaults).
-          The countdown comes from this caller's `seconds` — the badge itself
-          is untouched. (Supersedes §1.3's top-right; Ben's call.) */}
-      <GlassDurationBadge seconds={shown} fontSize={9.5} />
+      {/* THE CLUBHOUSE INLINE-VIDEO BADGE, verbatim (InlineVideo.tsx): the dark
+          chip, not the glass pill — same colours, same radius/padding/weight,
+          same 6px bottom-right inset, the same three animated PlayingBars while
+          the video plays, and the same floored countdown. Supersedes both §1.3
+          (top right) and the GlassDurationBadge match; Ben's call, twice. */}
+      {!!label && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            right: 6,
+            bottom: 6,
+            zIndex: 30,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '3px 7px',
+            borderRadius: 7,
+            background: 'rgba(10,14,10,0.72)',
+            color: '#FFFFFF',
+            fontSize: 10.5,
+            fontWeight: 700,
+            lineHeight: 1.1,
+            fontVariantNumeric: 'tabular-nums lining-nums',
+            /* NOT A CONTROL: the tap belongs to the card. */
+            pointerEvents: 'none',
+          }}
+        >
+          {playing && <PlayingBars />}
+          {label}
+        </span>
+      )}
     </>
   );
 }
