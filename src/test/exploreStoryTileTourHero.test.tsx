@@ -131,13 +131,18 @@ describe('Explore story tile matches the tour hero', () => {
     expect(c.querySelector<HTMLElement>('[data-explore-hero-bottom-lane="true"]')?.style.height).toBe('16px');
   });
 
-  it('§6 leaves the review card on its copy-anchored scrim and 2-line clamp', () => {
+  /* BRIEF_EXPLORE_REVIEW_TILE_C5 §3.1/§5 — the review keeps its own copy scrim
+     and does NOT take the story's; it adds a separate top-of-frame ramp because
+     the instrument now prints identity at the top. The words are gone, so there
+     is no headline to clamp. */
+  it('§6 leaves the review card on its copy-anchored scrim, never the story scrim', () => {
     const c = draw(review());
     expect(c.querySelector('[data-explore-story-scrim="true"]')).toBeNull();
     const copyScrim = c.querySelector<HTMLElement>('[data-explore-copy-scrim="true"]');
     expect(copyScrim?.style.inset).toBe('0');
-    expect(c.querySelector<HTMLElement>('[data-explore-headline="true"]')?.dataset.exploreLineClamp).toBe('2');
-    expect(c.querySelector('[data-review-identity="true"]')).not.toBeNull();
+    expect(c.querySelector('[data-explore-review-scrim="true"]')).not.toBeNull();
+    expect(c.querySelector('[data-explore-headline="true"]')).toBeNull();
+    expect(c.querySelector('[data-review-top-line="true"]')).not.toBeNull();
   });
 
   it('§6 a story with no image still renders below-photo at std', () => {
