@@ -1050,14 +1050,11 @@ export function ExploreCard({
           durationS={reviewMedia.durationS}
         />
       ) : leadReview && (item.facts.photoCount ?? 0) > 1 ? (
-        <GlassBadge
-          data-review-photo-count="true"
-          style={{ position: 'absolute', top: 8, right: 8, left: 'auto', bottom: 'auto', zIndex: 3 }}
-        >
+        <GlassBadge style={{ position: 'absolute', top: 8, right: 8, left: 'auto', bottom: 'auto', zIndex: 3 }}>
           <StackedLayersGlyph />
           {/* §4.1 THE FIGURE ONLY — the wordy "3 photos" chip was removed on
               purpose; this is the quiet form of the same fact. */}
-          {item.facts.photoCount}
+          <span data-review-photo-count="true">{item.facts.photoCount}</span>
         </GlassBadge>
       ) : null}
       {onPhoto && item.kind === 'story' ? (
