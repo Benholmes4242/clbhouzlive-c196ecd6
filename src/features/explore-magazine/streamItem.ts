@@ -3,6 +3,7 @@ import type { HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import type { Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
+import type { ReviewCardMedia } from './useReviewPageEnrichment';
 
 /**
  * THE UNIT'S CONTRACT (BRIEF_EXPLORE_MAGAZINE §6a).
