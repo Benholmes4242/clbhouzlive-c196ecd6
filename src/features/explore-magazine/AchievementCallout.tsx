@@ -406,6 +406,22 @@ export function RoundStatStrip({
     }
   })() : null;
 
+  /* BRIEF_FEED_SCORE_PILL §2 — the rarity glow is REPLACED BY A TAG. RARE sits
+     in the exact tag slot the NEW tag uses, in the same amber, size, weight and
+     letter-spacing. One accent per pill: a pill that already carries a worded
+     tag (NEW / MOVED UP) keeps it and does not also print RARE. */
+  const rareTag = achievement && !achievement.tag && tier !== 'ink'
+    ? t('amateur.stream.callout.tagRare', 'RARE')
+    : null;
+  const tag = achievement?.tag ?? rareTag;
+
+  /* §3 — THE QUALIFIER SENTENCE GETS ITS OWN ROW, full card width, directly
+     beneath the label row, muted, one line, NO divider above it, on EVERY pill
+     that has one. The subline ("11 shots better") and the rarity sentence
+     ("Only the second clbhouz member to achieve this.") both live here, never
+     inside the label cell and never under a rule. */
+  const hasSentence = Boolean(achievement?.subline) || (achievement != null && tier !== 'ink');
+
   return (
     <>
     <span
@@ -413,60 +429,70 @@ export function RoundStatStrip({
       data-explore-callout-tier={achievement ? tier : undefined}
       data-explore-stat-layout={achievement && hasNet ? 'achievement-and-figures' : achievement ? 'achievement-only' : 'figures-only'}
       style={{
-        display: 'grid',
-        gridTemplateColumns: achievement && hasNet ? 'minmax(0, 2.3fr) repeat(3, minmax(0, 0.7fr))' : hasNet ? 'repeat(3, minmax(0, 1fr))' : 'minmax(0, 1fr)',
+        display: 'flex',
+        flexDirection: 'column',
         width: '100%',
         minWidth: 0,
         marginTop: 10,
         marginBottom: 10,
         borderRadius: r.md,
         backgroundColor: A.PANEL,
-        backgroundImage: achievement && tier === 'top' ? FEAT_TOP_WASH : achievement && tier === 'gold' ? FEAT_GOLD_WASH : 'none',
         overflow: 'hidden',
         boxSizing: 'border-box',
       }}
     >
-      {achievement ? (
-        <span
-          data-explore-stat="achievement"
-          data-explore-callout={callout?.kind}
-          style={{ display: 'flex', minWidth: 0, minHeight: 52, alignItems: 'center', gap: 8, padding: '8px 10px', boxSizing: 'border-box' }}
-        >
-          <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px`, color: SC_FILL_GOLD }}>{achievement.icon}</span>
-          <span style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, gap: 2 }}>
-            {achievement.tag ? (
+      <span style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0, boxSizing: 'border-box' }}>
+        {achievement ? (
+          <span
+            data-explore-stat="achievement"
+            data-explore-callout={callout?.kind}
+            style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 52, alignItems: 'center', gap: 8, padding: '8px 10px', boxSizing: 'border-box' }}
+          >
+            <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px`, color: SC_FILL_GOLD }}>{achievement.icon}</span>
+            <span style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, gap: 2 }}>
+              {tag ? (
+                <span
+                  data-explore-achievement-tag="true"
+                  style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap' }}
+                >
+                  {tag}
+                </span>
+              ) : null}
               <span
-                data-explore-achievement-tag="true"
-                style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap' }}
+                data-explore-achievement-label="true"
+                style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'normal' }}
               >
-                {achievement.tag}
+                {achievement.label}
               </span>
-            ) : null}
-            <span
-              data-explore-achievement-label="true"
-              style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'normal' }}
-            >
-              {achievement.label}
             </span>
-            {achievement.subline ? (
-              <span
-                data-explore-achievement-subline="true"
-                style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: INK_FAINT, whiteSpace: 'normal' }}
-              >
-                {achievement.subline}
-              </span>
-            ) : null}
           </span>
+        ) : null}
+        {hasNet ? (
+          /* §1/§4 — TWO figures, NET then VS HCP, right-aligned, separated by
+             spacing alone. PAR is removed: the chip over the photo already
+             shows gross and to-par, and par is derivable from that pair. */
+          <span style={{ display: 'flex', flex: achievement ? '0 0 auto' : '1 1 auto', justifyContent: 'flex-end', alignItems: 'center', gap: 18, padding: '8px 10px', boxSizing: 'border-box' }}>
+            <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(net)} under={(net as number) < (coursePar as number)} />
+            <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(net as number, coursePar as number)} under={(net as number) < (coursePar as number)} />
+          </span>
+        ) : null}
+      </span>
+      {hasSentence ? (
+        <span
+          data-explore-achievement-sentence="true"
+          style={{ display: 'block', width: '100%', boxSizing: 'border-box', padding: '0 10px 8px', marginTop: -2 }}
+        >
+          {achievement?.subline ? (
+            <span
+              data-explore-achievement-subline="true"
+              style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
+              {achievement.subline}
+            </span>
+          ) : null}
+          {rarity}
         </span>
       ) : null}
-      {hasNet ? (
-        <>
-          <FigureCell label={t('amateur.stream.stat.par', 'PAR')} value={String(coursePar)} />
-          <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(net)} under={(net as number) < (coursePar as number)} />
-           <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(net as number, coursePar as number)} under={(net as number) < (coursePar as number)} />
-        </>
-      ) : null}
-      {achievement && tier !== 'ink' ? rarity : null}
     </span>
     </>
   );
