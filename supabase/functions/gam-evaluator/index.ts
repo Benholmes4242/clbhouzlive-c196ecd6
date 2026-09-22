@@ -5,6 +5,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
+import { assignCompetitionRanks, crownSetDelta } from './legendRanks.ts';
 export const FUNCTION_VERSION = '2026-09-20T00:00:00Z-v9-feat-rarity-lines';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
