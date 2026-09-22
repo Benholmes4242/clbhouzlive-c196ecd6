@@ -82,6 +82,19 @@ const HERO_TEXT_SHADOW = '0 1px 2px rgba(0,0,0,0.45)';
  *  the kicker, dark through the headline/who-line, and carried behind trace. */
 const HERO_COPY_SCRIM =
   'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 32%, rgba(0,0,0,0.70) 66%, rgba(0,0,0,0.82) 100%)';
+/** THE STORY SCRIM (BRIEF_EXPLORE_STORY_TILE_MATCH_THE_TOUR_HERO §1) — the tour
+ *  overview hero's ramp, applied to the WHOLE tile rather than the copy block,
+ *  because a story's meta line sits at the top of the frame and needs ground.
+ *  Three stops, each doing a job: 0.30 is that ground, 0.05 at 34% is where the
+ *  photograph reads through, 0.86 at the foot carries the headline. A story's
+ *  copy wrapper therefore renders NO scrim of its own — stacking the two would
+ *  double-darken the foot. HERO_COPY_SCRIM stays exactly as it is: the review
+ *  card's scrim is deliberately anchored to its copy. */
+const HERO_STORY_SCRIM =
+  'linear-gradient(180deg, rgba(0,0,0,0.30), rgba(0,0,0,0.05) 34%, rgba(0,0,0,0.86))';
+/** The story meta's own colour. NOT PHOTO_REVIEW_LABEL — the review card's
+ *  identity line and breakdown rail read that token and must not shift. */
+const HERO_STORY_META_COLOR = 'rgba(248,250,252,0.82)';
 
 function FigureChip({
   figure,
@@ -714,7 +727,13 @@ export function ExploreCard({
   );
 
   const leadReview = size === 'lead' && item.kind === 'review';
-  const headlineLineClamp = leadReview ? 2 : size === 'lead' ? 3 : 2;
+  /* §3 A STORY CLAMPS AT FOUR, like the tour hero. Every other branch is
+     untouched: the review stays at 2, other leads at 3. */
+  const headlineLineClamp = leadReview
+    ? 2
+    : size === 'lead'
+      ? (item.kind === 'story' ? 4 : 3)
+      : 2;
   const headlineNode = (
     <div
       data-explore-headline="true"
@@ -754,43 +773,46 @@ export function ExploreCard({
   const storyAge = item.kind === 'story'
     ? storyTime(item.facts.published_at ?? item.facts.arrived_at ?? null)
     : null;
+  /* §2 ONE LINE AT THE TOP OF THE FRAME, not a split row inside the copy. One
+     string — the separator exists only when there is an age — rendered inside
+     the 48px chip lane a story never uses, so the column geometry is unchanged.
+     It truncates; it never wraps, because a second line would change the lane
+     height and push the photograph down. */
   const storyMetaNode = item.kind === 'story' ? (
-    <div
+    <span
       data-explore-story-meta="true"
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-        marginBottom: 8,
-        color: PHOTO_REVIEW_LABEL,
+        display: 'block',
+        padding: '13px 16px 0',
+        color: HERO_STORY_META_COLOR,
         fontFamily: SANS,
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 700,
+        letterSpacing: '0.16em',
         lineHeight: 1.2,
         textTransform: 'uppercase',
         textShadow: HERO_TEXT_SHADOW,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
       }}
     >
-      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {storySource}
-      </span>
-      {storyAge ? <span style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>{storyAge}</span> : null}
-    </div>
+      {`${storySource}${storyAge ? ` · ${storyAge}` : ''}`}
+    </span>
   ) : null;
   const standfirstNode = storyStandfirst ? (
     <div
       data-explore-standfirst="true"
+      data-explore-standfirst-clamp={3}
       style={{
         marginTop: 8,
         fontFamily: SANS,
         fontSize: 13.5,
-        fontWeight: 500,
         lineHeight: 1.48,
-        color: 'rgba(255,255,255,0.85)',
+        color: 'rgba(248,250,252,0.80)',
         textShadow: onPhoto ? HERO_TEXT_SHADOW : undefined,
         display: '-webkit-box',
-        WebkitLineClamp: 2,
+        WebkitLineClamp: 3,
         WebkitBoxOrient: 'vertical',
         overflow: 'hidden',
         overflowWrap: 'break-word',
@@ -818,6 +840,13 @@ export function ExploreCard({
         : { height: PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }}
     >
       {chips}
+      {onPhoto && item.kind === 'story' ? (
+        <span
+          aria-hidden
+          data-explore-story-scrim="true"
+          style={{ position: 'absolute', inset: 0, background: HERO_STORY_SCRIM, zIndex: 1 }}
+        />
+      ) : null}
       {onPhoto ? (
         <span
           data-explore-hero="true"
@@ -829,13 +858,21 @@ export function ExploreCard({
             minHeight: PHOTO_H[size],
           }}
         >
-          <span aria-hidden style={{ flex: `0 0 ${HERO_CHIP_LANE}px` }} />
+          <span
+            aria-hidden={item.kind !== 'story'}
+            style={{ flex: `0 0 ${HERO_CHIP_LANE}px`, minWidth: 0, overflow: 'hidden' }}
+          >
+            {item.kind === 'story' ? storyMetaNode : null}
+          </span>
           <span style={{ flex: '1 1 auto', minHeight: 0 }} />
           <span style={{ position: 'relative', display: 'block' }}>
-            <span
-              aria-hidden
-              style={{ position: 'absolute', inset: 0, background: HERO_COPY_SCRIM, zIndex: 0 }}
-            />
+            {item.kind === 'story' ? null : (
+              <span
+                aria-hidden
+                data-explore-copy-scrim="true"
+                style={{ position: 'absolute', inset: 0, background: HERO_COPY_SCRIM, zIndex: 0 }}
+              />
+            )}
             <span
               data-explore-hero-copy="true"
               style={leadReview
@@ -844,9 +881,7 @@ export function ExploreCard({
             >
                {leadReview ? (
                 <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} reviewIdentity={reviewIdentity ?? undefined} />
-               ) : item.kind === 'story' ? (
-                 storyMetaNode
-              ) : (
+               ) : item.kind === 'story' ? null : (
                 <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               )}
               {headlineNode}

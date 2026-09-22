@@ -110,7 +110,10 @@ describe('Explore card shapes', () => {
     );
     const meta = container.querySelector<HTMLElement>('[data-explore-story-meta="true"]');
     expect(meta).not.toBeNull();
-    expect(meta?.firstElementChild?.textContent).toBe('Amateur News');
+    /* BRIEF_EXPLORE_STORY_TILE_MATCH_THE_TOUR_HERO §2.1 — ONE STRING, so the
+       meta no longer has a left/right pair of child elements. */
+    expect(meta?.firstElementChild).toBeNull();
+    expect(meta?.textContent?.startsWith('Amateur News')).toBe(true);
     expect(getByText('A championship story')).toBeInTheDocument();
     expect(getByText('The supporting detail follows beneath the title.')).toBeInTheDocument();
     expect(queryByText('A member')).toBeNull();
