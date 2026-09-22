@@ -5,6 +5,7 @@ import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { resolvePostAuthRoute } from '@/lib/auth/postAuthRoute';
 import { followClbhouzOnSignup } from '@/lib/auth/followClbhouz';
+import type { MedianAppleError, MedianAppleResponse, MedianAppleSuccess } from '@/types/median';
 import {
   trackAuthMethodSelected,
   trackAuthInitiated,

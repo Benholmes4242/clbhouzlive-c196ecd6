@@ -24,7 +24,7 @@ import { BoardTable, todayFromEntry, type BoardEntry, type CutState } from './Bo
 import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
-import { resolveCutDisplay } from '../_shared/cutDisplay';
+import { resolveCutDisplay, tournamentIsFinished } from '../_shared/cutDisplay';
 import { Skeleton } from '@/components/ui/skeleton';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -618,6 +618,7 @@ export function LeaderboardTab() {
           entries={filteredEntries}
           cutState={cutState}
           currentRound={currentRound}
+          complete={tournamentIsFinished(metaStatus)}
           headerTop={'var(--tour-header-h, 0px)'}
           surface={SURFACE}
           teeTimes={teeTimes}

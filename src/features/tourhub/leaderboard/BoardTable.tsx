@@ -139,6 +139,10 @@ interface Props {
   entries: BoardEntry[];
   cutState: CutState;
   currentRound?: number | null;
+  /** The event is over. Turns the live-round amber off; nothing else
+   * about the board changes. Defaults false so any caller that does
+   * not know keeps today's behaviour. */
+  complete?: boolean;
   onRowClick?: (entry: BoardEntry) => void;
   /** Header strip is owned by this component. Off only for embedded previews. */
   showHeader?: boolean;
@@ -235,6 +239,7 @@ export interface BoardColumns {
 export function computeBoardColumns(
   entries: BoardEntry[],
   currentRound?: number | null,
+  complete?: boolean,
 ): BoardColumns {
   let highest = 0;
   for (const e of entries) {
@@ -262,7 +267,19 @@ export function computeBoardColumns(
     entries.every((e) => e.score == null && e.position == null);
   // ANY row with a money value turns the column on for the whole tournament.
   const showPrize = entries.some((e) => e.money != null);
-  return { rounds, cellW: CELL_W, gap: GRID_GAP, liveRound: started ? currentRound! : null, showThru, showPrize, preTournament };
+  return {
+    rounds,
+    cellW: CELL_W,
+    gap: GRID_GAP,
+    /* AMBER IS A ROUND IN PROGRESS. `started` only knows that scores
+       exist for the current round, which stays true forever once the
+       event ends — so the final round wore amber permanently. The
+       event's own status is what settles it. */
+    liveRound: started && !complete ? currentRound as number : null,
+    showThru,
+    showPrize,
+    preTournament,
+  };
 }
 
 /** Shared movement source for both the column spec and the row renderer. */
@@ -424,6 +441,7 @@ export function BoardTable({
   entries,
   cutState,
   currentRound,
+  complete = false,
   onRowClick,
   showHeader = true,
   headerTop,
@@ -448,8 +466,8 @@ export function BoardTable({
   }, []);
 
   const base = useMemo(
-    () => computeBoardColumns(entries, currentRound),
-    [entries, currentRound],
+    () => computeBoardColumns(entries, currentRound, complete),
+    [entries, currentRound, complete],
   );
 
   const resolvedTeamInitials = useMemo(
@@ -611,7 +629,7 @@ export function BoardTable({
       ? ''
       : `${e.position_tied ? 'T' : ''}${e.position}`;
     const isLeader = !demotedRow && e.position === 1;
-    const totColor = demotedRow ? SECONDARY : houseColor(e.score, isLeader ? 'leader' : 'standard');
+    const totColor = demotedRow ? SECONDARY : houseColor(e.score);
     const totalDisplay = fmtScore(e.score);
     const todayVal = todayFromEntry(e, currentRound);
     // THRU must agree with the live round: if the active round has not started

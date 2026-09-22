@@ -55,8 +55,8 @@ interface Props {
   /**
    * Lifecycle. The tournament page passes 'completed' on its final
    * board so the score column can be named for its round and the dead
-   * THRU column dropped. The hero no longer reads it — its columns are
-   * decided by the round data itself (see heroHasRoundData).
+   * THRU column dropped. The hero uses it only to extinguish the final
+   * round's amber header; round-column presence remains data-led.
    */
   phase?: 'live' | 'completed';
 }
@@ -140,8 +140,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
      of the TOURNAMENT — the same doctrine that governs showPrize — so
      expanding or re-sorting the board can never add or drop a column. */
   const heroCols = useMemo(
-    () => computeBoardColumns(entries, currentRound ?? null),
-    [entries, currentRound],
+    () => computeBoardColumns(entries, currentRound ?? null, phase === 'completed'),
+    [entries, currentRound, phase],
   );
   /* THE GUARD IS ROUND DATA, NOT LIFECYCLE. computeBoardColumns floors
      `rounds` at [1] so it always has a track to draw, and preTournament
@@ -290,7 +290,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
           <div style={{ width: 34, flexShrink: 0 }}>{t('board.columns.pos')}</div>
           <div ref={nameTrackRef} style={{ flex: 1, minWidth: 0 }}>{t('board.columns.player')}</div>
           {showPanelThru ? <div style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.thru')}</div> : null}
-          <div style={{ width: 46, textAlign: 'right', flexShrink: 0, color: panelRoundNamed ? AMBER : undefined }}>{panelScoreLabel}</div>
+          <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{panelScoreLabel}</div>
           <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.tot')}</div>
           {showPrize ? <div style={{ width: 52, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.prize', 'Prize')}</div> : null}
 

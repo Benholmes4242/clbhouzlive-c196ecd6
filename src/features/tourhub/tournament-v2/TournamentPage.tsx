@@ -241,7 +241,7 @@ export function TournamentPage() {
         {strokeBoard && (
           <>
             <ContestSection contest={contest} state={pulse.state} />
-            <MoveSection contest={contest} state={pulse.state} tourCode={tourCode} />
+            <MoveSection contest={contest} state={pulse.state} tourCode={tourCode} currentRound={meta?.current_round ?? null} />
           </>
         )}
 

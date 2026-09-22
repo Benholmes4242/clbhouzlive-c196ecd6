@@ -23,16 +23,19 @@ export interface CutDisplay {
   cutline: number | null;
 }
 
-function isFinished(status: string): boolean {
-  return status === 'closed' || status === 'completed' || status === 'complete';
+/** The event is over. 'closed' | 'completed' | 'complete' are the
+ * three spellings the provider has used. Exported because the board
+ * needs the same answer the cut logic needs. */
+export function tournamentIsFinished(status: string | null | undefined): boolean {
+  const s = (status ?? '').toLowerCase();
+  return s === 'closed' || s === 'completed' || s === 'complete';
 }
 
 /** True once the cut has landed — actual figures only from here on. */
 export function cutHasHappened(input: CutInput): boolean {
-  const status = (input.status ?? '').toLowerCase();
   const { currentRound, cutRound } = input;
   if (cutRound != null && currentRound != null && currentRound > cutRound) return true;
-  return isFinished(status);
+  return tournamentIsFinished(input.status);
 }
 
 /** True only while the cut round itself is in play — projections allowed. */
