@@ -469,7 +469,7 @@ export function RoundStatStrip({
           {achievement.subline ? (
             <span
               data-explore-achievement-subline="true"
-              style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+              style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap' }}
             >
               {achievement.subline}
             </span>

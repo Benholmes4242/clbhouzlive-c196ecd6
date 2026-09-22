@@ -128,6 +128,8 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(subline?.textContent).toBe('2 shots better');
     expect(subline?.style.color).toBe('rgba(248, 250, 252, 0.62)');
     expect(subline?.style.whiteSpace).toBe('nowrap');
+    expect(subline?.style.overflow).toBe('');
+    expect(subline?.style.textOverflow).toBe('');
     expect(subline?.style.borderTop).toBe('');
     // The sentence must not live inside the achievement label cell any more.
     const cell = container.querySelector('[data-explore-stat="achievement"]');
