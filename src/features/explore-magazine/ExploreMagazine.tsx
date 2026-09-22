@@ -211,19 +211,19 @@ function buildBlocks(
   let cards = 0;
   let nextShelf = 0;
   let index = 0;
-  /* BRIEF_COURSES_MERGED §3 THE MERGED VIEW'S THREE RHYTHMS. Full width for
-     anything with something to say - EVERY review, and any course card whose
-     headline is a real EVENT. Two-up for the quiet ones: a course card whose
-     headline is a STABLE FACT. This is the SAME pairing path (sameKindPairs),
-     narrowed by what the card has to say - not a second one. */
-  const stableCourse = (item: StreamItem) => item.kind === 'course' && (item.facts.course_event ?? 'stable') === 'stable';
   /* BRIEF_EXPLORE_TWO_SHAPES §3 A REVIEW NEVER PAIRS, ON ANY VIEW: its shape is
      text on the photograph and a 124px tile cannot carry it. §2 a NOTABLE round
      never pairs either — that predicate is all that survives of the earned hero. */
   const canPair = (item: StreamItem) =>
     item.kind !== 'review' && !isNotableRound(item) && (
       opts.mergedCourses === true
-        ? stableCourse(item)
+        /* THE COURSES VIEW DOES NOT PAIR. BRIEF_COURSES_MERGED §3's
+           two-up lane split course cards by whether their headline was
+           an EVENT or a STABLE FACT — a distinction the member cannot
+           see, since both sizes show the same photo, name, sentence and
+           place at different widths. The page changed rhythm partway
+           down for no visible reason. One shape, every row. */
+        ? false
         : PAIRABLE.has(item.kind) || (opts.bareRoundPairs === true && pairableRound(item))
     );
 
