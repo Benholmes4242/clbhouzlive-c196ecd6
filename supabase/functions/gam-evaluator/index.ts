@@ -7,6 +7,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsFor } from '../_shared/cors.ts';
 import { assignCompetitionRanks, crownSetDelta } from './legendRanks.ts';
 import { countContestedTitles, type BoardKeyRow } from './legendTitles.ts';
+import { LEGEND_NOTIFY_MAX_AGE_DAYS, playDateFreshness } from './noticeFreshness.ts';
 export const FUNCTION_VERSION = '2026-09-20T00:00:00Z-v9-feat-rarity-lines';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
@@ -552,7 +553,7 @@ async function processSingle(whsScoreId: string) {
   // the same round produces the same rows. Owns sub_80, sub_par, birdie_round,
   // no_up, cutting. Non-fatal.
   try {
-    await deriveStreaks(userId);
+    await deriveStreaks(userId, (stats as any).play_date ?? null);
   } catch (e) {
     console.warn("[derive_streaks]", (e as Error).message);
   }
@@ -1620,7 +1621,7 @@ async function applyBadges(userId: string, stats: any, whsScoreId: string): Prom
     }
 
     if (badge.kind === "counter" || badge.kind === "tiered") {
-      const result = await evaluateCounterBadge(userId, badge, whsScoreId, currentById.get(badge.id));
+      const result = await evaluateCounterBadge(userId, badge, whsScoreId, today ?? null, currentById.get(badge.id));
       if (result) earned.push(result);
     }
     // streaks handled in applyStreaks
@@ -1641,6 +1642,7 @@ async function evaluateCounterBadge(
   userId: string,
   badge: any,
   whsScoreId: string | null,
+  triggerPlayDate: string | null,
   existingIn?: any,
 ): Promise<string | null> {
   if (!badge.counter_metric) return null;
@@ -1659,7 +1661,7 @@ async function evaluateCounterBadge(
   if (Array.isArray(tiers) && tiers.length > 0) {
     const tier = computeTier(lifetime, tiers);
     if (tier > 0 && (!existing || (existing.counter_tier ?? 0) < tier)) {
-      await upsertBadgeTiered(userId, badge.id, lifetime, tier, whsScoreId);
+      await upsertBadgeTiered(userId, badge.id, lifetime, tier, whsScoreId, triggerPlayDate);
       return badge.id;
     } else if (existing) {
       await supabase
@@ -1704,7 +1706,8 @@ async function processTop100Only(userId: string): Promise<{ earned: string[] }> 
 
   const earned: string[] = [];
   for (const badge of badges ?? []) {
-    const result = await evaluateCounterBadge(userId, badge, null);
+    // No trigger round on the rating path: badge rows still write, no notices.
+    const result = await evaluateCounterBadge(userId, badge, null, null);
     if (result) earned.push(result);
   }
   return { earned };
@@ -1750,7 +1753,20 @@ async function upsertBadgeEarned(userId: string, badgeId: string, whsScoreId: st
   return true;
 }
 
-async function upsertBadgeTiered(userId: string, badgeId: string, counterValue: number, tier: number, whsScoreId: string | null) {
+// BRIEF_BADGE_HISTORY_GATE. triggerPlayDate is the play_date of the round that
+// caused this evaluation, or null where there is no trigger round (a recompute,
+// a scheduled pass). THE ROW ALWAYS WRITES — tier, counter_value and earned_at
+// update exactly as before, so a requeue still corrects a badge. Only the
+// NOTIFICATION is gated, by the same helper and the same constant the crown
+// notices use: stale, missing, unparseable or absent → no notice.
+async function upsertBadgeTiered(
+  userId: string,
+  badgeId: string,
+  counterValue: number,
+  tier: number,
+  whsScoreId: string | null,
+  triggerPlayDate: string | null,
+) {
   const { data: existing } = await supabase
     .from("gam_user_badges")
     .select("counter_tier, seen_by_user")
@@ -1770,6 +1786,17 @@ async function upsertBadgeTiered(userId: string, badgeId: string, counterValue: 
     { onConflict: "user_id,badge_id" }
   );
   if (isNewTier) {
+    const { fresh, reason, ageDays } = playDateFreshness(triggerPlayDate);
+    if (!fresh) {
+      console.log(`[gam-evaluator] badge notice suppressed — ${reason === 'stale' ? 'historic round' : `trigger play_date ${reason}`}`, {
+        badge_id: badgeId,
+        tier,
+        play_date: triggerPlayDate,
+        ageDays,
+        whs_score_id: whsScoreId,
+      });
+      return;
+    }
     await enqueueNotification(userId, "badge_earned", {
       badge_id: badgeId,
       badge_title: await fetchBadgeTitle(badgeId),
@@ -1844,7 +1871,8 @@ async function recomputeLegendTitles(userId: string) {
 
   if (count > 0) {
     // upsertBadgeTiered handles the row + tier progression + notification.
-    await upsertBadgeTiered(userId, "legend_at_course", count, tier, null);
+    // Recompute, not a round: no trigger play_date, so no notification.
+    await upsertBadgeTiered(userId, "legend_at_course", count, tier, null, null);
   } else {
     // count === 0: user holds no contested rank-1 legends. Remove any stale badge
     // row so the trophy card falls back to the locked state cleanly.
@@ -2043,7 +2071,7 @@ function derivedCondition(
 }
 
 
-async function deriveStreaks(userId: string) {
+async function deriveStreaks(userId: string, triggerPlayDate: string | null = null) {
   const { data, error } = await supabase
     .from("gam_round_stats")
     .select(
@@ -2113,7 +2141,7 @@ async function deriveStreaks(userId: string) {
       .eq("user_id", userId)
       .eq("streak_type", streakType);
     if (wErr) throw wErr;
-    if (best > 0) await checkStreakBadges(userId, streakType, best);
+    if (best > 0) await checkStreakBadges(userId, streakType, best, triggerPlayDate);
   }
 }
 
@@ -2254,7 +2282,7 @@ async function rebuildDerivedStreaks(opts: {
       }
       if (changed) membersChanged += 1;
       perMember.push({ user_id: userId, streaks: sim });
-      if (opts.apply) await deriveStreaks(userId);
+      if (opts.apply) await deriveStreaks(userId, null);
     }
 
     const totals = mergeRebuildTotals(opts.totals, {
@@ -2361,7 +2389,7 @@ async function updateRoundStreak(userId: string, stats: any, streakType: string,
       last_updated_round_id: stats.whs_score_id,
       updated_at: new Date().toISOString(),
     }).eq("user_id", userId).eq("streak_type", streakType);
-    await checkStreakBadges(userId, streakType, newCount);
+    await checkStreakBadges(userId, streakType, newCount, (stats.play_date as string | null) ?? null);
   } else if (current.is_active) {
     await supabase.from("gam_streaks").update({
       current_count: 0,
@@ -2420,10 +2448,10 @@ async function updateRoundPlayedStreak(userId: string, stats: any) {
     last_updated_round_id: stats.whs_score_id,
     updated_at: new Date().toISOString(),
   }).eq("user_id", userId).eq("streak_type", "round_played");
-  await checkStreakBadges(userId, "round_played", newCount);
+  await checkStreakBadges(userId, "round_played", newCount, (stats.play_date as string | null) ?? null);
 }
 
-async function checkStreakBadges(userId: string, streakType: string, count: number) {
+async function checkStreakBadges(userId: string, streakType: string, count: number, triggerPlayDate: string | null) {
   if (REBUILD_SUPPRESS) return; // history correction: no badge writes
   const badgeId = STREAK_BADGE_MAP[streakType];
 
@@ -2434,7 +2462,7 @@ async function checkStreakBadges(userId: string, streakType: string, count: numb
     .eq("id", badgeId).maybeSingle();
   if (!badge?.counter_tiers) return;
   const tier = computeTier(count, badge.counter_tiers);
-  if (tier > 0) await upsertBadgeTiered(userId, badgeId, count, tier, null);
+  if (tier > 0) await upsertBadgeTiered(userId, badgeId, count, tier, null, triggerPlayDate);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2696,32 +2724,14 @@ type LegendTrigger = { whs_score_id: string | null; play_date: string | null };
 // news to the member. A round from March is not. The test is play_date, never
 // created_at — a row created today and played in 2021 is indistinguishable
 // from a fresh one by sync time alone.
-const LEGEND_NOTIFY_MAX_AGE_DAYS = 2;
+// The constant and the test now live in noticeFreshness.ts so badges share them
+// verbatim (BRIEF_BADGE_HISTORY_GATE) — one gate, one meaning.
 
 function isTriggerFreshForCrownNotice(trigger: LegendTrigger | undefined, courseId: string, category: string): boolean {
   const playDate = trigger?.play_date ?? null;
-  if (!playDate) {
-    // §5 — an unknown date is not a fresh one. Board still updated above.
-    console.log('[gam-evaluator] crown notice suppressed — trigger play_date missing', {
-      courseId,
-      category,
-      whs_score_id: trigger?.whs_score_id ?? null,
-    });
-    return false;
-  }
-  const played = Date.parse(`${String(playDate).slice(0, 10)}T00:00:00Z`);
-  if (!Number.isFinite(played)) {
-    console.log('[gam-evaluator] crown notice suppressed — trigger play_date unparseable', {
-      courseId,
-      category,
-      play_date: playDate,
-    });
-    return false;
-  }
-  const todayUtc = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`);
-  const ageDays = Math.floor((todayUtc - played) / 86400_000);
-  if (ageDays > LEGEND_NOTIFY_MAX_AGE_DAYS) {
-    console.log('[gam-evaluator] crown notice suppressed — historic round', {
+  const { fresh, reason, ageDays } = playDateFreshness(playDate);
+  if (!fresh) {
+    console.log(`[gam-evaluator] crown notice suppressed — ${reason === 'stale' ? 'historic round' : `trigger play_date ${reason}`}`, {
       courseId,
       category,
       play_date: playDate,
