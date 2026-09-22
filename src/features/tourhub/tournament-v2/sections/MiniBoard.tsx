@@ -298,10 +298,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
         >
           <div style={{ width: 34, flexShrink: 0 }}>{t('board.columns.pos')}</div>
           <div ref={nameTrackRef} style={{ flex: 1, minWidth: 0 }}>{t('board.columns.player')}</div>
-          {showPanelThru ? <div style={{ width: 40, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.thru')}</div> : null}
-          <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{panelScoreLabel}</div>
-          <div style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.tot')}</div>
-          {showPrize ? <div style={{ width: 52, textAlign: 'right', flexShrink: 0 }}>{t('board.columns.prize', 'Prize')}</div> : null}
+          {showPanelThru ? <div style={{ width: 40, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.thru')}</div> : null}
+          <div style={{ width: 46, textAlign: 'center', flexShrink: 0 }}>{panelScoreLabel}</div>
+          <div style={{ width: 46, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.tot')}</div>
+          {showPrize ? <div style={{ width: 52, textAlign: 'center', flexShrink: 0 }}>{t('board.columns.prize', 'Prize')}</div> : null}
 
 
         </div>
@@ -354,21 +354,21 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 )}
               </div>
               {showPanelThru ? (
-                <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                <div style={{ width: 40, textAlign: 'center', flexShrink: 0, fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                   {thruLabel(r, today)}
                 </div>
               ) : null}
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 46, textAlign: 'center', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {today == null ? todayBlank : fmtScore(today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 46, textAlign: 'center', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {r.score == null ? BLANK : fmtScore(r.score)}
               </div>
               {/* No money earned is a VALUE: an em dash in the faint slot, never
                   a blank, never a zero. Column presence is a tournament-level
                   decision (showPrize) so it cannot flicker per row. */}
               {showPrize ? (
-                <div style={{ width: 52, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: r.money != null ? T.mute : T.faint, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                <div style={{ width: 52, textAlign: 'center', flexShrink: 0, fontSize: 12, fontWeight: 600, color: r.money != null ? T.mute : T.faint, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                   {r.money != null ? formatEarnings(r.money) : '—'}
                 </div>
               ) : null}
