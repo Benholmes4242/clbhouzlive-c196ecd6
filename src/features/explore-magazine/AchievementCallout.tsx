@@ -290,7 +290,7 @@ export function vsHandicapLabel(net: number, par: number): string {
   return delta < 0 ? `\u2212${Math.abs(delta)}` : `+${delta}`;
 }
 
-function FigureCell({ label, value, under }: { label: string; value: string; under?: boolean }) {
+export function FigureCell({ label, value, under }: { label: string; value: string; under?: boolean }) {
   return (
     <span
       data-explore-stat={label.toLowerCase().replace(/\s+/g, '-')}
@@ -319,16 +319,12 @@ function FigureCell({ label, value, under }: { label: string; value: string; und
 
 export function RoundStatStrip({
   callout,
-  coursePar,
-  net,
   locale,
   scoreId = null,
   featCounts,
   ownerDisplayName,
 }: {
   callout: AchievementCallout | null;
-  coursePar: number | null;
-  net: number | null;
   locale: string;
   /** The round's whs_score_id — the key the rarity rows came back under. */
   scoreId?: string | null;
@@ -336,10 +332,9 @@ export function RoundStatStrip({
   ownerDisplayName?: string | null;
 }) {
   const { t } = useTranslation('courses');
-  const hasNet = coursePar != null && net != null;
+  if (!callout) return null;
   const tier = callout && 'tier' in callout ? callout.tier : 'ink';
   const rarity = <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} align="card" />;
-  if (!callout && !hasNet) return rarity;
 
   const ord = callout?.kind === 'rank_up' && callout.rank != null
     ? standingOrdinal(callout.rank, locale)
@@ -359,7 +354,7 @@ export function RoundStatStrip({
       ? t('amateur.stream.callout.featJoin', '{{first}} + {{second}}', { first: labels[0], second: labels[1] })
       : labels[0] ?? '';
   };
-  const achievement = callout ? (() => {
+  const achievement = (() => {
     switch (callout.kind) {
       case 'record': return {
         icon: <AchievementEmoji glyph="🏆" tier={tier} />,
@@ -404,13 +399,13 @@ export function RoundStatStrip({
       };
       case 'clean': return { icon: <AchievementEmoji glyph="🛡️" tier={tier} />, tag: null, label: featLabelFor(callout.feats), subline: null };
     }
-  })() : null;
+  })();
 
   /* BRIEF_FEED_SCORE_PILL §2 — the rarity glow is REPLACED BY A TAG. RARE sits
      in the exact tag slot the NEW tag uses, in the same amber, size, weight and
      letter-spacing. One accent per pill: a pill that already carries a worded
      tag (NEW / MOVED UP) keeps it and does not also print RARE. */
-  const rareTag = achievement && !achievement.tag && tier !== 'ink'
+  const rareTag = !achievement.tag && tier !== 'ink'
     ? t('amateur.stream.callout.tagRare', 'RARE')
     : null;
   const tag = achievement?.tag ?? rareTag;
@@ -420,14 +415,14 @@ export function RoundStatStrip({
      that has one. The subline ("11 shots better") and the rarity sentence
      ("Only the second clbhouz member to achieve this.") both live here, never
      inside the label cell and never under a rule. */
-  const hasSentence = Boolean(achievement?.subline) || (achievement != null && tier !== 'ink');
+  const hasSentence = Boolean(achievement.subline) || tier !== 'ink';
 
   return (
     <>
     <span
       data-explore-stat-strip="round"
-      data-explore-callout-tier={achievement ? tier : undefined}
-      data-explore-stat-layout={achievement && hasNet ? 'achievement-and-figures' : achievement ? 'achievement-only' : 'figures-only'}
+      data-explore-callout-tier={tier}
+      data-explore-stat-layout="achievement-only"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -442,14 +437,19 @@ export function RoundStatStrip({
       }}
     >
       <span style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0, boxSizing: 'border-box' }}>
-        {achievement ? (
           <span
             data-explore-stat="achievement"
             data-explore-callout={callout?.kind}
             style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 52, alignItems: 'center', gap: 8, padding: '8px 10px', boxSizing: 'border-box' }}
           >
             <span aria-hidden style={{ display: 'flex', flex: `0 0 ${CALLOUT_ICON}px`, color: SC_FILL_GOLD }}>{achievement.icon}</span>
-            <span style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, gap: 2 }}>
+            <span style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 7 }}>
+              <span
+                data-explore-achievement-label="true"
+                style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'normal' }}
+              >
+                {achievement.label}
+              </span>
               {tag ? (
                 <span
                   data-explore-achievement-tag="true"
@@ -458,31 +458,15 @@ export function RoundStatStrip({
                   {tag}
                 </span>
               ) : null}
-              <span
-                data-explore-achievement-label="true"
-                style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK, whiteSpace: 'normal', overflowWrap: 'normal' }}
-              >
-                {achievement.label}
-              </span>
             </span>
           </span>
-        ) : null}
-        {hasNet ? (
-          /* §1/§4 — TWO figures, NET then VS HCP, right-aligned, separated by
-             spacing alone. PAR is removed: the chip over the photo already
-             shows gross and to-par, and par is derivable from that pair. */
-          <span style={{ display: 'flex', flex: achievement ? '0 0 auto' : '1 1 auto', justifyContent: 'flex-end', alignItems: 'center', gap: 18, padding: '8px 10px', boxSizing: 'border-box' }}>
-            <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(net)} under={(net as number) < (coursePar as number)} />
-            <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(net as number, coursePar as number)} under={(net as number) < (coursePar as number)} />
-          </span>
-        ) : null}
       </span>
       {hasSentence ? (
         <span
           data-explore-achievement-sentence="true"
           style={{ display: 'block', width: '100%', boxSizing: 'border-box', padding: '0 10px 8px', marginTop: -2 }}
         >
-          {achievement?.subline ? (
+          {achievement.subline ? (
             <span
               data-explore-achievement-subline="true"
               style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}

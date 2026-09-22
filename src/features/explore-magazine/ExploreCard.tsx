@@ -23,7 +23,7 @@ import { courseSubScoreTone } from '@/features/courses/components/holes/analytic
 import { headlineFor, kickerParts, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
 import { calloutFor, rendersOnPhoto } from './cardTreatment';
-import { RoundStatStrip } from './AchievementCallout';
+import { FigureCell, RoundStatStrip, vsHandicapLabel } from './AchievementCallout';
 import { dotsFor, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
@@ -343,6 +343,7 @@ function WhoLine({
   onWhoTap,
   engagement,
   reviewIdentity,
+  roundIdentity,
 }: {
   item: StreamItem;
   size: CardSize;
@@ -350,6 +351,7 @@ function WhoLine({
   onWhoTap?: () => void;
   engagement?: RoundCardEngagement | null;
   reviewIdentity?: { course: string | null; scope: string | null; date: string | null };
+  roundIdentity?: { course: string | null; date: string | null; net: number; par: number };
 }) {
   const { t } = useTranslation('courses');
   const who = item.who;
@@ -402,6 +404,53 @@ function WhoLine({
     event.preventDefault();
   };
 
+  const reactions = showActions ? (
+    <span
+      data-round-reactions={pair ? 'counts' : 'controls'}
+      style={{
+        marginLeft: pair ? 'auto' : undefined,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: pair ? 8 : 14,
+        flex: '0 0 auto',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {engagement?.likeAvailable && (!pair || showPairLike) ? (
+        pair ? (
+          <span aria-label={`Like, ${engagement.likeCount} likes`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: engagement.liked ? A.AMBER : subColor }}>
+            <Heart size={14} strokeWidth={2} fill={engagement.liked ? A.AMBER : 'none'} aria-hidden />
+            <span style={countStyle}>{engagement.likeCount}</span>
+          </span>
+        ) : (
+          <span role="button" tabIndex={0} aria-pressed={engagement.liked} aria-label={`Like, ${engagement.likeCount} likes`}
+            onClick={(event) => { stop(event); engagement.onToggleLike?.(); }}
+            onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); engagement.onToggleLike?.(); }}
+            style={{ minWidth: 40, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? A.AMBER : subColor, cursor: 'pointer' }}>
+            <Heart size={18} strokeWidth={2} fill={engagement.liked ? A.AMBER : 'none'} aria-hidden />
+            {engagement.likeCount > 0 ? <span style={countStyle}>{engagement.likeCount}</span> : null}
+          </span>
+        )
+      ) : null}
+      {engagement?.commentAvailable && (!pair || showPairComment) ? (
+        pair ? (
+          <span aria-label={`Comments, ${engagement.commentCount}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: subColor }}>
+            <MessageCircle size={14} strokeWidth={2} aria-hidden />
+            <span style={countStyle}>{engagement.commentCount}</span>
+          </span>
+        ) : (
+          <span role="button" tabIndex={0} aria-label={`Comments, ${engagement.commentCount}`}
+            onClick={(event) => { stop(event); engagement.onOpenComments?.(); }}
+            onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); engagement.onOpenComments?.(); }}
+            style={{ minWidth: 40, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: subColor, cursor: 'pointer' }}>
+            <MessageCircle size={18} strokeWidth={2} aria-hidden />
+            {engagement.commentCount > 0 ? <span style={countStyle}>{engagement.commentCount}</span> : null}
+          </span>
+        )
+      ) : null}
+    </span>
+  ) : null;
+
   const avatar = who?.user_id ? (
     <span
       role={onWhoTap ? 'button' : undefined}
@@ -422,6 +471,27 @@ function WhoLine({
       <SquircleAvatar size={20} src={who.photo_url} alt={name} userId={who.user_id} hairlineRing hideRing={false} />
     </span>
   ) : null;
+
+  if (roundIdentity && !pair) {
+    const meta = [roundIdentity.course, roundIdentity.date].filter(Boolean).join(' · ');
+    const under = roundIdentity.net < roundIdentity.par;
+    return (
+      <div data-round-under-tile="true" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        <div data-round-identity-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 8 }}>
+          {avatar}
+          <span style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0, gap: 3 }}>
+            <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+            {meta ? <span data-round-identity-meta="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{meta}</span> : null}
+          </span>
+          <span data-round-identity-figures="true" style={{ display: 'flex', flex: '0 0 auto', alignItems: 'center', justifyContent: 'flex-end', gap: 18 }}>
+            <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(roundIdentity.net)} under={under} />
+            <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(roundIdentity.net, roundIdentity.par)} under={under} />
+          </span>
+        </div>
+        {reactions ? <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minHeight: 32, marginTop: 4 }}>{reactions}</div> : null}
+      </div>
+    );
+  }
 
   if (reviewIdentity) {
     const right = [reviewIdentity.scope, reviewIdentity.date].filter(Boolean).join(' · ');
@@ -529,69 +599,7 @@ function WhoLine({
           </span>
         ) : null}
       </div>
-      {showActions ? (
-        <span
-          data-round-reactions={pair ? 'counts' : 'controls'}
-          style={{
-            marginLeft: 'auto',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: pair ? 8 : 14,
-            flex: '0 0 auto',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {engagement?.likeAvailable && (!pair || showPairLike) ? (
-            pair ? (
-              <span aria-label={`Like, ${engagement.likeCount} likes`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: engagement.liked ? A.AMBER : subColor }}>
-                <Heart size={14} strokeWidth={2} fill={engagement.liked ? A.AMBER : 'none'} aria-hidden />
-                <span style={countStyle}>{engagement.likeCount}</span>
-              </span>
-            ) : (
-              <span
-                role="button"
-                tabIndex={0}
-                aria-pressed={engagement.liked}
-                aria-label={`Like, ${engagement.likeCount} likes`}
-                onClick={(event) => { stop(event); engagement.onToggleLike?.(); }}
-                onKeyDown={(event) => {
-                  if (event.key !== 'Enter' && event.key !== ' ') return;
-                  stop(event);
-                  engagement.onToggleLike?.();
-                }}
-                style={{ minWidth: 40, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? A.AMBER : subColor, cursor: 'pointer' }}
-              >
-                <Heart size={18} strokeWidth={2} fill={engagement.liked ? A.AMBER : 'none'} aria-hidden />
-                {engagement.likeCount > 0 ? <span style={countStyle}>{engagement.likeCount}</span> : null}
-              </span>
-            )
-          ) : null}
-          {engagement?.commentAvailable && (!pair || showPairComment) ? (
-            pair ? (
-              <span aria-label={`Comments, ${engagement.commentCount}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: subColor }}>
-                <MessageCircle size={14} strokeWidth={2} aria-hidden />
-                <span style={countStyle}>{engagement.commentCount}</span>
-              </span>
-            ) : (
-              <span
-                role="button"
-                tabIndex={0}
-                aria-label={`Comments, ${engagement.commentCount}`}
-                onClick={(event) => { stop(event); engagement.onOpenComments?.(); }}
-                onKeyDown={(event) => {
-                  if (event.key !== 'Enter' && event.key !== ' ') return;
-                  stop(event);
-                  engagement.onOpenComments?.();
-                }}
-                style={{ minWidth: 40, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: subColor, cursor: 'pointer' }}
-              >
-                <MessageCircle size={18} strokeWidth={2} aria-hidden />
-                {engagement.commentCount > 0 ? <span style={countStyle}>{engagement.commentCount}</span> : null}
-              </span>
-            )
-          ) : null}
-        </span>
-      ) : null}
+      {reactions}
     </div>
   );
 }
@@ -1223,18 +1231,25 @@ export function ExploreCard({
             albatrosses: item.facts.albatrosses ?? null,
             eagles: item.facts.eagles ?? null,
           }}
-          coursePar={item.facts.course_par ?? null}
-          net={item.facts.net != null && item.facts.course_handicap != null ? item.facts.net : null}
           locale={locale}
           ownerDisplayName={item.who?.display_name ?? null}
         />
       ) : null}
       {!onPhoto ? (
         /* §3d text inside a card's caption area is inset a further 4px. */
-        <span style={{ display: 'block', paddingInline: 4, marginTop: item.kind === 'round' && size !== 'pair' && (callout || (item.facts.net != null && item.facts.course_handicap != null && item.facts.course_par != null)) ? 0 : 8 }}>
-          {kicker}
-           {headlineNode}
-            <WhoLine item={item} size={size} onPhoto={false} onWhoTap={onWhoTap} engagement={engagement} />
+        <span style={{ display: 'block', paddingInline: 4, marginTop: item.kind === 'round' && size !== 'pair' && callout ? 0 : 8 }}>
+          {item.kind === 'round' && size !== 'pair' ? null : kicker}
+          {item.kind === 'round' && size !== 'pair' ? null : headlineNode}
+          <WhoLine
+            item={item}
+            size={size}
+            onPhoto={false}
+            onWhoTap={onWhoTap}
+            engagement={engagement}
+            roundIdentity={item.kind === 'round' && size !== 'pair' && item.facts.net != null && item.facts.course_par != null
+              ? { course: kickerPartsValue.course, date: kickerDate, net: item.facts.net, par: item.facts.course_par }
+              : undefined}
+          />
         </span>
       ) : null}
     </button>
