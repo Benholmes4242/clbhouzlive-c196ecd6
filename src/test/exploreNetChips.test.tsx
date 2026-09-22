@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
-import { A } from '@/components/explore-tab-new/courseled/tokens';
 import { vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
 import { calloutFor } from '@/features/explore-magazine/cardTreatment';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
