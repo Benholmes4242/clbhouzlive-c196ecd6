@@ -28,6 +28,9 @@ interface MedianBridge {
     };
     google?: MedianSocialProvider;
   };
+  statusbar?: {
+    set?: (opts: { style?: string; color?: string; overlay?: boolean; blur?: boolean }) => void;
+  };
   [key: string]: unknown;
 }
 
