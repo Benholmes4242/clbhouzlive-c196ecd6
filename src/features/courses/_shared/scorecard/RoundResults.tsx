@@ -132,7 +132,26 @@ export function RoundResults({ result, scope }: { result: RoundAwardsResult | nu
   if (awards.length === 0 && holes.length === 0 && efforts.length === 0) return null;
 
   const resultsTable = efforts.length > 0 ? (
-    <Block title={t('roundResults.sections.efforts')} testId="efforts">
+    <>
+      {scope && (
+        <div data-round-results-scope="true" style={{ margin: '4px 0 4px', minWidth: 0 }}>
+          <div style={{ color: INK_FAINT, fontSize: 9.5, fontWeight: 700, lineHeight: 1.2, textTransform: 'uppercase' }}>
+            {t('roundResults.scope.kicker')}
+          </div>
+          <h4 style={{ margin: '5px 0 0', color: INK, fontSize: 16, fontWeight: 700, lineHeight: 1.25 }}>
+            {t('roundResults.scope.heading', { name: scope.subjectName, course: scope.courseName })}
+          </h4>
+          <p style={{ margin: '6px 0 0', color: INK_FAINT, fontSize: 11.5, lineHeight: 1.45 }}>
+            {t('roundResults.scope.line', {
+              subject: scope.subject,
+              verb: scope.verb,
+              count: scope.roundsHere,
+              possessive: scope.possessive,
+            })}
+          </p>
+        </div>
+      )}
+      <Block title={t('roundResults.sections.efforts')} testId="efforts">
       <div data-round-efforts-table="true" style={{ minWidth: 0, overflowX: 'clip' }}>
         <div
           data-round-efforts-header="true"
@@ -158,7 +177,8 @@ export function RoundResults({ result, scope }: { result: RoundAwardsResult | nu
           );
         })}
       </div>
-    </Block>
+      </Block>
+    </>
   ) : null;
 
   return (
