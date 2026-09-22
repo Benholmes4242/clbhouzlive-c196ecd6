@@ -190,6 +190,7 @@
     },
     "roundCard": {
       "net": "Net",
+      "thruN": "thru {{n}}",
       "adjustedNotCompleted_one": "adjusted, {{count}} hole not completed",
       "adjustedNotCompleted_other": "adjusted, {{count}} holes not completed"
     },
