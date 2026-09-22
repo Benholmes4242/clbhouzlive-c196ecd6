@@ -50,6 +50,8 @@ import { useCourseRecordSummary } from './useCourseRecordSummary';
 import AboutSection from './about/AboutSection';
 import { YouButton, YouSentence } from './you/youBits';
 import YourRecordHere from './you/YourRecordHere';
+import WhereYouStandHere from './you/WhereYouStandHere';
+import { useMemberStandings } from '@/hooks/gam/useMemberStandings';
 import YourRoundsHere, { type YouRound } from './you/YourRoundsHere';
 import WhereYourShotsGo from './you/WhereYourShotsGo';
 import YourFormHere from './you/YourFormHere';
@@ -86,6 +88,8 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   const { data: myRounds } = useMyRoundsAtCourse(courseId);
   const { data: rating } = useUserCourseRating(courseId, user?.id);
   const { courseRecord, unclaimedCount } = useCourseRecordSummary(courseId, user?.id ?? null);
+  /* Scoped to this course; only read once the member is known to have played. */
+  const { data: standings } = useMemberStandings(user?.id, settled && hasTrackedRounds, courseId);
 
   const [openRoundId, setOpenRoundId] = React.useState<string | null>(null);
 
