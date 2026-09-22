@@ -70,7 +70,7 @@ describe('Explore story tile matches the tour hero', () => {
     const c = draw(story());
     const scrim = c.querySelector<HTMLElement>('[data-explore-story-scrim="true"]');
     expect(scrim?.style.position).toBe('absolute');
-    expect(scrim?.style.inset).toBe('0px');
+    expect(scrim?.style.inset).toBe('0');
     expect(scrim?.style.zIndex).toBe('1');
     /* Two scrims stacked would double-darken the foot. jsdom drops gradient
        values, so the copy scrim is asserted by its presence, not its fill. */
@@ -135,7 +135,7 @@ describe('Explore story tile matches the tour hero', () => {
     const c = draw(review());
     expect(c.querySelector('[data-explore-story-scrim="true"]')).toBeNull();
     const copyScrim = c.querySelector<HTMLElement>('[data-explore-copy-scrim="true"]');
-    expect(copyScrim?.style.inset).toBe('0px');
+    expect(copyScrim?.style.inset).toBe('0');
     expect(c.querySelector<HTMLElement>('[data-explore-headline="true"]')?.dataset.exploreLineClamp).toBe('2');
     expect(c.querySelector('[data-review-identity="true"]')).not.toBeNull();
   });
