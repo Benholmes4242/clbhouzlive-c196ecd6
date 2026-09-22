@@ -1931,7 +1931,9 @@ async function recomputeAllLegendTitles(opts: { apply: boolean }) {
         after: { count: after, tier: afterTier },
       });
 
-      if (opts.apply) await recomputeLegendTitles(userId);
+      // No trigger round on this path — null stays silent (and REBUILD_SUPPRESS
+      // is set for the whole pass anyway).
+      if (opts.apply) await recomputeLegendTitles(userId, null);
     }
 
     members.sort((a, b) => b.after.count - a.after.count);
