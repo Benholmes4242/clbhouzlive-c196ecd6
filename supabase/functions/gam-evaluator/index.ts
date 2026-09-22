@@ -500,7 +500,6 @@ async function processSingle(whsScoreId: string) {
       console.warn("[season_medal]", (e as Error).message);
     }
 
-
     // Rate-a-course prompt — self-contained, guarded, non-fatal.
     // Fires only on a score's FIRST evaluation (alreadyAtVersion === false)
     // so gender-change re-enqueued scores do not re-prompt. It fires only when
