@@ -171,13 +171,13 @@ describe('Tour Overview correctness gates', () => {
     expect(playedHeader?.textContent).toContain('R1');
     expect(playedHeader?.textContent).toContain('R2');
     expect(playedHeader?.textContent).toContain('R3');
-    expect(playedHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 30px 30px 30px 52px');
+    expect(playedHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 24px 24px 24px 40px');
     played.unmount();
 
     const totalsOnly = render(board([row('1', {}), row('2', {})]));
     const totalsHeader = totalsOnly.container.querySelector<HTMLElement>('[data-overview-board-header]');
     expect(totalsHeader?.textContent).not.toContain('R1');
-    expect(totalsHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 52px');
+    expect(totalsHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 40px');
   });
 
   it('marks the current round live only until the tournament is complete', () => {

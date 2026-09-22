@@ -73,11 +73,15 @@ const THEME_TOKENS = {
   heroBoard: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_06, press: 'active:bg-white/[0.06]' },
 } as const;
 
-/* The hero's round cell. 30px = the full board's 26px cell plus its
-   4px gap, folded into one track, because the hero grid carries no
-   column gap of its own. Fixed, never content-sized: a grid of
-   scores must align down the page. */
-const HERO_ROUND_CELL_W = 30;
+/* THE HERO'S SCORE RAIL. Both tracks are sized to their CONTENT plus
+   one hair, not to the full board's grid: a round figure is at most
+   three characters at 12/600 tabular (~21px) and a total at most
+   three at 13/700 (~24px). Right-aligned (see the header and row
+   below), so the five figures land on one ladder and the eye reads
+   down a column instead of across a gappy strip. Fixed widths, never
+   content-sized: a grid of scores must align down the page. */
+const HERO_ROUND_CELL_W = 24;
+const HERO_TOT_W = 40;
 
 
 /**
@@ -161,7 +165,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     showOverviewPosition ? '44px' : null,
     'minmax(0, 1fr)',
     heroRoundTracks || null,
-    '52px',
+    `${HERO_TOT_W}px`,
   ].filter(Boolean).join(' ');
 
   /* A ROUND IN PROGRESS IS WHAT THRU IS FOR. Decided over `entries`,
@@ -223,7 +227,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
             {heroRounds.map((rd) => (
-              <div key={rd} style={{ textAlign: 'center', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
+              <div key={rd} style={{ textAlign: 'right', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
                 {`R${rd}`}
               </div>
             ))}
@@ -257,7 +261,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     ? today
                     : ([r.round_1, r.round_2, r.round_3, r.round_4][rd - 1] ?? null);
                   return (
-                    <div key={rd} style={{ textAlign: 'center', fontSize: 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: getScoreColor(val, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>
+                    <div key={rd} style={{ textAlign: 'right', fontSize: 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: getScoreColor(val, scoreTheme), fontVariantNumeric: 'tabular-nums' }}>
                       {val == null ? BLANK : fmtScore(val)}
                     </div>
                   );
