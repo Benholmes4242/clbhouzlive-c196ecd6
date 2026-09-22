@@ -1,6 +1,6 @@
 // BRIEF_CONTESTED_TITLES proofs.
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
-import { boardKey, contestedBoardKeys, countContestedTitles } from "./legendTitles.ts";
+import { boardKey, contestedBoardKeys, countContestedTitles, isTenureCategory, TENURE_CATEGORIES } from "./legendTitles.ts";
 
 const row = (course_id: string, category: string) => ({ course_id, category });
 
