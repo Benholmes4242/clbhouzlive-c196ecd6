@@ -63,14 +63,12 @@ export function FeatRarityLines({
   counts,
   locale,
   ownerDisplayName,
-  tier = 'ink',
   align = 'panel',
 }: {
   scoreId: string | null | undefined;
   counts?: RarityFeatCounts;
   locale: string;
   ownerDisplayName?: string | null;
-  tier?: 'ink' | 'gold' | 'top';
   align?: 'panel' | 'card';
 }) {
   const { t } = useTranslation('courses');
@@ -276,7 +274,7 @@ export function AchievementCalloutPanel({
             {subline}
           </span>
         ) : null}
-        <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} tier={tier} />
+        <FeatRarityLines scoreId={scoreId} counts={featCounts} locale={locale} ownerDisplayName={ownerDisplayName} />
       </span>
     </span>
     </>
