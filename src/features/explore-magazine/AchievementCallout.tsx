@@ -239,7 +239,6 @@ export function AchievementCalloutPanel({
         padding: '10px 12px',
         borderRadius: r.md,
         backgroundColor: A.PANEL,
-        backgroundImage: tier === 'top' ? FEAT_TOP_WASH : tier === 'gold' ? FEAT_GOLD_WASH : 'none',
         minWidth: 0,
       }}
     >
