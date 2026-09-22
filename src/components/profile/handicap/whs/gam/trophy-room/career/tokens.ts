@@ -19,6 +19,9 @@ export const REC = {
   PANEL_2: CHART.PANEL_2,
   BORDER: CHART.BORDER,
   TRACK: CHART.TRACK,
+  /** A real (not hairline) border — the 'placed' standing disc reads as an
+   *  object at 0.22 where BORDER would read as a smudge. */
+  FAINT: CHART.FAINT,
   /**
    * Bar track. Lifted off CHART.TRACK on purpose: against the panel a faint
    * track makes a 0% bar read as a hairline and a 100% bar as a solid band,
