@@ -1034,24 +1034,31 @@ export function ExploreCard({
           style={{ position: 'absolute', inset: 0, background: HERO_REVIEW_SCRIM, zIndex: 1 }}
         />
       ) : null}
-      {/* §6 NO AUTOPLAY, AND IT IS A DECISION: the clips wall owns this page's
-          motion budget, so a review video renders its POSTER with a play
-          affordance and its duration. The tap opens the review, which plays it
-          properly. */}
+      {/* BRIEF_EXPLORE_REVIEW_TILE_VIDEO §3 — A REVIEW VIDEO AUTOPLAYS, muted and
+          looping, elected by the page's ONE existing budget. This reverses the
+          previous brief's no-autoplay line; it was Ben's call, not a drift.
+          §3.5 there is NO play glyph in any state: a tap opens the review, and
+          the duration badge alone says "this is a video".
+          ONE BADGE SLOT, TOP RIGHT (§4): a video shows its duration; otherwise
+          more than one photo shows a bare count; one photo or the course
+          fallback shows nothing. Dots are deliberately absent — the card does
+          not swipe. */}
       {reviewMedia?.kind === 'video' ? (
-        <>
-          <span data-review-play="true" style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
-            <MomentPlayGlyph />
-          </span>
-          {reviewMedia.durationS ? (
-            /* The 48px top lane is free now that §4.2 removed the photo-count
-               chip, so the duration sits where that chip used to — clear of the
-               score and the strip at the foot. */
-            <GlassBadge style={{ position: 'absolute', top: 8, right: 8, zIndex: 3 }}>
-              {formatDuration(reviewMedia.durationS)}
-            </GlassBadge>
-          ) : null}
-        </>
+        <ReviewVideoLayer
+          hlsUrl={reviewMedia.url}
+          posterUrl={reviewMedia.posterUrl}
+          durationS={reviewMedia.durationS}
+        />
+      ) : leadReview && (item.facts.photoCount ?? 0) > 1 ? (
+        <GlassBadge
+          data-review-photo-count="true"
+          style={{ position: 'absolute', top: 8, right: 8, left: 'auto', bottom: 'auto', zIndex: 3 }}
+        >
+          <StackedLayersGlyph />
+          {/* §4.1 THE FIGURE ONLY — the wordy "3 photos" chip was removed on
+              purpose; this is the quiet form of the same fact. */}
+          {item.facts.photoCount}
+        </GlassBadge>
       ) : null}
       {onPhoto && item.kind === 'story' ? (
         <span
