@@ -152,7 +152,6 @@ export function ReviewVideoLayer({
             pointerEvents: 'none',
           }}
         >
-          {playing && <PlayingBars />}
           {label}
         </span>
       )}
