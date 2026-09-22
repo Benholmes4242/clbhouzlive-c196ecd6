@@ -20,3 +20,7 @@
 - [x] Read gross-record ranks 1 and 2 together and carry the rank-2 margin to record cards.
 - [x] Reuse the existing board-movement delta for the callout subline.
 - [x] Verify margin/no-margin cards at 390, focused tests, typecheck, and unchanged net record.
+
+## course_par completeness (BRIEF_COURSE_PAR_COMPLETENESS)
+- [x] gam-evaluator: par summed only when every hole of whs_scores.total_holes is present, played and has a par; otherwise NULL (both the computeRoundStats path and the no-holes fallback)
+- [ ] Ben runs the requeue after deploy
