@@ -82,6 +82,9 @@ export function FeatRarityLines({
   const { viewerLine, ownerLine } = featRarityLines({ rows, owner, counts, t, locale, ownerDisplayName });
   const line = ownerLine ?? viewerLine;
   if (!line) return null;
+  /* BRIEF_FEED_SCORE_PILL §1/§3 — NO DIVIDERS, and the qualifier sentence is
+     MUTED on every pill: the RARE tag is the one accent, so this line can never
+     be gold or amber. ONE LINE, full card width; spacing separates, no rule. */
   return (
     <span
       data-feat-rarity-lines="true"
@@ -90,15 +93,13 @@ export function FeatRarityLines({
         width: '100%',
         boxSizing: 'border-box',
         gridColumn: align === 'card' ? '1 / -1' : undefined,
-        borderTop: align === 'card' ? `1px solid ${A.HAIRLINE}` : undefined,
-        padding: align === 'card' ? '8px 10px' : 0,
         marginTop: align === 'card' ? 0 : 3,
       }}
     >
       <span
         data-feat-rarity-viewer={ownerLine ? undefined : 'true'}
         data-feat-rarity-owner={ownerLine ? 'true' : undefined}
-        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: tier === 'ink' ? A.MUTE : FEAT_RARITY_GOLD_INK, whiteSpace: 'normal', overflowWrap: 'break-word' }}
+        style={{ display: 'block', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
       >
         {line}
       </span>
