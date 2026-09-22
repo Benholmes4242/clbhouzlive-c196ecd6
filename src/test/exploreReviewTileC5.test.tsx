@@ -162,7 +162,7 @@ describe('C5 §1/§6 the card takes that one answer', () => {
   it('§4 more than one image shows the bare figure; one image shows nothing', () => {
     const media = { mediaId: 'img', kind: 'image' as const, url: 'https://example.test/mine.jpg', posterUrl: null, streamId: null, durationS: null };
     const three = render(<ExploreCard item={review({ photoCount: 3, reviewMedia: media })} size="lead" shape={null} onTap={() => undefined} />);
-    expect(three.container.querySelector('[data-review-photo-count="true"]')?.textContent).toBe('3');
+    expect(three.container.querySelector('[data-review-photo-figure="true"]')?.textContent).toBe('3');
     expect(three.container.textContent).not.toMatch(/photo/i);
     const one = render(<ExploreCard item={review({ photoCount: 1, reviewMedia: media })} size="lead" shape={null} onTap={() => undefined} />);
     expect(one.container.querySelector('[data-review-photo-count="true"]')).toBeNull();

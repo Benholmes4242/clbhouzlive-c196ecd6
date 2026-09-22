@@ -1069,7 +1069,7 @@ export function ExploreCard({
           <StackedLayersGlyph />
           {/* §4.1 THE FIGURE ONLY — the wordy "3 photos" chip was removed on
               purpose; this is the quiet form of the same fact. */}
-          <span data-review-photo-count="true">{item.facts.photoCount}</span>
+          <span data-review-photo-figure="true">{item.facts.photoCount}</span>
         </GlassBadge>
       ) : null}
       {onPhoto && item.kind === 'story' ? (
