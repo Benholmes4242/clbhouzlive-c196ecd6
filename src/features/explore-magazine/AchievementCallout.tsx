@@ -37,10 +37,11 @@ import {
  *
  * THE PANEL IS THE EXISTING ANALYTICAL PANEL TOKEN (A.PANEL), slightly lighter
  * than the canvas, with NO border: separation is a panel edge, not a rule.
-   * GOLD and TOP are the single analytical-rule exception: their achievement
-   * significance is communicated by tokenized light around the fixed artwork,
-   * while the panel remains the same neutral A.PANEL surface as its neighbours.
- * TOP has never rendered. Zero platform rounds have held 2+ aces,
+   * GOLD and TOP significance is carried by the fixed artwork's emblem lighting
+   * and, on the score pill, by the RARE tag (BRIEF_FEED_SCORE_PILL §2) — the
+   * panel itself is always the same neutral A.PANEL surface as its neighbours;
+   * the rarity wash is deleted, not hidden.
+   * TOP has never rendered. Zero platform rounds have held 2+ aces,
  * 2+ albatrosses, or an ace and an albatross. Its first qualifying round is
  * therefore the treatment's first real-world test.
  *
@@ -301,7 +302,6 @@ function FigureCell({ label, value, under }: { label: string; value: string; und
         alignItems: 'center',
         justifyContent: 'center',
         gap: 3,
-        borderLeft: `0.5px solid ${A.HAIRLINE}`,
       }}
     >
       <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, color: A.MUTE, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>
