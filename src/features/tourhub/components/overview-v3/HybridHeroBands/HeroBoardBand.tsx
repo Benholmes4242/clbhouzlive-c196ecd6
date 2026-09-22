@@ -328,7 +328,12 @@ export function HeroBoardSection({
       const settled = settledFigureFor(best.line);
       // The trophy marks the CHAMPION, never a position: T1 playoff losers get none.
       const trophy = pickWonTournament(best.pick.playerId, championPlayerId, championPlayerIds);
-      const text = settled?.right === WON_LABEL
+      /* THE LINE FOLLOWS THE TROPHY, NOT THE POSITION. A playoff winner is
+         T1 on strokes and the champion in fact, so reading the win off
+         `settled.right` printed "Johnson T1" beside a trophy — a numeral
+         saying less than the icon next to it. pickWonTournament already
+         holds the answer this line needs. */
+      const text = trophy
         ? `Picked ${surnameOf(best.pick.playerName)} to win · ${WON_LABEL}`
         : `${surnameOf(best.pick.playerName)} ${settled?.right ?? ''}`.trim();
       return { text, trophy };
