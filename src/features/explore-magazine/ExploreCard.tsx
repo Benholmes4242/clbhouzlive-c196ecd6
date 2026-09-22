@@ -8,6 +8,7 @@ import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Heart, MessageCircle } from 'lucide-react';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { MomentPlayGlyph } from '@/components/explore-tab-new/courseled/MomentTile';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { storyTime } from '@/features/tourhub/news/storyTime';
 import { r } from '@/lib/radius';
@@ -15,9 +16,7 @@ import {
   CHIP_GLASS_CLASS,
   PHOTO_FIG_SHADOW,
   PHOTO_FIG_UNDER,
-  PHOTO_REVIEW_FILL,
   PHOTO_REVIEW_LABEL,
-  PHOTO_REVIEW_TRACK,
 } from '@/styles/photoScrim';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -40,8 +39,17 @@ import type { ReviewBreakdown } from './useReviewPageEnrichment';
  * unit changes.
  *
  * WHAT MAKES IT A MAGAZINE is the headline — the consequence for the viewer,
- * the review's own words, the story's headline — not the photograph. A round
- * card whose headline is a course name and a number is the page this replaces.
+ * the story's headline — not the photograph. A round card whose headline is a
+ * course name and a number is the page this replaces.
+ *
+ * ONE DELIBERATE EXCEPTION, AND IT REVERSES THAT PRINCIPLE FOR ONE KIND
+ * (BRIEF_EXPLORE_REVIEW_TILE_C5 §0). A LEAD REVIEW no longer carries the
+ * review's own words. It is an INSTRUMENT: the member's identity at the top,
+ * their OWN PHOTOGRAPH or VIDEO as the ground (the course thumbnail is now the
+ * fallback — §1), the score as a 40px figure and the four areas as a stat
+ * strip. The words live on the review page, which the tap opens. This was
+ * decided with the alternatives in front of us; it is not an oversight, and the
+ * principle above still governs every other kind at every size.
  *
  * TWO DEPARTURES FROM THE MOCK, both because the live app wins on shared
  * treatments (§0):
@@ -95,6 +103,14 @@ const HERO_STORY_SCRIM =
 /** The story meta's own colour. NOT PHOTO_REVIEW_LABEL — the review card's
  *  identity line and breakdown rail read that token and must not shift. */
 const HERO_STORY_META_COLOR = 'rgba(248,250,252,0.82)';
+/** C5 §3.1 — THE REVIEW'S FULL-TILE GROUND. The instrument puts identity at the
+ *  TOP of the frame, which the copy-anchored HERO_COPY_SCRIM does not reach, so
+ *  a lead review adds this ramp across the whole tile: ground at the top, the
+ *  photograph reading through the middle, and NOTHING added at the foot — the
+ *  foot is still HERO_COPY_SCRIM's, whose value and every other use are
+ *  unchanged. Stacking two dark feet would double-darken the score. */
+const HERO_REVIEW_SCRIM =
+  'linear-gradient(180deg, rgba(0,0,0,0.34), rgba(0,0,0,0.04) 38%, rgba(0,0,0,0.04))';
 
 function FigureChip({
   figure,
@@ -201,9 +217,18 @@ function CourseRankChip({ item }: { item: StreamItem }) {
 }
 
 /** §4b, by type. A story carries none; a moment carries none. */
-function chipsFor(item: StreamItem, t: (k: string, f?: string | Record<string, unknown>) => string, locale: string) {
+function chipsFor(
+  item: StreamItem,
+  t: (k: string, f?: string | Record<string, unknown>) => string,
+  locale: string,
+  size: CardSize,
+) {
   const out: React.ReactNode[] = [];
   const { facts, kind } = item;
+  /* C5 §4.1/§4.2 — THE LEAD REVIEW CARRIES NEITHER CHIP any more: the score is
+     the 40px figure in the foot, and the photo count is gone. Reviews at std and
+     pair are untouched, so the gate is the SIZE, not the kind. */
+  const leadReviewChips = kind === 'review' && size === 'lead';
 
   if (kind === 'round' && facts.gross != null) {
     const toPar = toParLabel(facts.to_par);
@@ -214,7 +239,7 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string | Record<string, u
     );
   }
 
-  if (kind === 'review' && facts.rating != null) {
+  if (kind === 'review' && !leadReviewChips && facts.rating != null) {
     const tier = getScoreTier(facts.rating);
     /* Tier owns the Exceptional gate; the analytical helper owns colour. Both
        intentionally meet at the canonical 9.0 threshold. */
@@ -234,7 +259,7 @@ function chipsFor(item: StreamItem, t: (k: string, f?: string | Record<string, u
     );
   }
 
-  if (kind === 'review' && (facts.photoCount ?? 0) > 1) {
+  if (kind === 'review' && !leadReviewChips && (facts.photoCount ?? 0) > 1) {
     out.push(
       <span
         key="review-photos"
@@ -563,38 +588,67 @@ const REVIEW_BREAKDOWN_AREAS = [
   ['facilities', 'facilities'],
 ] as const;
 
-function ReviewBreakdownRail({ breakdown }: { breakdown: ReviewBreakdown | undefined }) {
+/**
+ * C5 §3.3 GROUP TWO — THE STAT STRIP, and it is NOT A NEW SHAPE: it is the
+ * object the round card already draws for PAR / NET / VS HCP (RoundStatStrip's
+ * FigureCell), in the on-photo palette this card needs. Only the bars are gone.
+ *
+ * The all-or-none guard, the label keys and the aria-labels carry over from the
+ * retired breakdown rail unchanged (§3.4, §4.4): the numerals are visible now,
+ * but each item's label still carries the unit.
+ */
+function ReviewStatStrip({ breakdown }: { breakdown: ReviewBreakdown | undefined }) {
   const { t } = useTranslation('courses');
   if (!breakdown || REVIEW_BREAKDOWN_AREAS.some(([field]) => breakdown[field] == null)) return null;
 
   return (
     <ul
-      data-review-breakdown-rail="true"
-      style={{ listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, margin: 0, padding: 0 }}
+      data-review-stat-strip="true"
+      style={{
+        listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+        gap: 0, margin: 0, marginTop: 11, padding: '11px 0 0',
+        borderTop: '1px solid rgba(255,255,255,0.20)',
+      }}
     >
-      {REVIEW_BREAKDOWN_AREAS.map(([field, labelKey]) => {
+      {REVIEW_BREAKDOWN_AREAS.map(([field, labelKey], index) => {
         const score = breakdown[field] as number;
         const label = t(`review.subscore.${labelKey}`);
         const outOfTen = t('statBrowse.reviews.outOfTen');
-        const tone = courseSubScoreTone(score);
+        /* ONE HOME FOR THE 9.0 THRESHOLD (§5): the helper decides, never this
+           card. Below it the numeral takes the on-photo light ink, because
+           A.MUTE is a dark-canvas token and this sits on a photograph. */
+        const tone = courseSubScoreTone(score) === A.GREEN ? A.GREEN : 'rgba(255,255,255,0.92)';
         return (
-          <li key={field} aria-label={`${label} ${score.toFixed(1)} ${outOfTen}`} style={{ minWidth: 0 }}>
+          <li
+            key={field}
+            aria-label={`${label} ${score.toFixed(1)} ${outOfTen}`}
+            style={{
+              minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+              borderLeft: index === 0 ? undefined : '1px solid rgba(255,255,255,0.16)',
+            }}
+          >
             <span
               aria-hidden="true"
               title={label}
               style={{
-                display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                display: 'block', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 color: PHOTO_REVIEW_LABEL, fontFamily: SANS, fontSize: 8, fontWeight: 700,
                 letterSpacing: '0.10em', textTransform: 'uppercase', textShadow: HERO_TEXT_SHADOW,
               }}
             >
               {label}
             </span>
-            <span aria-hidden style={{ display: 'block', height: 3, marginTop: 5, borderRadius: 2, background: PHOTO_REVIEW_TRACK }}>
-              <span
-                data-review-breakdown-fill={field}
-                style={{ display: 'block', width: `${Math.max(0, Math.min(100, score * 10))}%`, height: '100%', borderRadius: 2, background: tone === A.GREEN ? A.GREEN : PHOTO_REVIEW_FILL }}
-              />
+            <span
+              aria-hidden="true"
+              data-review-stat-value={field}
+              style={{
+                fontFamily: SANS, fontSize: 17, fontWeight: 800, lineHeight: 1, color: tone,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                fontFeatureSettings: '"tnum" 1, "zero" 1',
+                textShadow: HERO_TEXT_SHADOW,
+              }}
+            >
+              {score.toFixed(1)}
             </span>
           </li>
         );
@@ -642,7 +696,7 @@ export function ExploreCard({
        the richer multi-feat sentence: rarer rounds must never say less. */
     plainRound: callout?.kind === 'record' || callout?.kind === 'net_record' || callout?.kind === 'rank_up',
   });
-  const chips = chipsFor(item, t as never, locale);
+  const chips = chipsFor(item, t as never, locale, size);
   /* §2 SHAPE IS DECIDED BY KIND, NOTHING ELSE. A REVIEW and an ILLUSTRATED
      STORY are text ON the photograph at every position; a ROUND is text UNDER
      it at every position. There is no earned treatment and position 0 is not
@@ -823,15 +877,148 @@ export function ExploreCard({
       {storyStandfirst}
     </div>
   ) : null;
-  const reviewIdentity = leadReview
-    ? { course: kickerPartsValue.course, scope: kickerPartsValue.scope, date: kickerDate }
+  /* C5 §1 — THE MEMBER'S OWN MEDIA IS THE GROUND, the course thumbnail the
+     fallback. The order (video with a poster, then image, then course photo) is
+     resolved ONCE in useReviewPageEnrichment; this card takes one answer. */
+  const reviewMedia = leadReview ? item.facts.reviewMedia ?? null : null;
+  const reviewGround = reviewMedia
+    ? (reviewMedia.kind === 'video' ? reviewMedia.posterUrl : reviewMedia.url)
     : null;
+  const reviewName = item.who?.is_viewer
+    ? t('amateur.stream.you', 'You')
+    : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
+  const reviewRegion = leadReview
+    ? coursePlaceLine({
+        region: item.subject?.region,
+        subCountry: item.subject?.sub_country,
+        country: item.subject?.country,
+      })
+    : null;
+  /* §3.2 THE TOP LINE — identity, which the instrument layout would otherwise
+     lose. It REPLACES the who-line at the foot: a review does not carry its
+     identity twice. It sits in the 48px lane at top 12, inset 14. */
+  const reviewTopLine = leadReview ? (
+    <span
+      data-review-top-line="true"
+      style={{
+        display: 'flex', alignItems: 'center', gap: 7, minWidth: 0,
+        padding: '12px 14px 0',
+      }}
+    >
+      {item.who?.user_id ? (
+        <span
+          role={onWhoTap ? 'button' : undefined}
+          tabIndex={onWhoTap ? 0 : undefined}
+          onClick={(event) => {
+            if (!onWhoTap) return;
+            event.stopPropagation();
+            onWhoTap();
+          }}
+          onKeyDown={(event) => {
+            if (!onWhoTap || (event.key !== 'Enter' && event.key !== ' ')) return;
+            event.preventDefault();
+            event.stopPropagation();
+            onWhoTap();
+          }}
+          style={{ display: 'inline-flex', flexShrink: 0, cursor: onWhoTap ? 'pointer' : 'default' }}
+        >
+          <SquircleAvatar size={26} src={item.who.photo_url} alt={reviewName} userId={item.who.user_id} hairlineRing hideRing={false} />
+        </span>
+      ) : null}
+      <span
+        data-review-member-name="true"
+        style={{
+          flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          fontFamily: SANS, fontSize: 13, fontWeight: 700,
+          color: item.who?.is_viewer ? A.AMBER : '#FFFFFF', textShadow: HERO_TEXT_SHADOW,
+        }}
+      >
+        {reviewName}
+      </span>
+      {kickerDate ? (
+        <span
+          data-review-date="true"
+          style={{
+            marginLeft: 'auto', flex: '0 0 auto', whiteSpace: 'nowrap', fontFamily: SANS,
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.72)', textShadow: HERO_TEXT_SHADOW,
+          }}
+        >
+          {kickerDate}
+        </span>
+      ) : null}
+    </span>
+  ) : null;
+  /* §3.3 GROUP ONE — the score as a figure with its verdict, and the course with
+     its region, on ONE row. The 9.0 threshold is the helper's, never this
+     card's; below it the figure takes on-photo light ink because A.MUTE is a
+     dark-canvas token and this sits on a photograph. */
+  const reviewScoreTone = item.facts.rating != null && courseSubScoreTone(item.facts.rating) === A.GREEN
+    ? A.GREEN
+    : 'rgba(255,255,255,0.94)';
+  const reviewFoot = leadReview ? (
+    <span data-review-instrument="true" style={{ display: 'block', minWidth: 0 }}>
+      <span style={{ display: 'flex', alignItems: 'flex-end', gap: 12, minWidth: 0 }}>
+        {item.facts.rating != null ? (
+          <span style={{ display: 'flex', flexDirection: 'column', flex: '0 0 auto' }}>
+            <span
+              data-review-score="true"
+              style={{
+                fontFamily: SANS, fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
+                color: reviewScoreTone, textShadow: HERO_TEXT_SHADOW,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                fontFeatureSettings: '"tnum" 1, "zero" 1',
+              }}
+            >
+              {item.facts.rating.toFixed(1)}
+            </span>
+            <span
+              data-review-verdict="true"
+              style={{
+                marginTop: 3, fontFamily: SANS, fontSize: 8, fontWeight: 800, letterSpacing: '0.14em',
+                textTransform: 'uppercase', color: reviewScoreTone, textShadow: HERO_TEXT_SHADOW,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {getScoreTier(item.facts.rating).label}
+            </span>
+          </span>
+        ) : null}
+        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'auto', minWidth: 0, textAlign: 'right' }}>
+          {kickerPartsValue.course ? (
+            <span
+              data-review-course-name="true"
+              style={{
+                maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                fontFamily: SANS, fontSize: 16, fontWeight: 700, color: '#FFFFFF', textShadow: HERO_TEXT_SHADOW,
+              }}
+            >
+              {kickerPartsValue.course}
+            </span>
+          ) : null}
+          {reviewRegion ? (
+            <span
+              data-review-region="true"
+              style={{
+                marginTop: 3, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                fontFamily: SANS, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.62)', textShadow: HERO_TEXT_SHADOW,
+              }}
+            >
+              {reviewRegion}
+            </span>
+          ) : null}
+        </span>
+      </span>
+      <ReviewStatStrip breakdown={item.facts.breakdown} />
+    </span>
+  ) : null;
 
   const photo = (
     <CourseImageFallback
       courseId={item.subject?.course_id ?? null}
       courseName={item.subject?.course_name ?? null}
-      imageUrl={item.subject?.image_url ?? null}
+      imageUrl={reviewGround ?? item.subject?.image_url ?? null}
       pending={!!item.subject?.pending}
       flatWhenEmpty={onPhoto}
       initialsSize={size === 'pair' ? 18 : 26}
@@ -840,6 +1027,32 @@ export function ExploreCard({
         : { height: PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }}
     >
       {chips}
+      {leadReview ? (
+        <span
+          aria-hidden
+          data-explore-review-scrim="true"
+          style={{ position: 'absolute', inset: 0, background: HERO_REVIEW_SCRIM, zIndex: 1 }}
+        />
+      ) : null}
+      {/* §6 NO AUTOPLAY, AND IT IS A DECISION: the clips wall owns this page's
+          motion budget, so a review video renders its POSTER with a play
+          affordance and its duration. The tap opens the review, which plays it
+          properly. */}
+      {reviewMedia?.kind === 'video' ? (
+        <>
+          <span data-review-play="true" style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
+            <MomentPlayGlyph />
+          </span>
+          {reviewMedia.durationS ? (
+            /* The 48px top lane is free now that §4.2 removed the photo-count
+               chip, so the duration sits where that chip used to — clear of the
+               score and the strip at the foot. */
+            <GlassBadge style={{ position: 'absolute', top: 8, right: 8, zIndex: 3 }}>
+              {formatDuration(reviewMedia.durationS)}
+            </GlassBadge>
+          ) : null}
+        </>
+      ) : null}
       {onPhoto && item.kind === 'story' ? (
         <span
           aria-hidden
@@ -859,10 +1072,10 @@ export function ExploreCard({
           }}
         >
           <span
-            aria-hidden={item.kind !== 'story'}
+            aria-hidden={item.kind !== 'story' && !leadReview}
             style={{ flex: `0 0 ${HERO_CHIP_LANE}px`, minWidth: 0, overflow: 'hidden' }}
           >
-            {item.kind === 'story' ? storyMetaNode : null}
+            {item.kind === 'story' ? storyMetaNode : leadReview ? reviewTopLine : null}
           </span>
           <span style={{ flex: '1 1 auto', minHeight: 0 }} />
           <span style={{ position: 'relative', display: 'block' }}>
@@ -876,17 +1089,17 @@ export function ExploreCard({
             <span
               data-explore-hero-copy="true"
               style={leadReview
-                ? { position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px 16px' }
+                ? { position: 'relative', zIndex: 1, display: 'block', padding: '0 16px 16px' }
                 : { position: 'relative', zIndex: 1, display: 'block', paddingInline: 16 }}
             >
-               {leadReview ? (
-                <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} reviewIdentity={reviewIdentity ?? undefined} />
-               ) : item.kind === 'story' ? null : (
+               {leadReview ? null : item.kind === 'story' ? null : (
                 <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               )}
-              {headlineNode}
+              {/* §4.3 THE QUOTE IS GONE for a lead review — the words live on the
+                  review page. Every other kind keeps its headline. */}
+              {leadReview ? null : headlineNode}
               {standfirstNode}
-              {leadReview ? <ReviewBreakdownRail breakdown={item.facts.breakdown} /> : null}
+              {reviewFoot}
                {!leadReview && item.kind !== 'story' ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
             </span>
             {/* §3 THE BOTTOM LANE IS 16px AND CARRIES NO TRACE. On-photo is now

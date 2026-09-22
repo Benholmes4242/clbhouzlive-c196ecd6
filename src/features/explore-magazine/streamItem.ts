@@ -3,6 +3,7 @@ import type { HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import type { Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
+import type { ReviewCardMedia } from './useReviewPageEnrichment';
 
 /**
  * THE UNIT'S CONTRACT (BRIEF_EXPLORE_MAGAZINE §6a).
@@ -125,6 +126,10 @@ export interface StreamFacts {
     facilities: number | null;
   };
   photoCount?: number;
+  /** BRIEF_EXPLORE_REVIEW_TILE_C5 §1 — the MEMBER'S own chosen media for the
+   *  lead review tile, resolved once by the enrichment hook. Null means the card
+   *  falls back to the course thumbnail, exactly as before. */
+  reviewMedia?: ReviewCardMedia | null;
   top100_world?: number | null;
   top100_regional?: number | null;
   /** THE LIST THE RANK CAME FROM ('global' | 'gb-i' | 'usa' | 'europe'). The
