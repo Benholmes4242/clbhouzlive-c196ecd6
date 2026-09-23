@@ -1002,6 +1002,16 @@ html, body, #root {
   --near-black-control-surface: #0A0A0A;
   --tour-hub-raised-surface: #141414;
   --light-route-canvas: #F8FAFC;
+  /* Alpha surfaces derived from canonical tokens in src/lib/tokens/surfaces.ts. */
+  --tour-hub-raised-surface-a60: rgba(20,20,20,0.6);
+  --near-black-control-surface-a98: rgba(10,10,10,0.98);
+  --light-route-canvas-a96: rgba(248,250,252,0.96);
+  --light-route-canvas-a85: rgba(248,250,252,0.85);
+  --echo-history-canvas-a52: rgba(8,9,11,0.52);
+  --echo-history-canvas-a44: rgba(8,9,11,0.44);
+  --echo-history-canvas-a74: rgba(8,9,11,0.74);
+  --echo-history-canvas-a96: rgba(8,9,11,0.96);
+  --immersive-feed-canvas: #05070A;
   --bg-surface: #0F0F0F;
   --bg-card: rgba(255,255,255,0.06);
   --bg-card-hover: rgba(255,255,255,0.08);
@@ -1018,7 +1028,7 @@ html, body, #root {
   
   /* Overlays / translucency */
   --overlay-scrim: rgba(0,0,0,0.36);
-  --glass-bg: rgba(20,20,20,0.6);
+  --glass-bg: var(--tour-hub-raised-surface-a60);
   --glass-blur: 12px;
   
   /* Borders / hairlines / separators */
@@ -2658,7 +2668,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --text-tab-inactive: rgba(255, 255, 255, 0.55);
     
     --surface-header: rgba(22, 24, 27, 0.98);
-    --surface-nav: rgba(10, 10, 10, 0.98);
+    --surface-nav: var(--near-black-control-surface-a98);
   }
 
   /* Hub: let the warm gradient bleed behind the status bar */
