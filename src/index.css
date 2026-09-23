@@ -996,23 +996,23 @@ html, body, #root {
      ======================================== */
   
   /* Core surfaces - Global Background: Cool blue-grey slate */
-  --bg-page: #15171F; /* PAGE_CANVAS in src/lib/tokens/surfaces.ts */
-  --app-shell-surface: #0D0D0D;
-  --desktop-gutter-surface: #0A0A0A;
-  --near-black-control-surface: #0A0A0A;
-  --tour-hub-raised-surface: #141414;
+  --bg-page: #0A0A0C; /* PAGE_CANVAS in src/lib/tokens/surfaces.ts */
+  --app-shell-surface: #0A0A0C;
+  --desktop-gutter-surface: #0A0A0C;
+  --near-black-control-surface: #1E1E23;
+  --tour-hub-raised-surface: #16161A;
   --light-route-canvas: #F8FAFC;
   /* Alpha surfaces derived from canonical tokens in src/lib/tokens/surfaces.ts. */
-  --tour-hub-raised-surface-a60: rgba(20,20,20,0.6);
-  --tour-hub-raised-surface-a45: rgba(20,20,20,0.45);
-  --near-black-control-surface-a98: rgba(10,10,10,0.98);
+  --tour-hub-raised-surface-a60: rgba(22,22,26,0.6);
+  --tour-hub-raised-surface-a45: rgba(22,22,26,0.45);
+  --near-black-control-surface-a98: rgba(30,30,35,0.98);
   --light-route-canvas-a96: rgba(248,250,252,0.96);
   --light-route-canvas-a85: rgba(248,250,252,0.85);
-  --echo-history-canvas-a52: rgba(8,9,11,0.52);
-  --echo-history-canvas-a44: rgba(8,9,11,0.44);
-  --echo-history-canvas-a74: rgba(8,9,11,0.74);
-  --echo-history-canvas-a96: rgba(8,9,11,0.96);
-  --immersive-feed-canvas: #05070A;
+  --echo-history-canvas-a52: rgba(10,10,12,0.52);
+  --echo-history-canvas-a44: rgba(10,10,12,0.44);
+  --echo-history-canvas-a74: rgba(10,10,12,0.74);
+  --echo-history-canvas-a96: rgba(10,10,12,0.96);
+  --immersive-feed-canvas: #0A0A0C;
   --bg-surface: #0F0F0F;
   --bg-card: rgba(255,255,255,0.06);
   --bg-card-hover: rgba(255,255,255,0.08);
@@ -1046,7 +1046,7 @@ html, body, #root {
   --slate-secondary: #94a3b8;  /* Secondary slate for borders/inputs */
   
   /* Base backgrounds */
-  --bg-modal: #0f0f0f;
+  --bg-modal: #16161A;
   --bg-glass: rgba(0,0,0,0.6);
   --bg-card-border: rgba(255,255,255,0.12);
 
@@ -2475,16 +2475,16 @@ html[data-immersive="true"] .app-shell--topSpacer {
      ======================================== */
     
     /* Base canvas */
-    --background: 225 11% 10%;           /* Intended PAGE_CANVAS counterpart; see surfaces.ts and Stage 0B report. */
+    --background: 240 9.1% 4.3%;         /* #0A0A0C */
     --foreground: 210 40% 98%;           /* #F8FAFC */
     
     /* Surfaces */
-    --surface-slate: #3A3F46;            /* headers, footers, active pills */
-    --surface-card: #1B1E27;             /* cards, tiles */
-    --surface-alt: #272C37;              /* inputs, inactive pills, subtle bands */
+    --surface-slate: #27272E;            /* RAISED: headers, footers, active pills */
+    --surface-card: #16161A;             /* PANEL: cards, tiles */
+    --surface-alt: #1E1E23;              /* CELL: inputs, inactive pills, subtle bands */
     
     /* Cards */
-    --card: 227 18% 13%;                 /* #1B1E27 */
+    --card: 240 8.3% 9.4%;               /* #16161A */
     --card-foreground: 210 40% 98%;      /* #F8FAFC */
     
     /* Borders
@@ -2526,13 +2526,13 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --accent-primary: #F7931E;           /* alias */
     
     /* Shadcn semantic tokens - updated to use orange accent */
-    --popover: 227 18% 13%;              /* #1B1E27 (same as card) */
+    --popover: 240 8.3% 9.4%;            /* #16161A */
     --popover-foreground: 210 40% 98%;   /* #F8FAFC */
     --primary: 31 93% 54%;               /* #F7931E - orange accent (UNIFIED) */
     --primary-foreground: 0 0% 100%;     /* white text on accent */
-    --secondary: 220 17% 18%;            /* #272C37 */
+    --secondary: 240 7.7% 12.7%;         /* #1E1E23 */
     --secondary-foreground: 0 0% 100%;   /* white text on slate */
-    --muted: 220 17% 18%;                /* #272C37 (surface-alt) */
+    --muted: 240 7.7% 12.7%;             /* #1E1E23 */
     --muted-foreground: 210 40% 98% / 0.62;
     --accent: 31 93% 54%;                /* #F7931E - orange accent */
     --accent-foreground: 0 0% 100%;
@@ -2634,15 +2634,15 @@ html[data-immersive="true"] .app-shell--topSpacer {
   .light,
   .light * {
     --foreground: 210 40% 98%;
-    --card: 227 18% 13%;
+    --card: 240 8.3% 9.4%;
     --card-foreground: 210 40% 98%;
-    --popover: 227 18% 13%;
+    --popover: 240 8.3% 9.4%;
     --popover-foreground: 210 40% 98%;
     --primary: 31 93% 54%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 17% 18%;
+    --secondary: 240 7.7% 12.7%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 220 17% 18%;
+    --muted: 240 7.7% 12.7%;
     --muted-foreground: 210 40% 98% / 0.62;
     --accent: 31 93% 54%;
     --accent-foreground: 0 0% 100%;
@@ -2656,7 +2656,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   body.route-hub,
   .route-hub .app-shell {
     --foreground: 0 0% 98%;
-    --card: 0 0% 6.3%;               /* #101010 */
+    --card: 240 8.3% 9.4%;           /* #16161A */
     --card-foreground: 0 0% 98%;
     --muted-foreground: 0 0% 64%;
     --border: 0 0% 14.9%;            /* #262626 */
@@ -2869,15 +2869,15 @@ html[data-immersive="true"] .app-shell--topSpacer {
   .dark {
     /* Legacy dark scope now matches the dark-only semantic baseline. */
     --foreground: 210 40% 98%;
-    --card: 227 18% 13%;
+    --card: 240 8.3% 9.4%;
     --card-foreground: 210 40% 98%;
-    --popover: 227 18% 13%;
+    --popover: 240 8.3% 9.4%;
     --popover-foreground: 210 40% 98%;
     --primary: 31 93% 54%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 17% 18%;
+    --secondary: 240 7.7% 12.7%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 220 17% 18%;
+    --muted: 240 7.7% 12.7%;
     --muted-foreground: 210 40% 98% / 0.62;
     --accent: 31 93% 54%;
     --accent-foreground: 0 0% 100%;
