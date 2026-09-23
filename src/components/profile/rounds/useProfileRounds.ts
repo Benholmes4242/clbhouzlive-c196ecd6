@@ -2,8 +2,10 @@
  * BRIEF_PROFILE_ROUNDS_TAB — data for the profile Rounds tab.
  *
  * VISIBILITY IS THE DATABASE'S. Both queries run on the signed-in client as
- * the viewer; gam_round_stats RLS decides what comes back. There is NO client
- * copy of the handicap_visibility rule here, by design.
+ * the viewer via get_profile_rounds (SECURITY DEFINER, one can_view_handicap
+ * gate). There is NO client copy of the handicap_visibility rule here.
+
+
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,20 +34,25 @@ export interface ProfileRound {
 export const isFullEighteen = (s: ProfileRound) =>
   s.whs_joined && !s.is_nine_hole && s.total_holes === 18;
 
+const fetchProfileRounds = async (userId: string): Promise<ProfileRound[]> => {
+  // One gate, in the database: get_profile_rounds checks can_view_handicap
+  // and joins whs_scores itself. No direct table reads from the client.
+  const { data, error } = await (supabase.rpc as any)('get_profile_rounds', { p_user_id: userId });
+  if (error) throw error;
+  return ((data ?? []) as any[]).map((r) => ({
+    ...r,
+    whs_joined: r.is_nine_hole != null || r.total_holes != null,
+  })) as ProfileRound[];
+};
+
 /** How many of this member's rounds the VIEWER may see. 0 = no tab. */
 export function useProfileRoundsCount(userId: string | undefined, enabled = true) {
   return useQuery({
-    queryKey: ['profile-rounds-count', userId],
+    queryKey: ['profile-rounds', userId],
     enabled: !!userId && enabled,
     staleTime: 60_000,
-    queryFn: async () => {
-      const { count, error } = await supabase
-        .from('gam_round_stats')
-        .select('whs_score_id', { count: 'exact', head: true })
-        .eq('user_id', userId!);
-      if (error) throw error;
-      return count ?? 0;
-    },
+    queryFn: () => fetchProfileRounds(userId!),
+    select: (rows: ProfileRound[]) => rows.length,
   });
 }
 
@@ -54,40 +61,7 @@ export function useProfileRounds(userId: string | undefined) {
     queryKey: ['profile-rounds', userId],
     enabled: !!userId,
     staleTime: 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('gam_round_stats')
-        .select(
-          'whs_score_id, play_date, course_id, course_name, course_par, gross_score, hcp_at_time, eagles, albatrosses, holes_in_one, clean_card',
-        )
-        .eq('user_id', userId!)
-        .order('play_date', { ascending: false })
-        .order('created_at', { ascending: false })
-        .limit(1000);
-      if (error) throw error;
-      const base = (data ?? []) as Omit<ProfileRound, 'is_nine_hole' | 'total_holes' | 'course_handicap' | 'whs_joined'>[];
-      // Join whs_scores as the viewer (RLS: own / friend / whs_connection_publicly_visible).
-      const ids = base.map((r) => r.whs_score_id);
-      const whs = new Map<string, { is_nine_hole: boolean | null; total_holes: number | null; course_handicap: number | null }>();
-      for (let i = 0; i < ids.length; i += 200) {
-        const { data: w, error: we } = await supabase
-          .from('whs_scores')
-          .select('id, is_nine_hole, total_holes, course_handicap')
-          .in('id', ids.slice(i, i + 200));
-        if (we) throw we;
-        for (const row of (w ?? []) as any[]) whs.set(row.id, row);
-      }
-      return base.map((r) => {
-        const w = whs.get(r.whs_score_id);
-        return {
-          ...r,
-          is_nine_hole: w?.is_nine_hole ?? null,
-          total_holes: w?.total_holes ?? null,
-          course_handicap: w?.course_handicap ?? null,
-          whs_joined: !!w,
-        } as ProfileRound;
-      });
-    },
+    queryFn: () => fetchProfileRounds(userId!),
   });
 }
 
