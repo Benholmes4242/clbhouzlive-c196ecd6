@@ -97,6 +97,8 @@ import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/pr
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
+import ProfileRoundsTab from '@/components/profile/rounds/ProfileRoundsTab';
+import { useProfileRoundsCount } from '@/components/profile/rounds/useProfileRounds';
 
 
 // Background color - uses CSS variable for theme support
@@ -278,7 +280,7 @@ const ProfilePageV2Content: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = useMemo(() => {
     const tabParam = searchParams.get('tab');
-    const validTabs = ['activity', 'courses', 'top100', 'handicap', 'stats'];
+    const validTabs = ['activity', 'courses', 'rounds', 'top100', 'handicap', 'stats'];
     return tabParam && validTabs.includes(tabParam) ? tabParam : 'activity';
   }, []);
 
@@ -349,10 +351,32 @@ const ProfilePageV2Content: React.FC = () => {
   const allTabs = getProfileTabs(profile?.user_type);
   // Per fix brief §5.1 — Handicap is now a top-level page for everyone,
   // hidden from all profile tab strips (own and friend).
-  const tabs = useMemo(
-    () => allTabs.filter(t => t.id !== 'stats' && t.id !== 'top100'),
-    [allTabs]
+  // BRIEF_PROFILE_ROUNDS_TAB — own profile always; anyone else only when RLS
+  // (as the viewer) returns at least one of their rounds. Private and empty
+  // both come back as 0, and both mean "no tab".
+  const { data: visibleRoundCount } = useProfileRoundsCount(
+    profile?.id,
+    isPersonal && !isSelf,
   );
+  const showRoundsTab = isPersonal && (isSelf || (visibleRoundCount ?? 0) > 0);
+  const tabs = useMemo(() => {
+    const base = allTabs.filter(t => t.id !== 'stats' && t.id !== 'top100');
+    if (!showRoundsTab) return base;
+    const at = base.findIndex(t => t.id === 'courses');
+    const out = [...base];
+    out.splice(at >= 0 ? at + 1 : out.length, 0, { id: 'rounds', label: 'Rounds' });
+    return out;
+  }, [allTabs, showRoundsTab]);
+
+  // A ?tab=rounds link to a member whose rounds the viewer cannot see lands
+  // on Posts, never on a locked or empty tab.
+  useEffect(() => {
+    if (activeSection !== 'rounds' || !profile?.id || isSelf) return;
+    if (visibleRoundCount === 0) {
+      setActiveSection('activity');
+      setSearchParams({ tab: 'activity' }, { replace: true });
+    }
+  }, [activeSection, profile?.id, isSelf, visibleRoundCount, setSearchParams]);
 
   // Per fix brief §5.2 — legacy ?tab=stats deep links redirect to the
   // dedicated handicap route. Own profile → /handicap. Another member →
@@ -709,6 +733,15 @@ const ProfilePageV2Content: React.FC = () => {
             userId={profile?.id || ''}
             isOwnProfile={isSelf}
             displayName={profile?.display_name ?? profile?.username}
+          />
+        );
+      case 'rounds':
+        if (!showRoundsTab || !profile?.id) return null;
+        return (
+          <ProfileRoundsTab
+            userId={profile.id}
+            isOwnProfile={isSelf}
+            handicapIndex={resolvedHcp.value ?? null}
           />
         );
       case 'achievements':
