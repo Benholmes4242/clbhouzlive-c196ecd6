@@ -1,6 +1,6 @@
 import {
   IMMERSIVE_FEED_STATUS_BAR,
-  LIGHT_IMMERSIVE_CANVAS,
+  IMMERSIVE_ROUTE_CANVAS,
   LIGHT_ROUTE_CANVAS,
   LIGHT_ROUTE_STATUS_BAR,
   PAGE_CANVAS,
@@ -101,7 +101,7 @@ export function applyRouteChrome(pathname: string, force = false): void {
     : darkChrome
     ? PAGE_CANVAS
     : immersive
-      ? (lightImmersive ? LIGHT_ROUTE_CANVAS : LIGHT_IMMERSIVE_CANVAS)
+      ? (lightImmersive ? LIGHT_ROUTE_CANVAS : IMMERSIVE_ROUTE_CANVAS)
       : LIGHT_ROUTE_CANVAS;
   const shieldColor = canvasDark
     ? CANVAS_DARK_CANVAS

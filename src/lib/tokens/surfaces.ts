@@ -87,8 +87,8 @@ export const TOUR_HUB_RAISED_SURFACE = '#16161A';
 /** Light compatibility route canvas retained for inactive legacy branches. */
 export const LIGHT_ROUTE_CANVAS = '#F8FAFC';
 
-/** Dark ink canvas retained by the light immersive-status-bar compatibility branch. */
-export const LIGHT_IMMERSIVE_CANVAS = '#0F172A';
+/** The page ground beneath immersive hero routes. Kept tied to the canonical route canvas. */
+export const IMMERSIVE_ROUTE_CANVAS = PAGE_CANVAS;
 
 /** Opaque slate fill for controls and utility cards on light member surfaces. */
 export const SLATE_CONTROL_SURFACE = '#1E1E23';
