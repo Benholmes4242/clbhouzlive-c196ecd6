@@ -4,7 +4,9 @@
  * waits on get_review_receipt and renders nothing until it arrives.
  */
 
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import { subscribeToReviewPublish, type ReviewPublishState } from '../lib/reviewUploadController';
 import { Trans, useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { RV2 } from '../tokens';
@@ -28,6 +30,9 @@ interface Props {
   onClubhouse: () => void;
   onBack: () => void;
   onNextCourse: (courseId: string) => void;
+  /** Controller key for the staged upload; null = no live progress to show. */
+  uploadKey?: string | null;
+  onPublished?: (ratingId: string) => void;
 }
 
 const CAT_ORDER: CategoryKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
@@ -68,11 +73,23 @@ export function ReviewReceipt({
   onClubhouse,
   onBack,
   onNextCourse,
+  uploadKey,
+  onPublished,
 }: Props) {
   const { t } = useTranslation('courses');
   const { data: receipt } = useReviewReceipt(ratingId);
   const heroColor = bandColor(overall);
   const short = shortCourseName(course.name);
+
+  const [pub, setPub] = useState<ReviewPublishState | null>(null);
+  useEffect(() => {
+    if (!pending || !uploadKey) return;
+    return subscribeToReviewPublish(uploadKey, setPub);
+  }, [pending, uploadKey]);
+  useEffect(() => {
+    if (pub?.phase === 'published' && pub.ratingId) onPublished?.(pub.ratingId);
+  }, [pub, onPublished]);
+  const phase = pub?.phase ?? 'uploading';
 
   const viewedRef = useRef(false);
   useEffect(() => {
@@ -164,9 +181,15 @@ export function ReviewReceipt({
               marginBottom: 12,
             }}
           >
-            {pending
-              ? t('review.wizard.receipt.eyebrowPending')
-              : t('review.wizard.receipt.eyebrow')}
+            {!pending
+              ? t('review.wizard.receipt.eyebrow')
+              : !uploadKey
+                ? t('review.wizard.receipt.eyebrowPending')
+                : phase === 'failed'
+                  ? t('review.wizard.receipt.eyebrowFailed')
+                  : phase === 'publishing' || phase === 'published'
+                    ? t('review.wizard.receipt.eyebrowPublishing')
+                    : t('review.wizard.receipt.eyebrowUploading')}
           </div>
           <div
             style={{
@@ -185,9 +208,55 @@ export function ReviewReceipt({
           <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 2 }}>
             {regionLine(course)}
           </div>
-          {pending && (
+          {pending && !uploadKey && (
             <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.secondary, marginTop: 14 }}>
               {t('review.wizard.receipt.pendingBody')}
+            </div>
+          )}
+          {pending && uploadKey && phase === 'uploading' && (
+            <div style={{ marginTop: 14 }}>
+              <div
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={pub?.percent ?? 0}
+                style={{ height: 4, borderRadius: 999, background: RV2.track, overflow: 'hidden' }}
+              >
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${pub?.percent ?? 0}%`,
+                    background: RV2.success,
+                    transition: 'width 120ms ease',
+                  }}
+                />
+              </div>
+              <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 8, ...FIGURE }}>
+                {t('review.wizard.receipt.uploadingCount', {
+                  done: pub?.uploaded ?? 0,
+                  total: pub?.total ?? 0,
+                })}
+              </div>
+              <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.secondary, marginTop: 10 }}>
+                {t('review.wizard.receipt.uploadingBody')}
+              </div>
+            </div>
+          )}
+          {pending && uploadKey && (phase === 'publishing' || phase === 'published') && (
+            <div style={{ marginTop: 14 }}>
+              <Loader2
+                aria-hidden
+                className="animate-spin"
+                style={{ width: 16, height: 16, color: RV2.secondary }}
+              />
+              <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.secondary, marginTop: 10 }}>
+                {t('review.wizard.receipt.uploadingBody')}
+              </div>
+            </div>
+          )}
+          {pending && uploadKey && phase === 'failed' && (
+            <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.secondary, marginTop: 14 }}>
+              {t('review.wizard.receipt.failedBody')}
             </div>
           )}
         </div>
