@@ -155,6 +155,46 @@ function writeDraft(
   }
 }
 
+/**
+ * PHASE 3 — seed the create-namespace draft from a failed staged review so
+ * "retry" means "here is your review, add the photos again". A staged review
+ * has no rating row (even when it was an edit); submit_course_review_v2
+ * upserts on publish, so an edit still resolves correctly.
+ */
+export function seedReviewDraftFromPending(row: {
+  course_id: string;
+  rating: number | null;
+  design_score: number | null;
+  condition_score: number | null;
+  clubhouse_score: number | null;
+  facilities_score: number | null;
+  review: string | null;
+  verdict: string | null;
+  tee_label: string | null;
+  share_to_feed: boolean | null;
+}) {
+  writeDraft(row.course_id, {
+    v: DRAFT_VERSION,
+    // Step 2, not 3: the scores are theirs; media is attached on step 2.
+    step: FIRST_STEP,
+    // They already set this score — don't make them drag the dial again.
+    overallTouched: true,
+    overall: row.rating,
+    scores: {
+      design: row.design_score,
+      condition: row.condition_score,
+      clubhouse: row.clubhouse_score,
+      facilities: row.facilities_score,
+    },
+    reviewText: row.review ?? '',
+    shareToFeed: row.share_to_feed ?? true,
+    teeLabel: row.tee_label ?? null,
+    // photoCount/videoCount deliberately omitted: pending_reviews records the
+    // total expected, not the split. The retry notice names the situation.
+    savedAt: Date.now(),
+  });
+}
+
 export function clearReviewDraft(
   courseId: string | null | undefined,
   reviewId?: string | null,
