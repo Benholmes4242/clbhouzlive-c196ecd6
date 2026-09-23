@@ -11,13 +11,13 @@
  */
 import React from 'react';
 import { useSkeletonShown } from '@/perf/usePageReady';
-import { MEMBER_CELL, MEMBER_PANEL, ECHO_RAISED_SURFACE, PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { MEMBER_CELL, MEMBER_PANEL, MEMBER_RAISED, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const CANVAS = PAGE_CANVAS;
 const PANEL = MEMBER_PANEL;
 
 const shimmer: React.CSSProperties = {
-  background: `linear-gradient(90deg, ${MEMBER_CELL} 25%, ${ECHO_RAISED_SURFACE} 50%, ${MEMBER_CELL} 75%)`,
+  background: `linear-gradient(90deg, ${MEMBER_CELL} 25%, ${MEMBER_RAISED} 50%, ${MEMBER_CELL} 75%)`,
   backgroundSize: '200% 100%',
   animation: 'roundSkelWave 1.4s ease-in-out infinite',
   borderRadius: 8,

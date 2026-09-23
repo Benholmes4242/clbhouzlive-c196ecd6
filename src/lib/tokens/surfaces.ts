@@ -42,6 +42,9 @@ export const MEMBER_PANEL = '#16161A';
 /** Cells and chips raised above a member sheet or panel. */
 export const MEMBER_CELL = '#1E1E23';
 
+/** Raised controls and emphasized blocks above a member cell or panel. */
+export const MEMBER_RAISED = '#27272E';
+
 /** The full-screen near-black ground used by Clubhouse, Messages, and Echo. */
 export const IMMERSIVE_FEED_CANVAS = '#0A0A0C';
 
@@ -49,7 +52,7 @@ export const IMMERSIVE_FEED_CANVAS = '#0A0A0C';
 export const FEED_CARD_SURFACE = '#16161A';
 
 /** Raised result cards and controls inside Echo. */
-export const ECHO_RAISED_SURFACE = '#27272E';
+export const ECHO_RAISED_SURFACE = MEMBER_RAISED;
 
 /** The outer shell behind the unified post and review composer. */
 export const COMPOSER_SHELL_SURFACE = '#0A0A0C';

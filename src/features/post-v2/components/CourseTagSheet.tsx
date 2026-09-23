@@ -17,6 +17,7 @@ import type { StageCourse } from '../hooks/useStageComposer';
 import { usePopularCourses } from '../hooks/usePopularCourses';
 import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
 import { CT } from '@/features/_shared/composerTokens';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 
 interface Props {
@@ -350,10 +351,10 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function CourseRowSkeleton() {
   return (
     <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 12 }}>
-      <div className="clb-shimmer-dark" style={{ width: 34, height: 34, borderRadius: 12, background: 'rgba(255,255,255,0.06)', flex: 'none' }} />
+      <div className="clb-shimmer-dark" style={{ width: 34, height: 34, borderRadius: 12, backgroundColor: MEMBER_CELL, flex: 'none' }} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div className="clb-shimmer-dark" style={{ height: 12, width: '55%', borderRadius: 6, background: 'rgba(255,255,255,0.06)' }} />
-        <div className="clb-shimmer-dark" style={{ height: 10, width: '30%', borderRadius: 6, background: 'rgba(255,255,255,0.06)' }} />
+        <div className="clb-shimmer-dark" style={{ height: 12, width: '55%', borderRadius: 6, backgroundColor: MEMBER_CELL }} />
+        <div className="clb-shimmer-dark" style={{ height: 10, width: '30%', borderRadius: 6, backgroundColor: MEMBER_CELL }} />
       </div>
     </div>
   );

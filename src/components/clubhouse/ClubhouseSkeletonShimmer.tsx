@@ -39,7 +39,7 @@ const SkeletonBlock: React.FC<{
 }> = ({ className, isStatic = false, style }) => (
   <div
     className={cn('relative overflow-hidden', !isStatic && 'clb-shimmer-dark', className)}
-    style={{ background: MEMBER_CELL, ...style }}
+    style={{ backgroundColor: MEMBER_CELL, ...style }}
   />
 );
 
