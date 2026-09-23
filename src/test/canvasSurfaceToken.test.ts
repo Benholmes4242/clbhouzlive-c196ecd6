@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -54,7 +55,7 @@ describe('canonical member surface tokens', () => {
   });
 
   it('keeps the global page and modal variables single-owned', () => {
-    const css = readFileSync(new URL('../index.css', import.meta.url), 'utf8');
+    const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8');
     expect(css.match(/--bg-page:\s*#15171F/g)).toHaveLength(1);
     expect(css.match(/--bg-modal:/g)).toHaveLength(1);
     expect(css.match(/--background:\s*225 11% 10%/g)).toHaveLength(1);
