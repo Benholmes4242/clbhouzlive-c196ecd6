@@ -1,12 +1,13 @@
 /**
  * Impression tracker — Phase 0.
  *
- * Silently records which posts each signed-in user has actually seen. Powers
- * feed v3 (seen-suppression, catch-up blocks, weight tuning). Nothing reads
- * this data yet.
+ * Records which posts each signed-in member has seen. READ IN PRODUCTION by
+ * get_suggested_feed_v3, where impression_count drives seen_decay (the
+ * multiplier applied to every candidate's orbit score). Treat a change here
+ * as a change to feed ranking.
  *
  * Contract:
- *  - `track(postId)` increments an in-memory buffer entry. No-op if signed out.
+ *  - `track(postId)` adds one in-memory buffer entry per session. No-op if signed out.
  *  - Flushes every 10s if the buffer is non-empty, on `visibilitychange` →
  *    hidden, and on `pagehide`.
  *  - Flush = ONE RPC (`record_post_impressions`) that upsert-increments
@@ -20,6 +21,14 @@ const FLUSH_INTERVAL_MS = 10_000;
 
 // postId → coalesced increment count for this un-flushed window.
 const buffer = new Map<string, number>();
+/* ONE IMPRESSION PER POST PER SESSION. impression_count feeds
+   seen_decay in get_suggested_feed_v3, where it means "how many
+   times have they seen this" — so a member paging back and forth
+   over one post must not read as ten viewings. The guard lives HERE
+   rather than at each callsite so every surface shares it: the
+   fullscreen viewer's effect re-fires by design, and the feed
+   observer below fires on every scroll tick. */
+const trackedThisSession = new Set<string>();
 let flushTimer: number | null = null;
 let started = false;
 
@@ -79,14 +88,16 @@ function startOnce() {
 }
 
 /**
- * Record an impression for a post. Safe to call from render effects — cheap
- * (Map.set), never throws, never awaits. No-op for signed-out users at
- * flush time.
+ * Record an impression for a post. Safe to call from render effects — the
+ * session guard makes repeat calls free. Never throws, never awaits. No-op
+ * for signed-out users at flush time.
  */
 export function track(postId: string | null | undefined): void {
   if (!postId) return;
+  if (trackedThisSession.has(postId)) return;
+  trackedThisSession.add(postId);
   startOnce();
-  buffer.set(postId, (buffer.get(postId) ?? 0) + 1);
+  buffer.set(postId, 1);
 }
 
 /** Test-only: force a flush now. Never call from product code. */
