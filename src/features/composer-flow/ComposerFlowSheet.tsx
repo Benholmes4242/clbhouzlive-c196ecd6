@@ -289,7 +289,7 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
         title={t('course.pickerTitle')}
         selectionMode="single"
         onClose={() => setCourseOpen(false)}
-        selected={[]}
+        selected={course ? [course.id] : []}
         userId={profile?.id ?? null}
         excludeReviewedForUserId={profile?.id ?? null}
         onDone={(cs) => {
@@ -297,7 +297,7 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
           setCourseOpen(false);
           if (!c) return;
           analyticsEvents.track('composer_course_source', { source: 'search' });
-          setCourse({ id: c.id, name: c.name });
+          setCourse({ id: c.id, name: c.name, thumbnail: null, when: null });
         }}
       />
     </>
