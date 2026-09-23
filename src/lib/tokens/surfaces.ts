@@ -63,6 +63,9 @@ export const APP_SHELL_SURFACE = '#0D0D0D';
 /** Desktop gutter outside the constrained member app column. */
 export const DESKTOP_GUTTER_SURFACE = '#0A0A0A';
 
+/** Near-black fill for compact controls, notices, and branded utility tiles. */
+export const NEAR_BLACK_CONTROL_SURFACE = '#0A0A0A';
+
 /** Near-black shell behind Discover tabs and feed chrome. */
 export const DISCOVER_SHELL_SURFACE = '#0A0E14';
 
@@ -71,6 +74,9 @@ export const LIGHT_ROUTE_CANVAS = '#F8FAFC';
 
 /** Dark ink canvas retained by the light immersive-status-bar compatibility branch. */
 export const LIGHT_IMMERSIVE_CANVAS = '#0F172A';
+
+/** Opaque slate fill for controls and utility cards on light member surfaces. */
+export const SLATE_CONTROL_SURFACE = '#0F172A';
 
 /** Full-screen ground used while resolving a direct post link. */
 export const POST_DEEP_LINK_CANVAS = '#0D0F11';

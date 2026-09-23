@@ -1,4 +1,6 @@
 
+import { NEAR_BLACK_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
+
 // Utility function to show a center-screen toast
 export function showToast(message: string, emoji = '', duration = 2000) {
   const toast = document.createElement('div');
@@ -8,7 +10,7 @@ export function showToast(message: string, emoji = '', duration = 2000) {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    backgroundColor: '#0a0a0a',
+    backgroundColor: NEAR_BLACK_CONTROL_SURFACE,
     color: '#FFFFFF',
     padding: '16px',
     borderRadius: '12px',

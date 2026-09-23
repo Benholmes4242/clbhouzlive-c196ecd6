@@ -21,6 +21,7 @@ import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants'
 
 import { SLATE_800, WHITE_ALPHA_55 } from '../../../_shared/tokens';
 import { formatNumber } from '@/i18n/format';
+import { SLATE_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 
 export interface CourseStatsStripProps {
   par?: number | null;
@@ -36,7 +37,7 @@ function FlagIcon() {
         width: 42,
         height: 42,
         borderRadius: '34%',
-        background: `linear-gradient(135deg, ${SLATE_800} 0%, #0f172a 100%)`,
+        background: `linear-gradient(135deg, ${SLATE_800} 0%, ${SLATE_CONTROL_SURFACE} 100%)`,
         boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
         display: 'flex',
         alignItems: 'center',

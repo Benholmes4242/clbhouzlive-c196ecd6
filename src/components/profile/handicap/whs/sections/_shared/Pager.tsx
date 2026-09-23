@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { SLATE_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 
 interface Props {
   page: number;
@@ -60,7 +61,7 @@ export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
               width: d.i === page ? 18 : 6,
               height: 6,
               borderRadius: 999,
-              background: d.i === page ? '#0F172A' : 'rgba(0,0,0,0.22)',
+              background: d.i === page ? SLATE_CONTROL_SURFACE : 'rgba(0,0,0,0.22)',
               border: 'none',
               padding: 0,
               cursor: d.i === page ? 'default' : 'pointer',

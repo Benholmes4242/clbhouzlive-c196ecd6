@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { SLATE_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -14,7 +15,7 @@ function Door({ title, suffix, onClick, tone }: DoorProps) {
   const isAmber = tone === 'amber';
   const bg = isAmber
     ? 'linear-gradient(135deg,#F7931E,#e07d0a)'
-    : '#0F172A';
+    : SLATE_CONTROL_SURFACE;
   const color = isAmber ? '#0b0d12' : '#fff';
   const countOpacity = isAmber ? 0.75 : 0.65;
   const chevronOpacity = isAmber ? 0.55 : 0.5;

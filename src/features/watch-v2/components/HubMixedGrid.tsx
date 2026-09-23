@@ -6,6 +6,7 @@ import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { packColumns } from '@/components/feed-cards/packColumns';
 import { FeedCard } from '@/components/feed-cards/FeedCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { SLATE_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -138,7 +139,7 @@ export function HubMixedGrid({
               padding: '8px 18px',
               borderRadius: 999,
               border: 'none',
-              background: '#0F172A',
+              background: SLATE_CONTROL_SURFACE,
               color: '#fff',
               fontWeight: 700,
               fontSize: 12.5,

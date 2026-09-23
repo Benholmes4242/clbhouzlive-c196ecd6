@@ -1,7 +1,7 @@
 import React from 'react';
 import { Compass, Users } from 'lucide-react';
 import { FriendsEmptyState } from '@/components/clubhouse/FriendsEmptyState';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { PAGE_CANVAS, SLATE_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 
 interface ClubhouseEmptyStateProps {
   activeTab: 'foryou' | 'friends';
@@ -58,7 +58,7 @@ export const ClubhouseEmptyState: React.FC<ClubhouseEmptyStateProps> = ({
           <p className="text-[14px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>Tap retry to try again.</p>
           <button
             onClick={onRetry}
-            style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.10em', padding: '12px 24px', borderRadius: 12, border: 'none' }}
+            style={{ background: SLATE_CONTROL_SURFACE, color: '#FFFFFF', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.10em', padding: '12px 24px', borderRadius: 12, border: 'none' }}
           >
             Retry
           </button>
@@ -92,7 +92,7 @@ export const ClubhouseEmptyState: React.FC<ClubhouseEmptyStateProps> = ({
       ) : (
         <button
           onClick={onRetry}
-          style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.10em', padding: '12px 24px', borderRadius: 12, border: 'none' }}
+          style={{ background: SLATE_CONTROL_SURFACE, color: '#FFFFFF', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.10em', padding: '12px 24px', borderRadius: 12, border: 'none' }}
         >
           Retry
         </button>
