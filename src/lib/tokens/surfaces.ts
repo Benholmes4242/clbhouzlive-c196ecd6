@@ -69,6 +69,21 @@ export const LIGHT_ROUTE_CANVAS = '#F8FAFC';
 /** Dark ink canvas retained by the light immersive-status-bar compatibility branch. */
 export const LIGHT_IMMERSIVE_CANVAS = '#0F172A';
 
+/** Full-screen ground used while resolving a direct post link. */
+export const POST_DEEP_LINK_CANVAS = '#0D0F11';
+
+/** Full-screen account-suspension page and its appeal sheet. */
+export const SUSPENSION_SURFACE = '#0F172A';
+
+/** Full-screen ground used by Echo chat history. */
+export const ECHO_HISTORY_CANVAS = '#08090B';
+
+/** Sheet and empty-state tile surface used by Echo chat history. */
+export const ECHO_HISTORY_PANEL = '#14181E';
+
+/** Secondary action surface inside the Echo history sheet. */
+export const ECHO_HISTORY_ACTION = '#1D222A';
+
 /** Native chrome encoding of the near-black Clubhouse, Messages, and Echo canvas. */
 export const IMMERSIVE_FEED_STATUS_BAR = 'FF05070A';
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { SuspensionDetails } from '@/hooks/useSuspensionStatus';
 import { formatDateLongTimeShort, formatDateNumeric } from '@/i18n/format';
+import { SUSPENSION_SURFACE } from '@/lib/tokens/surfaces';
 
 
 type Props = { suspension: SuspensionDetails };
@@ -132,7 +133,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
   return (
     <div
       style={{
-        position: 'fixed', inset: 0, background: '#0F172A', color: '#F8FAFC',
+        position: 'fixed', inset: 0, background: SUSPENSION_SURFACE, color: '#F8FAFC',
         zIndex: 10000, display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center',
         padding: 'max(env(safe-area-inset-top, 0px), 32px) 24px max(env(safe-area-inset-bottom, 0px), 32px)',
         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -219,7 +220,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              width: '100%', maxWidth: 520, background: '#0F172A', color: '#F8FAFC',
+              width: '100%', maxWidth: 520, background: SUSPENSION_SURFACE, color: '#F8FAFC',
               borderTop: '1px solid rgba(248, 250, 252, 0.12)',
               borderTopLeftRadius: 20, borderTopRightRadius: 20,
               padding: '18px 20px max(env(safe-area-inset-bottom, 0px), 24px)',

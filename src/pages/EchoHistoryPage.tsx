@@ -14,6 +14,11 @@ import { toast } from '@/lib/toast';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { TITLE } from '@/lib/tokens/type';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+import {
+  ECHO_HISTORY_ACTION,
+  ECHO_HISTORY_CANVAS,
+  ECHO_HISTORY_PANEL,
+} from '@/lib/tokens/surfaces';
 
 /**
  * BRIEF_ECHO_CADDIE §6.2 — NO LIGHT CANVAS SURVIVES ANYWHERE IN ECHO, history
@@ -24,7 +29,7 @@ import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
  * element's opacity. AMBER IS GONE from this surface: it means Echo's mark and
  * the member's own figures, and a pin marker is neither.
  */
-const CANVAS = '#08090B';
+const CANVAS = ECHO_HISTORY_CANVAS;
 const INK = '#FFFFFF';
 const SUB = '#8B929C';
 const MUTED = '#8B929C';
@@ -394,7 +399,7 @@ const EchoHistoryPage: React.FC = () => {
                   width: 52,
                   height: 52,
                   borderRadius: 17,
-                  background: '#14181E',
+                  background: ECHO_HISTORY_PANEL,
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -492,7 +497,7 @@ const EchoHistoryPage: React.FC = () => {
             style={{
               width: '100%',
               maxWidth: 620,
-              background: '#14181E',
+              background: ECHO_HISTORY_PANEL,
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
               padding: '12px 16px',
@@ -600,7 +605,7 @@ const EchoHistoryPage: React.FC = () => {
                       flex: 1,
                       padding: '12px 14px',
                       borderRadius: 12,
-                      background: '#1D222A',
+                      background: ECHO_HISTORY_ACTION,
                       color: INK,
                       border: 'none',
                       fontSize: 14,
