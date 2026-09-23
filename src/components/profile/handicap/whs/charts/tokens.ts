@@ -10,7 +10,14 @@
  * it is correct on this surface.
  */
 
-import { PAGE_CANVAS, MEMBER_PANEL, MEMBER_CELL } from '@/lib/tokens/surfaces';
+import { PAGE_CANVAS, MEMBER_PANEL, MEMBER_CELL, inkWithAlpha } from '@/lib/tokens/surfaces';
+import { SURFACE } from '@/lib/tokens/surface';
+
+/* ONE INK FAMILY: the chart ink is the app ink base (#F8FAFC), never pure
+   white with white alphas - one base, one family. Foreground tiers use the
+   ink helper, not the surface one. */
+const INK_BASE = SURFACE.dark.ink;
+
 
 
 export const CHART = {
@@ -19,13 +26,15 @@ export const CHART = {
   CANVAS: PAGE_CANVAS,
   PANEL: MEMBER_PANEL,
   PANEL_2: MEMBER_CELL,
-  BORDER: 'rgba(255,255,255,0.07)',
-  GRID: 'rgba(255,255,255,0.06)',
-  INK: '#FFFFFF',
-  MUTE: 'rgba(255,255,255,0.62)',
-  DIM: 'rgba(255,255,255,0.40)',
-  TRACK: 'rgba(255,255,255,0.10)',
-  FAINT: 'rgba(255,255,255,0.22)',
+  BORDER: inkWithAlpha(INK_BASE, 0.07),
+  /* Grid raised to 0.09: at 0.06 it measured 1.127:1 - a defect the ramp made
+     visible. Still quieter than TRACK so the hierarchy holds. */
+  GRID: inkWithAlpha(INK_BASE, 0.09),
+  INK: INK_BASE,
+  MUTE: inkWithAlpha(INK_BASE, 0.62),
+  DIM: inkWithAlpha(INK_BASE, 0.40),
+  TRACK: inkWithAlpha(INK_BASE, 0.10),
+  FAINT: inkWithAlpha(INK_BASE, 0.22),
   AMBER: '#F7931E',
   /** index rising = playing worse */
   UP: '#FF6B6B',
