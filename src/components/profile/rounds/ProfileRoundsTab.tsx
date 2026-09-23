@@ -2,9 +2,11 @@
  * BRIEF_PROFILE_ROUNDS_TAB — a member's round history on their profile.
  *
  * Missing data is ABSENT, never approximated:
- *  - course_par null  → no to-par; excluded from the form strip and the
- *                       to-par average. The round still lists with its gross.
- *  - course_handicap null (whs_scores) → excluded from the form strip.
+ *  - course_par null  → no to-par figure and out of the to-par average; the
+ *                       round still lists with its gross. The form strip is
+ *                       differential-based, so par is not needed for it.
+ *  - handicap_differential or handicap_index_at_time null → NO form value;
+ *    the current index is never substituted for the index held at the time.
  *  - not a full eighteen (isFullEighteen, PersonalBestsSection's test) →
  *    listed and marked, but out of Best, Average, to-par and form.
  */
@@ -35,9 +37,17 @@ function parseDate(v: string): Date {
   return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(v);
 }
 
+/**
+ * Differential form: played-to (the stored handicap_differential) minus the
+ * index the member held at the time. Par and course handicap are not part of
+ * it. A round with no index on record has NO form value — the member's
+ * current index is never substituted for the one they held.
+ */
 function formValue(r: ProfileRound): number | null {
-  if (!isFullEighteen(r) || r.gross_score == null || r.course_par == null || r.course_handicap == null) return null;
-  return r.gross_score - (r.course_par + Number(r.course_handicap));
+  if (!isFullEighteen(r) || r.handicap_differential == null || r.handicap_index_at_time == null) {
+    return null;
+  }
+  return Number(r.handicap_differential) - Number(r.handicap_index_at_time);
 }
 
 const fmt1 = (n: number) => n.toFixed(1);
@@ -227,7 +237,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
           </p>
           {stats.form.length < stats.lastCount ? (
             <p style={{ margin: '4px 0 0', fontSize: 11, color: CHART.DIM, ...FIGS }}>
-              {t('rounds.form.missing', '{{k}} of the last {{total}} are left out: nine holes, or no par or course handicap on record.', {
+              {t('rounds.form.missing', '{{k}} of the last {{total}} are left out: nine holes, or no handicap index on record.', {
                 k: stats.lastCount - stats.form.length,
                 total: stats.lastCount,
               })}

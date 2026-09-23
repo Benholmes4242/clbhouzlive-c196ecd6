@@ -4,8 +4,13 @@
  * VISIBILITY IS THE DATABASE'S. Both queries run on the signed-in client as
  * the viewer via get_profile_rounds (SECURITY DEFINER, one can_view_handicap
  * gate). There is NO client copy of the handicap_visibility rule here.
-
-
+ *
+ * BRIEF_ROUNDS_TAB_FORM_STRIP_DIFFERENTIAL — the strip is built on the stored
+ * differential and the index the member held AT THE TIME of the round:
+ *   form value = handicap_differential - handicap_index_at_time
+ * handicap_differential and slope/course ratings are complete on whs_scores;
+ * handicap_index_at_time is null on 19 rounds — those have NO form value and
+ * the member's CURRENT index is never substituted for the one they held.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,10 +27,14 @@ export interface ProfileRound {
   albatrosses: number | null;
   holes_in_one: number | null;
   clean_card: boolean | null;
-  /** From whs_scores (joined on whs_score_id). null = the row did not come back. */
+  /** From whs_scores (joined in get_profile_rounds). null = the row did not come back. */
   is_nine_hole: boolean | null;
   total_holes: number | null;
   course_handicap: number | null;
+  handicap_differential: number | null;
+  handicap_index_at_time: number | null;
+  slope_rating: number | null;
+  course_rating: number | null;
   /** false when the viewer could not read the whs_scores row — treat as unknown, never as 18. */
   whs_joined: boolean;
 }
