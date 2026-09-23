@@ -7980,6 +7980,88 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_reviews: {
+        Row: {
+          clubhouse_score: number | null
+          condition_score: number | null
+          course_id: string
+          created_at: string
+          design_score: number | null
+          error_message: string | null
+          facilities_score: number | null
+          id: string
+          media_expected: number
+          rating: number
+          review: string | null
+          share_to_feed: boolean
+          status: string
+          tee_label: string | null
+          updated_at: string
+          user_id: string
+          verdict: string | null
+        }
+        Insert: {
+          clubhouse_score?: number | null
+          condition_score?: number | null
+          course_id: string
+          created_at?: string
+          design_score?: number | null
+          error_message?: string | null
+          facilities_score?: number | null
+          id?: string
+          media_expected?: number
+          rating: number
+          review?: string | null
+          share_to_feed?: boolean
+          status?: string
+          tee_label?: string | null
+          updated_at?: string
+          user_id: string
+          verdict?: string | null
+        }
+        Update: {
+          clubhouse_score?: number | null
+          condition_score?: number | null
+          course_id?: string
+          created_at?: string
+          design_score?: number | null
+          error_message?: string | null
+          facilities_score?: number | null
+          id?: string
+          media_expected?: number
+          rating?: number
+          review?: string | null
+          share_to_feed?: boolean
+          status?: string
+          tee_label?: string | null
+          updated_at?: string
+          user_id?: string
+          verdict?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_reviews_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "course_pooling_watch"
+            referencedColumns: ["golf_course_id"]
+          },
+          {
+            foreignKeyName: "pending_reviews_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_reviews_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+        ]
+      }
       pickem_picks: {
         Row: {
           created_at: string
@@ -23539,6 +23621,10 @@ export type Database = {
       postgis_wagyu_version: { Args: never; Returns: string }
       prune_featured_rounds_history: { Args: never; Returns: number }
       prune_leaderboard_snapshots: { Args: never; Returns: undefined }
+      publish_pending_review: {
+        Args: { p_media: Json; p_pending_id: string }
+        Returns: string
+      }
       publish_scheduled_posts: { Args: never; Returns: undefined }
       queue_push_notification: {
         Args: {
@@ -24468,6 +24554,22 @@ export type Database = {
       st_wrapx: {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
+      }
+      stage_course_review: {
+        Args: {
+          p_clubhouse: number
+          p_condition: number
+          p_course_id: string
+          p_design: number
+          p_facilities: number
+          p_media_expected: number
+          p_rating: number
+          p_review?: string
+          p_share_to_feed?: boolean
+          p_tee_label?: string
+          p_verdict?: string
+        }
+        Returns: string
       }
       stat_browse_total_categories: { Args: never; Returns: number }
       submit_course_review_v2: {
