@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
 import { MapPreview } from './MapPreview';
 import { MapExpandedView, type MapExpandedViewNearbyPin } from './MapExpandedView';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 interface LocationMapCardProps {
   lat: number | null | undefined;
@@ -54,7 +55,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
       <div
         key={`map-${lat}-${lng}`}
         style={{
-          background: '#1B1E27',
+          background: MEMBER_PANEL,
           border: '1px solid rgba(255,255,255,0.10)',
           borderRadius: 16,
           overflow: 'hidden',

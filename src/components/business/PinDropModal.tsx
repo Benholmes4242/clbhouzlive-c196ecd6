@@ -8,7 +8,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { AddressValue } from './AddressAutocomplete';
 import { AppLog } from '@/lib/logger';
-import { MAP_CONFIG } from '@/config/maps';
+import { applyClbhouzMapStyle, MAP_CONFIG } from '@/config/maps';
 
 // Route through shared MAP_CONFIG so the workerClass override in maps.ts
 // is installed before this modal constructs a map.
@@ -49,9 +49,13 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
+      style: MAP_CONFIG.STYLE_URL,
       center: [center.lng, center.lat],
       zoom: initialZoom,
+    });
+
+    map.current.on('style.load', () => {
+      if (map.current) applyClbhouzMapStyle(map.current);
     });
 
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');

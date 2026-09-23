@@ -7,7 +7,8 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { createGlassyMarkerElement } from './MapMarker';
-import { MAP_CONFIG } from '@/config/maps';
+import { applyClbhouzMapStyle, MAP_CONFIG } from '@/config/maps';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { openMapsUrl } from '@/utils/median/openMapsUrl';
 import { getActorRouteByType } from '@/types/actor';
 
@@ -42,7 +43,6 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
   lng,
   name,
   locationText,
-  colorful = false,
   nearby,
 }) => {
   const navigate = useNavigate();
@@ -104,7 +104,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: colorful ? 'mapbox://styles/mapbox/streets-v12' : MAP_CONFIG.STYLE_URL,
+        style: MAP_CONFIG.STYLE_URL,
         center: [lng, lat],
         zoom: MAP_CONFIG.ZOOM.EXPANDED,
         interactive: true,
@@ -116,6 +116,8 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
       });
 
       mapRef.current = map;
+
+      map.on('style.load', () => applyClbhouzMapStyle(map));
 
       // Navigation controls
       map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
@@ -224,7 +226,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
       <SheetContent
         side="bottom"
         className="h-[75dvh] p-0 !rounded-t-2xl overflow-hidden flex flex-col immersive-map-sheet expanded-map-glass-controls"
-        style={{ background: '#1B1E27' }}
+        style={{ background: MEMBER_PANEL }}
         hideCloseButton
       >
         {/* Grabber */}
