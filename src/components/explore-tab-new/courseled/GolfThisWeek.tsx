@@ -18,6 +18,7 @@ import { ListTerminalRow } from './ListTerminalRow';
    the same day rotate. One hook decides which. */
 import { useDiscoverEntryBoard } from './hooks/useDiscoverEntryBoard';
 import { DEFAULT_BOARD_FALLBACK } from './hooks/useHandicapDefaultBoard';
+import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 import {
   BAND_OPTIONS,
@@ -237,7 +238,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           style={{
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(to top, ${A.CANVAS} 0%, rgba(21,23,31,0.82) 20%, rgba(21,23,31,0.34) 58%, rgba(21,23,31,0.08) 100%)`,
+            background: `linear-gradient(to top, ${A.CANVAS} 0%, ${surfaceWithAlpha(PAGE_CANVAS, 0.82)} 20%, ${surfaceWithAlpha(PAGE_CANVAS, 0.34)} 58%, ${surfaceWithAlpha(PAGE_CANVAS, 0.08)} 100%)`,
           }}
         />
         <div

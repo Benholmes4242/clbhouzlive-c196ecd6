@@ -1,3 +1,5 @@
+import { DISCOVER_SHELL_SURFACE } from '@/lib/tokens/surfaces';
+
 /**
  * Tour Hub design tokens — single source of truth.
  *
@@ -234,7 +236,7 @@ export const NAVY_HIGH = '#15203A';
 // ============================================================================
 // SHELL CHROME (Tour Hub navigation chrome — darker than INK or NAVY_HIGH)
 // ============================================================================
-export const SHELL_BG = '#0A0E14';                           // Tour Hub shell/chrome dark bg — 11 cross-app files (5 shell rows + tabs + pages)
+export const SHELL_BG = DISCOVER_SHELL_SURFACE;               // Tour Hub shell/chrome dark bg — 11 cross-app files (5 shell rows + tabs + pages)
 
 // ============================================================================
 // CHARCOAL (shared Clubhouse / player hero / live-card surface)

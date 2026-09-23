@@ -69,6 +69,9 @@ export const NEAR_BLACK_CONTROL_SURFACE = '#0A0A0A';
 /** Near-black shell behind Discover tabs and feed chrome. */
 export const DISCOVER_SHELL_SURFACE = '#0A0E14';
 
+/** Raised near-black card tier used by Tour Hub's dark surface stack. */
+export const TOUR_HUB_RAISED_SURFACE = '#141414';
+
 /** Light compatibility route canvas retained for inactive legacy branches. */
 export const LIGHT_ROUTE_CANVAS = '#F8FAFC';
 

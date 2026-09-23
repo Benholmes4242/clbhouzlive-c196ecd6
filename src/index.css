@@ -1000,6 +1000,7 @@ html, body, #root {
   --app-shell-surface: #0D0D0D;
   --desktop-gutter-surface: #0A0A0A;
   --near-black-control-surface: #0A0A0A;
+  --tour-hub-raised-surface: #141414;
   --light-route-canvas: #F8FAFC;
   --bg-surface: #0F0F0F;
   --bg-card: rgba(255,255,255,0.06);

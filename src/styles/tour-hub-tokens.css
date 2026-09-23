@@ -9,7 +9,7 @@
      ======================================== */
   --th-bg-canvas: #000000;           /* True black for cinematic sections */
   --th-bg-primary: var(--near-black-control-surface); /* Near-black for cards on dark */
-  --th-bg-secondary: #141414;        /* Elevated surfaces on dark */
+  --th-bg-secondary: var(--tour-hub-raised-surface); /* Elevated surfaces on dark */
   --th-bg-tertiary: #1C1C1E;         /* Highest elevation dark */
   --th-bg-light: #F5F5F7;            /* Light mode canvas (Apple gray) */
   --th-bg-card-light: #FFFFFF;       /* Cards on light */

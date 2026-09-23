@@ -29,6 +29,7 @@ import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens
 // BRIEF_SUGGESTED_GOLFERS S3.1 / S3.2 - reason-led suggestions inside the feed.
 import { SuggestedGolfersBlock } from '@/features/social-suggestions/SuggestedGolfersBlock';
 import { NobodySawThatRound } from '@/features/social-suggestions/NobodySawThatRound';
+import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -108,7 +109,7 @@ const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick }) => (
           fontSize: 11,
           padding: '2px 7px',
           borderRadius: 20,
-          background: active ? 'rgba(21,23,31,0.18)' : AMBER_SOFT,
+          background: active ? surfaceWithAlpha(PAGE_CANVAS, 0.18) : AMBER_SOFT,
           color: active ? PAGE : AMBER_DEEP,
           lineHeight: 1,
         }}
