@@ -4,7 +4,7 @@ import { formatMonthShort } from '@/i18n/format';
 import { formatPosition, formatScore, type PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import { isFinish, isNonStarter } from '../../_shared/resultStatus';
 import { getScoreColor } from '../../_shared/scoreColor';
-import { AMBER, HAIRLINE_INK_8, INK, INK_FAINT, SLATE_50 } from '../../_shared/tokens';
+import { AMBER, HAIRLINE_INK_8, INK, INK_FAINT, TOUR_CANVAS } from '../../_shared/tokens';
 
 // A position on the shape means a real finish: MDF plots normally, CUT/MC/WD/DQ
 // plot on the floor line. DNS is filtered out entirely before plotting — a
@@ -48,7 +48,7 @@ export function FormSection({ results }: { results: PlayerTournamentResult[] }) 
     setSelectedPoint(nearestIndex);
   };
   return (
-    <section style={{ background: SLATE_50, padding: '18px 16px 14px' }}>
+    <section style={{ background: TOUR_CANVAS, padding: '18px 16px 14px' }}>
       <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' }}>{t('player.form.eyebrow')}</p>
       <p style={{ margin: 0, fontSize: 12, color: INK_FAINT }}>{t('player.form.caption')}</p>
       <svg
@@ -82,7 +82,7 @@ export function FormSection({ results }: { results: PlayerTournamentResult[] }) 
         {plotted.map(({ result, position, x, y }) => position === 1 ? (
           <path key={result.id} d={`M${x},${y - 5} L${x + 5},${y} L${x},${y + 5} L${x - 5},${y} Z`} fill={AMBER} />
         ) : (
-          <circle key={result.id} cx={x} cy={y} r={position == null ? 2.5 : 3.5} fill={position == null ? INK_FAINT : SLATE_50} stroke={position == null ? INK_FAINT : INK} strokeWidth="1.5" />
+          <circle key={result.id} cx={x} cy={y} r={position == null ? 2.5 : 3.5} fill={position == null ? INK_FAINT : TOUR_CANVAS} stroke={position == null ? INK_FAINT : INK} strokeWidth="1.5" />
         ))}
       </svg>
       <div style={{ height: 28, display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>

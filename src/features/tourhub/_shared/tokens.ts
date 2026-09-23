@@ -13,7 +13,7 @@ import { DISCOVER_SHELL_SURFACE } from '@/lib/tokens/surfaces';
  * SURFACE ORIENTATION: DARK. As of BRIEF_TOUR_SURFACES_DARK_MIGRATION Part B,
  * INK_*, SLATE_* and SURFACE are the DARK-surface ramp: INK_* is near-white text
  * on a dark ground, SLATE_* are dark neutrals, SURFACE is a raised dark card.
- * THE NAMES ARE HISTORICAL AND DELIBERATELY NOT RENAMED HERE — 78 importers.
+ * The remaining SLATE_* names are historical; the route ground is role-named.
  * Read the value, not the name. The alphas in this file are one step STRONGER
  * than their former light counterparts: 8% ink on white and 8% white on #15171F
  * are not the same separation, and mirroring them is what made bogey grounds
@@ -21,7 +21,8 @@ import { DISCOVER_SHELL_SURFACE } from '@/lib/tokens/surfaces';
  *
  * Naming convention:
  * - INK_*       → text colour on DARK surfaces (primary / secondary / mute / faint / light)
- * - SLATE_*     → background-adjacent neutrals on DARK surfaces (50/150/200/etc., names Tailwind-scale, values not)
+ * - TOUR_CANVAS → Tour Hub route ground
+ * - SLATE_*     → background-adjacent neutrals on DARK surfaces (100/150/200/etc., names Tailwind-scale, values not)
  * - HAIRLINE_*  → divider colours / borders (solid or ink-alpha variants)
  * - AMBER_*     → brand amber (text, tints, borders, soft bgs)
  * - GOLD_*      → celebratory / winner / trophy moments (more saturated than amber)
@@ -48,12 +49,13 @@ export const INK_LIGHT = 'rgba(248,250,252,0.28)';
 export const SURFACE = MEMBER_PANEL;
 
 // ============================================================================
+// TOUR ROUTE GROUND
+// ============================================================================
+export const TOUR_CANVAS = PAGE_CANVAS;
+
+// ============================================================================
 // SLATE (neutrals on DARK surface)
 // ============================================================================
-// NOTE: shares a value with CHARCOAL and with the app canvas. Different reasons:
-// this is the quietest neutral in the tour ramp and will move again when the ramp
-// is renamed. Do not merge on the strength of the value.
-export const SLATE_50 = PAGE_CANVAS;
 export const SLATE_100 = 'rgba(255,255,255,0.06)';           // segmented-control trough, photo bg — 7 cross-app files
 export const SLATE_150 = 'rgba(255,255,255,0.08)';
 export const SLATE_200 = 'rgba(255,255,255,0.10)';
@@ -241,7 +243,7 @@ export const SHELL_BG = DISCOVER_SHELL_SURFACE;               // Tour Hub shell/
 // ============================================================================
 // CHARCOAL (shared Clubhouse / player hero / live-card surface)
 // ============================================================================
-// NOTE: shares a value with SLATE_50 and the app canvas. Different reasons: this
+// NOTE: shares a value with TOUR_CANVAS and the app canvas. Different reasons: this
 // is a named product surface — Clubhouse feed, player hero gradient end, live-now
 // card — not a ramp step. Do not merge on the strength of the value.
 export const CHARCOAL = PAGE_CANVAS;

@@ -30,7 +30,7 @@ import { selectPlayerSeason } from './playerSeason';
 import { useLeaderCategories } from '../leaders-v2/data/useLeaderCategories';
 import { mapTourSlug } from '../_shared/tourOrder';
 import { PlayerPageSkeleton } from '@/components/skeletons/PlayerPageSkeleton';
-import { SLATE_50 } from '../_shared/tokens';
+import { TOUR_CANVAS } from '../_shared/tokens';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
 export function PlayerPage() {
@@ -69,7 +69,7 @@ export function PlayerPage() {
         <div
           style={{
             paddingTop: 'var(--chrome-total-h, 0px)',
-            background: SLATE_50,
+            background: TOUR_CANVAS,
             minHeight: '60vh',
           }}
           className="px-5"
@@ -97,11 +97,11 @@ export function PlayerPage() {
     <TourHubShell>
       <TourPageShell
         immersive
-        background={SLATE_50}
+        background={TOUR_CANVAS}
         title={player.full_name}
         backFallback="/tourhub?tab=players"
       >
-      <div style={{ background: SLATE_50, minHeight: '100vh' }}>
+      <div style={{ background: TOUR_CANVAS, minHeight: '100vh' }}>
         <HeroSection player={player} playerStats={playerStats ?? null} selection={selection} />
 
         {(statsError || resultsError || seasonResultsError) && (

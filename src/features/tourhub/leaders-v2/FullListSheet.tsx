@@ -7,7 +7,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { AMBER, FONT, INK, INK_MUTE, SLATE_50, WHITE_ALPHA_06 } from '../_shared/tokens';
+import { AMBER, FONT, INK, INK_MUTE, WHITE_ALPHA_06 } from '../_shared/tokens';
 import type { LeaderCategoryDef } from './data/useLeaderCategories';
 import type { LivePlayerMap } from '../players-v2/data/useLivePlayerIds';
 
@@ -39,7 +39,7 @@ export function FullListSheet({ open, onClose, category, tourLabel, year }: Full
     : category.key === 'drive_avg'
       ? t('leaders.sheet.gapUnits.yards')
       : registeredUnit;
-  return <BottomSheet open={open} onClose={onClose} ariaLabelledBy="tour-leaders-full-sheet-title" style={{ maxHeight: '85dvh', display: 'flex', flexDirection: 'column', background: SLATE_50, fontFamily: FONT }}>
+  return <BottomSheet open={open} onClose={onClose} ariaLabelledBy="tour-leaders-full-sheet-title" style={{ maxHeight: '85dvh', display: 'flex', flexDirection: 'column', fontFamily: FONT }}>
     <header style={{ flexShrink: 0, padding: '12px 24px 16px', borderBottom: `1px solid ${WHITE_ALPHA_06}` }}>
       <p style={{ margin: 0, color: INK_MUTE, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{tourLabel} · {year}</p>
       <h2 id="tour-leaders-full-sheet-title" style={{ margin: '6px 0 0', color: INK, fontSize: 25, lineHeight: 1.05, fontWeight: 850 }}>{t(category.labelKey)}</h2>

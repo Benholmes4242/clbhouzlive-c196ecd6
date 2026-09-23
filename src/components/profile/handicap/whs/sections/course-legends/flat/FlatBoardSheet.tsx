@@ -112,7 +112,7 @@ export const FlatBoardSheet: React.FC<Props> = ({
     /* BRIEF_SHEET_SCROLL 1 - a full board is the longest list in the app and
         owned no scroll container of its own. */
     <BottomSheet open={open} onClose={onClose} maxHeight="88dvh" scrollBody>
-      <div style={{ padding: '4px 20px 8px', fontFamily: SANS, background: A.CANVAS }}>
+      <div style={{ padding: '4px 20px 8px', fontFamily: SANS }}>
         <div
           style={{
             fontSize: 9,

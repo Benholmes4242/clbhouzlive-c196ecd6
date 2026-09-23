@@ -55,7 +55,6 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
         display: 'flex',
         flexDirection: 'column',
         fontFamily: CHART_FONT,
-        background: CHART.CANVAS,
       }}
     >
       {/* Pinned header */}

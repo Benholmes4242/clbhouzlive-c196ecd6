@@ -27,7 +27,7 @@ import {
   INK,
   INK_FAINT,
   INK_MUTE,
-  SLATE_50,
+  TOUR_CANVAS,
 } from '../_shared/tokens';
 
 const TOUR_TAG: Record<string, string> = {
@@ -99,7 +99,7 @@ export function StoryArticle({ story, immersiveHero = false, tagLabel }: {
           the CANVAS behind a photograph, not a panel, so it takes the page
           surface and the surface is now continuous. */}
       {story.image_url && (
-        <div style={{ position: 'relative', height: immersiveHero ? OVERVIEW_HERO_HEIGHT : 232, width: '100%', overflow: 'hidden', background: SLATE_50 }}>
+        <div style={{ position: 'relative', height: immersiveHero ? OVERVIEW_HERO_HEIGHT : 232, width: '100%', overflow: 'hidden', background: TOUR_CANVAS }}>
 
 
           <img
@@ -120,7 +120,7 @@ export function StoryArticle({ story, immersiveHero = false, tagLabel }: {
             aria-hidden
             style={{
               position: 'absolute', left: 0, right: 0, bottom: 0, height: 260,
-              background: heroCanonScrimOn(SLATE_50),
+              background: heroCanonScrimOn(TOUR_CANVAS),
             }}
           />
           {story.kicker && (
@@ -210,7 +210,7 @@ export function StoryPage() {
   return (
     <div
       style={{
-        background: SLATE_50,
+        background: TOUR_CANVAS,
         minHeight: '100dvh',
         fontFamily: FONT,
       }}

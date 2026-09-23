@@ -59,7 +59,7 @@ import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 
 import {
-  FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, SURFACE,
+  FONT, INK, INK_MUTE, INK_FAINT, TOUR_CANVAS, HAIRLINE_INK_8, SURFACE,
 } from '../_shared/tokens';
 
 export function TournamentPage() {
@@ -145,7 +145,7 @@ export function TournamentPage() {
     return (
       <TourHubShell immersive immersiveStatusBar>
         <div style={{
-          background: SLATE_50, minHeight: '100dvh', fontFamily: FONT,
+          background: TOUR_CANVAS, minHeight: '100dvh', fontFamily: FONT,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '32px 20px', textAlign: 'center',
         }}>
@@ -162,7 +162,7 @@ export function TournamentPage() {
                 type="button"
                 onClick={() => refetchMeta()}
                 style={{
-                  background: INK, color: SLATE_50, border: 'none', borderRadius: 999,
+                  background: INK, color: TOUR_CANVAS, border: 'none', borderRadius: 999,
                   padding: '10px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
                   fontFamily: FONT, letterSpacing: '0.02em',
                 }}
@@ -223,12 +223,12 @@ export function TournamentPage() {
     <TourHubShell immersive immersiveStatusBar>
       <TourPageShell
         immersive
-        background={SLATE_50}
+        background={TOUR_CANVAS}
         title={meta?.name ?? 'Tournament'}
         subtitle={meta?.venue_name ?? undefined}
         backFallback="/tourhub?tab=schedule"
       >
-      <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
+      <div style={{ background: TOUR_CANVAS, minHeight: '100dvh', fontFamily: FONT }}>
         <HeroSection
           meta={meta}
           state={pulse.state}

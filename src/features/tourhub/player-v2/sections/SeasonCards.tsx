@@ -22,7 +22,7 @@ import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubDat
 import { StatsSheet } from '../StatsSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { mapTourSlug } from '../../_shared/tourOrder';
-import { INK, INK_FAINT, SLATE_50 } from '../../_shared/tokens';
+import { INK, INK_FAINT, TOUR_CANVAS } from '../../_shared/tokens';
 import type { PlayerSeasonSelection } from '../playerSeason';
 import { playerOrdinal } from '../playerOrdinal';
 import { isFinish, isNonStarter } from '../../_shared/resultStatus';
@@ -75,7 +75,7 @@ export function SeasonCards({ playerStats, results, player, selection }: SeasonC
   };
 
   return (
-    <section style={{ background: SLATE_50, padding: '16px 0 14px' }}>
+    <section style={{ background: TOUR_CANVAS, padding: '16px 0 14px' }}>
       {/* Kicker row */}
       <div
         style={{

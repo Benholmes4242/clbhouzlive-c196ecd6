@@ -20,7 +20,7 @@ import { NewsChromeBridge } from '@/features/tourhub/news/NewsChromeBridge';
 import { WorkhorseRow } from '@/features/tourhub/news/StoryShapes';
 import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
-import { FONT, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
+import { FONT, HAIRLINE_INK_10, INK, INK_MUTE, TOUR_CANVAS } from '@/features/tourhub/_shared/tokens';
 
 import { categoriesLine } from './categories';
 import { useAmateurStory, useMoreAmateurNews, type AmateurStory } from './useAmateurStories';
@@ -65,7 +65,7 @@ export function AmateurStoryPage() {
   const label = (value: string, fallback: string) => t(`amateurNews.categories.${value}`, fallback);
 
   return (
-    <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
+    <div style={{ background: TOUR_CANVAS, minHeight: '100dvh', fontFamily: FONT }}>
       <NewsChromeBridge label="Amateur News" mode="back" backFallback="/amateur" />
       <div style={{ paddingTop: 'var(--news-header-h)' }}>
         {isPending ? (

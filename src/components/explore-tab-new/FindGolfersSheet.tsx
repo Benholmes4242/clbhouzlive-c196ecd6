@@ -485,7 +485,6 @@ export function FindGolfersSheet({ open, onClose }: Props) {
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,
-        background: A.CANVAS,
         ...FIGS,
       }}
     >
@@ -493,7 +492,6 @@ export function FindGolfersSheet({ open, onClose }: Props) {
       <div
         style={{
           padding: '8px 16px 14px',
-          background: A.CANVAS,
           borderBottom: `1px solid ${A.BORDER}`,
         }}
       >

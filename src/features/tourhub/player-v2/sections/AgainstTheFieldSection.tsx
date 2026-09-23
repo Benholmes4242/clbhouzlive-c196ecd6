@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { HAIRLINE_INK_8, INK, INK_FAINT, SLATE_50 } from '../../_shared/tokens';
+import { HAIRLINE_INK_8, INK, INK_FAINT, TOUR_CANVAS } from '../../_shared/tokens';
 import type { PlayerSeasonSelection, PlayerSeasonStat } from '../playerSeason';
 import { playerOrdinal } from '../playerOrdinal';
 
@@ -24,7 +24,7 @@ export function AgainstTheFieldSection({ selection }: { selection: PlayerSeasonS
   const { t } = useTranslation('tourhub');
   if (selection.strengths.length === 0 && selection.weaknesses.length === 0) return null;
   return (
-    <section style={{ background: SLATE_50, padding: '18px 0 8px' }}>
+    <section style={{ background: TOUR_CANVAS, padding: '18px 0 8px' }}>
       <p style={{ margin: '0 16px 12px', fontSize: 11, fontWeight: 700, color: INK, letterSpacing: '0.16em', textTransform: 'uppercase' }}>{t('player.field.eyebrow')}</p>
       {selection.strengths.map((row) => <StatRow key={row.key} row={row} strength />)}
       {selection.weaknesses.map((row) => <StatRow key={row.key} row={row} strength={false} />)}

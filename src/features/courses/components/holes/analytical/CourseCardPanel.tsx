@@ -1397,7 +1397,6 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName, embedde
           maxHeight: '85dvh',
           display: 'flex',
           flexDirection: 'column',
-          background: A.CANVAS,
         }}
       >
         <div style={{ padding: '0 16px 12px' }}>

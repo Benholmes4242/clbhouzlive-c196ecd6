@@ -195,13 +195,11 @@ export function LatestReviewsSheet({
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,
-        background: A.CANVAS,
       }}
     >
       <div
         style={{
           padding: '10px 0 10px',
-          background: A.CANVAS,
           borderBottom: `1px solid ${A.BORDER}`,
         }}
       >
