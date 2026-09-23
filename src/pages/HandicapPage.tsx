@@ -157,7 +157,7 @@ const FriendTitleRow: React.FC<{
             textTransform: 'uppercase',
           }}
         >
-          HANDICAP
+          NEXT ROUND
         </div>
         <div
           style={{

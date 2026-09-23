@@ -269,6 +269,7 @@
     "nextRound": {
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
+      "sampleSentence": "최근 20라운드를 기준으로 합니다.",
       "lineHold": "다음 라운드에서 핸디캡이 올라갈 수 없습니다.",
       "subHold": "{{cut}}보다 좋으면 내려갑니다.",
       "lineRise": "다음 라운드에서 핸디캡이 {{settle}}로 올라갑니다",

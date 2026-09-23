@@ -117,7 +117,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       hideHcp: true,
     },
   },
-  { match: { exact: '/handicap' },                spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/profile' }, tone: 'dark',  bleed: true, hideHcp: true } },
+  { match: { exact: '/handicap' },                spec: { chrome: 'island', left: { kind: 'back', title: 'Next round', backTarget: 'history', backFallback: '/profile' }, tone: 'dark',  bleed: true, hideHcp: true } },
   { match: { exact: '/followers' },               spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/following' },               spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/join' },                    spec: { chrome: 'none', tone: 'light', bleed: false } },

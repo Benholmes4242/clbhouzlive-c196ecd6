@@ -12,7 +12,7 @@
  * personal best: it rewards playing more rather than playing better, and in a
  * list of scoring records it reads as one of them.
  *
- * NINE-HOLE ROUNDS ARE EXCLUDED FROM GROSS AND STABLEFORD, and the exclusion is
+ * NINE-HOLE ROUNDS ARE EXCLUDED FROM STABLEFORD AND AGAINST HANDICAP, and the exclusion is
  * NOT captioned — a record is a record, and "eighteen-hole" printed on one
  * reads as a qualification on the achievement rather than on the method. A
  * nine-hole gross is roughly half an eighteen-hole gross, so unfiltered it
@@ -44,8 +44,8 @@ const FIG: React.CSSProperties = {
   letterSpacing: '-0.04em',
 };
 
-/** The four records, in the order the brief fixes them. */
-const ORDER = ['diff', 'gross', 'stableford', 'vsHcp'] as const;
+/** The handicap-native records, in their fixed order. */
+const ORDER = ['diff', 'stableford', 'vsHcp'] as const;
 type RecordKey = (typeof ORDER)[number];
 
 interface Row {
@@ -60,6 +60,7 @@ interface Props {
   currentHandicap: number | null;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
+  showTrophyRoom?: boolean;
 }
 
 /** total_holes is checked as well as the flag: both travel on every row. */
@@ -77,6 +78,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
   currentHandicap,
   viewMode = 'owner',
   ownerFirstName = null,
+  showTrophyRoom = true,
 }) => {
   const { t } = useTranslation(['common']);
   const { data: scores, isFetched } = useAllScores(connectionId);
@@ -86,9 +88,8 @@ export const PersonalBestsSection: React.FC<Props> = ({
     if (!list.length) return [];
 
     const out: Row[] = [];
-    // Gross and stableford: eighteen-hole rounds only. See the file header.
+    // Stableford and against-handicap: eighteen-hole rounds only.
     const eighteen = list.filter(isEighteen);
-    const grossList = eighteen.filter(isReasonableGross);
     const diffList = list.filter(isReasonableDiff);
 
     if (diffList.length) {
@@ -100,18 +101,6 @@ export const PersonalBestsSection: React.FC<Props> = ({
         name: t('common:handicap.bests.bestDiff'),
         sub: courseDate(best),
         figure: fmtDiff(best.handicap_differential as number),
-      });
-    }
-
-    if (grossList.length) {
-      const best = grossList.reduce((a, b) =>
-        (a.adjusted_gross as number) <= (b.adjusted_gross as number) ? a : b,
-      );
-      out.push({
-        key: 'gross',
-        name: t('common:handicap.bests.bestGross'),
-        sub: courseDate(best),
-        figure: String(best.adjusted_gross),
       });
     }
 
@@ -131,7 +120,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
     // Against handicap: a round with no course par cannot be scored against
     // par, so it is dropped rather than defaulted to a guessed par.
     if (currentHandicap != null) {
-      const scored = grossList.flatMap((s) =>
+      const scored = eighteen.filter(isReasonableGross).flatMap((s) =>
         typeof s.adjusted_gross === 'number' && typeof s.course_par === 'number'
           ? [{ s, vsHcp: s.adjusted_gross - s.course_par - currentHandicap }]
           : [],
@@ -240,8 +229,15 @@ export const PersonalBestsSection: React.FC<Props> = ({
       )}
 
       {/* TERMINAL ROW — same handler as the AchievementsPanel tile. */}
-      {!isFriend && (
-        <button
+      {!isFriend && showTrophyRoom && <TrophyRoomRow />}
+    </HcpSection>
+  );
+};
+
+export const TrophyRoomRow: React.FC<{ standalone?: boolean }> = ({ standalone = false }) => {
+  const { t } = useTranslation(['common']);
+  const row = (
+      <button
           type="button"
           onClick={() => openGamAchievements()}
           style={{
@@ -250,8 +246,8 @@ export const PersonalBestsSection: React.FC<Props> = ({
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 12,
-            padding: '14px 0 0',
-            marginTop: 12,
+            padding: standalone ? '14px 0' : '14px 0 0',
+            marginTop: standalone ? 0 : 12,
             background: 'none',
             border: 'none',
             borderTopStyle: 'solid',
@@ -274,10 +270,10 @@ export const PersonalBestsSection: React.FC<Props> = ({
             {t('common:handicap.bests.trophyRoom')}
           </span>
           <ChevronRight size={14} strokeWidth={2.4} color={CHART.MUTE} />
-        </button>
-      )}
-    </HcpSection>
+      </button>
   );
+
+  return standalone ? <HcpSection hairline>{row}</HcpSection> : row;
 };
 
 export default PersonalBestsSection;

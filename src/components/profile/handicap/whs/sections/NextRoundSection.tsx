@@ -129,7 +129,6 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
     return (
       <HcpSection
         hairline
-        kicker={t('common:handicap.nextRound.eyebrow')}
         heading={t('common:handicap.nextRound.withheldHeading')}
       >
         <p style={{ margin: 0, fontSize: 12, color: CHART.DIM, lineHeight: 1.5, ...FIG }}>
@@ -154,6 +153,7 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
   const sub = willRise
     ? t('common:handicap.nextRound.subRise', { cut })
     : t('common:handicap.nextRound.subHold', { cut });
+  const supportingLine = `${sub} ${t('common:handicap.nextRound.sampleSentence')}`;
 
   const beating = last5.filter((v) => v < cutTarget).length;
   const bestOfFive = last5.length ? Math.min(...last5) : null;
@@ -172,9 +172,7 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
   return (
     <HcpSection
       hairline
-      kicker={t('common:handicap.nextRound.eyebrow')}
       heading={line}
-      meta={t('common:handicap.nextRound.sample')}
     >
       <p
         style={{
@@ -185,7 +183,7 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
           lineHeight: 1.45,
         }}
       >
-        {sub}
+        {supportingLine}
       </p>
 
       {/* Five bars, oldest first. Green beats the target. */}

@@ -509,6 +509,7 @@
     "nextRound": {
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
+      "sampleSentence": "Based on your last 20 rounds.",
       "lineHold": "Your handicap can't go up next round.",
       "subHold": "Beat {{cut}} and it comes down.",
       "lineRise": "Your handicap goes up to {{settle}} next round",

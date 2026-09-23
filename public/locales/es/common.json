@@ -270,6 +270,7 @@
     "nextRound": {
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
+      "sampleSentence": "Basado en tus últimas 20 vueltas.",
       "lineHold": "Tu handicap no puede subir en la próxima vuelta.",
       "subHold": "Supera {{cut}} y bajará.",
       "lineRise": "Tu handicap subirá a {{settle}} en la próxima vuelta",
