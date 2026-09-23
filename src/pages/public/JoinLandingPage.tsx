@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { INK_ON_LIGHT, MEMBER_PANEL, PAGE_CANVAS, inkWithAlpha } from '@/lib/tokens/surfaces';
+import { SURFACE } from '@/lib/tokens/surface';
 
 const AMBER = '#F7931E';
-const INK = '#0F172A';
-const INK_SOFT = '#475569';
-const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const INK = SURFACE.dark.ink;
+const INK_SOFT = SURFACE.dark.body ?? SURFACE.dark.mute;
 const FALLBACK_URL = 'https://clbhouz.co.uk';
 
 async function fetchDownloadUrl(): Promise<string> {
@@ -57,8 +58,7 @@ export function PublicLanding({
     <div
       style={{
         minHeight: '100dvh',
-        background: '#F8FAFC',
-        fontFamily: FONT,
+        background: PAGE_CANVAS,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -143,7 +143,7 @@ export function PublicLanding({
         style={{
           marginTop: 40,
           background: AMBER,
-          color: '#fff',
+          color: INK_ON_LIGHT,
           padding: '14px 28px',
           borderRadius: 999,
           fontSize: 14,
@@ -162,9 +162,9 @@ function ValueRow({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        background: '#FFFFFF',
+        background: MEMBER_PANEL,
         borderRadius: 12,
-        border: '0.5px solid rgba(15,23,42,0.08)',
+        border: `0.5px solid ${inkWithAlpha(INK, 0.08)}`,
         padding: '12px 14px',
         fontSize: 12.5,
         color: INK_SOFT,

@@ -1,9 +1,9 @@
 import React from 'react';
-import { LIGHT_ROUTE_CANVAS } from '@/lib/tokens/surfaces';
+import { INK_ON_LIGHT, PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { SURFACE } from '@/lib/tokens/surface';
 
-const INK = '#0F172A';
-const MUTE = '#64748B';
-const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const INK = SURFACE.dark.ink;
+const MUTE = SURFACE.dark.mute;
 const SUPPORT_EMAIL = 'support@clbhouz.com';
 
 /**
@@ -23,9 +23,10 @@ const DeletedAccountScreen: React.FC<{ onSignInDifferent?: () => void }> = ({
       position: 'fixed',
       inset: 0,
       zIndex: 2147483000,
-      background: LIGHT_ROUTE_CANVAS,
+      // This terminal screen deliberately used LIGHT_ROUTE_CANVAS before the
+      // dark-only arrival-screen cutover; PAGE_CANVAS now owns its ground.
+      background: PAGE_CANVAS,
       color: INK,
-      fontFamily: FONT,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
@@ -43,7 +44,7 @@ const DeletedAccountScreen: React.FC<{ onSignInDifferent?: () => void }> = ({
       >
         Account closed
       </span>
-      <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '10px 0 0', lineHeight: 1.15 }}>
+      <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: 0, margin: '10px 0 0', lineHeight: 1.15 }}>
         This account has been deleted
       </h1>
       <p style={{ fontSize: 15, lineHeight: 1.55, color: MUTE, margin: '14px 0 0' }}>
@@ -60,7 +61,7 @@ const DeletedAccountScreen: React.FC<{ onSignInDifferent?: () => void }> = ({
         style={{
           display: 'block', textAlign: 'center', marginTop: 28,
           padding: '15px 18px', borderRadius: 12,
-          background: INK, color: '#FFF',
+          background: INK, color: INK_ON_LIGHT,
           fontSize: 15, fontWeight: 600, textDecoration: 'none',
         }}
       >
@@ -75,8 +76,8 @@ const DeletedAccountScreen: React.FC<{ onSignInDifferent?: () => void }> = ({
             display: 'block', width: '100%', textAlign: 'center', marginTop: 10,
             padding: '15px 18px', borderRadius: 12,
             background: 'transparent', color: INK,
-            border: '1px solid #EDF0F3',
-            fontSize: 15, fontWeight: 600, fontFamily: FONT,
+            border: `1px solid ${SURFACE.dark.hairline}`,
+            fontSize: 15, fontWeight: 600,
           }}
         >
           Sign in with a different account
