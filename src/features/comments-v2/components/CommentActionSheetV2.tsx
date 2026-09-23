@@ -6,6 +6,7 @@
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, Flag, EyeOff, Pencil, Trash2 } from 'lucide-react';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 /* Dark baseline (MICRO_BRIEF_COMMENTS_DARK §2). Destructive red is the
    shipped dark danger value, not the light #B42318. */
@@ -43,7 +44,7 @@ export function CommentActionSheetV2({
             transition={{ type: 'spring', damping: 28, stiffness: 320 }}
             className="fixed left-0 right-0 bottom-0 z-[12005] mx-auto"
             style={{
-              maxWidth: 560, background: '#1B1E27',
+               maxWidth: 560, background: MEMBER_PANEL,
               borderRadius: '20px 20px 0 0',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
             }}

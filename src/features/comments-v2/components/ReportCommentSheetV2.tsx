@@ -9,7 +9,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
-import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
+import { INK_ON_LIGHT, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 const INK = '#F8FAFC';
 const SECONDARY = 'rgba(248,250,252,0.60)';
@@ -66,7 +66,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
             transition={{ type: 'spring', damping: 28, stiffness: 320 }}
             className="fixed left-0 right-0 bottom-0 z-[12007] mx-auto"
             style={{
-              maxWidth: 560, background: '#1B1E27',
+               maxWidth: 560, background: MEMBER_PANEL,
               borderRadius: '20px 20px 0 0',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
             }}
@@ -102,7 +102,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                         style={{
                           borderRadius: 12,
                           border: `1px solid ${active ? AMBER : HAIRLINE}`,
-                          background: active ? 'rgba(247,147,30,0.10)' : '#1B1E27',
+                           background: active ? 'rgba(247,147,30,0.10)' : MEMBER_PANEL,
                         }}
                       >
                         <span style={{ fontSize: 15, color: INK }}>{r.label}</span>
