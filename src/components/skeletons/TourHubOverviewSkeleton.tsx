@@ -5,7 +5,7 @@
  * Only the two certain blocks render: the 386px hero and its flat board rows.
  */
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { INK_TINT_06, WHITE_ALPHA_06 } from '@/features/tourhub/_shared/tokens';
+import { WHITE_ALPHA_06 } from '@/features/tourhub/_shared/tokens';
 import { OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 

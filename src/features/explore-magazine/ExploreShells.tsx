@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
