@@ -258,5 +258,31 @@ describe('canonical member surface tokens', () => {
       .map((path) => readFileSync(resolve(process.cwd(), path), 'utf8'))
       .join('\n');
     expect(fallbackSources).not.toMatch(/#1E4D38|#163A2B|#1B241C|#46665a|#2f4a40|hsl\(\$\{h\}/);
+
+    // Stage 2D stragglers: the profile editor's missing-photo gradients.
+    for (const path of [
+      'src/components/profile/edit-v2/HeaderPhotoCard.tsx',
+      'src/components/profile/edit-v2/ProfilePhotoCard.tsx',
+    ]) {
+      const source = readFileSync(resolve(process.cwd(), path), 'utf8');
+      expect(source, path).toContain('MEMBER_CELL');
+      expect(source, path).toContain('MEMBER_PANEL');
+      expect(source, path).not.toMatch(/#272C37|#1B1E27/);
+    }
+  });
+
+  it('keeps the handicap chart surfaces on the canonical ramp', () => {
+    const path = 'src/components/profile/handicap/whs/charts/tokens.ts';
+    const source = readFileSync(resolve(process.cwd(), path), 'utf8');
+    expect(source).toContain("from '@/lib/tokens/surfaces'");
+    expect(source).toMatch(/CANVAS:\s*PAGE_CANVAS/);
+    expect(source).toMatch(/PANEL:\s*MEMBER_PANEL/);
+    expect(source).toMatch(/PANEL_2:\s*MEMBER_CELL/);
+    // The chart's own pre-ramp surface values must never come back.
+    expect(source).not.toMatch(/#0B0F14|#151A21|#1B222B/);
+    // Accent colours carry meaning and stay exactly as they are.
+    expect(source).toContain('#F7931E');
+    expect(source).toContain('#FF6B6B');
+    expect(source).toContain('#5EE9A6');
   });
 });

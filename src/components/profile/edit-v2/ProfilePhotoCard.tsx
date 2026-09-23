@@ -4,6 +4,7 @@ import { Camera, User, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ImageCropperModal } from './ImageCropperModal';
 import { PhotoActionSheet } from './PhotoActionSheet';
+import { MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 interface ProfilePhotoCardProps {
   currentUrl?: string | null;
@@ -140,7 +141,8 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
               <div style={{
                 width: '100%', height: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'linear-gradient(135deg,#1B1E27,#272C37)',
+                /* Missing-photo fallback: Panel to Cell, both stops from the ramp. */
+                background: `linear-gradient(135deg,${MEMBER_PANEL},${MEMBER_CELL})`,
               }}>
                 <User size={28} strokeWidth={1.75} style={{ color: A.MUTE }} />
               </div>

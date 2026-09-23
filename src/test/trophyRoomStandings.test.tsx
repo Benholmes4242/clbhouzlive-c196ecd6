@@ -12,6 +12,12 @@ import {
 import type { MemberStandingRow } from '@/hooks/gam/useMemberStandings';
 import CareerRecordSheet from '@/components/profile/handicap/whs/gam/trophy-room/career/CareerRecordSheet';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
+
+const hexToRgbString = (hex: string) => {
+  const [, r, g, b] = hex.match(/^#(\w{2})(\w{2})(\w{2})$/) as RegExpMatchArray;
+  return `rgb(${parseInt(r, 16)}, ${parseInt(g, 16)}, ${parseInt(b, 16)})`;
+};
 
 /* BRIEF_STANDINGS_FOLLOWUPS — the empty branch reads these through the hook. */
 const standingsState = vi.hoisted(() => ({ rows: [] as unknown[] }));
@@ -180,7 +186,9 @@ describe('Trophy Room · where you stand', () => {
     expect(disc?.dataset.standingDisc).toBe('placed');
     const inner = disc?.firstElementChild as HTMLElement;
     expect(inner.style.border).not.toContain('dashed');
-    expect(inner.style.background).toBe('rgb(27, 34, 43)');
+    /* The placed disc is the chart's PANEL_2 tier, which now reads from the
+       app ramp (MEMBER_CELL). Assert through the token so the two cannot drift. */
+    expect(inner.style.background).toBe(hexToRgbString(MEMBER_CELL));
     expect(discState({ ...HANKLEY, rank: 3 })).toBe('bronze');
     expect(discState({ ...HANKLEY, medal_earned: false })).toBe('plain');
     expect(c.querySelector('[data-standing-line="true"]')?.textContent).toBe(

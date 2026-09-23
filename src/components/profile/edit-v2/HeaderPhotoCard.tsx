@@ -3,6 +3,7 @@ import { Camera } from 'lucide-react';
 import { ImageCropperModal } from './ImageCropperModal';
 import { PhotoActionSheet } from './PhotoActionSheet';
 import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
+import { MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 
 
@@ -109,7 +110,11 @@ return (
           display: 'block',
           width: '100%',
           aspectRatio: HEADER_ASPECT_CSS,
-          background: displayUrl ? 'transparent' : 'linear-gradient(135deg,#272C37,#1B1E27)',
+          /* Stands in for a photo: same decision as the other missing-image
+             fallbacks — Cell to Panel, both stops from the ramp. */
+          background: displayUrl
+            ? 'transparent'
+            : `linear-gradient(135deg,${MEMBER_CELL},${MEMBER_PANEL})`,
           overflow: 'hidden',
           border: 'none',
           padding: 0,
