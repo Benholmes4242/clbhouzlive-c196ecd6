@@ -289,7 +289,7 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
         title={t('course.pickerTitle')}
         selectionMode="single"
         onClose={() => setCourseOpen(false)}
-        selected={course ? [course.id] : []}
+        selected={course ? [{ id: course.id, name: course.name }] : []}
         userId={profile?.id ?? null}
         excludeReviewedForUserId={profile?.id ?? null}
         onDone={(cs) => {
