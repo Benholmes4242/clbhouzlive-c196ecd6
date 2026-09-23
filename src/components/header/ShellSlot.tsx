@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTourHeroOverlay } from '@/hooks/useTourHeroOverlay';
 import { getPageScrollTop, getPrimaryScrollElement } from '@/lib/getScrollParent';
+import { DISCOVER_SHELL_SURFACE } from '@/lib/tokens/surfaces';
 
 
 interface ShellSlotProps {
@@ -106,7 +107,7 @@ export const ShellSlot: React.FC<ShellSlotProps> = ({ children, dark = false }) 
         width: '100%',
         maxWidth: 480,
         zIndex: 29,
-        background: overlayActive ? 'transparent' : (dark ? '#0A0E14' : 'hsl(var(--background))'),
+        background: overlayActive ? 'transparent' : (dark ? DISCOVER_SHELL_SURFACE : 'hsl(var(--background))'),
         borderBottom: overlayActive
           ? 'none'
           : (dark

@@ -18,6 +18,7 @@ import {
 import { INK, INK_45, HAIR, CARD_BG, PAGE_BG } from '@/components/manage/ui';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { BIZ } from '@/components/business/businessTokens';
+import { surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 const AMBER = A.AMBER;
 const AMBER_SOFT = BIZ.amberTint;
@@ -281,7 +282,7 @@ export default function BusinessInvitePage() {
           style={{
             paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
             paddingTop: 12,
-            background: `linear-gradient(to top, ${PAGE_BG} 60%, rgba(21,23,31,0))`,
+            background: `linear-gradient(to top, ${PAGE_BG} 60%, ${surfaceWithAlpha(PAGE_BG, 0)})`,
           }}
         >
           <button

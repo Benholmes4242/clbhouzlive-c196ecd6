@@ -1,4 +1,5 @@
 import React from 'react';
+import { LIGHT_ROUTE_CANVAS } from '@/lib/tokens/surfaces';
 
 const INK = '#0F172A';
 const MUTE = '#64748B';
@@ -22,7 +23,7 @@ const DeletedAccountScreen: React.FC<{ onSignInDifferent?: () => void }> = ({
       position: 'fixed',
       inset: 0,
       zIndex: 2147483000,
-      background: '#F8FAFC',
+      background: LIGHT_ROUTE_CANVAS,
       color: INK,
       fontFamily: FONT,
       display: 'flex',

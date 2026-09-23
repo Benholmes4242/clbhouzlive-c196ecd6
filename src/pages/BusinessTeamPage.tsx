@@ -32,6 +32,7 @@ import {
    derived from the analytical `A` ramp. Declare a colour here and the next
    import-tracing audit cannot see this file. */
 import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, DANGER } from '@/components/manage/ui';
+import { surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
 
@@ -515,7 +516,7 @@ export default function BusinessTeamPage() {
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
               paddingTop: 12,
-              background: `linear-gradient(to top, ${PAGE_BG} 60%, rgba(21,23,31,0))`,
+              background: `linear-gradient(to top, ${PAGE_BG} 60%, ${surfaceWithAlpha(PAGE_BG, 0)})`,
             }}
           >
             <button

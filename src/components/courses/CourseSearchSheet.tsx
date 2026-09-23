@@ -11,7 +11,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { FIGS, TITLE } from '@/lib/tokens/type';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
-import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+import { MEMBER_PANEL, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface Course {
   id: string;
@@ -335,7 +335,7 @@ export function CourseSearchSheet({
               {items && items.length > 4 && (
                 <div
                   className="absolute bottom-0 left-0 right-0 h-6 pointer-events-none"
-                  style={{ background: 'linear-gradient(to top, #1B1E27, transparent)' }}
+                  style={{ background: `linear-gradient(to top, ${MEMBER_PANEL}, ${surfaceWithAlpha(MEMBER_PANEL, 0)})` }}
                 />
               )}
             </div>

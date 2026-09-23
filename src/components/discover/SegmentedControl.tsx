@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { DISCOVER_SHELL_SURFACE, LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface Tab {
   id: string;
@@ -60,7 +61,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
     <section
       className={cn('relative', !isDark && 'bg-background', className)}
       style={{
-        background: isDark ? '#0A0E14' : undefined,
+        background: isDark ? DISCOVER_SHELL_SURFACE : undefined,
         borderBottom: hideBorder
           ? 'none'
           : isDark
@@ -137,8 +138,8 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
             width: 28,
             pointerEvents: 'none',
             background: isDark
-              ? 'linear-gradient(to right, rgba(10,14,20,0), #0A0E14)'
-              : 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
+              ? `linear-gradient(to right, ${surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0)}, ${DISCOVER_SHELL_SURFACE})`
+              : `linear-gradient(to right, ${surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0)}, ${LIGHT_ROUTE_CANVAS})`,
           }}
         />
       )}

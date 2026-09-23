@@ -7,7 +7,7 @@
   /* Background - Charcoal Graphite gradient */
   --hub-bg-top: #0E0E0E;
   --hub-bg-bottom: #1A1A1A;
-  --hub-bg-gradient: linear-gradient(180deg, #0E0E0E 0%, #1A1A1A 100%);
+  --hub-bg-gradient: linear-gradient(180deg, var(--hub-bg-top) 0%, var(--hub-bg-bottom) 100%);
   
   /* Glass Surface - Neutral charcoal */
   --hub-surface: rgba(255, 255, 255, 0.04);

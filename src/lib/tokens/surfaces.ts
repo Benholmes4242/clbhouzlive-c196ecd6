@@ -24,7 +24,7 @@
  *                      encoding, different owner (the OS, not the DOM).
  */
 
-/** The ground a route is painted on. Mirrors CSS `--bg-page` / `--background`. */
+/** The ground a route is painted on. Mirrors CSS `--bg-page`; `--background` is a separately encoded legacy semantic. */
 export const PAGE_CANVAS = '#15171F';
 
 /** The ground a sheet is painted on. See components/ui/BottomSheet. */
@@ -63,6 +63,9 @@ export const APP_SHELL_SURFACE = '#0D0D0D';
 /** Desktop gutter outside the constrained member app column. */
 export const DESKTOP_GUTTER_SURFACE = '#0A0A0A';
 
+/** Near-black shell behind Discover tabs and feed chrome. */
+export const DISCOVER_SHELL_SURFACE = '#0A0E14';
+
 /** Light compatibility route canvas retained for inactive legacy branches. */
 export const LIGHT_ROUTE_CANVAS = '#F8FAFC';
 
@@ -89,3 +92,11 @@ export const IMMERSIVE_FEED_STATUS_BAR = 'FF05070A';
 
 /** Native chrome encoding of the retained light compatibility route canvas. */
 export const LIGHT_ROUTE_STATUS_BAR = 'FFF8FAFC';
+
+/** Preserve a token's RGB channels while applying an explicit alpha stop. */
+export function surfaceWithAlpha(hex: string, alpha: number): string {
+  const channels = hex.match(/^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i);
+  if (!channels) return hex;
+  const [, red, green, blue] = channels;
+  return `rgba(${parseInt(red, 16)},${parseInt(green, 16)},${parseInt(blue, 16)},${alpha})`;
+}
