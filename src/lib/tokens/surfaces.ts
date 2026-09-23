@@ -48,6 +48,9 @@ export const IMMERSIVE_FEED_CANVAS = '#05070A';
 /** Opaque post cards, editorial slides, and Echo chart panels on the feed canvas. */
 export const FEED_CARD_SURFACE = '#10151C';
 
+/** Raised result cards and controls inside Echo. */
+export const ECHO_RAISED_SURFACE = '#181F28';
+
 /** The outer shell behind the unified post and review composer. */
 export const COMPOSER_SHELL_SURFACE = '#0B0F14';
 
@@ -62,6 +65,9 @@ export const DESKTOP_GUTTER_SURFACE = '#0A0A0A';
 
 /** Light compatibility route canvas retained for inactive legacy branches. */
 export const LIGHT_ROUTE_CANVAS = '#F8FAFC';
+
+/** Dark ink canvas retained by the light immersive-status-bar compatibility branch. */
+export const LIGHT_IMMERSIVE_CANVAS = '#0F172A';
 
 /** Native chrome encoding of the near-black Clubhouse, Messages, and Echo canvas. */
 export const IMMERSIVE_FEED_STATUS_BAR = 'FF05070A';

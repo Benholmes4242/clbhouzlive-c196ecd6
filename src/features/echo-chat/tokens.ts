@@ -20,7 +20,7 @@
 
 import type React from 'react';
 import {
-  COMPOSER_PANEL_SURFACE,
+  ECHO_RAISED_SURFACE,
   FEED_CARD_SURFACE,
   IMMERSIVE_FEED_CANVAS,
 } from '@/lib/tokens/surfaces';
@@ -31,7 +31,7 @@ export const EC = {
   /** A chart's card. Solid, not the canvas at an alpha. */
   PANEL: FEED_CARD_SURFACE,
   /** Track behind a bar. */
-  RAISED: COMPOSER_PANEL_SURFACE,
+  RAISED: ECHO_RAISED_SURFACE,
   /** Hairline / border. */
   LINE: '#252E39',
   /** Ink tier 1 — the member's bubble text sits on white, so this is the ink. */

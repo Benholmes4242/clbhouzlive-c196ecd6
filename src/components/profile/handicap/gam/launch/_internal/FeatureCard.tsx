@@ -1,5 +1,6 @@
 import React from 'react';
 import type { LucideIcon } from 'lucide-react';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
@@ -18,7 +19,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, des
       gap: 14,
       padding: '14px 16px',
       borderRadius: 12,
-      background: '#1B1E27',
+      background: MEMBER_PANEL,
       border: '1px solid rgba(255,255,255,0.06)',
     }}
   >

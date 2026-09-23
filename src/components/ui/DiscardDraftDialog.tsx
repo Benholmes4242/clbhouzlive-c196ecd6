@@ -16,8 +16,9 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
-const SURFACE = '#1B1E27';
+const SURFACE = MEMBER_PANEL;
 const INK = 'rgba(255,255,255,0.96)';
 const INK_SOFT = 'rgba(255,255,255,0.62)';
 const HAIRLINE = 'rgba(255,255,255,0.10)';

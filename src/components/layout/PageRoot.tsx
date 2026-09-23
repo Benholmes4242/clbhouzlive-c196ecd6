@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 // useMedianStatusBar removed — chrome is owned solely by AppRoutes now.
 import { isDarkChromeRoute } from "@/components/header/globalHeaderRules";
 import { usePageRootMount } from "@/perf/usePageReady";
+import { LIGHT_IMMERSIVE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -68,7 +69,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
       <div
         ref={ref}
         className={cn(
-          `page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col ${immersiveStatusBar ? 'bg-[#0F172A]' : 'bg-[var(--bg-page)]'}`,
+          `page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col ${immersiveStatusBar ? '' : 'bg-[var(--bg-page)]'}`,
           dark === true && 'hcp-dark',
           dark === false && 'hcp-light',
           !fixedHeight && "min-h-[100vh]",
@@ -77,6 +78,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
         )}
         style={{
           ...style,
+          ...(immersiveStatusBar ? { backgroundColor: LIGHT_IMMERSIVE_CANVAS } : {}),
           ...(bottomPadding ? { paddingBottom: bottomPadding } : {}),
           ...(immersiveMargin ? { marginTop: immersiveMargin } : {}),
         }}
