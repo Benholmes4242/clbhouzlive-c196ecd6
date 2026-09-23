@@ -9,7 +9,7 @@ import { recordPostViewOnce } from '@/hooks/usePostViewTracker';
 import { mapActivityPostToFeedPost } from '@/lib/activityPostMapper';
 import type { ActivityPost } from '@/components/profile/types/ActivityTypes';
 import { MentionText } from '@/components/mentions/MentionText';
-import { POST_DEEP_LINK_CANVAS } from '@/lib/tokens/surfaces';
+import { POST_DEEP_LINK_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface PostPreview {
   id: string;
@@ -529,7 +529,7 @@ const PostDeepLinkPage: React.FC = () => {
         <div
           className="px-4 pt-4 pb-[max(env(safe-area-inset-bottom,0px),16px)]"
           style={{
-            background: 'linear-gradient(to top, rgba(13,15,17,0.95) 0%, rgba(13,15,17,0.8) 100%)',
+            background: `linear-gradient(to top, ${surfaceWithAlpha(POST_DEEP_LINK_CANVAS, 0.95)} 0%, ${surfaceWithAlpha(POST_DEEP_LINK_CANVAS, 0.8)} 100%)`,
             backdropFilter: 'blur(16px)',
           }}
         >

@@ -53,6 +53,7 @@ import {
   BIZ_BODY,
 } from '@/features/courses/components/holes/analytical/tokens';
 import DomainStep from './steps/DomainStep';
+import { MEMBER_PANEL, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import {
   Group,
   Row,
@@ -1262,7 +1263,7 @@ export default function VerificationFlowSheet({
               borderTop: `0.5px solid ${BIZ.hair}`,
               /* A.PANEL at 92% - a surface, not ink. The backdrop-blur-xl below
                  needs the remaining 8% to read as glass over scrolling content. */
-              background: 'rgba(27,30,39,0.92)',
+              background: surfaceWithAlpha(MEMBER_PANEL, 0.92),
               paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
             }}
           >

@@ -58,7 +58,7 @@
 
 /* Dark-context variant (if over dark video) */
 .theme-dark .echo-btn {
-  background: rgba(20,20,20,0.45);
+  background: var(--tour-hub-raised-surface-a45);
   color: #fff;
   border-color: rgba(255,255,255,0.18);
 }

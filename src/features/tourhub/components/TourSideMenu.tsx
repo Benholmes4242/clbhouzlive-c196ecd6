@@ -14,6 +14,7 @@ import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { Skeleton } from '@/components/ui/skeleton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
+import { MEMBER_PANEL, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import type { LucideIcon } from 'lucide-react';
 import {
   Compass,
@@ -167,7 +168,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           // Ground taken from the app's translucent dark chrome
           // (GlobalBottomNavigation's rgba(27,30,39,0.86) = A.PANEL alpha'd),
           // held at the menu's original 0.94 so the page still shows faintly.
-          background: 'rgba(27,30,39,0.94)',
+          background: surfaceWithAlpha(MEMBER_PANEL, 0.94),
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           boxShadow: '0 24px 60px rgba(0,0,0,0.55)',

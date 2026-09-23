@@ -11,6 +11,7 @@ import { MAX_MEDIA, type StageMediaItem } from '../hooks/useStageComposer';
 import SlideThumb from './SlideThumb';
 import { CT_DARK } from '@/features/_shared/composerTokens';
 import { CHIP_GLASS_CLASS, SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface Props {
   media: StageMediaItem[];
@@ -149,7 +150,7 @@ function arrowStyle(enabled: boolean): React.CSSProperties {
     width: 34,
     height: 34,
     borderRadius: 999,
-    background: 'rgba(248,250,252,0.08)',
+    background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.08),
     border: 0,
     display: 'flex',
     alignItems: 'center',

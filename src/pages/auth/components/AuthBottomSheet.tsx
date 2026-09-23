@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TITLE, BODY } from '@/lib/tokens/type';
+import { SHEET_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface AuthBottomSheetProps {
   isOpen: boolean;
@@ -69,7 +70,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             : "translate-y-full opacity-0"
         )}
         style={{
-          background: 'rgba(21,23,31,0.92)',
+          background: surfaceWithAlpha(SHEET_SURFACE, 0.92),
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
           borderTop: '1px solid rgba(255,255,255,0.06)',

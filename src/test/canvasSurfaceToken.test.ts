@@ -17,6 +17,7 @@ import {
   POST_DEEP_LINK_CANVAS,
   SHEET_SURFACE,
   SUSPENSION_SURFACE,
+  surfaceWithAlpha,
 } from '@/lib/tokens/surfaces';
 
 describe('canonical member surface tokens', () => {
@@ -59,5 +60,11 @@ describe('canonical member surface tokens', () => {
     expect(css.match(/--bg-page:\s*#15171F/g)).toHaveLength(1);
     expect(css.match(/--bg-modal:/g)).toHaveLength(1);
     expect(css.match(/--background:\s*225 11% 10%/g)).toHaveLength(1);
+  });
+
+  it('derives translucent surfaces without changing their rendered rgba strings', () => {
+    expect(surfaceWithAlpha(PAGE_CANVAS, 0.96)).toBe('rgba(21,23,31,0.96)');
+    expect(surfaceWithAlpha(MEMBER_PANEL, 0.92)).toBe('rgba(27,30,39,0.92)');
+    expect(surfaceWithAlpha(COMPOSER_SHELL_SURFACE, 0.55)).toBe('rgba(11,15,20,0.55)');
   });
 });

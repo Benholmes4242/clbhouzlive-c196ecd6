@@ -13,6 +13,7 @@ import {
 } from '@/hooks/useMyRequests';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 
 
@@ -204,7 +205,7 @@ export default function SupportThreadPage() {
         <div
           className="fixed bottom-0 left-0 right-0 z-30"
           style={{
-            background: 'rgba(21,23,31,0.96)', // was a light-mode glass literal
+            background: surfaceWithAlpha(PAGE_CANVAS, 0.96), // was a light-mode glass literal
             backdropFilter: 'saturate(180%) blur(14px)',
             WebkitBackdropFilter: 'saturate(180%) blur(14px)',
             borderTop: `1px solid ${A.BORDER}`,

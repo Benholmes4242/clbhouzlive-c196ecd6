@@ -5,6 +5,7 @@ import { formatDistanceToNowAgo } from '@/i18n/format';
 import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 import { reviewTierColor } from '@/components/shared/ReviewGhostScore';
+import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 // Dark-surface tier label colour. Resolved from the app-wide score bands —
 // no local hexes, no gold, no amber-for-quality.
@@ -228,7 +229,7 @@ export const LoopCard = React.memo(function LoopCard({
                 <div
                   className="flex items-baseline gap-1"
                   style={{
-                    background: 'rgba(10,14,20,0.52)',
+                    background: surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.52),
                     backdropFilter: 'blur(14px) saturate(150%)',
                     WebkitBackdropFilter: 'blur(14px) saturate(150%)',
                     border: '1px solid rgba(255,255,255,0.16)',
@@ -298,7 +299,7 @@ export const LoopCard = React.memo(function LoopCard({
               <div
                 className="absolute bottom-2 left-2 z-10 flex items-baseline gap-1"
                 style={{
-                  background: 'rgba(10,14,20,0.52)',
+                  background: surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.52),
                   backdropFilter: 'blur(14px) saturate(150%)',
                   WebkitBackdropFilter: 'blur(14px) saturate(150%)',
                   border: '1px solid rgba(255,255,255,0.16)',

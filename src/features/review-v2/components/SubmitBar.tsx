@@ -13,6 +13,7 @@
 
 import React from 'react';
 import { RV2 } from '../tokens';
+import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface Props {
   label: string;
@@ -66,7 +67,7 @@ export function SubmitBar({ label, enabled, onPress, summary, skipLabel, onSkip 
           textTransform: 'uppercase',
           letterSpacing: '0.10em',
           cursor: enabled ? 'pointer' : 'not-allowed',
-          boxShadow: enabled ? '0 6px 16px rgba(21,23,31,0.22)' : 'none',
+          boxShadow: enabled ? `0 6px 16px ${surfaceWithAlpha(PAGE_CANVAS, 0.22)}` : 'none',
           transition: 'background 160ms, color 160ms',
         }}
       >
