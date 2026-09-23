@@ -2,9 +2,9 @@
  * BRIEF_PROFILE_ROUNDS_TAB — a member's round history on their profile.
  *
  * Missing data is ABSENT, never approximated:
- *  - course_par null  → no to-par; the to-par average. The round still lists
- *                       with its gross. The form strip is differential-based,
- *                       so par is not needed for it.
+ *  - course_par null  → no to-par figure and out of the to-par average; the
+ *                       round still lists with its gross. The form strip is
+ *                       differential-based, so par is not needed for it.
  *  - handicap_differential or handicap_index_at_time null → NO form value;
  *    the current index is never substituted for the index held at the time.
  *  - not a full eighteen (isFullEighteen, PersonalBestsSection's test) →
