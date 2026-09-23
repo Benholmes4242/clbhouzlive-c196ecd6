@@ -16,7 +16,7 @@ import {
   useTournamentHoleAnalysis,
   type TournamentHole,
 } from '../data/useTournamentHoleAnalysis';
-import { FONT, SLATE_50 } from '../../_shared/tokens';
+import { FONT } from '../../_shared/tokens';
 import { A, CAPTION, KICKER, LABEL, Panel } from '@/features/courses/components/holes/analytical/tokens';
 import {
   TournamentHoleRow,
@@ -228,8 +228,7 @@ function HolesSheet({
       ariaLabelledBy="tournament-holes-sheet-title"
       style={{ height: 'auto', maxHeight: '85dvh' }}
     >
-      {/* Canonical sheet surface: the app canvas #15171F (SLATE_50). Panels inside stay A.PANEL. */}
-      <div style={{ background: SLATE_50, fontFamily: FONT, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ fontFamily: FONT, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '0 16px 10px' }}>
           <div style={KICKER}>{t('tournament.course.title', { ns: 'tourhub' })}</div>
           <h2

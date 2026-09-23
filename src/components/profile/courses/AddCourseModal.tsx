@@ -47,7 +47,6 @@ const BORDER = A.BORDER;
 const PANEL = A.PANEL;
 const TILE = 'rgba(255,255,255,0.06)';
 const DANGER = '#F87171';
-const BG_SURFACE = A.CANVAS;
 
 interface AddCourseModalProps {
   userId: string;
@@ -608,7 +607,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
-        background: BG_SURFACE,
       }}
     >
       {/* Flex column shell — header/status/tabs/search are natural height; scroll fills rest */}
@@ -617,7 +615,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         flexDirection: 'column',
         height: '100%',
         minHeight: 0,
-        background: BG_SURFACE,
       }}>
         {/* Canonical Dispatch sheet header */}
         <SheetHeader

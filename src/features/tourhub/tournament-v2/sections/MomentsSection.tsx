@@ -12,7 +12,7 @@ import { SectionEyebrow } from './SectionEyebrow';
 import { useEventMoments, MOMENT_TYPE_CONFIG, type MomentType } from '../../hooks/useEventMoments';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import {
-  FONT, INK, INK_MUTE, INK_FAINT, SURFACE, SLATE_50, HAIRLINE_INK_8,
+  FONT, INK, INK_MUTE, INK_FAINT, SURFACE, HAIRLINE_INK_8,
 } from '../../_shared/tokens';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
@@ -94,7 +94,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
               {t('tournament.moments.sheetTitle')}
             </h2>
           </div>
-          <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, background: PAGE_CANVAS, borderTop: `1px solid ${HAIRLINE_INK_8}`, borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
+          <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, borderTop: `1px solid ${HAIRLINE_INK_8}`, borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
             {list.map((m, i) => {
               const cfg = MOMENT_TYPE_CONFIG[m.moment_type as MomentType] ?? MOMENT_TYPE_CONFIG.highlight;
               return (
