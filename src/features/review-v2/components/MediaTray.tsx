@@ -70,10 +70,19 @@ export function MediaTray({
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : (
+              /* THE #t=0.1 MEDIA FRAGMENT IS WHAT MAKES THE FRAME APPEAR. A
+                 <video> that is never played and never seeked decodes nothing and
+                 paints black — metadata gives dimensions and duration, not a
+                 picture. The fragment tells the browser to position at 0.1s, so
+                 loading metadata also decodes that frame. Same pattern as
+                 PendingPostCard.tsx, which fixed this once already. 0.1 rather
+                 than 0 because a seek to exactly 0 is a no-op in some decoders
+                 and leaves the element unpainted. */
               <video
-                src={it.previewUrl}
+                src={`${it.previewUrl}#t=0.1`}
                 muted
                 playsInline
+                preload="metadata"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             )}
