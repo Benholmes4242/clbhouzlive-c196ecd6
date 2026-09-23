@@ -109,3 +109,11 @@ export function surfaceWithAlpha(hex: string, alpha: number): string {
   const [, red, green, blue] = channels;
   return `rgba(${parseInt(red, 16)},${parseInt(green, 16)},${parseInt(blue, 16)},${alpha})`;
 }
+
+/** Preserve a FOREGROUND ink colour's RGB channels while applying an explicit alpha. */
+export function inkWithAlpha(hex: string, alpha: number): string {
+  const channels = hex.match(/^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i);
+  if (!channels) return hex;
+  const [, red, green, blue] = channels;
+  return `rgba(${parseInt(red, 16)},${parseInt(green, 16)},${parseInt(blue, 16)},${alpha})`;
+}
