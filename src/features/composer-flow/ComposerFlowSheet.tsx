@@ -76,7 +76,9 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
   } | null>(null);
   const [courseOpen, setCourseOpen] = useState(false);
 
-  const { data: courses = [] } = useRecentCoursesForComposer(open);
+  const { data } = useRecentCoursesForComposer(open);
+  const courses = data?.courses ?? [];
+  const allReviewed = (data?.hadRecentRounds ?? false) && courses.length === 0;
   const hasCourses = courses.length > 0;
   const total = kind === 'review' ? 3 : 2;
 
@@ -95,8 +97,10 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
     if (!open) { emptyFired.current = false; return; }
     if (kind !== 'review' || hasCourses || emptyFired.current) return;
     emptyFired.current = true;
-    analyticsEvents.track('composer_empty_courses', {});
-  }, [open, kind, hasCourses]);
+    analyticsEvents.track('composer_empty_courses', {
+      reason: allReviewed ? 'all_reviewed' : 'no_rounds',
+    });
+  }, [open, kind, hasCourses, allReviewed]);
 
   const pendingNav = useRef<string | null>(null);
   const navigateAfterClose = (to: string) => {
@@ -255,10 +259,10 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
                   }}
                 >
                   <div style={{ fontSize: 15, fontWeight: 700, color: CT.ink }}>
-                    {t('course.emptyTitle')}
+                    {allReviewed ? t('course.allReviewedTitle') : t('course.emptyTitle')}
                   </div>
                   <div style={{ marginTop: 6, fontSize: 13, color: CT.secondary, lineHeight: 1.45 }}>
-                    {t('course.emptyBody')}
+                    {allReviewed ? t('course.allReviewedBody') : t('course.emptyBody')}
                   </div>
                 </div>
               )}
