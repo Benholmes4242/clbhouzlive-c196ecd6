@@ -2,6 +2,7 @@ import React from 'react';
 
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 /**
  * THE SHELLS (BRIEF_EXPLORE_MAGAZINE §9).
@@ -18,9 +19,9 @@ import { r } from '@/lib/radius';
 function Line({ width, height = 12 }: { width: number | string; height?: number }) {
   return (
     <div
-      className="clb-shimmer-light"
+      className="clb-shimmer-dark"
       aria-hidden
-      style={{ width, height, borderRadius: r.xs, background: A.TRACK, marginTop: 8 }}
+      style={{ width, height, borderRadius: r.xs, background: MEMBER_CELL, marginTop: 8 }}
     />
   );
 }
@@ -28,9 +29,9 @@ function Line({ width, height = 12 }: { width: number | string; height?: number 
 function Block({ height, radius }: { height: number; radius: string }) {
   return (
     <div
-      className="clb-shimmer-light"
+      className="clb-shimmer-dark"
       aria-hidden
-      style={{ height, borderRadius: radius, background: A.TRACK, width: '100%' }}
+      style={{ height, borderRadius: radius, background: MEMBER_CELL, width: '100%' }}
     />
   );
 }
@@ -82,8 +83,8 @@ export function ShelfShell({ tileW, tileH }: { tileW: number; tileH: number }) {
         {[0, 1, 2].map((index) => (
           <div
             key={index}
-            className="clb-shimmer-light"
-            style={{ width: tileW, height: tileH, flex: `0 0 ${tileW}px`, borderRadius: r.md, background: A.TRACK }}
+            className="clb-shimmer-dark"
+            style={{ width: tileW, height: tileH, flex: `0 0 ${tileW}px`, borderRadius: r.md, background: MEMBER_CELL }}
           />
         ))}
       </div>

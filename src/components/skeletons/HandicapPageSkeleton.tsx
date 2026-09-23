@@ -1,8 +1,8 @@
 import React from 'react';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { ECHO_RAISED_SURFACE, MEMBER_CELL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const shimmer: React.CSSProperties = {
-  background: 'linear-gradient(90deg, #1B1E27 25%, #20242E 50%, #1B1E27 75%)',
+  background: `linear-gradient(90deg, ${MEMBER_CELL} 25%, ${ECHO_RAISED_SURFACE} 50%, ${MEMBER_CELL} 75%)`,
   backgroundSize: '200% 100%',
   animation: 'hcpSkelWave 1.4s ease-in-out infinite',
   borderRadius: 12,

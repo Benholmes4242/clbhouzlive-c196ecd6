@@ -5,12 +5,13 @@
  * resolve into.
  */
 import type { CSSProperties } from 'react';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
-const TILE = 'rgba(255,255,255,0.06)';
+const TILE = MEMBER_CELL;
 const TOP_PAD = 'calc(env(safe-area-inset-top, 0px) + 47px)';
 
 function Block({ style }: { style?: CSSProperties }) {
-  return <div className="clb-shimmer-light" style={{ background: TILE, ...style }} />;
+  return <div className="clb-shimmer-dark" style={{ background: TILE, ...style }} />;
 }
 
 function Head() {

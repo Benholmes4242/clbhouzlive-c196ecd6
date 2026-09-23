@@ -83,7 +83,7 @@ const SKELETON_TILE = A.TRACK;
 function SheetSkeleton() {
   const block = (h: number, style: React.CSSProperties = {}) => (
     <div
-      className="clb-shimmer-light"
+      className="clb-shimmer-dark"
       style={{
         height: h,
         background: SKELETON_TILE,

@@ -85,9 +85,9 @@ export function CourseImageFallback({
   if (pending) {
     return (
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         aria-hidden="true"
-        style={{ position: 'relative', backgroundColor: 'rgba(14,18,22,0.06)', overflow: 'hidden', ...style }}
+        style={{ position: 'relative', backgroundColor: MEMBER_CELL, overflow: 'hidden', ...style }}
       />
     );
   }

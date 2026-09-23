@@ -6,7 +6,7 @@ import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { packColumns } from '@/components/feed-cards/packColumns';
 import { FeedCard } from '@/components/feed-cards/FeedCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { SLATE_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
+import { MEMBER_CELL, SLATE_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -15,30 +15,30 @@ function SkeletonTile({ aspect }: { aspect: string }) {
   return (
     <div style={{ marginBottom: 12 }}>
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           width: '100%',
           aspectRatio: aspect,
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          background: MEMBER_CELL,
         }}
       />
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           height: 12.5,
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          background: MEMBER_CELL,
           marginTop: 6,
         }}
       />
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           height: 11,
           width: '55%',
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          background: MEMBER_CELL,
           marginTop: 2,
         }}
       />

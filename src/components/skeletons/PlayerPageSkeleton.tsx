@@ -8,10 +8,10 @@
  */
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { MEMBER_PANEL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const SLATE_50 = PAGE_CANVAS;
-const SURFACE = '#1B1E27';
+const SURFACE = MEMBER_PANEL;
 const HAIRLINE_INK_8 = 'rgba(255,255,255,0.10)';
 
 function Bone({ w, h, radius = 6, dark = false }: { w: number | string; h: number; radius?: number; dark?: boolean }) {
@@ -29,7 +29,7 @@ export function PlayerPageSkeleton() {
       {/* Hero bone */}
       <div
         style={{
-          background: 'linear-gradient(180deg, #2a3542 0%, #0a0e14 100%)',
+          background: `linear-gradient(180deg, ${MEMBER_PANEL} 0%, ${PAGE_CANVAS} 100%)`,
           paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)',
           paddingBottom: 16,
         }}
