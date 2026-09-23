@@ -4,7 +4,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Clock, Trash2, Calendar, Play, Pencil } from 'lucide-react';
 import { formatMonthDayYearShort, formatTimeHm } from '@/i18n/format';
 import { useScheduledPosts, ScheduledPost } from '@/hooks/useScheduledPosts';
-import { MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
+import { INK_ON_LIGHT, MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 interface ScheduledPostsListProps {
   isOpen: boolean;
@@ -127,7 +127,8 @@ const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
                       <button 
                         onClick={() => handlePostNow(post.id)}
                         disabled={isPublishing}
-                        className="px-3 py-1.5 rounded-xl bg-[#F7931E] text-[#15171F] text-xs font-medium hover:bg-[#FFB45A] transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                        className="px-3 py-1.5 rounded-xl bg-[#F7931E] text-xs font-medium hover:bg-[#FFB45A] transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                        style={{ color: INK_ON_LIGHT }}
                       >
                         <Play className="w-3 h-3" />
                         Post Now

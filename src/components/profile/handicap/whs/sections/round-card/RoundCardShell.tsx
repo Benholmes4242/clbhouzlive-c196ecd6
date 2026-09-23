@@ -9,6 +9,7 @@
  */
 import React from 'react';
 import { ChevronRight, TrendingDown, TrendingUp } from 'lucide-react';
+import { MEMBER_CELL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { RoundCardHoleStrip, type HoleRow } from './RoundCardHoleStrip';
 
 const INK = 'var(--hcp-t-100)';
@@ -288,7 +289,7 @@ export const RoundCardShell: React.FC<RoundCardShellProps> = ({
           aspectRatio: '16 / 4',
           background: courseThumbnailUrl
             ? `url(${courseThumbnailUrl}) center/cover`
-            : 'linear-gradient(135deg, #1f2937, #0f172a)',
+            : `linear-gradient(135deg, ${MEMBER_CELL}, ${PAGE_CANVAS})`,
         }}
       >
         <div

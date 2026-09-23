@@ -11,7 +11,7 @@ import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer
 import { getSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import { FIGS } from '@/lib/tokens/type';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
-import { IMMERSIVE_FEED_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { IMMERSIVE_FEED_CANVAS, INK_ON_LIGHT, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 /**
  * BRIEF_MESSAGES_DARK §6 — AMBER IS NARROWED TO MATCH ECHO. The member's own
@@ -28,7 +28,7 @@ const HAIRLINE = 'rgba(255,255,255,0.10)';
 // Incoming: flat fill base (blur is an enhancement, applied via .ec-glass).
 const IN_BG = 'rgba(255,255,255,0.10)';
 const OUT_BG = '#F4F6F8';
-const OUT_FG = '#05070A';
+const OUT_FG = INK_ON_LIGHT;
 
 
 interface Props {

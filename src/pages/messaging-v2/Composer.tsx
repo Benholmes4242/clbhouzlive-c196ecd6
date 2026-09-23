@@ -4,6 +4,7 @@ import { Plus, ArrowUp, X, Play } from 'lucide-react';
 import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 
 
 /**
@@ -18,7 +19,7 @@ const HAIRLINE = 'rgba(255,255,255,0.07)';
 const COMPOSER_BG = '#0B0C0E';
 const COMPOSER_INPUT_BG = 'rgba(255,255,255,0.08)';
 const SEND_BG = '#F4F6F8';
-const SEND_FG = '#05070A';
+const SEND_FG = INK_ON_LIGHT;
 
 const LINE_HEIGHT = 20;
 const MAX_LINES = 5;

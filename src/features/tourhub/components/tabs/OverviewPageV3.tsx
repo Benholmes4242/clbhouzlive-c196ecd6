@@ -72,13 +72,10 @@ export function OverviewPageV3() {
 
       {/*
         ONE CANVAS (device-walk-2 A). The hero bands and the board band paint
-        A.CANVAS === PAGE_CANVAS (#15171F, the Explore page's canvas). This page
-        used the Tailwind `bg-background` utility, whose HSL resolves to
-        rgb(23,24,28) — two levels off, which is exactly the range that reads as
-        "two surfaces stitched together" rather than as a deliberate step. The
-        canvas is now the same token the board uses; no new hex, Explore
-        untouched. The CSS var's own `#15171F` comment is inaccurate and is a
-        separate item — do not "fix" this by trusting it.
+        A.CANVAS === PAGE_CANVAS (#0A0A0C, the Explore page's canvas). This page
+        once used a mismatched Tailwind `bg-background` value, which read as two
+        surfaces stitched together. The semantic background and page canvas now
+        both resolve to #0A0A0C, while the shared token remains the owner here.
       */}
       <motion.div
         className="min-h-screen"

@@ -40,6 +40,7 @@ import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
@@ -124,7 +125,7 @@ export const CircleSection: React.FC<Props> = ({ userId }) => {
             border: 'none',
             borderRadius: 999,
             background: CHART.AMBER,
-            color: '#0B0F14',
+            color: INK_ON_LIGHT,
             fontSize: 12,
             fontWeight: 700,
             cursor: 'pointer',

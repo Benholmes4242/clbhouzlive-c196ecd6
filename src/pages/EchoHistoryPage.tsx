@@ -18,6 +18,7 @@ import {
   ECHO_HISTORY_ACTION,
   ECHO_HISTORY_CANVAS,
   ECHO_HISTORY_PANEL,
+  INK_ON_LIGHT,
 } from '@/lib/tokens/surfaces';
 
 /**
@@ -373,7 +374,7 @@ const EchoHistoryPage: React.FC = () => {
                   padding: '10px 18px',
                   borderRadius: 12,
                   background: '#FFFFFF',
-                  color: '#08090B',
+                  color: INK_ON_LIGHT,
                   border: 'none',
                   fontSize: 14,
                   fontWeight: 600,
@@ -574,7 +575,7 @@ const EchoHistoryPage: React.FC = () => {
                     padding: '12px 14px',
                     borderRadius: 12,
                     background: '#FFFFFF',
-                    color: '#08090B',
+                    color: INK_ON_LIGHT,
                     border: 'none',
                     fontSize: 14,
                     fontWeight: 600,

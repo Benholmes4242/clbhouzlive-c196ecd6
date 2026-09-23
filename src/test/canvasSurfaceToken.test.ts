@@ -151,4 +151,27 @@ describe('canonical member surface tokens', () => {
       expect(hslToHex(Number(hue), Number(saturation), Number(lightness))).toBe(commentHex);
     }
   });
+
+  it('keeps Trophy Room card sweeps coupled to the panel token', () => {
+    const source = readFileSync(resolve(process.cwd(), 'src/components/profile/handicap/whs/gam/tokens.ts'), 'utf8');
+    expect(source.match(/cardBg: MEMBER_PANEL/g)).toHaveLength(9);
+    expect(source.match(/cardSweep: panelSweep\(/g)).toHaveLength(9);
+    expect(source).not.toMatch(/cardSweep:[^\n]*#1B1E27|cardSweep:\s*\n\s*['`][^\n]*#1B1E27/);
+    expect(source).toMatch(/linear-gradient\(150deg, \$\{openingStops\}, \$\{MEMBER_PANEL\} \$\{endStop\}\)/);
+  });
+
+  it('routes the named inverted-control foregrounds through INK_ON_LIGHT', () => {
+    const paths = [
+      'src/pages/messaging-v2/Composer.tsx',
+      'src/pages/messaging-v2/MessageBubble.tsx',
+      'src/pages/EchoHistoryPage.tsx',
+      'src/components/profile/handicap/whs/sections/CircleSection.tsx',
+      'src/pages/PostDeepLinkPage.tsx',
+      'src/components/post/scheduled/ScheduledPostsList.tsx',
+      'src/features/tourhub/components/TourSwitcherAffordance.tsx',
+    ];
+    for (const path of paths) {
+      expect(readFileSync(resolve(process.cwd(), path), 'utf8'), path).toContain('INK_ON_LIGHT');
+    }
+  });
 });

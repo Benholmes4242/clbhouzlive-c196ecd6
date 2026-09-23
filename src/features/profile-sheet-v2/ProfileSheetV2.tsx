@@ -75,7 +75,7 @@ export interface ProfileSheetV2Props {
 }
 
 /* SHEET_BG is gone: BottomSheet owns the one canonical sheet surface
-   (SHEET_SURFACE, #15171F) and applies it after any caller style, so a local
+   (SHEET_SURFACE, #16161A) and applies it after any caller style, so a local
    background here could not win and would only mislead. */
 const SKELETON_TILE = A.TRACK;
 
