@@ -29,6 +29,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteButton } from '@/audio/MuteButton';
 import { formatDuration, formatRemaining } from '@/features/watch-v2/utils/formatDuration';
 import { VideoProcessingCard } from './VideoProcessingCard';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import {
   vperfMarkEarlyStarted,
   vperfCardFraction,
@@ -288,7 +289,7 @@ export const InlineVideo: React.FC<Props> = ({
   }, [posterUrl, onFirstFrameReady]);
 
   return (
-    <div style={{ position: 'absolute', inset: 0, backgroundColor: '#0a0a0a' }}>
+    <div style={{ position: 'absolute', inset: 0, backgroundColor: PAGE_CANVAS }}>
       {posterUrl && (
         <img
           ref={posterElRef}

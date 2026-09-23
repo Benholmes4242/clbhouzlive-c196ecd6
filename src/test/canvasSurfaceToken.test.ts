@@ -227,4 +227,36 @@ describe('canonical member surface tokens', () => {
       expect(source, path).not.toContain('mapbox://styles/mapbox/light-v11');
     }
   });
+
+  it('keeps media grounds and missing-image fallbacks on the canonical ramp', () => {
+    const mediaGroundPaths = [
+      'src/components/feed/SnapVideoPlayer.tsx',
+      'src/components/feed/InlineVideo.tsx',
+      'src/components/feed/FeedImageCarousel.tsx',
+      'src/components/feed/FeedSlide.tsx',
+      'src/components/feed/VideoProcessingCard.tsx',
+    ];
+    for (const path of mediaGroundPaths) {
+      const source = readFileSync(resolve(process.cwd(), path), 'utf8');
+      expect(source, path).toContain('PAGE_CANVAS');
+      expect(source, path).not.toMatch(/#0A0E14|#0a0a0a/);
+    }
+
+    const fallbackPaths = [
+      'src/lib/avatarFallback.ts',
+      'src/components/ui/CoverPhotoFallback.tsx',
+      'src/components/explore-tab-new/courseled/CourseImageFallback.tsx',
+      'src/components/whs/CourseImageFallback.tsx',
+    ];
+    for (const path of fallbackPaths) {
+      const source = readFileSync(resolve(process.cwd(), path), 'utf8');
+      expect(source, path).toContain('MEMBER_CELL');
+      expect(source, path).toContain('MEMBER_PANEL');
+    }
+
+    const fallbackSources = fallbackPaths
+      .map((path) => readFileSync(resolve(process.cwd(), path), 'utf8'))
+      .join('\n');
+    expect(fallbackSources).not.toMatch(/#1E4D38|#163A2B|#1B241C|#46665a|#2f4a40|hsl\(\$\{h\}/);
+  });
 });

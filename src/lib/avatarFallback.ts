@@ -10,6 +10,8 @@
  * rendering context needs fallback colours, import from here.
  */
 
+import { MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
+
 export const AVATAR_FALLBACK_PALETTE = [
   '#3A4654', // slate
   '#3D4A52', // slate-teal
@@ -68,12 +70,12 @@ export function getInitialsFromName(
 }
 
 /**
- * HUE-DERIVED FALLBACK FILL (BRIEF_DISCOVER_BOARD_AVATARS_AND_RECENT A1.2).
+ * CANONICAL MEMBER FALLBACK FILL.
  *
  * AVATAR_FALLBACK_PALETTE above is twelve near-identical desaturated slates —
  * on a dark canvas ten consecutive tiles read as one block of grey. This helper
- * derives only the HUE from the stable user id and fixes saturation/lightness,
- * so every tile carries the same visual weight while the hue actually reads.
+ * Uses the shared member Cell → Panel ramp so an absent photograph reads as
+ * filled content rather than a hole in the page.
  *
  * Keys on the USER ID ALONE — never display name, initials or row position — so
  * a member's colour is identical on the board, in the see-all sheet and across
@@ -89,6 +91,6 @@ export function stableHue(key: string | null | undefined): number {
 }
 
 export function getAvatarFallbackGradient(userId: string | null | undefined): string {
-  const h = stableHue(userId);
-  return `linear-gradient(150deg, hsl(${h}, 22%, 30%) 0%, hsl(${h}, 20%, 20%) 100%)`;
+  void userId;
+  return `linear-gradient(150deg, ${MEMBER_CELL} 0%, ${MEMBER_PANEL} 100%)`;
 }

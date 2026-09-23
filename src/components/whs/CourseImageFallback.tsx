@@ -1,4 +1,5 @@
 import React from 'react';
+import { MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 /**
  * Fallback visual for when a course thumbnail can't be resolved.
@@ -22,7 +23,7 @@ export const CourseImageFallback: React.FC<Props> = ({
     style={{
       position: 'absolute',
       inset: 0,
-      background: `linear-gradient(${gradientAngle}deg, #46665a 0%, #2f4a40 100%)`,
+      background: `linear-gradient(${gradientAngle}deg, ${MEMBER_CELL} 0%, ${MEMBER_PANEL} 100%)`,
     }}
     aria-hidden="true"
   >

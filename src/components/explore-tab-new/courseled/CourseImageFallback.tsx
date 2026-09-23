@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MEMBER_CELL } from '@/lib/tokens/surfaces';
+import { MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 /**
  * CourseImageFallback — the ONE deterministic course image used by every
@@ -13,12 +13,12 @@ import { MEMBER_CELL } from '@/lib/tokens/surfaces';
  */
 
 const GRADIENTS = [
-  'linear-gradient(165deg,#7FA8C9 0%,#9DB88A 45%,#4C6640 100%)',
-  'linear-gradient(180deg,#3D5A63 0%,#7E9C7A 55%,#2C4526 100%)',
-  'linear-gradient(170deg,#95B7D4 0%,#C9D6C2 40%,#54703F 100%)',
-  'linear-gradient(160deg,#2E4A3A 0%,#6E8F6A 60%,#1E3A2B 100%)',
-  'linear-gradient(175deg,#E8C88A 0%,#A8B98E 50%,#4C6640 100%)',
-  'linear-gradient(185deg,#6B8CA8 0%,#8FAE7E 52%,#41603A 100%)',
+  `linear-gradient(165deg,${MEMBER_CELL} 0%,${MEMBER_CELL} 45%,${MEMBER_PANEL} 100%)`,
+  `linear-gradient(180deg,${MEMBER_CELL} 0%,${MEMBER_CELL} 55%,${MEMBER_PANEL} 100%)`,
+  `linear-gradient(170deg,${MEMBER_CELL} 0%,${MEMBER_CELL} 40%,${MEMBER_PANEL} 100%)`,
+  `linear-gradient(160deg,${MEMBER_CELL} 0%,${MEMBER_CELL} 60%,${MEMBER_PANEL} 100%)`,
+  `linear-gradient(175deg,${MEMBER_CELL} 0%,${MEMBER_CELL} 50%,${MEMBER_PANEL} 100%)`,
+  `linear-gradient(185deg,${MEMBER_CELL} 0%,${MEMBER_CELL} 52%,${MEMBER_PANEL} 100%)`,
 ] as const;
 
 function hash(seed: string): number {
@@ -97,7 +97,7 @@ export function CourseImageFallback({
     <div
       style={{
         position: 'relative',
-        background: flatWhenEmpty && !showImage ? '#1B241C' : gradientForCourse(courseId),
+        background: flatWhenEmpty && !showImage ? MEMBER_CELL : gradientForCourse(courseId),
         overflow: 'hidden',
         ...style,
       }}

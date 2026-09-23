@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 interface CoverPhotoFallbackProps {
   className?: string;
@@ -19,10 +20,8 @@ export const CoverPhotoFallback: React.FC<CoverPhotoFallbackProps> = ({
     <div
       className={cn('relative w-full h-full overflow-hidden', className)}
       style={{
-        // Cinematic dark fallback so full-bleed heroes bleed into the notch
-        // intentionally (instead of reading as a grey status-bar strip).
-        background:
-          'linear-gradient(180deg, #1E4D38 0%, #163A2B 45%, #0F172A 100%)',
+        // Filled content fallback: Cell settles into Panel beneath the avatar.
+        background: `linear-gradient(180deg, ${MEMBER_CELL} 0%, ${MEMBER_PANEL} 45%, ${MEMBER_PANEL} 100%)`,
       }}
     />
   );

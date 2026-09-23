@@ -60,7 +60,7 @@ export function applyClbhouzMapStyle(
     landColor?: string;
     /** Water fill override. Defaults to the page Canvas token in dark mode. */
     waterColor?: string;
-    /** Dark mode — inverts palette. Default false */
+    /** Dark mode — inverts palette. Default true */
     darkMode?: boolean;
     /** Show continent-level labels only (used for mini-globe). Default false */
     showContinentLabels?: boolean;
