@@ -10,7 +10,14 @@
  * it is correct on this surface.
  */
 
-import { PAGE_CANVAS, MEMBER_PANEL, MEMBER_CELL } from '@/lib/tokens/surfaces';
+import { PAGE_CANVAS, MEMBER_PANEL, MEMBER_CELL, inkWithAlpha } from '@/lib/tokens/surfaces';
+import { SURFACE } from '@/lib/tokens/surface';
+
+/* ONE INK FAMILY: the chart ink is the app ink base (#F8FAFC), never pure
+   white with white alphas - one base, one family. Foreground tiers use the
+   ink helper, not the surface one. */
+const INK_BASE = SURFACE.dark.ink;
+
 
 
 export const CHART = {
