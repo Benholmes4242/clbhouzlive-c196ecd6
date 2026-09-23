@@ -42,6 +42,8 @@ interface Props {
 interface Row extends StageCourse {
   sub_country?: string | null;
   isHomeClub?: boolean;
+  /** Optional so nothing that builds a Row without it breaks. */
+  thumbnail_image?: string | null;
 }
 
 export default function CourseTagSheet({
@@ -99,7 +101,7 @@ export default function CourseTagSheet({
       setSearching(true);
       const { data } = await supabase
         .from('golf_courses')
-        .select('id, name, country, sub_country')
+        .select('id, name, country, sub_country, thumbnail_image')
         .ilike('name', `%${q.trim()}%`)
         .limit(20);
       if (cancelled) return;

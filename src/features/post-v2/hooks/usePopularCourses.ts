@@ -17,6 +17,7 @@ export interface PopularCourse {
   name: string;
   country: string | null;
   sub_country: string | null;
+  thumbnail_image: string | null;
 }
 
 const LIMIT = 10;
@@ -71,6 +72,7 @@ export function usePopularCourses(
         course_name: string;
         country: string | null;
         region: string | null;
+        image_url: string | null;
       }>) {
         if (excludeReviewedForUserId && reviewed.has(r.course_id)) continue;
         list.push({
@@ -78,6 +80,8 @@ export function usePopularCourses(
           name: r.course_name,
           country: r.country ?? null,
           sub_country: r.region ?? null,
+          // get_course_leaderboard exposes golf_courses.thumbnail_image as image_url.
+          thumbnail_image: r.image_url ?? null,
         });
         if (list.length >= LIMIT) break;
       }
