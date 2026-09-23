@@ -276,6 +276,63 @@ function failNoisily(_detail: string) {
 
 export interface PublishOutcome { ok: boolean; ratingId?: string; error?: string; }
 
+/* ---------------------------------------------------------------------------
+ * PUBLISH STATE — what the pending receipt watches. Unlike the upload job,
+ * a listener can register before any state exists and hears the first change.
+ * ------------------------------------------------------------------------- */
+
+export type ReviewPublishPhase = 'uploading' | 'publishing' | 'published' | 'failed';
+
+export interface ReviewPublishState {
+  phase: ReviewPublishPhase;
+  uploaded: number;
+  total: number;
+  /** 0..100 averaged across all files. */
+  percent: number;
+  ratingId?: string;
+}
+
+const publishStates = new Map<string, ReviewPublishState>();
+const publishListeners = new Map<string, Set<(s: ReviewPublishState) => void>>();
+
+function setPublishState(key: string, patch: Partial<ReviewPublishState>) {
+  const cur = publishStates.get(key) ?? {
+    phase: 'uploading' as ReviewPublishPhase, uploaded: 0, total: 0, percent: 0,
+  };
+  const next = { ...cur, ...patch };
+  publishStates.set(key, next);
+  for (const l of publishListeners.get(key) ?? []) l(next);
+  if (next.phase === 'published' || next.phase === 'failed') {
+    // Retain terminal states briefly, as the job map does, so a receipt that
+    // mounts late still reads the outcome.
+    setTimeout(() => {
+      if (publishStates.get(key) === next) {
+        publishStates.delete(key);
+        publishListeners.delete(key);
+      }
+    }, 60_000);
+  }
+}
+
+export function getReviewPublishState(key: string): ReviewPublishState | null {
+  return publishStates.get(key) ?? null;
+}
+
+export function subscribeToReviewPublish(
+  key: string,
+  listener: (s: ReviewPublishState) => void,
+): () => void {
+  let set = publishListeners.get(key);
+  if (!set) { set = new Set(); publishListeners.set(key, set); }
+  set.add(listener);
+  const cur = publishStates.get(key);
+  if (cur) listener(cur);
+  return () => {
+    set!.delete(listener);
+    if (set!.size === 0 && publishListeners.get(key) === set) publishListeners.delete(key);
+  };
+}
+
 export async function uploadAndPublishReview(
   key: string,
   userId: string,
@@ -284,9 +341,20 @@ export async function uploadAndPublishReview(
   onPublished?: () => void,
 ): Promise<PublishOutcome> {
   const byId = new Map(items.map((i) => [i.id, i]));
+  setPublishState(key, {
+    phase: 'uploading', uploaded: 0, total: items.length, percent: 0,
+  });
   let results: ReviewUploadResult[];
+  const promise = startReviewUpload(key, userId, items); // registers the job
+  const unsub = subscribeToReviewUpload(key, (s) => {
+    const vals = Object.values(s.progress);
+    const pct = s.total > 0
+      ? Math.round(vals.reduce((a, b) => a + b, 0) / s.total)
+      : 0;
+    setPublishState(key, { uploaded: s.completed, total: s.total, percent: pct });
+  });
   try {
-    results = await startReviewUpload(key, userId, items);
+    results = await promise;
   } catch (e) {
     const msg = errText(e, 'Upload failed');
     await markPendingFailed(pendingId, msg);
@@ -295,7 +363,10 @@ export async function uploadAndPublishReview(
       pending_id: pendingId, total: items.length, failed: items.length,
       stage: 'upload_threw',
     });
+    setPublishState(key, { phase: 'failed' });
     return { ok: false, error: msg };
+  } finally {
+    unsub();
   }
 
   const failed = results.filter((r) => !r.ok);
@@ -306,6 +377,7 @@ export async function uploadAndPublishReview(
     analyticsEvents.track('review_staged_failed', {
       pending_id: pendingId, total: items.length, failed: failed.length,
     });
+    setPublishState(key, { phase: 'failed' });
     return { ok: false, error: msg };
   }
 
@@ -327,6 +399,7 @@ export async function uploadAndPublishReview(
     };
   });
 
+  setPublishState(key, { phase: 'publishing', percent: 100 });
   try {
     const { data, error } = await supabase.rpc('publish_pending_review' as never, {
       p_pending_id: pendingId,
@@ -338,12 +411,15 @@ export async function uploadAndPublishReview(
       pending_id: pendingId, media_count: media.length,
     });
     onPublished?.();
+    setPublishState(key, { phase: 'published', ratingId });
     return { ok: true, ratingId };
   } catch (e) {
     // SUPERSEDED, NOT FAILED. The member submitted again for this course and
     // stage_course_review dropped this row on purpose. Say nothing, mark
-    // nothing: the newer row is on its way up and will publish.
+    // nothing, paint nothing: the member is on a newer receipt.
     if (pgCode(e) === '02000') {
+      publishStates.delete(key);
+      publishListeners.delete(key);
       analyticsEvents.track('review_staged_superseded', { pending_id: pendingId });
       return { ok: false, error: 'superseded' };
     }
@@ -354,6 +430,7 @@ export async function uploadAndPublishReview(
     analyticsEvents.track('review_staged_failed', {
       pending_id: pendingId, total: items.length, failed: 0, stage: 'publish',
     });
+    setPublishState(key, { phase: 'failed' });
     return { ok: false, error: msg };
   }
 }
