@@ -35,6 +35,11 @@ import {
   surfaceWithAlpha,
 } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
+import {
+  isCanvasDarkRoute,
+  isDarkChromeRoute,
+  isImmersiveRoute,
+} from '@/components/header/globalHeaderRules';
 
 describe('canonical member surface tokens', () => {
   it('preserves every consolidated surface value exactly', () => {
@@ -344,5 +349,13 @@ describe('canonical member surface tokens', () => {
 
     const deleted = readFileSync(resolve(process.cwd(), 'src/components/DeletedAccountScreen.tsx'), 'utf8');
     expect(deleted).not.toContain('LIGHT_ROUTE_CANVAS');
+  });
+
+  it('keeps signed-out arrival routes on opaque dark route chrome', () => {
+    for (const path of ['/auth/callback', '/join', '/i/test-invite', '/missing-page']) {
+      expect(isDarkChromeRoute(path), path).toBe(true);
+      expect(isImmersiveRoute(path), path).toBe(false);
+      expect(isCanvasDarkRoute(path), path).toBe(false);
+    }
   });
 });
