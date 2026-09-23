@@ -1688,7 +1688,13 @@
         "rowDRight_one": "de {{count}} valorado",
         "rowDRight_other": "de {{count}} valorados",
         "eyebrowPending": "Esperando tus fotos",
-        "pendingBody": "Tu reseña se publicará en cuanto tus fotos y vídeos terminen de subirse. Puedes salir de esta pantalla: la subida continúa."
+        "pendingBody": "Tu reseña se publicará en cuanto tus fotos y vídeos terminen de subirse. Puedes salir de esta pantalla: la subida continúa.",
+        "eyebrowUploading": "Subiendo tus archivos",
+        "eyebrowPublishing": "Publicando tu reseña",
+        "eyebrowFailed": "La subida no terminó",
+        "uploadingCount": "{{done}} de {{total}} subidos",
+        "uploadingBody": "Puedes salir de esta pantalla: la subida continúa en segundo plano y tu reseña se publica en cuanto termine.",
+        "failedBody": "Tu reseña no se publicó. Está en tu perfil con todo lo que escribiste, lista para intentarlo de nuevo."
       },
       "save": "Guardar reseña",
       "saving": "Guardando...",
@@ -1742,7 +1748,10 @@
         "summary": "Puntúas {{course}} con {{score}}",
         "summaryShare": ", se publica en el Clubhouse",
         "threshold": "La tuya sería la {{ordinal}} valoración aquí: las barras se activan en la página del campo.",
-        "skipToPost": "Post without rating it"
+        "skipToPost": "Post without rating it",
+        "captionUntouched": "Empieza en {{score}}: arrastra para cambiarlo",
+        "confirmPost": "Publicar con {{score}}",
+        "confirmSave": "Guardar con {{score}}"
       },
       "uploadingMedia": "Subiendo fotos..."
     },

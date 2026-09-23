@@ -22,7 +22,9 @@
     "recent": "Zuletzt gespielt",
     "played": "Gespielt {{when}}",
     "emptyTitle": "Noch keine Runden",
-    "emptyBody": "Sobald dein Handicap verbunden ist, erscheinen die von dir gespielten Plätze hier automatisch. Bis dahin suche oben nach einem Platz."
+    "emptyBody": "Sobald dein Handicap verbunden ist, erscheinen die von dir gespielten Plätze hier automatisch. Bis dahin suche oben nach einem Platz.",
+    "allReviewedTitle": "Alles erledigt",
+    "allReviewedBody": "Du hast jeden Platz bewertet, den du zuletzt gespielt hast. Suche oben, um einen weiteren zu bewerten."
   },
   "footer": {
     "pickCourse": "Wähle einen Platz, um weiterzumachen",

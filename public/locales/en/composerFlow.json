@@ -22,7 +22,9 @@
   "recent": "Recently played",
   "played": "Played {{when}}",
   "emptyTitle": "No rounds yet",
-  "emptyBody": "Once your handicap is connected, the courses you play show up here on their own. Until then, search for one above."
+  "emptyBody": "Once your handicap is connected, the courses you play show up here on their own. Until then, search for one above.",
+  "allReviewedTitle": "All caught up",
+  "allReviewedBody": "You've reviewed every course you've played recently. Search above to rate another one."
  },
  "footer": {
   "pickCourse": "Pick a course to carry on",

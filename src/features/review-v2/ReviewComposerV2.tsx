@@ -282,7 +282,8 @@ function InnerComposer() {
         pending={!!success.pending}
         uploadKey={success.uploadKey ?? null}
         onPublished={(ratingId: string) =>
-          setSuccess((s) => (s ? { ...s, ratingId, pending: false } : s))}
+          setSuccess((s) =>
+            s && (s.pending || s.ratingId !== ratingId) ? { ...s, ratingId, pending: false } : s)}
         course={courseQ.data}
         overall={success.overall}
         scores={success.scores}

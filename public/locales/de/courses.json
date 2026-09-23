@@ -1688,7 +1688,13 @@
         "rowDRight_one": "von {{count}} bewertet",
         "rowDRight_other": "von {{count}} bewertet",
         "eyebrowPending": "Warten auf deine Fotos",
-        "pendingBody": "Deine Bewertung wird veröffentlicht, sobald deine Fotos und Videos fertig hochgeladen sind. Du kannst diesen Bildschirm verlassen — der Upload läuft weiter."
+        "pendingBody": "Deine Bewertung wird veröffentlicht, sobald deine Fotos und Videos fertig hochgeladen sind. Du kannst diesen Bildschirm verlassen — der Upload läuft weiter.",
+        "eyebrowUploading": "Deine Medien werden hochgeladen",
+        "eyebrowPublishing": "Deine Bewertung wird veröffentlicht",
+        "eyebrowFailed": "Upload nicht abgeschlossen",
+        "uploadingCount": "{{done}} von {{total}} hochgeladen",
+        "uploadingBody": "Du kannst diesen Bildschirm verlassen — der Upload läuft im Hintergrund weiter, und deine Bewertung erscheint, sobald er fertig ist.",
+        "failedBody": "Deine Bewertung wurde nicht veröffentlicht. Sie liegt mit allem, was du geschrieben hast, in deinem Profil bereit für einen neuen Versuch."
       },
       "save": "Bewertung speichern",
       "saving": "Wird gespeichert ...",
@@ -1742,7 +1748,10 @@
         "summary": "{{course}} mit {{score}} bewertet",
         "summaryShare": ", wird im Clubhaus geteilt",
         "threshold": "Deine wäre die {{ordinal}} Bewertung hier – danach gehen die Balken auf der Platzseite live.",
-        "skipToPost": "Post without rating it"
+        "skipToPost": "Post without rating it",
+        "captionUntouched": "Beginnt bei {{score}} — zum Ändern ziehen",
+        "confirmPost": "Mit {{score}} veröffentlichen",
+        "confirmSave": "Mit {{score}} speichern"
       },
       "uploadingMedia": "Fotos werden hochgeladen ..."
     },
