@@ -1752,7 +1752,17 @@
       "rate": "Rate",
       "title": "Played here?"
     },
-    "writePromptInline": "⭐ Write your review"
+    "writePromptInline": "⭐ Write your review",
+    "pending": {
+      "postingTitle": "Deine Bewertung wird veröffentlicht",
+      "postingBody": "Deine Fotos werden noch hochgeladen.",
+      "failedTitle": "Bewertung nicht veröffentlicht",
+      "failedBody": "Deine Fotos wurden nicht vollständig hochgeladen. Deine Worte und Bewertungen sind erhalten – füge die Fotos erneut hinzu, um sie zu veröffentlichen.",
+      "retry": "Fotos erneut hinzufügen",
+      "discard": "Verwerfen",
+      "discarded": "Bewertung verworfen",
+      "retryNotice": "Deine Bewertung ist da. Füge deine Fotos erneut hinzu, um sie zu veröffentlichen."
+    }
   },
   "reviewSheet": {
     "communityAverage_one": "Community-Durchschnitt {{average}}, aus {{count}} Bewertung",

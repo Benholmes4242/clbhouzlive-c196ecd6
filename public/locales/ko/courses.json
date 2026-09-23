@@ -1709,7 +1709,17 @@
       "rate": "Rate",
       "title": "Played here?"
     },
-    "writePromptInline": "⭐ Write your review"
+    "writePromptInline": "⭐ Write your review",
+    "pending": {
+      "postingTitle": "리뷰를 게시하는 중",
+      "postingBody": "사진을 아직 업로드하는 중입니다.",
+      "failedTitle": "리뷰가 게시되지 않았습니다",
+      "failedBody": "사진 업로드가 완료되지 않았습니다. 작성한 글과 점수는 저장되어 있으니 사진을 다시 추가해 게시하세요.",
+      "retry": "사진 다시 추가",
+      "discard": "삭제",
+      "discarded": "리뷰를 삭제했습니다",
+      "retryNotice": "리뷰가 여기 있습니다. 사진을 다시 추가해 게시하세요."
+    }
   },
   "reviewSheet": {
     "communityAverage_one": "커뮤니티 평균 {{average}}, 평가 {{count}}개",

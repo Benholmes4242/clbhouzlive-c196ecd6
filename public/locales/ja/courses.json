@@ -1706,7 +1706,17 @@
       "rate": "Rate",
       "title": "Played here?"
     },
-    "writePromptInline": "⭐ Write your review"
+    "writePromptInline": "⭐ Write your review",
+    "pending": {
+      "postingTitle": "レビューを投稿しています",
+      "postingBody": "写真をまだアップロード中です。",
+      "failedTitle": "レビューは投稿されませんでした",
+      "failedBody": "写真のアップロードが完了しませんでした。文章とスコアは保存されています。写真をもう一度追加して投稿してください。",
+      "retry": "写真をもう一度追加",
+      "discard": "破棄",
+      "discarded": "レビューを破棄しました",
+      "retryNotice": "レビューはここにあります。写真をもう一度追加して投稿してください。"
+    }
   },
   "reviewSheet": {
     "communityAverage_one": "コミュニティ平均 {{average}}、{{count}}件の評価",

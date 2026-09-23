@@ -2285,7 +2285,17 @@
       "rate": "Rate",
       "title": "Played here?"
     },
-    "writePromptInline": "⭐ Write your review"
+    "writePromptInline": "⭐ Write your review",
+    "pending": {
+      "postingTitle": "Posting your review",
+      "postingBody": "Your photos are still uploading.",
+      "failedTitle": "Review not posted",
+      "failedBody": "Your photos didn't finish uploading. Your words and scores were kept — add the photos again to post it.",
+      "retry": "Add photos again",
+      "discard": "Discard",
+      "discarded": "Review discarded",
+      "retryNotice": "Your review is here. Add your photos again to post it."
+    }
   },
   "reviewSheet": {
     "communityAverage_one": "Community average {{average}}, from {{count}} rating",
