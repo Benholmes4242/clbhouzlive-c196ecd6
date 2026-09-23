@@ -773,5 +773,6 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
     hasNewMedia,
     pendingMediaCount,
     startBackgroundPublish,
+    uploadKey: uploadKeyRef.current,
   };
 }

@@ -19,6 +19,8 @@ interface Props {
   ariaLabel: string;
   /** Live calibration against the member's OWN rated courses. Null hides it. */
   calibration?: string | null;
+  /** Untouched dial: numeral, fill and handle render quiet. Fill width stays. */
+  muted?: boolean;
 }
 
 
@@ -31,12 +33,15 @@ const toPct = (v: number) => ((v - MIN) / (MAX - MIN)) * 100;
 const MARK_5 = toPct(5);
 const MARK_9 = toPct(9);
 
-export function OverallScrubber({ value, onChange, caption, ariaLabel, calibration }: Props) {
+export function OverallScrubber({ value, onChange, caption, ariaLabel, calibration, muted }: Props) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [dragging, setDragging] = useState(false);
   const ghostDragRef = useRef(false);
   const movedRef = useRef(false);
-  const color = courseSubScoreTone(value);
+  const liveColor = courseSubScoreTone(value);
+  const color = muted ? RV2.muted : liveColor;
+  const fillColor = muted ? RV2.trackStrong : liveColor;
+  const handleBorder = muted ? RV2.trackStrong : liveColor;
   const fillPct = value == null ? 0 : toPct(value);
 
   const pointerToValue = useCallback((clientX: number) => {
@@ -148,7 +153,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, calibrati
             top: 0,
             bottom: 0,
             width: `${fillPct}%`,
-            background: value == null ? 'transparent' : color,
+            background: value == null ? 'transparent' : fillColor,
             borderRadius: 999,
             transition: dragging ? 'none' : 'width 120ms ease',
           }}
@@ -193,7 +198,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, calibrati
             height: 26,
             borderRadius: '50%',
             background: RV2.ink,
-            border: `2.5px solid ${color}`,
+            border: `2.5px solid ${handleBorder}`,
             boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
             pointerEvents: value == null ? 'auto' : 'none',
             cursor: value == null ? 'pointer' : undefined,

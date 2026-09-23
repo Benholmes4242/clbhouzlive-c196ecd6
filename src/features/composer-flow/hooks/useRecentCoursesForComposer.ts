@@ -47,6 +47,13 @@ function whenLabel(playDate: string, now: Date): string {
   return then.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
 }
 
+export interface ComposerRecentCoursesResult {
+  courses: ComposerRecentCourse[];
+  /** True when the member HAS recent rounds — even if every one of
+   *  those courses is already reviewed and the list came back empty. */
+  hadRecentRounds: boolean;
+}
+
 export function useRecentCoursesForComposer(enabled = true) {
   const { profile } = useProfileData();
   const userId = profile?.id ?? null;
@@ -55,7 +62,7 @@ export function useRecentCoursesForComposer(enabled = true) {
     queryKey: ['composer-flow-recent-courses', userId],
     enabled: enabled && !!userId,
     staleTime: 60 * 1000,
-    queryFn: async (): Promise<ComposerRecentCourse[]> => {
+    queryFn: async (): Promise<ComposerRecentCoursesResult> => {
       const now = new Date();
       const from = new Date(now);
       from.setDate(from.getDate() - COMPOSER_COURSE_WINDOW_DAYS);
@@ -71,7 +78,8 @@ export function useRecentCoursesForComposer(enabled = true) {
       if (error) throw error;
 
       // DISTINCT course, first sighting wins — the rows already arrive newest
-      // first, so the first row for a course is its most recent play.
+      // first, so the first row for a course is its most recent play. No cap
+      // here: the reviewed-filter runs first, THEN the cap.
       const seen = new Set<string>();
       const picked: ComposerRecentCourse[] = [];
       for (const r of rows ?? []) {
@@ -85,16 +93,39 @@ export function useRecentCoursesForComposer(enabled = true) {
           playDate: (r as { play_date: string }).play_date,
           when: whenLabel((r as { play_date: string }).play_date, now),
         });
-        if (picked.length >= COMPOSER_MAX_COURSES) break;
       }
-      if (picked.length === 0) return [];
+      if (picked.length === 0) return { courses: [], hadRecentRounds: false };
+
+      const ids = picked.map((p) => p.courseId);
+      const { data: rated } = await supabase
+        .from('course_ratings')
+        .select('course_id')
+        .eq('user_id', userId as string)
+        .in('course_id', ids);
+      // A staged review counts as reviewed: its upload may still be running,
+      // and offering the course again would invite a second review that
+      // stage_course_review would then throw away.
+      const { data: staged } = await (supabase as any)
+        .from('pending_reviews')
+        .select('course_id')
+        .eq('user_id', userId as string)
+        .in('course_id', ids);
+      const done = new Set<string>([
+        ...((rated ?? []) as { course_id: string }[]).map((r) => r.course_id),
+        ...((staged ?? []) as { course_id: string }[]).map((r) => r.course_id),
+      ]);
+
+      const offer = picked
+        .filter((p) => !done.has(p.courseId))
+        .slice(0, COMPOSER_MAX_COURSES);
+      if (offer.length === 0) return { courses: [], hadRecentRounds: true };
 
       // Name and image come from golf_courses, so the row reads the same as it
       // does everywhere else in the app rather than from the round's snapshot.
       const { data: courses } = await supabase
         .from('golf_courses')
         .select('id, name, thumbnail_image')
-        .in('id', picked.map((p) => p.courseId));
+        .in('id', offer.map((p) => p.courseId));
 
       const byId = new Map(
         (courses ?? []).map((c) => [
@@ -103,7 +134,7 @@ export function useRecentCoursesForComposer(enabled = true) {
         ]),
       );
 
-      return picked
+      const enriched = offer
         .filter((p) => byId.has(p.courseId))
         .map((p) => {
           const c = byId.get(p.courseId)!;
@@ -113,6 +144,7 @@ export function useRecentCoursesForComposer(enabled = true) {
             thumbnail: c.thumbnail_image ?? null,
           };
         });
+      return { courses: enriched, hadRecentRounds: picked.length > 0 };
     },
   });
 }

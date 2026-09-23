@@ -1646,7 +1646,13 @@
         "rowDRight_one": "{{count}}곳 중",
         "rowDRight_other": "{{count}}곳 중",
         "eyebrowPending": "사진 업로드를 기다리는 중",
-        "pendingBody": "사진과 동영상 업로드가 끝나면 리뷰가 바로 게시됩니다. 이 화면을 나가도 업로드는 계속됩니다."
+        "pendingBody": "사진과 동영상 업로드가 끝나면 리뷰가 바로 게시됩니다. 이 화면을 나가도 업로드는 계속됩니다.",
+        "eyebrowUploading": "미디어 업로드 중",
+        "eyebrowPublishing": "리뷰 게시 중",
+        "eyebrowFailed": "업로드가 완료되지 않았습니다",
+        "uploadingCount": "{{total}}개 중 {{done}}개 업로드됨",
+        "uploadingBody": "이 화면을 나가도 됩니다. 업로드는 백그라운드에서 계속되며, 완료되는 즉시 리뷰가 게시됩니다.",
+        "failedBody": "리뷰가 게시되지 않았습니다. 작성한 내용은 모두 프로필에 남아 있으니 다시 시도해 주세요."
       },
       "save": "리뷰 저장",
       "saving": "저장 중...",
@@ -1699,7 +1705,10 @@
         "summary": "{{course}} 점수 {{score}}",
         "summaryShare": ", 클럽하우스에 게시",
         "threshold": "당신이 {{ordinal}}번째 평가가 됩니다 — 코스 페이지의 마대가 공개됩니다.",
-        "skipToPost": "Post without rating it"
+        "skipToPost": "Post without rating it",
+        "captionUntouched": "{{score}}에서 시작 — 드래그해 변경하세요",
+        "confirmPost": "{{score}}점으로 게시",
+        "confirmSave": "{{score}}점으로 저장"
       },
       "uploadingMedia": "사진 업로드 중..."
     },

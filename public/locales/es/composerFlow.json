@@ -22,7 +22,9 @@
     "recent": "Jugados recientemente",
     "played": "Jugado {{when}}",
     "emptyTitle": "Aún no hay vueltas",
-    "emptyBody": "Cuando conectes tu hándicap, los campos que juegues apareceran aquí por su cuenta. Hasta entonces, busca uno arriba."
+    "emptyBody": "Cuando conectes tu hándicap, los campos que juegues apareceran aquí por su cuenta. Hasta entonces, busca uno arriba.",
+    "allReviewedTitle": "Todo al día",
+    "allReviewedBody": "Has reseñado todos los campos que has jugado últimamente. Busca arriba para valorar otro."
   },
   "footer": {
     "pickCourse": "Elige un campo para continuar",

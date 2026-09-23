@@ -127,6 +127,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 interface ReceiptState {
   ratingId: string | null;
   pending?: boolean;
+  uploadKey?: string | null;
   shareToFeed: boolean;
   overall: number | null;
   scores: Record<CategoryKey, number | null>;
@@ -279,6 +280,10 @@ function InnerComposer() {
       <ReviewReceipt
         ratingId={success.ratingId}
         pending={!!success.pending}
+        uploadKey={success.uploadKey ?? null}
+        onPublished={(ratingId: string) =>
+          setSuccess((s) =>
+            s && (s.pending || s.ratingId !== ratingId) ? { ...s, ratingId, pending: false } : s)}
         course={courseQ.data}
         overall={success.overall}
         scores={success.scores}
@@ -610,7 +615,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
    * uploads every file then publishes in one transaction — or marks the
    * staged row failed. The review never exists half-finished.
    */
+  const overallTouchedAtSubmitRef = useRef<boolean | null>(null);
   const handleSubmit = useCallback(async () => {
+    const overallTouched = overallTouchedAtSubmitRef.current ?? composer.overallTouched;
+    overallTouchedAtSubmitRef.current = null;
     try {
       const mediaExpected = media.pendingMediaCount();
 
@@ -657,6 +665,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         onSuccess({
           ratingId: null,
           pending: true,
+          uploadKey: media.uploadKey,
           shareToFeed: composer.state.shareToFeed,
           overall: composer.state.overall,
           scores: composer.state.scores,
@@ -676,6 +685,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         share_to_feed: composer.state.shareToFeed,
         staged: mediaExpected > 0,
         media_expected: mediaExpected,
+        overall_touched: overallTouched,
         total_ms: Math.round(Date.now() - mountedAtRef.current),
       });
       analyticsEvents.ratings.submitted({
@@ -712,6 +722,14 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
       step,
       ms_on_step: Math.round(Date.now() - stepEnteredAtRef.current),
     });
+    // Captured BEFORE the confirm press flips it, for review_submitted.
+    overallTouchedAtSubmitRef.current = composer.overallTouched;
+    if (!composer.overallTouched) {
+      // Pressing a button that names the score IS setting the score.
+      // setOverall writes the same value and marks it touched, so the
+      // draft, the analytics and the submitted row all agree.
+      composer.setOverall(composer.state.overall ?? 9);
+    }
     void handleSubmit();
   }, [step, composer, course.id, handleSubmit]);
 
@@ -753,21 +771,26 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
 
   // ---- gates and label -------------------------------------------------
-  const gateMet = step === FIRST_STEP ? composer.wordsGate : composer.ratingGate;
+  // The dial no longer blocks the button: an untouched dial is confirmed by
+  // the press itself ("Post at 9.0"). The four categories are still required.
+  // composer.ratingGate is left untouched for anything else that reads it.
+  const gateMet = step === FIRST_STEP ? composer.wordsGate : composer.catsSet === 4;
   const remaining = 4 - composer.catsSet;
+  const confirmScore = (composer.state.overall ?? 9).toFixed(1);
 
-  /* THE THREE LABELS OF THE RATING GATE, IN ORDER: an untouched dial asks for a
-     score, a touched dial with categories outstanding counts them, and only a
-     complete screen offers to submit. */
+  /* LABELS, IN ORDER: categories outstanding are counted; an untouched dial
+     names the score the press will commit; only then the plain submit. */
   let buttonLabel: string;
   if (submit.submitting) {
     buttonLabel = isEditMode ? t('review.wizard.saving') : t('review.wizard.posting');
   } else if (step === FIRST_STEP) {
     buttonLabel = t('review.wizard.continue');
-  } else if (!composer.overallTouched) {
-    buttonLabel = t('review.wizard.step3.gate');
   } else if (remaining > 0) {
     buttonLabel = t('review.wizard.step3.catsGate', { count: remaining });
+  } else if (!composer.overallTouched) {
+    buttonLabel = isEditMode
+      ? t('review.wizard.step3.confirmSave', { score: confirmScore })
+      : t('review.wizard.step3.confirmPost', { score: confirmScore });
   } else {
     buttonLabel = isEditMode ? t('review.wizard.save') : t('review.wizard.step3.submit');
   }
@@ -1304,7 +1327,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
               <OverallScrubber
                 value={composer.state.overall}
                 onChange={composer.setOverall}
-                caption={t('review.wizard.step3.caption')}
+                muted={!composer.overallTouched}
+                caption={composer.overallTouched
+                  ? t('review.wizard.step3.caption')
+                  : t('review.wizard.step3.captionUntouched', { score: (composer.state.overall ?? 9).toFixed(1) })}
                 ariaLabel={t('review.wizard.step0.a11y')}
               />
 

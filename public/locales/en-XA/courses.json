@@ -2068,7 +2068,13 @@
         "rowDRight_one": "[~~őƒ {{count}} řáţéđ~~]",
         "rowDRight_other": "[~~őƒ {{count}} řáţéđ~~]",
         "eyebrowPending": "[~~Ŵáíţíñĝ őñ ýőúř ƥĥőţőš~~]",
-        "pendingBody": "[~~Ýőúř řéṽíéŵ ƥőšţš áš šőőñ áš ýőúř ƥĥőţőš áñđ ṽíđéő fíñíšĥ úƥļőáđíñĝ. Ýőú čáñ ļéáṽé ţĥíš ščřééñ — ţĥéý ķééƥ ĝőíñĝ.~~]"
+        "pendingBody": "[~~Ýőúř řéṽíéŵ ƥőšţš áš šőőñ áš ýőúř ƥĥőţőš áñđ ṽíđéő fíñíšĥ úƥļőáđíñĝ. Ýőú čáñ ļéáṽé ţĥíš ščřééñ — ţĥéý ķééƥ ĝőíñĝ.~~]",
+        "eyebrowUploading": "[~~Uplőádíñg yőúř médíá~~]",
+        "eyebrowPublishing": "[~~Pőšţíñg yőúř řévíéw~~]",
+        "eyebrowFailed": "[~~Uplőád dídñ'ţ fíñíšh~~]",
+        "uploadingCount": "[~~{{done}} őf {{total}} úplőádéd~~]",
+        "uploadingBody": "[~~Yőú ĉáñ léávé ţhíš šĉřééñ — ţhé úplőád ĉářříéš őñ íñ ţhé báĉkgřőúñd, áñd yőúř řévíéw pőšţš áš šőőñ áš íţ fíñíšhéš.~~]",
+        "failedBody": "[~~Yőúř řévíéw wášñ'ţ pőšţéd. Iţ'š őñ yőúř přőfílé wíţh évéřyţhíñg yőú wřőţé, řéády ţő ţřy ágáíñ.~~]"
       },
       "save": "[~~Šáṽé řéṽíéŵ~~]",
       "saving": "[~~Šáṽíñĝ...~~]",
@@ -2122,7 +2128,10 @@
         "summary": "[~~Řáţíñĝ {{course}} áţ {{score}}~~]",
         "summaryShare": "[~~, ƥóšţíñĝ ţó ţĥé Ĉļúƀĥóúšé~~]",
         "threshold": "[~~Ýóúřš ŵóúļđ ƀé ţĥé {{ordinal}} řáţíñĝ ĥéřé — ţĥé ƀřéáķđóŵñ ƀářš ĝó ļíṽé óñ ţĥé ĉóúřšé ƥáĝé.~~]",
-        "skipToPost": "Post without rating it"
+        "skipToPost": "Post without rating it",
+        "captionUntouched": "[~~Sţářţš áţ {{score}} — dřág ţő ĉháñgé íţ~~]",
+        "confirmPost": "[~~Pőšţ áţ {{score}}~~]",
+        "confirmSave": "[~~Sávé áţ {{score}}~~]"
       },
       "uploadingMedia": "[~~Ůƥļőáđíñĝ ƥĥőţőš...~~]"
     },

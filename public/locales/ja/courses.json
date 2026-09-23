@@ -1643,7 +1643,13 @@
         "rowDRight_one": "{{count}} 件中",
         "rowDRight_other": "{{count}} 件中",
         "eyebrowPending": "写真のアップロードを待っています",
-        "pendingBody": "写真と動画のアップロードが完了すると、レビューが投稿されます。この画面を離れても、アップロードは続きます。"
+        "pendingBody": "写真と動画のアップロードが完了すると、レビューが投稿されます。この画面を離れても、アップロードは続きます。",
+        "eyebrowUploading": "メディアをアップロード中",
+        "eyebrowPublishing": "レビューを投稿中",
+        "eyebrowFailed": "アップロードが完了しませんでした",
+        "uploadingCount": "{{done}} / {{total}} 件アップロード済み",
+        "uploadingBody": "この画面を離れても大丈夫です。アップロードはバックグラウンドで続き、完了するとレビューが投稿されます。",
+        "failedBody": "レビューは投稿されませんでした。書いた内容はすべてプロフィールに残っているので、もう一度お試しください。"
       },
       "save": "レビューを保存",
       "saving": "保存中...",
@@ -1696,7 +1702,10 @@
         "summary": "{{course}} を {{score}} で採点",
         "summaryShare": "、クラブハウスに投稿",
         "threshold": "あなたが{{ordinal}}件目の評価になります — コースパージのバーが公開されます。",
-        "skipToPost": "Post without rating it"
+        "skipToPost": "Post without rating it",
+        "captionUntouched": "{{score}}から開始 — ドラッグして変更",
+        "confirmPost": "{{score}}で投稿",
+        "confirmSave": "{{score}}で保存"
       },
       "uploadingMedia": "写真をアップロード中..."
     },

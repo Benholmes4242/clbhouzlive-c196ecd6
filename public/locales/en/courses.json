@@ -2221,7 +2221,13 @@
         "rowDRight_one": "of {{count}} rated",
         "rowDRight_other": "of {{count}} rated",
         "eyebrowPending": "Waiting on your photos",
-        "pendingBody": "Your review posts as soon as your photos and video finish uploading. You can leave this screen — they keep going."
+        "pendingBody": "Your review posts as soon as your photos and video finish uploading. You can leave this screen — they keep going.",
+        "eyebrowUploading": "Uploading your media",
+        "eyebrowPublishing": "Posting your review",
+        "eyebrowFailed": "Upload didn't finish",
+        "uploadingCount": "{{done}} of {{total}} uploaded",
+        "uploadingBody": "You can leave this screen — the upload carries on in the background, and your review posts as soon as it finishes.",
+        "failedBody": "Your review wasn't posted. It's on your profile with everything you wrote, ready to try again."
       },
       "save": "Save review",
       "saving": "Saving...",
@@ -2275,7 +2281,10 @@
         "summary": "Rating {{course}} at {{score}}",
         "summaryShare": ", posting to the Clubhouse",
         "threshold": "Yours would be the {{ordinal}} rating here — the breakdown bars go live on the course page.",
-        "skipToPost": "Post without rating it"
+        "skipToPost": "Post without rating it",
+        "captionUntouched": "Starts at {{score}} — drag to change it",
+        "confirmPost": "Post at {{score}}",
+        "confirmSave": "Save at {{score}}"
       },
       "uploadingMedia": "Uploading photos..."
     },
