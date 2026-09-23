@@ -35,6 +35,11 @@ import {
   surfaceWithAlpha,
 } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
+import {
+  isCanvasDarkRoute,
+  isDarkChromeRoute,
+  isImmersiveRoute,
+} from '@/components/header/globalHeaderRules';
 
 describe('canonical member surface tokens', () => {
   it('preserves every consolidated surface value exactly', () => {
@@ -317,5 +322,40 @@ describe('canonical member surface tokens', () => {
     expect(source).toContain('backgroundColor = PROFILE_PILL_SURFACES.hover');
     expect(source).not.toContain('profile-pill-inactive');
     expect(source).not.toContain('--profile-pill-hover');
+  });
+
+  it('keeps every named arrival screen on the dark ramp', () => {
+    const arrivalPaths = [
+      'src/pages/auth/AuthCallback.tsx',
+      'src/pages/public/JoinLandingPage.tsx',
+      'src/pages/NotFound.tsx',
+      'src/components/DeletedAccountScreen.tsx',
+    ];
+    for (const path of arrivalPaths) {
+      const source = readFileSync(resolve(process.cwd(), path), 'utf8');
+      expect(source, path).toContain('PAGE_CANVAS');
+      expect(source, path).toContain("from '@/lib/tokens/surface'");
+      expect(source, path).not.toMatch(/#F8FAFC|#FFFFFF|#FFF\b|#0F172A|#64748B|#94A3B8/);
+    }
+
+    const authCallback = readFileSync(resolve(process.cwd(), 'src/pages/auth/AuthCallback.tsx'), 'utf8');
+    expect(authCallback).toContain('MEMBER_PANEL');
+    expect(authCallback).toContain('rgba(247,147,30,0.10)');
+    expect(authCallback).toContain('rgba(247,147,30,0.04)');
+
+    const join = readFileSync(resolve(process.cwd(), 'src/pages/public/JoinLandingPage.tsx'), 'utf8');
+    expect(join).toContain('MEMBER_PANEL');
+    expect(join).toContain('INK_ON_LIGHT');
+
+    const deleted = readFileSync(resolve(process.cwd(), 'src/components/DeletedAccountScreen.tsx'), 'utf8');
+    expect(deleted).not.toContain('LIGHT_ROUTE_CANVAS');
+  });
+
+  it('keeps signed-out arrival routes on opaque dark route chrome', () => {
+    for (const path of ['/auth/callback', '/join', '/i/test-invite', '/missing-page']) {
+      expect(isDarkChromeRoute(path), path).toBe(true);
+      expect(isImmersiveRoute(path), path).toBe(false);
+      expect(isCanvasDarkRoute(path), path).toBe(false);
+    }
   });
 });

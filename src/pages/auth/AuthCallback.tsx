@@ -4,6 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { MEMBER_PANEL, PAGE_CANVAS, inkWithAlpha, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { SURFACE } from '@/lib/tokens/surface';
+
+const INK = SURFACE.dark.ink;
+const BODY_INK = SURFACE.dark.body ?? SURFACE.dark.mute;
+const MUTE_INK = SURFACE.dark.mute;
+const DIM_INK = SURFACE.dark.dim;
 
 export default function AuthCallback() {
   const { t } = useTranslation('auth');
@@ -99,7 +106,7 @@ export default function AuthCallback() {
           alignItems: 'center',
           justifyContent: 'center',
           padding: '40px 24px',
-          background: 'radial-gradient(ellipse 70% 50% at 50% -10%, rgba(247,147,30,0.10) 0%, transparent 60%), radial-gradient(ellipse 100% 80% at 50% 110%, rgba(247,147,30,0.04) 0%, transparent 60%), #F8FAFC',
+          background: `radial-gradient(ellipse 70% 50% at 50% -10%, rgba(247,147,30,0.10) 0%, transparent 60%), radial-gradient(ellipse 100% 80% at 50% 110%, rgba(247,147,30,0.04) 0%, transparent 60%), ${PAGE_CANVAS}`,
         }}
       >
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, textAlign: 'center', maxWidth: 380, width: '100%' }}>
@@ -110,17 +117,17 @@ export default function AuthCallback() {
             className="h-16 w-auto opacity-90"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#0F172A', lineHeight: 1.2, letterSpacing: '-0.3px', margin: 0 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: INK, lineHeight: 1.2, letterSpacing: 0, margin: 0 }}>
             {t('callback.verifiedTitle')}
           </h1>
-          <p style={{ fontSize: 15, fontWeight: 300, color: '#64748B', lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
+          <p style={{ fontSize: 15, fontWeight: 400, color: BODY_INK, lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
             {t('callback.verifiedBody')}
           </p>
-          <p style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.5, maxWidth: 260, margin: 0 }}>
+          <p style={{ fontSize: 12, color: DIM_INK, lineHeight: 1.5, maxWidth: 260, margin: 0 }}>
             {t('callback.closePage')}
           </p>
         </div>
-        <div style={{ position: 'fixed', bottom: 28, left: 0, right: 0, textAlign: 'center', fontSize: 11, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        <div style={{ position: 'fixed', bottom: 28, left: 0, right: 0, textAlign: 'center', fontSize: 11, color: DIM_INK, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           {t('callback.brandTagline')}
         </div>
       </div>
@@ -131,15 +138,15 @@ export default function AuthCallback() {
     <div
       className="fixed inset-0 flex flex-col items-center justify-center"
       style={{
-        background: 'radial-gradient(ellipse 120% 80% at 50% 20%, #FFFFFF 0%, #F8FAFC 100%)',
+        background: `radial-gradient(ellipse 120% 80% at 50% 20%, ${MEMBER_PANEL} 0%, ${PAGE_CANVAS} 100%)`,
       }}
     >
       <div
         className="flex flex-col items-center gap-4 p-8 rounded-3xl"
         style={{
-          background: '#FFFFFF',
-          border: '0.5px solid rgba(15,23,42,0.07)',
-          boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
+          background: MEMBER_PANEL,
+          border: `0.5px solid ${SURFACE.dark.hairline}`,
+          boxShadow: `0 10px 30px ${surfaceWithAlpha(PAGE_CANVAS, 0.48)}`,
         }}
       >
         <img
@@ -148,8 +155,8 @@ export default function AuthCallback() {
           alt="clbhouz"
           className="h-10 w-auto opacity-80"
         />
-        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(15,23,42,0.10)', borderTopColor: '#0F172A' }} aria-label={t('a11y.loading')} />
-        <p className="text-sm" style={{ color: '#64748B' }} aria-live="polite">{message}</p>
+        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: inkWithAlpha(INK, 0.10), borderTopColor: INK }} aria-label={t('a11y.loading')} />
+        <p className="text-sm" style={{ color: MUTE_INK }} aria-live="polite">{message}</p>
       </div>
     </div>
   );
