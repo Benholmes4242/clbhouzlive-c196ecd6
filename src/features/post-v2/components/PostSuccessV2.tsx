@@ -23,7 +23,7 @@ import { subscribeToJob, getJobSnapshot } from '../lib/postUploadController';
 import type { UploadJobSnapshot } from '../lib/postUploadController';
 import { ImmersiveSuccessShell } from './ImmersiveSuccessShell';
 import { CT, CT_DARK } from '@/features/_shared/composerTokens';
-import { COMPOSER_SHELL_SURFACE, inkWithAlpha } from '@/lib/tokens/surfaces';
+import { COMPOSER_SHELL_SURFACE, inkWithAlpha, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
