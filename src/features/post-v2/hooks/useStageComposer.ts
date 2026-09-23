@@ -50,6 +50,9 @@ export interface StageCourse {
   id: string;
   name: string;
   country?: string | null;
+  /** Course photo, when the source query fetched one. Optional: the
+   *  post-v2 tagging paths do not need it and do not set it. */
+  thumbnail?: string | null;
 }
 
 export const MAX_MEDIA = 10;
