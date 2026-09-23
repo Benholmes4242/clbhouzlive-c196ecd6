@@ -20,7 +20,17 @@ export interface ProfileRound {
   albatrosses: number | null;
   holes_in_one: number | null;
   clean_card: boolean | null;
+  /** From whs_scores (joined on whs_score_id). null = the row did not come back. */
+  is_nine_hole: boolean | null;
+  total_holes: number | null;
+  course_handicap: number | null;
+  /** false when the viewer could not read the whs_scores row — treat as unknown, never as 18. */
+  whs_joined: boolean;
 }
+
+/** The canonical round-unit test (PersonalBestsSection). Unknown rows fail it. */
+export const isFullEighteen = (s: ProfileRound) =>
+  s.whs_joined && !s.is_nine_hole && s.total_holes === 18;
 
 /** How many of this member's rounds the VIEWER may see. 0 = no tab. */
 export function useProfileRoundsCount(userId: string | undefined, enabled = true) {
@@ -55,7 +65,28 @@ export function useProfileRounds(userId: string | undefined) {
         .order('created_at', { ascending: false })
         .limit(1000);
       if (error) throw error;
-      return (data ?? []) as ProfileRound[];
+      const base = (data ?? []) as Omit<ProfileRound, 'is_nine_hole' | 'total_holes' | 'course_handicap' | 'whs_joined'>[];
+      // Join whs_scores as the viewer (RLS: own / friend / whs_connection_publicly_visible).
+      const ids = base.map((r) => r.whs_score_id);
+      const whs = new Map<string, { is_nine_hole: boolean | null; total_holes: number | null; course_handicap: number | null }>();
+      for (let i = 0; i < ids.length; i += 200) {
+        const { data: w, error: we } = await supabase
+          .from('whs_scores')
+          .select('id, is_nine_hole, total_holes, course_handicap')
+          .in('id', ids.slice(i, i + 200));
+        if (we) throw we;
+        for (const row of (w ?? []) as any[]) whs.set(row.id, row);
+      }
+      return base.map((r) => {
+        const w = whs.get(r.whs_score_id);
+        return {
+          ...r,
+          is_nine_hole: w?.is_nine_hole ?? null,
+          total_holes: w?.total_holes ?? null,
+          course_handicap: w?.course_handicap ?? null,
+          whs_joined: !!w,
+        } as ProfileRound;
+      });
     },
   });
 }
