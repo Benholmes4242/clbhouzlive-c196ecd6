@@ -29,6 +29,21 @@ export type Database = {
         }
         Relationships: []
       }
+      _feed_v3_backup_20260923: {
+        Row: {
+          def: string | null
+          saved_at: string | null
+        }
+        Insert: {
+          def?: string | null
+          saved_at?: string | null
+        }
+        Update: {
+          def?: string | null
+          saved_at?: string | null
+        }
+        Relationships: []
+      }
       _par_race_test: {
         Row: {
           actual_gross: number | null
