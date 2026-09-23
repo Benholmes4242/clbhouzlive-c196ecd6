@@ -62,7 +62,18 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
   // TILE A IS SELECTED WHEN THE SCREEN OPENS — a rating is the outcome worth
   // defaulting to, and a plain post is one tap away.
   const [kind, setKind] = useState<Kind>('review');
-  const [course, setCourse] = useState<{ id: string; name: string } | null>(null);
+  /* A CHOSEN COURSE MUST BE DRAWABLE, not just identifiable. A search
+     pick is not in the recent list — CourseTagSheet is passed
+     excludeReviewedForUserId and searching is for courses you have NOT
+     recently played — so the row has to be built from what the pick
+     itself carries. thumbnail and when are absent for a search pick
+     and the row must read correctly without them. */
+  const [course, setCourse] = useState<{
+    id: string;
+    name: string;
+    thumbnail: string | null;
+    when: string | null;
+  } | null>(null);
   const [courseOpen, setCourseOpen] = useState(false);
 
   const { data: courses = [] } = useRecentCoursesForComposer(open);
@@ -109,8 +120,20 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
   };
 
   const pickRecent = (c: ComposerRecentCourse) => {
+    /* TAPPING THE CHOSEN COURSE CLEARS IT. A member who taps the wrong
+       row currently cannot undo it, only overwrite it. Returns before
+       the analytics call — a deselect is not a source event. */
+    if (course?.id === c.courseId) {
+      setCourse(null);
+      return;
+    }
     analyticsEvents.track('composer_course_source', { source: 'recent' });
-    setCourse({ id: c.courseId, name: c.courseName });
+    setCourse({
+      id: c.courseId,
+      name: c.courseName,
+      thumbnail: c.thumbnail,
+      when: c.when,
+    });
   };
 
   const canAdvance = kind === 'post' || !!course;
@@ -192,14 +215,31 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
                 <span style={{ flex: 1, minWidth: 0 }}>{t('course.searchAll')}</span>
               </button>
 
-              {hasCourses ? (
+              {course ? (
+                /* THE CHOSEN COURSE, ALONE. The suggestions are what you pick FROM;
+                   once something is picked they are noise, and showing only the
+                   choice is what confirms a search pick — which otherwise returned
+                   the member to an unchanged screen. */
+                <div style={{ marginTop: 18 }}>
+                  <CourseRow
+                    course={{
+                      courseId: course.id,
+                      courseName: course.name,
+                      thumbnail: course.thumbnail,
+                      when: course.when,
+                    }}
+                    selected
+                    onPick={() => setCourse(null)}
+                  />
+                </div>
+              ) : hasCourses ? (
                 <>
                   <Label text={t('course.recent')} />
                   {courses.map((c) => (
                     <CourseRow
                       key={c.courseId}
                       course={c}
-                      selected={course?.id === c.courseId}
+                      selected={false}
                       onPick={() => pickRecent(c)}
                     />
                   ))}
@@ -266,7 +306,7 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
         title={t('course.pickerTitle')}
         selectionMode="single"
         onClose={() => setCourseOpen(false)}
-        selected={[]}
+        selected={course ? [{ id: course.id, name: course.name }] : []}
         userId={profile?.id ?? null}
         excludeReviewedForUserId={profile?.id ?? null}
         onDone={(cs) => {
@@ -274,7 +314,7 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
           setCourseOpen(false);
           if (!c) return;
           analyticsEvents.track('composer_course_source', { source: 'search' });
-          setCourse({ id: c.id, name: c.name });
+          setCourse({ id: c.id, name: c.name, thumbnail: null, when: null });
         }}
       />
     </>
@@ -364,7 +404,12 @@ function CourseRow({
   selected,
   onPick,
 }: {
-  course: ComposerRecentCourse;
+  course: {
+    courseId: string;
+    courseName: string;
+    thumbnail: string | null;
+    when: string | null;
+  };
   selected: boolean;
   onPick: () => void;
 }) {
@@ -422,9 +467,14 @@ function CourseRow({
         >
           {course.courseName}
         </span>
-        <span style={{ display: 'block', marginTop: 2, fontSize: 12, color: CT.muted }}>
-          {t('course.played', { when: course.when })}
-        </span>
+        {/* NO PLAY DATE, NO SUBTITLE. A course found by search has never
+            been played by this member, so "Played ..." would be false. The
+            row is one line in that case, deliberately. */}
+        {course.when && (
+          <span style={{ display: 'block', marginTop: 2, fontSize: 12, color: CT.muted }}>
+            {t('course.played', { when: course.when })}
+          </span>
+        )}
       </span>
       {selected && <Check size={17} strokeWidth={3} color={CT.success} style={{ flexShrink: 0 }} />}
     </button>
