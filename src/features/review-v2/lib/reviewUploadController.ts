@@ -238,6 +238,7 @@ export function subscribeToReviewUpload(key: string, listener: Listener): () => 
  *  three, because error_message is what phase 3 shows and what we read when
  *  diagnosing a failure. */
 function errText(e: unknown, fallback: string): string {
+  if (typeof e === 'string') return e || fallback;
   const o = (e ?? {}) as { message?: string; details?: string; code?: string };
   const parts = [o.code, o.message, o.details].filter(Boolean) as string[];
   return parts.length > 0 ? parts.join(' | ') : fallback;
