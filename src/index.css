@@ -3317,36 +3317,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   .container { @apply max-w-6xl; }
 
-  /* Discover Page Specific Pills with Brand Orange */
-  .discover-pill {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2
-           select-none whitespace-nowrap
-           backdrop-blur-md bg-gray-50/80 text-gray-700
-           border border-gray-200/60 shadow-none
-           transition-all duration-200;
-    line-height: 1;
-    scroll-snap-align: start;
-  }
-
-  .discover-pill:hover {
-    @apply border-brand-orange/30 bg-brand-orange/5;
-  }
-
-  .discover-pill:focus-visible {
-    @apply outline-none ring-2 ring-brand-orange ring-offset-2;
-  }
-
-  .discover-pill--active {
-    @apply bg-brand-orange text-white border-brand-orange shadow-md;
-  }
-
-  .discover-pill__icon {
-    @apply w-4 h-4 flex-shrink-0;
-  }
-
-  .discover-pill__label {
-    @apply font-medium;
-  }
 
 @media (max-width: 960px) {
   .container {
