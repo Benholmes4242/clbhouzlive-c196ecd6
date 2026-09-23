@@ -28,7 +28,7 @@ import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { SC_BOGEY_DARK, SC_DOUBLE_DARK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { BAND_GREEN_DARK } from '@/features/courses/_shared/scoreBandTokens';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { MEMBER_PANEL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 /**
  * Canonical to-par RED, reused (not redeclared) from the tour tokens so one
@@ -38,7 +38,7 @@ export const TOPAR_RED = TOPAR_UNDER_DARK;
 
 export const A = {
   CANVAS: PAGE_CANVAS,
-  PANEL: '#1B1E27',
+  PANEL: MEMBER_PANEL,
   BORDER: 'rgba(255,255,255,0.10)',
   INK: '#F8FAFC',
   MUTE: 'rgba(248,250,252,0.62)',

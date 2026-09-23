@@ -22,6 +22,7 @@ import { ChevronRight } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRatingValue } from '@/utils/formatters';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import { FEED_CARD_SURFACE } from '@/lib/tokens/surfaces';
 
 /**
  * TONE MAP — the band renders on the dark Clubhouse slab AND on the light
@@ -66,7 +67,7 @@ const TONES: Record<CourseBandTone, ToneMap> = {
   },
 };
 /** Solid feed card surface, used to keep the actions row off the photo backdrop. */
-const OPAQUE_SURFACE = '#10151C';
+const OPAQUE_SURFACE = FEED_CARD_SURFACE;
 
 const MONO =
   'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';

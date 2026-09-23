@@ -60,13 +60,14 @@ import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
+import { SLAB } from './feedSurfaces';
 
 
 
 // Full-bleed slab chrome — the post slab is #10151C and the feed canvas behind
 // it (#05070A) is darker, so the gap between posts does the separating.
 // Text constants flip to light-on-dark; LINE becomes a white hairline.
-const CARD = '#10151C';
+const CARD = SLAB;
 const T100 = '#F8FAFC';
 const T60 = 'rgba(248,250,252,0.65)';
 const T40 = 'rgba(248,250,252,0.45)';
@@ -770,7 +771,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 // See MEDIA_CHROME_RESERVE / REVIEW_HEADER_EXTRA above.
                 maxHeight: mediaMaxHeight(!!post.isReview),
                 overflow: 'hidden',
-                background: '#10151C',
+                background: CARD,
               }}
 
             >

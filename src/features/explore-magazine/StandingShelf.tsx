@@ -21,6 +21,7 @@ import {
 import { effectiveStandingBoard, useStandingBoards } from './useStandingBoards';
 import { useViewerIdentity } from './useViewerIdentity';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 
 /**
@@ -228,7 +229,7 @@ function BoardSelector({
             right: 0,
             zIndex: 5,
             minWidth: 128,
-            background: '#1B1E27',
+            background: MEMBER_PANEL,
             border: `0.5px solid ${A.HAIRLINE}`,
             borderRadius: 10,
             overflow: 'hidden',

@@ -11,6 +11,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { FIGS, TITLE } from '@/lib/tokens/type';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 interface Course {
   id: string;
@@ -195,7 +196,7 @@ export function CourseSearchSheet({
             style={{
               maxHeight: 'min(85dvh, calc(100dvh - max(env(safe-area-inset-top, 47px), 47px) - 20px))',
               paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : 0,
-              backgroundColor: '#1B1E27',
+              backgroundColor: MEMBER_PANEL,
             }}
           >
             {/* Handle bar */}

@@ -2,6 +2,7 @@ import React from 'react';
 import type { BadgeRarity } from '@/lib/gam/types';
 import { rarityColor, rarityColorSoft } from '@/lib/gam/visuals';
 import { Skeleton as BaseSkeleton } from '@/components/ui/skeleton';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -54,7 +55,7 @@ export const GamCard: React.FC<{
       onTouchEnd={onClick ? () => setPressed(false) : undefined}
       onTouchCancel={onClick ? () => setPressed(false) : undefined}
       style={{
-        background: '#1B1E27',
+        background: MEMBER_PANEL,
         border: emphasized ? '1px solid rgba(255,255,255,0.10)' : '1px solid rgba(255,255,255,0.06)',
         borderRadius: 12,
         padding: noPad ? 0 : 16,
@@ -98,7 +99,7 @@ export const RetryStub: React.FC<{ message?: string; onRetry?: () => void }> = (
 }) => (
   <div
     style={{
-      background: '#1B1E27',
+      background: MEMBER_PANEL,
       border: '1px solid rgba(255,255,255,0.06)',
       borderRadius: 12,
       padding: 16,
@@ -140,7 +141,7 @@ export const EmptyStub: React.FC<{
 }> = ({ icon, title, body, cta }) => (
   <div
     style={{
-      background: '#1B1E27',
+      background: MEMBER_PANEL,
       border: '1px solid rgba(255,255,255,0.06)',
       borderRadius: 12,
       padding: 28,

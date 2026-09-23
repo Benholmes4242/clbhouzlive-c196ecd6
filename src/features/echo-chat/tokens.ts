@@ -19,14 +19,19 @@
  */
 
 import type React from 'react';
+import {
+  ECHO_RAISED_SURFACE,
+  FEED_CARD_SURFACE,
+  IMMERSIVE_FEED_CANVAS,
+} from '@/lib/tokens/surfaces';
 
 export const EC = {
   /** The Clubhouse canvas. Echo renders no photograph in any state (§2). */
-  BLACK: '#05070A',
+  BLACK: IMMERSIVE_FEED_CANVAS,
   /** A chart's card. Solid, not the canvas at an alpha. */
-  PANEL: '#10151C',
+  PANEL: FEED_CARD_SURFACE,
   /** Track behind a bar. */
-  RAISED: '#181F28',
+  RAISED: ECHO_RAISED_SURFACE,
   /** Hairline / border. */
   LINE: '#252E39',
   /** Ink tier 1 — the member's bubble text sits on white, so this is the ink. */

@@ -6,6 +6,7 @@ import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 const AMBER = '#F7931E';
 /**
@@ -19,7 +20,7 @@ const AMBER = '#F7931E';
  */
 const CARD_TOP = '#262B37';
 const CARD_MID = '#1F232E';
-const CARD_END = '#1B1E27';
+const CARD_END = MEMBER_PANEL;
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 

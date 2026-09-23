@@ -4,6 +4,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Clock, Trash2, Calendar, Play, Pencil } from 'lucide-react';
 import { formatMonthDayYearShort, formatTimeHm } from '@/i18n/format';
 import { useScheduledPosts, ScheduledPost } from '@/hooks/useScheduledPosts';
+import { MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 interface ScheduledPostsListProps {
   isOpen: boolean;
@@ -49,7 +50,7 @@ const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
           <div className="flex items-center justify-between px-4 pb-3 border-b border-white/10">
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-semibold text-[#F2F4F7]">Scheduled Posts</h2>
-              <span className="px-2 py-0.5 rounded-full bg-[#20242E] text-[rgba(242,244,247,0.55)] text-xs font-medium border border-white/10">
+              <span className="px-2 py-0.5 rounded-full text-[rgba(242,244,247,0.55)] text-xs font-medium border border-white/10" style={{ backgroundColor: MEMBER_CELL }}>
                 {scheduledPosts.length}
               </span>
             </div>
@@ -78,7 +79,8 @@ const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
                 return (
                   <div
                     key={post.id}
-                    className="p-3 bg-[#1B1E27] rounded-2xl border border-white/10 space-y-3 hover:border-white/20 transition-colors"
+                    className="p-3 rounded-2xl border border-white/10 space-y-3 hover:border-white/20 transition-colors"
+                    style={{ backgroundColor: MEMBER_PANEL }}
                   >
                     <div className="flex items-start gap-3">
                       {/* Thumbnail */}
@@ -86,10 +88,11 @@ const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
                         <img
                           src={thumbnail}
                           alt="Post thumbnail"
-                          className="w-14 h-14 rounded-xl object-cover bg-[#20242E] flex-shrink-0"
+                          className="w-14 h-14 rounded-xl object-cover flex-shrink-0"
+                          style={{ backgroundColor: MEMBER_CELL }}
                         />
                       ) : (
-                        <div className="w-14 h-14 rounded-xl bg-[#20242E] flex-shrink-0 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: MEMBER_CELL }}>
                           <Calendar className="w-6 h-6 text-[rgba(242,244,247,0.38)]" />
                         </div>
                       )}
@@ -112,7 +115,8 @@ const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
                       <button
                         onClick={() => handleDelete(post.id)}
                         disabled={isDeleting}
-                        className="w-8 h-8 rounded-xl bg-[#20242E] border border-white/10 flex items-center justify-center text-[rgba(242,244,247,0.38)] hover:text-red-500 hover:bg-red-50 hover:border-red-200 transition-colors flex-shrink-0 disabled:opacity-50"
+                        className="w-8 h-8 rounded-xl border border-white/10 flex items-center justify-center text-[rgba(242,244,247,0.38)] hover:text-red-500 hover:bg-red-50 hover:border-red-200 transition-colors flex-shrink-0 disabled:opacity-50"
+                        style={{ backgroundColor: MEMBER_CELL }}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -131,7 +135,8 @@ const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
                       {onEditPost && (
                         <button 
                           onClick={() => onEditPost(post)}
-                          className="px-3 py-1.5 rounded-xl bg-[#20242E] text-[#F2F4F7] border border-white/10 text-xs font-medium hover:bg-white/10 transition-colors flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded-xl text-[#F2F4F7] border border-white/10 text-xs font-medium hover:bg-white/10 transition-colors flex items-center gap-1.5"
+                          style={{ backgroundColor: MEMBER_CELL }}
                         >
                           <Pencil className="w-3 h-3" />
                           Edit

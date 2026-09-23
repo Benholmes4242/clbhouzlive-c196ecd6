@@ -15,14 +15,14 @@
  * pastels: a washed-out saturated hue reads as failed on a dark canvas.
  */
 
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { MEMBER_PANEL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 export const V4 = {
   // Canvas
   // NON-MERGE: #15171F is also CHARCOAL and SLATE_50 in
   // features/tourhub/_shared/tokens.ts. Three names, one value, three
   // reasons — see the two existing notes there. Deliberately not converged.
   bg: PAGE_CANVAS,
-  surface: '#1B1E27',
+  surface: MEMBER_PANEL,
   cardBorder: 'rgba(255,255,255,0.10)',
   // A card on dark is separated by its surface step and its hairline. A drop
   // shadow only adds a smudge — if a card reads flat, raise `surface`.

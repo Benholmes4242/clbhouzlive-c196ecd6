@@ -9,6 +9,7 @@ import { recordPostViewOnce } from '@/hooks/usePostViewTracker';
 import { mapActivityPostToFeedPost } from '@/lib/activityPostMapper';
 import type { ActivityPost } from '@/components/profile/types/ActivityTypes';
 import { MentionText } from '@/components/mentions/MentionText';
+import { POST_DEEP_LINK_CANVAS } from '@/lib/tokens/surfaces';
 
 interface PostPreview {
   id: string;
@@ -365,7 +366,7 @@ const PostDeepLinkPage: React.FC = () => {
   // --- Loading ---
   if (isLoading || authLoading) {
     return (
-      <div className="fixed inset-0 bg-[#0D0F11] flex items-center justify-center z-50">
+      <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: POST_DEEP_LINK_CANVAS }}>
         <Loader2 className="w-8 h-8 animate-spin text-white/40" />
       </div>
     );
@@ -374,7 +375,7 @@ const PostDeepLinkPage: React.FC = () => {
   // --- Load error (network/query failure) ---
   if (loadError) {
     return (
-      <div className="fixed inset-0 bg-[#0D0F11] flex flex-col items-center justify-center z-50 px-6">
+      <div className="fixed inset-0 flex flex-col items-center justify-center z-50 px-6" style={{ backgroundColor: POST_DEEP_LINK_CANVAS }}>
         <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
           <span className="text-2xl">⚠️</span>
         </div>
@@ -405,7 +406,7 @@ const PostDeepLinkPage: React.FC = () => {
   // the scrim is only correct while the overlay is genuinely about to mount.
   if (notFound || !post || (user && !feedPost)) {
     return (
-      <div className="fixed inset-0 bg-[#0D0F11] flex flex-col items-center justify-center z-50 px-6">
+      <div className="fixed inset-0 flex flex-col items-center justify-center z-50 px-6" style={{ backgroundColor: POST_DEEP_LINK_CANVAS }}>
         <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
           <span className="text-2xl">⛳</span>
         </div>
@@ -437,7 +438,7 @@ const PostDeepLinkPage: React.FC = () => {
   const isVideo = mediaUrl ? isVideoUrl(mediaUrl) : false;
 
   return (
-    <div className="fixed inset-0 bg-[#0D0F11] z-50 flex flex-col">
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ backgroundColor: POST_DEEP_LINK_CANVAS }}>
       {/* Full-screen media */}
       <div className="absolute inset-0" style={{ background: gradient }}>
         {mediaUrl && isVideo && (

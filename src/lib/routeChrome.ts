@@ -1,4 +1,11 @@
-import { PAGE_CANVAS, STATUS_BAR_CANVAS } from '@/lib/tokens/surfaces';
+import {
+  IMMERSIVE_FEED_STATUS_BAR,
+  LIGHT_IMMERSIVE_CANVAS,
+  LIGHT_ROUTE_CANVAS,
+  LIGHT_ROUTE_STATUS_BAR,
+  PAGE_CANVAS,
+  STATUS_BAR_CANVAS,
+} from '@/lib/tokens/surfaces';
 import {
   CANVAS_DARK_CANVAS,
   isCanvasDarkRoute,
@@ -94,13 +101,13 @@ export function applyRouteChrome(pathname: string, force = false): void {
     : darkChrome
     ? PAGE_CANVAS
     : immersive
-      ? (lightImmersive ? '#F8FAFC' : '#0F172A')
-      : '#F8FAFC';
+      ? (lightImmersive ? LIGHT_ROUTE_CANVAS : LIGHT_IMMERSIVE_CANVAS)
+      : LIGHT_ROUTE_CANVAS;
   const shieldColor = canvasDark
     ? CANVAS_DARK_CANVAS
     : immersive
       ? 'transparent'
-      : (darkChrome ? PAGE_CANVAS : '#F8FAFC');
+      : (darkChrome ? PAGE_CANVAS : LIGHT_ROUTE_CANVAS);
 
   // Status bar icon intent (see useMedianStatusBar for the inverted mapping):
   //   'dark'  intent = DARK icons  (for a LIGHT background)
@@ -110,14 +117,14 @@ export function applyRouteChrome(pathname: string, force = false): void {
   // - immersive light/dark (hero photo behind) -> transparent, dark icons
   // - default light (#F8FAFC notch)            -> opaque light, dark icons
   const statusBar = canvasDark
-    ? { style: 'light' as const, color: 'FF05070A' }
+    ? { style: 'light' as const, color: IMMERSIVE_FEED_STATUS_BAR }
     : darkChrome
     ? (immersive
         ? { style: 'light' as const, color: '00000000' }
         : { style: 'light' as const, color: STATUS_BAR_CANVAS })
     : immersive
       ? { style: 'dark' as const, color: '00000000' }
-      : { style: 'dark' as const, color: 'FFF8FAFC' };
+      : { style: 'dark' as const, color: LIGHT_ROUTE_STATUS_BAR };
 
   const sbKey = `${statusBar.style}|${statusBar.color}`;
   const prev = force ? undefined : ((window as any).__lvChromeCache as ChromeCache | undefined);

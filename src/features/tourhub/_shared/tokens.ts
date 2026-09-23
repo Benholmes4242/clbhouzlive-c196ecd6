@@ -29,7 +29,7 @@
  * - FONT        → canonical font stack (was 5 different stacks before)
  */
 
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { MEMBER_PANEL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 // ============================================================================
 // INK (text on DARK surface — names historical)
 // ============================================================================
@@ -43,7 +43,7 @@ export const INK_LIGHT = 'rgba(248,250,252,0.28)';
 // ============================================================================
 // SURFACE (background fills for cards on DARK theme — raised panel)
 // ============================================================================
-export const SURFACE = '#1B1E27';
+export const SURFACE = MEMBER_PANEL;
 
 // ============================================================================
 // SLATE (neutrals on DARK surface)
