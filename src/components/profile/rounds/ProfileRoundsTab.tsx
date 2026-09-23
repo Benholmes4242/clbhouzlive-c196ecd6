@@ -4,7 +4,9 @@
  * Missing data is ABSENT, never approximated:
  *  - course_par null  → no to-par; excluded from the form strip and the
  *                       to-par average. The round still lists with its gross.
- *  - hcp_at_time null → excluded from the form strip.
+ *  - course_handicap null (whs_scores) → excluded from the form strip.
+ *  - not a full eighteen (isFullEighteen, PersonalBestsSection's test) →
+ *    listed and marked, but out of Best, Average, to-par and form.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +18,7 @@ import { formatDayMonthShortGB, formatNumber } from '@/i18n/format';
 import { A, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { ABOUT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
 import { YouFigure } from '@/components/courses/course-detail/you/youBits';
-import { useOwnHandicapVisibility, useProfileRounds, type ProfileRound } from './useProfileRounds';
+import { isFullEighteen, useOwnHandicapVisibility, useProfileRounds, type ProfileRound } from './useProfileRounds';
 
 interface Props {
   userId: string;
@@ -34,8 +36,8 @@ function parseDate(v: string): Date {
 }
 
 function formValue(r: ProfileRound): number | null {
-  if (r.gross_score == null || r.course_par == null || r.hcp_at_time == null) return null;
-  return r.gross_score - (r.course_par + Number(r.hcp_at_time));
+  if (!isFullEighteen(r) || r.gross_score == null || r.course_par == null || r.course_handicap == null) return null;
+  return r.gross_score - (r.course_par + Number(r.course_handicap));
 }
 
 const fmt1 = (n: number) => n.toFixed(1);
@@ -72,10 +74,11 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
   const [openId, setOpenId] = React.useState<string | null>(null);
 
   const stats = React.useMemo(() => {
-    const grosses = rounds.map((r) => r.gross_score).filter((g): g is number => g != null);
+    const full = rounds.filter(isFullEighteen);
+    const grosses = full.map((r) => r.gross_score).filter((g): g is number => g != null);
     const best = grosses.length ? Math.min(...grosses) : null;
     const avg = grosses.length ? grosses.reduce((a, b) => a + b, 0) / grosses.length : null;
-    const withPar = rounds.filter((r) => r.gross_score != null && r.course_par != null);
+    const withPar = full.filter((r) => r.gross_score != null && r.course_par != null);
     const avgToPar = withPar.length
       ? withPar.reduce((a, r) => a + (r.gross_score! - r.course_par!), 0) / withPar.length
       : null;
@@ -132,7 +135,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
     for (const r of rounds) {
       const y = parseDate(r.play_date).getFullYear();
       count.set(y, (count.get(y) ?? 0) + 1);
-      if (r.gross_score != null) acc.set(y, [...(acc.get(y) ?? []), r.gross_score]);
+      if (r.gross_score != null && isFullEighteen(r)) acc.set(y, [...(acc.get(y) ?? []), r.gross_score]);
     }
     count.forEach((n, y) => {
       const g = acc.get(y) ?? [];
@@ -224,7 +227,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
           </p>
           {stats.form.length < stats.lastCount ? (
             <p style={{ margin: '4px 0 0', fontSize: 11, color: CHART.DIM, ...FIGS }}>
-              {t('rounds.form.missing', '{{k}} of the last {{total}} have no par or handicap on record.', {
+              {t('rounds.form.missing', '{{k}} of the last {{total}} are left out: nine holes, or no par or course handicap on record.', {
                 k: stats.lastCount - stats.form.length,
                 total: stats.lastCount,
               })}
@@ -256,9 +259,10 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
           const header = sort === 'recent' && y !== lastYear;
           lastYear = y;
           const meta = yearMeta.get(y);
-          const toPar = r.gross_score != null && r.course_par != null ? r.gross_score - r.course_par : null;
+          const full18 = isFullEighteen(r);
+          const toPar = full18 && r.gross_score != null && r.course_par != null ? r.gross_score - r.course_par : null;
           const parts = toPar != null ? toParParts(toPar, 0) : null;
-          const isBest = stats.best != null && r.gross_score === stats.best;
+          const isBest = full18 && stats.best != null && r.gross_score === stats.best;
           const fs = feats(r);
           return (
             <React.Fragment key={r.whs_score_id}>
@@ -282,8 +286,13 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
                   <span style={{ display: 'block', fontSize: 14, fontWeight: 600, color: CHART.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {r.course_name ?? '\u2014'}
                   </span>
-                  {fs.length ? (
+                  {fs.length || !full18 ? (
                     <span style={{ display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap' }}>
+                      {!full18 ? (
+                        <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: CHART.MUTE, border: `1px solid ${CHART.BORDER}`, borderRadius: 999, padding: '3px 6px', whiteSpace: 'nowrap' }}>
+                          {r.whs_joined && r.is_nine_hole ? t('rounds.nineHoles', '9 holes') : t('rounds.notFull', 'Not a full 18')}
+                        </span>
+                      ) : null}
                       {fs.map((f) => <FeatPill key={f} label={f} />)}
                     </span>
                   ) : null}
