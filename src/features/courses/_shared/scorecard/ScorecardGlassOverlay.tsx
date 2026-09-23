@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { pushSheetEntry, releaseSheetEntry } from '@/components/ui/sheetHistory';
 import { Z } from '@/config/zIndex';
 import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const AXIS_LOCK_PX = 8;
 const AXIS_RATIO = 1.2;
@@ -279,7 +280,10 @@ export function ScorecardGlassOverlay({
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          background: 'var(--page-canvas, #0d0d0d)',
+          /* CANVAS BY REFERENCE. This used to read a CSS variable named for the
+             page canvas that was declared nowhere, so its literal fallback was
+             what rendered — a near-black off the ramp. */
+          background: PAGE_CANVAS,
           /* THE PAGE WEARS THE SHARED ISLANDS, so it starts below them. The
              first child of this branch is the scorecard's FEAT BAND, which
              was rendering underneath the island. CHROME_CLEARANCE resolves
