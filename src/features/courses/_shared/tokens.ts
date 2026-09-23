@@ -1,4 +1,4 @@
-import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+import { DISCOVER_SHELL_SURFACE, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 /**
  * Courses feature DARK design tokens.
@@ -24,7 +24,7 @@ export const INK_ALPHA_60 = 'rgba(248,250,252,0.62)';       // supporting text �
 
 /* ── Surfaces ───────────────────────────────────────────────────────── */
 export const SURFACE = MEMBER_PANEL;                         // canonical panel surface
-export const SHELL_BG = '#0A0E14';                          // dark shell band (matches global header)
+export const SHELL_BG = DISCOVER_SHELL_SURFACE;              // dark shell band (matches global header)
 /*
  * BRIEF_SHEET_BACKGROUND_CANON_02 §2 — COLLAPSED. This module's `SLATE_50`
  * meant "page canvas", which is exactly what `A.CANVAS` in

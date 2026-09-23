@@ -17,7 +17,7 @@ import { pushSheetEntry, releaseSheetEntry } from './sheetHistory';
  * band, it uses a hairline or a PANEL panel INSIDE the body — never a second
  * full-width fill, which is what produced the seams this brief removed.
  */
-import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
+import { SHEET_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 export { SHEET_SURFACE };
 
 
@@ -582,7 +582,7 @@ export function BottomSheet({
             style={{
               position: 'absolute', left: 0, right: 0, bottom: offset, height: 56,
               pointerEvents: 'none',
-              background: `linear-gradient(to bottom, rgba(21,23,31,0) 0%, ${SHEET_SURFACE} 100%)`,
+              background: `linear-gradient(to bottom, ${surfaceWithAlpha(SHEET_SURFACE, 0)} 0%, ${SHEET_SURFACE} 100%)`,
             }}
           />
         )}

@@ -1,3 +1,5 @@
+import { NEAR_BLACK_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
+
 /**
  * tourMap — central source of truth for tour metadata.
  *
@@ -33,7 +35,7 @@ export const TOUR_MAP: Record<TourCode, TourMeta> = {
     label: 'DP World Tour',
     short: 'DP World Tour',
     pillCode: 'DP World Tour',
-    bg: '#0A0A0A',
+    bg: NEAR_BLACK_CONTROL_SURFACE,
     fg: '#FFFFFF',
   },
   LPGA: {

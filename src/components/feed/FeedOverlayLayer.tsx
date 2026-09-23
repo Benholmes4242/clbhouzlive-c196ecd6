@@ -11,6 +11,7 @@ import { formatRelative } from '@/i18n/format';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { LikesSheet } from '@/components/likes/LikesSheet';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface FeedOverlayLayerProps {
   posts: FeedPost[];
@@ -218,8 +219,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
               right: 0,
               bottom: 0,
               height: 'calc(var(--bottom-nav-height, 96px) + 36px)',
-              background:
-                'linear-gradient(to top, #0A0E14 0%, #0A0E14 60%, rgba(10,14,20,0) 100%)',
+              background: `linear-gradient(to top, ${DISCOVER_SHELL_SURFACE} 0%, ${DISCOVER_SHELL_SURFACE} 60%, ${surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0)} 100%)`,
               pointerEvents: 'none',
             }}
           />
