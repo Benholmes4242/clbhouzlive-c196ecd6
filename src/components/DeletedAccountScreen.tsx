@@ -23,8 +23,8 @@ const DeletedAccountScreen: React.FC<{ onSignInDifferent?: () => void }> = ({
       position: 'fixed',
       inset: 0,
       zIndex: 2147483000,
-      // This terminal screen deliberately used LIGHT_ROUTE_CANVAS before the
-      // dark-only arrival-screen cutover; PAGE_CANVAS now owns its ground.
+      // This terminal screen deliberately used the light compatibility canvas
+      // before the dark-only arrival-screen cutover; PAGE_CANVAS now owns it.
       background: PAGE_CANVAS,
       color: INK,
       display: 'flex',
