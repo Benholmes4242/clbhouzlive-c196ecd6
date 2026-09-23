@@ -234,6 +234,19 @@ export function subscribeToReviewUpload(key: string, listener: Listener): () => 
  * arrangement of navigation can leave a staged row with nobody finishing it.
  * ------------------------------------------------------------------------- */
 
+/** A PostgrestError carries code/message/details as plain fields; keep all
+ *  three, because error_message is what phase 3 shows and what we read when
+ *  diagnosing a failure. */
+function errText(e: unknown, fallback: string): string {
+  const o = (e ?? {}) as { message?: string; details?: string; code?: string };
+  const parts = [o.code, o.message, o.details].filter(Boolean) as string[];
+  return parts.length > 0 ? parts.join(' | ') : fallback;
+}
+
+function pgCode(e: unknown): string | undefined {
+  return (e as { code?: string } | null | undefined)?.code;
+}
+
 async function markPendingFailed(pendingId: string, message: string) {
   try {
     // pending_reviews is not in the generated types yet, hence the cast.
@@ -274,15 +287,19 @@ export async function uploadAndPublishReview(
   try {
     results = await startReviewUpload(key, userId, items);
   } catch (e) {
-    const msg = e instanceof Error ? e.message : 'Upload failed';
+    const msg = errText(e, 'Upload failed');
     await markPendingFailed(pendingId, msg);
     failNoisily(msg);
+    analyticsEvents.track('review_staged_failed', {
+      pending_id: pendingId, total: items.length, failed: items.length,
+      stage: 'upload_threw',
+    });
     return { ok: false, error: msg };
   }
 
   const failed = results.filter((r) => !r.ok);
   if (failed.length > 0 || results.length !== items.length) {
-    const msg = failed[0]?.error || 'Some files did not finish uploading';
+    const msg = errText(failed[0]?.error, 'Some files did not finish uploading');
     await markPendingFailed(pendingId, msg);
     failNoisily(msg);
     analyticsEvents.track('review_staged_failed', {
@@ -322,7 +339,15 @@ export async function uploadAndPublishReview(
     onPublished?.();
     return { ok: true, ratingId };
   } catch (e) {
-    const msg = e instanceof Error ? e.message : 'Could not post your review';
+    // SUPERSEDED, NOT FAILED. The member submitted again for this course and
+    // stage_course_review dropped this row on purpose. Say nothing, mark
+    // nothing: the newer row is on its way up and will publish.
+    if (pgCode(e) === '02000') {
+      analyticsEvents.track('review_staged_superseded', { pending_id: pendingId });
+      return { ok: false, error: 'superseded' };
+    }
+
+    const msg = errText(e, 'Could not post your review');
     await markPendingFailed(pendingId, msg);
     failNoisily(msg);
     analyticsEvents.track('review_staged_failed', {
