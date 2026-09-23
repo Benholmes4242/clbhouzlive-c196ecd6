@@ -1004,6 +1004,7 @@ html, body, #root {
   --light-route-canvas: #F8FAFC;
   /* Alpha surfaces derived from canonical tokens in src/lib/tokens/surfaces.ts. */
   --tour-hub-raised-surface-a60: rgba(20,20,20,0.6);
+  --tour-hub-raised-surface-a45: rgba(20,20,20,0.45);
   --near-black-control-surface-a98: rgba(10,10,10,0.98);
   --light-route-canvas-a96: rgba(248,250,252,0.96);
   --light-route-canvas-a85: rgba(248,250,252,0.85);

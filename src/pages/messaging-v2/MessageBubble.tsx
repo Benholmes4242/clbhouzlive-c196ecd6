@@ -11,6 +11,7 @@ import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer
 import { getSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import { FIGS } from '@/lib/tokens/type';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
+import { IMMERSIVE_FEED_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 /**
  * BRIEF_MESSAGES_DARK §6 — AMBER IS NARROWED TO MATCH ECHO. The member's own
@@ -335,12 +336,12 @@ export const MessageBubble: React.FC<Props> = ({
                   position: 'relative',
                   marginTop: 6,
                   paddingTop: 8,
-                  borderTop: `0.5px solid ${isOutgoing ? 'rgba(5,7,10,0.12)' : HAIRLINE}`,
+                  borderTop: `0.5px solid ${isOutgoing ? surfaceWithAlpha(IMMERSIVE_FEED_CANVAS, 0.12) : HAIRLINE}`,
                   background: 'transparent',
                   border: 'none',
                   borderTopWidth: '0.5px',
                   borderTopStyle: 'solid',
-                  borderTopColor: isOutgoing ? 'rgba(5,7,10,0.12)' : HAIRLINE,
+                  borderTopColor: isOutgoing ? surfaceWithAlpha(IMMERSIVE_FEED_CANVAS, 0.12) : HAIRLINE,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -384,7 +385,7 @@ export const MessageBubble: React.FC<Props> = ({
                 // bubble's context: an edge only where there is something to
                 // separate it from, and dark ink because its ground is white.
                 background: '#FFFFFF',
-                border: isOutgoing ? '0.5px solid rgba(5,7,10,0.12)' : 'none',
+                border: isOutgoing ? `0.5px solid ${surfaceWithAlpha(IMMERSIVE_FEED_CANVAS, 0.12)}` : 'none',
                 borderRadius: 11,
                 padding: '1px 7px',
                 fontSize: 12,
