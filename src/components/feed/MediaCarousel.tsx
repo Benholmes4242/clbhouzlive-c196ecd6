@@ -24,6 +24,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { PrefetchController } from '@/video/PrefetchController';
 import type { LaneId } from '@/video/lanePolicy';
+import { SLAB } from './feedSurfaces';
 
 
 interface Props {
@@ -392,7 +393,7 @@ export const MediaCarousel: React.FC<Props> = ({
         width: '100%',
         aspectRatio: String(frameRatio),
         maxHeight,
-        background: '#10151C',
+        background: SLAB,
         overflow: 'hidden',
       }}
     >

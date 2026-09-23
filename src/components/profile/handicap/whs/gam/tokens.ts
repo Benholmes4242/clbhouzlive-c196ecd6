@@ -1,4 +1,6 @@
 // Shared tokens for gamified handicap (gam_*) surfaces. Matches Dispatch aesthetic.
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+
 export const GAM = {
   AMBER: '#F7931E',
   AMBER_14: 'rgba(247,147,30,0.14)',
@@ -45,7 +47,7 @@ export const RARITY_DARK: Record<
     labelBg: 'rgba(148,163,184,0.14)',
     pillBorder: 'rgba(148,163,184,0.30)',
     cardBorder: 'rgba(148,163,184,0.30)',
-    cardBg: '#1B1E27',
+    cardBg: MEMBER_PANEL,
     cardSweep:
       'linear-gradient(150deg, rgba(148,163,184,0.20) 0%, #1B1E27 60%)',
     topStripe: null,
@@ -59,7 +61,7 @@ export const RARITY_DARK: Record<
     labelBg: 'rgba(59,130,246,0.14)',
     pillBorder: 'rgba(59,130,246,0.35)',
     cardBorder: 'rgba(59,130,246,0.28)',
-    cardBg: '#1B1E27',
+    cardBg: MEMBER_PANEL,
     cardSweep:
       'linear-gradient(150deg, rgba(59,130,246,0.20) 0%, #1B1E27 60%)',
     topStripe: null,
@@ -73,7 +75,7 @@ export const RARITY_DARK: Record<
     labelBg: 'rgba(247,147,30,0.16)',
     pillBorder: 'rgba(247,147,30,0.40)',
     cardBorder: 'rgba(247,147,30,0.32)',
-    cardBg: '#1B1E27',
+    cardBg: MEMBER_PANEL,
     cardSweep:
       'linear-gradient(150deg, rgba(247,147,30,0.20) 0%, #1B1E27 60%)',
     topStripe: null,
@@ -87,7 +89,7 @@ export const RARITY_DARK: Record<
     labelBg: 'rgba(168,85,247,0.14)',
     pillBorder: 'rgba(168,85,247,0.40)',
     cardBorder: 'rgba(168,85,247,0.32)',
-    cardBg: '#1B1E27',
+    cardBg: MEMBER_PANEL,
     cardSweep:
       'linear-gradient(150deg, rgba(168,85,247,0.20) 0%, #1B1E27 60%)',
     topStripe: 'linear-gradient(90deg, #A855F7 0%, #C084FC 100%)',
@@ -102,7 +104,7 @@ export const RARITY_DARK: Record<
       'linear-gradient(90deg, rgba(251,188,46,0.22) 0%, rgba(247,147,30,0.22) 100%)',
     pillBorder: 'rgba(251,188,46,0.45)',
     cardBorder: 'rgba(247,147,30,0.42)',
-    cardBg: '#1B1E27',
+    cardBg: MEMBER_PANEL,
     cardSweep:
       'linear-gradient(150deg, rgba(247,147,30,0.24) 0%, rgba(247,147,30,0.08) 50%, #1B1E27 100%)',
     topStripe: 'linear-gradient(90deg, #F7931E 0%, #FBBC2E 50%, #F7931E 100%)',
@@ -116,7 +118,7 @@ export const RARITY_DARK: Record<
     labelBg: 'linear-gradient(90deg, rgba(205,127,50,0.22) 0%, rgba(139,90,43,0.22) 100%)',
     pillBorder: 'rgba(205,127,50,0.42)',
     cardBorder: 'rgba(205,127,50,0.42)',
-    cardBg: '#1B1E27',
+    cardBg: MEMBER_PANEL,
     cardSweep: 'linear-gradient(150deg, rgba(205,127,50,0.20) 0%, #1B1E27 60%)',
     topStripe: 'linear-gradient(90deg, #8B5A2B 0%, #CD7F32 50%, #8B5A2B 100%)',
     glow: 'inset 0 0 0 1px rgba(205,127,50,0.14)',
@@ -129,7 +131,7 @@ export const RARITY_DARK: Record<
     labelBg: 'linear-gradient(90deg, rgba(192,192,200,0.22) 0%, rgba(148,163,184,0.22) 100%)',
     pillBorder: 'rgba(192,192,200,0.45)',
     cardBorder: 'rgba(192,192,200,0.45)',
-    cardBg: '#1B1E27',
+    cardBg: MEMBER_PANEL,
     cardSweep: 'linear-gradient(150deg, rgba(148,163,184,0.20) 0%, #1B1E27 60%)',
     topStripe: 'linear-gradient(90deg, #94A3B8 0%, #E2E8F0 50%, #94A3B8 100%)',
     glow: 'inset 0 0 0 1px rgba(192,192,200,0.14)',
@@ -146,7 +148,7 @@ export const RARITY_DARK: Record<
     labelBg: 'linear-gradient(90deg, rgba(16,185,129,0.22) 0%, rgba(4,120,87,0.22) 100%)',
     pillBorder: 'rgba(16,185,129,0.48)',
     cardBorder: 'rgba(16,185,129,0.48)',
-    cardBg: '#1B1E27',
+    cardBg: MEMBER_PANEL,
     cardSweep: 'linear-gradient(150deg, rgba(16,185,129,0.20) 0%, #1B1E27 60%)',
     topStripe: 'linear-gradient(90deg, #047857 0%, #34D399 50%, #047857 100%)',
     glow: 'inset 0 0 0 1px rgba(16,185,129,0.14)',
@@ -159,7 +161,7 @@ export const RARITY_DARK: Record<
     labelBg: 'linear-gradient(90deg, rgba(125,211,252,0.22) 0%, rgba(59,130,246,0.22) 100%)',
     pillBorder: 'rgba(125,211,252,0.50)',
     cardBorder: 'rgba(125,211,252,0.50)',
-    cardBg: '#1B1E27',
+    cardBg: MEMBER_PANEL,
     cardSweep: 'linear-gradient(150deg, rgba(125,211,252,0.22) 0%, #1B1E27 60%)',
     topStripe: 'linear-gradient(90deg, #3B82F6 0%, #93C5FD 30%, #FFFFFF 50%, #93C5FD 70%, #3B82F6 100%)',
     glow: 'inset 0 0 0 1px rgba(125,211,252,0.16)',

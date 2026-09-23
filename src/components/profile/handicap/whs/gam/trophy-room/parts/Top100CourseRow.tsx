@@ -2,6 +2,7 @@ import React from 'react';
 import { Check, MapPin } from 'lucide-react';
 import { GAM } from '../../tokens';
 import type { Top100CourseProgress } from '@/hooks/gam/useTop100ListProgress';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 interface Props {
   row: Top100CourseProgress;
@@ -48,7 +49,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
           borderRadius: 8,
           background: played
             ? 'linear-gradient(180deg, rgba(247,147,30,0.18), rgba(247,147,30,0.04))'
-            : '#20242E',
+            : MEMBER_CELL,
           border: played
             ? '1px solid rgba(247,147,30,0.32)'
             : '1px solid rgba(255,255,255,0.06)',
@@ -75,7 +76,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
             height: 44,
             borderRadius: 10,
             objectFit: 'cover',
-            background: '#20242E',
+            background: MEMBER_CELL,
           }}
         />
       ) : (
@@ -85,7 +86,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
             width: 44,
             height: 44,
             borderRadius: 10,
-            background: '#20242E',
+            background: MEMBER_CELL,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
