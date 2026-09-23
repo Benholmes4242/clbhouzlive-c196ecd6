@@ -25,7 +25,7 @@ import { useTeeTimesAll } from '../data/useTeeTimesAll';
 import { TeeTimesFirstGroups } from './TeeTimesFirstGroups';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { ScopeSegment, type ScopeSegmentOption } from '@/components/shared/ScopeSegment';
-import { FONT, INK, INK_MUTE, INK_FAINT, TOUR_CANVAS } from '../../_shared/tokens';
+import { FONT, INK, INK_MUTE, INK_FAINT } from '../../_shared/tokens';
 import { A, KICKER, LABEL, CAPTION } from '@/features/courses/components/holes/analytical/tokens';
 
 type RoundKey = '1' | '2' | '3' | '4';
@@ -208,7 +208,7 @@ export function AllTeeTimesSheet({
                 gap: 7,
                 padding: '7px 12px',
               }}
-              /* FIELD CANON (lib/tokens/field.ts): was a TOUR_CANVAS slab with a
+              /* FIELD CANON (lib/tokens/field.ts): was a page-canvas slab with a
                  0.5px border. HEIGHT EXCEPTION (~35px, padding-derived): sits
                  in the sheet header above the tee-time list; 44 would cost a
                  row. Constrained by neighbours, not preference. */

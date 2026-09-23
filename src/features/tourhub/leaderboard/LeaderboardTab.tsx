@@ -28,7 +28,7 @@ import { resolveCutDisplay, tournamentIsFinished } from '../_shared/cutDisplay';
 import { Skeleton } from '@/components/ui/skeleton';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS as TOUR_TOUR_CANVAS } from '../_shared/tokens';
+import { INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
 import { SearchFieldBox } from '@/features/search-v2/components/SearchField';
 import { resolveVenuePlace } from './venuePlace';
 
@@ -40,7 +40,7 @@ const INK = TOUR_INK;
 const SECONDARY = TOUR_INK_SOFT;
 const MUTED = TOUR_INK_FAINT;
 const HAIRLINE = 'rgba(255,255,255,0.12)';
-const SURFACE = TOUR_TOUR_CANVAS;
+const SURFACE = TOUR_CANVAS;
 const STATUS_LIVE_GREEN = '#22C55E';
 
 function fmtDateRange(start: string | null, end: string | null): string | null {
@@ -278,7 +278,7 @@ export function LeaderboardTab() {
           <button
             type="button"
             onClick={() => refetchLive()}
-            style={{ background: INK, color: TOUR_TOUR_CANVAS, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: F, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+            style={{ background: INK, color: TOUR_CANVAS, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: F, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
           >
             {t('board.retry')}
           </button>
@@ -596,7 +596,7 @@ export function LeaderboardTab() {
           <button
             type="button"
             onClick={() => refetchBoard()}
-            style={{ background: INK, color: TOUR_TOUR_CANVAS, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: F, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+            style={{ background: INK, color: TOUR_CANVAS, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: F, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
           >
             {t('board.retry')}
           </button>
