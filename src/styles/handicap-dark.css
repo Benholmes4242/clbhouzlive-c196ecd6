@@ -138,7 +138,7 @@
   --hcp-champ-card-bg:      linear-gradient(135deg, #FFFAEF, #FFF6E3);
   --hcp-pill-border:        rgba(255,255,255,0.14);
   --hcp-pill-rank-bg:       rgba(15,23,42,0.05);
-  --hcp-pill-rank-held-bg:  #0F172A;
+  --hcp-pill-rank-held-bg:  var(--surface-alt);
 
   /* Brand */
   --hcp-amber:      #F7931E;

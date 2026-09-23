@@ -9,7 +9,7 @@ import { recordPostViewOnce } from '@/hooks/usePostViewTracker';
 import { mapActivityPostToFeedPost } from '@/lib/activityPostMapper';
 import type { ActivityPost } from '@/components/profile/types/ActivityTypes';
 import { MentionText } from '@/components/mentions/MentionText';
-import { POST_DEEP_LINK_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { INK_ON_LIGHT, POST_DEEP_LINK_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface PostPreview {
   id: string;
@@ -545,9 +545,10 @@ const PostDeepLinkPage: React.FC = () => {
           </div>
           <button
             onClick={() => navigate('/auth')}
-            className="w-full h-[48px] rounded-xl font-semibold text-[14px] text-[#0D0F11] active:scale-[0.98] transition-all"
+            className="w-full h-[48px] rounded-xl font-semibold text-[14px] active:scale-[0.98] transition-all"
             style={{
               background: 'white',
+              color: INK_ON_LIGHT,
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5)',
             }}
           >

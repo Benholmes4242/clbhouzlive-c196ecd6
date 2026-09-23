@@ -7,6 +7,7 @@
 import React, { useState } from 'react';
 import { ArrowLeftRight, Trophy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
 import { useTourSelection } from '../context/TourSelectionContext';
 import { TourPickerSheet, useTourPillLabel } from './TourPickerSheet';
@@ -122,13 +123,13 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.04em',
-              color: isMajorActive ? GOLD_DEEP : '#0A0E14',
+              color: isMajorActive ? GOLD_DEEP : INK_ON_LIGHT,
               textTransform: 'uppercase',
               lineHeight: 1,
             }}
           >
             {pillLabel}
-            <ArrowLeftRight size={11} strokeWidth={2.2} color={isMajorActive ? GOLD_DEEP : '#0A0E14'} aria-hidden />
+            <ArrowLeftRight size={11} strokeWidth={2.2} color={isMajorActive ? GOLD_DEEP : INK_ON_LIGHT} aria-hidden />
           </span>
         </button>
       )}
