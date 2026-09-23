@@ -43,7 +43,6 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
   lng,
   name,
   locationText,
-  colorful = false,
   nearby,
 }) => {
   const navigate = useNavigate();

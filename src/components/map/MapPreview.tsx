@@ -34,7 +34,6 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   showExpandButton = true,
   onExpand,
   interactive = false,
-  colorful = false,
   locationText,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
