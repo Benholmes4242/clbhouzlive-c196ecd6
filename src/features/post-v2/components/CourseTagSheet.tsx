@@ -217,14 +217,14 @@ export default function CourseTagSheet({
 
 
         {/* Scrolling list region — the only part that grows */}
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', padding: '0 14px' }}>
           {showPopular ? (
             <>
               {!isSingle && popularPinned.pinned.length > 0 && (
                 <>
                   <SectionLabel>SELECTED</SectionLabel>
                   {popularPinned.pinned.map((r) => (
-                    <CourseRow key={`sel-${r.id}`} row={{ id: r.id, name: r.name, country: r.country ?? null }} selected onToggle={toggle} />
+                    <CourseRow key={`sel-${r.id}`} row={{ id: r.id, name: r.name, country: r.country ?? null, thumbnail_image: r.thumbnail ?? null }} selected onToggle={toggle} />
                   ))}
                 </>
               )}
@@ -233,7 +233,7 @@ export default function CourseTagSheet({
                 <>
                   <SectionLabel>SELECTED</SectionLabel>
                   {draft.filter((d) => !popular.some((p) => p.id === d.id)).map((r) => (
-                    <CourseRow key={`sel-${r.id}`} row={{ id: r.id, name: r.name, country: r.country ?? null }} selected onToggle={toggle} />
+                    <CourseRow key={`sel-${r.id}`} row={{ id: r.id, name: r.name, country: r.country ?? null, thumbnail_image: r.thumbnail ?? null }} selected onToggle={toggle} />
                   ))}
                 </>
               )}
@@ -249,7 +249,7 @@ export default function CourseTagSheet({
                   {popularPinned.rest.map(r => (
                     <CourseRow
                       key={r.id}
-                      row={{ id: r.id, name: r.name, country: r.country, sub_country: r.sub_country }}
+                      row={{ id: r.id, name: r.name, country: r.country, sub_country: r.sub_country, thumbnail_image: r.thumbnail_image }}
                       selected={selectedIds.has(r.id)}
                       onToggle={toggle}
                     />
@@ -270,7 +270,7 @@ export default function CourseTagSheet({
                 <>
                   <SectionLabel>SELECTED</SectionLabel>
                   {searchPinned.pinned.map((r) => (
-                    <CourseRow key={`sel-${r.id}`} row={r as Row} selected onToggle={toggle} />
+                    <CourseRow key={`sel-${r.id}`} row={{ id: r.id, name: r.name, country: r.country ?? null, thumbnail_image: r.thumbnail ?? (r as Row).thumbnail_image ?? null }} selected onToggle={toggle} />
                   ))}
                   <SectionLabel>RESULTS</SectionLabel>
                 </>
