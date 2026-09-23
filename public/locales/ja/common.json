@@ -269,6 +269,7 @@
     "nextRound": {
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
+      "sampleSentence": "直近20ラウンドに基づきます。",
       "lineHold": "次のラウンドでハンディキャップは上がりません。",
       "subHold": "{{cut}}を上回れば下がります。",
       "lineRise": "次のラウンドでハンディキャップは{{settle}}に上がります",

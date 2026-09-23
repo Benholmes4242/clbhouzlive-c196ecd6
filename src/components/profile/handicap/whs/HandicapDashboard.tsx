@@ -1,18 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { useHandicapTrend, useCounters, useAllScores } from '@/lib/whs/hooks';
+import { useHandicapTrend, useCounters } from '@/lib/whs/hooks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { WhsConnection } from '@/lib/whs/types';
 import { getSyncHealth } from '@/lib/whs/syncHealth';
 
-// ── SECTION A (Sep 2026): ONE SCROLLING PAGE, TEN SECTIONS ────────────────
+// ── ONE SCROLLING PAGE, LED BY THE NEXT-ROUND PROJECTION ─────────────────
 // The Today / Form / Circle tabs are gone. The three view components
 // (TodayView / TrendsView / CircleView) were deleted 10 Sep 2026 — their inner
 // blocks mount here directly, in the fixed page order:
 //
-//   1 Index · 2 Next round · 3 Last round · 4 Rounds that count ·
-//   5 How you're scoring · 6 Which holes cost you · 7 Personal bests ·
-//   8 Your circle · 9 Friends' rounds · 10 Footer
+//   1 Next round · 2 Index · 3 Rounds that count · 4 Which holes cost you ·
+//   5 Personal bests · 6 Your circle · 7 Trophy room · Footer provenance
 //
 // SECTION A IS THE SHELL ONLY. Each block below still renders its existing
 // pre-rebuild UI; sections B–K replace them one at a time with the flat
@@ -26,13 +25,10 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 
 import IndexSection from './sections/IndexSection';
 import NextRoundSection from './sections/NextRoundSection';
-import LastRoundSection from './sections/LastRoundSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
-import ScoringSection from './sections/ScoringSection';
 import HolesSection from './sections/HolesSection';
-import PersonalBestsSection from './sections/PersonalBestsSection';
+import PersonalBestsSection, { TrophyRoomRow } from './sections/PersonalBestsSection';
 import CircleSection from './sections/CircleSection';
-import RecentlyPlayedFeed from './sections/recently-played/RecentlyPlayedFeed';
 import HandicapFooter from './sections/HandicapFooter';
 import { LaunchSheetMount } from '../gam/launch/LaunchSheetMount';
 
@@ -57,9 +53,6 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   // ── Trend (used by hero + passed to sections as currentHandicap) ───────
   const { data: trend } = useHandicapTrend(connection.id);
   const currentHandicap = trend?.current ?? null;
-
-  // ── Stableford scores (section 5) — same query the deleted TrendsView ran ──────────
-  const { data: scores, isLoading: scoresLoading } = useAllScores(connection.id);
 
   const viewMode: 'owner' | 'friend' = readOnly ? 'friend' : 'owner';
 
@@ -118,44 +111,25 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         THE GREETING AND WEATHER LINE IS REMOVED (Section A). TodayGreeting was deleted 10 Sep 2026.
       */}
 
-      {/* 1 — INDEX */}
-      <IndexSection connection={connection} />
-
-      {/* 2 — NEXT ROUND (Section C) */}
+      {/* 1 — NEXT ROUND */}
       <NextRoundSection connectionId={connection.id} currentHandicap={currentHandicap} />
 
-      {/* 3 — LAST ROUND (Section D) */}
-      <LastRoundSection
-        connectionId={connection.id}
-        userId={userId}
-        viewMode={viewMode}
-        ownerFirstName={ownerFirstName}
-      />
+      {/* 2 — HANDICAP INDEX */}
+      <IndexSection connection={connection} />
 
-      {/* 4 — ROUNDS THAT COUNT (Section E). RoundsThatCountCard was deleted 10 Sep 2026: the flat section carries this slot now. */}
+      {/* 3 — ROUNDS THAT COUNT */}
       <RoundsThatCountSection connectionId={connection.id} userId={userId} />
 
-      {/* 5 — HOW YOU'RE SCORING (Section F). The points half of StablefordCard
-          is deleted 10 Sep 2026; SCORE STATS is still reported, not moved. */}
-      {scoresLoading ? null : <ScoringSection scores={scores ?? []} />}
-
-      {/* 6 — HOW YOU SCORE A HOLE (Section G). The outcome distribution moves
-          here from StablefordCard's SCORE STATS and the par-type rings from
-          GameEverywhereCard, which is deleted 10 Sep 2026.
-          RoundShapePanel is off the page: 22 of 22 eligible members get the
-          "no weak stretch" verdict, so the block says nothing. */}
+      {/* 4 — HOW YOU SCORE A HOLE */}
       <HolesSection userId={userId} connectionId={connection.id} readOnly={readOnly} />
 
-      {/* 7 — PERSONAL BESTS (Section H). records/PersonalBests was deleted 10 Sep 2026. AchievementsPanel is now OFF this page and deleted 10 Sep 2026
-          too: the terminal TROPHY ROOM › row at the foot of Personal bests is
-          verified opening the room, so the tile's only reason to exist is gone.
-          GamMount stays at page level, so ?gam=trophies (with &section= and
-          &badge=) and the ?sheet= aliases all still resolve. */}
+      {/* 5 — RECORDS TO BREAK */}
       <PersonalBestsSection
         connectionId={connection.id}
         currentHandicap={currentHandicap}
         viewMode={viewMode}
         ownerFirstName={ownerFirstName}
+        showTrophyRoom={false}
       />
 
       {/* StreaksCard (the ON THE LINE - {n} ACTIVE rail) is OFF this page and
@@ -164,28 +138,15 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           terminal TROPHY ROOM row at the foot of Personal bests, and
           StreaksSheetMount stays at page level so ?gam=streaks still opens. */}
 
-      {/* 8 — YOUR CIRCLE (Section I). FriendsLeaderboardSection, StandingFigures,
-          CompareEntryPanel, PulseSection and CircleInviteAction are all
-          deleted 10 Sep 2026: the rank is the heading, the gap is the
-          sub-line, the percentile is gone, and compare is reached by tapping a
-          person through the existing resolver. */}
+      {/* 6 — YOUR CIRCLE */}
       {!readOnly && <CircleSection userId={userId} />}
 
-      {/* 9 — FRIENDS' ROUNDS (Section J) */}
-      {!readOnly && <RecentlyPlayedFeed ownerUserId={userId} />}
+      {/* 7 — TROPHY ROOM */}
+      {!readOnly && <TrophyRoomRow standalone />}
 
-      {/* 10 — FOOTER (Section K1). RoundsArchivePanel, YourCoursesRail and
-          WhsConnectionCaption are deleted 10 Sep 2026: the rounds total is
-          the footer link into the SAME RoundsArchiveSheet, the counters figure
-          is Section E's meta, the 90-day count is Section F's meta, and the
-          provenance line moves into the footer row. No second terminal link —
-          TROPHY ROOM stays at the foot of Personal bests. */}
+      {/* FOOTER — provenance only. */}
       <HandicapFooter
-        connectionId={connection.id}
-        userId={userId}
         membershipNumber={connection.membership_number}
-        viewMode={viewMode}
-        ownerFirstName={ownerFirstName}
       />
 
       {/* Sheet mounts that lived inside the old views must survive them. */}

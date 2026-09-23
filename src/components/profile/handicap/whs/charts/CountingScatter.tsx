@@ -39,8 +39,8 @@ const VIEW_W = 320;
 
 /* DOT GEOMETRY AND THE INSET DERIVED FROM IT (SNAGS_01 §C, §D).
  *
- * The counting dot is reduced a touch (5.5 -> 4.75) while the non-counting dot
- * holds at 3, so the size difference that carries the meaning survives.
+ * Every round uses one radius. Fill alone distinguishes counting state so
+ * position remains the dominant signal.
  *
  * THE SELECTION RING IS NEVER CLIPPED: the plot area is inset on all four
  * sides by (ring radius + half its stroke + a hair), DERIVED from these
@@ -48,10 +48,7 @@ const VIEW_W = 320;
  * target is NOT tied to the radius — selection is resolved from the pointer's
  * horizontal fraction across the whole plot (see onPointerDown), so the hit
  * area is the full height of the svg regardless of how big a dot is drawn. */
-/** Counting / falling-off dot. */
 const DOT_R = 4.75;
-/** Non-counting dot — deliberately much smaller. */
-const DOT_R_NONE = 3;
 /** Air between the selected dot and its ring. */
 const RING_GAP = 3.5;
 const RING_SW = 1;
@@ -146,7 +143,7 @@ export const CountingScatter: React.FC<Props> = ({
             key={i}
             cx={x(i)}
             cy={y(r.diff)}
-            r={r.state === 'none' ? 3 : 5.5}
+            r={DOT_R}
             fill={fillFor(r.state)}
           />
         ))}

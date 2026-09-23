@@ -270,6 +270,7 @@
     "nextRound": {
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
+      "sampleSentence": "Basierend auf deinen letzten 20 Runden.",
       "lineHold": "Dein Handicap kann in der nächsten Runde nicht steigen.",
       "subHold": "Spiele besser als {{cut}} und es sinkt.",
       "lineRise": "Dein Handicap steigt in der nächsten Runde auf {{settle}}",
