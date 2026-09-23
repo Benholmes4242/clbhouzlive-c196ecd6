@@ -25,6 +25,7 @@ import { useInterruptClips } from '../hooks/useInterruptClips';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { VideoFeedCard } from './VideoFeedCard';
 import { ClipsInterruptShelf } from './ClipsInterruptShelf';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -42,7 +43,7 @@ function SkeletonCard() {
         style={{
           aspectRatio: '16 / 9',
           borderRadius: 4,
-          background: 'rgba(255,255,255,0.06)',
+          backgroundColor: MEMBER_CELL,
         }}
       />
       <div style={{ display: 'flex', gap: 9, marginTop: 8 }}>
@@ -52,14 +53,14 @@ function SkeletonCard() {
             width: 30,
             height: 30,
             borderRadius: '34%',
-            background: 'rgba(255,255,255,0.06)',
+            backgroundColor: MEMBER_CELL,
             flexShrink: 0,
           }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             className="clb-shimmer-dark"
-            style={{ height: 12, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }}
+            style={{ height: 12, borderRadius: 4, backgroundColor: MEMBER_CELL }}
           />
           <div
             className="clb-shimmer-dark"
@@ -68,7 +69,7 @@ function SkeletonCard() {
               height: 10,
               width: '60%',
               borderRadius: 4,
-              background: 'rgba(255,255,255,0.06)',
+              backgroundColor: MEMBER_CELL,
             }}
           />
         </div>

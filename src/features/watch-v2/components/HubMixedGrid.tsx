@@ -20,7 +20,7 @@ function SkeletonTile({ aspect }: { aspect: string }) {
           width: '100%',
           aspectRatio: aspect,
           borderRadius: 4,
-          background: MEMBER_CELL,
+          backgroundColor: MEMBER_CELL,
         }}
       />
       <div
@@ -28,7 +28,7 @@ function SkeletonTile({ aspect }: { aspect: string }) {
         style={{
           height: 12.5,
           borderRadius: 4,
-          background: MEMBER_CELL,
+          backgroundColor: MEMBER_CELL,
           marginTop: 6,
         }}
       />
@@ -38,7 +38,7 @@ function SkeletonTile({ aspect }: { aspect: string }) {
           height: 11,
           width: '55%',
           borderRadius: 4,
-          background: MEMBER_CELL,
+          backgroundColor: MEMBER_CELL,
           marginTop: 2,
         }}
       />

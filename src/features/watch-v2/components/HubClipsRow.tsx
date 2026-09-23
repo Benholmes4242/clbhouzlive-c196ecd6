@@ -150,7 +150,7 @@ function SkeletonTile() {
         style={{
           aspectRatio: '9 / 14',
           borderRadius: 4,
-          background: MEMBER_CELL,
+          backgroundColor: MEMBER_CELL,
         }}
       />
       <div
@@ -158,7 +158,7 @@ function SkeletonTile() {
         style={{
           height: 11.5,
           borderRadius: 4,
-          background: MEMBER_CELL,
+          backgroundColor: MEMBER_CELL,
           marginTop: 6,
         }}
       />
@@ -168,7 +168,7 @@ function SkeletonTile() {
           height: 10.5,
           width: '60%',
           borderRadius: 4,
-          background: MEMBER_CELL,
+          backgroundColor: MEMBER_CELL,
           marginTop: 1,
         }}
       />

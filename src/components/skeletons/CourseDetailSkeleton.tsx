@@ -23,7 +23,7 @@ export const CourseDetailSkeleton = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/60 pb-20 animate-in fade-in duration-200">
+    <div className="min-h-screen bg-background pb-20 animate-in fade-in duration-200">
       {/* Hero skeleton */}
       <div className="relative h-[400px]">
         <Skeleton className="absolute inset-0 rounded-none" />

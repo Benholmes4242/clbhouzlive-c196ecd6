@@ -215,7 +215,7 @@ function SkeletonCard() {
         style={{
           aspectRatio: '16 / 9',
           borderRadius: 4,
-          background: MEMBER_CELL,
+          backgroundColor: MEMBER_CELL,
         }}
       />
       <div style={{ display: 'flex', gap: 9, marginTop: 8, alignItems: 'flex-start' }}>
@@ -225,14 +225,14 @@ function SkeletonCard() {
             width: 30,
             height: 30,
             borderRadius: '34%',
-            background: MEMBER_CELL,
+            backgroundColor: MEMBER_CELL,
             flexShrink: 0,
           }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             className="clb-shimmer-dark"
-            style={{ height: 13.5, borderRadius: 4, background: MEMBER_CELL }}
+            style={{ height: 13.5, borderRadius: 4, backgroundColor: MEMBER_CELL }}
           />
           <div
             className="clb-shimmer-dark"
@@ -241,7 +241,7 @@ function SkeletonCard() {
               height: 11.5,
               width: '55%',
               borderRadius: 4,
-              background: MEMBER_CELL,
+              backgroundColor: MEMBER_CELL,
             }}
           />
         </div>

@@ -21,7 +21,7 @@ function Line({ width, height = 12 }: { width: number | string; height?: number 
     <div
       className="clb-shimmer-dark"
       aria-hidden
-      style={{ width, height, borderRadius: r.xs, background: MEMBER_CELL, marginTop: 8 }}
+      style={{ width, height, borderRadius: r.xs, backgroundColor: MEMBER_CELL, marginTop: 8 }}
     />
   );
 }
@@ -31,7 +31,7 @@ function Block({ height, radius }: { height: number; radius: string }) {
     <div
       className="clb-shimmer-dark"
       aria-hidden
-      style={{ height, borderRadius: radius, background: MEMBER_CELL, width: '100%' }}
+      style={{ height, borderRadius: radius, backgroundColor: MEMBER_CELL, width: '100%' }}
     />
   );
 }
@@ -84,7 +84,7 @@ export function ShelfShell({ tileW, tileH }: { tileW: number; tileH: number }) {
           <div
             key={index}
             className="clb-shimmer-dark"
-            style={{ width: tileW, height: tileH, flex: `0 0 ${tileW}px`, borderRadius: r.md, background: MEMBER_CELL }}
+            style={{ width: tileW, height: tileH, flex: `0 0 ${tileW}px`, borderRadius: r.md, backgroundColor: MEMBER_CELL }}
           />
         ))}
       </div>

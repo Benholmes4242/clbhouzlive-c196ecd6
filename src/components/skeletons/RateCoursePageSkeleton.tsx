@@ -18,7 +18,7 @@ function Block({ style }: { style?: React.CSSProperties }) {
   return (
     <div
       className="clb-shimmer-dark"
-      style={{ background: TILE, borderRadius: 6, ...style }}
+      style={{ backgroundColor: TILE, borderRadius: 6, ...style }}
     />
   );
 }

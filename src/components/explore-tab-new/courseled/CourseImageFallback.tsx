@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 /**
  * CourseImageFallback — the ONE deterministic course image used by every

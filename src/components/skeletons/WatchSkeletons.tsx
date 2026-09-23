@@ -14,7 +14,7 @@ function Block({ style }: { style?: CSSProperties }) {
   return (
     <div
       className="clb-shimmer-dark"
-      style={{ background: TILE, ...style }}
+      style={{ backgroundColor: TILE, ...style }}
     />
   );
 }
