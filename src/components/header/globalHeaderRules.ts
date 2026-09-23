@@ -1,5 +1,6 @@
 // Route classification for status-bar / immersive-surface concerns.
 // Header visibility now lives in features/chrome-v2/registry.ts.
+import { IMMERSIVE_FEED_CANVAS } from '@/lib/tokens/surfaces';
 
 /**
  * Routes whose hero media bleeds into the safe area.
@@ -138,7 +139,7 @@ export function isDarkChromeRoute(_pathname: string): boolean {
  * (fixed, z-index 55) and the native status bar. Chrome for these routes must
  * be the same near-black as the canvas.
  */
-export const CANVAS_DARK_CANVAS = '#05070A';
+export const CANVAS_DARK_CANVAS = IMMERSIVE_FEED_CANVAS;
 
 export function isCanvasDarkRoute(pathname: string): boolean {
   return (

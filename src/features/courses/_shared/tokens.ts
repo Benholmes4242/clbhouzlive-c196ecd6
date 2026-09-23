@@ -1,3 +1,5 @@
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+
 /**
  * Courses feature DARK design tokens.
  *
@@ -21,7 +23,7 @@ export const SLATE_600 = 'rgba(248,250,252,0.72)';          // sub-body text, pr
 export const INK_ALPHA_60 = 'rgba(248,250,252,0.62)';       // supporting text — RecCard location subline
 
 /* ── Surfaces ───────────────────────────────────────────────────────── */
-export const SURFACE = '#1B1E27';                           // canonical panel surface
+export const SURFACE = MEMBER_PANEL;                         // canonical panel surface
 export const SHELL_BG = '#0A0E14';                          // dark shell band (matches global header)
 /*
  * BRIEF_SHEET_BACKGROUND_CANON_02 §2 — COLLAPSED. This module's `SLATE_50`

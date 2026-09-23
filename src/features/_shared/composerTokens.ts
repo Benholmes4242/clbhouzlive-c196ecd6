@@ -2,10 +2,16 @@
  * Dark composer tokens for post-v2 media-first composer.
  * CT consumes these values too now that the app is dark-only.
  */
+import {
+  COMPOSER_PANEL_SURFACE,
+  COMPOSER_SHELL_SURFACE,
+  SHEET_SURFACE,
+} from '@/lib/tokens/surfaces';
+
 export const CT_DARK = {
-  bg: '#0B0F14',
-  surface: '#15171F',
-  elev: '#1B222B',
+  bg: COMPOSER_SHELL_SURFACE,
+  surface: SHEET_SURFACE,
+  elev: COMPOSER_PANEL_SURFACE,
   line: 'rgba(248,250,252,0.09)',
   ink: '#F8FAFC',
   mute: 'rgba(248,250,252,0.60)',

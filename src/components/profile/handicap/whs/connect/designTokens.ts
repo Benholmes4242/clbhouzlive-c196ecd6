@@ -5,9 +5,9 @@
  * ASCII only.
  */
 
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { MEMBER_PANEL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 export const CANVAS = PAGE_CANVAS;
-export const PANEL = '#1B1E27';
+export const PANEL = MEMBER_PANEL;
 export const BORDER = 'rgba(255,255,255,0.10)';
 export const INK = '#F8FAFC';
 export const MUTE = 'rgba(248,250,252,0.72)';

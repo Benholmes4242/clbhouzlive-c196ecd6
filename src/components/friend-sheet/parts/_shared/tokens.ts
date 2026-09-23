@@ -1,5 +1,5 @@
 import type React from 'react';
-import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
+import { MEMBER_CELL, MEMBER_PANEL, SHEET_SURFACE } from '@/lib/tokens/surfaces';
 
 // Dark handicap tokens for the unified friend sheet.
 //
@@ -9,8 +9,8 @@ import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 // are HARDCODED hexes so every sheet renders correctly regardless of portal
 // scope. See BRIEF: DARK MODE FOR HANDICAP-AREA BOTTOM SHEETS.
 export const BG_0 = SHEET_SURFACE;                       // sheet surface
-export const BG_1 = '#1B1E27';                       // raised card
-export const BG_2 = '#20242E';                       // cell / chip
+export const BG_1 = MEMBER_PANEL;                     // raised card
+export const BG_2 = MEMBER_CELL;                      // cell / chip
 export const T100 = '#F2F4F7';                       // ink
 export const T80 = 'rgba(242,244,247,0.72)';         // ink (soft)
 export const T60 = 'rgba(242,244,247,0.55)';         // dim

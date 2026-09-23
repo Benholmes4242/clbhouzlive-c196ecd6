@@ -6,8 +6,8 @@
  * primitive must not import a feature token file, and a pure-TS lib module
  * must not import a .tsx token file that pulls React in behind it.
  *
- * FOUR IDEAS, not one value four times. Today three of them hold the same
- * value. The day one moves, the choice of token at each callsite is the whole
+ * SURFACE ROLES, not a palette of interchangeable values. Several roles hold
+ * the same value today. The day one moves, the choice at each callsite is the whole
  * difference between a correct repaint and a visible seam — so pick by WHAT
  * THE ELEMENT IS, never by what the value currently is.
  *
@@ -35,3 +35,36 @@ export const INK_ON_LIGHT = '#15171F';
 
 /** Native chrome encoding (ARGB, no leading `#`) for the OS status bar. */
 export const STATUS_BAR_CANVAS = 'FF15171F';
+
+/** Raised analytical cards and panels on the standard member canvas. */
+export const MEMBER_PANEL = '#1B1E27';
+
+/** Cells and chips raised above a member sheet or panel. */
+export const MEMBER_CELL = '#20242E';
+
+/** The full-screen near-black ground used by Clubhouse, Messages, and Echo. */
+export const IMMERSIVE_FEED_CANVAS = '#05070A';
+
+/** Opaque post cards, editorial slides, and Echo chart panels on the feed canvas. */
+export const FEED_CARD_SURFACE = '#10151C';
+
+/** The outer shell behind the unified post and review composer. */
+export const COMPOSER_SHELL_SURFACE = '#0B0F14';
+
+/** Raised trays, cards, and mention results inside the unified composer. */
+export const COMPOSER_PANEL_SURFACE = '#1B222B';
+
+/** Legacy app-shell paint retained behind member routes during first layout. */
+export const APP_SHELL_SURFACE = '#0D0D0D';
+
+/** Desktop gutter outside the constrained member app column. */
+export const DESKTOP_GUTTER_SURFACE = '#0A0A0A';
+
+/** Light compatibility route canvas retained for inactive legacy branches. */
+export const LIGHT_ROUTE_CANVAS = '#F8FAFC';
+
+/** Native chrome encoding of the near-black Clubhouse, Messages, and Echo canvas. */
+export const IMMERSIVE_FEED_STATUS_BAR = 'FF05070A';
+
+/** Native chrome encoding of the retained light compatibility route canvas. */
+export const LIGHT_ROUTE_STATUS_BAR = 'FFF8FAFC';
