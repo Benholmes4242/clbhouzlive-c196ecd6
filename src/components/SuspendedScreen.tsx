@@ -154,7 +154,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
         </p>
 
         {suspension.reason ? (
-          <div style={{ border: '1px solid rgba(248, 250, 252, 0.12)', background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.04), borderRadius: 12, padding: '14px 16px', marginBottom: 24 }}>
+          <div style={{ border: `1px solid ${surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.12)}`, background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.04), borderRadius: 12, padding: '14px 16px', marginBottom: 24 }}>
             <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#94A3B8', fontWeight: 600, marginBottom: 6 }}>
               Reason
             </div>
@@ -184,7 +184,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
             href="mailto:support@clbhouz.co.uk?subject=Account%20suspension"
             style={{
               display: 'block', textAlign: 'center', padding: '12px 16px', borderRadius: 999,
-              background: 'transparent', color: '#F8FAFC', border: '1px solid rgba(248, 250, 252, 0.24)',
+              background: 'transparent', color: '#F8FAFC', border: `1px solid ${surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.24)}`,
               fontWeight: 500, fontSize: 15, textDecoration: 'none',
             }}
           >
@@ -221,7 +221,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
             onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%', maxWidth: 520, background: SUSPENSION_SURFACE, color: '#F8FAFC',
-              borderTop: '1px solid rgba(248, 250, 252, 0.12)',
+              borderTop: `1px solid ${surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.12)}`,
               borderTopLeftRadius: 20, borderTopRightRadius: 20,
               padding: '18px 20px max(env(safe-area-inset-bottom, 0px), 24px)',
               display: 'flex', flexDirection: 'column', gap: 14,
@@ -254,7 +254,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
                   style={{
                     width: '100%', padding: 12, borderRadius: 12,
                     background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.06), color: '#F8FAFC',
-                    border: '1px solid rgba(248, 250, 252, 0.14)',
+                    border: `1px solid ${surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.14)}`,
                     fontSize: 14, fontFamily: 'inherit', resize: 'vertical', outline: 'none',
                     lineHeight: 1.5,
                   }}
@@ -270,7 +270,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
                     style={{
                       padding: '10px 16px', borderRadius: 999,
                       background: 'transparent', color: '#F8FAFC',
-                      border: '1px solid rgba(248, 250, 252, 0.24)',
+                      border: `1px solid ${surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.24)}`,
                       fontWeight: 500, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit',
                     }}
                   >
@@ -316,7 +316,7 @@ function ExistingAppealCard({ row }: { row: AppealRow }) {
   return (
     <div
       style={{
-        border: '1px solid rgba(248, 250, 252, 0.14)',
+        border: `1px solid ${surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.14)}`,
         background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.04),
         borderRadius: 12, padding: '14px 16px',
         display: 'flex', flexDirection: 'column', gap: 8,
