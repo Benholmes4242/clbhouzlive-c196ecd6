@@ -25,10 +25,10 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { toast } from '@/lib/toast';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { MEMBER_PANEL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const CHARCOAL = PAGE_CANVAS;
-const CARD = '#1B1E27';
+const CARD = MEMBER_PANEL;
 const AMBER = '#F7931E';
 const INK_MUTED = 'rgba(255,255,255,0.60)';
 const INK_FAINT = 'rgba(255,255,255,0.40)';

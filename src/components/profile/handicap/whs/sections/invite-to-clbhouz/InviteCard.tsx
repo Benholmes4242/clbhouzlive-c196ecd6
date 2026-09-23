@@ -11,6 +11,7 @@ import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { whsKeys } from '@/lib/whs/hooks';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 import { fmtHcp } from '@/lib/whs/format';
+import { MEMBER_CELL, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 interface Props {
   friend: FriendLeaderboardEntry;
@@ -20,8 +21,8 @@ interface Props {
 const INK = '#F2F4F7';
 const INK_MUTE = 'rgba(242,244,247,0.55)';
 const HAIRLINE = 'rgba(255,255,255,0.08)';
-const CARD_BG = '#1B1E27';
-const CELL_BG = '#20242E';
+const CARD_BG = MEMBER_PANEL;
+const CELL_BG = MEMBER_CELL;
 
 const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
