@@ -10,10 +10,15 @@
  * it is correct on this surface.
  */
 
+import { PAGE_CANVAS, MEMBER_PANEL, MEMBER_CELL } from '@/lib/tokens/surfaces';
+
+
 export const CHART = {
-  CANVAS: '#0B0F14',
-  PANEL: '#151A21',
-  PANEL_2: '#1B222B',
+  /* SURFACES come from the app ramp by reference. The chart keeps its own NAMES
+     (twelve consumers depend on them) but no longer its own VALUES. */
+  CANVAS: PAGE_CANVAS,
+  PANEL: MEMBER_PANEL,
+  PANEL_2: MEMBER_CELL,
   BORDER: 'rgba(255,255,255,0.07)',
   GRID: 'rgba(255,255,255,0.06)',
   INK: '#FFFFFF',
