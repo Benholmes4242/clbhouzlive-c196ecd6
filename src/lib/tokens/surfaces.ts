@@ -25,52 +25,52 @@
  */
 
 /** The ground a route is painted on. Mirrors CSS `--bg-page`; `--background` is a separately encoded legacy semantic. */
-export const PAGE_CANVAS = '#15171F';
+export const PAGE_CANVAS = '#0A0A0C';
 
 /** The ground a sheet is painted on. See components/ui/BottomSheet. */
-export const SHEET_SURFACE = '#15171F';
+export const SHEET_SURFACE = '#16161A';
 
 /** Foreground ink for inverted controls (dark text on a light/amber chip). */
-export const INK_ON_LIGHT = '#15171F';
+export const INK_ON_LIGHT = '#0A0A0C';
 
 /** Native chrome encoding (ARGB, no leading `#`) for the OS status bar. */
-export const STATUS_BAR_CANVAS = 'FF15171F';
+export const STATUS_BAR_CANVAS = 'FF0A0A0C';
 
 /** Raised analytical cards and panels on the standard member canvas. */
-export const MEMBER_PANEL = '#1B1E27';
+export const MEMBER_PANEL = '#16161A';
 
 /** Cells and chips raised above a member sheet or panel. */
-export const MEMBER_CELL = '#20242E';
+export const MEMBER_CELL = '#1E1E23';
 
 /** The full-screen near-black ground used by Clubhouse, Messages, and Echo. */
-export const IMMERSIVE_FEED_CANVAS = '#05070A';
+export const IMMERSIVE_FEED_CANVAS = '#0A0A0C';
 
 /** Opaque post cards, editorial slides, and Echo chart panels on the feed canvas. */
-export const FEED_CARD_SURFACE = '#10151C';
+export const FEED_CARD_SURFACE = '#16161A';
 
 /** Raised result cards and controls inside Echo. */
-export const ECHO_RAISED_SURFACE = '#181F28';
+export const ECHO_RAISED_SURFACE = '#27272E';
 
 /** The outer shell behind the unified post and review composer. */
-export const COMPOSER_SHELL_SURFACE = '#0B0F14';
+export const COMPOSER_SHELL_SURFACE = '#0A0A0C';
 
 /** Raised trays, cards, and mention results inside the unified composer. */
-export const COMPOSER_PANEL_SURFACE = '#1B222B';
+export const COMPOSER_PANEL_SURFACE = '#16161A';
 
 /** Legacy app-shell paint retained behind member routes during first layout. */
-export const APP_SHELL_SURFACE = '#0D0D0D';
+export const APP_SHELL_SURFACE = '#0A0A0C';
 
 /** Desktop gutter outside the constrained member app column. */
-export const DESKTOP_GUTTER_SURFACE = '#0A0A0A';
+export const DESKTOP_GUTTER_SURFACE = '#0A0A0C';
 
 /** Near-black fill for compact controls, notices, and branded utility tiles. */
-export const NEAR_BLACK_CONTROL_SURFACE = '#0A0A0A';
+export const NEAR_BLACK_CONTROL_SURFACE = '#1E1E23';
 
 /** Near-black shell behind Discover tabs and feed chrome. */
-export const DISCOVER_SHELL_SURFACE = '#0A0E14';
+export const DISCOVER_SHELL_SURFACE = '#0A0A0C';
 
 /** Raised near-black card tier used by Tour Hub's dark surface stack. */
-export const TOUR_HUB_RAISED_SURFACE = '#141414';
+export const TOUR_HUB_RAISED_SURFACE = '#16161A';
 
 /** Light compatibility route canvas retained for inactive legacy branches. */
 export const LIGHT_ROUTE_CANVAS = '#F8FAFC';
@@ -79,25 +79,25 @@ export const LIGHT_ROUTE_CANVAS = '#F8FAFC';
 export const LIGHT_IMMERSIVE_CANVAS = '#0F172A';
 
 /** Opaque slate fill for controls and utility cards on light member surfaces. */
-export const SLATE_CONTROL_SURFACE = '#0F172A';
+export const SLATE_CONTROL_SURFACE = '#1E1E23';
 
 /** Full-screen ground used while resolving a direct post link. */
-export const POST_DEEP_LINK_CANVAS = '#0D0F11';
+export const POST_DEEP_LINK_CANVAS = '#0A0A0C';
 
 /** Full-screen account-suspension page and its appeal sheet. */
-export const SUSPENSION_SURFACE = '#0F172A';
+export const SUSPENSION_SURFACE = '#0A0A0C';
 
 /** Full-screen ground used by Echo chat history. */
-export const ECHO_HISTORY_CANVAS = '#08090B';
+export const ECHO_HISTORY_CANVAS = '#0A0A0C';
 
 /** Sheet and empty-state tile surface used by Echo chat history. */
-export const ECHO_HISTORY_PANEL = '#14181E';
+export const ECHO_HISTORY_PANEL = '#16161A';
 
 /** Secondary action surface inside the Echo history sheet. */
-export const ECHO_HISTORY_ACTION = '#1D222A';
+export const ECHO_HISTORY_ACTION = '#1E1E23';
 
 /** Native chrome encoding of the near-black Clubhouse, Messages, and Echo canvas. */
-export const IMMERSIVE_FEED_STATUS_BAR = 'FF05070A';
+export const IMMERSIVE_FEED_STATUS_BAR = 'FF0A0A0C';
 
 /** Native chrome encoding of the retained light compatibility route canvas. */
 export const LIGHT_ROUTE_STATUS_BAR = 'FFF8FAFC';

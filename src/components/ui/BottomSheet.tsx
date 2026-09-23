@@ -7,11 +7,8 @@ import { pushSheetEntry, releaseSheetEntry } from './sheetHistory';
 /**
  * BRIEF_SHEET_BACKGROUND_CANON — THE SHEET SURFACE.
  *
- * One value for every bottom sheet in the app: #15171F, the background the
- * Your-circle leaderboard sits on (CSS `--background`, and the same value as
- * the existing feature tokens `A.CANVAS` and tourhub `SLATE_50`). It is
- * redeclared here rather than imported because a shared ui primitive must not
- * depend on a feature token file; the three names must stay in step.
+ * One canonical value for every bottom sheet in the app, imported from the
+ * shared surface token module so sheets move with the member surface ramp.
  *
  * Sheets do NOT paint their own body or chrome. If a sheet needs a raised
  * band, it uses a hairline or a PANEL panel INSIDE the body — never a second
@@ -509,7 +506,7 @@ export function BottomSheet({
         )}
         style={{
           zIndex: zIndexBase,
-          backgroundColor: 'rgba(0,0,0,0.4)',
+          backgroundColor: 'rgba(0,0,0,0.55)',
           ...(detented
             ? { opacity: isAnimating ? 0.35 + 0.65 * revealed : 0, transition: dragging ? 'none' : undefined }
             : null),
@@ -552,8 +549,7 @@ export function BottomSheet({
              The sheet owns the whole rounded surface, grabber strip included,
              so chrome and body cannot show a seam. It is applied AFTER
              `...style` deliberately: a caller's own background cannot win, or
-             the canon is advisory. Value = SHEET_SURFACE (#15171F), the
-             background the Your-circle leaderboard sits on. */
+              the canon is advisory. Value = the canonical SHEET_SURFACE. */
           background: SHEET_SURFACE,
         }}
         role="dialog"
