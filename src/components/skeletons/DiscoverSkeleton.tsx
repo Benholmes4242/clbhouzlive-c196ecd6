@@ -1,13 +1,14 @@
 import { Skeleton } from "@/components/ui/skeleton"
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 export const DiscoverSkeleton = () => {
   return (
     <div className="min-h-screen page-with-header pb-20 bg-background">
       {/* Top tabs — 3 soft-squircle pills matching SegmentedControl */}
       <div className="flex" style={{ gap: 8, padding: '8px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
-        <Skeleton className="h-8 w-[72px] rounded-lg" style={{ background: 'rgba(255,255,255,0.08)' }} />
-        <Skeleton className="h-8 w-[78px] rounded-lg" style={{ background: 'rgba(255,255,255,0.08)' }} />
-        <Skeleton className="h-8 w-[70px] rounded-lg" style={{ background: 'rgba(255,255,255,0.08)' }} />
+        <Skeleton className="h-8 w-[72px] rounded-lg" style={{ backgroundColor: MEMBER_CELL }} />
+        <Skeleton className="h-8 w-[78px] rounded-lg" style={{ backgroundColor: MEMBER_CELL }} />
+        <Skeleton className="h-8 w-[70px] rounded-lg" style={{ backgroundColor: MEMBER_CELL }} />
       </div>
 
       {/* Sub-tabs — Clips/Videos pills */}

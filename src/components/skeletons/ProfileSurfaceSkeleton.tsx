@@ -20,15 +20,16 @@
  *   FilterChips          7px/14px padding on 12.5 text => 31px pills, gap 8
  *
  * Shimmer: dark bars sit on the hero (base rgba(255,255,255,0.06), the
- * canonical .clb-shimmer-dark sweep lifts the peak to ~0.12); canvas bars use
- * the light sweep over A.TRACK. Nothing below the tab row shimmers — the tab
+ * canonical .clb-shimmer-dark sweep crosses the Cell base); canvas bars use
+ * the same visible dark sweep. Nothing below the tab row shimmers — the tab
  * content is off the fold on every device we ship.
  */
 import React from 'react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { HERO_CONTENT_INSET, W_10 } from '@/components/profile/hero/HeroShell';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
-const DARK_FILL = 'rgba(255,255,255,0.06)';
+const DARK_FILL = MEMBER_CELL;
 
 /** Bar on the dark hero. */
 function D({ style }: { style?: React.CSSProperties }) {
@@ -45,8 +46,8 @@ function D({ style }: { style?: React.CSSProperties }) {
 function L({ style }: { style?: React.CSSProperties }) {
   return (
     <div
-      className="clb-shimmer-light"
-      style={{ backgroundColor: A.TRACK, borderRadius: 6, ...style }}
+      className="clb-shimmer-dark"
+      style={{ backgroundColor: MEMBER_CELL, borderRadius: 6, ...style }}
     />
   );
 }

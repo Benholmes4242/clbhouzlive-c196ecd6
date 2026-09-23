@@ -18,6 +18,7 @@ import {
   LIGHT_ROUTE_STATUS_BAR,
   MEMBER_CELL,
   MEMBER_PANEL,
+  MEMBER_RAISED,
   APP_SHELL_SURFACE,
   DESKTOP_GUTTER_SURFACE,
   DISCOVER_SHELL_SURFACE,
@@ -43,6 +44,7 @@ describe('canonical member surface tokens', () => {
       STATUS_BAR_CANVAS,
       MEMBER_PANEL,
       MEMBER_CELL,
+      MEMBER_RAISED,
       IMMERSIVE_FEED_CANVAS,
       IMMERSIVE_FEED_STATUS_BAR,
       FEED_CARD_SURFACE,
@@ -70,6 +72,7 @@ describe('canonical member surface tokens', () => {
       STATUS_BAR_CANVAS: 'FF0A0A0C',
       MEMBER_PANEL: '#16161A',
       MEMBER_CELL: '#1E1E23',
+      MEMBER_RAISED: '#27272E',
       IMMERSIVE_FEED_CANVAS: '#0A0A0C',
       IMMERSIVE_FEED_STATUS_BAR: 'FF0A0A0C',
       FEED_CARD_SURFACE: '#16161A',
@@ -173,5 +176,33 @@ describe('canonical member surface tokens', () => {
     for (const path of paths) {
       expect(readFileSync(resolve(process.cwd(), path), 'utf8'), path).toContain('INK_ON_LIGHT');
     }
+  });
+
+  it('keeps dark skeletons on the canonical ramp and away from the black shimmer', () => {
+    const darkSkeletonPaths = [
+      'src/components/skeletons/WatchSkeletons.tsx',
+      'src/components/skeletons/MediaLibrarySkeletons.tsx',
+      'src/components/skeletons/ProfileSurfaceSkeleton.tsx',
+      'src/components/skeletons/RateCoursePageSkeleton.tsx',
+      'src/components/explore-tab-new/courseled/CourseImageFallback.tsx',
+      'src/components/explore-tab-new/courseled/DiscoverSectionShells.tsx',
+      'src/features/explore-magazine/ExploreShells.tsx',
+      'src/features/watch-v2/components/HubVideoRow.tsx',
+      'src/features/watch-v2/components/HubMixedGrid.tsx',
+      'src/features/watch-v2/components/HubClipsRow.tsx',
+      'src/features/profile-sheet-v2/ProfileSheetV2.tsx',
+    ];
+    for (const path of darkSkeletonPaths) {
+      expect(readFileSync(resolve(process.cwd(), path), 'utf8'), path).not.toContain('clb-shimmer-light');
+    }
+
+    const primitive = readFileSync(resolve(process.cwd(), 'src/components/ui/skeleton.tsx'), 'utf8');
+    expect(primitive).toContain('variant = "dark"');
+    expect(primitive).toContain('bg-surface-alt');
+
+    const allDarkSources = darkSkeletonPaths
+      .map((path) => readFileSync(resolve(process.cwd(), path), 'utf8'))
+      .join('\n');
+    expect(allDarkSources).not.toMatch(/rgba\(0,\s*0,\s*0,\s*0\.0[46]\)/);
   });
 });

@@ -6,7 +6,7 @@
  */
 import { Skeleton } from '@/components/ui/skeleton';
 import { TOUR_HERO_BAND_H } from '@/features/tourhub/_shared/tokens';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { MEMBER_PANEL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const SLATE_50 = PAGE_CANVAS;
 const HAIRLINE_INK_8 = 'rgba(255,255,255,0.10)';
@@ -19,7 +19,7 @@ export const TournamentPageSkeleton = () => {
       <div
         style={{
           minHeight: TOUR_HERO_BAND_H,
-          background: '#0A0E14',
+          background: MEMBER_PANEL,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-end',

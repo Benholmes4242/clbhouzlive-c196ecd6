@@ -12,6 +12,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useNavigate } from 'react-router-dom';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { HubRpcRow } from '../utils/toFeedPost';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -145,29 +146,29 @@ function SkeletonTile() {
   return (
     <div style={{ width: 143, flexShrink: 0 }}>
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           aspectRatio: '9 / 14',
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          backgroundColor: MEMBER_CELL,
         }}
       />
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           height: 11.5,
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          backgroundColor: MEMBER_CELL,
           marginTop: 6,
         }}
       />
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           height: 10.5,
           width: '60%',
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          backgroundColor: MEMBER_CELL,
           marginTop: 1,
         }}
       />

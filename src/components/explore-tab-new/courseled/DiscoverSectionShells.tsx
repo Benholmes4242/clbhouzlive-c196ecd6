@@ -1,6 +1,7 @@
 import React from 'react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { CARD_SHELL, CHIP_RADIUS } from './tokens';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 /**
  * SECTION SHELLS THAT ARE NOT DISCOVER'S.
@@ -16,7 +17,7 @@ import { CARD_SHELL, CHIP_RADIUS } from './tokens';
  */
 
 /**
- * Shimmer block. The base fill is INLINE because `.clb-shimmer-light` sets the
+ * Shimmer block. The base fill is INLINE because `.clb-shimmer-dark` sets the
  * `background` shorthand, which would otherwise wipe out a `bg-*` utility class
  * and leave the bars invisible on the canvas.
  */
@@ -29,8 +30,8 @@ export function Bar({
 }) {
   return (
     <div
-      className={`clb-shimmer-light ${className ?? ''}`}
-      style={{ backgroundColor: A.TRACK, borderRadius: CHIP_RADIUS, ...style }}
+      className={`clb-shimmer-dark ${className ?? ''}`}
+      style={{ backgroundColor: MEMBER_CELL, borderRadius: CHIP_RADIUS, ...style }}
     />
   );
 }

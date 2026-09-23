@@ -8,16 +8,17 @@
 
 import React from 'react';
 import { RV2 } from '@/features/review-v2/tokens';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 const CANVAS = RV2.canvas;
-const TILE = RV2.ghost;
+const TILE = MEMBER_CELL;
 const HAIRLINE = RV2.hairline;
 
 function Block({ style }: { style?: React.CSSProperties }) {
   return (
     <div
-      className="clb-shimmer-light"
-      style={{ background: TILE, borderRadius: 6, ...style }}
+      className="clb-shimmer-dark"
+      style={{ backgroundColor: TILE, borderRadius: 6, ...style }}
     />
   );
 }

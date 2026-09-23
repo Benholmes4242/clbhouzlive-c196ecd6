@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { prefersReducedMotion } from '@/utils/env';
 import { useSkeletonShownWhenVisible } from '@/perf/usePageReady';
 import { COLD_START_SHAPE, type SkeletonCardVariant } from '@/lib/clubhouse/skeletonShapeHint';
+import { FEED_CARD_SURFACE, MEMBER_CELL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface ClubhouseSkeletonShimmerProps {
   isVisible: boolean;
@@ -38,7 +39,7 @@ const SkeletonBlock: React.FC<{
 }> = ({ className, isStatic = false, style }) => (
   <div
     className={cn('relative overflow-hidden', !isStatic && 'clb-shimmer-dark', className)}
-    style={{ background: 'rgba(255,255,255,0.06)', ...style }}
+    style={{ backgroundColor: MEMBER_CELL, ...style }}
   />
 );
 
@@ -246,9 +247,9 @@ const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =>
   </div>
 );
 
-const CARD_BG = '#10151C';
+const CARD_BG = FEED_CARD_SURFACE;
 const HAIRLINE = 'rgba(255,255,255,0.08)';
-const CANVAS = '#05070A';
+const CANVAS = PAGE_CANVAS;
 
 export const CardSkeleton: React.FC<{
   isStatic?: boolean;
@@ -365,7 +366,8 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className={cn('absolute inset-0 z-50 pointer-events-none', 'bg-[#05070A]', className)}
+          className={cn('absolute inset-0 z-50 pointer-events-none', className)}
+          style={{ background: PAGE_CANVAS }}
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}

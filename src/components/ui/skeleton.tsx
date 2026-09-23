@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 
 function Skeleton({
   className,
-  variant = "light",
+  variant = "dark",
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { variant?: "light" | "dark" }) {
   return (

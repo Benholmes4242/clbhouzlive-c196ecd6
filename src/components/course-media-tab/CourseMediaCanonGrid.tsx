@@ -31,6 +31,7 @@ import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFe
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { AMBER } from '@/features/courses/_shared/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -84,11 +85,12 @@ function SkeletonTile() {
   return (
     <div style={{ marginBottom: 12 }}>
       <div
+        className="clb-shimmer-dark"
         style={{
           width: '100%',
           aspectRatio: '9 / 14',
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          backgroundColor: MEMBER_CELL,
         }}
       />
     </div>

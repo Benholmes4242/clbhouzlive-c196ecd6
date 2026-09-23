@@ -17,6 +17,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { VideoCardMoreButton } from './VideoCardMoreButton';
 import type { HubRpcRow } from '../utils/toFeedPost';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -210,37 +211,37 @@ function SkeletonCard() {
   return (
     <div style={{ width: 'min(374px, calc(100vw - 32px))', flexShrink: 0 }}>
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           aspectRatio: '16 / 9',
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          backgroundColor: MEMBER_CELL,
         }}
       />
       <div style={{ display: 'flex', gap: 9, marginTop: 8, alignItems: 'flex-start' }}>
         <div
-          className="clb-shimmer-light"
+          className="clb-shimmer-dark"
           style={{
             width: 30,
             height: 30,
             borderRadius: '34%',
-            background: 'rgba(0,0,0,0.06)',
+            backgroundColor: MEMBER_CELL,
             flexShrink: 0,
           }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
-            className="clb-shimmer-light"
-            style={{ height: 13.5, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }}
+            className="clb-shimmer-dark"
+            style={{ height: 13.5, borderRadius: 4, backgroundColor: MEMBER_CELL }}
           />
           <div
-            className="clb-shimmer-light"
+            className="clb-shimmer-dark"
             style={{
               marginTop: 6,
               height: 11.5,
               width: '55%',
               borderRadius: 4,
-              background: 'rgba(0,0,0,0.06)',
+              backgroundColor: MEMBER_CELL,
             }}
           />
         </div>

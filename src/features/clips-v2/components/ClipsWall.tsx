@@ -6,6 +6,7 @@ import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import { packColumns } from '@/components/feed-cards/packColumns';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useClipsWallFeed, type ClipsV2Mood, type ClipsWallRow } from '../hooks/useClipsWallFeed';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -19,7 +20,7 @@ function SkeletonTile() {
           width: '100%',
           aspectRatio: '9 / 14',
           borderRadius: 4,
-          background: 'rgba(255,255,255,0.06)',
+          backgroundColor: MEMBER_CELL,
         }}
       />
       <div
@@ -27,7 +28,7 @@ function SkeletonTile() {
         style={{
           height: 12.5,
           borderRadius: 4,
-          background: 'rgba(255,255,255,0.06)',
+          backgroundColor: MEMBER_CELL,
           marginTop: 6,
         }}
       />
@@ -37,7 +38,7 @@ function SkeletonTile() {
           height: 11,
           width: '55%',
           borderRadius: 4,
-          background: 'rgba(255,255,255,0.06)',
+          backgroundColor: MEMBER_CELL,
           marginTop: 2,
         }}
       />

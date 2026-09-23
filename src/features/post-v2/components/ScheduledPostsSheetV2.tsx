@@ -12,6 +12,7 @@ import ScheduleSheetV2 from './ScheduleSheetV2';
 import { CalendarClock, Trash2 } from 'lucide-react';
 import { formatSchedule } from '../lib/formatSchedule';
 import { CT } from '@/features/_shared/composerTokens';
+import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 interface Row {
   id: string;
@@ -89,10 +90,10 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
             {[0, 1, 2].map((i) => (
               <div key={`sk-${i}`} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: `1px solid ${CT.hairline}` }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div className="clb-shimmer-dark" style={{ height: 14, width: '70%', borderRadius: 6, background: 'rgba(255,255,255,0.06)' }} />
-                  <div className="clb-shimmer-dark" style={{ height: 11, width: '40%', borderRadius: 6, background: 'rgba(255,255,255,0.06)' }} />
+                  <div className="clb-shimmer-dark" style={{ height: 14, width: '70%', borderRadius: 6, backgroundColor: MEMBER_CELL }} />
+                  <div className="clb-shimmer-dark" style={{ height: 11, width: '40%', borderRadius: 6, backgroundColor: MEMBER_CELL }} />
                 </div>
-                <div className="clb-shimmer-dark" style={{ height: 22, width: 92, borderRadius: 999, background: 'rgba(255,255,255,0.06)' }} />
+                <div className="clb-shimmer-dark" style={{ height: 22, width: 92, borderRadius: 999, backgroundColor: MEMBER_CELL }} />
               </div>
             ))}
           </>

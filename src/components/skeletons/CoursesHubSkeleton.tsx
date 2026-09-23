@@ -5,7 +5,7 @@
  * The other list-shaped course routes keep CoursesListSkeleton.
  */
 import { Skeleton } from '@/components/ui/skeleton';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { MEMBER_PANEL, PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const HERO_MIN_HEIGHT =
   'calc(clamp(280px, 35dvh, 390px) + env(safe-area-inset-top, 0px))';
@@ -19,8 +19,7 @@ export const CoursesHubSkeleton = () => {
         style={{
           minHeight: HERO_MIN_HEIGHT,
           width: '100%',
-          background:
-            'linear-gradient(180deg, #1E4D38, #0F172A)',
+          background: `linear-gradient(180deg, ${MEMBER_PANEL}, ${PAGE_CANVAS})`,
         }}
       />
 
@@ -31,7 +30,7 @@ export const CoursesHubSkeleton = () => {
           gap: 16,
           padding: '12px 16px',
           borderBottom: '0.5px solid rgba(255,255,255,0.08)',
-          background: '#1B1E27',
+          background: MEMBER_PANEL,
         }}
       >
         <Skeleton className="h-6 w-20 rounded-md" />
