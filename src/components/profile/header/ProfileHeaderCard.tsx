@@ -6,6 +6,17 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import CollegeStamp from '../CollegeStamp';
 import { useFollowedColleges } from '@/features/tourhub/hooks/useCollegeMovers';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { PROFILE_PILL_SURFACES } from '@/lib/tokens/surfaces';
+
+const profilePillSurfaceProps = {
+  style: { backgroundColor: PROFILE_PILL_SURFACES.inactive },
+  onMouseEnter: (event: React.MouseEvent<HTMLElement>) => {
+    event.currentTarget.style.backgroundColor = PROFILE_PILL_SURFACES.hover;
+  },
+  onMouseLeave: (event: React.MouseEvent<HTMLElement>) => {
+    event.currentTarget.style.backgroundColor = PROFILE_PILL_SURFACES.inactive;
+  },
+};
 
 interface ProfileHeaderCardProps {
   displayName: string;
@@ -103,7 +114,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
               </span>
             )}
             {businessCategory && (
-              <span className="rounded-full profile-pill-inactive px-2 py-0.5 text-xs">
+              <span className="rounded-full px-2 py-0.5 text-xs" {...profilePillSurfaceProps}>
                 {getCategoryLabel(businessCategory)}
               </span>
             )}
@@ -156,7 +167,8 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           type="button"
           onClick={onCustomiseClick}
           aria-label="Edit profile"
-          className="inline-flex items-center gap-1 px-3 py-1 rounded-full profile-pill-inactive text-xs transition hover:bg-[var(--profile-pill-hover)]"
+          className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs transition-colors"
+          {...profilePillSurfaceProps}
         >
           <Pencil className="h-3 w-3" />
           Edit profile

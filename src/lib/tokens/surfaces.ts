@@ -45,6 +45,15 @@ export const MEMBER_CELL = '#1E1E23';
 /** Raised controls and emphasized blocks above a member cell or panel. */
 export const MEMBER_RAISED = '#27272E';
 
+/** Profile header pills: a cell on a panel, raised on hover, inverted when selected. */
+export const PROFILE_PILL_SURFACES = {
+  inactive: MEMBER_CELL,
+  hover: MEMBER_RAISED,
+  // Complete the set for the next selected-state caller; currently unused.
+  active: '#F7931E',
+  activeInk: INK_ON_LIGHT,
+} as const;
+
 /** The full-screen near-black ground used by Clubhouse, Messages, and Echo. */
 export const IMMERSIVE_FEED_CANVAS = '#0A0A0C';
 

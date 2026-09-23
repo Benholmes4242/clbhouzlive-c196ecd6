@@ -25,6 +25,7 @@ import {
   NEAR_BLACK_CONTROL_SURFACE,
   PAGE_CANVAS,
   POST_DEEP_LINK_CANVAS,
+  PROFILE_PILL_SURFACES,
   SHEET_SURFACE,
   SLATE_CONTROL_SURFACE,
   STATUS_BAR_CANVAS,
@@ -58,6 +59,7 @@ describe('canonical member surface tokens', () => {
       NEAR_BLACK_CONTROL_SURFACE,
       SLATE_CONTROL_SURFACE,
       POST_DEEP_LINK_CANVAS,
+      PROFILE_PILL_SURFACES,
       SUSPENSION_SURFACE,
       ECHO_HISTORY_CANVAS,
       ECHO_HISTORY_PANEL,
@@ -86,6 +88,12 @@ describe('canonical member surface tokens', () => {
       NEAR_BLACK_CONTROL_SURFACE: '#1E1E23',
       SLATE_CONTROL_SURFACE: '#1E1E23',
       POST_DEEP_LINK_CANVAS: '#0A0A0C',
+      PROFILE_PILL_SURFACES: {
+        inactive: '#1E1E23',
+        hover: '#27272E',
+        active: '#F7931E',
+        activeInk: '#0A0A0C',
+      },
       SUSPENSION_SURFACE: '#0A0A0C',
       ECHO_HISTORY_CANVAS: '#0A0A0C',
       ECHO_HISTORY_PANEL: '#16161A',
@@ -293,5 +301,21 @@ describe('canonical member surface tokens', () => {
     // --page-canvas is declared nowhere, so the literal fallback was rendering.
     expect(source).not.toContain('var(--page-canvas');
     expect(source).not.toContain('#0d0d0d');
+  });
+
+  it('keeps the complete profile pill set together and removes the dead legacy styling hooks', () => {
+    expect(PROFILE_PILL_SURFACES).toEqual({
+      inactive: MEMBER_CELL,
+      hover: MEMBER_RAISED,
+      active: '#F7931E',
+      activeInk: INK_ON_LIGHT,
+    });
+
+    const source = readFileSync(resolve(process.cwd(), 'src/components/profile/header/ProfileHeaderCard.tsx'), 'utf8');
+    expect(source).toContain("PROFILE_PILL_SURFACES } from '@/lib/tokens/surfaces'");
+    expect(source).toContain('backgroundColor: PROFILE_PILL_SURFACES.inactive');
+    expect(source).toContain('backgroundColor = PROFILE_PILL_SURFACES.hover');
+    expect(source).not.toContain('profile-pill-inactive');
+    expect(source).not.toContain('--profile-pill-hover');
   });
 });
