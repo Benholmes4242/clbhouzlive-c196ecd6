@@ -215,14 +215,31 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
                 <span style={{ flex: 1, minWidth: 0 }}>{t('course.searchAll')}</span>
               </button>
 
-              {hasCourses ? (
+              {course ? (
+                /* THE CHOSEN COURSE, ALONE. The suggestions are what you pick FROM;
+                   once something is picked they are noise, and showing only the
+                   choice is what confirms a search pick — which otherwise returned
+                   the member to an unchanged screen. */
+                <div style={{ marginTop: 18 }}>
+                  <CourseRow
+                    course={{
+                      courseId: course.id,
+                      courseName: course.name,
+                      thumbnail: course.thumbnail,
+                      when: course.when,
+                    }}
+                    selected
+                    onPick={() => setCourse(null)}
+                  />
+                </div>
+              ) : hasCourses ? (
                 <>
                   <Label text={t('course.recent')} />
                   {courses.map((c) => (
                     <CourseRow
                       key={c.courseId}
                       course={c}
-                      selected={course?.id === c.courseId}
+                      selected={false}
                       onPick={() => pickRecent(c)}
                     />
                   ))}
@@ -387,7 +404,12 @@ function CourseRow({
   selected,
   onPick,
 }: {
-  course: ComposerRecentCourse;
+  course: {
+    courseId: string;
+    courseName: string;
+    thumbnail: string | null;
+    when: string | null;
+  };
   selected: boolean;
   onPick: () => void;
 }) {
@@ -445,9 +467,14 @@ function CourseRow({
         >
           {course.courseName}
         </span>
-        <span style={{ display: 'block', marginTop: 2, fontSize: 12, color: CT.muted }}>
-          {t('course.played', { when: course.when })}
-        </span>
+        {/* NO PLAY DATE, NO SUBTITLE. A course found by search has never
+            been played by this member, so "Played ..." would be false. The
+            row is one line in that case, deliberately. */}
+        {course.when && (
+          <span style={{ display: 'block', marginTop: 2, fontSize: 12, color: CT.muted }}>
+            {t('course.played', { when: course.when })}
+          </span>
+        )}
       </span>
       {selected && <Check size={17} strokeWidth={3} color={CT.success} style={{ flexShrink: 0 }} />}
     </button>
