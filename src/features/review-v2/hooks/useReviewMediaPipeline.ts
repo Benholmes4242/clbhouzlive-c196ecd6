@@ -23,7 +23,7 @@ import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloud
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { usePendingPostsStore, type PendingPost } from '@/uploads/pendingPostsStore';
 import { reviewRetryRegistry } from '@/uploads/reviewRetryRegistry';
-import { startReviewUpload } from '../lib/reviewUploadController';
+import { startReviewUpload, uploadAndPublishReview } from '../lib/reviewUploadController';
 import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
 
@@ -716,6 +716,47 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
     [uploadOne, updateItem, uploadPendingMedia],
   );
 
+  /** Count of files that would actually upload, read from the ref at submit time. */
+  const pendingMediaCount = useCallback(
+    () => itemsRef.current.filter(
+      (i) => (i.status === 'pending' || i.status === 'failed') && !!i.file,
+    ).length,
+    [],
+  );
+
+  /** Fire-and-forget: the controller uploads then publishes, surviving unmount. */
+  const startBackgroundPublish = useCallback(
+    (pendingId: string, opts?: { queryClient?: QueryClient }) => {
+      const pending = itemsRef.current.filter(
+        (i) => (i.status === 'pending' || i.status === 'failed') && !!i.file,
+      );
+      if (!userId || pending.length === 0) return;
+
+      for (const it of pending) {
+        updateItem(it.id, { status: 'uploading', progress: 0, error: undefined });
+      }
+
+      // NOT AWAITED. The QueryClient is captured so the sweep still works
+      // after the composer is gone.
+      const qc = opts?.queryClient ?? null;
+      void uploadAndPublishReview(
+        uploadKeyRef.current,
+        userId,
+        pendingId,
+        pending.map((i) => ({
+          id: i.id,
+          type: i.type,
+          file: i.file as File,
+          width: i.width ?? null,
+          height: i.height ?? null,
+          durationSeconds: i.durationSeconds ?? null,
+        })),
+        () => { if (qc) invalidateCourseRatingCaches(qc); },
+      );
+    },
+    [userId, updateItem],
+  );
+
   const hasNewMedia = useCallback(() => items.some((i) => !i.isExisting), [items]);
 
   return {
@@ -730,5 +771,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
     clearPickerError: () => setPickerError(null),
     count: items.length,
     hasNewMedia,
+    pendingMediaCount,
+    startBackgroundPublish,
   };
 }

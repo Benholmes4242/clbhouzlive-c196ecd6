@@ -12,6 +12,12 @@ interface SubmitArgs {
   state: ReviewComposerState;
 }
 
+interface StageArgs {
+  courseId: string;
+  state: ReviewComposerState;
+  mediaExpected: number;
+}
+
 interface SubmitResult {
   ratingId: string;
   shareToFeed: boolean;
@@ -101,5 +107,44 @@ export function useReviewSubmit() {
     }
   }, []);
 
-  return { submit, remove, submitting, error };
+  const stage = useCallback(async ({ courseId, state, mediaExpected }: StageArgs): Promise<string> => {
+    if (state.overall == null) throw new Error('Overall score required');
+    if (
+      state.scores.design == null || state.scores.condition == null ||
+      state.scores.clubhouse == null || state.scores.facilities == null
+    ) {
+      throw new Error('All category scores required');
+    }
+    if (mediaExpected < 1) throw new Error('stage is for reviews with media');
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase.rpc('stage_course_review' as never, {
+        p_course_id: courseId,
+        p_rating: state.overall,
+        p_design: state.scores.design,
+        p_condition: state.scores.condition,
+        p_clubhouse: state.scores.clubhouse,
+        p_facilities: state.scores.facilities,
+        p_media_expected: mediaExpected,
+        p_review: state.reviewText || undefined,
+        p_verdict: state.verdict,
+        p_share_to_feed: state.shareToFeed,
+        p_tee_label: state.teeLabel ?? undefined,
+      } as never);
+      if (error) throw error;
+      // RETURNS uuid -> a bare string. No object unwrapping needed here.
+      const pendingId = typeof data === 'string' ? data : null;
+      if (!pendingId) throw new Error('Stage succeeded but no pending id returned');
+      return pendingId;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Submit failed');
+      throw e;
+    } finally {
+      setSubmitting(false);
+    }
+  }, []);
+
+  return { submit, stage, remove, submitting, error };
 }

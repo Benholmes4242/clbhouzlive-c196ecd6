@@ -125,7 +125,8 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
  */
 
 interface ReceiptState {
-  ratingId: string;
+  ratingId: string | null;
+  pending?: boolean;
   shareToFeed: boolean;
   overall: number | null;
   scores: Record<CategoryKey, number | null>;
@@ -277,6 +278,7 @@ function InnerComposer() {
     return (
       <ReviewReceipt
         ratingId={success.ratingId}
+        pending={!!success.pending}
         course={courseQ.data}
         overall={success.overall}
         scores={success.scores}
@@ -590,84 +592,65 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   }, [step, composer, exitGuard]);
 
   /**
-   * R1 §1.1 — the submit bar tells the truth about which half of the work is
-   * running: photographs are moving, then the review is being posted. It is
-   * one press; the member should not have to guess why it is taking time.
-   */
-  const [mediaUploading, setMediaUploading] = useState(false);
-
-
-  /**
-   * R1 §1.1 — THE ORDER IS INVERTED, AND THAT IS THE WHOLE FIX.
-   *
-   * WAS (and this is what lost photographs): RPC -> receipt -> upload -> rows.
-   * The bytes moved after the member had been navigated away and the composer
-   * unmounted; in the native shell a background or a discard killed the
-   * in-flight invoke and the insert behind it. Measured: a review submitted
-   * 18 Sep 2026 14:16 UTC reporting media_count 2, zero rows written, and no
-   * word of it to the member.
-   *
-   * IS: upload (foreground, member watching) -> RPC -> rows (milliseconds) ->
-   * receipt. Nothing slow survives the navigation, because nothing slow is
-   * left. If an upload fails the member STAYS HERE with their files intact and
-   * a working Retry, and NOTHING is submitted — the opposite of the old
-   * behaviour, where the review existed and the photographs did not.
-   *
-   * ORPHANS ARE ACCEPTED (brief, explicit): abandoning after an upload leaves
-   * a file in R2 with no row. Cheap, sweepable, and the right side of the
-   * trade against losing a member's photographs.
+   * PHASE 2 — STAGED REVIEWS. handleSubmit splits on whether there is anything
+   * to upload. No new files: submit_course_review_v2 directly, instant, as
+   * before. Files attached: stage_course_review writes ONLY pending_reviews,
+   * the member goes straight to the receipt, and reviewUploadController
+   * uploads every file then publishes in one transaction — or marks the
+   * staged row failed. The review never exists half-finished.
    */
   const handleSubmit = useCallback(async () => {
     try {
-      // 1. BYTES FIRST, while this page is alive and on screen.
-      setMediaUploading(true);
-      const up = await media.uploadPendingMedia();
-      setMediaUploading(false);
-      if (!up.ok) {
-        // R1 §1.3b — a failure is said in words, not only drawn on a tile.
-        // No RPC runs: there is no review, so there is nothing to be missing
-        // media from, and the files are still here to retry.
-        toast.error(t('review.toast.mediaUploadFailed'));
-        return;
+      const mediaExpected = media.pendingMediaCount();
+
+      if (mediaExpected === 0) {
+        // ---- NO NEW FILES: today's path, unchanged, and still instant. ----
+        const { ratingId } = await submit.submit({
+          courseId: course.id,
+          state: composer.state,
+        });
+        submittedRef.current = true;
+        notifyComposerCompleted();
+        composer.clearDraft();
+
+        const attached = await media.attachToReview(ratingId, {
+          queryClient: qc,
+          caption: composer.state.reviewText,
+        });
+        if (attached.failed > 0) toast.error(t('review.toast.mediaAttachFailed'));
+        else if (attached.held > 0) toast.error(t('review.toast.mediaAttachHeld'));
+
+        invalidateCourseRatingCaches(qc);
+        onSuccess({
+          ratingId,
+          pending: false,
+          shareToFeed: composer.state.shareToFeed,
+          overall: composer.state.overall,
+          scores: composer.state.scores,
+        });
+      } else {
+        // ---- FILES ATTACHED: stage, leave, let the controller finish. ----
+        const pendingId = await submit.stage({
+          courseId: course.id,
+          state: composer.state,
+          mediaExpected,
+        });
+        submittedRef.current = true;
+        notifyComposerCompleted();
+        composer.clearDraft();
+
+        // NOT AWAITED, and NO cache sweep here: nothing the app reads has
+        // changed yet; a refetch now would show the old review as current.
+        media.startBackgroundPublish(pendingId, { queryClient: qc });
+
+        onSuccess({
+          ratingId: null,
+          pending: true,
+          shareToFeed: composer.state.shareToFeed,
+          overall: composer.state.overall,
+          scores: composer.state.scores,
+        });
       }
-
-      // 2. THE RECORD.
-      const { ratingId, shareToFeed } = await submit.submit({
-        courseId: course.id,
-        state: composer.state,
-      });
-      submittedRef.current = true;
-      // A finished job is not a change of mind: the composer-flow step 1 must
-      // never come back on top of the receipt.
-      notifyComposerCompleted();
-      composer.clearDraft();
-
-      // 3. THE ROWS — milliseconds, because the bytes are already at rest.
-      // Awaited: a receipt must not render in front of outstanding work.
-      //
-      // R1.2 §1 — three outcomes, three different sentences, because they are
-      // three different situations for the member:
-      //   held > 0   the photo is uploaded and a Retry is waiting on it; it
-      //              does NOT need re-attaching by hand.
-      //   failed > 0 a genuine dead end — nowhere to hold the retry — so the
-      //              member is asked to add it again. Should be rare.
-      //   neither    silence, which is correct.
-      const attached = await media.attachToReview(ratingId, {
-        queryClient: qc,
-        caption: composer.state.reviewText,
-      });
-      if (attached.failed > 0) toast.error(t('review.toast.mediaAttachFailed'));
-      else if (attached.held > 0) toast.error(t('review.toast.mediaAttachHeld'));
-
-      invalidateCourseRatingCaches(qc);
-
-      // 4. THE RECEIPT, last, with nothing behind it.
-      onSuccess({
-        ratingId,
-        shareToFeed,
-        overall: composer.state.overall,
-        scores: composer.state.scores,
-      });
 
       // review_submitted
       analyticsEvents.track('review_submitted', {
@@ -679,7 +662,9 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         text_len: composer.state.reviewText.trim().length,
         media_count: media.items.length,
         tee_set: composer.state.teeLabel != null,
-        share_to_feed: shareToFeed,
+        share_to_feed: composer.state.shareToFeed,
+        staged: mediaExpected > 0,
+        media_expected: mediaExpected,
         total_ms: Math.round(Date.now() - mountedAtRef.current),
       });
       analyticsEvents.ratings.submitted({
@@ -695,7 +680,6 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     } catch (e) {
       // R1 §1.3a — the silent `.catch(() => {})` that used to swallow the whole
       // flush is gone. Every failure in this function now ends in a sentence.
-      setMediaUploading(false);
       toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -765,10 +749,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
      score, a touched dial with categories outstanding counts them, and only a
      complete screen offers to submit. */
   let buttonLabel: string;
-  if (mediaUploading) {
-    // R1 §1.1a — the sending state names the half that is running.
-    buttonLabel = t('review.wizard.uploadingMedia');
-  } else if (submit.submitting) {
+  if (submit.submitting) {
     buttonLabel = isEditMode ? t('review.wizard.saving') : t('review.wizard.posting');
   } else if (step === FIRST_STEP) {
     buttonLabel = t('review.wizard.continue');
@@ -1376,7 +1357,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
       <SubmitBar
         label={buttonLabel}
-        enabled={gateMet && !submit.submitting && !mediaUploading}
+        enabled={gateMet && !submit.submitting}
         onPress={handlePrimary}
         summary={footerSummary}
         skipLabel={skipLabel}
