@@ -280,7 +280,10 @@ export function ScorecardGlassOverlay({
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          background: 'var(--page-canvas, #0d0d0d)',
+          /* CANVAS BY REFERENCE. This read `var(--page-canvas, #0d0d0d)`, and
+             --page-canvas was declared nowhere, so the surface was always the
+             literal fallback rather than the page canvas it named. */
+          background: PAGE_CANVAS,
           /* THE PAGE WEARS THE SHARED ISLANDS, so it starts below them. The
              first child of this branch is the scorecard's FEAT BAND, which
              was rendering underneath the island. CHROME_CLEARANCE resolves
