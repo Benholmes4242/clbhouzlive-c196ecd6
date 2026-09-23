@@ -19,7 +19,8 @@ import { useReviewReceipt } from '../hooks/useReviewReceipt';
 import type { CategoryKey, ReviewV2Course } from '../types';
 
 interface Props {
-  ratingId: string;
+  ratingId: string | null;
+  pending?: boolean;
   course: ReviewV2Course;
   overall: number | null;
   scores: Record<CategoryKey, number | null>;
@@ -59,6 +60,7 @@ function regionLine(course: ReviewV2Course): string {
 
 export function ReviewReceipt({
   ratingId,
+  pending,
   course,
   overall,
   scores,
@@ -162,7 +164,9 @@ export function ReviewReceipt({
               marginBottom: 12,
             }}
           >
-            {t('review.wizard.receipt.eyebrow')}
+            {pending
+              ? t('review.wizard.receipt.eyebrowPending')
+              : t('review.wizard.receipt.eyebrow')}
           </div>
           <div
             style={{
@@ -181,6 +185,11 @@ export function ReviewReceipt({
           <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 2 }}>
             {regionLine(course)}
           </div>
+          {pending && (
+            <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.secondary, marginTop: 14 }}>
+              {t('review.wizard.receipt.pendingBody')}
+            </div>
+          )}
         </div>
 
         {/* Breakdown card */}
@@ -271,7 +280,7 @@ export function ReviewReceipt({
         </div>
 
 
-        {receipt && (
+        {!pending && receipt && (
           <>
             {/* What your rating did */}
             <div style={{ padding: '0 20px 22px' }}>

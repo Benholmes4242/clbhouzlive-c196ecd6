@@ -36,12 +36,18 @@
 import { supabase } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
+import { toast } from '@/lib/toast';
+import i18n from '@/i18n';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 export interface ReviewUploadInput {
   /** Client item id — echoed back on the result so the caller can match. */
   id: string;
   type: 'image' | 'video';
   file: File;
+  width?: number | null;
+  height?: number | null;
+  durationSeconds?: number | null;
 }
 
 export interface ReviewUploadResult {
@@ -220,4 +226,108 @@ export function subscribeToReviewUpload(key: string, listener: Listener): () => 
   job.listeners.add(listener);
   listener({ ...job.snapshot, progress: { ...job.snapshot.progress } });
   return () => { job.listeners.delete(listener); };
+}
+
+/* ---------------------------------------------------------------------------
+ * PHASE 2 — STAGED REVIEWS. The controller owns the whole job: upload, then
+ * publish, or mark failed. It survives the composer unmounting, so no
+ * arrangement of navigation can leave a staged row with nobody finishing it.
+ * ------------------------------------------------------------------------- */
+
+async function markPendingFailed(pendingId: string, message: string) {
+  try {
+    // pending_reviews is not in the generated types yet, hence the cast.
+    await (supabase as any)
+      .from('pending_reviews')
+      .update({
+        status: 'failed',
+        error_message: message.slice(0, 500),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', pendingId);
+  } catch (e) {
+    console.warn('[review] could not mark pending review failed', e);
+  }
+}
+
+function failNoisily(_detail: string) {
+  // If the member has left, the marked row is the only record (phase 3
+  // surfaces it). If they are still here, say it now.
+  try {
+    toast.error(i18n.t('courses:review.toast.stagedFailed'));
+  } catch {
+    /* i18n not ready — the row is still marked, which is what matters */
+  }
+}
+
+export interface PublishOutcome { ok: boolean; ratingId?: string; error?: string; }
+
+export async function uploadAndPublishReview(
+  key: string,
+  userId: string,
+  pendingId: string,
+  items: ReviewUploadInput[],
+  onPublished?: () => void,
+): Promise<PublishOutcome> {
+  const byId = new Map(items.map((i) => [i.id, i]));
+  let results: ReviewUploadResult[];
+  try {
+    results = await startReviewUpload(key, userId, items);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Upload failed';
+    await markPendingFailed(pendingId, msg);
+    failNoisily(msg);
+    return { ok: false, error: msg };
+  }
+
+  const failed = results.filter((r) => !r.ok);
+  if (failed.length > 0 || results.length !== items.length) {
+    const msg = failed[0]?.error || 'Some files did not finish uploading';
+    await markPendingFailed(pendingId, msg);
+    failNoisily(msg);
+    analyticsEvents.track('review_staged_failed', {
+      pending_id: pendingId, total: items.length, failed: failed.length,
+    });
+    return { ok: false, error: msg };
+  }
+
+  // EVERY FILE OR NOTHING — the RPC re-checks this count and refuses a short
+  // array, so a mismatch here can never publish a partial review.
+  const media = results.map((r) => {
+    const input = byId.get(r.id)!;
+    const w = input.width ?? null;
+    const h = input.height ?? null;
+    return {
+      media_url: r.uploadedUrl ?? '',
+      media_type: input.type,
+      stream_id: r.streamId ?? null,
+      poster_url: r.posterUrl ?? null,
+      width: w,
+      height: h,
+      aspect_ratio: w && h ? Number((w / h).toFixed(4)) : null,
+      duration_seconds: input.type === 'video' ? (input.durationSeconds ?? null) : null,
+    };
+  });
+
+  try {
+    const { data, error } = await supabase.rpc('publish_pending_review' as never, {
+      p_pending_id: pendingId,
+      p_media: media,
+    } as never);
+    if (error) throw error;
+    const ratingId = typeof data === 'string' ? data : undefined;
+    analyticsEvents.track('review_staged_published', {
+      pending_id: pendingId, media_count: media.length,
+    });
+    onPublished?.();
+    return { ok: true, ratingId };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Could not post your review';
+    await markPendingFailed(pendingId, msg);
+    failNoisily(msg);
+    analyticsEvents.track('review_staged_failed', {
+      pending_id: pendingId, total: items.length, failed: 0, stage: 'publish',
+    });
+    return { ok: false, error: msg };
+  }
 }
