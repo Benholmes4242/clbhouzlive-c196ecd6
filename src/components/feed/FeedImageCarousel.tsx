@@ -4,6 +4,7 @@ import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import type { MediaItem } from '@/components/media-system/types/media';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 
 interface FeedImageCarouselProps {
@@ -46,7 +47,7 @@ const ZoomableImageSlide: React.FC<{
           filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
         }} />
       ) : (
-        <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+        <div className="absolute inset-0" style={{ background: PAGE_CANVAS }} aria-hidden="true" />
       )}
       <div
         ref={ref}

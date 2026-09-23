@@ -20,6 +20,7 @@ import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
 import { TapForSoundPill } from '@/audio/MuteButton';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { VideoProcessingCard } from './VideoProcessingCard';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
@@ -239,7 +240,7 @@ export const FeedSlide = memo(function FeedSlide({
       }
       return (
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+          <div className="absolute inset-0" style={{ background: PAGE_CANVAS }} aria-hidden="true" />
           {posterSrc && (
             <img
               src={posterSrc}
@@ -284,7 +285,7 @@ export const FeedSlide = memo(function FeedSlide({
       const objectFit: 'cover' | 'contain' = isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain');
       return (
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+          <div className="absolute inset-0" style={{ background: PAGE_CANVAS }} aria-hidden="true" />
           <div
             ref={zoomRef}
             style={{ ...zoomStyle, position: 'absolute', inset: 0, zIndex: 1 }}

@@ -8,6 +8,7 @@
  */
 import React from 'react';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface Props {
   /** Optional dim/overlay mode — sits over a poster in fullscreen. */
@@ -20,7 +21,7 @@ export const VideoProcessingCard: React.FC<Props> = ({ overlay = false }) => {
       className="absolute inset-0 flex flex-col items-center justify-center"
       style={{
         // A STATE WASH, not a chip — excluded from CHIP_GLASS.
-        background: overlay ? 'rgba(0,0,0,0.45)' : '#0A0E14',
+        background: overlay ? 'rgba(0,0,0,0.45)' : PAGE_CANVAS,
         zIndex: overlay ? 2 : undefined,
       }}
       aria-live="polite"

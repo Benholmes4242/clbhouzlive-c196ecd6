@@ -15,6 +15,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { audioDuck } from '@/audio/audioDuckStore';
 import { VideoSlot } from '@/video/pool/VideoSlot';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 function useDucked(): boolean {
   return useSyncExternalStore(
@@ -83,7 +84,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   return (
     <div
       className="absolute inset-0 w-full h-full overflow-hidden"
-      style={{ background: '#0A0E14' }}
+      style={{ background: PAGE_CANVAS }}
       onClick={handleTap}
     >
       {/* Blurred-fill backdrop — only when letterboxing (contain). */}
@@ -105,7 +106,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
           }} />
         </div>
       ) : (
-        <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+        <div className="absolute inset-0" style={{ background: PAGE_CANVAS }} aria-hidden="true" />
       )}
 
       {/* Pooled <video> path — always on. Poster fallback when no HLS. */}
