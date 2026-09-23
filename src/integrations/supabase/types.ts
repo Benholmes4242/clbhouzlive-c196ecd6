@@ -19129,6 +19129,10 @@ export type Database = {
         Returns: Json
       }
       disablelongtransactions: { Args: never; Returns: string }
+      discard_pending_review: {
+        Args: { p_pending_id: string }
+        Returns: boolean
+      }
       dismiss_golfer_candidate: {
         Args: { p_reason?: string; p_user_id: string }
         Returns: Json
@@ -21374,6 +21378,28 @@ export type Database = {
           hardest_hole_si: number
           thumbnail_image: string
           total_rounds: number
+        }[]
+      }
+      get_pending_reviews: {
+        Args: never
+        Returns: {
+          clubhouse_score: number
+          condition_score: number
+          course_id: string
+          course_name: string
+          course_thumbnail: string
+          created_at: string
+          design_score: number
+          effective_status: string
+          error_message: string
+          facilities_score: number
+          id: string
+          media_expected: number
+          rating: number
+          review: string
+          share_to_feed: boolean
+          tee_label: string
+          verdict: string
         }[]
       }
       get_personal_bests: {

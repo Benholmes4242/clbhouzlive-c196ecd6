@@ -27,7 +27,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { notifyComposerCompleted } from '@/features/composer-flow/composerFlowStore';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -286,7 +286,7 @@ function InnerComposer() {
         onClubhouse={() => navigate('/clubhouse')}
         onBack={() => navigate(`/courses/${courseQ.data!.id}`, { replace: true })}
         onNextCourse={(nextId) => {
-          navigate(`/courses/${nextId}/review`, { replace: true });
+          navigate(`/courses/${nextId}/rate`, { replace: true });
         }}
       />
     );
@@ -400,6 +400,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
      and plural keys rather than an interpolated count, because the six locales
      do not share one plural rule; the joiner is a key too, for the same reason.
      Null when the restored draft recorded no attached media. */
+  /* PHASE 3 RETRY. Arriving from a failed staged review's card: the member
+     finished this review and the upload failed, so the part-finished draft
+     notice is the wrong story. One line replaces it. */
+  const retryLocation = useLocation();
+  const retryOfPendingId =
+    (retryLocation.state as { retryOfPendingId?: string } | null)?.retryOfPendingId ?? null;
+
   const restoredMediaLine = useMemo(() => {
     const c = composer.restoredMediaCounts;
     if (!c) return null;
@@ -1013,7 +1020,24 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
       {/* RESTORED EDIT DRAFT (_04 §1). Says so out loud, and offers the way back
           to the published version. Not amber: amber means the viewing member. */}
-      {composer.restoredFromDraft && (
+      {retryOfPendingId && (
+        <div
+          role="status"
+          style={{
+            margin: '0 16px 16px',
+            padding: '12px 14px',
+            border: `1px solid ${RV2.hairline}`,
+            borderRadius: 12,
+            fontSize: 12.5,
+            lineHeight: 1.45,
+            color: RV2.secondary,
+          }}
+        >
+          {t('review.pending.retryNotice')}
+        </div>
+      )}
+
+      {!retryOfPendingId && composer.restoredFromDraft && (
         <div
           role="status"
           style={{
@@ -1064,7 +1088,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           is no published version to differ from — but silence is exactly what
           made the media loss invisible, so the media sentence stands alone and
           is dismissible without discarding the words. */}
-      {!composer.restoredFromDraft && restoredMediaLine && (
+      {!retryOfPendingId && !composer.restoredFromDraft && restoredMediaLine && (
         <div
           role="status"
           style={{
