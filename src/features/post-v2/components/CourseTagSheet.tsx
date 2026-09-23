@@ -344,7 +344,9 @@ export default function CourseTagSheet({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ padding: '10px 16px 6px', fontSize: 11, fontWeight: 700, letterSpacing: 1, color: CT.secondary }}>
+    // 10px side padding inside the list's 14px gutter keeps the label text
+    // aligned with the row text (14 + 10 = 24px, same as a row's own padding).
+    <div style={{ padding: '10px 10px 6px', fontSize: 11, fontWeight: 700, letterSpacing: 1, color: CT.secondary }}>
       {children}
     </div>
   );
@@ -352,8 +354,19 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function CourseRowSkeleton() {
   return (
-    <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 12 }}>
-      <div className="clb-shimmer-dark" style={{ width: 34, height: 34, borderRadius: 12, backgroundColor: MEMBER_CELL, flex: 'none' }} />
+    <div
+      style={{
+        marginBottom: 8,
+        padding: 10,
+        background: CT.cardBg,
+        border: `1px solid ${CT.hairline}`,
+        borderRadius: 16,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 11,
+      }}
+    >
+      <div className="clb-shimmer-dark" style={{ width: 44, height: 44, borderRadius: 11, backgroundColor: MEMBER_CELL, flex: 'none' }} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div className="clb-shimmer-dark" style={{ height: 12, width: '55%', borderRadius: 6, backgroundColor: MEMBER_CELL }} />
         <div className="clb-shimmer-dark" style={{ height: 10, width: '30%', borderRadius: 6, backgroundColor: MEMBER_CELL }} />
@@ -378,65 +391,96 @@ function CourseRow({
   const locality = row.isHomeClub ? 'Your home club' : (row.sub_country || row.country || null);
   return (
     <button
-      onClick={() => onToggle({ id: row.id, name: row.name, country: row.country ?? null })}
+      type="button"
+      onClick={() => onToggle({
+        id: row.id,
+        name: row.name,
+        country: row.country ?? null,
+        thumbnail: row.thumbnail_image ?? null,
+      })}
+      aria-pressed={selected}
       style={{
-        ...rowBtn,
-        background: selected ? 'rgba(247,147,30,0.06)' : 'transparent',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 11,
+        marginBottom: 8,
+        padding: 10,
+        textAlign: 'left',
+        /* The composer's chosen-row fill and border. One step above the
+           card ground, so a chosen row reads as chosen without a second
+           border weight. */
+        background: selected ? '#222A34' : CT.cardBg,
+        border: `1px solid ${selected ? CT.ink : CT.hairline}`,
+        borderRadius: 16,
+        cursor: 'pointer',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 34, height: 34, borderRadius: 12, background: CT.ghost, border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <MapPin size={16} color={CT.amber} />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, color: CT.ink, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</div>
-          {locality && <div style={{ fontSize: 12, color: row.isHomeClub ? CT.amber : CT.secondary, fontWeight: row.isHomeClub ? 700 : 400 }}>{locality}</div>}
-        </div>
-        {reviewed && !selected && (
-          <div
-            style={{
-              flex: 'none',
-              padding: '3px 8px',
-              borderRadius: 999,
-              background: 'rgba(247,147,30,0.12)',
-              color: CT.amberDeep,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-            }}
-          >
-            REVIEWED
-          </div>
+      <span
+        style={{
+          width: 44,
+          height: 44,
+          flexShrink: 0,
+          borderRadius: 11,
+          overflow: 'hidden',
+          background: 'linear-gradient(145deg,#2F5A3C,#16281D)',
+        }}
+      >
+        {row.thumbnail_image && (
+          <img
+            src={row.thumbnail_image}
+            alt=""
+            loading="lazy"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
         )}
-        <div
-          aria-hidden
+      </span>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span
           style={{
-            flex: 'none',
-            width: 22,
-            height: 22,
-            borderRadius: 999,
-            border: selected ? 0 : '1.5px solid rgba(255,255,255,0.22)',
-            background: selected ? CT.amber : 'transparent',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: 'block',
+            fontSize: 15,
+            fontWeight: 700,
+            letterSpacing: '-0.01em',
+            color: CT.ink,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
         >
-          {selected && <Check size={14} color={CT.cardBg} strokeWidth={3} />}
+          {row.name}
+        </span>
+        {locality && (
+          <span
+            style={{
+              display: 'block',
+              marginTop: 2,
+              fontSize: 12,
+              color: row.isHomeClub ? CT.amber : CT.muted,
+              fontWeight: row.isHomeClub ? 700 : 400,
+            }}
+          >
+            {locality}
+          </span>
+        )}
+      </span>
+      {reviewed && !selected && (
+        <div
+          style={{
+            flex: 'none',
+            padding: '3px 8px',
+            borderRadius: 999,
+            background: 'rgba(247,147,30,0.12)',
+            color: CT.amberDeep,
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+          }}
+        >
+          REVIEWED
         </div>
-      </div>
+      )}
+      {selected && <Check size={17} strokeWidth={3} color={CT.success} style={{ flexShrink: 0 }} />}
     </button>
   );
 }
-
-
-const rowBtn: React.CSSProperties = {
-  display: 'block',
-  width: '100%',
-  textAlign: 'left',
-  padding: '12px 16px',
-  border: 0,
-  borderTop: '1px solid rgba(255,255,255,0.08)',
-  background: 'transparent',
-  cursor: 'pointer',
-};
