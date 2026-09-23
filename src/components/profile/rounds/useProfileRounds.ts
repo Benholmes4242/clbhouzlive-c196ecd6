@@ -2,8 +2,10 @@
  * BRIEF_PROFILE_ROUNDS_TAB — data for the profile Rounds tab.
  *
  * VISIBILITY IS THE DATABASE'S. Both queries run on the signed-in client as
- * the viewer; gam_round_stats RLS decides what comes back. There is NO client
- * copy of the handicap_visibility rule here, by design.
+ * the viewer via get_profile_rounds (SECURITY DEFINER, one can_view_handicap
+ * gate). There is NO client copy of the handicap_visibility rule here.
+
+
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
