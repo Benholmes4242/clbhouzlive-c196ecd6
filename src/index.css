@@ -3066,8 +3066,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   /* Accessibility and performance optimizations */
   @media (prefers-reduced-motion: reduce) {
-    .discover-pill,
-    .discover-pill--active,
     .transition-all,
     .transition-colors,
     .transition-transform,
@@ -3081,7 +3079,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   /* Focus ring visibility */
   .focus-visible {
-    outline: 2px solid var(--discover-orange);
+    outline: 2px solid var(--accent-primary, #F7931E);
     outline-offset: 2px;
 }
 
@@ -3202,41 +3200,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
     line-height: 1;
   }
 
-  /* Discover Page Specific Pills with Subtle Orange */
-  .discover-pill {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5
-           select-none whitespace-nowrap min-h-[44px]
-           backdrop-blur-md bg-gray-50/80 text-gray-700
-           border border-gray-200/60 shadow-none
-           transition-all duration-200;
-    line-height: 1;
-    scroll-snap-align: start;
-  }
-
-  .discover-pill:hover {
-    border-color: hsl(var(--discover-orange) / 0.3);
-    background-color: hsl(var(--discover-orange) / 0.05);
-  }
-
-  .discover-pill:focus-visible {
-    @apply outline-none ring-2 ring-offset-2;
-    ring-color: hsl(var(--discover-orange));
-  }
-
-  .discover-pill--active {
-    background-color: hsl(var(--discover-orange));
-    color: white;
-    border-color: hsl(var(--discover-orange));
-    @apply shadow-md;
-  }
-
-  .discover-pill__icon {
-    @apply w-4 h-4 flex-shrink-0;
-  }
-
-  .discover-pill__label {
-    @apply font-medium;
-  }
   }
 
   .pill--sm { 
