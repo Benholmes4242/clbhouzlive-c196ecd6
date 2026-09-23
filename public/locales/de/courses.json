@@ -1,2027 +1,2030 @@
 {
- "amateur": {
-  "board": {
-   "backToStream": "Zurück zum Stream",
-   "openPicker": "Bestenliste wählen"
-  },
-  "courses": {
-   "anywhere": "Überall",
-   "choosePlace": "Ort wählen",
-   "clearPlace": "Ortsfilter löschen",
-   "findPlace": "Land oder Region finden",
-   "noMatch": "Nichts passt zu {{query}}.",
-   "noPlaceMatch": "Nichts passt zu {{query}}.",
-   "placeTitle": "Nach Ort suchen",
-   "searchClear": "Suche löschen",
-   "searchPlaceholder": "Plätze, Regionen und Bewertungen suchen"
-  },
-  "hero": {
-   "context": {
-    "busiestCircle": "Der aktivste {{span}} in deinem Kreis.",
-    "clear": "{{margin}} Vorsprung auf den Nächsten.",
-    "nobody": "Niemand sonst schaffte mehr als {{runnerUp}}.",
-    "offGross": "Von {{hcp}}, Brutto {{gross}}.",
-    "poolCircleLong": "Beste von {{rounds}} Runden in deinem Kreis {{span}}.",
-    "poolCircleShort": "Beste von {{rounds}} in deinem Kreis.",
-    "poolEveryoneLong": "Beste von {{rounds}} Runden auf clbhouz {{span}}.",
-    "poolEveryoneShort": "Beste von {{rounds}} auf clbhouz."
-   },
-   "metric": {
-    "bestStableford": "BESTES STABLEFORD",
-    "lowestGross": "NIEDRIGSTES BRUTTO",
-    "lowestNet": "NIEDRIGSTES NETTO",
-    "mostBirdies": "MEISTE BIRDIES",
-    "mostCourses": "MEISTE PLÄTZE",
-    "mostEagles": "MEISTE EAGLES",
-    "mostRounds": "MEISTE RUNDEN",
-    "vsHandicap": "BESTES GEGEN HANDICAP"
-   },
-   "span": {
-    "d14": "in diesen zwei Wochen",
-    "d30": "in diesem Monat",
-    "d90": "in diesem Quartal"
-   },
-   "spanNoun": {
-    "d14": "Zweiwochenzeitraum",
-    "d30": "Monat",
-    "d90": "Quartal"
-   },
-   "spread": {
-    "both": "Across {{rounds}}, {{courses}}.",
-    "courses": "{{count}} courses",
-    "courses_one": "{{count}} course",
-    "courses_other": "{{count}} courses",
-    "rounds": "{{count}} rounds",
-    "roundsOnly": "Across {{rounds}}.",
-    "rounds_one": "{{count}} round",
-    "rounds_other": "{{count}} rounds"
-   },
-   "unit": {
-    "birdies": "Birdies",
-    "courses": "Plätze",
-    "eagles": "Eagles",
-    "net": "Netto",
-    "points": "Punkte",
-    "rounds": "Runden",
-    "underPar": "unter Par"
-   },
-   "window": {
-    "d14": "14 TAGE",
-    "d30": "30 TAGE",
-    "d90": "90 TAGE"
-   }
-  },
-  "place": {
-   "pair": "{{place}}, {{nation}}"
-  },
-  "shelf": {
-   "alsoPlays": "Spielt auch {{course}}",
-   "aroundCounty": "Rund um {{county}}",
-   "aroundWorld": "Rund um die Welt",
-   "circlePlays": "Wo dein Kreis spielt",
-   "circlePlaysSub": "Plätze, auf denen die Menschen spielen, denen du folgst",
-   "follow": "Folgen",
-   "following": "Folgt",
-   "golfersAtClub": "Golfer bei {{club}}",
-   "golfersToFollow": "Golfer zum Folgen",
-   "highestRatedMonth": "Am besten bewertet in diesem Monat",
-   "highestRatedYear": "Am besten bewertet in diesem Jahr",
-   "holdsCourseRecord": "Hält den Platzrekord",
-   "holdsCourseRecords_one": "Hält einen Platzrekord",
-   "holdsCourseRecords_other": "Hält {{count}} Platzrekorde",
-   "newOnClbhouz": "Neu auf clbhouz",
-   "newOnClbhouzSub": "Plätze, die hier erstmals bewertet wurden",
-   "newThisMonth": "Neu diesen Monat",
-   "onYourList": "Auf deiner Liste",
-   "playsAtClub": "Spielt in {{club}}",
-   "recordReason": {
-    "allTimeAceLeader": "Ass-Bestmarke aller Zeiten",
-    "allTimeAlbatrossHolder": "Albatross-Bestmarke aller Zeiten",
-    "allTimeBirdieLeader": "Birdie-Bestmarke aller Zeiten",
-    "allTimeEagleLeader": "Eagle-Bestmarke aller Zeiten",
-    "allTimeStablefordLeader": "Stableford-Bestmarke aller Zeiten",
-    "bestScoreToParHere": "Bestes Ergebnis zu Par hier",
-    "courseRecordHolder": "Platzrekordhalter",
-    "mostRoundsHere": "Meiste Runden hier",
-    "womensCourseRecordHolder": "Halterin des Platzrekords"
-   },
-   "roundsHere_one": "{{count}} Runde hier",
-   "roundsHere_other": "{{count}} Runden hier",
-   "roundsThisMonth": "{{count}} Runden diesen Monat",
-   "topRated": "Zuletzt am besten bewertet",
-   "worldsBest": "Die besten der Welt",
-   "worldsBestSub": "Top 100 nach Rang",
-   "worthTheDrive": "Die Fahrt wert",
-   "worthTheDriveSub": "Hoch bewertet von den wenigen, die dort gespielt haben",
-   "yourClub": "deinem Club"
-  },
-  "stream": {
-   "aCourse": "einem Platz",
-   "aMember": "Ein Mitglied",
-   "allRounds": "Alle Runden",
-   "callout": {
-    "ace": "Hole-in-one",
-    "aceCount_one": "Hole-in-one",
-    "aceCount_other": "{{count}} Hole-in-ones",
-    "albatross": "Albatros",
-    "albatrossCount_one": "Albatros",
-    "albatrossCount_other": "{{count}} Albatrosse",
-    "beatHandicap": "Beat handicap by {{n}}",
-    "birdieRun": "Birdie-Serie",
-    "birdies": "{{n}} Birdies",
-    "birdiesSub_one": "Ein Birdie in einer Runde",
-    "birdiesSub_other": "{{count}} Birdies in einer Runde",
-    "bogeyFree": "Bogeyfrei",
-    "bogeyFreeSub": "Par oder besser auf jedem Loch",
-    "courseRecord": "Platzrekord",
-    "eagle": "Eagle",
-    "eagleCount_one": "Eagle",
-    "eagleCount_other": "Eagle-Brace",
-    "featJoin": "{{first}} + {{second}}",
-    "handicapCut": "Handicap cut",
-    "handicapCutSub": "{{from}} to {{to}}",
-    "movedUpBoard": "In der Rangliste aufgestiegen",
-    "netCourseRecord": "Netto-Platzrekord",
-    "netRecord": "New net course record",
-    "nowRank": "Jetzt {{ord}}",
-    "onHole": "an Loch {{ord}}",
-    "rankUp": "Aufgestiegen",
-    "rankUpBy_one": "Um einen Platz in der Platzrangliste gestiegen",
-    "rankUpBy_other": "Um {{count}} Plätze in der Platzrangliste gestiegen",
-    "rankUpTo": "Auf {{ord}}",
-    "record": "Platzrekord",
-    "recordMargin_one": "{{count}} Schlag besser als der vorherige Platzrekord",
-    "recordMargin_other": "{{count}} Schläge besser als der vorherige Platzrekord",
-    "tagMovedUp": "AUFGESTIEGEN",
-    "tagNew": "NEU",
-     "tagRare": "SELTEN"
-   },
-   "chip": {
-    "gbi": "GB&I",
-    "hcp": "HCP",
-    "net": "NET",
-    "rating": "Bewertung",
-    "world": "Welt"
-   },
-   "connect": {
-    "action": "Handicap verbinden >",
-    "body": "Verbinde ein Handicap, dann erscheint jede deiner Runden hier, eingeordnet gegen alle, die denselben Platz gespielt haben."
-   },
-   "course": {
-    "eventLow": "{{name}} spielte diesen Monat mit {{gross}} das beste Ergebnis hier.",
-    "eventLowAnon": "{{gross}} ist diesen Monat das beste Ergebnis hier.",
-    "eventRatings": "{{count}} Bewertungen diesen Monat, im Schnitt {{mean}}.",
-    "factRated": "{{rounds}} Runden erfasst, bewertet mit {{rating}} aus {{count}}.",
-    "factRatedOnly": "Bewertet mit {{rating}} aus {{count}}.",
-    "factRounds": "{{rounds}} Runden hier erfasst."
-   },
-   "empty": {
-    "courses": "Noch keine Platze in {{scope}}.",
-    "reviews": "Noch keine Bewertungen in {{scope}}."
-   },
-   "enrichment": {
-    "photos": "{{count}} Fotos"
-   },
-   "failed": "Das wurde nicht geladen.",
-   "headline": {
-    "ace": "Ein Hole-in-One.",
-    "aceHole": "Ein Hole-in-One am {{ordHole}}. Loch.",
-    "aceHoleToPar": "Ein Hole-in-One am {{ordHole}}. Loch, in einer Runde von {{gross}}, {{topar}}.",
-    "aceToPar": "Ein Hole-in-One, in einer Runde von {{gross}}, {{topar}}.",
-    "albatross": "Ein Albatros.",
-    "albatrossHole": "Ein Albatros am {{ordHole}}. Loch, in einer Runde von {{gross}}.",
-    "albatrossHoleToPar": "Ein Albatros am {{ordHole}}. Loch, in einer Runde von {{gross}}, {{topar}}.",
-    "albatrossRound": "Ein Albatros, in einer Runde von {{gross}}.",
-    "albatrossRoundToPar": "Ein Albatros, in einer Runde von {{gross}}, {{topar}}.",
-    "birdieHaul": "{{count}} Birdies in einer Runde von {{gross}}.",
-    "birdieHaulToPar": "{{count}} Birdies in einer Runde von {{gross}}, {{topar}}.",
-    "bogeyFree": "Bogeyfrei mit {{gross}}.",
-    "eagle": "Ein Eagle, in einer Runde von {{gross}}.",
-    "eagleHole": "Ein Eagle am {{ordHole}}. Loch, in einer Runde von {{gross}}.",
-    "eagleHoleToPar": "Ein Eagle am {{ordHole}}. Loch, in einer Runde von {{gross}}, {{topar}}.",
-    "eagleToPar": "Ein Eagle, in einer Runde von {{gross}}, {{topar}}.",
-    "featAce_one": "ein Hole-in-one",
-    "featAce_other": "{{spokenCount}} Hole-in-ones",
-    "featAlbatross_one": "ein Albatros",
-    "featAlbatross_other": "{{spokenCount}} Albatrosse",
-    "featBirdies_one": "{{spokenCount}} Birdie",
-    "featBirdies_other": "{{spokenCount}} Birdies",
-    "featClean_one": "eine bogeyfreie Runde",
-    "featClean_other": "eine bogeyfreie Runde",
-    "featEagle_one": "ein Eagle",
-    "featEagle_other": "ein Eagle-Brace",
-    "featJoin": "{{first}} und {{second}}",
-    "featsOnly": "{{feats}}.",
-    "featsRound": "{{feats}}, in einer Runde von {{gross}}.",
-    "featsRoundToPar": "{{feats}}, in einer Runde von {{gross}}, {{topar}}.",
-    "listFirst": "{{player}} spielte eine Runde in {{gross}} - die niedrigste, die hier jemand gespielt hat.",
-    "listNewLow": "{{gross}}, eine neue Bestleistung auf deiner Liste.",
-    "played": "Gespielt.",
-    "playedNoChange": "{{player}} spielte eine Runde in {{gross}}. Dein {{ord}} von {{of}} hier bleibt unverändert.",
-    "rankDown": "{{player}} spielte eine Runde in {{gross}}. Du stehst hier jetzt auf {{ord}} von {{of}}.",
-    "rankDownBy": "Runde in {{gross}} und dich {{delta}} Plätze zurück auf {{n}} von {{of}} geschoben.",
-    "rankDownMoved": "{{player}} spielte eine Runde in {{gross}}. Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plätze tiefer.",
-    "rankHold": "Deine {{gross}} ist weiterhin die {{ord}}-beste Runde, die hier jemand gespielt hat.",
-    "rankUp": "Deine {{gross}} ist die {{ord}}-beste hier gespielte Runde.",
-    "rankUpBy": "Deine {{gross}} ist die {{ord}}-beste hier gespielte Runde, {{n}} Plätze nach vorn.",
-    "rankUpOthers": "Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plätze höher.",
-    "rankUpOthersPlain": "Du stehst hier jetzt auf {{ord}} von {{of}}.",
-    "recordLost": "{{player}} holte deinen Platzrekord mit {{gross}}.",
-    "recordLostBest": "{{player}} holte deinen Platzrekord mit {{gross}}. Deine Bestleistung hier ist {{best}}.",
-    "recordLostGap": "Deinen Platzrekord mit {{gross}} übernommen. Deine Bestleistung liegt {{delta}} dahinter.",
-    "recordLostSince": "{{player}} holte deinen Platzrekord mit {{gross}}. Deine {{best}} stand seit {{month}}.",
-    "recordOwn": "Du hast den Platzrekord mit {{gross}} geholt.",
-    "recordOwnToPar": "Du hast den Platzrekord mit {{gross}} geholt, {{topar}}.",
-    "recordTaken": "{{player}} holte den Platzrekord mit {{gross}}.",
-    "recordTakenBest": "{{player}} holte den Platzrekord mit {{gross}}, {{topar}}. Deine Bestleistung hier ist {{best}}.",
-    "recordTakenToPar": "{{player}} holte den Platzrekord mit {{gross}}, {{topar}}.",
-    "round": "{{player}} spielte eine Runde in {{gross}}.",
-    "roundToPar": "{{player}} spielte eine Runde in {{gross}}, {{topar}}."
-   },
-   "kicker": {
-    "aroundCountry": "{{country}}",
-    "aroundRegion": "{{region}}",
-    "aroundWorld": "Welt",
-    "atYourClub": "In deinem Club",
-    "backlog": "Aus {{month}}",
-    "clip": "Clip",
-    "course": "Platz",
-    "courseRecord": "Platzrekord",
-    "moment": "Aus der Community",
-    "news": "News",
-    "onYourList": "Auf deiner Liste",
-    "ownRound": "Deine Runde",
-    "watch": "Langes Video"
-   },
-   "list": {
-    "eventLow": "Neue Bestmarke: {{gross}}",
-    "eventRating": "Neu bewertet mit {{rating}}",
-    "eventRecord": "Neuer Platzrekord"
-   },
-   "nothingYet": "Hier gibt es noch nichts zu deinen Platzen. Folge einem Platz oder verbinde ein Handicap, und diese Seite wird deine.",
-   "ratingCount": "{{count}} Bewertungen",
-   "ratingCount_one": "{{count}} Bewertung",
-   "ratingCount_other": "{{count}} Bewertungen",
-   "retry": "Erneut versuchen",
-   "roundCount": "{{count}} Runden",
-   "scope": {
-    "circle": "Mein Kreis",
-    "club": "Mein Club",
-    "theWorld": "der Welt",
-    "world": "Welt",
-    "yourCircle": "deinem Kreis",
-    "yourClub": "deinem Club"
-   },
-   "scopes": "Ergebnisbereich",
-   "seeAll": "Alle {{count}} ansehen",
-   "seeAllClips_one": "{{count}} Clip ansehen",
-   "seeAllClips_other": "Alle {{count}} Clips ansehen",
-   "seeAllCourses_one": "{{count}} Platz ansehen",
-   "seeAllCourses_other": "Alle {{count}} Platze ansehen",
-   "seeAllMoments_one": "{{count}} Moment ansehen",
-   "seeAllMoments_other": "Alle {{count}} Momente ansehen",
-   "seeAllRoundsPlain": "Alle Runden ansehen",
-   "seeAllRounds_one": "{{count}} Runde ansehen",
-   "seeAllRounds_other": "Alle {{count}} Runden ansehen",
-   "shelf": {
-    "circle": "Dein Kreis",
-    "clips": "Clips",
-    "clubWeek": "Diese Woche bei {{club}}",
-    "moments": "Aus der Community",
-    "standing": "Wo du stehst",
-    "videos": "Videos"
-   },
-   "standing": {
-    "board": "Niedrigster Brutto",
-    "boardGross": "Brutto",
-    "boardNet": "Netto",
-    "boards": {
-     "birdies": "Meiste Birdies pro Runde",
-     "improved": "Größte Handicap-Senkung",
-     "net": "Beste Nettorunde",
-     "stableford": "Beste Stableford-Runde",
-     "topar": "Beste Bruttorunde"
+  "amateur": {
+    "board": {
+      "backToStream": "Zurück zum Stream",
+      "openPicker": "Bestenliste wählen"
     },
-    "lastChange": "letzte Änderung {{when}}",
-    "of": "von {{count}}",
-    "pickBoard": "Wertung wechseln",
-    "retry": "Erneut versuchen",
-    "unreadable": "Deine Platzierung konnte nicht geladen werden."
-   },
-   "stat": {
-    "net": "NET",
-    "par": "PAR",
-    "vsHcp": "VS HCP"
-   },
-   "topar": {
-    "level": "Par",
-    "over": "{{n}} über Par",
-    "under": "{{n}} unter Par"
-   },
-   "view": {
-    "all": "Alle",
-    "courses": "Platze",
-    "reviews": "Bewertungen",
-    "scores": "Ergebnisse",
-    "watch": "Ansehen"
-   },
-   "views": "Explore-Ansichten",
-   "visual": {
-    "ace": "HOLE-IN-ONE AN {{n}}",
-    "albatross": "ALBATROSS AN {{n}}",
-    "birdie": "BIRDIE",
-    "bogey": "BOGEY",
-    "double": "DOUBLE AN {{n}}",
-    "eagle": "EAGLE AN {{n}}",
-    "par": "PAR",
-    "triple": "TRIPLE AN {{n}}"
-   },
-   "you": "Du"
+    "courses": {
+      "anywhere": "Überall",
+      "choosePlace": "Ort wählen",
+      "clearPlace": "Ortsfilter löschen",
+      "findPlace": "Land oder Region finden",
+      "noMatch": "Nichts passt zu {{query}}.",
+      "noPlaceMatch": "Nichts passt zu {{query}}.",
+      "placeTitle": "Nach Ort suchen",
+      "searchClear": "Suche löschen",
+      "searchPlaceholder": "Plätze, Regionen und Bewertungen suchen"
+    },
+    "hero": {
+      "context": {
+        "busiestCircle": "Der aktivste {{span}} in deinem Kreis.",
+        "clear": "{{margin}} Vorsprung auf den Nächsten.",
+        "nobody": "Niemand sonst schaffte mehr als {{runnerUp}}.",
+        "offGross": "Von {{hcp}}, Brutto {{gross}}.",
+        "poolCircleLong": "Beste von {{rounds}} Runden in deinem Kreis {{span}}.",
+        "poolCircleShort": "Beste von {{rounds}} in deinem Kreis.",
+        "poolEveryoneLong": "Beste von {{rounds}} Runden auf clbhouz {{span}}.",
+        "poolEveryoneShort": "Beste von {{rounds}} auf clbhouz."
+      },
+      "metric": {
+        "bestStableford": "BESTES STABLEFORD",
+        "lowestGross": "NIEDRIGSTES BRUTTO",
+        "lowestNet": "NIEDRIGSTES NETTO",
+        "mostBirdies": "MEISTE BIRDIES",
+        "mostCourses": "MEISTE PLÄTZE",
+        "mostEagles": "MEISTE EAGLES",
+        "mostRounds": "MEISTE RUNDEN",
+        "vsHandicap": "BESTES GEGEN HANDICAP"
+      },
+      "span": {
+        "d14": "in diesen zwei Wochen",
+        "d30": "in diesem Monat",
+        "d90": "in diesem Quartal"
+      },
+      "spanNoun": {
+        "d14": "Zweiwochenzeitraum",
+        "d30": "Monat",
+        "d90": "Quartal"
+      },
+      "spread": {
+        "both": "Across {{rounds}}, {{courses}}.",
+        "courses": "{{count}} courses",
+        "courses_one": "{{count}} course",
+        "courses_other": "{{count}} courses",
+        "rounds": "{{count}} rounds",
+        "roundsOnly": "Across {{rounds}}.",
+        "rounds_one": "{{count}} round",
+        "rounds_other": "{{count}} rounds"
+      },
+      "unit": {
+        "birdies": "Birdies",
+        "courses": "Plätze",
+        "eagles": "Eagles",
+        "net": "Netto",
+        "points": "Punkte",
+        "rounds": "Runden",
+        "underPar": "unter Par"
+      },
+      "window": {
+        "d14": "14 TAGE",
+        "d30": "30 TAGE",
+        "d90": "90 TAGE"
+      }
+    },
+    "place": {
+      "pair": "{{place}}, {{nation}}"
+    },
+    "shelf": {
+      "alsoPlays": "Spielt auch {{course}}",
+      "aroundCounty": "Rund um {{county}}",
+      "aroundWorld": "Rund um die Welt",
+      "circlePlays": "Wo dein Kreis spielt",
+      "circlePlaysSub": "Plätze, auf denen die Menschen spielen, denen du folgst",
+      "follow": "Folgen",
+      "following": "Folgt",
+      "golfersAtClub": "Golfer bei {{club}}",
+      "golfersToFollow": "Golfer zum Folgen",
+      "highestRatedMonth": "Am besten bewertet in diesem Monat",
+      "highestRatedYear": "Am besten bewertet in diesem Jahr",
+      "holdsCourseRecord": "Hält den Platzrekord",
+      "holdsCourseRecords_one": "Hält einen Platzrekord",
+      "holdsCourseRecords_other": "Hält {{count}} Platzrekorde",
+      "newOnClbhouz": "Neu auf clbhouz",
+      "newOnClbhouzSub": "Plätze, die hier erstmals bewertet wurden",
+      "newThisMonth": "Neu diesen Monat",
+      "onYourList": "Auf deiner Liste",
+      "playsAtClub": "Spielt in {{club}}",
+      "recordReason": {
+        "allTimeAceLeader": "Ass-Bestmarke aller Zeiten",
+        "allTimeAlbatrossHolder": "Albatross-Bestmarke aller Zeiten",
+        "allTimeBirdieLeader": "Birdie-Bestmarke aller Zeiten",
+        "allTimeEagleLeader": "Eagle-Bestmarke aller Zeiten",
+        "allTimeStablefordLeader": "Stableford-Bestmarke aller Zeiten",
+        "bestScoreToParHere": "Bestes Ergebnis zu Par hier",
+        "courseRecordHolder": "Platzrekordhalter",
+        "mostRoundsHere": "Meiste Runden hier",
+        "womensCourseRecordHolder": "Halterin des Platzrekords"
+      },
+      "roundsHere_one": "{{count}} Runde hier",
+      "roundsHere_other": "{{count}} Runden hier",
+      "roundsThisMonth": "{{count}} Runden diesen Monat",
+      "topRated": "Zuletzt am besten bewertet",
+      "worldsBest": "Die besten der Welt",
+      "worldsBestSub": "Top 100 nach Rang",
+      "worthTheDrive": "Die Fahrt wert",
+      "worthTheDriveSub": "Hoch bewertet von den wenigen, die dort gespielt haben",
+      "yourClub": "deinem Club"
+    },
+    "stream": {
+      "aCourse": "einem Platz",
+      "aMember": "Ein Mitglied",
+      "allRounds": "Alle Runden",
+      "callout": {
+        "ace": "Hole-in-one",
+        "aceCount_one": "Hole-in-one",
+        "aceCount_other": "{{count}} Hole-in-ones",
+        "albatross": "Albatros",
+        "albatrossCount_one": "Albatros",
+        "albatrossCount_other": "{{count}} Albatrosse",
+        "beatHandicap": "Beat handicap by {{n}}",
+        "birdieRun": "Birdie-Serie",
+        "birdies": "{{n}} Birdies",
+        "birdiesSub_one": "Ein Birdie in einer Runde",
+        "birdiesSub_other": "{{count}} Birdies in einer Runde",
+        "bogeyFree": "Bogeyfrei",
+        "bogeyFreeSub": "Par oder besser auf jedem Loch",
+        "courseRecord": "Platzrekord",
+        "eagle": "Eagle",
+        "eagleCount_one": "Eagle",
+        "eagleCount_other": "Eagle-Brace",
+        "featJoin": "{{first}} + {{second}}",
+        "handicapCut": "Handicap cut",
+        "handicapCutSub": "{{from}} to {{to}}",
+        "movedUpBoard": "In der Rangliste aufgestiegen",
+        "netCourseRecord": "Netto-Platzrekord",
+        "netRecord": "New net course record",
+        "nowRank": "Jetzt {{ord}}",
+        "onHole": "an Loch {{ord}}",
+        "rankUp": "Aufgestiegen",
+        "rankUpBy_one": "Um einen Platz in der Platzrangliste gestiegen",
+        "rankUpBy_other": "Um {{count}} Plätze in der Platzrangliste gestiegen",
+        "rankUpTo": "Auf {{ord}}",
+        "record": "Platzrekord",
+        "recordMargin_one": "{{count}} Schlag besser als der vorherige Platzrekord",
+        "recordMargin_other": "{{count}} Schläge besser als der vorherige Platzrekord",
+        "tagMovedUp": "AUFGESTIEGEN",
+        "tagNew": "NEU",
+        "tagRare": "SELTEN"
+      },
+      "chip": {
+        "gbi": "GB&I",
+        "hcp": "HCP",
+        "net": "NET",
+        "rating": "Bewertung",
+        "world": "Welt"
+      },
+      "connect": {
+        "action": "Handicap verbinden >",
+        "body": "Verbinde ein Handicap, dann erscheint jede deiner Runden hier, eingeordnet gegen alle, die denselben Platz gespielt haben."
+      },
+      "course": {
+        "eventLow": "{{name}} spielte diesen Monat mit {{gross}} das beste Ergebnis hier.",
+        "eventLowAnon": "{{gross}} ist diesen Monat das beste Ergebnis hier.",
+        "eventRatings": "{{count}} Bewertungen diesen Monat, im Schnitt {{mean}}.",
+        "factRated": "{{rounds}} Runden erfasst, bewertet mit {{rating}} aus {{count}}.",
+        "factRatedOnly": "Bewertet mit {{rating}} aus {{count}}.",
+        "factRounds": "{{rounds}} Runden hier erfasst."
+      },
+      "empty": {
+        "courses": "Noch keine Platze in {{scope}}.",
+        "reviews": "Noch keine Bewertungen in {{scope}}."
+      },
+      "enrichment": {
+        "photos": "{{count}} Fotos"
+      },
+      "failed": "Das wurde nicht geladen.",
+      "headline": {
+        "ace": "Ein Hole-in-One.",
+        "aceHole": "Ein Hole-in-One am {{ordHole}}. Loch.",
+        "aceHoleToPar": "Ein Hole-in-One am {{ordHole}}. Loch, in einer Runde von {{gross}}, {{topar}}.",
+        "aceToPar": "Ein Hole-in-One, in einer Runde von {{gross}}, {{topar}}.",
+        "albatross": "Ein Albatros.",
+        "albatrossHole": "Ein Albatros am {{ordHole}}. Loch, in einer Runde von {{gross}}.",
+        "albatrossHoleToPar": "Ein Albatros am {{ordHole}}. Loch, in einer Runde von {{gross}}, {{topar}}.",
+        "albatrossRound": "Ein Albatros, in einer Runde von {{gross}}.",
+        "albatrossRoundToPar": "Ein Albatros, in einer Runde von {{gross}}, {{topar}}.",
+        "birdieHaul": "{{count}} Birdies in einer Runde von {{gross}}.",
+        "birdieHaulToPar": "{{count}} Birdies in einer Runde von {{gross}}, {{topar}}.",
+        "bogeyFree": "Bogeyfrei mit {{gross}}.",
+        "eagle": "Ein Eagle, in einer Runde von {{gross}}.",
+        "eagleHole": "Ein Eagle am {{ordHole}}. Loch, in einer Runde von {{gross}}.",
+        "eagleHoleToPar": "Ein Eagle am {{ordHole}}. Loch, in einer Runde von {{gross}}, {{topar}}.",
+        "eagleToPar": "Ein Eagle, in einer Runde von {{gross}}, {{topar}}.",
+        "featAce_one": "ein Hole-in-one",
+        "featAce_other": "{{spokenCount}} Hole-in-ones",
+        "featAlbatross_one": "ein Albatros",
+        "featAlbatross_other": "{{spokenCount}} Albatrosse",
+        "featBirdies_one": "{{spokenCount}} Birdie",
+        "featBirdies_other": "{{spokenCount}} Birdies",
+        "featClean_one": "eine bogeyfreie Runde",
+        "featClean_other": "eine bogeyfreie Runde",
+        "featEagle_one": "ein Eagle",
+        "featEagle_other": "ein Eagle-Brace",
+        "featJoin": "{{first}} und {{second}}",
+        "featsOnly": "{{feats}}.",
+        "featsRound": "{{feats}}, in einer Runde von {{gross}}.",
+        "featsRoundToPar": "{{feats}}, in einer Runde von {{gross}}, {{topar}}.",
+        "listFirst": "{{player}} spielte eine Runde in {{gross}} - die niedrigste, die hier jemand gespielt hat.",
+        "listNewLow": "{{gross}}, eine neue Bestleistung auf deiner Liste.",
+        "played": "Gespielt.",
+        "playedNoChange": "{{player}} spielte eine Runde in {{gross}}. Dein {{ord}} von {{of}} hier bleibt unverändert.",
+        "rankDown": "{{player}} spielte eine Runde in {{gross}}. Du stehst hier jetzt auf {{ord}} von {{of}}.",
+        "rankDownBy": "Runde in {{gross}} und dich {{delta}} Plätze zurück auf {{n}} von {{of}} geschoben.",
+        "rankDownMoved": "{{player}} spielte eine Runde in {{gross}}. Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plätze tiefer.",
+        "rankHold": "Deine {{gross}} ist weiterhin die {{ord}}-beste Runde, die hier jemand gespielt hat.",
+        "rankUp": "Deine {{gross}} ist die {{ord}}-beste hier gespielte Runde.",
+        "rankUpBy": "Deine {{gross}} ist die {{ord}}-beste hier gespielte Runde, {{n}} Plätze nach vorn.",
+        "rankUpOthers": "Du stehst hier jetzt auf {{ord}} von {{of}}, {{n}} Plätze höher.",
+        "rankUpOthersPlain": "Du stehst hier jetzt auf {{ord}} von {{of}}.",
+        "recordLost": "{{player}} holte deinen Platzrekord mit {{gross}}.",
+        "recordLostBest": "{{player}} holte deinen Platzrekord mit {{gross}}. Deine Bestleistung hier ist {{best}}.",
+        "recordLostGap": "Deinen Platzrekord mit {{gross}} übernommen. Deine Bestleistung liegt {{delta}} dahinter.",
+        "recordLostSince": "{{player}} holte deinen Platzrekord mit {{gross}}. Deine {{best}} stand seit {{month}}.",
+        "recordOwn": "Du hast den Platzrekord mit {{gross}} geholt.",
+        "recordOwnToPar": "Du hast den Platzrekord mit {{gross}} geholt, {{topar}}.",
+        "recordTaken": "{{player}} holte den Platzrekord mit {{gross}}.",
+        "recordTakenBest": "{{player}} holte den Platzrekord mit {{gross}}, {{topar}}. Deine Bestleistung hier ist {{best}}.",
+        "recordTakenToPar": "{{player}} holte den Platzrekord mit {{gross}}, {{topar}}.",
+        "round": "{{player}} spielte eine Runde in {{gross}}.",
+        "roundToPar": "{{player}} spielte eine Runde in {{gross}}, {{topar}}."
+      },
+      "kicker": {
+        "aroundCountry": "{{country}}",
+        "aroundRegion": "{{region}}",
+        "aroundWorld": "Welt",
+        "atYourClub": "In deinem Club",
+        "backlog": "Aus {{month}}",
+        "clip": "Clip",
+        "course": "Platz",
+        "courseRecord": "Platzrekord",
+        "moment": "Aus der Community",
+        "news": "News",
+        "onYourList": "Auf deiner Liste",
+        "ownRound": "Deine Runde",
+        "watch": "Langes Video"
+      },
+      "list": {
+        "eventLow": "Neue Bestmarke: {{gross}}",
+        "eventRating": "Neu bewertet mit {{rating}}",
+        "eventRecord": "Neuer Platzrekord"
+      },
+      "nothingYet": "Hier gibt es noch nichts zu deinen Platzen. Folge einem Platz oder verbinde ein Handicap, und diese Seite wird deine.",
+      "ratingCount": "{{count}} Bewertungen",
+      "ratingCount_one": "{{count}} Bewertung",
+      "ratingCount_other": "{{count}} Bewertungen",
+      "retry": "Erneut versuchen",
+      "roundCount": "{{count}} Runden",
+      "scope": {
+        "circle": "Mein Kreis",
+        "club": "Mein Club",
+        "theWorld": "der Welt",
+        "world": "Welt",
+        "yourCircle": "deinem Kreis",
+        "yourClub": "deinem Club"
+      },
+      "scopes": "Ergebnisbereich",
+      "seeAll": "Alle {{count}} ansehen",
+      "seeAllClips_one": "{{count}} Clip ansehen",
+      "seeAllClips_other": "Alle {{count}} Clips ansehen",
+      "seeAllCourses_one": "{{count}} Platz ansehen",
+      "seeAllCourses_other": "Alle {{count}} Platze ansehen",
+      "seeAllMoments_one": "{{count}} Moment ansehen",
+      "seeAllMoments_other": "Alle {{count}} Momente ansehen",
+      "seeAllRoundsPlain": "Alle Runden ansehen",
+      "seeAllRounds_one": "{{count}} Runde ansehen",
+      "seeAllRounds_other": "Alle {{count}} Runden ansehen",
+      "shelf": {
+        "circle": "Dein Kreis",
+        "clips": "Clips",
+        "clubWeek": "Diese Woche bei {{club}}",
+        "moments": "Aus der Community",
+        "standing": "Wo du stehst",
+        "videos": "Videos"
+      },
+      "standing": {
+        "board": "Niedrigster Brutto",
+        "boardGross": "Brutto",
+        "boardNet": "Netto",
+        "boards": {
+          "birdies": "Meiste Birdies pro Runde",
+          "improved": "Größte Handicap-Senkung",
+          "net": "Beste Nettorunde",
+          "stableford": "Beste Stableford-Runde",
+          "topar": "Beste Bruttorunde"
+        },
+        "lastChange": "letzte Änderung {{when}}",
+        "of": "von {{count}}",
+        "pickBoard": "Wertung wechseln",
+        "retry": "Erneut versuchen",
+        "unreadable": "Deine Platzierung konnte nicht geladen werden."
+      },
+      "stat": {
+        "net": "NET",
+        "par": "PAR",
+        "vsHcp": "VS HCP"
+      },
+      "topar": {
+        "level": "Par",
+        "over": "{{n}} über Par",
+        "under": "{{n}} unter Par"
+      },
+      "view": {
+        "all": "Alle",
+        "courses": "Platze",
+        "reviews": "Bewertungen",
+        "scores": "Ergebnisse",
+        "watch": "Ansehen"
+      },
+      "views": "Explore-Ansichten",
+      "visual": {
+        "ace": "HOLE-IN-ONE AN {{n}}",
+        "albatross": "ALBATROSS AN {{n}}",
+        "birdie": "BIRDIE",
+        "bogey": "BOGEY",
+        "double": "DOUBLE AN {{n}}",
+        "eagle": "EAGLE AN {{n}}",
+        "par": "PAR",
+        "triple": "TRIPLE AN {{n}}"
+      },
+      "you": "Du"
+    },
+    "watch": {
+      "chip": {
+        "all": "Alle",
+        "clips": "Clips",
+        "forYou": "Für dich",
+        "friends": "Freunde",
+        "videos": "Videos",
+        "yourCourses": "Deine Plätze"
+      },
+      "empty": "Hier gibt es noch nichts zu sehen.",
+      "filters": "Watch-Filter",
+      "noResults": "Keine Treffer für {{query}}.",
+      "rail": {
+        "clips": "Clips",
+        "community": "Aus der Community",
+        "videos": "Videos"
+      },
+      "searchPlaceholder": "Videos, Clips und Creator suchen",
+      "untitled": "Video ohne Titel"
+    }
   },
-  "watch": {
-   "chip": {
-    "all": "Alle",
-    "clips": "Clips",
-    "forYou": "Für dich",
-    "friends": "Freunde",
-    "videos": "Videos",
-    "yourCourses": "Deine Plätze"
-   },
-   "empty": "Hier gibt es noch nichts zu sehen.",
-   "filters": "Watch-Filter",
-   "noResults": "Keine Treffer für {{query}}.",
-   "rail": {
-    "clips": "Clips",
-    "community": "Aus der Community",
-    "videos": "Videos"
-   },
-   "searchPlaceholder": "Videos, Clips und Creator suchen",
-   "untitled": "Video ohne Titel"
-  }
- },
- "amateurNews": {
-  "all": "All",
-  "allStories": "ALL STORIES",
-  "categories": {
-   "boys": "Boys",
-   "club": "Club",
-   "county": "County",
-   "girls": "Girls",
-   "international": "International",
-   "mens": "Men's",
-   "midam": "Mid-Am",
-   "seniors": "Seniors",
-   "university": "University",
-   "womens": "Women's"
-  },
-  "emptyAll": "The first stories are on their way.",
-  "emptyFilter": "Nothing filed under this yet.",
-  "filterAria": "Filter amateur news",
-  "label": "Amateurgolf",
-  "more": "MORE AMATEUR NEWS",
-  "notFound": "This story is no longer available.",
-  "section": "Amateur news"
- },
- "card": {
-  "aiQuoteFallback": "A golf experience like no other",
-  "aiQuoteLoading": "Generating quote...",
-  "avgRating": "Avg: {{rating}}",
-  "experiencePoints": "Experience Points Earned",
-  "friendsPlayedCount_one": "{{count}} friend played",
-  "friendsPlayedCount_other": "{{count}} friends played",
-  "friendsPlayed_one": "Played by {{count}} friend",
-  "friendsPlayed_other": "Played by {{count}} friends",
-  "logged": "Logged: {{date}}",
-  "noFriendsPlayed": "No friends played yet",
-  "played": "Gespielt.",
-  "rate": "Rate",
-  "xpValue": "{{xp}} XP",
-  "yourRating": "Your: {{rating}}",
-  "yourRounds": "Deine Runden",
-  "yourStats": "Your stats"
- },
- "champions": {
-  "board": {
-   "allTime": "ALL TIME",
-   "last90Days": "LAST 90 DAYS",
-   "mark": "MARK",
-   "member": "MEMBER",
-   "members": "{{count}} MEMBERS",
-   "pos": "POS",
-   "rounds": "{{count}} ROUNDS",
-   "seeAll": "SEE ALL {{count}}",
-   "unclaimedShort": "--",
-   "when": "WHEN"
-  }
- },
- "community": {
-  "browseByClub": "Browse by club",
-  "chips": {
-   "clips": "Clips",
-   "everything": "Everything",
-   "photos": "Photos",
-   "videos": "Videos"
-  },
-  "count": "{{count}} posts",
-  "count_one": "{{count}} post",
-  "empty": "No member media yet.",
-  "everything": "Everything",
-  "filter": {
-   "all": "All",
-   "played": "Played",
-   "video": "Video"
-  },
-  "heading": "From the community",
-  "rails": {
-   "busiest": "Busiest clubs",
-   "nearby": "Near you",
-   "played": "Courses you have played",
-   "top100": "From the Top 100",
-   "video": "In motion"
-  },
-  "sections": {
-   "clips": {
-    "subline": "Under three minutes",
-    "title": "Clips"
-   },
-   "clubs": {
-    "subline": "Only where a course was tagged",
-    "title": "Browse by club"
-   },
-   "photos": {
-    "subline": "From the courses",
-    "title": "Photos"
-   },
-   "videos": {
-    "subline": "Three minutes and over",
-    "title": "Latest videos"
-   }
-  },
-  "subline": "Everything members have filmed and photographed"
- },
- "courseDetail": {
-  "a11y": {
-   "openMediaTab": "Open Media tab",
-   "sections": "Course Detail Sections"
-  },
-  "about": {
-   "editRating": "Edit your rating",
-   "locationUnavailable": "Location data isn't available yet.",
-   "officialWebsite": "Official Course Website"
-  },
-  "allHolesSheet": {
-   "explainer": "A hole is marked when it sits at least four places out and at least 0.07 of a shot from what its index should return, scaled to this course's own spread.",
-   "holes": "Hole by hole",
-   "indexedPlays": "indexed {{index}}, plays {{plays}}",
-   "ladder": "Stroke index against how it plays",
-   "outOfStep_one": "1 out of step",
-   "outOfStep_other": "{{count}} out of step",
-   "pars": "How each par plays",
-   "plays": "Plays",
-   "si": "SI",
-   "title": "All 18 holes"
+  "amateurNews": {
+    "all": "All",
+    "allStories": "ALL STORIES",
+    "categories": {
+      "boys": "Boys",
+      "club": "Club",
+      "county": "County",
+      "girls": "Girls",
+      "international": "International",
+      "mens": "Men's",
+      "midam": "Mid-Am",
+      "seniors": "Seniors",
+      "university": "University",
+      "womens": "Women's"
+    },
+    "emptyAll": "The first stories are on their way.",
+    "emptyFilter": "Nothing filed under this yet.",
+    "filterAria": "Filter amateur news",
+    "label": "Amateurgolf",
+    "more": "MORE AMATEUR NEWS",
+    "notFound": "This story is no longer available.",
+    "section": "Amateur news"
   },
   "card": {
-   "a11yTeeRow": "{{tee}} Tees, Slope {{slope}}",
-   "a11yTeeRowNoSlope": "{{tee}} Tees, kein Slope",
-   "compare": {
-    "in": "In",
-    "kicker": "OUT AGAINST IN",
-    "out": "Out",
-    "par": "Par",
-    "si": "Mean SI",
-    "yards": "Yards"
-   },
-   "courseRating": "Course rating",
-   "fullCard": "Full card",
-   "lengthLabel": "Length",
-   "playsAverage": "Higher handicaps give up about as many strokes here, relative to a scratch golfer, as at an average course.",
-   "playsEasier": "Higher handicaps give up fewer strokes here, relative to a scratch golfer, than at an average course.",
-   "playsHarder": "Higher handicaps give up more strokes here, relative to a scratch golfer, than at an average course.",
-   "rampEasier": "Leichter",
-   "rampHarder": "Schwerer",
-   "seeFullShort": "See the full card",
-   "shape": {
-    "holeTail": "Loch {{n}}",
-    "longest": "Längstes",
-    "parN": "Par {{n}}",
-    "strokeIndexOne": "Vorgabenschlüssel 1",
-    "toughestRun": "Schwerste Folge",
-    "yardsTail": "{{yards}} yds"
-   },
-   "slopeLabel": "Slope rating",
-   "standardMark": "Standard {{standard}}",
-   "vsStandard": "vs standard slope of {{standard}}",
-   "yardsUnit": "yards",
-   "ydsUnit": "yds"
+    "aiQuoteFallback": "A golf experience like no other",
+    "aiQuoteLoading": "Generating quote...",
+    "avgRating": "Avg: {{rating}}",
+    "experiencePoints": "Experience Points Earned",
+    "friendsPlayedCount_one": "{{count}} friend played",
+    "friendsPlayedCount_other": "{{count}} friends played",
+    "friendsPlayed_one": "Played by {{count}} friend",
+    "friendsPlayed_other": "Played by {{count}} friends",
+    "logged": "Logged: {{date}}",
+    "noFriendsPlayed": "No friends played yet",
+    "played": "Gespielt.",
+    "rate": "Rate",
+    "xpValue": "{{xp}} XP",
+    "yourRating": "Your: {{rating}}",
+    "yourRounds": "Deine Runden",
+    "yourStats": "Your stats"
   },
-  "claim": {
-   "cta": {
-    "action": "Claim",
-    "body": "Claim it to respond to reviews and update info",
-    "title": "Own or manage this course?"
-   },
-   "profileLink": {
-    "manages": "Manages this course",
-    "visit": "Visit profile →"
-   },
-   "sheet": {
-    "categoryFallback": "business",
-    "claimAs": "Claim as {{name}}",
-    "claimAsFallback": "business",
-    "footnote": "Claiming covers all listings of this club on clbhouz.",
-    "linkedAlreadyManages": "{{name}} already manages another club and cannot claim a second course.",
-    "needsGolfClub": "Claiming a course needs a Golf Club profile. Your {{category}} profile cannot manage a course. Set up a Golf Club profile to claim {{clubName}}.",
-    "reviewBody": "Claim this course for your golf club profile. We will review it before it goes live.",
-    "setupGolfClub": "Set up a Golf Club profile",
-    "setupGolfClubShort": "Set up Golf Club profile",
-    "setupInstead": "Set up a new golf club profile instead",
-    "signIn": "Sign in",
-    "signInBody": "Sign in to claim this course.",
-    "stateCMulti": "Your golf club profiles already manage other clubs. A business can manage one club, so set up a separate Golf Club profile for {{clubName}}.",
-    "stateCSingle": "Your golf club profile {{name}} already manages another club. A business can manage one club, so set up a separate Golf Club profile for {{clubName}}.",
-    "stateDBody": "Set up a Golf Club profile to claim this course and manage its details, reviews, and updates.",
-    "submitError": "Could not submit claim. Please try again.",
-    "submitted": "Claim submitted for review.",
-    "title": "Claim {{clubName}}"
-   },
-   "underReview": {
-    "body": "A business has requested to manage this course. Verification is in progress.",
-    "title": "Claim under review"
-   }
+  "champions": {
+    "board": {
+      "allTime": "ALL TIME",
+      "last90Days": "LAST 90 DAYS",
+      "mark": "MARK",
+      "member": "MEMBER",
+      "members": "{{count}} MEMBERS",
+      "pos": "POS",
+      "rounds": "{{count}} ROUNDS",
+      "seeAll": "SEE ALL {{count}}",
+      "unclaimedShort": "--",
+      "when": "WHEN"
+    }
   },
-  "communityScore": {
-   "basedOn_one": "Based on 1 rating",
-   "basedOn_other": "Based on {{count}} ratings",
-   "beFirst": "Be the first to rate this course",
-   "categoryScores": "Category Scores",
-   "dashPlaceholder": "–",
-   "noOneRated": "No one's scored {{courseName}} yet. Give it a 0–10 and help fellow golfers discover it.",
-   "onlyYouSuffix": " · Only you",
-   "rateThis": "Rate this course",
-   "seeAllReviews": "See all reviews",
-   "thisCourse": "this course"
+  "community": {
+    "browseByClub": "Browse by club",
+    "chips": {
+      "clips": "Clips",
+      "everything": "Everything",
+      "photos": "Photos",
+      "videos": "Videos"
+    },
+    "count": "{{count}} posts",
+    "count_one": "{{count}} post",
+    "empty": "No member media yet.",
+    "everything": "Everything",
+    "filter": {
+      "all": "All",
+      "played": "Played",
+      "video": "Video"
+    },
+    "heading": "From the community",
+    "rails": {
+      "busiest": "Busiest clubs",
+      "nearby": "Near you",
+      "played": "Courses you have played",
+      "top100": "From the Top 100",
+      "video": "In motion"
+    },
+    "sections": {
+      "clips": {
+        "subline": "Under three minutes",
+        "title": "Clips"
+      },
+      "clubs": {
+        "subline": "Only where a course was tagged",
+        "title": "Browse by club"
+      },
+      "photos": {
+        "subline": "From the courses",
+        "title": "Photos"
+      },
+      "videos": {
+        "subline": "Three minutes and over",
+        "title": "Latest videos"
+      }
+    },
+    "subline": "Everything members have filmed and photographed"
   },
-  "exploreLinks": {
-   "exploreList": "Explore the full list",
-   "kicker": "KEEP EXPLORING",
-   "nearby": "More courses nearby",
-   "top100Suffix": "{{region}} Top 100"
-  },
-  "handicapCue": {
-   "bannerAction": "Connect →",
-   "cardCta": "Connect your handicap →",
-   "cardFootnote": "Works with WHS handicaps worldwide",
-   "variants": {
+  "courseDetail": {
+    "a11y": {
+      "openMediaTab": "Open Media tab",
+      "sections": "Course Detail Sections"
+    },
     "about": {
-     "benefit": "See how your handicap compares here",
-     "sub": "Friends, members and the world’s best at this course"
+      "editRating": "Edit your rating",
+      "locationUnavailable": "Location data isn't available yet.",
+      "officialWebsite": "Official Course Website"
     },
-    "champions": {
-     "benefit": "See where you rank at this course",
-     "sub": "Connect your handicap and your rounds join the {{name}} leaderboard."
+    "allHolesSheet": {
+      "explainer": "A hole is marked when it sits at least four places out and at least 0.07 of a shot from what its index should return, scaled to this course's own spread.",
+      "holes": "Hole by hole",
+      "indexedPlays": "indexed {{index}}, plays {{plays}}",
+      "ladder": "Stroke index against how it plays",
+      "outOfStep_one": "1 out of step",
+      "outOfStep_other": "{{count}} out of step",
+      "pars": "How each par plays",
+      "plays": "Plays",
+      "si": "SI",
+      "title": "All 18 holes"
     },
-    "discover": {
-     "benefit": "See which of these you’ve played",
-     "sub": "Connect your handicap to see how you scored at every course."
+    "card": {
+      "a11yTeeRow": "{{tee}} Tees, Slope {{slope}}",
+      "a11yTeeRowNoSlope": "{{tee}} Tees, kein Slope",
+      "compare": {
+        "in": "In",
+        "kicker": "OUT AGAINST IN",
+        "out": "Out",
+        "par": "Par",
+        "si": "Mean SI",
+        "yards": "Yards"
+      },
+      "courseRating": "Course rating",
+      "fullCard": "Full card",
+      "lengthLabel": "Length",
+      "playsAverage": "Higher handicaps give up about as many strokes here, relative to a scratch golfer, as at an average course.",
+      "playsEasier": "Higher handicaps give up fewer strokes here, relative to a scratch golfer, than at an average course.",
+      "playsHarder": "Higher handicaps give up more strokes here, relative to a scratch golfer, than at an average course.",
+      "rampEasier": "Leichter",
+      "rampHarder": "Schwerer",
+      "seeFullShort": "See the full card",
+      "shape": {
+        "holeTail": "Loch {{n}}",
+        "longest": "Längstes",
+        "parN": "Par {{n}}",
+        "strokeIndexOne": "Vorgabenschlüssel 1",
+        "toughestRun": "Schwerste Folge",
+        "yardsTail": "{{yards}} yds"
+      },
+      "slopeLabel": "Slope rating",
+      "standardMark": "Standard {{standard}}",
+      "vsStandard": "vs standard slope of {{standard}}",
+      "yardsUnit": "yards",
+      "ydsUnit": "yds"
+    },
+    "claim": {
+      "cta": {
+        "action": "Claim",
+        "body": "Claim it to respond to reviews and update info",
+        "title": "Own or manage this course?"
+      },
+      "profileLink": {
+        "manages": "Manages this course",
+        "visit": "Visit profile →"
+      },
+      "sheet": {
+        "categoryFallback": "business",
+        "claimAs": "Claim as {{name}}",
+        "claimAsFallback": "business",
+        "footnote": "Claiming covers all listings of this club on clbhouz.",
+        "linkedAlreadyManages": "{{name}} already manages another club and cannot claim a second course.",
+        "needsGolfClub": "Claiming a course needs a Golf Club profile. Your {{category}} profile cannot manage a course. Set up a Golf Club profile to claim {{clubName}}.",
+        "reviewBody": "Claim this course for your golf club profile. We will review it before it goes live.",
+        "setupGolfClub": "Set up a Golf Club profile",
+        "setupGolfClubShort": "Set up Golf Club profile",
+        "setupInstead": "Set up a new golf club profile instead",
+        "signIn": "Sign in",
+        "signInBody": "Sign in to claim this course.",
+        "stateCMulti": "Your golf club profiles already manage other clubs. A business can manage one club, so set up a separate Golf Club profile for {{clubName}}.",
+        "stateCSingle": "Your golf club profile {{name}} already manages another club. A business can manage one club, so set up a separate Golf Club profile for {{clubName}}.",
+        "stateDBody": "Set up a Golf Club profile to claim this course and manage its details, reviews, and updates.",
+        "submitError": "Could not submit claim. Please try again.",
+        "submitted": "Claim submitted for review.",
+        "title": "Claim {{clubName}}"
+      },
+      "underReview": {
+        "body": "A business has requested to manage this course. Verification is in progress.",
+        "title": "Claim under review"
+      }
+    },
+    "communityScore": {
+      "basedOn_one": "Based on 1 rating",
+      "basedOn_other": "Based on {{count}} ratings",
+      "beFirst": "Be the first to rate this course",
+      "categoryScores": "Category Scores",
+      "dashPlaceholder": "–",
+      "noOneRated": "No one's scored {{courseName}} yet. Give it a 0–10 and help fellow golfers discover it.",
+      "onlyYouSuffix": " · Only you",
+      "rateThis": "Rate this course",
+      "seeAllReviews": "See all reviews",
+      "thisCourse": "this course"
+    },
+    "exploreLinks": {
+      "exploreList": "Explore the full list",
+      "kicker": "KEEP EXPLORING",
+      "nearby": "More courses nearby",
+      "top100Suffix": "{{region}} Top 100"
+    },
+    "handicapCue": {
+      "bannerAction": "Connect →",
+      "cardCta": "Connect your handicap →",
+      "cardFootnote": "Works with WHS handicaps worldwide",
+      "variants": {
+        "about": {
+          "benefit": "See how your handicap compares here",
+          "sub": "Friends, members and the world’s best at this course"
+        },
+        "champions": {
+          "benefit": "See where you rank at this course",
+          "sub": "Connect your handicap and your rounds join the {{name}} leaderboard."
+        },
+        "discover": {
+          "benefit": "See which of these you’ve played",
+          "sub": "Connect your handicap to see how you scored at every course."
+        },
+        "holes": {
+          "benefit": "See your scoring on every hole",
+          "sub": "Your average vs everyone who’s played {{name}}, hole by hole."
+        },
+        "leaderboard": {
+          "benefit": "See where you rank worldwide",
+          "sub": "Connect your handicap to join the championship and climb the global rankings."
+        },
+        "progress": {
+          "benefit": "Fill in your Top 100 automatically",
+          "sub": "Connect your handicap and every round you play counts itself — no manual logging."
+        },
+        "tour-holes": {
+          "benefit": "See your scoring on these holes vs the field",
+          "sub": "Connect your WHS handicap to measure your game against the pros’, hole by hole."
+        },
+        "tour-venue": {
+          "benefit": "See how you'd score at {{name}}",
+          "sub": "Connect your WHS handicap to compare your game to this week’s venue."
+        }
+      }
     },
     "holes": {
-     "benefit": "See your scoring on every hole",
-     "sub": "Your average vs everyone who’s played {{name}}, hole by hole."
+      "courseAverageMark": "Tick marks the course average",
+      "difficultyRank": "Difficulty rank",
+      "rankOf": "{{rank}} of {{total}}",
+      "scaleLabel": "Schwierigkeitsskala",
+      "yourGap": "Your gap",
+      "yourGapVsField": "Dein Abstand zum Feld"
     },
-    "leaderboard": {
-     "benefit": "See where you rank worldwide",
-     "sub": "Connect your handicap to join the championship and climb the global rankings."
+    "legends": {
+      "allTime": "all time",
+      "fromChampion": "{{count}} {{unit}} from champion",
+      "last90Days": "last 90 days",
+      "units": {
+        "ace_one": "ace",
+        "ace_other": "aces",
+        "albatross_one": "albatross",
+        "albatross_other": "albatrosses",
+        "birdie_one": "birdie",
+        "birdie_other": "birdies",
+        "differentialShot_one": "shot against handicap",
+        "differentialShot_other": "shots against handicap",
+        "eagle_one": "eagle",
+        "eagle_other": "eagles",
+        "point_one": "point",
+        "point_other": "points",
+        "round_one": "round",
+        "round_other": "rounds",
+        "shot_one": "shot",
+        "shot_other": "shots"
+      }
     },
-    "progress": {
-     "benefit": "Fill in your Top 100 automatically",
-     "sub": "Connect your handicap and every round you play counts itself — no manual logging."
+    "locationPills": {
+      "separator": "›"
     },
-    "tour-holes": {
-     "benefit": "See your scoring on these holes vs the field",
-     "sub": "Connect your WHS handicap to measure your game against the pros’, hole by hole."
+    "mediaStrip": {
+      "helpDiscover": "Help fellow golfers discover this course — share your experience.",
+      "seeAll": "See all",
+      "share": "Share your experience"
     },
-    "tour-venue": {
-     "benefit": "See how you'd score at {{name}}",
-     "sub": "Connect your WHS handicap to compare your game to this week’s venue."
+    "parTypes": {
+      "holesN_one": "{{count}} hole",
+      "holesN_other": "{{count}} holes",
+      "keyBoth": "Bar is the field. Line is you.",
+      "keyField": "Bar is the field average over par.",
+      "kicker": "HOW EACH PAR PLAYS"
+    },
+    "plays": {
+      "easiestHole": "Easiest hole",
+      "hardestHole": "Hardest hole",
+      "holeN": "Hole {{hole}}",
+      "legendEasier": "Easier",
+      "legendField": "Field",
+      "legendHarder": "Harder",
+      "legendYou": "You",
+      "roundsWithDetail_one": "{{pooled}} von {{total}} Runde hat Lochdetails",
+      "roundsWithDetail_other": "{{pooled}} von {{total}} Runden haben Lochdetails"
+    },
+    "proView": {
+      "fieldLevel": "The field plays this course close to level par.",
+      "fieldOver": "The field plays this course over par, at {{figure}}.",
+      "fieldUnder": "The field plays this course under par, at {{figure}}.",
+      "members": "Golfers",
+      "membersSub": "Every round tracked here by clbhouz golfers",
+      "proBasis_one": "{{tournaments}} tournament · {{rounds}} player-rounds",
+      "proBasis_other": "{{tournaments}} tournaments · {{rounds}} player-rounds",
+      "proRounds_one": "{{rounds}} pro round",
+      "proRounds_other": "{{rounds}} pro rounds",
+      "proTournaments_one": "{{tournaments}} tournament tracked",
+      "proTournaments_other": "{{tournaments}} tournaments tracked",
+      "pros": "Tour pros",
+      "prosSub": "How the professional field played it"
+    },
+    "records": {
+      "units": {
+        "birdies": "Birdies",
+        "diff": "Diff",
+        "gross": "Gross",
+        "points": "Points",
+        "rounds": "Rounds"
+      },
+      "youAhead": "Level with the board",
+      "youBehind": "{{gap}} behind",
+      "youHold": "You hold this board",
+      "youRank": "{{rank}}.",
+      "youRankOf": "{{rank}}. von {{count}}",
+      "youValue": "You {{value}}"
+    },
+    "suggestEdit": {
+      "cancel": "Cancel",
+      "descriptionLabel": "Description",
+      "errorBody": "Failed to submit suggestion. Please try again.",
+      "errorTitle": "Error",
+      "noChangesBody": "Make at least one change to submit.",
+      "noChangesTitle": "No changes",
+      "submit": "Submit suggestion for review",
+      "submitting": "Submitting…",
+      "successBody": "Your suggestion has been submitted. We'll review it shortly.",
+      "successTitle": "Suggestion submitted",
+      "title": "Suggest an edit",
+      "websiteLabel": "Website"
+    },
+    "tabs": {
+      "about": "About",
+      "course": "About",
+      "holes": "Analysen",
+      "legends": "Champions",
+      "media": "Media",
+      "reviews": "Reviews",
+      "you": "You"
+    },
+    "whoPlaysHereMeta_one": "1 golfer",
+    "whoPlaysHereMeta_other": "{{count}} golfers",
+    "you": {
+      "avgGross": "Avg gross",
+      "colCostARound": "Cost a round",
+      "doublesARound": "Doubles a round",
+      "fieldHere": "The field here",
+      "fieldOnHole": "Feld hier",
+      "gapBetter": "Better than the field here",
+      "gapBetterShots": "Schläge besser als das Feld hier",
+      "gapLevel": "Level with the field here",
+      "gapWorse": "Worse than the field here",
+      "gapWorseShots": "Schläge schlechter als das Feld hier",
+      "oneToGoHole": "One to go · hole {{n}}",
+      "parOrBetterShort": "Par or better",
+      "roundsLabel": "Rounds",
+      "youHere": "Du hier"
+    },
+    "yourHolesSheet": {
+      "birdie": "Birdie+",
+      "bogey": "Bogey",
+      "byHole": "By hole",
+      "costliestBetter": "Hole {{hole}} costs you most, but you still beat the field there.",
+      "costliestNoField": "Hole {{hole}} costs you most here.",
+      "costliestWorse": "Hole {{hole}} costs you most, {{difference}} more than the field.",
+      "distribution": "Your distribution",
+      "double": "Double+",
+      "doublesLine": "You make {{count}} doubles or worse a round here.",
+      "empty": "Your hole-by-hole record is not available yet.",
+      "field": "Field",
+      "holes": "Hole by hole",
+      "loading": "Loading your holes...",
+      "par": "Par",
+      "pars": "How each par plays for you",
+      "parsMeta": "Shots over par a round",
+      "sortA11y": "Sort your holes",
+      "thirds": "How your round unfolds",
+      "thirdsDifference": "You drop {{difference}} shots more over the {{worst}} than the {{best}}.",
+      "thirdsEven": "You drop shots evenly across the three parts of the round.",
+      "thirdsMeta": "Shots dropped by third",
+      "title": "Your 18 holes",
+      "worstFirst": "Worst first"
+    },
+    "yourRoundsSheet": {
+      "average": "Average",
+      "best": "Best",
+      "empty": "No rounds are available here yet.",
+      "error": "Your rounds could not be loaded.",
+      "field": "Field",
+      "loading": "Loading your rounds...",
+      "lowestFirst": "Lowest first",
+      "mostRecent": "Most recent",
+      "sortA11y": "Sort your rounds",
+      "title": "Your rounds"
     }
-   }
+  },
+  "directorySheet": {
+    "addCourse": "Add \"{{query}}\"",
+    "clear": "Clear search",
+    "loadingMore": "Loading more courses...",
+    "noResults": "No courses matched that. Check the spelling and try again.",
+    "openA11y": "Search the full course directory",
+    "placeholder": "Search all courses",
+    "prompt": "Type at least {{count}} characters to search the full directory.",
+    "ratedHeading": "Recently rated",
+    "recentClear": "Clear",
+    "recentHeading": "Recent",
+    "scopeChip": "Searching {{country}} only",
+    "scopeClear": "Search everywhere"
+  },
+  "discover": {
+    "aroundTheWorld": "Herausragende Runden",
+    "clipsAction": "Alle Clips",
+    "clipsHeading": "Clips",
+    "comments": {
+      "action": "Comment on this round"
+    },
+    "creator": {
+      "chip": "Creator",
+      "clips_one": "{{count}} Clip",
+      "clips_other": "{{count}} Clips",
+      "photos_one": "{{count}} Foto",
+      "photos_other": "{{count}} Fotos"
+    },
+    "emptyPool": "Nothing logged anywhere in the last 90 days.",
+    "feat": {
+      "group": {
+        "firsts": "Einmal im Leben",
+        "milestones": "Den Platz bezwingen",
+        "records": "Rekorde gebrochen"
+      },
+      "kind": {
+        "ace": "Hole in One",
+        "albatross": "Albatros",
+        "birdieHaul": "{{count}} Birdies gespielt.",
+        "bogeyFree": "Bogeyfreie Runde",
+        "crown": "Platzrekord",
+        "underPar": "Runde unter Par"
+      }
+    },
+    "filterBoard": {
+      "featAce_one": "HOLE-IN-ONE",
+      "featAce_other": "{{count}} HOLE-IN-ONES",
+      "featAlbatross_one": "ALBATROS",
+      "featAlbatross_other": "{{count}} ALBATROSSE",
+      "featBirdies_one": "{{count}} BIRDIE",
+      "featBirdies_other": "{{count}} BIRDIES",
+      "featClean": "BOGEYFREI",
+      "featEagle_one": "EAGLE",
+      "featEagle_other": "EAGLE-BRACE",
+      "featJoin": "{{first}} + {{second}}",
+      "railCourses_one": "KURS",
+      "railCourses_other": "KURSE",
+      "railDays_one": "TAG",
+      "railDays_other": "TAGE",
+      "railMembers_one": "MITGLIED",
+      "railMembers_other": "MITGLIEDER",
+      "railRounds_one": "RUNDE",
+      "railRounds_other": "RUNDEN"
+    },
+    "findGolfers": {
+      "addFriend": "Freund hinzufügen",
+      "clear": "Löschen",
+      "count": "{{shown}} von {{total}} Mitgliedern",
+      "emptyBody": "Versuche den Handle oder lade sie zu clbhouz ein",
+      "emptyTitle": "Kein Golfer namens \"{{q}}\"",
+      "follow": "Folgen",
+      "following": "Folgt",
+      "groupFollowedBy": "Gefolgt von",
+      "groupMatch": "Treffer",
+      "groupPlays": "Spielt wo du spielst",
+      "groupPopular": "Mitglieder zum Kennenlernen",
+      "hcp": "HCP",
+      "homeClub": "HEIMCLUB",
+      "inviteCta": "Einen Golfer zu clbhouz einladen",
+      "inviteQuiet": "Golfer einladen",
+      "kicker": "Die Mitglieder",
+      "requested": "Angefragt",
+      "requestsSent": "{{count}} Anfragen gesendet",
+      "rounds": "RUNDEN",
+      "searchPlaceholder": "Name oder Handle",
+      "title": "Golfer finden"
+    },
+    "friendsRail": {
+      "bestHere": "Their best here, of {{count}} rounds",
+      "betterThanAvg": "{{figure}} better than their average here",
+      "birdies_one": "{{count}} Birdie",
+      "birdies_other": "{{count}} Birdies",
+      "firstHere": "Their first round here",
+      "index": "HCP",
+      "insight": {
+        "ace": "A hole in one",
+        "aceAtHole": "A hole in one at the {{hole}}",
+        "albatross": "An albatross",
+        "albatrossAtHole": "An albatross at the {{hole}}",
+        "birdieRun": "{{count}} birdies in a row",
+        "birdieRun_one": "{{count}} birdie in a row",
+        "birdies": "{{count}} birdies",
+        "birdies_one": "{{count}} birdie",
+        "bogeyFree": "A bogey-free card",
+        "eagles": "{{count}} eagles",
+        "eagles_one": "{{count}} eagle",
+        "firstSub80": "Their first round under 80",
+        "nines": "{{front}} raus, {{back}} rein",
+        "parLevel": "Par",
+        "parOver": "+{{n}}",
+        "parRun": "{{count}} holes in par or better",
+        "parUnder": "-{{n}}",
+        "record": "A new course record here"
+      },
+      "onAvg": "Genau ihr Schnitt hier",
+      "par": "Par {{par}}",
+      "worseThanAvg": "{{figure}} worse than their average here"
+    },
+    "friendsRounds": {
+      "empty": "Noch keine kürzlichen Runden von Freunden.",
+      "entryPlural": "RUNDEN",
+      "entrySingular": "RUNDE",
+      "overline": "DEIN KREIS",
+      "viewAll": "Alle ansehen"
+    },
+    "golfThisWeek": {
+      "bestLabel": "Beste Runde in 14 Tagen",
+      "birdiesLabel": "Meiste Birdies in einer Runde",
+      "board": {
+        "birdiesLabel": "Meiste Birdies",
+        "birdiesShort": "BIRDIES",
+        "birdiesUnit": "BIRDIES",
+        "circuitEyebrow": "Die Amateurtour",
+        "grossLabel": "Niedrigstes Brutto",
+        "grossShort": "BRUTTO",
+        "grossUnit": "BRUTTO",
+        "improvedLabel": "Größte Verbesserung",
+        "improvedShort": "VERBESSERT",
+        "improvedUnit": "ABZUG",
+        "member": "MITGLIED",
+        "netLabel": "Niedrigstes Netto",
+        "netSecondary": "BRUTTO",
+        "netShort": "NETTO",
+        "netUnit": "NETTO",
+        "par": "PAR",
+        "pickerAria": "Tabelle wechseln: {{label}}",
+        "pickerEyebrow": "Entdecken",
+        "pickerRowSubRounds_one": "{{count}} Runde",
+        "pickerRowSubRounds_other": "{{count}} Runden",
+        "pickerRowSub_one": "{{count}} im Feld",
+        "pickerRowSub_other": "{{count}} im Feld",
+        "pickerTitle": "Tabelle wahlen",
+        "pos": "POS",
+        "railCourses": "PLÄTZE",
+        "railDays": "TAGE",
+        "railRounds": "RUNDEN",
+        "recentLabel": "Neueste Runden",
+        "recentSecondary": "BRUTTO",
+        "recentShort": "NEUESTE",
+        "recentUnit": "WANN",
+        "stablefordLabel": "Stableford",
+        "stablefordShort": "STABLEFORD",
+        "stablefordUnit": "PKT"
+      },
+      "count": "{{rounds}} Runden · {{courses}} Plätze · {{days}} Tage",
+      "gap": {
+        "birdiesOff_one": "{{count}} BIRDIE ZURÜCK",
+        "birdiesOff_other": "{{count}} BIRDIES ZURÜCK",
+        "clear": "{{count}} VORN",
+        "cutOff_one": "{{count}} ZURÜCK",
+        "cutOff_other": "{{count}} ZURÜCK",
+        "off_one": "{{count}} ZURÜCK",
+        "off_other": "{{count}} ZURÜCK",
+        "pointsOff_one": "{{count}} PUNKT ZURÜCK",
+        "pointsOff_other": "{{count}} PUNKTE ZURÜCK",
+        "points_one": "{{count}} PUNKT VORN",
+        "points_other": "{{count}} PUNKTE VORN",
+        "roundsAgo_one": "VOR {{count}} RUNDE",
+        "roundsAgo_other": "VOR {{count}} RUNDEN",
+        "shotsOff_one": "{{count}} SCHLAG ZURÜCK",
+        "shotsOff_other": "{{count}} SCHLÄGE ZURÜCK",
+        "shots_one": "{{count}} SCHLAG VORN",
+        "shots_other": "{{count}} SCHLÄGE VORN",
+        "tied": "GLEICHSTAND"
+      },
+      "heading": "Letzte Runden",
+      "improvedLabel": "Größte Handicap-Verbesserung",
+      "moment": {
+        "figure": {
+          "birdies": "{n} BIRDIES",
+          "hole": "LOCH {n}",
+          "holes": "{n} SAUBERE LOCHER",
+          "inARow": "{n} PARS IN FOLGE",
+          "inThree": "{n} AUF DEN LETZTEN DREI"
+        },
+        "fullScorecard": "Ganze Scorekarte",
+        "label": {
+          "ace": "ACE",
+          "albatross": "ALBATROSS",
+          "birdieHaul": "BIRDIE-AUSBEUTE",
+          "courseRecord": "PLATZREKORD",
+          "eagle": "EAGLE",
+          "finishedInRed": "UNTER PAR BEENDET",
+          "grind": "DIE ARBEIT",
+          "run": "DIE SERIE",
+          "strongFinish": "STARKER SCHLUSS"
+        },
+        "scorecard": "SCORECARD",
+        "seeTheCard": "KARTE ANSEHEN",
+        "sentence": {
+          "birdieHaul": "{{0}} Birdies auf {{1}} Löchern.",
+          "courseRecordUnknown_one": "{{0}} Schlag besser als der bisherige Rekord von {{2}}.",
+          "courseRecordUnknown_other": "{{0}} Schläge besser als der bisherige Rekord von {{2}}.",
+          "courseRecord_one": "{{0}} Schlag besser als die {{2}} von {{1}}.",
+          "courseRecord_other": "{{0}} Schläge besser als die {{2}} von {{1}}.",
+          "eagle": "Eine {{0}} auf einem Par {{1}}.",
+          "finishedInRed": "Achtzehn Löcher unter Par beendet.",
+          "grind": "Nichts schlechter als ein Bogey auf der ganzen Runde.",
+          "noHoles": "Eine gespielte Runde. Die Details Loch für Loch wurden nicht erfasst.",
+          "plain": "{{0}} von {{1}} Löchern auf Par oder besser.",
+          "run": "Par oder besser von {{0}} bis {{1}}.",
+          "strongFinish": "Birdie oder besser auf den Schlusslöchern, Endstand {{0}}."
+        },
+        "theCard": "Die Karte"
+      },
+      "reference": {
+        "betterThanBest": "{{count}} besser als deine Bestleistung hier",
+        "fieldDay": "{{count}} besser als das Feld an diesem Tag",
+        "yourBest": "Deine Bestleistung hier ist {{count}}"
+      },
+      "stablefordLabel": "Beste Stableford-Punkte",
+      "stablefordUnit": "Punkte",
+      "you": "Du"
+    },
+    "hero": {
+      "viewScorecard": "Scorecard ansehen"
+    },
+    "heroStory": {
+      "beat": "Beat {{name}} by {{by}}.",
+      "beatSelf": "Lowered their own record by {{by}}.",
+      "firstEagle": "The first eagle logged at {{course}}.",
+      "mostBirdies": "The most birdies anyone has posted at {{course}}.",
+      "nounAce": "hole-in-one",
+      "nounAlbatross": "albatross",
+      "ordinal_ordinal_few": "{{count}}rd",
+      "ordinal_ordinal_one": "{{count}}st",
+      "ordinal_ordinal_other": "{{count}}th",
+      "ordinal_ordinal_two": "{{count}}nd",
+      "rarityNth": "Only the {{ordinal}} {{noun}} ever logged on clbhouz.",
+      "rarityOnly": "The only {{noun}} ever logged on clbhouz.",
+      "stood": " The record had stood since {{stood}}.",
+      "stoodSelf": " It had stood since {{stood}}."
+    },
+    "honours": {
+      "badgeAce": "Ace",
+      "badgeAlbatross": "Albatros",
+      "badgeCount": "{{label}} ×{{count}}",
+      "collapseFeats": "Weniger",
+      "countAces_one": "{{count}} Ass",
+      "countAces_other": "{{count}} Asse",
+      "countAlbatrosses_one": "{{count}} Albatros",
+      "countAlbatrosses_other": "{{count}} Albatrosse",
+      "expandFeats": "{{count}} weitere",
+      "expandFeats_one": "{{count}} weiterer",
+      "featCountWith_one": "{{count}} Leistung",
+      "featCountWith_other": "{{count}} Leistungen",
+      "featCount_one": "Leistung",
+      "featCount_other": "Leistungen",
+      "headlineAces_one": "{{count}} Ass.",
+      "headlineAces_other": "{{count}} Asse.",
+      "headlineAlbatrosses_one": "{{count}} Albatros.",
+      "headlineAlbatrosses_other": "{{count}} Albatrosse.",
+      "holeAndPar": "{{hole}} · Par {{par}}",
+      "latestAt": "Zuletzt {{year}} · {{course}}",
+      "modeLeaders": "Bestenliste",
+      "modeRecent": "Neueste",
+      "more": "{{count}} weitere",
+      "showLess": "Weniger anzeigen",
+      "subLeaders_one": "{{count}} Golfer",
+      "subLeaders_other": "{{count}} Golfer",
+      "subRecent": "In der clbhouz-Geschichte",
+      "sublineAces_one": "{{count}} Ace",
+      "sublineAces_other": "{{count}} Aces",
+      "sublineAlbatrosses_one": "{{count}} Albatross",
+      "sublineAlbatrosses_other": "{{count}} Albatrosses",
+      "sublineBoth": "{{aces}} und {{albatrosses}}, insgesamt. Seltenste zuerst, dann neueste. Ein Ace wird üblicherweise mit 12.500 zu 1 angegeben.",
+      "sublineOne": "{{feats}}, insgesamt. Seltenste zuerst, dann neueste. Ein Ace wird üblicherweise mit 12.500 zu 1 angegeben.",
+      "yards": "YARDS"
+    },
+    "honoursCaptionCount": "{{count}} Hole-in-One und Albatrosse auf der Tafel",
+    "honoursSeeAllPlain": "Alle ansehen",
+    "kickerFeats": "Die Bilanz",
+    "latest": "Latest",
+    "latestReviews": "Latest reviews",
+    "leader": "Führend",
+    "lens": {
+      "ariaLabel": "Relevance",
+      "emptyPlayed": "Nothing at your courses in the last 90 days.",
+      "emptyTop100": "No Top 100 news in the last 90 days.",
+      "played": "Played",
+      "suggested": "Suggested",
+      "top100": "Top 100",
+      "worldwide": "Worldwide"
+    },
+    "live": "Live",
+    "moments": {
+      "overlineAllTime": "All-time honours",
+      "overlineLatest": "Latest honours",
+      "tabs": {
+        "birdies": "Birdies",
+        "eagles": "Eagles",
+        "honours": "Honours"
+      },
+      "title": "Moments of the game",
+      "viewAll": "View all"
+    },
+    "momentsCount": "{{count}} Momente",
+    "momentsCount_one": "{{count}} Moment",
+    "momentsFromCommunity": "From the community",
+    "mostPlayed": "In den letzten 14 Tagen gespielte Plätze",
+    "mostPlayedAllRoundsHere": "ALLE {{count}} RUNDEN HIER",
+    "mostPlayedAvgToPar": "Gespielt zu {{value}}",
+    "mostPlayedAvgToParBy_one": "Gespielt zu {{value}} von {{count}} Mitglied",
+    "mostPlayedAvgToParBy_other": "Gespielt zu {{value}} von {{count}} Mitgliedern",
+    "mostPlayedBestRoundsHere": "BESTE RUNDEN HIER",
+    "mostPlayedBestScore": "BESTES ERGEBNIS",
+    "mostPlayedField": "FELD",
+    "mostPlayedGolferCount": "{{count}} Golfer",
+    "mostPlayedGolferCount_other": "{{count}} Golfer",
+    "mostPlayedLowLabel": "DIE EINZIGE RUNDE",
+    "mostPlayedLowLabel_other": "NIEDRIGSTE IN 14 TAGEN",
+    "mostPlayedLowest": "Niedrigster",
+    "mostPlayedMembers_one": "{{count}} Mitglied",
+    "mostPlayedMembers_other": "{{count}} Mitglieder",
+    "mostPlayedNew": "Neu",
+    "mostPlayedOneRoundLine": "Eine Runde hier: {{name}} spielte {{gross}}.",
+    "mostPlayedOneRoundLine_other": "Nur {{name}} hat hier gespielt, bestes {{gross}}.",
+    "mostPlayedPlayedToLabel": "Gespielt zu",
+    "mostPlayedPlaysTo": "SPIELT ZU",
+    "mostPlayedRoundCount": "{{count}} Runde",
+    "mostPlayedRoundCount_other": "{{count}} Runden",
+    "mostPlayedRoundsLabel": "RUNDEN",
+    "mostPlayedSeeAllAtCourse": "Diesen Platz besuchen",
+    "mostPlayedSheetCaption_one": "{{count}} Platz",
+    "mostPlayedSheetCaption_other": "{{count}} Plätze",
+    "pb": {
+      "after": "Nach",
+      "afterRounds": "Nach {{count}} Runden",
+      "gain": "{{count}} besser als zuvor",
+      "group": {
+        "best": "Große Ausbeute",
+        "firsts": "Zum ersten Mal",
+        "most": "Neue Bestwerte"
+      }
+    },
+    "playersTied": "{{count}} Spieler gleichauf",
+    "playersTied_one": "{{count}} Spieler gleichauf",
+    "prompt": {
+      "actionFinish": "FINISH",
+      "actionFriends": "SUCHEN",
+      "actionPhoto": "ADD",
+      "actionRate": "RATE",
+      "dismiss": "Dismiss",
+      "friendsStatus": "Ihre Scores landen hier",
+      "friendsTitle": "Runden deiner Freunde sehen",
+      "statusFinishNoDate": "Rated · detail missing",
+      "statusNoDate": "On your card",
+      "whenPlayed": "Played {{when}}",
+      "whenRated": "Rated {{when}}"
+    },
+    "reviews": {
+      "featured": "Featured",
+      "ratedChip": "Rated",
+      "sheetCaption": "{{count}} reviews",
+      "someone": "A member"
+    },
+    "roundFinished": "R{{round}} · beendet",
+    "roundThru": "R{{round}} · bis Loch {{thru}}",
+    "row": {
+      "bogeyFree": "Bogeyfrei mit {{gross}}.",
+      "moreHere_one": "+{{count}} more here",
+      "moreHere_other": "+{{count}} more here",
+      "underPar": "Round under par"
+    },
+    "scores": {
+      "beTheFirst": "Spiele den Platz und du wirst der Erste sein.",
+      "noOnePlayed": "Noch niemand hat {{course}} gespielt."
+    },
+    "seam": "Alle Zeiten · von allen",
+    "shortlist": {
+      "action": "Add to your list",
+      "failed": "Could not update your list"
+    },
+    "suggestedMark": "VORSCHLAG",
+    "thruOnly": "Bis Loch {{thru}}",
+    "tiedLead": "Geteilte Führung",
+    "tour": {
+      "clear": "{{count}} clear",
+      "clear_one": "{{count}} clear",
+      "nTied": "{{count}} tied",
+      "round": "Runde in {{gross}}.",
+      "second": "Second",
+      "thru": "Thru",
+      "thruF": "F"
+    },
+    "trackedRounds": "Erfasste Runden",
+    "videosAction": "Alle Videos",
+    "videosHeading": "Neueste Videos",
+    "week": {
+      "allRegions": "Überall",
+      "areaLabel": "Region",
+      "empty": {
+        "circle": "Diese Woche keine Runden aus deinem Kreis.",
+        "handicapBand": "Keine Runden nahe deinem Handicap in den letzten 14 Tagen.",
+        "played": "Diese Woche keine Runden auf deinen Plätzen.",
+        "suggested": "Diese Woche keine vorgeschlagenen Runden.",
+        "top100": "Diese Woche keine Top-100-Runden.",
+        "worldwide": "Diese Woche keine Runden."
+      },
+      "scope": {
+        "circle": "Dein Kreis",
+        "handicapBand": "Nahe deinem Handicap",
+        "homeClub": "Heimatclub",
+        "played": "Gespielt",
+        "suggested": "Vorgeschlagen",
+        "top100": "Top 100",
+        "worldwide": "Weltweit"
+      },
+      "scopeAria": "Runden-Bereich",
+      "selectRegionA11y": "Runden nach Region filtern"
+    },
+    "when": {
+      "relDaysAgo": "vor {{n}} T",
+      "relMonthsAgo": "vor {{n}} M",
+      "relToday": "heute",
+      "relWeeksAgo": "vor {{n}} Wo",
+      "relYearsAgo": "vor {{n}} J",
+      "relYest": "gestern"
+    },
+    "whereTheyPlayed": "Wo in den letzten 14 Tagen gespielt wurde",
+    "whosBeenPlaying": "Dein Kreis"
+  },
+  "explorer": {
+    "allRegions": "All Regions",
+    "allSubRegions": "All sub-regions",
+    "chooseRegionFirst": "Choose a region first",
+    "countInRegion_one": "<1>{{formattedCount}}</1> course in {{region}}",
+    "countInRegion_other": "<1>{{formattedCount}}</1> courses in {{region}}",
+    "countWorldwide_one": "<1>{{formattedCount}}</1> course worldwide",
+    "countWorldwide_other": "<1>{{formattedCount}}</1> courses worldwide",
+    "filtersA11y": "Course filters",
+    "loadMoreRetry": "Couldn't load more courses · Tap to retry",
+    "resetFilters": "Reset filters",
+    "results_one": "<1>{{formattedCount}}</1> result",
+    "results_other": "<1>{{formattedCount}}</1> results",
+    "searchA11y": "Search golf courses",
+    "searchPlaceholder": "Search by name, county or area…",
+    "searching": "Searching",
+    "selectRegionA11y": "Select region",
+    "sortA11y": "Sort courses",
+    "subRegionA11y": "Select sub-region",
+    "unableToLoadBody": "We couldn't fetch the courses. Please check your connection and try again.",
+    "unableToLoadTitle": "Unable to load courses"
+  },
+  "featRarity": {
+    "name": {
+      "ace": "Hole-in-One",
+      "albatross": "Albatros",
+      "eagleBrace": "Eagle-Brace"
+    },
+    "ord": {
+      "1": "erste",
+      "10": "zehnte",
+      "2": "zweite",
+      "3": "dritte",
+      "4": "vierte",
+      "5": "fünfte",
+      "6": "sechste",
+      "7": "siebte",
+      "8": "achte",
+      "9": "neunte"
+    },
+    "ownerFirst": "Dein erstes {{feat}}. Nach {{rounds}} Runden.",
+    "ownerFirstCongrats": "Glückwunsch, {{name}} — {{line}}",
+    "ownerRareThree": "Erst das dritte clbhouz-Mitglied, das dies erreicht hat.",
+    "ownerRareThreeCongrats": "Glückwunsch, {{name}} — {{line}}",
+    "ownerRareTwo": "Erst das zweite clbhouz-Mitglied, das dies erreicht hat.",
+    "ownerRareTwoCongrats": "Glückwunsch, {{name}} — {{line}}",
+    "ownerRepeat": "Dein {{ord}} {{feat}}. Das erste seit {{when}}.",
+    "ownerRepeatCongrats": "Glückwunsch, {{name}} — {{line}}",
+    "ownerSole": "Das erste clbhouz-Mitglied überhaupt, das dies erreicht hat.",
+    "ownerSoleCongrats": "Glückwunsch, {{name}} — {{line}}",
+    "viewer": "Das {{ord}} {{feat}} in {{rounds}} Runden.",
+    "viewerRareThree": "Erst das dritte clbhouz-Mitglied, das dies erreicht hat.",
+    "viewerRareTwo": "Erst das zweite clbhouz-Mitglied, das dies erreicht hat.",
+    "viewerSole": "Das erste clbhouz-Mitglied überhaupt, das dies erreicht hat."
+  },
+  "friends": {
+    "signIn": "Sign in",
+    "signInBody": "Discover where your friends have been playing and which courses are trending in your circle.",
+    "signInTitle": "Sign in to see friends' courses"
+  },
+  "hero": {
+    "contextBucket_one": "{{count}} golfer has this on their list",
+    "contextBucket_other": "{{count}} golfers have this on their list",
+    "contextFriendsMany": "{{name1}}, {{name2}} and {{count}} more have played here",
+    "contextFriendsOne": "{{name1}} has played here",
+    "contextFriendsTwo": "{{name1}} and {{name2}} have played here",
+    "contextHidden_one": "Rated {{avg}} from just {{count}} golfer",
+    "contextHidden_other": "Rated {{avg}} from just {{count}} golfers",
+    "factBestRound": "Best round tracked here: {{gross}}, {{holder}}",
+    "factHardestHole": "The {{hole}} plays hardest, {{over}} over par",
+    "factLevelPar": "Plays level par on average",
+    "factOverPar": "Plays {{over}} over par on average",
+    "factUnderPar": "Plays {{over}} under par on average",
+    "viewCourse": "View course"
   },
   "holes": {
-   "courseAverageMark": "Tick marks the course average",
-   "difficultyRank": "Difficulty rank",
-   "rankOf": "{{rank}} of {{total}}",
-   "scaleLabel": "Schwierigkeitsskala",
-   "yourGap": "Your gap",
-   "yourGapVsField": "Dein Abstand zum Feld"
+    "aceA11y": "Hole in one",
+    "allHolesKicker": "ALL HOLES",
+    "avgToPar": "AVG TO PAR",
+    "birdieRingNote": "A red dot by a hole number means you've birdied it.",
+    "birdiedOfTotal": "Birdied {{n}} of {{total}}",
+    "clubGuide": {
+      "bodySignedIn_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
+      "bodySignedIn_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
+      "bodySignedOut_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole.",
+      "bodySignedOut_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole.",
+      "title": "How the course plays"
+    },
+    "credibilityKicker": "OFFICIAL HOLE DATA",
+    "credibilitySuffix": " · Official WHS",
+    "detailsA11y": "Hole {{holeNo}} details",
+    "easiest": "EASIEST",
+    "easiestTitle": "Easiest",
+    "empty": {
+      "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.",
+      "eyebrow": "Official hole data",
+      "thisCourse": "this course",
+      "title": "Hole insights are coming"
+    },
+    "errorLoading": "Couldn't load hole analysis.",
+    "fieldPlaysTo": "Field: {{playsTo}}",
+    "hardest": "HARDEST",
+    "hardestTitle": "Hardest",
+    "holeByHole": "Hole by hole",
+    "legendEveryone": "Everyone",
+    "legendYou": "You",
+    "overPar": "Over-par",
+    "par": "Par",
+    "parAndSi": "Par {{par}} · SI {{si}}",
+    "parLabel": "Par {{par}}",
+    "players_one": "{{formattedCount}} player",
+    "players_other": "{{formattedCount}} players",
+    "playsTo": "PLAYS TO <1>{{playsTo}}</1>",
+    "playsToInline": "Plays to {{playsTo}}",
+    "preview": {
+      "eyebrow": "Hole by hole",
+      "legendBirdie": "Birdie+",
+      "legendBogey": "Bogey",
+      "legendDouble": "Double+",
+      "legendPar": "Par",
+      "seeAllShort": "Alle {{count}}",
+      "seeAll_one": "See all {{count}} hole",
+      "seeAll_other": "See all {{count}} holes",
+      "showLess": "Show less",
+      "title": "How the field scores every hole"
+    },
+    "rounds_one": "{{formattedCount}} round",
+    "rounds_other": "{{formattedCount}} rounds",
+    "scoringBreakdown": {
+      "bestHere": "BESTE HIER",
+      "bogey": "BOGEY",
+      "doublesShare_one": "{{count}} Doppelbogey · {{share}}% deiner",
+      "doublesShare_other": "{{count}} Doppelbogeys · {{share}}% deiner",
+      "formAside": "Letzte {{count}} Runden",
+      "formBest": "Beste {{n}}",
+      "formBetter": "{{n}} besser als die zehn davor",
+      "formLast10": "Deine letzten zehn hier",
+      "formLevel": "Gleich wie die zehn davor",
+      "formTitle": "Deine Form hier",
+      "formWorse": "{{n}} schlechter als die zehn davor",
+      "formWorstHere": "Schlechteste {{n}}",
+      "holeMany": "Löcher {{list}}",
+      "holeOne": "Loch {{n}}",
+      "mergeAside": "Jedes Loch, das du hier gespielt hast",
+      "mergeTitle": "Wohin die Schläge gehen",
+      "moreRoundsHint": "Spiele hier ein paar Runden mehr und wir zeigen dir die Muster.",
+      "nHoles_one": "{{count}} Loch",
+      "nHoles_other": "{{count}} Löcher",
+      "parLabel": "PAR {{n}}",
+      "parTypeAside": "Schläge über Par pro Runde",
+      "parTypeTitle": "Wie dir jedes Par liegt",
+      "parTypeTotal": "GESAMT",
+      "parYouAvg": "Par {{par}} · du spielst {{avg}}",
+      "reachAside": "Nächste Schritte auf diesem Platz",
+      "reachBirdies": "Löcher mit Birdie hier",
+      "reachChaseGap": "{{gap}} entfernt",
+      "reachChaseLevel": "Gleichstand mit dem Halter",
+      "reachOf": "{{done}} von {{of}}",
+      "reachTitle": "In Reichweite",
+      "s1Advice": "Spiele {{holes}} auf die Grünmitte und nimm das Bogey, wenn es sein muss.",
+      "s1Sub": "Nach verlorenen Schlägen, nicht nach Schwierigkeit",
+      "s3AdviceEarly": "Schlage vorher ein paar Bälle und rolle ein paar Putts - sonst wärmen dich deine ersten Löcher auf.",
+      "s3AdviceEven": "Wärme dich vor dem ersten Abschlag richtig auf und trinke und iss alle paar Löcher etwas.",
+      "s3AdviceLate": "Trinke und iss etwa am 12. Loch etwas, bevor der Einbruch beginnt.",
+      "s3AdviceMiddle": "Wähle bei jedem Schlag durch die Wende ein Ziel - dort lässt die Konzentration nach.",
+      "shareRest": "{{share}}% auf den anderen {{count}}",
+      "shareTop": "{{share}}% von diesen Löchern",
+      "third1": "Löcher 1-6",
+      "third2": "Löcher 7-12",
+      "third3": "Löcher 13-18",
+      "vsBetter": "Besser als das Feld hier",
+      "vsFieldLegend": "Feld hier",
+      "vsLevel": "Gleichauf mit dem Feld",
+      "vsWorse": "Schlechter als das Feld hier"
+    },
+    "shapeOfCourse": "The shape of the course",
+    "sortByDifficulty": "By difficulty",
+    "sortByHole": "By hole",
+    "strokeIndex": "SI {{index}}",
+    "subPar": "Sub-par",
+    "theBeastSuffix": " · the beast",
+    "yards": "{{yards}} yds",
+    "youAvg": "You {{avg}}",
+    "youPlayItTo": "You play it to {{playsTo}}",
+    "youValue": "You: {{value}}",
+    "yourBirdieMap": "Your birdie map",
+    "yourCourses": {
+      "eyebrow": "Course by course",
+      "nRounds_one": "{{count}} round",
+      "nRounds_other": "{{count}} rounds",
+      "roundsLabel": "Runden",
+      "title": "Your courses"
+    },
+    "yourNemesisTitle": "Your nemesis",
+    "yourScoringHoleTitle": "Your scoring hole"
   },
-  "legends": {
-   "allTime": "all time",
-   "fromChampion": "{{count}} {{unit}} from champion",
-   "last90Days": "last 90 days",
-   "units": {
-    "ace_one": "ace",
-    "ace_other": "aces",
-    "albatross_one": "albatross",
-    "albatross_other": "albatrosses",
-    "birdie_one": "birdie",
-    "birdie_other": "birdies",
-    "differentialShot_one": "shot against handicap",
-    "differentialShot_other": "shots against handicap",
-    "eagle_one": "eagle",
-    "eagle_other": "eagles",
-    "point_one": "point",
-    "point_other": "points",
-    "round_one": "round",
-    "round_other": "rounds",
-    "shot_one": "shot",
-    "shot_other": "shots"
-   }
+  "media": {
+    "addMediaA11y": "Add media",
+    "emptyBody": "Be the first to capture <1>{{courseName}}</1> — photos and videos from your round help fellow golfers discover it.",
+    "emptyCourseFallback": "this course",
+    "emptyTitle": "No media yet",
+    "errorBody": "Please check your connection and try again.",
+    "errorTitle": "Couldn't load media",
+    "filterA11y": "Media filter",
+    "filterAll": "All",
+    "filterPhotos": "Photos",
+    "filterVideos": "Videos",
+    "guide": {
+      "clubhouse": "Clubhouse & facilities",
+      "clubhouseSub": "Help others know what to expect before they visit",
+      "kicker": "What to share",
+      "shots": "Shots from your round",
+      "shotsSub": "Short clips of your best moments on the course",
+      "signatureHoles": "Signature holes",
+      "signatureHolesSub": "Show the world what makes this course special",
+      "views": "Views & atmosphere",
+      "viewsSub": "Sunsets, landscapes, the feeling of being there"
+    },
+    "shareExperience": "Share your experience",
+    "signInBody": "See photos and videos from golfers who've played here.",
+    "signInCta": "Sign in",
+    "signInTitle": "Sign in to view media",
+    "uploadVideo": "Upload a video"
   },
-  "locationPills": {
-   "separator": "›"
+  "network": {
+    "badge": {
+      "newForNetwork": "New for your network",
+      "playedByFriends_one": "Played by {{count}} friend",
+      "playedByFriends_other": "Played by {{count}} friends",
+      "topRated": "Top rated",
+      "trending": "Trending"
+    },
+    "circleKicker": "YOUR CIRCLE",
+    "emojiFlag": "⛳",
+    "friendsPlayedTitle": "Courses played by friends",
+    "unseenReviewsBody": "<name>{{name}}</name> reviewed <course>{{course}}</course> · <rating>{{rating}}</rating>",
+    "unseenReviewsMore_one": " +{{count}} more",
+    "unseenReviewsMore_other": " +{{count}} more",
+    "unseenReviewsTitle": "🔔 New review from your network",
+    "viewArrow": "View →",
+    "viewCourseA11y": "View {{name}}"
   },
-  "mediaStrip": {
-   "helpDiscover": "Help fellow golfers discover this course — share your experience.",
-   "seeAll": "See all",
-   "share": "Share your experience"
+  "phase5": {
+    "courseMomentAlt": "Course moment",
+    "personalReview": {
+      "aboveAvg": "{{diff}} above community avg",
+      "belowAvg": "{{diff}} below community avg",
+      "matchesConsensus": "Matches community consensus",
+      "reviewedOn": "Reviewed on {{date}}",
+      "title": "Your Rating"
+    },
+    "planning": {
+      "addBucketList": "Add to bucket list",
+      "privateNote": "Only you can see your bucket list.",
+      "title": "Planning"
+    },
+    "statusToggle": {
+      "addBucketList": "Add to bucket list",
+      "addedToBucket": "Added to bucket list",
+      "notPlayedSub": "Your rating helps golfers worldwide",
+      "notPlayedTitle": "Played here?",
+      "onBucketList": "On your bucket list",
+      "playedBadge": "Played",
+      "playedSub": "Tap to view or edit your review",
+      "playedTitle": "You've played here",
+      "rate": "Rate",
+      "removedFromBucket": "Removed from bucket list",
+      "signIn": "Sign in",
+      "signInPrompt": "Sign in to track this course"
+    },
+    "videoMomentAlt": "Video moment"
   },
-  "parTypes": {
-   "holesN_one": "{{count}} hole",
-   "holesN_other": "{{count}} holes",
-   "keyBoth": "Bar is the field. Line is you.",
-   "keyField": "Bar is the field average over par.",
-   "kicker": "HOW EACH PAR PLAYS"
+  "rateNudge": {
+    "emptyLabel": "Rate a course you've played",
+    "playedEyebrow": "YOU HAVEN'T RATED YET",
+    "playedSubNoRegion": "Played, not rated",
+    "playedSubWithRegion": "{{region}} · Played, not rated",
+    "rateCta": "Rate",
+    "suggestedEyebrow": "TRY RATING",
+    "suggestedForYou": "Suggested for you"
   },
-  "plays": {
-   "easiestHole": "Easiest hole",
-   "hardestHole": "Hardest hole",
-   "holeN": "Hole {{hole}}",
-   "legendEasier": "Easier",
-   "legendField": "Field",
-   "legendHarder": "Harder",
-   "legendYou": "You",
-   "roundsWithDetail_one": "{{pooled}} von {{total}} Runde hat Lochdetails",
-   "roundsWithDetail_other": "{{pooled}} von {{total}} Runden haben Lochdetails"
+  "rateSheet": {
+    "emptyLong": "Type a course name to get started",
+    "noResults": "No courses found for \"{{query}}\"",
+    "rateAction": "Rate →",
+    "searchPlaceholder": "Search courses…",
+    "searching": "Searching…",
+    "subtitle": "Search any course you've played"
   },
-  "proView": {
-   "fieldLevel": "The field plays this course close to level par.",
-   "fieldOver": "The field plays this course over par, at {{figure}}.",
-   "fieldUnder": "The field plays this course under par, at {{figure}}.",
-   "members": "Golfers",
-   "membersSub": "Every round tracked here by clbhouz golfers",
-   "proBasis_one": "{{tournaments}} tournament · {{rounds}} player-rounds",
-   "proBasis_other": "{{tournaments}} tournaments · {{rounds}} player-rounds",
-   "proRounds_one": "{{rounds}} pro round",
-   "proRounds_other": "{{rounds}} pro rounds",
-   "proTournaments_one": "{{tournaments}} tournament tracked",
-   "proTournaments_other": "{{tournaments}} tournaments tracked",
-   "pros": "Tour pros",
-   "prosSub": "How the professional field played it"
+  "request": {
+    "buttonCta": "Request a course",
+    "hero": {
+      "body": "If a course is missing, tell us and we'll add it to the map.",
+      "cta": "Request this course",
+      "headline": "Can't find a course?",
+      "headlineWithQuery": "Can't find \"{{query}}\"?",
+      "perkNotify": "We'll notify you the moment it's live",
+      "perkQuick": "Takes 20 seconds – just name and location"
+    },
+    "row": {
+      "subtitle": "Still not the one? Tap to request it.",
+      "title": "Request a course"
+    },
+    "sheet": {
+      "done": "Done",
+      "error": "Something went wrong. Please try again.",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Town, region, country",
+      "nameLabel": "Course name",
+      "noteLabel": "Note",
+      "notePlaceholder": "Anything else? New opening, alternative name…",
+      "optional": "(optional)",
+      "sending": "Sending…",
+      "submit": "Request course",
+      "subtitle": "Can't find it? Tell us the name and location and we'll get it added.",
+      "successBody": "We'll email you when this course is added.",
+      "successTitle": "Thanks — we've got it.",
+      "title": "Request a course"
+    }
   },
-  "records": {
-   "units": {
-    "birdies": "Birdies",
-    "diff": "Diff",
-    "gross": "Gross",
-    "points": "Points",
-    "rounds": "Rounds"
-   },
-   "youAhead": "Level with the board",
-   "youBehind": "{{gap}} behind",
-   "youHold": "You hold this board",
-   "youRank": "{{rank}}.",
-   "youRankOf": "{{rank}}. von {{count}}",
-   "youValue": "You {{value}}"
+  "review": {
+    "editYours": "Edit yours",
+    "empty": {
+      "body": "Be the first to share your experience at {{courseName}}.",
+      "cta": "Write the first review",
+      "kicker": "WHAT TO INCLUDE",
+      "title": "No reviews yet"
+    },
+    "emptyGuide": {
+      "condition": {
+        "sub": "Greens, fairways, bunkers, rough",
+        "title": "Course condition"
+      },
+      "facilities": {
+        "sub": "Clubhouse, practice areas, service",
+        "title": "Facilities"
+      },
+      "layout": {
+        "sub": "Challenge, variety, scenery, routing",
+        "title": "Layout & design"
+      },
+      "value": {
+        "sub": "Was it worth the green fee?",
+        "title": "Value"
+      }
+    },
+    "endMessage_one": "You've seen all {{count}} review.",
+    "endMessage_other": "You've seen all {{count}} reviews.",
+    "error": {
+      "body": "Something went wrong. Please try again.",
+      "retry": "Try Again",
+      "title": "Couldn't load reviews"
+    },
+    "filter": {
+      "button": "Filter",
+      "buttonLabel": "Filter: {{label}}. Tap to change.",
+      "buttonLabelDefault": "Filter reviews by rating",
+      "clear": "Clear filter",
+      "optionAll": "All ratings",
+      "optionExcellent": "Excellent",
+      "optionExceptional": "Exceptional",
+      "optionFair": "Fair",
+      "optionGood": "Good",
+      "optionPoor": "Poor",
+      "title": "Filter by rating"
+    },
+    "filterA11y": "Filter reviews: {{label}} ({{count}})",
+    "helpful": "Helpful?",
+    "noMatches": {
+      "body": "No reviews match your criteria.",
+      "clear": "Clear filters"
+    },
+    "ratingCount_one": "{{count}} rating",
+    "ratingCount_other": "{{count}} ratings",
+    "reportA11y": "Report review",
+    "response": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleteA11y": "Delete response",
+      "deleteConfirm": "Delete this response? This cannot be undone.",
+      "edit": "Edit",
+      "editA11y": "Edit response",
+      "ownerBadge": "- Owner response",
+      "post": "Post response",
+      "posting": "Posting...",
+      "reply": "Reply",
+      "replyPlaceholder": "Respond as {{business}}...",
+      "save": "Save",
+      "saving": "Saving...",
+      "verifyLink": "Verify {{business}}",
+      "verifyPrompt": "<1>Verify {{business}}</1> to respond to reviews."
+    },
+    "search": {
+      "cancel": "Cancel",
+      "openA11y": "Search reviews",
+      "placeholder": "Search reviews…"
+    },
+    "shareExperience": "Share your experience",
+    "sort": {
+      "helpful": "Most helpful",
+      "highest": "Highest rated",
+      "recent": "Most recent"
+    },
+    "sortA11y": "Sort reviews",
+    "subscore": {
+      "clubhouse": "Clubhouse",
+      "condition": "Condition",
+      "design": "Design",
+      "facilities": "Facilities"
+    },
+    "toast": {
+      "mediaAttachFailed": "Deine Bewertung wurde gepostet, aber ein Foto konnte nicht angehängt werden. Bearbeite die Bewertung, um es erneut hinzuzufügen.",
+      "mediaAttachHeld": "Deine Bewertung wurde gepostet. Ein Foto wird noch angehängt - falls es nicht fertig wird, findest du auf deinem Profil eine Schaltfläche zum erneuten Versuchen.",
+      "mediaUploadFailed": "Deine Fotos konnten nicht hochgeladen werden, daher wurde nichts gepostet. Tippe beim Foto auf Erneut versuchen und poste dann noch einmal.",
+      "rateBody": "Please sign in to rate courses",
+      "signInRequired": "Sign in required",
+      "voteBody": "Please sign in to vote on reviews",
+      "stagedFailed": "Deine Bewertung wurde nicht veröffentlicht — deine Fotos wurden nicht fertig hochgeladen. Du musst sie erneut erstellen."
+    },
+    "wizard": {
+      "a11yStep": "Schritt {{n}} von 3, {{label}}",
+      "a11yStepNumber": "Schritt {{n}} von {{m}}",
+      "backA11y": "Zurück",
+      "closeA11y": "Schließen",
+      "continue": "Weiter",
+      "deleteA11y": "Bewertung entfernen",
+      "draftRestored": {
+        "body": "Du hast diese Bearbeitung unvollendet verlassen, also haben wir sie zurückgeholt. Was du siehst, ist noch nicht veröffentlicht.",
+        "discard": "Verwerfen und veröffentlichte Version nutzen",
+        "mediaDismiss": "Verstanden",
+        "mediaJoin": " und ",
+        "mediaLost": "Fotos und Videos konnten nicht behalten werden: {{subject}} waren angehängt und müssen erneut hinzugefügt werden.",
+        "mediaPhoto": "1 Foto",
+        "mediaPhotos": "{{count}} Fotos",
+        "mediaVideo": "1 Video",
+        "mediaVideos": "{{count}} Videos",
+        "title": "Nicht gespeicherte Änderungen wiederhergestellt"
+      },
+      "hint": {
+        "clubhouse": "Empfang, Essen, Atmosphäre",
+        "condition": "Grüns, Fairways, Bunker am Spieltag",
+        "design": "Routing, Schlagvielfalt, Einprägsamkeit",
+        "facilities": "Range, Übungsbereiche, Umkleiden"
+      },
+      "post": "Bewertung posten",
+      "posting": "Wird gepostet ...",
+      "rail": {
+        "breakdown": "Details",
+        "score": "Wertung",
+        "words": "Worte"
+      },
+      "receipt": {
+        "actionBack": "Zurück zu {{course}}",
+        "actionClubhouse": "Im Clubhouse ansehen",
+        "categoryAverage": "Your categories average <avg>{{avg}}</avg>",
+        "didEyebrow": "Was das bewirkt hat",
+        "eyebrow": "Bewertung gepostet",
+        "nextEyebrow_one": "{{count}} gespielter Platz noch unbewertet",
+        "nextEyebrow_other": "{{count}} gespielte Plätze noch unbewertet",
+        "nextPlayed": "Gespielt am {{date}}",
+        "nextRate": "Bewerten",
+        "rowA": "<cnt>{{count}}</cnt> Mitglieder bewerten {{course}} mit <avg>{{avg}}</avg>",
+        "rowADeltaAbove": "Du hast {{delta}} über dem Durchschnitt bewertet",
+        "rowADeltaBelow": "Du hast {{delta}} unter dem Durchschnitt bewertet",
+        "rowB": "Du bist der Erste, der diesen Platz bewertet",
+        "rowBSub": "Deine Wertung setzt den Community-Durchschnitt",
+        "rowC": "Platz <b>#{{rank}}</b> der {{list}} Top 100",
+        "rowCRight_one": "{{count}} bewertet",
+        "rowCRight_other": "{{count}} bewertet",
+        "rowD": "Dein <b>{{ordinal}}</b> bestbewerteter Platz",
+        "rowDRight_one": "von {{count}} bewertet",
+        "rowDRight_other": "von {{count}} bewertet",
+        "eyebrowPending": "Warten auf deine Fotos",
+        "pendingBody": "Deine Bewertung wird veröffentlicht, sobald deine Fotos und Videos fertig hochgeladen sind. Du kannst diesen Bildschirm verlassen — der Upload läuft weiter."
+      },
+      "save": "Bewertung speichern",
+      "saving": "Wird gespeichert ...",
+      "step0": {
+        "a11y": "Gesamtwertung, 1 bis 10",
+        "bandHigh": "9.0 and up",
+        "bandLow": "Below 5.0",
+        "bandMid": "5.0 to 8.9",
+        "calibration": "Would be your {{ordinal}} highest of {{count}}",
+        "captionEmpty": "Ziehen, um deine Wertung zu setzen",
+        "captionSet": "Deine Gesamtwertung",
+        "gate": "Wertung festlegen",
+        "heading": "Wie gut ist er, von zehn?"
+      },
+      "step1": {
+        "body": "Alle vier sind nötig. Nur so bekommen die Community-Zahlen Bedeutung.",
+        "gate_one": "Noch {{count}} Kategorie",
+        "gate_other": "Noch {{count}} Kategorien",
+        "heading": "Im Detail"
+      },
+      "step2": {
+        "heading": "Fotos und ein paar Worte",
+        "lede": "Alles von deinem Tag in {{course}}.",
+        "optionalNote": "Optional. Alles Weitere unten auch.",
+        "photosEyebrow": "Fotos",
+        "placeholder": "Was sollte ein anderer Golfer vorher wissen?",
+        "shareSub": "Deine Bewertung erscheint im Feed",
+        "shareTitle": "Im Clubhouse teilen",
+        "skip": "Überspringen – direkt zur Note",
+        "summary": "Du teilst {{what}}",
+        "summaryJoin": " und ",
+        "summaryPhoto": "1 Foto",
+        "summaryPhotos": "{{count}} Fotos",
+        "summaryWords": "deine Worte",
+        "teesEyebrow": "Gespielte Abschläge",
+        "wordsEyebrow": "Deine Worte"
+      },
+      "step3": {
+        "breakdownBody": "Bewerte sie für sich, nicht gegen deine Gesamtnote. Ein Platz kann herrlich zu spielen und dürftig ausgestattet sein – genau das zeigt sich hier.",
+        "breakdownLabel": "Jetzt diese vier bewerten",
+        "caption": "Zum Ändern ziehen",
+        "catsGate_one": "Noch {{count}} Kategorie",
+        "catsGate_other": "Noch {{count}} Kategorien",
+        "gate": "Setz deine Note",
+        "heading": "Wie gut ist der Platz?",
+        "lede": "Deine Note bringt {{course}} in die Platzrangliste. Zieh am Regler.",
+        "shareSubRatingOnly": "Deine Note erscheint im Feed, ohne Fotos und Worte",
+        "shareSubReview": "Deine Bewertung erscheint im Feed",
+        "shareTitle": "Im Clubhaus teilen",
+        "submit": "Bewertung abschicken",
+        "summary": "{{course}} mit {{score}} bewertet",
+        "summaryShare": ", wird im Clubhaus geteilt",
+        "threshold": "Deine wäre die {{ordinal}} Bewertung hier – danach gehen die Balken auf der Platzseite live.",
+        "skipToPost": "Post without rating it"
+      },
+      "uploadingMedia": "Fotos werden hochgeladen ..."
+    },
+    "write": {
+      "body": "Your rating helps golfers worldwide",
+      "emoji": "⭐",
+      "rate": "Rate",
+      "title": "Played here?"
+    },
+    "writePromptInline": "⭐ Write your review"
   },
-  "suggestEdit": {
-   "cancel": "Cancel",
-   "descriptionLabel": "Description",
-   "errorBody": "Failed to submit suggestion. Please try again.",
-   "errorTitle": "Error",
-   "noChangesBody": "Make at least one change to submit.",
-   "noChangesTitle": "No changes",
-   "submit": "Submit suggestion for review",
-   "submitting": "Submitting…",
-   "successBody": "Your suggestion has been submitted. We'll review it shortly.",
-   "successTitle": "Suggestion submitted",
-   "title": "Suggest an edit",
-   "websiteLabel": "Website"
+  "reviewSheet": {
+    "communityAverage_one": "Community-Durchschnitt {{average}}, aus {{count}} Bewertung",
+    "communityAverage_other": "Community-Durchschnitt {{average}}, aus {{count}} Bewertungen"
+  },
+  "scorecard": {
+    "atThisCourseBare": "Auf diesem Platz",
+    "atThisCourseOther": "{{name}} auf diesem Platz",
+    "atThisCourseSelf": "Du auf diesem Platz",
+    "atThisCourse_one": "At this course · your {{count}} round here",
+    "atThisCourse_other": "At this course · your {{count}} rounds here",
+    "beatFieldBasis_one": "Basierend auf 1 weiteren Golfer, der hier gespielt hat.",
+    "beatFieldBasis_other": "Basierend auf {{count}} weiteren Golfern, die hier gespielt haben.",
+    "beatFieldOn": "You matched or beat the field average on {{beat}} of {{scored}} holes.",
+    "beatFieldOnPartial": "You matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
+    "beatFieldOnTour": "Matched or beat the field average on {{beat}} of {{scored}} holes.",
+    "beatFieldOnTourPartial": "Matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
+    "beatFieldOther": "{{name}} war auf {{n}} von {{m}} Löchern besser als der field-Durchschnitt.",
+    "beatFieldSelf": "Du warst auf {{n}} von {{m}} Löchern besser als der field-Durchschnitt.",
+    "beatFieldVoice": "{{who}} matched or beat the field average on {{beat}} of {{scored}} holes.",
+    "beatFieldVoicePartial": "{{who}} matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
+    "commentReview": "Diese Bewertung kommentieren",
+    "feat": {
+      "ace": {
+        "label": "HOLE-IN-ONE"
+      },
+      "albatross": {
+        "label": "ALBATROSS"
+      },
+      "birdies": {
+        "label": "BIRDIES",
+        "sub": "in einer Runde"
+      },
+      "clean": {
+        "label": "FEHLERFREIE RUNDE",
+        "sub": "kein Schlag verloren"
+      },
+      "eagle": {
+        "label": "EAGLE"
+      },
+      "eagleBrace": {
+        "label": "EAGLE-BRACE"
+      },
+      "onHole": "an der {{hole}}"
+    },
+    "fieldShort": "Feld",
+    "figBeatField": "FELD GESCHLAGEN",
+    "figBest": "BESTE",
+    "figHcpAtTime": "HCP zu diesem Zeitpunkt",
+    "figOfRounds": "von {{count}} Runden",
+    "figVsTheirAvg": "vs. eigener Durchschnitt",
+    "figVsYourAvg": "vs. dein Durchschnitt",
+    "gross": "GROSS",
+    "grossOnlyBody": "This round was logged as a total, without hole-by-hole scores.",
+    "grossOnlyTitle": "Gross score only",
+    "hideHoleByHole": "Vollständige Scorekarte ausblenden",
+    "holeByHole": "Vollständige Scorekarte",
+    "legendNotPlayed": "Nicht gespielt",
+    "likeReview": "Diese Bewertung liken",
+    "nineHoleTag": "9 holes",
+    "noFieldLine_one": "Nur 1 weiterer Golfer hat hier gespielt, daher gibt es noch kein Feld zum Vergleich.",
+    "noFieldLine_other": "Nur {{count}} weitere Golfer haben hier gespielt, daher gibt es noch kein Feld zum Vergleich.",
+    "noFieldNobody": "Noch hat niemand anderes hier gespielt, daher gibt es kein Feld zum Vergleich.",
+    "rankHere": "Your {{ordinal}} best of {{count}} rounds here.",
+    "rankHereNeutral": "{{ordinal}} best of {{count}} rounds here.",
+    "rankHereNeutralBest": "Best of {{count}} rounds here.",
+    "rankHereVoice": "{{whose}} {{ordinal}} best of {{count}} rounds here.",
+    "rankHereVoiceBest": "{{whose}} best of {{count}} rounds here.",
+    "roundBack": "Zurück",
+    "roundN": "Runde {{n}}",
+    "roundShort": "R{{n}}",
+    "roundSignInBody": "Eine Scorekarte ist nur für angemeldete Mitglieder sichtbar.",
+    "roundSignInCta": "Anmelden",
+    "roundSignInTitle": "Melde dich an, um diese Runde zu sehen",
+    "scoreRow": "Score",
+    "shareRound": "Teilen",
+    "syncingBody": "Hole-by-hole data is syncing from England Golf. It usually lands within a few hours.",
+    "syncingTitle": "Scorecard on the way",
+    "theCard": "DIE KARTE",
+    "toPar": "TO PAR",
+    "unavailableBody": "This scorecard isn't available right now.",
+    "unavailableTitle": "Scorecard unavailable",
+    "viewCourse": "Platz",
+    "viewProfile": "Profil",
+    "vsAvgBetter": "{{n}} shots better than {{whose}} average here.",
+    "vsAvgBetterNeutral": "{{n}} shots better than the average here.",
+    "vsAvgLevel": "Right on {{whose}} average here.",
+    "vsAvgLevelNeutral": "Right on the average here.",
+    "vsAvgWorse": "{{n}} shots worse than {{whose}} average here.",
+    "vsAvgWorseNeutral": "{{n}} shots worse than the average here.",
+    "vsOthersBetterNeutral_one": "{{n}} shots better than the other round here.",
+    "vsOthersBetterNeutral_other": "{{n}} shots better than the other {{count}} rounds here.",
+    "vsOthersBetter_one": "{{n}} shots better than {{whose}} other round here.",
+    "vsOthersBetter_other": "{{n}} shots better than {{whose}} other {{count}} rounds here.",
+    "vsOthersLevelNeutral_one": "Right on the other round here.",
+    "vsOthersLevelNeutral_other": "Right on the other {{count}} rounds here.",
+    "vsOthersLevel_one": "Right on {{whose}} other round here.",
+    "vsOthersLevel_other": "Right on {{whose}} other {{count}} rounds here.",
+    "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
+    "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here.",
+    "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
+    "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
+    "figOfRoundsSelf": "von deinen {{count}} Runden hier",
+    "figOfRoundsOther": "von {{possessive}} {{count}} Runden hier",
+    "figVsYourAvgHere": "Schläge besser als dein Durchschnitt hier",
+    "figVsTheirAvgHere": "Schläge besser als {{possessive}} Durchschnitt hier",
+    "scopeYou": "Du",
+    "scopeYour": "deinen",
+    "scopeHe": "Er",
+    "scopeHis": "seinen",
+    "scopeShe": "Sie",
+    "scopeHer": "ihren",
+    "scopeThey": "Die Person",
+    "scopeTheir": "deren",
+    "scopeHave": "hast",
+    "scopeHas": "hat"
+  },
+  "searchSheet": {
+    "added": "Added",
+    "clearSearchA11y": "Clear search",
+    "closeA11y": "Close search",
+    "outOfTen": "/ 10",
+    "placeholder": "Search for a golf course...",
+    "ratingBullet": "• ",
+    "retry": "Retry",
+    "title": "Choose Golf Club",
+    "trouble": "Trouble loading courses",
+    "yourCourses": "Your courses"
+  },
+  "statBrowse": {
+    "colArea": "Gebiet",
+    "colCountsCountry": "Mit Runden / im Verzeichnis",
+    "colCountsRegion": "Mit Runden",
+    "colRegion": "Region",
+    "countAll_one": " {{count}} von {{total}} Platz über offizielle WHS-Handicaps erfasst.",
+    "countAll_other": " {{count}} von {{total}} Plätzen über offizielle WHS-Handicaps erfasst.",
+    "countCountry_one": " In {{country}}: {{count}} von {{total}} Platz über offizielle WHS-Handicaps erfasst.",
+    "countCountry_other": " In {{country}}: {{count}} von {{total}} Plätzen über offizielle WHS-Handicaps erfasst.",
+    "countRegion_one": " In {{region}}, {{country}}: {{count}} Platz über offizielle WHS-Handicaps erfasst.",
+    "countRegion_other": " In {{region}}, {{country}}: {{count}} Plätze über offizielle WHS-Handicaps erfasst.",
+    "directory": {
+      "body": "Das vollständige Verzeichnis enthält {{total}} weitere Plätze.",
+      "cta": "Vollständiges Verzeichnis ansehen",
+      "title": "Suchst du woanders?"
+    },
+    "reviews": {
+      "actionFeatured": "Alle Bewertungen",
+      "actionRail": "Alle ansehen",
+      "heading": "Was Mitglieder sagen",
+      "outOfTen": "von 10"
+    }
   },
   "tabs": {
-   "about": "About",
-   "course": "About",
-   "holes": "Analysen",
-   "legends": "Champions",
-   "media": "Media",
-   "reviews": "Reviews",
-   "you": "You"
+    "explore": "Explore"
   },
-  "whoPlaysHereMeta_one": "1 golfer",
-  "whoPlaysHereMeta_other": "{{count}} golfers",
-  "you": {
-   "avgGross": "Avg gross",
-   "colCostARound": "Cost a round",
-   "doublesARound": "Doubles a round",
-   "fieldHere": "The field here",
-   "fieldOnHole": "Feld hier",
-   "gapBetter": "Better than the field here",
-   "gapBetterShots": "Schläge besser als das Feld hier",
-   "gapLevel": "Level with the field here",
-   "gapWorse": "Worse than the field here",
-   "gapWorseShots": "Schläge schlechter als das Feld hier",
-   "oneToGoHole": "One to go · hole {{n}}",
-   "parOrBetterShort": "Par or better",
-   "roundsLabel": "Rounds",
-   "youHere": "Du hier"
-  },
-  "yourHolesSheet": {
-   "birdie": "Birdie+",
-   "bogey": "Bogey",
-   "byHole": "By hole",
-   "costliestBetter": "Hole {{hole}} costs you most, but you still beat the field there.",
-   "costliestNoField": "Hole {{hole}} costs you most here.",
-   "costliestWorse": "Hole {{hole}} costs you most, {{difference}} more than the field.",
-   "distribution": "Your distribution",
-   "double": "Double+",
-   "doublesLine": "You make {{count}} doubles or worse a round here.",
-   "empty": "Your hole-by-hole record is not available yet.",
-   "field": "Field",
-   "holes": "Hole by hole",
-   "loading": "Loading your holes...",
-   "par": "Par",
-   "pars": "How each par plays for you",
-   "parsMeta": "Shots over par a round",
-   "sortA11y": "Sort your holes",
-   "thirds": "How your round unfolds",
-   "thirdsDifference": "You drop {{difference}} shots more over the {{worst}} than the {{best}}.",
-   "thirdsEven": "You drop shots evenly across the three parts of the round.",
-   "thirdsMeta": "Shots dropped by third",
-   "title": "Your 18 holes",
-   "worstFirst": "Worst first"
-  },
-  "yourRoundsSheet": {
-   "average": "Average",
-   "best": "Best",
-   "empty": "No rounds are available here yet.",
-   "error": "Your rounds could not be loaded.",
-   "field": "Field",
-   "loading": "Loading your rounds...",
-   "lowestFirst": "Lowest first",
-   "mostRecent": "Most recent",
-   "sortA11y": "Sort your rounds",
-   "title": "Your rounds"
-  }
- },
- "directorySheet": {
-  "addCourse": "Add \"{{query}}\"",
-  "clear": "Clear search",
-  "loadingMore": "Loading more courses...",
-  "noResults": "No courses matched that. Check the spelling and try again.",
-  "openA11y": "Search the full course directory",
-  "placeholder": "Search all courses",
-  "prompt": "Type at least {{count}} characters to search the full directory.",
-  "ratedHeading": "Recently rated",
-  "recentClear": "Clear",
-  "recentHeading": "Recent",
-  "scopeChip": "Searching {{country}} only",
-  "scopeClear": "Search everywhere"
- },
- "discover": {
-  "aroundTheWorld": "Herausragende Runden",
-  "clipsAction": "Alle Clips",
-  "clipsHeading": "Clips",
-  "comments": {
-   "action": "Comment on this round"
-  },
-  "creator": {
-   "chip": "Creator",
-   "clips_one": "{{count}} Clip",
-   "clips_other": "{{count}} Clips",
-   "photos_one": "{{count}} Foto",
-   "photos_other": "{{count}} Fotos"
-  },
-  "emptyPool": "Nothing logged anywhere in the last 90 days.",
-  "feat": {
-   "group": {
-    "firsts": "Einmal im Leben",
-    "milestones": "Den Platz bezwingen",
-    "records": "Rekorde gebrochen"
-   },
-   "kind": {
-    "ace": "Hole in One",
-    "albatross": "Albatros",
-    "birdieHaul": "{{count}} Birdies gespielt.",
-    "bogeyFree": "Bogeyfreie Runde",
-    "crown": "Platzrekord",
-    "underPar": "Runde unter Par"
-   }
-  },
-  "filterBoard": {
-   "featAce_one": "HOLE-IN-ONE",
-   "featAce_other": "{{count}} HOLE-IN-ONES",
-   "featAlbatross_one": "ALBATROS",
-   "featAlbatross_other": "{{count}} ALBATROSSE",
-   "featBirdies_one": "{{count}} BIRDIE",
-   "featBirdies_other": "{{count}} BIRDIES",
-   "featClean": "BOGEYFREI",
-   "featEagle_one": "EAGLE",
-   "featEagle_other": "EAGLE-BRACE",
-   "featJoin": "{{first}} + {{second}}",
-   "railCourses_one": "KURS",
-   "railCourses_other": "KURSE",
-   "railDays_one": "TAG",
-   "railDays_other": "TAGE",
-   "railMembers_one": "MITGLIED",
-   "railMembers_other": "MITGLIEDER",
-   "railRounds_one": "RUNDE",
-   "railRounds_other": "RUNDEN"
-  },
-  "findGolfers": {
-   "addFriend": "Freund hinzufügen",
-   "clear": "Löschen",
-   "count": "{{shown}} von {{total}} Mitgliedern",
-   "emptyBody": "Versuche den Handle oder lade sie zu clbhouz ein",
-   "emptyTitle": "Kein Golfer namens \"{{q}}\"",
-   "follow": "Folgen",
-   "following": "Folgt",
-   "groupFollowedBy": "Gefolgt von",
-   "groupMatch": "Treffer",
-   "groupPlays": "Spielt wo du spielst",
-   "groupPopular": "Mitglieder zum Kennenlernen",
-   "hcp": "HCP",
-   "homeClub": "HEIMCLUB",
-   "inviteCta": "Einen Golfer zu clbhouz einladen",
-   "inviteQuiet": "Golfer einladen",
-   "kicker": "Die Mitglieder",
-   "requested": "Angefragt",
-   "requestsSent": "{{count}} Anfragen gesendet",
-   "rounds": "RUNDEN",
-   "searchPlaceholder": "Name oder Handle",
-   "title": "Golfer finden"
-  },
-  "friendsRail": {
-   "bestHere": "Their best here, of {{count}} rounds",
-   "betterThanAvg": "{{figure}} better than their average here",
-   "birdies_one": "{{count}} Birdie",
-   "birdies_other": "{{count}} Birdies",
-   "firstHere": "Their first round here",
-   "index": "HCP",
-   "insight": {
-    "ace": "A hole in one",
-    "aceAtHole": "A hole in one at the {{hole}}",
-    "albatross": "An albatross",
-    "albatrossAtHole": "An albatross at the {{hole}}",
-    "birdieRun": "{{count}} birdies in a row",
-    "birdieRun_one": "{{count}} birdie in a row",
-    "birdies": "{{count}} birdies",
-    "birdies_one": "{{count}} birdie",
-    "bogeyFree": "A bogey-free card",
-    "eagles": "{{count}} eagles",
-    "eagles_one": "{{count}} eagle",
-    "firstSub80": "Their first round under 80",
-    "nines": "{{front}} raus, {{back}} rein",
-    "parLevel": "Par",
-    "parOver": "+{{n}}",
-    "parRun": "{{count}} holes in par or better",
-    "parUnder": "-{{n}}",
-    "record": "A new course record here"
-   },
-   "onAvg": "Genau ihr Schnitt hier",
-   "par": "Par {{par}}",
-   "worseThanAvg": "{{figure}} worse than their average here"
-  },
-  "friendsRounds": {
-   "empty": "Noch keine kürzlichen Runden von Freunden.",
-   "entryPlural": "RUNDEN",
-   "entrySingular": "RUNDE",
-   "overline": "DEIN KREIS",
-   "viewAll": "Alle ansehen"
-  },
-  "golfThisWeek": {
-   "bestLabel": "Beste Runde in 14 Tagen",
-   "birdiesLabel": "Meiste Birdies in einer Runde",
-   "board": {
-    "birdiesLabel": "Meiste Birdies",
-    "birdiesShort": "BIRDIES",
-    "birdiesUnit": "BIRDIES",
-    "circuitEyebrow": "Die Amateurtour",
-    "grossLabel": "Niedrigstes Brutto",
-    "grossShort": "BRUTTO",
-    "grossUnit": "BRUTTO",
-    "improvedLabel": "Größte Verbesserung",
-    "improvedShort": "VERBESSERT",
-    "improvedUnit": "ABZUG",
-    "member": "MITGLIED",
-    "netLabel": "Niedrigstes Netto",
-    "netSecondary": "BRUTTO",
-    "netShort": "NETTO",
-    "netUnit": "NETTO",
-    "par": "PAR",
-    "pickerAria": "Tabelle wechseln: {{label}}",
-    "pickerEyebrow": "Entdecken",
-    "pickerRowSubRounds_one": "{{count}} Runde",
-    "pickerRowSubRounds_other": "{{count}} Runden",
-    "pickerRowSub_one": "{{count}} im Feld",
-    "pickerRowSub_other": "{{count}} im Feld",
-    "pickerTitle": "Tabelle wahlen",
-    "pos": "POS",
-    "railCourses": "PLÄTZE",
-    "railDays": "TAGE",
-    "railRounds": "RUNDEN",
-    "recentLabel": "Neueste Runden",
-    "recentSecondary": "BRUTTO",
-    "recentShort": "NEUESTE",
-    "recentUnit": "WANN",
-    "stablefordLabel": "Stableford",
-    "stablefordShort": "STABLEFORD",
-    "stablefordUnit": "PKT"
-   },
-   "count": "{{rounds}} Runden · {{courses}} Plätze · {{days}} Tage",
-   "gap": {
-    "birdiesOff_one": "{{count}} BIRDIE ZURÜCK",
-    "birdiesOff_other": "{{count}} BIRDIES ZURÜCK",
-    "clear": "{{count}} VORN",
-    "cutOff_one": "{{count}} ZURÜCK",
-    "cutOff_other": "{{count}} ZURÜCK",
-    "off_one": "{{count}} ZURÜCK",
-    "off_other": "{{count}} ZURÜCK",
-    "pointsOff_one": "{{count}} PUNKT ZURÜCK",
-    "pointsOff_other": "{{count}} PUNKTE ZURÜCK",
-    "points_one": "{{count}} PUNKT VORN",
-    "points_other": "{{count}} PUNKTE VORN",
-    "roundsAgo_one": "VOR {{count}} RUNDE",
-    "roundsAgo_other": "VOR {{count}} RUNDEN",
-    "shotsOff_one": "{{count}} SCHLAG ZURÜCK",
-    "shotsOff_other": "{{count}} SCHLÄGE ZURÜCK",
-    "shots_one": "{{count}} SCHLAG VORN",
-    "shots_other": "{{count}} SCHLÄGE VORN",
-    "tied": "GLEICHSTAND"
-   },
-   "heading": "Letzte Runden",
-   "improvedLabel": "Größte Handicap-Verbesserung",
-   "moment": {
-    "figure": {
-     "birdies": "{n} BIRDIES",
-     "hole": "LOCH {n}",
-     "holes": "{n} SAUBERE LOCHER",
-     "inARow": "{n} PARS IN FOLGE",
-     "inThree": "{n} AUF DEN LETZTEN DREI"
+  "teeCard": {
+    "a11yToggle": "Toggle course card details",
+    "col": {
+      "length": "Länge"
     },
-    "fullScorecard": "Ganze Scorekarte",
-    "label": {
-     "ace": "ACE",
-     "albatross": "ALBATROSS",
-     "birdieHaul": "BIRDIE-AUSBEUTE",
-     "courseRecord": "PLATZREKORD",
-     "eagle": "EAGLE",
-     "finishedInRed": "UNTER PAR BEENDET",
-     "grind": "DIE ARBEIT",
-     "run": "DIE SERIE",
-     "strongFinish": "STARKER SCHLUSS"
+    "syncNote": {
+      "body": "Tee cards are built from golfers' synced rounds. Sync your WHS handicap and the tees you play will appear.",
+      "heading": "Play here?"
+    }
+  },
+  "toReview": {
+    "bandEarlier": "FRUHER",
+    "bandLastYear": "LETZTES JAHR",
+    "bandThisYear": "DIESES JAHR",
+    "close": "Schliessen",
+    "railCourses": "PLATZE",
+    "railYears": "JAHRE",
+    "rate": "BEWERTEN",
+    "subline": "Gespielt, aber nicht bewertet - neueste zuerst.",
+    "sublineBreakdowns": "Detailbewertungen fehlen - neueste zuerst.",
+    "title": "Zu bewertende Platze",
+    "titleBreakdowns": "Details hinzufugen"
+  },
+  "top100": {
+    "clearSearch": "Clear search",
+    "listsA11y": "Top 100 lists",
+    "metaCourses_one": "<1>{{count}}</1> course · {{listLabel}}",
+    "metaCourses_other": "<1>{{count}}</1> courses · {{listLabel}}",
+    "metaResults_one": "<1>{{count}}</1> result",
+    "metaResults_other": "<1>{{count}}</1> results",
+    "progress": {
+      "emptyBody": "Play one and it lands here, with your rating alongside the published rank.",
+      "emptyTitle": "You have not played any of these yet.",
+      "signedOutBody": "Sign in to track which of these you have played.",
+      "signedOutTitle": "Track your Top 100."
     },
-    "scorecard": "SCORECARD",
-    "seeTheCard": "KARTE ANSEHEN",
-    "sentence": {
-     "birdieHaul": "{{0}} Birdies auf {{1}} Löchern.",
-     "courseRecordUnknown_one": "{{0}} Schlag besser als der bisherige Rekord von {{2}}.",
-     "courseRecordUnknown_other": "{{0}} Schläge besser als der bisherige Rekord von {{2}}.",
-     "courseRecord_one": "{{0}} Schlag besser als die {{2}} von {{1}}.",
-     "courseRecord_other": "{{0}} Schläge besser als die {{2}} von {{1}}.",
-     "eagle": "Eine {{0}} auf einem Par {{1}}.",
-     "finishedInRed": "Achtzehn Löcher unter Par beendet.",
-     "grind": "Nichts schlechter als ein Bogey auf der ganzen Runde.",
-     "noHoles": "Eine gespielte Runde. Die Details Loch für Loch wurden nicht erfasst.",
-     "plain": "{{0}} von {{1}} Löchern auf Par oder besser.",
-     "run": "Par oder besser von {{0}} bis {{1}}.",
-     "strongFinish": "Birdie oder besser auf den Schlusslöchern, Endstand {{0}}."
+    "resetFilters": "Reset filters",
+    "searchA11y": "Search within Top 100 list",
+    "searchPlaceholder": "Search the {{listLabel}} Top 100",
+    "sectionTitle": "The world's best",
+    "stats": {
+      "avgToParLabel": "Schnitt zu Par",
+      "clubhouse": "Clubhouse",
+      "condition": "Condition",
+      "design": "Design",
+      "easierThan": "Easier than <1>{{pct}}%</1> of courses",
+      "easierThanLabel": "Leichter als",
+      "facilities": "Facilities",
+      "fromRatings_one": "from {{count}} rating",
+      "fromRatings_other": "from {{count}} ratings",
+      "harderThan": "Harder than <1>{{pct}}%</1> of courses",
+      "harderThanLabel": "Schwerer als",
+      "heading": "Course stats",
+      "middleOfPack": "Middle of the pack for difficulty",
+      "noRoundsCta": "Be the first.",
+      "noRoundsTitle": "Rated, but no rounds tracked here yet.",
+      "playsAbove": "Plays <1>{{value}}</1> above par on average",
+      "playsBelow": "Plays <1>{{value}}</1> below par on average",
+      "playsLevel": "Plays level par on average",
+      "ratingLabel": "Bewertung"
     },
-    "theCard": "Die Karte"
-   },
-   "reference": {
-    "betterThanBest": "{{count}} besser als deine Bestleistung hier",
-    "fieldDay": "{{count}} besser als das Feld an diesem Tag",
-    "yourBest": "Deine Bestleistung hier ist {{count}}"
-   },
-   "stablefordLabel": "Beste Stableford-Punkte",
-   "stablefordUnit": "Punkte",
-   "you": "Du"
+    "verdict": {
+      "higher": "Rated above its rank",
+      "lower": "Rated below its rank",
+      "ratingRank": "{{position}} of {{poolSize}} rated courses on the {{listLabel}} Top 100",
+      "ratingRankNoList": "{{position}} of {{poolSize}} rated courses on this list"
+    },
+    "verdictSheet": {
+      "distribution": "How golfers scored it",
+      "distributionNote_one": "From 1 golfer rating so far.",
+      "distributionNote_other": "From {{count}} golfer ratings so far.",
+      "explanation": "Published at #{{rank}}. Golfers who have played it rate it {{rating}} from {{ratingCount}} ratings. Across the Top 100 courses golfers have rated, one at #{{rank}} usually scores around {{expected}}. We show where those differ. We do not adjust the list.",
+      "listNote": "This is its {{listLabel}} rank. It sits at a different rank on other lists, so the comparison changes.",
+      "memberRating_one": "Golfer rating - {{count}} rating",
+      "memberRating_other": "Golfer rating - {{count}} ratings",
+      "rateCta": "Rate this course",
+      "ratingRank": "{{position}} of {{poolSize}} rated courses on this list",
+      "ratingRankLabel": "Golfer rating order",
+      "title": "How this compares"
+    }
   },
-  "hero": {
-   "viewScorecard": "Scorecard ansehen"
+  "userCourses": {
+    "emptyRecentOtherBody": "No courses played in the last 30 days",
+    "emptyRecentOtherTitle": "{{name}} has no recent activity",
+    "emptyRecentOwnBody": "Play some courses in the last 30 days and they'll appear here",
+    "emptyRecentOwnTitle": "No recent activity",
+    "emptyRegion": "No courses found in the selected region.",
+    "emptyTop100OtherBody": "Check back later to see their golf course journey",
+    "emptyTop100OtherTitle": "{{name}} hasn't rated any Top 100 courses yet",
+    "emptyTop100OwnBody": "Explore the world's greatest golf courses and rate them to track your journey",
+    "emptyTop100OwnTitle": "No Top 100 courses rated yet",
+    "loading": "Loading...",
+    "loadingBody": "Loading user profile and course information",
+    "notFound": "User Not Found",
+    "notFoundBody": "The user profile you're looking for doesn't exist or isn't public",
+    "regionalAddCourses": "Add Courses",
+    "regionalAddCoursesEmoji": "📍",
+    "regionalSortView": "Sort & View",
+    "showingRegion": "Showing {{region}} courses",
+    "signInBody": "Sign in to view user profiles and course checklists",
+    "signInRequired": "Sign in required",
+    "signInRequiredBody": "Create an account to view user profiles and course information",
+    "signInTitle": "User's Golf Courses"
   },
-  "heroStory": {
-   "beat": "Beat {{name}} by {{by}}.",
-   "beatSelf": "Lowered their own record by {{by}}.",
-   "firstEagle": "The first eagle logged at {{course}}.",
-   "mostBirdies": "The most birdies anyone has posted at {{course}}.",
-   "nounAce": "hole-in-one",
-   "nounAlbatross": "albatross",
-   "ordinal_ordinal_few": "{{count}}rd",
-   "ordinal_ordinal_one": "{{count}}st",
-   "ordinal_ordinal_other": "{{count}}th",
-   "ordinal_ordinal_two": "{{count}}nd",
-   "rarityNth": "Only the {{ordinal}} {{noun}} ever logged on clbhouz.",
-   "rarityOnly": "The only {{noun}} ever logged on clbhouz.",
-   "stood": " The record had stood since {{stood}}.",
-   "stoodSelf": " It had stood since {{stood}}."
-  },
-  "honours": {
-   "badgeAce": "Ace",
-   "badgeAlbatross": "Albatros",
-   "badgeCount": "{{label}} ×{{count}}",
-   "collapseFeats": "Weniger",
-   "countAces_one": "{{count}} Ass",
-   "countAces_other": "{{count}} Asse",
-   "countAlbatrosses_one": "{{count}} Albatros",
-   "countAlbatrosses_other": "{{count}} Albatrosse",
-   "expandFeats": "{{count}} weitere",
-   "expandFeats_one": "{{count}} weiterer",
-   "featCountWith_one": "{{count}} Leistung",
-   "featCountWith_other": "{{count}} Leistungen",
-   "featCount_one": "Leistung",
-   "featCount_other": "Leistungen",
-   "headlineAces_one": "{{count}} Ass.",
-   "headlineAces_other": "{{count}} Asse.",
-   "headlineAlbatrosses_one": "{{count}} Albatros.",
-   "headlineAlbatrosses_other": "{{count}} Albatrosse.",
-   "holeAndPar": "{{hole}} · Par {{par}}",
-   "latestAt": "Zuletzt {{year}} · {{course}}",
-   "modeLeaders": "Bestenliste",
-   "modeRecent": "Neueste",
-   "more": "{{count}} weitere",
-   "showLess": "Weniger anzeigen",
-   "subLeaders_one": "{{count}} Golfer",
-   "subLeaders_other": "{{count}} Golfer",
-   "subRecent": "In der clbhouz-Geschichte",
-   "sublineAces_one": "{{count}} Ace",
-   "sublineAces_other": "{{count}} Aces",
-   "sublineAlbatrosses_one": "{{count}} Albatross",
-   "sublineAlbatrosses_other": "{{count}} Albatrosses",
-   "sublineBoth": "{{aces}} und {{albatrosses}}, insgesamt. Seltenste zuerst, dann neueste. Ein Ace wird üblicherweise mit 12.500 zu 1 angegeben.",
-   "sublineOne": "{{feats}}, insgesamt. Seltenste zuerst, dann neueste. Ein Ace wird üblicherweise mit 12.500 zu 1 angegeben.",
-   "yards": "YARDS"
-  },
-  "honoursCaptionCount": "{{count}} Hole-in-One und Albatrosse auf der Tafel",
-  "honoursSeeAllPlain": "Alle ansehen",
-  "kickerFeats": "Die Bilanz",
-  "latest": "Latest",
-  "latestReviews": "Latest reviews",
-  "leader": "Führend",
-  "lens": {
-   "ariaLabel": "Relevance",
-   "emptyPlayed": "Nothing at your courses in the last 90 days.",
-   "emptyTop100": "No Top 100 news in the last 90 days.",
-   "played": "Played",
-   "suggested": "Suggested",
-   "top100": "Top 100",
-   "worldwide": "Worldwide"
-  },
-  "live": "Live",
-  "moments": {
-   "overlineAllTime": "All-time honours",
-   "overlineLatest": "Latest honours",
-   "tabs": {
-    "birdies": "Birdies",
-    "eagles": "Eagles",
-    "honours": "Honours"
-   },
-   "title": "Moments of the game",
-   "viewAll": "View all"
-  },
-  "momentsCount": "{{count}} Momente",
-  "momentsCount_one": "{{count}} Moment",
-  "momentsFromCommunity": "From the community",
-  "mostPlayed": "In den letzten 14 Tagen gespielte Plätze",
-  "mostPlayedAllRoundsHere": "ALLE {{count}} RUNDEN HIER",
-  "mostPlayedAvgToPar": "Gespielt zu {{value}}",
-  "mostPlayedAvgToParBy_one": "Gespielt zu {{value}} von {{count}} Mitglied",
-  "mostPlayedAvgToParBy_other": "Gespielt zu {{value}} von {{count}} Mitgliedern",
-  "mostPlayedBestRoundsHere": "BESTE RUNDEN HIER",
-  "mostPlayedBestScore": "BESTES ERGEBNIS",
-  "mostPlayedField": "FELD",
-  "mostPlayedGolferCount": "{{count}} Golfer",
-  "mostPlayedGolferCount_other": "{{count}} Golfer",
-  "mostPlayedLowLabel": "DIE EINZIGE RUNDE",
-  "mostPlayedLowLabel_other": "NIEDRIGSTE IN 14 TAGEN",
-  "mostPlayedLowest": "Niedrigster",
-  "mostPlayedMembers_one": "{{count}} Mitglied",
-  "mostPlayedMembers_other": "{{count}} Mitglieder",
-  "mostPlayedNew": "Neu",
-  "mostPlayedOneRoundLine": "Eine Runde hier: {{name}} spielte {{gross}}.",
-  "mostPlayedOneRoundLine_other": "Nur {{name}} hat hier gespielt, bestes {{gross}}.",
-  "mostPlayedPlayedToLabel": "Gespielt zu",
-  "mostPlayedPlaysTo": "SPIELT ZU",
-  "mostPlayedRoundCount": "{{count}} Runde",
-  "mostPlayedRoundCount_other": "{{count}} Runden",
-  "mostPlayedRoundsLabel": "RUNDEN",
-  "mostPlayedSeeAllAtCourse": "Diesen Platz besuchen",
-  "mostPlayedSheetCaption_one": "{{count}} Platz",
-  "mostPlayedSheetCaption_other": "{{count}} Plätze",
-  "pb": {
-   "after": "Nach",
-   "afterRounds": "Nach {{count}} Runden",
-   "gain": "{{count}} besser als zuvor",
-   "group": {
-    "best": "Große Ausbeute",
-    "firsts": "Zum ersten Mal",
-    "most": "Neue Bestwerte"
-   }
-  },
-  "playersTied": "{{count}} Spieler gleichauf",
-  "playersTied_one": "{{count}} Spieler gleichauf",
-  "prompt": {
-   "actionFinish": "FINISH",
-   "actionFriends": "SUCHEN",
-   "actionPhoto": "ADD",
-   "actionRate": "RATE",
-   "dismiss": "Dismiss",
-   "friendsStatus": "Ihre Scores landen hier",
-   "friendsTitle": "Runden deiner Freunde sehen",
-   "statusFinishNoDate": "Rated · detail missing",
-   "statusNoDate": "On your card",
-   "whenPlayed": "Played {{when}}",
-   "whenRated": "Rated {{when}}"
-  },
-  "reviews": {
-   "featured": "Featured",
-   "ratedChip": "Rated",
-   "sheetCaption": "{{count}} reviews",
-   "someone": "A member"
-  },
-  "roundFinished": "R{{round}} · beendet",
-  "roundThru": "R{{round}} · bis Loch {{thru}}",
-  "row": {
-   "bogeyFree": "Bogeyfrei mit {{gross}}.",
-   "moreHere_one": "+{{count}} more here",
-   "moreHere_other": "+{{count}} more here",
-   "underPar": "Round under par"
-  },
-  "scores": {
-   "beTheFirst": "Spiele den Platz und du wirst der Erste sein.",
-   "noOnePlayed": "Noch niemand hat {{course}} gespielt."
-  },
-  "seam": "Alle Zeiten · von allen",
-  "shortlist": {
-   "action": "Add to your list",
-   "failed": "Could not update your list"
-  },
-  "suggestedMark": "VORSCHLAG",
-  "thruOnly": "Bis Loch {{thru}}",
-  "tiedLead": "Geteilte Führung",
-  "tour": {
-   "clear": "{{count}} clear",
-   "clear_one": "{{count}} clear",
-   "nTied": "{{count}} tied",
-   "round": "Runde in {{gross}}.",
-   "second": "Second",
-   "thru": "Thru",
-   "thruF": "F"
-  },
-  "trackedRounds": "Erfasste Runden",
-  "videosAction": "Alle Videos",
-  "videosHeading": "Neueste Videos",
-  "week": {
-   "allRegions": "Überall",
-   "areaLabel": "Region",
-   "empty": {
-    "circle": "Diese Woche keine Runden aus deinem Kreis.",
-    "handicapBand": "Keine Runden nahe deinem Handicap in den letzten 14 Tagen.",
-    "played": "Diese Woche keine Runden auf deinen Plätzen.",
-    "suggested": "Diese Woche keine vorgeschlagenen Runden.",
-    "top100": "Diese Woche keine Top-100-Runden.",
-    "worldwide": "Diese Woche keine Runden."
-   },
-   "scope": {
-    "circle": "Dein Kreis",
-    "handicapBand": "Nahe deinem Handicap",
-    "homeClub": "Heimatclub",
-    "played": "Gespielt",
-    "suggested": "Vorgeschlagen",
-    "top100": "Top 100",
-    "worldwide": "Weltweit"
-   },
-   "scopeAria": "Runden-Bereich",
-   "selectRegionA11y": "Runden nach Region filtern"
-  },
-  "when": {
-   "relDaysAgo": "vor {{n}} T",
-   "relMonthsAgo": "vor {{n}} M",
-   "relToday": "heute",
-   "relWeeksAgo": "vor {{n}} Wo",
-   "relYearsAgo": "vor {{n}} J",
-   "relYest": "gestern"
-  },
-  "whereTheyPlayed": "Wo in den letzten 14 Tagen gespielt wurde",
-  "whosBeenPlaying": "Dein Kreis"
- },
- "explorer": {
-  "allRegions": "All Regions",
-  "allSubRegions": "All sub-regions",
-  "chooseRegionFirst": "Choose a region first",
-  "countInRegion_one": "<1>{{formattedCount}}</1> course in {{region}}",
-  "countInRegion_other": "<1>{{formattedCount}}</1> courses in {{region}}",
-  "countWorldwide_one": "<1>{{formattedCount}}</1> course worldwide",
-  "countWorldwide_other": "<1>{{formattedCount}}</1> courses worldwide",
-  "filtersA11y": "Course filters",
-  "loadMoreRetry": "Couldn't load more courses · Tap to retry",
-  "resetFilters": "Reset filters",
-  "results_one": "<1>{{formattedCount}}</1> result",
-  "results_other": "<1>{{formattedCount}}</1> results",
-  "searchA11y": "Search golf courses",
-  "searchPlaceholder": "Search by name, county or area…",
-  "searching": "Searching",
-  "selectRegionA11y": "Select region",
-  "sortA11y": "Sort courses",
-  "subRegionA11y": "Select sub-region",
-  "unableToLoadBody": "We couldn't fetch the courses. Please check your connection and try again.",
-  "unableToLoadTitle": "Unable to load courses"
- },
- "featRarity": {
-  "name": {
-   "ace": "Hole-in-One",
-   "albatross": "Albatros",
-   "eagleBrace": "Eagle-Brace"
-  },
-  "ord": {
-   "1": "erste",
-   "10": "zehnte",
-   "2": "zweite",
-   "3": "dritte",
-   "4": "vierte",
-   "5": "fünfte",
-   "6": "sechste",
-   "7": "siebte",
-   "8": "achte",
-   "9": "neunte"
-  },
-  "ownerFirst": "Dein erstes {{feat}}. Nach {{rounds}} Runden.",
-  "ownerFirstCongrats": "Glückwunsch, {{name}} — {{line}}",
-  "ownerRareThree": "Erst das dritte clbhouz-Mitglied, das dies erreicht hat.",
-  "ownerRareThreeCongrats": "Glückwunsch, {{name}} — {{line}}",
-  "ownerRareTwo": "Erst das zweite clbhouz-Mitglied, das dies erreicht hat.",
-  "ownerRareTwoCongrats": "Glückwunsch, {{name}} — {{line}}",
-  "ownerRepeat": "Dein {{ord}} {{feat}}. Das erste seit {{when}}.",
-  "ownerRepeatCongrats": "Glückwunsch, {{name}} — {{line}}",
-  "ownerSole": "Das erste clbhouz-Mitglied überhaupt, das dies erreicht hat.",
-  "ownerSoleCongrats": "Glückwunsch, {{name}} — {{line}}",
-  "viewer": "Das {{ord}} {{feat}} in {{rounds}} Runden.",
-  "viewerRareThree": "Erst das dritte clbhouz-Mitglied, das dies erreicht hat.",
-  "viewerRareTwo": "Erst das zweite clbhouz-Mitglied, das dies erreicht hat.",
-  "viewerSole": "Das erste clbhouz-Mitglied überhaupt, das dies erreicht hat."
- },
- "friends": {
-  "signIn": "Sign in",
-  "signInBody": "Discover where your friends have been playing and which courses are trending in your circle.",
-  "signInTitle": "Sign in to see friends' courses"
- },
- "hero": {
-  "contextBucket_one": "{{count}} golfer has this on their list",
-  "contextBucket_other": "{{count}} golfers have this on their list",
-  "contextFriendsMany": "{{name1}}, {{name2}} and {{count}} more have played here",
-  "contextFriendsOne": "{{name1}} has played here",
-  "contextFriendsTwo": "{{name1}} and {{name2}} have played here",
-  "contextHidden_one": "Rated {{avg}} from just {{count}} golfer",
-  "contextHidden_other": "Rated {{avg}} from just {{count}} golfers",
-  "factBestRound": "Best round tracked here: {{gross}}, {{holder}}",
-  "factHardestHole": "The {{hole}} plays hardest, {{over}} over par",
-  "factLevelPar": "Plays level par on average",
-  "factOverPar": "Plays {{over}} over par on average",
-  "factUnderPar": "Plays {{over}} under par on average",
-  "viewCourse": "View course"
- },
- "holes": {
-  "aceA11y": "Hole in one",
-  "allHolesKicker": "ALL HOLES",
-  "avgToPar": "AVG TO PAR",
-  "birdieRingNote": "A red dot by a hole number means you've birdied it.",
-  "birdiedOfTotal": "Birdied {{n}} of {{total}}",
-  "clubGuide": {
-   "bodySignedIn_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
-   "bodySignedIn_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
-   "bodySignedOut_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole.",
-   "bodySignedOut_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole.",
-   "title": "How the course plays"
-  },
-  "credibilityKicker": "OFFICIAL HOLE DATA",
-  "credibilitySuffix": " · Official WHS",
-  "detailsA11y": "Hole {{holeNo}} details",
-  "easiest": "EASIEST",
-  "easiestTitle": "Easiest",
-  "empty": {
-   "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.",
-   "eyebrow": "Official hole data",
-   "thisCourse": "this course",
-   "title": "Hole insights are coming"
-  },
-  "errorLoading": "Couldn't load hole analysis.",
-  "fieldPlaysTo": "Field: {{playsTo}}",
-  "hardest": "HARDEST",
-  "hardestTitle": "Hardest",
-  "holeByHole": "Hole by hole",
-  "legendEveryone": "Everyone",
-  "legendYou": "You",
-  "overPar": "Over-par",
-  "par": "Par",
-  "parAndSi": "Par {{par}} · SI {{si}}",
-  "parLabel": "Par {{par}}",
-  "players_one": "{{formattedCount}} player",
-  "players_other": "{{formattedCount}} players",
-  "playsTo": "PLAYS TO <1>{{playsTo}}</1>",
-  "playsToInline": "Plays to {{playsTo}}",
-  "preview": {
-   "eyebrow": "Hole by hole",
-   "legendBirdie": "Birdie+",
-   "legendBogey": "Bogey",
-   "legendDouble": "Double+",
-   "legendPar": "Par",
-   "seeAllShort": "Alle {{count}}",
-   "seeAll_one": "See all {{count}} hole",
-   "seeAll_other": "See all {{count}} holes",
-   "showLess": "Show less",
-   "title": "How the field scores every hole"
-  },
-  "rounds_one": "{{formattedCount}} round",
-  "rounds_other": "{{formattedCount}} rounds",
-  "scoringBreakdown": {
-   "bestHere": "BESTE HIER",
-   "bogey": "BOGEY",
-   "doublesShare_one": "{{count}} Doppelbogey · {{share}}% deiner",
-   "doublesShare_other": "{{count}} Doppelbogeys · {{share}}% deiner",
-   "formAside": "Letzte {{count}} Runden",
-   "formBest": "Beste {{n}}",
-   "formBetter": "{{n}} besser als die zehn davor",
-   "formLast10": "Deine letzten zehn hier",
-   "formLevel": "Gleich wie die zehn davor",
-   "formTitle": "Deine Form hier",
-   "formWorse": "{{n}} schlechter als die zehn davor",
-   "formWorstHere": "Schlechteste {{n}}",
-   "holeMany": "Löcher {{list}}",
-   "holeOne": "Loch {{n}}",
-   "mergeAside": "Jedes Loch, das du hier gespielt hast",
-   "mergeTitle": "Wohin die Schläge gehen",
-   "moreRoundsHint": "Spiele hier ein paar Runden mehr und wir zeigen dir die Muster.",
-   "nHoles_one": "{{count}} Loch",
-   "nHoles_other": "{{count}} Löcher",
-   "parLabel": "PAR {{n}}",
-   "parTypeAside": "Schläge über Par pro Runde",
-   "parTypeTitle": "Wie dir jedes Par liegt",
-   "parTypeTotal": "GESAMT",
-   "parYouAvg": "Par {{par}} · du spielst {{avg}}",
-   "reachAside": "Nächste Schritte auf diesem Platz",
-   "reachBirdies": "Löcher mit Birdie hier",
-   "reachChaseGap": "{{gap}} entfernt",
-   "reachChaseLevel": "Gleichstand mit dem Halter",
-   "reachOf": "{{done}} von {{of}}",
-   "reachTitle": "In Reichweite",
-   "s1Advice": "Spiele {{holes}} auf die Grünmitte und nimm das Bogey, wenn es sein muss.",
-   "s1Sub": "Nach verlorenen Schlägen, nicht nach Schwierigkeit",
-   "s3AdviceEarly": "Schlage vorher ein paar Bälle und rolle ein paar Putts - sonst wärmen dich deine ersten Löcher auf.",
-   "s3AdviceEven": "Wärme dich vor dem ersten Abschlag richtig auf und trinke und iss alle paar Löcher etwas.",
-   "s3AdviceLate": "Trinke und iss etwa am 12. Loch etwas, bevor der Einbruch beginnt.",
-   "s3AdviceMiddle": "Wähle bei jedem Schlag durch die Wende ein Ziel - dort lässt die Konzentration nach.",
-   "shareRest": "{{share}}% auf den anderen {{count}}",
-   "shareTop": "{{share}}% von diesen Löchern",
-   "third1": "Löcher 1-6",
-   "third2": "Löcher 7-12",
-   "third3": "Löcher 13-18",
-   "vsBetter": "Besser als das Feld hier",
-   "vsFieldLegend": "Feld hier",
-   "vsLevel": "Gleichauf mit dem Feld",
-   "vsWorse": "Schlechter als das Feld hier"
-  },
-  "shapeOfCourse": "The shape of the course",
-  "sortByDifficulty": "By difficulty",
-  "sortByHole": "By hole",
-  "strokeIndex": "SI {{index}}",
-  "subPar": "Sub-par",
-  "theBeastSuffix": " · the beast",
-  "yards": "{{yards}} yds",
-  "youAvg": "You {{avg}}",
-  "youPlayItTo": "You play it to {{playsTo}}",
-  "youValue": "You: {{value}}",
-  "yourBirdieMap": "Your birdie map",
   "yourCourses": {
-   "eyebrow": "Course by course",
-   "nRounds_one": "{{count}} round",
-   "nRounds_other": "{{count}} rounds",
-   "roundsLabel": "Runden",
-   "title": "Your courses"
-  },
-  "yourNemesisTitle": "Your nemesis",
-  "yourScoringHoleTitle": "Your scoring hole"
- },
- "media": {
-  "addMediaA11y": "Add media",
-  "emptyBody": "Be the first to capture <1>{{courseName}}</1> — photos and videos from your round help fellow golfers discover it.",
-  "emptyCourseFallback": "this course",
-  "emptyTitle": "No media yet",
-  "errorBody": "Please check your connection and try again.",
-  "errorTitle": "Couldn't load media",
-  "filterA11y": "Media filter",
-  "filterAll": "All",
-  "filterPhotos": "Photos",
-  "filterVideos": "Videos",
-  "guide": {
-   "clubhouse": "Clubhouse & facilities",
-   "clubhouseSub": "Help others know what to expect before they visit",
-   "kicker": "What to share",
-   "shots": "Shots from your round",
-   "shotsSub": "Short clips of your best moments on the course",
-   "signatureHoles": "Signature holes",
-   "signatureHolesSub": "Show the world what makes this course special",
-   "views": "Views & atmosphere",
-   "viewsSub": "Sunsets, landscapes, the feeling of being there"
-  },
-  "shareExperience": "Share your experience",
-  "signInBody": "See photos and videos from golfers who've played here.",
-  "signInCta": "Sign in",
-  "signInTitle": "Sign in to view media",
-  "uploadVideo": "Upload a video"
- },
- "network": {
-  "badge": {
-   "newForNetwork": "New for your network",
-   "playedByFriends_one": "Played by {{count}} friend",
-   "playedByFriends_other": "Played by {{count}} friends",
-   "topRated": "Top rated",
-   "trending": "Trending"
-  },
-  "circleKicker": "YOUR CIRCLE",
-  "emojiFlag": "⛳",
-  "friendsPlayedTitle": "Courses played by friends",
-  "unseenReviewsBody": "<name>{{name}}</name> reviewed <course>{{course}}</course> · <rating>{{rating}}</rating>",
-  "unseenReviewsMore_one": " +{{count}} more",
-  "unseenReviewsMore_other": " +{{count}} more",
-  "unseenReviewsTitle": "🔔 New review from your network",
-  "viewArrow": "View →",
-  "viewCourseA11y": "View {{name}}"
- },
- "phase5": {
-  "courseMomentAlt": "Course moment",
-  "personalReview": {
-   "aboveAvg": "{{diff}} above community avg",
-   "belowAvg": "{{diff}} below community avg",
-   "matchesConsensus": "Matches community consensus",
-   "reviewedOn": "Reviewed on {{date}}",
-   "title": "Your Rating"
-  },
-  "planning": {
-   "addBucketList": "Add to bucket list",
-   "privateNote": "Only you can see your bucket list.",
-   "title": "Planning"
-  },
-  "statusToggle": {
-   "addBucketList": "Add to bucket list",
-   "addedToBucket": "Added to bucket list",
-   "notPlayedSub": "Your rating helps golfers worldwide",
-   "notPlayedTitle": "Played here?",
-   "onBucketList": "On your bucket list",
-   "playedBadge": "Played",
-   "playedSub": "Tap to view or edit your review",
-   "playedTitle": "You've played here",
-   "rate": "Rate",
-   "removedFromBucket": "Removed from bucket list",
-   "signIn": "Sign in",
-   "signInPrompt": "Sign in to track this course"
-  },
-  "videoMomentAlt": "Video moment"
- },
- "rateNudge": {
-  "emptyLabel": "Rate a course you've played",
-  "playedEyebrow": "YOU HAVEN'T RATED YET",
-  "playedSubNoRegion": "Played, not rated",
-  "playedSubWithRegion": "{{region}} · Played, not rated",
-  "rateCta": "Rate",
-  "suggestedEyebrow": "TRY RATING",
-  "suggestedForYou": "Suggested for you"
- },
- "rateSheet": {
-  "emptyLong": "Type a course name to get started",
-  "noResults": "No courses found for \"{{query}}\"",
-  "rateAction": "Rate →",
-  "searchPlaceholder": "Search courses…",
-  "searching": "Searching…",
-  "subtitle": "Search any course you've played"
- },
- "request": {
-  "buttonCta": "Request a course",
-  "hero": {
-   "body": "If a course is missing, tell us and we'll add it to the map.",
-   "cta": "Request this course",
-   "headline": "Can't find a course?",
-   "headlineWithQuery": "Can't find \"{{query}}\"?",
-   "perkNotify": "We'll notify you the moment it's live",
-   "perkQuick": "Takes 20 seconds – just name and location"
-  },
-  "row": {
-   "subtitle": "Still not the one? Tap to request it.",
-   "title": "Request a course"
-  },
-  "sheet": {
-   "done": "Done",
-   "error": "Something went wrong. Please try again.",
-   "locationLabel": "Location",
-   "locationPlaceholder": "Town, region, country",
-   "nameLabel": "Course name",
-   "noteLabel": "Note",
-   "notePlaceholder": "Anything else? New opening, alternative name…",
-   "optional": "(optional)",
-   "sending": "Sending…",
-   "submit": "Request course",
-   "subtitle": "Can't find it? Tell us the name and location and we'll get it added.",
-   "successBody": "We'll email you when this course is added.",
-   "successTitle": "Thanks — we've got it.",
-   "title": "Request a course"
+    "avgHere": "{{avg}} here",
+    "avgHereOnAverage": "{{avg}} here on average",
+    "avgLabel": "{{avg}} im Schnitt",
+    "pillBirdiesLong": "birdies",
+    "pillBirdiesShort": "BIRD",
+    "pillBogeysLong": "bogeys+",
+    "pillBogeysShort": "BOG+",
+    "pillEaglesLong": "eagles+",
+    "pillEaglesShort": "EAG+",
+    "pillParsLong": "pars",
+    "pillParsShort": "PAR",
+    "roundsCount_one": "{{count}} round",
+    "roundsCount_other": "{{count}} rounds"
   }
- },
- "review": {
-  "editYours": "Edit yours",
-  "empty": {
-   "body": "Be the first to share your experience at {{courseName}}.",
-   "cta": "Write the first review",
-   "kicker": "WHAT TO INCLUDE",
-   "title": "No reviews yet"
-  },
-  "emptyGuide": {
-   "condition": {
-    "sub": "Greens, fairways, bunkers, rough",
-    "title": "Course condition"
-   },
-   "facilities": {
-    "sub": "Clubhouse, practice areas, service",
-    "title": "Facilities"
-   },
-   "layout": {
-    "sub": "Challenge, variety, scenery, routing",
-    "title": "Layout & design"
-   },
-   "value": {
-    "sub": "Was it worth the green fee?",
-    "title": "Value"
-   }
-  },
-  "endMessage_one": "You've seen all {{count}} review.",
-  "endMessage_other": "You've seen all {{count}} reviews.",
-  "error": {
-   "body": "Something went wrong. Please try again.",
-   "retry": "Try Again",
-   "title": "Couldn't load reviews"
-  },
-  "filter": {
-   "button": "Filter",
-   "buttonLabel": "Filter: {{label}}. Tap to change.",
-   "buttonLabelDefault": "Filter reviews by rating",
-   "clear": "Clear filter",
-   "optionAll": "All ratings",
-   "optionExcellent": "Excellent",
-   "optionExceptional": "Exceptional",
-   "optionFair": "Fair",
-   "optionGood": "Good",
-   "optionPoor": "Poor",
-   "title": "Filter by rating"
-  },
-  "filterA11y": "Filter reviews: {{label}} ({{count}})",
-  "helpful": "Helpful?",
-  "noMatches": {
-   "body": "No reviews match your criteria.",
-   "clear": "Clear filters"
-  },
-  "ratingCount_one": "{{count}} rating",
-  "ratingCount_other": "{{count}} ratings",
-  "reportA11y": "Report review",
-  "response": {
-   "cancel": "Cancel",
-   "delete": "Delete",
-   "deleteA11y": "Delete response",
-   "deleteConfirm": "Delete this response? This cannot be undone.",
-   "edit": "Edit",
-   "editA11y": "Edit response",
-   "ownerBadge": "- Owner response",
-   "post": "Post response",
-   "posting": "Posting...",
-   "reply": "Reply",
-   "replyPlaceholder": "Respond as {{business}}...",
-   "save": "Save",
-   "saving": "Saving...",
-   "verifyLink": "Verify {{business}}",
-   "verifyPrompt": "<1>Verify {{business}}</1> to respond to reviews."
-  },
-  "search": {
-   "cancel": "Cancel",
-   "openA11y": "Search reviews",
-   "placeholder": "Search reviews…"
-  },
-  "shareExperience": "Share your experience",
-  "sort": {
-   "helpful": "Most helpful",
-   "highest": "Highest rated",
-   "recent": "Most recent"
-  },
-  "sortA11y": "Sort reviews",
-  "subscore": {
-   "clubhouse": "Clubhouse",
-   "condition": "Condition",
-   "design": "Design",
-   "facilities": "Facilities"
-  },
-  "toast": {
-   "mediaAttachFailed": "Deine Bewertung wurde gepostet, aber ein Foto konnte nicht angehängt werden. Bearbeite die Bewertung, um es erneut hinzuzufügen.",
-   "mediaAttachHeld": "Deine Bewertung wurde gepostet. Ein Foto wird noch angehängt - falls es nicht fertig wird, findest du auf deinem Profil eine Schaltfläche zum erneuten Versuchen.",
-   "mediaUploadFailed": "Deine Fotos konnten nicht hochgeladen werden, daher wurde nichts gepostet. Tippe beim Foto auf Erneut versuchen und poste dann noch einmal.",
-   "rateBody": "Please sign in to rate courses",
-   "signInRequired": "Sign in required",
-   "voteBody": "Please sign in to vote on reviews"
-  },
-  "wizard": {
-   "a11yStep": "Schritt {{n}} von 3, {{label}}",
-   "a11yStepNumber": "Schritt {{n}} von {{m}}",
-   "backA11y": "Zurück",
-   "closeA11y": "Schließen",
-   "continue": "Weiter",
-   "deleteA11y": "Bewertung entfernen",
-   "draftRestored": {
-    "body": "Du hast diese Bearbeitung unvollendet verlassen, also haben wir sie zurückgeholt. Was du siehst, ist noch nicht veröffentlicht.",
-    "discard": "Verwerfen und veröffentlichte Version nutzen",
-    "mediaDismiss": "Verstanden",
-    "mediaJoin": " und ",
-    "mediaLost": "Fotos und Videos konnten nicht behalten werden: {{subject}} waren angehängt und müssen erneut hinzugefügt werden.",
-    "mediaPhoto": "1 Foto",
-    "mediaPhotos": "{{count}} Fotos",
-    "mediaVideo": "1 Video",
-    "mediaVideos": "{{count}} Videos",
-    "title": "Nicht gespeicherte Änderungen wiederhergestellt"
-   },
-   "hint": {
-    "clubhouse": "Empfang, Essen, Atmosphäre",
-    "condition": "Grüns, Fairways, Bunker am Spieltag",
-    "design": "Routing, Schlagvielfalt, Einprägsamkeit",
-    "facilities": "Range, Übungsbereiche, Umkleiden"
-   },
-   "post": "Bewertung posten",
-   "posting": "Wird gepostet ...",
-   "rail": {
-    "breakdown": "Details",
-    "score": "Wertung",
-    "words": "Worte"
-   },
-   "receipt": {
-    "actionBack": "Zurück zu {{course}}",
-    "actionClubhouse": "Im Clubhouse ansehen",
-    "categoryAverage": "Your categories average <avg>{{avg}}</avg>",
-    "didEyebrow": "Was das bewirkt hat",
-    "eyebrow": "Bewertung gepostet",
-    "nextEyebrow_one": "{{count}} gespielter Platz noch unbewertet",
-    "nextEyebrow_other": "{{count}} gespielte Plätze noch unbewertet",
-    "nextPlayed": "Gespielt am {{date}}",
-    "nextRate": "Bewerten",
-    "rowA": "<cnt>{{count}}</cnt> Mitglieder bewerten {{course}} mit <avg>{{avg}}</avg>",
-    "rowADeltaAbove": "Du hast {{delta}} über dem Durchschnitt bewertet",
-    "rowADeltaBelow": "Du hast {{delta}} unter dem Durchschnitt bewertet",
-    "rowB": "Du bist der Erste, der diesen Platz bewertet",
-    "rowBSub": "Deine Wertung setzt den Community-Durchschnitt",
-    "rowC": "Platz <b>#{{rank}}</b> der {{list}} Top 100",
-    "rowCRight_one": "{{count}} bewertet",
-    "rowCRight_other": "{{count}} bewertet",
-    "rowD": "Dein <b>{{ordinal}}</b> bestbewerteter Platz",
-    "rowDRight_one": "von {{count}} bewertet",
-    "rowDRight_other": "von {{count}} bewertet"
-   },
-   "save": "Bewertung speichern",
-   "saving": "Wird gespeichert ...",
-   "step0": {
-    "a11y": "Gesamtwertung, 1 bis 10",
-    "bandHigh": "9.0 and up",
-    "bandLow": "Below 5.0",
-    "bandMid": "5.0 to 8.9",
-    "calibration": "Would be your {{ordinal}} highest of {{count}}",
-    "captionEmpty": "Ziehen, um deine Wertung zu setzen",
-    "captionSet": "Deine Gesamtwertung",
-    "gate": "Wertung festlegen",
-    "heading": "Wie gut ist er, von zehn?"
-   },
-   "step1": {
-    "body": "Alle vier sind nötig. Nur so bekommen die Community-Zahlen Bedeutung.",
-    "gate_one": "Noch {{count}} Kategorie",
-    "gate_other": "Noch {{count}} Kategorien",
-    "heading": "Im Detail"
-   },
-   "step2": {
-    "heading": "Fotos und ein paar Worte",
-    "lede": "Alles von deinem Tag in {{course}}.",
-    "optionalNote": "Optional. Alles Weitere unten auch.",
-    "photosEyebrow": "Fotos",
-    "placeholder": "Was sollte ein anderer Golfer vorher wissen?",
-    "shareSub": "Deine Bewertung erscheint im Feed",
-    "shareTitle": "Im Clubhouse teilen",
-    "skip": "Überspringen – direkt zur Note",
-    "summary": "Du teilst {{what}}",
-    "summaryJoin": " und ",
-    "summaryPhoto": "1 Foto",
-    "summaryPhotos": "{{count}} Fotos",
-    "summaryWords": "deine Worte",
-    "teesEyebrow": "Gespielte Abschläge",
-    "wordsEyebrow": "Deine Worte"
-   },
-   "step3": {
-    "breakdownBody": "Bewerte sie für sich, nicht gegen deine Gesamtnote. Ein Platz kann herrlich zu spielen und dürftig ausgestattet sein – genau das zeigt sich hier.",
-    "breakdownLabel": "Jetzt diese vier bewerten",
-    "caption": "Zum Ändern ziehen",
-    "catsGate_one": "Noch {{count}} Kategorie",
-    "catsGate_other": "Noch {{count}} Kategorien",
-    "gate": "Setz deine Note",
-    "heading": "Wie gut ist der Platz?",
-    "lede": "Deine Note bringt {{course}} in die Platzrangliste. Zieh am Regler.",
-    "shareSubRatingOnly": "Deine Note erscheint im Feed, ohne Fotos und Worte",
-    "shareSubReview": "Deine Bewertung erscheint im Feed",
-    "shareTitle": "Im Clubhaus teilen",
-    "submit": "Bewertung abschicken",
-    "summary": "{{course}} mit {{score}} bewertet",
-    "summaryShare": ", wird im Clubhaus geteilt",
-    "threshold": "Deine wäre die {{ordinal}} Bewertung hier – danach gehen die Balken auf der Platzseite live.",
-    "skipToPost": "Post without rating it"
-   },
-   "uploadingMedia": "Fotos werden hochgeladen ..."
-  },
-  "write": {
-   "body": "Your rating helps golfers worldwide",
-   "emoji": "⭐",
-   "rate": "Rate",
-   "title": "Played here?"
-  },
-  "writePromptInline": "⭐ Write your review"
- },
- "reviewSheet": {
-  "communityAverage_one": "Community-Durchschnitt {{average}}, aus {{count}} Bewertung",
-  "communityAverage_other": "Community-Durchschnitt {{average}}, aus {{count}} Bewertungen"
- },
- "scorecard": {
-  "atThisCourseBare": "Auf diesem Platz",
-  "atThisCourseOther": "{{name}} auf diesem Platz",
-  "atThisCourseSelf": "Du auf diesem Platz",
-  "atThisCourse_one": "At this course · your {{count}} round here",
-  "atThisCourse_other": "At this course · your {{count}} rounds here",
-  "beatFieldBasis_one": "Basierend auf 1 weiteren Golfer, der hier gespielt hat.",
-  "beatFieldBasis_other": "Basierend auf {{count}} weiteren Golfern, die hier gespielt haben.",
-  "beatFieldOn": "You matched or beat the field average on {{beat}} of {{scored}} holes.",
-  "beatFieldOnPartial": "You matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
-  "beatFieldOnTour": "Matched or beat the field average on {{beat}} of {{scored}} holes.",
-  "beatFieldOnTourPartial": "Matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
-  "beatFieldOther": "{{name}} war auf {{n}} von {{m}} Löchern besser als der field-Durchschnitt.",
-  "beatFieldSelf": "Du warst auf {{n}} von {{m}} Löchern besser als der field-Durchschnitt.",
-  "beatFieldVoice": "{{who}} matched or beat the field average on {{beat}} of {{scored}} holes.",
-  "beatFieldVoicePartial": "{{who}} matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
-  "commentReview": "Diese Bewertung kommentieren",
-  "feat": {
-   "ace": {
-    "label": "HOLE-IN-ONE"
-   },
-   "albatross": {
-    "label": "ALBATROSS"
-   },
-   "birdies": {
-    "label": "BIRDIES",
-    "sub": "in einer Runde"
-   },
-   "clean": {
-    "label": "FEHLERFREIE RUNDE",
-    "sub": "kein Schlag verloren"
-   },
-   "eagle": {
-    "label": "EAGLE"
-   },
-   "eagleBrace": {
-    "label": "EAGLE-BRACE"
-   },
-   "onHole": "an der {{hole}}"
-  },
-  "fieldShort": "Feld",
-  "figBeatField": "FELD GESCHLAGEN",
-  "figBest": "BESTE",
-  "figHcpAtTime": "HCP zu diesem Zeitpunkt",
-  "figOfRounds": "von {{count}} Runden",
-  "figVsTheirAvg": "vs. eigener Durchschnitt",
-  "figVsYourAvg": "vs. dein Durchschnitt",
-  "gross": "GROSS",
-  "grossOnlyBody": "This round was logged as a total, without hole-by-hole scores.",
-  "grossOnlyTitle": "Gross score only",
-  "hideHoleByHole": "Vollständige Scorekarte ausblenden",
-  "holeByHole": "Vollständige Scorekarte",
-  "legendNotPlayed": "Nicht gespielt",
-  "likeReview": "Diese Bewertung liken",
-  "nineHoleTag": "9 holes",
-  "noFieldLine_one": "Nur 1 weiterer Golfer hat hier gespielt, daher gibt es noch kein Feld zum Vergleich.",
-  "noFieldLine_other": "Nur {{count}} weitere Golfer haben hier gespielt, daher gibt es noch kein Feld zum Vergleich.",
-  "noFieldNobody": "Noch hat niemand anderes hier gespielt, daher gibt es kein Feld zum Vergleich.",
-  "rankHere": "Your {{ordinal}} best of {{count}} rounds here.",
-  "rankHereNeutral": "{{ordinal}} best of {{count}} rounds here.",
-  "rankHereNeutralBest": "Best of {{count}} rounds here.",
-  "rankHereVoice": "{{whose}} {{ordinal}} best of {{count}} rounds here.",
-  "rankHereVoiceBest": "{{whose}} best of {{count}} rounds here.",
-  "roundBack": "Zurück",
-  "roundN": "Runde {{n}}",
-  "roundShort": "R{{n}}",
-  "roundSignInBody": "Eine Scorekarte ist nur für angemeldete Mitglieder sichtbar.",
-  "roundSignInCta": "Anmelden",
-  "roundSignInTitle": "Melde dich an, um diese Runde zu sehen",
-  "scoreRow": "Score",
-  "shareRound": "Teilen",
-  "syncingBody": "Hole-by-hole data is syncing from England Golf. It usually lands within a few hours.",
-  "syncingTitle": "Scorecard on the way",
-  "theCard": "DIE KARTE",
-  "toPar": "TO PAR",
-  "unavailableBody": "This scorecard isn't available right now.",
-  "unavailableTitle": "Scorecard unavailable",
-  "viewCourse": "Platz",
-  "viewProfile": "Profil",
-  "vsAvgBetter": "{{n}} shots better than {{whose}} average here.",
-  "vsAvgBetterNeutral": "{{n}} shots better than the average here.",
-  "vsAvgLevel": "Right on {{whose}} average here.",
-  "vsAvgLevelNeutral": "Right on the average here.",
-  "vsAvgWorse": "{{n}} shots worse than {{whose}} average here.",
-  "vsAvgWorseNeutral": "{{n}} shots worse than the average here.",
-  "vsOthersBetterNeutral_one": "{{n}} shots better than the other round here.",
-  "vsOthersBetterNeutral_other": "{{n}} shots better than the other {{count}} rounds here.",
-  "vsOthersBetter_one": "{{n}} shots better than {{whose}} other round here.",
-  "vsOthersBetter_other": "{{n}} shots better than {{whose}} other {{count}} rounds here.",
-  "vsOthersLevelNeutral_one": "Right on the other round here.",
-  "vsOthersLevelNeutral_other": "Right on the other {{count}} rounds here.",
-  "vsOthersLevel_one": "Right on {{whose}} other round here.",
-  "vsOthersLevel_other": "Right on {{whose}} other {{count}} rounds here.",
-  "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
-  "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here.",
-  "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
-  "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
-  "figOfRoundsSelf": "von deinen {{count}} Runden hier",
-  "figOfRoundsOther": "von {{possessive}} {{count}} Runden hier",
-  "figVsYourAvgHere": "Schläge besser als dein Durchschnitt hier",
-  "figVsTheirAvgHere": "Schläge besser als {{possessive}} Durchschnitt hier",
-  "scopeYou": "Du",
-  "scopeYour": "deinen",
-  "scopeHe": "Er",
-  "scopeHis": "seinen",
-  "scopeShe": "Sie",
-  "scopeHer": "ihren",
-  "scopeThey": "Die Person",
-  "scopeTheir": "deren",
-  "scopeHave": "hast",
-  "scopeHas": "hat"
- },
- "searchSheet": {
-  "added": "Added",
-  "clearSearchA11y": "Clear search",
-  "closeA11y": "Close search",
-  "outOfTen": "/ 10",
-  "placeholder": "Search for a golf course...",
-  "ratingBullet": "• ",
-  "retry": "Retry",
-  "title": "Choose Golf Club",
-  "trouble": "Trouble loading courses",
-  "yourCourses": "Your courses"
- },
- "statBrowse": {
-  "colArea": "Gebiet",
-  "colCountsCountry": "Mit Runden / im Verzeichnis",
-  "colCountsRegion": "Mit Runden",
-  "colRegion": "Region",
-  "countAll_one": " {{count}} von {{total}} Platz über offizielle WHS-Handicaps erfasst.",
-  "countAll_other": " {{count}} von {{total}} Plätzen über offizielle WHS-Handicaps erfasst.",
-  "countCountry_one": " In {{country}}: {{count}} von {{total}} Platz über offizielle WHS-Handicaps erfasst.",
-  "countCountry_other": " In {{country}}: {{count}} von {{total}} Plätzen über offizielle WHS-Handicaps erfasst.",
-  "countRegion_one": " In {{region}}, {{country}}: {{count}} Platz über offizielle WHS-Handicaps erfasst.",
-  "countRegion_other": " In {{region}}, {{country}}: {{count}} Plätze über offizielle WHS-Handicaps erfasst.",
-  "directory": {
-   "body": "Das vollständige Verzeichnis enthält {{total}} weitere Plätze.",
-   "cta": "Vollständiges Verzeichnis ansehen",
-   "title": "Suchst du woanders?"
-  },
-  "reviews": {
-   "actionFeatured": "Alle Bewertungen",
-   "actionRail": "Alle ansehen",
-   "heading": "Was Mitglieder sagen",
-   "outOfTen": "von 10"
-  }
- },
- "tabs": {
-  "explore": "Explore"
- },
- "teeCard": {
-  "a11yToggle": "Toggle course card details",
-  "col": {
-   "length": "Länge"
-  },
-  "syncNote": {
-   "body": "Tee cards are built from golfers' synced rounds. Sync your WHS handicap and the tees you play will appear.",
-   "heading": "Play here?"
-  }
- },
- "toReview": {
-  "bandEarlier": "FRUHER",
-  "bandLastYear": "LETZTES JAHR",
-  "bandThisYear": "DIESES JAHR",
-  "close": "Schliessen",
-  "railCourses": "PLATZE",
-  "railYears": "JAHRE",
-  "rate": "BEWERTEN",
-  "subline": "Gespielt, aber nicht bewertet - neueste zuerst.",
-  "sublineBreakdowns": "Detailbewertungen fehlen - neueste zuerst.",
-  "title": "Zu bewertende Platze",
-  "titleBreakdowns": "Details hinzufugen"
- },
- "top100": {
-  "clearSearch": "Clear search",
-  "listsA11y": "Top 100 lists",
-  "metaCourses_one": "<1>{{count}}</1> course · {{listLabel}}",
-  "metaCourses_other": "<1>{{count}}</1> courses · {{listLabel}}",
-  "metaResults_one": "<1>{{count}}</1> result",
-  "metaResults_other": "<1>{{count}}</1> results",
-  "progress": {
-   "emptyBody": "Play one and it lands here, with your rating alongside the published rank.",
-   "emptyTitle": "You have not played any of these yet.",
-   "signedOutBody": "Sign in to track which of these you have played.",
-   "signedOutTitle": "Track your Top 100."
-  },
-  "resetFilters": "Reset filters",
-  "searchA11y": "Search within Top 100 list",
-  "searchPlaceholder": "Search the {{listLabel}} Top 100",
-  "sectionTitle": "The world's best",
-  "stats": {
-   "avgToParLabel": "Schnitt zu Par",
-   "clubhouse": "Clubhouse",
-   "condition": "Condition",
-   "design": "Design",
-   "easierThan": "Easier than <1>{{pct}}%</1> of courses",
-   "easierThanLabel": "Leichter als",
-   "facilities": "Facilities",
-   "fromRatings_one": "from {{count}} rating",
-   "fromRatings_other": "from {{count}} ratings",
-   "harderThan": "Harder than <1>{{pct}}%</1> of courses",
-   "harderThanLabel": "Schwerer als",
-   "heading": "Course stats",
-   "middleOfPack": "Middle of the pack for difficulty",
-   "noRoundsCta": "Be the first.",
-   "noRoundsTitle": "Rated, but no rounds tracked here yet.",
-   "playsAbove": "Plays <1>{{value}}</1> above par on average",
-   "playsBelow": "Plays <1>{{value}}</1> below par on average",
-   "playsLevel": "Plays level par on average",
-   "ratingLabel": "Bewertung"
-  },
-  "verdict": {
-   "higher": "Rated above its rank",
-   "lower": "Rated below its rank",
-   "ratingRank": "{{position}} of {{poolSize}} rated courses on the {{listLabel}} Top 100",
-   "ratingRankNoList": "{{position}} of {{poolSize}} rated courses on this list"
-  },
-  "verdictSheet": {
-   "distribution": "How golfers scored it",
-   "distributionNote_one": "From 1 golfer rating so far.",
-   "distributionNote_other": "From {{count}} golfer ratings so far.",
-   "explanation": "Published at #{{rank}}. Golfers who have played it rate it {{rating}} from {{ratingCount}} ratings. Across the Top 100 courses golfers have rated, one at #{{rank}} usually scores around {{expected}}. We show where those differ. We do not adjust the list.",
-   "listNote": "This is its {{listLabel}} rank. It sits at a different rank on other lists, so the comparison changes.",
-   "memberRating_one": "Golfer rating - {{count}} rating",
-   "memberRating_other": "Golfer rating - {{count}} ratings",
-   "rateCta": "Rate this course",
-   "ratingRank": "{{position}} of {{poolSize}} rated courses on this list",
-   "ratingRankLabel": "Golfer rating order",
-   "title": "How this compares"
-  }
- },
- "userCourses": {
-  "emptyRecentOtherBody": "No courses played in the last 30 days",
-  "emptyRecentOtherTitle": "{{name}} has no recent activity",
-  "emptyRecentOwnBody": "Play some courses in the last 30 days and they'll appear here",
-  "emptyRecentOwnTitle": "No recent activity",
-  "emptyRegion": "No courses found in the selected region.",
-  "emptyTop100OtherBody": "Check back later to see their golf course journey",
-  "emptyTop100OtherTitle": "{{name}} hasn't rated any Top 100 courses yet",
-  "emptyTop100OwnBody": "Explore the world's greatest golf courses and rate them to track your journey",
-  "emptyTop100OwnTitle": "No Top 100 courses rated yet",
-  "loading": "Loading...",
-  "loadingBody": "Loading user profile and course information",
-  "notFound": "User Not Found",
-  "notFoundBody": "The user profile you're looking for doesn't exist or isn't public",
-  "regionalAddCourses": "Add Courses",
-  "regionalAddCoursesEmoji": "📍",
-  "regionalSortView": "Sort & View",
-  "showingRegion": "Showing {{region}} courses",
-  "signInBody": "Sign in to view user profiles and course checklists",
-  "signInRequired": "Sign in required",
-  "signInRequiredBody": "Create an account to view user profiles and course information",
-  "signInTitle": "User's Golf Courses"
- },
- "yourCourses": {
-  "avgHere": "{{avg}} here",
-  "avgHereOnAverage": "{{avg}} here on average",
-  "avgLabel": "{{avg}} im Schnitt",
-  "pillBirdiesLong": "birdies",
-  "pillBirdiesShort": "BIRD",
-  "pillBogeysLong": "bogeys+",
-  "pillBogeysShort": "BOG+",
-  "pillEaglesLong": "eagles+",
-  "pillEaglesShort": "EAG+",
-  "pillParsLong": "pars",
-  "pillParsShort": "PAR",
-  "roundsCount_one": "{{count}} round",
-  "roundsCount_other": "{{count}} rounds"
- }
 }
