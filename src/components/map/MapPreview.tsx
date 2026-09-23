@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Maximize2, MapPin } from 'lucide-react';
 import { createGlassyMarkerElement } from './MapMarker';
-import { MAP_CONFIG } from '@/config/maps';
+import { applyClbhouzMapStyle, MAP_CONFIG } from '@/config/maps';
 import { AppLog } from '@/lib/logger';
 
 interface MapPreviewProps {
@@ -66,7 +66,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: colorful ? 'mapbox://styles/mapbox/streets-v12' : MAP_CONFIG.STYLE_URL,
+        style: MAP_CONFIG.STYLE_URL,
         center: [lng, lat],
         zoom,
         interactive,
@@ -74,6 +74,8 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
       });
 
       mapRef.current = map;
+
+      map.on('style.load', () => applyClbhouzMapStyle(map));
 
       map.on('load', () => {
         if (mountedRef.current) {
@@ -116,7 +118,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
         mapRef.current = null;
       }
     };
-  }, [lat, lng, zoom, interactive, mapInitialized, hasValidCoords, colorful]);
+  }, [lat, lng, zoom, interactive, mapInitialized, hasValidCoords]);
 
   // Reset map when coordinates change
   useEffect(() => {

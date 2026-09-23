@@ -4,6 +4,8 @@
  */
 
 import mapboxgl from 'mapbox-gl';
+import { SURFACE } from '@/lib/tokens/surface';
+import { MEMBER_PANEL, PAGE_CANVAS, inkWithAlpha } from '@/lib/tokens/surfaces';
 
 // PRODUCTION FIX: esbuild minification breaks mapbox-gl's inline web worker
 // ("error parsing the WebWorker bundle" / "g is not defined"), which kills all
@@ -16,8 +18,8 @@ import MapboxWorker from 'mapbox-gl/dist/mapbox-gl-csp-worker?worker';
 (mapboxgl as unknown as { workerClass: unknown }).workerClass = MapboxWorker;
 
 export const MAP_CONFIG = {
-  /** Clean minimal base — roads/POIs stripped at runtime */
-  STYLE_URL: 'mapbox://styles/mapbox/light-v11',
+  /** Dark cartographic base; all app maps receive the shared paint pass below. */
+  STYLE_URL: 'mapbox://styles/mapbox/dark-v11',
   
   /** Token from environment */
   TOKEN: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string,
@@ -41,9 +43,9 @@ export const MAP_CONFIG = {
 } as const;
 
 /**
- * Strips the Mapbox light-v11 base down to a clean minimal cartographic base.
- * Removes roads, transit, POIs, and most labels. Keeps country/region boundaries,
- * water, landmass, and major place labels only.
+ * Strips the Mapbox dark-v11 base down to a clean minimal cartographic base.
+ * Removes transit, POIs, and most labels. Keeps restrained roads,
+ * country/region boundaries, water, landmass, and major place labels.
  *
  * Call inside map.on('style.load', () => applyClbhouzMapStyle(map, options))
  */
@@ -54,9 +56,9 @@ export function applyClbhouzMapStyle(
     showPlaceLabels?: boolean;
     /** Show water body labels (ocean, sea names). Default true */
     showWaterLabels?: boolean;
-    /** Land fill color. Default '#F2F0EB' (warm parchment) */
+    /** Land fill override. Defaults to the member Panel token in dark mode. */
     landColor?: string;
-    /** Water fill color. Default '#D4E4F1' (soft blue) */
+    /** Water fill override. Defaults to the page Canvas token in dark mode. */
     waterColor?: string;
     /** Dark mode — inverts palette. Default false */
     darkMode?: boolean;
@@ -69,7 +71,7 @@ export function applyClbhouzMapStyle(
     showWaterLabels = true,
     landColor = '#F2F0EB',
     waterColor = '#D4E4F1',
-    darkMode = false,
+    darkMode = true,
     showContinentLabels = false,
   } = options ?? {};
 
@@ -79,12 +81,6 @@ export function applyClbhouzMapStyle(
   // --- 1. REMOVE LAYERS WE DON'T WANT ---
   for (const layer of layers) {
     const id = layer.id;
-
-    // Roads, bridges, tunnels
-    if (id.startsWith('road') || id.startsWith('bridge') || id.startsWith('tunnel')) {
-      map.removeLayer(id);
-      continue;
-    }
 
     // Transit (rail, ferry, aeroway)
     if (
@@ -131,8 +127,8 @@ export function applyClbhouzMapStyle(
     // --- CONTINENT-ONLY LABEL MODE ---
     if (!showPlaceLabels && id.includes('label')) {
       if (showContinentLabels && id === 'continent-label') {
-        try { map.setPaintProperty(id, 'text-color', darkMode ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.25)'); } catch {}
-        try { map.setPaintProperty(id, 'text-halo-color', darkMode ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.6)'); } catch {}
+        try { map.setPaintProperty(id, 'text-color', darkMode ? SURFACE.dark.dim : 'rgba(0,0,0,0.25)'); } catch {}
+        try { map.setPaintProperty(id, 'text-halo-color', darkMode ? PAGE_CANVAS : 'rgba(255,255,255,0.6)'); } catch {}
         try { map.setPaintProperty(id, 'text-halo-width', 1.5); } catch {}
         try { map.setLayoutProperty(id, 'text-size', 11); } catch {}
         try { map.setLayoutProperty(id, 'text-letter-spacing', 0.15); } catch {}
@@ -147,12 +143,13 @@ export function applyClbhouzMapStyle(
   }
 
   // --- 2. RESTYLE WHAT REMAINS ---
-  const resolvedLandColor = darkMode ? '#1A1D23' : landColor;
-  const resolvedWaterColor = darkMode ? '#0F1218' : waterColor;
-  const borderColor = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-  const coastlineColor = darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
-  const labelColor = darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)';
-  const labelHaloColor = darkMode ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.8)';
+  const resolvedLandColor = darkMode ? MEMBER_PANEL : landColor;
+  const resolvedWaterColor = darkMode ? PAGE_CANVAS : waterColor;
+  const borderColor = darkMode ? inkWithAlpha(SURFACE.dark.ink, 0.08) : 'rgba(0,0,0,0.06)';
+  const coastlineColor = darkMode ? inkWithAlpha(SURFACE.dark.ink, 0.12) : 'rgba(0,0,0,0.08)';
+  const roadColor = darkMode ? inkWithAlpha(SURFACE.dark.ink, 0.08) : 'rgba(0,0,0,0.08)';
+  const labelColor = darkMode ? SURFACE.dark.mute : 'rgba(0,0,0,0.4)';
+  const labelHaloColor = darkMode ? PAGE_CANVAS : 'rgba(255,255,255,0.8)';
 
   // Background
   try { if (map.getLayer('background')) { map.setPaintProperty('background', 'background-color', resolvedLandColor); } } catch {}
@@ -181,6 +178,11 @@ export function applyClbhouzMapStyle(
     // Waterway / coastline lines
     if (id.includes('waterway') || id.includes('coastline')) {
       try { map.setPaintProperty(id, 'line-color', coastlineColor); } catch {}
+    }
+
+    // Roads, bridges, and tunnels — present but subordinate to labels and pins.
+    if (id.startsWith('road') || id.startsWith('bridge') || id.startsWith('tunnel')) {
+      try { map.setPaintProperty(id, 'line-color', roadColor); } catch {}
     }
 
     // Place labels — soften so pins dominate

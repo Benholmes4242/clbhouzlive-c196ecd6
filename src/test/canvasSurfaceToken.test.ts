@@ -205,4 +205,26 @@ describe('canonical member surface tokens', () => {
       .join('\n');
     expect(allDarkSources).not.toMatch(/rgba\(0,\s*0,\s*0,\s*0\.0[46]\)/);
   });
+
+  it('routes all three Mapbox maps through one dark ramp style path', () => {
+    const config = readFileSync(resolve(process.cwd(), 'src/config/maps.ts'), 'utf8');
+    expect(config).toContain("STYLE_URL: 'mapbox://styles/mapbox/dark-v11'");
+    expect(config).toContain('darkMode = true');
+    expect(config).toContain('darkMode ? MEMBER_PANEL : landColor');
+    expect(config).toContain('darkMode ? PAGE_CANVAS : waterColor');
+
+    const mapPaths = [
+      'src/components/map/MapPreview.tsx',
+      'src/components/map/MapExpandedView.tsx',
+      'src/components/business/PinDropModal.tsx',
+    ];
+    for (const path of mapPaths) {
+      const source = readFileSync(resolve(process.cwd(), path), 'utf8');
+      expect(source, path).toContain('style: MAP_CONFIG.STYLE_URL');
+      expect(source, path).toContain("on('style.load'");
+      expect(source, path).toContain('applyClbhouzMapStyle');
+      expect(source, path).not.toContain('mapbox://styles/mapbox/streets-v12');
+      expect(source, path).not.toContain('mapbox://styles/mapbox/light-v11');
+    }
+  });
 });
