@@ -47,6 +47,7 @@ import { WireFeedSlide } from '@/features/tourhub/news/WireFeedSlide';
 import type { ClubhouseFeedItem } from './injectWireStories';
 import { CANVAS, SLAB } from './feedSurfaces';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { track as trackImpression } from '@/lib/impressions/impressionTracker';
 
 
 /** How many neighbours on each side of the active card may mount a <video>. */
@@ -102,6 +103,8 @@ const FeedItemGate: React.FC<{
  * to date" to report) and nothing when none is.
  */
 const OLD_POST_MS = 30 * 24 * 60 * 60 * 1000;
+const SEEN_RATIO = 0.5;
+const SEEN_DWELL_MS = 1000;
 
 function upToDateDividerIndex(posts: FeedPost[]): number | null {
   if (posts.length < 2) return null;
@@ -372,6 +375,13 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const EARLY_MOTION_CLEAR = 0.08;    // drop earlyIdx below 8% (hysteresis)
   const EARLY_VELOCITY_MAX = 3;       // px/ms — above this = flick, no early
   const visibilityRef = useRef<Map<number, number>>(new Map());
+  /* SEEN = HALF ON SCREEN FOR A SECOND. A card the member flicks past
+     is not an impression; the ranker reads this as "they have already
+     had this one". Timers are per card index and are cancelled the
+     moment the card drops below the threshold, so only genuine dwell
+     counts. The tracker itself dedupes per session, so a card that
+     scrolls in and out repeatedly records once. */
+  const dwellTimers = useRef<Map<number, number>>(new Map());
   const scrollDirRef = useRef<number>(0); // +1 down, -1 up, 0 idle
   const lastScrollTopRef = useRef<number>(0);
   const lastScrollTsRef = useRef<number>(0);
@@ -546,7 +556,22 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
             visibilityRef.current.delete(idx);
           }
 
-
+          if (e.isIntersecting && e.intersectionRatio >= SEEN_RATIO) {
+            if (!dwellTimers.current.has(idx)) {
+              const t = window.setTimeout(() => {
+                dwellTimers.current.delete(idx);
+                const id = posts[idx]?.id;
+                if (id) trackImpression(id);
+              }, SEEN_DWELL_MS);
+              dwellTimers.current.set(idx, t);
+            }
+          } else {
+            const t = dwellTimers.current.get(idx);
+            if (t != null) {
+              window.clearTimeout(t);
+              dwellTimers.current.delete(idx);
+            }
+          }
         }
         recheckActive();
       },
@@ -556,6 +581,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     return () => {
       observer.disconnect();
       observerRef.current = null;
+      dwellTimers.current.forEach((t) => window.clearTimeout(t));
+      dwellTimers.current.clear();
       visibilityRef.current.clear();
       cardEls.current.clear();
     };
