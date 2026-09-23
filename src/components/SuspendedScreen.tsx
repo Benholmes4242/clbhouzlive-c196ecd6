@@ -2,7 +2,7 @@ import React from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { SuspensionDetails } from '@/hooks/useSuspensionStatus';
 import { formatDateLongTimeShort, formatDateNumeric } from '@/i18n/format';
-import { SUSPENSION_SURFACE } from '@/lib/tokens/surfaces';
+import { LIGHT_ROUTE_CANVAS, SUSPENSION_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 
 type Props = { suspension: SuspensionDetails };
@@ -154,7 +154,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
         </p>
 
         {suspension.reason ? (
-          <div style={{ border: '1px solid rgba(248, 250, 252, 0.12)', background: 'rgba(248, 250, 252, 0.04)', borderRadius: 12, padding: '14px 16px', marginBottom: 24 }}>
+          <div style={{ border: '1px solid rgba(248, 250, 252, 0.12)', background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.04), borderRadius: 12, padding: '14px 16px', marginBottom: 24 }}>
             <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#94A3B8', fontWeight: 600, marginBottom: 6 }}>
               Reason
             </div>
@@ -228,7 +228,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
               fontFamily: 'inherit',
             }}
           >
-            <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(248, 250, 252, 0.24)', margin: '0 auto 4px' }} />
+            <div style={{ width: 36, height: 4, borderRadius: 999, background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.24), margin: '0 auto 4px' }} />
             <div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>Appeal your suspension</div>
               <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 6, lineHeight: 1.5 }}>
@@ -253,7 +253,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
                   disabled={submitting}
                   style={{
                     width: '100%', padding: 12, borderRadius: 12,
-                    background: 'rgba(248, 250, 252, 0.06)', color: '#F8FAFC',
+                    background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.06), color: '#F8FAFC',
                     border: '1px solid rgba(248, 250, 252, 0.14)',
                     fontSize: 14, fontFamily: 'inherit', resize: 'vertical', outline: 'none',
                     lineHeight: 1.5,
@@ -317,7 +317,7 @@ function ExistingAppealCard({ row }: { row: AppealRow }) {
     <div
       style={{
         border: '1px solid rgba(248, 250, 252, 0.14)',
-        background: 'rgba(248, 250, 252, 0.04)',
+        background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.04),
         borderRadius: 12, padding: '14px 16px',
         display: 'flex', flexDirection: 'column', gap: 8,
       }}

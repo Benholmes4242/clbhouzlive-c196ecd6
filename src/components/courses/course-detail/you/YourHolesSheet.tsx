@@ -10,6 +10,7 @@ import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { ABOUT_KICKER } from '../about/AboutSection';
+import { LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 type SortMode = 'hole' | 'worst';
 
@@ -255,7 +256,7 @@ const YourHolesSheet: React.FC<Props> = ({ open, onClose, courseId, courseName }
                     <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE }}>Par {row.par}s</span>
                     <span style={{ position: 'relative', display: 'block', height: 7, borderRadius: BAR_RADIUS, background: A.TRACK }}>
                       <i style={{ display: 'block', width: `${Math.max(2, Math.max(0, row.you) / parScale * 100)}%`, height: '100%', borderRadius: BAR_RADIUS, background: A.AMBER }} />
-                      {row.fieldCount > 0 ? <i style={{ position: 'absolute', left: `${Math.max(0, row.field) / parScale * 100}%`, top: -2, width: 2, height: 11, borderRadius: 1, background: 'rgba(248,250,252,0.55)' }} /> : null}
+                      {row.fieldCount > 0 ? <i style={{ position: 'absolute', left: `${Math.max(0, row.field) / parScale * 100}%`, top: -2, width: 2, height: 11, borderRadius: 1, background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.55) }} /> : null}
                     </span>
                     <span style={{ ...FIGURE, fontSize: 13, fontWeight: 700, color: A.AMBER, textAlign: 'right' }}>{signed(row.you)}</span>
                     <span style={{ ...FIGURE, fontSize: 13, fontWeight: 700, color: A.MUTE, textAlign: 'right' }}>{row.fieldCount > 0 ? signed(row.field) : ''}</span>
@@ -270,7 +271,7 @@ const YourHolesSheet: React.FC<Props> = ({ open, onClose, courseId, courseName }
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, alignItems: 'end', height: 112, marginTop: 14 }}>
                 {thirds.map((value, index) => {
                   const worst = index === worstThird;
-                  return <div key={thirdLabels[index]} style={{ display: 'flex', height: '100%', flexDirection: 'column', justifyContent: 'flex-end', textAlign: 'center' }}><span style={{ ...FIGURE, fontSize: 15, fontWeight: 700, color: worst ? A.RED : A.INK }}>{signed(value)}</span><span style={{ display: 'block', height: `${Math.max(4, Math.max(0, value) / thirdsMax * 70)}px`, marginTop: 7, borderRadius: `${BAR_RADIUS}px ${BAR_RADIUS}px 0 0`, background: worst ? A.RED : 'rgba(248,250,252,0.22)' }} /><span style={{ ...ABOUT_KICKER, marginTop: 7 }}>{index === 0 ? '1-6' : index === 1 ? '7-12' : '13-18'}</span></div>;
+                  return <div key={thirdLabels[index]} style={{ display: 'flex', height: '100%', flexDirection: 'column', justifyContent: 'flex-end', textAlign: 'center' }}><span style={{ ...FIGURE, fontSize: 15, fontWeight: 700, color: worst ? A.RED : A.INK }}>{signed(value)}</span><span style={{ display: 'block', height: `${Math.max(4, Math.max(0, value) / thirdsMax * 70)}px`, marginTop: 7, borderRadius: `${BAR_RADIUS}px ${BAR_RADIUS}px 0 0`, background: worst ? A.RED : surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.22) }} /><span style={{ ...ABOUT_KICKER, marginTop: 7 }}>{index === 0 ? '1-6' : index === 1 ? '7-12' : '13-18'}</span></div>;
                 })}
               </div>
               <p style={{ margin: '14px 0 0', fontSize: 11, lineHeight: 1.45, color: A.DIM }}>{thirdsSentence}</p>

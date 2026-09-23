@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import type { StageMediaItem } from '../hooks/useStageComposer';
 import CroppedImage from './CroppedImage';
 import { extractPoster, getCachedPoster } from '../lib/videoPoster';
+import { LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 export function PlayGlyph({ size = 22 }: { size?: number }) {
   return (
@@ -41,7 +42,7 @@ export default function SlideThumb({ item, glyph = 22 }: Props) {
       <>
         {poster
           ? <img src={poster} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-          : <div style={{ width: '100%', height: '100%', background: 'rgba(248,250,252,0.06)' }} />}
+          : <div style={{ width: '100%', height: '100%', background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.06) }} />}
         {glyph > 0 && <PlayGlyph size={glyph} />}
       </>
     );

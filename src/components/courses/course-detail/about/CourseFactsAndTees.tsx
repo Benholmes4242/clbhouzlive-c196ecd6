@@ -29,6 +29,7 @@ import {
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { AboutSection, GUTTER, ABOUT_KICKER, aboutFig } from './AboutSection';
 import CenteredStatStrip from './CenteredStatStrip';
+import { LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 /** WHS standard slope. A course of exactly 113 plays to average difficulty. */
 const STANDARD_SLOPE = 113;
@@ -139,7 +140,7 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
                   textAlign: 'left',
                   cursor: 'pointer',
                   borderRadius: 10,
-                  background: on ? 'rgba(248,250,252,0.07)' : 'transparent',
+                  background: on ? surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.07) : 'transparent',
                   border: on ? '1px solid rgba(248,250,252,0.18)' : '1px solid transparent',
                   fontFamily: SANS,
                 }}

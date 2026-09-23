@@ -8,6 +8,7 @@ import { toast } from '@/lib/toast';
 import BottomSheet from './BottomSheet';
 import { formatScheduleDay, formatScheduleTime } from '../lib/formatSchedule';
 import { CT } from '@/features/_shared/composerTokens';
+import { LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface Props {
   open: boolean;
@@ -155,7 +156,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
 
         <div style={{ display: 'flex', gap: 8 }}>
           {value && (
-            <button onClick={clear} style={{ flex: 1, background: 'rgba(248,250,252,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.ink }}>Clear</button>
+            <button onClick={clear} style={{ flex: 1, background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.06), border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.ink }}>Clear</button>
           )}
           <button
             onClick={apply}

@@ -17,6 +17,7 @@ import {
   frameRatio,
 } from '../lib/frameCropMath';
 import { CT } from '@/features/_shared/composerTokens';
+import { LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface Props {
   open: boolean;
@@ -239,7 +240,7 @@ export default function AdjustSheet({ open, onClose, item, onApply }: Props) {
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={reset}
-            style={{ flex: 1, background: 'rgba(248,250,252,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '12px', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.10em', cursor: 'pointer', color: CT.ink, fontWeight: 600 }}
+            style={{ flex: 1, background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.06), border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '12px', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.10em', cursor: 'pointer', color: CT.ink, fontWeight: 600 }}
           >
             Reset
           </button>
