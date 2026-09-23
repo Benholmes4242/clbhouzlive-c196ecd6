@@ -249,10 +249,26 @@ export function useReviewComposer(
      pipeline). Read at every debounced write so the stored numbers describe
      what was attached at the moment the draft was last saved. */
   mediaCounts?: DraftMediaCounts,
+  opts?: { retry?: boolean },
 ) {
 
   const isEditMode = !!existing;
   const reviewId = existing?.id ?? null;
+
+  /* PHASE 3 RETRY USES THE CREATE SLOT, WHATEVER THE MODE.
+   *
+   * seedReviewDraftFromPending writes review-draft:<courseId>, because a
+   * staged review has no rating id to key an edit draft by. A member who
+   * already has a published review for this course is nonetheless in EDIT
+   * mode, and would otherwise read review-draft:edit:<ratingId> and never
+   * see the seed — they would be shown their old published review under a
+   * notice saying their failed one had been brought back.
+   *
+   * Only the DRAFT KEY changes. The composer stays in edit mode, seeds its
+   * base state from the published review, and publishes through
+   * submit_course_review_v2, which upserts. Nothing else is affected.
+   */
+  const draftReviewId = opts?.retry ? null : reviewId;
 
   /* EDIT MODE PERSISTS TOO (BRIEF_SHEET_BACK_BEHAVIOUR_04 §1).
    *
@@ -270,7 +286,7 @@ export function useReviewComposer(
   const publishedBase = useMemo(() => seedFromExisting(existing), [existing]);
 
   const restored = useMemo(
-    () => readDraft(courseId, reviewId),
+    () => readDraft(courseId, draftReviewId),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
@@ -369,17 +385,17 @@ export function useReviewComposer(
           videoCount,
           savedAt: Date.now(),
         },
-        reviewId,
+        draftReviewId,
       );
     }, 400);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [courseId, reviewId, step, state, photoCount, videoCount, overallTouched]);
+  }, [courseId, draftReviewId, step, state, photoCount, videoCount, overallTouched]);
 
   const clearDraft = useCallback(
-    () => clearReviewDraft(courseId, reviewId),
-    [courseId, reviewId],
+    () => clearReviewDraft(courseId, draftReviewId),
+    [courseId, draftReviewId],
   );
 
   /* GETTING BACK TO WHAT IS LIVE. A restoration the member cannot undo would
@@ -387,13 +403,13 @@ export function useReviewComposer(
    * the composer to the published review and drops the stored draft. */
   const discardRestoredDraft = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    clearReviewDraft(courseId, reviewId);
+    clearReviewDraft(courseId, draftReviewId);
     setState(seedFromExisting(existing));
     setOverallTouched(isEditMode);
     setRestoredFromDraft(false);
     setRestoredMediaCounts(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, reviewId, existing, isEditMode]);
+  }, [courseId, draftReviewId, existing, isEditMode]);
 
   /* Dismissing the media sentence alone, without discarding the restored work:
      the member has read it and re-attached, or decided not to. */
