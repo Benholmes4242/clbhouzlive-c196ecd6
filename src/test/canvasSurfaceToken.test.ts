@@ -285,4 +285,13 @@ describe('canonical member surface tokens', () => {
     expect(source).toContain('#FF6B6B');
     expect(source).toContain('#5EE9A6');
   });
+  it('paints the scorecard page surface from the ramp, not an undeclared CSS variable', () => {
+    const path = 'src/features/courses/_shared/scorecard/ScorecardGlassOverlay.tsx';
+    const source = readFileSync(resolve(process.cwd(), path), 'utf8');
+    expect(source).toContain("from '@/lib/tokens/surfaces'");
+    expect(source).toMatch(/background:\s*PAGE_CANVAS/);
+    // --page-canvas is declared nowhere, so the literal fallback was rendering.
+    expect(source).not.toContain('var(--page-canvas');
+    expect(source).not.toContain('#0d0d0d');
+  });
 });
