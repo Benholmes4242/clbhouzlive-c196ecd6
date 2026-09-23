@@ -394,18 +394,22 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     }
     return { photos, videos };
   }, [media.items]);
-  const composer = useReviewComposer(existing, course.id, draftMediaCounts);
+  /* PHASE 3 RETRY. Arriving from a failed staged review's card: the member
+     finished this review and the upload failed, so the part-finished draft
+     notice is the wrong story. One line replaces it. Read BEFORE
+     useReviewComposer so the retry flag can steer the draft key. */
+  const retryLocation = useLocation();
+  const retryOfPendingId =
+    (retryLocation.state as { retryOfPendingId?: string } | null)?.retryOfPendingId ?? null;
+
+  const composer = useReviewComposer(existing, course.id, draftMediaCounts, {
+    retry: !!retryOfPendingId,
+  });
 
   /* The one sentence that names the loss (_05 §1). Built from separate singular
      and plural keys rather than an interpolated count, because the six locales
      do not share one plural rule; the joiner is a key too, for the same reason.
      Null when the restored draft recorded no attached media. */
-  /* PHASE 3 RETRY. Arriving from a failed staged review's card: the member
-     finished this review and the upload failed, so the part-finished draft
-     notice is the wrong story. One line replaces it. */
-  const retryLocation = useLocation();
-  const retryOfPendingId =
-    (retryLocation.state as { retryOfPendingId?: string } | null)?.retryOfPendingId ?? null;
 
   const restoredMediaLine = useMemo(() => {
     const c = composer.restoredMediaCounts;
