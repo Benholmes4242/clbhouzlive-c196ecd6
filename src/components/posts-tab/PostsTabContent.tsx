@@ -36,6 +36,8 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { usePendingPostsForActor } from '@/uploads/usePendingPostsForActor';
 import { PendingPostCard } from './PendingPostCard';
+import { usePendingReviews } from '@/features/review-v2/hooks/usePendingReviews';
+import { PendingReviewCard } from '@/features/review-v2/components/PendingReviewCard';
 import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
 import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
 import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
@@ -86,6 +88,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   });
 
   const realPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
+  const pendingReviewsQ = usePendingReviews(isOwnProfile ? user?.id : null);
+  const pendingReviews = pendingReviewsQ.data ?? [];
   const pendingEntries = usePendingPostsForActor({
     authorActorType: actorType,
     authorActorId: actorId,
@@ -321,6 +325,16 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
         </div>
       )}
 
+      {/* Staged reviews (pending_reviews) — survive a reload, unlike the
+          in-memory pending posts below. */}
+      {isOwnProfile && pendingReviews.length > 0 && (
+        <div>
+          {pendingReviews.map((r) => (
+            <PendingReviewCard key={r.id} row={r} userId={user?.id ?? null} />
+          ))}
+        </div>
+      )}
+
       {/* Optimistic pending posts (author + viewer matched) */}
       {isOwnProfile && pendingEntries.length > 0 && (
         <div>
@@ -330,7 +344,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
         </div>
       )}
 
-      {filteredPosts.length === 0 && pendingEntries.length === 0 ? (
+      {filteredPosts.length === 0 && pendingEntries.length === 0 && pendingReviews.length === 0 ? (
         emptyState
       ) : filteredPosts.length === 0 ? null : (
         <LightCardFeed
