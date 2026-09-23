@@ -23,7 +23,8 @@ import { subscribeToJob, getJobSnapshot } from '../lib/postUploadController';
 import type { UploadJobSnapshot } from '../lib/postUploadController';
 import { ImmersiveSuccessShell } from './ImmersiveSuccessShell';
 import { CT, CT_DARK } from '@/features/_shared/composerTokens';
-import { COMPOSER_SHELL_SURFACE, LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { COMPOSER_SHELL_SURFACE, inkWithAlpha, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { SURFACE } from '@/lib/tokens/surface';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 const AMBER = CT.amber;
@@ -286,7 +287,7 @@ function PostCard({ result, completedFiles, resolved }: { result: SubmitResult; 
         )}
 
         {result.courseName && (
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, alignSelf: 'flex-start', border: `1px solid ${CT_DARK.line}`, background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.06), borderRadius: 999, padding: '5px 10px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, alignSelf: 'flex-start', border: `1px solid ${CT_DARK.line}`, background: inkWithAlpha(SURFACE.dark.ink, 0.06), borderRadius: 999, padding: '5px 10px' }}>
             <MapPin size={11} color={CT_DARK.mute} strokeWidth={2.5} />
             <span style={{ fontSize: 11.5, fontWeight: 700, color: CT_DARK.ink }}>{result.courseName}</span>
           </div>

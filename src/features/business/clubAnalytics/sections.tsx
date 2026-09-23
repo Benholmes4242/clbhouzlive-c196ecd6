@@ -36,7 +36,8 @@ import { SiLadder } from '@/features/courses/_shared/SiLadder';
 import { buildSiLadder } from '@/features/courses/_shared/siLadder';
 import type { ClubCourseAnalytics, ClubAnalyticsHole, ClubAnalyticsTee } from './types';
 import { sortTees, yd } from './tees';
-import { LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { inkWithAlpha } from '@/lib/tokens/surfaces';
+import { SURFACE } from '@/lib/tokens/surface';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -869,7 +870,7 @@ const BarRow: React.FC<{
               style={{
                 height: Math.max(count > 0 ? 4 : 2, (count / max) * 58),
                 borderRadius: 2,
-                background: isHollow ? 'transparent' : isPeak ? A.INK : surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.22),
+                background: isHollow ? 'transparent' : isPeak ? A.INK : inkWithAlpha(SURFACE.dark.ink, 0.22),
                 border: isHollow ? `1px dashed ${A.MUTE}` : undefined,
                 boxSizing: 'border-box',
               }}
@@ -997,7 +998,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
               </div>
               <div style={{ height: 5, borderRadius: 3, background: A.TRACK, marginTop: 5, overflow: 'hidden' }}>
                 {b.rounds > 0 && (
-                  <i style={{ display: 'block', height: '100%', width: `${(b.rounds / max) * 100}%`, background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.42) }} />
+                  <i style={{ display: 'block', height: '100%', width: `${(b.rounds / max) * 100}%`, background: inkWithAlpha(SURFACE.dark.ink, 0.42) }} />
                 )}
               </div>
               {/* A BAND WITH 400 ROUNDS FROM 2 MEMBERS IS NOT 400 GOLFERS. */}

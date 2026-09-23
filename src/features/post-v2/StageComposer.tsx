@@ -29,7 +29,8 @@ import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { POST_COMPOSER_Z } from '@/lib/zLayers';
-import { LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { inkWithAlpha } from '@/lib/tokens/surfaces';
+import { SURFACE } from '@/lib/tokens/surface';
 
 import { useStageComposer, MAX_MEDIA, type StageMediaItem } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
@@ -1112,7 +1113,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
             fontSize: 13,
             fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '0.10em',
-            background: canSubmit ? PAGE2.ink : surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.1),
+            background: canSubmit ? PAGE2.ink : inkWithAlpha(SURFACE.dark.ink, 0.1),
             color: canSubmit ? PAGE2.canvas : PAGE2.dim,
             cursor: canSubmit ? 'pointer' : 'not-allowed',
           }}
@@ -1152,7 +1153,7 @@ const emptyPrimaryButtonStyle: React.CSSProperties = {
 const emptySecondaryButtonStyle: React.CSSProperties = {
   ...emptyButtonBase,
   border: `1px solid ${CT_DARK.line}`,
-  background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.06),
+  background: inkWithAlpha(SURFACE.dark.ink, 0.06),
   color: CT_DARK.ink,
 };
 
@@ -1170,7 +1171,7 @@ const closeButtonStyle: React.CSSProperties = {
   width: 32,
   height: 32,
   borderRadius: 999,
-  background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.08),
+  background: inkWithAlpha(SURFACE.dark.ink, 0.08),
   border: 0,
   color: '#F8FAFC',
   cursor: 'pointer',
@@ -1186,7 +1187,7 @@ const iconButtonStyle: React.CSSProperties = {
   width: 40,
   height: 40,
   borderRadius: 999,
-  background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.08),
+  background: inkWithAlpha(SURFACE.dark.ink, 0.08),
   border: 0,
   display: 'flex',
   alignItems: 'center',
@@ -1203,7 +1204,7 @@ const floatingChipStyle: React.CSSProperties = {
   backdropFilter: 'blur(8px)',
   WebkitBackdropFilter: 'blur(8px)',
   color: '#F8FAFC',
-  border: `1px solid ${surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.1)}`,
+  border: `1px solid ${inkWithAlpha(SURFACE.dark.ink, 0.1)}`,
   borderRadius: 999,
   padding: '6px 12px',
   fontSize: 12,
@@ -1220,8 +1221,8 @@ const moreRowStyle: React.CSSProperties = {
   justifyContent: 'space-between',
   width: '100%',
   padding: '14px 16px',
-  background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.06),
-  border: `1px solid ${surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.08)}`,
+  background: inkWithAlpha(SURFACE.dark.ink, 0.06),
+  border: `1px solid ${inkWithAlpha(SURFACE.dark.ink, 0.08)}`,
   borderRadius: 14,
   cursor: 'pointer',
   textAlign: 'left',

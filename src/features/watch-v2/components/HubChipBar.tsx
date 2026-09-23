@@ -1,6 +1,7 @@
 import { FilterChips } from '@/components/ui/FilterChips';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { inkWithAlpha } from '@/lib/tokens/surfaces';
+import { SURFACE } from '@/lib/tokens/surface';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -38,7 +39,7 @@ export function HubChipBar({ active, onChange }: Props) {
         marginTop: 24,
         top: 'var(--sat, 0px)',
         zIndex: 10,
-        background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.72),
+        background: inkWithAlpha(SURFACE.dark.ink, 0.72),
         backdropFilter: 'blur(14px)',
         WebkitBackdropFilter: 'blur(14px)',
         padding: '8px 0 10px',
