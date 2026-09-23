@@ -213,8 +213,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
         </div>
       ))}
 
-      {/* Never a section with no rows and no sentence. Same sentence whether
-          one record is missing or all four. */}
+      {/* Never a section with no rows and no sentence. */}
       {missingNames.length > 0 && (
         <div
           style={{
@@ -237,40 +236,40 @@ export const PersonalBestsSection: React.FC<Props> = ({
 export const TrophyRoomRow: React.FC<{ standalone?: boolean }> = ({ standalone = false }) => {
   const { t } = useTranslation(['common']);
   const row = (
-      <button
-          type="button"
-          onClick={() => openGamAchievements()}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: standalone ? '14px 0' : '14px 0 0',
-            marginTop: standalone ? 0 : 12,
-            background: 'none',
-            border: 'none',
-            borderTopStyle: 'solid',
-            borderTopWidth: 1,
-            borderTopColor: CHART.BORDER,
-            color: CHART.MUTE,
-            cursor: 'pointer',
-            textAlign: 'left',
-            WebkitTapHighlightColor: 'transparent',
-          }}
-        >
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: '0.19em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('common:handicap.bests.trophyRoom')}
-          </span>
-          <ChevronRight size={14} strokeWidth={2.4} color={CHART.MUTE} />
-      </button>
+    <button
+      type="button"
+      onClick={() => openGamAchievements()}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        padding: standalone ? 0 : '14px 0 0',
+        marginTop: standalone ? 0 : 12,
+        background: 'none',
+        border: 'none',
+        borderTopStyle: standalone ? 'none' : 'solid',
+        borderTopWidth: standalone ? 0 : 1,
+        borderTopColor: CHART.BORDER,
+        color: CHART.MUTE,
+        cursor: 'pointer',
+        textAlign: 'left',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
+      <span
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: '0.19em',
+          textTransform: 'uppercase',
+        }}
+      >
+        {t('common:handicap.bests.trophyRoom')}
+      </span>
+      <ChevronRight size={14} strokeWidth={2.4} color={CHART.MUTE} />
+    </button>
   );
 
   return standalone ? <HcpSection hairline>{row}</HcpSection> : row;
