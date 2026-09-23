@@ -62,7 +62,18 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
   // TILE A IS SELECTED WHEN THE SCREEN OPENS — a rating is the outcome worth
   // defaulting to, and a plain post is one tap away.
   const [kind, setKind] = useState<Kind>('review');
-  const [course, setCourse] = useState<{ id: string; name: string } | null>(null);
+  /* A CHOSEN COURSE MUST BE DRAWABLE, not just identifiable. A search
+     pick is not in the recent list — CourseTagSheet is passed
+     excludeReviewedForUserId and searching is for courses you have NOT
+     recently played — so the row has to be built from what the pick
+     itself carries. thumbnail and when are absent for a search pick
+     and the row must read correctly without them. */
+  const [course, setCourse] = useState<{
+    id: string;
+    name: string;
+    thumbnail: string | null;
+    when: string | null;
+  } | null>(null);
   const [courseOpen, setCourseOpen] = useState(false);
 
   const { data: courses = [] } = useRecentCoursesForComposer(open);
@@ -109,8 +120,20 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
   };
 
   const pickRecent = (c: ComposerRecentCourse) => {
+    /* TAPPING THE CHOSEN COURSE CLEARS IT. A member who taps the wrong
+       row currently cannot undo it, only overwrite it. Returns before
+       the analytics call — a deselect is not a source event. */
+    if (course?.id === c.courseId) {
+      setCourse(null);
+      return;
+    }
     analyticsEvents.track('composer_course_source', { source: 'recent' });
-    setCourse({ id: c.courseId, name: c.courseName });
+    setCourse({
+      id: c.courseId,
+      name: c.courseName,
+      thumbnail: c.thumbnail,
+      when: c.when,
+    });
   };
 
   const canAdvance = kind === 'post' || !!course;
