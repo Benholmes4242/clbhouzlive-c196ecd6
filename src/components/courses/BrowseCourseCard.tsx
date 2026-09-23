@@ -3,6 +3,7 @@ import React from 'react';
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 import { A, FIGS, SANS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { StatBrowseRow } from './useStatBrowse';
+import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 const PHOTO_H = 196;
 const TRACK = 'rgba(248,250,252,0.10)';
@@ -137,7 +138,7 @@ export function BrowseCourseCard({
             right: 0,
             bottom: 0,
             height: '58%',
-            background: 'linear-gradient(0deg, rgba(10,14,20,0.68) 0%, rgba(10,14,20,0.40) 48%, rgba(10,14,20,0) 100%)',
+            background: `linear-gradient(0deg, ${surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.68)} 0%, ${surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.4)} 48%, ${surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0)} 100%)`,
           }}
         />
         {!top100 ? <RankBadge memberships={row.memberships} /> : null}

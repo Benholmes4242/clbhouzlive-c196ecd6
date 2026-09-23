@@ -24,6 +24,7 @@ import { Z } from '@/config/zIndex';
 import type { FeedPostTag } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FROST, FROST_BLUR } from '@/lib/frostPanel';
+import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface BreathingRoomBottomBarProps {
   caption: string;
@@ -146,7 +147,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               maxWidth: '100%',
               padding: '5px 11px',
               borderRadius: 999,
-              background: 'rgba(10,14,20,0.52)',
+              background: surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.52),
               border: '1px solid rgba(255,255,255,0.16)',
               backdropFilter: 'blur(14px) saturate(150%)',
               WebkitBackdropFilter: 'blur(14px) saturate(150%)',

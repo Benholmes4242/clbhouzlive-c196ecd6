@@ -43,6 +43,7 @@ import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
 import { setIslandEdgeScrolled } from '@/features/chrome-v2/islandEdge';
+import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { WireFeedSlide } from '@/features/tourhub/news/WireFeedSlide';
 import type { ClubhouseFeedItem } from './injectWireStories';
 import { CANVAS, SLAB } from './feedSurfaces';
@@ -1097,7 +1098,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
               width: 36,
               height: 36,
               borderRadius: 999,
-              background: 'rgba(21,23,31,0.6)',
+              background: surfaceWithAlpha(PAGE_CANVAS, 0.6),
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
               display: 'flex',

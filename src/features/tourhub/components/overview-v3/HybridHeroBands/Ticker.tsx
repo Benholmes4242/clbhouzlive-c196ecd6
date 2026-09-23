@@ -23,6 +23,7 @@ import { TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 
 import type { TickerRow } from '../HybridHero.utils';
 import { fmtScore } from '../HybridHero.utils';
+import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 // Pass 5.7: localized — was a shared constant with only this consumer.
 // Height of the live-state top-10 ticker band rendered inside MiddleBand.
@@ -56,7 +57,7 @@ function TickerEntry({ row }: { row: TickerRow }) {
 export function Ticker({ rows }: TickerProps) {
   const { t } = useTranslation('tourhub');
   if (!rows || rows.length === 0) {
-    return <div style={{ height: TICKER_HEIGHT, background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }} aria-hidden="true" />;
+    return <div style={{ height: TICKER_HEIGHT, background: surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.5), backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }} aria-hidden="true" />;
   }
   const doubled = [...rows, ...rows];
   return (
@@ -64,7 +65,7 @@ export function Ticker({ rows }: TickerProps) {
       aria-hidden="true"
       style={{
         height: TICKER_HEIGHT,
-        background: 'rgba(10,14,20,0.50)',
+        background: surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.5),
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
         position: 'relative',
@@ -84,7 +85,7 @@ export function Ticker({ rows }: TickerProps) {
           color: 'rgba(255,255,255,0.50)',
           flexShrink: 0,
           zIndex: 2,
-          background: 'rgba(10,14,20,0.50)',
+          background: surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.5),
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
           height: '100%',
@@ -121,7 +122,7 @@ export function Ticker({ rows }: TickerProps) {
             right: 0,
             width: 40,
             height: '100%',
-            background: 'linear-gradient(90deg, rgba(10,14,20,0) 0%, rgba(10,14,20,0.50) 100%)',
+            background: `linear-gradient(90deg, ${surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0)} 0%, ${surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.5)} 100%)`,
             pointerEvents: 'none',
           }}
         />

@@ -23,6 +23,7 @@ import { subscribeToJob, getJobSnapshot } from '../lib/postUploadController';
 import type { UploadJobSnapshot } from '../lib/postUploadController';
 import { ImmersiveSuccessShell } from './ImmersiveSuccessShell';
 import { CT, CT_DARK } from '@/features/_shared/composerTokens';
+import { COMPOSER_SHELL_SURFACE, LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 const AMBER = CT.amber;
@@ -285,7 +286,7 @@ function PostCard({ result, completedFiles, resolved }: { result: SubmitResult; 
         )}
 
         {result.courseName && (
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, alignSelf: 'flex-start', border: `1px solid ${CT_DARK.line}`, background: 'rgba(248,250,252,0.06)', borderRadius: 999, padding: '5px 10px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, alignSelf: 'flex-start', border: `1px solid ${CT_DARK.line}`, background: surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0.06), borderRadius: 999, padding: '5px 10px' }}>
             <MapPin size={11} color={CT_DARK.mute} strokeWidth={2.5} />
             <span style={{ fontSize: 11.5, fontWeight: 700, color: CT_DARK.ink }}>{result.courseName}</span>
           </div>
@@ -352,7 +353,7 @@ function MediaMosaic({
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'rgba(11,15,20,0.58)',
+              background: surfaceWithAlpha(COMPOSER_SHELL_SURFACE, 0.58),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -395,7 +396,7 @@ function Cell({ item, pending }: { item: { url: string; type: 'image' | 'video' 
         initial={false}
         animate={{ opacity: pending ? 1 : 0 }}
         transition={reduce ? { duration: 0 } : { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
-        style={{ position: 'absolute', inset: 0, background: 'rgba(11,15,20,0.55)', pointerEvents: 'none' }}
+        style={{ position: 'absolute', inset: 0, background: surfaceWithAlpha(COMPOSER_SHELL_SURFACE, 0.55), pointerEvents: 'none' }}
       />
     </>
   );

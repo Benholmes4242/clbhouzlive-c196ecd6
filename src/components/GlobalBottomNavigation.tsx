@@ -21,7 +21,7 @@ import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
 import { nextHandoffAction } from '@/features/composer-flow/handoffRules';
 import { NAV_CLEARANCE, NAV_PILL_H_FALLBACK, NAV_PILL_H_VAR } from '@/lib/navClearance';
-import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
+import { INK_ON_LIGHT, MEMBER_PANEL, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 
 /**
@@ -94,7 +94,7 @@ type ThemeTokens = {
 };
 
 const DARK_TOKENS: ThemeTokens = {
-  fill: 'rgba(27,30,39,0.86)',
+  fill: surfaceWithAlpha(MEMBER_PANEL, 0.86),
   hairline: '1px solid rgba(255,255,255,0.10)',
   // Specular top-rim highlight + drop shadow (kept in both no-blur and blur paths).
   shadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 10px 30px rgba(0,0,0,0.45)',
@@ -347,7 +347,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
             -webkit-backdrop-filter: blur(22px) saturate(180%);
           }
           .glass-nav-pill[data-theme='dark'] {
-            background: rgba(27,30,39,0.62) !important;
+             background: ${surfaceWithAlpha(MEMBER_PANEL, 0.62)} !important;
           }
           .glass-nav-pill[data-theme='light'] {
             background: rgba(250,251,253,0.66) !important;
@@ -505,7 +505,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                                 fontWeight: 700,
                                 lineHeight: '14px',
                                 textAlign: 'center',
-                                boxShadow: theme === 'dark' ? '0 0 0 1.5px rgba(27,30,39,0.9)' : '0 0 0 1.5px rgba(250,251,253,0.9)',
+                                boxShadow: theme === 'dark' ? `0 0 0 1.5px ${surfaceWithAlpha(MEMBER_PANEL, 0.9)}` : '0 0 0 1.5px rgba(250,251,253,0.9)',
                               }}
                             >
                               {badgeCount > 99 ? '99+' : badgeCount}

@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { MapPin } from 'lucide-react';
+import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface PinProps {
   children: React.ReactNode;
@@ -25,7 +26,7 @@ function PinInner({ children, variant = 'dark', icon, size = 'md' }: PinProps) {
     ? 'rgba(255,255,255,0.95)'
     : isAmber
     ? 'rgba(0,0,0,0.55)'
-    : 'rgba(10,14,20,0.52)';
+    : surfaceWithAlpha(DISCOVER_SHELL_SURFACE, 0.52);
   const color = isLight
     ? '#0F172A'
     : isAmber
