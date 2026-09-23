@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { pushSheetEntry, releaseSheetEntry } from '@/components/ui/sheetHistory';
 import { Z } from '@/config/zIndex';
 import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const AXIS_LOCK_PX = 8;
 const AXIS_RATIO = 1.2;
