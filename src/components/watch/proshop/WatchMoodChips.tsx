@@ -1,6 +1,7 @@
 import { memo, useRef } from 'react';
 import { WATCH_MOODS, type WatchMoodId } from './hooks/useWatchMood';
 import { useEdgeFades } from '../shared/useEdgeFades';
+import { LIGHT_ROUTE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 interface WatchMoodChipsProps {
   active: WatchMoodId;
@@ -21,7 +22,7 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
     <div
       ref={wrapperRef}
       className="relative hrail-edge-fade"
-      style={{ background: '#F8FAFC' }}
+      style={{ background: LIGHT_ROUTE_CANVAS }}
     >
       <div
         ref={scrollerRef}
@@ -66,7 +67,7 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
         className="pointer-events-none absolute top-0 left-0 h-full hrail-fade hrail-fade-left"
         style={{
           width: 5,
-          background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
+          background: `linear-gradient(to right, ${surfaceWithAlpha(LIGHT_ROUTE_CANVAS, 0)} 0%, ${LIGHT_ROUTE_CANVAS} 100%)`,
           opacity: 0,
           transition: 'opacity 150ms ease',
         }}

@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import type { LoopMode } from '@/components/loop-tab/types';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { DISCOVER_SHELL_SURFACE } from '@/lib/tokens/surfaces';
 
 interface ChipDef {
   id: LoopMode;
@@ -30,7 +31,7 @@ function DiscoverFriendsShellRowInner({
     <div
       className="relative"
       style={{
-        background: '#0A0E14',
+        background: DISCOVER_SHELL_SURFACE,
         borderBottom: '0.5px solid rgba(255,255,255,0.06)',
       }}
     >

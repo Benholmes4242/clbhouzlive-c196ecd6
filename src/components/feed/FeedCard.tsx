@@ -17,6 +17,7 @@
  */
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FEED_CARD_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useQueryClient } from '@tanstack/react-query';
@@ -242,7 +243,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               right: 0,
               bottom: 0,
               paddingLeft: 28,
-              background: 'linear-gradient(90deg, rgba(16,21,28,0) 0%, #10151C 40%)',
+               background: `linear-gradient(90deg, ${surfaceWithAlpha(FEED_CARD_SURFACE, 0)} 0%, ${FEED_CARD_SURFACE} 40%)`,
               border: 'none',
               color: T60,
               fontSize: 15,
@@ -263,7 +264,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               right: 0,
               bottom: 0,
               paddingLeft: 64,
-              background: 'linear-gradient(90deg, rgba(16,21,28,0) 0%, #10151C 38%)',
+               background: `linear-gradient(90deg, ${surfaceWithAlpha(FEED_CARD_SURFACE, 0)} 0%, ${FEED_CARD_SURFACE} 38%)`,
               border: 'none',
               color: T60,
               fontSize: 14,

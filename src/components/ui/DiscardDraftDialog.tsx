@@ -16,7 +16,7 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+import { LIGHT_ROUTE_CANVAS, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 const SURFACE = MEMBER_PANEL;
 const INK = 'rgba(255,255,255,0.96)';
@@ -93,7 +93,7 @@ export function DiscardDraftDialog({ open, onKeepEditing, onDiscard, zIndex = 20
             height: 44,
             borderRadius: 12,
             border: 0,
-            background: '#F8FAFC',
+            background: LIGHT_ROUTE_CANVAS,
             color: '#0F172A',
             fontSize: 15,
             fontWeight: 700,

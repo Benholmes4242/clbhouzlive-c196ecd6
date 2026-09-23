@@ -10,6 +10,10 @@
   --quest-accent-green: #334E3D;
   --quest-accent-gold: #C1A84C;
   --quest-accent-gold-light: rgba(193, 168, 76, 0.12);
+  --quest-rail-start: rgba(31, 36, 40, 0.08);
+  --quest-rail-end: rgba(31, 36, 40, 0.05);
+  --quest-mastery-start: rgba(210, 180, 97, 0.06);
+  --quest-mastery-end: rgba(210, 180, 97, 0.02);
 
   /* Shadows - quest-specific glow effects */
   --quest-shadow-glow: 0 4px 16px rgba(210, 180, 97, 0.1);
@@ -28,7 +32,7 @@
 
 /* Quest Light - Journey rail styles */
 .quest-theme-light .journey-rail {
-  background: linear-gradient(180deg, rgba(31, 36, 40, 0.08) 0%, rgba(31, 36, 40, 0.05) 100%);
+  background: linear-gradient(180deg, var(--quest-rail-start) 0%, var(--quest-rail-end) 100%);
 }
 
 .quest-theme-light .journey-node-glow {
@@ -127,7 +131,7 @@
 
 /* Mastery track styling */
 .quest-theme-light .mastery-track-header {
-  background: linear-gradient(135deg, rgba(210, 180, 97, 0.06) 0%, rgba(210, 180, 97, 0.02) 100%);
+  background: linear-gradient(135deg, var(--quest-mastery-start) 0%, var(--quest-mastery-end) 100%);
   border: 1px solid rgba(210, 180, 97, 0.12);
   border-radius: 12px;
   padding: 0.75rem 1rem;

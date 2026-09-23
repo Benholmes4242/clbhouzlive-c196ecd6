@@ -20,6 +20,7 @@ import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { MORE_SHEET_Z } from '@/lib/zLayers';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { LIGHT_ROUTE_CANVAS } from '@/lib/tokens/surfaces';
 
 /**
  * Shared non-owner "more options" sheet used by:
@@ -173,7 +174,7 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
               bottom: 0,
               zIndex: MORE_SHEET_Z + 1,
               width: '100%',
-              background: '#F8FAFC',
+              background: LIGHT_ROUTE_CANVAS,
               borderRadius: '20px 20px 0 0',
               display: 'flex',
               flexDirection: 'column',

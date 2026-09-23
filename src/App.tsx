@@ -26,6 +26,7 @@ import { WATCH_SURFACE } from '@/config/featureFlags';
 import { MomentsLibrarySkeleton } from '@/components/skeletons/MediaLibrarySkeletons';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { clearAppBadge } from '@/utils/pushBadge';
+import { LIGHT_ROUTE_CANVAS } from '@/lib/tokens/surfaces';
 
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { LockAnchorSync } from '@/components/LockAnchorSync';
@@ -377,7 +378,7 @@ const ReviewComposerOverlay: React.FC = () => {
       zIndex: 10000,
       overflowY: 'auto',
       WebkitOverflowScrolling: 'touch',
-      background: '#F8FAFC',
+      background: LIGHT_ROUTE_CANVAS,
     }}
   >
     <ReviewComposerRoute />
@@ -1172,7 +1173,7 @@ const App: React.FC = () => {
                     dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
                   }}
                 >
-                  <Suspense fallback={<div style={{ background: '#F8FAFC', minHeight: '100dvh' }} />}>
+                  <Suspense fallback={<div style={{ background: LIGHT_ROUTE_CANVAS, minHeight: '100dvh' }} />}>
                     <AppPrefetchProvider delay={2000} enabled={true}>
                       <RehydrationProvider>
                         <PostEventsBridge>

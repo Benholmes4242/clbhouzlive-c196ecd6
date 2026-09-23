@@ -18,6 +18,10 @@
   --warm-stone-500: 24 5% 45%;           /* #78716C */
   --warm-stone-400: 24 5% 64%;           /* #A8A29E */
   --warm-amber-900: 26 82% 31%;          /* #92400E */
+  --warm-canvas-start: #FFF7ED;
+  --warm-canvas-peach-1: #FFEDD5;
+  --warm-canvas-peach-2: #FED7AA;
+  --warm-canvas-peach-3: #FDBA74;
 }
 
 /* ========================================
@@ -66,7 +70,7 @@
   right: 0;
   bottom: 0;
   z-index: 0;
-  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 25%, #FED7AA 50%, #FDBA74 75%, #FFF7ED 100%);
+  background: linear-gradient(135deg, var(--warm-canvas-start) 0%, var(--warm-canvas-peach-1) 25%, var(--warm-canvas-peach-2) 50%, var(--warm-canvas-peach-3) 75%, var(--warm-canvas-start) 100%);
   background-size: 400% 400%;
   animation: warmGradientShift 12s ease infinite;
 }

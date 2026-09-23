@@ -156,7 +156,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                     className="flex-1 py-3 cursor-pointer"
                     style={{
                       borderRadius: 12, border: `1px solid ${HAIRLINE}`,
-                      background: '#1B1E27', color: INK,
+                      background: MEMBER_PANEL, color: INK,
                       /* CAPS BUTTON */
                       fontSize: 13, fontWeight: 600,
                       textTransform: 'uppercase', letterSpacing: '0.10em',

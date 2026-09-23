@@ -63,7 +63,7 @@ img[src*="Silhouette"] {
  * Now using standard body scroll with overscroll prevention.
  */
 html {
-  background-color: #15171F;
+  background-color: var(--bg-page);
   color-scheme: dark; /* clbhouz is dark-only; native controls and WebView paint follow */
   height: 100%;
   overflow-x: hidden;
@@ -74,7 +74,7 @@ html {
 
 body {
   @apply font-sans;
-  background-color: #15171F;
+  background-color: var(--bg-page);
   color-scheme: dark;
   height: 100%;
   overflow-x: hidden;
@@ -397,7 +397,6 @@ html.lightbox-open {
 
 /* Dark mode achievement card tokens */
 .dark {
-  --bg-page: #111113;
   --achievement-card-bg: rgba(255, 255, 255, 0.05);
   --achievement-card-border: rgba(255, 255, 255, 0.10);
   --achievement-ghost-overlay: rgba(255, 255, 255, 0.15);
@@ -807,7 +806,7 @@ html.lightbox-open {
   padding-right: max(var(--sal), var(--sar));
   
   /* Ensure background extends behind safe areas */
-  background-color: #0d0d0d;
+  background-color: var(--app-shell-surface);
 
   /* Desktop centering — constrains to mobile width on large screens */
   max-width: 480px;
@@ -885,7 +884,7 @@ html[data-immersive-route='true'] .app-shell {
 /* Desktop backdrop behind the app column */
 @media (min-width: 480px) {
   body {
-    background-color: #0A0A0A;
+    background-color: var(--desktop-gutter-surface);
   }
 }
 
@@ -997,7 +996,10 @@ html, body, #root {
      ======================================== */
   
   /* Core surfaces - Global Background: Cool blue-grey slate */
-  --bg-page: #15171F;
+  --bg-page: #15171F; /* PAGE_CANVAS in src/lib/tokens/surfaces.ts */
+  --app-shell-surface: #0D0D0D;
+  --desktop-gutter-surface: #0A0A0A;
+  --light-route-canvas: #F8FAFC;
   --bg-surface: #0F0F0F;
   --bg-card: rgba(255,255,255,0.06);
   --bg-card-hover: rgba(255,255,255,0.08);
@@ -1908,7 +1910,7 @@ html.overlay-open .clubhouse-progress {
   inset: 0;
   height: 100svh;
   width: 100%;
-  background: #F8FAFC;
+  background: var(--light-route-canvas);
   overflow: hidden;
 }
 @supports (height: 100dvh) {
@@ -2460,7 +2462,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
      ======================================== */
     
     /* Base canvas */
-    --background: 225 11% 10%;           /* #15171F */
+    --background: 225 11% 10%;           /* Intended PAGE_CANVAS counterpart; see surfaces.ts and Stage 0B report. */
     --foreground: 210 40% 98%;           /* #F8FAFC */
     
     /* Surfaces */
