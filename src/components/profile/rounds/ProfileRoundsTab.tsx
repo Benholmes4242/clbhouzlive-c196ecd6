@@ -51,7 +51,6 @@ function formValue(r: ProfileRound): number | null {
 }
 
 const fmt1 = (n: number) => n.toFixed(1);
-const signed = (n: number) => (n > 0 ? `+${n.toFixed(1)}` : n.toFixed(1));
 
 /** The feed's RARE/NEW tag treatment, as a small pill. */
 const FeatPill: React.FC<{ label: string }> = ({ label }) => (
@@ -88,18 +87,12 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
     const grosses = full.map((r) => r.gross_score).filter((g): g is number => g != null);
     const best = grosses.length ? Math.min(...grosses) : null;
     const avg = grosses.length ? grosses.reduce((a, b) => a + b, 0) / grosses.length : null;
-    const withPar = full.filter((r) => r.gross_score != null && r.course_par != null);
-    const avgToPar = withPar.length
-      ? withPar.reduce((a, r) => a + (r.gross_score! - r.course_par!), 0) / withPar.length
-      : null;
-    const courses = new Set(rounds.map((r) => r.course_id ?? r.course_name ?? '')).size;
     const last = rounds.slice(0, FORM_N);
     const form = last
       .map((r) => ({ r, v: formValue(r) }))
       .filter((x): x is { r: ProfileRound; v: number } => x.v != null)
       .reverse(); // oldest left
-    const beat = form.filter((x) => x.v < 0).length;
-    return { best, avg, avgToPar, courses, form, beat, lastCount: last.length };
+    return { best, avg, form, lastCount: last.length };
   }, [rounds]);
 
   if (isLoading) {
@@ -189,19 +182,11 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
 
       {/* 1. STAT BAND */}
       <div style={{ display: 'flex', gap: 12 }}>
-        <YouFigure label={t('rounds.stat.rounds', 'Rounds')} value={formatNumber(rounds.length)} />
-        <YouFigure label={t('rounds.stat.best', 'Best')} value={stats.best != null ? String(stats.best) : '\u2014'} tone={A.AMBER} />
-        <YouFigure label={t('rounds.stat.average', 'Average')} value={stats.avg != null ? fmt1(stats.avg) : '\u2014'} />
-        <YouFigure label={t('rounds.stat.index', 'Index')} value={handicapIndex != null ? fmt1(handicapIndex) : '\u2014'} />
+        <YouFigure align="center" label={t('rounds.stat.rounds', 'Rounds')} value={formatNumber(rounds.length)} />
+        <YouFigure align="center" label={t('rounds.stat.best', 'Best')} value={stats.best != null ? String(stats.best) : '\u2014'} tone={A.AMBER} />
+        <YouFigure align="center" label={t('rounds.stat.average', 'Average')} value={stats.avg != null ? fmt1(stats.avg) : '\u2014'} />
+        <YouFigure align="center" label={t('rounds.stat.index', 'Index')} value={handicapIndex != null ? fmt1(handicapIndex) : '\u2014'} />
       </div>
-      <p style={{ margin: '12px 0 0', fontSize: 12, lineHeight: 1.5, color: CHART.MUTE, ...FIGS }}>
-        {stats.avgToPar != null
-          ? t('rounds.context', '{{toPar}} to par on average, across {{courses}} courses', {
-              toPar: signed(stats.avgToPar),
-              courses: formatNumber(stats.courses),
-            })
-          : t('rounds.contextNoPar', 'Across {{courses}} courses', { courses: formatNumber(stats.courses) })}
-      </p>
 
       {/* 2. RECENT FORM */}
       {stats.form.length > 0 ? (
@@ -230,11 +215,6 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
               );
             })}
           </div>
-          <p style={{ margin: '10px 0 0', fontSize: 12, color: CHART.MUTE, ...FIGS }}>
-            {isOwnProfile
-              ? t('rounds.form.beatOwn', 'Beat your handicap in {{n}} of the last {{m}}.', { n: stats.beat, m: stats.form.length })
-              : t('rounds.form.beat', 'Beat their handicap in {{n}} of the last {{m}}.', { n: stats.beat, m: stats.form.length })}
-          </p>
           {stats.form.length < stats.lastCount ? (
             <p style={{ margin: '4px 0 0', fontSize: 11, color: CHART.DIM, ...FIGS }}>
               {t('rounds.form.missing', '{{k}} of the last {{total}} are left out: nine holes, or no handicap index on record.', {

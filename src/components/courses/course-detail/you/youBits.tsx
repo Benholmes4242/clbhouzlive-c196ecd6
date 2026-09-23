@@ -17,8 +17,9 @@ export const YouFigure: React.FC<{
   value: string;
   tone?: string;
   size?: number;
-}> = ({ label, value, tone = A.INK, size = 21 }) => (
-  <div style={{ flex: 1, minWidth: 0 }}>
+  align?: 'left' | 'center';
+}> = ({ label, value, tone = A.INK, size = 21, align = 'left' }) => (
+  <div style={{ flex: 1, minWidth: 0, textAlign: align }}>
     <div style={{ ...aboutFig(size, tone), lineHeight: 1 }}>{value}</div>
     <div style={{ ...ABOUT_KICKER, marginTop: 5, whiteSpace: 'nowrap' }}>{label}</div>
   </div>

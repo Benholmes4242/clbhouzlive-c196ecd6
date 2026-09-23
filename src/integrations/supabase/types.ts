@@ -21593,6 +21593,26 @@ export type Database = {
           width: number
         }[]
       }
+      get_profile_rounds: {
+        Args: { p_user_id: string }
+        Returns: {
+          albatrosses: number
+          clean_card: boolean
+          course_id: string
+          course_name: string
+          course_par: number
+          eagles: number
+          gross_score: number
+          handicap_differential: number
+          handicap_index_at_time: number
+          hcp_at_time: number
+          holes_in_one: number
+          is_nine_hole: boolean
+          play_date: string
+          total_holes: number
+          whs_score_id: string
+        }[]
+      }
       get_publication_stats: {
         Args: { p_end: string; p_start: string }
         Returns: Json
