@@ -33,7 +33,7 @@ import {
   INK_FAINT,
   INK_MUTE,
   LIVE_DOT,
-  SLATE_50,
+  TOUR_CANVAS,
 } from '../_shared/tokens';
 
 const KICKER: React.CSSProperties = {
@@ -308,7 +308,7 @@ export function ScheduleTab() {
   return (
     <div
       style={{
-        background: SLATE_50,
+        background: TOUR_CANVAS,
         minHeight: '100vh',
         fontFamily: FONT,
         position: 'relative',
@@ -411,7 +411,7 @@ export function ScheduleTab() {
               style={{
                 marginTop: 4,
                 background: INK,
-                color: SLATE_50,
+                color: TOUR_CANVAS,
                 border: 'none',
                 borderRadius: 999,
                 padding: '10px 20px',
@@ -442,7 +442,7 @@ export function ScheduleTab() {
                       position: 'sticky',
                       top: 'calc(var(--tour-header-h, 0px) + var(--tour-chips-h, 0px) - 1px)',
                       zIndex: 2,
-                      background: SLATE_50,
+                      background: TOUR_CANVAS,
                       padding: '14px 24px 6px',
                       // READ 11: the month group heading is language.
                       fontSize: 11,
@@ -498,7 +498,7 @@ export function ScheduleTab() {
             padding: '0 12px',
             borderRadius: 999,
             background: INK,
-            color: SLATE_50,
+            color: TOUR_CANVAS,
             border: 'none',
             fontFamily: FONT,
             fontSize: 11,

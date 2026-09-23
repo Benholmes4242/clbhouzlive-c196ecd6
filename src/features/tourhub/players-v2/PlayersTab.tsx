@@ -28,7 +28,7 @@ import {
   INK,
   INK_FAINT,
   INK_MUTE,
-  SLATE_50,
+  TOUR_CANVAS,
   SURFACE,
   TREND_UP,
   WHITE_ALPHA_06,
@@ -222,7 +222,7 @@ export function PlayersTab() {
   return (
     <div
       style={{
-        background: SLATE_50,
+        background: TOUR_CANVAS,
         minHeight: '100vh',
         fontFamily: FONT,
       }}
@@ -375,7 +375,7 @@ export function PlayersTab() {
           <button
             type="button"
             onClick={() => refetchRanking()}
-            style={{ background: INK, color: SLATE_50, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', cursor: 'pointer' }}
+            style={{ background: INK, color: TOUR_CANVAS, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', cursor: 'pointer' }}
           >
             {t('players.error.retry', { defaultValue: 'Retry' })}
           </button>
@@ -397,7 +397,7 @@ export function PlayersTab() {
       ) : orderedRows.length === 0 ? (
         <TourHubEmptyState variant="players" />
       ) : (
-        <div style={{ background: SLATE_50 }}>
+        <div style={{ background: TOUR_CANVAS }}>
           <RankedPlayerHeader
             rankLabel={t('players.header.rank')}
             playerLabel={t('players.header.player')}

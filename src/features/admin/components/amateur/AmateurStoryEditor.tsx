@@ -24,7 +24,7 @@ import type { StoryBlock } from '@/features/tourhub/news/blocks';
 import { StoryArticle } from '@/features/tourhub/news/StoryPage';
 import { LeadStory, StoryRow } from '@/features/tourhub/news/NewsTab';
 import { blocksToText, parseStoryText, slugifyHeadline } from '@/features/tourhub/news/parseStoryText';
-import { SLATE_50 } from '@/features/tourhub/_shared/tokens';
+import { TOUR_CANVAS } from '@/features/tourhub/_shared/tokens';
 import { AMATEUR_CATEGORIES, categoryLabel } from '@/features/amateur/news/categories';
 import { amateurTag } from '@/features/amateur/news/AmateurStoryPage';
 import type { AmateurStory } from '@/features/amateur/news/useAmateurStories';
@@ -447,7 +447,7 @@ export default function AmateurStoryEditor({
               style={{
                 width: 390, maxWidth: '100%', margin: '0 auto',
                 border: `1px solid ${t.line}`, borderRadius: 14, overflow: 'hidden',
-                background: SLATE_50, maxHeight: '62vh', overflowY: 'auto',
+                background: TOUR_CANVAS, maxHeight: '62vh', overflowY: 'auto',
               }}
             >
               <div style={{ paddingBottom: 20 }}>
@@ -460,7 +460,7 @@ export default function AmateurStoryEditor({
               style={{
                 width: 390, maxWidth: '100%', margin: '0 auto',
                 border: `1px solid ${t.line}`, borderRadius: 14, overflow: 'hidden',
-                background: SLATE_50, padding: '10px 0',
+                background: TOUR_CANVAS, padding: '10px 0',
               }}
             >
               <LeadStory story={preview} onOpen={() => {}} />

@@ -46,7 +46,7 @@ import {
   INK,
   INK_FAINT,
   INK_MUTE,
-  SLATE_50,
+  TOUR_CANVAS,
   SLATE_100,
 } from '../_shared/tokens';
 
@@ -128,7 +128,7 @@ export function LeadStory({ story, onOpen, compact = false, immersiveHero = true
                  frame shorter than 260px cuts the scrim mid-gradient and leaves
                  a visible seam. */
               position: 'absolute', left: 0, right: 0, bottom: 0, height: 'min(260px, 100%)',
-             background: heroCanonScrimOn(SLATE_50),
+             background: heroCanonScrimOn(TOUR_CANVAS),
           }}
         />
         <div style={{ position: 'absolute', top: compact ? 14 : immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 68px)' : 12, left: sidePadding, right: sidePadding }}>

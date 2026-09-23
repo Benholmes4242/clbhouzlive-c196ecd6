@@ -53,7 +53,7 @@ export const SURFACE = MEMBER_PANEL;
 // NOTE: shares a value with CHARCOAL and with the app canvas. Different reasons:
 // this is the quietest neutral in the tour ramp and will move again when the ramp
 // is renamed. Do not merge on the strength of the value.
-export const SLATE_50 = PAGE_CANVAS;
+export const TOUR_CANVAS = PAGE_CANVAS;
 export const SLATE_100 = 'rgba(255,255,255,0.06)';           // segmented-control trough, photo bg — 7 cross-app files
 export const SLATE_150 = 'rgba(255,255,255,0.08)';
 export const SLATE_200 = 'rgba(255,255,255,0.10)';
@@ -241,7 +241,7 @@ export const SHELL_BG = DISCOVER_SHELL_SURFACE;               // Tour Hub shell/
 // ============================================================================
 // CHARCOAL (shared Clubhouse / player hero / live-card surface)
 // ============================================================================
-// NOTE: shares a value with SLATE_50 and the app canvas. Different reasons: this
+// NOTE: shares a value with TOUR_CANVAS and the app canvas. Different reasons: this
 // is a named product surface — Clubhouse feed, player hero gradient end, live-now
 // card — not a ramp step. Do not merge on the strength of the value.
 export const CHARCOAL = PAGE_CANVAS;
