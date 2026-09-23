@@ -127,6 +127,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 interface ReceiptState {
   ratingId: string | null;
   pending?: boolean;
+  uploadKey?: string | null;
   shareToFeed: boolean;
   overall: number | null;
   scores: Record<CategoryKey, number | null>;
@@ -279,6 +280,9 @@ function InnerComposer() {
       <ReviewReceipt
         ratingId={success.ratingId}
         pending={!!success.pending}
+        uploadKey={success.uploadKey ?? null}
+        onPublished={(ratingId: string) =>
+          setSuccess((s) => (s ? { ...s, ratingId, pending: false } : s))}
         course={courseQ.data}
         overall={success.overall}
         scores={success.scores}
@@ -660,6 +664,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         onSuccess({
           ratingId: null,
           pending: true,
+          uploadKey: media.uploadKey,
           shareToFeed: composer.state.shareToFeed,
           overall: composer.state.overall,
           scores: composer.state.scores,
@@ -679,6 +684,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         share_to_feed: composer.state.shareToFeed,
         staged: mediaExpected > 0,
         media_expected: mediaExpected,
+        overall_touched: overallTouched,
         total_ms: Math.round(Date.now() - mountedAtRef.current),
       });
       analyticsEvents.ratings.submitted({
