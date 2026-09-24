@@ -28,7 +28,7 @@ import TrophyIcon from '@/components/icons/TrophyIcon';
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
   { id: 'watch',     label: 'Explore',   icon: CompassRoseIcon, path: '/amateur' },
-  { id: 'post',      label: 'Share',      icon: PlusSquareIcon, path: null, isAction: true },
+  { id: 'post',      label: 'Share',     icon: PlusSquareIcon, path: null, isAction: true },
   { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
   { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
 

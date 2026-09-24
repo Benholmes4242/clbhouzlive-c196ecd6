@@ -1031,10 +1031,12 @@ const FooterButton: React.FC<{
   active?: boolean;
   activeColor?: string;
   haptic?: 'none' | 'selection' | 'success' | 'warning';
-}> = ({ icon: Icon, label, onClick, active, activeColor, haptic = 'none' }) => (
+  ariaLabel?: string;
+}> = ({ icon: Icon, label, onClick, active, activeColor, haptic = 'none', ariaLabel }) => (
   <Pressable
     as="button"
     variant="icon"
+    aria-label={ariaLabel}
     haptic={haptic}
     onPress={(e) => {
       (e as React.MouseEvent).stopPropagation?.();
