@@ -65,6 +65,8 @@ img[src*="Silhouette"] {
 html {
   background-color: var(--bg-page);
   color-scheme: dark; /* clbhouz is dark-only; native controls and WebView paint follow */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -2465,7 +2467,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   /* Prevent iOS zoom on input focus */
   @media screen and (max-width: 768px) {
-    input, textarea, select {
+    input, textarea:not(.mentions-composer__input), select {
       font-size: 16px;
     }
   }

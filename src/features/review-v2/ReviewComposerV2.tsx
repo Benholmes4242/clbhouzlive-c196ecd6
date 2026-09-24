@@ -1278,7 +1278,9 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                      review composer sits at the floor alongside the comment
                      composer (15, inherited) and the post caption (16/17). */
                   fontSize: 15,
-                  lineHeight: '1.55',
+                  // PX, NOT A FACTOR: a unitless line-height is computed per
+                  // element, so the two layers can resolve it differently. 15 x 1.55.
+                  lineHeight: '23px',
                   minHeight: 72,
                   maxHeight: 260,
                   padding: '0',
