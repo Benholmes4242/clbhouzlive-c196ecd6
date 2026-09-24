@@ -30,6 +30,8 @@
  */
 
 
+  export const FS_OVERLAY_Z     = 200;   // FullscreenFeedOverlay root
+
   /**
    * ABOVE EVERY SHEET (12100+). CommentsSheetV2 and LikesSheet are LEAF
    * overlays: both are opened FROM the fullscreen viewer (200), the review
