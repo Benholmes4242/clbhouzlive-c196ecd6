@@ -12,25 +12,24 @@
  * No corrected variable-denominator projection is attempted here — that is
  * new handicap maths and a separate decision.
  *
- * CHART RULES (from the brief, do not relax):
- * - Five bars, one per round, oldest first. No target line, no shaded band.
- * - A bar that beats the target is green (CHART.DOWN); every other bar is the
- *   neutral track tone. The target is stated in words, not drawn.
- * - The zero rule renders ONLY when at least one differential is negative.
- * - Every bar carries its value beneath it.
- *
- * The old STAYS / DOWN TO scale bar above the table is gone; the table's own
- * figures say the same thing without a second geometry.
+ * THE LADDER (approved mock B). Everything is stated as a GROSS SCORE at the
+ * course played most in the last 20 — never as a differential. Rungs:
+ * "{stays} or worse" (muted), the score to beat, a good day (the
+ * nextRoundScale midpoint), and the member's real best at this course (dropped
+ * when it doesn't beat the target). Scores use ceil-minus-one so the printed
+ * target strictly beats cutTarget; Math.round could print a tie.
  */
 import React, { useEffect, useMemo, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useAllScores } from '@/lib/whs/hooks';
-import { projectNextRound, nextRoundScale } from '@/lib/whs/handicapMath';
+import { projectNextRound, nextRoundScale, indexAfter } from '@/lib/whs/handicapMath';
+import type { WhsScore } from '@/lib/whs/types';
 
 import { HcpSection } from './HcpSection';
-import { CHART, indexTone } from '../charts';
+import { CHART, DEAD_BAND, indexTone } from '../charts';
 
 /** A full rolling window. projectNextRound is only correct at this size. */
 const MIN_ROUNDS = 20;
@@ -50,7 +49,117 @@ interface Props {
   currentHandicap: number | null;
 }
 
-const BAR_H = 84;
+interface Rung {
+  label: string;
+  sub: string;
+  subGreen: boolean;
+  index: number;
+  kicker: string | null;
+  moves: boolean;
+}
+
+interface Ladder {
+  courseId: string;
+  courseName: string;
+  target: number;
+  rungs: Rung[];
+}
+
+/**
+ * Most-played course in the window (ties -> most recent round), using that
+ * course's most recent round's ratings. Falls to the next course when the
+ * ratings are missing; null when none has both.
+ */
+function pickCourse(window: WhsScore[]) {
+  const order: string[] = [];
+  const count = new Map<string, number>();
+  for (const r of window) {
+    if (!r.course_id) continue;
+    if (!count.has(r.course_id)) order.push(r.course_id);
+    count.set(r.course_id, (count.get(r.course_id) ?? 0) + 1);
+  }
+  // `order` is first appearance in a newest-first list = most recent; stable sort keeps it as tie-break.
+  const ranked = [...order].sort((a, b) => (count.get(b) ?? 0) - (count.get(a) ?? 0));
+  for (const id of ranked) {
+    const latest = window.find((r) => r.course_id === id)!;
+    if (latest.course_rating != null && latest.slope_rating) {
+      return { id, name: latest.course?.name ?? '', cr: latest.course_rating, slope: latest.slope_rating };
+    }
+  }
+  return null;
+}
+
+function buildLadder(
+  window: WhsScore[],
+  current: number,
+  cutTarget: number,
+  last5: number[],
+  t: TFunction,
+): Ladder | null {
+  const course = pickCourse(window);
+  if (!course) return null;
+  const { cr, slope } = course;
+  // PCC is ignored here (it is almost always 0); not modelled.
+  const diffOf = (gross: number) => ((gross - cr) * 113) / slope;
+  // Largest whole score that strictly BEATS a differential. Never Math.round:
+  // a rounded score can TIE the target and move nothing.
+  const beats = (d: number) => {
+    let s = Math.ceil((d * slope) / 113 + cr) - 1;
+    while (diffOf(s) >= d) s -= 1; // float guard
+    return s;
+  };
+  const target = beats(cutTarget);
+  const stays = target + 1;
+
+  const downRung = (score: number, sub: string): Rung | null => {
+    const idx = indexAfter(current, cutTarget, diffOf(score));
+    if (idx > current) return null;
+    const delta = current - idx;
+    return {
+      label: String(score),
+      sub,
+      subGreen: false,
+      index: idx,
+      kicker: delta < DEAD_BAND ? null : t('common:handicap.nextRound.rungDown', { delta: delta.toFixed(1) }),
+      moves: true,
+    };
+  };
+
+  const rungs: Rung[] = [
+    {
+      label: t('common:handicap.nextRound.rungStaysScore', { score: stays }),
+      sub: t('common:handicap.nextRound.rungStaysSub'),
+      subGreen: false,
+      index: current,
+      kicker: t('common:handicap.nextRound.rungStaysKicker'),
+      moves: false,
+    },
+  ];
+  const tRung = downRung(target, t('common:handicap.nextRound.rungTargetSub'));
+  if (tRung) rungs.push({ ...tRung, subGreen: true });
+
+  const bestOfFive = last5.length ? Math.min(...last5) : null;
+  const mid = nextRoundScale(current, cutTarget, bestOfFive)[1];
+  const good = mid ? beats(mid.shoot) : null;
+
+  const grossHere = window
+    .filter((r) => r.course_id === course.id && typeof r.adjusted_gross === 'number')
+    .map((r) => r.adjusted_gross as number);
+  const bestHere = grossHere.length ? Math.min(...grossHere) : null;
+
+  if (good != null && good < target && good !== bestHere) {
+    const r = downRung(good, t('common:handicap.nextRound.rungGoodSub'));
+    if (r) rungs.push(r);
+  }
+  // The member's real best AT THIS COURSE; dropped if it doesn't beat the target.
+  if (bestHere != null && bestHere < target) {
+    const r = downRung(bestHere, t('common:handicap.nextRound.rungBestSub'));
+    if (r) rungs.push(r);
+  }
+  rungs.sort((a, b) => (a.moves === b.moves ? b.index - a.index : a.moves ? 1 : -1));
+
+  return { courseId: course.id, courseName: course.name, target, rungs };
+}
 
 const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const { t } = useTranslation(['common']);
@@ -73,6 +182,13 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
       .reverse();
   }, [allScores]);
 
+  const ladder = useMemo(
+    () => (projection && projection.hasData && currentHandicap != null && allScores
+      ? buildLadder(allScores.slice(0, 20), currentHandicap, projection.cutTarget, last5, t)
+      : null),
+    [projection, currentHandicap, allScores, last5, t],
+  );
+
   const shownPayload = useMemo(() => {
     if (!projection || !projection.hasData || currentHandicap == null) return null;
     const { cutTarget, settleAtRaw } = projection;
@@ -81,8 +197,11 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
       cut: Number(cutTarget.toFixed(1)),
       rise: Number((settleAtRaw - currentHandicap).toFixed(1)),
       counting: Math.min(8, total),
+      course_id: ladder?.courseId ?? null,
+      target_score: ladder?.target ?? null,
+      stays_score: ladder ? ladder.target + 1 : null,
     };
-  }, [projection, currentHandicap, total]);
+  }, [projection, currentHandicap, total, ladder]);
 
   const firedRef = useRef(false);
   useEffect(() => {
@@ -140,164 +259,95 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
 
   if (!projection || !projection.hasData) return null;
 
-  const { cutTarget, settleAt, settleAtRaw } = projection;
+  const { cutTarget, settleAtRaw } = projection;
   if (!Number.isFinite(cutTarget) || !Number.isFinite(settleAtRaw)) return null;
 
-  const willRise = tone === 'up';
-  const cut = cutTarget.toFixed(1);
-  const settle = settleAt.toFixed(1);
-
-  const line = willRise
-    ? t('common:handicap.nextRound.lineRise', { settle })
-    : t('common:handicap.nextRound.lineHold');
-  const sub = willRise
-    ? t('common:handicap.nextRound.subRise', { cut })
-    : t('common:handicap.nextRound.subHold', { cut });
-  const supportingLine = `${sub} ${t('common:handicap.nextRound.sampleSentence')}`;
-
   const beating = last5.filter((v) => v < cutTarget).length;
-  const bestOfFive = last5.length ? Math.min(...last5) : null;
-  const rows = nextRoundScale(currentHandicap, cutTarget, bestOfFive);
 
-  // Bar scale. The floor is zero unless a differential is negative, in which
-  // case the scale opens downward and the zero rule appears.
-  const minV = last5.length ? Math.min(...last5) : 0;
-  const maxV = last5.length ? Math.max(...last5) : 1;
-  const lo = Math.min(0, minV);
-  const hi = Math.max(maxV, lo + 1);
-  const span = hi - lo;
-  const zeroPct = ((0 - lo) / span) * 100;
-  const hasNegative = minV < 0;
+  const willRise = tone === 'up';
+  const rungs = ladder?.rungs ?? [];
 
   return (
     <HcpSection
       hairline
-      heading={line}
+      kicker={t('common:handicap.nextRound.eyebrow')}
+      heading={t('common:handicap.nextRound.ladderHeading')}
     >
-      <p
-        style={{
-          margin: 0,
-          fontSize: 13.5,
-          fontWeight: 400,
-          color: CHART.MUTE,
-          lineHeight: 1.45,
-        }}
-      >
-        {supportingLine}
-      </p>
+      {ladder == null ? (
+        // No course among the last 20 carries both ratings: withhold rather
+        // than print a target in differentials.
+        <p style={{ margin: 0, fontSize: 12, color: CHART.DIM, lineHeight: 1.5, ...FIG }}>
+          {t('common:handicap.nextRound.withheldBody', { count: total })}
+        </p>
+      ) : (
+        <>
+          <p style={{ margin: 0, fontSize: 13.5, color: CHART.MUTE, lineHeight: 1.45 }}>
+            {t('common:handicap.nextRound.courseLine', { course: ladder.courseName })}
+          </p>
 
-      {/* Five bars, oldest first. Green beats the target. */}
-      {last5.length > 0 && (
-        <div style={{ marginTop: 20 }}>
-          <div
-            style={{
-              position: 'relative',
-              height: BAR_H,
-              display: 'flex',
-              alignItems: 'flex-end',
-              gap: 10,
-            }}
-          >
-            {hasNegative && (
-              <span
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  bottom: `${zeroPct}%`,
-                  height: 1,
-                  background: CHART.BORDER,
-                }}
-              />
-            )}
-            {last5.map((v, i) => {
-              const h = Math.max(3, ((v - lo) / span) * BAR_H);
-              return (
+          <div style={{ marginTop: 20, display: 'flex' }}>
+            {/* 3px rail: muted beside the "stays" rung, green from where it moves. */}
+            <div aria-hidden style={{ width: 3, display: 'flex', flexDirection: 'column', marginRight: 14 }}>
+              {rungs.map((r, i) => (
                 <span
                   key={i}
-                  aria-hidden
-                  style={{
-                    flex: 1,
-                    height: h,
-                    borderRadius: 3,
-                    background: v < cutTarget ? CHART.DOWN : CHART.TRACK,
-                  }}
+                  style={{ flex: 1, background: r.moves ? CHART.DOWN : CHART.TRACK }}
                 />
-              );
-            })}
+              ))}
+            </div>
+            <div style={{ flex: 1 }}>
+              {rungs.map((r, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 12,
+                    padding: '12px 0',
+                    borderTop: i === 0 ? 'none' : `1px solid ${CHART.BORDER}`,
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: r.moves ? CHART.INK : CHART.MUTE, ...FIG }}>
+                      {r.label}
+                    </div>
+                    <div style={{ fontSize: 12, marginTop: 2, color: r.subGreen ? CHART.DOWN : CHART.MUTE }}>
+                      {r.sub}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: r.moves ? CHART.DOWN : CHART.MUTE, ...FIG }}>
+                      {r.index.toFixed(1)}
+                    </div>
+                    {r.kicker && <div style={{ ...KICKER, marginTop: 2 }}>{r.kicker}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-            {last5.map((v, i) => (
-              <span
-                key={i}
-                style={{
-                  flex: 1,
-                  textAlign: 'center',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: v < cutTarget ? CHART.DOWN : CHART.MUTE,
-                  ...FIG,
-                }}
-              >
-                {v.toFixed(1)}
-              </span>
-            ))}
-          </div>
-          <div style={{ ...KICKER, marginTop: 10 }}>
-            {t('common:handicap.nextRound.beatLabel', {
-              count: beating,
-              total: last5.length,
-              cut,
-            })}
-          </div>
-        </div>
+
+          <p style={{ margin: '16px 0 0', fontSize: 13.5, color: CHART.MUTE, lineHeight: 1.45, ...FIG }}>
+            {beating > 0 ? (
+              <Trans
+                i18nKey="common:handicap.nextRound.formLine"
+                values={{ score: ladder.target, count: beating }}
+                components={{ g: <span style={{ color: CHART.DOWN, fontWeight: 700 }} /> }}
+              />
+            ) : (
+              t('common:handicap.nextRound.formLineNone')
+            )}
+          </p>
+        </>
       )}
 
-      {/* Shoot / Handicap. Break-even first, then the derived midpoint, then
-          the best of five. */}
-      <div style={{ marginTop: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={KICKER}>{t('common:handicap.nextRound.scaleShoot')}</span>
-          <span style={KICKER}>{t('common:handicap.nextRound.scaleBecomes')}</span>
-        </div>
-        {rows.map((r, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              justifyContent: 'space-between',
-              gap: 12,
-              marginTop: 10,
-            }}
-          >
-            <span style={{ fontSize: 14.5, fontWeight: 600, color: CHART.INK, ...FIG }}>
-              {t('common:handicap.nextRound.shootBeat', { value: r.shoot.toFixed(1) })}
-              {r.isBest && (
-                <span style={{ ...KICKER, marginLeft: 8 }}>
-                  {t('common:handicap.nextRound.yourBest')}
-                </span>
-              )}
-            </span>
-            <span style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span
-                style={{
-                  fontSize: 14.5,
-                  fontWeight: 700,
-                  color: r.noChange ? CHART.MUTE : CHART.DOWN,
-                  ...FIG,
-                }}
-              >
-                {r.becomes.toFixed(1)}
-              </span>
-              {r.noChange && (
-                <span style={KICKER}>{t('common:handicap.nextRound.noChange')}</span>
-              )}
-            </span>
-          </div>
-        ))}
-      </div>
+      <p style={{ margin: '10px 0 0', fontSize: 11.5, color: CHART.MUTE, lineHeight: 1.45 }}>
+        {/* The "cannot go up" clause is only true when the projection holds;
+            if the index is set to rise, print provenance alone. */}
+        {willRise
+          ? t('common:handicap.nextRound.sampleSentence')
+          : t('common:handicap.nextRound.provenance')}
+      </p>
     </HcpSection>
   );
 };

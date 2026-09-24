@@ -28,7 +28,6 @@ import NextRoundSection from './sections/NextRoundSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import HolesSection from './sections/HolesSection';
 import PersonalBestsSection, { TrophyRoomRow } from './sections/PersonalBestsSection';
-import CircleSection from './sections/CircleSection';
 import HandicapFooter from './sections/HandicapFooter';
 import { LaunchSheetMount } from '../gam/launch/LaunchSheetMount';
 
@@ -111,11 +110,11 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         THE GREETING AND WEATHER LINE IS REMOVED (Section A). TodayGreeting was deleted 10 Sep 2026.
       */}
 
-      {/* 1 — NEXT ROUND */}
-      <NextRoundSection connectionId={connection.id} currentHandicap={currentHandicap} />
-
-      {/* 2 — HANDICAP INDEX */}
+      {/* 1 — HANDICAP INDEX */}
       <IndexSection connection={connection} />
+
+      {/* 2 — NEXT ROUND */}
+      <NextRoundSection connectionId={connection.id} currentHandicap={currentHandicap} />
 
       {/* 3 — ROUNDS THAT COUNT */}
       <RoundsThatCountSection connectionId={connection.id} userId={userId} />
@@ -138,10 +137,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           terminal TROPHY ROOM row at the foot of Personal bests, and
           StreaksSheetMount stays at page level so ?gam=streaks still opens. */}
 
-      {/* 6 — YOUR CIRCLE */}
-      {!readOnly && <CircleSection userId={userId} />}
-
-      {/* 7 — TROPHY ROOM */}
+      {/* 6 — TROPHY ROOM */}
       {!readOnly && <TrophyRoomRow standalone />}
 
       {/* FOOTER — provenance only. */}

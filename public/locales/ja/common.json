@@ -267,6 +267,18 @@
       "leaderFallback": "shui no senshu"
     },
     "nextRound": {
+      "ladderHeading": "各スコアがインデックスに与える影響",
+      "courseLine": "最もよくプレーする{{course}}で。",
+      "rungStaysScore": "{{score}}以上",
+      "rungStaysSub": "変化なし",
+      "rungStaysKicker": "維持",
+      "rungTargetSub": "目標スコア",
+      "rungGoodSub": "好調な日",
+      "rungBestSub": "ここでのベスト",
+      "rungDown": "{{delta}}減",
+      "formLine": "直近5ラウンド中<g>{{count}}</g>回、{{score}}を上回りました。",
+      "formLineNone": "直近5ラウンドでインデックスが下がるスコアはありませんでした。",
+      "provenance": "直近20ラウンドに基づきます。次のラウンドでは、どんなスコアでもインデックスは上がりません。",
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
       "sampleSentence": "直近20ラウンドに基づきます。",

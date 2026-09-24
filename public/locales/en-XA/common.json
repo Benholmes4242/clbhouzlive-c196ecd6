@@ -506,6 +506,18 @@
       }
     },
     "nextRound": {
+      "ladderHeading": "[~~Ŵhát éáĉh šĉőřé dőéš tő ýőúř íñdéx~~]",
+      "courseLine": "[~~Át {{course}}, whéřé ýőú pláý mőšt.~~]",
+      "rungStaysScore": "[~~{{score}} őř wőřšé~~]",
+      "rungStaysSub": "[~~Nőthíñg háppéñš~~]",
+      "rungStaysKicker": "[~~štáýš~~]",
+      "rungTargetSub": "[~~Ţhé šĉőřé tő béát~~]",
+      "rungGoodSub": "[~~Á gőőd dáý~~]",
+      "rungBestSub": "[~~Ýőúř béšt héřé~~]",
+      "rungDown": "[~~dőwñ {{delta}}~~]",
+      "formLine": "[~~Ýőú béát {{score}} íñ <g>{{count}}</g> őf ýőúř lášt fívé řőúñdš.~~]",
+      "formLineNone": "[~~Nőñé őf ýőúř lášt fívé wőúld hávé břőúght ít dőwñ.~~]",
+      "provenance": "[~~Ɓášéd őñ ýőúř lášt 20 řőúñdš. Ýőúř íñdéx ĉáññőt gő úp ñéxt řőúñd whátévéř ýőú šhőőt.~~]",
       "eyebrow": "[~~Ñéẋţ řőúñđ~~]",
       "sample": "[~~Ļášţ 20 řőúñđš~~]",
       "sampleSentence": "[~~Ɓášéđ őñ ýőúř ļášţ 20 řőúñđš.~~]",

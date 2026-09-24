@@ -268,6 +268,18 @@
       "leaderFallback": "el líder"
     },
     "nextRound": {
+      "ladderHeading": "Lo que cada resultado hace a tu índice",
+      "courseLine": "En {{course}}, donde más juegas.",
+      "rungStaysScore": "{{score}} o peor",
+      "rungStaysSub": "No pasa nada",
+      "rungStaysKicker": "se mantiene",
+      "rungTargetSub": "El resultado a batir",
+      "rungGoodSub": "Un buen día",
+      "rungBestSub": "Tu mejor aquí",
+      "rungDown": "baja {{delta}}",
+      "formLine": "Batiste {{score}} en <g>{{count}}</g> de tus últimas cinco vueltas.",
+      "formLineNone": "Ninguna de tus últimas cinco lo habría bajado.",
+      "provenance": "Basado en tus últimas 20 vueltas. Tu índice no puede subir en la próxima vuelta hagas lo que hagas.",
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
       "sampleSentence": "Basado en tus últimas 20 vueltas.",
