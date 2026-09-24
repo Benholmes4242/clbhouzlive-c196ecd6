@@ -7,12 +7,12 @@
  *
  * Order (higher = on top):
  *   FS_OVERLAY_Z      fullscreen feed viewer (FullscreenFeedOverlay)
- *   COMMENTS_SHEET_Z  comments sheet opened FROM the viewer — must sit above it
- *   LIKES_SHEET_Z     likers sheet opened FROM the viewer or a card — above it
  *   MORE_SHEET_Z      more-options sheet opened FROM the viewer — above it
  *   REVIEW_SHEET_Z    read-review sheet opened FROM the viewer — above it
  *   MEDIA_PREVIEW_Z   read-only media viewer (MediaPreviewViewer) opened FROM a
  *                     sheet — must sit above every sheet listed here
+ *   COMMENTS_SHEET_Z / LIKES_SHEET_Z — leaf sheets that sit ABOVE EVERY SHEET
+ *                     (12100+), not just above the viewer; see their block below
  *
  * DIRECTION, NOT HIERARCHY: ranking follows "who opened whom". Everything the
  * feed viewer opens ranks above the feed viewer; anything a sheet opens ranks
@@ -30,20 +30,20 @@
  */
 
 
-  export const FS_OVERLAY_Z     = 200;   // FullscreenFeedOverlay root
+export const FS_OVERLAY_Z     = 200;   // FullscreenFeedOverlay root
 
-  /**
-   * ABOVE EVERY SHEET (12100+). CommentsSheetV2 and LikesSheet are LEAF
-   * overlays: both are opened FROM the fullscreen viewer (200), the review
-   * card (REVIEW_SHEET_Z + 1 = 241) AND the scorecard card (Z.sheet = 12003),
-   * and neither opens anything itself. A value that ranks correctly against
-   * one host cannot rank correctly against all three — LIKES_SHEET_Z was 220,
-   * chosen when the viewer was its only caller, and it has been rendering
-   * BEHIND both cards ever since they started using LikedByRow.
-   * These sit above Z.sheet (12003, src/config/zIndex.ts) deliberately.
-   */
-  export const COMMENTS_SHEET_Z = 12100;  // CommentsSheetV2 (panel = +1)
-  export const LIKES_SHEET_Z    = 12110;  // LikesSheet     (panel = +1)
+/**
+ * ABOVE EVERY SHEET (12100+). CommentsSheetV2 and LikesSheet are LEAF
+ * overlays: both are opened FROM the fullscreen viewer (200), the review
+ * card (REVIEW_SHEET_Z + 1 = 241) AND the scorecard card (Z.sheet = 12003),
+ * and neither opens anything itself. A value that ranks correctly against
+ * one host cannot rank correctly against all three — LIKES_SHEET_Z was 220,
+ * chosen when the viewer was its only caller, and it has been rendering
+ * BEHIND both cards ever since they started using LikedByRow.
+ * These sit above Z.sheet (12003, src/config/zIndex.ts) deliberately.
+ */
+export const COMMENTS_SHEET_Z = 12100;  // CommentsSheetV2 (panel = +1)
+export const LIKES_SHEET_Z    = 12110;  // LikesSheet     (panel = +1)
 export const MORE_SHEET_Z     = 230;   // MoreOptions sheet scrim (panel = +1)
 export const REVIEW_SHEET_Z   = 240;   // ReviewBottomSheet scrim (panel = +1)
 /** MediaPreviewViewer's own `z-[9999]` class. Mirrored here so the ordering is
