@@ -335,7 +335,11 @@ export function ScorecardGlassOverlay({
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          background: 'rgba(24,27,35,0.74)',
+          /* 0.74 -> 0.88, MATCHING ReviewBottomSheet's card exactly. Every other
+             property on these two cards is already the same; this was the only
+             divergence, and at 0.74 the card grid was hard to read over a busy
+             feed behind it. Change both together if either ever moves. */
+          background: 'rgba(24,27,35,0.88)',
           backdropFilter: 'blur(30px) saturate(160%)',
           WebkitBackdropFilter: 'blur(30px) saturate(160%)',
           border: '1px solid rgba(255,255,255,0.14)',

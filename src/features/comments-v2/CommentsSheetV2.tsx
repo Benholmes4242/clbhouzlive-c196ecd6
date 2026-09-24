@@ -12,6 +12,7 @@ import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { createPortal } from 'react-dom';
 import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
+import { COMMENTS_SHEET_Z } from '@/lib/zLayers';
 import { useDraftDismissGuard } from '@/components/ui/useDraftDismissGuard';
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -408,7 +409,7 @@ function CommentsSheetV2Inner({
               open={confirmOpen}
               onKeepEditing={keepEditing}
               onDiscard={discard}
-              zIndex={12100}
+              zIndex={COMMENTS_SHEET_Z}
             />
 
 
