@@ -435,7 +435,14 @@
       "bodyNoFall": "The {{count}} below the line are the ones your index is built from. As they drop out, worse rounds take their place.",
       "fallsIn_one": "{{count}} round",
       "fallsIn_other": "{{count}} rounds",
-      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which."
+      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which.",
+      "headroomLevel": "Sin margen",
+      "headroomOne": "1 golpe de margen",
+      "headroomOther": "{{count}} golpes de margen",
+      "bodyLine": "Las {{count}} por debajo de la línea son las que forman tu hándicap. La línea está en {{cut}} en {{course}}, y tu siguiente mejor vuelta es un {{next}}.",
+      "bodyLineNoCourse": "Las {{count}} por debajo de la línea son las que forman tu hándicap.",
+      "bodyLineNoNext": "Ahora mismo cuentan todas tus últimas veinte vueltas.",
+      "fallLine": "Tu vuelta del {{date}} sale de las veinte en {{falls}}."
     },
     "scoring": {
       "eyebrow": "Stableford",

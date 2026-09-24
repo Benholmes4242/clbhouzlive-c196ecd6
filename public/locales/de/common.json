@@ -435,7 +435,14 @@
       "bodyNoFall": "The {{count}} below the line are the ones your index is built from. As they drop out, worse rounds take their place.",
       "fallsIn_one": "{{count}} round",
       "fallsIn_other": "{{count}} rounds",
-      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which."
+      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which.",
+      "headroomLevel": "Kein Spielraum",
+      "headroomOne": "1 Schlag Spielraum",
+      "headroomOther": "{{count}} Schläge Spielraum",
+      "bodyLine": "Die {{count}} unter der Linie sind die, aus denen dein Index berechnet wird. Die Linie liegt bei {{cut}} auf {{course}}, und deine nächstbeste Runde ist eine {{next}}.",
+      "bodyLineNoCourse": "Die {{count}} unter der Linie sind die, aus denen dein Index berechnet wird.",
+      "bodyLineNoNext": "Gerade zählt jede deiner letzten zwanzig Runden.",
+      "fallLine": "Deine Runde vom {{date}} fällt in {{falls}} aus den zwanzig heraus."
     },
     "scoring": {
       "eyebrow": "Stableford",

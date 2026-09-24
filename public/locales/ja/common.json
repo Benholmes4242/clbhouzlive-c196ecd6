@@ -434,7 +434,14 @@
       "bodyNoFall": "The {{count}} below the line are the ones your index is built from. As they drop out, worse rounds take their place.",
       "fallsIn_one": "{{count}} round",
       "fallsIn_other": "{{count}} rounds",
-      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which."
+      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which.",
+      "headroomLevel": "余裕なし",
+      "headroomOne": "余裕は1打",
+      "headroomOther": "余裕は{{count}}打",
+      "bodyLine": "ラインより下の{{count}}ラウンドがハンディキャップの基になります。ラインは{{course}}で{{cut}}、次に良いラウンドは{{next}}です。",
+      "bodyLineNoCourse": "ラインより下の{{count}}ラウンドがハンディキャップの基になります。",
+      "bodyLineNoNext": "今は直近20ラウンドすべてがカウントされています。",
+      "fallLine": "{{date}}のラウンドは{{falls}}後に20ラウンドから外れます。"
     },
     "scoring": {
       "eyebrow": "Stableford",
