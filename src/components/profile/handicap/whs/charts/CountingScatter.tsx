@@ -33,6 +33,10 @@ interface Props {
    * the section's sentence names ("the 8 below the line").
    */
   cutLine?: number | null;
+  /** Text drawn at the right-hand end of the cut line. Null = today's
+   *  unlabelled rule. The line has always been the thing the sentence
+   *  names; without a value it asks the member to take it on trust. */
+  cutLabel?: string | null;
 }
 
 const VIEW_W = 320;
@@ -48,7 +52,7 @@ const VIEW_W = 320;
  * target is NOT tied to the radius — selection is resolved from the pointer's
  * horizontal fraction across the whole plot (see onPointerDown), so the hit
  * area is the full height of the svg regardless of how big a dot is drawn. */
-const DOT_R = 4.75;
+const DOT_R = 3.5;
 /** Air between the selected dot and its ring. */
 const RING_GAP = 3.5;
 const RING_SW = 1;
@@ -58,11 +62,13 @@ const INSET = Math.ceil(RING_R + RING_SW / 2 + 0.5);
 
 const PAD_X = INSET;
 const PAD_Y = Math.max(10, INSET);
+/** Viewbox room reserved at the right end of the cut line for its label. */
+const CUT_LABEL_W = 26;
 
 function fillFor(state: CountingState): string {
   if (state === 'counts') return CHART.DOWN;
   if (state === 'falling') return CHART.AMBER;
-  return CHART.FAINT;
+  return CHART.DOT_IDLE;
 }
 
 export const CountingScatter: React.FC<Props> = ({
@@ -72,6 +78,7 @@ export const CountingScatter: React.FC<Props> = ({
   selectedIndex = null,
   onSelectIndex,
   cutLine = null,
+  cutLabel = null,
 }) => {
   if (!rounds || rounds.length === 0) return null;
 
@@ -93,6 +100,7 @@ export const CountingScatter: React.FC<Props> = ({
 
   return (
     <div style={{ fontFamily: CHART_FONT }}>
+      <div style={{ position: 'relative' }}>
       <svg
         viewBox={`0 0 ${VIEW_W} ${height}`}
         preserveAspectRatio="none"
@@ -119,13 +127,14 @@ export const CountingScatter: React.FC<Props> = ({
       >
         {cutLine != null && cutLine >= min && cutLine <= max && (
           /* THE LINE THE SENTENCE NAMES. Drawn under the trace so a point
-             never disappears behind it. */
+             never disappears behind it. With a label it ends short of the
+             label's reserved room so the two never overlap. */
           <line
             x1={0}
-            x2={VIEW_W}
+            x2={cutLabel != null ? VIEW_W - CUT_LABEL_W : VIEW_W}
             y1={y(cutLine)}
             y2={y(cutLine)}
-            stroke="rgba(255,255,255,0.28)"
+            stroke={CHART.DIM}
             strokeWidth={1}
             strokeDasharray="3 3"
             vectorEffect="non-scaling-stroke"
@@ -134,7 +143,7 @@ export const CountingScatter: React.FC<Props> = ({
         <path
           d={path}
           fill="none"
-          stroke="rgba(255,255,255,0.18)"
+          stroke={CHART.TRACK}
           strokeWidth={1}
           vectorEffect="non-scaling-stroke"
         />
@@ -159,6 +168,30 @@ export const CountingScatter: React.FC<Props> = ({
           />
         )}
       </svg>
+        {cutLabel != null && cutLine != null && cutLine >= min && cutLine <= max && (
+          /* THE CUT LABEL. An HTML overlay, not an SVG <text>: the svg is
+             stretched (preserveAspectRatio none), so svg text would distort
+             horizontally. Positioned from the same y() in viewBox units,
+             which map 1:1 to px vertically because the svg height = height. */
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: y(cutLine),
+              transform: 'translateY(-50%)',
+              fontSize: 11,
+              fontWeight: 600,
+              lineHeight: 1,
+              color: CHART.MUTE,
+              fontVariantNumeric: 'tabular-nums lining-nums',
+              pointerEvents: 'none',
+            }}
+          >
+            {cutLabel}
+          </span>
+        )}
+      </div>
 
       <div
         style={{

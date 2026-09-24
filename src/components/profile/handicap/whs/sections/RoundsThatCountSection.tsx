@@ -81,8 +81,35 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
         play_date: r.play_date,
         diff: r.handicap_differential ?? null,
         is_counter: !!r.is_counter,
+        course_id: r.course_id ?? null,
+        course_name: r.course?.name ?? null,
+        course_rating: r.course_rating ?? null,
+        slope_rating: r.slope_rating ?? null,
       }));
   }, [allScores]);
+
+  /* THE COURSE THE LINE IS READ AT: most frequent course_id in the window,
+     ties broken by the most recent round; that round's name and ratings.
+     A course lacking either rating is skipped. Null = no score conversion
+     anywhere in this section; a differential is never printed as a score. */
+  const course = useMemo(() => {
+    const stats = new Map<string, { n: number; lastIdx: number }>();
+    window20.forEach((r, i) => {
+      if (!r.course_id) return;
+      const e = stats.get(r.course_id) ?? { n: 0, lastIdx: -1 };
+      e.n += 1;
+      e.lastIdx = i; // oldest-first, so the last seen is the most recent
+      stats.set(r.course_id, e);
+    });
+    const ranked = [...stats.entries()].sort((a, b) => b[1].n - a[1].n || b[1].lastIdx - a[1].lastIdx);
+    for (const [, e] of ranked) {
+      const r = window20[e.lastIdx];
+      if (r.course_rating != null && r.slope_rating != null && r.course_name) {
+        return { name: r.course_name, rating: r.course_rating, slope: r.slope_rating };
+      }
+    }
+    return null;
+  }, [window20]);
 
   const withheld = !isLoading && total > 0 && total < MIN_ROUNDS;
   const withheldFired = useRef(false);
@@ -123,29 +150,60 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
 
   // Falls-off-in: chronological position i drops out after i+1 more rounds.
   // Only counters inside the horizon matter — a non-counter leaving changes
-  // nothing the member can feel.
-  const fallsIn = (() => {
-    const hits = window20
-      .slice(0, FALLING_HORIZON)
-      .map((r, i) => (r.is_counter ? i + 1 : null))
-      .filter((v): v is number => v != null);
-    return hits.length ? Math.min(...hits) : null;
+  // nothing the member can feel. Returns the index too, for the round's date.
+  const falling = (() => {
+    for (let i = 0; i < Math.min(FALLING_HORIZON, window20.length); i++) {
+      if (window20[i].is_counter) return { idx: i, fallsIn: i + 1 };
+    }
+    return null;
   })();
 
-  const sentence =
-    fallsIn != null
-      ? t('common:handicap.roundsThatCount.body', {
-          count: counterCount,
-          falls: t('common:handicap.roundsThatCount.fallsIn', { count: fallsIn }),
-        })
-      : t('common:handicap.roundsThatCount.bodyNoFall', { count: counterCount });
-
-  /* THE COUNTS-BELOW LINE. The sentence has always named it; the chart never
-     drew it. It rules across at the WORST differential that still counts, so
-     every counter sits on or below it and every non-counter above. Null when
-     the counter set is empty — nothing to rule. */
+  /* THE COUNTS-BELOW LINE. It rules across at the WORST differential that
+     still counts, so every counter sits on or below it and every non-counter
+     above. Null when the counter set is empty — nothing to rule. */
   const counterDiffs = window20.filter((r) => r.is_counter && r.diff != null).map((r) => r.diff as number);
   const cutLine = counterDiffs.length ? Math.max(...counterDiffs) : null;
+  const nonCounterDiffs = window20.filter((r) => !r.is_counter && r.diff != null).map((r) => r.diff as number);
+  const nextDiff = nonCounterDiffs.length ? Math.min(...nonCounterDiffs) : null;
+
+  /* PLAIN ROUNDING, deliberately NOT the next-round ceil-minus-one: that is a
+     score to BEAT; this only describes where the line already sits. */
+  const scoreAt = (diff: number) =>
+    course ? Math.round((diff * course.slope) / 113 + course.rating) : null;
+
+  const cutScore = cutLine != null ? scoreAt(cutLine) : null;
+  const nextScore = nextDiff != null ? scoreAt(nextDiff) : null;
+  const headroom = cutScore != null && nextScore != null ? nextScore - cutScore : null;
+
+  /* SEPARATE KEYS, NOT AN INTERPOLATED PLURAL. 0 is its own state (the next
+     round in line is level with the last one counting), never "0 shots". */
+  const meta =
+    headroom == null
+      ? undefined
+      : headroom === 0
+        ? t('common:handicap.roundsThatCount.headroomLevel')
+        : headroom === 1
+          ? t('common:handicap.roundsThatCount.headroomOne')
+          : t('common:handicap.roundsThatCount.headroomOther', { count: headroom });
+
+  const bodyLine =
+    nextDiff == null
+      ? t('common:handicap.roundsThatCount.bodyLineNoNext')
+      : course && cutScore != null && nextScore != null
+        ? t('common:handicap.roundsThatCount.bodyLine', {
+            count: counterCount,
+            cut: cutScore,
+            course: course.name,
+            next: nextScore,
+          })
+        : t('common:handicap.roundsThatCount.bodyLineNoCourse', { count: counterCount });
+
+  const fallLine = falling
+    ? t('common:handicap.roundsThatCount.fallLine', {
+        date: formatDayMonthShortGB(window20[falling.idx].play_date),
+        falls: t('common:handicap.roundsThatCount.fallsIn', { count: falling.fallsIn }),
+      })
+    : null;
 
   const selected = selIdx != null ? window20[selIdx] : null;
 
@@ -167,7 +225,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
         hairline
         kicker={t('common:handicap.roundsThatCount.eyebrow')}
         heading={t('common:handicap.roundsThatCount.heading')}
-        meta={t('common:handicap.roundsThatCount.meta', { count: counterCount })}
+        meta={meta}
       >
         {/* Selection slot — height reserved from mount, empty until a tap. */}
         <div style={{ height: SLOT_H, marginBottom: 6 }}>
@@ -234,11 +292,17 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
           selectedIndex={selIdx}
           onSelectIndex={onSelect}
           cutLine={cutLine}
+          cutLabel={cutScore != null ? String(cutScore) : null}
         />
 
         <p style={{ margin: '14px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
-          {sentence}
+          {bodyLine}
         </p>
+        {fallLine && (
+          <p style={{ margin: '6px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
+            {fallLine}
+          </p>
+        )}
       </HcpSection>
 
       {selected && (

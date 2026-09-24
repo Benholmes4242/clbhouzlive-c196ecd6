@@ -434,7 +434,14 @@
       "bodyNoFall": "The {{count}} below the line are the ones your index is built from. As they drop out, worse rounds take their place.",
       "fallsIn_one": "{{count}} round",
       "fallsIn_other": "{{count}} rounds",
-      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which."
+      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which.",
+      "headroomLevel": "여유 없음",
+      "headroomOne": "여유 1타",
+      "headroomOther": "여유 {{count}}타",
+      "bodyLine": "선 아래의 {{count}}개 라운드가 핸디캡 지수의 기준입니다. 선은 {{course}}에서 {{cut}}타이고, 다음으로 좋은 라운드는 {{next}}타입니다.",
+      "bodyLineNoCourse": "선 아래의 {{count}}개 라운드가 핸디캡 지수의 기준입니다.",
+      "bodyLineNoNext": "지금은 최근 20개 라운드가 모두 반영됩니다.",
+      "fallLine": "{{date}} 라운드는 {{falls}} 후 20개에서 빠집니다."
     },
     "scoring": {
       "eyebrow": "Stableford",

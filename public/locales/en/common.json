@@ -745,7 +745,14 @@
       "bodyNoFall": "The {{count}} below the line are the ones your index is built from. As they drop out, worse rounds take their place.",
       "fallsIn_one": "{{count}} round",
       "fallsIn_other": "{{count}} rounds",
-      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which."
+      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which.",
+      "headroomLevel": "No headroom",
+      "headroomOne": "1 shot of headroom",
+      "headroomOther": "{{count}} shots of headroom",
+      "bodyLine": "The {{count}} below the line are the ones your index is built from. The line sits at {{cut}} at {{course}}, and your next best round is a {{next}}.",
+      "bodyLineNoCourse": "The {{count}} below the line are the ones your index is built from.",
+      "bodyLineNoNext": "Every one of your last twenty counts right now.",
+      "fallLine": "Your {{date}} round drops out of the twenty in {{falls}}."
     },
     "scoring": {
       "eyebrow": "Stableford",
