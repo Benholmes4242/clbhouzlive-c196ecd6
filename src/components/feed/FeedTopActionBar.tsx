@@ -229,7 +229,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
                 e.stopPropagation();
                 onShare();
               }}
-              aria-label="Share"
+              aria-label="Send"
               style={chipBase}
             >
               <Send size={24} stroke="#fff" strokeWidth={2} />

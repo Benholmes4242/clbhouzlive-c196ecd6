@@ -949,7 +949,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 label={commentCount > 0 ? formatCount(commentCount) : undefined}
                 onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
               />
-              <FooterButton icon={Share} onClick={() => onShare(post)} />
+              <FooterButton icon={Share} onClick={() => onShare(post)} ariaLabel="Send" />
               <div style={{ marginLeft: 'auto' }} />
               <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
             </div>
