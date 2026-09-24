@@ -77,7 +77,6 @@ import { applyRouteChrome } from '@/lib/routeChrome';
 import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { resolveRestingRect, getCurrentViewport, readRawViewportSnapshot } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
-import { FS_OVERLAY_Z } from '@/lib/zLayers';
 import { trace as perfTrace } from '@/perf/trace';
 import { vperfCloseMotionMark } from '@/perf/vperf';
 
@@ -203,6 +202,9 @@ export function FullscreenFeedOverlay() {
   const closeAnim = useFullscreenFeedStore(s => s.closeAnim);
   const closeAnimDone = useFullscreenFeedStore(s => s.closeAnimDone);
   const beginCloseAnim = useFullscreenFeedStore(s => s.beginCloseAnim);
+  // Stacking value taken AT OPEN TIME (FS_OVERLAY_Z by default). Root and
+  // every fixed child derive from this one value so chrome never detaches.
+  const overlayZ = useFullscreenFeedStore(s => s.zIndex);
   const signalCloseAnimDone = useFullscreenFeedStore(s => s.signalCloseAnimDone);
 
   // Autoplay-blocked → "Tap for sound" pill above the scrubber. Fires when
@@ -341,6 +343,11 @@ export function FullscreenFeedOverlay() {
   const handleClose = useCallback((info?: { reason?: 'navigating' }) => {
     closeInfoRef.current = info;
     if (closeAnim !== 'idle') return; // animation already in flight
+    // Nested open returning to the entry beneath: no reverse animation.
+    if (useFullscreenFeedStore.getState().restoreStack.length > 0) {
+      close(info);
+      return;
+    }
     const b = borrowRef.current;
     const o = origin;
     const sameSlide = activeIndex === startIndex;
@@ -897,7 +904,7 @@ export function FullscreenFeedOverlay() {
 
             data-vperf="fs-overlay"
             className="fixed inset-0 flex flex-col"
-            style={{ zIndex: FS_OVERLAY_Z }}
+            style={{ zIndex: overlayZ }}
 
           >
             {/* Black wash — solid canvas that fades OUT during the symmetric
@@ -999,7 +1006,7 @@ export function FullscreenFeedOverlay() {
                         left: '50%',
                         bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)',
                         transform: 'translateX(-50%)',
-                        zIndex: FS_OVERLAY_Z + 2,
+                        zIndex: overlayZ + 2,
                         pointerEvents: 'auto',
                       }}
                     >

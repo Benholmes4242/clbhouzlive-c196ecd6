@@ -111,6 +111,11 @@ interface OpenWithOriginArgs {
   openedFrom: string;
   /** Deliberate gallery opens start at frame zero instead of inheriting a prior session playhead. */
   forceStartAtZero?: boolean;
+  /** Gallery mode shorthand (same as options.readOnly). */
+  readOnly?: boolean;
+  /** Per-open stacking value; omitted → FS_OVERLAY_Z. Sheets pass
+   *  VIEWER_ABOVE_SHEETS_Z. */
+  zIndex?: number;
 
   options?: {
     openCommentsInitially?: boolean;
@@ -133,6 +138,8 @@ export function openWithOrigin({
   mediaId,
   openedFrom,
   forceStartAtZero = false,
+  readOnly,
+  zIndex,
   options,
 }: OpenWithOriginArgs): void {
 
@@ -524,6 +531,8 @@ export function openWithOrigin({
     mediaId: mediaId ?? null,
     openedFrom,
     borrow,
+    ...(readOnly !== undefined ? { readOnly } : {}),
+    ...(zIndex !== undefined ? { zIndex } : {}),
   });
 
   // [VPERF] end of the synchronous open() call — mark storeOpen phase and

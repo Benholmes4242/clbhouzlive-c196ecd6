@@ -44,6 +44,18 @@ export const FS_OVERLAY_Z     = 200;   // FullscreenFeedOverlay root
  */
 export const COMMENTS_SHEET_Z = 12100;  // CommentsSheetV2 (panel = +1)
 export const LIKES_SHEET_Z    = 12110;  // LikesSheet     (panel = +1)
+
+/**
+ * The canonical viewer OPENED FROM A SHEET. FS_OVERLAY_Z (200) is the
+ * value for the viewer opened from a feed or a page, where it is the
+ * top surface. When a SHEET opens it, it must clear that sheet — and
+ * the review sheet is at REVIEW_SHEET_Z + 1 (241) while the scorecard
+ * card is at Z.sheet (12003), so no single constant serves both.
+ * Passed per-open via fullscreenFeedStore.open({ zIndex }).
+ * Above LIKES_SHEET_Z deliberately: a photo opened from a sheet also
+ * clears a likers sheet left open behind it.
+ */
+export const VIEWER_ABOVE_SHEETS_Z = 12200;
 export const MORE_SHEET_Z     = 230;   // MoreOptions sheet scrim (panel = +1)
 export const REVIEW_SHEET_Z   = 240;   // ReviewBottomSheet scrim (panel = +1)
 /** MediaPreviewViewer's own `z-[9999]` class. Mirrored here so the ordering is
