@@ -144,10 +144,11 @@ export interface MentionsTextStyle {
   minHeight?: number;
   maxHeight?: number;
   /**
-   * ::placeholder fill. Needed because the textarea sets
-   * WebkitTextFillColor: 'transparent' (the highlighter paints the real text),
-   * and that inherited fill also blanks the placeholder — the highlighter has
-   * no placeholder layer to compensate. Defaults to the canonical dark tier.
+   * ::placeholder fill. The textarea now paints its own glyphs (see the note
+   * in index.css), so the placeholder renders natively; this prop is kept so
+   * each consumer continues to control its own placeholder tier. It
+   * originally existed because a transparent text-fill blanked the
+   * placeholder. Defaults to the canonical dark tier.
    */
   placeholderColor?: string;
 }
@@ -223,8 +224,11 @@ function buildMentionsStyle(text: MentionsTextStyle | undefined) {
     },
     highlighter: {
       ...sharedText,
-      color: t.color,
-      WebkitTextFillColor: t.color,
+      /* TRANSPARENT NOW, AND STILL LOAD-BEARING. It sizes the control and the
+         library measures mention offsets against it; it just no longer paints.
+         See the note in index.css. */
+      color: 'transparent',
+      WebkitTextFillColor: 'transparent',
       minHeight: minH,
       maxHeight: maxH,
       overflow: maxH ? 'hidden' : undefined,
@@ -232,8 +236,8 @@ function buildMentionsStyle(text: MentionsTextStyle | undefined) {
       wordWrap: 'break-word' as const,
       substring: {
         visibility: 'visible' as const,
-        color: t.color,
-        WebkitTextFillColor: t.color,
+        color: 'transparent',
+        WebkitTextFillColor: 'transparent',
       },
     },
     input: {
@@ -243,12 +247,13 @@ function buildMentionsStyle(text: MentionsTextStyle | undefined) {
       maxHeight: maxH,
       overflow: maxH ? ('auto' as const) : ('hidden' as const),
       background: 'transparent',
-      color: 'transparent',
+      /* THE TEXTAREA PAINTS. Caret and glyphs in one element, one layout. */
+      color: t.color,
+      WebkitTextFillColor: t.color,
       caretColor: t.caretColor,
       resize: 'none' as const,
       whiteSpace: 'pre-wrap' as const,
       wordWrap: 'break-word' as const,
-      WebkitTextFillColor: 'transparent',
     },
     // Invisible/inert shell. All visible chrome + positioning is
     // taken over by AnchoredMentionsPanel below (customSuggestionsContainer).
@@ -280,7 +285,11 @@ function buildMentionsStyle(text: MentionsTextStyle | undefined) {
 }
 
 const mentionStyle = {
-  color: AMBER,
+  /* Transparent: the textarea above paints these characters. Amber while
+     typing is what this fix costs; mentions are still amber everywhere
+     they are DISPLAYED. */
+  color: 'transparent',
+  WebkitTextFillColor: 'transparent',
   fontWeight: 400,
   background: 'transparent',
 };
