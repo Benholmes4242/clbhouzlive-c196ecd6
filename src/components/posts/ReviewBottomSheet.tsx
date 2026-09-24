@@ -11,12 +11,15 @@
  *   viewer → sheet:  the viewer's "read review ›" chrome opens THIS sheet while
  *                    the viewer stays open, so the sheet must paint ABOVE it —
  *                    REVIEW_SHEET_Z (240) > FS_OVERLAY_Z (200). Unchanged.
- *   sheet → viewer:  tapping a photo in the strip below opens the media viewer,
- *                    which must paint ABOVE this sheet. That is NOT the feed
- *                    overlay: it is MediaPreviewViewer, body-portaled at
- *                    MEDIA_PREVIEW_Z (9999), i.e. above every sheet in the
- *                    registry. The sheet stays mounted underneath and keeps its
- *                    scroll position; nothing in @/lib/zLayers is inverted.
+ *   sheet → viewer:  tapping a photo in the strip below opens the CANONICAL
+ *                    fullscreen viewer (openWithOrigin, FLIP from the tile),
+ *                    which must paint ABOVE this sheet. The viewer takes its z
+ *                    AT OPEN TIME: this sheet passes VIEWER_ABOVE_SHEETS_Z
+ *                    (12200), clearing the sheet and any likers sheet. When the
+ *                    viewer was already open beneath (viewer -> sheet -> photo)
+ *                    the store's one-level restore returns to it on close. The
+ *                    sheet stays mounted underneath and keeps its scroll
+ *                    position; FS_OVERLAY_Z (200) remains the default.
  * Both overlays portal to document.body, so this panel's translateZ(0) and the
  * scroller's -webkit-overflow-scrolling cannot clamp either of them.
  *
@@ -43,10 +46,10 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useReviewMedia, type ReviewMediaItem } from './useReviewMedia';
 import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { MentionText } from '@/components/mentions/MentionText';
-import { REVIEW_SHEET_Z } from '@/lib/zLayers';
+import { REVIEW_SHEET_Z, VIEWER_ABOVE_SHEETS_Z } from '@/lib/zLayers';
 import { footerTapProbeEnabled, recordFooterTap } from './footerTapProbe';
-import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
-import type { OrderedMediaItem } from '@/components/shared/media/types';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import type { FeedPost } from '@/components/media-system/types/media';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -349,27 +352,48 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const mediaStrip = allMedia.slice(0, 3);
 
   /* PHOTO TAP (§Part 1). The strip shows the first three; the viewer receives
-     ALL items so a 4-photo review stays fully reachable from the third tile. */
-  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
-
-  /* THE ORPHANED VIEWER (BRIEF_SHEET_BACK_BEHAVIOUR_04 §4). The viewer portals
-     to <body>, so it outlives this sheet's own unmount path: back closed the
-     host sheet and left a fullscreen viewer floating over a page with no sheet
-     under it. The host closing takes the viewer with it. */
-  useEffect(() => {
-    if (!isOpen) setViewerIndex(null);
-  }, [isOpen]);
-
-  const viewerItems: OrderedMediaItem[] = useMemo(
+     ALL items so a 4-photo review stays fully reachable from the third tile.
+     One synthetic FeedPost per media item, following CourseMoments. */
+  const reviewFullscreenPosts = useMemo<FeedPost[]>(
     () =>
-      allMedia.map((m, i) => ({
+      allMedia.map((m) => ({
         id: m.id,
-        type: m.mediaType,
-        previewUrl: m.mediaUrl,
-        thumbnailUrl: m.posterUrl ?? undefined,
-        order: i,
-      })),
-    [allMedia],
+        userId: user.id,
+        actorType: 'personal',
+        actorId: user.id,
+        username: user.username ?? '',
+        displayName: user.name,
+        avatarUrl: user.avatar ?? '',
+        isVerified: false,
+        creatorRelation: 'none',
+        caption: '',
+        mediaItems: [{
+          id: m.id,
+          type: m.mediaType,
+          hlsUrl: m.mediaType === 'video' ? m.mediaUrl : undefined,
+          imageUrl: m.mediaType === 'image' ? m.mediaUrl : undefined,
+          thumbnailUrl: m.posterUrl,
+          width: 0,
+          height: 0,
+        }],
+        createdAt: '',
+        // ⚠️ HARDCODED 0/false engagement fields.
+        // SAFE ONLY because the strip opens the viewer with readOnly:true —
+        // likes/comments UI is suppressed and no mutation can fire against
+        // these stubs. A review's likes live on the REVIEW, not on each
+        // photo: do NOT flip readOnly off or wire per-media engagement here,
+        // or every photo will read zeroed and any like will patch a stale delta.
+        likeCount: 0,
+        commentCount: 0,
+        shareCount: 0,
+        review: null,
+        isReview: false,
+        isLikedByMe: false,
+        isFollowedByMe: false,
+        courseName,
+        courseId,
+      }) as FeedPost),
+    [allMedia, user.id, user.username, user.name, user.avatar, courseName, courseId],
   );
 
 
@@ -660,10 +684,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               )}
 
               {/* MEDIA STRIP (§3c) — up to three thumbnails, 78 tall, r12.
-                  INTERACTIVE: each tile is a real button that opens
-                  MediaPreviewViewer (body-portaled, z 9999) at that index over
-                  this sheet, with the sheet left mounted so its scroll position
-                  survives the round trip. Video shows poster + glyph and never
+                  INTERACTIVE: each tile is a real button that opens the
+                  canonical fullscreen viewer (VIEWER_ABOVE_SHEETS_Z) at that
+                  index, expanding from the tile, with the sheet left mounted so
+                  its scroll position survives the round trip. Video shows poster + glyph and never
                   autoplays here. */}
               {mediaStrip.length > 0 && (
                 <div style={{ marginTop: 16 }}>
@@ -685,7 +709,15 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         key={m.id}
                         type="button"
                         aria-label={`Photo ${i + 1} of ${mediaTotal}`}
-                        onClick={() => setViewerIndex(i)}
+                        onClick={(e) => openWithOrigin({
+                          openedFrom: 'review-sheet',
+                          posts: reviewFullscreenPosts,
+                          index: i,
+                          originEl: e.currentTarget as HTMLElement,
+                          posterUrl: m.posterUrl ?? m.mediaUrl,
+                          readOnly: true,
+                          zIndex: VIEWER_ABOVE_SHEETS_Z,
+                        })}
                         style={{
                           flex: 1,
                           minWidth: 0,
@@ -795,17 +827,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             </div>
           </motion.div>
 
-          {/* Photo viewer — portals to <body> at z 9999, so it sits above this
-              sheet (REVIEW_SHEET_Z 240) on device, not just in preview. The
-              sheet is deliberately NOT closed: closing costs the scroll
-              position and was rejected on the Moments path. */}
-          {viewerIndex != null && viewerItems.length > 0 && (
-            <MediaPreviewViewer
-              items={viewerItems}
-              initialIndex={viewerIndex}
-              onClose={() => setViewerIndex(null)}
-            />
-          )}
           {commentsOpen && reviewId && (
             <CommentsSheetV2
               isOpen
