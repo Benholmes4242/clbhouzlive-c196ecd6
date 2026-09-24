@@ -10,6 +10,7 @@ import { useSessionAudio, getLastUnmuteGestureTs } from '@/audio/sessionAudioSto
 import { VideoEngine } from '@/video/VideoEngine';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { setLastCloseSnapshot } from '@/perf/positionContinuity';
+import { FS_OVERLAY_Z } from '@/lib/zLayers';
 
 /**
  * The fullscreen viewer paints media and nothing else. A post with an empty or
@@ -111,6 +112,29 @@ interface OpenOptions {
    *  opening slide takes the borrow branch (re-parents the live element)
    *  instead of loading the 'fullscreen' lane. */
   borrow?: BorrowDescriptor | null;
+  /** Stacking value for THIS open. Defaults to FS_OVERLAY_Z (feed/page opens).
+   *  A sheet that opens the viewer passes VIEWER_ABOVE_SHEETS_Z — ranking
+   *  follows who opened whom (see zLayers.ts). */
+  zIndex?: number;
+}
+
+/**
+ * One level of a nested open (viewer -> review sheet -> photo). Deliberately
+ * EXCLUDES `origin` and `borrow`: both describe a FLIP / video handoff that has
+ * already been consumed, and restoring them would animate from a tile that is
+ * no longer on screen.
+ */
+export interface FullscreenEntry {
+  posts: FeedPost[];
+  startIndex: number;
+  activeIndex: number;
+  readOnly: boolean;
+  openedFrom: string | null;
+  zIndex: number;
+  mediaIndex: number;
+  mediaId: string | null;
+  startPosition: number;
+  onCloseCallback: ((info?: CloseInfo) => void) | null;
 }
 
 
@@ -137,6 +161,11 @@ interface FullscreenFeedState {
   mediaId: string | null;
   openedFrom: string | null;
   borrow: BorrowDescriptor | null;
+  /** Stacking value of the current open; FS_OVERLAY_Z unless the opener passed one. */
+  zIndex: number;
+  /** Entries to return to on close (nested open). Typed as an array so a
+   *  second level cannot crash it; one is the expected depth. */
+  restoreStack: FullscreenEntry[];
   /** Stage-7 PR-3: one-shot flag set by the in-fullscreen media pager the
    *  first time the user swipes horizontally away from the opening media on
    *  the borrow slide. The overlay's dedicated effect consumes it and runs
@@ -211,6 +240,8 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   mediaIndex: 0,
   mediaId: null,
   openedFrom: null,
+  zIndex: FS_OVERLAY_Z,
+  restoreStack: [],
   borrow: null,
   borrowDemoteRequested: false,
   closeAnim: 'idle',
@@ -313,8 +344,29 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
         });
       } catch {}
     }
+    // NESTED OPEN: the viewer is already up (e.g. viewer -> review sheet ->
+    // photo). Snapshot the current entry so close() can RETURN to it instead
+    // of ending the viewer. Scroll lock / body class / status bar are keyed on
+    // isOpen, which stays true, so none of them re-fire.
+    const prev = get();
+    const restoreStack = prev.isOpen
+      ? [...prev.restoreStack, {
+          posts: prev.posts,
+          startIndex: prev.startIndex,
+          activeIndex: prev.activeIndex,
+          readOnly: prev.readOnly,
+          openedFrom: prev.openedFrom,
+          zIndex: prev.zIndex,
+          mediaIndex: prev.mediaIndex,
+          mediaId: prev.mediaId,
+          startPosition: prev.startPosition,
+          onCloseCallback: prev.onCloseCallback,
+        }]
+      : [];
     set({
       isOpen: true,
+      restoreStack,
+      zIndex: options?.zIndex ?? FS_OVERLAY_Z,
       posts,
       startIndex,
       activeIndex: startIndex,
@@ -338,6 +390,28 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
 
   },
   close: (info?: CloseInfo) => {
+    // RESTORE, not close: a nested open is returning to the entry beneath it.
+    // No close animation, no FLIP (origin/borrow are not restored), no
+    // callback — the outer entry is still open.
+    const stack = get().restoreStack;
+    if (stack.length > 0) {
+      const entry = stack[stack.length - 1];
+      try { VideoEngine.captureLastPos('fullscreen'); } catch {}
+      set({
+        ...entry,
+        restoreStack: stack.slice(0, -1),
+        origin: null,
+        borrow: null,
+        borrowDemoteRequested: false,
+        openCommentsInitially: false,
+        initialCommentId: null,
+        closeAnim: 'idle',
+        closeAnimDone: false,
+        activePagerIdx: entry.mediaIndex,
+        pausedOwnerKeys: new Set<string>(),
+      });
+      return;
+    }
     const cb = get().onCloseCallback;
     const borrow = get().borrow;
     // Close-transition fix: freeze lastPos to the element's true fs playback
@@ -463,6 +537,8 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       mediaId: null,
       openedFrom: null,
       borrow: null,
+      zIndex: FS_OVERLAY_Z,
+      restoreStack: [],
       borrowDemoteRequested: false,
       closeAnim: 'idle',
       closeAnimDone: false,
