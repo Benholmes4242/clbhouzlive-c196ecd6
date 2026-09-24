@@ -198,6 +198,16 @@ function buildMentionsStyle(text: MentionsTextStyle | undefined) {
     border: '0px solid transparent',
     boxSizing: 'border-box' as const,
     margin: 0,
+    /* TWO LAYERS, ONE TEXT LAYOUT. WebKit kerns block text and does not
+       kern inside form controls, so the painted <div> and the caret-owning
+       <textarea> disagree by a fraction of a pixel per character and the
+       caret drifts behind the glyphs along the line. Turning both OFF is
+       what makes them agree; turning both on is not available, because the
+       textarea will not honour it. */
+    fontKerning: 'none' as const,
+    fontVariantLigatures: 'none' as const,
+    fontFeatureSettings: '"kern" 0, "liga" 0, "clig" 0, "calt" 0',
+    fontVariant: 'normal' as const,
   };
   const maxH = text?.maxHeight;
   const minH = text?.minHeight;
