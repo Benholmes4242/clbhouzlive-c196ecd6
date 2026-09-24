@@ -4666,11 +4666,17 @@ em-emoji-picker input:focus {
  * reintroduce a colour in this file, with or without `!important`. */
 .mentions-composer__input,
 .mentions-composer textarea {
-  /* Structural only: the textarea must never paint its own glyphs, the
-     highlighter beneath it does. caret-color comes from the inline
-     style (textStyle.caretColor). */
-  color: transparent !important;
-  -webkit-text-fill-color: transparent !important;
+  /* THE TEXTAREA PAINTS ITS OWN GLYPHS (24 Sep 2026).
+     It used to be transparent, with the highlighter <div> beneath
+     painting the text — the library's default two-layer construction.
+     That put the caret in one element and the letters in another, and
+     the two disagree about trailing whitespace: the div hangs a trailing
+     space under pre-wrap, the textarea gives it advance. Measured on
+     device, typing a single space moved the caret 4 CSS px BACKWARDS,
+     onto the previous letter.
+     Do not make this transparent again, with or without !important. The
+     cost of this arrangement is that a mention is ink, not amber, while
+     it is being typed; that is deliberate. */
 }
 .mentions-composer__suggestions {
   width: 100% !important;
