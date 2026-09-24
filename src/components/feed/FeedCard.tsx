@@ -949,7 +949,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 label={commentCount > 0 ? formatCount(commentCount) : undefined}
                 onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
               />
-              <FooterButton icon={Share} onClick={() => onShare(post)} />
+              <FooterButton icon={Share} onClick={() => onShare(post)} ariaLabel="Send" />
               <div style={{ marginLeft: 'auto' }} />
               <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
             </div>
@@ -1031,10 +1031,12 @@ const FooterButton: React.FC<{
   active?: boolean;
   activeColor?: string;
   haptic?: 'none' | 'selection' | 'success' | 'warning';
-}> = ({ icon: Icon, label, onClick, active, activeColor, haptic = 'none' }) => (
+  ariaLabel?: string;
+}> = ({ icon: Icon, label, onClick, active, activeColor, haptic = 'none', ariaLabel }) => (
   <Pressable
     as="button"
     variant="icon"
+    aria-label={ariaLabel}
     haptic={haptic}
     onPress={(e) => {
       (e as React.MouseEvent).stopPropagation?.();

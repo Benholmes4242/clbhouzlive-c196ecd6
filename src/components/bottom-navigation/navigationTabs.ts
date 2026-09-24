@@ -18,6 +18,9 @@ import TrophyIcon from '@/components/icons/TrophyIcon';
 //                    standalone Watch hub stays dormant behind WATCH_SURFACE.
 //                    The id stays 'watch' on purpose - scroll-to-top logic and
 //                    analytics key off it.
+//   id 'post'      = the composer entry point (label "Share"). The composer
+//                    asks "What are you sharing?" and offers a review OR a
+//                    post, so the label names both; "Post" named only one.
 // Change labels/icons freely; do NOT rename IDs (scroll-to-top logic + analytics depend on them).
 // THE NAV ICON SET IS FILLED, NOT STROKED. Any new icon is a filled path matched
 // optically to the existing marks.
@@ -25,7 +28,7 @@ import TrophyIcon from '@/components/icons/TrophyIcon';
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
   { id: 'watch',     label: 'Explore',   icon: CompassRoseIcon, path: '/amateur' },
-  { id: 'post',      label: 'Post',      icon: PlusSquareIcon, path: null, isAction: true },
+  { id: 'post',      label: 'Share',     icon: PlusSquareIcon, path: null, isAction: true },
   { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
   { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
 

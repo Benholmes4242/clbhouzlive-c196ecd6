@@ -417,7 +417,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
           </ActionButton>
 
           {/* Share */}
-          <ActionButton onClick={onShare} ariaLabel="Share">
+          <ActionButton onClick={onShare} ariaLabel="Send">
             <Send size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
 

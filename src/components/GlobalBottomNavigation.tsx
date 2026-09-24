@@ -416,7 +416,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   const Icon = tab.icon;
                   const badgeCount = badges[tab.id] ?? 0;
 
-                  // Post is the app's ONE sanctioned amber control (create
+                  // The composer action is the app's ONE sanctioned amber control (create
                   // action). Every other tab — Tour included — is the ink/dim
                   // pair, except that Tour swaps ink/dim for the live green
                   // pair while play is genuinely in progress (state, not
