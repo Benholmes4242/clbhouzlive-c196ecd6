@@ -12,15 +12,12 @@
  * No corrected variable-denominator projection is attempted here — that is
  * new handicap maths and a separate decision.
  *
- * CHART RULES (from the brief, do not relax):
- * - Five bars, one per round, oldest first. No target line, no shaded band.
- * - A bar that beats the target is green (CHART.DOWN); every other bar is the
- *   neutral track tone. The target is stated in words, not drawn.
- * - The zero rule renders ONLY when at least one differential is negative.
- * - Every bar carries its value beneath it.
- *
- * The old STAYS / DOWN TO scale bar above the table is gone; the table's own
- * figures say the same thing without a second geometry.
+ * THE LADDER (approved mock B). Everything is stated as a GROSS SCORE at the
+ * course played most in the last 20 — never as a differential. Rungs:
+ * "{stays} or worse" (muted), the score to beat, a good day (the
+ * nextRoundScale midpoint), and the member's real best at this course (dropped
+ * when it doesn't beat the target). Scores use ceil-minus-one so the printed
+ * target strictly beats cutTarget; Math.round could print a tie.
  */
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -143,7 +140,7 @@ function buildLadder(
 
   const bestOfFive = last5.length ? Math.min(...last5) : null;
   const mid = nextRoundScale(current, cutTarget, bestOfFive)[1];
-  const good = mid ? beats(mid.shoot + 1e-9) : null;
+  const good = mid ? beats(mid.shoot) : null;
 
   const grossHere = window
     .filter((r) => r.course_id === course.id && typeof r.adjusted_gross === 'number')

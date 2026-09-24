@@ -267,6 +267,18 @@
       "leaderFallback": "seondu seonsu"
     },
     "nextRound": {
+      "ladderHeading": "각 스코어가 인덱스에 미치는 영향",
+      "courseLine": "가장 많이 치는 {{course}}에서.",
+      "rungStaysScore": "{{score}} 이상",
+      "rungStaysSub": "변화 없음",
+      "rungStaysKicker": "유지",
+      "rungTargetSub": "넘어야 할 스코어",
+      "rungGoodSub": "좋은 날",
+      "rungBestSub": "이곳 최고 기록",
+      "rungDown": "{{delta}} 하락",
+      "formLine": "최근 5라운드 중 <g>{{count}}</g>번 {{score}}보다 잘 쳤습니다.",
+      "formLineNone": "최근 5라운드 중 인덱스를 낮출 라운드는 없었습니다.",
+      "provenance": "최근 20라운드 기준입니다. 다음 라운드에서는 어떤 스코어를 쳐도 인덱스가 오르지 않습니다.",
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
       "sampleSentence": "최근 20라운드를 기준으로 합니다.",

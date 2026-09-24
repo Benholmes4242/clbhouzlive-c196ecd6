@@ -268,6 +268,18 @@
       "leaderFallback": "dem Spitzenreiter"
     },
     "nextRound": {
+      "ladderHeading": "Was jeder Score mit deinem Index macht",
+      "courseLine": "In {{course}}, wo du am meisten spielst.",
+      "rungStaysScore": "{{score}} oder schlechter",
+      "rungStaysSub": "Nichts passiert",
+      "rungStaysKicker": "bleibt",
+      "rungTargetSub": "Der Score, den du schlagen musst",
+      "rungGoodSub": "Ein guter Tag",
+      "rungBestSub": "Dein Bestwert hier",
+      "rungDown": "runter {{delta}}",
+      "formLine": "Du hast {{score}} in <g>{{count}}</g> deiner letzten fünf Runden geschlagen.",
+      "formLineNone": "Keine deiner letzten fünf Runden hätte ihn gesenkt.",
+      "provenance": "Basierend auf deinen letzten 20 Runden. Dein Index kann in der nächsten Runde nicht steigen, egal was du spielst.",
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
       "sampleSentence": "Basierend auf deinen letzten 20 Runden.",

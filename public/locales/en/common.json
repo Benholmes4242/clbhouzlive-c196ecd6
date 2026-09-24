@@ -507,6 +507,18 @@
       }
     },
     "nextRound": {
+      "ladderHeading": "What each score does to your index",
+      "courseLine": "At {{course}}, where you play most.",
+      "rungStaysScore": "{{score}} or worse",
+      "rungStaysSub": "Nothing happens",
+      "rungStaysKicker": "stays",
+      "rungTargetSub": "The score to beat",
+      "rungGoodSub": "A good day",
+      "rungBestSub": "Your best here",
+      "rungDown": "down {{delta}}",
+      "formLine": "You beat {{score}} in <g>{{count}}</g> of your last five rounds.",
+      "formLineNone": "None of your last five would have brought it down.",
+      "provenance": "Based on your last 20 rounds. Your index cannot go up next round whatever you shoot.",
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
       "sampleSentence": "Based on your last 20 rounds.",
