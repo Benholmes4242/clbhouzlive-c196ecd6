@@ -78,7 +78,7 @@ describe('Explore round-card who-line engagement', () => {
     const view = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement({ liked: true, likeCount: 4 })} />);
     const control = view.getByRole('button', { name: 'Celebrated' });
     expect(control.style.color).toBe('rgb(247, 147, 30)');
-    expect(control.querySelector('svg')?.getAttribute('fill')).toBe(A.AMBER);
+    expect(control.querySelector('svg g')?.getAttribute('fill')).toBe('currentColor');
     expect(control.style.color).not.toMatch(/255,?\s*107,?\s*96/i);
   });
 
