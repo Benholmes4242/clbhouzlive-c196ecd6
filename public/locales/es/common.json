@@ -480,7 +480,7 @@
       "heading": "Records to break",
       "headingFriend": "{{name}}'s records to break",
       "bestDiff": "Best differential",
-      "bestGross": "Best gross",
+      "bestGross": "Resultado más bajo",
       "bestStableford": "Best stableford",
       "bestVsHcp": "Mejor frente a tu hándicap",
       "trophyRoom": "Trophy room",
@@ -488,13 +488,12 @@
       "missingAll": "Your records appear here once you've posted a round.",
       "lower": {
         "diff": "best differential",
-        "gross": "best gross",
+        "gross": "resultado más bajo",
         "stableford": "best stableford",
         "vsHcp": "best against handicap",
-        "round": "mejor vuelta"
+        "vsCourse": "mejor vuelta frente al campo"
       },
       "stillToSet": "Still to set: {{list}}.",
-      "bestRound": "Mejor vuelta",
       "sameRound": "La misma vuelta",
       "playedOff": "con {{index}}",
       "beatRound": "Supéralo con un {{score}} en {{course}}",
@@ -504,7 +503,10 @@
       "stoodWeeksOther": "vigente desde hace {{count}} semanas",
       "stoodMonthsOne": "vigente desde hace 1 mes",
       "stoodMonthsOther": "vigente desde hace {{count}} meses",
-      "stoodYears": "vigente desde hace {{years}} a {{months}} m"
+      "stoodYears": "vigente desde hace {{years}} a {{months}} m",
+      "bestVsCourse": "Mejor vuelta frente al campo",
+      "beatGross": "Supéralo con un {{score}}",
+      "vsRating": "{{shots}} por debajo del rating {{rating}}, slope {{slope}}"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",

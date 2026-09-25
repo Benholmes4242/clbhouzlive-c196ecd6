@@ -46,7 +46,7 @@ const FIG: React.CSSProperties = {
 };
 
 /** The handicap-native records, in their fixed order. */
-const ORDER = ['diff', 'stableford', 'vsHcp'] as const;
+const ORDER = ['gross', 'stableford', 'diff', 'vsHcp'] as const;
 type RecordKey = (typeof ORDER)[number];
 
 interface Row {
@@ -58,6 +58,8 @@ interface Row {
   date: string | null;
   stood: string | null;
   figure: string;
+  /** Optional explanatory line (best-vs-course: why a higher gross ranks). */
+  context?: string | null;
   /** Beat line; muted = the honest two-part line with no green rule. */
   beat: { text: string; muted: boolean } | null;
 }
@@ -133,7 +135,22 @@ export const PersonalBestsSection: React.FC<Props> = ({
     const eighteen = list.filter(isEighteen);
     const diffList = list.filter(isReasonableDiff).filter((s) => typeof s.adjusted_gross === 'number');
 
-    // BEST ROUND: still ranked on the lowest DIFFERENTIAL; only what is printed
+    // LOWEST SCORE: eighteen-hole rounds only — a nine-hole 43 would win by construction.
+    const grossList = eighteen.filter(isReasonableGross).filter((s) => typeof s.adjusted_gross === 'number');
+    if (grossList.length) {
+      const best = grossList.reduce((a, b) => ((a.adjusted_gross as number) <= (b.adjusted_gross as number) ? a : b));
+      out.push({
+        key: 'gross',
+        name: t('common:handicap.bests.bestGross'),
+        figure: String(best.adjusted_gross),
+        beat: isOwner
+          ? { text: t('common:handicap.bests.beatGross', { score: (best.adjusted_gross as number) - 1 }), muted: false }
+          : null,
+        ...base(best),
+      });
+    }
+
+    // BEST ROUND AGAINST THE COURSE: still ranked on the lowest DIFFERENTIAL; only what is printed
     // changes — the round's own adjusted gross. Known ambiguity: this is not
     // necessarily the lowest gross ever (an easy-course 66 can lose on the
     // differential). That is correct ranking; do not switch it to gross.
@@ -152,8 +169,18 @@ export const PersonalBestsSection: React.FC<Props> = ({
       }
       out.push({
         key: 'diff',
-        name: t('common:handicap.bests.bestRound'),
+        name: t('common:handicap.bests.bestVsCourse'),
+        // THE FIGURE IS THE GROSS, and may read higher than Lowest score.
+        // The context line explains it; do not reorder or print the differential.
         figure: String(best.adjusted_gross),
+        context:
+          best.course_rating != null && best.slope_rating
+            ? t('common:handicap.bests.vsRating', {
+                shots: (best.course_rating - (best.adjusted_gross as number)).toFixed(1),
+                rating: best.course_rating.toFixed(1),
+                slope: best.slope_rating,
+              })
+            : null,
         beat,
         ...base(best),
       });
@@ -229,7 +256,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
      two can never disagree. No instruction on how to set a record: the section
      is called Records to break. */
   const missingNames = ORDER.filter((k) => !rows.some((r) => r.key === k)).map((k) =>
-    t(`common:handicap.bests.lower.${k === 'diff' ? 'round' : k}`),
+    t(`common:handicap.bests.lower.${k === 'diff' ? 'vsCourse' : k}`),
   );
 
   const fired = useRef(false);
@@ -286,6 +313,9 @@ export const PersonalBestsSection: React.FC<Props> = ({
               <div style={{ marginTop: 4, fontSize: 12, color: CHART.MUTE, lineHeight: 1.4, overflowWrap: 'anywhere' }}>
                 {sub}
               </div>
+            )}
+            {r.context && (
+              <div style={{ marginTop: 2, fontSize: 12, color: CHART.MUTE, lineHeight: 1.4 }}>{r.context}</div>
             )}
             {r.beat && (
               <div style={{ marginTop: 8, display: 'flex', alignItems: 'stretch', gap: 8 }}>

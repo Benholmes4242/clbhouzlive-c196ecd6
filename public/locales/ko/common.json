@@ -479,7 +479,7 @@
       "heading": "Records to break",
       "headingFriend": "{{name}}'s records to break",
       "bestDiff": "Best differential",
-      "bestGross": "Best gross",
+      "bestGross": "최저 타수",
       "bestStableford": "Best stableford",
       "bestVsHcp": "내 핸디캡 대비 베스트",
       "trophyRoom": "Trophy room",
@@ -487,13 +487,12 @@
       "missingAll": "Your records appear here once you've posted a round.",
       "lower": {
         "diff": "best differential",
-        "gross": "best gross",
+        "gross": "최저 타수",
         "stableford": "best stableford",
         "vsHcp": "best against handicap",
-        "round": "베스트 라운드"
+        "vsCourse": "코스 대비 베스트 라운드"
       },
       "stillToSet": "Still to set: {{list}}.",
-      "bestRound": "베스트 라운드",
       "sameRound": "같은 라운드",
       "playedOff": "핸디 {{index}}",
       "beatRound": "{{course}}에서 {{score}}타면 경신",
@@ -503,7 +502,10 @@
       "stoodWeeksOther": "{{count}}주 유지",
       "stoodMonthsOne": "1개월 유지",
       "stoodMonthsOther": "{{count}}개월 유지",
-      "stoodYears": "{{years}}년 {{months}}개월 유지"
+      "stoodYears": "{{years}}년 {{months}}개월 유지",
+      "bestVsCourse": "코스 대비 베스트 라운드",
+      "beatGross": "{{score}}타면 경신",
+      "vsRating": "코스 레이팅 {{rating}}보다 {{shots}}타 적음, 슬로프 {{slope}}"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",

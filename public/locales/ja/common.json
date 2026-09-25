@@ -479,7 +479,7 @@
       "heading": "Records to break",
       "headingFriend": "{{name}}'s records to break",
       "bestDiff": "Best differential",
-      "bestGross": "Best gross",
+      "bestGross": "最少スコア",
       "bestStableford": "Best stableford",
       "bestVsHcp": "あなたのハンディキャップ比ベスト",
       "trophyRoom": "Trophy room",
@@ -487,13 +487,12 @@
       "missingAll": "Your records appear here once you've posted a round.",
       "lower": {
         "diff": "best differential",
-        "gross": "best gross",
+        "gross": "最少スコア",
         "stableford": "best stableford",
         "vsHcp": "best against handicap",
-        "round": "ベストラウンド"
+        "vsCourse": "コース比ベストラウンド"
       },
       "stillToSet": "Still to set: {{list}}.",
-      "bestRound": "ベストラウンド",
       "sameRound": "同じラウンド",
       "playedOff": "HC {{index}}",
       "beatRound": "{{course}}で{{score}}を出せば更新",
@@ -503,7 +502,10 @@
       "stoodWeeksOther": "{{count}}週間保持",
       "stoodMonthsOne": "1か月保持",
       "stoodMonthsOther": "{{count}}か月保持",
-      "stoodYears": "{{years}}年{{months}}か月保持"
+      "stoodYears": "{{years}}年{{months}}か月保持",
+      "bestVsCourse": "コース比ベストラウンド",
+      "beatGross": "{{score}}を出せば更新",
+      "vsRating": "コースレート{{rating}}より{{shots}}打少ない・スロープ{{slope}}"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",
