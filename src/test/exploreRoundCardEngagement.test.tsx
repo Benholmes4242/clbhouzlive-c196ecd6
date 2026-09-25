@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ExploreCard, type RoundCardEngagement } from '@/features/explore-magazine/ExploreCard';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
+import { CELEBRATE_GLYPH_SIZE } from '@/lib/reactionKind';
 import { playDateFull } from '@/features/explore-magazine/exploreCopy';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
@@ -74,11 +75,18 @@ describe('Explore round-card who-line engagement', () => {
     expect(neither.container.querySelector('[data-round-reactions]')).toBeNull();
   });
 
-  it('uses amber for the liked icon and count, never the under-par red', () => {
+  /* BRIEF_CELEBRATE_GLYPH_AND_NAMES_LINE: a ROUND is celebrated with the
+     clap (Phosphor hands-clapping fill, one path), not the Heart. State is
+     carried by colour, so the path stays currentColor. */
+  it('uses amber for the celebrated clap and count, never the under-par red', () => {
     const view = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement({ liked: true, likeCount: 4 })} />);
     const control = view.getByRole('button', { name: 'Celebrated' });
     expect(control.style.color).toBe('rgb(247, 147, 30)');
-    expect(control.querySelector('svg g')?.getAttribute('fill')).toBe('currentColor');
+    const svg = control.querySelector('svg');
+    expect(svg?.getAttribute('viewBox')).toBe('0 0 256 256');
+    expect(svg?.classList.contains('lucide-heart')).toBe(false);
+    expect(svg?.querySelectorAll('path')).toHaveLength(1);
+    expect(svg?.querySelector('path')?.getAttribute('fill')).toBe('currentColor');
     expect(control.style.color).not.toMatch(/255,?\s*107,?\s*96/i);
   });
 
@@ -97,12 +105,27 @@ describe('Explore round-card who-line engagement', () => {
     expect(cardTap).not.toHaveBeenCalled();
   });
 
-  it('hides zero numerals and keeps 40 by 32 tap targets', () => {
+  /* BRIEF_CELEBRATE_ROW_CONSISTENCY §1: clap and comment share one 44x44
+     footprint and both glyphs read CELEBRATE_GLYPH_SIZE — asserted against
+     the imported constant, never a typed number. */
+  it('hides zero numerals and keeps 44 by 44 tap targets on both controls', () => {
     const view = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement()} />);
     const like = view.getByRole('button', { name: 'Celebrate this round' });
+    const comment = view.getByRole('button', { name: 'Comments, 0' });
     expect(like.textContent).toBe('');
-    expect(like.style.minWidth).toBe('40px');
-    expect(like.style.height).toBe('32px');
+    for (const control of [like, comment]) {
+      expect(control.style.minWidth).toBe('44px');
+      expect(control.style.height).toBe('44px');
+      expect(control.querySelector('svg')?.getAttribute('width')).toBe(String(CELEBRATE_GLYPH_SIZE));
+    }
+  });
+
+  /* The dense pair variant keeps its own 14 and is NOT tied to the constant. */
+  it('keeps the pair glyphs at their own dense size', () => {
+    const view = render(<ExploreCard item={item} size="pair" onTap={vi.fn()} engagement={engagement({ likeCount: 3, commentCount: 2 })} />);
+    const svgs = view.container.querySelectorAll('[data-round-reactions="counts"] svg');
+    expect(svgs.length).toBe(2);
+    svgs.forEach((svg) => expect(svg.getAttribute('width')).toBe('14'));
   });
 
   it('shows non-interactive nonzero counts on a pair and hides zeros', () => {
