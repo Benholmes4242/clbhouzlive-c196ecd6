@@ -28,6 +28,7 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'Namibia', 'Niger', 'Nigeria', 'Rwanda',
     'Sao Tome and Principe', 'Senegal', 'Seychelles', 'Sierra Leone',
     'Somalia', 'South Africa', 'South Sudan', 'Sudan',
+    'Ivory Coast', 'Mayotte', 'Saint Helena, Ascension, Tristan Dukana', 'Swaziland',
     'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe',
   ],
   'Asia': [
@@ -71,6 +72,7 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia', 'Norway',
     'Poland', 'Portugal', 'Romania', 'Russia', 'San Marino',
     'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
+    'Faroe Islands', 'Greenland',
     /* Filed as Continental Europe throughout golf_courses (Turkey 21,
        Cyprus 6). Transcontinental, and golf sells Belek and Paphos beside
        Spain and Portugal. Deliberately NOT also in Asia: two homes let one
@@ -89,6 +91,8 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'St Vincent and the Grenadines',
     'Trinidad and Tobago', 'USA',
     'Virgin Islands',
+    'Anguilla', 'Aruba', 'Cayman Islands', 'Guadeloupe', 'Martinique',
+    'Montserrat', 'St Martin', 'Turks and Caicos Islands',
   ],
   'Oceania': [
     // Legacy label
@@ -98,6 +102,8 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'Micronesia', 'Nauru', 'New Zealand', 'Palau',
     'Papua New Guinea', 'Samoa', 'Solomon Islands',
     'Tonga', 'Tuvalu', 'Vanuatu',
+    'Cook Islands', 'French Polynesia', 'Guam', 'New Caledonia',
+    'Norfolk Island', 'Northern Mariana Islands',
   ],
   'South America': [
     // Legacy label
@@ -106,6 +112,7 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'Argentina', 'Bolivia', 'Brazil', 'Chile', 'Colombia',
     'Ecuador', 'Guyana', 'Paraguay', 'Peru', 'Suriname',
     'Uruguay', 'Venezuela',
+    'Falkland Islands', 'French Guiana',
   ],
 };
 
