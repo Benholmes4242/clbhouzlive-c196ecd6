@@ -36,6 +36,10 @@ export function PersonalBestsShelf({
   const query = usePersonalBests(viewerId);
   const opener = useScorecardOpener();
   const rows = useMemo(() => personalBestTiles(query.data ?? []), [query.data]);
+  /* RESERVE ONLY WHEN SOME TILE ACTUALLY HAS ONE. If no row in this shelf
+     carries a reference line, reserving it would add a dead row to every
+     card. Do not simplify this to a constant true. */
+  const anySubline = rows.some((r) => !!r.reference_line);
   const courseIds = useMemo(
     () => rows.map((row) => row.course_id).filter((id): id is string => !!id),
     [rows],
@@ -88,6 +92,7 @@ export function PersonalBestsShelf({
                 detail={row.headline ?? ''}
                 subline={row.reference_line}
                 reserveTwoLines
+                reserveSubline={anySubline}
                 onPress={() => {
                   analyticsEvents.track('amateur_shelf_tile_tapped', {
                     kind: 'personal_bests',
