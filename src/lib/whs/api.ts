@@ -157,7 +157,6 @@ const SCORE_SELECT = `
 type WhsRoundStatsRef = { course_par: number | null };
 
 type RawScoreRow = Omit<WhsScore, 'course_par'> & {
-  handicap_index_at_time: number | null;
   course_par?: number | null;
   round_stats?: WhsRoundStatsRef | WhsRoundStatsRef[] | null;
 };

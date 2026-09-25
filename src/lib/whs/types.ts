@@ -45,12 +45,14 @@ export interface WhsScore {
   /** WHS-side course id. NOT a golf_courses id - bridge via whs_to_golf_course_map. */
   course_id: string | null;
   course: WhsCourseRef | null;
+  /** The index this round was played off, as the provider recorded it.
+   *  Already selected by SCORE_SELECT and returned by normalizeScoreRow;
+   *  it was declared only on WhsLastRound, so consumers could not see it. */
+  handicap_index_at_time: number | null;
 }
 
 export interface WhsLastRound extends WhsScore {
   course_thumbnail_image: string | null;
-  /** Handicap index after this round was applied. */
-  handicap_index_at_time: number | null;
   /**
    * Difference between this round's index and the previous round's index.
    * Negative = handicap dropped (improvement). Positive = went up.
