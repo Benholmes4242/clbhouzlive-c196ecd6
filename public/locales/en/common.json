@@ -792,7 +792,7 @@
       "bestDiff": "Best differential",
       "bestGross": "Best gross",
       "bestStableford": "Best stableford",
-      "bestVsHcp": "Best against handicap",
+      "bestVsHcp": "Best against your handicap",
       "trophyRoom": "Trophy room",
       "missing": "{{count}} more appear once you've posted a stableford and a round off your handicap.",
       "missingAll": "Your records appear here once you've posted a round.",
@@ -800,9 +800,21 @@
         "diff": "best differential",
         "gross": "best gross",
         "stableford": "best stableford",
-        "vsHcp": "best against handicap"
+        "vsHcp": "best against handicap",
+        "round": "best round"
       },
-      "stillToSet": "Still to set: {{list}}."
+      "stillToSet": "Still to set: {{list}}.",
+      "bestRound": "Best round",
+      "sameRound": "Same round",
+      "playedOff": "off {{index}}",
+      "beatRound": "Beat it with a {{score}} at {{course}}",
+      "beatStableford": "Beat it with {{points}} points",
+      "beatVsHcp": "You played off {{then}} that day. Off {{now}} it would take a {{score}} at {{course}}.",
+      "stoodWeeksOne": "stood 1 week",
+      "stoodWeeksOther": "stood {{count}} weeks",
+      "stoodMonthsOne": "stood 1 month",
+      "stoodMonthsOther": "stood {{count}} months",
+      "stoodYears": "stood {{years}} yr {{months}} mo"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",
