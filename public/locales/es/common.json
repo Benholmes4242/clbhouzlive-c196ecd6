@@ -506,7 +506,11 @@
       "stoodYears": "vigente desde hace {{years}} a {{months}} m",
       "bestVsCourse": "Mejor vuelta frente al campo",
       "beatGross": "Supéralo con un {{score}}",
-      "vsRating": "{{shots}} por debajo del rating {{rating}}, slope {{slope}}"
+      "vsRating": "{{shots}} por debajo del rating {{rating}}, slope {{slope}}",
+      "trophyRoomTitle": "Todo lo que tienes",
+      "crownsHeld": "Coronas en tu poder",
+      "trophyRoomA11y": "Sala de trofeos, {{count}} coronas en tu poder",
+      "trophyRoomA11yBare": "Sala de trofeos"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",

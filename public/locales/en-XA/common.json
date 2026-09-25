@@ -812,7 +812,11 @@
       "stoodYears": "[~~stood {{years}} yr {{months}} mo~~]",
       "bestVsCourse": "[~~Best round against the course~~]",
       "beatGross": "[~~Beat it with a {{score}}~~]",
-      "vsRating": "[~~{{shots}} under the {{rating}} rating, slope {{slope}}~~]"
+      "vsRating": "[~~{{shots}} under the {{rating}} rating, slope {{slope}}~~]",
+      "trophyRoomTitle": "[~~Ëṽéřýţĥíñğ ýőű ĥőľđ~~]",
+      "crownsHeld": "[~~Çřőŵñš ĥéľđ~~]",
+      "trophyRoomA11y": "[~~Ţřőƥĥý řőőɱ, {{count}} ċřőŵñš ĥéľđ~~]",
+      "trophyRoomA11yBare": "[~~Ţřőƥĥý řőőɱ~~]"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",

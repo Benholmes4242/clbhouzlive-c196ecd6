@@ -506,7 +506,11 @@
       "stoodYears": "steht seit {{years}} J. {{months}} Mon.",
       "bestVsCourse": "Beste Runde gegen den Platz",
       "beatGross": "Schlag das mit einer {{score}}",
-      "vsRating": "{{shots}} unter dem Course Rating {{rating}}, Slope {{slope}}"
+      "vsRating": "{{shots}} unter dem Course Rating {{rating}}, Slope {{slope}}",
+      "trophyRoomTitle": "Alles, was du hältst",
+      "crownsHeld": "Gehaltene Kronen",
+      "trophyRoomA11y": "Trophäenraum, {{count}} Kronen gehalten",
+      "trophyRoomA11yBare": "Trophäenraum"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",

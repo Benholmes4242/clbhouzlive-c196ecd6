@@ -505,7 +505,11 @@
       "stoodYears": "{{years}}년 {{months}}개월 유지",
       "bestVsCourse": "코스 대비 베스트 라운드",
       "beatGross": "{{score}}타면 경신",
-      "vsRating": "코스 레이팅 {{rating}}보다 {{shots}}타 적음, 슬로프 {{slope}}"
+      "vsRating": "코스 레이팅 {{rating}}보다 {{shots}}타 적음, 슬로프 {{slope}}",
+      "trophyRoomTitle": "당신이 가진 모든 것",
+      "crownsHeld": "보유 중인 크라운",
+      "trophyRoomA11y": "트로피 룸, 보유 크라운 {{count}}개",
+      "trophyRoomA11yBare": "트로피 룸"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",
