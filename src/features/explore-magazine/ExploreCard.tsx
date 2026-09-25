@@ -8,6 +8,7 @@ import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MessageCircle } from 'lucide-react';
 import { LikedByRow } from '@/components/likes/LikedByRow';
+import { CALLOUT_SUBTEXT } from './AchievementCallout';
 import ClapIcon from '@/components/icons/ClapIcon';
 import { CELEBRATE_GLYPH_SIZE, celebrateFigureSize } from '@/lib/reactionKind';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
@@ -519,6 +520,9 @@ function WhoLine({
             ownerName={engagement.ownerName ?? null}
             isOwnRound={engagement.isOwnRound ?? false}
             style={{ marginTop: 8 }}
+            /* Matched to AchievementCallout's subtext line (CALLOUT_SUBTEXT). */
+            fontSize={CALLOUT_SUBTEXT.fontSize}
+            fontWeight={CALLOUT_SUBTEXT.fontWeight}
           />
         ) : null}
       </div>
