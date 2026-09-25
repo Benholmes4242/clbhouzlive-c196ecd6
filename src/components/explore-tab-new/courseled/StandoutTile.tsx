@@ -72,6 +72,13 @@ interface Props {
    */
   reserveTwoLines?: boolean;
   /**
+   * Reserve the reference-line row even when this tile has none, so every
+   * tile in a rail is one height. OPT-IN: Standout Rounds and the club and
+   * standing shelves must not gain a dead row. Same discipline as
+   * CircleShelf reserving its HCP row when privacy leaves it empty.
+   */
+  reserveSubline?: boolean;
+  /**
    * STANDING SHELF ONLY: the name is always the one word "You" and the fact
    * line is the one-line "Last change …" — neither can wrap, so reserving two
    * lines of each leaves the caption visibly taller than the club rail's.
@@ -160,6 +167,7 @@ export function StandoutTile({
   subline = null,
   trailing,
   reserveTwoLines = false,
+  reserveSubline = false,
   nameLines = 2,
   factLines = 2,
   railCaptionLine,
@@ -643,23 +651,26 @@ export function StandoutTile({
               )}
 
               {/* THE REFERENCE LINE (§3.5) — only when it did not already carry
-                  the reaction above. Never a placeholder when absent. */}
+                  the reaction above. No placeholder when absent, UNLESS the
+                  rail opted in with reserveSubline (equal tile heights). */}
               {subline && !factIsSubline ? (
                 <div
                   style={{
-                    fontSize: 11,
+                    fontSize: SUBLINE_FS,
                     fontWeight: 600,
-                    lineHeight: 1.3,
+                    lineHeight: SUBLINE_LH,
                     color: A.MUTE,
                     marginTop: 3,
                     display: '-webkit-box',
-                    WebkitLineClamp: 2,
+                    WebkitLineClamp: reserveSubline ? 1 : 2,
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
                   }}
                 >
                   {subline}
                 </div>
+              ) : reserveSubline ? (
+                <div aria-hidden style={{ height: SUBLINE_RESERVE, marginTop: 3 }} />
               ) : null}
             </>
           );
