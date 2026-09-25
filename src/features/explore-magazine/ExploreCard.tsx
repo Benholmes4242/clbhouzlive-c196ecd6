@@ -6,7 +6,8 @@ import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Heart, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
+import ClapIcon from '@/components/icons/ClapIcon';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { ReviewVideoLayer } from './ReviewVideoLayer';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
@@ -426,16 +427,16 @@ function WhoLine({
     >
       {engagement?.likeAvailable && (!pair || showPairLike) ? (
         pair ? (
-          <span aria-label={`Like, ${engagement.likeCount} likes`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: engagement.liked ? A.AMBER : subColor }}>
-            <Heart size={14} strokeWidth={2} fill={engagement.liked ? A.AMBER : 'none'} aria-hidden />
+          <span aria-label={engagement.liked ? t('discover.reactions.celebrated', 'Celebrated') : t('discover.reactions.action', 'Celebrate this round')} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: engagement.liked ? A.AMBER : subColor }}>
+            <ClapIcon size={14} aria-hidden />
             <span style={countStyle}>{engagement.likeCount}</span>
           </span>
         ) : (
-          <span role="button" tabIndex={0} aria-pressed={engagement.liked} aria-label={`Like, ${engagement.likeCount} likes`}
+          <span role="button" tabIndex={0} aria-pressed={engagement.liked} aria-label={engagement.liked ? t('discover.reactions.celebrated', 'Celebrated') : t('discover.reactions.action', 'Celebrate this round')}
             onClick={(event) => { stop(event); engagement.onToggleLike?.(); }}
             onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); engagement.onToggleLike?.(); }}
             style={{ minWidth: 40, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? A.AMBER : subColor, cursor: 'pointer' }}>
-            <Heart size={18} strokeWidth={2} fill={engagement.liked ? A.AMBER : 'none'} aria-hidden />
+            <ClapIcon size={18} aria-hidden />
             {engagement.likeCount > 0 ? <span style={countStyle}>{engagement.likeCount}</span> : null}
           </span>
         )

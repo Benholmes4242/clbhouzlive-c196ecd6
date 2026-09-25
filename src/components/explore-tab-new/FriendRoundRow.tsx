@@ -262,6 +262,7 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight, shape = 
               readOnly={reaction.readOnly}
               onToggle={reaction.onToggle}
               label={reaction.label}
+              kind="celebrate"
             />
           </ReactionSlot>
         )}
