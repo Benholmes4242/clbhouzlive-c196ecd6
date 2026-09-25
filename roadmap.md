@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## Explore clap weight and scroll-to-top
+- [x] Match the shared clap icon's optical weight to the message icon.
+- [x] Reuse the Courses scroll-to-top control across every Explore view.
+- [x] Verify the scrolled phone view, interaction, focused checks, and clean preview build.
+
 - [x] Refactor lead review copy into identity, two-line quote, and optional breakdown rail
 - [x] Move review photo count into the top-right glass chip
 - [x] Remove only the five verified orphan locale keys across six locales
