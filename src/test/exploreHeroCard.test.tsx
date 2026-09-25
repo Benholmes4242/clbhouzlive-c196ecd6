@@ -135,6 +135,13 @@ describe('Explore card shapes', () => {
     expect(noAge?.querySelector('[data-explore-story-age="true"]')).toBeNull();
     expect(noAge?.getAttribute('style')).toBe(meta?.getAttribute('style'));
     noAgeView.unmount();
+    /* Restore brief §3 — the other half of the StreamFacts contract: a NULL
+       standfirst renders no element in that slot, not an empty one. */
+    const noSf = render(
+      <ExploreCard item={{ ...story(), facts: { ...story().facts, standfirst: null } }} size="lead" shape={null} onTap={() => undefined} />,
+    );
+    expect(noSf.container.querySelector('[data-explore-story-standfirst]')).toBeNull();
+    noSf.unmount();
     expect(getByText('A championship story')).toBeInTheDocument();
     expect(getByText('The supporting detail follows beneath the title.')).toBeInTheDocument();
     expect(queryByText('A member')).toBeNull();
