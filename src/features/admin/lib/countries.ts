@@ -44,7 +44,8 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'Palestine', 'Philippines', 'Qatar', 'Saudi Arabia',
     'Singapore', 'South Korea', 'Sri Lanka', 'Syria',
     'Taiwan', 'Tajikistan', 'Thailand', 'Timor-Leste',
-    /* Turkey and Cyprus removed from Asia: Filed as Continental Europe throughout golf_courses (Turkey 21,
+    /* Turkey and Cyprus removed from Asia. Filed as Continental Europe
+       throughout golf_courses (Turkey 21,
        Cyprus 6). Transcontinental, and golf sells Belek and Paphos beside
        Spain and Portugal. Deliberately NOT also in Asia: two homes let one
        country be filed two ways. */
@@ -58,22 +59,23 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland',
     // Countries
     'Albania', 'Andorra', 'Austria', 'Belarus', 'Belgium',
-    'Bosnia and Herzegovina', 'Bulgaria',     /* Filed as Continental Europe throughout golf_courses (Turkey 21,
+    'Bosnia and Herzegovina', 'Bulgaria', 'Croatia',
+    /* Filed as Continental Europe throughout golf_courses (Turkey 21,
        Cyprus 6). Transcontinental, and golf sells Belek and Paphos beside
        Spain and Portugal. Deliberately NOT also in Asia: two homes let one
        country be filed two ways. */
-    'Croatia', 'Cyprus', 'Czech Republic',
+    'Cyprus', 'Czech Republic',
     'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece',
     'Hungary', 'Iceland', 'Italy', 'Kosovo', 'Latvia',
     'Liechtenstein', 'Lithuania', 'Luxembourg', 'Malta', 'Moldova',
     'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia', 'Norway',
     'Poland', 'Portugal', 'Romania', 'Russia', 'San Marino',
-    'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden',
-        /* Filed as Continental Europe throughout golf_courses (Turkey 21,
+    'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
+    /* Filed as Continental Europe throughout golf_courses (Turkey 21,
        Cyprus 6). Transcontinental, and golf sells Belek and Paphos beside
        Spain and Portugal. Deliberately NOT also in Asia: two homes let one
        country be filed two ways. */
-    'Switzerland', 'Turkey', 'Ukraine', 'United Kingdom',
+    'Turkey', 'Ukraine', 'United Kingdom',
   ],
   'North America': [
     // Legacy labels
