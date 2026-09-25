@@ -54,18 +54,19 @@ export const ROW_CONTINENT_COUNTRY: Record<RowContinent, string> = {
   'North America': 'Caribbean',
 };
 
-/**
- * Caribbean island nations already present in the catalogue (122 ROW /
- * North America rows). Spellings match the stored data exactly - note
- * 'Curacao' (no cedilla) and the unqualified 'Virgin Islands'.
- */
+/* EVERY NAME HERE MUST ALSO BE IN CONTINENT_COUNTRIES['North America'],
+   SPELLED IDENTICALLY. This set decides only the country LABEL; that list
+   decides what can be picked. A name in one and not the other is either an
+   island nobody can choose or one that files as 'Rest of World' while its
+   neighbours file as 'Caribbean'. Verified against golf_courses: change
+   both or neither. The test in §5 enforces it. */
 export const CARIBBEAN_NATIONS = new Set<string>([
   'Anguilla', 'Antigua and Barbuda', 'Aruba', 'Bahamas', 'Barbados',
-  'Cayman Islands', 'Cuba', 'Curacao', 'Dominica', 'Dominican Republic',
+  'Cayman Islands', 'Cuba', 'Curaçao', 'Dominica', 'Dominican Republic',
   'Grenada', 'Guadeloupe', 'Haiti', 'Jamaica', 'Martinique', 'Montserrat',
   'Puerto Rico', 'St Kitts and Nevis', 'St Lucia', 'St Martin',
   'St Vincent and the Grenadines', 'Trinidad and Tobago',
-  'Turks and Caicos', 'Virgin Islands',
+  'Turks and Caicos Islands', 'Virgin Islands',
 ]);
 
 export interface GroupingOption {
