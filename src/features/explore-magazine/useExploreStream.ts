@@ -117,9 +117,11 @@ function roundPayload(row: StreamRow): CircleRoundRow | undefined {
     net: f.net ?? null,
     hcp_delta: null,
     hcp_at_time: f.hcp_at_time ?? null,
-    /* Server stream cards do not disclose the Circle rail's current-index pair.
-       These explicit closed defaults preserve their existing rendering. */
-    current_handicap_index: null,
+    /* The index pair arrives server-gated (can_view_handicap, incl. friends-only).
+       handicap_visibility / eg_visible / has_active_whs_connection stay CLOSED:
+       the server already consumed them and the client must not re-decide with
+       fields it does not have. */
+    current_handicap_index: f.current_handicap_index ?? null,
     handicap_visibility: null,
     eg_visible: false,
     has_active_whs_connection: false,
@@ -141,7 +143,7 @@ function roundPayload(row: StreamRow): CircleRoundRow | undefined {
     is_first_sub_80: false,
     suggested: false,
     is_self: !!row.who?.is_viewer,
-    delta_index: null,
+    delta_index: f.delta_index ?? null,
     stableford_points: f.stableford ?? null,
   };
 }

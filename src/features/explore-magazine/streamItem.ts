@@ -108,6 +108,11 @@ export interface StreamFacts {
   course_par?: number | null;
   to_par?: number | null;
   net?: number | null;
+  /** THE INDEX PAIR. Viewer-gated in the RPC beside net: a player whose
+   *  handicap this viewer may not see carries neither. Absent means NOT
+   *  DISCLOSED — never zero, never "no movement". */
+  current_handicap_index?: number | null;
+  delta_index?: number | null;
   stableford?: number | null;
   score_id?: string | null;
   connection_id?: string | null;

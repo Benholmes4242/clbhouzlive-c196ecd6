@@ -15,6 +15,9 @@ export interface CircleHandicapDisplay {
 }
 
 /**
+ * THE CIRCLE RAIL'S OWN GATE. Unchanged behaviour: it holds raw profile
+ * fields and must test them before formatting.
+ *
  * The Circle rail's explicit disclosure gate. This intentionally does not rely
  * on whs_connection_publicly_visible() or table RLS: neither promises to enforce
  * handicap_visibility for this public rail. Index and movement are one
@@ -37,6 +40,22 @@ export function circleHandicapDisplay(input: CircleHandicapDisclosure): CircleHa
   ) {
     return null;
   }
+
+  return handicapPairDisplay({ handicapIndex: input.handicapIndex, deltaIndex: input.deltaIndex });
+}
+
+/**
+ * HOW THE PAIR LOOKS. No gate, no permission test — the caller has already
+ * decided. The ONE place the arrow, the unsigned figure, the 0.05 floor and
+ * the improved/drifted tones are chosen, so two surfaces cannot disagree
+ * about which direction is green. Returns null only when there is no index
+ * to show (absent = not disclosed).
+ */
+export function handicapPairDisplay(input: {
+  handicapIndex: number | null | undefined;
+  deltaIndex: number | null | undefined;
+}): CircleHandicapDisplay | null {
+  if (input.handicapIndex == null || !Number.isFinite(Number(input.handicapIndex))) return null;
 
   const rawDelta = input.deltaIndex == null ? null : Number(input.deltaIndex);
   const delta = rawDelta == null || !Number.isFinite(rawDelta) || Math.abs(rawDelta) < 0.05
