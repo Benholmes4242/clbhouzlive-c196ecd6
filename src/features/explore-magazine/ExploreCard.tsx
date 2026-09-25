@@ -7,6 +7,7 @@ import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/use
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MessageCircle } from 'lucide-react';
+import { LikedByRow } from '@/components/likes/LikedByRow';
 import ClapIcon from '@/components/icons/ClapIcon';
 import { CELEBRATE_GLYPH_SIZE, celebrateFigureSize } from '@/lib/reactionKind';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
@@ -73,6 +74,12 @@ export interface RoundCardEngagement {
   commentAvailable: boolean;
   onToggleLike?: () => void;
   onOpenComments?: () => void;
+  /** THE SCORE ID, under source 'round'. Never post.postId (the comments id). */
+  reactionSubjectId?: string | null;
+  /** The round owner's FIRST name, as the card's who-line shows it. */
+  ownerName?: string | null;
+  /** The viewer owns this round -> "your round". */
+  isOwnRound?: boolean;
 }
 
 const PHOTO_H: Record<CardSize, number> = { lead: 340, std: 210, pair: 124 };
@@ -502,6 +509,18 @@ function WhoLine({
           ) : null}
         </div>
         {reactions ? <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minHeight: 32, marginTop: 4 }}>{reactions}</div> : null}
+        {/* Names line: lead/std only, same x as the clap (the footer's own left edge). */}
+        {!pair && engagement?.reactionSubjectId && engagement.likeCount > 0 ? (
+          <LikedByRow
+            postId={engagement.reactionSubjectId}
+            count={engagement.likeCount}
+            source="round"
+            kind="celebrate"
+            ownerName={engagement.ownerName ?? null}
+            isOwnRound={engagement.isOwnRound ?? false}
+            style={{ marginTop: 8 }}
+          />
+        ) : null}
       </div>
     );
   }
