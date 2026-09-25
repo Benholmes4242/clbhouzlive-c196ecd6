@@ -900,7 +900,12 @@ export function ExploreCard({
      where it sits inside the fixed PHOTO_H and moves nothing. ABSENT RENDERS
      NOTHING — no element, no reserved height (the StreamFacts contract). */
   const standfirstText = item.kind === 'story' ? (item.facts.standfirst ?? '').trim() : '';
-  const standfirstNode = standfirstText ? (
+  /* TWO SURFACES. On the photo this is light ink with a shadow; on the
+     canvas it is A.MUTE with none. A.MUTE is a DARK-CANVAS token and is
+     unreadable over a bright photograph. One function so the two cannot
+     drift. The on-photo ink is HERO_STORY_META_COLOR, taken from the story
+     meta row that shares this overlay. */
+  const renderStandfirst = (onPhotoSurface: boolean) => (standfirstText ? (
     <div
       data-explore-story-standfirst="true"
       style={{
@@ -908,7 +913,8 @@ export function ExploreCard({
         fontFamily: SANS,
         fontSize: 13,
         lineHeight: 1.45,
-        color: A.MUTE,
+        color: onPhotoSurface ? HERO_STORY_META_COLOR : A.MUTE,
+        textShadow: onPhotoSurface ? HERO_TEXT_SHADOW : undefined,
         display: '-webkit-box',
         WebkitLineClamp: 2,
         WebkitBoxOrient: 'vertical',
@@ -919,7 +925,7 @@ export function ExploreCard({
     >
       {standfirstText}
     </div>
-  ) : null;
+  ) : null);
   /* THE SECTION LABEL IS FIXED. It names the section, not the story, so
      it no longer falls back out of the story's own kicker: the kicker
      now has its own slot above the headline and a card must
@@ -1232,7 +1238,7 @@ export function ExploreCard({
               {/* §4.3 THE QUOTE IS GONE for a lead review — the words live on the
                   review page. Every other kind keeps its headline. */}
               {leadReview ? null : headlineNode}
-              {standfirstNode}
+              {renderStandfirst(true)}
               {reviewFoot}
                {!leadReview && item.kind !== 'story' ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
             </span>
@@ -1322,10 +1328,10 @@ export function ExploreCard({
         <span style={{ display: 'block', paddingInline: 4, marginTop: item.kind === 'round' && size !== 'pair' && callout ? 0 : 8 }}>
           {item.kind === 'round' && size !== 'pair' ? null : kicker}
           {item.kind === 'round' && size !== 'pair' ? null : headlineNode}
-          {/* NO STANDFIRST OFF-PHOTO (restore brief §2): here the tile has no
-              fixed photo height to sit inside, so a line grows the tile
-              (+25px one line, +44px two, measured on pair and photo-less
-              lead/std). Held back pending Ben's call rather than absorbed. */}
+          {/* PHOTO-LESS STORY SHOWS THE STANDFIRST AND GROWS (placement brief):
+              +25px one line, +44px two, approved. The pair variant stays off —
+              it is a dense two-up for scanning. Gutter is this caption block's. */}
+          {item.kind === 'story' && size !== 'pair' ? renderStandfirst(false) : null}
           <WhoLine
             item={item}
             size={size}
