@@ -26,7 +26,7 @@ describe('Explore course-shelf rating count', () => {
        the value in the locale FILE, read here, so a corrected translation
        fails loudly against a stale copy instead of drifting silently. */
     const stream = (courses.amateur as Record<string, Record<string, string>>).stream;
-    const fromFile = Object.entries(stream).filter(([k]) => k.startsWith('ratingCount_')).map(([, v]) => v);
+    const fromFile = Object.entries(stream).filter(([k]) => k === 'ratingCount' || k.startsWith('ratingCount_')).map(([, v]) => v);
     expect(fromFile.map((v) => v.replace('{{count}}', '1'))).toContain(expected[0]);
     expect(fromFile.map((v) => v.replace('{{count}}', '2'))).toContain(expected[1]);
   });
