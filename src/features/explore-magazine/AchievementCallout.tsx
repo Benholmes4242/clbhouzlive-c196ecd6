@@ -28,6 +28,10 @@ import {
   AchievementEmoji,
 } from './achievementIcons';
 
+/** The callout's muted subtext ("Only the second clbhouz member…"). The Explore
+ *  card's celebrate names line borrows this so the two stay matched. */
+export const CALLOUT_SUBTEXT = { fontSize: 11.5, fontWeight: 600 } as const;
+
 /**
  * THE ACHIEVEMENT CALLOUT PANEL (BRIEF_EXPLORE_TWO_SHAPES §5).
  *
@@ -471,7 +475,7 @@ export function RoundStatStrip({
               {achievement.subline ? (
               <span
                   data-explore-achievement-subline="true"
-                  style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.3, color: A.MUTE }}
+                  style={{ display: 'block', maxWidth: '100%', fontFamily: SANS, fontSize: CALLOUT_SUBTEXT.fontSize, fontWeight: CALLOUT_SUBTEXT.fontWeight, lineHeight: 1.3, color: A.MUTE }}
               >
                   {achievement.subline}
               </span>

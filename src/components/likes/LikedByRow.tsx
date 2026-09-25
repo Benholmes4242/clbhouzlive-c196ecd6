@@ -54,6 +54,10 @@ export interface LikedByRowProps {
   /** The viewer owns the round (celebrate only). */
   isOwnRound?: boolean;
   style?: React.CSSProperties;
+  /** Line type size; default 13 (Clubhouse FeedCard, ReviewBottomSheet, scorecard). */
+  fontSize?: number;
+  /** Line weight; default 500. */
+  fontWeight?: number;
 }
 
 export function LikedByRow({
@@ -65,6 +69,8 @@ export function LikedByRow({
   kind = 'like',
   ownerName = null,
   isOwnRound = false,
+  fontSize = 13,
+  fontWeight = 500,
 }: LikedByRowProps) {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
@@ -137,8 +143,8 @@ export function LikedByRow({
       >
         <span
           style={{
-            fontSize: 13,
-            fontWeight: 500,
+            fontSize,
+            fontWeight,
             color: 'rgba(248,250,252,0.65)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
