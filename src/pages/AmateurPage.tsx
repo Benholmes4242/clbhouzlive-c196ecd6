@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { restoreAmateurScroll, takeAmateurScroll } from '@/features/amateur/amateurScrollMemory';
@@ -99,6 +100,9 @@ export default function AmateurPage() {
         connectionId={opener.target?.connectionId ?? null}
         profileUserId={opener.target?.profileUserId ?? null}
       />
+      {/* One page-level control covers every Explore view: All, Scores,
+          Courses and Watch all share #root as their scroll owner. */}
+      <ScrollToTopGlass />
     </div>
   );
 }
