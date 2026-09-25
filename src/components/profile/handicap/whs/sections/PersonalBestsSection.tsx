@@ -57,6 +57,9 @@ interface Row {
 
 interface Props {
   connectionId: string;
+  /** No longer read: against-handicap scores each round off the index it was
+   *  played at (handicap_index_at_time), never the current index. Kept on the
+   *  interface so callers need not change. */
   currentHandicap: number | null;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
