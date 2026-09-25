@@ -255,6 +255,7 @@ const SharePromptAction: React.FC<{ candidate: SharePromptCandidate }> = ({ cand
 
 export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => {
 
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const location = useLocation();
   const spec = resolveKind(row);

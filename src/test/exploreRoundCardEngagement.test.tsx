@@ -61,12 +61,12 @@ describe('Explore round-card who-line engagement', () => {
 
   it('shows both controls with a post and only the available subset without one', () => {
     const both = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement()} />);
-    expect(both.getByRole('button', { name: 'Like, 0 likes' })).toBeTruthy();
+    expect(both.getByRole('button', { name: 'Celebrate this round' })).toBeTruthy();
     expect(both.getByRole('button', { name: 'Comments, 0' })).toBeTruthy();
     both.unmount();
 
     const likeOnly = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement({ commentAvailable: false })} />);
-    expect(likeOnly.getByRole('button', { name: 'Like, 0 likes' })).toBeTruthy();
+    expect(likeOnly.getByRole('button', { name: 'Celebrate this round' })).toBeTruthy();
     expect(likeOnly.queryByRole('button', { name: /Comments/ })).toBeNull();
     likeOnly.unmount();
 
@@ -76,7 +76,7 @@ describe('Explore round-card who-line engagement', () => {
 
   it('uses amber for the liked icon and count, never the under-par red', () => {
     const view = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement({ liked: true, likeCount: 4 })} />);
-    const control = view.getByRole('button', { name: 'Like, 4 likes' });
+    const control = view.getByRole('button', { name: 'Celebrated' });
     expect(control.style.color).toBe('rgb(247, 147, 30)');
     expect(control.querySelector('svg')?.getAttribute('fill')).toBe(A.AMBER);
     expect(control.style.color).not.toMatch(/255,?\s*107,?\s*96/i);
@@ -89,7 +89,7 @@ describe('Explore round-card who-line engagement', () => {
     const view = render(
       <ExploreCard item={item} size="std" onTap={cardTap} engagement={engagement({ onToggleLike: toggle, onOpenComments: openComments })} />,
     );
-    fireEvent.click(view.getByRole('button', { name: 'Like, 0 likes' }));
+    fireEvent.click(view.getByRole('button', { name: 'Celebrate this round' }));
     expect(toggle).toHaveBeenCalledOnce();
     expect(cardTap).not.toHaveBeenCalled();
     fireEvent.click(view.getByRole('button', { name: 'Comments, 0' }));
@@ -99,7 +99,7 @@ describe('Explore round-card who-line engagement', () => {
 
   it('hides zero numerals and keeps 40 by 32 tap targets', () => {
     const view = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement()} />);
-    const like = view.getByRole('button', { name: 'Like, 0 likes' });
+    const like = view.getByRole('button', { name: 'Celebrate this round' });
     expect(like.textContent).toBe('');
     expect(like.style.minWidth).toBe('40px');
     expect(like.style.height).toBe('32px');
@@ -109,7 +109,7 @@ describe('Explore round-card who-line engagement', () => {
     const view = render(<ExploreCard item={item} size="pair" onTap={vi.fn()} engagement={engagement({ likeCount: 3, commentCount: 0 })} />);
     const counts = view.container.querySelector('[data-round-reactions="counts"]');
     expect(counts?.textContent).toBe('3');
-    expect(view.queryByRole('button', { name: 'Like, 3 likes' })).toBeNull();
+    expect(view.queryByRole('button', { name: 'Celebrate this round' })).toBeNull();
     expect(view.queryByLabelText('Comments, 0')).toBeNull();
   });
 
