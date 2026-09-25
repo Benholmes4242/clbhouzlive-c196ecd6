@@ -31,6 +31,8 @@ import { dotsFor, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { handicapPairDisplay } from './circleHandicap';
+import { NUMF } from '@/components/explore-tab-new/courseled/tokens';
 import type { ReviewBreakdown } from './useReviewPageEnrichment';
 
 
@@ -360,7 +362,7 @@ function WhoLine({
   onWhoTap?: () => void;
   engagement?: RoundCardEngagement | null;
   reviewIdentity?: { course: string | null; scope: string | null; date: string | null };
-  roundIdentity?: { course: string | null; date: string | null; net: number | null; par: number | null };
+  roundIdentity?: { course: string | null; date: string | null; net: number | null; par: number | null; handicapIndex?: number | null; deltaIndex?: number | null };
 }) {
   const { t } = useTranslation('courses');
   /* AN OBJECT IS NOT AN IDENTITY. get_explore_stream builds its `who`
@@ -493,6 +495,8 @@ function WhoLine({
   if (roundIdentity && !pair) {
     const hasFigures = roundIdentity.net != null && roundIdentity.par != null;
     const under = hasFigures && roundIdentity.net < roundIdentity.par;
+    // Server already gated; format only. Absent pair = no line, no gap.
+    const hcpPair = handicapPairDisplay({ handicapIndex: roundIdentity.handicapIndex, deltaIndex: roundIdentity.deltaIndex });
     return (
       <div data-round-under-tile="true" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <div data-round-identity-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 8 }}>
@@ -501,6 +505,19 @@ function WhoLine({
             <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
             {roundIdentity.course ? <span data-round-identity-course="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{roundIdentity.course}</span> : null}
             {roundIdentity.date ? <span data-round-identity-date="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap' }}>{roundIdentity.date}</span> : null}
+            {hcpPair ? (
+              <span data-round-identity-hcp="true" style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', lineHeight: 1, color: A.DIM, textTransform: 'uppercase' }}>
+                  {t('friendsRail.index', 'HCP')} {hcpPair.index}
+                </span>
+                {hcpPair.delta ? (
+                  <span style={{ ...NUMF, marginLeft: 6, display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 9, fontWeight: 700, lineHeight: 1, color: hcpPair.delta.tone }}>
+                    <span aria-hidden>{hcpPair.delta.arrow}</span>
+                    <span>{hcpPair.delta.text}</span>
+                  </span>
+                ) : null}
+              </span>
+            ) : null}
           </span>
           {hasFigures ? (
             <span data-round-identity-figures="true" style={{ display: 'flex', flex: '0 0 auto', alignItems: 'center', justifyContent: 'flex-end', gap: 18 }}>
@@ -1283,7 +1300,7 @@ export function ExploreCard({
             onWhoTap={onWhoTap}
             engagement={engagement}
             roundIdentity={item.kind === 'round' && size !== 'pair'
-              ? { course: kickerPartsValue.course, date: playDateFull(item.facts.play_date ?? item.facts.arrived_at), net: item.facts.net ?? null, par: item.facts.course_par ?? null }
+              ? { course: kickerPartsValue.course, date: playDateFull(item.facts.play_date ?? item.facts.arrived_at), net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null }
               : undefined}
           />
         </span>
