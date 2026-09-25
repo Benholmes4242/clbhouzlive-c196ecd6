@@ -627,6 +627,7 @@
   "reactions": {
     "celebratedThisRound": "{{names}}님이 이 라운드를 축하했어요",
     "celebratedYourRound": "{{names}}님이 회원님의 라운드를 축하했어요",
+    "celebratedOwnersRound": "{{names}}님이 {{owner}}님의 라운드를 축하했어요",
     "namesTwo": "{{a}}, {{b}}",
     "namesOneAndOne": "{{a}} 외 1명",
     "namesTwoAndOne": "{{a}}, {{b}} 외 1명",

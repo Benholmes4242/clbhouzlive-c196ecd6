@@ -932,6 +932,7 @@
   "reactions": {
     "celebratedThisRound": "{{names}} celebrated this round",
     "celebratedYourRound": "{{names}} celebrated your round",
+    "celebratedOwnersRound": "{{names}} celebrated {{owner}}'s round",
     "namesTwo": "{{a}} and {{b}}",
     "namesOneAndOne": "{{a}} and one other",
     "namesTwoAndOne": "{{a}}, {{b}} and one other",

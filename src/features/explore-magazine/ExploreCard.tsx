@@ -8,6 +8,7 @@ import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MessageCircle } from 'lucide-react';
 import ClapIcon from '@/components/icons/ClapIcon';
+import { CELEBRATE_GLYPH_SIZE } from '@/lib/reactionKind';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { ReviewVideoLayer } from './ReviewVideoLayer';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
@@ -435,8 +436,8 @@ function WhoLine({
           <span role="button" tabIndex={0} aria-pressed={engagement.liked} aria-label={engagement.liked ? t('discover.reactions.celebrated', 'Celebrated') : t('discover.reactions.action', 'Celebrate this round')}
             onClick={(event) => { stop(event); engagement.onToggleLike?.(); }}
             onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); engagement.onToggleLike?.(); }}
-            style={{ minWidth: 40, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? A.AMBER : subColor, cursor: 'pointer' }}>
-            <ClapIcon size={18} aria-hidden />
+            style={{ minWidth: 44, height: 44, margin: '-6px 0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? A.AMBER : subColor, cursor: 'pointer' }}>
+            <ClapIcon size={CELEBRATE_GLYPH_SIZE} aria-hidden />
             {engagement.likeCount > 0 ? <span style={countStyle}>{engagement.likeCount}</span> : null}
           </span>
         )

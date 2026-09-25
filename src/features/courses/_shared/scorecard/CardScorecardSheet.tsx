@@ -1073,6 +1073,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   count={engagement.likeCount}
                   source={engagement.likeSource ?? 'post'}
                   kind="celebrate"
+                  isOwnRound={isOwner}
+                  ownerName={isTour ? null : (playerName.trim().split(/\s+/)[0] || null)}
                   style={{ marginTop: 8 }}
                 />
               )}

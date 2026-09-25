@@ -628,6 +628,7 @@
   "reactions": {
     "celebratedThisRound": "{{names}} celebró esta vuelta",
     "celebratedYourRound": "{{names}} celebró tu vuelta",
+    "celebratedOwnersRound": "{{names}} celebró la vuelta de {{owner}}",
     "namesTwo": "{{a}} y {{b}}",
     "namesOneAndOne": "{{a}} y otra persona",
     "namesTwoAndOne": "{{a}}, {{b}} y otra persona",
