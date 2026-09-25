@@ -197,9 +197,9 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
                       display: 'grid',
                       placeItems: 'center',
                       boxSizing: 'border-box',
-                      background: tone ?? 'rgba(248,250,252,0.10)',
-                      border: tone ? 'none' : '1px solid rgba(248,250,252,0.18)',
-                      color: tone ? REC.CANVAS : 'rgba(248,250,252,0.45)',
+                      background: tone ?? REC.HOLLOW_BG,
+                      border: tone ? 'none' : `1px solid ${REC.HOLLOW_BORDER}`,
+                      color: tone ? REC.CANVAS : REC.HOLLOW_GLYPH,
                     }}
                   >
                     <Medal size={13} strokeWidth={2.25} />

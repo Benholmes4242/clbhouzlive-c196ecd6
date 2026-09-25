@@ -29,6 +29,10 @@ export const REC = {
    * bar still reads as a bar.
    */
   BAR_TRACK: 'rgba(255,255,255,0.16)',
+  /** Tier-zero medal chip: HOLLOW, so "not started" reads at arm's length. */
+  HOLLOW_BG: 'rgba(255,255,255,0.10)',
+  HOLLOW_BORDER: 'rgba(255,255,255,0.18)',
+  HOLLOW_GLYPH: 'rgba(255,255,255,0.45)',
   INK: CHART.INK,
   MUTE: CHART.MUTE,
   DIM: CHART.DIM,
