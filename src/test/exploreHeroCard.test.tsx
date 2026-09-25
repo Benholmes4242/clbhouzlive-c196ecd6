@@ -128,11 +128,13 @@ describe('Explore card shapes', () => {
     expect(age?.style.whiteSpace).toBe('nowrap');
     expect(age?.style.overflow).not.toBe('hidden');
     expect(age?.style.textOverflow).toBe('');
-    const noAge = render(
+    const noAgeView = render(
       <ExploreCard item={{ ...story(), facts: { ...story().facts, published_at: null } }} size="lead" shape={null} onTap={() => undefined} />,
-    ).container.querySelector<HTMLElement>('[data-explore-story-meta="true"]');
+    );
+    const noAge = noAgeView.container.querySelector<HTMLElement>('[data-explore-story-meta="true"]');
     expect(noAge?.querySelector('[data-explore-story-age="true"]')).toBeNull();
     expect(noAge?.getAttribute('style')).toBe(meta?.getAttribute('style'));
+    noAgeView.unmount();
     expect(getByText('A championship story')).toBeInTheDocument();
     expect(getByText('The supporting detail follows beneath the title.')).toBeInTheDocument();
     expect(queryByText('A member')).toBeNull();
