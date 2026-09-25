@@ -31,7 +31,9 @@
  * below it these rows are counts and thresholds only, which is correct on
  * today's population.
  */
-import React from 'react';
+import React, { useState } from 'react';
+import { ChevronRight, Medal } from 'lucide-react';
+import { tierTone } from '../medalTone';
 import { useTranslation } from 'react-i18next';
 import { REC, LABEL } from '../tokens';
 import { Panel, RowButton, Bar, MetaLabel } from '../Primitives';
@@ -86,6 +88,7 @@ interface Row {
 
 export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => {
   const { t } = useTranslation('handicap');
+  const [expanded, setExpanded] = useState(false);
   if (items.length === 0) return null;
 
   const rows: Row[] = items.map((item) => {
@@ -149,8 +152,6 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
     };
   });
 
-  const complete = rows.filter((r) => r.complete && r.value > 0).length;
-
   /**
    * CLOSENESS TO THE NEXT TIER is the sort, so the three closest lead without a
    * separate panel. Not specified by the brief and decided here: a finished
@@ -168,9 +169,77 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
   return (
     <Panel
       title={t('career.countingKicker')}
-      action={<MetaLabel>{t('career.countingComplete', { n: complete, total: rows.length })}</MetaLabel>}
+      /* "{n} of {m} complete" is gone: most members never finish a ladder, and
+         it read as a scolding. countingComplete is left for the key sweep. */
+      action={<MetaLabel>{t('career.closest')}</MetaLabel>}
     >
-      {ordered.map((r, i) => (
+      {!expanded && (
+        <>
+          {/* CLOSEST THREE — RoundResults' row vocabulary. No bars here: the
+              sentence carries the distance and the medal carries the state;
+              a bar under both would be a third telling. Bars stay on the full
+              list below. */}
+          {ordered.slice(0, 3).map((r) => {
+            const tone = tierTone(r.item);
+            return (
+              <RowButton
+                key={r.item.badgeId}
+                onClick={() => data.onOpen({ kind: 'counting', badgeId: r.item.badgeId })}
+                ariaLabel={`${r.item.name}, ${r.value}`}
+              >
+                <div style={{ display: 'grid', gridTemplateColumns: '22px minmax(0,1fr) auto', alignItems: 'center', gap: 10 }}>
+                  <span
+                    aria-hidden
+                    style={{
+                      width: 22,
+                      height: 26,
+                      borderRadius: 6,
+                      display: 'grid',
+                      placeItems: 'center',
+                      boxSizing: 'border-box',
+                      background: tone ?? REC.HOLLOW_BG,
+                      border: tone ? 'none' : `1px solid ${REC.HOLLOW_BORDER}`,
+                      color: tone ? REC.CANVAS : REC.HOLLOW_GLYPH,
+                    }}
+                  >
+                    <Medal size={13} strokeWidth={2.25} />
+                  </span>
+                  <span style={{ minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600, color: REC.INK, letterSpacing: '-0.015em' }}>
+                      {r.item.name}
+                    </span>
+                    <span
+                      style={{
+                        display: 'block',
+                        marginTop: 2,
+                        fontSize: 11.5,
+                        color: r.complete && r.value > 0 ? REC.GOOD : REC.MUTE,
+                        ...REC.TABULAR,
+                      }}
+                    >
+                      {r.value === 0 && r.item.reachedTier === 0 ? t('career.tierNotStarted') : r.progress}
+                    </span>
+                  </span>
+                  <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.03em', color: r.value > 0 ? REC.INK : REC.DIM, ...REC.TABULAR }}>
+                    {r.value}
+                  </span>
+                </div>
+              </RowButton>
+            );
+          })}
+          {ordered.length > 3 && (
+            /* EXPANDS IN PLACE — cheaper than a new route, and every full row
+               still taps through to CountingStatDetail as before. */
+            <RowButton last onClick={() => setExpanded(true)} ariaLabel={t('career.allRecords', { count: ordered.length })}>
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13.5, fontWeight: 600, color: REC.INK }}>
+                {t('career.allRecords', { count: ordered.length })}
+                <ChevronRight size={16} color={REC.MUTE} />
+              </span>
+            </RowButton>
+          )}
+        </>
+      )}
+      {expanded && ordered.map((r, i) => (
         <RowButton
           key={r.item.badgeId}
           last={i === ordered.length - 1}
@@ -223,7 +292,7 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
           </div>
         </RowButton>
       ))}
-      <div style={{ padding: '10px 14px', borderTop: `1px solid ${REC.BORDER}` }}>
+      {expanded && <div style={{ padding: '10px 14px', borderTop: `1px solid ${REC.BORDER}` }}>
         {sparse ? (
           <div style={{ fontSize: 11, color: REC.MUTE, lineHeight: 1.5 }}>
             {t('career.sparseFootnote')}
@@ -231,7 +300,7 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
         ) : (
           <MetaLabel>MEASURED ACROSS MEMBERS WITH A POSTED INDEX</MetaLabel>
         )}
-      </div>
+      </div>}
     </Panel>
   );
 };

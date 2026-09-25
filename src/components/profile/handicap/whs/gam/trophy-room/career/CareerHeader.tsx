@@ -5,7 +5,8 @@
 import React from 'react';
 import { REC } from './tokens';
 import { Kicker, Caption } from './Primitives';
-import { yearOf, plural } from './format';
+import { yearOf } from './format';
+import { useTranslation, Trans } from 'react-i18next';
 import type { CareerData } from './types';
 
 interface Props {
@@ -13,42 +14,43 @@ interface Props {
 }
 
 export const CareerHeader: React.FC<Props> = ({ data }) => {
-  const { rounds, isFriendView, ownerFirstName } = data;
+  const { rounds } = data;
   const courses = new Set(
     rounds.map((r) => r.course_id || `name:${r.course_name ?? ''}`).filter(Boolean),
   ).size;
   const years = rounds.map((r) => yearOf(r.play_date)).filter((y): y is number => y !== null);
   const since = years.length > 0 ? Math.min(...years) : null;
 
-  const title = isFriendView && ownerFirstName ? `${ownerFirstName}'s record` : 'Your record';
+  const { t } = useTranslation('handicap');
 
+  // Figures come from the same computation as before; only the voice changed.
   return (
     <header style={{ padding: '14px 2px 16px', fontFamily: REC.FONT }}>
       <Kicker>CAREER RECORD</Kicker>
-      <h2
-        style={{
-          margin: '8px 0 0',
-          fontSize: 24,
-          fontWeight: 700,
-          letterSpacing: '-0.03em',
-          color: REC.INK,
-        }}
-      >
-        {title}
-      </h2>
-      <div style={{ marginTop: 8 }}>
-        <Caption>
-          {rounds.length > 0 ? (
-            <span style={REC.TABULAR}>
-              {rounds.length} {plural(rounds.length, 'round', 'rounds')} across {courses}{' '}
-              {plural(courses, 'course', 'courses')}
-              {since ? ` since ${since}` : ''}
+      {rounds.length > 0 ? (
+        <>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 8 }}>
+            <span style={{ fontSize: 46, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1, color: REC.INK, ...REC.TABULAR }}>
+              {rounds.length}
             </span>
-          ) : (
-            'No scored rounds on the record yet.'
-          )}
-        </Caption>
-      </div>
+            <span style={{ fontSize: 17, fontWeight: 600, color: REC.INK }}>{t('career.cabinet.rounds')}</span>
+          </div>
+          {since ? (
+            <div style={{ marginTop: 6, fontSize: 14, color: REC.MUTE, ...REC.TABULAR }}>
+              <Trans
+                t={t}
+                i18nKey="career.cabinet.since"
+                values={{ courses, year: since }}
+                components={{ b: <span style={{ color: REC.INK, fontWeight: 600 }} /> }}
+              />
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <div style={{ marginTop: 8 }}>
+          <Caption>No scored rounds on the record yet.</Caption>
+        </div>
+      )}
     </header>
   );
 };
