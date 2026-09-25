@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart } from 'lucide-react';
+import { reactionGlyph, type ReactionKind } from '@/lib/reactionKind';
 
 import { A, FIGS, SANS } from './tokens';
 
@@ -47,6 +47,8 @@ interface Props {
    * rail reads in a single row and must not gain the dead width.
    */
   reserveCount?: boolean;
+  /** 'celebrate' on ROUNDS (clap), 'like' elsewhere (heart). See lib/reactionKind. */
+  kind?: ReactionKind;
 }
 
 export function ReactionAction({
@@ -60,8 +62,10 @@ export function ReactionAction({
   size = 15,
   figureSize = 11.5,
   reserveCount = false,
+  kind = 'like',
 }: Props) {
   if (hidden) return null;
+  const Glyph = reactionGlyph(kind);
 
   const glass = tone === 'glass';
   const idle = glass ? WHITE_72 : A.MUTE;
@@ -97,7 +101,7 @@ export function ReactionAction({
           fontFamily: SANS,
         }}
       >
-        <Heart size={size} strokeWidth={2} color={idle} fill="none" aria-hidden />
+        <Glyph size={size} strokeWidth={2} color={idle} fill="none" aria-hidden />
         {figure}
       </span>
     );
@@ -133,7 +137,7 @@ export function ReactionAction({
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <Heart
+      <Glyph
         size={size}
         strokeWidth={2}
         color={reacted ? amber : idle}
