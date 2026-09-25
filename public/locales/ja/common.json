@@ -505,7 +505,11 @@
       "stoodYears": "{{years}}年{{months}}か月保持",
       "bestVsCourse": "コース比ベストラウンド",
       "beatGross": "{{score}}を出せば更新",
-      "vsRating": "コースレート{{rating}}より{{shots}}打少ない・スロープ{{slope}}"
+      "vsRating": "コースレート{{rating}}より{{shots}}打少ない・スロープ{{slope}}",
+      "trophyRoomTitle": "あなたが持つすべて",
+      "crownsHeld": "保持中のクラウン",
+      "trophyRoomA11y": "トロフィールーム、保持中のクラウン{{count}}個",
+      "trophyRoomA11yBare": "トロフィールーム"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",
