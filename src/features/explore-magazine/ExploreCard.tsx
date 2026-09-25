@@ -892,6 +892,33 @@ export function ExploreCard({
       {headline}
     </div>
   );
+  /* THE STANDFIRST (BRIEF_EXPLORE_STORY_TILE_RESTORE_STANDFIRST §1). Dropped
+     from the render on 22 Sep while the RPC and StreamFacts kept carrying it;
+     restored to the Tour hero's treatment (NewsTab LeadStory: 13 / 1.45 /
+     INK_MUTE). A.MUTE is this surface's name for the same ink value. Clamped
+     to two lines like the other multi-line copy here. ABSENT RENDERS
+     NOTHING — no element, no reserved height (the StreamFacts contract). */
+  const standfirstText = item.kind === 'story' ? (item.facts.standfirst ?? '').trim() : '';
+  const standfirstNode = standfirstText ? (
+    <div
+      data-explore-story-standfirst="true"
+      style={{
+        marginTop: 6,
+        fontFamily: SANS,
+        fontSize: 13,
+        lineHeight: 1.45,
+        color: A.MUTE,
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        overflowWrap: 'break-word',
+        minWidth: 0,
+      }}
+    >
+      {standfirstText}
+    </div>
+  ) : null;
   /* THE SECTION LABEL IS FIXED. It names the section, not the story, so
      it no longer falls back out of the story's own kicker: the kicker
      now has its own slot above the headline and a card must
@@ -1204,6 +1231,7 @@ export function ExploreCard({
               {/* §4.3 THE QUOTE IS GONE for a lead review — the words live on the
                   review page. Every other kind keeps its headline. */}
               {leadReview ? null : headlineNode}
+              {standfirstNode}
               {reviewFoot}
                {!leadReview && item.kind !== 'story' ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
             </span>
@@ -1293,6 +1321,7 @@ export function ExploreCard({
         <span style={{ display: 'block', paddingInline: 4, marginTop: item.kind === 'round' && size !== 'pair' && callout ? 0 : 8 }}>
           {item.kind === 'round' && size !== 'pair' ? null : kicker}
           {item.kind === 'round' && size !== 'pair' ? null : headlineNode}
+          {standfirstNode}
           <WhoLine
             item={item}
             size={size}
