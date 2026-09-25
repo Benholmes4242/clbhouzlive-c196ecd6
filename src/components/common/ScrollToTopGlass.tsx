@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronUp } from 'lucide-react';
-import { getPrimaryScrollElement, scrollPageToTop } from '@/lib/getScrollParent';
+import { getPrimaryScrollElement } from '@/lib/getScrollParent';
 import { useIsFullScreenSurfaceOpen } from '@/stores/fullScreenSurfaceStore';
 
 const ScrollToTopGlass = () => {
@@ -13,7 +13,10 @@ const ScrollToTopGlass = () => {
   const surfaceOpen = useIsFullScreenSurfaceOpen();
 
   useEffect(() => {
-    const target = getPrimaryScrollElement();
+    // #root is the page scroller by definition. Prefer the live node here so
+    // an early cached document fallback cannot strand this route listener.
+    const root = document.getElementById('root');
+    const target = root instanceof HTMLElement ? root : getPrimaryScrollElement();
     if (!target) return;
     let ticking = false;
 
@@ -51,7 +54,9 @@ const ScrollToTopGlass = () => {
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    scrollPageToTop('smooth');
+    const root = document.getElementById('root');
+    const target = root instanceof HTMLElement ? root : getPrimaryScrollElement();
+    target?.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
   if (surfaceOpen) return null;
