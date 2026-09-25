@@ -26,16 +26,17 @@
  */
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { ChevronRight } from 'lucide-react';
 
 import { useAllScores } from '@/lib/whs/hooks';
-import { fmtDiff } from '@/lib/whs/format';
 import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
 import { formatDay2MonthYearShortGB } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { WhsScore } from '@/lib/whs/types';
 
 import { HcpSection } from './HcpSection';
+import { pickCourse } from './NextRoundSection';
 import { CHART } from '../charts';
 import { openGamAchievements } from '../gam/events';
 
@@ -51,15 +52,21 @@ type RecordKey = (typeof ORDER)[number];
 interface Row {
   key: RecordKey;
   name: string;
-  sub: string | null;
+  /** Score id — the same-round comparison is on id, never name/date. */
+  id: string;
+  course: string | null;
+  date: string | null;
+  stood: string | null;
   figure: string;
+  /** Beat line; muted = the honest two-part line with no green rule. */
+  beat: { text: string; muted: boolean } | null;
 }
 
 interface Props {
   connectionId: string;
-  /** No longer read: against-handicap scores each round off the index it was
-   *  played at (handicap_index_at_time), never the current index. Kept on the
-   *  interface so callers need not change. */
+  /** The member's index now — used ONLY for the beat line of the
+   *  against-handicap record (what it takes today). The record itself is
+   *  scored off handicap_index_at_time. */
   currentHandicap: number | null;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
@@ -69,40 +76,86 @@ interface Props {
 /** total_holes is checked as well as the flag: both travel on every row. */
 const isEighteen = (s: WhsScore) => !s.is_nine_hole && s.total_holes === 18;
 
-function courseDate(s: WhsScore | null): string | null {
-  if (!s) return null;
-  const name = s.course?.name ?? null;
-  const d = s.play_date ? formatDay2MonthYearShortGB(new Date(s.play_date)) : null;
-  return [name, d].filter(Boolean).join(' \u00b7 ') || null;
+const fmtIdx = (n: number) => (n < 0 ? `+${Math.abs(n).toFixed(1)}` : n.toFixed(1));
+
+/** How long a record has stood, from play_date alone. */
+function stoodFor(playDate: string | null | undefined, t: TFunction): string | null {
+  if (!playDate) return null;
+  const then = new Date(playDate);
+  const now = new Date();
+  const days = Math.max(0, Math.floor((now.getTime() - then.getTime()) / 86400000));
+  if (days < 56) {
+    const w = Math.max(1, Math.floor(days / 7));
+    return w === 1
+      ? t('common:handicap.bests.stoodWeeksOne')
+      : t('common:handicap.bests.stoodWeeksOther', { count: w });
+  }
+  let months = (now.getFullYear() - then.getFullYear()) * 12 + (now.getMonth() - then.getMonth());
+  if (now.getDate() < then.getDate()) months -= 1;
+  months = Math.max(1, months);
+  if (months < 18) {
+    return months === 1
+      ? t('common:handicap.bests.stoodMonthsOne')
+      : t('common:handicap.bests.stoodMonthsOther', { count: months });
+  }
+  return t('common:handicap.bests.stoodYears', { years: Math.floor(months / 12), months: months % 12 });
 }
 
 export const PersonalBestsSection: React.FC<Props> = ({
   connectionId,
+  currentHandicap,
   viewMode = 'owner',
   ownerFirstName = null,
   showTrophyRoom = true,
 }) => {
   const { t } = useTranslation(['common']);
   const { data: scores, isFetched } = useAllScores(connectionId);
+  const isOwner = viewMode === 'owner';
 
   const rows = useMemo<Row[]>(() => {
     const list = scores ?? [];
     if (!list.length) return [];
 
-    const out: Row[] = [];
-    // Stableford and against-handicap: eighteen-hole rounds only.
-    const eighteen = list.filter(isEighteen);
-    const diffList = list.filter(isReasonableDiff);
+    // Reference course: the SAME pick as Next round, so the two agree.
+    const window20 = list.slice(0, 20);
+    const ref = pickCourse(window20);
+    const refPar =
+      ref ? window20.find((r) => r.course_id === ref.id && typeof r.course_par === 'number')?.course_par ?? null : null;
 
+    const base = (s: WhsScore) => ({
+      id: s.id,
+      course: s.course?.name ?? null,
+      date: s.play_date ? formatDay2MonthYearShortGB(new Date(s.play_date)) : null,
+      stood: stoodFor(s.play_date, t),
+    });
+
+    const out: Row[] = [];
+    const eighteen = list.filter(isEighteen);
+    const diffList = list.filter(isReasonableDiff).filter((s) => typeof s.adjusted_gross === 'number');
+
+    // BEST ROUND: still ranked on the lowest DIFFERENTIAL; only what is printed
+    // changes — the round's own adjusted gross. Known ambiguity: this is not
+    // necessarily the lowest gross ever (an easy-course 66 can lose on the
+    // differential). That is correct ranking; do not switch it to gross.
     if (diffList.length) {
       const best = diffList.reduce((a, b) =>
         (a.handicap_differential as number) <= (b.handicap_differential as number) ? a : b,
       );
+      let beat: Row['beat'] = null;
+      if (isOwner && ref) {
+        const record = best.handicap_differential as number;
+        const diffOf = (g: number) => ((g - ref.cr) * 113) / ref.slope;
+        // CEIL MINUS ONE, never round: a rounded score can merely TIE the record.
+        let score = Math.ceil((record * ref.slope) / 113 + ref.cr) - 1;
+        while (diffOf(score) >= record) score -= 1;
+        beat = { text: t('common:handicap.bests.beatRound', { score, course: ref.name }), muted: false };
+      }
       out.push({
         key: 'diff',
-        name: t('common:handicap.bests.bestDiff'),
-        sub: courseDate(best),
-        figure: fmtDiff(best.handicap_differential as number),
+        name: t('common:handicap.bests.bestRound'),
+        figure: String(best.adjusted_gross),
+        beat,
+        ...base(best),
       });
     }
 
@@ -114,38 +167,60 @@ export const PersonalBestsSection: React.FC<Props> = ({
       out.push({
         key: 'stableford',
         name: t('common:handicap.bests.bestStableford'),
-        sub: courseDate(best),
         figure: String(best.stableford_points),
+        beat: isOwner
+          ? { text: t('common:handicap.bests.beatStableford', { points: (best.stableford_points as number) + 1 }), muted: false }
+          : null,
+        ...base(best),
       });
     }
 
     // Against handicap: each round is scored against the index it was played
     // off, as the provider recorded it — never the member's current index,
-    // which would re-rank the whole record every time the index moves. As
-    // with course par, a round missing the figure it needs is dropped rather
-    // than scored against a guessed or current one.
+    // which would re-rank the whole record every time the index moves. A round
+    // missing the figure it needs is dropped rather than scored against a guess.
     const scored = eighteen.filter(isReasonableGross).flatMap((s) =>
       typeof s.adjusted_gross === 'number' &&
       typeof s.course_par === 'number' &&
       typeof s.handicap_index_at_time === 'number'
-        ? [{ s, vsHcp: s.adjusted_gross - s.course_par - s.handicap_index_at_time }]
+        ? [{ s, then: s.handicap_index_at_time, vsHcp: s.adjusted_gross - s.course_par - s.handicap_index_at_time }]
         : [],
     );
 
     if (scored.length) {
       const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
       const abs = Math.abs(best.vsHcp).toFixed(1);
+      let beat: Row['beat'] = null;
+      if (isOwner && ref && refPar != null && currentHandicap != null) {
+        // gross - par - currentIndex < record
+        const score = Math.ceil(refPar + currentHandicap + best.vsHcp) - 1;
+        beat =
+          Math.abs(best.then - currentHandicap) <= 0.5
+            ? { text: t('common:handicap.bests.beatRound', { score, course: ref.name }), muted: false }
+            : {
+                // A record set off a much higher index is near-unbeatable now;
+                // say so rather than dress it as achievable.
+                text: t('common:handicap.bests.beatVsHcp', {
+                  then: fmtIdx(best.then),
+                  now: fmtIdx(currentHandicap),
+                  score,
+                  course: ref.name,
+                }),
+                muted: true,
+              };
+      }
       out.push({
         key: 'vsHcp',
         name: t('common:handicap.bests.bestVsHcp'),
-        sub: courseDate(best.s),
         // True minus, never a hyphen.
         figure: best.vsHcp < 0 ? `\u2212${abs}` : best.vsHcp > 0 ? `+${abs}` : abs,
+        beat,
+        ...base(best.s),
       });
     }
 
     return ORDER.flatMap((k) => out.filter((r) => r.key === k));
-  }, [scores, t]);
+  }, [scores, t, isOwner, currentHandicap]);
 
   /* THE SENTENCE NAMES WHAT IS MISSING AND EXPLAINS NOTHING (Sep 2026 ruling).
      The old wording named a stableford and a round off handicap whatever was
@@ -154,7 +229,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
      two can never disagree. No instruction on how to set a record: the section
      is called Records to break. */
   const missingNames = ORDER.filter((k) => !rows.some((r) => r.key === k)).map((k) =>
-    t(`common:handicap.bests.lower.${k}`),
+    t(`common:handicap.bests.lower.${k === 'diff' ? 'round' : k}`),
   );
 
   const fired = useRef(false);
@@ -184,40 +259,47 @@ export const PersonalBestsSection: React.FC<Props> = ({
           : t('common:handicap.bests.heading')
       }
     >
-      {rows.map((r, i) => (
-        <div
-          key={r.key}
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 12,
-            padding: '12px 0',
-            borderTop: i === 0 ? 'none' : `1px solid ${CHART.BORDER}`,
-          }}
-        >
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: CHART.INK, letterSpacing: '-0.01em' }}>
-              {r.name}
+      {rows.map((r, i) => {
+        // SAME ROUND: the second row sharing a score id drops its course · date.
+        const repeat = rows.slice(0, i).some((p) => p.id === r.id);
+        const sub = (repeat
+          ? [t('common:handicap.bests.sameRound'), r.stood]
+          : [r.course, r.date, r.stood]
+        ).filter(Boolean).join(' \u00b7 ');
+        return (
+          <div
+            key={r.key}
+            style={{
+              padding: '16px 0',
+              borderTop: i === 0 ? 'none' : `1px solid ${CHART.BORDER}`,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+              <div style={{ minWidth: 0, flex: 1, fontSize: 15, fontWeight: 600, color: CHART.INK, letterSpacing: '-0.01em' }}>
+                {r.name}
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: CHART.INK, flexShrink: 0, ...FIG }}>
+                {r.figure}
+              </div>
             </div>
-            {r.sub && (
-              <div
-                style={{
-                  marginTop: 3,
-                  fontSize: 11,
-                  color: CHART.DIM,
-                  lineHeight: 1.35,
-                  overflowWrap: 'anywhere',
-                }}
-              >
-                {r.sub}
+            {sub && (
+              <div style={{ marginTop: 4, fontSize: 12, color: CHART.MUTE, lineHeight: 1.4, overflowWrap: 'anywhere' }}>
+                {sub}
+              </div>
+            )}
+            {r.beat && (
+              <div style={{ marginTop: 8, display: 'flex', alignItems: 'stretch', gap: 8 }}>
+                {!r.beat.muted && (
+                  <span aria-hidden style={{ width: 3, flexShrink: 0, background: CHART.DOWN, borderRadius: 1 }} />
+                )}
+                <span style={{ fontSize: 13, lineHeight: 1.45, color: r.beat.muted ? CHART.MUTE : CHART.INK }}>
+                  {r.beat.text}
+                </span>
               </div>
             )}
           </div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: CHART.INK, flexShrink: 0, ...FIG }}>
-            {r.figure}
-          </div>
-        </div>
-      ))}
+        );
+      })}
 
       {/* Never a section with no rows and no sentence. */}
       {missingNames.length > 0 && (

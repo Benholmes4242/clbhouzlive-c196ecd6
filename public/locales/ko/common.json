@@ -481,7 +481,7 @@
       "bestDiff": "Best differential",
       "bestGross": "Best gross",
       "bestStableford": "Best stableford",
-      "bestVsHcp": "Best against handicap",
+      "bestVsHcp": "내 핸디캡 대비 베스트",
       "trophyRoom": "Trophy room",
       "missing": "{{count}} more appear once you've posted a stableford and a round off your handicap.",
       "missingAll": "Your records appear here once you've posted a round.",
@@ -489,9 +489,21 @@
         "diff": "best differential",
         "gross": "best gross",
         "stableford": "best stableford",
-        "vsHcp": "best against handicap"
+        "vsHcp": "best against handicap",
+        "round": "베스트 라운드"
       },
-      "stillToSet": "Still to set: {{list}}."
+      "stillToSet": "Still to set: {{list}}.",
+      "bestRound": "베스트 라운드",
+      "sameRound": "같은 라운드",
+      "playedOff": "핸디 {{index}}",
+      "beatRound": "{{course}}에서 {{score}}타면 경신",
+      "beatStableford": "{{points}}포인트면 경신",
+      "beatVsHcp": "그날은 핸디 {{then}}로 쳤습니다. 지금 핸디 {{now}}라면 {{course}}에서 {{score}}타가 필요합니다.",
+      "stoodWeeksOne": "1주 유지",
+      "stoodWeeksOther": "{{count}}주 유지",
+      "stoodMonthsOne": "1개월 유지",
+      "stoodMonthsOther": "{{count}}개월 유지",
+      "stoodYears": "{{years}}년 {{months}}개월 유지"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",

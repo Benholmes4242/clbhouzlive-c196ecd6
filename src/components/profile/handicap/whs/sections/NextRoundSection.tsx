@@ -70,7 +70,7 @@ interface Ladder {
  * course's most recent round's ratings. Falls to the next course when the
  * ratings are missing; null when none has both.
  */
-function pickCourse(window: WhsScore[]) {
+export function pickCourse(window: WhsScore[]) {
   const order: string[] = [];
   const count = new Map<string, number>();
   for (const r of window) {

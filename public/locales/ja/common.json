@@ -481,7 +481,7 @@
       "bestDiff": "Best differential",
       "bestGross": "Best gross",
       "bestStableford": "Best stableford",
-      "bestVsHcp": "Best against handicap",
+      "bestVsHcp": "あなたのハンディキャップ比ベスト",
       "trophyRoom": "Trophy room",
       "missing": "{{count}} more appear once you've posted a stableford and a round off your handicap.",
       "missingAll": "Your records appear here once you've posted a round.",
@@ -489,9 +489,21 @@
         "diff": "best differential",
         "gross": "best gross",
         "stableford": "best stableford",
-        "vsHcp": "best against handicap"
+        "vsHcp": "best against handicap",
+        "round": "ベストラウンド"
       },
-      "stillToSet": "Still to set: {{list}}."
+      "stillToSet": "Still to set: {{list}}.",
+      "bestRound": "ベストラウンド",
+      "sameRound": "同じラウンド",
+      "playedOff": "HC {{index}}",
+      "beatRound": "{{course}}で{{score}}を出せば更新",
+      "beatStableford": "{{points}}ポイントで更新",
+      "beatVsHcp": "この日はHC {{then}}でプレー。HC {{now}}の今なら{{course}}で{{score}}が必要です。",
+      "stoodWeeksOne": "1週間保持",
+      "stoodWeeksOther": "{{count}}週間保持",
+      "stoodMonthsOne": "1か月保持",
+      "stoodMonthsOther": "{{count}}か月保持",
+      "stoodYears": "{{years}}年{{months}}か月保持"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",
