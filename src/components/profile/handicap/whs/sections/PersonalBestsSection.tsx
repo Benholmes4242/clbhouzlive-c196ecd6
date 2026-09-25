@@ -27,7 +27,10 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 
 import { useAllScores } from '@/lib/whs/hooks';
 import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
@@ -351,46 +354,151 @@ export const PersonalBestsSection: React.FC<Props> = ({
   );
 };
 
-export const TrophyRoomRow: React.FC<{ standalone?: boolean }> = ({ standalone = false }) => {
+/** Crowns held = current rank-1 rows in gam_course_legends_view — the same
+ *  source and definition the trophy room uses (useUserTopLegends, maxRank 1).
+ *  COUNT-ONLY: head request, no rows. Null on error so the tile never shows
+ *  a false zero. */
+function useCrownsHeldCount(userId: string | undefined) {
+  return useQuery({
+    queryKey: ['gam', 'crowns-held-count', userId],
+    enabled: Boolean(userId),
+    staleTime: 5 * 60_000,
+    queryFn: async (): Promise<number | null> => {
+      const { count, error } = await supabase
+        .from('gam_course_legends_view')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId!)
+        .eq('is_current', true)
+        .lte('rank', 1);
+      if (error) return null;
+      return count ?? null;
+    },
+  });
+}
+
+/** Gold, not amber: gold already means RARE ACHIEVEMENT (eagle chip, ace ring). */
+const GOLD_A = (a: number) => `rgba(255,210,0,${a})`; // SC_FILL_GOLD components
+
+export const TrophyRoomRow: React.FC<{ standalone?: boolean; userId?: string }> = ({
+  standalone = false,
+  userId,
+}) => {
   const { t } = useTranslation(['common']);
-  const row = (
+  const { data: crowns } = useCrownsHeldCount(userId);
+  const showFigure = typeof crowns === 'number' && crowns > 0;
+  const tile = (
     <button
       type="button"
       onClick={() => openGamAchievements()}
+      aria-label={
+        showFigure
+          ? t('common:handicap.bests.trophyRoomA11y', { count: crowns })
+          : t('common:handicap.bests.trophyRoomA11yBare')
+      }
       style={{
         width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-        padding: standalone ? 0 : '14px 0 0',
-        marginTop: standalone ? 0 : 12,
-        background: 'none',
-        border: 'none',
-        borderTopStyle: standalone ? 'none' : 'solid',
-        borderTopWidth: standalone ? 0 : 1,
-        borderTopColor: CHART.BORDER,
-        color: CHART.MUTE,
-        cursor: 'pointer',
+        display: 'block',
         textAlign: 'left',
+        marginTop: standalone ? 0 : 12,
+        borderRadius: 18,
+        border: `1px solid ${GOLD_A(0.3)}`,
+        background: `linear-gradient(160deg, ${GOLD_A(0.14)} 0%, ${GOLD_A(0.045)} 46%, ${GOLD_A(0.02)} 100%)`,
+        padding: '20px 18px 18px',
+        position: 'relative',
+        overflow: 'hidden',
+        cursor: 'pointer',
         WebkitTapHighlightColor: 'transparent',
       }}
     >
       <span
+        aria-hidden
         style={{
-          fontSize: 9,
-          fontWeight: 700,
-          letterSpacing: '0.19em',
-          textTransform: 'uppercase',
+          position: 'absolute',
+          top: -58,
+          left: -34,
+          width: 190,
+          height: 190,
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          background: `radial-gradient(circle, ${GOLD_A(0.22)} 0%, ${GOLD_A(0.07)} 42%, ${GOLD_A(0)} 70%)`,
         }}
-      >
-        {t('common:handicap.bests.trophyRoom')}
+      />
+      <span aria-hidden style={{ position: 'relative', display: 'block' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <span
+            style={{
+              width: 46,
+              height: 46,
+              borderRadius: 13,
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: GOLD_A(0.16),
+              border: `1px solid ${GOLD_A(0.28)}`,
+            }}
+          >
+            <Trophy size={23} strokeWidth={1.9} color={SC_FILL_GOLD} />
+          </span>
+          <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '0.19em',
+                textTransform: 'uppercase',
+                color: GOLD_A(0.8),
+              }}
+            >
+              {t('common:handicap.bests.trophyRoom')}
+            </span>
+            <span style={{ fontSize: 17, fontWeight: 700, color: CHART.INK }}>
+              {t('common:handicap.bests.trophyRoomTitle')}
+            </span>
+          </span>
+          <ChevronRight size={19} color={GOLD_A(0.65)} />
+        </span>
+        {showFigure && (
+          <span
+            style={{
+              display: 'block',
+              marginTop: 13,
+              paddingTop: 13,
+              borderTop: `1px solid ${GOLD_A(0.16)}`,
+            }}
+          >
+            <span
+              style={{
+                display: 'block',
+                fontSize: 22,
+                fontWeight: 700,
+                color: SC_FILL_GOLD,
+                fontVariantNumeric: 'tabular-nums',
+                fontFeatureSettings: '"kern" 1, "liga" 1',
+              }}
+            >
+              {crowns}
+            </span>
+            <span
+              style={{
+                display: 'block',
+                marginTop: 2,
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color: CHART.MUTE,
+              }}
+            >
+              {t('common:handicap.bests.crownsHeld')}
+            </span>
+          </span>
+        )}
       </span>
-      <ChevronRight size={14} strokeWidth={2.4} color={CHART.MUTE} />
     </button>
   );
 
-  return standalone ? <HcpSection hairline>{row}</HcpSection> : row;
+  return standalone ? <HcpSection>{tile}</HcpSection> : tile;
 };
 
 export default PersonalBestsSection;

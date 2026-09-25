@@ -138,7 +138,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           StreaksSheetMount stays at page level so ?gam=streaks still opens. */}
 
       {/* 6 — TROPHY ROOM */}
-      {!readOnly && <TrophyRoomRow standalone />}
+      {!readOnly && <TrophyRoomRow standalone userId={userId} />}
 
       {/* FOOTER — provenance only. */}
       <HandicapFooter
