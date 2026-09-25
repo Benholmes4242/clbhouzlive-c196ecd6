@@ -623,5 +623,15 @@
     "body": "This will not be saved.",
     "keepEditing": "Keep editing",
     "discard": "Discard"
+  },
+  "reactions": {
+    "celebratedThisRound": "{{names}}님이 이 라운드를 축하했어요",
+    "celebratedYourRound": "{{names}}님이 회원님의 라운드를 축하했어요",
+    "namesTwo": "{{a}}, {{b}}",
+    "namesOneAndOne": "{{a}} 외 1명",
+    "namesTwoAndOne": "{{a}}, {{b}} 외 1명",
+    "namesOneAndMore": "{{a}} 외 {{n}}명",
+    "namesTwoAndMore": "{{a}}, {{b}} 외 {{n}}명",
+    "sheetTitleCelebrated": "축하함"
   }
 }

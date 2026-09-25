@@ -1370,8 +1370,9 @@
     "ratingCount_one": "[~~{{value}} řáţíñĝ~~]",
     "ratingCount_other": "[~~{{value}} řáţíñĝš~~]",
     "reactions": {
-      "action": "[~~Ļíǩé ţĥíš řőúñđ~~]",
-      "actionReview": "[~~Ļíǩé ţĥíš řéṽíéŵ~~]"
+      "action": "[~~Çéľéƀřáţé ţĥíš řőúñđ~~]",
+      "actionReview": "[~~Ļíǩé ţĥíš řéṽíéŵ~~]",
+      "celebrated": "[~~Çéľéƀřáţéđ~~]"
     },
     "reviews": {
       "featured": "[~~Ƒéáţúřéđ~~]",

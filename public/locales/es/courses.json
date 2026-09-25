@@ -1213,7 +1213,11 @@
       "relYest": "ayer"
     },
     "whereTheyPlayed": "Dónde jugaron en los últimos 14 días",
-    "whosBeenPlaying": "Tu círculo"
+    "whosBeenPlaying": "Tu círculo",
+    "reactions": {
+      "action": "Celebrar esta vuelta",
+      "celebrated": "Celebrado"
+    }
   },
   "explorer": {
     "allRegions": "All Regions",

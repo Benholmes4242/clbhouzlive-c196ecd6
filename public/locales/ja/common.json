@@ -623,5 +623,15 @@
     "body": "This will not be saved.",
     "keepEditing": "Keep editing",
     "discard": "Discard"
+  },
+  "reactions": {
+    "celebratedThisRound": "{{names}}がこのラウンドを称えました",
+    "celebratedYourRound": "{{names}}があなたのラウンドを称えました",
+    "namesTwo": "{{a}}と{{b}}",
+    "namesOneAndOne": "{{a}}ほか1人",
+    "namesTwoAndOne": "{{a}}、{{b}}ほか1人",
+    "namesOneAndMore": "{{a}}ほか{{n}}人",
+    "namesTwoAndMore": "{{a}}、{{b}}ほか{{n}}人",
+    "sheetTitleCelebrated": "称えた人"
   }
 }

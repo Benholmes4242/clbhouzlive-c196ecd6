@@ -262,7 +262,13 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
   const sharePrompt = useSharePromptFor(row.notif_id);
 
   const isUnread = !row.is_read;
-  const body = row.message ?? row.title ?? '';
+  const rawBody = row.message ?? row.title ?? '';
+  /* CELEBRATE ON ROUNDS (lib/reactionKind). The trigger still writes
+     "{name} liked your round"; a round's reaction reads as "celebrated", so
+     the sentence is re-voiced here at display time. The SQL copy is Ben's to
+     change; until then this keeps old and new rows speaking one language. */
+  const likedRound = /^(.+) liked your round$/.exec(rawBody);
+  const body = likedRound ? t('reactions.celebratedYourRound', { names: likedRound[1] }) : rawBody;
   const data = (row.data && typeof row.data === 'object' ? row.data : {}) as Record<string, string | undefined>;
 
   const holdTimer = useRef<number | null>(null);

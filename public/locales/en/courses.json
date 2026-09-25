@@ -1503,8 +1503,9 @@
     "ratingCount_one": "{{value}} rating",
     "ratingCount_other": "{{value}} ratings",
     "reactions": {
-      "action": "Like this round",
-      "actionReview": "Like this review"
+      "action": "Celebrate this round",
+      "actionReview": "Like this review",
+      "celebrated": "Celebrated"
     },
     "reviews": {
       "featured": "Featured",

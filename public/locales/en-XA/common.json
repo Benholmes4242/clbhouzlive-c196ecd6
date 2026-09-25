@@ -923,5 +923,15 @@
     "body": "[~~Ţĥíš ŵíļļ ñőţ ƀé šáṽéđ.~~]",
     "keepEditing": "[~~Ǩééƥ éđíţíñĝ~~]",
     "discard": "[~~Đíšĉářđ~~]"
+  },
+  "reactions": {
+    "celebratedThisRound": "[~~{{names}} ċéľéƀřáţéđ ţĥíš řőúñđ~~]",
+    "celebratedYourRound": "[~~{{names}} ċéľéƀřáţéđ ýőűř řőúñđ~~]",
+    "namesTwo": "[~~{{a}} áñđ {{b}}~~]",
+    "namesOneAndOne": "[~~{{a}} áñđ őñé őţĥéř~~]",
+    "namesTwoAndOne": "[~~{{a}}, {{b}} áñđ őñé őţĥéř~~]",
+    "namesOneAndMore": "[~~{{a}} áñđ {{n}} ɱőřé~~]",
+    "namesTwoAndMore": "[~~{{a}}, {{b}} áñđ {{n}} ɱőřé~~]",
+    "sheetTitleCelebrated": "[~~Çéľéƀřáţéđ~~]"
   }
 }
