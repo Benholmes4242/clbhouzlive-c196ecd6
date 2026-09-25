@@ -75,7 +75,6 @@ function courseDate(s: WhsScore | null): string | null {
 
 export const PersonalBestsSection: React.FC<Props> = ({
   connectionId,
-  currentHandicap,
   viewMode = 'owner',
   ownerFirstName = null,
   showTrophyRoom = true,
@@ -117,26 +116,18 @@ export const PersonalBestsSection: React.FC<Props> = ({
       });
     }
 
-    // Against handicap: a round with no course par cannot be scored against
-    // par, so it is dropped rather than defaulted to a guessed par.
-    if (currentHandicap != null) {
-      const scored = eighteen.filter(isReasonableGross).flatMap((s) =>
-        typeof s.adjusted_gross === 'number' && typeof s.course_par === 'number'
-          ? [{ s, vsHcp: s.adjusted_gross - s.course_par - currentHandicap }]
-          : [],
-      );
-      if (scored.length) {
-        const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
-        const abs = Math.abs(best.vsHcp).toFixed(1);
-        out.push({
-          key: 'vsHcp',
-          name: t('common:handicap.bests.bestVsHcp'),
-          sub: courseDate(best.s),
-          // True minus, never a hyphen.
-          figure: best.vsHcp < 0 ? `\u2212${abs}` : best.vsHcp > 0 ? `+${abs}` : abs,
-        });
-      }
-    }
+    // Against handicap: each round is scored against the index it was played
+    // off, as the provider recorded it — never the member's current index,
+    // which would re-rank the whole record every time the index moves. As
+    // with course par, a round missing the figure it needs is dropped rather
+    // than scored against a guessed or current one.
+    const scored = eighteen.filter(isReasonableGross).flatMap((s) =>
+      typeof s.adjusted_gross === 'number' &&
+      typeof s.course_par === 'number' &&
+      typeof s.handicap_index_at_time === 'number'
+        ? [{ s, vsHcp: s.adjusted_gross - s.course_par - s.handicap_index_at_time }]
+        : [],
+    );
 
     return ORDER.flatMap((k) => out.filter((r) => r.key === k));
   }, [scores, currentHandicap, t]);
