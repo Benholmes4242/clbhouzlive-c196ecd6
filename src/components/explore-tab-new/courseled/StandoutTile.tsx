@@ -21,6 +21,11 @@ import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
 
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
+/** The reference line's metrics — the reserve is DERIVED, never typed. */
+const SUBLINE_FS = 11;
+const SUBLINE_LH = 1.3;
+const SUBLINE_RESERVE = Math.round(SUBLINE_FS * SUBLINE_LH); // 14
+
 /** The tile scrim, held once in ./photoScrim and shared with the photo rails. */
 export const TILE_SCRIM = SCRIM_STANDOUT;
 
