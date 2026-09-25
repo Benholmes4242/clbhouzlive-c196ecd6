@@ -8,7 +8,7 @@ import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MessageCircle } from 'lucide-react';
 import ClapIcon from '@/components/icons/ClapIcon';
-import { CELEBRATE_GLYPH_SIZE } from '@/lib/reactionKind';
+import { CELEBRATE_GLYPH_SIZE, celebrateFigureSize } from '@/lib/reactionKind';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { ReviewVideoLayer } from './ReviewVideoLayer';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
@@ -404,7 +404,7 @@ function WhoLine({
     : !!engagement && (engagement.likeAvailable || engagement.commentAvailable);
   const countStyle: React.CSSProperties = {
     fontFamily: SANS,
-    fontSize: pair ? 11 : 13,
+    fontSize: pair ? 11 : celebrateFigureSize(CELEBRATE_GLYPH_SIZE),
     fontWeight: 600,
     fontVariantNumeric: 'tabular-nums lining-nums',
     lineHeight: 1,
@@ -452,8 +452,8 @@ function WhoLine({
           <span role="button" tabIndex={0} aria-label={`Comments, ${engagement.commentCount}`}
             onClick={(event) => { stop(event); engagement.onOpenComments?.(); }}
             onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); engagement.onOpenComments?.(); }}
-            style={{ minWidth: 40, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: subColor, cursor: 'pointer' }}>
-            <MessageCircle size={18} strokeWidth={2} aria-hidden />
+            style={{ minWidth: 44, height: 44, margin: '-6px 0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: subColor, cursor: 'pointer' }}>
+            <MessageCircle size={CELEBRATE_GLYPH_SIZE} strokeWidth={2} aria-hidden />
             {engagement.commentCount > 0 ? <span style={countStyle}>{engagement.commentCount}</span> : null}
           </span>
         )
