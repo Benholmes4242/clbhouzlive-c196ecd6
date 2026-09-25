@@ -199,7 +199,7 @@ describe('LatestReviews mosaic', () => {
       />,
     );
     const html = screen.getByTestId('review-tile-breakdown').innerHTML;
-    const fills = Array.from(screen.getByTestId('review-tile-breakdown').querySelectorAll<HTMLElement>('div[style*="width:"] > div'))
+    const fills = Array.from(screen.getByTestId('review-tile-breakdown').querySelectorAll<HTMLElement>('div[style*="height: 3px"] > div'))
       .map((el) => el.style.background);
     // jsdom normalises colours; normalise the function's value the same way.
     const norm = (c: string) => { const el = document.createElement('div'); el.style.background = c; return el.style.background; };
