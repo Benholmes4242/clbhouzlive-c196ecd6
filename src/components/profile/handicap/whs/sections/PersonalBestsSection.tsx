@@ -129,8 +129,20 @@ export const PersonalBestsSection: React.FC<Props> = ({
         : [],
     );
 
+    if (scored.length) {
+      const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
+      const abs = Math.abs(best.vsHcp).toFixed(1);
+      out.push({
+        key: 'vsHcp',
+        name: t('common:handicap.bests.bestVsHcp'),
+        sub: courseDate(best.s),
+        // True minus, never a hyphen.
+        figure: best.vsHcp < 0 ? `\u2212${abs}` : best.vsHcp > 0 ? `+${abs}` : abs,
+      });
+    }
+
     return ORDER.flatMap((k) => out.filter((r) => r.key === k));
-  }, [scores, currentHandicap, t]);
+  }, [scores, t]);
 
   /* THE SENTENCE NAMES WHAT IS MISSING AND EXPLAINS NOTHING (Sep 2026 ruling).
      The old wording named a stableford and a round off handicap whatever was
