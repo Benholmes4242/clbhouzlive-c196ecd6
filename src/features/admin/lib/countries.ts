@@ -19,8 +19,8 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'Africa',
     // Countries
     'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi',
-    'Cabo Verde', 'Cameroon', 'Central African Republic', 'Chad', 'Comoros',
-    'Congo', 'Cote d\'Ivoire', 'Democratic Republic of the Congo', 'Djibouti',
+    'Cape Verde', 'Cameroon', 'Central African Republic', 'Chad', 'Comoros',
+    'Congo', 'Cote d\'Ivoire', 'Democratic Republic of Congo', 'Djibouti',
     'Egypt', 'Equatorial Guinea', 'Eritrea', 'Eswatini', 'Ethiopia',
     'Gabon', 'Gambia', 'Ghana', 'Guinea', 'Guinea-Bissau',
     'Kenya', 'Lesotho', 'Liberia', 'Libya', 'Madagascar', 'Malawi',
@@ -35,7 +35,8 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'Asia', 'Middle East',
     // Countries
     'Afghanistan', 'Armenia', 'Azerbaijan', 'Bahrain', 'Bangladesh',
-    'Bhutan', 'Brunei', 'Cambodia', 'China', 'Cyprus',
+    'Bhutan', 'Brunei', 'Cambodia', 'China',
+    'Hong Kong',
     'Georgia', 'India', 'Indonesia', 'Iran', 'Iraq', 'Israel',
     'Japan', 'Jordan', 'Kazakhstan', 'Kuwait', 'Kyrgyzstan',
     'Laos', 'Lebanon', 'Malaysia', 'Maldives', 'Mongolia',
@@ -43,7 +44,11 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'Palestine', 'Philippines', 'Qatar', 'Saudi Arabia',
     'Singapore', 'South Korea', 'Sri Lanka', 'Syria',
     'Taiwan', 'Tajikistan', 'Thailand', 'Timor-Leste',
-    'Turkey', 'Turkmenistan', 'United Arab Emirates',
+    /* Turkey and Cyprus removed from Asia: Filed as Continental Europe throughout golf_courses (Turkey 21,
+       Cyprus 6). Transcontinental, and golf sells Belek and Paphos beside
+       Spain and Portugal. Deliberately NOT also in Asia: two homes let one
+       country be filed two ways. */
+    'Turkmenistan', 'United Arab Emirates',
     'Uzbekistan', 'Vietnam', 'Yemen',
   ],
   'Europe': [
@@ -53,27 +58,35 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     'England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland',
     // Countries
     'Albania', 'Andorra', 'Austria', 'Belarus', 'Belgium',
-    'Bosnia and Herzegovina', 'Bulgaria', 'Croatia', 'Czech Republic',
+    'Bosnia and Herzegovina', 'Bulgaria',     /* Filed as Continental Europe throughout golf_courses (Turkey 21,
+       Cyprus 6). Transcontinental, and golf sells Belek and Paphos beside
+       Spain and Portugal. Deliberately NOT also in Asia: two homes let one
+       country be filed two ways. */
+    'Croatia', 'Cyprus', 'Czech Republic',
     'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece',
     'Hungary', 'Iceland', 'Italy', 'Kosovo', 'Latvia',
     'Liechtenstein', 'Lithuania', 'Luxembourg', 'Malta', 'Moldova',
     'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia', 'Norway',
     'Poland', 'Portugal', 'Romania', 'Russia', 'San Marino',
     'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden',
-    'Switzerland', 'Ukraine', 'United Kingdom',
+        /* Filed as Continental Europe throughout golf_courses (Turkey 21,
+       Cyprus 6). Transcontinental, and golf sells Belek and Paphos beside
+       Spain and Portugal. Deliberately NOT also in Asia: two homes let one
+       country be filed two ways. */
+    'Switzerland', 'Turkey', 'Ukraine', 'United Kingdom',
   ],
   'North America': [
     // Legacy labels
     'Caribbean', 'Central and South America', 'Rest of World',
     // Countries
     'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Belize',
-    'Canada', 'Costa Rica', 'Cuba', 'Curacao', 'Dominica',
+    'Canada', 'Costa Rica', 'Cuba', 'Curaçao', 'Dominica',
     'Dominican Republic', 'El Salvador', 'Grenada', 'Guatemala',
     'Haiti', 'Honduras', 'Jamaica', 'Mexico', 'Nicaragua', 'Panama',
-    'Puerto Rico', 'Saint Kitts and Nevis', 'Saint Lucia',
-    'Saint Vincent and the Grenadines',
+    'Puerto Rico', 'St Kitts and Nevis', 'St Lucia',
+    'St Vincent and the Grenadines',
     'Trinidad and Tobago', 'USA',
-    'US Virgin Islands',
+    'Virgin Islands',
   ],
   'Oceania': [
     // Legacy label
