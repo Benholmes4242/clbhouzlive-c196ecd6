@@ -48,5 +48,6 @@ describe('ComingUp component', () => {
     // We need to find the container. In the new implementation it will have overflowX: 'auto'.
     const rail = screen.getByRole('list'); // We should use a role or data-testid
     expect(rail.style.overflowX).toBe('auto');
+    expect(screen.getAllByRole('listitem')).toHaveLength(6);
   });
 });

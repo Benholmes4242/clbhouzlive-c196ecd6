@@ -110,10 +110,29 @@ describe('Explore card shapes', () => {
     );
     const meta = container.querySelector<HTMLElement>('[data-explore-story-meta="true"]');
     expect(meta).not.toBeNull();
-    /* BRIEF_EXPLORE_STORY_TILE_MATCH_THE_TOUR_HERO §2.1 — ONE STRING, so the
-       meta no longer has a left/right pair of child elements. */
-    expect(meta?.firstElementChild).toBeNull();
+    /* BRIEF_TEST_SUITE_TRIAGE_PART_2 §1 — the behaviour storyMetaNode's
+       comment promises, not a markup shape: one line that never wraps, the
+       section label truncates, the age never shrinks or truncates, and the
+       row's box is identical with or without an age. (jsdom has no layout, so
+       "height unchanged" is pinned through the styles that set it.) */
     expect(meta?.textContent?.startsWith('Amateur News')).toBe(true);
+    expect(meta?.style.display).toBe('flex');
+    expect(meta?.style.flexWrap).not.toBe('wrap');
+    const section = meta?.querySelector<HTMLElement>('[data-explore-story-section="true"]');
+    expect(section?.style.whiteSpace).toBe('nowrap');
+    expect(section?.style.overflow).toBe('hidden');
+    expect(section?.style.textOverflow).toBe('ellipsis');
+    const age = meta?.querySelector<HTMLElement>('[data-explore-story-age="true"]');
+    expect(age).not.toBeNull();
+    expect(age?.style.flex).toBe('0 0 auto');
+    expect(age?.style.whiteSpace).toBe('nowrap');
+    expect(age?.style.overflow).not.toBe('hidden');
+    expect(age?.style.textOverflow).toBe('');
+    const noAge = render(
+      <ExploreCard item={{ ...story(), facts: { ...story().facts, published_at: null } }} size="lead" shape={null} onTap={() => undefined} />,
+    ).container.querySelector<HTMLElement>('[data-explore-story-meta="true"]');
+    expect(noAge?.querySelector('[data-explore-story-age="true"]')).toBeNull();
+    expect(noAge?.getAttribute('style')).toBe(meta?.getAttribute('style'));
     expect(getByText('A championship story')).toBeInTheDocument();
     expect(getByText('The supporting detail follows beneath the title.')).toBeInTheDocument();
     expect(queryByText('A member')).toBeNull();
