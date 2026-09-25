@@ -510,7 +510,8 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                             count={st.count}
                             reacted={st.mine}
                             onToggle={() => reactions.toggle('round', r.score_id)}
-                            label={t('discover.reactions.action', 'Like this round')}
+                            label={st.mine ? t('discover.reactions.celebrated', 'Celebrated') : t('discover.reactions.action', 'Celebrate this round')}
+                            kind="celebrate"
                           />
                         );
                       })()}

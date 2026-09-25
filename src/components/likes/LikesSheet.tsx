@@ -13,6 +13,8 @@
  *
  * PAGINATION: renders 30 rows, pages on scroll.
  */
+import { useTranslation } from 'react-i18next';
+import type { ReactionKind } from '@/lib/reactionKind';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -37,9 +39,11 @@ export interface LikesSheetProps {
   /** The surface's own like count — never the list length. */
   count: number;
   source?: LikeSource;
+  kind?: ReactionKind;
 }
 
-export function LikesSheet({ open, onClose, postId, count, source = 'post' }: LikesSheetProps) {
+export function LikesSheet({ open, onClose, postId, count, source = 'post', kind = 'like' }: LikesSheetProps) {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { likers, isLoading } = usePostLikers(postId, open, source);
   const [visible, setVisible] = useState(PAGE);
@@ -68,7 +72,7 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post' }: Li
     >
       <div style={{ padding: '4px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}>
-          Likes
+          {kind === 'celebrate' ? t('reactions.sheetTitleCelebrated') : 'Likes'}
         </div>
         <div style={{ fontSize: 12.5, fontWeight: 500, color: A.MUTE, marginTop: 2 }}>
           {count === 1 ? '1 person' : `${count.toLocaleString()} people`}

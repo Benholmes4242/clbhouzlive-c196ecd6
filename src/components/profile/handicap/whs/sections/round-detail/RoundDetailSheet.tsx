@@ -419,7 +419,9 @@ export const RoundDetailSheet: React.FC<Props> = ({
         likeCount: reactions.stateFor('round', scoreId).count,
         likeMine: reactions.stateFor('round', scoreId).mine,
         onToggleLike: () => reactions.toggle('round', scoreId),
-        likeLabel: t('discover.reactions.action', 'Like this round'),
+        likeLabel: reactions.stateFor('round', scoreId).mine
+          ? t('discover.reactions.celebrated', 'Celebrated')
+          : t('discover.reactions.action', 'Celebrate this round'),
         /* G7.3(b) — the liked-by line reads the SCORE's reactions, so a round
            with likes and no post finally shows who left them. */
         postId: scoreId,

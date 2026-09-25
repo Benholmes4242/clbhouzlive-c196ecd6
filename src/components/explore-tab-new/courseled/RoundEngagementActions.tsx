@@ -2,6 +2,7 @@ import React from 'react';
 
 import { CommentAction } from './CommentAction';
 import { ReactionAction } from './ReactionAction';
+import type { ReactionKind } from '@/lib/reactionKind';
 
 /**
  * One canonical round-engagement pair for every round surface.
@@ -28,9 +29,11 @@ interface Props {
   comment: RoundCommentAction | null;
   like: RoundLikeAction;
   size?: number;
+  /** ReviewBottomSheet shares this pair and keeps the heart; round surfaces pass 'celebrate'. */
+  kind?: ReactionKind;
 }
 
-export function RoundEngagementActions({ comment, like, size = 15 }: Props) {
+export function RoundEngagementActions({ comment, like, size = 15, kind = 'like' }: Props) {
   return (
     <span
       data-round-engagement="comment-heart"
@@ -52,6 +55,7 @@ export function RoundEngagementActions({ comment, like, size = 15 }: Props) {
         onToggle={like.onToggle}
         label={like.label}
         size={size}
+        kind={kind}
       />
     </span>
   );

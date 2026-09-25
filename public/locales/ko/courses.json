@@ -1175,7 +1175,11 @@
       "relYest": "어제"
     },
     "whereTheyPlayed": "최근 14일간 플레이한 곳",
-    "whosBeenPlaying": "내 써클"
+    "whosBeenPlaying": "내 써클",
+    "reactions": {
+      "action": "이 라운드 축하하기",
+      "celebrated": "축하함"
+    }
   },
   "explorer": {
     "allRegions": "All Regions",

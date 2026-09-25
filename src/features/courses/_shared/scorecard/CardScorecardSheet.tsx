@@ -1054,6 +1054,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               {engagement && (
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <RoundEngagementActions
+                    /* A scorecard is always a ROUND: the clap (lib/reactionKind). */
+                    kind="celebrate"
                     comment={engagement.comment ?? null}
                     like={{
                       hidden: engagement.likeHidden,
@@ -1070,6 +1072,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   postId={engagement.postId}
                   count={engagement.likeCount}
                   source={engagement.likeSource ?? 'post'}
+                  kind="celebrate"
                   style={{ marginTop: 8 }}
                 />
               )}

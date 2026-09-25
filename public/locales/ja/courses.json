@@ -1172,7 +1172,11 @@
       "relYest": "昨日"
     },
     "whereTheyPlayed": "過去14日間にプレーした場所",
-    "whosBeenPlaying": "あなたのサークル"
+    "whosBeenPlaying": "あなたのサークル",
+    "reactions": {
+      "action": "このラウンドを称える",
+      "celebrated": "称えました"
+    }
   },
   "explorer": {
     "allRegions": "All Regions",

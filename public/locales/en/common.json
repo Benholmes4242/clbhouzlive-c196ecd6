@@ -928,5 +928,15 @@
     "body": "This will not be saved.",
     "keepEditing": "Keep editing",
     "discard": "Discard"
+  },
+  "reactions": {
+    "celebratedThisRound": "{{names}} celebrated this round",
+    "celebratedYourRound": "{{names}} celebrated your round",
+    "namesTwo": "{{a}} and {{b}}",
+    "namesOneAndOne": "{{a}} and one other",
+    "namesTwoAndOne": "{{a}}, {{b}} and one other",
+    "namesOneAndMore": "{{a}} and {{n}} more",
+    "namesTwoAndMore": "{{a}}, {{b}} and {{n}} more",
+    "sheetTitleCelebrated": "Celebrated"
   }
 }

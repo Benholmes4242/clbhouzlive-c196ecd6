@@ -29,6 +29,8 @@
  *
  * Read and presentation only. No like write path, and no long-press gesture.
  */
+import { useTranslation } from 'react-i18next';
+import type { ReactionKind } from '@/lib/reactionKind';
 import { useState } from 'react';
 import { usePostLikers, likerFirstNames } from '@/hooks/usePostLikers';
 import type { LikeSource } from '@/hooks/usePostLikes';
@@ -45,6 +47,8 @@ export interface LikedByRowProps {
    */
   surfaceColor?: string;
   source?: LikeSource;
+  /** 'celebrate' on ROUNDS — see lib/reactionKind. Never a plural noun. */
+  kind?: ReactionKind;
   style?: React.CSSProperties;
 }
 
@@ -54,7 +58,9 @@ export function LikedByRow({
   surfaceColor,
   source = 'post',
   style,
+  kind = 'like',
 }: LikedByRowProps) {
+  const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
   // The names are the same query key the sheet uses, so opening it costs
   // nothing. The line does not wait on it.
@@ -65,7 +71,23 @@ export function LikedByRow({
   const names = likerFirstNames(likers, 2);
 
   let copy: string;
-  if (names.length >= 2 && count > 2) {
+  if (kind === 'celebrate') {
+    // "{names} celebrated this round" — the verb, never a plural noun.
+    const rest = count - names.length;
+    const namesText =
+      names.length === 0
+        ? null
+        : rest <= 0
+          ? names.length === 2
+            ? t('reactions.namesTwo', { a: names[0], b: names[1] })
+            : names[0]
+          : rest === 1
+            ? t(names.length === 2 ? 'reactions.namesTwoAndOne' : 'reactions.namesOneAndOne', { a: names[0], b: names[1] })
+            : t(names.length === 2 ? 'reactions.namesTwoAndMore' : 'reactions.namesOneAndMore', { a: names[0], b: names[1], n: rest.toLocaleString() });
+    copy = namesText
+      ? t('reactions.celebratedThisRound', { names: namesText })
+      : t('reactions.celebratedThisRound', { names: count.toLocaleString() });
+  } else if (names.length >= 2 && count > 2) {
     const others = Math.max(count - 2, 1);
     copy = `Liked by ${names[0]}, ${names[1]} and ${others.toLocaleString()} other${others === 1 ? '' : 's'}`;
   } else if (names.length >= 2) {
@@ -123,6 +145,7 @@ export function LikedByRow({
         postId={postId}
         count={count}
         source={source}
+        kind={kind}
       />
     </>
   );

@@ -1213,7 +1213,11 @@
       "relYest": "gestern"
     },
     "whereTheyPlayed": "Wo in den letzten 14 Tagen gespielt wurde",
-    "whosBeenPlaying": "Dein Kreis"
+    "whosBeenPlaying": "Dein Kreis",
+    "reactions": {
+      "action": "Diese Runde feiern",
+      "celebrated": "Gefeiert"
+    }
   },
   "explorer": {
     "allRegions": "All Regions",
