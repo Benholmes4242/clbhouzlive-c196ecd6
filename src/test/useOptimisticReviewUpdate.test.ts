@@ -249,8 +249,18 @@ describe('useOptimisticReviewUpdate', () => {
         result.current.confirmUpdate(courseId, userId);
       });
       
-      // Should invalidate reviews, user rating, aggregates, distribution, and media
-      expect(invalidateSpy).toHaveBeenCalledTimes(5);
+      /* BRIEF_TEST_SUITE_TRIAGE_PART_2 §5 — membership, not a call count: the
+         failure that matters is a required key being DROPPED; new keys may
+         arrive freely. */
+      const invalidated = invalidateSpy.mock.calls.map(([f]) => JSON.stringify((f as { queryKey: unknown }).queryKey));
+      const required = [
+        ['course-reviews-full', courseId],
+        ['user-course-rating', courseId, userId],
+        ['course-rating-aggregates', courseId],
+        ['course-rating-distribution', courseId],
+        ['club-media', courseId],
+      ];
+      for (const key of required) expect(invalidated).toContain(JSON.stringify(key));
     });
   });
 });

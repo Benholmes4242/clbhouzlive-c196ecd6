@@ -11,7 +11,7 @@ vi.mock('react-i18next', () => ({
 
 import { LatestReviews } from '@/components/explore-tab-new/courseled/LatestReviews';
 import { REVIEW_TILE_HEIGHT, REVIEW_TILE_FEATURED_HEIGHT } from '@/components/explore-tab-new/courseled/ReviewTile';
-import { BAND_GREEN_DARK, BAND_AMBER_DARK, BAND_RED_DARK } from '@/features/courses/_shared/scoreBands';
+import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
 /** The mosaic reads reactions through React Query; the tree needs a client. */
@@ -185,7 +185,9 @@ describe('LatestReviews mosaic', () => {
     expect(screen.queryByTestId('review-tile-breakdown')).toBeNull();
   });
 
-  it('tints dark-surface bars with the app-wide dark score bands, not the light scale', () => {
+  /* BRIEF_TEST_SUITE_TRIAGE_PART_2 §3 — the two-tone sub-score rule, asserted
+     THROUGH courseSubScoreTone so the threshold and tokens may move. */
+  it('tints bars with the two-tone sub-score rule, sub-threshold bars in neutral ink', () => {
     render(
       <LatestReviews
         reviews={[
@@ -197,11 +199,12 @@ describe('LatestReviews mosaic', () => {
       />,
     );
     const html = screen.getByTestId('review-tile-breakdown').innerHTML;
-    // jsdom serialises inline colours as rgb(); assert the band values.
-    const rgb = (hex: string) =>
-      `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ')})`;
-    expect(html).toContain(rgb(BAND_GREEN_DARK));
-    expect(html).toContain(rgb(BAND_AMBER_DARK));
-    expect(html).toContain(rgb(BAND_RED_DARK));
+    const fills = Array.from(screen.getByTestId('review-tile-breakdown').querySelectorAll<HTMLElement>('div[style*="height: 3px"] > div'))
+      .map((el) => el.style.background);
+    // jsdom normalises colours; normalise the function's value the same way.
+    const norm = (c: string) => { const el = document.createElement('div'); el.style.background = c; return el.style.background; };
+    expect(fills).toEqual([9.4, 6.1, 4.2].map((v) => norm(courseSubScoreTone(v))));
+    // The design claim: below threshold is neutral ink, never a hue.
+    expect(norm(courseSubScoreTone(6.1))).toBe('rgba(248, 250, 252, 0.62)');
   });
 });
