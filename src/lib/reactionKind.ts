@@ -22,7 +22,7 @@ import ClapIcon from '@/components/icons/ClapIcon';
  * action on a round; the heart is one control among several on a photo or
  * review post. These two constants are the ONLY place either size is set.
  */
-export const CELEBRATE_GLYPH_SIZE = 29;         // stacked round footers
+export const CELEBRATE_GLYPH_SIZE = 26;         // stacked round footers
 export const CELEBRATE_GLYPH_SIZE_COMPACT = 18; // one-line Discover rows
 
 /** The count beside a scaled glyph: size * 0.62, one decimal. */
