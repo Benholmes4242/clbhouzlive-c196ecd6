@@ -1361,6 +1361,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       likeAvailable,
       commentCount: post?.commentCount ?? 0,
       commentAvailable: !!post,
+      reactionSubjectId: scoreId,
+      ownerName: item.who?.display_name?.trim().split(/\s+/)[0] || null,
+      isOwnRound: item.who?.is_viewer ?? false,
       onToggleLike: likeAvailable ? () => {
         analyticsEvents.track('explore_round_like_toggled', { score_id: scoreId, liked: !state.mine, view });
         roundReactions.toggle('round', scoreId);
