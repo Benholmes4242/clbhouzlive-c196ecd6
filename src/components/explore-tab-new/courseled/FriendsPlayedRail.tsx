@@ -1,3 +1,4 @@
+import { CELEBRATE_GLYPH_SIZE_COMPACT } from '@/lib/reactionKind';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -512,6 +513,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                             onToggle={() => reactions.toggle('round', r.score_id)}
                             label={st.mine ? t('discover.reactions.celebrated', 'Celebrated') : t('discover.reactions.action', 'Celebrate this round')}
                             kind="celebrate"
+                            size={CELEBRATE_GLYPH_SIZE_COMPACT}
                           />
                         );
                       })()}

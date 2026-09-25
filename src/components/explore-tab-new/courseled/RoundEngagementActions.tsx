@@ -2,7 +2,7 @@ import React from 'react';
 
 import { CommentAction } from './CommentAction';
 import { ReactionAction } from './ReactionAction';
-import type { ReactionKind } from '@/lib/reactionKind';
+import { CELEBRATE_GLYPH_SIZE, celebrateFigureSize, type ReactionKind } from '@/lib/reactionKind';
 
 /**
  * One canonical round-engagement pair for every round surface.
@@ -33,11 +33,15 @@ interface Props {
   kind?: ReactionKind;
 }
 
-export function RoundEngagementActions({ comment, like, size = 15, kind = 'like' }: Props) {
+export function RoundEngagementActions({ comment, like, size: sizeProp, kind = 'like' }: Props) {
+  // One size feeds BOTH glyphs so the comment bubble moves with the clap.
+  const celebrateDefault = kind === 'celebrate' && sizeProp == null;
+  const size = sizeProp ?? (celebrateDefault ? CELEBRATE_GLYPH_SIZE : 15);
+  const figureSize = celebrateDefault ? celebrateFigureSize(size) : undefined;
   return (
     <span
       data-round-engagement="comment-heart"
-      style={{ display: 'inline-flex', alignItems: 'center', gap: 12, flexShrink: 0, whiteSpace: 'nowrap' }}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: celebrateDefault ? 18 : 12, flexShrink: 0, whiteSpace: 'nowrap' }}
     >
       {comment && (
         <CommentAction
@@ -45,6 +49,7 @@ export function RoundEngagementActions({ comment, like, size = 15, kind = 'like'
           onOpen={comment.onOpen}
           label={comment.label}
           size={size}
+          figureSize={figureSize}
         />
       )}
       <ReactionAction
@@ -55,6 +60,7 @@ export function RoundEngagementActions({ comment, like, size = 15, kind = 'like'
         onToggle={like.onToggle}
         label={like.label}
         size={size}
+        figureSize={figureSize}
         kind={kind}
       />
     </span>

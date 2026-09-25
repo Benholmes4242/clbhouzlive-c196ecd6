@@ -1,3 +1,4 @@
+import { CELEBRATE_GLYPH_SIZE_COMPACT } from '@/lib/reactionKind';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 import { useTranslation } from 'react-i18next';
@@ -263,6 +264,7 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight, shape = 
               onToggle={reaction.onToggle}
               label={reaction.label}
               kind="celebrate"
+              size={CELEBRATE_GLYPH_SIZE_COMPACT}
             />
           </ReactionSlot>
         )}

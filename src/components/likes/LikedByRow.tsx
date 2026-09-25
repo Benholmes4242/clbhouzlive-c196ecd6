@@ -49,6 +49,10 @@ export interface LikedByRowProps {
   source?: LikeSource;
   /** 'celebrate' on ROUNDS — see lib/reactionKind. Never a plural noun. */
   kind?: ReactionKind;
+  /** The round owner's FIRST name (celebrate only). */
+  ownerName?: string | null;
+  /** The viewer owns the round (celebrate only). */
+  isOwnRound?: boolean;
   style?: React.CSSProperties;
 }
 
@@ -59,6 +63,8 @@ export function LikedByRow({
   source = 'post',
   style,
   kind = 'like',
+  ownerName = null,
+  isOwnRound = false,
 }: LikedByRowProps) {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
@@ -84,9 +90,16 @@ export function LikedByRow({
           : rest === 1
             ? t(names.length === 2 ? 'reactions.namesTwoAndOne' : 'reactions.namesOneAndOne', { a: names[0], b: names[1] })
             : t(names.length === 2 ? 'reactions.namesTwoAndMore' : 'reactions.namesOneAndMore', { a: names[0], b: names[1], n: rest.toLocaleString() });
-    copy = namesText
-      ? t('reactions.celebratedThisRound', { names: namesText })
-      : t('reactions.celebratedThisRound', { names: count.toLocaleString() });
+    // WHOSE ROUND: own -> "your round"; known owner -> "<Name>'s round"
+    // (always 's, even after an s); otherwise the still-true "this round".
+    // Never a bare "'s round".
+    const who = namesText ?? count.toLocaleString();
+    const owner = ownerName?.trim();
+    copy = isOwnRound
+      ? t('reactions.celebratedYourRound', { names: who })
+      : owner
+        ? t('reactions.celebratedOwnersRound', { names: who, owner })
+        : t('reactions.celebratedThisRound', { names: who });
   } else if (names.length >= 2 && count > 2) {
     const others = Math.max(count - 2, 1);
     copy = `Liked by ${names[0]}, ${names[1]} and ${others.toLocaleString()} other${others === 1 ? '' : 's'}`;

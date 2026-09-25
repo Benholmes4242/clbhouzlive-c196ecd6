@@ -627,6 +627,7 @@
   "reactions": {
     "celebratedThisRound": "{{names}}がこのラウンドを称えました",
     "celebratedYourRound": "{{names}}があなたのラウンドを称えました",
+    "celebratedOwnersRound": "{{names}}が{{owner}}さんのラウンドを称えました",
     "namesTwo": "{{a}}と{{b}}",
     "namesOneAndOne": "{{a}}ほか1人",
     "namesTwoAndOne": "{{a}}、{{b}}ほか1人",

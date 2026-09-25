@@ -927,6 +927,7 @@
   "reactions": {
     "celebratedThisRound": "[~~{{names}} ċéľéƀřáţéđ ţĥíš řőúñđ~~]",
     "celebratedYourRound": "[~~{{names}} ċéľéƀřáţéđ ýőűř řőúñđ~~]",
+    "celebratedOwnersRound": "[~~{{names}} ċéľéƀřáţéđ {{owner}}'š řőúñđ~~]",
     "namesTwo": "[~~{{a}} áñđ {{b}}~~]",
     "namesOneAndOne": "[~~{{a}} áñđ őñé őţĥéř~~]",
     "namesTwoAndOne": "[~~{{a}}, {{b}} áñđ őñé őţĥéř~~]",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { reactionGlyph, type ReactionKind } from '@/lib/reactionKind';
+import { reactionGlyph, CELEBRATE_GLYPH_SIZE, celebrateFigureSize, type ReactionKind } from '@/lib/reactionKind';
 
 import { A, FIGS, SANS } from './tokens';
 
@@ -59,12 +59,20 @@ export function ReactionAction({
   tone = 'ink',
   readOnly = false,
   hidden = false,
-  size = 15,
-  figureSize = 11.5,
+  size: sizeProp,
+  figureSize: figureSizeProp,
   reserveCount = false,
   kind = 'like',
 }: Props) {
   if (hidden) return null;
+  // DEFAULT stays 15 for every heart; a celebrate with no explicit size takes
+  // the shared constant (lib/reactionKind) and its count scales with it.
+  const celebrateDefault = kind === 'celebrate' && sizeProp == null;
+  const size = sizeProp ?? (celebrateDefault ? CELEBRATE_GLYPH_SIZE : 15);
+  const figureSize = figureSizeProp ?? (celebrateDefault ? celebrateFigureSize(size) : 11.5);
+  // 44x44 minimum hit area: horizontal padding grows for small glyphs.
+  const padX = Math.max(10, Math.ceil((44 - size) / 2));
+  const padY = Math.max(13, Math.ceil((44 - size) / 2));
   const Glyph = reactionGlyph(kind);
 
   const glass = tone === 'glass';
@@ -132,8 +140,8 @@ export function ReactionAction({
         fontFamily: SANS,
         cursor: 'pointer',
         // 44px tap target without a layout footprint.
-        padding: '13px 10px',
-        margin: '-13px -10px',
+        padding: `${padY}px ${padX}px`,
+        margin: `-${padY}px -${padX}px`,
         WebkitTapHighlightColor: 'transparent',
       }}
     >
