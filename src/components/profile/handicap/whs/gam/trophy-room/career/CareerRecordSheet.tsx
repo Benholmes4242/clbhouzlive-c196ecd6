@@ -33,6 +33,7 @@ import { normalizeBadge, normalizeLegend } from '../_shared/normalizeTrophyItem'
 import { isTop100Achievement } from '../_shared/showpieces';
 import { REC } from './tokens';
 import { Caption } from './Primitives';
+import { CabinetPanel } from './panels/CabinetPanel';
 import { CareerHeader } from './CareerHeader';
 import { CountingStatsPanel } from './panels/CountingStatsPanel';
 import { SeasonCutPanel } from './panels/SeasonCutPanel';
@@ -297,8 +298,11 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
               <StandingsPanel rows={standings} />
             ) : (
               <>
-                <SeasonCutPanel rounds={rounds} />
+                {/* A trophy room opens on a career: cabinet, then the three
+                    closest records, THEN this season (moved, not deleted). */}
+                <CabinetPanel data={data} items={achievements} />
                 <CountingStatsPanel data={data} items={counting} sparse={sparse} />
+                <SeasonCutPanel rounds={rounds} />
                 <Top100Panel data={data} items={top100} />
                 <CourseRecordsPanel data={data} groups={crownGroups} />
                 <StandingsPanel rows={standings} />
