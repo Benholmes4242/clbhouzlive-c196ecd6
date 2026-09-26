@@ -14,10 +14,11 @@
  * is entered through the SAME `onMediaClick(index, el)` contract.
 
  *
- * HELPFUL: a single affirmative. All 99 votes ever cast are `helpful` — there
+ * LIKE (was "Helpful", merged into content_reactions): a single affirmative. All 99 votes ever cast are `helpful` — there
  * has never been an unhelpful vote — so the thumbs-down is gone and the
  * mutation is called only with 'helpful' | 'clear'.
  */
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import { ThumbsUp, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
@@ -152,6 +153,7 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
   onReadMore,
   isHighlighted,
 }) => {
+  const { t: tCommon } = useTranslation('common');
   const [expanded, setExpanded] = useState(false);
   const name = isMine ? 'You' : displayName;
   const score = review.rating ?? 0;
@@ -255,7 +257,7 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
       {/* d) photos */}
       <PhotoStrip review={review} onMediaClick={onMediaClick} />
 
-      {/* e) the foot row: one Helpful control, overflow right */}
+      {/* e) the foot row: one like control (glyph + count, no word), overflow right */}
       {!isMine && (
         <div style={{ display: 'flex', alignItems: 'center', marginTop: 12 }}>
           <button
@@ -276,10 +278,10 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
               opacity: votingDisabled ? 0.5 : 1,
             }}
             aria-pressed={!!isHelpful}
+            aria-label={isHelpful ? tCommon('comments.unlike') : tCommon('comments.like')}
           >
             <ThumbsUp size={13} strokeWidth={2} fill={isHelpful ? A.INK : 'none'} />
             {helpfulCount > 0 && <span style={FIGS}>{helpfulCount}</span>}
-            <span>Helpful</span>
           </button>
 
           {onOverflow && (
