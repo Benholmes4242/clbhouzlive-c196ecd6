@@ -177,7 +177,13 @@ const RoundPage: React.FC = () => {
   usePageReady(!pending);
 
   const content = useMemo(() => {
-    if (pending) return asOverlay ? null : <RoundPageSkeleton />;
+    /* COLD AND UNDECIDED: the session has not settled, so we do not yet know
+       whether this becomes a sheet over Activity or a sign-in shell. Painting
+       the PAGE skeleton here would commit to a presentation we are about to
+       replace — the flash BRIEF_ROUND_PUSH_OPENS_AS_SHEET §1 exists to
+       prevent. Render nothing and let the boot shield hold. */
+    const undecided = !asOverlay && !synthesised && !missingId;
+    if (pending) return (asOverlay || undecided) ? null : <RoundPageSkeleton />;
 
     if (missingId) {
 
@@ -227,7 +233,7 @@ const RoundPage: React.FC = () => {
       </div>
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pending, missingId, signedOut, whsScoreId, ownerId, t, hasHistory, authLoading, asOverlay]);
+  }, [pending, missingId, signedOut, whsScoreId, ownerId, t, hasHistory, authLoading, asOverlay, synthesised]);
 
   /**
    * BRIEF_ROUND_PUSH_OPENS_AS_SHEET — a cold arrival (push into a cold app,
@@ -240,7 +246,7 @@ const RoundPage: React.FC = () => {
    * Settled signed-out visitors are not redirected (they keep the sign-in
    * shell); on the web the AppDownloadGate in App.tsx runs before this.
    */
-  if (!asOverlay && !synthesised && !missingId && !signedOut) {
+  if (!asOverlay && !synthesised && !missingId && !authLoading && !signedOut) {
     return (
       <Navigate
         replace

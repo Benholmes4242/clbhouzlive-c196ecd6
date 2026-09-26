@@ -14,7 +14,7 @@ describe('round notifications open the scorecard over Activity', () => {
         kind: 'back',
         title: null,
         backTarget: 'history',
-        backFallback: '/handicap',
+        backFallback: '/notificationmessages',
       },
       tone: 'dark',
       bleed: false,
@@ -46,13 +46,21 @@ describe('round notifications open the scorecard over Activity', () => {
     const app = source('src/App.tsx');
 
     expect(page).toContain('const asOverlay = Boolean(');
-    expect(page).toContain("if (pending) return asOverlay ? null : <RoundPageSkeleton />;");
+    expect(page).toContain("if (pending) return (asOverlay || undecided) ? null : <RoundPageSkeleton />;");
     expect(page).toContain("presentation={asOverlay ? 'overlay' : 'page'}");
     expect(page).toContain('return asOverlay ? sheet : (');
-    expect(page).toContain('if (!asOverlay && !synthesised && !missingId && !signedOut) {');
+    expect(page).toContain('if (!asOverlay && !synthesised && !missingId && !authLoading && !signedOut) {');
     expect(page).toContain("navigate('/notificationmessages', { replace: true })");
     expect(page).toContain('initialCommentsOpen={openCommentsRequested}');
     expect(app.match(/path="\/round\/:whsScoreId"/g)).toHaveLength(2);
     expect(app).toContain('<Suspense fallback={<RoundPageSkeleton />}><RoundPage /></Suspense>');
+  });
+
+  it('never redirects a cold arrival while the session is loading', () => {
+    const page = source('src/pages/RoundPage.tsx');
+    const guard = page.match(/if \((!asOverlay[^)]*)\) \{\s*return \(\s*<Navigate/);
+    expect(guard).not.toBeNull();
+    expect(guard![1].split('&&').map((s) => s.trim())).toContain('!authLoading');
+    expect(page).toContain('const undecided = !asOverlay && !synthesised && !missingId;');
   });
 });
