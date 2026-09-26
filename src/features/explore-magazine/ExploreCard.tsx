@@ -507,11 +507,11 @@ function WhoLine({
             {roundIdentity.date ? <span data-round-identity-date="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap' }}>{roundIdentity.date}</span> : null}
             {hcpPair ? (
               <span data-round-identity-hcp="true" style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', lineHeight: 1, color: A.DIM, textTransform: 'uppercase' }}>
+                <span style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE }}>
                   {t('friendsRail.index', 'HCP')} {hcpPair.index}
                 </span>
                 {hcpPair.delta ? (
-                  <span style={{ ...NUMF, marginLeft: 6, display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 9, fontWeight: 700, lineHeight: 1, color: hcpPair.delta.tone }}>
+                  <span style={{ ...NUMF, marginLeft: 6, display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 10.5, fontWeight: 600, color: hcpPair.delta.tone }}>
                     <span aria-hidden>{hcpPair.delta.arrow}</span>
                     <span>{hcpPair.delta.text}</span>
                   </span>
@@ -540,6 +540,7 @@ function WhoLine({
             /* Matched to AchievementCallout's subtext line (CALLOUT_SUBTEXT). */
             fontSize={CALLOUT_SUBTEXT.fontSize}
             fontWeight={CALLOUT_SUBTEXT.fontWeight}
+            lines={2}
           />
         ) : null}
       </div>

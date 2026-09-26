@@ -58,6 +58,8 @@ export interface LikedByRowProps {
   fontSize?: number;
   /** Line weight; default 500. */
   fontWeight?: number;
+  /** 1 (default) = single line with ellipsis; 2 = wraps, clamped to two (stacked feed cards). */
+  lines?: 1 | 2;
 }
 
 export function LikedByRow({
@@ -71,6 +73,7 @@ export function LikedByRow({
   isOwnRound = false,
   fontSize = 13,
   fontWeight = 500,
+  lines = 1,
 }: LikedByRowProps) {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
@@ -146,10 +149,9 @@ export function LikedByRow({
             fontSize,
             fontWeight,
             color: 'rgba(248,250,252,0.65)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: 'block',
+            ...(lines === 2
+              ? { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }
+              : { whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }),
             fontVariantNumeric: 'tabular-nums lining-nums',
             letterSpacing: 0,
           }}
