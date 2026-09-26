@@ -17,6 +17,8 @@ import { useTranslation } from 'react-i18next';
 import type { ReactionKind } from '@/lib/reactionKind';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -63,6 +65,93 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
     }
   };
 
+  const { user } = useSupabaseSession();
+
+  /* TWO GROUPS over usePostLikers' existing followed-first order — never
+     re-sorted here. An empty group renders nothing (no eyebrow). */
+  const followed = rows.filter((l) => l.isFollowing);
+  const others = rows.filter((l) => !l.isFollowing);
+
+  const renderRow = (l: (typeof rows)[number], i: number) => {
+    const isBusiness = l.actorType === 'business';
+    const actorId = l.actorId ?? l.userId;
+    const isViewer = !isBusiness && !!user?.id && actorId === user.id;
+    return (
+      <button
+        key={`${l.actorType ?? 'personal'}:${actorId}`}
+        type="button"
+        onClick={() => {
+          onClose();
+          if (isBusiness) {
+            if (l.username) navigate(`/business/${l.actorId ?? l.userId}`);
+          } else if (l.username) {
+            navigate(`/profile/${l.username}`);
+          }
+        }}
+        style={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          width: '100%',
+          padding: '10px 16px',
+          background: 'transparent',
+          border: 'none',
+          textAlign: 'left',
+        }}
+      >
+        {/* Inset rule from 68px so the avatar column is unbroken; none above a group's first row. */}
+        {i > 0 && (
+          <span aria-hidden style={{ position: 'absolute', top: 0, left: 68, right: 0, height: 1, background: A.BORDER }} />
+        )}
+        <SquircleAvatar
+          size={40}
+          src={l.avatarUrl}
+          alt={l.displayName}
+          userId={isBusiness ? null : actorId}
+          hairlineRing
+        />
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontSize: 14.5,
+              fontWeight: 600,
+              letterSpacing: '-0.1px',
+              /* Amber = the viewer, and nothing else on this surface. */
+              color: isViewer ? A.AMBER : A.INK,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {l.displayName || l.username}
+            {isViewer ? ' · You' : null}
+          </div>
+          {isBusiness ? (
+            <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, marginTop: 5 }}>
+              {businessTypeLabel(l.businessType)}
+            </span>
+          ) : l.handicapIndex !== null ? (
+            /* CircleShelf grammar: label then figure. Withheld and absent both land here as null → no line. */
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 3 }}>
+              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM }}>HCP</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.1px', color: A.MUTE, fontVariantNumeric: 'tabular-nums' }}>
+                {formatHcp(l.handicapIndex)}
+              </span>
+            </div>
+          ) : null}
+        </div>
+        <ChevronRight size={16} color={A.DIM} aria-hidden style={{ flexShrink: 0 }} />
+      </button>
+    );
+  };
+
+  const eyebrow = (label: string) => (
+    <div style={{ padding: '14px 16px 7px', fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM }}>
+      {label}
+    </div>
+  );
+
   return (
     <BottomSheet
       open={open}
@@ -71,10 +160,11 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
       maxHeight="85dvh"
     >
       <div style={{ padding: '4px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>
-        <div style={{ fontSize: 17, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}>
+        <div style={{ fontSize: 19, fontWeight: 700, color: A.INK, letterSpacing: '-0.4px' }}>
           {kind === 'celebrate' ? t('reactions.sheetTitleCelebrated') : 'Likes'}
         </div>
-        <div style={{ fontSize: 12.5, fontWeight: 500, color: A.MUTE, marginTop: 2 }}>
+        {/* The surface's own count — never likers.length. */}
+        <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, marginTop: 4 }}>
           {count === 1 ? '1 person' : `${count.toLocaleString()} people`}
         </div>
       </div>
@@ -87,73 +177,20 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
         {isLoading && rows.length === 0 ? (
           <div style={{ padding: '20px 16px', fontSize: 12.5, color: A.MUTE }}>Loading…</div>
         ) : (
-          rows.map((l) => {
-            const isBusiness = l.actorType === 'business';
-            const sub = isBusiness
-              ? businessTypeLabel(l.businessType)
-              : l.handicapIndex !== null
-                ? `${formatHcp(l.handicapIndex)} index`
-                : null;
-            return (
-              <button
-                key={`${l.actorType ?? 'personal'}:${l.actorId ?? l.userId}`}
-                type="button"
-                onClick={() => {
-                  onClose();
-                  if (isBusiness) {
-                    if (l.username) navigate(`/business/${l.actorId ?? l.userId}`);
-                  } else if (l.username) {
-                    navigate(`/profile/${l.username}`);
-                  }
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  width: '100%',
-                  padding: '10px 16px',
-                  background: 'transparent',
-                  border: 'none',
-                  textAlign: 'left',
-                }}
-              >
-                <SquircleAvatar
-                  size={38}
-                  src={l.avatarUrl}
-                  alt={l.displayName}
-                  userId={isBusiness ? null : l.actorId ?? l.userId}
-                  hairlineRing
-                />
-                <div style={{ minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 13.5,
-                      fontWeight: 700,
-                      color: A.INK,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {l.displayName || l.username}
-                  </div>
-                  {sub ? (
-                    <div
-                      style={{
-                        fontSize: 11.5,
-                        fontWeight: 500,
-                        color: A.MUTE,
-                        marginTop: 1,
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {sub}
-                    </div>
-                  ) : null}
-                </div>
-              </button>
-            );
-          })
+          <>
+            {followed.length > 0 && (
+              <div data-likes-group="following">
+                {eyebrow('People you follow')}
+                {followed.map(renderRow)}
+              </div>
+            )}
+            {others.length > 0 && (
+              <div data-likes-group="others">
+                {eyebrow('Everyone else')}
+                {others.map(renderRow)}
+              </div>
+            )}
+          </>
         )}
       </div>
     </BottomSheet>
