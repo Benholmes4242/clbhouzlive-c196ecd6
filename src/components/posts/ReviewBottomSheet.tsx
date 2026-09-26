@@ -69,6 +69,23 @@ import { courseSubScoreTone } from '@/features/courses/components/holes/analytic
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
    a caption would take: this sheet's payload is three paragraphs of member
    prose, and body copy needs more separation than a label does. */
+/** BRIEF_REVIEW_SHEET_MEDIA_GRID §3 — first value chosen to bound sheet height. */
+export const REVIEW_MEDIA_GRID_CAP = 9;
+
+/**
+ * §1 — name only what is there. Photos and videos counted separately, each
+ * part singular/plural on its own, a zero never printed. (AboutMediaStrip
+ * always prints both parts — deliberately not copied.)
+ */
+export function reviewMediaHeading(items: { mediaType: 'image' | 'video' }[]): string {
+  const videos = items.filter((m) => m.mediaType === 'video').length;
+  const photos = items.length - videos;
+  const parts: string[] = [];
+  if (photos > 0) parts.push(`${photos} ${photos === 1 ? 'PHOTO' : 'PHOTOS'}`);
+  if (videos > 0) parts.push(`${videos} ${videos === 1 ? 'VIDEO' : 'VIDEOS'}`);
+  return parts.join(' · ');
+}
+
 const CANVAS = SHEET_SURFACE;
 const BORDER = 'rgba(255,255,255,0.10)';
 const INK = '#F8FAFC';
