@@ -40,6 +40,7 @@ import {
 
 import { ReportCommentSheetV2 } from './components/ReportCommentSheetV2';
 import { FIGS, A } from '@/features/courses/components/holes/analytical/tokens';
+import { MessageCircle } from 'lucide-react';
 import { TITLE as TITLE_SCALE, BODY } from '@/lib/tokens/type';
 
 import {
