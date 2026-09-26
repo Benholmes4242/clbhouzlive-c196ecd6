@@ -583,9 +583,29 @@ const ProfilePageV2Content: React.FC = () => {
   };
 
   const { data: viewedWhsConnection } = useWhsConnection(profileUserId ?? undefined);
+  /* PRIVACY (BRIEF_PROFILE_HANDICAP_GATE §1). Another member's index comes
+     ONLY from get_visible_handicaps (gated on can_view_handicap). No row =
+     withheld or never had one — both render '–', indistinguishably. The
+     viewer's own profile reads its own values directly: no extra round trip.
+     PROFILE_FULL_SELECT still carries the columns; this page just stops
+     trusting them for someone else. */
+  const { data: gatedHcp } = useQuery({
+    queryKey: ['visible-handicap', profileUserId],
+    enabled: !isOwnAccount && !!profileUserId,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).rpc('get_visible_handicaps', { p_ids: [profileUserId] });
+      if (error) throw error;
+      const row = ((data ?? []) as any[])[0];
+      return {
+        eg: row?.eg_handicap_index ?? null,
+        manual: row?.manual_handicap_index ?? null,
+      } as { eg: number | null; manual: number | null };
+    },
+  });
   const resolvedHcp = resolveDisplayHandicap({
-    egHandicapIndex: profile?.eg_handicap_index ?? null,
-    manualHandicapIndex: profile?.manual_handicap_index ?? null,
+    egHandicapIndex: isOwnAccount ? profile?.eg_handicap_index ?? null : gatedHcp?.eg ?? null,
+    manualHandicapIndex: isOwnAccount ? profile?.manual_handicap_index ?? null : gatedHcp?.manual ?? null,
     hasWhsConnection: !!viewedWhsConnection,
   });
 

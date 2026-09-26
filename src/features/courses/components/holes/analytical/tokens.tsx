@@ -45,6 +45,11 @@ export const A = {
   /** Detail lines: near-ink body text, heavier than MUTE. */
   BODY: 'rgba(248,250,252,0.72)',
   DIM: 'rgba(248,250,252,0.42)',
+  /** The softer of the two hairlines: rules INSIDE a block (between rows of
+   *  one list) as against A.BORDER, which separates blocks. Not a new colour
+   *  — rgba(255,255,255,0.06) is already a literal in 83 files; this is the
+   *  name it never got. */
+  SOFT: 'rgba(255,255,255,0.06)',
   AMBER: '#F7931E',
   AMBER_DEEP: '#F7931E',
   RED: TOPAR_UNDER_DARK,

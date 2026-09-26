@@ -102,7 +102,7 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
       >
         {/* Inset rule from 68px so the avatar column is unbroken; none above a group's first row. */}
         {i > 0 && (
-          <span aria-hidden style={{ position: 'absolute', top: 0, left: 68, right: 0, height: 1, background: A.BORDER }} />
+          <span aria-hidden style={{ position: 'absolute', top: 0, left: 68, right: 0, height: 1, background: A.SOFT }} />
         )}
         <SquircleAvatar
           size={40}
