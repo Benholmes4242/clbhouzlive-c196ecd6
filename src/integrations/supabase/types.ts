@@ -22839,7 +22839,9 @@ export type Database = {
       get_visible_handicaps: {
         Args: { p_ids: string[] }
         Returns: {
+          eg_handicap_index: number
           handicap_index: number
+          manual_handicap_index: number
           user_id: string
         }[]
       }
