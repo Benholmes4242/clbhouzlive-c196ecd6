@@ -49,6 +49,8 @@ describe('round notifications open the scorecard over Activity', () => {
     expect(page).toContain("if (pending) return asOverlay ? null : <RoundPageSkeleton />;");
     expect(page).toContain("presentation={asOverlay ? 'overlay' : 'page'}");
     expect(page).toContain('return asOverlay ? sheet : (');
+    expect(page).toContain('if (!asOverlay && !synthesised && !missingId && !signedOut) {');
+    expect(page).toContain("navigate('/notificationmessages', { replace: true })");
     expect(page).toContain('initialCommentsOpen={openCommentsRequested}');
     expect(app.match(/path="\/round\/:whsScoreId"/g)).toHaveLength(2);
     expect(app).toContain('<Suspense fallback={<RoundPageSkeleton />}><RoundPage /></Suspense>');

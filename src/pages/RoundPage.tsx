@@ -24,7 +24,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Table } from 'lucide-react';
@@ -128,8 +128,11 @@ const RoundPage: React.FC = () => {
   /**
    * S2.4 — A DESTINATION, NOT AN OVERLAY. React Router marks the first entry of
    * a session with key 'default', so a cold launch straight to this URL has no
-   * history to pop: closing goes to Discover with a replace. Any in-app arrival
-   * goes back where it came from.
+   * history to pop: closing goes to Activity (/notificationmessages) with a
+   * replace. A synthesised background (cold push / shared link, see below)
+   * also closes to Activity with a replace — never -1, since the replaced
+   * entry has a real key but nothing behind it. Any other in-app arrival goes
+   * back where it came from.
    */
   const hasHistory = location.key !== 'default';
   /**
@@ -143,9 +146,13 @@ const RoundPage: React.FC = () => {
   const asOverlay = Boolean(
     (location.state as { backgroundLocation?: unknown } | null)?.backgroundLocation,
   );
+  const navState = location.state as
+    | { backgroundLocation?: unknown; synthesisedBackground?: boolean }
+    | null;
+  const synthesised = navState?.synthesisedBackground === true;
   const goBack = () => {
-    if (hasHistory) navigate(-1);
-    else navigate('/handicap', { replace: true });
+    if (hasHistory && !synthesised) navigate(-1);
+    else navigate('/notificationmessages', { replace: true });
   };
 
   /**
@@ -209,6 +216,11 @@ const RoundPage: React.FC = () => {
     );
     /* The canvas is the PAGE's, not the overlay's: an opaque 100dvh
        backdrop over Activity would defeat the point. */
+    /* UNREACHABLE VIA ROUTING (BRIEF_ROUND_PUSH_OPENS_AS_SHEET): every cold
+       arrival is redirected below with a synthesised backgroundLocation, so
+       asOverlay is always true. Kept deliberately. KNOWN FAULT if revived: this
+       page branch applies no bottom clearance, while the floating nav publishes
+       its height as --bottom-nav-height — anything restoring it must pad to it. */
     return asOverlay ? sheet : (
       <div style={{ minHeight: '100dvh', background: A.CANVAS }}>
         {sheet}
@@ -216,6 +228,33 @@ const RoundPage: React.FC = () => {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pending, missingId, signedOut, whsScoreId, ownerId, t, hasHistory, authLoading, asOverlay]);
+
+  /**
+   * BRIEF_ROUND_PUSH_OPENS_AS_SHEET — a cold arrival (push into a cold app,
+   * shared link) has no backgroundLocation. Redirect BEFORE anything paints —
+   * a render-time <Navigate>, not an effect — to the same URL (search kept, so
+   * ?openComments=1 survives) with Activity synthesised beneath. LOOP GUARD:
+   * the replaced entry carries backgroundLocation, so the second pass takes
+   * the overlay path; if router state was ever stripped and we arrive with the
+   * synthesised marker but no background, we do NOT redirect again.
+   * Settled signed-out visitors are not redirected (they keep the sign-in
+   * shell); on the web the AppDownloadGate in App.tsx runs before this.
+   */
+  if (!asOverlay && !synthesised && !missingId && !signedOut) {
+    return (
+      <Navigate
+        replace
+        to={location.pathname + location.search}
+        state={{
+          backgroundLocation: {
+            pathname: '/notificationmessages',
+            search: '', hash: '', state: null, key: 'default',
+          },
+          synthesisedBackground: true,
+        }}
+      />
+    );
+  }
 
   return content;
 };
