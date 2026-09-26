@@ -71,11 +71,15 @@ export function CommentCard({
       ref={registerRef?.(comment.id)}
       style={{
         padding: isFirst ? '0 0 16px' : '16px 0',
-        borderTop: isFirst ? undefined : `1px solid ${BORDER}`,
+        position: 'relative',
         transition: 'background-color 300ms',
         background: highlightedId === comment.id ? 'rgba(247,147,30,0.12)' : 'transparent',
       }}
     >
+      {/* Inset rule from 49px (avatar column unbroken), A.SOFT; none above the first row. */}
+      {!isFirst && (
+        <span aria-hidden data-comment-rule="true" style={{ position: 'absolute', top: 0, left: 49, right: 0, height: 1, background: A.SOFT }} />
+      )}
       {/* Parent row */}
       <div className="flex" style={{ gap: 11 }}>
         <button
