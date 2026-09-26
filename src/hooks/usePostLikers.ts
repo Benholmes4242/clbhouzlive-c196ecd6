@@ -87,10 +87,10 @@ export function usePostLikers(
     queryFn: async () => {
       const [profilesRes, businessesRes, followsRes] = await Promise.all([
         personalIds.length > 0
-          ? supabase
-              .from('user_profiles')
-              .select('id, eg_handicap_index, manual_handicap_index')
-              .in('id', personalIds)
+          ? /* PRIVACY: gated server-side on can_view_handicap. A withheld or
+               absent index returns NO ROW, so the two are indistinguishable.
+               Never select eg_/manual_handicap_index on another member. */
+            (supabase as any).rpc('get_visible_handicaps', { p_ids: personalIds })
           : Promise.resolve({ data: [] as any[], error: null }),
         businessIds.length > 0
           ? supabase
@@ -110,8 +110,8 @@ export function usePostLikers(
 
       const hcp = new Map<string, number | null>();
       for (const p of (profilesRes.data ?? []) as any[]) {
-        const value = p.eg_handicap_index ?? p.manual_handicap_index ?? null;
-        hcp.set(p.id, value === null ? null : Number(value));
+        const value = p.handicap_index ?? null;
+        hcp.set(p.user_id, value === null ? null : Number(value));
       }
       const types = new Map<string, string | null>();
       for (const b of (businessesRes.data ?? []) as any[]) {
