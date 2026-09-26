@@ -637,6 +637,23 @@
     "sheetTitleCelebrated": "Gefeiert"
   },
   "comments": {
+    "countNone": "Noch keine Kommentare",
+    "count_one": "{{count}} Kommentar",
+    "count_other": "{{count}} Kommentare",
+    "emptyLine": "Woran denkst du gerade?",
+    "placeholder": "Kommentar hinzufügen…",
+    "replyPlaceholder": "Auf {{name}} antworten…",
+    "replyingTo": "Antwort an",
+    "reply": "Antworten",
+    "viewMoreReplies_one": "{{count}} weitere Antwort anzeigen",
+    "viewMoreReplies_other": "{{count}} weitere Antworten anzeigen",
+    "viewEarlier": "FRÜHERE KOMMENTARE ANZEIGEN",
+    "loading": "Wird geladen…",
+    "edited": "bearbeitet",
+    "business": "UNTERNEHMEN",
+    "like": "Gefällt mir",
+    "unlike": "Gefällt mir nicht mehr",
+    "more": "Mehr",
     "sheetTitle": "Kommentare"
   }
 }

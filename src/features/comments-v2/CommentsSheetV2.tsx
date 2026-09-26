@@ -26,7 +26,7 @@ import type { ActiveActor } from '@/types/actor';
 
 import { useCommentsV2, type TargetType, type CommentV2 } from './hooks/useCommentsV2';
 import { useCommentsRealtimeV2 } from './hooks/useCommentsRealtimeV2';
-import { CommentCard } from './components/CommentCard';
+import { CommentCard, COMMENT_AVATAR_SIZE, COMMENT_RULE_INSET } from './components/CommentCard';
 import { CommentComposer } from './components/CommentComposer';
 import { CommentActionSheetV2 } from './components/CommentActionSheetV2';
 import {
@@ -531,11 +531,15 @@ function SkeletonRows() {
           className="flex"
           style={{
             gap: 11,
+            position: 'relative',
             padding: i === 0 ? '0 0 16px' : '16px 0',
-            borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
           }}
         >
-          <div className="w-[34px] h-[34px] rounded-[34%] shrink-0" style={{ background: SHIMMER }} />
+          {i > 0 && (
+            <span aria-hidden style={{ position: 'absolute', top: 0, left: COMMENT_RULE_INSET, right: 0, height: 1, background: A.SOFT }} />
+          )}
+          {/* 34% squircle = SquircleAvatar's radius, sized from the row's constant. */}
+          <div className="rounded-[34%] shrink-0" style={{ width: COMMENT_AVATAR_SIZE, height: COMMENT_AVATAR_SIZE, background: SHIMMER }} />
           <div className="flex-1 space-y-2 py-0.5">
             <div className="h-4 w-24 rounded" style={{ background: SHIMMER }} />
             <div className="h-4 w-[85%] rounded" style={{ background: SHIMMER }} />
