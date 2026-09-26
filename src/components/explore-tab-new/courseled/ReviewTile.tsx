@@ -408,6 +408,7 @@ export function ReviewTile({
             onToggle={() => onToggleReaction?.()}
             reserveCount
             label={t('discover.reactions.actionReview', 'Like this review')}
+            kind="helpful"
           />
         </span>
 

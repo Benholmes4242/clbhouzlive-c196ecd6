@@ -19,7 +19,7 @@
  * mutation is called only with 'helpful' | 'clear'.
  */
 import React, { useState } from 'react';
-import { Heart, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
+import { ThumbsUp, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatRatingValue } from '@/utils/formatters';
@@ -277,7 +277,7 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
             }}
             aria-pressed={!!isHelpful}
           >
-            <Heart size={13} strokeWidth={2} fill={isHelpful ? A.INK : 'none'} />
+            <ThumbsUp size={13} strokeWidth={2} fill={isHelpful ? A.INK : 'none'} />
             {helpfulCount > 0 && <span style={FIGS}>{helpfulCount}</span>}
             <span>Helpful</span>
           </button>
