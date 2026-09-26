@@ -254,7 +254,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     reactions.toggle('review', reviewId, () => {
       // On failure the hook rolls back its own cache; restore ours too.
       if (reactions.stateFor('review', reviewId).mine === before) {
-        prevReviews.forEach(([key, data]) => queryClient.setQueryData(key, data));
+        prevReviews.forEach(([key, data]) => queryClient.setQueryData<CourseReview[]>(key, data as CourseReview[]));
       }
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
     });
