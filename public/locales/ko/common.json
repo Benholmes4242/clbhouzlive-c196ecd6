@@ -639,7 +639,7 @@
     "countNone": "아직 댓글이 없어요",
     "count_one": "댓글 {{count}}개",
     "count_other": "댓글 {{count}}개",
-    "emptyLine": "무슨 생각을 하고 계신가요?",
+    "emptyLine": "첫 번째 댓글을 남겨보세요.",
     "placeholder": "댓글 추가…",
     "replyPlaceholder": "{{name}}님에게 답글…",
     "replyingTo": "답글 대상",

@@ -40,6 +40,7 @@ import {
 
 import { ReportCommentSheetV2 } from './components/ReportCommentSheetV2';
 import { FIGS, A } from '@/features/courses/components/holes/analytical/tokens';
+import { MessageCircle } from 'lucide-react';
 import { TITLE as TITLE_SCALE, BODY } from '@/lib/tokens/type';
 
 import {
@@ -332,20 +333,13 @@ function CommentsSheetV2Inner({
                   className="rounded-sm"
                   style={{ width: 72, height: 11, marginTop: 6, background: SHIMMER }}
                 />
-              ) : (
+              ) : totalCount === 0 ? null /* No count line at zero — the title and rule are the header. */ : (
                 /* Uppercase by textTransform — the locale strings stay sentence case. */
                 <div style={{ ...FIGS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, marginTop: 6 }}>
-                  {totalCount === 0
-                    ? t('comments.countNone')
-                    : t('comments.count', { count: totalCount })}
+                  {t('comments.count', { count: totalCount })}
                 </div>
               )}
             </div>
-            {totalCountFetched && totalCount === 0 && (
-              <div className="px-5 shrink-0" style={{ ...BODY, color: MUTE, paddingTop: 12 }}>
-                {t('comments.emptyLine')}
-              </div>
-            )}
 
             {/* Scroll area */}
             <div
@@ -366,7 +360,24 @@ function CommentsSheetV2Inner({
                   isLoading was false while the query sat disabled-pending. */}
               {!isFetched ? (
                 <SkeletonRows />
-              ) : threads.length === 0 ? null : (
+              ) : threads.length === 0 ? (
+                /* Empty state lives in the body; minHeight 220 stops the sheet collapsing. */
+                <div
+                  style={{
+                    flex: 1, display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    padding: '34px 30px 30px', gap: 7, minHeight: 220,
+                  }}
+                >
+                  <MessageCircle size={34} strokeWidth={1.5} color={A.DIM} style={{ marginBottom: 3 }} aria-hidden />
+                  <div style={{ fontSize: 15, fontWeight: 600, color: A.INK, letterSpacing: '-0.1px' }}>
+                    {t('comments.countNone')}
+                  </div>
+                  <div style={{ fontSize: 13, lineHeight: 1.45, color: A.MUTE, maxWidth: 230 }}>
+                    {t('comments.emptyLine')}
+                  </div>
+                </div>
+              ) : (
                 <div>
                   {threads.map((c, i) => (
                     <CommentCard
