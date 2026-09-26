@@ -25,7 +25,6 @@ const BODY_INK = 'rgba(248,250,252,0.88)';
 const MUTE = A.MUTE;
 const DIM = 'rgba(248,250,252,0.42)';
 const AMBER = '#F7931E';
-const BORDER = A.BORDER;
 const CONNECTOR = 'rgba(255,255,255,0.14)';
 
 const INITIAL_REPLIES = 3;
