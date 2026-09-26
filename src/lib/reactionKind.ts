@@ -1,11 +1,11 @@
-import { Heart, ThumbsUp } from 'lucide-react';
+import { ThumbsUp } from 'lucide-react';
 import ClapIcon from '@/components/icons/ClapIcon';
 
 /**
  * THE POST TYPE DECIDES THE REACTION (BRIEF_CELEBRATE_REACTION_BUILD).
  *
  *   ROUND      -> 'celebrate': the clap glyph, the verb "celebrated"
- *   everything -> 'like':      the heart glyph, the verb "liked"
+ *   everything -> 'like':      the thumbs-up glyph, the verb "liked"
  *
  * THERE IS DELIBERATELY NO REACTION-TYPE COLUMN. Neither reaction store
  * (content_reactions for members, post_likes for business actors on round
@@ -30,13 +30,16 @@ export function celebrateFigureSize(size: number): number {
   return Math.round(size * 0.62 * 10) / 10;
 }
 
-/* THE SUBJECT DECIDES THE GLYPH, AND EVERY GLYPH MATCHES A VERB THE DATA
-   ALREADY USES:
-     clap   CELEBRATE  an achievement            -> a round
-     thumb  LIKE/HELPFUL an opinion              -> a comment, a review
-     heart  LIKE       something made or shared  -> a photo, video, story
-   A review is an opinion with a score: the useful signal on it is
-   agreement, which is why the code already calls it isHelpful. */
+/* TWO GLYPHS, APP-WIDE.
+     clap    CELEBRATE  a round — an achievement, and you celebrate it
+     thumbs  LIKE       everything else
+   The clap is the ONLY exception, and it earns it: a score is not a thing
+   someone made, and "loved" was the wrong word for it. Everything else —
+   photos, videos, stories, news, reviews, comments — is a like, and a
+   thumbs-up is the glyph for a like.
+   ANY NEW REACTION CONTROL TAKES ITS GLYPH FROM reactionGlyph(). A
+   hardcoded lucide Heart is a bug: fourteen of them had to be swept out
+   of this app once. */
 export type ReactionKind = 'like' | 'celebrate' | 'helpful';
 
 export function reactionKindFor(subject: { isRound: boolean; isReview: boolean }): ReactionKind {
@@ -49,5 +52,5 @@ export function reactionKindFor(subject: { isRound: boolean; isReview: boolean }
 export function reactionGlyph(kind: ReactionKind) {
   if (kind === 'celebrate') return ClapIcon;
   if (kind === 'helpful') return ThumbsUp;
-  return Heart;
+  return ThumbsUp;
 }
