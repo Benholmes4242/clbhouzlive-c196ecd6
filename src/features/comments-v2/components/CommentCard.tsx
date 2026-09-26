@@ -29,6 +29,12 @@ const CONNECTOR = 'rgba(255,255,255,0.14)';
 
 const INITIAL_REPLIES = 3;
 
+/** Row metrics shared with CommentsSheetV2's SkeletonRows — one copy, so the
+ *  placeholder can't drift from the row it stands in for. */
+export const COMMENT_AVATAR_SIZE = 38;
+/** Inter-row rule inset: starts past the avatar column so faces run unbroken. */
+export const COMMENT_RULE_INSET = 49;
+
 interface Props {
   comment: CommentV2;
   currentUserId: string | null;
@@ -77,7 +83,7 @@ export function CommentCard({
     >
       {/* Inset rule from 49px (avatar column unbroken), A.SOFT; none above the first row. */}
       {!isFirst && (
-        <span aria-hidden data-comment-rule="true" style={{ position: 'absolute', top: 0, left: 49, right: 0, height: 1, background: A.SOFT }} />
+        <span aria-hidden data-comment-rule="true" style={{ position: 'absolute', top: 0, left: COMMENT_RULE_INSET, right: 0, height: 1, background: A.SOFT }} />
       )}
       {/* Parent row */}
       <div className="flex" style={{ gap: 11 }}>
@@ -93,7 +99,7 @@ export function CommentCard({
           style={{ cursor: deleted ? 'default' : 'pointer' }}
         >
           <SquircleAvatar
-            size={38}
+            size={COMMENT_AVATAR_SIZE}
             src={comment.avatar_url}
             alt={comment.display_name}
             userId={comment.actor_id ?? comment.user_id}

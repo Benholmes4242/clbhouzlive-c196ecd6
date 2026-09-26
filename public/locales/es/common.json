@@ -637,6 +637,23 @@
     "sheetTitleCelebrated": "Celebrado"
   },
   "comments": {
+    "countNone": "Aún no hay comentarios",
+    "count_one": "{{count}} comentario",
+    "count_other": "{{count}} comentarios",
+    "emptyLine": "¿Qué estás pensando?",
+    "placeholder": "Añadir un comentario…",
+    "replyPlaceholder": "Responder a {{name}}…",
+    "replyingTo": "Respondiendo a",
+    "reply": "Responder",
+    "viewMoreReplies_one": "Ver {{count}} respuesta más",
+    "viewMoreReplies_other": "Ver {{count}} respuestas más",
+    "viewEarlier": "VER COMENTARIOS ANTERIORES",
+    "loading": "Cargando…",
+    "edited": "editado",
+    "business": "EMPRESA",
+    "like": "Me gusta",
+    "unlike": "Ya no me gusta",
+    "more": "Más",
     "sheetTitle": "Comentarios"
   }
 }
