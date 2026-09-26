@@ -640,7 +640,7 @@
     "countNone": "Noch keine Kommentare",
     "count_one": "{{count}} Kommentar",
     "count_other": "{{count}} Kommentare",
-    "emptyLine": "Woran denkst du gerade?",
+    "emptyLine": "Schreib den ersten Kommentar.",
     "placeholder": "Kommentar hinzufügen…",
     "replyPlaceholder": "Auf {{name}} antworten…",
     "replyingTo": "Antwort an",

@@ -837,7 +837,7 @@
     "countNone": "No comments yet",
     "count_one": "{{count}} comment",
     "count_other": "{{count}} comments",
-    "emptyLine": "What's on your mind?",
+    "emptyLine": "Be the first to say something.",
     "placeholder": "Add a comment…",
     "replyPlaceholder": "Reply to {{name}}…",
     "replyingTo": "Replying to",

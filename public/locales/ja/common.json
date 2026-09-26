@@ -639,7 +639,7 @@
     "countNone": "まだコメントはありません",
     "count_one": "コメント{{count}}件",
     "count_other": "コメント{{count}}件",
-    "emptyLine": "いまどう思っていますか？",
+    "emptyLine": "最初のコメントを書いてみましょう。",
     "placeholder": "コメントを追加…",
     "replyPlaceholder": "{{name}}さんに返信…",
     "replyingTo": "返信先",
