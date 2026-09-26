@@ -634,5 +634,8 @@
     "namesOneAndMore": "{{a}}ほか{{n}}人",
     "namesTwoAndMore": "{{a}}、{{b}}ほか{{n}}人",
     "sheetTitleCelebrated": "称えた人"
+  },
+  "comments": {
+    "sheetTitle": "コメント"
   }
 }

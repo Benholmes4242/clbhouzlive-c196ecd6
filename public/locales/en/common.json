@@ -850,7 +850,8 @@
     "business": "BUSINESS",
     "like": "Like",
     "unlike": "Unlike",
-    "more": "More"
+    "more": "More",
+    "sheetTitle": "Comments"
   },
   "suggestedGolfers": {
     "heading": "Golfers to follow",

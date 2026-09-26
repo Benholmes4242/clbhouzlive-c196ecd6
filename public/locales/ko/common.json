@@ -634,5 +634,8 @@
     "namesOneAndMore": "{{a}} 외 {{n}}명",
     "namesTwoAndMore": "{{a}}, {{b}} 외 {{n}}명",
     "sheetTitleCelebrated": "축하함"
+  },
+  "comments": {
+    "sheetTitle": "댓글"
   }
 }

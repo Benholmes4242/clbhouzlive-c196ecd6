@@ -635,5 +635,8 @@
     "namesOneAndMore": "{{a}} y {{n}} más",
     "namesTwoAndMore": "{{a}}, {{b}} y {{n}} más",
     "sheetTitleCelebrated": "Celebrado"
+  },
+  "comments": {
+    "sheetTitle": "Comentarios"
   }
 }
