@@ -26,7 +26,7 @@ import type { ActiveActor } from '@/types/actor';
 
 import { useCommentsV2, type TargetType, type CommentV2 } from './hooks/useCommentsV2';
 import { useCommentsRealtimeV2 } from './hooks/useCommentsRealtimeV2';
-import { CommentCard } from './components/CommentCard';
+import { CommentCard, COMMENT_AVATAR_SIZE, COMMENT_RULE_INSET } from './components/CommentCard';
 import { CommentComposer } from './components/CommentComposer';
 import { CommentActionSheetV2 } from './components/CommentActionSheetV2';
 import {
