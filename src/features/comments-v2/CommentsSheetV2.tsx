@@ -3,7 +3,7 @@
  * and editorial cards. Fetches via useCommentsV2 (RPC-only writes); realtime
  * merges via useCommentsRealtimeV2.
  *
- * Design: DARK canvas (A.CANVAS #15171F) — see MICRO_BRIEF_COMMENTS_DARK,
+ * Design: DARK canvas (A.CANVAS — the page canvas token) — see MICRO_BRIEF_COMMENTS_DARK,
  * comments as hairline
  * separated ROWS (no cards). Height is content-driven, capped at 75dvh.
  * Keyboard-aware via useKeyboardHeight.
@@ -322,25 +322,30 @@ function CommentsSheetV2Inner({
                 ChromeIsland, the profile counters, the review wizard's step
                 strip, and this sheet. Reaching for isLoading is the natural
                 thing to write and it has been wrong every time. */}
-            <div className="px-5 pb-3 shrink-0">
+            <div className="px-5 pb-3 shrink-0" style={{ borderBottom: `1px solid ${BORDER}` }}>
+              {/* Title and count split, matching LikesSheet. */}
+              <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.4px', color: INK }}>
+                {t('comments.sheetTitle')}
+              </div>
               {!totalCountFetched ? (
                 <div
                   className="rounded-sm"
-                  style={{ width: 96, height: 21, background: SHIMMER }}
+                  style={{ width: 72, height: 11, marginTop: 6, background: SHIMMER }}
                 />
               ) : (
-                <div style={{ ...TITLE_SCALE, ...FIGS, color: INK }}>
+                /* Uppercase by textTransform — the locale strings stay sentence case. */
+                <div style={{ ...FIGS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, marginTop: 6 }}>
                   {totalCount === 0
                     ? t('comments.countNone')
                     : t('comments.count', { count: totalCount })}
                 </div>
               )}
-              {totalCountFetched && totalCount === 0 && (
-                <div style={{ ...BODY, color: MUTE, marginTop: 4 }}>
-                  {t('comments.emptyLine')}
-                </div>
-              )}
             </div>
+            {totalCountFetched && totalCount === 0 && (
+              <div className="px-5 shrink-0" style={{ ...BODY, color: MUTE, paddingTop: 12 }}>
+                {t('comments.emptyLine')}
+              </div>
+            )}
 
             {/* Scroll area */}
             <div

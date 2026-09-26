@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Heart, MoreHorizontal } from 'lucide-react';
+import { ThumbsUp, MoreHorizontal } from 'lucide-react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
@@ -20,6 +20,8 @@ import type { CommentV2 } from '../hooks/useCommentsV2';
 /* Dark baseline (MICRO_BRIEF_COMMENTS_DARK §2). Row separation is hairline
    only, so the border sits one step stronger than its light counterpart. */
 const INK = A.INK;
+/** Comment body: the words are the content, the name is the label. */
+const BODY_INK = 'rgba(248,250,252,0.88)';
 const MUTE = A.MUTE;
 const DIM = 'rgba(248,250,252,0.42)';
 const AMBER = '#F7931E';
@@ -55,6 +57,8 @@ export function CommentCard({
   const { t } = useTranslation('common');
   const [expanded, setExpanded] = useState(false);
 
+  /* Amber = the viewer, and nothing else on this surface. */
+  const isViewer = !!currentUserId && comment.user_id === currentUserId;
   const deleted = !comment.user_id || comment.display_name === 'Deleted user';
   const replies = comment.replies;
   const showAll = expanded || replies.length <= INITIAL_REPLIES;
@@ -86,9 +90,10 @@ export function CommentCard({
           style={{ cursor: deleted ? 'default' : 'pointer' }}
         >
           <SquircleAvatar
-            size={34}
+            size={38}
             src={comment.avatar_url}
             alt={comment.display_name}
+{isViewer ? ' · You' : null}
             userId={comment.actor_id ?? comment.user_id}
             fallback={comment.display_name?.charAt(0) || '?'}
             hairlineRing ringColor={DARK_HAIRLINE}
@@ -97,7 +102,7 @@ export function CommentCard({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="truncate" style={{ fontSize: 15, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
+            <span className="truncate" style={{ fontSize: 14.5, fontWeight: 600, color: isViewer ? A.AMBER : INK, letterSpacing: '-0.01em' }}>
               {comment.display_name}
             </span>
             {comment.actor_type === 'business' && (
@@ -107,10 +112,10 @@ export function CommentCard({
                 background: 'rgba(247,147,30,0.16)', color: AMBER,
               }}>{t('comments.business')}</span>
             )}
-            <span style={{ ...FIGS, fontSize: 13, color: DIM }}>
+            <span style={{ ...FIGS, fontSize: 11.5, color: DIM, fontVariantNumeric: 'tabular-nums' }}>
               {relativeTime(comment.created_at)}
             </span>
-            {comment.is_edited && <span style={{ ...FIGS, fontSize: 13, color: DIM }}>{'\u00B7'} {t('comments.edited')}</span>}
+            {comment.is_edited && <span style={{ ...FIGS, fontSize: 11.5, color: DIM, fontVariantNumeric: 'tabular-nums' }}>{'\u00B7'} {t('comments.edited')}</span>}
           </div>
 
           {comment.content && (
@@ -120,7 +125,7 @@ export function CommentCard({
               className="mt-1 whitespace-pre-wrap"
               style={big
                 ? { fontSize: 32, lineHeight: 1.15, color: INK }
-                : { fontSize: 14, lineHeight: 1.5, color: INK }}
+                : { fontSize: 14.5, lineHeight: 1.52, color: BODY_INK }}
               onMentionTap={(m) => {
                 onClose?.();
                 navigate(m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
@@ -140,7 +145,7 @@ export function CommentCard({
               className="flex items-center gap-1.5 bg-transparent border-0 p-0 cursor-pointer"
               aria-label={comment.has_liked ? t('comments.unlike') : t('comments.like')}
             >
-              <Heart
+              <ThumbsUp
                 size={15}
                 strokeWidth={2}
                 style={{
