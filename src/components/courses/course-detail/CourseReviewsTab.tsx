@@ -11,7 +11,7 @@
  *   and search and the rating-filter chips are retired outright: they operated
  *   on a list the member can already see whole.
  *   99 helpful votes, ALL of them 'helpful', not one unhelpful ever — so the
- *   thumbs-down goes and Helpful is a single affirmative.
+ *   thumbs-down goes and the like is a single affirmative.
  *
  * RETIRED FROM THIS TAB (files untouched, other importers unaffected):
  *   RatingTierDistribution — one or two populated bars and four empty ones.
@@ -24,7 +24,7 @@
  */
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -71,7 +71,7 @@ const SORT_LABELS: Record<ReviewsSortBy, string> = {
   recent: 'Most recent',
   highest: 'Highest first',
   lowest: 'Lowest first',
-  helpful: 'Most helpful',
+  helpful: 'Most liked',
 };
 
 const SORT_ORDER: ReviewsSortBy[] = ['recent', 'highest', 'helpful'];

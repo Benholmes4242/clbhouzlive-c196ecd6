@@ -14,10 +14,11 @@
  * is entered through the SAME `onMediaClick(index, el)` contract.
 
  *
- * HELPFUL: a single affirmative. All 99 votes ever cast are `helpful` — there
+ * LIKE (was "Helpful", merged into content_reactions): a single affirmative. All 99 votes ever cast are `helpful` — there
  * has never been an unhelpful vote — so the thumbs-down is gone and the
  * mutation is called only with 'helpful' | 'clear'.
  */
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import { ThumbsUp, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
@@ -152,6 +153,7 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
   onReadMore,
   isHighlighted,
 }) => {
+  const { t: tCommon } = useTranslation('common');
   const [expanded, setExpanded] = useState(false);
   const name = isMine ? 'You' : displayName;
   const score = review.rating ?? 0;
