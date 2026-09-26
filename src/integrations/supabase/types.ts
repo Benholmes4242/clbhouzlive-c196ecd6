@@ -22836,6 +22836,13 @@ export type Database = {
           courses: number
         }[]
       }
+      get_visible_handicaps: {
+        Args: { p_ids: string[] }
+        Returns: {
+          handicap_index: number
+          user_id: string
+        }[]
+      }
       get_waitlist_display: {
         Args: { _country_id: string }
         Returns: {
