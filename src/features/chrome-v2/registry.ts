@@ -367,7 +367,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     match: { prefix: '/round/' },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/handicap' },
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/notificationmessages' },
       tone: 'dark',
       bleed: false,
       hideHcp: true,
