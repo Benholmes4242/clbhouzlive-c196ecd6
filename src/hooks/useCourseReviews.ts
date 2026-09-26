@@ -24,7 +24,9 @@ export type CourseReview = {
   review_date: string | null;
   helpful_count: number | null;
   unhelpful_count: number | null;
-  current_user_vote?: 'helpful' | 'unhelpful' | null;
+  /** True when the viewer has liked this review (content_reactions, target_type
+   *  'review'). There is no unhelpful — zero rows ever existed. */
+  current_user_vote?: boolean;
   is_mock: boolean;
   // L6 - tee played (optional). May be absent on old reviews.
   tee_label?: string | null;
@@ -163,6 +165,9 @@ export function useCourseReviews(
           });
           break;
         case 'helpful':
+          // helpful_count COUNTS LIKES (content_reactions, target_type 'review'),
+          // kept by trg_sync_review_like_count. The name is historical. The sort
+          // stays server-side: sorting the fetched 100 would drop a review at 101.
           query = query
             .order('helpful_count', { ascending: false, nullsFirst: false })
             .order('review_date', { ascending: false });
@@ -195,20 +200,18 @@ export function useCourseReviews(
       // If user is logged in, fetch their votes for these reviews
       if (currentUserId && reviews.length > 0) {
         const reviewIds = reviews.map((r) => r.id);
-        const { data: votes } = await supabase
-          .from('course_review_votes')
-          .select('rating_id, vote_type')
+        const { data: likes } = await supabase
+          .from('content_reactions')
+          .select('target_id')
           .eq('user_id', currentUserId)
-          .in('rating_id', reviewIds);
+          .eq('target_type', 'review')
+          .in('target_id', reviewIds);
 
-        // Map votes to reviews
-        const voteMap = new Map(
-          votes?.map((v) => [v.rating_id, v.vote_type as 'helpful' | 'unhelpful']) ?? []
-        );
+        const liked = new Set((likes ?? []).map((l) => l.target_id as string));
 
         return reviews.map((review) => ({
           ...review,
-          current_user_vote: voteMap.get(review.id) ?? null,
+          current_user_vote: liked.has(review.id),
         }));
       }
 

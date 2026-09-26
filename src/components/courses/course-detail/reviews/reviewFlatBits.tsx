@@ -255,7 +255,7 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
       {/* d) photos */}
       <PhotoStrip review={review} onMediaClick={onMediaClick} />
 
-      {/* e) the foot row: one Helpful control, overflow right */}
+      {/* e) the foot row: one like control (glyph + count, no word), overflow right */}
       {!isMine && (
         <div style={{ display: 'flex', alignItems: 'center', marginTop: 12 }}>
           <button
@@ -276,10 +276,10 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
               opacity: votingDisabled ? 0.5 : 1,
             }}
             aria-pressed={!!isHelpful}
+            aria-label={isHelpful ? tCommon('comments.unlike') : tCommon('comments.like')}
           >
             <ThumbsUp size={13} strokeWidth={2} fill={isHelpful ? A.INK : 'none'} />
             {helpfulCount > 0 && <span style={FIGS}>{helpfulCount}</span>}
-            <span>Helpful</span>
           </button>
 
           {onOverflow && (

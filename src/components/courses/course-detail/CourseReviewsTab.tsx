@@ -37,6 +37,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview } from '@/hooks/useCourseReviews';
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
@@ -228,73 +229,36 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     return () => clearTimeout(timeout);
   }, [isJustSubmittedOrUpdated]);
 
-  /* ── helpful vote: single affirmative, optimistic ───────────────────────── */
-  const { data: userVotes } = useQuery({
-    queryKey: ['review-votes', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from('course_review_votes')
-        .select('rating_id, vote_type')
-        .eq('user_id', user.id);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!user?.id,
-  });
+  /* ── review like: the SAME content_reactions toggle the Explore tile and the
+     review sheet use (target_type 'review', target_id = review id). The
+     optimistic helpful_count move stays: that column counts likes now (kept
+     by trg_sync_review_like_count) and is what the server sort reads. ───── */
+  const reactionTargets = useMemo(
+    () => reviews.map((r) => ({ type: 'review' as const, id: r.id })),
+    [reviews],
+  );
+  const reactions = useContentReactions(reactionTargets);
 
-  const toggleHelpfulMutation = useMutation({
-    mutationFn: async ({ reviewId, action }: { reviewId: string; action: 'helpful' | 'clear' }) => {
-      if (!user?.id) throw new Error('Must be logged in');
-      if (action === 'clear') {
-        const { error } = await supabase
-          .from('course_review_votes')
-          .delete()
-          .eq('rating_id', reviewId)
-          .eq('user_id', user.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('course_review_votes').upsert(
-          { rating_id: reviewId, user_id: user.id, vote_type: action },
-          { onConflict: 'rating_id,user_id' }
-        );
-        if (error) throw error;
-      }
-    },
+  const toggleReviewLike = (reviewId: string, action: 'helpful' | 'clear') => {
+    const reviewsKey = { queryKey: ['course-reviews-full', courseId] } as const;
+    const prevReviews = queryClient.getQueriesData<CourseReview[]>(reviewsKey);
     // The count moves under the finger, then reconciles on settle.
-    onMutate: async ({ reviewId, action }) => {
-      const reviewsKey = { queryKey: ['course-reviews-full', courseId] } as const;
-      const votesKey = ['review-votes', user?.id] as const;
-      await queryClient.cancelQueries(reviewsKey);
-      const prevReviews = queryClient.getQueriesData<CourseReview[]>(reviewsKey);
-      const prevVotes = queryClient.getQueryData<{ rating_id: string; vote_type: string }[]>(votesKey);
-
-      queryClient.setQueriesData<CourseReview[]>(reviewsKey, (old) =>
-        old?.map((r) =>
-          r.id === reviewId
-            ? { ...r, helpful_count: Math.max(0, (r.helpful_count ?? 0) + (action === 'helpful' ? 1 : -1)) }
-            : r
-        )
-      );
-      queryClient.setQueryData(votesKey, (old: { rating_id: string; vote_type: string }[] | undefined) => {
-        const rest = (old ?? []).filter((v) => v.rating_id !== reviewId);
-        return action === 'helpful' ? [...rest, { rating_id: reviewId, vote_type: 'helpful' }] : rest;
-      });
-
-      return { prevReviews, prevVotes, votesKey };
-    },
-    onError: (e, _vars, ctx) => {
-      ctx?.prevReviews?.forEach(([key, data]) => queryClient.setQueryData<CourseReview[]>(key as string[], data as CourseReview[]));
-      if (ctx?.votesKey) queryClient.setQueryData(ctx.votesKey as unknown as string[], ctx.prevVotes);
-      toast(t('review.toast.voteFailed', { defaultValue: "Couldn't save your vote" }), {
-        description: e instanceof Error ? e.message : undefined,
-      });
-    },
-    onSettled: () => {
+    queryClient.setQueriesData<CourseReview[]>(reviewsKey, (old) =>
+      old?.map((r) =>
+        r.id === reviewId
+          ? { ...r, helpful_count: Math.max(0, (r.helpful_count ?? 0) + (action === 'helpful' ? 1 : -1)) }
+          : r
+      )
+    );
+    const before = reactions.stateFor('review', reviewId).mine;
+    reactions.toggle('review', reviewId, () => {
+      // On failure the hook rolls back its own cache; restore ours too.
+      if (reactions.stateFor('review', reviewId).mine === before) {
+        prevReviews.forEach(([key, data]) => queryClient.setQueryData(key, data));
+      }
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
-      queryClient.invalidateQueries({ queryKey: ['review-votes', user?.id] });
-    },
-  });
+    });
+  };
 
   const handleToggleHelpful = (reviewId: string, action: 'helpful' | 'clear') => {
     if (!user) {
@@ -307,7 +271,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       review_id: reviewId,
       direction: action === 'helpful' ? 'helpful' : 'cleared',
     });
-    toggleHelpfulMutation.mutate({ reviewId, action });
+    toggleReviewLike(reviewId, action);
   };
 
   const handleWriteReview = (source: 'write' | 'first' | 'edit') => {
@@ -438,8 +402,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     clubhouse: ratingAggregates?.avg_clubhouse_score,
   }), [ratingAggregates]);
 
-  const voteFor = (reviewId: string) =>
-    userVotes?.find((v) => v.rating_id === reviewId)?.vote_type === 'helpful';
+  const voteFor = (reviewId: string) => reactions.stateFor('review', reviewId).mine;
 
   const renderRow = (review: CourseReview, isMine: boolean) => {
     const profile = review.user_profiles;

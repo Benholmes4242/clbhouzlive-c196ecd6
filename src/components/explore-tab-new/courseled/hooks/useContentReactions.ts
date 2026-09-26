@@ -200,9 +200,17 @@ export function useContentReactions(
   });
 
   const toggle = useCallback(
-    (type: ReactionTargetType, id: string | null | undefined) => {
+    (
+      type: ReactionTargetType,
+      id: string | null | undefined,
+      /* Optional per-call settle hook (BRIEF_REVIEW_REACTION_MERGE §1): lets a
+         caller that mirrors the write into its own cache (the course reviews
+         tab's helpful_count) reconcile when THIS write settles, without a
+         second write path against content_reactions. */
+      onSettled?: () => void,
+    ) => {
       if (!id || !viewerId || unavailable) return;
-      mutation.mutate({ type, id, mine: stateFor(type, id).mine });
+      mutation.mutate({ type, id, mine: stateFor(type, id).mine }, { onSettled });
     },
     [mutation, stateFor, unavailable, viewerId],
   );
