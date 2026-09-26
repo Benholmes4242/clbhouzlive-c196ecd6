@@ -15,11 +15,15 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Send, MoreHorizontal, Plus, Check } from 'lucide-react';
+import { MessageCircle, Send, MoreHorizontal, Plus, Check } from 'lucide-react';
+import { reactionGlyph } from '@/lib/reactionKind';
 import { MuteButton } from '@/audio/MuteButton';
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCountKilo } from '@/i18n/format';
+
+/* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
+const LikeGlyph = reactionGlyph('like');
 
 // Shared lift + stroke for every floating glyph in the immersive feed chrome.
 const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
@@ -357,7 +361,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
                 ariaLabel={hasLiked ? 'Unlike' : 'Like'}
                 animateKey={likeAnimKey}
               >
-                <Heart
+                <LikeGlyph
                   size={28}
                   fill={hasLiked ? '#F7931E' : 'transparent'}
                   stroke={hasLiked ? '#F7931E' : '#fff'}
@@ -398,7 +402,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               accentCount={hasLiked}
               animateKey={likeAnimKey}
             >
-              <Heart
+              <LikeGlyph
                 size={28}
                 fill={hasLiked ? '#F7931E' : 'transparent'}
                 stroke={hasLiked ? '#F7931E' : '#fff'}

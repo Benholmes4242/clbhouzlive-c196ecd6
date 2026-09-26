@@ -9,8 +9,12 @@
  * `onDone` on the same schedule.
  */
 import React, { useEffect } from 'react';
-import { Heart } from 'lucide-react';
+import { reactionGlyph } from '@/lib/reactionKind';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+
+/* The name HeartBurst (and its CSS class/keyframe) is historical: it draws
+   the like glyph (thumbs-up) now, not a heart. */
+const LikeGlyph = reactionGlyph('like');
 
 const AMBER = '#F7931E';
 const LIFETIME_MS = 600;
@@ -39,7 +43,7 @@ export const HeartBurst: React.FC<Props> = ({ onDone }) => {
         zIndex: 6,
       }}
     >
-      <Heart
+      <LikeGlyph
         size={112}
         color={AMBER}
         fill={AMBER}

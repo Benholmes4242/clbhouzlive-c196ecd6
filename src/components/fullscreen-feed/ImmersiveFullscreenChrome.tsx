@@ -18,15 +18,8 @@
  * the top-right is the ONLY score surface.
  */
 import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import {
-  ChevronLeft,
-  Heart,
-  MessageCircle,
-  Send,
-  MoreHorizontal,
-  Volume2,
-  VolumeX,
-} from 'lucide-react';
+import { ChevronLeft, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
+import { reactionGlyph } from '@/lib/reactionKind';
 import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -45,6 +38,9 @@ import { useFollowState } from '@/hooks/useFollowState';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatCountKilo, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
+
+/* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
+const LikeGlyph = reactionGlyph('like');
 
 const AMBER = '#F7931E';
 const CHEVRON_BG = 'rgba(0,0,0,0.32)';
@@ -628,7 +624,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             count={likeStr}
             accent={likeState.isLiked}
           >
-            <Heart
+            <LikeGlyph
               size={32}
               fill={likeState.isLiked ? AMBER : 'transparent'}
               stroke={likeState.isLiked ? AMBER : '#fff'}

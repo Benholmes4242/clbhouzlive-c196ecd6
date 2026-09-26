@@ -15,11 +15,15 @@
  * something they cannot see.
  */
 import React from 'react';
-import { Heart, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
+import { reactionGlyph } from '@/lib/reactionKind';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 import type { StoryEngagement } from './useStoryEngagement';
+
+/* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
+const LikeGlyph = reactionGlyph('like');
 
 /** On-dark amber: filled = you, exactly as it means app-wide. */
 const AMBER_ON_DARK = '#FFB25E';
@@ -63,7 +67,7 @@ export function StoryRowEngagement({
       style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexShrink: 0 }}
     >
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: likeCount > 0 ? 4 : 0 }}>
-        <Heart
+        <LikeGlyph
           size={size}
           strokeWidth={2}
           color={liked ? AMBER_ON_DARK : color}

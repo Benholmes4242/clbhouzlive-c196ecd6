@@ -23,7 +23,8 @@ import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useQueryClient } from '@tanstack/react-query';
 import { prefetchReviewSheet } from '@/components/posts/prefetchReviewSheet';
 import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
-import { Heart, MessageCircle, Share } from 'lucide-react';
+import { MessageCircle, Share } from 'lucide-react';
+import { reactionGlyph } from '@/lib/reactionKind';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
@@ -62,6 +63,9 @@ import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { SLAB } from './feedSurfaces';
+
+/* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
+const LikeGlyph = reactionGlyph('like');
 
 
 
@@ -937,7 +941,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               }}
             >
               <FooterButton
-                icon={Heart}
+                icon={LikeGlyph}
                 label={likeCount > 0 ? formatCount(likeCount) : undefined}
                 active={liked}
                 onClick={() => onLike(post, effectiveActor)}

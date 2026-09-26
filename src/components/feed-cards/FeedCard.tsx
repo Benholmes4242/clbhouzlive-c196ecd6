@@ -19,7 +19,7 @@
  *   - `isAutoplayActive` — activeIndices.has(flatIndex).
  */
 import { useRef } from 'react';
-import { Heart } from 'lucide-react';
+import { reactionGlyph } from '@/lib/reactionKind';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
 import { formatCountShort as formatCount } from '@/i18n/format';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
@@ -30,6 +30,9 @@ import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
+
+/* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
+const LikeGlyph = reactionGlyph('like');
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -326,7 +329,7 @@ export function FeedCard({
               pointerEvents: 'none',
             }}
           >
-            <Heart
+            <LikeGlyph
               style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }}
               strokeWidth={1.8}
             />
@@ -385,7 +388,7 @@ export function FeedCard({
                   flexShrink: 0,
                 }}
               >
-                <Heart
+                <LikeGlyph
                   style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }}
                   strokeWidth={1.8}
                 />

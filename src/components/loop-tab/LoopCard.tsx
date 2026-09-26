@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNowAgo } from '@/i18n/format';
-import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
+import { MessageCircle, Share2, MapPin, X } from 'lucide-react';
+import { reactionGlyph } from '@/lib/reactionKind';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 import { reviewTierColor } from '@/components/shared/ReviewGhostScore';
 import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
@@ -34,6 +35,9 @@ import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatCountUpperPadded as formatCompact } from '@/i18n/format';
+
+/* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
+const LikeGlyph = reactionGlyph('like');
 
 interface LoopCardProps {
   post: FeedPost;
@@ -497,9 +501,9 @@ export const LoopCard = React.memo(function LoopCard({
             style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
           >
             {isLiked ? (
-              <Heart style={{ width: 17, height: 17, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
+              <LikeGlyph style={{ width: 17, height: 17, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
             ) : (
-              <Heart className="w-[17px] h-[17px] text-muted-foreground" />
+              <LikeGlyph className="w-[17px] h-[17px] text-muted-foreground" />
             )}
             <span style={{
               fontSize: 13, fontWeight: 700,
