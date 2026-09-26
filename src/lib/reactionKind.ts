@@ -1,4 +1,4 @@
-import { Heart } from 'lucide-react';
+import { Heart, ThumbsUp } from 'lucide-react';
 import ClapIcon from '@/components/icons/ClapIcon';
 
 /**
@@ -30,13 +30,24 @@ export function celebrateFigureSize(size: number): number {
   return Math.round(size * 0.62 * 10) / 10;
 }
 
-export type ReactionKind = 'like' | 'celebrate';
+/* THE SUBJECT DECIDES THE GLYPH, AND EVERY GLYPH MATCHES A VERB THE DATA
+   ALREADY USES:
+     clap   CELEBRATE  an achievement            -> a round
+     thumb  LIKE/HELPFUL an opinion              -> a comment, a review
+     heart  LIKE       something made or shared  -> a photo, video, story
+   A review is an opinion with a score: the useful signal on it is
+   agreement, which is why the code already calls it isHelpful. */
+export type ReactionKind = 'like' | 'celebrate' | 'helpful';
 
-export function reactionKindFor(subject: { isRound: boolean }): ReactionKind {
-  return subject.isRound ? 'celebrate' : 'like';
+export function reactionKindFor(subject: { isRound: boolean; isReview: boolean }): ReactionKind {
+  if (subject.isRound) return 'celebrate';
+  if (subject.isReview) return 'helpful';
+  return 'like';
 }
 
-/** The glyph for a kind. Both accept lucide-shaped props (size, color, fill). */
+/** The glyph for a kind. All accept lucide-shaped props (size, color, fill). */
 export function reactionGlyph(kind: ReactionKind) {
-  return kind === 'celebrate' ? ClapIcon : Heart;
+  if (kind === 'celebrate') return ClapIcon;
+  if (kind === 'helpful') return ThumbsUp;
+  return Heart;
 }

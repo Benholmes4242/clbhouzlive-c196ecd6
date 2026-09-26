@@ -57,7 +57,10 @@ import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 import { GlassCardFootAction } from '@/features/courses/_shared/scorecard/GlassCardFootAction';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 /* ReactionAction is now reached through RoundEngagementActions, which owns the
-   canonical comment+heart pair; the direct import is gone, the module is not. */
+   canonical comment+reaction pair; the direct import is gone, the module is not.
+   A REVIEW TAKES THE THUMB (kind="helpful"), not the heart: it is an opinion
+   with a score, and agreement is the useful signal on it. The verb stays
+   "like" — thumb and word agree — so LikedByRow below keeps no kind. */
 import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
 import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
@@ -138,7 +141,7 @@ export interface ReviewBottomSheetProps {
   /** G2.5 — false while the prose read is still open; the empty-state line stays silent. */
   proseSettled?: boolean;
   reactionCount?: number;
-  /** G4.3 — the review's heart. Same content_reactions row LatestReviews toggles. */
+  /** G4.3 — the review's like (thumb glyph). Same content_reactions row LatestReviews toggles. */
   reactionMine?: boolean;
   onToggleReaction?: () => void;
   reactionHidden?: boolean;
@@ -848,6 +851,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       label: t('scorecard.likeReview', 'Like this review'),
                       hidden: reactionHidden,
                     }}
+                    kind="helpful"
                   />
                 </div>
               )}
