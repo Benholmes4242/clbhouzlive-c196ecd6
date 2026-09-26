@@ -32,7 +32,7 @@ interface Props {
   onClose?: () => void;
 }
 
-export function ReplyRow({ comment, registerRef, highlighted, onLike, onMore, onClose }: Props) {
+export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onLike, onMore, onClose }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
   /* Amber = the viewer, and nothing else on this surface. */
