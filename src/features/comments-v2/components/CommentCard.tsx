@@ -96,7 +96,6 @@ export function CommentCard({
             size={38}
             src={comment.avatar_url}
             alt={comment.display_name}
-{isViewer ? ' · You' : null}
             userId={comment.actor_id ?? comment.user_id}
             fallback={comment.display_name?.charAt(0) || '?'}
             hairlineRing ringColor={DARK_HAIRLINE}
@@ -107,6 +106,7 @@ export function CommentCard({
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="truncate" style={{ fontSize: 14.5, fontWeight: 600, color: isViewer ? A.AMBER : INK, letterSpacing: '-0.01em' }}>
               {comment.display_name}
+              {isViewer ? ' · You' : null}
             </span>
             {comment.actor_type === 'business' && (
               <span style={{
