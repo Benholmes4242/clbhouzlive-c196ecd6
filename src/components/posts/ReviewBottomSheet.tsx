@@ -349,10 +349,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const { data: fetchedMedia } = useReviewMedia(reviewId ?? null, isOpen && !media?.length);
   const allMedia = (resolvedMedia !== undefined ? resolvedMedia : (media?.length ? media : fetchedMedia)) ?? [];
   const mediaTotal = allMedia.length;
-  const mediaStrip = allMedia.slice(0, 3);
+  /* §3 — at most nine tiles (three rows); the ninth carries "+N" when more exist.
+     Order is fetchReviewMedia's (cover first, then created_at) — never re-sorted here. */
+  const mediaGrid = allMedia.slice(0, REVIEW_MEDIA_GRID_CAP);
+  const hiddenCount = Math.max(0, mediaTotal - REVIEW_MEDIA_GRID_CAP);
 
-  /* PHOTO TAP (§Part 1). The strip shows the first three; the viewer receives
-     ALL items so a 4-photo review stays fully reachable from the third tile.
+  /* PHOTO TAP (§Part 1). The viewer receives ALL items so everything past the
+     cap is reachable by swiping from the ninth tile.
      One synthetic FeedPost per media item, following CourseMoments. */
   const reviewFullscreenPosts = useMemo<FeedPost[]>(
     () =>
@@ -689,7 +692,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   index, expanding from the tile, with the sheet left mounted so
                   its scroll position survives the round trip. Video shows poster + glyph and never
                   autoplays here. */}
-              {mediaStrip.length > 0 && (
+              {mediaGrid.length > 0 && (
                 <div style={{ marginTop: 16 }}>
                   <div
                     style={{
@@ -701,25 +704,31 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       marginBottom: 6,
                     }}
                   >
-                    {mediaTotal === 1 ? '1 PHOTO' : `${mediaTotal} PHOTOS`}
+                    {reviewMediaHeading(allMedia)}
                   </div>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    {mediaStrip.map((m, i) => (
+                  {/* GRID (BRIEF_REVIEW_SHEET_MEDIA_GRID §2). Last row stays ragged:
+                      tiles keep their column width, never stretch. */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                    {mediaGrid.map((m, i) => {
+                      // §4a — index off allMedia explicitly, not the rendered slice.
+                      const index = allMedia.indexOf(m);
+                      const isOverflowTile = i === REVIEW_MEDIA_GRID_CAP - 1 && hiddenCount > 0;
+                      const kindLabel = m.mediaType === 'video' ? 'Video' : 'Photo';
+                      return (
                       <button
                         key={m.id}
                         type="button"
-                        aria-label={`Photo ${i + 1} of ${mediaTotal}`}
+                        aria-label={isOverflowTile ? `Show all ${mediaTotal}` : `${kindLabel} ${index + 1} of ${mediaTotal}`}
                         onClick={(e) => openWithOrigin({
                           openedFrom: 'review-sheet',
                           posts: reviewFullscreenPosts,
-                          index: i,
+                          index,
                           originEl: e.currentTarget as HTMLElement,
                           posterUrl: m.posterUrl ?? m.mediaUrl,
                           readOnly: true,
                           zIndex: VIEWER_ABOVE_SHEETS_Z,
                         })}
                         style={{
-                          flex: 1,
                           minWidth: 0,
                           height: 78,
                           padding: 0,
@@ -740,7 +749,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                           loading="lazy"
                           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                         />
-                        {m.mediaType === 'video' && (
+                        {m.mediaType === 'video' && !isOverflowTile && (
                           <div
                             style={{
                               position: 'absolute',
@@ -765,8 +774,28 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                             </div>
                           </div>
                         )}
+                        {isOverflowTile && (
+                          <div
+                            aria-hidden
+                            data-review-media-overflow="true"
+                            style={{
+                              position: 'absolute',
+                              inset: 0,
+                              background: 'rgba(10,10,12,0.66)',
+                              color: '#FFFFFF',
+                              fontSize: 15,
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            +{hiddenCount}
+                          </div>
+                        )}
                       </button>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
