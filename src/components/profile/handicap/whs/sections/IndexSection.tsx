@@ -206,7 +206,7 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
     setWin(next);
   };
 
-  if (isLoading || all.length === 0) return null;
+  if (isLoading) return null;
 
   const idx = Math.min(sel, pts.length - 1);
   const cur = pts[idx];

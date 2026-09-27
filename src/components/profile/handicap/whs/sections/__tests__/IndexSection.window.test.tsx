@@ -48,7 +48,10 @@ describe('Walk your index — window anchored to today', () => {
   it('no history: no chart, quiet line, chips still live', () => {
     history = [];
     const { container } = render(<IndexSection connection={conn} />);
-    // All-empty history renders nothing (existing behaviour); nothing to walk.
     expect(container.querySelector('svg')).toBeNull();
+    expect(screen.getByText('common:handicap.walk.heading')).toBeTruthy();
+    expect(screen.getByText('common:handicap.walk.empty')).toBeTruthy();
+    fireEvent.click(screen.getByText('90D'));
+    expect(screen.getByText('90D').getAttribute('aria-pressed')).toBe('true');
   });
 });
