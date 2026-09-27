@@ -73,22 +73,66 @@ describe('Index block — window anchored to today, headline mutated in place', 
   });
 });
 
-describe('softStepPath — |rise|/2 and RADIUS_MAX clamps', () => {
-  it('every coordinate stays within the series min/max y and radius <= 9', async () => {
-    const { softStepPath } = await import('../IndexSection');
-    for (let trial = 0; trial < 200; trial++) {
+/** Sample every cubic along its length; return the y extent. */
+function sampledExtent(d: string): [number, number] {
+  const tok = d.match(/[MLC]|-?\d+(?:\.\d+)?(?:e-?\d+)?/g)!;
+  let i = 0; let cx = 0; let cy = 0; let lo = Infinity; let hi = -Infinity;
+  const see = (y: number) => { lo = Math.min(lo, y); hi = Math.max(hi, y); };
+  while (i < tok.length) {
+    const c = tok[i++];
+    if (c === 'M' || c === 'L') { cx = +tok[i++]; cy = +tok[i++]; see(cy); }
+    else if (c === 'C') {
+      const [, y1, , y2, x3, y3] = tok.slice(i, i + 6).map(Number); i += 6;
+      for (let k = 0; k <= 200; k++) {
+        const u = k / 200; const v = 1 - u;
+        see(v * v * v * cy + 3 * v * v * u * y1 + 3 * v * u * u * y2 + u * u * u * y3);
+      }
+      cx = x3; cy = y3;
+    }
+  }
+  void cx;
+  return [lo, hi];
+}
+
+describe('monotonePath — Fritsch–Carlson, no overshoot', () => {
+  it('sampled y extent equals the series min/max (random series)', async () => {
+    const { monotonePath } = await import('../IndexSection');
+    for (let trial = 0; trial < 300; trial++) {
       const n = 2 + (trial % 30);
       let x = 0;
       const p: Array<[number, number]> = Array.from({ length: n }, () => {
-        x += Math.random() * 120;
+        x += Math.random() < 0.1 ? 0 : Math.random() * 120;
         return [x, 20 + Math.round(Math.random() * 10) * 9] as [number, number];
       });
-      const d = softStepPath(p, x + 50);
-      const nums = d.match(/-?\d+(\.\d+)?/g)!.map(Number);
-      const ys = nums.filter((_, i) => i % 2 === 1);
-      const lo = Math.min(...p.map((q) => q[1]));
-      const hi = Math.max(...p.map((q) => q[1]));
-      ys.forEach((yy) => { expect(yy).toBeGreaterThanOrEqual(lo - 1e-9); expect(yy).toBeLessThanOrEqual(hi + 1e-9); });
+      const [lo, hi] = sampledExtent(monotonePath(p, x + 50));
+      expect(lo).toBeCloseTo(Math.min(...p.map((q) => q[1])), 6);
+      expect(hi).toBeCloseTo(Math.max(...p.map((q) => q[1])), 6);
     }
+  });
+
+  it('prototype shape: extent 14 to 96 against data 14 to 96', async () => {
+    const { monotonePath } = await import('../IndexSection');
+    const p: Array<[number, number]> = [[0, 60], [40, 60], [80, 14], [120, 96], [160, 50], [200, 50]];
+    expect(sampledExtent(monotonePath(p, 240))).toEqual([14, 96]);
+  });
+
+  it('a window with no rounds is entirely flat — no sag, no lift', async () => {
+    const { monotonePath } = await import('../IndexSection');
+    const [lo, hi] = sampledExtent(monotonePath([[0, 55], [300, 55]], 300));
+    expect(lo).toBeCloseTo(55, 9); expect(hi).toBeCloseTo(55, 9);
+  });
+
+  it('lead and trail stretches stay flat around a change', async () => {
+    const { monotonePath } = await import('../IndexSection');
+    const d = monotonePath([[0, 40], [100, 40], [150, 80], [300, 80]], 300);
+    const segs = d.split(/(?=[CL])/).slice(1);
+    const nums = (s: string) => s.match(/-?\d+(?:\.\d+)?/g)!.map(Number);
+    expect(nums(segs[0]).filter((_, i) => i % 2 === 1)).toEqual([40, 40, 40]);
+    expect(nums(segs[2]).filter((_, i) => i % 2 === 1)).toEqual([80, 80, 80]);
+  });
+
+  it('staircase code is gone', async () => {
+    const mod = await import('../IndexSection');
+    expect((mod as Record<string, unknown>).softStepPath).toBeUndefined();
   });
 });
