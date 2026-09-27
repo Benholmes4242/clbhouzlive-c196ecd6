@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { CourseRegionPills, type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
+import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 export type CoursePrimaryTab = 'all' | 'top100';
@@ -58,7 +59,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
         aria-label="Course list filter"
         style={{
           display: 'flex',
-          gap: 8,
+          gap: RAIL_CHIP_GAP,
           justifyContent: 'center',
           fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}
@@ -72,22 +73,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
               aria-pressed={isActive}
               aria-selected={isActive}
               onClick={() => onTabChange(key)}
-              style={{
-                flexShrink: 0,
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: 12.5,
-                padding: '7px 14px',
-                borderRadius: 999,
-                background: isActive ? A.INK : A.PANEL,
-                color: isActive ? A.PANEL : A.INK,
-                border: `1px solid ${isActive ? A.INK : A.BORDER}`,
-                fontFamily: 'inherit',
-                whiteSpace: 'nowrap',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
+              style={{ ...railChipStyle(isActive), display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
               {label}
               {count > 0 && (
@@ -95,7 +81,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
                   style={{
                     fontSize: 11.5,
                     fontWeight: 600,
-                    color: isActive ? 'rgba(21,23,31,0.65)' : A.MUTE,
+                    color: A.DIM,
                     fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >

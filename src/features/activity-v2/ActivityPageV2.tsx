@@ -25,7 +25,7 @@ import { FIGURE } from '@/lib/tokens/type';
 import { LedgerRow } from './components/LedgerRow';
 import { ActivityActionsSheet } from './components/ActivityActionsSheet';
 import { ActivityRowsSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
-import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
+import { railChipStyle } from '@/components/ui/RailChips';
 // BRIEF_SUGGESTED_GOLFERS S3.1 / S3.2 - reason-led suggestions inside the feed.
 import { SuggestedGolfersBlock } from '@/features/social-suggestions/SuggestedGolfersBlock';
 import { NobodySawThatRound } from '@/features/social-suggestions/NobodySawThatRound';
@@ -83,22 +83,7 @@ const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick }) => (
   <button
     onClick={onClick}
     className="shrink-0 inline-flex items-center transition-all active:scale-[0.96]"
-    style={{
-      // §2.3 These are the app's scope pills: same geometry, same type, same
-      // two states as PillFilterRow. The count badge is Activity-only and has
-      // no equivalent there — see the report.
-      padding: '8px 14px',
-      borderRadius: SCOPE_PILL_RADIUS,
-      background: active ? INK : ACT.CANVAS,
-      // §2.2 was `active ? INK : '#FFFFFF'` over `active ? '#FFFFFF' : INK_60`
-      // — a token/literal ternary, so flipping INK broke BOTH states at once.
-      color: active ? PAGE : INK,
-      border: `1px solid ${active ? INK : HAIR2}`,
-      gap: 6,
-      fontFamily: SF_STACK,
-      fontSize: 12.5,
-      fontWeight: 700,
-    }}
+    style={{ ...railChipStyle(active), gap: 6 }}
   >
     {label}
     {typeof count === 'number' && count > 0 && (
@@ -109,8 +94,8 @@ const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick }) => (
           fontSize: 11,
           padding: '2px 7px',
           borderRadius: 20,
-          background: active ? surfaceWithAlpha(PAGE_CANVAS, 0.18) : AMBER_SOFT,
-          color: active ? PAGE : AMBER_DEEP,
+          background: AMBER_SOFT,
+          color: AMBER_DEEP,
           lineHeight: 1,
         }}
       >

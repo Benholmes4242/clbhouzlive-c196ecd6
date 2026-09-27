@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import type { ExploreLens } from '../hooks/useExploreLens';
 
@@ -55,7 +56,7 @@ export function ScopePills({ lens, onChange, style }: Props) {
         borderBottom: `1px solid ${A.BORDER}`,
         padding: '12px 16px',
         display: 'flex',
-        gap: 8,
+        gap: RAIL_CHIP_GAP,
         overflowX: 'auto',
         ...style,
       }}
@@ -71,19 +72,7 @@ export function ScopePills({ lens, onChange, style }: Props) {
             role="tab"
             aria-selected={active}
             onClick={() => onChange(id)}
-            style={{
-              flex: 'none',
-              border: `1px solid ${active ? A.INK : A.BORDER}`,
-              background: active ? A.INK : A.PANEL,
-              color: active ? A.PANEL : A.INK,
-              borderRadius: 999,
-              padding: '9px 16px',
-              fontSize: 13,
-              fontWeight: 700,
-              fontFamily: SANS,
-              whiteSpace: 'nowrap',
-              cursor: 'pointer',
-            }}
+            style={{ ...railChipStyle(active), flex: 'none' }}
           >
             {t(key, fallback)}
           </button>

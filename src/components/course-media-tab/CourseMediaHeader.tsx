@@ -1,3 +1,4 @@
+import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
@@ -52,7 +53,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
 
   if (!hasBothTypes) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 20px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: RAIL_CHIP_GAP, padding: '0 20px 12px' }}>
         {/* ONE KIND, NO CHIPS (§3) — so this must not read as a lone chip
             pretending not to be a filter. A quiet 11px DIM line, sentence
             case, beside the add control. */}
@@ -88,7 +89,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
     <div
       role="tablist"
       aria-label={t('courses:media.filterA11y')}
-      style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 20px 12px' }}
+      style={{ display: 'flex', alignItems: 'center', gap: RAIL_CHIP_GAP, padding: '0 20px 12px' }}
     >
       {FILTER_KEYS.map(({ key, i18nKey }) => {
         const isActive = activeFilter === key;
@@ -100,21 +101,13 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
             role="tab"
             aria-selected={isActive}
             onClick={() => onFilterChange(key)}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              height: 34, padding: '0 13px', borderRadius: 17,
-              background: isActive ? INK : 'rgba(255,255,255,0.06)',
-              border: isActive ? `1px solid ${INK}` : `1px solid ${HAIRLINE_INK_10}`,
-              fontSize: 12.5, fontWeight: isActive ? 700 : 600,
-              color: isActive ? INK_ON_LIGHT : INK_MUTE,
-              cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-            }}
+            style={{ ...railChipStyle(isActive), display: 'inline-flex', alignItems: 'center', gap: 5 }}
           >
             {t(i18nKey)}
             {(
               <span style={{
                 fontSize: 11, fontWeight: 700, fontVariantNumeric: 'tabular-nums lining-nums',
-                 color: isActive ? 'rgba(21,23,31,0.55)' : A.DIM,
+                 color: A.DIM,
               }}>
                 {count}
               </span>
