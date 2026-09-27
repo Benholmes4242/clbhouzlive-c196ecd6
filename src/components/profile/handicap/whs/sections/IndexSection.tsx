@@ -185,7 +185,7 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   /* null = LANDING (window movement). A number = parked on that point. */
   const [sel, setSel] = useState<number | null>(null);
 
-  // ── Width, measured (the chart is full width of the tab) ──────────────
+  // ── Width, measured (the chart sits inside the tab's gutter) ──────────
   const boxRef = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(0);
   useLayoutEffect(() => {
@@ -376,7 +376,7 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
         </p>
       ) : (
         <>
-          {/* Full width of the tab: bleed through the section's 20px gutter. */}
+          {/* Inside the section's own gutter: same left/right edges as the headings (no bleed - this chart does not scroll). */}
           <div
             ref={boxRef}
             role="img"
@@ -400,7 +400,7 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
               dragging.current = false;
             }}
             style={{
-              margin: '14px -20px 0',
+              margin: '14px 0 0',
               height: CHART_H,
               touchAction: 'none',
               position: 'relative',
