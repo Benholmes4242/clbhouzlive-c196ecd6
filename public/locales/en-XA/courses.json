@@ -800,7 +800,10 @@
       "youHold": "[~~Ýőú ĥőļđ ţĥíš ƀőářđ~~]",
       "youRank": "[~~{{rank}}{{suffix}}~~]",
       "youRankOf": "[~~{{rank}}{{suffix}} őƒ {{count}}~~]",
-      "youValue": "[~~Ýőú {{value}}~~]"
+      "youValue": "[~~Ýőú {{value}}~~]",
+      "jointTwo": "[~~{{first}} & {{second}}~~]",
+      "jointMany": "[~~{{first}} & {{count}} others~~]",
+      "youShare": "[~~You share this board~~]"
     },
     "sections": {
       "aboutThisPlace": "[[Àbóút thís plãçé]]",
@@ -927,6 +930,14 @@
       "mostRecent": "Most recent",
       "sortA11y": "Sort your rounds",
       "title": "Your rounds"
+    },
+    "youTab": {
+      "grabs": {
+        "heldJointTwo": "[~~{{first}} and {{second}} jointly hold the course record here with {{value}}.~~]",
+        "heldJointMany": "[~~{{first}} and {{count}} others jointly hold the course record here with {{value}}.~~]",
+        "yoursJointTwo": "[~~You and {{other}} jointly hold the course record here with {{value}}.~~]",
+        "yoursJointMany": "[~~You and {{count}} others jointly hold the course record here with {{value}}.~~]"
+      }
     }
   },
   "courseHero": {

@@ -813,7 +813,10 @@
       "youHold": "You hold this board",
       "youRank": "{{rank}}{{suffix}}",
       "youRankOf": "{{rank}}{{suffix}} of {{count}}",
-      "youValue": "You {{value}}"
+      "youValue": "You {{value}}",
+      "jointTwo": "{{first}} & {{second}}",
+      "jointMany": "{{first}} & {{count}} others",
+      "youShare": "You share this board"
     },
     "sections": {
       "aboutThisPlace": "About this place",
@@ -933,7 +936,11 @@
         "held": "{{name}} holds the course record here with {{value}}.",
         "notPlayed": "No course record here yet. It is there for the taking.",
         "played": "No course record here yet. Your {{score}} would take it.",
-        "yours": "You hold the course record here with {{value}}."
+        "yours": "You hold the course record here with {{value}}.",
+        "heldJointTwo": "{{first}} and {{second}} jointly hold the course record here with {{value}}.",
+        "heldJointMany": "{{first}} and {{count}} others jointly hold the course record here with {{value}}.",
+        "yoursJointTwo": "You and {{other}} jointly hold the course record here with {{value}}.",
+        "yoursJointMany": "You and {{count}} others jointly hold the course record here with {{value}}."
       },
       "momentsMeta": "{{moments}}",
       "notPlayed": {
