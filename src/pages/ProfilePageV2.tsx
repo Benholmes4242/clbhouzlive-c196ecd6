@@ -104,6 +104,7 @@ import { StreaksSheetMount } from '@/components/profile/handicap/gam/streaks/Str
 import CompareMount from '@/components/profile/handicap/whs/sections/compare/CompareMount';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { openGamAchievements, openAllStreaks } from '@/components/profile/handicap/whs/gam/events';
+import { useDeepLinkTabScroll } from '@/hooks/useDeepLinkTabScroll';
 import { useProfileRoundsCount } from '@/components/profile/rounds/useProfileRounds';
 
 
@@ -322,6 +323,9 @@ const ProfilePageV2Content: React.FC = () => {
   }, []);
   
   const [activeSection, setActiveSection] = useState(initialTab);
+  const tabBarRef = useRef<HTMLElement>(null);
+  // Another member's ?tab=handicap redirects to compare and never renders the tab.
+  useDeepLinkTabScroll(tabBarRef, initialTab, !authLoading && !!profile?.id, !(initialTab === 'handicap' && !isSelf));
 
   // The URL is the source of the tab. A navigation to /profile?tab=handicap
   // while the profile is already mounted (the hero index cell, the /handicap
@@ -1367,8 +1371,10 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* Canonical chip tabs */}
         <section
+          ref={tabBarRef}
           className="px-4 pt-1 pb-0"
           style={{
+            scrollMarginTop: 'var(--chrome-clearance)',
             /* One canvas: --background and --bg-page resolve differently, which
                printed a black band behind the tabs. Paint nothing but the page. */
             background: 'var(--bg-page)',
