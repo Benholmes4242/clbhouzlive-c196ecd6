@@ -287,32 +287,38 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
             {t('common:handicap.nextRound.courseLine', { course: ladder.courseName })}
           </p>
 
-          {/* A ROW OF EQUAL CELLS (Phase 2 §5.1): break-even first, then the
-              rungs that cut, each marked by a green edge and a faint green
-              tint. Copy, arithmetic and the break-even rule are unchanged. */}
-          <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
+          {/* ROW PER OUTCOME (BRIEF_NEXT_ROUND_KEEPS_ITS_ROWS): full-width rows
+              give the plain-English copy the room it needs at any rung count
+              (2-4). Break-even first; the rungs that cut carry a green edge and
+              faint green tint - the marking, not geometry, carries hierarchy. */}
+          <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
             {rungs.map((r, i) => (
               <div
                 key={i}
                 style={{
-                  flex: 1,
-                  minWidth: 0,
-                  padding: '10px 10px 12px',
-                  borderRadius: 10,
-                  border: `1px solid ${r.moves ? CHART.DOWN : CHART.BORDER}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  padding: '10px 12px',
+                  borderLeft: `3px solid ${r.moves ? CHART.DOWN : CHART.BORDER}`,
                   background: r.moves ? CUT_TINT : 'transparent',
                 }}
               >
-                <div style={{ fontSize: 16, fontWeight: 700, color: r.moves ? CHART.INK : CHART.MUTE, ...FIG }}>
-                  {r.label}
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: r.moves ? CHART.INK : CHART.MUTE, ...FIG }}>
+                    {r.label}
+                  </div>
+                  <div style={{ fontSize: 11.5, marginTop: 2, lineHeight: 1.3, color: r.subGreen ? CHART.DOWN : CHART.MUTE }}>
+                    {r.sub}
+                  </div>
                 </div>
-                <div style={{ fontSize: 11.5, marginTop: 2, lineHeight: 1.3, color: r.subGreen ? CHART.DOWN : CHART.MUTE }}>
-                  {r.sub}
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: r.moves ? CHART.DOWN : CHART.MUTE, ...FIG }}>
+                    {r.index.toFixed(1)}
+                  </div>
+                  {r.kicker && <div style={{ ...KICKER, marginTop: 2, whiteSpace: 'nowrap' }}>{r.kicker}</div>}
                 </div>
-                <div style={{ marginTop: 10, fontSize: 16, fontWeight: 700, color: r.moves ? CHART.DOWN : CHART.MUTE, ...FIG }}>
-                  {r.index.toFixed(1)}
-                </div>
-                {r.kicker && <div style={{ ...KICKER, marginTop: 2 }}>{r.kicker}</div>}
               </div>
             ))}
           </div>
