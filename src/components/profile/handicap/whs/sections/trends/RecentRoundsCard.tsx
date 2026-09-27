@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { countsTowardIndex } from '@/lib/whs/counting';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { formatMonthYearLongGB } from '@/i18n/format';
@@ -173,13 +174,13 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
 
   const filteredRounds = useMemo(() => {
     if (filter.kind === 'all') return rounds;
-    if (filter.kind === 'counters') return rounds.filter((r) => r.is_counter);
+    if (filter.kind === 'counters') return rounds.filter(countsTowardIndex);
     return rounds.filter((r) => r.course_id === filter.id);
   }, [rounds, filter]);
 
   const visibleRounds = filteredRounds.slice(0, displayedCount);
   const hasMore = filteredRounds.length > displayedCount;
-  const counterCount = useMemo(() => rounds.filter((r) => r.is_counter).length, [rounds]);
+  const counterCount = useMemo(() => rounds.filter(countsTowardIndex).length, [rounds]);
 
   const grouped = useMemo(() => {
     const groups: { month: string; rounds: RoundWithDelta[] }[] = [];
@@ -641,7 +642,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
    * non-counter carries nothing at all, so the blank is explained rather than
    * left to be interpreted.
    */
-  const isCounter = !!round.is_counter;
+  const isCounter = countsTowardIndex(round);
   /**
    * DELIBERATE, NOT AN OMISSION. There are FOUR cases on a counter, not three:
    * a delta that moved, a delta computed and rounded flat inside the 0.05 dead

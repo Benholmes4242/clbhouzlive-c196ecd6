@@ -375,7 +375,9 @@ export function routeForNotif(input: NotifRouteInput): string {
   // tracker reads. The gap is authoritative; data.link is only a display echo.
   if (type === 'onboarding_nudge') {
     const gap = data.gap;
-    if (gap === 'whs') return '/handicap?src=nudge_whs';
+    // Byte-identical to handicapTabRoute({ src: 'nudge_whs' }) in activityLinks.ts
+    // (parity test). Emitting the tab route directly avoids the /handicap hop.
+    if (gap === 'whs') return '/profile?src=nudge_whs&tab=handicap';
     if (gap === 'club') return '/edit-profile?src=nudge_club';
     if (gap === 'username') return '/edit-profile?src=nudge_username';
     return '/edit-profile';

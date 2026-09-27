@@ -35,6 +35,8 @@ import { CHART, DEAD_BAND, indexTone } from '../charts';
 const MIN_ROUNDS = 20;
 
 const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums' };
+/** Faint green tint on a cell that cuts: CHART.DOWN at 8% (hex alpha suffix). */
+const CUT_TINT = `${CHART.DOWN}14`;
 
 const KICKER: React.CSSProperties = {
   fontSize: 9,
@@ -285,46 +287,34 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
             {t('common:handicap.nextRound.courseLine', { course: ladder.courseName })}
           </p>
 
-          <div style={{ marginTop: 20, display: 'flex' }}>
-            {/* 3px rail: muted beside the "stays" rung, green from where it moves. */}
-            <div aria-hidden style={{ width: 3, display: 'flex', flexDirection: 'column', marginRight: 14 }}>
-              {rungs.map((r, i) => (
-                <span
-                  key={i}
-                  style={{ flex: 1, background: r.moves ? CHART.DOWN : CHART.TRACK }}
-                />
-              ))}
-            </div>
-            <div style={{ flex: 1 }}>
-              {rungs.map((r, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 12,
-                    padding: '12px 0',
-                    borderTop: i === 0 ? 'none' : `1px solid ${CHART.BORDER}`,
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: 17, fontWeight: 700, color: r.moves ? CHART.INK : CHART.MUTE, ...FIG }}>
-                      {r.label}
-                    </div>
-                    <div style={{ fontSize: 12, marginTop: 2, color: r.subGreen ? CHART.DOWN : CHART.MUTE }}>
-                      {r.sub}
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 17, fontWeight: 700, color: r.moves ? CHART.DOWN : CHART.MUTE, ...FIG }}>
-                      {r.index.toFixed(1)}
-                    </div>
-                    {r.kicker && <div style={{ ...KICKER, marginTop: 2 }}>{r.kicker}</div>}
-                  </div>
+          {/* A ROW OF EQUAL CELLS (Phase 2 §5.1): break-even first, then the
+              rungs that cut, each marked by a green edge and a faint green
+              tint. Copy, arithmetic and the break-even rule are unchanged. */}
+          <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
+            {rungs.map((r, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  padding: '10px 10px 12px',
+                  borderRadius: 10,
+                  border: `1px solid ${r.moves ? CHART.DOWN : CHART.BORDER}`,
+                  background: r.moves ? CUT_TINT : 'transparent',
+                }}
+              >
+                <div style={{ fontSize: 16, fontWeight: 700, color: r.moves ? CHART.INK : CHART.MUTE, ...FIG }}>
+                  {r.label}
                 </div>
-              ))}
-            </div>
+                <div style={{ fontSize: 11.5, marginTop: 2, lineHeight: 1.3, color: r.subGreen ? CHART.DOWN : CHART.MUTE }}>
+                  {r.sub}
+                </div>
+                <div style={{ marginTop: 10, fontSize: 16, fontWeight: 700, color: r.moves ? CHART.DOWN : CHART.MUTE, ...FIG }}>
+                  {r.index.toFixed(1)}
+                </div>
+                {r.kicker && <div style={{ ...KICKER, marginTop: 2 }}>{r.kicker}</div>}
+              </div>
+            ))}
           </div>
 
           <p style={{ margin: '16px 0 0', fontSize: 13.5, color: CHART.MUTE, lineHeight: 1.45, ...FIG }}>
