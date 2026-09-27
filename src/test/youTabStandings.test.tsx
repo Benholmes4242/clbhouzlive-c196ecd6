@@ -8,6 +8,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
+import { categoryLabel } from '@/components/profile/handicap/whs/gam/trophy-room/career/standings';
 import WhereYouStandHere from '@/components/courses/course-detail/you/WhereYouStandHere';
 import type { MemberStandingRow } from '@/hooks/gam/useMemberStandings';
 
@@ -73,63 +74,88 @@ const TENURE = row({
   is_tenure: true,
   rank: 1,
   field_size: 4,
-  value: 112,
-  leader_value: 112,
+  value: 74,
+  leader_value: 74,
   next_value: 98,
   medal_earned: false,
 });
 
-function rankSpan(category: string): HTMLElement {
-  const rowEl = document.querySelector(`[data-you-standing-row="${category}"]`);
-  expect(rowEl).not.toBeNull();
-  const rank = rowEl!.querySelector('[data-you-standing-rank="true"]');
-  expect(rank).not.toBeNull();
-  return rank as HTMLElement;
+const TENURE_90 = row({ category: 'most_rounds_90d', is_tenure: false, rank: 1, field_size: 17, value: 9, medal_earned: true });
+const GROSS_ALL = row({ category: 'lowest_gross_all_time', rank: 4, field_size: 9, ahead_count: 3, behind_count: 5, value: 78, medal_earned: true });
+
+function cell(board: string, w: '90d' | 'all'): HTMLElement {
+  const el = document.querySelector(`[data-you-standing-board="${board}"] [data-you-standing-cell="${w}"]`);
+  expect(el).not.toBeNull();
+  return el as HTMLElement;
 }
+const rank = (el: HTMLElement) => el.querySelector('[data-you-standing-rank="true"]') as HTMLElement | null;
 
-describe('BRIEF_YOU_TAB_STANDINGS · compact block', () => {
-  it('Sundridge: amber 1st /17 with "Shared with 3 · clear by 1"', () => {
+describe('BRIEF_YOU_TAB_STANDINGS_PAIRED', () => {
+  it('rows follow BOARD_ORDER, not arrival order', () => {
+    render(<WhereYouStandHere rows={[TENURE, SUNDRIDGE, GROSS_ALL, HANKLEY]} />);
+    const seq = Array.from(document.querySelectorAll('[data-you-standing-board]')).map((e) => e.getAttribute('data-you-standing-board'));
+    expect(seq).toEqual(['lowest_gross', 'best_stableford', 'most_rounds']);
+    expect(screen.getByText('Where you stand here')).toBeTruthy();
+  });
+
+  it('a board present in one window renders an empty other cell', () => {
+    render(<WhereYouStandHere rows={[GROSS_ALL]} />);
+    expect(cell('lowest_gross', '90d').textContent).toBe('');
+    expect(cell('lowest_gross', 'all').textContent).toContain('78');
+  });
+
+  it('tenure is per cell: all-time 74 has no rank, 90d does', () => {
+    render(<WhereYouStandHere rows={[TENURE, TENURE_90]} />);
+    const all = cell('most_rounds', 'all');
+    expect(all.textContent).toBe('74');
+    expect(rank(all)).toBeNull();
+    expect(rank(cell('most_rounds', '90d'))!.textContent).toBe('1st /17');
+  });
+
+  it('rank tones unchanged, in the right cell', () => {
+    render(<WhereYouStandHere rows={[SUNDRIDGE, HANKLEY, QUEENWOOD]} />);
+    // SUNDRIDGE and QUEENWOOD share best_stableford_90d; the later one fills the cell.
+    expect(rank(cell('best_stableford', '90d'))!.style.color).toBe('rgba(248, 250, 252, 0.42)');
+    expect(rank(cell('best_stableford', 'all'))!.style.color).toBe('rgb(248, 250, 252)');
+  });
+
+  it('amber for medal_earned 1st', () => {
     render(<WhereYouStandHere rows={[SUNDRIDGE]} />);
-    const rank = rankSpan('best_stableford_90d');
-    expect(rank.textContent).toBe('1st /17');
-    expect(rank.style.color).toBe('rgb(247, 147, 30)'); // A.AMBER #F7931E
-    expect(screen.getByText('Shared with 3 · clear by 1')).toBeTruthy();
+    const r = rank(cell('best_stableford', '90d'))!;
+    expect(r.textContent).toBe('1st /17');
+    expect(r.style.color).toBe('rgb(247, 147, 30)');
   });
 
-  it('Queenwood: 1st /1 in DIM, "Only card on this board" — not amber', () => {
-    render(<WhereYouStandHere rows={[QUEENWOOD]} />);
-    const rank = rankSpan('best_stableford_90d');
-    expect(rank.textContent).toBe('1st /1');
-    expect(rank.style.color).toBe('rgba(248, 250, 252, 0.42)'); // A.DIM
-    expect(screen.getByText('Only card on this board')).toBeTruthy();
-  });
-
-  it('a rank-4 medal_earned row shows default ink, not dim', () => {
-    render(<WhereYouStandHere rows={[HANKLEY]} />);
-    const rank = rankSpan('best_stableford_all_time');
-    expect(rank.textContent).toBe('4th /9');
-    expect(rank.style.color).toBe('rgb(248, 250, 252)'); // A.INK #F8FAFC
-  });
-
-  it('tenure rows carry no rank emphasis at all', () => {
-    render(<WhereYouStandHere rows={[TENURE]} />);
-    const rowEl = document.querySelector('[data-you-standing-row="most_rounds_all_time"]');
-    expect(rowEl).not.toBeNull();
-    expect(rowEl!.querySelector('[data-you-standing-rank="true"]')).toBeNull();
-    expect(screen.getByText('112')).toBeTruthy();
-  });
-
-  it('renders nothing when the RPC returns no rows — no empty state', () => {
+  it('rows=[] renders null', () => {
     const { container } = render(<WhereYouStandHere rows={[]} />);
     expect(container.firstChild).toBeNull();
   });
 
-  it('standings come before tenure in the same block, one heading', () => {
-    render(<WhereYouStandHere rows={[TENURE, SUNDRIDGE]} />);
-    const rows = Array.from(document.querySelectorAll('[data-you-standing-row]')).map((el) =>
-      el.getAttribute('data-you-standing-row'),
-    );
-    expect(rows).toEqual(['best_stableford_90d', 'most_rounds_all_time']);
-    expect(screen.getByText('Where you stand here')).toBeTruthy();
+  it('unknown category still renders after the known boards, 90-day column', () => {
+    render(<WhereYouStandHere rows={[row({ category: 'most_sandies_90d', value: 3 }), TENURE]} />);
+    const seq = Array.from(document.querySelectorAll('[data-you-standing-board]')).map((e) => e.getAttribute('data-you-standing-board'));
+    expect(seq).toEqual(['most_rounds', 'most_sandies_90d']);
+    expect(screen.getByText('most sandies 90d')).toBeTruthy();
+    expect(cell('most_sandies_90d', '90d').textContent).toContain('3');
+    expect(cell('most_sandies_90d', 'all').textContent).toBe('');
+  });
+
+  it('categoryLabel reproduces all thirteen Trophy Room strings', () => {
+    const expected: Record<string, string> = {
+      lowest_gross_all_time: 'Lowest gross',
+      lowest_gross_90d: 'Lowest gross \u00b7 90 days',
+      best_score_diff_all_time: 'Best differential',
+      best_score_diff_90d: 'Best differential \u00b7 90 days',
+      best_stableford_all_time: 'Best stableford',
+      best_stableford_90d: 'Best stableford \u00b7 90 days',
+      most_rounds_all_time: 'Rounds played',
+      most_rounds_90d: 'Rounds played \u00b7 90 days',
+      most_birdies_all_time: 'Birdies',
+      most_birdies_90d: 'Birdies \u00b7 90 days',
+      most_eagles_all_time: 'Eagles',
+      most_eagles_90d: 'Eagles \u00b7 90 days',
+      most_aces_all_time: 'Holes in one',
+    };
+    for (const [k, v] of Object.entries(expected)) expect(categoryLabel(k)).toBe(v);
   });
 });
