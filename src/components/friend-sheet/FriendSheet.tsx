@@ -1,3 +1,4 @@
+import { compareRouteFor } from '@/components/friend-sheet/useMemberTapResolver';
 import { Skeleton } from '@/components/ui/skeleton';
 /**
  * FriendSheet — unified bottom sheet for all four friend states.
@@ -115,7 +116,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     onClose();
     // The rivalry page is gone; the compare sheet answers the same question
     // and opens pre-selected on this player.
-    navigate(`/handicap?compare=${encodeURIComponent(targetUserId)}`);
+    navigate(compareRouteFor(targetUserId));
   };
 
   // handleSeeHandicap is GONE. Another member's handicap page is private to
