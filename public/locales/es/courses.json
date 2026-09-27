@@ -692,7 +692,10 @@
       "youHold": "You hold this board",
       "youRank": "{{rank}}.º",
       "youRankOf": "{{rank}}.º de {{count}}",
-      "youValue": "You {{value}}"
+      "youValue": "You {{value}}",
+      "jointTwo": "{{first}} & {{second}}",
+      "jointMany": "{{first}} & {{count}} others",
+      "youShare": "You share this board"
     },
     "suggestEdit": {
       "cancel": "Cancel",
@@ -771,6 +774,14 @@
       "mostRecent": "Most recent",
       "sortA11y": "Sort your rounds",
       "title": "Your rounds"
+    },
+    "youTab": {
+      "grabs": {
+        "heldJointTwo": "{{first}} and {{second}} jointly hold the course record here with {{value}}.",
+        "heldJointMany": "{{first}} and {{count}} others jointly hold the course record here with {{value}}.",
+        "yoursJointTwo": "You and {{other}} jointly hold the course record here with {{value}}.",
+        "yoursJointMany": "You and {{count}} others jointly hold the course record here with {{value}}."
+      }
     }
   },
   "directorySheet": {

@@ -41,16 +41,30 @@ export interface CourseRecordSummary {
   isLoading: boolean;
   /** Rank-1 holder per category (all-time window). */
   holders: Map<LegendCategory, CourseLegendRow>;
-  /** Ordered rank-1 rows for the record book preview, max 5. */
-  previewRows: { category: LegendCategory; row: CourseLegendRow }[];
+  /** Every rank-1 holder per category, ordered. Length 1 on an untied board. */
+  holderGroups: Map<LegendCategory, CourseLegendRow[]>;
+  /**
+   * Ordered boards for the record book preview, max 5. `rows` is the holder
+   * group; `row` (= rows[0]) is kept only so the unmounted CourseRecordBook.tsx
+   * still compiles.
+   */
+  previewRows: { category: LegendCategory; row: CourseLegendRow; rows: CourseLegendRow[] }[];
   /** The course record (lowest gross, all time), or null. */
   courseRecord: CourseLegendRow | null;
+  /** Every holder of the course record (lowest gross, all time). */
+  courseRecordHolders: CourseLegendRow[];
   /** All-time categories with nobody on the board. */
   unclaimedCount: number;
   hasAnyHolder: boolean;
   /** Viewer's own row per category (any rank), with gap from the champion. */
   viewerByCategory: Map<LegendCategory, ViewerStanding>;
 }
+
+/**
+ * Tie key. MUST stay in step with valueKey in
+ * supabase/functions/gam-evaluator/legendRanks.ts (Deno; cannot be imported).
+ */
+const valueKey = (v: number | string): string => Number(v).toFixed(6);
 
 export function useCourseRecordSummary(
   courseId: string | undefined,
@@ -89,19 +103,48 @@ export function useCourseRecordSummary(
       });
     });
 
+    // Joint holders: group by VALUE against the min-rank anchor, never by rank,
+    // so boards still carrying pre-competition positional ranks (1,2,..) show
+    // every holder, and this agrees with Champions' positionsFor().
+    const byCategory = new Map<LegendCategory, CourseLegendRow[]>();
+    (data ?? []).forEach((row) => {
+      const list = byCategory.get(row.category);
+      if (list) list.push(row); else byCategory.set(row.category, [row]);
+    });
+    const holderGroups = new Map<LegendCategory, CourseLegendRow[]>();
+    byCategory.forEach((rows, category) => {
+      const anchor = rows.reduce((a, b) => (b.rank < a.rank ? b : a));
+      const key = valueKey(anchor.value);
+      const group = rows
+        .filter((r) => valueKey(r.value) === key)
+        .sort((a, b) => {
+          if (a.is_self !== b.is_self) return a.is_self ? -1 : 1;
+          return String(a.attained_at ?? '').localeCompare(String(b.attained_at ?? ''));
+        });
+      holderGroups.set(category, group);
+    });
+
     const previewRows = RECORD_BOOK_ORDER
       .filter((c) => holders.has(c))
       .slice(0, 5)
-      .map((category) => ({ category, row: holders.get(category)! }));
+      .map((category) => {
+        const rows = holderGroups.get(category) ?? [holders.get(category)!];
+        return { category, row: rows[0], rows };
+      });
 
     const unclaimedCount = CHAMPIONS_ORDER_ALL_TIME
       .filter((c) => !holders.has(c)).length;
 
+    const courseRecord = holders.get('lowest_gross_all_time') ?? null;
     return {
       isLoading,
       holders,
+      holderGroups,
       previewRows,
-      courseRecord: holders.get('lowest_gross_all_time') ?? null,
+      courseRecord,
+      courseRecordHolders: courseRecord
+        ? holderGroups.get('lowest_gross_all_time') ?? [courseRecord]
+        : [],
       unclaimedCount,
       hasAnyHolder: holders.size > 0,
       viewerByCategory,

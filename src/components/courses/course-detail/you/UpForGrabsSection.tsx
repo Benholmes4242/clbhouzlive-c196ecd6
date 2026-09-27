@@ -13,13 +13,13 @@ import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection from '../about/AboutSection';
 import { YouAction } from './youBits';
+import type { CourseLegendRow } from '@/lib/gam/types';
 
 interface Props {
   /** The course record gross, when someone holds it. */
   recordValue: number | null;
-  holderName: string | null;
-  /** True when the viewing member holds it. */
-  holderIsYou: boolean;
+  /** Every holder of the record, viewer first then earliest attained. */
+  holders: CourseLegendRow[];
   unclaimedCount: number;
   /** The member's own best gross here, when they have played. */
   yourBest: number | null;
@@ -28,21 +28,37 @@ interface Props {
 
 const UpForGrabsSection: React.FC<Props> = ({
   recordValue,
-  holderName,
-  holderIsYou,
+  holders,
   unclaimedCount,
   yourBest,
   onAllBoards,
 }) => {
   const { t } = useTranslation('courses');
 
-  const body = recordValue != null
+  const holderIsYou = holders.some((h) => h.is_self);
+  const fallbackName = t('courseDetail.records.holder', { defaultValue: 'A member' });
+  const nm = (h: CourseLegendRow | undefined) => h?.user_display_name ?? fallbackName;
+  const others = holders.filter((h) => !h.is_self);
+  const value = recordValue != null ? formatLegendValueCompact('lowest_gross_all_time', recordValue) : '';
+  const joint = holders.length >= 2
+    ? holderIsYou
+      ? holders.length === 2
+        ? t('courseDetail.youTab.grabs.yoursJointTwo', { other: nm(others[0]), value })
+        : t('courseDetail.youTab.grabs.yoursJointMany', { count: holders.length - 1, value })
+      : holders.length === 2
+        ? t('courseDetail.youTab.grabs.heldJointTwo', { first: nm(holders[0]), second: nm(holders[1]), value })
+        : t('courseDetail.youTab.grabs.heldJointMany', { first: nm(holders[0]), count: holders.length - 1, value })
+    : null;
+
+  const body = recordValue != null && joint
+    ? joint
+    : recordValue != null
     ? holderIsYou
       ? t('courseDetail.youTab.grabs.yours', {
           value: formatLegendValueCompact('lowest_gross_all_time', recordValue),
         })
       : t('courseDetail.youTab.grabs.held', {
-          name: holderName ?? t('courseDetail.records.holder', { defaultValue: 'A member' }),
+          name: nm(holders[0]),
           value: formatLegendValueCompact('lowest_gross_all_time', recordValue),
         })
     : yourBest != null

@@ -87,7 +87,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   });
   const { data: myRounds } = useMyRoundsAtCourse(courseId);
   const { data: rating } = useUserCourseRating(courseId, user?.id);
-  const { courseRecord, unclaimedCount } = useCourseRecordSummary(courseId, user?.id ?? null);
+  const { courseRecord, courseRecordHolders, unclaimedCount } = useCourseRecordSummary(courseId, user?.id ?? null);
 
   const [openRoundId, setOpenRoundId] = React.useState<string | null>(null);
 
@@ -147,13 +147,10 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     });
   }, [settled, courseId, roundTotal, connection]);
 
-  const holderIsYou = Boolean(user?.id && courseRecord?.user_id === user.id);
-
   const upForGrabs = (
     <UpForGrabsSection
       recordValue={courseRecord?.value ?? null}
-      holderName={courseRecord?.user_display_name ?? null}
-      holderIsYou={holderIsYou}
+      holders={courseRecordHolders}
       unclaimedCount={unclaimedCount}
       yourBest={bestGross}
       onAllBoards={() => {
