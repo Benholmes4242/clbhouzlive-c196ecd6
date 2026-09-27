@@ -17,7 +17,8 @@
  *   ProfileTopTenRail    kicker 9.5 caps, subtitle 11.5 (marginTop 3), rail
  *                        marginTop 12 / gap 9 / paddingLeft 16, card 168 wide,
  *                        image 112 r14, fixed 46px text block (marginTop 7)
- *   FilterChips          7px/14px padding on 12.5 text => 31px pills, gap 8
+ *   RailChips (md)       6px/11px padding + 1px edge on 12px text (18px line)
+ *                        => 32px pills, radius 11, gap 6
  *
  * Shimmer: dark bars sit on the hero (base rgba(255,255,255,0.06), the
  * canonical .clb-shimmer-dark sweep crosses the Cell base); canvas bars use
@@ -184,7 +185,7 @@ function TopTenSkeleton() {
   );
 }
 
-/** FilterChips row — three 31px pills, centred, gap 8. */
+/** RailChips row — 32px pills, radius 11, centred, gap 6. */
 function TabsSkeleton({ count }: { count: number }) {
   return (
     <div
@@ -192,12 +193,12 @@ function TabsSkeleton({ count }: { count: number }) {
         marginTop: 20,
         display: 'flex',
         justifyContent: 'center',
-        gap: 8,
+        gap: 6,
         padding: '0 16px',
       }}
     >
       {Array.from({ length: count }).map((_, i) => (
-        <L key={i} style={{ height: 31, width: 88, borderRadius: 999 }} />
+        <L key={i} style={{ height: 32, width: 72, borderRadius: 11 }} />
       ))}
     </div>
   );

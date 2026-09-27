@@ -34,7 +34,7 @@ import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 
 import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { FilterChips } from '@/components/ui/FilterChips';
+import { RailChips } from '@/components/ui/RailChips';
 
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
@@ -657,7 +657,8 @@ const BusinessProfilePage: React.FC = () => {
           resolve to the canonical Canvas (#0A0A0C). */}
       <section className="px-4">
         <div className="flex justify-center" style={{ padding: '10px 0' }}>
-          <FilterChips
+          <RailChips
+            align="center-when-fit"
             options={tabs.map((tab) => ({ id: tab.id, label: tab.label }))}
             value={activeTab}
             onChange={(id) => {

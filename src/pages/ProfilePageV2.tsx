@@ -48,7 +48,7 @@ import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
-import { FilterChips } from '@/components/ui/FilterChips';
+import { RailChips } from '@/components/ui/RailChips';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
@@ -1383,7 +1383,8 @@ const ProfilePageV2Content: React.FC = () => {
           }}
         >
           <div className="flex justify-center">
-            <FilterChips
+            <RailChips
+              align="center-when-fit"
               options={tabs.map((t) => ({ id: t.id, label: t.label }))}
               value={activeSection}
               onChange={(id) => handleTabChange(id)}

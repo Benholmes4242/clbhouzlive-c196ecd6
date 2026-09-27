@@ -1,4 +1,4 @@
-import { FilterChips } from '@/components/ui/FilterChips';
+import { RailChips } from '@/components/ui/RailChips';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
@@ -46,7 +46,8 @@ export function HubChipBar({ active, onChange }: Props) {
         fontFamily: FONT_FAMILY,
       }}
     >
-      <FilterChips
+      <RailChips
+        align="center-when-fit"
         options={CHIPS}
         value={active}
         onChange={select}

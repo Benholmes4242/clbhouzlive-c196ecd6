@@ -1,5 +1,5 @@
 import React from 'react';
-import { FilterChips } from '@/components/ui/FilterChips';
+import { RailChips } from '@/components/ui/RailChips';
 
 type CoursesTab = 'explore' | 'top100';
 
@@ -14,7 +14,7 @@ interface CoursesShellTabsProps {
 }
 
 /**
- * CoursesShellTabs — canonical dark-fill pill row (FilterChips), matching the
+ * CoursesShellTabs — canonical chip row (RailChips), matching the
  * Top 100 region pills. Centered, no bottom divider (the parent owns the seam).
  */
 export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
@@ -22,7 +22,8 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
   onTabChange,
 }) => (
   <div className="px-4 py-1 flex justify-center">
-    <FilterChips
+    <RailChips
+      align="center-when-fit"
       options={TABS}
       value={activeTab}
       onChange={(id) => onTabChange(id as CoursesTab)}
