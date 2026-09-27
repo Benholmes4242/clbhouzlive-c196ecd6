@@ -1367,7 +1367,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       ) => Promise<{ data: string | null; error: unknown }>)('ensure_round_post', { p_whs_score_id: scoreId });
       if (error || !data) throw error ?? new Error('no post id');
       setOpenCommentsPostId(data);
-      void qc.invalidateQueries({ queryKey: ['round-post-comments'] });
+      void queryClient.invalidateQueries({ queryKey: ["round-post-comments"] });
     } catch (err) {
       console.error('[round-comments] ensure_round_post failed', err);
       toast.error('Could not open comments. Please try again.');
@@ -1375,7 +1375,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       ensuringRef.current = false;
       setEnsuringScoreId(null);
     }
-  }, [qc]);
+  }, [queryClient]);
 
   const engagementFor = useCallback((item: StreamItem) => {
     const scoreId = item.kind === 'round' ? item.facts.score_id : null;
