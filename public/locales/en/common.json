@@ -783,7 +783,9 @@
       "withheldNone": "Hole-by-hole scoring needs rounds with a full card. None of your rounds have one yet.",
       "withheldSome": "Hole-by-hole scoring needs rounds with a full card. Only {{count}} of your rounds do.",
       "basisHoles": "Across {{count}} holes.",
-      "basisRings": "Eighteen-hole rounds at mapped courses."
+      "basisRings": "Eighteen-hole rounds at mapped courses.",
+      "shotsHeading": "Where the shots go",
+      "overPerHole": "+{{v}} a hole"
     },
     "bests": {
       "eyebrow": "Personal bests",
@@ -831,6 +833,22 @@
       "heading": "Connect your handicap",
       "body": "Connect your handicap and this page becomes your record: your index and how it is moving, what your next round does to it, which of your last twenty rounds count, and where you sit among the golfers you play with.",
       "connect": "Connect handicap"
+    },
+    "walk": {
+      "kicker30": "Thirty days",
+      "kicker90": "Ninety days",
+      "kicker12": "Twelve months",
+      "heading": "Walk your index",
+      "chartLabel": "Your handicap index over time. Drag to read any date.",
+      "empty": "Not enough in this window to draw a line. Try a wider range.",
+      "today": "Today",
+      "onThisDate": "On this date",
+      "noChange": "No change",
+      "firstInWindow": "First in window",
+      "down": "Down {{v}}",
+      "up": "Up {{v}}",
+      "high": "High {{v}}",
+      "low": "Low {{v}}"
     }
   },
   "comments": {
