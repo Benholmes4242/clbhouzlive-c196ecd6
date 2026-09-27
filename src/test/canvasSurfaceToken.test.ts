@@ -295,8 +295,10 @@ describe('canonical member surface tokens', () => {
     expect(source).not.toMatch(/#0B0F14|#151A21|#1B222B/);
     // Accent colours carry meaning and stay exactly as they are.
     expect(source).toContain('#F7931E');
-    expect(source).toContain('#FF6B6B');
-    expect(source).toContain('#5EE9A6');
+    // The movement pair is sourced from INDEX_DELTA, never re-declared.
+    expect(source).toMatch(/UP:\s*INDEX_DELTA\.dark\.drifted/);
+    expect(source).toMatch(/DOWN:\s*INDEX_DELTA\.dark\.improved/);
+    expect(source).not.toMatch(/#FF6B6B|#5EE9A6/i);
   });
   it('paints the scorecard page surface from the ramp, not an undeclared CSS variable', () => {
     const path = 'src/features/courses/_shared/scorecard/ScorecardGlassOverlay.tsx';

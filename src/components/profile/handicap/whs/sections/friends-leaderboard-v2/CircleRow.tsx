@@ -23,12 +23,10 @@
  * (handicap_30d_delta <= -0.5). It is labelled by CircleFlameLegend, which
  * renders only when a flame is on screen.
  *
- * THE FLAME IS GREEN, AND THE GREEN IS CHART.DOWN - NOT INDEX_DELTA.
- * The argument for green is that the flame marks a falling index, so it must
- * match the 90-day and 12-month index deltas at the top of THIS page. Those
- * deltas are coloured by toneColor(indexTone(...)) in IndexSection, which
- * resolves a falling index to CHART.DOWN (#5EE9A6). Sourcing INDEX_DELTA here
- * would be a DIFFERENT green from the figures it is supposed to agree with.
+ * THE FLAME IS GREEN, AND THE GREEN IS CHART.DOWN. The flame marks a falling
+ * index, so it must match the index deltas at the top of THIS page.
+ * CHART.DOWN now resolves to INDEX_DELTA.dark.improved (BRIEF_ONE_MOVEMENT_PAIR),
+ * so there is one green across the page.
  * INDEX_DELTA.light / .dark are named for the BACKGROUND LUMINANCE they are
  * legible on, not for a palette: .light is for white / #F8FAFC analytical
  * surfaces (HcpStrip, Discover), .dark for near-black ones. The handicap page
