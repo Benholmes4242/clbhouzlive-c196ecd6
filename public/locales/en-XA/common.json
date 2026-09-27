@@ -537,9 +537,9 @@
       "withheldHeading": "[~~Éṽéřý řőúñđ šţíļļ ĉőúñţš.~~]",
       "withheldBody": "[~~Ŵíţĥ {{count}} řőúñđš őñ řéĉőřđ éṽéřý őñé őƒ ţĥéɱ ĉőúñţš ţőŵářđ ýőúř íñđéẋ, šő ţĥéřé'š ñő ţářĝéţ ţő ƀéáţ ýéţ. Ţĥíš šţářţš ţéļļíñĝ ýőú šőɱéţĥíñĝ őñĉé ýőú ĥáṽé ţŵéñţý.~~]",
       "shootBeat": "[~~Ɓéáţ {{value}}~~]",
-      "headingBeat": "[~~Ɓéáţ {{score}} ñéẋţ ţíɱé őúţ~~]",
-      "caption": "[~~{{course}}, ŵĥéřé ýőú ƥļáý ɱőšţ.~~]",
-      "captionHold": "[~~{{course}}, ŵĥéřé ýőú ƥļáý ɱőšţ. Íţ <m>ĉáññőţ ĝő úƥ</m> ŵĥáţéṽéř ýőú šĥőőţ.~~]"
+      "headingBeat": "Beat {{score}} next time out",
+      "caption": "{{course}}, where you play most.",
+      "captionHold": "{{course}}, where you play most. It <m>cannot go up</m> whatever you shoot."
     },
     "achievements": {
       "trophyRoom": "[~~Ţřőƥĥý řőőɱ~~]",
@@ -756,8 +756,8 @@
       "bodyLineNoCourse": "[~~Ţĥé {{count}} ƀéļőŵ ţĥé ļíñé ářé ţĥé őñéš ýőúř íñđéẋ íš ƀúíļţ ƒřőɱ.~~]",
       "bodyLineNoNext": "[~~Éṽéřý őñé őƒ ýőúř ļášţ ţŵéñţý ĉőúñţš říĝĥţ ñőŵ.~~]",
       "fallLine": "[~~Ýőúř {{date}} řőúñđ đřőƥš őúţ őƒ ţĥé ţŵéñţý íñ {{falls}}.~~]",
-      "headingCount": "[~~{{count}} őƒ ýőúř ļášţ 20 ĉőúñţ~~]",
-      "caption": "[~~Áñýţĥíñĝ úñđéř {{cut}} řéƥļáĉéš őñé őƒ ţĥéɱ.~~]"
+      "headingCount": "{{count}} of your last 20 count",
+      "caption": "Anything under {{cut}} replaces one of them."
     },
     "scoring": {
       "eyebrow": "[~~Šţáƀļéƒőřđ~~]",
@@ -791,9 +791,9 @@
       "basisRings": "[~~Éíĝĥţééñ-ĥőļé řőúñđš áţ ɱáƥƥéđ ĉőúřšéš.~~]",
       "shotsHeading": "[~~Ŵĥéřé ţĥé šĥőţš ĝő~~]",
       "overPerHole": "[~~+{{v}} á ĥőļé~~]",
-      "mergedHeading": "[~~Ŵĥéřé ýőúř šĥőţš ĝő~~]",
-      "caption": "[~~Šĥőţš á ĥőļé, őṽéř {{holes}} ĥőļéš.~~]",
-      "captionShare": "[~~Šĥőţš á ĥőļé, őṽéř {{holes}} ĥőļéš. Ƥář {{n}}š ářé {{share}}% őƒ ţĥéɱ.~~]"
+      "mergedHeading": "Where your shots go",
+      "caption": "Shots a hole, over {{holes}} holes.",
+      "captionShare": "Shots a hole, over {{holes}} holes. Par {{n}}s are {{share}}% of them."
     },
     "bests": {
       "eyebrow": "[~~Ƥéřšőñáļ ƀéšţš~~]",
@@ -831,10 +831,10 @@
       "crownsHeld": "[~~Ĉřőŵñš ĥéļđ~~]",
       "trophyRoomA11y": "[~~Ţřőƥĥý řőőɱ, {{count}} ĉřőŵñš ĥéļđ~~]",
       "trophyRoomA11yBare": "[~~Ţřőƥĥý řőőɱ~~]",
-      "metaOff": "[~~Őƒƒ {{then}} ţĥáţ đáý~~]",
-      "beatWith": "[~~ƀéáţ ŵíţĥ {{n}}~~]",
-      "crowns_one": "[~~{{count}} ĉřőŵñ~~]",
-      "crowns_other": "[~~{{count}} ĉřőŵñš~~]"
+      "metaOff": "Off {{then}} that day",
+      "beatWith": "beat with {{n}}",
+      "crowns_one": "{{count}} crown",
+      "crowns_other": "{{count}} crowns"
     },
     "footer": {
       "allRounds": "[~~Áļļ {{n}} řőúñđš~~]",
@@ -861,11 +861,11 @@
       "up": "[~~Úƥ {{v}}~~]",
       "high": "[~~Ĥíĝĥ {{v}}~~]",
       "low": "[~~Ļőŵ {{v}}~~]",
-      "headlineLabel": "[~~Ĥáñđíĉáƥ íñđéẋ~~]",
-      "window30": "[~~30 đáýš~~]",
-      "window90": "[~~90 đáýš~~]",
-      "window12": "[~~12 ɱőñţĥš~~]",
-      "thisStep": "[~~Ţĥíš šţéƥ~~]"
+      "headlineLabel": "Handicap index",
+      "window30": "30 days",
+      "window90": "90 days",
+      "window12": "12 months",
+      "thisStep": "This step"
     }
   },
   "comments": {
