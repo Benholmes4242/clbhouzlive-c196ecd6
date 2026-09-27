@@ -1,3 +1,4 @@
+import { BirdieCountIcon } from '@/features/explore-magazine/achievementIcons';
 import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
 import { roundCoursePar } from '@/lib/whs/api';
 import React, { useEffect, useMemo, useRef } from 'react';
@@ -767,28 +768,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         {feat && (
           <div data-scorecard-feat={feat.kind} style={{ ...FEAT_BAND_STYLE, alignItems: 'center' }}>
             {feat.kind === 'birdies' ? (
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-                aria-hidden="true"
-                style={{ display: 'block', flex: '0 0 14px', alignSelf: 'center' }}
-              >
-                <circle cx="7" cy="7" r="6" stroke={A.AMBER} strokeWidth="1" />
-                <text
-                  x="7"
-                  y="7"
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fill={A.AMBER}
-                  fontSize="7"
-                  fontWeight="700"
-                  fontFamily={SANS}
-                >
-                  {feat.count}
-                </text>
-              </svg>
+              // The Explore callout's mark, not a redraw: one component, no drift.
+              <BirdieCountIcon count={feat.count} />
             ) : (
               <span
                 aria-hidden="true"
@@ -802,13 +783,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             )}
             <span style={{ display: 'flex', minWidth: 0, flexDirection: 'column', gap: 3 }}>
               <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.13em',
-                  textTransform: 'uppercase',
-                  color: A.AMBER,
-                }}
+                // Headline in INK, as AchievementCallout: amber is a tag's job,
+                // never a headline's. No tag here — the sheet has nothing extra to say.
+                style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: A.INK }}
               >
                 {t(
                   feat.kind === 'eagle' && feat.count >= 2
