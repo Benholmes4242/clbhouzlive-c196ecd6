@@ -120,6 +120,31 @@ const APPLIED_FILL = 'rgba(255,255,255,0.06)';
  *  the 10% hairline every other chip wears. */
 const SELECTED_EDGE = 'rgba(255,255,255,0.28)';
 
+/**
+ * THE CANONICAL CHOICE-CHIP STYLE (BRIEF_ONE_CHIP_SWEEP_PASS_1). Rows that
+ * cannot mount RailChips itself (node labels, deselect, wrap, a count inside
+ * the chip) take their chip style from here — never restate the values.
+ */
+export function railChipStyle(active: boolean, size: 'sm' | 'md' = 'md'): CSSProperties {
+  const geo = RAIL_CHIP_GEOMETRY[size];
+  return {
+    flexShrink: 0,
+    padding: geo.padding,
+    borderRadius: geo.radius,
+    border: `1px solid ${active ? SELECTED_EDGE : A.BORDER}`,
+    background: active ? APPLIED_FILL : 'transparent',
+    color: active ? A.INK : A.MUTE,
+    fontFamily: SANS,
+    fontSize: geo.fontSize,
+    fontWeight: 700,
+    whiteSpace: 'nowrap',
+    cursor: 'pointer',
+  };
+}
+
+/** The canonical chip-row gap. */
+export const RAIL_CHIP_GAP = 6;
+
 export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'filled-selection', align = 'start', size = 'md', distribute = false, trailing }: RailChipsProps) {
   const filled = ground === 'filled';
   /* ONE geometry pair, stated once. 'md' is the canonical chip. */

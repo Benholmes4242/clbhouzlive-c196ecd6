@@ -26,11 +26,8 @@ export function PrimaryActionSection({ value, onChange }: Props) {
           {/*
             THE PILL IS SHARED. This is a single-select one-of-N row, i.e. the
             same control as the Discover scope pills, so it consumes
-            PillFilterRow rather than restating its colours. surface="panel"
-            because the row sits inside a SectionCard (A.PANEL), where an
-            unselected A.PANEL pill would vanish into its own container.
-            Geometry becomes the primitive's (SCOPE_PILL_RADIUS, 8/14, 12.5/700):
-            this deliberately overturns the previous brief's radius/weight fence.
+            PillFilterRow rather than restating its colours. Geometry and both
+            states are the canonical RailChips chip (railChipStyle, md).
           */}
           <PillFilterRow
             value={value}

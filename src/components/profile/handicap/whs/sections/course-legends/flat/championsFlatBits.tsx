@@ -11,7 +11,7 @@
 import React from 'react';
 import { Crown } from 'lucide-react';
 import { A, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
+import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
 import { BoardAvatar, formatChampionsWhen, formatToPar, toParColor, hasToPar } from '../drilldown/_shared/boardParts';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { TFunction } from 'i18next';
@@ -133,7 +133,7 @@ export const BoardChips: React.FC<{
     className="champions-flat-chips"
     style={{
       display: 'flex',
-      gap: 8,
+      gap: RAIL_CHIP_GAP,
       overflowX: 'auto',
       scrollbarWidth: 'none',
       WebkitOverflowScrolling: 'touch',
@@ -150,25 +150,10 @@ export const BoardChips: React.FC<{
           type="button"
           onClick={() => onSelect(c.key)}
           aria-pressed={active}
-          style={{
-            flexShrink: 0,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '8px 14px',
-            borderRadius: SCOPE_PILL_RADIUS,
-            border: `1px solid ${active ? A.INK : A.BORDER}`,
-            background: active ? A.INK : 'transparent',
-            color: active ? A.PANEL : A.INK,
-            fontFamily: SANS,
-            fontSize: 12.5,
-            fontWeight: 700,
-            whiteSpace: 'nowrap',
-            cursor: 'pointer',
-          }}
+          style={{ ...railChipStyle(active), display: 'inline-flex', alignItems: 'center', gap: 6 }}
         >
           {c.short}
-          <span style={{ ...NUM, fontSize: 12.5, fontWeight: 700, color: active ? A.PANEL : A.INK }}>
+          <span style={{ ...NUM, fontSize: 'inherit', fontWeight: 700, color: 'inherit' }}>
             {c.figure}
           </span>
         </button>

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { A, SCOPE_PILL_RADIUS } from './tokens';
+import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
 
 export interface PillFilterOption<T extends string> {
   value: T;
@@ -16,10 +16,9 @@ type PillFilterBaseProps<T extends string> = {
   ariaLabel: string;
   style?: React.CSSProperties;
   /**
-   * 'canvas' (default): the row sits on A.CANVAS, so an unselected pill is
-   * A.PANEL. 'panel': the row sits INSIDE an A.PANEL container (a SectionCard),
-   * where A.PANEL would vanish into its own ground, so unselected is a 6% raised
-   * fill. Radius, padding, type and the selected treatment are identical.
+   * Kept for caller compatibility. Since BRIEF_ONE_CHIP_SWEEP_PASS_1 the row
+   * renders the canonical RailChips style on every ground (unselected chips
+   * are transparent), so the surface no longer changes anything.
    */
   surface?: PillFilterSurface;
   /**
@@ -60,12 +59,10 @@ export function PillFilterRow<T extends string>({
   onChange,
   ariaLabel,
   style,
-  surface = 'canvas',
   wrap = false,
   deselectable,
 }: PillFilterRowProps<T>) {
   const emit = onChange as (next: T | null) => void;
-  const unselectedFill = surface === 'panel' ? 'rgba(255,255,255,0.06)' : A.PANEL;
 
   return (
     <div
@@ -74,7 +71,7 @@ export function PillFilterRow<T extends string>({
       className="scrollbar-hide"
       style={{
         display: 'flex',
-        gap: 8,
+        gap: RAIL_CHIP_GAP,
         /* wrap=false (default): single scrolling row — every existing caller.
            wrap=true: all options render in full on as many lines as needed. */
         flexWrap: wrap ? 'wrap' : 'nowrap',
@@ -92,18 +89,7 @@ export function PillFilterRow<T extends string>({
             role="tab"
             aria-selected={active}
             onClick={() => emit(active && deselectable ? null : option.value)}
-            style={{
-              flex: 'none',
-              border: `1px solid ${active ? A.INK : A.BORDER}`,
-              background: active ? A.INK : unselectedFill,
-              color: active ? A.PANEL : A.INK,
-              borderRadius: SCOPE_PILL_RADIUS,
-              padding: '8px 14px',
-              fontSize: 12.5,
-              fontWeight: 700,
-              whiteSpace: 'nowrap',
-              cursor: 'pointer',
-            }}
+            style={{ ...railChipStyle(active), flex: 'none' }}
           >
             {option.label}
           </button>

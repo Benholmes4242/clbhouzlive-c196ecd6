@@ -45,6 +45,7 @@ import { ChevronRight } from 'lucide-react';
 import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
 import { A, KICKER, LABEL, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatDayMonthShortGB } from '@/i18n/format';
 import { HcpTrendChart } from '@/components/profile/handicap/whs/charts';
@@ -291,7 +292,7 @@ const TrendCard: React.FC<{
       header={
         <>
           <span style={KICKER}>Handicap index</span>
-          <span style={{ display: 'inline-flex', gap: 2, background: A.TRACK, borderRadius: 7, padding: 2 }}>
+          <span role="tablist" aria-label="Index window" style={{ display: 'inline-flex', gap: RAIL_CHIP_GAP }}>
             {([30, 90] as const).map((d) => {
               const on = windowDays === d;
               return (
@@ -299,19 +300,9 @@ const TrendCard: React.FC<{
                   key={d}
                   type="button"
                   onClick={() => onWindow(d)}
-                  style={{
-                    border: 'none',
-                    background: on ? A.PANEL : 'transparent',
-                    borderRadius: 5,
-                    padding: '3px 9px',
-                    fontFamily: SANS,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '0.08em',
-                    color: on ? A.INK : A.DIM,
-                    boxShadow: on ? `0 1px 2px ${A.BORDER}` : 'none',
-                    cursor: 'pointer',
-                  }}
+                  role="tab"
+                  aria-selected={on}
+                  style={railChipStyle(on)}
                 >
                   {d}D
                 </button>
