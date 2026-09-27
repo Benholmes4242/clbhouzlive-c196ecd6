@@ -1,3 +1,4 @@
+import { handicapTabRoute } from '@/lib/handicap/handicapTabRoute';
 /**
  * useMemberTapResolver — tapping another member inside the handicap area
  * resolves DIRECTLY to one of three destinations. There is no intermediate
@@ -61,7 +62,7 @@ export interface MemberTapArgs {
 
 /** The compare destination. One string, one place. */
 export function compareRouteFor(userId: string): string {
-  return `/handicap?compare=${encodeURIComponent(userId)}`;
+  return handicapTabRoute({ compare: userId });
 }
 
 export function useMemberTapResolver() {
