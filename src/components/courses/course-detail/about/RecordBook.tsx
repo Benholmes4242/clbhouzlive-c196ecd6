@@ -31,7 +31,7 @@ import { legendCategoryLabel, formatLegendValueCompact } from '@/lib/gam/visuals
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import type { LegendCategory } from '@/lib/gam/types';
+import type { CourseLegendRow, LegendCategory } from '@/lib/gam/types';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseRecordSummary } from '../useCourseRecordSummary';
 import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
@@ -68,6 +68,35 @@ const BoardFigure: React.FC<{ category: LegendCategory; value: number; tone: str
   );
 };
 
+/** Joint-holder faces: two overlapping 30px squircles, or one plus "+N". Decorative. */
+const STACK_CUT = '0 0 0 2px #0A0A0C';
+const HolderStack: React.FC<{ rows: CourseLegendRow[] }> = ({ rows }) => {
+  const [first, second] = rows;
+  const disc: React.CSSProperties = { position: 'absolute', top: 3, width: 30, height: 30, borderRadius: '34%', boxShadow: STACK_CUT };
+  return (
+    <div aria-hidden="true" style={{ position: 'relative', width: 52, height: 36 }}>
+      <div style={{ ...disc, left: 0, zIndex: 0 }}>
+        <SquircleAvatar src={first.user_photo_url} alt="" userId={first.user_id} size={30} thinRing />
+      </div>
+      {rows.length === 2 ? (
+        <div style={{ ...disc, left: 20, zIndex: 1 }}>
+          <SquircleAvatar src={second.user_photo_url} alt="" userId={second.user_id} size={30} thinRing />
+        </div>
+      ) : (
+        <div
+          style={{
+            ...disc, left: 20, zIndex: 1, background: 'rgba(248,250,252,0.16)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 10, fontWeight: 700, color: 'rgba(248,250,252,0.80)', fontFamily: SANS, ...FIGS,
+          }}
+        >
+          +{rows.length - 1}
+        </div>
+      )}
+    </div>
+  );
+};
+
 interface RecordBookProps {
   courseId: string;
   courseName: string;
@@ -96,11 +125,11 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
       : null;
 
   /** Where the viewing member stands on a board they do not hold. */
-  const viewerLine = (category: LegendCategory, isYou: boolean) => {
+  const viewerLine = (category: LegendCategory, isYou: boolean, shared = false) => {
     if (isYou) {
       return (
         <div style={{ ...ABOUT_KICKER, color: A.AMBER_DEEP, marginTop: 4 }}>
-          {t('courseDetail.records.youHold')}
+          {shared ? t('courseDetail.records.youShare') : t('courseDetail.records.youHold')}
         </div>
       );
     }
@@ -165,8 +194,11 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
   }
 
   // ONE NAME, EVERY BOARD.
+  // Joint holders break a sweep: two members jointly holding every board must
+  // not read as "X holds all five" — the full state says it board by board.
+  const allUntied = previewRows.every((r) => r.rows.length === 1);
   const holderIds = new Set(previewRows.map((r) => r.row.user_id));
-  const sweep = holderIds.size === 1 && previewRows.length > 1 ? previewRows[0].row : null;
+  const sweep = allUntied && holderIds.size === 1 && previewRows.length > 1 ? previewRows[0].row : null;
 
   if (sweep) {
     const isYou = !!user?.id && sweep.user_id === user.id;
@@ -238,12 +270,20 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
     );
   }
 
-  // FULL STATE — one row per board, each on its own hairline.
+  // FULL STATE — one row per board, each on its own hairline. The avatar
+  // column widens to 52px for the WHOLE list when any board is tied, so labels
+  // stay aligned; an untied course is pixel-identical to before.
+  const anyTied = previewRows.some((r) => r.rows.length > 1);
+  const isViewer = (r: { user_id: string; is_self: boolean }) =>
+    r.is_self || (!!user?.id && r.user_id === user.id);
+  const nameOf = (r: { user_id: string; is_self: boolean; user_display_name: string | null }) =>
+    isViewer(r) ? t('courseDetail.records.you') : r.user_display_name ?? 'Golfer';
   return (
     <AboutSection heading={heading} meta={meta}>
       <div style={{ display: 'grid' }}>
-        {previewRows.map(({ category, row }) => {
-          const isYou = !!user?.id && row.user_id === user.id;
+        {previewRows.map(({ category, row, rows }) => {
+          const isYou = rows.some(isViewer);
+          const shared = rows.length > 1;
           const tone = isYou ? A.AMBER_DEEP : A.INK;
           return (
             <button
@@ -252,7 +292,7 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
               onClick={openBoards}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '36px 1fr 74px',
+                gridTemplateColumns: `${anyTied ? 52 : 36}px 1fr 74px`,
                 alignItems: 'center',
                 gap: 12,
                 width: '100%',
@@ -265,13 +305,17 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
                 fontFamily: SANS,
               }}
             >
-              <SquircleAvatar
-                src={row.user_photo_url}
-                alt={row.user_display_name ?? 'Golfer'}
-                userId={row.user_id}
-                size={36}
-                thinRing
-              />
+              {shared ? (
+                <HolderStack rows={rows} />
+              ) : (
+                <SquircleAvatar
+                  src={row.user_photo_url}
+                  alt={row.user_display_name ?? 'Golfer'}
+                  userId={row.user_id}
+                  size={36}
+                  thinRing
+                />
+              )}
               <div style={{ minWidth: 0 }}>
                 <BoardLabel category={category} tone={isYou ? A.AMBER_DEEP : undefined} />
                 <div
@@ -285,9 +329,13 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {isYou ? t('courseDetail.records.you') : row.user_display_name ?? 'Golfer'}
+                  {rows.length === 1
+                    ? nameOf(row)
+                    : rows.length === 2
+                      ? t('courseDetail.records.jointTwo', { first: nameOf(rows[0]), second: nameOf(rows[1]) })
+                      : t('courseDetail.records.jointMany', { first: nameOf(rows[0]), count: rows.length - 1 })}
                 </div>
-                {viewerLine(category, isYou)}
+                {viewerLine(category, isYou, shared)}
               </div>
               <BoardFigure category={category} value={row.value} tone={tone} />
             </button>
