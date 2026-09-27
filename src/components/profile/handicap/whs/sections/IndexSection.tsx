@@ -19,9 +19,15 @@
  * - LANDING MOVEMENT is window end minus window start. Down = improved tone,
  *   up = drifted tone, zero = A.DIM and reads "0.0".
  *
- * - THE LINE IS COLOURED BY STEP: each run + riser into the next value is one
- *   path, toned by that step's direction. The final run to today is ALWAYS the
- *   unchanged tone — nothing has happened since.
+ * - THE LINE IS ONE COLOUR, SET BY THE WINDOW (BRIEF_INDEX_LINE_SOFTENED_STEPS):
+ *   `windowNet` is computed ONCE and drives both the headline movement figure
+ *   and the stroke/fill tone. Scrub never recolours the line.
+ *
+ * - SOFTENED STAIRCASE: still a step function; each corner is a quadratic with
+ *   its control point ON the corner, r = min(RADIUS_MAX, run/2, |rise|/2), so
+ *   the arc can never pass beyond a value the member actually held.
+ *
+ * - FILL: same path data as the stroke + two closing edges to the plot bottom.
  *
  * - COLOUR PAIR: A.IMPROVED / A.DRIFTED (= INDEX_DELTA.dark), the pair the
  *   movement figure already resolved to, so line and figure cannot disagree.
@@ -55,6 +61,29 @@ const PAD_T = 22;
 const PAD_B = 22;
 /** Scrub within this many px of the high/low point and its label yields. */
 const LABEL_YIELD_PX = 36;
+/** Absolute corner cap: keeps a sparse window reading as hold-then-jump. */
+const RADIUS_MAX = 9;
+const FILL_ALPHA = { down: 0.26, up: 0.16 } as const;
+
+/** Softened staircase through step points, holding the last value to xEnd. */
+export function softStepPath(p: Array<[number, number]>, xEnd: number): string {
+  let d = `M ${p[0][0]} ${p[0][1]}`;
+  for (let i = 1; i < p.length; i++) {
+    const [X, y1] = p[i];
+    const [x0, y0] = p[i - 1];
+    const rise = y1 - y0;
+    if (Math.abs(rise) < 0.01) continue; // zero rise: plain run, no arcs
+    const nextX = i + 1 < p.length ? p[i + 1][0] : xEnd;
+    const r = Math.min(RADIUS_MAX, (X - x0) / 2, (nextX - X) / 2, Math.abs(rise) / 2);
+    if (r < 0.5) {
+      d += ` L ${X} ${y0} L ${X} ${y1}`;
+      continue;
+    }
+    const s = Math.sign(rise);
+    d += ` L ${X - r} ${y0} Q ${X} ${y0} ${X} ${y0 + s * r} L ${X} ${y1 - s * r} Q ${X} ${y1} ${X + r} ${y1}`;
+  }
+  return `${d} L ${xEnd} ${p[p.length - 1][1]}`;
+}
 
 type WindowKey = '30d' | '90d' | '12m';
 const DAYS: Record<WindowKey, number> = { '30d': 30, '90d': 90, '12m': 365 };
@@ -183,23 +212,16 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
     // Worse (higher index) is HIGHER on screen; SVG y grows down, so subtract.
     const y = (v: number) => PAD_T + (1 - (v - lo) / (hi - lo)) * (CHART_H - PAD_T - PAD_B);
     const xs = pts.map((p) => x(p.ts));
-    // One path per step: the run at value i plus the riser into i+1, toned by
-    // that step. The run from the newest point to today is always unchanged.
-    const segs: Array<{ d: string; tone: 'down' | 'up' | 'flat' }> = [];
-    for (let i = 1; i < pts.length; i++) {
-      const dv = pts[i].v - pts[i - 1].v;
-      const tone = pts[i].edge === 'trail' || Math.abs(dv) < DEAD_BAND ? 'flat' : dv < 0 ? 'down' : 'up';
-      segs.push({ d: `M ${xs[i - 1]} ${y(pts[i - 1].v)} H ${xs[i]} V ${y(pts[i].v)}`, tone });
-    }
-    const lastX = xs[xs.length - 1];
-    if (lastX < w) segs.push({ d: `M ${lastX} ${y(pts[pts.length - 1].v)} H ${w}`, tone: 'flat' });
+    const line = softStepPath(pts.map((p, i) => [xs[i], y(p.v)] as [number, number]), w);
+    // One path, two uses: the fill is the stroke's own data plus two closing edges.
+    const fill = `${line} L ${w} ${CHART_H} L ${xs[0]} ${CHART_H} Z`;
     let hiIdx = 0;
     let loIdx = 0;
     pts.forEach((p, i) => {
       if (p.v > pts[hiIdx].v) hiIdx = i;
       if (p.v < pts[loIdx].v) loIdx = i;
     });
-    return { xs, y, segs, hiIdx, loIdx };
+    return { xs, y, line, fill, hiIdx, loIdx };
   }, [drawable, view, pts, w]);
 
 
@@ -235,6 +257,12 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
     setSel(null);
   };
 
+  /* THE ONE VALUE (§2.2): window end minus window start. The headline figure
+     and the line/fill tone both read it; they cannot disagree. */
+  const windowNet = pts.length ? pts[pts.length - 1].v - pts[0].v : 0;
+  const lineTone: 'down' | 'up' | 'flat' =
+    Math.abs(windowNet) < DEAD_BAND ? 'flat' : windowNet < 0 ? 'down' : 'up';
+
   if (isLoading) return null;
 
   const idx = sel == null ? null : Math.min(sel, pts.length - 1);
@@ -249,9 +277,8 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   let moveColor: string;
   let windowLabel: string;
   if (cur == null) {
-    const first = pts[0];
     const last = pts[pts.length - 1];
-    const d = first && last ? last.v - first.v : 0;
+    const d = windowNet;
     label = t('common:handicap.walk.headlineLabel');
     value = last ? formatIndex(last.v) : '';
     move = formatMove(d);
@@ -383,18 +410,26 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
           >
             {geo && (
               <svg width={w} height={CHART_H} style={{ display: 'block', overflow: 'visible' }}>
-                {geo.segs.map((sg, i) => (
-                  <path
-                    key={i}
-                    data-tone={sg.tone}
-                    d={sg.d}
-                    fill="none"
-                    stroke={segColor[sg.tone]}
-                    strokeWidth={sg.tone === 'flat' ? 1.75 : 2.4}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                ))}
+                {lineTone !== 'flat' && (
+                  <>
+                    <defs>
+                      <linearGradient id="hcp-index-fill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={segColor[lineTone]} stopOpacity={FILL_ALPHA[lineTone]} />
+                        <stop offset="100%" stopColor={segColor[lineTone]} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <path data-fill d={geo.fill} fill="url(#hcp-index-fill)" />
+                  </>
+                )}
+                <path
+                  data-tone={lineTone}
+                  d={geo.line}
+                  fill="none"
+                  stroke={segColor[lineTone]}
+                  strokeWidth={2.4}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
                 {/* HIGH red, LOW green: a lower index is better. Yields to the scrub. */}
                 {geo.hiIdx !== geo.loIdx && !labelYields(geo.hiIdx) && (
                   <text

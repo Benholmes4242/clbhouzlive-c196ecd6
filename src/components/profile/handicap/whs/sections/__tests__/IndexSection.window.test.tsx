@@ -31,7 +31,8 @@ describe('Index block — window anchored to today, headline mutated in place', 
     expect(screen.getByText('12.6')).toBeTruthy();
     expect(screen.getByText('0.0')).toBeTruthy();
     expect(screen.getByText('common:handicap.walk.window30')).toBeTruthy();
-    expect(container.querySelectorAll('path[data-tone="flat"]').length).toBeGreaterThan(0);
+    expect(container.querySelectorAll('path[data-tone="flat"]').length).toBe(1);
+    expect(container.querySelector('path[data-fill]')).toBeNull();
     expect(container.querySelector('path[data-tone="down"]')).toBeNull();
     const chart = screen.getByRole('img');
     chart.getBoundingClientRect = () => ({ left: 0 } as DOMRect);
@@ -44,14 +45,15 @@ describe('Index block — window anchored to today, headline mutated in place', 
     expect(screen.getByText('common:handicap.walk.headlineLabel')).toBeTruthy();
   });
 
-  it('12M: landing movement is end minus start; improving step green, final run to today unchanged', () => {
+  it('12M: landing movement is end minus start; ONE line in the net tone, fill from the same path', () => {
     history = [{ observed_at: iso(400), handicap_index: 14 }, { observed_at: iso(100), handicap_index: 12 }, { observed_at: iso(50), handicap_index: 12.5 }];
     const { container } = render(<IndexSection connection={conn} />);
     expect(screen.getByText('\u22121.5')).toBeTruthy();
-    expect(container.querySelector('path[data-tone="down"]')).not.toBeNull();
-    expect(container.querySelector('path[data-tone="up"]')).not.toBeNull();
     const paths = container.querySelectorAll('path[data-tone]');
-    expect(paths[paths.length - 1].getAttribute('data-tone')).toBe('flat');
+    expect(paths.length).toBe(1);
+    expect(paths[0].getAttribute('data-tone')).toBe('down');
+    const fill = container.querySelector('path[data-fill]')!.getAttribute('d')!;
+    expect(fill.startsWith(paths[0].getAttribute('d')!)).toBe(true);
   });
 
   it.each([['30D', 30], ['90D', 90], ['12M', 365]] as const)('active member: %s axis spans %i days ending today', (chip, days) => {
@@ -68,5 +70,25 @@ describe('Index block — window anchored to today, headline mutated in place', 
     expect(screen.getByText('common:handicap.walk.empty')).toBeTruthy();
     fireEvent.click(screen.getByText('90D'));
     expect(screen.getByText('90D').getAttribute('aria-pressed')).toBe('true');
+  });
+});
+
+describe('softStepPath — |rise|/2 and RADIUS_MAX clamps', () => {
+  it('every coordinate stays within the series min/max y and radius <= 9', async () => {
+    const { softStepPath } = await import('../IndexSection');
+    for (let trial = 0; trial < 200; trial++) {
+      const n = 2 + (trial % 30);
+      let x = 0;
+      const p: Array<[number, number]> = Array.from({ length: n }, () => {
+        x += Math.random() * 120;
+        return [x, 20 + Math.round(Math.random() * 10) * 9] as [number, number];
+      });
+      const d = softStepPath(p, x + 50);
+      const nums = d.match(/-?\d+(\.\d+)?/g)!.map(Number);
+      const ys = nums.filter((_, i) => i % 2 === 1);
+      const lo = Math.min(...p.map((q) => q[1]));
+      const hi = Math.max(...p.map((q) => q[1]));
+      ys.forEach((yy) => { expect(yy).toBeGreaterThanOrEqual(lo - 1e-9); expect(yy).toBeLessThanOrEqual(hi + 1e-9); });
+    }
   });
 });
