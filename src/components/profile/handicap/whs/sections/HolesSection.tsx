@@ -36,7 +36,7 @@ import {
 } from '@/features/courses/components/holes/_constants';
 
 import { HcpSection } from './HcpSection';
-import { CHART, MiniRing, sharedMax, type ChartTone } from '../charts';
+import { CHART, sharedMax, type ChartTone } from '../charts';
 
 /** The distribution row needs this many holes before it says anything. */
 const MIN_HOLES_DISTRIBUTION = 180;
@@ -206,83 +206,84 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
         })
       : null;
 
+  /* ONE COMPONENT, ONE SET OF QUERIES, TWO HEADED BLOCKS (Phase 2 §5.2):
+     "Where the shots go" (par-type cost bars) then "Every hole you've
+     played" (the four-row distribution). Each block states its own basis. */
+  const toneColorOf = (tone: ChartTone) =>
+    tone === 'up' ? CHART.UP : tone === 'down' ? CHART.DOWN : CHART.AMBER;
+
   return (
-    <HcpSection
-      hairline
-      kicker={t('common:handicap.holes.eyebrow')}
-      heading={t('common:handicap.holes.heading')}
-      /* NO META. Two round populations live in this section — every hole with a
-         card for the distribution, mapped eighteen-hole rounds for the rings —
-         and one figure in the meta slot could only describe one of them. Each
-         pool states its own basis beneath itself instead. */
-    >
-      {/* THE OUTCOME DISTRIBUTION — four counts, equal columns, no ring */}
-      <div style={{ display: 'flex', gap: 12 }}>
-        {bands.map((b) => {
-          const pct = totalHoles > 0 ? Math.round((b.count / totalHoles) * 100) : 0;
-          return (
-            <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  color: b.count === 0 ? CHART.MUTE : b.color,
-                  ...FIG,
-                }}
-              >
-                {b.count}
+    <>
+      <HcpSection hairline heading={t('common:handicap.holes.shotsHeading')}>
+        {rings.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {rings.map((ring) => {
+              const tone = toneColorOf(toneFor(ring));
+              const pct = ringMax > 0 ? Math.max(0, Math.min(1, ring.data.avg_over / ringMax)) : 0;
+              return (
+                <div key={ring.key}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: CHART.INK }}>
+                      {t('common:handicap.holes.parNs', { n: ring.parN })}
+                    </span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
+                      <span style={{ color: tone, marginRight: 8 }}>
+                        {t('common:handicap.holes.overPerHole', { v: ring.data.avg_over.toFixed(2) })}
+                      </span>
+                      {t('common:handicap.holes.nHoles', { count: ring.data.holes_played })}
+                    </span>
+                  </div>
+                  <div style={{ marginTop: 6, height: 6, borderRadius: 3, background: CHART.TRACK, overflow: 'hidden' }}>
+                    <div style={{ width: `${pct * 100}%`, height: '100%', background: tone, borderRadius: 3 }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* BASIS for the bars: the RPC excludes nine-hole rounds and requires a
+            mapped course; it is deployed, so this states it. */}
+        <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
+          {t('common:handicap.holes.basisRings')}
+        </div>
+
+        {(ringSentence || missingSentence) && (
+          <p style={{ margin: '14px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
+            {[ringSentence, missingSentence].filter(Boolean).join(' ')}
+          </p>
+        )}
+      </HcpSection>
+
+      <HcpSection
+        hairline
+        kicker={t('common:handicap.holes.eyebrow')}
+        heading={t('common:handicap.holes.heading')}
+      >
+        {/* THE OUTCOME DISTRIBUTION — four counts, equal columns, no ring */}
+        <div style={{ display: 'flex', gap: 12 }}>
+          {bands.map((b) => {
+            const pct = totalHoles > 0 ? Math.round((b.count / totalHoles) * 100) : 0;
+            return (
+              <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 16, fontWeight: 700, lineHeight: 1, color: b.count === 0 ? CHART.MUTE : b.color, ...FIG }}>
+                  {b.count}
+                </div>
+                <div style={{ ...KICKER, marginTop: 6 }}>{b.label}</div>
+                <div style={{ marginTop: 3, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
+                  {pct}%
+                </div>
               </div>
-              <div style={{ ...KICKER, marginTop: 6 }}>{b.label}</div>
-              <div style={{ marginTop: 3, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
-                {pct}%
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      {/* BASIS for the four counts above. Percentages need their denominator. */}
-      <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
-        {t('common:handicap.holes.basisHoles', { count: totalHoles })}
-      </div>
-
-      {/* Hairline across the content width */}
-      <div aria-hidden style={{ height: 1, background: CHART.BORDER, margin: '18px 0' }} />
-
-      {/* THE THREE PAR-TYPE RINGS — a missing type leaves its column empty */}
-      <div style={{ display: 'flex', gap: 6 }}>
-        {allTypes.map((row) => {
-          const ring = rings.find((r) => r.key === row.key);
-          return (
-            <div key={row.key} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-              {ring && (
-                <MiniRing
-                  value={ring.data.avg_over}
-                  max={ringMax}
-                  label={t('common:handicap.holes.parNs', { n: ring.parN })}
-                  sub={t('common:handicap.holes.nHoles', { count: ring.data.holes_played })}
-                  tone={toneFor(ring)}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* BASIS for the rings: both restrictions are real and neither is visible
-          from the hole counts alone. The RPC excludes nine-hole rounds and
-          requires a mapped course; it is deployed, so this states it. */}
-      <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
-        {t('common:handicap.holes.basisRings')}
-      </div>
-
-      {(ringSentence || missingSentence) && (
-        <p style={{ margin: '14px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
-          {[ringSentence, missingSentence].filter(Boolean).join(' ')}
-        </p>
-      )}
-    </HcpSection>
+        {/* BASIS for the four counts above. Percentages need their denominator. */}
+        <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
+          {t('common:handicap.holes.basisHoles', { count: totalHoles })}
+        </div>
+      </HcpSection>
+    </>
   );
 };
 
