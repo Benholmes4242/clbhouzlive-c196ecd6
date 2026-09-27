@@ -19192,6 +19192,7 @@ export type Database = {
         Returns: string
       }
       enablelongtransactions: { Args: never; Returns: string }
+      ensure_round_post: { Args: { p_whs_score_id: string }; Returns: string }
       ensure_user_season_stats: { Args: { p_user_id: string }; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       evaluate_user_top100_badges: {
