@@ -300,7 +300,16 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
 
       {/* BRIEF_YOU_TAB_STANDINGS — compact standings, same RPC and rules as the
           Trophy Room. Renders only when the course-scoped read returns rows. */}
-      <WhereYouStandHere rows={standings ?? []} />
+      <WhereYouStandHere
+        rows={standings ?? []}
+        onAllBoards={() => {
+          analyticsEvents.track('course_you_standings_all_boards', {
+            course_id: courseId,
+            boards: (standings ?? []).length,
+          });
+          onTabChange?.('legends');
+        }}
+      />
 
       <YourRatingSection
         rating={rating ?? null}

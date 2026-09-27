@@ -78,24 +78,52 @@ export function standingLine(row: MemberStandingRow): string | null {
   return line;
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  lowest_gross_all_time: 'Lowest gross',
-  lowest_gross_90d: 'Lowest gross · 90 days',
-  best_score_diff_all_time: 'Best differential',
-  best_score_diff_90d: 'Best differential · 90 days',
-  best_stableford_all_time: 'Best stableford',
-  best_stableford_90d: 'Best stableford · 90 days',
-  most_rounds_all_time: 'Rounds played',
-  most_rounds_90d: 'Rounds played · 90 days',
-  most_birdies_all_time: 'Birdies',
-  most_birdies_90d: 'Birdies · 90 days',
-  most_eagles_all_time: 'Eagles',
-  most_eagles_90d: 'Eagles · 90 days',
-  most_aces_all_time: 'Holes in one',
+export type StandingWindow = 'all' | '90d';
+
+/** The seven boards, in the order the You-tab grid renders them. */
+export const BOARD_ORDER = [
+  'lowest_gross',
+  'best_score_diff',
+  'best_stableford',
+  'most_birdies',
+  'most_eagles',
+  'most_aces',
+  'most_rounds',
+] as const;
+export type BoardKey = (typeof BOARD_ORDER)[number];
+
+export const BOARD_LABELS: Record<BoardKey, string> = {
+  lowest_gross: 'Lowest gross',
+  best_score_diff: 'Best differential',
+  best_stableford: 'Best stableford',
+  most_birdies: 'Birdies',
+  most_eagles: 'Eagles',
+  most_aces: 'Holes in one',
+  most_rounds: 'Rounds played',
 };
 
+/** category -> the board it belongs to and the window it covers. ONE table. */
+export const CATEGORY_BOARD: Record<string, { board: BoardKey; window: StandingWindow }> = {
+  lowest_gross_all_time: { board: 'lowest_gross', window: 'all' },
+  lowest_gross_90d: { board: 'lowest_gross', window: '90d' },
+  best_score_diff_all_time: { board: 'best_score_diff', window: 'all' },
+  best_score_diff_90d: { board: 'best_score_diff', window: '90d' },
+  best_stableford_all_time: { board: 'best_stableford', window: 'all' },
+  best_stableford_90d: { board: 'best_stableford', window: '90d' },
+  most_rounds_all_time: { board: 'most_rounds', window: 'all' },
+  most_rounds_90d: { board: 'most_rounds', window: '90d' },
+  most_birdies_all_time: { board: 'most_birdies', window: 'all' },
+  most_birdies_90d: { board: 'most_birdies', window: '90d' },
+  most_eagles_all_time: { board: 'most_eagles', window: 'all' },
+  most_eagles_90d: { board: 'most_eagles', window: '90d' },
+  most_aces_all_time: { board: 'most_aces', window: 'all' },
+};
+
+/** Derived from the two tables above — Trophy Room strings stay byte-identical. */
 export function categoryLabel(category: string): string {
-  return CATEGORY_LABELS[category] ?? category.replace(/_/g, ' ');
+  const m = CATEGORY_BOARD[category];
+  if (!m) return category.replace(/_/g, ' ');
+  return m.window === '90d' ? `${BOARD_LABELS[m.board]} · 90 days` : BOARD_LABELS[m.board];
 }
 
 export interface StandingsCourseGroup {
