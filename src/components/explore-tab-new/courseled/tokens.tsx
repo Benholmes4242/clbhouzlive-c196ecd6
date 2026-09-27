@@ -91,7 +91,6 @@ export const CARD_RADIUS = 8;
 export const WELL_RADIUS = Math.round(CARD_RADIUS * 0.85);
 export const THUMBNAIL_RADIUS = Math.round(CARD_RADIUS * 0.78);
 export const CHIP_RADIUS = Math.round(CARD_RADIUS * 0.5);
-export const SCOPE_PILL_RADIUS = CARD_RADIUS;
 
 
 export const NUMF: React.CSSProperties = {
