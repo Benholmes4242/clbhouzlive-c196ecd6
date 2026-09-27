@@ -176,28 +176,16 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
   const nextScore = nextDiff != null ? scoreAt(nextDiff) : null;
   const headroom = cutScore != null && nextScore != null ? nextScore - cutScore : null;
 
-  /* SEPARATE KEYS, NOT AN INTERPOLATED PLURAL. 0 is its own state (the next
-     round in line is level with the last one counting), never "0 shots". */
-  const meta =
-    headroom == null
-      ? undefined
-      : headroom === 0
-        ? t('common:handicap.roundsThatCount.headroomLevel')
-        : headroom === 1
-          ? t('common:handicap.roundsThatCount.headroomOne')
-          : t('common:handicap.roundsThatCount.headroomOther', { count: headroom });
-
+  /* ONE CAPTION (BRIEF_HANDICAP_TAB_SIMPLIFY §3.2). The headroom meta is gone:
+     "cannot go up" in Next round states that fact once. */
   const bodyLine =
     nextDiff == null
       ? t('common:handicap.roundsThatCount.bodyLineNoNext')
-      : course && cutScore != null && nextScore != null
-        ? t('common:handicap.roundsThatCount.bodyLine', {
-            count: counterCount,
-            cut: cutScore,
-            course: course.name,
-            next: nextScore,
-          })
-        : t('common:handicap.roundsThatCount.bodyLineNoCourse', { count: counterCount });
+      : cutScore != null
+        ? t('common:handicap.roundsThatCount.caption', { cut: cutScore })
+        : null;
+  void nextScore;
+  void headroom;
 
   const fallLine = falling
     ? t('common:handicap.roundsThatCount.fallLine', {
@@ -224,9 +212,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
     <>
       <HcpSection
         hairline
-        kicker={t('common:handicap.roundsThatCount.eyebrow')}
-        heading={t('common:handicap.roundsThatCount.heading')}
-        meta={meta}
+        heading={t('common:handicap.roundsThatCount.headingCount', { count: counterCount })}
       >
         {/* Selection slot — height reserved from mount, empty until a tap. */}
         <div style={{ height: SLOT_H, marginBottom: 6 }}>
@@ -296,9 +282,11 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
           cutLabel={cutScore != null ? String(cutScore) : null}
         />
 
-        <p style={{ margin: '14px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
-          {bodyLine}
-        </p>
+        {bodyLine && (
+          <p style={{ margin: '14px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
+            {bodyLine}
+          </p>
+        )}
         {fallLine && (
           <p style={{ margin: '6px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
             {fallLine}
