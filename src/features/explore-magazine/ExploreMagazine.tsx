@@ -1911,17 +1911,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       ) : null}
 
 
-      {view === 'scores' && !scoresBoardActive && scoreScopeOptions.length > 1 && scoreScopeLabel ? (
-        <div style={{
-          padding: '2px 16px 10px',
-          fontFamily: SANS, fontSize: 10, fontWeight: 800,
-          letterSpacing: '0.14em', textTransform: 'uppercase',
-          color: A.INK, lineHeight: 1,
-        }}>{scoreScopeLabel}</div>
-      ) : null}
       {view === 'scores' && !scoresBoardActive ? (
         <div style={{ marginBottom: BLOCK_GAP }}>
           <CircleShelf viewerId={userId} pos={0} />
+        </div>
+      ) : null}
+      {view === 'scores' && !scoresBoardActive && scoreScopeOptions.length > 1 && scoreScopeLabel ? (
+        /* HEADS THE STREAM, NOT THE RAIL — Your circle is never scoped by the chip row. */
+        <div style={{ fontFamily: SANS, ...SHELF_HEADING, padding: '0 16px 10px' }}>
+          {scoreScopeLabel}
         </div>
       ) : null}
 

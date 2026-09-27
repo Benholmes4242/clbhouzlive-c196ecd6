@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import React, { useEffect, useRef } from 'react';
 
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
@@ -15,6 +16,16 @@ import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
  * An empty shelf renders NOTHING — no heading over nothing. The caller decides
  * emptiness (it owns the hook) and simply does not mount this.
  */
+
+
+/** THE SHELF HEADING, PUBLISHED. Any surface that must read as a peer of
+ *  a shelf heading spreads this rather than restating the values. */
+export const SHELF_HEADING: CSSProperties = {
+  fontSize: 16,
+  fontWeight: 700,
+  letterSpacing: '-0.015em',
+  color: A.INK,
+};
 
 export function ExploreShelf({
   heading,
@@ -82,7 +93,7 @@ export function ExploreShelf({
           padding: '0 16px',
         }}
       >
-        <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK, minWidth: 0 }}>
+        <span style={{ ...SHELF_HEADING, minWidth: 0 }}>
           {heading}
         </span>
         {headingRight ? (
