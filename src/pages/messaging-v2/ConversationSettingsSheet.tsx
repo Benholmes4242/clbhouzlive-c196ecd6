@@ -1,3 +1,4 @@
+import { compareRouteFor } from '@/components/friend-sheet/useMemberTapResolver';
 /**
  * ADDENDUM TO BRIEF_MESSAGES_DARK — THE THREAD DETAILS SHEET.
  *
@@ -376,7 +377,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const goCompare = useCallback(() => {
     if (!rivalUserId) return;
     onClose();
-    navigate(`/handicap?compare=${encodeURIComponent(rivalUserId)}`);
+    navigate(compareRouteFor(rivalUserId));
   }, [rivalUserId, navigate, onClose]);
 
   const handleBlock = useCallback(async () => {

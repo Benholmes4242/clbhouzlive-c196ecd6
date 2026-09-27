@@ -1,3 +1,4 @@
+import { handicapTabRoute } from '@/lib/handicap/handicapTabRoute';
 /**
  * Activity V2 deep-link router.
  *
@@ -415,7 +416,7 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   // tracker reads. The gap is authoritative; data.link is only a display echo.
   if (type === 'onboarding_nudge') {
     const gap = data.gap;
-    if (gap === 'whs') return '/handicap?src=nudge_whs';
+    if (gap === 'whs') return handicapTabRoute({ src: 'nudge_whs' });
     if (gap === 'club') return '/edit-profile?src=nudge_club';
     if (gap === 'username') return '/edit-profile?src=nudge_username';
     return '/edit-profile';
