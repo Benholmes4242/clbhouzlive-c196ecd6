@@ -27,10 +27,10 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 import { useAllScores } from '@/lib/whs/hooks';
 import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
@@ -65,6 +65,10 @@ interface Row {
   context?: string | null;
   /** Beat line; muted = the honest two-part line with no green rule. */
   beat: { text: string; muted: boolean } | null;
+  /** The figure that beats it — shown right as "beat with {n}". Owner only. */
+  beatN?: number | null;
+  /** Replaces course in the meta line (against-handicap: "Off 3.3 that day"). */
+  metaLead?: string | null;
 }
 
 interface Props {
@@ -149,6 +153,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
         beat: isOwner
           ? { text: t('common:handicap.bests.beatGross', { score: (best.adjusted_gross as number) - 1 }), muted: false }
           : null,
+        beatN: isOwner ? (best.adjusted_gross as number) - 1 : null,
         ...base(best),
       });
     }
@@ -162,6 +167,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
         (a.handicap_differential as number) <= (b.handicap_differential as number) ? a : b,
       );
       let beat: Row['beat'] = null;
+      let beatN: number | null = null;
       if (isOwner && ref) {
         const record = best.handicap_differential as number;
         const diffOf = (g: number) => ((g - ref.cr) * 113) / ref.slope;
@@ -169,6 +175,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
         let score = Math.ceil((record * ref.slope) / 113 + ref.cr) - 1;
         while (diffOf(score) >= record) score -= 1;
         beat = { text: t('common:handicap.bests.beatRound', { score, course: ref.name }), muted: false };
+        beatN = score;
       }
       out.push({
         key: 'diff',
@@ -185,6 +192,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
               })
             : null,
         beat,
+        beatN,
         ...base(best),
       });
     }
@@ -201,6 +209,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
         beat: isOwner
           ? { text: t('common:handicap.bests.beatStableford', { points: (best.stableford_points as number) + 1 }), muted: false }
           : null,
+        beatN: isOwner ? (best.stableford_points as number) + 1 : null,
         ...base(best),
       });
     }
@@ -221,9 +230,11 @@ export const PersonalBestsSection: React.FC<Props> = ({
       const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
       const abs = Math.abs(best.vsHcp).toFixed(1);
       let beat: Row['beat'] = null;
+      let beatN: number | null = null;
       if (isOwner && ref && refPar != null && currentHandicap != null) {
         // gross - par - currentIndex < record
         const score = Math.ceil(refPar + currentHandicap + best.vsHcp) - 1;
+        beatN = score;
         beat =
           Math.abs(best.then - currentHandicap) <= 0.5
             ? { text: t('common:handicap.bests.beatRound', { score, course: ref.name }), muted: false }
@@ -245,6 +256,8 @@ export const PersonalBestsSection: React.FC<Props> = ({
         // True minus, never a hyphen.
         figure: best.vsHcp < 0 ? `\u2212${abs}` : best.vsHcp > 0 ? `+${abs}` : abs,
         beat,
+        beatN,
+        metaLead: t('common:handicap.bests.metaOff', { then: fmtIdx(best.then) }),
         ...base(best.s),
       });
     }
@@ -282,7 +295,6 @@ export const PersonalBestsSection: React.FC<Props> = ({
   return (
     <HcpSection
       hairline
-      kicker={t('common:handicap.bests.eyebrow')}
       heading={
         isFriend && ownerFirstName
           ? t('common:handicap.bests.headingFriend', { name: ownerFirstName })
@@ -290,46 +302,50 @@ export const PersonalBestsSection: React.FC<Props> = ({
       }
     >
       {rows.map((r, i) => {
-        // SAME ROUND: the second row sharing a score id drops its course · date.
+        /* TWO LINES (§5.2): name + one meta line left, figure + "beat with"
+           right. SAME ROUND: a repeat score id drops its course. */
         const repeat = rows.slice(0, i).some((p) => p.id === r.id);
-        const sub = (repeat
-          ? [t('common:handicap.bests.sameRound'), r.stood]
-          : [r.course, r.date, r.stood]
-        ).filter(Boolean).join(' \u00b7 ');
+        const lead = repeat ? t('common:handicap.bests.sameRound') : r.metaLead ?? r.course;
+        const sub = [lead, r.stood].filter(Boolean).join(' \u00b7 ');
         return (
           <div
             key={r.key}
             style={{
-              padding: '16px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '12px 0',
               borderTop: i === 0 ? 'none' : `1px solid ${CHART.BORDER}`,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-              <div style={{ minWidth: 0, flex: 1, fontSize: 15, fontWeight: 600, color: CHART.INK, letterSpacing: '-0.01em' }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: CHART.INK, letterSpacing: '-0.01em' }}>
                 {r.name}
               </div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: CHART.INK, flexShrink: 0, ...FIG }}>
-                {r.figure}
-              </div>
+              {sub && (
+                <div
+                  style={{
+                    marginTop: 3,
+                    fontSize: 10.5,
+                    color: A.DIM,
+                    lineHeight: 1.35,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {sub}
+                </div>
+              )}
             </div>
-            {sub && (
-              <div style={{ marginTop: 4, fontSize: 12, color: CHART.MUTE, lineHeight: 1.4, overflowWrap: 'anywhere' }}>
-                {sub}
-              </div>
-            )}
-            {r.context && (
-              <div style={{ marginTop: 2, fontSize: 12, color: CHART.MUTE, lineHeight: 1.4 }}>{r.context}</div>
-            )}
-            {r.beat && (
-              <div style={{ marginTop: 8, display: 'flex', alignItems: 'stretch', gap: 8 }}>
-                {!r.beat.muted && (
-                  <span aria-hidden style={{ width: 3, flexShrink: 0, background: CHART.DOWN, borderRadius: 1 }} />
-                )}
-                <span style={{ fontSize: 13, lineHeight: 1.45, color: r.beat.muted ? CHART.MUTE : CHART.INK }}>
-                  {r.beat.text}
-                </span>
-              </div>
-            )}
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div style={{ fontSize: 19, fontWeight: 700, lineHeight: 1, color: CHART.INK, ...FIG }}>{r.figure}</div>
+              {r.beatN != null && (
+                <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, color: CHART.DOWN, whiteSpace: 'nowrap', ...FIG, letterSpacing: 0 }}>
+                  {t('common:handicap.bests.beatWith', { n: r.beatN })}
+                </div>
+              )}
+            </div>
           </div>
         );
       })}
@@ -376,9 +392,8 @@ function useCrownsHeldCount(userId: string | undefined) {
   });
 }
 
-/** Gold, not amber: gold already means RARE ACHIEVEMENT (eagle chip, ace ring). */
-const GOLD_A = (a: number) => `rgba(255,210,0,${a})`; // SC_FILL_GOLD components
-
+/** PLAIN TERMINAL ROW (§6.1). Same handler as before — the only navigable
+ *  door to the trophy room. Amber: this is the viewing member's own count. */
 export const TrophyRoomRow: React.FC<{ standalone?: boolean; userId?: string }> = ({
   standalone = false,
   userId,
@@ -386,7 +401,7 @@ export const TrophyRoomRow: React.FC<{ standalone?: boolean; userId?: string }> 
   const { t } = useTranslation(['common']);
   const { data: crowns } = useCrownsHeldCount(userId);
   const showFigure = typeof crowns === 'number' && crowns > 0;
-  const tile = (
+  const row = (
     <button
       type="button"
       onClick={() => openGamAchievements()}
@@ -397,108 +412,33 @@ export const TrophyRoomRow: React.FC<{ standalone?: boolean; userId?: string }> 
       }
       style={{
         width: '100%',
-        display: 'block',
-        textAlign: 'left',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        minHeight: 44,
         marginTop: standalone ? 0 : 12,
-        borderRadius: 18,
-        border: `1px solid ${GOLD_A(0.3)}`,
-        background: `linear-gradient(160deg, ${GOLD_A(0.14)} 0%, ${GOLD_A(0.045)} 46%, ${GOLD_A(0.02)} 100%)`,
-        padding: '20px 18px 18px',
-        position: 'relative',
-        overflow: 'hidden',
+        padding: '14px 0 0',
+        border: 'none',
+        borderTop: `1px solid ${A.SOFT}`,
+        borderRadius: 0,
+        background: 'transparent',
+        textAlign: 'left',
         cursor: 'pointer',
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <span
-        aria-hidden
-        style={{
-          position: 'absolute',
-          top: -58,
-          left: -34,
-          width: 190,
-          height: 190,
-          borderRadius: '50%',
-          pointerEvents: 'none',
-          background: `radial-gradient(circle, ${GOLD_A(0.22)} 0%, ${GOLD_A(0.07)} 42%, ${GOLD_A(0)} 70%)`,
-        }}
-      />
-      <span aria-hidden style={{ position: 'relative', display: 'block' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span
-            style={{
-              width: 46,
-              height: 46,
-              borderRadius: 13,
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: GOLD_A(0.16),
-              border: `1px solid ${GOLD_A(0.28)}`,
-            }}
-          >
-            <Trophy size={23} strokeWidth={1.9} color={SC_FILL_GOLD} />
-          </span>
-          <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: '0.19em',
-                textTransform: 'uppercase',
-                color: GOLD_A(0.8),
-              }}
-            >
-              {t('common:handicap.bests.trophyRoom')}
-            </span>
-            <span style={{ fontSize: 17, fontWeight: 700, color: CHART.INK }}>
-              {t('common:handicap.bests.trophyRoomTitle')}
-            </span>
-          </span>
-          <ChevronRight size={19} color={GOLD_A(0.65)} />
-        </span>
-        {showFigure && (
-          <span
-            style={{
-              display: 'block',
-              marginTop: 13,
-              paddingTop: 13,
-              borderTop: `1px solid ${GOLD_A(0.16)}`,
-            }}
-          >
-            <span
-              style={{
-                display: 'block',
-                fontSize: 22,
-                fontWeight: 700,
-                color: SC_FILL_GOLD,
-                fontVariantNumeric: 'tabular-nums',
-                fontFeatureSettings: '"kern" 1, "liga" 1',
-              }}
-            >
-              {crowns}
-            </span>
-            <span
-              style={{
-                display: 'block',
-                marginTop: 2,
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-                color: CHART.MUTE,
-              }}
-            >
-              {t('common:handicap.bests.crownsHeld')}
-            </span>
-          </span>
-        )}
+      <span style={{ fontSize: 14, fontWeight: 700, color: CHART.INK }}>
+        {t('common:handicap.bests.trophyRoom')}
+      </span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 13, fontWeight: 700, color: A.AMBER, ...FIG, letterSpacing: 0 }}>
+        {showFigure && t('common:handicap.bests.crowns', { count: crowns })}
+        <ChevronRight size={15} strokeWidth={2.4} aria-hidden />
       </span>
     </button>
   );
 
-  return standalone ? <HcpSection>{tile}</HcpSection> : tile;
+  return standalone ? <HcpSection>{row}</HcpSection> : row;
 };
 
 export default PersonalBestsSection;

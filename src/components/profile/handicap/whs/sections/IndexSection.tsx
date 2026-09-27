@@ -1,50 +1,49 @@
 /**
- * IndexSection — "WALK YOUR INDEX" (BRIEF_HANDICAP_TAB_PHASE_2 §1).
+ * IndexSection — the handicap index block (BRIEF_HANDICAP_TAB_SIMPLIFY §1).
  *
- * Kicker / heading, range chips, a scrubbable index chart, then a two-column
- * readout: ON THIS DATE + the date under the scrub on the left, the index on
- * that date (large) and its movement since the previous point on the right.
+ * No heading, no kicker: the index figure IS the headline. Headline row
+ * (HANDICAP INDEX + value left, window movement + window label right), then
+ * range chips, then the scrubbable step chart. There is NO separate readout:
+ * the scrub mutates the headline in place, and nothing else moves.
  *
  * RULES (do not relax them):
  *
- * - THE SERIES IS THE ONE ALREADY ON SCREEN: useHandicapHistory(…, 'all'),
- *   i.e. fetchHandicapHistory's merge of snapshots and
- *   whs_scores.handicap_index_at_time. No new read. The line is a step
- *   function of the index in force on a given day.
+ * - THE SERIES IS THE ONE ALREADY ON SCREEN: useHandicapHistory(…, 'all').
+ *   No new read. The line is a step function of the index in force.
  *
- * - NO ROUND PANEL and NO CAUSAL CLAIM. There is no exact join from a point
- *   on this line to the round behind it, so nothing here names a round. The
- *   readout says what the index WAS on a date — "ON THIS DATE", never
- *   "this round". Absent beats approximated.
+ * - NO CAUSAL CLAIM. No point can be joined to a round, so the scrub says
+ *   "THIS STEP", never "this round" (BRIEF_WALK_YOUR_INDEX_DATA_CHECK).
  *
- * - WINDOWS are the last N days ENDING TODAY; see the view memo below.
+ * - WINDOWS are the last N days ENDING TODAY (…_WINDOW_ANCHOR, not revisited).
  *
- * - NO HISTORY AT ALL: no chart. Heading, chips and one quiet line; the chips
- *   stay live. Any history draws, including the flat case.
+ * - LANDING MOVEMENT is window end minus window start. Down = improved tone,
+ *   up = drifted tone, zero = A.DIM and reads "0.0".
  *
- * - MOVEMENT is scrubbed point minus the previous point IN THE WINDOW, in the
- *   INDEX_DELTA dark pair (down green, up red). An index that held reads
- *   "NO CHANGE" in DIM — never an em dash. This is movement, not a score.
+ * - THE LINE IS COLOURED BY STEP: each run + riser into the next value is one
+ *   path, toned by that step's direction. The final run to today is ALWAYS the
+ *   unchanged tone — nothing has happened since.
  *
- * - SCRUB: pointer down snaps to the nearest observation; drag follows under
- *   pointer capture; release leaves it. Defaults to the newest on mount and on
- *   every range change. touch-action: none is on the chart element ONLY.
+ * - COLOUR PAIR: A.IMPROVED / A.DRIFTED (= INDEX_DELTA.dark), the pair the
+ *   movement figure already resolved to, so line and figure cannot disagree.
+ *
+ * - SCRUB: pointer down snaps to the nearest point; drag follows under pointer
+ *   capture; release PARKS it. Any range change resets to landing.
+ *   touch-action: none is on the chart element ONLY.
  *
  * - CHIPS are plain buttons with aria-pressed, NOT role="tab": handicap-dark.css
- *   forces [role="tab"][aria-selected="true"] to white with !important inside
- *   .hcp-dark, which would override the chip treatment.
+ *   forces [role="tab"][aria-selected="true"] to white with !important.
  */
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 
 import { useHandicapHistory } from '@/lib/whs/hooks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { WhsConnection } from '@/lib/whs/types';
-import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 import { HcpSection } from './HcpSection';
-import { CHART } from '../charts/tokens';
+import { CHART, DEAD_BAND } from '../charts/tokens';
 
 interface Props {
   connection: WhsConnection;
@@ -62,12 +61,28 @@ const DAYS: Record<WindowKey, number> = { '30d': 30, '90d': 90, '12m': 365 };
 const CHIP_LABEL: Record<WindowKey, string> = { '30d': '30D', '90d': '90D', '12m': '12M' };
 /* The pre-rebuild handicap_chart_scoped wire vocabulary, kept comparable. */
 const WIRE: Record<WindowKey, string> = { '30d': '1M', '90d': '3M', '12m': '1Y' };
+const WINDOW_KEY: Record<WindowKey, string> = {
+  '30d': 'common:handicap.walk.window30',
+  '90d': 'common:handicap.walk.window90',
+  '12m': 'common:handicap.walk.window12',
+};
 
 const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums' };
-const KICKER: React.CSSProperties = {
+/* 8.5 / 0.16em label. Weight 700, not the prototype's 800: the canonical scale
+   (src/lib/tokens/type.ts) allows 400-700 only. */
+const HEAD_LABEL: React.CSSProperties = {
+  fontSize: 8.5,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: A.DIM,
+  lineHeight: '12px',
+  whiteSpace: 'nowrap',
+};
+const AXIS: React.CSSProperties = {
   fontSize: 9,
   fontWeight: 700,
-  letterSpacing: '0.19em',
+  letterSpacing: '0.12em',
   textTransform: 'uppercase',
   color: CHART.DIM,
 };
@@ -75,6 +90,17 @@ const KICKER: React.CSSProperties = {
 /** Plus handicaps render with a leading '+'. */
 function formatIndex(v: number): string {
   return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
+}
+
+/** A movement: true minus when down, '+' when up, "0.0" when held. */
+function formatMove(d: number): string {
+  if (Math.abs(d) < DEAD_BAND) return '0.0';
+  return d < 0 ? `\u2212${Math.abs(d).toFixed(1)}` : `+${d.toFixed(1)}`;
+}
+
+function moveTone(d: number | null, held: string): string {
+  if (d == null || Math.abs(d) < DEAD_BAND) return held;
+  return d < 0 ? A.IMPROVED : A.DRIFTED;
 }
 
 interface Pt {
@@ -127,11 +153,8 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   // NO CHART only when there is no index history at all at or before today.
   const drawable = pts.length >= 1;
 
-  const [sel, setSel] = useState(0);
-  // Newest observation on mount and on every range change.
-  useEffect(() => {
-    setSel(Math.max(0, pts.length - 1));
-  }, [win, pts.length]);
+  /* null = LANDING (window movement). A number = parked on that point. */
+  const [sel, setSel] = useState<number | null>(null);
 
   // ── Width, measured (the chart is full width of the tab) ──────────────
   const boxRef = useRef<HTMLDivElement>(null);
@@ -160,20 +183,25 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
     // Worse (higher index) is HIGHER on screen; SVG y grows down, so subtract.
     const y = (v: number) => PAD_T + (1 - (v - lo) / (hi - lo)) * (CHART_H - PAD_T - PAD_B);
     const xs = pts.map((p) => x(p.ts));
-    // Step function: the index holds until the next observation, then to today.
-    let d = `M ${xs[0]} ${y(pts[0].v)}`;
+    // One path per step: the run at value i plus the riser into i+1, toned by
+    // that step. The run from the newest point to today is always unchanged.
+    const segs: Array<{ d: string; tone: 'down' | 'up' | 'flat' }> = [];
     for (let i = 1; i < pts.length; i++) {
-      d += ` H ${xs[i]} V ${y(pts[i].v)}`;
+      const dv = pts[i].v - pts[i - 1].v;
+      const tone = pts[i].edge === 'trail' || Math.abs(dv) < DEAD_BAND ? 'flat' : dv < 0 ? 'down' : 'up';
+      segs.push({ d: `M ${xs[i - 1]} ${y(pts[i - 1].v)} H ${xs[i]} V ${y(pts[i].v)}`, tone });
     }
-    d += ` H ${w}`;
+    const lastX = xs[xs.length - 1];
+    if (lastX < w) segs.push({ d: `M ${lastX} ${y(pts[pts.length - 1].v)} H ${w}`, tone: 'flat' });
     let hiIdx = 0;
     let loIdx = 0;
     pts.forEach((p, i) => {
       if (p.v > pts[hiIdx].v) hiIdx = i;
       if (p.v < pts[loIdx].v) loIdx = i;
     });
-    return { xs, y, d, hiIdx, loIdx };
+    return { xs, y, segs, hiIdx, loIdx };
   }, [drawable, view, pts, w]);
+
 
   // ── Scrub ──────────────────────────────────────────────────────────────
   const dragging = useRef(false);
@@ -204,25 +232,50 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
       sample_size: sample,
     });
     setWin(next);
+    setSel(null);
   };
 
   if (isLoading) return null;
 
-  const idx = Math.min(sel, pts.length - 1);
-  const cur = pts[idx];
-  const prev = idx > 0 ? pts[idx - 1] : null;
-  // Edge points never claim movement: lead reads FIRST IN WINDOW, trail NO CHANGE.
-  const delta = !cur || cur.edge === 'lead' || !prev ? null : cur.edge === 'trail' ? 0 : cur.v - prev.v;
-  const held = delta != null && Math.abs(delta) < 0.05;
+  const idx = sel == null ? null : Math.min(sel, pts.length - 1);
+  const cur = idx == null ? null : pts[idx];
+  const prev = idx != null && idx > 0 ? pts[idx - 1] : null;
 
-  const kickerKey: Record<WindowKey, string> = {
-    '30d': 'common:handicap.walk.kicker30',
-    '90d': 'common:handicap.walk.kicker90',
-    '12m': 'common:handicap.walk.kicker12',
-  };
+  /* THE HEADLINE — four slots, fixed metrics, mutated in place by the scrub. */
+  let label: string;
+  let value: string;
+  let valueTone: string = A.INK;
+  let move: string;
+  let moveColor: string;
+  let windowLabel: string;
+  if (cur == null) {
+    const first = pts[0];
+    const last = pts[pts.length - 1];
+    const d = first && last ? last.v - first.v : 0;
+    label = t('common:handicap.walk.headlineLabel');
+    value = last ? formatIndex(last.v) : '';
+    move = formatMove(d);
+    moveColor = moveTone(d, A.DIM);
+    windowLabel = t(WINDOW_KEY[win]);
+  } else {
+    // Edge points never claim movement: lead = FIRST IN WINDOW, trail = NO CHANGE.
+    const d = cur.edge === 'lead' || !prev ? null : cur.edge === 'trail' ? 0 : cur.v - prev.v;
+    const held = d == null || Math.abs(d) < DEAD_BAND;
+    label = format(new Date(cur.ts), 'd MMM yyyy').toUpperCase();
+    value = formatIndex(cur.v);
+    valueTone = moveTone(d, A.INK);
+    move = formatMove(d ?? 0);
+    moveColor = moveTone(d, A.DIM);
+    windowLabel =
+      d == null
+        ? t('common:handicap.walk.firstInWindow')
+        : held
+          ? t('common:handicap.walk.noChange')
+          : t('common:handicap.walk.thisStep');
+  }
 
   const chips = (
-    <div style={{ display: 'flex', gap: 6 }}>
+    <div style={{ display: 'flex', gap: 6, marginTop: 14 }}>
       {(Object.keys(DAYS) as WindowKey[]).map((k) => {
         const on = k === win;
         return (
@@ -251,10 +304,43 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   );
 
   const labelYields = (i: number) =>
-    !!geo && Math.abs(geo.xs[i] - geo.xs[idx]) < LABEL_YIELD_PX;
+    !!geo && idx != null && Math.abs(geo.xs[i] - geo.xs[idx]) < LABEL_YIELD_PX;
+
+  const segColor = { down: A.IMPROVED, up: A.DRIFTED, flat: A.DIM } as const;
+  const dotIdx = idx ?? pts.length - 1;
 
   return (
-    <HcpSection kicker={t(kickerKey[win])} heading={t('common:handicap.walk.heading')} first>
+    <HcpSection first>
+      {drawable && (
+        <div
+          data-hcp-headline
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}
+        >
+          <div style={{ minWidth: 0 }}>
+            <div style={HEAD_LABEL}>{label}</div>
+            <div
+              style={{
+                marginTop: 6,
+                fontSize: 52,
+                fontWeight: 700,
+                letterSpacing: '-0.04em',
+                lineHeight: 0.9,
+                color: valueTone,
+                ...FIG,
+              }}
+            >
+              {value}
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: moveColor, ...FIG }}>
+              {move}
+            </div>
+            <div style={{ ...HEAD_LABEL, letterSpacing: '0.14em', marginTop: 4 }}>{windowLabel}</div>
+          </div>
+        </div>
+      )}
+
       {chips}
 
       {!drawable ? (
@@ -277,6 +363,7 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
               if (dragging.current) pickAt(e.clientX);
             }}
             onPointerUp={(e) => {
+              // PARKS where released — never auto-resets.
               dragging.current = false;
               if (e.currentTarget.hasPointerCapture(e.pointerId)) {
                 e.currentTarget.releasePointerCapture(e.pointerId);
@@ -286,7 +373,7 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
               dragging.current = false;
             }}
             style={{
-              margin: '16px -20px 0',
+              margin: '14px -20px 0',
               height: CHART_H,
               touchAction: 'none',
               position: 'relative',
@@ -296,7 +383,18 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
           >
             {geo && (
               <svg width={w} height={CHART_H} style={{ display: 'block', overflow: 'visible' }}>
-                <path d={geo.d} fill="none" stroke={CHART.MUTE} strokeWidth={1.75} strokeLinejoin="round" />
+                {geo.segs.map((sg, i) => (
+                  <path
+                    key={i}
+                    data-tone={sg.tone}
+                    d={sg.d}
+                    fill="none"
+                    stroke={segColor[sg.tone]}
+                    strokeWidth={sg.tone === 'flat' ? 1.75 : 2.4}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                ))}
                 {/* HIGH red, LOW green: a lower index is better. Yields to the scrub. */}
                 {geo.hiIdx !== geo.loIdx && !labelYields(geo.hiIdx) && (
                   <text
@@ -318,53 +416,17 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
                     {t('common:handicap.walk.low', { v: formatIndex(pts[geo.loIdx].v) })}
                   </text>
                 )}
-                {/* Scrub line + dot */}
-                <line x1={geo.xs[idx]} x2={geo.xs[idx]} y1={0} y2={CHART_H} stroke={CHART.FAINT} strokeWidth={1} />
-                <circle cx={geo.xs[idx]} cy={geo.y(cur.v)} r={4.5} fill={CHART.INK} stroke={CHART.CANVAS} strokeWidth={2} />
+                {idx != null && (
+                  <line x1={geo.xs[idx]} x2={geo.xs[idx]} y1={0} y2={CHART_H} stroke={CHART.FAINT} strokeWidth={1} />
+                )}
+                <circle cx={geo.xs[dotIdx]} cy={geo.y(pts[dotIdx].v)} r={4.5} fill={CHART.INK} stroke={CHART.CANVAS} strokeWidth={2} />
               </svg>
             )}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, ...KICKER, letterSpacing: '0.12em' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, ...AXIS }}>
             <span>{view ? format(new Date(view.start), 'MMM yyyy') : ''}</span>
             <span>{t('common:handicap.walk.today')}</span>
-          </div>
-
-          {/* Readout */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 18, gap: 16 }}>
-            <div>
-              <div style={KICKER}>{t('common:handicap.walk.onThisDate')}</div>
-              <div style={{ marginTop: 6, fontSize: 15, fontWeight: 700, color: CHART.INK, ...FIG }}>
-                {format(new Date(cur.ts), 'd MMM yyyy')}
-              </div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 40, fontWeight: 700, lineHeight: 1, color: CHART.INK, letterSpacing: '-0.04em', ...FIG }}>
-                {formatIndex(cur.v)}
-              </div>
-              <div
-                style={{
-                  ...KICKER,
-                  marginTop: 6,
-                  letterSpacing: '0.12em',
-                  color:
-                    delta == null || held
-                      ? CHART.DIM
-                      : delta < 0
-                        ? INDEX_DELTA.dark.improved
-                        : INDEX_DELTA.dark.drifted,
-                  ...FIG,
-                }}
-              >
-                {delta == null
-                  ? t('common:handicap.walk.firstInWindow')
-                  : held
-                    ? t('common:handicap.walk.noChange')
-                    : t(delta < 0 ? 'common:handicap.walk.down' : 'common:handicap.walk.up', {
-                        v: Math.abs(delta).toFixed(1),
-                      })}
-              </div>
-            </div>
           </div>
         </>
       )}

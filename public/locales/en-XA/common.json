@@ -532,7 +532,10 @@
       "yourBest": "[~~ýőúř ƀéšţ~~]",
       "withheldHeading": "Every round still counts.",
       "withheldBody": "With {{count}} rounds on record every one of them counts toward your index, so there's no target to beat yet. This starts telling you something once you have twenty.",
-      "shootBeat": "Beat {{value}}"
+      "shootBeat": "Beat {{value}}",
+      "headingBeat": "[~~Ɓéáţ {{score}} ñéẋţ ţíɱé őúţ~~]",
+      "caption": "[~~{{course}}, ŵĥéřé ýőú ƥļáý ɱőšţ.~~]",
+      "captionHold": "[~~{{course}}, ŵĥéřé ýőú ƥļáý ɱőšţ. Íţ <m>ĉáññőţ ĝő úƥ</m> ŵĥáţéṽéř ýőú šĥőőţ.~~]"
     },
     "achievements": {
       "trophyRoom": "[~~Ţřőƥĥý řőőɱ~~]",
@@ -748,7 +751,9 @@
       "bodyLine": "[~~The {{count}} below the line are the ones your index is built from. The line sits at {{cut}} at {{course}}, and your next best round is a {{next}}.~~]",
       "bodyLineNoCourse": "[~~The {{count}} below the line are the ones your index is built from.~~]",
       "bodyLineNoNext": "[~~Every one of your last twenty counts right now.~~]",
-      "fallLine": "[~~Your {{date}} round drops out of the twenty in {{falls}}.~~]"
+      "fallLine": "[~~Your {{date}} round drops out of the twenty in {{falls}}.~~]",
+      "headingCount": "[~~{{count}} őƒ ýőúř ļášţ 20 ĉőúñţ~~]",
+      "caption": "[~~Áñýţĥíñĝ úñđéř {{cut}} řéƥļáĉéš őñé őƒ ţĥéɱ.~~]"
     },
     "scoring": {
       "eyebrow": "Stableford",
@@ -781,7 +786,10 @@
       "basisHoles": "Across {{count}} holes.",
       "basisRings": "Eighteen-hole rounds at mapped courses.",
       "shotsHeading": "Where the shots go",
-      "overPerHole": "+{{v}} a hole"
+      "overPerHole": "+{{v}} a hole",
+      "mergedHeading": "[~~Ŵĥéřé ýőúř šĥőţš ĝő~~]",
+      "caption": "[~~Šĥőţš á ĥőļé, őṽéř {{holes}} ĥőļéš.~~]",
+      "captionShare": "[~~Šĥőţš á ĥőļé, őṽéř {{holes}} ĥőļéš. Ƥář {{n}}š ářé {{share}}% őƒ ţĥéɱ.~~]"
     },
     "bests": {
       "eyebrow": "Personal bests",
@@ -818,7 +826,11 @@
       "trophyRoomTitle": "[~~Ëṽéřýţĥíñğ ýőű ĥőľđ~~]",
       "crownsHeld": "[~~Çřőŵñš ĥéľđ~~]",
       "trophyRoomA11y": "[~~Ţřőƥĥý řőőɱ, {{count}} ċřőŵñš ĥéľđ~~]",
-      "trophyRoomA11yBare": "[~~Ţřőƥĥý řőőɱ~~]"
+      "trophyRoomA11yBare": "[~~Ţřőƥĥý řőőɱ~~]",
+      "metaOff": "[~~Őƒƒ {{then}} ţĥáţ đáý~~]",
+      "beatWith": "[~~ƀéáţ ŵíţĥ {{n}}~~]",
+      "crowns_one": "[~~{{count}} ĉřőŵñ~~]",
+      "crowns_other": "[~~{{count}} ĉřőŵñš~~]"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",
@@ -844,7 +856,12 @@
       "down": "Down {{v}}",
       "up": "Up {{v}}",
       "high": "High {{v}}",
-      "low": "Low {{v}}"
+      "low": "Low {{v}}",
+      "headlineLabel": "[~~Ĥáñđíĉáƥ íñđéẋ~~]",
+      "window30": "[~~30 đáýš~~]",
+      "window90": "[~~90 đáýš~~]",
+      "window12": "[~~12 ɱőñţĥš~~]",
+      "thisStep": "[~~Ţĥíš šţéƥ~~]"
     }
   },
   "comments": {

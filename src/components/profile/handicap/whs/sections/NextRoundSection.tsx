@@ -28,6 +28,7 @@ import { useAllScores } from '@/lib/whs/hooks';
 import { projectNextRound, nextRoundScale, indexAfter } from '@/lib/whs/handicapMath';
 import type { WhsScore } from '@/lib/whs/types';
 
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { HcpSection } from './HcpSection';
 import { CHART, DEAD_BAND, indexTone } from '../charts';
 
@@ -264,17 +265,19 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
   const { cutTarget, settleAtRaw } = projection;
   if (!Number.isFinite(cutTarget) || !Number.isFinite(settleAtRaw)) return null;
 
-  const beating = last5.filter((v) => v < cutTarget).length;
-
   const willRise = tone === 'up';
   const rungs = ladder?.rungs ?? [];
+  /* THE HEADING STATES THE ANSWER. The score is ladder.target, the value the
+     rungs are built from (from cutTarget) - read, never recomputed. If no rung
+     cuts (no improving outcome), "Beat" would be false: fall back to the
+     existing "Next round" label and invent nothing. */
+  const cuts = rungs.some((r) => r.moves);
+  const heading = ladder && cuts
+    ? t('common:handicap.nextRound.headingBeat', { score: ladder.target })
+    : t('common:handicap.nextRound.eyebrow');
 
   return (
-    <HcpSection
-      hairline
-      kicker={t('common:handicap.nextRound.eyebrow')}
-      heading={t('common:handicap.nextRound.ladderHeading')}
-    >
+    <HcpSection hairline heading={heading}>
       {ladder == null ? (
         // No course among the last 20 carries both ratings: withhold rather
         // than print a target in differentials.
@@ -283,15 +286,8 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
         </p>
       ) : (
         <>
-          <p style={{ margin: 0, fontSize: 13.5, color: CHART.MUTE, lineHeight: 1.45 }}>
-            {t('common:handicap.nextRound.courseLine', { course: ladder.courseName })}
-          </p>
-
-          {/* ROW PER OUTCOME (BRIEF_NEXT_ROUND_KEEPS_ITS_ROWS): full-width rows
-              give the plain-English copy the room it needs at any rung count
-              (2-4). Break-even first; the rungs that cut carry a green edge and
-              faint green tint - the marking, not geometry, carries hierarchy. */}
-          <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {/* ROW PER OUTCOME (BRIEF_NEXT_ROUND_KEEPS_ITS_ROWS), unchanged. */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {rungs.map((r, i) => (
               <div
                 key={i}
@@ -323,27 +319,20 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
             ))}
           </div>
 
-          <p style={{ margin: '16px 0 0', fontSize: 13.5, color: CHART.MUTE, lineHeight: 1.45, ...FIG }}>
-            {beating > 0 ? (
-              <Trans
-                i18nKey="common:handicap.nextRound.formLine"
-                values={{ score: ladder.target, count: beating }}
-                components={{ g: <span style={{ color: CHART.DOWN, fontWeight: 700 }} /> }}
-              />
+          {/* ONE CAPTION. "cannot go up" only when the projection holds. */}
+          <p style={{ margin: '10px 0 0', fontSize: 11.5, color: A.DIM, lineHeight: 1.45 }}>
+            {willRise ? (
+              t('common:handicap.nextRound.caption', { course: ladder.courseName })
             ) : (
-              t('common:handicap.nextRound.formLineNone')
+              <Trans
+                i18nKey="common:handicap.nextRound.captionHold"
+                values={{ course: ladder.courseName }}
+                components={{ m: <span style={{ color: A.MUTE }} /> }}
+              />
             )}
           </p>
         </>
       )}
-
-      <p style={{ margin: '10px 0 0', fontSize: 11.5, color: CHART.MUTE, lineHeight: 1.45 }}>
-        {/* The "cannot go up" clause is only true when the projection holds;
-            if the index is set to rise, print provenance alone. */}
-        {willRise
-          ? t('common:handicap.nextRound.sampleSentence')
-          : t('common:handicap.nextRound.provenance')}
-      </p>
     </HcpSection>
   );
 };
