@@ -17,10 +17,12 @@ import { fetchCircleIds } from '@/lib/social/circle';
  * the former usePulseFriends.ts (deleted 10 Sep 2026) for the friend-resolution reference — this hook does
  * not modify or share cache with it.
  *
- * NET DECISION (brief 1.2)
- *   Option (a): join gam_round_stats.whs_score_id -> whs_scores for
- *   adjusted_gross and course_handicap; net = adjusted_gross - course_handicap.
- *   Rows without a matching whs_scores row simply omit net (undefined). We do
+ * NET DECISION (10 Sep ruling, BRIEF_CIRCLE_RAIL_NET_SOURCE)
+ *   net is gam_round_net.net_score — the DATABASE'S number, the same view
+ *   useRoundNetScores reads. NO course-handicap arithmetic in this file: a
+ *   second client copy of the WHS formula is how the two drift (and
+ *   whs_scores.course_handicap is null on every row). A round with no
+ *   net_score has net null — never defaulted, never gross. We do
  *   NOT approximate net from hcp_at_time (that is the handicap INDEX, not the
  *   course-specific playing handicap).
  *
@@ -297,7 +299,7 @@ export function useCircleLatestRounds(
          caller asks for rather than a second definition. */
       const readIds = includeSelf ? Array.from(new Set([...circleIds, userId])) : circleIds;
       if (scope === 'circle' && readIds.length > 0) {
-        const { data: rounds } = (await scoped(
+        const { data: rounds, error: roundsError } = (await scoped(
           supabase
             .from('gam_round_stats' as never)
             .select(ROUND_COLS)
@@ -305,7 +307,8 @@ export function useCircleLatestRounds(
             .gte('play_date', windowStartIso)
             .eq('holes_played', 18)
             .order('play_date', { ascending: false }),
-        )) as { data: unknown };
+        )) as { data: unknown; error: unknown };
+        if (roundsError) throw roundsError;
         circleRounds = ((rounds ?? []) as unknown) as Round[];
       }
 
@@ -349,7 +352,7 @@ export function useCircleLatestRounds(
        * histories and index movement.
        */
       if (scope === 'everyone') {
-        const { data: all } = (await scoped(
+        const { data: all, error: allError } = (await scoped(
           supabase
             .from('gam_round_stats' as never)
             .select(ROUND_COLS)
@@ -357,7 +360,8 @@ export function useCircleLatestRounds(
             .eq('holes_played', 18)
             .order('play_date', { ascending: false })
             .limit(limit),
-        )) as { data: unknown };
+        )) as { data: unknown; error: unknown };
+        if (allError) throw allError;
 
         pickedRounds.length = 0;
         pickedRounds.push(...(((all ?? []) as unknown) as Round[]));
@@ -383,7 +387,7 @@ export function useCircleLatestRounds(
       /* Scope 'suggested' IS this pool and nothing else — the same code path, so
          the two scopes can never disagree about who is outside the circle. */
       if ((includeSuggested && scope === 'circle') || scope === 'suggested') {
-        const { data: pool } = (await scoped(
+        const { data: pool, error: poolError } = (await scoped(
           supabase
             .from('gam_round_stats' as never)
             .select(ROUND_COLS)
@@ -391,7 +395,8 @@ export function useCircleLatestRounds(
             .eq('holes_played', 18)
             .order('play_date', { ascending: false })
             .limit(400),
-        )) as { data: unknown };
+        )) as { data: unknown; error: unknown };
+        if (poolError) throw poolError;
 
 
         const excluded = new Set<string>([userId, ...circleIds]);
@@ -479,28 +484,29 @@ export function useCircleLatestRounds(
       }
 
 
-      // 5. whs_scores lookup for net (option 1.2a) + connection_id for opener.
+      // 5. NET from gam_round_net (the database's number; 10 Sep ruling) +
+      //    connection_id from whs_scores for the round opener. Chunked: a
+      //    single in.(...) over SHEET_LIMIT ids grows past what PostgREST
+      //    accepts (see COUNT_CHUNK in CircleShelf.tsx).
       const scoreIds = rowsWindow.map((r) => r.whs_score_id).filter((v): v is string => !!v);
-      const scoreById = new Map<
-        string,
-        { adjusted_gross: number | null; course_handicap: number | null; connection_id: string | null }
-      >();
-      if (scoreIds.length > 0) {
-        const { data: scores } = await supabase
-          .from('whs_scores' as never)
-          .select('id, adjusted_gross, course_handicap, connection_id')
-          .in('id', scoreIds);
-        for (const s of ((scores ?? []) as unknown) as Array<{
-          id: string;
-          adjusted_gross: number | null;
-          course_handicap: number | null;
-          connection_id: string | null;
-        }>) {
-          scoreById.set(s.id, {
-            adjusted_gross: s.adjusted_gross,
-            course_handicap: s.course_handicap,
-            connection_id: s.connection_id,
-          });
+      const connectionByScore = new Map<string, string | null>();
+      const netByScore = new Map<string, number>();
+      const ID_CHUNK = 20;
+      for (let i = 0; i < scoreIds.length; i += ID_CHUNK) {
+        const slice = scoreIds.slice(i, i + ID_CHUNK);
+        const [scoresRes, netsRes] = await Promise.all([
+          supabase.from('whs_scores' as never).select('id, connection_id').in('id', slice),
+          supabase.from('gam_round_net' as never).select('whs_score_id, net_score').in('whs_score_id', slice),
+        ]);
+        if (scoresRes.error) throw scoresRes.error;
+        if (netsRes.error) throw netsRes.error;
+        for (const s of ((scoresRes.data ?? []) as unknown) as Array<{ id: string; connection_id: string | null }>) {
+          connectionByScore.set(s.id, s.connection_id);
+        }
+        for (const n of ((netsRes.data ?? []) as unknown) as Array<{ whs_score_id: string; net_score: number | null }>) {
+          if (n.whs_score_id && n.net_score != null && Number.isFinite(Number(n.net_score))) {
+            netByScore.set(n.whs_score_id, Number(n.net_score));
+          }
         }
       }
 
@@ -555,12 +561,13 @@ export function useCircleLatestRounds(
       const histKey = (u: string, c: string) => `${u}|${c}`;
       const histBy = new Map<string, Hist>();
       if (surfacedCourseIds.length > 0) {
-        const { data: hist } = await supabase
+        const { data: hist, error: histError } = await supabase
           .from('gam_round_stats' as never)
           .select('user_id, course_id, gross_score')
           .in('user_id', surfacedFriendIds)
           .in('course_id', surfacedCourseIds)
           .eq('holes_played', 18);
+        if (histError) throw histError;
         for (const h of ((hist ?? []) as unknown) as Array<{
           user_id: string;
           course_id: string | null;
@@ -589,10 +596,11 @@ export function useCircleLatestRounds(
       const aceHoleByScore = new Map<string, number>();
       const albatrossHoleByScore = new Map<string, number>();
       if (scoreIds.length > 0) {
-        const { data: holes } = await supabase
+        const { data: holes, error: holesError } = await supabase
           .from('whs_score_holes' as never)
           .select('score_id, hole_no, par, actual_gross')
           .in('score_id', scoreIds);
+        if (holesError) throw holesError;
         type Hole = {
           score_id: string;
           hole_no: number | null;
@@ -649,12 +657,13 @@ export function useCircleLatestRounds(
       //  iii. FIRST SUB-80. Earliest sub-80 play_date per surfaced friend.
       const firstSub80ByUser = new Map<string, string>();
       if (surfacedFriendIds.length > 0) {
-        const { data: sub80 } = await supabase
+        const { data: sub80, error: sub80Error } = await supabase
           .from('gam_round_stats' as never)
           .select('user_id, play_date')
           .in('user_id', surfacedFriendIds)
           .eq('holes_played', 18)
           .eq('sub_80', true);
+        if (sub80Error) throw sub80Error;
         for (const s of ((sub80 ?? []) as unknown) as Array<{ user_id: string; play_date: string }>) {
           const cur = firstSub80ByUser.get(s.user_id);
           if (!cur || s.play_date < cur) firstSub80ByUser.set(s.user_id, s.play_date);
@@ -665,11 +674,8 @@ export function useCircleLatestRounds(
       // 8. Assemble rows.
       const out: CircleRoundRow[] = rowsWindow.map((r): CircleRoundRow => {
         const profile = profileById.get(r.user_id);
-        const score = r.whs_score_id ? scoreById.get(r.whs_score_id) : undefined;
-        const net =
-          score && score.adjusted_gross != null && score.course_handicap != null
-            ? score.adjusted_gross - score.course_handicap
-            : null;
+        /* ABSENT STAYS ABSENT: no net_score, no net. Never gross, never hcp_at_time. */
+        const net = r.whs_score_id ? netByScore.get(r.whs_score_id) ?? null : null;
         const current = currentHcpByUser.get(r.user_id) ?? null;
         const hist = r.course_id ? histBy.get(histKey(r.user_id, r.course_id)) : undefined;
         const hcpDelta =
@@ -679,7 +685,7 @@ export function useCircleLatestRounds(
         return {
           round_id: r.whs_score_id ?? `${r.user_id}-${r.play_date}`,
           score_id: r.whs_score_id,
-          connection_id: score?.connection_id ?? null,
+          connection_id: r.whs_score_id ? connectionByScore.get(r.whs_score_id) ?? null : null,
           user_id: r.user_id,
           display_name: profile?.display_name ?? 'Player',
           profile_photo_url: profile?.profile_photo_url ?? null,
