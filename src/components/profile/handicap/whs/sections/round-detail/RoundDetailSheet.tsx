@@ -6,6 +6,7 @@
  * floating glass overlay. `variant` remains ignored for compatibility.
  */
 
+import { DIAG_ON, roundDiag } from '@/diag/roundPushDiag'; // TEMPORARY diag
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -399,6 +400,12 @@ export const RoundDetailSheet: React.FC<Props> = ({
     supporting,
   });
   const cardOpen = presentation === 'page' ? open : open && overlayGate.visible;
+  // TEMPORARY — BRIEF_ROUND_PUSH_DEVICE_READOUT. Publish only; no behaviour.
+  if (DIAG_ON) {
+    roundDiag.round = `${userQuery.status}/${userQuery.fetchStatus} (${presentation})`;
+    roundDiag.cardOpen = String(cardOpen);
+    roundDiag.gate = String(overlayGate.visible);
+  }
   const coalesced = useCoalescedBlocks(supporting, overlayGate.visible);
   const include = presentation === 'page'
     ? { context: true, reactions: true, comments: true, commentPreview: true, field: true }
