@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { CourseRegionPills, type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
-import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
+import { RailChips } from '@/components/ui/RailChips';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 export type CoursePrimaryTab = 'all' | 'top100';
@@ -54,44 +54,13 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   return (
     <div className="space-y-3">
       {/* Primary tab row — canonical charcoal chips */}
-      <div
-        role="tablist"
-        aria-label="Course list filter"
-        style={{
-          display: 'flex',
-          gap: RAIL_CHIP_GAP,
-          justifyContent: 'center',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        }}
-      >
-        {TABS.map(({ key, label, count }) => {
-          const isActive = activeTab === key;
-          return (
-            <button
-              key={key}
-              role="tab"
-              aria-pressed={isActive}
-              aria-selected={isActive}
-              onClick={() => onTabChange(key)}
-              style={{ ...railChipStyle(isActive), display: 'inline-flex', alignItems: 'center', gap: 6 }}
-            >
-              {label}
-              {count > 0 && (
-                <span
-                  style={{
-                    fontSize: 11.5,
-                    fontWeight: 600,
-                    color: A.DIM,
-                    fontVariantNumeric: 'tabular-nums lining-nums',
-                  }}
-                >
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      <RailChips
+        ariaLabel="Course list filter"
+        align="center-when-fit"
+        options={TABS.map(({ key, label, count }) => ({ id: key, label, count }))}
+        value={activeTab}
+        onChange={(next) => onTabChange(next as CoursePrimaryTab)}
+      />
 
 
       {/* Controls: region pills + sort on a single row */}
