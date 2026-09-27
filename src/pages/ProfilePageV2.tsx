@@ -98,6 +98,12 @@ import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchD
 import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 import ProfileRoundsTab from '@/components/profile/rounds/ProfileRoundsTab';
+import ProfileHandicapTab, { handicapOwnerFirstName } from '@/components/profile/handicap/ProfileHandicapTab';
+import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
+import { StreaksSheetMount } from '@/components/profile/handicap/gam/streaks/StreaksSheetMount';
+import CompareMount from '@/components/profile/handicap/whs/sections/compare/CompareMount';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { openGamAchievements, openAllStreaks } from '@/components/profile/handicap/whs/gam/events';
 import { useProfileRoundsCount } from '@/components/profile/rounds/useProfileRounds';
 
 
@@ -821,6 +827,14 @@ const ProfilePageV2Content: React.FC = () => {
             displayName={profile?.display_name ?? profile?.username}
           />
         );
+      case 'handicap':
+        if (!showHandicapTab || !profile?.id) return null;
+        return (
+          <ProfileHandicapTab
+            userId={profile.id}
+            ownerFirstName={handicapOwnerFirstName(profile.display_name, profile.username)}
+          />
+        );
       case 'rounds':
         if (!showRoundsTab || !profile?.id) return null;
         return (
@@ -1373,7 +1387,7 @@ const ProfilePageV2Content: React.FC = () => {
         </section>
 
         {/* Tab Content */}
-        <div className={cn(activeSection === 'activity' ? 'pt-0 px-0' : activeSection === 'courses' || activeSection === 'stats' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
+        <div className={cn(activeSection === 'activity' ? 'pt-0 px-0' : activeSection === 'handicap' ? 'pt-4 px-0' : activeSection === 'courses' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
           {getCurrentContent()}
         </div>
 
@@ -1469,6 +1483,28 @@ const ProfilePageV2Content: React.FC = () => {
         />
       )}
       <ScrollToTopGlass />
+
+      {/* HANDICAP DEEP-LINK SHEETS - page level, not inside the tab body, so a
+          deep link still opens its sheet if the member switches tabs. Own
+          profile only; each portals to body with its own dark treatment. */}
+      {showHandicapTab && profile?.id && user?.id && (
+        <>
+          <GamMount
+            ownerUserId={profile.id}
+            viewerUserId={user.id}
+            ownerFirstName={handicapOwnerFirstName(profile.display_name, profile.username)}
+            readOnly={false}
+          />
+          <StreaksSheetMount />
+          <CompareMount viewerUserId={user.id} />
+          <RoundDetailSheet
+            open={!!deepLinkScoreId}
+            onClose={() => setDeepLinkScoreId(null)}
+            scoreId={deepLinkScoreId}
+            profileUserId={profile.id}
+          />
+        </>
+      )}
     </PageRoot>
   );
 };
