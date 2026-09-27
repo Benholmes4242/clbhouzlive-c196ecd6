@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FilterChips } from '@/components/ui/FilterChips';
+import { RailChips } from '@/components/ui/RailChips';
 
 type CourseDetailTab = 'course' | 'you' | 'legends' | 'reviews' | 'media';
 
@@ -18,7 +18,7 @@ interface CourseDetailShellTabsProps {
 }
 
 /**
- * CourseDetailShellTabs — canonical dark-fill pill row (FilterChips), matching
+ * CourseDetailShellTabs — canonical chip row (RailChips), matching
  * the Courses / Top 100 shell tabs.
  */
 export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
@@ -29,7 +29,8 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
 
   return (
     <div className="px-4 py-2 flex justify-center">
-      <FilterChips
+      <RailChips
+        align="center-when-fit"
         options={TABS.map((tab) => ({ id: tab.id, label: t(tab.labelKey) }))}
         value={activeTab}
         onChange={(id) => onTabChange(id as CourseDetailTab)}

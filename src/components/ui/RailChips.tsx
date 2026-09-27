@@ -11,16 +11,20 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
  * Watch destinations (/watch/clips, /watch/videos, /explore/reviews,
  * /explore/moments).
  *
- * 12 / 700, padding 6 by 11, radius 11. Selected is A.INK ground with A.CANVAS
- * text — the active state is stated by inversion, never by colour, because
- * amber belongs to the viewing member. Unselected is transparent with a 1px
- * A.BORDER and A.MUTE text. The row scrolls horizontally and never wraps.
+ * 12 / 700, padding 6 by 11, radius 11. The row scrolls horizontally and
+ * never wraps.
  *
- * TWO GROUNDS, ONE GEOMETRY (BRIEF_EXPLORE_REFINEMENT ruling 1). The default
- * ground, `outline`, states A CHOICE: one chip selected by inversion, the rest
- * transparent with a hairline. The `filled` ground states APPLIED STATE: a 6%
- * white ground, no border, nothing selected, and tapping opens a panel rather
- * than switching a list. The Explore filter rail is the one filled consumer.
+ * ONE SELECTION GROUND, ONE APPLIED GROUND (BRIEF_ONE_CHIP_APP_WIDE). The
+ * default and only choice ground, `filled-selection`, states A CHOICE: the
+ * selected chip takes the 6% white ground, ink text and a bright edge; every
+ * other chip is transparent with a 1px A.BORDER hairline and A.MUTE text. The
+ * solid white (inverted) selected pill is RETIRED app-wide and this component
+ * can no longer draw it — do not reintroduce an inverted branch. Amber stays
+ * out because it belongs to the viewing member.
+ *
+ * The `filled` ground states APPLIED STATE: a 6% white ground, no border,
+ * NOTHING selected, and tapping opens a panel rather than switching a list.
+ * The Explore filter rail is the one filled consumer.
  * A control that looks like a choice must behave like one, so do not reach for
  * `filled` on anything that actually switches the surface below it.
  *
@@ -65,17 +69,12 @@ export interface RailChipsProps {
    */
   locked?: boolean;
   /**
-   * ADDITIVE. Omitted or 'outline' renders exactly as every existing consumer
-   * always has. 'filled' is the applied-state ground described above.
-   *
-   * 'filled-selection' (BRIEF_EXPLORE_BOARD_SELECTOR §1) is the THIRD ground and
-   * the only one that both SWITCHES the surface below and states the applied
-   * chip with the 6% ground: the selected chip takes APPLIED_FILL with ink text
-   * and no border, every other chip stays transparent with the hairline. It
-   * exists because 'filled' marks NOTHING as selected — correct for a panel
-   * opener, wrong for a row of views, where it left all five chips identical.
+   * 'filled-selection' (the default) is the only ground for a row that
+   * SWITCHES the surface below: selected chip = APPLIED_FILL, ink text, bright
+   * edge; others transparent with the hairline. 'filled' marks NOTHING as
+   * selected — correct for a panel opener only.
    */
-  ground?: 'outline' | 'filled' | 'filled-selection';
+  ground?: 'filled' | 'filled-selection';
 
   /** ADDITIVE: centre a fitting choice group; overflow still starts at the leading edge. */
   align?: 'start' | 'center-when-fit';
@@ -121,10 +120,8 @@ const APPLIED_FILL = 'rgba(255,255,255,0.06)';
  *  the 10% hairline every other chip wears. */
 const SELECTED_EDGE = 'rgba(255,255,255,0.28)';
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start', size = 'md', distribute = false, trailing }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'filled-selection', align = 'start', size = 'md', distribute = false, trailing }: RailChipsProps) {
   const filled = ground === 'filled';
-  /* The selecting filled ground: a choice group, so tablist/tab semantics stay. */
-  const filledSelection = ground === 'filled-selection';
   /* ONE geometry pair, stated once. 'md' is the canonical chip. */
   const geo = size === 'sm' ? RAIL_CHIP_GEOMETRY.sm : RAIL_CHIP_GEOMETRY.md;
 
@@ -168,13 +165,10 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
               borderRadius: geo.radius,
 
 
-              /* The active chip keeps a TRANSPARENT hairline rather than none, so
-                 switching view costs no 1px width shift in the row. */
-              border: filled
-                ? 'none'
-                : `1px solid ${filledSelection && active ? SELECTED_EDGE : active ? 'transparent' : A.BORDER}`,
-              background: filled || (filledSelection && active) ? APPLIED_FILL : active ? A.INK : 'transparent',
-              color: filled || (filledSelection && active) ? A.INK : active ? A.CANVAS : A.MUTE,
+              /* Every chip keeps a 1px edge, so switching costs no width shift. */
+              border: filled ? 'none' : `1px solid ${active ? SELECTED_EDGE : A.BORDER}`,
+              background: filled || active ? APPLIED_FILL : 'transparent',
+              color: filled || active ? A.INK : A.MUTE,
 
 
               fontFamily: SANS,

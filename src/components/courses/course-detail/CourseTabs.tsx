@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FilterChips } from '@/components/ui/FilterChips';
+import { RailChips } from '@/components/ui/RailChips';
 
 export type CourseTabId = 'course' | 'you' | 'legends' | 'reviews' | 'media';
 
@@ -21,7 +21,7 @@ const TABS: { id: CourseTabId; labelKey: string }[] = [
 
 /**
  * CourseTabs — Modal tab bar for the course detail sheet.
- * Canonical dark-fill pill row (FilterChips), matching the Courses shell tabs.
+ * Canonical chip row (RailChips), matching the Courses shell tabs.
  */
 export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: CourseTabsProps) {
   const { t } = useTranslation('courses');
@@ -38,7 +38,8 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
       className="px-4 py-2 flex justify-center"
       style={{ background: 'hsl(var(--background))' }}
     >
-      <FilterChips
+      <RailChips
+        align="center-when-fit"
         options={TABS.map((tab) => ({ id: tab.id, label: getLabel(tab) }))}
         value={activeTab}
         onChange={(id) => onChange(id as CourseTabId)}

@@ -156,7 +156,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
           value={selectedList}
           onChange={(next) => { restored.current = true; setSelectedList(next); }}
           ariaLabel="Top 100 region"
-          ground="outline"
           align="center-when-fit"
           trailing={(
             <button
