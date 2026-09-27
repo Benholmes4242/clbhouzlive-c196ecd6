@@ -299,17 +299,39 @@ export function useCircleLatestRounds(
          caller asks for rather than a second definition. */
       const readIds = includeSelf ? Array.from(new Set([...circleIds, userId])) : circleIds;
       if (scope === 'circle' && readIds.length > 0) {
-        const { data: rounds, error: roundsError } = (await scoped(
-          supabase
-            .from('gam_round_stats' as never)
-            .select(ROUND_COLS)
-            .in('user_id', readIds)
-            .gte('play_date', windowStartIso)
-            .eq('holes_played', 18)
-            .order('play_date', { ascending: false }),
-        )) as { data: unknown; error: unknown };
-        if (roundsError) throw roundsError;
-        circleRounds = ((rounds ?? []) as unknown) as Round[];
+        /* SLICED, NOT ONE URL (BRIEF_CIRCLE_ROUNDS_UNBOUNDED_URL). readIds is the
+           whole circle and grows with the follow set; one `in.(...)` list 400s
+           on a large account — the bug COUNT_CHUNK in CircleShelf.tsx already
+           fixed for the count. NO PER-SLICE CAP: every slice returns all of its
+           rows in the window, so the merged set is the full circle set and the
+           single sort below makes it newest-first across the whole circle.
+           Per-slice ordering is never relied on. */
+        const MEMBER_CHUNK = 20;
+        const slices: string[][] = [];
+        for (let i = 0; i < readIds.length; i += MEMBER_CHUNK) {
+          slices.push(readIds.slice(i, i + MEMBER_CHUNK));
+        }
+        const results = await Promise.all(
+          slices.map(
+            (slice) =>
+              scoped(
+                supabase
+                  .from('gam_round_stats' as never)
+                  .select(ROUND_COLS)
+                  .in('user_id', slice)
+                  .gte('play_date', windowStartIso)
+                  .eq('holes_played', 18)
+                  .order('play_date', { ascending: false }),
+              ) as unknown as Promise<{ data: unknown; error: unknown }>,
+          ),
+        );
+        const merged: Round[] = [];
+        for (const { data: rounds, error: roundsError } of results) {
+          if (roundsError) throw roundsError;
+          merged.push(...(((rounds ?? []) as unknown) as Round[]));
+        }
+        merged.sort((a, b) => b.play_date.localeCompare(a.play_date));
+        circleRounds = merged;
       }
 
 
