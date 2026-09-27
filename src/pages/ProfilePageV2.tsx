@@ -98,6 +98,12 @@ import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchD
 import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 import ProfileRoundsTab from '@/components/profile/rounds/ProfileRoundsTab';
+import ProfileHandicapTab, { handicapOwnerFirstName } from '@/components/profile/handicap/ProfileHandicapTab';
+import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
+import { StreaksSheetMount } from '@/components/profile/handicap/gam/streaks/StreaksSheetMount';
+import CompareMount from '@/components/profile/handicap/whs/sections/compare/CompareMount';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { openGamAchievements, openAllStreaks } from '@/components/profile/handicap/whs/gam/events';
 import { useProfileRoundsCount } from '@/components/profile/rounds/useProfileRounds';
 
 
@@ -278,11 +284,14 @@ const ProfilePageV2Content: React.FC = () => {
     friendshipStatus !== 'friends';
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab = useMemo(() => {
-    const tabParam = searchParams.get('tab');
+  // 'stats' is the legacy id of the handicap tab: accepted, mapped on read,
+  // never emitted.
+  const tabFromParam = (tabParam: string | null): string => {
     const validTabs = ['activity', 'courses', 'rounds', 'top100', 'handicap', 'stats'];
-    return tabParam && validTabs.includes(tabParam) ? tabParam : 'activity';
-  }, []);
+    if (!tabParam || !validTabs.includes(tabParam)) return 'activity';
+    return tabParam === 'stats' ? 'handicap' : tabParam;
+  };
+  const initialTab = useMemo(() => tabFromParam(searchParams.get('tab')), []);
 
   // Deep-link consumption for Top-10 comment notifications (Item 2B).
   // URL contract: ?tab=courses&course=<id>&top_ten_comment=<id>[&top_ten_parent=<id>]
@@ -313,6 +322,14 @@ const ProfilePageV2Content: React.FC = () => {
   }, []);
   
   const [activeSection, setActiveSection] = useState(initialTab);
+
+  // The URL is the source of the tab. A navigation to /profile?tab=handicap
+  // while the profile is already mounted (the hero index cell, the /handicap
+  // redirect, a sheet link) must switch tabs, not be ignored.
+  const urlTab = tabFromParam(searchParams.get('tab'));
+  useEffect(() => {
+    setActiveSection((cur) => (cur === urlTab ? cur : urlTab));
+  }, [urlTab]);
   const [bioExpanded, setBioExpanded] = useState(false);
   /* READ MORE is gated on a MEASUREMENT, not a character count: a char count
      cannot predict rendered lines (viewport width, font metrics, word breaks). */
@@ -349,8 +366,6 @@ const ProfilePageV2Content: React.FC = () => {
   const profileTypeInfo = getProfileType(profile?.user_type);
   const { isPersonal } = profileTypeInfo;
   const allTabs = getProfileTabs(profile?.user_type);
-  // Per fix brief §5.1 — Handicap is now a top-level page for everyone,
-  // hidden from all profile tab strips (own and friend).
   // BRIEF_PROFILE_ROUNDS_TAB — own profile always; anyone else only when RLS
   // (as the viewer) returns at least one of their rounds. Private and empty
   // both come back as 0, and both mean "no tab".
@@ -359,14 +374,20 @@ const ProfilePageV2Content: React.FC = () => {
     isPersonal && !isSelf,
   );
   const showRoundsTab = isPersonal && (isSelf || (visibleRoundCount ?? 0) > 0);
+  // HANDICAP IS SELF-ONLY (Aug 7 ruling: a member's handicap is private to
+  // them). Own profile shows four tabs, anyone else's three. It sits LAST so
+  // another member's profile loses a tab off the end, not from the middle.
+  const showHandicapTab = isPersonal && isSelf;
   const tabs = useMemo(() => {
-    const base = allTabs.filter(t => t.id !== 'stats' && t.id !== 'top100');
+    const base = allTabs.filter(
+      t => t.id !== 'top100' && (t.id !== 'handicap' || showHandicapTab),
+    );
     if (!showRoundsTab) return base;
     const at = base.findIndex(t => t.id === 'courses');
     const out = [...base];
     out.splice(at >= 0 ? at + 1 : out.length, 0, { id: 'rounds', label: 'Rounds' });
     return out;
-  }, [allTabs, showRoundsTab]);
+  }, [allTabs, showRoundsTab, showHandicapTab]);
 
   // A ?tab=rounds link to a member whose rounds the viewer cannot see lands
   // on Posts, never on a locked or empty tab.
@@ -378,21 +399,72 @@ const ProfilePageV2Content: React.FC = () => {
     }
   }, [activeSection, profile?.id, isSelf, visibleRoundCount, setSearchParams]);
 
-  // Per fix brief §5.2 — legacy ?tab=stats deep links redirect to the
-  // dedicated handicap route. Own profile → /handicap. Another member →
-  // compare against them, since their handicap page is private to them.
+  // ?tab=handicap (or legacy ?tab=stats) on SOMEONE ELSE's profile: their
+  // handicap is private, so compare against them, sheet already open.
   useEffect(() => {
-    if (activeSection !== 'stats') return;
-    if (isSelf) {
-      analyticsEvents.track('handicap_legacy_redirect_fired', { source: 'profile_stats_tab' });
-      navigate('/handicap', { replace: true });
-    } else if (profile?.id) {
-      analyticsEvents.track('handicap_legacy_redirect_fired', { source: 'friend_profile_stats_tab' });
-      // A legacy ?tab=stats link on someone else's profile can no longer land
-      // on their handicap page. Compare answers the same question.
-      navigate(compareRouteFor(profile.id), { replace: true });
-    }
-  }, [activeSection, isSelf, profile?.id, navigate]);
+    if (activeSection !== 'handicap' || authLoading || !profile?.id || isSelf) return;
+    navigate(compareRouteFor(profile.id), { replace: true });
+  }, [activeSection, authLoading, isSelf, profile?.id, navigate]);
+
+  /* HANDICAP DEEP-LINK PARAMS - moved here with the surface from the retired
+     /handicap page. Each effect strips ONLY its own param and never `tab`, so
+     consuming a link never knocks the member off the Handicap tab. */
+
+  // ?subtab= is stale (bookmarks / delivered pushes): ignored and stripped.
+  useEffect(() => {
+    if (!searchParams.has('subtab')) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete('subtab');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
+
+  // ?score=<whs score id> opens the scorecard sheet (round reaction pushes).
+  const [deepLinkScoreId, setDeepLinkScoreId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isSelf) return;
+    const scoreId = searchParams.get('score');
+    if (!scoreId) return;
+    setDeepLinkScoreId(scoreId);
+    const next = new URLSearchParams(searchParams);
+    next.delete('score');
+    setSearchParams(next, { replace: true });
+  }, [isSelf, searchParams, setSearchParams]);
+
+  /* ONE HANDLER, TWO VOCABULARIES. ?gam= is current; ?sheet= is what the push
+     dispatcher emitted until 10 Sep 2026 and 591 delivered pushes still carry
+     it - this branch looks dead and is not, it stays permanently.
+       gam=trophies | sheet=achievements -> openGamAchievements()
+       gam=streaks  | sheet=streaks      -> openAllStreaks()
+     &section= / &badge= are honoured when present. The emit is deferred a
+     macrotask so GamMount / StreaksSheetMount have subscribed first. */
+  useEffect(() => {
+    if (!isSelf) return;
+    const gam = searchParams.get('gam');
+    const sheet = searchParams.get('sheet');
+    const intent: 'trophies' | 'streaks' | null =
+      gam === 'trophies' || sheet === 'achievements'
+        ? 'trophies'
+        : gam === 'streaks' || sheet === 'streaks'
+          ? 'streaks'
+          : null;
+    if (!intent) return;
+    const section = searchParams.get('section') === 'crowns' ? 'crowns' : undefined;
+    const badgeId = searchParams.get('badge') || undefined;
+    const id = setTimeout(() => {
+      if (intent === 'trophies') {
+        openGamAchievements(badgeId || section ? { badgeId, section } : undefined);
+      } else {
+        openAllStreaks();
+      }
+      const next = new URLSearchParams(searchParams);
+      next.delete('gam');
+      next.delete('sheet');
+      next.delete('section');
+      next.delete('badge');
+      setSearchParams(next, { replace: true });
+    }, 0);
+    return () => clearTimeout(id);
+  }, [isSelf, searchParams, setSearchParams]);
 
   // Legacy ?tab=top100 deep links → Courses tab (Top 100 now lives in the
   // Courses tab's All/Top 100 toggle). Mirrors the stats-tab retirement.
@@ -753,6 +825,14 @@ const ProfilePageV2Content: React.FC = () => {
             userId={profile?.id || ''}
             isOwnProfile={isSelf}
             displayName={profile?.display_name ?? profile?.username}
+          />
+        );
+      case 'handicap':
+        if (!showHandicapTab || !profile?.id) return null;
+        return (
+          <ProfileHandicapTab
+            userId={profile.id}
+            ownerFirstName={handicapOwnerFirstName(profile.display_name, profile.username)}
           />
         );
       case 'rounds':
@@ -1307,7 +1387,7 @@ const ProfilePageV2Content: React.FC = () => {
         </section>
 
         {/* Tab Content */}
-        <div className={cn(activeSection === 'activity' ? 'pt-0 px-0' : activeSection === 'courses' || activeSection === 'stats' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
+        <div className={cn(activeSection === 'activity' ? 'pt-0 px-0' : activeSection === 'handicap' ? 'pt-4 px-0' : activeSection === 'courses' ? 'pt-4 px-2.5' : 'pt-4 px-4')}>
           {getCurrentContent()}
         </div>
 
@@ -1403,6 +1483,28 @@ const ProfilePageV2Content: React.FC = () => {
         />
       )}
       <ScrollToTopGlass />
+
+      {/* HANDICAP DEEP-LINK SHEETS - page level, not inside the tab body, so a
+          deep link still opens its sheet if the member switches tabs. Own
+          profile only; each portals to body with its own dark treatment. */}
+      {showHandicapTab && profile?.id && user?.id && (
+        <>
+          <GamMount
+            ownerUserId={profile.id}
+            viewerUserId={user.id}
+            ownerFirstName={handicapOwnerFirstName(profile.display_name, profile.username)}
+            readOnly={false}
+          />
+          <StreaksSheetMount />
+          <CompareMount viewerUserId={user.id} />
+          <RoundDetailSheet
+            open={!!deepLinkScoreId}
+            onClose={() => setDeepLinkScoreId(null)}
+            scoreId={deepLinkScoreId}
+            profileUserId={profile.id}
+          />
+        </>
+      )}
     </PageRoot>
   );
 };

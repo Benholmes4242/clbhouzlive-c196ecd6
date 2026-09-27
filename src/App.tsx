@@ -242,8 +242,8 @@ const ManageMyRequestsPage = lazy(() => import("./pages/manage/MyRequestsPage"))
 const SupportThreadPage = lazy(() => import("./pages/manage/SupportThreadPage"));
 const ManageLegalPage = lazy(() => import("./pages/manage/LegalPage"));
 const ManageHandicapPage = lazy(() => import("./pages/manage/HandicapManagePage"));
-// ProfileHandicapView removed — /profile/handicap now redirects to /handicap (fix brief §2.1)
-const HandicapPage = lazy(() => import("./pages/HandicapPage"));
+// /handicap and its legacy aliases redirect to the self-only Handicap tab on /profile.
+const HandicapRedirect = lazy(() => import("./pages/HandicapRedirect"));
 const RivalryCompareRedirect = lazy(() => import("./pages/RivalryCompareRedirect"));
 
 
@@ -544,19 +544,19 @@ function AppRoutes() {
         <Route path="/onboarding/account-type" element={<Navigate to="/edit-profile?onboarding=1" replace />} />
         <Route path="/create-profile" element={<CreateProfileRedirect />} />
         <Route path="/profile" element={<ProfileWrapped />} />
-        <Route path="/profile/handicap" element={<Navigate to="/handicap" replace />} />
-        <Route path="/handicap" element={<Suspense fallback={<HandicapPageSkeleton />}><HandicapPage /></Suspense>} />
-        <Route path="/handicap/legends" element={<Navigate to="/handicap" replace />} />
+        <Route path="/profile/handicap" element={<Navigate to="/profile?tab=handicap" replace />} />
+        <Route path="/handicap" element={<Suspense fallback={null}><HandicapRedirect /></Suspense>} />
+        <Route path="/handicap/legends" element={<Navigate to="/profile?tab=handicap" replace />} />
         
         <Route path="/handicap/rivalry/:rivalUserId" element={<Suspense fallback={<HandicapPageSkeleton />}><RivalryCompareRedirect /></Suspense>} />
-        <Route path="/handicap/:userId" element={<Suspense fallback={<HandicapPageSkeleton />}><HandicapPage /></Suspense>} />
+        <Route path="/handicap/:userId" element={<Suspense fallback={null}><HandicapRedirect /></Suspense>} />
         <Route path="/handicap/:friendUserId/rivalry/:rivalUserId" element={<Suspense fallback={<HandicapPageSkeleton />}><RivalryCompareRedirect /></Suspense>} />
 
 
         
-        <Route path="/profile/quest" element={<Navigate to="/handicap" replace />} />
-        <Route path="/profile/quest/index" element={<Navigate to="/handicap" replace />} />
-        <Route path="/profile/quest/replay" element={<Navigate to="/handicap" replace />} />
+        <Route path="/profile/quest" element={<Navigate to="/profile?tab=handicap" replace />} />
+        <Route path="/profile/quest/index" element={<Navigate to="/profile?tab=handicap" replace />} />
+        <Route path="/profile/quest/replay" element={<Navigate to="/profile?tab=handicap" replace />} />
         <Route path="/edit-profile" element={<Suspense fallback={<ManagePageSkeleton />}><ManageProfilePage /></Suspense>} />
         <Route path="/manage/email" element={<Suspense fallback={<ManagePageSkeleton />}><ManageEmailPage /></Suspense>} />
         <Route path="/manage/blocked" element={<Suspense fallback={<ManagePageSkeleton />}><ManageBlockedPage /></Suspense>} />

@@ -34,7 +34,9 @@ export const getProfileType = (userType: string | null | undefined): ProfileType
 export const PERSONAL_TABS = [
   { id: 'activity', label: 'Posts' },
   { id: 'courses', label: 'Courses' },
-  { id: 'stats', label: 'Handicap' }
+  // Self-only - ProfilePageV2 renders it only when isSelf. 'stats' survives
+  // only as a legacy ?tab= alias read by the profile page.
+  { id: 'handicap', label: 'Handicap' }
 ];
 
 /**
