@@ -43,12 +43,16 @@ interface Props {
   figure: string | null;
   /**
    * FIGURE TONE — the glass chip's numeral colour. Defaults to flat white
-   * (BRIEF_GLASS_BADGES_DARK). "Beating the course" passes the app's TOPAR red
-   * so an under-par figure reads as under par here as it does everywhere else.
+   * (BRIEF_GLASS_BADGES_DARK). One caller today: CourseShelf passes the green
+   * 9+ rating tone. The to-par red is NOT carried here — see `unitTone`.
    */
   figureTone?: string;
 
   unit?: string;
+  /** The to-par unit's colour when the round is UNDER par. Omitted keeps
+   *  the white unit, so every non-golf unit (rank scope, rating tier) is
+   *  unchanged. Mirrors FigureChip's prop of the same name. */
+  unitTone?: string;
   /** Relative age, top-right. */
   whenLabel: string;
   /**
@@ -166,6 +170,7 @@ export function StandoutTile({
   photo,
   figure,
   unit,
+  unitTone,
   whenLabel,
   whenGlass = false,
   who,
@@ -295,7 +300,7 @@ export function StandoutTile({
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                   lineHeight: 1,
-                  color: 'rgba(255,255,255,0.9)',
+                  color: unitTone ?? 'rgba(255,255,255,0.9)',
                 }}
               >
                 {unit}

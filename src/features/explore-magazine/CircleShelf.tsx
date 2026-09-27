@@ -233,10 +233,12 @@ export function CircleShelf({
                 region={null}
                 photo={TILE.photo}
                 reserveTwoLines
-                /* Gross is the figure and stays white; only the to-par unit
-                   takes the under-par red, inside StandoutTile. */
+                /* Gross is the figure and stays white; the to-par unit takes
+                   A.RED via unitTone when under par — branched on the NUMBER,
+                   never the label (toParLabel emits U+2212, not '-'). */
                 figure={row.gross != null ? String(row.gross) : null}
                 unit={toParLabel(toPar(row)) ?? undefined}
+                unitTone={(toPar(row) ?? 0) < 0 ? A.RED : undefined}
                  /* INTENTIONALLY DIFFERENT FROM STANDING AND CLUB. Those rails
                     place this same railCaptionDate beneath the name. Circle's
                     second caption line belongs to HCP movement, so adding the
