@@ -685,7 +685,7 @@ export function useCircleLatestRounds(
         return {
           round_id: r.whs_score_id ?? `${r.user_id}-${r.play_date}`,
           score_id: r.whs_score_id,
-          connection_id: score?.connection_id ?? null,
+          connection_id: r.whs_score_id ? connectionByScore.get(r.whs_score_id) ?? null : null,
           user_id: r.user_id,
           display_name: profile?.display_name ?? 'Player',
           profile_photo_url: profile?.profile_photo_url ?? null,
