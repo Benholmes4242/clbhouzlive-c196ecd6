@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { it, vi } from 'vitest';
 
-const log: string[] = [];
+const log: string[] = []; (globalThis as any).__probe = (m: string) => log.push(m);
 const session = { user: null as null | { id: string }, loading: true };
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => session }));
 vi.mock('@/perf/usePageReady', () => ({ usePageReady: () => {} }));
