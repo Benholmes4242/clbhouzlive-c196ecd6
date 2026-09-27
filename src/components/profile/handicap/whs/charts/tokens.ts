@@ -12,6 +12,7 @@
 
 import { PAGE_CANVAS, MEMBER_PANEL, MEMBER_CELL, inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 
 /* ONE INK FAMILY: the chart ink is the app ink base (#F8FAFC), never pure
    white with white alphas - one base, one family. Foreground tiers use the
@@ -43,10 +44,13 @@ export const CHART = {
      composited over PAGE_CANVAS, made solid. Dots only. */
   DOT_IDLE: '#4A4C50',
   AMBER: '#F7931E',
+  /* THE MOVEMENT PAIR IS SOURCED, NOT DECLARED (BRIEF_ONE_MOVEMENT_PAIR).
+     CHART.UP / CHART.DOWN keep their names as the chart layer's vocabulary,
+     but resolve to the app-wide INDEX_DELTA dark pair: one green, one red. */
   /** index rising = playing worse */
-  UP: '#FF6B6B',
+  UP: INDEX_DELTA.dark.drifted,
   /** index falling = playing better */
-  DOWN: '#5EE9A6',
+  DOWN: INDEX_DELTA.dark.improved,
 } as const;
 
 export const CHART_FONT =
