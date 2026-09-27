@@ -40,7 +40,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
-import { ExploreShelf } from './ExploreShelf';
+import { ExploreShelf, SHELF_HEADING } from './ExploreShelf';
 import { useCircleSize } from '@/features/amateur/useCircleSize';
 import { ENTRY_BOARD, useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
 import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBlock';
