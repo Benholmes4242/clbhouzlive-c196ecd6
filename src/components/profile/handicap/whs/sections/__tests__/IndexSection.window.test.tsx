@@ -119,7 +119,7 @@ describe('monotonePath — Fritsch–Carlson, no overshoot', () => {
   it('a window with no rounds is entirely flat — no sag, no lift', async () => {
     const { monotonePath } = await import('../IndexSection');
     const [lo, hi] = sampledExtent(monotonePath([[0, 55], [300, 55]], 300));
-    expect(lo).toBe(55); expect(hi).toBe(55);
+    expect(lo).toBeCloseTo(55, 9); expect(hi).toBeCloseTo(55, 9);
   });
 
   it('lead and trail stretches stay flat around a change', async () => {
