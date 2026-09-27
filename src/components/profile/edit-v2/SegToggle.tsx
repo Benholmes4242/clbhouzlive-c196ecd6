@@ -17,6 +17,12 @@ interface SegToggleProps {
   fill?: boolean;
 }
 
+/**
+ * NOT A CHIP ROW (BRIEF_CHIP_SWEEP_PASS_1_FOLLOW_UPS §4): a form control with a
+ * 44px tap area and a check mark that changes a value. Chip sweeps leave it
+ * alone. HcpStrip's 30D/90D segmented toggle is the same class and follows
+ * this component's ruling; the two are decided together.
+ */
 export function SegToggle({ options, value, onChange, fill }: SegToggleProps) {
   return (
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
