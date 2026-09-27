@@ -12,8 +12,7 @@
  * fixes the scale, and a second glyph beside the figure only competes with it.
  */
 import React from 'react';
-import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
-import { getScoreTier } from '@/utils/getScoreTier';
+import { OverallScoreLine } from '../CategoryScores';
 import { GUTTER } from '../about/AboutSection';
 
 interface TheScoreProps {
@@ -21,29 +20,11 @@ interface TheScoreProps {
   ratingCount: number;
 }
 
-export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount }) => {
-  const tier = getScoreTier(score);
-  const settled = ratingCount >= 5;
-  const count = `${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'}`;
-  const scoreColor = courseSubScoreTone(score);
-
-  return (
-    <section style={{ padding: `0 ${GUTTER}px`, fontFamily: SANS }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-        <span style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: scoreColor, ...FIGS }}>
-          {score.toFixed(1)}
-        </span>
-        {settled ? (
-          <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em', color: scoreColor }}>
-            {tier.label}
-          </span>
-        ) : null}
-      </div>
-      <div style={{ fontSize: 11, color: A.DIM, marginTop: 6 }}>
-        {settled ? count : `${count} — too few to be settled.`}
-      </div>
-    </section>
-  );
-};
+/** BRIEF_ONE_CATEGORY_SCORE_BLOCK §3 — same overall line as the Course tab. */
+export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount }) => (
+  <section style={{ padding: `0 ${GUTTER}px` }}>
+    <OverallScoreLine score={score} ratingCount={ratingCount} />
+  </section>
+);
 
 export default TheScore;

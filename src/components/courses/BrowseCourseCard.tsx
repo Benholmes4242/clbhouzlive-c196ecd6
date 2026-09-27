@@ -1,22 +1,15 @@
 import React from 'react';
 
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
-import { A, FIGS, SANS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { CategoryScores } from './course-detail/CategoryScores';
 import type { StatBrowseRow } from './useStatBrowse';
 import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 const PHOTO_H = 196;
-const TRACK = 'rgba(248,250,252,0.10)';
 const PHOTO_MUTE = 'rgba(255,255,255,0.66)';
 const PHOTO_DIM = 'rgba(255,255,255,0.55)';
 const RANK_GLASS = 'rgba(15,23,42,0.42)';
-
-const CATEGORY_LABELS = [
-  ['design_score', 'Design'],
-  ['condition_score', 'Condition'],
-  ['clubhouse_score', 'Clubhouse'],
-  ['facilities_score', 'Facilities'],
-] as const;
 
 function RankBadge({ memberships }: { memberships: StatBrowseRow['memberships'] }) {
   const labels = memberships
@@ -44,40 +37,6 @@ function RankBadge({ memberships }: { memberships: StatBrowseRow['memberships'] 
       }}
     >
       {labels.join(' | ')}
-    </div>
-  );
-}
-
-function CategoryBreakdown({ row }: { row: StatBrowseRow }) {
-  const scores = CATEGORY_LABELS.flatMap(([key, label]) => {
-    const score = row[key];
-    return score == null ? [] : [{ label, score }];
-  });
-  if (scores.length === 0) return null;
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 12, marginTop: 13 }}>
-      {scores.map(({ label, score }) => {
-        const fill = Math.max(0, Math.min(100, ((score - 6) / 4) * 100));
-        const tone = courseSubScoreTone(score);
-        return (
-          <div key={label} style={{ minWidth: 0 }}>
-            <div style={{ height: 3, borderRadius: 2, background: TRACK, overflow: 'hidden' }}>
-              <div
-                data-category-score={score.toFixed(1)}
-                style={{ height: '100%', width: `${fill}%`, borderRadius: 2, background: tone }}
-              />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 6, minWidth: 0, whiteSpace: 'nowrap' }}>
-              <span style={{ ...FIGS, fontSize: 13, fontWeight: 700, letterSpacing: '-0.04em', color: tone }}>
-                {score.toFixed(1)}
-              </span>
-              <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: 11, color: A.DIM }}>
-                {label}
-              </span>
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 }
@@ -205,7 +164,10 @@ export function BrowseCourseCard({
             {ratedWithoutRoundsNote}
           </div>
         ) : null}
-        <CategoryBreakdown row={row} />
+        <CategoryScores
+          marginTop={13}
+          scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }}
+        />
       </div>
     </button>
   );
