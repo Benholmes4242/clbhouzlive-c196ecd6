@@ -12,7 +12,7 @@ import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hoo
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { FeatRarityProvider } from '@/hooks/gam/useFeatRarity';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { RailChips } from '@/components/ui/RailChips';
+import { RailChips, type RailChipOption } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import {
   RoundDetailSheet,
@@ -559,6 +559,16 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
   /** The scope the VIEW ON SCREEN is looking at. */
   const activeScope: ScoreScope = view === 'courses' ? coursesScope : scoreScope;
+  /* ONE LIST FOR THE SCOPE CHIPS AND THE SCOPE TITLE, so the title can never
+     name a scope the chip row does not offer. World is always present, so
+     length > 1 means there is a real choice. LABEL grammar — not scopeName. */
+  const scoreScopeOptions = useMemo<RailChipOption[]>(() => [
+    ...(geography.scope.primaryClubId ? [{ id: 'club', label: t('amateur.stream.scope.club', 'My club') }] : []),
+    ...(geography.scope.county ? [{ id: 'county', label: geography.scope.county }] : []),
+    ...(geography.scope.country ? [{ id: 'country', label: geography.scope.country }] : []),
+    { id: 'world', label: t('amateur.stream.scope.world', 'World') },
+  ], [geography.scope.primaryClubId, geography.scope.county, geography.scope.country, t]);
+  const scoreScopeLabel = scoreScopeOptions.find((o) => o.id === scoreScope)?.label ?? null;
 
   /* §6, §7 SEARCH AND PLACE. Both REPLACE THE PAGE BODY and neither is a route
      or a sheet, so the chips, the field and the scope row all stay mounted -
@@ -1734,14 +1744,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
               overflow: 'hidden',
             }}
           >
-            {geography.scope.primaryClubId || geography.scope.county || geography.scope.country ? (
+            {scoreScopeOptions.length > 1 ? (
               <RailChips
-                options={[
-                  ...(geography.scope.primaryClubId ? [{ id: 'club', label: t('amateur.stream.scope.club', 'My club') }] : []),
-                  ...(geography.scope.county ? [{ id: 'county', label: geography.scope.county }] : []),
-                  ...(geography.scope.country ? [{ id: 'country', label: geography.scope.country }] : []),
-                  { id: 'world', label: t('amateur.stream.scope.world', 'World') },
-                ]}
+                options={scoreScopeOptions}
                 value={scoreScope}
                 onChange={(next) => {
                   const value = next as ScoreScope;
@@ -1906,6 +1911,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       ) : null}
 
 
+      {view === 'scores' && !scoresBoardActive && scoreScopeOptions.length > 1 && scoreScopeLabel ? (
+        <div style={{
+          padding: '2px 16px 10px',
+          fontFamily: SANS, fontSize: 10, fontWeight: 800,
+          letterSpacing: '0.14em', textTransform: 'uppercase',
+          color: A.INK, lineHeight: 1,
+        }}>{scoreScopeLabel}</div>
+      ) : null}
       {view === 'scores' && !scoresBoardActive ? (
         <div style={{ marginBottom: BLOCK_GAP }}>
           <CircleShelf viewerId={userId} pos={0} />

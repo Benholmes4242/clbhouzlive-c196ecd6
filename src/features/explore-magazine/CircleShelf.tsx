@@ -17,6 +17,7 @@ import { ExploreShelf } from './ExploreShelf';
 import { ShelfRetry, ShelfShell } from './ExploreShells';
 import { railCaptionDate, relativeDay, toParLabel } from './exploreCopy';
 import { circleHandicapDisplay } from './circleHandicap';
+import { FigureCell, vsHandicapLabel } from './AchievementCallout';
 
 /**
  * "YOUR CIRCLE" (BRIEF_EXPLORE_CIRCLE_SHELF) — the latest rounds from the people
@@ -58,7 +59,9 @@ import { circleHandicapDisplay } from './circleHandicap';
  *  member names and pushed the date on the photo into the score chip. The width
  *  removes the pressure; the chip/date lanes in StandoutTile remove the
  *  possibility. */
-const TILE = { w: 206, h: 118 };
+const TILE = { w: 206, photo: 118 };
+/* photo + figure row + rule + text panel (11 top, 16 name, 12 bottom) */
+const TILE_H = TILE.photo + 52 + 1 + 11 + 16 + 12; // 210
 
 /** §2 the rail draws ten; the see-all sheet carries the rest. */
 const RENDERED = 10;
@@ -164,7 +167,7 @@ export function CircleShelf({
        no rows           -> nothing at all
        total unsettled   -> shell (only reachable once the rail has rows) */
   if (!circle.isFetched) {
-    return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
+    return <ShelfShell tileW={TILE.w} tileH={TILE_H} />;
   }
   if (circle.isError) {
     return (
@@ -180,7 +183,7 @@ export function CircleShelf({
      NO SHELF. Skipped; the next shelf takes the slot. */
   if (rows.length === 0) return null;
   if (!total.isFetched) {
-    return <ShelfShell tileW={TILE.w} tileH={TILE.h} />;
+    return <ShelfShell tileW={TILE.w} tileH={TILE_H} />;
   }
 
 
@@ -228,7 +231,7 @@ export function CircleShelf({
                 courseName={row.course_name ?? t('amateur.stream.aCourse', 'a course')}
                 imageUrl={course?.imageUrl ?? null}
                 region={null}
-                photo={TILE.h}
+                photo={TILE.photo}
                 reserveTwoLines
                 /* Gross is the figure and stays white; only the to-par unit
                    takes the under-par red, inside StandoutTile. */
@@ -248,48 +251,30 @@ export function CircleShelf({
                    Golf names and photo URLs and leaked once already. */
                 avatarUrl={row.profile_photo_url ?? null}
                 avatarUserId={row.user_id}
-                /* MATCH THE CLUB RAIL'S 35PX CAPTION. The name and HCP remain
-                   two distinct, tight rows; a long name ellipsizes on row one
-                   rather than adding a third row. The shared caption reserves
-                   the HCP row even when privacy leaves it empty, so every tile
-                   and its vertically centred avatar keep identical geometry. */
-                captionNameLines={1}
-
-                railCaptionLine={
-                  handicap ? (
-                    <>
-                      <span
-                        style={{
-                          fontSize: 9,
-                          fontWeight: 700,
-                          letterSpacing: '0.19em',
-                          lineHeight: 1,
-                          color: A.DIM,
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {t('friendsRail.index', 'HCP')} {handicap.index}
-                      </span>
-                      {handicap.delta ? (
-                        <span
-                          style={{
-                            ...NUMF,
-                            marginLeft: 6,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 2,
-                            fontSize: 9,
-                            fontWeight: 700,
-                            lineHeight: 1,
-                            color: handicap.delta.tone,
-                          }}
-                        >
-                          <span aria-hidden>{handicap.delta.arrow}</span>
-                          <span>{handicap.delta.text}</span>
-                        </span>
-                      ) : null}
-                    </>
-                  ) : null
+                /* NAME-ONLY CAPTION: the HCP moved into the figure row, so the
+                   name is one ellipsized, reserved line and the rail stays uniform. */
+                nameLines={1}
+                /* OPTION D: NET, VS HCP, HCP as one row of three. Under-par colour
+                   is decided inside FigureCell (the stream card's cell), never here.
+                   Missing figures leave an EMPTY cell: nothing reflows. The index
+                   comes only through circleHandicapDisplay's gate; the movement
+                   arrow is deliberately dropped on this tile. */
+                railFigures={
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                    {row.net != null
+                      ? <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(row.net)} />
+                      : <span />}
+                    {row.net != null && row.course_par != null
+                      ? <FigureCell
+                          label={t('amateur.stream.stat.vsHcp', 'VS HCP')}
+                          value={vsHandicapLabel(row.net, row.course_par)}
+                          under={row.net < row.course_par}
+                        />
+                      : <span />}
+                    {handicap
+                      ? <FigureCell label={t('friendsRail.index', 'HCP')} value={handicap.index} />
+                      : <span />}
+                  </div>
                 }
                 onPress={() => open(row)}
               />

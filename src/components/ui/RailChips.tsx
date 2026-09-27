@@ -116,6 +116,10 @@ export interface RailChipsProps {
 
 /** The applied-state ground: 6% white, stated once. */
 const APPLIED_FILL = 'rgba(255,255,255,0.06)';
+/** filled-selection's EDGE: the selected chip is the one with a BRIGHT
+ *  border, not the one with none. 6% fill alone is darker on A.CANVAS than
+ *  the 10% hairline every other chip wears. */
+const SELECTED_EDGE = 'rgba(255,255,255,0.28)';
 
 export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline', align = 'start', size = 'md', distribute = false, trailing }: RailChipsProps) {
   const filled = ground === 'filled';
@@ -166,7 +170,9 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
 
               /* The active chip keeps a TRANSPARENT hairline rather than none, so
                  switching view costs no 1px width shift in the row. */
-              border: filled ? 'none' : `1px solid ${active ? 'transparent' : A.BORDER}`,
+              border: filled
+                ? 'none'
+                : `1px solid ${filledSelection && active ? SELECTED_EDGE : active ? 'transparent' : A.BORDER}`,
               background: filled || (filledSelection && active) ? APPLIED_FILL : active ? A.INK : 'transparent',
               color: filled || (filledSelection && active) ? A.INK : active ? A.CANVAS : A.MUTE,
 
