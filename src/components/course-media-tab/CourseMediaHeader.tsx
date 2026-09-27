@@ -90,7 +90,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
       <div style={{ flex: 1, minWidth: 0 }}>
         <RailChips
           ariaLabel={t('courses:media.filterA11y')}
-          options={FILTER_KEYS.map(({ key, i18nKey }) => ({ id: key, label: t(i18nKey), count: countFor(key) }))}
+          options={FILTER_KEYS.map(({ key, i18nKey }) => ({ id: key, label: t(i18nKey), value: countFor(key) }))}
           value={activeFilter}
           onChange={(next) => onFilterChange(next as typeof activeFilter)}
         />
