@@ -57,7 +57,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
       <RailChips
         ariaLabel="Course list filter"
         align="center-when-fit"
-        options={TABS.map(({ key, label, count }) => ({ id: key, label, count }))}
+        options={TABS.map(({ key, label, count }) => ({ id: key, label, value: count }))}
         value={activeTab}
         onChange={(next) => onTabChange(next as CoursePrimaryTab)}
       />

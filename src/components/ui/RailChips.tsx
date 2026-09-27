@@ -53,13 +53,14 @@ export interface RailChipOption {
   id: string;
   label: string;
   /**
-   * ADDITIVE — A COUNT INSIDE THE CHIP (BRIEF_CHIP_COUNT_CAPABILITY §2). How
-   * many exist, rendered after the label at the same size, 5px gap, A.DIM
-   * unselected / A.MUTE selected, inside the chip's own padding. undefined or
-   * null renders NOTHING (no node, no width change). 0 renders "0" — zero is
-   * an answer, not an absence. Never an unread badge: that is a different fact.
+   * ADDITIVE — A TRAILING VALUE (BRIEF_CHIP_TRAILING_VALUE). A figure that
+   * qualifies the label — a count, a leading score, a total. The chip renders
+   * it; the caller owns what it means. After the label, same size, 5px gap,
+   * A.DIM unselected / A.MUTE selected, inside the chip's own padding.
+   * undefined or null renders NOTHING (no node, no width change). 0 renders
+   * "0"; a caller with no figure passes null. Never an unread badge.
    */
-  count?: number | null;
+  value?: string | number | null;
 }
 
 export interface RailChipsProps {
@@ -140,12 +141,8 @@ const SELECTED_EDGE = 'rgba(255,255,255,0.28)';
  *   ScopePills (explore-tab-new/wire)         — the row element itself must be
  *                                               position:sticky (RailChips'
  *                                               `style` is margin/padding only)
- *
- * Media All/Photos/Videos and Profile courses All/Top 100 left this list when
- * `count` landed (BRIEF_CHIP_COUNT_CAPABILITY). Two rows still read it pending
- * a ruling, because the number they carry is NOT a count:
- *   BoardChips (championsFlatBits)            — a board's leading score
- *   ActivityPageV2 ChipButton                 — the amber unread badge
+ *   ActivityPageV2 ChipButton                 — an amber unread badge, which is
+ *                                               state not a figure
  *
  * A NEW row may NOT join this list. If it needs a capability the component
  * lacks, add that capability to RailChips instead.
@@ -235,7 +232,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
             }}
           >
             {option.label}
-            {option.count != null ? (
+            {option.value != null ? (
               <span
                 style={{
                   marginLeft: 5,
@@ -243,7 +240,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
                   fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
-                {option.count}
+                {option.value}
               </span>
             ) : null}
           </button>

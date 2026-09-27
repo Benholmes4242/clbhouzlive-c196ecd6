@@ -11,7 +11,7 @@
 import React from 'react';
 import { Crown } from 'lucide-react';
 import { A, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
+import { RailChips } from '@/components/ui/RailChips';
 import { BoardAvatar, formatChampionsWhen, formatToPar, toParColor, hasToPar } from '../drilldown/_shared/boardParts';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { TFunction } from 'i18next';
@@ -129,37 +129,13 @@ export const BoardChips: React.FC<{
   onSelect: (key: LegendCategory) => void;
   gutter?: number;
 }> = ({ chips, activeKey, onSelect, gutter = 20 }) => (
-  <div
-    className="champions-flat-chips"
-    style={{
-      display: 'flex',
-      gap: RAIL_CHIP_GAP,
-      overflowX: 'auto',
-      scrollbarWidth: 'none',
-      WebkitOverflowScrolling: 'touch',
-      padding: `0 ${gutter}px`,
-      margin: `0 -${gutter}px`,
-    }}
-  >
-    <style>{`.champions-flat-chips::-webkit-scrollbar{display:none}`}</style>
-    {chips.map((c) => {
-      const active = c.key === activeKey;
-      return (
-        <button
-          key={c.key}
-          type="button"
-          onClick={() => onSelect(c.key)}
-          aria-pressed={active}
-          style={{ ...railChipStyle(active), display: 'inline-flex', alignItems: 'center', gap: 6 }}
-        >
-          {c.short}
-          <span style={{ ...NUM, fontSize: 'inherit', fontWeight: 700, color: 'inherit' }}>
-            {c.figure}
-          </span>
-        </button>
-      );
-    })}
-  </div>
+  <RailChips
+    ariaLabel="Boards"
+    options={chips.map((c) => ({ id: c.key, label: c.short, value: c.figure ?? null }))}
+    value={activeKey}
+    onChange={(next) => onSelect(next as LegendCategory)}
+    style={{ padding: `0 ${gutter}px`, margin: `0 -${gutter}px` }}
+  />
 );
 
 /* --------------------------------------------------------- CHAMPION LINE */
