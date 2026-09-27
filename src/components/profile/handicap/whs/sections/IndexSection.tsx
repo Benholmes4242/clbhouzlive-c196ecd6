@@ -3,13 +3,13 @@
  *
  * No heading, no kicker: the index figure IS the headline. Headline row
  * (HANDICAP INDEX + value left, window movement + window label right), then
- * range chips, then the scrubbable step chart. There is NO separate readout:
+ * range chips, then the scrubbable index curve. There is NO separate readout:
  * the scrub mutates the headline in place, and nothing else moves.
  *
  * RULES (do not relax them):
  *
  * - THE SERIES IS THE ONE ALREADY ON SCREEN: useHandicapHistory(…, 'all').
- *   No new read. The line is a step function of the index in force.
+ *   No new read. The line is a monotone curve through the index in force.
  *
  * - NO CAUSAL CLAIM. No point can be joined to a round, so the scrub says
  *   "THIS STEP", never "this round" (BRIEF_WALK_YOUR_INDEX_DATA_CHECK).
@@ -19,13 +19,13 @@
  * - LANDING MOVEMENT is window end minus window start. Down = improved tone,
  *   up = drifted tone, zero = A.DIM and reads "0.0".
  *
- * - THE LINE IS ONE COLOUR, SET BY THE WINDOW (BRIEF_INDEX_LINE_SOFTENED_STEPS):
+ * - THE LINE IS ONE COLOUR, SET BY THE WINDOW (BRIEF_INDEX_LINE_SMOOTH_CURVE):
  *   `windowNet` is computed ONCE and drives both the headline movement figure
  *   and the stroke/fill tone. Scrub never recolours the line.
  *
- * - SOFTENED STAIRCASE: still a step function; each corner is a quadratic with
- *   its control point ON the corner, r = min(RADIUS_MAX, run/2, |rise|/2), so
- *   the arc can never pass beyond a value the member actually held.
+ * - MONOTONE CURVE (Fritsch–Carlson), never Catmull-Rom/cardinal/basis: those
+ *   overshoot and draw an index the member never held. The curve misstates
+ *   TIMING only; the scrub states timing exactly. Flat lead/trail stay flat.
  *
  * - FILL: same path data as the stroke + two closing edges to the plot bottom.
  *
@@ -61,28 +61,56 @@ const PAD_T = 22;
 const PAD_B = 22;
 /** Scrub within this many px of the high/low point and its label yields. */
 const LABEL_YIELD_PX = 36;
-/** Absolute corner cap: keeps a sparse window reading as hold-then-jump. */
-const RADIUS_MAX = 9;
 const FILL_ALPHA = { down: 0.26, up: 0.16 } as const;
 
-/** Softened staircase through step points, holding the last value to xEnd. */
-export function softStepPath(p: Array<[number, number]>, xEnd: number): string {
+/**
+ * MONOTONE CUBIC HERMITE (Fritsch–Carlson) through the points, holding the
+ * last value flat to xEnd. Slopes from neighbouring secants, zeroed at every
+ * local extremum and wherever a secant is zero, scaled back where
+ * alpha² + beta² > 9. One cubic Bézier per interval, controls at thirds.
+ * Never overshoots: the curve's y extent is the series' own min/max. Points
+ * sharing an x (same-day observations) join with a straight vertical.
+ */
+export function monotonePath(p: Array<[number, number]>, xEnd: number): string {
+  const n = p.length;
   let d = `M ${p[0][0]} ${p[0][1]}`;
-  for (let i = 1; i < p.length; i++) {
-    const [X, y1] = p[i];
-    const [x0, y0] = p[i - 1];
-    const rise = y1 - y0;
-    if (Math.abs(rise) < 0.01) continue; // zero rise: plain run, no arcs
-    const nextX = i + 1 < p.length ? p[i + 1][0] : xEnd;
-    const r = Math.min(RADIUS_MAX, (X - x0) / 2, (nextX - X) / 2, Math.abs(rise) / 2);
-    if (r < 0.5) {
-      d += ` L ${X} ${y0} L ${X} ${y1}`;
-      continue;
+  if (n > 1) {
+    const dx: number[] = [];
+    const sec: number[] = [];
+    for (let i = 0; i < n - 1; i++) {
+      dx.push(p[i + 1][0] - p[i][0]);
+      sec.push(dx[i] > 0 ? (p[i + 1][1] - p[i][1]) / dx[i] : 0);
     }
-    const s = Math.sign(rise);
-    d += ` L ${X - r} ${y0} Q ${X} ${y0} ${X} ${y0 + s * r} L ${X} ${y1 - s * r} Q ${X} ${y1} ${X + r} ${y1}`;
+    const m: number[] = new Array(n).fill(0);
+    m[0] = sec[0];
+    m[n - 1] = sec[n - 2];
+    for (let i = 1; i < n - 1; i++) {
+      m[i] = sec[i - 1] * sec[i] <= 0 || dx[i - 1] <= 0 || dx[i] <= 0 ? 0 : (sec[i - 1] + sec[i]) / 2;
+    }
+    for (let i = 0; i < n - 1; i++) {
+      if (dx[i] <= 0) { m[i] = 0; m[i + 1] = 0; continue; }
+      if (sec[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+      const al = m[i] / sec[i];
+      const be = m[i + 1] / sec[i];
+      if (al < 0) m[i] = 0;
+      if (be < 0) m[i + 1] = 0;
+      const h = al * al + be * be;
+      if (h > 9) {
+        const t = 3 / Math.sqrt(h);
+        m[i] = t * al * sec[i];
+        m[i + 1] = t * be * sec[i];
+      }
+    }
+    for (let i = 0; i < n - 1; i++) {
+      const [x0, y0] = p[i];
+      const [x1, y1] = p[i + 1];
+      if (dx[i] <= 0) { d += ` L ${x1} ${y1}`; continue; }
+      const h3 = dx[i] / 3;
+      d += ` C ${x0 + h3} ${y0 + m[i] * h3} ${x1 - h3} ${y1 - m[i + 1] * h3} ${x1} ${y1}`;
+    }
   }
-  return `${d} L ${xEnd} ${p[p.length - 1][1]}`;
+  const [lx, ly] = p[n - 1];
+  return lx < xEnd ? `${d} L ${xEnd} ${ly}` : d;
 }
 
 type WindowKey = '30d' | '90d' | '12m';
@@ -212,7 +240,7 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
     // Worse (higher index) is HIGHER on screen; SVG y grows down, so subtract.
     const y = (v: number) => PAD_T + (1 - (v - lo) / (hi - lo)) * (CHART_H - PAD_T - PAD_B);
     const xs = pts.map((p) => x(p.ts));
-    const line = softStepPath(pts.map((p, i) => [xs[i], y(p.v)] as [number, number]), w);
+    const line = monotonePath(pts.map((p, i) => [xs[i], y(p.v)] as [number, number]), w);
     // One path, two uses: the fill is the stroke's own data plus two closing edges.
     const fill = `${line} L ${w} ${CHART_H} L ${xs[0]} ${CHART_H} Z`;
     let hiIdx = 0;
@@ -426,7 +454,7 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
                   d={geo.line}
                   fill="none"
                   stroke={segColor[lineTone]}
-                  strokeWidth={2.4}
+                  strokeWidth={2.2}
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
