@@ -27,9 +27,12 @@ describe('C1 course rating consistency', () => {
   });
 
   it('keeps the requested category order on both tabs', () => {
+    const block = src('src/components/courses/course-detail/CategoryScores.tsx');
     const course = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const reviews = src('src/components/courses/course-detail/reviews/WhatTheyScored.tsx');
-    for (const file of [course, reviews]) {
+    const browse = src('src/components/courses/BrowseCourseCard.tsx');
+    for (const file of [course, reviews, browse]) expect(file).toContain('<CategoryScores');
+    for (const file of [block]) {
       expect(file.indexOf("label: 'Design'")).toBeLessThan(file.indexOf("label: 'Condition'"));
       expect(file.indexOf("label: 'Condition'")).toBeLessThan(file.indexOf("label: 'Clubhouse'"));
       expect(file.indexOf("label: 'Clubhouse'")).toBeLessThan(file.indexOf("label: 'Facilities'"));
@@ -40,8 +43,10 @@ describe('C1 course rating consistency', () => {
     const course = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const reviews = src('src/components/courses/course-detail/reviews/TheScore.tsx');
     const card = src('src/components/posts/ReviewBottomSheet.tsx');
-    expect(course).toContain('tone={courseSubScoreTone(score)}');
-    expect(reviews).toContain('const scoreColor = courseSubScoreTone(score)');
+    const block = src('src/components/courses/course-detail/CategoryScores.tsx');
+    expect(course).toContain('<OverallScoreLine');
+    expect(reviews).toContain('<OverallScoreLine');
+    expect(block).toContain('const tone = courseSubScoreTone(score)');
     expect(card).toContain('const ratingColor = courseSubScoreTone(rating)');
   });
 
@@ -50,11 +55,13 @@ describe('C1 course rating consistency', () => {
     const reviews = src('src/components/courses/course-detail/reviews/WhatTheyScored.tsx');
     const row = src('src/components/courses/course-detail/reviews/reviewFlatBits.tsx');
     const browse = src('src/components/courses/BrowseCourseCard.tsx');
-    expect(course).toContain('value == null ? []');
-    expect(course).toContain('courseSubScoreTone(value)');
-    expect(reviews.match(/courseSubScoreTone\(row\.value\)/g)).toHaveLength(2);
+    const block = src('src/components/courses/course-detail/CategoryScores.tsx');
+    expect(block).toContain('if (value == null) return <div');
+    expect(block).toContain("const tone = courseSubScoreTone(value)");
+    expect(block).toContain("Math.min(100, (value / 10) * 100)");
+    expect(reviews).not.toContain('courseSubScoreTone');
     expect(row).toContain('courseSubScoreTone(value)');
-    expect(browse.match(/courseSubScoreTone\(score\)/g)).toHaveLength(1);
+    expect(browse).not.toContain('courseSubScoreTone');
     expect(browse).not.toContain('COURSE_RATING_THEMES');
     expect(browse).not.toContain('getRatingTier');
   });
@@ -82,8 +89,7 @@ describe('C1 course rating consistency', () => {
       'src/components/courses/CourseCommunityRating.tsx',
       'src/components/courses/CourseSearchSheet.tsx',
       'src/components/business/hero/BusinessProfileHero.tsx',
-      'src/components/courses/course-detail/reviews/TheScore.tsx',
-      'src/components/courses/course-detail/about/WhatPeopleSay.tsx',
+      'src/components/courses/course-detail/CategoryScores.tsx',
       'src/components/courses/phase5/PersonalReviewCard.tsx',
       'src/components/courses/review/ReviewBlockFlat.tsx',
       'src/components/explore-tab-new/courseled/ReviewTile.tsx',
@@ -110,7 +116,7 @@ describe('C1 course rating consistency', () => {
   it('preserves viewing-member amber and moves the composer onto the course rule', () => {
     const about = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const rows = src('src/components/courses/course-detail/reviews/reviewFlatBits.tsx');
-    expect(about).toContain('tone={A.AMBER_DEEP}');
+    expect(about).toContain('aboutFig(22, A.AMBER_DEEP)');
     expect(rows).toContain('isMine ? A.AMBER : courseSubScoreTone(score)');
 
     /* THE COMPOSER PREVIEWS THE COURSE PAGE (phase 2 §8). The dial value, the

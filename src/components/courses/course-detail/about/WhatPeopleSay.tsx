@@ -23,12 +23,11 @@ import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
-import { getRatingTier, TIER_LABEL_STYLE } from '@/lib/ratingTier';
-import { A, SANS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { CategoryScores, OverallScoreLine } from '../CategoryScores';
 import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
 
-/** Below this the score is shown but not called settled. */
-export const SETTLED_MIN_RATINGS = 5;
+export { SETTLED_MIN_RATINGS } from '../CategoryScores';
 
 interface WhatPeopleSayProps {
   courseId: string;
@@ -38,28 +37,13 @@ interface WhatPeopleSayProps {
   onSeeAllReviews?: () => void;
 }
 
-const Figure: React.FC<{
-  label: string;
-  value: string;
-  tone: string;
-  size?: number;
-  tier?: string | null;
-}> = ({ label, value, tone, size = 34, tier }) => (
-  <div style={{ minWidth: 0 }}>
-    <div style={{ ...aboutFig(size, tone), lineHeight: 1, whiteSpace: 'nowrap' }}>{value}</div>
+const YoursFigure: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <div style={{ minWidth: 0, flexShrink: 0, textAlign: 'right' }}>
+    {/* Amber here means "yours", not a score band. */}
+    <div style={{ ...aboutFig(22, A.AMBER_DEEP), lineHeight: 1, whiteSpace: 'nowrap' }}>{value}</div>
     <div style={{ ...ABOUT_KICKER, marginTop: 6 }}>{label}</div>
-    {tier ? (
-      <div style={{ ...TIER_LABEL_STYLE, fontSize: 11, color: tone, marginTop: 4 }}>{tier}</div>
-    ) : null}
   </div>
 );
-
-const CATEGORY_FIGURES = [
-  { key: 'avg_design_score', label: 'Design' },
-  { key: 'avg_condition_score', label: 'Condition' },
-  { key: 'avg_clubhouse_score', label: 'Clubhouse' },
-  { key: 'avg_facilities_score', label: 'Facilities' },
-] as const;
 
 const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   courseId,
@@ -76,25 +60,22 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   const total = aggregates?.review_count ?? 0;
   const score = aggregates?.avg_overall_score ?? 0;
   const yours = userRating?.rating ?? null;
-  const categoryFigures = CATEGORY_FIGURES.flatMap(({ key, label }) => {
-    const value = aggregates?.[key];
-    return value == null ? [] : [{ key, label, value }];
-  });
 
   const rateAction = (
     <button
       type="button"
       onClick={onRateClick}
       style={{
-        display: 'block',
+        display: 'inline-block',
         marginTop: 14,
-        background: 'transparent',
-        border: 0,
-        padding: 0,
+        background: 'rgba(255,255,255,0.06)',
+        border: `1px solid ${A.BORDER}`,
+        borderRadius: 11,
+        padding: '8px 14px',
         cursor: 'pointer',
         fontFamily: SANS,
         fontSize: 13,
-        fontWeight: 600,
+        fontWeight: 700,
         color: A.INK,
         textAlign: 'left',
       }}
@@ -118,54 +99,24 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
     );
   }
 
-  const settled = total >= SETTLED_MIN_RATINGS;
-
   return (
     <AboutSection heading={heading} meta={t('courseDetail.communityScore.basedOn', { count: total })}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20 }}>
-        <Figure
-          label={t('courseDetail.rating.overall')}
-          value={score.toFixed(1)}
-          tone={courseSubScoreTone(score)}
-          tier={settled ? getRatingTier(score) : null}
-        />
-        {yours != null ? (
-          <Figure
-            label={t('courseDetail.rating.yours')}
-            value={yours.toFixed(1)}
-            // Amber here means "yours", not a score band.
-            tone={A.AMBER_DEEP}
-            size={22}
-          />
-        ) : null}
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <OverallScoreLine score={score} ratingCount={total} />
+        </div>
+        {yours != null ? <YoursFigure label={t('courseDetail.rating.yours')} value={yours.toFixed(1)} /> : null}
       </div>
 
-      {categoryFigures.length > 0 ? (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${categoryFigures.length}, minmax(0, 1fr))`,
-            gap: 12,
-            marginTop: 16,
-          }}
-        >
-          {categoryFigures.map(({ key, label, value }) => (
-            <div key={key} style={{ minWidth: 0 }}>
-              <div style={{ ...aboutFig(15, courseSubScoreTone(value)), lineHeight: 1 }}>
-                {value.toFixed(1)}
-              </div>
-              <div style={{ ...ABOUT_KICKER, marginTop: 5 }}>{label}</div>
-            </div>
-          ))}
-        </div>
-      ) : null}
-
-      {/* THE THIN SENTENCE — the sample is named and its limit stated. */}
-      {!settled ? (
-        <p style={{ margin: '10px 0 0', fontSize: 11.5, lineHeight: 1.5, fontWeight: 600, color: A.MUTE }}>
-          {t('courseDetail.rating.tooFew', { count: total })}
-        </p>
-      ) : null}
+      <CategoryScores
+        marginTop={16}
+        scores={{
+          design: aggregates?.avg_design_score,
+          condition: aggregates?.avg_condition_score,
+          clubhouse: aggregates?.avg_clubhouse_score,
+          facilities: aggregates?.avg_facilities_score,
+        }}
+      />
 
       {rateAction}
 
