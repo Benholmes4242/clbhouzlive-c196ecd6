@@ -35,6 +35,7 @@ import {
   SC_DOUBLE_DARK,
 } from '@/features/courses/components/holes/_constants';
 
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { HcpSection } from './HcpSection';
 import { CHART, sharedMax, type ChartTone } from '../charts';
 
@@ -111,8 +112,7 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
     return (
       <HcpSection
         hairline
-        kicker={t('common:handicap.holes.eyebrow')}
-        heading={t('common:handicap.holes.heading')}
+        heading={t('common:handicap.holes.mergedHeading')}
         meta={t('common:handicap.holes.meta', { count: rounds })}
       >
         <p style={{ margin: 0, fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
@@ -187,17 +187,6 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
   const ringHoles = rings.reduce((s, r) => s + r.data.holes_played, 0);
   const share = worst && ringHoles > 0 ? Math.round((worst.data.holes_played / ringHoles) * 100) : 0;
 
-  const ringSentence =
-    worst && best && worst !== best
-      ? t('common:handicap.holes.parSentence', {
-          worst: worst.parN,
-          worstAvg: worst.data.avg_over.toFixed(2),
-          best: best.parN,
-          bestAvg: best.data.avg_over.toFixed(2),
-          share,
-        })
-      : null;
-
   const missingSentence =
     missing.length > 0
       ? t('common:handicap.holes.parMissing', {
@@ -206,84 +195,76 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
         })
       : null;
 
-  /* ONE COMPONENT, ONE SET OF QUERIES, TWO HEADED BLOCKS (Phase 2 §5.2):
-     "Where the shots go" (par-type cost bars) then "Every hole you've
-     played" (the four-row distribution). Each block states its own basis. */
+  /* ONE CAPTION states the unit once (BRIEF_HANDICAP_TAB_SIMPLIFY §4.4). The
+     share is the existing worst-par-type share, not a new computation. */
+  const holesFmt = totalHoles.toLocaleString('en-GB');
+  const caption =
+    worst && best && worst !== best
+      ? t('common:handicap.holes.captionShare', { holes: holesFmt, n: worst.parN, share })
+      : t('common:handicap.holes.caption', { holes: holesFmt });
+
   const toneColorOf = (tone: ChartTone) =>
     tone === 'up' ? CHART.UP : tone === 'down' ? CHART.DOWN : CHART.AMBER;
 
+  /* ONE SECTION (§4): distribution bar, its key, the cost bars, one caption.
+     Same two reads as before. The four raw counts leave the surface. */
   return (
-    <>
-      <HcpSection hairline heading={t('common:handicap.holes.shotsHeading')}>
-        {rings.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {rings.map((ring) => {
-              const tone = toneColorOf(toneFor(ring));
-              const pct = ringMax > 0 ? Math.max(0, Math.min(1, ring.data.avg_over / ringMax)) : 0;
-              return (
-                <div key={ring.key}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: CHART.INK }}>
-                      {t('common:handicap.holes.parNs', { n: ring.parN })}
-                    </span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
-                      <span style={{ color: tone, marginRight: 8 }}>
-                        {t('common:handicap.holes.overPerHole', { v: ring.data.avg_over.toFixed(2) })}
-                      </span>
+    <HcpSection hairline heading={t('common:handicap.holes.mergedHeading')}>
+      <div
+        aria-hidden
+        style={{ display: 'flex', height: 9, borderRadius: 5, overflow: 'hidden', background: CHART.TRACK }}
+      >
+        {bands.map((b) =>
+          b.count > 0 ? (
+            <div key={b.key} style={{ width: `${(b.count / totalHoles) * 100}%`, background: b.color }} />
+          ) : null,
+        )}
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+        {bands.map((b) => {
+          const pct = totalHoles > 0 ? Math.round((b.count / totalHoles) * 100) : 0;
+          return (
+            <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1, color: b.count === 0 ? CHART.MUTE : b.color, ...FIG }}>
+                {pct}%
+              </div>
+              <div style={{ ...KICKER, fontSize: 8, marginTop: 5 }}>{b.label}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {rings.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 20 }}>
+          {rings.map((ring) => {
+            const tone = toneColorOf(toneFor(ring));
+            const pct = ringMax > 0 ? Math.max(0, Math.min(1, ring.data.avg_over / ringMax)) : 0;
+            return (
+              <div key={ring.key}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: CHART.INK }}>
+                    {t('common:handicap.holes.parNs', { n: ring.parN })}
+                    <span style={{ marginLeft: 8, fontSize: 11, color: CHART.DIM, ...FIG }}>
                       {t('common:handicap.holes.nHoles', { count: ring.data.holes_played })}
                     </span>
-                  </div>
-                  <div style={{ marginTop: 6, height: 6, borderRadius: 3, background: CHART.TRACK, overflow: 'hidden' }}>
-                    <div style={{ width: `${pct * 100}%`, height: '100%', background: tone, borderRadius: 3 }} />
-                  </div>
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: tone, ...FIG }}>
+                    +{ring.data.avg_over.toFixed(2)}
+                  </span>
                 </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* BASIS for the bars: the RPC excludes nine-hole rounds and requires a
-            mapped course; it is deployed, so this states it. */}
-        <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
-          {t('common:handicap.holes.basisRings')}
-        </div>
-
-        {(ringSentence || missingSentence) && (
-          <p style={{ margin: '14px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
-            {[ringSentence, missingSentence].filter(Boolean).join(' ')}
-          </p>
-        )}
-      </HcpSection>
-
-      <HcpSection
-        hairline
-        kicker={t('common:handicap.holes.eyebrow')}
-        heading={t('common:handicap.holes.heading')}
-      >
-        {/* THE OUTCOME DISTRIBUTION — four counts, equal columns, no ring */}
-        <div style={{ display: 'flex', gap: 12 }}>
-          {bands.map((b) => {
-            const pct = totalHoles > 0 ? Math.round((b.count / totalHoles) * 100) : 0;
-            return (
-              <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 16, fontWeight: 700, lineHeight: 1, color: b.count === 0 ? CHART.MUTE : b.color, ...FIG }}>
-                  {b.count}
-                </div>
-                <div style={{ ...KICKER, marginTop: 6 }}>{b.label}</div>
-                <div style={{ marginTop: 3, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
-                  {pct}%
+                <div style={{ marginTop: 6, height: 6, borderRadius: 3, background: CHART.TRACK, overflow: 'hidden' }}>
+                  <div style={{ width: `${pct * 100}%`, height: '100%', background: tone, borderRadius: 3 }} />
                 </div>
               </div>
             );
           })}
         </div>
+      )}
 
-        {/* BASIS for the four counts above. Percentages need their denominator. */}
-        <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: CHART.DIM, ...FIG }}>
-          {t('common:handicap.holes.basisHoles', { count: totalHoles })}
-        </div>
-      </HcpSection>
-    </>
+      <p style={{ margin: '12px 0 0', fontSize: 11.5, color: A.DIM, lineHeight: 1.45, ...FIG }}>
+        {[caption, missingSentence].filter(Boolean).join(' ')}
+      </p>
+    </HcpSection>
   );
 };
 

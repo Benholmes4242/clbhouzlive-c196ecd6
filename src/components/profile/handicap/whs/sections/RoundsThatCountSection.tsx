@@ -173,8 +173,6 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
     course ? Math.round((diff * course.slope) / 113 + course.rating) : null;
 
   const cutScore = cutLine != null ? scoreAt(cutLine) : null;
-  const nextScore = nextDiff != null ? scoreAt(nextDiff) : null;
-  const headroom = cutScore != null && nextScore != null ? nextScore - cutScore : null;
 
   /* ONE CAPTION (BRIEF_HANDICAP_TAB_SIMPLIFY §3.2). The headroom meta is gone:
      "cannot go up" in Next round states that fact once. */
@@ -184,8 +182,6 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
       : cutScore != null
         ? t('common:handicap.roundsThatCount.caption', { cut: cutScore })
         : null;
-  void nextScore;
-  void headroom;
 
   const fallLine = falling
     ? t('common:handicap.roundsThatCount.fallLine', {
