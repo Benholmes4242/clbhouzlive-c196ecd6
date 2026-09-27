@@ -99,6 +99,9 @@ interface Props {
    * Omitted by existing callers, whose caption layout remains unchanged.
    */
   railCaptionLine?: React.ReactNode;
+  /** Optional full-width figure row between photo and text panel, with a
+   *  1px A.SOFT rule beneath it. Omitted by every existing caller. */
+  railFigures?: React.ReactNode;
 
   /**
    * ADDITIVE. With the rail caption layout, allow the NAME two lines and reserve
@@ -176,6 +179,7 @@ export function StandoutTile({
   nameLines = 2,
   factLines = 2,
   railCaptionLine,
+  railFigures,
   captionNameLines = 1,
 
 
@@ -455,6 +459,13 @@ export function StandoutTile({
         </div>
       </CourseImageFallback>
 
+      {railFigures ? (
+        <>
+          {railFigures}
+          <div style={{ height: 1, background: A.SOFT }} />
+        </>
+      ) : null}
+
       {/* TEXT PANEL — no figure here. One figure per tile. */}
       <div style={{ padding: '11px 13px 12px' }}>
         {/* HERO KICKER (§1.3) — the feat kind, so the hero says WHAT it is
@@ -580,7 +591,7 @@ export function StandoutTile({
                 color: isOwn ? A.AMBER_DEEP : A.INK,
                 lineHeight: 1.2,
                 display: '-webkit-box',
-                WebkitLineClamp: 2,
+                WebkitLineClamp: nameLines,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
               }}
