@@ -17,13 +17,10 @@
  *   readout says what the index WAS on a date — "ON THIS DATE", never
  *   "this round". Absent beats approximated.
  *
- * - WINDOWS are measured back from the NEWEST observation, not from today, so
- *   a member who has not played for six weeks still gets a real 30D window.
- *   The axis runs to today on the right (the newest index is still in force),
- *   so the step holds flat from the newest observation to TODAY.
+ * - WINDOWS are the last N days ENDING TODAY; see the view memo below.
  *
- * - FEWER THAN TWO OBSERVATIONS in the window: no chart. Heading, chips and
- *   one quiet line; the chips stay so the member can widen the range.
+ * - NO HISTORY AT ALL: no chart. Heading, chips and one quiet line; the chips
+ *   stay live. Any history draws, including the flat case.
  *
  * - MOVEMENT is scrubbed point minus the previous point IN THE WINDOW, in the
  *   INDEX_DELTA dark pair (down green, up red). An index that held reads
@@ -83,6 +80,8 @@ function formatIndex(v: number): string {
 interface Pt {
   ts: number;
   v: number;
+  /** Window edge (index in force), not an observation. */
+  edge?: 'lead' | 'trail';
 }
 
 const IndexSection: React.FC<Props> = ({ connection }) => {
@@ -100,17 +99,33 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
 
   const [win, setWin] = useState<WindowKey>('12m');
 
+  /* THE WINDOW IS THE LAST N DAYS ENDING TODAY (BRIEF_WALK_YOUR_INDEX_WINDOW_ANCHOR).
+     The chip, the kicker and the axis state the same span by construction.
+     The series is the index IN FORCE across the window:
+       - a leading edge point at `start` carrying the last observation at or
+         before start (when one exists),
+       - the observations inside [start, end],
+       - a trailing edge point at `end` carrying the newest index, so the step
+         holds flat to today.
+     Edge points are not observations and never claim a movement. An inactive
+     member's 30D is therefore a flat line — their index has not moved. */
   const view = useMemo(() => {
     if (all.length === 0) return null;
-    const newest = all[all.length - 1].ts;
-    const start = newest - DAYS[win] * MS_PER_DAY;
-    const pts = all.filter((p) => p.ts >= start);
-    const end = Math.max(newest, Date.now());
+    const end = Date.now();
+    const start = end - DAYS[win] * MS_PER_DAY;
+    const before = all.filter((p) => p.ts <= start);
+    const inside = all.filter((p) => p.ts > start && p.ts <= end);
+    const pts: Pt[] = [];
+    if (before.length) pts.push({ ts: start, v: before[before.length - 1].v, edge: 'lead' });
+    pts.push(...inside);
+    const last = pts[pts.length - 1];
+    if (last && last.ts < end) pts.push({ ts: end, v: last.v, edge: 'trail' });
     return { pts, start, end };
   }, [all, win]);
 
   const pts = view?.pts ?? [];
-  const drawable = pts.length >= 2;
+  // NO CHART only when there is no index history at all at or before today.
+  const drawable = pts.length >= 1;
 
   const [sel, setSel] = useState(0);
   // Newest observation on mount and on every range change.
@@ -196,7 +211,8 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   const idx = Math.min(sel, pts.length - 1);
   const cur = pts[idx];
   const prev = idx > 0 ? pts[idx - 1] : null;
-  const delta = cur && prev ? cur.v - prev.v : null;
+  // Edge points never claim movement: lead reads FIRST IN WINDOW, trail NO CHANGE.
+  const delta = !cur || cur.edge === 'lead' || !prev ? null : cur.edge === 'trail' ? 0 : cur.v - prev.v;
   const held = delta != null && Math.abs(delta) < 0.05;
 
   const kickerKey: Record<WindowKey, string> = {
