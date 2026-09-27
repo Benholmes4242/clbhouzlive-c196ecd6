@@ -22,6 +22,7 @@
  * NINE HOLES CARRY NO MARK HERE: WHS states every differential on an
  * eighteen-hole basis, so every point is already on one scale.
  */
+import { countsTowardIndex } from '@/lib/whs/counting';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -80,7 +81,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
         id: r.id,
         play_date: r.play_date,
         diff: r.handicap_differential ?? null,
-        is_counter: !!r.is_counter,
+        is_counter: countsTowardIndex(r),
         course_id: r.course_id ?? null,
         course_name: r.course?.name ?? null,
         course_rating: r.course_rating ?? null,
