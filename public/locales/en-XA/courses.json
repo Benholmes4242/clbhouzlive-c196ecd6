@@ -802,8 +802,8 @@
       "youRankOf": "[~~{{rank}}{{suffix}} őƒ {{count}}~~]",
       "youValue": "[~~Ýőú {{value}}~~]",
       "jointTwo": "[~~{{first}} & {{second}}~~]",
-      "jointMany": "[~~{{first}} & {{count}} others~~]",
-      "youShare": "[~~You share this board~~]"
+      "jointMany": "[~~{{first}} & {{count}} őţĥéřš~~]",
+      "youShare": "[~~Ýőú šĥářé ţĥíš ƀőářđ~~]"
     },
     "sections": {
       "aboutThisPlace": "[[Àbóút thís plãçé]]",
@@ -933,10 +933,10 @@
     },
     "youTab": {
       "grabs": {
-        "heldJointTwo": "[~~{{first}} and {{second}} jointly hold the course record here with {{value}}.~~]",
-        "heldJointMany": "[~~{{first}} and {{count}} others jointly hold the course record here with {{value}}.~~]",
-        "yoursJointTwo": "[~~You and {{other}} jointly hold the course record here with {{value}}.~~]",
-        "yoursJointMany": "[~~You and {{count}} others jointly hold the course record here with {{value}}.~~]"
+        "heldJointTwo": "[~~{{first}} áñđ {{second}} ĵőíñţļý ĥőļđ ţĥé ĉőúřšé řéĉőřđ ĥéřé ŵíţĥ {{value}}.~~]",
+        "heldJointMany": "[~~{{first}} áñđ {{count}} őţĥéřš ĵőíñţļý ĥőļđ ţĥé ĉőúřšé řéĉőřđ ĥéřé ŵíţĥ {{value}}.~~]",
+        "yoursJointTwo": "[~~Ýőú áñđ {{other}} ĵőíñţļý ĥőļđ ţĥé ĉőúřšé řéĉőřđ ĥéřé ŵíţĥ {{value}}.~~]",
+        "yoursJointMany": "[~~Ýőú áñđ {{count}} őţĥéřš ĵőíñţļý ĥőļđ ţĥé ĉőúřšé řéĉőřđ ĥéřé ŵíţĥ {{value}}.~~]"
       }
     }
   },
