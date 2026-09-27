@@ -242,7 +242,7 @@ const ManageMyRequestsPage = lazy(() => import("./pages/manage/MyRequestsPage"))
 const SupportThreadPage = lazy(() => import("./pages/manage/SupportThreadPage"));
 const ManageLegalPage = lazy(() => import("./pages/manage/LegalPage"));
 const ManageHandicapPage = lazy(() => import("./pages/manage/HandicapManagePage"));
-// ProfileHandicapView removed — /profile/handicap now redirects to /handicap (fix brief §2.1)
+// /handicap and its legacy aliases redirect to the self-only Handicap tab on /profile.
 const HandicapRedirect = lazy(() => import("./pages/HandicapRedirect"));
 const RivalryCompareRedirect = lazy(() => import("./pages/RivalryCompareRedirect"));
 
