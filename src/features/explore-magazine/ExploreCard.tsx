@@ -77,6 +77,9 @@ export interface RoundCardEngagement {
   commentAvailable: boolean;
   onToggleLike?: () => void;
   onOpenComments?: () => void;
+  /** ensure_round_post is in flight for this round: the comment control is
+   *  inert so the first tap cannot double-fire. */
+  commentPending?: boolean;
   /** THE SCORE ID, under source 'round'. Never post.postId (the comments id). */
   reactionSubjectId?: string | null;
   /** The round owner's FIRST name, as the card's who-line shows it. */
@@ -460,9 +463,10 @@ function WhoLine({
           </span>
         ) : (
           <span role="button" tabIndex={0} aria-label={`Comments, ${engagement.commentCount}`}
-            onClick={(event) => { stop(event); engagement.onOpenComments?.(); }}
-            onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); engagement.onOpenComments?.(); }}
-            style={{ minWidth: 44, height: 44, margin: '-6px 0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: subColor, cursor: 'pointer' }}>
+            aria-disabled={engagement.commentPending || undefined}
+            onClick={(event) => { stop(event); if (!engagement.commentPending) engagement.onOpenComments?.(); }}
+            onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); if (!engagement.commentPending) engagement.onOpenComments?.(); }}
+            style={{ minWidth: 44, height: 44, margin: '-6px 0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: subColor, cursor: engagement.commentPending ? 'progress' : 'pointer', opacity: engagement.commentPending ? 0.5 : 1 }}>
             <MessageCircle size={CELEBRATE_GLYPH_SIZE} strokeWidth={2} aria-hidden />
             {engagement.commentCount > 0 ? <span style={countStyle}>{engagement.commentCount}</span> : null}
           </span>

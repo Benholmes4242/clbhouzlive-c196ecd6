@@ -35,6 +35,8 @@ import { Z } from '@/config/zIndex';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { toast } from '@/lib/toast';
+import { supabase } from '@/integrations/supabase/client';
 
 import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
@@ -1349,6 +1351,32 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view],
   );
 
+  /* FIRST COMMENT ON A POST-LESS ROUND. The control is inert while the RPC is
+     in flight; the sheet opens only on success; failure is a toast. */
+  const [ensuringScoreId, setEnsuringScoreId] = useState<string | null>(null);
+  const ensuringRef = useRef(false);
+  const ensureRoundPostAndOpen = useCallback(async (scoreId: string) => {
+    if (ensuringRef.current) return;
+    ensuringRef.current = true;
+    setEnsuringScoreId(scoreId);
+    try {
+      // ensure_round_post is hand-run SQL (docs/sql/ensure_round_post.sql) and
+      // is not yet in the generated types.
+      const { data, error } = await (supabase.rpc as unknown as (
+        fn: string, args: Record<string, unknown>,
+      ) => Promise<{ data: string | null; error: unknown }>)('ensure_round_post', { p_whs_score_id: scoreId });
+      if (error || !data) throw error ?? new Error('no post id');
+      setOpenCommentsPostId(data);
+      void queryClient.invalidateQueries({ queryKey: ["round-post-comments"] });
+    } catch (err) {
+      console.error('[round-comments] ensure_round_post failed', err);
+      toast.error('Could not open comments. Please try again.');
+    } finally {
+      ensuringRef.current = false;
+      setEnsuringScoreId(null);
+    }
+  }, [queryClient]);
+
   const engagementFor = useCallback((item: StreamItem) => {
     const scoreId = item.kind === 'round' ? item.facts.score_id : null;
     if (!scoreId || roundReactions.unavailable) return null;
@@ -1360,7 +1388,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       liked: state.mine,
       likeAvailable,
       commentCount: post?.commentCount ?? 0,
-      commentAvailable: !!post,
+      // EVERY ROUND IS COMMENTABLE. A round with no post gets one on first
+      // comment via ensure_round_post (owned by the round's owner, backdated,
+      // excluded from Clubhouse by post_type 'round' + round_pool_cap 0).
+      commentAvailable: true,
+      commentPending: ensuringScoreId === scoreId,
       reactionSubjectId: scoreId,
       ownerName: item.who?.display_name?.trim().split(/\s+/)[0] || null,
       isOwnRound: item.who?.is_viewer ?? false,
@@ -1368,12 +1400,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         analyticsEvents.track('explore_round_like_toggled', { score_id: scoreId, liked: !state.mine, view });
         roundReactions.toggle('round', scoreId);
       } : undefined,
-      onOpenComments: post ? () => {
+      onOpenComments: () => {
         analyticsEvents.track('explore_round_comments_opened', { score_id: scoreId, view });
-        setOpenCommentsPostId(post.postId);
-      } : undefined,
+        if (post) { setOpenCommentsPostId(post.postId); return; }
+        void ensureRoundPostAndOpen(scoreId);
+      },
     };
-  }, [roundPosts, roundReactions, view]);
+  }, [ensureRoundPostAndOpen, ensuringScoreId, roundPosts, roundReactions, view]);
 
   const tapWho = useCallback(
     (item: StreamItem) => {
