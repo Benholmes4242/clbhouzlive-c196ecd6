@@ -753,6 +753,7 @@
       "bodyLineNoNext": "[~~Every one of your last twenty counts right now.~~]",
       "fallLine": "[~~Your {{date}} round drops out of the twenty in {{falls}}.~~]",
       "headingCount": "[~~{{count}} őƒ ýőúř ļášţ 20 ĉőúñţ~~]",
+      "nextInLine": "[~~ñéxţ íñ ļíñé~~]",
       "caption": "[~~Áñýţĥíñĝ úñđéř {{cut}} řéƥļáĉéš őñé őƒ ţĥéɱ.~~]"
     },
     "scoring": {

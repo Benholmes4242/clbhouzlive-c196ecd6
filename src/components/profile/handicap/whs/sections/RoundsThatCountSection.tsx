@@ -3,7 +3,7 @@
  *
  * Flat replacement for RoundsThatCountCard: no panel, no border, no radius, no
  * background tint. Kicker, heading, "{n} count" meta, a reserved selection
- * slot, the existing CountingScatter, and ONE generated sentence.
+ * slot, LastTwentyBars (bars above, the eight below), and ONE generated sentence.
  *
  * WHAT IS GONE FROM THIS SECTION, BY CONSTRUCTION:
  *  - The NEXT ROUND / "{target} CUTS" / CAN'T RISE footer strip. Section C is
@@ -36,7 +36,7 @@ import { formatDayMonthShortGB } from '@/i18n/format';
 import { HcpSection } from './HcpSection';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import { CHART } from '../charts';
-import CountingScatter, { type CountingRound } from '../charts/CountingScatter';
+import LastTwentyBars from '../charts/LastTwentyBars';
 
 /** A full rolling window. Below this the section states the sample instead. */
 const MIN_ROUNDS = 20;
@@ -144,11 +144,6 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
     );
   }
 
-  const points: CountingRound[] = window20.map((r) => ({
-    diff: r.diff ?? 0,
-    state: countsTowardIndex(r) ? 'counts' : 'none',
-  }));
-
   // Falls-off-in: chronological position i drops out after i+1 more rounds.
   // Only counters inside the horizon matter — a non-counter leaving changes
   // nothing the member can feel. Returns the index too, for the round's date.
@@ -171,6 +166,12 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
      score to BEAT; this only describes where the line already sits. */
   const scoreAt = (diff: number) =>
     course ? Math.round((diff * course.slope) / 113 + course.rating) : null;
+
+  /* Strip figures: the score at the line's course, else the differential. */
+  const fmtFigure = (d: number) => {
+    const sc = scoreAt(d);
+    return sc != null ? String(sc) : fmtDiff(d);
+  };
 
   const cutScore = cutLine != null ? scoreAt(cutLine) : null;
 
@@ -269,13 +270,13 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
           )}
         </div>
 
-        <CountingScatter
-          rounds={points}
-          showLegend={false}
+        <LastTwentyBars
+          rounds={window20.map((r) => ({ diff: r.diff, counts: countsTowardIndex(r) }))}
+          eight={[...counterDiffs].sort((x, y) => x - y).map(fmtFigure)}
+          next={nextDiff != null ? fmtFigure(nextDiff) : null}
+          nextLabel={t('common:handicap.roundsThatCount.nextInLine')}
           selectedIndex={selIdx}
           onSelectIndex={onSelect}
-          cutLine={cutLine}
-          cutLabel={cutScore != null ? String(cutScore) : null}
         />
 
         {bodyLine && (

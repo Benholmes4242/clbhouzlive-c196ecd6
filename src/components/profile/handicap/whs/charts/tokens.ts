@@ -35,6 +35,8 @@ export const CHART = {
   DIM: inkWithAlpha(INK_BASE, 0.40),
   TRACK: inkWithAlpha(INK_BASE, 0.10),
   FAINT: inkWithAlpha(INK_BASE, 0.22),
+  /** A bar that does not count (BRIEF_LAST_20_BARS_AND_THE_EIGHT §2.3). */
+  BAR_IDLE: inkWithAlpha(INK_BASE, 0.24),
   /* OPAQUE, NOT AN ALPHA. FAINT is ink at 0.22, so a dot drawn with it
      shifts tone wherever the trace passes behind it, and at a smaller
      radius it washes out against the canvas. This is the same colour
