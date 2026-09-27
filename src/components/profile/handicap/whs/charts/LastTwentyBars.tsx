@@ -56,7 +56,7 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, selec
 
   return (
     <div>
-      <div style={{ display: 'flex', columnGap: `${(GAP_U / VIEW_W) * 100}%`, alignItems: 'flex-end', height: BAR_AREA }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', columnGap: `${(GAP_U / VIEW_W) * 100}%`, alignItems: 'flex-end', height: BAR_AREA }}>
         {rounds.map((r, i) => (
           <button
             key={i}
