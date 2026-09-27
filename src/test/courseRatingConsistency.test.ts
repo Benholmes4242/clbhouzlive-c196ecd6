@@ -57,7 +57,7 @@ describe('C1 course rating consistency', () => {
     const browse = src('src/components/courses/BrowseCourseCard.tsx');
     const block = src('src/components/courses/course-detail/CategoryScores.tsx');
     expect(block).toContain('if (value == null) return <div');
-    expect(block.match(/courseSubScoreTone\(value\)/g)).toHaveLength(1);
+    expect(block).toContain("const tone = courseSubScoreTone(value)");
     expect(block.match(/value \/ 10\) \* 100/g)).toHaveLength(1);
     expect(reviews).not.toContain('courseSubScoreTone');
     expect(row).toContain('courseSubScoreTone(value)');
