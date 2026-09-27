@@ -662,7 +662,7 @@ const BusinessProfilePage: React.FC = () => {
             options={tabs.map((tab) => ({ id: tab.id, label: tab.label }))}
             value={activeTab}
             onChange={(id) => {
-              setActiveTab(id);
+              setActiveTab(id as BusinessTab);
               void analyticsEvents.track('business_tab_changed', {
                 business_id: business.id,
                 to: id,
