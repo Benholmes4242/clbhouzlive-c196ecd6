@@ -218,6 +218,9 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           <nav style={{ marginTop: 4, flexShrink: 0 }}>
             {DESTINATIONS.filter(({ id }) => id !== 'live' || showLive).map(({ id, labelKey, Icon }) => {
               const isActive = id === activeTab;
+              /* NOT A CHIP ROW (BRIEF_CHIP_SWEEP_PASS_1_FOLLOW_UPS §4): a navigation
+                 menu — tapping switches the tour tab and closes the menu. Its
+                 solid selected row is deliberate; chip sweeps leave it alone. */
               return (
                 <button
                   key={id}

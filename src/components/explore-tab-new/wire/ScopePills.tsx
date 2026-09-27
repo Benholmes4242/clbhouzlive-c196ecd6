@@ -72,7 +72,7 @@ export function ScopePills({ lens, onChange, style }: Props) {
             role="tab"
             aria-selected={active}
             onClick={() => onChange(id)}
-            style={{ ...railChipStyle(active), flex: 'none' }}
+            style={railChipStyle(active)}
           >
             {t(key, fallback)}
           </button>

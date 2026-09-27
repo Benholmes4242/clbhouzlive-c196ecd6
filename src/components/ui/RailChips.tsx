@@ -121,9 +121,29 @@ const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 const SELECTED_EDGE = 'rgba(255,255,255,0.28)';
 
 /**
- * THE CANONICAL CHOICE-CHIP STYLE (BRIEF_ONE_CHIP_SWEEP_PASS_1). Rows that
- * cannot mount RailChips itself (node labels, deselect, wrap, a count inside
- * the chip) take their chip style from here — never restate the values.
+ * THE PUBLISHED CHIP STYLE — A BOUNDED EXCEPTION (BRIEF_CHIP_SWEEP_PASS_1_FOLLOW_UPS §2).
+ *
+ * These values exist ONLY for rows that cannot use the RailChips component.
+ * The list of such rows is closed; each is named with the one capability the
+ * component lacks:
+ *
+ *   PillFilterRow (explore-tab-new/courseled) — React-node labels,
+ *                                               tap-again-to-clear, wrapping
+ *   BoardChips (championsFlatBits)            — a count inside the chip
+ *   CourseMediaHeader                         — a count inside the chip
+ *   StickyFilterBar (profile/courses)         — a count inside the chip
+ *   ActivityPageV2 ChipButton                 — a count inside the chip
+ *   ScopePills (explore-tab-new/wire)         — the row element itself must be
+ *                                               position:sticky (RailChips'
+ *                                               `style` is margin/padding only)
+ *
+ * A NEW row may NOT join this list. If it needs a capability the component
+ * lacks, add that capability to RailChips instead.
+ *
+ * Every reader SPREADS this object. No reader restates a value and no reader
+ * overrides one; it may only ADD layout for its own contents (display,
+ * alignItems, gap for an inner count). A row that needs a different value is a
+ * second treatment and comes back here for a ruling.
  */
 export function railChipStyle(active: boolean, size: 'sm' | 'md' = 'md'): CSSProperties {
   const geo = RAIL_CHIP_GEOMETRY[size];

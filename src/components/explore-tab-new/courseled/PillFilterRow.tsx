@@ -89,7 +89,7 @@ export function PillFilterRow<T extends string>({
             role="tab"
             aria-selected={active}
             onClick={() => emit(active && deselectable ? null : option.value)}
-            style={{ ...railChipStyle(active), flex: 'none' }}
+            style={railChipStyle(active)}
           >
             {option.label}
           </button>
