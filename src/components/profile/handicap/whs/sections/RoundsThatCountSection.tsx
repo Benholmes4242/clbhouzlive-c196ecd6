@@ -126,7 +126,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
 
   if (isLoading || total === 0) return null;
 
-  const counterCount = window20.filter((r) => r.is_counter).length;
+  const counterCount = window20.filter(countsTowardIndex).length;
 
   // ── Withheld: fewer than a full window ────────────────────────────────
   if (withheld) {
@@ -146,7 +146,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
 
   const points: CountingRound[] = window20.map((r) => ({
     diff: r.diff ?? 0,
-    state: r.is_counter ? 'counts' : 'none',
+    state: countsTowardIndex(r) ? 'counts' : 'none',
   }));
 
   // Falls-off-in: chronological position i drops out after i+1 more rounds.
@@ -154,7 +154,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
   // nothing the member can feel. Returns the index too, for the round's date.
   const falling = (() => {
     for (let i = 0; i < Math.min(FALLING_HORIZON, window20.length); i++) {
-      if (window20[i].is_counter) return { idx: i, fallsIn: i + 1 };
+      if (countsTowardIndex(window20[i])) return { idx: i, fallsIn: i + 1 };
     }
     return null;
   })();
@@ -162,9 +162,9 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
   /* THE COUNTS-BELOW LINE. It rules across at the WORST differential that
      still counts, so every counter sits on or below it and every non-counter
      above. Null when the counter set is empty — nothing to rule. */
-  const counterDiffs = window20.filter((r) => r.is_counter && r.diff != null).map((r) => r.diff as number);
+  const counterDiffs = window20.filter((r) => countsTowardIndex(r) && r.diff != null).map((r) => r.diff as number);
   const cutLine = counterDiffs.length ? Math.max(...counterDiffs) : null;
-  const nonCounterDiffs = window20.filter((r) => !r.is_counter && r.diff != null).map((r) => r.diff as number);
+  const nonCounterDiffs = window20.filter((r) => !countsTowardIndex(r) && r.diff != null).map((r) => r.diff as number);
   const nextDiff = nonCounterDiffs.length ? Math.min(...nonCounterDiffs) : null;
 
   /* PLAIN ROUNDING, deliberately NOT the next-round ceil-minus-one: that is a
@@ -214,7 +214,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
     setSelIdx(i);
     analyticsEvents.track('handicap_counting_point_tapped', {
       score_id: r.id,
-      counts: r.is_counter,
+      counts: countsTowardIndex(r),
       position: i + 1,
       of: window20.length,
     });
@@ -262,7 +262,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                   style={{
                     fontSize: 16,
                     fontWeight: 700,
-                    color: selected.is_counter ? CHART.DOWN : CHART.MUTE,
+                    color: countsTowardIndex(selected) ? CHART.DOWN : CHART.MUTE,
                     ...FIG,
                   }}
                 >
@@ -274,10 +274,10 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                     fontWeight: 700,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
-                    color: selected.is_counter ? CHART.DOWN : CHART.DIM,
+                    color: countsTowardIndex(selected) ? CHART.DOWN : CHART.DIM,
                   }}
                 >
-                  {selected.is_counter
+                  {countsTowardIndex(selected)
                     ? t('common:handicap.roundsThatCount.counts')
                     : t('common:handicap.roundsThatCount.doesNotCount')}
                 </span>

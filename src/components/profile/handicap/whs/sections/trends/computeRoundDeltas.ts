@@ -1,3 +1,4 @@
+import { countsTowardIndex } from '@/lib/whs/counting';
 import type { WhsScoreWithIndex } from '@/lib/whs/types';
 
 export interface RoundWithDelta extends WhsScoreWithIndex {
@@ -35,7 +36,7 @@ export function computeRoundDeltas(
     const isNewest = i === ascending.length - 1;
     const nextRound = isNewest ? null : ascending[i + 1];
 
-    if (!round.is_counter || round.handicap_index_at_time === null) {
+    if (!countsTowardIndex(round) || round.handicap_index_at_time === null) {
       deltas.set(round.id, null);
       continue;
     }
