@@ -77,6 +77,7 @@ export function WeeklyClubShelf({
               photo={TILE.h}
               figure={row.gross_score != null ? String(row.gross_score) : null}
               unit={toParLabel(toPar) ?? undefined}
+              unitTone={toPar != null && toPar < 0 ? A.RED : undefined}
               /* DATE BELONGS UNDER THE MEMBER NAME. Using the fixed calendar
                  formatter prevents "Sun" and "Sun 6 Sep" within one rail. */
               whenLabel=""
