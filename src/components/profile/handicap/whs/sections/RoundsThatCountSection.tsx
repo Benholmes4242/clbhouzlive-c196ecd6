@@ -3,7 +3,7 @@
  *
  * Flat replacement for RoundsThatCountCard: no panel, no border, no radius, no
  * background tint. Kicker, heading, "{n} count" meta, a reserved selection
- * slot, the existing CountingScatter, and ONE generated sentence.
+ * slot, LastTwentyBars (bars above, the eight below), and ONE generated sentence.
  *
  * WHAT IS GONE FROM THIS SECTION, BY CONSTRUCTION:
  *  - The NEXT ROUND / "{target} CUTS" / CAN'T RISE footer strip. Section C is
