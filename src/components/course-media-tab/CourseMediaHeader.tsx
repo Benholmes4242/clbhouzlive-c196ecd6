@@ -1,4 +1,4 @@
-import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
+import { RailChips, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
@@ -86,35 +86,15 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
   }
 
   return (
-    <div
-      role="tablist"
-      aria-label={t('courses:media.filterA11y')}
-      style={{ display: 'flex', alignItems: 'center', gap: RAIL_CHIP_GAP, padding: '0 20px 12px' }}
-    >
-      {FILTER_KEYS.map(({ key, i18nKey }) => {
-        const isActive = activeFilter === key;
-        const count = countFor(key);
-
-        return (
-          <button
-            key={key}
-            role="tab"
-            aria-selected={isActive}
-            onClick={() => onFilterChange(key)}
-            style={{ ...railChipStyle(isActive), display: 'inline-flex', alignItems: 'center', gap: 5 }}
-          >
-            {t(i18nKey)}
-            {(
-              <span style={{
-                fontSize: 11, fontWeight: 700, fontVariantNumeric: 'tabular-nums lining-nums',
-                 color: A.DIM,
-              }}>
-                {count}
-              </span>
-            )}
-          </button>
-        );
-      })}
+    <div style={{ display: 'flex', alignItems: 'center', gap: RAIL_CHIP_GAP, padding: '0 20px 12px' }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <RailChips
+          ariaLabel={t('courses:media.filterA11y')}
+          options={FILTER_KEYS.map(({ key, i18nKey }) => ({ id: key, label: t(i18nKey), count: countFor(key) }))}
+          value={activeFilter}
+          onChange={(next) => onFilterChange(next as typeof activeFilter)}
+        />
+      </div>
 
       {(
         <button

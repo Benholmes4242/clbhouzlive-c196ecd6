@@ -52,6 +52,14 @@ export const RAIL_CHIP_GEOMETRY = {
 export interface RailChipOption {
   id: string;
   label: string;
+  /**
+   * ADDITIVE — A COUNT INSIDE THE CHIP (BRIEF_CHIP_COUNT_CAPABILITY §2). How
+   * many exist, rendered after the label at the same size, 5px gap, A.DIM
+   * unselected / A.MUTE selected, inside the chip's own padding. undefined or
+   * null renders NOTHING (no node, no width change). 0 renders "0" — zero is
+   * an answer, not an absence. Never an unread badge: that is a different fact.
+   */
+  count?: number | null;
 }
 
 export interface RailChipsProps {
@@ -129,13 +137,15 @@ const SELECTED_EDGE = 'rgba(255,255,255,0.28)';
  *
  *   PillFilterRow (explore-tab-new/courseled) — React-node labels,
  *                                               tap-again-to-clear, wrapping
- *   BoardChips (championsFlatBits)            — a count inside the chip
- *   CourseMediaHeader                         — a count inside the chip
- *   StickyFilterBar (profile/courses)         — a count inside the chip
- *   ActivityPageV2 ChipButton                 — a count inside the chip
  *   ScopePills (explore-tab-new/wire)         — the row element itself must be
  *                                               position:sticky (RailChips'
  *                                               `style` is margin/padding only)
+ *
+ * Media All/Photos/Videos and Profile courses All/Top 100 left this list when
+ * `count` landed (BRIEF_CHIP_COUNT_CAPABILITY). Two rows still read it pending
+ * a ruling, because the number they carry is NOT a count:
+ *   BoardChips (championsFlatBits)            — a board's leading score
+ *   ActivityPageV2 ChipButton                 — the amber unread badge
  *
  * A NEW row may NOT join this list. If it needs a capability the component
  * lacks, add that capability to RailChips instead.
@@ -225,6 +235,17 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
             }}
           >
             {option.label}
+            {option.count != null ? (
+              <span
+                style={{
+                  marginLeft: 5,
+                  color: active ? A.MUTE : A.DIM,
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                }}
+              >
+                {option.count}
+              </span>
+            ) : null}
           </button>
         );
       })}
