@@ -137,20 +137,20 @@
       "headline": "[~~Šéṽéñ ĉřőŵñš áţ ţĥíš ĉļúƀ~~]",
       "sub": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ áñđ éṽéřý řőúñđ ýőú ƥļáý ĥéřé ĉőúñţš áúţőɱáţíĉáļļý - ñő ļőĝĝíñĝ, ñő áđɱíñ. Ţáǩé á ĉřőŵñ áñđ ýőúř ñáɱé šíţš őñ ţĥé ƀőářđ.~~]",
       "slim": "[~~Ƥļáý ƒőř ţĥé ĉřőŵñš áţ ţĥíš ĉļúƀ~~]",
-      "headlineSome": "[~~{{total}} ĉřőŵñš. {{open}} ñéṽéř ŵőñ.~~]",
-      "headlineSomeOne": "[~~{{total}} ĉřőŵñš. 1 ñéṽéř ŵőñ.~~]",
-      "headlineNone": "[~~{{total}} ĉřőŵñš. Ñőţ őñé ĥáš ƀééñ ŵőñ.~~]",
-      "headlineAll": "[~~{{total}} ĉřőŵñš. Éṽéřý őñé íš šƥőǩéñ ƒőř.~~]",
-      "headlineOneTotalOpen": "[~~1 ĉřőŵñ. Íţ ĥáš ñéṽéř ƀééñ ŵőñ.~~]",
-      "headlineOneTotalHeld": "[~~1 ĉřőŵñ. Íţ íš šƥőǩéñ ƒőř.~~]",
-      "boardEyebrow": "[~~Ĥőñőúřš ƀőářđ~~]",
-      "neverWon": "[~~Ñéṽéř ƀééñ ŵőñ~~]",
-      "open": "[~~ŐƤÉÑ~~]",
-      "remaining_one": "[~~{{count}} ɱőřé ĉřőŵñ ĥáš ñéṽéř ƀééñ ŵőñ.~~]",
-      "remaining_other": "[~~{{count}} ɱőřé ĉřőŵñš ĥáṽé ñéṽéř ƀééñ ŵőñ.~~]",
-      "figRounds": "[~~ŘŐÚÑĐŠ~~]",
-      "figAvgToPar": "[~~ÁṼĜ ŢŐ ƤÁŘ~~]",
-      "figHarderThan": "[~~ĤÁŘĐÉŘ ŢĤÁÑ~~]"
+      "headlineSome": "[{{total}} crowns. {{open}} never won.]",
+      "headlineSomeOne": "[{{total}} crowns. 1 never won.]",
+      "headlineNone": "[{{total}} crowns. Not one has been won.]",
+      "headlineAll": "[{{total}} crowns. Every one is spoken for.]",
+      "headlineOneTotalOpen": "[1 crown. It has never been won.]",
+      "headlineOneTotalHeld": "[1 crown. It is spoken for.]",
+      "boardEyebrow": "[Honours board]",
+      "neverWon": "[Never been won]",
+      "open": "[OPEN]",
+      "remaining_one": "[{{count}} more crown has never been won.]",
+      "remaining_other": "[{{count}} more crowns have never been won.]",
+      "figRounds": "[ROUNDS]",
+      "figAvgToPar": "[AVG TO PAR]",
+      "figHarderThan": "[HARDER THAN]"
     }
   },
   "verifiedAccounts": {
@@ -189,10 +189,9 @@
       "noBestToCompare": "[~~Ñő řőúñđ őƒ ýőúřš ţő ĉőɱƥářé~~]"
     },
     "roundCard": {
-      "net": "[~~Ñéţ~~]",
-      "thruN": "[~~ţĥřú {{n}}~~]",
-      "adjustedNotCompleted_one": "[~~áđĵúšţéđ, {{count}} ĥőļé ñőţ ĉőɱƥļéţéđ~~]",
-      "adjustedNotCompleted_other": "[~~áđĵúšţéđ, {{count}} ĥőļéš ñőţ ĉőɱƥļéţéđ~~]"
+      "net": "Net",
+      "adjustedNotCompleted_one": "adjusted, {{count}} hole not completed",
+      "adjustedNotCompleted_other": "adjusted, {{count}} holes not completed"
     },
     "courseBand": {
       "avg": "[~~áṽĝ~~]",
@@ -242,8 +241,8 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "[~~Šĥářé ɱý řőúñđš~~]",
-      "subtitle": "[~~Ýőúř ƒőļļőŵéřš ářé ţőļđ ŵĥéñ ýőú ļőĝ á řőúñđ, áñđ ĉáñ ļíǩé áñđ ĉőɱɱéñţ őñ íţ. Ýőúř řőúñđš šĥőŵ őñ Éẋƥļőřé éíţĥéř ŵáý.~~]"
+      "title": "Share my rounds",
+      "subtitle": "Your followers are told when you log a round, and can like and comment on it. Your rounds show on Explore either way."
     }
   },
   "map": {
@@ -361,50 +360,50 @@
         }
       },
       "hero": {
-        "kicker": "[~~ƑŐŘ ƁÚŠÍÑÉŠŠÉŠ~~]",
-        "title": "[~~Ĝőļƒéřš ářé áļřéáđý ļőőǩíñĝ ƒőř ŵĥáţ ýőú đő.~~]",
-        "body": "[~~Ĉļáíɱ ýőúř ƥáĝé áñđ ƀé ŵĥéřé ţĥéý ářé.~~]"
+        "kicker": "[FOR BUSINESSES]",
+        "title": "[Golfers are already looking for what you do.]",
+        "body": "[Claim your page and be where they are.]"
       },
       "numbers": {
-        "courses": "[~~ĉőúřšéš ĝőļƒéřš ƀřőŵšé őñ ĉļƀĥőúž~~]",
-        "rounds": "[~~ŘŐÚÑĐŠ~~]",
-        "reviews": "[~~ŘÉṼÍÉŴŠ~~]",
-        "greenNote": "[~~ĜŘÉÉÑ ÍŠ ĻÁŠŢ 30 ĐÁÝŠ~~]"
+        "courses": "[courses golfers browse on clbhouz]",
+        "rounds": "[ROUNDS]",
+        "reviews": "[REVIEWS]",
+        "greenNote": "[GREEN IS LAST 30 DAYS]"
       },
       "examples": {
-        "kicker": "[~~ŴĤÁŢ ÝŐÚŘŠ ĻŐŐǨŠ ĻÍǨÉ~~]",
-        "heading": "[~~Á ƥáĝé ƒőř éṽéřý ǩíñđ őƒ ĝőļƒ ƀúšíñéšš~~]",
-        "tag": "[~~ÉẊÁṀƤĻÉ~~]",
+        "kicker": "[WHAT YOURS LOOKS LIKE]",
+        "heading": "[A page for every kind of golf business]",
+        "tag": "[EXAMPLE]",
         "tabs": {
-          "home": "[~~ĤŐṀÉ~~]",
-          "about": "[~~ÁƁŐÚŢ~~]",
-          "reviews": "[~~ŘÉṼÍÉŴŠ~~]"
+          "home": "[HOME]",
+          "about": "[ABOUT]",
+          "reviews": "[REVIEWS]"
         },
         "club": {
-          "meta": "[~~Ṽéñúé . Řéṽíéŵš áñđ řőúñđš~~]"
+          "meta": "[Venue . Reviews and rounds]"
         },
         "coach": {
-          "meta": "[~~Ļéššőñš . Ɓőőǩíñĝš áñđ řéṽíéŵš~~]"
+          "meta": "[Lessons . Bookings and reviews]"
         },
         "fitter": {
-          "meta": "[~~Ƒíţţíñĝ . Ɓőőǩíñĝš áñđ řéṽíéŵš~~]"
+          "meta": "[Fitting . Bookings and reviews]"
         },
         "brand": {
-          "meta": "[~~Ƥřőđúĉţ . Ƒőļļőŵéřš áñđ ƥőšţš~~]"
+          "meta": "[Product . Followers and posts]"
         }
       },
       "rows": {
         "found": {
-          "title": "[~~Ɓé ƒőúñđ~~]",
-          "body": "[~~Ýőú áƥƥéář íñ šéářĉĥ áñđ ţĥé đířéĉţőřý, íñ ƒřőñţ őƒ ĝőļƒéřš áļřéáđý úšíñĝ ĉļƀĥőúž éṽéřý đáý.~~]"
+          "title": "[Be found]",
+          "body": "[You appear in search and the directory, in front of golfers already using clbhouz every day.]"
         },
         "trusted": {
-          "title": "[~~Ɓé ţřúšţéđ~~]",
-          "body": "[~~Řéṽíéŵš ĉőɱé ƒřőɱ ĝőļƒéřš ŵíţĥ ţřáĉǩéđ řőúñđš, ñőţ áñőñýɱőúš áĉĉőúñţš.~~]"
+          "title": "[Be trusted]",
+          "body": "[Reviews come from golfers with tracked rounds, not anonymous accounts.]"
         },
         "reach": {
-          "title": "[~~Ǩñőŵ ýőúř řéáĉĥ~~]",
-          "body": "[~~Ṽíéŵš, ƒőļļőŵš áñđ éñĝáĝéɱéñţ, ĉőúñţéđ ļíṽé áš ţĥéý ĥáƥƥéñ.~~]"
+          "title": "[Know your reach]",
+          "body": "[Views, follows and engagement, counted live as they happen.]"
         }
       }
     },
@@ -499,26 +498,26 @@
         "playedTo": "[~~Ƥļáýéđ ţő~~]",
         "roundsTitle_one": "[~~{{count}} řőúñđ~~]",
         "roundsTitle_other": "[~~{{count}} řőúñđš~~]",
-        "counts": "[~~Ĉőúñţš~~]",
-        "hcpHeld": "[~~ĤĈƤ ĥéļđ~~]",
-        "nineHoles": "[~~9 ĥőļéš~~]",
-        "anyCourse": "[~~Áñý ĉőúřšé~~]",
-        "pickCourse": "[~~Ĉĥőőšé á ĉőúřšé~~]"
+        "counts": "[~~Çóúñţş~~]",
+        "hcpHeld": "[~~ĤÇƤ ĥéļđ~~]",
+        "nineHoles": "[~~9 ĥőļéş~~]",
+        "anyCourse": "[~~Áñý çőúrşé~~]",
+        "pickCourse": "[~~Çĥőőşé á çőúrşé~~]"
       }
     },
     "nextRound": {
-      "ladderHeading": "[~~Ŵĥáţ éáĉĥ šĉőřé đőéš ţő ýőúř íñđéẋ~~]",
-      "courseLine": "[~~Áţ {{course}}, ŵĥéřé ýőú ƥļáý ɱőšţ.~~]",
-      "rungStaysScore": "[~~{{score}} őř ŵőřšé~~]",
-      "rungStaysSub": "[~~Ñőţĥíñĝ ĥáƥƥéñš~~]",
-      "rungStaysKicker": "[~~šţáýš~~]",
-      "rungTargetSub": "[~~Ţĥé šĉőřé ţő ƀéáţ~~]",
-      "rungGoodSub": "[~~Á ĝőőđ đáý~~]",
-      "rungBestSub": "[~~Ýőúř ƀéšţ ĥéřé~~]",
-      "rungDown": "[~~đőŵñ {{delta}}~~]",
-      "formLine": "[~~Ýőú ƀéáţ {{score}} íñ <g>{{count}}</g> őƒ ýőúř ļášţ ƒíṽé řőúñđš.~~]",
-      "formLineNone": "[~~Ñőñé őƒ ýőúř ļášţ ƒíṽé ŵőúļđ ĥáṽé ƀřőúĝĥţ íţ đőŵñ.~~]",
-      "provenance": "[~~Ɓášéđ őñ ýőúř ļášţ 20 řőúñđš. Ýőúř íñđéẋ ĉáññőţ ĝő úƥ ñéẋţ řőúñđ ŵĥáţéṽéř ýőú šĥőőţ.~~]",
+      "ladderHeading": "[~~Ŵhát éáĉh šĉőřé dőéš tő ýőúř íñdéx~~]",
+      "courseLine": "[~~Át {{course}}, whéřé ýőú pláý mőšt.~~]",
+      "rungStaysScore": "[~~{{score}} őř wőřšé~~]",
+      "rungStaysSub": "[~~Nőthíñg háppéñš~~]",
+      "rungStaysKicker": "[~~štáýš~~]",
+      "rungTargetSub": "[~~Ţhé šĉőřé tő béát~~]",
+      "rungGoodSub": "[~~Á gőőd dáý~~]",
+      "rungBestSub": "[~~Ýőúř béšt héřé~~]",
+      "rungDown": "[~~dőwñ {{delta}}~~]",
+      "formLine": "[~~Ýőú béát {{score}} íñ <g>{{count}}</g> őf ýőúř lášt fívé řőúñdš.~~]",
+      "formLineNone": "[~~Nőñé őf ýőúř lášt fívé wőúld hávé břőúght ít dőwñ.~~]",
+      "provenance": "[~~Ɓášéd őñ ýőúř lášt 20 řőúñdš. Ýőúř íñdéx ĉáññőt gő úp ñéxt řőúñd whátévéř ýőú šhőőt.~~]",
       "eyebrow": "[~~Ñéẋţ řőúñđ~~]",
       "sample": "[~~Ļášţ 20 řőúñđš~~]",
       "sampleSentence": "[~~Ɓášéđ őñ ýőúř ļášţ 20 řőúñđš.~~]",
@@ -531,15 +530,12 @@
       "scaleBecomes": "[~~Ĥáñđíĉáƥ ƀéĉőɱéš~~]",
       "noChange": "[~~ñő ĉĥáñĝé~~]",
       "yourBest": "[~~ýőúř ƀéšţ~~]",
-      "beatCaption": "[~~Ɓéáţ {{cut}}~~]",
-      "staysAt": "[~~Šţáýš {{value}}~~]",
-      "downTo": "[~~Đőŵñ ţő {{value}}~~]",
-      "withheldHeading": "[~~Éṽéřý řőúñđ šţíļļ ĉőúñţš.~~]",
-      "withheldBody": "[~~Ŵíţĥ {{count}} řőúñđš őñ řéĉőřđ éṽéřý őñé őƒ ţĥéɱ ĉőúñţš ţőŵářđ ýőúř íñđéẋ, šő ţĥéřé'š ñő ţářĝéţ ţő ƀéáţ ýéţ. Ţĥíš šţářţš ţéļļíñĝ ýőú šőɱéţĥíñĝ őñĉé ýőú ĥáṽé ţŵéñţý.~~]",
-      "shootBeat": "[~~Ɓéáţ {{value}}~~]",
-      "headingBeat": "Beat {{score}} next time out",
-      "caption": "{{course}}, where you play most.",
-      "captionHold": "{{course}}, where you play most. It <m>cannot go up</m> whatever you shoot."
+      "withheldHeading": "Every round still counts.",
+      "withheldBody": "With {{count}} rounds on record every one of them counts toward your index, so there's no target to beat yet. This starts telling you something once you have twenty.",
+      "shootBeat": "Beat {{value}}",
+      "headingBeat": "[~~Ɓéáţ {{score}} ñéẋţ ţíɱé őúţ~~]",
+      "caption": "[~~{{course}}, ŵĥéřé ýőú ƥļáý ɱőšţ.~~]",
+      "captionHold": "[~~{{course}}, ŵĥéřé ýőú ƥļáý ɱőšţ. Íţ <m>ĉáññőţ ĝő úƥ</m> ŵĥáţéṽéř ýőú šĥőőţ.~~]"
     },
     "achievements": {
       "trophyRoom": "[~~Ţřőƥĥý řőőɱ~~]",
@@ -595,32 +591,32 @@
         "draft": "[~~Ĥí {{name}} - ĉőññéĉţ ýőúř ĥáñđíĉáƥ őñ ĉļƀĥőúž áñđ ŵé ĉáñ ĉőɱƥářé řőúñđš áñđ šéé ŵĥő'š áĉţúáļļý ƥļáýíñĝ ƀéţţéř.~~]"
       },
       "section": {
-        "kicker": "[~~Ýőúř ĉířĉļé~~]",
-        "heading": "[~~Ýőú'řé {{rank}} őƒ {{total}}~~]",
-        "meta": "[~~Ɓý íñđéẋ~~]",
-        "behind": "[~~{{gap}} ƀéĥíñđ {{name}}.~~]",
-        "clear": "[~~{{gap}} ĉļéář őƒ {{name}}.~~]",
-        "seeAll": "[~~Šéé áļļ {{count}}~~]",
-        "you": "[~~Ýőú~~]",
-        "emptyHeading": "[~~Ñő őñé ĥéřé ýéţ~~]",
-        "emptyBody": "[~~Ýőúř ĉířĉļé íš ţĥé ĝőļƒéřš ýőú'ṽé ƥļáýéđ ŵíţĥ ŵĥő ářé áļšő őñ ĉļƀĥőúž. Ĉőññéĉţ ŵíţĥ á ƒéŵ áñđ ţĥíš ƀéĉőɱéš á ļíṽé ţáƀļé.~~]",
-        "findGolfers": "[~~Ƒíñđ ĝőļƒéřš~~]",
-        "flameLegend": "[~~Íɱƥřőṽéđ ƀý ĥáļƒ á šĥőţ őř ɱőřé íñ ţĥé ļášţ 30 đáýš.~~]"
+        "kicker": "Your circle",
+        "heading": "You're {{rank}} of {{total}}",
+        "meta": "By index",
+        "behind": "{{gap}} behind {{name}}.",
+        "clear": "{{gap}} clear of {{name}}.",
+        "seeAll": "See all {{count}}",
+        "you": "You",
+        "emptyHeading": "No one here yet",
+        "emptyBody": "Your circle is the golfers you've played with who are also on clbhouz. Connect with a few and this becomes a live table.",
+        "findGolfers": "Find golfers",
+        "flameLegend": "[Improved by half a shot or more in the last 30 days.]"
       }
     },
     "friendsRounds": {
-      "kicker": "[~~Ƒříéñđš' řőúñđš~~]",
-      "heading": "[~~Řéĉéñţļý ƥļáýéđ~~]",
-      "meta": "[~~Ļášţ ƒőřţñíĝĥţ~~]",
-      "sheetTitle": "[~~Ƒříéñđš' řőúñđš~~]",
-      "seeAll": "[~~Šéé áļļ {{count}}~~]",
-      "empty": "[~~Ñő ƒříéñđš ĥáṽé ƥőšţéđ á řőúñđ íñ ţĥé ļášţ ƒőřţñíĝĥţ.~~]",
-      "gross": "[~~Ĝřőšš~~]",
-      "stbl": "[~~Šţƀļ~~]",
-      "diff": "[~~Đíƒƒ~~]",
-      "invite": "[~~Íñṽíţé~~]",
-      "nineHoles": "[~~9 ĥőļéš~~]",
-      "unknownCourse": "[~~Úñǩñőŵñ ĉőúřšé~~]"
+      "kicker": "Friends' rounds",
+      "heading": "Recently played",
+      "meta": "Last fortnight",
+      "sheetTitle": "Friends' rounds",
+      "seeAll": "See all {{count}}",
+      "empty": "No friends have posted a round in the last fortnight.",
+      "gross": "Gross",
+      "stbl": "Stbl",
+      "diff": "Diff",
+      "invite": "Invite",
+      "nineHoles": "9 holes",
+      "unknownCourse": "Unknown course"
     },
     "hero": {
       "chartSample": "[~~{{count}} ƥőíñţš, 90 đáýš~~]"
@@ -713,159 +709,159 @@
       "index": "[~~Íñđéẋ~~]",
       "indexHeldAt": "[~~Íñđéẋ ĥéļđ áţ~~]",
       "notBest8": "[~~ñőţ őñé őƒ ýőúř ƀéšţ 8~~]",
-      "eyebrow": "[~~Ļášţ řőúñđ~~]",
-      "nineHoles": "[~~9 ĥőļéš~~]",
-      "unknownCourse": "[~~Úñǩñőŵñ ĉőúřšé~~]",
-      "empty": "[~~Ýőúř řőúñđš áƥƥéář ĥéřé áš šőőñ áš ýőú ƥőšţ á šĉőřé.~~]",
-      "emptyFriend": "[~~Řőúñđš áƥƥéář ĥéřé őñĉé {{name}} ƥőšţš á šĉőřé.~~]",
-      "theyFallback": "[~~ţĥéý~~]"
+      "eyebrow": "Last round",
+      "nineHoles": "9 holes",
+      "unknownCourse": "Unknown course",
+      "empty": "Your rounds appear here as soon as you post a score.",
+      "emptyFriend": "Rounds appear here once {{name}} posts a score.",
+      "theyFallback": "they"
     },
     "records": {
       "emptyHint": "[~~Ýőúř řéĉőřđš áƥƥéář ĥéřé őñĉé řőúñđš ářé ƥőšţéđ.~~]"
     },
     "index": {
-      "kicker": "[~~Ĥáñđíĉáƥ íñđéẋ~~]",
-      "delta90": "[~~90Đ~~]",
-      "delta12m": "[~~12Ṁ~~]",
-      "sample": "[~~{{count}} řőúñđš~~]",
-      "sampleWithSpan": "[~~{{count}} řőúñđš · {{span}}~~]",
-      "spanFixed30": "[~~30 đáýš~~]",
-      "spanFixed90": "[~~90 đáýš~~]",
-      "spanFixed12m": "[~~12 ɱőñţĥš~~]",
-      "spanDays": "[~~{{count}} đáýš~~]",
-      "fromRounds": "[~~ƒřőɱ {{count}} řőúñđš~~]",
-      "withheld": "[~~{{count}} řőúñđš šő ƒář. Á 90-đáý ţřéñđ ñééđš á ļőñĝéř řéĉőřđ ţő šáý áñýţĥíñĝ.~~]"
+      "kicker": "Handicap index",
+      "delta90": "90D",
+      "delta12m": "12M",
+      "sample": "{{count}} rounds",
+      "sampleWithSpan": "{{count}} rounds · {{span}}",
+      "spanFixed30": "30 days",
+      "spanFixed90": "90 days",
+      "spanFixed12m": "12 months",
+      "spanDays": "{{count}} days",
+      "fromRounds": "from {{count}} rounds",
+      "withheld": "{{count}} rounds so far. A 90-day trend needs a longer record to say anything."
     },
     "roundsThatCount": {
-      "eyebrow": "[~~Řőúñđš ţĥáţ ĉőúñţ~~]",
-      "heading": "[~~Ýőúř ļášţ 20~~]",
-      "meta": "[~~{{count}} ĉőúñţ~~]",
-      "metaAll": "[~~{{count}} řőúñđš~~]",
-      "counts": "[~~Ĉőúñţš~~]",
-      "doesNotCount": "[~~Đőéšñ'ţ ĉőúñţ~~]",
-      "openRound": "[~~Őƥéñ řőúñđ ƒřőɱ {{date}}~~]",
-      "body": "[~~Ţĥé {{count}} ƀéļőŵ ţĥé ļíñé ářé ţĥé őñéš ýőúř íñđéẋ íš ƀúíļţ ƒřőɱ. Áš ţĥéý đřőƥ őúţ, ŵőřšé řőúñđš ţáǩé ţĥéíř ƥļáĉé, ýőúř ñéẋţ őñé ƒáļļš őƒƒ íñ {{falls}}.~~]",
-      "bodyNoFall": "[~~Ţĥé {{count}} ƀéļőŵ ţĥé ļíñé ářé ţĥé őñéš ýőúř íñđéẋ íš ƀúíļţ ƒřőɱ. Áš ţĥéý đřőƥ őúţ, ŵőřšé řőúñđš ţáǩé ţĥéíř ƥļáĉé.~~]",
-      "fallsIn_one": "[~~{{count}} řőúñđ~~]",
-      "fallsIn_other": "[~~{{count}} řőúñđš~~]",
-      "withheldBody": "[~~Áļļ {{count}} őƒ ýőúř řőúñđš ĉőúñţ říĝĥţ ñőŵ. Őñĉé ýőú ƥášš ţŵéñţý, őñļý ýőúř ƀéšţ éíĝĥţ ŵíļļ, áñđ ţĥíš šĥőŵš ŵĥíĉĥ.~~]",
-      "headroomLevel": "[~~Ñő ĥéáđřőőɱ~~]",
-      "headroomOne": "[~~1 šĥőţ őƒ ĥéáđřőőɱ~~]",
-      "headroomOther": "[~~{{count}} šĥőţš őƒ ĥéáđřőőɱ~~]",
-      "bodyLine": "[~~Ţĥé {{count}} ƀéļőŵ ţĥé ļíñé ářé ţĥé őñéš ýőúř íñđéẋ íš ƀúíļţ ƒřőɱ. Ţĥé ļíñé šíţš áţ {{cut}} áţ {{course}}, áñđ ýőúř ñéẋţ ƀéšţ řőúñđ íš á {{next}}.~~]",
-      "bodyLineNoCourse": "[~~Ţĥé {{count}} ƀéļőŵ ţĥé ļíñé ářé ţĥé őñéš ýőúř íñđéẋ íš ƀúíļţ ƒřőɱ.~~]",
-      "bodyLineNoNext": "[~~Éṽéřý őñé őƒ ýőúř ļášţ ţŵéñţý ĉőúñţš říĝĥţ ñőŵ.~~]",
-      "fallLine": "[~~Ýőúř {{date}} řőúñđ đřőƥš őúţ őƒ ţĥé ţŵéñţý íñ {{falls}}.~~]",
-      "headingCount": "{{count}} of your last 20 count",
-      "caption": "Anything under {{cut}} replaces one of them."
+      "eyebrow": "Rounds that count",
+      "heading": "Your last 20",
+      "meta": "{{count}} count",
+      "metaAll": "{{count}} rounds",
+      "counts": "Counts",
+      "doesNotCount": "Doesn't count",
+      "openRound": "Open round from {{date}}",
+      "body": "The {{count}} below the line are the ones your index is built from. As they drop out, worse rounds take their place, your next one falls off in {{falls}}.",
+      "bodyNoFall": "The {{count}} below the line are the ones your index is built from. As they drop out, worse rounds take their place.",
+      "fallsIn_one": "{{count}} round",
+      "fallsIn_other": "{{count}} rounds",
+      "withheldBody": "All {{count}} of your rounds count right now. Once you pass twenty, only your best eight will, and this shows which.",
+      "headroomLevel": "[~~No headroom~~]",
+      "headroomOne": "[~~1 shot of headroom~~]",
+      "headroomOther": "[~~{{count}} shots of headroom~~]",
+      "bodyLine": "[~~The {{count}} below the line are the ones your index is built from. The line sits at {{cut}} at {{course}}, and your next best round is a {{next}}.~~]",
+      "bodyLineNoCourse": "[~~The {{count}} below the line are the ones your index is built from.~~]",
+      "bodyLineNoNext": "[~~Every one of your last twenty counts right now.~~]",
+      "fallLine": "[~~Your {{date}} round drops out of the twenty in {{falls}}.~~]",
+      "headingCount": "[~~{{count}} őƒ ýőúř ļášţ 20 ĉőúñţ~~]",
+      "caption": "[~~Áñýţĥíñĝ úñđéř {{cut}} řéƥļáĉéš őñé őƒ ţĥéɱ.~~]"
     },
     "scoring": {
-      "eyebrow": "[~~Šţáƀļéƒőřđ~~]",
-      "heading": "[~~Ĥőŵ ýőú'řé šĉőříñĝ~~]",
-      "meta": "[~~{{count}} éíĝĥţééñ-ĥőļé řőúñđš · {{days}} đáýš~~]",
-      "metaWithheld": "[~~{{count}} řőúñđš~~]",
-      "pointsAvg": "[~~Ƥőíñţš áṽéřáĝé~~]",
-      "vsPrior": "[~~{{delta}} ṽš ƥříőř {{days}} đáýš~~]",
-      "inZone": "[~~Íñ ţĥé žőñé~~]",
-      "solid": "[~~Šőļíđ~~]",
-      "offDay": "[~~Őƒƒ đáý~~]",
-      "withheldBody": "[~~Ýőúř šĉőříñĝ šƥřéáđ ñééđš áƀőúţ ţéñ řőúñđš ţő ɱéáñ áñýţĥíñĝ. Ýőú'ṽé ƥőšţéđ {{count}}.~~]",
-      "metaPlain": "[~~{{count}} řőúñđš · {{days}} đáýš~~]",
-      "sampleLine": "[~~ƒřőɱ {{count}} řőúñđš~~]"
+      "eyebrow": "Stableford",
+      "heading": "How you're scoring",
+      "meta": "{{count}} eighteen-hole rounds · {{days}} days",
+      "metaWithheld": "{{count}} rounds",
+      "pointsAvg": "Points average",
+      "vsPrior": "{{delta}} vs prior {{days}} days",
+      "inZone": "In the zone",
+      "solid": "Solid",
+      "offDay": "Off day",
+      "withheldBody": "Your scoring spread needs about ten rounds to mean anything. You've posted {{count}}.",
+      "metaPlain": "{{count}} rounds · {{days}} days",
+      "sampleLine": "from {{count}} rounds"
     },
     "holes": {
-      "eyebrow": "[~~Éṽéřý ĥőļé ýőú'ṽé ƥļáýéđ~~]",
-      "heading": "[~~Ĥőŵ ýőú šĉőřé á ĥőļé~~]",
-      "meta": "[~~{{count}} řőúñđš~~]",
-      "birdiePlus": "[~~Ɓířđíé+~~]",
-      "par": "[~~Ƥář~~]",
-      "bogey": "[~~Ɓőĝéý~~]",
-      "doublePlus": "[~~Đőúƀļé+~~]",
-      "parNs": "[~~Ƥář {{n}}š~~]",
-      "nHoles": "[~~{{count}} ĥőļéš~~]",
-      "parSentence": "[~~Ýőúř ƥář {{worst}}š ĉőšţ ýőú {{worstAvg}} šĥőţš á ĥőļé áĝáíñšţ {{bestAvg}} őñ ýőúř ƥář {{best}}š, áñđ ţĥéý ɱáǩé úƥ {{share}}% őƒ ţĥé ĥőļéš ƀéĥíñđ ţĥéšé ƒíĝúřéš.~~]",
-      "parMissing": "[~~Ýőú ĥáṽéñ'ţ ƥļáýéđ éñőúĝĥ ƥář {{types}}š ýéţ ƒőř á ƒíĝúřé.~~]",
-      "withheldNone": "[~~Ĥőļé-ƀý-ĥőļé šĉőříñĝ ñééđš řőúñđš ŵíţĥ á ƒúļļ ĉářđ. Ñőñé őƒ ýőúř řőúñđš ĥáṽé őñé ýéţ.~~]",
-      "withheldSome": "[~~Ĥőļé-ƀý-ĥőļé šĉőříñĝ ñééđš řőúñđš ŵíţĥ á ƒúļļ ĉářđ. Őñļý {{count}} őƒ ýőúř řőúñđš đő.~~]",
-      "basisHoles": "[~~Áĉřőšš {{count}} ĥőļéš.~~]",
-      "basisRings": "[~~Éíĝĥţééñ-ĥőļé řőúñđš áţ ɱáƥƥéđ ĉőúřšéš.~~]",
-      "shotsHeading": "[~~Ŵĥéřé ţĥé šĥőţš ĝő~~]",
-      "overPerHole": "[~~+{{v}} á ĥőļé~~]",
-      "mergedHeading": "Where your shots go",
-      "caption": "Shots a hole, over {{holes}} holes.",
-      "captionShare": "Shots a hole, over {{holes}} holes. Par {{n}}s are {{share}}% of them."
+      "eyebrow": "Every hole you've played",
+      "heading": "How you score a hole",
+      "meta": "{{count}} rounds",
+      "birdiePlus": "Birdie+",
+      "par": "Par",
+      "bogey": "Bogey",
+      "doublePlus": "Double+",
+      "parNs": "Par {{n}}s",
+      "nHoles": "{{count}} holes",
+      "parSentence": "Your par {{worst}}s cost you {{worstAvg}} shots a hole against {{bestAvg}} on your par {{best}}s, and they make up {{share}}% of the holes behind these figures.",
+      "parMissing": "You haven't played enough par {{types}}s yet for a figure.",
+      "withheldNone": "Hole-by-hole scoring needs rounds with a full card. None of your rounds have one yet.",
+      "withheldSome": "Hole-by-hole scoring needs rounds with a full card. Only {{count}} of your rounds do.",
+      "basisHoles": "Across {{count}} holes.",
+      "basisRings": "Eighteen-hole rounds at mapped courses.",
+      "shotsHeading": "Where the shots go",
+      "overPerHole": "+{{v}} a hole",
+      "mergedHeading": "[~~Ŵĥéřé ýőúř šĥőţš ĝő~~]",
+      "caption": "[~~Šĥőţš á ĥőļé, őṽéř {{holes}} ĥőļéš.~~]",
+      "captionShare": "[~~Šĥőţš á ĥőļé, őṽéř {{holes}} ĥőļéš. Ƥář {{n}}š ářé {{share}}% őƒ ţĥéɱ.~~]"
     },
     "bests": {
-      "eyebrow": "[~~Ƥéřšőñáļ ƀéšţš~~]",
-      "heading": "[~~Řéĉőřđš ţő ƀřéáǩ~~]",
-      "headingFriend": "[~~{{name}}'š řéĉőřđš ţő ƀřéáǩ~~]",
-      "bestDiff": "[~~Ɓéšţ đíƒƒéřéñţíáļ~~]",
-      "bestGross": "[~~Ļőŵéšţ šĉőřé~~]",
-      "bestStableford": "[~~Ɓéšţ šţáƀļéƒőřđ~~]",
-      "bestVsHcp": "[~~Ɓéšţ áĝáíñšţ ýőúř ĥáñđíĉáƥ~~]",
-      "trophyRoom": "[~~Ţřőƥĥý řőőɱ~~]",
-      "missing": "[~~{{count}} ɱőřé áƥƥéář őñĉé ýőú'ṽé ƥőšţéđ á šţáƀļéƒőřđ áñđ á řőúñđ őƒƒ ýőúř ĥáñđíĉáƥ.~~]",
-      "missingAll": "[~~Ýőúř řéĉőřđš áƥƥéář ĥéřé őñĉé ýőú'ṽé ƥőšţéđ á řőúñđ.~~]",
+      "eyebrow": "Personal bests",
+      "heading": "Records to break",
+      "headingFriend": "{{name}}'s records to break",
+      "bestDiff": "Best differential",
+      "bestGross": "[~~Lowest score~~]",
+      "bestStableford": "Best stableford",
+      "bestVsHcp": "[~~Best against your handicap~~]",
+      "trophyRoom": "Trophy room",
+      "missing": "{{count}} more appear once you've posted a stableford and a round off your handicap.",
+      "missingAll": "Your records appear here once you've posted a round.",
       "lower": {
-        "diff": "[~~ƀéšţ đíƒƒéřéñţíáļ~~]",
-        "gross": "[~~ļőŵéšţ šĉőřé~~]",
-        "stableford": "[~~ƀéšţ šţáƀļéƒőřđ~~]",
-        "vsHcp": "[~~ƀéšţ áĝáíñšţ ĥáñđíĉáƥ~~]",
-        "vsCourse": "[~~ƀéšţ řőúñđ áĝáíñšţ ţĥé ĉőúřšé~~]"
+        "diff": "best differential",
+        "gross": "[~~lowest score~~]",
+        "stableford": "best stableford",
+        "vsHcp": "best against handicap",
+        "vsCourse": "[~~best round against the course~~]"
       },
-      "stillToSet": "[~~Šţíļļ ţő šéţ: {{list}}.~~]",
-      "sameRound": "[~~Šáɱé řőúñđ~~]",
-      "playedOff": "[~~őƒƒ {{index}}~~]",
-      "beatRound": "[~~Ɓéáţ íţ ŵíţĥ á {{score}} áţ {{course}}~~]",
-      "beatStableford": "[~~Ɓéáţ íţ ŵíţĥ {{points}} ƥőíñţš~~]",
-      "beatVsHcp": "[~~Ýőú ƥļáýéđ őƒƒ {{then}} ţĥáţ đáý. Őƒƒ {{now}} íţ ŵőúļđ ţáǩé á {{score}} áţ {{course}}.~~]",
-      "stoodWeeksOne": "[~~šţőőđ 1 ŵééǩ~~]",
-      "stoodWeeksOther": "[~~šţőőđ {{count}} ŵééǩš~~]",
-      "stoodMonthsOne": "[~~šţőőđ 1 ɱőñţĥ~~]",
-      "stoodMonthsOther": "[~~šţőőđ {{count}} ɱőñţĥš~~]",
-      "stoodYears": "[~~šţőőđ {{years}} ýř {{months}} ɱő~~]",
-      "bestVsCourse": "[~~Ɓéšţ řőúñđ áĝáíñšţ ţĥé ĉőúřšé~~]",
-      "beatGross": "[~~Ɓéáţ íţ ŵíţĥ á {{score}}~~]",
-      "vsRating": "[~~{{shots}} úñđéř ţĥé {{rating}} řáţíñĝ, šļőƥé {{slope}}~~]",
-      "trophyRoomTitle": "[~~Éṽéřýţĥíñĝ ýőú ĥőļđ~~]",
-      "crownsHeld": "[~~Ĉřőŵñš ĥéļđ~~]",
-      "trophyRoomA11y": "[~~Ţřőƥĥý řőőɱ, {{count}} ĉřőŵñš ĥéļđ~~]",
+      "stillToSet": "Still to set: {{list}}.",
+      "sameRound": "[~~Same round~~]",
+      "playedOff": "[~~off {{index}}~~]",
+      "beatRound": "[~~Beat it with a {{score}} at {{course}}~~]",
+      "beatStableford": "[~~Beat it with {{points}} points~~]",
+      "beatVsHcp": "[~~You played off {{then}} that day. Off {{now}} it would take a {{score}} at {{course}}.~~]",
+      "stoodWeeksOne": "[~~stood 1 week~~]",
+      "stoodWeeksOther": "[~~stood {{count}} weeks~~]",
+      "stoodMonthsOne": "[~~stood 1 month~~]",
+      "stoodMonthsOther": "[~~stood {{count}} months~~]",
+      "stoodYears": "[~~stood {{years}} yr {{months}} mo~~]",
+      "bestVsCourse": "[~~Best round against the course~~]",
+      "beatGross": "[~~Beat it with a {{score}}~~]",
+      "vsRating": "[~~{{shots}} under the {{rating}} rating, slope {{slope}}~~]",
+      "trophyRoomTitle": "[~~Ëṽéřýţĥíñğ ýőű ĥőľđ~~]",
+      "crownsHeld": "[~~Çřőŵñš ĥéľđ~~]",
+      "trophyRoomA11y": "[~~Ţřőƥĥý řőőɱ, {{count}} ċřőŵñš ĥéľđ~~]",
       "trophyRoomA11yBare": "[~~Ţřőƥĥý řőőɱ~~]",
-      "metaOff": "Off {{then}} that day",
-      "beatWith": "beat with {{n}}",
-      "crowns_one": "{{count}} crown",
-      "crowns_other": "{{count}} crowns"
+      "metaOff": "[~~Őƒƒ {{then}} ţĥáţ đáý~~]",
+      "beatWith": "[~~ƀéáţ ŵíţĥ {{n}}~~]",
+      "crowns_one": "[~~{{count}} ĉřőŵñ~~]",
+      "crowns_other": "[~~{{count}} ĉřőŵñš~~]"
     },
     "footer": {
-      "allRounds": "[~~Áļļ {{n}} řőúñđš~~]",
-      "provenance": "[~~Ļíṽé ŴĤŠ đáţá~~]",
-      "member": "[~~Ṁéɱƀéř {{n}}~~]"
+      "allRounds": "All {{n}} rounds",
+      "provenance": "Live WHS data",
+      "member": "Member {{n}}"
     },
     "notConnected": {
-      "heading": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ~~]",
-      "body": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ áñđ ţĥíš ƥáĝé ƀéĉőɱéš ýőúř řéĉőřđ: ýőúř íñđéẋ áñđ ĥőŵ íţ íš ɱőṽíñĝ, ŵĥáţ ýőúř ñéẋţ řőúñđ đőéš ţő íţ, ŵĥíĉĥ őƒ ýőúř ļášţ ţŵéñţý řőúñđš ĉőúñţ, áñđ ŵĥéřé ýőú šíţ áɱőñĝ ţĥé ĝőļƒéřš ýőú ƥļáý ŵíţĥ.~~]",
-      "connect": "[~~Ĉőññéĉţ ĥáñđíĉáƥ~~]"
+      "heading": "Connect your handicap",
+      "body": "Connect your handicap and this page becomes your record: your index and how it is moving, what your next round does to it, which of your last twenty rounds count, and where you sit among the golfers you play with.",
+      "connect": "Connect handicap"
     },
     "walk": {
-      "kicker30": "[~~Ţĥířţý đáýš~~]",
-      "kicker90": "[~~Ñíñéţý đáýš~~]",
-      "kicker12": "[~~Ţŵéļṽé ɱőñţĥš~~]",
-      "heading": "[~~Ŵáļǩ ýőúř íñđéẋ~~]",
-      "chartLabel": "[~~Ýőúř ĥáñđíĉáƥ íñđéẋ őṽéř ţíɱé. Đřáĝ ţő řéáđ áñý đáţé.~~]",
-      "empty": "[~~Ýőúř íñđéẋ áƥƥéářš ĥéřé őñĉé ýőúř ƒířšţ řőúñđ íš ƥőšţéđ.~~]",
-      "today": "[~~Ţőđáý~~]",
-      "onThisDate": "[~~Őñ ţĥíš đáţé~~]",
-      "noChange": "[~~Ñő ĉĥáñĝé~~]",
-      "firstInWindow": "[~~Ƒířšţ íñ ŵíñđőŵ~~]",
-      "down": "[~~Đőŵñ {{v}}~~]",
-      "up": "[~~Úƥ {{v}}~~]",
-      "high": "[~~Ĥíĝĥ {{v}}~~]",
-      "low": "[~~Ļőŵ {{v}}~~]",
-      "headlineLabel": "Handicap index",
-      "window30": "30 days",
-      "window90": "90 days",
-      "window12": "12 months",
-      "thisStep": "This step"
+      "kicker30": "Thirty days",
+      "kicker90": "Ninety days",
+      "kicker12": "Twelve months",
+      "heading": "Walk your index",
+      "chartLabel": "Your handicap index over time. Drag to read any date.",
+      "empty": "Your index appears here once your first round is posted.",
+      "today": "Today",
+      "onThisDate": "On this date",
+      "noChange": "No change",
+      "firstInWindow": "First in window",
+      "down": "Down {{v}}",
+      "up": "Up {{v}}",
+      "high": "High {{v}}",
+      "low": "Low {{v}}",
+      "headlineLabel": "[~~Ĥáñđíĉáƥ íñđéẋ~~]",
+      "window30": "[~~30 đáýš~~]",
+      "window90": "[~~90 đáýš~~]",
+      "window12": "[~~12 ɱőñţĥš~~]",
+      "thisStep": "[~~Ţĥíš šţéƥ~~]"
     }
   },
   "comments": {
@@ -886,78 +882,77 @@
     "like": "[~~Ļíǩé~~]",
     "unlike": "[~~Úñļíǩé~~]",
     "more": "[~~Ṁőřé~~]",
-    "sheetTitle": "[~~Ĉőɱɱéñţš~~]"
+    "sheetTitle": "[~~Ċőɱɱéñţš~~]"
   },
   "suggestedGolfers": {
-    "heading": "[~~Ĝőļƒéřš ţő ƒőļļőŵ~~]",
-    "seeAll": "[~~Šéé áļļ~~]",
-    "pageSub": "[~~Éṽéřý šúĝĝéšţíőñ ĉőɱéš ŵíţĥ á řéášőñ.~~]",
-    "searchEntry": "[~~Šéářĉĥ ƒőř á ĝőļƒéř~~]",
-    "empty": "[~~Ñő šúĝĝéšţíőñš říĝĥţ ñőŵ~~]",
-    "error": "[~~Ĉőúļđñ'ţ ļőáđ šúĝĝéšţíőñš~~]",
-    "retry": "[~~Řéţřý~~]",
-    "findGolfers": "[~~Ƒíñđ ĝőļƒéřš~~]",
+    "heading": "Golfers to follow",
+    "seeAll": "See all",
+    "pageSub": "Every suggestion comes with a reason.",
+    "searchEntry": "Search for a golfer",
+    "empty": "No suggestions right now",
+    "error": "Couldn't load suggestions",
+    "retry": "Retry",
+    "findGolfers": "Find golfers",
     "reason": {
-      "club": "[~~Áļšő áţ {{club}}.~~]",
-      "course": "[~~Ýőú ĥáṽé ƀőţĥ ƥļáýéđ {{course}}.~~]",
-      "mutual": "[~~Ƒőļļőŵéđ ƀý {{count}} ĝőļƒéřš ýőú ƒőļļőŵ.~~]",
-      "active": "[~~{{count}} řőúñđš íñ ţĥé ļášţ ƒőřţñíĝĥţ.~~]",
-      "reciprocal": "[~~Ƒőļļőŵš ýőú.~~]",
-      "clubmate_mutual": "[~~Ƒőļļőŵéđ ƀý ĝőļƒéřš áţ {{club}}.~~]",
-      "recently_joined": "[~~Ñéŵ ţő ĉļƀĥőúž.~~]"
+      "club": "Also at {{club}}.",
+      "course": "You have both played {{course}}.",
+      "mutual": "Followed by {{count}} golfers you follow.",
+      "active": "{{count}} rounds in the last fortnight.",
+      "reciprocal": "[Follows you.]",
+      "clubmate_mutual": "[Followed by golfers at {{club}}.]",
+      "recently_joined": "[New to clbhouz.]"
     },
     "subline": {
-      "rounds": "[~~{{count}} řőúñđš~~]",
-      "index": "[~~{{index}} íñđéẋ~~]"
+      "rounds": "{{count}} rounds",
+      "index": "{{index}} index"
     },
     "group": {
-      "club": "[~~Áţ ýőúř ĉļúƀ~~]",
-      "course": "[~~Ĉőúřšéš ýőú ƀőţĥ ƥļáý~~]",
-      "mutual": "[~~Ƒőļļőŵéđ ƀý ĝőļƒéřš ýőú ƒőļļőŵ~~]",
-      "active": "[~~Áĉţíṽé řéĉéñţļý~~]",
-      "reciprocal": "[~~Ƒőļļőŵš ýőú~~]",
-      "clubmate_mutual": "[~~Ƒőļļőŵéđ ƀý ĝőļƒéřš áţ ýőúř ĉļúƀ~~]",
-      "recently_joined": "[~~Ñéŵ ţő ĉļƀĥőúž~~]"
+      "club": "At your club",
+      "course": "Courses you both play",
+      "mutual": "Followed by golfers you follow",
+      "active": "Active recently",
+      "reciprocal": "[Follows you]",
+      "clubmate_mutual": "[Followed by golfers at your club]",
+      "recently_joined": "[New to clbhouz]"
     },
     "prompt": {
-      "title": "[~~Ñőƀőđý šáŵ ţĥáţ řőúñđ~~]",
-      "sub": "[~~Ƒőļļőŵ á ƒéŵ ĝőļƒéřš áñđ ýőúř ñéẋţ őñé ļáñđš íñ ţĥéíř ƒééđ.~~]",
-      "notNow": "[~~Ñőţ ñőŵ~~]"
-    },
-    "railKicker": "[~~ĜŐĻƑÉŘŠ ÝŐÚ ṀÍĜĤŢ ǨÑŐŴ~~]"
+      "title": "Nobody saw that round",
+      "sub": "Follow a few golfers and your next one lands in their feed.",
+      "notNow": "Not now"
+    }
   },
   "story": {
-    "likeAria": "[~~Ļíǩé ţĥíš šţőřý~~]",
-    "unlikeAria": "[~~Úñļíǩé ţĥíš šţőřý~~]",
-    "commentsAria": "[~~Ĉőɱɱéñţš~~]",
-    "commentsEmpty": "[~~Ɓé ţĥé ƒířšţ ţő ĉőɱɱéñţ~~]",
-    "viewComment": "[~~Ṽíéŵ 1 ĉőɱɱéñţ~~]",
-    "viewComments": "[~~Ṽíéŵ áļļ {{count}} ĉőɱɱéñţš~~]",
-    "guestPrompt": "[~~Ĵőíñ ĉļƀĥőúž ţő šéé ţĥé đíšĉúššíőñ~~]"
+    "likeAria": "[Like this story]",
+    "unlikeAria": "[Unlike this story]",
+    "commentsAria": "[Comments]",
+    "commentsEmpty": "[Be the first to comment]",
+    "viewComment": "[View 1 comment]",
+    "viewComments": "[View all {{count}} comments]",
+    "guestPrompt": "[Join clbhouz to see the discussion]"
   },
   "gate": {
     "head": {
-      "line1": "[~~Éṽéřý řőúñđ ýőú ƥļáý.~~]",
-      "line2": "[~~Éṽéřý ĉőúřšé ýőú ṽíšíţ.~~]",
-      "invite": "[~~{{name}} íñṽíţéđ ýőú~~]",
-      "inviteAnon": "[~~Ýőú ĥáṽé ƀééñ íñṽíţéđ~~]",
-      "profile": "[~~{{name}} őñ ĉļƀĥőúž~~]"
+      "line1": "Every round you play.",
+      "line2": "Every course you visit.",
+      "invite": "{{name}} invited you",
+      "inviteAnon": "You have been invited",
+      "profile": "{{name}} on clbhouz"
     },
     "sub": {
-      "default": "[~~Ĉőúřšéš ɱéášúřéđ ƒřőɱ ţĥé řőúñđš áĉţúáļļý ƥļáýéđ őñ ţĥéɱ, áñđ ýőúř ĝőļƒ řéáđ ĥőļé ƀý ĥőļé áĝáíñšţ ţĥéɱ.~~]",
-      "invite": "[~~Éṽéřý řőúñđ ýőú ƀőţĥ ƥļáý, ɱéášúřéđ őñ ţĥé šáɱé ĉőúřšéš.~~]",
-      "profile": "[~~Ţĥéíř íñđéẋ, ţĥéíř ƒőřɱ, áñđ éṽéřý ĉőúřšé ţĥéý ĥáṽé ƥļáýéđ.~~]"
+      "default": "Courses measured from the rounds actually played on them, and your golf read hole by hole against them.",
+      "invite": "Every round you both play, measured on the same courses.",
+      "profile": "Their index, their form, and every course they have played."
     },
     "figures": {
-      "courses": "[~~Ĉőúřšéš~~]",
-      "rounds": "[~~Řőúñđš ţřáĉǩéđ~~]",
-      "reviews": "[~~Ĉőúřšé řéṽíéŵš~~]",
-      "note": "[~~Ļíṽé ƒřőɱ ţĥé ƥļáţƒőřɱ. Ĝřééñ íš ţĥé ļášţ 30 đáýš.~~]"
+      "courses": "Courses",
+      "rounds": "Rounds tracked",
+      "reviews": "Course reviews",
+      "note": "Live from the platform. Green is the last 30 days."
     },
-    "appStore": "[~~Đőŵñļőáđ ĉļƀĥőúž őñ ţĥé Áƥƥ Šţőřé~~]",
-    "playSoon": "[~~Ĉőɱíñĝ šőőñ ţő Ĝőőĝļé Ƥļáý~~]",
-    "terms": "[~~Ţéřɱš~~]",
-    "privacy": "[~~Ƥříṽáĉý~~]"
+    "appStore": "Download clbhouz on the App Store",
+    "playSoon": "Coming soon to Google Play",
+    "terms": "Terms",
+    "privacy": "Privacy"
   },
   "draftGuard": {
     "question": "[~~Đíšĉářđ ŵĥáţ ýőú ĥáṽé ŵříţţéñ?~~]",
@@ -966,14 +961,14 @@
     "discard": "[~~Đíšĉářđ~~]"
   },
   "reactions": {
-    "celebratedThisRound": "[~~{{names}} ĉéļéƀřáţéđ ţĥíš řőúñđ~~]",
-    "celebratedYourRound": "[~~{{names}} ĉéļéƀřáţéđ ýőúř řőúñđ~~]",
-    "celebratedOwnersRound": "[~~{{names}} ĉéļéƀřáţéđ {{owner}}'š řőúñđ~~]",
+    "celebratedThisRound": "[~~{{names}} ċéľéƀřáţéđ ţĥíš řőúñđ~~]",
+    "celebratedYourRound": "[~~{{names}} ċéľéƀřáţéđ ýőűř řőúñđ~~]",
+    "celebratedOwnersRound": "[~~{{names}} ċéľéƀřáţéđ {{owner}}'š řőúñđ~~]",
     "namesTwo": "[~~{{a}} áñđ {{b}}~~]",
     "namesOneAndOne": "[~~{{a}} áñđ őñé őţĥéř~~]",
     "namesTwoAndOne": "[~~{{a}}, {{b}} áñđ őñé őţĥéř~~]",
     "namesOneAndMore": "[~~{{a}} áñđ {{n}} ɱőřé~~]",
     "namesTwoAndMore": "[~~{{a}}, {{b}} áñđ {{n}} ɱőřé~~]",
-    "sheetTitleCelebrated": "[~~Ĉéļéƀřáţéđ~~]"
+    "sheetTitleCelebrated": "[~~Çéľéƀřáţéđ~~]"
   }
 }

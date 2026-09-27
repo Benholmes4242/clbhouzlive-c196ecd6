@@ -50,16 +50,16 @@
     "threadStartGroup": "[~~Ţĥíš íš ţĥé šţářţ őƒ {{name}}.~~]",
     "threadStartGroupGeneric": "[~~Ţĥíš íš ţĥé šţářţ őƒ ţĥíš ĝřőúƥ.~~]",
     "threadStartWith": "[~~Ţĥíš íš ţĥé šţářţ őƒ ýőúř ĉőñṽéřšáţíőñ ŵíţĥ {{name}}.~~]",
-    "threadCommonGround": "[~~Ýőú áñđ {{name}} ĥáṽé ƥļáýéđ {{count}} řőúñđš ţőĝéţĥéř, ɱőšţ řéĉéñţļý áţ {{course}}.~~]",
-    "startTitle": "[~~Ñőţĥíñĝ ĥéřé ýéţ~~]",
-    "startPlayed": "[~~Šţářţ ŵíţĥ šőɱéőñé ýőú'ṽé ƥļáýéđ ŵíţĥ.~~]",
-    "startCircle": "[~~Šţářţ ŵíţĥ šőɱéőñé íñ ýőúř ĉířĉļé.~~]",
-    "inCircle": "[~~Íñ ýőúř ĉířĉļé~~]",
-    "messageSomeoneElse": "[~~Ṁéššáĝé šőɱéőñé éļšé~~]",
-    "messageSomeone": "[~~Ṁéššáĝé šőɱéőñé~~]",
-    "bareTitle": "[~~Ñő ĉőñṽéřšáţíőñš ýéţ~~]",
-    "bareBody": "[~~Ƒőļļőŵ á ƒéŵ ĝőļƒéřš áñđ ýőúř ĉőñṽéřšáţíőñš ŵíļļ šţářţ ĥéřé.~~]",
-    "bareUnresolvedBody": "[~~Šéářĉĥ ƒőř á ĝőļƒéř, ĉļúƀ őř ƀúšíñéšš ţő šţářţ á ĉőñṽéřšáţíőñ.~~]"
+    "threadCommonGround": "[Ýöû äñd {{name}} hävé pläyéd {{count}} röûñds tögéthér, möst récéñtly ät {{course}}.]",
+    "startTitle": "[Nothing here yet]",
+    "startPlayed": "[Start with someone you've played with.]",
+    "startCircle": "[Start with someone in your circle.]",
+    "inCircle": "[In your circle]",
+    "messageSomeoneElse": "[Message someone else]",
+    "messageSomeone": "[Message someone]",
+    "bareTitle": "[No conversations yet]",
+    "bareBody": "[Follow a few golfers and your conversations will start here.]",
+    "bareUnresolvedBody": "[Search for a golfer, club or business to start a conversation.]"
   },
   "error": {
     "couldntLoadInbox": "[~~Ĉőúļđñ'ţ ļőáđ ɱéššáĝéš~~]",
@@ -80,8 +80,8 @@
     "peopleAnd": "[~~Šéářĉĥ ƥéőƥļé áñđ ƀúšíñéššéš~~]",
     "prompt": "[~~Šéářĉĥ ƒőř šőɱéőñé ţő ɱéššáĝé.~~]",
     "searching": "[~~Šéářĉĥíñĝ…~~]",
-    "threads": "[~~Šéářĉĥ ĉőñṽéřšáţíőñš~~]",
-    "noResultsHint": "[~~Ţřý á ƒúļļ ñáɱé őř á úšéřñáɱé.~~]"
+    "threads": "[Séärçh çöñvérsätiöñs]",
+    "noResultsHint": "[Try a full name or a username.]"
   },
   "sheet": {
     "detailsTitle": "[~~Đéţáíļš~~]"
@@ -90,30 +90,30 @@
     "inbox": "[~~Ṁéššáĝéš~~]"
   },
   "preview": {
-    "photo": "[~~Ƥĥőţő~~]",
-    "video": "[~~Ṽíđéő~~]",
-    "voice": "[~~Ṽőíĉé ɱéššáĝé~~]",
-    "attachment": "[~~Áţţáĉĥɱéñţ~~]",
-    "empty": "[~~Ñő ɱéššáĝéš ýéţ~~]"
+    "photo": "[Phötö]",
+    "video": "[Vidéö]",
+    "voice": "[Vöiçé méssägé]",
+    "attachment": "[Attächméñt]",
+    "empty": "[Nö méssägés yét]"
   },
   "context": {
-    "business": "[~~Ɓúšíñéšš~~]",
-    "members": "[~~{{count}} ɱéɱƀéřš~~]",
-    "roundsTogether": "[~~{{count}} řőúñđš ţőĝéţĥéř~~]"
+    "business": "[Bûsiñéss]",
+    "members": "[{{count}} mémbérs]",
+    "roundsTogether": "[{{count}} röûñds tögéthér]"
   },
   "header": {
-    "roundsTogether": "[~~{{count}} řőúñđš ţőĝéţĥéř~~]"
+    "roundsTogether": "[{{count}} röûñds tögéthér]"
   },
   "shared": {
-    "eyebrow": "[~~Ƥļáýéđ ŵíţĥ {{name}} · {{count}}~~]",
-    "you": "[~~Ýőú~~]"
+    "eyebrow": "[Pläyéd with {{name}} · {{count}}]",
+    "you": "[Ýöû]"
   },
   "compose": {
-    "playedWith": "[~~Ƥļáýéđ ŵíţĥ~~]",
-    "roundsTogether": "[~~{{count}} řőúñđš ţőĝéţĥéř~~]",
-    "chooseSomeone": "[~~Ĉĥőőšé šőɱéőñé~~]",
-    "oneSelected": "[~~1 šéļéĉţéđ~~]",
-    "nSelected": "[~~{{count}} šéļéĉţéđ~~]",
-    "nSelectedGroup": "[~~{{count}} šéļéĉţéđ · ĝřőúƥ~~]"
+    "playedWith": "[Pläyéd with]",
+    "roundsTogether": "[{{count}} röûñds tögéthér]",
+    "chooseSomeone": "[Ch00se s0me0ne]",
+    "oneSelected": "[1 selected]",
+    "nSelected": "[{{count}} selected]",
+    "nSelectedGroup": "[{{count}} selected · group]"
   }
 }
