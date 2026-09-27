@@ -22,20 +22,36 @@ beforeAll(() => {
 const conn = { id: 'c1' } as any;
 const axisStart = () => screen.getByText('common:handicap.walk.today').previousSibling?.textContent;
 
-describe('Walk your index — window anchored to today', () => {
-  it('inactive member: 30D is a flat line, readout reads NO CHANGE at today and FIRST IN WINDOW at the start', () => {
+describe('Index block — window anchored to today, headline mutated in place', () => {
+  it('inactive member: 30D lands flat at 0.0; scrub parks and reads FIRST IN WINDOW at the start', () => {
     history = [{ observed_at: iso(200), handicap_index: 14.2 }, { observed_at: iso(45), handicap_index: 12.6 }];
-    render(<IndexSection connection={conn} />);
+    const { container } = render(<IndexSection connection={conn} />);
     fireEvent.click(screen.getByText('30D'));
     expect(axisStart()).toBe(format(new Date(Date.now() - 30 * DAY), 'MMM yyyy'));
     expect(screen.getByText('12.6')).toBeTruthy();
-    expect(screen.getByText('common:handicap.walk.noChange')).toBeTruthy();
-    // scrub to the left edge
+    expect(screen.getByText('0.0')).toBeTruthy();
+    expect(screen.getByText('common:handicap.walk.window30')).toBeTruthy();
+    expect(container.querySelectorAll('path[data-tone="flat"]').length).toBeGreaterThan(0);
+    expect(container.querySelector('path[data-tone="down"]')).toBeNull();
     const chart = screen.getByRole('img');
     chart.getBoundingClientRect = () => ({ left: 0 } as DOMRect);
     fireEvent.pointerDown(chart, { clientX: 0, pointerId: 1 });
+    fireEvent.pointerUp(chart, { clientX: 0, pointerId: 1 });
+    // parked after release
     expect(screen.getByText('common:handicap.walk.firstInWindow')).toBeTruthy();
-    expect(screen.getByText('12.6')).toBeTruthy();
+    // range change resets to landing
+    fireEvent.click(screen.getByText('90D'));
+    expect(screen.getByText('common:handicap.walk.headlineLabel')).toBeTruthy();
+  });
+
+  it('12M: landing movement is end minus start; improving step green, final run to today unchanged', () => {
+    history = [{ observed_at: iso(400), handicap_index: 14 }, { observed_at: iso(100), handicap_index: 12 }, { observed_at: iso(50), handicap_index: 12.5 }];
+    const { container } = render(<IndexSection connection={conn} />);
+    expect(screen.getByText('\u22121.5')).toBeTruthy();
+    expect(container.querySelector('path[data-tone="down"]')).not.toBeNull();
+    expect(container.querySelector('path[data-tone="up"]')).not.toBeNull();
+    const paths = container.querySelectorAll('path[data-tone]');
+    expect(paths[paths.length - 1].getAttribute('data-tone')).toBe('flat');
   });
 
   it.each([['30D', 30], ['90D', 90], ['12M', 365]] as const)('active member: %s axis spans %i days ending today', (chip, days) => {
@@ -49,7 +65,6 @@ describe('Walk your index — window anchored to today', () => {
     history = [];
     const { container } = render(<IndexSection connection={conn} />);
     expect(container.querySelector('svg')).toBeNull();
-    expect(screen.getByText('common:handicap.walk.heading')).toBeTruthy();
     expect(screen.getByText('common:handicap.walk.empty')).toBeTruthy();
     fireEvent.click(screen.getByText('90D'));
     expect(screen.getByText('90D').getAttribute('aria-pressed')).toBe('true');
