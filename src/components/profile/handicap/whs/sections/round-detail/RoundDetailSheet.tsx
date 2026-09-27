@@ -399,6 +399,12 @@ export const RoundDetailSheet: React.FC<Props> = ({
     supporting,
   });
   const cardOpen = presentation === 'page' ? open : open && overlayGate.visible;
+  // TEMPORARY — BRIEF_ROUND_PUSH_DEVICE_READOUT. Publish only; no behaviour.
+  if (DIAG_ON) {
+    roundDiag.round = `${userQuery.status}/${userQuery.fetchStatus} (${presentation})`;
+    roundDiag.cardOpen = String(cardOpen);
+    roundDiag.gate = String(overlayGate.visible);
+  }
   const coalesced = useCoalescedBlocks(supporting, overlayGate.visible);
   const include = presentation === 'page'
     ? { context: true, reactions: true, comments: true, commentPreview: true, field: true }

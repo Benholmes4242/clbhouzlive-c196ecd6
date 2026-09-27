@@ -429,6 +429,8 @@ import { InAppNotificationsMount } from '@/components/notifications/InAppNotific
 import { GenderPromptSheet } from '@/components/profile/GenderPromptSheet';
 
 import { useSilentSwitchHint } from '@/audio/useSilentSwitchHint';
+// TEMPORARY — BRIEF_ROUND_PUSH_DEVICE_READOUT
+import { RoundPushDiag } from '@/diag/roundPushDiag';
 
 
 
@@ -1096,6 +1098,7 @@ const AppInner: React.FC = () => {
                                                   {/* Global header for all pages except Clubhouse/Auth/Admin */}
                                                   <AppShellOnly><GlobalHeader /></AppShellOnly>
                                                   <AppRoutes />
+                                                  <RoundPushDiag />
                                                   
                                                 </div>
                                               </UserStatsCoursesProvider>
