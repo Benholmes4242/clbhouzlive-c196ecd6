@@ -14,7 +14,7 @@ import { NewsChromeBridge } from './NewsChromeBridge';
 
 import { useMoreFromTheWire, useTourStory, type TourStory } from './useTourStories';
 import StoryLeaderboardStrip from './StoryLeaderboardStrip';
-import { WorkhorseRow } from './StoryShapes';
+import { MORE_HEADING, WorkhorseRow } from './StoryShapes';
 import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { StoryBody } from './StoryBody';
@@ -238,7 +238,7 @@ export function StoryPage() {
 
           {(more?.length ?? 0) > 0 && (
             <div style={{ marginTop: 28 }}>
-              <div style={{ ...KICKER, color: INK, padding: '0 14px 6px', letterSpacing: '0.14em', fontSize: 11 }}>
+              <div style={{ ...MORE_HEADING, color: INK, padding: '0 14px 6px' }}>
                 {t('news.more', 'MORE FROM THE WIRE')}
               </div>
               {(more ?? []).map((s, i) => (

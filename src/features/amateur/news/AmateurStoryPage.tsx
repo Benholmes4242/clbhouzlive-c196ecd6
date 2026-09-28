@@ -17,20 +17,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { StoryArticle } from '@/features/tourhub/news/StoryPage';
 import { NewsChromeBridge } from '@/features/tourhub/news/NewsChromeBridge';
-import { WorkhorseRow } from '@/features/tourhub/news/StoryShapes';
+import { MORE_HEADING, WorkhorseRow } from '@/features/tourhub/news/StoryShapes';
 import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { FONT, HAIRLINE_INK_10, INK, INK_MUTE, TOUR_CANVAS } from '@/features/tourhub/_shared/tokens';
 
 import { categoriesLine } from './categories';
 import { useAmateurStory, useMoreAmateurNews, type AmateurStory } from './useAmateurStories';
-
-const KICKER: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: '0.14em',
-  textTransform: 'uppercase',
-};
 
 /**
  * The tag beside the timestamp: the category line and the event, joined. Either
@@ -87,7 +80,7 @@ export function AmateurStoryPage() {
 
           {(more?.length ?? 0) > 0 && (
             <div style={{ marginTop: 28 }}>
-              <div style={{ ...KICKER, color: INK, padding: '0 14px 6px' }}>
+              <div style={{ ...MORE_HEADING, color: INK, padding: '0 14px 6px' }}>
                 {t('amateurNews.more', 'MORE AMATEUR NEWS')}
               </div>
               {(more ?? []).map((s) => (
@@ -97,14 +90,13 @@ export function AmateurStoryPage() {
               ))}
             </div>
           )}
+          <div
+            aria-hidden
+            style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 96px) + 16px)' }}
+          />
           </>
         )}
       </div>
-
-      <div
-        aria-hidden
-        style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 96px) + 16px)' }}
-      />
     </div>
   );
 }
