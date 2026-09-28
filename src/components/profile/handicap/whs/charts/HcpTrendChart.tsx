@@ -129,7 +129,9 @@ export const HcpTrendChart: React.FC<Props> = ({
     const nearRight = lx >= width - padX - 18;
     const anchor = nearLeft ? 'start' : nearRight ? 'end' : 'middle';
     const tx = nearLeft ? 2 : nearRight ? width - 2 : lx;
-    const ty = Math.max(cy - 8, 9);
+    // The best-index callout sits below its low point so the descending stroke
+    // can never run through the value; the worst-index callout stays above.
+    const ty = kind === 'low' ? Math.min(cy + 13, height - 2) : Math.max(cy - 8, 9);
     return (
       <g key={idx} opacity={onMarker ? 0.42 : 1}>
         {!onMarker && (
