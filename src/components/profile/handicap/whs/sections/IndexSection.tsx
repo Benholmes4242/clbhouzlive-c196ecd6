@@ -163,7 +163,8 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
     if (!el || pts.length < 2) return;
     const rect = el.getBoundingClientRect();
     const width = rect.width || el.clientWidth;
-    const ratio = (clientX - rect.left) / Math.max(1, width);
+    const pointerX = Number.isFinite(clientX) ? clientX : rect.left;
+    const ratio = (pointerX - rect.left) / Math.max(1, width);
     setSel(Math.round(Math.min(1, Math.max(0, ratio)) * (pts.length - 1)));
   };
 
