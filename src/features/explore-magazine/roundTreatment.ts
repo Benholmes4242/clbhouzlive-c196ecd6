@@ -2,6 +2,7 @@ import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/use
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { StreamItem } from './streamItem';
+import { BIRDIE_HAUL_THRESHOLD } from '@/lib/gam/roundFeats';
 
 /**
  * THE EXPLORE ROUND VISUAL — ONE TREATMENT, GOOD THINGS ONLY.
@@ -61,7 +62,7 @@ export function hasMarkableAchievement(item: StreamItem): boolean {
     (facts.holes_in_one ?? 0) > 0 ||
     (facts.albatrosses ?? 0) > 0 ||
     (facts.eagles ?? 0) > 0 ||
-    (facts.birdies ?? 0) >= 4 ||
+    (facts.birdies ?? 0) >= BIRDIE_HAUL_THRESHOLD ||
     (facts.to_par ?? 0) < 0 ||
     facts.is_course_record === true
   );

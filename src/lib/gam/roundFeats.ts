@@ -17,8 +17,13 @@ export interface RoundFeat {
   count: number;
 }
 
-/** Birdie-haul threshold - MUST match refresh_discover_feats (birdie_count >= 4). */
-export const BIRDIE_HAUL_THRESHOLD = 4;
+/**
+ * The CLIENT's single source for the birdie-haul threshold: 5. SQL
+ * (refresh_discover_feats, get_explore_stream) and the Deno evaluator
+ * (gam-evaluator, five_birdie_round) each use 5 as their own literal and cannot
+ * import this, so all four must change together if it ever moves again.
+ */
+export const BIRDIE_HAUL_THRESHOLD = 5;
 
 export interface RoundFeatStats {
   birdies?: number | null;
