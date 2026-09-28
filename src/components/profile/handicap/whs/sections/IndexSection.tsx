@@ -9,7 +9,7 @@
  * RULES (do not relax them):
  *
  * - THE SERIES IS THE ONE ALREADY ON SCREEN: useHandicapHistory(…, 'all').
- *   No new read. The line is a monotone curve through the index in force.
+ *   No new read. The line shows the index in force across the selected window.
  *
  * - NO CAUSAL CLAIM. No point can be joined to a round, so the scrub says
  *   "THIS STEP", never "this round" (BRIEF_WALK_YOUR_INDEX_DATA_CHECK).
@@ -143,6 +143,10 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   }, [all, win]);
 
   const pts = view?.pts ?? [];
+  const chartPoints = useMemo(
+    () => pts.map((p) => ({ t: new Date(p.ts).toISOString(), v: p.v })),
+    [pts],
+  );
   // NO CHART only when there is no index history at all at or before today.
   const drawable = pts.length >= 1;
 
@@ -321,7 +325,7 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
             }}
           >
             <HcpTrendChart
-              points={pts.map((p) => ({ t: new Date(p.ts).toISOString(), v: p.v }))}
+              points={chartPoints}
               active={dotIdx}
               showCrosshair={idx != null}
               height={CHART_H}
