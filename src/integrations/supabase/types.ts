@@ -20631,6 +20631,40 @@ export type Database = {
         Args: { p_round?: number; p_tournament_id: string }
         Returns: Json
       }
+      get_featured_round: {
+        Args: {
+          p_club_id?: string
+          p_country?: string
+          p_county?: string
+          p_days?: number
+          p_scope?: string
+          p_viewer: string
+        }
+        Returns: {
+          albatrosses: number
+          birdies: number
+          clean_card: boolean
+          course_id: string
+          course_name: string
+          course_par: number
+          display_name: string
+          eagles: number
+          gross: number
+          holes_in_one: number
+          image_url: string
+          joint_with: string
+          net_score: number
+          photo_url: string
+          play_date: string
+          reason: string
+          stableford: number
+          tier: number
+          to_par: number
+          user_id: string
+          vs_hcp: number
+          whs_score_id: string
+        }[]
+      }
       get_friend_course_activity: {
         Args: { p_course_ids: string[]; p_user_id: string }
         Returns: {

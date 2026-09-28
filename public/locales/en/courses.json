@@ -1028,6 +1028,21 @@
       "mostRecent": "Most recent",
       "sortA11y": "Sort your rounds",
       "title": "Your rounds"
+    },
+    "featured": {
+      "label": "Round of the week",
+      "holeInOne": "Hole in one",
+      "albatross": "Albatross",
+      "courseRecord": "Course record",
+      "courseRecordJoint": "Course record · joint with {{names}}",
+      "eagleBrace": "{{count}} eagles",
+      "stablefordPoints": "points",
+      "underPar": "Under par",
+      "birdieHaul_one": "{{count}} birdie",
+      "birdieHaul_other": "{{count}} birdies",
+      "cleanCard": "Clean card",
+      "vsHandicap": "vs handicap",
+      "strapline": "The best round of the last seven days. Open the scorecard"
     }
   },
   "courseHero": {

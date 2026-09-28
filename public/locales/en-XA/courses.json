@@ -938,6 +938,21 @@
         "yoursJointTwo": "[~~Ýőú áñđ {{other}} ĵőíñţļý ĥőļđ ţĥé ĉőúřšé řéĉőřđ ĥéřé ŵíţĥ {{value}}.~~]",
         "yoursJointMany": "[~~Ýőú áñđ {{count}} őţĥéřš ĵőíñţļý ĥőļđ ţĥé ĉőúřšé řéĉőřđ ĥéřé ŵíţĥ {{value}}.~~]"
       }
+    },
+    "featured": {
+      "label": "[~~Röüñd öf thé wéék~~]",
+      "holeInOne": "[~~Hölé îñ öñé~~]",
+      "albatross": "[~~Àlbàtröšš~~]",
+      "courseRecord": "[~~Çöüršé réçörd~~]",
+      "courseRecordJoint": "[~~Çöüršé réçörd · jöîñt wîth {{names}}~~]",
+      "eagleBrace": "[~~{{count}} éàgléš~~]",
+      "stablefordPoints": "[~~pöîñtš~~]",
+      "underPar": "[~~Üñdér pàr~~]",
+      "birdieHaul_one": "[~~{{count}} bîrdîé~~]",
+      "birdieHaul_other": "[~~{{count}} bîrdîéš~~]",
+      "cleanCard": "[~~Çléàñ çàrd~~]",
+      "vsHandicap": "[~~vš hàñdîçàp~~]",
+      "strapline": "[~~Thé béšt röüñd öf thé làšt šévéñ dàýš. Öpéñ thé šçöréçàrd~~]"
     }
   },
   "courseHero": {
