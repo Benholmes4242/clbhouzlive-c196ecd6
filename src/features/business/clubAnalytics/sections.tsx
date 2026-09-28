@@ -430,6 +430,83 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
 /* ─────────────────── THE STROKE INDEX RECOMMENDATION ─────────────────── */
 
 /**
+ * BRIEF_SI_CHECK_LOCKED_REDESIGN — the locked gate as a progress state. The
+ * shortfall stays named and attributed to higher-handicap members (the
+ * commercial mechanic). `min_*_rows` are HOLE ROWS (scores on one hole), never
+ * converted to rounds.
+ */
+const StrokeIndexLocked: React.FC<{ gate: ClubCourseAnalytics['si_band_rows'] }> = ({ gate }) => {
+  const [open, setOpen] = React.useState(false);
+  const threshold = gate?.threshold ?? 200;
+  const bands = gate
+    ? [
+        { name: 'Lower handicaps', rows: gate.min_low_rows ?? 0 },
+        { name: 'Higher handicaps', rows: gate.min_high_rows ?? 0 },
+      ]
+    : [];
+  const bandText: React.CSSProperties = { fontFamily: SANS, fontSize: 12.5, fontWeight: 700 };
+  return (
+    <Panel kicker="Stroke index check" aside="Locked" style={CARD}>
+      <div style={{ ...BIZ_TITLE, marginBottom: 8 }}>We can't check your stroke index yet</div>
+      {gate ? (
+        <>
+          <Inset style={{ marginTop: 4 }}>
+            <div style={{ ...BIZ_LABEL, marginBottom: 10 }}>Scores on your least-played hole</div>
+            {bands.map((b, i) => {
+              const met = b.rows >= threshold;
+              const tone = met ? A.GREEN : A.RED;
+              // §1.1 — zero is zero; a non-zero shortfall keeps a visible mark.
+              const pct = met ? 100 : b.rows === 0 ? 0 : Math.max(MIN_BAR_PCT, (b.rows / threshold) * 100);
+              return (
+                <div key={b.name} style={{ marginTop: i === 0 ? 0 : 14 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                    <span style={{ ...bandText, color: A.INK }}>{b.name}</span>
+                    <span style={{ ...bandText, ...FIGS, color: tone }}>
+                      {met ? `${fmt(b.rows)} · ready` : `${fmt(b.rows)} of ${fmt(threshold)}`}
+                    </span>
+                  </div>
+                  <div style={{ marginTop: 7, height: 6, borderRadius: 999, background: A.TRACK, overflow: 'hidden' }}>
+                    <div style={{ width: `${Math.min(100, pct)}%`, height: '100%', borderRadius: 999, background: tone }} />
+                  </div>
+                </div>
+              );
+            })}
+          </Inset>
+          <Body style={{ marginTop: 10 }}>
+            Your higher-handicap members are the ones this is waiting on. Every one of them who connects to clbhouz
+            moves that second bar.
+          </Body>
+        </>
+      ) : (
+        <Body style={{ marginTop: 10 }}>
+          We need {fmt(threshold)} scores from each handicap band on every hole before we put a recommendation in front
+          of your handicap secretary.
+        </Body>
+      )}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        style={{
+          ...bandText, color: A.AMBER, marginTop: 12, padding: 0, background: 'none', border: 0,
+          display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer',
+        }}
+      >
+        Why we need both
+        <span aria-hidden style={{ display: 'inline-block', transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 150ms' }}>›</span>
+      </button>
+      {open && (
+        <Body style={{ marginTop: 8 }}>
+          A stroke index is not a difficulty order. It ranks where a higher handicapper needs a shot most relative to a
+          lower one, so it can only be measured when both ends of the handicap range have played every hole enough
+          times.
+        </Body>
+      )}
+    </Panel>
+  );
+};
+
+/**
  * GATED, AND THE GATE IS THE POINT. Read si_advice_state, never si_advice's
  * presence.
  *
@@ -448,51 +525,7 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
   const gate = data.si_band_rows;
   const ready = data.si_advice_state === 'ready' && (data.si_advice?.length ?? 0) > 0;
 
-  if (!ready) {
-    const threshold = gate?.threshold ?? 200;
-    // A null count from a course with no rounds is zero, never NaN.
-    const lowRows = gate?.min_low_rows ?? 0;
-    const highRows = gate?.min_high_rows ?? 0;
-    const highRounds = Math.max(1, Math.round(highRows / 18));
-    return (
-      <Panel kicker="Stroke index check" aside="Locked" style={CARD}>
-        <div style={{ ...BIZ_TITLE, marginBottom: 8 }}>We will not rank your stroke index on this sample</div>
-        <Body>
-          A stroke index is not a difficulty order. It ranks where a higher handicapper needs a shot most relative to a
-          lower one, so it can only be measured when both ends of the handicap range have played every hole enough
-          times.
-        </Body>
-        {gate && (
-          <Inset style={{ marginTop: 12 }}>
-            <div style={{ ...BIZ_LABEL, marginBottom: 10 }}>What we hold on your thinnest hole</div>
-            <div style={{ display: 'flex', gap: 22 }}>
-              {[
-                { label: 'Lower handicaps', value: lowRows },
-                { label: 'Higher handicaps', value: highRows },
-                { label: 'Needed, each', value: threshold },
-              ].map((s) => (
-                <div key={s.label}>
-                  <div style={bizFigure(19, s.value < threshold ? TOPAR_RED : A.INK)}>
-                    {fmt(s.value)}
-                  </div>
-                  <div style={{ ...LABEL, marginTop: 4 }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </Inset>
-        )}
-        <Body style={{ marginTop: 12 }}>
-          {gate
-            ? `Your higher-handicap side stands at ${fmt(highRows)} hole ${
-                highRows === 1 ? 'row' : 'rows'
-              } on the thinnest hole — roughly ${highRounds} ${highRounds === 1 ? 'round' : 'rounds'}. We need ${fmt(threshold)} on every hole in both bands before we will put a recommendation in front of your handicap secretary.`
-            : `We need ${fmt(threshold)} hole rows in each handicap band, on every hole, before we will put a recommendation in front of your handicap secretary.`}{' '}
-          Every higher-handicap member who connects to clbhouz moves that number, and they are the members this
-          measurement is waiting on.
-        </Body>
-      </Panel>
-    );
-  }
+  if (!ready) return <StrokeIndexLocked gate={gate} />;
 
   const rows = data.si_advice ?? [];
   return (
