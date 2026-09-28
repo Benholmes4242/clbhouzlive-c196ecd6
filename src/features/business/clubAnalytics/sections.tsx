@@ -100,7 +100,7 @@ const roundsLabel = (n: number | null | undefined) => `${fmt(n)} ${n === 1 ? 'ro
  * 1px gaps showing the border through, so the figures read as one instrument
  * rather than three loose numbers.
  */
-export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?: string }[] }> = ({ cells }) => (
+export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?: string }[]; twoLineLabels?: boolean }> = ({ cells, twoLineLabels }) => (
   <div
     style={{
       display: 'grid',
@@ -118,7 +118,7 @@ export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?
       <div key={c.label} style={{ background: A.PANEL, padding: '13px 12px' }}>
         <div style={bizFigure(21, c.tone ?? A.INK)}>{c.figure}</div>
         {/* LABEL_FITS §3 — every cell reserves two lines so figures share a baseline. */}
-        <div style={{ ...LABEL, marginTop: 6, lineHeight: 1.3, minHeight: '2.6em' }}>{c.label}</div>
+        <div style={{ ...LABEL, marginTop: 6, ...(twoLineLabels ? { lineHeight: 1.3, minHeight: '2.6em' } : null) }}>{c.label}</div>
       </div>
     ))}
   </div>
@@ -137,6 +137,7 @@ export const VerdictStrip: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) 
 
   return (
     <StatStrip
+      twoLineLabels
       cells={[
         { figure: data.avg_gross == null ? '—' : String(data.avg_gross), label: 'Mean gross' },
         { figure: hardest ? String(hardest.hole_no) : '—', label: 'Hardest hole' },
@@ -708,7 +709,7 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
             <div key={c.label} style={{ background: A.PANEL, padding: '12px 12px' }}>
               <div style={bizFigure(17, A.INK)}>{c.value}</div>
               {/* LABEL_FITS §3 — every cell reserves two lines so figures share a baseline. */}
-        <div style={{ ...LABEL, marginTop: 6, lineHeight: 1.3, minHeight: '2.6em' }}>{c.label}</div>
+        <div style={{ ...LABEL, marginTop: 6 }}>{c.label}</div>
             </div>
           ))}
         </div>
