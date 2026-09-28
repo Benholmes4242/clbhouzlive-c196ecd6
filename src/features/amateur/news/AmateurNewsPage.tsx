@@ -23,13 +23,13 @@ const BOTTOM_SPACER = 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-
 export function AmateurNewsPage() {
   const navigate = useNavigate();
   return (
-    <div style={{ background: TOUR_CANVAS, minHeight: '100dvh', fontFamily: FONT }}>
+    <main style={{ background: TOUR_CANVAS, minHeight: '100dvh', fontFamily: FONT }}>
       <NewsChromeBridge label="Amateur News" mode="menu" backFallback="/amateur" />
       <div style={{ paddingTop: 'var(--news-header-h)' }}>
         <NewsTabPage chrome="none" railBy="category" onOpenStory={(slug) => navigate(`/discover/news/${slug}`)} />
       </div>
       <div aria-hidden style={{ height: BOTTOM_SPACER }} />
-    </div>
+    </main>
   );
 }
 

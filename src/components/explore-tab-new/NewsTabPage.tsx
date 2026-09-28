@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { categoryLabel } from '@/features/amateur/news/categories';
+import { AMATEUR_CATEGORIES, categoryLabel } from '@/features/amateur/news/categories';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { type AmateurStory, useAmateurStories } from '@/features/amateur/news/useAmateurStories';
@@ -56,8 +56,10 @@ export function NewsTabPage({
     useMemo(() => allStories.map((story) => ({ type: 'amateur_story' as const, id: story.id })), [allStories]),
   );
 
-  const lead = stories[0];
-  const afterLead = stories.slice(1);
+  /* A story with no photograph never takes the hero slot — a photo-led band
+     with no photo is a 340px grey slab. It joins the normal flow instead. */
+  const lead = stories[0]?.image_url ? stories[0] : undefined;
+  const afterLead = lead ? stories.slice(1) : stories;
   const twoUp = afterLead.length >= 2 ? afterLead.slice(0, 2) : [];
   const afterFeatures = afterLead.slice(twoUp.length);
   const rows = afterFeatures.slice(0, 3);
@@ -66,13 +68,14 @@ export function NewsTabPage({
 
   const competitions = useMemo(() => {
     const counts = new Map<string, number>();
+    if (railBy === 'category') {
+      for (const story of allStories) for (const c of story.categories) counts.set(c, (counts.get(c) ?? 0) + 1);
+      /* Declared order, whole vocabulary — ORDER IS MEANINGFUL, nothing to cap. */
+      return AMATEUR_CATEGORIES.filter((c) => (counts.get(c.value) ?? 0) > 0).map((c) => [c.value, counts.get(c.value)!] as [string, number]);
+    }
     for (const story of allStories) {
-      if (railBy === 'category') {
-        for (const c of story.categories) counts.set(c, (counts.get(c) ?? 0) + 1);
-      } else {
-        const name = story.tournament_name?.trim();
-        if (name) counts.set(name, (counts.get(name) ?? 0) + 1);
-      }
+      const name = story.tournament_name?.trim();
+      if (name) counts.set(name, (counts.get(name) ?? 0) + 1);
     }
     return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8);
   }, [allStories, railBy]);
@@ -112,16 +115,18 @@ export function NewsTabPage({
         </div>
       ) : allStories.length === 0 ? (
         <div style={{ padding: `18px ${GUTTER}px ${bottomPad}px`, fontSize: 13, color: A.MUTE }}>{railBy === 'category' ? t('amateurNews.emptyAll', 'The first stories are on their way.') : 'The first stories are on their way.'}</div>
-      ) : !lead ? (
+      ) : stories.length === 0 ? (
         <div style={{ padding: `18px ${GUTTER}px ${bottomPad}px`, fontSize: 13, color: A.MUTE }}>{railBy === 'category' ? t('amateurNews.emptyFilter', 'Nothing filed under this yet.') : 'The first stories are on their way.'}</div>
       ) : (
         <>
-          <HeroStory
-            story={lead}
-            onOpen={() => open(lead)}
-            engagement={engagementFor(lead.id)}
-            engagementAction={engagementAction(lead, 14)}
-          />
+          {lead && (
+            <HeroStory
+              story={lead}
+              onOpen={() => open(lead)}
+              engagement={engagementFor(lead.id)}
+              engagementAction={engagementAction(lead, 14)}
+            />
+          )}
 
           <div style={{ padding: `0 ${GUTTER}px ${bottomPad}px` }}>
             {twoUp.length === 2 && (
@@ -147,6 +152,8 @@ export function NewsTabPage({
                 chips={competitions.map(([name, count]) => ({ key: name, label: chipLabel(name), count }))}
                 selected={competition}
                 sentenceHeading
+                allLabel={railBy === 'category' ? t('amateurNews.all', 'All') : 'All'}
+                ariaLabel={railBy === 'category' ? t('amateurNews.filterAria', 'Filter amateur news') : undefined}
                 onSelect={(key) => {
                   setCompetition(key);
                   setWireLimit(WIRE_PAGE_SIZE);
