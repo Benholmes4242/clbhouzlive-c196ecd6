@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { fetchGolfClub } from '@/features/business/claimClub';
 import { Loader2, Check, BadgeCheck, ArrowRight } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -16,14 +18,15 @@ interface ClaimCourseSheetProps {
   open: boolean;
   onClose: () => void;
   clubId: string;
-  clubName: string;
   sourceCourseId?: string;
 }
 
 const HAIRLINE = A.BORDER;
 
-const createUrl = (clubId: string, clubName: string, sourceCourseId?: string) => {
-  const p = new URLSearchParams({ category: 'golf_club', clubId, clubName });
+// The club id is the only club fact carried in the URL; the editor reads the
+// name (and geography) from golf_clubs by id.
+const createUrl = (clubId: string, sourceCourseId?: string) => {
+  const p = new URLSearchParams({ category: 'golf_club', clubId });
   if (sourceCourseId) p.set('sourceCourseId', sourceCourseId);
   return `/business/create?${p.toString()}`;
 };
@@ -57,13 +60,19 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
   open,
   onClose,
   clubId,
-  clubName,
   sourceCourseId,
 }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: memberships, isLoading } = useMyBusinesses(user?.id);
+  const { data: club } = useQuery({
+    queryKey: ['golf-club', clubId],
+    enabled: open && !!clubId,
+    staleTime: 10 * 60 * 1000,
+    queryFn: () => fetchGolfClub(clubId),
+  });
+  const clubName = club?.name ?? '';
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -103,7 +112,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
 
   const goToCreate = () => {
     onClose();
-    navigate(createUrl(clubId, clubName, sourceCourseId));
+    navigate(createUrl(clubId, sourceCourseId));
   };
 
   const handleSubmitClaim = async () => {

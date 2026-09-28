@@ -235,7 +235,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           open={showClaimSheet}
           onClose={() => setShowClaimSheet(false)}
           clubId={course.club_id}
-          clubName={course.name}
           sourceCourseId={course.id}
         />
       )}
