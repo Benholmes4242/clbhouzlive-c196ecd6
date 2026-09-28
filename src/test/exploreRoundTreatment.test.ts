@@ -3,6 +3,7 @@ import {
   MIN_SHAPE_SPAN,
   cumulativeSpan,
   dotsFor,
+  goodHoleDots,
   treatmentFor,
 } from '@/features/explore-magazine/roundTreatment';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
@@ -26,7 +27,7 @@ describe('treatmentFor', () => {
     ['an ace draws the line', { holes_in_one: 1 }, shape([-3, 0, 0]), 'line'],
     ['an albatross draws the line', { albatrosses: 1 }, shape([-3, 0, 0]), 'line'],
     ['an eagle draws the line', { eagles: 1 }, shape([-2, 0, 0]), 'line'],
-    ['four birdies draws the line', { birdies: 4 }, shape([-1, -1, -1, -1]), 'line'],
+    ['five birdies draws the line', { birdies: 5 }, shape([-1, -1, -1, -1, -1]), 'line'],
     ['under par draws the line even when flat', { to_par: -1 }, shape([-1, 0, 0]), 'line'],
     ['a course record draws the line', { is_course_record: true }, shape([0, 0, 0]), 'line'],
     /* MEDIAN TRAVEL, NOT ANY TRAVEL. A span of 10 draws; a span of 3 — which
@@ -64,5 +65,12 @@ describe('dotsFor', () => {
 
   it('never marks a round that earned its line on movement alone', () => {
     expect(dotsFor(item({ to_par: 4 }), shape([1, -1, 1, 1, 1]))).toEqual([]);
+  });
+
+  it('provides the same good-hole dots when a featured line is already visible', () => {
+    expect(goodHoleDots(shape([-2, -1, 0, 1]))).toEqual([
+      { i: 1, tone: SC_FILL_GOLD },
+      { i: 2, tone: TOPAR_UNDER_DARK },
+    ]);
   });
 });

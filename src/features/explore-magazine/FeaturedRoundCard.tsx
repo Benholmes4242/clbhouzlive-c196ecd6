@@ -25,6 +25,7 @@ import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
+import { goodHoleDots } from './roundTreatment';
 
 const GOLD = SC_FILL_GOLD;
 const gold = (pct: number) => `color-mix(in srgb, ${GOLD} ${pct}%, transparent)`;
@@ -138,6 +139,7 @@ export const FeaturedRoundCard: React.FC<{
   // V2 §5 — the place line: course · the kicker's figures · date.
   const placeLine = [r.course_name, ...parts, date].filter(Boolean).join(' · ');
   const traceRow = { round_id: r.whs_score_id, front_nine_to_par: null, back_nine_to_par: null } as unknown as CircleRoundRow;
+  const dots = goodHoleDots(shape);
 
   return (
     <button
@@ -189,7 +191,7 @@ export const FeaturedRoundCard: React.FC<{
           {shape ? (
             <RoundShape row={traceRow} shape={shape} width={SHAPE_W} height={SHAPE_BAND - EXPLORE_END_LABEL_BAND}
               showMeta={false} showBaseline baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2}
-              exploreLineOnly endLabels exploreGlow underParFill />
+              exploreLineOnly endLabels exploreGlow exploreDots={dots} underParFill />
           ) : null}
         </div>
         <div style={{ position: 'relative', padding: '0 16px 16px', textShadow: TEXT_SHADOW }}>
