@@ -14,7 +14,7 @@ import { NewsChromeBridge } from './NewsChromeBridge';
 
 import { useMoreFromTheWire, useTourStory, type TourStory } from './useTourStories';
 import StoryLeaderboardStrip from './StoryLeaderboardStrip';
-import { WorkhorseRow } from './StoryShapes';
+import { MORE_HEADING, WorkhorseRow } from './StoryShapes';
 import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { StoryBody } from './StoryBody';
