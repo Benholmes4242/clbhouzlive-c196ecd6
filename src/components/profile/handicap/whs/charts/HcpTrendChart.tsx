@@ -100,8 +100,13 @@ export const HcpTrendChart: React.FC<Props> = ({
   }
 
   const { xy, line, area, deltaTone, worstIdx, bestIdx } = geom;
-  const [mx, my] = xy[active];
-  const markerTone = zoneColor(points[active].v, stats.best, stats.worst);
+  const activePoint = xy[active];
+  const activeValue = points[active];
+  if (!activePoint || !activeValue || !stats) {
+    return <div ref={ref} style={{ width: '100%', height }} />;
+  }
+  const [mx, my] = activePoint;
+  const markerTone = zoneColor(activeValue.v, stats.best, stats.worst);
 
   // Collision guard: nudge the low label away from the high one when extremes
   // are close in both x and y.

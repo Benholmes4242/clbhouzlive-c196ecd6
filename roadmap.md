@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## Profile handicap chart parity — done
+- [x] Reuse the profile bottom sheet's handicap trend chart in the profile Handicap tab.
+- [x] Preserve the tab's history windows, headline, scrub behavior, and no-history state.
+- [x] Verify focused tests, TypeScript, and preview build.
+
 ## Explore clap weight and scroll-to-top
 - [x] Match the shared clap icon's optical weight to the message icon.
 - [x] Reuse the Courses scroll-to-top control across every Explore view.
