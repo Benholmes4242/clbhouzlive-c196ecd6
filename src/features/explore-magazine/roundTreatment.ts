@@ -94,6 +94,12 @@ export function treatmentFor(
  */
 export function dotsFor(item: StreamItem, shape: HoleShape | null | undefined): RoundDot[] {
   if (!shape || !hasMarkableAchievement(item)) return [];
+  return goodHoleDots(shape);
+}
+
+/** Shared dot grammar for a round whose line is already known to be visible. */
+export function goodHoleDots(shape: HoleShape | null | undefined): RoundDot[] {
+  if (!shape) return [];
   const out: RoundDot[] = [];
   holeDeltas(shape).forEach(({ delta, strokes }, index) => {
     if (strokes === 1 || delta <= -2) out.push({ i: index + 1, tone: SC_FILL_GOLD });

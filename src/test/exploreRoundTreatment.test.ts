@@ -3,6 +3,7 @@ import {
   MIN_SHAPE_SPAN,
   cumulativeSpan,
   dotsFor,
+  goodHoleDots,
   treatmentFor,
 } from '@/features/explore-magazine/roundTreatment';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
@@ -64,5 +65,12 @@ describe('dotsFor', () => {
 
   it('never marks a round that earned its line on movement alone', () => {
     expect(dotsFor(item({ to_par: 4 }), shape([1, -1, 1, 1, 1]))).toEqual([]);
+  });
+
+  it('provides the same good-hole dots when a featured line is already visible', () => {
+    expect(goodHoleDots(shape([-2, -1, 0, 1]))).toEqual([
+      { i: 1, tone: SC_FILL_GOLD },
+      { i: 2, tone: TOPAR_UNDER_DARK },
+    ]);
   });
 });
