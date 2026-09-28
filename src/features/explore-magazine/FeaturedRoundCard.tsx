@@ -120,16 +120,11 @@ export const FeaturedRoundCard: React.FC<{
   let parts: (string | null)[];
   let unit: string | null = null;
   if (r.tier === 2) {
-    // HEADLINE_FIT §2 — the unit is ALWAYS the short label; the joint clause
-    // (standalone jointWith_* keys, no "Course record ·") sits on the place line.
-    unit = k('courseRecord');
-    parts = [
-      (r.joint_count ?? 0) >= 2
-        ? k('jointWith_other', { count: r.joint_count })
-        : r.joint_count === 1 && r.joint_name
-          ? k('jointWith_one', { name: r.joint_name })
-          : null,
-    ];
+    // JOINT_LABEL §1 — the qualifier lives in the label ("Joint course record");
+    // the place line carries no joint clause and the co-holder is never named.
+    // joint_name stays in the row for future use but is not rendered.
+    unit = (r.joint_count ?? 0) > 0 ? k('courseRecordJoint') : k('courseRecord');
+    parts = [];
   } else if (r.tier === 3 && r.reason !== 'eagle_brace' && r.reason !== 'stableford_45') {
     parts = [gross]; // headline already showed the to-par
   } else if (r.tier >= 5) {
