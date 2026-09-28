@@ -5,7 +5,7 @@
 // small - no orchestration or DB writes live here (see usePostSubmit +
 // usePostUploadOrchestrator for those).
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { toast } from '@/lib/toast';
 import { POST_LIMITS, formatDuration } from '@/constants/postLimits';
 
