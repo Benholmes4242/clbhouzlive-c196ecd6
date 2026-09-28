@@ -17,7 +17,7 @@
 //     revokes the composer's blob URLs, which is why this screen owns its own
 //     object URLs (see PostCard) instead of borrowing the composer's.
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Clock, AlertTriangle, MapPin } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
