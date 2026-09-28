@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Maximize2, MapPin } from 'lucide-react';
 import { createGlassyMarkerElement } from './MapMarker';
-import { applyClbhouzMapStyle, MAP_CONFIG } from '@/config/maps';
+import { applyClbhouzMapDeclutter, applyClbhouzMapStyle, MAP_CONFIG } from '@/config/maps';
 import { AppLog } from '@/lib/logger';
 
 interface MapPreviewProps {
@@ -34,6 +34,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   showExpandButton = true,
   onExpand,
   interactive = false,
+  colorful = false,
   locationText,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -65,7 +66,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: MAP_CONFIG.STYLE_URL,
+        style: colorful ? MAP_CONFIG.STYLE_URL_COLOUR : MAP_CONFIG.STYLE_URL,
         center: [lng, lat],
         zoom,
         interactive,
@@ -74,7 +75,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
 
       mapRef.current = map;
 
-      map.on('style.load', () => applyClbhouzMapStyle(map));
+      map.on('style.load', () => (colorful ? applyClbhouzMapDeclutter(map) : applyClbhouzMapStyle(map)));
 
       map.on('load', () => {
         if (mountedRef.current) {
@@ -117,7 +118,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
         mapRef.current = null;
       }
     };
-  }, [lat, lng, zoom, interactive, mapInitialized, hasValidCoords]);
+  }, [lat, lng, zoom, interactive, colorful, mapInitialized, hasValidCoords]);
 
   // Reset map when coordinates change
   useEffect(() => {

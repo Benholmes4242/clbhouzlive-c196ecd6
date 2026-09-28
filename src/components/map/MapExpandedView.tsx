@@ -7,7 +7,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { createGlassyMarkerElement } from './MapMarker';
-import { applyClbhouzMapStyle, MAP_CONFIG } from '@/config/maps';
+import { applyClbhouzMapDeclutter, applyClbhouzMapStyle, MAP_CONFIG } from '@/config/maps';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { openMapsUrl } from '@/utils/median/openMapsUrl';
 import { getActorRouteByType } from '@/types/actor';
@@ -33,8 +33,9 @@ interface MapExpandedViewProps {
 }
 
 /**
- * Unified expanded map view used by both Course Details and Business Profile.
- * Features satellite-streets, glassy orange marker, zoom controls, Apple/Google Maps buttons.
+ * Expanded bottom-sheet map for the course detail location card.
+ * Dark restrained base by default; `colorful` switches to the colour base with a
+ * declutter-only pass. Amber marker, nearby pins, zoom controls, Apple/Google Maps buttons.
  */
 export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
   open,
@@ -43,6 +44,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
   lng,
   name,
   locationText,
+  colorful = false,
   nearby,
 }) => {
   const navigate = useNavigate();
@@ -104,7 +106,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: MAP_CONFIG.STYLE_URL,
+        style: colorful ? MAP_CONFIG.STYLE_URL_COLOUR : MAP_CONFIG.STYLE_URL,
         center: [lng, lat],
         zoom: MAP_CONFIG.ZOOM.EXPANDED,
         interactive: true,
@@ -117,7 +119,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
 
       mapRef.current = map;
 
-      map.on('style.load', () => applyClbhouzMapStyle(map));
+      map.on('style.load', () => (colorful ? applyClbhouzMapDeclutter(map) : applyClbhouzMapStyle(map)));
 
       // Navigation controls
       map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
@@ -154,7 +156,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
         mapRef.current = null;
       }
     };
-  }, [open, lat, lng]);
+  }, [open, lat, lng, colorful]);
 
   // Secondary hospitality pins — mount after map is ready and re-sync on change.
   useEffect(() => {

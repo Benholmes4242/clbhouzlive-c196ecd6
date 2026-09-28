@@ -20,6 +20,9 @@ import MapboxWorker from 'mapbox-gl/dist/mapbox-gl-csp-worker?worker';
 export const MAP_CONFIG = {
   /** Dark cartographic base; all app maps receive the shared paint pass below. */
   STYLE_URL: 'mapbox://styles/mapbox/dark-v11',
+
+  /** Colour cartographic base, for maps whose job is to show a PLACE. */
+  STYLE_URL_COLOUR: 'mapbox://styles/mapbox/outdoors-v12',
   
   /** Token from environment */
   TOKEN: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string,
@@ -190,6 +193,30 @@ export function applyClbhouzMapStyle(
       try { map.setPaintProperty(id, 'text-color', labelColor); } catch {}
       try { map.setPaintProperty(id, 'text-halo-color', labelHaloColor); } catch {}
       try { map.setPaintProperty(id, 'text-halo-width', 1.5); } catch {}
+    }
+  }
+}
+
+/**
+ * Colour pass for `colorful` maps: removes clutter ONLY and repaints nothing.
+ * The base style's own palette (golf-course landuse, water, parks) is the point.
+ * Keeps landuse, water, roads, buildings and place labels.
+ *
+ * Call inside map.on('style.load', () => applyClbhouzMapDeclutter(map))
+ */
+export function applyClbhouzMapDeclutter(map: mapboxgl.Map) {
+  const layers = map.getStyle().layers;
+  if (!layers) return;
+  for (const { id } of layers) {
+    if (
+      id.startsWith('poi') ||
+      id.startsWith('transit') ||
+      id.startsWith('rail') ||
+      id.startsWith('ferry') ||
+      id.startsWith('aeroway') ||
+      id.includes('housenum')
+    ) {
+      map.removeLayer(id);
     }
   }
 }
