@@ -3,6 +3,8 @@
 // The filmstrip and the page-2 media strip both need a cheap thumbnail for
 // video slides; decoding a <video> per tile is expensive in the WebView, so
 // each slide id resolves to a data URL once and is reused thereafter.
+// RULE: the first argument (the cache key) is a STABLE ITEM ID, never a blob
+// URL — blob URLs are reminted per mount and this cache is never evicted.
 //
 // WebView notes (this is the whole reason posters were black/grey on device):
 //  - `preload = 'metadata'` never loads frame data, so `loadeddata` may never

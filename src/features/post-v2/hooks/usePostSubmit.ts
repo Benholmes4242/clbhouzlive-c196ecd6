@@ -78,7 +78,7 @@ export interface SubmitResult {
   actorId?: string | null;
   /** Ordered picked media for the card's media block. `file` is absent for
    *  already-uploaded items (edit path) — those have no local preview. */
-  mediaPreviews?: { file?: File; type: 'image' | 'video' }[];
+  mediaPreviews?: { id: string; file?: File; type: 'image' | 'video'; posterTimestamp?: number | null }[];
 }
 
 export function usePostSubmit() {
@@ -232,7 +232,7 @@ export function usePostSubmit() {
         actorName: input.authorName,
         actorAvatarUrl: input.authorAvatarUrl,
         actorId: input.actorId,
-        mediaPreviews: input.media.map((m) => ({ file: m.file, type: m.type })),
+        mediaPreviews: input.media.map((m) => ({ id: m.id, file: m.file, type: m.type, posterTimestamp: m.posterTimestamp })),
       };
     } catch (e) {
       // Roll back the optimistic pending card - the post was never born.
