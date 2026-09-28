@@ -25,14 +25,29 @@ import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 const WIRE_PAGE_SIZE = 10;
 
 /** NEWS is editorial only and deliberately mounts no Discover media query. */
-export function NewsTabPage({ onOpenStory }: { onOpenStory: (slug: string) => void }) {
+export function NewsTabPage({
+  onOpenStory,
+  chrome = 'discover',
+  railBy = 'competition',
+}: {
+  onOpenStory: (slug: string) => void;
+  /** The page shell owns the frame. Discover's tab owns its own. */
+  chrome?: 'discover' | 'none';
+  /** Which cut the chip rail offers. Same rail, same threshold. */
+  railBy?: 'competition' | 'category';
+}) {
+  const { t } = useTranslation('courses');
   const { stories: allStories = [], isPending } = useAmateurStories(null);
   const [wireLimit, setWireLimit] = useState(WIRE_PAGE_SIZE);
   const [competition, setCompetition] = useState<string | null>(null);
   const [commentsStoryId, setCommentsStoryId] = useState<string | null>(null);
   const stories = useMemo(
-    () => competition ? allStories.filter((story) => story.tournament_name?.trim() === competition) : allStories,
-    [allStories, competition],
+    () => !competition
+      ? allStories
+      : railBy === 'category'
+        ? allStories.filter((story) => story.categories.includes(competition))
+        : allStories.filter((story) => story.tournament_name?.trim() === competition),
+    [allStories, competition, railBy],
   );
   const { engagementFor } = useStoryEngagement('amateur_story', useMemo(() => allStories.map((story) => story.id), [allStories]));
   const { stateFor, toggle, unavailable, viewerId } = useContentReactions(
@@ -50,11 +65,22 @@ export function NewsTabPage({ onOpenStory }: { onOpenStory: (slug: string) => vo
   const competitions = useMemo(() => {
     const counts = new Map<string, number>();
     for (const story of allStories) {
-      const name = story.tournament_name?.trim();
-      if (name) counts.set(name, (counts.get(name) ?? 0) + 1);
+      if (railBy === 'category') {
+        for (const c of story.categories) counts.set(c, (counts.get(c) ?? 0) + 1);
+      } else {
+        const name = story.tournament_name?.trim();
+        if (name) counts.set(name, (counts.get(name) ?? 0) + 1);
+      }
     }
     return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8);
-  }, [allStories]);
+  }, [allStories, railBy]);
+  const chipLabel = (key: string) =>
+    railBy === 'category' ? categoryLabel(key, (v, f) => t(`amateurNews.categories.${v}`, f)) : key;
+  const bottomPad = chrome === 'none' ? 0 : 110;
+  const Frame = chrome === 'none' ? 'div' : 'main';
+  const frameStyle: React.CSSProperties = chrome === 'none'
+    ? {}
+    : { paddingTop: 'var(--discover-header-h, calc(env(safe-area-inset-top, 0px) + 78px))', minHeight: '100dvh', background: A.CANVAS, color: A.INK, fontFamily: SANS };
 
   const open = (story: AmateurStory) => onOpenStory(story.slug);
   const engagementAction = (story: AmateurStory, size = 13) => {
