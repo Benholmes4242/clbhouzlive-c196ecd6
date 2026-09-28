@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
@@ -208,7 +208,10 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   // If the browser served the image from cache, `onLoad` may have fired
   // before this component's listener attached. Detect completeness on mount
   // and after src changes so onLoad consumers still fire reliably.
-  useEffect(() => {
+  // LAYOUT effect, deliberately: a passive useEffect runs after paint, so a
+  // fully cached photo would paint one frame at opacity 0 with the initials
+  // showing through. Do not "simplify" this back to useEffect.
+  useLayoutEffect(() => {
     if (!imageSrc || showFallback) return;
     const img = imgRef.current;
     if (img && img.complete && img.naturalWidth > 0) {
@@ -240,14 +243,16 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   // A stalled image, dead URL, slow network or missing photo all degrade to the
   // same correct-looking avatar instead of a blank tile. There is no loading
   // skeleton: the old "neutral skeleton, never initials" rule bought a flash-free
-  // cached load, but cached loads don't flash anyway (the img.complete effect
-  // sets imageLoaded synchronously on mount) and it cost a hole on every cold one.
+  // cached load; cached loads now stay flash-free because the img.complete check
+  // is a useLayoutEffect (a passive effect would paint a frame of initials
+  // first), and the skeleton cost a hole on every cold load.
   const avatarContent = (
     <>
       <div
         className="absolute inset-0 flex items-center justify-center overflow-hidden text-white"
         style={{ background: fallbackBg }}
-        aria-label={alt || fallbackInitials}
+        aria-label={imageSrc && !showFallback ? undefined : alt || fallbackInitials}
+        aria-hidden={imageSrc && !showFallback ? true : undefined}
       >
         {hasInitials ? (
           <span
