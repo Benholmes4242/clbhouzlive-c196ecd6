@@ -7,6 +7,7 @@
  *   /business/create         → create mode (no :id)
  *   /business/:id/edit       → edit mode  (loads existing)
  */
+import { fetchGolfClub, clubRowToSelected, clubInsertFields } from '@/features/business/claimClub';
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -157,22 +158,17 @@ export default function BusinessProfileEditor() {
 
   /* ── prefilled club from URL params (Claim this course) ── */
   const prefilledClubId = searchParams.get('clubId');
-  const prefilledClubName = searchParams.get('clubName');
+  // The name and geography are READ from golf_clubs by id — never carried in
+  // the URL (a course name once travelled there and became the business name).
   useEffect(() => {
-    if (mode === 'create' && prefilledClubId && prefilledClubName && !selectedClub) {
-      setSelectedClub({
-        id: prefilledClubId,
-        name: prefilledClubName,
-        club_key: null,
-        country: null,
-        sub_country: null,
-        region: null,
-        latitude: null,
-        longitude: null,
-      } as SelectedClub);
-    }
+    if (mode !== 'create' || !prefilledClubId || selectedClub) return;
+    let cancelled = false;
+    fetchGolfClub(prefilledClubId)
+      .then((row) => { if (!cancelled && row) setSelectedClub(clubRowToSelected(row)); })
+      .catch(() => {});
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefilledClubId, prefilledClubName, mode]);
+  }, [prefilledClubId, mode]);
 
   /* ── auth gate ────────────────────────────────────── */
   useEffect(() => {
@@ -472,9 +468,11 @@ export default function BusinessProfileEditor() {
           // Ownership of the course is granted only when an admin approves a
           // course_claim_request (filed below after the business is created).
           // Display fields (lat/lng/country) are safe to populate up-front.
-          insertData.lat = selectedClub.latitude || null;
-          insertData.lng = selectedClub.longitude || null;
-          insertData.country = selectedClub.country || null;
+          const fromClub = clubInsertFields(selectedClub);
+          insertData.club_name = fromClub.club_name;
+          insertData.lat = fromClub.lat;
+          insertData.lng = fromClub.lng;
+          insertData.country = fromClub.country;
         }
 
         if (address) {
