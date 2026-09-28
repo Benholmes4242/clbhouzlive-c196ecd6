@@ -1,8 +1,8 @@
 /**
  * BRIEF_COURSE_TAB_REBUILD §3.9 — WHERE IT IS, flat.
  *
- * The map card itself is UNTOUCHED (LocationMapCard is shared with the business
- * profile); what changed is that it now sits under the tab's section heading
+ * The map card itself is UNTOUCHED (LocationMapCard's only consumer is this
+ * section); what changed is that it now sits under the tab's section heading
  * with the place named as the meta, instead of floating in a padded block with
  * no title at all. Nearby pins still come from the same cached read the Nearby
  * section uses, so no extra request is made.
