@@ -119,12 +119,14 @@ export function NewsTabPage({
         <div style={{ padding: `18px ${GUTTER}px ${bottomPad}px`, fontSize: 13, color: A.MUTE }}>{railBy === 'category' ? t('amateurNews.emptyFilter', 'Nothing filed under this yet.') : 'The first stories are on their way.'}</div>
       ) : (
         <>
-          <HeroStory
-            story={lead}
-            onOpen={() => open(lead)}
-            engagement={engagementFor(lead.id)}
-            engagementAction={engagementAction(lead, 14)}
-          />
+          {lead && (
+            <HeroStory
+              story={lead}
+              onOpen={() => open(lead)}
+              engagement={engagementFor(lead.id)}
+              engagementAction={engagementAction(lead, 14)}
+            />
+          )}
 
           <div style={{ padding: `0 ${GUTTER}px ${bottomPad}px` }}>
             {twoUp.length === 2 && (
