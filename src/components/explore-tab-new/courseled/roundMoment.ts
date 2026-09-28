@@ -171,10 +171,15 @@ export const RUN_MIN = 7;
 export const FINISH_MIN = 2;
 /** THE GRIND: twelve holes taken care of and nothing worse than a bogey. */
 export const GRIND_MIN = 12;
+/** THIS IS A STORY THRESHOLD, NOT A FEAT THRESHOLD. The feat is
+ *  BIRDIE_HAUL_THRESHOLD in @/lib/gam/roundFeats and is higher. They
+ *  are different questions and must never be merged or aligned:
+ *  a moment names what a round was about, a feat records something
+ *  permanent and comparable. Do not import one into the other. */
 /** FOUR BIRDIES: three is a good day for most members and common enough to be
  *  unremarkable; four is the point at which the birdies, not the score, are the
  *  story of the round. */
-export const BIRDIE_HAUL_MIN = 4;
+export const BIRDIE_MOMENT_MIN = 4;
 
 interface Scored {
   holeNo: number;
@@ -298,7 +303,7 @@ export function selectMoment(
      already been taken by the eagle above. The birdie holes ARE marked: they
      are scattered by nature and worth grouping. */
   const birdies = hs.filter((h) => h.d === -1);
-  if (birdies.length >= BIRDIE_HAUL_MIN) {
+  if (birdies.length >= BIRDIE_MOMENT_MIN) {
     return {
       kind: 'birdieHaul',
       tone: MOMENT_TONE.birdieHaul,
