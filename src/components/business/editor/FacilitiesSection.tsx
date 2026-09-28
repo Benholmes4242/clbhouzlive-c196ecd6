@@ -1,11 +1,9 @@
 import React from 'react';
-import { Check } from 'lucide-react';
 
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
-import { BIZ } from '@/components/business/businessTokens';
 import { HINT_CLASS } from '@/components/manage/fieldTreatment';
+import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
 import { getFacilitiesForCategory } from './editorTypes';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   category: string;
@@ -32,29 +30,23 @@ export function FacilitiesSection({ category, amenities, setAmenities }: Props) 
               Tap what you offer. These show as tags on your profile.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          {/* Multi-select toggles: role="group" + aria-pressed, never a tablist.
+              Canonical chip spread verbatim — no tick, no amber (amber = viewing member). */}
+          <div
+            role="group"
+            aria-label="Facilities and amenities"
+            style={{ display: 'flex', flexWrap: 'wrap', gap: RAIL_CHIP_GAP }}
+          >
             {options.map((tag) => {
               const active = amenities.includes(tag);
               return (
                 <button
                   key={tag}
                   type="button"
+                  aria-pressed={active}
                   onClick={() => toggle(tag)}
-                  className="inline-flex items-center gap-1.5 rounded-full text-[13px] font-medium transition-colors"
-                  style={{
-                    padding: '7px 12px',
-                    /*
-                      Inactive branch only (§5): a white slab became the 6%
-                      raised fill. The amber selected border is untouched.
-                    */
-                    background: active ? BIZ.amberTint : 'rgba(255,255,255,0.06)',
-                    border: active
-                      ? `1px solid ${BIZ.amber}`
-                      : `1px solid ${A.BORDER}`,
-                    color: active ? BIZ.amber : A.BODY,
-                  }}
+                  style={railChipStyle(active)}
                 >
-                  {active && <Check size={13} strokeWidth={2.5} />}
                   {tag}
                 </button>
               );
