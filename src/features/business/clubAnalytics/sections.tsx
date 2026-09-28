@@ -831,10 +831,24 @@ function whoPlaysIt(t: ClubAnalyticsTee): string | null {
   return 'A mixed field';
 }
 
+const TEE_GRID: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '1fr 64px 62px',
+  gap: 10,
+  alignItems: 'baseline',
+};
+const TEE_HEAD: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase',
+  color: A.DIM,
+};
+
 export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
   const tees = sortTees(data.tees ?? []);
   const totalRounds = tees.reduce((s, t) => s + t.rounds, 0);
-  const maxRounds = tees.reduce((m, t) => Math.max(m, t.rounds), 1);
 
   if (tees.length === 0) {
     return (
@@ -858,35 +872,40 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
       style={CARD}
     >
       <Inset>
+        <div style={{ ...TEE_GRID, paddingBottom: 10 }}>
+          <span style={TEE_HEAD}>Yardage</span>
+          <span style={{ ...TEE_HEAD, textAlign: 'right' }}>Rounds</span>
+          <span style={{ ...TEE_HEAD, textAlign: 'right' }}>To par</span>
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {tees.map((t) => {
             const parts = toParParts(t.avg_to_par);
             const who = whoPlaysIt(t);
+            const share = totalRounds > 0 ? t.rounds / totalRounds : 0;
+            const pct = Math.round(share * 100);
+            const num: React.CSSProperties = { fontSize: 13, fontWeight: 700, textAlign: 'right', ...FIGS };
             return (
               <div key={t.yards} style={{ fontFamily: SANS, ...FIGS }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
+                <div style={TEE_GRID}>
                   {/* NO NAME. The yardage is the label. */}
                   <span style={bizFigure(15, A.INK)}>{yd(t.yards)}</span>
-                  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8 }}>
-                    <span style={bizFigure(13, parts?.tone ?? A.INK)}>{parts?.text ?? '0'}</span>
-                    <span style={{ fontSize: 11.5, fontWeight: 600, color: A.DIM }}>
-                      {fmt(t.rounds)}
-                    </span>
-                  </span>
+                  <span style={{ ...num, color: A.INK }}>{fmt(t.rounds)}</span>
+                  <span style={{ ...num, color: parts?.tone ?? A.INK }}>{parts?.text ?? '0'}</span>
                 </div>
                 <div style={{ height: 5, borderRadius: 3, background: A.TRACK, marginTop: 6, overflow: 'hidden' }}>
                   <i
                     style={{
                       display: 'block',
                       height: '100%',
-                      width: `${Math.max(MIN_BAR_PCT, (t.rounds / maxRounds) * 100)}%`,
-                      background: difficultyRampStop(2),
+                      width: `${Math.max(MIN_BAR_PCT, share * 100)}%`,
+                      background: A.INK,
                     }}
                   />
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: A.BODY, marginTop: 7 }}>
-                  {who ?? `Mix not available — ${fmt(t.with_index)} indexed rounds`}
-                  {t.mean_index != null && who ? ` · mean index ${t.mean_index.toFixed(1)}` : ''}
+                <div style={{ fontSize: 11.5, lineHeight: 1.4, color: A.DIM, marginTop: 6 }}>
+                  {`${pct}% of play`}
+                  {who ? ` · ${who}` : ''}
+                  {who && t.mean_index != null ? `, mean index ${t.mean_index.toFixed(1)}` : ''}
                 </div>
               </div>
             );
@@ -894,12 +913,12 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
         </div>
       </Inset>
       <Body style={{ marginTop: 12 }}>
-        Scoring differences between yardages largely reflect who chooses them, so nothing here ranks your tees by
+        Scores differ between yardages mostly because of who chooses them, so this does not rank your tees by
         difficulty.
       </Body>
       <Body style={{ marginTop: 8, fontSize: 11.5, color: A.DIM }}>
-        To par is the mean 18-hole score against each round's own par. Yardages come from the rounds themselves,
-        bucketed to the nearest hundred; we do not know which colour your club calls each tee, so we do not name them.
+        Yardages come from the rounds themselves, rounded to the nearest hundred. We do not know which colour your club
+        calls each tee, so we do not name them.
       </Body>
     </Panel>
   );
