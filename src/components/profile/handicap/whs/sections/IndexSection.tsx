@@ -19,18 +19,8 @@
  * - LANDING MOVEMENT is window end minus window start. Down = improved tone,
  *   up = drifted tone, zero = A.DIM and reads "0.0".
  *
- * - THE LINE IS ONE COLOUR, SET BY THE WINDOW (BRIEF_INDEX_LINE_SMOOTH_CURVE):
- *   `windowNet` is computed ONCE and drives both the headline movement figure
- *   and the stroke/fill tone. Scrub never recolours the line.
- *
- * - MONOTONE CURVE (Fritsch–Carlson), never Catmull-Rom/cardinal/basis: those
- *   overshoot and draw an index the member never held. The curve misstates
- *   TIMING only; the scrub states timing exactly. Flat lead/trail stay flat.
- *
- * - FILL: same path data as the stroke + two closing edges to the plot bottom.
- *
- * - COLOUR PAIR: A.IMPROVED / A.DRIFTED (= INDEX_DELTA.dark), the pair the
- *   movement figure already resolved to, so line and figure cannot disagree.
+ * - THE CHART IS THE SAME SHARED HcpTrendChart USED BY THE PROFILE SHEET:
+ *   zone-graded stroke, net-movement fill, best/worst callouts and active halo.
  *
  * - SCRUB: pointer down snaps to the nearest point; drag follows under pointer
  *   capture; release PARKS it. Any range change resets to landing.
@@ -39,7 +29,7 @@
  * - CHIPS are plain buttons with aria-pressed, NOT role="tab": handicap-dark.css
  *   forces [role="tab"][aria-selected="true"] to white with !important.
  */
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 
@@ -50,68 +40,14 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 import { HcpSection } from './HcpSection';
 import { CHART, DEAD_BAND } from '../charts/tokens';
+import { HcpTrendChart } from '../charts/HcpTrendChart';
 
 interface Props {
   connection: WhsConnection;
 }
 
 const MS_PER_DAY = 86_400_000;
-const CHART_H = 132;
-const PAD_T = 22;
-const PAD_B = 22;
-/** Scrub within this many px of the high/low point and its label yields. */
-const LABEL_YIELD_PX = 36;
-const FILL_ALPHA = { down: 0.26, up: 0.16 } as const;
-
-/**
- * MONOTONE CUBIC HERMITE (Fritsch–Carlson) through the points, holding the
- * last value flat to xEnd. Slopes from neighbouring secants, zeroed at every
- * local extremum and wherever a secant is zero, scaled back where
- * alpha² + beta² > 9. One cubic Bézier per interval, controls at thirds.
- * Never overshoots: the curve's y extent is the series' own min/max. Points
- * sharing an x (same-day observations) join with a straight vertical.
- */
-export function monotonePath(p: Array<[number, number]>, xEnd: number): string {
-  const n = p.length;
-  let d = `M ${p[0][0]} ${p[0][1]}`;
-  if (n > 1) {
-    const dx: number[] = [];
-    const sec: number[] = [];
-    for (let i = 0; i < n - 1; i++) {
-      dx.push(p[i + 1][0] - p[i][0]);
-      sec.push(dx[i] > 0 ? (p[i + 1][1] - p[i][1]) / dx[i] : 0);
-    }
-    const m: number[] = new Array(n).fill(0);
-    m[0] = sec[0];
-    m[n - 1] = sec[n - 2];
-    for (let i = 1; i < n - 1; i++) {
-      m[i] = sec[i - 1] * sec[i] <= 0 || dx[i - 1] <= 0 || dx[i] <= 0 ? 0 : (sec[i - 1] + sec[i]) / 2;
-    }
-    for (let i = 0; i < n - 1; i++) {
-      if (dx[i] <= 0) { m[i] = 0; m[i + 1] = 0; continue; }
-      if (sec[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
-      const al = m[i] / sec[i];
-      const be = m[i + 1] / sec[i];
-      if (al < 0) m[i] = 0;
-      if (be < 0) m[i + 1] = 0;
-      const h = al * al + be * be;
-      if (h > 9) {
-        const t = 3 / Math.sqrt(h);
-        m[i] = t * al * sec[i];
-        m[i + 1] = t * be * sec[i];
-      }
-    }
-    for (let i = 0; i < n - 1; i++) {
-      const [x0, y0] = p[i];
-      const [x1, y1] = p[i + 1];
-      if (dx[i] <= 0) { d += ` L ${x1} ${y1}`; continue; }
-      const h3 = dx[i] / 3;
-      d += ` C ${x0 + h3} ${y0 + m[i] * h3} ${x1 - h3} ${y1 - m[i + 1] * h3} ${x1} ${y1}`;
-    }
-  }
-  const [lx, ly] = p[n - 1];
-  return lx < xEnd ? `${d} L ${xEnd} ${ly}` : d;
-}
+const CHART_H = 96;
 
 type WindowKey = '30d' | '90d' | '12m';
 const DAYS: Record<WindowKey, number> = { '30d': 30, '90d': 90, '12m': 365 };
@@ -213,62 +149,17 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   /* null = LANDING (window movement). A number = parked on that point. */
   const [sel, setSel] = useState<number | null>(null);
 
-  // ── Width, measured (the chart sits inside the tab's gutter) ──────────
   const boxRef = useRef<HTMLDivElement>(null);
-  const [w, setW] = useState(0);
-  useLayoutEffect(() => {
-    const el = boxRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(() => setW(el.clientWidth));
-    ro.observe(el);
-    setW(el.clientWidth);
-    return () => ro.disconnect();
-  }, [drawable]);
-
-  const geo = useMemo(() => {
-    if (!drawable || !view || w <= 0) return null;
-    const vs = pts.map((p) => p.v);
-    let lo = Math.min(...vs);
-    let hi = Math.max(...vs);
-    if (hi - lo < 0.5) {
-      const mid = (hi + lo) / 2;
-      lo = mid - 0.25;
-      hi = mid + 0.25;
-    }
-    const span = Math.max(1, view.end - view.start);
-    const x = (ts: number) => ((ts - view.start) / span) * w;
-    // Worse (higher index) is HIGHER on screen; SVG y grows down, so subtract.
-    const y = (v: number) => PAD_T + (1 - (v - lo) / (hi - lo)) * (CHART_H - PAD_T - PAD_B);
-    const xs = pts.map((p) => x(p.ts));
-    const line = monotonePath(pts.map((p, i) => [xs[i], y(p.v)] as [number, number]), w);
-    // One path, two uses: the fill is the stroke's own data plus two closing edges.
-    const fill = `${line} L ${w} ${CHART_H} L ${xs[0]} ${CHART_H} Z`;
-    let hiIdx = 0;
-    let loIdx = 0;
-    pts.forEach((p, i) => {
-      if (p.v > pts[hiIdx].v) hiIdx = i;
-      if (p.v < pts[loIdx].v) loIdx = i;
-    });
-    return { xs, y, line, fill, hiIdx, loIdx };
-  }, [drawable, view, pts, w]);
 
 
   // ── Scrub ──────────────────────────────────────────────────────────────
   const dragging = useRef(false);
   const pickAt = (clientX: number) => {
     const el = boxRef.current;
-    if (!el || !geo) return;
-    const px = clientX - el.getBoundingClientRect().left;
-    let best = 0;
-    let bestD = Infinity;
-    geo.xs.forEach((gx, i) => {
-      const dd = Math.abs(gx - px);
-      if (dd < bestD) {
-        bestD = dd;
-        best = i;
-      }
-    });
-    setSel(best);
+    if (!el || pts.length < 2) return;
+    const rect = el.getBoundingClientRect();
+    const ratio = (clientX - rect.left) / Math.max(1, rect.width);
+    setSel(Math.round(Math.min(1, Math.max(0, ratio)) * (pts.length - 1)));
   };
 
   const scopeWindow = (next: WindowKey) => {
@@ -288,9 +179,6 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   /* THE ONE VALUE (§2.2): window end minus window start. The headline figure
      and the line/fill tone both read it; they cannot disagree. */
   const windowNet = pts.length ? pts[pts.length - 1].v - pts[0].v : 0;
-  const lineTone: 'down' | 'up' | 'flat' =
-    Math.abs(windowNet) < DEAD_BAND ? 'flat' : windowNet < 0 ? 'down' : 'up';
-
   if (isLoading) return null;
 
   const idx = sel == null ? null : Math.min(sel, pts.length - 1);
@@ -358,10 +246,6 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
     </div>
   );
 
-  const labelYields = (i: number) =>
-    !!geo && idx != null && Math.abs(geo.xs[i] - geo.xs[idx]) < LABEL_YIELD_PX;
-
-  const segColor = { down: A.IMPROVED, up: A.DRIFTED, flat: A.DIM } as const;
   const dotIdx = idx ?? pts.length - 1;
 
   return (
@@ -436,55 +320,12 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
               userSelect: 'none',
             }}
           >
-            {geo && (
-              <svg width={w} height={CHART_H} style={{ display: 'block', overflow: 'visible' }}>
-                {lineTone !== 'flat' && (
-                  <>
-                    <defs>
-                      <linearGradient id="hcp-index-fill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={segColor[lineTone]} stopOpacity={FILL_ALPHA[lineTone]} />
-                        <stop offset="100%" stopColor={segColor[lineTone]} stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <path data-fill d={geo.fill} fill="url(#hcp-index-fill)" />
-                  </>
-                )}
-                <path
-                  data-tone={lineTone}
-                  d={geo.line}
-                  fill="none"
-                  stroke={segColor[lineTone]}
-                  strokeWidth={2.2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                {/* HIGH red, LOW green: a lower index is better. Yields to the scrub. */}
-                {geo.hiIdx !== geo.loIdx && !labelYields(geo.hiIdx) && (
-                  <text
-                    x={geo.xs[geo.hiIdx]}
-                    y={geo.y(pts[geo.hiIdx].v) - 8}
-                    textAnchor={geo.xs[geo.hiIdx] < 30 ? 'start' : geo.xs[geo.hiIdx] > w - 30 ? 'end' : 'middle'}
-                    style={{ fontSize: 10, fontWeight: 700, fill: CHART.UP, ...FIG }}
-                  >
-                    {t('common:handicap.walk.high', { v: formatIndex(pts[geo.hiIdx].v) })}
-                  </text>
-                )}
-                {geo.hiIdx !== geo.loIdx && !labelYields(geo.loIdx) && (
-                  <text
-                    x={geo.xs[geo.loIdx]}
-                    y={geo.y(pts[geo.loIdx].v) + 16}
-                    textAnchor={geo.xs[geo.loIdx] < 30 ? 'start' : geo.xs[geo.loIdx] > w - 30 ? 'end' : 'middle'}
-                    style={{ fontSize: 10, fontWeight: 700, fill: CHART.DOWN, ...FIG }}
-                  >
-                    {t('common:handicap.walk.low', { v: formatIndex(pts[geo.loIdx].v) })}
-                  </text>
-                )}
-                {idx != null && (
-                  <line x1={geo.xs[idx]} x2={geo.xs[idx]} y1={0} y2={CHART_H} stroke={CHART.FAINT} strokeWidth={1} />
-                )}
-                <circle cx={geo.xs[dotIdx]} cy={geo.y(pts[dotIdx].v)} r={4.5} fill={CHART.INK} stroke={CHART.CANVAS} strokeWidth={2} />
-              </svg>
-            )}
+            <HcpTrendChart
+              points={pts.map((p) => ({ t: new Date(p.ts).toISOString(), v: p.v }))}
+              active={dotIdx}
+              showCrosshair={idx != null}
+              height={CHART_H}
+            />
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, ...AXIS }}>
