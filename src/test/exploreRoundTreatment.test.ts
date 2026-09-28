@@ -27,7 +27,7 @@ describe('treatmentFor', () => {
     ['an ace draws the line', { holes_in_one: 1 }, shape([-3, 0, 0]), 'line'],
     ['an albatross draws the line', { albatrosses: 1 }, shape([-3, 0, 0]), 'line'],
     ['an eagle draws the line', { eagles: 1 }, shape([-2, 0, 0]), 'line'],
-    ['four birdies draws the line', { birdies: 4 }, shape([-1, -1, -1, -1]), 'line'],
+    ['five birdies draws the line', { birdies: 5 }, shape([-1, -1, -1, -1, -1]), 'line'],
     ['under par draws the line even when flat', { to_par: -1 }, shape([-1, 0, 0]), 'line'],
     ['a course record draws the line', { is_course_record: true }, shape([0, 0, 0]), 'line'],
     /* MEDIAN TRAVEL, NOT ANY TRAVEL. A span of 10 draws; a span of 3 — which
