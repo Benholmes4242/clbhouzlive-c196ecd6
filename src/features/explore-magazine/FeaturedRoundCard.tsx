@@ -17,6 +17,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { MINUS } from './exploreCopy';
 import type { FeaturedRound } from './useFeaturedRound';
 
 const GOLD = SC_FILL_GOLD;
@@ -25,7 +26,8 @@ const SCRIM =
   'linear-gradient(180deg, color-mix(in srgb, black 45%, transparent) 0%, color-mix(in srgb, black 5%, transparent) 34%, color-mix(in srgb, black 88%, transparent) 100%)';
 const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
 const BIG: React.CSSProperties = { fontSize: 44, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: A.INK, ...FIG };
-const toPar = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `${n}`);
+const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `${MINUS}${Math.abs(n)}` : `${n}`);
+const toPar = (n: number | null) => (n == null ? null : n === 0 ? 'E' : signed(n));
 
 function Headline({ r }: { r: FeaturedRound }) {
   const { t } = useTranslation('courses');
@@ -41,12 +43,12 @@ function Headline({ r }: { r: FeaturedRound }) {
   );
   switch (r.tier) {
     case 1:
-      return feat(r.holes_in_one > 0 || r.reason === 'hole_in_one' ? k('holeInOne') : k('albatross'));
+      return feat((r.holes_in_one ?? 0) > 0 || r.reason === 'hole_in_one' ? k('holeInOne') : k('albatross'));
     case 2:
       return (
         <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8 }}>
           <span style={BIG}>{r.gross}</span>
-          {r.to_par < 0 ? (
+          {r.to_par != null && r.to_par < 0 ? (
             <span style={{ fontSize: 19, fontWeight: 700, color: TOPAR_UNDER_DARK, ...FIG }}>{toPar(r.to_par)}</span>
           ) : null}
         </span>
@@ -66,7 +68,7 @@ function Headline({ r }: { r: FeaturedRound }) {
           <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.MUTE }}>
             {k('vsHandicap')}
           </span>
-          <span style={BIG}>{r.vs_hcp > 0 ? `+${r.vs_hcp}` : r.vs_hcp}</span>
+          <span style={BIG}>{r.vs_hcp == null ? null : signed(r.vs_hcp)}</span>
         </span>
       );
   }
@@ -85,13 +87,15 @@ export const FeaturedRoundCard: React.FC<{ round: FeaturedRound; viewerId?: stri
   // KICKER, ALWAYS: gross and to-par, plus one more fact. The score is never lost.
   const extra =
     r.tier === 2
-      ? r.joint_with
-        ? k('courseRecordJoint', { names: r.joint_with })
-        : k('courseRecord')
+      ? (r.joint_count ?? 0) >= 2
+        ? k('courseRecordJoint_other', { count: r.joint_count })
+        : r.joint_count === 1 && r.joint_name
+          ? k('courseRecordJoint_one', { name: r.joint_name })
+          : k('courseRecord')
       : r.tier === 5 && r.net_score != null
-        ? `Net ${r.net_score}`
+        ? k('netFact', { net: r.net_score })
         : null;
-  const kicker = [`${r.gross}`, toPar(r.to_par), extra].filter(Boolean).join(' · ');
+  const kicker = [r.gross == null ? null : `${r.gross}`, toPar(r.to_par), extra].filter(Boolean).join(' · ');
 
   return (
     <button
@@ -136,7 +140,7 @@ export const FeaturedRoundCard: React.FC<{ round: FeaturedRound; viewerId?: stri
         </div>
         <div style={{ position: 'absolute', left: 16, right: 16, bottom: 16 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: mine ? A.AMBER : A.INK, marginBottom: 8 }}>
-            {mine ? 'You' : r.display_name}
+            {mine ? t('courseDetail.records.you') : r.display_name}
             <span style={{ fontWeight: 600, color: A.MUTE }}> · {r.course_name}</span>
           </div>
           <Headline r={r} />

@@ -20652,7 +20652,8 @@ export type Database = {
           gross: number
           holes_in_one: number
           image_url: string
-          joint_with: string
+          joint_count: number
+          joint_name: string
           net_score: number
           photo_url: string
           play_date: string

@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 
 /**
  * BRIEF_SCORES_FEATURED_ROUND §3 — the one round above the Scores feed.
@@ -13,7 +12,16 @@ import type { Database } from '@/integrations/supabase/types';
  * The key carries viewer, scope AND geography, exactly as exploreKeys.stream,
  * or a scope change would serve another scope's hero from cache.
  */
-export type FeaturedRound = Database['public']['Functions']['get_featured_round']['Returns'][number];
+/** LOCAL ON PURPOSE: the RPC now returns joint_name/joint_count, newer than the generated types.ts. */
+export interface FeaturedRound { whs_score_id: string; user_id: string;
+  display_name: string | null; photo_url: string | null; course_id: string;
+  course_name: string | null; image_url: string | null; play_date: string;
+  gross: number | null; course_par: number | null; to_par: number | null;
+  stableford: number | null; birdies: number | null; eagles: number | null;
+  albatrosses: number | null; holes_in_one: number | null;
+  clean_card: boolean | null; net_score: number | null;
+  vs_hcp: number | null; tier: number; reason: string;
+  joint_name: string | null; joint_count: number | null; }
 
 export function useFeaturedRound(
   viewerId: string | undefined,

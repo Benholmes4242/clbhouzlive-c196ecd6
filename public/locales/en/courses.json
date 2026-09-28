@@ -1034,7 +1034,6 @@
       "holeInOne": "Hole in one",
       "albatross": "Albatross",
       "courseRecord": "Course record",
-      "courseRecordJoint": "Course record · joint with {{names}}",
       "eagleBrace": "{{count}} eagles",
       "stablefordPoints": "points",
       "underPar": "Under par",
@@ -1042,7 +1041,10 @@
       "birdieHaul_other": "{{count}} birdies",
       "cleanCard": "Clean card",
       "vsHandicap": "vs handicap",
-      "strapline": "The best round of the last seven days. Open the scorecard"
+      "strapline": "Nobody has played better in the last seven days.",
+      "netFact": "Net {{net}}",
+      "courseRecordJoint_one": "Course record · joint with {{name}}",
+      "courseRecordJoint_other": "Course record · joint with {{count}} others"
     }
   },
   "courseHero": {
