@@ -1043,8 +1043,7 @@
       "vsHandicap": "vs handicap",
       "strapline": "The standout round of the last seven days.",
       "netFact": "Net {{net}}",
-      "jointWith_one": "joint with {{name}}",
-      "jointWith_other": "joint with {{count}} others"
+      "courseRecordJoint": "Joint course record"
     }
   },
   "courseHero": {

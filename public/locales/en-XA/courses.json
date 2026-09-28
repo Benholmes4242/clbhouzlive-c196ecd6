@@ -953,8 +953,7 @@
       "vsHandicap": "[~~vš hàñdîçàp~~]",
       "strapline": "[~~Ţĥé šţáñđőúţ řőúñđ őƒ ţĥé ļášţ šéṽéñ đáýš.~~]",
       "netFact": "[~~Ñéţ {{net}}~~]",
-      "jointWith_one": "[~~ĵőíñţ ŵíţĥ {{name}}~~]",
-      "jointWith_other": "[~~ĵőíñţ ŵíţĥ {{count}} őţĥéřš~~]"
+      "courseRecordJoint": "[~~Ĵőíñţ ĉőúřšé řéĉőřđ~~]"
     }
   },
   "courseHero": {
