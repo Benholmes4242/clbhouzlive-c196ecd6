@@ -43,7 +43,7 @@ const SCRIM =
 const UNIT: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.INK };
 const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
 const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
-const BIG: React.CSSProperties = { fontSize: 44, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: A.INK, ...FIG };
+const BIG: React.CSSProperties = { fontSize: 50, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: A.INK, ...FIG };
 const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `${MINUS}${Math.abs(n)}` : `${n}`);
 const toPar = (n: number | null) => (n == null ? null : n === 0 ? 'E' : signed(n));
 
