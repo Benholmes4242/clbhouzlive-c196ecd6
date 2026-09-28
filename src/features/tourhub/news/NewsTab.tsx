@@ -214,7 +214,8 @@ export function StoryRow({ story, onOpen, compact = false, engagement }: { story
 /**
  * THE WIRE INDEX (BRIEF_WIRE_REDESIGN). Four shapes, each denser than the last:
  * hero, two-up, rows, Latest. The shapes are the SHARED ones in StoryShapes —
- * the amateur News tab renders the same components at the same sizes.
+ * the amateur index (NewsTabPage, mounted by the Discover NEWS tab and by the
+ * /discover/news page) renders the same components at the same sizes.
  *
  * The tour lens stays CLIENT-SIDE (see useTourStories) and re-derives every
  * section, including which tournaments have enough stories for the rail.

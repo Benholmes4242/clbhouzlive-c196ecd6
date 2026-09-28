@@ -2,9 +2,10 @@
  * SHARED NEWS SHAPES (BRIEF_WIRE_REDESIGN S1).
  *
  * FOUR SHAPES, each denser than the last: hero, two-up, row, wire item. They
- * live here, beside LeadStory and StoryRow, and are imported by BOTH the
- * amateur News tab (src/components/explore-tab-new/NewsTabPage.tsx) and The
- * Wire (NewsTab.tsx). Two copies of a news card is how the two pages drift.
+ * live here, beside LeadStory and StoryRow, and are imported by the amateur
+ * index (src/components/explore-tab-new/NewsTabPage.tsx — rendered by both the
+ * Discover NEWS tab and the /discover/news page shell) and The Wire
+ * (NewsTab.tsx). Two copies of a news card is how the two pages drift.
  *
  * Only CONTENT and the rail's heading differ between the surfaces; the shapes
  * are identical. Amber is never used here — amber means the viewing member.
@@ -41,6 +42,14 @@ export const KICKER: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 700,
   lineHeight: 1.2,
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+};
+
+/** The MORE … heading under both story pages (/tour/news/:slug, /discover/news/:slug). */
+export const MORE_HEADING: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
   letterSpacing: '0.14em',
   textTransform: 'uppercase',
 };
