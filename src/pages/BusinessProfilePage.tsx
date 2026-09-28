@@ -640,7 +640,7 @@ const BusinessProfilePage: React.FC = () => {
         <div className="px-4">
           <Panel
             kicker={t('business.course.kickerPlural')}
-            aside={clubRounds != null ? t('business.course.roundsTotal', { count: clubRounds, formatted: clubRounds.toLocaleString() }).replace(String(clubRounds), clubRounds.toLocaleString()) : undefined}
+            aside={clubRounds != null ? t('business.course.roundsTotal', { count: clubRounds.toLocaleString() }) : undefined}
             style={{ marginTop: 12 }}
           >
             {courses.map((course, i) => (
