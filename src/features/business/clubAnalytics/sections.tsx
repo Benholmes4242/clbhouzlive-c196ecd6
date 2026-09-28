@@ -100,7 +100,7 @@ const roundsLabel = (n: number | null | undefined) => `${fmt(n)} ${n === 1 ? 'ro
  * 1px gaps showing the border through, so the figures read as one instrument
  * rather than three loose numbers.
  */
-export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?: string }[] }> = ({ cells }) => (
+export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?: string }[]; twoLineLabels?: boolean }> = ({ cells, twoLineLabels }) => (
   <div
     style={{
       display: 'grid',
@@ -117,7 +117,8 @@ export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?
     {cells.map((c) => (
       <div key={c.label} style={{ background: A.PANEL, padding: '13px 12px' }}>
         <div style={bizFigure(21, c.tone ?? A.INK)}>{c.figure}</div>
-        <div style={{ ...LABEL, marginTop: 6 }}>{c.label}</div>
+        {/* LABEL_FITS §3 — every cell reserves two lines so figures share a baseline. */}
+        <div style={{ ...LABEL, marginTop: 6, ...(twoLineLabels ? { lineHeight: 1.3, minHeight: '2.6em' } : null) }}>{c.label}</div>
       </div>
     ))}
   </div>
@@ -136,6 +137,7 @@ export const VerdictStrip: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) 
 
   return (
     <StatStrip
+      twoLineLabels
       cells={[
         { figure: data.avg_gross == null ? '—' : String(data.avg_gross), label: 'Mean gross' },
         { figure: hardest ? String(hardest.hole_no) : '—', label: 'Hardest hole' },
@@ -224,7 +226,7 @@ export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
  * §6.5 — HOLE AND PAR GET THEIR OWN GRID COLUMNS. They had collided into
  * "HOLEPAR" at 26px each.
  */
-const CLUB_HOLE_GRID = '34px 30px 28px 1fr 38px 48px';
+const CLUB_HOLE_GRID = '40px 30px 28px 1fr 42px 48px';
 
 /** §3 / §4 — the four-way split, in scorecard colours. */
 const SPLIT_TIERS = [
@@ -332,7 +334,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
         <span style={{ ...LABEL, textAlign: 'center' }}>SI</span>
         <span style={{ ...LABEL }}>Measured</span>
         <span style={{ ...LABEL, textAlign: 'right' }}>Rank</span>
-        <span style={{ ...LABEL, textAlign: 'right' }}>To par</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>±Par</span>
       </div>
 
       {rows.map((h) => {
@@ -500,11 +502,11 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
       subline="Where a higher handicapper needs the shot most, measured against the index your card declares."
       style={CARD}
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '26px 1fr 48px 48px', gap: 10, paddingBottom: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 60px 60px', gap: 10, paddingBottom: 8 }}>
         <span style={{ ...LABEL, textAlign: 'center' }}>Hole</span>
         <span style={{ ...LABEL }}>Shot needed</span>
-        <span style={{ ...LABEL, textAlign: 'right' }}>Declared</span>
-        <span style={{ ...LABEL, textAlign: 'right' }}>Measured</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>Card</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>Actual</span>
       </div>
       {rows.map((r) => {
         const spread = r.spread ?? 0;
@@ -515,7 +517,7 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
             key={r.hole_no}
             style={{
               display: 'grid',
-              gridTemplateColumns: '26px 1fr 48px 48px',
+              gridTemplateColumns: '40px 1fr 60px 60px',
               gap: 10,
               alignItems: 'center',
               padding: '8px 0',
@@ -706,7 +708,8 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
           {cells.map((c) => (
             <div key={c.label} style={{ background: A.PANEL, padding: '12px 12px' }}>
               <div style={bizFigure(17, A.INK)}>{c.value}</div>
-              <div style={{ ...LABEL, marginTop: 6 }}>{c.label}</div>
+              {/* LABEL_FITS §3 — every cell reserves two lines so figures share a baseline. */}
+        <div style={{ ...LABEL, marginTop: 6 }}>{c.label}</div>
             </div>
           ))}
         </div>
