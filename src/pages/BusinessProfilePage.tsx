@@ -216,13 +216,20 @@ const BusinessProfilePage: React.FC = () => {
     });
   }, [business?.id, business?.club_id, membership?.canManage, courses.length, followersCount]);
 
-  // business_course_panel_shown - once per mount, when the panels resolve.
+  // business_course_panel_shown - once per mount, when the rows resolve.
+  // The same channel carries rounds_tracked so the panel aside (club total)
+  // renders only once EVERY course has reported — never a partial sum.
   const panelFiguresRef = useRef<Map<string, boolean>>(new Map());
+  const panelRoundsRef = useRef<Map<string, number>>(new Map());
   const panelReportedRef = useRef(false);
-  const handleFiguresResolved = React.useCallback((courseId: string, hasFigures: boolean) => {
+  const [clubRounds, setClubRounds] = React.useState<number | null>(null);
+  const handleFiguresResolved = React.useCallback((courseId: string, hasFigures: boolean, rounds: number) => {
     panelFiguresRef.current.set(courseId, hasFigures);
+    panelRoundsRef.current.set(courseId, rounds);
+    if (courses.length === 0 || panelRoundsRef.current.size < courses.length) return;
+    const total = Array.from(panelRoundsRef.current.values()).reduce((s, n) => s + n, 0);
+    setClubRounds(total > 0 ? total : null);
     if (panelReportedRef.current || !business?.id) return;
-    if (panelFiguresRef.current.size < courses.length || courses.length === 0) return;
     panelReportedRef.current = true;
     const withStats = Array.from(panelFiguresRef.current.values()).filter(Boolean).length;
     void analyticsEvents.track('business_course_panel_shown', {
@@ -628,20 +635,25 @@ const BusinessProfilePage: React.FC = () => {
         );
       })()}
 
-      {/* ----- Club courses (club-only): one panel per course ----- */}
+      {/* ----- Club courses (club-only): ONE panel, one row per course ----- */}
       {business.club_id && courses.length > 0 && (
         <div className="px-4">
-          {courses.map((course, i) => (
-            <BusinessCoursePanel
-              key={course.id}
-              course={course}
-              isFirst={i === 0}
-              plural={courses.length > 1}
-              position={i}
-              onOpen={handleCourseOpen}
-              onFiguresResolved={handleFiguresResolved}
-            />
-          ))}
+          <Panel
+            kicker={t('business.course.kickerPlural')}
+            aside={clubRounds != null ? t('business.course.roundsTotal', { count: clubRounds, formatted: clubRounds.toLocaleString() }).replace(String(clubRounds), clubRounds.toLocaleString()) : undefined}
+            style={{ marginTop: 12 }}
+          >
+            {courses.map((course, i) => (
+              <BusinessCoursePanel
+                key={course.id}
+                course={course}
+                isFirst={i === 0}
+                position={i}
+                onOpen={handleCourseOpen}
+                onFiguresResolved={handleFiguresResolved}
+              />
+            ))}
+          </Panel>
         </div>
       )}
 
