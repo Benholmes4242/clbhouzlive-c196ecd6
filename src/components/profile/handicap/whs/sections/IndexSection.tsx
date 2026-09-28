@@ -331,6 +331,9 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
               active={dotIdx}
               showCrosshair={idx != null}
               height={CHART_H}
+              /* FULL SECTION WIDTH: padX 0 so the line spans the same left and
+                 right edges as the section rows below (BRIEF user ruling). */
+              padX={0}
             />
           </div>
 

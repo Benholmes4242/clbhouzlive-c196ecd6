@@ -152,7 +152,9 @@ export const HcpTrendChart: React.FC<Props> = ({
 
   return (
     <div ref={ref} style={{ width: '100%', height }}>
-      <svg width={width} height={height} style={{ display: 'block' }}>
+      {/* overflow visible: edge-to-edge plots (padX 0) let the end-of-line
+          halo and stroke caps draw past the SVG box instead of clipping. */}
+      <svg width={width} height={height} style={{ display: 'block', overflow: 'visible' }}>
         <defs>
           <linearGradient id={`hcp-trend-fill-${uid}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={deltaTone} stopOpacity={0.42} />
