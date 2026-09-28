@@ -121,7 +121,7 @@ export const FeaturedRoundCard: React.FC<{
   let unit: string | null = null;
   if (r.tier === 2) {
     // HEADLINE_FIT §2 — the unit is ALWAYS the short label; the joint clause
-    // (same keys, same branching) moves to the place line.
+    // (standalone jointWith_* keys, no "Course record ·") sits on the place line.
     unit = k('courseRecord');
     parts = [
       (r.joint_count ?? 0) >= 2
