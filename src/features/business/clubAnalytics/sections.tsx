@@ -8,7 +8,7 @@
  * ORDER, and the order is an argument:
  *   verdict strip, WHERE YOUR INDEX DISAGREES, THE SAMPLE, HOLE BY HOLE,
  *   STROKE INDEX CHECK (locked), WHAT GETS MADE HERE, THE COURSE RECORD,
- *   YOUR TEES, WHEN YOUR COURSE PLAYS, WHO PLAYS HERE, COMPETITION OR SOCIAL.
+ *   YOUR TEES, WHEN MEMBERS PLAY, WHO PLAYS HERE, COMPETITION OR SOCIAL.
  * The ladder leads deliberately: it is the one thing on this page no other
  * product can show a club, and it is readable in two seconds.
  *
@@ -117,7 +117,7 @@ export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?
     {cells.map((c) => (
       <div key={c.label} style={{ background: A.PANEL, padding: '13px 12px' }}>
         <div style={bizFigure(21, c.tone ?? A.INK)}>{c.figure}</div>
-        <div style={{ ...LABEL, fontSize: 8.5, marginTop: 6 }}>{c.label}</div>
+        <div style={{ ...LABEL, marginTop: 6 }}>{c.label}</div>
       </div>
     ))}
   </div>
@@ -139,7 +139,7 @@ export const VerdictStrip: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) 
       cells={[
         { figure: data.avg_gross == null ? '—' : String(data.avg_gross), label: 'Mean gross' },
         { figure: hardest ? String(hardest.hole_no) : '—', label: 'Hardest hole' },
-        { figure: compPct == null ? '—' : `${compPct}%`, label: 'Competition' },
+        { figure: compPct == null ? '—' : `${compPct}%`, label: 'Competition rounds' },
       ]}
     />
   );
@@ -247,7 +247,7 @@ const DistributionStrip: React.FC<{ counts: number[]; total: number }> = ({ coun
       {SPLIT_TIERS.map((t, i) => (
         <span key={t.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <i style={{ width: 7, height: 7, borderRadius: 2, background: t.colour, flexShrink: 0 }} />
-          <span style={{ ...LABEL, fontSize: 9 }}>{t.label}</span>
+          <span style={{ ...LABEL }}>{t.label}</span>
           <span style={bizFigure(12, A.INK)}>{fmt(counts[i])}</span>
           <span style={bizFigure(11, A.DIM)}>{share(counts[i] ?? 0, total)}</span>
         </span>
@@ -327,12 +327,12 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: CLUB_HOLE_GRID, gap: 8, paddingBottom: 8 }}>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'center' }}>Hole</span>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'center' }}>Par</span>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'center' }}>SI</span>
-        <span style={{ ...LABEL, fontSize: 8.5 }}>Measured</span>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'right' }}>Rank</span>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'right' }}>To par</span>
+        <span style={{ ...LABEL, textAlign: 'center' }}>Hole</span>
+        <span style={{ ...LABEL, textAlign: 'center' }}>Par</span>
+        <span style={{ ...LABEL, textAlign: 'center' }}>SI</span>
+        <span style={{ ...LABEL }}>Measured</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>Rank</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>To par</span>
       </div>
 
       {rows.map((h) => {
@@ -390,7 +390,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
             {open && holeTotal > 0 && (
               <div style={{ paddingBottom: 10 }}>
                 <Inset style={{ padding: 12 }}>
-                  <div style={{ ...LABEL, fontSize: 9, marginBottom: 10 }}>
+                  <div style={{ ...LABEL, marginBottom: 10 }}>
                     Hole {h.hole_no} · {fmt(holeTotal)} rounds
                   </div>
                   <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: A.TRACK }}>
@@ -404,7 +404,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
                     {SPLIT_TIERS.map((tier) => (
                       <span key={tier.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                         <i style={{ width: 7, height: 7, borderRadius: 2, background: tier.colour, flexShrink: 0 }} />
-                        <span style={{ ...LABEL, fontSize: 9 }}>{tier.label}</span>
+                        <span style={{ ...LABEL }}>{tier.label}</span>
                         <span style={bizFigure(12, A.INK)}>{fmt(h[tier.key])}</span>
                       </span>
                     ))}
@@ -501,10 +501,10 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
       style={CARD}
     >
       <div style={{ display: 'grid', gridTemplateColumns: '26px 1fr 48px 48px', gap: 10, paddingBottom: 8 }}>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'center' }}>Hole</span>
-        <span style={{ ...LABEL, fontSize: 8.5 }}>Shot needed</span>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'right' }}>Declared</span>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'right' }}>Measured</span>
+        <span style={{ ...LABEL, textAlign: 'center' }}>Hole</span>
+        <span style={{ ...LABEL }}>Shot needed</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>Declared</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>Measured</span>
       </div>
       {rows.map((r) => {
         const spread = r.spread ?? 0;
@@ -567,13 +567,13 @@ export const ScoringSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }
   }
 
   const rows: Outcome[] = [
-    { key: 'double_plus', label: 'Double +', count: o.double_plus, colour: SC_DOUBLE_DARK },
-    { key: 'bogey', label: 'Bogey', count: o.bogey, colour: SC_BOGEY_DARK },
-    { key: 'par', label: 'Par', count: o.par, colour: SC_PAR_DARK },
-    { key: 'birdie', label: 'Birdie', count: o.birdie, colour: SC_BIRDIE_DARK },
-    { key: 'eagle', label: 'Eagle', count: o.eagle, colour: SC_EAGLE_DARK },
-    { key: 'albatross', label: 'Albatross', count: o.albatross, colour: SC_ALBATROSS_DARK },
     { key: 'ace', label: 'Hole in one', count: o.ace, colour: SC_ACE_DARK },
+    { key: 'albatross', label: 'Albatross', count: o.albatross, colour: SC_ALBATROSS_DARK },
+    { key: 'eagle', label: 'Eagle', count: o.eagle, colour: SC_EAGLE_DARK },
+    { key: 'birdie', label: 'Birdie', count: o.birdie, colour: SC_BIRDIE_DARK },
+    { key: 'par', label: 'Par', count: o.par, colour: SC_PAR_DARK },
+    { key: 'bogey', label: 'Bogey', count: o.bogey, colour: SC_BOGEY_DARK },
+    { key: 'double_plus', label: 'Double +', count: o.double_plus, colour: SC_DOUBLE_DARK },
   ];
   const total = data.outcomes_total || rows.reduce((s, r) => s + r.count, 0);
 
@@ -595,7 +595,7 @@ export const ScoringSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }
 
   return (
     <Panel kicker="What gets made here" aside={`${fmt(total)} holes`}
-      subline="Every scored hole on your course, worst to best." style={CARD}>
+      subline="Every scored hole on your course, best to worst." style={CARD}>
       <Inset>
         <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: A.TRACK }}>
           {present.map((r) => (
@@ -695,7 +695,7 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
       {gross?.value != null && (
         <>
           <div style={bizFigure(46, A.INK)}>{gross.value}</div>
-          <div style={{ ...LABEL, fontSize: 8.5, marginTop: 8 }}>
+          <div style={{ ...LABEL, marginTop: 8 }}>
             Lowest gross{gross.attained_at ? ` · ${dayMonthYear(gross.attained_at)}` : ''}
           </div>
         </>
@@ -706,7 +706,7 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
           {cells.map((c) => (
             <div key={c.label} style={{ background: A.PANEL, padding: '12px 12px' }}>
               <div style={bizFigure(17, A.INK)}>{c.value}</div>
-              <div style={{ ...LABEL, fontSize: 8.5, marginTop: 6 }}>{c.label}</div>
+              <div style={{ ...LABEL, marginTop: 6 }}>{c.label}</div>
             </div>
           ))}
         </div>
@@ -847,7 +847,7 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
   );
 };
 
-/* ─────────────────── WHEN YOUR COURSE PLAYS ─────────────────── */
+/* ─────────────────── WHEN MEMBERS PLAY ─────────────────── */
 
 const BarRow: React.FC<{
   labels: string[];
@@ -875,7 +875,7 @@ const BarRow: React.FC<{
                 boxSizing: 'border-box',
               }}
             />
-            <div style={{ ...LABEL, fontSize: 10, letterSpacing: '0.04em', marginTop: 5 }}>{label}</div>
+            <div style={{ ...LABEL, marginTop: 5 }}>{label}</div>
           </div>
         );
       })}
@@ -888,7 +888,7 @@ export const SeasonalitySection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
   const total = months.reduce((s, m) => s + m.rounds, 0);
   if (total === 0) {
     return (
-      <Panel kicker="When your course plays" style={CARD}>
+      <Panel kicker="When members play" style={CARD}>
         <Body>We hold no dated rounds on this course, so there is no seasonal pattern to show.</Body>
       </Panel>
     );
@@ -908,7 +908,7 @@ export const SeasonalitySection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
   const partialYear = years.find((y) => y.partial);
 
   return (
-    <Panel kicker="When your course plays" aside={`${fmt(total)} rounds`} style={CARD}>
+    <Panel kicker="When members play" aside={`${fmt(total)} rounds`} style={CARD}>
       <div style={{ ...BIZ_LABEL, marginBottom: 8 }}>Across the year</div>
       <Inset>
         <BarRow labels={MONTHS.map((m) => m[0])} values={values} />
@@ -1002,7 +1002,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
                 )}
               </div>
               {/* A BAND WITH 400 ROUNDS FROM 2 MEMBERS IS NOT 400 GOLFERS. */}
-              <div style={{ ...LABEL, fontSize: 10, marginTop: 5 }}>
+              <div style={{ ...LABEL, marginTop: 5 }}>
                 {fmt(b.members)} {b.members === 1 ? 'member' : 'members'}
               </div>
             </div>
@@ -1034,8 +1034,8 @@ export const CompetitionSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
   }
 
   const rows = [
-    { label: 'Competition', count: c.competition, colour: A.INK },
-    { label: 'Social', count: c.social, colour: 'rgba(248,250,252,0.42)' },
+    { label: 'Competition rounds', count: c.competition, colour: A.INK },
+    { label: 'Social rounds', count: c.social, colour: 'rgba(248,250,252,0.42)' },
   ];
 
   return (

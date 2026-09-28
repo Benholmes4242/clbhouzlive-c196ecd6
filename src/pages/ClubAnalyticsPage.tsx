@@ -39,6 +39,8 @@ import {
 import type { ClubCourseRef } from '@/features/business/clubAnalytics/types';
 
 const TITLE = 'Your course';
+/** §4 — plural when the club owns more than one course. */
+const titleFor = (n: number) => (n > 1 ? 'Your courses' : 'Your course');
 
 /** One shape for every "we cannot show this, and here is exactly why" state.
  *  It never renders empty charts. */
@@ -334,7 +336,7 @@ export default function ClubAnalyticsPage() {
 
 
   return (
-    <ManagePageShell title={TITLE}>
+    <ManagePageShell title={titleFor(courses.length)}>
       <div style={{ padding: '16px 16px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
         {courses.length > 1 && (
           <p style={{ ...BIZ_BODY, margin: 0, fontSize: 12.5 }}>
