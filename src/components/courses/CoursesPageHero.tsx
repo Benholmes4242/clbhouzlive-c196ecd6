@@ -13,6 +13,7 @@ import { formatNumber } from '@/i18n/format';
 import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHeroCourseFact';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
+import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
 import { KICKER } from '@/lib/tokens/type';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 
@@ -24,7 +25,8 @@ import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
  * hero (notch bleed, scrim, cover position) and the SAME data source as
  * the old Discover "Standout courses" card (useExploreHero).
  *
- * Scrim treatment: the ONE canon hero scrim (heroCanonBackground) —
+ * Scrim treatment: the ONE canon hero scrim, HERO_CANON_SCRIM, applied as an
+ * inset-0 overlay over the container image —
  * a single layer ending on the canvas. No top scrim, no radial ambient.
  *
  * The shared chrome island floats over this hero and is the ONLY safe-area
@@ -227,7 +229,7 @@ function CoursesPageHeroInner() {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.10) 42%, rgba(0,0,0,0.40) 72%, rgba(0,0,0,0.78) 100%)',
+          background: HERO_CANON_SCRIM,
         }}
       />
       {/* Bottom-anchored identity + CTA — absolute so copy never expands the
