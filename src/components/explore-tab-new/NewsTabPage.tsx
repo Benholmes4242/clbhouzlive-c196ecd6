@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { categoryLabel } from '@/features/amateur/news/categories';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { type AmateurStory, useAmateurStories } from '@/features/amateur/news/useAmateurStories';
@@ -102,14 +104,16 @@ export function NewsTabPage({
   };
 
   return (
-    <main style={{ paddingTop: 'var(--discover-header-h, calc(env(safe-area-inset-top, 0px) + 78px))', minHeight: '100dvh', background: A.CANVAS, color: A.INK, fontFamily: SANS }}>
+    <Frame style={frameStyle}>
       {isPending ? (
         <div>
           <Skeleton style={{ height: 340, width: '100%', borderRadius: 0 }} />
-          <div style={{ padding: `11px ${GUTTER}px 110px` }}><Skeleton style={{ height: 16, width: 82 }} /></div>
+          <div style={{ padding: `11px ${GUTTER}px ${bottomPad}px` }}><Skeleton style={{ height: 16, width: 82 }} /></div>
         </div>
+      ) : allStories.length === 0 ? (
+        <div style={{ padding: `18px ${GUTTER}px ${bottomPad}px`, fontSize: 13, color: A.MUTE }}>{railBy === 'category' ? t('amateurNews.emptyAll', 'The first stories are on their way.') : 'The first stories are on their way.'}</div>
       ) : !lead ? (
-        <div style={{ padding: `18px ${GUTTER}px 110px`, fontSize: 13, color: A.MUTE }}>The first stories are on their way.</div>
+        <div style={{ padding: `18px ${GUTTER}px ${bottomPad}px`, fontSize: 13, color: A.MUTE }}>{railBy === 'category' ? t('amateurNews.emptyFilter', 'Nothing filed under this yet.') : 'The first stories are on their way.'}</div>
       ) : (
         <>
           <HeroStory
@@ -119,7 +123,7 @@ export function NewsTabPage({
             engagementAction={engagementAction(lead, 14)}
           />
 
-          <div style={{ padding: `0 ${GUTTER}px 110px` }}>
+          <div style={{ padding: `0 ${GUTTER}px ${bottomPad}px` }}>
             {twoUp.length === 2 && (
               <section aria-label="Featured stories" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 9, marginTop: 24 }}>
                 {twoUp.map((story) => <FeatureStory key={story.id} story={story} onOpen={() => open(story)} engagement={engagementFor(story.id)} engagementAction={engagementAction(story)} />)}
@@ -139,8 +143,8 @@ export function NewsTabPage({
             {competitions.length >= 2 && (
               <StoryChipRail
                 id="news-competitions"
-                heading="By competition"
-                chips={competitions.map(([name, count]) => ({ key: name, label: name, count }))}
+                heading={railBy === 'category' ? 'By category' : 'By competition'}
+                chips={competitions.map(([name, count]) => ({ key: name, label: chipLabel(name), count }))}
                 selected={competition}
                 sentenceHeading
                 onSelect={(key) => {
@@ -173,6 +177,6 @@ export function NewsTabPage({
           )}
         </>
       )}
-    </main>
+    </Frame>
   );
 }
