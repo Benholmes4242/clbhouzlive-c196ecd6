@@ -511,10 +511,9 @@ const StrokeIndexLocked: React.FC<{ gate: ClubCourseAnalytics['si_band_rows'] }>
  * presence.
  *
  * A stroke index ranks WHERE A HIGHER HANDICAPPER NEEDS A SHOT MOST relative to
- * a lower one — not raw difficulty. That needs both bands well sampled. At
- * Sundridge East there are 541 low-handicap hole rows and 18 high; eighteen rows
- * is roughly one round, and a recommendation built on it falls apart the moment
- * a handicap secretary asks how many players it came from.
+ * a lower one — not raw difficulty. That needs both bands well sampled, and
+ * min_high_rows is a MINIMUM PER HOLE: rows on the least-played hole say
+ * nothing about how many complete rounds the recommendation rests on.
  *
  * So below the gate NO RANKING RENDERS ANYWHERE HERE, the shortfall is named,
  * and that is the strongest "get your members on clbhouz" argument on the page.
