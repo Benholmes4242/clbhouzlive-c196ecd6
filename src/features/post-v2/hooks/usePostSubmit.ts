@@ -64,8 +64,10 @@ export interface SubmitResult {
   round?: { gross?: number | null; toPar?: number | null; birdies?: number | null };
 
   // ---- card facts (§2): the material needed to render the post AS IT WILL
-  // APPEAR while it uploads. Client-side only — previewUrl blobs stay valid for
-  // the life of the composer mount, which is exactly the life of this screen.
+  // APPEAR while it uploads. Client-side only. Media is handed over as the
+  // picked File, never the composer's blob URL: that URL is owned by the
+  // pending-posts store and revoked on upload:complete, the same event that
+  // mounts PostedScreen. The success card mints and revokes its own URLs.
   /** The caption the member typed, verbatim (may be empty). */
   caption?: string;
   /** Posting actor's display name. */
@@ -74,8 +76,9 @@ export interface SubmitResult {
   actorAvatarUrl?: string | null;
   /** Posting actor's id — keys the avatar fallback hue. */
   actorId?: string | null;
-  /** Ordered local previews for the card's media block. */
-  mediaPreviews?: { url: string; type: 'image' | 'video' }[];
+  /** Ordered picked media for the card's media block. `file` is absent for
+   *  already-uploaded items (edit path) — those have no local preview. */
+  mediaPreviews?: { file?: File; type: 'image' | 'video' }[];
 }
 
 export function usePostSubmit() {
@@ -229,7 +232,7 @@ export function usePostSubmit() {
         actorName: input.authorName,
         actorAvatarUrl: input.authorAvatarUrl,
         actorId: input.actorId,
-        mediaPreviews: input.media.map((m) => ({ url: m.previewUrl, type: m.type })),
+        mediaPreviews: input.media.map((m) => ({ file: m.file, type: m.type })),
       };
     } catch (e) {
       // Roll back the optimistic pending card - the post was never born.

@@ -12,8 +12,12 @@
 //     eyebrow (see honestEyebrow). Phase-driven: running / complete / failed.
 //   - 'scheduled' (text-only or media): calendar glyph confirmation.
 //   - 'published' (text-only, and the edit-save path): the card, resolved.
+//   - media posts ALSO land on PostedScreen once the upload job completes
+//     (phase === 'complete' below). That is the moment the pending-posts store
+//     revokes the composer's blob URLs, which is why this screen owns its own
+//     object URLs (see PostCard) instead of borrowing the composer's.
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Clock, AlertTriangle, MapPin } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +30,7 @@ import { CT, CT_DARK } from '@/features/_shared/composerTokens';
 import { COMPOSER_SHELL_SURFACE, inkWithAlpha, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { MentionText } from '@/components/mentions/MentionText';
 
 const AMBER = CT.amber;
 /** On-dark green: the shell's accent, the LIVE eyebrow. */
@@ -229,12 +234,34 @@ const CARD_MAX = 344;
 const CELL_GAP = 2;
 
 /**
- * The post as it will appear in the clubhouse: media block, actor, caption,
- * course. `completedFiles` scrims the cells still in flight; `resolved` clears
- * every scrim regardless.
+ * A preview of the post the member just published — NOT a render of the feed
+ * card. What is guaranteed: the same caption (parsed through MentionText, so
+ * tagged members read as names exactly as in the feed), the same actor, the
+ * same course, and the member's own picked files in order. What is not: the
+ * media shown is the LOCAL file, not the uploaded/transcoded asset the feed
+ * serves, and the layout is this overlay's mosaic, not the feed's carousel.
+ *
+ * Media ownership: this card creates its own object URLs from the picked
+ * Files and revokes them in the memo's cleanup. It never displays a URL owned
+ * elsewhere. Items without a File (edit path) have no local preview and are
+ * omitted; if none remain the card renders with NO media block.
+ *
+ * `completedFiles` scrims the cells still in flight; `resolved` clears every
+ * scrim regardless.
  */
-function PostCard({ result, completedFiles, resolved }: { result: SubmitResult; completedFiles: number; resolved?: boolean }) {
-  const previews = result.mediaPreviews ?? [];
+export function PostCard({ result, completedFiles, resolved }: { result: SubmitResult; completedFiles: number; resolved?: boolean }) {
+  const owned = useOwnedPreviews(result.mediaPreviews);
+  const [failed, setFailed] = useState<ReadonlySet<number>>(() => new Set());
+  const previews = owned
+    .map((p, i) => ({ ...p, key: i }))
+    .filter((p) => !failed.has(p.key));
+  const onCellError = (key: number) =>
+    setFailed((prev) => {
+      if (prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
   const caption = (result.caption ?? '').trim();
   return (
     <div
@@ -249,7 +276,7 @@ function PostCard({ result, completedFiles, resolved }: { result: SubmitResult; 
       }}
     >
       {previews.length > 0 && (
-        <MediaMosaic previews={previews} completedFiles={completedFiles} resolved={resolved} />
+        <MediaMosaic previews={previews} completedFiles={completedFiles} resolved={resolved} onCellError={onCellError} />
       )}
 
       <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -282,7 +309,7 @@ function PostCard({ result, completedFiles, resolved }: { result: SubmitResult; 
               overflow: 'hidden',
             }}
           >
-            {caption}
+            <MentionText text={caption} disableNavigation />
           </div>
         )}
 
@@ -305,24 +332,52 @@ function PostCard({ result, completedFiles, resolved }: { result: SubmitResult; 
  *   4+       the same three cells, +N over the last
  * The +N is NOT a progress indicator: it never animates and never counts down.
  */
+type OwnedPreview = { url: string; type: 'image' | 'video'; key: number };
+
+/**
+ * One owner, one lifetime: object URLs are minted here from the Files and
+ * revoked in this memo's own cleanup (on unmount or when the list changes).
+ */
+function useOwnedPreviews(list: SubmitResult['mediaPreviews']): { url: string; type: 'image' | 'video' }[] {
+  const urls = useMemo(
+    () =>
+      (list ?? [])
+        .filter((m): m is { file: File; type: 'image' | 'video' } => Boolean(m.file))
+        .map((m) => ({ url: URL.createObjectURL(m.file), type: m.type })),
+    [list],
+  );
+  useEffect(
+    () => () => {
+      for (const u of urls) {
+        try { URL.revokeObjectURL(u.url); } catch { /* ignore */ }
+      }
+    },
+    [urls],
+  );
+  return urls;
+}
+
 function MediaMosaic({
   previews,
   completedFiles,
   resolved,
+  onCellError,
 }: {
-  previews: { url: string; type: 'image' | 'video' }[];
+  previews: OwnedPreview[];
   completedFiles: number;
   resolved?: boolean;
+  onCellError: (key: number) => void;
 }) {
   const n = previews.length;
   const visible = previews.slice(0, 3);
   const overflow = n > 3 ? n - 3 : 0;
-  const pending = (i: number) => !resolved && i >= completedFiles;
+  const pending = (i: number) => !resolved && previews[i].key >= completedFiles;
+  const err = (i: number) => () => onCellError(previews[i].key);
 
   if (n === 1) {
     return (
       <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 5', background: '#000' }}>
-        <Cell item={visible[0]} pending={pending(0)} />
+        <Cell item={visible[0]} pending={pending(0)} onError={err(0)} />
       </div>
     );
   }
@@ -331,8 +386,8 @@ function MediaMosaic({
     return (
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: CELL_GAP, width: '100%', aspectRatio: '4 / 5', background: '#000' }}>
         {visible.map((m, i) => (
-          <div key={i} style={{ position: 'relative', overflow: 'hidden' }}>
-            <Cell item={m} pending={pending(i)} />
+          <div key={m.key} style={{ position: 'relative', overflow: 'hidden' }}>
+            <Cell item={m} pending={pending(i)} onError={err(i)} />
           </div>
         ))}
       </div>
@@ -342,13 +397,13 @@ function MediaMosaic({
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gridTemplateRows: '1fr 1fr', gap: CELL_GAP, width: '100%', aspectRatio: '4 / 5', background: '#000' }}>
       <div style={{ gridRow: '1 / span 2', position: 'relative', overflow: 'hidden' }}>
-        <Cell item={visible[0]} pending={pending(0)} />
+        <Cell item={visible[0]} pending={pending(0)} onError={err(0)} />
       </div>
       <div style={{ position: 'relative', overflow: 'hidden' }}>
-        <Cell item={visible[1]} pending={pending(1)} />
+        <Cell item={visible[1]} pending={pending(1)} onError={err(1)} />
       </div>
       <div style={{ position: 'relative', overflow: 'hidden' }}>
-        <Cell item={visible[2]} pending={pending(2)} />
+        <Cell item={visible[2]} pending={pending(2)} onError={err(2)} />
         {overflow > 0 && (
           <div
             style={{
@@ -372,23 +427,32 @@ function MediaMosaic({
   );
 }
 
-/** One mosaic cell: the local preview, plus the pending scrim that clears. */
-function Cell({ item, pending }: { item: { url: string; type: 'image' | 'video' }; pending: boolean }) {
+/**
+ * One mosaic cell: the local preview, plus the pending scrim that clears.
+ * Video matches the composer's own preview (MediaStageV2) exactly —
+ * playsInline muted loop autoPlay — so iOS decodes a frame instead of painting
+ * the element's black background. On error the parent drops the cell and the
+ * mosaic reflows: no black rectangle, no placeholder (cf. NewsTab StoryRow).
+ */
+function Cell({ item, pending, onError }: { item: { url: string; type: 'image' | 'video' }; pending: boolean; onError: () => void }) {
   const reduce = useReducedMotion();
   return (
     <>
       {item.type === 'video' ? (
         <video
           src={item.url}
-          muted
           playsInline
-          preload="metadata"
+          muted
+          loop
+          autoPlay
+          onError={onError}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
       ) : (
         <img
           src={item.url}
           alt=""
+          onError={onError}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
       )}
