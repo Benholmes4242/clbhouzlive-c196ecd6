@@ -953,8 +953,8 @@
       "vsHandicap": "[~~vš hàñdîçàp~~]",
       "strapline": "[~~Ñőƀőđý ĥáš рļáýéđ ƀéţţéř íñ ţĥé ļášţ šéνéñ đáýš.~~]",
       "netFact": "[~~Ñéţ {{net}}~~]",
-      "courseRecordJoint_one": "[~~Ĉőúřšé řéĉőřđ · ĵőíñţ ŵíţĥ {{name}}~~]",
-      "courseRecordJoint_other": "[~~Ĉőúřšé řéĉőřđ · ĵőíñţ ŵíţĥ {{count}} őţĥéřš~~]"
+      "jointWith_one": "[~~ĵőíñţ ŵíţĥ {{name}}~~]",
+      "jointWith_other": "[~~ĵőíñţ ŵíţĥ {{count}} őţĥéřš~~]"
     }
   },
   "courseHero": {
