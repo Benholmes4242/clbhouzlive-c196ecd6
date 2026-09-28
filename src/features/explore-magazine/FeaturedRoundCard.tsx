@@ -3,7 +3,9 @@
  *
  * AchievementCallout's "a special round is MARKED, NEVER ENLARGED" still governs
  * the FEED. This hero is the one agreed exception (Ben), mounted only in the
- * slot above the Scores feed. No feed card changes.
+ * slot above the All feed. No feed card changes. BRIEF_FEATURED_ROUND_FIXES:
+ * the pane is the feed card's photographic treatment (course image_url, the
+ * same RoundShape trace) plus a gold frame, a pill and a headline.
  *
  * GOLD, NEVER AMBER, ON THE FRAME. Gold means a rare achievement (eagle chips,
  * ace ring). Amber means the viewing member, so on the viewer's own round only
@@ -18,12 +20,25 @@ import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { MINUS } from './exploreCopy';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
+import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
 
 const GOLD = SC_FILL_GOLD;
 const gold = (pct: number) => `color-mix(in srgb, ${GOLD} ${pct}%, transparent)`;
+/** Feed card std photo height (ExploreCard PHOTO_H.std). The pane grows only if
+ *  its copy needs more, exactly as the feed's on-photo card does. */
+const PANE_H = 210;
+/** The feed card's std trace band and width. */
+const SHAPE_BAND = 52;
+const SHAPE_W = 350;
+/** §5 — the dark stop begins at 22%, ABOVE the headline, so the whole text block
+ *  (headline, kicker, who line) and the trace sit on >= 0.72 black. */
 const SCRIM =
-  'linear-gradient(180deg, color-mix(in srgb, black 45%, transparent) 0%, color-mix(in srgb, black 5%, transparent) 34%, color-mix(in srgb, black 88%, transparent) 100%)';
+  'linear-gradient(180deg, color-mix(in srgb, black 45%, transparent) 0%, color-mix(in srgb, black 20%, transparent) 14%, color-mix(in srgb, black 72%, transparent) 22%, color-mix(in srgb, black 90%, transparent) 100%)';
+const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
 const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
 const BIG: React.CSSProperties = { fontSize: 44, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: A.INK, ...FIG };
 const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `${MINUS}${Math.abs(n)}` : `${n}`);
@@ -74,28 +89,44 @@ function Headline({ r }: { r: FeaturedRound }) {
   }
 }
 
-export const FeaturedRoundCard: React.FC<{ round: FeaturedRound; viewerId?: string; onOpen: () => void }> = ({
+export const FeaturedRoundCard: React.FC<{
+  round: FeaturedRound;
+  viewerId?: string;
+  shape?: HoleShape | null;
+  onOpen: () => void;
+}> = ({
   round: r,
   viewerId,
+  shape = null,
   onOpen,
 }) => {
   const { t } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
   const mine = !!viewerId && r.user_id === viewerId;
-  const image = r.photo_url || r.image_url;
 
-  // KICKER, ALWAYS: gross and to-par, plus one more fact. The score is never lost.
-  const extra =
-    r.tier === 2
-      ? (r.joint_count ?? 0) >= 2
+  const image = r.image_url;
+  const gross = r.gross == null ? null : `${r.gross}`;
+  const par = toPar(r.to_par);
+
+  // §4 THE KICKER CARRIES WHAT THE HEADLINE DOES NOT. No figure in both.
+  let parts: (string | null)[];
+  if (r.tier === 2) {
+    parts = [
+      (r.joint_count ?? 0) >= 2
         ? k('courseRecordJoint_other', { count: r.joint_count })
         : r.joint_count === 1 && r.joint_name
           ? k('courseRecordJoint_one', { name: r.joint_name })
-          : k('courseRecord')
-      : r.tier === 5 && r.net_score != null
-        ? k('netFact', { net: r.net_score })
-        : null;
-  const kicker = [r.gross == null ? null : `${r.gross}`, toPar(r.to_par), extra].filter(Boolean).join(' · ');
+          : k('courseRecord'),
+    ];
+  } else if (r.tier === 3 && r.reason !== 'eagle_brace' && r.reason !== 'stableford_45') {
+    parts = [gross]; // headline already showed the to-par
+  } else if (r.tier >= 5) {
+    parts = [gross, par, r.net_score != null ? k('netFact', { net: r.net_score }) : null];
+  } else {
+    parts = [gross, par];
+  }
+  const kicker = parts.filter(Boolean).join(' · ');
+  const traceRow = { round_id: r.whs_score_id, front_nine_to_par: null, back_nine_to_par: null } as unknown as CircleRoundRow;
 
   return (
     <button
@@ -114,7 +145,7 @@ export const FeaturedRoundCard: React.FC<{ round: FeaturedRound; viewerId?: stri
         cursor: 'pointer',
       }}
     >
-      <div style={{ position: 'relative', height: 290 }}>
+      <div style={{ position: 'relative', minHeight: PANE_H, display: 'flex', flexDirection: 'column' }}>
         {image ? (
           <img src={image} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : null}
@@ -138,13 +169,31 @@ export const FeaturedRoundCard: React.FC<{ round: FeaturedRound; viewerId?: stri
             {k('label')}
           </span>
         </div>
-        <div style={{ position: 'absolute', left: 16, right: 16, bottom: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: mine ? A.AMBER : A.INK, marginBottom: 8 }}>
-            {mine ? t('courseDetail.records.you') : r.display_name}
-            <span style={{ fontWeight: 600, color: A.MUTE }}> · {r.course_name}</span>
-          </div>
+        {/* The pill lane, then copy at the foot: headline, kicker, who line. */}
+        <div style={{ flex: '0 0 48px' }} />
+        <div style={{ flex: '1 1 auto' }} />
+        <div style={{ position: 'relative', padding: '0 16px', textShadow: TEXT_SHADOW }}>
           <Headline r={r} />
-          <div style={{ marginTop: 8, fontSize: 11.5, fontWeight: 600, color: A.MUTE, ...FIG }}>{kicker}</div>
+          {kicker ? (
+            <div style={{ marginTop: 8, fontSize: 11.5, fontWeight: 600, color: A.INK, ...FIG }}>{kicker}</div>
+          ) : null}
+          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            {/* §1 THE AVATAR IS 30px, EXPLICITLY — it can never fill the pane again. */}
+            <span style={{ width: 30, height: 30, flex: '0 0 30px', display: 'inline-flex' }}>
+              <SquircleAvatar size={30} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} hairlineRing hideRing={false} />
+            </span>
+            <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 700, color: mine ? A.AMBER : A.INK }}>
+              {mine ? t('courseDetail.records.you') : r.display_name}
+              {r.course_name ? <span style={{ fontWeight: 500, color: A.INK }}> · {r.course_name}</span> : null}
+            </span>
+          </div>
+        </div>
+        <div aria-hidden="true" style={{ position: 'relative', height: shape ? SHAPE_BAND + 12 : 16, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', overflow: 'hidden' }}>
+          {shape ? (
+            <RoundShape row={traceRow} shape={shape} width={SHAPE_W} height={SHAPE_BAND - EXPLORE_END_LABEL_BAND}
+              showMeta={false} showBaseline baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2}
+              exploreLineOnly endLabels exploreGlow underParFill />
+          ) : null}
         </div>
       </div>
       <div
