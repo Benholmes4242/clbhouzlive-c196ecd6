@@ -335,25 +335,26 @@ export function PostCard({ result, completedFiles, resolved }: { result: SubmitR
 type OwnedPreview = { url: string; type: 'image' | 'video'; key: number };
 
 /**
- * One owner, one lifetime: object URLs are minted here from the Files and
- * revoked in this memo's own cleanup (on unmount or when the list changes).
+ * One owner, one lifetime: object URLs are minted in an effect (not in render,
+ * so StrictMode's dev double-render cannot leak an unrevoked set) and revoked
+ * in that same effect's cleanup. Keys are the ordinal among File-bearing items,
+ * which is exactly the list the upload controller counts `completedFiles`
+ * against: create hands it `input.media` (every item has a File) and the edit
+ * path hands it only `!existingId && file` items and never renders this card.
  */
 function useOwnedPreviews(list: SubmitResult['mediaPreviews']): { url: string; type: 'image' | 'video' }[] {
-  const urls = useMemo(
-    () =>
-      (list ?? [])
-        .filter((m): m is { file: File; type: 'image' | 'video' } => Boolean(m.file))
-        .map((m) => ({ url: URL.createObjectURL(m.file), type: m.type })),
-    [list],
-  );
-  useEffect(
-    () => () => {
-      for (const u of urls) {
+  const [urls, setUrls] = useState<{ url: string; type: 'image' | 'video' }[]>([]);
+  useEffect(() => {
+    const minted = (list ?? [])
+      .filter((m): m is { file: File; type: 'image' | 'video' } => Boolean(m.file))
+      .map((m) => ({ url: URL.createObjectURL(m.file), type: m.type }));
+    setUrls(minted);
+    return () => {
+      for (const u of minted) {
         try { URL.revokeObjectURL(u.url); } catch { /* ignore */ }
       }
-    },
-    [urls],
-  );
+    };
+  }, [list]);
   return urls;
 }
 
@@ -377,7 +378,7 @@ function MediaMosaic({
   if (n === 1) {
     return (
       <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 5', background: '#000' }}>
-        <Cell item={visible[0]} pending={pending(0)} onError={err(0)} />
+        <Cell item={visible[0]} live pending={pending(0)} onError={err(0)} />
       </div>
     );
   }
@@ -429,32 +430,38 @@ function MediaMosaic({
 
 /**
  * One mosaic cell: the local preview, plus the pending scrim that clears.
- * Video matches the composer's own preview (MediaStageV2) exactly —
- * playsInline muted loop autoPlay — so iOS decodes a frame instead of painting
- * the element's black background. On error the parent drops the cell and the
- * mosaic reflows: no black rectangle, no placeholder (cf. NewsTab StoryRow).
+ * `live` (the one-cell case only) mounts a playsInline muted loop autoPlay
+ * <video>, matching MediaStageV2. Two or more cells use the cached poster
+ * frame (videoPoster, as SlideThumb does) — no live <video> per tile. Every
+ * video carries the extracted poster so a refused autoplay (iOS Low Power
+ * Mode fires no error) still shows a frame. If a poster cannot be extracted
+ * the cell shows the neutral tint placeholder, never the black element.
  */
-function Cell({ item, pending, onError }: { item: { url: string; type: 'image' | 'video' }; pending: boolean; onError: () => void }) {
+function Cell({ item, pending, onError, live = false }: { item: { url: string; type: 'image' | 'video' }; pending: boolean; onError: () => void; live?: boolean }) {
   const reduce = useReducedMotion();
+  const isVideo = item.type === 'video';
+  const [poster, setPoster] = useState<string | null>(() => (isVideo ? getCachedPoster(item.url) : null));
+  useEffect(() => {
+    if (!isVideo || poster) return;
+    let cancelled = false;
+    void extractPoster(item.url, item.url).then((u) => { if (!cancelled && u) setPoster(u); });
+    return () => { cancelled = true; };
+  }, [isVideo, item.url, poster]);
+  const fill = { position: 'absolute' as const, inset: 0, width: '100%', height: '100%', objectFit: 'cover' as const };
   return (
     <>
-      {item.type === 'video' ? (
-        <video
-          src={item.url}
-          playsInline
-          muted
-          loop
-          autoPlay
-          onError={onError}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-        />
+      {isVideo ? (
+        <>
+          <div aria-hidden style={{ position: 'absolute', inset: 0, background: inkWithAlpha(SURFACE.dark.ink, 0.06) }} />
+          {live ? (
+            <video src={item.url} poster={poster ?? undefined} playsInline muted loop autoPlay onError={onError} style={{ ...fill, background: 'transparent' }} />
+          ) : (
+            poster && <img src={poster} alt="" style={fill} />
+          )}
+          {!live && <PlayGlyph size={22} />}
+        </>
       ) : (
-        <img
-          src={item.url}
-          alt=""
-          onError={onError}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-        />
+        <img src={item.url} alt="" onError={onError} style={fill} />
       )}
       <motion.div
         aria-hidden
