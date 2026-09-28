@@ -422,7 +422,7 @@ const TrendCard: React.FC<{
               fontFamily: SANS,
             }}
           >
-            <span style={{ ...LABEL, color: A.INK }}>View next round</span>
+            <span style={{ ...LABEL, color: A.INK }}>View handicap</span>
             <ChevronRight size={12} strokeWidth={2.6} color={A.INK} />
           </button>
         </>
