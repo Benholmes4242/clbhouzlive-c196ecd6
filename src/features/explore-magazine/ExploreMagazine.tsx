@@ -71,6 +71,8 @@ import { WatchFeed } from './watch/WatchFeed';
 import { VideoCard } from './watch/videoUnit';
 import { useWatchVideos } from './watch/useWatchVideos';
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
+import { useFeaturedRound } from './useFeaturedRound';
+import { FeaturedRoundCard } from './FeaturedRoundCard';
 import { useExploreStream } from './useExploreStream';
 import { dedupeItems, warnDuplicates } from './dedupeStream';
 import type { StreamItem } from './streamItem';
@@ -658,6 +660,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      and cadenced by the RPC and the two are interleaved by the score the RPC
      itself assigned. docs/sql/explore_courses_merged_search.sql files the
      unapplied one-pool change that would let SQL do the merge outright. */
+  /* BRIEF_SCORES_FEATURED_ROUND — same scope and geography the Scores stream is asked for. */
+  const featured = useFeaturedRound(
+    userId && view === 'scores' && serverReady ? userId : undefined,
+    serverScope,
+    { clubId: streamGeo.primaryClubId, county: streamGeo.county, country: streamGeo.country },
+  );
+
   const serverReviews = useExploreStream(
     userId && serverReady && !indexPath && view === 'courses' ? userId : undefined,
     'reviews',
@@ -1920,6 +1929,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         /* HEADS THE STREAM, NOT THE RAIL — Your circle is never scoped by the chip row. */
         <div style={{ fontFamily: SANS, ...SHELF_HEADING, padding: '0 16px 10px' }}>
           {scoreScopeLabel}
+        </div>
+      ) : null}
+      {view === 'scores' && !scoresBoardActive && featured.data ? (
+        <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
+          <FeaturedRoundCard
+            round={featured.data}
+            viewerId={userId}
+            onOpen={() => opener.openByScore(featured.data!.whs_score_id, null, featured.data!.user_id)}
+          />
         </div>
       ) : null}
 
