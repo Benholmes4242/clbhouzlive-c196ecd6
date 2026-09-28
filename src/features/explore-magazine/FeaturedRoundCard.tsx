@@ -44,6 +44,12 @@ const UNIT: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing:
 const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
 const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
 const BIG: React.CSSProperties = { fontSize: 50, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: A.INK, ...FIG };
+/** HEADLINE_FIT §1 — pure-word headlines (hole in one, albatross, clean card)
+ *  at 34 so they hold one line at 375; numeric and count-led stay at BIG. */
+const BIG_WORD: React.CSSProperties = { ...BIG, fontSize: 34 };
+/** §3 — the headline row never wraps; the unit label ellipsises instead. */
+const ROW: React.CSSProperties = { display: 'flex', alignItems: 'baseline', minWidth: 0, flexWrap: 'nowrap', whiteSpace: 'nowrap' };
+const UNIT_FIT: React.CSSProperties = { minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' };
 const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `${MINUS}${Math.abs(n)}` : `${n}`);
 const toPar = (n: number | null) => (n == null ? null : n === 0 ? 'E' : signed(n));
 
@@ -51,12 +57,12 @@ function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
   const { t } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
   const feat = (text: string) => (
-    <span style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.03em', color: GOLD, lineHeight: 1.05 }}>{text}</span>
+    <span style={{ ...BIG_WORD, color: GOLD }}>{text}</span>
   );
   const points = (n: number) => (
-    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
-      <span style={BIG}>{n}</span>
-      <span style={{ fontSize: 17, fontWeight: 600, color: A.INK }}>{k('stablefordPoints')}</span>
+    <span style={{ ...ROW, gap: 6 }}>
+      <span style={{ ...BIG, flex: '0 0 auto' }}>{n}</span>
+      <span style={{ ...UNIT_FIT, fontSize: 17, fontWeight: 600, color: A.INK }}>{k('stablefordPoints')}</span>
     </span>
   );
   switch (r.tier) {
@@ -64,12 +70,12 @@ function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
       return feat((r.holes_in_one ?? 0) > 0 || r.reason === 'hole_in_one' ? k('holeInOne') : k('albatross'));
     case 2:
       return (
-        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-          <span style={BIG}>{r.gross}</span>
+        <span style={{ ...ROW, gap: 8 }}>
+          <span style={{ ...BIG, flex: '0 0 auto' }}>{r.gross}</span>
           {r.to_par != null && r.to_par < 0 ? (
-            <span style={{ fontSize: 19, fontWeight: 700, color: TOPAR_UNDER_DARK, ...FIG }}>{toPar(r.to_par)}</span>
+            <span style={{ flex: '0 0 auto', fontSize: 19, fontWeight: 700, color: TOPAR_UNDER_DARK, ...FIG }}>{toPar(r.to_par)}</span>
           ) : null}
-          {unit ? <span style={{ ...UNIT, marginLeft: 2 }}>{unit}</span> : null}
+          {unit ? <span style={{ ...UNIT, ...UNIT_FIT, marginLeft: 2 }}>{unit}</span> : null}
         </span>
       );
     case 3:
@@ -80,12 +86,12 @@ function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
       if (r.reason === 'stableford_40') return points(r.stableford);
       if (r.reason === 'birdie_haul')
         return <span style={BIG}>{k(r.birdies === 1 ? 'birdieHaul_one' : 'birdieHaul_other', { count: r.birdies })}</span>;
-      return <span style={BIG}>{k('cleanCard')}</span>;
+      return <span style={BIG_WORD}>{k('cleanCard')}</span>;
     default:
       return (
-        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 10 }}>
-          <span style={BIG}>{r.vs_hcp == null ? null : signed(r.vs_hcp)}</span>
-          <span style={UNIT}>{k('vsHandicap')}</span>
+        <span style={{ ...ROW, gap: 10 }}>
+          <span style={{ ...BIG, flex: '0 0 auto' }}>{r.vs_hcp == null ? null : signed(r.vs_hcp)}</span>
+          <span style={{ ...UNIT, ...UNIT_FIT }}>{k('vsHandicap')}</span>
         </span>
       );
   }
@@ -114,14 +120,16 @@ export const FeaturedRoundCard: React.FC<{
   let parts: (string | null)[];
   let unit: string | null = null;
   if (r.tier === 2) {
-    parts = [];
-    // V2 §4 — the record label is the figure's unit, set beside it.
-    unit =
+    // HEADLINE_FIT §2 — the unit is ALWAYS the short label; the joint clause
+    // (same keys, same branching) moves to the place line.
+    unit = k('courseRecord');
+    parts = [
       (r.joint_count ?? 0) >= 2
         ? k('courseRecordJoint_other', { count: r.joint_count })
         : r.joint_count === 1 && r.joint_name
           ? k('courseRecordJoint_one', { name: r.joint_name })
-          : k('courseRecord');
+          : null,
+    ];
   } else if (r.tier === 3 && r.reason !== 'eagle_brace' && r.reason !== 'stableford_45') {
     parts = [gross]; // headline already showed the to-par
   } else if (r.tier >= 5) {
