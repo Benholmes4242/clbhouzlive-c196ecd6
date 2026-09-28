@@ -1,3 +1,4 @@
+import { BIRDIE_HAUL_THRESHOLD } from '@/lib/gam/roundFeats';
 import type { StreamFacts } from './streamItem';
 
 /** Explore's permanent round feats, in rarity order. */
@@ -10,7 +11,6 @@ export interface ExploreRoundFeat {
 
 export type ExploreFeatTier = 'ink' | 'gold' | 'top';
 
-const BIRDIE_HAUL = 5;
 
 /** Collect every carried fact before applying the two-item prose/marker cap. */
 export function collectRoundFeats(facts: StreamFacts): ExploreRoundFeat[] {
@@ -22,7 +22,7 @@ export function collectRoundFeats(facts: StreamFacts): ExploreRoundFeat[] {
   if (aces > 0) feats.push({ kind: 'ace', count: aces });
   if (albatrosses > 0) feats.push({ kind: 'albatross', count: albatrosses });
   if (eagles > 0) feats.push({ kind: 'eagle', count: eagles });
-  if (birdies >= BIRDIE_HAUL) feats.push({ kind: 'birdies', count: birdies });
+  if (birdies >= BIRDIE_HAUL_THRESHOLD) feats.push({ kind: 'birdies', count: birdies });
   if (facts.clean_card === true) feats.push({ kind: 'clean', count: 1 });
   return feats;
 }
