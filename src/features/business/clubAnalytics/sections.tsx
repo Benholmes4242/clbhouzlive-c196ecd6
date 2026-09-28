@@ -881,8 +881,7 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
           {tees.map((t) => {
             const parts = toParParts(t.avg_to_par);
             const who = whoPlaysIt(t);
-            const share = totalRounds > 0 ? t.rounds / totalRounds : 0;
-            const pct = Math.round(share * 100);
+            const barPct = totalRounds > 0 ? (t.rounds / totalRounds) * 100 : 0;
             const num: React.CSSProperties = { fontSize: 13, fontWeight: 700, textAlign: 'right', ...FIGS };
             return (
               <div key={t.yards} style={{ fontFamily: SANS, ...FIGS }}>
@@ -897,13 +896,13 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
                     style={{
                       display: 'block',
                       height: '100%',
-                      width: `${Math.max(MIN_BAR_PCT, share * 100)}%`,
+                      width: t.rounds > 0 ? `${Math.max(MIN_BAR_PCT, barPct)}%` : '0%',
                       background: A.INK,
                     }}
                   />
                 </div>
                 <div style={{ fontSize: 11.5, lineHeight: 1.4, color: A.DIM, marginTop: 6 }}>
-                  {`${pct}% of play`}
+                  {`${share(t.rounds, totalRounds)} of play`}
                   {who ? ` · ${who}` : ''}
                   {who && t.mean_index != null ? `, mean index ${t.mean_index.toFixed(1)}` : ''}
                 </div>
