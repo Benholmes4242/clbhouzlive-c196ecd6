@@ -12,7 +12,11 @@ import { supabase } from '@/integrations/supabase/client';
  * The key carries viewer, scope AND geography, exactly as exploreKeys.stream,
  * or a scope change would serve another scope's hero from cache.
  */
-/** LOCAL ON PURPOSE: the RPC now returns joint_name/joint_count, newer than the generated types.ts. */
+/**
+ * LOCAL ON PURPOSE: the generated get_featured_round block types every column as
+ * non-nullable (display_name: string), but most can genuinely be null. Do not
+ * replace this with the generated type.
+ */
 export interface FeaturedRound { whs_score_id: string; user_id: string;
   display_name: string | null; photo_url: string | null; course_id: string;
   course_name: string | null; image_url: string | null; play_date: string;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { BIRDIE_HAUL_THRESHOLD } from '@/lib/gam/roundFeats';
 import { useTranslation } from 'react-i18next';
 import { ChartNoAxesColumn } from 'lucide-react';
 import { A, TOPAR_RED, FIGS } from '@/features/courses/components/holes/analytical/tokens';
@@ -390,7 +391,7 @@ function candidatesFor(row: CircleRoundRow, t: T): RoundInsight[] {
       defaultValue: '{{count}} eagles',
       count: eagles,
     }));
-  } else if (birdies >= 4) {
+  } else if (birdies >= BIRDIE_HAUL_THRESHOLD) {
     push('haul', t('discover.friendsRail.insight.birdies', {
       defaultValue: '{{count}} birdies',
       count: birdies,
