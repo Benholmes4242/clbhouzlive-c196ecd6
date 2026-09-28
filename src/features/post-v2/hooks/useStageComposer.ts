@@ -5,7 +5,7 @@
 // small - no orchestration or DB writes live here (see usePostSubmit +
 // usePostUploadOrchestrator for those).
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { toast } from '@/lib/toast';
 import { POST_LIMITS, formatDuration } from '@/constants/postLimits';
 
@@ -88,17 +88,10 @@ const emptyState: StageState = {
 export function useStageComposer() {
   const [state, setState] = useState<StageState>(emptyState);
 
-  // revoke blob URLs when unmounting so we don't leak
-  useEffect(() => {
-    return () => {
-      for (const m of state.media) {
-        if (m.previewUrl.startsWith('blob:')) {
-          try { URL.revokeObjectURL(m.previewUrl); } catch { /* ignore */ }
-        }
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Blob URL revocation is NOT done here. A submitted item's previewUrl is
+  // owned by pendingPostsStore (removeJob → revokeMediaBlobs, on upload
+  // completion); removed items are revoked in removeMedia below. The former
+  // unmount effect closed over the initial empty list and revoked nothing.
 
   const markDirty = (patch: Partial<StageState>) =>
     setState(s => ({ ...s, ...patch, dirty: true }));

@@ -1,6 +1,7 @@
 import { Play } from 'lucide-react';
 import type { VideoHit } from '../lib/searchNavigation';
 import { S } from '../lib/tokens';
+import { MentionText } from '@/components/mentions/MentionText';
 
 interface Props { video: VideoHit; onSelect: () => void }
 
@@ -105,7 +106,7 @@ export function VideoRailCard({ video, onSelect }: Props) {
             overflow: 'hidden',
           }}
         >
-          {caption}
+          <MentionText text={caption} disableNavigation />
         </div>
       </div>
     </button>

@@ -78,18 +78,6 @@ export interface SquircleAvatarProps {
   children?: React.ReactNode;
   /** Click handler */
   onClick?: () => void;
-  /** Enable premium glow effect for achievement rings */
-  enableGlow?: boolean;
-}
-
-/**
- * Convert hex color to rgba with alpha
- */
-function hexToRgba(hex: string, alpha: number): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 /**
@@ -121,7 +109,6 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   priority = false,
   children,
   onClick,
-  enableGlow = false,
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [showFallback, setShowFallback] = useState(false);
@@ -247,43 +234,37 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   const fallbackBg = getAvatarFallbackGradient(userId || alt);
   const initialsFontSize = Math.max(10, Math.round(pixelSize * 0.38));
 
-  // Three render states:
-  //  - LOADING (image in flight, candidates not exhausted) → neutral skeleton, NEVER initials
-  //  - LOADED → photo (fade in)
-  //  - FAILED (showFallback, all candidates exhausted) → canonical initials on deterministic colour
-  const isLoading = !imageLoaded && !showFallback && candidates.length > 0;
+  // Two render states, never three:
+  //  - BASE (always rendered): canonical initials on the member's deterministic hue.
+  //  - PHOTO: fades in on top of the base once it decodes.
+  // A stalled image, dead URL, slow network or missing photo all degrade to the
+  // same correct-looking avatar instead of a blank tile. There is no loading
+  // skeleton: the old "neutral skeleton, never initials" rule bought a flash-free
+  // cached load, but cached loads don't flash anyway (the img.complete effect
+  // sets imageLoaded synchronously on mount) and it cost a hole on every cold one.
   const avatarContent = (
     <>
-      {showFallback && (
-        <div
-          className="absolute inset-0 flex items-center justify-center overflow-hidden text-white"
-          style={{ background: fallbackBg }}
-          aria-label={alt || fallbackInitials}
-        >
-          {hasInitials ? (
-            <span
-              style={{
-                fontSize: `${initialsFontSize}px`,
-                fontWeight: 600,
-                letterSpacing: '0.01em',
-                lineHeight: 1,
-                userSelect: 'none',
-              }}
-            >
-              {fallbackInitials}
-            </span>
-          ) : (
-            <User size="60%" strokeWidth={1.75} aria-hidden="true" />
-          )}
-        </div>
-      )}
-      {isLoading && (
-        <div
-          className="absolute inset-0"
-          style={{ background: 'rgba(15,23,42,0.08)' }}
-          aria-hidden="true"
-        />
-      )}
+      <div
+        className="absolute inset-0 flex items-center justify-center overflow-hidden text-white"
+        style={{ background: fallbackBg }}
+        aria-label={alt || fallbackInitials}
+      >
+        {hasInitials ? (
+          <span
+            style={{
+              fontSize: `${initialsFontSize}px`,
+              fontWeight: 600,
+              letterSpacing: '0.01em',
+              lineHeight: 1,
+              userSelect: 'none',
+            }}
+          >
+            {fallbackInitials}
+          </span>
+        ) : (
+          <User size="60%" strokeWidth={1.75} aria-hidden="true" />
+        )}
+      </div>
       {imageSrc && !showFallback && (
         <img
           ref={imgRef}
@@ -324,13 +305,8 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     ? 'transparent' 
     : effectiveRingColor || THEME_COLORS.noTierGray;
 
-  // Achievement state: colored ring with optional premium glow
+  // Achievement state: colored ring
   if (hasAchievementRing && effectiveRingColor) {
-    // Build premium glow box-shadow if enabled
-    const glowShadow = enableGlow
-      ? `0 0 0 2px rgba(0,0,0,0.4), 0 6px 20px rgba(0,0,0,0.3), 0 0 14px ${hexToRgba(effectiveRingColor, 0.35)}`
-      : undefined;
-
     return (
       <div
         className={cn(
@@ -340,27 +316,13 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
         )}
         onClick={onClick}
       >
-        {/* Outer glow halo (only when enableGlow) */}
-        {enableGlow && (
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              borderRadius: '34%',
-              background: `radial-gradient(circle, ${hexToRgba(effectiveRingColor, 0.18)} 0%, transparent 70%)`,
-              filter: 'blur(6px)',
-              transform: 'scale(1.15)',
-              opacity: 0.85,
-            }}
-          />
-        )}
         <div
-          className="relative overflow-hidden bg-white"
+          className="relative overflow-hidden"
           style={{
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
             border: hairlineRing ? 'none' : `${ringThickness}px solid ${effectiveRingColor}`,
-            boxShadow: glowShadow,
           }}
         >
           {avatarContent}
@@ -382,7 +344,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
       onClick={onClick}
     >
       <div
-        className={cn("relative overflow-hidden", hideRing ? "bg-transparent" : "bg-white")}
+        className="relative overflow-hidden"
         style={{
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
