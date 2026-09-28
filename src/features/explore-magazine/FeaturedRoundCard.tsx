@@ -125,9 +125,9 @@ export const FeaturedRoundCard: React.FC<{
     unit = k('courseRecord');
     parts = [
       (r.joint_count ?? 0) >= 2
-        ? k('courseRecordJoint_other', { count: r.joint_count })
+        ? k('jointWith_other', { count: r.joint_count })
         : r.joint_count === 1 && r.joint_name
-          ? k('courseRecordJoint_one', { name: r.joint_name })
+          ? k('jointWith_one', { name: r.joint_name })
           : null,
     ];
   } else if (r.tier === 3 && r.reason !== 'eagle_brace' && r.reason !== 'stableford_45') {

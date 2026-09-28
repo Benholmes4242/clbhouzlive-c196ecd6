@@ -1043,8 +1043,8 @@
       "vsHandicap": "vs handicap",
       "strapline": "Nobody has played better in the last seven days.",
       "netFact": "Net {{net}}",
-      "courseRecordJoint_one": "Course record · joint with {{name}}",
-      "courseRecordJoint_other": "Course record · joint with {{count}} others"
+      "jointWith_one": "joint with {{name}}",
+      "jointWith_other": "joint with {{count}} others"
     }
   },
   "courseHero": {
