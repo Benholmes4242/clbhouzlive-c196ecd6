@@ -289,6 +289,8 @@
       "rankOn": "{{list}} RANK",
       "footLine": "Toughest hole plays {{toPar}}",
       "footHardest": "Toughest hole plays {{toPar}}",
+      "roundsLabel": "ROUNDS",
+      "roundsTotal": "{{count}} rounds",
       "footMembers": "{{count}} members have played here",
       "open": "Open course"
     },
