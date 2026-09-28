@@ -708,54 +708,77 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
     );
   }
 
-  const cells: { label: string; value: string }[] = [];
-  if (birdies?.value != null) cells.push({ label: 'Most birdies here', value: fmt(birdies.value) });
-  if (stableford?.value != null) cells.push({ label: 'Best Stableford', value: fmt(stableford.value) });
-  if (holders != null) cells.push({ label: holders === 1 ? 'Holder, all time' : 'Holders, all time', value: fmt(holders) });
-  if (since != null) cells.push({ label: 'Rounds since', value: fmt(since) });
-
-  // The "has stood since" story belongs to whichever record is actually old —
-  // derived from attained_at, never assumed.
-  const oldest = [
-    { label: 'gross record', at: gross?.attained_at, has: gross?.value != null },
-    { label: 'Stableford record', at: stableford?.attained_at, has: stableford?.value != null },
+  // §1 — the hero's own sentence. Each clause appears only when its field does.
+  const middle: string[] = [];
+  if (holders != null && holders > 1) middle.push(`${fmt(holders)} members have held this record`);
+  if (since != null && since > 0) middle.push(`${fmt(since)} rounds have been played here since it was set`);
+  const heroSentence = [
+    gross?.attained_at ? `Set on ${dayMonthYear(gross.attained_at)}.` : null,
+    middle.length === 2
+      ? `${middle[0]}, and ${middle[1].charAt(0).toLowerCase()}${middle[1].slice(1)}.`
+      : middle.length === 1
+        ? `${middle[0]}.`
+        : null,
+    since === 0 ? 'It was set in the most recent round played here.' : null,
   ]
-    .filter((r) => r.has && r.at)
-    .sort((a, b) => String(a.at).localeCompare(String(b.at)))[0];
-  const oldestYears = oldest ? yearsSince(oldest.at) : null;
+    .filter(Boolean)
+    .join(' ');
+
+  // §2 — round records first, career totals second. Each row dates ITSELF.
+  const rows: { name: string; meta: string | null; value: string }[] = [];
+  if (stableford?.value != null) {
+    const yrs = stableford.attained_at ? yearsSince(stableford.attained_at) : null;
+    rows.push({
+      name: 'Best Stableford',
+      meta: stableford.attained_at
+        ? `Set ${dayMonthYear(stableford.attained_at)}${yrs != null && yrs >= 2 ? ` · has stood ${Math.floor(yrs)} years` : ''}`
+        : null,
+      value: fmt(stableford.value),
+    });
+  }
+  if (birdies?.value != null) {
+    rows.push({ name: 'Most birdies by one member', meta: 'A career total on this course, not one round', value: fmt(birdies.value) });
+  }
+  const hasHero = gross?.value != null;
 
   return (
     <Panel kicker="The course record" style={CARD}>
-      {gross?.value != null && (
+      {hasHero && (
         <>
-          <div style={bizFigure(46, A.INK)}>{gross.value}</div>
-          <div style={{ ...LABEL, marginTop: 8 }}>
-            Lowest gross{gross.attained_at ? ` · ${dayMonthYear(gross.attained_at)}` : ''}
-          </div>
+          <div style={bizFigure(46, A.INK)}>{gross!.value}</div>
+          <div style={{ ...LABEL, marginTop: 8 }}>Lowest gross</div>
+          {heroSentence && <Body style={{ marginTop: 12 }}>{heroSentence}</Body>}
         </>
       )}
 
-      {cells.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: A.BORDER, border: `1px solid ${A.BORDER}`, borderRadius: 12, overflow: 'hidden', marginTop: 16 }}>
-          {cells.map((c) => (
-            <div key={c.label} style={{ background: A.PANEL, padding: '12px 12px' }}>
-              <div style={bizFigure(17, A.INK)}>{c.value}</div>
-              {/* LABEL_FITS §3 — every cell reserves two lines so figures share a baseline. */}
-        <div style={{ ...LABEL, marginTop: 6 }}>{c.label}</div>
+      {rows.length > 0 && (
+        <div style={hasHero ? { borderTop: `1px solid ${A.BORDER}`, marginTop: 16, paddingTop: 4, marginBottom: 16 } : { marginBottom: 16 }}>
+          {rows.map((r, i) => (
+            <div
+              key={r.name}
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 12,
+                padding: '12px 0',
+                borderTop: i > 0 ? `1px solid ${A.SOFT}` : undefined,
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, fontFamily: SANS }}>{r.name}</div>
+                {r.meta && (
+                  <div style={{ marginTop: 3, fontSize: 11.5, lineHeight: 1.4, color: A.DIM, fontFamily: SANS }}>{r.meta}</div>
+                )}
+              </div>
+              <div className="tabular-nums lining-nums" style={{ flex: 'none', ...bizFigure(20, A.INK) }}>{r.value}</div>
             </div>
           ))}
         </div>
       )}
 
-      {oldest && oldestYears != null && oldestYears >= 2 && (
-        <Body style={{ marginTop: 12 }}>
-          Your {oldest.label} has stood for {Math.floor(oldestYears)} years, set {dayMonthYear(oldest.at)}.
-        </Body>
-      )}
-
-      <Body style={{ marginTop: 12, fontSize: 11.5, color: A.DIM }}>
-        Most birdies here is a career total on this course, not a single round. Nobody is named on this page: names live
-        on your course's Champions tab, where each member controls whether they appear.
+      <Body style={{ marginTop: rows.length > 0 ? 0 : 12, fontSize: 11.5, color: A.DIM }}>
+        Nobody is named on this page. Names live on your course's Champions tab, where each member controls whether
+        they appear.
       </Body>
 
       {onSeeChampions && (
