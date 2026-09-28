@@ -162,7 +162,8 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
     const el = boxRef.current;
     if (!el || pts.length < 2) return;
     const rect = el.getBoundingClientRect();
-    const ratio = (clientX - rect.left) / Math.max(1, rect.width);
+    const width = rect.width || el.clientWidth;
+    const ratio = (clientX - rect.left) / Math.max(1, width);
     setSel(Math.round(Math.min(1, Math.max(0, ratio)) * (pts.length - 1)));
   };
 
