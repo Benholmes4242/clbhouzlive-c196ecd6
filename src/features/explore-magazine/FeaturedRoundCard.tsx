@@ -28,23 +28,26 @@ import type { FeaturedRound } from './useFeaturedRound';
 
 const GOLD = SC_FILL_GOLD;
 const gold = (pct: number) => `color-mix(in srgb, ${GOLD} ${pct}%, transparent)`;
-/** Feed card std photo height (ExploreCard PHOTO_H.std). The pane grows only if
- *  its copy needs more, exactly as the feed's on-photo card does. */
-const PANE_H = 210;
+/** BRIEF_FEATURED_ROUND_PANE_V2 §1 — 290, never less. 210 left no room for the
+ *  trace and the text block to coexist. The pane may grow if copy wraps. */
+const PANE_H = 290;
 /** The feed card's std trace band and width. */
 const SHAPE_BAND = 52;
 const SHAPE_W = 350;
-/** §5 — the dark stop begins at 22%, ABOVE the headline, so the whole text block
- *  (headline, kicker, who line) and the trace sit on >= 0.72 black. */
+/** V2 §6 — the trace sits in the upper middle on >= 0.5 black; the dark stop
+ *  begins at 48%, ABOVE the headline, reaching 0.86 by 60% and 0.94 at the foot,
+ *  so the lower-third text holds 4.5:1 over the brightest possible photograph. */
 const SCRIM =
-  'linear-gradient(180deg, color-mix(in srgb, black 45%, transparent) 0%, color-mix(in srgb, black 20%, transparent) 14%, color-mix(in srgb, black 72%, transparent) 22%, color-mix(in srgb, black 90%, transparent) 100%)';
+  'linear-gradient(180deg, color-mix(in srgb, black 55%, transparent) 0%, color-mix(in srgb, black 50%, transparent) 20%, color-mix(in srgb, black 55%, transparent) 42%, color-mix(in srgb, black 86%, transparent) 60%, color-mix(in srgb, black 94%, transparent) 100%)';
+/** V2 §4 — the unit label beside the figure, on its baseline. */
+const UNIT: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.INK };
 const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
 const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
-const BIG: React.CSSProperties = { fontSize: 44, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: A.INK, ...FIG };
+const BIG: React.CSSProperties = { fontSize: 50, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: A.INK, ...FIG };
 const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `${MINUS}${Math.abs(n)}` : `${n}`);
 const toPar = (n: number | null) => (n == null ? null : n === 0 ? 'E' : signed(n));
 
-function Headline({ r }: { r: FeaturedRound }) {
+function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
   const { t } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
   const feat = (text: string) => (
@@ -61,11 +64,12 @@ function Headline({ r }: { r: FeaturedRound }) {
       return feat((r.holes_in_one ?? 0) > 0 || r.reason === 'hole_in_one' ? k('holeInOne') : k('albatross'));
     case 2:
       return (
-        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
           <span style={BIG}>{r.gross}</span>
           {r.to_par != null && r.to_par < 0 ? (
             <span style={{ fontSize: 19, fontWeight: 700, color: TOPAR_UNDER_DARK, ...FIG }}>{toPar(r.to_par)}</span>
           ) : null}
+          {unit ? <span style={{ ...UNIT, marginLeft: 2 }}>{unit}</span> : null}
         </span>
       );
     case 3:
@@ -79,11 +83,9 @@ function Headline({ r }: { r: FeaturedRound }) {
       return <span style={BIG}>{k('cleanCard')}</span>;
     default:
       return (
-        <span style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.MUTE }}>
-            {k('vsHandicap')}
-          </span>
+        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 10 }}>
           <span style={BIG}>{r.vs_hcp == null ? null : signed(r.vs_hcp)}</span>
+          <span style={UNIT}>{k('vsHandicap')}</span>
         </span>
       );
   }
@@ -100,7 +102,7 @@ export const FeaturedRoundCard: React.FC<{
   shape = null,
   onOpen,
 }) => {
-  const { t } = useTranslation('courses');
+  const { t, i18n } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
   const mine = !!viewerId && r.user_id === viewerId;
 
@@ -110,14 +112,16 @@ export const FeaturedRoundCard: React.FC<{
 
   // §4 THE KICKER CARRIES WHAT THE HEADLINE DOES NOT. No figure in both.
   let parts: (string | null)[];
+  let unit: string | null = null;
   if (r.tier === 2) {
-    parts = [
+    parts = [];
+    // V2 §4 — the record label is the figure's unit, set beside it.
+    unit =
       (r.joint_count ?? 0) >= 2
         ? k('courseRecordJoint_other', { count: r.joint_count })
         : r.joint_count === 1 && r.joint_name
           ? k('courseRecordJoint_one', { name: r.joint_name })
-          : k('courseRecord'),
-    ];
+          : k('courseRecord');
   } else if (r.tier === 3 && r.reason !== 'eagle_brace' && r.reason !== 'stableford_45') {
     parts = [gross]; // headline already showed the to-par
   } else if (r.tier >= 5) {
@@ -125,7 +129,11 @@ export const FeaturedRoundCard: React.FC<{
   } else {
     parts = [gross, par];
   }
-  const kicker = parts.filter(Boolean).join(' · ');
+  const date = r.play_date
+    ? new Date(r.play_date).toLocaleDateString(i18n.language, { day: 'numeric', month: 'short' })
+    : null;
+  // V2 §5 — the place line: course · the kicker's figures · date.
+  const placeLine = [r.course_name, ...parts, date].filter(Boolean).join(' · ');
   const traceRow = { round_id: r.whs_score_id, front_nine_to_par: null, back_nine_to_par: null } as unknown as CircleRoundRow;
 
   return (
@@ -160,7 +168,9 @@ export const FeaturedRoundCard: React.FC<{
             gap: 6,
             borderRadius: 999,
             padding: '5px 11px 5px 8px',
-            background: gold(18),
+            // V2 §6 — the pill carries its own darkening so gold reads on a bright sky.
+            background: `linear-gradient(${gold(18)}, ${gold(18)}), color-mix(in srgb, black 64%, transparent)`,
+            zIndex: 1,
             border: `1px solid ${gold(34)}`,
           }}
         >
@@ -169,30 +179,29 @@ export const FeaturedRoundCard: React.FC<{
             {k('label')}
           </span>
         </div>
-        {/* The pill lane, then copy at the foot: headline, kicker, who line. */}
-        <div style={{ flex: '0 0 48px' }} />
-        <div style={{ flex: '1 1 auto' }} />
-        <div style={{ position: 'relative', padding: '0 16px', textShadow: TEXT_SHADOW }}>
-          <Headline r={r} />
-          {kicker ? (
-            <div style={{ marginTop: 8, fontSize: 11.5, fontWeight: 600, color: A.INK, ...FIG }}>{kicker}</div>
-          ) : null}
-          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            {/* §1 THE AVATAR IS 30px, EXPLICITLY — it can never fill the pane again. */}
-            <span style={{ width: 30, height: 30, flex: '0 0 30px', display: 'inline-flex' }}>
-              <SquircleAvatar size={30} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} hairlineRing hideRing={false} />
-            </span>
-            <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 700, color: mine ? A.AMBER : A.INK }}>
-              {mine ? t('courseDetail.records.you') : r.display_name}
-              {r.course_name ? <span style={{ fontWeight: 500, color: A.INK }}> · {r.course_name}</span> : null}
-            </span>
-          </div>
-        </div>
-        <div aria-hidden="true" style={{ position: 'relative', height: shape ? SHAPE_BAND + 12 : 16, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', overflow: 'hidden' }}>
+        {/* V2 §2/§3 — pill lane, the trace in the upper middle with air around it,
+            then the text block in the lower third. */}
+        <div style={{ flex: '0 0 52px' }} />
+        <div aria-hidden="true" style={{ position: 'relative', flex: '1 1 auto', minHeight: shape ? SHAPE_BAND + 36 : 24, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0 18px' }}>
           {shape ? (
             <RoundShape row={traceRow} shape={shape} width={SHAPE_W} height={SHAPE_BAND - EXPLORE_END_LABEL_BAND}
               showMeta={false} showBaseline baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2}
               exploreLineOnly endLabels exploreGlow underParFill />
+          ) : null}
+        </div>
+        <div style={{ position: 'relative', padding: '0 16px 16px', textShadow: TEXT_SHADOW }}>
+          <Headline r={r} unit={unit} />
+          <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            {/* §1 THE AVATAR IS 30px, EXPLICITLY — it can never fill the pane again. */}
+            <span style={{ width: 30, height: 30, flex: '0 0 30px', display: 'inline-flex' }}>
+              <SquircleAvatar size={30} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} hairlineRing hideRing={false} />
+            </span>
+            <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', color: mine ? A.AMBER : A.INK }}>
+              {mine ? t('courseDetail.records.you') : r.display_name}
+            </span>
+          </div>
+          {placeLine ? (
+            <div style={{ marginTop: 6, fontSize: 13, fontWeight: 500, color: A.INK, ...FIG }}>{placeLine}</div>
           ) : null}
         </div>
       </div>
