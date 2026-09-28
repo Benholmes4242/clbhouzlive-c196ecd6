@@ -23,6 +23,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import type { SubmitResult } from '../hooks/usePostSubmit';
 import { formatSchedule } from '../lib/formatSchedule';
+import { extractPoster, getCachedPoster } from '../lib/videoPoster';
+import { PlayGlyph } from './SlideThumb';
 import { subscribeToJob, getJobSnapshot } from '../lib/postUploadController';
 import type { UploadJobSnapshot } from '../lib/postUploadController';
 import { ImmersiveSuccessShell } from './ImmersiveSuccessShell';
