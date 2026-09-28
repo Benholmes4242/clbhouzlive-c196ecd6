@@ -660,10 +660,19 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      and cadenced by the RPC and the two are interleaved by the score the RPC
      itself assigned. docs/sql/explore_courses_merged_search.sql files the
      unapplied one-pool change that would let SQL do the merge outright. */
-  /* BRIEF_FEATURED_ROUND_FIXES §6 — the hero lives on All; same scope and geography resolver. */
+  /* BRIEF_FEATURED_ROUND_FIXES §6 — the hero lives on All; same geography resolver. */
+  /* BRIEF_FEATURED_ROUND_SCOPE — the hero's scope is literally 'world', never
+     serverScope. All is UNSCOPED: get_explore_stream short-circuits its scope
+     filter on v_view = 'all' and All shows no scope chip row, so serverScope
+     (= chipScope, i.e. whatever the member last picked on SCORES) is invisible
+     to them here. A club-scoped hero above an unscoped feed makes the strapline
+     false at the scale the page is showing. Geography still passes through
+     unchanged — get_featured_round ignores club/county/country when p_scope is
+     'world', and keeping them keeps this call identical in shape to
+     useExploreStream's. DO NOT "tidy" this back to serverScope. */
   const featured = useFeaturedRound(
     userId && view === 'all' && serverReady ? userId : undefined,
-    serverScope,
+    'world',
     { clubId: streamGeo.primaryClubId, county: streamGeo.county, country: streamGeo.country },
   );
 
