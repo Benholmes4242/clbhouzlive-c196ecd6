@@ -18,6 +18,9 @@ export interface BusinessMembership {
     is_deleted: boolean | null;
     club_id: string | null;
   };
+  /** Every course the business's club owns (golf_courses by club_id), by name.
+   *  Empty when the business has no club. */
+  clubCourses: { id: string; name: string }[];
 }
 
 /**
@@ -53,12 +56,31 @@ export function useMyBusinesses(userProfileId?: string) {
 
       if (error) throw error;
       
-      // Transform the data to match our interface, filtering out deleted businesses
-      return (data ?? []).map(item => ({
+      // Filter out deleted businesses
+      const rows = (data ?? []).map(item => ({
         id: item.id,
         role: item.role as BusinessMembership['role'],
         business: item.business as unknown as BusinessMembership['business'],
       })).filter(item => item.business !== null && !item.business.is_deleted);
+
+      // ONE read for every club's courses — counted from golf_courses by
+      // club_id, never business_claimed_courses (empty even on verified clubs).
+      const clubIds = [...new Set(rows.map(r => r.business.club_id).filter((v): v is string => !!v))];
+      const byClub = new Map<string, { id: string; name: string }[]>();
+      if (clubIds.length) {
+        const { data: courses, error: cErr } = await supabase
+          .from('golf_courses')
+          .select('id, name, club_id')
+          .in('club_id', clubIds)
+          .order('name');
+        if (cErr) throw cErr;
+        for (const c of (courses ?? []) as { id: string; name: string; club_id: string }[]) {
+          const list = byClub.get(c.club_id) ?? [];
+          list.push({ id: c.id, name: c.name });
+          byClub.set(c.club_id, list);
+        }
+      }
+      return rows.map(r => ({ ...r, clubCourses: r.business.club_id ? byClub.get(r.business.club_id) ?? [] : [] }));
     },
   });
 }

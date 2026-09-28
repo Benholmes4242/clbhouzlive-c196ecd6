@@ -27,6 +27,7 @@ import { useBusinessReviews } from '@/hooks/useBusinessReviews';
 import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 import { BIZ } from './businessTokens';
+import { courseCountSuffix } from '@/features/business/claimClub';
 import { mayHaveClubAnalytics } from '@/features/business/clubAnalytics/useClubCourseLink';
 
 interface BusinessCommandCardProps {
@@ -72,6 +73,8 @@ export function BusinessCommandCard({
 
 
   const { business, role } = membership;
+  const clubCourses = membership.clubCourses ?? [];
+  const courseSuffix = courseCountSuffix(clubCourses.length);
 
   // Fetch 7-day stats for visits/impressions — only when expanded, to keep collapsed rows cheap.
   const { data: stats, isLoading: statsLoading } = useBusinessStats7d(business?.id);
@@ -226,6 +229,12 @@ export function BusinessCommandCard({
             </div>
             <p style={{ color: BIZ.inkMute, fontSize: 12, fontWeight: 500, lineHeight: 1.35 }}>
               {ACCESS_LABELS[role] || role}
+              {courseSuffix && (
+                <>
+                  <span style={{ color: A.DIM }}> · </span>
+                  {courseSuffix}
+                </>
+              )}
             </p>
             {locationDisplay && (
               <p
@@ -497,7 +506,17 @@ export function BusinessCommandCard({
                   <ActionRow icon={Pencil} label={t('business.card.actions.edit')} onClick={() => goto('/edit')} />
                   <ActionRow icon={BarChart3} label={t('business.card.actions.insights')} onClick={() => goto('/insights')} />
                   {showClubAnalytics && (
-                    <ActionRow icon={Flag} label="Your course" onClick={() => goto('/course')} />
+                    clubCourses.length > 1 ? (
+                      <ActionRow
+                        icon={Flag}
+                        label="Your courses"
+                        hint={String(clubCourses.length)}
+                        onClick={() => goto('/course')}
+                        caption={clubCourses.map((c) => c.name)}
+                      />
+                    ) : (
+                      <ActionRow icon={Flag} label="Your course" onClick={() => goto('/course')} />
+                    )
                   )}
                   {hasCourse && (
                     <ActionRow
@@ -620,20 +639,18 @@ function ActionRow({
   onClick,
   badge = false,
   hint,
+  caption,
 }: {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   label: string;
   onClick: () => void;
   badge?: boolean;
   hint?: string;
+  /** Non-tappable caption lines beneath the row; the whole block is ONE target. */
+  caption?: string[];
 }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full flex items-center gap-2.5 active:opacity-60 transition-opacity"
-      style={{ background: 'transparent', border: 'none', minHeight: 46 }}
-    >
+  const row = (
+    <>
       {/* Inline glyph as a category marker — no ornamental tile. */}
       <Icon className="shrink-0" style={{ width: 15, height: 15, color: BIZ.inkMute }} />
       <span
@@ -654,6 +671,36 @@ function ActionRow({
         />
       )}
       <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkFaint }} />
+    </>
+  );
+  if (!caption?.length) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full flex items-center gap-2.5 active:opacity-60 transition-opacity"
+        style={{ background: 'transparent', border: 'none', minHeight: 46 }}
+      >
+        {row}
+      </button>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full block text-left active:opacity-60 transition-opacity"
+      style={{ background: 'transparent', border: 'none', paddingBottom: 8 }}
+    >
+      <span className="flex items-center gap-2.5" style={{ minHeight: 46 }}>{row}</span>
+      {/* Indented to the label: 15px glyph + 10px gap. */}
+      <span className="block" style={{ paddingLeft: 25, marginTop: -8 }}>
+        {caption.map((name) => (
+          <span key={name} className="block truncate" style={{ fontSize: 12, color: A.MUTE, lineHeight: 1.5 }}>
+            {name}
+          </span>
+        ))}
+      </span>
     </button>
   );
 }
