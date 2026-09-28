@@ -660,9 +660,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      and cadenced by the RPC and the two are interleaved by the score the RPC
      itself assigned. docs/sql/explore_courses_merged_search.sql files the
      unapplied one-pool change that would let SQL do the merge outright. */
-  /* BRIEF_SCORES_FEATURED_ROUND — same scope and geography the Scores stream is asked for. */
+  /* BRIEF_FEATURED_ROUND_FIXES §6 — the hero lives on All; same scope and geography resolver. */
   const featured = useFeaturedRound(
-    userId && view === 'scores' && serverReady ? userId : undefined,
+    userId && view === 'all' && serverReady ? userId : undefined,
     serverScope,
     { clubId: streamGeo.primaryClubId, county: streamGeo.county, country: streamGeo.country },
   );
@@ -823,8 +823,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
        per-author cap act on exactly the rows they scored. */
     const { items: unique, drops } = dedupeItems(base);
     warnDuplicates('ExploreMagazine:visible', drops);
-    return unique;
-  }, [serverOn, source.items, revealed]);
+    /* BRIEF_FEATURED_ROUND_FIXES §7 — the hero's round is not also a card below
+       it. Exactly one card removed; nothing about the stream changes. */
+    const heroId = view === 'all' ? featured.data?.whs_score_id : undefined;
+    if (!heroId) return unique;
+    const at = unique.findIndex((item) => item.kind === 'round' && item.facts.score_id === heroId);
+    return at < 0 ? unique : [...unique.slice(0, at), ...unique.slice(at + 1)];
+  }, [serverOn, source.items, revealed, view, featured.data?.whs_score_id]);
 
   /* R2.5 — ORDER AND IDENTITY STAY WITH THE STREAM. This one page-level read
      decorates only the review IDs already present; it never enters the ranker. */
@@ -856,6 +861,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   /* useRoundHoleShapes RETURNS `Map | null` — null while unresolved. Keep that
      state distinct from a settled map with no key, so cards never manufacture a
      treatment from hole detail that has not arrived. */
+  const featuredShapes = useRoundHoleShapes(useMemo(() => [featured.data?.whs_score_id ?? null], [featured.data?.whs_score_id]));
   const shapesMap = useRoundHoleShapes(useMemo(() => visible.map((item) => item.facts.score_id ?? null), [visible]));
   /* THE VIEWER'S OWN BEST PER COURSE. ONE batched viewer-scoped read for the
      whole page, never per card, so a record headline can say what the record was
@@ -1931,11 +1937,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           {scoreScopeLabel}
         </div>
       ) : null}
-      {view === 'scores' && !scoresBoardActive && featured.data ? (
+      {view === 'all' && featured.data ? (
         <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
           <FeaturedRoundCard
             round={featured.data}
             viewerId={userId}
+            shape={featuredShapes?.get(featured.data.whs_score_id) ?? null}
             onOpen={() => opener.openByScore(featured.data!.whs_score_id, null, featured.data!.user_id)}
           />
         </div>
