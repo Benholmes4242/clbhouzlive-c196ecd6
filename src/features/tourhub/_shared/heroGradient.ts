@@ -1,6 +1,6 @@
 import { CHARCOAL } from './tokens';
 
-// Canonical charcoal channels, parsed from the CHARCOAL token (#15171F).
+// Canonical charcoal channels, parsed from the CHARCOAL token (#0A0A0C, = PAGE_CANVAS).
 const C_R = 0x15, C_G = 0x17, C_B = 0x1f;
 
 function parseHex(hex: string): [number, number, number] | null {
@@ -33,7 +33,7 @@ export function heroTintGradient(brandHex: string | null, amount = 0.3): string 
 /**
  * BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON — the ONE photo-hero scrim.
  *
- * One layer, ending on the canvas (#15171F === CHARCOAL === A.CANVAS: one
+ * One layer, ending on the canvas (#0A0A0C === CHARCOAL === A.CANVAS: one
  * colour, three names). No top scrim, no radial ambient, no second bottom
  * scrim, no text shadow. Every photo-led hero (course detail, courses page,
  * tournament) uses this and nothing else.
