@@ -578,8 +578,8 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
         );
       })}
       <Body style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
-        Measured is the order of the gap between what higher and lower handicaps return on each hole. It is a
-        measurement of your course, not a statement that your card is incorrect.
+        Measured is the order of the gap between what members playing off 15 and above return on each hole and what
+        members under 9 return. It is a measurement of your course, not a statement that your card is incorrect.
       </Body>
     </Panel>
   );
