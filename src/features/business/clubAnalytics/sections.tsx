@@ -431,7 +431,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
 
 /**
  * BRIEF_SI_CHECK_LOCKED_REDESIGN — the locked gate as a progress state. The
- * shortfall stays named and attributed to higher-handicap members (the
+ * shortfall stays named and attributed to members playing off 15 and above (the
  * commercial mechanic). `min_*_rows` are HOLE ROWS (scores on one hole), never
  * converted to rounds.
  */
@@ -440,8 +440,8 @@ const StrokeIndexLocked: React.FC<{ gate: ClubCourseAnalytics['si_band_rows'] }>
   const threshold = gate?.threshold ?? 200;
   const bands = gate
     ? [
-        { name: 'Lower handicaps', rows: gate.min_low_rows ?? 0 },
-        { name: 'Higher handicaps', rows: gate.min_high_rows ?? 0 },
+        { name: 'Handicap under 9', rows: gate.min_low_rows ?? 0 },
+        { name: 'Handicap 15 and above', rows: gate.min_high_rows ?? 0 },
       ]
     : [];
   const bandText: React.CSSProperties = { fontFamily: SANS, fontSize: 12.5, fontWeight: 700 };
@@ -473,14 +473,14 @@ const StrokeIndexLocked: React.FC<{ gate: ClubCourseAnalytics['si_band_rows'] }>
             })}
           </Inset>
           <Body style={{ marginTop: 10 }}>
-            Your higher-handicap members are the ones this is waiting on. Every one of them who connects to clbhouz
-            moves that second bar.
+            Members playing off 15 and above are the ones this is waiting on. Every one of them who connects to
+            clbhouz moves that second bar.
           </Body>
         </>
       ) : (
         <Body style={{ marginTop: 10 }}>
-          We need {fmt(threshold)} scores from each handicap band on every hole before we put a recommendation in front
-          of your handicap secretary.
+          We need {fmt(threshold)} scores from each end of the handicap range — under 9, and 15 and above — on every
+          hole before we put a recommendation in front of your handicap secretary.
         </Body>
       )}
       <button
@@ -514,6 +514,13 @@ const StrokeIndexLocked: React.FC<{ gate: ClubCourseAnalytics['si_band_rows'] }>
  * a lower one — not raw difficulty. That needs both bands well sampled, and
  * min_high_rows is a MINIMUM PER HOLE: rows on the least-played hole say
  * nothing about how many complete rounds the recommendation rests on.
+ *
+ * THE BANDS ARE THE RPC'S AND THE LABELS MUST MATCH THEM. min_low_rows
+ * counts hole rows where idx < 9; min_high_rows counts idx >= 15.
+ * Indexes 9 to 14.9 count toward NEITHER. Never relabel these as
+ * "lower" and "higher" handicaps, and never write copy asking
+ * higher-handicap members generally to connect: only 15 and above
+ * moves the second bar.
  *
  * So below the gate NO RANKING RENDERS ANYWHERE HERE, the shortfall is named,
  * and that is the strongest "get your members on clbhouz" argument on the page.
