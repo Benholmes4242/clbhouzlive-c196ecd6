@@ -18,10 +18,21 @@ export interface RoundFeat {
 }
 
 /**
- * The CLIENT's single source for the birdie-haul threshold: 5. SQL
- * (refresh_discover_feats, get_explore_stream) and the Deno evaluator
- * (gam-evaluator, five_birdie_round) each use 5 as their own literal and cannot
- * import this, so all four must change together if it ever moves again.
+ * The CLIENT's single source for the birdie-haul threshold. It is NOT
+ * the only copy of this number, and the copies cannot import each
+ * other:
+ *   - supabase/functions/gam-evaluator/index.ts, five_birdie_round,
+ *     has its own literal.
+ *   - public.refresh_discover_feats has its own literal, and it is
+ *     the ONE that decides which rounds become birdie_haul rows in
+ *     discover_rail_cache.
+ *   - get_explore_stream has NO threshold. It reads
+ *     discover_rail_cache at 'feats:worldwide:birdie_hauls' and
+ *     inherits refresh_discover_feats's number.
+ * So the server decides what is a haul and this constant decides how
+ * the client describes it. If they disagree, the stream serves a card
+ * the client will not mark. Move all three together, and re-run
+ * refresh_discover_feats afterwards or the cache keeps the old gate.
  */
 export const BIRDIE_HAUL_THRESHOLD = 5;
 

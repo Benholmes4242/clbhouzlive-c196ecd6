@@ -1,5 +1,6 @@
 import type { StreamItem } from './streamItem';
 import { indefiniteArticleForScore, standingOrdinal } from './ordinal';
+import { BIRDIE_HAUL_THRESHOLD } from '@/lib/gam/roundFeats';
 import { topRoundFeats, type ExploreRoundFeat } from './roundFeatCollection';
 
 /**
@@ -486,7 +487,7 @@ export function headlineFor(item: StreamItem, t: T, locale = 'en', ctx: Headline
   if (item.facts.clean_card && gross != null) {
     return t('amateur.stream.headline.bogeyFree', 'Not a single bogey, in a round of {{gross}}.', { gross });
   }
-  if (item.facts.birdies != null && item.facts.birdies >= 5 && gross != null) {
+  if (item.facts.birdies != null && item.facts.birdies >= BIRDIE_HAUL_THRESHOLD && gross != null) {
     /* THE ONE TEMPLATE WHOSE FIRST WORD IS INTERPOLATED (§4a). The spoken number
        opens the sentence, so it is capitalised HERE — the template cannot do it
        and no player name is ever passed through this helper. */

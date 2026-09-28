@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { BIRDIE_HAUL_THRESHOLD } from '@/lib/gam/roundFeats';
 
 import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { useLatestReviews } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
@@ -88,7 +89,8 @@ export function notability(item: StreamItem): number {
   if (f.to_par != null && f.to_par < 0) return 3;
   if (f.eagles && f.eagles > 0) return 2.6 + 0.1 * extra(f.eagles);
   if (f.clean_card) return 2.5;
-  if (f.birdies != null && f.birdies >= 5) return 2 + 0.05 * Math.min(f.birdies - 5, 6);
+  if (f.birdies != null && f.birdies >= BIRDIE_HAUL_THRESHOLD)
+    return 2 + 0.05 * Math.min(f.birdies - BIRDIE_HAUL_THRESHOLD, 6);
   if (item.kind === 'review' && f.rating != null && f.rating >= 9) return 2;
   return 0;
 }
