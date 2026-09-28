@@ -17,7 +17,7 @@
 //     revokes the composer's blob URLs, which is why this screen owns its own
 //     object URLs (see PostCard) instead of borrowing the composer's.
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Clock, AlertTriangle, MapPin } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -334,7 +334,8 @@ export function PostCard({ result, completedFiles, resolved }: { result: SubmitR
  *   4+       the same three cells, +N over the last
  * The +N is NOT a progress indicator: it never animates and never counts down.
  */
-type OwnedPreview = { url: string; type: 'image' | 'video'; key: number };
+type OwnedPreviewBase = { id: string; url: string; type: 'image' | 'video'; posterTimestamp?: number | null };
+type OwnedPreview = OwnedPreviewBase & { key: number };
 
 /**
  * One owner, one lifetime: object URLs are minted in an effect (not in render,
@@ -343,13 +344,17 @@ type OwnedPreview = { url: string; type: 'image' | 'video'; key: number };
  * which is exactly the list the upload controller counts `completedFiles`
  * against: create hands it `input.media` (every item has a File) and the edit
  * path hands it only `!existingId && file` items and never renders this card.
+ * LAYOUT effect, deliberately (the second time this file pair has needed it):
+ * a passive effect paints a first frame with no previews, so the ~430px mosaic
+ * appears from nothing and shoves the status block. Do not make it useEffect.
+ * The minted url is only the SOURCE; `id` (the stable slide id) is the poster key.
  */
-function useOwnedPreviews(list: SubmitResult['mediaPreviews']): { url: string; type: 'image' | 'video' }[] {
-  const [urls, setUrls] = useState<{ url: string; type: 'image' | 'video' }[]>([]);
-  useEffect(() => {
+function useOwnedPreviews(list: SubmitResult['mediaPreviews']): OwnedPreviewBase[] {
+  const [urls, setUrls] = useState<OwnedPreviewBase[]>([]);
+  useLayoutEffect(() => {
     const minted = (list ?? [])
-      .filter((m): m is { file: File; type: 'image' | 'video' } => Boolean(m.file))
-      .map((m) => ({ url: URL.createObjectURL(m.file), type: m.type }));
+      .filter((m): m is NonNullable<SubmitResult['mediaPreviews']>[number] & { file: File } => Boolean(m.file))
+      .map((m) => ({ id: m.id, url: URL.createObjectURL(m.file), type: m.type, posterTimestamp: m.posterTimestamp }));
     setUrls(minted);
     return () => {
       for (const u of minted) {
@@ -439,16 +444,16 @@ function MediaMosaic({
  * Mode fires no error) still shows a frame. If a poster cannot be extracted
  * the cell shows the neutral tint placeholder, never the black element.
  */
-function Cell({ item, pending, onError, live = false }: { item: { url: string; type: 'image' | 'video' }; pending: boolean; onError: () => void; live?: boolean }) {
+function Cell({ item, pending, onError, live = false }: { item: OwnedPreviewBase; pending: boolean; onError: () => void; live?: boolean }) {
   const reduce = useReducedMotion();
   const isVideo = item.type === 'video';
-  const [poster, setPoster] = useState<string | null>(() => (isVideo ? getCachedPoster(item.url) : null));
+  const [poster, setPoster] = useState<string | null>(() => (isVideo ? getCachedPoster(item.id) : null));
   useEffect(() => {
     if (!isVideo || poster) return;
     let cancelled = false;
-    void extractPoster(item.url, item.url).then((u) => { if (!cancelled && u) setPoster(u); });
+    void extractPoster(item.id, item.url, item.posterTimestamp ?? 0.1).then((u) => { if (!cancelled && u) setPoster(u); });
     return () => { cancelled = true; };
-  }, [isVideo, item.url, poster]);
+  }, [isVideo, item.id, item.url, item.posterTimestamp, poster]);
   const fill = { position: 'absolute' as const, inset: 0, width: '100%', height: '100%', objectFit: 'cover' as const };
   return (
     <>
