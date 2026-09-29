@@ -69,18 +69,23 @@ SELECT cron.alter_job(
 --      decode plus margin comparison, not a presence check). Uses a GENUINE
 --      expired England Golf token that Ben pastes into Edge Function secrets at
 --      run time. NEVER write any token value into this file or the repo.
---      a. Snapshot connections first:
---           CREATE TEMP TABLE eg_conn_before AS
---           SELECT id, last_sync_status, last_attempted_at, consecutive_failures
---           FROM whs_connections;
+--      a. Snapshot connections first — WHOLE ROWS, not named columns. A
+--         named-column check passes even if an aborted run advanced a field
+--         nobody thought to list (e.g. next_sync_after, whose drift past the
+--         next sweep's due window is what silently skipped members and caused
+--         the early-September gap). Snapshot everything:
+--           CREATE TEMP TABLE eg_conn_before AS SELECT * FROM whs_connections;
 --      b. Set EG_PREAUTH_TOKEN to the real expired token; invoke sync-whs-due
 --         once. Expect HTTP 503, error "token_unavailable", reason "expired"
 --         (NOT "missing"), plus expiredAt.
---      c. Connections unchanged — expect zero rows:
---           SELECT c.id FROM whs_connections c JOIN eg_conn_before b USING (id)
---           WHERE c.last_sync_status IS DISTINCT FROM b.last_sync_status
---              OR c.last_attempted_at IS DISTINCT FROM b.last_attempted_at
---              OR c.consecutive_failures IS DISTINCT FROM b.consecutive_failures;
+--      c. Connections unchanged in BOTH directions — expect zero rows from
+--         each (first catches live rows changed or added since the snapshot;
+--         second catches snapshot rows deleted or altered in place):
+--           (SELECT * FROM whs_connections EXCEPT SELECT * FROM eg_conn_before);
+--           (SELECT * FROM eg_conn_before EXCEPT SELECT * FROM whs_connections);
+--         Run them as two separate statements; either returning any row is a
+--         FAIL. (EXCEPT collapses duplicate rows, but id is a primary key on
+--         whs_connections so every row is unique — no duplicates to hide.)
 --      d. SELECT value, updated_at FROM app_config WHERE key = 'eg_sync_last_run';
 --         expect outcome token_unavailable, reason expired, fresh updated_at.
 --      e. SELECT get_eg_sync_health(); expect token_unavailable true,
