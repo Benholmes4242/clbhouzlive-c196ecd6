@@ -18,6 +18,7 @@ import { bandColorOnDark as bandColor } from '../bandColor';
    the three-band composer scale; the brief scopes the change to the breakdown. */
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { useReviewReceipt } from '../hooks/useReviewReceipt';
+import { shortCourseName } from '@/features/courses/_shared/courseLabel';
 import type { CategoryKey, ReviewV2Course } from '../types';
 
 interface Props {
@@ -37,12 +38,8 @@ interface Props {
 
 const CAT_ORDER: CategoryKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
 
-export function shortCourseName(name: string): string {
-  const idx = name.indexOf('Golf');
-  if (idx > 0) return name.slice(0, idx).trim();
-  return name;
-}
-
+/* One of several ordinal implementations in the app; a consolidation
+   sweep is pending. Do not add a ninth — import an existing export. */
 export function ordinal(n: number): string {
   const rem100 = n % 100;
   if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
