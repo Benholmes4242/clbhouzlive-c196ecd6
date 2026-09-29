@@ -27,7 +27,7 @@
  */
 import React from 'react';
 import {
-  A, SANS, FIGS, NUM, LABEL, Panel, BIZ_LABEL, BIZ_BODY, BIZ_TITLE, bizFigure,
+  A, SANS, FIGS, NUM, LABEL, Panel, BIZ_LABEL, BIZ_BODY, bizFigure,
   BIZ_INSET, difficultyRampColor, difficultyRampStop, RAMP_TOPAR, TOPAR_RED, toParParts,
 } from '@/features/courses/components/holes/analytical/tokens';
 import {
