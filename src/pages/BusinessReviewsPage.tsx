@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { RailChips } from '@/components/ui/RailChips';
 import { TITLE, FIGURE } from '@/lib/tokens/type';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -22,6 +23,7 @@ import {
   type BusinessReview,
   type BusinessReviewFilter,
   type BusinessReviewSort,
+  type BusinessReviewCourse,
 } from '@/hooks/useBusinessReviews';
 
 /* NO PRIVATE PALETTE. This page declared its own INK/HAIR/CARD_BG/GREEN/RED
@@ -39,6 +41,13 @@ import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/
 
 const AMBER = A.AMBER;
 const AMBER_SOFT = BIZ.amberTint;
+
+/** Display-only: a parenthesised segment's contents, else the name unchanged.
+ *  'Sundridge Park Golf Club (East Course)' -> 'East Course'. */
+function shortCourseName(name: string): string {
+  const m = name.match(/\(([^()]+)\)/);
+  return m ? m[1].trim() : name;
+}
 
 type ChipKey = 'all' | 'unreplied' | 'recent' | 'lowest';
 
@@ -234,10 +243,12 @@ function CourseTag({ name }: { name: string }) {
 function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }> }) {
   const max = Math.max(...dist.map((d) => d.count), 1);
   const labels: Record<number, string> = { 5: '9-10', 4: '7-8', 3: '5-6', 2: '3-4', 1: '0-2' };
-  /* Each bucket spans a range, so it gets a REPRESENTATIVE score and the canon
-     colours it — same pattern as CourseReviewsTab's tier bars. Result is
-     green / amber / amber / red / red, which is what the wizard produces for
-     these scores. Never hand-write that as a ternary. */
+  /* Each bucket spans a range, so it takes a REPRESENTATIVE score and the
+     canon colours it. courseSubScoreTone is BINARY: A.GREEN at 9.0 and
+     above, A.MUTE below. So bucket 5 is the only green bar, and that is
+     why the band boundary is 9.0 and not 8.0 — green on this page must
+     mean what green means on every course card. If the SQL banding ever
+     moves off 9, this colour stops being true. */
   const BUCKET_REP_SCORE: Record<number, number> = {
     5: 9.5,   // 9-10
     4: 7.5,   // 7-8
@@ -440,14 +451,24 @@ export default function BusinessReviewsPage() {
 
   const [chip, setChip] = useState<ChipKey>('all');
   const active = CHIPS.find((c) => c.key === chip)!;
+  // Course scope is independent of the filter chip: neither resets the other.
+  const [courseId, setCourseId] = useState<string | null>(null);
 
   const { data, isLoading, isError, refetch } = useBusinessReviews(businessId, {
     filter: active.filter,
     sort: active.sort,
+    courseId,
   });
 
   const summary = data?.summary;
   const reviews = data?.reviews || [];
+  // Hold the last course list across refetches so the row doesn't blink while
+  // a newly selected course loads.
+  const coursesRef = useRef<BusinessReviewCourse[]>([]);
+  if (data?.courses && data.courses.length > 0) coursesRef.current = data.courses;
+  const courses = coursesRef.current;
+  const selectedCourse = courseId ? courses.find((c) => c.course_id === courseId) ?? null : null;
+  const reviewedElsewhere = courses.filter((c) => c.course_id !== courseId && c.count > 0);
 
   const [replyTarget, setReplyTarget] = useState<{ review: BusinessReview; mode: 'create' | 'edit' } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<BusinessReview | null>(null);
@@ -480,11 +501,26 @@ export default function BusinessReviewsPage() {
   }
 
   const showEmpty = !isLoading && !isError && (summary?.count ?? 0) === 0;
+  const showCourseEmpty = showEmpty && !!selectedCourse && reviewedElsewhere.length > 0;
 
   return (
     <ManagePageShell title="Reviews">
       <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          {/* COURSE SCOPE — above the summary because it changes the summary.
+              Hidden entirely for single-course clubs. */}
+          {courses.length > 1 && (
+            <RailChips
+              className="mb-3"
+              ariaLabel="Course"
+              value={courseId ?? 'all'}
+              onChange={(id) => setCourseId(id === 'all' ? null : id)}
+              options={[
+                { id: 'all', label: 'All courses', value: courses.reduce((n, c) => n + c.count, 0) },
+                ...courses.map((c) => ({ id: c.course_id, label: shortCourseName(c.course_name), value: c.count })),
+              ]}
+            />
+          )}
           {/* SUMMARY */}
           <section
             className="mb-4 p-4"
@@ -589,6 +625,26 @@ export default function BusinessReviewsPage() {
               >
                 Retry
               </button>
+            </div>
+          ) : showCourseEmpty && selectedCourse ? (
+            <div
+              className="text-center py-10 px-6"
+              style={{ background: CARD_BG, border: `1px solid ${HAIR}`, borderRadius: 16 }}
+            >
+              <div
+                className="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-3"
+                style={{ background: AMBER_SOFT }}
+              >
+                <Sparkles size={22} style={{ color: AMBER }} />
+              </div>
+              <div className="text-[16px] font-bold" style={{ color: INK }}>
+                No reviews for the {shortCourseName(selectedCourse.course_name)} yet
+              </div>
+              <p className="text-[13px] leading-relaxed mt-1.5" style={{ color: INK_45 }}>
+                {reviewedElsewhere.length === 1
+                  ? `Every review your club has received is on the ${shortCourseName(reviewedElsewhere[0].course_name)}.`
+                  : 'Your reviews are on your other courses.'}
+              </p>
             </div>
           ) : showEmpty ? (
             <div
