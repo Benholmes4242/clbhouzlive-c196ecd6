@@ -1956,6 +1956,17 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           />
         </div>
       ) : null}
+      {view === 'all' ? (
+        /* HEADS THE STREAM, NOT THE HERO — renders whether or not a featured
+           round exists. It names the CONTENT, never the ORDER: the All stream is
+           ranked by get_explore_stream's score (consequence, ring, freshness,
+           notability) and is deliberately NOT chronological. Never relabel this
+           "Most recent" / "Latest" — that asserts an order the ranker does not
+           provide and makes correct behaviour look like a bug. */
+        <div style={{ fontFamily: SANS, ...SHELF_HEADING, padding: '0 16px 10px' }}>
+          {t('amateur.stream.allHeading', "What's happening")}
+        </div>
+      ) : null}
 
       {/* P1 — A PICKED BOARD REPLACES THE RANKED STREAM. The block is the same
           one the old page rendered (same RPC, same rows, same count line and
