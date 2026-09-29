@@ -32,8 +32,13 @@ const gold = (pct: number) => `color-mix(in srgb, ${GOLD} ${pct}%, transparent)`
 /** BRIEF_FEATURED_ROUND_PANE_V2 §1 — 290, never less. 210 left no room for the
  *  trace and the text block to coexist. The pane may grow if copy wraps. */
 const PANE_H = 290;
-/** The feed card's std trace band and width. */
-const SHAPE_BAND = 52;
+/** 52 is the FEED CARD's band (ExploreCard), correct on a 210px card. The
+ *  hero's pane is 290, and 52 minus the 13px end-label band leaves height = 39,
+ *  so the line had only 19px of vertical range (RoundShape plots between top = 8
+ *  and bottom = height − 12). At 72 that becomes 39px, roughly doubling the
+ *  swing, and still leaves clear space above the headline. Do not copy this
+ *  value back to the feed card — 52 is right there. */
+const SHAPE_BAND = 72;
 const SHAPE_W = 350;
 /** BRIEF_FEATURED_ROUND_SCRIM — the scrim is a FOOT, not a filter. Fully
  *  transparent across the top 46% so the photograph (and the trace over it)
