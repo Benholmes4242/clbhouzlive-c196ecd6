@@ -32,11 +32,11 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
 import { goodHoleDots } from './roundTreatment';
 import { Skeleton } from '@/components/ui/skeleton';
-/** BRIEF_FEATURED_ROUND_PANE_V2 §1 — 290, never less. 210 left no room for the
+/** Matches the Courses-tab lead course-record tile. 210 left no room for the
  *  trace and the text block to coexist. The pane may grow if copy wraps. */
-const PANE_H = 290;
+const PANE_H = 300;
 /** 52 is the FEED CARD's band (ExploreCard), correct on a 210px card. The
- *  hero's pane is 290, and 52 minus the 13px end-label band leaves height = 39,
+ *  hero's pane is 300, and 52 minus the 13px end-label band leaves height = 39,
  *  so the line had only 19px of vertical range (RoundShape plots between top = 8
  *  and bottom = height − 12). At 72 that becomes 39px, roughly doubling the
  *  swing, and still leaves clear space above the headline. Do not copy this
@@ -268,7 +268,7 @@ export interface FeaturedRoundEngagement {
   onOpenComments: () => void;
 }
 
-/** Loading silhouette of the Round of the week card: the same rounded 290px
+/** Loading silhouette of the Round of the week card: the same rounded 300px
  *  photo pane, chip top-left, then figure, member, course and fact lines. */
 export const FeaturedRoundSkeleton: React.FC = () => {
   const bar = (w: number | string, h: number, extra?: React.CSSProperties) => (
