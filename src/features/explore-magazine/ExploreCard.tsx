@@ -30,6 +30,7 @@ import { FigureCell, RoundStatStrip, vsHandicapLabel } from './AchievementCallou
 import { dotsFor, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
+import { RankFlagBadge } from './RankFlagBadge';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { handicapPairDisplay } from './circleHandicap';
 import { NUMF } from '@/components/explore-tab-new/courseled/tokens';
@@ -229,7 +230,11 @@ function CourseRankChip({ item }: { item: StreamItem }) {
     standing?.scope ??
     (factScope && factScope in RANK_SCOPE_LABEL ? (factScope as RankListSlug) : null);
 
-  return <FigureChip corner="right" figure={`#${rank}`} unit={scope ? RANK_SCOPE_LABEL[scope] : undefined} />;
+  return (
+    <div style={{ position: 'absolute', top: 8, right: 8, pointerEvents: 'none' }}>
+      <RankFlagBadge rank={rank} scope={scope} />
+    </div>
+  );
 }
 
 /** §4b, by type. A story carries none; a moment carries none. */

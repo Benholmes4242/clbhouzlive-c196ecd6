@@ -597,6 +597,7 @@ export function FullscreenFeedOverlay() {
       // Snapshot #root scroll before any clamp/reset happens.
       const rootEl = document.getElementById('root');
       const savedScrollTop = rootEl ? rootEl.scrollTop : 0;
+      const savedPath = window.location.pathname;
 
       // Clear any stale 'open' span left un-closed from a prior session before
       // starting a fresh one (prevents a leftover span producing a fake duration).
@@ -676,9 +677,11 @@ export function FullscreenFeedOverlay() {
 
         // Restore #root scroll position on the next frame so the feed's scroll
         // height is settled after the overlay unmounts.
-        if (rootEl) {
+        if (rootEl && window.location.pathname === savedPath) {
           requestAnimationFrame(() => {
-            rootEl.scrollTop = savedScrollTop;
+            /* Re-check inside the frame: a navigation can land between the
+               cleanup and the frame. */
+            if (window.location.pathname === savedPath) rootEl.scrollTop = savedScrollTop;
           });
         }
       };
