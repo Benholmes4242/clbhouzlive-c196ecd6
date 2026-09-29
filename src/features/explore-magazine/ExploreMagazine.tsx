@@ -1793,7 +1793,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                      heading over a year's data is a small lie. */
                   <CourseShelf
                     heading={t('amateur.shelf.highestRatedYear', 'Highest rated this year')}
-                    sub={t('amateur.shelf.highestRatedFloorSub', "Three ratings minimum \u2014 a single opinion never sets a course's score.")}
                     rows={mergedShelves.lead.rows}
                     isFetched={candidates.isFetched}
                     kind={`courses_highest_rated_${mergedShelves.lead.window}`}
