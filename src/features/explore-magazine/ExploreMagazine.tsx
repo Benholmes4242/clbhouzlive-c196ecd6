@@ -975,6 +975,27 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   }, [scoresStanding.rows]);
   const rankGate = useMemo(() => applyRankCardRule(enriched, standingByCourse), [enriched, standingByCourse]);
   const ranked = rankGate.items;
+  /* §A4 THE QUOTED REVIEW — one read for the window, never per card. */
+  const courseQuotes = useCourseQuotes(
+    useMemo(
+      () => (view === 'courses' ? ranked.filter((i) => i.kind === 'course').map((i) => i.subject?.course_id ?? '') : []),
+      [view, ranked],
+    ),
+  );
+  const listIds = useMemo(() => new Set(listCourses.rows.map((row) => row.courseId)), [listCourses.rows]);
+  const chipsFor = useCallback(
+    (courseId: string | null | undefined) => {
+      const best = courseId ? viewerBests.bestsAt.get(courseId) ?? null : null;
+      const clubId = courseId ? candidates.index.courses.get(courseId)?.clubId ?? null : null;
+      return {
+        club: !!clubId && clubId === geography.scope.primaryClubId,
+        played: !!best,
+        best: best?.gross ?? null,
+        onList: !!courseId && listIds.has(courseId),
+      };
+    },
+    [viewerBests.bestsAt, candidates.index, geography.scope.primaryClubId, listIds],
+  );
   /* THE HERO'S ROUND IS FILTERED OUT OF THE FEED, so its id is added back here
      or its clap/comment counts would never load (BRIEF_FEATURED_ROUND_ACTIONS §5). */
   const roundScoreIds = useMemo(() => {
@@ -1715,11 +1736,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                   <CourseShelf
                     heading={
                       view === 'courses'
-                        ? t('amateur.shelf.worldsBest', "The world's best")
+                        ? t('amateur.shelf.top100Unplayed', "Top 100 you haven't played")
                         : t('amateur.shelf.aroundWorld', 'Around the world')
                     }
-                    sub={view === 'courses' ? t('amateur.shelf.worldsBestSub', 'Top 100 by rank') : null}
-                    rows={worldCourses.rows}
+                    /* §B2 — the tile wears the RANK, never a rating, and a course
+                       the viewer has played is filtered out. */
+                    rows={view === 'courses' ? worldCourses.rows.filter((row) => !viewerBests.bestsAt.has(row.courseId)) : worldCourses.rows}
                     isFetched={worldCourses.isFetched}
                     kind="courses_world"
                     pos={pos}
@@ -1753,11 +1775,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                      month cannot fill the rail, then "this year". A month's
                      heading over a year's data is a small lie. */
                   <CourseShelf
-                    heading={
-                      mergedShelves.lead.window === 'month'
-                        ? t('amateur.shelf.highestRatedMonth', 'Highest rated this month')
-                        : t('amateur.shelf.highestRatedYear', 'Highest rated this year')
-                    }
+                    heading={t('amateur.shelf.highestRatedYear', 'Highest rated this year')}
+                    sub={t('amateur.shelf.highestRatedFloorSub', "Three ratings minimum \u2014 a single opinion never sets a course's score.")}
                     rows={mergedShelves.lead.rows}
                     isFetched={candidates.isFetched}
                     kind={`courses_highest_rated_${mergedShelves.lead.window}`}
@@ -1793,6 +1812,17 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     kind="courses_new"
                     pos={pos}
                     onDepart={depart}
+                  />
+                ) : shelf === 'regionGrid' ? (
+                  <RegionGrid rows={regionActivity.rows} onPress={() => undefined} />
+                ) : shelf === 'nationList' ? (
+                  <NationList rows={nationActivity.rows} onPress={() => undefined} />
+                ) : shelf === 'helpfulReviews' ? (
+                  <HelpfulReviewsShelf
+                    items={railReviews}
+                    countFor={railReviewCount}
+                    pos={pos}
+                    onPress={(item) => tapCard(item, 'std', pos)}
                   />
                 ) : shelf === 'people' ? (
                   <PeopleShelf
@@ -2203,6 +2233,26 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
              std. Reviews are excluded from pairs by buildBlocks(). */
           const size = fullWidthCardSize(item);
           const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
+          /* BRIEF_COURSES_DISCOVERY §A2/§B1 — the Courses view's course unit. */
+          if (view === 'courses' && item.kind === 'course') {
+            return (
+              <div key={item.id} style={{ paddingInline: CARD_INSET }}>
+                <div ref={(el) => { cardRefs.current.set(item.id, el); }} style={{ WebkitTapHighlightColor: 'transparent' }}>
+                  {block.kind === 'lead' && !filtering ? (
+                    <CourseLeadCard item={item} onTap={() => tapCard(item, size, pos)} />
+                  ) : (
+                    <CourseLedCard
+                      item={item}
+                      quote={item.subject?.course_id ? courseQuotes.get(item.subject.course_id) ?? null : null}
+                      chips={chipsFor(item.subject?.course_id)}
+                      viewerId={userId}
+                      onTap={() => tapCard(item, size, pos)}
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          }
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>
              <div
