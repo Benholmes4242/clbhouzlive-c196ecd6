@@ -560,11 +560,12 @@ function WhoLine({
               <span data-round-identity-date="true" style={{ ...NUMF, fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{roundIdentity.date}</span>
             ) : null}
           </span>
+          {/* Actions opposite the person; each control keeps its own 44x44 hit area. */}
+          {reactions ? <span style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 14 }}>{reactions}</span> : null}
         </div>
-        {reactions || namesLineShows ? (
-          <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 32, marginTop: 4 }}>
-            {reactions}
-            {namesLineShows ? (
+        {namesLineShows ? (
+          <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 6 }}>
+            {(
               <LikedByRow
                 postId={engagement!.reactionSubjectId!}
                 count={engagement!.likeCount}
@@ -572,7 +573,7 @@ function WhoLine({
                 kind={helpful ? 'helpful' : 'celebrate'}
                 ownerName={engagement!.ownerName ?? null}
                 isOwnRound={engagement!.isOwnRound ?? false}
-                style={{ marginTop: 0, marginLeft: 'auto', textAlign: 'right', minWidth: 0 }}
+                style={{ marginTop: 0, minWidth: 0 }}
                 fontSize={CALLOUT_SUBTEXT.fontSize}
                 fontWeight={CALLOUT_SUBTEXT.fontWeight}
                 lines={1}
