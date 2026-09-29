@@ -13,6 +13,7 @@ import { courseHeadline } from './courseHeadline';
 import { toParLabel } from './exploreCopy';
 import { ratingPrintable } from './courseRatingFloor';
 import { coursePlaceLine } from './placeLine';
+import { useFitOneLine } from './useFitOneLine';
 import type { StreamItem } from './streamItem';
 import type { CourseQuote } from './useCourseQuotes';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
@@ -292,14 +293,32 @@ export function CourseLedCard({
   );
 }
 
-/** §B1 THE LEAD — same content, bigger, no quote. */
+/** FeaturedRoundCard's scrim, verbatim. A FOOT, not a filter: fully
+ *  transparent across the top 46% so the photograph is never dimmed. Do not
+ *  substitute SCRIM_STANDOUT, which starts fading at 32% and would grey the
+ *  picture. */
+const HERO_SCRIM =
+  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 46%, rgba(0,0,0,0.55) 64%, rgba(0,0,0,0.88) 84%, rgba(0,0,0,0.94) 100%)';
+const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
+/** The unit beside the figure. WHITE, not gold — the chip already carries the
+ *  gold, and two golds in one corner flatten each other. */
+const HERO_UNIT: React.CSSProperties = {
+  fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase',
+  color: A.INK, textShadow: TEXT_SHADOW,
+};
+const GOLD_FRAME = 'rgba(216,169,60,0.55)';
+const GOLD_FRAME_SOFT = 'rgba(216,169,60,0.14)';
+const GOLD_STRIP = 'linear-gradient(180deg, rgba(216,169,60,0.16), rgba(216,169,60,0.09))';
+
+/** §B1 THE LEAD — BRIEF_COURSES_LEAD_HERO: figure, member and place over the photograph. */
 export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () => void }) {
   const { t } = useTranslation('courses');
   const subject = item.subject;
+  const topar = grossToPar(item);
   const count = item.facts.rating_n ?? 0;
   const printable = ratingPrintable(item.facts.rating, count);
+  const holder = item.facts.low_by ?? null;
   const place = coursePlaceLine({ region: subject?.region, subCountry: subject?.sub_country, country: subject?.country });
-  const sentence = courseHeadline(t, headlineFacts(item));
   const event = item.facts.course_event;
   const eventChip =
     event === 'record'
@@ -309,6 +328,25 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
       : event === 'ratings'
         ? t('amateur.courseLead.chipRatings', 'New ratings')
         : null;
+  const eventUnit =
+    event === 'record'
+      ? t('amateur.courseLead.unitRecord', 'Course record')
+      : t('amateur.courseLead.unitLow', 'Low this month');
+
+  const rounds = item.facts.rounds_tracked ?? 0;
+  /* Same keys courseHeadline owns; their sentence tail (" here.") is dropped
+     for the one-line place label. */
+  const roundsText = (rounds === 1
+    ? t('amateur.stream.course.factRoundsOne', '1 round tracked here.')
+    : t('amateur.stream.course.factRoundsN', '{{n}} rounds tracked here.', { n: rounds })
+  ).replace(/\s*here\.?$/i, '').replace(/\.$/, '');
+  const placeLine = [place, rounds > 0 ? roundsText : null].filter(Boolean).join(' \u00B7 ');
+  const stripLine = printable
+    ? t('amateur.courseLead.stripRated', 'Rated {{rating}} by {{n}} golfers', { rating: (item.facts.rating as number).toFixed(1), n: count })
+    : place ?? '';
+
+  const nameRef = useFitOneLine<HTMLDivElement>(subject?.course_name ?? '', 13.5, 10.5);
+  const placeRef = useFitOneLine<HTMLDivElement>(placeLine, 9, 7.5);
 
   return (
     <div style={{ fontFamily: SANS }}>
@@ -317,50 +355,115 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
         onClick={onTap}
         style={{ all: 'unset', display: 'block', width: '100%', cursor: 'pointer', boxSizing: 'border-box' }}
       >
-        <div style={{ position: 'relative', height: 300, borderRadius: r.lg, overflow: 'hidden', background: A.PANEL }}>
-          {subject?.image_url ? (
-            <img src={subject.image_url} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <CourseImageFallback />
-          )}
-          <div aria-hidden style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT, pointerEvents: 'none' }} />
-          {eventChip ? (
-            <span
-              className="standout-figure-chip"
-              style={{
-                position: 'absolute', top: 12, left: 12, color: A.INK, fontSize: 10, fontWeight: 700,
-                letterSpacing: '0.12em', textTransform: 'uppercase', padding: '5px 10px', borderRadius: r.pill,
-              }}
-            >
-              {eventChip}
-            </span>
-          ) : null}
-        </div>
-        <div style={{ marginTop: 12 }}>
-          <div style={{ fontSize: 25, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, lineHeight: 1.15 }}>
-            {subject?.course_name ?? ''}
-          </div>
-          {place ? <div style={{ ...PLACE, marginTop: 5 }}>{place}</div> : null}
-          {/* BRIEF_COURSES_LEAD_FOOT §1: the 66px rating column is present only
-              when there is a figure to put in it; unrated leads give the sentence full width. */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginTop: 12 }}>
-            {printable ? (
-              <div style={{ flex: '0 0 66px' }}>
+        <div
+          style={{
+            border: `1px solid ${GOLD_FRAME}`,
+            borderRadius: r.lg,
+            overflow: 'hidden',
+            boxShadow: `0 0 0 1px ${GOLD_FRAME_SOFT}, 0 10px 30px rgba(0,0,0,0.5)`,
+          }}
+        >
+          <div style={{ position: 'relative', height: 300, background: A.PANEL }}>
+            {subject?.image_url ? (
+              <img src={subject.image_url} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <CourseImageFallback />
+            )}
+            <div aria-hidden style={{ position: 'absolute', inset: 0, background: HERO_SCRIM, pointerEvents: 'none' }} />
+            {eventChip ? (
+              <span
+                className="standout-figure-chip"
+                style={{
+                  position: 'absolute', top: 12, left: 12, color: A.INK, fontSize: 10, fontWeight: 700,
+                  letterSpacing: '0.12em', textTransform: 'uppercase', padding: '5px 10px', borderRadius: r.pill,
+                }}
+              >
+                {eventChip}
+              </span>
+            ) : null}
+
+            <div style={{ position: 'absolute', left: 16, right: 16, bottom: 14 }}>
+              {topar ? (
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, whiteSpace: 'nowrap', minWidth: 0 }}>
+                  <span style={{ ...NUMF, fontSize: 50, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: A.INK, textShadow: TEXT_SHADOW, flex: '0 0 auto' }}>
+                    {topar.gross}
+                  </span>
+                  <span style={{ ...NUMF, fontSize: 19, fontWeight: 700, color: TOPAR_UNDER_DARK, textShadow: TEXT_SHADOW, flex: '0 0 auto' }}>
+                    {toParLabel(topar.toPar)}
+                  </span>
+                  <span style={{ ...HERO_UNIT, marginLeft: 2, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {eventUnit}
+                  </span>
+                </div>
+              ) : printable ? (
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, whiteSpace: 'nowrap', minWidth: 0 }}>
+                  <span
+                    style={{
+                      ...NUMF, fontSize: 50, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1,
+                      color: courseSubScoreTone(item.facts.rating as number) === A.GREEN ? A.GREEN : A.INK,
+                      textShadow: TEXT_SHADOW, flex: '0 0 auto',
+                    }}
+                  >
+                    {(item.facts.rating as number).toFixed(1)}
+                  </span>
+                  <span style={{ ...HERO_UNIT, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {t('amateur.courseLead.fromGolfers', 'from {{n}} golfers', { n: count })}
+                  </span>
+                </div>
+              ) : null}
+
+              {/* MEMBER ROW — only with a gross AND a named holder. A joint
+                  record names nobody (low_by null at source). */}
+              {topar && holder ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginTop: 10, minWidth: 0 }}>
+                  {item.who?.user_id ? (
+                    <SquircleAvatar size={30} src={item.who.photo_url} alt={holder} userId={item.who.user_id} hideRing />
+                  ) : null}
+                  <span
+                    style={{
+                      fontSize: 19, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, textShadow: TEXT_SHADOW,
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0,
+                    }}
+                  >
+                    {holder}
+                  </span>
+                </div>
+              ) : null}
+
+              <div
+                ref={nameRef}
+                style={{
+                  marginTop: topar || printable ? 8 : 0, fontSize: 13.5, fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.86)',
+                  textShadow: TEXT_SHADOW, whiteSpace: 'nowrap', overflow: 'hidden',
+                }}
+              >
+                {subject?.course_name ?? ''}
+              </div>
+
+              {placeLine ? (
                 <div
+                  ref={placeRef}
                   style={{
-                    ...NUMF, fontSize: 32, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
-                    color: courseSubScoreTone(item.facts.rating as number) === A.GREEN ? A.GREEN : A.INK,
+                    marginTop: 4, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+                    color: 'rgba(255,255,255,0.62)', textShadow: TEXT_SHADOW, whiteSpace: 'nowrap', overflow: 'hidden',
                   }}
                 >
-                  {(item.facts.rating as number).toFixed(1)}
+                  {placeLine}
                 </div>
-                <div style={{ ...LEAD_LABEL, marginTop: 4 }}>
-                  {t('amateur.courseLead.fromGolfers', 'from {{n}} golfers', { n: count })}
-                </div>
-              </div>
-            ) : null}
-            {sentence ? <div style={{ minWidth: 0, flex: 1, marginTop: 2 }}><EventSentence text={sentence} size={13} topar={grossToPar(item)} /></div> : null}
+              ) : null}
+            </div>
           </div>
+
+          {stripLine ? (
+            <div
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px',
+                background: GOLD_STRIP, fontSize: 12.5, fontWeight: 600, color: A.INK,
+              }}
+            >
+              {stripLine}
+            </div>
+          ) : null}
         </div>
       </button>
     </div>
