@@ -104,7 +104,7 @@ import { CourseLeadCard, CourseLedCard } from './CourseLedCard';
 import { useCourseQuotes } from './useCourseQuotes';
 import { HelpfulReviewsShelf } from './HelpfulReviewsShelf';
 import { NationList, RegionGrid } from './DiscoveryBlocks';
-import { useNationActivity, useRegionActivity } from './useDiscoveryCounts';
+import { useCourseGeography } from './useDiscoveryCounts';
 
 /**
  * THE MAGAZINE (BRIEF_EXPLORE_MAGAZINE, PHASE A).
@@ -875,8 +875,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     (id: string) => railReviewReactions.stateFor('review', id).count,
     [railReviewReactions],
   );
-  const regionActivity = useRegionActivity(view === 'courses');
-  const nationActivity = useNationActivity(view === 'courses');
+  const geography = useCourseGeography(userId, view === 'courses');
 
 
   /* THE SERVER PAGE IS ALREADY A PAGE. Reveal slicing belongs to the client
@@ -1814,9 +1813,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     onDepart={depart}
                   />
                 ) : shelf === 'regionGrid' ? (
-                  <RegionGrid rows={regionActivity.rows} onPress={() => undefined} />
+                  <RegionGrid rows={geography.regions} onPress={() => undefined} />
                 ) : shelf === 'nationList' ? (
-                  <NationList rows={nationActivity.rows} onPress={() => undefined} />
+                  <NationList rows={geography.nations} onPress={() => undefined} />
                 ) : shelf === 'helpfulReviews' ? (
                   <HelpfulReviewsShelf
                     items={railReviews}
