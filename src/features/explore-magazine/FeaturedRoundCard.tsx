@@ -13,7 +13,10 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, ChevronRight } from 'lucide-react';
+import { Trophy, MessageCircle } from 'lucide-react';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import { celebrateFigureSize } from '@/lib/reactionKind';
+import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
@@ -111,11 +114,15 @@ export const FeaturedRoundCard: React.FC<{
   viewerId?: string;
   shape?: HoleShape | null;
   onOpen: () => void;
+  /** Clap + comment in the gold strip (BRIEF_FEATURED_ROUND_ACTIONS). Optional:
+   *  null/absent renders the strapline alone. */
+  engagement?: FeaturedRoundEngagement | null;
 }> = ({
   round: r,
   viewerId,
   shape = null,
   onOpen,
+  engagement = null,
 }) => {
   const { t, i18n } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
@@ -230,8 +237,73 @@ export const FeaturedRoundCard: React.FC<{
         }}
       >
         <span style={{ flex: 1, minWidth: 0 }}>{k('strapline')}</span>
-        <ChevronRight size={16} color={A.MUTE} aria-hidden="true" />
+        {engagement ? (
+          <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 24 }}>
+            {/* size 20, not CELEBRATE_GLYPH_SIZE (23): on a 13px strip the default dominates (BRIEF_FEATURED_ROUND_ACTIONS §3). */}
+            <ReactionAction
+              kind="celebrate"
+              tone="ink"
+              size={20}
+              figureSize={celebrateFigureSize(20)}
+              count={engagement.likeCount}
+              reacted={engagement.liked}
+              readOnly={mine}
+              hidden={!engagement.likeAvailable || !engagement.onToggleLike}
+              onToggle={() => engagement.onToggleLike?.()}
+              label={
+                engagement.liked
+                  ? t('amateur.round.celebrated', 'Celebrated')
+                  : t('amateur.round.celebrate', 'Celebrate this round')
+              }
+            />
+            <span
+              role="button"
+              tabIndex={0}
+              aria-label={`Comments, ${engagement.commentCount}`}
+              onClick={(ev) => {
+                ev.stopPropagation();
+                ev.preventDefault();
+                engagement.onOpenComments();
+              }}
+              onKeyDown={(ev) => {
+                if (ev.key !== 'Enter' && ev.key !== ' ') return;
+                ev.stopPropagation();
+                ev.preventDefault();
+                engagement.onOpenComments();
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                color: A.MUTE,
+                cursor: 'pointer',
+                padding: '13px 12px',
+                margin: '-13px -12px',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <MessageCircle size={20} strokeWidth={2} color={A.MUTE} aria-hidden />
+              {engagement.commentCount > 0 ? (
+                <span
+                  className="tabular-nums"
+                  style={{ ...FIGS, fontSize: celebrateFigureSize(20), fontWeight: 700, lineHeight: 1, color: A.MUTE }}
+                >
+                  {engagement.commentCount}
+                </span>
+              ) : null}
+            </span>
+          </span>
+        ) : null}
       </div>
     </button>
   );
 };
+
+export interface FeaturedRoundEngagement {
+  likeCount: number;
+  liked: boolean;
+  likeAvailable: boolean;
+  commentCount: number;
+  onToggleLike?: () => void;
+  onOpenComments: () => void;
+}
