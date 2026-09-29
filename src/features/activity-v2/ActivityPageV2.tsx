@@ -402,7 +402,7 @@ export const ActivityPageV2: React.FC = () => {
   }, [feed.hasNextPage, feed.isFetchingNextPage, feed.fetchNextPage]);
 
   const chips = (
-    <div className="px-4 flex gap-2 overflow-x-auto scrollbar-none" style={{ paddingBottom: 12 }}>
+    <div className="px-4 flex gap-2 overflow-x-auto scrollbar-none" style={{ paddingTop: 10, paddingBottom: 12 }}>
       {CHIPS.map((c) => (
         <ChipButton
           key={c.key}

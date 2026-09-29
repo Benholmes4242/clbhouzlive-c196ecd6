@@ -33,7 +33,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SheetHeader } from '@/components/ui/SheetHeader';
 import ActorCards from './components/ActorCards';
 import HcpStrip from './components/HcpStrip';
 import QuickActionsRow from './components/QuickActionsRow';
@@ -202,14 +201,18 @@ export default function ProfileSheetV2({
           overflow: 'hidden',
         }}
       >
-        {/* FIXED HEAD (E). The sheet had no title at all, so a scrolled open
-            landed mid-card with nothing naming the surface. */}
-        <SheetHeader
-          title="Account"
-          onClose={onClose}
-          dark
-          borderBottom
-        />
+        {/* The sheet's accessible name. BottomSheet points ariaLabelledBy at this
+            id; there is no visible title because the grabber and the backdrop
+            already say what the header used to. */}
+        <h2
+          id="ps2-title"
+          style={{
+            position: 'absolute', width: 1, height: 1, padding: 0, margin: -1,
+            overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap', border: 0,
+          }}
+        >
+          Account
+        </h2>
         <div
           style={{
             flex: 1,
