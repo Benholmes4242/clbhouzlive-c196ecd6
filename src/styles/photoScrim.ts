@@ -27,6 +27,8 @@ import type { CSSProperties } from 'react';
  * controls, the Clubhouse feed overlay foot (FeedOverlayLayer — a 42% band
  * carrying caption + action rail over full-screen post media), the TI pick
  * dark band (needs a 0.12 top floor, BRIEF_TI_TILE_DARK_SCRIM §2.1),
+ * the course-led card (CourseLedCard — a two-line nameplate needs a 56%
+ * termination, BRIEF_COURSE_CARD_NAME_ON_PHOTO §1),
  * sheet/modal backdrops, brand washes, maps, rail edge fades, and state washes
  * such as VideoProcessingCard.
  *
