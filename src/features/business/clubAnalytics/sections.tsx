@@ -7,12 +7,13 @@
  *
  * ORDER, and the order is an argument:
  *   verdict strip, WHERE YOUR INDEX DISAGREES, THE SAMPLE, HOLE BY HOLE,
- *   STROKE INDEX CHECK (locked), WHAT GETS MADE HERE, THE COURSE RECORD,
+ *   WHAT GETS MADE HERE, THE COURSE RECORD,
  *   YOUR TEES, WHEN MEMBERS PLAY, WHO PLAYS HERE, COMPETITION OR SOCIAL.
  * The ladder leads because it is the richest thing that renders on the samples
- * clubs currently have. It is a DIFFICULTY order, not a stroke index verdict:
- * the Stroke index check below is the one that measures the card, and it is
- * that check which is the thing on this page no other product can show a club.
+ * clubs currently have. It is a DIFFICULTY order and nothing on this page
+ * measures a stroke index: that check was removed on 29 Sep 2026 because no
+ * course on the platform could reach its sample. Never reintroduce
+ * stroke-index-verdict language to any section here.
  *
  * FOUR RULES CARRIED FORWARD:
  *   - ZERO IS A FACT. A club with no albatrosses renders 0. The dash is
@@ -26,7 +27,7 @@
  */
 import React from 'react';
 import {
-  A, SANS, FIGS, NUM, LABEL, Panel, BIZ_LABEL, BIZ_BODY, BIZ_TITLE, bizFigure,
+  A, SANS, FIGS, NUM, LABEL, Panel, BIZ_LABEL, BIZ_BODY, bizFigure,
   BIZ_INSET, difficultyRampColor, difficultyRampStop, RAMP_TOPAR, TOPAR_RED, toParParts,
 } from '@/features/courses/components/holes/analytical/tokens';
 import {
@@ -209,7 +210,7 @@ export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
       <Body style={{ marginTop: 12 }}>
         That is every member of your club who has connected their handicap record to clbhouz, and every round of theirs
         played here{since ? ` since ${since}` : ''}. The more of your members are connected, the sharper this picture
-        gets — each one adds rounds to every figure below, and to the stroke index check.
+        gets — each one adds rounds to every figure below.
       </Body>
       <Body style={{ marginTop: 10, fontSize: 12, color: A.DIM }}>
         {fmt(data.complete_rounds)} of those rounds carry all 18 holes, and hole figures are taken from
@@ -264,8 +265,9 @@ const DistributionStrip: React.FC<{ counts: number[]; total: number }> = ({ coun
 /**
  * THIS SECTION DESCRIBES THE COURSE. IT DOES NOT AUDIT THE CARD.
  * measured_rank ranks mean strokes over par across ALL handicaps.
- * A stroke index ranks the GAP between bands (si_should_be), needs
- * 200 scores per hole per band, and lives in StrokeIndexSection.
+ * A stroke index ranks the GAP between the under-9 and 15-and-above
+ * bands. Nothing in this app measures that any more. Do not reimplement
+ * it here from pooled avg_to_par.
  * Never compare stroke_index to measured_rank here, never highlight
  * a divergence between them, and never word the subline or note so
  * that a reader could take this for a verdict on their card.
@@ -412,166 +414,8 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
         Difficulty is where the hole sits on mean strokes over par across
         {` ${fmt(data.complete_rounds)} `}
         full rounds, pooled across every handicap. That is not what a stroke index measures {'\u2014'} a stroke
-        index ranks where a higher handicapper needs a shot most relative to a lower one, which is the Stroke
-        index check below. Tap a hole for its own split. A dash means we hold no figure for that hole.
-      </Body>
-    </Panel>
-  );
-};
-
-/* ─────────────────── THE STROKE INDEX RECOMMENDATION ─────────────────── */
-
-/**
- * BRIEF_SI_CHECK_LOCKED_REDESIGN — the locked gate as a progress state. The
- * shortfall stays named and attributed to members playing off 15 and above (the
- * commercial mechanic). `min_*_rows` are HOLE ROWS (scores on one hole), never
- * converted to rounds.
- */
-const StrokeIndexLocked: React.FC<{ gate: ClubCourseAnalytics['si_band_rows'] }> = ({ gate }) => {
-  const [open, setOpen] = React.useState(false);
-  const threshold = gate?.threshold ?? 200;
-  const bands = gate
-    ? [
-        { name: 'Handicap under 9', rows: gate.min_low_rows ?? 0 },
-        { name: 'Handicap 15 and above', rows: gate.min_high_rows ?? 0 },
-      ]
-    : [];
-  const bandText: React.CSSProperties = { fontFamily: SANS, fontSize: 12.5, fontWeight: 700 };
-  return (
-    <Panel kicker="Stroke index check" aside="Locked" style={CARD}>
-      <div style={{ ...BIZ_TITLE, marginBottom: 8 }}>We can't check your stroke index yet</div>
-      {gate ? (
-        <>
-          <Inset style={{ marginTop: 4 }}>
-            <div style={{ ...BIZ_LABEL, marginBottom: 10 }}>Scores on your least-played hole</div>
-            {bands.map((b, i) => {
-              const met = b.rows >= threshold;
-              const tone = met ? A.GREEN : A.RED;
-              // §1.1 — zero is zero; a non-zero shortfall keeps a visible mark.
-              const pct = met ? 100 : b.rows === 0 ? 0 : Math.max(MIN_BAR_PCT, (b.rows / threshold) * 100);
-              return (
-                <div key={b.name} style={{ marginTop: i === 0 ? 0 : 14 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ ...bandText, color: A.INK }}>{b.name}</span>
-                    <span style={{ ...bandText, ...FIGS, color: tone }}>
-                      {met ? `${fmt(b.rows)} · ready` : `${fmt(b.rows)} of ${fmt(threshold)}`}
-                    </span>
-                  </div>
-                  <div style={{ marginTop: 7, height: 6, borderRadius: 999, background: A.TRACK, overflow: 'hidden' }}>
-                    <div style={{ width: `${Math.min(100, pct)}%`, height: '100%', borderRadius: 999, background: tone }} />
-                  </div>
-                </div>
-              );
-            })}
-          </Inset>
-          <Body style={{ marginTop: 10 }}>
-            Members playing off 15 and above are the ones this is waiting on. Every one of them who connects to
-            clbhouz moves that second bar.
-          </Body>
-        </>
-      ) : (
-        <Body style={{ marginTop: 10 }}>
-          We need {fmt(threshold)} scores from each end of the handicap range — under 9, and 15 and above — on every
-          hole before we put a recommendation in front of your handicap secretary.
-        </Body>
-      )}
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        style={{
-          ...bandText, color: A.INK, marginTop: 12, padding: 0, background: 'none', border: 0,
-          display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer',
-        }}
-      >
-        Why we need both
-        <span aria-hidden style={{ display: 'inline-block', transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 150ms' }}>›</span>
-      </button>
-      {open && (
-        <Body style={{ marginTop: 8 }}>
-          A stroke index is not a difficulty order. It ranks where a higher handicapper needs a shot most relative to a
-          lower one, so it can only be measured when both ends of the handicap range have played every hole enough
-          times.
-        </Body>
-      )}
-    </Panel>
-  );
-};
-
-/**
- * GATED, AND THE GATE IS THE POINT. Read si_advice_state, never si_advice's
- * presence.
- *
- * A stroke index ranks WHERE A HIGHER HANDICAPPER NEEDS A SHOT MOST relative to
- * a lower one — not raw difficulty. That needs both bands well sampled, and
- * min_high_rows is a MINIMUM PER HOLE: rows on the least-played hole say
- * nothing about how many complete rounds the recommendation rests on.
- *
- * THE BANDS ARE THE RPC'S AND THE LABELS MUST MATCH THEM. min_low_rows
- * counts hole rows where idx < 9; min_high_rows counts idx >= 15.
- * Indexes 9 to 14.9 count toward NEITHER. Never relabel these as
- * "lower" and "higher" handicaps, and never write copy asking
- * higher-handicap members generally to connect: only 15 and above
- * moves the second bar.
- *
- * So below the gate NO RANKING RENDERS ANYWHERE HERE, the shortfall is named,
- * and that is the strongest "get your members on clbhouz" argument on the page.
- * It is the commercial mechanic: it is NEVER softened into a generic
- * "not enough data".
- */
-export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const gate = data.si_band_rows;
-  const ready = data.si_advice_state === 'ready' && (data.si_advice?.length ?? 0) > 0;
-
-  if (!ready) return <StrokeIndexLocked gate={gate} />;
-
-  const rows = data.si_advice ?? [];
-  return (
-    <Panel
-      kicker="Stroke index check"
-      aside={`${fmt(data.complete_rounds)} full rounds`}
-      subline="Where a higher handicapper needs the shot most, measured against the index your card declares."
-      style={CARD}
-    >
-      <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 60px 60px', gap: 10, paddingBottom: 8 }}>
-        <span style={{ ...LABEL, textAlign: 'center' }}>Hole</span>
-        <span style={{ ...LABEL }}>Shot needed</span>
-        <span style={{ ...LABEL, textAlign: 'right' }}>Card</span>
-        <span style={{ ...LABEL, textAlign: 'right' }}>Actual</span>
-      </div>
-      {rows.map((r) => {
-        const spread = r.spread ?? 0;
-        const max = rows.reduce((m, x) => Math.max(m, Math.abs(x.spread ?? 0)), 0.01);
-        const t = Math.min(1, Math.abs(spread) / max);
-        return (
-          <div
-            key={r.hole_no}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '40px 1fr 60px 60px',
-              gap: 10,
-              alignItems: 'center',
-              padding: '8px 0',
-              fontFamily: SANS,
-              ...FIGS,
-            }}
-          >
-            <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{r.hole_no}</span>
-            <span style={{ height: 5, borderRadius: 3, background: A.TRACK, display: 'block', overflow: 'hidden' }}>
-              <i style={{ display: 'block', height: '100%', width: `${Math.max(4, t * 100)}%`, background: difficultyRampColor(t) }} />
-            </span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE, textAlign: 'right' }}>
-              {r.declared ?? '\u2014'}
-            </span>
-            <span style={{ ...NUM, fontSize: 13, color: A.INK, textAlign: 'right' }}>
-              {r.should_be ?? '\u2014'}
-            </span>
-          </div>
-        );
-      })}
-      <Body style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
-        Measured is the order of the gap between what members playing off 15 and above return on each hole and what
-        members under 9 return. It is a measurement of your course, not a statement that your card is incorrect.
+        index ranks where a higher handicapper needs a shot most relative to a lower one, which is a different
+        measurement, and not one shown anywhere here. Tap a hole for its own split. A dash means we hold no figure for that hole.
       </Body>
     </Panel>
   );

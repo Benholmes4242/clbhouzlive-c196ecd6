@@ -63,7 +63,6 @@ export function useClubCourseAnalytics(courseId: string | undefined, enabled = t
         years: arr(row.years),
         tees: arr(row.tees),
         handicap_bands: arr(row.handicap_bands),
-        si_advice: Array.isArray(row.si_advice) ? (row.si_advice as ClubCourseAnalytics['si_advice']) : null,
       };
       return { state: 'ok', data: shaped };
     },

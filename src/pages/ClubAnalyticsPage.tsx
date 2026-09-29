@@ -31,7 +31,7 @@ import {
 import { useClubCourseLink } from '@/features/business/clubAnalytics/useClubCourseLink';
 import { useClubCourseAnalytics } from '@/features/business/clubAnalytics/useClubCourseAnalytics';
 import {
-  VerdictStrip, IndexDisagreesSection, SampleSection, HoleBySection, StrokeIndexSection,
+  VerdictStrip, IndexDisagreesSection, SampleSection, HoleBySection,
   ScoringSection, RecordBookSection, TeesSection, SeasonalitySection, WhoPlaysSection,
   CompetitionSection,
 } from '@/features/business/clubAnalytics/sections';
@@ -184,7 +184,6 @@ const CourseBlock: React.FC<{
               <SectionGuard><HoleBySection data={result.data} /></SectionGuard>
               {/* §2 — the ladder is the one thing no other product shows a club. */}
               <SectionGuard><IndexDisagreesSection data={result.data} /></SectionGuard>
-              <SectionGuard><StrokeIndexSection data={result.data} /></SectionGuard>
               <SectionGuard><ScoringSection data={result.data} /></SectionGuard>
               {/* §5 — values only. Names live on the course's Champions tab. */}
               <SectionGuard>

@@ -44,7 +44,7 @@ const COPY: Record<SiLadderVoice, { heading: string; subline: string; closing: s
   club: {
     heading: 'Stroke indexes',
     subline:
-      'How hard each hole plays for your members overall, against the position your card gives it. This is a difficulty order, which is not the same thing as a stroke index \u2014 the Stroke index check below is the one that measures a stroke index properly.',
+      'How hard each hole plays for your members overall, against the position your card gives it. This is a difficulty order, which is not the same thing as a stroke index. A stroke index ranks where a higher handicapper needs a shot most relative to a lower one, and nothing here measures that.',
     closing:
       'A stroke index ranks where a higher handicapper needs a shot most relative to a lower one, not which hole is hardest overall. Nothing here is a recommendation to change your card.',
     harder: 'Plays harder than you index it',

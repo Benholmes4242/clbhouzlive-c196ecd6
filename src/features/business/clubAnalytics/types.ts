@@ -149,21 +149,6 @@ export interface ClubAnalyticsCompetition {
   social: number;
 }
 
-/** One row of the gated stroke-index recommendation. */
-export interface ClubAnalyticsSiAdvice {
-  hole_no: number;
-  declared: number | null;
-  should_be: number | null;
-  spread: number | null;
-}
-
-/** The gate's own numbers, so the locked state can name the shortfall. */
-export interface ClubAnalyticsSiBandRows {
-  min_low_rows: number;
-  min_high_rows: number;
-  threshold: number;
-}
-
 /**
  * Every course the club owns. Supersedes any client-side course picking.
  * ORDERED BY rounds DESC, then name — entry [0] is the club's main course.
@@ -180,7 +165,14 @@ export interface ClubCourseRef {
   rounds: number;
 }
 
-
+/**
+ * ALSO UNUSED, AND DELIBERATELY: get_club_course_analytics still returns
+ * si_advice, si_advice_state and si_band_rows. The stroke index check
+ * was removed from the product on 29 Sep 2026; changing the function's
+ * RETURNS TABLE needs a DROP on a live SECURITY DEFINER RPC, so these
+ * join places_gap and shots_gap as columns to drop in one later SQL
+ * pass. Do not wire any of them back in.
+ */
 export interface ClubCourseAnalytics {
   course_id: string;
   course_name: string;
@@ -213,9 +205,4 @@ export interface ClubCourseAnalytics {
   competition: ClubAnalyticsCompetition | null;
   /** Values and dates only — no member is named here, ever. */
   record_book: ClubAnalyticsRecordBook | null;
-
-  /** NULL unless si_advice_state is 'ready'. Read the state, never this. */
-  si_advice: ClubAnalyticsSiAdvice[] | null;
-  si_advice_state: 'ready' | 'needs_more_players' | string;
-  si_band_rows: ClubAnalyticsSiBandRows | null;
 }
