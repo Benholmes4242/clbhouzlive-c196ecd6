@@ -100,6 +100,11 @@ import { ScopeControlSeparator } from './ScopeControlSeparator';
 import { useReviewPageEnrichment } from './useReviewPageEnrichment';
 
 import { useViewerCourseBests } from './useViewerCourseBests';
+import { CourseLeadCard, CourseLedCard } from './CourseLedCard';
+import { useCourseQuotes } from './useCourseQuotes';
+import { HelpfulReviewsShelf } from './HelpfulReviewsShelf';
+import { NationList, RegionGrid } from './DiscoveryBlocks';
+import { useNationActivity, useRegionActivity } from './useDiscoveryCounts';
 
 /**
  * THE MAGAZINE (BRIEF_EXPLORE_MAGAZINE, PHASE A).
@@ -164,7 +169,11 @@ type ShelfKind =
   | 'coursesLeadRated'
   | 'coursesCircle'
   | 'coursesWorthDrive'
-  | 'coursesNew';
+  | 'coursesNew'
+  /** BRIEF_COURSES_DISCOVERY §C1/§B3/§C2 — the Courses page's three new blocks. */
+  | 'regionGrid'
+  | 'helpfulReviews'
+  | 'nationList';
 
 type Block =
   | { kind: 'lead'; item: StreamItem }
@@ -263,6 +272,45 @@ function buildBlocks(
     if (shelf != null && due != null && cards >= due) {
       blocks.push({ kind: 'shelf', shelf });
       nextShelf += 1;
+    }
+  }
+  return blocks;
+}
+
+/**
+ * BRIEF_COURSES_DISCOVERY §D — THE COURSES PAGE ORDER, in one place:
+ *   lead, Highest rated, 2 cards, region grid, 1 card, helpful reviews,
+ *   2 cards, Top 100 you haven't played, nation list — then the remaining
+ *   rails every four cards. A rail with nothing in it renders nothing (the
+ *   existing skip rule); no prompt takes its place.
+ */
+const COURSES_OPENING: Array<ShelfKind | number> = [
+  'coursesLeadRated', 2, 'regionGrid', 1, 'helpfulReviews', 2, 'coursesWorld', 'nationList',
+];
+const COURSES_LATER: ShelfKind[] = ['coursesList', 'coursesCircle', 'coursesCounty', 'coursesWorthDrive', 'coursesNew'];
+
+function buildCoursesBlocks(items: StreamItem[]): Block[] {
+  const blocks: Block[] = [];
+  let index = 0;
+  if (items[0]) {
+    blocks.push({ kind: 'lead', item: items[0] });
+    index = 1;
+  }
+  for (const step of COURSES_OPENING) {
+    if (typeof step === 'number') {
+      for (let n = 0; n < step && index < items.length; n += 1) blocks.push({ kind: 'std', item: items[index++] });
+    } else {
+      blocks.push({ kind: 'shelf', shelf: step });
+    }
+  }
+  let since = 0;
+  let later = 0;
+  while (index < items.length) {
+    blocks.push({ kind: 'std', item: items[index++] });
+    since += 1;
+    if (since >= 4 && later < COURSES_LATER.length) {
+      blocks.push({ kind: 'shelf', shelf: COURSES_LATER[later++] });
+      since = 0;
     }
   }
   return blocks;
@@ -773,21 +821,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      the score each pool already carries. */
   const mergedServerItems = useMemo(() => {
     if (view !== 'courses') return server.items;
-    return [...server.items, ...serverReviews.items].sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
-  }, [view, server.items, serverReviews.items]);
+    /* BRIEF_COURSES_DISCOVERY §A1 — THE SUBJECT IS THE COURSE. The reviews read
+       stays (it feeds the Most helpful reviews rail) but supplies no cards. */
+    return server.items.filter((item) => item.kind === 'course');
+  }, [view, server.items]);
   const mergedFallbackItems = useMemo(() => {
     if (view !== 'courses') return stream.items;
-    /* THE FALLBACK CARRIES NO COMPARABLE SCORE (the client composition scores
-       reviews 0), so the two pools are ZIPPED rather than sorted - an honest
-       alternation instead of a ranking that is not there. */
-    const out: StreamItem[] = [];
-    const a = coursesView.items;
-    const b = stream.items;
-    for (let i = 0; i < Math.max(a.length, b.length); i += 1) {
-      if (a[i]) out.push(a[i]);
-      if (b[i]) out.push(b[i]);
-    }
-    return out;
+    /* §A1 — the zip that alternated course and review cards is gone. */
+    return coursesView.items.filter((item) => item.kind === 'course');
   }, [view, coursesView.items, stream.items]);
 
   /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so a
@@ -819,6 +860,23 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const topRatedCourses = useRecentCourseRatings(false);
   /* §4 THE FOUR NEW RAILS, all from the index. */
   const mergedShelves = useMergedCourseShelves(candidates.index, geography.scope.county, circle.circleIds);
+  /* §B3 THE REVIEWS READ, KEPT: it now feeds the helpful-reviews rail only. */
+  const railReviews = useMemo(
+    () => (view !== 'courses' ? [] : (serverOn ? serverReviews.items : stream.items).filter((item) => item.kind === 'review')),
+    [view, serverOn, serverReviews.items, stream.items],
+  );
+  const railReviewReactions = useContentReactions(
+    useMemo(
+      () => railReviews.map((item) => item.facts.review_id).filter((id): id is string => !!id).map((id) => ({ type: 'review' as const, id })),
+      [railReviews],
+    ),
+  );
+  const railReviewCount = useCallback(
+    (id: string) => railReviewReactions.stateFor('review', id).count,
+    [railReviewReactions],
+  );
+  const regionActivity = useRegionActivity(view === 'courses');
+  const nationActivity = useNationActivity(view === 'courses');
 
 
   /* THE SERVER PAGE IS ALREADY A PAGE. Reveal slicing belongs to the client
@@ -917,6 +975,27 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   }, [scoresStanding.rows]);
   const rankGate = useMemo(() => applyRankCardRule(enriched, standingByCourse), [enriched, standingByCourse]);
   const ranked = rankGate.items;
+  /* §A4 THE QUOTED REVIEW — one read for the window, never per card. */
+  const courseQuotes = useCourseQuotes(
+    useMemo(
+      () => (view === 'courses' ? ranked.filter((i) => i.kind === 'course').map((i) => i.subject?.course_id ?? '') : []),
+      [view, ranked],
+    ),
+  );
+  const listIds = useMemo(() => new Set(listCourses.rows.map((row) => row.courseId)), [listCourses.rows]);
+  const chipsFor = useCallback(
+    (courseId: string | null | undefined) => {
+      const best = courseId ? viewerBests.bestsAt.get(courseId) ?? null : null;
+      const clubId = courseId ? candidates.index.courses.get(courseId)?.clubId ?? null : null;
+      return {
+        club: !!clubId && clubId === geography.scope.primaryClubId,
+        played: !!best,
+        best: best?.gross ?? null,
+        onList: !!courseId && listIds.has(courseId),
+      };
+    },
+    [viewerBests.bestsAt, candidates.index, geography.scope.primaryClubId, listIds],
+  );
   /* THE HERO'S ROUND IS FILTERED OUT OF THE FEED, so its id is added back here
      or its clap/comment counts would never load (BRIEF_FEATURED_ROUND_ACTIONS §5). */
   const roundScoreIds = useMemo(() => {
@@ -1000,14 +1079,16 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const singleType = view === 'courses';
   const blocks = useMemo(
     () =>
-      buildBlocks(ranked, shelves, false, {
+      view === 'courses' && !filtering
+        ? buildCoursesBlocks(ranked)
+        : buildBlocks(ranked, shelves, false, {
         bareRoundPairs: view === 'scores',
         repeatShelves: view === 'scores' || view === 'all',
         /* §3 THE MERGED VIEW'S RHYTHM: pairs are STABLE-FACT COURSE CARDS only,
            reviews and event cards always full width. */
         mergedCourses: view === 'courses',
       }),
-    [ranked, view, activeScope, shelves, singleType],
+    [ranked, view, activeScope, shelves, singleType, filtering],
   );
   /* §2 THE EARNED HERO IS RETIRED: cardTreatments() and its 1-in-4 positional
      cap are gone. Reviews alone retain the lead SIZE because their copy sits on
@@ -1655,11 +1736,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                   <CourseShelf
                     heading={
                       view === 'courses'
-                        ? t('amateur.shelf.worldsBest', "The world's best")
+                        ? t('amateur.shelf.top100Unplayed', "Top 100 you haven't played")
                         : t('amateur.shelf.aroundWorld', 'Around the world')
                     }
-                    sub={view === 'courses' ? t('amateur.shelf.worldsBestSub', 'Top 100 by rank') : null}
-                    rows={worldCourses.rows}
+                    /* §B2 — the tile wears the RANK, never a rating, and a course
+                       the viewer has played is filtered out. */
+                    rows={view === 'courses' ? worldCourses.rows.filter((row) => !viewerBests.bestsAt.has(row.courseId)) : worldCourses.rows}
                     isFetched={worldCourses.isFetched}
                     kind="courses_world"
                     pos={pos}
@@ -1693,11 +1775,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                      month cannot fill the rail, then "this year". A month's
                      heading over a year's data is a small lie. */
                   <CourseShelf
-                    heading={
-                      mergedShelves.lead.window === 'month'
-                        ? t('amateur.shelf.highestRatedMonth', 'Highest rated this month')
-                        : t('amateur.shelf.highestRatedYear', 'Highest rated this year')
-                    }
+                    heading={t('amateur.shelf.highestRatedYear', 'Highest rated this year')}
+                    sub={t('amateur.shelf.highestRatedFloorSub', "Three ratings minimum \u2014 a single opinion never sets a course's score.")}
                     rows={mergedShelves.lead.rows}
                     isFetched={candidates.isFetched}
                     kind={`courses_highest_rated_${mergedShelves.lead.window}`}
@@ -1733,6 +1812,17 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     kind="courses_new"
                     pos={pos}
                     onDepart={depart}
+                  />
+                ) : shelf === 'regionGrid' ? (
+                  <RegionGrid rows={regionActivity.rows} onPress={() => undefined} />
+                ) : shelf === 'nationList' ? (
+                  <NationList rows={nationActivity.rows} onPress={() => undefined} />
+                ) : shelf === 'helpfulReviews' ? (
+                  <HelpfulReviewsShelf
+                    items={railReviews}
+                    countFor={railReviewCount}
+                    pos={pos}
+                    onPress={(item) => tapCard(item, 'std', pos)}
                   />
                 ) : shelf === 'people' ? (
                   <PeopleShelf
@@ -2143,6 +2233,26 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
              std. Reviews are excluded from pairs by buildBlocks(). */
           const size = fullWidthCardSize(item);
           const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
+          /* BRIEF_COURSES_DISCOVERY §A2/§B1 — the Courses view's course unit. */
+          if (view === 'courses' && item.kind === 'course') {
+            return (
+              <div key={item.id} style={{ paddingInline: CARD_INSET }}>
+                <div ref={(el) => { cardRefs.current.set(item.id, el); }} style={{ WebkitTapHighlightColor: 'transparent' }}>
+                  {block.kind === 'lead' && !filtering ? (
+                    <CourseLeadCard item={item} onTap={() => tapCard(item, size, pos)} />
+                  ) : (
+                    <CourseLedCard
+                      item={item}
+                      quote={item.subject?.course_id ? courseQuotes.get(item.subject.course_id) ?? null : null}
+                      chips={chipsFor(item.subject?.course_id)}
+                      viewerId={userId}
+                      onTap={() => tapCard(item, size, pos)}
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          }
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>
              <div

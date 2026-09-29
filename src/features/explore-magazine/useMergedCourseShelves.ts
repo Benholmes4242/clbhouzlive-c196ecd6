@@ -6,6 +6,7 @@ import { fetchCircleIds } from '@/lib/social/circle';
 import type { CourseCandidateIndex } from './useCourseCandidateIndex';
 import type { CourseShelfRow } from './useCourseShelves';
 import { coursePlaceLine } from './placeLine';
+import { COURSE_RATING_FLOOR } from './courseRatingFloor';
 
 /**
  * THE MERGED COURSES SHELVES (BRIEF_COURSES_MERGED §4).
@@ -30,8 +31,8 @@ import { coursePlaceLine } from './placeLine';
 /** A rail shows 12 tiles; below SIX it reads as a stub, so that is the fill
  *  threshold the month has to clear before the heading may say "this month". */
 export const RAIL_FILL = 6;
-/** §4 the rating sample floor, unchanged from the shelf it replaces. */
-export const RATING_FLOOR = 2;
+/** BRIEF_COURSES_DISCOVERY §A3 — the one sample floor. */
+export const RATING_FLOOR = COURSE_RATING_FLOOR;
 
 /** WORTH THE DRIVE, chosen from the data (see header). Rated 8.0 or better by at
  *  least two members, with five or fewer tracked rounds: 28 courses today. The
@@ -80,8 +81,8 @@ export function leadRatedShelf(index: CourseCandidateIndex): LeadRatedShelf {
         rowFor(index, courseId, { rating: mean(stats), ratingCount: n(stats) }),
       );
 
-  const month = pick((s) => s.n30, (s) => s.mean30);
-  if (month.length >= RAIL_FILL) return { rows: month, window: 'month' };
+  /* BRIEF_COURSES_DISCOVERY §B2 — the lead rail is "Highest rated this year"
+     for everyone; the month window no longer competes for it. */
   return { rows: pick((s) => s.n365, (s) => s.mean365), window: 'year' };
 }
 

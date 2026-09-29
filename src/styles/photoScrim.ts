@@ -99,3 +99,7 @@ export const PHOTO_REVIEW_FILL = 'rgba(255,255,255,0.72)';
 /** A tight dark shadow, not a glow: separates a coloured figure from a lifted
  *  ground without adding a second fill. Neutral white figures do not need it. */
 export const PHOTO_FIG_SHADOW = '0 1px 2px rgba(0,0,0,0.62)';
+
+/** The Top 100 rank pill on a course photograph (BRIEF_COURSES_DISCOVERY §A2):
+ *  gold figure on a 66%-black pill. */
+export const RANK_PILL_BG = 'rgba(0,0,0,0.66)';
