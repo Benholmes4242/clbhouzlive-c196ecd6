@@ -100,6 +100,7 @@ import { ScopeControlSeparator } from './ScopeControlSeparator';
 import { useReviewPageEnrichment } from './useReviewPageEnrichment';
 
 import { useViewerCourseBests } from './useViewerCourseBests';
+import { useViewerCourseContext } from './useViewerCourseContext';
 import { CourseLeadCard, CourseLedCard } from './CourseLedCard';
 import { useCourseQuotes } from './useCourseQuotes';
 import { HelpfulReviewsShelf } from './HelpfulReviewsShelf';
@@ -959,6 +960,19 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      whole page, never per card, so a record headline can say what the record was
      measured against. Absent = the comparison is dropped, never invented. */
   const viewerBests = useViewerCourseBests(userId ?? undefined);
+  const viewerContext = useViewerCourseContext(userId ?? undefined);
+  /**
+   * PLAYED MEANS THE MEMBER HAS BEEN THERE — not that England Golf holds a card
+   * (BRIEF_PLAYED_INCLUDES_REVIEWED). A logged round proves it; so does the
+   * member's own review, which cannot be written from the car park. Either is
+   * sufficient, and the rail and the chips read the same set so they can never
+   * disagree about one course.
+   */
+  const viewerPlayed = useMemo(() => {
+    const ids = new Set<string>(viewerBests.bestsAt.keys());
+    for (const id of viewerContext.context.ratings.keys()) ids.add(id);
+    return ids;
+  }, [viewerBests.bestsAt, viewerContext.context.ratings]);
 
   const enriched = useMemo(
     () =>
@@ -1006,12 +1020,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       const clubId = courseId ? candidates.index.courses.get(courseId)?.clubId ?? null : null;
       return {
         club: !!clubId && clubId === geography.scope.primaryClubId,
-        played: !!best,
+        played: !!courseId && viewerPlayed.has(courseId),
         best: best?.gross ?? null,
         onList: !!courseId && listIds.has(courseId),
       };
     },
-    [viewerBests.bestsAt, candidates.index, geography.scope.primaryClubId, listIds],
+    [viewerBests.bestsAt, viewerPlayed, candidates.index, geography.scope.primaryClubId, listIds],
   );
   /* THE HERO'S ROUND IS FILTERED OUT OF THE FEED, so its id is added back here
      or its clap/comment counts would never load (BRIEF_FEATURED_ROUND_ACTIONS §5). */
@@ -1758,11 +1772,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     }
                     /* §B2 — the tile wears the RANK, never a rating, and a course
                        the viewer has played is filtered out. */
-                    rows={view === 'courses' ? worldCourses.rows.filter((row) => !viewerBests.bestsAt.has(row.courseId)) : worldCourses.rows}
+                    rows={view === 'courses' ? worldCourses.rows.filter((row) => !viewerPlayed.has(row.courseId)) : worldCourses.rows}
                     /* BRIEF_TOP100_UNPLAYED_GATE — the heading claims something
                        about the viewer, so the rail must not render until the
                        viewer's own bests have settled too. */
-                    isFetched={worldCourses.isFetched && viewerBests.isFetched}
+                    isFetched={worldCourses.isFetched && viewerBests.isFetched && viewerContext.isFetched}
                     kind="courses_world"
                     pos={pos}
                     onDepart={depart}
