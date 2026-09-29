@@ -58,8 +58,8 @@ export function courseHeadline(t: TFunction, facts: CourseHeadlineFacts): string
       : t('amateur.stream.course.eventRecordJoint', 'Course record — {{gross}}.', { gross: facts.lowGross });
   }
   if (facts.event === 'ratings' && (facts.burstCount ?? 0) >= 2 && facts.burstMean != null) {
-    return t('amateur.stream.course.eventRatings', '{{count}} ratings this month, averaging {{mean}}.', {
-      count: facts.burstCount,
+    return t('amateur.stream.course.eventGolfersRated', '{{n}} golfers rated it this month, averaging {{mean}}.', {
+      n: facts.burstCount,
       mean: Number(facts.burstMean).toFixed(1),
     });
   }
@@ -72,19 +72,26 @@ export function courseHeadline(t: TFunction, facts: CourseHeadlineFacts): string
       : t('amateur.stream.course.eventLowAnon', '{{gross}} is the low here this month.', { gross: facts.lowGross });
   }
   if (rating != null && rounds > 0) {
-    return t('amateur.stream.course.factRated', '{{rounds}} rounds tracked, rated {{rating}} from {{count}}.', {
-      rounds,
-      rating: Number(rating).toFixed(1),
-      count: ratingCount,
-    });
+    return rounds === 1
+      ? t('amateur.stream.course.factRatedOneRound', '1 round tracked, rated {{rating}} by {{g}} golfers.', {
+          rating: Number(rating).toFixed(1),
+          g: ratingCount,
+        })
+      : t('amateur.stream.course.factRatedGolfers', '{{n}} rounds tracked, rated {{rating}} by {{g}} golfers.', {
+          n: rounds,
+          rating: Number(rating).toFixed(1),
+          g: ratingCount,
+        });
   }
   if (rounds > 0) {
-    return t('amateur.stream.course.factRounds', '{{rounds}} rounds tracked here.', { rounds });
+    return rounds === 1
+      ? t('amateur.stream.course.factRoundsOne', '1 round tracked here.')
+      : t('amateur.stream.course.factRoundsN', '{{n}} rounds tracked here.', { n: rounds });
   }
   if (rating != null) {
-    return t('amateur.stream.course.factRatedOnly', 'Rated {{rating}} from {{count}}.', {
+    return t('amateur.stream.course.factRatedGolfersOnly', 'Rated {{rating}} by {{g}} golfers.', {
       rating: Number(rating).toFixed(1),
-      count: ratingCount,
+      g: ratingCount,
     });
   }
   /* Neither rounds nor a rating: no sentence exists, so none is invented. */

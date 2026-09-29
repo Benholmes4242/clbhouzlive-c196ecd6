@@ -122,7 +122,7 @@ function Figure({ rating, count, size }: { rating: number; count: number; size: 
         {rating.toFixed(1)}
       </div>
       <div style={{ ...PLACE, marginTop: 4 }}>
-        {t('amateur.courseCard.fromRatings', 'From {{count}} ratings', { count })}
+        {t('amateur.courseCard.fromGolfers', 'From {{n}} golfers', { n: count })}
       </div>
     </div>
   );
@@ -355,7 +355,7 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
                   {(item.facts.rating as number).toFixed(1)}
                 </div>
                 <div style={{ ...LEAD_LABEL, marginTop: 4 }}>
-                  {t('amateur.courseLead.fromRatings', 'from {{count}} ratings', { count })}
+                  {t('amateur.courseLead.fromGolfers', 'from {{n}} golfers', { n: count })}
                 </div>
               </div>
             ) : null}
