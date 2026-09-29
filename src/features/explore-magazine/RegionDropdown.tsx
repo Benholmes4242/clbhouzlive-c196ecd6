@@ -148,7 +148,7 @@ export const RegionDropdown = forwardRef<RegionDropdownHandle, {
       </BottomSheet>
     </>
   );
-}
+});
 
 function PlaceRow({
   label,
@@ -203,6 +203,6 @@ function PlaceRow({
       ) : null}
     </button>
   );
-});
+}
 
 export default RegionDropdown;
