@@ -910,10 +910,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   }, [scoresStanding.rows]);
   const rankGate = useMemo(() => applyRankCardRule(enriched, standingByCourse), [enriched, standingByCourse]);
   const ranked = rankGate.items;
-  const roundScoreIds = useMemo(
-    () => ranked.filter((item) => item.kind === 'round').map((item) => item.facts.score_id),
-    [ranked],
-  );
+  /* THE HERO'S ROUND IS FILTERED OUT OF THE FEED, so its id is added back here
+     or its clap/comment counts would never load (BRIEF_FEATURED_ROUND_ACTIONS §5). */
+  const roundScoreIds = useMemo(() => {
+    const ids = ranked.filter((item) => item.kind === 'round').map((item) => item.facts.score_id);
+    const heroId = view === 'all' ? featured.data?.whs_score_id : null;
+    if (heroId && !ids.includes(heroId)) ids.push(heroId);
+    return ids;
+  }, [ranked, view, featured.data?.whs_score_id]);
   const roundPosts = useRoundPostComments(roundScoreIds);
   const roundReactions = useContentReactions(
     useMemo(
@@ -1416,8 +1420,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     }
   }, [queryClient]);
 
-  const engagementFor = useCallback((item: StreamItem) => {
-    const scoreId = item.kind === 'round' ? item.facts.score_id : null;
+  const engagementForRound = useCallback((
+    scoreId: string | null,
+    ownerName: string | null,
+    isOwn: boolean,
+    surface: 'feed' | 'hero',
+  ) => {
     if (!scoreId || roundReactions.unavailable) return null;
     const post = roundPosts.infoFor(scoreId);
     const state = roundReactions.stateFor('round', scoreId);
@@ -1433,19 +1441,30 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       commentAvailable: true,
       commentPending: ensuringScoreId === scoreId,
       reactionSubjectId: scoreId,
-      ownerName: item.who?.display_name?.trim().split(/\s+/)[0] || null,
-      isOwnRound: item.who?.is_viewer ?? false,
+      ownerName,
+      isOwnRound: isOwn,
       onToggleLike: likeAvailable ? () => {
-        analyticsEvents.track('explore_round_like_toggled', { score_id: scoreId, liked: !state.mine, view });
+        analyticsEvents.track('explore_round_like_toggled', { score_id: scoreId, liked: !state.mine, view, surface });
         roundReactions.toggle('round', scoreId);
       } : undefined,
       onOpenComments: () => {
-        analyticsEvents.track('explore_round_comments_opened', { score_id: scoreId, view });
+        analyticsEvents.track('explore_round_comments_opened', { score_id: scoreId, view, surface });
         if (post) { setOpenCommentsPostId(post.postId); return; }
         void ensureRoundPostAndOpen(scoreId);
       },
     };
   }, [ensureRoundPostAndOpen, ensuringScoreId, roundPosts, roundReactions, view]);
+
+  const engagementFor = useCallback(
+    (item: StreamItem) =>
+      engagementForRound(
+        item.kind === 'round' ? item.facts.score_id : null,
+        item.who?.display_name?.trim().split(/\s+/)[0] || null,
+        item.who?.is_viewer ?? false,
+        'feed',
+      ),
+    [engagementForRound],
+  );
 
   const tapWho = useCallback(
     (item: StreamItem) => {
@@ -1957,6 +1976,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             round={featured.data}
             viewerId={userId}
             shape={featuredShapes?.get(featured.data.whs_score_id) ?? null}
+            engagement={engagementForRound(
+              featured.data.whs_score_id,
+              featured.data.display_name?.trim().split(/\s+/)[0] || null,
+              featured.data.user_id === userId,
+              'hero',
+            )}
             onOpen={() => opener.openByScore(featured.data!.whs_score_id, null, featured.data!.user_id)}
           />
         </div>
