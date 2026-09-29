@@ -13,7 +13,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { celebrateFigureSize } from '@/lib/reactionKind';
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
@@ -21,17 +21,16 @@ import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { MINUS } from './exploreCopy';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
+import { r as rad } from '@/lib/radius';
+import { useFitOneLine } from './useFitOneLine';
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
 import { goodHoleDots } from './roundTreatment';
-
-const GOLD = SC_FILL_GOLD;
-const gold = (pct: number) => `color-mix(in srgb, ${GOLD} ${pct}%, transparent)`;
 /** BRIEF_FEATURED_ROUND_PANE_V2 §1 — 290, never less. 210 left no room for the
  *  trace and the text block to coexist. The pane may grow if copy wraps. */
 const PANE_H = 290;
@@ -68,9 +67,7 @@ const toPar = (n: number | null) => (n == null ? null : n === 0 ? 'E' : signed(n
 function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
   const { t } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
-  const feat = (text: string) => (
-    <span style={{ ...BIG_WORD, color: GOLD }}>{text}</span>
-  );
+  const feat = (text: string) => <span style={BIG_WORD}>{text}</span>;
   const points = (n: number) => (
     <span style={{ ...ROW, gap: 6 }}>
       <span style={{ ...BIG, flex: '0 0 auto' }}>{n}</span>
@@ -127,6 +124,7 @@ export const FeaturedRoundCard: React.FC<{
   const { t, i18n } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
   const mine = !!viewerId && r.user_id === viewerId;
+  const nameRef = useFitOneLine<HTMLDivElement>(r.course_name ?? '', 13.5, 10.5);
 
   const image = r.image_url;
   const gross = r.gross == null ? null : `${r.gross}`;
@@ -259,10 +257,6 @@ function Actions({ engagement, mine }: { engagement: FeaturedRoundEngagement; mi
     </span>
   );
 }
-
-const _unused = () => {
-  return null;
-};
 
 export interface FeaturedRoundEngagement {
   likeCount: number;
