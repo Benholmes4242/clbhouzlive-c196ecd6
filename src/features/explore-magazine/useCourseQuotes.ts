@@ -18,9 +18,18 @@ export interface CourseQuote {
   courseId: string;
   userId: string | null;
   rating: number;
+  /** The first sentence — what the CARD quotes. Unchanged. */
   text: string;
+  /** The whole review — what the SHEET shows. The card must not use this. */
+  fullText: string;
   name: string | null;
   avatar: string | null;
+  breakdown: {
+    design: number | null;
+    conditions: number | null;
+    clubhouse: number | null;
+    facilities: number | null;
+  };
 }
 
 const EMPTY = new Map<string, CourseQuote>();
@@ -40,7 +49,7 @@ export function useCourseQuotes(courseIds: string[]) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('course_ratings')
-        .select('id, course_id, user_id, rating, review, helpful_count, created_at')
+        .select('id, course_id, user_id, rating, review, helpful_count, created_at, design_score, condition_score, clubhouse_score, facilities_score')
         .in('course_id', ids)
         .eq('is_mock', false)
         .not('review', 'is', null)
@@ -49,6 +58,7 @@ export function useCourseQuotes(courseIds: string[]) {
       const picked = new Map<string, {
         id: string; course_id: string; user_id: string | null; rating: number; review: string;
         helpful_count: number | null; created_at: string;
+        design_score: number | null; condition_score: number | null; clubhouse_score: number | null; facilities_score: number | null;
       }>();
       for (const row of data ?? []) {
         if (!row.review || !row.review.trim()) continue;
@@ -82,8 +92,15 @@ export function useCourseQuotes(courseIds: string[]) {
           userId: row.user_id,
           rating: Number(row.rating),
           text: firstSentence(row.review),
+          fullText: row.review,
           name: person?.name ?? null,
           avatar: person?.avatar ?? null,
+          breakdown: {
+            design: row.design_score != null ? Number(row.design_score) : null,
+            conditions: row.condition_score != null ? Number(row.condition_score) : null,
+            clubhouse: row.clubhouse_score != null ? Number(row.clubhouse_score) : null,
+            facilities: row.facilities_score != null ? Number(row.facilities_score) : null,
+          },
         });
       }
       return out;
