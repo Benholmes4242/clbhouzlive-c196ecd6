@@ -31,6 +31,7 @@ import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/use
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
 import { goodHoleDots } from './roundTreatment';
+import { Skeleton } from '@/components/ui/skeleton';
 /** BRIEF_FEATURED_ROUND_PANE_V2 §1 — 290, never less. 210 left no room for the
  *  trace and the text block to coexist. The pane may grow if copy wraps. */
 const PANE_H = 290;
@@ -266,3 +267,25 @@ export interface FeaturedRoundEngagement {
   onToggleLike?: () => void;
   onOpenComments: () => void;
 }
+
+/** Loading silhouette of the Round of the week card: the same rounded 290px
+ *  photo pane, chip top-left, then figure, member, course and fact lines. */
+export const FeaturedRoundSkeleton: React.FC = () => {
+  const bar = (w: number | string, h: number, extra?: React.CSSProperties) => (
+    <Skeleton style={{ width: w, height: h, borderRadius: 6, ...extra }} />
+  );
+  return (
+    <div aria-hidden="true" style={{ position: 'relative', height: PANE_H, borderRadius: rad.lg, overflow: 'hidden', background: A.PANEL }}>
+      <div style={{ position: 'absolute', top: 12, left: 12 }}>{bar(112, 22, { borderRadius: rad.pill })}</div>
+      <div style={{ position: 'absolute', left: 16, right: 16, bottom: 14 }}>
+        {bar(96, 44)}
+        <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 9 }}>
+          {bar(30, 30, { borderRadius: '34%' })}
+          {bar(140, 18)}
+        </div>
+        <div style={{ marginTop: 8 }}>{bar('60%', 13)}</div>
+        <div style={{ marginTop: 6 }}>{bar('40%', 9)}</div>
+      </div>
+    </div>
+  );
+};
