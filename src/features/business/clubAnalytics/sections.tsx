@@ -140,7 +140,7 @@ export const VerdictStrip: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) 
     <StatStrip
       twoLineLabels
       cells={[
-        { figure: data.avg_gross == null ? '—' : String(data.avg_gross), label: 'Mean gross' },
+        { figure: data.avg_gross == null ? '—' : String(data.avg_gross), label: 'Mean gross score' },
         { figure: hardest ? String(hardest.hole_no) : '—', label: 'Hardest hole' },
         { figure: compPct == null ? '—' : `${compPct}%`, label: 'Competition rounds' },
       ]}
