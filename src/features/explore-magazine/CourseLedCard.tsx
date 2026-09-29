@@ -7,7 +7,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
-import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 import { courseHeadline } from './courseHeadline';
 import { toParLabel } from './exploreCopy';
@@ -44,6 +43,16 @@ const LEAD_LABEL: React.CSSProperties = {
   lineHeight: 1.3,
   color: A.MUTE,
 };
+
+const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
+
+/**
+ * LOCAL EXCEPTION TO SCRIM_STANDOUT (BRIEF_COURSE_CARD_NAME_ON_PHOTO §1).
+ * The canonical gradient terminates at 32%; this card's foot is a two-line
+ * name plus a place line and reaches 56% of its 168px. Same colour and the
+ * same construction — only the termination moves, and only for this card.
+ */
+const COURSE_CARD_SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.86) 0%, rgba(10,14,10,0) 56%)';
 
 const PLACE: React.CSSProperties = {
   fontSize: 9,
@@ -104,7 +113,7 @@ function useRank(item: StreamItem): { rank: number; scope: RankListSlug | null }
   return { rank, scope };
 }
 
-function Figure({ rating, count, size }: { rating: number; count: number; size: number }) {
+function Figure({ rating, count, size, onPhoto = false }: { rating: number; count: number; size: number; onPhoto?: boolean }) {
   const { t } = useTranslation('courses');
   /* Green is reserved for the standout signal: the threshold lives only in
    * courseSubScoreTone (9.0+), and the figure reads it rather than carrying
@@ -118,11 +127,14 @@ function Figure({ rating, count, size }: { rating: number; count: number; size: 
           fontWeight: 800,
           lineHeight: 1,
           color: courseSubScoreTone(rating) === A.GREEN ? A.GREEN : A.INK,
+          textShadow: onPhoto ? TEXT_SHADOW : undefined,
         }}
       >
         {rating.toFixed(1)}
       </div>
-      <div style={{ ...PLACE, marginTop: 4 }}>
+      <div style={{ ...PLACE, marginTop: 4,
+                    color: onPhoto ? 'rgba(255,255,255,0.62)' : undefined,
+                    textShadow: onPhoto ? TEXT_SHADOW : undefined }}>
         {t('amateur.courseCard.fromGolfers', 'From {{n}} golfers', { n: count })}
       </div>
     </div>
@@ -191,25 +203,43 @@ export function CourseLedCard({
         ) : (
           <CourseImageFallback />
         )}
+        <div aria-hidden style={{ position: 'absolute', inset: 0, background: COURSE_CARD_SCRIM, pointerEvents: 'none' }} />
         {rank ? (
           <div style={{ position: 'absolute', top: 10, left: 10, pointerEvents: 'none' }}>
             <RankFlagBadge rank={rank.rank} scope={rank.scope} />
           </div>
         ) : null}
-      </div>
 
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginTop: 12 }}>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, lineHeight: 1.2 }}>
-            {subject?.course_name ?? ''}
+        {/* THE NAMEPLATE. Name and place left, the rating figure right — the same
+            pairing the row below the photo used to hold, moved onto it. */}
+        <div style={{ position: 'absolute', left: 12, right: 12, bottom: 10, display: 'flex', alignItems: 'flex-end', gap: 12 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div
+              style={{
+                fontSize: 19, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2, color: '#fff',
+                textShadow: TEXT_SHADOW,
+                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+              }}
+            >
+              {subject?.course_name ?? ''}
+            </div>
+            {place ? (
+              <div
+                style={{
+                  ...PLACE, marginTop: 4, color: 'rgba(255,255,255,0.62)', textShadow: TEXT_SHADOW,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}
+              >
+                {place}
+              </div>
+            ) : null}
           </div>
-          {place ? <div style={{ ...PLACE, marginTop: 4 }}>{place}</div> : null}
+          {printable ? <Figure rating={item.facts.rating as number} count={count} size={30} onPhoto /> : null}
         </div>
-        {printable ? <Figure rating={item.facts.rating as number} count={count} size={30} /> : null}
       </div>
 
       {chipLabels.length > 0 ? (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 12 }}>
           {chipLabels.map((label) => (
             <span
               key={label}
@@ -231,7 +261,7 @@ export function CourseLedCard({
         </div>
       ) : null}
 
-      {sentence ? <div style={{ marginTop: 10 }}><EventSentence text={sentence} size={13} topar={grossToPar(item)} /></div> : null}
+      {sentence ? <div style={{ marginTop: chipLabels.length > 0 ? 10 : 12 }}><EventSentence text={sentence} size={13} topar={grossToPar(item)} /></div> : null}
 
       {quote ? (
         <div
@@ -299,7 +329,6 @@ export function CourseLedCard({
  *  picture. */
 const HERO_SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 46%, rgba(0,0,0,0.55) 64%, rgba(0,0,0,0.88) 84%, rgba(0,0,0,0.94) 100%)';
-const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
 /** The unit beside the figure. WHITE — there is no gold anywhere on this
  *  card, and the chip already names the event. */
 const HERO_UNIT: React.CSSProperties = {
