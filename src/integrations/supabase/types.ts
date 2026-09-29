@@ -20025,6 +20025,7 @@ export type Database = {
           level: string
           name: string
           parent: string
+          thumb: string
           you_played: number
         }[]
       }
