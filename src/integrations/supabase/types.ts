@@ -20017,6 +20017,17 @@ export type Database = {
           course_rounds: number
         }[]
       }
+      get_course_geography: {
+        Args: { p_region_limit?: number; p_viewer: string }
+        Returns: {
+          active: number
+          catalogue: number
+          level: string
+          name: string
+          parent: string
+          you_played: number
+        }[]
+      }
       get_course_hall_of_fame: {
         Args: never
         Returns: {

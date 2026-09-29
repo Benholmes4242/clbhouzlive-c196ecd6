@@ -46,6 +46,12 @@ export interface EgSyncHealth {
   cron_last_run_at: string | null;
   cron_last_status: string | null;
   cron_hours_ago: number | null;
+  /** The sweep's last run aborted because the shared pre-auth token was missing
+   *  or expired. Distinct from auth_failed (a member's own credential). Absent
+   *  until docs/sql/eg_sync_token_unavailable.sql is applied. */
+  token_unavailable?: boolean;
+  token_unavailable_reason?: 'missing' | 'expired' | null;
+  last_run_at?: string | null;
   computed_at: string;
 }
 

@@ -72,6 +72,8 @@ function Cap({ state, to }: { state: ChipState; to: string }) {
  */
 function egDetail(chip: ChipState, eg?: EgSyncHealth): string {
   if (chip.tone === 'ok' || chip.tone === 'idle' || !eg) return chip.detail;
+  /* A missing shared token is ONE fault, not twenty broken members. */
+  if (eg.token_unavailable) return 'No token';
   const auth = eg.auth_failed ?? 0;
   const unavailable = eg.eg_unavailable ?? 0;
   if (auth === 0 && unavailable === 0) {
