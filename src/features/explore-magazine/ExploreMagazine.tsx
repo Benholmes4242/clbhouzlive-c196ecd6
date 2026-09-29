@@ -35,6 +35,8 @@ import { Z } from '@/config/zIndex';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import type { RoundCardEngagement } from './ExploreCard';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -851,6 +853,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [visible],
   );
   const reviewEnrichment = useReviewPageEnrichment(visibleReviewIds);
+  /* BRIEF_REVIEW_TILE_ACTIONS §7 — one batched read each for the window. */
+  const reviewReactions = useContentReactions(
+    useMemo(() => visibleReviewIds.map((id) => ({ type: 'review' as const, id })), [visibleReviewIds]),
+  );
+  const reviewEngagement = useStoryEngagement('review', visibleReviewIds);
   const displayItems = useMemo(
     () => visible.map((item) => {
       if (item.kind !== 'review' || !item.facts.review_id) return item;
@@ -1097,7 +1104,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      SHEET ALONE. This page mounts CommentsSheetV2 itself, exactly as
      RoundDetailSheet does, so the round sheet is never involved and closing
      returns straight to the feed. */
-  const [openCommentsPostId, setOpenCommentsPostId] = useState<string | null>(null);
+  const [openComments, setOpenComments] = useState<{ type: 'post' | 'review'; id: string } | null>(null);
+  const openPostComments = useCallback((id: string) => setOpenComments({ type: 'post', id }), []);
   const pageIxRef = useRef<number | null>(null);
   pageIxRef.current = pageIx;
   const [shift, setShift] = useState<{ dx: number; opacity?: number; animating: boolean } | null>(null);
@@ -1409,7 +1417,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         fn: string, args: Record<string, unknown>,
       ) => Promise<{ data: string | null; error: unknown }>)('ensure_round_post', { p_whs_score_id: scoreId });
       if (error || !data) throw error ?? new Error('no post id');
-      setOpenCommentsPostId(data);
+      setOpenComments({ type: 'post', id: data });
       void queryClient.invalidateQueries({ queryKey: ["round-post-comments"] });
     } catch (err) {
       console.error('[round-comments] ensure_round_post failed', err);
@@ -1431,6 +1439,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     const state = roundReactions.stateFor('round', scoreId);
     const likeAvailable = !!roundReactions.viewerId;
     return {
+      kind: 'celebrate' as const,
       likeCount: state.count,
       liked: state.mine,
       likeAvailable,
@@ -1449,21 +1458,55 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       } : undefined,
       onOpenComments: () => {
         analyticsEvents.track('explore_round_comments_opened', { score_id: scoreId, view, surface });
-        if (post) { setOpenCommentsPostId(post.postId); return; }
+        if (post) { setOpenComments({ type: 'post', id: post.postId }); return; }
         void ensureRoundPostAndOpen(scoreId);
       },
     };
   }, [ensureRoundPostAndOpen, ensuringScoreId, roundPosts, roundReactions, view]);
 
+  /* BRIEF_REVIEW_TILE_ACTIONS §8 — a review IS the reaction target
+     (target_type 'review'); no post is created, no ensure_round_post. */
+  const engagementForReview = useCallback((item: StreamItem): RoundCardEngagement | null => {
+    const reviewId = item.kind === 'review' ? item.facts.review_id : null;
+    if (!reviewId || reviewReactions.unavailable) return null;
+    const state = reviewReactions.stateFor('review', reviewId);
+    return {
+      kind: 'helpful',
+      likeCount: state.count,
+      liked: state.mine,
+      likeAvailable: !!reviewReactions.viewerId,
+      // ONLY the comment count comes from get_story_engagement; like state is
+      // useContentReactions' alone (it carries the optimistic toggle).
+      commentCount: reviewEngagement.engagementFor(reviewId).commentCount,
+      commentAvailable: true,
+      commentPending: false,
+      reactionSubjectId: reviewId,
+      ownerName: item.who?.display_name?.trim().split(/\s+/)[0] || null,
+      isOwnRound: item.who?.is_viewer ?? false,
+      onToggleLike: reviewReactions.viewerId
+        ? () => {
+            analyticsEvents.track('explore_review_like_toggled', { review_id: reviewId, liked: !state.mine, view });
+            reviewReactions.toggle('review', reviewId);
+          }
+        : undefined,
+      onOpenComments: () => {
+        analyticsEvents.track('explore_review_comments_opened', { review_id: reviewId, view });
+        setOpenComments({ type: 'review', id: reviewId });
+      },
+    };
+  }, [reviewReactions, reviewEngagement, view]);
+
   const engagementFor = useCallback(
     (item: StreamItem) =>
-      engagementForRound(
-        item.kind === 'round' ? item.facts.score_id : null,
-        item.who?.display_name?.trim().split(/\s+/)[0] || null,
-        item.who?.is_viewer ?? false,
-        'feed',
-      ),
-    [engagementForRound],
+      item.kind === 'review'
+        ? engagementForReview(item)
+        : engagementForRound(
+            item.kind === 'round' ? item.facts.score_id : null,
+            item.who?.display_name?.trim().split(/\s+/)[0] || null,
+            item.who?.is_viewer ?? false,
+            'feed',
+          ),
+    [engagementForRound, engagementForReview],
   );
 
   const tapWho = useCallback(
@@ -1752,7 +1795,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       {/* THE WATCH VIEW IS ONE ENDLESS MIXED FEED, shape-typed and searchable
           (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely; the
           view chips above stay exactly where they are. */}
-      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={setOpenCommentsPostId} /> : null}
+      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={openPostComments} /> : null}
 
       {/* §6 THE SEARCH FIELD SITS ABOVE THE SCOPE ROW on the merged Courses view.
           Results replace the page BODY; this field, the scope row and the chips
@@ -2203,17 +2246,22 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           above the feed. Closing it refetches the batched round-comments read
           for this window (refetchType 'all', so a mounted-but-stale count can
           never survive) and returns the member straight to the feed. */}
-      {openCommentsPostId && (
+      {openComments && (
         <CommentsSheetV2
           isOpen
           onClose={() => {
-            setOpenCommentsPostId(null);
+            const closedType = openComments.type;
+            setOpenComments(null);
+            if (closedType === 'review') {
+              queryClient.invalidateQueries({ queryKey: ['story-engagement', 'review'], refetchType: 'all' });
+              return;
+            }
             queryClient.invalidateQueries({ queryKey: ['round-post-comments'], refetchType: 'all' });
             queryClient.invalidateQueries({ queryKey: ['explore-watch-videos'], refetchType: 'all' });
             queryClient.invalidateQueries({ queryKey: ['explore-watch-clips'], refetchType: 'all' });
           }}
-          targetType="post"
-          targetId={openCommentsPostId}
+          targetType={openComments.type}
+          targetId={openComments.id}
         />
       )}
 
