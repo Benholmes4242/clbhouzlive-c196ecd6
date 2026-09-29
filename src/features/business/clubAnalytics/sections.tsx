@@ -33,6 +33,7 @@ import {
 } from '@/features/courses/components/holes/_constants';
 import { PCT_MIN_N, MIN_BAR_PCT } from './constants';
 import { SiLadder } from '@/features/courses/_shared/SiLadder';
+import RailChips from '@/components/ui/RailChips';
 import { buildSiLadder } from '@/features/courses/_shared/siLadder';
 import type { ClubCourseAnalytics, ClubAnalyticsHole, ClubAnalyticsTee } from './types';
 import { sortTees, yd } from './tees';
