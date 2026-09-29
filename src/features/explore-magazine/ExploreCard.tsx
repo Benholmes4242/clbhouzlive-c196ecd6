@@ -27,7 +27,7 @@ import { headlineFor, kickerParts, playDateFull, relativeDay, toParLabel } from 
 import type { StreamItem } from './streamItem';
 import { calloutFor, rendersOnPhoto } from './cardTreatment';
 import { FigureCell, RoundStatStrip, vsHandicapLabel } from './AchievementCallout';
-import { dotsFor, treatmentFor } from './roundTreatment';
+import { dotsFor, SCORE_TRACE_PLOT_HEIGHT, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
 import { RankFlagBadge } from './RankFlagBadge';
@@ -96,8 +96,12 @@ const PHOTO_H: Record<CardSize, number> = { lead: 340, std: 210, pair: 124 };
 const RADIUS: Record<CardSize, string> = { lead: r.lg, std: r.md, pair: r.md };
 /** The trace width the lead and std pass. New widths, not new behaviour. */
 const SHAPE_W: Record<CardSize, number> = { lead: 350, std: 350, pair: 0 };
-/** The band the trace occupies at the foot of the photograph. */
-const SHAPE_BAND: Record<CardSize, number> = { lead: 56, std: 52, pair: 0 };
+/** Every full-width score tile uses the All-tab featured hero's trace height. */
+const SHAPE_BAND: Record<CardSize, number> = {
+  lead: SCORE_TRACE_PLOT_HEIGHT,
+  std: SCORE_TRACE_PLOT_HEIGHT,
+  pair: 0,
+};
 
 /** The chip is 28px high at the canonical padding. 8 + 28 + 12 reserves the
  *  ruled clearance before any hero copy, whether or not a chip is present. */

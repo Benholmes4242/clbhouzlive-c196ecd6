@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  MIN_SHAPE_SPAN,
-  cumulativeSpan,
-  dotsFor,
-  goodHoleDots,
-  treatmentFor,
-} from '@/features/explore-magazine/roundTreatment';
+import { cumulativeSpan, dotsFor, goodHoleDots, treatmentFor } from '@/features/explore-magazine/roundTreatment';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
@@ -30,19 +24,17 @@ describe('treatmentFor', () => {
     ['five birdies draws the line', { birdies: 5 }, shape([-1, -1, -1, -1, -1]), 'line'],
     ['under par draws the line even when flat', { to_par: -1 }, shape([-1, 0, 0]), 'line'],
     ['a course record draws the line', { is_course_record: true }, shape([0, 0, 0]), 'line'],
-    /* MEDIAN TRAVEL, NOT ANY TRAVEL. A span of 10 draws; a span of 3 — which
-       passed under the old threshold — now goes quiet. */
+    /* Every settled score shape now draws, regardless of movement. */
     ['median movement alone draws the line', { to_par: 10 }, shape([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]), 'line'],
-    ['small movement alone draws nothing', { to_par: 3 }, shape([1, 1, 1]), 'none'],
-    ['a flat ordinary round draws nothing', { to_par: 2 }, shape([1, 0, 1]), 'none'],
-    ['a disaster-only round draws nothing', { to_par: 2 }, shape([2, 0, 0]), 'none'],
+    ['small movement still draws the line', { to_par: 3 }, shape([1, 1, 1]), 'line'],
+    ['a flat ordinary round still draws the line', { to_par: 2 }, shape([1, 0, 1]), 'line'],
+    ['a disaster-only round still draws the line', { to_par: 2 }, shape([2, 0, 0]), 'line'],
     ['no hole detail draws nothing', { to_par: -4 }, null, 'none'],
   ])('%s', (_label, facts, holes, expected) => {
     expect(treatmentFor(item(facts), holes)).toBe(expected);
   });
 
-  it('uses the span threshold derived from real rounds', () => {
-    expect(MIN_SHAPE_SPAN).toBe(10);
+  it('still measures cumulative movement independently of line visibility', () => {
     expect(cumulativeSpan(shape([1, 1, 1]))).toBe(3);
     expect(cumulativeSpan(shape([1, -1, 0]))).toBe(1);
     expect(cumulativeSpan(null)).toBeNull();

@@ -185,24 +185,6 @@ type Block =
 /** §6d PAIRS carry no round shape, so only kinds that never draw one pair up. */
 const PAIRABLE = new Set(['review', 'course', 'story']);
 
-/** SCORES ONLY — A BARE ROUND MAY PAIR. DO NOT HARMONISE THIS WITH ALL.
- *
- *  On All, a round card's shape is often the point, so the rule above stands
- *  there unchanged. On the rounds-only view the failure mode is twelve
- *  identical full-width cards, and a round with NO CONSEQUENCE is exactly the
- *  card whose line was earned on travel with nothing to mark — a pair draws no
- *  trace anyway (SHAPE_W.pair is 0), so the trace is not the loss it looks
- *  like. Measured: an all-bare page of 12 falls from ~3,240px to a lead plus
- *  five pair rows at ~1,275px, and records and circle rounds keep full width
- *  so the strong cards read AS strong.
- *
- *  The test is CONSEQUENCE ALONE, not consequence-and-no-visual: the visual
- *  form of the test would have fired on about 3% of rounds and changed
- *  nothing. */
-function pairableRound(item: StreamItem): boolean {
-  return item.kind === 'round' && item.consequence == null;
-}
-
 /** Full-width photo-led treatment is stable across views and positions, and
  *  asks the SAME predicate ExploreCard uses to put the text on the image. */
 export function fullWidthCardSize(item: StreamItem): CardSize {
@@ -221,7 +203,7 @@ function buildBlocks(
   items: StreamItem[],
   shelves: ShelfKind[],
   sameKindPairs = false,
-  opts: { bareRoundPairs?: boolean; shelfAt?: number[]; mergedCourses?: boolean; repeatShelves?: boolean } = {},
+  opts: { shelfAt?: number[]; mergedCourses?: boolean; repeatShelves?: boolean } = {},
 ): Block[] {
   const blocks: Block[] = [];
   let cards = 0;
@@ -240,7 +222,7 @@ function buildBlocks(
            place at different widths. The page changed rhythm partway
            down for no visible reason. One shape, every row. */
         ? false
-        : PAIRABLE.has(item.kind) || (opts.bareRoundPairs === true && pairableRound(item))
+        : PAIRABLE.has(item.kind)
     );
 
   while (index < items.length) {
@@ -255,7 +237,7 @@ function buildBlocks(
       next &&
       canPair(item) &&
       canPair(next) &&
-      (sameKindPairs || opts.mergedCourses === true || item.kind !== next.kind || (opts.bareRoundPairs === true && item.kind === 'round'))
+      (sameKindPairs || opts.mergedCourses === true || item.kind !== next.kind)
     ) {
       blocks.push({ kind: 'pair', items: [item, next] });
       index += 2;
@@ -1113,7 +1095,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       view === 'courses' && !filtering
         ? buildCoursesBlocks(ranked)
         : buildBlocks(ranked, shelves, false, {
-        bareRoundPairs: view === 'scores',
         repeatShelves: view === 'scores' || view === 'all',
         /* §3 THE MERGED VIEW'S RHYTHM: pairs are STABLE-FACT COURSE CARDS only,
            reviews and event cards always full width. */

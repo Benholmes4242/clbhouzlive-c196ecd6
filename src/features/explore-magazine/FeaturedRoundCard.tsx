@@ -30,7 +30,7 @@ import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
-import { goodHoleDots } from './roundTreatment';
+import { goodHoleDots, SCORE_TRACE_PLOT_HEIGHT } from './roundTreatment';
 import { Skeleton } from '@/components/ui/skeleton';
 /** Matches the Courses-tab lead course-record tile. 210 left no room for the
  *  trace and the text block to coexist. The pane may grow if copy wraps. */
@@ -41,7 +41,7 @@ const PANE_H = 300;
  *  and bottom = height − 12). At 72 that becomes 39px, roughly doubling the
  *  swing, and still leaves clear space above the headline. Do not copy this
  *  value back to the feed card — 52 is right there. */
-const SHAPE_BAND = 72;
+const SHAPE_BAND = SCORE_TRACE_PLOT_HEIGHT + EXPLORE_END_LABEL_BAND;
 const SHAPE_W = 350;
 /** BRIEF_FEATURED_ROUND_SCRIM — the scrim is a FOOT, not a filter. Fully
  *  transparent across the top 46% so the photograph (and the trace over it)
@@ -184,7 +184,7 @@ export const FeaturedRoundCard: React.FC<{
         <div style={{ flex: '0 0 44px' }} />
         <div aria-hidden="true" style={{ position: 'relative', flex: '1 1 auto', minHeight: shape ? SHAPE_BAND + 36 : 24, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0 18px' }}>
           {shape ? (
-            <RoundShape row={traceRow} shape={shape} width={SHAPE_W} height={SHAPE_BAND - EXPLORE_END_LABEL_BAND}
+            <RoundShape row={traceRow} shape={shape} width={SHAPE_W} height={SCORE_TRACE_PLOT_HEIGHT}
               showMeta={false} showBaseline baselineColor="rgba(255,255,255,0.34)" strokeWidth={2.2}
               exploreLineOnly endLabels exploreGlow exploreDots={dots} underParFill />
           ) : null}
