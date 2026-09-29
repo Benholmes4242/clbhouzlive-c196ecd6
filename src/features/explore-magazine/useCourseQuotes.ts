@@ -62,12 +62,15 @@ export function useCourseQuotes(courseIds: string[]) {
       const userIds = Array.from(new Set(Array.from(picked.values()).map((r) => r.user_id).filter((id): id is string => !!id)));
       const profiles = new Map<string, { name: string | null; avatar: string | null }>();
       if (userIds.length > 0) {
-        const { data: people } = await supabase
-          .from('profiles')
-          .select('id, display_name, username, avatar_url')
+        /* public_profiles, as useLatestReviews reads it: profiles is RLS-gated
+           and every byline would collapse to "A member". */
+        const { data: people } = await (supabase.from('public_profiles' as never) as unknown as {
+          select: (cols: string) => { in: (col: string, ids: string[]) => Promise<{ data: unknown }> };
+        })
+          .select('id, display_name, username, profile_photo_url')
           .in('id', userIds);
-        for (const p of (people ?? []) as Array<{ id: string; display_name: string | null; username: string | null; avatar_url: string | null }>) {
-          profiles.set(p.id, { name: p.display_name || p.username || null, avatar: p.avatar_url });
+        for (const p of ((people ?? []) as Array<{ id: string; display_name: string | null; username: string | null; profile_photo_url: string | null }>)) {
+          profiles.set(p.id, { name: p.display_name || p.username || null, avatar: p.profile_photo_url });
         }
       }
       const out = new Map<string, CourseQuote>();

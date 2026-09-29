@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
+import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { A, GOLD, NUMF, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';

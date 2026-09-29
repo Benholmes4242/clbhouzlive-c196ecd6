@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
+import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { A, NUMF, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
