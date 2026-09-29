@@ -1733,7 +1733,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       {/* THE WATCH VIEW IS ONE ENDLESS MIXED FEED, shape-typed and searchable
           (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely; the
           view chips above stay exactly where they are. */}
-      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} /> : null}
+      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={setOpenCommentsPostId} /> : null}
 
       {/* §6 THE SEARCH FIELD SITS ABOVE THE SCOPE ROW on the merged Courses view.
           Results replace the page BODY; this field, the scope row and the chips
@@ -2184,6 +2184,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           onClose={() => {
             setOpenCommentsPostId(null);
             queryClient.invalidateQueries({ queryKey: ['round-post-comments'], refetchType: 'all' });
+            queryClient.invalidateQueries({ queryKey: ['explore-watch-videos'], refetchType: 'all' });
+            queryClient.invalidateQueries({ queryKey: ['explore-watch-clips'], refetchType: 'all' });
           }}
           targetType="post"
           targetId={openCommentsPostId}

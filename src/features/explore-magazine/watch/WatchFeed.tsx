@@ -11,6 +11,8 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreShelf } from '../ExploreShelf';
@@ -154,11 +156,14 @@ export function WatchFeed({
   userId,
   onDepart,
   initialFilter = 'all',
+  onOpenComments,
 }: {
   userId: string | undefined;
   onDepart: () => void;
   /** Entry selection, e.g. Explore's community see-all opens on 'community'. */
   initialFilter?: WatchFilter;
+  /** Opens ExploreMagazine's one mounted CommentsSheetV2 — never a second sheet here. */
+  onOpenComments?: (postId: string) => void;
 }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
@@ -202,6 +207,9 @@ export function WatchFeed({
 
   const videoPosts = useMemo(() => toFeedPosts(videoRows), [videoRows]);
   const clipPosts = useMemo(() => toFeedPosts(clipRows), [clipRows]);
+  const { activeActor } = useActiveActor();
+  const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
+  const likeAvailable = !!userId && !!activeActor;
 
   useEffect(() => {
     analyticsEvents.track('amateur_watch_filter_changed', { filter, searching });
@@ -454,7 +462,24 @@ export function WatchFeed({
       : null;
     return (
       <div key={`video:${row.post_id}`} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
-        <VideoCard row={row} onPress={() => openVideo(index)} />
+        <VideoCard
+          row={row}
+          onPress={() => openVideo(index)}
+          engagement={(() => {
+            /* videoPosts[index] is 1:1 with videoRows[index] (load-bearing). */
+            const post = videoPosts[index] ?? null;
+            const like = getActiveLikeState(post);
+            return {
+              likeAvailable,
+              liked: like.isLiked,
+              likeCount: like.count,
+              own: !!userId && (row.post_user_id ?? row.actor_id) === userId,
+              onToggleLike: () => handleLike(post),
+              commentCount: Number(row.comment_count ?? 0),
+              onOpenComments: () => onOpenComments?.(row.post_id),
+            };
+          })()}
+        />
         {rails && ordinal != null ? (
           <div style={{ minWidth: 0, overflow: 'hidden' }}>
             {railKindAt(ordinal) === 'clips' ? clipsRail(ordinal) : communityRail(ordinal)}
