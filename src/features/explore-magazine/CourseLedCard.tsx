@@ -262,7 +262,9 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
   const sentence = courseHeadline(t, headlineFacts(item));
   const event = item.facts.course_event;
   const eventChip =
-    event === 'low'
+    event === 'record'
+      ? t('amateur.courseLead.chipRecord', 'Course record')
+      : event === 'low'
       ? t('amateur.courseLead.chipLow', 'Low round')
       : event === 'ratings'
         ? t('amateur.courseLead.chipRatings', 'New ratings')
