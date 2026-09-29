@@ -300,15 +300,12 @@ export function CourseLedCard({
 const HERO_SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 46%, rgba(0,0,0,0.55) 64%, rgba(0,0,0,0.88) 84%, rgba(0,0,0,0.94) 100%)';
 const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
-/** The unit beside the figure. WHITE, not gold — the chip already carries the
- *  gold, and two golds in one corner flatten each other. */
+/** The unit beside the figure. WHITE — there is no gold anywhere on this
+ *  card, and the chip already names the event. */
 const HERO_UNIT: React.CSSProperties = {
   fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase',
   color: A.INK, textShadow: TEXT_SHADOW,
 };
-const GOLD_FRAME = 'rgba(216,169,60,0.55)';
-const GOLD_FRAME_SOFT = 'rgba(216,169,60,0.14)';
-const GOLD_STRIP = 'linear-gradient(180deg, rgba(216,169,60,0.16), rgba(216,169,60,0.09))';
 
 /** §B1 THE LEAD — BRIEF_COURSES_LEAD_HERO: figure, member and place over the photograph. */
 export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () => void }) {
@@ -341,9 +338,6 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
     : t('amateur.stream.course.factRoundsN', '{{n}} rounds tracked here.', { n: rounds })
   ).replace(/\s*here\.?$/i, '').replace(/\.$/, '');
   const placeLine = [place, rounds > 0 ? roundsText : null].filter(Boolean).join(' \u00B7 ');
-  const stripLine = printable
-    ? t('amateur.courseLead.stripRated', 'Rated {{rating}} by {{n}} golfers', { rating: (item.facts.rating as number).toFixed(1), n: count })
-    : place ?? '';
 
   const nameRef = useFitOneLine<HTMLDivElement>(subject?.course_name ?? '', 13.5, 10.5);
   const placeRef = useFitOneLine<HTMLDivElement>(placeLine, 9, 7.5);
@@ -355,15 +349,8 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
         onClick={onTap}
         style={{ all: 'unset', display: 'block', width: '100%', cursor: 'pointer', boxSizing: 'border-box' }}
       >
-        <div
-          style={{
-            border: `1px solid ${GOLD_FRAME}`,
-            borderRadius: r.lg,
-            overflow: 'hidden',
-            boxShadow: `0 0 0 1px ${GOLD_FRAME_SOFT}, 0 10px 30px rgba(0,0,0,0.5)`,
-          }}
-        >
-          <div style={{ position: 'relative', height: 300, background: A.PANEL }}>
+        <div>
+          <div style={{ position: 'relative', height: 300, borderRadius: r.lg, overflow: 'hidden', background: A.PANEL }}>
             {subject?.image_url ? (
               <img src={subject.image_url} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
@@ -433,7 +420,7 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
               <div
                 ref={nameRef}
                 style={{
-                  marginTop: topar || printable ? 8 : 0, fontSize: 13.5, fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.86)',
+                  marginTop: 8, fontSize: 13.5, fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.86)',
                   textShadow: TEXT_SHADOW, whiteSpace: 'nowrap', overflow: 'hidden',
                 }}
               >
@@ -454,16 +441,6 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
             </div>
           </div>
 
-          {stripLine ? (
-            <div
-              style={{
-                display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px',
-                background: GOLD_STRIP, fontSize: 12.5, fontWeight: 600, color: A.INK,
-              }}
-            >
-              {stripLine}
-            </div>
-          ) : null}
         </div>
       </button>
     </div>
