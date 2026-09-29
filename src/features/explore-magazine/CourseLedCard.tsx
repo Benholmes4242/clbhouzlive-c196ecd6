@@ -6,7 +6,6 @@ import { A, GOLD, NUMF, SANS } from '@/components/explore-tab-new/courseled/toke
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
-import { celebrateFigureSize } from '@/lib/reactionKind';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { RANK_PILL_BG, SCRIM_STANDOUT } from '@/styles/photoScrim';
 
@@ -33,6 +32,15 @@ export interface CourseViewerChips {
   onList: boolean;
 }
 
+const LEAD_LABEL: React.CSSProperties = {
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: '0.10em',
+  textTransform: 'uppercase',
+  lineHeight: 1.3,
+  color: A.MUTE,
+};
+
 const PLACE: React.CSSProperties = {
   fontSize: 9,
   fontWeight: 700,
@@ -52,7 +60,8 @@ function grossToPar(item: StreamItem): { gross: number; toPar: number } | null {
 
 /** The event sentence, with its figures at 700 and tabular (§A2). The sentence
  *  itself always comes from courseHeadline.ts. The first figure equal to the
- *  gross takes the to-par beside it: 0.62 size, under = TOPAR_UNDER_DARK,
+ *  gross takes ", " (sentence colour) then the to-par at the sentence's own
+ *  size (BRIEF_COURSES_LEAD_FOOT §2-3): under = TOPAR_UNDER_DARK,
  *  over = ink, level "E" muted. Sign via toParLabel (true minus). */
 function EventSentence({ text, size, topar }: { text: string; size: number; topar?: { gross: number; toPar: number } | null }) {
   const parts = text.split(/(\d[\d,.]*\d|\d)/g);
@@ -66,9 +75,10 @@ function EventSentence({ text, size, topar }: { text: string; size: number; topa
           <React.Fragment key={i}>
             <span style={{ ...NUMF, fontWeight: 700, color: A.INK }}>{part}</span>
             {i === grossIdx && label ? (
-              <span style={{ ...NUMF, fontWeight: 700, fontSize: celebrateFigureSize(size), color: tone }}>
-                {'\u2009'}{label}
-              </span>
+<>
+                {', '}
+                <span style={{ ...NUMF, fontWeight: 700, color: tone }}>{label}</span>
+              </>
             ) : null}
           </React.Fragment>
         ) : (
@@ -328,9 +338,29 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
             {subject?.course_name ?? ''}
           </div>
           {place ? <div style={{ ...PLACE, marginTop: 5 }}>{place}</div> : null}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 12 }}>
-            {printable ? <Figure rating={item.facts.rating as number} count={count} size={30} /> : <SampleLine count={count} />}
-            {sentence ? <div style={{ minWidth: 0, flex: 1 }}><EventSentence text={sentence} size={13} topar={grossToPar(item)} /></div> : null}
+          {/* BRIEF_COURSES_LEAD_FOOT §1: pinned 66px rating column + text column,
+              so the sentence never reflows between rated and unrated courses. */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginTop: 12 }}>
+            <div style={{ flex: '0 0 66px' }}>
+              {printable ? (
+                <div
+                  style={{
+                    ...NUMF, fontSize: 32, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
+                    color: courseSubScoreTone(item.facts.rating as number) === A.GREEN ? A.GREEN : A.INK,
+                  }}
+                >
+                  {(item.facts.rating as number).toFixed(1)}
+                </div>
+              ) : null}
+              <div style={{ ...LEAD_LABEL, marginTop: printable ? 4 : 0 }}>
+                {printable
+                  ? t('amateur.courseLead.fromRatings', 'from {{count}} ratings', { count })
+                  : count > 0
+                    ? t('amateur.courseLead.sampleSoFar', '{{count}} ratings so far', { count })
+                    : t('amateur.courseCard.notRated', 'Not rated yet')}
+              </div>
+            </div>
+            {sentence ? <div style={{ minWidth: 0, flex: 1, marginTop: 2 }}><EventSentence text={sentence} size={13} topar={grossToPar(item)} /></div> : null}
           </div>
         </div>
       </button>
