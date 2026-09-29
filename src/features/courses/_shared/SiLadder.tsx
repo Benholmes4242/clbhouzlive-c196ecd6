@@ -40,19 +40,32 @@ const ROW_H = 16;
 export type SiLadderVoice = 'club' | 'course';
 
 /** §3 — the only difference between the two surfaces. */
-const COPY: Record<SiLadderVoice, { heading: string; subline: string; harder: string; easier: string }> = {
+const COPY: Record<SiLadderVoice, { heading: string; subline: string; closing: string; harder: string; easier: string }> = {
   club: {
-    heading: 'Where your index disagrees',
-    subline: 'Your declared stroke index on the left, the position each hole actually plays in on the right.',
+    heading: 'Where your card and your difficulty order part company',
+    subline:
+      'How hard each hole plays for your members overall, against the position your card gives it. This is a difficulty order, which is not the same thing as a stroke index \u2014 the Stroke index check below is the one that measures a stroke index properly.',
+    closing:
+      'A stroke index ranks where a higher handicapper needs a shot most relative to a lower one, not which hole is hardest overall. Nothing here is a recommendation to change your card.',
     harder: 'Plays harder than you index it',
     easier: 'Plays easier than you index it',
   },
   course: {
-    heading: 'Stroke index against how it plays',
-    subline: 'The stroke index on the card, against the position each hole actually plays in.',
+    heading: 'Where the card and the difficulty order part company',
+    subline:
+      'How hard each hole plays for golfers here overall, against the position the card gives it. This is a difficulty order, which is not the same thing as a stroke index.',
+    closing:
+      'A stroke index ranks where a higher handicapper needs a shot most relative to a lower one, not which hole is hardest overall. Nothing here is a recommendation to change the card.',
     harder: 'Plays harder than the card indexes it',
     easier: 'Plays easier than the card indexes it',
   },
+};
+
+/** 1 -> 1st, 2 -> 2nd, 11 -> 11th. Copy only; no maths moves. */
+const ordinal = (n: number) => {
+  const t = n % 100;
+  const suffix = t >= 11 && t <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th';
+  return `${n}${suffix}`;
 };
 
 const colourFor = (r: SiLadderRow) =>
@@ -201,8 +214,8 @@ export const SiLadder: React.FC<{
             >
               <span style={{ fontSize: 12.5, fontWeight: 600, color: A.BODY }}>
                 {voice === 'club'
-                  ? `Hole ${r.holeNo} - Your index ${r.strokeIndex}, plays ${r.measuredRank}`
-                  : `Hole ${r.holeNo} - indexed ${r.strokeIndex}, plays ${r.measuredRank}`}
+                  ? `Hole ${r.holeNo} - your card says ${r.strokeIndex}, plays ${ordinal(r.measuredRank)} hardest`
+                  : `Hole ${r.holeNo} - the card says ${r.strokeIndex}, plays ${ordinal(r.measuredRank)} hardest`}
               </span>
               <span style={{ ...bizFigure(12.5, colourFor(r)), flexShrink: 0 }}>
                 {r.shotsGap > 0 ? '+' : '\u2212'}
@@ -222,6 +235,8 @@ export const SiLadder: React.FC<{
         {ladder.shotsFloor.toFixed(2)} of a shot away from what its declared index should return. That shots figure is
         scaled to this course's own spread, so a flat course is judged no more harshly than a dramatic one.
       </p>
+
+      <p style={{ ...BIZ_BODY, margin: '8px 0 0', fontSize: 11.5, color: A.DIM }}>{copy.closing}</p>
     </Panel>
   );
 };
