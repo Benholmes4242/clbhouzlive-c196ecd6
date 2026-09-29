@@ -120,17 +120,6 @@ export function RankPill({ rank, label }: { rank: number; label: string | null }
   );
 }
 
-function SampleLine({ count }: { count: number }) {
-  const { t } = useTranslation('courses');
-  return (
-    <span style={{ fontSize: 11.5, fontWeight: 600, color: A.DIM, lineHeight: 1.3 }}>
-      {count > 0
-        ? t('amateur.courseCard.sampleOnly', '{{count}} ratings so far \u2014 not enough to score', { count })
-        : t('amateur.courseCard.notRated', 'Not rated yet')}
-    </span>
-  );
-}
-
 function Figure({ rating, count, size }: { rating: number; count: number; size: number }) {
   const { t } = useTranslation('courses');
   /* Green is reserved for the standout signal: the threshold lives only in
@@ -229,7 +218,6 @@ export function CourseLedCard({
         </div>
         {printable ? <Figure rating={item.facts.rating as number} count={count} size={30} /> : null}
       </div>
-      {!printable ? <div style={{ marginTop: 6 }}><SampleLine count={count} /></div> : null}
 
       {chipLabels.length > 0 ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
@@ -338,11 +326,11 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
             {subject?.course_name ?? ''}
           </div>
           {place ? <div style={{ ...PLACE, marginTop: 5 }}>{place}</div> : null}
-          {/* BRIEF_COURSES_LEAD_FOOT §1: pinned 66px rating column + text column,
-              so the sentence never reflows between rated and unrated courses. */}
+          {/* BRIEF_COURSES_LEAD_FOOT §1: the 66px rating column is present only
+              when there is a figure to put in it; unrated leads give the sentence full width. */}
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginTop: 12 }}>
-            <div style={{ flex: '0 0 66px' }}>
-              {printable ? (
+            {printable ? (
+              <div style={{ flex: '0 0 66px' }}>
                 <div
                   style={{
                     ...NUMF, fontSize: 32, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
@@ -351,15 +339,11 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
                 >
                   {(item.facts.rating as number).toFixed(1)}
                 </div>
-              ) : null}
-              <div style={{ ...LEAD_LABEL, marginTop: printable ? 4 : 0 }}>
-                {printable
-                  ? t('amateur.courseLead.fromRatings', 'from {{count}} ratings', { count })
-                  : count > 0
-                    ? t('amateur.courseLead.sampleSoFar', '{{count}} ratings so far', { count })
-                    : t('amateur.courseCard.notRated', 'Not rated yet')}
+                <div style={{ ...LEAD_LABEL, marginTop: 4 }}>
+                  {t('amateur.courseLead.fromRatings', 'from {{count}} ratings', { count })}
+                </div>
               </div>
-            </div>
+            ) : null}
             {sentence ? <div style={{ minWidth: 0, flex: 1, marginTop: 2 }}><EventSentence text={sentence} size={13} topar={grossToPar(item)} /></div> : null}
           </div>
         </div>
