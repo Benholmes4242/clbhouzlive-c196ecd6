@@ -272,7 +272,7 @@ export interface FeaturedRoundEngagement {
  *  photo pane, chip top-left, then figure, member, course and fact lines. */
 export const FeaturedRoundSkeleton: React.FC = () => {
   const bar = (w: number | string, h: number, extra?: React.CSSProperties) => (
-    <Skeleton style={{ width: w, height: h, borderRadius: rad.sm, ...extra }} />
+    <Skeleton style={{ width: w, height: h, borderRadius: 6, ...extra }} />
   );
   return (
     <div aria-hidden="true" style={{ position: 'relative', height: PANE_H, borderRadius: rad.lg, overflow: 'hidden', background: A.PANEL }}>
