@@ -1073,7 +1073,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
               </div>
               {/* A BAND WITH 400 ROUNDS FROM 2 MEMBERS IS NOT 400 GOLFERS. */}
               <div style={{ ...LABEL, marginTop: 5 }}>
-                {fmt(b.members)} {b.members === 1 ? 'member' : 'members'}
+                {fmt(b.members)} {b.members === 1 ? 'golfer' : 'golfers'}
               </div>
             </div>
           ))}
@@ -1081,7 +1081,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
       </Inset>
       {/* §6.3 — THE COUNTS ADD TO MORE THAN THE MEMBER TOTAL ON PURPOSE. */}
       <Body style={{ marginTop: 12, fontSize: 11.5, color: A.DIM }}>
-        These member counts add to {fmt(memberSum)}, more than the {fmt(data.members)} members
+        These golfer counts add to {fmt(memberSum)}, more than the {fmt(data.members)} golfers
         behind this course, and that is correct: an index moves over the years, so one person appears in every band they
         have played to. Rounds and members are separate figures — a band can carry hundreds of rounds from a handful of
         regulars, and it should not be read as a headcount.
