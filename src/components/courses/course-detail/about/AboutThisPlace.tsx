@@ -5,7 +5,7 @@
  * what someone deciding whether to play here wants first.
  *
  * No card, no border — the Panel wrapper is gone (Panel itself untouched).
- * Two to three lines of the description at 13px MUTE / 1.55, then READ MORE.
+ * Two to three lines of the description at 13px MUTE / 1.55, then Read more.
  * The existing i18n keys are reused rather than rewritten (§6).
  */
 import React from 'react';
@@ -84,8 +84,7 @@ const AboutThisPlace: React.FC<AboutThisPlaceProps> = ({ courseId, description, 
             fontFamily: SANS,
             fontSize: 12,
             fontWeight: 700,
-            letterSpacing: '0.11em',
-            textTransform: 'uppercase',
+            letterSpacing: 0,
             color: A.MUTE,
             cursor: 'pointer',
             /* A CHEVRON MUST SAY WHERE IT GOES. This control toggles in place,
