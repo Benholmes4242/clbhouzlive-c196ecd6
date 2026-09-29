@@ -1173,7 +1173,6 @@ export function ExploreCard({
             display: 'flex', alignItems: 'center', gap: 26,
             marginTop: 12, paddingTop: 11,
             borderTop: '1px solid rgba(255,255,255,0.20)',
-            paddingRight: reviewMedia?.kind === 'video' ? 52 : 0,
           }}
         >
           <ReactionAction
@@ -1183,7 +1182,9 @@ export function ExploreCard({
             figureSize={celebrateFigureSize(19)}
             count={engagement.likeCount}
             reacted={engagement.liked}
-            readOnly={item.who?.is_viewer ?? false}
+            /* DELIBERATE, differs from the round card: a round's clap stays
+               read-only on your own round; a review's helpful does not. */
+            readOnly={false}
             hidden={!engagement.likeAvailable}
             onToggle={() => engagement.onToggleLike?.()}
             label={engagement.liked ? 'Marked helpful' : 'Mark this review helpful'}
@@ -1269,7 +1270,6 @@ export function ExploreCard({
         <ReviewVideoLayer
           hlsUrl={reviewMedia.url}
           posterUrl={reviewMedia.posterUrl}
-          durationS={reviewMedia.durationS}
         />
       ) : leadReview && (item.facts.photoCount ?? 0) > 1 ? (
         <GlassBadge style={{ position: 'absolute', top: 8, right: 8, left: 'auto', bottom: 'auto', zIndex: 3 }}>
