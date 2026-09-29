@@ -1,11 +1,14 @@
-import { ThumbsUp } from 'lucide-react';
-import ClapIcon from '@/components/icons/ClapIcon';
+import ThumbIcon from '@/components/icons/ThumbIcon';
 
 /**
  * THE POST TYPE DECIDES THE REACTION (BRIEF_CELEBRATE_REACTION_BUILD).
  *
- *   ROUND      -> 'celebrate': the clap glyph, the verb "celebrated"
- *   everything -> 'like':      the thumbs-up glyph, the verb "liked"
+ *   ROUND      -> 'celebrate': the verb "celebrated", the larger size
+ *   review     -> 'helpful':   the helpful wording
+ *   everything -> 'like':      the verb "liked"
+ *
+ * The kind decides SIZE and WORDING, never the icon: every kind draws the
+ * same solid thumbs-up (BRIEF_ONE_REACTION_GLYPH).
  *
  * THERE IS DELIBERATELY NO REACTION-TYPE COLUMN. Neither reaction store
  * (content_reactions for members, post_likes for business actors on round
@@ -18,8 +21,8 @@ import ClapIcon from '@/components/icons/ClapIcon';
  * Existing counts are untouched: a round's reactions ARE its celebrations.
  */
 /**
- * THE CELEBRATE ROW IS BIGGER THAN A LIKE ROW. The clap is the primary
- * action on a round; the heart is one control among several on a photo or
+ * THE CELEBRATE ROW IS BIGGER THAN A LIKE ROW. The round reaction is the
+ * primary action on a round; a like is one control among several on a photo or
  * review post. These two constants are the ONLY place either size is set.
  */
 export const CELEBRATE_GLYPH_SIZE = 23;         // stacked round footers
@@ -30,16 +33,12 @@ export function celebrateFigureSize(size: number): number {
   return Math.round(size * 0.62 * 10) / 10;
 }
 
-/* TWO GLYPHS, APP-WIDE.
-     clap    CELEBRATE  a round — an achievement, and you celebrate it
-     thumbs  LIKE       everything else
-   The clap is the ONLY exception, and it earns it: a score is not a thing
-   someone made, and "loved" was the wrong word for it. Everything else —
-   photos, videos, stories, news, reviews, comments — is a like, and a
-   thumbs-up is the glyph for a like.
-   ANY NEW REACTION CONTROL TAKES ITS GLYPH FROM reactionGlyph(). A
-   hardcoded lucide Heart is a bug: fourteen of them had to be swept out
-   of this app once. */
+/* ONE GLYPH, APP-WIDE (BRIEF_ONE_REACTION_GLYPH).
+   Every reaction draws the same fill-weight thumbs-up (ThumbIcon). The kind
+   decides size and wording, never the icon. State is COLOUR, never fill:
+   idle is the solid shape in a muted tone, reacted is the same shape in amber.
+   ANY NEW REACTION CONTROL TAKES ITS GLYPH FROM reactionGlyph(). A hardcoded
+   icon is a bug. */
 export type ReactionKind = 'like' | 'celebrate' | 'helpful';
 
 export function reactionKindFor(subject: { isRound: boolean; isReview: boolean }): ReactionKind {
@@ -48,9 +47,7 @@ export function reactionKindFor(subject: { isRound: boolean; isReview: boolean }
   return 'like';
 }
 
-/** The glyph for a kind. All accept lucide-shaped props (size, color, fill). */
-export function reactionGlyph(kind: ReactionKind) {
-  if (kind === 'celebrate') return ClapIcon;
-  if (kind === 'helpful') return ThumbsUp;
-  return ThumbsUp;
+/** THE glyph. One for every kind — see the header. */
+export function reactionGlyph(_kind: ReactionKind) {
+  return ThumbIcon;
 }

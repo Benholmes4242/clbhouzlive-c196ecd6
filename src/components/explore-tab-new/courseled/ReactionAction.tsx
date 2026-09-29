@@ -6,13 +6,12 @@ import { A, FIGS, SANS } from './tokens';
 /**
  * REACTION ACTION (BRIEF_DISCOVER_REACTIONS, section 2).
  *
- * Reuses the app's canonical like affordance — the lucide `Heart` glyph with an
- * AMBER active state, exactly as the feed footer button uses it (see
- * FooterButton in the light feed card, deleted 10 Sep 2026) — so members
- * learn one vocabulary, not two.
+ * Reuses the app's one reaction glyph — the solid thumbs-up from
+ * reactionGlyph() — so members learn one vocabulary, not two. State is
+ * carried by COLOUR only (BRIEF_ONE_REACTION_GLYPH).
  *
- *   not reacted   outline glyph, MUTE on light / white at 72% on photography
- *   reacted       FILLED AMBER (the one legitimate amber here: filled = you)
+ *   not reacted   the solid shape in MUTE / white at 72% on photography
+ *   reacted       the same solid shape in AMBER (the one legitimate amber: you)
  *   count         beside the glyph, tabular, HIDDEN ENTIRELY at zero
  *   own content   the count alone, no tappable glyph
  *   signed out    not rendered at all (the caller passes readOnly=false only
@@ -47,7 +46,7 @@ interface Props {
    * rail reads in a single row and must not gain the dead width.
    */
   reserveCount?: boolean;
-  /** 'celebrate' on ROUNDS (clap), 'like' elsewhere (heart). See lib/reactionKind. */
+  /** 'celebrate' on ROUNDS (larger size, celebrate copy), 'like' elsewhere; same glyph. See lib/reactionKind. */
   kind?: ReactionKind;
   /** ASYMMETRIC HIT AREA (BRIEF_WATCH_VIDEO_ROW_REACTIONS §3).
    *  'center' (default) keeps the symmetric 44px box every card footer
@@ -116,7 +115,7 @@ export function ReactionAction({
           fontFamily: SANS,
         }}
       >
-        <Glyph size={size} strokeWidth={2} color={idle} fill="none" aria-hidden />
+        <Glyph size={size} color={idle} aria-hidden />
         {figure}
       </span>
     );
@@ -157,13 +156,7 @@ export function ReactionAction({
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <Glyph
-        size={size}
-        strokeWidth={2}
-        color={reacted ? amber : idle}
-        fill={reacted ? amber : 'none'}
-        aria-hidden
-      />
+      <Glyph size={size} color={reacted ? amber : idle} aria-hidden />
       {figure}
     </span>
   );
