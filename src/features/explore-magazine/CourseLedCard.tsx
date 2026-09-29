@@ -17,6 +17,8 @@ import type { StreamItem } from './streamItem';
 import type { CourseQuote } from './useCourseQuotes';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
 import { RankFlagBadge } from './RankFlagBadge';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /**
  * THE COURSE-LED CARD (BRIEF_COURSES_DISCOVERY §A2).
@@ -170,12 +172,17 @@ export function CourseLedCard({
   else if (chips.played) chipLabels.push(t('amateur.courseCard.played', 'Played'));
   if (chips.onList) chipLabels.push(t('amateur.courseCard.onList', 'On your list'));
   const own = !!quote && !!viewerId && quote.userId === viewerId;
+  const openReviewSheet = useReviewSheetStore((st) => st.open);
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onTap}
-      style={{ all: 'unset', display: 'block', width: '100%', cursor: 'pointer', fontFamily: SANS, boxSizing: 'border-box' }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTap(); }
+      }}
+      style={{ display: 'block', width: '100%', cursor: 'pointer', fontFamily: SANS, boxSizing: 'border-box' }}
     >
       <div style={{ position: 'relative', height: 168, borderRadius: r.md, overflow: 'hidden', background: A.PANEL }}>
         {subject?.image_url ? (
@@ -226,7 +233,34 @@ export function CourseLedCard({
       {sentence ? <div style={{ marginTop: 10 }}><EventSentence text={sentence} size={13} topar={grossToPar(item)} /></div> : null}
 
       {quote ? (
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: `0.5px solid ${A.BORDER}` }}>
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={(ev) => {
+            ev.stopPropagation();
+            analyticsEvents.track('course_card_quote_tapped', { course_id: subject?.course_id ?? null });
+            openReviewSheet({
+              user: {
+                id: quote.userId ?? '',
+                name: own ? t('amateur.courseCard.you', 'You') : quote.name ?? t('amateur.courseCard.aMember', 'A member'),
+                avatar: quote.avatar,
+              },
+              courseId: quote.courseId,
+              courseName: subject?.course_name ?? '',
+              rating: quote.rating,
+              reviewId: quote.reviewId,
+              courseCountry: subject?.country ?? null,
+              courseRegion: subject?.region ?? null,
+              courseSubCountry: subject?.sub_country ?? null,
+              reviewText: quote.fullText,
+              breakdown: quote.breakdown,
+            });
+          }}
+          onKeyDown={(ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); ev.stopPropagation(); ev.currentTarget.click(); }
+          }}
+          style={{ marginTop: 12, paddingTop: 12, borderTop: `0.5px solid ${A.BORDER}`, cursor: 'pointer' }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <SquircleAvatar size={26} src={quote.avatar} alt={quote.name ?? ''} userId={quote.userId} hairlineRing hideRing={false} />
             <span style={{ fontSize: 13, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -254,7 +288,7 @@ export function CourseLedCard({
           </p>
         </div>
       ) : null}
-    </button>
+    </div>
   );
 }
 
