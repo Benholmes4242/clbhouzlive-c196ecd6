@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { ChevronDown, Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -19,17 +19,19 @@ import type { PlaceChoice, PlaceNode } from './coursesSearch';
  * long. ONLY PLACES WITH CONTENT APPEAR — the tree handed in is already filtered
  * to the candidate rule (see coursesSearch.placeTree).
  */
-export function RegionDropdown({
-  tree,
-  choice,
-  onChoose,
-}: {
+export interface RegionDropdownHandle {
+  /** Open the picker panel (a doorway from the nation list). */
+  open: () => void;
+}
+
+export const RegionDropdown = forwardRef<RegionDropdownHandle, {
   tree: PlaceNode[];
   choice: PlaceChoice | null;
   onChoose: (next: PlaceChoice | null) => void;
-}) {
+}>(function RegionDropdown({ tree, choice, onChoose }, ref) {
   const { t } = useTranslation('courses');
   const [open, setOpen] = useState(false);
+  useImperativeHandle(ref, () => ({ open: () => setOpen(true) }), []);
   const [find, setFind] = useState('');
 
   const filtered = useMemo(() => {
@@ -201,6 +203,6 @@ function PlaceRow({
       ) : null}
     </button>
   );
-}
+});
 
 export default RegionDropdown;
