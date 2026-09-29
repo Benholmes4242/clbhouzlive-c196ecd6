@@ -20,7 +20,7 @@ import type { TFunction } from 'i18next';
  * ever arrives this returns null rather than inventing a line.
  */
 
-export type CourseEventKind = 'ratings' | 'low' | 'stable';
+export type CourseEventKind = 'record' | 'ratings' | 'low' | 'stable';
 
 export interface CourseHeadlineFacts {
   event?: CourseEventKind | null;
@@ -35,6 +35,7 @@ export interface CourseHeadlineFacts {
 
 /** The ordering weight the event carries. Ordering only, never rendered. */
 export function courseEventStrength(event: CourseEventKind, burstCount?: number | null): number {
+  if (event === 'record') return 4;
   if (event === 'ratings') return 2 + Math.min(burstCount ?? 0, 12) / 12;
   if (event === 'low') return 1;
   return 0;
@@ -45,6 +46,17 @@ export function courseHeadline(t: TFunction, facts: CourseHeadlineFacts): string
   const rating = facts.rating ?? null;
   const ratingCount = facts.ratingCount ?? 0;
 
+  /* RECORD (BRIEF_COURSE_RECORD_EVENT): low_gross/low_by carry the record's
+   * gross and holder, switched at source. lowBy is null when the record is
+   * joint - co-holders are never named - so the figure prints alone. No date. */
+  if (facts.event === 'record' && facts.lowGross != null) {
+    return facts.lowBy
+      ? t('amateur.stream.course.eventRecord', 'Course record — {{name}} shot {{gross}} here.', {
+          name: facts.lowBy,
+          gross: facts.lowGross,
+        })
+      : t('amateur.stream.course.eventRecordJoint', 'Course record — {{gross}}.', { gross: facts.lowGross });
+  }
   if (facts.event === 'ratings' && (facts.burstCount ?? 0) >= 2 && facts.burstMean != null) {
     return t('amateur.stream.course.eventRatings', '{{count}} ratings this month, averaging {{mean}}.', {
       count: facts.burstCount,

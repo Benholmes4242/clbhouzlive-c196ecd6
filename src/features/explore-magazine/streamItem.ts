@@ -174,7 +174,7 @@ export interface StreamFacts {
   low_by?: string | null;
   ratings_burst_n?: number | null;
   ratings_burst_mean?: number | null;
-  course_event?: 'ratings' | 'low' | 'stable' | null;
+  course_event?: 'record' | 'ratings' | 'low' | 'stable' | null;
 }
 
 
