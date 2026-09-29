@@ -12,6 +12,14 @@
  * what it returns. Implementing this twice is how the two surfaces start
  * disagreeing about the same golf course.
  *
+ * THIS HELPER MEASURES DIFFICULTY, NOT A STROKE INDEX. avg_to_par is
+ * pooled across every handicap. A stroke index is the GAP between the
+ * under-9 and 15-and-above bands, which is si_should_be in
+ * get_club_course_analytics and needs a per-band sample this helper
+ * neither has nor checks. Never word this ladder's output as a verdict
+ * on a club's card, and never feed pooled avg_to_par into anything
+ * described as a stroke index recommendation.
+ *
  * DEBT, NAMED NOT FIXED: get_club_course_analytics also returns `places_gap`
  * and `shots_gap`, added in an earlier pass. They are now REDUNDANT — this
  * helper computes both — and they are DELIBERATELY NOT READ anywhere. The

@@ -9,8 +9,10 @@
  *   verdict strip, WHERE YOUR INDEX DISAGREES, THE SAMPLE, HOLE BY HOLE,
  *   STROKE INDEX CHECK (locked), WHAT GETS MADE HERE, THE COURSE RECORD,
  *   YOUR TEES, WHEN MEMBERS PLAY, WHO PLAYS HERE, COMPETITION OR SOCIAL.
- * The ladder leads deliberately: it is the one thing on this page no other
- * product can show a club, and it is readable in two seconds.
+ * The ladder leads because it is the richest thing that renders on the samples
+ * clubs currently have. It is a DIFFICULTY order, not a stroke index verdict:
+ * the Stroke index check below is the one that measures the card, and it is
+ * that check which is the thing on this page no other product can show a club.
  *
  * FOUR RULES CARRIED FORWARD:
  *   - ZERO IS A FACT. A club with no albatrosses renders 0. The dash is
