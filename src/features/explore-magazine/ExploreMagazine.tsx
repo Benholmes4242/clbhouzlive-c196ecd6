@@ -403,7 +403,7 @@ function VideosShelf({
   );
 }
 
-function MomentsShelf({ pos, onOpenCommunity }: { pos: number; onOpenCommunity: () => void }) {
+function MomentsShelf({ pos, onDepart, onOpenCommunity }: { pos: number; onDepart: () => void; onOpenCommunity: () => void }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const moments = useMomentsOfTheWeek(30, { enabled: true, candidateLimit: 72 });
@@ -1681,7 +1681,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     pos={pos}
                   />
                 ) : (
-                  <MomentsShelf pos={pos} onOpenCommunity={openCommunity} />
+                  <MomentsShelf pos={pos} onDepart={depart} onOpenCommunity={openCommunity} />
                 )}
     </>
   );
