@@ -1173,7 +1173,6 @@ export function ExploreCard({
             display: 'flex', alignItems: 'center', gap: 26,
             marginTop: 12, paddingTop: 11,
             borderTop: '1px solid rgba(255,255,255,0.20)',
-            paddingRight: reviewMedia?.kind === 'video' ? 52 : 0,
           }}
         >
           <ReactionAction
@@ -1183,7 +1182,9 @@ export function ExploreCard({
             figureSize={celebrateFigureSize(19)}
             count={engagement.likeCount}
             reacted={engagement.liked}
-            readOnly={item.who?.is_viewer ?? false}
+            /* DELIBERATE, differs from the round card: a round's clap stays
+               read-only on your own round; a review's helpful does not. */
+            readOnly={false}
             hidden={!engagement.likeAvailable}
             onToggle={() => engagement.onToggleLike?.()}
             label={engagement.liked ? 'Marked helpful' : 'Mark this review helpful'}
@@ -1253,7 +1254,7 @@ export function ExploreCard({
         <span
           aria-hidden
           data-explore-review-scrim="true"
-          style={{ position: 'absolute', inset: 0, background: HERO_REVIEW_SCRIM, zIndex: 1 }}
+          style={{ position: 'absolute', inset: 0, background: HERO_REVIEW_SCRIM, zIndex: 1, pointerEvents: 'none' }}
         />
       ) : null}
       {/* BRIEF_EXPLORE_REVIEW_TILE_VIDEO §3 — A REVIEW VIDEO AUTOPLAYS, muted and
@@ -1269,7 +1270,6 @@ export function ExploreCard({
         <ReviewVideoLayer
           hlsUrl={reviewMedia.url}
           posterUrl={reviewMedia.posterUrl}
-          durationS={reviewMedia.durationS}
         />
       ) : leadReview && (item.facts.photoCount ?? 0) > 1 ? (
         <GlassBadge style={{ position: 'absolute', top: 8, right: 8, left: 'auto', bottom: 'auto', zIndex: 3 }}>
@@ -1283,7 +1283,7 @@ export function ExploreCard({
         <span
           aria-hidden
           data-explore-story-scrim="true"
-          style={{ position: 'absolute', inset: 0, background: HERO_STORY_SCRIM, zIndex: 1 }}
+          style={{ position: 'absolute', inset: 0, background: HERO_STORY_SCRIM, zIndex: 1, pointerEvents: 'none' }}
         />
       ) : null}
       {onPhoto ? (
@@ -1309,7 +1309,7 @@ export function ExploreCard({
               <span
                 aria-hidden
                 data-explore-copy-scrim="true"
-                style={{ position: 'absolute', inset: 0, background: HERO_COPY_SCRIM, zIndex: 0 }}
+                style={{ position: 'absolute', inset: 0, background: HERO_COPY_SCRIM, zIndex: 0, pointerEvents: 'none' }}
               />
             )}
             <span
@@ -1337,6 +1337,7 @@ export function ExploreCard({
               style={{
                 position: 'relative',
                 zIndex: 1,
+                pointerEvents: 'none',
                 height: hasVisual ? band + 12 : 16,
                 display: 'flex',
                 alignItems: 'flex-end',
