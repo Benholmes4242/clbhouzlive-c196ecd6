@@ -516,12 +516,6 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
       cells.push(
         <HeroStatCell key="pb" label={t('courseHero.yourPb')} value={String(courseStats.your_best)} />
       );
-    } else if (courseStats.harder_than_pct != null) {
-      cells.push(
-        <span key="harder" style={CELL_LABEL}>
-          {t('courseHero.harderThan', { pct: Math.round(courseStats.harder_than_pct) })}
-        </span>
-      );
     }
   }
   if (communityRating != null) {
