@@ -56,6 +56,8 @@ export interface LikedByRowProps {
   style?: React.CSSProperties;
   /** Line type size; default 13 (Clubhouse FeedCard, ReviewBottomSheet, scorecard). */
   fontSize?: number;
+  /** Line colour; default the dark-canvas 0.65 slate. Pass an on-photo value over photography. */
+  color?: string;
   /** Line weight; default 500. */
   fontWeight?: number;
   /** 1 (default) = single line with ellipsis; 2 = wraps, clamped to two (stacked feed cards). */
@@ -74,6 +76,7 @@ export function LikedByRow({
   fontSize = 13,
   fontWeight = 500,
   lines = 1,
+  color = 'rgba(248,250,252,0.65)',
 }: LikedByRowProps) {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
@@ -148,7 +151,7 @@ export function LikedByRow({
           style={{
             fontSize,
             fontWeight,
-            color: 'rgba(248,250,252,0.65)',
+            color,
             ...(lines === 2
               ? { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }
               : { whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }),

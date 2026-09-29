@@ -9,8 +9,8 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MessageCircle } from 'lucide-react';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 import { CALLOUT_SUBTEXT } from './AchievementCallout';
-import ClapIcon from '@/components/icons/ClapIcon';
-import { CELEBRATE_GLYPH_SIZE, celebrateFigureSize } from '@/lib/reactionKind';
+import { CELEBRATE_GLYPH_SIZE, celebrateFigureSize, reactionGlyph, type ReactionKind } from '@/lib/reactionKind';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { ReviewVideoLayer } from './ReviewVideoLayer';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
@@ -70,6 +70,8 @@ import type { ReviewBreakdown } from './useReviewPageEnrichment';
 export type CardSize = 'lead' | 'std' | 'pair';
 
 export interface RoundCardEngagement {
+  /** Which reaction this is — drives the glyph via reactionGlyph(). Absent = 'celebrate' (rounds). */
+  kind?: ReactionKind;
   likeCount: number;
   liked: boolean;
   likeAvailable: boolean;
@@ -426,6 +428,15 @@ function WhoLine({
     event.stopPropagation();
     event.preventDefault();
   };
+  /* The glyph comes from reactionGlyph(), never hardcoded: a review handed an
+     engagement object must show the thumb, not the clap. */
+  const reactionKind: ReactionKind = engagement?.kind ?? 'celebrate';
+  const Glyph = reactionGlyph(reactionKind);
+  const helpful = reactionKind === 'helpful';
+  const likeLabel = helpful
+    ? (engagement?.liked ? 'Marked helpful' : 'Mark this review helpful')
+    : engagement?.liked ? t('discover.reactions.celebrated', 'Celebrated') : t('discover.reactions.action', 'Celebrate this round');
+  const likeColour = engagement?.liked ? A.AMBER : subColor;
 
   const reactions = showActions ? (
     <span
@@ -441,16 +452,16 @@ function WhoLine({
     >
       {engagement?.likeAvailable && (!pair || showPairLike) ? (
         pair ? (
-          <span aria-label={engagement.liked ? t('discover.reactions.celebrated', 'Celebrated') : t('discover.reactions.action', 'Celebrate this round')} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: engagement.liked ? A.AMBER : subColor }}>
-            <ClapIcon size={14} aria-hidden />
+          <span aria-label={likeLabel} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: engagement.liked ? A.AMBER : subColor }}>
+            <Glyph size={14} strokeWidth={2} fill={engagement.liked && helpful ? likeColour : 'none'} color={likeColour} aria-hidden />
             <span style={countStyle}>{engagement.likeCount}</span>
           </span>
         ) : (
-          <span role="button" tabIndex={0} aria-pressed={engagement.liked} aria-label={engagement.liked ? t('discover.reactions.celebrated', 'Celebrated') : t('discover.reactions.action', 'Celebrate this round')}
+          <span role="button" tabIndex={0} aria-pressed={engagement.liked} aria-label={likeLabel}
             onClick={(event) => { stop(event); engagement.onToggleLike?.(); }}
             onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); engagement.onToggleLike?.(); }}
             style={{ minWidth: 44, height: 44, margin: '-6px 0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? A.AMBER : subColor, cursor: 'pointer' }}>
-            <ClapIcon size={CELEBRATE_GLYPH_SIZE} aria-hidden />
+            <Glyph size={CELEBRATE_GLYPH_SIZE} strokeWidth={2} fill={engagement.liked && helpful ? likeColour : 'none'} color={likeColour} aria-hidden />
             {engagement.likeCount > 0 ? <span style={countStyle}>{engagement.likeCount}</span> : null}
           </span>
         )
@@ -536,8 +547,8 @@ function WhoLine({
           <LikedByRow
             postId={engagement.reactionSubjectId}
             count={engagement.likeCount}
-            source="round"
-            kind="celebrate"
+            source={helpful ? 'review' : 'round'}
+            kind={helpful ? 'helpful' : 'celebrate'}
             ownerName={engagement.ownerName ?? null}
             isOwnRound={engagement.isOwnRound ?? false}
             style={{ marginTop: 8 }}
@@ -1152,6 +1163,76 @@ export function ExploreCard({
         </span>
       </span>
       <ReviewStatStrip breakdown={item.facts.breakdown} />
+      {/* BRIEF_REVIEW_TILE_ACTIONS §2 — its own line under the stat strip.
+          gap 26 = two ±13px hit boxes abutting. A review video reserves the
+          bottom-right duration badge (which never moves). */}
+      {engagement ? (
+        <span
+          data-review-actions="true"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 26,
+            marginTop: 12, paddingTop: 11,
+            borderTop: '1px solid rgba(255,255,255,0.20)',
+            paddingRight: reviewMedia?.kind === 'video' ? 52 : 0,
+          }}
+        >
+          <ReactionAction
+            kind="helpful"
+            tone="glass"
+            size={19}
+            figureSize={celebrateFigureSize(19)}
+            count={engagement.likeCount}
+            reacted={engagement.liked}
+            readOnly={item.who?.is_viewer ?? false}
+            hidden={!engagement.likeAvailable}
+            onToggle={() => engagement.onToggleLike?.()}
+            label={engagement.liked ? 'Marked helpful' : 'Mark this review helpful'}
+          />
+          {engagement.commentAvailable ? (
+            <span
+              role="button"
+              tabIndex={0}
+              aria-label={`Comments, ${engagement.commentCount}`}
+              onClick={(ev) => { ev.stopPropagation(); ev.preventDefault(); engagement.onOpenComments?.(); }}
+              onKeyDown={(ev) => {
+                if (ev.key !== 'Enter' && ev.key !== ' ') return;
+                ev.stopPropagation(); ev.preventDefault(); engagement.onOpenComments?.();
+              }}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '13px 13px', margin: '-13px -13px',
+                color: 'rgba(255,255,255,0.72)', cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <MessageCircle size={19} strokeWidth={2} aria-hidden />
+              {engagement.commentCount > 0 ? (
+                <span style={{
+                  fontFamily: SANS, fontSize: celebrateFigureSize(19), fontWeight: 700, lineHeight: 1,
+                  fontVariantNumeric: 'tabular-nums lining-nums', textShadow: HERO_TEXT_SHADOW,
+                }}>
+                  {engagement.commentCount}
+                </span>
+              ) : null}
+            </span>
+          ) : null}
+          {engagement.reactionSubjectId && engagement.likeCount > 0 ? (
+            <span style={{ marginLeft: 'auto', minWidth: 0, flex: '0 1 auto' }}>
+              <LikedByRow
+                postId={engagement.reactionSubjectId}
+                count={engagement.likeCount}
+                source="review"
+                kind="helpful"
+                lines={1}
+                fontSize={11}
+                fontWeight={600}
+                color="rgba(255,255,255,0.72)"
+                style={{ textShadow: HERO_TEXT_SHADOW }}
+              />
+            </span>
+          ) : null}
+        </span>
+      ) : null}
     </span>
   ) : null;
 
