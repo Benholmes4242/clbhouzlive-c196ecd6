@@ -49,6 +49,12 @@ interface Props {
   reserveCount?: boolean;
   /** 'celebrate' on ROUNDS (clap), 'like' elsewhere (heart). See lib/reactionKind. */
   kind?: ReactionKind;
+  /** ASYMMETRIC HIT AREA (BRIEF_WATCH_VIDEO_ROW_REACTIONS §3).
+   *  'center' (default) keeps the symmetric 44px box every card footer
+   *  uses. 'down' grows the box downward instead, for a control that sits
+   *  on a meta line with tappable content directly above it: a centred box
+   *  there reaches into the title and steals the card's own tap. */
+  hitBias?: 'center' | 'down';
 }
 
 export function ReactionAction({
@@ -63,6 +69,7 @@ export function ReactionAction({
   figureSize: figureSizeProp,
   reserveCount = false,
   kind = 'like',
+  hitBias = 'center',
 }: Props) {
   if (hidden) return null;
   // DEFAULT stays 15 for every heart; a celebrate with no explicit size takes
@@ -140,8 +147,13 @@ export function ReactionAction({
         fontFamily: SANS,
         cursor: 'pointer',
         // 44px tap target without a layout footprint.
-        padding: `${padY}px ${padX}px`,
-        margin: `-${padY}px -${padX}px`,
+        ...(hitBias === 'down'
+          ? (() => {
+              const padTop = 8;
+              const padBottom = Math.max(44 - size - padTop, 13);
+              return { padding: `${padTop}px 8px ${padBottom}px`, margin: `-${padTop}px 0 -${padBottom}px` };
+            })()
+          : { padding: `${padY}px ${padX}px`, margin: `-${padY}px -${padX}px` }),
         WebkitTapHighlightColor: 'transparent',
       }}
     >

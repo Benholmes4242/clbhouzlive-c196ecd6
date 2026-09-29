@@ -1,3 +1,4 @@
+import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { r } from '@/lib/radius';
@@ -13,6 +14,10 @@ import type { HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { formatRelativeAgo } from '@/i18n/format';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { getThumbnailUrl } from '@/utils/thumbnail';
+import { MessageCircle } from 'lucide-react';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
+import { reactionKindFor } from '@/lib/reactionKind';
 
 /**
  * THE LONG-FORM VIDEO UNIT — ONE UNIT, TWO SIZES (BRIEF_EXPLORE_ALL_VIDEO).
@@ -185,6 +190,7 @@ export function VideoCard({
   size = 'full',
   context = 'watch',
   autoplay = size === 'full',
+  engagement,
 }: {
   row: HubRpcRow;
   onPress: () => void;
@@ -195,6 +201,9 @@ export function VideoCard({
    *  would compete with the full-width card for the page's one stream, and win
    *  it whenever the rail happened to be nearer the viewport centre. */
   autoplay?: boolean;
+  /** ROW REACTIONS (BRIEF_WATCH_VIDEO_ROW_REACTIONS). Optional and only passed
+   *  by the Watch feed's full-width rows; the All rail never passes it. */
+  engagement?: VideoRowEngagement;
 }) {
   const { t } = useTranslation('courses');
   const rail = size === 'rail';
@@ -324,25 +333,105 @@ export function VideoCard({
                 {who}
               </span>
             ) : null
-          ) : meta ? (
-            <span
-              style={{
-                display: 'block',
-                marginTop: 3,
-                fontSize: 11.5,
-                fontWeight: 500,
-                color: A.MUTE,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {meta}
+          ) : (meta || engagement) ? (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3 }}>
+              <span
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: 11.5,
+                  fontWeight: 500,
+                  color: A.MUTE,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {meta}
+              </span>
+              {engagement ? (
+                <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 0, marginRight: -8 }}>
+                  <ReactionAction
+                    kind={reactionKindFor({ isRound: false, isReview: !!(row.source_review_id || row.review_id) })}
+                    count={engagement.likeCount}
+                    reacted={engagement.liked}
+                    onToggle={engagement.onToggleLike}
+                    readOnly={engagement.own}
+                    hidden={!engagement.likeAvailable}
+                    tone="ink"
+                    hitBias="down"
+                    label={
+                      engagement.liked
+                        ? t('amateur.watch.liked', 'Liked')
+                        : t('amateur.watch.likeVideo', 'Like this video')
+                    }
+                  />
+                  <VideoCommentAction
+                    count={engagement.commentCount}
+                    onOpen={engagement.onOpenComments}
+                    label={t('amateur.watch.comments', 'Comments, {{count}}', { count: engagement.commentCount })}
+                  />
+                </span>
+              ) : null}
             </span>
           ) : null}
         </span>
       </div>
     </button>
+  );
+}
+
+export interface VideoRowEngagement {
+  likeAvailable: boolean;
+  liked: boolean;
+  likeCount: number;
+  own: boolean;
+  onToggleLike: () => void;
+  commentCount: number;
+  onOpenComments: () => void;
+}
+
+/** Comment control for the meta line: same downward-biased 44px-tall hit area
+ *  as the like (hitBias 'down'), glyph alone at zero, never amber. */
+function VideoCommentAction({ count, onOpen, label }: { count: number; onOpen: () => void; label: string }) {
+  const stop = (ev: React.SyntheticEvent) => {
+    ev.stopPropagation();
+    ev.preventDefault();
+  };
+  const size = 15;
+  const padTop = 8;
+  const padBottom = Math.max(44 - size - padTop, 13);
+  return (
+    <span
+      role="button"
+      tabIndex={0}
+      aria-label={label}
+      onClick={(ev) => {
+        stop(ev);
+        onOpen();
+      }}
+      onKeyDown={(ev) => {
+        if (ev.key !== 'Enter' && ev.key !== ' ') return;
+        stop(ev);
+        onOpen();
+      }}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: count > 0 ? 5 : 0,
+        cursor: 'pointer',
+        padding: `${padTop}px 8px ${padBottom}px`,
+        margin: `-${padTop}px 0 -${padBottom}px`,
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
+      <MessageCircle size={size} strokeWidth={2} color={A.MUTE} fill="none" aria-hidden />
+      {count > 0 ? (
+        <span className="tabular-nums" style={{ ...FIGS, fontSize: 11.5, fontWeight: 700, color: A.MUTE, lineHeight: 1 }}>
+          {count}
+        </span>
+      ) : null}
+    </span>
   );
 }
 
