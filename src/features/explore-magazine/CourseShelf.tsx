@@ -121,23 +121,6 @@ function sublineFor(
     }
   }
   if (row.area) parts.push(row.area);
-  /* The sample only where there is no event — event plus area is already two
-     parts, and the panel clamps at two lines on a 180px tile. */
-  if (parts.length < 2) {
-    if (row.ratingCount > 0) {
-      parts.push(
-        row.ratingCount === 1
-          ? t('amateur.stream.oneGolfer', '1 golfer')
-          : t('amateur.stream.golferCount', '{{n}} golfers', { n: row.ratingCount }),
-      );
-    } else if (row.rounds > 0) {
-      parts.push(
-        row.rounds === 1
-          ? t('amateur.stream.oneRound', '1 round')
-          : t('amateur.stream.roundCountN', '{{n}} rounds', { n: row.rounds }),
-      );
-    }
-  }
   return parts.join(' \u00B7 ');
 }
 
