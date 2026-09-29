@@ -19802,6 +19802,17 @@ export type Database = {
         }
         Returns: Json
       }
+      get_business_reviews_v2: {
+        Args: {
+          p_business_id: string
+          p_course_id?: string
+          p_filter?: string
+          p_limit?: number
+          p_offset?: number
+          p_sort?: string
+        }
+        Returns: Json
+      }
       get_championship_dispatches: {
         Args: { p_limit?: number }
         Returns: {

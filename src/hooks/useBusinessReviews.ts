@@ -47,15 +47,25 @@ export interface BusinessReviewsSummary {
   distribution: Array<{ bucket: number; count: number }>;
 }
 
+export interface BusinessReviewCourse {
+  course_id: string;
+  course_name: string;
+  count: number;
+}
+
 export interface BusinessReviewsResult {
   reviews: BusinessReview[];
   summary: BusinessReviewsSummary;
+  /** Every course under the club, busiest first, including zero-review courses. */
+  courses: BusinessReviewCourse[];
 }
 
 interface UseBusinessReviewsOpts {
   filter?: BusinessReviewFilter;
   sort?: BusinessReviewSort;
   limit?: number;
+  /** null = whole club. Scopes both reviews and summary. */
+  courseId?: string | null;
 }
 
 const EMPTY_SUMMARY: BusinessReviewsSummary = {
@@ -91,25 +101,34 @@ export function useBusinessReviews(
   const filter = opts.filter ?? 'all';
   const sort = opts.sort ?? 'recent';
   const limit = opts.limit ?? 100;
+  const courseId = opts.courseId ?? null;
 
   return useQuery({
-    queryKey: ['business-reviews', businessId, filter, sort, limit],
+    queryKey: ['business-reviews', businessId, filter, sort, limit, courseId],
     enabled: !!businessId,
     staleTime: 60 * 1000,
     queryFn: async (): Promise<BusinessReviewsResult> => {
-      if (!businessId) return { reviews: [], summary: EMPTY_SUMMARY };
-      const { data, error } = await supabase.rpc('get_business_reviews', {
+      if (!businessId) return { reviews: [], summary: EMPTY_SUMMARY, courses: [] };
+      const { data, error } = await (supabase.rpc as any)('get_business_reviews_v2', {
         p_business_id: businessId,
         p_filter: filter,
         p_sort: sort,
         p_limit: limit,
         p_offset: 0,
+        p_course_id: courseId,
       });
       if (error) throw error;
       const raw = (data as any) || {};
       return {
         reviews: Array.isArray(raw.reviews) ? raw.reviews : [],
         summary: normalizeSummary(raw.summary),
+        courses: Array.isArray(raw.courses)
+          ? raw.courses.map((c: any) => ({
+              course_id: String(c.course_id),
+              course_name: String(c.course_name ?? ''),
+              count: Number(c.count) || 0,
+            }))
+          : [],
       };
     },
   });
