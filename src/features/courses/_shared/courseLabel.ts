@@ -31,3 +31,21 @@ export function shortCourseName(name: string, max = 26): string {
 
   return (paren ? `${clipped} ${paren}` : clipped).trim();
 }
+
+/**
+ * NAMING A COURSE INSIDE A KNOWN CLUB. Every option on a club's own
+ * course switcher shares the same stem, so the stem is the noise and
+ * the parenthetical is the whole signal — the exact inverse of
+ * shortCourseName above, which is for naming a course among many
+ * clubs. Use this ONLY where the club is already established by the
+ * surrounding context.
+ *   'Sundridge Park Golf Club (East Course)' -> 'East Course'
+ *   'Eltham Warren Golf Club'                -> 'Eltham Warren Golf Club'
+ * A name with no parenthetical is returned unchanged: a club whose
+ * courses are not parenthesised has nothing to strip, and guessing
+ * would produce an empty chip.
+ */
+export function courseNameWithinClub(name: string): string {
+  const m = name.match(/\(([^()]+)\)/);
+  return (m ? m[1] : name).trim();
+}
