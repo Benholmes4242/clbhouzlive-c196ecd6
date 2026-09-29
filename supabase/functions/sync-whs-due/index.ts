@@ -25,6 +25,53 @@ import {
   decryptVaultSecret,
   enrichScoresWithHoles,
 } from "../_shared/eg-api.ts";
+
+/**
+ * THE SHARED PRE-AUTH TOKEN IS NOT A MEMBER'S CREDENTIAL.
+ *
+ * last_sync_status = 'auth_failed' means "this member's stored England Golf
+ * credential is bad". A missing or expired EG_PREAUTH_TOKEN 401s every
+ * connection at once, and writing that onto each row marked healthy members as
+ * broken and buried the one real signal. So the sweep checks the token FIRST
+ * and, when it is unusable, aborts before touching any connection — no claim,
+ * no status, no consecutive_failures — and records the run as token_unavailable
+ * in app_config (key eg_sync_last_run), which get_eg_sync_health reads.
+ *
+ * "Usable" = present, and if it is a JWT carrying `exp`, not expired (with a
+ * two-minute margin so a token does not die mid-sweep). A token that is not a
+ * JWT is treated as usable: we cannot see its life, so EG decides.
+ */
+const TOKEN_EXPIRY_MARGIN_S = 120;
+function preAuthTokenProblem(): { reason: "missing" | "expired"; expiredAt?: string } | null {
+  const tok = Deno.env.get("EG_PREAUTH_TOKEN");
+  if (!tok || !tok.trim()) return { reason: "missing" };
+  const raw = tok.trim().replace(/^Bearer\s+/i, "");
+  const parts = raw.split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(b64 + "=".repeat((4 - (b64.length % 4)) % 4)));
+    const exp = typeof payload?.exp === "number" ? payload.exp : null;
+    if (exp != null && exp - TOKEN_EXPIRY_MARGIN_S <= Date.now() / 1000) {
+      return { reason: "expired", expiredAt: new Date(exp * 1000).toISOString() };
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+const RUN_RECORD_KEY = "eg_sync_last_run";
+async function recordRun(admin: SupabaseClient, record: Record<string, unknown>): Promise<void> {
+  try {
+    const { error } = await admin
+      .from("app_config")
+      .upsert({ key: RUN_RECORD_KEY, value: JSON.stringify(record), updated_at: new Date().toISOString() }, { onConflict: "key" });
+    if (error) console.error("[sync-due] run record write failed:", error);
+  } catch (err) {
+    console.error("[sync-due] run record write threw:", err);
+  }
+}
 import { snapshotCounterFlags, requeueCounterFlips } from "../_shared/counter-requeue.ts";
 
 
@@ -497,6 +544,21 @@ Deno.serve(async (req) => {
     const includePoisoned = url.searchParams.get("includePoisoned") === "true";
     const admin = adminClient();
 
+    // TOKEN GATE — before any connection is read, claimed or written.
+    const tokenProblem = preAuthTokenProblem();
+    if (tokenProblem) {
+      console.warn(`[sync-due ${runId}] ABORT token_unavailable reason=${tokenProblem.reason}${tokenProblem.expiredAt ? ` expired_at=${tokenProblem.expiredAt}` : ""}`);
+      await recordRun(admin, {
+        run_id: runId,
+        at: new Date().toISOString(),
+        outcome: "token_unavailable",
+        reason: tokenProblem.reason,
+        token_expired_at: tokenProblem.expiredAt ?? null,
+      });
+      logSummary("abort=token_unavailable");
+      return Response.json({ ok: false, runId, error: "token_unavailable", reason: tokenProblem.reason, expiredAt: tokenProblem.expiredAt ?? null }, { status: 503 });
+    }
+
     // Find due connections.
     //
     // Gate retries by consecutive_failures and next_sync_after only — DO NOT
@@ -616,6 +678,15 @@ Deno.serve(async (req) => {
     }
 
     logSummary();
+    await recordRun(admin, {
+      run_id: runId,
+      at: new Date().toISOString(),
+      outcome: "ran",
+      attempted: summary.attempted,
+      succeeded: summary.succeeded,
+      partial: summary.partial,
+      failed: summary.failed + summary.timedOut,
+    });
     return Response.json({
       ok: true,
       processed: results.length,
