@@ -787,7 +787,7 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
             fontFamily: SANS,
             fontSize: 12.5,
             fontWeight: 700,
-            color: A.AMBER,
+            color: A.INK,
             cursor: 'pointer',
           }}
         >
