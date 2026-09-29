@@ -186,7 +186,7 @@ describe('Explore card shapes', () => {
 
   it('keeps every non-review FigureChip on the unchanged inline geometry', () => {
     const { container } = render(
-      <ExploreCard item={round()} size="std" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={round()} size="pair" shape={null} onTap={() => undefined} />,
     );
     const chip = container.querySelector<HTMLElement>('[data-figure-chip="inline"]');
     expect(chip?.style.flexDirection).toBe('row');
