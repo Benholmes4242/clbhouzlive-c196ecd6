@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { A, NUMF, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
-import { PHOTO_REVIEW_LABEL } from '@/styles/photoScrim';
+import { PHOTO_REVIEW_LABEL, SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 import { SHELF_HEADING } from './ExploreShelf';
 import type { NationActivityRow, RegionActivityRow } from './useDiscoveryCounts';
@@ -18,45 +18,19 @@ import type { NationActivityRow, RegionActivityRow } from './useDiscoveryCounts'
 /** Same shadow the other on-photo labels use (CoursesPlayedSection). */
 const ON_PHOTO_SHADOW = '0 1px 2px rgba(0,0,0,0.72)';
 
-/** The fact that sends you somewhere: what is left to play. */
-const TILE_META_PRIMARY: CSSProperties = {
-  marginTop: 2,
+/** The tile's one sentence. It WRAPS — no nowrap, no ellipsis: at 193px the
+ *  longest real string ("32 courses, 12 played by you.") lands well inside one
+ *  line, and if a bigger region ever pushes it to two, wrapping is the correct
+ *  failure rather than a clipped word. */
+const TILE_SENTENCE: CSSProperties = {
+  marginTop: 3,
   fontSize: 10,
   fontWeight: 600,
-  lineHeight: 1.3,
+  lineHeight: 1.35,
   color: A.INK,
   textShadow: ON_PHOTO_SHADOW,
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
   ...NUMF,
 };
-
-/** The fact you already know: your own history, one tier quieter.
- *  0.07em tracking is deliberate: mostly digits, 193px column. */
-const TILE_META_QUIET: CSSProperties = {
-  marginTop: 2,
-  fontSize: 9,
-  fontWeight: 700,
-  lineHeight: 1.3,
-  letterSpacing: '0.07em',
-  textTransform: 'uppercase',
-  color: PHOTO_REVIEW_LABEL,
-  textShadow: ON_PHOTO_SHADOW,
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  ...NUMF,
-};
-
-/**
- * LOCAL EXCEPTION TO SCRIM_STANDOUT (BRIEF_REGION_TILE_TWO_LINE_FOOT §3).
- * The canonical gradient goes transparent at 32%; this tile's foot is now
- * three lines tall and reaches 56% of its 104px, so the region name would sit
- * on bare photograph. Same colour and the same construction — only the
- * termination moves, and only for this tile.
- */
-const REGION_TILE_SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.86) 0%, rgba(10,14,10,0) 56%)';
 
 function Heading({ children }: { children: string }) {
   return <div style={{ ...SHELF_HEADING, padding: '0 16px', marginBottom: 10 }}>{children}</div>;
@@ -81,7 +55,7 @@ export function RegionGrid({ rows, onPress }: { rows: RegionActivityRow[] | null
             ) : (
               <CourseImageFallback />
             )}
-            <div aria-hidden style={{ position: 'absolute', inset: 0, background: REGION_TILE_SCRIM }} />
+            <div aria-hidden style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
             <div style={{ position: 'absolute', left: 10, right: 10, bottom: 9 }}>
               <div
                 style={{
@@ -91,24 +65,19 @@ export function RegionGrid({ rows, onPress }: { rows: RegionActivityRow[] | null
               >
                 {row.region}
               </div>
-              {row.played === 0 ? (
-                <div style={TILE_META_PRIMARY}>
-                  {t('amateur.discovery.activeCourses', '{{count}} courses', { count: row.active })}
-                </div>
-              ) : row.played >= row.active ? (
-                <div style={TILE_META_PRIMARY}>
-                  {t('amateur.discovery.playedAll', "You've played all {{count}}", { count: row.active })}
-                </div>
-              ) : (
-                <>
-                  <div style={TILE_META_PRIMARY}>
-                    {t('amateur.discovery.toDiscover', '{{count}} to discover', { count: row.toDiscover })}
-                  </div>
-                  <div style={TILE_META_QUIET}>
-                    {t('amateur.discovery.playedOf', 'played {{played}} of {{active}}', { played: row.played, active: row.active })}
-                  </div>
-                </>
-              )}
+              <div style={TILE_SENTENCE}>
+                {row.active === 1
+                  ? t('amateur.discovery.regionOneCourse', '1 course,')
+                  : t('amateur.discovery.regionNCourses', '{{n}} courses,', { n: row.active })}
+                <span style={{ color: PHOTO_REVIEW_LABEL }}>
+                  {' '}
+                  {row.played === 0
+                    ? t('amateur.discovery.regionPlayedNone', 'none played yet.')
+                    : row.played >= row.active
+                      ? t('amateur.discovery.regionPlayedAll', 'all played by you.')
+                      : t('amateur.discovery.regionPlayedSome', '{{n}} played by you.', { n: row.played })}
+                </span>
+              </div>
             </div>
           </button>
         ))}
