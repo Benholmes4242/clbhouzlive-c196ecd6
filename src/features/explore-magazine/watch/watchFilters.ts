@@ -19,7 +19,7 @@
  *   docs/sql/watch_long_form_played_courses.sql, UNAPPLIED.
  */
 
-export const WATCH_FILTERS = ['all', 'for_you', 'friends', 'your_courses', 'clips', 'videos'] as const;
+export const WATCH_FILTERS = ['all', 'for_you', 'friends', 'your_courses', 'clips', 'videos', 'community'] as const;
 
 export type WatchFilter = (typeof WATCH_FILTERS)[number];
 
@@ -27,6 +27,10 @@ export type WatchFilter = (typeof WATCH_FILTERS)[number];
 export function videoParams(filter: WatchFilter): { mode: string } | null {
   switch (filter) {
     case 'clips':
+      return null;
+    /* COMMUNITY PHOTOS ARE NEITHER LONG-FORM NOR CLIPS. The chip reads the
+       community moments query instead, so the video feed stands down. */
+    case 'community':
       return null;
     /* NO PLAYED-COURSES MODE EXISTS. Clips only, rather than a page of videos
        that ignore the chip the member just tapped. */
@@ -48,6 +52,10 @@ export function clipParams(filter: WatchFilter): { mode: string; filter?: string
   switch (filter) {
     case 'videos':
       return null;
+    /* COMMUNITY PHOTOS ARE NEITHER LONG-FORM NOR CLIPS — the clips feed stands
+       down too, rather than showing clips under a community chip. */
+    case 'community':
+      return null;
     case 'for_you':
       return { mode: 'for_you' };
     case 'friends':
@@ -67,7 +75,12 @@ export function isClipsOnly(filter: WatchFilter): boolean {
   return filter === 'clips' || filter === 'your_courses';
 }
 
+/** THE COMMUNITY SHAPE: the shared MomentsGrid mosaic (mixed-ratio media). */
+export function isCommunityOnly(filter: WatchFilter): boolean {
+  return filter === 'community';
+}
+
 /** Community photos have no server search path, so rails stand down on search. */
 export function railsWanted(filter: WatchFilter, searching: boolean): boolean {
-  return !searching && filter !== 'videos' && !isClipsOnly(filter);
+  return !searching && filter !== 'videos' && !isClipsOnly(filter) && !isCommunityOnly(filter);
 }

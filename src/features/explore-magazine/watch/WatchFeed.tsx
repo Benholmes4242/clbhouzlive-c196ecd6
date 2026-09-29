@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
+import { MomentsGrid } from '@/components/explore-tab-new/courseled/MomentsGrid';
 import { RailChips } from '@/components/ui/RailChips';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -18,6 +19,7 @@ import {
   WATCH_FILTERS,
   clipParams,
   isClipsOnly,
+  isCommunityOnly,
   railsWanted,
   videoParams,
   type WatchFilter,
@@ -148,12 +150,21 @@ function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number | st
   );
 }
 
-export function WatchFeed({ userId, onDepart }: { userId: string | undefined; onDepart: () => void }) {
+export function WatchFeed({
+  userId,
+  onDepart,
+  initialFilter = 'all',
+}: {
+  userId: string | undefined;
+  onDepart: () => void;
+  /** Entry selection, e.g. Explore's community see-all opens on 'community'. */
+  initialFilter?: WatchFilter;
+}) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   /* SESSION-SCOPED SELECTION: the chip resets to All on the next visit, so the
      page a member returns to is the page the page is meant to be. */
-  const [filter, setFilter] = useState<WatchFilter>('all');
+  const [filter, setFilter] = useState<WatchFilter>(initialFilter);
   const [draft, setDraft] = useState('');
   const [query, setQuery] = useState('');
 
@@ -169,7 +180,15 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
   const videos = useWatchVideos({ userId, mode: vParams?.mode ?? null, search });
   const clips = useWatchClips({ userId, mode: cParams?.mode ?? null, filter: cParams?.filter, search });
   const rails = railsWanted(filter, searching);
-  const moments = useMomentsOfTheWeek(30, { enabled: rails && !!userId, candidateLimit: 72 });
+  const community = isCommunityOnly(filter);
+  /* COMMUNITY HAS NO SERVER SEARCH PATH: under a search term the chip is hidden
+     and a selected community chip falls back to All — never an unfiltered wall
+     beneath a filter. */
+  useEffect(() => {
+    if (searching && filter === 'community') setFilter('all');
+  }, [searching, filter]);
+  /* ONE QUERY: the community chip reads the same moments the rail reads. */
+  const moments = useMomentsOfTheWeek(30, { enabled: (rails || community) && !!userId, candidateLimit: 72 });
 
   const videoRows = useMemo(
     () => ((videos.data?.pages ?? []).flat() as HubRpcRow[]).filter((row) => !!row?.post_id),
@@ -257,22 +276,26 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
 
   const chips = useMemo(
     () =>
-      WATCH_FILTERS.map((key) => ({
+      WATCH_FILTERS.filter((key) => !(searching && key === 'community')).map((key) => ({
         id: key,
         label:
           key === 'all'
             ? t('amateur.watch.chip.all', 'All')
             : key === 'for_you'
-              ? t('amateur.watch.chip.forYou', 'For you')
+              ? /* Label only. The VALUE stays 'for_you' — it is also the clips
+                   RPC's p_mode string and any stored selection. Do not rename it. */
+                t('amateur.watch.chip.forYou', 'Suggested')
               : key === 'friends'
                 ? t('amateur.watch.chip.friends', 'Friends')
                 : key === 'your_courses'
                   ? t('amateur.watch.chip.yourCourses', 'Your courses')
                   : key === 'clips'
                     ? t('amateur.watch.chip.clips', 'Clips')
-                    : t('amateur.watch.chip.videos', 'Videos'),
+                    : key === 'videos'
+                      ? t('amateur.watch.chip.videos', 'Videos')
+                      : t('amateur.watch.chip.community', 'Community'),
       })),
-    [t],
+    [t, searching],
   );
 
   const clipWindow = (ordinal: number): HubRpcRow[] => {
@@ -345,10 +368,8 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
         seeAllLabel={t('amateur.watch.seeAll', 'See all')}
         onSeeAll={() => {
           analyticsEvents.track('amateur_shelf_see_all', { kind: 'moments', surface: 'watch' });
-          onDepart();
-          /* NOT /community: that route redirects straight to /explore, which
-             would send the member in a circle. */
-          navigate('/media?kind=community');
+          /* SELECTS THE COMMUNITY CHIP IN PLACE — same page, no navigation. */
+          setFilter('community');
         }}
       >
         {window.map((moment) => (
@@ -446,6 +467,7 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
   const videosSettled = !vParams || videos.isFetched;
   const clipsSettled = !cParams || clips.isFetched;
   const nothing =
+    !community &&
     videosSettled &&
     clipsSettled &&
     videoRows.length === 0 &&
@@ -504,7 +526,50 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
         </div>
       ) : null}
 
-      {isClipsOnly(filter) ? (
+      {community ? (
+        moments.isError ? (
+          <ShelfRetry
+            heading={t('amateur.watch.rail.community', 'From the community')}
+            label={t('amateur.stream.failed', 'This did not load.')}
+            action={t('amateur.stream.retry', 'Try again')}
+            onRetry={() => void moments.refetch()}
+          />
+        ) : !moments.isFetched ? (
+          <ShelfShell tileW={320} tileH={240} />
+        ) : momentRows.length === 0 ? (
+          <div style={{ paddingInline: INSET, paddingTop: 8 }}>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
+              {t('amateur.watch.empty', 'Nothing to watch here yet.')}
+            </p>
+          </div>
+        ) : (
+          /* THE EXISTING MOSAIC — the same MomentsGrid Discover and the media
+             library use. Never a third grid, never the 3-up clips grid. */
+          <div style={{ paddingInline: INSET }}>
+            <MomentsGrid
+              moments={momentRows}
+              gap={4}
+              tall={320}
+              radius={10}
+              autoplayGroup="amateur-watch-community"
+              onTilePress={(moment) => {
+                analyticsEvents.track('amateur_watch_tapped', { kind: 'moment', filter });
+                onDepart();
+                openWithOrigin({
+                  posts: [moment.post],
+                  index: 0,
+                  originEl: null,
+                  posterUrl: moment.thumbnail,
+                  mediaIndex: moment.mediaIndex ?? 0,
+                  mediaId: moment.mediaId ?? null,
+                  openedFrom: 'amateur-moments',
+                  forceStartAtZero: true,
+                });
+              }}
+            />
+          </div>
+        )
+      ) : isClipsOnly(filter) ? (
         <>
           {clips.isError ? (
             <ShelfRetry
@@ -537,7 +602,7 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
         </div>
       ) : null}
 
-      {!videosSettled && videoRows.length === 0 && !isClipsOnly(filter) ? (
+      {!videosSettled && videoRows.length === 0 && !isClipsOnly(filter) && !community ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
           <ShelfShell tileW={320} tileH={180} />
           <ShelfShell tileW={320} tileH={180} />
