@@ -53,6 +53,12 @@ function eventOf(item: StreamItem): ListEvent | null {
   }
 
   if (item.kind === 'course') {
+    /* Ordered ABOVE 'low': the two are mutually exclusive at source (the
+       function's CASE tests record first), so this states the precedence
+       rather than relying on the server to be the only guard. */
+    if (f.course_event === 'record' && f.low_gross != null) {
+      return { kind: 'record', strength: STRENGTH.record, gross: f.low_gross };
+    }
     if (f.course_event === 'low' && f.low_gross != null) {
       return { kind: 'low', strength: STRENGTH.low, gross: f.low_gross };
     }
