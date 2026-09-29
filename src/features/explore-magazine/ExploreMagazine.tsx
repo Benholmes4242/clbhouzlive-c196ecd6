@@ -875,7 +875,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     (id: string) => railReviewReactions.stateFor('review', id).count,
     [railReviewReactions],
   );
-  const geography = useCourseGeography(userId, view === 'courses');
+  const courseGeo = useCourseGeography(userId, view === 'courses');
 
 
   /* THE SERVER PAGE IS ALREADY A PAGE. Reveal slicing belongs to the client
@@ -1813,9 +1813,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     onDepart={depart}
                   />
                 ) : shelf === 'regionGrid' ? (
-                  <RegionGrid rows={geography.regions} onPress={() => undefined} />
+                  <RegionGrid rows={courseGeo.regions} onPress={() => undefined} />
                 ) : shelf === 'nationList' ? (
-                  <NationList rows={geography.nations} onPress={() => undefined} />
+                  <NationList rows={courseGeo.nations} onPress={() => undefined} />
                 ) : shelf === 'helpfulReviews' ? (
                   <HelpfulReviewsShelf
                     items={railReviews}
