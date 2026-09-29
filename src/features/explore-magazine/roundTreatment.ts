@@ -21,18 +21,10 @@ import { BIRDIE_HAUL_THRESHOLD } from '@/lib/gam/roundFeats';
  */
 export type RoundTreatment = 'line' | 'none';
 
-/** The cumulative series must TRAVEL this far (min to max, in strokes) for a
- *  round with nothing to mark to still earn a line.
- *
- *  WHY 10 AND NOT 3. Measured across 3,519 eligible 18-hole rounds: 2,845
- *  (81%) drew a line, and only 100 of the drawable ones failed a threshold of
- *  3 — the gate sat BELOW the 10th percentile, so it rejected nothing and
- *  every rounds card looked identical. The span distribution runs
- *  2 / 6 / 10 / 14 / 28 across p10 / p25 / p50 / p75 / max, so 10 is the
- *  MEDIAN: half of the rounds with nothing to mark go quiet, and all 484
- *  markable rounds keep their line and their dots regardless of span.
- *  A trace now means "this round moved", not "this is a round". */
-export const MIN_SHAPE_SPAN = 10;
+/** The shared plot band for every Explore score trace. This is the All-tab
+ *  featured-round hero's established 72px total band minus its 13px end-label
+ *  footer, so ordinary score tiles draw with exactly the same vertical range. */
+export const SCORE_TRACE_PLOT_HEIGHT = 72 - 13;
 
 export interface RoundDot {
   /** Index into HoleShape.series — the cumulative value AFTER the hole, so the
@@ -68,20 +60,13 @@ export function hasMarkableAchievement(item: StreamItem): boolean {
   );
 }
 
-/**
- * First match wins:
- *  - an achievement worth marking  -> line (with dots)
- *  - otherwise a series that travels -> line (no dots)
- *  - otherwise nothing. The photograph and the headline carry the card.
- */
+/** Every score tile with settled hole detail carries its round trace. */
 export function treatmentFor(
-  item: StreamItem,
+  _item: StreamItem,
   shape: HoleShape | null | undefined,
 ): RoundTreatment {
   if (!shape) return 'none';
-  if (hasMarkableAchievement(item)) return 'line';
-  if ((cumulativeSpan(shape) ?? -1) >= MIN_SHAPE_SPAN) return 'line';
-  return 'none';
+  return 'line';
 }
 
 /**
