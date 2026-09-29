@@ -7,12 +7,16 @@
 -- {"outcome":"token_unavailable","reason":"missing|expired",...}. A normal run
 -- writes {"outcome":"ran",...}. Part 2 surfaces that on the board.
 
--- ── PART 1: re-anchor job 87 in place (02/08/14/20 UTC). ─────────────────────
--- Schedule is UTC; the token refresh habit is local, so the margin narrows by an
--- hour after 25 October. 08:00 UTC still clears the morning refresh.
+-- ── PART 1: re-anchor job 87 in place (08/14/22 UTC, three runs a day). ─────
+-- Morning token (set 07:20–07:50 local) reliably covers 06:25–16:25 UTC, so
+-- 08:00 and 14:00 are unconditionally covered. The evening refresh wanders
+-- (12:27–22:23 local over twelve days); 22:00 UTC sits after all but one recent
+-- evening capture and catches the day's play. 02:00 was the worst slot (failed
+-- 4/12) and 20:00 failed 2/12, so both are dropped. alter_job only: no delete,
+-- no recreate, no catch-up job.
 SELECT cron.alter_job(
-  job_id   := (SELECT jobid FROM cron.job WHERE jobname = 'sync-whs-due-every-6h'),
-  schedule := '0 2,8,14,20 * * *'
+  job_id   := 87,
+  schedule := '0 8,14,22 * * *'
 );
 -- Check: SELECT jobid, jobname, schedule FROM cron.job WHERE jobname = 'sync-whs-due-every-6h';
 
@@ -43,3 +47,24 @@ SELECT cron.alter_job(
 --
 -- ── One-off cleanup (optional): rows wrongly marked by the 29 Sep 06:00 run
 -- will clear on the next successful sweep; no data edit is needed.
+
+
+-- ── PART 3: PROVE the app_config write before closing (do not skip). ─────────
+-- The function writes with the service-role client. Service role bypasses RLS
+-- but still needs table privileges:
+--   SELECT has_table_privilege('service_role', 'public.app_config', 'INSERT'),
+--          has_table_privilege('service_role', 'public.app_config', 'UPDATE');
+--   -- if either is false: GRANT INSERT, UPDATE ON public.app_config TO service_role;
+--
+-- Forced no-token run:
+--   1. Note the current EG_PREAUTH_TOKEN, then blank it in Edge Function secrets.
+--   2. Invoke sync-whs-due once (same headers as job 87). Expect HTTP 503,
+--      error "token_unavailable", reason "missing".
+--   3. SELECT value, updated_at FROM app_config WHERE key = 'eg_sync_last_run';
+--      expect outcome token_unavailable, reason missing, updated_at = now-ish.
+--   4. SELECT get_eg_sync_health(); expect status red, token_unavailable true,
+--      token_unavailable_reason 'missing' (requires PART 2 applied); the admin
+--      dashboard should show red with "No token".
+--   5. Restore the token and invoke once more; expect outcome "ran".
+--   If step 3 shows no fresh row, check the function log for
+--   "[sync-due] run record write failed" — that is the denial.

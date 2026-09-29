@@ -38,8 +38,10 @@ import {
  * in app_config (key eg_sync_last_run), which get_eg_sync_health reads.
  *
  * "Usable" = present, and if it is a JWT carrying `exp`, not expired (with a
- * two-minute margin so a token does not die mid-sweep). A token that is not a
- * JWT is treated as usable: we cannot see its life, so EG decides.
+ * two-minute margin so a token does not die mid-sweep). The England Golf
+ * pre-auth token is always a JWT with `exp` (10h life = exp - iat), so the
+ * expiry check is the real gate. The "not a JWT / no exp → usable" branch is a
+ * safety fallback only; nothing relies on it.
  */
 const TOKEN_EXPIRY_MARGIN_S = 120;
 function preAuthTokenProblem(): { reason: "missing" | "expired"; expiredAt?: string } | null {
