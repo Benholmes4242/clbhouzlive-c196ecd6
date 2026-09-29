@@ -65,6 +65,31 @@ SELECT cron.alter_job(
 --   4. SELECT get_eg_sync_health(); expect status red, token_unavailable true,
 --      token_unavailable_reason 'missing' (requires PART 2 applied); the admin
 --      dashboard should show red with "No token".
---   5. Restore the token and invoke once more; expect outcome "ran".
---   If step 3 shows no fresh row, check the function log for
+--   5. EXPIRED PATH (the one that fired on 29 September; different code — JWT
+--      decode plus margin comparison, not a presence check). Uses a GENUINE
+--      expired England Golf token that Ben pastes into Edge Function secrets at
+--      run time. NEVER write any token value into this file or the repo.
+--      a. Snapshot connections first:
+--           CREATE TEMP TABLE eg_conn_before AS
+--           SELECT id, last_sync_status, last_attempted_at, consecutive_failures
+--           FROM whs_connections;
+--      b. Set EG_PREAUTH_TOKEN to the real expired token; invoke sync-whs-due
+--         once. Expect HTTP 503, error "token_unavailable", reason "expired"
+--         (NOT "missing"), plus expiredAt.
+--      c. Connections unchanged — expect zero rows:
+--           SELECT c.id FROM whs_connections c JOIN eg_conn_before b USING (id)
+--           WHERE c.last_sync_status IS DISTINCT FROM b.last_sync_status
+--              OR c.last_attempted_at IS DISTINCT FROM b.last_attempted_at
+--              OR c.consecutive_failures IS DISTINCT FROM b.consecutive_failures;
+--      d. SELECT value, updated_at FROM app_config WHERE key = 'eg_sync_last_run';
+--         expect outcome token_unavailable, reason expired, fresh updated_at.
+--      e. SELECT get_eg_sync_health(); expect token_unavailable true,
+--         token_unavailable_reason 'expired'; board red with that reason.
+--   6. Restore the live token and invoke once more; expect outcome "ran".
+--   If step 3 or 5d shows no fresh row, check the function log for
 --   "[sync-due] run record write failed" — that is the denial.
+--
+-- MARGIN NOTE: the expired check depends on the two-minute margin
+-- (TOKEN_EXPIRY_MARGIN_S = 120). A token whose exp falls within that margin is
+-- treated as EXPIRED, not usable, so it cannot die mid-sweep. Confirmed in
+-- sync-whs-due/index.ts: the comparison is (exp - margin) <= now, not exp <= now.
