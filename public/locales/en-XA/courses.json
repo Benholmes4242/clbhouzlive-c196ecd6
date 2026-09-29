@@ -357,6 +357,7 @@
         "videos": "[!! Videos !!]"
       },
       "searchPlaceholder": "[!! Search videos, clips and creators !!]",
+      "seeAll": "[!! See all !!]",
       "untitled": "[!! Untitled video !!]"
     }
   },
