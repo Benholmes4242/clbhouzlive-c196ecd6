@@ -435,7 +435,7 @@ describe('Explore card shapes', () => {
     );
     expect(container.querySelector('[data-explore-kicker="true"]')).toBeNull();
     expect(container.querySelector('[data-round-identity-meta="true"]')).toBeNull();
-    expect(container.querySelector('[data-round-identity-course="true"]')?.textContent).toBe('The Addington Golf Club');
+    expect(container.querySelector('[data-round-photo-course="true"]')?.textContent).toBe('The Addington Golf Club');
     expect(container.querySelector('[data-round-identity-date="true"]')?.textContent).toBeTruthy();
   });
 

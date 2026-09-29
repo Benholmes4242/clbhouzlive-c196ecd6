@@ -36,6 +36,7 @@ import { handicapPairDisplay } from './circleHandicap';
 import { NUMF } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { ReviewBreakdown } from './useReviewPageEnrichment';
+import { useFitOneLine } from './useFitOneLine';
 
 
 /**
@@ -552,14 +553,11 @@ function WhoLine({
         <div data-round-identity-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 8, marginTop: 12 }}>
           {avatar}
           <span style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0, gap: 2 }}>
-            <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
-              <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: '0 1 auto' }}>{name}</span>
-              {roundIdentity.date ? (
-                <span data-round-identity-date="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.DIM, whiteSpace: 'nowrap', marginLeft: 'auto', flex: '0 0 auto' }}>{roundIdentity.date}</span>
-              ) : null}
-            </span>
-            {roundIdentity.course ? (
-              <span data-round-identity-course="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{roundIdentity.course}</span>
+            <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{name}</span>
+            {/* Place -> who -> when: the course now lives on the photograph, so the
+                date takes its line and its material (A.MUTE, not A.DIM). */}
+            {roundIdentity.date ? (
+              <span data-round-identity-date="true" style={{ ...NUMF, fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{roundIdentity.date}</span>
             ) : null}
           </span>
         </div>
@@ -814,11 +812,19 @@ export function ExploreCard({
   });
   const chips = chipsFor(item, t as never, locale, size);
   /* §2 SHAPE IS DECIDED BY KIND, NOTHING ELSE. A REVIEW and an ILLUSTRATED
-     STORY are text ON the photograph at every position; a ROUND is text UNDER
-     it at every position. There is no earned treatment and position 0 is not
-     special. The predicate lives in cardTreatment.ts because ExploreMagazine
+     STORY are text ON the photograph at every position; a ROUND's text
+     BLOCK — headline, figures, identity, reactions — is UNDER it at every
+     position. There is no earned treatment and position 0 is not special.
+     AMENDED 29 Sep 2026 (Ben): a round carries ONE caption on the
+     photograph, its course name, top left over a cap scrim. It is at the
+     TOP because the trace and its end labels own the foot, which is where
+     FeaturedRoundCard puts the same fact. It is a label on the picture,
+     not the card's text block. Nothing else about a round moves onto the
+     photograph, and the kicker stays suppressed for non-pair rounds. The predicate lives in cardTreatment.ts because ExploreMagazine
      sizes the card from the same answer. */
   const onPhoto = rendersOnPhoto(item, size);
+  const roundPhotoCourse = item.kind === 'round' && size !== 'pair' ? kickerPartsValue.course : null;
+  const roundCourseRef = useFitOneLine<HTMLSpanElement>(roundPhotoCourse ?? '', 12, 9.5);
   const isOwnRound = item.kind === 'round' && item.who?.is_viewer === true;
   const kickerDate = item.kind === 'review' || item.kind === 'round'
     ? relativeDay(item.facts.play_date ?? item.facts.arrived_at)
@@ -1274,6 +1280,27 @@ export function ExploreCard({
         : { height: PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }}
     >
       {chips}
+      {/* ROUND COURSE CAPTION. FeaturedRoundCard puts the course name at the
+          FOOT of its photo; these tiles cannot — the shape trace and its 1/18
+          end labels occupy the foot. Top left is the only free corner, and that
+          is the reason. The cap scrim renders whenever the name does, never
+          separately: on a bright sky the name is unreadable without it. */}
+      {roundPhotoCourse ? (
+        <>
+          <span
+            aria-hidden
+            data-round-photo-course-scrim="true"
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 74, zIndex: 1, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.34) 46%, rgba(0,0,0,0) 100%)' }}
+          />
+          <span
+            ref={roundCourseRef}
+            data-round-photo-course="true"
+            style={{ position: 'absolute', top: 10, left: 12, right: 12, zIndex: 2, display: 'block', fontFamily: SANS, fontSize: 12, fontWeight: 700, color: '#FFFFFF', textShadow: HERO_TEXT_SHADOW, whiteSpace: 'nowrap', overflow: 'hidden' }}
+          >
+            {roundPhotoCourse}
+          </span>
+        </>
+      ) : null}
       {leadReview ? (
         <span
           aria-hidden
@@ -1450,7 +1477,7 @@ export function ExploreCard({
             onWhoTap={onWhoTap}
             engagement={engagement}
             roundIdentity={item.kind === 'round' && size !== 'pair'
-              ? { course: kickerPartsValue.course, date: railCaptionDate(item.facts.play_date ?? item.facts.arrived_at), gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null }
+              ? { course: kickerPartsValue.course, date: railCaptionDate(item.facts.play_date ?? null), gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null }
               : undefined}
           />
         </span>
