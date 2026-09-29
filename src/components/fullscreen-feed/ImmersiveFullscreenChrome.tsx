@@ -626,9 +626,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           >
             <LikeGlyph
               size={32}
-              fill={likeState.isLiked ? AMBER : 'transparent'}
-              stroke={likeState.isLiked ? AMBER : '#fff'}
-              strokeWidth={2}
+              color={likeState.isLiked ? AMBER : '#fff'}
             />
           </RailButton>
 

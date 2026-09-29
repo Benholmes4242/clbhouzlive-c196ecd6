@@ -167,9 +167,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
             >
               <LikeGlyph
                 size={24}
-                fill={hasLiked ? '#F7931E' : 'transparent'}
-                stroke={hasLiked ? '#F7931E' : '#fff'}
-                strokeWidth={2}
+                color={hasLiked ? '#F7931E' : '#fff'}
               />
               {likeStr && !onOpenLikes && (
                 <span

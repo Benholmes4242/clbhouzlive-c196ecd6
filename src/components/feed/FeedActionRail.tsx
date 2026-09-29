@@ -363,9 +363,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               >
                 <LikeGlyph
                   size={28}
-                  fill={hasLiked ? '#F7931E' : 'transparent'}
-                  stroke={hasLiked ? '#F7931E' : '#fff'}
-                  strokeWidth={FLOAT_STROKE}
+                  color={hasLiked ? '#F7931E' : '#fff'}
                 />
               </ActionButton>
               <button
@@ -404,9 +402,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             >
               <LikeGlyph
                 size={28}
-                fill={hasLiked ? '#F7931E' : 'transparent'}
-                stroke={hasLiked ? '#F7931E' : '#fff'}
-                strokeWidth={FLOAT_STROKE}
+                color={hasLiked ? '#F7931E' : '#fff'}
               />
             </ActionButton>
           )}

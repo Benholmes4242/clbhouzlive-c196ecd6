@@ -29,7 +29,7 @@ interface Props {
   comment: RoundCommentAction | null;
   like: RoundLikeAction;
   size?: number;
-  /** ReviewBottomSheet shares this pair and keeps the heart; round surfaces pass 'celebrate'. */
+  /** ReviewBottomSheet shares this pair with the like size; round surfaces pass 'celebrate' (larger size, same glyph). */
   kind?: ReactionKind;
 }
 
