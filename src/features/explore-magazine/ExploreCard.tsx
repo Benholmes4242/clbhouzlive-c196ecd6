@@ -560,24 +560,23 @@ function WhoLine({
               <span data-round-identity-date="true" style={{ ...NUMF, fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{roundIdentity.date}</span>
             ) : null}
           </span>
+          {/* Actions opposite the person; each control keeps its own 44x44 hit area. */}
+          {reactions ? <span style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 14 }}>{reactions}</span> : null}
         </div>
-        {reactions || namesLineShows ? (
-          <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 32, marginTop: 4 }}>
-            {reactions}
-            {namesLineShows ? (
-              <LikedByRow
+        {namesLineShows ? (
+          <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 6 }}>
+            <LikedByRow
                 postId={engagement!.reactionSubjectId!}
                 count={engagement!.likeCount}
                 source={helpful ? 'review' : 'round'}
                 kind={helpful ? 'helpful' : 'celebrate'}
                 ownerName={engagement!.ownerName ?? null}
                 isOwnRound={engagement!.isOwnRound ?? false}
-                style={{ marginTop: 0, marginLeft: 'auto', textAlign: 'right', minWidth: 0 }}
+                style={{ marginTop: 0, minWidth: 0 }}
                 fontSize={CALLOUT_SUBTEXT.fontSize}
                 fontWeight={CALLOUT_SUBTEXT.fontWeight}
                 lines={1}
               />
-            ) : null}
           </div>
         ) : null}
       </div>
@@ -816,7 +815,8 @@ export function ExploreCard({
      BLOCK — headline, figures, identity, reactions — is UNDER it at every
      position. There is no earned treatment and position 0 is not special.
      AMENDED 29 Sep 2026 (Ben): a round carries ONE caption on the
-     photograph, its course name, top left over a cap scrim. It is at the
+     photograph, its course name, top left over a cap scrim, sized 17 down
+     to 12 by useFitOneLine. It is at the
      TOP because the trace and its end labels own the foot, which is where
      FeaturedRoundCard puts the same fact. It is a label on the picture,
      not the card's text block. Nothing else about a round moves onto the
@@ -824,7 +824,7 @@ export function ExploreCard({
      sizes the card from the same answer. */
   const onPhoto = rendersOnPhoto(item, size);
   const roundPhotoCourse = item.kind === 'round' && size !== 'pair' ? kickerPartsValue.course : null;
-  const roundCourseRef = useFitOneLine<HTMLSpanElement>(roundPhotoCourse ?? '', 12, 9.5);
+  const roundCourseRef = useFitOneLine<HTMLSpanElement>(roundPhotoCourse ?? '', 17, 12);
   const isOwnRound = item.kind === 'round' && item.who?.is_viewer === true;
   const kickerDate = item.kind === 'review' || item.kind === 'round'
     ? relativeDay(item.facts.play_date ?? item.facts.arrived_at)
@@ -1290,12 +1290,12 @@ export function ExploreCard({
           <span
             aria-hidden
             data-round-photo-course-scrim="true"
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 74, zIndex: 1, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.34) 46%, rgba(0,0,0,0) 100%)' }}
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 86, zIndex: 1, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.34) 46%, rgba(0,0,0,0) 100%)' }}
           />
           <span
             ref={roundCourseRef}
             data-round-photo-course="true"
-            style={{ position: 'absolute', top: 10, left: 12, right: 12, zIndex: 2, display: 'block', fontFamily: SANS, fontSize: 12, fontWeight: 700, color: '#FFFFFF', textShadow: HERO_TEXT_SHADOW, whiteSpace: 'nowrap', overflow: 'hidden' }}
+            style={{ position: 'absolute', top: 10, left: 12, right: 12, zIndex: 2, display: 'block', fontFamily: SANS, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: '#FFFFFF', textShadow: HERO_TEXT_SHADOW, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
           >
             {roundPhotoCourse}
           </span>

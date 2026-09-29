@@ -33,7 +33,7 @@ function engagement(patch: Partial<RoundCardEngagement> = {}): RoundCardEngageme
 }
 
 describe('Explore round-card who-line engagement', () => {
-  it('uses identity and figures as the always-present row with reactions beneath', () => {
+  it('uses identity and figures as the always-present row with reactions trailing it', () => {
     const view = render(<ExploreCard item={item} size="std" onTap={vi.fn()} engagement={engagement()} />);
     expect(view.container.querySelector('[data-explore-stat-strip="round"]')).toBeNull();
     expect(view.container.querySelector('[data-round-identity-row="true"]')).not.toBeNull();
@@ -41,7 +41,7 @@ describe('Explore round-card who-line engagement', () => {
     expect(view.container.querySelector('[data-round-photo-course="true"]')?.textContent).toBe('Test Course');
     expect(view.container.querySelector('[data-round-identity-date="true"]')?.textContent).toBe(railCaptionDate('2026-09-15'));
     expect(view.container.querySelector('[data-round-figures="true"]')?.textContent).toContain('NET76VS HCP+4');
-    expect(view.container.querySelector('[data-round-reactions-row="true"] [data-round-reactions="controls"]')).not.toBeNull();
+    expect(view.container.querySelector('[data-round-identity-row="true"] [data-round-reactions="controls"]')).not.toBeNull();
     expect(view.container.querySelector('[data-explore-headline="true"]')).toBeNull();
     expect(view.container.querySelector('[data-explore-kicker="true"]')).toBeNull();
   });
