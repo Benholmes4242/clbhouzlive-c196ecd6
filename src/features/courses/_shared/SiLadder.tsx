@@ -24,6 +24,7 @@
  * nothing, so neither page needs its own gate.
  */
 import React from 'react';
+import RailChips from '@/components/ui/RailChips';
 import { A, SANS, FIGS, LABEL, Panel, bizFigure, BIZ_BODY } from '@/features/courses/components/holes/analytical/tokens';
 import type { SiLadder as SiLadderData, SiLadderRow } from './siLadder';
 import { SC_FILL_BIRDIE_DK } from '@/features/courses/components/holes/_constants';
@@ -89,31 +90,18 @@ export const SiLadder: React.FC<{
       subline={copy.subline}
       style={style}
     >
-      <div style={{ display: 'flex', gap: 16, marginBottom: 12 }}>
-        {[
-          { label: 'Official SI', key: 'si' as const },
-          { label: 'Holes', key: 'hole' as const },
-        ].map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setSort(t.key)}
-            aria-pressed={sort === t.key}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              padding: 0,
-              cursor: 'pointer',
-              fontFamily: SANS,
-              fontSize: 12,
-              fontWeight: sort === t.key ? 700 : 600,
-              color: sort === t.key ? A.INK : A.DIM,
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {/* Canonical RailChips choice pair — same treatment as the hole-order
+          toggle on the club analytics page (BRIEF_ONE_CHIP_APP_WIDE). */}
+      <RailChips
+        options={[
+          { id: 'si', label: 'Official SI' },
+          { id: 'hole', label: 'Holes' },
+        ]}
+        value={sort}
+        onChange={(next) => setSort(next as 'si' | 'hole')}
+        ariaLabel="Stroke index view"
+        style={{ marginBottom: 12 }}
+      />
 
       {/* HEADERS AND ROWS SHARE ONE GRID, so Hole and SI cannot collide. */}
       <div style={{ display: 'grid', gridTemplateColumns: GRID, marginBottom: 6 }}>
@@ -213,8 +201,8 @@ export const SiLadder: React.FC<{
             >
               <span style={{ fontSize: 12.5, fontWeight: 600, color: A.BODY }}>
                 {voice === 'club'
-                  ? `Hole ${r.holeNo} — you say ${r.strokeIndex}, plays ${r.measuredRank}`
-                  : `Hole ${r.holeNo} — indexed ${r.strokeIndex}, plays ${r.measuredRank}`}
+                  ? `Hole ${r.holeNo} - Your index ${r.strokeIndex}, plays ${r.measuredRank}`
+                  : `Hole ${r.holeNo} - indexed ${r.strokeIndex}, plays ${r.measuredRank}`}
               </span>
               <span style={{ ...bizFigure(12.5, colourFor(r)), flexShrink: 0 }}>
                 {r.shotsGap > 0 ? '+' : '\u2212'}
