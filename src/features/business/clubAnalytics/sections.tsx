@@ -301,32 +301,18 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
         </div>
       )}
 
-      {/* CARD ORDER IS THE DEFAULT. Text-only toggle, no fills. */}
-      <div style={{ display: 'flex', gap: 16, marginBottom: 10 }}>
-        {[
-          { label: 'Card order', on: !hardestFirst, next: false },
-          { label: 'Hardest first', on: hardestFirst, next: true },
-        ].map((t) => (
-          <button
-            key={t.label}
-            type="button"
-            onClick={() => setHardestFirst(t.next)}
-            aria-pressed={t.on}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              padding: 0,
-              cursor: 'pointer',
-              fontFamily: SANS,
-              fontSize: 12,
-              fontWeight: t.on ? 700 : 600,
-              color: t.on ? A.INK : A.DIM,
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {/* CARD ORDER IS THE DEFAULT. The canonical RailChips choice pair —
+          same treatment as the Explore page sort rails (BRIEF_ONE_CHIP_APP_WIDE). */}
+      <RailChips
+        options={[
+          { id: 'card', label: 'Card order' },
+          { id: 'hardest', label: 'Hardest first' },
+        ]}
+        value={hardestFirst ? 'hardest' : 'card'}
+        onChange={(next) => setHardestFirst(next === 'hardest')}
+        ariaLabel="Hole order"
+        style={{ marginBottom: 10 }}
+      />
 
       <div style={{ display: 'grid', gridTemplateColumns: CLUB_HOLE_GRID, gap: 8, paddingBottom: 8 }}>
         <span style={{ ...LABEL, textAlign: 'center' }}>Hole</span>
