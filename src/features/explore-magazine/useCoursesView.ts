@@ -1,3 +1,4 @@
+import { COURSE_RATING_FLOOR } from './courseRatingFloor';
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -46,8 +47,8 @@ import { coursePlaceLine } from './placeLine';
  */
 
 const THIRTY_DAYS_MS = 30 * 86_400_000;
-/** §5b/§7 the top-rated shelf floors the sample at two ratings. */
-export const TOP_RATED_FLOOR = 2;
+/** BRIEF_COURSES_DISCOVERY §A3 — ONE floor: the card's and the shelf's are the same constant. */
+export const TOP_RATED_FLOOR = COURSE_RATING_FLOOR;
 
 export interface RecentRatings {
   courseId: string;

@@ -11,6 +11,7 @@ import type { ListEvent } from './listCourseEvents';
 import { ShelfShell } from './ExploreShells';
 import type { CourseShelfRow } from './useCourseShelves';
 import { RANK_SCOPE_LABEL } from './useTop100RankIndex';
+import { ratingPrintable } from './courseRatingFloor';
 
 /**
  * THE COURSE RAIL (BRIEF_EXPLORE_MAGAZINE PHASE C §3a-§3c) — kind: courses.
@@ -82,7 +83,7 @@ export function CourseShelf({
             figure={
               row.rank != null
                 ? `#${row.rank}`
-                : row.rating != null
+                : ratingPrintable(row.rating, row.ratingCount)
                   ? row.rating.toFixed(1)
                   : null
             }
@@ -91,7 +92,7 @@ export function CourseShelf({
                course is not. */
             unit={row.rank != null && row.rankScope ? RANK_SCOPE_LABEL[row.rankScope] : undefined}
             /* Neutral keeps the component's white default over photography. */
-            figureTone={row.rank == null && row.rating != null && row.rating >= 9 ? courseSubScoreTone(row.rating) : undefined}
+            figureTone={row.rank == null && ratingPrintable(row.rating, row.ratingCount) && row.rating >= 9 ? courseSubScoreTone(row.rating) : undefined}
             whenLabel=""
             who=""
             isOwn={false}
