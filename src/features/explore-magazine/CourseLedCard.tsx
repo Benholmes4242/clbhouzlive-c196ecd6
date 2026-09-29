@@ -99,6 +99,9 @@ function SampleLine({ count }: { count: number }) {
 
 function Figure({ rating, count, size }: { rating: number; count: number; size: number }) {
   const { t } = useTranslation('courses');
+  /* Green is reserved for the standout signal: the threshold lives only in
+   * courseSubScoreTone (9.0+), and the figure reads it rather than carrying
+   * its own gate. Below it the figure is plain ink. */
   return (
     <div style={{ textAlign: 'right', flexShrink: 0 }}>
       <div
@@ -107,7 +110,7 @@ function Figure({ rating, count, size }: { rating: number; count: number; size: 
           fontSize: size,
           fontWeight: 800,
           lineHeight: 1,
-          color: rating >= 9 ? courseSubScoreTone(rating) : A.INK,
+          color: courseSubScoreTone(rating) === A.GREEN ? A.GREEN : A.INK,
         }}
       >
         {rating.toFixed(1)}
@@ -272,9 +275,6 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
 
   return (
     <div style={{ fontFamily: SANS }}>
-      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, marginBottom: 10 }}>
-        {t('amateur.courseLead.kicker', 'Happening now')}
-      </div>
       <button
         type="button"
         onClick={onTap}
