@@ -1120,7 +1120,7 @@ export const CompetitionSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
         </div>
         <div style={{ marginTop: 14, display: 'flex', gap: 24 }}>
           {rows.map((r) => (
-            <div key={r.label}>
+            <div key={r.label} style={{ textAlign: 'center' }}>
               <div style={bizFigure(19, A.INK)}>{fmt(r.count)}</div>
               <div style={{ ...LABEL, marginTop: 4 }}>
                 {r.label} · {share(r.count, total)}
