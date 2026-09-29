@@ -63,7 +63,7 @@ import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
 import type { CategoryKey, ExistingMedia, ExistingReview, ReviewV2Course } from './types';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
 import ComposerStepHeader from '@/features/composer-flow/components/ComposerStepHeader';
-import { courseShortName } from '@/features/composer-flow/courseShortName';
+import { shortCourseName } from '@/features/courses/_shared/courseLabel';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
@@ -454,7 +454,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
 
   const step = composer.step;
-  const shortName = courseShortName(course.name);
+  const shortName = shortCourseName(course.name ?? '');
 
   /* DID STEP 1 PUT US HERE? A member who came through the tiles has a step to
      go BACK to, and backing out returns them to it (the phase 1 handoff record
