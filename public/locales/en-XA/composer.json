@@ -14,14 +14,14 @@
     "uploadFailedFallback": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ - ýőúř ƥőšţ ŵáš ñőţ ƥúƀļíšĥéđ.~~]",
     "uploadingScheduledBody": "[~~Úƥļőáđíñĝ - íţ'ļļ ĝő őúţ {{when}}.~~]",
     "liveKicker": "[~~Ļíṽé íñ ţĥé ĉļúƀĥőúšé~~]",
-    "uploadingSimple": "Uploading",
-    "keepUsing": "You can keep using the app",
-    "keepUsingSub": "We'll finish this in the background.",
-    "stagePreparing": "Preparing",
-    "stageUploading": "Uploading",
-    "stagePublishing": "Publishing",
-    "timeLeftSeconds": "{{n}}s left",
-    "timeLeftMinutes": "{{m}}m {{s}}s left"
+    "uploadingSimple": "[~~Úƥļőáđíñĝ~~]",
+    "keepUsing": "[~~Ýőú ĉáñ ǩééƥ úšíñĝ ţĥé áƥƥ~~]",
+    "keepUsingSub": "[~~Ŵé'ļļ ƒíñíšĥ ţĥíš íñ ţĥé ƀáĉǩĝřőúñđ.~~]",
+    "stagePreparing": "[~~Ƥřéƥáříñĝ~~]",
+    "stageUploading": "[~~Úƥļőáđíñĝ~~]",
+    "stagePublishing": "[~~Ƥúƀļíšĥíñĝ~~]",
+    "timeLeftSeconds": "[~~{{n}}š ļéƒţ~~]",
+    "timeLeftMinutes": "[~~{{m}}ɱ {{s}}š ļéƒţ~~]"
   },
   "drafts": {
     "footerNote": "[~~Đřáƒţš ǩééƥ ýőúř ŵőřđš, ţáĝš áñđ šéţţíñĝš. Ƥĥőţőš áñđ ṽíđéő ářé ñőţ šáṽéđ.~~]"
@@ -29,34 +29,34 @@
   "closeGuard": {
     "saveDraftKeepsNothingElse": "[~~Šáṽé đřáƒţ · ŵőřđš áñđ ţáĝš őñļý~~]",
     "saveDraftLosesMedia": "[~~Ƥĥőţőš áñđ ṽíđéő ŵíļļ ñőţ ƀé ǩéƥţ~~]",
-    "saveDraftLosesSchedule": "[~~Ţĥéščĥéđúļéđ ţímé ŵíļļ ñőţ ƀé ǩéƥţ~~]",
-    "saveDraftLosesBoth": "[~~Ƥĥőţőš, ṽíđéő áñđ ţĥéščĥéđúļéđ ţímé ŵíļļ ñőţ ƀé ǩéƥţ~~]"
+    "saveDraftLosesSchedule": "[~~Ţĥé šĉĥéđúļéđ ţíɱé ŵíļļ ñőţ ƀé ǩéƥţ~~]",
+    "saveDraftLosesBoth": "[~~Ƥĥőţőš, ṽíđéő áñđ ţĥé šĉĥéđúļéđ ţíɱé ŵíļļ ñőţ ƀé ǩéƥţ~~]"
   },
   "stage": {
     "mediaSheet": {
-      "title": "Edit photos",
-      "done": "DONE"
+      "title": "[~~Éđíţ ƥĥőţőš~~]",
+      "done": "[~~ĐŐÑÉ~~]"
     },
-    "tapToEdit": "Tap a photo to edit it",
-    "editItem": "Edit item {{n}}",
-    "addMedia": "Add photos or video",
-    "addShort": "+ Add",
-    "edit": "Edit",
-    "emptyGate": "ADD A PHOTO OR A FEW WORDS",
-    "chooseFromLibrary": "Choose from library",
-    "takePhotoOrVideo": "Take photo or video",
-    "captionPlaceholder": "What's on your mind",
-    "mentionHint": "@mention friends and businesses",
-    "tagCourse": "Tag a course",
-    "search": "Search",
-    "untag": "Untag {{name}}",
-    "postingAs": "Posting as",
-    "scheduleForLater": "Schedule for later",
-    "off": "Off",
-    "drafts": "Drafts",
-    "saveChanges": "Save changes",
-    "schedule": "Schedule",
-    "share": "Share",
-    "editPost": "Edit post"
+    "tapToEdit": "[~~Ţáƥ á ƥĥőţő ţő éđíţ íţ~~]",
+    "editItem": "[~~Éđíţ íţéɱ {{n}}~~]",
+    "addMedia": "[~~Áđđ ƥĥőţőš őř ṽíđéő~~]",
+    "addShort": "[~~+ Áđđ~~]",
+    "edit": "[~~Éđíţ~~]",
+    "emptyGate": "[~~ÁĐĐ Á ƤĤŐŢŐ ŐŘ Á ƑÉŴ ŴŐŘĐŠ~~]",
+    "chooseFromLibrary": "[~~Ĉĥőőšé ƒřőɱ ļíƀřářý~~]",
+    "takePhotoOrVideo": "[~~Ţáǩé ƥĥőţő őř ṽíđéő~~]",
+    "captionPlaceholder": "[~~Ŵĥáţ'š őñ ýőúř ɱíñđ~~]",
+    "mentionHint": "[~~@ɱéñţíőñ ƒříéñđš áñđ ƀúšíñéššéš~~]",
+    "tagCourse": "[~~Ţáĝ á ĉőúřšé~~]",
+    "search": "[~~Šéářĉĥ~~]",
+    "untag": "[~~Úñţáĝ {{name}}~~]",
+    "postingAs": "[~~Ƥőšţíñĝ áš~~]",
+    "scheduleForLater": "[~~Šĉĥéđúļé ƒőř ļáţéř~~]",
+    "off": "[~~Őƒƒ~~]",
+    "drafts": "[~~Đřáƒţš~~]",
+    "saveChanges": "[~~Šáṽé ĉĥáñĝéš~~]",
+    "schedule": "[~~Šĉĥéđúļé~~]",
+    "share": "[~~Šĥářé~~]",
+    "editPost": "[~~Éđíţ ƥőšţ~~]"
   }
 }
