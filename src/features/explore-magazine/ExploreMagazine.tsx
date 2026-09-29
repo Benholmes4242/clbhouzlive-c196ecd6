@@ -100,6 +100,11 @@ import { ScopeControlSeparator } from './ScopeControlSeparator';
 import { useReviewPageEnrichment } from './useReviewPageEnrichment';
 
 import { useViewerCourseBests } from './useViewerCourseBests';
+import { CourseLeadCard, CourseLedCard } from './CourseLedCard';
+import { useCourseQuotes } from './useCourseQuotes';
+import { HelpfulReviewsShelf } from './HelpfulReviewsShelf';
+import { NationList, RegionGrid } from './DiscoveryBlocks';
+import { useNationActivity, useRegionActivity } from './useDiscoveryCounts';
 
 /**
  * THE MAGAZINE (BRIEF_EXPLORE_MAGAZINE, PHASE A).
@@ -164,7 +169,11 @@ type ShelfKind =
   | 'coursesLeadRated'
   | 'coursesCircle'
   | 'coursesWorthDrive'
-  | 'coursesNew';
+  | 'coursesNew'
+  /** BRIEF_COURSES_DISCOVERY §C1/§B3/§C2 — the Courses page's three new blocks. */
+  | 'regionGrid'
+  | 'helpfulReviews'
+  | 'nationList';
 
 type Block =
   | { kind: 'lead'; item: StreamItem }
@@ -263,6 +272,45 @@ function buildBlocks(
     if (shelf != null && due != null && cards >= due) {
       blocks.push({ kind: 'shelf', shelf });
       nextShelf += 1;
+    }
+  }
+  return blocks;
+}
+
+/**
+ * BRIEF_COURSES_DISCOVERY §D — THE COURSES PAGE ORDER, in one place:
+ *   lead, Highest rated, 2 cards, region grid, 1 card, helpful reviews,
+ *   2 cards, Top 100 you haven't played, nation list — then the remaining
+ *   rails every four cards. A rail with nothing in it renders nothing (the
+ *   existing skip rule); no prompt takes its place.
+ */
+const COURSES_OPENING: Array<ShelfKind | number> = [
+  'coursesLeadRated', 2, 'regionGrid', 1, 'helpfulReviews', 2, 'coursesWorld', 'nationList',
+];
+const COURSES_LATER: ShelfKind[] = ['coursesList', 'coursesCircle', 'coursesCounty', 'coursesWorthDrive', 'coursesNew'];
+
+function buildCoursesBlocks(items: StreamItem[]): Block[] {
+  const blocks: Block[] = [];
+  let index = 0;
+  if (items[0]) {
+    blocks.push({ kind: 'lead', item: items[0] });
+    index = 1;
+  }
+  for (const step of COURSES_OPENING) {
+    if (typeof step === 'number') {
+      for (let n = 0; n < step && index < items.length; n += 1) blocks.push({ kind: 'std', item: items[index++] });
+    } else {
+      blocks.push({ kind: 'shelf', shelf: step });
+    }
+  }
+  let since = 0;
+  let later = 0;
+  while (index < items.length) {
+    blocks.push({ kind: 'std', item: items[index++] });
+    since += 1;
+    if (since >= 4 && later < COURSES_LATER.length) {
+      blocks.push({ kind: 'shelf', shelf: COURSES_LATER[later++] });
+      since = 0;
     }
   }
   return blocks;
@@ -773,21 +821,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      the score each pool already carries. */
   const mergedServerItems = useMemo(() => {
     if (view !== 'courses') return server.items;
-    return [...server.items, ...serverReviews.items].sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
-  }, [view, server.items, serverReviews.items]);
+    /* BRIEF_COURSES_DISCOVERY §A1 — THE SUBJECT IS THE COURSE. The reviews read
+       stays (it feeds the Most helpful reviews rail) but supplies no cards. */
+    return server.items.filter((item) => item.kind === 'course');
+  }, [view, server.items]);
   const mergedFallbackItems = useMemo(() => {
     if (view !== 'courses') return stream.items;
-    /* THE FALLBACK CARRIES NO COMPARABLE SCORE (the client composition scores
-       reviews 0), so the two pools are ZIPPED rather than sorted - an honest
-       alternation instead of a ranking that is not there. */
-    const out: StreamItem[] = [];
-    const a = coursesView.items;
-    const b = stream.items;
-    for (let i = 0; i < Math.max(a.length, b.length); i += 1) {
-      if (a[i]) out.push(a[i]);
-      if (b[i]) out.push(b[i]);
-    }
-    return out;
+    /* §A1 — the zip that alternated course and review cards is gone. */
+    return coursesView.items.filter((item) => item.kind === 'course');
   }, [view, coursesView.items, stream.items]);
 
   /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so a
@@ -819,6 +860,23 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const topRatedCourses = useRecentCourseRatings(false);
   /* §4 THE FOUR NEW RAILS, all from the index. */
   const mergedShelves = useMergedCourseShelves(candidates.index, geography.scope.county, circle.circleIds);
+  /* §B3 THE REVIEWS READ, KEPT: it now feeds the helpful-reviews rail only. */
+  const railReviews = useMemo(
+    () => (view !== 'courses' ? [] : (serverOn ? serverReviews.items : stream.items).filter((item) => item.kind === 'review')),
+    [view, serverOn, serverReviews.items, stream.items],
+  );
+  const railReviewReactions = useContentReactions(
+    useMemo(
+      () => railReviews.map((item) => item.facts.review_id).filter((id): id is string => !!id).map((id) => ({ type: 'review' as const, id })),
+      [railReviews],
+    ),
+  );
+  const railReviewCount = useCallback(
+    (id: string) => railReviewReactions.stateFor('review', id).count,
+    [railReviewReactions],
+  );
+  const regionActivity = useRegionActivity(view === 'courses');
+  const nationActivity = useNationActivity(view === 'courses');
 
 
   /* THE SERVER PAGE IS ALREADY A PAGE. Reveal slicing belongs to the client
@@ -1000,14 +1058,16 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const singleType = view === 'courses';
   const blocks = useMemo(
     () =>
-      buildBlocks(ranked, shelves, false, {
+      view === 'courses' && !filtering
+        ? buildCoursesBlocks(ranked)
+        : buildBlocks(ranked, shelves, false, {
         bareRoundPairs: view === 'scores',
         repeatShelves: view === 'scores' || view === 'all',
         /* §3 THE MERGED VIEW'S RHYTHM: pairs are STABLE-FACT COURSE CARDS only,
            reviews and event cards always full width. */
         mergedCourses: view === 'courses',
       }),
-    [ranked, view, activeScope, shelves, singleType],
+    [ranked, view, activeScope, shelves, singleType, filtering],
   );
   /* §2 THE EARNED HERO IS RETIRED: cardTreatments() and its 1-in-4 positional
      cap are gone. Reviews alone retain the lead SIZE because their copy sits on
