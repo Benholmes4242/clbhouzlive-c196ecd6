@@ -259,6 +259,15 @@ const DistributionStrip: React.FC<{ counts: number[]; total: number }> = ({ coun
   </Inset>
 );
 
+/**
+ * THIS SECTION DESCRIBES THE COURSE. IT DOES NOT AUDIT THE CARD.
+ * measured_rank ranks mean strokes over par across ALL handicaps.
+ * A stroke index ranks the GAP between bands (si_should_be), needs
+ * 200 scores per hole per band, and lives in StrokeIndexSection.
+ * Never compare stroke_index to measured_rank here, never highlight
+ * a divergence between them, and never word the subline or note so
+ * that a reader could take this for a verdict on their card.
+ */
 export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
   const [hardestFirst, setHardestFirst] = React.useState(false);
   const [openHole, setOpenHole] = React.useState<number | null>(null);
@@ -293,7 +302,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
     <Panel
       kicker="Hole by hole"
       aside={`${fmt(data.complete_rounds)} full rounds`}
-      subline="Your declared stroke index beside the position each hole actually plays in, 1 being the hardest."
+      subline="How each hole plays for your members, hardest first when you ask for it. Your card's stroke index is shown for reference."
       style={CARD}
     >
       {stripCounts && stripTotal > 0 && (
@@ -320,7 +329,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
         <span style={{ ...LABEL, textAlign: 'center' }}>Par</span>
         <span style={{ ...LABEL, textAlign: 'center' }}>SI</span>
         <span style={{ ...LABEL }}>Measured</span>
-        <span style={{ ...LABEL, textAlign: 'right' }}>Rank</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>Difficulty</span>
         <span style={{ ...LABEL, textAlign: 'right' }}>±Par</span>
       </div>
 
@@ -328,7 +337,6 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
         const parts = toParParts(h.avg_to_par);
         const t = tFor(h.avg_to_par);
         const width = Math.max(4, t * 100);
-        const out = h.stroke_index != null ? Math.abs(h.stroke_index - h.measured_rank) : null;
         const open = openHole === h.hole_no;
         const holeTotal = h.birdie_plus + h.par_count + h.bogey + h.double_plus;
         return (
@@ -356,14 +364,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
               <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE, textAlign: 'center' }}>
                 {h.par ?? '\u2014'}
               </span>
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: out != null && out >= 6 ? 700 : 600,
-                  color: out != null && out >= 6 ? A.INK : A.MUTE,
-                  textAlign: 'center',
-                }}
-              >
+              <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE, textAlign: 'center' }}>
                 {h.stroke_index ?? '\u2014'}
               </span>
               <span style={{ height: 5, borderRadius: 3, background: A.TRACK, display: 'block', overflow: 'hidden' }}>
@@ -406,9 +407,11 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
       })}
 
       <Body style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
-        SI is the stroke index your card declares. Rank is where the hole sits on mean strokes over par across
+        Difficulty is where the hole sits on mean strokes over par across
         {` ${fmt(data.complete_rounds)} `}
-        full rounds. Tap a hole for its own split. A dash means we hold no figure for that hole.
+        full rounds, pooled across every handicap. That is not what a stroke index measures {'\u2014'} a stroke
+        index ranks where a higher handicapper needs a shot most relative to a lower one, which is the Stroke
+        index check below. Tap a hole for its own split. A dash means we hold no figure for that hole.
       </Body>
     </Panel>
   );
