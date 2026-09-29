@@ -265,7 +265,7 @@ export function StandoutTile({
             and blur live in `.standout-figure-chip` (liquid-glass.css) because
             the blur must be an @supports enhancement over a flat base fill —
             inline styles cannot express that (BRIEF_STANDOUT_TILE_MARGIN §5a). */}
-        {figure ? (
+        {figureNode ?? (figure ? (
           <span
             className="standout-figure-chip"
             style={{
@@ -389,7 +389,7 @@ export function StandoutTile({
             ) : null}
 
           </span>
-        ) : null}
+        ) : null)}
 
         {/* AGE — PLAIN TEXT ON THE PHOTO, EVERYWHERE, NO EXCEPTIONS.
             The glass date badge is RETIRED. Glass is the score chip's material,
