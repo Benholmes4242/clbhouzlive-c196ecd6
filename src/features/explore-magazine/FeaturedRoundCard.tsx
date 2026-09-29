@@ -35,11 +35,14 @@ const PANE_H = 290;
 /** The feed card's std trace band and width. */
 const SHAPE_BAND = 52;
 const SHAPE_W = 350;
-/** V2 §6 — the trace sits in the upper middle on >= 0.5 black; the dark stop
- *  begins at 48%, ABOVE the headline, reaching 0.86 by 60% and 0.94 at the foot,
- *  so the lower-third text holds 4.5:1 over the brightest possible photograph. */
+/** BRIEF_FEATURED_ROUND_SCRIM — the scrim is a FOOT, not a filter. Fully
+ *  transparent across the top 46% so the photograph (and the trace over it)
+ *  shows at full brightness, exactly as the feed cards do. It ramps only where
+ *  text sits: every text line is below the 64% stop (>= 0.55 black), name and
+ *  course on >= 0.88. Contrast comes from the dark foot, never from dimming
+ *  the picture — do not add a flat layer or anything behind the trace. */
 const SCRIM =
-  'linear-gradient(180deg, color-mix(in srgb, black 55%, transparent) 0%, color-mix(in srgb, black 50%, transparent) 20%, color-mix(in srgb, black 55%, transparent) 42%, color-mix(in srgb, black 86%, transparent) 60%, color-mix(in srgb, black 94%, transparent) 100%)';
+  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 46%, rgba(0,0,0,0.55) 64%, rgba(0,0,0,0.88) 84%, rgba(0,0,0,0.94) 100%)';
 /** V2 §4 — the unit label beside the figure, on its baseline. */
 const UNIT: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.INK };
 const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
