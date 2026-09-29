@@ -6,9 +6,12 @@ import { A, GOLD, NUMF, SANS } from '@/components/explore-tab-new/courseled/toke
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
+import { celebrateFigureSize } from '@/lib/reactionKind';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { RANK_PILL_BG, SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 import { courseHeadline } from './courseHeadline';
+import { toParLabel } from './exploreCopy';
 import { ratingPrintable } from './courseRatingFloor';
 import { coursePlaceLine } from './placeLine';
 import type { StreamItem } from './streamItem';
@@ -38,15 +41,36 @@ const PLACE: React.CSSProperties = {
   color: A.DIM,
 };
 
+/** BRIEF_COURSE_EVENT_TOPAR: only 'record' and 'low' print a gross, so only
+ *  they carry a to-par. No course_par → nothing (no fallback, no "E"). */
+function grossToPar(item: StreamItem): { gross: number; toPar: number } | null {
+  const f = item.facts;
+  if (f.course_event !== 'record' && f.course_event !== 'low') return null;
+  if (f.low_gross == null || f.course_par == null) return null;
+  return { gross: f.low_gross, toPar: f.low_gross - f.course_par };
+}
+
 /** The event sentence, with its figures at 700 and tabular (§A2). The sentence
- *  itself always comes from courseHeadline.ts. */
-function EventSentence({ text, size }: { text: string; size: number }) {
+ *  itself always comes from courseHeadline.ts. The first figure equal to the
+ *  gross takes the to-par beside it: 0.62 size, under = TOPAR_UNDER_DARK,
+ *  over = ink, level "E" muted. Sign via toParLabel (true minus). */
+function EventSentence({ text, size, topar }: { text: string; size: number; topar?: { gross: number; toPar: number } | null }) {
   const parts = text.split(/(\d[\d,.]*\d|\d)/g);
+  const grossIdx = topar ? parts.findIndex((p) => p === String(topar.gross)) : -1;
+  const label = topar ? toParLabel(topar.toPar) : null;
+  const tone = topar ? (topar.toPar < 0 ? TOPAR_UNDER_DARK : topar.toPar === 0 ? A.MUTE : A.INK) : A.INK;
   return (
     <p style={{ margin: 0, fontSize: size, fontWeight: 500, lineHeight: 1.4, color: A.BODY }}>
       {parts.map((part, i) =>
         /\d/.test(part) ? (
-          <span key={i} style={{ ...NUMF, fontWeight: 700, color: A.INK }}>{part}</span>
+          <React.Fragment key={i}>
+            <span style={{ ...NUMF, fontWeight: 700, color: A.INK }}>{part}</span>
+            {i === grossIdx && label ? (
+              <span style={{ ...NUMF, fontWeight: 700, fontSize: celebrateFigureSize(size), color: tone }}>
+                {'\u2009'}{label}
+              </span>
+            ) : null}
+          </React.Fragment>
         ) : (
           <React.Fragment key={i}>{part}</React.Fragment>
         ),
@@ -220,7 +244,7 @@ export function CourseLedCard({
         </div>
       ) : null}
 
-      {sentence ? <div style={{ marginTop: 10 }}><EventSentence text={sentence} size={13} /></div> : null}
+      {sentence ? <div style={{ marginTop: 10 }}><EventSentence text={sentence} size={13} topar={grossToPar(item)} /></div> : null}
 
       {quote ? (
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: `0.5px solid ${A.BORDER}` }}>
@@ -306,7 +330,7 @@ export function CourseLeadCard({ item, onTap }: { item: StreamItem; onTap: () =>
           {place ? <div style={{ ...PLACE, marginTop: 5 }}>{place}</div> : null}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 12 }}>
             {printable ? <Figure rating={item.facts.rating as number} count={count} size={30} /> : <SampleLine count={count} />}
-            {sentence ? <div style={{ minWidth: 0, flex: 1 }}><EventSentence text={sentence} size={13} /></div> : null}
+            {sentence ? <div style={{ minWidth: 0, flex: 1 }}><EventSentence text={sentence} size={13} topar={grossToPar(item)} /></div> : null}
           </div>
         </div>
       </button>
