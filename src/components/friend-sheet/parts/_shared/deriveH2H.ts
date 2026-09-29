@@ -92,7 +92,5 @@ export function shortCourseName(name: string): string {
   return name
     .replace(' Golf Club', '')
     .replace(' Course', '')
-    .replace('Sundridge Park-East', 'Sundridge East')
-    .replace('Sundridge Park-West', 'Sundridge West')
     .replace(/^The /, '');
 }
