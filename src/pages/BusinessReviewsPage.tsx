@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { RailChips } from '@/components/ui/RailChips';
+import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { TITLE, FIGURE } from '@/lib/tokens/type';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -41,13 +42,6 @@ import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/
 
 const AMBER = A.AMBER;
 const AMBER_SOFT = BIZ.amberTint;
-
-/** Display-only: a parenthesised segment's contents, else the name unchanged.
- *  'Sundridge Park Golf Club (East Course)' -> 'East Course'. */
-function shortCourseName(name: string): string {
-  const m = name.match(/\(([^()]+)\)/);
-  return m ? m[1].trim() : name;
-}
 
 type ChipKey = 'all' | 'unreplied' | 'recent' | 'lowest';
 
@@ -517,7 +511,7 @@ export default function BusinessReviewsPage() {
               onChange={(id) => setCourseId(id === 'all' ? null : id)}
               options={[
                 { id: 'all', label: 'All courses', value: courses.reduce((n, c) => n + c.count, 0) },
-                ...courses.map((c) => ({ id: c.course_id, label: shortCourseName(c.course_name), value: c.count })),
+                ...courses.map((c) => ({ id: c.course_id, label: courseNameWithinClub(c.course_name), value: c.count })),
               ]}
             />
           )}
@@ -638,11 +632,11 @@ export default function BusinessReviewsPage() {
                 <Sparkles size={22} style={{ color: AMBER }} />
               </div>
               <div className="text-[16px] font-bold" style={{ color: INK }}>
-                No reviews for the {shortCourseName(selectedCourse.course_name)} yet
+                No reviews for the {courseNameWithinClub(selectedCourse.course_name)} yet
               </div>
               <p className="text-[13px] leading-relaxed mt-1.5" style={{ color: INK_45 }}>
                 {reviewedElsewhere.length === 1
-                  ? `Every review your club has received is on the ${shortCourseName(reviewedElsewhere[0].course_name)}.`
+                  ? `Every review your club has received is on the ${courseNameWithinClub(reviewedElsewhere[0].course_name)}.`
                   : 'Your reviews are on your other courses.'}
               </p>
             </div>
