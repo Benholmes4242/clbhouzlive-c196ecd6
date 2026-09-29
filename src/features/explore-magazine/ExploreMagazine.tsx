@@ -1759,7 +1759,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     /* §B2 — the tile wears the RANK, never a rating, and a course
                        the viewer has played is filtered out. */
                     rows={view === 'courses' ? worldCourses.rows.filter((row) => !viewerBests.bestsAt.has(row.courseId)) : worldCourses.rows}
-                    isFetched={worldCourses.isFetched}
+                    /* BRIEF_TOP100_UNPLAYED_GATE — the heading claims something
+                       about the viewer, so the rail must not render until the
+                       viewer's own bests have settled too. */
+                    isFetched={worldCourses.isFetched && viewerBests.isFetched}
                     kind="courses_world"
                     pos={pos}
                     onDepart={depart}
