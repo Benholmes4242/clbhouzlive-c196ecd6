@@ -23,7 +23,7 @@ import {
 } from '@/styles/photoScrim';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
-import { headlineFor, kickerParts, playDateFull, relativeDay, toParLabel } from './exploreCopy';
+import { headlineFor, kickerParts, playDateFull, railCaptionDate, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
 import { calloutFor, rendersOnPhoto } from './cardTreatment';
 import { FigureCell, RoundStatStrip, vsHandicapLabel } from './AchievementCallout';
@@ -34,6 +34,7 @@ import { RankFlagBadge } from './RankFlagBadge';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { handicapPairDisplay } from './circleHandicap';
 import { NUMF } from '@/components/explore-tab-new/courseled/tokens';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { ReviewBreakdown } from './useReviewPageEnrichment';
 
 
@@ -255,7 +256,7 @@ function chipsFor(
      pair are untouched, so the gate is the SIZE, not the kind. */
   const leadReviewChips = kind === 'review' && size === 'lead';
 
-  if (kind === 'round' && facts.gross != null) {
+  if (kind === 'round' && facts.gross != null && size === 'pair') {
     const toPar = toParLabel(facts.to_par);
     const under = (facts.to_par ?? 0) < 0;
     out.push(
@@ -376,7 +377,7 @@ function WhoLine({
   onWhoTap?: () => void;
   engagement?: RoundCardEngagement | null;
   reviewIdentity?: { course: string | null; scope: string | null; date: string | null };
-  roundIdentity?: { course: string | null; date: string | null; net: number | null; par: number | null; handicapIndex?: number | null; deltaIndex?: number | null };
+  roundIdentity?: { course: string | null; date: string | null; gross?: number | null; toPar?: number | null; net: number | null; par: number | null; handicapIndex?: number | null; deltaIndex?: number | null };
 }) {
   const { t } = useTranslation('courses');
   /* AN OBJECT IS NOT AN IDENTITY. get_explore_stream builds its `who`
@@ -447,6 +448,11 @@ function WhoLine({
     : engagement?.liked ? t('discover.reactions.celebrated', 'Celebrated') : t('discover.reactions.action', 'Celebrate this round');
   const likeColour = engagement?.liked ? A.AMBER : subColor;
 
+  /* The names line carries the count on lead/std; LikedByRow only returns null
+     for a missing post or zero likes, both excluded here, and its loading state
+     still prints the figure — so the thumb's count can safely step aside. */
+  const namesLineShows = !pair && !!engagement?.reactionSubjectId && (engagement?.likeCount ?? 0) > 0;
+
   const reactions = showActions ? (
     <span
       data-round-reactions={pair ? 'counts' : 'controls'}
@@ -471,7 +477,7 @@ function WhoLine({
             onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); engagement.onToggleLike?.(); }}
             style={{ minWidth: 44, height: 44, margin: '-6px 0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? A.AMBER : subColor, cursor: 'pointer' }}>
             <Glyph size={CELEBRATE_GLYPH_SIZE} strokeWidth={2} fill={engagement.liked && helpful ? likeColour : 'none'} color={likeColour} aria-hidden />
-            {engagement.likeCount > 0 ? <span style={countStyle}>{engagement.likeCount}</span> : null}
+            {engagement.likeCount > 0 && !namesLineShows ? <span style={countStyle}>{engagement.likeCount}</span> : null}
           </span>
         )
       ) : null}
@@ -518,54 +524,63 @@ function WhoLine({
 
   if (roundIdentity && !pair) {
     const hasFigures = roundIdentity.net != null && roundIdentity.par != null;
-    const under = hasFigures && roundIdentity.net < roundIdentity.par;
-    // Server already gated; format only. Absent pair = no line, no gap.
+    const under = hasFigures && roundIdentity.net! < roundIdentity.par!;
+    // Server already gated; format only. Absent pair = empty HCP cell.
     const hcpPair = handicapPairDisplay({ handicapIndex: roundIdentity.handicapIndex, deltaIndex: roundIdentity.deltaIndex });
+    const toPar = toParLabel(roundIdentity.toPar ?? null);
+    const grossToParNode = toPar
+      ? <span style={{ ...NUMF, color: (roundIdentity.toPar ?? 0) < 0 ? TOPAR_UNDER_DARK : A.MUTE }}>{toPar}</span>
+      : null;
+    const hcpDeltaNode = hcpPair?.delta
+      ? <span style={{ ...NUMF, display: 'inline-flex', alignItems: 'center', gap: 2, color: hcpPair.delta.tone }}>
+          <span aria-hidden>{hcpPair.delta.arrow}</span><span>{hcpPair.delta.text}</span>
+        </span>
+      : null;
     return (
       <div data-round-under-tile="true" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <div data-round-identity-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 8 }}>
+        {/* FOUR COLUMNS, ALWAYS: a missing figure is an empty cell so NET sits at the same x on every card. */}
+        <div data-round-figures="true" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', marginTop: 4 }}>
+          <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')}
+            value={roundIdentity.gross != null ? String(roundIdentity.gross) : ''} suffix={grossToParNode} />
+          <FigureCell minHeight={34} label={t('amateur.stream.stat.net', 'NET')}
+            value={roundIdentity.net != null ? String(roundIdentity.net) : ''} />
+          <FigureCell minHeight={34} label={t('amateur.stream.stat.vsHcp', 'VS HCP')}
+            value={hasFigures ? vsHandicapLabel(roundIdentity.net!, roundIdentity.par!) : ''} under={under} />
+          <FigureCell minHeight={34} label={t('friendsRail.index', 'HCP')}
+            value={hcpPair?.index ?? ''} suffix={hcpDeltaNode} />
+        </div>
+        <div data-round-identity-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 8, marginTop: 12 }}>
           {avatar}
-          <span style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0, gap: 3 }}>
-            <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
-            {roundIdentity.course ? <span data-round-identity-course="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{roundIdentity.course}</span> : null}
-            {roundIdentity.date ? <span data-round-identity-date="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap' }}>{roundIdentity.date}</span> : null}
-            {hcpPair ? (
-              <span data-round-identity-hcp="true" style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                <span style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE }}>
-                  {t('friendsRail.index', 'HCP')} {hcpPair.index}
-                </span>
-                {hcpPair.delta ? (
-                  <span style={{ ...NUMF, marginLeft: 6, display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 10.5, fontWeight: 600, color: hcpPair.delta.tone }}>
-                    <span aria-hidden>{hcpPair.delta.arrow}</span>
-                    <span>{hcpPair.delta.text}</span>
-                  </span>
-                ) : null}
-              </span>
+          <span style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0, gap: 2 }}>
+            <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
+              <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: '0 1 auto' }}>{name}</span>
+              {roundIdentity.date ? (
+                <span data-round-identity-date="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.DIM, whiteSpace: 'nowrap', marginLeft: 'auto', flex: '0 0 auto' }}>{roundIdentity.date}</span>
+              ) : null}
+            </span>
+            {roundIdentity.course ? (
+              <span data-round-identity-course="true" style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{roundIdentity.course}</span>
             ) : null}
           </span>
-          {hasFigures ? (
-            <span data-round-identity-figures="true" style={{ display: 'flex', flex: '0 0 auto', alignItems: 'center', justifyContent: 'flex-end', gap: 18 }}>
-              <FigureCell label={t('amateur.stream.stat.net', 'NET')} value={String(roundIdentity.net)} />
-              <FigureCell label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHandicapLabel(roundIdentity.net, roundIdentity.par)} under={under} />
-            </span>
-          ) : null}
         </div>
-        {reactions ? <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minHeight: 32, marginTop: 4 }}>{reactions}</div> : null}
-        {/* Names line: lead/std only, same x as the clap (the footer's own left edge). */}
-        {!pair && engagement?.reactionSubjectId && engagement.likeCount > 0 ? (
-          <LikedByRow
-            postId={engagement.reactionSubjectId}
-            count={engagement.likeCount}
-            source={helpful ? 'review' : 'round'}
-            kind={helpful ? 'helpful' : 'celebrate'}
-            ownerName={engagement.ownerName ?? null}
-            isOwnRound={engagement.isOwnRound ?? false}
-            style={{ marginTop: 8 }}
-            /* Matched to AchievementCallout's subtext line (CALLOUT_SUBTEXT). */
-            fontSize={CALLOUT_SUBTEXT.fontSize}
-            fontWeight={CALLOUT_SUBTEXT.fontWeight}
-            lines={2}
-          />
+        {reactions || namesLineShows ? (
+          <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 32, marginTop: 4 }}>
+            {reactions}
+            {namesLineShows ? (
+              <LikedByRow
+                postId={engagement!.reactionSubjectId!}
+                count={engagement!.likeCount}
+                source={helpful ? 'review' : 'round'}
+                kind={helpful ? 'helpful' : 'celebrate'}
+                ownerName={engagement!.ownerName ?? null}
+                isOwnRound={engagement!.isOwnRound ?? false}
+                style={{ marginTop: 0, marginLeft: 'auto', textAlign: 'right', minWidth: 0 }}
+                fontSize={CALLOUT_SUBTEXT.fontSize}
+                fontWeight={CALLOUT_SUBTEXT.fontWeight}
+                lines={1}
+              />
+            ) : null}
+          </div>
         ) : null}
       </div>
     );
@@ -1435,7 +1450,7 @@ export function ExploreCard({
             onWhoTap={onWhoTap}
             engagement={engagement}
             roundIdentity={item.kind === 'round' && size !== 'pair'
-              ? { course: kickerPartsValue.course, date: playDateFull(item.facts.play_date ?? item.facts.arrived_at), net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null }
+              ? { course: kickerPartsValue.course, date: railCaptionDate(item.facts.play_date ?? item.facts.arrived_at), gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null }
               : undefined}
           />
         </span>
