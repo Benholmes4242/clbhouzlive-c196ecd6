@@ -23,7 +23,7 @@ import {
 } from '@/styles/photoScrim';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
-import { headlineFor, kickerParts, playDateFull, railCaptionDate, relativeDay, toParLabel } from './exploreCopy';
+import { headlineFor, kickerParts, railCaptionDate, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
 import { calloutFor, rendersOnPhoto } from './cardTreatment';
 import { FigureCell, RoundStatStrip, vsHandicapLabel } from './AchievementCallout';
