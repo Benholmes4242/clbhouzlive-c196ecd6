@@ -95,7 +95,7 @@ import { useCourseResults } from './useCourseResults';
 import { useCircleCourseIds, circleCourseIds, useMergedCourseShelves } from './useMergedCourseShelves';
 import { searchCourses, placeTree, placeCourseIds, type PlaceChoice } from './coursesSearch';
 import { CoursesSearchField } from './CoursesSearchField';
-import { RegionDropdown } from './RegionDropdown';
+import { RegionDropdown, type RegionDropdownHandle } from './RegionDropdown';
 import { ScopeControlSeparator } from './ScopeControlSeparator';
 import { useReviewPageEnrichment } from './useReviewPageEnrichment';
 
@@ -628,6 +628,24 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      that is the member's way back. */
   const [search, setSearch] = useState('');
   const [place, setPlace] = useState<PlaceChoice | null>(null);
+  const placePickerRef = useRef<RegionDropdownHandle>(null);
+  /* One place-choosing path for the picker and the region tiles (GEOGRAPHY_NAV §2). */
+  const choosePlace = (next: PlaceChoice | null) => {
+              analyticsEvents.track('amateur_place_changed', {
+                view,
+                country: next?.country ?? null,
+                region: next?.region ?? null,
+                scope_reset: next !== null && coursesScope !== 'world',
+              });
+              setPlace(next);
+              /* CHOOSING A PLACE MEANS EVERYONE IN IT (§5). Clearing it changes
+                 nothing about scope. */
+              if (next !== null) {
+                setCoursesScope('world');
+              }
+              setRevealed(STREAM_PAGE_SIZE);
+              loggedRef.current = 0;
+            };
   const query = search.trim();
   const filtering = view === 'courses' && (query.length >= 2 || place !== null);
 
@@ -1813,9 +1831,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     onDepart={depart}
                   />
                 ) : shelf === 'regionGrid' ? (
-                  <RegionGrid rows={courseGeo.regions} onPress={() => undefined} />
+                  <RegionGrid rows={courseGeo.regions} onPress={(row) => { choosePlace({ country: row.parent ?? '', region: row.region }); scrollPageToTop('auto'); }} />
                 ) : shelf === 'nationList' ? (
-                  <NationList rows={courseGeo.nations} onPress={() => undefined} />
+                  <NationList rows={courseGeo.nations} onPress={() => placePickerRef.current?.open()} />
                 ) : shelf === 'helpfulReviews' ? (
                   <HelpfulReviewsShelf
                     items={railReviews}
@@ -2056,24 +2074,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           </div>
           <ScopeControlSeparator />
           <RegionDropdown
+            ref={placePickerRef}
             tree={places}
             choice={place}
-            onChoose={(next) => {
-              analyticsEvents.track('amateur_place_changed', {
-                view,
-                country: next?.country ?? null,
-                region: next?.region ?? null,
-                scope_reset: next !== null && coursesScope !== 'world',
-              });
-              setPlace(next);
-              /* CHOOSING A PLACE MEANS EVERYONE IN IT (§5). Clearing it changes
-                 nothing about scope. */
-              if (next !== null) {
-                setCoursesScope('world');
-              }
-              setRevealed(STREAM_PAGE_SIZE);
-              loggedRef.current = 0;
-            }}
+            onChoose={choosePlace}
           />
         </div>
       ) : null}

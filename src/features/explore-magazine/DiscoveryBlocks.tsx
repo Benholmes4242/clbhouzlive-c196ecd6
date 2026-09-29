@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { A, NUMF, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
-import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { PHOTO_REVIEW_LABEL, SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 import { SHELF_HEADING } from './ExploreShelf';
 import type { NationActivityRow, RegionActivityRow } from './useDiscoveryCounts';
@@ -51,7 +51,7 @@ export function RegionGrid({ rows, onPress }: { rows: RegionActivityRow[] | null
                 ) : (
                   <>
                     {t('amateur.discovery.toDiscover', '{{count}} to discover', { count: row.toDiscover })}
-                    <span style={{ color: A.MUTE }}>
+                    <span style={{ color: PHOTO_REVIEW_LABEL }}>
                       {' \u00B7 '}
                       {t('amateur.discovery.playedOf', 'played {{played}} of {{active}}', { played: row.played, active: row.active })}
                     </span>
