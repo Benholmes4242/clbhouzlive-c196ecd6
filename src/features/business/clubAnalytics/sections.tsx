@@ -475,7 +475,7 @@ const StrokeIndexLocked: React.FC<{ gate: ClubCourseAnalytics['si_band_rows'] }>
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         style={{
-          ...bandText, color: A.AMBER, marginTop: 12, padding: 0, background: 'none', border: 0,
+          ...bandText, color: A.INK, marginTop: 12, padding: 0, background: 'none', border: 0,
           display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer',
         }}
       >
