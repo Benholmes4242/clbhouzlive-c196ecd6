@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { useParams, useNavigate, useNavigationType } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import GolfClubView from '@/components/golf-club/GolfClubView';
@@ -18,10 +18,12 @@ const CourseDetailPage = () => {
 
   usePreventOverscroll();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const sp = new URLSearchParams(window.location.search);
-    const hasDeepLink = sp.has('review') || sp.has('reviewId') || sp.has('tab');
+    const hasDeepLink = sp.has('review') || sp.has('reviewId');
     if (navigationType !== 'POP' && !hasDeepLink) {
+      const rootEl = document.getElementById('root');
+      if (rootEl) rootEl.scrollTop = 0;
       scrollPageToTop('auto');
     }
 

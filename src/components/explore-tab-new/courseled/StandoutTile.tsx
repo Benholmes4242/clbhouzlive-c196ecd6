@@ -147,6 +147,14 @@ interface Props {
    */
   delta?: number | null;
   /**
+   * A COMPLETE REPLACEMENT for the glass figure chip, not an addition to it
+   * (BRIEF_COURSE_TILES_BADGE_AND_SCROLL §2b). One caller: the course rails,
+   * which now wear the app's rank badge. Given, `figure`, `unit`,
+   * `figureTone`, `delta` and `wait` are all ignored — nesting a glass badge
+   * inside the glass chip would stack two blurs.
+   */
+  figureNode?: React.ReactNode;
+  /**
    * THE WAIT (BRIEF_FEAT_SECOND_FIGURE §1.2, §3.3) — the rounds a first-ever
    * feat took, drawn in the same chip slot as a delta but in WHITE, never
    * green: nothing was beaten, so there is no "better" to report. Mutually
@@ -169,6 +177,7 @@ export function StandoutTile({
   region,
   photo,
   figure,
+  figureNode,
   unit,
   unitTone,
   whenLabel,
@@ -265,7 +274,7 @@ export function StandoutTile({
             and blur live in `.standout-figure-chip` (liquid-glass.css) because
             the blur must be an @supports enhancement over a flat base fill —
             inline styles cannot express that (BRIEF_STANDOUT_TILE_MARGIN §5a). */}
-        {figure ? (
+        {figureNode ?? (figure ? (
           <span
             className="standout-figure-chip"
             style={{
@@ -389,7 +398,7 @@ export function StandoutTile({
             ) : null}
 
           </span>
-        ) : null}
+        ) : null)}
 
         {/* AGE — PLAIN TEXT ON THE PHOTO, EVERYWHERE, NO EXCEPTIONS.
             The glass date badge is RETIRED. Glass is the score chip's material,

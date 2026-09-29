@@ -10,8 +10,8 @@ import { courseSubScoreTone } from '@/features/courses/components/holes/analytic
 import type { ListEvent } from './listCourseEvents';
 import { ShelfShell } from './ExploreShells';
 import type { CourseShelfRow } from './useCourseShelves';
-import { RANK_SCOPE_LABEL } from './useTop100RankIndex';
 import { ratingPrintable } from './courseRatingFloor';
+import { RankFlagBadge } from './RankFlagBadge';
 
 /**
  * THE COURSE RAIL (BRIEF_EXPLORE_MAGAZINE PHASE C §3a-§3c) — kind: courses.
@@ -77,20 +77,11 @@ export function CourseShelf({
             courseId={row.courseId}
             courseName={row.name}
             imageUrl={row.imageUrl}
-            region={row.area}
+            region={null}
             photo={TILE.h}
               reserveTwoLines
-            figure={
-              row.rank != null
-                ? `#${row.rank}`
-                : ratingPrintable(row.rating, row.ratingCount)
-                  ? row.rating.toFixed(1)
-                  : null
-            }
-            /* THE CHIP NAMES THE LIST THE RANK CAME FROM. An unresolved scope
-               shows the rank alone — "#3" is honest, "#3 GB&I" on a New Jersey
-               course is not. */
-            unit={row.rank != null && row.rankScope ? RANK_SCOPE_LABEL[row.rankScope] : undefined}
+            figureNode={row.rank != null ? <RankFlagBadge rank={row.rank} scope={row.rankScope ?? null} /> : undefined}
+            figure={row.rank != null ? null : ratingPrintable(row.rating, row.ratingCount) ? row.rating.toFixed(1) : null}
             /* Neutral keeps the component's white default over photography. */
             figureTone={row.rank == null && ratingPrintable(row.rating, row.ratingCount) && row.rating >= 9 ? courseSubScoreTone(row.rating) : undefined}
             whenLabel=""
@@ -121,19 +112,23 @@ function sublineFor(
 ): string {
   const parts: string[] = [];
   if (event) {
-    if (event.kind === 'record') return t('amateur.stream.list.eventRecord', 'New course record');
-    if (event.kind === 'low' && event.gross != null) {
-      return t('amateur.stream.list.eventLow', 'New low of {{gross}}', { gross: event.gross });
-    }
-    if (event.kind === 'rating' && event.rating != null) {
-      return t('amateur.stream.list.eventRating', 'Newly rated {{rating}}', { rating: event.rating.toFixed(1) });
+    if (event.kind === 'record') {
+      parts.push(t('amateur.stream.list.eventRecord', 'New course record'));
+    } else if (event.kind === 'low' && event.gross != null) {
+      parts.push(t('amateur.stream.list.eventLow', 'New low of {{gross}}', { gross: event.gross }));
+    } else if (event.kind === 'rating' && event.rating != null) {
+      parts.push(t('amateur.stream.list.eventRating', 'Newly rated {{rating}}', { rating: event.rating.toFixed(1) }));
     }
   }
   if (row.area) parts.push(row.area);
-  if (row.ratingCount > 0) {
-    parts.push(t('amateur.stream.ratingCount', '{{count}} ratings', { count: row.ratingCount }));
-  } else if (row.rounds > 0) {
-    parts.push(t('amateur.stream.roundCount', '{{count}} rounds', { count: row.rounds }));
+  /* The sample only where there is no event — event plus area is already two
+     parts, and the panel clamps at two lines on a 180px tile. */
+  if (parts.length < 2) {
+    if (row.ratingCount > 0) {
+      parts.push(t('amateur.stream.ratingCount', '{{count}} ratings', { count: row.ratingCount }));
+    } else if (row.rounds > 0) {
+      parts.push(t('amateur.stream.roundCount', '{{count}} rounds', { count: row.rounds }));
+    }
   }
   return parts.join(' \u00B7 ');
 }

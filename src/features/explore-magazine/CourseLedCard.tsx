@@ -2,12 +2,12 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
-import { A, GOLD, NUMF, SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { A, NUMF, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
-import { RANK_PILL_BG, SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 import { courseHeadline } from './courseHeadline';
 import { toParLabel } from './exploreCopy';
@@ -16,6 +16,7 @@ import { coursePlaceLine } from './placeLine';
 import type { StreamItem } from './streamItem';
 import type { CourseQuote } from './useCourseQuotes';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
+import { RankFlagBadge } from './RankFlagBadge';
 
 /**
  * THE COURSE-LED CARD (BRIEF_COURSES_DISCOVERY §A2).
@@ -89,7 +90,7 @@ function EventSentence({ text, size, topar }: { text: string; size: number; topa
   );
 }
 
-function useRank(item: StreamItem): { rank: number; label: string | null } | null {
+function useRank(item: StreamItem): { rank: number; scope: RankListSlug | null } | null {
   const { index } = useTop100RankIndex();
   const courseId = item.subject?.course_id ?? null;
   const standing = courseId ? index?.get(courseId) ?? null : null;
@@ -97,27 +98,7 @@ function useRank(item: StreamItem): { rank: number; label: string | null } | nul
   if (rank == null) return null;
   const factScope = item.facts.top100_scope;
   const scope = standing?.scope ?? (factScope && factScope in RANK_SCOPE_LABEL ? (factScope as RankListSlug) : null);
-  return { rank, label: scope ? RANK_SCOPE_LABEL[scope] : null };
-}
-
-export function RankPill({ rank, label }: { rank: number; label: string | null }) {
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '4px 8px',
-        borderRadius: r.pill,
-        background: RANK_PILL_BG,
-        color: GOLD,
-        fontSize: 11,
-        ...NUMF,
-      }}
-    >
-      {'\u2605'} #{rank}{label ? ` ${label}` : ''}
-    </span>
-  );
+  return { rank, scope };
 }
 
 function Figure({ rating, count, size }: { rating: number; count: number; size: number }) {
@@ -204,7 +185,7 @@ export function CourseLedCard({
         )}
         {rank ? (
           <div style={{ position: 'absolute', top: 10, left: 10, pointerEvents: 'none' }}>
-            <RankPill rank={rank.rank} label={rank.label} />
+            <RankFlagBadge rank={rank.rank} scope={rank.scope} />
           </div>
         ) : null}
       </div>
