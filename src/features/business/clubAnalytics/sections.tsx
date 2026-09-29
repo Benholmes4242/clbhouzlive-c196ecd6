@@ -116,7 +116,7 @@ export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?
     }}
   >
     {cells.map((c) => (
-      <div key={c.label} style={{ background: A.PANEL, padding: '13px 12px' }}>
+      <div key={c.label} style={{ background: A.PANEL, padding: '13px 12px', textAlign: 'center' }}>
         <div style={bizFigure(21, c.tone ?? A.INK)}>{c.figure}</div>
         {/* LABEL_FITS §3 — every cell reserves two lines so figures share a baseline. */}
         <div style={{ ...LABEL, marginTop: 6, ...(twoLineLabels ? { lineHeight: 1.3, minHeight: '2.6em' } : null) }}>{c.label}</div>
