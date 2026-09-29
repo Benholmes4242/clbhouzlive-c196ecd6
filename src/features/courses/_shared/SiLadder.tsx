@@ -42,7 +42,7 @@ export type SiLadderVoice = 'club' | 'course';
 /** §3 — the only difference between the two surfaces. */
 const COPY: Record<SiLadderVoice, { heading: string; subline: string; closing: string; harder: string; easier: string }> = {
   club: {
-    heading: 'Where your card and your difficulty order part company',
+    heading: 'Stroke indexes',
     subline:
       'How hard each hole plays for your members overall, against the position your card gives it. This is a difficulty order, which is not the same thing as a stroke index \u2014 the Stroke index check below is the one that measures a stroke index properly.',
     closing:
