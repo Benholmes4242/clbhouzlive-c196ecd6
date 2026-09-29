@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
@@ -43,11 +44,15 @@ import { useWatchVideos } from './useWatchVideos';
  * knows what a vertical thumbnail is; a badge would be the layout apologising
  * for itself.
  *
- * NO SEE-ALL ON ANY SECTION. A see-all implies a fuller list elsewhere, which
- * would make this page a summary of something rather than the thing itself. The
- * RAILS ARE WINDOWS INTO THE FEED: each repeat takes the NEXT window of rows,
- * never the first one again, and a member who wants more clips taps the Clips
- * chip and the whole page becomes clips.
+ * SEE-ALL IS A DOORWAY, NOT A SUMMARY (owner ruling, 2026-09-29; reverses the
+ * blanket no-see-all of BRIEF_WATCH_MIXED_FEED). The Clips rail opens
+ * /watch/clips and the community rail opens /media?kind=community — the full
+ * pages for those kinds, the same destinations the member can already reach
+ * from the Watch hub's doors and Discover's shelves. The label stays
+ * count-free: a rail only knows its loaded window, and a count of a window
+ * would be a lie. Inside the feed the rails still take the NEXT window of
+ * rows, never the first one again, and only the Clips chip turns the whole
+ * page into clips.
  *
  * WATCH IS CLIENT-COMPOSED. It is not in the stream ranker's pool and this
  * brief does not change that.
@@ -145,6 +150,7 @@ function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number | st
 
 export function WatchFeed({ userId, onDepart }: { userId: string | undefined; onDepart: () => void }) {
   const { t } = useTranslation('courses');
+  const navigate = useNavigate();
   /* SESSION-SCOPED SELECTION: the chip resets to All on the next visit, so the
      page a member returns to is the page the page is meant to be. */
   const [filter, setFilter] = useState<WatchFilter>('all');
@@ -301,7 +307,15 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
     if (window.length === 0) return null;
     const offset = clipRows.indexOf(window[0]);
     return (
-      <ExploreShelf heading={t('amateur.watch.rail.clips', 'Clips')} seeAllLabel={null}>
+      <ExploreShelf
+        heading={t('amateur.watch.rail.clips', 'Clips')}
+        seeAllLabel={t('amateur.watch.seeAll', 'See all')}
+        onSeeAll={() => {
+          analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
+          onDepart();
+          navigate('/watch/clips');
+        }}
+      >
         {window.map((row, index) => (
           <div key={`clip:${row.post_id}:${row.media_id ?? index}`} style={{ flex: `0 0 ${CLIP_W}px` }}>
             <ClipTile row={row} onPress={() => openClip(offset + index)} />
@@ -326,7 +340,15 @@ export function WatchFeed({ userId, onDepart }: { userId: string | undefined; on
     const window = momentWindow(ordinal);
     if (window.length === 0) return null;
     return (
-      <ExploreShelf heading={t('amateur.watch.rail.community', 'From the community')} seeAllLabel={null}>
+      <ExploreShelf
+        heading={t('amateur.watch.rail.community', 'From the community')}
+        seeAllLabel={t('amateur.watch.seeAll', 'See all')}
+        onSeeAll={() => {
+          analyticsEvents.track('amateur_shelf_see_all', { kind: 'moments', surface: 'watch' });
+          onDepart();
+          navigate('/media?kind=community');
+        }}
+      >
         {window.map((moment) => (
           <div key={`moment:${moment.key}`} style={{ flex: `0 0 ${MOMENT_W}px` }}>
             <div style={{ width: MOMENT_W, height: MOMENT_W }}>
