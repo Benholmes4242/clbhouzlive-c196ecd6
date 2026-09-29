@@ -14,6 +14,9 @@ import type { NationActivityRow, RegionActivityRow } from './useDiscoveryCounts'
  * lands. No rows = no block.
  */
 
+/** Same shadow the other on-photo labels use (CoursesPlayedSection). */
+const ON_PHOTO_SHADOW = '0 1px 2px rgba(0,0,0,0.72)';
+
 function Heading({ children }: { children: string }) {
   return <div style={{ ...SHELF_HEADING, padding: '0 16px', marginBottom: 10 }}>{children}</div>;
 }
@@ -39,13 +42,21 @@ export function RegionGrid({ rows, onPress }: { rows: RegionActivityRow[] | null
             )}
             <div aria-hidden style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
             <div style={{ position: 'absolute', left: 10, right: 10, bottom: 9 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.region}</div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...{ fontVariantNumeric: 'tabular-nums' } }}>
-                {t('amateur.discovery.toDiscover', '{{count}} to discover', { count: row.toDiscover })}
-                <span style={{ color: A.MUTE }}>
-                  {' \u00B7 '}
-                  {t('amateur.discovery.playedOf', 'played {{played}} of {{active}}', { played: row.played, active: row.active })}
-                </span>
+              <div style={{ fontSize: 15, fontWeight: 700, color: A.INK, textShadow: ON_PHOTO_SHADOW, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.region}</div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: A.INK, textShadow: ON_PHOTO_SHADOW, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...NUMF }}>
+                {row.played === 0 ? (
+                  t('amateur.discovery.activeCourses', '{{count}} courses', { count: row.active })
+                ) : row.played >= row.active ? (
+                  t('amateur.discovery.playedAll', "You've played all {{count}}", { count: row.active })
+                ) : (
+                  <>
+                    {t('amateur.discovery.toDiscover', '{{count}} to discover', { count: row.toDiscover })}
+                    <span style={{ color: A.MUTE }}>
+                      {' \u00B7 '}
+                      {t('amateur.discovery.playedOf', 'played {{played}} of {{active}}', { played: row.played, active: row.active })}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </button>
@@ -61,19 +72,23 @@ export function NationList({ rows, onPress }: { rows: NationActivityRow[] | null
   return (
     <div style={{ fontFamily: SANS }}>
       <Heading>{t('amateur.discovery.nationsHeading', 'Browse the world')}</Heading>
+      <div style={{ padding: '0 16px', marginTop: -6, marginBottom: 10, fontSize: 11.5, fontWeight: 500, color: A.DIM }}>
+        {t('amateur.discovery.nationsSub', 'Courses with a round or a rating')}
+      </div>
       <div style={{ margin: '0 12px', borderRadius: r.md, background: A.PANEL, overflow: 'hidden' }}>
         {rows.map((row, i) => {
           const empty = row.active === 0;
           const inner = (
             <>
               <span style={{ fontSize: 14, fontWeight: 600, color: A.INK }}>{row.nation}</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: A.MUTE }}>
+              <span style={{ fontSize: 11.5, fontWeight: 600, color: A.DIM, ...NUMF }}>
                 {empty ? (
                   t('amateur.discovery.nothingYet', 'Nothing yet')
                 ) : (
                   <>
-                    <span style={NUMF}>{row.active.toLocaleString()}</span>{' '}
-                    {t('amateur.discovery.courses', 'courses')} {'\u203A'}
+                    {row.active === 1
+                      ? t('amateur.discovery.oneCourse', '1 course')
+                      : t('amateur.discovery.nCourses', '{{n}} courses', { n: row.active.toLocaleString() })}{' \u203A'}
                   </>
                 )}
               </span>
