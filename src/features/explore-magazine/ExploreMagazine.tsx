@@ -74,7 +74,7 @@ import { VideoCard } from './watch/videoUnit';
 import { useWatchVideos } from './watch/useWatchVideos';
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { useFeaturedRound } from './useFeaturedRound';
-import { FeaturedRoundCard } from './FeaturedRoundCard';
+import { FeaturedRoundCard, FeaturedRoundSkeleton } from './FeaturedRoundCard';
 import { useExploreStream } from './useExploreStream';
 import { dedupeItems, warnDuplicates } from './dedupeStream';
 import type { StreamItem } from './streamItem';
@@ -2120,6 +2120,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         /* HEADS THE STREAM, NOT THE RAIL — Your circle is never scoped by the chip row. */
         <div style={{ fontFamily: SANS, ...SHELF_HEADING, padding: '0 16px 10px' }}>
           {scoreScopeLabel}
+        </div>
+      ) : null}
+      {view === 'all' && featured.isLoading ? (
+        <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
+          <FeaturedRoundSkeleton />
         </div>
       ) : null}
       {view === 'all' && featured.data ? (
