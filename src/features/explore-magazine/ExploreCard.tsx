@@ -1254,7 +1254,7 @@ export function ExploreCard({
         <span
           aria-hidden
           data-explore-review-scrim="true"
-          style={{ position: 'absolute', inset: 0, background: HERO_REVIEW_SCRIM, zIndex: 1 }}
+          style={{ position: 'absolute', inset: 0, background: HERO_REVIEW_SCRIM, zIndex: 1, pointerEvents: 'none' }}
         />
       ) : null}
       {/* BRIEF_EXPLORE_REVIEW_TILE_VIDEO §3 — A REVIEW VIDEO AUTOPLAYS, muted and
@@ -1283,7 +1283,7 @@ export function ExploreCard({
         <span
           aria-hidden
           data-explore-story-scrim="true"
-          style={{ position: 'absolute', inset: 0, background: HERO_STORY_SCRIM, zIndex: 1 }}
+          style={{ position: 'absolute', inset: 0, background: HERO_STORY_SCRIM, zIndex: 1, pointerEvents: 'none' }}
         />
       ) : null}
       {onPhoto ? (
@@ -1309,7 +1309,7 @@ export function ExploreCard({
               <span
                 aria-hidden
                 data-explore-copy-scrim="true"
-                style={{ position: 'absolute', inset: 0, background: HERO_COPY_SCRIM, zIndex: 0 }}
+                style={{ position: 'absolute', inset: 0, background: HERO_COPY_SCRIM, zIndex: 0, pointerEvents: 'none' }}
               />
             )}
             <span
@@ -1337,6 +1337,7 @@ export function ExploreCard({
               style={{
                 position: 'relative',
                 zIndex: 1,
+                pointerEvents: 'none',
                 height: hasVisual ? band + 12 : 16,
                 display: 'flex',
                 alignItems: 'flex-end',
