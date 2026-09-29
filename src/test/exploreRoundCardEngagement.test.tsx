@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ExploreCard, type RoundCardEngagement } from '@/features/explore-magazine/ExploreCard';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
 import { CELEBRATE_GLYPH_SIZE } from '@/lib/reactionKind';
-import { playDateFull } from '@/features/explore-magazine/exploreCopy';
+import { railCaptionDate } from '@/features/explore-magazine/exploreCopy';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
 afterEach(cleanup);
@@ -39,8 +39,8 @@ describe('Explore round-card who-line engagement', () => {
     expect(view.container.querySelector('[data-round-identity-row="true"]')).not.toBeNull();
     expect(view.container.querySelector('[data-round-identity-meta="true"]')).toBeNull();
     expect(view.container.querySelector('[data-round-identity-course="true"]')?.textContent).toBe('Test Course');
-    expect(view.container.querySelector('[data-round-identity-date="true"]')?.textContent).toBe(playDateFull('2026-09-15'));
-    expect(view.container.querySelector('[data-round-identity-figures="true"]')?.textContent).toContain('NET76VS HCP+4');
+    expect(view.container.querySelector('[data-round-identity-date="true"]')?.textContent).toBe(railCaptionDate('2026-09-15'));
+    expect(view.container.querySelector('[data-round-figures="true"]')?.textContent).toContain('NET76VS HCP+4');
     expect(view.container.querySelector('[data-round-reactions-row="true"] [data-round-reactions="controls"]')).not.toBeNull();
     expect(view.container.querySelector('[data-explore-headline="true"]')).toBeNull();
     expect(view.container.querySelector('[data-explore-kicker="true"]')).toBeNull();
@@ -55,7 +55,7 @@ describe('Explore round-card who-line engagement', () => {
     const date = view.container.querySelector<HTMLElement>('[data-round-identity-date="true"]');
     expect(course?.textContent).toBe('Test Course');
     expect(course?.style.textOverflow).toBe('ellipsis');
-    expect(date?.textContent).toBe(playDateFull(priorYear));
+    expect(date?.textContent).toBe(railCaptionDate(priorYear));
     expect(date?.textContent).toContain(String(new Date().getFullYear() - 1));
     expect(date?.style.textOverflow).toBe('');
   });

@@ -294,14 +294,27 @@ export function vsHandicapLabel(net: number, par: number): string {
   return delta < 0 ? `\u2212${Math.abs(delta)}` : `+${delta}`;
 }
 
-export function FigureCell({ label, value, under }: { label: string; value: string; under?: boolean }) {
+export function FigureCell({
+  label, value, under, suffix, minHeight = 52,
+}: {
+  label: string;
+  value: string;
+  under?: boolean;
+  /** A second, smaller figure on the value's baseline — the to-par beside a
+   *  gross, the delta beside a handicap. Its own colour; never inherits the
+   *  value's `under` tone. */
+  suffix?: React.ReactNode;
+  /** 52 matches the four-line identity column the round card used to have.
+   *  The scoreboard strip has no column beside it and passes 34. */
+  minHeight?: number;
+}) {
   return (
     <span
       data-explore-stat={label.toLowerCase().replace(/\s+/g, '-')}
       style={{
         display: 'flex',
         minWidth: 0,
-        minHeight: 52,
+        minHeight,
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
@@ -316,6 +329,7 @@ export function FigureCell({ label, value, under }: { label: string; value: stri
         style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: under ? TOPAR_UNDER_DARK : A.INK }}
       >
         {value}
+        {suffix ? <span style={{ fontSize: 11, fontWeight: 700, marginLeft: 3 }}>{suffix}</span> : null}
       </span>
     </span>
   );
