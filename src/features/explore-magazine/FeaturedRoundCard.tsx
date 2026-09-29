@@ -13,7 +13,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { celebrateFigureSize } from '@/lib/reactionKind';
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
@@ -21,17 +21,16 @@ import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { MINUS } from './exploreCopy';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
+import { r as rad } from '@/lib/radius';
+import { useFitOneLine } from './useFitOneLine';
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
 import { goodHoleDots } from './roundTreatment';
-
-const GOLD = SC_FILL_GOLD;
-const gold = (pct: number) => `color-mix(in srgb, ${GOLD} ${pct}%, transparent)`;
 /** BRIEF_FEATURED_ROUND_PANE_V2 §1 — 290, never less. 210 left no room for the
  *  trace and the text block to coexist. The pane may grow if copy wraps. */
 const PANE_H = 290;
@@ -68,9 +67,7 @@ const toPar = (n: number | null) => (n == null ? null : n === 0 ? 'E' : signed(n
 function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
   const { t } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
-  const feat = (text: string) => (
-    <span style={{ ...BIG_WORD, color: GOLD }}>{text}</span>
-  );
+  const feat = (text: string) => <span style={BIG_WORD}>{text}</span>;
   const points = (n: number) => (
     <span style={{ ...ROW, gap: 6 }}>
       <span style={{ ...BIG, flex: '0 0 auto' }}>{n}</span>
@@ -127,6 +124,7 @@ export const FeaturedRoundCard: React.FC<{
   const { t, i18n } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
   const mine = !!viewerId && r.user_id === viewerId;
+  const nameRef = useFitOneLine<HTMLDivElement>(r.course_name ?? '', 13.5, 10.5);
 
   const image = r.image_url;
   const gross = r.gross == null ? null : `${r.gross}`;
@@ -151,8 +149,10 @@ export const FeaturedRoundCard: React.FC<{
   const date = r.play_date
     ? new Date(r.play_date).toLocaleDateString(i18n.language, { day: 'numeric', month: 'short' })
     : null;
-  // V2 §5 — the place line: course · the kicker's figures · date.
-  const placeLine = [r.course_name, ...parts, date].filter(Boolean).join(' · ');
+  /* LEAD-HERO PARITY — the card now shares the Courses lead card's design:
+     no frame, no footer strip; chip top-left, then figure, member, course name
+     and an uppercase fact line over the photograph. */
+  const factLine = [...parts, date].filter(Boolean).join(' · ');
   const traceRow = { round_id: r.whs_score_id, front_nine_to_par: null, back_nine_to_par: null } as unknown as CircleRoundRow;
   const dots = goodHoleDots(shape);
 
@@ -161,47 +161,26 @@ export const FeaturedRoundCard: React.FC<{
       type="button"
       onClick={onOpen}
       style={{
-        display: 'block',
-        width: '100%',
-        textAlign: 'left',
-        padding: 0,
-        borderRadius: 18,
-        border: `1px solid ${gold(26)}`,
-        overflow: 'hidden',
-        background: A.PANEL,
-        fontFamily: SANS,
-        cursor: 'pointer',
+        all: 'unset', display: 'block', width: '100%', boxSizing: 'border-box', cursor: 'pointer', fontFamily: SANS,
       }}
     >
-      <div style={{ position: 'relative', minHeight: PANE_H, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', minHeight: PANE_H, borderRadius: rad.lg, overflow: 'hidden', background: A.PANEL, display: 'flex', flexDirection: 'column' }}>
         {image ? (
           <img src={image} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-        ) : null}
-        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: SCRIM }} />
-        <div
+        ) : (
+          <CourseImageFallback />
+        )}
+        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: SCRIM, pointerEvents: 'none' }} />
+        <span
+          className="standout-figure-chip"
           style={{
-            position: 'absolute',
-            top: 14,
-            left: 14,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            borderRadius: 999,
-            padding: '5px 11px 5px 8px',
-            // V2 §6 — the pill carries its own darkening so gold reads on a bright sky.
-            background: `linear-gradient(${gold(18)}, ${gold(18)}), color-mix(in srgb, black 64%, transparent)`,
-            zIndex: 1,
-            border: `1px solid ${gold(34)}`,
+            position: 'absolute', top: 12, left: 12, zIndex: 1, color: A.INK, fontSize: 10, fontWeight: 700,
+            letterSpacing: '0.12em', textTransform: 'uppercase', padding: '5px 10px', borderRadius: rad.pill,
           }}
         >
-          <Trophy size={12} color={GOLD} strokeWidth={2.4} aria-hidden="true" />
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.17em', textTransform: 'uppercase', color: GOLD }}>
-            {k('label')}
-          </span>
-        </div>
-        {/* V2 §2/§3 — pill lane, the trace in the upper middle with air around it,
-            then the text block in the lower third. */}
-        <div style={{ flex: '0 0 52px' }} />
+          {k('label')}
+        </span>
+        <div style={{ flex: '0 0 44px' }} />
         <div aria-hidden="true" style={{ position: 'relative', flex: '1 1 auto', minHeight: shape ? SHAPE_BAND + 36 : 24, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0 18px' }}>
           {shape ? (
             <RoundShape row={traceRow} shape={shape} width={SHAPE_W} height={SHAPE_BAND - EXPLORE_END_LABEL_BAND}
@@ -209,95 +188,75 @@ export const FeaturedRoundCard: React.FC<{
               exploreLineOnly endLabels exploreGlow exploreDots={dots} underParFill />
           ) : null}
         </div>
-        <div style={{ position: 'relative', padding: '0 16px 16px', textShadow: TEXT_SHADOW }}>
+        <div style={{ position: 'relative', padding: '0 16px 14px', textShadow: TEXT_SHADOW }}>
           <Headline r={r} unit={unit} />
-          <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-            {/* §1 THE AVATAR IS 30px, EXPLICITLY — it can never fill the pane again. */}
+          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
             <span style={{ width: 30, height: 30, flex: '0 0 30px', display: 'inline-flex' }}>
-              <SquircleAvatar size={30} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} hairlineRing hideRing={false} />
+              <SquircleAvatar size={30} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} hideRing />
             </span>
-            <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', color: mine ? A.AMBER : A.INK }}>
+            <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 19, fontWeight: 700, letterSpacing: '-0.01em', color: mine ? A.AMBER : A.INK }}>
               {mine ? t('courseDetail.records.you') : r.display_name}
             </span>
+            {engagement ? <Actions engagement={engagement} mine={mine} /> : null}
           </div>
-          {placeLine ? (
-            <div style={{ marginTop: 6, fontSize: 13, fontWeight: 500, color: A.INK, ...FIG }}>{placeLine}</div>
+          <div
+            ref={nameRef}
+            style={{ marginTop: 8, fontSize: 13.5, fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.86)', whiteSpace: 'nowrap', overflow: 'hidden' }}
+          >
+            {r.course_name ?? ''}
+          </div>
+          {factLine ? (
+            <div
+              style={{ marginTop: 4, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.62)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...FIG }}
+            >
+              {factLine}
+            </div>
           ) : null}
         </div>
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: '12px 16px',
-          background: gold(6),
-          fontSize: 13,
-          color: A.INK,
-        }}
-      >
-        <span style={{ flex: 1, minWidth: 0 }}>{k('strapline')}</span>
-        {engagement ? (
-          <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 24 }}>
-            {/* size 20, not CELEBRATE_GLYPH_SIZE (23): on a 13px strip the default dominates (BRIEF_FEATURED_ROUND_ACTIONS §3). */}
-            <ReactionAction
-              kind="celebrate"
-              tone="ink"
-              size={20}
-              figureSize={celebrateFigureSize(20)}
-              count={engagement.likeCount}
-              reacted={engagement.liked}
-              readOnly={mine}
-              hidden={!engagement.likeAvailable || !engagement.onToggleLike}
-              onToggle={() => engagement.onToggleLike?.()}
-              label={
-                engagement.liked
-                  ? t('amateur.round.celebrated', 'Celebrated')
-                  : t('amateur.round.celebrate', 'Celebrate this round')
-              }
-            />
-            <span
-              role="button"
-              tabIndex={0}
-              aria-label={`Comments, ${engagement.commentCount}`}
-              onClick={(ev) => {
-                ev.stopPropagation();
-                ev.preventDefault();
-                engagement.onOpenComments();
-              }}
-              onKeyDown={(ev) => {
-                if (ev.key !== 'Enter' && ev.key !== ' ') return;
-                ev.stopPropagation();
-                ev.preventDefault();
-                engagement.onOpenComments();
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-                color: A.MUTE,
-                cursor: 'pointer',
-                padding: '13px 12px',
-                margin: '-13px -12px',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <MessageCircle size={20} strokeWidth={2} color={A.MUTE} aria-hidden />
-              {engagement.commentCount > 0 ? (
-                <span
-                  className="tabular-nums"
-                  style={{ ...FIGS, fontSize: celebrateFigureSize(20), fontWeight: 700, lineHeight: 1, color: A.MUTE }}
-                >
-                  {engagement.commentCount}
-                </span>
-              ) : null}
-            </span>
-          </span>
-        ) : null}
       </div>
     </button>
   );
 };
+
+function Actions({ engagement, mine }: { engagement: FeaturedRoundEngagement; mine: boolean }) {
+  const { t } = useTranslation('courses');
+  const open = (ev: React.SyntheticEvent) => {
+    ev.stopPropagation();
+    ev.preventDefault();
+    engagement.onOpenComments();
+  };
+  return (
+    <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 24, textShadow: 'none' }}>
+      <ReactionAction
+        kind="celebrate"
+        tone="ink"
+        size={20}
+        figureSize={celebrateFigureSize(20)}
+        count={engagement.likeCount}
+        reacted={engagement.liked}
+        readOnly={mine}
+        hidden={!engagement.likeAvailable || !engagement.onToggleLike}
+        onToggle={() => engagement.onToggleLike?.()}
+        label={engagement.liked ? t('amateur.round.celebrated', 'Celebrated') : t('amateur.round.celebrate', 'Celebrate this round')}
+      />
+      <span
+        role="button"
+        tabIndex={0}
+        aria-label={`Comments, ${engagement.commentCount}`}
+        onClick={open}
+        onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') open(ev); }}
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: A.INK, cursor: 'pointer', padding: '13px 12px', margin: '-13px -12px', WebkitTapHighlightColor: 'transparent' }}
+      >
+        <MessageCircle size={20} strokeWidth={2} color={A.INK} aria-hidden />
+        {engagement.commentCount > 0 ? (
+          <span className="tabular-nums" style={{ ...FIGS, fontSize: celebrateFigureSize(20), fontWeight: 700, lineHeight: 1, color: A.INK }}>
+            {engagement.commentCount}
+          </span>
+        ) : null}
+      </span>
+    </span>
+  );
+}
 
 export interface FeaturedRoundEngagement {
   likeCount: number;
