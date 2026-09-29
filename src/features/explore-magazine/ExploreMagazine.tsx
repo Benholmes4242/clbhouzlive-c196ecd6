@@ -403,7 +403,7 @@ function VideosShelf({
   );
 }
 
-function MomentsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) {
+function MomentsShelf({ pos, onOpenCommunity }: { pos: number; onOpenCommunity: () => void }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const moments = useMomentsOfTheWeek(30, { enabled: true, candidateLimit: 72 });
@@ -430,8 +430,8 @@ function MomentsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) 
       onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'moments', pos })}
       onSeeAll={() => {
         analyticsEvents.track('amateur_shelf_see_all', { kind: 'moments' });
-        onDepart();
-        navigate('/media?kind=community');
+        /* Opens Watch with the Community chip selected — not /media. */
+        onOpenCommunity();
       }}
     >
       {tiles.map((moment) => (
@@ -529,6 +529,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const openReview = useReviewSheetStore((state) => state.open);
 
   const [view, setView] = useState<ExploreView>(() => readExploreView());
+  const [watchEntry, setWatchEntry] = useState<'all' | 'community'>('all');
   const geography = useViewerScoreScope(userId);
   /* §1 ONE SCOPE ROW, ONE COMPONENT, TWO VIEWS. Scores and the merged Courses
      view read the SAME shared geography resolver; All and Watch never show the
@@ -1070,6 +1071,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     },
     [view],
   );
+  const openCommunity = useCallback(() => {
+    setWatchEntry('community');
+    changeView('watch');
+  }, [changeView]);
 
 
   /* ==================================================================== §2
@@ -1676,7 +1681,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     pos={pos}
                   />
                 ) : (
-                  <MomentsShelf pos={pos} onDepart={depart} />
+                  <MomentsShelf pos={pos} onOpenCommunity={openCommunity} />
                 )}
     </>
   );
@@ -1728,7 +1733,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       {/* THE WATCH VIEW IS ONE ENDLESS MIXED FEED, shape-typed and searchable
           (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely; the
           view chips above stay exactly where they are. */}
-      {view === 'watch' ? <WatchFeed userId={userId} onDepart={depart} /> : null}
+      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} /> : null}
 
       {/* §6 THE SEARCH FIELD SITS ABOVE THE SCOPE ROW on the merged Courses view.
           Results replace the page BODY; this field, the scope row and the chips
