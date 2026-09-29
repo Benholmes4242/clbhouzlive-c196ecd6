@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useNavigationType, useSearchParams } from 'react-router-dom';
 
 import { MomentsGrid } from '@/components/explore-tab-new/courseled/MomentsGrid';
 import { MediaRailTile } from '@/components/explore-tab-new/courseled/MediaRailTile';
@@ -134,9 +134,23 @@ export default function MediaLibraryPage() {
         { replace: true },
       );
       analyticsEvents.track('media_library_kind_changed', { kind: next });
+      /* EACH KIND IS A DIFFERENT WALL of a different length. ScrollRestoration
+         keeps scroll on query-only changes (right for tabs over one list, wrong
+         here), so the page resets itself. Page-local; globals untouched. */
+      scrollPageToTop('instant');
     },
     [setParams],
   );
+
+  /* OPEN AT THE TOP. This component IS the lazy chunk, so a layout effect here
+     only runs once the real content is in the tree — never under the Suspense
+     fallback. First mount only (empty deps), and a POP is left alone so
+     ScrollRestoration's saved position wins on back navigation. */
+  const navigationType = useNavigationType();
+  useLayoutEffect(() => {
+    if (navigationType !== 'POP') scrollPageToTop('instant');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* Entering with no kind states the default in the URL, so a share or a
      refresh lands on the same wall. */
