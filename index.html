@@ -25,7 +25,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-itunes-app" content="app-id=6752538886">
-    <meta name="theme-color" content="#15171F" id="theme-color-meta">
+    <meta name="theme-color" content="#0A0A0C" id="theme-color-meta">
 
     <!-- Font CDN preconnects -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,13 +57,14 @@
 
   </head>
 
-  <body style="background-color:#15171F;margin:0;">
+  <body style="background-color:#0A0A0C;margin:0;">
     <!-- Shield seeded TRANSPARENT so full-bleed/immersive heroes (tour/course/profile/business)
-         can bleed into the notch from frame 0. The body+root behind it remain #15171F, so the
-         Clubhouse cold-launch chain still reads as seamless charcoal. Dark-chrome routes
-         (Clubhouse) repaint the shield to #15171F via App.tsx's route effect. -->
+         can bleed into the notch from frame 0. The body and root behind it are PAGE_CANVAS
+         (#0A0A0C), the same ground every route paints, so the cold-launch chain shows no colour
+         step. These three values are the pre-React mirror of PAGE_CANVAS in
+         src/lib/tokens/surfaces.ts — if that token moves, move them in the same commit. -->
     <div id="safe-area-shield" aria-hidden="true" style="background-color:transparent;"></div>
-    <div id="root"><div style="background:#F8FAFC;min-height:100vh;width:100%;"></div></div>
+    <div id="root"><div style="background:#0A0A0C;min-height:100vh;width:100%;"></div></div>
     <div id="portal-root"></div>
     <script>
       // Early log buffer: captures console output BEFORE the JS modules evaluate, so the on-screen

@@ -121,7 +121,7 @@ export function isImmersiveRoute(pathname: string): boolean {
  * PageRoot status-bar styling, and pre-React shell seeding.
  *
  * The cold-launch chain (splash → shell → skeleton → feed) is all
- * `#15171F` on these routes so there is no perceptible colour transition.
+ * `#0A0A0C` on these routes so there is no perceptible colour transition.
  */
 export const DARK_CHROME_ROUTES = ['/', '/clubhouse', '/auth', '/signup'] as const;
 
