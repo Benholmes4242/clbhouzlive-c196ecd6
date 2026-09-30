@@ -300,7 +300,7 @@ const InboxV2Page: React.FC = () => {
                           </span>
                         ) : null}
                         <div style={{ width: 56, height: 56, margin: '0 auto' }}>
-                          <SquircleAvatar src={m.avatarUrl} name={m.name} size={56} />
+                          <SquircleAvatar src={m.avatarUrl} alt={m.name} userId={m.userId} size={56} />
                         </div>
                         <div style={{ marginTop: 5, fontSize: 11, color: MSG.INK_2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {m.name.split(' ')[0]}
