@@ -30,6 +30,7 @@ export interface BusinessReview {
   review_date: string;
   design_score: number | null;
   condition_score: number | null;
+  clubhouse_score: number | null;
   facilities_score: number | null;
   course_id: string;
   course_name: string;

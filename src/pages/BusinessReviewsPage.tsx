@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { RailChips, APPLIED_FILL } from '@/components/ui/RailChips';
 import { formatHcp } from '@/lib/formatHcp';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
@@ -210,31 +210,6 @@ function ReplySheet({
 
 /* ─────────────── Small parts ─────────────── */
 
-function RatingChip({ rating }: { rating: number }) {
-  const t = ratingTone(rating);
-  return (
-    <span
-      className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11.5px] font-bold tabular-nums"
-      style={{ background: t.bg, color: t.fg }}
-    >
-      <Star size={10} strokeWidth={2.5} style={{ fill: t.fg, color: t.fg }} />
-      {fmtRating(rating)}
-    </span>
-  );
-}
-
-function CourseTag({ name }: { name: string }) {
-  return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold truncate max-w-[180px]"
-      style={{ background: 'rgba(255,255,255,0.06)', color: INK_45, border: `1px solid ${HAIR}` }}
-    >
-      <MapPin size={10} strokeWidth={2.5} />
-      <span className="truncate">{name}</span>
-    </span>
-  );
-}
-
 function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }> }) {
   const max = Math.max(...dist.map((d) => d.count), 1);
   const labels: Record<number, string> = { 5: '9-10', 4: '7-8', 3: '5-6', 2: '3-4', 1: '0-2' };
@@ -321,38 +296,58 @@ function ReviewCard({
   const hasReply = !!r.response;
   const isOwnReply = hasReply && r.response?.responded_by === currentUserId;
 
+  const bodyRef = useRef<HTMLParagraphElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [clamped, setClamped] = useState(false);
+  useLayoutEffect(() => {
+    const el = bodyRef.current;
+    if (el && !expanded) setClamped(el.scrollHeight > el.clientHeight + 1);
+  }, [r.review, expanded]);
+
+  const meta = [
+    r.reviewer.handicap != null ? `HCP ${formatHcp(r.reviewer.handicap)}` : null,
+    courseNameWithinClub(r.course_name),
+    relativeTime(r.review_date),
+  ].filter(Boolean).join(' · ');
+
+  /* Canonical category order — ReviewReceipt CAT_ORDER. Absent is absent. */
+  const subs: Array<[string, number | null]> = [
+    ['Design', r.design_score],
+    ['Condition', r.condition_score],
+    ['Clubhouse', r.clubhouse_score],
+    ['Facilities', r.facilities_score],
+  ];
+  const presentSubs = subs.filter(([, v]) => v != null) as Array<[string, number]>;
+
   return (
     <div style={{ background: CARD_BG, border: `1px solid ${HAIR}`, borderRadius: 14, padding: 14 }}>
-      <div className="flex items-start gap-3">
+      {!hasReply && (
+        <div
+          className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.15em]"
+          style={{ color: BIZ.amber, marginBottom: 9 }}
+        >
+          <span style={{ width: 6, height: 6, borderRadius: 3, background: BIZ.amber }} />
+          Awaiting reply
+        </div>
+      )}
+      <div className="flex items-center gap-3">
         <SquircleAvatar
           src={r.reviewer.profile_photo_url || undefined}
           alt={name}
           userId={r.reviewer.id}
-          size={40}
+          size={34}
           hairlineRing
           ringColor={DARK_HAIRLINE}
         />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-[14.5px] truncate" style={{ color: INK }}>
-              {name}
-            </span>
-            {r.reviewer.handicap != null && (
-              <span
-                className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold tabular-nums"
-                style={{ background: APPLIED_FILL, color: INK_45 }}
-              >
-                HCP {formatHcp(r.reviewer.handicap)}
-              </span>
-            )}
-            <RatingChip rating={r.rating} />
-          </div>
-          <div className="mt-0.5 flex items-center gap-2 flex-wrap">
-            <CourseTag name={r.course_name} />
-            <span className="text-[11.5px]" style={{ color: INK_45 }}>
-              {relativeTime(r.review_date)}
-            </span>
-          </div>
+          <div className="font-semibold text-[14.5px] truncate" style={{ color: INK }}>{name}</div>
+          <div className="mt-0.5 text-[11.5px] truncate tabular-nums" style={{ color: A.DIM }}>{meta}</div>
+        </div>
+        <div
+          className="text-[26px] font-bold tabular-nums leading-none"
+          style={{ color: INK, letterSpacing: '-0.025em' }}
+        >
+          {fmtRating(r.rating)}
         </div>
       </div>
 
@@ -362,70 +357,66 @@ function ReviewCard({
         </div>
       )}
       {r.review && (
-        <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: A.BODY }}>
-          {r.review}
-        </p>
+        <>
+          <p
+            ref={bodyRef}
+            className={`mt-2 text-[13.5px] leading-relaxed ${expanded ? '' : 'line-clamp-4'}`}
+            style={{ color: A.BODY }}
+          >
+            {r.review}
+          </p>
+          {(clamped || expanded) && (
+            <button
+              onClick={() => setExpanded((v) => !v)}
+              className="mt-1 text-[12.5px] font-bold active:opacity-70"
+              style={{ color: INK_45 }}
+            >
+              {expanded ? 'Less' : 'More'}
+            </button>
+          )}
+        </>
       )}
 
-      {/* sub scores */}
-      {(r.design_score != null || r.condition_score != null || r.facilities_score != null) && (
-        <div className="mt-3 flex gap-3 text-[11.5px]" style={{ color: INK_45 }}>
-          {r.design_score != null && <span>Design <b className="tabular-nums" style={{ color: INK }}>{fmtRating(r.design_score)}</b></span>}
-          {r.condition_score != null && <span>Condition <b className="tabular-nums" style={{ color: INK }}>{fmtRating(r.condition_score)}</b></span>}
-          {r.facilities_score != null && <span>Facilities <b className="tabular-nums" style={{ color: INK }}>{fmtRating(r.facilities_score)}</b></span>}
+      {presentSubs.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11.5px]" style={{ color: INK_45 }}>
+          {presentSubs.map(([label, v]) => (
+            <span key={label} className="whitespace-nowrap">
+              {label} <b className="tabular-nums" style={{ color: INK }}>{fmtRating(v)}</b>
+            </span>
+          ))}
         </div>
       )}
 
-      {/* Reply block */}
       {hasReply ? (
-        <div
-          className="mt-3 p-3"
-          style={{
-            background: BIZ.amberTint,
-            border: `1px solid ${BIZ.amberHair}`,
-            borderRadius: 12,
-          }}
-        >
-          <div className="flex items-center justify-between mb-1">
-            <div className="text-[11.5px] font-bold uppercase tracking-[0.06em]" style={{ color: A.MUTE }}>
-              Your reply
-            </div>
-            <div className="text-[11px]" style={{ color: INK_45 }}>
-              {r.response!.updated_at ? `edited ${relativeTime(r.response!.updated_at)}` : relativeTime(r.response!.created_at)}
-            </div>
+        <div className="mt-3" style={{ paddingLeft: 11, borderLeft: `2px solid ${A.BORDER}` }}>
+          <div className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: A.DIM }}>
+            You replied · {r.response!.updated_at ? `edited ${relativeTime(r.response!.updated_at)}` : relativeTime(r.response!.created_at)}
           </div>
-          <p className="text-[13.5px] leading-relaxed" style={{ color: INK }}>
+          <p className="mt-1 text-[13px]" style={{ color: A.BODY, lineHeight: 1.55 }}>
             {r.response!.response_text}
           </p>
           {isOwnReply && (
-            <div className="mt-2 flex gap-2">
-              <button
-                onClick={() => onEdit(r)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-semibold active:opacity-70"
-                style={{ background: CARD_BG, border: `1px solid ${HAIR}`, color: INK }}
-              >
+            <div className="mt-2 flex gap-4 text-[11.5px] font-bold">
+              <button onClick={() => onEdit(r)} className="inline-flex items-center gap-1 active:opacity-70" style={{ color: INK_45 }}>
                 <Edit3 size={11} strokeWidth={2.5} /> Edit
               </button>
-              <button
-                onClick={() => onDelete(r)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-semibold active:opacity-70"
-                style={{ background: 'rgba(255,90,90,0.14)', border: '1px solid rgba(255,90,90,0.28)', color: RED }}
-              >
+              <button onClick={() => onDelete(r)} className="inline-flex items-center gap-1 active:opacity-70" style={{ color: RED }}>
                 <Trash2 size={11} strokeWidth={2.5} /> Delete
               </button>
             </div>
           )}
         </div>
       ) : (
-        <div className="mt-3 flex gap-2">
+        <>
+          <div style={{ height: 1, background: HAIR, margin: '11px -14px' }} />
           <button
             onClick={() => onReply(r)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12.5px] font-bold active:opacity-90"
-            style={{ background: INK, color: A.CANVAS, border: 'none' }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold active:opacity-80"
+            style={{ background: APPLIED_FILL, color: INK, border: 'none', borderRadius: 11 }}
           >
-            <MessageSquare size={12} strokeWidth={2.5} /> Reply
+            <MessageSquare size={12} strokeWidth={2.5} /> Write a reply
           </button>
-        </div>
+        </>
       )}
     </div>
   );
