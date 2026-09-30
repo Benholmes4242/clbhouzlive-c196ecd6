@@ -45,7 +45,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RailChips } from '@/components/ui/RailChips';
 import { cn } from '@/lib/utils';
-import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS, FIELD_HEIGHT, FIELD_RADIUS, FIELD_REST_BG, FIELD_REST_BORDER } from '@/lib/tokens/field';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
@@ -923,7 +923,7 @@ export default function VerificationFlowSheet({
                           {otpEmailVerified ? (
                             <span
                               className="inline-flex items-center gap-1.5 px-3 rounded-md text-[12px] font-semibold"
-                              style={{ background: A.SOFT, color: A.GREEN, marginTop: 10, minHeight: 28 }}
+                              style={{ background: A.SOFT, color: A.GREEN, marginTop: 10 }}
                             >
                               <CheckCircle2 className="h-3.5 w-3.5" />
                               Verified
