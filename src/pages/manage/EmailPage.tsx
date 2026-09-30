@@ -179,7 +179,7 @@ export default function EmailPage() {
               </div>
             </div>
 
-            <div className="flex justify-center">
+            <div className="w-full">
               <InputOTP
                 value={code}
                 onChange={(v) => { setCode(v); if (otpError) setOtpError(null); }}
