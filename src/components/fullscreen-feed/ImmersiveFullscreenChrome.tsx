@@ -4,7 +4,8 @@
  * untouched.
  *
  * Layout:
- *   TOP scrim (persistent, ~78px, rgba(0,0,0,.5)→transparent):
+ *   TOP (no scrim — the back chevron and course block carry their own
+ *   shadow over the blurred media backdrop):
  *     - Back chevron top-LEFT (circular rgba(0,0,0,.32))
  *     - Course block top-RIGHT (name 12/500 ellipsis, location 9/.75 w/ map-pin,
  *       amber ◉ score chip below)
@@ -264,6 +265,29 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
 
 
+  // HOOKS BEFORE EVERY EARLY RETURN (rules of hooks). The queries still run on
+  // every render; only their fetch is gated on the conditions the returns test.
+  const hookPost = posts[activeIndex] ?? null;
+  const hookEditorial =
+    hookPost?.postType === 'tournament_result' ||
+    hookPost?.postType === 'pga_card' ||
+    hookPost?.postType === 'course_of_week_card';
+  const hooksLive = !feedEnded && !!hookPost && !hookEditorial && !isTournamentCardActive;
+  const { activeActor } = useActiveActor();
+  const canFollowActor =
+    hookPost?.actorType === 'personal' || hookPost?.actorType === 'business';
+  const { isFollowing: canonicalFollowing } = useFollowState({
+    targetActorType: canFollowActor ? (hookPost!.actorType as 'personal' | 'business') : 'personal',
+    targetActorId: hooksLive && canFollowActor ? hookPost?.actorId : undefined,
+    viewerActorType: activeActor?.type ?? 'personal',
+    viewerActorId: activeActor?.id ?? undefined,
+  });
+  const hookCourseId =
+    hookPost?.review?.courseId ?? golfCourse?.id ?? hookPost?.courseId ?? null;
+  const { data: ratingAggregate } = useCourseRatingAggregates(
+    hooksLive && hookPost?.courseRating == null ? hookCourseId ?? undefined : undefined,
+  );
+
   if (feedEnded) {
     return (
       <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
@@ -306,15 +330,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);
-  const { activeActor } = useActiveActor();
-  const canFollowActor =
-    activePost.actorType === 'personal' || activePost.actorType === 'business';
-  const { isFollowing: canonicalFollowing } = useFollowState({
-    targetActorType: canFollowActor ? (activePost.actorType as 'personal' | 'business') : 'personal',
-    targetActorId: canFollowActor ? activePost.actorId : undefined,
-    viewerActorType: activeActor?.type ?? 'personal',
-    viewerActorId: activeActor?.id ?? undefined,
-  });
   // Canonical cache wins (DB-seeded + patched live by every toggle);
   // item-embedded state is only the pre-seed fallback.
   const isFollowed = canonicalFollowing ?? getFollowState(activePost);
@@ -335,9 +350,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // (tag-only posts, older RPCs). Resolve the community rating from
   // course_rating_aggregates when the payload is missing it.
   const resolvedCourseId = activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId ?? null;
-  const { data: ratingAggregate } = useCourseRatingAggregates(
-    activePost.courseRating == null ? resolvedCourseId ?? undefined : undefined,
-  );
   const courseRating =
     activePost.viewerRating ??
     activePost.courseRating ??
@@ -613,6 +625,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               postId={activePost.id}
               count={likeState.count}
               source={activePost.isReview ? 'review' : 'post'}
+              /* isRound is false by construction: rounds do not appear in this feed
+                 (auto-posting of rounds to Clubhouse was discontinued). The derivation is
+                 kept rather than hardcoding 'like' so that if rounds ever return to this
+                 surface, only the flag changes. */
               kind={reactionKindFor({ isRound: false, isReview: !!activePost.isReview })}
               avatarRing="media"
               lines={1}
