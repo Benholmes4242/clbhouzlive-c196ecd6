@@ -28,7 +28,8 @@ import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 import { BIZ } from './businessTokens';
 import { courseCountSuffix } from '@/features/business/claimClub';
-import { mayHaveClubAnalytics } from '@/features/business/clubAnalytics/useClubCourseLink';
+import { mayHaveClubAnalytics, CLUB_ANALYTICS_CATEGORY } from '@/features/business/clubAnalytics/useClubCourseLink';
+import { ClaimYourCourseSheet } from './ClaimYourCourseSheet';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 
 interface BusinessCommandCardProps {
@@ -69,6 +70,7 @@ export function BusinessCommandCard({
   const navigate = useNavigate();
   const { t } = useTranslation('common');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [claimSheetOpen, setClaimSheetOpen] = useState(false);
 
 
 
@@ -112,6 +114,14 @@ export function BusinessCommandCard({
 
   const canDelete = role === 'owner';
   const canManage = role === 'owner' || role === 'admin';
+  // Gate on the claim VALUE, never truthiness: a rejected claim must still allow a retry.
+  const claimInFlight =
+    courseClaim?.status === 'pending' || courseClaim?.status === 'needs_more_info';
+  const canClaimCourse =
+    canManage &&
+    business.category === CLUB_ANALYTICS_CATEGORY &&
+    !business.club_id &&
+    !claimInFlight;
   // Reviews only exist for course-linked businesses (course_ratings live on their courses).
   // Brands / coaches / retailers without a claimed club never see the Reviews UI.
   const hasCourse = !!business.club_id;
@@ -507,6 +517,15 @@ export function BusinessCommandCard({
                   </div>
                   <ActionRow icon={Pencil} label={t('business.card.actions.edit')} onClick={() => goto('/edit')} />
                   <ActionRow icon={BarChart3} label={t('business.card.actions.insights')} onClick={() => goto('/insights')} />
+                  {canClaimCourse && (
+                    <ActionRow
+                      icon={Flag}
+                      label={t('business.card.actions.claimCourse')}
+                      badge
+                      caption={[t('business.card.actions.claimCourseCaption')]}
+                      onClick={() => setClaimSheetOpen(true)}
+                    />
+                  )}
                   {showClubAnalytics && (
                     clubCourses.length > 1 ? (
                       <ActionRow
