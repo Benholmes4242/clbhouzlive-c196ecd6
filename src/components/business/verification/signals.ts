@@ -79,6 +79,7 @@ export function evaluateBar(claimed: ClaimedSignals): {
  * control of a mailbox, not a connection to a business. Maintained in ONE
  * place — the flow, the copy and any future reviewer tooling read this list.
  */
+// Mirrored in supabase/functions/_shared/freeEmailDomains.ts. src/test/freeEmailDomains.parity.test.ts fails if they drift.
 export const FREE_EMAIL_DOMAINS = new Set([
   'gmail.com', 'googlemail.com',
   'outlook.com', 'outlook.co.uk', 'hotmail.com', 'hotmail.co.uk', 'live.com', 'live.co.uk', 'msn.com',
