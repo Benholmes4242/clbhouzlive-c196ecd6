@@ -442,7 +442,8 @@ export default function VerificationFlowSheet({
         business_id: businessId,
         requested_by: user.id,
         website: business?.website || null,
-        status: 'pending',
+        // A3 — a draft until the member submits; only submit makes it a request.
+        status: 'draft',
         proof_method: 'business_email',
         proof_value: email,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -572,7 +573,7 @@ export default function VerificationFlowSheet({
         const { data, error } = await supabase
           .from('business_verification_requests')
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .update(payload as any)
+          .update({ ...payload, status: 'pending' } as any)
           .eq('id', requestId)
           .select('id');
         if (error) throw error;
