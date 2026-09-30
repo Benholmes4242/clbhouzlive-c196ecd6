@@ -1,3 +1,12 @@
+DO $$ BEGIN
+  RAISE EXCEPTION
+    'SUPERSEDED: this file is a historical copy, not the live '
+    'definition. Running it would roll % back. Check '
+    'pg_get_functiondef first; delete these five lines only if you '
+    'have decided to overwrite the live function deliberately.',
+    'get_admin_dashboard_glance, get_admin_overview_metrics, get_admin_top_content and get_admin_funnel_cohorts';
+END $$;
+
 -- =====================================================================
 -- ROUND POSTS OUT OF THE ADMIN NUMBERS
 -- 2026-09-15. Ben runs this. Nothing here is applied by the agent.

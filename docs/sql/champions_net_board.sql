@@ -1,3 +1,12 @@
+DO $$ BEGIN
+  RAISE EXCEPTION
+    'SUPERSEDED: this file is a historical copy, not the live '
+    'definition. Running it would roll % back. Check '
+    'pg_get_functiondef first; delete these five lines only if you '
+    'have decided to overwrite the live function deliberately.',
+    'get_course_net_board';
+END $$;
+
 -- =====================================================================
 -- CHAMPIONS GAINS A NET BOARD (BRIEF_STANDING_TAP §2b). Ben runs this.
 --

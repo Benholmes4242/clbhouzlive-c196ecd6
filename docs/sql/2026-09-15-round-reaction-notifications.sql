@@ -1,3 +1,12 @@
+DO $$ BEGIN
+  RAISE EXCEPTION
+    'SUPERSEDED: this file is a historical copy, not the live '
+    'definition. Running it would roll % back. Check '
+    'pg_get_functiondef first; delete these five lines only if you '
+    'have decided to overwrite the live function deliberately.',
+    'create_like_notification_aggregated, comments_v2_notify and create_mention_notification';
+END $$;
+
 -- =====================================================================
 -- ROUND REACTION NOTIFICATIONS CARRY THE ROUND
 -- 2026-09-15. DRAFT - NOT APPLIED. Ben runs this.

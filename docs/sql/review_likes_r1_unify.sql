@@ -1,3 +1,12 @@
+DO $$ BEGIN
+  RAISE EXCEPTION
+    'SUPERSEDED: this file is a historical copy, not the live '
+    'definition. Running it would roll % back. Check '
+    'pg_get_functiondef first; delete these five lines only if you '
+    'have decided to overwrite the live function deliberately.',
+    'viewer_liked_post, recount_review_post_likes and the like-count sync functions';
+END $$;
+
 -- ============================================================================
 -- R1 — a review's likes are split across two stores
 --

@@ -1,4 +1,32 @@
 # docs/sql
+#
+# These files are RUNNABLE SCRIPTS, not notes. Several DROP a function
+# before recreating it, and several more CREATE OR REPLACE a whole
+# function body — so an out-of-date file here does not merely describe
+# an old state, it RESTORES one.
+#
+# Three kinds of file live here:
+#
+# 1. CURRENT  — matches `pg_get_functiondef` for the live function.
+#               Safe to re-run. Must be updated in the same sitting
+#               as any change Ben applies by hand.
+# 2. GUARDED  — a patch that inspects the live body and refuses if it
+#               is not what it expects. Safe by construction. THIS IS
+#               THE PREFERRED SHAPE for anything incremental.
+# 3. INERT    — a historical full copy, topped with a RAISE EXCEPTION
+#               so it cannot run by accident.
+#
+# THE DATABASE IS THE SOURCE OF TRUTH, NOT THIS FOLDER AND NOT
+# supabase/migrations. Both have been found stale against production:
+# the migrations had a birdie threshold of 4 while live was 5, and
+# this folder had an 18-column get_profile_rounds while live had 15.
+# Before reasoning about any function, run:
+#
+#   SELECT pg_get_functiondef(p.oid) FROM pg_proc p
+#   JOIN pg_namespace n ON n.oid = p.pronamespace
+#   WHERE n.nspname = 'public' AND p.proname = '<name>';
+
+# docs/sql
 
 Hand-run SQL. Nothing here is applied by the agent. Each file is a guarded
 patch: it asserts the exact deployed body it was written against, refuses to run

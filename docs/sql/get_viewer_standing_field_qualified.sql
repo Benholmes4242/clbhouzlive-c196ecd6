@@ -1,3 +1,12 @@
+DO $$ BEGIN
+  RAISE EXCEPTION
+    'SUPERSEDED: this file is a historical copy, not the live '
+    'definition. Running it would roll % back. Check '
+    'pg_get_functiondef first; delete these five lines only if you '
+    'have decided to overwrite the live function deliberately.',
+    'get_viewer_standing';
+END $$;
+
 -- =====================================================================
 -- FIX field_now: THE PRINTED "of N" MUST BE THE QUALIFIED COUNT
 -- Ben's ruling on the board measurement, SS1. THIS IS A LIVE BUG FIX, not a
