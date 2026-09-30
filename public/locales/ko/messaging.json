@@ -123,5 +123,8 @@
   },
   "rail": {
     "start": "시작"
+  },
+  "playingOff": {
+    "eyebrow": "핸디캡"
   }
 }

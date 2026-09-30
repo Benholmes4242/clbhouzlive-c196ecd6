@@ -123,5 +123,8 @@
   },
   "rail": {
     "start": "Start"
+  },
+  "playingOff": {
+    "eyebrow": "Playing off"
   }
 }

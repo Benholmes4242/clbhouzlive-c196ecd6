@@ -123,5 +123,8 @@
   },
   "rail": {
     "start": "新規"
+  },
+  "playingOff": {
+    "eyebrow": "ハンディキャップ"
   }
 }
