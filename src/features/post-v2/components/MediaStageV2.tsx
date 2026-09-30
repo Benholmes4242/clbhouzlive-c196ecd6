@@ -8,6 +8,7 @@ import type { StageMediaItem, FrameId } from '../hooks/useStageComposer';
 import CroppedImage from './CroppedImage';
 import { CT_DARK } from '@/features/_shared/composerTokens';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
 
 
 const FRAME_RATIO: Record<FrameId, number | null> = {
@@ -75,6 +76,25 @@ export default function MediaStageV2({ item, index, total, onRequestAdd }: Props
     return unsub;
   }, []);
 
+  // An existing (edit-mode) video plays from its Stream HLS manifest. A bare
+  // <video src=".m3u8"> plays nothing on Chromium, so attach via the shared
+  // tile helper; one <video> = one Hls, released on url change/unmount.
+  // Fresh picks (blob:) keep the plain src path untouched.
+  const hlsUrl = isVideo && item?.previewUrl.endsWith('.m3u8') ? item.previewUrl : null;
+  const isHls = hlsUrl !== null;
+  const [hlsFailed, setHlsFailed] = useState(false);
+  useEffect(() => {
+    setHlsFailed(false);
+    const el = videoRef.current;
+    if (!hlsUrl || !el) return;
+    const att = attachTileHls(el, hlsUrl, () => setHlsFailed(true));
+    el.muted = useSessionAudio.getState().isMuted;
+    Promise.resolve(el.play()).catch(() => {
+      if (!el.muted) { el.muted = true; Promise.resolve(el.play()).catch(() => {}); }
+    });
+    return () => att.detach();
+  }, [hlsUrl, item?.id]);
+
 
 
   if (!item) {
@@ -110,7 +130,11 @@ export default function MediaStageV2({ item, index, total, onRequestAdd }: Props
     <div ref={stageRef} style={{ flex: 1, background: CT_DARK.surface, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       <div style={{ ...boxStyle, transition: 'width 250ms cubic-bezier(.2,.8,.2,1), height 250ms cubic-bezier(.2,.8,.2,1)' }}>
         {item.type === 'video' ? (
-          <video ref={videoRef} src={item.previewUrl} playsInline muted loop autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          hlsFailed && item.posterUrl ? (
+            <img src={item.posterUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          ) : (
+            <video ref={videoRef} src={isHls ? undefined : item.previewUrl} playsInline muted loop autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          )
         ) : (
           <CroppedImage item={item} />
         )}

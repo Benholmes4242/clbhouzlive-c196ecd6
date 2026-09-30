@@ -184,7 +184,15 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
       id: `existing-${m.id}`,
       existingId: m.id,
       type: m.mediaType,
-      previewUrl: m.mediaUrl,
+      /* A VIDEO'S PLAYABLE URL IS BUILT FROM stream_id, NEVER READ FROM
+       * media_url: 37 of 157 video rows store the sentinel 'stream:<uid>' there,
+       * and no surface in the app resolves that prefix. Every video row has a
+       * stream_id, so this is the uniform path, not a special case. Images keep
+       * media_url, which is a real URL on all 678 rows. */
+      previewUrl: m.mediaType === 'video' && m.streamId
+        ? generateStreamHlsUrl(m.streamId)
+        : m.mediaUrl,
+      streamId: m.streamId ?? null,
       posterUrl: m.posterUrl ?? null,
       naturalWidth: m.width ?? undefined,
       naturalHeight: m.height ?? undefined,
