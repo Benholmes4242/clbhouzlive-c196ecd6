@@ -3,6 +3,7 @@ import { OTPInput, OTPInputContext } from "input-otp"
 import { Dot } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { SELECTED_EDGE } from "@/components/ui/RailChips"
 
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
@@ -31,7 +32,7 @@ InputOTPGroup.displayName = "InputOTPGroup"
 const InputOTPSlot = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div"> & { index: number }
->(({ index, className, ...props }, ref) => {
+>(({ index, className, style, ...props }, ref) => {
   const inputOTPContext = React.useContext(OTPInputContext)
   const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
 
