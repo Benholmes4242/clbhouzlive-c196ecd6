@@ -23,6 +23,10 @@
 -- HOW TO REFRESH. Re-run the two queries in the header of
 -- tests/sql/schema_parity_assert.sql against the project and replace the rows
 -- below. Refreshing is a deliberate act with a date on it, never a silent fix.
+--
+-- 2026-09-30: gam_round_stats.nett_score dropped from production (dead column,
+-- only ever NULL; net's one definition is the view public.gam_round_net).
+-- Removed here to match. Single known column - not a re-snapshot.
 \set ON_ERROR_STOP on
 
 create table prod_columns (
@@ -118,7 +122,6 @@ insert into prod_columns (table_name, column_name, data_type) values
 ('gam_round_stats','course_rating','numeric'),
 ('gam_round_stats','slope_rating','integer'),
 ('gam_round_stats','gross_score','integer'),
-('gam_round_stats','nett_score','integer'),
 ('gam_round_stats','stableford_points','integer'),
 ('gam_round_stats','score_diff','numeric'),
 ('gam_round_stats','hcp_at_time','numeric'),

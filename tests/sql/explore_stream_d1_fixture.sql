@@ -45,7 +45,6 @@ create table gam_round_stats (
   course_rating numeric,
   slope_rating int,
   gross_score int,
-  nett_score int,
   stableford_points int,
   score_diff numeric,
   hcp_at_time numeric,
