@@ -15,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
  * The mode='domain' entry (admin-initiated domain check on an existing pending
  * request) still renders the standalone DomainStep, unchanged.
  */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Label } from '@/components/ui/label';
@@ -43,6 +43,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { RailChips } from '@/components/ui/RailChips';
+import { cn } from '@/lib/utils';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
@@ -54,15 +57,30 @@ import {
 } from '@/features/courses/components/holes/analytical/tokens';
 import DomainStep from './steps/DomainStep';
 import { MEMBER_PANEL, surfaceWithAlpha } from '@/lib/tokens/surfaces';
-import {
-  Group,
-  Row,
-  RowList,
-  Footnote,
-  FilledButton,
-  PlainButton,
-} from './manageRows';
+import { Group, Row, RowList } from './manageRows';
 import { INK, INK_45, INK_30, INK_60, GREEN, HAIR, SF_STACK } from '@/components/manage/ui';
+
+/**
+ * B5 — every control in the wizard takes the field canon (6% rest ground, 10%
+ * rest border, radius 14, 38% placeholder, focus-within step). No inline
+ * background/border/radius on a control, or the focus step dies silently.
+ */
+const FIELD_CLASS = cn(
+  FIELD_PAINT_CLASS,
+  FIELD_PLACEHOLDER_CLASS,
+  'h-auto min-h-[44px] px-[13px] py-3 text-[14px] font-normal',
+);
+
+const SIGNAL_PHRASE: Record<SignalKey, string> = {
+  domain: 'a business domain',
+  document: 'a document',
+  presence: 'your presence',
+};
+
+function joinAnd(parts: string[]): string {
+  if (parts.length <= 1) return parts.join('');
+  return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
 import {
   PROOF_OPTIONS,
   REGISTRY_OPTIONS,
@@ -142,9 +160,12 @@ export default function VerificationFlowSheet({
   const [proofCompanyNumber, setProofCompanyNumber] = useState('');
   const [proofRegistryUrl, setProofRegistryUrl] = useState('');
 
-  // --- presence evidence ---
+  // --- presence evidence --- (B3a: one draft PER KIND; switching preserves each)
   const [presenceKind, setPresenceKind] = useState<PresenceKind>('website');
-  const [presenceValue, setPresenceValue] = useState('');
+  const [presenceValues, setPresenceValues] = useState<Record<PresenceKind, string>>({
+    website: '', listing: '', social: '', phone: '',
+  });
+  const presenceValue = presenceValues[presenceKind];
 
   // --- ownership state ---
   const [contactEmail, setContactEmail] = useState('');
@@ -189,7 +210,7 @@ export default function VerificationFlowSheet({
     setProofCompanyNumber('');
     setProofRegistryUrl('');
     setPresenceKind('website');
-    setPresenceValue('');
+    setPresenceValues({ website: '', listing: '', social: '', phone: '' });
     setRole('');
     setNotes('');
     setDocPath(null);
@@ -238,6 +259,11 @@ export default function VerificationFlowSheet({
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0 });
     setValidationError(null);
+    // B9g — move focus to the new step's heading so the change is announced.
+    requestAnimationFrame(() => {
+      const h = mainRef.current?.querySelector<HTMLElement>('h3[data-vf-heading]');
+      h?.focus({ preventScroll: true });
+    });
   }, [safeIndex, pages.length]);
 
   // ---- §1.4 free-provider check, AT THE POINT OF ENTRY ----
@@ -249,7 +275,8 @@ export default function VerificationFlowSheet({
     const v = presenceValue.trim();
     if (!v) return false;
     if (presenceKind === 'phone') return v.replace(/[^\d]/g, '').length >= 7;
-    if (presenceKind === 'social') return v.length >= 3;
+    // B3e — a handle ("@" + at least 2 more) or a real profile link.
+    if (presenceKind === 'social') return /^@\S{2,}$/.test(v) || isValidUrl(v);
     return isValidUrl(v);
   }, [presenceKind, presenceValue]);
 
@@ -270,17 +297,18 @@ export default function VerificationFlowSheet({
    * entered but no code counts as provided: it gets checked by hand.
    */
   const unevidencedSignals = useMemo(() => {
-    const out: string[] = [];
-    if (claimed.domain && !domainReady)
-      out.push('You marked a business domain but have not confirmed one. You can still submit; it will be checked by hand.');
-    if (claimed.document && !documentReady)
-      out.push('You marked a document but have not attached one. You can still submit; it will be checked by hand.');
-    if (claimed.presence && !presenceReady)
-      out.push('You marked presence but have not given anything to check. You can still submit; it will be checked by hand.');
+    const out: SignalKey[] = [];
+    if (claimed.domain && !domainReady) out.push('domain');
+    if (claimed.document && !documentReady) out.push('document');
+    if (claimed.presence && !presenceReady) out.push('presence');
     return out;
   }, [claimed, domainReady, documentReady, presenceReady]);
 
-  const detailsReady = !!business?.website && !!business?.email;
+  const stepEmpty =
+    (page === 'domain' && !domainReady) ||
+    (page === 'document' && !documentReady) ||
+    (page === 'presence' && !presenceReady);
+
 
 
   // ---- §1.5 signal payload ----
@@ -389,6 +417,8 @@ export default function VerificationFlowSheet({
   ].filter((v) => !v || !String(v).trim()).length;
 
   function toggleSignal(key: SignalKey) {
+    // B10a — unticking the document drops the upload too (best-effort storage remove).
+    if (key === 'document' && claimed.document && docPath) void handleDocRemove();
     setClaimed((prev) => ({ ...prev, [key]: !prev[key] }));
     setExclusivityError('');
   }
@@ -433,10 +463,6 @@ export default function VerificationFlowSheet({
     const email = proofEmail.trim();
     if (!email || !isValidEmail(email)) {
       toast.error('Enter a valid business email first.');
-      return;
-    }
-    if (isFreeEmailDomain(email)) {
-      toast.error('That is a personal mailbox, not a business domain.');
       return;
     }
     setOtpSending(true);
@@ -532,7 +558,7 @@ export default function VerificationFlowSheet({
         proof_metadata,
         contact_email: contactEmail.trim() || null,
         contact_role: role || null,
-        proof_document_url: docPath,
+        proof_document_url: claimed.document ? docPath : null,
       };
 
       let requestId = otpRequestId;
@@ -636,15 +662,17 @@ export default function VerificationFlowSheet({
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0, cursor: 'pointer',
               }}
-              aria-label={safeIndex > 0 ? 'Back' : 'Close'}
+              aria-label={!confirmation && !showDomainMode && safeIndex > 0 ? 'Back' : 'Close'}
             >
               <ChevronLeft size={18} strokeWidth={2.5} style={{ color: A.INK }} />
             </button>
-            <h2 style={{ fontFamily: SF_STACK, fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: INK, lineHeight: 1, margin: 0 }}>
-              {showDomainMode ? 'Verify domain' : 'Get verified'}
-            </h2>
+            <DialogTitle asChild>
+              <h2 style={{ fontFamily: SF_STACK, fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: INK, lineHeight: 1, margin: 0 }}>
+                {showDomainMode ? 'Verify domain' : 'Get verified'}
+              </h2>
+            </DialogTitle>
             {!showDomainMode && !confirmation && (
-              <span style={{ ...BIZ_LABEL, marginLeft: 'auto' }}>
+              <span role="status" aria-live="polite" style={{ ...BIZ_LABEL, marginLeft: 'auto' }}>
                 {safeIndex + 1} / {pages.length}
               </span>
             )}
@@ -668,21 +696,7 @@ export default function VerificationFlowSheet({
             </div>
           ) : (
             <div className="space-y-4">
-              <style>{`
-                [data-vf-field] input,
-                [data-vf-field] textarea,
-                [data-vf-field] button[role="combobox"] {
-                  border: 1px solid ${A.BORDER};
-                  border-radius: 11px;
-                  padding: 12px 13px;
-                  font-size: 14px;
-                  font-weight: 400;
-                  color: ${A.INK};
-                  background: ${A.PANEL};
-                  height: auto;
-                  min-height: 44px;
-                }
-              `}</style>
+
 
               {/* ================= STEP 1 — ELIGIBILITY ================= */}
               {page === 'eligibility' && (
@@ -783,20 +797,30 @@ export default function VerificationFlowSheet({
                     </div>
                   </Group>
 
-                  {/* §6.3 THE LIVE VERDICT — a Status group, one row. */}
-                  <Group
-                    header="Status"
-                    footnote={bar.met ? undefined : bar.missing || undefined}
+                  {/* B2a THE LIVE VERDICT — a sentence, never a count. */}
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="flex"
+                    style={{ background: A.SOFT, borderRadius: 12, padding: '12px 13px', marginTop: 12, gap: 10 }}
                   >
-                    <div role="status" aria-live="polite">
-                      <Row
-                        label={bar.met ? 'You meet the bar' : 'Not there yet'}
-                        glyph={bar.met ? 'confirmed' : 'waiting'}
-                        value={`${bar.count} of 2`}
-                        tone={bar.met ? 'confirmed' : 'waiting'}
-                      />
-                    </div>
-                  </Group>
+                    <span
+                      aria-hidden
+                      className="flex-none"
+                      style={{
+                        width: 7, height: 7, borderRadius: '50%', marginTop: 5,
+                        background: bar.met ? A.GREEN : BIZ.amber,
+                      }}
+                    />
+                    <p style={{ fontFamily: SF_STACK, fontSize: 12.5, lineHeight: 1.45, color: A.BODY, margin: 0 }}>
+                      <span style={{ color: A.INK, fontWeight: 700 }}>{bar.met ? 'That works.' : 'Not yet.'}</span>{' '}
+                      {bar.met
+                        ? `You'll show us ${joinAnd(
+                            SIGNALS.filter((s) => claimed[s.key]).map((s) => SIGNAL_PHRASE[s.key]),
+                          )}. We need two signals, and at least one has to be a domain or a document.`
+                        : bar.missing}
+                    </p>
+                  </div>
 
                   {/* §5.4 — the criteria as a chevron row. */}
                   <Group header="Before you start">
@@ -817,85 +841,101 @@ export default function VerificationFlowSheet({
 
               {/* ================= DOMAIN EVIDENCE ================= */}
               {page === 'domain' && (
-                <SectionCard number={safeIndex + 1} title="Confirm your business domain">
+                <SectionCard title="Confirm your business domain">
                   <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '0 0 12px' }}>
                     Enter an address on your business's own domain. We send a 6-digit code to it.
                   </p>
                   <div className="space-y-3">
                     <FieldGroup label="Business email">
-                      <div className="flex gap-2">
-                        <Input
-                          value={proofEmail}
-                          onChange={(e) => {
-                            setProofEmail(e.target.value);
-                            if (otpEmailVerified) setOtpEmailVerified(false);
-                            if (otpSent) setOtpSent(false);
-                          }}
-                          placeholder="name@yourbusiness.com"
-                          type="email"
-                          disabled={otpEmailVerified}
-                          className="flex-1"
-                        />
-                        {otpEmailVerified ? (
-                          <span
-                            className="inline-flex items-center gap-1.5 px-3 rounded-md text-[12px] font-semibold"
-                            style={{ background: 'rgba(52,215,127,0.16)', color: A.GREEN }}
-                          >
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                            Verified
-                          </span>
-                        ) : (
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={handleSendOtp}
-                            disabled={
-                              !domainReady || otpSending || sendCode.isPending
-                            }
-                          >
-                            {otpSending || sendCode.isPending ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : otpSent ? (
-                              'Resend code'
+                      {(id) => (
+                        <>
+                          <div className="flex gap-2">
+                            <Input
+                              id={id}
+                              value={proofEmail}
+                              onChange={(e) => {
+                                setProofEmail(e.target.value);
+                                if (otpEmailVerified) setOtpEmailVerified(false);
+                                if (otpSent) setOtpSent(false);
+                                // B7b — a code must never be checked against a previous address.
+                                setOtpVerificationId(null);
+                                setOtpCode('');
+                              }}
+                              placeholder="name@yourbusiness.com"
+                              type="email"
+                              disabled={otpEmailVerified}
+                              className={cn(FIELD_CLASS, 'flex-1')}
+                            />
+                            {otpEmailVerified ? (
+                              <span
+                                className="inline-flex items-center gap-1.5 px-3 rounded-md text-[12px] font-semibold"
+                                style={{ background: A.SOFT, color: A.GREEN }}
+                              >
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                Verified
+                              </span>
                             ) : (
-                              'Send code'
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={handleSendOtp}
+                                disabled={!domainReady || otpSending || sendCode.isPending}
+                              >
+                                {otpSending || sendCode.isPending ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : otpSent ? (
+                                  'Resend code'
+                                ) : (
+                                  'Send code'
+                                )}
+                              </Button>
                             )}
-                          </Button>
-                        )}
-                      </div>
-                      {/* §1.4 THE REASON, IN THE FLOW, AT THE POINT OF ENTRY. */}
-                      {emailIsFreeProvider ? (
-                        <p className="text-[12px]" style={{ color: '#B91C1C', marginTop: 6, lineHeight: 1.4 }}>
-                          {emailDomain(proofEmail)} is a personal mailbox provider. It proves you
-                          control an inbox, not that you are connected to this business, so it does
-                          not count as a domain signal. Use an address on your own domain — or
-                          go back and claim a document instead.
-                        </p>
-                      ) : otpEmailVerified ? (
-                        <p
-                          style={{
-                            fontFamily: SF_STACK,
-                            fontSize: 13,
-                            fontWeight: 400,
-                            marginTop: 6,
-                            color: GREEN,
-                          }}
-                        >
-                          {emailDomain(proofEmail)} is a business domain, not a mailbox provider.
-                        </p>
-                      ) : (
-                        /* The OTP is a fast path, never a gate — but skipping it
-                           must not be silent. Same voice as the missing-details
-                           line on the review step. Gated on claimed.domain by
-                           construction: this screen only exists when it is ticked. */
-                        <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '6px 0 0' }}>
-                          {domainReady
-                            ? 'Enter the code to confirm this now, or continue and we will check it by hand — that takes longer.'
-                            : 'You can continue without this. Your domain will be checked by hand, which takes longer.'}
-                        </p>
+                          </div>
+                          {/* §1.4 THE REASON, IN THE FLOW, AT THE POINT OF ENTRY. */}
+                          {emailIsFreeProvider ? (
+                            <p role="alert" className="text-[12px]" style={{ color: A.RED, marginTop: 6, lineHeight: 1.4 }}>
+                              {emailDomain(proofEmail)} is a personal mailbox provider. It proves you
+                              control an inbox, not that you are connected to this business, so it does
+                              not count as a domain signal. Use an address on your own domain — or
+                              go back and claim a document instead.
+                            </p>
+                          ) : otpEmailVerified ? (
+                            <>
+                              <p style={{ fontFamily: SF_STACK, fontSize: 13, fontWeight: 400, marginTop: 6, color: GREEN }}>
+                                {emailDomain(proofEmail)} is a business domain, not a mailbox provider.
+                              </p>
+                              {/* B7c — a way back from a verified address. */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setProofEmail('');
+                                  setOtpEmailVerified(false);
+                                  setOtpSent(false);
+                                  setOtpVerificationId(null);
+                                  setOtpCode('');
+                                }}
+                                className="min-h-[44px]"
+                                style={{ ...BIZ_LABEL, color: A.INK, background: 'transparent', border: 'none', padding: 0 }}
+                              >
+                                Use a different email
+                              </button>
+                            </>
+                          ) : !proofEmail.trim() ? (
+                            <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '6px 0 0' }}>
+                              You can continue without this. Your domain will be checked by hand, which takes longer.
+                            </p>
+                          ) : !isValidEmail(proofEmail) ? (
+                            <p style={{ fontFamily: SF_STACK, fontSize: 12.5, color: A.DIM, margin: '6px 0 0' }}>
+                              That isn't a complete email address yet.
+                            </p>
+                          ) : (
+                            <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '6px 0 0' }}>
+                              Confirm it now and it's done. Continue without it and a reviewer checks by hand, which takes longer.
+                            </p>
+                          )}
+                        </>
                       )}
-
                     </FieldGroup>
 
                     {otpSent && !otpEmailVerified && (
@@ -931,7 +971,7 @@ export default function VerificationFlowSheet({
 
               {/* ================= DOCUMENT EVIDENCE ================= */}
               {page === 'document' && (
-                <SectionCard number={safeIndex + 1} title="Attach a document">
+                <SectionCard title="Attach a document">
                   {/* §3.3 what it must SHOW, not what kind it must be. */}
                   <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '0 0 12px' }}>
                     One document that shows your business name, legibly. A registration, a licence,
@@ -988,7 +1028,7 @@ export default function VerificationFlowSheet({
                           padding: '12px 14px',
                           borderRadius: 12,
                           border: 'none',
-                          background: 'rgba(14,18,22,0.028)',
+                          background: BIZ.fill,
                           ...BIZ_LABEL,
                           color: A.INK,
                         }}
@@ -1008,6 +1048,10 @@ export default function VerificationFlowSheet({
                       <div className="text-center" style={{ ...BIZ_LABEL, marginTop: 6 }}>
                         Image or PDF · Max 10MB
                       </div>
+                      {/* B10e — the reason sits with the thing that fixes it. */}
+                      <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '8px 0 0', textAlign: 'center' }}>
+                        Without a document attached, this signal does not count.
+                      </p>
                     </div>
                   )}
 
@@ -1024,105 +1068,105 @@ export default function VerificationFlowSheet({
 
                   <div className="space-y-3 mt-4">
                     <FieldGroup label="What kind of document is it?">
-                      <Select value={proofRegistry} onValueChange={setProofRegistry}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {REGISTRY_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      {(id) => (
+                        <Select value={proofRegistry} onValueChange={setProofRegistry}>
+                          <SelectTrigger id={id} className={FIELD_CLASS}>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {REGISTRY_OPTIONS.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     </FieldGroup>
                     {/* Phase 1: the applicant names their OWN registry. */}
                     <FieldGroup label="Name of register or authority">
-                      <Input
-                        value={proofRegistryName}
-                        onChange={(e) => setProofRegistryName(e.target.value)}
-                        placeholder="e.g. your national company register"
-                      />
+                      {(id) => (
+                        <Input
+                          id={id}
+                          className={FIELD_CLASS}
+                          value={proofRegistryName}
+                          onChange={(e) => setProofRegistryName(e.target.value)}
+                          placeholder="e.g. your national company register"
+                        />
+                      )}
                     </FieldGroup>
                     <FieldGroup label="Registration number">
-                      <Input
-                        value={proofCompanyNumber}
-                        onChange={(e) => setProofCompanyNumber(e.target.value)}
-                        placeholder="As it appears on your document"
-                      />
+                      {(id) => (
+                        <Input
+                          id={id}
+                          className={FIELD_CLASS}
+                          value={proofCompanyNumber}
+                          onChange={(e) => setProofCompanyNumber(e.target.value)}
+                          placeholder="As it appears on your document"
+                        />
+                      )}
                     </FieldGroup>
-                    <FieldGroup
-                      label={
-                        <>
-                          Or registry URL{' '}
-                          <span className="font-normal" style={{ color: BIZ.inkMute }}>
-                            (alternative)
-                          </span>
-                        </>
-                      }
-                    >
-                      <Input
-                        value={proofRegistryUrl}
-                        onChange={(e) => setProofRegistryUrl(e.target.value)}
-                        placeholder="https://…"
-                        type="url"
-                      />
+                    <FieldGroup label="Registry URL" hint="If your register is searchable online.">
+                      {(id) => (
+                        <Input
+                          id={id}
+                          className={FIELD_CLASS}
+                          value={proofRegistryUrl}
+                          onChange={(e) => setProofRegistryUrl(e.target.value)}
+                          placeholder="https://…"
+                          type="url"
+                        />
+                      )}
                     </FieldGroup>
                   </div>
-
-                  {!documentReady && (
-                    <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '10px 0 0' }}>
-                      Without a document attached, this signal does not count.
-                    </p>
-                  )}
                 </SectionCard>
               )}
 
               {/* ================= PRESENCE EVIDENCE ================= */}
               {page === 'presence' && (
-                <SectionCard number={safeIndex + 1} title="Show us your presence">
+                <SectionCard title="Show us your presence">
                   <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '0 0 12px' }}>
-                    Something public that matches this business. A reviewer judges whether it does —
-                    we only check the shape of what you enter.
+                    One public thing that matches this business.{' '}
+                    <span style={{ color: A.INK, fontWeight: 700 }}>
+                      One is enough — this counts as a single signal however you evidence it.
+                    </span>
                   </p>
-                  <div className="flex flex-wrap gap-3 mb-3">
-                    {PRESENCE_KINDS.map((k) => {
-                      const active = presenceKind === k.value;
-                      return (
-                        <button
-                          key={k.value}
-                          type="button"
-                          onClick={() => setPresenceKind(k.value)}
-                          aria-pressed={active}
-                          className="px-1 text-[13px] min-h-[44px]"
-                          style={{
-                            background: 'transparent',
-                            border: 'none',
-                            fontWeight: active ? 700 : 500,
-                            color: active ? A.INK : A.MUTE,
-                          }}
-                        >
-                          {k.label}
-                        </button>
-                      );
-                    })}
+                  <div style={{ fontFamily: SF_STACK, fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.MUTE, marginBottom: 8 }}>
+                    Choose one
                   </div>
-                  <FieldGroup label={PRESENCE_KINDS.find((k) => k.value === presenceKind)!.label}>
-                    <Input
-                      value={presenceValue}
-                      onChange={(e) => setPresenceValue(e.target.value)}
-                      placeholder={PRESENCE_KINDS.find((k) => k.value === presenceKind)!.placeholder}
-                      type={presenceKind === 'phone' ? 'tel' : 'text'}
-                    />
-                    {!!presenceValue.trim() && !presenceReady && (
-                      <p className="text-[12px]" style={{ color: '#B91C1C', marginTop: 6 }}>
-                        {presenceKind === 'phone'
-                          ? 'That does not look like a phone number.'
-                          : presenceKind === 'social'
-                            ? 'Enter a handle or a profile link.'
-                            : 'Enter a full web address.'}
-                      </p>
+                  <RailChips
+                    options={PRESENCE_KINDS.map((k) => ({ id: k.value, label: k.short }))}
+                    value={presenceKind}
+                    onChange={(id) => setPresenceKind(id as PresenceKind)}
+                    ariaLabel="Kind of presence"
+                    style={{ marginBottom: 12 }}
+                  />
+                  <FieldGroup
+                    label={PRESENCE_KINDS.find((k) => k.value === presenceKind)!.label}
+                  >
+                    {(id) => (
+                      <>
+                        <Input
+                          id={id}
+                          className={FIELD_CLASS}
+                          value={presenceValue}
+                          onChange={(e) => setPresenceValues((v) => ({ ...v, [presenceKind]: e.target.value }))}
+                          placeholder={PRESENCE_KINDS.find((k) => k.value === presenceKind)!.placeholder}
+                          type={presenceKind === 'phone' ? 'tel' : 'text'}
+                        />
+                        {!!presenceValue.trim() && !presenceReady && (
+                          <p role="alert" className="text-[12px]" style={{ color: A.RED, marginTop: 6 }}>
+                            {presenceKind === 'phone'
+                              ? 'That does not look like a phone number.'
+                              : presenceKind === 'social'
+                                ? 'Enter a handle or a profile link.'
+                                : 'Enter a full web address.'}
+                          </p>
+                        )}
+                        <p style={{ fontFamily: SF_STACK, fontSize: 11.5, color: A.DIM, margin: '6px 0 0' }}>
+                          A reviewer judges whether it matches. We only check the shape.
+                        </p>
+                      </>
                     )}
                   </FieldGroup>
                 </SectionCard>
@@ -1131,48 +1175,46 @@ export default function VerificationFlowSheet({
               {/* ================= OWNERSHIP ================= */}
               {page === 'ownership' && (
                 <>
-                  <SectionCard number={safeIndex + 1} title="Confirm you represent this business">
+                  <SectionCard title="Confirm you represent this business">
                     {/* §3.5 kept: who you are is a separate question from whether
                         the business is real, and the reviewer needs both. */}
                     <div className="space-y-3">
-                      <FieldGroup label="Contact email">
-                        <Input
-                          value={contactEmail}
-                          onChange={(e) => setContactEmail(e.target.value)}
-                          placeholder="name@yourdomain.com"
-                          type="email"
-                        />
-                        <p className="text-[11px]" style={{ color: BIZ.inkMute }}>
-                          Use a business email if possible.
-                        </p>
+                      <FieldGroup label="Contact email" hint="Use a business email if possible.">
+                        {(id) => (
+                          <Input
+                            id={id}
+                            className={FIELD_CLASS}
+                            value={contactEmail}
+                            onChange={(e) => setContactEmail(e.target.value)}
+                            placeholder="name@yourdomain.com"
+                            type="email"
+                          />
+                        )}
                       </FieldGroup>
-                      <FieldGroup label="Your role">
-                        <Select value={role} onValueChange={setRole}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select your role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {ROLE_OPTIONS.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {role === 'owner' && (
-                          <p style={{ ...BIZ_LABEL, color: A.MUTE, margin: '6px 0 0' }}>
-                            Owners can usually answer our questions fastest.
-                          </p>
+                      <FieldGroup
+                        label="Your role"
+                        hint={role === 'owner' ? 'Owners can usually answer our questions fastest.' : undefined}
+                      >
+                        {() => (
+                          <RailChips
+                            options={ROLE_OPTIONS.map((o) => ({ id: o.value, label: o.label }))}
+                            value={role}
+                            onChange={setRole}
+                            ariaLabel="Your role"
+                          />
                         )}
                       </FieldGroup>
                       <FieldGroup label="How are you connected to this business?" hint="Max 500 characters">
-                        <Textarea
-                          value={notes}
-                          onChange={(e) => setNotes(e.target.value.slice(0, 500))}
-                          placeholder="What does this business do, and what's your role?"
-                          rows={3}
-                          className="resize-none text-sm"
-                        />
+                        {(id) => (
+                          <Textarea
+                            id={id}
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value.slice(0, 500))}
+                            placeholder="What does this business do, and what's your role?"
+                            rows={3}
+                            className={cn(FIELD_CLASS, 'resize-none')}
+                          />
+                        )}
                       </FieldGroup>
                     </div>
                     <p
@@ -1183,61 +1225,68 @@ export default function VerificationFlowSheet({
                     </p>
                   </SectionCard>
 
-                  <SectionCard number={safeIndex + 2} title="Your details">
-                    <div>
+                  {/* B2b — what the reviewer will actually receive, not a count. */}
+                  <section>
+                    <div style={{ fontFamily: SF_STACK, fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.MUTE, marginBottom: 8 }}>
+                      What the reviewer will get
+                    </div>
+                    <dl
+                      style={{ background: BIZ.card, border: `1px solid ${HAIR}`, borderRadius: 14, margin: 0, overflow: 'hidden' }}
+                    >
+                      {SIGNALS.filter((s) => claimed[s.key]).map((s) => {
+                        const ready =
+                          s.key === 'domain' ? domainReady : s.key === 'document' ? documentReady : presenceReady;
+                        const text =
+                          s.key === 'domain'
+                            ? ready ? 'Confirmed' : 'Not confirmed'
+                            : s.key === 'document'
+                              ? ready ? 'Attached' : 'Nothing attached'
+                              : ready ? 'Given' : 'Nothing given';
+                        return (
+                          <DetailRow key={s.key} label={s.label} value={text} tone={ready ? A.GREEN : A.DIM} />
+                        );
+                      })}
                       <DetailRow label="Business name" value={business?.name} />
                       <DetailRow label="Category" value={business?.category} />
                       <DetailRow label="Location" value={business?.location} />
-                      <DetailRow
-                        label="Website"
-                        value={business?.website}
-                        missing={!business?.website}
-                        missingMessage="Not set"
-                      />
-                      <DetailRow
-                        label="Contact email"
-                        value={business?.email}
-                        missing={!business?.email}
-                        missingMessage="Not set"
-                      />
-                    </div>
+                      <DetailRow label="Website" value={business?.website} />
+                      <DetailRow label="Profile email" value={business?.email} />
+                    </dl>
+
+                    <p style={{ fontFamily: SF_STACK, fontSize: 12.5, lineHeight: 1.45, color: A.BODY, margin: '12px 0 0' }}>
+                      {unevidencedSignals.length === 0 && evidencedBar.met ? (
+                        "Everything's here. A reviewer will look at this within a few days."
+                      ) : (
+                        <>
+                          <span style={{ color: A.INK, fontWeight: 700 }}>
+                            {evidencedBar.display === 0
+                              ? 'No signals of the two yet.'
+                              : evidencedBar.display === 1
+                                ? 'One signal of the two.'
+                                : 'Both signals are in.'}
+                          </span>
+                          {unevidencedSignals.length > 0 &&
+                            ` You marked ${joinAnd(unevidencedSignals.map((k) => SIGNAL_PHRASE[k]))} but haven't given anything to check.`}
+                          {' '}You can still submit — a reviewer will look either way, it just takes longer.
+                        </>
+                      )}
+                    </p>
+
                     {missingDetailCount > 0 && (
-                      <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '8px 0 0' }}>
-                        {missingDetailCount === 1
-                          ? '1 detail is missing. You can still submit, but adding it speeds up review.'
-                          : `${missingDetailCount} details are missing. You can still submit, but adding them speeds up review.`}
-                      </p>
+                      <div style={{ fontFamily: SF_STACK, fontSize: 11.5, color: A.DIM, marginTop: 8 }}>
+                        Adding a website and contact email to your profile helps the reviewer place you.{' '}
+                        <Link
+                          to={`/business/${businessId}/edit`}
+                          onClick={() => onOpenChange(false)}
+                          className="inline-flex items-center gap-1.5"
+                          style={{ ...BIZ_LABEL, color: A.INK, minHeight: 44, alignItems: 'center' }}
+                        >
+                          <ExternalLink size={10} strokeWidth={2.5} />
+                          Edit business profile
+                        </Link>
+                      </div>
                     )}
-                    {unevidencedSignals.map((line) => (
-                      <p key={line} style={{ ...BIZ_BODY, fontSize: 12.5, margin: '8px 0 0' }}>
-                        {line}
-                      </p>
-                    ))}
-
-                    <div className="pt-3">
-                      <Link
-                        to={`/business/${businessId}/edit`}
-                        onClick={() => onOpenChange(false)}
-                        className="inline-flex items-center gap-1.5"
-                        style={{ ...BIZ_LABEL, color: A.INK, minHeight: 44, alignItems: 'center' }}
-                      >
-                        <ExternalLink size={10} strokeWidth={2.5} />
-                        Edit business profile
-                      </Link>
-                    </div>
-                  </SectionCard>
-
-                  {/* §2.5 the warning follows them to the submit screen. */}
-                  {!evidencedBar.met && (
-                    <Group header="Status">
-                      <Row
-                        label="Below the bar"
-                        glyph="waiting"
-                        value={`${evidencedBar.count} of 2`}
-                        tone="waiting"
-                      />
-                    </Group>
-                  )}
+                  </section>
                 </>
               )}
 
@@ -1247,11 +1296,6 @@ export default function VerificationFlowSheet({
                 </p>
               )}
               {validationError && <p className="text-[12px] text-destructive">{validationError}</p>}
-              {!detailsReady && page === 'ownership' && (
-                <p style={{ ...BIZ_BODY, fontSize: 12.5 }}>
-                  Adding a website and contact email to your profile helps the reviewer place you.
-                </p>
-              )}
             </div>
           )}
         </main>
@@ -1275,9 +1319,9 @@ export default function VerificationFlowSheet({
                   className="h-12 px-5 text-[15px]"
                   style={{
                     borderRadius: BIZ.rInner,
-                    /* Explicit treatment: shadcn's outline variant is near
+                    /* BIZ.fill (6%) — shadcn's outline variant is near
                        invisible against the dark footer. */
-                    background: 'rgba(255,255,255,0.08)',
+                    background: BIZ.fill,
                     color: A.INK,
                     border: `1px solid ${A.BORDER}`,
                   }}
@@ -1285,31 +1329,37 @@ export default function VerificationFlowSheet({
                   Back
                 </Button>
               )}
-              <Button
-                onClick={() => (isLast ? submitMutation.mutate() : setPageIndex(safeIndex + 1))}
-                disabled={submitMutation.isPending || !canContinue}
-                className="flex-1 h-12 border-0 text-[15px]"
-                style={{
-                  background: isLast && !evidencedBar.met ? 'transparent' : INK,
-                  /* Filled branch only: an INK fill takes a CANVAS label. The
-                     transparent branch keeps INK ink and is correct. */
-                  color: isLast && !evidencedBar.met ? INK : A.CANVAS,
-                  border: isLast && !evidencedBar.met ? `1px solid ${HAIR}` : 'none',
-                  borderRadius: BIZ.rInner,
-                  fontWeight: isLast && !evidencedBar.met ? 400 : 600,
-                }}
-              >
-                {submitMutation.isPending ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Submitting…
-                  </span>
-                ) : isLast ? (
-                  evidencedBar.met ? 'Submit for review' : 'Submit anyway'
-                ) : (
-                  'Continue'
-                )}
-              </Button>
+              {(() => {
+                // B4 — the label says what the button does. Last page is always primary.
+                const ghost = !isLast && stepEmpty;
+                return (
+                  <Button
+                    onClick={() => (isLast ? submitMutation.mutate() : setPageIndex(safeIndex + 1))}
+                    disabled={submitMutation.isPending || !canContinue}
+                    className="flex-1 h-12 border-0 text-[15px]"
+                    style={{
+                      background: ghost ? 'transparent' : INK,
+                      color: ghost ? INK : A.CANVAS,
+                      border: ghost ? `1px solid ${HAIR}` : 'none',
+                      borderRadius: BIZ.rInner,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {submitMutation.isPending ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Submitting…
+                      </span>
+                    ) : isLast ? (
+                      'Submit for review'
+                    ) : ghost ? (
+                      'Skip for now'
+                    ) : (
+                      'Continue'
+                    )}
+                  </Button>
+                );
+              })()}
             </div>
           </footer>
         )}
@@ -1322,74 +1372,50 @@ export default function VerificationFlowSheet({
 
 const SectionCard = React.forwardRef<
   HTMLDivElement,
-  { number: number; title: string; children: React.ReactNode }
->(function SectionCard({ number, title, children }, ref) {
+  { title: string; children: React.ReactNode }
+>(function SectionCard({ title, children }, ref) {
   return (
     <div
       ref={ref}
       className="rounded-[14px] p-4"
       style={{ background: BIZ.card, border: `1px solid ${HAIR}` }}
     >
-      <div className="flex items-baseline gap-2.5 mb-3">
-        <span
-          style={{
-            fontFamily: SF_STACK,
-            fontSize: 13,
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: INK_45,
-            flexShrink: 0,
-          }}
-        >{`Step ${number}`}</span>
-        <h3 style={{ fontFamily: SF_STACK, fontSize: 17, fontWeight: 600, color: INK, margin: 0, letterSpacing: '-0.01em' }}>
-          {title}
-        </h3>
-      </div>
+      <h3
+        data-vf-heading
+        tabIndex={-1}
+        className="mb-3 outline-none"
+        style={{ fontFamily: SF_STACK, fontSize: 17, fontWeight: 600, color: INK, margin: 0, marginBottom: 12, letterSpacing: '-0.01em' }}
+      >
+        {title}
+      </h3>
       {children}
     </div>
   );
 });
 
+/** One <dt>/<dd> row of the reviewer list. A missing value always reads "Not set". */
 function DetailRow({
   label,
   value,
-  missing,
-  missingMessage,
+  tone,
 }: {
   label: string;
   value?: string | null;
-  missing?: boolean;
-  missingMessage?: string;
-  /** @deprecated rows no longer draw rules; kept so callers need not change. */
-  last?: boolean;
+  tone?: string;
 }) {
+  const missing = !value || !String(value).trim();
   return (
     <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '130px minmax(0,1fr)',
-        alignItems: 'baseline',
-        gap: 12,
-        padding: '8px 0',
-      }}
+      className="flex items-baseline justify-between"
+      style={{ gap: 12, padding: '11px 14px', borderTop: `1px solid ${HAIR}`, marginTop: -1 }}
     >
-      <span style={{ fontFamily: SF_STACK, fontSize: 15.5, fontWeight: 400, color: INK_60 }}>{label}</span>
-      {missing ? (
-        <span
-          className="min-w-0 text-right"
-          style={{ fontFamily: SF_STACK, fontSize: 15.5, fontWeight: 400, color: INK_30 }}
-        >
-          {missingMessage}
-        </span>
-      ) : (
-        <span
-          className="min-w-0 text-right overflow-hidden text-ellipsis whitespace-nowrap"
-          style={{ fontFamily: SF_STACK, fontSize: 15.5, fontWeight: 400, color: INK }}
-        >
-          {value || ''}
-        </span>
-      )}
+      <dt style={{ fontFamily: SF_STACK, fontSize: 13.5, fontWeight: 400, color: A.BODY, flexShrink: 0 }}>{label}</dt>
+      <dd
+        className="min-w-0 text-right overflow-hidden text-ellipsis whitespace-nowrap"
+        style={{ fontFamily: SF_STACK, fontSize: 13.5, fontWeight: 400, margin: 0, color: missing ? A.DIM : tone ?? A.INK }}
+      >
+        {missing ? 'Not set' : value}
+      </dd>
     </div>
   );
 }
@@ -1401,12 +1427,16 @@ function FieldGroup({
 }: {
   label: React.ReactNode;
   hint?: React.ReactNode;
-  children: React.ReactNode;
+  /** Render prop: receives the generated id to put on the control (label htmlFor). */
+  children: (id: string) => React.ReactNode;
 }) {
+  const id = useId();
   return (
     <div data-vf-field>
-      <div
+      <label
+        htmlFor={id}
         style={{
+          display: 'block',
           fontFamily: SF_STACK,
           fontSize: 13,
           fontWeight: 600,
@@ -1415,8 +1445,8 @@ function FieldGroup({
         }}
       >
         {label}
-      </div>
-      {children}
+      </label>
+      {children(id)}
       {hint && (
         <div style={{ fontFamily: SF_STACK, fontSize: 13, fontWeight: 400, color: INK_45, marginTop: 6 }}>
           {hint}
