@@ -6177,7 +6177,6 @@ export type Database = {
           is_counter: boolean
           longest_birdie_run: number
           longest_par_or_better_run: number
-          nett_score: number | null
           pars: number
           pcc: number | null
           play_date: string
@@ -6224,7 +6223,6 @@ export type Database = {
           is_counter?: boolean
           longest_birdie_run?: number
           longest_par_or_better_run?: number
-          nett_score?: number | null
           pars?: number
           pcc?: number | null
           play_date: string
@@ -6271,7 +6269,6 @@ export type Database = {
           is_counter?: boolean
           longest_birdie_run?: number
           longest_par_or_better_run?: number
-          nett_score?: number | null
           pars?: number
           pcc?: number | null
           play_date?: string
