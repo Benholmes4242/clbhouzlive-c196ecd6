@@ -29,6 +29,7 @@ import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 import { BIZ } from './businessTokens';
 import { courseCountSuffix } from '@/features/business/claimClub';
 import { mayHaveClubAnalytics } from '@/features/business/clubAnalytics/useClubCourseLink';
+import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 
 interface BusinessCommandCardProps {
   membership: BusinessMembership;
@@ -98,6 +99,7 @@ export function BusinessCommandCard({
 
   // Reviews summary — used for the Reviews action badge / rating.
   const { data: reviewsData } = useBusinessReviews(business?.id, { filter: 'all', sort: 'recent', limit: 1 });
+  const reviewCourses = reviewsData?.courses ?? [];
   const awaitingReplies = reviewsData?.summary?.awaiting_reply ?? 0;
   const avgReviewRating = reviewsData?.summary?.avg ?? null;
 
@@ -529,6 +531,14 @@ export function BusinessCommandCard({
                           : undefined
                       }
                       badge={awaitingReplies > 0}
+                      caption={
+                        reviewCourses.length > 1
+                          ? reviewCourses.map(
+                              (c) =>
+                                `${courseNameWithinClub(c.course_name)} · ${c.count} ${c.count === 1 ? 'review' : 'reviews'}`,
+                            )
+                          : undefined
+                      }
                     />
                   )}
                   {canManage && (
