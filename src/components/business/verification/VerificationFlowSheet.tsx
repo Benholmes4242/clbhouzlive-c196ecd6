@@ -417,6 +417,8 @@ export default function VerificationFlowSheet({
   ].filter((v) => !v || !String(v).trim()).length;
 
   function toggleSignal(key: SignalKey) {
+    // B10a — unticking the document drops the upload too (best-effort storage remove).
+    if (key === 'document' && claimed.document && docPath) void handleDocRemove();
     setClaimed((prev) => ({ ...prev, [key]: !prev[key] }));
     setExclusivityError('');
   }
@@ -461,10 +463,6 @@ export default function VerificationFlowSheet({
     const email = proofEmail.trim();
     if (!email || !isValidEmail(email)) {
       toast.error('Enter a valid business email first.');
-      return;
-    }
-    if (isFreeEmailDomain(email)) {
-      toast.error('That is a personal mailbox, not a business domain.');
       return;
     }
     setOtpSending(true);
@@ -560,7 +558,7 @@ export default function VerificationFlowSheet({
         proof_metadata,
         contact_email: contactEmail.trim() || null,
         contact_role: role || null,
-        proof_document_url: docPath,
+        proof_document_url: claimed.document ? docPath : null,
       };
 
       let requestId = otpRequestId;
@@ -664,15 +662,17 @@ export default function VerificationFlowSheet({
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0, cursor: 'pointer',
               }}
-              aria-label={safeIndex > 0 ? 'Back' : 'Close'}
+              aria-label={!confirmation && !showDomainMode && safeIndex > 0 ? 'Back' : 'Close'}
             >
               <ChevronLeft size={18} strokeWidth={2.5} style={{ color: A.INK }} />
             </button>
-            <h2 style={{ fontFamily: SF_STACK, fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: INK, lineHeight: 1, margin: 0 }}>
-              {showDomainMode ? 'Verify domain' : 'Get verified'}
-            </h2>
+            <DialogTitle asChild>
+              <h2 style={{ fontFamily: SF_STACK, fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: INK, lineHeight: 1, margin: 0 }}>
+                {showDomainMode ? 'Verify domain' : 'Get verified'}
+              </h2>
+            </DialogTitle>
             {!showDomainMode && !confirmation && (
-              <span style={{ ...BIZ_LABEL, marginLeft: 'auto' }}>
+              <span role="status" aria-live="polite" style={{ ...BIZ_LABEL, marginLeft: 'auto' }}>
                 {safeIndex + 1} / {pages.length}
               </span>
             )}
@@ -696,21 +696,7 @@ export default function VerificationFlowSheet({
             </div>
           ) : (
             <div className="space-y-4">
-              <style>{`
-                [data-vf-field] input,
-                [data-vf-field] textarea,
-                [data-vf-field] button[role="combobox"] {
-                  border: 1px solid ${A.BORDER};
-                  border-radius: 11px;
-                  padding: 12px 13px;
-                  font-size: 14px;
-                  font-weight: 400;
-                  color: ${A.INK};
-                  background: ${A.PANEL};
-                  height: auto;
-                  min-height: 44px;
-                }
-              `}</style>
+
 
               {/* ================= STEP 1 — ELIGIBILITY ================= */}
               {page === 'eligibility' && (
@@ -811,20 +797,30 @@ export default function VerificationFlowSheet({
                     </div>
                   </Group>
 
-                  {/* §6.3 THE LIVE VERDICT — a Status group, one row. */}
-                  <Group
-                    header="Status"
-                    footnote={bar.met ? undefined : bar.missing || undefined}
+                  {/* B2a THE LIVE VERDICT — a sentence, never a count. */}
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="flex"
+                    style={{ background: A.SOFT, borderRadius: 12, padding: '12px 13px', marginTop: 12, gap: 10 }}
                   >
-                    <div role="status" aria-live="polite">
-                      <Row
-                        label={bar.met ? 'You meet the bar' : 'Not there yet'}
-                        glyph={bar.met ? 'confirmed' : 'waiting'}
-                        value={`${bar.count} of 2`}
-                        tone={bar.met ? 'confirmed' : 'waiting'}
-                      />
-                    </div>
-                  </Group>
+                    <span
+                      aria-hidden
+                      className="flex-none"
+                      style={{
+                        width: 7, height: 7, borderRadius: '50%', marginTop: 5,
+                        background: bar.met ? A.GREEN : BIZ.amber,
+                      }}
+                    />
+                    <p style={{ fontFamily: SF_STACK, fontSize: 12.5, lineHeight: 1.45, color: A.BODY, margin: 0 }}>
+                      <span style={{ color: A.INK, fontWeight: 700 }}>{bar.met ? 'That works.' : 'Not yet.'}</span>{' '}
+                      {bar.met
+                        ? `You'll show us ${joinAnd(
+                            SIGNALS.filter((s) => claimed[s.key]).map((s) => SIGNAL_PHRASE[s.key]),
+                          )}. We need two signals, and at least one has to be a domain or a document.`
+                        : bar.missing}
+                    </p>
+                  </div>
 
                   {/* §5.4 — the criteria as a chevron row. */}
                   <Group header="Before you start">
