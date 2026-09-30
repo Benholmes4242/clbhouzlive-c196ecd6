@@ -1,15 +1,9 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
-import { ChevronDown, Film } from 'lucide-react';
+import { Film } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { RailChips } from '@/components/ui/RailChips';
 import { MoreOptionsDrawer } from '@/components/clubhouse/MoreOptionsDrawer';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -242,7 +236,6 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
 
 
-  const currentFilterLabel = FILTER_OPTIONS.find(o => o.value === activeFilter)?.label || 'All Posts';
 
   // ── Loading / error / empty states ──
   // Same fault, same fix as Clubhouse: hold the skeleton while the chained
@@ -294,34 +287,14 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
   return (
     <div>
-      {/* Filter dropdown */}
       {posts.length > 0 && (
-        <div className="flex justify-end px-4 pt-1 pb-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium min-h-[36px] whitespace-nowrap shrink-0"
-                style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, color: A.INK }}
-              >
-                {currentFilterLabel}
-                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[180px]">
-              {FILTER_OPTIONS.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.value}
-                  onClick={() => setActiveFilter(opt.value)}
-                  className={cn(
-                    'text-sm',
-                    activeFilter === opt.value && 'font-semibold'
-                  )}
-                >
-                  {opt.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="px-4 pt-4 pb-2">
+          <RailChips
+            options={FILTER_OPTIONS.map((o) => ({ id: o.value, label: o.label }))}
+            value={activeFilter}
+            onChange={(id) => setActiveFilter(id as PostsFilter)}
+            ariaLabel="Filter posts"
+          />
         </div>
       )}
 

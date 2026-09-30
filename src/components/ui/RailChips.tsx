@@ -24,7 +24,8 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
  *
  * The `filled` ground states APPLIED STATE: a 6% white ground, no border,
  * NOTHING selected, and tapping opens a panel rather than switching a list.
- * The Explore filter rail is the one filled consumer.
+ * The `filled` ground currently has NO live consumer; it is retained for a
+ * panel opener should one arrive.
  * A control that looks like a choice must behave like one, so do not reach for
  * `filled` on anything that actually switches the surface below it.
  *
