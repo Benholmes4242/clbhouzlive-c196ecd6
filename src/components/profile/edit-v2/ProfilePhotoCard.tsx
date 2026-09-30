@@ -92,7 +92,8 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
       onOpenChange={handleCropperClose}
       image={cropperImage}
       aspectRatio={PROFILE_ASPECT_RATIO}
-      cropShape={variant === 'bare' ? 'round' : 'rect'}
+      cropShape="rect"
+      helperText="Position your photo in the frame. It will display as a rounded squircle."
       title="Crop Profile Photo"
       onCropComplete={handleCropComplete}
     />
