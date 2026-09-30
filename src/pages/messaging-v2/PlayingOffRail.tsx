@@ -8,6 +8,11 @@
  *
  * Renders nothing when no member has an index. No amber: "You" identifies the
  * viewer (amber in Messages is reserved for the member's own shared-round score).
+ *
+ * BRIEF_PLAYING_OFF_NO_POP_IN — while the RPC is in flight the rail is reserved
+ * with one em-dash tile per personal member (same geometry as resolved), so the
+ * message list never shifts when the numbers arrive. If the answer is "nobody
+ * has an index", the rail collapses once; that shift is deliberate.
  */
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -34,7 +39,7 @@ export const PlayingOffRail: React.FC<Props> = ({ members, viewerActorType, view
     [members],
   );
 
-  const { data: byId } = useQuery({
+  const { data: byId, isLoading } = useQuery({
     queryKey: ['messaging', 'playing-off', personalIds],
     enabled: personalIds.length > 0,
     staleTime: 60_000,
