@@ -15,6 +15,13 @@
 #               THE PREFERRED SHAPE for anything incremental.
 # 3. INERT    — a historical full copy, topped with a RAISE EXCEPTION
 #               so it cannot run by accident.
+# 4. POLICIES — a file that DROPs and recreates an RLS policy is the
+#               most dangerous kind here, not the least. A stale
+#               function serves the wrong data; a stale policy changes
+#               WHO CAN READ A TABLE, raises no error, and looks
+#               entirely normal afterwards. Treat every policy file as
+#               INERT unless it has just been verified against
+#               pg_policies.
 #
 # THE DATABASE IS THE SOURCE OF TRUTH, NOT THIS FOLDER AND NOT
 # supabase/migrations. Both have been found stale against production:
@@ -25,8 +32,6 @@
 #   SELECT pg_get_functiondef(p.oid) FROM pg_proc p
 #   JOIN pg_namespace n ON n.oid = p.pronamespace
 #   WHERE n.nspname = 'public' AND p.proname = '<name>';
-
-# docs/sql
 
 Hand-run SQL. Nothing here is applied by the agent. Each file is a guarded
 patch: it asserts the exact deployed body it was written against, refuses to run
