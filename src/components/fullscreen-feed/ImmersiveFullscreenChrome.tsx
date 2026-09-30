@@ -8,11 +8,24 @@
  *     - Back chevron top-LEFT (circular rgba(0,0,0,.32))
  *     - Course block top-RIGHT (name 12/500 ellipsis, location 9/.75 w/ map-pin,
  *       amber ◉ score chip below)
- *   BOTTOM scrim (persistent, ~130px, transparent → rgba(0,0,0,.7)):
- *     - LEFT: 32px squircle avatar + column (name · [2mo · FollowPill] · read
- *       review ›)
+ *   BOTTOM (no scrim — removed earlier; every element carries its own
+ *   drop-shadow over the blurred media backdrop). From the top down:
+ *     - LEFT: 40px squircle avatar + column (name · [time · FollowPill] ·
+ *       caption · read review › · likers row). The likers row is LikedByRow
+ *       with avatarRing="media"; it reserves its full size at first paint.
  *     - CENTER: segmented carousel dots (white active)
- *     - RIGHT: vertical action rail (heart, comment, send, more)
+ *     - RIGHT: vertical action rail (mute, heart, comment, send, more)
+ *     - BOTTOM-MOST: the comment bar (viewer avatar + "Add a comment…"),
+ *       above FullscreenScrubber, which keeps the true bottom edge. When the
+ *       bar renders, the author column, dots and rail are lifted by
+ *       COMMENT_BAR_LIFT; when it does not, they sit exactly where they did.
+ *
+ * THE COMMENT BAR IS A BUTTON, NOT AN INPUT. It opens CommentsSheetV2 with its
+ * composer focused and contains no input/textarea/contentEditable, because a
+ * focused field inside this fixed full-screen overlay raises the keyboard over
+ * a fixed layer on iOS/WKWebView (the same class of bug
+ * lockFullscreenViewportScroll exists for) and would be a second composer.
+ * Do not "fix" it into a real field.
  *
  * NO fade-on-idle. NO carousel dots at top. NO score eyebrow. Course chip in
  * the top-right is the ONLY score surface.
