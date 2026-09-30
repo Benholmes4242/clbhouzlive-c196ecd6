@@ -1258,7 +1258,7 @@ export function ExploreCard({
                 fontSize={11}
                 fontWeight={600}
                 color="rgba(255,255,255,0.72)"
-                showAvatars={false}
+                avatarRing="none"
                 style={{ textShadow: HERO_TEXT_SHADOW }}
               />
             </span>

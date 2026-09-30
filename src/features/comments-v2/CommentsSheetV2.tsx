@@ -82,11 +82,16 @@ interface Props {
   targetSecondaryId?: string | null;
   /** Deep-link: scroll to + briefly highlight this comment on open. */
   initialCommentId?: string | null;
+  /** Open with the composer already focused — for entry points that are
+   *  themselves a comment affordance (the fullscreen viewer's bar). */
+  autoFocusComposer?: boolean;
 }
 
 function CommentsSheetV2Inner({
   isOpen, onClose, targetType, targetId, targetSecondaryId, initialCommentId,
+  autoFocusComposer = false,
 }: Props) {
+  const [composerFocusToken, setComposerFocusToken] = useState(0);
   const { user } = useSupabaseSession();
   const { t } = useTranslation('common');
   const kb = useKeyboardHeight();
@@ -296,6 +301,12 @@ function CommentsSheetV2Inner({
           <motion.div
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            /* Focus AFTER the open spring settles, never on mount — focusing
+               mid-transition fights the animation. Exit completions are
+               ignored because isOpen is false by then. */
+            onAnimationComplete={() => {
+              if (autoFocusComposer && isOpen) setComposerFocusToken((n) => n + 1);
+            }}
             className="fixed inset-x-0 bottom-0 z-[12003] w-full md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px] flex flex-col"
             style={{
               background: CANVAS,
@@ -417,6 +428,7 @@ function CommentsSheetV2Inner({
               isSubmitting={addComment.isPending}
               onDirtyChange={setComposerDirty}
               draftKey={commentsDraftKey}
+              focusToken={composerFocusToken}
             />
 
 

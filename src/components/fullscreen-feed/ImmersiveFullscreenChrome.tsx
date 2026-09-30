@@ -8,18 +8,33 @@
  *     - Back chevron top-LEFT (circular rgba(0,0,0,.32))
  *     - Course block top-RIGHT (name 12/500 ellipsis, location 9/.75 w/ map-pin,
  *       amber ◉ score chip below)
- *   BOTTOM scrim (persistent, ~130px, transparent → rgba(0,0,0,.7)):
- *     - LEFT: 32px squircle avatar + column (name · [2mo · FollowPill] · read
- *       review ›)
+ *   BOTTOM (no scrim — removed earlier; every element carries its own
+ *   drop-shadow over the blurred media backdrop). From the top down:
+ *     - LEFT: 40px squircle avatar + column (name · [time · FollowPill] ·
+ *       caption · read review › · likers row). The likers row is LikedByRow
+ *       with avatarRing="media"; it reserves its full size at first paint.
  *     - CENTER: segmented carousel dots (white active)
- *     - RIGHT: vertical action rail (heart, comment, send, more)
+ *     - RIGHT: vertical action rail (mute, heart, comment, send, more)
+ *     - BOTTOM-MOST: the comment bar (viewer avatar + "Add a comment…"),
+ *       above FullscreenScrubber, which keeps the true bottom edge. When the
+ *       bar renders, the author column, dots and rail are lifted by
+ *       COMMENT_BAR_LIFT; when it does not, they sit exactly where they did.
+ *
+ * THE COMMENT BAR IS A BUTTON, NOT AN INPUT. It opens CommentsSheetV2 with its
+ * composer focused and contains no input/textarea/contentEditable, because a
+ * focused field inside this fixed full-screen overlay raises the keyboard over
+ * a fixed layer on iOS/WKWebView (the same class of bug
+ * lockFullscreenViewportScroll exists for) and would be a second composer.
+ * Do not "fix" it into a real field.
  *
  * NO fade-on-idle. NO carousel dots at top. NO score eyebrow. Course chip in
  * the top-right is the ONLY score surface.
  */
 import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronLeft, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { reactionGlyph, reactionKindFor } from '@/lib/reactionKind';
+import { LikedByRow } from '@/components/likes/LikedByRow';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -47,6 +62,9 @@ const CHEVRON_BG = 'rgba(0,0,0,0.32)';
 const CHIP_BG = 'rgba(0,0,0,0.40)';
 const ICON_SHADOW = 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))';
 const TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.55)';
+/* The comment bar's block height plus breathing room. Everything that used
+   to anchor to the bottom edge is lifted by exactly this. */
+const COMMENT_BAR_LIFT = 48;
 
 function formatCount(n: number | null | undefined): string | null {
   if (n === null || n === undefined || n === 0) return null;
@@ -164,6 +182,8 @@ interface Props {
   onClose: () => void;
   onLike: (post: FeedPost) => void;
   onComment: () => void;
+  /** The comment bar: opens the same sheet with its composer focused. */
+  onCompose?: () => void;
   onShare: (post: FeedPost) => void;
   onMore: () => void;
   getLikeState: (post: FeedPost) => { isLiked: boolean; count: number };
@@ -186,6 +206,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   onClose,
   onLike,
   onComment,
+  onCompose,
   onShare,
   onMore,
   getLikeState,
@@ -201,6 +222,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   feedEnded = false,
 }: Props) {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
 
   // Mentions inside the caption must dismiss the fullscreen overlay BEFORE
   // routing, otherwise the profile mounts underneath the still-open viewer.
@@ -323,6 +345,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const showCourseChip = courseRating != null;
   const courseRatingLabel = courseRating == null ? '' : formatRatingValue(courseRating);
 
+  // Same guard the rail's comment glyph uses (!readOnly), plus a signed-in
+  // actor to comment as.
+  const showCommentBar = !readOnly && !!activeActor && !!onCompose;
+  const lift = showCommentBar ? ` + ${COMMENT_BAR_LIFT}px` : '';
   const likeStr = formatCount(likeState.count);
   const commentStr = formatCount(commentCount);
   const timeLabel = timeAgo(activePost.createdAt);
@@ -468,7 +494,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           style={{
             position: 'fixed',
             left: 0, right: 0,
-            bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 12px) + 12px)',
+            bottom: `calc(max(env(safe-area-inset-bottom, 0px), 12px) + 12px${lift})`,
             display: 'flex', justifyContent: 'center',
             pointerEvents: 'none',
             zIndex: Z.echo + 1,
@@ -482,7 +508,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       <div
         style={{
           position: 'fixed',
-          bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px)',
+          bottom: `calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px${lift})`,
           left: 'max(14px, env(safe-area-inset-left, 0px))',
           right: 64, // reserve space for right rail
           zIndex: Z.echo,
@@ -580,6 +606,22 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               read review ›
             </button>
           )}
+
+          {/* Likers row — LikedByRow returns null at zero; no second guard. */}
+          <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
+            <LikedByRow
+              postId={activePost.id}
+              count={likeState.count}
+              source={activePost.isReview ? 'review' : 'post'}
+              kind={reactionKindFor({ isRound: false, isReview: !!activePost.isReview })}
+              avatarRing="media"
+              lines={1}
+              fontSize={12.5}
+              fontWeight={500}
+              color="rgba(255,255,255,0.86)"
+              style={{ marginTop: 9, textShadow: TEXT_SHADOW }}
+            />
+          </div>
         </div>
 
       </div>
@@ -595,7 +637,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         style={{
           position: 'fixed',
           right: 'max(12px, env(safe-area-inset-right, 0px))',
-          bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px)',
+          bottom: `calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px${lift})`,
           zIndex: Z.echo,
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           gap: 20, pointerEvents: 'none',
@@ -645,10 +687,63 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         )}
       </div>
 
-
+      {/* Comment bar — a BUTTON styled as a field (see header). Inside the
+          data-immersive-chrome root so the scrubber's tap-to-pause skips it. */}
+      {showCommentBar && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onCompose?.(); }}
+          aria-label={t('comments.placeholder')}
+          style={{
+            position: 'fixed',
+            left: 0, right: 0,
+            bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 12px) + 14px)',
+            zIndex: Z.echo,
+            display: 'flex', alignItems: 'center', gap: 9,
+            minHeight: 44,
+            paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
+            paddingRight: 'max(14px, env(safe-area-inset-right, 0px))',
+            background: 'transparent', border: 'none', margin: 0,
+            cursor: 'pointer', pointerEvents: 'auto', textAlign: 'left',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          }}
+        >
+          <span
+            style={{
+              width: 26, height: 26, borderRadius: 8, flex: 'none', overflow: 'hidden',
+              boxShadow: '0 0 0 1px rgba(255,255,255,0.22)',
+              background: 'rgba(255,255,255,0.12)',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.86)',
+            }}
+          >
+            {activeActor!.avatarUrl ? (
+              <img src={activeActor!.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            ) : (
+              (activeActor!.name ?? '').trim().charAt(0).toUpperCase()
+            )}
+          </span>
+          <span
+            style={{
+              flex: 1, minWidth: 0, height: 38, borderRadius: 12,
+              background: 'rgba(255,255,255,0.12)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+              padding: '0 13px', boxSizing: 'border-box',
+              display: 'flex', alignItems: 'center',
+              fontSize: 13, color: 'rgba(255,255,255,0.62)',
+            }}
+          >
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
+              {t('comments.placeholder')}
+            </span>
+          </span>
+        </button>
+      )}
     </div>
   );
 });
+
 
 interface RailButtonProps {
   onClick: () => void;
