@@ -115,5 +115,13 @@
     "oneSelected": "1 selected",
     "nSelected": "{{count}} selected",
     "nSelectedGroup": "{{count}} selected · group"
+  },
+  "filter": {
+    "all": "All",
+    "unread": "Unread",
+    "playedWith": "Played with"
+  },
+  "rail": {
+    "start": "Start"
   }
 }

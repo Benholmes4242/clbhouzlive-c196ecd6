@@ -6,15 +6,17 @@
  * none: not the member's course, not the thread's course, just a picture behind
  * a utility list. THE IMAGE IS INFORMATION OR IT IS ABSENT, NEVER ATMOSPHERE.
  *
- * Search appears at eight threads (§4.5). Threads with nothing said in them are
- * not rendered at all (§4.1).
+ * BRIEF_MESSAGES_INBOX_LANDING: search, the played-with rail and the filter
+ * chips render whenever there is at least one thread — a binary, not a
+ * threshold. The empty inbox is unchanged. Threads with nothing said in them
+ * are not rendered at all (§4.1).
  */
 
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, PencilLine, Search, X } from 'lucide-react';
+import { ChevronLeft, PencilLine, Plus, Search, X } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
@@ -22,12 +24,18 @@ import InboxEmptyState from './InboxEmptyState';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSharedGroundBatch } from '@/hooks/messaging/useSharedGround';
+import { useInboxStarters } from '@/hooks/messaging/useInboxStarters';
+import { useStartConversation } from '@/hooks/messaging/useStartConversation';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { RailChips } from '@/components/ui/RailChips';
+import { formatRelative } from '@/i18n/format';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { isSpeakableThread } from './messagePreview';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
 import '@/features/messaging-dark/messages-dark.css';
 
-const SEARCH_THRESHOLD = 8;
+type InboxFilter = 'all' | 'unread' | 'played';
+const RAIL_CAP = 8;
 
 const SkeletonRow: React.FC = () => (
   <div className="msg-row msg-row-sep" style={{ pointerEvents: 'none' }}>
@@ -51,11 +59,18 @@ const InboxV2Page: React.FC = () => {
   const navigate = useNavigate();
   const [composeOpen, setComposeOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [filter, setFilter] = useState<InboxFilter>('all');
   const { conversations, isLoading, error, refetch, hasActor } = useConversations();
   const actor = useMessagingActor();
   const { user } = useSupabaseSession();
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const { start } = useStartConversation();
+  const { kind: starterKind, members: starters } = useInboxStarters(user?.id, !!user?.id, RAIL_CAP);
+  const railIds = useMemo(
+    () => (starterKind === 'played' ? starters.map((m) => m.userId) : []),
+    [starterKind, starters],
+  );
+  const { byUserId: railGround } = useSharedGroundBatch(user?.id, railIds, RAIL_CAP);
 
   useEffect(() => {
     if (!actor) return;
@@ -70,10 +85,10 @@ const InboxV2Page: React.FC = () => {
     [conversations],
   );
 
-  const showSearch = speakable.length >= SEARCH_THRESHOLD;
+  const hasList = hasActor && !isLoading && !error && speakable.length > 0;
   const isEmptyInbox = hasActor && !isLoading && !error && speakable.length === 0 && !query.trim();
 
-  const visible = useMemo(() => {
+  const searched = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return speakable;
     return speakable.filter((c) => {
@@ -86,32 +101,41 @@ const InboxV2Page: React.FC = () => {
     });
   }, [speakable, query]);
 
+  const otherPersonalId = (c: (typeof speakable)[number]) => {
+    if (c.type !== 'direct') return null;
+    const other = c.participants.find(
+      (p) => !(p.actor_type === actor?.actorType && p.actor_id === actor?.actorId),
+    );
+    return other?.actor_type === 'personal' ? other.actor_id : null;
+  };
+
   // §2.3 the context line. ONE batched count query for the whole list; round
   // detail only for direct threads that actually have shared golf.
   const directUserIds = useMemo(
     () =>
-      visible
-        .filter((c) => c.type === 'direct')
-        .map((c) => {
-          const other = c.participants.find(
-            (p) => !(p.actor_type === actor?.actorType && p.actor_id === actor?.actorId),
-          );
-          return other?.actor_type === 'personal' ? other.actor_id : null;
-        })
+      searched
+        .map(otherPersonalId)
         .filter((id): id is string => !!id),
-    [visible, actor],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searched, actor],
   );
   const { byUserId } = useSharedGroundBatch(user?.id, directUserIds);
 
-  const groundFor = (conversationIndex: number) => {
-    const c = visible[conversationIndex];
-    if (c.type !== 'direct') return undefined;
-    const other = c.participants.find(
-      (p) => !(p.actor_type === actor?.actorType && p.actor_id === actor?.actorId),
-    );
-    if (!other || other.actor_type !== 'personal') return undefined;
-    return byUserId[other.actor_id];
+  const groundOf = (c: (typeof speakable)[number]) => {
+    const id = otherPersonalId(c);
+    return id ? byUserId[id] : undefined;
   };
+
+  // Chips filter the in-memory list only; they compose with the search query.
+  const visible = searched.filter((c) => {
+    if (filter === 'unread') return c.unread_count > 0;
+    if (filter === 'played') {
+      const g = groundOf(c);
+      return !!g && g.count > 0;
+    }
+    return true;
+  });
+  const isFiltering = !!query.trim() || filter !== 'all';
 
   return (
     <div className="messages-root" style={{ background: MSG.BLACK, color: MSG.INK }}>
@@ -156,29 +180,6 @@ const InboxV2Page: React.FC = () => {
               </div>
 
               <div className="flex items-center" style={{ gap: 2 }}>
-                {showSearch ? (
-                  <button
-                    type="button"
-                    aria-label={t('messaging:search.people')}
-                    onClick={() => {
-                      setSearchOpen((v) => !v);
-                      if (searchOpen) setQuery('');
-                    }}
-                    className="active:opacity-60"
-                    style={{
-                      width: 34,
-                      height: 34,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      background: 'transparent',
-                      border: 'none',
-                      color: searchOpen ? MSG.INK : MSG.INK_2,
-                    }}
-                  >
-                    {searchOpen ? <X size={19} /> : <Search size={19} />}
-                  </button>
-                ) : null}
                 <button
                   type="button"
                   aria-label={t('messaging:a11y.newMessage')}
@@ -201,15 +202,18 @@ const InboxV2Page: React.FC = () => {
               </div>
             </div>
 
-            {/* §4.5 SEARCH ARRIVES AT EIGHT THREADS, not before. */}
+          </div>
 
-            {showSearch && searchOpen ? (
+          {hasList ? (
+            <>
               <div
-                className="ec-glass--pill"
                 style={{
-                  marginTop: 12,
-                  borderRadius: 999,
-                  padding: '9px 14px',
+                  margin: '0 14px 11px',
+                  height: 38,
+                  borderRadius: 12,
+                  background: 'rgba(255,255,255,0.06)',
+                  border: `1px solid ${MSG.EDGE}`,
+                  padding: '0 12px',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
@@ -218,17 +222,109 @@ const InboxV2Page: React.FC = () => {
                 <Search size={15} color={MSG.INK_3} />
                 <input
                   className="msg-input"
-                  autoFocus
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={t('messaging:search.threads', {
                     defaultValue: 'Search conversations',
                   })}
+                  aria-label={t('messaging:search.threads', {
+                    defaultValue: 'Search conversations',
+                  })}
                   style={{ fontSize: 14, fontWeight: 500 }}
                 />
               </div>
-            ) : null}
-          </div>
+
+              {starterKind === 'played' ? (
+                <div
+                  className="no-scrollbar"
+                  style={{
+                    display: 'flex',
+                    gap: 13,
+                    overflowX: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                    padding: '2px 14px 14px',
+                    alignItems: 'flex-end',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setComposeOpen(true)}
+                    aria-label={t('messaging:a11y.newMessage')}
+                    className="active:opacity-60"
+                    style={{ width: 62, flex: 'none', background: 'transparent', border: 'none', padding: 0, textAlign: 'center' }}
+                  >
+                    <div
+                      style={{
+                        width: 56,
+                        height: 56,
+                        margin: '0 auto',
+                        borderRadius: 17,
+                        border: '1px dashed rgba(255,255,255,0.28)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: MSG.INK_2,
+                      }}
+                    >
+                      <Plus size={20} />
+                    </div>
+                    <div style={{ marginTop: 5, fontSize: 11, color: MSG.INK_2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {t('messaging:rail.start', { defaultValue: 'Start' })}
+                    </div>
+                  </button>
+                  {starters.map((m) => {
+                    const date = railGround[m.userId]?.lastPlayDate ?? m.lastPlayDate;
+                    return (
+                      <button
+                        key={m.userId}
+                        type="button"
+                        onClick={() => start({ actorType: 'personal', actorId: m.userId })}
+                        className="active:opacity-60"
+                        style={{ width: 62, flex: 'none', background: 'transparent', border: 'none', padding: 0, textAlign: 'center' }}
+                      >
+                        {date ? (
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              background: 'rgba(255,255,255,0.09)',
+                              borderRadius: 10,
+                              padding: '4px 7px',
+                              fontSize: 9.5,
+                              lineHeight: 1.25,
+                              color: MSG.INK_2,
+                              marginBottom: 6,
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {formatRelative(date)}
+                          </span>
+                        ) : null}
+                        <div style={{ width: 56, height: 56, margin: '0 auto' }}>
+                          <SquircleAvatar src={m.avatarUrl} alt={m.name} userId={m.userId} size={56} />
+                        </div>
+                        <div style={{ marginTop: 5, fontSize: 11, color: MSG.INK_2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {m.name.split(' ')[0]}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
+
+              <div style={{ padding: '0 14px 11px' }}>
+                <RailChips
+                  ariaLabel={t('messaging:title.inbox')}
+                  value={filter}
+                  onChange={(v) => setFilter(v as InboxFilter)}
+                  options={[
+                    { id: 'all', label: t('messaging:filter.all', { defaultValue: 'All' }) },
+                    { id: 'unread', label: t('messaging:filter.unread', { defaultValue: 'Unread' }) },
+                    { id: 'played', label: t('messaging:filter.playedWith', { defaultValue: 'Played with' }) },
+                  ]}
+                />
+              </div>
+            </>
+          ) : null}
         </header>
 
         {/* ── The list ───────────────────────────────────────────────────── */}
@@ -275,7 +371,7 @@ const InboxV2Page: React.FC = () => {
                 {t('common:action.tryAgain')}
               </button>
             </div>
-          ) : visible.length === 0 && query.trim() ? (
+          ) : visible.length === 0 && isFiltering ? (
             <div
               className="flex flex-col items-center justify-center text-center"
               style={{ padding: '72px 32px' }}
@@ -353,11 +449,11 @@ const InboxV2Page: React.FC = () => {
                 </div>
               )}
 
-              {visible.map((c, i) => (
+              {visible.map((c) => (
                 <ConversationRow
                   key={c.conversation_id}
                   conversation={c}
-                  ground={groundFor(i)}
+                  ground={groundOf(c)}
                 />
               ))}
             </div>

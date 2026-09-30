@@ -115,5 +115,13 @@
     "oneSelected": "1 ausgewählt",
     "nSelected": "{{count}} ausgewählt",
     "nSelectedGroup": "{{count}} ausgewählt · Gruppe"
+  },
+  "filter": {
+    "all": "Alle",
+    "unread": "Ungelesen",
+    "playedWith": "Zusammen gespielt"
+  },
+  "rail": {
+    "start": "Neu"
   }
 }

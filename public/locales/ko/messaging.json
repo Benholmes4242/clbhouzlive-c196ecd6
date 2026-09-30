@@ -115,5 +115,13 @@
     "oneSelected": "1명 선택",
     "nSelected": "{{count}}명 선택",
     "nSelectedGroup": "{{count}}명 선택 · 그룹"
+  },
+  "filter": {
+    "all": "전체",
+    "unread": "읽지 않음",
+    "playedWith": "함께 플레이"
+  },
+  "rail": {
+    "start": "시작"
   }
 }
