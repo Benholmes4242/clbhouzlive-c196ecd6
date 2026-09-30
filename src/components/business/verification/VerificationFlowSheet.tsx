@@ -111,11 +111,11 @@ const MAX_DOC_BYTES = 10 * 1024 * 1024; // 10 MB
 const ACCEPTED_DOC = 'image/*,application/pdf';
 
 const PROOF_CONFLICT_MESSAGE: Record<ProofMethod, string> = {
-  official_website: 'This website is already linked to a verified business.',
-  business_email: 'This email address is already linked to a verified business.',
-  registered_business: 'This company registration is already linked to a verified business.',
-  creator_business: 'This contact is already linked to a verified business.',
-  golf_course: 'This golf course website is already linked to a verified business.',
+  official_website: 'That website is already linked to another verified business on clbhouz. One website can only vouch for one business.',
+  business_email: 'That business email is already confirmed for another verified business on clbhouz. One address can only vouch for one business.',
+  registered_business: 'That company registration is already linked to another verified business on clbhouz. One registration can only vouch for one business.',
+  creator_business: 'That phone number is already linked to another verified business on clbhouz. One number can only vouch for one business.',
+  golf_course: 'That golf course website is already linked to another verified business on clbhouz. One website can only vouch for one business.',
 };
 
 interface Props {
@@ -191,7 +191,7 @@ export default function VerificationFlowSheet({
   const verifyCode = useVerifyDomainCode();
 
   // --- ui state ---
-  const [exclusivityError, setExclusivityError] = useState('');
+  const [conflict, setConflict] = useState<{ value: string; message: string; page: PageKey } | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<{ requestId: string; method: ProofMethod } | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -202,7 +202,7 @@ export default function VerificationFlowSheet({
     if (!open) return;
     setClaimed(NO_SIGNALS);
     setPageIndex(0);
-    setExclusivityError('');
+    setConflict(null);
     setValidationError(null);
     setConfirmation(null);
     setProofEmail('');
@@ -427,7 +427,7 @@ export default function VerificationFlowSheet({
     // B10a — unticking the document drops the upload too (best-effort storage remove).
     if (key === 'document' && claimed.document && docPath) void handleDocRemove();
     setClaimed((prev) => ({ ...prev, [key]: !prev[key] }));
-    setExclusivityError('');
+    setConflict(null);
   }
 
   // ---- OTP flow (domain signal) ----
@@ -487,6 +487,16 @@ export default function VerificationFlowSheet({
     }
   }
 
+  function resetDomainEmail() {
+    setProofEmail('');
+    setOtpEmailVerified(false);
+    setOtpSent(false);
+    setOtpVerificationId(null);
+    setOtpCode('');
+    setOtpVerifyError(null);
+    setConflict(null);
+  }
+
   async function handleVerifyOtp() {
     if (!otpVerificationId || otpCode.length !== 6) return;
     setOtpVerifyError(null);
@@ -498,6 +508,26 @@ export default function VerificationFlowSheet({
       // feedback — the code auto-submits and the user may not be looking.
       setOtpVerifyError((e as Error)?.message || 'That code did not match. Check it and try again.');
       setOtpCode('');
+      return;
+    }
+    // Early exclusivity check — the domain email is final once the code is
+    // accepted, so a conflict is surfaced here rather than at submit. Same
+    // select as the submit backstop. A failed lookup never blocks the user.
+    try {
+      const email = proofEmail.trim();
+      const { data: clash } = await supabase
+        .from('business_verification_requests')
+        .select('id')
+        .eq('proof_method', 'business_email')
+        .eq('proof_value', email)
+        .eq('status', 'approved')
+        .neq('business_id', businessId)
+        .limit(1);
+      if (clash && clash.length > 0) {
+        setConflict({ value: email, message: PROOF_CONFLICT_MESSAGE.business_email, page: 'domain' });
+      }
+    } catch {
+      /* swallowed — submit-time check remains the backstop */
     }
   }
 
@@ -556,9 +586,10 @@ export default function VerificationFlowSheet({
       if (checkError) throw checkError;
       if (existingApproved && existingApproved.length > 0) {
         const conflict = new Error(
-          PROOF_CONFLICT_MESSAGE[primaryMethod] ?? 'This proof is already linked to a verified business.',
-        ) as Error & { isProofConflict?: boolean };
+          PROOF_CONFLICT_MESSAGE[primaryMethod] ?? 'This proof is already linked to another verified business on clbhouz.',
+        ) as Error & { isProofConflict?: boolean; proofValue?: string };
         conflict.isProofConflict = true;
+        conflict.proofValue = proof_value;
         throw conflict;
       }
 
@@ -629,9 +660,22 @@ export default function VerificationFlowSheet({
       setConfirmation(result);
     },
     onError: (error: unknown) => {
-      const err = error as Error & { isValidation?: boolean; isProofConflict?: boolean };
+      const err = error as Error & { isValidation?: boolean; isProofConflict?: boolean; proofValue?: string };
       const message = err?.message || 'Failed to submit verification request';
-      if (err?.isProofConflict) setExclusivityError(message);
+      if (err?.isProofConflict) {
+        // Route to the step that owns the proof, not a global footer message.
+        const owner = signalOfProofMethod(primaryMethod);
+        setConflict({
+          value: err.proofValue ?? '',
+          message:
+            PROOF_CONFLICT_MESSAGE[primaryMethod] ?? 'This proof is already linked to another verified business on clbhouz.',
+          page: owner,
+        });
+        const i = pages.indexOf(owner);
+        if (i >= 0) setPageIndex(i);
+        toast.error(message);
+        return;
+      }
       // Validation stops used to be swallowed entirely — the member pressed
       // submit and nothing moved. Now every stop toasts and scrolls into view.
       toast.error(message);
@@ -872,10 +916,12 @@ export default function VerificationFlowSheet({
                                 setOtpVerificationId(null);
                                 setOtpCode('');
                                 setOtpVerifyError(null);
+                                setConflict(null);
                               }}
                               placeholder="name@yourbusiness.com"
                               type="email"
-                              disabled={otpEmailVerified}
+                              readOnly={otpEmailVerified}
+                              aria-readonly={otpEmailVerified}
                               className={cn(FIELD_CLASS, 'w-full')}
                             />
                           {/* §1.4 THE REASON, IN THE FLOW, AT THE POINT OF ENTRY. */}
@@ -888,25 +934,24 @@ export default function VerificationFlowSheet({
                             </p>
                           ) : otpEmailVerified ? (
                             <>
-                              <p style={{ fontFamily: SF_STACK, fontSize: 13, fontWeight: 400, marginTop: 6, color: GREEN }}>
-                                {emailDomain(proofEmail)} is a business domain, not a mailbox provider.
+                              <div style={{ display: 'flex', gap: 7, alignItems: 'flex-start', marginTop: 9 }}>
+                                <CheckCircle2 className="h-[15px] w-[15px]" style={{ color: GREEN, flex: 'none', marginTop: 1 }} />
+                                <p style={{ fontFamily: SF_STACK, fontSize: 13, fontWeight: 400, color: GREEN, lineHeight: 1.45, margin: 0 }}>
+                                  Confirmed. You entered the code we sent to this address.
+                                </p>
+                              </div>
+                              {/* B7c — a way back from a verified address, at reduced prominence. */}
+                              <p style={{ fontFamily: SF_STACK, fontSize: 12.5, color: A.MUTE, marginTop: 12, marginBottom: 0 }}>
+                                Confirmed the wrong address?{' '}
+                                <button
+                                  type="button"
+                                  onClick={resetDomainEmail}
+                                  className="min-h-[44px]"
+                                  style={{ fontSize: 12.5, fontWeight: 700, color: A.INK, background: 'transparent', border: 'none', padding: 0 }}
+                                >
+                                  Use a different email
+                                </button>
                               </p>
-                              {/* B7c — a way back from a verified address. */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setProofEmail('');
-                                  setOtpEmailVerified(false);
-                                  setOtpSent(false);
-                                  setOtpVerificationId(null);
-                                  setOtpCode('');
-                                  setOtpVerifyError(null);
-                                }}
-                                className="min-h-[44px]"
-                                style={{ ...BIZ_LABEL, color: A.INK, background: 'transparent', border: 'none', padding: 0 }}
-                              >
-                                Use a different email
-                              </button>
                             </>
                           ) : !proofEmail.trim() ? (
                             <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '6px 0 0' }}>
@@ -921,15 +966,7 @@ export default function VerificationFlowSheet({
                               Confirm it now and it's done. Continue without it and a reviewer checks by hand, which takes longer.
                             </p>
                           )}
-                          {otpEmailVerified ? (
-                            <span
-                              className="inline-flex items-center gap-1.5 px-3 rounded-md text-[12px] font-semibold"
-                              style={{ background: A.SOFT, color: A.GREEN, marginTop: 10 }}
-                            >
-                              <CheckCircle2 className="h-3.5 w-3.5" />
-                              Verified
-                            </span>
-                          ) : !otpSent ? (
+                          {otpEmailVerified ? null : !otpSent ? (
                             <button
                               type="button"
                               onClick={handleSendOtp}
@@ -1100,7 +1137,7 @@ export default function VerificationFlowSheet({
                   <div className="space-y-3 mt-4">
                     <FieldGroup label="What kind of document is it?">
                       {(id) => (
-                        <Select value={proofRegistry} onValueChange={setProofRegistry}>
+                        <Select value={proofRegistry} onValueChange={(v) => { setProofRegistry(v); setConflict(null); }}>
                           <SelectTrigger id={id} className={FIELD_CLASS}>
                             <SelectValue placeholder="Select type" />
                           </SelectTrigger>
@@ -1121,7 +1158,7 @@ export default function VerificationFlowSheet({
                           id={id}
                           className={FIELD_CLASS}
                           value={proofRegistryName}
-                          onChange={(e) => setProofRegistryName(e.target.value)}
+                          onChange={(e) => { setProofRegistryName(e.target.value); setConflict(null); }}
                           placeholder="e.g. your national company register"
                         />
                       )}
@@ -1132,7 +1169,7 @@ export default function VerificationFlowSheet({
                           id={id}
                           className={FIELD_CLASS}
                           value={proofCompanyNumber}
-                          onChange={(e) => setProofCompanyNumber(e.target.value)}
+                          onChange={(e) => { setProofCompanyNumber(e.target.value); setConflict(null); }}
                           placeholder="As it appears on your document"
                         />
                       )}
@@ -1143,7 +1180,7 @@ export default function VerificationFlowSheet({
                           id={id}
                           className={FIELD_CLASS}
                           value={proofRegistryUrl}
-                          onChange={(e) => setProofRegistryUrl(e.target.value)}
+                          onChange={(e) => { setProofRegistryUrl(e.target.value); setConflict(null); }}
                           placeholder="https://…"
                           type="url"
                         />
@@ -1181,7 +1218,7 @@ export default function VerificationFlowSheet({
                           id={id}
                           className={FIELD_CLASS}
                           value={presenceValue}
-                          onChange={(e) => setPresenceValues((v) => ({ ...v, [presenceKind]: e.target.value }))}
+                          onChange={(e) => { setPresenceValues((v) => ({ ...v, [presenceKind]: e.target.value })); setConflict(null); }}
                           placeholder={PRESENCE_KINDS.find((k) => k.value === presenceKind)!.placeholder}
                           type={presenceKind === 'phone' ? 'tel' : 'text'}
                         />
@@ -1321,10 +1358,34 @@ export default function VerificationFlowSheet({
                 </>
               )}
 
-              {exclusivityError && (
-                <p className="text-[12px] text-destructive bg-destructive/10 p-3 rounded-lg">
-                  {exclusivityError}
-                </p>
+              {/* The conflict renders only on the evidence step that owns it,
+                  directly under that step's section — never globally. */}
+              {conflict && conflict.page === page && (
+                <div
+                  role="alert"
+                  style={{
+                    marginTop: 12,
+                    padding: 12,
+                    borderRadius: 12,
+                    background: 'rgba(255,107,107,0.10)',
+                    border: '1px solid rgba(255,107,107,0.22)',
+                  }}
+                >
+                  <p style={{ fontSize: 12.5, fontWeight: 700, color: A.RED, margin: 0, overflowWrap: 'anywhere' }}>{conflict.value}</p>
+                  <p style={{ fontSize: 12.5, fontWeight: 400, color: A.RED, lineHeight: 1.5, margin: '4px 0 0' }}>
+                    {conflict.message}
+                  </p>
+                  {conflict.page === 'domain' && (
+                    <button
+                      type="button"
+                      onClick={resetDomainEmail}
+                      className="min-h-[44px]"
+                      style={{ marginTop: 9, fontSize: 12.5, fontWeight: 700, color: A.INK, background: 'transparent', border: 'none', padding: 0 }}
+                    >
+                      Use a different email
+                    </button>
+                  )}
+                </div>
               )}
               {validationError && <p className="text-[12px] text-destructive">{validationError}</p>}
             </div>
@@ -1366,7 +1427,7 @@ export default function VerificationFlowSheet({
                 return (
                   <Button
                     onClick={() => (isLast ? submitMutation.mutate() : setPageIndex(safeIndex + 1))}
-                    disabled={submitMutation.isPending || !canContinue}
+                    disabled={submitMutation.isPending || !canContinue || (!!conflict && conflict.page === page)}
                     className="flex-1 h-12 border-0 text-[15px]"
                     style={{
                       background: ghost ? 'transparent' : INK,
