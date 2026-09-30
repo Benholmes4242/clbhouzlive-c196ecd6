@@ -115,5 +115,13 @@
     "oneSelected": "1人選択",
     "nSelected": "{{count}}人選択",
     "nSelectedGroup": "{{count}}人選択・グループ"
+  },
+  "filter": {
+    "all": "すべて",
+    "unread": "未読",
+    "playedWith": "一緒にプレー"
+  },
+  "rail": {
+    "start": "新規"
   }
 }

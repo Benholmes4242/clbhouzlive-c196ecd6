@@ -115,5 +115,13 @@
     "oneSelected": "[~~1 šéļéĉţéđ~~]",
     "nSelected": "[~~{{count}} šéļéĉţéđ~~]",
     "nSelectedGroup": "[~~{{count}} šéļéĉţéđ · ĝřőúƥ~~]"
+  },
+  "filter": {
+    "all": "[Àļļ]",
+    "unread": "[Ûñŕéàð]",
+    "playedWith": "[Þļàýéð ŵîţĥ]"
+  },
+  "rail": {
+    "start": "[Šţàŕţ]"
   }
 }
