@@ -242,7 +242,8 @@
         "from_other": "Impeuresyeon {{n}} gi jun",
         "none": "Geusi reul olligo impeuresyeon i moimyeon chamyeoyul i pyosi dwimnida.",
         "tooFew": "Uimi inneun biyureul boyeojugien impeuresyeon i ajik bujokhamnida.",
-        "benchmark": "Impeuresyeon daebi joayo wa daetgeul bijung."
+        "benchmark": "Impeuresyeon daebi joayo wa daetgeul bijung.",
+        "impressionsLabel": "Impeuresyeon"
       },
       "topPosts": {
         "impressions_one": "Impeuresyeon {{n}}",

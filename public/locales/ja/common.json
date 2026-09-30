@@ -242,7 +242,8 @@
         "from_other": "{{n}} inpuresshon kara",
         "none": "Toko shite inpuresshon ga tamaru to engejimento ritsu ga hyoji sarema su.",
         "tooFew": "Imi no aru ritsu o dasu ni wa inpuresshon ga mada tarimasen.",
-        "benchmark": "Inpuresshon ni taisuru ii ne to komento no wariai."
+        "benchmark": "Inpuresshon ni taisuru ii ne to komento no wariai.",
+        "impressionsLabel": "Inpuresshon"
       },
       "topPosts": {
         "impressions_one": "{{n}} inpuresshon",

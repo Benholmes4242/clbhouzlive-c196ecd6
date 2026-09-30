@@ -243,7 +243,8 @@
         "from_other": "Aus {{n}} Impressionen",
         "none": "Veröffentliche Beiträge und sammle Impressionen, um deine Interaktionsrate zu sehen.",
         "tooFew": "Noch nicht genug Impressionen für eine aussagekräftige Rate.",
-        "benchmark": "Likes und Kommentare im Verhältnis zu Impressionen."
+        "benchmark": "Likes und Kommentare im Verhältnis zu Impressionen.",
+        "impressionsLabel": "Impressionen"
       },
       "topPosts": {
         "impressions_one": "{{n}} Impression",

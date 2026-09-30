@@ -463,7 +463,8 @@
         "from_other": "From {{n}} impressions",
         "none": "[~~Ƥúƀļíšĥ ƥőšţš áñđ ĝáţĥéř íɱƥřéššíőñš ţő šéé ýőúř éñĝáĝéɱéñţ řáţé.~~]",
         "tooFew": "Not enough impressions yet to give a meaningful rate.",
-        "benchmark": "Likes and comments as a share of impressions."
+        "benchmark": "Likes and comments as a share of impressions.",
+        "impressionsLabel": "Impressions"
       },
       "topPosts": {
         "impressions_one": "{{n}} impression",
