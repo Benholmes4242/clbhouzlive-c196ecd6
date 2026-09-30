@@ -125,8 +125,12 @@ export const PlayingOffRail: React.FC<Props> = ({ members, viewerActorType, view
         {t('playingOff.eyebrow', { defaultValue: 'Playing off' })}
       </div>
       <div className="msg-rail" style={{ gap: 12, padding: '0 14px 14px' }}>
-        {ordered.withIdx.map(tile)}
-        {ordered.without.map(tile)}
+        {isLoading ? placeholder.map(tile) : (
+          <>
+            {ordered.withIdx.map(tile)}
+            {ordered.without.map(tile)}
+          </>
+        )}
       </div>
     </div>
   );
