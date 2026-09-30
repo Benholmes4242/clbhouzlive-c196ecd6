@@ -434,8 +434,7 @@ export default function VerificationFlowSheet({
     if (!user?.id) return null;
     const email = proofEmail.trim();
     if (!email || !isValidEmail(email)) return null;
-    const domain = emailDomain(email);
-    if (!domain) return null;
+    if (!emailDomain(email)) return null;
     const { data, error } = await supabase
       .from('business_verification_requests')
       .insert({
@@ -451,7 +450,7 @@ export default function VerificationFlowSheet({
         contact_email: contactEmail.trim() || business?.email || null,
         contact_role: role || null,
         note: notes || null,
-        domain,
+        // `domain` is written by send-domain-verification-code (one writer).
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any)
       .select('id')

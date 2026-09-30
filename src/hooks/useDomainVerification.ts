@@ -1,6 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
+import { FunctionsHttpError } from '@supabase/supabase-js';
+
+/** Member-facing copy for send-domain-verification-code failures. Never raw. */
+function mapSendError(status: number | undefined, msg: string): string {
+  if (status === 401 || status === 403) {
+    return 'You need to be an owner or admin of this business to verify its domain.';
+  }
+  if (status === 400 && msg.includes('must be from')) return msg;
+  if (status === 400 && msg === 'free_provider') {
+    return "That's a personal mailbox, not a business domain. Use an address on your own domain.";
+  }
+  return "We couldn't send the code. Try again, or continue and we'll check your domain by hand.";
+}
 
 export interface DomainVerification {
   id: string;
@@ -63,8 +76,19 @@ export function useSendDomainCode(businessId: string) {
       const { data, error } = await supabase.functions.invoke('send-domain-verification-code', {
         body: { requestId, businessId, email },
       });
-      if (error) throw error;
-      if (!data.success) throw new Error(data.error || 'Failed to send verification code');
+      if (error) {
+        let status: number | undefined;
+        let msg = '';
+        if (error instanceof FunctionsHttpError) {
+          status = error.context?.status;
+          try {
+            const body = await error.context.json();
+            msg = typeof body?.error === 'string' ? body.error : '';
+          } catch { /* no body */ }
+        }
+        throw new Error(mapSendError(status, msg));
+      }
+      if (!data?.success) throw new Error(mapSendError(400, data?.error || ''));
       return data;
     },
     onSuccess: () => {

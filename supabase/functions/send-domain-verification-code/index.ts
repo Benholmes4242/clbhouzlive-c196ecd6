@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
+import { FREE_EMAIL_DOMAINS } from '../_shared/freeEmailDomains.ts';
 function generateCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
@@ -27,46 +28,73 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { requestId, businessId, email } = await req.json();
+    const json = (status: number, body: Record<string, unknown>) =>
+      new Response(JSON.stringify(body), {
+        status, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+
+    const { requestId, businessId, email } = await req.json().catch(() => ({}));
 
     if (!requestId || !businessId || !email) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Missing required fields" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return json(400, { success: false, error: "Missing required fields" });
     }
 
-    // Validate email domain matches the required domain.
-    // Note: requires_domain_check is admin-initiated; the client never sets it.
-    // When true the owner must complete the Domain step before an admin can approve.
+    // ---- Authorisation: the caller must own/admin this business ----
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader) return json(401, { success: false, error: "Unauthorized" });
+    const supabaseUser = createClient(
+      supabaseUrl,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } }, auth: { persistSession: false } },
+    );
+    const { data: userData, error: userErr } = await supabaseUser.auth.getUser();
+    if (userErr || !userData?.user) return json(401, { success: false, error: "Unauthorized" });
+    const callerId = userData.user.id;
+
+    const { data: membership } = await supabase
+      .from("business_members")
+      .select("business_id")
+      .eq("business_id", businessId)
+      .eq("user_profile_id", callerId)
+      .in("role", ["owner", "admin"])
+      .maybeSingle();
+    if (!membership) return json(403, { success: false, error: "Not authorised for this business" });
+
+    // requires_domain_check is admin-initiated and is NOT a permission to send;
+    // membership above is the permission.
     const { data: verificationRequest, error: reqError } = await supabase
       .from("business_verification_requests")
-      .select("domain, requires_domain_check")
+      .select("business_id, domain")
       .eq("id", requestId)
       .single();
 
     if (reqError || !verificationRequest) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Verification request not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return json(404, { success: false, error: "Verification request not found" });
+    }
+    if (verificationRequest.business_id !== businessId) {
+      return json(403, { success: false, error: "Not authorised for this business" });
     }
 
-    if (!verificationRequest.requires_domain_check) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Domain verification not required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    const emailDomain = String(email).trim().toLowerCase().split("@")[1] ?? "";
+    if (!emailDomain) return json(400, { success: false, error: "Invalid email" });
+    if (FREE_EMAIL_DOMAINS.has(emailDomain)) {
+      return json(400, { success: false, error: "free_provider" });
     }
 
-    const emailDomain = email.split("@")[1]?.toLowerCase();
-    const requiredDomain = verificationRequest.domain?.toLowerCase();
-
-    if (!emailDomain || emailDomain !== requiredDomain) {
-      return new Response(
-        JSON.stringify({ success: false, error: `Email must be from @${requiredDomain}` }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    const nominated = verificationRequest.domain?.toLowerCase() ?? null;
+    if (nominated) {
+      if (emailDomain !== nominated) {
+        return json(400, { success: false, error: `Email must be from @${nominated}` });
+      }
+    } else {
+      const { error: domainErr } = await supabase
+        .from("business_verification_requests")
+        .update({ domain: emailDomain })
+        .eq("id", requestId);
+      if (domainErr) {
+        console.error("Domain write-back error:", domainErr);
+        return json(500, { success: false, error: "Failed to record domain" });
+      }
     }
 
     // Generate code and hash
