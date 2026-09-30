@@ -224,7 +224,7 @@
       "deltaCaption": "Zenkai no {{range}} to no hikaku",
       "audience": {
         "locked": "Rokku chu",
-        "visitorsLabel": "Genzai no yuniku homonsha",
+        "visitorsLabel": "Kono kikan no yuniku homonsha",
         "body": "Handi no han-i to jouyou chiiki wa motto ookina dokusha ga hitsuyou desu. Kono ninzu de wa kojin ga tokutei sareru tame hyoji shimasen."
       },
       "followers": {
@@ -238,11 +238,22 @@
         "posts": "Kono kikan ni toko wa arimasen."
       },
       "rate": {
-        "from": "{{n}} inpuresshon kara",
+        "from_one": "{{n}} inpuresshon kara",
+        "from_other": "{{n}} inpuresshon kara",
         "none": "Toko shite inpuresshon ga tamaru to engejimento ritsu ga hyoji sarema su.",
-        "tooFew": "Hikaku suru ni wa inpuresshon ga sukunasugimasu.",
-        "benchmark": "Inpuresshon ni taisuru ii ne to komento no wariai. 2 pasento ijou wa kyoryoku desu."
-      }
+        "tooFew": "Imi no aru ritsu o dasu ni wa inpuresshon ga mada tarimasen.",
+        "benchmark": "Inpuresshon ni taisuru ii ne to komento no wariai."
+      },
+      "topPosts": {
+        "impressions_one": "{{n}} inpuresshon",
+        "impressions_other": "{{n}} inpuresshon",
+        "likes_one": "{{n}} ii ne",
+        "likes_other": "{{n}} ii ne",
+        "comments_one": "{{n}} komento",
+        "comments_other": "{{n}} komento"
+      },
+      "reviewsCount_one": "{{n}} rebyu",
+      "reviewsCount_other": "{{n}} rebyu"
     },
     "team": {
       "member": "Team member",

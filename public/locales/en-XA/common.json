@@ -445,7 +445,7 @@
       "deltaCaption": "[~~Ĉĥáñĝé ṽš ţĥé ƥřéṽíőúš {{range}}~~]",
       "audience": {
         "locked": "[~~Ļőĉǩéđ~~]",
-        "visitorsLabel": "[~~Úñíʠúé ṽíšíţőřš šő ƒář~~]",
+        "visitorsLabel": "Unique visitors in this period",
         "body": "[~~Ĥáñđíĉáƥ řáñĝéš áñđ ţőƥ ļőĉáţíőñš ñééđ á ƀíĝĝéř áúđíéñĉé ƒířšţ. Á ƀřéáǩđőŵñ őƒ ţĥíš ƒéŵ ƥéőƥļé ŵőúļđ íđéñţíƒý ţĥéɱ, šő ŵé ĥőļđ íţ ƀáĉǩ úñţíļ ţĥéñ.~~]"
       },
       "followers": {
@@ -459,11 +459,22 @@
         "posts": "[~~Ñő ƥőšţš ƥúƀļíšĥéđ íñ ţĥíš ƥéříőđ.~~]"
       },
       "rate": {
-        "from": "[~~Ƒřőɱ {{n}} íɱƥřéššíőñš~~]",
+        "from_one": "From {{n}} impression",
+        "from_other": "From {{n}} impressions",
         "none": "[~~Ƥúƀļíšĥ ƥőšţš áñđ ĝáţĥéř íɱƥřéššíőñš ţő šéé ýőúř éñĝáĝéɱéñţ řáţé.~~]",
-        "tooFew": "[~~Ţőő ƒéŵ íɱƥřéššíőñš ýéţ ţő ĉőɱƥářé áĝáíñšţ áñýţĥíñĝ.~~]",
-        "benchmark": "[~~Ļíǩéš áñđ ĉőɱɱéñţš áš á šĥářé őƒ íɱƥřéššíőñš. Áƀőṽé 2 ƥéřĉéñţ íš šţřőñĝ.~~]"
-      }
+        "tooFew": "Not enough impressions yet to give a meaningful rate.",
+        "benchmark": "Likes and comments as a share of impressions."
+      },
+      "topPosts": {
+        "impressions_one": "{{n}} impression",
+        "impressions_other": "{{n}} impressions",
+        "likes_one": "{{n}} like",
+        "likes_other": "{{n}} likes",
+        "comments_one": "{{n}} comment",
+        "comments_other": "{{n}} comments"
+      },
+      "reviewsCount_one": "{{n}} review",
+      "reviewsCount_other": "{{n}} reviews"
     }
   },
   "handicap": {

@@ -225,7 +225,7 @@
       "deltaCaption": "Veränderung zu den vorherigen {{range}}",
       "audience": {
         "locked": "Gesperrt",
-        "visitorsLabel": "Eindeutige Besucher bisher",
+        "visitorsLabel": "Eindeutige Besucher in diesem Zeitraum",
         "body": "Handicap-Bereiche und Top-Standorte brauchen zuerst ein größeres Publikum. Bei so wenigen Personen wäre die Aufschlüsselung zuordenbar, deshalb halten wir sie zurück."
       },
       "followers": {
@@ -239,11 +239,22 @@
         "posts": "In diesem Zeitraum keine Beiträge veröffentlicht."
       },
       "rate": {
-        "from": "Aus {{n}} Impressionen",
+        "from_one": "Aus {{n}} Impression",
+        "from_other": "Aus {{n}} Impressionen",
         "none": "Veröffentliche Beiträge und sammle Impressionen, um deine Interaktionsrate zu sehen.",
-        "tooFew": "Noch zu wenige Impressionen für einen Vergleich.",
-        "benchmark": "Likes und Kommentare im Verhältnis zu Impressionen. Über 2 Prozent ist stark."
-      }
+        "tooFew": "Noch nicht genug Impressionen für eine aussagekräftige Rate.",
+        "benchmark": "Likes und Kommentare im Verhältnis zu Impressionen."
+      },
+      "topPosts": {
+        "impressions_one": "{{n}} Impression",
+        "impressions_other": "{{n}} Impressionen",
+        "likes_one": "{{n}} Like",
+        "likes_other": "{{n}} Likes",
+        "comments_one": "{{n}} Kommentar",
+        "comments_other": "{{n}} Kommentare"
+      },
+      "reviewsCount_one": "{{n}} Bewertung",
+      "reviewsCount_other": "{{n}} Bewertungen"
     },
     "team": {
       "member": "Team member",
