@@ -193,7 +193,7 @@ export const HcpTrendChart: React.FC<Props> = ({
         {showCrosshair && (
           <line x1={mx} y1={0} x2={mx} y2={height} stroke="#FFFFFF" strokeOpacity={0.85} strokeWidth={2} />
         )}
-        <circle cx={mx} cy={my} r={8.5} fill="#FFFFFF" fillOpacity={0.45} />
+        <circle cx={mx} cy={my} r={6.5} fill="#FFFFFF" fillOpacity={0.45} />
         <circle cx={mx} cy={my} r={4.5} fill="#FFFFFF" />
         <circle cx={mx} cy={my} r={2.5} fill={markerTone} />
       </svg>

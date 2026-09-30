@@ -390,24 +390,6 @@ const TrendCard: React.FC<{
       )}
       legend={
         <>
-          {/* BRIEF_ACCOUNT_SHEET_REBUILD B — the three WORST/MID/BEST swatches
-              are gone. best/worst are the min/max of the SELECTED WINDOW, so
-              green and red were guaranteed on every window by construction:
-              a shape key wearing quality words. The gradient is unchanged; it
-              now simply says what it keys. */}
-          <span
-            style={{
-              fontFamily: SANS,
-              fontSize: 11,
-              lineHeight: 1.35,
-              color: A.DIM,
-              flex: 1,
-              minWidth: 0,
-            }}
-          >
-            Coloured against your best and worst in this window.
-          </span>
-
           <button
             type="button"
             onClick={() => onNavigate('/handicap')}
@@ -415,6 +397,7 @@ const TrendCard: React.FC<{
               border: 'none',
               background: 'transparent',
               padding: 0,
+              marginLeft: 'auto',
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
