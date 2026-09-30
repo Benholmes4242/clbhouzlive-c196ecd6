@@ -225,7 +225,7 @@
       "deltaCaption": "Cambio frente a los {{range}} anteriores",
       "audience": {
         "locked": "Bloqueado",
-        "visitorsLabel": "Visitantes únicos hasta ahora",
+        "visitorsLabel": "Visitantes únicos en este período",
         "body": "Los rangos de handicap y las ubicaciones principales necesitan más audiencia. Con tan pocas personas el desglose las identificaría, así que lo reservamos."
       },
       "followers": {
@@ -239,11 +239,23 @@
         "posts": "No se publicaron publicaciones en este periodo."
       },
       "rate": {
-        "from": "De {{n}} impresiones",
+        "from_one": "De {{n}} impresión",
+        "from_other": "De {{n}} impresiones",
         "none": "Publica y acumula impresiones para ver tu tasa de interaccion.",
-        "tooFew": "Aun hay muy pocas impresiones para comparar.",
-        "benchmark": "Me gusta y comentarios sobre las impresiones. Más del 2 por ciento es fuerte."
-      }
+        "tooFew": "Aún no hay suficientes impresiones para una tasa significativa.",
+        "benchmark": "Me gusta y comentarios sobre las impresiones.",
+        "impressionsLabel": "Impresiones"
+      },
+      "topPosts": {
+        "impressions_one": "{{n}} impresión",
+        "impressions_other": "{{n}} impresiones",
+        "likes_one": "{{n}} me gusta",
+        "likes_other": "{{n}} me gusta",
+        "comments_one": "{{n}} comentario",
+        "comments_other": "{{n}} comentarios"
+      },
+      "reviewsCount_one": "{{n}} reseña",
+      "reviewsCount_other": "{{n}} reseñas"
     },
     "team": {
       "member": "Team member",

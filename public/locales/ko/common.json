@@ -224,7 +224,7 @@
       "deltaCaption": "Ijeon {{range}} daebi byeonhwa",
       "audience": {
         "locked": "Jamgim",
-        "visitorsLabel": "Jigeumkkaji sunbangmunja",
+        "visitorsLabel": "I gigan sunbangmunja",
         "body": "Haendikaep gugan gwa juyo jiyeok eun deo mahn eun dokja ga piryohapnida. Ireon soosu ro neun gaein i teukjeong doelsu itgi ttaemune borryu hapnida."
       },
       "followers": {
@@ -238,11 +238,23 @@
         "posts": "I gigan e geusi ga eopseumnida."
       },
       "rate": {
-        "from": "Impeuresyeon {{n}} gi jun",
+        "from_one": "Impeuresyeon {{n}} gi jun",
+        "from_other": "Impeuresyeon {{n}} gi jun",
         "none": "Geusi reul olligo impeuresyeon i moimyeon chamyeoyul i pyosi dwimnida.",
-        "tooFew": "Bigyo hagien impeuresyeon i neomu jeokseumnida.",
-        "benchmark": "Impeuresyeon daebi joayo wa daetgeul bijung. 2 peosenteu isang imyeon useu hapnida."
-      }
+        "tooFew": "Uimi inneun biyureul boyeojugien impeuresyeon i ajik bujokhamnida.",
+        "benchmark": "Impeuresyeon daebi joayo wa daetgeul bijung.",
+        "impressionsLabel": "Impeuresyeon"
+      },
+      "topPosts": {
+        "impressions_one": "Impeuresyeon {{n}}",
+        "impressions_other": "Impeuresyeon {{n}}",
+        "likes_one": "Joayo {{n}}",
+        "likes_other": "Joayo {{n}}",
+        "comments_one": "Daetgeul {{n}}",
+        "comments_other": "Daetgeul {{n}}"
+      },
+      "reviewsCount_one": "Ribyu {{n}}",
+      "reviewsCount_other": "Ribyu {{n}}"
     },
     "team": {
       "member": "Team member",

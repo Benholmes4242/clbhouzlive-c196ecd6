@@ -469,7 +469,7 @@
       "deltaCaption": "Change vs the previous {{range}}",
       "audience": {
         "locked": "Locked",
-        "visitorsLabel": "Unique visitors so far",
+        "visitorsLabel": "Unique visitors in this period",
         "body": "Handicap ranges and top locations need a bigger audience first. A breakdown of this few people would identify them, so we hold it back until then."
       },
       "followers": {
@@ -483,11 +483,23 @@
         "posts": "No posts published in this period."
       },
       "rate": {
-        "from": "From {{n}} impressions",
+        "from_one": "From {{n}} impression",
+        "from_other": "From {{n}} impressions",
         "none": "Publish posts and gather impressions to see your engagement rate.",
-        "tooFew": "Too few impressions yet to compare against anything.",
-        "benchmark": "Likes and comments as a share of impressions. Above 2 percent is strong."
-      }
+        "tooFew": "Not enough impressions yet to give a meaningful rate.",
+        "benchmark": "Likes and comments as a share of impressions.",
+        "impressionsLabel": "Impressions"
+      },
+      "topPosts": {
+        "impressions_one": "{{n}} impression",
+        "impressions_other": "{{n}} impressions",
+        "likes_one": "{{n}} like",
+        "likes_other": "{{n}} likes",
+        "comments_one": "{{n}} comment",
+        "comments_other": "{{n}} comments"
+      },
+      "reviewsCount_one": "{{n}} review",
+      "reviewsCount_other": "{{n}} reviews"
     }
   },
   "handicap": {
