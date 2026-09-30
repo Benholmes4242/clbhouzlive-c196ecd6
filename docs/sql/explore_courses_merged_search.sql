@@ -1,3 +1,12 @@
+DO $$ BEGIN
+  RAISE EXCEPTION
+    'SUPERSEDED: this file is a historical copy, not the live '
+    'definition. Running it would roll % back. Check '
+    'pg_get_functiondef first; delete these five lines only if you '
+    'have decided to overwrite the live function deliberately.',
+    'search_explore_courses';
+END $$;
+
 -- =====================================================================
 -- BRIEF_COURSES_MERGED  §6 SEARCH  /  §2 ONE MIXED POOL
 -- UNAPPLIED PROPOSAL. Ben's to run. Nothing in the app depends on it:

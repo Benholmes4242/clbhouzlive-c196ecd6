@@ -1,3 +1,12 @@
+DO $$ BEGIN
+  RAISE EXCEPTION
+    'SUPERSEDED: this file is a historical copy, not the live '
+    'definition. Running it would roll % back. Check '
+    'pg_get_functiondef first; delete these five lines only if you '
+    'have decided to overwrite the live function deliberately.',
+    'get_viewer_standing and get_viewer_standing_boards';
+END $$;
+
 -- =====================================================================
 -- "WHERE YOU STAND" GAINS FIVE BOARDS
 -- Ben's rulings on the board measurement, SS2 and SS3. RUN AFTER

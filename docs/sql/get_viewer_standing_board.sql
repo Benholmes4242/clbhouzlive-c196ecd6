@@ -1,3 +1,12 @@
+DO $$ BEGIN
+  RAISE EXCEPTION
+    'SUPERSEDED: this file is a historical copy, not the live '
+    'definition. Running it would roll % back. Check '
+    'pg_get_functiondef first; delete these five lines only if you '
+    'have decided to overwrite the live function deliberately.',
+    'get_viewer_standing';
+END $$;
+
 -- =====================================================================
 -- get_viewer_standing(p_viewer uuid, p_board text) - THE BOARD SELECTOR
 -- BRIEF: "WHERE YOU STAND GETS A BOARD SELECTOR" (Ben's ruling, §3).

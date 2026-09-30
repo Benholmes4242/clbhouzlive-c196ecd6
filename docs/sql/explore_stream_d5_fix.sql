@@ -1,3 +1,12 @@
+DO $$ BEGIN
+  RAISE EXCEPTION
+    'SUPERSEDED: this file is a historical copy, not the live '
+    'definition. Running it would roll % back. Check '
+    'pg_get_functiondef first; delete these five lines only if you '
+    'have decided to overwrite the live function deliberately.',
+    'get_explore_stream';
+END $$;
+
 -- =====================================================================
 -- PHASE D HOTFIX (D5) - get_explore_stream: 42703 column g.id does not exist
 --
