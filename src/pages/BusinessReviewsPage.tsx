@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
-import { RailChips } from '@/components/ui/RailChips';
+import { RailChips, APPLIED_FILL } from '@/components/ui/RailChips';
+import { formatHcp } from '@/lib/formatHcp';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { TITLE, FIGURE } from '@/lib/tokens/type';
 import { useParams } from 'react-router-dom';
@@ -339,9 +340,9 @@ function ReviewCard({
             {r.reviewer.handicap != null && (
               <span
                 className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold tabular-nums"
-                style={{ background: 'rgba(255,255,255,0.06)', color: INK_45 }}
+                style={{ background: APPLIED_FILL, color: INK_45 }}
               >
-                Hcp {r.reviewer.handicap.toFixed(1)}
+                HCP {formatHcp(r.reviewer.handicap)}
               </span>
             )}
             <RatingChip rating={r.rating} />
