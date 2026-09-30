@@ -92,7 +92,7 @@ export function LikedByRow({
   const [open, setOpen] = useState(false);
   // The names are the same query key the sheet uses, so opening it costs
   // nothing. The line does not wait on it.
-  const { likers } = usePostLikers(postId, !!postId && count > 0, source);
+  const { likers, isLoading } = usePostLikers(postId, !!postId && count > 0, source);
 
   if (!postId || count <= 0) return null;
 
@@ -160,29 +160,38 @@ export function LikedByRow({
           ...style,
         }}
       >
+        {/* THE WIDTH LIVES ON THIS CONTAINER, NOT ON THE SLOTS. Slot COUNT is reserved
+           from `count` (known at first paint); the faces come from `likers`, which has
+           blocked members removed and can therefore be shorter. Sizing the container
+           means a missing face leaves empty space inside a box that never changes
+           width — rather than a placeholder square that never resolves and reads as a
+           stuck spinner. Do not move the width back onto the slots. */}
         {avatarRing !== 'none' && (
           <span
             aria-hidden="true"
             style={{
-              display: 'flex',
+              position: 'relative',
               flex: 'none',
+              height: 18,
+              width: 18 + (Math.min(count, 3) - 1) * 12,
               ...(avatarRing === 'media' ? { filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))' } : null),
             }}
           >
-            {Array.from({ length: Math.min(count, 3) }, (_, i) => {
+            {Array.from({ length: isLoading ? Math.min(count, 3) : Math.min(likers.length, Math.min(count, 3)) }, (_, i) => {
               const liker = likers[i];
               const slot: React.CSSProperties = {
                 width: 18,
                 height: 18,
                 borderRadius: 6,
                 flex: 'none',
-                marginLeft: i === 0 ? 0 : -6,
+                position: 'absolute',
+                top: 0,
+                left: i * 12,
                 boxShadow: `0 0 0 1.5px ${avatarRing === 'media' ? 'rgba(0,0,0,0.55)' : surfaceColor}`,
                 overflow: 'hidden',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                position: 'relative',
                 zIndex: 3 - i,
               };
               if (!liker) {
