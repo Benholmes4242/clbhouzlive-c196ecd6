@@ -163,7 +163,7 @@ export default function DomainStep({ businessId, onDone }: Props) {
           We sent a 6-digit code to <span className="font-medium">{email}</span>
         </p>
       </div>
-      <div className="flex justify-center">
+      <div className="w-full">
         <InputOTP value={code} onChange={setCode} maxLength={6} onComplete={handleVerify}>
           <InputOTPGroup>
             {[0, 1, 2, 3, 4, 5].map((i) => (
