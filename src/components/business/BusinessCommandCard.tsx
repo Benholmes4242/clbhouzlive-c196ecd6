@@ -230,14 +230,14 @@ export function BusinessCommandCard({
 
           {/* Name + sub */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span
-                className="truncate leading-tight"
-                style={{ color: BIZ.ink, fontSize: 17, fontWeight: 700, letterSpacing: '-0.032em' }}
-              >
-                {business.name}
-              </span>
-              {isVerified && <VerifiedBadge size="sm" />}
+            <div
+              className="line-clamp-2 leading-tight"
+              style={{ color: BIZ.ink, fontSize: 17, fontWeight: 700, letterSpacing: '-0.032em' }}
+            >
+              {business.name}
+              {isVerified && (
+                <span className="inline-flex align-middle ml-1.5"><VerifiedBadge size="sm" /></span>
+              )}
             </div>
             <p style={{ color: BIZ.inkMute, fontSize: 12, fontWeight: 500, lineHeight: 1.35 }}>
               {ACCESS_LABELS[role] || role}
