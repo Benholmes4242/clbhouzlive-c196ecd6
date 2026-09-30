@@ -720,7 +720,6 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     course_rating: score.course_rating,
     slope_rating: score.slope_rating,
     gross_score: grossScore,
-    nett_score: null,
     // Pending-handicap rounds (handicap_index_at_time IS NULL) play off a temporary
     // max course handicap of 54, producing inflated stableford values (~60-70 pts) that
     // aren't comparable to post-pending rounds. Null them out so they don't pollute
