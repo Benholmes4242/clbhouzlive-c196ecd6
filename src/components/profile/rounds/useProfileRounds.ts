@@ -23,6 +23,10 @@ export interface ProfileRound {
   course_par: number | null;
   gross_score: number | null;
   hcp_at_time: number | null;
+  /** DB-calculated net (Ben's get_profile_rounds). null = absent, never derived. */
+  nett_score: number | null;
+  /** Index movement this round. null = unknown / no move — never drawn as 0.0. */
+  delta_index: number | null;
   eagles: number | null;
   albatrosses: number | null;
   holes_in_one: number | null;
@@ -30,11 +34,8 @@ export interface ProfileRound {
   /** From whs_scores (joined in get_profile_rounds). null = the row did not come back. */
   is_nine_hole: boolean | null;
   total_holes: number | null;
-  course_handicap: number | null;
   handicap_differential: number | null;
   handicap_index_at_time: number | null;
-  slope_rating: number | null;
-  course_rating: number | null;
   /** false when the viewer could not read the whs_scores row — treat as unknown, never as 18. */
   whs_joined: boolean;
 }
