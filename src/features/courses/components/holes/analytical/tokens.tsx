@@ -798,7 +798,7 @@ export const bizFigure = (
 
 /** The one inset every business chart region sits in, populated or not. */
 export const BIZ_INSET: React.CSSProperties = {
-  background: 'rgba(14,18,22,0.028)',
+  background: A.SOFT,
   borderRadius: 13,
   border: 'none',
 };
