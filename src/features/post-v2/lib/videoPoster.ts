@@ -109,6 +109,11 @@ export function extractPoster(id: string, src: string, at = 0.1): Promise<string
     video.onerror = () => finish(null);
     // Hard stop so a stubborn file never leaves a tile spinning.
     timer = setTimeout(() => finish(null), 8000);
+    /* A REMOTE source must be CORS-enabled or drawImage taints the canvas and
+     * toDataURL throws — that is exactly what made edit-mode thumbnails black.
+     * A `blob:` source must NOT carry crossOrigin: WebKit fails the load
+     * outright (see this file's header). The scheme decides, never the caller. */
+    if (!src.startsWith('blob:')) video.crossOrigin = 'anonymous';
     video.src = src;
     try { video.load(); } catch { /* load best-effort */ }
   });
