@@ -44,6 +44,12 @@ export interface StageMediaItem {
   posterTimestamp?: number | null;
   /** Set for items loaded from an existing post - the post_media.id. */
   existingId?: string;
+  /** An ALREADY-UPLOADED poster for this item (post_media.poster_url). Set only
+   *  on items hydrated from an existing post; newly-picked items extract their
+   *  own frame from the local blob. When present it is used as-is and NO
+   *  extraction is attempted — a remote video cannot be drawn to a canvas
+   *  without tainting it. */
+  posterUrl?: string | null;
 }
 
 export interface StageCourse {

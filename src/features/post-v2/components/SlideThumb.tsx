@@ -26,17 +26,20 @@ interface Props {
 }
 
 export default function SlideThumb({ item, glyph = 22 }: Props) {
-  const [poster, setPoster] = useState<string | null>(() => getCachedPoster(item.id));
+  const [poster, setPoster] = useState<string | null>(
+    () => item.posterUrl ?? getCachedPoster(item.id),
+  );
 
   useEffect(() => {
     if (item.type !== 'video') return;
     if (poster) return;
+    if (item.posterUrl) return;
     let cancelled = false;
     void extractPoster(item.id, item.previewUrl, item.posterTimestamp ?? 0.1).then((url) => {
       if (!cancelled && url) setPoster(url);
     });
     return () => { cancelled = true; };
-  }, [item.id, item.previewUrl, item.type, item.posterTimestamp, poster]);
+  }, [item.id, item.previewUrl, item.posterUrl, item.type, item.posterTimestamp, poster]);
 
   if (item.type === 'video') {
     return (
