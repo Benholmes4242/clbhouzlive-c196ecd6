@@ -5,7 +5,7 @@ import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { TITLE, FIGURE } from '@/lib/tokens/type';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MessageSquare, Star, X, Edit3, Trash2, MapPin, Sparkles } from 'lucide-react';
+import { MessageSquare, Star, X, Edit3, Trash2, Sparkles } from 'lucide-react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
@@ -209,6 +209,19 @@ function ReplySheet({
 }
 
 /* ─────────────── Small parts ─────────────── */
+
+function RatingChip({ rating }: { rating: number }) {
+  const t = ratingTone(rating);
+  return (
+    <span
+      className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11.5px] font-bold tabular-nums"
+      style={{ background: t.bg, color: t.fg }}
+    >
+      <Star size={10} strokeWidth={2.5} style={{ fill: t.fg, color: t.fg }} />
+      {fmtRating(rating)}
+    </span>
+  );
+}
 
 function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }> }) {
   const max = Math.max(...dist.map((d) => d.count), 1);
