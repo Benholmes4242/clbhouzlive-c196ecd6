@@ -82,7 +82,6 @@ function joinAnd(parts: string[]): string {
   return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
 }
 import {
-  PROOF_OPTIONS,
   REGISTRY_OPTIONS,
   ROLE_OPTIONS,
   isValidEmail,
@@ -91,6 +90,7 @@ import {
 } from './steps/verificationTypes';
 import {
   SIGNALS,
+  signalOfProofMethod,
   NO_SIGNALS,
   PRESENCE_KINDS,
   evaluateBar,
@@ -205,6 +205,7 @@ export default function VerificationFlowSheet({
     setValidationError(null);
     setConfirmation(null);
     setProofEmail('');
+    setContactEmail('');
     setProofRegistry('');
     setProofRegistryName('');
     setProofCompanyNumber('');
@@ -240,8 +241,12 @@ export default function VerificationFlowSheet({
   });
 
   useEffect(() => {
-    if (business?.email && !contactEmail) setContactEmail(business.email);
-  }, [business?.email]); // eslint-disable-line react-hooks/exhaustive-deps
+    // A1 — runs AFTER the reset (declared later, same open trigger). The
+    // functional update reads the queued '' from the reset, never a stale value.
+    if (!open || !business?.email) return;
+    const email = business.email;
+    setContactEmail((prev) => prev || email);
+  }, [open, businessId, business?.email]);
 
   // ---- §2.2 the live verdict ----
   const bar = useMemo(() => evaluateBar(claimed), [claimed]);
@@ -446,7 +451,6 @@ export default function VerificationFlowSheet({
         contact_role: role || null,
         note: notes || null,
         domain,
-        requires_domain_check: true,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any)
       .select('id')
@@ -515,7 +519,7 @@ export default function VerificationFlowSheet({
 
 
       const proof_value = primaryProofValue();
-      if (!proof_value) throw new Error('Please complete the evidence for the signals you marked.');
+      if (!proof_value) stop('Please complete the evidence for the signals you marked.');
 
       const signals = buildSignals();
       const proof_metadata: Record<string, unknown> = {
@@ -545,9 +549,11 @@ export default function VerificationFlowSheet({
         .limit(1);
       if (checkError) throw checkError;
       if (existingApproved && existingApproved.length > 0) {
-        throw new Error(
+        const conflict = new Error(
           PROOF_CONFLICT_MESSAGE[primaryMethod] ?? 'This proof is already linked to a verified business.',
-        );
+        ) as Error & { isProofConflict?: boolean };
+        conflict.isProofConflict = true;
+        throw conflict;
       }
 
       const payload: Record<string, unknown> = {
@@ -617,9 +623,9 @@ export default function VerificationFlowSheet({
       setConfirmation(result);
     },
     onError: (error: unknown) => {
-      const err = error as Error & { isValidation?: boolean };
+      const err = error as Error & { isValidation?: boolean; isProofConflict?: boolean };
       const message = err?.message || 'Failed to submit verification request';
-      if (message.toLowerCase().includes('already linked')) setExclusivityError(message);
+      if (err?.isProofConflict) setExclusivityError(message);
       // Validation stops used to be swallowed entirely — the member pressed
       // submit and nothing moved. Now every stop toasts and scrolls into view.
       toast.error(message);
@@ -1466,7 +1472,7 @@ function ConfirmationView({
   onDone: () => void;
 }) {
   const shortRef = requestId.slice(0, 8).toUpperCase();
-  const methodLabel = PROOF_OPTIONS.find((o) => o.id === method)?.label ?? method;
+  const signalLabel = SIGNALS.find((s) => s.key === signalOfProofMethod(method))!.label;
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -1502,7 +1508,7 @@ function ConfirmationView({
             Primary signal
           </span>
           <span className="text-[13px]" style={{ color: BIZ.ink }}>
-            {methodLabel}
+            {signalLabel}
           </span>
         </div>
       </div>
