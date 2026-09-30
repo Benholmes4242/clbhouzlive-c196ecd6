@@ -7,6 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { TITLE } from '@/lib/tokens/type';
 import { ZoomIn, ZoomOut, RotateCcw, Check, X } from 'lucide-react';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface ImageCropperModalProps {
   open: boolean;
@@ -15,6 +16,8 @@ interface ImageCropperModalProps {
   aspectRatio: number;
   cropShape?: 'rect' | 'round';
   title?: string;
+  /** Optional muted caption beneath the crop frame. */
+  helperText?: string;
   onCropComplete: (croppedImage: Blob) => void;
 }
 
@@ -116,6 +119,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
   aspectRatio,
   cropShape = 'rect',
   title = 'Crop Image',
+  helperText,
   onCropComplete,
 }) => {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
@@ -190,7 +194,10 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
         {/* Controls */}
         <div className="px-4 py-4 space-y-4" style={{ backgroundColor: MEMBER_PANEL }}>
-          {/* Zoom slider - orange accent */}
+          {helperText ? (
+            <p className="text-xs text-center text-muted-foreground">{helperText}</p>
+          ) : null}
+          {/* Zoom slider */}
           <div className="flex items-center gap-3">
             <ZoomOut className="w-4 h-4 text-[rgba(248,250,252,0.62)] flex-shrink-0" />
             <Slider
@@ -199,7 +206,8 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
               min={1}
               max={3}
               step={0.1}
-              className="flex-1 [&_[role=slider]]:bg-[hsl(38,92%,50%)] [&_.bg-primary]:bg-[hsl(38,92%,50%)]"
+              className="flex-1 [&_[role=slider]]:bg-[var(--crop-ink)] [&_[role=slider]]:border-[var(--crop-ink)] [&_.bg-primary]:bg-[var(--crop-ink)]"
+              style={{ ['--crop-ink' as string]: A.INK } as React.CSSProperties}
             />
             <ZoomIn className="w-4 h-4 text-[rgba(248,250,252,0.62)] flex-shrink-0" />
           </div>
@@ -234,7 +242,8 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                 size="sm"
                 onClick={handleSave}
                 disabled={isSaving}
-                className="gap-1.5 bg-[hsl(38,92%,50%)] text-white hover:bg-[hsl(38,85%,45%)]"
+                className="gap-1.5 hover:opacity-90"
+                style={{ background: A.INK, color: A.CANVAS }}
               >
                 <Check className="w-4 h-4" />
                 {isSaving ? 'Saving...' : 'Apply'}
