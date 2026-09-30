@@ -69,20 +69,18 @@ export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?:
   );
 };
 
-/** Below this the score is shown but not called settled; no tier word. */
+/** Below this the tier word is withheld — a verdict needs a sample. The score and its rating count still show. */
 export const SETTLED_MIN_RATINGS = 5;
 
 /**
  * §3.1 — the overall, 38px, inline with its sample on one baseline:
- *   7.9  overall · from 1 rating — too few to be settled.
+ *   7.9  overall · 1 rating
  */
 export const OverallScoreLine: React.FC<{ score: number; ratingCount: number }> = ({ score, ratingCount }) => {
   const { t } = useTranslation('courses');
   const settled = ratingCount >= SETTLED_MIN_RATINGS;
   const tone = courseSubScoreTone(score);
-  const sampleRaw = settled
-    ? t('courseDetail.communityScore.basedOn', { count: ratingCount })
-    : t('courseDetail.rating.tooFew', { count: ratingCount });
+  const sampleRaw = t('courseDetail.communityScore.basedOn', { count: ratingCount });
   const sample = sampleRaw.charAt(0).toLowerCase() + sampleRaw.slice(1);
   return (
     <div data-overall-score style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0, fontFamily: SANS }}>

@@ -3,16 +3,18 @@
  *
  * The four aggregate category scores live on BOTH the Course and Reviews tabs.
  * They render from the first rating onward because an aggregate from one rating
- * is still factual; the thin-sample caveat does the honest qualification. Only
+ * is still factual; the rating count does the honest qualification. Only
  * the tier word stays gated below five ratings because it makes a verdict.
  *
  *   NOT HERE AT ALL — the friends average. It was a third headline figure on a
  *   section that is meant to carry two; the friends strip below already names
  *   the people.
  *
- * THIN STATE, BUILT WITH THE FULL ONE: under five ratings the score shows with
- * "From 2 ratings — too few to be settled." beneath it, and no tier word. A
- * tier label on two ratings claims a verdict the sample cannot support.
+ * THIN STATE, BUILT WITH THE FULL ONE: under five ratings the score and its
+ * rating count show exactly as they do when settled, and only the tier word is
+ * withheld. A tier label on two ratings claims a verdict the sample cannot
+ * support; the rating count beside the score lets the reader judge the weight
+ * for themselves.
  *
  * COLOUR: the community figure takes its score band; the viewer's own figure is
  * amber, which on this platform means the viewing member and nothing else.
