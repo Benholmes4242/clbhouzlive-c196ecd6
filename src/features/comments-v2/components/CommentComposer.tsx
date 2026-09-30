@@ -62,11 +62,12 @@ interface Props {
      still owns the text, so persistence is a write of state it already holds
      rather than a second owner of the field. Absent key = no persistence. */
   draftKey?: string | null;
-
+  /** Bump to focus the input once (CommentsSheetV2 autoFocusComposer). */
+  focusToken?: number;
 }
 
 
-export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting, onDirtyChange, draftKey }: Props) {
+export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting, onDirtyChange, draftKey, focusToken = 0 }: Props) {
   const { user } = useSupabaseSession();
   const { t } = useTranslation('common');
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
@@ -90,6 +91,10 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
   useEffect(() => {
     if (replyingTo) requestAnimationFrame(() => inputRef.current?.focus());
   }, [replyingTo]);
+
+  useEffect(() => {
+    if (focusToken > 0) inputRef.current?.focus();
+  }, [focusToken]);
 
   /* Debounced write, 400ms, same figure as the review composer. The key is the
      thread, so words typed on one post cannot appear on another. */

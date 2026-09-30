@@ -50,8 +50,11 @@ export interface LikedByRowProps {
    * separate — pass the card's own background, never a guess.
    */
   surfaceColor?: string;
-  /** Render the avatar stack (default true). False over photography. */
-  showAvatars?: boolean;
+  /** How the overlapping avatars are ringed. 'surface' rings them in
+   *  surfaceColor (a card or sheet ground). 'media' rings them in scrim and
+   *  adds the on-media drop shadow, for chrome over a photo or video.
+   *  'none' draws no avatars at all. */
+  avatarRing?: 'surface' | 'media' | 'none';
   source?: LikeSource;
   /** 'celebrate' on ROUNDS — see lib/reactionKind. Never a plural noun. */
   kind?: ReactionKind;
@@ -74,7 +77,7 @@ export function LikedByRow({
   postId,
   count,
   surfaceColor = MEMBER_PANEL,
-  showAvatars = true,
+  avatarRing = 'surface',
   source = 'post',
   style,
   kind = 'like',
@@ -157,8 +160,15 @@ export function LikedByRow({
           ...style,
         }}
       >
-        {showAvatars && (
-          <span aria-hidden="true" style={{ display: 'flex', flex: 'none' }}>
+        {avatarRing !== 'none' && (
+          <span
+            aria-hidden="true"
+            style={{
+              display: 'flex',
+              flex: 'none',
+              ...(avatarRing === 'media' ? { filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))' } : null),
+            }}
+          >
             {Array.from({ length: Math.min(count, 3) }, (_, i) => {
               const liker = likers[i];
               const slot: React.CSSProperties = {
@@ -167,7 +177,7 @@ export function LikedByRow({
                 borderRadius: 6,
                 flex: 'none',
                 marginLeft: i === 0 ? 0 : -6,
-                boxShadow: `0 0 0 1.5px ${surfaceColor}`,
+                boxShadow: `0 0 0 1.5px ${avatarRing === 'media' ? 'rgba(0,0,0,0.55)' : surfaceColor}`,
                 overflow: 'hidden',
                 display: 'flex',
                 alignItems: 'center',

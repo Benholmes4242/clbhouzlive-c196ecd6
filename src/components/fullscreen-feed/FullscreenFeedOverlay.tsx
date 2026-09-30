@@ -504,7 +504,11 @@ export function FullscreenFeedOverlay() {
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
   const { followOverrides, handleFollow, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
-  const safeOpenComments = useCallback(() => { if (!readOnly) openComments(); }, [readOnly, openComments]);
+  // Two entry points, two intents: the rail glyph lands on the thread, the
+  // viewer's comment bar lands on writing (composer focused).
+  const [composeOnOpen, setComposeOnOpen] = useState(false);
+  const safeOpenComments = useCallback(() => { if (!readOnly) { setComposeOnOpen(false); openComments(); } }, [readOnly, openComments]);
+  const safeComposeComment = useCallback(() => { if (!readOnly) { setComposeOnOpen(true); openComments(); } }, [readOnly, openComments]);
   const {
     handleShare,
     handleReport,
@@ -980,6 +984,7 @@ export function FullscreenFeedOverlay() {
                     onClose={handleClose}
                     onLike={handleLike}
                     onComment={safeOpenComments}
+                    onCompose={safeComposeComment}
                     onShare={handleShare}
                     onMore={() => setMoreOptionsOpen(true)}
 
@@ -1182,6 +1187,7 @@ export function FullscreenFeedOverlay() {
           targetType="post"
           targetId={activePost?.id ?? ""}
           initialCommentId={initialCommentId}
+          autoFocusComposer={composeOnOpen}
         />
       )}
 
