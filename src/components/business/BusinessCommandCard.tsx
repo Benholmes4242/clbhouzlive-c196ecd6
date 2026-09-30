@@ -577,6 +577,15 @@ export function BusinessCommandCard({
         </AnimatePresence>
       </motion.div>
 
+      <ClaimYourCourseSheet
+        open={claimSheetOpen}
+        onClose={() => setClaimSheetOpen(false)}
+        businessId={business.id}
+        businessName={business.name}
+        userProfileId={userId}
+      />
+
+
       {/* NOTE: the confirm dialog is intentionally NOT rendered here. It is
           hoisted to `MyBusinessesPage` and opened via `onRequestDelete`. When
           the mutation invalidates and evicts this card, the dialog host is
