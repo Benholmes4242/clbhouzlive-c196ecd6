@@ -1,6 +1,7 @@
 // MIRROR of src/components/business/verification/signals.ts FREE_EMAIL_DOMAINS.
 // Edge functions cannot import from src/, so this is a copy. Keep the two
 // byte-identical; the client list is the canonical source.
+// Mirrored in src/components/business/verification/signals.ts. src/test/freeEmailDomains.parity.test.ts fails if they drift.
 export const FREE_EMAIL_DOMAINS = new Set([
   'gmail.com', 'googlemail.com',
   'outlook.com', 'outlook.co.uk', 'hotmail.com', 'hotmail.co.uk', 'live.com', 'live.co.uk', 'msn.com',
