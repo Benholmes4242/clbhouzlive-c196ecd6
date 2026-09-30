@@ -44,6 +44,9 @@ export interface StageMediaItem {
   posterTimestamp?: number | null;
   /** Set for items loaded from an existing post - the post_media.id. */
   existingId?: string;
+  /** Cloudflare Stream uid for an already-uploaded video. The playable
+   *  URL is built from this, never parsed back out of previewUrl. */
+  streamId?: string | null;
   /** An ALREADY-UPLOADED poster for this item (post_media.poster_url). Set only
    *  on items hydrated from an existing post; newly-picked items extract their
    *  own frame from the local blob. When present it is used as-is and NO
