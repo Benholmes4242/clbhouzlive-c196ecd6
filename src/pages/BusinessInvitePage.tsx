@@ -17,11 +17,9 @@ import {
    derived from the analytical `A` ramp. */
 import { INK, INK_45, HAIR, CARD_BG, PAGE_BG } from '@/components/manage/ui';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { BIZ } from '@/components/business/businessTokens';
+import { APPLIED_FILL, SELECTED_EDGE } from '@/components/ui/RailChips';
 import { surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
-const AMBER = A.AMBER;
-const AMBER_SOFT = BIZ.amberTint;
 
 interface UserResult {
   id: string;
@@ -233,20 +231,19 @@ export default function BusinessInvitePage() {
                     onClick={() => setRole(r.value)}
                     className="w-full flex items-start gap-3 p-3.5 text-left active:opacity-90"
                     style={{
-                      background: CARD_BG,
-                      border: `1px solid ${selected ? 'rgba(247,147,30,0.35)' : HAIR}`,
+                      background: selected ? APPLIED_FILL : CARD_BG,
+                      border: `1px solid ${selected ? SELECTED_EDGE : HAIR}`,
                       borderRadius: 14,
-                      boxShadow: selected ? `0 0 0 3px ${AMBER_SOFT}` : 'none',
                     }}
                   >
                     <div
                       className="h-9 w-9 flex items-center justify-center shrink-0"
                       style={{
-                        background: selected ? AMBER : 'rgba(255,255,255,0.06)',
+                        background: APPLIED_FILL,
                         borderRadius: 10,
                       }}
                     >
-                      <Icon size={16} color={selected ? A.CANVAS : INK_45} strokeWidth={2.25} />
+                      <Icon size={16} color={selected ? A.INK : INK_45} strokeWidth={2.25} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -254,7 +251,7 @@ export default function BusinessInvitePage() {
                         {selected && (
                           <span
                             className="inline-flex items-center justify-center h-4 w-4 rounded-full"
-                            style={{ background: AMBER }}
+                            style={{ background: A.INK }}
                           >
                             <Check size={10} color={A.CANVAS} strokeWidth={3} />
                           </span>
