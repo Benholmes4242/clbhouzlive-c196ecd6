@@ -242,7 +242,18 @@ const MetricCell = ({ label, value, prev, loading }: {
   label: string; value: number; prev: number; loading: boolean;
 }) => (
   <div className="flex flex-col items-center text-center gap-1.5">
-    <span style={{ ...BIZ_LABEL, lineHeight: 1.25 }}>{label}</span>
+    <span
+      style={{
+        ...BIZ_LABEL,
+        lineHeight: 1.25,
+        minHeight: 28,
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+      }}
+    >
+      {label}
+    </span>
     {loading ? (
       <Skeleton className="h-7 w-12" />
     ) : (
