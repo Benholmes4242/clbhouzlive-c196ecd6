@@ -133,7 +133,7 @@ export const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 /** filled-selection's EDGE: the selected chip is the one with a BRIGHT
  *  border, not the one with none. 6% fill alone is darker on A.CANVAS than
  *  the 10% hairline every other chip wears. */
-const SELECTED_EDGE = 'rgba(255,255,255,0.28)';
+export const SELECTED_EDGE = 'rgba(255,255,255,0.28)';
 
 /**
  * THE PUBLISHED CHIP STYLE — A BOUNDED EXCEPTION (BRIEF_CHIP_SWEEP_PASS_1_FOLLOW_UPS §2).

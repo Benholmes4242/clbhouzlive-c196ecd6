@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Crown, Shield, Edit3, BarChart3, MoreHorizontal, Trash2,
+  MoreHorizontal, Trash2,
   Eye, EyeOff, Mail, AtSign, UserPlus, Plus, Pencil, ChevronRight,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -32,30 +32,18 @@ import {
    derived from the analytical `A` ramp. Declare a colour here and the next
    import-tracing audit cannot see this file. */
 import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, DANGER } from '@/components/manage/ui';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
 
-const ROLE_ICON: Record<BusinessRole, typeof Crown> = {
-  owner: Crown,
-  admin: Shield,
-  editor: Edit3,
-  analyst: BarChart3,
-};
-
 /**
- * The role is a LABEL, not a pill. The ROLE_ICON glyph stays as a category
- * marker; the tinted capsule and the eleventh amber-deep variant
- * are gone. Vocabulary is unchanged.
+ * The role is a LABEL, not a pill and not an icon. The tinted capsule went
+ * first; the lucide role glyphs followed (a size-9 Crown resolves to a smudge).
+ * A business team page states the role in words.
  */
 function RoleLabel({ role }: { role: BusinessRole }) {
-  const Icon = ROLE_ICON[role];
-  return (
-    <span className="inline-flex items-center gap-1" style={BIZ_LABEL}>
-      <Icon size={9} strokeWidth={2.5} />
-      {BUSINESS_ROLE_LABELS[role]}
-    </span>
-  );
+  return <span style={BIZ_LABEL}>{BUSINESS_ROLE_LABELS[role]}</span>;
 }
 
 const JOB_TITLE_MAX = 40;
@@ -159,13 +147,7 @@ function JobTitleField({
   return (
     <div
       ref={wrapRef}
-      className="flex items-center gap-2"
-      style={{
-        background: PAGE_BG,
-        border: `1.5px solid ${A.INK}`,
-        borderRadius: 10,
-        padding: '9px 11px',
-      }}
+      className={`flex items-center gap-2 px-3 py-2.5 ${FIELD_PAINT_CLASS}`}
     >
       <input
         ref={inputRef}
@@ -181,9 +163,9 @@ function JobTitleField({
           if (e.key === 'Escape') { setValue(savedTitle); setEditing(false); }
         }}
         disabled={saving && !editing}
-        className="flex-1 min-w-0 bg-transparent outline-none"
+        className={`flex-1 min-w-0 bg-transparent outline-none ${FIELD_PLACEHOLDER_CLASS}`}
         style={{
-          fontSize: 13,
+          fontSize: 14,
           color: value ? A.INK : A.DIM,
           fontWeight: value ? 600 : 400,
         }}
