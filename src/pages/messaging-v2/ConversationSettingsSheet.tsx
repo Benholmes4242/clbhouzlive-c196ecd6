@@ -711,11 +711,21 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                           {canRemove ? (
                             <button
                               type="button"
-                              onClick={() => handleRemove(m)}
+                              onClick={() => {
+                                if (confirmRemove !== key) {
+                                  setConfirmRemove(key);
+                                  setTimeout(
+                                    () => setConfirmRemove((cur) => (cur === key ? null : cur)),
+                                    3000,
+                                  );
+                                  return;
+                                }
+                                void handleRemove(m);
+                              }}
                               disabled={busy}
                               style={menuItemStyle(DANGER)}
                             >
-                              {t('messaging:action.removeFromGroup')}
+                              {confirmRemove === key ? 'Remove?' : t('messaging:action.removeFromGroup')}
                             </button>
                           ) : null}
                         </div>
@@ -769,7 +779,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
 
               {!isGroup && dmOther?.actor_type === 'personal' ? (
                 <ActionRow
-                  icon={<Ban size={19} color={INK} />}
+                  icon={<Ban size={19} color={DANGER} />}
                   label={confirmBlock ? 'Tap again to confirm' : 'Block'}
                   onClick={() => {
                     if (!confirmBlock) {
@@ -780,6 +790,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                     void handleBlock();
                   }}
                   disabled={busy}
+                  danger
                 />
               ) : null}
 
