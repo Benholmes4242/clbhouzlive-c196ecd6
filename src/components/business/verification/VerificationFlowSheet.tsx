@@ -487,7 +487,7 @@ export default function VerificationFlowSheet({
     }
   }
 
-  function useDifferentEmail() {
+  function resetDomainEmail() {
     setProofEmail('');
     setOtpEmailVerified(false);
     setOtpSent(false);
@@ -945,7 +945,7 @@ export default function VerificationFlowSheet({
                                 Confirmed the wrong address?{' '}
                                 <button
                                   type="button"
-                                  onClick={useDifferentEmail}
+                                  onClick={resetDomainEmail}
                                   className="min-h-[44px]"
                                   style={{ fontSize: 12.5, fontWeight: 700, color: A.INK, background: 'transparent', border: 'none', padding: 0 }}
                                 >
@@ -1378,7 +1378,7 @@ export default function VerificationFlowSheet({
                   {conflict.page === 'domain' && (
                     <button
                       type="button"
-                      onClick={useDifferentEmail}
+                      onClick={resetDomainEmail}
                       className="min-h-[44px]"
                       style={{ marginTop: 9, fontSize: 12.5, fontWeight: 700, color: A.INK, background: 'transparent', border: 'none', padding: 0 }}
                     >
