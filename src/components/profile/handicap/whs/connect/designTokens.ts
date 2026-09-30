@@ -27,9 +27,17 @@ export const FONT =
  */
 export const SURFACE = PAGE_CANVAS;
 
-/** Amber wash. Runs edge to edge, sits behind the content, never a top bar. */
+/**
+ * Amber wash. Runs edge to edge, sits behind the content, never a top bar.
+ * RENDERED ONLY ON STAGE 1. On a light canvas an amber radial read as a soft
+ * consumer gradient and was cut; on near-black the same radial reads as
+ * stadium light. It is the brand colour used as LIGHT, not as ink, so it does
+ * not compete with amber's meaning elsewhere - the viewing member's own data.
+ */
 export const WASH =
-  `radial-gradient(130% 52% at 50% -6%, rgba(247,147,30,0.20) 0%, rgba(247,147,30,0.07) 42%, rgba(247,147,30,0) 72%), ${SURFACE}`;
+  `radial-gradient(118% 56% at 50% -8%, rgba(247,147,30,0.30) 0%, rgba(247,147,30,0.10) 34%, rgba(247,147,30,0) 62%), ` +
+  `radial-gradient(80% 40% at 88% 4%, rgba(255,205,140,0.14) 0%, transparent 58%), ` +
+  `${SURFACE}`;
 
 /** Every figure on this surface. */
 export const NUM: React.CSSProperties = {

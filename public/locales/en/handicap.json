@@ -167,9 +167,29 @@
     "intro": {
       "headline": "Your game, in numbers you can use.",
       "sub": "Connect your official record once. We read every round you have ever posted and show you where the shots actually go.",
-      "cta": "Choose your country",
+      "cta": "Find your country",
       "decline": "I don't hold an official handicap",
-      "kicker": "Your record, read properly"
+      "kicker": "Connect your handicap",
+      "headlineLine1": "Connect once.",
+      "headlineLine2": "All of it opens.",
+      "promises": {
+        "analyse": {
+          "title": "Analyse your golf",
+          "line": "Every hole, every course, back to your first card."
+        },
+        "leaderboards": {
+          "title": "Take your place on the leaderboards",
+          "line": "Course records, crowns and champions."
+        },
+        "topTen": {
+          "title": "Rate your top 10",
+          "line": "Your own ranking of the courses you have played."
+        },
+        "community": {
+          "title": "Join the community",
+          "line": "Golfers, clubs, and the rounds they post."
+        }
+      }
     },
     "rings": {
       "label": "Which holes cost you",
