@@ -58,6 +58,7 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
     supabase
       .from('business_verification_requests')
       .select('id, status, requested_by, created_at, reviewed_at, reviewed_by, review_reason, approval_count, required_approvals, note, admin_note, business_id, domain, domain_confirmed, proof_method, proof_value, proof_metadata, proof_document_url, contact_email, contact_role')
+      .neq('status', 'draft')
       .order('created_at', { ascending: false }),
     supabase
       .from('golfer_verification_requests')
