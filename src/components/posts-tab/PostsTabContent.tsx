@@ -3,7 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { Film } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { RailChips } from '@/components/ui/RailChips';
+import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { RailChipTrigger, APPLIED_FILL, RAIL_CHIP_WEIGHT } from '@/components/ui/RailChips';
 import { MoreOptionsDrawer } from '@/components/clubhouse/MoreOptionsDrawer';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -237,6 +244,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
 
 
+  const currentFilterLabel = FILTER_OPTIONS.find(o => o.value === activeFilter)?.label || 'All Posts';
+
   // ── Loading / error / empty states ──
   // Same fault, same fix as Clubhouse: hold the skeleton while the chained
   // round queries are outstanding, capped, and not at all when no post on the
@@ -287,14 +296,30 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
   return (
     <div>
+      {/* Filter dropdown */}
       {posts.length > 0 && (
-        <div className="px-4 pt-4 pb-2">
-          <RailChips
-            options={FILTER_OPTIONS.map((o) => ({ id: o.value, label: o.label }))}
-            value={activeFilter}
-            onChange={(id) => setActiveFilter(id as PostsFilter)}
-            ariaLabel="Filter posts"
-          />
+        <div className="flex justify-end px-4 pt-4 pb-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <RailChipTrigger label={currentFilterLabel} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[180px]">
+              {FILTER_OPTIONS.map((opt) => (
+                <DropdownMenuItem
+                  key={opt.value}
+                  onClick={() => setActiveFilter(opt.value)}
+                  className={cn('text-sm')}
+                  style={
+                    activeFilter === opt.value
+                      ? { background: APPLIED_FILL, color: A.INK, fontWeight: RAIL_CHIP_WEIGHT }
+                      : undefined
+                  }
+                >
+                  {opt.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
 

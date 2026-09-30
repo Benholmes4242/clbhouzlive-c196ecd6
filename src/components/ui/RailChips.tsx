@@ -1,4 +1,5 @@
 import React, { type CSSProperties } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -24,8 +25,8 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
  *
  * The `filled` ground states APPLIED STATE: a 6% white ground, no border,
  * NOTHING selected, and tapping opens a panel rather than switching a list.
- * The `filled` ground currently has NO live consumer; it is retained for a
- * panel opener should one arrive.
+ * Its consumer is the profile Posts filter, and the shape it takes there is
+ * `RailChipTrigger` (a dropdown opener exported below).
  * A control that looks like a choice must behave like one, so do not reach for
  * `filled` on anything that actually switches the surface below it.
  *
@@ -35,6 +36,10 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
  */
 
 export const RAIL_CHIP_RADIUS = 11;
+/** The chips' one weight, stated once. */
+export const RAIL_CHIP_WEIGHT = 700;
+/** Gap before a trailing value or glyph inside a chip. */
+export const RAIL_CHIP_TRAILING_GAP = 5;
 
 /**
  * THE CHIP GEOMETRY, PUBLISHED (BRIEF_SEARCH_CONTROL_HEIGHT). A `trailing`
@@ -124,7 +129,7 @@ export interface RailChipsProps {
 
 
 /** The applied-state ground: 6% white, stated once. */
-const APPLIED_FILL = 'rgba(255,255,255,0.06)';
+export const APPLIED_FILL = 'rgba(255,255,255,0.06)';
 /** filled-selection's EDGE: the selected chip is the one with a BRIGHT
  *  border, not the one with none. 6% fill alone is darker on A.CANVAS than
  *  the 10% hairline every other chip wears. */
@@ -164,7 +169,7 @@ export function railChipStyle(active: boolean, size: 'sm' | 'md' = 'md'): CSSPro
     color: active ? A.INK : A.MUTE,
     fontFamily: SANS,
     fontSize: geo.fontSize,
-    fontWeight: 700,
+    fontWeight: RAIL_CHIP_WEIGHT,
     whiteSpace: 'nowrap',
     cursor: 'pointer',
   };
@@ -227,7 +232,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
               fontFamily: SANS,
               fontSize: geo.fontSize,
 
-              fontWeight: 700,
+              fontWeight: RAIL_CHIP_WEIGHT,
               whiteSpace: 'nowrap',
               cursor: 'pointer',
             }}
@@ -236,7 +241,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
             {option.value != null ? (
               <span
                 style={{
-                  marginLeft: 5,
+                  marginLeft: RAIL_CHIP_TRAILING_GAP,
                   color: active ? A.MUTE : A.DIM,
                   fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
@@ -257,5 +262,48 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
     </div>
   );
 }
+
+/**
+ * THE `filled` GROUND AS A DROPDOWN OPENER. Applied state, nothing selected:
+ * 6% white, no border, ink label, trailing chevron. forwardRef + prop spread
+ * are required so Radix `<DropdownMenuTrigger asChild>` can attach its ref,
+ * aria attributes and handlers. Takes no style/className by design.
+ */
+export interface RailChipTriggerProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'style' | 'className' | 'children'> {
+  label: string;
+}
+
+export const RailChipTrigger = React.forwardRef<HTMLButtonElement, RailChipTriggerProps>(
+  function RailChipTrigger({ label, type = 'button', ...props }, ref) {
+    const geo = RAIL_CHIP_GEOMETRY.md;
+    return (
+      <button
+        ref={ref}
+        type={type}
+        {...props}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: RAIL_CHIP_TRAILING_GAP,
+          flexShrink: 0,
+          padding: geo.padding,
+          borderRadius: geo.radius,
+          border: 0,
+          background: APPLIED_FILL,
+          color: A.INK,
+          fontFamily: SANS,
+          fontSize: geo.fontSize,
+          fontWeight: RAIL_CHIP_WEIGHT,
+          whiteSpace: 'nowrap',
+          cursor: 'pointer',
+        }}
+      >
+        {label}
+        <ChevronDown aria-hidden size={12} color={A.MUTE} />
+      </button>
+    );
+  },
+);
 
 export default RailChips;
