@@ -19,7 +19,7 @@ import SyncingScreen from './connect/SyncingScreen';
 import WelcomeAboardScreen from './connect/WelcomeAboardScreen';
 import DeclinedScreen from './connect/DeclinedScreen';
 import { BackRow } from './connect/Primitives';
-import { SURFACE, FONT } from './connect/designTokens';
+import { SURFACE, WASH, FONT } from './connect/designTokens';
 
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -343,11 +343,10 @@ export const WhsConnectScreen: React.FC<Props> = ({
       className={wrapperClass}
       style={{
         fontFamily: FONT,
-        /* FULL BLEED, FLAT. The flow paints SURFACE edge to edge - the amber
-           wash is gone, because a gradient behind display type is decoration
-           competing with the figure. #F8FAFC matches the host page and the
-           notch shield exactly, so there is no seam under the header. */
-        background: SURFACE,
+        /* FULL BLEED. Stage 1 (intro) paints WASH - amber as light, resolved
+           to flat canvas before the promise rows. Every other stage paints
+           SURFACE flat, matching the host page and notch shield. */
+        background: stage === 'intro' ? WASH : SURFACE,
         ...(immersive
           ? { minHeight: '100dvh', flex: '1 1 auto' }
           : { flex: '1 1 auto', minHeight: 0 }),
