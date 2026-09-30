@@ -141,6 +141,9 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmBlock, setConfirmBlock] = useState(false);
+  // Two-tap confirm for remove-member, keyed BY MEMBER so confirming on one
+  // member can never fire the removal of another.
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const invalidateAll = useCallback(() => {
@@ -222,6 +225,12 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
     },
     [actor, conversationId, runRpc],
   );
+
+  // Clear the remove confirm whenever the row menu closes or opens on a
+  // different member — a pending confirm never outlives its own menu.
+  React.useEffect(() => {
+    setConfirmRemove((cur) => (rowMenu === null || rowMenu !== cur ? null : cur));
+  }, [rowMenu]);
 
   const handleAddMembers = useCallback(
     async (picks: Candidate[]) => {
@@ -702,11 +711,21 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                           {canRemove ? (
                             <button
                               type="button"
-                              onClick={() => handleRemove(m)}
+                              onClick={() => {
+                                if (confirmRemove !== key) {
+                                  setConfirmRemove(key);
+                                  setTimeout(
+                                    () => setConfirmRemove((cur) => (cur === key ? null : cur)),
+                                    3000,
+                                  );
+                                  return;
+                                }
+                                void handleRemove(m);
+                              }}
                               disabled={busy}
                               style={menuItemStyle(DANGER)}
                             >
-                              {t('messaging:action.removeFromGroup')}
+                              {confirmRemove === key ? 'Remove?' : t('messaging:action.removeFromGroup')}
                             </button>
                           ) : null}
                         </div>
@@ -760,7 +779,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
 
               {!isGroup && dmOther?.actor_type === 'personal' ? (
                 <ActionRow
-                  icon={<Ban size={19} color={INK} />}
+                  icon={<Ban size={19} color={DANGER} />}
                   label={confirmBlock ? 'Tap again to confirm' : 'Block'}
                   onClick={() => {
                     if (!confirmBlock) {
@@ -771,6 +790,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                     void handleBlock();
                   }}
                   disabled={busy}
+                  danger
                 />
               ) : null}
 
