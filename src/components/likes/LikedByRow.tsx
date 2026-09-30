@@ -1,11 +1,15 @@
 /**
  * LikedByRow — the single entry point to "who liked this".
  *
- * ONE LINE OF TEXT, PRESENT IMMEDIATELY (BRIEF_FEED_CARD_REBUILD section B).
- * The avatar cluster is gone: three 22px squircles arrived a beat after the
- * card, so the footer moved under the thumb. The row is now a single tappable
- * text line that renders the moment the card does, and swaps to names when
- * they resolve. No layout change either way.
+ * ONE LINE, PRESENT IMMEDIATELY, WITH ITS SPACE ALREADY RESERVED.
+ * The avatar cluster was removed once because three squircles arrived a beat
+ * after the card and the footer moved under the thumb. It is back on one
+ * condition: the row reserves its full height and the stack its full width at
+ * FIRST PAINT. Slot count comes from `count` — known immediately — never from
+ * `likers.length`, which is not. Unresolved slots are neutral placeholders at
+ * final size, and avatars replace them in place. If a change here can move the
+ * row between first paint and resolution, it reintroduces the bug that removed
+ * the cluster the first time.
  *
  * COPY, by count:
  *   0    — nothing renders at all (no empty state, no gap)
@@ -35,17 +39,19 @@ import { useState } from 'react';
 import { usePostLikers, likerFirstNames } from '@/hooks/usePostLikers';
 import type { LikeSource } from '@/hooks/usePostLikes';
 import { LikesSheet } from './LikesSheet';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 export interface LikedByRowProps {
   postId: string | null;
   /** The surface's own like count. Zero renders nothing. */
   count: number;
   /**
-   * DEAD PROP (section B). The avatar borders took the card surface colour so
-   * they read as separate; there are no avatars now. Retained so every caller
-   * renders unchanged and recorded on the dead-code list.
+   * The ground this row sits on. Rings the overlapping avatars so they read as
+   * separate — pass the card's own background, never a guess.
    */
   surfaceColor?: string;
+  /** Render the avatar stack (default true). False over photography. */
+  showAvatars?: boolean;
   source?: LikeSource;
   /** 'celebrate' on ROUNDS — see lib/reactionKind. Never a plural noun. */
   kind?: ReactionKind;
@@ -67,7 +73,8 @@ export interface LikedByRowProps {
 export function LikedByRow({
   postId,
   count,
-  surfaceColor,
+  surfaceColor = MEMBER_PANEL,
+  showAvatars = true,
   source = 'post',
   style,
   kind = 'like',
@@ -137,7 +144,10 @@ export function LikedByRow({
         type="button"
         onClick={() => setOpen(true)}
         style={{
-          display: 'block',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          minHeight: 22,
           width: '100%',
           boxSizing: 'border-box',
           padding: 0,
@@ -147,8 +157,45 @@ export function LikedByRow({
           ...style,
         }}
       >
+        {showAvatars && (
+          <span aria-hidden="true" style={{ display: 'flex', flex: 'none' }}>
+            {Array.from({ length: Math.min(count, 3) }, (_, i) => {
+              const liker = likers[i];
+              const slot: React.CSSProperties = {
+                width: 18,
+                height: 18,
+                borderRadius: 6,
+                flex: 'none',
+                marginLeft: i === 0 ? 0 : -6,
+                boxShadow: `0 0 0 1.5px ${surfaceColor}`,
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                zIndex: 3 - i,
+              };
+              if (!liker) {
+                return <span key={i} style={{ ...slot, background: 'rgba(255,255,255,0.07)' }} />;
+              }
+              if (liker.avatarUrl) {
+                return (
+                  <span key={i} style={slot}>
+                    <img src={liker.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  </span>
+                );
+              }
+              return (
+                <span key={i} style={{ ...slot, background: 'rgba(255,255,255,0.10)', color: 'rgba(248,250,252,0.62)', fontSize: 8, fontWeight: 700, lineHeight: 1 }}>
+                  {(liker.displayName ?? '').trim().charAt(0).toUpperCase()}
+                </span>
+              );
+            })}
+          </span>
+        )}
         <span
           style={{
+            minWidth: 0,
             fontSize,
             fontWeight,
             color,

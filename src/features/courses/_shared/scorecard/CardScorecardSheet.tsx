@@ -1,3 +1,4 @@
+import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 import { BirdieCountIcon } from '@/features/explore-magazine/achievementIcons';
 import { FIELD_MIN_PLAYERS } from '@/lib/gam/fieldGate';
 import { roundCoursePar } from '@/lib/whs/api';
@@ -1052,6 +1053,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   kind="celebrate"
                   isOwnRound={isOwner}
                   ownerName={isTour ? null : (playerName.trim().split(/\s+/)[0] || null)}
+                  surfaceColor={SHEET_SURFACE}
                   style={{ marginTop: 8 }}
                 />
               )}
