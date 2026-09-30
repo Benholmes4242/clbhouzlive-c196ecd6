@@ -17,9 +17,15 @@ import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/rou
 import { CHART } from '@/components/profile/handicap/whs/charts/tokens';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 import { formatDayMonthShortGB, formatNumber } from '@/i18n/format';
-import { A, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { ABOUT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
 import { YouFigure } from '@/components/courses/course-detail/you/youBits';
+import RailChips from '@/components/ui/RailChips';
+import { FigureCell, vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
+import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap';
+import { toParLabel } from '@/features/explore-magazine/exploreCopy';
+import { useFitOneLine } from '@/features/explore-magazine/useFitOneLine';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { isFullEighteen, useOwnHandicapVisibility, useProfileRounds, type ProfileRound } from './useProfileRounds';
 
 interface Props {
@@ -72,6 +78,16 @@ const FeatPill: React.FC<{ label: string }> = ({ label }) => (
     {label}
   </span>
 );
+
+/** Course name: one line, type shrinks 14 -> 11 instead of truncating. */
+const RowName: React.FC<{ name: string }> = ({ name }) => {
+  const ref = useFitOneLine<HTMLSpanElement>(name, 14, 11);
+  return (
+    <span ref={ref} style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: CHART.INK, whiteSpace: 'nowrap', overflow: 'hidden' }}>
+      {name}
+    </span>
+  );
+};
 
 const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex }) => {
   const { t } = useTranslation('profile');
@@ -296,10 +312,9 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
                 ) : null}
                 {/* FOUR COLUMNS, ALWAYS: a missing figure is an empty cell. */}
                 <span style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', marginTop: 8 }}>
-                  <span style={isBest ? { color: CHART.AMBER } : undefined} data-best-gross={isBest || undefined}>
-                    <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')}
-                      value={r.gross_score != null ? String(r.gross_score) : ''} suffix={grossToParNode} best={isBest} />
-                  </span>
+                  <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')}
+                    value={r.gross_score != null ? String(r.gross_score) : ''} suffix={grossToParNode}
+                    tone={isBest ? CHART.AMBER : undefined} />
                   <FigureCell minHeight={34} label={t('amateur.stream.stat.net', 'NET')}
                     value={net != null ? String(net) : ''} />
                   <FigureCell minHeight={34} label={t('amateur.stream.stat.vsHcp', 'VS HCP')}

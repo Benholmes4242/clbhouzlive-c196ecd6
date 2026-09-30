@@ -295,8 +295,10 @@ export function vsHandicapLabel(net: number, par: number): string {
 }
 
 export function FigureCell({
-  label, value, under, suffix, minHeight = 52,
+  label, value, under, suffix, minHeight = 52, tone,
 }: {
+  /** Optional value colour override (e.g. a member's best gross). `under` wins. */
+  tone?: string;
   label: string;
   value: string;
   under?: boolean;
@@ -326,7 +328,7 @@ export function FigureCell({
       </span>
       <span
         data-explore-stat-value={label.toLowerCase().replace(/\s+/g, '-')}
-        style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: under ? TOPAR_UNDER_DARK : A.INK }}
+        style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: under ? TOPAR_UNDER_DARK : tone ?? A.INK }}
       >
         {value}
         {suffix ? <span style={{ fontSize: 11, fontWeight: 700, marginLeft: 3 }}>{suffix}</span> : null}
