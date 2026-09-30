@@ -141,6 +141,9 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmBlock, setConfirmBlock] = useState(false);
+  // Two-tap confirm for remove-member, keyed BY MEMBER so confirming on one
+  // member can never fire the removal of another.
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const invalidateAll = useCallback(() => {
