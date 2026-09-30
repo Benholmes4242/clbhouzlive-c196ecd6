@@ -227,20 +227,16 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
       ) : null}
 
       {/* 3. SORT */}
-      <div role="tablist" style={{ display: 'flex', gap: 18, marginTop: 28 }}>
-        {(['recent', 'lowest'] as Sort[]).map((s) => (
-          <button
-            key={s}
-            role="tab"
-            aria-selected={sort === s}
-            type="button"
-            onClick={() => setSort(s)}
-            style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 13, fontWeight: sort === s ? 700 : 600, color: sort === s ? CHART.INK : CHART.DIM }}
-          >
-            {s === 'recent' ? t('rounds.sort.recent', 'Recent') : t('rounds.sort.lowest', 'Lowest')}
-          </button>
-        ))}
-      </div>
+      <RailChips
+        options={[
+          { id: 'recent', label: t('rounds.sort.recent', 'Recent') },
+          { id: 'lowest', label: t('rounds.sort.lowest', 'Lowest') },
+        ]}
+        value={sort}
+        onChange={(next) => setSort(next as Sort)}
+        ariaLabel={t('rounds.sort.a11y', 'Sort rounds')}
+        style={{ marginTop: 28 }}
+      />
 
       {/* 4–5. YEAR GROUPS + ROWS */}
       <div style={{ marginTop: 8 }}>
@@ -251,9 +247,22 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
           const meta = yearMeta.get(y);
           const full18 = isFullEighteen(r);
           const toPar = full18 && r.gross_score != null && r.course_par != null ? r.gross_score - r.course_par : null;
-          const parts = toPar != null ? toParParts(toPar, 0) : null;
           const isBest = full18 && stats.best != null && r.gross_score === stats.best;
           const fs = feats(r);
+          // Mirrors ExploreCard's roundIdentity construction. Absent, never approximated.
+          const net = full18 && r.nett_score != null ? Number(r.nett_score) : null;
+          const hasVs = net != null && r.course_par != null;
+          const under = hasVs && net! < r.course_par!;
+          const toParText = toParLabel(toPar);
+          const grossToParNode = toParText
+            ? <span style={{ ...FIGS, color: (toPar ?? 0) < 0 ? TOPAR_UNDER_DARK : A.MUTE }}>{toParText}</span>
+            : null;
+          const hcpPair = handicapPairDisplay({ handicapIndex: r.hcp_at_time, deltaIndex: r.delta_index });
+          const hcpDeltaNode = hcpPair?.delta
+            ? <span style={{ ...FIGS, display: 'inline-flex', alignItems: 'center', gap: 2, color: hcpPair.delta.tone }}>
+                <span aria-hidden>{hcpPair.delta.arrow}</span><span>{hcpPair.delta.text}</span>
+              </span>
+            : null;
           return (
             <React.Fragment key={r.whs_score_id}>
               {header && meta ? (
@@ -267,31 +276,39 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
               <button
                 type="button"
                 onClick={() => setOpenId(r.whs_score_id)}
-                style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', background: 'transparent', border: 0, borderBottom: `1px solid ${CHART.BORDER}`, padding: '11px 0', cursor: 'pointer', fontFamily: SANS }}
+                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, borderBottom: `1px solid ${CHART.BORDER}`, padding: '11px 0', cursor: 'pointer', fontFamily: SANS }}
               >
-                <span style={{ width: 52, flexShrink: 0, fontSize: 12, fontWeight: 600, color: CHART.MUTE, ...FIGS }}>
-                  {formatDayMonthShortGB(parseDate(r.play_date))}
-                </span>
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: 'block', fontSize: 14, fontWeight: 600, color: CHART.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {r.course_name ?? '\u2014'}
+                <span style={{ display: 'flex', alignItems: 'baseline', gap: 12, minWidth: 0 }}>
+                  <RowName name={r.course_name ?? '\u2014'} />
+                  <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 600, color: CHART.DIM, ...FIGS }}>
+                    {formatDayMonthShortGB(parseDate(r.play_date))}
                   </span>
-                  {fs.length || !full18 ? (
-                    <span style={{ display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap' }}>
-                      {!full18 ? (
-                        <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: CHART.MUTE, border: `1px solid ${CHART.BORDER}`, borderRadius: 999, padding: '3px 6px', whiteSpace: 'nowrap' }}>
-                          {r.whs_joined && r.is_nine_hole ? t('rounds.nineHoles', '9 holes') : t('rounds.notFull', 'Not a full 18')}
-                        </span>
-                      ) : null}
-                      {fs.map((f) => <FeatPill key={f} label={f} />)}
-                    </span>
-                  ) : null}
                 </span>
-                <span style={{ width: 34, textAlign: 'right', fontSize: 16, fontWeight: 700, color: isBest ? CHART.AMBER : CHART.INK, ...FIGS }}>
-                  {r.gross_score ?? '\u2014'}
-                </span>
-                <span style={{ width: 34, textAlign: 'right', fontSize: 13, fontWeight: 700, color: parts?.tone ?? CHART.MUTE, ...FIGS }}>
-                  {parts?.text ?? ''}
+                {fs.length || !full18 ? (
+                  <span style={{ display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap' }}>
+                    {!full18 ? (
+                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: CHART.MUTE, border: `1px solid ${CHART.BORDER}`, borderRadius: 999, padding: '3px 6px', whiteSpace: 'nowrap' }}>
+                        {r.whs_joined && r.is_nine_hole ? t('rounds.nineHoles', '9 holes') : t('rounds.notFull', 'Not a full 18')}
+                      </span>
+                    ) : null}
+                    {fs.map((f) => <FeatPill key={f} label={f} />)}
+                  </span>
+                ) : null}
+                {/* FOUR COLUMNS, ALWAYS: a missing figure is an empty cell. */}
+                <span style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', marginTop: 8 }}>
+                  <span style={isBest ? { color: CHART.AMBER } : undefined} data-best-gross={isBest || undefined}>
+                    <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')}
+                      value={r.gross_score != null ? String(r.gross_score) : ''} suffix={grossToParNode} best={isBest} />
+                  </span>
+                  <FigureCell minHeight={34} label={t('amateur.stream.stat.net', 'NET')}
+                    value={net != null ? String(net) : ''} />
+                  <FigureCell minHeight={34} label={t('amateur.stream.stat.vsHcp', 'VS HCP')}
+                    value={hasVs ? vsHandicapLabel(net!, r.course_par!) : ''} under={under} />
+                  {/* Deliberately NOT the Explore tile's figure: Explore shows the member's
+                      CURRENT index; a history row shows hcp_at_time, the index they held
+                      for THAT round. Same header, different question. Do not "fix". */}
+                  <FigureCell minHeight={34} label={t('friendsRail.index', 'HCP')}
+                    value={hcpPair?.index ?? ''} suffix={hcpDeltaNode} />
                 </span>
               </button>
             </React.Fragment>
