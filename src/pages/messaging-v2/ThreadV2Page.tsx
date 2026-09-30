@@ -24,6 +24,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSharedGroundOne } from '@/hooks/messaging/useSharedGround';
 import { useMessagesStagePhoto } from '@/hooks/messaging/useMessagesStagePhoto';
 import { SharedGroundStrip } from './SharedGroundStrip';
+import { PlayingOffRail } from './PlayingOffRail';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
 import '@/features/messaging-dark/messages-dark.css';
 
@@ -457,6 +458,12 @@ const ThreadV2Page: React.FC = () => {
           {/* §4.1 NO SHARED ROUNDS -> NO STRIP. */}
           {isDirect ? (
             <SharedGroundStrip ground={ground} rivalFirstName={rivalFirstName} />
+          ) : (detail?.type ?? conv?.type) === 'group' ? (
+            <PlayingOffRail
+              members={(detail?.members ?? []) as ConversationMember[]}
+              viewerActorType={actor?.actorType ?? null}
+              viewerActorId={actor?.actorId ?? null}
+            />
           ) : null}
         </div>
       </header>

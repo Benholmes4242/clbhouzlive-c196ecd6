@@ -123,5 +123,8 @@
   },
   "rail": {
     "start": "Neu"
+  },
+  "playingOff": {
+    "eyebrow": "Spielt mit"
   }
 }
