@@ -1,6 +1,6 @@
 -- THIS FILE MUST MATCH `pg_get_functiondef` FOR THE LIVE FUNCTION.
--- It DROPs before it CREATEs, so a stale copy here is not
--- documentation, it is a script that silently removes columns the app
+-- It USED TO DROP before it CREATEd, so a stale copy here was not
+-- documentation, it was a script that silently removed columns the app
 -- depends on. It previously held an 18-column plpgsql version that had
 -- not been live for some time; the live function was a 15-column sql
 -- rewrite, and is now this 17-column one. Running the old file on
