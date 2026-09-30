@@ -39,7 +39,7 @@ const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'
 
 /**
  * The role is a LABEL, not a pill and not an icon. The tinted capsule went
- * first; the lucide role glyphs followed (a size-9 Crown resolves to a smudge).
+ * first; the lucide role glyphs followed (a size-9 glyph resolves to a smudge).
  * A business team page states the role in words.
  */
 function RoleLabel({ role }: { role: BusinessRole }) {
