@@ -226,6 +226,12 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
     [actor, conversationId, runRpc],
   );
 
+  // Clear the remove confirm whenever the row menu closes or opens on a
+  // different member — a pending confirm never outlives its own menu.
+  React.useEffect(() => {
+    setConfirmRemove((cur) => (rowMenu === null || rowMenu !== cur ? null : cur));
+  }, [rowMenu]);
+
   const handleAddMembers = useCallback(
     async (picks: Candidate[]) => {
       if (!actor || picks.length === 0) return;
