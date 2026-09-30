@@ -430,7 +430,31 @@
         "insights": "Insights",
         "reviews": "Reviews",
         "team": "Manage team",
-        "viewProfile": "View live profile"
+        "viewProfile": "View live profile",
+        "claimCourse": "Claim your course",
+        "claimCourseCaption": "Link the club you manage. Reviewed by our team."
+      },
+      "claimSheet": {
+        "title": "Claim your course",
+        "intro": "Find the club {{name}} manages. Our team reviews every claim.",
+        "searchPlaceholder": "Search for your golf club",
+        "searching": "Searching…",
+        "noResults": "No clubs found",
+        "managed": "Already managed by another business",
+        "underReview": "A claim is already under review",
+        "noteLabel": "Tell us your connection to this club",
+        "optional": "(optional)",
+        "notePlaceholder": "e.g. I'm the General Manager, work email on the club domain, happy to send a verification email.",
+        "noteHint": "Helps admins verify your claim faster. Your club link is pending until approval.",
+        "submit": "Claim as {{name}}",
+        "footer": "Claims are reviewed before a course is handed over.",
+        "success": "Claim submitted for review.",
+        "errors": {
+          "alreadyClaimed": "This club has already been claimed by another business.",
+          "underReview": "A claim for this club is already under review.",
+          "notAuthorized": "You need to be an owner or admin of this business to claim a course.",
+          "generic": "Could not submit claim. Please try again."
+        }
       }
     },
     "insights": {

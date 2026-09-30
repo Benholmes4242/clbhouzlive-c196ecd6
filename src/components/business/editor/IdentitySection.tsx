@@ -144,7 +144,7 @@ export function IdentitySection({
             <label className={LABEL_CLASS}>
               Business Name <span className="text-destructive">*</span>
             </label>
-            {isGolfClub && (mode === 'create' || !isClubLinked) ? (
+            {isGolfClub && mode === 'create' ? (
               <>
                 <ClubSearchDropdown
                   value={selectedClub}
