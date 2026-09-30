@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Label } from '@/components/ui/label';
@@ -43,6 +43,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { RailChips } from '@/components/ui/RailChips';
+import { cn } from '@/lib/utils';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
@@ -54,15 +57,30 @@ import {
 } from '@/features/courses/components/holes/analytical/tokens';
 import DomainStep from './steps/DomainStep';
 import { MEMBER_PANEL, surfaceWithAlpha } from '@/lib/tokens/surfaces';
-import {
-  Group,
-  Row,
-  RowList,
-  Footnote,
-  FilledButton,
-  PlainButton,
-} from './manageRows';
+import { Group, Row, RowList } from './manageRows';
 import { INK, INK_45, INK_30, INK_60, GREEN, HAIR, SF_STACK } from '@/components/manage/ui';
+
+/**
+ * B5 — every control in the wizard takes the field canon (6% rest ground, 10%
+ * rest border, radius 14, 38% placeholder, focus-within step). No inline
+ * background/border/radius on a control, or the focus step dies silently.
+ */
+const FIELD_CLASS = cn(
+  FIELD_PAINT_CLASS,
+  FIELD_PLACEHOLDER_CLASS,
+  'h-auto min-h-[44px] px-[13px] py-3 text-[14px] font-normal',
+);
+
+const SIGNAL_PHRASE: Record<SignalKey, string> = {
+  domain: 'a business domain',
+  document: 'a document',
+  presence: 'your presence',
+};
+
+function joinAnd(parts: string[]): string {
+  if (parts.length <= 1) return parts.join('');
+  return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
 import {
   PROOF_OPTIONS,
   REGISTRY_OPTIONS,
@@ -142,9 +160,12 @@ export default function VerificationFlowSheet({
   const [proofCompanyNumber, setProofCompanyNumber] = useState('');
   const [proofRegistryUrl, setProofRegistryUrl] = useState('');
 
-  // --- presence evidence ---
+  // --- presence evidence --- (B3a: one draft PER KIND; switching preserves each)
   const [presenceKind, setPresenceKind] = useState<PresenceKind>('website');
-  const [presenceValue, setPresenceValue] = useState('');
+  const [presenceValues, setPresenceValues] = useState<Record<PresenceKind, string>>({
+    website: '', listing: '', social: '', phone: '',
+  });
+  const presenceValue = presenceValues[presenceKind];
 
   // --- ownership state ---
   const [contactEmail, setContactEmail] = useState('');
@@ -189,7 +210,7 @@ export default function VerificationFlowSheet({
     setProofCompanyNumber('');
     setProofRegistryUrl('');
     setPresenceKind('website');
-    setPresenceValue('');
+    setPresenceValues({ website: '', listing: '', social: '', phone: '' });
     setRole('');
     setNotes('');
     setDocPath(null);
@@ -238,6 +259,11 @@ export default function VerificationFlowSheet({
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0 });
     setValidationError(null);
+    // B9g — move focus to the new step's heading so the change is announced.
+    requestAnimationFrame(() => {
+      const h = mainRef.current?.querySelector<HTMLElement>('h3[data-vf-heading]');
+      h?.focus({ preventScroll: true });
+    });
   }, [safeIndex, pages.length]);
 
   // ---- §1.4 free-provider check, AT THE POINT OF ENTRY ----
@@ -249,7 +275,8 @@ export default function VerificationFlowSheet({
     const v = presenceValue.trim();
     if (!v) return false;
     if (presenceKind === 'phone') return v.replace(/[^\d]/g, '').length >= 7;
-    if (presenceKind === 'social') return v.length >= 3;
+    // B3e — a handle ("@" + at least 2 more) or a real profile link.
+    if (presenceKind === 'social') return /^@\S{2,}$/.test(v) || isValidUrl(v);
     return isValidUrl(v);
   }, [presenceKind, presenceValue]);
 
@@ -270,17 +297,18 @@ export default function VerificationFlowSheet({
    * entered but no code counts as provided: it gets checked by hand.
    */
   const unevidencedSignals = useMemo(() => {
-    const out: string[] = [];
-    if (claimed.domain && !domainReady)
-      out.push('You marked a business domain but have not confirmed one. You can still submit; it will be checked by hand.');
-    if (claimed.document && !documentReady)
-      out.push('You marked a document but have not attached one. You can still submit; it will be checked by hand.');
-    if (claimed.presence && !presenceReady)
-      out.push('You marked presence but have not given anything to check. You can still submit; it will be checked by hand.');
+    const out: SignalKey[] = [];
+    if (claimed.domain && !domainReady) out.push('domain');
+    if (claimed.document && !documentReady) out.push('document');
+    if (claimed.presence && !presenceReady) out.push('presence');
     return out;
   }, [claimed, domainReady, documentReady, presenceReady]);
 
-  const detailsReady = !!business?.website && !!business?.email;
+  const stepEmpty =
+    (page === 'domain' && !domainReady) ||
+    (page === 'document' && !documentReady) ||
+    (page === 'presence' && !presenceReady);
+
 
 
   // ---- §1.5 signal payload ----
