@@ -222,6 +222,7 @@ export default function VerificationFlowSheet({
     setOtpRequestId(null);
     setOtpVerificationId(null);
     setOtpCode('');
+    setOtpVerifyError(null);
     setOtpEmailVerified(false);
     setOtpSent(false);
   }, [open, mode]);
@@ -975,11 +976,11 @@ export default function VerificationFlowSheet({
                           </InputOTPGroup>
                         </InputOTP>
                         {otpVerifyError && (
-                          <p role="alert" style={{ fontSize: 12, color: A.RED, lineHeight: 1.4, marginTop: 8 }}>
+                          <p role="alert" style={{ fontSize: 12, color: A.RED, lineHeight: 1.4 }}>
                             {otpVerifyError}
                           </p>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, marginTop: 9 }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
                           <span style={{ fontSize: 12, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
                             {verifyCode.isPending ? 'Checking your code…' : `Sent to ${proofEmail}`}
                           </span>
