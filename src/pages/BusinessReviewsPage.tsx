@@ -534,8 +534,7 @@ export default function BusinessReviewsPage() {
                     >
                       {fmtRating(summary?.avg ?? null)}
                     </div>
-                    <div className="mt-1 flex items-center gap-1 text-[11px]" style={{ color: INK_45 }}>
-                      <Star size={11} strokeWidth={2.5} style={{ color: AMBER, fill: AMBER }} />
+                    <div className="mt-1 text-[11px]" style={{ color: INK_45 }}>
                       out of 10 - {summary?.count ?? 0} review{(summary?.count ?? 0) === 1 ? '' : 's'}
                     </div>
                   </div>
