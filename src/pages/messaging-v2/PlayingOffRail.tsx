@@ -8,6 +8,11 @@
  *
  * Renders nothing when no member has an index. No amber: "You" identifies the
  * viewer (amber in Messages is reserved for the member's own shared-round score).
+ *
+ * BRIEF_PLAYING_OFF_NO_POP_IN — while the RPC is in flight the rail is reserved
+ * with one em-dash tile per personal member (same geometry as resolved), so the
+ * message list never shifts when the numbers arrive. If the answer is "nobody
+ * has an index", the rail collapses once; that shift is deliberate.
  */
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -34,7 +39,7 @@ export const PlayingOffRail: React.FC<Props> = ({ members, viewerActorType, view
     [members],
   );
 
-  const { data: byId } = useQuery({
+  const { data: byId, isLoading } = useQuery({
     queryKey: ['messaging', 'playing-off', personalIds],
     enabled: personalIds.length > 0,
     staleTime: 60_000,
@@ -60,7 +65,14 @@ export const PlayingOffRail: React.FC<Props> = ({ members, viewerActorType, view
     return { withIdx, without, idx };
   }, [members, byId]);
 
-  if (ordered.withIdx.length === 0) return null;
+  // Placeholder order while loading: personal members in their existing order,
+  // each showing the em-dash bubble (idx is empty, so tile() renders dashes).
+  const placeholder = useMemo(
+    () => members.filter((m) => m.actor_type === 'personal'),
+    [members],
+  );
+
+  if (!isLoading && ordered.withIdx.length === 0) return null;
 
   const bubbleBase: React.CSSProperties = {
     display: 'inline-block',
@@ -113,8 +125,12 @@ export const PlayingOffRail: React.FC<Props> = ({ members, viewerActorType, view
         {t('playingOff.eyebrow', { defaultValue: 'Playing off' })}
       </div>
       <div className="msg-rail" style={{ gap: 12, padding: '0 14px 14px' }}>
-        {ordered.withIdx.map(tile)}
-        {ordered.without.map(tile)}
+        {isLoading ? placeholder.map(tile) : (
+          <>
+            {ordered.withIdx.map(tile)}
+            {ordered.without.map(tile)}
+          </>
+        )}
       </div>
     </div>
   );
