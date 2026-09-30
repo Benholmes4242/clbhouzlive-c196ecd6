@@ -185,6 +185,7 @@ export default function VerificationFlowSheet({
   const [otpCode, setOtpCode] = useState('');
   const [otpEmailVerified, setOtpEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [otpVerifyError, setOtpVerifyError] = useState<string | null>(null);
   const [otpSending, setOtpSending] = useState(false);
   const sendCode = useSendDomainCode(businessId);
   const verifyCode = useVerifyDomainCode();
@@ -487,11 +488,15 @@ export default function VerificationFlowSheet({
 
   async function handleVerifyOtp() {
     if (!otpVerificationId || otpCode.length !== 6) return;
+    setOtpVerifyError(null);
     try {
       await verifyCode.mutateAsync({ verificationId: otpVerificationId, code: otpCode });
       setOtpEmailVerified(true);
-    } catch {
-      /* toast already fired inside mutation */
+    } catch (e) {
+      // The explicit Verify button is gone, so a toast is no longer sufficient
+      // feedback — the code auto-submits and the user may not be looking.
+      setOtpVerifyError((e as Error)?.message || 'That code did not match. Check it and try again.');
+      setOtpCode('');
     }
   }
 
@@ -855,7 +860,6 @@ export default function VerificationFlowSheet({
                     <FieldGroup label="Business email">
                       {(id) => (
                         <>
-                          <div className="flex gap-2">
                             <Input
                               id={id}
                               value={proofEmail}
@@ -866,38 +870,13 @@ export default function VerificationFlowSheet({
                                 // B7b — a code must never be checked against a previous address.
                                 setOtpVerificationId(null);
                                 setOtpCode('');
+                                setOtpVerifyError(null);
                               }}
                               placeholder="name@yourbusiness.com"
                               type="email"
                               disabled={otpEmailVerified}
-                              className={cn(FIELD_CLASS, 'flex-1')}
+                              className={cn(FIELD_CLASS, 'w-full')}
                             />
-                            {otpEmailVerified ? (
-                              <span
-                                className="inline-flex items-center gap-1.5 px-3 rounded-md text-[12px] font-semibold"
-                                style={{ background: A.SOFT, color: A.GREEN }}
-                              >
-                                <CheckCircle2 className="h-3.5 w-3.5" />
-                                Verified
-                              </span>
-                            ) : (
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="outline"
-                                onClick={handleSendOtp}
-                                disabled={!domainReady || otpSending || sendCode.isPending}
-                              >
-                                {otpSending || sendCode.isPending ? (
-                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                ) : otpSent ? (
-                                  'Resend code'
-                                ) : (
-                                  'Send code'
-                                )}
-                              </Button>
-                            )}
-                          </div>
                           {/* §1.4 THE REASON, IN THE FLOW, AT THE POINT OF ENTRY. */}
                           {emailIsFreeProvider ? (
                             <p role="alert" className="text-[12px]" style={{ color: A.RED, marginTop: 6, lineHeight: 1.4 }}>
@@ -920,6 +899,7 @@ export default function VerificationFlowSheet({
                                   setOtpSent(false);
                                   setOtpVerificationId(null);
                                   setOtpCode('');
+                                  setOtpVerifyError(null);
                                 }}
                                 className="min-h-[44px]"
                                 style={{ ...BIZ_LABEL, color: A.INK, background: 'transparent', border: 'none', padding: 0 }}
@@ -940,6 +920,38 @@ export default function VerificationFlowSheet({
                               Confirm it now and it's done. Continue without it and a reviewer checks by hand, which takes longer.
                             </p>
                           )}
+                          {otpEmailVerified ? (
+                            <span
+                              className="inline-flex items-center gap-1.5 px-3 rounded-md text-[12px] font-semibold"
+                              style={{ background: A.SOFT, color: A.GREEN, marginTop: 10, minHeight: 28 }}
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              Verified
+                            </span>
+                          ) : !otpSent ? (
+                            <button
+                              type="button"
+                              onClick={handleSendOtp}
+                              disabled={!domainReady || otpSending || sendCode.isPending}
+                              className="w-full flex items-center justify-center disabled:opacity-50"
+                              style={{
+                                height: FIELD_HEIGHT,
+                                borderRadius: FIELD_RADIUS,
+                                background: FIELD_REST_BG,
+                                border: `1px solid ${FIELD_REST_BORDER}`,
+                                fontSize: 14,
+                                fontWeight: 600,
+                                color: A.INK,
+                                marginTop: 10,
+                              }}
+                            >
+                              {otpSending || sendCode.isPending ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                'Send code'
+                              )}
+                            </button>
+                          ) : null}
                         </>
                       )}
                     </FieldGroup>
@@ -949,25 +961,37 @@ export default function VerificationFlowSheet({
                         <Label className="text-[13px]" style={{ color: BIZ.ink }}>
                           Enter the 6-digit code
                         </Label>
-                        <div className="flex items-center gap-3">
-                          <InputOTP value={otpCode} onChange={setOtpCode} maxLength={6} onComplete={handleVerifyOtp}>
-                            <InputOTPGroup>
-                              {[0, 1, 2, 3, 4, 5].map((i) => (
-                                <InputOTPSlot key={i} index={i} />
-                              ))}
-                            </InputOTPGroup>
-                          </InputOTP>
-                          <Button
+                        <InputOTP
+                          value={otpCode}
+                          onChange={(v) => { setOtpCode(v); if (otpVerifyError) setOtpVerifyError(null); }}
+                          maxLength={6}
+                          onComplete={handleVerifyOtp}
+                          disabled={verifyCode.isPending}
+                        >
+                          <InputOTPGroup>
+                            {[0, 1, 2, 3, 4, 5].map((i) => (
+                              <InputOTPSlot key={i} index={i} />
+                            ))}
+                          </InputOTPGroup>
+                        </InputOTP>
+                        {otpVerifyError && (
+                          <p role="alert" style={{ fontSize: 12, color: A.RED, lineHeight: 1.4, marginTop: 8 }}>
+                            {otpVerifyError}
+                          </p>
+                        )}
+                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, marginTop: 9 }}>
+                          <span style={{ fontSize: 12, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                            {verifyCode.isPending ? 'Checking your code…' : `Sent to ${proofEmail}`}
+                          </span>
+                          <button
                             type="button"
-                            size="sm"
-                            onClick={handleVerifyOtp}
-                            disabled={otpCode.length !== 6 || verifyCode.isPending}
-                            /* INK fill takes a CANVAS label; white-on-white
-                               after BIZ.ink was re-pointed to A.INK. */
-                            style={{ background: BIZ.ink, color: A.CANVAS }}
+                            onClick={handleSendOtp}
+                            disabled={otpSending || sendCode.isPending}
+                            className="min-h-[44px]"
+                            style={{ flex: 'none', fontSize: 12, fontWeight: 700, color: A.INK, background: 'transparent', border: 'none', padding: 0 }}
                           >
-                            {verifyCode.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Verify'}
-                          </Button>
+                            {otpSending || sendCode.isPending ? 'Sending…' : 'Resend'}
+                          </button>
                         </div>
                       </div>
                     )}
