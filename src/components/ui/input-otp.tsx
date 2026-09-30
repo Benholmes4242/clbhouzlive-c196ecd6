@@ -3,6 +3,7 @@ import { OTPInput, OTPInputContext } from "input-otp"
 import { Dot } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { SELECTED_EDGE } from "@/components/ui/RailChips"
 
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
@@ -31,7 +32,7 @@ InputOTPGroup.displayName = "InputOTPGroup"
 const InputOTPSlot = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div"> & { index: number }
->(({ index, className, ...props }, ref) => {
+>(({ index, className, style, ...props }, ref) => {
   const inputOTPContext = React.useContext(OTPInputContext)
   const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
 
@@ -40,9 +41,10 @@ const InputOTPSlot = React.forwardRef<
       ref={ref}
       className={cn(
         "relative flex h-10 w-10 items-center justify-center border-y border-r border-input/10 text-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md",
-        isActive && "z-10 ring-2 ring-ring ring-offset-background",
+        isActive && "z-10 ring-2 ring-offset-background",
         className
       )}
+      style={isActive ? ({ "--tw-ring-color": SELECTED_EDGE, ...style } as React.CSSProperties) : style}
       {...props}
     >
       {char}
