@@ -40,6 +40,7 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
         .from('business_verification_requests')
         .select('id, business_id, status, requested_by, created_at, reviewed_at, admin_note, review_reason, requires_domain_check, domain, domain_confirmed, contact_email, contact_role, proof_metadata')
         .eq('business_id', businessId)
+        .neq('status', 'draft')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();

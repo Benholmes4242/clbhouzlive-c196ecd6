@@ -35,6 +35,7 @@ export default function DomainStep({ businessId, onDone }: Props) {
         .from('business_verification_requests')
         .select('*')
         .eq('business_id', businessId)
+        .neq('status', 'draft')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
