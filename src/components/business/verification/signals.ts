@@ -53,7 +53,10 @@ export const NO_SIGNALS: ClaimedSignals = { domain: false, document: false, pres
  * Presence alone, or presence twice, never qualifies.
  */
 export function evaluateBar(claimed: ClaimedSignals): {
+  /** RAW count — used for logic. Three ticked genuinely meets the bar. */
   count: number;
+  /** DISPLAY count, clamped to the bar's size (2). Render this, never `count`. */
+  display: number;
   met: boolean;
   /** Plain sentence naming what is still missing. Empty when the bar is met. */
   missing: string;
@@ -68,7 +71,7 @@ export function evaluateBar(claimed: ClaimedSignals): {
     else if (!hasQualifying) missing = 'Presence on its own is not enough. You will also need a document or a business domain.';
     else if (count === 1) missing = 'One more signal is needed. Add a second, or add presence.';
   }
-  return { count, met, missing };
+  return { count, display: Math.min(count, 2), met, missing };
 }
 
 /**
@@ -104,11 +107,12 @@ export function isFreeEmailDomain(email: string): boolean {
 
 export type PresenceKind = 'website' | 'listing' | 'social' | 'phone';
 
-export const PRESENCE_KINDS: { value: PresenceKind; label: string; placeholder: string }[] = [
-  { value: 'website', label: 'Live website', placeholder: 'https://yourbusiness.com' },
-  { value: 'listing', label: 'Business listing', placeholder: 'Link to your listing or map profile' },
-  { value: 'social', label: 'Social account', placeholder: '@yourhandle or a profile link' },
-  { value: 'phone', label: 'Published phone number', placeholder: 'Include your country code' },
+/** `short` labels the chip; the full `label` labels the field and carries the meaning. */
+export const PRESENCE_KINDS: { value: PresenceKind; label: string; short: string; placeholder: string }[] = [
+  { value: 'website', label: 'Live website', short: 'Website', placeholder: 'https://yourbusiness.com' },
+  { value: 'listing', label: 'Business listing', short: 'Listing', placeholder: 'Link to your listing or map profile' },
+  { value: 'social', label: 'Social account', short: 'Social', placeholder: '@yourhandle or a profile link' },
+  { value: 'phone', label: 'Published phone number', short: 'Phone', placeholder: 'Include your country code' },
 ];
 
 /**
