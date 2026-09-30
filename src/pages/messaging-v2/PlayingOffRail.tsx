@@ -65,7 +65,14 @@ export const PlayingOffRail: React.FC<Props> = ({ members, viewerActorType, view
     return { withIdx, without, idx };
   }, [members, byId]);
 
-  if (ordered.withIdx.length === 0) return null;
+  // Placeholder order while loading: personal members in their existing order,
+  // each showing the em-dash bubble (idx is empty, so tile() renders dashes).
+  const placeholder = useMemo(
+    () => members.filter((m) => m.actor_type === 'personal'),
+    [members],
+  );
+
+  if (!isLoading && ordered.withIdx.length === 0) return null;
 
   const bubbleBase: React.CSSProperties = {
     display: 'inline-block',
