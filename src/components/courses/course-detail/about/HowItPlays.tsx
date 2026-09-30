@@ -9,6 +9,7 @@
  * THE CHART IS LOCAL TO THIS SECTION. Eighteen independent field bars carry an
  * optional amber marker for the viewer on the same per-hole scale. There is no
  * connecting curve: this is a comparison across holes, not a round sequence.
+ * The bars are a single neutral tone — difficulty is carried by height, and amber is reserved for the viewer's own line.
  *
  * STATE A (>= 20 pooled rounds) AND STATE B (1–19) ARE BUILT TOGETHER. Under the
  * threshold there is NO chart, no figures and no distribution: one round's
@@ -59,10 +60,17 @@ const LocalHoleChart: React.FC<{
           const markerBottom = mine == null
             ? null
             : Math.max(0, Math.min(barHeight - 2, (Math.max(0, mine) / maxField) * CHART_HEIGHT));
-          const strong = hole.avg_to_par > 0.6;
-          const overPar = hole.avg_to_par > 0;
 
           return (
+            /* NEUTRAL ON PURPOSE. The bars carried a two-step red keyed on avg_to_par,
+               which is the number the bar HEIGHT already encodes on the same scale — so
+               the colour was a duplicate, not a signal. Worse, that red was A.RED
+               (#E24B3F), which is TOPAR_UNDER_DARK: the same hex as RAMP_TOPAR.birdie in
+               the distribution strip below, where it means the BEST scores. One value
+               cannot mean "hardest hole" here and "birdie" there.
+               Height carries difficulty. Amber carries the viewer. Nothing else is a
+               colour. Do not reintroduce a difficulty hue here — if one is ever wanted,
+               it is DIFFICULTY_RAMP from the analytical tokens and nothing else. */
             <span
               key={hole.hole_no}
               style={{
@@ -71,11 +79,7 @@ const LocalHoleChart: React.FC<{
                 width: '100%',
                 height: barHeight,
                 borderRadius: BAR_RADIUS,
-                background: overPar && !strong
-                  ? `color-mix(in srgb, ${A.RED} 55%, transparent)`
-                  : overPar
-                    ? A.RED
-                    : A.MUTE,
+                background: A.DIM,
                 overflow: 'hidden',
               }}
             >
