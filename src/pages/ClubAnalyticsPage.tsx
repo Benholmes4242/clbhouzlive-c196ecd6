@@ -19,14 +19,15 @@
  */
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
+import { RailChips } from '@/components/ui/RailChips';
+import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import {
-  A, SANS, FIGS, LABEL, BIZ_BODY, BIZ_TITLE, Panel,
+  A, BIZ_BODY, BIZ_TITLE, Panel,
 } from '@/features/courses/components/holes/analytical/tokens';
 import { useClubCourseLink } from '@/features/business/clubAnalytics/useClubCourseLink';
 import { useClubCourseAnalytics } from '@/features/business/clubAnalytics/useClubCourseAnalytics';
@@ -78,73 +79,18 @@ const SectionGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 /* ───────────────────────── ONE COURSE BLOCK ───────────────────────── */
 
 /**
- * §2 — a collapsible block, headed by the course name. It fetches ONLY once it
- * has been opened: `openedOnce` gates the query, so a collapsed block costs
- * nothing.
- *
- * BRIEF_CLUB_COURSES_ROUND_COUNTS §2 — the COLLAPSED head states its round
- * count from `club_courses`, never from a fetch. That count is the whole point
- * of the RPC change; fetching a collapsed course to fill its header would undo
- * it. The EXPANDED header — members, rounds, date range — comes from that
- * course's own response, via SampleSection.
+ * BRIEF_CLUB_COURSES_TO_PILLS_AND_REVIEW_COUNTS — the block has no head. The
+ * course name and round count live in the chip; members, rounds and range live
+ * in The sample. It fetches only the course it is given, so one selection is
+ * one RPC and a re-selected course is served from the react-query cache.
  */
-const CourseBlock: React.FC<{
-  course: ClubCourseRef;
-  open: boolean;
-  onToggle: () => void;
-}> = ({ course, open, onToggle }) => {
-  const [openedOnce, setOpenedOnce] = React.useState(open);
-  React.useEffect(() => {
-    if (open) setOpenedOnce(true);
-  }, [open]);
-
+const CourseBlock: React.FC<{ course: ClubCourseRef }> = ({ course }) => {
   const navigate = useNavigate();
-  const { data: result, isLoading } = useClubCourseAnalytics(course.course_id, openedOnce);
-
+  const { data: result, isLoading } = useClubCourseAnalytics(course.course_id);
 
   return (
-    /* BRIEF_CLUB_ANALYTICS_PAGE_REBUILD §1 — THE BLOCK IS NO LONGER A CARD.
-       It was one tall panel with every section ruled off inside it, which is
-       why the page read as an endless tile. The head is now a bare heading row
-       on the canvas and each section is its own card beneath it. */
     <section>
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          width: '100%',
-          padding: '4px 2px 12px',
-          border: 'none',
-          background: 'transparent',
-          cursor: 'pointer',
-          textAlign: 'left',
-          fontFamily: SANS,
-          ...FIGS,
-        }}
-      >
-        <span style={{ minWidth: 0 }}>
-          <span style={{ ...BIZ_TITLE, display: 'block' }}>{course.course_name}</span>
-          {!open && (
-            <span style={{ ...LABEL, display: 'block', marginTop: 5 }}>
-              {course.rounds.toLocaleString()} {course.rounds === 1 ? 'round' : 'rounds'}
-            </span>
-          )}
-        </span>
-
-        <ChevronDown
-          size={18}
-          color={A.MUTE}
-          style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 160ms ease' }}
-        />
-      </button>
-
-      {open && (
-        /* §1 — 14px between cards, and the cards carry their own 16px padding. */
+        {/* §1 — 14px between cards, and the cards carry their own 16px padding. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {isLoading && (
             <>
@@ -199,7 +145,6 @@ const CourseBlock: React.FC<{
             </>
           )}
         </div>
-      )}
     </section>
   );
 };
@@ -223,7 +168,7 @@ export default function ClubAnalyticsPage() {
   const seedId = link?.state === 'seed' ? link.courseId : undefined;
   const { data: seed, isLoading: seedLoading } = useClubCourseAnalytics(seedId);
 
-  const [openId, setOpenId] = React.useState<string | null>(null);
+  const [selectedId, setSelectedId] = React.useState<string | null>(null);
 
 
   if (businessLoading || linkLoading) {
@@ -326,12 +271,9 @@ export default function ClubAnalyticsPage() {
     ? seed.data.club_courses
     : [{ course_id: seed.data.course_id, course_name: seed.data.course_name, rounds: seed.data.rounds }];
 
-  // §1 — the default-open block is club_courses[0] (ordered rounds DESC, then
-  // name), NOT the seed. The seed only existed to make the first call; if it is
-  // not [0] its response stays in the react-query cache under its own course id,
-  // so expanding that block later costs no request.
-  const defaultOpen = courses[0]?.course_id ?? null;
-  const effectiveOpen = openId ?? defaultOpen;
+  // Default selection is club_courses[0] (rounds DESC, then name), NOT the seed.
+  // The seed's response stays cached under its own id, so choosing it costs nothing.
+  const selected = courses.find((c) => c.course_id === selectedId) ?? courses[0];
 
 
   return (
@@ -344,14 +286,20 @@ export default function ClubAnalyticsPage() {
           </p>
         )}
 
-        {courses.map((c) => (
-          <CourseBlock
-            key={c.course_id}
-            course={c}
-            open={effectiveOpen === c.course_id}
-            onToggle={() => setOpenId(effectiveOpen === c.course_id ? '' : c.course_id)}
+        {courses.length > 1 && (
+          <RailChips
+            options={courses.map((c) => ({
+              id: c.course_id,
+              label: courseNameWithinClub(c.course_name),
+              value: c.rounds,
+            }))}
+            value={selected.course_id}
+            onChange={setSelectedId}
+            ariaLabel="Course"
           />
-        ))}
+        )}
+
+        {selected && <CourseBlock key={selected.course_id} course={selected} />}
 
         <p style={{ ...BIZ_BODY, fontSize: 11.5, margin: 0, color: A.DIM }}>
           Everything on this page is an aggregate across rounds played on your courses. No individual member, round or
