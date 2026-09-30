@@ -9,19 +9,19 @@
  *   - NOTHING IS INVENTED. No placeholder rows, no mock bars, no fabricated
  *     locations. A locked section says what it is waiting for and shows the
  *     member's REAL progress towards it.
- *   - A RATE CARRIES ITS DENOMINATOR, and below RATE_MIN_IMPRESSIONS it is a
- *     whole number with no benchmark, because a benchmark off n=21 is noise.
+ *   - A RATE CARRIES ITS DENOMINATOR, and below RATE_MIN_IMPRESSIONS it is not
+ *     printed at all: the count is stated and the rate is withheld.
  *
  * Type: the shared BUSINESS TYPE SCALE (BIZ_KICKER / BIZ_LABEL / BIZ_TITLE /
  * BIZ_BODY / bizFigure) from analytical/tokens. Nothing here renders at 800.
  */
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Lock, ChevronRight } from 'lucide-react';
 import {
-  AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+  ComposedChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
@@ -29,16 +29,13 @@ import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { useBusinessInsights, deltaPct } from '@/hooks/useBusinessInsights';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { AppLog } from '@/lib/logger';
+import { RailChips } from '@/components/ui/RailChips';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { BIZ } from '@/components/business/businessTokens';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { formatNumber, formatDayMonthShortGB } from '@/i18n/format';
 import {
-  A, RAMP, BIZ_KICKER, BIZ_LABEL, BIZ_TITLE, BIZ_BODY, bizFigure, BIZ_INSET, BIZ_TRACK_H,
+  A, BIZ_KICKER, BIZ_LABEL, BIZ_TITLE, BIZ_BODY, bizFigure, BIZ_INSET, BIZ_TRACK_H,
 } from '@/features/courses/components/holes/analytical/tokens';
 
 type DateRange = '7d' | '30d' | '90d';
@@ -49,8 +46,17 @@ type DateRange = '7d' | '30d' | '90d';
  */
 const DELTA_MIN_BASE = 20;
 
-/** Below this many impressions: whole percent, and NO benchmark comparison. */
+/** Below this many impressions the rate is WITHHELD: the page states the
+ *  impression count and says why, rather than printing a number it disowns. */
 const RATE_MIN_IMPRESSIONS = 500;
+
+/** Below this many total discovery events, rows show counts only - one
+ *  impression is not "100%". */
+const DISCOVERY_MIN_TOTAL = 10;
+
+/** Bar fill on a dark track: ink at reduced alpha, lighter than A.TRACK, so
+ *  the filled part reads as filled rather than as a hole in the track. */
+const BAR_FILL = A.DIM;
 
 const GREEN = A.GREEN;
 const RED = A.RED;
@@ -78,6 +84,7 @@ const SOURCE_LABEL: Record<string, string> = {
 // Reused Reviews section (structure untouched; amber -> neutral ink only)
 // ─────────────────────────────────────────────────────────────
 const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate: (path: string) => void }) => {
+  const { t } = useTranslation('common');
   const { data: reviewStats, isLoading, error, refetch } = useBusinessReviewStats(businessId);
 
   const shell = (children: React.ReactNode) => (
@@ -129,14 +136,14 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
             <span className="tabular-nums" style={bizFigure(30)}>{reviewStats.avgRating}</span>
             <span style={{ ...BIZ_BODY, color: A.DIM }}>/ 10</span>
           </div>
-          <p className="mt-1" style={BIZ_BODY}>{reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}</p>
+          <p className="mt-1" style={BIZ_BODY}>{t('business.insights.reviewsCount', { count: reviewStats.totalReviews, n: formatNum(reviewStats.totalReviews) })}</p>
         </div>
         <div className="flex-1 space-y-1.5">
           {reviewStats.distribution.slice().reverse().map(item => (
             <div key={item.score} className="flex items-center gap-2">
               <span className="text-[11px] w-5 text-right tabular-nums" style={{ color: A.MUTE, ...numFeat }}>{item.score}</span>
               <div className="flex-1 rounded-full overflow-hidden" style={{ height: BIZ_TRACK_H, background: A.TRACK }}>
-                <div className="h-full rounded-full" style={{ width: `${(item.count / maxCount) * 100}%`, background: RAMP.double }} />
+                <div className="h-full rounded-full" style={{ width: `${(item.count / maxCount) * 100}%`, background: BAR_FILL }} />
               </div>
               <span className="text-[11px] w-6 text-right tabular-nums" style={{ color: A.MUTE, ...numFeat }}>{item.count}</span>
             </div>
@@ -191,14 +198,14 @@ const Triangle = ({ up, color }: { up: boolean; color: string }) => (
 );
 
 /**
- * The delta. THE FLOOR LIVES HERE, not in the shared deltaPct helper, which
- * has three other consumers in the admin analytics pages.
- *   prev < DELTA_MIN_BASE -> absolute change ("+12")
+ * The delta. THE FLOOR LIVES HERE, not in the shared deltaPct helper (whose
+ * only consumer is this page).
+ *   prev < DELTA_MIN_BASE -> absolute change WITH its base ("+12 vs 1"), so
+ *                            the unit switch is visible on the surface
  *   prev >= DELTA_MIN_BASE -> percentage, as before
  *   value === prev         -> nothing at all, never "0%"
  */
 const Delta = ({ value, prev }: { value: number; prev: number }) => {
-  if (value == null || prev == null) return null;
   if (value === prev) return null;
 
   const up = value > prev;
@@ -207,10 +214,9 @@ const Delta = ({ value, prev }: { value: number; prev: number }) => {
   let text: string;
   if (prev < DELTA_MIN_BASE) {
     const diff = value - prev;
-    text = `${diff > 0 ? '+' : '\u2212'}${formatNum(Math.abs(diff))}`;
+    text = `${diff > 0 ? '+' : '\u2212'}${formatNum(Math.abs(diff))} vs ${formatNum(prev)}`;
   } else {
-    const pct = deltaPct(value, prev);
-    if (pct === null || Number.isNaN(pct)) return null;
+    const pct = deltaPct(value, prev) as number;
     const abs = Math.abs(pct);
     text = `${pct >= 0 ? '+' : '\u2212'}${abs.toFixed(abs >= 10 ? 0 : 1)}%`;
   }
@@ -283,16 +289,18 @@ const InsetMessage = ({ title, body }: { title?: string; body: string }) => (
 // Section: Visits over time
 // ─────────────────────────────────────────────────────────────
 const VisitsChart = ({ data, emptyLabel }: { data: { day: string; total: number; unique: number }[]; emptyLabel: string }) => {
-  const hasData = data.some(d => d.total > 0 || d.unique > 0);
+  const gradId = `visitsInk-${useId().replace(/:/g, '')}`;
+  // ABSENCE of rows is "no data"; a gap-filled series of zeros is a fact.
+  const hasData = data.length > 0;
   if (!hasData) return <ChartInset height={220} center><InsetMessage body={emptyLabel} /></ChartInset>;
   const rows = data.map(d => ({ day: formatDay(d.day), Total: d.total, Unique: d.unique }));
   return (
     <ChartInset height={220}>
       <div style={{ width: '100%', height: 204 }}>
         <ResponsiveContainer>
-          <AreaChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+          <ComposedChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <defs>
-              <linearGradient id="visitsInk" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={A.INK} stopOpacity={0.18} />
                 <stop offset="100%" stopColor={A.INK} stopOpacity={0} />
               </linearGradient>
@@ -302,9 +310,9 @@ const VisitsChart = ({ data, emptyLabel }: { data: { day: string; total: number;
             <YAxis tick={{ fill: A.MUTE, fontSize: 10 /* AXIS floor 10: chart tick, a coordinate */ }} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
             <Tooltip contentStyle={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8, fontSize: 12, color: A.INK }} labelStyle={{ color: A.MUTE }} />
             <Legend wrapperStyle={{ fontSize: 11, color: A.MUTE }} iconType="circle" iconSize={8} />
-            <Area type="monotone" dataKey="Total" stroke={A.INK} strokeWidth={2} fill="url(#visitsInk)" />
+            <Area type="monotone" dataKey="Total" stroke={A.INK} strokeWidth={2} fill={`url(#${gradId})`} />
             <Line type="monotone" dataKey="Unique" stroke={A.MUTE} strokeWidth={1.75} dot={false} />
-          </AreaChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     </ChartInset>
@@ -323,16 +331,19 @@ const DiscoveryBars = ({ sources, emptyLabel }: { sources: { source: string; cou
       <div className="space-y-3 p-2.5">
         {rows.map(r => {
           const pct = (r.count / total) * 100;
+          const showPct = total >= DISCOVERY_MIN_TOTAL;
           return (
             <div key={r.source}>
               <div className="flex items-baseline justify-between mb-1.5">
                 <span style={{ fontSize: 13, fontWeight: 500, color: A.INK }}>{SOURCE_LABEL[r.source] ?? r.source}</span>
                 <span className="tabular-nums" style={{ fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, ...numFeat }}>
-                  {pct.toFixed(0)}% <span style={{ fontWeight: 400, color: A.MUTE }}>&middot; {formatNum(r.count)}</span>
+                  {showPct
+                    ? <>{pct.toFixed(0)}% <span style={{ fontWeight: 400, color: A.MUTE }}>&middot; {formatNum(r.count)}</span></>
+                    : formatNum(r.count)}
                 </span>
               </div>
               <div className="rounded-full overflow-hidden" style={{ height: BIZ_TRACK_H, background: A.TRACK }}>
-                <div className="h-full rounded-full" style={{ width: `${pct}%`, background: RAMP.double }} />
+                <div className="h-full rounded-full" style={{ width: `${pct}%`, background: BAR_FILL }} />
               </div>
             </div>
           );
@@ -348,7 +359,8 @@ const DiscoveryBars = ({ sources, emptyLabel }: { sources: { source: string; cou
 const FollowersChart = ({ data, emptyTitle, emptyBody }: {
   data: { day: string; count: number }[]; emptyTitle: string; emptyBody: string;
 }) => {
-  const hasData = data.some(d => d.count > 0);
+  // ABSENCE of rows is "no data"; a flat zero line is the truthful answer.
+  const hasData = data.length > 0;
   if (!hasData) {
     return (
       <ChartInset height={200} center>
@@ -382,6 +394,7 @@ const TopPosts = ({ items, onOpen, emptyLabel }: {
   onOpen: (postId: string) => void;
   emptyLabel: string;
 }) => {
+  const { t } = useTranslation('common');
   if (items.length === 0) return <ChartInset height={140} center><InsetMessage body={emptyLabel} /></ChartInset>;
   return (
     <ul className="divide-y" style={{ borderColor: BIZ.hairSoft }}>
@@ -397,9 +410,9 @@ const TopPosts = ({ items, onOpen, emptyLabel }: {
                 {stripMentionMarkup(p.content_preview ?? '').trim() || 'Untitled post'}
               </p>
               <div className="mt-1 flex items-center gap-3 tabular-nums" style={{ fontSize: 11.5, color: A.MUTE, ...numFeat }}>
-                <span>{formatNum(p.impressions)} impressions</span>
-                <span>{formatNum(p.likes)} likes</span>
-                <span>{formatNum(p.comments)} comments</span>
+                <span>{t('business.insights.topPosts.impressions', { count: p.impressions, n: formatNum(p.impressions) })}</span>
+                <span>{t('business.insights.topPosts.likes', { count: p.likes, n: formatNum(p.likes) })}</span>
+                <span>{t('business.insights.topPosts.comments', { count: p.comments, n: formatNum(p.comments) })}</span>
               </div>
             </div>
             <ChevronRight className="h-4 w-4 mt-1 flex-shrink-0" style={{ color: A.DIM }} />
@@ -418,7 +431,6 @@ const BusinessInsightsPageV2 = () => {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
   const [dateRange, setDateRange] = useState<DateRange>('30d');
-  const { user } = useSupabaseSession();
 
   useHideBottomNav();
   const { data: business, isLoading: businessLoading } = useBusinessProfile(id);
@@ -426,14 +438,6 @@ const BusinessInsightsPageV2 = () => {
   const { data: insights, isLoading: insightsLoading } = useBusinessInsights(business?.id, dateRange);
 
   const isLoading = businessLoading || membershipLoading;
-
-  useEffect(() => {
-    if (business?.id && !isLoading) {
-      trackBusinessProfileVisit(business.id, user?.id, 'direct', { page: 'insights' }).catch(err => {
-        AppLog.error('[BusinessInsightsPageV2]', 'Failed to track visit:', err);
-      });
-    }
-  }, [business?.id, user?.id, isLoading]);
 
   useEffect(() => {
     // eslint-disable-next-line settled/no-not-loading-empty-check -- the branch already requires membershipFetched.
@@ -473,12 +477,14 @@ const BusinessInsightsPageV2 = () => {
     );
   }
 
+  // TERMINAL, not a skeleton: the redirect effect above normally moves the
+  // viewer on, but this state must never be able to hang.
   if (!membership?.canViewInsights) {
     return (
       <ManagePageShell title="Insights">
-        <div className="space-y-4 px-4 pt-4">
-          <Skeleton className="h-32 rounded-2xl" />
-          <Skeleton className="h-24 rounded-2xl" />
+        <div className="max-w-xl mx-auto mt-10 text-center px-4">
+          <p style={BIZ_BODY}>You don't have access to this business's insights.</p>
+          <Button onClick={() => navigate(`/business/${id}`, { replace: true })} className="mt-4 border-0" style={{ background: A.INK, color: A.CANVAS }}>Back to profile</Button>
         </div>
       </ManagePageShell>
     );
@@ -489,35 +495,19 @@ const BusinessInsightsPageV2 = () => {
 
   const rangePicker = (
     <div className="flex justify-center pb-3">
-      <div className="inline-flex rounded-full p-1" style={{ border: `1px solid ${A.BORDER}`, background: A.PANEL }}>
-        {(['7d', '30d', '90d'] as DateRange[]).map(range => {
-          const active = dateRange === range;
-          return (
-            <button
-              key={range}
-              onClick={() => setDateRange(range)}
-              className={cn('px-3.5 md:px-4 rounded-full transition-colors flex items-center justify-center')}
-              // A filled button is INK. Amber means the viewing member.
-              style={{
-                minHeight: 40,
-                fontSize: 13,
-                fontWeight: active ? 700 : 500,
-                letterSpacing: '-0.01em',
-                ...(active ? { background: A.INK, color: A.CANVAS } : { color: A.MUTE, background: 'transparent' }),
-              }}
-            >
-              {rangeLabels[range]}
-            </button>
-          );
-        })}
-      </div>
+      <RailChips
+        options={(['7d', '30d', '90d'] as DateRange[]).map(r => ({ id: r, label: rangeLabels[r] }))}
+        value={dateRange}
+        onChange={(next) => setDateRange(next as DateRange)}
+        ariaLabel="Date range"
+      />
     </div>
   );
 
   return (
     <ManagePageShell title="Insights" belowTitle={rangePicker}>
 
-      <div className="max-w-[1024px] mx-auto px-4 md:px-6 py-6 space-y-5 md:space-y-6">
+      <div className="mx-auto px-4 md:px-6 py-6 space-y-5 md:space-y-6">
         {/* ── OVERVIEW: ONE panel, one grid, no per-cell chrome ── */}
         <section className="rounded-[18px] p-4 md:p-5" style={cardStyle}>
           <p style={{ ...BIZ_KICKER, marginBottom: 18 }}>OVERVIEW</p>
@@ -613,7 +603,8 @@ const BusinessInsightsPageV2 = () => {
             )}
         </InsightCard>
 
-        {/* ── ENGAGEMENT: the rate carries its denominator ── */}
+        {/* ── ENGAGEMENT: the rate carries its denominator, and below the
+            floor it is withheld - the count is stated, the rate is not. ── */}
         <section className="rounded-[18px] p-4 md:p-5" style={cardStyle}>
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -621,27 +612,34 @@ const BusinessInsightsPageV2 = () => {
               <h3 style={BIZ_TITLE}>Engagement rate</h3>
             </div>
             <div className="text-right">
-              {engagement !== null && (
+              {insightsLoading ? (
+                <Skeleton className="h-7 w-14" />
+              ) : engagement !== null && engagement.impressions >= RATE_MIN_IMPRESSIONS ? (
                 <>
-                  <p className="tabular-nums" style={bizFigure(24)}>
-                    {engagement.impressions < RATE_MIN_IMPRESSIONS
-                      ? `${Math.round(engagement.rate)}%`
-                      : `${engagement.rate.toFixed(1)}%`}
-                  </p>
+                  <p className="tabular-nums" style={bizFigure(24)}>{`${engagement.rate.toFixed(1)}%`}</p>
                   <p style={{ ...BIZ_LABEL, marginTop: 6 }}>
                     {t('business.insights.rate.from', { count: engagement.impressions, n: formatNum(engagement.impressions) })}
                   </p>
                 </>
-              )}
+              ) : engagement !== null ? (
+                <>
+                  <p className="tabular-nums" style={bizFigure(24)}>{formatNum(engagement.impressions)}</p>
+                  <p style={{ ...BIZ_LABEL, marginTop: 6 }}>{t('business.insights.rate.impressionsLabel')}</p>
+                </>
+              ) : null}
             </div>
           </div>
-          <p style={{ ...BIZ_BODY, marginTop: 10 }}>
-            {engagement === null
-              ? t('business.insights.rate.none')
-              : engagement.impressions < RATE_MIN_IMPRESSIONS
-                ? t('business.insights.rate.tooFew')
-                : t('business.insights.rate.benchmark')}
-          </p>
+          {insightsLoading ? (
+            <Skeleton className="h-4 w-3/4 mt-3" />
+          ) : (
+            <p style={{ ...BIZ_BODY, marginTop: 10 }}>
+              {engagement === null
+                ? t('business.insights.rate.none')
+                : engagement.impressions < RATE_MIN_IMPRESSIONS
+                  ? t('business.insights.rate.tooFew')
+                  : t('business.insights.rate.benchmark')}
+            </p>
+          )}
         </section>
 
         {/* ── REPUTATION (course-linked only) ── */}
