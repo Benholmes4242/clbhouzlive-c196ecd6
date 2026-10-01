@@ -28,7 +28,7 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores, OverallScoreLine } from '../CategoryScores';
-import AboutSection, { ABOUT_KICKER, AboutHairline } from './AboutSection';
+import AboutSection, { AboutHairline } from './AboutSection';
 
 export { SETTLED_MIN_RATINGS } from '../CategoryScores';
 
