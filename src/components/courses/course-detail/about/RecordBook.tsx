@@ -280,7 +280,10 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
     isViewer(r) ? t('courseDetail.records.you') : r.user_display_name ?? 'Golfer';
   return (
     <AboutSection heading={heading} meta={meta}>
-      <div style={{ display: 'grid' }}>
+      {/* BRIEF_RECORD_BOOK_NO_ROW_RULES: no row rules. The old 11px padding only
+          held text off each row's own rule; with no rule it moves into an 18px
+          gap, so all separation sits BETWEEN rows and each row reads as one block. */}
+      <div style={{ display: 'grid', gap: 18 }}>
         {previewRows.map(({ category, row, rows }) => {
           const isYou = rows.some(isViewer);
           const shared = rows.length > 1;
@@ -299,8 +302,7 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
                 textAlign: 'left',
                 background: 'transparent',
                 border: 0,
-                borderBottom: `1px solid ${A.HAIRLINE}`,
-                padding: '11px 0',
+                padding: '4px 0',
                 cursor: 'pointer',
                 fontFamily: SANS,
               }}
