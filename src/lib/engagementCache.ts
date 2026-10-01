@@ -222,5 +222,5 @@ export function seedViewerInLikers(
   }
   const rest = prev.filter((l) => !isMe(l));
   queryClient.setQueryData<PostLiker[]>(key, liked ? [me, ...rest] : rest);
-  return () => queryClient.setQueryData(key, prev);
+  return () => queryClient.setQueryData<PostLiker[]>(key, prev);
 }
