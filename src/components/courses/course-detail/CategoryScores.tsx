@@ -84,10 +84,11 @@ export const OverallScoreLine: React.FC<{ score: number; ratingCount: number }> 
       <span style={{ ...FIGS, flexShrink: 0, fontSize: 38, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: tone }}>
         {score.toFixed(1)}
       </span>
-      <span style={{ minWidth: 0, fontSize: 11.5, fontWeight: 600, lineHeight: 1.35, color: A.MUTE }}>
-        {settled ? <span style={{ color: tone }}>{getRatingTierLabel(score)} · </span> : null}
-        overall
-      </span>
+      {settled ? (
+        <span style={{ minWidth: 0, fontSize: 11.5, fontWeight: 600, lineHeight: 1.35, color: tone }}>
+          {getRatingTierLabel(score)}
+        </span>
+      ) : null}
     </div>
   );
 };
