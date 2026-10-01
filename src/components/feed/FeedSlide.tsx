@@ -511,6 +511,13 @@ const FullscreenVideoSlot: React.FC<{
     onEnded,
   });
 
+  // Borrowed lane: forward loop + ended to the lane actually playing. Inert
+  // when not borrowing. Handback restores loop=true in the engine.
+  useLaneEnded(isBorrowSlide && borrow ? (borrow.laneId as LaneId) : null, onEnded);
+  useEffect(() => {
+    if (isBorrowSlide && borrow) VideoEngine.setLoop(borrow.laneId as LaneId, loop);
+  }, [isBorrowSlide, borrow?.laneId, loop]);
+
   // Autoplay-blocked → show "Tap for sound" pill. The engine's unmuted
   // rejection path muted THIS lane to keep playback going but did NOT
   // touch the session store. Tapping the pill re-asserts unmute with a

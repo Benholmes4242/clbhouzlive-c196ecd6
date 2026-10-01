@@ -202,8 +202,9 @@ function createLaneElement(laneId: LaneId): HTMLVideoElement {
   el.playsInline = true;
   el.muted = true;
 
-  // Loop is JS-driven (lane.loop) so 'ended' fires and can be observed.
-  el.loop = false;
+  // Native loop on by default; the attribute follows lane.loop (setLoop/load),
+  // so only lanes explicitly set to loop=false ever fire 'ended'.
+  el.loop = true;
   // 'auto' is load-bearing on the NATIVE HLS path (iOS/WKWebView, where
   // Hls.isSupported() is false): with 'metadata' the element fetches only the
   // manifest + init segment and refuses to buffer media until play() is
@@ -417,6 +418,10 @@ class VideoEngineImpl {
     const s = useFullscreenFeedStore.getState();
     const next = { isOpen: !!s.isOpen, borrowLaneId: (s.borrow?.laneId ?? null) as LaneId | null };
     if (next.isOpen === this.lastFsSnapshot.isOpen && next.borrowLaneId === this.lastFsSnapshot.borrowLaneId) return;
+    // Handback: a borrowed lane always returns to its card looping.
+    if (this.lastFsSnapshot.borrowLaneId && this.lastFsSnapshot.borrowLaneId !== next.borrowLaneId) {
+      this.setLoop(this.lastFsSnapshot.borrowLaneId, true);
+    }
     this.lastFsSnapshot = next;
     this.reconcileAudio('overlay-change');
   };
@@ -563,6 +568,7 @@ class VideoEngineImpl {
   setLoop(laneId: LaneId, loop: boolean): void {
     const lane = this.getLane(laneId);
     lane.loop = loop;
+    lane.el.loop = lane.loop;
   }
 
   setAudioPolicy(laneId: LaneId, policy: LaneAudioPolicy): void {
@@ -677,7 +683,7 @@ class VideoEngineImpl {
     opts: { hlsUrl: string; posterUrl?: string | null; startPosition?: number; postId?: string | null; loop?: boolean }
   ): void {
     const lane = this.getLane(laneId);
-    if (typeof opts.loop === 'boolean') lane.loop = opts.loop;
+    if (typeof opts.loop === 'boolean') { lane.loop = opts.loop; lane.el.loop = lane.loop; }
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
     // [TRACE] engine.load — one line per load() call, before any decisions.
     {
