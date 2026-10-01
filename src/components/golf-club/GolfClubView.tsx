@@ -460,14 +460,6 @@ const CELL_LABEL: React.CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
-/** Round FIRST, then decide direction — otherwise -0.04 prints as "-0.0". */
-const signedToPar = (raw: number): string => {
-  const v = Math.round(raw * 10) / 10;
-  if (v > 0) return `+${v.toFixed(1)}`;
-  if (v < 0) return `-${Math.abs(v).toFixed(1)}`;
-  return 'E';
-};
-
 const HeroStatCell: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, whiteSpace: 'nowrap' }}>
     <span style={CELL_LABEL}>{label}</span>
