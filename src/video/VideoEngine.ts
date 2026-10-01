@@ -1037,7 +1037,7 @@ class VideoEngineImpl {
     const lane = this.getLane(laneId);
     // Paused neighbours buffer a short lead only; play() restores the full
     // forward buffer when the lane is promoted. hls.js reads this per check.
-    if (lane.hls && laneId !== 'fullscreen') {
+    if (lane.hls && laneId.startsWith('feed-')) {
       try { lane.hls.config.maxBufferLength = FEED_PRELOAD_MAX_BUFFER_S; } catch { /* noop */ }
     }
     if (!lane.el.paused) lane.el.pause();
@@ -1256,7 +1256,7 @@ class VideoEngineImpl {
 
   play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean } = {}): Promise<void> {
     const lane = this.getLane(laneId);
-    if (lane.hls && laneId !== 'fullscreen') {
+    if (lane.hls && laneId.startsWith('feed-')) {
       try { lane.hls.config.maxBufferLength = FEED_ACTIVE_MAX_BUFFER_S; } catch { /* noop */ }
     }
     const caller = opts.callerPostId ?? null;
