@@ -222,11 +222,11 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   const activeChampionMemberIds = activeChampionEntry?.team?.members
     ?.map((member: any) => member.player?.id)
     .filter((id: unknown): id is string => typeof id === 'string' && id.length > 0) ?? [];
-  // A wrapped champion name may grow beyond STRIP_HEIGHT, so the completed
-  // frame follows its content rather than clipping against a guessed height.
-  const activeHeroHeight = height ?? (active.type === 'completed' && (active.tournament.winnerName || activeChampionEntry)
-    ? 'auto'
-    : OVERVIEW_HERO_TOTAL_HEIGHT);
+  // The frame follows its content in every state (wrapped champion name,
+  // rotation line, whatever comes next). An explicit `height` prop still
+  // sizes a specific slot. The photo band is only a FLOOR, so the
+  // wait-mode crossfade never collapses the frame between slides.
+  const activeHeroHeight = height ?? 'auto';
 
   // Chevron UI removed per micro-brief; swipe is the sole gesture and
   // goPrev/goNext are retained for keyboard/a11y and COMMAND-jump paths.
@@ -238,7 +238,13 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   return (
     <>
     <div
-      style={{ position: 'relative', width: '100%', height: activeHeroHeight }}
+      data-overview-hero-frame
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: activeHeroHeight,
+        minHeight: height === undefined ? OVERVIEW_HERO_TOTAL_HEIGHT : undefined,
+      }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
