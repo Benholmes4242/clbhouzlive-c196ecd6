@@ -989,7 +989,7 @@ export function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, onOpenEx
       }
       toast.success(`"${form.name}" created`);
       clearDraft(draftKey);
-      const keepOpen = (await onCreated({ id: created.id, name: created.name ?? form.name })) === false;
+      const keepOpen = (await onCreated({ id: created.id, name: form.name.trim() })) === false;
       if (!keepOpen) onClose();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to create course');
