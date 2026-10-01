@@ -29,7 +29,7 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
-import AllHolesSheet from './AllHolesSheet';
+import AllHolesSheet, { CompactHoleRow } from './AllHolesSheet';
 
 const CHART_HEIGHT = 82;
 
