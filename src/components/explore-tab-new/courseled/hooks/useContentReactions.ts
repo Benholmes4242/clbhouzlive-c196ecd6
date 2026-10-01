@@ -4,7 +4,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
-import { patchEngagement } from '@/lib/engagementCache';
+import { patchEngagement, seedViewerInLikers } from '@/lib/engagementCache';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 /**
  * useContentReactions (BRIEF_DISCOVER_REACTIONS, section 3).
@@ -80,6 +81,7 @@ export function useContentReactions(
   const { user } = useSupabaseSession();
   const viewerId = user?.id ?? null;
   const queryClient = useQueryClient();
+  const { availableActors } = useActiveActor();
 
   // Stable key: the sorted set of ids in the visible window.
   const ids = useMemo(() => {
@@ -165,7 +167,7 @@ export function useContentReactions(
      * and the whole family is invalidated on settle.
      */
     onMutate: ({ type, id, mine }) => {
-      if (!viewerId) return { previous: [] as [readonly unknown[], CacheShape | undefined][] };
+      if (!viewerId) return { previous: [] as [readonly unknown[], CacheShape | undefined][], revertLikers: undefined as undefined | (() => void) };
       const entries = queryClient.getQueriesData<CacheShape>({ queryKey: ['content-reactions'] });
       const previous: [readonly unknown[], CacheShape | undefined][] = [];
       for (const [key, prev] of entries) {
@@ -188,14 +190,34 @@ export function useContentReactions(
           likeCountDelta: mine ? -1 : +1,
         });
       }
-      return { previous };
+      // Viewer seed — content_reactions are always personal; source is the
+      // target type ('round' | 'review'). Stories have no likers list.
+      let revertLikers: undefined | (() => void);
+      if (type === 'round' || type === 'review') {
+        const me = availableActors.find((x) => x.type === 'personal');
+        revertLikers = seedViewerInLikers(queryClient, id, type, {
+          userId: viewerId,
+          actorType: 'personal',
+          actorId: viewerId,
+          name: me?.name ?? null,
+          avatarUrl: me?.avatarUrl ?? null,
+        }, !mine);
+      }
+      return { previous, revertLikers };
     },
     onError: (_err, _vars, ctx) => {
       for (const [key, prev] of ctx?.previous ?? []) queryClient.setQueryData(key, prev);
+      ctx?.revertLikers?.();
       toast.error('Could not save that reaction. Please try again.');
     },
-    onSettled: () => {
+    onSettled: (_d, _e, vars) => {
+      // TWO READINGS OF ONE FACT: ['content-reactions'] and ['post-likes'] both
+      // report this like — refresh them together, by prefix (no source), from
+      // both write paths.
       queryClient.invalidateQueries({ queryKey: ['content-reactions'] });
+      queryClient.invalidateQueries({ queryKey: ['post-likes', vars.id] });
+      const postId = options.postIdFor?.(vars.id);
+      if (postId) queryClient.invalidateQueries({ queryKey: ['post-likes', postId] });
     },
   });
 
