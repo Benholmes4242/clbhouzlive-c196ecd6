@@ -14,12 +14,15 @@
  *     - LEFT: 40px squircle avatar + column (name · [time · FollowPill] ·
  *       caption · read review › · likers row). The likers row is LikedByRow
  *       with avatarRing="media"; it reserves its full size at first paint.
- *     - CENTER: segmented carousel dots (white active)
  *     - RIGHT: vertical action rail (mute, heart, comment, send, more)
  *     - BOTTOM-MOST: the comment bar (viewer avatar + "Add a comment…"),
- *       above FullscreenScrubber, which keeps the true bottom edge. When the
- *       bar renders, the author column, dots and rail are lifted by
- *       COMMENT_BAR_LIFT; when it does not, they sit exactly where they did.
+ *       clamped to the physical bottom edge as an opaque bar. When it
+ *       renders, the author column and rail clear it by COMMENT_BAR_BLOCK;
+ *       when it does not, they sit on the safe-area floor. There are no
+ *       bottom carousel dots and no bottom scrubber bar.
+ *   TOP STRIP: FullscreenTopProgress — a segmented strip carrying carousel
+ *   position and video progress (not draggable; no seeking). The top chrome
+ *   row is pushed down to clear it whenever it renders (showsTopProgress).
  *
  * THE COMMENT BAR IS A BUTTON, NOT AN INPUT. It opens CommentsSheetV2 with its
  * composer focused and contains no input/textarea/contentEditable, because a
@@ -28,7 +31,7 @@
  * lockFullscreenViewportScroll exists for) and would be a second composer.
  * Do not "fix" it into a real field.
  *
- * NO fade-on-idle. NO carousel dots at top. NO score eyebrow. Course chip in
+ * NO fade-on-idle. NO score eyebrow. Course chip in
  * the top-right is the ONLY score surface.
  */
 import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -41,7 +44,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { triggerHaptic } from '@/lib/ui/haptics';
-import { CarouselDots } from '@/components/media/CarouselDots';
+import { FullscreenTopProgress, showsTopProgress } from './FullscreenTopProgress';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 
@@ -63,9 +66,9 @@ const CHEVRON_BG = 'rgba(0,0,0,0.32)';
 const CHIP_BG = 'rgba(0,0,0,0.40)';
 const ICON_SHADOW = 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))';
 const TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.55)';
-/* The comment bar's block height plus breathing room. Everything that used
-   to anchor to the bottom edge is lifted by exactly this. */
-const COMMENT_BAR_LIFT = 48;
+/* The clamped comment bar's real block height: 11px top padding + 38px field
+   + 10px bottom padding = 59, plus the safe area. Change these together. */
+const COMMENT_BAR_BLOCK = 'calc(59px + env(safe-area-inset-bottom, 0px))';
 
 function formatCount(n: number | null | undefined): string | null {
   if (n === null || n === undefined || n === 0) return null;
@@ -360,7 +363,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // Same guard the rail's comment glyph uses (!readOnly), plus a signed-in
   // actor to comment as.
   const showCommentBar = !readOnly && !!activeActor && !!onCompose;
-  const lift = showCommentBar ? ` + ${COMMENT_BAR_LIFT}px` : '';
+  const bottomAnchor = (gap: number) => showCommentBar
+    ? `calc(${COMMENT_BAR_BLOCK} + ${gap}px)`
+    : `calc(max(env(safe-area-inset-bottom, 0px), 24px) + ${gap}px)`;
+  const showTopStrip = showsTopProgress(activePost);
   const likeStr = formatCount(likeState.count);
   const commentStr = formatCount(commentCount);
   const timeLabel = timeAgo(activePost.createdAt);
@@ -374,6 +380,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
+      <FullscreenTopProgress activePost={activePost} />
       {/* Top scrim removed — chrome sits directly on the blurred media
           backdrop. Text/icons carry their own drop-shadow for legibility. */}
       <div
@@ -384,7 +391,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           right: 0,
           zIndex: Z.echo + 2,
           pointerEvents: 'none',
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 48px) + 8px)',
+          paddingTop: showTopStrip ? 'calc(max(env(safe-area-inset-top, 0px), 44px) + 19px)' : 'calc(max(env(safe-area-inset-top, 0px), 48px) + 8px)',
           paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
           paddingRight: 'max(14px, env(safe-area-inset-right, 0px))',
           paddingBottom: 10,
@@ -500,27 +507,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       {/* Bottom scrim removed — author strip + action rail sit on the
           blurred backdrop; each element carries its own drop-shadow. */}
 
-      {/* Carousel dots — bottom-center, above scrubber (~16px from bottom) */}
-      {mediaCount > 1 && (
-        <div
-          style={{
-            position: 'fixed',
-            left: 0, right: 0,
-            bottom: `calc(max(env(safe-area-inset-bottom, 0px), 12px) + 12px${lift})`,
-            display: 'flex', justifyContent: 'center',
-            pointerEvents: 'none',
-            zIndex: Z.echo + 1,
-          }}
-        >
-          <CarouselDots count={mediaCount} active={carouselSlide} tone="light" isVisible />
-        </div>
-      )}
-
       {/* Bottom-LEFT — author + info stack */}
       <div
         style={{
           position: 'fixed',
-          bottom: `calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px${lift})`,
+          bottom: bottomAnchor(26),
           left: 'max(14px, env(safe-area-inset-left, 0px))',
           right: 64, // reserve space for right rail
           zIndex: Z.echo,
@@ -653,7 +644,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         style={{
           position: 'fixed',
           right: 'max(12px, env(safe-area-inset-right, 0px))',
-          bottom: `calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px${lift})`,
+          bottom: bottomAnchor(26),
           zIndex: Z.echo,
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           gap: 20, pointerEvents: 'none',
@@ -713,13 +704,17 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           style={{
             position: 'fixed',
             left: 0, right: 0,
-            bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 12px) + 14px)',
-            zIndex: Z.echo,
+            bottom: 0,
+            zIndex: Z.echo + 1,
             display: 'flex', alignItems: 'center', gap: 9,
-            minHeight: 44,
+            background: 'rgba(10,10,12,0.92)',
+            backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
+            borderTop: '0.5px solid rgba(255,255,255,0.10)',
+            paddingTop: 11,
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
             paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
             paddingRight: 'max(14px, env(safe-area-inset-right, 0px))',
-            background: 'transparent', border: 'none', margin: 0,
+            borderLeft: 'none', borderRight: 'none', borderBottom: 'none', margin: 0,
             cursor: 'pointer', pointerEvents: 'auto', textAlign: 'left',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           }}
@@ -742,9 +737,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           <span
             style={{
               flex: 1, minWidth: 0, height: 38, borderRadius: 12,
-              background: 'rgba(255,255,255,0.12)',
-              border: '1px solid rgba(255,255,255,0.18)',
-              backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+              background: 'rgba(255,255,255,0.10)',
+              border: '1px solid rgba(255,255,255,0.14)',
               padding: '0 13px', boxSizing: 'border-box',
               display: 'flex', alignItems: 'center',
               fontSize: 13, color: 'rgba(255,255,255,0.62)',
