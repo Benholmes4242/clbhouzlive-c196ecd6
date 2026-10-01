@@ -16,6 +16,8 @@ export interface CompressionOptions {
   maxWidthOrHeight?: number;
   quality?: number;
   preserveExif?: boolean;
+  /** Output type; defaults to the input file's type. */
+  fileType?: 'image/jpeg' | 'image/png' | 'image/webp';
 }
 
 export interface CompressionResult {
@@ -37,6 +39,7 @@ export const COMPRESSION_PRESETS = {
     maxSizeMB: 2,
     maxWidthOrHeight: 2048,
     quality: 0.85,
+    fileType: 'image/webp',
   },
   
   // For profile pictures - smaller size
@@ -61,7 +64,7 @@ export const COMPRESSION_PRESETS = {
   },
 } as const;
 
-const DEFAULT_OPTIONS: Required<CompressionOptions> = {
+const DEFAULT_OPTIONS: Required<Omit<CompressionOptions, 'fileType'>> = {
   maxSizeMB: 2,
   maxWidthOrHeight: 2048,
   quality: 0.85,
@@ -90,7 +93,7 @@ export async function compressImage(
   const originalDimensions = await getImageDimensions(file);
   
   // Skip compression for small images or if already small enough
-  if (originalSize < COMPRESSION_THRESHOLD_BYTES) {
+  if (originalSize < COMPRESSION_THRESHOLD_BYTES && (!options.fileType || options.fileType === file.type)) {
     console.log(`[ImageCompression] Skipping ${file.name}: already small (${formatBytes(originalSize)})`);
     console.log('[UPLOAD/COMPRESS] ok', {
       name: file.name, outSize: originalSize, wasCompressed: false,
@@ -115,7 +118,7 @@ export async function compressImage(
       useWebWorker: true,
       preserveExif: mergedOptions.preserveExif,
       initialQuality: mergedOptions.quality,
-      fileType: file.type as 'image/jpeg' | 'image/png' | 'image/webp',
+      fileType: options.fileType ?? (file.type as 'image/jpeg' | 'image/png' | 'image/webp'),
     });
     
     const compressedSize = compressedFile.size;

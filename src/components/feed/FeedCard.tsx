@@ -41,6 +41,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
+import { postImageProps } from '@/utils/imageSrc';
 import { useNavigate } from 'react-router-dom';
 import { MediaCarousel } from './MediaCarousel';
 import { useClubhouseStore } from '@/store/clubhouseStore';
@@ -553,7 +554,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onClick={() => onProfile(post)}
           style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
         >
-          <SquircleAvatar src={buildImageThumbnailUrl(post.avatarUrl, { width: 72, height: 72 })} alt={post.displayName} userId={post.actorId ?? post.userId} size={34} hairlineRing />
+          <SquircleAvatar src={buildImageThumbnailUrl(post.avatarUrl, { width: 72 * (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1) })} alt={post.displayName} userId={post.actorId ?? post.userId} size={34} hairlineRing />
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
           <button
@@ -814,9 +815,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   )}
                   <img
                     ref={isFirstCard ? primaryImgRef : undefined}
-                    src={mediaUrl}
+                    {...postImageProps(mediaUrl)}
                     alt={post.caption || post.displayName}
                     loading="lazy"
+                    decoding="async"
+                    {...(isActive ? { fetchpriority: 'high' } : {})}
 
                     style={{
                       position: 'absolute',

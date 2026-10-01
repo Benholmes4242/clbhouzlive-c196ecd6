@@ -54,7 +54,10 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     // Threaded through so AnimatedTileThumb can request the animated variant.
     streamId: streamId ?? undefined,
     width: row.width || 1080,
-    height: row.height || 1920,
+    height: row.height
+      || (row.aspect_ratio && Number(row.aspect_ratio) > 0
+        ? Math.round((row.width || 1080) / Number(row.aspect_ratio))
+        : 1920),
     duration: row.duration_seconds ? Number(row.duration_seconds) : undefined,
     displayOrder: row.display_order || 0,
     isProcessing: isVideo && !videoReady,

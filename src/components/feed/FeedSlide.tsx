@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { postImageProps } from '@/utils/imageSrc';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { FeedImageCarousel } from './FeedImageCarousel';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
@@ -304,11 +305,12 @@ export const FeedSlide = memo(function FeedSlide({
           >
             <img
               ref={imgRef}
-              src={imgSrc}
+              {...postImageProps(imgSrc)}
               alt=""
               className="w-full h-full"
               style={{ objectFit }}
               loading="eager"
+              decoding="async"
               draggable={false}
             />
           </div>
@@ -441,11 +443,12 @@ const FullscreenImageSlot: React.FC<{
       >
         <img
           ref={imgRef}
-          src={imgSrc}
+          {...postImageProps(imgSrc)}
           alt=""
           className="w-full h-full"
           style={{ objectFit: fsRect.fit }}
           loading="eager"
+          decoding="async"
           draggable={false}
         />
       </div>
@@ -1849,11 +1852,12 @@ const FullscreenPagerPage: React.FC<{
         >
           <img
             ref={imgRef}
-            src={imgSrc}
+            {...postImageProps(imgSrc)}
             alt=""
             className="w-full h-full"
             style={{ objectFit: imgRect.fit }}
             loading={isActivePage ? 'eager' : 'lazy'}
+            decoding="async"
             draggable={false}
           />
         </div>
@@ -1897,7 +1901,7 @@ const FullscreenBackdrop: React.FC<{ src: string }> = ({ src }) => {
       {layers.map((l) => (
         <img
           key={l.key}
-          src={l.src}
+          {...postImageProps(l.src)}
           alt=""
           loading="lazy"
           decoding="async"
