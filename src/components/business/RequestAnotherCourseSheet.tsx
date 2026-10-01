@@ -4,8 +4,9 @@
  * queue through the existing `request-course` function. It is NOT a claim and
  * never touches course_claim_requests. It searches nothing.
  */
-import { useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
@@ -21,15 +22,95 @@ interface Props {
   businessName: string;
   clubId: string;
   clubName: string;
-  existingCourseNames: string[];
+  existingCourses: { course_id: string; course_name: string }[];
+}
+
+interface CandidateRow {
+  id: string;
+  name: string;
+  country: string | null;
+  sub_country: string | null;
+  thumbnail_image: string | null;
+  club_id: string | null;
+}
+
+const KICKER_STYLE = { color: BIZ.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', margin: '16px 0 6px' } as const;
+const TEXT_BTN_STYLE = { alignSelf: 'flex-start', border: 'none', background: 'transparent', padding: 0, fontSize: 12.5, fontWeight: 600, color: BIZ.inkMute, cursor: 'pointer', textAlign: 'left' } as const;
+
+function useDebounced<T>(value: T, ms: number): T {
+  const [v, setV] = useState(value);
+  useEffect(() => { const h = setTimeout(() => setV(value), ms); return () => clearTimeout(h); }, [value, ms]);
+  return v;
+}
+
+async function fetchCandidates(term: string): Promise<CandidateRow[]> {
+  const { data, error } = await supabase
+    .from('golf_courses')
+    .select('id, name, country, sub_country, thumbnail_image, club_id')
+    .ilike('name', `%${term}%`)
+    .order('name')
+    .limit(20);
+  if (error) throw error;
+  return (data ?? []) as CandidateRow[];
 }
 
 const LABEL_STYLE = { color: BIZ.inkMute, fontSize: 12.5, fontWeight: 600, marginBottom: 6, display: 'block' } as const;
 const FIELD_CLASS = `${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full px-4 py-3 text-[15px] focus:outline-none`;
 
 export function RequestAnotherCourseSheet({
-  open, onClose, businessId, clubId, clubName, existingCourseNames,
+  open, onClose, businessId, clubId, clubName, existingCourses,
 }: Props) {
+  const [mode, setMode] = useState<'pick' | 'request'>('pick');
+  const [query, setQuery] = useState('');
+  const [pickingId, setPickingId] = useState<string | null>(null);
+  const debouncedQ = useDebounced(query.trim(), 250);
+  const existingIds = useMemo(() => new Set(existingCourses.map((c) => c.course_id)), [existingCourses]);
+  const existingCourseNames = useMemo(
+    () => existingCourses.flatMap((c) => [c.course_name, courseNameWithinClub(c.course_name)]),
+    [existingCourses],
+  );
+  const stem = existingCourses.length > 0
+    ? existingCourses[0].course_name.replace(/\s*\([^()]*\)\s*$/, '').trim()
+    : clubName.trim();
+  const searching = debouncedQ.length >= 2;
+  const seedQ = useQuery({
+    queryKey: ['club-course-candidates', clubId, stem],
+    queryFn: () => fetchCandidates(stem),
+    staleTime: 60_000,
+    enabled: open && mode === 'pick' && stem.length >= 4,
+  });
+  const searchQ = useQuery({
+    queryKey: ['club-course-candidates', clubId, 'q', debouncedQ],
+    queryFn: () => fetchCandidates(debouncedQ),
+    staleTime: 60_000,
+    enabled: open && mode === 'pick' && searching,
+  });
+  const rows: CandidateRow[] = (searching ? searchQ.data : seedQ.data) ?? [];
+  const rowIds = rows.map((r) => r.id);
+  // One batched availability read per result page — never per row.
+  const pendingQ = useQuery({
+    queryKey: ['club-course-pending', businessId, rowIds.join(',')],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('course_requests')
+        .select('for_course_id')
+        .eq('for_business_id', businessId)
+        .eq('status', 'pending')
+        .in('for_course_id', rowIds);
+      if (error) throw error;
+      return new Set(((data ?? []) as { for_course_id: string | null }[]).map((r) => r.for_course_id).filter(Boolean) as string[]);
+    },
+    enabled: open && mode === 'pick' && rowIds.length > 0,
+    staleTime: 0,
+  });
+  const verdict = (r: CandidateRow): string | null => {
+    if (existingIds.has(r.id)) return 'Already yours';
+    if (r.club_id && r.club_id !== clubId) return 'Belongs to another club';
+    if (pendingQ.data?.has(r.id)) return 'Requested';
+    return null;
+  };
+  const seedHasSelectable = (seedQ.data ?? []).some((r) => verdict(r) === null);
+  const showList = searching ? rows.length > 0 : seedHasSelectable;
   const queryClient = useQueryClient();
   const [courseName, setCourseName] = useState('');
   const [location, setLocation] = useState('');
@@ -39,6 +120,9 @@ export function RequestAnotherCourseSheet({
 
   useEffect(() => {
     if (!open) {
+      setMode('pick');
+      setQuery('');
+      setPickingId(null);
       setCourseName('');
       setLocation('');
       setNote('');
@@ -49,6 +133,28 @@ export function RequestAnotherCourseSheet({
   const name = courseName.trim();
   const loc = location.trim();
   const canSubmit = name.length > 0 && loc.length > 0 && !submitting;
+
+  const reportError = async (error: any) => {
+      let raw = '';
+    let status: number | undefined;
+    if (error instanceof FunctionsHttpError) {
+      status = (error.context as Response | undefined)?.status;
+      try {
+        const body = await error.context.json();
+        raw = body?.error ?? body?.message ?? '';
+      } catch {
+        /* keep fallback */
+      }
+    } else if (error.message) {
+      raw = error.message;
+    }
+    const m = String(raw).toLowerCase();
+    if (status === 403 || m.includes('not authorized') || m.includes('cannot request')) {
+      toast.error('You need to be an owner or admin of this business.');
+    } else {
+      toast.error("Couldn't send your request. Please try again.");
+    }
+  };
 
   const submit = async () => {
     if (!canSubmit) return;
@@ -72,25 +178,7 @@ export function RequestAnotherCourseSheet({
     setSubmitting(false);
 
     if (error) {
-      let raw = '';
-      let status: number | undefined;
-      if (error instanceof FunctionsHttpError) {
-        status = (error.context as Response | undefined)?.status;
-        try {
-          const body = await error.context.json();
-          raw = body?.error ?? body?.message ?? '';
-        } catch {
-          /* keep fallback */
-        }
-      } else if (error.message) {
-        raw = error.message;
-      }
-      const m = String(raw).toLowerCase();
-      if (status === 403 || m.includes('not authorized') || m.includes('cannot request')) {
-        toast.error('You need to be an owner or admin of this business.');
-      } else {
-        toast.error("Couldn't send your request. Please try again.");
-      }
+      await reportError(error);
       return;
     }
 
@@ -98,6 +186,34 @@ export function RequestAnotherCourseSheet({
       toast.info(data?.message ?? 'You have already asked us for that course — we are on it.');
     } else {
       toast.success('Request sent — we will add it to your club and let you know.');
+    }
+    queryClient.invalidateQueries({ queryKey: ['club-course-analytics'] });
+    queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
+    onClose();
+  };
+
+  const pickCourse = async (row: CandidateRow) => {
+    if (pickingId) return;
+    setPickingId(row.id);
+    const { data, error } = await supabase.functions.invoke('request-course', {
+      body: {
+        course_name: row.name,
+        location: row.sub_country || row.country || 'Unknown',
+        note: null,
+        for_business_id: businessId,
+        for_club_id: clubId,
+        for_course_id: row.id,
+      },
+    });
+    setPickingId(null);
+    if (error) {
+      await reportError(error);
+      return;
+    }
+    if (data?.duplicate) {
+      toast.info(data?.message ?? 'You have already asked us for that course — we are on it.');
+    } else {
+      toast.success(`Request sent — we will attach ${row.name} to your club and let you know.`);
     }
     queryClient.invalidateQueries({ queryKey: ['club-course-analytics'] });
     queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
