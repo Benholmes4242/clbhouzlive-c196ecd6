@@ -25,6 +25,8 @@ export const MAX_PLAYING = 1;
 
 const THRESHOLDS = [0, 0.25, 0.4, IN_VIEW_THRESHOLD, 0.8, 1];
 
+import { deliverVerdict } from './reviewVideoAutoplay';
+
 type PlayCb = (playing: boolean) => void;
 
 interface Entry {
@@ -33,6 +35,9 @@ interface Entry {
   /** Distance from the element centre to the viewport centre, in px. */
   dist: number;
   playing: boolean;
+  /** Verdict actually handed to the tile (lags `playing` by settle/grace). */
+  delivered: boolean;
+  timer: ReturnType<typeof setTimeout> | null;
 }
 
 const entries = new Map<Element, Entry>();
@@ -53,10 +58,8 @@ function settle(): void {
 
   for (const [el, e] of entries) {
     const next = winners.has(el);
-    if (next !== e.playing) {
-      e.playing = next;
-      e.cb(next);
-    }
+    e.playing = next;
+    deliverVerdict(e, next, paused);
   }
 }
 
@@ -81,12 +84,12 @@ function observer(): IntersectionObserver {
 
 /** Register a rail tile. Returns the unregister function. */
 export function registerRailVideo(el: Element, cb: PlayCb): () => void {
-  entries.set(el, { cb, ratio: 0, dist: Number.POSITIVE_INFINITY, playing: false });
+  entries.set(el, { cb, ratio: 0, dist: Number.POSITIVE_INFINITY, playing: false, delivered: false, timer: null });
   observer().observe(el);
   return () => {
     io?.unobserve(el);
     const e = entries.get(el);
-    if (e?.playing) e.cb(false);
+    if (e) deliverVerdict(e, false, true);
     entries.delete(el);
     if (entries.size === 0) {
       io?.disconnect();

@@ -10,7 +10,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd, vperfEnd, vperfSupersede } from '@/perf/vperf';
 import { PrefetchController } from '@/video/PrefetchController';
-import { VideoPool } from '@/video/pool/VideoPool';
 
 import { trace } from '@/perf/trace';
 import { VideoEngine } from '@/video/VideoEngine';
@@ -462,9 +461,6 @@ export function SnapFeed({
         const arrivalMs = distance / speed;
         if (arrivalMs > 0 && arrivalMs <= 1500) {
           PrefetchController.request(`${post.id}:0`, hlsUrl);
-          // Warm a pooled <video> for the +1 neighbour so the swipe is
-          // a same-slot reuse (readyState≥2), not a cold hls rebuild.
-          if (k === 1) VideoPool.prewarm(hlsUrl, 'inline');
         }
       }
     };

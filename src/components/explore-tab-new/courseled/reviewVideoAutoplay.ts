@@ -19,8 +19,7 @@
  *     second concurrency ceiling.
  *   - When more than MAX_PLAYING qualify, the tiles nearest the VIEWPORT
  *     CENTRE win; the rest hold their poster.
- *   - Tiles that scroll out lose immediately (pause + release happens in the
- *     tile itself).
+ *   - Tiles that scroll out lose after AUTOPLAY_LOSS_GRACE_MS (300ms); winners play after AUTOPLAY_SETTLE_MS (80ms).
  *   - document.visibilityState === 'hidden' pauses every group.
  *
  * Groups are independent (the Discover page and the Latest reviews sheet each
@@ -46,12 +45,42 @@ const THRESHOLDS = [0, 0.25, 0.4, IN_VIEW_THRESHOLD, 0.8, 1];
 
 type PlayCb = (playing: boolean) => void;
 
+/** Same settle the Clubhouse feed uses (CardFeed SETTLE_MS) — a tile must
+ *  hold its win this long before it is told to play (and build a player). */
+export const AUTOPLAY_SETTLE_MS = 80;
+/** A loser keeps its player this long, so lose-then-re-win mid-scroll does
+ *  not tear down and rebuild hls.js. */
+export const AUTOPLAY_LOSS_GRACE_MS = 300;
+
+/**
+ * Deliver a tile's verdict after the settle / grace windows. `immediate`
+ * (tab hidden, unregister) bypasses both. Re-calling with the current
+ * delivered verdict cancels any pending flip.
+ */
+export function deliverVerdict(
+  e: { cb: (playing: boolean) => void; delivered: boolean; timer: ReturnType<typeof setTimeout> | null },
+  next: boolean,
+  immediate = false,
+): void {
+  if (e.timer) { clearTimeout(e.timer); e.timer = null; }
+  if (next === e.delivered) return;
+  if (immediate) { e.delivered = next; e.cb(next); return; }
+  e.timer = setTimeout(() => {
+    e.timer = null;
+    e.delivered = next;
+    e.cb(next);
+  }, next ? AUTOPLAY_SETTLE_MS : AUTOPLAY_LOSS_GRACE_MS);
+}
+
 interface Entry {
   cb: PlayCb;
   ratio: number;
   /** Distance from the element centre to the viewport centre, in px. */
   dist: number;
   playing: boolean;
+  /** Verdict actually handed to the tile (lags `playing` by settle/grace). */
+  delivered: boolean;
+  timer: ReturnType<typeof setTimeout> | null;
 }
 
 class Group {
@@ -60,12 +89,12 @@ class Group {
   private entries = new Map<Element, Entry>();
 
   register(el: Element, cb: PlayCb): () => void {
-    this.entries.set(el, { cb, ratio: 0, dist: Number.POSITIVE_INFINITY, playing: false });
+    this.entries.set(el, { cb, ratio: 0, dist: Number.POSITIVE_INFINITY, playing: false, delivered: false, timer: null });
     this.observer().observe(el);
     return () => {
       this.io?.unobserve(el);
       const e = this.entries.get(el);
-      if (e?.playing) e.cb(false);
+      if (e) deliverVerdict(e, false, true);
       this.entries.delete(el);
       if (this.entries.size === 0) {
         this.io?.disconnect();
@@ -112,10 +141,8 @@ class Group {
 
     for (const [el, e] of this.entries) {
       const next = winners.has(el);
-      if (next !== e.playing) {
-        e.playing = next;
-        e.cb(next);
-      }
+      e.playing = next;
+      deliverVerdict(e, next, paused);
     }
   }
 }

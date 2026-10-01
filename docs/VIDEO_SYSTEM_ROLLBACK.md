@@ -1,172 +1,33 @@
-# Video System Refactor: Rollback Procedures
+# Video engine rollback (BRIEF_FEED_VIDEO_BUDGET)
 
-## Overview
+Applies to the current lane-based `VideoEngine` (`src/video/VideoEngine.ts`).
+Each change below is independent — roll back only the one that regressed.
+Line numbers are as of the brief landing.
 
-This document outlines rollback procedures for the poster → paused-video architecture migration.
+## 1 — Feed lanes capped to the card
+Symptom: inline feed video looks soft / under-resolved.
+- `src/video/lanePolicy.ts:99-101` — `FEED_HLS_OVERRIDES`: set to `{}` (removes `capLevelToPlayerSize` from feed-active/next/prev).
+- `src/video/VideoEngine.ts:916` — opening rung: replace
+  `lane.id === 'fullscreen' ? viewportPixelHeight() : elementPixelHeight(lane.el)` with `viewportPixelHeight()`.
+- Fullscreen lane was never capped; nothing to restore there.
 
----
+## 2 — Paused neighbours buffer 6s
+Symptom: stall on swipe into the next card.
+- `src/video/lanePolicy.ts:106` — `FEED_PRELOAD_MAX_BUFFER_S`: restore to `20`
+  (equal to `HLS_CONFIG.maxBufferLength` at `lanePolicy.ts:64`). The preload write (`VideoEngine.ts:1041`) and play restore (`VideoEngine.ts:1260`) then become no-ops.
 
-## Rollback Triggers (Circuit Breakers)
+## 3 — Orphan VideoPool prewarm removed
+Symptom: swipe in fullscreen opens colder than before (unlikely — the pooled element was never used).
+- `src/components/feed/SnapFeed.tsx:463` — after `PrefetchController.request(...)` reinstate
+  `if (k === 1) VideoPool.prewarm(hlsUrl, 'inline');`
+  and re-add `import { VideoPool } from '@/video/pool/VideoPool';` to the imports.
 
-Monitor these metrics. If any threshold is breached, initiate rollback:
+## 4 — Explore tile settle / grace
+- `src/components/explore-tab-new/courseled/reviewVideoAutoplay.ts` — set `AUTOPLAY_SETTLE_MS` and `AUTOPLAY_LOSS_GRACE_MS` to `0` (used by both review and media-rail coordinators).
 
-| Metric | Threshold | Action |
-|--------|-----------|--------|
-| TTFF (P95) | Increases >30% | Level 1 Rollback |
-| Video startup failure rate | Increases >5% | Level 1 Rollback |
-| Video completion rate | Drops >10% | Level 2 Rollback |
-| Crash/error rate | Significant increase | Level 3 Rollback |
+## 5 — Instrumentation
+- `src/perf/vperf.ts:134` — `on()`: return `true` to restore always-on recording for the silent telemetry shipper.
+- `loadingCount` settles via `settleLoading()` in `VideoEngine.ts`; it gates only a debug log, so no rollback is needed.
 
----
-
-## Level 1: Feature Flag Disable (< 5 minutes)
-
-**When to use:** Performance degradation across all surfaces.
-
-### Steps
-
-1. Open `src/config/flags.ts`
-2. Set the flag to `false`:
-
-```typescript
-// src/config/flags.ts
-export const FLAGS = {
-  // ... other flags
-  USE_PAUSED_VIDEO_INSTEAD_OF_POSTER: false, // DISABLED - rollback
-} as const;
-```
-
-3. Commit and deploy:
-```bash
-git add src/config/flags.ts
-git commit -m "Rollback: Disable paused video mode"
-git push origin main
-```
-
-4. Monitor dashboards for recovery (metrics should return to baseline within 5-10 minutes)
-
----
-
-## Level 2: Component-Level Disable (< 30 minutes)
-
-**When to use:** Only specific surfaces are affected.
-
-### Steps
-
-1. Identify the problematic surface (e.g., Watch page, Clubhouse feed)
-
-2. Add explicit `usePausedVideo={false}` to affected components:
-
-```tsx
-// Example: src/media/MediaTile.tsx
-<HLSPlayer
-  src={videoUrl}
-  poster={posterUrl}
-  usePausedVideo={false}  // Force poster mode on this surface
-  // ... other props
-/>
-```
-
-3. Commit and deploy:
-```bash
-git add <affected-files>
-git commit -m "Rollback: Disable paused video on [surface name]"
-git push origin main
-```
-
-4. Re-enable globally once the surface-specific issue is identified and fixed
-
----
-
-## Level 3: Full Git Revert (< 1 hour)
-
-**When to use:** Critical bugs affecting core functionality.
-
-### Steps
-
-1. Identify the commit(s) to revert:
-```bash
-git log --oneline | head -20
-```
-
-2. Revert the migration commits:
-```bash
-git revert <commit-hash>
-# Or for multiple commits:
-git revert <oldest-hash>..<newest-hash>
-```
-
-3. Resolve any conflicts if they arise
-
-4. Push to production:
-```bash
-git push origin main
-```
-
-5. Schedule post-mortem to identify root cause
-
----
-
-## Monitoring Dashboards
-
-### Key Metrics to Watch
-
-1. **TTFF (Time to First Frame)**
-   - Analytics event: `video_ttff`
-   - Key fields: `ttff_ms`, `used_poster`, `surface`, `device`
-   - Compare `used_poster=true` vs `used_poster=false`
-
-2. **Video Failures**
-   - Analytics event: `video_failure`
-   - Key fields: `error`, `fatal`, `surface`
-
-3. **Video Sessions**
-   - Analytics event: `video_session_end`
-   - Key fields: `duration_ms`, `had_error`, `rebuffer_count`
-
-### Debug Tools
-
-```javascript
-// In browser console:
-window.__videoPerf.logReport()  // Performance summary
-window.__videoPerf.getSummary() // Raw metrics object
-window.__videoPerf.getActiveSessions() // Current sessions
-```
-
----
-
-## Post-Rollback Checklist
-
-- [ ] Verify metrics returned to baseline
-- [ ] Notify team of rollback
-- [ ] Document timeline of events
-- [ ] Create investigation ticket
-- [ ] Schedule post-mortem if Level 3 rollback
-
----
-
-## Feature Flag Reference
-
-```typescript
-// src/config/flags.ts
-FLAGS.USE_PAUSED_VIDEO_INSTEAD_OF_POSTER
-// true  = New architecture (paused video first frame)
-// false = Current architecture (poster images)
-
-// Component-level override
-<HLSPlayer usePausedVideo={true|false} />
-// Overrides global flag for specific components
-```
-
----
-
-## Contact
-
-For urgent rollback decisions during off-hours:
-- On-call engineer: Check rotation schedule
-- Escalation: Engineering lead
-
----
-
-*Last updated: December 29, 2024*
-*Owner: Engineering Team*
+## Untouched by this brief
+Loop / ended / borrow handling, carousel smoothness, rail lane config, the 90s fullscreen back buffer (`lanePolicy.ts` `FULLSCREEN_HLS_OVERRIDES`).

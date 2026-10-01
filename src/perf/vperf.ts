@@ -131,7 +131,9 @@ export function vperfGetPage(): string { return __currentPage; }
 //   consoleOn() — mirrors isPerfEnabled(); guards every console.info /
 //     scorecard emission so pill/console behaviour stays byte-identical.
 // Old `on()` is kept (=recordOn) so the ~25 existing call sites don't churn.
-function on(): boolean { return true; }
+function on(): boolean {
+  try { return isPerfEnabled(); } catch { return false; }
+}
 function consoleOn(): boolean {
   try { return isPerfEnabled(); } catch { return false; }
 }

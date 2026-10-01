@@ -64,9 +64,9 @@ export const HLS_CONFIG = {
   maxBufferLength: 20,
   maxMaxBufferLength: 40,
   maxBufferSize: 30 * 1024 * 1024,
-  // NOTE: capLevelToPlayerSize is applied per-lane in VideoEngine (rails only).
-  // Feed-active + fullscreen lanes render at viewport size; capping there
-  // would only cost quality. Rails render in small tiles — worth the cap.
+  // NOTE: capLevelToPlayerSize is applied per-lane in VideoEngine (rail and
+  // feed lanes). Feed lanes render inside a card, rails inside small tiles;
+  // only the fullscreen lane renders at viewport size and stays uncapped.
   // Don't let hls thrash when tabs backgrounded.
   enableWorker: true,
   lowLatencyMode: false,
@@ -93,6 +93,17 @@ export const RAIL_HLS_OVERRIDES = {
   capLevelToPlayerSize: true,
 } as const;
 
+
+/** Feed-lane overrides (feed-active / feed-next / feed-prev): cap ABR to the
+ *  card's rendered size. The fullscreen lane is deliberately NOT capped. */
+export const FEED_HLS_OVERRIDES = {
+  capLevelToPlayerSize: true,
+} as const;
+
+/** Forward buffer (s) for the playing feed lane — equals HLS_CONFIG.maxBufferLength. */
+export const FEED_ACTIVE_MAX_BUFFER_S = 20;
+/** Forward buffer (s) for paused, preloaded neighbour lanes. */
+export const FEED_PRELOAD_MAX_BUFFER_S = 6;
 
 /** Fullscreen-only overrides: a longer back buffer so the JS loop's seek to 0
  *  on long clips does not refetch evicted segments. maxBufferSize still caps

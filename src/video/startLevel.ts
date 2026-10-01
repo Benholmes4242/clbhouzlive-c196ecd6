@@ -54,6 +54,18 @@ export function viewportPixelHeight(): number {
   return Math.round(cssH * dpr);
 }
 
+/** Device pixel height of a lane element as rendered (card height × DPR).
+ *  Falls back to the viewport when the element has no layout yet (e.g. a
+ *  preload lane parked in the hidden host); capLevelToPlayerSize then
+ *  corrects it once the element is laid out. */
+export function elementPixelHeight(el: Element | null | undefined): number {
+  if (typeof window === 'undefined' || !el) return viewportPixelHeight();
+  const h = el.getBoundingClientRect?.().height ?? 0;
+  if (!(h > 0)) return viewportPixelHeight();
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  return Math.round(h * dpr);
+}
+
 /**
  * Pick the initial rung: the highest level that both
  *   (a) fits the rendered pixel height (with a little headroom), and
