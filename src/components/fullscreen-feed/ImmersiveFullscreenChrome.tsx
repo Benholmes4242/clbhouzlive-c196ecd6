@@ -617,39 +617,18 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             )}
           </div>
 
-          {/* Caption — 3-line clamp + See more/See less. Nothing renders for
-              empty/whitespace-only captions (no element, no gap). */}
-          {activePost.caption?.trim() ? (
+          {/* Caption — measured 3-line cut + one inline CTA. Non-review posts
+              with an empty caption render nothing; reviews always mount so the
+              empty-text "Full review" fallback can reach the sheet. */}
+          {activePost.caption?.trim() || activePost.isReview ? (
             <CaptionBlock
-              caption={activePost.caption}
+              caption={activePost.caption ?? ''}
               resetKey={activeIndex}
               onMentionTap={handleMentionTap}
-              // HELD (brief item 4): reviews stay on the caption variant and keep
-              // the separate "read review ›" button until the empty-caption review
-              // case is decided. Switch to `activePost.isReview ? 'review' : 'caption'`
-              // in the same change that deletes that button.
-              variant="caption"
+              variant={activePost.isReview ? 'review' : 'caption'}
               onFullReview={onReviewTap}
             />
           ) : null}
-
-
-
-          {activePost.isReview && activePost.review && (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onReviewTap(); }}
-              aria-label="Read review"
-              style={{
-                alignSelf: 'flex-start', marginTop: 3, background: 'transparent',
-                border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
-                fontFamily: 'inherit', fontSize: 13, fontWeight: 500, color: '#fff',
-                opacity: 0.7, lineHeight: 1, textShadow: TEXT_SHADOW,
-              }}
-            >
-              read review ›
-            </button>
-          )}
 
           {/* Likers row — LikedByRow returns null at zero; no second guard. */}
           <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
