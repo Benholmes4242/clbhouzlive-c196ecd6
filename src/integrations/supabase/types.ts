@@ -3944,6 +3944,8 @@ export type Database = {
           country: string | null
           course_name: string
           created_at: string
+          for_business_id: string | null
+          for_club_id: string | null
           home_club_for_user_id: string | null
           id: string
           location: string
@@ -3958,6 +3960,8 @@ export type Database = {
           country?: string | null
           course_name: string
           created_at?: string
+          for_business_id?: string | null
+          for_club_id?: string | null
           home_club_for_user_id?: string | null
           id?: string
           location: string
@@ -3972,6 +3976,8 @@ export type Database = {
           country?: string | null
           course_name?: string
           created_at?: string
+          for_business_id?: string | null
+          for_club_id?: string | null
           home_club_for_user_id?: string | null
           id?: string
           location?: string
@@ -3982,6 +3988,20 @@ export type Database = {
           status?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "course_requests_for_business_id_fkey"
+            columns: ["for_business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_requests_for_club_id_fkey"
+            columns: ["for_club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_clubs"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "course_requests_home_club_for_user_id_fkey"
             columns: ["home_club_for_user_id"]
@@ -23913,6 +23933,14 @@ export type Database = {
       reset_watch_personalization: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      resolve_club_course_request: {
+        Args: {
+          p_admin_notes?: string
+          p_course_id: string
+          p_request_id: string
+        }
+        Returns: Json
       }
       resolve_home_club_request: {
         Args: {
