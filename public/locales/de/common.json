@@ -646,7 +646,22 @@
     "namesTwoAndOne": "{{a}}, {{b}} und eine weitere Person",
     "namesOneAndMore": "{{a}} und {{n}} weitere",
     "namesTwoAndMore": "{{a}}, {{b}} und {{n}} weitere",
-    "sheetTitleCelebrated": "Gefeiert"
+    "sheetTitleCelebrated": "Gefeiert",
+    "likedByYou": "Liked by you",
+    "likedByYouAndName": "Liked by you and {{b}}",
+    "likedByYouAndOne": "Liked by you and one other",
+    "likedByYouAndMore": "Liked by you and {{n}} others",
+    "likedByYouNameAndOne": "Liked by you, {{b}} and one other",
+    "likedByYouNameAndMore": "Liked by you, {{b}} and {{n}} others",
+    "youOnly": "You",
+    "youAndName": "You and {{b}}",
+    "youAndOne": "You and one other",
+    "youAndMore": "You and {{n}} more",
+    "youNameAndOne": "You, {{b}} and one other",
+    "youNameAndMore": "You, {{b}} and {{n}} more",
+    "youCelebratedThisRound": "{{names}} celebrated this round",
+    "youCelebratedYourRound": "{{names}} celebrated your round",
+    "youCelebratedOwnersRound": "{{names}} celebrated {{owner}}'s round"
   },
   "comments": {
     "countNone": "Noch keine Kommentare",

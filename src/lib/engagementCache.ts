@@ -145,7 +145,10 @@ export function patchEngagement(
   // - Likes sheet for THIS post (modal, gated by `enabled: isOpen`)
   // - Notifications (may include "X liked your post")
   // - Per-user "what posts have I liked"
-  queryClient.invalidateQueries({ queryKey: ['post-likes', postId, 'post'] });
+  // SOURCE DELIBERATELY OMITTED: the same post can be read under more than one
+  // LikeSource ('post' | 'editorial' | 'review' | 'round'); prefix-matching on
+  // ['post-likes', postId] invalidates every one of them.
+  queryClient.invalidateQueries({ queryKey: ['post-likes', postId] });
   queryClient.invalidateQueries({ queryKey: ['notifications'] });
   queryClient.invalidateQueries({ queryKey: ['user-post-likes'] });
 

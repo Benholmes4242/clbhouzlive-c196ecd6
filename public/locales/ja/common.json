@@ -645,7 +645,22 @@
     "namesTwoAndOne": "{{a}}、{{b}}ほか1人",
     "namesOneAndMore": "{{a}}ほか{{n}}人",
     "namesTwoAndMore": "{{a}}、{{b}}ほか{{n}}人",
-    "sheetTitleCelebrated": "称えた人"
+    "sheetTitleCelebrated": "称えた人",
+    "likedByYou": "Liked by you",
+    "likedByYouAndName": "Liked by you and {{b}}",
+    "likedByYouAndOne": "Liked by you and one other",
+    "likedByYouAndMore": "Liked by you and {{n}} others",
+    "likedByYouNameAndOne": "Liked by you, {{b}} and one other",
+    "likedByYouNameAndMore": "Liked by you, {{b}} and {{n}} others",
+    "youOnly": "You",
+    "youAndName": "You and {{b}}",
+    "youAndOne": "You and one other",
+    "youAndMore": "You and {{n}} more",
+    "youNameAndOne": "You, {{b}} and one other",
+    "youNameAndMore": "You, {{b}} and {{n}} more",
+    "youCelebratedThisRound": "{{names}} celebrated this round",
+    "youCelebratedYourRound": "{{names}} celebrated your round",
+    "youCelebratedOwnersRound": "{{names}} celebrated {{owner}}'s round"
   },
   "comments": {
     "countNone": "まだコメントはありません",

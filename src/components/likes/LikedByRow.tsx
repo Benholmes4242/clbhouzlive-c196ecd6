@@ -97,9 +97,40 @@ export function LikedByRow({
   if (!postId || count <= 0) return null;
 
   const names = likerFirstNames(likers, 2);
+  // VIEWER-FIRST: usePostLikers sorts the viewer to the front. Their own name
+  // read back in the third person reads as a bug — they are "you", via their
+  // own keys (several languages inflect the verb with "you").
+  const viewerFirst = likers[0]?.isViewer === true;
+  const otherName = viewerFirst ? likerFirstNames(likers.slice(1), 1)[0] ?? null : null;
 
   let copy: string;
-  if (kind === 'celebrate') {
+  if (viewerFirst && kind === 'celebrate') {
+    const restAfter = count - 1 - (otherName ? 1 : 0);
+    const youText =
+      restAfter <= 0
+        ? otherName ? t('reactions.youAndName', { b: otherName }) : t('reactions.youOnly')
+        : restAfter === 1
+          ? otherName ? t('reactions.youNameAndOne', { b: otherName }) : t('reactions.youAndOne')
+          : otherName
+            ? t('reactions.youNameAndMore', { b: otherName, n: restAfter.toLocaleString() })
+            : t('reactions.youAndMore', { n: restAfter.toLocaleString() });
+    const owner = ownerName?.trim();
+    copy = isOwnRound
+      ? t('reactions.youCelebratedYourRound', { names: youText })
+      : owner
+        ? t('reactions.youCelebratedOwnersRound', { names: youText, owner })
+        : t('reactions.youCelebratedThisRound', { names: youText });
+  } else if (viewerFirst) {
+    const restAfter = count - 1 - (otherName ? 1 : 0);
+    copy =
+      restAfter <= 0
+        ? otherName ? t('reactions.likedByYouAndName', { b: otherName }) : t('reactions.likedByYou')
+        : restAfter === 1
+          ? otherName ? t('reactions.likedByYouNameAndOne', { b: otherName }) : t('reactions.likedByYouAndOne')
+          : otherName
+            ? t('reactions.likedByYouNameAndMore', { b: otherName, n: restAfter.toLocaleString() })
+            : t('reactions.likedByYouAndMore', { n: restAfter.toLocaleString() });
+  } else if (kind === 'celebrate') {
     // "{names} celebrated this round" — the verb, never a plural noun.
     const rest = count - names.length;
     const namesText =
