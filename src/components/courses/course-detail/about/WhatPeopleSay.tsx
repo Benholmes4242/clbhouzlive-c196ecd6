@@ -16,8 +16,9 @@
  * support; the rating count beside the score lets the reader judge the weight
  * for themselves.
  *
- * COLOUR: the community figure takes its score band; the viewer's own figure is
- * amber, which on this platform means the viewing member and nothing else.
+ * COLOUR: the community figure takes its score band. The rating count is
+ * right-aligned in the slot where the viewer's amber "Your rating" figure sat;
+ * the viewer's own score is not shown here.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +28,7 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores, OverallScoreLine } from '../CategoryScores';
-import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
+import AboutSection, { ABOUT_KICKER, AboutHairline } from './AboutSection';
 
 export { SETTLED_MIN_RATINGS } from '../CategoryScores';
 
@@ -39,13 +40,15 @@ interface WhatPeopleSayProps {
   onSeeAllReviews?: () => void;
 }
 
-const YoursFigure: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <div style={{ minWidth: 0, flexShrink: 0, textAlign: 'right' }}>
-    {/* Amber here means "yours", not a score band. */}
-    <div style={{ ...aboutFig(22, A.AMBER_DEEP), lineHeight: 1, whiteSpace: 'nowrap' }}>{value}</div>
-    <div style={{ ...ABOUT_KICKER, marginTop: 6 }}>{label}</div>
-  </div>
-);
+/** The rating count, right-aligned in the slot where "Your rating" used to sit. */
+const CountSlot: React.FC<{ count: number }> = ({ count }) => {
+  const { t } = useTranslation('courses');
+  return (
+    <div style={{ minWidth: 0, flexShrink: 0, textAlign: 'right', paddingBottom: 2 }}>
+      <span style={ABOUT_KICKER}>{t('courseDetail.communityScore.basedOn', { count })}</span>
+    </div>
+  );
+};
 
 const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   courseId,
@@ -102,12 +105,12 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   }
 
   return (
-    <AboutSection heading={heading} meta={t('courseDetail.communityScore.basedOn', { count: total })}>
+    <AboutSection heading={heading}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <OverallScoreLine score={score} ratingCount={total} />
         </div>
-        {yours != null ? <YoursFigure label={t('courseDetail.rating.yours')} value={yours.toFixed(1)} /> : null}
+        <CountSlot count={total} />
       </div>
 
       <CategoryScores
