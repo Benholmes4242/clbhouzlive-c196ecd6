@@ -67,7 +67,6 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
 
   const [flashIcon, setFlashIcon] = useState<'play' | 'pause' | null>(null);
 
-  const rafRef = useRef<number | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Tap-to-pause: window listener, filters clean single-finger taps that miss
