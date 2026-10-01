@@ -13,13 +13,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, MessageCircle, Send, MoreHorizontal } from 'lucide-react';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { ReactionGlyph } from '@/lib/reactionKind';
 import { Z } from '@/config/zIndex';
 import { MuteButton } from '@/audio/MuteButton';
 import { formatCountKilo } from '@/i18n/format';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
-const LikeGlyph = reactionGlyph('like');
 
 interface FeedTopActionBarProps {
   onClose?: () => void;
@@ -165,10 +164,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
               aria-label={hasLiked ? 'Unlike' : 'Like'}
               style={likeStr && !onOpenLikes ? chipWithCount : chipBase}
             >
-              <LikeGlyph
-                size={24}
-                color={hasLiked ? '#F7931E' : '#fff'}
-              />
+              <ReactionGlyph reacted={hasLiked} size={24} tone="media" />
               {likeStr && !onOpenLikes && (
                 <span
                   style={{

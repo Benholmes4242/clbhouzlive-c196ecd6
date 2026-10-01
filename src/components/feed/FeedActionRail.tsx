@@ -16,14 +16,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, Send, MoreHorizontal, Plus, Check } from 'lucide-react';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { ReactionGlyph } from '@/lib/reactionKind';
 import { MuteButton } from '@/audio/MuteButton';
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCountKilo } from '@/i18n/format';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
-const LikeGlyph = reactionGlyph('like');
 
 // Shared lift + stroke for every floating glyph in the immersive feed chrome.
 const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
@@ -361,10 +360,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
                 ariaLabel={hasLiked ? 'Unlike' : 'Like'}
                 animateKey={likeAnimKey}
               >
-                <LikeGlyph
-                  size={28}
-                  color={hasLiked ? '#F7931E' : '#fff'}
-                />
+                <ReactionGlyph reacted={hasLiked} size={28} tone="media" />
               </ActionButton>
               <button
                 type="button"
@@ -400,10 +396,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               accentCount={hasLiked}
               animateKey={likeAnimKey}
             >
-              <LikeGlyph
-                size={28}
-                color={hasLiked ? '#F7931E' : '#fff'}
-              />
+              <ReactionGlyph reacted={hasLiked} size={28} tone="media" />
             </ActionButton>
           )}
 

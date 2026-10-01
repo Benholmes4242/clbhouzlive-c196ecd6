@@ -5,7 +5,7 @@
  * of truth). No imports from src/components/watch/.
  */
 import { useRef } from 'react';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { ReactionGlyph } from '@/lib/reactionKind';
 import Pressable from '@/components/ui/Pressable';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
@@ -21,7 +21,6 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { VideoCardMoreButton } from '@/features/watch-v2/components/VideoCardMoreButton';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
-const LikeGlyph = reactionGlyph('like');
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -203,7 +202,7 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
                   )}
                   {likeCount > 0 && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-                      <LikeGlyph style={{ width: 12, height: 12, color: A.AMBER, fill: A.AMBER }} strokeWidth={1.8} />
+                      <ReactionGlyph reacted size={12} />
                       {formatCount(likeCount)}
                     </span>
                   )}
