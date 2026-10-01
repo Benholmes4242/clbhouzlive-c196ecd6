@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { patchEngagement } from '@/lib/engagementCache';
+import { patchEngagement, seedViewerInLikers } from '@/lib/engagementCache';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface LikeMutationParams {
   postId: string;
@@ -12,6 +13,7 @@ interface LikeMutationParams {
 
 export function useLikeMutation() {
   const queryClient = useQueryClient();
+  const { availableActors } = useActiveActor();
 
   return useMutation({
     mutationFn: async ({ postId, actorId, actorType, isLiked }: LikeMutationParams) => {
@@ -30,8 +32,20 @@ export function useLikeMutation() {
       });
       if (error) throw error;
     },
-    onError: (error) => {
+    // Viewer seed: the likers list moves on the same tap as the count.
+    onMutate: ({ postId, userId, actorId, actorType, isLiked }: LikeMutationParams) => {
+      const a = availableActors.find((x) => x.id === actorId && x.type === actorType);
+      const revertLikers = seedViewerInLikers(queryClient, postId, 'post', {
+        userId, actorType, actorId,
+        name: a?.name ?? null,
+        avatarUrl: a?.avatarUrl ?? null,
+        slug: a?.slug ?? null,
+      }, !isLiked);
+      return { revertLikers };
+    },
+    onError: (error, _vars, ctx) => {
       console.error('[Like] Mutation failed:', error);
+      ctx?.revertLikers?.();
     },
     onSuccess: (_data, variables) => {
       // Patch cache ONLY after a confirmed successful write. Previously this
@@ -46,7 +60,13 @@ export function useLikeMutation() {
          scorecard sheet read. Invalidating that family makes the heart agree on
          every surface without a manual refresh
          (BRIEF_ROUND_COMMENTS_EVERYWHERE §S3.1). */
+    },
+    onSettled: (_d, _e, variables) => {
+      // TWO READINGS OF ONE FACT: ['content-reactions'] and ['post-likes'] both
+      // report this like — refresh them together, by prefix (no source), from
+      // both write paths.
       queryClient.invalidateQueries({ queryKey: ['content-reactions'] });
+      queryClient.invalidateQueries({ queryKey: ['post-likes', variables.postId] });
     },
   });
 }

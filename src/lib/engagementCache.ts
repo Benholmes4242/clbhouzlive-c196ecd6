@@ -25,6 +25,7 @@
  */
 
 import type { QueryClient } from '@tanstack/react-query';
+import type { LikeSource, PostLiker } from '@/hooks/usePostLikes';
 import {
   FEED_QUERY_KEYS,
   PROFILE_QUERY_KEYS,
@@ -155,4 +156,71 @@ export function patchEngagement(
   // Notify non-RQ subscribers (e.g. zustand snapshots like useFullscreenFeedStore).
   // Subscribers must apply the same delta to their own state via applyEngagementDelta.
   engagementBus.emit({ postId, delta });
+}
+
+
+/** The viewing actor as the likers list should show them. */
+export interface LikerViewer {
+  /** Auth user id (the person behind the actor). */
+  userId: string;
+  actorType: 'personal' | 'business';
+  /** Profile id for personal, business id for business. */
+  actorId: string;
+  name: string | null;
+  avatarUrl: string | null;
+  /** Business slug, used as the username for business actors. */
+  slug?: string | null;
+}
+
+/**
+ * seedViewerInLikers — THE ONLY place that decides what an optimistic viewer
+ * entry in a likers list looks like. Both like-write paths call it:
+ * useLikeMutation (post path, source 'post') and useContentReactions
+ * (source 'round' | 'review').
+ *
+ * Writes the viewer to the FRONT of ['post-likes', subjectId, source] on like,
+ * removes them on unlike. `source` is REQUIRED and never inferred: the same
+ * fact is keyed on a post id under 'post' and on a review / whs_score id under
+ * 'review' / 'round', and guessing one is the hardcoded-'post' fault.
+ *
+ * When there is no cached entry it creates one ONLY for a like — a first like
+ * on a zero-like subject is what first enables the likers query, so without a
+ * seed the row would fetch before the write commits and cache an empty list.
+ * An unlike with no cache does nothing.
+ *
+ * Returns a revert function that restores the exact pre-tap cache.
+ *
+ * KNOWN LIMIT (do not "fix" by guessing an id): a like made on the POST path
+ * cannot seed a likers list keyed on the REVIEW id (or whs_score id). The post
+ * path holds only the post id; the review id is a different key it does not
+ * know. Those lists catch up on the cross-family invalidation instead.
+ */
+export function seedViewerInLikers(
+  queryClient: QueryClient,
+  subjectId: string,
+  source: LikeSource,
+  viewer: LikerViewer,
+  liked: boolean,
+): () => void {
+  const key = ['post-likes', subjectId, source] as const;
+  const prev = queryClient.getQueryData<PostLiker[]>(key);
+  const isMe = (l: PostLiker) =>
+    (l.actorType ?? 'personal') === viewer.actorType &&
+    (l.actorId ?? l.userId) === viewer.actorId;
+  const me: PostLiker = {
+    userId: viewer.actorType === 'business' ? viewer.userId : viewer.actorId,
+    displayName: viewer.name ?? '',
+    username: (viewer.actorType === 'business' ? viewer.slug : null) ?? viewer.name ?? '',
+    avatarUrl: viewer.avatarUrl ?? null,
+    actorType: viewer.actorType,
+    actorId: viewer.actorId,
+  };
+  if (prev === undefined) {
+    if (!liked) return () => {};
+    queryClient.setQueryData<PostLiker[]>(key, [me]);
+    return () => queryClient.removeQueries({ queryKey: key, exact: true });
+  }
+  const rest = prev.filter((l) => !isMe(l));
+  queryClient.setQueryData<PostLiker[]>(key, liked ? [me, ...rest] : rest);
+  return () => queryClient.setQueryData(key, prev);
 }
