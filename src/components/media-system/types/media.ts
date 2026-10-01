@@ -438,6 +438,8 @@ export const PRELOAD_CONFIG = {
 
 /** Raw row shape returned by get_suggested_feed / get_friends_feed RPCs */
 export interface FeedRpcRow {
+  /** post_media.aspect_ratio (width/height). Present only if the feed RPC returns it. */
+  aspect_ratio?: number | string | null;
   post_id: string;
   post_content: string | null;
   post_created_at: string;
