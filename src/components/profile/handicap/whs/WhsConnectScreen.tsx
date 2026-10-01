@@ -343,10 +343,13 @@ export const WhsConnectScreen: React.FC<Props> = ({
       className={wrapperClass}
       style={{
         fontFamily: FONT,
-        /* FULL BLEED. Stage 1 (intro) paints WASH - amber as light, resolved
+        /* FULL BLEED. WASH paints on the intro (the promise) and done (the payoff):
+           amber light on the promise, flat canvas while the work happens, amber
+           light again on the payoff - on every stage it would be wallpaper.
+           Was: stage 1 only - amber as light, resolved
            to flat canvas before the promise rows. Every other stage paints
            SURFACE flat, matching the host page and notch shield. */
-        background: stage === 'intro' ? WASH : SURFACE,
+        background: stage === 'intro' || stage === 'done' ? WASH : SURFACE,
         ...(immersive
           ? { minHeight: '100dvh', flex: '1 1 auto' }
           : { flex: '1 1 auto', minHeight: 0 }),

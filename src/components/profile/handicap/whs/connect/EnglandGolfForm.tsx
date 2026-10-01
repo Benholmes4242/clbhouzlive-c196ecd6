@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { INK, MUTE, DIM, BORDER, BAD, FONT, LABEL_LG } from './designTokens';
+import { useTranslation } from 'react-i18next';
+import { fieldPaint, FIELD_HEIGHT, FIELD_INK } from '@/lib/tokens/field';
+import { MUTE, DIM, BAD, FONT, LABEL_LG } from './designTokens';
 import { PrimaryButton, FooterBar, Action, Stage, StageHead } from './Primitives';
 
 interface Props {
@@ -15,38 +17,54 @@ interface Props {
 }
 
 /**
- * Undecorated field: no box. A hairline under the input is the whole chrome, so
- * the field belongs to the stage rather than sitting in a panel.
+ * FIELD CANON (lib/tokens/field.ts): a 44px box, radius 14, rest/focus paint.
+ * Replaces the earlier undecorated 24px input on a hairline so a member types a
+ * membership number into the same box they type into everywhere else.
+ * A rejected credential turns the border BAD.
  */
 const Field: React.FC<{
   label: string;
   hint: React.ReactNode;
   hintColor?: string;
   invalid?: boolean;
-  input: React.ReactNode;
+  input: (handlers: { onFocus: () => void; onBlur: () => void }) => React.ReactNode;
   first?: boolean;
-}> = ({ label, hint, hintColor, invalid, input, first }) => (
-  <div style={{ paddingTop: first ? 0 : 30 }}>
-    <div style={{ ...LABEL_LG, marginBottom: 10 }}>{label}</div>
-    {input}
-    <div style={{ height: 1, background: invalid ? BAD : BORDER, marginTop: 10 }} />
-    <div style={{ fontSize: 12.5, color: hintColor ?? DIM, marginTop: 10, lineHeight: 1.5 }}>
-      {hint}
+}> = ({ label, hint, hintColor, invalid, input, first }) => {
+  const [focused, setFocused] = useState(false);
+  const paint = fieldPaint(focused);
+  return (
+    <div style={{ paddingTop: first ? 0 : 30 }}>
+      <div style={{ ...LABEL_LG, marginBottom: 10 }}>{label}</div>
+      <div
+        style={{
+          ...paint,
+          ...(invalid ? { border: `1px solid ${BAD}` } : null),
+          height: FIELD_HEIGHT,
+          boxSizing: 'border-box',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 14px',
+        }}
+      >
+        {input({ onFocus: () => setFocused(true), onBlur: () => setFocused(false) })}
+      </div>
+      <div style={{ fontSize: 12.5, color: hintColor ?? DIM, marginTop: 10, lineHeight: 1.5 }}>
+        {hint}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  boxSizing: 'border-box',
+  minWidth: 0,
   padding: 0,
   border: 'none',
   outline: 'none',
   background: 'transparent',
-  fontSize: 24,
-  fontWeight: 700,
-  letterSpacing: '-0.02em',
-  color: INK,
+  fontSize: 15,
+  fontWeight: 400,
+  color: FIELD_INK,
   fontFamily: FONT,
   fontVariantNumeric: 'tabular-nums lining-nums',
 };
@@ -66,6 +84,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
   submitting,
   bodyName = 'England Golf',
 }) => {
+  const { t } = useTranslation('handicap');
   const [membershipNumber, setMembershipNumber] = useState('');
   const [password, setPassword] = useState('');
 
@@ -90,7 +109,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
       <Stage>
         <StageHead
           small
-          kicker={bodyName}
+          kicker={t('whsConnect.steps.form', { body: bodyName })}
           headline="Sign in once."
           lead={`The same details you use for the ${bodyName} app.`}
         />
@@ -100,8 +119,9 @@ export const EnglandGolfForm: React.FC<Props> = ({
             first
             label="Membership number"
             hint="Ten digits, on your member card"
-            input={
+            input={(h) => (
               <input
+                {...h}
                 value={membershipNumber}
                 onChange={(e) => setMembershipNumber(e.target.value)}
                 inputMode="numeric"
@@ -109,7 +129,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
                 aria-label="Membership number"
                 style={inputStyle}
               />
-            }
+            )}
           />
 
           <Field
@@ -121,8 +141,9 @@ export const EnglandGolfForm: React.FC<Props> = ({
                 ? `${bodyName} did not accept those details.`
                 : `Kept encrypted in a vault and decrypted only to run a sync. Disconnect and it is deleted.`
             }
-            input={
+            input={(h) => (
               <input
+                {...h}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -131,7 +152,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
                 aria-invalid={rejected}
                 style={inputStyle}
               />
-            }
+            )}
           />
 
           {error && !rejected ? (
