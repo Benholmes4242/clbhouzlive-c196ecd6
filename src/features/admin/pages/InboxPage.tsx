@@ -28,7 +28,7 @@ import HolePhotoReviewSheet from '../components/HolePhotoReviewSheet';
 import ConfirmDialog from '../components/ConfirmDialog';
 import type { HolePhotoQueueRow } from '../hooks/useHolePhotoQueue';
 import CourseMatchingPage from './CourseMatchingPage';
-import { AddCourseSheet } from './ContentPage';
+import AddCourseSheet from '../components/AddCourseSheet';
 import { uploadCoursePhoto } from '../hooks/useCourses';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
