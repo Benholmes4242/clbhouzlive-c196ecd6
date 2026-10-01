@@ -31,7 +31,20 @@ interface TheScoreProps {
   viewerScore?: number | null;
   /** Five-band counts; omitted when they cannot be shown to agree with ratingCount. */
   distribution?: RatingTierDistributionData | null;
+  /** Render this same markup with text swapped for skeleton bars. Height matches
+   *  the resolved state by construction: each bar is the placeholder text itself,
+   *  transparent, in the real line's own type. */
+  loading?: boolean;
 }
+
+const ZERO: RatingTierDistributionData = { exceptional: 0, excellent: 0, good: 0, fair: 0, poor: 0 };
+
+/** Inline skeleton occupying exactly the line box of `children` in the parent's type. */
+const Bar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span aria-hidden className="rounded-sq-sm bg-surface-alt clb-shimmer-dark" style={{ color: 'transparent' }}>
+    {children}
+  </span>
+);
 
 const EYEBROW: React.CSSProperties = {
   fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1,
@@ -73,21 +86,22 @@ const DeltaLine: React.FC<{ delta: number }> = ({ delta }) => {
   );
 };
 
-/** Pair (~67px) + 20px gap + five 20px band rows with 8px gaps. The skeleton
- *  and the resolved block share this so the swap does not move the page. */
-export const TheScoreReservedHeight = 67 + 20 + 5 * 20 + 4 * 8;
-
-export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount, viewerScore, distribution }) => {
-  const hasYou = viewerScore != null;
+export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount, viewerScore, distribution, loading }) => {
+  const hasYou = !loading && viewerScore != null;
+  const dist = loading ? ZERO : distribution;
   return (
-    <section style={{ padding: `0 ${GUTTER}px`, fontFamily: SANS, minHeight: TheScoreReservedHeight }}>
+    <section style={{ padding: `0 ${GUTTER}px`, fontFamily: SANS }} aria-busy={loading || undefined}>
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ ...EYEBROW, color: A.DIM }}>Community</div>
-          <div style={{ ...FIGURE, color: A.INK }}>{score.toFixed(1)}</div>
+          <div style={{ ...FIGURE, color: A.INK }}>{loading ? <Bar>0.0</Bar> : score.toFixed(1)}</div>
           <div style={SUPPORT}>
-            {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
-            {` · ${getRatingTierLabel(score)}`}
+            {loading ? <Bar>0 ratings · Excellent</Bar> : (
+              <>
+                {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
+                {` · ${getRatingTierLabel(score)}`}
+              </>
+            )}
           </div>
         </div>
         {hasYou && (
@@ -101,9 +115,9 @@ export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount, viewerSc
           </>
         )}
       </div>
-      {distribution && (
+      {dist && (
         <div style={{ marginTop: 20 }}>
-          <RatingTierDistribution distribution={distribution} />
+          <RatingTierDistribution distribution={dist} />
         </div>
       )}
     </section>
