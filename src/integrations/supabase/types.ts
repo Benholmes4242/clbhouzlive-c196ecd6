@@ -18868,6 +18868,10 @@ export type Database = {
           total_users: number
         }[]
       }
+      admin_set_course_club: {
+        Args: { p_club_id: string; p_course_id: string }
+        Returns: undefined
+      }
       admin_set_test_user_photo: {
         Args: { p_photo_url: string }
         Returns: undefined
