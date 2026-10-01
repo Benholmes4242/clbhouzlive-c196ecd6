@@ -146,11 +146,15 @@ async function searchCoursesForVenue(venue: VenueInput): Promise<{
   const allCourses = new Map<string, { id: string; name: string; thumbnail_image: string | null; country: string | null }>();
   
   const searchPromises = keywordsToSearch.map(async (keyword) => {
-    const { data, error } = await supabase
+    let query = supabase
       .from('golf_courses')
       .select('id, name, thumbnail_image, country')
       .ilike('name', `%${keyword}%`)
-      .limit(30);
+      .order('name')
+      .limit(100);
+    // Country narrowing at query time when the venue carries one.
+    if (venue.country) query = query.eq('country', venue.country);
+    const { data, error } = await query;
     
     if (error) {
       console.error(`[CourseResolver] Search error for "${keyword}":`, error);
@@ -237,7 +241,9 @@ function findBestMatch(
   }
   
   // High confidence: good score or high combined
-  if (bestMatch && (bestMatch.score >= 0.3 || bestMatch.combined >= 100)) {
+  // A country mismatch can never pass as high confidence.
+  const countryMismatch = !!(venue.country && bestMatch?.course.country && bestMatch.course.country !== venue.country);
+  if (bestMatch && !countryMismatch && (bestMatch.score >= 0.3 || bestMatch.combined >= 100)) {
     return { course: bestMatch.course, score: bestMatch.score, isLowConfidence: false };
   }
   
@@ -256,6 +262,13 @@ function findBestMatch(
 // Cache a successful match
 async function cacheMatch(venue: VenueInput, courseId: string, confidence: number, isLowConfidence: boolean): Promise<void> {
   try {
+    // Never overwrite a hand-corrected mapping: read first, skip if 'manual'.
+    const { data: existing } = await supabase
+      .from('sr_course_map')
+      .select('source')
+      .eq('sr_venue_name', venue.venueName)
+      .maybeSingle();
+    if ((existing as { source?: string } | null)?.source === 'manual') return;
     const source = isLowConfidence ? 'low_confidence' : (confidence > 0.8 ? 'normalized' : 'fuzzy');
     
     const { error } = await supabase.from('sr_course_map').upsert({
