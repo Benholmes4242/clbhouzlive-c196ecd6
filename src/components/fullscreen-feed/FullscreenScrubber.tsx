@@ -1,11 +1,8 @@
 /**
- * FullscreenScrubber — thin bottom progress bar + tap-to-pause for the
- * fullscreen video viewer.
- *
- * All playback control routes through VideoEngine (never raw element calls).
- * Position/duration are read from VideoEngine.snapshot('fullscreen') via a
- * rAF loop while visible. Seeks are gated by an ownerKey check against the
- * live snapshot — a seek must never land on a repointed lane.
+ * FullscreenScrubber — tap-to-pause + centre play/pause flash for the
+ * fullscreen video viewer. The bottom progress bar and seeking are gone:
+ * position/progress now live in FullscreenTopProgress (which owns the only
+ * rAF poll). Playback control routes through VideoEngine, owner-guarded.
  *
  * Tap-to-pause: window-level pointer listeners record clean-tap movement so
  * the layer does NOT interfere with vertical swipe (post nav), horizontal
@@ -16,21 +13,13 @@
  * skipped) — we detect this via useClubhouseStore.carouselPositions +
  * activePost.mediaItems.
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Z } from '@/config/zIndex';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { LaneId } from '@/video/lanePolicy';
-
-function fmtTime(sec: number): string {
-  if (!isFinite(sec) || sec <= 0) return '0:00';
-  const s = Math.floor(sec);
-  const m = Math.floor(s / 60);
-  const r = s % 60;
-  return `${m}:${r.toString().padStart(2, '0')}`;
-}
 
 function expectedOwnerKey(postId: string | undefined, mediaIdx: number): string | null {
   if (!postId) return null;
@@ -76,99 +65,10 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
   }, [borrow, activePost?.id]);
 
 
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [dragging, setDragging] = useState(false);
   const [flashIcon, setFlashIcon] = useState<'play' | 'pause' | null>(null);
 
-  const dragTimeRef = useRef<number | null>(null);
-  const barRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // rAF poll — only while a video slide is active.
-  useEffect(() => {
-    if (!isVideo || !expectedKey) return;
-    let alive = true;
-    const tick = () => {
-      if (!alive) return;
-      try {
-        const s = VideoEngine.snapshot(laneId);
-        if (ownerMatches(s.postId, expectedKey)) {
-          if (!dragging) setCurrentTime(s.currentTime);
-          setDuration(s.duration);
-          setIsPlaying(s.state === 'playing');
-        }
-      } catch { /* noop */ }
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    rafRef.current = requestAnimationFrame(tick);
-    return () => {
-      alive = false;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    };
-  }, [isVideo, expectedKey, laneId, dragging]);
-
-  // Reset displayed position when active media changes.
-  useEffect(() => {
-    setCurrentTime(0);
-    setDuration(0);
-    setDragging(false);
-    dragTimeRef.current = null;
-  }, [expectedKey]);
-
-  const applySeek = useCallback((sec: number) => {
-    if (!expectedKey) return;
-    try {
-      const s = VideoEngine.snapshot(laneId);
-      if (!ownerMatches(s.postId, expectedKey)) return; // stale owner — reject
-      const target = Math.max(0, Math.min(sec, duration > 0 ? duration : sec));
-      VideoEngine.seek(laneId, target);
-    } catch { /* noop */ }
-  }, [expectedKey, laneId, duration]);
-
-
-  // Bar drag handlers.
-  const seekFromClientX = useCallback((clientX: number): number | null => {
-    const el = barRef.current;
-    if (!el || duration <= 0) return null;
-    const r = el.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
-    return ratio * duration;
-  }, [duration]);
-
-  const onPointerDown = useCallback((e: React.PointerEvent) => {
-    if (!isVideo || duration <= 0) return;
-    e.stopPropagation();
-    (e.target as Element).setPointerCapture?.(e.pointerId);
-    setDragging(true);
-    const t = seekFromClientX(e.clientX);
-    if (t != null) {
-      dragTimeRef.current = t;
-      setCurrentTime(t);
-    }
-  }, [isVideo, duration, seekFromClientX]);
-
-  const onPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!dragging) return;
-    e.stopPropagation();
-    const t = seekFromClientX(e.clientX);
-    if (t != null) {
-      dragTimeRef.current = t;
-      setCurrentTime(t);
-    }
-  }, [dragging, seekFromClientX]);
-
-  const onPointerUp = useCallback((e: React.PointerEvent) => {
-    if (!dragging) return;
-    e.stopPropagation();
-    const t = dragTimeRef.current;
-    if (t != null) applySeek(t);
-    setDragging(false);
-    dragTimeRef.current = null;
-  }, [dragging, applySeek]);
 
   // Tap-to-pause: window listener, filters clean single-finger taps that miss
   // the chrome / scrubber. Only active while a video slide is showing.
@@ -261,9 +161,6 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
     };
   }, [isVideo, expectedKey, laneId, addPausedOwnerKey, removePausedOwnerKey]);
 
-  const progress = duration > 0 ? Math.max(0, Math.min(1, currentTime / duration)) : 0;
-  const barHeight = dragging ? 6 : 3;
-  const thumbSize = dragging ? 12 : 0;
 
   if (!isVideo) return null;
 
@@ -295,99 +192,6 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
       )}
       <style>{`@keyframes fs-scrubber-flash { 0% { opacity: 0.95; transform: translate(-50%,-50%) scale(0.85); } 60% { opacity: 0.85; transform: translate(-50%,-50%) scale(1); } 100% { opacity: 0; transform: translate(-50%,-50%) scale(1.05); } }`}</style>
 
-      {/* Scrubber bar — very bottom edge */}
-      <div
-        data-fs-scrubber
-        style={{
-          position: 'fixed',
-          left: 0, right: 0,
-          bottom: 0,
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-          zIndex: Z.echo + 3,
-          pointerEvents: 'none',
-        }}
-      >
-        {/* Time bubble */}
-        {dragging && duration > 0 && (
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              left: `${progress * 100}%`,
-              transform: 'translate(-50%, -140%)',
-              bottom: 'calc(env(safe-area-inset-bottom, 0px) + 14px)',
-              background: 'rgba(0,0,0,0.66)',
-              color: '#fff',
-              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-              fontSize: 11,
-              fontWeight: 600,
-              fontVariantNumeric: 'tabular-nums lining-nums',
-              padding: '3px 7px',
-              borderRadius: 6,
-              pointerEvents: 'none',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {fmtTime(currentTime)}
-          </div>
-        )}
-        {/* Bar hit-area (14px tall) — inner track is thinner */}
-        <div
-          ref={barRef}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-          style={{
-            position: 'relative',
-            height: 14,
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'stretch',
-            touchAction: 'none',
-            pointerEvents: 'auto',
-            cursor: 'pointer',
-          }}
-        >
-          {/* Track */}
-          <div
-            style={{
-              position: 'absolute',
-              left: 0, right: 0, bottom: 0,
-              height: barHeight,
-              background: 'rgba(255,255,255,0.25)',
-              transition: 'height 140ms ease',
-            }}
-          />
-          {/* Fill */}
-          <div
-            style={{
-              position: 'absolute',
-              left: 0, bottom: 0,
-              width: `${progress * 100}%`,
-              height: barHeight,
-              background: '#FFFFFF',
-              transition: 'height 140ms ease',
-            }}
-          />
-          {/* Thumb (only when dragging) */}
-          {dragging && (
-            <div
-              style={{
-                position: 'absolute',
-                left: `${progress * 100}%`,
-                bottom: barHeight / 2 - thumbSize / 2,
-                width: thumbSize,
-                height: thumbSize,
-                borderRadius: '50%',
-                background: '#fff',
-                transform: 'translateX(-50%)',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.45)',
-              }}
-            />
-          )}
-        </div>
-      </div>
     </>
   );
 };
