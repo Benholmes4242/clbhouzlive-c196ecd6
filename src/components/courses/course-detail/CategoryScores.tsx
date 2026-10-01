@@ -11,7 +11,6 @@
  * An absent category renders an EMPTY column — never a zero, never a dash.
  */
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { A, SANS, FIGS, BAR_RADIUS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 
@@ -73,15 +72,13 @@ export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?:
 export const SETTLED_MIN_RATINGS = 5;
 
 /**
- * §3.1 — the overall, 38px, inline with its sample on one baseline:
- *   7.9  overall · 1 rating
+ * §3.1 — the overall, 38px, with its tier word on one baseline: "7.9 overall".
+ * The rating count no longer sits beside it — the count lives in the right-hand
+ * slot of the Course tab's score row, where "Your rating" used to sit.
  */
 export const OverallScoreLine: React.FC<{ score: number; ratingCount: number }> = ({ score, ratingCount }) => {
-  const { t } = useTranslation('courses');
   const settled = ratingCount >= SETTLED_MIN_RATINGS;
   const tone = courseSubScoreTone(score);
-  const sampleRaw = t('courseDetail.communityScore.basedOn', { count: ratingCount });
-  const sample = sampleRaw.charAt(0).toLowerCase() + sampleRaw.slice(1);
   return (
     <div data-overall-score style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0, fontFamily: SANS }}>
       <span style={{ ...FIGS, flexShrink: 0, fontSize: 38, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: tone }}>
@@ -89,7 +86,7 @@ export const OverallScoreLine: React.FC<{ score: number; ratingCount: number }> 
       </span>
       <span style={{ minWidth: 0, fontSize: 11.5, fontWeight: 600, lineHeight: 1.35, color: A.MUTE }}>
         {settled ? <span style={{ color: tone }}>{getRatingTierLabel(score)} · </span> : null}
-        overall · {sample}
+        overall
       </span>
     </div>
   );
