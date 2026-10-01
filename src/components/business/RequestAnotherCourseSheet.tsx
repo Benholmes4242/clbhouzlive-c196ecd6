@@ -230,6 +230,78 @@ export function RequestAnotherCourseSheet({
           This course will be added to {clubName}.
         </p>
 
+        {mode === 'pick' ? (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label htmlFor="rac-search" style={LABEL_STYLE}>Search any course</label>
+            <input
+              id="rac-search"
+              type="search"
+              value={query}
+              maxLength={200}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Course name"
+              className={FIELD_CLASS}
+              style={{ color: BIZ.ink }}
+            />
+            {showList && (
+              <>
+                <p style={KICKER_STYLE}>{searching ? 'SEARCH RESULTS' : 'COURSES WE MAY BE MISSING'}</p>
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {rows.map((r) => {
+                    const label = verdict(r);
+                    const disabled = label !== null || pickingId !== null;
+                    const sub = r.sub_country || r.country;
+                    return (
+                      <li
+                        key={r.id}
+                        role="button"
+                        tabIndex={label ? -1 : 0}
+                        aria-disabled={disabled || undefined}
+                        onClick={label ? undefined : () => pickCourse(r)}
+                        onKeyDown={label ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickCourse(r); } }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0',
+                          borderBottom: `0.5px solid ${BIZ.hairSoft}`,
+                          opacity: label ? 0.45 : pickingId === r.id ? 0.7 : 1,
+                          cursor: label ? 'default' : 'pointer',
+                        }}
+                      >
+                        <div style={{ width: 44, height: 44, borderRadius: 8, background: BIZ.fill, overflow: 'hidden', flexShrink: 0 }}>
+                          {r.thumbnail_image ? (
+                            <img
+                              src={r.thumbnail_image}
+                              alt=""
+                              width={44}
+                              height={44}
+                              style={{ width: 44, height: 44, objectFit: 'cover', display: 'block' }}
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                          ) : null}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ color: BIZ.ink, fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</div>
+                          {sub ? <div style={{ color: BIZ.inkMute, fontSize: 12 }}>{sub}</div> : null}
+                        </div>
+                        {label ? <span style={{ color: BIZ.inkFaint, fontSize: 12, flexShrink: 0 }}>{label}</span> : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={() => { if (query.trim()) setCourseName(query.trim()); setMode('request'); }}
+              style={{ ...TEXT_BTN_STYLE, marginTop: 16 }}
+            >
+              Can't see it? Request a new course ›
+            </button>
+          </div>
+        ) : (
+        <>
+        <button type="button" onClick={() => setMode('pick')} style={{ ...TEXT_BTN_STYLE, marginBottom: 12 }}>
+          ‹ Back to the list
+        </button>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
             <label htmlFor="rac-name" style={LABEL_STYLE}>Course name</label>
@@ -280,6 +352,8 @@ export function RequestAnotherCourseSheet({
         <Button className="w-full mt-5" disabled={!canSubmit} onClick={submit}>
           {submitting ? 'Sending…' : 'Send request'}
         </Button>
+        </>
+        )}
       </div>
     </BottomSheet>
   );
