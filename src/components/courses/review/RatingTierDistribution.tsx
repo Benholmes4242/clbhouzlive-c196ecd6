@@ -2,6 +2,9 @@ import React from 'react';
 import { reviewTierColor } from '@/components/shared/ReviewGhostScore';
 import type { RatingTier } from '@/lib/ratingTier';
 
+// The Reviews tab header (TheScore) is its one live importer: restored by
+// BRIEF_REVIEWS_HEADER_PAIR_AND_DISTRIBUTION. Empty bands render as the label,
+// an empty track and a 0 — never hidden.
 // Bar fill comes from the app-wide score bands via `reviewTierColor` — a flat
 // band colour, not a gold/amber ramp.
 
