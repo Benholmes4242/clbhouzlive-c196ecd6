@@ -615,7 +615,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             <LikedByRow
               postId={activePost.id}
               count={likeState.count}
-              source={activePost.isReview ? 'review' : 'post'}
+              source="post"
               /* isRound is false by construction: rounds do not appear in this feed
                  (auto-posting of rounds to Clubhouse was discontinued). The derivation is
                  kept rather than hardcoding 'like' so that if rounds ever return to this
@@ -707,9 +707,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             bottom: 0,
             zIndex: Z.echo + 1,
             display: 'flex', alignItems: 'center', gap: 9,
-            background: 'rgba(10,10,12,0.92)',
-            backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
-            borderTop: '0.5px solid rgba(255,255,255,0.10)',
+            background: 'var(--glass-bg)',
+            backdropFilter: 'blur(var(--glass-blur)) saturate(140%)',
+            WebkitBackdropFilter: 'blur(var(--glass-blur)) saturate(140%)',
+            borderTop: '0.5px solid rgba(255,255,255,0.12)',
             paddingTop: 11,
             paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
             paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
@@ -737,8 +738,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           <span
             style={{
               flex: 1, minWidth: 0, height: 38, borderRadius: 12,
-              background: 'rgba(255,255,255,0.10)',
-              border: '1px solid rgba(255,255,255,0.14)',
+              background: 'rgba(255,255,255,0.14)',
+              border: '1px solid rgba(255,255,255,0.20)',
+              backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
               padding: '0 13px', boxSizing: 'border-box',
               display: 'flex', alignItems: 'center',
               fontSize: 13, color: 'rgba(255,255,255,0.62)',
