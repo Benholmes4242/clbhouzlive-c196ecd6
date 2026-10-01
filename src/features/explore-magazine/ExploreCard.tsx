@@ -442,7 +442,7 @@ function WhoLine({
   /* The glyph comes from reactionGlyph(), never hardcoded: a review handed an
      engagement object must show the thumb, not the clap. */
   const reactionKind: ReactionKind = engagement?.kind ?? 'celebrate';
-  const Glyph = reactionGlyph(reactionKind);
+
   const helpful = reactionKind === 'helpful';
   const likeLabel = helpful
     ? (engagement?.liked ? 'Marked helpful' : 'Mark this review helpful')
