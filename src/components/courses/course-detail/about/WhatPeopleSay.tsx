@@ -16,8 +16,9 @@
  * support; the rating count beside the score lets the reader judge the weight
  * for themselves.
  *
- * COLOUR: the community figure takes its score band; the viewer's own figure is
- * amber, which on this platform means the viewing member and nothing else.
+ * COLOUR: the community figure takes its score band. The rating count is
+ * right-aligned in the slot where the viewer's amber "Your rating" figure sat;
+ * the viewer's own score is not shown here.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +28,7 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores, OverallScoreLine } from '../CategoryScores';
-import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
+import AboutSection, { ABOUT_KICKER, AboutHairline } from './AboutSection';
 
 export { SETTLED_MIN_RATINGS } from '../CategoryScores';
 
@@ -40,15 +41,13 @@ interface WhatPeopleSayProps {
 }
 
 /** The rating count, right-aligned in the slot where "Your rating" used to sit. */
-const CountSlot: React.FC<{ count: number }> = ({ count }) => (
-  <div style={{ minWidth: 0, flexShrink: 0, textAlign: 'right', paddingBottom: 2 }}>
-    <CountText count={count} />
-  </div>
-);
-
-const CountText: React.FC<{ count: number }> = ({ count }) => {
+const CountSlot: React.FC<{ count: number }> = ({ count }) => {
   const { t } = useTranslation('courses');
-  return <span style={ABOUT_KICKER}>{t('courseDetail.communityScore.basedOn', { count })}</span>;
+  return (
+    <div style={{ minWidth: 0, flexShrink: 0, textAlign: 'right', paddingBottom: 2 }}>
+      <span style={ABOUT_KICKER}>{t('courseDetail.communityScore.basedOn', { count })}</span>
+    </div>
+  );
 };
 
 const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
@@ -111,7 +110,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
         <div style={{ flex: 1, minWidth: 0 }}>
           <OverallScoreLine score={score} ratingCount={total} />
         </div>
-        {yours != null ? <YoursFigure label={t('courseDetail.rating.yours')} value={yours.toFixed(1)} /> : null}
+        <CountSlot count={total} />
       </div>
 
       <CategoryScores
