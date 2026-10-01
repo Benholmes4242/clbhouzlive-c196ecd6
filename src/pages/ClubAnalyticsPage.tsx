@@ -373,7 +373,7 @@ export default function ClubAnalyticsPage() {
             businessName={business.name}
             clubId={business.club_id}
             fallbackClubName={business.club_name ?? null}
-            existingCourseNames={courses.map((c) => c.course_name)}
+            existingCourseNames={courses.flatMap((c) => [c.course_name, courseNameWithinClub(c.course_name)])}
           />
         )}
 
