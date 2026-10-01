@@ -29,7 +29,10 @@ export const SURFACE = PAGE_CANVAS;
 
 /**
  * Amber wash. Runs edge to edge, sits behind the content, never a top bar.
- * RENDERED ONLY ON STAGE 1. On a light canvas an amber radial read as a soft
+ * RENDERED ON THE INTRO AND THE PAYOFF (done) ONLY: amber light on the
+ * promise, flat canvas while the work happens (country, form, syncing, coming
+ * soon), amber light again on the payoff. The wash marks a moment; on every
+ * screen it would be wallpaper and stop meaning anything. On a light canvas an amber radial read as a soft
  * consumer gradient and was cut; on near-black the same radial reads as
  * stadium light. It is the brand colour used as LIGHT, not as ink, so it does
  * not compete with amber's meaning elsewhere - the viewing member's own data.
@@ -97,8 +100,10 @@ export const CAPTION: React.CSSProperties = {
 
 /* ── DISPLAY SCALE (BRIEF_WHS_CONNECT_FLOW_CINEMATIC) ──────────────────────
    The flow is read at arm's length, one idea per screen, so the headline and
-   the figure are the structure - not decoration inside a card. Sizes here are
-   deliberately larger than the app scale and belong to THIS surface only. */
+   the figure are the structure - not decoration inside a card. This scale
+   governs HEADLINES AND FIGURES only (DISPLAY, DISPLAY_SM, HERO_FIG, LEAD) and
+   is deliberately larger than the app scale. INPUTS are not part of it: every
+   field in the flow takes the app field canon (lib/tokens/field.ts). */
 
 /** Stage headline. Three lines maximum, always left aligned. */
 export const DISPLAY: React.CSSProperties = {
@@ -144,8 +149,15 @@ export const KICKER_LG: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.18em',
   textTransform: 'uppercase',
-  color: INK,
+  /* AMBER ON EVERY STAGE (BRIEF_WHS_CONNECT_FLOW_ONE_LANGUAGE). There is no
+     colour override on StageHead: an escape hatch here is how four eyebrow
+     colours happened. A non-amber eyebrow is a design question, not a prop. */
+  color: AMBER,
 };
+
+/** Syncing step not yet reached: ring and label. */
+export const STEP_WAIT_RING = 'rgba(255,255,255,0.14)';
+export const STEP_WAIT_INK = 'rgba(248,250,252,0.38)';
 
 /** Names a value on the display surface. */
 export const LABEL_LG: React.CSSProperties = {

@@ -265,14 +265,13 @@ export const Stage: React.FC<{ children: React.ReactNode }> = ({ children }) => 
  */
 export const StageHead: React.FC<{
   kicker?: string;
-  kickerColor?: string;
   headline: React.ReactNode;
   lead?: React.ReactNode;
   small?: boolean;
-}> = ({ kicker, kickerColor, headline, lead, small }) => (
+}> = ({ kicker, headline, lead, small }) => (
   <div>
     {kicker ? (
-      <div style={{ ...KICKER_LG, ...(kickerColor ? { color: kickerColor } : null), marginBottom: 14 }}>
+      <div style={{ ...KICKER_LG, marginBottom: 14 }}>
         {kicker}
       </div>
     ) : null}

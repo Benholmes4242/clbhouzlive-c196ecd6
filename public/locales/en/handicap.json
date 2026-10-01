@@ -233,6 +233,12 @@
       "cta": "See your full record",
       "headlineRounds": "{{rounds}} rounds, all here.",
       "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
+    },
+    "steps": {
+      "country": "Step 1 · Your country",
+      "form": "Step 2 · {{body}}",
+      "sync": "Step 3 · Connecting",
+      "comingSoon": "Step 1 · {{country}}"
     }
   },
   "roundResults": {

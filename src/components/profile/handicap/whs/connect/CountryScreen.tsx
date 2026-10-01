@@ -1,10 +1,10 @@
-import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS, FIELD_HEIGHT, FIELD_INK } from '@/lib/tokens/field';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, ChevronRight } from 'lucide-react';
 import { WHS_COUNTRIES, type WhsCountry } from '@/lib/whs/whsCountries';
 import { KICKER } from '@/lib/tokens/type';
-import { INK, MUTE, DIM, BORDER, PANEL, FONT, LABEL_LG, CAPTION } from './designTokens';
+import { AMBER, INK, MUTE, DIM, BORDER, PANEL, FONT, LABEL_LG, CAPTION } from './designTokens';
 import { Collapsible, Stage, StageHead } from './Primitives';
 
 interface Props {
@@ -43,7 +43,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
 
   return (
     <Stage>
-      <StageHead small headline="Where do you play?" lead={t('whsConnect.country.sub')} />
+      <StageHead small kicker={t('whsConnect.steps.country')} headline="Where do you play?" lead={t('whsConnect.country.sub')} />
 
       {/* FIELD CANON (lib/tokens/field.ts). Was PANEL/BORDER with no focus step. */}
       <div
@@ -52,7 +52,9 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          padding: '12px 14px',
+          height: FIELD_HEIGHT,
+          boxSizing: 'border-box',
+          padding: '0 14px',
           marginTop: 28,
         }}
       >
@@ -70,7 +72,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
             background: 'transparent',
             fontFamily: FONT,
             fontSize: 15,
-            color: INK,
+            color: FIELD_INK,
           }}
           className={FIELD_PLACEHOLDER_CLASS}
         />
@@ -85,7 +87,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
       {/* LIVE: one large card per open federation. The only card in the flow. */}
       {live.length > 0 ? (
         <div style={{ marginTop: 26 }}>
-          <div style={{ ...LABEL_LG, marginBottom: 12 }}>Live</div>
+          <div style={{ ...LABEL_LG, color: AMBER, marginBottom: 12 }}>Live</div>
           {live.map((c) => (
             <button
               key={c.id}
@@ -158,7 +160,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
                   </div>
                   <div style={{ ...LABEL_LG, marginTop: 5 }}>{c.body}</div>
                 </div>
-                <div style={{ ...LABEL_LG, textAlign: 'right', flexShrink: 0 }}>
+                <div style={{ ...LABEL_LG, color: c.comingSoon ? AMBER : DIM, textAlign: 'right', flexShrink: 0 }}>
                   {c.comingSoon ? 'coming soon' : 'on the list'}
                 </div>
               </div>

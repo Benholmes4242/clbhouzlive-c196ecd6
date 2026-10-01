@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { WhsCountry } from '@/lib/whs/whsCountries';
 import { CAPTION, DIM } from './designTokens';
 import { PrimaryButton, FooterBar, Stage, StageHead } from './Primitives';
@@ -18,12 +19,14 @@ interface Props {
  * member when the federation goes live. It also does not offer manual round
  * entry - the app has never supported it.
  */
-export const ComingSoonScreen: React.FC<Props> = ({ country, onChangeCountry }) => (
+export const ComingSoonScreen: React.FC<Props> = ({ country, onChangeCountry }) => {
+  const { t } = useTranslation('handicap');
+  return (
   <>
     <Stage>
       <StageHead
         small
-        kicker="Coming soon"
+        kicker={t('whsConnect.steps.comingSoon', { country: country.name })}
         headline={`${country.name} is not open yet.`}
         lead={`${country.body} has to open an API before we can read your record. When it does, it appears in the list here.`}
       />
@@ -37,6 +40,7 @@ export const ComingSoonScreen: React.FC<Props> = ({ country, onChangeCountry }) 
       <PrimaryButton onClick={onChangeCountry}>Choose another country</PrimaryButton>
     </FooterBar>
   </>
-);
+  );
+};
 
 export default ComingSoonScreen;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
-import { CANVAS, INK, MUTE, DIM, BORDER, TRACK, GOOD, LABEL_LG } from './designTokens';
+import { CANVAS, INK, MUTE, DIM, BORDER, GOOD, LABEL_LG, STEP_WAIT_RING, STEP_WAIT_INK } from './designTokens';
 import { Stage, StageHead } from './Primitives';
 
 /**
@@ -32,8 +32,7 @@ export const SyncingScreen: React.FC = () => {
   return (
     <Stage>
       <StageHead
-        kicker={t('whsConnect.sync.kicker')}
-        kickerColor={GOOD}
+        kicker={t('whsConnect.steps.sync')}
         headline={t('whsConnect.sync.headline')}
         lead={t('whsConnect.sync.sub')}
       />
@@ -63,7 +62,10 @@ export const SyncingScreen: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   background: passed ? GOOD : 'transparent',
-                  border: passed ? 'none' : `1.5px solid ${isCurrent ? GOOD : TRACK}`,
+                  /* GREEN HAS ONE JOB: a step the server has completed (filled)
+                     or is on (ring). Waiting steps sit at the quiet tier. */
+                  boxSizing: 'border-box',
+                  border: passed ? 'none' : `2px solid ${isCurrent ? GOOD : STEP_WAIT_RING}`,
                   transition: 'background 200ms ease, border-color 200ms ease',
                 }}
               >
@@ -74,7 +76,7 @@ export const SyncingScreen: React.FC = () => {
                   fontSize: 15,
                   fontWeight: isCurrent ? 700 : 400,
                   letterSpacing: '-0.01em',
-                  color: passed || isCurrent ? INK : MUTE,
+                  color: isCurrent ? INK : passed ? MUTE : STEP_WAIT_INK,
                 }}
               >
                 {t(`whsConnect.sync.${key}`)}

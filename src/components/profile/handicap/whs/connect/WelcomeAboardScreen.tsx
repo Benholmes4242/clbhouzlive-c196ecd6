@@ -182,7 +182,6 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
       <Stage>
         <StageHead
           kicker={t('whsConnect.done.kicker')}
-          kickerColor={GOOD}
           headline={headline}
           lead={lead}
         />
