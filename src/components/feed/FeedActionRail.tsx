@@ -360,7 +360,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
                 ariaLabel={hasLiked ? 'Unlike' : 'Like'}
                 animateKey={likeAnimKey}
               >
-                <ReactionGlyph reacted={hasLiked} size={28} tone="media" />
+                <ReactionGlyph reacted={hasLiked} size={28} tone="chrome" />
               </ActionButton>
               <button
                 type="button"
@@ -396,7 +396,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               accentCount={hasLiked}
               animateKey={likeAnimKey}
             >
-              <ReactionGlyph reacted={hasLiked} size={28} tone="media" />
+              <ReactionGlyph reacted={hasLiked} size={28} tone="chrome" />
             </ActionButton>
           )}
 

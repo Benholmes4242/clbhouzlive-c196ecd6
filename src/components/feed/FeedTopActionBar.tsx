@@ -164,7 +164,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
               aria-label={hasLiked ? 'Unlike' : 'Like'}
               style={likeStr && !onOpenLikes ? chipWithCount : chipBase}
             >
-              <ReactionGlyph reacted={hasLiked} size={24} tone="media" />
+              <ReactionGlyph reacted={hasLiked} size={24} tone="chrome" />
               {likeStr && !onOpenLikes && (
                 <span
                   style={{
