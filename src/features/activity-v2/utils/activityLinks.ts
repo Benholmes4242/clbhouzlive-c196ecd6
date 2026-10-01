@@ -369,6 +369,12 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     if (bizId) return `/business/${bizId}/verification`;
   }
 
+  // BRIEF_CLUB_REQUEST_ANOTHER_COURSE — above the entity_type 'course' fallback.
+  if (type === 'club_course_added') {
+    const cid = data.course_id || entity_id;
+    if (cid) return `/courses/${cid}`;
+  }
+
   if (
     type === 'course_claim_submitted' ||
     type === 'course_claim_approved' ||

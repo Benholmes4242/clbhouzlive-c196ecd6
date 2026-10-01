@@ -51,6 +51,12 @@ serve(async (req) => {
     // BRIEF_HOME_CLUB_PICKER §3.3 — a home-club request records WHO asked, so
     // resolving it can connect them (and everyone else who asked) automatically.
     const isHomeClub = body?.home_club === true;
+    // BRIEF_CLUB_REQUEST_ANOTHER_COURSE §4 — a verified club reporting a course
+    // its club is missing. Only when BOTH ids are present; otherwise every
+    // existing path below is unchanged.
+    const for_business_id = body?.for_business_id ? String(body.for_business_id) : null;
+    const for_club_id = body?.for_club_id ? String(body.for_club_id) : null;
+    const isClubCourse = !!for_business_id && !!for_club_id && !isHomeClub;
 
     if (!course_name) return json({ ok: false, error: "Missing course_name" }, 400);
     if (!location) return json({ ok: false, error: "Missing location" }, 400);
@@ -58,7 +64,53 @@ serve(async (req) => {
       return json({ ok: false, error: "Input too long" }, 400);
     }
 
-    if (isHomeClub) {
+    let clubLabel: string | null = null;
+    let businessLabel: string | null = null;
+    if (isClubCourse) {
+      const { data: member } = await supabaseAdmin
+        .from("business_members")
+        .select("role")
+        .eq("business_id", for_business_id)
+        .eq("user_id", user.id)
+        .in("role", ["owner", "admin"])
+        .limit(1);
+      if (!member || member.length === 0) {
+        return json({ ok: false, error: "Not authorized for this business" }, 403);
+      }
+      const { data: biz } = await supabaseAdmin
+        .from("business_accounts")
+        .select("name, is_deleted, category, is_verified, club_id")
+        .eq("id", for_business_id)
+        .maybeSingle();
+      if (
+        !biz || biz.is_deleted !== false || biz.category !== "Golf Club" ||
+        biz.is_verified !== true || biz.club_id !== for_club_id
+      ) {
+        return json({ ok: false, error: "This business cannot request courses" }, 403);
+      }
+      businessLabel = biz.name ?? null;
+      const { data: club } = await supabaseAdmin
+        .from("golf_clubs").select("name").eq("id", for_club_id).maybeSingle();
+      clubLabel = club?.name ?? null;
+    }
+
+    if (isClubCourse) {
+      // Dedupe PER BUSINESS — never against the global queue, so another club
+      // with a similarly named course is not silently swallowed.
+      const { data: mine } = await supabaseAdmin
+        .from("course_requests")
+        .select("id")
+        .eq("status", "pending")
+        .eq("for_business_id", for_business_id)
+        .ilike("course_name", course_name)
+        .limit(1);
+      if (mine && mine.length > 0) {
+        return json(
+          { ok: true, duplicate: true, message: "You have already asked us for that course — we are on it." },
+          200,
+        );
+      }
+    } else if (isHomeClub) {
       // Dedupe PER MEMBER, not per club: several members may (and should) be
       // able to request the same missing club so resolving it connects them all.
       const { data: mine } = await supabaseAdmin
@@ -97,6 +149,7 @@ serve(async (req) => {
         country,
         note,
         home_club_for_user_id: isHomeClub ? user.id : null,
+        ...(isClubCourse ? { for_business_id, for_club_id } : {}),
       })
       .select("id, created_at")
       .single();
@@ -134,7 +187,9 @@ serve(async (req) => {
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (resendApiKey) {
-      const subject = isHomeClub
+      const subject = isClubCourse
+        ? `Club course request: ${course_name}`
+        : isHomeClub
         ? `Home club request: ${course_name}`
         : `New course request: ${course_name}`;
       const text =
@@ -143,6 +198,7 @@ serve(async (req) => {
         `Location: ${location}\n` +
         (country ? `Country: ${country}\n` : "") +
         (note ? `Note: ${note}\n` : "") +
+        (isClubCourse ? `Club: ${clubLabel ?? for_club_id}\nBusiness: ${businessLabel ?? for_business_id}\n` : "") +
         `Requested by: ${requesterName} (${requesterEmail})\n\n` +
         `Review in admin panel: ${ADMIN_PANEL_URL}`;
       const html = `
@@ -153,6 +209,7 @@ serve(async (req) => {
     <tr><td style="color:#64748B;padding:4px 16px 4px 0;">Location</td><td>${esc(location)}</td></tr>
     ${country ? `<tr><td style="color:#64748B;padding:4px 16px 4px 0;">Country</td><td>${esc(country)}</td></tr>` : ""}
     ${note ? `<tr><td style="color:#64748B;padding:4px 16px 4px 0;">Note</td><td>${esc(note)}</td></tr>` : ""}
+    ${isClubCourse ? `<tr><td style="color:#64748B;padding:4px 16px 4px 0;">Club</td><td>${esc(clubLabel ?? for_club_id ?? "")}</td></tr><tr><td style="color:#64748B;padding:4px 16px 4px 0;">Business</td><td>${esc(businessLabel ?? for_business_id ?? "")}</td></tr>` : ""}
     <tr><td style="color:#64748B;padding:4px 16px 4px 0;">Requested by</td><td>${esc(requesterName)} (${esc(requesterEmail)})</td></tr>
   </table>
   <p style="margin-top:20px;">

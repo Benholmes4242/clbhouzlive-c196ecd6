@@ -38,6 +38,9 @@ import {
 } from '@/features/business/clubAnalytics/sections';
 
 import type { ClubCourseRef } from '@/features/business/clubAnalytics/types';
+import { useQuery } from '@tanstack/react-query';
+import { fetchGolfClub } from '@/features/business/claimClub';
+import { RequestAnotherCourseSheet } from '@/components/business/RequestAnotherCourseSheet';
 
 const TITLE = 'Your course';
 /** §4 — plural when the club owns more than one course. */
@@ -150,6 +153,58 @@ const CourseBlock: React.FC<{ course: ClubCourseRef }> = ({ course }) => {
 };
 
 
+/* ─────────────── BRIEF_CLUB_REQUEST_ANOTHER_COURSE §2 ─────────────── */
+
+/** A text button in the page's idiom that opens the request sheet. Mounted
+ *  only under the course block and in the `unclaimed` notice. */
+const RequestAnotherCourse: React.FC<{
+  businessId: string;
+  businessName: string;
+  clubId: string;
+  fallbackClubName: string | null;
+  existingCourseNames: string[];
+}> = ({ businessId, businessName, clubId, fallbackClubName, existingCourseNames }) => {
+  const [open, setOpen] = React.useState(false);
+  const { data: club } = useQuery({
+    queryKey: ['golf-club', clubId],
+    queryFn: () => fetchGolfClub(clubId),
+    staleTime: 5 * 60_000,
+  });
+  const clubName = club?.name ?? fallbackClubName ?? businessName;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <p style={{ ...BIZ_BODY, fontSize: 11.5, margin: 0, color: A.DIM }}>
+        Missing a course? Tell us and we will add it to your club.
+      </p>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        style={{
+          alignSelf: 'flex-start',
+          border: 'none',
+          background: 'transparent',
+          padding: 0,
+          fontSize: 12.5,
+          fontWeight: 600,
+          color: A.MUTE,
+          cursor: 'pointer',
+        }}
+      >
+        Request another course ›
+      </button>
+      <RequestAnotherCourseSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        businessId={businessId}
+        businessName={businessName}
+        clubId={clubId}
+        clubName={clubName}
+        existingCourseNames={existingCourseNames}
+      />
+    </div>
+  );
+};
+
 /* ───────────────────────── THE PAGE ───────────────────────── */
 
 export default function ClubAnalyticsPage() {
@@ -228,6 +283,17 @@ export default function ClubAnalyticsPage() {
           headline="Your claim is not yet attached to a course"
           body="Course analytics follow the course your club claim resolves to. Once that link is in place, this page fills itself in — there is nothing for you to set up."
         />
+        {business.club_id && (
+          <div style={{ padding: '16px 16px 0' }}>
+            <RequestAnotherCourse
+              businessId={business.id}
+              businessName={business.name}
+              clubId={business.club_id}
+              fallbackClubName={business.club_name ?? null}
+              existingCourseNames={[]}
+            />
+          </div>
+        )}
       </ManagePageShell>
     );
   }
@@ -300,6 +366,16 @@ export default function ClubAnalyticsPage() {
         )}
 
         {selected && <CourseBlock key={selected.course_id} course={selected} />}
+
+        {business.club_id && (
+          <RequestAnotherCourse
+            businessId={business.id}
+            businessName={business.name}
+            clubId={business.club_id}
+            fallbackClubName={business.club_name ?? null}
+            existingCourseNames={courses.flatMap((c) => [c.course_name, courseNameWithinClub(c.course_name)])}
+          />
+        )}
 
         <p style={{ ...BIZ_BODY, fontSize: 11.5, margin: 0, color: A.DIM }}>
           Everything on this page is an aggregate across rounds played on your courses. No individual member, round or
