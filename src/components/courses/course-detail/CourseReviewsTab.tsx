@@ -6,15 +6,20 @@
  * render when they can change what you see.
  *
  * WHAT THE NUMBERS DECIDED (measured across course_ratings):
- *   174 ratings, 151 with prose (87%) — so the prose is the content.
- *   9 ratings on the busiest course, average under 2 — so sort gates at 8,
+ *   185 ratings across 101 rated courses; 9 on the busiest, 24 courses at 5+,
+ *   none at 10+. Prose is the content — so sort gates at 8,
  *   and search and the rating-filter chips are retired outright: they operated
  *   on a list the member can already see whole.
  *   99 helpful votes, ALL of them 'helpful', not one unhelpful ever — so the
  *   thumbs-down goes and the like is a single affirmative.
  *
+ * RESTORED (BRIEF_REVIEWS_HEADER_PAIR_AND_DISTRIBUTION): RatingTierDistribution,
+ *   under the Community/You pair. Its bands are sparse at these numbers and
+ *   empty bands are accepted as the honest picture. Counts are computed here
+ *   from the same non-mock rated set the header counts; if the two disagree
+ *   the bars are withheld rather than contradict the header.
+ *
  * RETIRED FROM THIS TAB (files untouched, other importers unaffected):
- *   RatingTierDistribution — one or two populated bars and four empty ones.
  *   RatingFilterChips      — nothing left to filter from.
  *   the inline search field, and the control row's "Edit yours" button (the
  *   edit action now lives inside Your review, beside the thing being edited).
@@ -46,6 +51,7 @@ import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 
 import { AboutSection, AboutHairline, GUTTER } from './about/AboutSection';
 import { TheScore } from './reviews/TheScore';
+import { getRatingTier } from '@/lib/ratingTier';
 import { WhatTheyScored } from './reviews/WhatTheyScored';
 import { FlatReviewRow, FlatAction } from './reviews/reviewFlatBits';
 import { ResponseDisplay, ReplyForm, VerifyToRespondPrompt } from '../review/ReviewResponseBlock';
@@ -394,6 +400,22 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const ratingCount = ratingAggregates?.review_count ?? 0;
   const hasRatings = ratingCount > 0;
 
+  /* Five-band counts from the SAME set the header counts (non-mock, rated). */
+  const distribution = useMemo(() => {
+    const d = { exceptional: 0, excellent: 0, good: 0, fair: 0, poor: 0 };
+    for (const r of reviews) {
+      if (r.is_mock || r.rating == null) continue;
+      d[getRatingTier(r.rating).toLowerCase() as keyof typeof d] += 1;
+    }
+    const total = d.exceptional + d.excellent + d.good + d.fair + d.poor;
+    if (total !== ratingCount) {
+      console.warn('[CourseReviewsTab] distribution total', total, '≠ header count', ratingCount, '— bars withheld');
+      return null;
+    }
+    return d;
+  }, [reviews, ratingCount]);
+  const viewerScore = myReview?.rating ?? null;
+
   const showSort = reviews.length >= SORT_GATE;
   const categoryAggregates = useMemo(() => ({
     design: ratingAggregates?.avg_design_score,
@@ -480,7 +502,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         ) : (
           <>
             {/* §3.1 */}
-            <TheScore score={communityScore} ratingCount={ratingCount} />
+            <TheScore score={communityScore} ratingCount={ratingCount} viewerScore={viewerScore} distribution={distribution} />
 
             {/* §3.2 */}
             <WhatTheyScored aggregates={categoryAggregates} />

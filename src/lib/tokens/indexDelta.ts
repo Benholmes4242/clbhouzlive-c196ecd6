@@ -22,3 +22,14 @@ export const INDEX_DELTA = {
     drifted: '#F87171',
   },
 } as const;
+
+/**
+ * DELTA_TONE — the token for a SIGNED DIFFERENCE FROM A REFERENCE (e.g. your
+ * rating against the community's). INDEX_DELTA remains the token for MOVEMENT
+ * OVER TIME. The two deliberately share values: both express direction on the
+ * same surfaces. Neither may ever be sourced from TOPAR_RED, A.RED or A.GREEN.
+ */
+export const DELTA_TONE = {
+  light: { up: INDEX_DELTA.light.improved, down: INDEX_DELTA.light.drifted },
+  dark: { up: INDEX_DELTA.dark.improved, down: INDEX_DELTA.dark.drifted },
+} as const;
