@@ -557,6 +557,17 @@ export function SnapFeed({
     }
   }, []);
 
+  // One stable ref callback per idx so FeedSlide's React.memo holds.
+  const slideRefCallbacks = useRef(new Map<number, (el: HTMLDivElement | null) => void>());
+  const getSlideRefCallback = useCallback((idx: number) => {
+    let cb = slideRefCallbacks.current.get(idx);
+    if (!cb) {
+      cb = (el: HTMLDivElement | null) => setSlideRef(idx, el);
+      slideRefCallbacks.current.set(idx, cb);
+    }
+    return cb;
+  }, [setSlideRef]);
+
   // ── Scroll to top when tab changes ──
   const prevTab = useRef(activeTab);
   useEffect(() => {
@@ -831,7 +842,7 @@ export function SnapFeed({
             key={post.id}
             post={post}
             index={idx}
-            setRef={(el) => setSlideRef(idx, el)}
+            setRef={getSlideRefCallback(idx)}
             activeTab={activeTab}
             followOverrides={followOverrides}
             onFollowChange={onFollowChange}
