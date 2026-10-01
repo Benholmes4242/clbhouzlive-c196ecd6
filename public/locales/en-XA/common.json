@@ -989,6 +989,21 @@
     "namesTwoAndOne": "[~~{{a}}, {{b}} áñđ őñé őţĥéř~~]",
     "namesOneAndMore": "[~~{{a}} áñđ {{n}} ɱőřé~~]",
     "namesTwoAndMore": "[~~{{a}}, {{b}} áñđ {{n}} ɱőřé~~]",
-    "sheetTitleCelebrated": "[~~Ĉéļéƀřáţéđ~~]"
+    "sheetTitleCelebrated": "[~~Ĉéļéƀřáţéđ~~]",
+    "likedByYou": "Liked by you",
+    "likedByYouAndName": "Liked by you and {{b}}",
+    "likedByYouAndOne": "Liked by you and one other",
+    "likedByYouAndMore": "Liked by you and {{n}} others",
+    "likedByYouNameAndOne": "Liked by you, {{b}} and one other",
+    "likedByYouNameAndMore": "Liked by you, {{b}} and {{n}} others",
+    "youOnly": "You",
+    "youAndName": "You and {{b}}",
+    "youAndOne": "You and one other",
+    "youAndMore": "You and {{n}} more",
+    "youNameAndOne": "You, {{b}} and one other",
+    "youNameAndMore": "You, {{b}} and {{n}} more",
+    "youCelebratedThisRound": "{{names}} celebrated this round",
+    "youCelebratedYourRound": "{{names}} celebrated your round",
+    "youCelebratedOwnersRound": "{{names}} celebrated {{owner}}'s round"
   }
 }

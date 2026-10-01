@@ -26,6 +26,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostLikes, type LikeSource, type PostLiker } from '@/hooks/usePostLikes';
 import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 export interface PostLikerEnriched extends PostLiker {
   /** Handicap index for personal actors. Null for business actors and for
@@ -34,6 +35,8 @@ export interface PostLikerEnriched extends PostLiker {
   /** Business type label for business actors (shown instead of a handicap). */
   businessType: string | null;
   isFollowing: boolean;
+  /** This entry is the viewing actor — LikedByRow renders it as "you". */
+  isViewer: boolean;
 }
 
 function firstName(name: string): string {
@@ -54,6 +57,9 @@ export function usePostLikers(
 ) {
   const { user } = useSupabaseSession();
   const blockedIds = useBlockedUserIds(user?.id ?? null);
+  const { activeActor } = useActiveActor();
+  const viewerType = activeActor?.type ?? 'personal';
+  const viewerId = activeActor?.id ?? user?.id ?? null;
   const base = usePostLikes(postId, enabled, source);
   const likers = base.data ?? [];
 
@@ -139,17 +145,21 @@ export function usePostLikers(
           handicapIndex: isBusiness ? null : meta?.hcp.get(actorId) ?? null,
           businessType: isBusiness ? meta?.types.get(actorId) ?? null : null,
           isFollowing: !isBusiness && !!meta?.following.has(actorId),
+          isViewer: viewerId != null && actorId === viewerId && (l.actorType ?? 'personal') === viewerType,
         } as PostLikerEnriched;
       });
 
 
-    // Stable partition: followed first, then everyone else. usePostLikes
+    // Stable partition: viewer, then followed, then everyone else. usePostLikes
     // already ordered most-recent-first, so recency survives inside groups.
+    // The VIEWER comes first, ahead of followed members (and so is the first
+    // avatar in the stack).
     return [
-      ...enrichedList.filter((l) => l.isFollowing),
-      ...enrichedList.filter((l) => !l.isFollowing),
+      ...enrichedList.filter((l) => l.isViewer),
+      ...enrichedList.filter((l) => !l.isViewer && l.isFollowing),
+      ...enrichedList.filter((l) => !l.isViewer && !l.isFollowing),
     ];
-  }, [likers, enrichment.data, blockedIds]);
+  }, [likers, enrichment.data, blockedIds, viewerId, viewerType]);
 
   return {
     likers: ordered,
