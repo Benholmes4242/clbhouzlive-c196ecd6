@@ -23,8 +23,7 @@ import { A, FIGS, SANS } from './tokens';
  */
 
 const WHITE_72 = 'rgba(255,255,255,0.72)';
-/** On-dark amber: #F7931E does not hold on photography. */
-const AMBER_ON_DARK = '#FFB25E';
+import { AMBER_ON_MEDIA } from '@/lib/tokens/surfaces';
 
 interface Props {
   count: number;
@@ -82,7 +81,7 @@ export function ReactionAction({
 
   const glass = tone === 'glass';
   const idle = glass ? WHITE_72 : A.MUTE;
-  const amber = glass ? AMBER_ON_DARK : A.AMBER;
+  const amber = glass ? AMBER_ON_MEDIA : A.AMBER;
   const countColor = reacted ? amber : glass ? WHITE_72 : A.MUTE;
 
   const figure =

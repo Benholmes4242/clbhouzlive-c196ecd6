@@ -1,5 +1,6 @@
 import React from 'react';
 import ThumbIcon from '@/components/icons/ThumbIcon';
+import { AMBER_ON_MEDIA } from '@/lib/tokens/surfaces';
 
 /**
  * THE POST TYPE DECIDES THE REACTION (BRIEF_CELEBRATE_REACTION_BUILD).
@@ -66,7 +67,7 @@ export function ReactionGlyph({
   return React.createElement(ThumbIcon, {
     weight: reacted ? 'fill' : 'regular',
     size,
-    color: color ?? (reacted ? AMBER : tone === 'media' ? IDLE_MEDIA : IDLE_PANEL),
+    color: color ?? (reacted ? (tone === 'media' ? AMBER_ON_MEDIA : AMBER) : tone === 'media' ? IDLE_MEDIA : IDLE_PANEL),
     'aria-hidden': true,
   });
 }

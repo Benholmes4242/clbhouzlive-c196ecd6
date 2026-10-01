@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { AMBER_ON_MEDIA } from '@/lib/tokens/surfaces';
 import { useTranslation } from 'react-i18next';
 
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
@@ -266,7 +267,7 @@ export function MomentTile({
               style={{
                 fontSize: 14,
                 fontWeight: 700,
-                color: '#FFB25E',
+                color: AMBER_ON_MEDIA,
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
                 fontVariantNumeric: 'tabular-nums',

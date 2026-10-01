@@ -320,7 +320,7 @@ export function FeedCard({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 3,
-              color: AMBER,
+              color: '#FFFFFF',
               fontWeight: 700,
               fontSize: 11,
               fontFamily: FONT_FAMILY,
@@ -328,7 +328,7 @@ export function FeedCard({
               pointerEvents: 'none',
             }}
           >
-            <ReactionGlyph reacted size={12} tone="media" />
+            <ReactionGlyph reacted={false} size={12} tone="media" />
             {formatCount(row.like_count)}
           </div>
         ) : null}
@@ -384,7 +384,7 @@ export function FeedCard({
                   flexShrink: 0,
                 }}
               >
-                <ReactionGlyph reacted size={12} />
+                <ReactionGlyph reacted={false} size={12} />
                 {formatCount(row.like_count)}
               </span>
             )}

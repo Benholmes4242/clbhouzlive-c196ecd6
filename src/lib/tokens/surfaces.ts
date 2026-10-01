@@ -129,3 +129,11 @@ export function inkWithAlpha(hex: string, alpha: number): string {
   const [, red, green, blue] = channels;
   return `rgba(${parseInt(red, 16)},${parseInt(green, 16)},${parseInt(blue, 16)},${alpha})`;
 }
+
+/**
+ * AMBER_ON_MEDIA — the amber for a glyph or figure sitting DIRECTLY on
+ * photography with no scrim or shadow behind it; standard amber is hard to
+ * read on a bright photograph. AMBER (#F7931E) remains the amber everywhere
+ * else. Declared once, here.
+ */
+export const AMBER_ON_MEDIA = '#FFB25E';
