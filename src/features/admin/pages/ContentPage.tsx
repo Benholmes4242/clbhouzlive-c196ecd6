@@ -27,6 +27,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import AdminSheet from '../components/AdminSheet';
 import CourseInsight from '../components/CourseInsight';
 import AdminAccessDenied from '../components/AdminAccessDenied';
+import CourseClubControl from '../components/CourseClubControl';
 import { COURSE_TYPES } from '../constants';
 import { CourseGeographySelectors } from '../components/CourseGeographySelectors';
 import { DuplicateCourseWarning, useDuplicateCourseCheck } from '../components/DuplicateCourseWarning';
@@ -722,6 +723,7 @@ function CourseDetail({
           <Section title="Identity">
             <Field label="Name"><TextInput value={form.name} onChange={v => set('name', v)} /></Field>
             <Field label="Country code"><TextInput value={form.country_code} onChange={v => set('country_code', v)} placeholder="e.g. US" /></Field>
+            <Field label="Club">{courseId && <CourseClubControl courseId={courseId} clubId={(course as any)?.club_id ?? null} />}</Field>
           </Section>
 
           <Section title="Location">
