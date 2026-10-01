@@ -32,6 +32,8 @@ export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, 
   };
   const [form, setForm] = useState(EMPTY);
   const [busy, setBusy] = useState(false);
+  /** Set once a course row exists; blocks a second create in this sheet session. */
+  const [createdId, setCreatedId] = useState<string | null>(null);
   const [draftRestored, setDraftRestored] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -61,6 +63,7 @@ export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, 
     }
     // Closed: reset ephemeral form + photo, but leave the persisted draft alone.
     setForm(EMPTY);
+    setCreatedId(null);
     setDraftRestored(false);
     setPhotoFile(null);
     if (photoPreview) URL.revokeObjectURL(photoPreview);
@@ -89,6 +92,7 @@ export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, 
   );
 
   const submit = async () => {
+    if (createdId) return;
     if (!form.name.trim()) { toast.error('Name is required'); return; }
     if (!form.region_key || !isCanonicalCountry(form.country) || !form.continent) {
       toast.error('Pick a region (and continent for Rest of World)');
@@ -98,6 +102,7 @@ export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, 
     setBusy(true);
     try {
       const created = await createCourse(form);
+      if (created?.id) setCreatedId(created.id);
       if (photoFile && created?.id) {
         try {
           await uploadPhoto(created.id, photoFile);
@@ -123,6 +128,12 @@ export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, 
       title="Add course"
       subtitle="Create a new golf course record"
       footer={
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {createdId && (
+          <div role="status" style={{ fontSize: 12, color: t.inkMuted, fontWeight: 600 }}>
+            Course created. Close this and use Attach to club to finish.
+          </div>
+        )}
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={onClose}
@@ -135,21 +146,22 @@ export default function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, 
           >Cancel</button>
           <button
             onClick={submit}
-            disabled={!valid || busy}
+            disabled={!valid || busy || !!createdId}
             style={{
               padding: '10px 16px', borderRadius: t.radius.md,
               border: 'none',
-              background: valid && !busy ? t.ink : t.line,
-              color: valid && !busy ? t.surface : t.inkFaint,
+              background: valid && !busy && !createdId ? t.ink : t.line,
+              color: valid && !busy && !createdId ? t.surface : t.inkFaint,
               fontSize: 13, fontWeight: 700,
-              cursor: valid && !busy ? 'pointer' : 'not-allowed',
+              cursor: valid && !busy && !createdId ? 'pointer' : 'not-allowed',
               flex: 2, minHeight: 44,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             }}
           >
             {busy && <Loader2 size={14} className="admin-spin" />}
-            {busy ? 'Creating…' : 'Create course'}
+            {createdId ? 'Created' : busy ? 'Creating…' : 'Create course'}
           </button>
+        </div>
         </div>
       }
     >

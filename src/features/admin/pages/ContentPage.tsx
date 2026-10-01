@@ -788,7 +788,6 @@ function CourseDetail({
 }
 
 
-/* ───────── Add course sheet ───────── */
 
 
 /* ───────────────────────── Tour Data tab ───────────────────────── */
