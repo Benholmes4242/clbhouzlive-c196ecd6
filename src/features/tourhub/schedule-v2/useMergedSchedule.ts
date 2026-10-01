@@ -1,3 +1,4 @@
+import { linkedTournamentPlace, TOURNAMENT_COURSE_PLACE_JOIN, type CoursePlaceJoin } from '../_shared/tournamentPlace';
 /**
  * useMergedSchedule — All Tours chronological merge for schedule-v2.
  *
@@ -49,6 +50,8 @@ interface MergedRow {
   venue_country: string | null;
   purse: number | null;
   defending_champion: string | null;
+  golf_course_id?: string | null;
+  course?: CoursePlaceJoin | CoursePlaceJoin[];
   season?: { tour_name: string | null; tour_full_name: string | null } | null;
 }
 
@@ -72,7 +75,7 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
       const { data, error } = await supabase
         .from('sr_tournaments')
         .select(
-          'id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, season:sr_seasons(tour_name, tour_full_name)',
+          `id, season_id, name, status, start_date, end_date, venue_name, venue_city, venue_country, purse, defending_champion, golf_course_id, season:sr_seasons(tour_name, tour_full_name), ${TOURNAMENT_COURSE_PLACE_JOIN}`,
         )
         .gte('start_date', start)
         .lt('start_date', end)
@@ -164,6 +167,7 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
         name: r.name,
         venueName: r.venue_name,
         venueCity: r.venue_city,
+        coursePlace: linkedTournamentPlace(r.golf_course_id, r.course),
         venueCountry: r.venue_country,
         purse: r.purse,
         startDate: r.start_date,

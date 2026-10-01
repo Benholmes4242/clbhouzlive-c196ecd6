@@ -94,7 +94,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
     fontFamily: FONT,
   };
 
-  const venueLine = [event.venueName, event.venueCity].filter(Boolean).join(' · ');
+  const venueLine = [event.venueName, event.coursePlace ?? event.venueCity].filter(Boolean).join(' · ');
   const tourLabel = event.tourSlug ? (TOUR_LABEL[event.tourSlug] ?? event.tourSlug) : null;
 
   return (
