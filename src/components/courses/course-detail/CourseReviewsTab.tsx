@@ -50,7 +50,7 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 
 import { AboutSection, AboutHairline, GUTTER } from './about/AboutSection';
-import { TheScore } from './reviews/TheScore';
+import { TheScore, TheScoreReservedHeight } from './reviews/TheScore';
 import { getRatingTier } from '@/lib/ratingTier';
 import { WhatTheyScored } from './reviews/WhatTheyScored';
 import { FlatReviewRow, FlatAction } from './reviews/reviewFlatBits';
@@ -397,7 +397,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   };
 
   const communityScore = ratingAggregates?.avg_overall_score || 0;
-  const hasRatings = ratingCount > 0;
 
   /* ONE SOURCE FOR THE COUNT AND THE BARS. Both derive from the same filtered
      array, so they cannot disagree. The average still comes from the
@@ -413,6 +412,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     for (const r of ratedReviews) d[getRatingTier(r.rating).toLowerCase() as keyof typeof d] += 1;
     return d;
   }, [ratedReviews]);
+  const hasRatings = ratingCount > 0;
   const headerResolved = reviewsResolved && aggregatesResolved;
   const viewerScore = myReview?.rating ?? null;
 
@@ -490,7 +490,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
       <div style={{ background: A.CANVAS, minHeight: '100%', paddingBottom: 8, fontFamily: SANS }}>
         {/* §6A — no reviews: no figure, no tier, no zero. One section. */}
-        {!hasRatings ? (
+        {headerResolved && !hasRatings ? (
           <AboutSection heading="Reviews" first space={0}>
             <div>
               <p style={{ fontSize: 13, color: A.MUTE, lineHeight: 1.6, margin: 0 }}>
@@ -502,7 +502,17 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         ) : (
           <>
             {/* §3.1 */}
-            <TheScore score={communityScore} ratingCount={ratingCount} viewerScore={viewerScore} distribution={distribution} />
+            {headerResolved ? (
+              <TheScore score={communityScore} ratingCount={ratingCount} viewerScore={viewerScore} distribution={distribution} />
+            ) : (
+              /* Holds the full height of the pair + five band rows so nothing below moves. */
+              <div aria-hidden style={{ padding: `0 ${GUTTER}px`, height: TheScoreReservedHeight }}>
+                <Skeleton className="h-[67px] w-[140px]" />
+                <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-[20px] w-full" />)}
+                </div>
+              </div>
+            )}
 
             {/* §3.2 */}
             <WhatTheyScored aggregates={categoryAggregates} />

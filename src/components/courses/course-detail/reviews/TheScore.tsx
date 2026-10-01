@@ -73,10 +73,14 @@ const DeltaLine: React.FC<{ delta: number }> = ({ delta }) => {
   );
 };
 
+/** Pair (~67px) + 20px gap + five 20px band rows with 8px gaps. The skeleton
+ *  and the resolved block share this so the swap does not move the page. */
+export const TheScoreReservedHeight = 67 + 20 + 5 * 20 + 4 * 8;
+
 export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount, viewerScore, distribution }) => {
   const hasYou = viewerScore != null;
   return (
-    <section style={{ padding: `0 ${GUTTER}px`, fontFamily: SANS }}>
+    <section style={{ padding: `0 ${GUTTER}px`, fontFamily: SANS, minHeight: TheScoreReservedHeight }}>
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ ...EYEBROW, color: A.DIM }}>Community</div>
