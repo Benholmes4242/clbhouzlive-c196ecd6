@@ -25,7 +25,6 @@ import type { StoryEngagement } from './useStoryEngagement';
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 
 /** On-dark amber: filled = you, exactly as it means app-wide. */
-const AMBER_ON_DARK = '#FFB25E';
 const WHITE_72 = 'rgba(255,255,255,0.72)';
 
 interface Props {
