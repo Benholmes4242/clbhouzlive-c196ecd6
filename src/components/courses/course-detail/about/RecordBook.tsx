@@ -153,7 +153,6 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
 
   const drillDown = (
     <>
-      <AboutHairline style={{ marginTop: 18 }} />
       <button
         type="button"
         onClick={openBoards}
