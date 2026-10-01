@@ -96,26 +96,51 @@ const CaptionBlock: React.FC<{
   onFullReview?: () => void;
 }> = ({ caption, resetKey, onMentionTap, variant, onFullReview }) => {
   const [expanded, setExpanded] = useState(false);
-  const [overflows, setOverflows] = useState(false);
+  // null = caption fits (no CTA). A string = the word-snapped prefix that fits
+  // three lines WITH the CTA inline. This is the sole overflow answer.
+  const [visibleText, setVisibleText] = useState<string | null>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const mirrorRef = useRef<HTMLDivElement>(null);
+  const slotRef = useRef<HTMLSpanElement>(null);
   const isReview = variant === 'review';
   const isExpanded = !isReview && expanded;
+  const label = isReview ? 'Full review' : 'Read more';
+  const isEmpty = !caption.trim();
 
-  // Reset on pager move — keyed on activeIndex, NOT the caption string, since
-  // two neighbouring posts can carry identical text.
   useEffect(() => {
     setExpanded(false);
   }, [resetKey]);
 
-  // Real overflow measurement (never estimated from string length).
+  // Measured cut (real geometry in a hidden mirror; never string-length estimates).
   useLayoutEffect(() => {
     const el = textRef.current;
-    if (!el) return;
+    if (!el || isEmpty) return;
     const measure = () => {
       const node = textRef.current;
-      if (!node) return;
+      const mirror = mirrorRef.current;
+      const slot = slotRef.current;
+      if (!node || !mirror || !slot) return;
       if (isExpanded) return; // clamp is off — nothing meaningful to measure
-      setOverflows(node.scrollHeight > node.clientHeight + 1);
+      mirror.style.width = `${node.clientWidth}px`;
+      const MAXH = CAPTION_FONT_SIZE * CAPTION_LINE_HEIGHT * 3 + 1;
+      slot.textContent = caption;
+      if (mirror.scrollHeight <= MAXH) {
+        setVisibleText(null);
+        return;
+      }
+      let lo = 0;
+      let hi = caption.length;
+      while (lo < hi) {
+        const mid = Math.ceil((lo + hi) / 2);
+        slot.textContent = caption.slice(0, mid);
+        if (mirror.scrollHeight <= MAXH) lo = mid;
+        else hi = mid - 1;
+      }
+      const n = lo;
+      // Word-boundary snap keeps @mention tokens whole — do not remove.
+      let cut = caption.lastIndexOf(' ', n);
+      if (cut <= 0) cut = n;
+      setVisibleText(caption.slice(0, cut).replace(/\s+$/, ''));
     };
     measure();
     let ro: ResizeObserver | null = null;
@@ -129,19 +154,62 @@ const CaptionBlock: React.FC<{
       if (ro) ro.disconnect();
       else window.removeEventListener('resize', measure);
     };
-  }, [caption, isExpanded]);
+  }, [caption, variant, isExpanded, isEmpty]);
 
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
-  const showInlineCta = !isExpanded && overflows;
+
+  const ctaStyle: React.CSSProperties = {
+    fontSize: CAPTION_FONT_SIZE, lineHeight: CAPTION_LINE_HEIGHT, fontWeight: 600,
+    color: '#fff', opacity: 0.72, whiteSpace: 'nowrap', textShadow: TEXT_SHADOW,
+    pointerEvents: 'auto', background: 'transparent', border: 'none', padding: 0,
+    margin: 0, fontFamily: 'inherit', cursor: 'pointer',
+  };
+  const onCta = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isReview) onFullReview?.();
+    else setExpanded(true);
+  };
+
+  // Review with no text: the CTA alone, on its own line, where the old
+  // "read review ›" button sat. Non-review empty captions never mount.
+  if (isEmpty) {
+    if (!isReview) return null;
+    return (
+      <button
+        type="button"
+        onClick={onCta}
+        style={{ ...ctaStyle, marginTop: 3, alignSelf: 'flex-start' }}
+      >
+        {label}
+      </button>
+    );
+  }
+
+  const showCta = !isExpanded && visibleText !== null;
 
   return (
     <div
-      style={{ marginTop: 6, minWidth: 0, pointerEvents: 'auto' }}
+      style={{ marginTop: 6, minWidth: 0, pointerEvents: 'auto', position: 'relative' }}
       onClick={stop}
       onPointerDown={stop}
       onTouchStart={stop}
       onTouchMove={stop}
     >
+      <div
+        ref={mirrorRef}
+        aria-hidden
+        style={{
+          position: 'absolute', visibility: 'hidden', pointerEvents: 'none',
+          top: 0, left: -9999, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+          fontSize: CAPTION_FONT_SIZE, lineHeight: CAPTION_LINE_HEIGHT,
+        }}
+      >
+        <span ref={slotRef} />
+        <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
+          <span style={{ fontWeight: 400, opacity: 0.8 }}>… </span>
+          {label}
+        </span>
+      </div>
       <div
         ref={textRef}
         style={{
@@ -153,43 +221,26 @@ const CaptionBlock: React.FC<{
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
           ...(isExpanded
-            ? {
-                overflow: 'auto',
-                maxHeight: '40vh',
-                overscrollBehavior: 'contain',
-              }
-            : {
-                position: 'relative',
-                maxHeight: `calc(${CAPTION_LINE_PX} * 3)`,
-                overflow: 'hidden',
-              }),
+            ? { overflow: 'auto', maxHeight: '40vh', overscrollBehavior: 'contain' }
+            : { maxHeight: `calc(${CAPTION_LINE_PX} * 3)`, overflow: 'hidden' }),
         }}
       >
-        {showInlineCta && (
-          <>
-            <span aria-hidden style={{ float: 'right', width: 0, height: `calc(${CAPTION_LINE_PX} * 2)` }} />
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (isReview) onFullReview?.();
-                else setExpanded(true);
-              }}
-              aria-expanded={isReview ? undefined : false}
-              style={{
-                float: 'right', clear: 'both', marginLeft: 4,
-                fontSize: CAPTION_FONT_SIZE, lineHeight: CAPTION_LINE_HEIGHT, fontWeight: 600,
-                color: '#fff', opacity: 0.72, whiteSpace: 'nowrap', textShadow: TEXT_SHADOW,
-                pointerEvents: 'auto', background: 'transparent', border: 'none', padding: 0,
-                fontFamily: 'inherit', cursor: 'pointer',
-              }}
-            >
-              <span style={{ fontWeight: 400, opacity: 0.8 }}>… </span>
-              {isReview ? 'Full review' : 'Read more'}
-            </button>
-          </>
+        <MentionText
+          text={isExpanded ? caption : (visibleText ?? caption)}
+          onMentionTap={onMentionTap}
+          style={{ pointerEvents: 'auto' }}
+        />
+        {showCta && (
+          <button
+            type="button"
+            onClick={onCta}
+            aria-expanded={isReview ? undefined : false}
+            style={ctaStyle}
+          >
+            <span style={{ fontWeight: 400, opacity: 0.8 }}>… </span>
+            {label}
+          </button>
         )}
-        <MentionText text={caption} onMentionTap={onMentionTap} style={{ pointerEvents: 'auto' }} />
       </div>
       {isExpanded && (
         <button
