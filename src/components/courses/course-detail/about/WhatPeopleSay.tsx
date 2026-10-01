@@ -28,7 +28,7 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores, OverallScoreLine } from '../CategoryScores';
-import AboutSection, { ABOUT_KICKER, AboutHairline } from './AboutSection';
+import AboutSection, { AboutHairline } from './AboutSection';
 
 export { SETTLED_MIN_RATINGS } from '../CategoryScores';
 
@@ -45,7 +45,9 @@ const CountSlot: React.FC<{ count: number }> = ({ count }) => {
   const { t } = useTranslation('courses');
   return (
     <div style={{ minWidth: 0, flexShrink: 0, textAlign: 'right', paddingBottom: 2 }}>
-      <span style={ABOUT_KICKER}>{t('courseDetail.communityScore.basedOn', { count })}</span>
+      <span style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.35, color: A.MUTE }}>
+        {t('courseDetail.communityScore.basedOn', { count })}
+      </span>
     </div>
   );
 };
