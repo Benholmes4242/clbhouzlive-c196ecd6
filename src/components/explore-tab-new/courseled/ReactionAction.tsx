@@ -11,7 +11,7 @@ import { A, FIGS, SANS } from './tokens';
  * carried by COLOUR only (BRIEF_ONE_REACTION_GLYPH).
  *
  *   not reacted   the solid shape in MUTE / white at 72% on photography
- *   reacted       the same solid shape in AMBER (the one legitimate amber: you)
+ *   reacted       the FILL weight in AMBER via ReactionGlyph; idle is the regular outline (the one legitimate amber: you)
  *   count         beside the glyph, tabular, HIDDEN ENTIRELY at zero
  *   own content   the count alone, no tappable glyph
  *   signed out    not rendered at all (the caller passes readOnly=false only
