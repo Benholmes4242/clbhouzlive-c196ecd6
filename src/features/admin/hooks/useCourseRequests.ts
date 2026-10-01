@@ -24,6 +24,9 @@ export interface CourseRequestRow {
   /** BRIEF_CLUB_REQUEST_ANOTHER_COURSE §5 — set on a club course request. */
   forBusinessId?: string | null;
   forClubId?: string | null;
+  /** BRIEF_CLUB_COURSE_PICKER §8 — the catalogue row the club picked (attach). */
+  forCourseId?: string | null;
+  pickedCourseName?: string | null;
   businessName?: string | null;
   clubName?: string | null;
   displayName?: string | null;
@@ -41,7 +44,7 @@ const STATUS_ORDER: Record<string, number> = {
 export async function fetchCourseRequests(): Promise<CourseRequestRow[]> {
   const { data, error } = await supabase
     .from('course_requests')
-    .select('id, requested_by, course_name, location, country, note, status, admin_notes, resolved_by, resolved_at, created_at, home_club_for_user_id, for_business_id, for_club_id')
+    .select('id, requested_by, course_name, location, country, note, status, admin_notes, resolved_by, resolved_at, created_at, home_club_for_user_id, for_business_id, for_club_id, for_course_id')
     .order('created_at', { ascending: false });
   if (error) throw error;
 
@@ -60,6 +63,7 @@ export async function fetchCourseRequests(): Promise<CourseRequestRow[]> {
     homeClubForUserId: r.home_club_for_user_id ?? null,
     forBusinessId: r.for_business_id ?? null,
     forClubId: r.for_club_id ?? null,
+    forCourseId: r.for_course_id ?? null,
   }));
 
   const userIds = [...new Set(rows.map(r => r.requestedBy).filter(Boolean))] as string[];
@@ -79,14 +83,18 @@ export async function fetchCourseRequests(): Promise<CourseRequestRow[]> {
 
   const bizIds = [...new Set(rows.map(r => r.forBusinessId).filter(Boolean))] as string[];
   const clubIds = [...new Set(rows.map(r => r.forClubId).filter(Boolean))] as string[];
-  const [bizRes, clubRes] = await Promise.all([
+  const courseIds = [...new Set(rows.map(r => r.forCourseId).filter(Boolean))] as string[];
+  const [bizRes, clubRes, courseRes] = await Promise.all([
     bizIds.length ? supabase.from('business_accounts').select('id, name').in('id', bizIds) : Promise.resolve({ data: [] as any[] }),
     clubIds.length ? supabase.from('golf_clubs').select('id, name').in('id', clubIds) : Promise.resolve({ data: [] as any[] }),
+    courseIds.length ? supabase.from('golf_courses').select('id, name, club_id').in('id', courseIds) : Promise.resolve({ data: [] as any[] }),
   ]);
+  const courseMap = new Map(((courseRes as any).data ?? []).map((c: any) => [c.id, c.name as string]));
   const bizMap = new Map(((bizRes as any).data ?? []).map((b: any) => [b.id, b.name as string]));
   const clubMap = new Map(((clubRes as any).data ?? []).map((c: any) => [c.id, c.name as string]));
   for (const r of rows) {
     if (r.forBusinessId) r.businessName = (bizMap.get(r.forBusinessId) as string | undefined) ?? null;
+    if (r.forCourseId) r.pickedCourseName = (courseMap.get(r.forCourseId) as string | undefined) ?? null;
     if (r.forClubId) r.clubName = (clubMap.get(r.forClubId) as string | undefined) ?? null;
   }
 
