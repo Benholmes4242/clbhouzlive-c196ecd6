@@ -93,7 +93,7 @@ export async function compressImage(
   const originalDimensions = await getImageDimensions(file);
   
   // Skip compression for small images or if already small enough
-  if (originalSize < COMPRESSION_THRESHOLD_BYTES) {
+  if (originalSize < COMPRESSION_THRESHOLD_BYTES && (!options.fileType || options.fileType === file.type)) {
     console.log(`[ImageCompression] Skipping ${file.name}: already small (${formatBytes(originalSize)})`);
     console.log('[UPLOAD/COMPRESS] ok', {
       name: file.name, outSize: originalSize, wasCompressed: false,
