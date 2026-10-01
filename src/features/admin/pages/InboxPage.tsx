@@ -28,6 +28,7 @@ import HolePhotoReviewSheet from '../components/HolePhotoReviewSheet';
 import ConfirmDialog from '../components/ConfirmDialog';
 import type { HolePhotoQueueRow } from '../hooks/useHolePhotoQueue';
 import CourseMatchingPage from './CourseMatchingPage';
+import VenueMappingPage from './VenueMappingPage';
 import AddCourseSheet from '../components/AddCourseSheet';
 import { uploadCoursePhoto } from '../hooks/useCourses';
 import { usePanelRole } from '@/hooks/usePanelRole';
@@ -403,6 +404,16 @@ function InboxListPage() {
               <div style={{ fontSize: 11.5, color: t.inkMuted }}>
                 {workbenchCount} scored course{workbenchCount === 1 ? '' : 's'} unmatched
               </div>
+            </div>
+            <ChevronRight size={16} color={t.inkFaint} />
+          </Link>
+          <Link
+            to="/admin-v2/inbox/venues"
+            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px 4px', textDecoration: 'none', color: t.ink }}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: t.ink }}>Tour venue mapping</div>
+              <div style={{ fontSize: 11.5, color: t.inkMuted }}>Link tournament venues to courses</div>
             </div>
             <ChevronRight size={16} color={t.inkFaint} />
           </Link>
@@ -1302,6 +1313,7 @@ export default function InboxPage() {
     <Routes>
       <Route index element={<InboxListPage />} />
       <Route path="matching" element={<CourseMatchingPage />} />
+      <Route path="venues" element={<VenueMappingPage />} />
     </Routes>
   );
 }

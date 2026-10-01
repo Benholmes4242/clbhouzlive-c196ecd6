@@ -1,10 +1,17 @@
 /**
  * useCourseImageResolver - Resolves SR venue names to golf_courses images
- * Uses server-side ILIKE search + client-side scoring for best match
+ * Uses server-side ILIKE search + client-side scoring for best match.
+ *
+ * GEOGRAPHY IS A HARD GATE (BRIEF_TOURNAMENT_VENUE_MAPPING_GATE_AND_REVIEW).
+ * Every candidate failing isVenueGeographyCompatible is REMOVED before scoring -
+ * not penalised, not demoted to low confidence. Name similarity is not evidence
+ * of identity, and a confidence number computed from name similarity cannot
+ * tell you otherwise. cacheMatch re-checks the gate and never writes a failing row.
  */
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { isVenueGeographyCompatible } from '@/lib/tourhub/venueGeography';
 import sedgefieldCC from '@/assets/courses/sedgefield-country-club.jpg.asset.json';
 import clubAtIndianCreek from '@/assets/courses/club-at-indian-creek.jpg.asset.json';
 
@@ -25,8 +32,18 @@ export interface VenueInput {
   venueName: string;
   venueCourseName?: string | null;
   city?: string | null;
+  /** SportRadar ISO3 venue_country. */
   country?: string | null;
+  /** SportRadar venue_state (USA/CAN only). */
+  state?: string | null;
 }
+
+type CandidateCourse = {
+  id: string;
+  name: string;
+  thumbnail_image: string | null;
+  sub_country: string | null;
+};
 
 // Generic words that appear in many course names - deprioritize as keywords
 const GENERIC_WORDS = new Set([
@@ -125,7 +142,7 @@ function getSearchKeywords(venueName: string): { distinctive: string[]; generic:
 
 // Server-side search for courses matching a venue using multiple keywords
 async function searchCoursesForVenue(venue: VenueInput): Promise<{
-  courses: Array<{ id: string; name: string; thumbnail_image: string | null; country: string | null }>;
+  courses: CandidateCourse[];
   searchTerms: string[];
 }> {
   const { distinctive, generic } = getSearchKeywords(venue.venueName);
@@ -143,17 +160,17 @@ async function searchCoursesForVenue(venue: VenueInput): Promise<{
   
   // Search with up to 3 keywords in parallel, combining results
   const keywordsToSearch = allKeywords.slice(0, 3);
-  const allCourses = new Map<string, { id: string; name: string; thumbnail_image: string | null; country: string | null }>();
+  const allCourses = new Map<string, CandidateCourse>();
   
   const searchPromises = keywordsToSearch.map(async (keyword) => {
-    let query = supabase
+    // No country filter here: golf_courses.country is a region grouping and
+    // never equals an ISO3 code. The geography gate runs in findBestMatch.
+    const query = supabase
       .from('golf_courses')
-      .select('id, name, thumbnail_image, country')
+      .select('id, name, thumbnail_image, sub_country')
       .ilike('name', `%${keyword}%`)
       .order('name')
       .limit(100);
-    // Country narrowing at query time when the venue carries one.
-    if (venue.country) query = query.eq('country', venue.country);
     const { data, error } = await query;
     
     if (error) {
@@ -179,11 +196,14 @@ async function searchCoursesForVenue(venue: VenueInput): Promise<{
   return { courses, searchTerms: keywordsToSearch };
 }
 
-// Find best match from search results - always return something if we have results
+// Find best match among geography-compatible candidates only.
 function findBestMatch(
   venue: VenueInput,
-  courses: Array<{ id: string; name: string; thumbnail_image: string | null; country: string | null }>
-): { course: typeof courses[0]; score: number; isLowConfidence: boolean } | null {
+  allCourses: CandidateCourse[]
+): { course: CandidateCourse; score: number; isLowConfidence: boolean } | null {
+  // THE GATE: incompatible candidates are removed before any scoring.
+  const venueGeo = { country: venue.country, state: venue.state };
+  const courses = allCourses.filter((c) => isVenueGeographyCompatible(venueGeo, c));
   if (courses.length === 0) return null;
   
   const isDebug = venue.venueName.toLowerCase().includes('tiburon') || 
@@ -191,7 +211,7 @@ function findBestMatch(
                   venue.venueName.toLowerCase().includes('kapalua') ||
                   venue.venueName.toLowerCase().includes('waialae');
   
-  let bestMatch: { course: typeof courses[0]; score: number; combined: number } | null = null;
+  let bestMatch: { course: CandidateCourse; score: number; combined: number } | null = null;
   const candidates: Array<{ name: string; score: number; boost: number; combined: number; hasImage: boolean }> = [];
   
   for (const course of courses) {
@@ -214,16 +234,10 @@ function findBestMatch(
       }
     }
     
-    // Country match bonus - also penalize mismatches
-    let countryBonus = 0;
-    if (venue.country && course.country) {
-      countryBonus = venue.country === course.country ? 20 : -30;
-    }
-    
     // Prefer courses with images
     const imageBonus = course.thumbnail_image ? 5 : 0;
     
-    const combined = score * 100 + boost + exactBonus + variantBonus + countryBonus + imageBonus;
+    const combined = score * 100 + boost + exactBonus + variantBonus + imageBonus;
     
     candidates.push({ name: course.name, score, boost, combined, hasImage: !!course.thumbnail_image });
     
@@ -240,27 +254,19 @@ function findBestMatch(
     }
   }
   
-  // High confidence: good score or high combined
-  // A country mismatch can never pass as high confidence.
-  const countryMismatch = !!(venue.country && bestMatch?.course.country && bestMatch.course.country !== venue.country);
-  if (bestMatch && !countryMismatch && (bestMatch.score >= 0.3 || bestMatch.combined >= 100)) {
+  if (!bestMatch) return null;
+  if (bestMatch.score >= 0.3 || bestMatch.combined >= 100) {
     return { course: bestMatch.course, score: bestMatch.score, isLowConfidence: false };
   }
-  
-  // Low confidence fallback: return best available if country matches (or no country check)
-  if (bestMatch) {
-    const countryMatches = !venue.country || bestMatch.course.country === venue.country;
-    if (countryMatches) {
-      console.log(`[CourseResolver] ⚠ LOW CONFIDENCE match for "${venue.venueName}" -> "${bestMatch.course.name}" (combined: ${bestMatch.combined})`);
-      return { course: bestMatch.course, score: bestMatch.score, isLowConfidence: true };
-    }
-  }
-  
-  return null;
+  console.log(`[CourseResolver] ⚠ LOW CONFIDENCE match for "${venue.venueName}" -> "${bestMatch.course.name}" (combined: ${bestMatch.combined})`);
+  return { course: bestMatch.course, score: bestMatch.score, isLowConfidence: true };
 }
 
 // Cache a successful match
-async function cacheMatch(venue: VenueInput, courseId: string, confidence: number, isLowConfidence: boolean): Promise<void> {
+async function cacheMatch(venue: VenueInput, course: CandidateCourse, confidence: number, isLowConfidence: boolean): Promise<void> {
+  // Never write a row that fails the gate, whatever the caller believed.
+  if (!isVenueGeographyCompatible({ country: venue.country, state: venue.state }, course)) return;
+  const courseId = course.id;
   try {
     // Never overwrite a hand-corrected mapping: read first, skip if 'manual'.
     const { data: existing } = await supabase
@@ -269,7 +275,9 @@ async function cacheMatch(venue: VenueInput, courseId: string, confidence: numbe
       .eq('sr_venue_name', venue.venueName)
       .maybeSingle();
     if ((existing as { source?: string } | null)?.source === 'manual') return;
-    const source = isLowConfidence ? 'low_confidence' : (confidence > 0.8 ? 'normalized' : 'fuzzy');
+    // sr_course_map_source_check allows only exact|fuzzy|manual; a machine match is 'fuzzy'.
+    void isLowConfidence;
+    const source = 'fuzzy';
     
     const { error } = await supabase.from('sr_course_map').upsert({
       sr_venue_name: venue.venueName,
@@ -390,7 +398,7 @@ export function useCourseImageResolver(venues: VenueInput[]) {
         resolutions
           .filter((r): r is NonNullable<typeof r> => !!r)
           .map((r) =>
-            cacheMatch(r.venue, r.match.course.id, r.match.score, r.match.isLowConfidence),
+            cacheMatch(r.venue, r.match.course, r.match.score, r.match.isLowConfidence),
           ),
       );
 

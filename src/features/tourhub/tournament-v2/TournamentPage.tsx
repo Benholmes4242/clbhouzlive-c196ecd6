@@ -90,6 +90,7 @@ export function TournamentPage() {
       venueCourseName: meta.venue_course_name,
       city: meta.venue_city,
       country: meta.venue_country,
+      state: meta.venue_state,
     };
   }, [meta]);
   const { courseImage } = useSingleCourseImage(venueInput);
