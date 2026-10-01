@@ -93,3 +93,10 @@ export const RAIL_HLS_OVERRIDES = {
   capLevelToPlayerSize: true,
 } as const;
 
+
+/** Fullscreen-only overrides: a longer back buffer so the JS loop's seek to 0
+ *  on long clips does not refetch evicted segments. maxBufferSize still caps
+ *  memory. Feed and rail lanes keep HLS_CONFIG's 30s. */
+export const FULLSCREEN_HLS_OVERRIDES = {
+  backBufferLength: 90,
+} as const;
