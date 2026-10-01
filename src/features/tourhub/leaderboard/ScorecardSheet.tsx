@@ -143,7 +143,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
     ?? t('tournament.scorecard.courseFallback');
   const courseLocation =
     // CLUB FIRST, COURSE AFTER (see venueLabel.ts), then the city.
-    [formatVenueLabel(meta.data?.venue_name, meta.data?.venue_course_name), meta.data?.venue_city]
+    [formatVenueLabel(meta.data?.venue_name, meta.data?.venue_course_name), meta.data?.course_place ?? meta.data?.venue_city]
       .filter(Boolean).join(` ${'\u00B7'} `) || null;
   const coursePar = meta.data?.venue_par ?? null;
 

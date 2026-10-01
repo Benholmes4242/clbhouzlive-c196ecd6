@@ -356,7 +356,7 @@ export function LeaderboardTab() {
   // Order is fixed: par and yards before the field average (see the comment
   // on the meta line for why the volatile segment must come last).
   const venue = meta?.venue_name ?? selected.venue_name;
-  const cityNation = resolveVenuePlace({
+  const cityNation = meta?.course_place ?? resolveVenuePlace({
     city: meta?.venue_city ?? selected.venue_city,
     countryCode: meta?.venue_country ?? selected.venue_country,
     stateCode: meta?.venue_state,

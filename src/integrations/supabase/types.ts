@@ -12055,6 +12055,7 @@ export type Database = {
           venue_longitude: string | null
           venue_name: string | null
           venue_par: number | null
+          venue_rotation: Json | null
           venue_state: string | null
           venue_yardage: number | null
           venue_zipcode: string | null
@@ -12101,6 +12102,7 @@ export type Database = {
           venue_longitude?: string | null
           venue_name?: string | null
           venue_par?: number | null
+          venue_rotation?: Json | null
           venue_state?: string | null
           venue_yardage?: number | null
           venue_zipcode?: string | null
@@ -12147,6 +12149,7 @@ export type Database = {
           venue_longitude?: string | null
           venue_name?: string | null
           venue_par?: number | null
+          venue_rotation?: Json | null
           venue_state?: string | null
           venue_yardage?: number | null
           venue_zipcode?: string | null

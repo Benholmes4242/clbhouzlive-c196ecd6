@@ -48,7 +48,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
     : null;
   const completedChampionName = completedChampion?.prose ?? null;
   const score = contest.leader?.score == null ? null : fmtScore(contest.leader.score);
-  const cityCountry = [meta.venue_city, meta.venue_country].filter(Boolean).join(', ');
+  const cityCountry = meta.course_place ?? [meta.venue_city, meta.venue_country].filter(Boolean).join(', ');
   const venueLine = [meta.venue_name, cityCountry || null].filter(Boolean).join(' · ');
   const tourRaw = meta.tour_full_name ?? tourCode ?? '';
   const tourLabel = cjk ? tourRaw : tourRaw.toUpperCase();
