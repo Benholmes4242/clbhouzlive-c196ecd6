@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import '@/styles/hybrid-hero.css';
 
 import type { HeroSlide } from '../../hooks/useHeroCarouselData';
-import { useTourLeaderboard, type TourTournament } from '../../hooks/useTourHubData';
+import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
+import { VenueRotationLine } from './HybridHeroBands/VenueRotationLine';
 import { PhotoBand, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
 import { deriveHeroState, detectTopTie, fmtScore } from './HybridHero.utils';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
@@ -92,12 +93,12 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
     return () => setHeroFullBleed(false);
   }, []);
 
-  const venueAdapter: TourTournament[] = useMemo(
-    () => tournament.venueName ? [{ venue_name: tournament.venueName } as TourTournament] : [],
-    [tournament.venueName],
+  const venueAdapter = useMemo(
+    () => tournament.id ? [{ id: tournament.id, venue_name: tournament.venueName }] : [],
+    [tournament.id, tournament.venueName],
   );
   const { data: imageMap } = useBatchCourseImages(venueAdapter);
-  const venueImageUrl = tournament.venueName ? imageMap?.get(tournament.venueName) ?? null : null;
+  const venueImageUrl = tournament.id ? imageMap?.get(tournament.id) ?? null : null;
   const { data: leaderboard = [] } = useTourLeaderboard(state.kind === 'upcoming' ? '' : tournament.id);
   const rows = Array.isArray(leaderboard) ? leaderboard : [];
   const top = rows[0];
@@ -173,6 +174,7 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
         heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
         onOpen={onOpenTournament}
       />
+      <VenueRotationLine tournamentId={tournament.id} />
       {state.kind === 'results' && champion ? (
         <ChampionStrip
           name={champion.name}
