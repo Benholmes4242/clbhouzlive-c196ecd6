@@ -104,6 +104,18 @@ export const FeedSlide = memo(function FeedSlide({
 
 
 
+  // ONE blurred backdrop per fullscreen slide for single media (the pager
+  // owns its own, behind its scroller). Video: active slide only, as before.
+  const singleBackdropSrc: string | null = (() => {
+    if (!isFullscreen || isEditorial) return null;
+    if (isActive && media && media.length > 1) return null; // pager owns it
+    const bm = media?.[openIdx] ?? media?.[0];
+    if (!bm) return null;
+    if (bm.type === 'image') return bm.imageUrl || bm.thumbnailUrl || '';
+    if (bm.type === 'video' && isActive) return bm.thumbnailUrl || '';
+    return null;
+  })();
+
   // Pinch zoom for single images
   const { ref: zoomRef, imgRef, style: zoomStyle, scale: zoomScale, reset: resetZoom } = usePinchZoomPointer();
 
@@ -335,6 +347,7 @@ export const FeedSlide = memo(function FeedSlide({
       )}
       <PostViewSentinel postId={post.id} />
 
+      {singleBackdropSrc != null && <FullscreenBackdrop src={singleBackdropSrc} />}
       {renderContent()}
 
       {/* Inline carousel dots — top-right, always visible, multi-media non-editorial only */}
@@ -415,10 +428,6 @@ const FullscreenImageSlot: React.FC<{
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      <div aria-hidden="true" className="absolute inset-0" style={{
-        backgroundImage: `url(${imgSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
-        filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
-      }} />
       <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
       <div
         ref={zoomRef}
@@ -953,12 +962,6 @@ const FullscreenVideoSlot: React.FC<{
   };
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {posterSrc && (
-        <div aria-hidden="true" className="absolute inset-0" style={{
-          backgroundImage: `url(${posterSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
-          filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
-        }} />
-      )}
       {/* Dim the surround (near-black); media sits above at zIndex ≥ 1. */}
       <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
       {posterSrc && (
@@ -1418,12 +1421,6 @@ const BorrowedFullscreenSlot: React.FC<{
     <>
       {/* Poster underlay (blurred, matches non-borrow branch aesthetic). */}
       <div className="absolute inset-0 overflow-hidden">
-        {posterSrc && (
-          <div aria-hidden="true" className="absolute inset-0" style={{
-            backgroundImage: `url(${posterSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
-            filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
-          }} />
-        )}
         {/* Dark scrim over the blurred poster for CONTAIN targets (landscape
             video). Product rule: contained-media surround = blur + darken,
             NEVER solid black. 0.55 leaves the blurred poster visible beneath
@@ -1647,13 +1644,25 @@ const FullscreenMediaPager: React.FC<{
     return () => {
       el.removeEventListener('scroll', onScroll);
       if (raf) cancelAnimationFrame(raf);
-      PrefetchController.abortAll('slideDeactivated');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePagerIdx, borrow, post.id, openIdx]);
 
+  // Abort neighbour warms on unmount only — never on a page change, which
+  // would cancel the warmNeighbours requests the scroll handler just sent.
+  useEffect(() => () => {
+    PrefetchController.abortAll('slideDeactivated');
+  }, []);
+
+  const activeBackdropMedia = media[activePagerIdx];
+  const activeBackdropSrc = activeBackdropMedia
+    ? (activeBackdropMedia.type === 'video'
+        ? activeBackdropMedia.thumbnailUrl || ''
+        : activeBackdropMedia.imageUrl || activeBackdropMedia.thumbnailUrl || '')
+    : '';
   return (
     <div className="absolute inset-0">
+      <FullscreenBackdrop src={activeBackdropSrc} />
       <div
         ref={scrollerRef}
         style={{
@@ -1664,6 +1673,7 @@ const FullscreenMediaPager: React.FC<{
           overflowX: 'auto',
           overflowY: 'hidden',
           scrollSnapType: 'x mandatory',
+          overscrollBehaviorX: 'contain',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
           // Let the browser axis-lock; vertical pans continue to reach
@@ -1793,25 +1803,10 @@ const FullscreenPagerPage: React.FC<{
         />
       );
     }
-    // Inactive video page — poster fallback (rect matches active slot so
-    // page-become-active does not resize).
+    // Inactive video page — flat canvas. The single blurred backdrop lives
+    // behind the pager scroller and shows the ACTIVE page only.
     return (
-      <div className="absolute inset-0 overflow-hidden">
-        {posterSrc && (
-          <div
-            aria-hidden="true"
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url(${posterSrc})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(40px) brightness(0.5) saturate(1.2)',
-              transform: 'scale(1.2)',
-            }}
-          />
-        )}
-        {/* Dim the surround (near-black); media sits above at zIndex 1. */}
-        <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
+      <div className="absolute inset-0 overflow-hidden" style={{ background: PAGE_CANVAS }}>
         {posterSrc && (
           <img
             src={posterSrc}
@@ -1837,19 +1832,11 @@ const FullscreenPagerPage: React.FC<{
     const imgRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'image');
     return (
       <div className="absolute inset-0 overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url(${imgSrc})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            filter: 'blur(40px) brightness(0.5) saturate(1.2)',
-            transform: 'scale(1.2)',
-          }}
-        />
-        {/* Dim the surround (near-black); media sits above at zIndex 1. */}
-        <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
+        {/* Active page: transparent over the single backdrop behind the
+            scroller. Inactive pages: flat canvas, no filter work. */}
+        {isActivePage
+          ? <div aria-hidden="true" className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.55)' }} />
+          : <div aria-hidden="true" className="absolute inset-0" style={{ background: PAGE_CANVAS }} />}
         <div
           ref={zoomRef}
           style={{
@@ -1875,4 +1862,56 @@ const FullscreenPagerPage: React.FC<{
   }
 
   return null;
+};
+
+/**
+ * FullscreenBackdrop — the single blurred backdrop for a fullscreen slide.
+ * An <img> (not a CSS background) so the browser can defer/decode it async.
+ * Crossfades over 180ms when the source changes.
+ */
+const FullscreenBackdrop: React.FC<{ src: string }> = ({ src }) => {
+  const [layers, setLayers] = useState<Array<{ src: string; key: number }>>(
+    () => (src ? [{ src, key: 0 }] : []),
+  );
+  const [shown, setShown] = useState<number>(0);
+  const keyRef = useRef(0);
+  useEffect(() => {
+    setLayers((prev) => {
+      if (prev.length && prev[prev.length - 1].src === src) return prev;
+      if (!src) return [];
+      keyRef.current += 1;
+      return [...prev.slice(-1), { src, key: keyRef.current }];
+    });
+  }, [src]);
+  useEffect(() => {
+    const last = layers[layers.length - 1];
+    if (!last) return;
+    const raf = requestAnimationFrame(() => setShown(last.key));
+    const t = window.setTimeout(() => {
+      setLayers((prev) => (prev.length > 1 ? prev.slice(-1) : prev));
+    }, 220);
+    return () => { cancelAnimationFrame(raf); window.clearTimeout(t); };
+  }, [layers]);
+  return (
+    <div aria-hidden="true" className="absolute inset-0 overflow-hidden" style={{ pointerEvents: 'none' }}>
+      {layers.map((l) => (
+        <img
+          key={l.key}
+          src={l.src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            objectFit: 'cover',
+            filter: 'blur(40px) brightness(0.5) saturate(1.2)',
+            transform: 'scale(1.2)',
+            opacity: l.key === shown || layers.length === 1 ? 1 : 0,
+            transition: 'opacity 180ms linear',
+          }}
+        />
+      ))}
+    </div>
+  );
 };
