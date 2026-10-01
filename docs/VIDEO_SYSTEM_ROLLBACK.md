@@ -26,7 +26,6 @@ Symptom: swipe in fullscreen opens colder than before (unlikely — the pooled e
 - `src/components/explore-tab-new/courseled/reviewVideoAutoplay.ts` — set `AUTOPLAY_SETTLE_MS` and `AUTOPLAY_LOSS_GRACE_MS` to `0` (used by both review and media-rail coordinators).
 
 ## 5 — Instrumentation
-- `src/perf/vperf.ts:134` — `on()`: return `true` to restore always-on recording for the silent telemetry shipper.
 - `loadingCount` settles via `settleLoading()` in `VideoEngine.ts`; it gates only a debug log, so no rollback is needed.
 
 ## Untouched by this brief
