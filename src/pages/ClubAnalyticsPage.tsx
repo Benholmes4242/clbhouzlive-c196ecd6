@@ -155,47 +155,72 @@ const CourseBlock: React.FC<{ course: ClubCourseRef }> = ({ course }) => {
 
 /* ─────────────── BRIEF_CLUB_REQUEST_ANOTHER_COURSE §2 ─────────────── */
 
-/** A text button in the page's idiom that opens the request sheet. `compact`
- *  (top of the course list) is a single "+" line; the `unclaimed` notice keeps
- *  its explanatory caption. */
+/** BRIEF_YOUR_COURSES_REQUEST_PANEL — the "Missing a course?" panel: states
+ *  the benefit, opens the request sheet, and offers a route to support. */
 const RequestAnotherCourse: React.FC<{
   businessId: string;
   businessName: string;
   clubId: string;
   fallbackClubName: string | null;
   existingCourses: { course_id: string; course_name: string }[];
-  compact?: boolean;
-}> = ({ businessId, businessName, clubId, fallbackClubName, existingCourses, compact = false }) => {
+  body: string;
+}> = ({ businessId, businessName, clubId, fallbackClubName, existingCourses, body }) => {
   const [open, setOpen] = React.useState(false);
+  const navigate = useNavigate();
   const { data: club } = useQuery({
     queryKey: ['golf-club', clubId],
     queryFn: () => fetchGolfClub(clubId),
     staleTime: 5 * 60_000,
   });
   const clubName = club?.name ?? fallbackClubName ?? businessName;
+  const linkStyle: React.CSSProperties = {
+    border: 'none',
+    background: 'transparent',
+    padding: 0,
+    fontSize: 12.5,
+    fontWeight: 600,
+    cursor: 'pointer',
+  };
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      {!compact && (
-        <p style={{ ...BIZ_BODY, fontSize: 11.5, margin: 0, color: A.DIM }}>
-          Missing a course? Tell us and we will add it to your club.
-        </p>
-      )}
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
+    <div
+      style={{
+        background: A.PANEL,
+        border: `1px solid ${A.HAIRLINE}`,
+        borderRadius: 14,
+        padding: '14px 16px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+      }}
+    >
+      <div
         style={{
-          alignSelf: 'flex-start',
-          border: 'none',
-          background: 'transparent',
-          padding: 0,
-          fontSize: 12.5,
-          fontWeight: 600,
-          color: A.MUTE,
-          cursor: 'pointer',
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: '0.19em',
+          textTransform: 'uppercase',
+          color: A.DIM,
         }}
       >
-        {compact ? '+ Request another course' : 'Request another course ›'}
-      </button>
+        Missing a course?
+      </div>
+      <p style={{ ...BIZ_BODY, fontSize: 12.5, lineHeight: 1.5, margin: 0, color: A.BODY }}>{body}</p>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 4 }}>
+        <button type="button" onClick={() => setOpen(true)} style={{ ...linkStyle, color: A.INK }}>
+          + Request another course
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            navigate(
+              `/manage/contact?category=other&subject=${encodeURIComponent('Course question — ' + businessName)}`,
+            )
+          }
+          style={{ ...linkStyle, color: A.MUTE }}
+        >
+          Something else? Contact support ›
+        </button>
+      </div>
       <RequestAnotherCourseSheet
         open={open}
         onClose={() => setOpen(false)}
@@ -295,6 +320,7 @@ export default function ClubAnalyticsPage() {
               clubId={business.club_id}
               fallbackClubName={business.club_name ?? null}
               existingCourses={[]}
+              body="Your club is not linked to a course yet. If a course of yours is missing from clbhouz, tell us and we will add it."
             />
           </div>
         )}
@@ -356,6 +382,17 @@ export default function ClubAnalyticsPage() {
           </p>
         )}
 
+        {business.club_id && (
+          <RequestAnotherCourse
+            businessId={business.id}
+            businessName={business.name}
+            clubId={business.club_id}
+            fallbackClubName={business.club_name ?? null}
+            existingCourses={courses.map((c) => ({ course_id: c.course_id, course_name: c.course_name }))}
+            body="Every course your club owns gets its own page on clbhouz — its own scores, reviews and the figures below. If one is missing from this list, tell us and we will add it."
+          />
+        )}
+
         {courses.length > 1 && (
           <RailChips
             options={courses.map((c) => ({
@@ -366,17 +403,6 @@ export default function ClubAnalyticsPage() {
             value={selected.course_id}
             onChange={setSelectedId}
             ariaLabel="Course"
-          />
-        )}
-
-        {business.club_id && (
-          <RequestAnotherCourse
-            compact
-            businessId={business.id}
-            businessName={business.name}
-            clubId={business.club_id}
-            fallbackClubName={business.club_name ?? null}
-            existingCourses={courses.map((c) => ({ course_id: c.course_id, course_name: c.course_name }))}
           />
         )}
 
