@@ -398,7 +398,7 @@ export function useInboxFeed(): InboxFeedResult {
               ? `Home club request: ${row.courseName}`
               : `New course request: ${row.courseName}`,
             meta: isClubCourse
-              ? `Club course request - ${row.clubName ?? 'club'} · ${row.businessName ?? 'business'}`
+              ? `Club course request · ${row.forCourseId ? 'attach' : 'new course'} - ${row.clubName ?? 'club'} · ${row.businessName ?? 'business'}`
               : isHomeClub
               ? `Home club - ${who} is waiting`
               : `Course requests - ${row.displayName ?? row.username ?? 'user'}`,
