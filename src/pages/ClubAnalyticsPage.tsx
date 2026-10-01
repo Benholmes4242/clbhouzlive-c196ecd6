@@ -382,6 +382,17 @@ export default function ClubAnalyticsPage() {
           </p>
         )}
 
+        {business.club_id && (
+          <RequestAnotherCourse
+            businessId={business.id}
+            businessName={business.name}
+            clubId={business.club_id}
+            fallbackClubName={business.club_name ?? null}
+            existingCourses={courses.map((c) => ({ course_id: c.course_id, course_name: c.course_name }))}
+            body="Every course your club owns gets its own page on clbhouz — its own scores, reviews and the figures below. If one is missing from this list, tell us and we will add it."
+          />
+        )}
+
         {courses.length > 1 && (
           <RailChips
             options={courses.map((c) => ({
@@ -392,17 +403,6 @@ export default function ClubAnalyticsPage() {
             value={selected.course_id}
             onChange={setSelectedId}
             ariaLabel="Course"
-          />
-        )}
-
-        {business.club_id && (
-          <RequestAnotherCourse
-            compact
-            businessId={business.id}
-            businessName={business.name}
-            clubId={business.club_id}
-            fallbackClubName={business.club_name ?? null}
-            existingCourses={courses.map((c) => ({ course_id: c.course_id, course_name: c.course_name }))}
           />
         )}
 
