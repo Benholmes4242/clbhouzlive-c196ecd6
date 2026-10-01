@@ -501,6 +501,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
     });
   }, [showBand, courseId, rounds, reviewCount]);
 
+  const avgToPar = courseStats?.avg_over_par;
   const cells: React.ReactNode[] = [];
   if (showBand) {
     if (rounds > 0) {
@@ -508,6 +509,15 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
     }
     if (reviewCount > 0) {
       cells.push(<HeroStatCell key="reviews" label={t('courseHero.reviews')} value={String(reviewCount)} />);
+    }
+    if (avgToPar != null) {
+      cells.push(
+        <HeroStatCell
+          key="avgToPar"
+          label={t('courseHero.avgToPar')}
+          value={`${avgToPar > 0 ? '+' : ''}${avgToPar.toFixed(1)}`}
+        />
+      );
     }
   }
   if (communityRating != null) {
