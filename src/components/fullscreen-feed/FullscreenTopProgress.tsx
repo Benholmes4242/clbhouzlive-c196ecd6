@@ -12,7 +12,7 @@
  * segment filling with playback; 2–10 → equal segments; >10 → a single
  * track filled to (activeSlide + slideProgress) / mediaCount.
  */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Z } from '@/config/zIndex';
@@ -70,21 +70,29 @@ export const FullscreenTopProgress: React.FC<Props> = ({ activePost }) => {
     return 'fullscreen' as LaneId;
   }, [borrow, activePost?.id]);
 
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  // No React state for playback position: the rAF writes a CSS custom
+  // property (--fs-progress, 0..1) straight onto the root element, so the bar
+  // advances with zero React commits. Only the segment index is React state.
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number | null>(null);
+  const writeProgress = (v: number) => {
+    rootRef.current?.style.setProperty('--fs-progress', String(v));
+  };
 
   // The ONE rAF poll — only while a video slide is active.
   useEffect(() => {
+    // Reset on active media change; images read as full.
+    writeProgress(isVideo ? 0 : 1);
     if (!isVideo || !expectedKey) return;
     let alive = true;
+    let last = -1;
     const tick = () => {
       if (!alive) return;
       try {
         const s = VideoEngine.snapshot(laneId);
         if (ownerMatches(s.postId, expectedKey)) {
-          setCurrentTime(s.currentTime);
-          setDuration(s.duration);
+          const r = s.duration > 0 ? Math.max(0, Math.min(1, s.currentTime / s.duration)) : 1;
+          if (r !== last) { last = r; writeProgress(r); }
         }
       } catch { /* noop */ }
       rafRef.current = requestAnimationFrame(tick);
@@ -97,26 +105,16 @@ export const FullscreenTopProgress: React.FC<Props> = ({ activePost }) => {
     };
   }, [isVideo, expectedKey, laneId]);
 
-  // Reset displayed position when active media changes.
-  useEffect(() => {
-    setCurrentTime(0);
-    setDuration(0);
-  }, [expectedKey]);
-
   if (!showsTopProgress(activePost)) return null;
-
-  const slideProgress = isVideo
-    ? (duration > 0 ? Math.max(0, Math.min(1, currentTime / duration)) : 1)
-    : 1;
 
   const segStyle: React.CSSProperties = {
     position: 'relative', flex: 1, height: 3, borderRadius: 99, overflow: 'hidden',
   };
-  const fill = (ratio: number) => (
+  const fill = (width: string) => (
     <div
       style={{
         position: 'absolute', left: 0, top: 0, bottom: 0,
-        width: `${ratio * 100}%`, background: FILLED,
+        width, background: FILLED,
         transition: 'width 100ms linear',
       }}
     />
@@ -126,19 +124,20 @@ export const FullscreenTopProgress: React.FC<Props> = ({ activePost }) => {
   if (mediaCount > MAX_SEGMENTS) {
     content = (
       <div style={{ ...segStyle, background: EMPTY }}>
-        {fill((activeSlide + slideProgress) / mediaCount)}
+        {fill(`calc((${activeSlide} + var(--fs-progress, 1)) / ${mediaCount} * 100%)`)}
       </div>
     );
   } else {
     content = Array.from({ length: mediaCount }, (_, i) => {
       if (i < activeSlide) return <div key={i} style={{ ...segStyle, background: FILLED }} />;
       if (i > activeSlide) return <div key={i} style={{ ...segStyle, background: EMPTY }} />;
-      return <div key={i} style={{ ...segStyle, background: EMPTY }}>{fill(slideProgress)}</div>;
+      return <div key={i} style={{ ...segStyle, background: EMPTY }}>{fill('calc(var(--fs-progress, 1) * 100%)')}</div>;
     });
   }
 
   return (
     <div
+      ref={rootRef}
       aria-hidden
       style={{
         position: 'fixed',
