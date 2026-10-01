@@ -1,3 +1,4 @@
+import React from 'react';
 import ThumbIcon from '@/components/icons/ThumbIcon';
 
 /**
@@ -8,7 +9,7 @@ import ThumbIcon from '@/components/icons/ThumbIcon';
  *   everything -> 'like':      the verb "liked"
  *
  * The kind decides SIZE and WORDING, never the icon: every kind draws the
- * same solid thumbs-up (BRIEF_ONE_REACTION_GLYPH).
+ * same thumbs-up glyph (BRIEF_ONE_REACTION_GLYPH).
  *
  * THERE IS DELIBERATELY NO REACTION-TYPE COLUMN. Neither reaction store
  * (content_reactions for members, post_likes for business actors on round
@@ -34,11 +35,12 @@ export function celebrateFigureSize(size: number): number {
 }
 
 /* ONE GLYPH, APP-WIDE (BRIEF_ONE_REACTION_GLYPH).
-   Every reaction draws the same fill-weight thumbs-up (ThumbIcon). The kind
-   decides size and wording, never the icon. State is COLOUR, never fill:
-   idle is the solid shape in a muted tone, reacted is the same shape in amber.
-   ANY NEW REACTION CONTROL TAKES ITS GLYPH FROM reactionGlyph(). A hardcoded
-   icon is a bug. */
+   Every kind draws the SAME thumbs-up (ThumbIcon); the kind decides size and
+   wording only. State is WEIGHT AND COLOUR together
+   (BRIEF_REACTION_GLYPH_OUTLINE_TO_FILL): idle is the regular-weight outline
+   in a muted tone, reacted is the fill weight in amber. ReactionGlyph is the
+   ONLY thing that decides either — a call site that picks a weight or writes
+   an amber hex for this glyph is a bug. The swap is instant: never animate it. */
 export type ReactionKind = 'like' | 'celebrate' | 'helpful';
 
 export function reactionKindFor(subject: { isRound: boolean; isReview: boolean }): ReactionKind {
@@ -47,7 +49,29 @@ export function reactionKindFor(subject: { isRound: boolean; isReview: boolean }
   return 'like';
 }
 
-/** THE glyph. One for every kind — see the header. */
+/** THE reaction amber. Declared once, here. */
+export const AMBER = '#F7931E';
+const IDLE_PANEL = 'rgba(255,255,255,0.72)';
+const IDLE_MEDIA = '#FFFFFF';
+
+export function ReactionGlyph({
+  reacted, size, tone = 'panel', color,
+}: {
+  reacted: boolean;
+  size: number;
+  tone?: 'panel' | 'media';
+  /** HelpfulReviewsShelf ONLY: inherit the row colour. Do not use elsewhere. */
+  color?: string;
+}) {
+  return React.createElement(ThumbIcon, {
+    weight: reacted ? 'fill' : 'regular',
+    size,
+    color: color ?? (reacted ? AMBER : tone === 'media' ? IDLE_MEDIA : IDLE_PANEL),
+    'aria-hidden': true,
+  });
+}
+
+/** Legacy accessor — kept for typing; reaction controls use ReactionGlyph. */
 export function reactionGlyph(_kind: ReactionKind) {
   return ThumbIcon;
 }
