@@ -959,6 +959,7 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
  */
 function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | null; onClose: () => void }) {
   const isHomeClub = !!row?.homeClubForUserId;
+  const isClubCourse = !!row?.forClubId;
   const { data: allRequests, resolveHomeClubRequest, rejectHomeClubRequest } = useCourseRequests();
   const [clubQuery, setClubQuery] = useState('');
   const [pickedClub, setPickedClub] = useState<{ id: string; name: string } | null>(null);
@@ -991,9 +992,15 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
       open={row !== null}
       onClose={onClose}
       title={row.courseName}
-      subtitle={isHomeClub ? `Home club request - ${who}` : 'Course request'}
+      subtitle={isClubCourse ? 'Club course request' : isHomeClub ? `Home club request - ${who}` : 'Course request'}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, color: t.ink }}>
+        {isClubCourse && (
+          <>
+            <div><b>Club:</b> {row.clubName ?? row.forClubId}</div>
+            <div><b>Business:</b> {row.businessName ?? row.forBusinessId}</div>
+          </>
+        )}
         {isHomeClub && (
           <div style={{
             background: 'rgba(247,147,30,0.10)', border: `1px solid ${t.line}`,
@@ -1097,6 +1104,10 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
           </div>
         )}
 
+        {isClubCourse && row.status === 'pending' && row.forClubId && (
+          <ClubCoursePicker requestId={row.id} clubId={row.forClubId} initialQuery={row.courseName} onDone={onClose} />
+        )}
+
         <div style={{ marginTop: 8 }}>
           <Link
             to="/admin-v2/content"
@@ -1107,6 +1118,107 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
         </div>
       </div>
     </AdminSheet>
+  );
+}
+
+/**
+ * BRIEF_CLUB_REQUEST_ANOTHER_COURSE §5 — the RPC takes a course id, so the
+ * admin picks an existing golf_courses row. Only unattached rows are
+ * selectable; the RPC also refuses a course owned by another club.
+ */
+function ClubCoursePicker({
+  requestId, clubId, initialQuery, onDone,
+}: { requestId: string; clubId: string; initialQuery: string; onDone: () => void }) {
+  const { resolveClubCourseRequest } = useCourseRequests();
+  const [q, setQ] = useState(initialQuery);
+  const [hits, setHits] = useState<Array<{ id: string; name: string; club_id: string | null }>>([]);
+  const [loading, setLoading] = useState(false);
+  const [picked, setPicked] = useState<{ id: string; name: string } | null>(null);
+
+  useEffect(() => {
+    const term = q.trim();
+    if (term.length < 2) { setHits([]); return; }
+    let cancelled = false;
+    setLoading(true);
+    const h = setTimeout(async () => {
+      const { data } = await supabase
+        .from('golf_courses')
+        .select('id, name, club_id')
+        .ilike('name', `%${term}%`)
+        .limit(10);
+      if (cancelled) return;
+      setHits((data ?? []) as any);
+      setLoading(false);
+    }, 250);
+    return () => { cancelled = true; clearTimeout(h); };
+  }, [q]);
+
+  const busy = resolveClubCourseRequest.isPending;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+      <div style={{ color: t.inkMuted, fontSize: 12 }}>Pick the catalogue course to attach to this club.</div>
+      <input
+        value={q}
+        onChange={(e) => { setQ(e.target.value); setPicked(null); }}
+        placeholder="Search golf_courses"
+        style={{
+          height: 36, padding: '0 10px', borderRadius: t.radius.md,
+          border: `1px solid ${t.line}`, background: t.canvas, color: t.ink, fontSize: 13,
+        }}
+      />
+      <div style={{ color: t.inkMuted, fontSize: 11.5 }}>
+        Not in the catalogue yet? Add the course first, then attach it here.
+      </div>
+      {picked ? (
+        <div style={{ fontSize: 13 }}>
+          Selected: <b>{picked.name}</b>{' '}
+          <button type="button" onClick={() => setPicked(null)} style={{ background: 'transparent', border: `1px solid ${t.line}`, borderRadius: t.radius.md, color: t.inkMuted, fontSize: 12, padding: '2px 8px', marginLeft: 6, cursor: 'pointer' }}>
+            Change
+          </button>
+        </div>
+      ) : loading ? (
+        <div style={{ color: t.inkMuted, fontSize: 12 }}>Searching…</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {hits.map((c) => {
+            const reason = c.club_id === clubId
+              ? 'Already on this club'
+              : c.club_id
+              ? 'Already belongs to another club'
+              : null;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                disabled={!!reason}
+                onClick={() => setPicked({ id: c.id, name: c.name })}
+                style={{
+                  textAlign: 'left', background: 'transparent', border: 'none',
+                  borderBottom: `1px solid ${t.line}`, padding: '7px 2px',
+                  cursor: reason ? 'default' : 'pointer', opacity: reason ? 0.5 : 1,
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{c.name}</div>
+                {reason && <div style={{ fontSize: 11.5, color: t.inkMuted }}>{reason}</div>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+      <button
+        type="button"
+        disabled={!picked || busy}
+        onClick={async () => {
+          if (!picked) return;
+          await resolveClubCourseRequest.mutateAsync({ id: requestId, courseId: picked.id });
+          onDone();
+        }}
+        style={{ ...btnPrimary(busy), alignSelf: 'flex-start', opacity: !picked || busy ? 0.55 : 1 }}
+      >
+        Attach to club
+      </button>
+    </div>
   );
 }
 

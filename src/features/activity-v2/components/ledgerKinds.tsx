@@ -335,6 +335,15 @@ export function resolveKind(row: {
       bold: 'course_name',
     };
   }
+  if (t === 'club_course_added') {
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: { icon: BadgeCheck, fg: ACT.GREEN, bg: ACT.GREEN_SOFT },
+      isSystem: true,
+      bold: 'course_name',
+    };
+  }
   if (t === 'course_claim_approved') {
     return {
       left: 'tile',

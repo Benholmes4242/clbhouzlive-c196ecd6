@@ -21,6 +21,11 @@ export interface CourseRequestRow {
    * for that member, so resolving it can connect them (§3.4).
    */
   homeClubForUserId?: string | null;
+  /** BRIEF_CLUB_REQUEST_ANOTHER_COURSE §5 — set on a club course request. */
+  forBusinessId?: string | null;
+  forClubId?: string | null;
+  businessName?: string | null;
+  clubName?: string | null;
   displayName?: string | null;
   username?: string | null;
   avatarUrl?: string | null;
@@ -36,7 +41,7 @@ const STATUS_ORDER: Record<string, number> = {
 export async function fetchCourseRequests(): Promise<CourseRequestRow[]> {
   const { data, error } = await supabase
     .from('course_requests')
-    .select('id, requested_by, course_name, location, country, note, status, admin_notes, resolved_by, resolved_at, created_at, home_club_for_user_id')
+    .select('id, requested_by, course_name, location, country, note, status, admin_notes, resolved_by, resolved_at, created_at, home_club_for_user_id, for_business_id, for_club_id')
     .order('created_at', { ascending: false });
   if (error) throw error;
 
@@ -53,6 +58,8 @@ export async function fetchCourseRequests(): Promise<CourseRequestRow[]> {
     resolvedAt: r.resolved_at,
     createdAt: r.created_at,
     homeClubForUserId: r.home_club_for_user_id ?? null,
+    forBusinessId: r.for_business_id ?? null,
+    forClubId: r.for_club_id ?? null,
   }));
 
   const userIds = [...new Set(rows.map(r => r.requestedBy).filter(Boolean))] as string[];
@@ -68,6 +75,19 @@ export async function fetchCourseRequests(): Promise<CourseRequestRow[]> {
       r.username = p?.username ?? null;
       r.avatarUrl = p?.profile_photo_url ?? null;
     }
+  }
+
+  const bizIds = [...new Set(rows.map(r => r.forBusinessId).filter(Boolean))] as string[];
+  const clubIds = [...new Set(rows.map(r => r.forClubId).filter(Boolean))] as string[];
+  const [bizRes, clubRes] = await Promise.all([
+    bizIds.length ? supabase.from('business_accounts').select('id, name').in('id', bizIds) : Promise.resolve({ data: [] as any[] }),
+    clubIds.length ? supabase.from('golf_clubs').select('id, name').in('id', clubIds) : Promise.resolve({ data: [] as any[] }),
+  ]);
+  const bizMap = new Map(((bizRes as any).data ?? []).map((b: any) => [b.id, b.name as string]));
+  const clubMap = new Map(((clubRes as any).data ?? []).map((c: any) => [c.id, c.name as string]));
+  for (const r of rows) {
+    if (r.forBusinessId) r.businessName = (bizMap.get(r.forBusinessId) as string | undefined) ?? null;
+    if (r.forClubId) r.clubName = (clubMap.get(r.forClubId) as string | undefined) ?? null;
   }
 
   return rows.sort((a, b) => {
@@ -174,10 +194,31 @@ export function useCourseRequests() {
     },
   });
 
+  /** §5 — attaches an existing catalogue course to the requesting club. */
+  const resolveClubCourseRequest = useMutation({
+    mutationFn: async ({ id, courseId, adminNotes }: { id: string; courseId: string; adminNotes?: string | null }) => {
+      const { data: result, error } = await supabase.rpc('resolve_club_course_request', {
+        p_request_id: id,
+        p_course_id: courseId,
+        p_admin_notes: adminNotes ?? null,
+      });
+      if (error) throw error;
+      return result as unknown as { course_name: string; club_name: string };
+    },
+    onSuccess: (result) => toast.success(`${result?.course_name} attached to ${result?.club_name}`),
+    onError: (e: any) => toast.error(e?.message || 'Failed to attach course'),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'course-requests'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox', 'course-requests'] });
+      qc.invalidateQueries({ queryKey: ['club-course-analytics'] });
+      qc.invalidateQueries({ queryKey: ['my-businesses'] });
+    },
+  });
+
   const pendingCount = data.filter(r => r.status === 'pending').length;
 
   return {
     data, isLoading, refetch, pendingCount,
-    resolveCourseRequest, resolveHomeClubRequest, rejectHomeClubRequest,
+    resolveCourseRequest, resolveHomeClubRequest, rejectHomeClubRequest, resolveClubCourseRequest,
   };
 }

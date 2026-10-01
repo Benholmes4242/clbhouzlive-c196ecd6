@@ -387,14 +387,19 @@ export function useInboxFeed(): InboxFeedResult {
           // BRIEF_HOME_CLUB_PICKER §4.1 — home-club requests are marked and
           // prioritised: a member is waiting on each one.
           const isHomeClub = !!row.homeClubForUserId;
+          const isClubCourse = !!row.forClubId;
           const who = row.username ? `@${row.username}` : (row.displayName ?? 'user');
           open.push({
             id: row.id,
             type: 'courseRequest',
-            title: isHomeClub
+            title: isClubCourse
+              ? `Club course request: ${row.courseName}`
+              : isHomeClub
               ? `Home club request: ${row.courseName}`
               : `New course request: ${row.courseName}`,
-            meta: isHomeClub
+            meta: isClubCourse
+              ? `Club course request - ${row.clubName ?? 'club'} · ${row.businessName ?? 'business'}`
+              : isHomeClub
               ? `Home club - ${who} is waiting`
               : `Course requests - ${row.displayName ?? row.username ?? 'user'}`,
             createdAt: row.createdAt,
