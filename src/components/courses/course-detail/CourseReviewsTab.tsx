@@ -97,7 +97,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { data: businessClaim } = useBusinessClaimForCourse(courseId);
   const { data: reviewResponses } = useReviewResponses(courseId);
   const submitResponseMutation = useSubmitReviewResponse(courseId);
-  const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
+  const { data: ratingAggregates, isSuccess: aggregatesResolved } = useCourseRatingAggregates(courseId);
 
   const [sortBy, setSortBy] = useState<ReviewsSortBy>('recent');
   const [sortOpen, setSortOpen] = useState(false);
@@ -105,7 +105,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(externalHighlightReviewId || null);
   const [pendingSheetReviewId, setPendingSheetReviewId] = useState<string | null>(null);
 
-  const { data: reviewsData, isLoading, isError, refetch } = useCourseReviews(
+  const { data: reviewsData, isLoading, isError, refetch, isSuccess: reviewsResolved } = useCourseReviews(
     courseId,
     sortBy,
     'all',
@@ -397,23 +397,23 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   };
 
   const communityScore = ratingAggregates?.avg_overall_score || 0;
-  const ratingCount = ratingAggregates?.review_count ?? 0;
   const hasRatings = ratingCount > 0;
 
-  /* Five-band counts from the SAME set the header counts (non-mock, rated). */
+  /* ONE SOURCE FOR THE COUNT AND THE BARS. Both derive from the same filtered
+     array, so they cannot disagree. The average still comes from the
+     aggregates view: the list is fetched with is_mock=false, the same set the
+     view aggregates.
+     VALID ONLY WHILE THE LIST IS COMPLETE: useCourseReviews caps at 100 rows
+     and the busiest course has 9 today. If any course approaches that cap this
+     silently under-counts — revisit the limit BEFORE that happens. */
+  const ratedReviews = useMemo(() => reviews.filter((r) => !r.is_mock && r.rating != null), [reviews]);
+  const ratingCount = ratedReviews.length;
   const distribution = useMemo(() => {
     const d = { exceptional: 0, excellent: 0, good: 0, fair: 0, poor: 0 };
-    for (const r of reviews) {
-      if (r.is_mock || r.rating == null) continue;
-      d[getRatingTier(r.rating).toLowerCase() as keyof typeof d] += 1;
-    }
-    const total = d.exceptional + d.excellent + d.good + d.fair + d.poor;
-    if (total !== ratingCount) {
-      console.warn('[CourseReviewsTab] distribution total', total, '≠ header count', ratingCount, '— bars withheld');
-      return null;
-    }
+    for (const r of ratedReviews) d[getRatingTier(r.rating).toLowerCase() as keyof typeof d] += 1;
     return d;
-  }, [reviews, ratingCount]);
+  }, [ratedReviews]);
+  const headerResolved = reviewsResolved && aggregatesResolved;
   const viewerScore = myReview?.rating ?? null;
 
   const showSort = reviews.length >= SORT_GATE;

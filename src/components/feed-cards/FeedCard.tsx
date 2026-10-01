@@ -19,7 +19,7 @@
  *   - `isAutoplayActive` — activeIndices.has(flatIndex).
  */
 import { useRef } from 'react';
-import { ReactionGlyph, AMBER } from '@/lib/reactionKind';
+import { ReactionGlyph } from '@/lib/reactionKind';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
 import { formatCountShort as formatCount } from '@/i18n/format';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
@@ -320,7 +320,7 @@ export function FeedCard({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 3,
-              color: '#FFFFFF',
+              color: '#fff',
               fontWeight: 700,
               fontSize: 11,
               fontFamily: FONT_FAMILY,
