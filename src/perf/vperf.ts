@@ -5,7 +5,9 @@
  * named phase timings and a pass/fail budget verdict. NOT a per-event trace
  * (that was the retired [FSV] telemetry — high volume, gone by design).
  *
- * All entry points no-op instantly when `isPerfEnabled()` is false. Nothing
+ * Recording is always on — every entry point accumulates counters/rollups for
+ * the telemetry shipper regardless of flags. Console output (console.info /
+ * scorecard emission) is the only thing gated on `isPerfEnabled()`. Nothing
  * here changes playback behaviour — pure measurement.
  *
  * Public API
@@ -132,7 +134,7 @@ export function vperfGetPage(): string { return __currentPage; }
 //     scorecard emission so pill/console behaviour stays byte-identical.
 // Old `on()` is kept (=recordOn) so the ~25 existing call sites don't churn.
 function on(): boolean {
-  try { return isPerfEnabled(); } catch { return false; }
+  return true;
 }
 function consoleOn(): boolean {
   try { return isPerfEnabled(); } catch { return false; }
