@@ -28,6 +28,8 @@ import HolePhotoReviewSheet from '../components/HolePhotoReviewSheet';
 import ConfirmDialog from '../components/ConfirmDialog';
 import type { HolePhotoQueueRow } from '../hooks/useHolePhotoQueue';
 import CourseMatchingPage from './CourseMatchingPage';
+import { AddCourseSheet } from './ContentPage';
+import { uploadCoursePhoto } from '../hooks/useCourses';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import { supabase } from '@/integrations/supabase/client';
@@ -1111,7 +1113,7 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
           <AttachPickedCourse requestId={row.id} courseId={row.forCourseId} clubName={row.clubName ?? 'club'} onDone={onClose} />
         )}
         {isClubCourse && row.status === 'pending' && row.forClubId && !row.forCourseId && (
-          <ClubCoursePicker requestId={row.id} clubId={row.forClubId} initialQuery={row.courseName} onDone={onClose} />
+          <ClubCoursePicker requestId={row.id} clubId={row.forClubId} initialQuery={row.courseName} requestLocation={row.location ?? undefined} onDone={onClose} />
         )}
 
         <div style={{ marginTop: 8 }}>
@@ -1154,9 +1156,10 @@ function AttachPickedCourse({
  * selectable; the RPC also refuses a course owned by another club.
  */
 function ClubCoursePicker({
-  requestId, clubId, initialQuery, onDone,
-}: { requestId: string; clubId: string; initialQuery: string; onDone: () => void }) {
+  requestId, clubId, initialQuery, requestLocation, onDone,
+}: { requestId: string; clubId: string; initialQuery: string; requestLocation?: string; onDone: () => void }) {
   const { resolveClubCourseRequest } = useCourseRequests();
+  const [createOpen, setCreateOpen] = useState(false);
   const [q, setQ] = useState(initialQuery);
   const [hits, setHits] = useState<Array<{ id: string; name: string; club_id: string | null }>>([]);
   const [loading, setLoading] = useState(false);
@@ -1194,9 +1197,34 @@ function ClubCoursePicker({
           border: `1px solid ${t.line}`, background: t.canvas, color: t.ink, fontSize: 13,
         }}
       />
-      <div style={{ color: t.inkMuted, fontSize: 11.5 }}>
-        Not in the catalogue yet? Add the course first, then attach it here.
-      </div>
+      <button
+        type="button"
+        onClick={() => setCreateOpen(true)}
+        disabled={busy}
+        style={{ ...btnGhost(), alignSelf: 'flex-start', fontSize: 12.5 }}
+      >
+        Create this course ›
+      </button>
+      <AddCourseSheet
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        prefillName={initialQuery}
+        prefillSubCountry={requestLocation}
+        uploadPhoto={uploadCoursePhoto}
+        onOpenExisting={() => setCreateOpen(false)}
+        onCreated={async (created) => {
+          try {
+            await resolveClubCourseRequest.mutateAsync({ id: requestId, courseId: created.id });
+            onDone();
+            return true;
+          } catch {
+            // Course exists now but is not attached: select it so the admin
+            // can retry the attach alone. The mutation already toasts the error.
+            setPicked({ id: created.id, name: created.name });
+            return false;
+          }
+        }}
+      />
       {picked ? (
         <div style={{ fontSize: 13 }}>
           Selected: <b>{picked.name}</b>{' '}

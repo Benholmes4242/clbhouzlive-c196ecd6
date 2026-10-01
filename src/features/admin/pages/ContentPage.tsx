@@ -27,6 +27,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import AdminSheet from '../components/AdminSheet';
 import CourseInsight from '../components/CourseInsight';
 import AdminAccessDenied from '../components/AdminAccessDenied';
+import CourseClubControl from '../components/CourseClubControl';
 import { COURSE_TYPES } from '../constants';
 import { CourseGeographySelectors } from '../components/CourseGeographySelectors';
 import { DuplicateCourseWarning, useDuplicateCourseCheck } from '../components/DuplicateCourseWarning';
@@ -722,6 +723,7 @@ function CourseDetail({
           <Section title="Identity">
             <Field label="Name"><TextInput value={form.name} onChange={v => set('name', v)} /></Field>
             <Field label="Country code"><TextInput value={form.country_code} onChange={v => set('country_code', v)} placeholder="e.g. US" /></Field>
+            <Field label="Club">{courseId && <CourseClubControl courseId={courseId} clubId={(course as any)?.club_id ?? null} />}</Field>
           </Section>
 
           <Section title="Location">
@@ -895,10 +897,13 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
 
 /* ───────── Add course sheet ───────── */
 
-function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, onOpenExisting }: {
+export function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, onOpenExisting, prefillName, prefillSubCountry }: {
   open: boolean;
   onClose: () => void;
-  onCreated: () => void;
+  /** Receives the created row. Return `false` to keep the sheet open (e.g. a follow-up step failed). */
+  onCreated: (created: { id: string; name: string }) => void | boolean | Promise<void | boolean>;
+  prefillName?: string;
+  prefillSubCountry?: string;
   uploadPhoto: (id: string, file: File) => Promise<any>;
   onOpenExisting: (id: string) => void;
 }) {
@@ -927,10 +932,15 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, onOpenExisting 
     if (open) {
       // Restore any prior draft when the sheet appears (fresh mount or reopen).
       const draft = loadDraft(draftKey) as Partial<typeof EMPTY> | null;
-      if (draft && !draftsEqual(draft as any, EMPTY as any)) {
-        setForm({ ...EMPTY, ...draft });
-        setDraftRestored(true);
-      }
+      const hasDraft = !!draft && !draftsEqual(draft as any, EMPTY as any);
+      const base = hasDraft ? { ...EMPTY, ...draft } : EMPTY;
+      const seeded = {
+        ...base,
+        ...(prefillName ? { name: prefillName } : {}),
+        ...(prefillSubCountry ? { sub_country: prefillSubCountry } : {}),
+      };
+      if (hasDraft || prefillName || prefillSubCountry) setForm(seeded);
+      if (hasDraft) setDraftRestored(true);
       return;
     }
     // Closed: reset ephemeral form + photo, but leave the persisted draft alone.
@@ -981,8 +991,8 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, onOpenExisting 
       }
       toast.success(`"${form.name}" created`);
       clearDraft(draftKey);
-      onCreated();
-      onClose();
+      const keepOpen = (await onCreated({ id: created.id, name: form.name.trim() })) === false;
+      if (!keepOpen) onClose();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to create course');
     } finally {
