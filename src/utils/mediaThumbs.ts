@@ -1,4 +1,5 @@
 // utils/mediaThumbs.ts
+import { imageSrc } from './imageSrc';
 export type Media = { id: string; type: "image" | "video"; url: string; thumbUrl?: string };
 export type Thumb = { id?: string; displaySrc: string; kind: "user" | "ph" };
 
@@ -20,7 +21,8 @@ export function streamPosterFrom(url?: string) {
  *    in src/utils/posterPrefetch.ts). The early-return in
  *    buildImageThumbnailUrl only applied to R2-style width/height/fit
  *    on Stream — the LQIP shape below is what Stream actually supports.
- *  - imagedelivery / R2 accept ?width=&height=&fit=.
+ *  - Everything else goes through imageSrc (Cloudflare Image
+ *    Transformations on media.clbhouz.co.uk; other hosts unchanged).
  */
 export function buildLqipUrl(url: string | null | undefined): string | null {
   if (!url) return null;
@@ -31,7 +33,8 @@ export function buildLqipUrl(url: string | null | undefined): string | null {
     /\/thumbnails\/thumbnail\.jpg/i.test(url) &&
     (url.includes('videodelivery.net') || url.includes('cloudflarestream.com'));
   if (isStreamThumb) return `${url}${sep}time=1s&height=24&fit=crop`;
-  return `${url}${sep}width=32&height=24&fit=cover`;
+  const out = imageSrc(url, 32);
+  return out === url ? null : out;
 }
 
 /**
@@ -59,10 +62,8 @@ export function buildImageThumbnailUrl(
 
   if (isStreamThumb) return url;
 
-  const sep = url.includes('?') ? '&' : '?';
-
-  // Add transformation params (works with Cloudflare R2/Images)
-  return `${url}${sep}width=${width}&height=${height}&fit=${fit}`;
+  void height; void fit;
+  return imageSrc(url, width);
 }
 
 /**

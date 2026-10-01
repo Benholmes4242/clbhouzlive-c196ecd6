@@ -15,6 +15,7 @@
  *  - Inline video lifecycle: only the active slide may autoplay.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { postImageProps } from '@/utils/imageSrc';
 import type { MediaItem } from '@/components/media-system/types/media';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { InlineVideo } from './InlineVideo';
@@ -526,7 +527,7 @@ export const MediaCarousel: React.FC<Props> = ({
                 ) : null
               ) : url ? (
                 <img
-                  src={url}
+                  {...postImageProps(url)}
                   alt=""
                   loading={Math.abs(i - active) <= 1 ? 'eager' : 'lazy'}
                     decoding="async"
