@@ -45,15 +45,15 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
 
   return (
-    <div className="space-y-2">
+    <div className="grid items-center gap-x-2 gap-y-2" style={{ gridTemplateColumns: 'max-content 1fr 24px' }}>
       {distributionItems.map((item) => {
         const percentage = (item.count / maxCount) * 100;
         const hasCount = item.count > 0;
         const bandFill = reviewTierColor(item.key as RatingTier, 'dark');
 
         return (
-          <div key={item.key} className="flex items-center gap-2">
-            <span className="w-[76px] text-[13px] text-muted-foreground shrink-0">
+          <React.Fragment key={item.key}>
+            <span className="text-[13px] text-muted-foreground">
               {item.label}
             </span>
 
@@ -69,10 +69,10 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
             </div>
 
 
-            <span className="w-6 text-right text-xs text-muted-foreground tabular-nums shrink-0">
+            <span className="text-right text-xs text-muted-foreground tabular-nums">
               {item.count}
             </span>
-          </div>
+          </React.Fragment>
         );
       })}
     </div>

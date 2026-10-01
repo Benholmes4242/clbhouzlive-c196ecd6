@@ -50,7 +50,7 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 
 import { AboutSection, AboutHairline, GUTTER } from './about/AboutSection';
-import { TheScore, TheScoreReservedHeight } from './reviews/TheScore';
+import { TheScore } from './reviews/TheScore';
 import { getRatingTier } from '@/lib/ratingTier';
 import { WhatTheyScored } from './reviews/WhatTheyScored';
 import { FlatReviewRow, FlatAction } from './reviews/reviewFlatBits';
@@ -502,17 +502,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         ) : (
           <>
             {/* §3.1 */}
-            {headerResolved ? (
-              <TheScore score={communityScore} ratingCount={ratingCount} viewerScore={viewerScore} distribution={distribution} />
-            ) : (
-              /* Holds the full height of the pair + five band rows so nothing below moves. */
-              <div aria-hidden style={{ padding: `0 ${GUTTER}px`, height: TheScoreReservedHeight }}>
-                <Skeleton className="h-[67px] w-[140px]" />
-                <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-[20px] w-full" />)}
-                </div>
-              </div>
-            )}
+            <TheScore loading={!headerResolved} score={communityScore} ratingCount={ratingCount} viewerScore={viewerScore} distribution={distribution} />
 
             {/* §3.2 */}
             <WhatTheyScored aggregates={categoryAggregates} />
