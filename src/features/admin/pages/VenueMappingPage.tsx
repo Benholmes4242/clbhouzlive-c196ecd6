@@ -128,7 +128,7 @@ export default function VenueMappingPage() {
     return c;
   }, [data]);
 
-  if (isError) return <AdminErrorState error={error as Error} onRetry={() => refetch()} />;
+  if (isError) return <AdminErrorState message={(error as Error)?.message} onRetry={() => refetch()} />;
 
   const columns: DataListColumn<VenueRow>[] = [
     { key: 'v', header: 'Venue', render: (r) => <b style={{ color: t.ink }}>{r.venueName}</b> },
