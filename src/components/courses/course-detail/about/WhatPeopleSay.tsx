@@ -105,7 +105,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   }
 
   return (
-    <AboutSection heading={heading} meta={t('courseDetail.communityScore.basedOn', { count: total })}>
+    <AboutSection heading={heading}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <OverallScoreLine score={score} ratingCount={total} />
