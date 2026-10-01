@@ -275,7 +275,9 @@ async function cacheMatch(venue: VenueInput, course: CandidateCourse, confidence
       .eq('sr_venue_name', venue.venueName)
       .maybeSingle();
     if ((existing as { source?: string } | null)?.source === 'manual') return;
-    const source = isLowConfidence ? 'low_confidence' : (confidence > 0.8 ? 'normalized' : 'fuzzy');
+    // sr_course_map_source_check allows only exact|fuzzy|manual; a machine match is 'fuzzy'.
+    void isLowConfidence;
+    const source = 'fuzzy';
     
     const { error } = await supabase.from('sr_course_map').upsert({
       sr_venue_name: venue.venueName,
@@ -396,7 +398,7 @@ export function useCourseImageResolver(venues: VenueInput[]) {
         resolutions
           .filter((r): r is NonNullable<typeof r> => !!r)
           .map((r) =>
-            cacheMatch(r.venue, r.match.course.id, r.match.score, r.match.isLowConfidence),
+            cacheMatch(r.venue, r.match.course, r.match.score, r.match.isLowConfidence),
           ),
       );
 
