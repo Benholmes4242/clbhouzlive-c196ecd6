@@ -12,7 +12,9 @@
  *   BOTTOM (no scrim — removed earlier; every element carries its own
  *   drop-shadow over the blurred media backdrop). From the top down:
  *     - LEFT: 40px squircle avatar + column (name · [time · FollowPill] ·
- *       caption · read review › · likers row). The likers row is LikedByRow
+ *       caption with one inline CTA at the end of line three — "Read more"
+ *       (expands in place) or, on reviews, "Full review" (opens the sheet;
+ *       own line when the review has no text) · likers row). LikedByRow
  *       with avatarRing="media"; it reserves its full size at first paint.
  *     - RIGHT: vertical action rail (mute, heart, comment, send, more)
  *     - BOTTOM-MOST: the comment bar (viewer avatar + "Add a comment…"),
