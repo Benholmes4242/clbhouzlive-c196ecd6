@@ -66,6 +66,9 @@ interface Props {
 
 const FRAME_DEFAULT = 4 / 5;
 
+const supportsScrollEnd =
+  typeof window !== 'undefined' && 'onscrollend' in window;
+
 export const MediaCarousel: React.FC<Props> = ({
   items,
   isCardActive,
@@ -96,6 +99,24 @@ export const MediaCarousel: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const settleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const publishedRef = useRef<number>(active);
+  const onIndexChangeRef = useRef(onIndexChange);
+  onIndexChangeRef.current = onIndexChange;
+  const publishIfSettled = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    if (w <= 0) return;
+    const idx = Math.round(el.scrollLeft / w);
+    // Settled = within 1px of a slide boundary.
+    if (Math.abs(el.scrollLeft - idx * w) > 1) return;
+    const safe = Math.max(0, Math.min(idx, items.length - 1));
+    if (safe === publishedRef.current) return;
+    publishedRef.current = safe;
+    onIndexChangeRef.current?.(safe);
+  }, [items.length]);
+
   const handleScroll = useCallback(() => {
     const el = trackRef.current;
     if (!el) return;
@@ -105,15 +126,27 @@ export const MediaCarousel: React.FC<Props> = ({
       if (w <= 0) return;
       const idx = Math.round(el.scrollLeft / w);
       const safe = Math.max(0, Math.min(idx, items.length - 1));
-      if (safe !== active) {
-        setActive(safe);
-        onIndexChange?.(safe);
-      }
+      // Local flip at the halfway point (dots + ±1 video roles flip early).
+      if (safe !== active) setActive(safe);
     });
-  }, [active, items.length, onIndexChange]);
+    // Store publish waits for settle: 'scrollend' where supported, else a
+    // 120ms debounce after the last scroll event.
+    if (!supportsScrollEnd) {
+      if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
+      settleTimerRef.current = setTimeout(publishIfSettled, 120);
+    }
+  }, [active, items.length, publishIfSettled]);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el || !supportsScrollEnd) return;
+    el.addEventListener('scrollend', publishIfSettled);
+    return () => el.removeEventListener('scrollend', publishIfSettled);
+  }, [publishIfSettled]);
 
   useEffect(() => () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
   }, []);
 
   // [CAROUSEL] instrumentation — observable slide switches within a post.
@@ -408,6 +441,7 @@ export const MediaCarousel: React.FC<Props> = ({
           overflowY: 'hidden',
           scrollSnapType: 'x mandatory',
           scrollBehavior: 'smooth',
+          overscrollBehaviorX: 'contain',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
         }}
@@ -477,7 +511,8 @@ export const MediaCarousel: React.FC<Props> = ({
                   <img
                     src={m.thumbnailUrl}
                     alt=""
-                    loading={i === 0 ? 'eager' : 'lazy'}
+                    loading={Math.abs(i - active) <= 1 ? 'eager' : 'lazy'}
+                    decoding="async"
                     style={{
                       position: 'absolute',
                       inset: 0,
@@ -493,7 +528,8 @@ export const MediaCarousel: React.FC<Props> = ({
                 <img
                   src={url}
                   alt=""
-                  loading={i === 0 ? 'eager' : 'lazy'}
+                  loading={Math.abs(i - active) <= 1 ? 'eager' : 'lazy'}
+                    decoding="async"
                   style={{
                     position: 'absolute',
                     inset: 0,

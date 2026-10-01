@@ -43,6 +43,7 @@ import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { useNavigate } from 'react-router-dom';
 import { MediaCarousel } from './MediaCarousel';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { FeedFollowPill } from './FeedFollowPill';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 import { FeedActorPicker } from './FeedActorPicker';
@@ -133,6 +134,11 @@ export interface FeedCardProps {
   earlyMotion?: boolean;
   /** Initial carousel slide for multi-media posts (from persisted store). */
   initialMediaIndex?: number;
+  /** When set, the carousel's restored slide is read from the clubhouse
+   *  store for this card's feedIndex (per-card selector), so one card's
+   *  carousel settling never re-renders the list. Value = store tab key, or
+   *  '' for the legacy mirror. */
+  carouselRestoreTab?: string;
   /** Notified when user swipes the multi-media carousel. */
   onCarouselIndexChange?: (post: FeedPost, idx: number) => void;
   onFollow?: (post: FeedPost) => void;
@@ -302,7 +308,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   isActive = false,
   mountVideo = false,
   earlyMotion = false,
-  initialMediaIndex = 0,
+  initialMediaIndex: initialMediaIndexProp,
+  carouselRestoreTab,
   onCarouselIndexChange,
   onFollow,
   currentUserId,
@@ -317,6 +324,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   commentPreview,
   commentPreviewEnabled = false,
 }) => {
+  const storedSlide = useClubhouseStore((s) => {
+    if (carouselRestoreTab == null || feedIndex == null) return 0;
+    const map = carouselRestoreTab
+      ? (s.carouselPositionsByTab[carouselRestoreTab] ?? s.carouselPositions)
+      : s.carouselPositions;
+    return map.get(feedIndex) ?? 0;
+  });
+  const initialMediaIndex = initialMediaIndexProp ?? storedSlide;
   
   const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
