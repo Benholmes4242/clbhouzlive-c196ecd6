@@ -21,6 +21,9 @@ import {
   HLS_CONFIG,
   RAIL_HLS_OVERRIDES,
   FULLSCREEN_HLS_OVERRIDES,
+  FEED_HLS_OVERRIDES,
+  FEED_ACTIVE_MAX_BUFFER_S,
+  FEED_PRELOAD_MAX_BUFFER_S,
   type LaneId,
   MAX_CONCURRENT_LOADS,
   ONE_UNMUTED_LANE,
@@ -40,7 +43,7 @@ import {
   vperfNextId,
 } from '@/perf/vperf';
 import { readSeededBandwidth } from './bandwidthMemory';
-import { applyStartLevel, bandwidthSeed, upshiftForSurface, viewportPixelHeight } from './startLevel';
+import { applyStartLevel, bandwidthSeed, upshiftForSurface, viewportPixelHeight, elementPixelHeight } from './startLevel';
 
 import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
@@ -829,9 +832,14 @@ class VideoEngineImpl {
 
     // hls.js path.
     const isRail = laneId.startsWith('rail-');
+    const isFeed = laneId === 'feed-active' || laneId === 'feed-next' || laneId === 'feed-prev';
+    // Any load still counted against MAX_CONCURRENT_LOADS is superseded by
+    // this re-point — settle it before the new one is counted.
+    this.settleLoading(lane);
     if (!lane.hls) {
-      // Rail lanes keep capLevelToPlayerSize (small tiles), feed-active and
-      // fullscreen render at viewport size so they must NOT be capped.
+      // Rail and feed lanes use capLevelToPlayerSize (they render inside a
+      // card / tile); only the fullscreen lane renders at viewport size and
+      // stays uncapped.
       // [PREDICT] Part 1 — seed ABR from persisted bandwidth memory for
       // FEED-ACTIVE / FULLSCREEN lanes only. Rails intentionally excluded:
       // capLevelToPlayerSize already keeps them small.
@@ -840,6 +848,7 @@ class VideoEngineImpl {
       const config: Partial<HlsConfig> = {
         ...HLS_CONFIG,
         ...(isRail ? RAIL_HLS_OVERRIDES : {}),
+        ...(isFeed ? FEED_HLS_OVERRIDES : {}),
         ...(laneId === 'fullscreen' ? FULLSCREEN_HLS_OVERRIDES : {}),
         startPosition,
         // hls.js expects bps. Prefer a real remembered measurement, else the
@@ -902,7 +911,9 @@ class VideoEngineImpl {
         const minHeight = lane.id === 'fullscreen' ? 720 : 540;
         const applied = applyStartLevel(
           hls as any,
-          viewportPixelHeight(),
+          // Feed lanes open at the CARD's rendered height; only the
+          // fullscreen lane opens at viewport height.
+          lane.id === 'fullscreen' ? viewportPixelHeight() : elementPixelHeight(lane.el),
           (lane as any)._seededBw ?? null,
           minHeight,
         );
@@ -920,6 +931,7 @@ class VideoEngineImpl {
 
     const onError = (_evt: unknown, data: any) => {
       if (data?.fatal) {
+        this.settleLoading(lane);
         lane.state = 'error';
         this.emit(lane, data?.details ?? 'fatal');
       }
@@ -934,6 +946,7 @@ class VideoEngineImpl {
     this.wireElementEvents(lane, /* usingHls */ true);
     this.transition(lane, 'loading');
     this.loadingCount++;
+    (lane as any)._countedLoading = true;
     DBG(laneId, 'load', { hlsUrl, startPosition });
   }
 
@@ -1022,7 +1035,20 @@ class VideoEngineImpl {
     // Explicitly ensure the preload lane is paused (its element is in the
     // hidden host — nothing to render — but paused keeps the decoder cool).
     const lane = this.getLane(laneId);
+    // Paused neighbours buffer a short lead only; play() restores the full
+    // forward buffer when the lane is promoted. hls.js reads this per check.
+    if (lane.hls && laneId !== 'fullscreen') {
+      try { lane.hls.config.maxBufferLength = FEED_PRELOAD_MAX_BUFFER_S; } catch { /* noop */ }
+    }
     if (!lane.el.paused) lane.el.pause();
+  }
+
+  /** Decrement loadingCount once per counted load (loadeddata, error,
+   *  re-point or release) so the MAX_CONCURRENT_LOADS gauge cannot drift. */
+  private settleLoading(lane: Lane): void {
+    if (!(lane as any)._countedLoading) return;
+    (lane as any)._countedLoading = false;
+    if (this.loadingCount > 0) this.loadingCount--;
   }
 
   private wireElementEvents(lane: Lane, _usingHls: boolean) {
@@ -1086,7 +1112,7 @@ class VideoEngineImpl {
       this.emit(lane);
     };
     const onLoadedData = () => {
-      if (this.loadingCount > 0) this.loadingCount--;
+      this.settleLoading(lane);
       if (lane.state === 'loading') this.transition(lane, 'ready');
       // Do not reveal on loadeddata. WebKit can fire it before a synchronous
       // currentTime reset/seek has visibly committed, which exposes frame 0 or
@@ -1178,6 +1204,7 @@ class VideoEngineImpl {
     };
 
     const onError = () => {
+      this.settleLoading(lane);
       this.transition(lane, 'error');
       vperfSessionEnd(lane.id, 'error');
     };
@@ -1229,6 +1256,9 @@ class VideoEngineImpl {
 
   play(laneId: LaneId, opts: { callerPostId?: string | null; viaViewer?: boolean } = {}): Promise<void> {
     const lane = this.getLane(laneId);
+    if (lane.hls && laneId !== 'fullscreen') {
+      try { lane.hls.config.maxBufferLength = FEED_ACTIVE_MAX_BUFFER_S; } catch { /* noop */ }
+    }
     const caller = opts.callerPostId ?? null;
     // Trace viewer-sourced play so device captures show the path.
     if (opts.viaViewer) {
@@ -1824,6 +1854,7 @@ class VideoEngineImpl {
   release(laneId: LaneId): void {
     const lane = this.getLane(laneId);
     vperfSessionEnd(laneId, 'release');
+    this.settleLoading(lane);
     if (lane.hls) {
       lane.hls.stopLoad();
       lane.hls.detachMedia();
