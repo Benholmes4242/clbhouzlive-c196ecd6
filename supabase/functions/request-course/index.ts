@@ -67,21 +67,29 @@ serve(async (req) => {
     let clubLabel: string | null = null;
     let businessLabel: string | null = null;
     if (isClubCourse) {
-      const { data: member } = await supabaseAdmin
+      const { data: member, error: memberErr } = await supabaseAdmin
         .from("business_members")
         .select("role")
         .eq("business_id", for_business_id)
-        .eq("user_id", user.id)
+        .eq("user_profile_id", user.id)
         .in("role", ["owner", "admin"])
         .limit(1);
+      if (memberErr) {
+        console.error("[request-course] membership lookup failed", memberErr);
+        return json({ ok: false, error: "Could not verify your access" }, 500);
+      }
       if (!member || member.length === 0) {
         return json({ ok: false, error: "Not authorized for this business" }, 403);
       }
-      const { data: biz } = await supabaseAdmin
+      const { data: biz, error: bizErr } = await supabaseAdmin
         .from("business_accounts")
         .select("name, is_deleted, category, is_verified, club_id")
         .eq("id", for_business_id)
         .maybeSingle();
+      if (bizErr) {
+        console.error("[request-course] business lookup failed", bizErr);
+        return json({ ok: false, error: "Could not verify your access" }, 500);
+      }
       if (
         !biz || biz.is_deleted !== false || biz.category !== "Golf Club" ||
         biz.is_verified !== true || biz.club_id !== for_club_id
@@ -89,8 +97,9 @@ serve(async (req) => {
         return json({ ok: false, error: "This business cannot request courses" }, 403);
       }
       businessLabel = biz.name ?? null;
-      const { data: club } = await supabaseAdmin
+      const { data: club, error: clubErr } = await supabaseAdmin
         .from("golf_clubs").select("name").eq("id", for_club_id).maybeSingle();
+      if (clubErr) console.error("[request-course] club name lookup failed", clubErr);
       clubLabel = club?.name ?? null;
     }
 
