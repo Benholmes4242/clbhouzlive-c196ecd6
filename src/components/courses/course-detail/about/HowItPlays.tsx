@@ -29,7 +29,7 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
-import AllHolesSheet from './AllHolesSheet';
+import AllHolesSheet, { CompactHoleRow } from './AllHolesSheet';
 
 const CHART_HEIGHT = 82;
 
@@ -172,38 +172,6 @@ const Sentence: React.FC<{ children: React.ReactNode; quiet?: boolean }> = ({ ch
   </p>
 );
 
-/** §3.4 d / §3.10 — the one drill-down. A right chevron, because it navigates. */
-const DrillDownRow: React.FC<{ holes: number; onPress: () => void }> = ({ holes, onPress }) => {
-  const { t } = useTranslation('courses');
-  return (
-    <>
-      <AboutHairline style={{ marginTop: 18 }} />
-      <button
-        type="button"
-        onClick={onPress}
-        style={{
-          display: 'block',
-          width: '100%',
-          textAlign: 'left',
-          background: 'transparent',
-          border: 0,
-          padding: '14px 0 0',
-          cursor: 'pointer',
-          fontFamily: SANS,
-        }}
-      >
-        <span style={{ display: 'block', fontSize: 13, fontWeight: 600, color: A.INK }}>
-          {t('courseDetail.plays.allHoles', { count: holes, holes: formatNumber(holes) })} ›
-        </span>
-        <span
-          style={{ display: 'block', marginTop: 5, fontSize: 11, lineHeight: 1.5, color: A.DIM }}
-        >
-          {t('courseDetail.plays.allHolesSub')}
-        </span>
-      </button>
-    </>
-  );
-};
 
 /** §4 — the pooled-round threshold below which no course picture is drawn. */
 const MIN_ROUNDS = 20;
@@ -371,10 +339,6 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
           />
         ) : null}
         <Figure
-          label={t('courseDetail.plays.hardestHole')}
-          value={String(stats.hardest.hole_no)}
-        />
-        <Figure
           label={t('courseDetail.plays.easiestHole')}
           value={String(stats.easiest.hole_no)}
         />
@@ -383,8 +347,23 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
       {/* c) the course-wide spread, in the four scoring tones the rows use. */}
       {shares ? <CourseDistributionSummary shares={shares} /> : null}
 
-      {/* d) the hairline and the one drill-down. */}
-      <DrillDownRow holes={holes.length} onPress={openDrillDown} />
+      {/* d) the specimen hole — the sheet's own row — then the one drill-down. */}
+      <AboutHairline style={{ marginTop: 18 }} />
+      <div style={{ paddingTop: 14 }}>
+        <span style={ABOUT_KICKER}>{t('courseDetail.plays.hardestHole')}</span>
+        <div style={{ marginTop: 2 }}>
+          <CompactHoleRow hole={stats.hardest} mine={myByHole.get(stats.hardest.hole_no) ?? null} hasYou={hasYou} last />
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={openDrillDown}
+        style={{ display: 'block', width: '100%', textAlign: 'left', background: 'transparent', border: 0, padding: '4px 0 0', cursor: 'pointer', fontFamily: SANS }}
+      >
+        <span style={{ display: 'block', fontSize: 13, fontWeight: 600, color: A.INK }}>
+          {t('courseDetail.plays.allHoles', { count: holes.length, holes: formatNumber(holes.length) })} ›
+        </span>
+      </button>
       {allHolesSheet}
     </AboutSection>
   );
