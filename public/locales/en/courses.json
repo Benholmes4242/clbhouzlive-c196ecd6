@@ -1050,6 +1050,7 @@
   "courseHero": {
     "avgToPar": "avg to par",
     "harderThan": "harder than {{pct}}%",
+    "reviews": "reviews",
     "rounds": "rounds",
     "yourPb": "your pb"
   },
