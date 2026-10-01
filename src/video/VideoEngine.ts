@@ -20,6 +20,7 @@ import {
   DEFAULT_LANE_IDS,
   HLS_CONFIG,
   RAIL_HLS_OVERRIDES,
+  FULLSCREEN_HLS_OVERRIDES,
   type LaneId,
   MAX_CONCURRENT_LOADS,
   ONE_UNMUTED_LANE,
@@ -128,6 +129,8 @@ export interface LaneSnapshot {
    *  depending on which entry point wrote last. Consumers should handle both
    *  shapes (exact match OR `${postId}:` prefix). Do NOT normalize here. */
   postId: string | null;
+  /** Increments each time the clip reaches its end with loop=false. */
+  endedCount: number;
   error?: string;
 }
 
@@ -149,6 +152,9 @@ interface Lane {
   listeners: Set<LaneListener>;
   detachFns: Array<() => void>;
   audioPolicy: LaneAudioPolicy;
+  /** JS-driven loop (the native attribute is off so 'ended' is observable). */
+  loop: boolean;
+  endedCount: number;
 }
 
 
@@ -196,7 +202,8 @@ function createLaneElement(laneId: LaneId): HTMLVideoElement {
   el.playsInline = true;
   el.muted = true;
 
-  el.loop = true; // Stage-1 polish: loop by default on both feed + fullscreen lanes.
+  // Loop is JS-driven (lane.loop) so 'ended' fires and can be observed.
+  el.loop = false;
   // 'auto' is load-bearing on the NATIVE HLS path (iOS/WKWebView, where
   // Hls.isSupported() is false): with 'metadata' the element fetches only the
   // manifest + init segment and refuses to buffer media until play() is
@@ -377,6 +384,8 @@ class VideoEngineImpl {
         listeners: new Set(),
         detachFns: [],
         audioPolicy: 'always-muted',
+        loop: true,
+        endedCount: 0,
       });
     }
     if (PAUSE_ON_HIDDEN && typeof document !== 'undefined') {
@@ -550,6 +559,12 @@ class VideoEngineImpl {
    * 'always-muted' lanes stay muted regardless; 'local' lanes are left alone
    * (only setMuted controls them). Applied immediately.
    */
+  /** Set whether this lane wraps to 0 on end (true) or emits endedCount (false). */
+  setLoop(laneId: LaneId, loop: boolean): void {
+    const lane = this.getLane(laneId);
+    lane.loop = loop;
+  }
+
   setAudioPolicy(laneId: LaneId, policy: LaneAudioPolicy): void {
     const lane = this.getLane(laneId);
     if (lane.audioPolicy === policy) return;
@@ -659,9 +674,10 @@ class VideoEngineImpl {
    */
   load(
     laneId: LaneId,
-    opts: { hlsUrl: string; posterUrl?: string | null; startPosition?: number; postId?: string | null }
+    opts: { hlsUrl: string; posterUrl?: string | null; startPosition?: number; postId?: string | null; loop?: boolean }
   ): void {
     const lane = this.getLane(laneId);
+    if (typeof opts.loop === 'boolean') lane.loop = opts.loop;
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
     // [TRACE] engine.load — one line per load() call, before any decisions.
     {
@@ -818,6 +834,7 @@ class VideoEngineImpl {
       const config: Partial<HlsConfig> = {
         ...HLS_CONFIG,
         ...(isRail ? RAIL_HLS_OVERRIDES : {}),
+        ...(laneId === 'fullscreen' ? FULLSCREEN_HLS_OVERRIDES : {}),
         startPosition,
         // hls.js expects bps. Prefer a real remembered measurement, else the
         // Network Information API / a sane default — a 500kbps seed opened
@@ -1081,7 +1098,7 @@ class VideoEngineImpl {
       // Gapless loop for short clips (<15s): native loop leaves a 100-300ms
       // gap on iOS HLS. Preempt the seam by seeking to 0 + play() ourselves.
       const dur = lane.el.duration;
-      if (isFinite(dur) && dur > 0 && dur < 15) {
+      if (lane.loop && isFinite(dur) && dur > 0 && dur < 15) {
         const remaining = dur - (lane.el.currentTime || 0);
         if (remaining < 0.1) {
           // [VPERF] S7 loop.gap — measure seek-to-0 → next 'playing' event.
@@ -1135,6 +1152,24 @@ class VideoEngineImpl {
     const onWaiting = () => {
       vperfLaneEvent(lane.id, 'waiting');
     };
+    const onEnded = () => {
+      if (lane.loop) {
+        const gapId = vperfNextId(`loop.gap:${lane.id}`);
+        vperfStart(gapId, 'loop.gap', { laneId: lane.id, postId: lane.postId });
+        vperfSessionSuppressNextStall(lane.id);
+        vperfArmLane(lane.id, { spanId: gapId, endOn: 'playing' });
+        // hls.js: get segment 0 in flight before the seek lands.
+        if (lane.hls) { try { lane.hls.startLoad(0); } catch { /* noop */ } }
+        try { lane.el.currentTime = 0; } catch { /* noop */ }
+        const p = lane.el.play();
+        if (p && typeof (p as Promise<void>).catch === 'function') {
+          (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
+        }
+        return;
+      }
+      lane.endedCount++;
+      this.emit(lane);
+    };
 
     const onError = () => {
       this.transition(lane, 'error');
@@ -1159,6 +1194,7 @@ class VideoEngineImpl {
     el.addEventListener('pause', onPause);
     el.addEventListener('waiting', onWaiting);
     el.addEventListener('error', onError);
+    el.addEventListener('ended', onEnded);
     lane.detachFns.push(() => {
       el.removeEventListener('loadeddata', onLoadedData);
       el.removeEventListener('canplay', onCanPlay);
@@ -1168,6 +1204,7 @@ class VideoEngineImpl {
       el.removeEventListener('pause', onPause);
       el.removeEventListener('waiting', onWaiting);
       el.removeEventListener('error', onError);
+      el.removeEventListener('ended', onEnded);
     });
 
     // [VPERF] hls.js LEVEL_SWITCHED feeds session.levelSwitches / endLevel.
@@ -1810,6 +1847,7 @@ class VideoEngineImpl {
       muted: lane.el.muted,
       firstFrame: lane.firstFrame,
       postId: lane.postId,
+      endedCount: lane.endedCount,
     };
   }
 

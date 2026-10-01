@@ -471,7 +471,10 @@ const FullscreenVideoSlot: React.FC<{
    *  dims fall back to full viewport (util's own default). */
   mediaW?: number;
   mediaH?: number;
-}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady, ownerKey, allowBorrow = true, mediaW = 0, mediaH = 0 }) => {
+  /** Wrap at the end (default true). Pager passes false on non-last pages. */
+  loop?: boolean;
+  onEnded?: () => void;
+}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady, ownerKey, allowBorrow = true, mediaW = 0, mediaH = 0, loop = true, onEnded }) => {
   // Mute state now owned by VideoEngine via 'session' audioPolicy — no local read.
   const storedStart = useFullscreenFeedStore((s) => s.startPosition);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
@@ -504,6 +507,8 @@ const FullscreenVideoSlot: React.FC<{
     active: isActive && !isBorrowSlide,
     audioPolicy: 'session',
     postId: resumeKey,
+    loop,
+    onEnded,
   });
 
   // Autoplay-blocked → show "Tap for sound" pill. The engine's unmuted
@@ -1683,6 +1688,14 @@ const FullscreenMediaPager: React.FC<{
                 isActivePage={isActivePage}
                 isSlideActive={isSlideActive}
                 isSuggestedFeed={isSuggestedFeed}
+                pageCount={media.length}
+                onAdvance={() => {
+                  const el = scrollerRef.current;
+                  if (!el || !el.clientWidth) return;
+                  // Pager already moved on → ignore the stale end.
+                  if (Math.round(el.scrollLeft / el.clientWidth) !== i) return;
+                  el.scrollTo({ left: (i + 1) * el.clientWidth, behavior: 'smooth' });
+                }}
                 onFirstFrameReady={isActivePage ? onFirstFrameReady : undefined}
                 onZoomChange={isActivePage ? onZoomChange : undefined}
               />
@@ -1711,9 +1724,11 @@ const FullscreenPagerPage: React.FC<{
   isActivePage: boolean;
   isSlideActive: boolean;
   isSuggestedFeed: boolean;
+  pageCount: number;
+  onAdvance: () => void;
   onFirstFrameReady?: () => void;
   onZoomChange?: (zoomed: boolean) => void;
-}> = ({ post, media: m, pageIdx, openIdx, ownerKey, isActivePage, isSlideActive, onFirstFrameReady, onZoomChange }) => {
+}> = ({ post, media: m, pageIdx, openIdx, ownerKey, isActivePage, isSlideActive, pageCount, onAdvance, onFirstFrameReady, onZoomChange }) => {
   const { ref: zoomRef, imgRef, style: zoomStyle, scale: zoomScale, reset: resetZoom } =
     usePinchZoomPointer();
 
@@ -1748,7 +1763,11 @@ const FullscreenPagerPage: React.FC<{
 
   if (m?.type === 'video') {
     const posterSrc = m.thumbnailUrl || '';
-    const mHlsUrl = (m as any).hlsUrl || null;
+    const mHlsUrl =
+      (m as any).hlsUrl ||
+      (!(m as any).isProcessing && (m as any).streamId
+        ? generateStreamHlsUrl((m as any).streamId)
+        : null);
     const videoRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'video');
     if (isActivePage && mHlsUrl) {
       return (
@@ -1762,6 +1781,8 @@ const FullscreenPagerPage: React.FC<{
           allowBorrow={pageIdx === openIdx}
           mediaW={m.width ?? 0}
           mediaH={m.height ?? 0}
+          loop={!(pageCount > 1 && pageIdx < pageCount - 1)}
+          onEnded={isActivePage ? onAdvance : undefined}
         />
       );
     }

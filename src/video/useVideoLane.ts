@@ -40,6 +40,10 @@ export interface UseVideoLaneOptions {
    * release) may pass a null caller.
    */
   ownerKey?: string | null;
+  /** Wrap to 0 at the end (default true). False makes the end observable. */
+  loop?: boolean;
+  /** Fired when the snapshot's endedCount advances (only when loop=false). */
+  onEnded?: () => void;
 }
 
 
@@ -62,6 +66,7 @@ const NULL_SNAP: LaneSnapshot = {
   muted: true,
   firstFrame: false,
   postId: null,
+  endedCount: 0,
 };
 
 export function useVideoLane(
@@ -153,6 +158,7 @@ export function useVideoLane(
       posterUrl: opts.posterUrl ?? null,
       startPosition: opts.startPosition ?? -1,
       postId: opts.postId ?? null,
+      loop: opts.loop ?? true,
     });
     setSnapshot(VideoEngine.snapshot(laneId));
   }, [laneId, opts.active, opts.hlsUrl, opts.posterUrl, opts.startPosition, opts.postId]);
@@ -185,6 +191,30 @@ export function useVideoLane(
     void VideoEngine.play(laneId, { callerPostId });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [creationClosedAt]);
+
+  // LOOP: forward on bind and whenever it changes.
+  const loop = opts.loop ?? true;
+  useEffect(() => {
+    if (!laneId) return;
+    VideoEngine.setLoop(laneId, loop);
+  }, [laneId, loop]);
+
+  // ENDED: fire onEnded when endedCount advances past the value seen at bind.
+  const onEndedRef = useRef(opts.onEnded);
+  onEndedRef.current = opts.onEnded;
+  const endedSeenRef = useRef<number | null>(null);
+  const endedCount = snapshot?.endedCount ?? 0;
+  useEffect(() => {
+    endedSeenRef.current = null;
+  }, [laneId]);
+  useEffect(() => {
+    if (!laneId) return;
+    if (endedSeenRef.current === null) { endedSeenRef.current = endedCount; return; }
+    if (endedCount > endedSeenRef.current) {
+      endedSeenRef.current = endedCount;
+      onEndedRef.current?.();
+    }
+  }, [laneId, endedCount]);
 
   // AUDIO POLICY: declare this lane's policy to the engine. Engine handles
   // mute state from the session store; consumers do NOT push mute values.
