@@ -1,5 +1,5 @@
 import React from 'react';
-import { reactionGlyph, CELEBRATE_GLYPH_SIZE, celebrateFigureSize, type ReactionKind } from '@/lib/reactionKind';
+import { ReactionGlyph, CELEBRATE_GLYPH_SIZE, celebrateFigureSize, type ReactionKind } from '@/lib/reactionKind';
 
 import { A, FIGS, SANS } from './tokens';
 
@@ -11,7 +11,7 @@ import { A, FIGS, SANS } from './tokens';
  * carried by COLOUR only (BRIEF_ONE_REACTION_GLYPH).
  *
  *   not reacted   the solid shape in MUTE / white at 72% on photography
- *   reacted       the same solid shape in AMBER (the one legitimate amber: you)
+ *   reacted       the FILL weight in AMBER via ReactionGlyph; idle is the regular outline (the one legitimate amber: you)
  *   count         beside the glyph, tabular, HIDDEN ENTIRELY at zero
  *   own content   the count alone, no tappable glyph
  *   signed out    not rendered at all (the caller passes readOnly=false only
@@ -79,7 +79,6 @@ export function ReactionAction({
   // 44x44 minimum hit area: horizontal padding grows for small glyphs.
   const padX = Math.max(10, Math.ceil((44 - size) / 2));
   const padY = Math.max(13, Math.ceil((44 - size) / 2));
-  const Glyph = reactionGlyph(kind);
 
   const glass = tone === 'glass';
   const idle = glass ? WHITE_72 : A.MUTE;
@@ -115,7 +114,7 @@ export function ReactionAction({
           fontFamily: SANS,
         }}
       >
-        <Glyph size={size} color={idle} aria-hidden />
+        <ReactionGlyph reacted={false} size={size} tone={glass ? 'media' : 'panel'} />
         {figure}
       </span>
     );
@@ -156,7 +155,7 @@ export function ReactionAction({
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <Glyph size={size} color={reacted ? amber : idle} aria-hidden />
+      <ReactionGlyph reacted={reacted} size={size} tone={glass ? 'media' : 'panel'} />
       {figure}
     </span>
   );

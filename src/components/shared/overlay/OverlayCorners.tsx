@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { MapPin, Flame } from 'lucide-react';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { ReactionGlyph } from '@/lib/reactionKind';
 import GlassPill, { formatPillDuration, getRankingInfo, RankingType } from '@/components/shared/GlassPill';
 import {
   OVERLAY_TOP_LEFT,
@@ -19,7 +19,6 @@ import {
 } from './constants';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
-const LikeGlyph = reactionGlyph('like');
 
 export interface OverlayCornersProps {
   // Surface context (affects max-widths and styling)
@@ -183,9 +182,9 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
           {showLikes && (
             <div className="inline-flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full">
               {(likes ?? 0) > 0 ? (
-                <LikeGlyph style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
+                <ReactionGlyph reacted size={12} tone="media" />
               ) : (
-                <LikeGlyph className="w-3 h-3 flex-shrink-0 text-white" />
+                <ReactionGlyph reacted={false} size={12} tone="media" />
               )}
               {(likes ?? 0) > 0 && (
                 <span className="text-[10px] text-white font-medium">{formatLikeCount(likes ?? 0)}</span>

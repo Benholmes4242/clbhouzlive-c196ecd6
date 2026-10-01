@@ -9,7 +9,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MessageCircle } from 'lucide-react';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 import { CALLOUT_SUBTEXT } from './AchievementCallout';
-import { CELEBRATE_GLYPH_SIZE, celebrateFigureSize, reactionGlyph, type ReactionKind } from '@/lib/reactionKind';
+import { CELEBRATE_GLYPH_SIZE, celebrateFigureSize, reactionGlyph, ReactionGlyph, type ReactionKind } from '@/lib/reactionKind';
 import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { A, DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { ReviewVideoLayer } from './ReviewVideoLayer';
@@ -442,7 +442,7 @@ function WhoLine({
   /* The glyph comes from reactionGlyph(), never hardcoded: a review handed an
      engagement object must show the thumb, not the clap. */
   const reactionKind: ReactionKind = engagement?.kind ?? 'celebrate';
-  const Glyph = reactionGlyph(reactionKind);
+
   const helpful = reactionKind === 'helpful';
   const likeLabel = helpful
     ? (engagement?.liked ? 'Marked helpful' : 'Mark this review helpful')
@@ -469,7 +469,7 @@ function WhoLine({
       {engagement?.likeAvailable && (!pair || showPairLike) ? (
         pair ? (
           <span aria-label={likeLabel} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: engagement.liked ? A.AMBER : subColor }}>
-            <Glyph size={14} strokeWidth={2} fill={engagement.liked && helpful ? likeColour : 'none'} color={likeColour} aria-hidden />
+            <ReactionGlyph reacted={engagement.liked} size={14} />
             <span style={countStyle}>{engagement.likeCount}</span>
           </span>
         ) : (
@@ -477,7 +477,7 @@ function WhoLine({
             onClick={(event) => { stop(event); engagement.onToggleLike?.(); }}
             onKeyDown={(event) => { if (event.key !== 'Enter' && event.key !== ' ') return; stop(event); engagement.onToggleLike?.(); }}
             style={{ minWidth: 44, height: 44, margin: '-6px 0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: engagement.liked ? A.AMBER : subColor, cursor: 'pointer' }}>
-            <Glyph size={CELEBRATE_GLYPH_SIZE} strokeWidth={2} fill={engagement.liked && helpful ? likeColour : 'none'} color={likeColour} aria-hidden />
+            <ReactionGlyph reacted={engagement.liked} size={CELEBRATE_GLYPH_SIZE} />
             {engagement.likeCount > 0 && !namesLineShows ? <span style={countStyle}>{engagement.likeCount}</span> : null}
           </span>
         )

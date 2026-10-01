@@ -38,7 +38,7 @@
  */
 import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronLeft, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
-import { reactionGlyph, reactionKindFor } from '@/lib/reactionKind';
+import { ReactionGlyph, AMBER, reactionKindFor } from '@/lib/reactionKind';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -61,9 +61,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { formatCountKilo, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
-const LikeGlyph = reactionGlyph('like');
 
-const AMBER = '#F7931E';
 const CHEVRON_BG = 'rgba(0,0,0,0.32)';
 const CHIP_BG = 'rgba(0,0,0,0.40)';
 const ICON_SHADOW = 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))';
@@ -746,10 +744,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             count={likeStr}
             accent={likeState.isLiked}
           >
-            <LikeGlyph
-              size={32}
-              color={likeState.isLiked ? AMBER : '#fff'}
-            />
+            <ReactionGlyph reacted={likeState.isLiked} size={32} tone="media" />
           </RailButton>
 
           <RailButton onClick={onComment} ariaLabel="Comments" count={commentStr}>

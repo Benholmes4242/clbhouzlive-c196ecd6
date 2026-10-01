@@ -9,14 +9,13 @@
  * `onDone` on the same schedule.
  */
 import React, { useEffect } from 'react';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { AMBER } from '@/lib/reactionKind';
+import ThumbIcon from '@/components/icons/ThumbIcon';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 /* The name HeartBurst (and its CSS class/keyframe) is historical: it draws
    the like glyph (thumbs-up) now, not a heart. */
-const LikeGlyph = reactionGlyph('like');
 
-const AMBER = '#F7931E';
 const LIFETIME_MS = 600;
 
 interface Props {
@@ -43,11 +42,12 @@ export const HeartBurst: React.FC<Props> = ({ onDone }) => {
         zIndex: 6,
       }}
     >
-      <LikeGlyph
+      {/* reacted by definition: fill weight. Uses ThumbIcon directly only
+          because it needs a style (shadow + animation) ReactionGlyph does not take. */}
+      <ThumbIcon
+        weight="fill"
         size={112}
         color={AMBER}
-        fill={AMBER}
-        strokeWidth={1}
         style={{
           filter: 'drop-shadow(0 4px 18px rgba(0,0,0,0.35))',
           animation: reduced

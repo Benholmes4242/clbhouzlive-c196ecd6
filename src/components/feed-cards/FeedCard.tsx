@@ -19,7 +19,7 @@
  *   - `isAutoplayActive` — activeIndices.has(flatIndex).
  */
 import { useRef } from 'react';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { ReactionGlyph, AMBER } from '@/lib/reactionKind';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
 import { formatCountShort as formatCount } from '@/i18n/format';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
@@ -32,7 +32,6 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
-const LikeGlyph = reactionGlyph('like');
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -321,7 +320,7 @@ export function FeedCard({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 3,
-              color: '#F7931E',
+              color: AMBER,
               fontWeight: 700,
               fontSize: 11,
               fontFamily: FONT_FAMILY,
@@ -329,10 +328,7 @@ export function FeedCard({
               pointerEvents: 'none',
             }}
           >
-            <LikeGlyph
-              style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }}
-              strokeWidth={1.8}
-            />
+            <ReactionGlyph reacted size={12} tone="media" />
             {formatCount(row.like_count)}
           </div>
         ) : null}
@@ -388,10 +384,7 @@ export function FeedCard({
                   flexShrink: 0,
                 }}
               >
-                <LikeGlyph
-                  style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }}
-                  strokeWidth={1.8}
-                />
+                <ReactionGlyph reacted size={12} />
                 {formatCount(row.like_count)}
               </span>
             )}

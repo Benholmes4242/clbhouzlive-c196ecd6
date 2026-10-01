@@ -24,7 +24,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { prefetchReviewSheet } from '@/components/posts/prefetchReviewSheet';
 import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
 import { MessageCircle, Share } from 'lucide-react';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { reactionGlyph, ReactionGlyph, AMBER } from '@/lib/reactionKind';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
@@ -77,7 +77,6 @@ const T100 = '#F8FAFC';
 const T60 = 'rgba(248,250,252,0.65)';
 const T40 = 'rgba(248,250,252,0.45)';
 const LINE = 'rgba(255,255,255,0.08)';
-const AMBER = '#F7931E';
 const GREEN = '#22C55E';
 
 /** Shared inset and spacing for the unified footer. */
@@ -946,6 +945,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 active={liked}
                 onClick={() => onLike(post, effectiveActor)}
                 activeColor={AMBER}
+                glyph={<ReactionGlyph reacted={liked} size={21} />}
                 haptic={!liked ? 'selection' : 'none'}
               />
               <FooterButton
@@ -1035,9 +1035,11 @@ const FooterButton: React.FC<{
   onClick: () => void;
   active?: boolean;
   activeColor?: string;
+  /** Overrides Icon — the like button passes ReactionGlyph. */
+  glyph?: React.ReactNode;
   haptic?: 'none' | 'selection' | 'success' | 'warning';
   ariaLabel?: string;
-}> = ({ icon: Icon, label, onClick, active, activeColor, haptic = 'none', ariaLabel }) => (
+}> = ({ icon: Icon, label, onClick, active, activeColor, glyph, haptic = 'none', ariaLabel }) => (
   <Pressable
     as="button"
     variant="icon"
@@ -1060,7 +1062,7 @@ const FooterButton: React.FC<{
     }}
     innerStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
   >
-    <Icon
+    {glyph ?? <Icon
       /* §6 condense. The engagement row is SHARED by every feed card, so it
          steps 24 -> 21 rather than to the mock's 19: a round-post-only figure
          would restyle photo and review posts too. */
@@ -1068,7 +1070,7 @@ const FooterButton: React.FC<{
       strokeWidth={1.75}
       color={active ? activeColor ?? T100 : T60}
       fill={active ? activeColor ?? 'none' : 'none'}
-    />
+    />}
     {label && <span>{label}</span>}
   </Pressable>
 );

@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { ReactionGlyph } from '@/lib/reactionKind';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHubLongFormVideos } from '../hooks/useHubLongFormVideos';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
@@ -20,7 +20,6 @@ import type { HubRpcRow } from '../utils/toFeedPost';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
-const LikeGlyph = reactionGlyph('like');
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -197,7 +196,7 @@ function Card({
 
               {Number(row.like_count ?? 0) > 0 && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-                  <LikeGlyph style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
+                  <ReactionGlyph reacted size={12} />
                   {formatCount(Number(row.like_count ?? 0))}
                 </span>
               )}

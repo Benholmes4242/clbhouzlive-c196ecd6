@@ -1,12 +1,11 @@
 import React from 'react';
 import { ChevronRight, MessageSquare } from 'lucide-react';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { ReactionGlyph } from '@/lib/reactionKind';
 import { Eyebrow } from './_shared/Eyebrow';
 import { BG_1, T100, T60, T40, LINE, FONT, TAB } from './_shared/tokens';
 import { formatMonthDay2ShortGB } from '@/i18n/format';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
-const LikeGlyph = reactionGlyph('like');
 
 
 interface Props {
@@ -76,7 +75,7 @@ export const LatestPostCard: React.FC<Props> = ({ post, onTap }) => {
             <span>{fmtRelative(post.created_at)}</span>
             {post.like_count > 0 && (
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-                <LikeGlyph size={11} strokeWidth={2} /> {post.like_count}
+                <ReactionGlyph reacted={false} size={11} /> {post.like_count}
               </span>
             )}
             {post.comment_count > 0 && (

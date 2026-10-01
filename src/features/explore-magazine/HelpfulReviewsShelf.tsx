@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { A, NUMF, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { r } from '@/lib/radius';
-import { reactionGlyph } from '@/lib/reactionKind';
+import { ReactionGlyph } from '@/lib/reactionKind';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreShelf } from './ExploreShelf';
@@ -29,7 +29,6 @@ export function HelpfulReviewsShelf({
   onPress: (item: StreamItem) => void;
 }) {
   const { t } = useTranslation('courses');
-  const Thumb = reactionGlyph('helpful');
   const rows = useMemo(
     () =>
       items
@@ -99,7 +98,9 @@ export function HelpfulReviewsShelf({
               </div>
               {count > 0 ? (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: A.AMBER, fontSize: 12, ...NUMF }}>
-                  <Thumb size={14} color="currentColor" />
+                  {/* A count label, not the viewer's state: outline; inherits the row colour
+                      via the shelf-only color override. */}
+                  <ReactionGlyph reacted={false} size={14} color="currentColor" />
                   {count}
                 </span>
               ) : null}
