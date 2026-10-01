@@ -54,7 +54,7 @@ export function VenueRotationLine({ tournamentId }: { tournamentId: string | und
             onClick={() => navigate(`/courses/${c.id}`)}
             style={{ margin: 0, padding: 0, border: 'none', background: 'transparent', color: INK, font: 'inherit', fontWeight: 600, cursor: 'pointer' }}
           >
-            {c.name}
+            {c.name.replace(/\s*\([^)]*\)\s*$/, '')}
           </button>
         </Fragment>
       ))}
