@@ -82,14 +82,22 @@ function formatCount(n: number | null | undefined): string | null {
  * (measured scrollHeight vs clientHeight, same approach as the tour hero
  * insight line). Collapses again whenever the pager moves to another post.
  */
+const CAPTION_FONT_SIZE = 13.5;
+const CAPTION_LINE_HEIGHT = 1.35;
+const CAPTION_LINE_PX = `${CAPTION_FONT_SIZE}px * ${CAPTION_LINE_HEIGHT}`;
+
 const CaptionBlock: React.FC<{
   caption: string;
   resetKey: number;
   onMentionTap: (m: { entityType: 'user' | 'business'; entityId: string; display: string }) => void;
-}> = ({ caption, resetKey, onMentionTap }) => {
+  variant: 'caption' | 'review';
+  onFullReview?: () => void;
+}> = ({ caption, resetKey, onMentionTap, variant, onFullReview }) => {
   const [expanded, setExpanded] = useState(false);
   const [overflows, setOverflows] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
+  const isReview = variant === 'review';
+  const isExpanded = !isReview && expanded;
 
   // Reset on pager move — keyed on activeIndex, NOT the caption string, since
   // two neighbouring posts can carry identical text.
@@ -104,7 +112,7 @@ const CaptionBlock: React.FC<{
     const measure = () => {
       const node = textRef.current;
       if (!node) return;
-      if (expanded) return; // clamp is off — nothing meaningful to measure
+      if (isExpanded) return; // clamp is off — nothing meaningful to measure
       setOverflows(node.scrollHeight > node.clientHeight + 1);
     };
     measure();
@@ -119,9 +127,10 @@ const CaptionBlock: React.FC<{
       if (ro) ro.disconnect();
       else window.removeEventListener('resize', measure);
     };
-  }, [caption, expanded]);
+  }, [caption, isExpanded]);
 
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
+  const showInlineCta = !isExpanded && overflows;
 
   return (
     <div
@@ -134,35 +143,57 @@ const CaptionBlock: React.FC<{
       <div
         ref={textRef}
         style={{
-          fontSize: 13.5,
-          lineHeight: 1.35,
+          fontSize: CAPTION_FONT_SIZE,
+          lineHeight: CAPTION_LINE_HEIGHT,
           color: '#fff',
           opacity: 0.92,
           textShadow: TEXT_SHADOW,
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
-          ...(expanded
+          ...(isExpanded
             ? {
-                WebkitLineClamp: 'unset' as unknown as number,
                 overflow: 'auto',
                 maxHeight: '40vh',
                 overscrollBehavior: 'contain',
               }
             : {
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical' as const,
+                position: 'relative',
+                maxHeight: `calc(${CAPTION_LINE_PX} * 3)`,
                 overflow: 'hidden',
               }),
         }}
       >
+        {showInlineCta && (
+          <>
+            <span aria-hidden style={{ float: 'right', width: 0, height: `calc(${CAPTION_LINE_PX} * 2)` }} />
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isReview) onFullReview?.();
+                else setExpanded(true);
+              }}
+              aria-expanded={isReview ? undefined : false}
+              style={{
+                float: 'right', clear: 'both', marginLeft: 4,
+                fontSize: CAPTION_FONT_SIZE, lineHeight: CAPTION_LINE_HEIGHT, fontWeight: 600,
+                color: '#fff', opacity: 0.72, whiteSpace: 'nowrap', textShadow: TEXT_SHADOW,
+                pointerEvents: 'auto', background: 'transparent', border: 'none', padding: 0,
+                fontFamily: 'inherit', cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontWeight: 400, opacity: 0.8 }}>… </span>
+              {isReview ? 'Full review' : 'Read more'}
+            </button>
+          </>
+        )}
         <MentionText text={caption} onMentionTap={onMentionTap} style={{ pointerEvents: 'auto' }} />
       </div>
-      {(overflows || expanded) && (
+      {isExpanded && (
         <button
           type="button"
-          aria-expanded={expanded}
-          onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
+          aria-expanded
+          onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
           style={{
             marginTop: 4, alignSelf: 'flex-start', background: 'transparent',
             border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
@@ -170,7 +201,7 @@ const CaptionBlock: React.FC<{
             opacity: 0.7, textShadow: TEXT_SHADOW, lineHeight: 1.2,
           }}
         >
-          {expanded ? 'See less' : 'See more'}
+          See less
         </button>
       )}
     </div>
@@ -589,7 +620,17 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           {/* Caption — 3-line clamp + See more/See less. Nothing renders for
               empty/whitespace-only captions (no element, no gap). */}
           {activePost.caption?.trim() ? (
-            <CaptionBlock caption={activePost.caption} resetKey={activeIndex} onMentionTap={handleMentionTap} />
+            <CaptionBlock
+              caption={activePost.caption}
+              resetKey={activeIndex}
+              onMentionTap={handleMentionTap}
+              // HELD (brief item 4): reviews stay on the caption variant and keep
+              // the separate "read review ›" button until the empty-caption review
+              // case is decided. Switch to `activePost.isReview ? 'review' : 'caption'`
+              // in the same change that deletes that button.
+              variant="caption"
+              onFullReview={onReviewTap}
+            />
           ) : null}
 
 
