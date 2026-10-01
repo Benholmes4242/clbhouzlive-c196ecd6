@@ -133,6 +133,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   // see the hook header: the "never prefetch" rule is about N courses in a feed.
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
   const communityRating = ratingAggregate?.avg_overall_score ?? null;
+  const reviewCount = ratingAggregate?.review_count ?? 0;
   const [statsSheetOpen, setStatsSheetOpen] = useState(false);
   const roundsSheetOpen = searchParams.get('sheet') === 'rounds';
   const yourHolesSheetOpen = searchParams.get('sheet') === 'your-holes';
@@ -241,6 +242,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         course={course}
         courseStats={courseStats ?? null}
         communityRating={communityRating}
+        reviewCount={reviewCount}
         onOpenStats={() => setStatsSheetOpen(true)}
       />
     </div>
@@ -268,6 +270,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         course={course}
         courseStats={courseStats ?? null}
         communityRating={communityRating}
+        reviewCount={reviewCount}
         onOpenStats={() => setStatsSheetOpen(true)}
       />
     </div>
@@ -432,6 +435,7 @@ interface CourseTitleOverlayProps {
   course: CourseOverlayShape;
   courseStats: CourseStatsDetail | null;
   communityRating: number | null;
+  reviewCount: number;
   onOpenStats: () => void;
 }
 
@@ -475,11 +479,12 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   course,
   courseStats,
   communityRating,
+  reviewCount,
   onOpenStats,
 }) => {
   const { t } = useTranslation('courses');
   const rounds = typeof courseStats?.rounds_tracked === 'number' ? courseStats.rounds_tracked : 0;
-  const showBand = rounds > 0;
+  const showBand = rounds > 0 || reviewCount > 0;
 
   const courseId = (course as { id?: string }).id ?? null;
 
@@ -500,22 +505,17 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
     analyticsEvents.track('course_hero_stats_shown', {
       course_id: courseId,
       rounds_tracked: rounds,
-      has_your_pb: Boolean((courseStats?.your_rounds ?? 0) > 0 && courseStats?.your_best != null),
+      review_count: reviewCount,
     });
-  }, [showBand, courseId, rounds, courseStats?.your_rounds, courseStats?.your_best]);
+  }, [showBand, courseId, rounds, reviewCount]);
 
   const cells: React.ReactNode[] = [];
-  if (showBand && courseStats) {
-    cells.push(<HeroStatCell key="rounds" label={t('courseHero.rounds')} value={String(rounds)} />);
-    if (courseStats.avg_over_par != null) {
-      cells.push(
-        <HeroStatCell key="atp" label={t('courseHero.avgToPar')} value={signedToPar(courseStats.avg_over_par)} />
-      );
+  if (showBand) {
+    if (rounds > 0) {
+      cells.push(<HeroStatCell key="rounds" label={t('courseHero.rounds')} value={String(rounds)} />);
     }
-    if ((courseStats.your_rounds ?? 0) > 0 && courseStats.your_best != null) {
-      cells.push(
-        <HeroStatCell key="pb" label={t('courseHero.yourPb')} value={String(courseStats.your_best)} />
-      );
+    if (reviewCount > 0) {
+      cells.push(<HeroStatCell key="reviews" label={t('courseHero.reviews')} value={String(reviewCount)} />);
     }
   }
   if (communityRating != null) {
