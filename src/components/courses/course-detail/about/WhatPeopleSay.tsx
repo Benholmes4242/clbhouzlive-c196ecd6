@@ -39,13 +39,17 @@ interface WhatPeopleSayProps {
   onSeeAllReviews?: () => void;
 }
 
-const YoursFigure: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <div style={{ minWidth: 0, flexShrink: 0, textAlign: 'right' }}>
-    {/* Amber here means "yours", not a score band. */}
-    <div style={{ ...aboutFig(22, A.AMBER_DEEP), lineHeight: 1, whiteSpace: 'nowrap' }}>{value}</div>
-    <div style={{ ...ABOUT_KICKER, marginTop: 6 }}>{label}</div>
+/** The rating count, right-aligned in the slot where "Your rating" used to sit. */
+const CountSlot: React.FC<{ count: number }> = ({ count }) => (
+  <div style={{ minWidth: 0, flexShrink: 0, textAlign: 'right', paddingBottom: 2 }}>
+    <CountText count={count} />
   </div>
 );
+
+const CountText: React.FC<{ count: number }> = ({ count }) => {
+  const { t } = useTranslation('courses');
+  return <span style={ABOUT_KICKER}>{t('courseDetail.communityScore.basedOn', { count })}</span>;
+};
 
 const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   courseId,
