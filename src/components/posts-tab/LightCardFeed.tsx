@@ -416,7 +416,6 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
-  const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
   // fsOpen / borrow.ownerKey consumed inside `LightItemGate` — see CardFeed.
 
@@ -505,7 +504,6 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const itemContent = useCallback(
     (index: number, post: FeedPost) => {
       const likeState = getLikeState(post);
-      const initialSlide = carouselPositions.get(index) ?? 0;
       return (
         <div
           data-card-index={index}
@@ -542,7 +540,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                 isActive={isActive}
                 mountVideo={mountVideo}
                 earlyMotion={earlyMotion}
-                initialMediaIndex={initialSlide}
+                carouselRestoreTab=""
                 onCarouselIndexChange={getCarouselChangeHandler(post.id)}
                 onFollow={onFollow}
                 currentUserId={currentUserId}
@@ -580,7 +578,6 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       activeIdx,
       playingIdx,
       earlyIdx,
-      carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
       getLikeState,

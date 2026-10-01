@@ -184,7 +184,18 @@ export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
-  const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex, openCommentsInitially, consumeOpenCommentsInitially, initialCommentId, consumeInitialCommentId } = useFullscreenFeedStore();
+  // Field selectors — a whole-store subscription re-rendered the overlay on
+  // every store write (activePagerIdx, borrow, startPosition…).
+  const isOpen = useFullscreenFeedStore((s) => s.isOpen);
+  const posts = useFullscreenFeedStore((s) => s.posts);
+  const startIndex = useFullscreenFeedStore((s) => s.startIndex);
+  const activeIndex = useFullscreenFeedStore((s) => s.activeIndex);
+  const close = useFullscreenFeedStore((s) => s.close);
+  const setActiveIndex = useFullscreenFeedStore((s) => s.setActiveIndex);
+  const openCommentsInitially = useFullscreenFeedStore((s) => s.openCommentsInitially);
+  const consumeOpenCommentsInitially = useFullscreenFeedStore((s) => s.consumeOpenCommentsInitially);
+  const initialCommentId = useFullscreenFeedStore((s) => s.initialCommentId);
+  const consumeInitialCommentId = useFullscreenFeedStore((s) => s.consumeInitialCommentId);
 
   // Fullscreen viewer owns the whole screen: unmount the chrome island
   // (top-left capsule + top-right cluster) while open. Restores on close/
@@ -878,6 +889,10 @@ export function FullscreenFeedOverlay() {
     }
   }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
 
+  const handleSnapFollowChange = useCallback((targetUserId: string, nextFollowed: boolean) => {
+    const p = posts.find((x) => x.userId === targetUserId);
+    if (p) handleFollow({ ...p, isFollowedByMe: !nextFollowed });
+  }, [posts, handleFollow]);
 
   return (
     <>
@@ -965,10 +980,7 @@ export function FullscreenFeedOverlay() {
                     isRefreshing={isFetchingNextPage}
                     hasNextPage={hasNextPage}
                     followOverrides={followOverrides}
-                    onFollowChange={(targetUserId, nextFollowed) => {
-                      const p = posts.find((x) => x.userId === targetUserId);
-                      if (p) handleFollow({ ...p, isFollowedByMe: !nextFollowed });
-                    }}
+                    onFollowChange={handleSnapFollowChange}
                     onFirstFrameReady={handleSnapFeedFirstFrame}
                     startIndex={startIndex}
                     onActiveIndexChange={setActiveIndex}

@@ -702,9 +702,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
-  const carouselPositionsByTab = useClubhouseStore((s) => s.carouselPositionsByTab);
-  const globalCarouselPositions = useClubhouseStore((s) => s.carouselPositions);
-  const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
   // NOTE: fsOpen / borrow.ownerKey are intentionally NOT read at this level.
   // They are consumed inside `FeedItemGate` so viewer-open doesn't change
@@ -814,9 +811,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       const { post, postIndex: index } = item;
       const likeState = getLikeState(post);
 
-
-
-      const initialSlide = carouselPositions.get(index) ?? 0;
       return (
         <>
         {/* Rendered ABOVE this card rather than as a list item, so the divider
@@ -860,7 +854,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 isActive={isActive}
                 mountVideo={mountVideo}
                 earlyMotion={earlyMotion}
-                initialMediaIndex={initialSlide}
+                carouselRestoreTab={tab ?? ''}
                 onCarouselIndexChange={getCarouselChangeHandler(post.id)}
                 onFollow={onFollow}
                 currentUserId={currentUserId}
@@ -902,7 +896,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       activeIdx,
       playingIdx,
       earlyIdx,
-      carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
       getLikeState,
