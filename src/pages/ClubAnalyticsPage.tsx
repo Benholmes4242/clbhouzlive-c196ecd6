@@ -155,15 +155,17 @@ const CourseBlock: React.FC<{ course: ClubCourseRef }> = ({ course }) => {
 
 /* ─────────────── BRIEF_CLUB_REQUEST_ANOTHER_COURSE §2 ─────────────── */
 
-/** A text button in the page's idiom that opens the request sheet. Mounted
- *  only under the course block and in the `unclaimed` notice. */
+/** A text button in the page's idiom that opens the request sheet. `compact`
+ *  (top of the course list) is a single "+" line; the `unclaimed` notice keeps
+ *  its explanatory caption. */
 const RequestAnotherCourse: React.FC<{
   businessId: string;
   businessName: string;
   clubId: string;
   fallbackClubName: string | null;
   existingCourses: { course_id: string; course_name: string }[];
-}> = ({ businessId, businessName, clubId, fallbackClubName, existingCourses }) => {
+  compact?: boolean;
+}> = ({ businessId, businessName, clubId, fallbackClubName, existingCourses, compact = false }) => {
   const [open, setOpen] = React.useState(false);
   const { data: club } = useQuery({
     queryKey: ['golf-club', clubId],
@@ -173,9 +175,11 @@ const RequestAnotherCourse: React.FC<{
   const clubName = club?.name ?? fallbackClubName ?? businessName;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <p style={{ ...BIZ_BODY, fontSize: 11.5, margin: 0, color: A.DIM }}>
-        Missing a course? Tell us and we will add it to your club.
-      </p>
+      {!compact && (
+        <p style={{ ...BIZ_BODY, fontSize: 11.5, margin: 0, color: A.DIM }}>
+          Missing a course? Tell us and we will add it to your club.
+        </p>
+      )}
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -190,7 +194,7 @@ const RequestAnotherCourse: React.FC<{
           cursor: 'pointer',
         }}
       >
-        Request another course ›
+        {compact ? '+ Request another course' : 'Request another course ›'}
       </button>
       <RequestAnotherCourseSheet
         open={open}
@@ -365,10 +369,9 @@ export default function ClubAnalyticsPage() {
           />
         )}
 
-        {selected && <CourseBlock key={selected.course_id} course={selected} />}
-
         {business.club_id && (
           <RequestAnotherCourse
+            compact
             businessId={business.id}
             businessName={business.name}
             clubId={business.club_id}
@@ -376,6 +379,8 @@ export default function ClubAnalyticsPage() {
             existingCourses={courses.map((c) => ({ course_id: c.course_id, course_name: c.course_name }))}
           />
         )}
+
+        {selected && <CourseBlock key={selected.course_id} course={selected} />}
 
         <p style={{ ...BIZ_BODY, fontSize: 11.5, margin: 0, color: A.DIM }}>
           Everything on this page is an aggregate across rounds played on your courses. No individual member, round or
