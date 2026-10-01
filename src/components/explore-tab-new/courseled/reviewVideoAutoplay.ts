@@ -19,7 +19,7 @@
  *     second concurrency ceiling.
  *   - When more than MAX_PLAYING qualify, the tiles nearest the VIEWPORT
  *     CENTRE win; the rest hold their poster.
- *   - Tiles that scroll out lose immediately (pause + release happens in the
+ *   - Tiles that scroll out lose after AUTOPLAY_LOSS_GRACE_MS (300ms); winners play after AUTOPLAY_SETTLE_MS (80ms).
  *     tile itself).
  *   - document.visibilityState === 'hidden' pauses every group.
  *
