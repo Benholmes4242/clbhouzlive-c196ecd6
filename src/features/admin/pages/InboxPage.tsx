@@ -992,13 +992,16 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
       open={row !== null}
       onClose={onClose}
       title={row.courseName}
-      subtitle={isClubCourse ? 'Club course request' : isHomeClub ? `Home club request - ${who}` : 'Course request'}
+      subtitle={isClubCourse ? (row.forCourseId ? 'Club course request · attach' : 'Club course request · new course') : isHomeClub ? `Home club request - ${who}` : 'Course request'}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, color: t.ink }}>
         {isClubCourse && (
           <>
             <div><b>Club:</b> {row.clubName ?? row.forClubId}</div>
             <div><b>Business:</b> {row.businessName ?? row.forBusinessId}</div>
+            {row.forCourseId && (
+              <div><b>Picked course:</b> {row.pickedCourseName ?? row.courseName} — already in the catalogue</div>
+            )}
           </>
         )}
         {isHomeClub && (
@@ -1104,7 +1107,10 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
           </div>
         )}
 
-        {isClubCourse && row.status === 'pending' && row.forClubId && (
+        {isClubCourse && row.status === 'pending' && row.forClubId && row.forCourseId && (
+          <AttachPickedCourse requestId={row.id} courseId={row.forCourseId} clubName={row.clubName ?? 'club'} onDone={onClose} />
+        )}
+        {isClubCourse && row.status === 'pending' && row.forClubId && !row.forCourseId && (
           <ClubCoursePicker requestId={row.id} clubId={row.forClubId} initialQuery={row.courseName} onDone={onClose} />
         )}
 
@@ -1118,6 +1124,27 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
         </div>
       </div>
     </AdminSheet>
+  );
+}
+
+/** BRIEF_CLUB_COURSE_PICKER §8 — the club already chose; one button attaches it. */
+function AttachPickedCourse({
+  requestId, courseId, clubName, onDone,
+}: { requestId: string; courseId: string; clubName: string; onDone: () => void }) {
+  const { resolveClubCourseRequest } = useCourseRequests();
+  const busy = resolveClubCourseRequest.isPending;
+  return (
+    <button
+      type="button"
+      disabled={busy}
+      onClick={async () => {
+        await resolveClubCourseRequest.mutateAsync({ id: requestId, courseId });
+        onDone();
+      }}
+      style={{ ...btnPrimary(busy), alignSelf: 'flex-start', marginTop: 4 }}
+    >
+      Attach to {clubName}
+    </button>
   );
 }
 

@@ -162,8 +162,8 @@ const RequestAnotherCourse: React.FC<{
   businessName: string;
   clubId: string;
   fallbackClubName: string | null;
-  existingCourseNames: string[];
-}> = ({ businessId, businessName, clubId, fallbackClubName, existingCourseNames }) => {
+  existingCourses: { course_id: string; course_name: string }[];
+}> = ({ businessId, businessName, clubId, fallbackClubName, existingCourses }) => {
   const [open, setOpen] = React.useState(false);
   const { data: club } = useQuery({
     queryKey: ['golf-club', clubId],
@@ -199,7 +199,7 @@ const RequestAnotherCourse: React.FC<{
         businessName={businessName}
         clubId={clubId}
         clubName={clubName}
-        existingCourseNames={existingCourseNames}
+        existingCourses={existingCourses}
       />
     </div>
   );
@@ -290,7 +290,7 @@ export default function ClubAnalyticsPage() {
               businessName={business.name}
               clubId={business.club_id}
               fallbackClubName={business.club_name ?? null}
-              existingCourseNames={[]}
+              existingCourses={[]}
             />
           </div>
         )}
@@ -373,7 +373,7 @@ export default function ClubAnalyticsPage() {
             businessName={business.name}
             clubId={business.club_id}
             fallbackClubName={business.club_name ?? null}
-            existingCourseNames={courses.flatMap((c) => [c.course_name, courseNameWithinClub(c.course_name)])}
+            existingCourses={courses.map((c) => ({ course_id: c.course_id, course_name: c.course_name }))}
           />
         )}
 

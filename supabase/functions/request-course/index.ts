@@ -57,6 +57,8 @@ serve(async (req) => {
     const for_business_id = body?.for_business_id ? String(body.for_business_id) : null;
     const for_club_id = body?.for_club_id ? String(body.for_club_id) : null;
     const isClubCourse = !!for_business_id && !!for_club_id && !isHomeClub;
+    // BRIEF_CLUB_COURSE_PICKER §7 — a picked catalogue row (attach, not create).
+    const for_course_id = isClubCourse && body?.for_course_id ? String(body.for_course_id) : null;
 
     if (!course_name) return json({ ok: false, error: "Missing course_name" }, 400);
     if (!location) return json({ ok: false, error: "Missing location" }, 400);
@@ -101,18 +103,30 @@ serve(async (req) => {
         .from("golf_clubs").select("name").eq("id", for_club_id).maybeSingle();
       if (clubErr) console.error("[request-course] club name lookup failed", clubErr);
       clubLabel = club?.name ?? null;
+      if (for_course_id) {
+        const { data: course, error: courseErr } = await supabaseAdmin
+          .from("golf_courses").select("id, club_id").eq("id", for_course_id).maybeSingle();
+        if (courseErr) {
+          console.error("[request-course] course lookup failed", courseErr);
+          return json({ ok: false, error: "Could not verify your access" }, 500);
+        }
+        if (!course || (course.club_id !== null && course.club_id !== for_club_id)) {
+          return json({ ok: false, error: "That course belongs to another club" }, 409);
+        }
+      }
     }
 
     if (isClubCourse) {
       // Dedupe PER BUSINESS — never against the global queue, so another club
       // with a similarly named course is not silently swallowed.
-      const { data: mine } = await supabaseAdmin
+      let dq = supabaseAdmin
         .from("course_requests")
         .select("id")
         .eq("status", "pending")
-        .eq("for_business_id", for_business_id)
-        .ilike("course_name", course_name)
-        .limit(1);
+        .eq("for_business_id", for_business_id);
+      dq = for_course_id ? dq.eq("for_course_id", for_course_id) : dq.ilike("course_name", course_name);
+      const { data: mine, error: dedupeErr } = await dq.limit(1);
+      if (dedupeErr) console.error("[request-course] dedupe read failed", dedupeErr);
       if (mine && mine.length > 0) {
         return json(
           { ok: true, duplicate: true, message: "You have already asked us for that course — we are on it." },
@@ -122,12 +136,13 @@ serve(async (req) => {
     } else if (isHomeClub) {
       // Dedupe PER MEMBER, not per club: several members may (and should) be
       // able to request the same missing club so resolving it connects them all.
-      const { data: mine } = await supabaseAdmin
+      const { data: mine, error: dedupeErr } = await supabaseAdmin
         .from("course_requests")
         .select("id")
         .eq("status", "pending")
         .eq("home_club_for_user_id", user.id)
         .limit(1);
+      if (dedupeErr) console.error("[request-course] dedupe read failed", dedupeErr);
       if (mine && mine.length > 0) {
         return json(
           { ok: true, duplicate: true, message: "You've already asked us for a club — we'll connect you as soon as it's added." },
@@ -135,12 +150,13 @@ serve(async (req) => {
         );
       }
     } else {
-      const { data: dupes } = await supabaseAdmin
+      const { data: dupes, error: dedupeErr } = await supabaseAdmin
         .from("course_requests")
         .select("id")
         .eq("status", "pending")
         .ilike("course_name", course_name)
         .limit(1);
+      if (dedupeErr) console.error("[request-course] dedupe read failed", dedupeErr);
       if (dupes && dupes.length > 0) {
         return json(
           { ok: true, duplicate: true, message: "That course has already been requested — we're on it." },
@@ -158,7 +174,7 @@ serve(async (req) => {
         country,
         note,
         home_club_for_user_id: isHomeClub ? user.id : null,
-        ...(isClubCourse ? { for_business_id, for_club_id } : {}),
+        ...(isClubCourse ? { for_business_id, for_club_id, ...(for_course_id ? { for_course_id } : {}) } : {}),
       })
       .select("id, created_at")
       .single();
@@ -208,6 +224,7 @@ serve(async (req) => {
         (country ? `Country: ${country}\n` : "") +
         (note ? `Note: ${note}\n` : "") +
         (isClubCourse ? `Club: ${clubLabel ?? for_club_id}\nBusiness: ${businessLabel ?? for_business_id}\n` : "") +
+        (for_course_id ? `Picked course: ${course_name} — already in the catalogue (attach, not create)\n` : "") +
         `Requested by: ${requesterName} (${requesterEmail})\n\n` +
         `Review in admin panel: ${ADMIN_PANEL_URL}`;
       const html = `
@@ -219,6 +236,7 @@ serve(async (req) => {
     ${country ? `<tr><td style="color:#64748B;padding:4px 16px 4px 0;">Country</td><td>${esc(country)}</td></tr>` : ""}
     ${note ? `<tr><td style="color:#64748B;padding:4px 16px 4px 0;">Note</td><td>${esc(note)}</td></tr>` : ""}
     ${isClubCourse ? `<tr><td style="color:#64748B;padding:4px 16px 4px 0;">Club</td><td>${esc(clubLabel ?? for_club_id ?? "")}</td></tr><tr><td style="color:#64748B;padding:4px 16px 4px 0;">Business</td><td>${esc(businessLabel ?? for_business_id ?? "")}</td></tr>` : ""}
+    ${for_course_id ? `<tr><td style="color:#64748B;padding:4px 16px 4px 0;">Course</td><td>${esc(course_name)} — already exists in the catalogue; attach it, do not create it.</td></tr>` : ""}
     <tr><td style="color:#64748B;padding:4px 16px 4px 0;">Requested by</td><td>${esc(requesterName)} (${esc(requesterEmail)})</td></tr>
   </table>
   <p style="margin-top:20px;">
