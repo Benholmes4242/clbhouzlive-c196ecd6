@@ -80,7 +80,7 @@ function formatCount(n: number | null | undefined): string | null {
 /**
  * FullscreenCaption — the post caption beneath the author sub-row.
  *
- * Clamped to 3 lines; "See more" renders ONLY when the text really overflows
+ * Cut to 3 lines by a measured mirror; the inline CTA renders ONLY when the text really overflows
  * (measured scrollHeight vs clientHeight, same approach as the tour hero
  * insight line). Collapses again whenever the pager moves to another post.
  */
