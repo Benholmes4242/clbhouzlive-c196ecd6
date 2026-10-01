@@ -1,5 +1,6 @@
 import React from 'react';
 import ThumbIcon from '@/components/icons/ThumbIcon';
+import { AMBER_ON_MEDIA } from '@/lib/tokens/surfaces';
 
 /**
  * THE POST TYPE DECIDES THE REACTION (BRIEF_CELEBRATE_REACTION_BUILD).
@@ -59,14 +60,17 @@ export function ReactionGlyph({
 }: {
   reacted: boolean;
   size: number;
-  tone?: 'panel' | 'media';
+  /** 'panel' = muted idle, AMBER reacted. 'media' = on bare photography:
+   *  white idle, AMBER_ON_MEDIA reacted. 'chrome' = on photography but behind a
+   *  drop-shadow (fullscreen/feed rails): white idle, AMBER reacted. */
+  tone?: 'panel' | 'media' | 'chrome';
   /** HelpfulReviewsShelf ONLY: inherit the row colour. Do not use elsewhere. */
   color?: string;
 }) {
   return React.createElement(ThumbIcon, {
     weight: reacted ? 'fill' : 'regular',
     size,
-    color: color ?? (reacted ? AMBER : tone === 'media' ? IDLE_MEDIA : IDLE_PANEL),
+    color: color ?? (reacted ? (tone === 'media' ? AMBER_ON_MEDIA : AMBER) : tone === 'panel' ? IDLE_PANEL : IDLE_MEDIA),
     'aria-hidden': true,
   });
 }

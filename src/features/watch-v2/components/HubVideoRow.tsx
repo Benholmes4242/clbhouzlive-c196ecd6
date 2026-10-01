@@ -196,7 +196,7 @@ function Card({
 
               {Number(row.like_count ?? 0) > 0 && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-                  <ReactionGlyph reacted size={12} />
+                  <ReactionGlyph reacted={false} size={12} />
                   {formatCount(Number(row.like_count ?? 0))}
                 </span>
               )}

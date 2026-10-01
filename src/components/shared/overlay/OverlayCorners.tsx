@@ -182,7 +182,7 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
           {showLikes && (
             <div className="inline-flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full">
               {(likes ?? 0) > 0 ? (
-                <ReactionGlyph reacted size={12} tone="media" />
+                <ReactionGlyph reacted={false} size={12} tone="media" />
               ) : (
                 <ReactionGlyph reacted={false} size={12} tone="media" />
               )}

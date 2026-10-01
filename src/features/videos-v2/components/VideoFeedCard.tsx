@@ -202,7 +202,7 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
                   )}
                   {likeCount > 0 && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-                      <ReactionGlyph reacted size={12} />
+                      <ReactionGlyph reacted={false} size={12} />
                       {formatCount(likeCount)}
                     </span>
                   )}

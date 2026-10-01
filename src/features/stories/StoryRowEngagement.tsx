@@ -17,6 +17,7 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
 import { ReactionGlyph, AMBER } from '@/lib/reactionKind';
+import { AMBER_ON_MEDIA } from '@/lib/tokens/surfaces';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -66,7 +67,7 @@ export function StoryRowEngagement({
     >
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: likeCount > 0 ? 4 : 0 }}>
         <ReactionGlyph reacted={liked} size={size} tone={tone === 'glass' ? 'media' : 'panel'} />
-        {figure(likeCount, liked ? AMBER : color)}
+        {figure(likeCount, liked ? (tone === 'glass' ? AMBER_ON_MEDIA : AMBER) : color)}
       </span>
       {user && (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: commentCount > 0 ? 4 : 0 }}>

@@ -744,7 +744,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             count={likeStr}
             accent={likeState.isLiked}
           >
-            <ReactionGlyph reacted={likeState.isLiked} size={32} tone="media" />
+            <ReactionGlyph reacted={likeState.isLiked} size={32} tone="chrome" />
           </RailButton>
 
           <RailButton onClick={onComment} ariaLabel="Comments" count={commentStr}>

@@ -79,7 +79,7 @@ export function reviewTier(r: LatestReview): ReviewTier {
 /** The one course-photo scrim (BRIEF_DISCOVER_SCRIM_AUDIT §2.1). Never local. */
 const SCRIM = SCRIM_STANDOUT;
 /** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
-const AMBER_ON_DARK = '#FFB25E';
+import { AMBER_ON_MEDIA } from '@/lib/tokens/surfaces';
 
 
 
@@ -439,7 +439,7 @@ export function ReviewTile({
               textOverflow: 'ellipsis',
             }}
           >
-            <span style={{ color: isOwn ? AMBER_ON_DARK : 'inherit' }}>{reviewer}</span>
+            <span style={{ color: isOwn ? AMBER_ON_MEDIA : 'inherit' }}>{reviewer}</span>
             {' \u00b7 '}
             <span style={FIGS}>{relativeAge(r.at, t)}</span>
           </div>
