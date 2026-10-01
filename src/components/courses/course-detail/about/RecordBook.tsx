@@ -34,7 +34,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { CourseLegendRow, LegendCategory } from '@/lib/gam/types';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseRecordSummary } from '../useCourseRecordSummary';
-import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
+import AboutSection, { ABOUT_KICKER, aboutFig } from './AboutSection';
 
 /** The unit under each figure, so a bare number never has to explain itself. */
 const UNIT_KEY: Record<string, string> = {
@@ -153,7 +153,6 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
 
   const drillDown = (
     <>
-      <AboutHairline style={{ marginTop: 18 }} />
       <button
         type="button"
         onClick={openBoards}
