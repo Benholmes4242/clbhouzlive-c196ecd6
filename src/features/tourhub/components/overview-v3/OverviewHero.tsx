@@ -41,7 +41,7 @@ interface OverviewHeroProps {
  */
 export const OVERVIEW_HERO_HEIGHT = `${PHOTO_BAND_HEIGHT}px`;
 
-/** Wire-ticker band height (kept in sync with HeroWireTicker). */
+/** Minimum floor for the overview hero frame (the photo band). Never the frame height: the frame follows its content. Also sizes the loading skeleton. */
 export const OVERVIEW_HERO_TOTAL_HEIGHT = `${OVERVIEW_PHOTO_BAND_HEIGHT}px`;
 
 export function OverviewHero({ height }: OverviewHeroProps) {
