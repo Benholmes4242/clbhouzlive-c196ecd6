@@ -199,22 +199,7 @@ export function useVideoLane(
     VideoEngine.setLoop(laneId, loop);
   }, [laneId, loop]);
 
-  // ENDED: fire onEnded when endedCount advances past the value seen at bind.
-  const onEndedRef = useRef(opts.onEnded);
-  onEndedRef.current = opts.onEnded;
-  const endedSeenRef = useRef<number | null>(null);
-  const endedCount = snapshot?.endedCount ?? 0;
-  useEffect(() => {
-    endedSeenRef.current = null;
-  }, [laneId]);
-  useEffect(() => {
-    if (!laneId) return;
-    if (endedSeenRef.current === null) { endedSeenRef.current = endedCount; return; }
-    if (endedCount > endedSeenRef.current) {
-      endedSeenRef.current = endedCount;
-      onEndedRef.current?.();
-    }
-  }, [laneId, endedCount]);
+  useLaneEnded(laneId, opts.onEnded);
 
   // AUDIO POLICY: declare this lane's policy to the engine. Engine handles
   // mute state from the session store; consumers do NOT push mute values.
@@ -232,4 +217,26 @@ export function useVideoLane(
     setMuted: (m: boolean) => { if (laneId) VideoEngine.setMuted(laneId, m); },
     release: () => { if (laneId) VideoEngine.release(laneId); },
   };
+}
+
+/**
+ * useLaneEnded — fires onEnded when the lane's endedCount advances. Seeds with
+ * the lane's current endedCount on bind and fires only on an increase. Inert
+ * when laneId is null.
+ */
+export function useLaneEnded(laneId: LaneId | null, onEnded?: () => void): void {
+  const onEndedRef = useRef(onEnded);
+  onEndedRef.current = onEnded;
+  useEffect(() => {
+    if (!laneId) return;
+    let seen = VideoEngine.snapshot(laneId).endedCount;
+    return VideoEngine.subscribe(laneId, (snap) => {
+      if (snap.endedCount > seen) {
+        seen = snap.endedCount;
+        onEndedRef.current?.();
+      } else {
+        seen = snap.endedCount;
+      }
+    });
+  }, [laneId]);
 }

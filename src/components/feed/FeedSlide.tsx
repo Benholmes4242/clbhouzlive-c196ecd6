@@ -5,9 +5,9 @@ import { FeedImageCarousel } from './FeedImageCarousel';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
-import { useVideoLane } from '@/video/useVideoLane';
+import { useVideoLane, useLaneEnded } from '@/video/useVideoLane';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
-import { VideoEngine } from '@/video/VideoEngine';
+import { VideoEngine, type LaneId } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { isPerfEnabled } from '@/perf/navTiming';
@@ -510,6 +510,13 @@ const FullscreenVideoSlot: React.FC<{
     loop,
     onEnded,
   });
+
+  // Borrowed lane: forward loop + ended to the lane actually playing. Inert
+  // when not borrowing. Handback restores loop=true in the engine.
+  useLaneEnded(isBorrowSlide && borrow ? (borrow.laneId as LaneId) : null, onEnded);
+  useEffect(() => {
+    if (isBorrowSlide && borrow) VideoEngine.setLoop(borrow.laneId as LaneId, loop);
+  }, [isBorrowSlide, borrow?.laneId, loop]);
 
   // Autoplay-blocked → show "Tap for sound" pill. The engine's unmuted
   // rejection path muted THIS lane to keep playback going but did NOT
