@@ -163,16 +163,7 @@ export function useCourses() {
   });
 
   const photoMutation = useMutation({
-    mutationFn: async ({ courseId, file }: { courseId: string; file: File }) => {
-      const ext = file.name.split('.').pop();
-      const path = `course-photos/${courseId}-${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from('course-images').upload(path, file, { upsert: true });
-      if (upErr) throw upErr;
-      const { data: { publicUrl } } = supabase.storage.from('course-images').getPublicUrl(path);
-      const { error: updErr } = await supabase.from('golf_courses').update({ thumbnail_image: publicUrl }).eq('id', courseId);
-      if (updErr) throw updErr;
-      return publicUrl;
-    },
+    mutationFn: ({ courseId, file }: { courseId: string; file: File }) => uploadCoursePhoto(courseId, file),
     onSuccess: () => {
       toast.success('Photo updated');
       qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
@@ -221,6 +212,18 @@ export function useCourses() {
     deleteCourse: (id: string) => deleteMutation.mutateAsync(id),
     isDeleting: deleteMutation.isPending,
   };
+}
+
+/** Uploads a course photo and sets it as the thumbnail. Shared by the course list hook and the Inbox create-and-attach path. */
+export async function uploadCoursePhoto(courseId: string, file: File) {
+  const ext = file.name.split('.').pop();
+  const path = `course-photos/${courseId}-${Date.now()}.${ext}`;
+  const { error: upErr } = await supabase.storage.from('course-images').upload(path, file, { upsert: true });
+  if (upErr) throw upErr;
+  const { data: { publicUrl } } = supabase.storage.from('course-images').getPublicUrl(path);
+  const { error: updErr } = await supabase.from('golf_courses').update({ thumbnail_image: publicUrl }).eq('id', courseId);
+  if (updErr) throw updErr;
+  return publicUrl;
 }
 
 export async function createCourse(input: {
