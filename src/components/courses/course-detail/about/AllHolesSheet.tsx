@@ -99,7 +99,7 @@ const HoleDistribution: React.FC<{ hole: CourseHole }> = ({ hole }) => {
   );
 };
 
-const CompactHoleRow: React.FC<{
+export const CompactHoleRow: React.FC<{
   hole: CourseHole;
   mine: MyHolePerformanceRow | null;
   hasYou: boolean;
