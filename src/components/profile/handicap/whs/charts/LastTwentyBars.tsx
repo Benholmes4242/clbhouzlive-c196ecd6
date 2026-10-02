@@ -1,9 +1,12 @@
 /**
  * LastTwentyBars — BRIEF_LAST_20_BARS_AND_THE_EIGHT.
  *
- * Twenty capsule bars, OLDEST LEFT, NEWEST RIGHT; better (lower differential)
- * is taller, scaled across these rounds only with a BAR_FLOOR px floor. Below a
- * rule: the counting set in ascending order, a divider, then the next in line.
+ * Twenty capsule bars, OLDEST LEFT, NEWEST RIGHT; height follows the
+ * differential (lower = shorter, matching the trend chart above, where lower is
+ * better), scaled across these rounds only with a BAR_FLOOR px floor. A round
+ * with no differential is a hollow capsule at the floor so it is never mistaken
+ * for the best round. Below a rule: the counting set in ascending order, a
+ * divider, then the next in line.
  *
  * TWO ORDERS, DELIBERATELY UNALIGNED: the bars are chronological, the strip is
  * sorted. The strip is laid out with its own flex distribution; nothing shares
@@ -50,8 +53,8 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, selec
   const hi = diffs.length ? Math.max(...diffs) : 0;
   const heightOf = (d: number | null) => {
     if (d == null) return BAR_FLOOR;
-    if (hi === lo) return BAR_AREA;
-    return BAR_FLOOR + ((hi - d) / (hi - lo)) * (BAR_AREA - BAR_FLOOR);
+    if (hi === lo) return BAR_FLOOR + (BAR_AREA - BAR_FLOOR) / 2;
+    return BAR_FLOOR + ((d - lo) / (hi - lo)) * (BAR_AREA - BAR_FLOOR);
   };
 
   return (
@@ -75,7 +78,8 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, selec
             <span
               style={{
                 display: 'block', width: '100%', height: heightOf(r.diff), borderRadius: 9999,
-                background: r.counts ? A.IMPROVED : CHART.BAR_IDLE,
+                background: r.diff == null ? 'transparent' : r.counts ? A.IMPROVED : CHART.BAR_IDLE,
+                boxShadow: r.diff == null ? `inset 0 0 0 1.5px ${CHART.BAR_IDLE}` : undefined,
                 opacity: selectedIndex != null && selectedIndex !== i ? 0.55 : 1,
               }}
             />
