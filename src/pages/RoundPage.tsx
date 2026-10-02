@@ -150,6 +150,10 @@ const RoundPage: React.FC = () => {
     | { backgroundLocation?: unknown; synthesisedBackground?: boolean }
     | null;
   const synthesised = navState?.synthesisedBackground === true;
+  // A history pop (navigate(-1)) is async and cannot be followed by a push in
+  // the same tick — the queued back() would pop the pushed page. Any
+  // route-mounted host offering "leave to another page" actions must replace,
+  // never pop-then-push (see onLeave below).
   const goBack = () => {
     if (hasHistory && !synthesised) navigate(-1);
     else navigate('/notificationmessages', { replace: true });
@@ -215,6 +219,7 @@ const RoundPage: React.FC = () => {
         open
         presentation={asOverlay ? 'overlay' : 'page'}
         onClose={goBack}
+        onLeave={(to) => navigate(to, { replace: true })}
         scoreId={whsScoreId}
         profileUserId={ownerId}
         initialCommentsOpen={openCommentsRequested}
