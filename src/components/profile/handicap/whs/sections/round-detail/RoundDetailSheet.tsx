@@ -118,6 +118,10 @@ interface Props {
    * (?openComments=1 on /round/:whsScoreId). Absent keeps today's behaviour.
    */
   initialCommentsOpen?: boolean;
+  /** Called instead of onClose()+navigate() when the card is leaving for
+   *  another page. A route-mounted host must supply it, because its onClose
+   *  is a history pop and cannot be followed by a push. */
+  onLeave?: (to: string) => void;
 }
 
 export const RoundDetailSheet: React.FC<Props> = ({
@@ -125,6 +129,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
   seed = null, onHorizontalDrag = null, onStatsSeen,
   pageShift = null, pagePreview = null, paging = null,
   initialCommentsOpen = false,
+  onLeave,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
@@ -314,12 +319,13 @@ export const RoundDetailSheet: React.FC<Props> = ({
   // handicap page, and never the signed-out handicap login. Identity
   // resolution (compare / nudge / invite) is a different action.
   const profileUsername = profile?.username ?? null;
+  const leaveTo = (to: string) => { if (onLeave) onLeave(to); else { onClose(); navigate(to); } };
   const onViewProfile = profileUsername
-    ? () => { onClose(); navigate(`/profile/${profileUsername}`); }
+    ? () => leaveTo(`/profile/${profileUsername}`)
     : undefined;
 
   const onViewCourse = courseIdQuery.data
-    ? () => { onClose(); navigate(`/courses/${courseIdQuery.data}`); }
+    ? () => leaveTo(`/courses/${courseIdQuery.data}`)
     : undefined;
 
   // C3 — "Share this round". Offered only on the viewer's OWN round, and only
