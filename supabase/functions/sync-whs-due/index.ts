@@ -79,7 +79,7 @@ import { snapshotCounterFlags, requeueCounterFlips } from "../_shared/counter-re
 
 // Configuration
 const BATCH_SIZE = 25;                    // max connections per cron run
-const DEFAULT_SYNC_INTERVAL_HOURS = 6;    // refresh cadence
+const DEFAULT_SYNC_INTERVAL_HOURS = 4;    // defer < cron tick (6h) so it cannot drift past the due window
 const MAX_CONSECUTIVE_FAILURES = 50;      // give up after this many in a row.
                                           // High because pre-auth token expiry
                                           // causes simultaneous failures on all
