@@ -338,7 +338,12 @@
         "par": "PAR",
         "triple": "TRIPLE AN {{n}}"
       },
-      "you": "Du"
+      "you": "Du",
+      "medals": {
+        "gold": "{{count}} Gold",
+        "silver": "{{count}} Silber",
+        "bronze": "{{count}} Bronze"
+      }
     },
     "watch": {
       "chip": {

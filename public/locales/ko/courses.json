@@ -338,7 +338,12 @@
         "par": "PAR",
         "triple": "TRIPLE ON {{n}}"
       },
-      "you": "당신"
+      "you": "당신",
+      "medals": {
+        "gold": "금 {{count}}",
+        "silver": "은 {{count}}",
+        "bronze": "동 {{count}}"
+      }
     },
     "watch": {
       "chip": {

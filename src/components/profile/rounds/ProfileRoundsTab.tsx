@@ -60,25 +60,17 @@ function formValue(r: ProfileRound): number | null {
 
 const fmt1 = (n: number) => n.toFixed(1);
 
+/** The one pill chrome on this list: feat tags, the not-full-18 tag and the medal pill. */
+const CAPS: React.CSSProperties = { fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' };
+const Pill: React.FC<{ tone?: string; padding?: string; style?: React.CSSProperties; children: React.ReactNode }> = ({ tone, padding = '3px 6px', style, children }) => (
+  <span style={{ ...style, color: tone, border: `1px solid ${CHART.BORDER}`, borderRadius: 999, lineHeight: 1, whiteSpace: 'nowrap', padding, display: 'inline-flex', alignItems: 'center' }}>
+    {children}
+  </span>
+);
+
 /** The feed's RARE/NEW tag treatment, as a small pill. */
 const FeatPill: React.FC<{ label: string }> = ({ label }) => (
-  <span
-    style={{
-      fontFamily: SANS,
-      fontSize: 9,
-      fontWeight: 800,
-      letterSpacing: '0.12em',
-      lineHeight: 1,
-      textTransform: 'uppercase',
-      color: CHART.AMBER,
-      border: `1px solid ${CHART.BORDER}`,
-      borderRadius: 999,
-      padding: '3px 6px',
-      whiteSpace: 'nowrap',
-    }}
-  >
-    {label}
-  </span>
+  <Pill tone={CHART.AMBER} style={CAPS}>{label}</Pill>
 );
 
 /** Course name: one line, type shrinks 14 -> 11 instead of truncating. */
@@ -304,11 +296,15 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
                 </span>
                 {fs.length || !full18 || medalTotal(r) > 0 ? (
                   <span style={{ display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap', alignItems: 'center' }}>
-                    <MedalCluster gold={r.medals_gold ?? 0} silver={r.medals_silver ?? 0} bronze={r.medals_bronze ?? 0} surfaceColor={CHART.CANVAS} />
+                    {medalTotal(r) > 0 ? (
+                      <Pill padding="3px 8px">
+                        <MedalCluster scale="pill" gold={r.medals_gold ?? 0} silver={r.medals_silver ?? 0} bronze={r.medals_bronze ?? 0} surfaceColor={CHART.CANVAS} />
+                      </Pill>
+                    ) : null}
                     {!full18 ? (
-                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: CHART.MUTE, border: `1px solid ${CHART.BORDER}`, borderRadius: 999, padding: '3px 6px', whiteSpace: 'nowrap' }}>
+                      <Pill tone={CHART.MUTE} style={CAPS}>
                         {r.whs_joined && r.is_nine_hole ? t('rounds.nineHoles', '9 holes') : t('rounds.notFull', 'Not a full 18')}
-                      </span>
+                      </Pill>
                     ) : null}
                     {fs.map((f) => <FeatPill key={f} label={f} />)}
                   </span>
