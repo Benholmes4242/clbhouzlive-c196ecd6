@@ -14,14 +14,6 @@
  */
 
 import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
-import { getActiveLocale } from '@/i18n';
-
-function toLocalDate(iso: string | null | undefined): Date | null {
-  if (!iso) return null;
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
-  const d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(iso);
-  return isNaN(d.getTime()) ? null : d;
-}
 
 export function fmtDateEyebrow(iso: string | null | undefined): string {
   if (!iso) return '';
@@ -34,8 +26,5 @@ export function fmtDateEyebrow(iso: string | null | undefined): string {
   return `${dow}, ${day} ${mon}`;
 }
 
-export function fmtDateLong(iso: string | null | undefined): string {
-  const d = toLocalDate(iso);
-  if (!d) return '';
-  return new Intl.DateTimeFormat(getActiveLocale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
-}
+/** fmtDateLong lives in @/i18n/format (shared with Explore's featured round). */
+export { fmtDateLong } from '@/i18n/format';

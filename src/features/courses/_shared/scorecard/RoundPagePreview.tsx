@@ -20,7 +20,8 @@ import { roundCoursePar } from '@/lib/whs/api';
 import { useTranslation } from 'react-i18next';
 
 import type { RoundDetailSeed } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { fmtDateEyebrow, fmtDateLong } from '@/components/profile/handicap/whs/sections/round-detail/roundDateEyebrow';
+import { fmtDateEyebrow } from '@/components/profile/handicap/whs/sections/round-detail/roundDateEyebrow';
+import { fmtDateLong } from '@/i18n/format';
 import { FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import {
   Nine, NotPlayedLine, RoundSummaryHead, SANS, ScorecardSection,

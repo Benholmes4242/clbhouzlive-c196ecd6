@@ -939,7 +939,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      treatment from hole detail that has not arrived. */
   const featuredShapes = useRoundHoleShapes(useMemo(() => [featured.data?.whs_score_id ?? null], [featured.data?.whs_score_id]));
   /* ONE gam_round_awards read per rendered page; cards receive counts. */
-  const roundMedals = useBatchRoundMedals(useMemo(() => visible.filter((item) => item.kind === 'round').map((item) => item.facts.score_id ?? null), [visible]));
+  const roundMedals = useBatchRoundMedals(useMemo(() => [
+    // The hero rides in the feed's one batched award read — never a second request.
+    ...(view === 'all' ? [featured.data?.whs_score_id ?? null] : []),
+    ...visible.filter((item) => item.kind === 'round').map((item) => item.facts.score_id ?? null),
+  ], [visible, view, featured.data?.whs_score_id]));
   const shapesMap = useRoundHoleShapes(useMemo(() => visible.map((item) => item.facts.score_id ?? null), [visible]));
   /* THE VIEWER'S OWN BEST PER COURSE. ONE batched viewer-scoped read for the
      whole page, never per card, so a record headline can say what the record was
@@ -2115,6 +2119,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
           <FeaturedRoundCard
             round={featured.data}
+            medals={roundMedals.isSuccess ? roundMedals.medals?.get(featured.data.whs_score_id) ?? null : undefined}
             viewerId={userId}
             shape={featuredShapes?.get(featured.data.whs_score_id) ?? null}
             engagement={engagementForRound(
