@@ -873,7 +873,9 @@
       "metaOff": "Off {{then}} that day",
       "beatWith": "beat with {{n}}",
       "crowns_one": "{{count}} crown",
-      "crowns_other": "{{count}} crowns"
+      "crowns_other": "{{count}} crowns",
+      "doorCrowns": "CROWNS",
+      "doorMilestones": "MILESTONES"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",

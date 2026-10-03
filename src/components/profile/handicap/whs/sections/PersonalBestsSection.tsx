@@ -42,6 +42,12 @@ import { HcpSection } from './HcpSection';
 import { pickCourse } from './NextRoundSection';
 import { CHART } from '../charts';
 import { openGamAchievements } from '../gam/events';
+import { AwardMark, type AwardTier } from '@/components/awards/AwardMark';
+import { useMemberRecordSplit, recordsWonFrom } from '@/hooks/gam/useMemberRecordSplit';
+import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
+import { milestonesReachedFrom } from '../gam/trophy-room/career/milestones';
+import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+import { r } from '@/lib/radius';
 
 const FIG: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining-nums',
@@ -388,53 +394,82 @@ function useCrownsHeldCount(userId: string | undefined) {
   });
 }
 
-/** PLAIN TERMINAL ROW (§6.1). Same handler as before — the only navigable
- *  door to the trophy room. Amber: this is the viewing member's own count. */
-export const TrophyRoomRow: React.FC<{ standalone?: boolean; userId?: string }> = ({
-  standalone = false,
-  userId,
-}) => {
-  const { t } = useTranslation(['common']);
+/** THE TROPHY ROOM DOOR — the only navigable door to the trophy room. One
+ *  button, one tap target, one aria-label naming every figure it shows.
+ *  Neutral member-panel chrome: amber on this page means the index.
+ *
+ *  Every figure reads the trophy room's own source — nothing is recomputed:
+ *    crowns      useCrownsHeldCount (head count, null on error)
+ *    records     useMemberRecordSplit -> recordsWonFrom (CourseRecordsPanel's sum)
+ *    milestones  useUserAchievements -> milestonesReachedFrom (MilestonesPanel's n)
+ *  ABSENT IS NOT ZERO: an unresolved, errored or zero figure has its slot
+ *  omitted. "Records held" (split unavailable) needs the full legends list,
+ *  so on this page that slot is omitted rather than adding a heavy query. */
+export const TrophyRoomRow: React.FC<{ userId?: string }> = ({ userId }) => {
+  const { t } = useTranslation(['common', 'handicap']);
   const { data: crowns } = useCrownsHeldCount(userId);
-  const showFigure = typeof crowns === 'number' && crowns > 0;
-  const row = (
-    <button
-      type="button"
-      onClick={() => openGamAchievements()}
-      aria-label={
-        showFigure
-          ? t('common:handicap.bests.trophyRoomA11y', { count: crowns })
-          : t('common:handicap.bests.trophyRoomA11yBare')
-      }
-      style={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-        minHeight: 44,
-        marginTop: standalone ? 0 : 12,
-        padding: '14px 0 0',
-        border: 'none',
-        borderTop: `1px solid ${A.SOFT}`,
-        borderRadius: 0,
-        background: 'transparent',
-        textAlign: 'left',
-        cursor: 'pointer',
-        WebkitTapHighlightColor: 'transparent',
-      }}
-    >
-      <span style={{ fontSize: 14, fontWeight: 700, color: CHART.INK }}>
-        {t('common:handicap.bests.trophyRoom')}
-      </span>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 13, fontWeight: 700, color: A.AMBER, ...FIG, letterSpacing: 0 }}>
-        {showFigure && t('common:handicap.bests.crowns', { count: crowns })}
-        <ChevronRight size={15} strokeWidth={2.4} aria-hidden />
-      </span>
-    </button>
-  );
+  const { data: split } = useMemberRecordSplit(userId);
+  const { data: badges } = useUserAchievements(userId);
 
-  return standalone ? <HcpSection>{row}</HcpSection> : row;
+  const figures: { key: string; tier: AwardTier; glyph: 'medal' | 'crown'; value: number; label: string }[] = [];
+  if (typeof crowns === 'number' && crowns > 0) {
+    figures.push({ key: 'crowns', tier: 'gold', glyph: 'crown', value: crowns, label: t('common:handicap.bests.doorCrowns') });
+  }
+  if (split?.available) {
+    const won = recordsWonFrom(split.byCourse);
+    if (won > 0) {
+      figures.push({ key: 'records', tier: 'silver', glyph: 'medal', value: won, label: t('handicap:career.cabinetRecordsWon') });
+    }
+  }
+  if (Array.isArray(badges)) {
+    const reached = milestonesReachedFrom(badges);
+    if (reached > 0) {
+      figures.push({ key: 'milestones', tier: 'bronze', glyph: 'medal', value: reached, label: t('common:handicap.bests.doorMilestones') });
+    }
+  }
+
+  const title = t('common:handicap.bests.trophyRoom');
+  const ariaLabel = [title, ...figures.map((f) => `${f.value} ${f.label.toLowerCase()}`)].join(', ');
+
+  return (
+    <HcpSection>
+      <button
+        type="button"
+        onClick={() => openGamAchievements()}
+        aria-label={ariaLabel}
+        style={{
+          width: '100%',
+          display: 'block',
+          minHeight: 44,
+          padding: 16,
+          border: `1px solid ${A.HAIRLINE}`,
+          borderRadius: r.lg,
+          background: MEMBER_PANEL,
+          textAlign: 'left',
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        <span aria-hidden style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: CHART.INK }}>{title}</span>
+          <ChevronRight size={18} strokeWidth={2.4} color={A.AMBER} />
+        </span>
+        {figures.length > 0 && (
+          <span aria-hidden style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 12 }}>
+            {figures.map((f) => (
+              <span key={f.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <AwardMark tier={f.tier} size="pill" glyph={f.glyph} />
+                <span style={{ fontSize: 15, fontWeight: 700, color: CHART.INK, ...FIG, letterSpacing: 0 }}>{f.value}</span>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: CHART.MUTE }}>
+                  {f.label}
+                </span>
+              </span>
+            ))}
+          </span>
+        )}
+      </button>
+    </HcpSection>
+  );
 };
 
 export default PersonalBestsSection;

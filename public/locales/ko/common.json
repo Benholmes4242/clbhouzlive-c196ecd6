@@ -521,7 +521,9 @@
       "trophyRoomTitle": "당신이 가진 모든 것",
       "crownsHeld": "보유 중인 크라운",
       "trophyRoomA11y": "트로피 룸, 보유 크라운 {{count}}개",
-      "trophyRoomA11yBare": "트로피 룸"
+      "trophyRoomA11yBare": "트로피 룸",
+      "doorCrowns": "CROWNS",
+      "doorMilestones": "MILESTONES"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",
