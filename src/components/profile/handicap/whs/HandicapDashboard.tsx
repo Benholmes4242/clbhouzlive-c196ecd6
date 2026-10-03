@@ -128,7 +128,6 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         currentHandicap={currentHandicap}
         viewMode={viewMode}
         ownerFirstName={ownerFirstName}
-        showTrophyRoom={false}
       />
 
       {/* StreaksCard (the ON THE LINE - {n} ACTIVE rail) is OFF this page and
@@ -137,8 +136,8 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           terminal TROPHY ROOM row at the foot of Personal bests, and
           StreaksSheetMount stays at page level so ?gam=streaks still opens. */}
 
-      {/* 6 — TROPHY ROOM */}
-      {!readOnly && <TrophyRoomRow standalone userId={userId} />}
+      {/* 6 — TROPHY ROOM — the one door, directly after Personal bests. */}
+      {!readOnly && <TrophyRoomRow userId={userId} />}
 
       {/* FOOTER — provenance only. */}
       <HandicapFooter

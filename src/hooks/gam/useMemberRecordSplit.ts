@@ -45,3 +45,11 @@ export function useMemberRecordSplit(userId: string | null | undefined, enabled 
     },
   });
 }
+
+/** Records WON = contested records summed across courses. The one derivation:
+ *  the trophy room's recordSplit and the handicap page's door both call it. */
+export function recordsWonFrom(byCourse: Map<string, CourseRecordSplit>): number {
+  let won = 0;
+  for (const s of byCourse.values()) won += s.contested;
+  return won;
+}

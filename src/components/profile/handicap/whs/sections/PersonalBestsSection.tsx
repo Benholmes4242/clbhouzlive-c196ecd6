@@ -79,7 +79,6 @@ interface Props {
   currentHandicap: number | null;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
-  showTrophyRoom?: boolean;
 }
 
 /** total_holes is checked as well as the flag: both travel on every row. */
@@ -115,7 +114,6 @@ export const PersonalBestsSection: React.FC<Props> = ({
   currentHandicap,
   viewMode = 'owner',
   ownerFirstName = null,
-  showTrophyRoom = true,
 }) => {
   const { t } = useTranslation(['common']);
   const { data: scores, isFetched } = useAllScores(connectionId);
@@ -364,8 +362,6 @@ export const PersonalBestsSection: React.FC<Props> = ({
         </div>
       )}
 
-      {/* TERMINAL ROW — same handler as the AchievementsPanel tile. */}
-      {!isFriend && showTrophyRoom && <TrophyRoomRow />}
     </HcpSection>
   );
 };

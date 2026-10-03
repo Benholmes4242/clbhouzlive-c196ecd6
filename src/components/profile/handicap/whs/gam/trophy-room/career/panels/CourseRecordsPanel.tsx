@@ -49,6 +49,7 @@
  *
  * REPLACES CrownsPanel, which stays on disk on the dead list.
  */
+import { recordsWonFrom } from '@/hooks/gam/useMemberRecordSplit';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
@@ -89,12 +90,9 @@ export function recordSplit(
     }
     return { available, won: 0, uncontested: 0, total };
   }
-  let won = 0;
+  const won = recordsWonFrom(data.recordSplitByCourse);
   let uncontested = 0;
-  for (const s of data.recordSplitByCourse.values()) {
-    won += s.contested;
-    uncontested += s.sole;
-  }
+  for (const s of data.recordSplitByCourse.values()) uncontested += s.sole;
   return { available, won, uncontested, total: won + uncontested };
 }
 
