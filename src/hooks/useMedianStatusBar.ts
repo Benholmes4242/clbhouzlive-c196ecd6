@@ -84,28 +84,47 @@ function toMedianStyle(intent: string): string {
  * and matches the pre-break behaviour that worked.
  */
 let statusBarOverlayBooted = false;
+
+/** True when the Median native bridge exposes statusbar.set. On the web
+ *  window.median is absent, so every status-bar call stays a no-op there. */
+export function isMedianBridgeUp(): boolean {
+  if (typeof window === 'undefined') return false;
+  return typeof window.median?.statusbar?.set === 'function';
+}
+
+/** True once Median's median_library_ready callback has fired. */
+export function isMedianLibraryReady(): boolean {
+  return medianLibraryReady;
+}
+
+type StatusBarPayload = { style: string; color: string; overlay: boolean; blur: boolean };
+
+/** Single choke point for every statusbar.set call. Returns true when set
+ *  was called without throwing. Logs every attempt for the device check. */
+function sendStatusBar(payload: StatusBarPayload): boolean {
+  if (!isMedianBridgeUp()) {
+    console.info('[chrome] statusbar.set skipped (bridge-down)', payload);
+    return false;
+  }
+  try {
+    window.median!.statusbar!.set!(payload);
+    console.info('[chrome] statusbar.set sent', payload);
+    return true;
+  } catch {
+    console.info('[chrome] statusbar.set skipped (threw)', payload);
+    return false;
+  }
+}
+
 export function ensureStatusBarOverlayBooted(): void {
   if (statusBarOverlayBooted) return;
   if (typeof window === 'undefined') return;
-  if (!navigator.userAgent.toLowerCase().includes('median')) {
-    statusBarOverlayBooted = true;
-    return;
-  }
-  try {
-    // style/color here are throwaway — they get overwritten immediately by
-    // the first route/overlay setStyleColor call. What matters is overlay:true.
-    if (window.median?.statusbar?.set) {
-      window.median.statusbar.set({
-        style: 'light',
-        color: '00000000',
-        overlay: true,
-        blur: false,
-      });
-      statusBarOverlayBooted = true;
-    }
-  } catch {
-    // Bridge not ready — the ready callback below retries.
-  }
+  // style/color here are throwaway — they get overwritten immediately by
+  // the first route/overlay setStyleColor call. What matters is overlay:true.
+  // No early latch: before median_library_ready, every call re-sends (the
+  // full payload never transitions, so the fs.open jolt cannot occur).
+  const sent = sendStatusBar({ style: 'light', color: '00000000', overlay: true, blur: false });
+  if (sent && medianLibraryReady) statusBarOverlayBooted = true;
 }
 
 /**
@@ -114,30 +133,27 @@ export function ensureStatusBarOverlayBooted(): void {
  * idempotent full-state assertion so the overlay value never transitions,
  * which is what prevents the fs.open viewport-resize jolt AND guarantees
  * the WebView never falls out of overlay mode (grey band regression).
+ * Returns true when set was called without throwing, false otherwise.
  */
-export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexColor: string): void {
-  if (typeof window === 'undefined') return;
-  if (!navigator.userAgent.toLowerCase().includes('median')) return;
-  try {
-    if (window.median?.statusbar?.set) {
-      window.median.statusbar.set({
-        style: toMedianStyle(intent),
-        color: toAARRGGBB(hexColor),
-        overlay: true,
-        blur: false,
-      });
-    }
-  } catch {
-    // Bridge not ready — silent no-op.
-  }
+export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexColor: string): boolean {
+  if (typeof window === 'undefined') return false;
+  return sendStatusBar({
+    style: toMedianStyle(intent),
+    color: toAARRGGBB(hexColor),
+    overlay: true,
+    blur: false,
+  });
 }
 
 
 // Kick a boot-attempt at module load, then again on the Median ready callback.
+// The module-level chain owns the ready flag.
 if (typeof window !== 'undefined') {
   ensureStatusBarOverlayBooted();
   const prev = window.median_library_ready;
   window.median_library_ready = () => {
+    medianLibraryReady = true;
+    console.info('[chrome] median_library_ready fired');
     if (typeof prev === 'function') prev();
     ensureStatusBarOverlayBooted();
   };
