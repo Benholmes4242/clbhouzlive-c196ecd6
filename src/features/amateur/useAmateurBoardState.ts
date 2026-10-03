@@ -154,8 +154,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
      so the count in the panel can never disagree with the rows on the page. */
   const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: active && resolved });
 
-  /* D — NO CIRCLE: the ladder above skips the circle rung, so the entry
-     filter is already Everyone before any board read is issued. */
+  /* D — a member whose circle is empty simply fails the circle rung's floor. */
 
   /* C — A CIRCLE THAT SAID NOTHING THIS FORTNIGHT. The list becomes Everyone
      and `widened` makes the page say so. Once, and only while the member has
