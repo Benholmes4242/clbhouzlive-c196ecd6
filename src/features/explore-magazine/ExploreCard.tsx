@@ -779,8 +779,11 @@ export function ExploreCard({
   onTap,
   onWhoTap,
   engagement,
+  medals,
 }: {
   item: StreamItem;
+  /** From useBatchRoundMedals, resolved queries only. undefined = no cluster. */
+  medals?: { gold: number; silver: number; bronze: number };
   size: CardSize;
   /** Rounds only. A pair never draws a shape: at 124px it cannot be read. */
   /** undefined = unresolved; null = settled without usable hole detail. */
@@ -1478,7 +1481,7 @@ export function ExploreCard({
             onWhoTap={onWhoTap}
             engagement={engagement}
             roundIdentity={item.kind === 'round' && size !== 'pair'
-              ? { course: kickerPartsValue.course, date: railCaptionDate(item.facts.play_date ?? null), gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null, medalsGold: item.facts.medals_gold ?? null, medalsSilver: item.facts.medals_silver ?? null, medalsBronze: item.facts.medals_bronze ?? null }
+              ? { course: kickerPartsValue.course, date: railCaptionDate(item.facts.play_date ?? null), gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null, medalsGold: medals?.gold ?? null, medalsSilver: medals?.silver ?? null, medalsBronze: medals?.bronze ?? null }
               : undefined}
           />
         </span>

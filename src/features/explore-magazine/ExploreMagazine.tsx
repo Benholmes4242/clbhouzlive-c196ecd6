@@ -40,6 +40,7 @@ import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 
+import { useBatchRoundMedals } from './useBatchRoundMedals';
 import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
 import { ExploreShelf, SHELF_HEADING } from './ExploreShelf';
@@ -937,6 +938,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      state distinct from a settled map with no key, so cards never manufacture a
      treatment from hole detail that has not arrived. */
   const featuredShapes = useRoundHoleShapes(useMemo(() => [featured.data?.whs_score_id ?? null], [featured.data?.whs_score_id]));
+  /* ONE gam_round_awards read per rendered page; cards receive counts. */
+  const roundMedals = useBatchRoundMedals(useMemo(() => visible.filter((item) => item.kind === 'round').map((item) => item.facts.score_id ?? null), [visible]));
   const shapesMap = useRoundHoleShapes(useMemo(() => visible.map((item) => item.facts.score_id ?? null), [visible]));
   /* THE VIEWER'S OWN BEST PER COURSE. ONE batched viewer-scoped read for the
      whole page, never per card, so a record headline can say what the record was
@@ -2275,6 +2278,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 onTap={() => tapCard(item, size, pos)}
                 onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
                  engagement={engagementFor(item)}
+                medals={roundMedals.isSuccess && item.facts.score_id ? roundMedals.medals?.get(item.facts.score_id) : undefined}
               />
              </div>
             </div>
