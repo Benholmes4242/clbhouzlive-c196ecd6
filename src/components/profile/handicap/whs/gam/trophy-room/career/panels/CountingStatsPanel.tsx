@@ -41,6 +41,50 @@ import { namedPartsFor } from '../criteria';
 import { monthYear } from '../format';
 import { attainedAt } from '@/lib/gam/badgeBackfill';
 import type { Achievement, CareerData } from '../types';
+import { Check } from 'lucide-react';
+
+/**
+ * The tile's top-row mark. Completion is a different state, not another
+ * rung on the ladder, so it branches on `done` BEFORE tierTone is read and
+ * gets a different shape: a green check disc. Otherwise the 9px ladder dot
+ * (tierTone, or the hollow ring when null) exactly as before.
+ */
+function TileMark({ done, tone }: { done: boolean; tone: string | null | undefined }) {
+  if (done) {
+    return (
+      <span
+        aria-hidden
+        style={{
+          width: 13,
+          height: 13,
+          borderRadius: '50%',
+          flexShrink: 0,
+          background: REC.GOOD,
+          color: REC.CANVAS,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Check size={9} strokeWidth={4} />
+      </span>
+    );
+  }
+  return (
+    <span
+      aria-hidden
+      style={{
+        width: 9,
+        height: 9,
+        borderRadius: '50%',
+        flexShrink: 0,
+        boxSizing: 'border-box',
+        background: tone ?? 'transparent',
+        border: tone ? 'none' : `1px solid ${REC.DOT_HOLLOW}`,
+      }}
+    />
+  );
+}
 
 interface Props {
   data: CareerData;
@@ -262,7 +306,7 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
               key={r.item.badgeId}
               type="button"
               onClick={() => open(r)}
-              aria-label={`${shortLabel(r)}, ${r.value}`}
+              aria-label={`${shortLabel(r)}, ${r.value}, ${caption}`}
               style={{
                 textAlign: 'left',
                 padding: '12px 11px',
@@ -291,18 +335,7 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
                 >
                   {r.value}
                 </span>
-                <span
-                  aria-hidden
-                  style={{
-                    width: 9,
-                    height: 9,
-                    borderRadius: '50%',
-                    flexShrink: 0,
-                    boxSizing: 'border-box',
-                    background: tone ?? 'transparent',
-                    border: tone ? 'none' : `1px solid ${REC.DOT_HOLLOW}`,
-                  }}
-                />
+                <TileMark done={done} tone={tone} />
               </span>
               <span
                 style={{
