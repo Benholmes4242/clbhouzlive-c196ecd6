@@ -12,7 +12,8 @@ import { useBoardFacets } from '@/components/explore-tab-new/courseled/hooks/use
 import { useBoardPage } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-import { useAvailableWeekScopes } from '@/components/explore-tab-new/courseled/hooks/useGolfThisWeek';
+import { useViewerHomeClubId } from '@/components/explore-tab-new/courseled/hooks/useGolfThisWeek';
+import { CIRCLE_ROW_FLOOR } from '@/components/explore-tab-new/courseled/hooks/useDiscoverEntryBoard';
 import type { ScopeKey } from '@/components/explore-tab-new/courseled/boardFilters';
 
 import { useCircleSize } from './useCircleSize';
@@ -50,17 +51,23 @@ const PAGE_FETCH = 200;
 /** §1 — the one entry board, always. */
 export const ENTRY_BOARD: BoardKey = 'recent';
 
-/** BRIEF_SCORES_RETIRE_THE_GEOGRAPHY_RAIL §3 — THE DEFAULT SCOPE IS A LADDER.
- *  The first rung that applies to this member wins. Reorder here, nowhere else. */
-export const SCOPE_LADDER: ScopeKey[] = ['club', 'circle', 'everyone'];
+/** SCORES LANDING SCOPE (amendment to §3). Tried in order; the first rung whose
+ *  board returns at least CIRCLE_ROW_FLOOR rows wins. Everyone is terminal and
+ *  never tested. Reorder here, nowhere else. */
+export const LANDING_SCOPES: ScopeKey[] = ['circle', 'club', 'everyone'];
 
-/** Everything but scope is fixed; scope is resolved from SCOPE_LADDER. */
+/** Everything EXCEPT scope. Scope arrives from the LANDING_SCOPES ladder. */
+export const ENTRY_FILTERS: Omit<BoardFilters, 'scope'> = (() => {
+  const { scope: _scope, ...rest } = normalizeFilters({ ...DEFAULT_FILTERS, window: '14', courses: 'any' });
+  return rest;
+})();
+
 export function entryFiltersFor(scope: ScopeKey): BoardFilters {
-  return normalizeFilters({ ...DEFAULT_FILTERS, scope, window: '14', courses: 'any' });
+  return normalizeFilters({ ...ENTRY_FILTERS, scope });
 }
 
-/** The pre-ladder shape, kept for callers that need a static value. */
-export const ENTRY_FILTERS: BoardFilters = entryFiltersFor('circle');
+/** Pre-resolution placeholder only; never rendered (the block holds until the ladder settles). */
+const UNRESOLVED_FILTERS: BoardFilters = entryFiltersFor('everyone');
 
 /** §6 — SHEET-ONLY AXES that differ from the default. Scope and board are
  *  stated on the page and are deliberately NOT counted. Max 5. */
@@ -75,7 +82,7 @@ export function sheetOnlyDiffCount(f: BoardFilters, d: BoardFilters): number {
 }
 
 export function useAmateurBoardState(userId: string | undefined, active = true) {
-  const [filters, setFilters] = useState<BoardFilters>(ENTRY_FILTERS);
+  const [filters, setFilters] = useState<BoardFilters>(UNRESOLVED_FILTERS);
   /* The resolved default. null until the ladder has resolved, and the board
      reads stay off until then — never render on one scope and swap. */
   const [entry, setEntry] = useState<BoardFilters | null>(null);
@@ -92,27 +99,54 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
      failure. `null` while unknown: we never guess. */
   const circle = useCircleSize(userId, !!userId);
   const hasCircle = circle.data == null ? null : circle.data > 0;
-  /* §3 — the club gate that already exists (HOME_CLUB_MIN_MEMBERS). */
-  const weekScopes = useAvailableWeekScopes(userId);
-  const clubApplies = weekScopes.scopes.includes('home_club');
-  const ladderKnown = !!userId && weekScopes.ready && circle.isFetched;
+  /* LANDING LADDER — the useDiscoverEntryBoard rung pattern. Each rung reads the
+     board it would actually render (same board, filters and limit as `page`, so
+     the winner's read IS the page's cache entry). Rungs below a winner are never
+     enabled. Silent: nothing on screen names a skipped rung. */
+  const homeClub = useViewerHomeClubId(userId);
+  const [probeScopes] = useState(() => LANDING_SCOPES.filter((k) => k !== 'everyone'));
+  const rungAFilters = useMemo(() => entryFiltersFor(probeScopes[0]), [probeScopes]);
+  const rungBFilters = useMemo(() => entryFiltersFor(probeScopes[1]), [probeScopes]);
+  /* A rung whose scope cannot return rows is skipped outright — no query.
+     Club with no primary_club_id is the common case (66 of 107). */
+  const rungApplies = (k: ScopeKey) => (k === 'club' ? !!homeClub.clubId : true);
+  const ladderOn = !!userId && active && entry === null && homeClub.ready;
 
-  /* RESOLVES ONCE, when availability is known. */
+  const rungA = useBoardPage(userId, ENTRY_BOARD, rungAFilters, {
+    limit: PAGE_FETCH,
+    enabled: ladderOn && rungApplies(probeScopes[0]),
+  });
+  const rungASkipped = homeClub.ready && !rungApplies(probeScopes[0]);
+  const rungASettled = rungASkipped || rungA.isSuccess || rungA.isError;
+  const rungAOk = !rungASkipped && rungA.isSuccess && (rungA.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
+
+  const rungB = useBoardPage(userId, ENTRY_BOARD, rungBFilters, {
+    limit: PAGE_FETCH,
+    enabled: ladderOn && rungASettled && !rungAOk && rungApplies(probeScopes[1]),
+  });
+  const rungBSkipped = homeClub.ready && !rungApplies(probeScopes[1]);
+  const rungBSettled = rungBSkipped || rungB.isSuccess || rungB.isError;
+  const rungBOk = !rungBSkipped && rungB.isSuccess && (rungB.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
+
+  let landing: ScopeKey | null = null;
+  if (homeClub.ready && rungASettled) {
+    if (rungAOk) landing = probeScopes[0];
+    else if (rungBSettled) landing = rungBOk ? probeScopes[1] : 'everyone';
+  }
+
+  /* RESOLVES ONCE. Until then the board reads stay off and the block holds. */
   useEffect(() => {
-    if (entry !== null || !ladderKnown) return;
-    const applies: Record<ScopeKey, boolean> = {
-      club: clubApplies,
-      circle: hasCircle === true,
-      everyone: true,
-    } as Record<ScopeKey, boolean>;
-    const scope = SCOPE_LADDER.find((k) => applies[k]) ?? 'everyone';
-    const next = entryFiltersFor(scope);
+    if (entry !== null || landing === null) return;
+    const next = entryFiltersFor(landing);
     setEntry(next);
     if (!touched.current) setFilters(next);
-  }, [entry, ladderKnown, clubApplies, hasCircle]);
+  }, [entry, landing]);
+
+  /* Kept for the head: whether Your club is a real choice for this member. */
+  const clubApplies = !!homeClub.clubId;
 
   const resolved = entry !== null;
-  const entryFilters = entry ?? ENTRY_FILTERS;
+  const entryFilters = entry ?? UNRESOLVED_FILTERS;
 
   const facets = useBoardFacets(userId, board, filters, { enabled: active && resolved });
   /* ONE READ, TWO READERS. The leaderboard block renders these rows and the
@@ -120,8 +154,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
      so the count in the panel can never disagree with the rows on the page. */
   const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: active && resolved });
 
-  /* D — NO CIRCLE: the ladder above skips the circle rung, so the entry
-     filter is already Everyone before any board read is issued. */
+  /* D — a member whose circle is empty simply fails the circle rung's floor. */
 
   /* C — A CIRCLE THAT SAID NOTHING THIS FORTNIGHT. The list becomes Everyone
      and `widened` makes the page say so. Once, and only while the member has
