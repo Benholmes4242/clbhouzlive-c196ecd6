@@ -10,10 +10,10 @@ export const SUPABASE_ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlieGtlaHlvbWNha3FqdnVobm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MDg4OTgsImV4cCI6MjA2NTI4NDg5OH0.rVzRKRklmZoWMxZ-jHKfdrvf2uJjtoQuwVjPMb1I7Xw';
 
 export const SITE_ORIGIN = 'https://clbhouz.co.uk';
-export const GENERIC_IMAGE = SITE_ORIGIN + '/og-card.png';
-export const GENERIC_TITLE = 'clbhouz | the home of golf courses';
+export const GENERIC_IMAGE = SITE_ORIGIN + '/og-card-v2.png';
+export const GENERIC_TITLE = 'clbhouz | stay in play.';
 export const GENERIC_DESCRIPTION =
-  'clbhouz - the home of golf courses. Every course in the world, gathered into one place, rated and brought to life.';
+  'Every round from your official handicap, scored hole by hole against the course you played. Courses rated, records to chase, and the golfers you play with.';
 
 const CRAWLER_TOKENS = [
   'facebookexternalhit',
@@ -121,6 +121,8 @@ export function metaDocument(opts) {
     <meta property="og:type" content="${esc(type)}" />
     <meta property="og:url" content="${esc(url)}" />
     <meta property="og:image" content="${esc(image)}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@clbhouz" />
     <meta name="twitter:title" content="${esc(title)}" />

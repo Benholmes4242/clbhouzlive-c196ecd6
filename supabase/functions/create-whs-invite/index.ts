@@ -141,7 +141,7 @@ Deno.serve(async (req) => {
   const inviterFirstName = user.firstName ?? "your friend";
   const inviteeFirstName = friend.friend_name.split(",").pop()?.trim().split(" ")[0] ?? friend.friend_name;
   const shareMessage =
-    `Hi ${inviteeFirstName} — ${inviterFirstName} invited you to Clbhouz, the new social home for golf. ` +
+    `Hi ${inviteeFirstName}, ${inviterFirstName} invited you to clbhouz. ` +
     `Connect your England Golf handicap and we can compare rounds. Tap: ${shareUrl}`;
 
   return json({
