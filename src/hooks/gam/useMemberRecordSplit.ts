@@ -28,12 +28,12 @@ export function useMemberRecordSplit(userId: string | null | undefined, enabled 
     retry: false,
     queryFn: async (): Promise<MemberRecordSplit> => {
       if (!userId) return UNAVAILABLE();
-      const { data, error } = await (supabase.rpc as any)('get_member_record_split', {
+      const { data, error } = await supabase.rpc('get_member_record_split', {
         p_user_id: userId,
       });
       if (error || !Array.isArray(data)) return UNAVAILABLE();
       const byCourse = new Map<string, CourseRecordSplit>();
-      for (const r of data as Array<Record<string, unknown>>) {
+      for (const r of data) {
         if (typeof r?.course_id !== 'string') continue;
         byCourse.set(r.course_id, {
           contested: Number(r.contested) || 0,
