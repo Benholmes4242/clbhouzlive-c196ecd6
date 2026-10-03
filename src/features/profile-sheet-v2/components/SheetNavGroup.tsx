@@ -1,14 +1,14 @@
 /**
  * ProfileSheetV2 · SheetNavGroup
  *
- * Grouped card with View profile / Manage businesses / Settings and Manage Profile, plus
- * an admin-only Command Center row. Route strings verbatim from
+ * Grouped card with View profile / Manage businesses / Settings and manage profile, plus
+ * an admin-only Command centre row. Route strings verbatim from
  * src/components/profile/ProfileHubSheet.tsx (via its opener
  * PostingAsMenu.handleAccountHubNavigate):
  *   View profile             -> `/profile/${currentActor.id}`
  *   Manage businesses        -> '/businesses/manage'
- *   Settings and Manage Profile -> '/edit-profile?tab=settings'
- *   Command Center           -> '/admin/command-center'
+ *   Settings and manage profile -> '/edit-profile?tab=settings'
+ *   Command centre           -> '/admin/command-center'
  */
 
 import React from 'react';
@@ -24,6 +24,7 @@ const CHEVRON = '\u203A';
 type AnalyticsState = 'ready' | 'building' | 'disconnected';
 
 interface Props {
+  gutter: number;
   currentActor: { id: string; type: 'personal' | 'business' };
   isAdmin: boolean;
   onNavigate: (route: string) => void;
@@ -41,11 +42,12 @@ interface RowProps {
   onClick: () => void;
   trailing?: React.ReactNode;
   isLast?: boolean;
+  isFirst?: boolean;
   subLabel?: string;
   disabled?: boolean;
 }
 
-function Row({ label, onClick, trailing, isLast, subLabel, disabled }: RowProps) {
+function Row({ label, onClick, trailing, isFirst, subLabel, disabled }: RowProps) {
   return (
     <button
       type="button"
@@ -59,6 +61,7 @@ function Row({ label, onClick, trailing, isLast, subLabel, disabled }: RowProps)
         padding: '13px 0',
         background: 'transparent',
         border: 0,
+        borderTop: isFirst ? 0 : `1px solid ${A.SOFT}`,
         cursor: 'pointer',
         transition: 'transform 120ms ease',
         opacity: disabled ? 0.55 : 1,
@@ -82,6 +85,7 @@ function Row({ label, onClick, trailing, isLast, subLabel, disabled }: RowProps)
 }
 
 export default function SheetNavGroup({
+  gutter,
   currentActor,
   isAdmin,
   onNavigate,
@@ -123,15 +127,13 @@ export default function SheetNavGroup({
   return (
     <div
       style={{
-        margin: '12px 20px 0',
-        background: A.PANEL,
-        border: `1px solid ${A.BORDER}`,
-        borderRadius: 16,
-        padding: '4px 16px',
+        margin: '12px 0 0',
+        padding: `4px ${gutter}px`,
       }}
     >
       <Row
         label="View profile"
+        isFirst
         onClick={() => onNavigate(`/profile/${currentActor.id}`)}
       />
       {showAnalytics && (
@@ -166,13 +168,13 @@ export default function SheetNavGroup({
       />
 
       <Row
-        label="Settings and Manage Profile"
+        label="Settings and manage profile"
         onClick={() => onNavigate('/edit-profile?tab=settings')}
         isLast={!isAdmin}
       />
       {isAdmin && (
         <Row
-          label="Command Center"
+          label="Command centre"
           onClick={() => onNavigate('/admin/command-center')}
           isLast
           trailing={

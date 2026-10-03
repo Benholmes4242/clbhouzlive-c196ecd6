@@ -38,6 +38,9 @@ import HcpStrip from './components/HcpStrip';
 import QuickActionsRow from './components/QuickActionsRow';
 import SheetNavGroup from './components/SheetNavGroup';
 import SignOutRow from './components/SignOutRow';
+
+/** One side gutter for the sheet's unboxed content (quick actions + nav rows). */
+const SHEET_GUTTER = 20;
 import YourCourseAnalyticsSheet from './components/YourCourseAnalyticsSheet';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useWhsConnection } from '@/lib/whs/hooks';
@@ -238,11 +241,13 @@ export default function ProfileSheetV2({
                 onNavigate={onNavigate}
               />
               <QuickActionsRow
+                gutter={SHEET_GUTTER}
                 actorType={currentActor.type}
                 actorId={currentActor.id}
                 onNavigate={onNavigate}
               />
               <SheetNavGroup
+                gutter={SHEET_GUTTER}
                 currentActor={{ id: currentActor.id, type: currentActor.type }}
                 isAdmin={isAdmin}
                 onNavigate={onNavigate}
