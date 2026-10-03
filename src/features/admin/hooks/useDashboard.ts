@@ -32,6 +32,9 @@ export interface EgSyncHealth {
   total_connected: number;
   status_ok_count: number;
   auth_failed: number;
+  /** Connections whose last sync hit England Golf rate limiting. Absent until
+   *  docs/sql/eg_sync_four_runs_rename.sql is applied. */
+  rate_limited?: number;
   eg_unavailable: number;
   consecutive_failures_total: number;
   /** consecutive_failures >= 5: skipped by the normal sweep, surfaced here. */
