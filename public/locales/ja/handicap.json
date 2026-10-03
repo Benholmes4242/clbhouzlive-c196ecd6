@@ -104,7 +104,8 @@
     "milestonesSeeAll": "SEE ALL {{n}}",
     "cabinet": {
       "rounds": "ラウンド",
-      "since": "{{year}}年以降 <b>{{courses}}コース</b>"
+      "since_other": "Across <b>{{count}} courses</b> since {{year}}",
+      "thisYear_other": "<b>{{count}} rounds</b> this year"
     },
     "closest": "次のティアに最も近い記録",
     "allRecords": "全{{count}}件の記録",
