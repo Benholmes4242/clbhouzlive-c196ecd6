@@ -34,7 +34,7 @@
 import React from 'react';
 import { tierTone } from '../medalTone';
 import { useTranslation } from 'react-i18next';
-import { REC, LABEL } from '../tokens';
+import { REC } from '../tokens';
 import { MetaLabel } from '../Primitives';
 import { measuredShare } from '../shareModel';
 import { namedPartsFor } from '../criteria';
@@ -48,29 +48,6 @@ interface Props {
   /** Sparse account: the closing footnote says what appears as they play. */
   sparse?: boolean;
 }
-
-/** Row kicker: 9 / 700 / 0.12em, the sheet's one row-kicker treatment. */
-const ROW_KICKER: React.CSSProperties = { ...LABEL };
-
-const NAME: React.CSSProperties = {
-  fontSize: 14,
-  fontWeight: 600,
-  letterSpacing: '-0.015em',
-  color: REC.INK,
-};
-
-/** Row figures are 16. There is no other row figure size on this sheet. */
-const FIG = (color: string): React.CSSProperties => ({
-  fontSize: 16,
-  fontWeight: 700,
-  letterSpacing: '-0.03em',
-  color,
-  ...REC.TABULAR,
-  flexShrink: 0,
-});
-
-/** Sub-line: the catalogue description, 11 / T40. */
-const SUB: React.CSSProperties = { fontSize: 11, color: REC.DIM, lineHeight: 1.45 };
 
 /**
  * Short display names keyed by gam_badge_catalogue id; falls back to item.name.
