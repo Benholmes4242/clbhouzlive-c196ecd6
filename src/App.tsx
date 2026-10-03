@@ -37,6 +37,8 @@ import { MaintenanceGate } from "@/components/maintenance/MaintenanceGate";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import DeletedAccountGate from "@/components/DeletedAccountGate";
 import BootHold from "@/components/BootHold";
+import { hasStoredSession } from "@/utils/auth/hasStoredSession";
+import { PAGE_CANVAS } from "@/lib/tokens/surfaces";
 
 // REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted
 import { RehydrationProvider } from './contexts/RehydrationContext';
@@ -189,7 +191,18 @@ const RootGate: React.FC = () => {
   if (envStatus === 'pending') return <BootHold />;
   if (envStatus === 'web') return <AppDownloadGate />;
 
-  if (authLoading) return <BootHold />;
+  // Signed-in phone: go straight to Clubhouse, whose own skeleton covers the
+  // rest of the session resolve. Signed-out phone: a plain canvas hold (no
+  // logo) until INITIAL_SESSION lands and the /auth redirect takes over.
+  if (authLoading) {
+    if (hasStoredSession()) return <ClubhouseWrapped />;
+    return (
+      <div
+        aria-hidden
+        style={{ position: 'fixed', inset: 0, background: PAGE_CANVAS, zIndex: 2147483000 }}
+      />
+    );
+  }
   if (!user) return isActive ? <Navigate to="/auth" replace /> : null;
 
   if (suspension.status === 'suspended') {
