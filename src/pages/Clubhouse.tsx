@@ -141,11 +141,13 @@ const ClubhouseContent = () => {
   // Feed reach instrumentation. One feed, so this fires once per session as a
   // "a session reached the feed" signal.
   const feedViewedRef = useRef(false);
+  // Guarded on user?.id: Clubhouse now mounts during the session resolve.
   useEffect(() => {
+    if (!user?.id) return;
     if (feedViewedRef.current) return;
     feedViewedRef.current = true;
     analyticsEvents.track('feed_tab_viewed', { tab: 'merged' });
-  }, []);
+  }, [user?.id]);
 
   // Clear any previously registered Clubhouse island slot (the Suggested /
   // Friends toggle was the only occupant).
