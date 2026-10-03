@@ -146,7 +146,7 @@ export default function SheetNavGroup({
           // No trailing tag: this row takes the same chevron as View profile,
           // Invite friends and Manage businesses. The old amber "New" badge
           // replaced the chevron, making this the one row without one.
-          // `trailing` itself stays — Command Center's "Admin" tag uses it.
+          // `trailing` itself stays — Command centre's "Admin" tag uses it.
         />
       )}
       {currentActor.type === 'personal' && onInviteFriends && (
