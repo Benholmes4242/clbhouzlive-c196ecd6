@@ -310,7 +310,10 @@
       "bestSelf": "Your best {{unit}} here",
       "bestOther": "{{name}} best {{unit}} here",
       "matchedBestSelf": "Matched your best {{unit}} here",
-      "matchedBestOther": "Matched {{name}} best {{unit}} here"
+      "matchedBestOther": "Matched {{name}} best {{unit}} here",
+      "first_birdie": "First birdie on the {{hole}}",
+      "first_eagle": "First eagle on the {{hole}}",
+      "first_albatross": "First albatross on the {{hole}}"
     },
     "previous": "Previous best {{value}}",
     "placing": {
@@ -343,13 +346,43 @@
         "you": "{{score}}. Your best here was {{previous}}",
         "he": "{{score}}. His best here was {{previous}}",
         "she": "{{score}}. Her best here was {{previous}}",
-        "they": "{{score}}. Their best here was {{previous}}"
+        "they": "{{score}}. Their best here was {{previous}}",
+        "none": "{{score}}. Previous best here was {{previous}}."
       },
       "matched": {
         "you": "{{score}}, equalling your best here",
         "he": "{{score}}, equalling his best here",
         "she": "{{score}}, equalling her best here",
-        "they": "{{score}}, equalling their best here"
+        "they": "{{score}}, equalling their best here",
+        "none": "{{score}}, equalling the best here"
+      },
+      "firstUnder": {
+        "you": "Your first time under par here",
+        "he": "His first time under par here",
+        "she": "Her first time under par here",
+        "they": "Their first time under par here",
+        "none": "First time under par here"
+      },
+      "placed": {
+        "you": "{{score}}. Your {{place}} best {{unit}} here, from {{count}}.",
+        "he": "{{score}}. His {{place}} best {{unit}} here, from {{count}}.",
+        "she": "{{score}}. Her {{place}} best {{unit}} here, from {{count}}.",
+        "they": "{{score}}. Their {{place}} best {{unit}} here, from {{count}}.",
+        "none": "{{score}}. {{place}} best {{unit}} here, from {{count}}."
+      },
+      "topTen": {
+        "you": "{{score}}. Inside your best ten {{unitPlural}} here, from {{count}}.",
+        "he": "{{score}}. Inside his best ten {{unitPlural}} here, from {{count}}.",
+        "she": "{{score}}. Inside her best ten {{unitPlural}} here, from {{count}}.",
+        "they": "{{score}}. Inside their best ten {{unitPlural}} here, from {{count}}.",
+        "none": "{{score}}. Inside the best ten {{unitPlural}} here, from {{count}}."
+      },
+      "newBestBare": {
+        "you": "{{score}}. Your best here.",
+        "he": "{{score}}. His best here.",
+        "she": "{{score}}. Her best here.",
+        "they": "{{score}}. Their best here.",
+        "none": "{{score}}. Best here."
       }
     },
     "scoreName": {
@@ -370,6 +403,16 @@
       "double": "a double bogey",
       "triple": "a triple bogey"
     },
-    "points": "{{count}} points"
+    "points": "{{count}} points",
+    "placeUnit": {
+      "round": "round",
+      "roundPlural": "rounds",
+      "nine": "nine",
+      "ninePlural": "nines",
+      "stretch": "finish",
+      "stretchPlural": "finishes",
+      "score": "score",
+      "scorePlural": "scores"
+    }
   }
 }

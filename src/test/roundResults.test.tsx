@@ -48,14 +48,14 @@ describe('round results', () => {
       efforts: [],
       awards: [
         { award_kind: 'new_best', unit_kind: 'front_nine', unit_key: 0, tier: 'gold', value: -2, previous_value: -1, delta: 1, rank_here: 1, attempts_at_detection: 55 },
-        { award_kind: 'first_birdie', unit_kind: 'hole', unit_key: 7, tier: 'bronze', value: -1, previous_value: null, delta: null, rank_here: 1, attempts_at_detection: 0 },
+        { award_kind: 'first_birdie', unit_kind: 'hole', unit_key: 7, tier: 'bronze', value: -2, previous_value: null, delta: null, rank_here: 1, attempts_at_detection: 0 },
       ],
     };
     const { container } = render(<RoundResults result={result} />);
     expect(container.querySelectorAll('[data-round-results-block]')).toHaveLength(2);
     expect(container.querySelector('[data-round-results-block="awards"] [data-round-award="front_nine"]')).not.toBeNull();
     const hole = container.querySelector('[data-round-results-block="holes"] [data-round-award="hole"]');
-    expect(hole?.textContent).toContain('roundResults.award.firstBirdie');
+    expect(hole?.textContent).toContain('roundResults.award.first_eagle');
     expect(hole?.children).toHaveLength(2);
   });
 });
