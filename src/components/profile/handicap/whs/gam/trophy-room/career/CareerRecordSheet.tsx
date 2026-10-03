@@ -28,6 +28,7 @@ import { useCareerRounds } from '@/hooks/gam/useCareerRounds';
 import { useCourseFieldSizes } from '@/hooks/gam/useCourseFieldSizes';
 import { useCourseFieldPlayers } from '@/hooks/gam/useCourseFieldPlayers';
 import { useMemberStandings } from '@/hooks/gam/useMemberStandings';
+import { useMemberRecordSplit } from '@/hooks/gam/useMemberRecordSplit';
 import { Skeleton } from '@/components/ui/skeleton';
 import { normalizeBadge, normalizeLegend } from '../_shared/normalizeTrophyItem';
 import { isTop100Achievement } from '../_shared/showpieces';
@@ -60,6 +61,7 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
   const [open, setOpen] = useState(false);
   /* Where you stand: one call, opened with the sheet. */
   const { data: standingsRows } = useMemberStandings(userId, open);
+  const { data: recordSplitData } = useMemberRecordSplit(userId, open);
   const standings = standingsRows ?? [];
   const [view, setView] = useState<CareerView>({ kind: 'room' });
   const [tab, setTab] = useState<CareerTab>('records');
@@ -153,6 +155,8 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
       fieldSizes: fieldSizes ?? new Map(),
       fieldPlayers: fieldPlayers?.sizes,
       fieldPlayersAvailable: fieldPlayers?.available ?? false,
+      recordSplitByCourse: recordSplitData?.byCourse ?? new Map(),
+      recordSplitAvailable: recordSplitData?.available ?? false,
       config: config ?? RECORD_CONFIG_DEFAULTS,
       onOpen,
     }),
@@ -169,6 +173,7 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
       distribution,
       fieldSizes,
       fieldPlayers,
+      recordSplitData,
       config,
       onOpen,
     ],
