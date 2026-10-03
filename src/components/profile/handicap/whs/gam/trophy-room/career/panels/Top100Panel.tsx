@@ -128,16 +128,16 @@ export const Top100Panel: React.FC<Props> = ({ data, items }) => {
                 {label}
               </span>
               <span style={{ fontSize: 12.5, color: REC.MUTE, ...REC.TABULAR }}>
-                {zero ? t('career.top100NotStarted') : `${count} of 100 played · ${100 - count} to go`}
+                {zero ? t('career.top100NotStarted') : t('career.top100PlayedToGo', { count, toGo: 100 - count })}
               </span>
               {standing.kind === 'share' && (
                 <span style={{ fontSize: 11.5, fontWeight: 700, color: REC.GOOD, ...REC.TABULAR }}>
-                  Ahead of {standing.pct}% of members
+                  {t('career.top100Ahead', { pct: standing.pct })}
                 </span>
               )}
               {standing.kind === 'ordinal' && (
                 <span style={{ fontSize: 11.5, fontWeight: 700, color: REC.GOOD, ...REC.TABULAR }}>
-                  Among the top {standing.members} of any member
+                  {t('career.top100AmongTop', { members: standing.members })}
                 </span>
               )}
             </span>

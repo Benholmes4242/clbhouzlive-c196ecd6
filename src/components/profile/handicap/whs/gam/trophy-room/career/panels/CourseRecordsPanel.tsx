@@ -129,7 +129,9 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
       title={t('career.recordsKicker')}
       action={
         <MetaLabel>
-          {available ? `${won} WON · ${uncontested} UNCONTESTED` : `${total} HELD`}
+          {available
+            ? t('career.recordsWonUncontested', { won, uncontested })
+            : t('career.recordsTotalHeld', { total })}
         </MetaLabel>
       }
     >
@@ -146,9 +148,9 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
           const dim = contested === 0;
           const count = dim ? sole : contested;
           const note = dim
-            ? { text: 'nobody else yet', color: REC.DIM }
+            ? { text: t('career.recordsNobodyElseYet'), color: REC.DIM }
             : sole > 0
-              ? { text: `+${sole} uncontested`, color: REC.INK_50 }
+              ? { text: t('career.recordsPlusUncontested', { n: sole }), color: REC.INK_50 }
               : null;
           return (
             <button

@@ -1,6 +1,10 @@
 import React from 'react';
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import handicapEn from '../../public/locales/en/handicap.json';
 
 import { StandingsPanel } from '@/components/profile/handicap/whs/gam/trophy-room/career/panels/StandingsPanel';
 import {
@@ -55,8 +59,22 @@ vi.mock('@/hooks/gam/useCourseFieldSizes', () => ({
 vi.mock('@/hooks/gam/useCourseFieldPlayers', () => ({
   useCourseFieldPlayers: () => ({ data: undefined }),
 }));
+vi.mock('@/hooks/gam/useMemberRecordSplit', () => ({
+  useMemberRecordSplit: () => ({ data: { available: true, byCourse: new Map() }, isLoading: false }),
+}));
 
 afterEach(cleanup);
+
+/* The trophy room reads its strings from the handicap namespace (B7); load the
+   real English file so every text assertion reads the shipped copy. */
+void i18n.use(initReactI18next).init({
+  lng: 'en',
+  fallbackLng: 'en',
+  ns: ['handicap'],
+  defaultNS: 'handicap',
+  resources: { en: { handicap: handicapEn } },
+  interpolation: { escapeValue: false },
+});
 
 /**
  * BRIEF_TROPHY_ROOM_STANDINGS — every fixture below is a LIVE row read from
@@ -145,39 +163,45 @@ const HANKLEY = row({
 });
 
 function draw(rows: MemberStandingRow[]) {
-  return render(<StandingsPanel rows={rows} />).container;
+  return render(
+    <MemoryRouter>
+      <StandingsPanel rows={rows} />
+    </MemoryRouter>,
+  ).container;
 }
 
 describe('Trophy Room · where you stand', () => {
-  it('Sundridge Park East stableford: GOLD disc, 1 of 17, shared with 3 and clear by 1', () => {
+  /* B7: the panel is an accordion and no longer prints the standing line, so
+     each disc test asserts the disc on the open course's table and the line
+     through standingLine() directly. The '1of 17' text became '1': the field
+     size left the disc in B4. */
+  it('Sundridge Park East stableford: GOLD disc, rank 1, shared with 3 and clear by 1', () => {
     const c = draw([SUNDRIDGE_STABLEFORD]);
     const disc = c.querySelector<HTMLElement>('[data-standing-disc]');
     expect(disc?.dataset.standingDisc).toBe('gold');
-    expect(disc?.textContent).toBe('1of 17');
-    expect(c.querySelector('[data-standing-line="true"]')?.textContent).toBe(
-      'Shared with 3 · clear by 1',
-    );
+    expect(disc?.textContent).toBe('1');
+    expect(standingLine(SUNDRIDGE_STABLEFORD)).toBe('Shared with 3 · clear by 1');
     expect(tiedWith(SUNDRIDGE_STABLEFORD)).toBe(3);
   });
 
-  it('Queenwood: DASHED disc, 1 of 1, only card on this board', () => {
+  it('Queenwood: DASHED disc, rank 1, only card on this board', () => {
     const c = draw([QUEENWOOD]);
     const disc = c.querySelector<HTMLElement>('[data-standing-disc]');
     expect(disc?.dataset.standingDisc).toBe('plain');
-    expect(disc?.firstElementChild).toHaveProperty('style');
     expect((disc?.firstElementChild as HTMLElement).style.border).toContain('dashed');
-    expect(disc?.textContent).toBe('1of 1');
-    expect(c.querySelector('[data-standing-line="true"]')?.textContent).toBe(
-      'Only card on this board',
-    );
+    expect(disc?.textContent).toBe('1');
+    expect(standingLine(QUEENWOOD)).toBe('Only card on this board');
   });
 
-  it('Vale do Lobo rounds played: under AT THIS COURSE with NO disc at all', () => {
+  it('Vale do Lobo rounds played: a tenure board renders its VALUE as text in ALL TIME, with NO disc', () => {
     const c = draw([VALE_ROUNDS]);
     expect(c.querySelector('[data-standing-disc]')).toBeNull();
-    expect(c.textContent).toContain('At this course');
-    expect(c.textContent).not.toContain('Standings');
-    expect(c.querySelector('[data-standing-row="most_rounds_all_time"]')).not.toBeNull();
+    const boardRow = c.querySelector<HTMLElement>('[data-standing-row="most_rounds"]');
+    expect(boardRow).not.toBeNull();
+    const cells = boardRow!.children;
+    /* label, 90 DAYS, ALL TIME */
+    expect(cells[1].textContent).toBe('');
+    expect(cells[2].textContent).toBe('1');
   });
 
   it('rank > 3 with a medal renders the solid "placed" disc, distinct from bronze and dashed', () => {
@@ -191,9 +215,22 @@ describe('Trophy Room · where you stand', () => {
     expect(inner.style.background).toBe(hexToRgbString(MEMBER_CELL));
     expect(discState({ ...HANKLEY, rank: 3 })).toBe('bronze');
     expect(discState({ ...HANKLEY, medal_earned: false })).toBe('plain');
-    expect(c.querySelector('[data-standing-line="true"]')?.textContent).toBe(
-      '1 off the player above · 6 off the lead',
-    );
+    expect(standingLine(HANKLEY)).toBe('1 off the player above · 6 off the lead');
+  });
+
+  it('opens the first course by default; tapping a second course closes the first', () => {
+    const c = draw([SUNDRIDGE_STABLEFORD, HANKLEY]);
+    const course = (id: string) => c.querySelector<HTMLElement>(`[data-standing-course="${id}"]`)!;
+    const header = (id: string) => course(id).querySelector<HTMLButtonElement>('button')!;
+    expect(header('sundridge').getAttribute('aria-expanded')).toBe('true');
+    expect(course('sundridge').querySelector('[data-standing-disc]')).not.toBeNull();
+    expect(header('hankley').getAttribute('aria-expanded')).toBe('false');
+    expect(course('hankley').querySelector('[data-standing-disc]')).toBeNull();
+    act(() => header('hankley').click());
+    expect(header('hankley').getAttribute('aria-expanded')).toBe('true');
+    expect(course('hankley').querySelector('[data-standing-disc]')).not.toBeNull();
+    expect(header('sundridge').getAttribute('aria-expanded')).toBe('false');
+    expect(course('sundridge').querySelector('[data-standing-disc]')).toBeNull();
   });
 
   it('picks ONE line, in the brief order, from the named columns only', () => {
@@ -250,7 +287,11 @@ describe('BRIEF_STANDINGS_FOLLOWUPS · the empty branch', () => {
   const SHEET_USER = '11111111-1111-1111-1111-111111111111';
 
   function mountSheet() {
-    return render(<CareerRecordSheet userId={SHEET_USER} />);
+    return render(
+      <MemoryRouter>
+        <CareerRecordSheet userId={SHEET_USER} />
+      </MemoryRouter>,
+    );
   }
 
   it('a member with standings and no badges sees standings, never "Nothing on the record yet"', async () => {

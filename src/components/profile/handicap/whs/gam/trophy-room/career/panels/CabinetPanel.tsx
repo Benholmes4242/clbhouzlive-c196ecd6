@@ -16,6 +16,7 @@
  * Nothing to show: the band does not render. Never a placeholder, never a zero.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Medal } from 'lucide-react';
 import { REC } from '../tokens';
 import { measuredShare } from '../shareModel';
@@ -41,6 +42,7 @@ interface Tile {
 }
 
 export const CabinetPanel: React.FC<Props> = ({ data, items, split, onShowCourses }) => {
+  const { t } = useTranslation('handicap');
   const floor = data.config.shareMinDenominator;
   const pieces = items
     .filter((a) => SHOWPIECE_BADGE_IDS.has(a.badgeId) && !isTop100Achievement(a.badgeId) && (a.currentValue ?? 0) > 0)
@@ -68,7 +70,7 @@ export const CabinetPanel: React.FC<Props> = ({ data, items, split, onShowCourse
       key: 'records',
       tone: MEDAL_GOLD,
       value: split.available ? split.won : split.total,
-      label: split.available ? 'RECORDS WON' : 'RECORDS HELD',
+      label: split.available ? t('career.cabinetRecordsWon') : t('career.cabinetRecordsHeld'),
       onClick: onShowCourses,
     });
   }
