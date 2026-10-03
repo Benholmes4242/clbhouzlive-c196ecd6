@@ -49,7 +49,8 @@ export type ResolvedAward = {
  * and must not share a sentence.
  *
  * Equalling your best is a SILVER with its own kind (matched_best) so the copy
- * can say "Matched your best here" rather than "second best here".
+ * can say "Matched your best here" rather than "second best here". This applies
+ * to coarse units only — holes earn no placings at all (see resolveAwards).
  *
  * RANK COMES FROM THIS ROW AND NOWHERE ELSE. The tier and the rank are two
  * readings of one comparison, so they are taken from one source; derived from
