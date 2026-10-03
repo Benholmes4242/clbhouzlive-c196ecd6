@@ -101,8 +101,17 @@ export function recordSplit(
 export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   const { t } = useTranslation('handicap');
 
+  const { available, won, uncontested, total } = recordSplit(data, groups);
+
+  // Split unavailable (RPC errored): rows come from `groups`, counting
+  // non-attendance records. Carried as contested with sole 0 so the row is
+  // neither dimmed nor noted; the sort reduces to count desc, then name.
   const rows = groups
     .map((group) => {
+      if (!available) {
+        const n = group.records.filter((r) => !TENURE_CATEGORIES.has(String(r.category))).length;
+        return { group, contested: n, sole: 0 };
+      }
       const s = data.recordSplitByCourse.get(group.courseId);
       return { group, contested: s?.contested ?? 0, sole: s?.sole ?? 0 };
     })
@@ -113,8 +122,6 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
         b.sole - a.sole ||
         a.group.courseName.localeCompare(b.group.courseName),
     );
-
-  const { available, won, uncontested, total } = recordSplit(data, groups);
   if (rows.length === 0 && total === 0) return null;
 
   return (
