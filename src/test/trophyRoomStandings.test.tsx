@@ -74,7 +74,6 @@ void i18n.use(initReactI18next).init({
   defaultNS: 'handicap',
   resources: { en: { handicap: handicapEn } },
   interpolation: { escapeValue: false },
-  initImmediate: false,
 });
 
 /**
