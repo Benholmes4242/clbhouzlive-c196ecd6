@@ -685,8 +685,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      to be asked for a county or a country, so a chosen place is expressed in that
      same vocabulary rather than in a second filtering path: the place supplies
      the county and country, and the scope the ranker is asked for becomes
-     'county' (a region was chosen) or 'country'. The chips stay usable — a member
-     who then picks My club is asking a narrower question and gets it. */
+     'county' (a region was chosen) or 'country'. UNREACHABLE while the Scores
+     stream is off — every consumer of streamGeo and serverScope (the main stream
+     read, fallbackWanted, the client ranker) is gated off for Scores. This branch
+     is the documented rollback: re-enabling the Scores stream is a one-line
+     change at the boardPick useState below, and that reversal needs this branch
+     intact. Do NOT delete it as dead code. */
   const placeScoped = view === 'scores' && place !== null;
   const streamGeo = placeScoped
     ? { ...geography.scope, county: place?.region ?? null, country: place?.country ?? null }
@@ -709,7 +713,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   /* BRIEF_FEATURED_ROUND_SCOPE — the hero's scope is literally 'world', never
      serverScope. All is UNSCOPED: get_explore_stream short-circuits its scope
      filter on v_view = 'all' and All shows no scope chip row, so serverScope
-     (= chipScope, i.e. whatever the member last picked on SCORES) is invisible
+     (= chipScope, the All view's own scope, now always the literal 'world' —
+     Scores no longer feeds it a member-picked value) is invisible
      to them here. A club-scoped hero above an unscoped feed makes the strapline
      false at the scale the page is showing. Geography still passes through
      unchanged — get_featured_round ignores club/county/country when p_scope is
@@ -1637,9 +1642,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [t],
   );
 
-  /** §5d THE ONE EMPTY SENTENCE of these two views names the scope the member is
-   *  looking at, so the row above it is the way out. The county and country names
-   *  are DATA; "your club", "your circle" and "the world" are the translated ones. */
+  /** §5d THE ONE EMPTY SENTENCE of the merged Courses view (Courses and Reviews
+   *  are one surface; Scores never renders it — it has no scope row). It names
+   *  the scope the member is looking at, so the row above it is the way out. The
+   *  county and country names are DATA; "your club", "your circle" and "the
+   *  world" are the translated ones. */
   const scopeName =
     activeScope === 'club'
       ? geography.scope.primaryClubName ?? t('amateur.stream.scope.yourClub', 'your club')
