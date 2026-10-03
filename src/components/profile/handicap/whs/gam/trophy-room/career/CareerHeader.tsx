@@ -38,22 +38,28 @@ export const CareerHeader: React.FC<Props> = ({ data }) => {
             <span style={{ fontSize: 17, fontWeight: 600, color: REC.INK }}>{t('career.cabinet.rounds')}</span>
           </div>
           {since ? (
-            <div style={{ marginTop: 6, fontSize: 14, color: REC.MUTE, ...REC.TABULAR }}>
-              <Trans
-                t={t}
-                i18nKey="career.cabinet.since"
-                values={{ courses, year: since }}
-                components={{ b: <span style={{ color: REC.INK, fontWeight: 600 }} /> }}
-              />
-              {thisYear > 0 ? (
+            <>
+              <div style={{ marginTop: 6, fontSize: 14, color: REC.MUTE, ...REC.TABULAR }}>
                 <Trans
                   t={t}
-                  i18nKey="career.cabinet.thisYear"
-                  values={{ n: thisYear }}
+                  i18nKey="career.cabinet.since"
+                  count={courses}
+                  values={{ count: courses, year: since }}
                   components={{ b: <span style={{ color: REC.INK, fontWeight: 600 }} /> }}
                 />
+              </div>
+              {thisYear > 0 ? (
+                <div style={{ marginTop: 3, fontSize: 14, color: REC.MUTE, ...REC.TABULAR }}>
+                  <Trans
+                    t={t}
+                    i18nKey="career.cabinet.thisYear"
+                    count={thisYear}
+                    values={{ count: thisYear }}
+                    components={{ b: <span style={{ color: REC.INK, fontWeight: 600 }} /> }}
+                  />
+                </div>
               ) : null}
-            </div>
+            </>
           ) : null}
         </>
       ) : (
