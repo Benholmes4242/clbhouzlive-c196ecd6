@@ -12,6 +12,9 @@ import { useBoardFacets } from '@/components/explore-tab-new/courseled/hooks/use
 import { useBoardPage } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+import { useAvailableWeekScopes } from '@/components/explore-tab-new/courseled/hooks/useGolfThisWeek';
+import type { ScopeKey } from '@/components/explore-tab-new/courseled/boardFilters';
+
 import { useCircleSize } from './useCircleSize';
 
 /**
@@ -44,17 +47,38 @@ import { useCircleSize } from './useCircleSize';
 /** One read serves the visible cut, the pinned own row and the panel's count. */
 const PAGE_FETCH = 200;
 
-/** §1 — the one entry state, always. */
+/** §1 — the one entry board, always. */
 export const ENTRY_BOARD: BoardKey = 'recent';
-export const ENTRY_FILTERS: BoardFilters = normalizeFilters({
-  ...DEFAULT_FILTERS,
-  scope: 'circle',
-  window: '14',
-  courses: 'any',
-});
+
+/** BRIEF_SCORES_RETIRE_THE_GEOGRAPHY_RAIL §3 — THE DEFAULT SCOPE IS A LADDER.
+ *  The first rung that applies to this member wins. Reorder here, nowhere else. */
+export const SCOPE_LADDER: ScopeKey[] = ['club', 'circle', 'everyone'];
+
+/** Everything but scope is fixed; scope is resolved from SCOPE_LADDER. */
+export function entryFiltersFor(scope: ScopeKey): BoardFilters {
+  return normalizeFilters({ ...DEFAULT_FILTERS, scope, window: '14', courses: 'any' });
+}
+
+/** The pre-ladder shape, kept for callers that need a static value. */
+export const ENTRY_FILTERS: BoardFilters = entryFiltersFor('circle');
+
+/** §6 — SHEET-ONLY AXES that differ from the default. Scope and board are
+ *  stated on the page and are deliberately NOT counted. Max 5. */
+export function sheetOnlyDiffCount(f: BoardFilters, d: BoardFilters): number {
+  let n = 0;
+  if (f.window !== d.window) n += 1;
+  if (f.regionKind !== d.regionKind || f.regionValue !== d.regionValue) n += 1;
+  if (f.courses !== d.courses || f.courseId !== d.courseId) n += 1;
+  if (f.band !== d.band) n += 1;
+  if (f.competition !== d.competition) n += 1;
+  return n;
+}
 
 export function useAmateurBoardState(userId: string | undefined, active = true) {
   const [filters, setFilters] = useState<BoardFilters>(ENTRY_FILTERS);
+  /* The resolved default. null until the ladder has resolved, and the board
+     reads stay off until then — never render on one scope and swap. */
+  const [entry, setEntry] = useState<BoardFilters | null>(null);
   const [board, setBoard] = useState<BoardKey>(ENTRY_BOARD);
   const [courseBoard, setCourseBoard] = useState<CourseBoardKey>('played');
   const [panelOpen, setPanelOpen] = useState(false);
@@ -68,20 +92,36 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
      failure. `null` while unknown: we never guess. */
   const circle = useCircleSize(userId, !!userId);
   const hasCircle = circle.data == null ? null : circle.data > 0;
+  /* §3 — the club gate that already exists (HOME_CLUB_MIN_MEMBERS). */
+  const weekScopes = useAvailableWeekScopes(userId);
+  const clubApplies = weekScopes.scopes.includes('home_club');
+  const ladderKnown = !!userId && weekScopes.ready && circle.isFetched;
 
-  const facets = useBoardFacets(userId, board, filters, { enabled: active });
+  /* RESOLVES ONCE, when availability is known. */
+  useEffect(() => {
+    if (entry !== null || !ladderKnown) return;
+    const applies: Record<ScopeKey, boolean> = {
+      club: clubApplies,
+      circle: hasCircle === true,
+      everyone: true,
+    } as Record<ScopeKey, boolean>;
+    const scope = SCOPE_LADDER.find((k) => applies[k]) ?? 'everyone';
+    const next = entryFiltersFor(scope);
+    setEntry(next);
+    if (!touched.current) setFilters(next);
+  }, [entry, ladderKnown, clubApplies, hasCircle]);
+
+  const resolved = entry !== null;
+  const entryFilters = entry ?? ENTRY_FILTERS;
+
+  const facets = useBoardFacets(userId, board, filters, { enabled: active && resolved });
   /* ONE READ, TWO READERS. The leaderboard block renders these rows and the
      filter panel states their count; react-query serves both from the same key,
      so the count in the panel can never disagree with the rows on the page. */
-  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: active });
+  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: active && resolved });
 
-  /* D — NO CIRCLE, NO CIRCLE FILTER. The entry state resolves to Everyone
-     before any board read lands on an empty circle, so a member who follows
-     nobody never sees a board flicker through empty. */
-  useEffect(() => {
-    if (touched.current || hasCircle !== false) return;
-    setFilters((prev) => (prev.scope === 'everyone' ? prev : normalizeFilters({ ...prev, scope: 'everyone' })));
-  }, [hasCircle]);
+  /* D — NO CIRCLE: the ladder above skips the circle rung, so the entry
+     filter is already Everyone before any board read is issued. */
 
   /* C — A CIRCLE THAT SAID NOTHING THIS FORTNIGHT. The list becomes Everyone
      and `widened` makes the page say so. Once, and only while the member has
@@ -123,8 +163,8 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
     touched.current = true;
     setWidened(false);
     analyticsEvents.track('amateur_filter_reset', {});
-    setFilters({ ...ENTRY_FILTERS });
-  }, []);
+    setFilters({ ...entryFilters });
+  }, [entryFilters]);
 
   /* §3 B — THE MEMBER WIDENS A THIN CIRCLE THEMSELVES. It writes the same
      filter object the rail reads, so the chips and the count move with it. */
@@ -142,15 +182,28 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
     touched.current = true;
     setWidened(false);
     analyticsEvents.track('amateur_filter_reset', {});
-    setFilters({ ...ENTRY_FILTERS });
+    setFilters({ ...entryFilters });
     setBoard(ENTRY_BOARD);
-  }, []);
+  }, [entryFilters]);
 
-  const canReset = !sameFilters(filters, ENTRY_FILTERS) || board !== ENTRY_BOARD;
+  /* ONE DEFAULT OBJECT for the Reset button and the Filters badge. */
+  const canReset = !sameFilters(filters, entryFilters) || board !== ENTRY_BOARD;
+  const sheetFilterCount = sheetOnlyDiffCount(filters, entryFilters);
+
+  /* §7 — the page's segmented control writes scope through here. */
+  const changeScope = useCallback((next: ScopeKey) => {
+    touched.current = true;
+    setWidened(false);
+    setFilters((prev) => {
+      if (prev.scope !== next) analyticsEvents.track('amateur_scope_changed', { view: 'scores', from: prev.scope, to: next });
+      return normalizeFilters({ ...prev, scope: next });
+    });
+  }, []);
 
   return useMemo(
     () => ({
-      ready: true,
+      ready: resolved,
+      clubApplies,
       board,
       filters,
       courseBoard,
@@ -173,9 +226,11 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
       resetFilters,
       resetAll,
       canReset,
+      sheetFilterCount,
+      changeScope,
       seeEveryone,
     }),
-    [board, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, resetAll, canReset, seeEveryone],
+    [resolved, clubApplies, sheetFilterCount, changeScope, board, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, resetAll, canReset, seeEveryone],
   );
 }
 
