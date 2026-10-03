@@ -455,13 +455,22 @@ export const TrophyRoomRow: React.FC<{ userId?: string }> = ({ userId }) => {
           <ChevronRight size={18} strokeWidth={2.4} color={A.AMBER} />
         </span>
         {figures.length > 0 && (
-          <span aria-hidden style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 12 }}>
+          /*
+           * BUDGET: three stacked figures share ~324px (390pt card less the
+           * panel's 16px padding) with captions at 9px / 700 / 0.1em nowrap.
+           * "RECORDS WON" brings the row to 308px; "RECORDS HELD" to ~315.
+           * There is no room for a fourth figure or a longer caption. No
+           * flex-wrap on purpose: an overflow must show, not silently reflow.
+           */
+          <span aria-hidden style={{ display: 'flex', gap: 14, marginTop: 12 }}>
             {figures.map((f) => (
-              <span key={f.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <AwardMark tier={f.tier} size="pill" glyph={f.glyph} />
-                <span style={{ fontSize: 15, fontWeight: 700, color: CHART.INK, ...FIG, letterSpacing: 0 }}>{f.value}</span>
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: CHART.MUTE }}>
-                  {f.label}
+              <span key={f.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+                <AwardMark tier={f.tier} size="sheet" glyph={f.glyph} />
+                <span style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: 17, fontWeight: 700, lineHeight: 1, color: CHART.INK, ...FIG, letterSpacing: 0 }}>{f.value}</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.MUTE, marginTop: 3, whiteSpace: 'nowrap' }}>
+                    {f.label}
+                  </span>
                 </span>
               </span>
             ))}
