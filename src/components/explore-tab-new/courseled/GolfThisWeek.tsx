@@ -111,6 +111,9 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
      for the rest of the session. */
   const entry = useDiscoverEntryBoard(userId);
   const [pickedBoard, setBoard] = useState<BoardKey | null>(null);
+  /* pickedBoard is seeded by the entry effect, so it is never null once ready;
+     this marks a MEMBER pick, which is what "changed from default" means. */
+  const [boardTouched, setBoardTouched] = useState(false);
   const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
 
   /* Nothing is special-cased downstream: the entry pick is applied as a board
@@ -185,6 +188,15 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
   const changeBoard = useCallback((next: BoardKey) => {
     analyticsEvents.track('discover_board_category_change', { board: next });
     setBoard(next);
+    setBoardTouched(true);
+  }, []);
+
+  /* Reset clears filters AND the board pick. pickedBoard → null makes the entry
+     effect re-seed board/window/scope from the member's own default chain. */
+  const resetAll = useCallback(() => {
+    setBoardTouched(false);
+    setFilters(null);
+    setBoard(null);
   }, []);
 
   const changeFilters = useCallback((next: BoardFilters) => {
@@ -371,6 +383,8 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
         userId={userId}
         board={board}
         onBoardChange={changeBoard}
+        boardChanged={boardTouched && pickedBoard !== entry.board}
+        onReset={resetAll}
         resultCount={total}
         filters={filters}
         onChange={changeFilters}

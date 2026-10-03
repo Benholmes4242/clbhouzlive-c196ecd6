@@ -244,6 +244,11 @@ export interface BoardFilterPanelProps {
   userId: string | undefined;
   board: BoardKey;
   onBoardChange: (next: BoardKey) => void;
+  /** True when the board differs from the member's resolved default. */
+  boardChanged?: boolean;
+  /** One action: the caller clears the filters AND the board pick, so the
+      board re-resolves through the member's own default chain. */
+  onReset: () => void;
   resultCount: number;
   filters: BoardFilters;
   onChange: (next: BoardFilters) => void;
@@ -256,6 +261,8 @@ export function BoardFilterPanel({
   userId,
   board,
   onBoardChange,
+  boardChanged = false,
+  onReset,
   resultCount,
   filters,
   onChange,
@@ -420,7 +427,7 @@ export function BoardFilterPanel({
         <button
           type="button"
           disabled={atDefaults}
-          onClick={() => onChange({ ...DEFAULT_FILTERS })}
+          onClick={onReset}
           style={{
             flexShrink: 0,
             background: 'transparent',
@@ -478,7 +485,7 @@ export function BoardFilterPanel({
 
             {/* S2.2 — RANKED BY keeps the Rankings / Feats split. A feat IS a
                 board, not an axis laid over one, and the split is how that reads. */}
-            <SectionLabel>{t('discover.filterBoard.rankedBy', 'Ranked by')}</SectionLabel>
+            <SectionLabel changed={boardChanged}>{t('discover.filterBoard.rankedBy', 'Ranked by')}</SectionLabel>
             <SubLabel>{t('discover.filterBoard.rankings', 'Rankings')}</SubLabel>
             <ChipWrap>
               {RANKING_BOARD_KEYS.map((key) => (
@@ -697,7 +704,7 @@ export function BoardFilterPanel({
   );
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SectionLabel({ children, changed = false }: { children: React.ReactNode; changed?: boolean }) {
   return (
     <div
       style={{
@@ -706,7 +713,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
         letterSpacing: '0.13em',
         textTransform: 'uppercase',
         padding: '22px 16px 9px',
-        color: A.DIM,
+        color: changed ? A.INK : A.DIM,
       }}
     >
       {children}
