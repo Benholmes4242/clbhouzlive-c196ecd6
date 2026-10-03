@@ -1,19 +1,19 @@
 /**
- * THE CABINET — up to three medal tiles under the career header.
+ * THE CABINET — the band under the career header.
  *
- * WHICH THREE: the member's SHOWPIECES (SHOWPIECE_BADGE_IDS — the one list,
- * never a second) with a non-zero count, ordered BY RARITY ASCENDING.
+ * SHOWPIECES: at most TWO tiles, drawn only from first_birdie / first_eagle /
+ * hole_in_one (SHOWPIECE_BADGE_IDS) with a non-zero count. Top 100 is excluded
+ * because it has its own tab.
  *
- * THIS DELIBERATELY DIVERGES FROM LIFETIME_ORDER, which leads with birdies.
- * A cabinet shows what is rare; 323 birdies is volume and belongs in the list
- * below, not behind glass. Do not "harmonise" the two orders.
+ * RARITY SORT (unchanged): ascending population share from data.shares via
+ * measuredShare; below the denominator floor the member's own count ascending
+ * stands in. This deliberately diverges from LIFETIME_ORDER — do not harmonise.
  *
- * Rarity is the population share the sheet already loads (data.shares via
- * measuredShare). Below the denominator floor there is no honest share, so the
- * member's own count ascending stands in. No new rarity source.
+ * RECORDS TILE: alongside the showpieces, a RECORDS WON tile (RECORDS HELD when
+ * the field read is unavailable) fed by recordSplit(), shared with the Courses
+ * tab. Tapping it switches the sheet to the Courses tab.
  *
- * Fewer than three: only what exists, same tile width, left-aligned. None: the
- * band does not render. Never a placeholder, never a zero.
+ * Nothing to show: the band does not render. Never a placeholder, never a zero.
  */
 import React from 'react';
 import { Medal } from 'lucide-react';

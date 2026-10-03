@@ -46,10 +46,12 @@ export const CareerHeader: React.FC<Props> = ({ data }) => {
                 components={{ b: <span style={{ color: REC.INK, fontWeight: 600 }} /> }}
               />
               {thisYear > 0 ? (
-                <>
-                  {' · '}
-                  <span style={{ color: REC.INK, fontWeight: 600 }}>{thisYear}</span> this year
-                </>
+                <Trans
+                  t={t}
+                  i18nKey="career.cabinet.thisYear"
+                  values={{ n: thisYear }}
+                  components={{ b: <span style={{ color: REC.INK, fontWeight: 600 }} /> }}
+                />
               ) : null}
             </div>
           ) : null}

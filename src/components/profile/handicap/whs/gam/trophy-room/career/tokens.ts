@@ -35,6 +35,17 @@ export const REC = {
   HOLLOW_GLYPH: 'rgba(255,255,255,0.45)',
   /** Selected tab fill in the career record TabBar. */
   TAB_ON: '#2A2A30',
+  /** Records tab: Closest card wash/line and ring track. */
+  AMBER_WASH: 'rgba(247,147,30,0.06)',
+  AMBER_LINE: 'rgba(247,147,30,0.22)',
+  RING_TRACK: 'rgba(248,250,252,0.10)',
+  /** Records grid tiles. */
+  TILE_LINE: 'rgba(248,250,252,0.08)',
+  TILE_DASH: 'rgba(248,250,252,0.16)',
+  TILE_TRACK: 'rgba(255,255,255,0.14)',
+  DOT_HOLLOW: 'rgba(255,255,255,0.30)',
+  GOOD_WASH: 'rgba(74,222,128,0.05)',
+  GOOD_LINE: 'rgba(74,222,128,0.22)',
   INK: CHART.INK,
   MUTE: CHART.MUTE,
   DIM: CHART.DIM,
