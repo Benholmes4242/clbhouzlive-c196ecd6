@@ -313,7 +313,6 @@
         "par": "PAR",
         "vsHcp": "VS HCP",
         "medals": "MEDAILLEN",
-        "_awardsBudgetNote": "Stat-cell labels render nowrap in an ~85px column at 9px/700/0.08em tracking (FigureCell). Keep amateur.stream.stat.awards inside that budget — real German runs wider than the en-XA pseudo-locale.",
         "awards": "ERFOLGE",
         "gross": "BRUTTO"
       },

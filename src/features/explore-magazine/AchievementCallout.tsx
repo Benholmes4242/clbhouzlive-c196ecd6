@@ -323,6 +323,7 @@ export function FigureCell({
         gap: 3,
       }}
     >
+      {/* A stat label renders NOWRAP in roughly 85px (a quarter of a 390pt card, less the gutters) at 9px / 700 / 0.08em. A longer label pushes into its neighbour instead of wrapping. Measured: "AUSZEICHNUNGEN" is 95.1px and overflowed, which is why the German label is ERFOLGE. The en-XA pseudo-locale does NOT catch this — its expansion is shorter than real German. */}
       <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, color: A.MUTE, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>
         {label}
       </span>
