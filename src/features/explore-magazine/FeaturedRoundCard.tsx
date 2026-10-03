@@ -29,7 +29,6 @@ import { fmtDateLong } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { r as rad } from '@/lib/radius';
-import { useFitOneLine } from './useFitOneLine';
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
