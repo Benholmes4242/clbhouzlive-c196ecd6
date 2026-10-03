@@ -43,6 +43,10 @@
  * opens with "Won against", never "Only". Won rows render in INK; nobody-else
  * rows render in T40.
  *
+ * BRIEF_TROPHY_ROOM_B5_STRICT_WON SUPERSEDES the field-player contest rule
+ * above: WON / UNCONTESTED now come only from get_member_record_split, the
+ * Course Legend badge's per-board rule, and attendance boards count in neither.
+ *
  * REPLACES CrownsPanel, which stays on disk on the dead list.
  */
 import React from 'react';
@@ -50,7 +54,6 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { REC, FIGURE } from '../tokens';
 import { Panel, Collapsible, MetaLabel } from '../Primitives';
-import { CROWN_MIN_OTHERS, hasContest } from '@/lib/gam/fieldGate';
 import type { CourseCrownGroup } from './CrownsPanel';
 import type { CareerData } from '../types';
 
@@ -60,83 +63,59 @@ interface Props {
 }
 
 /**
- * A row's contest state. `unknown` = the batched field read is unavailable.
- *
- * THREE BANDS: alone / one / won (2+). Won rows use "Won against..."; alone
- * rows use "Nobody else has played here yet". The number carries the size of
- * the contest, so there is no separate 2-4 band.
+ * Attendance boards: not records, counted in neither figure. CLIENT COPY of
+ * TENURE_CATEGORIES in supabase/functions/gam-evaluator/legendTitles.ts, which
+ * is the source; keep the two in step.
  */
-type Contest =
-  | { kind: 'unknown' }
-  | { kind: 'won'; others: number }
-  | { kind: 'one' }
-  | { kind: 'alone' };
-
-export function contestOf(
-  others: number | undefined,
-  available: boolean,
-): Contest {
-  if (!available || others === undefined) return { kind: 'unknown' };
-  if (others < CROWN_MIN_OTHERS) return { kind: 'alone' };
-  if (others === 1) return { kind: 'one' };
-  return { kind: 'won', others };
-}
-
-/** WON in the headline: a record beaten somebody. Only `alone` is uncontested. */
-const isWon = (c: Contest): boolean => c.kind === 'won' || c.kind === 'one';
+export const TENURE_CATEGORIES: ReadonlySet<string> = new Set([
+  'most_rounds_all_time',
+  'most_birdies_all_time',
+]);
 
 /**
- * ONE source for the record split. The panel headline and the cabinet's
- * RECORDS tile both read this, so the two figures cannot disagree.
+ * ONE source for the record split. The panel aside and the cabinet's RECORDS
+ * tile both read this, so the two figures cannot disagree. Reads ONLY
+ * data.recordSplitByCourse; when unavailable it states a total and no split.
  */
 export function recordSplit(
   data: CareerData,
   groups: CourseCrownGroup[],
 ): { available: boolean; won: number; uncontested: number; total: number } {
-  const available = data.fieldPlayersAvailable === true;
+  const available = data.recordSplitAvailable;
+  if (!available) {
+    let total = 0;
+    for (const g of groups) {
+      for (const r of g.records) if (!TENURE_CATEGORIES.has(String(r.category))) total += 1;
+    }
+    return { available, won: 0, uncontested: 0, total };
+  }
   let won = 0;
   let uncontested = 0;
-  let total = 0;
-  for (const group of groups) {
-    const n = group.records.length;
-    const c = contestOf(data.fieldPlayers?.get(group.courseId), available);
-    total += n;
-    if (isWon(c)) won += n;
-    else if (c.kind === 'alone') uncontested += n;
+  for (const s of data.recordSplitByCourse.values()) {
+    won += s.contested;
+    uncontested += s.sole;
   }
-  return { available, won, uncontested, total };
+  return { available, won, uncontested, total: won + uncontested };
 }
 
 export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   const { t } = useTranslation('handicap');
-  // Nothing held: the section does not render. No zeros, no empty state -- and
-  // on today's population no connected member is in this state anyway.
-  if (groups.length === 0) return null;
 
-  const available = data.fieldPlayersAvailable === true;
-  const rows = groups.map((group) => ({
-    group,
-    contest: contestOf(data.fieldPlayers?.get(group.courseId), available),
-  }));
+  const rows = groups
+    .map((group) => {
+      const s = data.recordSplitByCourse.get(group.courseId);
+      return { group, contested: s?.contested ?? 0, sole: s?.sole ?? 0 };
+    })
+    .filter((r) => r.contested + r.sole > 0)
+    .sort(
+      (a, b) =>
+        b.contested - a.contested ||
+        b.sole - a.sole ||
+        a.group.courseName.localeCompare(b.group.courseName),
+    );
 
-  // Contested first, each band by record count descending, then by name so the
-  // order is stable between renders.
-  const rank = (c: Contest) => (isWon(c) ? 0 : 1);
-  const ordered = [...rows].sort((a, b) => {
-    if (rank(a.contest) !== rank(b.contest)) return rank(a.contest) - rank(b.contest);
-    if (b.group.records.length !== a.group.records.length)
-      return b.group.records.length - a.group.records.length;
-    return a.group.courseName.localeCompare(b.group.courseName);
-  });
-
-  const { won, uncontested, total } = recordSplit(data, groups);
-
-  const note = (c: Contest): { text: string; color: string } | null => {
-    if (c.kind === 'won') return { text: `beat ${c.others} golfers`, color: REC.INK_50 };
-    if (c.kind === 'one') return { text: 'beat 1 golfer', color: REC.INK_50 };
-    if (c.kind === 'alone') return { text: 'nobody else yet', color: REC.DIM };
-    return null;
-  };
+  const { available, won, uncontested, total } = recordSplit(data, groups);
+  if (rows.length === 0 && total === 0) return null;
 
   return (
     <Panel
@@ -150,21 +129,26 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
       <Collapsible
         showAllLabel={
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-            {t('career.recordsSeeAll', { n: groups.length })}
+            {t('career.recordsSeeAll', { n: rows.length })}
             <ChevronRight size={13} strokeWidth={2.4} />
           </span>
         }
         showFewerLabel={t('career.showFewer')}
       >
-        {ordered.map(({ group, contest }, i) => {
-          const dim = contest.kind === 'alone';
-          const n = note(contest);
+        {rows.map(({ group, contested, sole }, i) => {
+          const dim = contested === 0;
+          const count = dim ? sole : contested;
+          const note = dim
+            ? { text: 'nobody else yet', color: REC.DIM }
+            : sole > 0
+              ? { text: `+${sole} uncontested`, color: REC.INK_50 }
+              : null;
           return (
             <button
               type="button"
               key={group.key}
               onClick={() => data.onOpen({ kind: 'crown', courseKey: group.key })}
-              aria-label={`${group.courseName}, ${group.records.length} records`}
+              aria-label={`${group.courseName}, ${count} records`}
               style={{
                 display: 'flex',
                 alignItems: 'baseline',
@@ -173,7 +157,7 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
                 padding: '13px 14px',
                 background: 'transparent',
                 border: 'none',
-                borderBottom: i === ordered.length - 1 ? 'none' : `1px solid ${REC.BORDER}`,
+                borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${REC.BORDER}`,
                 textAlign: 'left',
                 fontFamily: REC.FONT,
                 cursor: 'pointer',
@@ -193,9 +177,9 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
               >
                 {group.courseName}
               </span>
-              {n ? (
-                <span style={{ fontSize: 11.5, color: n.color, whiteSpace: 'nowrap', ...REC.TABULAR }}>
-                  {n.text}
+              {note ? (
+                <span style={{ fontSize: 11.5, color: note.color, whiteSpace: 'nowrap', ...REC.TABULAR }}>
+                  {note.text}
                 </span>
               ) : null}
               <span
@@ -208,7 +192,7 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
                   color: dim ? REC.DIM : REC.INK,
                 }}
               >
-                {group.records.length}
+                {count}
               </span>
             </button>
           );
@@ -218,6 +202,4 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   );
 };
 
-export { CROWN_MIN_OTHERS, hasContest };
 export default CourseRecordsPanel;
-
