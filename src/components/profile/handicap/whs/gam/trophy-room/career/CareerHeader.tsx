@@ -6,6 +6,7 @@ import React from 'react';
 import { REC } from './tokens';
 import { Kicker, Caption } from './Primitives';
 import { yearOf } from './format';
+import { seasonCut } from './criteria';
 import { useTranslation, Trans } from 'react-i18next';
 import type { CareerData } from './types';
 
@@ -21,6 +22,7 @@ export const CareerHeader: React.FC<Props> = ({ data }) => {
   const years = rounds.map((r) => yearOf(r.play_date)).filter((y): y is number => y !== null);
   const since = years.length > 0 ? Math.min(...years) : null;
 
+  const thisYear = seasonCut(rounds, new Date().getFullYear()).rounds;
   const { t } = useTranslation('handicap');
 
   // Figures come from the same computation as before; only the voice changed.
@@ -43,6 +45,12 @@ export const CareerHeader: React.FC<Props> = ({ data }) => {
                 values={{ courses, year: since }}
                 components={{ b: <span style={{ color: REC.INK, fontWeight: 600 }} /> }}
               />
+              {thisYear > 0 ? (
+                <>
+                  {' · '}
+                  <span style={{ color: REC.INK, fontWeight: 600 }}>{thisYear}</span> this year
+                </>
+              ) : null}
             </div>
           ) : null}
         </>

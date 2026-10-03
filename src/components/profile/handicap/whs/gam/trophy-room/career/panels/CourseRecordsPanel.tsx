@@ -85,6 +85,28 @@ export function contestOf(
 /** WON in the headline: a record beaten somebody. Only `alone` is uncontested. */
 const isWon = (c: Contest): boolean => c.kind === 'won' || c.kind === 'one';
 
+/**
+ * ONE source for the record split. The panel headline and the cabinet's
+ * RECORDS tile both read this, so the two figures cannot disagree.
+ */
+export function recordSplit(
+  data: CareerData,
+  groups: CourseCrownGroup[],
+): { available: boolean; won: number; uncontested: number; total: number } {
+  const available = data.fieldPlayersAvailable === true;
+  let won = 0;
+  let uncontested = 0;
+  let total = 0;
+  for (const group of groups) {
+    const n = group.records.length;
+    const c = contestOf(data.fieldPlayers?.get(group.courseId), available);
+    total += n;
+    if (isWon(c)) won += n;
+    else if (c.kind === 'alone') uncontested += n;
+  }
+  return { available, won, uncontested, total };
+}
+
 export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
   const { t } = useTranslation('handicap');
   // Nothing held: the section does not render. No zeros, no empty state -- and
@@ -107,13 +129,7 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
     return a.group.courseName.localeCompare(b.group.courseName);
   });
 
-  const won = rows
-    .filter((r) => isWon(r.contest))
-    .reduce((sum, r) => sum + r.group.records.length, 0);
-  const uncontested = rows
-    .filter((r) => r.contest.kind === 'alone')
-    .reduce((sum, r) => sum + r.group.records.length, 0);
-  const total = rows.reduce((sum, r) => sum + r.group.records.length, 0);
+  const { won, uncontested, total } = recordSplit(data, groups);
 
   const subLine = (c: Contest): string | null => {
     if (c.kind === 'won') return t('career.recordsWonAgainst', { n: c.others });
