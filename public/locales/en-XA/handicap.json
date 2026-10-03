@@ -108,7 +108,10 @@
     },
     "closest": "[~~Çľőšéšţ ţő ţĥé ñéxţ ţíéř~~]",
     "allRecords": "[~~Áľľ {{count}} řéçőřđš~~]",
-    "tierNotStarted": "[~~Ñőţ šţářţéđ~~]"
+    "tierNotStarted": "[~~Ñőţ šţářţéđ~~]",
+    "closestKicker": "NEXT TO BREAK",
+    "closestToGo": "{{toGo}} to {{next}}",
+    "closestHeading": "{{toGo}} more to {{next}}"
   },
   "roundResults": {
     "sections": {

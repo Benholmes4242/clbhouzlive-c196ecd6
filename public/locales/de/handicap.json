@@ -108,7 +108,10 @@
     },
     "closest": "Am nächsten an der nächsten Stufe",
     "allRecords": "Alle {{count}} Rekorde",
-    "tierNotStarted": "Nicht begonnen"
+    "tierNotStarted": "Nicht begonnen",
+    "closestKicker": "NEXT TO BREAK",
+    "closestToGo": "{{toGo}} to {{next}}",
+    "closestHeading": "{{toGo}} more to {{next}}"
   },
   "roundResults": {
     "sections": {

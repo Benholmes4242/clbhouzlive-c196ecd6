@@ -108,7 +108,10 @@
     },
     "closest": "다음 티어에 가장 가까운 기록",
     "allRecords": "기록 {{count}}개 모두 보기",
-    "tierNotStarted": "시작 전"
+    "tierNotStarted": "시작 전",
+    "closestKicker": "NEXT TO BREAK",
+    "closestToGo": "{{toGo}} to {{next}}",
+    "closestHeading": "{{toGo}} more to {{next}}"
   },
   "roundResults": {
     "sections": {

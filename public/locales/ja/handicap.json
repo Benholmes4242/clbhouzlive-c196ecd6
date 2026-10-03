@@ -108,7 +108,10 @@
     },
     "closest": "次のティアに最も近い記録",
     "allRecords": "全{{count}}件の記録",
-    "tierNotStarted": "未着手"
+    "tierNotStarted": "未着手",
+    "closestKicker": "NEXT TO BREAK",
+    "closestToGo": "{{toGo}} to {{next}}",
+    "closestHeading": "{{toGo}} more to {{next}}"
   },
   "roundResults": {
     "sections": {

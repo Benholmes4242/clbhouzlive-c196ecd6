@@ -215,7 +215,7 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
         <button
           type="button"
           onClick={() => open(closest)}
-          aria-label={`${shortLabel(closest)}, ${closest.value}`}
+          aria-label={`${shortLabel(closest)}, ${closest.value}, ${t("career.closestHeading", { toGo: closest.toGo, next: closest.item.nextThreshold })}`}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -267,7 +267,7 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
               {t('career.closestKicker')}
             </span>
             <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: REC.INK, ...REC.TABULAR }}>
-              {t('career.closestToGo', { toGo: closest.toGo, next: closest.item.nextThreshold })}
+              {t('career.closestHeading', { toGo: closest.toGo, next: closest.item.nextThreshold })}
             </span>
             <span style={{ fontSize: 12.5, color: REC.MUTE, ...REC.TABULAR }}>
               {t('career.closestSoFar', { label: shortLabel(closest), value: closest.value })}
