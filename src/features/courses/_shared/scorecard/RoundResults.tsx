@@ -76,7 +76,13 @@ function awardTitle(award: RoundAwardRow, t: T, voice: RoundResultsVoice | null 
   const name = voice?.subjectName;
   if (award.unit_kind === 'hole') {
     const hole = formatOrdinal(award.unit_key);
-    if (award.award_kind === 'first_birdie') return t('roundResults.award.firstBirdie', { hole });
+    if (award.award_kind === 'first_birdie') {
+      // Fires on the hole's FIRST time under par — an eagle on a never-birdied
+      // hole is "First eagle", not "First birdie".
+      const word = award.value != null ? HOLE_WORDS[Math.round(award.value)] : null;
+      const kind = word === 'eagle' || word === 'albatross' ? word : 'birdie';
+      return t(`roundResults.award.first_${kind}`, { hole });
+    }
     if (award.award_kind === 'top_three') return t('roundResults.award.topThreeHole', { hole });
     if (award.award_kind === 'top_ten') return t('roundResults.award.topTenHole', { hole });
     if (award.award_kind === 'matched_best') return t(`roundResults.award.matchedBestHole${who}`, { hole, name });
@@ -114,39 +120,44 @@ function scoreWords(unit: RoundAwardUnitKind, value: number, slot: 'scoreName' |
  * full sentence per pronoun is its own key — no string capitalisation. A
  * matched_best has previous_value === value, so it never says "best was X".
  */
+function placeUnit(unit: RoundAwardUnitKind): string {
+  if (unit === 'hole') return 'score';
+  if (unit === 'front_nine' || unit === 'back_nine') return 'nine';
+  if (unit === 'finish_six') return 'stretch';
+  return 'round';
+}
+
 function awardSentence(award: RoundAwardRow, t: T, voice: RoundResultsVoice | null | undefined): string | null {
-  if (!voice || award.value == null) return null;
-  if (award.award_kind === 'matched_best') {
-    return t(`roundResults.line.matched.${voice.pronoun}`, { score: scoreWords(award.unit_kind, award.value, 'scoreName', t) });
+  // No voice = the impersonal form of the same sentences, never figures.
+  const p = voice?.pronoun ?? 'none';
+  if (award.award_kind === 'first_birdie') return t(`roundResults.line.firstUnder.${p}`);
+  if (award.value == null) return null;
+  const score = scoreWords(award.unit_kind, award.value, 'scoreName', t);
+  if (award.award_kind === 'matched_best') return t(`roundResults.line.matched.${p}`, { score });
+  if (award.award_kind === 'new_best') {
+    if (award.previous_value == null) return t(`roundResults.line.newBestBare.${p}`, { score });
+    return t(`roundResults.line.newBest.${p}`, { score, previous: scoreWords(award.unit_kind, award.previous_value, 'scorePrev', t) });
   }
-  if (award.award_kind === 'new_best' && award.previous_value != null) {
-    return t(`roundResults.line.newBest.${voice.pronoun}`, {
-      score: scoreWords(award.unit_kind, award.value, 'scoreName', t),
-      previous: scoreWords(award.unit_kind, award.previous_value, 'scorePrev', t),
-    });
+  // top_three / top_ten. rank_here is deliberately NULL for 4th-9th — say
+  // "inside the best ten", never interpolate or look it up again.
+  const u = placeUnit(award.unit_kind);
+  const count = award.attempts_at_detection ?? 0;
+  if (award.rank_here != null) {
+    return t(`roundResults.line.placed.${p}`, { score, place: formatOrdinal(award.rank_here), unit: t(`roundResults.placeUnit.${u}`), count });
   }
-  return null;
+  return t(`roundResults.line.topTen.${p}`, { score, unitPlural: t(`roundResults.placeUnit.${u}Plural`), count });
 }
 
 function AwardRow({ award, voice }: { award: RoundAwardRow; voice?: RoundResultsVoice | null }) {
   const { t } = useTranslation('handicap');
-  const sentence = awardSentence(award, t, voice);
-  const previous = award.previous_value == null
-    ? null
-    : t('roundResults.previous', { value: formatValue(award.unit_kind, award.previous_value) });
-  const placing = award.rank_here == null
-    ? null
-    : award.rank_here === 1
-      ? t('roundResults.placing.best')
-      : t('roundResults.placing.ordinal', { place: formatOrdinal(award.rank_here), count: award.attempts_at_detection ?? 0 });
-  const subline = sentence ?? [previous, placing].filter(Boolean).join(' - ');
+  const subline = awardSentence(award, t, voice);
 
   return (
     <div data-round-award={award.unit_kind} style={{ minWidth: 0, display: 'grid', gridTemplateColumns: '22px minmax(0,1fr)', alignItems: 'center', gap: 10, padding: '10px 0' }}>
       <AwardMark tier={award.tier} size="sheet" />
       <span style={{ minWidth: 0 }}>
         <span style={{ display: 'block', color: INK, fontSize: 13.5, fontWeight: 600, lineHeight: 1.25 }}>{awardTitle(award, t, voice)}</span>
-        {subline && <span style={{ display: 'block', color: INK_FAINT, fontSize: 11.5, lineHeight: 1.35, marginTop: 3 }}>{subline}</span>}
+        {subline && <span data-round-award-line="true" style={{ display: 'block', color: INK_FAINT, fontSize: 11.5, lineHeight: 1.35, marginTop: 3 }}>{subline}</span>}
       </span>
     </div>
   );

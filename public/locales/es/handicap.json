@@ -251,7 +251,9 @@
       "nine": "nine",
       "ninePlural": "nines",
       "stretch": "finish",
-      "stretchPlural": "finishes"
+      "stretchPlural": "finishes",
+      "score": "score",
+      "scorePlural": "scores"
     }
   }
 }
