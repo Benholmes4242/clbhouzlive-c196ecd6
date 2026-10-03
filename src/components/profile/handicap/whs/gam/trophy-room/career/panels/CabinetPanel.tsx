@@ -20,42 +20,70 @@ import { Medal } from 'lucide-react';
 import { REC } from '../tokens';
 import { measuredShare } from '../shareModel';
 import { tierTone, toneAlpha } from '../medalTone';
-import { SHOWPIECE_BADGE_IDS, SHOWPIECE_COUNTER_LABEL, shortenShowpieceCaption } from '../../_shared/showpieces';
-import { MEDAL_BRONZE } from '@/features/tourhub/_shared/tokens';
+import { isTop100Achievement, SHOWPIECE_BADGE_IDS, SHOWPIECE_COUNTER_LABEL, shortenShowpieceCaption } from '../../_shared/showpieces';
+import { MEDAL_BRONZE, MEDAL_GOLD } from '@/features/tourhub/_shared/tokens';
 import type { Achievement, CareerData } from '../types';
 
 interface Props {
   data: CareerData;
   items: Achievement[];
+  /** From recordSplit() -- the cabinet never computes its own split. */
+  split: { available: boolean; won: number; total: number };
+  onShowCourses: () => void;
 }
 
-export const CabinetPanel: React.FC<Props> = ({ data, items }) => {
+interface Tile {
+  key: string;
+  tone: string;
+  value: number;
+  label: string;
+  onClick: () => void;
+}
+
+export const CabinetPanel: React.FC<Props> = ({ data, items, split, onShowCourses }) => {
   const floor = data.config.shareMinDenominator;
   const pieces = items
-    .filter((a) => SHOWPIECE_BADGE_IDS.has(a.badgeId) && (a.currentValue ?? 0) > 0)
+    .filter((a) => SHOWPIECE_BADGE_IDS.has(a.badgeId) && !isTop100Achievement(a.badgeId) && (a.currentValue ?? 0) > 0)
     .map((a) => ({ a, share: measuredShare(data.shares.get(a.badgeId), floor) }))
     .sort((x, y) => {
       if (x.share !== null && y.share !== null && x.share !== y.share) return x.share - y.share;
       return (x.a.currentValue ?? 0) - (y.a.currentValue ?? 0);
     })
-    .slice(0, 3);
+    .slice(0, 2);
 
-  if (pieces.length === 0) return null;
+  const tiles: Tile[] = pieces.map(({ a }) => {
+    // A non-zero showpiece below tier 1 still earns a tile; it takes the
+    // bottom-third tone rather than a hollow chip — it is behind glass.
+    const caption = SHOWPIECE_COUNTER_LABEL[a.badgeId];
+    return {
+      key: a.badgeId,
+      tone: tierTone(a) ?? MEDAL_BRONZE,
+      value: a.currentValue ?? 0,
+      label: caption ? shortenShowpieceCaption(caption) : a.name,
+      onClick: () => data.onOpen({ kind: 'counting', badgeId: a.badgeId }),
+    };
+  });
+  if (split.total > 0) {
+    tiles.push({
+      key: 'records',
+      tone: MEDAL_GOLD,
+      value: split.available ? split.won : split.total,
+      label: split.available ? 'RECORDS WON' : 'RECORDS HELD',
+      onClick: onShowCourses,
+    });
+  }
+
+  if (tiles.length === 0) return null;
 
   return (
-    <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-      {pieces.map(({ a }) => {
-        // A non-zero showpiece below tier 1 still earns a tile; it takes the
-        // bottom-third tone rather than a hollow chip — it is behind glass.
-        const tone = tierTone(a) ?? MEDAL_BRONZE;
-        const caption = SHOWPIECE_COUNTER_LABEL[a.badgeId];
-        const label = caption ? shortenShowpieceCaption(caption) : a.name;
+    <div style={{ display: 'flex', gap: 8, marginBottom: 22 }}>
+      {tiles.map(({ key, tone, value, label, onClick }) => {
         return (
           <button
-            key={a.badgeId}
+            key={key}
             type="button"
-            onClick={() => data.onOpen({ kind: 'counting', badgeId: a.badgeId })}
-            aria-label={`${label}, ${a.currentValue}`}
+            onClick={onClick}
+            aria-label={`${label}, ${value}`}
             style={{
               flex: '1 1 0',
               maxWidth: 'calc((100% - 16px) / 3)',
@@ -95,7 +123,7 @@ export const CabinetPanel: React.FC<Props> = ({ data, items }) => {
                 ...REC.TABULAR,
               }}
             >
-              {a.currentValue}
+              {value}
             </span>
             <span
               style={{

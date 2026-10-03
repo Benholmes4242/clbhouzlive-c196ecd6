@@ -36,10 +36,10 @@ import { Caption } from './Primitives';
 import { CabinetPanel } from './panels/CabinetPanel';
 import { CareerHeader } from './CareerHeader';
 import { CountingStatsPanel } from './panels/CountingStatsPanel';
-import { SeasonCutPanel } from './panels/SeasonCutPanel';
+import { TabBar, type CareerTab } from './TabBar';
 import { Top100Panel } from './panels/Top100Panel';
 import { groupCrowns } from './panels/CrownsPanel';
-import { CourseRecordsPanel } from './panels/CourseRecordsPanel';
+import { CourseRecordsPanel, recordSplit } from './panels/CourseRecordsPanel';
 import { StandingsPanel } from './panels/StandingsPanel';
 import { StreaksPanel } from './panels/StreaksPanel';
 import { MilestonesPanel } from './panels/MilestonesPanel';
@@ -62,6 +62,7 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
   const { data: standingsRows } = useMemberStandings(userId, open);
   const standings = standingsRows ?? [];
   const [view, setView] = useState<CareerView>({ kind: 'room' });
+  const [tab, setTab] = useState<CareerTab>('records');
 
   // A badgeId in the payload must land on that badge's detail, not the room.
   // Badges are only fetched once `open` is true, so the id is parked here and
@@ -73,6 +74,11 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
       gamAchievementsBus.subscribe((payload) => {
         setView({ kind: 'room' });
         setPendingBadgeId(payload?.badgeId ?? null);
+        setTab(
+          payload?.section === 'crowns' ? 'courses'
+          : payload?.badgeId ? (isTop100Achievement(payload.badgeId) ? 'top100' : 'records')
+          : 'records',
+        );
         setOpen(true);
       }),
     [],
@@ -200,6 +206,11 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
   }, [pendingBadgeId, badgesLoading, top100, counting, milestones]);
 
   const isLoading = badgesLoading || legendsLoading;
+  const split = recordSplit(data, crownGroups);
+  const selectTab = (next: CareerTab) => {
+    setTab(next);
+    analyticsEvents.track('career_record_tab', { tab: next });
+  };
   const back = () => setView({ kind: 'room' });
 
   /**
@@ -256,6 +267,7 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
       onClose={() => {
         setOpen(false);
         setView({ kind: 'room' });
+        setTab('records');
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, flexShrink: 0 }}>
@@ -298,16 +310,29 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
               <StandingsPanel rows={standings} />
             ) : (
               <>
-                {/* A trophy room opens on a career: cabinet, then the three
-                    closest records, THEN this season (moved, not deleted). */}
-                <CabinetPanel data={data} items={achievements} />
-                <CountingStatsPanel data={data} items={counting} sparse={sparse} />
-                <SeasonCutPanel rounds={rounds} />
-                <Top100Panel data={data} items={top100} />
-                <CourseRecordsPanel data={data} groups={crownGroups} />
-                <StandingsPanel rows={standings} />
-                <StreaksPanel streaks={streaks} />
-                <MilestonesPanel data={data} items={milestones} />
+                <CabinetPanel
+                  data={data}
+                  items={achievements}
+                  split={split}
+                  onShowCourses={() => setTab('courses')}
+                />
+                <TabBar tab={tab} onSelect={selectTab} />
+                <div role="tabpanel">
+                  {tab === 'records' ? (
+                    <>
+                      <CountingStatsPanel data={data} items={counting} sparse={sparse} />
+                      <StreaksPanel streaks={streaks} />
+                      <MilestonesPanel data={data} items={milestones} />
+                    </>
+                  ) : tab === 'top100' ? (
+                    <Top100Panel data={data} items={top100} />
+                  ) : (
+                    <>
+                      <CourseRecordsPanel data={data} groups={crownGroups} />
+                      <StandingsPanel rows={standings} />
+                    </>
+                  )}
+                </div>
               </>
             )}
           </>

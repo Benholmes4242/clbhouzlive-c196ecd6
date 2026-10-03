@@ -33,6 +33,8 @@ export const REC = {
   HOLLOW_BG: 'rgba(255,255,255,0.10)',
   HOLLOW_BORDER: 'rgba(255,255,255,0.18)',
   HOLLOW_GLYPH: 'rgba(255,255,255,0.45)',
+  /** Selected tab fill in the career record TabBar. */
+  TAB_ON: '#2A2A30',
   INK: CHART.INK,
   MUTE: CHART.MUTE,
   DIM: CHART.DIM,
