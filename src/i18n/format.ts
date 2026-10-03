@@ -827,3 +827,17 @@ export function formatCountUpperPadded(n: number): string {
   return formatCompact(n);
 }
 
+
+/**
+ * fmtDateLong — the locale's long date, weekday, no year ("Friday 2 October").
+ * The member place line on the scorecard sheet and Explore's featured round
+ * both print this; no ordinal (Intl has none). Date-only ISO strings are read
+ * as local calendar dates so the day never shifts across a timezone.
+ */
+export function fmtDateLong(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  const d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return new Intl.DateTimeFormat(getActiveLocale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
+}

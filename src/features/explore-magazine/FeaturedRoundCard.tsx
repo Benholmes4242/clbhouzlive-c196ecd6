@@ -22,10 +22,13 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { MINUS } from './exploreCopy';
+import { FigureCell } from './AchievementCallout';
+import { AwardCluster } from './AwardCluster';
+import type { RoundMedalCounts } from './useBatchRoundMedals';
+import { fmtDateLong } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { r as rad } from '@/lib/radius';
-import { useFitOneLine } from './useFitOneLine';
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
@@ -43,14 +46,14 @@ const PANE_H = 300;
  *  value back to the feed card — 52 is right there. */
 const SHAPE_BAND = SCORE_TRACE_PLOT_HEIGHT + EXPLORE_END_LABEL_BAND;
 const SHAPE_W = 350;
-/** BRIEF_FEATURED_ROUND_SCRIM — the scrim is a FOOT, not a filter. Fully
- *  transparent across the top 46% so the photograph (and the trace over it)
- *  shows at full brightness, exactly as the feed cards do. It ramps only where
- *  text sits: every text line is below the 64% stop (>= 0.55 black), name and
- *  course on >= 0.88. Contrast comes from the dark foot, never from dimming
- *  the picture — do not add a flat layer or anything behind the trace. */
+/** THE WASH (EXPLORE_FEATURED_ROUND_GETS_A_BAND §2). Only the headline block —
+ *  gross, to-par and reason line — still sits on the photograph; the member,
+ *  course, date, reactions and figures live in the band below the pane. That
+ *  block carries TEXT_SHADOW, so the foot only needs a light ramp to seat it:
+ *  transparent to 40%, then up to 0.30 black at the base. A ramp, not a flat
+ *  layer, and nothing behind the trace — the picture stays bright. */
 const SCRIM =
-  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 46%, rgba(0,0,0,0.55) 64%, rgba(0,0,0,0.88) 84%, rgba(0,0,0,0.94) 100%)';
+  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.30) 100%)';
 /** V2 §4 — the unit label beside the figure, on its baseline. */
 const UNIT: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.INK };
 const TEXT_SHADOW = '0 1px 2px color-mix(in srgb, black 45%, transparent)';
@@ -115,45 +118,32 @@ export const FeaturedRoundCard: React.FC<{
   /** Clap + comment in the gold strip (BRIEF_FEATURED_ROUND_ACTIONS). Optional:
    *  null/absent renders the strapline alone. */
   engagement?: FeaturedRoundEngagement | null;
+  /** From the feed's batched award read. undefined = unresolved (empty cell). */
+  medals?: RoundMedalCounts | null;
 }> = ({
   round: r,
   viewerId,
   shape = null,
   onOpen,
   engagement = null,
+  medals,
 }) => {
   const { t, i18n } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
   const mine = !!viewerId && r.user_id === viewerId;
-  const nameRef = useFitOneLine<HTMLDivElement>(r.course_name ?? '', 13.5, 10.5);
-
   const image = r.image_url;
-  const gross = r.gross == null ? null : `${r.gross}`;
-  const par = toPar(r.to_par);
-
-  // §4 THE KICKER CARRIES WHAT THE HEADLINE DOES NOT. No figure in both.
-  let parts: (string | null)[];
   let unit: string | null = null;
   if (r.tier === 2) {
-    // JOINT_LABEL §1 — the qualifier lives in the label ("Joint course record");
-    // the place line carries no joint clause and the co-holder is never named.
-    // joint_name stays in the row for future use but is not rendered.
+    // JOINT_LABEL §1 — the qualifier lives in the label; the co-holder is never named.
     unit = (r.joint_count ?? 0) > 0 ? k('courseRecordJoint') : k('courseRecord');
-    parts = [];
-  } else if (r.tier === 3 && r.reason !== 'eagle_brace' && r.reason !== 'stableford_45') {
-    parts = [gross]; // headline already showed the to-par
-  } else if (r.tier >= 5) {
-    parts = [gross, par, r.net_score != null ? k('netFact', { net: r.net_score }) : null];
-  } else {
-    parts = [gross, par];
   }
-  const date = r.play_date
-    ? new Date(r.play_date).toLocaleDateString(i18n.language, { day: 'numeric', month: 'short' })
+  const placeLine = [r.course_name, fmtDateLong(r.play_date)].filter(Boolean).join(' · ');
+  const tp = toPar(r.to_par);
+  const grossSuffix = tp
+    ? <span style={{ ...FIG, color: (r.to_par ?? 0) < 0 ? TOPAR_UNDER_DARK : A.MUTE }}>{tp}</span>
     : null;
-  /* LEAD-HERO PARITY — the card now shares the Courses lead card's design:
-     no frame, no footer strip; chip top-left, then figure, member, course name
-     and an uppercase fact line over the photograph. */
-  const factLine = [...parts, date].filter(Boolean).join(' · ');
+  const vsHcp = r.vs_hcp == null ? '' : r.vs_hcp === 0 ? 'Level' : signed(r.vs_hcp);
+  const mGold = medals?.gold ?? 0, mSilver = medals?.silver ?? 0, mBronze = medals?.bronze ?? 0;
   const traceRow = { round_id: r.whs_score_id, front_nine_to_par: null, back_nine_to_par: null } as unknown as CircleRoundRow;
   const dots = goodHoleDots(shape);
 
@@ -165,7 +155,8 @@ export const FeaturedRoundCard: React.FC<{
         all: 'unset', display: 'block', width: '100%', boxSizing: 'border-box', cursor: 'pointer', fontFamily: SANS,
       }}
     >
-      <div style={{ position: 'relative', minHeight: PANE_H, borderRadius: rad.lg, overflow: 'hidden', background: A.PANEL, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ borderRadius: rad.lg, overflow: 'hidden', background: A.PANEL }}>
+      <div style={{ position: 'relative', minHeight: PANE_H, background: A.PANEL, display: 'flex', flexDirection: 'column' }}>
         {image ? (
           <img src={image} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
@@ -189,31 +180,35 @@ export const FeaturedRoundCard: React.FC<{
               exploreLineOnly endLabels exploreGlow exploreDots={dots} underParFill />
           ) : null}
         </div>
-        <div style={{ position: 'relative', padding: '0 16px 14px', textShadow: TEXT_SHADOW }}>
+        <div style={{ position: 'relative', padding: '0 16px 16px', textShadow: TEXT_SHADOW }}>
           <Headline r={r} unit={unit} />
-          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
-            <span style={{ width: 30, height: 30, flex: '0 0 30px', display: 'inline-flex' }}>
-              <SquircleAvatar size={30} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} hideRing />
-            </span>
-            <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 19, fontWeight: 700, letterSpacing: '-0.01em', color: mine ? A.AMBER : A.INK }}>
+        </div>
+      </div>
+      <div data-featured-band="true" style={{ background: A.PANEL, padding: '13px 16px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
+          <span style={{ width: 20, height: 20, flex: '0 0 20px', display: 'inline-flex' }}>
+            <SquircleAvatar size={20} src={r.photo_url} alt={r.display_name ?? ''} userId={r.user_id} hideRing />
+          </span>
+          <span style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, gap: 1 }}>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14.5, fontWeight: 700, color: mine ? A.AMBER : A.INK }}>
               {mine ? t('courseDetail.records.you') : r.display_name}
             </span>
-            {engagement ? <Actions engagement={engagement} mine={mine} /> : null}
-          </div>
-          <div
-            ref={nameRef}
-            style={{ marginTop: 8, fontSize: 13.5, fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.86)', whiteSpace: 'nowrap', overflow: 'hidden' }}
-          >
-            {r.course_name ?? ''}
-          </div>
-          {factLine ? (
-            <div
-              style={{ marginTop: 4, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.62)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...FIG }}
-            >
-              {factLine}
-            </div>
-          ) : null}
+            {placeLine ? (
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 11.5, color: A.MUTE }}>{placeLine}</span>
+            ) : null}
+          </span>
+          {engagement ? <Actions engagement={engagement} mine={mine} /> : null}
         </div>
+        <div style={{ marginTop: 11, paddingTop: 11, borderTop: `1px solid ${A.SOFT}`, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>
+          <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')} value={r.gross != null ? String(r.gross) : ''} suffix={grossSuffix} />
+          <FigureCell minHeight={34} label={t('amateur.stream.stat.net', 'NET')} value={r.net_score != null ? String(r.net_score) : ''} />
+          <FigureCell minHeight={34} label={t('amateur.stream.stat.vsHcp', 'VS HCP')} value={vsHcp} under={(r.vs_hcp ?? 0) < 0} />
+          {mGold + mSilver + mBronze > 0 ? (
+            <FigureCell minHeight={34} label={t('amateur.stream.stat.awards', 'AWARDS')}
+              value={<AwardCluster gold={mGold} silver={mSilver} bronze={mBronze} scale="row" surfaceColor={A.PANEL} />} />
+          ) : <span />}
+        </div>
+      </div>
       </div>
     </button>
   );
