@@ -140,6 +140,9 @@
       "topThree": "Top-three {{unit}} here",
       "topTen": "Top-ten {{unit}} here",
       "bestHole": "Best on the {{hole}}",
+      "matchedBestHole": "Matched your best on the {{hole}}",
+      "topThreeHole": "Top-three on the {{hole}} here",
+      "topTenHole": "Top-ten on the {{hole}} here",
       "firstBirdie": "First birdie on the {{hole}}"
     },
     "previous": "Previous best {{value}}",
