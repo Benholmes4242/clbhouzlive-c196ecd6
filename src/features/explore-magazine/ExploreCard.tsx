@@ -32,7 +32,7 @@ import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
 import { RankFlagBadge } from './RankFlagBadge';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { MedalCluster } from './MedalCluster';
+import { AwardCluster } from './AwardCluster';
 import { NUMF } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { ReviewBreakdown } from './useReviewPageEnrichment';
@@ -546,8 +546,8 @@ function WhoLine({
           <FigureCell minHeight={34} label={t('amateur.stream.stat.vsHcp', 'VS HCP')}
             value={hasFigures ? vsHandicapLabel(roundIdentity.net!, roundIdentity.par!) : ''} under={under} />
           {hasMedals ? (
-            <FigureCell minHeight={34} label={t('amateur.stream.stat.medals', 'MEDALS')}
-              value={<MedalCluster gold={mGold} silver={mSilver} bronze={mBronze} surfaceColor={A.CANVAS} />} />
+            <FigureCell minHeight={34} label={t('amateur.stream.stat.awards', 'AWARDS')}
+              value={<AwardCluster gold={mGold} silver={mSilver} bronze={mBronze} surfaceColor={A.CANVAS} />} />
           ) : <span />}
         </div>
         <div data-round-identity-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 8, marginTop: 12 }}>

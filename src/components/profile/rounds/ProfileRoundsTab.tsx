@@ -24,7 +24,7 @@ import RailChips from '@/components/ui/RailChips';
 import { FigureCell, vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
 import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap';
 import { toParLabel } from '@/features/explore-magazine/exploreCopy';
-import { MedalCluster } from '@/features/explore-magazine/MedalCluster';
+import { AwardCluster } from '@/features/explore-magazine/AwardCluster';
 import { useFitOneLine } from '@/features/explore-magazine/useFitOneLine';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 const medalTotal = (r: ProfileRound) => (r.medals_gold ?? 0) + (r.medals_silver ?? 0) + (r.medals_bronze ?? 0);
@@ -298,7 +298,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
                   <span style={{ display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap', alignItems: 'center' }}>
                     {medalTotal(r) > 0 ? (
                       <Pill padding="3px 8px">
-                        <MedalCluster scale="pill" gold={r.medals_gold ?? 0} silver={r.medals_silver ?? 0} bronze={r.medals_bronze ?? 0} surfaceColor={CHART.CANVAS} />
+                        <AwardCluster scale="pill" gold={r.medals_gold ?? 0} silver={r.medals_silver ?? 0} bronze={r.medals_bronze ?? 0} surfaceColor={CHART.CANVAS} />
                       </Pill>
                     ) : null}
                     {!full18 ? (

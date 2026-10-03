@@ -1,24 +1,23 @@
 /**
- * MEDAL CLUSTER — ONE dot, of the best tier the round reached (gold, then
- * silver, then bronze), followed by THAT TIER'S count. Never the total.
+ * AWARD CLUSTER — one AwardMark per tier PRESENT (gold, silver, bronze order,
+ * overlapping by 4px with a 1.5px separator in surfaceColor), followed by the
+ * TOTAL number of awards across all three tiers. Null when all are zero.
  *
- * Why: the figure must mean one thing. Silver (matched_best) is half of all
- * awards and bronze top_tens can stack to a dozen on one round, so a total
- * ranks rounds backwards — twelve top-ten placings must not print a bigger
- * number than a course record. The colour says which kind of medal, the
- * figure says how many of that kind; the full list lives in RoundResults in
- * the scorecard sheet. Do not "fix" this back into a sum.
+ * Why a total is safe: hole units earn only a new best (gold) or a first
+ * birdie (bronze) — no matched-best, top-three or top-ten placings — under the
+ * rule in supabase/functions/gam-evaluator/awards.ts (resolveAwards). That rule
+ * is what stops a round stacking a dozen hole placings into a figure bigger
+ * than a course record. If that rule is ever loosened, revisit this figure.
+ * The full list lives in RoundResults in the scorecard sheet.
  *
- * Hue alone carries tier, so the wrapper carries a counted aria-label.
- * surfaceColor is always a prop (Explore canvas vs Scores list ground).
- * scale: 'row' matches 15px row figures (Explore); 'pill' matches 9px pills (Scores).
+ * The aria-label joins the counted tier keys: "4 gold, 11 silver".
+ * scale: 'row' beside 15px figures (Explore); 'pill' beside 11.5px (Scores).
  */
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
-import { medalTierTone } from '@/lib/tokens/medals';
+import { AwardMark, type AwardTier } from '@/components/awards/AwardMark';
 
-export interface MedalClusterProps {
+export interface AwardClusterProps {
   gold: number;
   silver: number;
   bronze: number;
@@ -26,30 +25,26 @@ export interface MedalClusterProps {
   scale?: 'row' | 'pill';
 }
 
-const SCALES = {
-  row: { dot: 10, figure: 15 },
-  pill: { dot: 8, figure: 11.5 },
-} as const;
-
+const FIGURE = { row: 15, pill: 11.5 } as const;
 const DEFAULTS = { gold: '{{count}} gold', silver: '{{count}} silver', bronze: '{{count}} bronze' } as const;
 
-export function MedalCluster({ gold, silver, bronze, surfaceColor, scale = 'row' }: MedalClusterProps) {
+export function AwardCluster({ gold, silver, bronze, surfaceColor, scale = 'row' }: AwardClusterProps) {
   const { t } = useTranslation('courses');
-  const top = gold > 0 ? (['gold', gold] as const) : silver > 0 ? (['silver', silver] as const) : bronze > 0 ? (['bronze', bronze] as const) : null;
-  if (!top) return null;
-  const [tier, count] = top;
-  const s = SCALES[scale];
+  const tiers = ([['gold', gold], ['silver', silver], ['bronze', bronze]] as Array<[AwardTier, number]>).filter(([, n]) => n > 0);
+  if (tiers.length === 0) return null;
+  const total = gold + silver + bronze;
+  const label = tiers.map(([tier, count]) => t(`amateur.stream.medals.${tier}`, { count, defaultValue: DEFAULTS[tier] })).join(', ');
   return (
-    <span
-      data-medal-cluster={tier}
-      role="img"
-      aria-label={t(`amateur.stream.medals.${tier}`, { count, defaultValue: DEFAULTS[tier] })}
-      style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
-    >
-      <span aria-hidden style={{ width: s.dot, height: s.dot, borderRadius: 999, background: medalTierTone(tier), boxShadow: `0 0 0 1.5px ${surfaceColor}`, flex: 'none' }} />
-      <span aria-hidden style={{ fontSize: s.figure, fontWeight: 700, color: A.INK, fontVariantNumeric: 'tabular-nums' }}>{count}</span>
+    <span data-award-cluster={tiers.map(([k]) => k).join(' ')} role="img" aria-label={label}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+      <span aria-hidden style={{ display: 'inline-flex', alignItems: 'center' }}>
+        {tiers.map(([tier], i) => (
+          <AwardMark key={tier} tier={tier} size={scale} ring={surfaceColor} style={{ marginLeft: i === 0 ? 0 : -4, position: 'relative', zIndex: tiers.length - i }} />
+        ))}
+      </span>
+      <span aria-hidden style={{ fontSize: FIGURE[scale], fontWeight: 700, color: A.INK, fontVariantNumeric: 'tabular-nums' }}>{total}</span>
     </span>
   );
 }
 
-export default MedalCluster;
+export default AwardCluster;
