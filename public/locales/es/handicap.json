@@ -184,10 +184,10 @@
     },
     "line": {
       "newBest": {
-        "you": "{{score}}. Your best here was {{previous}}",
-        "he": "{{score}}. His best here was {{previous}}",
-        "she": "{{score}}. Her best here was {{previous}}",
-        "they": "{{score}}. Their best here was {{previous}}",
+        "you": "{{score}}. Your previous best here was {{previous}}",
+        "he": "{{score}}. His previous best here was {{previous}}",
+        "she": "{{score}}. Her previous best here was {{previous}}",
+        "they": "{{score}}. Their previous best here was {{previous}}",
         "none": "{{score}}. Previous best here was {{previous}}."
       },
       "matched": {
