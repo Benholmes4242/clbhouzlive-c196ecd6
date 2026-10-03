@@ -23,7 +23,7 @@ interface Props {
 }
 
 /** Period comes from the raw LegendCategory key, never the name or short label. */
-const is90d = (r: Legend) => String((r as { category?: string }).category ?? '').endsWith('_90d');
+const is90d = (r: Legend) => r.category.endsWith('_90d');
 
 export const CrownDetail: React.FC<Props> = ({ data, group, onBack }) => {
   const navigate = useNavigate();
