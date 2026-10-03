@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { currentShieldColor, applyShieldColor } from './useMedianStatusBar';
+import { reassertRouteChrome } from '@/lib/routeChrome';
 
 // Thresholds for rehydration behavior
 const REHYDRATION_THRESHOLDS = {
@@ -41,11 +41,10 @@ export function useAppLifecycle() {
 
       const backgroundDuration = Date.now() - backgroundTimeRef.current;
 
-      // Step 0: Re-apply current shield color so the repaint uses the correct value
-      const color = currentShieldColor ?? 'transparent';
-      applyShieldColor(color);
-      document.documentElement.style.backgroundColor = color;
-      document.body.style.backgroundColor = color;
+      // Step 0: Re-assert route chrome (overlay claim, or the route's surface,
+      // shield and status bar). force bypasses the cache, so html/body are
+      // repainted with the route surface — never 'transparent'.
+      reassertRouteChrome('resume');
 
       // Step 1: Immediately ensure shield is painted (no gap)
       const shield = document.getElementById('safe-area-shield');
