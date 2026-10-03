@@ -6,6 +6,7 @@ import {
   type BoardFilters,
   type BoardKey,
   type CourseBoardKey,
+  sameFilters,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 import { useBoardFacets } from '@/components/explore-tab-new/courseled/hooks/useBoardFacets';
 import { useBoardPage } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
@@ -134,6 +135,19 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
     setFilters((prev) => normalizeFilters({ ...prev, scope: 'everyone' }));
   }, []);
 
+  /* ONE RESET. Board and filters together, one event. Calling changeBoard
+     from a reset reported amateur_board_changed as though the member had
+     picked Most recent. */
+  const resetAll = useCallback(() => {
+    touched.current = true;
+    setWidened(false);
+    analyticsEvents.track('amateur_filter_reset', {});
+    setFilters({ ...ENTRY_FILTERS });
+    setBoard(ENTRY_BOARD);
+  }, []);
+
+  const canReset = !sameFilters(filters, ENTRY_FILTERS) || board !== ENTRY_BOARD;
+
   return useMemo(
     () => ({
       ready: true,
@@ -157,9 +171,11 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
       changeFilters,
       changeCourseBoard,
       resetFilters,
+      resetAll,
+      canReset,
       seeEveryone,
     }),
-    [board, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, seeEveryone],
+    [board, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, resetAll, canReset, seeEveryone],
   );
 }
 

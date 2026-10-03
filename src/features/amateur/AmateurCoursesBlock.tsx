@@ -9,7 +9,6 @@ import { useBoardCourses } from '@/components/explore-tab-new/courseled/hooks/us
 import {
   COURSE_BOARD_KEYS,
   COURSE_BOARD_LABELS,
-  filtersAreDefault,
   type CourseBoardKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 import { DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
@@ -99,10 +98,10 @@ export function AmateurCoursesBlock({
               line: appliedParts.join(' \u00B7 '),
             })}
           </p>
-          {!filtersAreDefault(filters) && (
+          {state.canReset && (
             <button
               type="button"
-              onClick={state.resetFilters}
+              onClick={state.resetAll}
               style={{
                 marginTop: 10,
                 padding: 0,

@@ -18,7 +18,6 @@ import {
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
   boardCountsRounds,
-  filtersAreDefault,
   type BandKey,
   type BoardFilters,
   type BoardKey,
@@ -249,6 +248,10 @@ export interface BoardFilterPanelProps {
   /** One action: the caller clears the filters AND the board pick, so the
       board re-resolves through the member's own default chain. */
   onReset: () => void;
+  /** True when the member has moved ANY axis, the board included, away
+      from what onReset will restore. The caller owns this because the
+      caller owns the reset target -- the panel cannot compute it. */
+  canReset: boolean;
   resultCount: number;
   filters: BoardFilters;
   onChange: (next: BoardFilters) => void;
@@ -263,6 +266,7 @@ export function BoardFilterPanel({
   onBoardChange,
   boardChanged = false,
   onReset,
+  canReset,
   resultCount,
   filters,
   onChange,
@@ -318,7 +322,6 @@ export function BoardFilterPanel({
     ? t('discover.filterBoard.railRounds', { count: footN, defaultValue_one: 'ROUND', defaultValue_other: 'ROUNDS' })
     : t('discover.filterBoard.railMembers', { count: footN, defaultValue_one: 'MEMBER', defaultValue_other: 'MEMBERS' });
 
-  const atDefaults = filtersAreDefault(filters);
 
   const courseRows = facets.openList('course');
   const needle = courseSearch.trim().toLowerCase();
@@ -426,7 +429,7 @@ export function BoardFilterPanel({
         {/* S1.4 — RESET lives here now. Disabled and dim at defaults. */}
         <button
           type="button"
-          disabled={atDefaults}
+          disabled={!canReset}
           onClick={onReset}
           style={{
             flexShrink: 0,
@@ -435,8 +438,8 @@ export function BoardFilterPanel({
             padding: '8px 0',
             fontFamily: SANS,
             ...KICKER,
-            color: atDefaults ? A.DIM : A.MUTE,
-            cursor: atDefaults ? 'default' : 'pointer',
+            color: canReset ? A.MUTE : A.DIM,
+            cursor: canReset ? 'pointer' : 'default',
           }}
         >
           {t('discover.filterBoard.reset', 'Reset all filters')}

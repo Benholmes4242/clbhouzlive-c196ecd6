@@ -31,7 +31,7 @@ import {
   WINDOW_SHORT,
   boardCountsRounds,
   normalizeFilters,
-  filtersAreDefault,
+  sameFilters,
   type BoardFilters,
   type BoardKey,
   type CourseBoardKey,
@@ -127,6 +127,16 @@ export function ScoresTab({
   /* pickedBoard is seeded by the entry effect, so it is never null once ready;
      this marks a MEMBER pick, which is what "changed from default" means. */
   const [boardTouched, setBoardTouched] = useState(false);
+
+  /* THE RESET TARGET. The entry effect seeds from this and canReset
+     measures against it. Two copies of this object is how the Reset
+     button came to be lit on an untouched page. */
+  const entryFilters = useMemo(
+    () => normalizeFilters({ ...DEFAULT_FILTERS, window: entry.window, scope: entry.scope }),
+    [entry.window, entry.scope],
+  );
+  const canReset =
+    boardTouched || (pickedFilters != null && !sameFilters(pickedFilters, entryFilters));
   const [courseBoard, setCourseBoard] = useState<CourseBoardKey>('played');
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -138,8 +148,8 @@ export function ScoresTab({
   useEffect(() => {
     if (pickedBoard || !entry.resolved || !entry.board) return;
     setBoard(entry.board);
-    setFilters(normalizeFilters({ ...DEFAULT_FILTERS, window: entry.window, scope: entry.scope }));
-  }, [pickedBoard, entry.resolved, entry.board, entry.window, entry.scope]);
+    setFilters(entryFilters);
+  }, [pickedBoard, entry.resolved, entry.board, entryFilters]);
 
   const ready = pickedBoard !== null && pickedFilters !== null;
   const board = pickedBoard ?? entry.board ?? DEFAULT_BOARD_FALLBACK;
@@ -312,8 +322,8 @@ export function ScoresTab({
             line={t('discover.filterBoard.emptyLine', 'Nothing on this board for {{line}}.', {
               line: appliedParts.join(' \u00B7 '),
             })}
-            canReset={!filtersAreDefault(filters)}
-            onReset={() => changeFilters({ ...DEFAULT_FILTERS })}
+            canReset={canReset}
+            onReset={resetAll}
           />
         ) : (
           <>
@@ -369,8 +379,8 @@ export function ScoresTab({
             line={t('discover.coursesPlayed.emptyLine', 'No courses played for {{line}}.', {
               line: appliedParts.join(' \u00B7 '),
             })}
-            canReset={!filtersAreDefault(filters)}
-            onReset={() => changeFilters({ ...DEFAULT_FILTERS })}
+            canReset={canReset}
+            onReset={resetAll}
           />
         ) : (
           <>
@@ -405,6 +415,7 @@ export function ScoresTab({
         onBoardChange={changeBoard}
         boardChanged={boardTouched && pickedBoard !== entry.board}
         onReset={resetAll}
+        canReset={canReset}
         resultCount={total}
         filters={filters}
         onChange={changeFilters}
