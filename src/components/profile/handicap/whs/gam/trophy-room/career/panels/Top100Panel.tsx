@@ -14,17 +14,20 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { REC } from '../tokens';
-import { Panel, RowButton, Figure, Bar, MetaLabel } from '../Primitives';
+import { ChevronRight } from 'lucide-react';
 import { top100Standing } from '../shareModel';
 import { top100BadgeIdToListSlug } from '../../_shared/showpieces';
 import type { Achievement, CareerData } from '../types';
 
 const LIST_LABEL: Record<string, string> = {
-  top_100_worldwide: 'World Top 100',
-  top_100_gbni: 'GB and Ireland Top 100',
-  top_100_europe: 'Continental Europe Top 100',
-  top_100_usa: 'USA Top 100',
+  top_100_worldwide: 'World',
+  top_100_gbni: 'GB & Ireland',
+  top_100_europe: 'Continental Europe',
+  top_100_usa: 'USA',
 };
+
+const RING_R = 32;
+const RING_C = 2 * Math.PI * RING_R;
 
 const ORDER = ['top_100_worldwide', 'top_100_gbni', 'top_100_europe', 'top_100_usa'];
 
@@ -41,17 +44,15 @@ export const Top100Panel: React.FC<Props> = ({ data, items }) => {
     return d !== 0 ? d : ORDER.indexOf(a.badgeId) - ORDER.indexOf(b.badgeId);
   });
   if (sorted.length === 0) return null;
-  // Sparse account: every list at zero is four rows of nothing. The panel
-  // does not render at all rather than showing "0 of 100" four times.
-  if (sorted.every((item) => (item.currentValue ?? 0) === 0)) return null;
+  // On a tab, four "Not started" cards are the correct state -- no all-zero
+  // early return.
 
   return (
-    <Panel
-      title={t('career.top100Kicker')}
-      action={<MetaLabel>{t('career.top100Basis')}</MetaLabel>}
-    >
-      {sorted.map((item, i) => {
+    <section style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
+      {sorted.map((item) => {
         const count = item.currentValue ?? 0;
+        const zero = count === 0;
+        const label = LIST_LABEL[item.badgeId] ?? item.name;
         const slug = top100BadgeIdToListSlug(item.badgeId) ?? '';
         const standing = top100Standing(
           data.distribution,
@@ -62,54 +63,89 @@ export const Top100Panel: React.FC<Props> = ({ data, items }) => {
           data.config.shareMinDenominator,
         );
         return (
-          <RowButton
+          <button
             key={item.badgeId}
-            last={i === sorted.length - 1}
+            type="button"
             onClick={() => data.onOpen({ kind: 'top100', badgeId: item.badgeId })}
-            ariaLabel={`${LIST_LABEL[item.badgeId] ?? item.name}, ${count} of 100`}
+            aria-label={`${label}, ${count} of 100`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              width: '100%',
+              padding: 16,
+              borderRadius: 16,
+              border: zero ? `1px dashed ${REC.TILE_DASH}` : `1px solid ${REC.TILE_LINE}`,
+              background: zero ? 'transparent' : REC.PANEL_2,
+              textAlign: 'left',
+              cursor: 'pointer',
+              fontFamily: REC.FONT,
+            }}
           >
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-              <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 700, color: REC.INK }}>
-                {LIST_LABEL[item.badgeId] ?? item.name}
+            <span style={{ position: 'relative', width: 76, height: 76, flexShrink: 0 }}>
+              <svg width={76} height={76} viewBox="0 0 76 76" aria-hidden>
+                <circle
+                  cx={38}
+                  cy={38}
+                  r={RING_R}
+                  fill="none"
+                  stroke={REC.RING_TRACK}
+                  strokeWidth={6}
+                  strokeDasharray={zero ? '3 5' : undefined}
+                />
+                {!zero && (
+                  <circle
+                    cx={38}
+                    cy={38}
+                    r={RING_R}
+                    fill="none"
+                    stroke={REC.AMBER}
+                    strokeWidth={6}
+                    strokeLinecap="round"
+                    strokeDasharray={`${(Math.min(100, count) / 100) * RING_C} ${RING_C}`}
+                    transform="rotate(-90 38 38)"
+                  />
+                )}
+              </svg>
+              <span
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontSize: 26,
+                  fontWeight: 700,
+                  letterSpacing: '-0.03em',
+                  color: zero ? REC.DIM : REC.INK,
+                  ...REC.TABULAR,
+                }}
+              >
+                {count}
               </span>
-              <span style={{ ...REC.TABULAR, fontSize: 11, color: REC.DIM }}>
-                <Figure value={count} size={16} color={count > 0 ? REC.INK : REC.DIM} /> of 100
+            </span>
+            <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.015em', color: REC.INK }}>
+                {label}
               </span>
-            </div>
-            {/* No bar at zero. The row states the state in words instead. */}
-            {count > 0 ? (
-              <div style={{ marginTop: 8 }}>
-                <Bar pct={count} color={REC.AMBER} />
-              </div>
-            ) : null}
-            <div
-              style={{
-                marginTop: 7,
-                fontSize: 11,
-                color: REC.MUTE,
-                ...REC.TABULAR,
-              }}
-            >
+              <span style={{ fontSize: 12.5, color: REC.MUTE, ...REC.TABULAR }}>
+                {zero ? t('career.top100NotStarted') : `${count} of 100 played · ${100 - count} to go`}
+              </span>
               {standing.kind === 'share' && (
-                <span style={{ color: REC.GOOD, fontWeight: 700 }}>
+                <span style={{ fontSize: 11.5, fontWeight: 700, color: REC.GOOD, ...REC.TABULAR }}>
                   Ahead of {standing.pct}% of members
                 </span>
               )}
               {standing.kind === 'ordinal' && (
-                <span style={{ color: REC.GOOD, fontWeight: 700 }}>
+                <span style={{ fontSize: 11.5, fontWeight: 700, color: REC.GOOD, ...REC.TABULAR }}>
                   Among the top {standing.members} of any member
                 </span>
               )}
-              {standing.kind === 'none' && (
-                <span>
-                  {count === 0 ? t('career.top100NotStarted') : `${100 - count} still to play`}
-                </span>
-              )}
-            </div>
-          </RowButton>
+            </span>
+            <ChevronRight size={18} color={REC.DIM} style={{ flexShrink: 0 }} />
+          </button>
         );
       })}
-    </Panel>
+    </section>
   );
 };
 

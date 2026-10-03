@@ -44,7 +44,7 @@ export const SHOWPIECE_COUNTER_LABEL: Record<string, string> = {
   top_100_worldwide: 'of World Top 100 played',
   top_100_usa:       'of USA Top 100 played',
   top_100_gbni:      'of GB&I Top 100 played',
-  top_100_europe:    'of Europe Top 100 played',
+  top_100_europe:    'of Continental Europe Top 100 played',
 };
 
 export function shortenShowpieceCaption(caption: string): string {
