@@ -67,7 +67,8 @@ export function AmateurLeaderboardBlock({
   userId: string | undefined;
   state: AmateurBoardState;
   onRowPress: (row: BoardRow) => void;
-  onBack: () => void;
+  /** Omitted where the board IS the landing view (Explore Scores): no stream to go back to. */
+  onBack?: () => void;
 }) {
   const { t } = useTranslation('courses');
   const [seeAll, setSeeAll] = useState(false);
@@ -111,13 +112,15 @@ export function AmateurLeaderboardBlock({
           padding: '0 24px 10px',
         }}
       >
-        <button
-          type="button"
-          onClick={onBack}
-          style={{ ...QUIET_ACTION, color: A.MUTE, fontWeight: 700, flexShrink: 0 }}
-        >
-          ‹ {t('amateur.board.backToStream', 'Back to the stream')}
-        </button>
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            style={{ ...QUIET_ACTION, color: A.MUTE, fontWeight: 700, flexShrink: 0 }}
+          >
+            ‹ {t('amateur.board.backToStream', 'Back to the stream')}
+          </button>
+        ) : <span />}
         <span
           className="tabular-nums lining-nums"
           style={{ minWidth: 0, fontSize: 12, fontWeight: 600, color: A.DIM, whiteSpace: 'nowrap' }}
