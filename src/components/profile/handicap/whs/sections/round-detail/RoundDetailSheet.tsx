@@ -22,7 +22,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import type { WhsScoreHole } from '@/lib/whs/types';
-import { fmtDateEyebrow } from './roundDateEyebrow';
+import { fmtDateEyebrow, fmtDateLong } from './roundDateEyebrow';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -291,6 +291,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
 
 
   const eyebrowText = fmtDateEyebrow(userData?.play_date ?? (usingSeed ? seed?.playDate : null));
+  const dateLongText = fmtDateLong(userData?.play_date ?? (usingSeed ? seed?.playDate : null));
   const canonicalCourse = canonicalCourseQuery.data ?? null;
   const courseName = canonicalCourse?.name ?? userData?.course?.name ?? (usingSeed ? seed?.courseName ?? '' : '');
   const courseLocation = canonicalCourse
@@ -460,6 +461,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       open={cardOpen}
       onClose={onClose}
       eyebrowText={eyebrowText}
+      dateLongText={dateLongText}
       courseName={courseName}
       courseLocation={courseLocation}
       coursePar={coursePar}
