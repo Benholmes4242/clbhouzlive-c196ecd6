@@ -143,7 +143,15 @@
       "matchedBestHole": "Matched your best on the {{hole}}",
       "topThreeHole": "Top-three on the {{hole}} here",
       "topTenHole": "Top-ten on the {{hole}} here",
-      "firstBirdie": "First birdie on the {{hole}}"
+      "firstBirdie": "First birdie on the {{hole}}",
+      "bestHoleSelf": "Your best on the {{hole}}",
+      "bestHoleOther": "{{name}} best on the {{hole}}",
+      "matchedBestHoleSelf": "Matched your best on the {{hole}}",
+      "matchedBestHoleOther": "Matched {{name}} best on the {{hole}}",
+      "bestSelf": "Your best {{unit}} here",
+      "bestOther": "{{name}} best {{unit}} here",
+      "matchedBestSelf": "Matched your best {{unit}} here",
+      "matchedBestOther": "Matched {{name}} best {{unit}} here"
     },
     "previous": "Previous best {{value}}",
     "placing": {
@@ -170,6 +178,39 @@
       "back_nine": "Holes 10–18",
       "finish_six": "Holes 13–18",
       "round_stableford": "Points, 18 holes"
-    }
+    },
+    "line": {
+      "newBest": {
+        "you": "{{score}}. Your best here was {{previous}}",
+        "he": "{{score}}. His best here was {{previous}}",
+        "she": "{{score}}. Her best here was {{previous}}",
+        "they": "{{score}}. Their best here was {{previous}}"
+      },
+      "matched": {
+        "you": "{{score}}, equalling your best here",
+        "he": "{{score}}, equalling his best here",
+        "she": "{{score}}, equalling her best here",
+        "they": "{{score}}, equalling their best here"
+      }
+    },
+    "scoreName": {
+      "albatross": "Albatross",
+      "eagle": "Eagle",
+      "birdie": "Birdie",
+      "par": "Par",
+      "bogey": "Bogey",
+      "double": "Double bogey",
+      "triple": "Triple bogey"
+    },
+    "scorePrev": {
+      "albatross": "an albatross",
+      "eagle": "an eagle",
+      "birdie": "a birdie",
+      "par": "par",
+      "bogey": "a bogey",
+      "double": "a double bogey",
+      "triple": "a triple bogey"
+    },
+    "points": "{{count}} points"
   }
 }

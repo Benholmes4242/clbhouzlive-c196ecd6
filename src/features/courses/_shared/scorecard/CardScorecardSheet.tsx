@@ -417,11 +417,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    */
   const isOwner = !isTour && (subjectIsViewer ?? (!!playerUserId && !!user?.id && playerUserId === user.id));
   const scopeVoice = useMemo(() => {
-    if (isOwner) return { subjectName: t('courses:scorecard.scopeYou'), subject: t('courses:scorecard.scopeYou'), possessive: t('courses:scorecard.scopeYour'), verb: t('courses:scorecard.scopeHave') };
+    if (isOwner) return { self: true, pronoun: 'you' as const, subjectName: t('courses:scorecard.scopeYou'), subject: t('courses:scorecard.scopeYou'), possessive: t('courses:scorecard.scopeYour'), verb: t('courses:scorecard.scopeHave') };
     const namedPossessive = playerName.endsWith('s') ? `${playerName}'` : `${playerName}'s`;
-    if (playerGender === 'male') return { subjectName: namedPossessive, subject: t('courses:scorecard.scopeHe'), possessive: t('courses:scorecard.scopeHis'), verb: t('courses:scorecard.scopeHas') };
-    if (playerGender === 'female') return { subjectName: namedPossessive, subject: t('courses:scorecard.scopeShe'), possessive: t('courses:scorecard.scopeHer'), verb: t('courses:scorecard.scopeHas') };
-    return { subjectName: namedPossessive, subject: t('courses:scorecard.scopeThey'), possessive: t('courses:scorecard.scopeTheir'), verb: t('courses:scorecard.scopeHave') };
+    if (playerGender === 'male') return { self: false, pronoun: 'he' as const, subjectName: namedPossessive, subject: t('courses:scorecard.scopeHe'), possessive: t('courses:scorecard.scopeHis'), verb: t('courses:scorecard.scopeHas') };
+    if (playerGender === 'female') return { self: false, pronoun: 'she' as const, subjectName: namedPossessive, subject: t('courses:scorecard.scopeShe'), possessive: t('courses:scorecard.scopeHer'), verb: t('courses:scorecard.scopeHas') };
+    return { self: false, pronoun: 'they' as const, subjectName: namedPossessive, subject: t('courses:scorecard.scopeThey'), possessive: t('courses:scorecard.scopeTheir'), verb: t('courses:scorecard.scopeHave') };
   }, [isOwner, playerGender, playerName, t]);
 
 
@@ -861,6 +861,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           playerUserId={playerUserId}
           tourAvatarCandidates={tourAvatarCandidates}
           isOwner={isOwner}
+          playerHcp={playerHcp}
           playerHcpDelta={playerHcpDelta}
           rail={rail}
         />
@@ -976,7 +977,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 courseName,
                 roundsHere: courseContext.roundsHere,
                 ...scopeVoice,
-              } : null} />}
+              } : null} voice={playerName || isOwner ? scopeVoice : null} />}
 
               {/*
                 §C — AT THIS COURSE. ONE POOL: the member's own rounds at this
