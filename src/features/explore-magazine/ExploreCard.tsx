@@ -32,7 +32,7 @@ import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
 import { RankFlagBadge } from './RankFlagBadge';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { handicapPairDisplay } from './circleHandicap';
+import { MedalCluster } from './MedalCluster';
 import { NUMF } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { ReviewBreakdown } from './useReviewPageEnrichment';
@@ -378,7 +378,8 @@ function WhoLine({
   onWhoTap?: () => void;
   engagement?: RoundCardEngagement | null;
   reviewIdentity?: { course: string | null; scope: string | null; date: string | null };
-  roundIdentity?: { course: string | null; date: string | null; gross?: number | null; toPar?: number | null; net: number | null; par: number | null; handicapIndex?: number | null; deltaIndex?: number | null };
+  roundIdentity?: { course: string | null; date: string | null; gross?: number | null; toPar?: number | null; net: number | null; par: number | null; handicapIndex?: number | null; deltaIndex?: number | null; medalsGold?: number | null; medalsSilver?: number | null; medalsBronze?: number | null };
+  // handicapIndex/deltaIndex are unread here today: the index returns to the name row in a later change — keep them on the prop.
 }) {
   const { t } = useTranslation('courses');
   /* AN OBJECT IS NOT AN IDENTITY. get_explore_stream builds its `who`
@@ -526,16 +527,13 @@ function WhoLine({
   if (roundIdentity && !pair) {
     const hasFigures = roundIdentity.net != null && roundIdentity.par != null;
     const under = hasFigures && roundIdentity.net! < roundIdentity.par!;
-    // Server already gated; format only. Absent pair = empty HCP cell.
-    const hcpPair = handicapPairDisplay({ handicapIndex: roundIdentity.handicapIndex, deltaIndex: roundIdentity.deltaIndex });
+    const mGold = roundIdentity.medalsGold ?? 0;
+    const mSilver = roundIdentity.medalsSilver ?? 0;
+    const mBronze = roundIdentity.medalsBronze ?? 0;
+    const hasMedals = mGold + mSilver + mBronze > 0;
     const toPar = toParLabel(roundIdentity.toPar ?? null);
     const grossToParNode = toPar
       ? <span style={{ ...NUMF, color: (roundIdentity.toPar ?? 0) < 0 ? TOPAR_UNDER_DARK : A.MUTE }}>{toPar}</span>
-      : null;
-    const hcpDeltaNode = hcpPair?.delta
-      ? <span style={{ ...NUMF, display: 'inline-flex', alignItems: 'center', gap: 2, color: hcpPair.delta.tone }}>
-          <span aria-hidden>{hcpPair.delta.arrow}</span><span>{hcpPair.delta.text}</span>
-        </span>
       : null;
     return (
       <div data-round-under-tile="true" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
@@ -547,8 +545,10 @@ function WhoLine({
             value={roundIdentity.net != null ? String(roundIdentity.net) : ''} />
           <FigureCell minHeight={34} label={t('amateur.stream.stat.vsHcp', 'VS HCP')}
             value={hasFigures ? vsHandicapLabel(roundIdentity.net!, roundIdentity.par!) : ''} under={under} />
-          <FigureCell minHeight={34} label={t('friendsRail.index', 'HCP')}
-            value={hcpPair?.index ?? ''} suffix={hcpDeltaNode} />
+          {hasMedals ? (
+            <FigureCell minHeight={34} label={t('amateur.stream.stat.medals', 'MEDALS')}
+              value={<MedalCluster gold={mGold} silver={mSilver} bronze={mBronze} surfaceColor={A.CANVAS} />} />
+          ) : <span />}
         </div>
         <div data-round-identity-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 8, marginTop: 12 }}>
           {avatar}
@@ -1478,7 +1478,7 @@ export function ExploreCard({
             onWhoTap={onWhoTap}
             engagement={engagement}
             roundIdentity={item.kind === 'round' && size !== 'pair'
-              ? { course: kickerPartsValue.course, date: railCaptionDate(item.facts.play_date ?? null), gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null }
+              ? { course: kickerPartsValue.course, date: railCaptionDate(item.facts.play_date ?? null), gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null, medalsGold: item.facts.medals_gold ?? null, medalsSilver: item.facts.medals_silver ?? null, medalsBronze: item.facts.medals_bronze ?? null }
               : undefined}
           />
         </span>

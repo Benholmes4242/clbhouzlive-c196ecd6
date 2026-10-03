@@ -316,7 +316,9 @@
       "stat": {
         "net": "NET",
         "par": "PAR",
-        "vsHcp": "VS HCP"
+        "vsHcp": "VS HCP",
+        "medals": "MEDALS",
+        "gross": "GROSS"
       },
       "topar": {
         "level": "level par",

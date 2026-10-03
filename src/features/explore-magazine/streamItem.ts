@@ -154,6 +154,10 @@ export interface StreamFacts {
   birdies?: number | null;
   eagles?: number | null;
   albatrosses?: number | null;
+  /** Round-award medal counts (get_explore_stream, pending). Absent = none. */
+  medals_gold?: number | null;
+  medals_silver?: number | null;
+  medals_bronze?: number | null;
   holes_in_one?: number | null;
   clean_card?: boolean | null;
   is_course_record?: boolean | null;

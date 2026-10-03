@@ -311,7 +311,9 @@
       "stat": {
         "net": "NET",
         "par": "PAR",
-        "vsHcp": "VS HCP"
+        "vsHcp": "VS HCP",
+        "medals": "메달",
+        "gross": "그로스"
       },
       "topar": {
         "level": "이븐파",

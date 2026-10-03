@@ -24,8 +24,10 @@ import RailChips from '@/components/ui/RailChips';
 import { FigureCell, vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
 import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap';
 import { toParLabel } from '@/features/explore-magazine/exploreCopy';
+import { MedalCluster } from '@/features/explore-magazine/MedalCluster';
 import { useFitOneLine } from '@/features/explore-magazine/useFitOneLine';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+const medalTotal = (r: ProfileRound) => (r.medals_gold ?? 0) + (r.medals_silver ?? 0) + (r.medals_bronze ?? 0);
 import { isFullEighteen, useOwnHandicapVisibility, useProfileRounds, type ProfileRound } from './useProfileRounds';
 
 interface Props {
@@ -300,8 +302,9 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
                     {formatDayMonthShortGB(parseDate(r.play_date))}
                   </span>
                 </span>
-                {fs.length || !full18 ? (
-                  <span style={{ display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap' }}>
+                {fs.length || !full18 || medalTotal(r) > 0 ? (
+                  <span style={{ display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <MedalCluster gold={r.medals_gold ?? 0} silver={r.medals_silver ?? 0} bronze={r.medals_bronze ?? 0} surfaceColor={CHART.CANVAS} />
                     {!full18 ? (
                       <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: CHART.MUTE, border: `1px solid ${CHART.BORDER}`, borderRadius: 999, padding: '3px 6px', whiteSpace: 'nowrap' }}>
                         {r.whs_joined && r.is_nine_hole ? t('rounds.nineHoles', '9 holes') : t('rounds.notFull', 'Not a full 18')}
