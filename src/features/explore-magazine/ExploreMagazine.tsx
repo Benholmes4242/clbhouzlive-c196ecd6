@@ -12,7 +12,7 @@ import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hoo
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { FeatRarityProvider } from '@/hooks/gam/useFeatRarity';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { RailChips, type RailChipOption } from '@/components/ui/RailChips';
+import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import {
   RoundDetailSheet,
@@ -50,7 +50,6 @@ import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBl
 import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
 import { BOARD_LABELS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
-import { ChevronDown } from 'lucide-react';
 
 import { CircleShelf } from './CircleShelf';
 import { ScoresFilterHead } from './ScoresFilterHead';
