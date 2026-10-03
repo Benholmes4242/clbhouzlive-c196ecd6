@@ -91,6 +91,8 @@ export interface CardScorecardSheetProps {
   onClose: () => void;
   // HEADER (course-first)
   eyebrowText: string;
+  /** Member place line: the long date (fmtDateLong). */
+  dateLongText?: string;
   courseName: string;
   courseLocation?: string | null;
   coursePar?: number | null;
@@ -328,7 +330,7 @@ export interface CardScorecardEngagement {
 /* ------------------------------------------------------------- the sheet */
 
 export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
-  open, onClose, eyebrowText,
+  open, onClose, eyebrowText, dateLongText = '',
   courseName, courseLocation, coursePar, courseSlope,
   holes, totalHoles = null, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
@@ -387,6 +389,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         ? `${eyebrowText} \u00B7 ${t('courses:scorecard.nineHoleTag')}`
         : t('courses:scorecard.nineHoleTag'))
     : eyebrowText;
+  // Sibling for the member place line: long date, sentence-case tag.
+  const memberDateText = nineHole
+    ? [dateLongText, t('courses:scorecard.nineHoleTag')].filter(Boolean).join(' \u00B7 ')
+    : dateLongText;
 
 
   const isTour = surface === 'tour';
@@ -847,6 +853,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         <RoundSummaryHead
           isTour={isTour}
           kickerText={kickerText}
+          memberDateText={memberDateText}
           courseName={courseName}
           courseLocation={courseLocation}
           showScore={totals.played}

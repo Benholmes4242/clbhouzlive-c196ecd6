@@ -20,7 +20,7 @@ import { roundCoursePar } from '@/lib/whs/api';
 import { useTranslation } from 'react-i18next';
 
 import type { RoundDetailSeed } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { fmtDateEyebrow } from '@/components/profile/handicap/whs/sections/round-detail/roundDateEyebrow';
+import { fmtDateEyebrow, fmtDateLong } from '@/components/profile/handicap/whs/sections/round-detail/roundDateEyebrow';
 import { FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import {
   Nine, NotPlayedLine, RoundSummaryHead, SANS, ScorecardSection,
@@ -85,6 +85,7 @@ export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
         courseName={seed?.courseName ?? ''}
         courseLocation={seed?.placeLine ?? null}
         kickerText={fmtDateEyebrow(seed?.playDate ?? null)}
+        memberDateText={fmtDateLong(seed?.playDate ?? null)}
         showScore={seed?.gross != null}
         gross={seed?.gross ?? null}
         toPar={seed?.toPar ?? null}

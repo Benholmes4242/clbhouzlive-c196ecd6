@@ -343,6 +343,8 @@ export interface RailFigure {
 export interface RoundSummaryHeadProps {
   isTour?: boolean;
   kickerText?: string;
+  /** Member place line date (long form, sentence case). */
+  memberDateText?: string;
   courseName: string;
   courseLocation?: string | null;
   /** Shown only when the round has a score to show. */
@@ -377,7 +379,7 @@ export interface RoundSummaryHeadProps {
  * preview drawn during a swipe.
  */
 export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
-  isTour = false, kickerText, courseName, courseLocation,
+  isTour = false, kickerText, memberDateText, courseName, courseLocation,
   showScore, gross, toPar, shownPar = 0, playedHoles = 0, coursePar,
   heroMuted, playerName, playerAvatarUrl, playerUserId,
   tourAvatarCandidates = [], isOwner = false, playerHcp, playerHcpDelta, rail = [],
@@ -388,7 +390,7 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
   // Member surface: the round's date joins the place line (both are
   // circumstances of the round); the identity row carries the player + HCP.
   const memberPlace = !isTour
-    ? [courseLocation, kickerText].filter(Boolean).join(' \u00B7 ')
+    ? [courseLocation, memberDateText].filter(Boolean).join(' \u00B7 ')
     : courseLocation;
   const hcpPair = !isTour ? handicapPairDisplay({ handicapIndex: playerHcp, deltaIndex: playerHcpDelta }) : null;
 
