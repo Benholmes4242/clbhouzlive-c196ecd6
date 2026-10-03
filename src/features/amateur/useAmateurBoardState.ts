@@ -224,14 +224,16 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   const sheetFilterCount = sheetOnlyDiffCount(filters, entryFilters);
 
   /* §7 — the page's segmented control writes scope through here. */
+  /* The event fires OUTSIDE the updater: StrictMode double-invokes updaters,
+     and amateur_scope_changed must stay continuous across the rail retirement. */
   const changeScope = useCallback((next: ScopeKey) => {
     touched.current = true;
     setWidened(false);
-    setFilters((prev) => {
-      if (prev.scope !== next) analyticsEvents.track('amateur_scope_changed', { view: 'scores', from: prev.scope, to: next });
-      return normalizeFilters({ ...prev, scope: next });
-    });
-  }, []);
+    if (filters.scope !== next) {
+      analyticsEvents.track('amateur_scope_changed', { view: 'scores', from: filters.scope, to: next });
+    }
+    setFilters((prev) => normalizeFilters({ ...prev, scope: next }));
+  }, [filters.scope]);
 
   return useMemo(
     () => ({
