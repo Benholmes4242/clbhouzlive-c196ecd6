@@ -34,7 +34,7 @@ function rankTone(row: MemberStandingRow): string {
   return row.rank === 1 ? A.AMBER : A.INK;
 }
 
-interface BoardRow {
+export interface BoardRow {
   key: string;
   label: string;
   cells: Partial<Record<StandingWindow, MemberStandingRow>>;
