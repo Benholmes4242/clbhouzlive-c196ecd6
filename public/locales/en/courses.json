@@ -2489,7 +2489,8 @@
     "scopeThey": "They",
     "scopeTheir": "their",
     "scopeHave": "have",
-    "scopeHas": "has"
+    "scopeHas": "has",
+    "hcpLabel": "HCP"
   },
   "search": {
     "yourRounds": "Your rounds"

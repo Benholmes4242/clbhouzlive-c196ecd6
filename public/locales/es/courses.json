@@ -1899,7 +1899,8 @@
     "scopeThey": "La persona",
     "scopeTheir": "suyas",
     "scopeHave": "has",
-    "scopeHas": "ha"
+    "scopeHas": "ha",
+    "hcpLabel": "HCP"
   },
   "searchSheet": {
     "added": "Added",
