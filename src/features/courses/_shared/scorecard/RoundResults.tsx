@@ -1,5 +1,4 @@
 import React from 'react';
-import { Medal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { fmtToPar } from '@/components/feed/fmtToPar';
@@ -12,7 +11,7 @@ import {
   STATUS_LIVE_TINT_10,
 } from '@/features/tourhub/_shared/tokens';
 import { SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { medalTierTone } from '@/lib/tokens/medals';
+import { AwardMark } from '@/components/awards/AwardMark';
 import { formatOrdinal } from '@/i18n/format';
 
 export interface RoundResultsScope {
@@ -61,7 +60,11 @@ function placingText(rank: number | null, topTen: boolean, t: (key: string, opti
 function awardTitle(award: RoundAwardRow, t: (key: string, options?: Record<string, unknown>) => string): string {
   if (award.unit_kind === 'hole') {
     return t(
-      award.award_kind === 'first_birdie' ? 'roundResults.award.firstBirdie' : 'roundResults.award.bestHole',
+      award.award_kind === 'first_birdie' ? 'roundResults.award.firstBirdie'
+        : award.award_kind === 'matched_best' ? 'roundResults.award.matchedBestHole'
+        : award.award_kind === 'top_three' ? 'roundResults.award.topThreeHole'
+        : award.award_kind === 'top_ten' ? 'roundResults.award.topTenHole'
+        : 'roundResults.award.bestHole',
       { hole: formatOrdinal(award.unit_key) },
     );
   }
@@ -87,9 +90,7 @@ function AwardRow({ award }: { award: RoundAwardRow }) {
 
   return (
     <div data-round-award={award.unit_kind} style={{ minWidth: 0, display: 'grid', gridTemplateColumns: '22px minmax(0,1fr) auto', alignItems: 'center', gap: 10, padding: '10px 0' }}>
-      <span aria-hidden="true" style={{ width: 22, height: 26, borderRadius: 6, display: 'grid', placeItems: 'center', background: medalTierTone(award.tier), color: INK }}>
-        <Medal size={14} strokeWidth={2.25} />
-      </span>
+      <AwardMark tier={award.tier} size="sheet" />
       <span style={{ minWidth: 0 }}>
         <span style={{ display: 'block', color: INK, fontSize: 13.5, fontWeight: 600, lineHeight: 1.25 }}>{awardTitle(award, t)}</span>
         {subline && <span style={{ display: 'block', color: INK_FAINT, fontSize: 11.5, lineHeight: 1.35, marginTop: 3 }}>{subline}</span>}

@@ -6,7 +6,7 @@
  * The marks are medals (medalTierTone); the things they stand for are awards.
  */
 import { Medal } from 'lucide-react';
-import { INK } from '@/components/tourhub/tokens';
+import { INK } from '@/features/tourhub/_shared/tokens';
 import { medalTierTone } from '@/lib/tokens/medals';
 
 export type AwardTier = 'gold' | 'silver' | 'bronze';
