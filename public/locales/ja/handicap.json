@@ -99,6 +99,8 @@
     "top100Basis": "COURSES PLAYED OF EACH LIST OF 100",
     "top100NotStarted": "Not started",
     "milestonesKicker": "MILESTONES",
+    "milestoneTileReached": "{{name}}, reached",
+    "milestoneTileNotYet": "{{name}}, not yet reached",
     "milestonesReached": "{{n}} OF {{total}} REACHED",
     "milestoneReachedAt": "Reached {{when}}",
     "milestonesSeeAll": "SEE ALL {{n}}",

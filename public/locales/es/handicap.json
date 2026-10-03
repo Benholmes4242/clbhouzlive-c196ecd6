@@ -99,6 +99,8 @@
     "top100Basis": "CAMPOS JUGADOS DE CADA LISTA DE 100",
     "top100NotStarted": "Sin empezar",
     "milestonesKicker": "HITOS",
+    "milestoneTileReached": "{{name}}, reached",
+    "milestoneTileNotYet": "{{name}}, not yet reached",
     "milestonesReached": "{{n}} DE {{total}} ALCANZADOS",
     "milestoneReachedAt": "Alcanzado {{when}}",
     "milestonesSeeAll": "VER LOS {{n}}",
