@@ -56,13 +56,18 @@ export const ENTRY_BOARD: BoardKey = 'recent';
  *  never tested. Reorder here, nowhere else. */
 export const LANDING_SCOPES: ScopeKey[] = ['circle', 'club', 'everyone'];
 
-/** Everything but scope is fixed; scope is resolved from SCOPE_LADDER. */
+/** Everything EXCEPT scope. Scope arrives from the LANDING_SCOPES ladder. */
+export const ENTRY_FILTERS: Omit<BoardFilters, 'scope'> = (() => {
+  const { scope: _scope, ...rest } = normalizeFilters({ ...DEFAULT_FILTERS, window: '14', courses: 'any' });
+  return rest;
+})();
+
 export function entryFiltersFor(scope: ScopeKey): BoardFilters {
-  return normalizeFilters({ ...DEFAULT_FILTERS, scope, window: '14', courses: 'any' });
+  return normalizeFilters({ ...ENTRY_FILTERS, scope });
 }
 
-/** The pre-ladder shape, kept for callers that need a static value. */
-export const ENTRY_FILTERS: BoardFilters = entryFiltersFor('circle');
+/** Pre-resolution placeholder only; never rendered (the block holds until the ladder settles). */
+const UNRESOLVED_FILTERS: BoardFilters = entryFiltersFor('everyone');
 
 /** §6 — SHEET-ONLY AXES that differ from the default. Scope and board are
  *  stated on the page and are deliberately NOT counted. Max 5. */
@@ -77,7 +82,7 @@ export function sheetOnlyDiffCount(f: BoardFilters, d: BoardFilters): number {
 }
 
 export function useAmateurBoardState(userId: string | undefined, active = true) {
-  const [filters, setFilters] = useState<BoardFilters>(ENTRY_FILTERS);
+  const [filters, setFilters] = useState<BoardFilters>(UNRESOLVED_FILTERS);
   /* The resolved default. null until the ladder has resolved, and the board
      reads stay off until then — never render on one scope and swap. */
   const [entry, setEntry] = useState<BoardFilters | null>(null);
@@ -141,7 +146,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   const clubApplies = !!homeClub.clubId;
 
   const resolved = entry !== null;
-  const entryFilters = entry ?? ENTRY_FILTERS;
+  const entryFilters = entry ?? UNRESOLVED_FILTERS;
 
   const facets = useBoardFacets(userId, board, filters, { enabled: active && resolved });
   /* ONE READ, TWO READERS. The leaderboard block renders these rows and the
