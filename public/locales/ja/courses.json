@@ -338,7 +338,12 @@
         "par": "PAR",
         "triple": "TRIPLE ON {{n}}"
       },
-      "you": "あなた"
+      "you": "あなた",
+      "medals": {
+        "gold": "金 {{count}}",
+        "silver": "銀 {{count}}",
+        "bronze": "銅 {{count}}"
+      }
     },
     "watch": {
       "chip": {
