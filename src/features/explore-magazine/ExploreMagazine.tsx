@@ -1904,24 +1904,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           stay put. */}
       {view === 'courses' ? <CoursesSearchField value={search} onChange={setSearch} /> : null}
 
-      {/* §1 THE SAME SCOPE CHIPS, THE SAME COMPONENT, for Scores and the merged
-          Courses view. Scores does not render them at all where neither a club
-          nor a county resolves, and the view is then World.
-
-          BRIEF_EXPLORE_SECOND_PASS §1 REVERSES THE 'sm' RULING. Every secondary
-          row in Explore is now ONE size — the Watch filter row's, which is the
-          canonical 'md' chip — so the three rows agree with each other and with
-          the reference. The hierarchy is carried by position and by the primary
-          row being CENTRED, not by shrinking the filter.
-
-          P2 — SCORES HAS ONE PINNED CONTROL, NOT TWO. Place/course are open-list
-          board filters and stay inside BoardFilterPanel, where their facet counts
-          already live. The scope chips alone scroll; the board picker alone pins. */}
       {view === 'scores' ? (
         <div style={{ paddingBottom: 4 }}>
           <ScoresFilterHead
             board={boardState.board}
             scope={boardState.filters.scope}
+            clubApplies={boardState.clubApplies}
             filterCount={boardState.ready ? boardState.sheetFilterCount : 0}
             onOpenBoard={() => {
               analyticsEvents.track('amateur_board_picker_opened', {
@@ -1941,7 +1929,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       ) : null}
 
-      {/* §5, §7 THE MERGED VIEW'S SCOPE ROW AND ITS PLACE DROPDOWN.
+      {/* BRIEF_EXPLORE_SECOND_PASS §1 REVERSES THE 'sm' RULING. Every secondary
+          row in Explore is ONE size — the Watch filter row's, which is the
+          canonical 'md' chip — so the rows agree with each other and with the
+          reference. The hierarchy is carried by position and by the primary row
+          being CENTRED, not by shrinking the filter.
+
+          §5, §7 THE MERGED VIEW'S SCOPE ROW AND ITS PLACE DROPDOWN.
           PLACE IS *WHERE*, SCOPE IS *WHOSE*, AND THEY COMPOSE — BUT CHOOSING A
           PLACE RESETS SCOPE TO WORLD (BRIEF_EXPLORE_DEVICE_PASS §5).
 

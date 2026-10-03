@@ -18,6 +18,7 @@ import {
 export function ScoresFilterHead({
   board,
   scope,
+  clubApplies,
   filterCount,
   onOpenBoard,
   onOpenFilters,
@@ -25,6 +26,8 @@ export function ScoresFilterHead({
 }: {
   board: BoardKey;
   scope: ScopeKey;
+  /** False for a member with no club: the Your club segment is not offered. */
+  clubApplies: boolean;
   /** Sheet-only axes that differ from the default. Scope and board never count. */
   filterCount: number;
   onOpenBoard: () => void;
@@ -32,6 +35,8 @@ export function ScoresFilterHead({
   onScopeChange: (next: ScopeKey) => void;
 }) {
   const { t } = useTranslation('courses');
+  const options = SCOPE_OPTIONS.filter((o) => (o.key === 'club' ? clubApplies : true));
+
 
   return (
     <div style={{ padding: '0 16px', fontFamily: SANS }}>
@@ -111,7 +116,7 @@ export function ScoresFilterHead({
         style={{
           marginTop: 12,
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, minmax(0,1fr))',
+          gridTemplateColumns: `repeat(${options.length}, minmax(0,1fr))`,
           gap: 3,
           padding: 3,
           borderRadius: 999,
@@ -119,7 +124,7 @@ export function ScoresFilterHead({
           border: '1px solid rgba(255,255,255,0.10)',
         }}
       >
-        {SCOPE_OPTIONS.map((o) => {
+        {options.map((o) => {
           const selected = scope === o.key;
           return (
             <button
@@ -141,14 +146,16 @@ export function ScoresFilterHead({
                 minWidth: 0,
               }}
             >
-              {/* WIDTH BUDGET: at 390pt each segment is 114px wide with 4px
-                  padding each side, so a label has 106px before it ellipses.
+              {/* WIDTH BUDGET: at 390pt with THREE segments (a member with a
+                  club) each is 114px wide, 106px of label room after 4px padding
+                  each side. With TWO segments (no club) each is 173px, 165px of
+                  label room. The three-segment budget is the one that matters:
+                  it is the tighter case and the one a new translation must clear.
                   Measured at 12.5px/600 in Chromium: en "Your circle" 63.7px,
                   de "Dein Kreis" 61.8px, fr "Tout le monde" 84.5px, es "Todo el
                   mundo" 88.7px (the longest shipped label), ja and ko all under
-                  51px. Nothing clips today. Any new translation must be measured
-                  against 106px, and en-XA pseudo-localisation will NOT catch an
-                  overflow here. */}
+                  51px. Nothing clips today. en-XA pseudo-localisation will NOT
+                  catch an overflow here. */}
               <span style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {t(o.i18n, o.label)}
               </span>
