@@ -256,6 +256,10 @@ export interface BoardFilterPanelProps {
   filters: BoardFilters;
   onChange: (next: BoardFilters) => void;
   facets: BoardFacets;
+  /** False when the caller states scope on its own page (Explore Scores). */
+  showScope?: boolean;
+  /** False when the caller states the board on its own page (Explore Scores). */
+  showBoard?: boolean;
 }
 
 export function BoardFilterPanel({
@@ -271,6 +275,8 @@ export function BoardFilterPanel({
   filters,
   onChange,
   facets,
+  showScope = true,
+  showBoard = true,
 }: BoardFilterPanelProps) {
   const { t } = useTranslation('courses');
   const [screen, setScreen] = useState<Screen>('root');
@@ -473,6 +479,7 @@ export function BoardFilterPanel({
               ))}
             </ChipWrap>
 
+            {showScope ? (<>
             <SectionLabel>{t('discover.filterBoard.who', 'Who')}</SectionLabel>
             <ChipWrap>
               {SCOPE_OPTIONS.filter((o) => (o.key === 'club' ? clubApplies : true)).map((o) => (
@@ -486,6 +493,9 @@ export function BoardFilterPanel({
               ))}
             </ChipWrap>
 
+            </>) : null}
+
+            {showBoard ? (<>
             {/* S2.2 — RANKED BY keeps the Rankings / Feats split. A feat IS a
                 board, not an axis laid over one, and the split is how that reads. */}
             <SectionLabel changed={boardChanged}>{t('discover.filterBoard.rankedBy', 'Ranked by')}</SectionLabel>
@@ -515,6 +525,8 @@ export function BoardFilterPanel({
                 />
               ))}
             </ChipWrap>
+
+            </>) : null}
 
             {/* PLAIN COUNTS. NOT A SPLIT: the three do not sum to the total,
                 because a member with a competition round and a social round is

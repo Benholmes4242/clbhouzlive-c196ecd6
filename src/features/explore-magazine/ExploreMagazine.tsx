@@ -12,7 +12,7 @@ import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hoo
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { FeatRarityProvider } from '@/hooks/gam/useFeatRarity';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { RailChips, type RailChipOption } from '@/components/ui/RailChips';
+import { RailChips } from '@/components/ui/RailChips';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import {
   RoundDetailSheet,
@@ -50,9 +50,9 @@ import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBl
 import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
 import { BOARD_LABELS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
-import { ChevronDown } from 'lucide-react';
 
 import { CircleShelf } from './CircleShelf';
+import { ScoresFilterHead } from './ScoresFilterHead';
 import { StandingShelf } from './StandingShelf';
 import { ScoresStandingSlot } from './ConnectStandingInvite';
 
@@ -577,13 +577,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
    *  rows are now built separately because their vocabularies differ (§5). */
   const scoped = SCOPED_VIEWS.includes(view);
   void scoped;
-  const [scoreScope, setScoreScope] = useState<ScoreScope>('world');
-  const scoreScopeChosen = useRef(false);
-  useEffect(() => {
-    if (view !== 'scores' || !geography.isFetched || scoreScopeChosen.current) return;
-    setScoreScope(geography.scope.primaryClubId ? 'club' : geography.scope.county ? 'county' : 'world');
-    scoreScopeChosen.current = true;
-  }, [view, geography.isFetched, geography.scope.primaryClubId, geography.scope.county]);
 
   /* §5 MY CIRCLE IS STILL OFFERED, WORLD IS THE LANDING SCOPE (Ben, Sep 2026).
      Courses opens on World for every member and stays there until they pick
@@ -595,17 +588,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const hasCircle = circleSize.isSuccess && !circleSize.isFetching && (circleSize.data ?? 0) > 0;
 
   /** The scope the VIEW ON SCREEN is looking at. */
-  const activeScope: ScoreScope = view === 'courses' ? coursesScope : scoreScope;
-  /* ONE LIST FOR THE SCOPE CHIPS AND THE SCOPE TITLE, so the title can never
-     name a scope the chip row does not offer. World is always present, so
-     length > 1 means there is a real choice. LABEL grammar — not scopeName. */
-  const scoreScopeOptions = useMemo<RailChipOption[]>(() => [
-    ...(geography.scope.primaryClubId ? [{ id: 'club', label: t('amateur.stream.scope.club', 'My club') }] : []),
-    ...(geography.scope.county ? [{ id: 'county', label: geography.scope.county }] : []),
-    ...(geography.scope.country ? [{ id: 'country', label: geography.scope.country }] : []),
-    { id: 'world', label: t('amateur.stream.scope.world', 'World') },
-  ], [geography.scope.primaryClubId, geography.scope.county, geography.scope.country, t]);
-  const scoreScopeLabel = scoreScopeOptions.find((o) => o.id === scoreScope)?.label ?? null;
+  /* Scores no longer carries a stream scope (its stream is gated off); the
+     board's own scope lives in useAmateurBoardState. */
+  const activeScope: ScoreScope = view === 'courses' ? coursesScope : 'world';
 
   /* §6, §7 SEARCH AND PLACE. Both REPLACE THE PAGE BODY and neither is a route
      or a sheet, so the chips, the field and the scope row all stay mounted -
@@ -640,8 +625,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      nothing here is persisted or put in the URL, so leaving Explore resets it.
      `active` keeps every board read quiet on the other three views and on an
      untouched Scores view. */
-  const [boardPick, setBoardPick] = useState<BoardKey | null>(null);
+  /* BRIEF_SCORES_RETIRE_THE_GEOGRAPHY_RAIL §2 — SCORES OPENS ON A BOARD. The
+     board is the landing view now, so the stream and CircleShelf below are
+     unreachable on Scores. They are KEPT ON PURPOSE: starting this at `null`
+     again (and re-enabling the Scores stream read) brings the stream back. */
+  const [boardPick, setBoardPick] = useState<BoardKey | null>(ENTRY_BOARD);
   const [boardPanelOpen, setBoardPanelOpen] = useState(false);
+  /* The title opens the sheet onto the board choice; Filters opens it without. */
+  const [boardPanelShowsBoard, setBoardPanelShowsBoard] = useState(false);
   const scoresBoardActive = view === 'scores' && boardPick !== null;
   const boardState = useAmateurBoardState(
     view === 'scores' ? userId : undefined,
@@ -702,7 +693,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     : geography.scope;
   const serverScope: ScoreScope =
     placeScoped && chipScope === 'world' ? (place?.region ? 'county' : 'country') : chipScope;
-  const server = useExploreStream(userId && serverReady && !indexPath ? userId : undefined, view, serverScope, {
+  /* §2 — no Scores stream read: the Scores view cannot render it. */
+  const server = useExploreStream(userId && serverReady && !indexPath && view !== 'scores' ? userId : undefined, view, serverScope, {
     clubId: streamGeo.primaryClubId,
     county: streamGeo.county,
     country: streamGeo.country,
@@ -739,7 +731,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   /* THE FALLBACK CONDITION, in one place. While the RPC is still in flight the
      client composition is NOT fetched - the server hook shows its own shells, so
      a member never pays for two rankers. */
-  const fallbackWanted = !serverView || server.unavailable;
+  const fallbackWanted = view !== 'scores' && (!serverView || server.unavailable);
   const stream = useExploreStreamClient(
     fallbackWanted && !indexPath ? userId : undefined,
     /* THE MERGED VIEW'S FALLBACK REVIEWS. The client composition has always
@@ -1168,7 +1160,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       if (!EXPLORE_VIEWS.includes(value)) return;
       analyticsEvents.track('amateur_view_changed', { from: view, to: value });
       setView(value);
-      if (value === 'scores') scoreScopeChosen.current = false;
       /* LEAVING THE MERGED VIEW CLEARS ITS QUESTION. A search or a place is an
          answer to something asked on that view; carrying it into the next visit
          would filter a page the member never filtered. */
@@ -1926,100 +1917,27 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           P2 — SCORES HAS ONE PINNED CONTROL, NOT TWO. Place/course are open-list
           board filters and stay inside BoardFilterPanel, where their facet counts
           already live. The scope chips alone scroll; the board picker alone pins. */}
-      {view === 'scores' && geography.isFetched ? (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '0 12px 14px',
-            minWidth: 0,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            data-scores-scope-track
-            style={{
-              position: 'relative',
-              minWidth: 0,
-              flex: '1 1 auto',
-              overflow: 'hidden',
-            }}
-          >
-            {scoreScopeOptions.length > 1 ? (
-              <RailChips
-                options={scoreScopeOptions}
-                value={scoreScope}
-                onChange={(next) => {
-                  const value = next as ScoreScope;
-                  analyticsEvents.track('amateur_scope_changed', { view, from: scoreScope, to: value });
-                  scoreScopeChosen.current = true;
-                  setScoreScope(value);
-                  setRevealed(STREAM_PAGE_SIZE);
-                  loggedRef.current = 0;
-                }}
-                ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
-                ground="filled-selection"
-                distribute
-                style={{ flexWrap: 'nowrap' }}
-                trailing={<span aria-hidden="true" style={{ display: 'block', width: 21 }} />}
-              />
-            ) : null}
-            <div
-              data-scores-scope-fade
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                bottom: 0,
-                width: 26,
-                pointerEvents: 'none',
-                background: `linear-gradient(90deg, transparent, ${A.CANVAS})`,
-              }}
-            />
-          </div>
-
-          <ScopeControlSeparator />
-
-          {/* P2 — THE ONLY PINNED CONTROL. Its full board label is never
-              truncated; the scope track yields and scrolls instead. */}
-          <button
-            data-scores-board-picker
-            type="button"
-            onClick={() => {
+      {view === 'scores' ? (
+        <div style={{ paddingBottom: 4 }}>
+          <ScoresFilterHead
+            board={boardState.board}
+            scope={boardState.filters.scope}
+            filterCount={boardState.ready ? boardState.sheetFilterCount : 0}
+            onOpenBoard={() => {
               analyticsEvents.track('amateur_board_picker_opened', {
                 board: boardPick ?? ENTRY_BOARD,
                 board_active: scoresBoardActive,
               });
+              setBoardPanelShowsBoard(true);
               setBoardPanelOpen(true);
             }}
-            aria-label={t('amateur.board.openPicker', 'Choose a board')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              flex: '0 0 auto',
-              height: 32,
-              padding: '0 12px',
-              borderRadius: 999,
-              border: `1px solid ${scoresBoardActive ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.16)'}`,
-              background: scoresBoardActive ? 'rgba(255,255,255,0.10)' : 'transparent',
-              color: A.INK,
-              fontFamily: SANS,
-              fontSize: 12.5,
-              fontWeight: 700,
-              whiteSpace: 'nowrap',
+            onOpenFilters={() => {
+              analyticsEvents.track('amateur_filter_opened', { board: boardState.board });
+              setBoardPanelShowsBoard(false);
+              setBoardPanelOpen(true);
             }}
-          >
-            <span>
-              {t(
-                BOARD_LABELS[boardPick ?? ENTRY_BOARD].i18n,
-                BOARD_LABELS[boardPick ?? ENTRY_BOARD].label,
-              )}
-            </span>
-            <ChevronDown className="w-3 h-3 shrink-0" strokeWidth={2.5} />
-          </button>
+            onScopeChange={boardState.changeScope}
+          />
         </div>
       ) : null}
 
@@ -2099,15 +2017,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       ) : null}
 
 
+      {/* UNREACHABLE ON SCORES SINCE THE BOARD BECAME THE LANDING VIEW — kept, not
+          dead: see boardPick. Bringing the stream back is a one-line change. */}
       {view === 'scores' && !scoresBoardActive ? (
         <div style={{ marginBottom: BLOCK_GAP }}>
           <CircleShelf viewerId={userId} pos={0} />
-        </div>
-      ) : null}
-      {view === 'scores' && !scoresBoardActive && scoreScopeOptions.length > 1 && scoreScopeLabel ? (
-        /* HEADS THE STREAM, NOT THE RAIL — Your circle is never scoped by the chip row. */
-        <div style={{ fontFamily: SANS, ...SHELF_HEADING, padding: '0 16px 10px' }}>
-          {scoreScopeLabel}
         </div>
       ) : null}
       {view === 'all' && featured.isLoading ? (
@@ -2154,10 +2068,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             userId={userId}
             state={boardState}
             onRowPress={boardRowPress}
-            onBack={() => {
-                analyticsEvents.track('amateur_board_cleared', { board: boardPick });
-                setBoardPick(null);
-            }}
           />
         </div>
       ) : null}
@@ -2409,6 +2319,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         canReset={boardState.canReset}
         onReset={() => { boardState.resetAll(); setBoardPick(ENTRY_BOARD); }}
         facets={boardState.facets}
+        showScope={false}
+        showBoard={boardPanelShowsBoard}
       />
     </div>
     </FeatRarityProvider>
