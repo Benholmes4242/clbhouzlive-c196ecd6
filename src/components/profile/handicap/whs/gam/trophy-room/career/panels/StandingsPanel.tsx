@@ -253,7 +253,7 @@ export const StandingsPanel: React.FC<{ rows: MemberStandingRow[] }> = ({ rows }
           collapsedCount={5}
           showAllLabel={
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-              {t('career.recordsSeeAll', { n: groups.length })}
+              All {groups.length} courses
               <ChevronRight size={13} strokeWidth={2.4} />
             </span>
           }
