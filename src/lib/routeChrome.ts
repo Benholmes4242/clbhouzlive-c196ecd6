@@ -16,6 +16,7 @@ import {
 import {
   applyShieldColor,
   ensureStatusBarOverlayBooted,
+  isMedianLibraryReady,
   setStatusBarStyleColor,
 } from '@/hooks/useMedianStatusBar';
 
@@ -25,7 +26,8 @@ type ChromeCache = {
   isAuth: boolean;
   immersive: boolean;
   shieldColor: string;
-  sbKey: string;
+  /** undefined when the last status-bar send did not land — forces a re-send. */
+  sbKey: string | undefined;
 };
 
 export type ChromeClaim = {
@@ -76,7 +78,35 @@ export function releaseOverlayChrome(id: string): void {
  * force=true bypasses the cache (used after an overlay mutated chrome behind
  * the cache's back, so the values must be re-asserted even if "unchanged").
  */
+let firstApplyDone = false;
+
+export type ReassertTrigger =
+  | 'ready'
+  | 'failsafe-250'
+  | 'failsafe-750'
+  | 'failsafe-1500'
+  | 'resume';
+
+/** Re-assert the current route's chrome (or the top overlay claim),
+ *  bypassing the idempotency cache. */
+export function reassertRouteChrome(trigger?: ReassertTrigger): void {
+  console.info('[chrome] reassertRouteChrome', trigger ?? 'direct');
+  applyRouteChrome(window.location.pathname, true);
+}
+
 export function applyRouteChrome(pathname: string, force = false): void {
+  // Cold-launch failsafe: on the first call of the session only, re-assert
+  // at 250/750/1500ms unless Median has already reported ready.
+  if (!firstApplyDone && typeof window !== 'undefined') {
+    firstApplyDone = true;
+    ([250, 750, 1500] as const).forEach((ms) => {
+      window.setTimeout(() => {
+        if (isMedianLibraryReady()) return;
+        reassertRouteChrome(`failsafe-${ms}` as ReassertTrigger);
+      }, ms);
+    });
+  }
+
   // An open overlay owns the chrome: re-assert its claim instead of the
   // route. (Overlay teardowns call applyRouteChrome unconditionally - this
   // is what makes returning from fullscreen/immersive land on the claim.)
@@ -158,12 +188,35 @@ export function applyRouteChrome(pathname: string, force = false): void {
   if (!prev || prev.shieldColor !== shieldColor) {
     try { applyShieldColor(shieldColor); } catch {}
   }
+  let sbSent = prev?.sbKey === sbKey;
   if (!prev || prev.sbKey !== sbKey) {
     try {
       ensureStatusBarOverlayBooted();
-      setStatusBarStyleColor(statusBar.style, statusBar.color);
-    } catch {}
+      sbSent = setStatusBarStyleColor(statusBar.style, statusBar.color);
+    } catch {
+      sbSent = false;
+    }
   }
 
-  (window as any).__lvChromeCache = { surface, darkChrome, isAuth, immersive, shieldColor, sbKey };
+  // Cache sbKey only when the bridge call landed, so a dropped send is
+  // retried by the next applyRouteChrome instead of being skipped.
+  (window as any).__lvChromeCache = {
+    surface,
+    darkChrome,
+    isAuth,
+    immersive,
+    shieldColor,
+    sbKey: sbSent ? sbKey : undefined,
+  };
+}
+
+// When Median reports ready, re-assert overlay + route chrome. The previous
+// handler (the status-bar module's chain) runs first and sets the ready flag.
+if (typeof window !== 'undefined') {
+  const prevReady = window.median_library_ready;
+  window.median_library_ready = () => {
+    if (typeof prevReady === 'function') prevReady();
+    ensureStatusBarOverlayBooted();
+    reassertRouteChrome('ready');
+  };
 }
