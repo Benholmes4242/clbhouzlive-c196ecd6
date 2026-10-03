@@ -10,6 +10,7 @@
  */
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronRight, ChevronUp } from 'lucide-react';
 
@@ -77,10 +78,10 @@ const Cell: React.FC<{ row?: MemberStandingRow }> = ({ row }) => {
   );
 };
 
-function headerSubline(group: StandingsCourseGroup): string {
+function headerSubline(group: StandingsCourseGroup, t: TFunction): string {
   const golds = group.standings.filter((r) => r.medal_earned && r.rank === 1).length;
   const boards = group.standings.length + group.tenure.length;
-  return golds > 0 ? `1st on ${golds} of ${boards} boards` : courseSubline(group);
+  return golds > 0 ? t('career.standingsFirstOn', { golds, boards }) : courseSubline(group);
 }
 
 function medalDots(group: StandingsCourseGroup): DiscState[] {
@@ -96,6 +97,7 @@ const CourseItem: React.FC<{
   onToggle: () => void;
 }> = ({ group, open, last, onToggle }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('handicap');
   const boards = pairStandings([...group.standings, ...group.tenure]);
   const dots = open ? [] : medalDots(group);
   const Chevron = open ? ChevronUp : ChevronDown;
@@ -135,7 +137,7 @@ const CourseItem: React.FC<{
             {group.courseName}
           </div>
           <div style={{ fontSize: 11.5, color: REC.MUTE, paddingTop: 2, ...REC.TABULAR }}>
-            {headerSubline(group)}
+            {headerSubline(group, t)}
           </div>
         </div>
         {dots.length > 0 ? (
@@ -168,8 +170,8 @@ const CourseItem: React.FC<{
               }}
             >
               <div />
-              <div style={{ ...LABEL, fontFamily: REC.FONT, textAlign: 'center' }}>90 days</div>
-              <div style={{ ...LABEL, fontFamily: REC.FONT, textAlign: 'center' }}>All time</div>
+              <div style={{ ...LABEL, fontFamily: REC.FONT, textAlign: 'center' }}>{t('career.standings90d')}</div>
+              <div style={{ ...LABEL, fontFamily: REC.FONT, textAlign: 'center' }}>{t('career.standingsAllTime')}</div>
             </div>
             {boards.map((b, i) => (
               <div
@@ -208,7 +210,7 @@ const CourseItem: React.FC<{
               cursor: 'pointer',
             }}
           >
-            Open the course ›
+            {t('career.standingsOpenCourse')}
           </button>
         </>
       ) : null}
@@ -224,9 +226,9 @@ export const StandingsPanel: React.FC<{ rows: MemberStandingRow[] }> = ({ rows }
   if (groups.length === 0) {
     return (
       <>
-        <SectionTitle>Where you stand</SectionTitle>
+        <SectionTitle>{t('career.standingsTitle')}</SectionTitle>
         <Caption>
-          No course standings yet — they start once someone else has played a course you have.
+          {t('career.standingsEmpty')}
         </Caption>
       </>
     );
@@ -244,8 +246,8 @@ export const StandingsPanel: React.FC<{ rows: MemberStandingRow[] }> = ({ rows }
           marginTop: 22,
         }}
       >
-        <Kicker>Where you stand</Kicker>
-        <MetaLabel>Your place on each board</MetaLabel>
+        <Kicker>{t('career.standingsTitle')}</Kicker>
+        <MetaLabel>{t('career.standingsPlaceOnBoard')}</MetaLabel>
       </div>
       <Panel>
         <Collapsible
@@ -253,7 +255,7 @@ export const StandingsPanel: React.FC<{ rows: MemberStandingRow[] }> = ({ rows }
           collapsedCount={5}
           showAllLabel={
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-              All {groups.length} courses
+              {t('career.standingsAllCourses', { n: groups.length })}
               <ChevronRight size={13} strokeWidth={2.4} />
             </span>
           }

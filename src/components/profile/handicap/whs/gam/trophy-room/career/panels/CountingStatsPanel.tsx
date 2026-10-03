@@ -220,13 +220,13 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
           </span>
           <span style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
             <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: REC.AMBER }}>
-              CLOSEST
+              {t('career.closestKicker')}
             </span>
             <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: REC.INK, ...REC.TABULAR }}>
-              {`${closest.toGo} to ${closest.item.nextThreshold}`}
+              {t('career.closestToGo', { toGo: closest.toGo, next: closest.item.nextThreshold })}
             </span>
             <span style={{ fontSize: 12.5, color: REC.MUTE, ...REC.TABULAR }}>
-              {`${shortLabel(closest)} · ${closest.value} so far`}
+              {t('career.closestSoFar', { label: shortLabel(closest), value: closest.value })}
             </span>
           </span>
         </button>
@@ -242,8 +242,8 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
           marginBottom: 10,
         }}
       >
-        <MetaLabel>ALL RECORDS</MetaLabel>
-        <MetaLabel>CLOSEST FIRST</MetaLabel>
+        <MetaLabel>{t('career.allRecords')}</MetaLabel>
+        <MetaLabel>{t('career.closestFirst')}</MetaLabel>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
@@ -253,10 +253,10 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
           const tone = tierTone(r.item);
           const named = namedPartsFor(r.item.badgeId, data.rounds);
           let caption: string;
-          if (done) caption = 'Complete';
-          else if (notStarted) caption = 'Not yet';
-          else if (named) caption = `${named.parts.length} of ${named.total}`;
-          else caption = `${r.toGo} to ${r.item.nextThreshold}`;
+          if (done) caption = t('career.tileComplete');
+          else if (notStarted) caption = t('career.tileNotYet');
+          else if (named) caption = t('career.tileNOfTotal', { n: named.parts.length, total: named.total });
+          else caption = t('career.closestToGo', { toGo: r.toGo, next: r.item.nextThreshold });
           return (
             <button
               key={r.item.badgeId}

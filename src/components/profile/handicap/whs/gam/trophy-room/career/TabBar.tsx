@@ -1,13 +1,14 @@
 /** Career record tabs: Records / Top 100 / Courses. Presentation only. */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { REC } from './tokens';
 
 export type CareerTab = 'records' | 'top100' | 'courses';
 
 const TABS: Array<{ id: CareerTab; label: string }> = [
-  { id: 'records', label: 'Records' },
-  { id: 'top100', label: 'Top 100' },
-  { id: 'courses', label: 'Courses' },
+  { id: 'records', label: 'career.tabRecords' },
+  { id: 'top100', label: 'career.tabTop100' },
+  { id: 'courses', label: 'career.tabCourses' },
 ];
 
 interface Props {
@@ -15,7 +16,9 @@ interface Props {
   onSelect: (tab: CareerTab) => void;
 }
 
-export const TabBar: React.FC<Props> = ({ tab, onSelect }) => (
+export const TabBar: React.FC<Props> = ({ tab, onSelect }) => {
+  const { t } = useTranslation('handicap');
+  return (
   <div
     role="tablist"
     style={{
@@ -49,11 +52,12 @@ export const TabBar: React.FC<Props> = ({ tab, onSelect }) => (
             cursor: 'pointer',
           }}
         >
-          {label}
+          {t(label)}
         </button>
       );
     })}
   </div>
-);
+  );
+};
 
 export default TabBar;
