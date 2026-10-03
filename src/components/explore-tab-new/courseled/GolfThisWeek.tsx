@@ -111,6 +111,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
      for the rest of the session. */
   const entry = useDiscoverEntryBoard(userId);
   const [pickedBoard, setBoard] = useState<BoardKey | null>(null);
+  const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
   /* pickedBoard is seeded by the entry effect, so it is never null once ready;
      this marks a MEMBER pick, which is what "changed from default" means. */
   const [boardTouched, setBoardTouched] = useState(false);
@@ -124,7 +125,6 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
   );
   const canReset =
     boardTouched || (pickedFilters != null && !sameFilters(pickedFilters, entryFilters));
-  const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
 
   /* Nothing is special-cased downstream: the entry pick is applied as a board
      plus the standard filters, exactly as a member's own selection would be.
