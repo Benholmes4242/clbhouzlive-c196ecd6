@@ -45,7 +45,8 @@
     "milestonesSeeAll": "SEE ALL {{n}}",
     "cabinet": {
       "rounds": "rounds",
-      "since": "across <b>{{courses}} courses</b> since {{year}}"
+      "since": "across <b>{{courses}} courses</b> since {{year}}",
+      "thisYear": " · <b>{{n}}</b> this year"
     },
     "closest": "Closest to the next tier",
     "allRecords": "All {{count}} records",

@@ -31,12 +31,11 @@
  * below it these rows are counts and thresholds only, which is correct on
  * today's population.
  */
-import React, { useState } from 'react';
-import { ChevronRight, Medal } from 'lucide-react';
+import React from 'react';
 import { tierTone } from '../medalTone';
 import { useTranslation } from 'react-i18next';
 import { REC, LABEL } from '../tokens';
-import { Panel, RowButton, Bar, MetaLabel } from '../Primitives';
+import { MetaLabel } from '../Primitives';
 import { measuredShare } from '../shareModel';
 import { namedPartsFor } from '../criteria';
 import { monthYear } from '../format';
@@ -73,6 +72,26 @@ const FIG = (color: string): React.CSSProperties => ({
 /** Sub-line: the catalogue description, 11 / T40. */
 const SUB: React.CSSProperties = { fontSize: 11, color: REC.DIM, lineHeight: 1.45 };
 
+/**
+ * Short display names keyed by gam_badge_catalogue id; falls back to item.name.
+ * The grid uppercases through CSS, the Closest card uses them as written.
+ */
+const SHORT_LABEL: Record<string, string> = {
+  rounds_played: 'Rounds',
+  legend_at_course: 'Course legend',
+  continental: 'Continents',
+  globetrotter: 'Countries',
+  first_birdie: 'Birdies',
+  first_eagle: 'Eagles',
+  hole_in_one: 'Holes in one',
+  albatross: 'Albatrosses',
+  first_albatross: 'Albatrosses',
+  four_seasons: 'Four seasons',
+};
+
+const RING_R = 36;
+const RING_C = 2 * Math.PI * RING_R;
+
 interface Row {
   item: Achievement;
   value: number;
@@ -88,7 +107,6 @@ interface Row {
 
 export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => {
   const { t } = useTranslation('handicap');
-  const [expanded, setExpanded] = useState(false);
   if (items.length === 0) return null;
 
   const rows: Row[] = items.map((item) => {
@@ -166,142 +184,214 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
     return a.item.name.localeCompare(b.item.name);
   });
 
+  const closest = ordered.find((r) => !r.complete && r.value > 0) ?? null;
+  const shortLabel = (r: Row) => SHORT_LABEL[r.item.badgeId] ?? r.item.name;
+  const open = (r: Row) => data.onOpen({ kind: 'counting', badgeId: r.item.badgeId });
+
   return (
-    <Panel
-      title={t('career.countingKicker')}
-      /* "{n} of {m} complete" is gone: most members never finish a ladder, and
-         it read as a scolding. countingComplete is left for the key sweep. */
-      action={<MetaLabel>{t('career.closest')}</MetaLabel>}
-    >
-      {!expanded && (
-        <>
-          {/* CLOSEST THREE — RoundResults' row vocabulary. No bars here: the
-              sentence carries the distance and the medal carries the state;
-              a bar under both would be a third telling. Bars stay on the full
-              list below. */}
-          {ordered.slice(0, 3).map((r) => {
-            const tone = tierTone(r.item);
-            return (
-              <RowButton
-                key={r.item.badgeId}
-                onClick={() => data.onOpen({ kind: 'counting', badgeId: r.item.badgeId })}
-                ariaLabel={`${r.item.name}, ${r.value}`}
-              >
-                <div style={{ display: 'grid', gridTemplateColumns: '22px minmax(0,1fr) auto', alignItems: 'center', gap: 10 }}>
-                  <span
-                    aria-hidden
-                    style={{
-                      width: 22,
-                      height: 26,
-                      borderRadius: 6,
-                      display: 'grid',
-                      placeItems: 'center',
-                      boxSizing: 'border-box',
-                      background: tone ?? REC.HOLLOW_BG,
-                      border: tone ? 'none' : `1px solid ${REC.HOLLOW_BORDER}`,
-                      color: tone ? REC.CANVAS : REC.HOLLOW_GLYPH,
-                    }}
-                  >
-                    <Medal size={13} strokeWidth={2.25} />
-                  </span>
-                  <span style={{ minWidth: 0 }}>
-                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600, color: REC.INK, letterSpacing: '-0.015em' }}>
-                      {r.item.name}
-                    </span>
-                    <span
-                      style={{
-                        display: 'block',
-                        marginTop: 2,
-                        fontSize: 11.5,
-                        color: r.complete && r.value > 0 ? REC.GOOD : REC.MUTE,
-                        ...REC.TABULAR,
-                      }}
-                    >
-                      {r.value === 0 && r.item.reachedTier === 0 ? t('career.tierNotStarted') : r.progress}
-                    </span>
-                  </span>
-                  <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.03em', color: r.value > 0 ? REC.INK : REC.DIM, ...REC.TABULAR }}>
-                    {r.value}
-                  </span>
-                </div>
-              </RowButton>
-            );
-          })}
-          {ordered.length > 3 && (
-            /* EXPANDS IN PLACE — cheaper than a new route, and every full row
-               still taps through to CountingStatDetail as before. */
-            <RowButton last onClick={() => setExpanded(true)} ariaLabel={t('career.allRecords', { count: ordered.length })}>
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13.5, fontWeight: 600, color: REC.INK }}>
-                {t('career.allRecords', { count: ordered.length })}
-                <ChevronRight size={16} color={REC.MUTE} />
-              </span>
-            </RowButton>
-          )}
-        </>
-      )}
-      {expanded && ordered.map((r, i) => (
-        <RowButton
-          key={r.item.badgeId}
-          last={i === ordered.length - 1}
-          onClick={() => data.onOpen({ kind: 'counting', badgeId: r.item.badgeId })}
-          ariaLabel={`${r.item.name}, ${r.value}`}
+    <section style={{ marginBottom: 22 }}>
+      {closest && closest.item.nextThreshold ? (
+        <button
+          type="button"
+          onClick={() => open(closest)}
+          aria-label={`${shortLabel(closest)}, ${closest.value}`}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 16,
+            width: '100%',
+            padding: 16,
+            borderRadius: 16,
+            border: `1px solid ${REC.AMBER_LINE}`,
+            background: REC.AMBER_WASH,
+            marginBottom: 22,
+            textAlign: 'left',
+            cursor: 'pointer',
+            fontFamily: REC.FONT,
+          }}
         >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-            <span style={{ flex: 1, minWidth: 0, ...NAME }}>{r.item.name}</span>
-            <span style={FIG(r.value > 0 ? REC.INK : REC.DIM)}>{r.value}</span>
-          </div>
-          {/* Criteria. Nothing renders when the catalogue has no description --
-              a description is written at source, never in the client. */}
-          {r.item.description ? (
-            <div style={{ marginTop: 4, ...SUB }}>{r.item.description}</div>
-          ) : null}
-          <div style={{ marginTop: 8 }}>
-            {/* GREEN HERE MEANS THE LADDER IS FINISHED and nothing else. It is
-                not "better"; amber is in-progress. */}
-            <Bar
-              pct={r.pct}
-              color={
-                r.complete && r.value > 0 ? REC.GOOD : r.value > 0 ? REC.AMBER : REC.BAR_TRACK
-              }
-            />
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              justifyContent: 'space-between',
-              gap: 8,
-              marginTop: 7,
-              ...REC.TABULAR,
-            }}
-          >
+          <span style={{ position: 'relative', width: 84, height: 84, flexShrink: 0 }}>
+            <svg width={84} height={84} viewBox="0 0 84 84" aria-hidden>
+              <circle cx={42} cy={42} r={RING_R} fill="none" stroke={REC.RING_TRACK} strokeWidth={6} />
+              <circle
+                cx={42}
+                cy={42}
+                r={RING_R}
+                fill="none"
+                stroke={REC.AMBER}
+                strokeWidth={6}
+                strokeLinecap="round"
+                strokeDasharray={`${(Math.max(0, Math.min(100, closest.pct)) / 100) * RING_C} ${RING_C}`}
+                transform="rotate(-90 42 42)"
+              />
+            </svg>
             <span
               style={{
-                ...ROW_KICKER,
-                color: r.complete && r.value > 0 ? REC.GOOD : REC.MUTE,
+                position: 'absolute',
+                inset: 0,
+                display: 'grid',
+                placeItems: 'center',
+                fontSize: 30,
+                fontWeight: 700,
+                letterSpacing: '-0.03em',
+                color: REC.INK,
+                ...REC.TABULAR,
               }}
             >
-              {r.progress}
+              {closest.toGo}
             </span>
-            <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexShrink: 0 }}>
-              {r.share !== null && (
-                <span style={{ ...ROW_KICKER, color: REC.GOOD }}>{r.share}% of members</span>
+          </span>
+          <span style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: REC.AMBER }}>
+              CLOSEST
+            </span>
+            <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: REC.INK, ...REC.TABULAR }}>
+              {`${closest.toGo} to ${closest.item.nextThreshold}`}
+            </span>
+            <span style={{ fontSize: 12.5, color: REC.MUTE, ...REC.TABULAR }}>
+              {`${shortLabel(closest)} · ${closest.value} so far`}
+            </span>
+          </span>
+        </button>
+      ) : null}
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 8,
+          padding: '0 2px',
+          marginBottom: 10,
+        }}
+      >
+        <MetaLabel>ALL RECORDS</MetaLabel>
+        <MetaLabel>CLOSEST FIRST</MetaLabel>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
+        {ordered.map((r) => {
+          const done = r.complete && r.value > 0;
+          const notStarted = r.value === 0 && r.item.reachedTier === 0;
+          const tone = tierTone(r.item);
+          const named = namedPartsFor(r.item.badgeId, data.rounds);
+          let caption: string;
+          if (done) caption = 'Complete';
+          else if (notStarted) caption = 'Not yet';
+          else if (named) caption = `${named.parts.length} of ${named.total}`;
+          else caption = `${r.toGo} to ${r.item.nextThreshold}`;
+          return (
+            <button
+              key={r.item.badgeId}
+              type="button"
+              onClick={() => open(r)}
+              aria-label={`${shortLabel(r)}, ${r.value}`}
+              style={{
+                textAlign: 'left',
+                padding: '12px 11px',
+                borderRadius: 13,
+                minWidth: 0,
+                cursor: 'pointer',
+                fontFamily: REC.FONT,
+                border: done
+                  ? `1px solid ${REC.GOOD_LINE}`
+                  : notStarted
+                    ? `1px dashed ${REC.TILE_DASH}`
+                    : `1px solid ${REC.TILE_LINE}`,
+                background: done ? REC.GOOD_WASH : notStarted ? 'transparent' : REC.PANEL_2,
+              }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                <span
+                  style={{
+                    fontSize: 21,
+                    fontWeight: 700,
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1,
+                    color: notStarted ? REC.DIM : REC.INK,
+                    ...REC.TABULAR,
+                  }}
+                >
+                  {r.value}
+                </span>
+                <span
+                  aria-hidden
+                  style={{
+                    width: 9,
+                    height: 9,
+                    borderRadius: '50%',
+                    flexShrink: 0,
+                    boxSizing: 'border-box',
+                    background: tone ?? 'transparent',
+                    border: tone ? 'none' : `1px solid ${REC.DOT_HOLLOW}`,
+                  }}
+                />
+              </span>
+              <span
+                style={{
+                  display: 'block',
+                  marginTop: 6,
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: REC.MUTE,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {shortLabel(r)}
+              </span>
+              {notStarted ? (
+                <span style={{ display: 'block', height: 3, marginTop: 10 }} />
+              ) : (
+                <span
+                  style={{
+                    display: 'block',
+                    height: 3,
+                    marginTop: 10,
+                    borderRadius: 2,
+                    background: REC.TILE_TRACK,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'block',
+                      height: '100%',
+                      width: `${done ? 100 : Math.max(0, Math.min(100, r.pct))}%`,
+                      background: done ? REC.GOOD : REC.AMBER,
+                      borderRadius: 2,
+                    }}
+                  />
+                </span>
               )}
-              {r.when ? <span style={ROW_KICKER}>{r.when}</span> : null}
-            </span>
-          </div>
-        </RowButton>
-      ))}
-      {expanded && <div style={{ padding: '10px 14px', borderTop: `1px solid ${REC.BORDER}` }}>
-        {sparse ? (
-          <div style={{ fontSize: 11, color: REC.MUTE, lineHeight: 1.5 }}>
-            {t('career.sparseFootnote')}
-          </div>
-        ) : (
-          <MetaLabel>MEASURED ACROSS MEMBERS WITH A POSTED INDEX</MetaLabel>
-        )}
-      </div>}
-    </Panel>
+              <span
+                style={{
+                  display: 'block',
+                  marginTop: 6,
+                  fontSize: 11,
+                  color: done ? REC.GOOD : REC.MUTE,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  ...REC.TABULAR,
+                }}
+              >
+                {caption}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {sparse ? (
+        <div style={{ marginTop: 10, fontSize: 12, color: REC.MUTE, lineHeight: 1.5 }}>
+          {t('career.sparseFootnote')}
+        </div>
+      ) : null}
+    </section>
   );
 };
 
