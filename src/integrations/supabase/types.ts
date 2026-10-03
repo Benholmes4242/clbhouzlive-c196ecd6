@@ -21276,6 +21276,15 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_member_record_split: {
+        Args: { p_user_id: string }
+        Returns: {
+          attendance: number
+          contested: number
+          course_id: string
+          sole: number
+        }[]
+      }
       get_member_standings: {
         Args: { p_course_id?: string; p_limit?: number; p_user_id: string }
         Returns: {
