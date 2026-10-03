@@ -61,7 +61,7 @@ export const SHOWPIECE_LOCKED_HINT: Record<string, string> = {
   top_100_worldwide: 'Play your first World Top 100 course',
   top_100_usa: 'Play your first USA Top 100 course',
   top_100_gbni: 'Play your first GB&I Top 100 course',
-  top_100_europe: 'Play your first Europe Top 100 course',
+  top_100_europe: 'Play your first Continental Europe Top 100 course',
 };
 
 /**

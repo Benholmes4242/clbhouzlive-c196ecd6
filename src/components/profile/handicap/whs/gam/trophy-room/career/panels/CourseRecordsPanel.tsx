@@ -48,8 +48,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { REC, LABEL } from '../tokens';
-import { Panel, RowButton, Figure, Collapsible, MetaLabel } from '../Primitives';
+import { REC, FIGURE } from '../tokens';
+import { Panel, Collapsible, MetaLabel } from '../Primitives';
 import { CROWN_MIN_OTHERS, hasContest } from '@/lib/gam/fieldGate';
 import type { CourseCrownGroup } from './CrownsPanel';
 import type { CareerData } from '../types';
@@ -131,56 +131,22 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
 
   const { won, uncontested, total } = recordSplit(data, groups);
 
-  const subLine = (c: Contest): string | null => {
-    if (c.kind === 'won') return t('career.recordsWonAgainst', { n: c.others });
-    if (c.kind === 'one') return t('career.recordsOneOther');
-    if (c.kind === 'alone') return t('career.recordsNobodyElse');
+  const note = (c: Contest): { text: string; color: string } | null => {
+    if (c.kind === 'won') return { text: `beat ${c.others} golfers`, color: REC.INK_50 };
+    if (c.kind === 'one') return { text: 'beat 1 golfer', color: REC.INK_50 };
+    if (c.kind === 'alone') return { text: 'nobody else yet', color: REC.DIM };
     return null;
   };
 
   return (
     <Panel
       title={t('career.recordsKicker')}
-      action={<MetaLabel>{t('career.recordsCourses', { n: groups.length })}</MetaLabel>}
+      action={
+        <MetaLabel>
+          {available ? `${won} WON · ${uncontested} UNCONTESTED` : `${total} HELD`}
+        </MetaLabel>
+      }
     >
-      <div style={{ padding: '12px 14px', borderBottom: `1px solid ${REC.BORDER}` }}>
-        {available ? (
-          <>
-            <div style={{ display: 'flex', gap: 24 }}>
-              <div>
-                <div style={{ ...LABEL, fontFamily: REC.FONT }}>{t('career.recordsWon')}</div>
-                <div style={{ marginTop: 4 }}>
-                  <Figure value={won} size={21} color={REC.INK} />
-                </div>
-              </div>
-              <div>
-                <div style={{ ...LABEL, fontFamily: REC.FONT }}>
-                  {t('career.recordsUncontested')}
-                </div>
-                <div style={{ marginTop: 4 }}>
-                  <Figure value={uncontested} size={21} color={REC.DIM} />
-                </div>
-              </div>
-            </div>
-            <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: REC.MUTE }}>
-              {t('career.recordsDefinition')}
-            </div>
-          </>
-        ) : (
-          <>
-            {/* No field read: the total is stated and no course is called won or
-                uncontested. Stating a split we cannot measure is the fault. */}
-            <div style={{ ...LABEL, fontFamily: REC.FONT }}>{t('career.recordsHeld')}</div>
-            <div style={{ marginTop: 4 }}>
-              <Figure value={total} size={21} color={REC.INK} />
-            </div>
-            <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: REC.MUTE }}>
-              {t('career.recordsNoFieldData')}
-            </div>
-          </>
-        )}
-      </div>
-
       <Collapsible
         showAllLabel={
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
@@ -191,46 +157,60 @@ export const CourseRecordsPanel: React.FC<Props> = ({ data, groups }) => {
         showFewerLabel={t('career.showFewer')}
       >
         {ordered.map(({ group, contest }, i) => {
-          const wonRow = isWon(contest);
-          const sub = subLine(contest);
+          const dim = contest.kind === 'alone';
+          const n = note(contest);
           return (
-            <RowButton
+            <button
+              type="button"
               key={group.key}
-              last={i === ordered.length - 1}
               onClick={() => data.onOpen({ kind: 'crown', courseKey: group.key })}
-              ariaLabel={`${group.courseName}, ${group.records.length} records`}
+              aria-label={`${group.courseName}, ${group.records.length} records`}
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 8,
+                width: '100%',
+                padding: '13px 14px',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: i === ordered.length - 1 ? 'none' : `1px solid ${REC.BORDER}`,
+                textAlign: 'left',
+                fontFamily: REC.FONT,
+                cursor: 'pointer',
+              }}
             >
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-                <span
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: wonRow ? REC.INK : REC.DIM,
-                  }}
-                >
-                  {group.courseName}
+              <span
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  color: dim ? REC.DIM : REC.INK,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {group.courseName}
+              </span>
+              {n ? (
+                <span style={{ fontSize: 11.5, color: n.color, whiteSpace: 'nowrap', ...REC.TABULAR }}>
+                  {n.text}
                 </span>
-                <Figure
-                  value={group.records.length}
-                  size={16}
-                  color={wonRow ? REC.INK : REC.DIM}
-                />
-              </div>
-              {sub ? (
-                <div
-                  style={{
-                    marginTop: 5,
-                    fontSize: 11,
-                    color: wonRow ? REC.INK : REC.DIM,
-                    ...REC.TABULAR,
-                  }}
-                >
-                  {sub}
-                </div>
               ) : null}
-            </RowButton>
+              <span
+                style={{
+                  ...FIGURE,
+                  fontSize: 16,
+                  width: 26,
+                  textAlign: 'right',
+                  flexShrink: 0,
+                  color: dim ? REC.DIM : REC.INK,
+                }}
+              >
+                {group.records.length}
+              </span>
+            </button>
           );
         })}
       </Collapsible>

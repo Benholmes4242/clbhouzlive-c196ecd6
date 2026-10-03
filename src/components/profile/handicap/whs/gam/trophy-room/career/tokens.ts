@@ -46,6 +46,10 @@ export const REC = {
   DOT_HOLLOW: 'rgba(255,255,255,0.30)',
   GOOD_WASH: 'rgba(74,222,128,0.05)',
   GOOD_LINE: 'rgba(74,222,128,0.22)',
+  /** Courses tab: contest note ink, standings table rules. */
+  INK_50: 'rgba(248,250,252,0.50)',
+  TABLE_HEAD_LINE: 'rgba(248,250,252,0.07)',
+  TABLE_ROW_LINE: 'rgba(248,250,252,0.05)',
   INK: CHART.INK,
   MUTE: CHART.MUTE,
   DIM: CHART.DIM,
