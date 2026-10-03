@@ -60,8 +60,8 @@ interface Props {
 export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFirstName }) => {
   const [open, setOpen] = useState(false);
   /* Where you stand: one call, opened with the sheet. */
-  const { data: standingsRows } = useMemberStandings(userId, open);
-  const { data: recordSplitData } = useMemberRecordSplit(userId, open);
+  const { data: standingsRows, isLoading: standingsLoading } = useMemberStandings(userId, open);
+  const { data: recordSplitData, isLoading: splitLoading } = useMemberRecordSplit(userId, open);
   const standings = standingsRows ?? [];
   const [view, setView] = useState<CareerView>({ kind: 'room' });
   const [tab, setTab] = useState<CareerTab>('records');
@@ -210,7 +210,7 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
     setPendingBadgeId(null);
   }, [pendingBadgeId, badgesLoading, top100, counting, milestones]);
 
-  const isLoading = badgesLoading || legendsLoading;
+  const isLoading = badgesLoading || legendsLoading || standingsLoading || splitLoading;
   const split = recordSplit(data, crownGroups);
   const selectTab = (next: CareerTab) => {
     setTab(next);
