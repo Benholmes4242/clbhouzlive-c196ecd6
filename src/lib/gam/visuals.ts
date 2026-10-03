@@ -7,6 +7,18 @@ import {
   Sparkles,
   Bird,
   Flag,
+  Flower,
+  Flame,
+  Scissors,
+  Gauge,
+  ListChecks,
+  Crown,
+  Medal,
+  Zap,
+  Shield,
+  Globe,
+  Map as MapIcon,
+  Star,
   type LucideIcon,
 } from 'lucide-react';
 import type { BadgeRarity, LegendCategory, StreakType } from './types';
@@ -240,4 +252,38 @@ export function formatLegendGap(category: LegendCategory, gap: number): string {
       return `${n} ${n === 1 ? 'stroke' : 'strokes'}`;
     }
   }
+}
+
+
+/**
+ * Lucide icon per gam_badge_catalogue.icon_name. Canonical map for badge
+ * glyphs; do not build a second registry in a panel. 'season-medal' is not a
+ * Lucide name and maps to Medal explicitly. Unmapped keys fall back to
+ * BADGE_ICON_FALLBACK so a tile never renders without a glyph.
+ */
+export const badgeIcon: Record<string, LucideIcon> = {
+  flower: Flower,
+  flame: Flame,
+  scissors: Scissors,
+  gauge: Gauge,
+  bird: Bird,
+  'list-checks': ListChecks,
+  crown: Crown,
+  flag: Flag,
+  'trending-down': TrendingDown,
+  medal: Medal,
+  feather: Feather,
+  zap: Zap,
+  target: Target,
+  shield: Shield,
+  globe: Globe,
+  map: MapIcon,
+  star: Star,
+  'season-medal': Medal,
+};
+
+export const BADGE_ICON_FALLBACK: LucideIcon = Award;
+
+export function badgeIconFor(iconName: string | null | undefined): LucideIcon {
+  return (iconName && badgeIcon[iconName]) || BADGE_ICON_FALLBACK;
 }
