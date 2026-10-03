@@ -2406,12 +2406,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         filters={boardState.filters}
         onChange={boardState.changeFilters}
         boardChanged={boardState.board !== ENTRY_BOARD}
-        onReset={() => {
-          /* This surface has no handicap chain: its default IS ENTRY_BOARD. */
-          boardState.resetFilters();
-          boardState.changeBoard(ENTRY_BOARD);
-          setBoardPick(ENTRY_BOARD);
-        }}
+        canReset={boardState.canReset}
+        onReset={() => { boardState.resetAll(); setBoardPick(ENTRY_BOARD); }}
         facets={boardState.facets}
       />
     </div>

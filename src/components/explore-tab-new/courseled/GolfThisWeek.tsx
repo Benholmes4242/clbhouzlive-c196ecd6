@@ -29,7 +29,7 @@ import {
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
   boardCountsRounds,
-  filtersAreDefault,
+  sameFilters,
   type BoardFilters,
   normalizeFilters,
   type BoardKey,
@@ -111,10 +111,20 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
      for the rest of the session. */
   const entry = useDiscoverEntryBoard(userId);
   const [pickedBoard, setBoard] = useState<BoardKey | null>(null);
+  const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
   /* pickedBoard is seeded by the entry effect, so it is never null once ready;
      this marks a MEMBER pick, which is what "changed from default" means. */
   const [boardTouched, setBoardTouched] = useState(false);
-  const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
+
+  /* THE RESET TARGET. The entry effect seeds from this and canReset
+     measures against it. Two copies of this object is how the Reset
+     button came to be lit on an untouched page. */
+  const entryFilters = useMemo(
+    () => normalizeFilters({ ...DEFAULT_FILTERS, window: entry.window, scope: entry.scope }),
+    [entry.window, entry.scope],
+  );
+  const canReset =
+    boardTouched || (pickedFilters != null && !sameFilters(pickedFilters, entryFilters));
 
   /* Nothing is special-cased downstream: the entry pick is applied as a board
      plus the standard filters, exactly as a member's own selection would be.
@@ -123,8 +133,8 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
   useEffect(() => {
     if (pickedBoard || !entry.resolved || !entry.board) return;
     setBoard(entry.board);
-    setFilters(normalizeFilters({ ...DEFAULT_FILTERS, window: entry.window, scope: entry.scope }));
-  }, [pickedBoard, entry.resolved, entry.board, entry.window, entry.scope]);
+    setFilters(entryFilters);
+  }, [pickedBoard, entry.resolved, entry.board, entryFilters]);
 
 
   /* H4.2 — BEFORE THE INDEX RESOLVES THERE IS NO BOARD. The reads stay parked
@@ -333,7 +343,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
         {!ready || page.isPending ? (
           <div style={{ height: 240 }} aria-hidden />
         ) : total === 0 ? (
-          <EmptyAnswer board={board} filters={filters} onReset={() => changeFilters({ ...DEFAULT_FILTERS })} />
+          <EmptyAnswer board={board} filters={filters} canReset={canReset} onReset={resetAll} />
         ) : (
           <>
             <BoardHeaderRow board={board} />
@@ -385,6 +395,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
         onBoardChange={changeBoard}
         boardChanged={boardTouched && pickedBoard !== entry.board}
         onReset={resetAll}
+        canReset={canReset}
         resultCount={total}
         filters={filters}
         onChange={changeFilters}
@@ -477,10 +488,12 @@ function EmptyAnswer({
   board,
   filters,
   onReset,
+  canReset,
 }: {
   board: BoardKey;
   filters: BoardFilters;
   onReset: () => void;
+  canReset: boolean;
 }) {
   const { t } = useTranslation('courses');
   const line = describeFilters(filters, t as never);
@@ -501,7 +514,7 @@ function EmptyAnswer({
           {floor}
         </p>
       )}
-      {!filtersAreDefault(filters) && (
+      {canReset && (
         <button
           type="button"
           onClick={onReset}

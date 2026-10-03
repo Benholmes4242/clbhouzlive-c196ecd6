@@ -217,16 +217,24 @@ export const BOARD_LABELS: Record<BoardKey, { i18n: string; label: string }> = {
 export const boardCountsRounds = (board: BoardKey) =>
   board === 'recent' || isFeatBoard(board);
 
-export function filtersAreDefault(f: BoardFilters): boolean {
+/** Field-by-field equality on the seven axes a member can set. The ONE
+    comparator: filtersAreDefault and every caller's canReset go through it,
+    so "changed" cannot mean two different things in two places. */
+export function sameFilters(a: BoardFilters, b: BoardFilters): boolean {
   return (
-    f.scope === DEFAULT_FILTERS.scope &&
-    f.window === DEFAULT_FILTERS.window &&
-    f.regionKind == null &&
-    f.courses === 'any' &&
-    f.courseId == null &&
-    f.band === 'any' &&
-    f.competition === 'any'
+    a.scope === b.scope &&
+    a.window === b.window &&
+    a.regionKind === b.regionKind &&
+    a.regionValue === b.regionValue &&
+    a.courses === b.courses &&
+    a.courseId === b.courseId &&
+    a.band === b.band &&
+    a.competition === b.competition
   );
+}
+
+export function filtersAreDefault(f: BoardFilters): boolean {
+  return sameFilters(f, DEFAULT_FILTERS);
 }
 
 /**

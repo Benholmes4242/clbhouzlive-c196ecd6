@@ -9,7 +9,6 @@ import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useB
 import {
   BOARD_LABELS,
   boardCountsRounds,
-  filtersAreDefault,
   type BoardKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
@@ -141,8 +140,8 @@ export function AmateurLeaderboardBlock({
               line: appliedParts.join(' \u00B7 '),
             })}
           </p>
-          {!filtersAreDefault(filters) && (
-            <button type="button" onClick={state.resetFilters} style={{ ...QUIET_ACTION, marginTop: 12 }}>
+          {state.canReset && (
+            <button type="button" onClick={state.resetAll} style={{ ...QUIET_ACTION, marginTop: 12 }}>
               {t('discover.filterBoard.reset', 'Clear the filter')}
             </button>
           )}
