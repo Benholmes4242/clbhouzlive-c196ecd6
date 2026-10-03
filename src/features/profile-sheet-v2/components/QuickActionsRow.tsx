@@ -19,7 +19,11 @@ import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
+/** Quiet tile ground. The unread badge ring reads this same value. */
+const TILE_GROUND = 'rgba(255,255,255,0.05)';
+
 interface Props {
+  gutter: number;
   actorType: 'personal' | 'business';
   actorId: string;
   onNavigate: (route: string) => void;
@@ -41,15 +45,15 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
       style={{
         position: 'relative',
         flex: 1,
-        background: A.PANEL,
-        border: `1px solid ${A.BORDER}`,
-        borderRadius: 16,
-        padding: '12px 0',
+        background: TILE_GROUND,
+        border: 0,
+        borderRadius: 11,
+        padding: 11,
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 5,
+        gap: 8,
         cursor: 'pointer',
         transition: 'transform 120ms ease',
       }}
@@ -76,7 +80,7 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
             fontWeight: 700,
             fontSize: 11,
             fontVariantNumeric: 'tabular-nums',
-            border: `2px solid ${A.PANEL}`,
+            border: `2px solid ${TILE_GROUND}`,
             boxSizing: 'content-box',
             display: 'flex',
             alignItems: 'center',
@@ -90,7 +94,7 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
   );
 }
 
-export default function QuickActionsRow({ actorType, actorId, onNavigate }: Props) {
+export default function QuickActionsRow({ gutter, actorType, actorId, onNavigate }: Props) {
   // Messages: sum of per-conversation unread from the same RPC the inbox uses,
   // so the badge cannot drift from what the Messages page renders.
   const { conversations } = useConversations();
@@ -102,7 +106,7 @@ export default function QuickActionsRow({ actorType, actorId, onNavigate }: Prop
   const { unreadCount: alertsBadge } = useUnreadNotifications();
 
   return (
-    <div style={{ display: 'flex', gap: 8, padding: '12px 20px 0' }}>
+    <div style={{ display: 'flex', gap: 8, padding: `12px ${gutter}px 0` }}>
       <Tile
         label="Messages"
         icon={<Mail size={17} color={A.INK} />}
