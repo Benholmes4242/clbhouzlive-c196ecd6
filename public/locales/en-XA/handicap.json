@@ -104,7 +104,10 @@
     "milestonesSeeAll": "[SEE ALL {{n}}]",
     "cabinet": {
       "rounds": "[~~řőúñđš~~]",
-      "since": "[~~áçřőšš <b>{{courses}} çőúřšéš</b> šíñçé {{year}}~~]"
+      "since_one": "[~~Áçřőšš <b>{{count}} çőúřšé</b> šíñçé {{year}}~~]",
+      "since_other": "[~~Áçřőšš <b>{{count}} çőúřšéš</b> šíñçé {{year}}~~]",
+      "thisYear_one": "[~~<b>{{count}} řőúñð</b> ťĥíš ýéář~~]",
+      "thisYear_other": "[~~<b>{{count}} řőúñðš</b> ťĥíš ýéář~~]"
     },
     "closest": "[~~Çľőšéšţ ţő ţĥé ñéxţ ţíéř~~]",
     "allRecords": "[~~Áľľ {{count}} řéçőřđš~~]",

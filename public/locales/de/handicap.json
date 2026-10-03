@@ -104,7 +104,10 @@
     "milestonesSeeAll": "ALLE {{n}}",
     "cabinet": {
       "rounds": "Runden",
-      "since": "auf <b>{{courses}} Plätzen</b> seit {{year}}"
+      "since_one": "Across <b>{{count}} course</b> since {{year}}",
+      "since_other": "Across <b>{{count}} courses</b> since {{year}}",
+      "thisYear_one": "<b>{{count}} round</b> this year",
+      "thisYear_other": "<b>{{count}} rounds</b> this year"
     },
     "closest": "Am nächsten an der nächsten Stufe",
     "allRecords": "Alle {{count}} Rekorde",

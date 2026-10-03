@@ -104,7 +104,10 @@
     "milestonesSeeAll": "VER LOS {{n}}",
     "cabinet": {
       "rounds": "vueltas",
-      "since": "en <b>{{courses}} campos</b> desde {{year}}"
+      "since_one": "Across <b>{{count}} course</b> since {{year}}",
+      "since_other": "Across <b>{{count}} courses</b> since {{year}}",
+      "thisYear_one": "<b>{{count}} round</b> this year",
+      "thisYear_other": "<b>{{count}} rounds</b> this year"
     },
     "closest": "Más cerca del siguiente nivel",
     "allRecords": "Los {{count}} récords",

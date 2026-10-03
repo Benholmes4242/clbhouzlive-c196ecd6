@@ -104,7 +104,8 @@
     "milestonesSeeAll": "SEE ALL {{n}}",
     "cabinet": {
       "rounds": "라운드",
-      "since": "{{year}}년부터 <b>{{courses}}개 코스</b>"
+      "since_other": "Across <b>{{count}} courses</b> since {{year}}",
+      "thisYear_other": "<b>{{count}} rounds</b> this year"
     },
     "closest": "다음 티어에 가장 가까운 기록",
     "allRecords": "기록 {{count}}개 모두 보기",
