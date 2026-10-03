@@ -522,7 +522,9 @@
       "trophyRoomTitle": "Todo lo que tienes",
       "crownsHeld": "Coronas en tu poder",
       "trophyRoomA11y": "Sala de trofeos, {{count}} coronas en tu poder",
-      "trophyRoomA11yBare": "Sala de trofeos"
+      "trophyRoomA11yBare": "Sala de trofeos",
+      "doorCrowns": "CROWNS",
+      "doorMilestones": "MILESTONES"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",

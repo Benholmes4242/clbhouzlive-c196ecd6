@@ -521,7 +521,9 @@
       "trophyRoomTitle": "あなたが持つすべて",
       "crownsHeld": "保持中のクラウン",
       "trophyRoomA11y": "トロフィールーム、保持中のクラウン{{count}}個",
-      "trophyRoomA11yBare": "トロフィールーム"
+      "trophyRoomA11yBare": "トロフィールーム",
+      "doorCrowns": "CROWNS",
+      "doorMilestones": "MILESTONES"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",

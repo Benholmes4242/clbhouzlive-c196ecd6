@@ -48,6 +48,7 @@ import { CountingStatDetail } from './details/CountingStatDetail';
 import { Top100Detail } from './details/Top100Detail';
 import { CrownDetail } from './details/CrownDetail';
 import { MilestoneDetail } from './details/MilestoneDetail';
+import { isMilestoneAchievement } from './milestones';
 import { STREAK_BADGE_IDS, type Achievement, type CareerData, type CareerView } from './types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -187,14 +188,7 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
       a.category !== 'community' &&
       (a.counterMetric !== null || a.tiers.length > 1),
   );
-  const milestones = achievements.filter(
-    (a) =>
-      !isTop100Achievement(a.badgeId) &&
-      !STREAK_BADGE_IDS.has(a.badgeId) &&
-      a.category !== 'community' &&
-      a.counterMetric === null &&
-      a.tiers.length <= 1,
-  );
+  const milestones = achievements.filter(isMilestoneAchievement);
 
   // Resolve a parked badgeId to the right detail view. Kind is derived from the
   // same partition the panels use, so a deep link and a tap agree. An unknown

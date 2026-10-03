@@ -849,7 +849,9 @@
       "metaOff": "[~~Őƒƒ {{then}} ţĥáţ đáý~~]",
       "beatWith": "[~~ƀéáţ ŵíţĥ {{n}}~~]",
       "crowns_one": "[~~{{count}} ĉřőŵñ~~]",
-      "crowns_other": "[~~{{count}} ĉřőŵñš~~]"
+      "crowns_other": "[~~{{count}} ĉřőŵñš~~]",
+      "doorCrowns": "CROWNS",
+      "doorMilestones": "MILESTONES"
     },
     "footer": {
       "allRounds": "[~~Áļļ {{n}} řőúñđš~~]",

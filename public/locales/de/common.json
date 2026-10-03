@@ -522,7 +522,9 @@
       "trophyRoomTitle": "Alles, was du hältst",
       "crownsHeld": "Gehaltene Kronen",
       "trophyRoomA11y": "Trophäenraum, {{count}} Kronen gehalten",
-      "trophyRoomA11yBare": "Trophäenraum"
+      "trophyRoomA11yBare": "Trophäenraum",
+      "doorCrowns": "CROWNS",
+      "doorMilestones": "MILESTONES"
     },
     "footer": {
       "allRounds": "All {{n}} rounds",
