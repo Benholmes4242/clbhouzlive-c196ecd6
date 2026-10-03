@@ -30,7 +30,7 @@ export default function JoinLandingPage() {
   const [href, setHref] = useState<string>(FALLBACK_URL);
 
   useEffect(() => {
-    document.title = 'Join clbhouz — the home of golf courses';
+    document.title = 'Join clbhouz | stay in play.';
     const ref = params.get('ref');
     if (ref) {
       try {
@@ -103,7 +103,7 @@ export function PublicLanding({
           maxWidth: 360,
         }}
       >
-        the home of golf courses
+        stay in play<span style={{ color: '#F7931E' }}>.</span>
       </h1>
 
       {eyebrowNote && (

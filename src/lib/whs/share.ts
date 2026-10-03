@@ -73,7 +73,7 @@ export async function shareInvitesBulk(
   const links = invites
     .map((i) => `${firstName(i.invitee_name)}: ${i.share_url}`)
     .join('\n');
-  const combinedMessage = `Join me on Clbhouz, ${namesJoined} — your invite links below:\n\n${links}`;
+  const combinedMessage = `Join me on clbhouz, ${namesJoined} — your invite links below:\n\n${links}`;
   if (typeof navigator !== 'undefined' && navigator.share) {
     try {
       await navigator.share({
