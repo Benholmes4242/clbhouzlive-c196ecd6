@@ -7,6 +7,7 @@ import type { BadgeShareRow } from '@/hooks/gam/useBadgePopulationShare';
 import type { Top100DistributionRow } from '@/hooks/gam/useTop100Distribution';
 import type { GamRecordConfig } from '@/hooks/gam/useGamRecordConfig';
 import type { CareerRoundRow } from '@/hooks/gam/useCareerRounds';
+import type { CourseRecordSplit } from '@/hooks/gam/useMemberRecordSplit';
 import type { StreakRow } from '@/lib/gam/types';
 
 export type Achievement = Extract<TrophyItem, { kind: 'achievement' }>;
@@ -52,6 +53,10 @@ export interface CareerData {
   fieldPlayers?: Map<string, number>;
   /** False when the batched field read is unavailable; no split is claimed. */
   fieldPlayersAvailable?: boolean;
+  /** Per-course contested / sole / attendance from get_member_record_split (Course Legend rule). */
+  recordSplitByCourse: Map<string, CourseRecordSplit>;
+  /** False when get_member_record_split errored or has not answered; no split is claimed. */
+  recordSplitAvailable: boolean;
   config: GamRecordConfig;
   onOpen: (view: CareerView) => void;
 }
