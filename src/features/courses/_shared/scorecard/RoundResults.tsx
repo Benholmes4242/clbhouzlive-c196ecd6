@@ -8,7 +8,6 @@ import {
   INK,
   INK_FAINT,
   LIVE_INK,
-  STATUS_LIVE_TINT_10,
 } from '@/features/tourhub/_shared/tokens';
 import { SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { AwardMark } from '@/components/awards/AwardMark';
@@ -21,6 +20,18 @@ export interface RoundResultsScope {
   subject: string;
   possessive: string;
   verb: string;
+}
+
+/**
+ * The sheet's ONE voice (CardScorecardSheet's scopeVoice), threaded to the
+ * award rows. `subjectName` is already possessive for another member
+ * ("Andrew's") and plain "You" for the viewer, so owner and non-owner titles
+ * are SEPARATE keys — never `${subjectName}'s`, which would print "You's".
+ */
+export interface RoundResultsVoice {
+  self: boolean;
+  subjectName: string;
+  pronoun: 'you' | 'he' | 'she' | 'they';
 }
 
 const COARSE_UNITS = new Set<RoundAwardUnitKind>([
@@ -57,26 +68,69 @@ function placingText(rank: number | null, topTen: boolean, t: (key: string, opti
   return null;
 }
 
-function awardTitle(award: RoundAwardRow, t: (key: string, options?: Record<string, unknown>) => string): string {
+type T = (key: string, options?: Record<string, unknown>) => string;
+
+function awardTitle(award: RoundAwardRow, t: T, voice: RoundResultsVoice | null | undefined): string {
+  // Owner and non-owner are separate keys; with no voice the generic keys stand.
+  const who = voice ? (voice.self ? 'Self' : 'Other') : '';
+  const name = voice?.subjectName;
   if (award.unit_kind === 'hole') {
-    return t(
-      award.award_kind === 'first_birdie' ? 'roundResults.award.firstBirdie'
-        : award.award_kind === 'matched_best' ? 'roundResults.award.matchedBestHole'
-        : award.award_kind === 'top_three' ? 'roundResults.award.topThreeHole'
-        : award.award_kind === 'top_ten' ? 'roundResults.award.topTenHole'
-        : 'roundResults.award.bestHole',
-      { hole: formatOrdinal(award.unit_key) },
-    );
+    const hole = formatOrdinal(award.unit_key);
+    if (award.award_kind === 'first_birdie') return t('roundResults.award.firstBirdie', { hole });
+    if (award.award_kind === 'top_three') return t('roundResults.award.topThreeHole', { hole });
+    if (award.award_kind === 'top_ten') return t('roundResults.award.topTenHole', { hole });
+    if (award.award_kind === 'matched_best') return t(`roundResults.award.matchedBestHole${who}`, { hole, name });
+    return t(`roundResults.award.bestHole${who}`, { hole, name });
   }
   const unit = t(awardUnitKey(award.unit_kind));
-  if (award.award_kind === 'matched_best') return t('roundResults.award.matchedBest', { unit });
+  if (award.award_kind === 'matched_best') return t(`roundResults.award.matchedBest${who}`, { unit, name });
   if (award.award_kind === 'top_three') return t('roundResults.award.topThree', { unit });
   if (award.award_kind === 'top_ten') return t('roundResults.award.topTen', { unit });
-  return t('roundResults.award.best', { unit });
+  return t(`roundResults.award.best${who}`, { unit, name });
 }
 
-function AwardRow({ award }: { award: RoundAwardRow }) {
+/*
+ * HOLE SCORES AS WORDS. A hole award's value is TO-PAR, with no par on the
+ * row. DO NOT add "hole in one": an ace on a par 3 and an eagle on a par 5 are
+ * both -2, so any ace label would be wrong half the time. Beyond +3 the signed
+ * figure stands rather than an invented name.
+ */
+const HOLE_WORDS: Record<number, string> = {
+  [-3]: 'albatross', [-2]: 'eagle', [-1]: 'birdie', 0: 'par', 1: 'bogey', 2: 'double', 3: 'triple',
+};
+
+/** `slot` = 'scoreName' opens a sentence; 'scorePrev' carries its own article. */
+function scoreWords(unit: RoundAwardUnitKind, value: number, slot: 'scoreName' | 'scorePrev', t: T): string {
+  if (unit === 'hole') {
+    const word = HOLE_WORDS[Math.round(value)];
+    return word ? t(`roundResults.${slot}.${word}`) : fmtToPar(value);
+  }
+  if (unit === 'round_stableford' && slot === 'scoreName') return t('roundResults.points', { count: Math.round(value) });
+  return formatValue(unit, value);
+}
+
+/*
+ * THE SENTENCE. The name owns the title; the pronoun owns the sentence. Each
+ * full sentence per pronoun is its own key — no string capitalisation. A
+ * matched_best has previous_value === value, so it never says "best was X".
+ */
+function awardSentence(award: RoundAwardRow, t: T, voice: RoundResultsVoice | null | undefined): string | null {
+  if (!voice || award.value == null) return null;
+  if (award.award_kind === 'matched_best') {
+    return t(`roundResults.line.matched.${voice.pronoun}`, { score: scoreWords(award.unit_kind, award.value, 'scoreName', t) });
+  }
+  if (award.award_kind === 'new_best' && award.previous_value != null) {
+    return t(`roundResults.line.newBest.${voice.pronoun}`, {
+      score: scoreWords(award.unit_kind, award.value, 'scoreName', t),
+      previous: scoreWords(award.unit_kind, award.previous_value, 'scorePrev', t),
+    });
+  }
+  return null;
+}
+
+function AwardRow({ award, voice }: { award: RoundAwardRow; voice?: RoundResultsVoice | null }) {
   const { t } = useTranslation('handicap');
+  const sentence = awardSentence(award, t, voice);
   const previous = award.previous_value == null
     ? null
     : t('roundResults.previous', { value: formatValue(award.unit_kind, award.previous_value) });
@@ -85,21 +139,15 @@ function AwardRow({ award }: { award: RoundAwardRow }) {
     : award.rank_here === 1
       ? t('roundResults.placing.best')
       : t('roundResults.placing.ordinal', { place: formatOrdinal(award.rank_here), count: award.attempts_at_detection ?? 0 });
-  const subline = [previous, placing].filter(Boolean).join(' - ');
-  const delta = award.delta == null ? null : formatValue(award.unit_kind, award.value);
+  const subline = sentence ?? [previous, placing].filter(Boolean).join(' - ');
 
   return (
-    <div data-round-award={award.unit_kind} style={{ minWidth: 0, display: 'grid', gridTemplateColumns: '22px minmax(0,1fr) auto', alignItems: 'center', gap: 10, padding: '10px 0' }}>
+    <div data-round-award={award.unit_kind} style={{ minWidth: 0, display: 'grid', gridTemplateColumns: '22px minmax(0,1fr)', alignItems: 'center', gap: 10, padding: '10px 0' }}>
       <AwardMark tier={award.tier} size="sheet" />
       <span style={{ minWidth: 0 }}>
-        <span style={{ display: 'block', color: INK, fontSize: 13.5, fontWeight: 600, lineHeight: 1.25 }}>{awardTitle(award, t)}</span>
+        <span style={{ display: 'block', color: INK, fontSize: 13.5, fontWeight: 600, lineHeight: 1.25 }}>{awardTitle(award, t, voice)}</span>
         {subline && <span style={{ display: 'block', color: INK_FAINT, fontSize: 11.5, lineHeight: 1.35, marginTop: 3 }}>{subline}</span>}
       </span>
-      {delta && (
-        <span style={{ flexShrink: 0, whiteSpace: 'nowrap', borderRadius: 6, padding: '5px 8px', background: STATUS_LIVE_TINT_10, color: LIVE_INK, fontSize: 12.5, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-          {delta}
-        </span>
-      )}
     </div>
   );
 }
@@ -113,7 +161,7 @@ function Block({ title, children, testId }: { title: string; children: React.Rea
   );
 }
 
-export function RoundResults({ result, scope }: { result: RoundAwardsResult | null | undefined; scope?: RoundResultsScope | null }) {
+export function RoundResults({ result, scope, voice }: { result: RoundAwardsResult | null | undefined; scope?: RoundResultsScope | null; voice?: RoundResultsVoice | null }) {
   const { t } = useTranslation('handicap');
   if (!result) return null;
 
@@ -178,12 +226,12 @@ export function RoundResults({ result, scope }: { result: RoundAwardsResult | nu
     <div data-round-results="true" style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS }}>
       {awards.length > 0 && (
         <Block title={t('roundResults.sections.awards')} testId="awards">
-          {awards.map((award, index) => <AwardRow key={`${award.unit_kind}:${award.unit_key}:${award.award_kind}:${index}`} award={award} />)}
+          {awards.map((award, index) => <AwardRow key={`${award.unit_kind}:${award.unit_key}:${award.award_kind}:${index}`} award={award} voice={voice} />)}
         </Block>
       )}
       {holes.length > 0 && (
         <Block title={t('roundResults.sections.holes')} testId="holes">
-          {holes.map((award, index) => <AwardRow key={`${award.unit_key}:${award.award_kind}:${index}`} award={award} />)}
+          {holes.map((award, index) => <AwardRow key={`${award.unit_key}:${award.award_kind}:${index}`} award={award} voice={voice} />)}
         </Block>
       )}
       {resultsTable}

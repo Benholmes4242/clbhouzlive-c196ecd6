@@ -1,3 +1,4 @@
+import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap';
 /**
  * BRIEF_ROUND_SHEET_PEEK §1 — THE SCORECARD'S SHARED PARTS.
  *
@@ -364,6 +365,8 @@ export interface RoundSummaryHeadProps {
   /** Tour only — the ordered candidate chain from the canonical resolver. */
   tourAvatarCandidates?: string[];
   isOwner?: boolean;
+  /** Member surface: the index under the player's name (handicapPairDisplay). */
+  playerHcp?: number | null;
   playerHcpDelta?: number | null;
   rail?: RailFigure[];
 }
@@ -377,11 +380,17 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
   isTour = false, kickerText, courseName, courseLocation,
   showScore, gross, toPar, shownPar = 0, playedHoles = 0, coursePar,
   heroMuted, playerName, playerAvatarUrl, playerUserId,
-  tourAvatarCandidates = [], isOwner = false, playerHcpDelta, rail = [],
+  tourAvatarCandidates = [], isOwner = false, playerHcp, playerHcpDelta, rail = [],
 }) => {
   const { t } = useTranslation(['courses']);
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
   const showIdentity = !!playerName;
+  // Member surface: the round's date joins the place line (both are
+  // circumstances of the round); the identity row carries the player + HCP.
+  const memberPlace = !isTour
+    ? [courseLocation, kickerText].filter(Boolean).join(' \u00B7 ')
+    : courseLocation;
+  const hcpPair = !isTour ? handicapPairDisplay({ handicapIndex: playerHcp, deltaIndex: playerHcpDelta }) : null;
 
   return (
     <div
@@ -408,8 +417,8 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
           >
             {courseName}
           </div>
-          {courseLocation && (
-            <div style={{ fontSize: 12, color: A.DIM, marginTop: 2 }}>{courseLocation}</div>
+          {memberPlace && (
+            <div style={{ fontSize: 12, color: A.DIM, marginTop: 2 }}>{memberPlace}</div>
           )}
           {showIdentity && isTour && (
             <div style={{ display: 'flex', alignItems: 'center', marginTop: 8, minWidth: 0 }}>
@@ -467,11 +476,20 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
           <span style={{ flexShrink: 0, marginRight: 8 }}>
             <SquircleAvatar src={playerAvatarUrl ?? null} alt={playerName as string} userId={playerUserId ?? undefined} size={24} hairlineRing />
           </span>
-          <span style={{ fontSize: 12.5, fontWeight: 700, color: isOwner ? A.AMBER : A.INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {playerName}
+          <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: isOwner ? A.AMBER : A.INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {playerName}
+            </span>
+            {hcpPair && (
+              <span data-scorecard-hcp="true" style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 2, whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: A.MUTE }}>{t('courses:scorecard.hcpLabel', { defaultValue: 'HCP' })}</span>
+                <span style={{ ...NUM, fontSize: 11.5, fontWeight: 700, color: A.INK }}>{hcpPair.index}</span>
+                {hcpPair.delta && (
+                  <span style={{ ...NUM, fontSize: 11.5, fontWeight: 700, color: hcpPair.delta.tone }}>{hcpPair.delta.arrow}{hcpPair.delta.text}</span>
+                )}
+              </span>
+            )}
           </span>
-          {!!kickerText && <span style={{ ...LABEL_READ, marginLeft: 8, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kickerText}</span>}
-          {showChip && <span style={{ marginLeft: 8, flexShrink: 0 }}><HandicapChip delta={playerHcpDelta as number} /></span>}
         </div>
       )}
 

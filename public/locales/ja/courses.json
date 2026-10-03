@@ -1853,7 +1853,8 @@
     "scopeThey": "本人",
     "scopeTheir": "本人の",
     "scopeHave": "は",
-    "scopeHas": "は"
+    "scopeHas": "は",
+    "hcpLabel": "HCP"
   },
   "searchSheet": {
     "added": "Added",

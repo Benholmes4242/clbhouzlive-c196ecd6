@@ -1899,7 +1899,8 @@
     "scopeThey": "Die Person",
     "scopeTheir": "deren",
     "scopeHave": "hast",
-    "scopeHas": "hat"
+    "scopeHas": "hat",
+    "hcpLabel": "HCP"
   },
   "searchSheet": {
     "added": "Added",

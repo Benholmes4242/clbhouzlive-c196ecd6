@@ -1856,7 +1856,8 @@
     "scopeThey": "회원은",
     "scopeTheir": "회원의",
     "scopeHave": "플레이했습니다",
-    "scopeHas": "플레이했습니다"
+    "scopeHas": "플레이했습니다",
+    "hcpLabel": "HCP"
   },
   "searchSheet": {
     "added": "Added",
