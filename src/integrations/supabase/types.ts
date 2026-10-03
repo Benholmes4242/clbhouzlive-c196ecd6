@@ -21725,6 +21725,9 @@ export type Database = {
           hcp_at_time: number
           holes_in_one: number
           is_nine_hole: boolean
+          medals_bronze: number
+          medals_gold: number
+          medals_silver: number
           nett_score: number
           play_date: string
           total_holes: number

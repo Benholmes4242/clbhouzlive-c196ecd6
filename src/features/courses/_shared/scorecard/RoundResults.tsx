@@ -9,12 +9,10 @@ import {
   INK,
   INK_FAINT,
   LIVE_INK,
-  MEDAL_BRONZE,
-  MEDAL_GOLD,
-  MEDAL_SILVER,
   STATUS_LIVE_TINT_10,
 } from '@/features/tourhub/_shared/tokens';
 import { SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { medalTierTone } from '@/lib/tokens/medals';
 import { formatOrdinal } from '@/i18n/format';
 
 export interface RoundResultsScope {
@@ -54,12 +52,6 @@ function awardUnitKey(unit: RoundAwardUnitKind): string {
   return `roundResults.awardUnits.${unit}`;
 }
 
-function medalTone(tier: RoundAwardRow['tier']): string {
-  if (tier === 'gold') return MEDAL_GOLD;
-  if (tier === 'silver') return MEDAL_SILVER;
-  return MEDAL_BRONZE;
-}
-
 function placingText(rank: number | null, topTen: boolean, t: (key: string, options?: Record<string, unknown>) => string): string | null {
   if (rank != null) return formatOrdinal(rank);
   if (topTen) return t('roundResults.placing.topTen');
@@ -95,7 +87,7 @@ function AwardRow({ award }: { award: RoundAwardRow }) {
 
   return (
     <div data-round-award={award.unit_kind} style={{ minWidth: 0, display: 'grid', gridTemplateColumns: '22px minmax(0,1fr) auto', alignItems: 'center', gap: 10, padding: '10px 0' }}>
-      <span aria-hidden="true" style={{ width: 22, height: 26, borderRadius: 6, display: 'grid', placeItems: 'center', background: medalTone(award.tier), color: INK }}>
+      <span aria-hidden="true" style={{ width: 22, height: 26, borderRadius: 6, display: 'grid', placeItems: 'center', background: medalTierTone(award.tier), color: INK }}>
         <Medal size={14} strokeWidth={2.25} />
       </span>
       <span style={{ minWidth: 0 }}>

@@ -31,6 +31,10 @@ export interface ProfileRound {
   albatrosses: number | null;
   holes_in_one: number | null;
   clean_card: boolean | null;
+  /** Round-award medal counts (get_profile_rounds, pending). Absent = none. */
+  medals_gold?: number | null;
+  medals_silver?: number | null;
+  medals_bronze?: number | null;
   /** From whs_scores (joined in get_profile_rounds). null = the row did not come back. */
   is_nine_hole: boolean | null;
   total_holes: number | null;

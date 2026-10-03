@@ -300,7 +300,7 @@ export function FigureCell({
   /** Optional value colour override (e.g. a member's best gross). `under` wins. */
   tone?: string;
   label: string;
-  value: string;
+  value: React.ReactNode;
   under?: boolean;
   /** A second, smaller figure on the value's baseline — the to-par beside a
    *  gross, the delta beside a handicap. Its own colour; never inherits the
