@@ -22525,6 +22525,7 @@ export type Database = {
           is_owner_played: boolean
           is_viewer_played: boolean
           owner_rating: number
+          owner_rating_id: string
           rank: number
           region: string
           thumbnail_image: string
