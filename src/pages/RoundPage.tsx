@@ -156,7 +156,7 @@ const RoundPage: React.FC = () => {
   // never pop-then-push (see onLeave below).
   const goBack = () => {
     if (hasHistory && !synthesised) navigate(-1);
-    else navigate('/notificationmessages', { replace: true });
+    else navigate('/notificationmessages', { replace: true, state: { exitFromPushRound: true } });
   };
 
   /**

@@ -170,7 +170,16 @@ if (typeof window !== 'undefined') {
         ? new URL(target).pathname + new URL(target).search + new URL(target).hash
         : target;
       // Defer a tick so router is ready on cold start.
-      setTimeout(() => { appNavigate(path); }, 0);
+      setTimeout(() => {
+        // A cold push is auto-navigated by Median from targetUrl; navigating to
+        // the same path again would stack a duplicate entry (the back loop).
+        const current = window.location.pathname + window.location.search;
+        const u = new URL(path, window.location.origin);
+        const tgt = u.pathname + u.search;
+        const action = tgt === current ? 'skip' : 'navigate';
+        console.info('[push] opened', { target: tgt, current, action });
+        if (action === 'navigate') appNavigate(path);
+      }, 0);
     } catch { /* swallow */ }
   };
 }
