@@ -451,7 +451,7 @@ export function ScoresLeaderboardsPage({
   const sub80C = useCareerBoard(userId, 'sub_80', 2, 'get_year_leaderboard');
   const eaglesC = useCareerBoard(userId, 'eagles', 2, 'get_year_leaderboard');
   const [top100List, setTop100List] = useState<RankListSlug>(TOP100_DEFAULT);
-  const top100 = useCareerBoard(userId, TOP100_METRIC[top100List], 25);
+  const top100 = useCareerBoard(userId, TOP100_METRIC[top100List], 100);
   const top100Defaulted = top100List === TOP100_DEFAULT;
   const pickTop100 = (next: string) => {
     const slug = next as RankListSlug;
