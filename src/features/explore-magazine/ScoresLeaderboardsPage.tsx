@@ -1,3 +1,4 @@
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -592,7 +593,7 @@ export function ScoresLeaderboardsPage({
           <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>{r.rank_now}</span>
           <span style={{ fontSize: 11, fontWeight: 700, color: A.DIM }}>{t('amateur.leaderboards.ofN', 'of {{n}}', { n: r.field_now })}</span>
         </span>
-        <span className="tabular-nums" style={{ display: 'inline-flex', alignItems: 'center', gap: 2, marginTop: 4, fontSize: 10.5, fontWeight: 700, color: up ? A.GREEN : A.DIM }}>
+        <span className="tabular-nums" style={{ display: 'inline-flex', alignItems: 'center', gap: 2, marginTop: 4, fontSize: 10.5, fontWeight: 700, color: up ? INDEX_DELTA.dark.improved : down ? INDEX_DELTA.dark.drifted : A.DIM }}>
           {up ? <ArrowUp size={11} /> : down ? <ArrowDown size={11} /> : null}
           {up || down ? Math.abs(d!) : t('amateur.leaderboards.held', 'Held')}
         </span>
