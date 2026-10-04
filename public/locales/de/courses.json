@@ -834,7 +834,7 @@
       "featBirdies_other": "{{count}} BIRDIES",
       "featClean": "BOGEYFREI",
       "featEagle_one": "EAGLE",
-      "featEagle_other": "EAGLE-BRACE",
+      "featEagle_other": "{{count}} EAGLES",
       "featJoin": "{{first}} + {{second}}",
       "railCourses_one": "KURS",
       "railCourses_other": "KURSE",

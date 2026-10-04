@@ -1153,7 +1153,7 @@
       "featBirdies_other": "{{count}} BIRDIES",
       "featClean": "BOGEY-FREE",
       "featEagle_one": "EAGLE",
-      "featEagle_other": "EAGLE BRACE",
+      "featEagle_other": "{{count}} EAGLES",
       "featJoin": "{{first}} + {{second}}",
       "nMembers_one": "{{count}} member",
       "nMembers_other": "{{count}} members",
