@@ -955,13 +955,34 @@ export function ScoresLeaderboardsPage({
         ariaLabelledBy="improved-see-all-title"
         style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
       >
-        <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>
-          <h2 id="improved-see-all-title" style={{ ...KICKER, margin: 0, color: A.INK }}>
-            {t('amateur.leaderboards.mostImproved', 'Most improved')}
-          </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 13px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h2 id="improved-see-all-title" style={{ margin: 0, fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>
+              {t('amateur.leaderboards.mostImproved', 'Most improved')}
+            </h2>
+            <div style={{ marginTop: 2, fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>
+              {improvedRows.length > 0
+                ? `${t('amateur.leaderboards.improvedScope', 'Everyone · this year')} · ${membersText(Number(improvedRows[0].total_members) || improvedRows.length)}`
+                : t('amateur.leaderboards.improvedScope', 'Everyone · this year')}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setImprovedSheet(false)}
+            style={{ flex: 'none', background: 'none', border: 0, padding: 0, cursor: 'pointer', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK }}
+          >
+            {t('common.done', 'Done')}
+          </button>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px 6px', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, flexShrink: 0 }}>
+          <span>{t('amateur.leaderboards.member', 'Member')}</span>
+          <span>{t('amateur.leaderboards.indexChange', 'Index change')}</span>
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
           {improvedRows.map((r, i, arr) => improvedRow(r, i < arr.length - 1, true))}
+          <div style={{ fontFamily: SANS, fontSize: 11.5, lineHeight: 1.45, color: A.DIM, padding: '14px 0 8px' }}>
+            {t('amateur.leaderboards.improvedQualifier', 'Members with five or more rounds this year.')}
+          </div>
         </div>
       </BottomSheet>
 
