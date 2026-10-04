@@ -844,25 +844,33 @@ export function ScoresLeaderboardsPage({
                   <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.AMBER }}>
                     {c.label}
                   </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, minWidth: 0 }}>
-                    <Avatar id={r.user_id} name={nameOf(r.display_name)} src={r.photo_url} size={24} />
-                    <span style={{ display: 'block', minWidth: 0 }}>
-                      <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {nameOf(r.display_name)}
-                      </span>
-                      {/* CLUB LINE TRUNCATES BY DESIGN. Measured at 390pt the club
-                          gets 92px here; every real club name exceeds it ("Walton
-                          Heath Golf Club" is 105px). The first two words identify
-                          the club. Do not move this line or shrink the avatar. */}
-                      {r.home_club ? (
-                        <span style={{ display: 'block', marginTop: 2, fontSize: 10, fontWeight: 500, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {r.home_club}
-                        </span>
-                      ) : null}
-                    </span>
+                  <span style={{ display: 'block', marginTop: 8, fontSize: 12.5, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {nameOf(r.display_name)}
                   </span>
-                  <span className="tabular-nums" style={{ display: 'block', marginTop: 8, fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
-                    {r.value}
+                  {/* NAME AND CLUB TAKE THE CARD'S FULL WIDTH. The avatar moved
+                      beside the value, which was empty space, so these two lines
+                      no longer share the row with it.
+                      THE CLUB MAY STILL TRUNCATE: "Hanbury Manor Golf & Country
+                      Club" measures 160.6px against roughly 122px. That is
+                      accepted, not solved — render the full home_club and let it
+                      ellipse; never shorten club names.
+                      CHROMIUM MEASUREMENTS UNDERSTATE DEVICE WIDTHS: "Andrew
+                      Yetzes" measured 66px yet truncated at 94px on an iPhone.
+                      Treat these figures as a floor, not a budget — a label that
+                      only just fits in a measurement does not fit. That is why
+                      this layout took a 34% width increase over a calculated one. */}
+                  {r.home_club ? (
+                    <span style={{ display: 'block', marginTop: 2, fontSize: 10, fontWeight: 500, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {r.home_club}
+                    </span>
+                  ) : null}
+                  <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+                    <span className="tabular-nums" style={{ display: 'block', fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
+                      {r.value}
+                    </span>
+                    <span style={{ flexShrink: 0, display: 'flex' }}>
+                      <Avatar id={r.user_id} name={nameOf(r.display_name)} src={r.photo_url} size={30} />
+                    </span>
                   </span>
                   {margin != null ? (
                     <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, color: A.DIM }}>
