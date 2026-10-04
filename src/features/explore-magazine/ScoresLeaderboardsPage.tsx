@@ -223,6 +223,7 @@ function Avatar({ id, name, src, size }: { id: string; name: string; src: string
   );
 }
 
+/* PAGE DATED, SHEET GROUPED: this flat board leads the second line with the date; BoardSeeAllSheet groups by period and prints the course alone. Deliberate — do not match one to the other. */
 /** "26 Sep" — the one date rule on this page. play_date is a calendar date, read in UTC so it never shifts a day. */
 function fmtDayMonth(d: string | null | undefined): string | null {
   if (!d) return null;
