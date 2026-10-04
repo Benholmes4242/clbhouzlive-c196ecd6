@@ -36,7 +36,6 @@ import { ListTerminalRow } from './ListTerminalRow';
  * switching Ranked by must leave it completely unchanged.
  */
 
-const TOPAR_UNDER = A.RED;
 const ROW_H = 46;
 const RANK_W = 14;
 const PLAYS_TO_W = 62;
@@ -825,7 +824,7 @@ function LowRoundLine({
         : toPar < 0
           ? `\u2212${Math.abs(toPar)}`
           : `+${toPar}`;
-  const toParTone = toPar == null ? A.DIM : toPar < 0 ? TOPAR_UNDER : toPar === 0 ? A.MUTE : A.INK;
+  const toParTone = toPar == null ? A.DIM : toPar < 0 ? A.RED : toPar === 0 ? A.MUTE : A.INK;
   const lowLabel = {
     '14': t('discover.coursesPlayed.low14DayBy', '14-DAY LOW BY {{name}}', { name: row.low_by ?? '\u2014' }),
     '30': t('discover.coursesPlayed.low30DayBy', '30-DAY LOW BY {{name}}', { name: row.low_by ?? '\u2014' }),
@@ -940,7 +939,7 @@ export function PlaysTo({
         : value < 0
           ? `\u2212${Math.abs(value).toFixed(1)}`
           : '0.0';
-  const tone = value == null ? A.DIM : color ?? (value < 0 ? TOPAR_UNDER : A.INK);
+  const tone = value == null ? A.DIM : color ?? (value < 0 ? A.RED : A.INK);
 
   return (
     <span style={{ width, flexShrink: 0, textAlign: 'right' }}>
