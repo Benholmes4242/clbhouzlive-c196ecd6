@@ -1419,7 +1419,6 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 }
               />
             </div>
-            )}
           </section>
         </>
       )}
