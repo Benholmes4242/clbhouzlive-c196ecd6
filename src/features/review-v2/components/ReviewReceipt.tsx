@@ -11,7 +11,6 @@ import { Trans, useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { RV2 } from '../tokens';
 import { FIGURE } from '@/lib/tokens/type';
-import { bandColorOnDark as bandColor } from '../bandColor';
 /* THE BREAKDOWN BARS ONLY (BRIEF phase 2 §8): the four category values and
    their fills take the course page's two-tone rule so the receipt shows what
    the course page will show. The hero overall and the community average keep
@@ -75,7 +74,7 @@ export function ReviewReceipt({
 }: Props) {
   const { t } = useTranslation('courses');
   const { data: receipt } = useReviewReceipt(ratingId);
-  const heroColor = bandColor(overall);
+  const heroColor = courseSubScoreTone(overall);
   const short = shortCourseName(course.name);
 
   const [pub, setPub] = useState<ReviewPublishState | null>(null);
@@ -333,7 +332,7 @@ export function ReviewReceipt({
                     <span
                       style={{
                         fontWeight: 700,
-                        color: bandColor(catAvg),
+                        color: courseSubScoreTone(catAvg),
                         fontVariantNumeric: 'tabular-nums',
                       }}
                     />
@@ -385,7 +384,7 @@ export function ReviewReceipt({
                               count: receipt.rating_count ?? 0,
                             }}
                             components={{
-                              avg: <span style={figure(bandColor(Number(receipt.community_avg)))} />,
+                              avg: <span style={figure(courseSubScoreTone(Number(receipt.community_avg)))} />,
                               cnt: <span style={figure(RV2.ink)} />,
                             }}
                           />
