@@ -586,7 +586,7 @@ export function ScoresLeaderboardsPage({
     rows: CareerRow[],
     secondary: (r: CareerRow) => string | null,
     caption: string,
-    onPress: (r: CareerRow) => void = (r) => onOpenProfile(r.user_id),
+    onPress: (r: CareerRow) => void = (r) => onMemberTap(r.user_id),
   ) => {
     const top = rows.slice(0, SHORT_ROWS);
     const mine = rows.find((r) => r.is_viewer) ?? (userId ? rows.find((r) => r.user_id === userId) : undefined);
