@@ -904,7 +904,7 @@ export function ScoresLeaderboardsPage({
       ) : null}
 
       {/* §6 WHO LEADS WHAT — this calendar year's leader of each metric, read
-          from get_year_leaderboard (fetch 2: the footnote needs second place).
+          from get_year_leaderboard (CAREER_RAIL_LIMIT: the tile reads rows 0-1, the sheet the field).
           JANUARY IS THIN BY DESIGN: on 1 January every value is zero, the RPC
           filters value > 0, and this section renders nothing. That is a fresh
           race, not a bug — never add a "last year's final" fallback or carry
