@@ -1,8 +1,7 @@
-import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronRight, ArrowUp, ArrowDown, Medal } from 'lucide-react';
+import { ChevronDown, ChevronRight, Medal } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -541,7 +540,7 @@ export function ScoresLeaderboardsPage({
   const careerShown = career.filter((c) => c.q.isSuccess && (c.q.data?.length ?? 0) > 0);
   const careerMembers = careerShown.reduce((m, c) => Math.max(m, Number(c.q.data![0].total_members) || 0), 0);
 
-  /* ------------------------------------------------- §7/§7 short boards */
+  /* ------------------------------------------------- §7/§8 short boards */
   const shortBoard = (
     rows: CareerRow[],
     secondary: (r: CareerRow) => string | null,
