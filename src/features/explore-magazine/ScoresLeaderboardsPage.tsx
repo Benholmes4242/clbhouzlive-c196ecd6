@@ -29,6 +29,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
+import { RailChips } from '@/components/ui/RailChips';
+import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
 
 /**
  * THE LEADERBOARDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A).
@@ -62,7 +64,12 @@ interface CareerRow {
   is_viewer: boolean | null;
 }
 
-type CareerMetric = 'top_100_gbni_distinct' | 'birdies' | 'rounds' | 'sub_80' | 'eagles';
+type CareerMetric =
+  | 'top_100_gbni_distinct'
+  | 'top_100_worldwide_distinct'
+  | 'top_100_europe_distinct'
+  | 'top_100_usa_distinct'
+  | 'birdies' | 'rounds' | 'sub_80' | 'eagles';
 
 function useCareerBoard(
   viewerId: string | undefined,
@@ -124,6 +131,22 @@ function useYearImprovement(viewerId: string | undefined) {
     },
   });
 }
+
+/**
+ * §7 — THE ONE PLACE A TOP 100 CHIP MEETS ITS METRIC. Chip order is the map's
+ * key order. NOTE THE ONE MISMATCH: the chip reads "Global" (RANK_SCOPE_LABEL,
+ * the app's published name) while the metric key says "worldwide" (the
+ * database's name). Neither changes here; they meet only on this line.
+ */
+const TOP100_METRIC: Record<RankListSlug, CareerMetric> = {
+  'gb-i': 'top_100_gbni_distinct',
+  global: 'top_100_worldwide_distinct',
+  europe: 'top_100_europe_distinct',
+  usa: 'top_100_usa_distinct',
+};
+const TOP100_ORDER = Object.keys(TOP100_METRIC) as RankListSlug[];
+/** The list with the most members, and the one the section always showed. */
+const TOP100_DEFAULT: RankListSlug = 'gb-i';
 
 /** Matches AmateurLeaderboardBlock's THIN_FLOOR: fewer ranked rows is not a board. */
 const THIN_FLOOR = 4;
@@ -424,7 +447,16 @@ export function ScoresLeaderboardsPage({
   const roundsC = useCareerBoard(userId, 'rounds', 2, 'get_year_leaderboard');
   const sub80C = useCareerBoard(userId, 'sub_80', 2, 'get_year_leaderboard');
   const eaglesC = useCareerBoard(userId, 'eagles', 2, 'get_year_leaderboard');
-  const top100 = useCareerBoard(userId, 'top_100_gbni_distinct', 25);
+  const [top100List, setTop100List] = useState<RankListSlug>(TOP100_DEFAULT);
+  const top100 = useCareerBoard(userId, TOP100_METRIC[top100List], 25);
+  const top100Defaulted = top100List === TOP100_DEFAULT;
+  const pickTop100 = (next: string) => {
+    const slug = next as RankListSlug;
+    if (slug === top100List) return;
+    /* Reuses the "a chip changed the list" event rather than naming it twice. */
+    analyticsEvents.track('amateur_board_changed', { board: `top100:${slug}`, list: slug });
+    setTop100List(slug);
+  };
 
   const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
   const [careerSheet, setCareerSheet] = useState(false);
@@ -846,24 +878,44 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §7 TOP 100 GB&I — get_career_leaderboard('top_100_gbni_distinct').
-          This section is now get_career_leaderboard's ONLY consumer; its other
-          branches (including 'crowns') stay in SQL, dormant. */}
-      {top100.isPending ? (
+      {/* §7 TOP 100 — get_career_leaderboard(TOP100_METRIC[list]). This section
+          is get_career_leaderboard's ONLY consumer; its other branches
+          (including 'crowns') stay in SQL, dormant.
+          NO THIN FLOOR ON A LIST THE MEMBER CHOSE: once a chip is tapped, any
+          row count is shown and zero rows reads one quiet line. Only the
+          DEFAULT list being empty (or failing) on load hides the section. */}
+      {top100Defaulted && top100.isPending ? (
         pending(170)
-      ) : top100.isSuccess && top100Rows.length > 0 ? (
+      ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
         <Section
           contest
           eyebrow={t('amateur.leaderboards.theHundred', 'The hundred')}
-          title={t('amateur.leaderboards.top100Gbi', 'Top 100 GB&I')}
-          meta={membersText(Number(top100Rows[0].total_members))}
+          title={t('amateur.leaderboards.top100', 'Top 100')}
+          meta={top100Rows.length > 0 ? membersText(Number(top100Rows[0].total_members)) : undefined}
         >
-          {shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100', 'of 100'))}
+          <div style={{ marginBottom: 12 }}>
+            <RailChips
+              ground="filled-selection"
+              options={TOP100_ORDER.map((slug) => ({ id: slug, label: RANK_SCOPE_LABEL[slug] }))}
+              value={top100List}
+              onChange={pickTop100}
+              ariaLabel={t('amateur.leaderboards.top100List', 'Top 100 list')}
+            />
+          </div>
+          {top100.isPending ? (
+            <div style={{ minHeight: 120 }} />
+          ) : top100Rows.length === 0 ? (
+            <p style={{ margin: 0, padding: '12px 0', fontFamily: SANS, fontSize: 13, color: A.MUTE }}>
+              {t('amateur.leaderboards.top100Empty', 'Nobody has played a course on this list yet.')}
+            </p>
+          ) : (
+            shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100', 'of 100'))
+          )}
           {top100Rows.length > SHORT_ROWS ? (
             <SeeAll label={seeAllMembers(Number(top100Rows[0].total_members))} onPress={() => setCareerSheet(true)} />
           ) : null}
         </Section>
-      ) : null}
+      )}
 
       {seeAll ? (
         <BoardSeeAllSheet
@@ -904,7 +956,7 @@ export function ScoresLeaderboardsPage({
       >
         <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>
           <h2 id="career-see-all-title" style={{ ...KICKER, margin: 0, color: A.INK }}>
-            {t('amateur.leaderboards.top100Gbi', 'Top 100 GB&I')}
+            {`${t('amateur.leaderboards.top100', 'Top 100')} · ${RANK_SCOPE_LABEL[top100List]}`}
           </h2>
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
