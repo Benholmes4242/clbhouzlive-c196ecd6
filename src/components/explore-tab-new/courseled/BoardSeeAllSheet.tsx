@@ -234,3 +234,25 @@ export function BoardSeeAllSheet({
 }
 
 export default BoardSeeAllSheet;
+
+/**
+ * THE ONE WINDOW -> GROUPING RULE. Short windows ('14', '30') group by day
+ * with relativeDayFull; longer windows ('90', 'year', 'all') group by month
+ * ("September 2026"), because a header per day over months is noise.
+ */
+function groupFor(
+  window: BoardFilters['window'],
+  playDate: string | null | undefined,
+  t: (k: string, o?: any) => string,
+): { key: string; label: string } {
+  const iso = String(playDate ?? '').slice(0, 10);
+  if (window === '14' || window === '30') {
+    return { key: iso, label: relativeDayFull(playDate, t) };
+  }
+  const month = iso.slice(0, 7);
+  const dt = new Date(`${month}-01T12:00:00Z`);
+  const label = Number.isNaN(dt.getTime())
+    ? iso
+    : dt.toLocaleDateString(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  return { key: month, label };
+}
