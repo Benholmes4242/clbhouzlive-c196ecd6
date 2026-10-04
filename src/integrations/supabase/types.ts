@@ -23375,6 +23375,22 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_year_leaderboard: {
+        Args: { p_limit?: number; p_metric: string; p_viewer: string }
+        Returns: {
+          courses: number
+          display_name: string
+          field_avg: number
+          home_club: string
+          is_tie: boolean
+          is_viewer: boolean
+          photo_url: string
+          pos: number
+          total_members: number
+          user_id: string
+          value: number
+        }[]
+      }
       gettransactionid: { Args: never; Returns: unknown }
       global_search_v2: {
         Args: {
