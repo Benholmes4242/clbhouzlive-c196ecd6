@@ -425,7 +425,8 @@ export function ScoresLeaderboardsPage({
   const sub80C = useCareerBoard(userId, 'sub_80', 2, 'get_year_leaderboard');
   const eaglesC = useCareerBoard(userId, 'eagles', 2, 'get_year_leaderboard');
   const top100 = useCareerBoard(userId, 'top_100_gbni_distinct', 25);
-...
+
+  const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
   const [careerSheet, setCareerSheet] = useState(false);
 
   const windowLabel = (w: WindowKey) =>
