@@ -35,8 +35,8 @@ import { fmtHcp } from '@/lib/whs/format';
  *
  * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the lead board
  * (§3 Lowest gross) and nothing below it. Sections, in order: head, §3 Lowest
- * gross, §4 Most improved, §5 Feats this year, §6 Career, §7 Course records,
- * §8 Top 100 GB&I — §4 onward are platform facts. Each section owns its read, holds its
+ * gross, §4 Most improved, §5 Feats this year, §6 Who leads what, §7 Top 100
+ * GB&I — §4 onward are platform facts. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
  */
 
@@ -62,7 +62,7 @@ interface CareerRow {
   is_viewer: boolean | null;
 }
 
-type CareerMetric = 'crowns' | 'top_100_gbni_distinct' | 'birdies' | 'rounds' | 'sub_80' | 'eagles';
+type CareerMetric = 'top_100_gbni_distinct' | 'birdies' | 'rounds' | 'sub_80' | 'eagles';
 
 function useCareerBoard(
   viewerId: string | undefined,
@@ -424,11 +424,9 @@ export function ScoresLeaderboardsPage({
   const roundsC = useCareerBoard(userId, 'rounds', 2, 'get_year_leaderboard');
   const sub80C = useCareerBoard(userId, 'sub_80', 2, 'get_year_leaderboard');
   const eaglesC = useCareerBoard(userId, 'eagles', 2, 'get_year_leaderboard');
-  const crowns = useCareerBoard(userId, 'crowns', 25);
   const top100 = useCareerBoard(userId, 'top_100_gbni_distinct', 25);
-
-  const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
-  const [careerSheet, setCareerSheet] = useState<'crowns' | 'top100' | null>(null);
+...
+  const [careerSheet, setCareerSheet] = useState(false);
 
   const windowLabel = (w: WindowKey) =>
     w === '14'
@@ -545,7 +543,7 @@ export function ScoresLeaderboardsPage({
   const careerShown = career.filter((c) => c.q.isSuccess && (c.q.data?.length ?? 0) > 0);
   const careerMembers = careerShown.reduce((m, c) => Math.max(m, Number(c.q.data![0].total_members) || 0), 0);
 
-  /* ------------------------------------------------- §7/§8 short boards */
+  /* ------------------------------------------------- §7 short board */
   const shortBoard = (
     rows: CareerRow[],
     secondary: (r: CareerRow) => string | null,
@@ -573,13 +571,7 @@ export function ScoresLeaderboardsPage({
     ));
   };
 
-  const crownsRows = crowns.data ?? [];
   const top100Rows = top100.data ?? [];
-  const recordsCaption = t('amateur.leaderboards.records', 'records');
-  const crownsSecondary = (r: CareerRow) =>
-    r.courses != null
-      ? t('amateur.leaderboards.acrossCourses', { count: r.courses, defaultValue_one: 'Across {{count}} course', defaultValue_other: 'Across {{count}} courses' })
-      : null;
   /* get_career_leaderboard returns no most-recent course; the home club is the
      only place line it carries. */
   const top100Secondary = (_r: CareerRow): string | null => null;
@@ -853,24 +845,9 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §7 COURSE RECORDS — live from get_career_leaderboard('crowns'). */}
-      {crowns.isPending ? (
-        pending(170)
-      ) : crowns.isSuccess && crownsRows.length > 0 ? (
-        <Section
-          contest
-          eyebrow={t('amateur.leaderboards.heldNow', 'Held right now')}
-          title={t('amateur.leaderboards.courseRecords', 'Course records')}
-          meta={membersText(Number(crownsRows[0].total_members))}
-        >
-          {shortBoard(crownsRows, crownsSecondary, recordsCaption)}
-          {crownsRows.length > SHORT_ROWS ? (
-            <SeeAll label={seeAllMembers(Number(crownsRows[0].total_members))} onPress={() => setCareerSheet('crowns')} />
-          ) : null}
-        </Section>
-      ) : null}
-
-      {/* §8 TOP 100 GB&I — get_career_leaderboard('top_100_gbni_distinct'). */}
+      {/* §7 TOP 100 GB&I — get_career_leaderboard('top_100_gbni_distinct').
+          This section is now get_career_leaderboard's ONLY consumer; its other
+          branches (including 'crowns') stay in SQL, dormant. */}
       {top100.isPending ? (
         pending(170)
       ) : top100.isSuccess && top100Rows.length > 0 ? (
@@ -882,7 +859,7 @@ export function ScoresLeaderboardsPage({
         >
           {shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100', 'of 100'))}
           {top100Rows.length > SHORT_ROWS ? (
-            <SeeAll label={seeAllMembers(Number(top100Rows[0].total_members))} onPress={() => setCareerSheet('top100')} />
+            <SeeAll label={seeAllMembers(Number(top100Rows[0].total_members))} onPress={() => setCareerSheet(true)} />
           ) : null}
         </Section>
       ) : null}
@@ -918,21 +895,19 @@ export function ScoresLeaderboardsPage({
       </BottomSheet>
 
       <BottomSheet
-        open={careerSheet !== null}
-        onClose={() => setCareerSheet(null)}
+        open={careerSheet}
+        onClose={() => setCareerSheet(false)}
         maxHeight="85dvh"
         ariaLabelledBy="career-see-all-title"
         style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
       >
         <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>
           <h2 id="career-see-all-title" style={{ ...KICKER, margin: 0, color: A.INK }}>
-            {careerSheet === 'top100'
-              ? t('amateur.leaderboards.top100Gbi', 'Top 100 GB&I')
-              : t('amateur.leaderboards.courseRecords', 'Course records')}
+            {t('amateur.leaderboards.top100Gbi', 'Top 100 GB&I')}
           </h2>
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
-          {(careerSheet === 'top100' ? top100Rows : crownsRows).map((r, i, arr) => (
+          {top100Rows.map((r, i, arr) => (
             <CompactRow
               key={r.user_id}
               pos={r.pos}
@@ -940,13 +915,13 @@ export function ScoresLeaderboardsPage({
               id={r.user_id}
               name={nameOf(r.display_name)}
               photo={r.photo_url}
-              secondary={careerSheet === 'top100' ? top100Secondary(r) : crownsSecondary(r)}
+              secondary={top100Secondary(r)}
               value={String(r.value)}
-              caption={careerSheet === 'top100' ? t('amateur.leaderboards.of100', 'of 100') : recordsCaption}
+              caption={t('amateur.leaderboards.of100', 'of 100')}
               self={!!r.is_viewer || r.user_id === userId}
               divider={i < arr.length - 1}
               onPress={() => {
-                setCareerSheet(null);
+                setCareerSheet(false);
                 onOpenProfile(r.user_id);
               }}
             />
