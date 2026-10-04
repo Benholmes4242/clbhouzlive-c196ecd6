@@ -972,10 +972,38 @@ export function ScoresLeaderboardsPage({
         ariaLabelledBy="career-see-all-title"
         style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
       >
-        <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>
-          <h2 id="career-see-all-title" style={{ ...KICKER, margin: 0, color: A.INK }}>
-            {`${t('amateur.leaderboards.top100', 'Top 100')} · ${RANK_SCOPE_LABEL[top100List]}`}
-          </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 13px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h2 id="career-see-all-title" style={{ margin: 0, fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>
+              {t('amateur.leaderboards.top100', 'Top 100')}
+            </h2>
+            <div style={{ marginTop: 2, fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>
+              {top100Rows.length > 0
+                ? `${RANK_SCOPE_LABEL[top100List]} · ${membersText(Number(top100Rows[0].total_members))}`
+                : RANK_SCOPE_LABEL[top100List]}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCareerSheet(false)}
+            style={{ flex: 'none', background: 'none', border: 0, padding: 0, cursor: 'pointer', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK }}
+          >
+            {t('common.done', 'Done')}
+          </button>
+        </div>
+        <div style={{ padding: '11px 16px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+          <RailChips
+            align="center-when-fit"
+            ground="filled-selection"
+            options={TOP100_ORDER.map((slug) => ({ id: slug, label: RANK_SCOPE_LABEL[slug] }))}
+            value={top100List}
+            onChange={pickTop100}
+            ariaLabel={t('amateur.leaderboards.top100List', 'Top 100 list')}
+          />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px 6px', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, flexShrink: 0 }}>
+          <span>{t('amateur.leaderboards.member', 'Member')}</span>
+          <span>{t('amateur.leaderboards.coursesOf100', 'Courses of 100')}</span>
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
           {top100Rows.map((r, i, arr) => (
@@ -988,7 +1016,6 @@ export function ScoresLeaderboardsPage({
               photo={r.photo_url}
               secondary={top100Secondary(r)}
               value={String(r.value)}
-              caption={t('amateur.leaderboards.of100', 'of 100')}
               self={!!r.is_viewer || r.user_id === userId}
               divider={i < arr.length - 1}
               onPress={() => {
