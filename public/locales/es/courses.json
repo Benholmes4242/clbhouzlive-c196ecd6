@@ -1748,7 +1748,9 @@
         "typeItTitle": "Type it",
         "typeItSub": "Use the keyboard",
         "recordingHint": "Keep going — tap stop when you're done. You can edit every word afterwards.",
-        "sayMore": "Say more"
+        "sayMore": "Say more",
+        "mediaEmptyTitle": "Add photos or videos",
+        "mediaEmptySub": "Up to {{count}} from your camera roll"
       },
       "step3": {
         "breakdownBody": "Puntúalas por sí solas, no frente a tu nota general. Un campo puede ser magnífico de jugar y flojo en servicios: aquí es donde eso se ve.",

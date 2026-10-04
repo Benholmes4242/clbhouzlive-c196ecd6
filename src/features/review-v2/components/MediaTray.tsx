@@ -4,7 +4,8 @@
  */
 
 import React, { useRef } from 'react';
-import { Plus, X, Play, RotateCcw, AlertCircle } from 'lucide-react';
+import { Plus, X, Play, RotateCcw, AlertCircle, Camera } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { RV2, REVIEW_V2_LIMITS } from '../tokens';
 import type { MediaItem } from '../types';
 
@@ -28,9 +29,12 @@ export function MediaTray({
   disabled,
 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const { t } = useTranslation('courses');
 
   const remaining = REVIEW_V2_LIMITS.MAX_MEDIA - items.length;
   const canAdd = remaining > 0 && !disabled;
+  /** Decides the add control's presentation — the only switch. */
+  const empty = items.length === 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -177,31 +181,80 @@ export function MediaTray({
           </div>
         ))}
 
+        {/* ONE add control, two presentations: while the tray is empty it is a
+            full-width row (an empty strip is a strip of nothing, so the width is
+            free — ~5x the tap area at the same 72px height); from the first item
+            on it is the 72px square at the end of the strip. Same onClick, same
+            hidden input, same aria-label. */}
         {canAdd && (
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
             aria-label="Add photo or video"
-            style={{
-              width: 72,
-              height: 72,
-              flexShrink: 0,
-              borderRadius: 12,
-              border: `1.5px dashed ${RV2.hairlineStrong}`,
-              background: RV2.ghost,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 2,
-              color: RV2.secondary,
-              cursor: 'pointer',
-            }}
+            style={
+              empty
+                ? {
+                    width: '100%',
+                    borderRadius: 14,
+                    border: `1.5px dashed ${RV2.hairlineStrong}`,
+                    background: RV2.ghost,
+                    padding: '15px 14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }
+                : {
+                    width: 72,
+                    height: 72,
+                    flexShrink: 0,
+                    borderRadius: 12,
+                    border: `1.5px dashed ${RV2.hairlineStrong}`,
+                    background: RV2.ghost,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 2,
+                    color: RV2.secondary,
+                    cursor: 'pointer',
+                  }
+            }
           >
-            <Plus size={20} strokeWidth={2} />
-            <span style={{ /* CAPS ACTION (§5), floor 11. */ fontSize: 11, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
-              Add
-            </span>
+            {empty ? (
+              <>
+                <span
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 11,
+                    flex: 'none',
+                    display: 'grid',
+                    placeItems: 'center',
+                    background: 'rgba(255,255,255,0.07)',
+                    color: RV2.ink,
+                  }}
+                >
+                  <Camera size={20} />
+                </span>
+                <span style={{ flex: 1, minWidth: 0, display: 'block' }}>
+                  <span style={{ display: 'block', fontSize: 14, fontWeight: 600, color: RV2.ink }}>
+                    {t('review.wizard.step2.mediaEmptyTitle')}
+                  </span>
+                  <span style={{ display: 'block', marginTop: 2, fontSize: 11.5, color: RV2.secondary }}>
+                    {t('review.wizard.step2.mediaEmptySub', { count: REVIEW_V2_LIMITS.MAX_MEDIA })}
+                  </span>
+                </span>
+              </>
+            ) : (
+              <>
+                <Plus size={20} strokeWidth={2} />
+                <span style={{ /* CAPS ACTION (§5), floor 11. */ fontSize: 11, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
+                  Add
+                </span>
+              </>
+            )}
           </button>
         )}
       </div>

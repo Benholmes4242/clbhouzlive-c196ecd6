@@ -6,10 +6,18 @@
  * parenthetical: "(East Course)" / "(West Course)" are the only thing that
  * distinguishes two courses at one club, so dropping them would produce two
  * identical headers on the same list — the exact ambiguity the header fixes.
+ *
+ * The generic suffix includes the whole "Golf and Country Club" / "Golf &
+ * Country Club" form, matched as ONE phrase (longest alternative first).
+ * Stripping only its "Country Club" tail left "Monte Rei Golf and". A trailing
+ * connective (and/&/+) is stripped afterwards as a second guard; one in the
+ * middle of a name ("Royal Lytham & St Annes") is untouched.
  */
 
 const CLUB_SUFFIX =
-  /\s+(golf\s+club|golf\s+course|golf\s+links|country\s+club|club)\s*$/i;
+  /\s+(golf\s*(?:and|&)\s*country\s+club|golf\s+club|golf\s+course|golf\s+links|country\s+club|club)\s*$/i;
+
+const TRAILING_CONNECTIVE = /\s+(?:and|&|\+)\s*$/i;
 
 export function shortCourseName(name: string, max = 26): string {
   if (!name) return '';
@@ -21,7 +29,8 @@ export function shortCourseName(name: string, max = 26): string {
   const stem = (m ? m[1] : collapsed).trim();
   const paren = m ? m[2] : '';
 
-  const trimmedStem = stem.replace(CLUB_SUFFIX, '').trim() || stem;
+  const suffixless = stem.replace(CLUB_SUFFIX, '').trim() || stem;
+  const trimmedStem = suffixless.replace(TRAILING_CONNECTIVE, '').trim() || suffixless;
   // The max applies to the stem only: a parenthetical is a disambiguator and is
   // never dropped or clipped. CSS ellipsis is the second guard on width.
   const clipped =

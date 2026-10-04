@@ -1706,7 +1706,9 @@
         "typeItTitle": "Type it",
         "typeItSub": "Use the keyboard",
         "recordingHint": "Keep going — tap stop when you're done. You can edit every word afterwards.",
-        "sayMore": "Say more"
+        "sayMore": "Say more",
+        "mediaEmptyTitle": "Add photos or videos",
+        "mediaEmptySub": "Up to {{count}} from your camera roll"
       },
       "step3": {
         "breakdownBody": "총점과 바꾸지 말고 각각을 그 자심으로 평가하세요. 플레이는 훌륭하지만 부대시설은 부족한 코스도 있습니다. 그것이 여기서 드러납니다.",

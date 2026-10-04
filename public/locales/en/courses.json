@@ -2286,7 +2286,7 @@
         "heading": "Photos and a few words",
         "lede": "Anything from your day at {{course}}.",
         "optionalNote": "Optional. Everything below is too.",
-        "photosEyebrow": "Photos",
+        "photosEyebrow": "Photos and videos",
         "placeholder": "What should another golfer know before they play here?",
         "shareSub": "Your review appears in the feed",
         "shareTitle": "Share to the Clubhouse",
@@ -2303,7 +2303,9 @@
         "typeItTitle": "Type it",
         "typeItSub": "Use the keyboard",
         "recordingHint": "Keep going — tap stop when you're done. You can edit every word afterwards.",
-        "sayMore": "Say more"
+        "sayMore": "Say more",
+        "mediaEmptyTitle": "Add photos or videos",
+        "mediaEmptySub": "Up to {{count}} from your camera roll"
       },
       "step3": {
         "breakdownBody": "Score these on their own, not against your overall. A course can be brilliant to play and thin on facilities — this is where that shows.",
