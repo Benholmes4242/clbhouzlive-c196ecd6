@@ -28,6 +28,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { useViewerStanding } from './useViewerStanding';
+import { handicapJourneyDisplay, handicapPairDisplay } from './circleHandicap';
 
 /**
  * THE LEADERBOARDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A).
@@ -192,6 +193,7 @@ function CompactRow({
   secondary,
   value,
   caption,
+  valueTone,
   self,
   divider,
   onPress,
@@ -204,7 +206,7 @@ function CompactRow({
   secondary: string | null;
   value: string;
   caption?: string | null;
-  captionTone?: string;
+  valueTone?: string;
   self: boolean;
   divider: boolean;
   onPress: () => void;
@@ -268,7 +270,7 @@ function CompactRow({
         ) : null}
       </span>
       <span style={{ flexShrink: 0, textAlign: 'right' }}>
-        <span className="tabular-nums" style={{ display: 'block', fontSize: 14, fontWeight: 700, color: ink }}>
+        <span className="tabular-nums" style={{ display: 'block', fontSize: 14, fontWeight: 700, color: self ? ink : valueTone ?? ink }}>
           {value}
         </span>
         {caption ? (
@@ -370,6 +372,7 @@ export function ScoresLeaderboardsPage({
 
   const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
   const [careerSheet, setCareerSheet] = useState<'crowns' | 'top100' | null>(null);
+  const [coursesSheet, setCoursesSheet] = useState(false);
 
   const windowLabel = (w: WindowKey) =>
     w === '14'
@@ -499,6 +502,25 @@ export function ScoresLeaderboardsPage({
   /* get_career_leaderboard returns no most-recent course; the home club is the
      only place line it carries. */
   const top100Secondary = (_r: CareerRow): string | null => null;
+
+  /** Rank, field and movement — one form for the rail card and the sheet row. */
+  const standingFigures = (r: (typeof standing.rows)[number]) => {
+    const d = r.delta;
+    const up = d != null && d > 0;
+    const down = d != null && d < 0;
+    return (
+      <>
+        <span style={{ display: 'flex', alignItems: 'baseline', gap: 4 }} className="tabular-nums">
+          <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>{r.rank_now}</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: A.DIM }}>{t('amateur.leaderboards.ofN', 'of {{n}}', { n: r.field_now })}</span>
+        </span>
+        <span className="tabular-nums" style={{ display: 'inline-flex', alignItems: 'center', gap: 2, marginTop: 4, fontSize: 10.5, fontWeight: 700, color: up ? A.GREEN : down ? A.RED : A.DIM }}>
+          {up ? <ArrowUp size={11} /> : down ? <ArrowDown size={11} /> : null}
+          {up || down ? Math.abs(d!) : t('amateur.leaderboards.held', 'Held')}
+        </span>
+      </>
+    );
+  };
 
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
@@ -683,10 +705,8 @@ export function ScoresLeaderboardsPage({
           meta={windowLabel(cutsFilters.window)}
         >
           {cuts.data!.rows.slice(0, SHORT_ROWS).map((r, i, arr) => {
-            const cut = r.delta_index != null ? Math.abs(r.delta_index) : null;
-            /* hcp_at_time is the PRE-round index (verified against consecutive rounds); do not flip. */
-            const before = r.hcp_at_time;
-            const after = before != null && r.delta_index != null ? before + r.delta_index : null;
+            const pair = handicapPairDisplay({ handicapIndex: r.hcp_at_time, deltaIndex: r.delta_index });
+            const journey = handicapJourneyDisplay({ handicapIndex: r.hcp_at_time, deltaIndex: r.delta_index });
             return (
               <CompactRow
                 key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
@@ -695,8 +715,9 @@ export function ScoresLeaderboardsPage({
                 id={r.user_id}
                 name={nameOf(r.display_name)}
                 photo={r.profile_photo_url}
-                secondary={before != null && after != null ? `${before.toFixed(1)} \u2192 ${after.toFixed(1)}` : r.course_name}
-                value={cut != null ? `\u2212${cut.toFixed(1)}` : '\u2014'}
+                secondary={journey ? `${journey.before} \u2192 ${journey.after}` : r.course_name}
+                value={pair?.delta ? `${pair.delta.arrow}${pair.delta.text}` : '\u2014'}
+                valueTone={pair?.delta?.tone}
                 self={r.user_id === userId}
                 divider={i < arr.length - 1}
                 onPress={() => onRowPress(r)}
@@ -721,52 +742,19 @@ export function ScoresLeaderboardsPage({
           meta={t('amateur.leaderboards.sinceLastVisit', 'Since your last visit')}
         >
           <Rail>
-            {standing.rows.map((r) => {
-              const d = r.delta;
-              const up = d != null && d > 0;
-              const down = d != null && d < 0;
-              return (
-                <button key={r.course_id} type="button" onClick={() => onOpenCourse(r.course_id)} style={{ ...RAIL_CARD, width: 152 }}>
-                  <span
-                    style={{
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      height: 31,
-                      fontSize: 12,
-                      fontWeight: 600,
-                      lineHeight: 1.3,
-                      color: A.MUTE,
-                    }}
-                  >
-                    {r.course_name ?? t('discover.unknownCourse', 'A course')}
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 8 }} className="tabular-nums">
-                    <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>{r.rank_now}</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: A.DIM }}>
-                      {t('amateur.leaderboards.ofN', 'of {{n}}', { n: r.field_now })}
-                    </span>
-                  </span>
-                  <span
-                    className="tabular-nums"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 2,
-                      marginTop: 4,
-                      fontSize: 10.5,
-                      fontWeight: 700,
-                      color: up ? A.GREEN : down ? A.RED : A.DIM,
-                    }}
-                  >
-                    {up ? <ArrowUp size={11} /> : down ? <ArrowDown size={11} /> : null}
-                    {up || down ? Math.abs(d!) : t('amateur.leaderboards.held', 'Held')}
-                  </span>
-                </button>
-              );
-            })}
+            {standing.rows.map((r) => (
+              <button key={r.course_id} type="button" onClick={() => onOpenCourse(r.course_id)} style={{ ...RAIL_CARD, width: 152 }}>
+                <span style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', height: 31, fontSize: 12, fontWeight: 600, lineHeight: 1.3, color: A.MUTE }}>
+                  {r.course_name ?? t('discover.unknownCourse', 'A course')}
+                </span>
+                <span style={{ display: 'block', marginTop: 8 }}>{standingFigures(r)}</span>
+              </button>
+            ))}
           </Rail>
+          <SeeAll
+            label={t('amateur.leaderboards.allCourses', { count: standing.rows.length, defaultValue_one: 'All {{count}} course', defaultValue_other: 'All {{count}} courses' })}
+            onPress={() => setCoursesSheet(true)}
+          />
         </Section>
       ) : null}
 
@@ -885,6 +873,35 @@ export function ScoresLeaderboardsPage({
           onRowPress={onRowPress}
         />
       ) : null}
+
+      <BottomSheet
+        open={coursesSheet}
+        onClose={() => setCoursesSheet(false)}
+        maxHeight="85dvh"
+        ariaLabelledBy="courses-see-all-title"
+        style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
+      >
+        <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>
+          <h2 id="courses-see-all-title" style={{ ...KICKER, margin: 0, color: A.INK }}>
+            {t('amateur.leaderboards.yourCourses', 'Your courses')}
+          </h2>
+        </div>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
+          {standing.rows.map((r, i, arr) => (
+            <button
+              key={r.course_id}
+              type="button"
+              onClick={() => { setCoursesSheet(false); onOpenCourse(r.course_id); }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 0', border: 'none', borderBottom: i < arr.length - 1 ? `1px solid ${A.SOFT}` : 'none', background: 'transparent', textAlign: 'left', fontFamily: SANS, cursor: 'pointer' }}
+            >
+              <span style={{ minWidth: 0, fontSize: 12, fontWeight: 600, lineHeight: 1.3, color: A.MUTE }}>
+                {r.course_name ?? t('discover.unknownCourse', 'A course')}
+              </span>
+              <span style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>{standingFigures(r)}</span>
+            </button>
+          ))}
+        </div>
+      </BottomSheet>
 
       <BottomSheet
         open={careerSheet !== null}
