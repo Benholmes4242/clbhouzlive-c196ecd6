@@ -266,6 +266,11 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
             : <>{t('otp.resendPromptPrefix')}<span style={{ color: '#FFFFFF', fontWeight: 600 }}>{t('otp.resendPromptCta')}</span></>}
         </button>
       </div>
+
+      {/* Some members' codes land in Junk (seen on Hotmail) — always say where else to look. */}
+      <p className="text-center" style={{ ...BODY, fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 8 }}>
+        {t('otp.junkHint')}
+      </p>
     </div>
   );
 };
