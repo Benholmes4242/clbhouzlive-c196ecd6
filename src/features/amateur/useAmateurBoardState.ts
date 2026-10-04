@@ -49,7 +49,7 @@ import { useCircleSize } from './useCircleSize';
 const PAGE_FETCH = 200;
 
 /** §1 — the one entry board, always. */
-export const ENTRY_BOARD: BoardKey = 'recent';
+export const ENTRY_BOARD: BoardKey = 'topar';
 
 /** SCORES LANDING SCOPE (amendment to §3). Tried in order; the first rung whose
  *  board returns at least CIRCLE_ROW_FLOOR rows wins. Everyone is terminal and
