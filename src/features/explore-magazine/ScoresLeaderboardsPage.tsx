@@ -124,7 +124,6 @@ function useYearImprovement(viewerId: string | undefined) {
 const THIN_FLOOR = 4;
 
 const YEAR_FILTERS: BoardFilters = { ...DEFAULT_FILTERS, window: 'year' };
-const ALL_TIME_FILTERS: BoardFilters = { ...DEFAULT_FILTERS, window: 'all' };
 
 /* ------------------------------------------------------------ furniture */
 
