@@ -23357,6 +23357,24 @@ export type Database = {
           score_id: string
         }[]
       }
+      get_year_improvement_leaderboard: {
+        Args: { p_limit?: number; p_viewer: string }
+        Returns: {
+          current_index: number
+          display_name: string
+          home_club: string
+          improvement: number
+          is_tie: boolean
+          is_viewer: boolean
+          photo_url: string
+          pos: number
+          rounds_this_year: number
+          start_index: number
+          started_on: string
+          total_members: number
+          user_id: string
+        }[]
+      }
       gettransactionid: { Args: never; Returns: unknown }
       global_search_v2: {
         Args: {
