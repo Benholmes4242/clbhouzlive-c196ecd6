@@ -2303,7 +2303,9 @@
         "typeItTitle": "Type it",
         "typeItSub": "Use the keyboard",
         "recordingHint": "Keep going — tap stop when you're done. You can edit every word afterwards.",
-        "sayMore": "Say more"
+        "sayMore": "Say more",
+        "mediaEmptyTitle": "Add photos or videos",
+        "mediaEmptySub": "Up to {{count}} from your camera roll"
       },
       "step3": {
         "breakdownBody": "[~~Šĉőřé ţĥéšé őñ ţĥéíř őŵñ, ñőţ áĝáíñšţ ýőúř őṽéřáļļ. Á ĉőúřšé ĉáñ ƀé ƀříļļíáñţ ţő ƥļáý áñđ ţĥíñ őñ ƒáĉíļíţíéš — ţĥíš íš ŵĥéřé ţĥáţ šĥőŵš.~~]",
