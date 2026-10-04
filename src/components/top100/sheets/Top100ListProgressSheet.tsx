@@ -218,11 +218,11 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
   );
 
   const courseRow = (r: Top100CourseProgress, isPlayed: boolean) => {
-    const meta: string[] = [];
-    if (listSlug !== 'global' && r.global_rank != null) meta.push(`#${r.global_rank} worldwide`);
+    const meta: Array<{ text: string; note: boolean }> = [];
+    if (listSlug !== 'global' && r.global_rank != null) meta.push({ text: `#${r.global_rank} worldwide`, note: false });
     if (!isOwn) {
-      if (isPlayed && !r.is_viewer_played) meta.push('New to you');
-      if (!isPlayed && r.is_viewer_played) meta.push("You've played it");
+      if (isPlayed && !r.is_viewer_played) meta.push({ text: 'New to you', note: true });
+      if (!isPlayed && r.is_viewer_played) meta.push({ text: "You've played it", note: true });
     }
     return (
       <div
@@ -253,7 +253,14 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ ...ELLIPSIS, fontSize: 13, fontWeight: 600, color: isPlayed ? A.INK : A.MUTE }}>{r.course_name}</div>
           {meta.length > 0 ? (
-            <div style={{ ...ELLIPSIS, fontSize: 10.5, color: A.MUTE }}>{meta.join(' · ')}</div>
+            <div style={{ ...ELLIPSIS, fontSize: 10.5, color: A.DIM }}>
+              {meta.map((m, i) => (
+                <React.Fragment key={m.text}>
+                  {i > 0 ? ' · ' : null}
+                  <span style={m.note ? { color: A.MUTE } : undefined}>{m.text}</span>
+                </React.Fragment>
+              ))}
+            </div>
           ) : null}
         </div>
         <div style={{ flex: 'none' }}>
