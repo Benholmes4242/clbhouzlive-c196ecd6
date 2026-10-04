@@ -28,7 +28,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { useViewerStanding } from './useViewerStanding';
-import { handicapJourneyDisplay, handicapPairDisplay } from './circleHandicap';
+import { handicapPairDisplay } from './circleHandicap';
+import { fmtHcp } from '@/lib/whs/format';
 
 /**
  * THE LEADERBOARDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A).
@@ -83,6 +84,44 @@ function useCareerBoard(viewerId: string | undefined, metric: CareerMetric, limi
     },
   });
 }
+
+interface ImprovementRow {
+  pos: number;
+  is_tie: boolean;
+  user_id: string;
+  display_name: string | null;
+  photo_url: string | null;
+  start_index: number | null;
+  current_index: number | null;
+  improvement: number | null;
+  started_on: string | null;
+  total_members: number;
+  is_viewer: boolean | null;
+}
+
+/** §4 — cumulative cut this year, all members (the RPC takes no scope). An
+ *  error (e.g. the function missing) hides the section rather than erroring. */
+function useYearImprovement(viewerId: string | undefined) {
+  return useQuery<ImprovementRow[]>({
+    queryKey: ['leaderboards', 'year-improvement', viewerId ?? 'anon'],
+    staleTime: 5 * 60_000,
+    retry: false,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as unknown as (
+        f: string,
+        a: Record<string, unknown>,
+      ) => Promise<{ data: ImprovementRow[] | null; error: unknown }>).call(supabase, 'get_year_improvement_leaderboard', {
+        p_viewer: viewerId ?? null,
+        p_limit: 100,
+      });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+/** Matches AmateurLeaderboardBlock's THIN_FLOOR: fewer ranked rows is not a board. */
+const THIN_FLOOR = 4;
 
 const YEAR_FILTERS: BoardFilters = { ...DEFAULT_FILTERS, window: 'year' };
 const ALL_TIME_FILTERS: BoardFilters = { ...DEFAULT_FILTERS, window: 'all' };
@@ -352,9 +391,10 @@ export function ScoresLeaderboardsPage({
   /* PAGE HEAD figures: the all-time pool of every member's rounds. */
   const totals = useBoardPage(userId, 'recent', ALL_TIME_FILTERS, { limit: 1 });
 
-  /* §4 — the improved board at the page's scope; sheet filters belong to §3. */
-  const cutsFilters = useMemo(() => ({ ...entryFiltersFor(scope), window: 'year' as WindowKey }), [scope]);
-  const cuts = useBoardPage(userId, 'improved', cutsFilters, { limit: 50, enabled: state.ready });
+  /* §4 — most improved this year, all members. Scope does not apply. */
+  const improved = useYearImprovement(userId);
+  const improvedRows = improved.data ?? [];
+  const [improvedSheet, setImprovedSheet] = useState(false);
 
   const standing = useViewerStanding(userId);
 
@@ -389,6 +429,42 @@ export function ScoresLeaderboardsPage({
     t('amateur.leaderboards.nMembers', { count: n, defaultValue_one: '{{count}} member', defaultValue_other: '{{count}} members' });
   const seeAllMembers = (n: number) =>
     t('amateur.leaderboards.seeAllMembers', { count: n, defaultValue_one: 'See all {{count}} member', defaultValue_other: 'See all {{count}} members' });
+
+  /* §4 row. start_index and current_index are FACTS from the RPC, so they are
+     formatted directly — handicapJourneyDisplay derives an after-value from a
+     round's delta and must not be used to re-derive numbers we already have. */
+  const improvedRow = (r: ImprovementRow, divider: boolean, inSheet: boolean) => {
+    const pair = handicapPairDisplay({
+      handicapIndex: r.current_index,
+      deltaIndex: r.improvement == null ? null : -Number(r.improvement),
+    });
+    const month = r.started_on
+      ? new Date(`${r.started_on.slice(0, 10)}T12:00:00`).toLocaleDateString(undefined, { month: 'long' })
+      : null;
+    const journey =
+      r.start_index != null && r.current_index != null
+        ? `${fmtHcp(Number(r.start_index))} \u2192 ${fmtHcp(Number(r.current_index))}${month ? ` ${t('amateur.leaderboards.since', 'since {{month}}', { month })}` : ''}`
+        : null;
+    return (
+      <CompactRow
+        key={r.user_id}
+        pos={r.pos}
+        tie={r.is_tie}
+        id={r.user_id}
+        name={nameOf(r.display_name)}
+        photo={r.photo_url}
+        secondary={journey}
+        value={pair?.delta ? `${pair.delta.arrow}${pair.delta.text}` : '\u2014'}
+        valueTone={pair?.delta?.tone}
+        self={!!r.is_viewer || r.user_id === userId}
+        divider={divider}
+        onPress={() => {
+          if (inSheet) setImprovedSheet(false);
+          onOpenProfile(r.user_id);
+        }}
+      />
+    );
+  };
 
   /* ------------------------------------------------------------ §3 lead */
   const leadRows = state.page.data?.rows ?? [];
@@ -549,7 +625,7 @@ export function ScoresLeaderboardsPage({
           style={{ marginTop: 12 }}
         />
         <div style={{ marginTop: 8, fontSize: 11, color: FAINT }}>
-          {t('amateur.leaderboards.scopeNote', 'Applies to the two boards below. Career records are all members.')}
+          {t('amateur.leaderboards.scopeNote', 'Applies to the scoring board below. Everything else is all members.')}
         </div>
       </div>
 
@@ -694,39 +770,20 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §4 BIGGEST CUTS */}
-      {!state.ready || cuts.isPending ? (
+      {/* §4 MOST IMPROVED — cumulative this year, not a single round's cut. */}
+      {improved.isPending ? (
         pending(200)
-      ) : cuts.isSuccess && (cuts.data?.rows.length ?? 0) > 0 ? (
+      ) : improved.isSuccess && improvedRows.length >= THIN_FLOOR ? (
         <Section
           contest
           eyebrow={t('amateur.leaderboards.climb', 'The climb')}
-          title={t('amateur.leaderboards.biggestCuts', 'Biggest cuts')}
-          meta={windowLabel(cutsFilters.window)}
+          title={t('amateur.leaderboards.mostImproved', 'Most improved')}
+          meta={t('amateur.leaderboards.window.year', 'This year')}
         >
-          {cuts.data!.rows.slice(0, SHORT_ROWS).map((r, i, arr) => {
-            const pair = handicapPairDisplay({ handicapIndex: r.hcp_at_time, deltaIndex: r.delta_index });
-            const journey = handicapJourneyDisplay({ handicapIndex: r.hcp_at_time, deltaIndex: r.delta_index });
-            return (
-              <CompactRow
-                key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
-                pos={r.pos}
-                tie={r.is_tie}
-                id={r.user_id}
-                name={nameOf(r.display_name)}
-                photo={r.profile_photo_url}
-                secondary={journey ? `${journey.before} \u2192 ${journey.after}` : r.course_name}
-                value={pair?.delta ? `${pair.delta.arrow}${pair.delta.text}` : '\u2014'}
-                valueTone={pair?.delta?.tone}
-                self={r.user_id === userId}
-                divider={i < arr.length - 1}
-                onPress={() => onRowPress(r)}
-              />
-            );
-          })}
+          {improvedRows.slice(0, SHORT_ROWS).map((r, i, arr) => improvedRow(r, i < arr.length - 1, false))}
           <SeeAll
-            label={seeAllMembers(cuts.data!.total)}
-            onPress={() => setSeeAll({ board: 'improved', filters: cutsFilters })}
+            label={seeAllMembers(Number(improvedRows[0].total_members) || improvedRows.length)}
+            onPress={() => setImprovedSheet(true)}
           />
         </Section>
       ) : null}
@@ -900,6 +957,23 @@ export function ScoresLeaderboardsPage({
               <span style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>{standingFigures(r)}</span>
             </button>
           ))}
+        </div>
+      </BottomSheet>
+
+      <BottomSheet
+        open={improvedSheet}
+        onClose={() => setImprovedSheet(false)}
+        maxHeight="85dvh"
+        ariaLabelledBy="improved-see-all-title"
+        style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
+      >
+        <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>
+          <h2 id="improved-see-all-title" style={{ ...KICKER, margin: 0, color: A.INK }}>
+            {t('amateur.leaderboards.mostImproved', 'Most improved')}
+          </h2>
+        </div>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
+          {improvedRows.map((r, i, arr) => improvedRow(r, i < arr.length - 1, true))}
         </div>
       </BottomSheet>
 
