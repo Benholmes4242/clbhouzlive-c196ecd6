@@ -17,6 +17,9 @@ import { useTop100ListProgress, type Top100CourseProgress } from '@/hooks/gam/us
 import { Top100CourseRow } from '../../parts/Top100CourseRow';
 import { MatchRequestSheet } from '../../parts/MatchRequestSheet';
 import type { Achievement, CareerData } from '../types';
+import { ChevronRight } from 'lucide-react';
+import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
+import type { RankListSlug } from '@/features/explore-magazine/useTop100RankIndex';
 
 interface Props {
   data: CareerData;
@@ -33,6 +36,7 @@ export const Top100Detail: React.FC<Props> = ({ data, item, onBack }) => {
     ownerUserId,
     viewerUserId,
   );
+  const [listSheet, setListSheet] = useState(false);
   const [matchRequest, setMatchRequest] = useState<{ courseId: string; courseName: string } | null>(
     null,
   );
@@ -49,7 +53,7 @@ export const Top100Detail: React.FC<Props> = ({ data, item, onBack }) => {
     return { played: p, unplayed: u, viewerPlayed: viewer };
   }, [rows]);
 
-  const count = item.currentValue ?? played.length;
+  const count = played.length;
   const standing = top100Standing(
     data.distribution,
     slug ?? '',
@@ -170,9 +174,40 @@ export const Top100Detail: React.FC<Props> = ({ data, item, onBack }) => {
               <div style={{ padding: '10px 14px', borderTop: `1px solid ${REC.BORDER}` }}>
                 <MetaLabel>PLAYED ONE ALREADY? MATCH IT TO YOUR ROUND</MetaLabel>
               </div>
+              {slug ? (
+                <button
+                  type="button"
+                  onClick={() => setListSheet(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderTop: `1px solid ${REC.BORDER}`,
+                    background: 'transparent',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: REC.INK,
+                  }}
+                >
+                  See all 100 courses
+                  <ChevronRight size={13} strokeWidth={2.4} />
+                </button>
+              ) : null}
             </Panel>
           )}
         </>
+      )}
+
+      {slug && (
+        <Top100ListProgressSheet
+          open={listSheet}
+          onClose={() => setListSheet(false)}
+          listSlug={slug as RankListSlug}
+          ownerUserId={ownerUserId}
+          ownerName={data.ownerFirstName ?? 'A member'}
+        />
       )}
 
       {matchRequest && (

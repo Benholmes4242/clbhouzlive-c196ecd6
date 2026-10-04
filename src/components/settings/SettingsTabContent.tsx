@@ -4,6 +4,7 @@ import { formatRelativeAgoLong } from '@/i18n/format';
 import {
   ChevronRight, Mail, Bell, Shield, UserX,
   HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Link2, Briefcase, UserPlus, BadgeCheck,
+  Flag,
 } from 'lucide-react';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
@@ -65,6 +66,7 @@ type SettingsProfileRow = {
   is_public?: boolean | null;
   handicap_visibility?: VisibilityLevel | null;
   leaderboard_visibility?: VisibilityLevel | null;
+  top100_visibility?: VisibilityLevel | null;
   auto_post_rounds?: boolean | null;
   hide_handicap_chip?: boolean | null;
   eg_handicap_index?: number | null;
@@ -104,6 +106,7 @@ export function SettingsTabContent() {
     (profile?.handicap_visibility ?? 'public') as VisibilityLevel,
     (profile?.leaderboard_visibility ?? 'public') as VisibilityLevel,
     profile?.auto_post_rounds ?? true,
+    (profile?.top100_visibility ?? 'public') as VisibilityLevel,
   );
 
   const handleToggleAutoPostRounds = (enabled: boolean) => {
@@ -269,6 +272,17 @@ export function SettingsTabContent() {
             value={privacy.leaderboardVisibility}
             disabled={privacy.isUpdatingLeaderboardVisibility}
             onChange={privacy.setLeaderboardVisibilityLevel}
+          />
+          <SettingsLevelRow
+            icon={<Flag size={15} />}
+            title="Courses you've played"
+            subtitle="Your Top 100 lists and your Courses tab, wherever they appear — leaderboards, Explore and your profile. Your counts stay on the boards either way."
+            value={privacy.top100Visibility}
+            disabled={privacy.isUpdatingTop100Visibility}
+            onChange={privacy.setTop100VisibilityLevel}
+            publicLabel="Everyone"
+            friendsLabel="Friends"
+            privateLabel="Only me"
           />
           <SettingsToggleRow
             icon={<Eye size={15} />}

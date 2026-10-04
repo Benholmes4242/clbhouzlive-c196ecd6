@@ -1,260 +1,366 @@
 /**
- * Top100ListProgressSheet — opened from a list row in YOUR PROGRESS.
+ * Top100ListProgressSheet — one member's Top 100 list: played, then still to
+ * play, in list order. Opened from the Explore Top 100 board and from the
+ * trophy room Top 100 detail.
  *
- * Uses the shared BottomSheet primitive (src/components/ui/BottomSheet.tsx)
- * and the canonical ScopeSegment; no new sheet primitive is introduced.
+ * EVERY COUNT IS COUNTED FROM THE ROWS RENDERED. No badge counter, progress
+ * view or passport figure is read here.
  *
- * Defaults to "Not played" — a member opening their progress wants to know
- * what is left, not what is done.
+ * THE STANDING IS PASSED IN, NEVER COMPUTED — get_career_leaderboard owns it.
  *
- * Analytics callsites:
+ * OVERLAP: MARK THE DIFFERENCE, NEVER THE MATCH. Notes are A.MUTE, never green.
+ *
+ * Analytics:
  *  - top100_progress_opened  { list_slug }
- *  - top100_progress_segment { list_slug, segment }
+ *  - top100_progress_segment { list_slug, segment: 'still_to_play' } — the first
+ *    time the still-to-play section scrolls into view (sections are stacked now).
  */
-import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { ChevronRight, Lock, Star } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { ScopeSegment } from '@/components/shared/ScopeSegment';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getInitialsFromName } from '@/lib/avatarFallback';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { RANK_SCOPE_LABEL, type RankListSlug } from '@/features/explore-magazine/useTop100RankIndex';
+import { useTop100ListProgress, type Top100CourseProgress } from '@/hooks/gam/useTop100ListProgress';
+import { useCanViewTop100 } from '@/hooks/gam/useCanViewTop100';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
+import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
-import { TITLE } from '@/lib/tokens/type';
-import {
-  AMBER,
-  HAIRLINE_INK_8,
-  INK,
-  INK_MUTE,
-  INK_TINT_04,
-} from '@/features/courses/_shared/tokens';
-
-/** Numerals stay in the SF Pro stack: monospace faces slash their zeros. */
-const MONO = 'inherit';
-
-type Segment = 'all' | 'played' | 'not_played' | 'rated';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  listSlug: string;
-  listName: string;
-  played: number;
-  total: number;
-  rated: number;
-  userId: string | undefined;
-  /** Course ids the viewer has rated — supplied by the batched enrichment. */
-  ratedCourseIds: Set<string>;
+  listSlug: RankListSlug;
+  ownerUserId: string;
+  ownerName: string;
+  ownerPhotoUrl?: string | null;
+  standing?: { place: number; fieldSize: number } | null;
 }
+
+const TNUM: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1' };
+const CAPS: React.CSSProperties = {
+  fontSize: 10.5,
+  fontWeight: 700,
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+};
+const ELLIPSIS: React.CSSProperties = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
+const B = (n: React.ReactNode) => <span style={{ color: A.INK, fontWeight: 700 }}>{n}</span>;
 
 export const Top100ListProgressSheet: React.FC<Props> = ({
   open,
   onClose,
   listSlug,
-  listName,
-  played,
-  total,
-  rated,
-  userId,
-  ratedCourseIds,
+  ownerUserId,
+  ownerName,
+  ownerPhotoUrl,
+  standing,
 }) => {
-  const { t } = useTranslation('courses');
-  const navigate = useNavigate();
-  const [segment, setSegment] = useState<Segment>('not_played');
+  const { user } = useSupabaseSession();
+  const viewerUserId = user?.id;
+  const isOwn = !!viewerUserId && viewerUserId === ownerUserId;
+  const { resolve } = useMemberTapResolver();
 
-  const { data: rows = [] } = useTop100ListProgress(
-    open ? listSlug : undefined,
-    userId,
-    userId,
-  );
+  const access = useCanViewTop100(open ? ownerUserId : undefined, viewerUserId);
+  const progress = useTop100ListProgress(open ? listSlug : undefined, ownerUserId, viewerUserId);
 
   useEffect(() => {
-    if (!open) return;
-    setSegment('not_played');
-    analyticsEvents.track('top100_progress_opened', { list_slug: listSlug });
+    if (open) analyticsEvents.track('top100_progress_opened', { list_slug: listSlug });
   }, [open, listSlug]);
 
-  const filtered = useMemo(() => {
-    const sorted = [...rows].sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999));
-    switch (segment) {
-      case 'played':
-        return sorted.filter((r) => r.is_viewer_played);
-      case 'not_played':
-        return sorted.filter((r) => !r.is_viewer_played);
-      case 'rated':
-        return sorted.filter((r) => ratedCourseIds.has(r.course_id));
-      default:
-        return sorted;
+  const rows = useMemo(
+    () => [...(progress.data ?? [])].sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999)),
+    [progress.data],
+  );
+  const played = rows.filter((r) => r.is_owner_played);
+  const toPlay = rows.filter((r) => !r.is_owner_played);
+  const newToViewer = rows.filter((r) => r.is_owner_played && !r.is_viewer_played).length;
+  const viewerOnly = rows.filter((r) => !r.is_owner_played && r.is_viewer_played).length;
+  const pct = rows.length > 0 ? (played.length / rows.length) * 100 : 0;
+
+  /* segment event: first sight of the still-to-play section */
+  const toPlayRef = useRef<HTMLDivElement | null>(null);
+  const segmentSent = useRef(false);
+  useEffect(() => {
+    if (!open) { segmentSent.current = false; return; }
+    const el = toPlayRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver((entries) => {
+      if (!segmentSent.current && entries.some((e) => e.isIntersecting)) {
+        segmentSent.current = true;
+        analyticsEvents.track('top100_progress_segment', { list_slug: listSlug, segment: 'still_to_play' });
+      }
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [open, listSlug, progress.isSuccess, access.isSuccess]);
+
+  const firstName = ownerName.trim().split(/\s+/)[0] || ownerName;
+  const settled = access.isSuccess && (access.data === false || progress.isSuccess);
+  const gated = access.isSuccess && access.data === false;
+
+  const head = (
+    <div
+      style={{
+        flexShrink: 0,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '12px 16px 13px',
+        borderBottom: `1px solid ${A.BORDER}`,
+      }}
+    >
+      {!isOwn ? (
+        <SquircleAvatar
+          src={ownerPhotoUrl ?? null}
+          alt={ownerName}
+          userId={ownerUserId}
+          fallback={getInitialsFromName(ownerName).slice(0, 2)}
+          size={30}
+          hairlineRing
+        />
+      ) : null}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ ...ELLIPSIS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>{ownerName}</div>
+        <div style={{ ...CAPS, color: A.DIM }}>{`Top 100 ${RANK_SCOPE_LABEL[listSlug]}`}</div>
+      </div>
+      {isOwn ? (
+        <button type="button" onClick={onClose} style={{ ...CAPS, color: A.INK, background: 'transparent', flex: 'none' }}>
+          Done
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => {
+            onClose();
+            void resolve({ targetUserId: ownerUserId });
+          }}
+          style={{
+            flex: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            height: 28,
+            padding: '0 10px',
+            borderRadius: 999,
+            border: `1px solid ${A.BORDER}`,
+            background: A.SOFT,
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            color: A.INK,
+          }}
+        >
+          Profile
+          <ChevronRight size={12} />
+        </button>
+      )}
+    </div>
+  );
+
+  const heroLine = (() => {
+    if (isOwn) {
+      const first = toPlay[0];
+      if (!first) return <>You have played every course on this list.</>;
+      return (
+        <>
+          Highest you haven't played is {B(first.rank != null ? `#${first.rank}` : null)} {B(first.course_name)}.
+        </>
+      );
     }
-  }, [rows, segment, ratedCourseIds]);
+    const lead = standing ? (
+      <>
+        {B(formatOrdinal(standing.place))} of {B(standing.fieldSize)} members on this list.{' '}
+      </>
+    ) : null;
+    let rest: React.ReactNode;
+    if (newToViewer === 0 && viewerOnly === 0) rest = <>You have played exactly the same courses.</>;
+    else {
+      const a = newToViewer > 0 ? <>{B(newToViewer)} of their {B(played.length)} are new to you</> : null;
+      const b = viewerOnly > 0 ? <>{B(viewerOnly)} you have played and they have not</> : null;
+      rest = (
+        <>
+          {a}
+          {a && b ? '; ' : null}
+          {b}.
+        </>
+      );
+    }
+    return (
+      <>
+        {lead}
+        {rest}
+      </>
+    );
+  })();
 
-  const pct = total > 0 ? Math.min(100, (played / total) * 100) : 0;
+  const sectionHead = (lead: string, n: number, right?: string) => (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        padding: '11px 16px 7px',
+        fontSize: 10.5,
+        fontWeight: 700,
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
+        color: A.DIM,
+      }}
+    >
+      <span>
+        <span style={{ color: A.INK }}>{lead}</span> · <span style={TNUM}>{n}</span>
+      </span>
+      {right ? <span>{right}</span> : null}
+    </div>
+  );
 
-  const emptyCopy =
-    segment === 'not_played'
-      ? t('top100.listSheet.emptyNotPlayed')
-      : segment === 'played'
-        ? t('top100.listSheet.emptyPlayed')
-        : segment === 'rated'
-          ? t('top100.listSheet.emptyRated')
-          : t('top100.listSheet.emptyAll');
-
-  return (
-    <BottomSheet open={open} onClose={onClose} maxHeight="85dvh">
-      <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(85dvh - 30px)' }}>
-        <div style={{ padding: '4px 16px 12px', borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
-          <div style={{ ...TITLE, color: INK }}>
-            {listName}
-          </div>
-          <div
-            style={{
-              fontFamily: MONO,
-              fontVariantNumeric: 'tabular-nums',
-              fontFeatureSettings: '"zero" 0, "tnum" 1',
-              fontSize: 11.5,
-              fontWeight: 700,
-              color: INK_MUTE,
-              marginTop: 4,
-            }}
-          >
-            {t('top100.listSheet.summary', { played, total, rated })}
-          </div>
-          <div
-            style={{
-              marginTop: 8,
-              height: 4,
-              borderRadius: 999,
-              background: 'rgba(15,23,42,0.07)',
-              overflow: 'hidden',
-            }}
-          >
-            <div style={{ width: `${pct}%`, height: '100%', background: AMBER }} />
-          </div>
-          <div style={{ marginTop: 12, display: 'flex', justifyContent: 'center' }}>
-            <ScopeSegment
-              tone="dark"
-              value={segment}
-              ariaLabel={t('top100.listSheet.segmentA11y')}
-              onChange={(next) => {
-                setSegment(next);
-                analyticsEvents.track('top100_progress_segment', {
-                  list_slug: listSlug,
-                  segment: next,
-                });
-              }}
-              options={[
-                { value: 'all', label: t('top100.listSheet.segAll') },
-                { value: 'played', label: t('top100.listSheet.segPlayed') },
-                { value: 'not_played', label: t('top100.listSheet.segNotPlayed') },
-                { value: 'rated', label: t('top100.listSheet.segRated') },
-              ]}
-            />
-          </div>
+  const courseRow = (r: Top100CourseProgress, isPlayed: boolean) => {
+    const meta: Array<{ text: string; note: boolean }> = [];
+    if (listSlug !== 'global' && r.global_rank != null) meta.push({ text: `#${r.global_rank} worldwide`, note: false });
+    if (!isOwn) {
+      if (isPlayed && !r.is_viewer_played) meta.push({ text: 'New to you', note: true });
+      if (!isPlayed && r.is_viewer_played) meta.push({ text: "You've played it", note: true });
+    }
+    return (
+      <div
+        key={r.course_id}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 11,
+          padding: '9px 16px',
+          borderTop: `1px solid ${A.BORDER}`,
+        }}
+      >
+        {r.thumbnail_image ? (
+          <img
+            src={r.thumbnail_image}
+            alt=""
+            loading="lazy"
+            style={{ width: 38, height: 38, borderRadius: 9, objectFit: 'cover', flex: 'none', opacity: isPlayed ? 1 : 0.5 }}
+          />
+        ) : (
+          <div style={{ width: 38, height: 38, borderRadius: 9, background: A.TRACK, flex: 'none', opacity: isPlayed ? 1 : 0.5 }} />
+        )}
+        {r.rank != null ? (
+          <span style={{ ...TNUM, width: 30, textAlign: 'right', flex: 'none', fontSize: 12, fontWeight: 700, color: A.DIM }}>
+            #{r.rank}
+          </span>
+        ) : null}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ ...ELLIPSIS, fontSize: 13, fontWeight: 600, color: isPlayed ? A.INK : A.MUTE }}>{r.course_name}</div>
+          {meta.length > 0 ? (
+            <div style={{ ...ELLIPSIS, fontSize: 10.5, color: A.DIM }}>
+              {meta.map((m, i) => (
+                <React.Fragment key={m.text}>
+                  {i > 0 ? ' · ' : null}
+                  <span style={m.note ? { color: A.MUTE } : undefined}>{m.text}</span>
+                </React.Fragment>
+              ))}
+            </div>
+          ) : null}
         </div>
-
-        <div style={{ overflowY: 'auto', WebkitOverflowScrolling: 'touch', flex: 1 }}>
-          {filtered.length === 0 ? (
-            <div
+        <div style={{ flex: 'none' }}>
+          {isPlayed ? (
+            <span
               style={{
-                padding: '32px 24px',
-                textAlign: 'center',
-                fontSize: 13,
-                fontWeight: 500,
-                color: INK_MUTE,
+                ...TNUM,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 3,
+                height: 24,
+                minWidth: 40,
+                padding: '0 8px',
+                borderRadius: 7,
+                background: r.owner_rating != null ? 'rgba(247,147,30,0.14)' : 'rgba(255,255,255,0.07)',
+                color: r.owner_rating != null ? A.AMBER : A.DIM,
+                fontSize: 12,
+                fontWeight: 700,
               }}
             >
-              {emptyCopy}
-            </div>
+              {r.owner_rating != null ? (
+                <>
+                  <Star size={10} fill="currentColor" strokeWidth={0} />
+                  {r.owner_rating.toFixed(1)}
+                </>
+              ) : (
+                '—'
+              )}
+            </span>
           ) : (
-            filtered.map((row, i) => {
-              const isRated = ratedCourseIds.has(row.course_id);
-              return (
-                <button
-                  key={row.course_id}
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    navigate(`/courses/${row.course_id}`);
-                  }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '9px 16px',
-                    borderTop: i === 0 ? 'none' : `1px solid ${HAIRLINE_INK_8}`,
-                    background: 'transparent',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: MONO,
-                      fontVariantNumeric: 'tabular-nums',
-                      fontFeatureSettings: '"zero" 0, "tnum" 1',
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: 'rgba(15,23,42,0.35)',
-                      width: 26,
-                      flexShrink: 0,
-                    }}
-                  >
-                    {row.rank ?? ''}
-                  </span>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 30,
-                      borderRadius: 6,
-                      overflow: 'hidden',
-                      flexShrink: 0,
-                      background: INK_TINT_04,
-                    }}
-                  >
-                    {row.thumbnail_image && (
-                      <img
-                        src={row.thumbnail_image}
-                        alt=""
-                        loading="lazy"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    )}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: INK,
-                        letterSpacing: '-0.01em',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {row.course_name}
-                    </div>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
-                      {[row.region, row.country].filter(Boolean).join(', ')}
-                    </div>
-                  </div>
-                  {(row.is_viewer_played || isRated) && (
-                    <span
-                      style={{
-                        flexShrink: 0,
-                        fontSize: 8.5,
-                        fontWeight: 700,
-                        letterSpacing: '0.12em',
-                        textTransform: 'uppercase',
-                        color: AMBER,
-                      }}
-                    >
-                      {isRated ? t('top100.pill.rated') : t('top100.pill.played')}
-                    </span>
-                  )}
-                </button>
-              );
-            })
+            <span
+              aria-hidden
+              style={{ display: 'block', width: 24, height: 24, borderRadius: 999, border: '1px dashed rgba(255,255,255,0.18)' }}
+            />
           )}
         </div>
+      </div>
+    );
+  };
+
+  return (
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      maxHeight="90dvh"
+      style={{ height: '90dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
+    >
+      {head}
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 32 }}>
+        {!settled ? null : gated ? (
+          <div style={{ padding: '40px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 999,
+                background: A.SOFT,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Lock size={17} color={A.DIM} />
+            </div>
+            <div style={{ marginTop: 12, fontSize: 14, fontWeight: 600, color: A.INK }}>
+              {`${firstName} keeps their Top 100 lists private`}
+            </div>
+            <div style={{ marginTop: 6, maxWidth: 250, fontSize: 11.5, lineHeight: 1.5, color: A.DIM }}>
+              They still count on the board — you just can't see which courses.
+            </div>
+          </div>
+        ) : (
+          <>
+            <div style={{ padding: '15px 16px 14px', borderBottom: `1px solid ${A.BORDER}` }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <span style={{ ...TNUM, fontSize: 36, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
+                  {played.length}
+                </span>
+                <span style={{ fontSize: 12.5, color: A.MUTE }}>{`of ${rows.length} played`}</span>
+              </div>
+              <div style={{ marginTop: 8, height: 5, borderRadius: 99, background: A.TRACK, overflow: 'hidden' }}>
+                <div style={{ width: `${pct}%`, height: '100%', background: A.AMBER }} />
+              </div>
+              <div style={{ marginTop: 10, fontSize: 11.5, lineHeight: 1.45, color: A.MUTE }}>{heroLine}</div>
+            </div>
+            {played.length > 0 ? (
+              <>
+                {sectionHead('Played', played.length, 'Rating')}
+                {played.map((r) => courseRow(r, true))}
+              </>
+            ) : null}
+            {toPlay.length > 0 ? (
+              <div ref={toPlayRef}>
+                {sectionHead('Still to play', toPlay.length)}
+                {toPlay.map((r) => courseRow(r, false))}
+              </div>
+            ) : null}
+          </>
+        )}
       </div>
     </BottomSheet>
   );

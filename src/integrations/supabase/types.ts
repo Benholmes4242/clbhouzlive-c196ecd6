@@ -14899,6 +14899,7 @@ export type Database = {
           tiktok_handle: string
           top_ten_comments_privacy: string | null
           top_ten_visibility: string
+          top100_visibility: string
           top100_visible: boolean | null
           tracker_visible: boolean | null
           twitter_handle: string
@@ -15027,6 +15028,7 @@ export type Database = {
           tiktok_handle?: string
           top_ten_comments_privacy?: string | null
           top_ten_visibility?: string
+          top100_visibility?: string
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
           twitter_handle?: string
@@ -15155,6 +15157,7 @@ export type Database = {
           tiktok_handle?: string
           top_ten_comments_privacy?: string | null
           top_ten_visibility?: string
+          top100_visibility?: string
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
           twitter_handle?: string
@@ -19040,6 +19043,10 @@ export type Database = {
         Args: { _target: string; _viewer: string }
         Returns: boolean
       }
+      can_view_top100: {
+        Args: { p_owner_user_id: string; p_viewer_user_id: string }
+        Returns: boolean
+      }
       canonical_club_name_v2: { Args: { p_name: string }; Returns: string }
       capture_all_leaderboard_snapshots: { Args: never; Returns: undefined }
       capture_course_tee_sets_history: { Args: never; Returns: Json }
@@ -22514,8 +22521,10 @@ export type Database = {
           country: string
           course_id: string
           course_name: string
+          global_rank: number
           is_owner_played: boolean
           is_viewer_played: boolean
+          owner_rating: number
           rank: number
           region: string
           thumbnail_image: string

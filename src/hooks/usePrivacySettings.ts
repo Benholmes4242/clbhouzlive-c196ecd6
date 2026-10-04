@@ -16,12 +16,15 @@ export function usePrivacySettings(
   initialHandicapVisibility: VisibilityLevel = 'public',
   initialLeaderboardVisibility: VisibilityLevel = 'public',
   initialAutoPostRounds: boolean = true,
+  initialTop100Visibility: VisibilityLevel = 'public',
 ) {
   const queryClient = useQueryClient();
 
   const [isPublic, setIsPublic] = useState(initialIsPublic);
   const [handicapVisibility, setHandicapVisibility] = useState<VisibilityLevel>(initialHandicapVisibility);
   const [leaderboardVisibility, setLeaderboardVisibility] = useState<VisibilityLevel>(initialLeaderboardVisibility);
+  const [top100Visibility, setTop100Visibility] = useState<VisibilityLevel>(initialTop100Visibility);
+  const [isUpdatingTop100Visibility, setIsUpdatingTop100Visibility] = useState(false);
   const [autoPostRounds, setAutoPostRounds] = useState(initialAutoPostRounds);
   const [isUpdatingAutoPostRounds, setIsUpdatingAutoPostRounds] = useState(false);
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
@@ -31,6 +34,7 @@ export function usePrivacySettings(
   useEffect(() => { setIsPublic(initialIsPublic); }, [initialIsPublic]);
   useEffect(() => { setHandicapVisibility(initialHandicapVisibility); }, [initialHandicapVisibility]);
   useEffect(() => { setLeaderboardVisibility(initialLeaderboardVisibility); }, [initialLeaderboardVisibility]);
+  useEffect(() => { setTop100Visibility(initialTop100Visibility); }, [initialTop100Visibility]);
   useEffect(() => { setAutoPostRounds(initialAutoPostRounds); }, [initialAutoPostRounds]);
 
   const invalidate = () => {
@@ -107,6 +111,27 @@ export function usePrivacySettings(
     }
   };
 
+  const setTop100VisibilityLevel = async (value: VisibilityLevel) => {
+    if (!userId) return;
+    const next = coerceLevel(value);
+    setIsUpdatingTop100Visibility(true);
+    const prev = top100Visibility;
+    setTop100Visibility(next);
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ top100_visibility: next } as any)
+        .eq('id', userId);
+      if (error) throw error;
+      invalidate();
+    } catch {
+      setTop100Visibility(prev);
+      toast.error('Could not update course visibility.');
+    } finally {
+      setIsUpdatingTop100Visibility(false);
+    }
+  };
+
   const toggleAutoPostRounds = async (value: boolean) => {
     if (!userId) return;
     setIsUpdatingAutoPostRounds(true);
@@ -140,5 +165,8 @@ export function usePrivacySettings(
     togglePublic,
     setHandicapVisibilityLevel,
     setLeaderboardVisibilityLevel,
+    top100Visibility,
+    isUpdatingTop100Visibility,
+    setTop100VisibilityLevel,
   };
 }

@@ -30,6 +30,7 @@ import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
 import { RailChips } from '@/components/ui/RailChips';
+import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
 
 /**
@@ -584,6 +585,7 @@ export function ScoresLeaderboardsPage({
     rows: CareerRow[],
     secondary: (r: CareerRow) => string | null,
     caption: string,
+    onPress: (r: CareerRow) => void = (r) => onOpenProfile(r.user_id),
   ) => {
     const top = rows.slice(0, SHORT_ROWS);
     const mine = rows.find((r) => r.is_viewer) ?? (userId ? rows.find((r) => r.user_id === userId) : undefined);
@@ -602,7 +604,7 @@ export function ScoresLeaderboardsPage({
         caption={caption}
         self={!!r.is_viewer || r.user_id === userId}
         divider={i < list.length - 1}
-        onPress={() => onOpenProfile(r.user_id)}
+        onPress={() => onPress(r)}
       />
     ));
   };
@@ -611,6 +613,8 @@ export function ScoresLeaderboardsPage({
   /* get_career_leaderboard returns no most-recent course; the home club is the
      only place line it carries. */
   const top100Secondary = (_r: CareerRow): string | null => null;
+  const [top100Sheet, setTop100Sheet] = useState<CareerRow | null>(null);
+  const openTop100Sheet = (r: CareerRow) => setTop100Sheet(r);
 
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
@@ -922,7 +926,7 @@ export function ScoresLeaderboardsPage({
               {t('amateur.leaderboards.top100Empty', 'Nobody has played a course on this list yet.')}
             </p>
           ) : (
-            shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100', 'of 100'))
+            shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100', 'of 100'), openTop100Sheet)
           )}
           {top100Rows.length > SHORT_ROWS ? (
             <SeeAll label={seeAllMembers(Number(top100Rows[0].total_members))} onPress={() => setCareerSheet(true)} />
@@ -988,12 +992,24 @@ export function ScoresLeaderboardsPage({
               divider={i < arr.length - 1}
               onPress={() => {
                 setCareerSheet(false);
-                onOpenProfile(r.user_id);
+                openTop100Sheet(r);
               }}
             />
           ))}
         </div>
       </BottomSheet>
+
+      {top100Sheet ? (
+        <Top100ListProgressSheet
+          open
+          onClose={() => setTop100Sheet(null)}
+          listSlug={top100List}
+          ownerUserId={top100Sheet.user_id}
+          ownerName={nameOf(top100Sheet.display_name)}
+          ownerPhotoUrl={top100Sheet.photo_url}
+          standing={{ place: top100Sheet.pos, fieldSize: Number(top100Sheet.total_members) }}
+        />
+      ) : null}
     </div>
   );
 }

@@ -75,8 +75,6 @@ export const RETIRED_EVENTS: Record<string, string> = {
 
   // Top 100 progress: Top100ProgressPanel and Top100ListProgressSheet have no
   // remaining consumer anywhere in src/.
-  top100_progress_opened: 'Top100ListProgressSheet has no consumer (Aug 2026)',
-  top100_progress_segment: 'Top100ListProgressSheet has no consumer (Aug 2026)',
   t100_progress_empty_shown: 'Top100ProgressPanel has no consumer (Aug 2026)',
 
   // Tour follow prompt: the prompt was removed from the Tour hub rebuild.
