@@ -124,7 +124,6 @@ function useYearImprovement(viewerId: string | undefined) {
 const THIN_FLOOR = 4;
 
 const YEAR_FILTERS: BoardFilters = { ...DEFAULT_FILTERS, window: 'year' };
-const ALL_TIME_FILTERS: BoardFilters = { ...DEFAULT_FILTERS, window: 'all' };
 
 /* ------------------------------------------------------------ furniture */
 
@@ -223,6 +222,19 @@ function Avatar({ id, name, src, size }: { id: string; name: string; src: string
   );
 }
 
+/** "26 Sep" — the one date rule on this page. play_date is a calendar date, read in UTC so it never shifts a day. */
+function fmtDayMonth(d: string | null | undefined): string | null {
+  if (!d) return null;
+  const dt = new Date(d.length === 10 ? `${d}T00:00:00Z` : d);
+  if (Number.isNaN(dt.getTime())) return null;
+  return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+}
+
+/** §3 second line: date FIRST so the unbounded course name absorbs any ellipsis. */
+function roundLine(r: BoardRow): string | null {
+  return [fmtDayMonth(r.play_date), r.course_name].filter(Boolean).join(' \u00B7 ') || null;
+}
+
 function CompactRow({
   pos,
   tie,
@@ -232,6 +244,7 @@ function CompactRow({
   secondary,
   value,
   caption,
+  captionTone,
   valueTone,
   self,
   divider,
@@ -245,6 +258,8 @@ function CompactRow({
   secondary: string | null;
   value: string;
   caption?: string | null;
+  /** Ignored on the viewer's own row: amber identity outranks par tone. */
+  captionTone?: string;
   valueTone?: string;
   self: boolean;
   divider: boolean;
@@ -313,7 +328,7 @@ function CompactRow({
           {value}
         </span>
         {caption ? (
-          <span className="tabular-nums" style={{ display: 'block', fontSize: 10.5, fontWeight: 700, color: A.DIM }}>
+          <span className="tabular-nums" style={{ display: 'block', fontSize: 10.5, fontWeight: 700, color: !self && captionTone ? captionTone : A.DIM }}>
             {caption}
           </span>
         ) : null}
@@ -388,8 +403,6 @@ export function ScoresLeaderboardsPage({
   const nameOf = (n: string | null | undefined) => n || t('discover.aMember', 'A member');
   const scope = state.filters.scope;
 
-  /* PAGE HEAD figures: the all-time pool of every member's rounds. */
-  const totals = useBoardPage(userId, 'recent', ALL_TIME_FILTERS, { limit: 1 });
 
   /* §4 — most improved this year, all members. Scope does not apply. */
   const improved = useYearImprovement(userId);
@@ -489,6 +502,13 @@ export function ScoresLeaderboardsPage({
       return fmtToPar(r.gross_score != null && r.course_par != null ? r.gross_score - r.course_par : null);
     }
     return boardSecondary(r, state.board)?.text ?? null;
+  };
+  /* UNDER PAR IS RED: decided from the numeric to-par, never the formatted
+     string. Same token the leader card reads (A.RED); level/over stay dim. */
+  const leadCaptionTone = (r: BoardRow) => {
+    if (state.board !== 'topar' && state.board !== 'gross') return undefined;
+    const p = r.gross_score != null && r.course_par != null ? r.gross_score - r.course_par : null;
+    return p != null && p < 0 ? A.RED : undefined;
   };
   const leadValue = (r: BoardRow) =>
     state.board === 'topar' || state.board === 'gross'
@@ -600,24 +620,14 @@ export function ScoresLeaderboardsPage({
 
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
-  const totalsRow = totals.data?.rows[0];
 
   return (
     <div style={{ fontFamily: SANS }}>
       {/* PAGE HEAD — no Filters button; filters belong to the board they filter. */}
       <div style={{ paddingInline: GUTTER }}>
         <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
-          {t('amateur.leaderboards.title', 'Leaderboards')}
+          {t('amateur.leaderboards.title', 'Scores and leaderboards')}
         </h1>
-        <div className="tabular-nums" style={{ marginTop: 4, minHeight: 17, fontSize: 12.5, color: A.DIM }}>
-          {totals.isSuccess && totalsRow
-            ? `${membersText(Number(totalsRow.pool_members))} \u00B7 ${t('amateur.leaderboards.nRounds', {
-                count: Number(totalsRow.pool_rounds),
-                defaultValue_one: '{{count}} round',
-                defaultValue_other: '{{count}} rounds',
-              })}`
-            : null}
-        </div>
         <ScopeSegments
           scope={scope}
           clubApplies={state.clubApplies}
@@ -715,9 +725,7 @@ export function ScoresLeaderboardsPage({
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {[leader.course_name, leader.play_date ? new Date(leader.play_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : null]
-                      .filter(Boolean)
-                      .join(' \u00B7 ')}
+                    {roundLine(leader)}
                   </span>
                 </span>
                 <span style={{ flexShrink: 0, textAlign: 'right' }}>
@@ -748,9 +756,10 @@ export function ScoresLeaderboardsPage({
                   id={r.user_id}
                   name={nameOf(r.display_name)}
                   photo={r.profile_photo_url}
-                  secondary={r.course_name}
+                  secondary={roundLine(r)}
                   value={leadValue(r)}
                   caption={leadCaption(r)}
+                  captionTone={leadCaptionTone(r)}
                   self={r.user_id === userId}
                   divider={i < list.length - 1}
                   onPress={() => onRowPress(r)}
