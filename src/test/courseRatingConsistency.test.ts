@@ -119,15 +119,14 @@ describe('C1 course rating consistency', () => {
     expect(about).toContain('aboutFig(22, A.AMBER_DEEP)');
     expect(rows).toContain('isMine ? A.AMBER : courseSubScoreTone(score)');
 
-    /* THE COMPOSER PREVIEWS THE COURSE PAGE (phase 2 §8). The dial value, the
-       four category values and their bar fills take courseSubScoreTone, so a
-       score shown in the composer is the colour the course page will print.
-       bandColor.ts itself is untouched and still serves the receipt's hero
-       figure and the community average, which the brief left in the three-band
-       scale. */
+    /* THE REVIEW FLOW PRINTS THE COURSE PAGE'S COLOURS. Every score figure in
+       the composer and on the receipt takes courseSubScoreTone, so a score
+       shown anywhere in the review flow is the colour the course page will
+       print. */
     const onCourseRule = [
       'src/features/review-v2/components/OverallScrubber.tsx',
       'src/features/review-v2/components/CategoryGrid.tsx',
+      'src/features/review-v2/components/ReviewReceipt.tsx',
     ].map(src);
     for (const file of onCourseRule) {
       expect(file).toContain('courseSubScoreTone');
@@ -135,8 +134,6 @@ describe('C1 course rating consistency', () => {
     }
     const receipt = src('src/features/review-v2/components/ReviewReceipt.tsx');
     expect(receipt).toContain('const c = courseSubScoreTone(v)');
-    expect(receipt).toContain('bandColor(overall)');
-    expect(src('src/features/review-v2/bandColor.ts')).toContain('bandColorOnDark');
   });
 
   it('keeps photography neutral white while sourcing 9+ green from the helper', () => {
