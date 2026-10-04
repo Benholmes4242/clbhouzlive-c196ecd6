@@ -421,7 +421,7 @@ export function ScoresLeaderboardsPage({
   onOpenBoard,
   onOpenFilters,
   onRowPress,
-  onOpenProfile,
+  onMemberTap,
   onOpenCourse,
 }: {
   userId: string | undefined;
@@ -429,7 +429,8 @@ export function ScoresLeaderboardsPage({
   onOpenBoard: () => void;
   onOpenFilters: () => void;
   onRowPress: (row: BoardRow) => void;
-  onOpenProfile: (userId: string) => void;
+  /** Resolves to compare, nudge or invite via useMemberTapResolver. NOT a profile page — the Top 100 sheet's Profile pill navigates to /profile/:id itself. */
+  onMemberTap: (userId: string) => void;
   onOpenCourse: (courseId: string) => void;
 }) {
   const { t } = useTranslation('courses');
@@ -511,7 +512,7 @@ export function ScoresLeaderboardsPage({
         divider={divider}
         onPress={() => {
           if (inSheet) setImprovedSheet(false);
-          onOpenProfile(r.user_id);
+          onMemberTap(r.user_id);
         }}
       />
     );
@@ -585,7 +586,7 @@ export function ScoresLeaderboardsPage({
     rows: CareerRow[],
     secondary: (r: CareerRow) => string | null,
     caption: string,
-    onPress: (r: CareerRow) => void = (r) => onOpenProfile(r.user_id),
+    onPress: (r: CareerRow) => void = (r) => onMemberTap(r.user_id),
   ) => {
     const top = rows.slice(0, SHORT_ROWS);
     const mine = rows.find((r) => r.is_viewer) ?? (userId ? rows.find((r) => r.user_id === userId) : undefined);
@@ -847,7 +848,7 @@ export function ScoresLeaderboardsPage({
               /* Decided from the VALUES, not is_tie (which marks a tie anywhere). */
               const margin = second ? Number(r.value) - Number(second.value) : null;
               return (
-                <button key={c.metric} type="button" onClick={() => onOpenProfile(r.user_id)} style={{ ...RAIL_CARD, width: 150 }}>
+                <button key={c.metric} type="button" onClick={() => onMemberTap(r.user_id)} style={{ ...RAIL_CARD, width: 150 }}>
                   <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.AMBER }}>
                     {c.label}
                   </span>
