@@ -81,6 +81,9 @@ function useCareerBoard(
     queryKey: ['leaderboards', rpc, viewerId ?? 'anon', metric, limit],
     staleTime: 5 * 60_000,
     retry: false,
+    /* A metric change is a new key; keep the previous rows on screen until
+     * the next list arrives so the section never drops to its skeleton. */
+    placeholderData: (prev) => prev,
     queryFn: async () => {
       /* Bound to the client: supabase.rpc reads `this.rest`. */
       const { data, error } = await (supabase.rpc as unknown as (
