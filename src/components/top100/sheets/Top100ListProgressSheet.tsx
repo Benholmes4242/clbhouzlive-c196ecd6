@@ -8,7 +8,11 @@
  *
  * THE STANDING IS PASSED IN, NEVER COMPUTED — get_career_leaderboard owns it.
  *
- * OVERLAP: MARK THE DIFFERENCE, NEVER THE MATCH. Notes are A.MUTE, never green.
+ * NO OVERLAP NOTES. is_viewer_played is read from the RPC but dormant — nothing
+ * is computed from it.
+ *
+ * ROW TAP opens the OWNER's review when one exists (owner_rating_id), else the
+ * course page — same two-branch shape as AllCoursesList handleFullReview.
  *
  * Analytics:
  *  - top100_progress_opened  { list_slug }
@@ -16,6 +20,7 @@
  *    time the still-to-play section scrolls into view (sections are stacked now).
  */
 import React, { useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Lock, Star } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -62,6 +67,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
   const viewerUserId = user?.id;
   const isOwn = !!viewerUserId && viewerUserId === ownerUserId;
   const { resolve } = useMemberTapResolver();
+  const navigate = useNavigate();
 
   const access = useCanViewTop100(open ? ownerUserId : undefined, viewerUserId);
   const progress = useTop100ListProgress(open ? listSlug : undefined, ownerUserId, viewerUserId);
@@ -76,8 +82,6 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
   );
   const played = rows.filter((r) => r.is_owner_played);
   const toPlay = rows.filter((r) => !r.is_owner_played);
-  const newToViewer = rows.filter((r) => r.is_owner_played && !r.is_viewer_played).length;
-  const viewerOnly = rows.filter((r) => !r.is_owner_played && r.is_viewer_played).length;
   const pct = rows.length > 0 ? (played.length / rows.length) * 100 : 0;
 
   /* segment event: first sight of the still-to-play section */
@@ -171,28 +175,10 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
         </>
       );
     }
-    const lead = standing ? (
-      <>
-        {B(formatOrdinal(standing.place))} of {B(standing.fieldSize)} members on this list.{' '}
-      </>
-    ) : null;
-    let rest: React.ReactNode;
-    if (newToViewer === 0 && viewerOnly === 0) rest = <>You have played exactly the same courses.</>;
-    else {
-      const a = newToViewer > 0 ? <>{B(newToViewer)} of their {B(played.length)} are new to you</> : null;
-      const b = viewerOnly > 0 ? <>{B(viewerOnly)} you have played and they have not</> : null;
-      rest = (
-        <>
-          {a}
-          {a && b ? '; ' : null}
-          {b}.
-        </>
-      );
-    }
+    if (!standing) return null;
     return (
       <>
-        {lead}
-        {rest}
+        {B(formatOrdinal(standing.place))} of {B(standing.fieldSize)} members on this list.
       </>
     );
   })();
@@ -218,16 +204,24 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
   );
 
   const courseRow = (r: Top100CourseProgress, isPlayed: boolean) => {
-    const meta: Array<{ text: string; note: boolean }> = [];
-    if (listSlug !== 'global' && r.global_rank != null) meta.push({ text: `#${r.global_rank} worldwide`, note: false });
-    if (!isOwn) {
-      if (isPlayed && !r.is_viewer_played) meta.push({ text: 'New to you', note: true });
-      if (!isPlayed && r.is_viewer_played) meta.push({ text: "You've played it", note: true });
-    }
+    const meta: string[] = [];
+    if (r.rank != null) meta.push(`${RANK_SCOPE_LABEL[listSlug]} #${r.rank}`);
+    if (listSlug !== 'global' && r.global_rank != null) meta.push(`#${r.global_rank} worldwide`);
+    const onPress = () => {
+      onClose();
+      if (r.owner_rating_id) navigate(`/courses/${r.course_id}?tab=reviews&review=${r.owner_rating_id}`);
+      else navigate(`/courses/${r.course_id}`);
+    };
     return (
-      <div
+      <button
+        type="button"
         key={r.course_id}
+        onClick={onPress}
+        className="transition-opacity active:opacity-60"
         style={{
+          width: '100%',
+          textAlign: 'left',
+          background: 'transparent',
           display: 'flex',
           alignItems: 'center',
           gap: 11,
@@ -245,21 +239,11 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
         ) : (
           <div style={{ width: 38, height: 38, borderRadius: 9, background: A.TRACK, flex: 'none', opacity: isPlayed ? 1 : 0.5 }} />
         )}
-        {r.rank != null ? (
-          <span style={{ ...TNUM, width: 30, textAlign: 'right', flex: 'none', fontSize: 12, fontWeight: 700, color: A.DIM }}>
-            #{r.rank}
-          </span>
-        ) : null}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ ...ELLIPSIS, fontSize: 13, fontWeight: 600, color: isPlayed ? A.INK : A.MUTE }}>{r.course_name}</div>
           {meta.length > 0 ? (
             <div style={{ ...ELLIPSIS, fontSize: 10.5, color: A.DIM }}>
-              {meta.map((m, i) => (
-                <React.Fragment key={m.text}>
-                  {i > 0 ? ' · ' : null}
-                  <span style={m.note ? { color: A.MUTE } : undefined}>{m.text}</span>
-                </React.Fragment>
-              ))}
+              {meta.join(' · ')}
             </div>
           ) : null}
         </div>
@@ -298,7 +282,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
             />
           )}
         </div>
-      </div>
+      </button>
     );
   };
 
@@ -306,8 +290,8 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
     <BottomSheet
       open={open}
       onClose={onClose}
-      maxHeight="90dvh"
-      style={{ height: '90dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
+      maxHeight="85dvh"
+      style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
     >
       {head}
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 32 }}>
@@ -345,7 +329,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
               <div style={{ marginTop: 8, height: 5, borderRadius: 99, background: A.TRACK, overflow: 'hidden' }}>
                 <div style={{ width: `${pct}%`, height: '100%', background: A.AMBER }} />
               </div>
-              <div style={{ marginTop: 10, fontSize: 11.5, lineHeight: 1.45, color: A.MUTE }}>{heroLine}</div>
+              {heroLine ? <div style={{ marginTop: 10, fontSize: 11.5, lineHeight: 1.45, color: A.MUTE }}>{heroLine}</div> : null}
             </div>
             {played.length > 0 ? (
               <>
