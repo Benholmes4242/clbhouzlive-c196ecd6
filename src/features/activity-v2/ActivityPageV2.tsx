@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCheck } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -172,6 +172,14 @@ export const ActivityPageV2: React.FC = () => {
   useHideHeader();
 
   const navigate = useNavigate();
+  const location = useLocation();
+  /* A synthesised exit from a push-opened round, or Activity as the session's
+     first entry, has nothing safe behind it: go to Clubhouse instead. */
+  const goBack = () => {
+    const fromPush = (location.state as { exitFromPushRound?: boolean } | null)?.exitFromPushRound === true;
+    if (fromPush || location.key === 'default') navigate('/', { replace: true });
+    else navigate(-1);
+  };
   const qc = useQueryClient();
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
@@ -474,7 +482,7 @@ export const ActivityPageV2: React.FC = () => {
   return (
     <ManagePageShell
       title="Activity"
-      onBack={() => navigate(-1)}
+      onBack={goBack}
       right={markAllRead}
       belowTitle={chips}
       theme="dark"
