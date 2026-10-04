@@ -22,7 +22,7 @@ import type { TFunction } from 'i18next';
  * and is not spent on anything else.
  */
 
-const TOPAR_UNDER = '#E5484D';
+export const TOPAR_UNDER = '#E5484D';
 
 export interface BoardColumns {
   value: { i18n: string; label: string };
