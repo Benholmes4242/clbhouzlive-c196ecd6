@@ -1700,7 +1700,13 @@
         "summaryPhotos": "사진 {{count}}장",
         "summaryWords": "당신의 글",
         "teesEyebrow": "플레이한 티",
-        "wordsEyebrow": "내 후기"
+        "wordsEyebrow": "내 후기",
+        "sayItTitle": "Say it",
+        "sayItSub": "Talk, we'll write it down",
+        "typeItTitle": "Type it",
+        "typeItSub": "Use the keyboard",
+        "recordingHint": "Keep going — tap stop when you're done. You can edit every word afterwards.",
+        "sayMore": "Say more"
       },
       "step3": {
         "breakdownBody": "총점과 바꾸지 말고 각각을 그 자심으로 평가하세요. 플레이는 훌륭하지만 부대시설은 부족한 코스도 있습니다. 그것이 여기서 드러납니다.",

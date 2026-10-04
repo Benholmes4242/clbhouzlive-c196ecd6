@@ -1742,7 +1742,13 @@
         "summaryPhotos": "{{count}} Fotos",
         "summaryWords": "deine Worte",
         "teesEyebrow": "Gespielte Abschläge",
-        "wordsEyebrow": "Deine Worte"
+        "wordsEyebrow": "Deine Worte",
+        "sayItTitle": "Say it",
+        "sayItSub": "Talk, we'll write it down",
+        "typeItTitle": "Type it",
+        "typeItSub": "Use the keyboard",
+        "recordingHint": "Keep going — tap stop when you're done. You can edit every word afterwards.",
+        "sayMore": "Say more"
       },
       "step3": {
         "breakdownBody": "Bewerte sie für sich, nicht gegen deine Gesamtnote. Ein Platz kann herrlich zu spielen und dürftig ausgestattet sein – genau das zeigt sich hier.",
