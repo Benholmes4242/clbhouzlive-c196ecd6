@@ -68,3 +68,19 @@ export function handicapPairDisplay(input: {
 
   return { index: fmtHcp(Number(input.handicapIndex)), delta };
 }
+/**
+ * THE JOURNEY: where an index started and where the round left it.
+ * Verified against consecutive real rounds: hcp_at_time is the index the round
+ * was PLAYED OFF, so it is the BEFORE value, and the after is
+ * hcp_at_time + delta_index (delta_index is negative for a cut). Returns null
+ * when either input is missing — never a guess.
+ */
+export function handicapJourneyDisplay(input: {
+  handicapIndex: number | null | undefined;
+  deltaIndex: number | null | undefined;
+}): { before: string; after: string } | null {
+  const b = input.handicapIndex == null ? NaN : Number(input.handicapIndex);
+  const d = input.deltaIndex == null ? NaN : Number(input.deltaIndex);
+  if (!Number.isFinite(b) || !Number.isFinite(d)) return null;
+  return { before: fmtHcp(b), after: fmtHcp(b + d) };
+}
