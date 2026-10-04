@@ -1153,7 +1153,7 @@
       "featBirdies_other": "[~~{{count}} ƁÍŘĐÍÉŠ~~]",
       "featClean": "[~~ƁŐĜÉÝ-ƑŘÉÉ~~]",
       "featEagle_one": "[~~ÉÁĜĻÉ~~]",
-      "featEagle_other": "[~~ÉÁĜĻÉ ƁŘÁĈÉ~~]",
+      "featEagle_other": "[~~{{count}} ÉÁĜĻÉŠ~~]",
       "featJoin": "[~~{{first}} + {{second}}~~]",
       "nMembers_one": "[~~{{count}} ɱéɱƀéř~~]",
       "nMembers_other": "[~~{{count}} ɱéɱƀéřš~~]",

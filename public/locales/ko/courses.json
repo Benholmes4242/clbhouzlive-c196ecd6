@@ -831,7 +831,7 @@
       "featBirdies_other": "버디 {{count}}개",
       "featClean": "보기 없음",
       "featEagle_one": "이글",
-      "featEagle_other": "이글 2개",
+      "featEagle_other": "이글 {{count}}개",
       "featJoin": "{{first}} · {{second}}",
       "railCourses_one": "코스",
       "railCourses_other": "코스",

@@ -36,6 +36,11 @@ export interface BoardColumns {
    * it from a board-key list.
    */
   valueIsText: boolean;
+  /** FALSE ON THE FIVE WHEN BOARDS. They are ordered by date, so a position
+      column would number recency and call it rank — and because the sheet groups
+      by month, the count runs ACROSS the groups: 1-6 in September, 7 in August.
+      Everyone on a feat board did the thing; there is nothing to come first in. */
+  ranked: boolean;
 }
 
 export function boardColumns(board: BoardKey): BoardColumns {
@@ -45,36 +50,42 @@ export function boardColumns(board: BoardKey): BoardColumns {
         value: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         secondary: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
         valueIsText: false,
+        ranked: true,
       };
     case 'topar':
       return {
         value: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         valueIsText: false,
+        ranked: true,
       };
     case 'net':
       return {
         value: { i18n: 'discover.filterBoard.col.net', label: 'NET' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         valueIsText: false,
+        ranked: true,
       };
     case 'stableford':
       return {
         value: { i18n: 'discover.filterBoard.col.points', label: 'PTS' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         valueIsText: false,
+        ranked: true,
       };
     case 'improved':
       return {
         value: { i18n: 'discover.filterBoard.col.cut', label: 'CUT' },
         secondary: null,
         valueIsText: false,
+        ranked: true,
       };
     case 'birdies':
       return {
         value: { i18n: 'discover.filterBoard.col.birdies', label: 'BIRDIES' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         valueIsText: false,
+        ranked: true,
       };
     /* A3.1 — MOST RECENT CARRIES TO PAR, NOT GROSS. The board spans many
        courses, so a bare 71 beside an 85 is two unrelated numbers; to-par is
@@ -84,6 +95,7 @@ export function boardColumns(board: BoardKey): BoardColumns {
         value: { i18n: 'discover.filterBoard.col.when', label: 'WHEN' },
         secondary: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
         valueIsText: true,
+        ranked: false,
       };
     /* B1.3 / A3.5 — THE FEAT BOARDS KEEP GROSS: they are event lists where the
        interesting fact is the feat and gross is context, not comparison. */
@@ -92,6 +104,7 @@ export function boardColumns(board: BoardKey): BoardColumns {
         value: { i18n: 'discover.filterBoard.col.when', label: 'WHEN' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         valueIsText: true,
+        ranked: false,
       };
   }
 }
@@ -265,7 +278,7 @@ function boardFeatLabel(feat: ExploreRoundFeat, t: BoardT): string {
     case 'albatross':
       return t('discover.filterBoard.featAlbatross', { count: feat.count, defaultValue_one: 'ALBATROSS', defaultValue_other: '{{count}} ALBATROSSES' });
     case 'eagle':
-      return t('discover.filterBoard.featEagle', { count: feat.count, defaultValue_one: 'EAGLE', defaultValue_other: 'EAGLE BRACE' });
+      return t('discover.filterBoard.featEagle', { count: feat.count, defaultValue_one: 'EAGLE', defaultValue_other: '{{count}} EAGLES' });
     case 'birdies':
       return t('discover.filterBoard.featBirdies', { count: feat.count, defaultValue_one: '{{count}} BIRDIE', defaultValue_other: '{{count}} BIRDIES' });
     case 'clean':
@@ -301,9 +314,11 @@ export function BoardHeaderRow({ board, hideValue }: { board: BoardKey; hideValu
         borderBottom: `1px solid ${A.BORDER}`,
       }}
     >
-      <span style={{ ...cap, width: POS_W, textAlign: 'center', flexShrink: 0 }}>
-        {t('discover.filterBoard.col.pos', 'POS')}
-      </span>
+      {cols.ranked && (
+        <span style={{ ...cap, width: POS_W, textAlign: 'center', flexShrink: 0 }}>
+          {t('discover.filterBoard.col.pos', 'POS')}
+        </span>
+      )}
       <span style={{ ...cap, flex: 1, minWidth: 0 }}>
         {t('discover.filterBoard.col.member', 'MEMBER')}
       </span>
@@ -345,7 +360,7 @@ export function BoardRowView({
   const value = boardValue(row, board, t as never);
   const second = boardSecondary(row, board);
   /* B4.3 — the column, not the row, decides whether the value is words. */
-  const valueIsText = boardColumns(board).valueIsText;
+  const { valueIsText, ranked } = boardColumns(board);
   const ink = isSelf ? A.AMBER : A.INK;
   const feat = boardFeatMarker(row, t);
 
@@ -360,13 +375,14 @@ export function BoardRowView({
         gap: 10,
         padding: '6px 2px',
         /* The wash states rank; amber remains the viewing member's identity. */
-        background: row.pos === 1 ? LEADER_WASH : 'transparent',
+        background: ranked && row.pos === 1 ? LEADER_WASH : 'transparent',
         border: 'none',
         textAlign: 'left',
         fontFamily: SANS,
         cursor: onPress ? 'pointer' : 'default',
       }}
     >
+      {ranked && (
       <span
           className="tabular-nums"
           style={{
@@ -382,6 +398,7 @@ export function BoardRowView({
               is_tie is always false, so this renders a plain number (B1.3). */}
           {row.is_tie ? `T${row.pos}` : row.pos}
         </span>
+      )}
 
       <span style={{ flexShrink: 0 }}>
         <BoardAvatar row={row} size={28} />
@@ -412,25 +429,47 @@ export function BoardRowView({
           {row.display_name ?? t('discover.aMember', 'A member')}
         </span>
         {/* S5.5 — THE SECOND LINE IS THE COURSE, on every board and every row. */}
-        <span
-          style={{
-            display: 'block',
-            marginTop: 1,
-            /* §7 ROW SUB-LINE — 11 DIM. */
-            fontSize: 11,
-            fontWeight: 600,
-            color: A.DIM,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            lineHeight: '12px',
-          }}
-        >
-          {gap ??
+        {!gap && feat && !ranked ? (
+          /* On a feat board the feat is the subject: it leads and never
+             shrinks; the course is context and truncates behind it. */
+          <span
+            style={{
+              display: 'flex',
+              marginTop: 1,
+              fontSize: 11,
+              fontWeight: 600,
+              color: A.DIM,
+              whiteSpace: 'nowrap',
+              lineHeight: '12px',
+              minWidth: 0,
+            }}
+          >
+            <span style={{ flexShrink: 0 }}>{feat} {'\u00B7'}&nbsp;</span>
+            <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {row.course_name ?? t('discover.unknownCourse', 'A course')}
+            </span>
+          </span>
+        ) : (
+          <span
+            style={{
+              display: 'block',
+              marginTop: 1,
+              /* §7 ROW SUB-LINE — 11 DIM. */
+              fontSize: 11,
+              fontWeight: 600,
+              color: A.DIM,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              lineHeight: '12px',
+            }}
+          >
+            {gap ??
             (feat
               ? `${row.course_name ?? t('discover.unknownCourse', 'A course')} \u00B7 ${feat}`
               : (row.course_name ?? t('discover.unknownCourse', 'A course')))}
-        </span>
+          </span>
+        )}
       </span>
       {second && (
         <span

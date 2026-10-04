@@ -834,7 +834,7 @@
       "featBirdies_other": "{{count}} BIRDIES",
       "featClean": "SIN BOGEYS",
       "featEagle_one": "EAGLE",
-      "featEagle_other": "DOBLETE DE EAGLES",
+      "featEagle_other": "{{count}} EAGLES",
       "featJoin": "{{first}} + {{second}}",
       "railCourses_one": "CAMPO",
       "railCourses_other": "CAMPOS",

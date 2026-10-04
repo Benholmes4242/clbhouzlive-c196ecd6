@@ -831,7 +831,7 @@
       "featBirdies_other": "バーディー {{count}}回",
       "featClean": "ボギーなし",
       "featEagle_one": "イーグル",
-      "featEagle_other": "イーグル2個",
+      "featEagle_other": "イーグル{{count}}個",
       "featJoin": "{{first}}・{{second}}",
       "railCourses_one": "コース",
       "railCourses_other": "コース",
