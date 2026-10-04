@@ -36,8 +36,8 @@ import type { AmateurBoardState } from './useAmateurBoardState';
  * gap to the leader stated. Amber remains identity; the leader wash states rank.
  */
 
-/** Eight positions on the page; the see-all sheet holds the remainder. */
-const VISIBLE_POSITIONS = 8;
+/** Ten positions on the page; the see-all sheet holds the remainder. */
+const VISIBLE_POSITIONS = 10;
 
 /** §2 — four ranked rows is a leaderboard; fewer is a stated thin result. */
 const THIN_FLOOR = 4;
