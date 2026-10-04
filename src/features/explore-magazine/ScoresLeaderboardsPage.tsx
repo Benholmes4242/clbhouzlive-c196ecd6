@@ -903,6 +903,8 @@ export function ScoresLeaderboardsPage({
         >
           <div style={{ marginBottom: 12 }}>
             <RailChips
+              align="center-when-fit"
+
               ground="filled-selection"
               options={TOP100_ORDER.map((slug) => ({ id: slug, label: RANK_SCOPE_LABEL[slug] }))}
               value={top100List}
