@@ -452,6 +452,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const [removeOpen, setRemoveOpen] = useState(false);
 
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
+  /** Set true only by the chooser's "Type it"; never reset. */
+  const [choseToType, setChoseToType] = useState(false);
 
   const step = composer.step;
   const shortName = shortCourseName(course.name ?? '');
@@ -798,6 +800,14 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   /* THE FOOTER SUMMARY names what is actually there, and is omitted - never a
      placeholder - when there is nothing to name. */
   const hasWords = composer.state.reviewText.trim().length > 0;
+  /** Chooser vs field: empty text AND the member has not chosen to type. */
+  const showWordsChooser = composer.state.reviewText.length === 0 && !choseToType;
+  const appendDictation = (text: string) => {
+    const prev = composer.state.reviewText;
+    const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
+    composer.setReviewText(`${prev}${joiner}${text}`);
+    setDictationFlashKey((k) => k + 1);
+  };
   const hasMedia = media.count > 0;
 
   let footerSummary: string | null = null;
@@ -1235,15 +1245,17 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
               >
                 {t('review.wizard.step2.wordsEyebrow')}
               </div>
-              <VoiceDictateButton
-                onAppend={(text) => {
-                  const prev = composer.state.reviewText;
-                  const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
-                  composer.setReviewText(`${prev}${joiner}${text}`);
-                  setDictationFlashKey((k) => k + 1);
-                }}
-              />
+              {!showWordsChooser && (
+                <VoiceDictateButton onAppend={appendDictation} />
+              )}
             </div>
+            {showWordsChooser ? (
+              <VoiceDictateButton
+                idleVariant="chooser"
+                onAppend={appendDictation}
+                onChooseType={() => setChoseToType(true)}
+              />
+            ) : (
             <div
               key={dictationFlashKey}
               style={{
@@ -1273,6 +1285,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 onChange={composer.setReviewText}
                 placeholder={t('review.wizard.step2.placeholder')}
                 currentUserId={userId}
+                autoFocus={choseToType}
                 textStyle={{
                   /* YOUR WORDS is PINNED here, not inherited. 14 -> 15 so the
                      review composer sits at the floor alongside the comment
@@ -1294,6 +1307,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 }}
               />
             </div>
+            )}
           </section>
         </>
       )}

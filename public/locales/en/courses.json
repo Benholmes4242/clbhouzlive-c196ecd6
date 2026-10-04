@@ -2297,7 +2297,13 @@
         "summaryPhotos": "{{count}} photos",
         "summaryWords": "your words",
         "teesEyebrow": "Tees played",
-        "wordsEyebrow": "Your words"
+        "wordsEyebrow": "Your words",
+        "sayItTitle": "Say it",
+        "sayItSub": "Talk, we'll write it down",
+        "typeItTitle": "Type it",
+        "typeItSub": "Use the keyboard",
+        "recordingHint": "Keep going — tap stop when you're done. You can edit every word afterwards.",
+        "sayMore": "Say more"
       },
       "step3": {
         "breakdownBody": "Score these on their own, not against your overall. A course can be brilliant to play and thin on facilities — this is where that shows.",

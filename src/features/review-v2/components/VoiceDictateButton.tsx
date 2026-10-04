@@ -2,7 +2,7 @@
  * VoiceDictateButton — Words-section dictation control with live signal.
  *
  * States:
- *   idle       -> compact pill: mic + "Dictate"
+ *   idle       -> compact pill: mic + "Say more" (or the Say it / Type it chooser)
  *   listening  -> live strip: pulsing red dot, waveform (AnalyserNode on
  *                 the recorder's live MediaStream), mm:ss timer, stop button
  *   processing -> flat shimmer bars + "Transcribing..." secondary label
@@ -12,13 +12,20 @@
  */
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Mic, Square } from 'lucide-react';
+import { Keyboard, Mic, Square } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { transcribeAudio } from '@/lib/transcribeAudio';
 import { RV2 } from '../tokens';
 
 interface Props {
   onAppend: (text: string) => void;
+  /** 'pill' (default) = compact inline control. 'chooser' = the empty-field
+   *  presentation: Say it / Type it cards, full-width live states. Same
+   *  recorder and transcribe path in both — two presentations, one implementation. */
+  idleVariant?: 'pill' | 'chooser';
+  /** Chooser only: "Type it". Must not touch the recorder. */
+  onChooseType?: () => void;
 }
 
 const BAR_COUNT = 24;
@@ -201,7 +208,8 @@ function ProcessingStrip({ reduced }: { reduced: boolean }) {
   );
 }
 
-export function VoiceDictateButton({ onAppend }: Props) {
+export function VoiceDictateButton({ onAppend, idleVariant = 'pill', onChooseType }: Props) {
+  const { t } = useTranslation('courses');
   const rec = useVoiceRecorder();
   const [processing, setProcessing] = useState(false);
   const reduced = usePrefersReducedMotion();
@@ -228,15 +236,64 @@ export function VoiceDictateButton({ onAppend }: Props) {
   }, [rec.audioBlob]);
 
   const listening = rec.isRecording;
+  /** The ONE start path — the pill and the chooser's "Say it" both call this. */
+  const startRecording = () => rec.startRecording();
+  const chooser = idleVariant === 'chooser';
+  const sayMore = t('review.wizard.step2.sayMore');
+
+  // Idle chooser (empty field)
+  if (chooser && !listening && !processing) {
+    const card: React.CSSProperties = {
+      flex: 1,
+      border: `1px solid ${RV2.hairline}`,
+      borderRadius: 14,
+      padding: '16px 12px',
+      textAlign: 'center',
+      background: 'transparent',
+      cursor: 'pointer',
+    };
+    const circle: React.CSSProperties = {
+      width: 40,
+      height: 40,
+      borderRadius: 999,
+      margin: '0 auto',
+      display: 'grid',
+      placeItems: 'center',
+    };
+    const title: React.CSSProperties = { marginTop: 10, fontSize: 14, fontWeight: 600, color: RV2.ink };
+    const sub: React.CSSProperties = { marginTop: 3, fontSize: 11.5, lineHeight: 1.4, color: RV2.secondary };
+    return (
+      <div style={{ display: 'flex', gap: 10, width: '100%' }}>
+        <button
+          type="button"
+          onClick={startRecording}
+          style={{ ...card, borderColor: 'rgba(247,147,30,0.45)', background: 'rgba(247,147,30,0.07)' }}
+        >
+          <div style={{ ...circle, background: RV2.amber, color: '#1A1205' }}>
+            <Mic size={20} />
+          </div>
+          <div style={title}>{t('review.wizard.step2.sayItTitle')}</div>
+          <div style={sub}>{t('review.wizard.step2.sayItSub')}</div>
+        </button>
+        <button type="button" onClick={() => onChooseType?.()} style={card}>
+          <div style={{ ...circle, background: 'rgba(255,255,255,0.07)', color: RV2.ink }}>
+            <Keyboard size={20} />
+          </div>
+          <div style={title}>{t('review.wizard.step2.typeItTitle')}</div>
+          <div style={sub}>{t('review.wizard.step2.typeItSub')}</div>
+        </button>
+      </div>
+    );
+  }
 
   // Idle pill
   if (!listening && !processing) {
     return (
       <button
         type="button"
-        onClick={() => rec.startRecording()}
-        aria-label="Dictate"
-        title="Dictate"
+        onClick={startRecording}
+        aria-label={sayMore}
+        title={sayMore}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -257,17 +314,27 @@ export function VoiceDictateButton({ onAppend }: Props) {
         }}
       >
         <Mic size={16} />
-        <span>Dictate</span>
+        <span>{sayMore}</span>
       </button>
     );
   }
 
-  // Live strip (listening OR processing)
-  return (
+  // Live strip (listening OR processing). In the chooser variant only the
+  // container changes: full width, the chooser's border/radius/padding.
+  const strip = (
     <div
       role="status"
       aria-live="polite"
-      style={{
+      style={chooser ? {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '16px 12px',
+        borderRadius: 14,
+        border: `1px solid ${RV2.hairline}`,
+      } : {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 8,
@@ -346,6 +413,18 @@ export function VoiceDictateButton({ onAppend }: Props) {
         >
           Transcribing...
         </span>
+      )}
+    </div>
+  );
+
+  if (!chooser) return strip;
+  return (
+    <div style={{ width: '100%' }}>
+      {strip}
+      {listening && (
+        <div style={{ marginTop: 8, fontSize: 11.5, color: RV2.secondary }}>
+          {t('review.wizard.step2.recordingHint')}
+        </div>
       )}
     </div>
   );

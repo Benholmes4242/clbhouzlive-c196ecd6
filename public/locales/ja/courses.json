@@ -1697,7 +1697,13 @@
         "summaryPhotos": "写真{{count}}枚",
         "summaryWords": "あなたの言葉",
         "teesEyebrow": "プレーしたティー",
-        "wordsEyebrow": "あなたのコメント"
+        "wordsEyebrow": "あなたのコメント",
+        "sayItTitle": "Say it",
+        "sayItSub": "Talk, we'll write it down",
+        "typeItTitle": "Type it",
+        "typeItSub": "Use the keyboard",
+        "recordingHint": "Keep going — tap stop when you're done. You can edit every word afterwards.",
+        "sayMore": "Say more"
       },
       "step3": {
         "breakdownBody": "総合点と比べず、それぞれを単独で採点してください。プレーは素晴らしくても設備は物足りないコースもあります。それがここに表れます。",
