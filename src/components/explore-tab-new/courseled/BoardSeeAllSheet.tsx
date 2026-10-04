@@ -99,8 +99,6 @@ export function BoardSeeAllSheet({
       else out.push({ key, label, rows: [r] });
     }
     /* Newest first; stable sort keeps board order inside each group. */
-    const order = new Map<string, number>();
-    out.forEach((g, i) => order.set(g.key, i));
     const merged = new Map<string, { key: string; label: string; rows: BoardRow[] }>();
     for (const g of out) {
       const m = merged.get(g.key);
