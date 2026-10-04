@@ -54,6 +54,7 @@ interface CareerRow {
   photo_url: string | null;
   home_club: string | null;
   value: number;
+  field_avg: number | null;
   courses: number | null;
   total_members: number;
   is_viewer: boolean | null;
@@ -350,7 +351,7 @@ export function ScoresLeaderboardsPage({
   const totals = useBoardPage(userId, 'recent', ALL_TIME_FILTERS, { limit: 1 });
 
   /* §4 — the improved board at the page's scope; sheet filters belong to §3. */
-  const cutsFilters = useMemo(() => entryFiltersFor(scope), [scope]);
+  const cutsFilters = useMemo(() => ({ ...entryFiltersFor(scope), window: 'year' as WindowKey }), [scope]);
   const cuts = useBoardPage(userId, 'improved', cutsFilters, { limit: 50, enabled: state.ready });
 
   const standing = useViewerStanding(userId);
@@ -454,7 +455,7 @@ export function ScoresLeaderboardsPage({
     { metric: 'birdies', label: t('amateur.leaderboards.career.birdies', 'Birdies'), q: birdiesC },
     { metric: 'rounds', label: t('amateur.leaderboards.career.rounds', 'Rounds'), q: roundsC },
     { metric: 'sub_80', label: t('amateur.leaderboards.career.sub80', 'Sub-80 rounds'), q: sub80C },
-    { metric: 'eagles', label: t('amateur.leaderboards.career.eagles', 'Eagles'), q: eaglesC },
+    { metric: 'eagles', label: t('amateur.leaderboards.career.eagles', 'Eagles'), q: eaglesC, noAvg: true },
   ];
   const careerSettled = career.every((c) => c.q.isFetched);
   const careerShown = career.filter((c) => c.q.isSuccess && (c.q.data?.length ?? 0) > 0);
@@ -497,7 +498,7 @@ export function ScoresLeaderboardsPage({
       : null;
   /* get_career_leaderboard returns no most-recent course; the home club is the
      only place line it carries. */
-  const top100Secondary = (r: CareerRow) => r.home_club;
+  const top100Secondary = (_r: CareerRow): string | null => null;
 
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
@@ -683,8 +684,9 @@ export function ScoresLeaderboardsPage({
         >
           {cuts.data!.rows.slice(0, SHORT_ROWS).map((r, i, arr) => {
             const cut = r.delta_index != null ? Math.abs(r.delta_index) : null;
-            const after = r.hcp_at_time;
-            const before = after != null && cut != null ? after + cut : null;
+            /* hcp_at_time is the PRE-round index (verified against consecutive rounds); do not flip. */
+            const before = r.hcp_at_time;
+            const after = before != null && r.delta_index != null ? before + r.delta_index : null;
             return (
               <CompactRow
                 key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
@@ -716,7 +718,7 @@ export function ScoresLeaderboardsPage({
           contest={false}
           eyebrow={t('amateur.leaderboards.whereYouStand', 'Where you stand')}
           title={t('amateur.leaderboards.yourCourses', 'Your courses')}
-          meta={t('amateur.leaderboards.nCourses', { count: standing.rows.length, defaultValue_one: '{{count}} course', defaultValue_other: '{{count}} courses' })}
+          meta={t('amateur.leaderboards.sinceLastVisit', 'Since your last visit')}
         >
           <Rail>
             {standing.rows.map((r) => {
@@ -824,7 +826,12 @@ export function ScoresLeaderboardsPage({
                   <span className="tabular-nums" style={{ display: 'block', marginTop: 8, fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
                     {r.value}
                   </span>
-                  <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, color: A.DIM }}>{membersText(Number(r.total_members))}</span>
+                  <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, color: A.DIM }}>{(() => {
+                    const avg = Math.round(Number(r.field_avg) || 0);
+                    return !('noAvg' in c) && avg > 0
+                      ? t('amateur.leaderboards.average', 'Average {{n}}', { n: avg })
+                      : membersText(Number(r.total_members));
+                  })()}</span>
                 </button>
               );
             })}

@@ -19866,6 +19866,7 @@ export type Database = {
         Returns: {
           courses: number
           display_name: string
+          field_avg: number
           home_club: string
           is_tie: boolean
           is_viewer: boolean
