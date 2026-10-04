@@ -22,7 +22,7 @@ import type { TFunction } from 'i18next';
  * and is not spent on anything else.
  */
 
-export const TOPAR_UNDER = '#E5484D';
+/* TO-PAR RED HAS EXACTLY ONE SOURCE: TOPAR_UNDER_DARK, read here as A.RED. A local hex for it is always a fork. */
 
 export interface BoardColumns {
   value: { i18n: string; label: string };
@@ -136,7 +136,7 @@ export function boardValue(
       return { text: r.gross_score != null ? String(r.gross_score) : '\u2014', tone: A.INK };
     case 'topar': {
       const p = toParOf(r);
-      return { text: fmtToPar(p), tone: p != null && p < 0 ? TOPAR_UNDER : A.INK };
+      return { text: fmtToPar(p), tone: p != null && p < 0 ? A.RED : A.INK };
     }
     /* AMENDMENT B2.1/B2.2 — THE NET BOARD RENDERS ITS RANKED FIGURE. The RPC
        ranks 'net' on (net_score - course_par), so the column must show net TO
@@ -145,7 +145,7 @@ export function boardValue(
        under-par colour law applies, true minus and never a hyphen. */
     case 'net': {
       const n = netToParOf(r);
-      return { text: fmtToPar(n), tone: n != null && n < 0 ? TOPAR_UNDER : A.INK };
+      return { text: fmtToPar(n), tone: n != null && n < 0 ? A.RED : A.INK };
     }
     case 'stableford':
       return {
@@ -168,7 +168,7 @@ export function boardSecondary(r: Row, board: BoardKey): Cell | null {
   switch (board) {
     case 'gross': {
       const p = toParOf(r);
-      return { text: fmtToPar(p), tone: p != null && p < 0 ? TOPAR_UNDER : A.MUTE };
+      return { text: fmtToPar(p), tone: p != null && p < 0 ? A.RED : A.MUTE };
     }
     case 'improved':
       return null;
@@ -178,7 +178,7 @@ export function boardSecondary(r: Row, board: BoardKey): Cell | null {
       const p = toParOf(r);
       return {
         text: fmtToPar(p),
-        tone: p == null ? A.DIM : p < 0 ? TOPAR_UNDER : p === 0 ? A.MUTE : A.INK,
+        tone: p == null ? A.DIM : p < 0 ? A.RED : p === 0 ? A.MUTE : A.INK,
       };
     }
     case 'topar':
