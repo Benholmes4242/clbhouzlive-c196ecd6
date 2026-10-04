@@ -70,7 +70,73 @@ type CareerMetric =
   | 'top_100_worldwide_distinct'
   | 'top_100_europe_distinct'
   | 'top_100_usa_distinct'
-  | 'birdies' | 'rounds' | 'sub_80' | 'eagles';
+  | 'birdies' | 'rounds' | 'sub_80' | 'eagles'
+  | 'best_stableford' | 'best_score_diff';
+
+/** get_year_leaderboard.value is numeric, so it arrives as a string. The ONE
+ *  per-metric formatter: a differential carries one decimal and an explicit
+ *  sign; every other metric is an integer. */
+function fmtCareerValue(metric: CareerMetric, v: number | string | null | undefined): string {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return '\u2014';
+  if (metric === 'best_score_diff') return `${n > 0 ? '+' : n < 0 ? '-' : ''}${Math.abs(n).toFixed(1)}`;
+  return String(Math.round(n));
+}
+
+/** Leader's distance from second, whichever way the board counts. */
+function fmtCareerMargin(metric: CareerMetric, a: number | string, b: number | string): { zero: boolean; text: string } {
+  const d = Math.abs(Number(a) - Number(b));
+  const text = metric === 'best_score_diff' ? d.toFixed(1) : String(Math.round(d));
+  return { zero: Number(text) === 0, text };
+}
+
+interface BoardSheetProps {
+  open: boolean;
+  onClose: () => void;
+  titleId: string;
+  title: string;
+  subtitle: string;
+  valueHeading: string;
+  footnote?: string;
+  above?: React.ReactNode;
+  children: React.ReactNode;
+}
+
+/** THE ONE SEE-ALL SHELL on this page: Top 100, Most improved and every §6 tile. */
+function BoardSheet({ open, onClose, titleId, title, subtitle, valueHeading, footnote, above, children }: BoardSheetProps) {
+  const { t } = useTranslation('courses');
+  const cap: React.CSSProperties = { fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' };
+  return (
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      maxHeight="85dvh"
+      ariaLabelledBy={titleId}
+      style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 13px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h2 id={titleId} style={{ margin: 0, fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>{title}</h2>
+          <div style={{ ...cap, marginTop: 2, color: A.DIM }}>{subtitle}</div>
+        </div>
+        <button type="button" onClick={onClose} style={{ ...cap, flex: 'none', background: 'none', border: 0, padding: 0, cursor: 'pointer', color: A.INK }}>
+          {t('common.done', 'Done')}
+        </button>
+      </div>
+      {above}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px 6px', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, flexShrink: 0 }}>
+        <span>{t('amateur.leaderboards.member', 'Member')}</span>
+        <span>{valueHeading}</span>
+      </div>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
+        {children}
+        {footnote ? (
+          <div style={{ fontFamily: SANS, fontSize: 11.5, lineHeight: 1.45, color: A.DIM, padding: '14px 0 8px' }}>{footnote}</div>
+        ) : null}
+      </div>
+    </BottomSheet>
+  );
+}
 
 function useCareerBoard(
   viewerId: string | undefined,
@@ -142,6 +208,9 @@ function useYearImprovement(viewerId: string | undefined) {
  * the app's published name) while the metric key says "worldwide" (the
  * database's name). Neither changes here; they meet only on this line.
  */
+/** §6 rail fetch: the tile reads two rows, the sheet the field. */
+const CAREER_RAIL_LIMIT = 100;
+
 const TOP100_METRIC: Record<RankListSlug, CareerMetric> = {
   'gb-i': 'top_100_gbni_distinct',
   global: 'top_100_worldwide_distinct',
@@ -448,10 +517,14 @@ export function ScoresLeaderboardsPage({
   const eagle = useBoardPage(userId, 'eagle', YEAR_FILTERS, { limit: 200 });
   const clean = useBoardPage(userId, 'clean_card', YEAR_FILTERS, { limit: 200 });
 
-  const birdiesC = useCareerBoard(userId, 'birdies', 2, 'get_year_leaderboard');
-  const roundsC = useCareerBoard(userId, 'rounds', 2, 'get_year_leaderboard');
-  const sub80C = useCareerBoard(userId, 'sub_80', 2, 'get_year_leaderboard');
-  const eaglesC = useCareerBoard(userId, 'eagles', 2, 'get_year_leaderboard');
+  const birdiesC = useCareerBoard(userId, 'birdies', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
+  const roundsC = useCareerBoard(userId, 'rounds', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
+  const sub80C = useCareerBoard(userId, 'sub_80', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
+  const eaglesC = useCareerBoard(userId, 'eagles', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
+  const stablefordC = useCareerBoard(userId, 'best_stableford', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
+  const scoreDiffC = useCareerBoard(userId, 'best_score_diff', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
+  /* The tile reads rows 0-1; the sheet it opens reads the same query object. */
+  const [leaderSheet, setLeaderSheet] = useState<CareerMetric | null>(null);
   const [top100List, setTop100List] = useState<RankListSlug>(TOP100_DEFAULT);
   const top100 = useCareerBoard(userId, TOP100_METRIC[top100List], 100);
   const top100Defaulted = top100List === TOP100_DEFAULT;
@@ -576,7 +649,10 @@ export function ScoresLeaderboardsPage({
     { metric: 'rounds', label: t('amateur.leaderboards.career.rounds', 'Rounds'), q: roundsC },
     { metric: 'sub_80', label: t('amateur.leaderboards.career.sub80', 'Sub-80 rounds'), q: sub80C },
     { metric: 'eagles', label: t('amateur.leaderboards.career.eagles', 'Eagles'), q: eaglesC, noAvg: true },
-  ];
+    { metric: 'best_stableford', label: t('amateur.leaderboards.career.bestStableford', 'Best stableford'), q: stablefordC },
+    { metric: 'best_score_diff', label: t('amateur.leaderboards.career.bestScoreDiff', 'Best to handicap'), q: scoreDiffC },
+  ] as { metric: CareerMetric; label: string; q: typeof birdiesC; noAvg?: boolean }[];
+  /* NOTHING ELSE JOINS THIS RAIL: holes in one / albatrosses are §5, lowest gross §3, bogey-free §5. */
   const careerSettled = career.every((c) => c.q.isFetched);
   const careerShown = career.filter((c) => c.q.isSuccess && (c.q.data?.length ?? 0) > 0);
   const careerMembers = careerShown.reduce((m, c) => Math.max(m, Number(c.q.data![0].total_members) || 0), 0);
@@ -587,8 +663,9 @@ export function ScoresLeaderboardsPage({
     secondary: (r: CareerRow) => string | null,
     caption: string,
     onPress: (r: CareerRow) => void = (r) => onMemberTap(r.user_id),
+    opts: { all?: boolean; fmt?: (r: CareerRow) => string } = {},
   ) => {
-    const top = rows.slice(0, SHORT_ROWS);
+    const top = opts.all ? rows : rows.slice(0, SHORT_ROWS);
     const mine = rows.find((r) => r.is_viewer) ?? (userId ? rows.find((r) => r.user_id === userId) : undefined);
     const pin = mine && !top.some((r) => r.user_id === mine.user_id) ? mine : null;
     const list = pin ? [...top, pin] : top;
@@ -601,7 +678,7 @@ export function ScoresLeaderboardsPage({
         name={nameOf(r.display_name)}
         photo={r.photo_url}
         secondary={secondary(r)}
-        value={String(r.value)}
+        value={opts.fmt ? opts.fmt(r) : String(r.value)}
         caption={caption}
         self={!!r.is_viewer || r.user_id === userId}
         divider={i < list.length - 1}
@@ -827,7 +904,7 @@ export function ScoresLeaderboardsPage({
       ) : null}
 
       {/* §6 WHO LEADS WHAT — this calendar year's leader of each metric, read
-          from get_year_leaderboard (fetch 2: the footnote needs second place).
+          from get_year_leaderboard (CAREER_RAIL_LIMIT: the tile reads rows 0-1, the sheet the field).
           JANUARY IS THIN BY DESIGN: on 1 January every value is zero, the RPC
           filters value > 0, and this section renders nothing. That is a fresh
           race, not a bug — never add a "last year's final" fallback or carry
@@ -846,9 +923,9 @@ export function ScoresLeaderboardsPage({
               const r = c.q.data![0];
               const second = c.q.data![1];
               /* Decided from the VALUES, not is_tie (which marks a tie anywhere). */
-              const margin = second ? Number(r.value) - Number(second.value) : null;
+              const margin = second ? fmtCareerMargin(c.metric, r.value, second.value) : null;
               return (
-                <button key={c.metric} type="button" onClick={() => onMemberTap(r.user_id)} style={{ ...RAIL_CARD, width: 150 }}>
+                <button key={c.metric} type="button" onClick={() => setLeaderSheet(c.metric)} style={{ ...RAIL_CARD, width: 150 }}>
                   <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.AMBER }}>
                     {c.label}
                   </span>
@@ -874,7 +951,7 @@ export function ScoresLeaderboardsPage({
                   ) : null}
                   <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
                     <span className="tabular-nums" style={{ display: 'block', fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
-                      {r.value}
+                      {fmtCareerValue(c.metric, r.value)}
                     </span>
                     <span style={{ flexShrink: 0, display: 'flex' }}>
                       <Avatar id={r.user_id} name={nameOf(r.display_name)} src={r.photo_url} size={30} />
@@ -882,9 +959,9 @@ export function ScoresLeaderboardsPage({
                   </span>
                   {margin != null ? (
                     <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, color: A.DIM }}>
-                      {margin === 0
+                      {margin.zero
                         ? t('amateur.leaderboards.tiedTop', 'Tied at the top')
-                        : t('amateur.leaderboards.clearOf2nd', '{{n}} clear of 2nd', { n: margin })}
+                        : t('amateur.leaderboards.clearOf2nd', '{{n}} clear of 2nd', { n: margin.text })}
                     </span>
                   ) : null}
                 </button>
@@ -948,70 +1025,48 @@ export function ScoresLeaderboardsPage({
         />
       ) : null}
 
-      <BottomSheet
+      <BoardSheet
         open={improvedSheet}
         onClose={() => setImprovedSheet(false)}
-        maxHeight="85dvh"
-        ariaLabelledBy="improved-see-all-title"
-        style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
+        titleId="improved-see-all-title"
+        title={t('amateur.leaderboards.mostImproved', 'Most improved')}
+        subtitle={improvedRows.length > 0
+          ? `${t('amateur.leaderboards.improvedScope', 'Everyone · this year')} · ${membersText(Number(improvedRows[0].total_members) || improvedRows.length)}`
+          : t('amateur.leaderboards.improvedScope', 'Everyone · this year')}
+        valueHeading={t('amateur.leaderboards.indexChange', 'Index change')}
+        footnote={t('amateur.leaderboards.improvedQualifier', 'Members with five or more rounds this year.')}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 13px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <h2 id="improved-see-all-title" style={{ margin: 0, fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>
-              {t('amateur.leaderboards.mostImproved', 'Most improved')}
-            </h2>
-            <div style={{ marginTop: 2, fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>
-              {improvedRows.length > 0
-                ? `${t('amateur.leaderboards.improvedScope', 'Everyone · this year')} · ${membersText(Number(improvedRows[0].total_members) || improvedRows.length)}`
-                : t('amateur.leaderboards.improvedScope', 'Everyone · this year')}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setImprovedSheet(false)}
-            style={{ flex: 'none', background: 'none', border: 0, padding: 0, cursor: 'pointer', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK }}
-          >
-            {t('common.done', 'Done')}
-          </button>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px 6px', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, flexShrink: 0 }}>
-          <span>{t('amateur.leaderboards.member', 'Member')}</span>
-          <span>{t('amateur.leaderboards.indexChange', 'Index change')}</span>
-        </div>
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
-          {improvedRows.map((r, i, arr) => improvedRow(r, i < arr.length - 1, true))}
-          <div style={{ fontFamily: SANS, fontSize: 11.5, lineHeight: 1.45, color: A.DIM, padding: '14px 0 8px' }}>
-            {t('amateur.leaderboards.improvedQualifier', 'Members with five or more rounds this year.')}
-          </div>
-        </div>
-      </BottomSheet>
+        {improvedRows.map((r, i, arr) => improvedRow(r, i < arr.length - 1, true))}
+      </BoardSheet>
 
-      <BottomSheet
+      {(() => {
+        const c = leaderSheet ? career.find((x) => x.metric === leaderSheet) : undefined;
+        const rows = c?.q.data ?? [];
+        const scope = t('amateur.leaderboards.improvedScope', 'Everyone · this year');
+        return (
+          <BoardSheet
+            open={!!c}
+            onClose={() => setLeaderSheet(null)}
+            titleId="leader-see-all-title"
+            title={c?.label ?? ''}
+            subtitle={rows.length > 0 ? `${scope} · ${membersText(Number(rows[0].total_members))}` : scope}
+            valueHeading={c?.label ?? ''}
+          >
+            {c ? shortBoard(rows, () => null, '', (r) => onMemberTap(r.user_id), { all: true, fmt: (r) => fmtCareerValue(c.metric, r.value) }) : null}
+          </BoardSheet>
+        );
+      })()}
+
+      <BoardSheet
         open={careerSheet}
         onClose={() => setCareerSheet(false)}
-        maxHeight="85dvh"
-        ariaLabelledBy="career-see-all-title"
-        style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 13px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <h2 id="career-see-all-title" style={{ margin: 0, fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>
-              {t('amateur.leaderboards.top100', 'Top 100')}
-            </h2>
-            <div style={{ marginTop: 2, fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>
-              {top100Rows.length > 0
-                ? `${RANK_SCOPE_LABEL[top100List]} · ${membersText(Number(top100Rows[0].total_members))}`
-                : RANK_SCOPE_LABEL[top100List]}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setCareerSheet(false)}
-            style={{ flex: 'none', background: 'none', border: 0, padding: 0, cursor: 'pointer', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK }}
-          >
-            {t('common.done', 'Done')}
-          </button>
-        </div>
+        titleId="career-see-all-title"
+        title={t('amateur.leaderboards.top100', 'Top 100')}
+        subtitle={top100Rows.length > 0
+          ? `${RANK_SCOPE_LABEL[top100List]} · ${membersText(Number(top100Rows[0].total_members))}`
+          : RANK_SCOPE_LABEL[top100List]}
+        valueHeading={t('amateur.leaderboards.coursesOf100', 'Courses of 100')}
+        above={
         <div style={{ padding: '11px 16px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <RailChips
             align="center-when-fit"
@@ -1022,11 +1077,8 @@ export function ScoresLeaderboardsPage({
             ariaLabel={t('amateur.leaderboards.top100List', 'Top 100 list')}
           />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px 6px', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, flexShrink: 0 }}>
-          <span>{t('amateur.leaderboards.member', 'Member')}</span>
-          <span>{t('amateur.leaderboards.coursesOf100', 'Courses of 100')}</span>
-        </div>
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
+        }
+      >
           {top100Rows.map((r, i, arr) => (
             <CompactRow
               key={r.user_id}
@@ -1045,8 +1097,7 @@ export function ScoresLeaderboardsPage({
               }}
             />
           ))}
-        </div>
-      </BottomSheet>
+      </BoardSheet>
 
       {top100Sheet ? (
         <Top100ListProgressSheet
