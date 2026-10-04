@@ -46,13 +46,12 @@ import { monthLabel } from './exploreCopy';
 import { ExploreShelf, SHELF_HEADING } from './ExploreShelf';
 import { useCircleSize } from '@/features/amateur/useCircleSize';
 import { ENTRY_BOARD, useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
-import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBlock';
 import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
 import { BOARD_LABELS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 
 import { CircleShelf } from './CircleShelf';
-import { ScoresFilterHead } from './ScoresFilterHead';
+import { ScoresLeaderboardsPage } from './ScoresLeaderboardsPage';
 import { StandingShelf } from './StandingShelf';
 import { ScoresStandingSlot } from './ConnectStandingInvite';
 
@@ -1911,30 +1910,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           stay put. */}
       {view === 'courses' ? <CoursesSearchField value={search} onChange={setSearch} /> : null}
 
-      {view === 'scores' ? (
-        <div style={{ paddingBottom: 4 }}>
-          <ScoresFilterHead
-            board={boardState.board}
-            scope={boardState.filters.scope}
-            clubApplies={boardState.clubApplies}
-            filterCount={boardState.ready ? boardState.sheetFilterCount : 0}
-            onOpenBoard={() => {
-              analyticsEvents.track('amateur_board_picker_opened', {
-                board: boardPick ?? ENTRY_BOARD,
-                board_active: scoresBoardActive,
-              });
-              setBoardPanelShowsBoard(true);
-              setBoardPanelOpen(true);
-            }}
-            onOpenFilters={() => {
-              analyticsEvents.track('amateur_filter_opened', { board: boardState.board });
-              setBoardPanelShowsBoard(false);
-              setBoardPanelOpen(true);
-            }}
-            onScopeChange={boardState.changeScope}
-          />
-        </div>
-      ) : null}
 
       {/* BRIEF_EXPLORE_SECOND_PASS §1 REVERSES THE 'sm' RULING. Every secondary
           row in Explore is ONE size — the Watch filter row's, which is the
@@ -2065,10 +2040,25 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           who cannot find the stream again will think the app broke. */}
       {scoresBoardActive ? (
         <div style={{ marginBottom: BLOCK_GAP }}>
-          <AmateurLeaderboardBlock
+          <ScoresLeaderboardsPage
             userId={userId}
             state={boardState}
             onRowPress={boardRowPress}
+            onOpenProfile={(id) => opener.openProfile(id)}
+            onOpenCourse={(id) => { depart(); navigate(`/courses/${id}`); }}
+            onOpenBoard={() => {
+              analyticsEvents.track('amateur_board_picker_opened', {
+                board: boardPick ?? ENTRY_BOARD,
+                board_active: scoresBoardActive,
+              });
+              setBoardPanelShowsBoard(true);
+              setBoardPanelOpen(true);
+            }}
+            onOpenFilters={() => {
+              analyticsEvents.track('amateur_filter_opened', { board: boardState.board });
+              setBoardPanelShowsBoard(false);
+              setBoardPanelOpen(true);
+            }}
           />
         </div>
       ) : null}
