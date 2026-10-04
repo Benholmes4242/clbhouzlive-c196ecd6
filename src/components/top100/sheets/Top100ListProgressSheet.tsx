@@ -258,7 +258,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
   const courseRow = (r: Top100CourseProgress, isPlayed: boolean) => {
     const meta: string[] = [];
     if (r.rank != null) meta.push(`${RANK_SCOPE_LABEL[slug]} #${r.rank}`);
-    if (slug !== 'global' && r.global_rank != null) meta.push(`#${r.global_rank} worldwide`);
+    if (slug !== 'global' && r.global_rank != null) meta.push(`Worldwide #${r.global_rank}`);
     const onPress = () => {
       onClose();
       if (r.owner_rating_id) navigate(`/courses/${r.course_id}?tab=reviews&review=${r.owner_rating_id}`);
