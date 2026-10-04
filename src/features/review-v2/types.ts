@@ -65,6 +65,8 @@ export interface MediaItem {
   streamId?: string | null;
   uploadedUrl?: string | null;
   durationSeconds?: number | null;
+  /** True from the moment the tile appears until its probe settles. */
+  analysing?: boolean;
   width?: number | null;
   height?: number | null;
   isExisting?: boolean;

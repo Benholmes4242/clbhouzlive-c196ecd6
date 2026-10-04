@@ -44,18 +44,64 @@ function nid(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-async function probeVideoDuration(file: File): Promise<number> {
+/**
+ * ONE element load reads both the duration and a poster frame. muted +
+ * playsInline are what let iOS decode a frame at all. The frame is drawn on
+ * SEEKED (not loadedmetadata). Any failure, or a seek that has not landed
+ * within 3s, resolves with a null poster — a missing poster never costs the
+ * member their video. Only an element error before metadata rejects.
+ */
+function probeVideo(
+  file: File,
+  registerBlob: (url: string) => string,
+): Promise<{ duration: number; posterUrl: string | null }> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const v = document.createElement('video');
-    v.preload = 'metadata';
     v.muted = true;
-    v.onloadedmetadata = () => {
-      const d = v.duration;
+    v.playsInline = true;
+    v.preload = 'metadata';
+    let duration: number | null = null;
+    let done = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const finish = (posterUrl: string | null) => {
+      if (done) return;
+      done = true;
+      if (timer) clearTimeout(timer);
       URL.revokeObjectURL(url);
-      resolve(Number.isFinite(d) ? d : 0);
+      v.removeAttribute('src');
+      resolve({ duration: duration ?? 0, posterUrl });
+    };
+    v.onloadedmetadata = () => {
+      duration = Number.isFinite(v.duration) ? v.duration : 0;
+      timer = setTimeout(() => finish(null), 3000);
+      try {
+        v.currentTime = Math.min(0.1, (v.duration || 1) / 2);
+      } catch {
+        finish(null);
+      }
+    };
+    v.onseeked = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = v.videoWidth;
+        canvas.height = v.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx || !canvas.width || !canvas.height) return finish(null);
+        ctx.drawImage(v, 0, 0);
+        canvas.toBlob(
+          (blob) => finish(blob ? registerBlob(URL.createObjectURL(blob)) : null),
+          'image/jpeg',
+          0.7,
+        );
+      } catch {
+        finish(null);
+      }
     };
     v.onerror = () => {
+      if (duration !== null) return finish(null);
+      if (done) return;
+      done = true;
       URL.revokeObjectURL(url);
       reject(new Error('Could not read video metadata'));
     };
@@ -145,56 +191,47 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
   const addFiles = useCallback(
     async (files: File[]) => {
       setPickerError(null);
-      let currentCount = items.length;
 
-      for (const file of files) {
-        if (currentCount >= REVIEW_V2_LIMITS.MAX_MEDIA) {
-          setPickerError('Reviews carry up to 10 photos or clips.');
-          break;
-        }
-
+      // PASS ONE — fully synchronous. Nothing is awaited before setItems.
+      const room = Math.max(0, REVIEW_V2_LIMITS.MAX_MEDIA - items.length);
+      if (files.length > room) setPickerError('Reviews carry up to 10 photos or clips.');
+      const kept = files.slice(0, room);
+      if (kept.length === 0) return;
+      const added: MediaItem[] = kept.map((file) => {
         const isVideo = file.type.startsWith('video/');
+        const preview = registerBlob(URL.createObjectURL(file));
+        return isVideo
+          ? { id: nid(), file, type: 'video', previewUrl: preview, posterUrl: null,
+              status: 'pending', progress: 0, durationSeconds: null, analysing: true }
+          : { id: nid(), file, type: 'image', previewUrl: preview,
+              status: 'pending', progress: 0, width: null, height: null, analysing: true };
+      });
+      setItems((prev) => [...prev, ...added]);
 
-        if (isVideo) {
+      // PASS TWO — probe every file in parallel, patching each as it lands.
+      const patch = (id: string, p: Partial<MediaItem>) =>
+        setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...p } : i)));
+      await Promise.all(
+        added.map(async (item) => {
+          const file = item.file as File;
           try {
-            const dur = await probeVideoDuration(file);
-            if (dur > REVIEW_V2_LIMITS.MAX_VIDEO_SECONDS) {
-              setPickerError('Videos need to be 3 minutes or under.');
-              continue;
+            if (item.type === 'video') {
+              const { duration, posterUrl } = await probeVideo(file, registerBlob);
+              if (duration > REVIEW_V2_LIMITS.MAX_VIDEO_SECONDS) {
+                setItems((prev) => prev.filter((i) => i.id !== item.id));
+                setPickerError('Videos need to be 3 minutes or under.');
+                return;
+              }
+              patch(item.id, { durationSeconds: duration, posterUrl, analysing: false });
+            } else {
+              const dims = await probeImageDims(file);
+              patch(item.id, { width: dims?.width ?? null, height: dims?.height ?? null, analysing: false });
             }
-            const preview = registerBlob(URL.createObjectURL(file));
-            const item: MediaItem = {
-              id: nid(),
-              file,
-              type: 'video',
-              previewUrl: preview,
-              posterUrl: null,
-              status: 'pending',
-              progress: 0,
-              durationSeconds: dur,
-            };
-            setItems((prev) => [...prev, item]);
-            currentCount++;
           } catch {
-            setPickerError('Could not read video.');
+            patch(item.id, { analysing: false });
           }
-        } else {
-          const dims = await probeImageDims(file);
-          const preview = registerBlob(URL.createObjectURL(file));
-          const item: MediaItem = {
-            id: nid(),
-            file,
-            type: 'image',
-            previewUrl: preview,
-            status: 'pending',
-            progress: 0,
-            width: dims?.width ?? null,
-            height: dims?.height ?? null,
-          };
-          setItems((prev) => [...prev, item]);
-          currentCount++;
-        }
-      }
+        }),
+      );
     },
     [items.length],
   );

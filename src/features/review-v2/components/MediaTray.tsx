@@ -4,7 +4,7 @@
  */
 
 import React, { useRef } from 'react';
-import { Plus, X, Play, RotateCcw, AlertCircle, Camera } from 'lucide-react';
+import { Plus, X, Play, Loader2, RotateCcw, AlertCircle, Camera } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { RV2, REVIEW_V2_LIMITS } from '../tokens';
 import type { MediaItem } from '../types';
@@ -91,7 +91,7 @@ export function MediaTray({
               />
             )}
 
-            {it.type === 'video' && (
+            {it.type === 'video' && !it.analysing && (
               <div
                 aria-hidden
                 style={{
@@ -109,7 +109,7 @@ export function MediaTray({
               </div>
             )}
 
-            {(it.status === 'uploading' || it.status === 'pending') && (
+            {!it.analysing && (it.status === 'uploading' || it.status === 'pending') && (
               <div
                 style={{
                   position: 'absolute',
@@ -128,6 +128,22 @@ export function MediaTray({
                     transition: 'width 200ms',
                   }}
                 />
+              </div>
+            )}
+
+            {it.analysing && (
+              <div
+                aria-label="Preparing"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(0,0,0,0.45)',
+                  display: 'grid',
+                  placeItems: 'center',
+                  pointerEvents: 'none',
+                }}
+              >
+                <Loader2 size={20} color={RV2.onDark} className="motion-safe:animate-spin" />
               </div>
             )}
 
