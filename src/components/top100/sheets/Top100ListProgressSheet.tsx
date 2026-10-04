@@ -16,10 +16,11 @@
  *
  * Analytics:
  *  - top100_progress_opened  { list_slug }
+ *  - top100_progress_list_switched { from_slug, to_slug } — four-list strip tap
  *  - top100_progress_segment { list_slug, segment: 'still_to_play' } — the first
  *    time the still-to-play section scrolls into view (sections are stacked now).
  */
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Lock, Star } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -29,6 +30,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { RANK_SCOPE_LABEL, type RankListSlug } from '@/features/explore-magazine/useTop100RankIndex';
 import { useTop100ListProgress, type Top100CourseProgress } from '@/hooks/gam/useTop100ListProgress';
 import { useCanViewTop100 } from '@/hooks/gam/useCanViewTop100';
+import { useTop100DistinctCounts } from '@/hooks/gam/useTop100DistinctCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import { formatOrdinal } from '@/i18n/format';
@@ -112,12 +114,12 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
     const io = new IntersectionObserver((entries) => {
       if (!segmentSent.current && entries.some((e) => e.isIntersecting)) {
         segmentSent.current = true;
-        analyticsEvents.track('top100_progress_segment', { list_slug: listSlug, segment: 'still_to_play' });
+        analyticsEvents.track('top100_progress_segment', { list_slug: slug, segment: 'still_to_play' });
       }
     });
     io.observe(el);
     return () => io.disconnect();
-  }, [open, listSlug, progress.isSuccess, access.isSuccess]);
+  }, [open, slug, progress.isSuccess, access.isSuccess]);
 
   const firstName = ownerName.trim().split(/\s+/)[0] || ownerName;
   const settled = access.isSuccess && (access.data === false || progress.isSuccess);
@@ -146,7 +148,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
       ) : null}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ ...ELLIPSIS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>{ownerName}</div>
-        <div style={{ ...CAPS, color: A.DIM }}>{`Top 100 ${RANK_SCOPE_LABEL[listSlug]}`}</div>
+        <div style={{ ...CAPS, color: A.DIM }}>{`Top 100 ${RANK_SCOPE_LABEL[slug]}`}</div>
       </div>
       {isOwn ? (
         <button type="button" onClick={onClose} style={{ ...CAPS, color: A.INK, background: 'transparent', flex: 'none' }}>
@@ -183,6 +185,39 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
     </div>
   );
 
+  const STRIP_ORDER: RankListSlug[] = ['gb-i', 'global', 'europe', 'usa'];
+  const strip = (
+    <div style={{ flexShrink: 0, display: 'flex', gap: 6, padding: '12px 16px', borderBottom: `1px solid ${A.BORDER}` }}>
+      {STRIP_ORDER.map((s) => {
+        const selected = s === slug;
+        const n = counts.isSuccess ? countBySlug.get(s) ?? 0 : null;
+        return (
+          <button
+            key={s}
+            type="button"
+            aria-pressed={selected}
+            onClick={() => switchTo(s)}
+            style={{
+              flex: 1,
+              minWidth: 0,
+              padding: '9px 8px',
+              borderRadius: 10,
+              background: selected ? 'rgba(247,147,30,0.12)' : 'rgba(255,255,255,0.04)',
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ ...ELLIPSIS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: selected ? A.AMBER : A.DIM }}>
+              {RANK_SCOPE_LABEL[s]}
+            </div>
+            <div style={{ ...TNUM, fontSize: 17, fontWeight: 700, color: A.INK, marginTop: 3, lineHeight: 1, height: 17 }}>
+              {n != null ? n : null}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+
   const heroLine = (() => {
     if (isOwn) {
       const first = toPlay[0];
@@ -193,7 +228,8 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
         </>
       );
     }
-    if (!standing) return null;
+    // The standing is true of the entry list only.
+    if (!standing || slug !== listSlug) return null;
     return (
       <>
         {B(formatOrdinal(standing.place))} of {B(standing.fieldSize)} members on this list.
@@ -223,8 +259,8 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
 
   const courseRow = (r: Top100CourseProgress, isPlayed: boolean) => {
     const meta: string[] = [];
-    if (r.rank != null) meta.push(`${RANK_SCOPE_LABEL[listSlug]} #${r.rank}`);
-    if (listSlug !== 'global' && r.global_rank != null) meta.push(`#${r.global_rank} worldwide`);
+    if (r.rank != null) meta.push(`${RANK_SCOPE_LABEL[slug]} #${r.rank}`);
+    if (slug !== 'global' && r.global_rank != null) meta.push(`#${r.global_rank} worldwide`);
     const onPress = () => {
       onClose();
       if (r.owner_rating_id) navigate(`/courses/${r.course_id}?tab=reviews&review=${r.owner_rating_id}`);
@@ -312,6 +348,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
       style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
     >
       {head}
+      {settled && !gated ? strip : null}
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 32 }}>
         {!settled ? null : gated ? (
           <div style={{ padding: '40px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
