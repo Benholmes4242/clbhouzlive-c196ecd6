@@ -11,6 +11,7 @@ export interface Top100CourseProgress {
   is_viewer_played: boolean;
   global_rank: number | null;
   owner_rating: number | null;
+  owner_rating_id: string | null;
 }
 
 /**
