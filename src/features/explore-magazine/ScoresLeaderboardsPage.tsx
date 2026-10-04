@@ -1,8 +1,7 @@
-import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronRight, ArrowUp, ArrowDown, Medal } from 'lucide-react';
+import { ChevronDown, ChevronRight, Medal } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -28,7 +27,6 @@ import { entryFiltersFor, type AmateurBoardState } from '@/features/amateur/useA
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
-import { useViewerStanding } from './useViewerStanding';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
 
@@ -36,8 +34,9 @@ import { fmtHcp } from '@/lib/whs/format';
  * THE LEADERBOARDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A).
  *
  * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the lead board
- * (§3 Lowest gross) and nothing below it: §4 Most improved, career, course
- * records and Top 100 are platform facts. Each section owns its read, holds its
+ * (§3 Lowest gross) and nothing below it. Sections, in order: head, §3 Lowest
+ * gross, §4 Most improved, §5 Feats this year, §6 Career, §7 Course records,
+ * §8 Top 100 GB&I — §4 onward are platform facts. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
  */
 
@@ -411,8 +410,6 @@ export function ScoresLeaderboardsPage({
   const improvedRows = improved.data ?? [];
   const [improvedSheet, setImprovedSheet] = useState(false);
 
-  const standing = useViewerStanding(userId);
-
   const ace = useBoardPage(userId, 'ace', YEAR_FILTERS, { limit: 200 });
   const albatross = useBoardPage(userId, 'albatross', YEAR_FILTERS, { limit: 200 });
   const eagle = useBoardPage(userId, 'eagle', YEAR_FILTERS, { limit: 200 });
@@ -427,7 +424,6 @@ export function ScoresLeaderboardsPage({
 
   const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
   const [careerSheet, setCareerSheet] = useState<'crowns' | 'top100' | null>(null);
-  const [coursesSheet, setCoursesSheet] = useState(false);
 
   const windowLabel = (w: WindowKey) =>
     w === '14'
@@ -501,7 +497,7 @@ export function ScoresLeaderboardsPage({
 
   const boardTitle = t(BOARD_LABELS[state.board].i18n, BOARD_LABELS[state.board].label);
 
-  /* ------------------------------------------------------------ §6 feats */
+  /* ------------------------------------------------------------ §5 feats */
   const feats = (
     [
       { key: 'ace' as FeatBoardKey, q: ace, tone: MEDAL_GOLD },
@@ -533,7 +529,7 @@ export function ScoresLeaderboardsPage({
     }
   };
 
-  /* ------------------------------------------------------------ §7 career */
+  /* ------------------------------------------------------------ §6 career */
   const career = [
     { metric: 'birdies', label: t('amateur.leaderboards.career.birdies', 'Birdies'), q: birdiesC },
     { metric: 'rounds', label: t('amateur.leaderboards.career.rounds', 'Rounds'), q: roundsC },
@@ -544,7 +540,7 @@ export function ScoresLeaderboardsPage({
   const careerShown = career.filter((c) => c.q.isSuccess && (c.q.data?.length ?? 0) > 0);
   const careerMembers = careerShown.reduce((m, c) => Math.max(m, Number(c.q.data![0].total_members) || 0), 0);
 
-  /* ------------------------------------------------- §8/§9 short boards */
+  /* ------------------------------------------------- §7/§8 short boards */
   const shortBoard = (
     rows: CareerRow[],
     secondary: (r: CareerRow) => string | null,
@@ -582,25 +578,6 @@ export function ScoresLeaderboardsPage({
   /* get_career_leaderboard returns no most-recent course; the home club is the
      only place line it carries. */
   const top100Secondary = (_r: CareerRow): string | null => null;
-
-  /** Rank, field and movement — one form for the rail card and the sheet row. */
-  const standingFigures = (r: (typeof standing.rows)[number]) => {
-    const d = r.delta;
-    const up = d != null && d > 0;
-    const down = d != null && d < 0;
-    return (
-      <>
-        <span style={{ display: 'flex', alignItems: 'baseline', gap: 4 }} className="tabular-nums">
-          <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>{r.rank_now}</span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: A.DIM }}>{t('amateur.leaderboards.ofN', 'of {{n}}', { n: r.field_now })}</span>
-        </span>
-        <span className="tabular-nums" style={{ display: 'inline-flex', alignItems: 'center', gap: 2, marginTop: 4, fontSize: 10.5, fontWeight: 700, color: up ? INDEX_DELTA.dark.improved : down ? INDEX_DELTA.dark.drifted : A.DIM }}>
-          {up ? <ArrowUp size={11} /> : down ? <ArrowDown size={11} /> : null}
-          {up || down ? Math.abs(d!) : t('amateur.leaderboards.held', 'Held')}
-        </span>
-      </>
-    );
-  };
 
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
@@ -782,34 +759,7 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §5 YOUR COURSES — per-course rank, never labelled with a board name. */}
-      {!standing.isFetched ? (
-        userId ? pending(150) : null
-      ) : !standing.unresolved && standing.rows.length > 0 ? (
-        <Section
-          contest={false}
-          eyebrow={t('amateur.leaderboards.whereYouStand', 'Where you stand')}
-          title={t('amateur.leaderboards.yourCourses', 'Your courses')}
-          meta={t('amateur.leaderboards.sinceLastVisit', 'Since your last visit')}
-        >
-          <Rail>
-            {standing.rows.map((r) => (
-              <button key={r.course_id} type="button" onClick={() => onOpenCourse(r.course_id)} style={{ ...RAIL_CARD, width: 152 }}>
-                <span style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', height: 31, fontSize: 12, fontWeight: 600, lineHeight: 1.3, color: A.MUTE }}>
-                  {r.course_name ?? t('discover.unknownCourse', 'A course')}
-                </span>
-                <span style={{ display: 'block', marginTop: 8 }}>{standingFigures(r)}</span>
-              </button>
-            ))}
-          </Rail>
-          <SeeAll
-            label={t('amateur.leaderboards.allCourses', { count: standing.rows.length, defaultValue_one: 'All {{count}} course', defaultValue_other: 'All {{count}} courses' })}
-            onPress={() => setCoursesSheet(true)}
-          />
-        </Section>
-      ) : null}
-
-      {/* §6 FEATS THIS YEAR — event counts; footnote is distinct members. */}
+      {/* §5 FEATS THIS YEAR — event counts; footnote is distinct members. */}
       {!featsSettled ? (
         pending(150)
       ) : featsShown.length > 0 ? (
@@ -838,7 +788,7 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §7 CAREER — the leader of each metric, never the viewer. */}
+      {/* §6 CAREER — the leader of each metric, never the viewer. */}
       {!careerSettled ? (
         pending(150)
       ) : careerShown.length > 0 ? (
@@ -878,7 +828,7 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §8 COURSE RECORDS — live from get_career_leaderboard('crowns'). */}
+      {/* §7 COURSE RECORDS — live from get_career_leaderboard('crowns'). */}
       {crowns.isPending ? (
         pending(170)
       ) : crowns.isSuccess && crownsRows.length > 0 ? (
@@ -895,7 +845,7 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §9 TOP 100 GB&I — get_career_leaderboard('top_100_gbni_distinct'). */}
+      {/* §8 TOP 100 GB&I — get_career_leaderboard('top_100_gbni_distinct'). */}
       {top100.isPending ? (
         pending(170)
       ) : top100.isSuccess && top100Rows.length > 0 ? (
@@ -924,35 +874,6 @@ export function ScoresLeaderboardsPage({
           onRowPress={onRowPress}
         />
       ) : null}
-
-      <BottomSheet
-        open={coursesSheet}
-        onClose={() => setCoursesSheet(false)}
-        maxHeight="85dvh"
-        ariaLabelledBy="courses-see-all-title"
-        style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
-      >
-        <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>
-          <h2 id="courses-see-all-title" style={{ ...KICKER, margin: 0, color: A.INK }}>
-            {t('amateur.leaderboards.yourCourses', 'Your courses')}
-          </h2>
-        </div>
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
-          {standing.rows.map((r, i, arr) => (
-            <button
-              key={r.course_id}
-              type="button"
-              onClick={() => { setCoursesSheet(false); onOpenCourse(r.course_id); }}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 0', border: 'none', borderBottom: i < arr.length - 1 ? `1px solid ${A.SOFT}` : 'none', background: 'transparent', textAlign: 'left', fontFamily: SANS, cursor: 'pointer' }}
-            >
-              <span style={{ minWidth: 0, fontSize: 12, fontWeight: 600, lineHeight: 1.3, color: A.MUTE }}>
-                {r.course_name ?? t('discover.unknownCourse', 'A course')}
-              </span>
-              <span style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>{standingFigures(r)}</span>
-            </button>
-          ))}
-        </div>
-      </BottomSheet>
 
       <BottomSheet
         open={improvedSheet}
