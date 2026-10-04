@@ -34,8 +34,8 @@ import { fmtHcp } from '@/lib/whs/format';
 /**
  * THE LEADERBOARDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A).
  *
- * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the two lead boards
- * (§3 Lowest gross) and nothing below it — §4 Most improved is all members: career, course
+ * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the lead board
+ * (§3 Lowest gross) and nothing below it: §4 Most improved, career, course
  * records and Top 100 are platform facts. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
  */
