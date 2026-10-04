@@ -2044,7 +2044,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             userId={userId}
             state={boardState}
             onRowPress={boardRowPress}
-            onOpenProfile={(id) => opener.openProfile(id)}
+            onMemberTap={(id) => opener.openProfile(id)}
             onOpenCourse={(id) => { depart(); navigate(`/courses/${id}`); }}
             onOpenBoard={() => {
               analyticsEvents.track('amateur_board_picker_opened', {
