@@ -64,9 +64,14 @@ interface CareerRow {
 
 type CareerMetric = 'crowns' | 'top_100_gbni_distinct' | 'birdies' | 'rounds' | 'sub_80' | 'eagles';
 
-function useCareerBoard(viewerId: string | undefined, metric: CareerMetric, limit: number) {
+function useCareerBoard(
+  viewerId: string | undefined,
+  metric: CareerMetric,
+  limit: number,
+  rpc: 'get_career_leaderboard' | 'get_year_leaderboard' = 'get_career_leaderboard',
+) {
   return useQuery<CareerRow[]>({
-    queryKey: ['leaderboards', 'career', viewerId ?? 'anon', metric, limit],
+    queryKey: ['leaderboards', rpc, viewerId ?? 'anon', metric, limit],
     staleTime: 5 * 60_000,
     retry: false,
     queryFn: async () => {
@@ -74,7 +79,7 @@ function useCareerBoard(viewerId: string | undefined, metric: CareerMetric, limi
       const { data, error } = await (supabase.rpc as unknown as (
         f: string,
         a: Record<string, unknown>,
-      ) => Promise<{ data: CareerRow[] | null; error: unknown }>).call(supabase, 'get_career_leaderboard', {
+      ) => Promise<{ data: CareerRow[] | null; error: unknown }>).call(supabase, rpc, {
         p_viewer: viewerId ?? null,
         p_metric: metric,
         p_limit: limit,
@@ -415,10 +420,10 @@ export function ScoresLeaderboardsPage({
   const eagle = useBoardPage(userId, 'eagle', YEAR_FILTERS, { limit: 200 });
   const clean = useBoardPage(userId, 'clean_card', YEAR_FILTERS, { limit: 200 });
 
-  const birdiesC = useCareerBoard(userId, 'birdies', 1);
-  const roundsC = useCareerBoard(userId, 'rounds', 1);
-  const sub80C = useCareerBoard(userId, 'sub_80', 1);
-  const eaglesC = useCareerBoard(userId, 'eagles', 1);
+  const birdiesC = useCareerBoard(userId, 'birdies', 2, 'get_year_leaderboard');
+  const roundsC = useCareerBoard(userId, 'rounds', 2, 'get_year_leaderboard');
+  const sub80C = useCareerBoard(userId, 'sub_80', 2, 'get_year_leaderboard');
+  const eaglesC = useCareerBoard(userId, 'eagles', 2, 'get_year_leaderboard');
   const crowns = useCareerBoard(userId, 'crowns', 25);
   const top100 = useCareerBoard(userId, 'top_100_gbni_distinct', 25);
 
@@ -788,39 +793,59 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §6 CAREER — the leader of each metric, never the viewer. */}
+      {/* §6 WHO LEADS WHAT — this calendar year's leader of each metric, read
+          from get_year_leaderboard (fetch 2: the footnote needs second place).
+          JANUARY IS THIN BY DESIGN: on 1 January every value is zero, the RPC
+          filters value > 0, and this section renders nothing. That is a fresh
+          race, not a bug — never add a "last year's final" fallback or carry
+          figures over. */}
       {!careerSettled ? (
         pending(150)
       ) : careerShown.length > 0 ? (
         <Section
           contest
-          eyebrow={t('amateur.leaderboards.career', 'Career')}
+          eyebrow={String(new Date().getFullYear())}
           title={t('amateur.leaderboards.whoLeads', 'Who leads what')}
           meta={careerMembers > 0 ? membersText(careerMembers) : null}
         >
           <Rail>
             {careerShown.map((c) => {
               const r = c.q.data![0];
+              const second = c.q.data![1];
+              /* Decided from the VALUES, not is_tie (which marks a tie anywhere). */
+              const margin = second ? Number(r.value) - Number(second.value) : null;
               return (
                 <button key={c.metric} type="button" onClick={() => onOpenProfile(r.user_id)} style={{ ...RAIL_CARD, width: 150 }}>
                   <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.AMBER }}>
                     {c.label}
                   </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, minWidth: 0 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, minWidth: 0 }}>
                     <Avatar id={r.user_id} name={nameOf(r.display_name)} src={r.photo_url} size={24} />
-                    <span style={{ minWidth: 0, fontSize: 12.5, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {nameOf(r.display_name)}
+                    <span style={{ display: 'block', minWidth: 0 }}>
+                      <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {nameOf(r.display_name)}
+                      </span>
+                      {/* CLUB LINE TRUNCATES BY DESIGN. Measured at 390pt the club
+                          gets 92px here; every real club name exceeds it ("Walton
+                          Heath Golf Club" is 105px). The first two words identify
+                          the club. Do not move this line or shrink the avatar. */}
+                      {r.home_club ? (
+                        <span style={{ display: 'block', marginTop: 2, fontSize: 10, fontWeight: 500, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {r.home_club}
+                        </span>
+                      ) : null}
                     </span>
                   </span>
                   <span className="tabular-nums" style={{ display: 'block', marginTop: 8, fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
                     {r.value}
                   </span>
-                  <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, color: A.DIM }}>{(() => {
-                    const avg = Math.round(Number(r.field_avg) || 0);
-                    return !('noAvg' in c) && avg > 0
-                      ? t('amateur.leaderboards.average', 'Average {{n}}', { n: avg })
-                      : membersText(Number(r.total_members));
-                  })()}</span>
+                  {margin != null ? (
+                    <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, color: A.DIM }}>
+                      {margin === 0
+                        ? t('amateur.leaderboards.tiedTop', 'Tied at the top')
+                        : t('amateur.leaderboards.clearOf2nd', '{{n}} clear of 2nd', { n: margin })}
+                    </span>
+                  ) : null}
                 </button>
               );
             })}
