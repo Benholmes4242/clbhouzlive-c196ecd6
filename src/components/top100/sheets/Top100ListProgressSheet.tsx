@@ -69,12 +69,30 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
   const { resolve } = useMemberTapResolver();
   const navigate = useNavigate();
 
+  /* THE ONE SLUG. Seeded from the prop; re-seeded on open or prop change. */
+  const [slug, setSlug] = useState<RankListSlug>(listSlug);
+  useEffect(() => {
+    if (open) setSlug(listSlug);
+  }, [open, listSlug]);
+
   const access = useCanViewTop100(open ? ownerUserId : undefined, viewerUserId);
-  const progress = useTop100ListProgress(open ? listSlug : undefined, ownerUserId, viewerUserId);
+  const progress = useTop100ListProgress(open ? slug : undefined, ownerUserId, viewerUserId);
+  const counts = useTop100DistinctCounts(open ? ownerUserId : undefined);
+  const countBySlug = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const c of counts.data ?? []) m.set(c.slug, c.course_count);
+    return m;
+  }, [counts.data]);
 
   useEffect(() => {
     if (open) analyticsEvents.track('top100_progress_opened', { list_slug: listSlug });
   }, [open, listSlug]);
+
+  const switchTo = (to: RankListSlug) => {
+    if (to === slug) return;
+    analyticsEvents.track('top100_progress_list_switched', { from_slug: slug, to_slug: to });
+    setSlug(to);
+  };
 
   const rows = useMemo(
     () => [...(progress.data ?? [])].sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999)),
