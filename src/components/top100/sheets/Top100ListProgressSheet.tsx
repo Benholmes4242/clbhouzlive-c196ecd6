@@ -32,7 +32,6 @@ import { useTop100ListProgress, type Top100CourseProgress } from '@/hooks/gam/us
 import { useCanViewTop100 } from '@/hooks/gam/useCanViewTop100';
 import { useTop100DistinctCounts } from '@/hooks/gam/useTop100DistinctCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -68,7 +67,6 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
   const { user } = useSupabaseSession();
   const viewerUserId = user?.id;
   const isOwn = !!viewerUserId && viewerUserId === ownerUserId;
-  const { resolve } = useMemberTapResolver();
   const navigate = useNavigate();
 
   /* THE ONE SLUG. Seeded from the prop; re-seeded on open or prop change. */
@@ -159,7 +157,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
           type="button"
           onClick={() => {
             onClose();
-            void resolve({ targetUserId: ownerUserId });
+            navigate(`/profile/${ownerUserId}`);
           }}
           style={{
             flex: 'none',
