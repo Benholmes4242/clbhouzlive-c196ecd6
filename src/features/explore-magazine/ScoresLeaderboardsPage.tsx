@@ -486,34 +486,16 @@ export function ScoresLeaderboardsPage({
   const leadMine = userId ? leadRows.find((r) => r.user_id === userId) ?? null : null;
   const leadPinned = !!leadMine && !leadVisible.some((r) => r.user_id === leadMine.user_id);
 
-  /** The leader card's big figure and the line beneath it. */
+  /** THE ONE SOURCE for §3's figures — leader card and compact rows alike.
+      Text AND tone come from boardValue()/boardSecondary() (the under-par
+      colour law lives there); this page applies no colour of its own. topar
+      and gross both read the 'gross' cells: strokes big, to-par small. */
   const leaderFigures = (r: BoardRow) => {
-    const board = state.board;
-    if (board === 'topar' || board === 'gross') {
-      const p = r.gross_score != null && r.course_par != null ? r.gross_score - r.course_par : null;
-      return { big: r.gross_score != null ? String(r.gross_score) : '\u2014', small: fmtToPar(p), tone: A.RED };
-    }
-    const v = boardValue(r, board, t as never);
-    const s = boardSecondary(r, board);
-    return { big: v.text, small: s?.text ?? null, tone: A.RED };
+    const b: BoardKey = state.board === 'topar' || state.board === 'gross' ? 'gross' : state.board;
+    const big = boardValue(r, b, t as never);
+    const small = boardSecondary(r, b);
+    return { big: big.text, bigTone: big.tone, small: small?.text ?? null, smallTone: small?.tone };
   };
-  const leadCaption = (r: BoardRow) => {
-    if (state.board === 'topar' || state.board === 'gross') {
-      return fmtToPar(r.gross_score != null && r.course_par != null ? r.gross_score - r.course_par : null);
-    }
-    return boardSecondary(r, state.board)?.text ?? null;
-  };
-  /* UNDER PAR IS RED: decided from the numeric to-par, never the formatted
-     string. Same token the leader card reads (A.RED); level/over stay dim. */
-  const leadCaptionTone = (r: BoardRow) => {
-    if (state.board !== 'topar' && state.board !== 'gross') return undefined;
-    const p = r.gross_score != null && r.course_par != null ? r.gross_score - r.course_par : null;
-    return p != null && p < 0 ? A.RED : undefined;
-  };
-  const leadValue = (r: BoardRow) =>
-    state.board === 'topar' || state.board === 'gross'
-      ? r.gross_score != null ? String(r.gross_score) : '\u2014'
-      : boardValue(r, state.board, t as never).text;
 
   const boardTitle = t(BOARD_LABELS[state.board].i18n, BOARD_LABELS[state.board].label);
 
@@ -610,7 +592,7 @@ export function ScoresLeaderboardsPage({
           <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>{r.rank_now}</span>
           <span style={{ fontSize: 11, fontWeight: 700, color: A.DIM }}>{t('amateur.leaderboards.ofN', 'of {{n}}', { n: r.field_now })}</span>
         </span>
-        <span className="tabular-nums" style={{ display: 'inline-flex', alignItems: 'center', gap: 2, marginTop: 4, fontSize: 10.5, fontWeight: 700, color: up ? A.GREEN : down ? A.RED : A.DIM }}>
+        <span className="tabular-nums" style={{ display: 'inline-flex', alignItems: 'center', gap: 2, marginTop: 4, fontSize: 10.5, fontWeight: 700, color: up ? A.GREEN : A.DIM }}>
           {up ? <ArrowUp size={11} /> : down ? <ArrowDown size={11} /> : null}
           {up || down ? Math.abs(d!) : t('amateur.leaderboards.held', 'Held')}
         </span>
@@ -731,12 +713,12 @@ export function ScoresLeaderboardsPage({
                 <span style={{ flexShrink: 0, textAlign: 'right' }}>
                   <span
                     className="tabular-nums"
-                    style={{ display: 'block', fontSize: 30, fontWeight: 700, letterSpacing: '-0.03em', color: self ? A.AMBER : A.INK, lineHeight: 1 }}
+                    style={{ display: 'block', fontSize: 30, fontWeight: 700, letterSpacing: '-0.03em', color: self ? A.AMBER : f.bigTone, lineHeight: 1 }}
                   >
                     {f.big}
                   </span>
                   {f.small ? (
-                    <span className="tabular-nums" style={{ display: 'block', marginTop: 4, fontSize: 12, fontWeight: 700, color: f.tone }}>
+                    <span className="tabular-nums" style={{ display: 'block', marginTop: 4, fontSize: 12, fontWeight: 700, color: self ? A.AMBER : f.smallTone }}>
                       {f.small}
                     </span>
                   ) : null}
@@ -757,9 +739,10 @@ export function ScoresLeaderboardsPage({
                   name={nameOf(r.display_name)}
                   photo={r.profile_photo_url}
                   secondary={roundLine(r)}
-                  value={leadValue(r)}
-                  caption={leadCaption(r)}
-                  captionTone={leadCaptionTone(r)}
+                  value={leaderFigures(r).big}
+                  valueTone={leaderFigures(r).bigTone}
+                  caption={leaderFigures(r).small}
+                  captionTone={leaderFigures(r).smallTone}
                   self={r.user_id === userId}
                   divider={i < list.length - 1}
                   onPress={() => onRowPress(r)}
