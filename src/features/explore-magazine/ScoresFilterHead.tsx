@@ -140,7 +140,6 @@ export function ScopeSegments({
       role="radiogroup"
       aria-label={t('amateur.stream.scopes', 'Scores scope')}
       style={{
-        marginTop: 12,
         display: 'grid',
         gridTemplateColumns: `repeat(${options.length}, minmax(0,1fr))`,
         gap: 3,
@@ -148,6 +147,7 @@ export function ScopeSegments({
         borderRadius: 999,
         background: 'rgba(255,255,255,0.05)',
         border: '1px solid rgba(255,255,255,0.10)',
+        ...style,
       }}
     >
       {options.map((o) => {
