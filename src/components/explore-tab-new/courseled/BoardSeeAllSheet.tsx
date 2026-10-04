@@ -75,21 +75,40 @@ export function BoardSeeAllSheet({
   const rows = useMemo(() => (query.data?.pages ?? []).flat(), [query.data]);
   const total = rows.length > 0 ? Number(rows[0].total_count) : 0;
 
-  /* S4.5 — DAY GROUPING BELONGS TO THE FIVE EVENT BOARDS ONLY, where the ranked
-     value IS the date. The six ranking boards keep their figure column and no
-     headers: grouping a gross board by day would hide the thing it ranks on. */
-  const grouped = boardColumns(board).valueIsText;
+  /* GROUPING IS ON FOR EVERY ROUND BOARD — a deliberate reversal of S4.5, chosen
+     with the consequence seen rendered. Any sheet whose rows carry a play_date
+     groups: all six ranking boards and all five event boards. Rows with no
+     play_date (career / per-course lists) stay flat. The ranked POS column and
+     the figure columns are retained so the member still sees where a round sits
+     on the whole board; the cost is that the first group does not open on
+     position 1. Within a group rows keep the board's own order and POS is never
+     renumbered.
+     SHEET GROUPED, PAGE DATED: the group header states when, so the row's second
+     line here is the course alone. The page's flat board leads its second line
+     with the date instead — do not "fix" either to match the other. */
+  const grouped = rows.length > 0 && rows.some((r) => !!r.play_date);
+  /* Event boards rank on the date itself, so their value column stays hidden. */
+  const hideValue = boardColumns(board).valueIsText;
   const groups = useMemo(() => {
     if (!grouped) return null;
     const out: { key: string; label: string; rows: BoardRow[] }[] = [];
     for (const r of rows) {
-      const key = String(r.play_date ?? '').slice(0, 10);
+      const { key, label } = groupFor(filters.window, r.play_date, t as never);
       const last = out[out.length - 1];
       if (last && last.key === key) last.rows.push(r);
-      else out.push({ key, label: relativeDayFull(r.play_date, t as never), rows: [r] });
+      else out.push({ key, label, rows: [r] });
     }
-    return out;
-  }, [grouped, rows, t]);
+    /* Newest first; stable sort keeps board order inside each group. */
+    const order = new Map<string, number>();
+    out.forEach((g, i) => order.set(g.key, i));
+    const merged = new Map<string, { key: string; label: string; rows: BoardRow[] }>();
+    for (const g of out) {
+      const m = merged.get(g.key);
+      if (m) m.rows.push(...g.rows);
+      else merged.set(g.key, { ...g, rows: [...g.rows] });
+    }
+    return [...merged.values()].sort((a, b) => (a.key < b.key ? 1 : a.key > b.key ? -1 : 0));
+  }, [grouped, rows, filters.window, t]);
 
 
   return (
@@ -138,7 +157,7 @@ export function BoardSeeAllSheet({
         </div>
       </div>
       <div style={{ flexShrink: 0, padding: '8px 16px 0', fontFamily: SANS, ...FIGS }}>
-        <BoardHeaderRow board={board} hideValue={grouped} />
+        <BoardHeaderRow board={board} hideValue={hideValue} />
       </div>
       <div
         style={{
@@ -156,9 +175,8 @@ export function BoardSeeAllSheet({
         {groups
           ? groups.map((g, gi) => (
               <div key={`${g.key}:${gi}`}>
-                {/* S4.2/S4.6/S4.7 — one header per day, no count, not sticky.
-                    POS keeps counting through the groups (S4.4): the rows carry
-                    the RPC's own positions and nothing restarts here. */}
+                {/* Period and round count, not sticky. POS keeps counting
+                    through the groups: rows carry the RPC's own positions. */}
                 <div
                   style={{
                     ...KICKER,
@@ -167,7 +185,8 @@ export function BoardSeeAllSheet({
                     padding: gi === 0 ? '10px 2px 6px' : '18px 2px 6px',
                   }}
                 >
-                  {g.label}
+                  {g.label} {'\u00B7'}{' '}
+                  {t('discover.filterBoard.nRounds', '{{count}} rounds', { count: g.rows.length })}
                 </div>
                 {g.rows.map((r) => (
                   <BoardRowView
@@ -175,7 +194,7 @@ export function BoardSeeAllSheet({
                     row={r}
                     board={board}
                     isSelf={!!userId && r.user_id === userId}
-                    hideValue
+                    hideValue={hideValue}
                     onPress={onRowPress}
                   />
                 ))}
