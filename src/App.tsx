@@ -453,6 +453,7 @@ import { GenderPromptSheet } from '@/components/profile/GenderPromptSheet';
 import { useSilentSwitchHint } from '@/audio/useSilentSwitchHint';
 // TEMPORARY — BRIEF_ROUND_PUSH_DEVICE_READOUT
 import { RoundPushDiag } from '@/diag/roundPushDiag';
+import { PushTapMarkRead } from '@/features/activity-v2/PushTapMarkRead';
 
 
 
@@ -1073,6 +1074,7 @@ const AppInner: React.FC = () => {
       <BrowserRouter>
         <MaintenanceGate>
         <NavTimingProvider>
+        <PushTapMarkRead />
         <AdminGatedPerfHud />
         <AdminGatedLogHud />
         <AdminGatedPerfPill />
