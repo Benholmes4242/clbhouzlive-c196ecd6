@@ -957,6 +957,73 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     </div>
   );
 
+  const tagAndDetails = (
+    <>
+      {/* Tag a course — suggestion-first, Search is the fallback */}
+      <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
+        <div style={{ padding: '14px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.tagCourse')}</span>
+            <button
+              onClick={() => { openDetail('course'); setSheet('course'); }}
+              style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: PAGE2.ink, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+            >
+              {t('stage.search')}
+              <ChevronRight size={12} strokeWidth={2.5} />
+            </button>
+          </div>
+
+          {/* Tagging is SEARCH-ONLY (MICRO_BRIEF_POST_WIZARD_FIELDS §4): the
+              recent-rounds suggestion chips are gone. Only a course the
+              member actually chose renders here, and it stays removable. */}
+          {state.courses.length > 0 && (
+            <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
+              {state.courses.map((c) => (
+                <button
+                  key={`tagged-${c.id}`}
+                  onClick={() => setCourses(state.courses.filter((x) => x.id !== c.id))}
+                  aria-label={t('stage.untag', { name: c.name })}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${PAGE2.ink}`, background: PAGE2.ink, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: PAGE2.canvas }}
+                >
+                  {c.name}
+                  <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.85 }}>×</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Detail rows — Drafts appears only when drafts exist */}
+      <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '12px 16px 0', overflow: 'hidden' }}>
+        <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={page2RowStyle(false)}>
+          <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.postingAs')}</span>
+          <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 13, color: PAGE2.mute, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
+            <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={DARK_HAIRLINE} />
+          </span>
+          <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
+        </button>
+        {showScheduleRow && (
+          <button onClick={() => { openDetail('schedule'); setSheet('schedule'); }} style={page2RowStyle(true)}>
+            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.scheduleForLater')}</span>
+            <span style={{ marginLeft: 'auto', fontSize: 13, color: state.scheduledAt ? PAGE2.ink : PAGE2.mute }}>
+              {state.scheduledAt ? state.scheduledAt.toLocaleString() : t('stage.off')}
+            </span>
+            <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
+          </button>
+        )}
+        {!isEditMode && drafts.drafts.length > 0 && (
+          <button onClick={() => setSheet('drafts')} style={page2RowStyle(true)}>
+            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.drafts')}</span>
+            <span style={{ marginLeft: 'auto', fontSize: 13, color: PAGE2.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>
+            <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
+          </button>
+        )}
+      </div>
+    </>
+  );
+
   // ---- STEP 2 — ONE SCREEN --------------------------------------------------
   return (
     <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
@@ -968,48 +1035,68 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2px 0 16px', display: 'flex', flexDirection: 'column' }}>
-        {/* THE MEDIA RAIL. Nothing here auto-fires a picker: no effect opens a
-            file input on mount. That behaviour was deleted in August and must
-            not come back. */}
-        {emptyStage ? (
-          /* Both inputs live HERE, each one anchored EXACTLY OVER ITS OWN
-             BUTTON so the iOS chooser menu opens from the control that was
-             tapped rather than over the footer. Do not consolidate them. */
-          <div style={{ padding: '4px 16px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ position: 'relative' }}>
-              <button onClick={() => emptyLibraryInputRef.current?.click()} style={emptyPrimaryButtonStyle}>
-                {t('stage.chooseFromLibrary')}
-              </button>
-              <input
-                ref={emptyLibraryInputRef}
-                type="file"
-                accept="image/*,video/*"
-                multiple
-                onChange={handleStageAddFiles}
-                tabIndex={-1}
-                aria-hidden="true"
-                style={anchoredInputStyle}
-              />
+      {emptyStage ? (
+        /* EMPTY STATE keeps its original single-scroller layout. */
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2px 0 16px', display: 'flex', flexDirection: 'column' }}>
+          {/* THE MEDIA RAIL. Nothing here auto-fires a picker: no effect opens a
+              file input on mount. That behaviour was deleted in August and must
+              not come back. */}
+            /* Both inputs live HERE, each one anchored EXACTLY OVER ITS OWN
+               BUTTON so the iOS chooser menu opens from the control that was
+               tapped rather than over the footer. Do not consolidate them. */
+            <div style={{ padding: '4px 16px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ position: 'relative' }}>
+                <button onClick={() => emptyLibraryInputRef.current?.click()} style={emptyPrimaryButtonStyle}>
+                  {t('stage.chooseFromLibrary')}
+                </button>
+                <input
+                  ref={emptyLibraryInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  onChange={handleStageAddFiles}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  style={anchoredInputStyle}
+                />
+              </div>
+              <div style={{ position: 'relative' }}>
+                <button onClick={() => emptyCameraInputRef.current?.click()} style={emptySecondaryButtonStyle}>
+                  {t('stage.takePhotoOrVideo')}
+                </button>
+                <input
+                  ref={emptyCameraInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  capture="environment"
+                  onChange={handleStageAddFiles}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  style={anchoredInputStyle}
+                />
+              </div>
             </div>
-            <div style={{ position: 'relative' }}>
-              <button onClick={() => emptyCameraInputRef.current?.click()} style={emptySecondaryButtonStyle}>
-                {t('stage.takePhotoOrVideo')}
-              </button>
-              <input
-                ref={emptyCameraInputRef}
-                type="file"
-                accept="image/*,video/*"
-                capture="environment"
-                onChange={handleStageAddFiles}
-                tabIndex={-1}
-                aria-hidden="true"
-                style={anchoredInputStyle}
-              />
-            </div>
+          <div style={{ padding: '10px 16px 0' }}>
+            <CaptionField
+              value={state.caption}
+              onChange={handleSetCaption}
+              currentUserId={profile?.id ?? null}
+              variant="dark"
+              minHeight={96}
+              placeholder={t('stage.captionPlaceholder')}
+              autoFocus={!isEditMode}
+              inputRef={(el) => { captionElRef.current = el; }}
+            />
+            <div style={{ fontSize: 11, color: PAGE2.dim, marginTop: 2 }}>{t('stage.mentionHint')}</div>
           </div>
-        ) : (
-          <>
+          {tagAndDetails}
+        </div>
+      ) : (
+        <>
+          {/* BAND 1 — FIXED. THE MEDIA RAIL. Nothing here auto-fires a picker: no
+              effect opens a file input on mount. That behaviour was deleted in
+              August and must not come back. */}
+          <div style={{ flex: 'none', paddingTop: 2 }}>
             <div style={{ display: 'flex', gap: 6, padding: '2px 16px 0', overflowX: 'auto' }}>
               {state.media.map((m, i) => (
                 <button
@@ -1028,11 +1115,11 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
               >+</button>
             </div>
             <div style={{ padding: '6px 18px 0', fontSize: 11, color: PAGE2.dim }}>{t('stage.tapToEdit')}</div>
-          </>
-        )}
+          </div>
 
-        {/* Caption — bare on the canvas, cursor flashing on arrival */}
-        <div style={{ padding: '10px 16px 0' }}>
+          {/* BAND 2 — THE ONLY SCROLLER. The caption grows; this band scrolls and
+              absorbs all viewport loss (keyboard included). */}
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '10px 16px 0' }}>
           <CaptionField
             value={state.caption}
             onChange={handleSetCaption}
@@ -1043,72 +1130,15 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
             autoFocus={!isEditMode}
             inputRef={(el) => { captionElRef.current = el; }}
           />
-          <div style={{ fontSize: 11, color: PAGE2.dim, marginTop: 2 }}>{t('stage.mentionHint')}</div>
-        </div>
-
-        {/* Tag a course — suggestion-first, Search is the fallback */}
-        <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
-          <div style={{ padding: '14px 16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.tagCourse')}</span>
-              <button
-                onClick={() => { openDetail('course'); setSheet('course'); }}
-                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: PAGE2.ink, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
-              >
-                {t('stage.search')}
-                <ChevronRight size={12} strokeWidth={2.5} />
-              </button>
-            </div>
-
-            {/* Tagging is SEARCH-ONLY (MICRO_BRIEF_POST_WIZARD_FIELDS §4): the
-                recent-rounds suggestion chips are gone. Only a course the
-                member actually chose renders here, and it stays removable. */}
-            {state.courses.length > 0 && (
-              <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
-                {state.courses.map((c) => (
-                  <button
-                    key={`tagged-${c.id}`}
-                    onClick={() => setCourses(state.courses.filter((x) => x.id !== c.id))}
-                    aria-label={t('stage.untag', { name: c.name })}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${PAGE2.ink}`, background: PAGE2.ink, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: PAGE2.canvas }}
-                  >
-                    {c.name}
-                    <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.85 }}>×</span>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
-        </div>
 
-        {/* Detail rows — Drafts appears only when drafts exist */}
-        <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '12px 16px 0', overflow: 'hidden' }}>
-          <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={page2RowStyle(false)}>
-            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.postingAs')}</span>
-            <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 13, color: PAGE2.mute, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
-              <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={DARK_HAIRLINE} />
-            </span>
-            <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
-          </button>
-          {showScheduleRow && (
-            <button onClick={() => { openDetail('schedule'); setSheet('schedule'); }} style={page2RowStyle(true)}>
-              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.scheduleForLater')}</span>
-              <span style={{ marginLeft: 'auto', fontSize: 13, color: state.scheduledAt ? PAGE2.ink : PAGE2.mute }}>
-                {state.scheduledAt ? state.scheduledAt.toLocaleString() : t('stage.off')}
-              </span>
-              <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
-            </button>
-          )}
-          {!isEditMode && drafts.drafts.length > 0 && (
-            <button onClick={() => setSheet('drafts')} style={page2RowStyle(true)}>
-              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.drafts')}</span>
-              <span style={{ marginLeft: 'auto', fontSize: 13, color: PAGE2.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>
-              <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
-            </button>
-          )}
-        </div>
-      </div>
+          {/* BAND 3 — FIXED. Mention hint, Tag a course, detail rows. */}
+          <div style={{ flex: 'none', paddingBottom: 16 }}>
+            <div style={{ fontSize: 11, color: PAGE2.dim, padding: '2px 16px 0' }}>{t('stage.mentionHint')}</div>
+            {tagAndDetails}
+          </div>
+        </>
+      )}
 
 
       {/* Share */}
