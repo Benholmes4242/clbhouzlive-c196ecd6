@@ -1070,17 +1070,17 @@ export function ScoresLeaderboardsPage({
             />
           </div>
           {/* A chip tap starts a fresh slug query. While it loads, reserve the
-              strip (caption + 60px tile row) instead of holding the old list:
+              strip (caption + 76px tile row) instead of holding the old list:
               last list's photographs under the new list's caption is worse than
               a brief empty rail. Deliberately NOT placeholderData. */}
           {userId && listCourses.isPending ? (
             <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 12 }}>
+              <div style={{ marginTop: 16 }}>
                 <span style={{ ...TILE_HEAD, color: A.DIM }}>
                   {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
                 </span>
               </div>
-              <div aria-hidden style={{ height: 60 }} />
+              <div aria-hidden style={{ height: 76 }} />
             </div>
           ) : listCourses.isSuccess && listTiles.length > 0 ? (
             <div style={{ marginBottom: 12 }}>
