@@ -7,7 +7,7 @@
  *
  *   1. This is a SETTINGS page. It lives inside ManagePageShell next to every
  *      other /manage/* surface, so it reads as one of them.
- *   2. A LIST carries all ten BUSINESS_CATEGORIES. Four photographed examples
+ *   2. A LIST carries every BUSINESS_CATEGORIES entry. Four photographed examples
  *      left six categories out, which told a university or a retailer the
  *      platform was not for them.
  *   3. The examples needed assets that represent no real business, so every one
@@ -29,7 +29,7 @@
  */
 import { useTranslation } from 'react-i18next';
 import { usePlatformReach } from '@/hooks/usePlatformReach';
-import { BUSINESS_CATEGORIES } from '@/types/profile';
+import { BUSINESS_CATEGORIES } from '@/constants/businessCategories';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {

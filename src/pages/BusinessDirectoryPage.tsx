@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { Building2, MapPin, Search, ChevronLeft, Plus, Pencil } from 'lucide-react';
-import { BUSINESS_CATEGORIES } from '@/types/profile';
+import { BUSINESS_CATEGORIES } from '@/constants/businessCategories';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';

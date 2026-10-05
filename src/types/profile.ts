@@ -4,27 +4,6 @@
 
 export type ProfileType = 'personal' | 'business';
 
-export type BusinessCategory = 
-  | 'golf_club'
-  | 'brand'
-  | 'coach_academy'
-  | 'fitter_retail'
-  | 'tour_series'
-  | 'other';
-
-export const BUSINESS_CATEGORIES: string[] = [
-  'Golf Club',
-  'Golf Academy',
-  'Coach / Instructor',
-  'University / College',
-  'Creator',
-  'Retailer / Pro Shop',
-  'Club Fitter',
-  'Resort',
-  'Brand / Manufacturer',
-  'Other',
-];
-
 export interface UserProfileData {
   id: string;
   profile_type: ProfileType;
@@ -48,7 +27,7 @@ export interface UserProfileData {
 
   // Business-only fields
   business_name?: string | null;
-  business_category?: BusinessCategory | null;
+  business_category?: string | null;
   business_website?: string | null;
   business_location?: string | null;
   business_contact_email?: string | null;

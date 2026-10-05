@@ -77,6 +77,31 @@ import { Check } from 'lucide-react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { FIELD_LABEL, FIELD_INPUT_CLASS, FIELD_INPUT_STYLE, FIELD_PLACEHOLDER_CLASS } from '@/components/manage/fieldTreatment';
 
+/* ── save-failure reporting ─────────────────────────
+ * A failed create names its own failure: the Postgres code/message/details/
+ * hint as returned, the category, create vs edit, and the failing step. */
+class SaveStepError extends Error {
+  constructor(public step: string, public cause: unknown) {
+    super(errorText(cause) || step);
+  }
+}
+function pgFields(err: unknown) {
+  const e = (err ?? {}) as { code?: string; message?: string; details?: string; hint?: string };
+  return { code: e.code ?? null, message: e.message ?? String(err), details: e.details ?? null, hint: e.hint ?? null };
+}
+function errorText(err: unknown): string {
+  const { code, message, details } = pgFields(err);
+  return [message, details, code ? `(${code})` : null].filter(Boolean).join(' ');
+}
+function logSaveFailure(step: string, err: unknown, ctx: Record<string, unknown>) {
+  AppLog.error('BusinessProfileEditor', `save failed at step: ${step}`, { step, ...ctx, ...pgFields(err), error: err });
+}
+/** Mirrors public.normalize_club_key(): lower(trim(name)) with non [a-z0-9] removed. */
+function normalizeClubKey(name: string): string {
+  return name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+
 /* ─────────────────────── constants ─────────────────────── */
 
 
@@ -284,11 +309,15 @@ export default function BusinessProfileEditor() {
     let cancelled = false;
     (async () => {
       try {
+        // club_id is never written at create (granted on claim approval), so
+        // the guard reads what ux_business_accounts_club_key actually protects:
+        // club_key, derived by trg_business_set_club_key from club_name via
+        // normalize_club_key(). The index is not filtered on is_deleted, so a
+        // deleted row still collides and is matched here too.
         const { data } = await supabase
           .from('business_accounts')
           .select('id, name')
-          .eq('club_id', selectedClub.id)
-          .eq('is_deleted', false)
+          .eq('club_key', normalizeClubKey(selectedClub.name))
           .limit(1)
           .maybeSingle();
         if (cancelled) return;
@@ -455,7 +484,7 @@ export default function BusinessProfileEditor() {
           opening_hours: openingHours as unknown as Json,
           social_links: hasSocial ? (socialLinks as unknown as Json) : null,
           is_verified: false,
-          amenities: amenities.length ? amenities : null,
+          amenities,
           primary_action: primaryAction || null,
           show_opening_hours: showOpeningHours,
         };
@@ -495,7 +524,7 @@ export default function BusinessProfileEditor() {
           .insert(insertData)
           .select('id, slug')
           .single();
-        if (insertErr) throw insertErr;
+        if (insertErr) throw new SaveStepError('insert', insertErr);
         const newId = row.id;
 
         // images after insert
@@ -505,16 +534,19 @@ export default function BusinessProfileEditor() {
           // direct upload path — useBusinessImageUpload requires id, so call it directly via a transient hook is awkward.
           // Instead inline the same supabase update once we have the id.
           // Simpler: use a one-off uploader by calling the same hook signature via a helper.
-          logoUrl = await uploadImageDirect(newId, logo.pendingFile, 'logo');
+          try { logoUrl = await uploadImageDirect(newId, logo.pendingFile, 'logo'); }
+          catch (e) { logSaveFailure('logo upload', e, { category, mode, businessId: newId }); }
         }
         if (cover.pendingFile) {
-          coverUrlVal = await uploadImageDirect(newId, cover.pendingFile, 'cover');
+          try { coverUrlVal = await uploadImageDirect(newId, cover.pendingFile, 'cover'); }
+          catch (e) { logSaveFailure('cover upload', e, { category, mode, businessId: newId }); }
         }
         if (logoUrl || coverUrlVal) {
           const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
           if (logoUrl) patch.logo_url = logoUrl;
           if (coverUrlVal) patch.cover_image_url = coverUrlVal;
-          await supabase.from('business_accounts').update(patch).eq('id', newId);
+          const { error: patchErr } = await supabase.from('business_accounts').update(patch).eq('id', newId);
+          if (patchErr) logSaveFailure('image patch', patchErr, { category, mode, businessId: newId });
         }
 
         // owner row — a DB trigger auto-creates the owner membership on
@@ -530,7 +562,7 @@ export default function BusinessProfileEditor() {
             { onConflict: 'business_id,user_profile_id', ignoreDuplicates: true },
           );
         if (memberErr) {
-          console.warn('[BusinessProfileEditor] owner membership upsert warning:', memberErr);
+          logSaveFailure('members upsert', memberErr, { category, mode, businessId: newId });
         }
 
         // For golf-club businesses: file a course-claim request for admin review.
@@ -565,6 +597,7 @@ export default function BusinessProfileEditor() {
               msg = claimErr.message;
             }
             claimError = msg;
+            logSaveFailure('claim invoke', claimErr, { category, mode, businessId: newId, body: msg });
           } else {
             claimFiled = true;
           }
@@ -615,7 +648,7 @@ export default function BusinessProfileEditor() {
         booking_url: bookingUrl || null,
         opening_hours: openingHours as unknown as Json,
         social_links: hasSocial ? (socialLinks as unknown as Json) : null,
-        amenities: amenities.length ? amenities : null,
+        amenities,
         primary_action: primaryAction || null,
         show_opening_hours: showOpeningHours,
 
@@ -646,7 +679,7 @@ export default function BusinessProfileEditor() {
         .from('business_accounts')
         .update(updatePayload)
         .eq('id', id);
-      if (updateErr) throw updateErr;
+      if (updateErr) throw new SaveStepError('update', updateErr);
 
       await queryClient.invalidateQueries({
         predicate: (query) => {
@@ -669,8 +702,12 @@ export default function BusinessProfileEditor() {
       toast.success('Changes saved');
       navigate(`/business/${id}`);
     } catch (e) {
-      AppLog.error('[BusinessProfileEditor]', 'save failed', e);
-      toast.error(mode === 'create' ? 'Failed to create business profile' : 'Unable to save your changes.');
+      const step = e instanceof SaveStepError ? e.step : mode === 'create' ? 'create' : 'edit';
+      const cause = e instanceof SaveStepError ? e.cause : e;
+      logSaveFailure(step, cause, { category, mode });
+      const text = errorText(cause);
+      const lead = mode === 'create' ? "Couldn't create the business" : "Couldn't save your changes";
+      toast.error(text ? `${lead}: ${text}` : lead);
     } finally {
       setSaving(false);
     }
