@@ -83,7 +83,8 @@
       "unit": {
         "holes": "holes",
         "rounds": "rounds"
-      }
+      },
+      "title": "Standings"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
@@ -338,7 +339,7 @@
         "all": "All",
         "courses": "Courses",
         "reviews": "Reviews",
-        "scores": "Scores",
+        "scores": "Standings",
         "watch": "Watch"
       },
       "views": "Explore views",

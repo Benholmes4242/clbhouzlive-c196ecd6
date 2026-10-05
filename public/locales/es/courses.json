@@ -77,7 +77,8 @@
       "unit": {
         "holes": "hoyos",
         "rounds": "vueltas"
-      }
+      },
+      "title": "Clasificación"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
@@ -333,7 +334,7 @@
         "all": "Todo",
         "courses": "Campos",
         "reviews": "Reseñas",
-        "scores": "Resultados",
+        "scores": "Clasificación",
         "watch": "Ver"
       },
       "views": "Vistas de Explorar",

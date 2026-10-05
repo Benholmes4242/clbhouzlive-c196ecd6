@@ -697,7 +697,7 @@ export function ScoresLeaderboardsPage({
       {/* PAGE HEAD — no Filters button; filters belong to the board they filter. */}
       <div style={{ paddingInline: GUTTER }}>
         <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
-          {t('amateur.leaderboards.title', 'Scores and leaderboards')}
+          {t('amateur.leaderboards.title', 'Standings')}
         </h1>
         <ScopeSegments
           scope={scope}
