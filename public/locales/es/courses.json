@@ -78,7 +78,12 @@
         "holes": "hoyos",
         "rounds": "vueltas"
       },
-      "title": "Clasificación"
+      "title": "Clasificación",
+      "top100": "Top 100 campos",
+      "top100FieldAvg": "La media del grupo es <n>{{n}}</n> de los cien.",
+      "latestCourse": "Último · {{course}}",
+      "theListHundred": "Los cien de {{list}}",
+      "inRankOrder": "Por orden de ranking"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
@@ -1266,7 +1271,6 @@
     },
     "ord": {
       "1": "primer",
-      "10": "décimo",
       "2": "segundo",
       "3": "tercer",
       "4": "cuarto",
@@ -1274,7 +1278,8 @@
       "6": "sexto",
       "7": "séptimo",
       "8": "octavo",
-      "9": "noveno"
+      "9": "noveno",
+      "10": "décimo"
     },
     "ownerFirst": "Tu primer {{feat}}. {{rounds}} rondas después.",
     "ownerFirstCongrats": "{{line}} — enhorabuena, {{name}}",

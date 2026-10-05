@@ -78,7 +78,12 @@
         "holes": "홀",
         "rounds": "라운드"
       },
-      "title": "순위"
+      "title": "순위",
+      "top100": "톱 100 코스",
+      "top100FieldAvg": "전체 평균은 100곳 중 <n>{{n}}</n>곳입니다.",
+      "latestCourse": "최근 · {{course}}",
+      "theListHundred": "{{list}} 100곳",
+      "inRankOrder": "순위순"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
@@ -1228,7 +1233,6 @@
     },
     "ord": {
       "1": "1",
-      "10": "10",
       "2": "2",
       "3": "3",
       "4": "4",
@@ -1236,7 +1240,8 @@
       "6": "6",
       "7": "7",
       "8": "8",
-      "9": "9"
+      "9": "9",
+      "10": "10"
     },
     "ownerFirst": "첫 {{feat}}. {{rounds}}라운드 만에.",
     "ownerFirstCongrats": "{{line}} — {{name}}님, 축하합니다",

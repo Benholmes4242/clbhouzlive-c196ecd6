@@ -19877,6 +19877,7 @@ export type Database = {
           home_club: string
           is_tie: boolean
           is_viewer: boolean
+          last_course_name: string
           photo_url: string
           pos: number
           total_members: number

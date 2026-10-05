@@ -84,7 +84,12 @@
         "holes": "holes",
         "rounds": "rounds"
       },
-      "title": "Standings"
+      "title": "Standings",
+      "top100": "Top 100 courses",
+      "top100FieldAvg": "The field averages <n>{{n}}</n> of the hundred.",
+      "latestCourse": "Latest · {{course}}",
+      "theListHundred": "The {{list}} hundred",
+      "inRankOrder": "In rank order"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
@@ -1735,7 +1740,6 @@
     },
     "ord": {
       "1": "first",
-      "10": "tenth",
       "2": "second",
       "3": "third",
       "4": "fourth",
@@ -1743,7 +1747,8 @@
       "6": "sixth",
       "7": "seventh",
       "8": "eighth",
-      "9": "ninth"
+      "9": "ninth",
+      "10": "tenth"
     },
     "ownerFirst": "Your first {{feat}}. {{rounds}} rounds in.",
     "ownerFirstCongrats": "{{line}} — congrats, {{name}}",
