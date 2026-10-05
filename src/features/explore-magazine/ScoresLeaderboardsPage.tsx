@@ -230,7 +230,6 @@ const TOP100_DEFAULT: RankListSlug = 'gb-i';
 /** Matches AmateurLeaderboardBlock's THIN_FLOOR: fewer ranked rows is not a board. */
 const THIN_FLOOR = 4;
 
-const YEAR_FILTERS: BoardFilters = { ...DEFAULT_FILTERS, window: 'year' };
 
 /* ------------------------------------------------------------ furniture */
 
@@ -532,6 +531,8 @@ export function ScoresLeaderboardsPage({
 
   const [featWindow, setFeatWindow] = useState<FeatWindow>('year');
   const featsYear = useFeatsWindow(userId, featWindow);
+  /** Feat tiles are counted in the section's own window, so their sheets open on the same one. */
+  const featFilters: BoardFilters = { ...DEFAULT_FILTERS, window: featWindow };
   const pickFeatWindow = (next: FeatWindow) => {
     if (next === featWindow) return;
     setFeatWindow(next);
@@ -947,7 +948,7 @@ export function ScoresLeaderboardsPage({
         >
           <Rail>
             {featsShown.map((f) => (
-              <button key={f.key} type="button" onClick={() => setSeeAll({ board: f.key, filters: YEAR_FILTERS })} style={{ ...RAIL_CARD, width: 150, position: 'relative' }}>
+              <button key={f.key} type="button" onClick={() => setSeeAll({ board: f.key, filters: featFilters })} style={{ ...RAIL_CARD, width: 150, position: 'relative' }}>
                 <span aria-hidden style={{ position: 'absolute', top: 12, right: 11, color: FAINT, display: 'flex' }}>
                   <ChevronRight size={13} />
                 </span>
