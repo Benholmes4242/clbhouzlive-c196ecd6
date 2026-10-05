@@ -1,7 +1,6 @@
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React from 'react';
 import { Globe, Pencil, Building2, MapPin, CheckCircle2 } from 'lucide-react';
-import { BUSINESS_CATEGORIES, BusinessCategory } from '@/types/profile';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import CollegeStamp from '../CollegeStamp';
 import { useFollowedColleges } from '@/features/tourhub/hooks/useCollegeMovers';

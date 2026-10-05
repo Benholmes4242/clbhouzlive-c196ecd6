@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PROFILE_FULL } from '@/lib/supabase/selects';
-import { ProfileType, BusinessCategory } from '@/types/profile';
+import { ProfileType } from '@/types/profile';
 
 // Unified profile interface - all fields that might be needed
 export interface UserProfile {
@@ -49,7 +49,7 @@ export interface UserProfile {
   location?: string | null;
   // Business profile fields
   business_name?: string | null;
-  business_category?: BusinessCategory | null;
+  business_category?: string | null;
   business_website?: string | null;
   business_location?: string | null;
   business_contact_email?: string | null;
