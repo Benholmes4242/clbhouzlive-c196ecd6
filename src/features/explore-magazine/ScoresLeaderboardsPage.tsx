@@ -12,7 +12,7 @@ import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
 import { boardSecondary, boardValue, fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
 import { describeFilterParts } from '@/components/explore-tab-new/courseled/GolfThisWeek';
-import { useBoardPage, type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
+import { type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import {
   BOARD_LABELS,
   DEFAULT_FILTERS,
