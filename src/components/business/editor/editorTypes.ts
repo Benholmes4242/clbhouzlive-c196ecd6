@@ -1,3 +1,4 @@
+import type { BusinessCategoryValue } from '@/constants/businessCategories';
 export const DAYS_ORDER = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 export type Day = typeof DAYS_ORDER[number];
 
@@ -73,12 +74,11 @@ const RETAIL = [
  * Keyed on the EXACT category values in src/constants/businessCategories.ts.
  * Every category has an entry. To give a category no facilities, set an
  * empty array (the section hides): a deliberate entry, never a failed match.
- * No substring matching. GENERAL is the list these four showed before via
- * the old fallback, kept so nothing changes on screen.
- * NOTE: BUSINESS_CATEGORIES is typed string[], so a renamed category is not a
- * compile error here — it falls to [] (no facilities). Rename both together.
+ * No substring matching. Typed Record<BusinessCategoryValue, …>, so every
+ * category must appear and a renamed category fails to compile. Creator and
+ * Brand have no premises, hence [].
  */
-const FACILITIES_BY_CATEGORY: Record<string, string[]> = {
+const FACILITIES_BY_CATEGORY: Record<BusinessCategoryValue, string[]> = {
   'Golf Club': [
     '18 holes', '9 holes', 'Driving range', 'Putting green', 'Pro shop',
     'Cafe / bar', 'Restaurant', 'Buggy hire', 'Club hire', 'Lessons',
@@ -87,7 +87,7 @@ const FACILITIES_BY_CATEGORY: Record<string, string[]> = {
   'Golf Academy': COACHING,
   'Coach / Instructor': COACHING,
   'University / College': GENERAL,
-  'Creator': GENERAL,
+  'Creator': [],
   'Retailer / Pro Shop': RETAIL,
   'Club Fitter': RETAIL,
   'Resort': [
@@ -97,10 +97,10 @@ const FACILITIES_BY_CATEGORY: Record<string, string[]> = {
   'Hotel / Accommodation': ['Parking', 'Restaurant', 'Bar', 'Spa', 'Gym', 'Golf packages', 'Club storage', 'EV charging'],
   'Restaurant / Cafe': ['Parking', 'Outdoor seating', 'Takeaway', 'Reservations', 'Vegetarian options', 'Family friendly'],
   'Bar / Pub': ['Parking', 'Outdoor seating', 'Live sport on TV', 'Food served', 'Dog friendly', 'Beer garden'],
-  'Brand / Manufacturer': GENERAL,
+  'Brand / Manufacturer': [],
   'Other': GENERAL,
 };
 
 export function getFacilitiesForCategory(category: string): string[] {
-  return FACILITIES_BY_CATEGORY[category] ?? [];
+  return FACILITIES_BY_CATEGORY[category as BusinessCategoryValue] ?? [];
 }

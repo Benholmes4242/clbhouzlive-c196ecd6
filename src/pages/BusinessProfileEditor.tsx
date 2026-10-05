@@ -178,6 +178,10 @@ export default function BusinessProfileEditor() {
   /* ── flow state ───────────────────────────────────── */
   const [saving, setSaving] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  /* Ownerless-business notice: must be acknowledged, never times out. The
+   * business id is the only way support can recover it. */
+  const [ownerlessNotice, setOwnerlessNotice] = useState<{ name: string; id: string; target: string } | null>(null);
+  const [ownerlessCopied, setOwnerlessCopied] = useState(false);
   const [existingBusinessForClub, setExistingBusinessForClub] = useState<
     { id: string; name: string } | null
   >(null);
@@ -316,10 +320,12 @@ export default function BusinessProfileEditor() {
   const isGolfClub = category === 'Golf Club';
   const isUniversity = category === 'University / College';
 
-  /* University: no college id is stored on business_accounts (no column), so
-   * the identifier the picker returns cannot be matched. Interim guard: the
-   * exact stored name, which create always writes verbatim from
-   * selectedCollege.college_name, within the University category. */
+  /* COLLEGE guard — EXCLUDES deleted businesses, on purpose. There is no
+   * unique index on this path at all, so this is a courtesy check only and a
+   * deleted business is not a real obstacle. (The club guard below differs
+   * deliberately.) It matches on NAME because business_accounts has no column
+   * for the college id; create writes selectedCollege.college_name verbatim,
+   * so it only catches businesses created through the college picker. */
   useEffect(() => {
     if (mode !== 'create' || category !== 'University / College' || !selectedCollege) return;
     let cancelled = false;
@@ -352,6 +358,10 @@ export default function BusinessProfileEditor() {
     let cancelled = false;
     (async () => {
       try {
+        // CLUB guard — INCLUDES deleted businesses, on purpose (unlike the
+        // college guard above): ux_business_accounts_club_key is not filtered
+        // on is_deleted, so a deleted row still collides at the database level
+        // and the insert really would fail.
         // club_id is never written at create (granted on claim approval), so
         // the guard reads what ux_business_accounts_club_key actually protects:
         // club_key, derived by trg_business_set_club_key from club_name via
@@ -617,12 +627,9 @@ export default function BusinessProfileEditor() {
           logSaveFailure('members upsert (FATAL: ownerless business)', memberErr, {
             severity: 'fatal', category, mode, businessId: newId, businessName: resolvedName,
           });
-          toast.error(
-            `"${resolvedName}" was created, but you are not yet listed as its owner. ` +
-            `Contact support to fix it and quote business id ${newId}.`,
-            { duration: 20000 },
-          );
-          navigate(`/business/${row.slug || newId}`);
+          // Persistent, acknowledged panel — navigation happens on dismiss.
+          setOwnerlessCopied(false);
+          setOwnerlessNotice({ name: resolvedName, id: newId, target: `/business/${row.slug || newId}` });
           return;
         }
 
@@ -1075,6 +1082,44 @@ export default function BusinessProfileEditor() {
       </ManagePageShell>
 
 
+
+      {/* Ownerless business — must be acknowledged */}
+      <AlertDialog open={!!ownerlessNotice} onOpenChange={() => { /* dismiss only via the button */ }}>
+        <AlertDialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>You are not yet listed as the owner</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{ownerlessNotice?.name}" was created, but you are not yet listed as its owner.
+              Contact support to fix it and quote this business id.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex items-center gap-2 rounded-md border border-border bg-muted px-3 py-2">
+            <code className="flex-1 break-all text-[13px] tabular-nums text-foreground">{ownerlessNotice?.id}</code>
+            <button
+              type="button"
+              className="text-[13px] font-semibold text-primary"
+              onClick={async () => {
+                if (!ownerlessNotice) return;
+                try { await navigator.clipboard.writeText(ownerlessNotice.id); setOwnerlessCopied(true); }
+                catch { setOwnerlessCopied(false); }
+              }}
+            >
+              {ownerlessCopied ? 'Copied' : 'Copy id'}
+            </button>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => {
+                const t = ownerlessNotice?.target;
+                setOwnerlessNotice(null);
+                if (t) navigate(t);
+              }}
+            >
+              I've noted it
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Close confirm */}
       <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
