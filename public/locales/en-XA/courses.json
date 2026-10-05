@@ -80,6 +80,8 @@
     "leaderboards": {
       "featsFrom": "[~~Ƒřőɱ {{rounds}} řőúñđš áñđ {{holes}} ĥőļéš ţřáĉǩéđ őñ clbhouz.~~]",
       "featRarity": "[~~1 íñ éṽéřý {{n}} {{unit}}~~]",
+      "feats": "[~~Ƒéáţš~~]",
+      "allTime": "[~~Áļļ ţíɱé~~]",
       "unit": {
         "holes": "[~~ĥőļéš~~]",
         "rounds": "[~~řőúñđš~~]"

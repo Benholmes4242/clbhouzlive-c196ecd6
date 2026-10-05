@@ -20722,8 +20722,8 @@ export type Database = {
           username: string
         }[]
       }
-      get_feats_year: {
-        Args: { p_viewer?: string }
+      get_feats_window: {
+        Args: { p_viewer?: string; p_window?: string }
         Returns: {
           denominator: number
           denominator_unit: string

@@ -74,6 +74,8 @@
     "leaderboards": {
       "featsFrom": "De {{rounds}} vueltas y {{holes}} hoyos registrados en clbhouz.",
       "featRarity": "1 de cada {{n}} {{unit}}",
+      "feats": "Hazañas",
+      "allTime": "Siempre",
       "unit": {
         "holes": "hoyos",
         "rounds": "vueltas"

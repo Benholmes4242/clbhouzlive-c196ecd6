@@ -20,17 +20,21 @@ export interface FeatYearRow {
 }
 
 /**
- * Live per-request figures from get_feats_year (same board_pool/board_qualifies
+ * Live per-request figures from get_feats_window (same board_pool/board_qualifies
  * pair the boards use). Nothing stored or snapshotted — a synced round changes
  * the next read. No client filtering or sorting: the RPC returns display order.
  */
-export function useFeatsYear(userId: string | undefined) {
+export type FeatWindow = 'year' | 'all';
+
+export function useFeatsWindow(userId: string | undefined, window: FeatWindow) {
   return useQuery<FeatYearRow[]>({
-    queryKey: ['explore', 'feats-year', userId],
+    queryKey: ['explore', 'feats-window', userId, window],
     staleTime: 60_000,
+    // Hold the previous window's rows while the next loads so the rail keeps its height.
+    placeholderData: (prev) => prev,
     queryFn: async () => {
       // RPC is newer than the generated types.
-      const { data, error } = await (supabase.rpc as any)('get_feats_year', { p_viewer: userId ?? null });
+      const { data, error } = await (supabase.rpc as any)('get_feats_window', { p_viewer: userId ?? null, p_window: window });
       if (error) throw error;
       return ((data ?? []) as any[]).map((r) => ({
         feat_kind: r.feat_kind as FeatKind,

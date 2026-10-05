@@ -74,6 +74,8 @@
     "leaderboards": {
       "featsFrom": "Aus {{rounds}} Runden und {{holes}} Löchern, die auf clbhouz erfasst wurden.",
       "featRarity": "1 von {{n}} {{unit}}",
+      "feats": "Feats",
+      "allTime": "Gesamt",
       "unit": {
         "holes": "Löcher",
         "rounds": "Runden"
