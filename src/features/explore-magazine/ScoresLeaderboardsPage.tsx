@@ -32,6 +32,7 @@ import { fmtHcp } from '@/lib/whs/format';
 import { useFeatsYear, type FeatKind } from './useFeatsYear';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
+import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
 
 /**
@@ -61,6 +62,8 @@ interface CareerRow {
   home_club: string | null;
   value: number;
   field_avg: number | null;
+  /** Most recent round on a course in the SELECTED list — same scope as `value`. */
+  last_course_name: string | null;
   courses: number | null;
   total_members: number;
   is_viewer: boolean | null;
@@ -445,6 +448,8 @@ function CompactRow({
   );
 }
 
+const TILE_HEAD = { fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' } as const;
+
 function Rail({ children }: { children: ReactNode }) {
   return (
     <div style={{ position: 'relative', marginInline: -GUTTER }}>
@@ -683,9 +688,18 @@ export function ScoresLeaderboardsPage({
   };
 
   const top100Rows = top100.data ?? [];
-  /* get_career_leaderboard returns no most-recent course; the home club is the
-     only place line it carries. */
-  const top100Secondary = (_r: CareerRow): string | null => null;
+  /* last_course_name is scoped in SQL to the selected list, so it changes with
+     the chip alongside the count. Never fall back to home_club. */
+  const top100Secondary = (r: CareerRow): string | null =>
+    r.last_course_name ? t('amateur.leaderboards.latestCourse', 'Latest · {{course}}', { course: r.last_course_name }) : null;
+  /* Same call as the progress sheet (same query key) — the sheet opens from cache. */
+  const listCourses = useTop100ListProgress(userId ? top100List : undefined, userId, userId);
+  const listTiles = useMemo(
+    () => [...(listCourses.data ?? [])].sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)),
+    [listCourses.data],
+  );
+  const fieldAvgRaw = top100Rows[0]?.field_avg;
+  const fieldAvg = fieldAvgRaw == null ? NaN : Number(fieldAvgRaw);
   const [top100Sheet, setTop100Sheet] = useState<CareerRow | null>(null);
   const openTop100Sheet = (r: CareerRow) => setTop100Sheet(r);
 
@@ -996,8 +1010,16 @@ export function ScoresLeaderboardsPage({
         <Section
           contest
           eyebrow={t('amateur.leaderboards.theHundred', 'The hundred')}
-          title={t('amateur.leaderboards.top100', 'Top 100')}
+          title={t('amateur.leaderboards.top100', 'Top 100 courses')}
           meta={top100Rows.length > 0 ? membersText(Number(top100Rows[0].total_members)) : undefined}
+          lede={Number.isFinite(fieldAvg) ? (
+            <Trans
+              i18nKey="amateur.leaderboards.top100FieldAvg"
+              defaults="The field averages <n>{{n}}</n> of the hundred."
+              values={{ n: Math.round(fieldAvg) }}
+              components={{ n: <span style={{ fontWeight: 700, color: A.INK }} /> }}
+            />
+          ) : undefined}
         >
           <div style={{ marginBottom: 12 }}>
             <RailChips
@@ -1010,6 +1032,51 @@ export function ScoresLeaderboardsPage({
               ariaLabel={t('amateur.leaderboards.top100List', 'Top 100 list')}
             />
           </div>
+          {listCourses.isSuccess && listTiles.length > 0 ? (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <span style={{ ...TILE_HEAD, color: A.DIM }}>
+                  {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
+                </span>
+                <span style={{ ...TILE_HEAD, color: A.MUTE }}>
+                  {t('amateur.leaderboards.inRankOrder', 'In rank order')}
+                </span>
+              </div>
+              <Rail>
+                {listTiles.map((c) => (
+                  <button
+                    key={c.course_id}
+                    type="button"
+                    onClick={() => onOpenCourse(c.course_id)}
+                    aria-label={c.course_name}
+                    style={{
+                      width: 86, height: 60, borderRadius: 10, overflow: 'hidden', position: 'relative',
+                      flexShrink: 0, padding: 0, background: A.PANEL,
+                      border: c.thumbnail_image ? 'none' : `1px solid ${A.BORDER}`,
+                    }}
+                  >
+                    {c.thumbnail_image ? (
+                      <img src={c.thumbnail_image} alt="" loading="lazy" decoding="async"
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : null}
+                    <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.72))' }} />
+                    {c.rank != null ? (
+                      <span className="tabular-nums" style={{ position: 'absolute', left: 5, top: 4, fontSize: 8.5, fontWeight: 700, color: '#FFF', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
+                        {`#${c.rank}`}
+                      </span>
+                    ) : null}
+                    <span style={{
+                      position: 'absolute', left: 5, right: 5, bottom: 4, fontSize: 8.5, fontWeight: 700,
+                      letterSpacing: '0.04em', textTransform: 'uppercase', lineHeight: 1.15, color: '#FFF',
+                      textShadow: '0 1px 4px rgba(0,0,0,0.9)', maxHeight: 29, overflow: 'hidden', textAlign: 'left',
+                    }}>
+                      {c.course_name}
+                    </span>
+                  </button>
+                ))}
+              </Rail>
+            </div>
+          ) : null}
           {top100.isPending ? (
             <div style={{ minHeight: 120 }} />
           ) : top100Rows.length === 0 ? (
@@ -1074,7 +1141,7 @@ export function ScoresLeaderboardsPage({
         open={careerSheet}
         onClose={() => setCareerSheet(false)}
         titleId="career-see-all-title"
-        title={t('amateur.leaderboards.top100', 'Top 100')}
+        title={t('amateur.leaderboards.top100', 'Top 100 courses')}
         subtitle={top100Rows.length > 0
           ? `${RANK_SCOPE_LABEL[top100List]} · ${membersText(Number(top100Rows[0].total_members))}`
           : RANK_SCOPE_LABEL[top100List]}
