@@ -1084,7 +1084,7 @@ export function ScoresLeaderboardsPage({
             </div>
           ) : listCourses.isSuccess && listTiles.length > 0 ? (
             <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 12 }}>
+              <div style={{ marginTop: 16 }}>
                 <span style={{ ...TILE_HEAD, color: A.DIM }}>
                   {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
                 </span>
