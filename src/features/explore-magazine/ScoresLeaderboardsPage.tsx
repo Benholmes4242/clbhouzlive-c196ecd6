@@ -230,7 +230,6 @@ const TOP100_DEFAULT: RankListSlug = 'gb-i';
 /** Matches AmateurLeaderboardBlock's THIN_FLOOR: fewer ranked rows is not a board. */
 const THIN_FLOOR = 4;
 
-const YEAR_FILTERS: BoardFilters = { ...DEFAULT_FILTERS, window: 'year' };
 
 /* ------------------------------------------------------------ furniture */
 
