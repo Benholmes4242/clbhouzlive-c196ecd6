@@ -34,6 +34,8 @@ export interface IdentitySectionProps {
   setBusinessName: (v: string) => void;
   isClubLinked: boolean;
   existingBusinessForClub: { id: string; name: string } | null;
+  /** What the duplicate is matched on — worded in the warning. */
+  existingSubject?: 'club' | 'college';
   onRequestAccess: () => void;
   onRequestClub: () => void;
   description: string;
@@ -56,6 +58,7 @@ export function IdentitySection({
   setBusinessName,
   isClubLinked,
   existingBusinessForClub,
+  existingSubject = 'club',
   onRequestAccess,
   onRequestClub,
   description,
@@ -120,7 +123,7 @@ export function IdentitySection({
               <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <p className="text-[13px] font-semibold text-foreground">
-                  This club already has a business profile
+                  This {existingSubject} already has a business profile
                 </p>
                 <p className="text-[12px] text-muted-foreground mt-1">
                   "{existingBusinessForClub.name}" is managed by someone else.

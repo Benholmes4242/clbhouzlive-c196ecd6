@@ -93,6 +93,11 @@ function errorText(err: unknown): string {
   const { code, message, details } = pgFields(err);
   return [message, details, code ? `(${code})` : null].filter(Boolean).join(' ');
 }
+const SESSION_ENDED_MSG = 'Your session has ended. Please sign in again; nothing has been saved yet.';
+function isAuthError(err: unknown): boolean {
+  const { code, message } = pgFields(err);
+  return code === 'PGRST301' || code === '42501' || /jwt|not authenticated|row-level security/i.test(message ?? '');
+}
 function logSaveFailure(step: string, err: unknown, ctx: Record<string, unknown>) {
   AppLog.error('BusinessProfileEditor', `save failed at step: ${step}`, { step, ...ctx, ...pgFields(err), error: err });
 }
@@ -196,10 +201,21 @@ export default function BusinessProfileEditor() {
   }, [prefilledClubId, mode]);
 
   /* ── auth gate ────────────────────────────────────── */
+  const sessionSeenRef = useRef(false);
   useEffect(() => {
     // eslint-disable-next-line settled/no-not-loading-empty-check -- authLoading is the session flag, not a React Query.
-    if (!authLoading && !user) navigate('/auth');
-  }, [authLoading, user, navigate]);
+    if (!authLoading && !user) {
+      // Session ended while the editor was open: say so before the redirect
+      // takes the member away, so the lost form is never a silent mystery.
+      if (sessionSeenRef.current) {
+        logSaveFailure('session ended (redirect)', new Error('no signed-in user'), { category, mode });
+        toast.error(SESSION_ENDED_MSG);
+      }
+      navigate('/auth');
+    } else if (user) {
+      sessionSeenRef.current = true;
+    }
+  }, [authLoading, user, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── permission gate (edit) ───────────────────────── */
   useEffect(() => {
@@ -300,7 +316,34 @@ export default function BusinessProfileEditor() {
   const isGolfClub = category === 'Golf Club';
   const isUniversity = category === 'University / College';
 
+  /* University: no college id is stored on business_accounts (no column), so
+   * the identifier the picker returns cannot be matched. Interim guard: the
+   * exact stored name, which create always writes verbatim from
+   * selectedCollege.college_name, within the University category. */
   useEffect(() => {
+    if (mode !== 'create' || category !== 'University / College' || !selectedCollege) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from('business_accounts')
+        .select('id, name')
+        .eq('category', 'University / College')
+        .eq('name', selectedCollege.college_name)
+        .eq('is_deleted', false)
+        .limit(1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) AppLog.error('BusinessProfileEditor', 'college dup check failed', pgFields(error));
+      setExistingBusinessForClub(data ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, [mode, category, selectedCollege?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (category === 'University / College') {
+      if (!selectedCollege) setExistingBusinessForClub(null);
+      return;
+    }
     if (mode !== 'create' || !selectedClub?.id) {
       setExistingBusinessForClub(null);
       setClubClaimPending(false);
@@ -374,7 +417,7 @@ export default function BusinessProfileEditor() {
     if (mode === 'create') {
       if (!category) return false;
       if (isGolfClub) return !!selectedClub && !existingBusinessForClub && !clubClaimPending;
-      if (isUniversity) return !!selectedCollege;
+      if (isUniversity) return !!selectedCollege && !existingBusinessForClub;
       return resolvedName.length > 0;
     }
     // edit: always require a name (club-linked is always set)
@@ -458,7 +501,12 @@ export default function BusinessProfileEditor() {
   );
 
   const handleSave = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      // Never a silent no-op: the form is kept, the member is told why.
+      logSaveFailure('session ended (no user at submit)', new Error('no signed-in user'), { category, mode });
+      toast.error(SESSION_ENDED_MSG);
+      return;
+    }
     if (!isValid) return;
     setSaving(true);
     try {
@@ -528,6 +576,7 @@ export default function BusinessProfileEditor() {
         const newId = row.id;
 
         // images after insert
+        const partials: string[] = [];
         let logoUrl: string | null = null;
         let coverUrlVal: string | null = null;
         if (logo.pendingFile) {
@@ -535,26 +584,29 @@ export default function BusinessProfileEditor() {
           // Instead inline the same supabase update once we have the id.
           // Simpler: use a one-off uploader by calling the same hook signature via a helper.
           try { logoUrl = await uploadImageDirect(newId, logo.pendingFile, 'logo'); }
-          catch (e) { logSaveFailure('logo upload', e, { category, mode, businessId: newId }); }
+          catch (e) { logSaveFailure('logo upload', e, { category, mode, businessId: newId }); partials.push('logo'); }
         }
         if (cover.pendingFile) {
           try { coverUrlVal = await uploadImageDirect(newId, cover.pendingFile, 'cover'); }
-          catch (e) { logSaveFailure('cover upload', e, { category, mode, businessId: newId }); }
+          catch (e) { logSaveFailure('cover upload', e, { category, mode, businessId: newId }); partials.push('cover photo'); }
         }
         if (logoUrl || coverUrlVal) {
           const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
           if (logoUrl) patch.logo_url = logoUrl;
           if (coverUrlVal) patch.cover_image_url = coverUrlVal;
           const { error: patchErr } = await supabase.from('business_accounts').update(patch).eq('id', newId);
-          if (patchErr) logSaveFailure('image patch', patchErr, { category, mode, businessId: newId });
+          if (patchErr) {
+            logSaveFailure('image patch', patchErr, { category, mode, businessId: newId });
+            partials.push('photos');
+          }
         }
 
-        // owner row — a DB trigger auto-creates the owner membership on
-        // business creation, so a plain insert here fails with 23505
-        // (business_members_business_id_user_profile_id_key). Upsert with
-        // ignoreDuplicates as belt-and-braces in case the trigger is ever
-        // removed. Do NOT throw on failure — the business already exists;
-        // surface softly instead of reporting "failed to create business".
+        // owner row. A DB trigger is believed to auto-create the owner
+        // membership, but that trigger is NOT in this repo's migrations, so
+        // this upsert may be the only writer. A failure leaves an ownerless
+        // business: data damage, not a warning. It is reported loudly (fatal
+        // severity) but the business is NOT deleted — a known half-created
+        // business is recoverable; a deleted one with uploaded images is not.
         const { error: memberErr } = await supabase
           .from('business_members')
           .upsert(
@@ -562,7 +614,16 @@ export default function BusinessProfileEditor() {
             { onConflict: 'business_id,user_profile_id', ignoreDuplicates: true },
           );
         if (memberErr) {
-          logSaveFailure('members upsert', memberErr, { category, mode, businessId: newId });
+          logSaveFailure('members upsert (FATAL: ownerless business)', memberErr, {
+            severity: 'fatal', category, mode, businessId: newId, businessName: resolvedName,
+          });
+          toast.error(
+            `"${resolvedName}" was created, but you are not yet listed as its owner. ` +
+            `Contact support to fix it and quote business id ${newId}.`,
+            { duration: 20000 },
+          );
+          navigate(`/business/${row.slug || newId}`);
+          return;
         }
 
         // For golf-club businesses: file a course-claim request for admin review.
@@ -603,22 +664,31 @@ export default function BusinessProfileEditor() {
           }
         }
 
-        await queryClient.invalidateQueries({
-          predicate: (query) => {
-            const k = query.queryKey;
-            if (!Array.isArray(k) || typeof k[0] !== 'string') return false;
-            const key = k[0];
-            return (
-              key === 'my-businesses' ||
-              key === 'business-profile' ||
-              key === 'business-directory' ||
-              key === 'suggestedBusinesses' ||
-              key.startsWith('business-')
-            );
-          },
-        });
+        // The business exists from here on. A refresh failure must never reach
+        // the outer catch and report a failed create (which invites a duplicate).
+        try {
+          await queryClient.invalidateQueries({
+            predicate: (query) => {
+              const k = query.queryKey;
+              if (!Array.isArray(k) || typeof k[0] !== 'string') return false;
+              const key = k[0];
+              return (
+                key === 'my-businesses' ||
+                key === 'business-profile' ||
+                key === 'business-directory' ||
+                key === 'suggestedBusinesses' ||
+                key.startsWith('business-')
+              );
+            },
+          });
+        } catch (e) {
+          logSaveFailure('query refresh after create', e, { category, mode, businessId: newId });
+        }
+        if (partials.length) {
+          toast.warning(`Your ${partials.join(' and ')} didn't save. You can add ${partials.length > 1 ? 'them' : 'it'} in Edit.`);
+        }
         if (claimError) {
-          toast.error(`Business created, but the claim couldn't be submitted: ${claimError}`);
+          toast.error(`Business created, but the club claim didn't save: ${claimError}. You can file it again from Edit.`);
         } else {
           toast.success(
             claimFiled
@@ -706,6 +776,10 @@ export default function BusinessProfileEditor() {
       const cause = e instanceof SaveStepError ? e.cause : e;
       logSaveFailure(step, cause, { category, mode });
       const text = errorText(cause);
+      if (isAuthError(cause)) {
+        toast.error(`${SESSION_ENDED_MSG} (${text})`);
+        return;
+      }
       const lead = mode === 'create' ? "Couldn't create the business" : "Couldn't save your changes";
       toast.error(text ? `${lead}: ${text}` : lead);
     } finally {
@@ -817,6 +891,7 @@ export default function BusinessProfileEditor() {
             businessName={businessName}
             setBusinessName={setBusinessName}
             isClubLinked={isClubLinked}
+            existingSubject={isUniversity ? 'college' : 'club'}
             existingBusinessForClub={existingBusinessForClub}
             onRequestAccess={() => setShowRequestAccessModal(true)}
             onRequestClub={() => setShowRequestClubModal(true)}
