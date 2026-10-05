@@ -641,7 +641,8 @@ export function ScoresLeaderboardsPage({
     ? featRows.filter((f) => f.events > 0).map((f) => ({ ...f, key: f.feat_kind as FeatBoardKey, tone: FEAT_TONE[f.feat_kind] }))
     : [];
   const featTotals = featsYear.isSuccess ? featRows[0] ?? null : null;
-  const featsSettled = featsYear.isFetched;
+  // First load only: isFetched drops on key change while placeholderData holds rows; isSuccess does not.
+  const featsFirstLoad = !featsYear.isSuccess && featRows.length === 0;
   const featLabel = (k: FeatBoardKey, n: number) => {
     switch (k) {
       case 'ace':
@@ -667,7 +668,6 @@ export function ScoresLeaderboardsPage({
   /* NOTHING ELSE JOINS THIS RAIL: holes in one / albatrosses are §5, lowest gross §3, bogey-free §5. */
   const careerSettled = career.every((c) => c.q.isFetched);
   const careerShown = career.filter((c) => c.q.isSuccess && (c.q.data?.length ?? 0) > 0);
-  const careerMembers = careerShown.reduce((m, c) => Math.max(m, Number(c.q.data![0].total_members) || 0), 0);
 
   /* ------------------------------------------------- §7 short board */
   const shortBoard = (
@@ -894,7 +894,7 @@ export function ScoresLeaderboardsPage({
       ) : null}
 
       {/* §5 FEATS THIS YEAR — event counts; footnote is distinct members. */}
-      {!featsSettled ? (
+      {featsFirstLoad ? (
         pending(175)
       ) : featsShown.length > 0 ? (
         <Section
@@ -988,7 +988,6 @@ export function ScoresLeaderboardsPage({
           contest
           eyebrow={String(new Date().getFullYear())}
           title={t('amateur.leaderboards.whoLeads', 'Who leads what')}
-          meta={careerMembers > 0 ? membersText(careerMembers) : null}
         >
           <Rail>
             {careerShown.map((c) => {
