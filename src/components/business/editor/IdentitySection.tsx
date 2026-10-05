@@ -102,7 +102,7 @@ export function IdentitySection({
                     setSelectedClub(null);
                     setSelectedCollege(null);
                   }}
-                  options={BUSINESS_CATEGORIES_WITH_ICONS.map(({ value, label, subtitle }) => ({
+                  options={(BUSINESS_CATEGORIES_WITH_ICONS as readonly BusinessCategoryOption[]).map(({ value, label, subtitle }) => ({
                     value,
                     label: `${label}${subtitle ? ` — ${subtitle}` : ''}`,
                   }))}
