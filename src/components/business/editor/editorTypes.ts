@@ -59,38 +59,36 @@ export const PRIMARY_ACTION_OPTIONS = [
 export type PrimaryActionKey = typeof PRIMARY_ACTION_OPTIONS[number]['key'];
 
 /* ── Facilities / amenities (category-aware) ────────── */
-const DEFAULT_TAGS = ['Parking', 'Cafe / bar', 'Pro shop', 'Lessons', 'Custom fitting', 'Online store'];
+import type { BUSINESS_CATEGORIES } from '@/constants/businessCategories';
 
+const COACHING = [
+  'Indoor bays', 'Launch monitors', 'Video analysis', 'Putting studio',
+  'Short-game area', 'Custom fitting', 'Junior coaching', 'Group clinics',
+];
+const RETAIL = [
+  'Custom fitting', 'Launch monitors', 'Trade-in', 'Repairs',
+  'Online store', 'Big brands', 'Parking',
+];
+
+/**
+ * Keyed on the EXACT category values in src/constants/businessCategories.ts.
+ * Every category has an entry; an empty array is a deliberate "no facilities"
+ * (the section hides), never a failed match. No substring matching: a renamed
+ * category with no entry here is caught by the Record type below.
+ */
+type CategoryValue = (typeof BUSINESS_CATEGORIES)[number];
 const FACILITIES_BY_CATEGORY: Record<string, string[]> = {
   'Golf Club': [
     '18 holes', '9 holes', 'Driving range', 'Putting green', 'Pro shop',
     'Cafe / bar', 'Restaurant', 'Buggy hire', 'Club hire', 'Lessons',
     'Changing rooms', 'Parking',
   ],
-  'Golf Academy': [
-    'Indoor bays', 'Launch monitors', 'Video analysis', 'Putting studio',
-    'Short-game area', 'Custom fitting', 'Junior coaching', 'Group clinics',
-  ],
-  'Coach': [
-    'Indoor bays', 'Launch monitors', 'Video analysis', 'Putting studio',
-    'Short-game area', 'Custom fitting', 'Junior coaching', 'Group clinics',
-  ],
-  'Instructor': [
-    'Indoor bays', 'Launch monitors', 'Video analysis', 'Putting studio',
-    'Short-game area', 'Custom fitting', 'Junior coaching', 'Group clinics',
-  ],
-  'Retailer': [
-    'Custom fitting', 'Launch monitors', 'Trade-in', 'Repairs',
-    'Online store', 'Big brands', 'Parking',
-  ],
-  'Pro Shop': [
-    'Custom fitting', 'Launch monitors', 'Trade-in', 'Repairs',
-    'Online store', 'Big brands', 'Parking',
-  ],
-  'Club Fitter': [
-    'Custom fitting', 'Launch monitors', 'Trade-in', 'Repairs',
-    'Online store', 'Big brands', 'Parking',
-  ],
+  'Golf Academy': COACHING,
+  'Coach / Instructor': COACHING,
+  'University / College': [],
+  'Creator': [],
+  'Retailer / Pro Shop': RETAIL,
+  'Club Fitter': RETAIL,
   'Resort': [
     'On-site accommodation', 'Multiple courses', 'Driving range', 'Pro shop',
     'Restaurant', 'Spa', 'Buggy hire', 'Lessons',
@@ -98,14 +96,10 @@ const FACILITIES_BY_CATEGORY: Record<string, string[]> = {
   'Hotel / Accommodation': ['Parking', 'Restaurant', 'Bar', 'Spa', 'Gym', 'Golf packages', 'Club storage', 'EV charging'],
   'Restaurant / Cafe': ['Parking', 'Outdoor seating', 'Takeaway', 'Reservations', 'Vegetarian options', 'Family friendly'],
   'Bar / Pub': ['Parking', 'Outdoor seating', 'Live sport on TV', 'Food served', 'Dog friendly', 'Beer garden'],
-};
+  'Brand / Manufacturer': [],
+  'Other': [],
+} satisfies Record<CategoryValue, string[]>;
 
 export function getFacilitiesForCategory(category: string): string[] {
-  if (!category) return [];
-  if (FACILITIES_BY_CATEGORY[category]) return FACILITIES_BY_CATEGORY[category];
-  const lower = category.toLowerCase();
-  for (const key of Object.keys(FACILITIES_BY_CATEGORY)) {
-    if (lower.includes(key.toLowerCase())) return FACILITIES_BY_CATEGORY[key];
-  }
-  return DEFAULT_TAGS;
+  return FACILITIES_BY_CATEGORY[category] ?? [];
 }
