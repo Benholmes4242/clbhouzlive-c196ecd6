@@ -20,7 +20,7 @@ export interface RoundAwardRow {
   previous_value: number | null;
   delta: number | null;
   rank_here: number | null;
-  attempts_at_detection: number | null;
+  attempts: number | null;
 }
 
 export interface RoundEffortRow {

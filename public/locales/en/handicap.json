@@ -375,12 +375,26 @@
         "they": "{{score}}. Their {{place}} best {{unit}} here, from {{count}}.",
         "none": "{{score}}. {{place}} best {{unit}} here, from {{count}}."
       },
+      "placedBare": {
+        "you": "{{score}}. Your {{place}} best {{unit}} here.",
+        "he": "{{score}}. His {{place}} best {{unit}} here.",
+        "she": "{{score}}. Her {{place}} best {{unit}} here.",
+        "they": "{{score}}. Their {{place}} best {{unit}} here.",
+        "none": "{{score}}. {{place}} best {{unit}} here."
+      },
       "topTen": {
         "you": "{{score}}. Inside your best ten {{unitPlural}} here, from {{count}}.",
         "he": "{{score}}. Inside his best ten {{unitPlural}} here, from {{count}}.",
         "she": "{{score}}. Inside her best ten {{unitPlural}} here, from {{count}}.",
         "they": "{{score}}. Inside their best ten {{unitPlural}} here, from {{count}}.",
         "none": "{{score}}. Inside the best ten {{unitPlural}} here, from {{count}}."
+      },
+      "topTenBare": {
+        "you": "{{score}}. Inside your best ten {{unitPlural}} here.",
+        "he": "{{score}}. Inside his best ten {{unitPlural}} here.",
+        "she": "{{score}}. Inside her best ten {{unitPlural}} here.",
+        "they": "{{score}}. Inside their best ten {{unitPlural}} here.",
+        "none": "{{score}}. Inside the best ten {{unitPlural}} here."
       },
       "newBestBare": {
         "you": "{{score}}. Your best here.",
