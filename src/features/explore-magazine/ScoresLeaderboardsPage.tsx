@@ -29,7 +29,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
-import { useFeatsYear, type FeatKind } from './useFeatsYear';
+import { useFeatsWindow, type FeatKind, type FeatWindow } from './useFeatsWindow';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
@@ -246,6 +246,7 @@ function Section({
   contest,
   title,
   meta,
+  metaAlign,
   first,
   lede,
   children,
@@ -254,6 +255,8 @@ function Section({
   contest: boolean;
   title: ReactNode;
   meta?: ReactNode;
+  /** 'center' for a control in the meta slot — the row is baseline-aligned for text. */
+  metaAlign?: 'center';
   first?: boolean;
   lede?: ReactNode;
   children: ReactNode;
@@ -283,7 +286,7 @@ function Section({
           {title}
         </div>
         {meta != null ? (
-          <div className="tabular-nums" style={{ ...EYEBROW, color: A.DIM, flexShrink: 0, whiteSpace: 'nowrap' }}>
+          <div className="tabular-nums" style={{ ...EYEBROW, color: A.DIM, flexShrink: 0, whiteSpace: 'nowrap', alignSelf: metaAlign }}>
             {meta}
           </div>
         ) : null}
@@ -527,7 +530,13 @@ export function ScoresLeaderboardsPage({
   const improvedRows = improved.data ?? [];
   const [improvedSheet, setImprovedSheet] = useState(false);
 
-  const featsYear = useFeatsYear(userId);
+  const [featWindow, setFeatWindow] = useState<FeatWindow>('year');
+  const featsYear = useFeatsWindow(userId, featWindow);
+  const pickFeatWindow = (next: FeatWindow) => {
+    if (next === featWindow) return;
+    setFeatWindow(next);
+    analyticsEvents.track('feats_window_changed', { window: next });
+  };
 
   const birdiesC = useCareerBoard(userId, 'birdies', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
   const roundsC = useCareerBoard(userId, 'rounds', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
@@ -624,7 +633,7 @@ export function ScoresLeaderboardsPage({
   const boardTitle = t(BOARD_LABELS[state.board].i18n, BOARD_LABELS[state.board].label);
 
   /* ------------------------------------------------------------ §5 feats */
-  /* §5 reads get_feats_year: true event counts (eagles, not rounds with an
+  /* §5 reads get_feats_window: true event counts (eagles, not rounds with an
      eagle) and the denominator each divides by, from one RPC row per kind. */
   const featRows = featsYear.data ?? [];
   const featsShown = featsYear.isSuccess
@@ -890,8 +899,43 @@ export function ScoresLeaderboardsPage({
         <Section
           contest={false}
           eyebrow={t('amateur.leaderboards.rareAir', 'Rare air')}
-          title={t('amateur.leaderboards.featsThisYear', 'Feats this year')}
-          meta={t('amateur.leaderboards.nKinds', { count: featsShown.length, defaultValue_one: '{{count}} kind', defaultValue_other: '{{count}} kinds' })}
+          title={t('amateur.leaderboards.feats', 'Feats')}
+          metaAlign="center"
+          meta={(
+            <div
+              role="radiogroup"
+              aria-label={t('amateur.leaderboards.featsWindow', 'Feats period')}
+              style={{
+                display: 'flex', gap: 3, padding: 3, borderRadius: 999, flex: 'none', alignSelf: 'center',
+                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
+              }}
+            >
+              {([
+                ['year', String(new Date().getFullYear())],
+                ['all', t('amateur.leaderboards.allTime', 'All time')],
+              ] as const).map(([key, label]) => {
+                const selected = featWindow === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => pickFeatWindow(key)}
+                    style={{
+                      height: 24, padding: '0 10px', borderRadius: 999, border: 'none',
+                      fontFamily: SANS, fontSize: 11.5, fontWeight: 600, whiteSpace: 'nowrap',
+                      letterSpacing: 'normal', textTransform: 'none',
+                      background: selected ? 'rgba(255,255,255,0.12)' : 'transparent',
+                      color: selected ? A.INK : A.MUTE,
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
           lede={featTotals && featTotals.total_rounds > 0 ? (
             <Trans
               i18nKey="amateur.leaderboards.featsFrom"
@@ -1011,9 +1055,9 @@ export function ScoresLeaderboardsPage({
           contest
           eyebrow={t('amateur.leaderboards.theHundred', 'The hundred')}
           title={t('amateur.leaderboards.top100', 'Top 100 courses')}
-          /* §7 head is eyebrow + title only — meta (member count) and lede
-             (field average) were dropped; See all is the only count surface. */
         >
+          {/* §7 head is eyebrow + title only — meta (member count) and lede
+              (field average) were dropped; See all is the only count surface. */}
           <div style={{ marginBottom: 12 }}>
             <RailChips
               align="center-when-fit"
@@ -1025,7 +1069,20 @@ export function ScoresLeaderboardsPage({
               ariaLabel={t('amateur.leaderboards.top100List', 'Top 100 list')}
             />
           </div>
-          {listCourses.isSuccess && listTiles.length > 0 ? (
+          {/* A chip tap starts a fresh slug query. While it loads, reserve the
+              strip (caption + 60px tile row) instead of holding the old list:
+              last list's photographs under the new list's caption is worse than
+              a brief empty rail. Deliberately NOT placeholderData. */}
+          {userId && listCourses.isPending ? (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ marginTop: 12 }}>
+                <span style={{ ...TILE_HEAD, color: A.DIM }}>
+                  {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
+                </span>
+              </div>
+              <div aria-hidden style={{ height: 60 }} />
+            </div>
+          ) : listCourses.isSuccess && listTiles.length > 0 ? (
             <div style={{ marginBottom: 12 }}>
               <div style={{ marginTop: 12 }}>
                 <span style={{ ...TILE_HEAD, color: A.DIM }}>
