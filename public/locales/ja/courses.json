@@ -80,7 +80,7 @@
       },
       "title": "順位",
       "top100": "トップ100コース",
-      "latestCourse": "最新 · {{course}}",
+      "latestCourse": "追加 · {{course}}",
       "theListHundred": "{{list}}の100コース"
     },
     "place": {

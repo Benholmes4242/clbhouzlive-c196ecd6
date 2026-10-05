@@ -80,7 +80,7 @@
       },
       "title": "Wertung",
       "top100": "Top-100-Plätze",
-      "latestCourse": "Zuletzt · {{course}}",
+      "latestCourse": "Hinzugefügt · {{course}}",
       "theListHundred": "Die {{list}}-Hundert"
     },
     "place": {

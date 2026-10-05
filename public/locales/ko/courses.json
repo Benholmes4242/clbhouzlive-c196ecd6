@@ -80,7 +80,7 @@
       },
       "title": "순위",
       "top100": "톱 100 코스",
-      "latestCourse": "최근 · {{course}}",
+      "latestCourse": "추가됨 · {{course}}",
       "theListHundred": "{{list}} 100곳"
     },
     "place": {
