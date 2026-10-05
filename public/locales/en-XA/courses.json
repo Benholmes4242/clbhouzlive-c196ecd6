@@ -86,10 +86,8 @@
       },
       "title": "[~~Šţåñðîñĝš~~]",
       "top100": "[~~Ţőƥ 100 ćőúřšéš~~]",
-      "top100FieldAvg": "[~~Ţĥé ƒíéļđ áṽéřáĝéš <n>{{n}}</n> őƒ ţĥé ĥúñđřéđ.~~]",
       "latestCourse": "[~~Ļáţéšţ · {{course}}~~]",
-      "theListHundred": "[~~Ţĥé {{list}} ĥúñđřéđ~~]",
-      "inRankOrder": "[~~Íñ řáñķ őřđéř~~]"
+      "theListHundred": "[~~Ţĥé {{list}} ĥúñđřéđ~~]"
     },
     "place": {
       "pair": "[~~{{place}}, {{nation}}~~]"

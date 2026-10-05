@@ -86,10 +86,8 @@
       },
       "title": "Standings",
       "top100": "Top 100 courses",
-      "top100FieldAvg": "The field averages <n>{{n}}</n> of the hundred.",
       "latestCourse": "Latest · {{course}}",
-      "theListHundred": "The {{list}} hundred",
-      "inRankOrder": "In rank order"
+      "theListHundred": "The {{list}} hundred"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"

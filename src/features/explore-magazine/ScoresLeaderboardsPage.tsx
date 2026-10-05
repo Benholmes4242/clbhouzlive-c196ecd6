@@ -61,6 +61,8 @@ interface CareerRow {
   photo_url: string | null;
   home_club: string | null;
   value: number;
+  /** Read from get_career_leaderboard but deliberately UNRENDERED — §7 dropped
+   * the field-average line; kept only so the SQL column isn't "fixed" back into the UI. */
   field_avg: number | null;
   /** Most recent round on a course in the SELECTED list — same scope as `value`. */
   last_course_name: string | null;
@@ -698,8 +700,6 @@ export function ScoresLeaderboardsPage({
     () => [...(listCourses.data ?? [])].sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)),
     [listCourses.data],
   );
-  const fieldAvgRaw = top100Rows[0]?.field_avg;
-  const fieldAvg = fieldAvgRaw == null ? NaN : Number(fieldAvgRaw);
   const [top100Sheet, setTop100Sheet] = useState<CareerRow | null>(null);
   const openTop100Sheet = (r: CareerRow) => setTop100Sheet(r);
 
@@ -1011,15 +1011,8 @@ export function ScoresLeaderboardsPage({
           contest
           eyebrow={t('amateur.leaderboards.theHundred', 'The hundred')}
           title={t('amateur.leaderboards.top100', 'Top 100 courses')}
-          meta={top100Rows.length > 0 ? membersText(Number(top100Rows[0].total_members)) : undefined}
-          lede={Number.isFinite(fieldAvg) ? (
-            <Trans
-              i18nKey="amateur.leaderboards.top100FieldAvg"
-              defaults="The field averages <n>{{n}}</n> of the hundred."
-              values={{ n: Math.round(fieldAvg) }}
-              components={{ n: <span style={{ fontWeight: 700, color: A.INK }} /> }}
-            />
-          ) : undefined}
+          /* §7 head is eyebrow + title only — meta (member count) and lede
+             (field average) were dropped; See all is the only count surface. */
         >
           <div style={{ marginBottom: 12 }}>
             <RailChips
@@ -1034,12 +1027,9 @@ export function ScoresLeaderboardsPage({
           </div>
           {listCourses.isSuccess && listTiles.length > 0 ? (
             <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <div style={{ marginTop: 12 }}>
                 <span style={{ ...TILE_HEAD, color: A.DIM }}>
                   {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
-                </span>
-                <span style={{ ...TILE_HEAD, color: A.MUTE }}>
-                  {t('amateur.leaderboards.inRankOrder', 'In rank order')}
                 </span>
               </div>
               <Rail>

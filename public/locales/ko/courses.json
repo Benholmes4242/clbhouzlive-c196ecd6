@@ -80,10 +80,8 @@
       },
       "title": "순위",
       "top100": "톱 100 코스",
-      "top100FieldAvg": "전체 평균은 100곳 중 <n>{{n}}</n>곳입니다.",
       "latestCourse": "최근 · {{course}}",
-      "theListHundred": "{{list}} 100곳",
-      "inRankOrder": "순위순"
+      "theListHundred": "{{list}} 100곳"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
