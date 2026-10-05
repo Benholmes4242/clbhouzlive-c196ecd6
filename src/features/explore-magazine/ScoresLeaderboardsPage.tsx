@@ -693,7 +693,7 @@ export function ScoresLeaderboardsPage({
   /* last_course_name is scoped in SQL to the selected list, so it changes with
      the chip alongside the count. Never fall back to home_club. */
   const top100Secondary = (r: CareerRow): string | null =>
-    r.last_course_name ? t('amateur.leaderboards.latestCourse', 'Latest · {{course}}', { course: r.last_course_name }) : null;
+    r.last_course_name ? t('amateur.leaderboards.latestCourse', 'Added · {{course}}', { course: r.last_course_name }) : null;
   /* Same call as the progress sheet (same query key) — the sheet opens from cache. */
   const listCourses = useTop100ListProgress(userId ? top100List : undefined, userId, userId);
   const listTiles = useMemo(
