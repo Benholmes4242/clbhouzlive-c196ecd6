@@ -531,6 +531,8 @@ export function ScoresLeaderboardsPage({
 
   const [featWindow, setFeatWindow] = useState<FeatWindow>('year');
   const featsYear = useFeatsWindow(userId, featWindow);
+  /** Feat tiles are counted in the section's own window, so their sheets open on the same one. */
+  const featFilters: BoardFilters = { ...DEFAULT_FILTERS, window: featWindow };
   const pickFeatWindow = (next: FeatWindow) => {
     if (next === featWindow) return;
     setFeatWindow(next);
