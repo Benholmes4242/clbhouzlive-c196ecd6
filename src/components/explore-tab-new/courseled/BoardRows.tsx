@@ -8,7 +8,7 @@ import { boardCountsRounds, isFeatBoard, type BoardKey, type FeatBoardKey } from
 import type { ExploreRoundFeatKind } from '@/features/explore-magazine/roundFeatCollection';
 import type { BoardRow as Row } from './hooks/useBoardPage';
 import { INK_TINT_04 as LEADER_WASH } from '@/features/tourhub/_shared/tokens';
-import { topRoundFeats, type ExploreRoundFeat } from '@/features/explore-magazine/roundFeatCollection';
+import { collectRoundFeats, FEAT_PRECEDENCE, topRoundFeats, type ExploreRoundFeat } from '@/features/explore-magazine/roundFeatCollection';
 import type { TFunction } from 'i18next';
 
 /**
