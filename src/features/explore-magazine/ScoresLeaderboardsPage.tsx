@@ -1070,21 +1070,21 @@ export function ScoresLeaderboardsPage({
             />
           </div>
           {/* A chip tap starts a fresh slug query. While it loads, reserve the
-              strip (caption + 60px tile row) instead of holding the old list:
+              strip (caption + 76px tile row) instead of holding the old list:
               last list's photographs under the new list's caption is worse than
               a brief empty rail. Deliberately NOT placeholderData. */}
           {userId && listCourses.isPending ? (
             <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 12 }}>
+              <div style={{ marginTop: 16 }}>
                 <span style={{ ...TILE_HEAD, color: A.DIM }}>
                   {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
                 </span>
               </div>
-              <div aria-hidden style={{ height: 60 }} />
+              <div aria-hidden style={{ height: 76 }} />
             </div>
           ) : listCourses.isSuccess && listTiles.length > 0 ? (
             <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 12 }}>
+              <div style={{ marginTop: 16 }}>
                 <span style={{ ...TILE_HEAD, color: A.DIM }}>
                   {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
                 </span>
@@ -1097,7 +1097,7 @@ export function ScoresLeaderboardsPage({
                     onClick={() => onOpenCourse(c.course_id)}
                     aria-label={c.course_name}
                     style={{
-                      width: 86, height: 60, borderRadius: 10, overflow: 'hidden', position: 'relative',
+                      width: 108, height: 76, borderRadius: 10, overflow: 'hidden', position: 'relative',
                       flexShrink: 0, padding: 0, background: A.PANEL,
                       border: c.thumbnail_image ? 'none' : `1px solid ${A.BORDER}`,
                     }}
@@ -1106,16 +1106,18 @@ export function ScoresLeaderboardsPage({
                       <img src={c.thumbnail_image} alt="" loading="lazy" decoding="async"
                         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : null}
-                    <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.72))' }} />
+                    <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.76))' }} />
                     {c.rank != null ? (
-                      <span className="tabular-nums" style={{ position: 'absolute', left: 5, top: 4, fontSize: 8.5, fontWeight: 700, color: '#FFF', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
+                      <span className="tabular-nums" style={{ position: 'absolute', left: 6, top: 5, fontSize: 9, fontWeight: 700, color: '#FFF', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
                         {`#${c.rank}`}
                       </span>
                     ) : null}
                     <span style={{
-                      position: 'absolute', left: 5, right: 5, bottom: 4, fontSize: 8.5, fontWeight: 700,
+                      position: 'absolute', left: 6, right: 6, bottom: 5, fontSize: 9, fontWeight: 700,
                       letterSpacing: '0.04em', textTransform: 'uppercase', lineHeight: 1.15, color: '#FFF',
-                      textShadow: '0 1px 4px rgba(0,0,0,0.9)', maxHeight: 29, overflow: 'hidden', textAlign: 'left',
+                      textShadow: '0 1px 4px rgba(0,0,0,0.9)',
+                      display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden',
+                      textAlign: 'left',
                     }}>
                       {c.course_name}
                     </span>
