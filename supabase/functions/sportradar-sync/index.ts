@@ -785,10 +785,12 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         score: entry.score,
         strokes: entry.strokes,
         thru: derivedThru,
-        round_1: rounds[0]?.strokes,
-        round_2: rounds[1]?.strokes,
-        round_3: rounds[2]?.strokes,
-        round_4: rounds[3]?.strokes,
+        // round_1..round_4 on sr_leaderboards are TO-PAR, the same unit as `score`.
+        // `.strokes` is the gross figure, which this table does not store.
+        round_1: rounds[0]?.score,
+        round_2: rounds[1]?.score,
+        round_3: rounds[2]?.score,
+        round_4: rounds[3]?.score,
         money: entry.money,
         points: entry.points,
         status: derivedStatus,
@@ -861,10 +863,12 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         score: entry.score,
         strokes: entry.strokes,
         thru: derivedThru,
-        round_1: rounds[0]?.strokes,
-        round_2: rounds[1]?.strokes,
-        round_3: rounds[2]?.strokes,
-        round_4: rounds[3]?.strokes,
+        // round_1..round_4 on sr_leaderboards are TO-PAR, the same unit as `score`.
+        // `.strokes` is the gross figure, which this table does not store.
+        round_1: rounds[0]?.score,
+        round_2: rounds[1]?.score,
+        round_3: rounds[2]?.score,
+        round_4: rounds[3]?.score,
         money: entry.money,
         points: entry.points,
         status: derivedStatus,
