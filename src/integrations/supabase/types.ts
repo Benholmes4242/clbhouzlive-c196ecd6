@@ -20721,6 +20721,21 @@ export type Database = {
           username: string
         }[]
       }
+      get_feats_year: {
+        Args: { p_viewer?: string }
+        Returns: {
+          denominator: number
+          denominator_unit: string
+          events: number
+          feat_kind: string
+          holes_estimated: number
+          members: number
+          rounds_with: number
+          total_holes: number
+          total_members: number
+          total_rounds: number
+        }[]
+      }
       get_featured_groups: {
         Args: { p_round?: number; p_tournament_id: string }
         Returns: Json
