@@ -948,7 +948,7 @@ export function ScoresLeaderboardsPage({
         >
           <Rail>
             {featsShown.map((f) => (
-              <button key={f.key} type="button" onClick={() => setSeeAll({ board: f.key, filters: YEAR_FILTERS })} style={{ ...RAIL_CARD, width: 150, position: 'relative' }}>
+              <button key={f.key} type="button" onClick={() => setSeeAll({ board: f.key, filters: featFilters })} style={{ ...RAIL_CARD, width: 150, position: 'relative' }}>
                 <span aria-hidden style={{ position: 'absolute', top: 12, right: 11, color: FAINT, display: 'flex' }}>
                   <ChevronRight size={13} />
                 </span>
