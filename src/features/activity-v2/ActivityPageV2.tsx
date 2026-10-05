@@ -18,6 +18,7 @@ import {
   type ActivityFeedRowV2,
 } from './hooks/useActivityFeedV2';
 import { useRecordsUnreadCount } from './hooks/useRecordsUnreadCount';
+import { markNotificationRead } from './markNotificationRead';
 import { GAME_NOTIF_TYPES, ACT } from './components/ledgerKinds';
 import { FeaturedMomentCard, pickFeaturedRow } from './components/FeaturedMomentCard';
 import { FriendRequestsRail } from './components/FriendRequestsRail';
@@ -255,28 +256,8 @@ export const ActivityPageV2: React.FC = () => {
   );
 
 
-  // Optimistic single-row mark-read ----
-  // NOTE: only touch the local 'activity-v2' cache so the visible dot state
-  // remains through the visit; badges are refreshed via invalidation which
-  // re-runs the pure is_read=false count.
-  const markRead = async (notifId: string) => {
-    type FeedCache = { pages: ActivityFeedRowV2[][]; pageParams: unknown[] };
-    qc.setQueriesData<FeedCache>({ queryKey: ['activity-v2'] }, (old) => {
-      if (!old?.pages) return old;
-      return {
-        ...old,
-        pages: old.pages.map((p) =>
-          p.map((r) => (r.notif_id === notifId ? { ...r, is_read: true } : r)),
-        ),
-      };
-    });
-    // Both read-state columns (§2), so the two can never drift further.
-    await supabase.from('notifications').update({ is_read: true, read: true }).eq('id', notifId);
-
-    qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
-    qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
-    qc.invalidateQueries({ queryKey: ['records-unread-count'] });
-  };
+  // Single-row mark-read — the shared one (also used by push taps).
+  const markRead = (notifId: string) => markNotificationRead(qc, notifId);
 
   const openSheet = (row: ActivityFeedRowV2) => {
     setSheetRow(row);
