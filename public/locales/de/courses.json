@@ -71,6 +71,14 @@
         "d90": "90 TAGE"
       }
     },
+    "leaderboards": {
+      "featsFrom": "Aus {{rounds}} Runden und {{holes}} Löchern, die auf clbhouz erfasst wurden.",
+      "featRarity": "1 von {{n}} {{unit}}",
+      "unit": {
+        "holes": "Löcher",
+        "rounds": "Runden"
+      }
+    },
     "place": {
       "pair": "{{place}}, {{nation}}"
     },

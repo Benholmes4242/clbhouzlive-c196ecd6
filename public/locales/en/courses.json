@@ -77,6 +77,14 @@
         "d90": "90 DAYS"
       }
     },
+    "leaderboards": {
+      "featsFrom": "From {{rounds}} rounds and {{holes}} holes tracked on clbhouz.",
+      "featRarity": "1 in every {{n}} {{unit}}",
+      "unit": {
+        "holes": "holes",
+        "rounds": "rounds"
+      }
+    },
     "place": {
       "pair": "{{place}}, {{nation}}"
     },

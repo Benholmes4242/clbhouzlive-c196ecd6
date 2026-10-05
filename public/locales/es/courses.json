@@ -71,6 +71,14 @@
         "d90": "90 DIAS"
       }
     },
+    "leaderboards": {
+      "featsFrom": "De {{rounds}} vueltas y {{holes}} hoyos registrados en clbhouz.",
+      "featRarity": "1 de cada {{n}} {{unit}}",
+      "unit": {
+        "holes": "hoyos",
+        "rounds": "vueltas"
+      }
+    },
     "place": {
       "pair": "{{place}}, {{nation}}"
     },
