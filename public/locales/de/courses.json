@@ -78,7 +78,12 @@
         "holes": "Löcher",
         "rounds": "Runden"
       },
-      "title": "Wertung"
+      "title": "Wertung",
+      "top100": "Top-100-Plätze",
+      "top100FieldAvg": "Im Schnitt hat das Feld <n>{{n}}</n> der hundert gespielt.",
+      "latestCourse": "Zuletzt · {{course}}",
+      "theListHundred": "Die {{list}}-Hundert",
+      "inRankOrder": "Nach Rang"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
@@ -1266,7 +1271,6 @@
     },
     "ord": {
       "1": "erste",
-      "10": "zehnte",
       "2": "zweite",
       "3": "dritte",
       "4": "vierte",
@@ -1274,7 +1278,8 @@
       "6": "sechste",
       "7": "siebte",
       "8": "achte",
-      "9": "neunte"
+      "9": "neunte",
+      "10": "zehnte"
     },
     "ownerFirst": "Dein erstes {{feat}}. Nach {{rounds}} Runden.",
     "ownerFirstCongrats": "Glückwunsch, {{name}} — {{line}}",
