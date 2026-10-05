@@ -173,7 +173,17 @@ serve(async (req) => {
         // no JS required). Origin MUST match the app's WebView Initial URL /
         // AASA host so taps stay inside the WebView.
         const APP_ORIGIN = (Deno.env.get('APP_WEBVIEW_ORIGIN') ?? 'https://clbhouz.co.uk').replace(/\/$/, '');
-        const targetUrl = route.startsWith('http') ? route : `${APP_ORIGIN}${route}`;
+        // Carry the notification id as ?n= so the app marks it read on tap.
+        // URL API preserves any existing query string and hash.
+        let targetUrl = route.startsWith('http') ? route : `${APP_ORIGIN}${route}`;
+        const notifId = typeof data.notification_id === 'string' ? data.notification_id : '';
+        if (notifId) {
+          try {
+            const u = new URL(targetUrl);
+            u.searchParams.set('n', notifId);
+            targetUrl = u.toString();
+          } catch { /* leave targetUrl unchanged */ }
+        }
         const outgoingData = { ...data, route, targetUrl };
 
         const badgeCount = unreadByUser.has(item.user_id)
