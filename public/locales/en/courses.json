@@ -78,7 +78,7 @@
       }
     },
     "leaderboards": {
-      "featsFrom": "From {{rounds}} rounds and {{holes}} holes tracked on clbhouz.",
+      "featsFrom": "From {{rounds}} full rounds and {{holes}} holes tracked on clbhouz.",
       "featRarity": "1 in every {{n}} {{unit}}",
       "feats": "Feats",
       "allTime": "All time",

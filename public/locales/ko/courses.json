@@ -72,7 +72,7 @@
       }
     },
     "leaderboards": {
-      "featsFrom": "clbhouz에서 기록된 {{rounds}}라운드와 {{holes}}홀 기준입니다.",
+      "featsFrom": "clbhouz에서 기록된 {{rounds}}개의 전체 라운드와 {{holes}}홀 기준입니다.",
       "featRarity": "{{n}}{{unit}}당 1회",
       "feats": "기록",
       "allTime": "전체 기간",
