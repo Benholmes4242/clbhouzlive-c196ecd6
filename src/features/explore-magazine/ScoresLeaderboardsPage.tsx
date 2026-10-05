@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronRight, Medal } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -29,6 +29,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
+import { useFeatsYear, type FeatKind } from './useFeatsYear';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
@@ -241,6 +242,7 @@ function Section({
   title,
   meta,
   first,
+  lede,
   children,
 }: {
   eyebrow: string;
@@ -248,6 +250,7 @@ function Section({
   title: ReactNode;
   meta?: ReactNode;
   first?: boolean;
+  lede?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -280,6 +283,9 @@ function Section({
           </div>
         ) : null}
       </div>
+      {lede != null ? (
+        <div style={{ marginTop: 8, fontSize: 11.5, lineHeight: 1.45, color: A.MUTE }}>{lede}</div>
+      ) : null}
       <div style={{ marginTop: 12 }}>{children}</div>
     </section>
   );
@@ -471,6 +477,8 @@ function Rail({ children }: { children: ReactNode }) {
   );
 }
 
+const FEAT_TONE: Record<FeatKind, string> = { ace: MEDAL_GOLD, albatross: MEDAL_SILVER, eagle: MEDAL_BRONZE, clean_card: REC.GOOD };
+
 const RAIL_CARD = {
   flexShrink: 0,
   padding: 12,
@@ -512,10 +520,7 @@ export function ScoresLeaderboardsPage({
   const improvedRows = improved.data ?? [];
   const [improvedSheet, setImprovedSheet] = useState(false);
 
-  const ace = useBoardPage(userId, 'ace', YEAR_FILTERS, { limit: 200 });
-  const albatross = useBoardPage(userId, 'albatross', YEAR_FILTERS, { limit: 200 });
-  const eagle = useBoardPage(userId, 'eagle', YEAR_FILTERS, { limit: 200 });
-  const clean = useBoardPage(userId, 'clean_card', YEAR_FILTERS, { limit: 200 });
+  const featsYear = useFeatsYear(userId);
 
   const birdiesC = useCareerBoard(userId, 'birdies', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
   const roundsC = useCareerBoard(userId, 'rounds', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
@@ -612,24 +617,14 @@ export function ScoresLeaderboardsPage({
   const boardTitle = t(BOARD_LABELS[state.board].i18n, BOARD_LABELS[state.board].label);
 
   /* ------------------------------------------------------------ §5 feats */
-  const feats = (
-    [
-      { key: 'ace' as FeatBoardKey, q: ace, tone: MEDAL_GOLD },
-      { key: 'albatross' as FeatBoardKey, q: albatross, tone: MEDAL_SILVER },
-      { key: 'eagle' as FeatBoardKey, q: eagle, tone: MEDAL_BRONZE },
-      { key: 'clean_card' as FeatBoardKey, q: clean, tone: REC.GOOD },
-    ]
-  ).map((f) => {
-    const rows = f.q.data?.rows ?? [];
-    return {
-      ...f,
-      events: f.q.data?.total ?? 0,
-      /* DISTINCT MEMBERS from the returned rows, never a pool_* field. */
-      members: new Set(rows.map((r) => r.user_id)).size,
-    };
-  });
-  const featsSettled = feats.every((f) => f.q.isFetched);
-  const featsShown = feats.filter((f) => f.q.isSuccess && f.events > 0);
+  /* §5 reads get_feats_year: true event counts (eagles, not rounds with an
+     eagle) and the denominator each divides by, from one RPC row per kind. */
+  const featRows = featsYear.data ?? [];
+  const featsShown = featsYear.isSuccess
+    ? featRows.filter((f) => f.events > 0).map((f) => ({ ...f, key: f.feat_kind as FeatBoardKey, tone: FEAT_TONE[f.feat_kind] }))
+    : [];
+  const featTotals = featsYear.isSuccess ? featRows[0] ?? null : null;
+  const featsSettled = featsYear.isFetched;
   const featLabel = (k: FeatBoardKey, n: number) => {
     switch (k) {
       case 'ace':
@@ -876,17 +871,28 @@ export function ScoresLeaderboardsPage({
 
       {/* §5 FEATS THIS YEAR — event counts; footnote is distinct members. */}
       {!featsSettled ? (
-        pending(150)
+        pending(175)
       ) : featsShown.length > 0 ? (
         <Section
           contest={false}
           eyebrow={t('amateur.leaderboards.rareAir', 'Rare air')}
           title={t('amateur.leaderboards.featsThisYear', 'Feats this year')}
           meta={t('amateur.leaderboards.nKinds', { count: featsShown.length, defaultValue_one: '{{count}} kind', defaultValue_other: '{{count}} kinds' })}
+          lede={featTotals && featTotals.total_rounds > 0 ? (
+            <Trans
+              i18nKey="amateur.leaderboards.featsFrom"
+              defaults="From <n>{{rounds}} rounds</n> and <n>{{holes}} holes</n> tracked on clbhouz."
+              values={{ rounds: featTotals.total_rounds.toLocaleString(), holes: featTotals.total_holes.toLocaleString() }}
+              components={{ n: <span style={{ fontWeight: 700, color: A.INK }} /> }}
+            />
+          ) : undefined}
         >
           <Rail>
             {featsShown.map((f) => (
-              <button key={f.key} type="button" onClick={() => setSeeAll({ board: f.key, filters: YEAR_FILTERS })} style={{ ...RAIL_CARD, width: 112 }}>
+              <button key={f.key} type="button" onClick={() => setSeeAll({ board: f.key, filters: YEAR_FILTERS })} style={{ ...RAIL_CARD, width: 150, position: 'relative' }}>
+                <span aria-hidden style={{ position: 'absolute', top: 12, right: 11, color: FAINT, display: 'flex' }}>
+                  <ChevronRight size={13} />
+                </span>
                 <span style={{ width: 26, height: 26, borderRadius: 8, display: 'grid', placeItems: 'center', background: f.tone, color: A.CANVAS }}>
                   <Medal size={15} />
                 </span>
@@ -895,6 +901,13 @@ export function ScoresLeaderboardsPage({
                 </span>
                 <span style={{ display: 'block', marginTop: 2, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.MUTE }}>
                   {featLabel(f.key, f.events)}
+                </span>
+                <span className="tabular-nums" style={{ display: 'block', marginTop: 6, fontSize: 10.5, lineHeight: 1.3, color: A.MUTE }}>
+                  {t('amateur.leaderboards.featRarity', {
+                    n: Math.round(f.denominator / f.events).toLocaleString(),
+                    unit: t(`amateur.leaderboards.unit.${f.denominator_unit}`, f.denominator_unit),
+                    defaultValue: '1 in every {{n}} {{unit}}',
+                  })}
                 </span>
                 <span style={{ display: 'block', marginTop: 6, fontSize: 10.5, color: A.DIM }}>{membersText(f.members)}</span>
               </button>
