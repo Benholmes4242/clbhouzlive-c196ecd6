@@ -13,6 +13,7 @@ const t = (_key: string, fallbackOrOptions?: string | Record<string, unknown>, v
   if (_key.endsWith('featJoin')) return `${first} + ${second}`;
   if (_key.endsWith('featAce')) return count === 1 ? 'HOLE IN ONE' : `${count} HOLES IN ONE`;
   if (_key.endsWith('featAlbatross')) return count === 1 ? 'ALBATROSS' : `${count} ALBATROSSES`;
+  if (_key.endsWith('featClean')) return 'BOGEY-FREE';
   if (_key.endsWith('featEagle')) return count === 1 ? 'EAGLE' : `${count} EAGLES`;
   return '';
 };
@@ -39,7 +40,16 @@ describe('E2 round feat fixtures', () => {
   it.each(cases)('%s uses tier %s and marker %s', (_name, facts, tier, marker) => {
     const round = item(facts);
     expect(calloutFor(round)).toMatchObject({ tier });
-    expect(boardFeatMarker(round.facts as never, t as never)).toBe(marker);
+    expect(boardFeatMarker(round.facts as never, 'topar', t as never)).toBe(marker);
+  });
+
+  it.each([
+    ['eagle board, 1 eagle', 'eagle', { eagles: 1 }, null],
+    ['eagle board, 2 eagles', 'eagle', { eagles: 2 }, '2 EAGLES'],
+    ['eagle board, 1 eagle + bogey-free', 'eagle', { eagles: 1, clean_card: true }, 'BOGEY-FREE'],
+    ['topar board, 1 eagle', 'topar', { eagles: 1 }, 'EAGLE'],
+  ] as const)('%s -> %s', (_n, board, facts, marker) => {
+    expect(boardFeatMarker(item(facts as StreamFacts).facts as never, board, t as never)).toBe(marker);
   });
 
   it('uses bounded count bonuses inside rarity bands', () => {

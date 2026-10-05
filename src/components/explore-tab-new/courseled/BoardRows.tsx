@@ -4,7 +4,8 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { A, SANS } from './tokens';
 import { relativeDayCompact } from './discoverWhen';
-import { boardCountsRounds, isFeatBoard, type BoardKey } from './boardFilters';
+import { boardCountsRounds, isFeatBoard, type BoardKey, type FeatBoardKey } from './boardFilters';
+import type { ExploreRoundFeatKind } from '@/features/explore-magazine/roundFeatCollection';
 import type { BoardRow as Row } from './hooks/useBoardPage';
 import { INK_TINT_04 as LEADER_WASH } from '@/features/tourhub/_shared/tokens';
 import { topRoundFeats, type ExploreRoundFeat } from '@/features/explore-magazine/roundFeatCollection';
@@ -286,8 +287,22 @@ function boardFeatLabel(feat: ExploreRoundFeat, t: BoardT): string {
   }
 }
 
-export function boardFeatMarker(row: Row, t: BoardT): string | null {
-  const labels = topRoundFeats(row).map((feat) => boardFeatLabel(feat, t));
+/** The feat each feat sheet is ABOUT. A marker that only restates this (count
+ *  1 or absent) repeats the sheet header and is dropped; a count the header
+ *  cannot carry ("2 EAGLES") and a feat of another kind survive. */
+const FEAT_BOARD_SUBJECT: Record<FeatBoardKey, ExploreRoundFeatKind> = {
+  ace: 'ace',
+  albatross: 'albatross',
+  eagle: 'eagle',
+  clean_card: 'clean',
+};
+
+export function boardFeatMarker(row: Row, board: BoardKey, t: BoardT): string | null {
+  const subject = isFeatBoard(board) ? FEAT_BOARD_SUBJECT[board as FeatBoardKey] : null;
+  const feats = topRoundFeats(row).filter(
+    (feat) => !(subject && feat.kind === subject && (feat.count == null || feat.count === 1 || feat.kind === 'clean')),
+  );
+  const labels = feats.map((feat) => boardFeatLabel(feat, t));
   if (labels.length === 0) return null;
   return labels.length > 1
     ? t('discover.filterBoard.featJoin', '{{first}} + {{second}}', { first: labels[0], second: labels[1] })
@@ -362,7 +377,7 @@ export function BoardRowView({
   /* B4.3 — the column, not the row, decides whether the value is words. */
   const { valueIsText, ranked } = boardColumns(board);
   const ink = isSelf ? A.AMBER : A.INK;
-  const feat = boardFeatMarker(row, t);
+  const feat = boardFeatMarker(row, board, t);
 
   return (
     <button
