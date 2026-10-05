@@ -77,6 +77,14 @@
         "d90": "[~~90 ĐÁÝŠ~~]"
       }
     },
+    "leaderboards": {
+      "featsFrom": "[~~Ƒřőɱ {{rounds}} řőúñđš áñđ {{holes}} ĥőļéš ţřáĉǩéđ őñ clbhouz.~~]",
+      "featRarity": "[~~1 íñ éṽéřý {{n}} {{unit}}~~]",
+      "unit": {
+        "holes": "[~~ĥőļéš~~]",
+        "rounds": "[~~řőúñđš~~]"
+      }
+    },
     "place": {
       "pair": "[~~{{place}}, {{nation}}~~]"
     },

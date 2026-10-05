@@ -71,6 +71,14 @@
         "d90": "90日"
       }
     },
+    "leaderboards": {
+      "featsFrom": "clbhouzで記録された{{rounds}}ラウンド、{{holes}}ホールのデータです。",
+      "featRarity": "{{n}}{{unit}}に1回",
+      "unit": {
+        "holes": "ホール",
+        "rounds": "ラウンド"
+      }
+    },
     "place": {
       "pair": "{{place}}、{{nation}}"
     },

@@ -71,6 +71,14 @@
         "d90": "90일"
       }
     },
+    "leaderboards": {
+      "featsFrom": "clbhouz에서 기록된 {{rounds}}라운드와 {{holes}}홀 기준입니다.",
+      "featRarity": "{{n}}{{unit}}당 1회",
+      "unit": {
+        "holes": "홀",
+        "rounds": "라운드"
+      }
+    },
     "place": {
       "pair": "{{place}}, {{nation}}"
     },
