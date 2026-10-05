@@ -8,7 +8,7 @@ import { boardCountsRounds, isFeatBoard, type BoardKey, type FeatBoardKey } from
 import type { ExploreRoundFeatKind } from '@/features/explore-magazine/roundFeatCollection';
 import type { BoardRow as Row } from './hooks/useBoardPage';
 import { INK_TINT_04 as LEADER_WASH } from '@/features/tourhub/_shared/tokens';
-import { topRoundFeats, type ExploreRoundFeat } from '@/features/explore-magazine/roundFeatCollection';
+import { collectRoundFeats, FEAT_PRECEDENCE, topRoundFeats, type ExploreRoundFeat } from '@/features/explore-magazine/roundFeatCollection';
 import type { TFunction } from 'i18next';
 
 /**
@@ -299,9 +299,20 @@ const FEAT_BOARD_SUBJECT: Record<FeatBoardKey, ExploreRoundFeatKind> = {
 
 export function boardFeatMarker(row: Row, board: BoardKey, t: BoardT): string | null {
   const subject = isFeatBoard(board) ? FEAT_BOARD_SUBJECT[board as FeatBoardKey] : null;
-  const feats = topRoundFeats(row).filter(
-    (feat) => !(subject && feat.kind === subject && (feat.count == null || feat.count === 1 || feat.kind === 'clean')),
-  );
+  /* FEAT SHEET: a round shows only what OUTRANKS the sheet's feat — its own
+     brace ("2 EAGLES"), a strictly rarer feat, or bogey-free. A lesser feat
+     (an eagle on the holes-in-one sheet, maybe the very same shot) is dropped.
+     Ranking boards filter nothing. Filter before the two-item cap. */
+  const feats = subject
+    ? collectRoundFeats(row)
+        .filter(
+          (feat) =>
+            (feat.kind === subject && feat.kind !== 'clean' && feat.count > 1)
+            || FEAT_PRECEDENCE[feat.kind] < FEAT_PRECEDENCE[subject]
+            || (feat.kind === 'clean' && subject !== 'clean'),
+        )
+        .slice(0, 2)
+    : topRoundFeats(row);
   const labels = feats.map((feat) => boardFeatLabel(feat, t));
   if (labels.length === 0) return null;
   return labels.length > 1

@@ -48,6 +48,11 @@ describe('E2 round feat fixtures', () => {
     ['eagle board, 2 eagles', 'eagle', { eagles: 2 }, '2 EAGLES'],
     ['eagle board, 1 eagle + bogey-free', 'eagle', { eagles: 1, clean_card: true }, 'BOGEY-FREE'],
     ['topar board, 1 eagle', 'topar', { eagles: 1 }, 'EAGLE'],
+    ['ace board, 1 ace + 1 eagle', 'ace', { holes_in_one: 1, eagles: 1 }, null],
+    ['ace board, 1 ace + bogey-free', 'ace', { holes_in_one: 1, clean_card: true }, 'BOGEY-FREE'],
+    ['eagle board, 1 eagle + 1 ace', 'eagle', { eagles: 1, holes_in_one: 1 }, 'HOLE IN ONE'],
+    ['eagle board, 2 eagles (brace)', 'eagle', { eagles: 2 }, '2 EAGLES'],
+    ['clean_card board, 1 eagle', 'clean_card', { eagles: 1, clean_card: true }, 'EAGLE'],
   ] as const)('%s -> %s', (_n, board, facts, marker) => {
     expect(boardFeatMarker(item(facts as StreamFacts).facts as never, board, t as never)).toBe(marker);
   });

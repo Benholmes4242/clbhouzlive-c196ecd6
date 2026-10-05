@@ -9,6 +9,20 @@ export interface ExploreRoundFeat {
   count: number;
 }
 
+/**
+ * THE ONE FEAT PRECEDENCE. Same order as featKicker in AmateurHero.tsx
+ * (ace, albatross, eagle). Lower outranks higher. `clean` sits outside the
+ * hole-level ladder: bogey-free is a fact about the round, never about a hole,
+ * so it neither competes with nor is suppressed by a hole-level feat.
+ */
+export const FEAT_PRECEDENCE: Record<ExploreRoundFeatKind, number> = {
+  ace: 1,
+  albatross: 2,
+  eagle: 3,
+  birdies: 4,
+  clean: 99,
+};
+
 export type ExploreFeatTier = 'ink' | 'gold' | 'top';
 
 
