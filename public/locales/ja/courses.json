@@ -72,7 +72,7 @@
       }
     },
     "leaderboards": {
-      "featsFrom": "clbhouzで記録された{{rounds}}ラウンド、{{holes}}ホールのデータです。",
+      "featsFrom": "clbhouzで記録された{{rounds}}フルラウンド、{{holes}}ホールのデータです。",
       "featRarity": "{{n}}{{unit}}に1回",
       "feats": "達成",
       "allTime": "通算",

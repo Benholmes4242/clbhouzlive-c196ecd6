@@ -939,7 +939,7 @@ export function ScoresLeaderboardsPage({
           lede={featTotals && featTotals.total_rounds > 0 ? (
             <Trans
               i18nKey="amateur.leaderboards.featsFrom"
-              defaults="From <n>{{rounds}} rounds</n> and <n>{{holes}} holes</n> tracked on clbhouz."
+              defaults="From <n>{{rounds}} full rounds</n> and <n>{{holes}} holes</n> tracked on clbhouz."
               values={{ rounds: featTotals.total_rounds.toLocaleString(), holes: featTotals.total_holes.toLocaleString() }}
               components={{ n: <span style={{ fontWeight: 700, color: A.INK }} /> }}
             />
