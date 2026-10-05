@@ -59,8 +59,7 @@ export const PRIMARY_ACTION_OPTIONS = [
 export type PrimaryActionKey = typeof PRIMARY_ACTION_OPTIONS[number]['key'];
 
 /* ── Facilities / amenities (category-aware) ────────── */
-import type { BUSINESS_CATEGORIES } from '@/constants/businessCategories';
-
+const GENERAL = ['Parking', 'Cafe / bar', 'Pro shop', 'Lessons', 'Custom fitting', 'Online store'];
 const COACHING = [
   'Indoor bays', 'Launch monitors', 'Video analysis', 'Putting studio',
   'Short-game area', 'Custom fitting', 'Junior coaching', 'Group clinics',
@@ -72,11 +71,13 @@ const RETAIL = [
 
 /**
  * Keyed on the EXACT category values in src/constants/businessCategories.ts.
- * Every category has an entry; an empty array is a deliberate "no facilities"
- * (the section hides), never a failed match. No substring matching: a renamed
- * category with no entry here is caught by the Record type below.
+ * Every category has an entry. To give a category no facilities, set an
+ * empty array (the section hides): a deliberate entry, never a failed match.
+ * No substring matching. GENERAL is the list these four showed before via
+ * the old fallback, kept so nothing changes on screen.
+ * NOTE: BUSINESS_CATEGORIES is typed string[], so a renamed category is not a
+ * compile error here — it falls to [] (no facilities). Rename both together.
  */
-type CategoryValue = (typeof BUSINESS_CATEGORIES)[number];
 const FACILITIES_BY_CATEGORY: Record<string, string[]> = {
   'Golf Club': [
     '18 holes', '9 holes', 'Driving range', 'Putting green', 'Pro shop',
@@ -85,8 +86,8 @@ const FACILITIES_BY_CATEGORY: Record<string, string[]> = {
   ],
   'Golf Academy': COACHING,
   'Coach / Instructor': COACHING,
-  'University / College': [],
-  'Creator': [],
+  'University / College': GENERAL,
+  'Creator': GENERAL,
   'Retailer / Pro Shop': RETAIL,
   'Club Fitter': RETAIL,
   'Resort': [
@@ -96,9 +97,9 @@ const FACILITIES_BY_CATEGORY: Record<string, string[]> = {
   'Hotel / Accommodation': ['Parking', 'Restaurant', 'Bar', 'Spa', 'Gym', 'Golf packages', 'Club storage', 'EV charging'],
   'Restaurant / Cafe': ['Parking', 'Outdoor seating', 'Takeaway', 'Reservations', 'Vegetarian options', 'Family friendly'],
   'Bar / Pub': ['Parking', 'Outdoor seating', 'Live sport on TV', 'Food served', 'Dog friendly', 'Beer garden'],
-  'Brand / Manufacturer': [],
-  'Other': [],
-} satisfies Record<CategoryValue, string[]>;
+  'Brand / Manufacturer': GENERAL,
+  'Other': GENERAL,
+};
 
 export function getFacilitiesForCategory(category: string): string[] {
   return FACILITIES_BY_CATEGORY[category] ?? [];
