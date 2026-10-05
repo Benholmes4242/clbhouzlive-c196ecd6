@@ -80,10 +80,8 @@
       },
       "title": "Clasificación",
       "top100": "Top 100 campos",
-      "top100FieldAvg": "La media del grupo es <n>{{n}}</n> de los cien.",
       "latestCourse": "Último · {{course}}",
-      "theListHundred": "Los cien de {{list}}",
-      "inRankOrder": "Por orden de ranking"
+      "theListHundred": "Los cien de {{list}}"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"

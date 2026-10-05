@@ -80,10 +80,8 @@
       },
       "title": "順位",
       "top100": "トップ100コース",
-      "top100FieldAvg": "全体の平均は100コース中<n>{{n}}</n>コースです。",
       "latestCourse": "最新 · {{course}}",
-      "theListHundred": "{{list}}の100コース",
-      "inRankOrder": "ランキング順"
+      "theListHundred": "{{list}}の100コース"
     },
     "place": {
       "pair": "{{place}}、{{nation}}"

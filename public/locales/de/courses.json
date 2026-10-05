@@ -80,10 +80,8 @@
       },
       "title": "Wertung",
       "top100": "Top-100-Plätze",
-      "top100FieldAvg": "Im Schnitt hat das Feld <n>{{n}}</n> der hundert gespielt.",
       "latestCourse": "Zuletzt · {{course}}",
-      "theListHundred": "Die {{list}}-Hundert",
-      "inRankOrder": "Nach Rang"
+      "theListHundred": "Die {{list}}-Hundert"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
