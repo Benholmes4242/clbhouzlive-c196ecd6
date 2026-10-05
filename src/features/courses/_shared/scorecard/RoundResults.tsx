@@ -141,11 +141,13 @@ function awardSentence(award: RoundAwardRow, t: T, voice: RoundResultsVoice | nu
   // top_three / top_ten. rank_here is deliberately NULL for 4th-9th — say
   // "inside the best ten", never interpolate or look it up again.
   const u = placeUnit(award.unit_kind);
-  const count = award.attempts_at_detection ?? 0;
+  const count = award.attempts ?? 0;
+  // A frozen award carries its as-at-detection count; never print "from 0".
+  const bare = count > 0 ? '' : 'Bare';
   if (award.rank_here != null) {
-    return t(`roundResults.line.placed.${p}`, { score, place: formatOrdinal(award.rank_here), unit: t(`roundResults.placeUnit.${u}`), count });
+    return t(`roundResults.line.placed${bare}.${p}`, { score, place: formatOrdinal(award.rank_here), unit: t(`roundResults.placeUnit.${u}`), count });
   }
-  return t(`roundResults.line.topTen.${p}`, { score, unitPlural: t(`roundResults.placeUnit.${u}Plural`), count });
+  return t(`roundResults.line.topTen${bare}.${p}`, { score, unitPlural: t(`roundResults.placeUnit.${u}Plural`), count });
 }
 
 function AwardRow({ award, voice }: { award: RoundAwardRow; voice?: RoundResultsVoice | null }) {

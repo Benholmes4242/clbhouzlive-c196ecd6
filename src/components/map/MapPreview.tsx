@@ -43,20 +43,25 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   const mountedRef = useRef(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   // Validate coordinates
   const hasValidCoords = Number.isFinite(lat) && Number.isFinite(lng);
 
+  // mountedRef means "component is mounted" — owned by a mount-only effect,
+  // never by the map effect's cleanup (which also runs on dep changes).
   useEffect(() => {
     mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
+  useEffect(() => {
     if (!MAP_CONFIG.TOKEN) {
       AppLog.warn('[MapPreview]', 'VITE_MAPBOX_ACCESS_TOKEN not configured');
       return;
     }
     if (!hasValidCoords) return;
     if (!mapContainerRef.current) return;
-    if (mapInitialized) return;
 
     const initMap = () => {
       if (!mountedRef.current || !mapContainerRef.current) return;
@@ -79,6 +84,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
 
       map.on('load', () => {
         if (mountedRef.current) {
+          setMapLoaded(true);
           map.resize();
         }
       });
@@ -94,7 +100,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !mapInitialized && mountedRef.current) {
+          if (entry.isIntersecting && mountedRef.current) {
             setMapInitialized(true);
             setTimeout(initMap, 100);
           }
@@ -106,8 +112,6 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
     observerRef.current.observe(mapContainerRef.current);
 
     return () => {
-      mountedRef.current = false;
-
       if (observerRef.current) {
         observerRef.current.disconnect();
         observerRef.current = null;
@@ -118,7 +122,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
         mapRef.current = null;
       }
     };
-  }, [lat, lng, zoom, interactive, colorful, mapInitialized, hasValidCoords]);
+  }, [lat, lng, zoom, interactive, colorful, hasValidCoords]);
 
   // Reset map when coordinates change
   useEffect(() => {
@@ -146,7 +150,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
       className={`relative w-full overflow-hidden ${onExpand ? 'cursor-pointer' : ''}`}
       style={{ height }}
     >
-      <div ref={mapContainerRef} className={`w-full h-full bg-muted ${mapInitialized ? '' : 'animate-pulse'}`} aria-hidden="true" />
+      <div ref={mapContainerRef} className={`w-full h-full bg-muted ${mapLoaded ? '' : 'animate-pulse'}`} aria-hidden="true" />
       {(locationText || (showExpandButton && onExpand)) && (
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
       )}

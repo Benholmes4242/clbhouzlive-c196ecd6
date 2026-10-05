@@ -47,8 +47,8 @@ describe('round results', () => {
     const result: RoundAwardsResult = {
       efforts: [],
       awards: [
-        { award_kind: 'new_best', unit_kind: 'front_nine', unit_key: 0, tier: 'gold', value: -2, previous_value: -1, delta: 1, rank_here: 1, attempts_at_detection: 55 },
-        { award_kind: 'first_birdie', unit_kind: 'hole', unit_key: 7, tier: 'bronze', value: -2, previous_value: null, delta: null, rank_here: 1, attempts_at_detection: 0 },
+        { award_kind: 'new_best', unit_kind: 'front_nine', unit_key: 0, tier: 'gold', value: -2, previous_value: -1, delta: 1, rank_here: 1, attempts: 55 },
+        { award_kind: 'first_birdie', unit_kind: 'hole', unit_key: 7, tier: 'bronze', value: -2, previous_value: null, delta: null, rank_here: 1, attempts: 0 },
       ],
     };
     const { container } = render(<RoundResults result={result} />);
