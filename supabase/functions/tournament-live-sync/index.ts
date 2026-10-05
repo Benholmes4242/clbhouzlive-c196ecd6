@@ -84,7 +84,38 @@ Deno.serve(async (req) => {
     // ── Housekeeping (lightweight, every invocation — no API calls) ───
     const today = new Date().toISOString().split('T')[0];
 
-    // 1. Auto-close stale tournaments whose end_date has passed
+    // 0. Manual close-out for an event that was closed before the
+    //    reconciliation existed: POST { reconcileTournamentId }.
+    let manualBody: any = null;
+    try { manualBody = req.method === 'POST' ? await req.clone().json() : null; } catch { manualBody = null; }
+    if (manualBody?.reconcileTournamentId) {
+      const { data: t } = await supabase
+        .from('sr_tournaments')
+        .select('id, sr_id, name, season_id, start_date, timezone')
+        .eq('id', manualBody.reconcileTournamentId)
+        .maybeSingle();
+      if (!t) {
+        return new Response(JSON.stringify({ error: 'Tournament not found' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      const r = await reconcileFinal(supabase, sportradarApiKey, t);
+      return new Response(JSON.stringify({ reconciled: t.name, ...r }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // 1. Auto-close stale tournaments whose end_date has passed.
+    //    Nothing polls after the final group finishes, so before closing, each
+    //    stale event gets ONE full leaderboard fetch; when the feed reports it
+    //    closed, that pass writes the final rounds without the thru gate.
+    const { data: staleCandidates } = await supabase
+      .from('sr_tournaments')
+      .select('id, sr_id, name, season_id, start_date, timezone')
+      .eq('status', 'inprogress')
+      .lt('end_date', today);
+    for (const t of staleCandidates ?? []) {
+      try { await reconcileFinal(supabase, sportradarApiKey, t); }
+      catch (e: any) { console.error(`[LiveSync] Close-out fetch failed for ${t.name}:`, e?.message ?? String(e)); }
+    }
     const { data: staleTournaments } = await supabase
       .from('sr_tournaments')
       .update({ status: 'closed' })
@@ -842,6 +873,40 @@ interface LeaderboardSyncResult {
   sportradarStatus?: string;
 }
 
+/** One full fetch of an ended event. Rounds are written ungated only if the feed itself reports the event closed. */
+async function reconcileFinal(supabase: any, apiKey: string, t: any): Promise<{ records: number; sportradarStatus?: string; final: boolean }> {
+  const { data: season } = await supabase.from('sr_seasons').select('year, tour_name').eq('id', t.season_id).maybeSingle();
+  const year = season?.year || new Date().getFullYear();
+  const tour = mapTourName(season?.tour_name || 'pga');
+  const r = await syncLeaderboard(supabase, apiKey, tour, year, t.sr_id, t.id, t);
+  const final = FINAL_FEED_STATUSES.includes(String(r.sportradarStatus ?? '').toLowerCase());
+  console.log(`[LiveSync] Close-out ${t.name}: feed '${r.sportradarStatus}', ${r.records} rows${final ? ' (final, ungated)' : ' (feed not final — gate kept)'}`);
+  return { ...r, final };
+}
+
+const FINAL_FEED_STATUSES = ['closed', 'complete', 'completed', 'official'];
+
+/**
+ * One round cell. LIVE: written only when the player is through 18 and has
+ * strokes — a partial round must never be stored as a finished one while
+ * people are on the course. FINAL (feed reports the event closed): the thru
+ * gate is lifted. The strokes > 0 check stays in BOTH modes, so a player who
+ * missed the cut (no final-round strokes) keeps a null cell — never 0.
+ */
+function roundCell(rounds: Array<{ thru: number; strokes: number; score: number | null }>, i: number, isFinal: boolean): number | null {
+  const r = rounds.length > i ? rounds[i] : undefined;
+  if (!r || !(r.strokes > 0)) return null;
+  if (!isFinal && !(r.thru >= 18)) return null;
+  return r.score ?? null;
+}
+
+/** On a final payload a still-'active' (or position-only) finisher becomes COMPLETE; CUT/WD/DQ/MDF/DNS are kept as the feed sent them. */
+function finalStatus(status: string | null, isFinal: boolean): string | null {
+  if (!isFinal) return status;
+  if (status == null || status.trim().toLowerCase() === 'active') return 'COMPLETE';
+  return status;
+}
+
 async function syncLeaderboard(
   supabase: any, apiKey: string, tour: string, year: number,
   tournamentSrId: string, tournamentDbId: string,
@@ -852,6 +917,14 @@ async function syncLeaderboard(
 
   const sportradarStatus = data.status || data.tournament?.status;
   const leaderboard = data.leaderboard || [];
+
+  // CLOSE-OUT RECONCILIATION. While play is live a round is written only once
+  // that player is through 18 (roundCell gate). When the FEED itself says the
+  // event is over, the event finishing is what makes every round final: this
+  // pass writes each round from the final payload without the thru gate, and
+  // marks finishers COMPLETE so nothing downstream infers it from thru.
+  const isFinal = FINAL_FEED_STATUSES.includes(String(sportradarStatus ?? '').toLowerCase());
+  if (isFinal) console.log(`[LiveSync] Final payload (${sportradarStatus}) for ${tournament.name} — writing rounds without thru gate`);
 
   // Active round is computed by getActiveRound() AFTER this upsert finishes —
   // it reads the freshly-written sr_leaderboards rows. We don't compute or
@@ -991,7 +1064,7 @@ async function syncLeaderboard(
         : null;
       const fallbackThru = typeof entry.thru === 'number' ? entry.thru : parseInt(String(entry.thru ?? ''), 10) || 0;
       const derivedThru = activeRound?.thru ?? (fallbackThru > 0 ? fallbackThru : null);
-      const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
+      const derivedStatus = finalStatus(entry.status || (entry.position != null ? 'active' : null), isFinal);
 
       // History, team side (BRIEF_LEADERBOARD_HISTORY_WRITER §1.3, extended).
       // A LIV team standing moves for exactly the same reasons a player's does,
@@ -1034,10 +1107,10 @@ async function syncLeaderboard(
         strokes: entry.strokes,
         thru: derivedThru,
         thru_updated_at: derivedThru !== null && derivedThru > 0 ? new Date().toISOString() : null,
-        round_1: rounds.length > 0 && rounds[0]?.thru >= 18 && rounds[0]?.strokes > 0 ? rounds[0]?.score : null,
-        round_2: rounds.length > 1 && rounds[1]?.thru >= 18 && rounds[1]?.strokes > 0 ? rounds[1]?.score : null,
-        round_3: rounds.length > 2 && rounds[2]?.thru >= 18 && rounds[2]?.strokes > 0 ? rounds[2]?.score : null,
-        round_4: rounds.length > 3 && rounds[3]?.thru >= 18 && rounds[3]?.strokes > 0 ? rounds[3]?.score : null,
+        round_1: roundCell(rounds, 0, isFinal),
+        round_2: roundCell(rounds, 1, isFinal),
+        round_3: roundCell(rounds, 2, isFinal),
+        round_4: roundCell(rounds, 3, isFinal),
         today: activeRound?.score ?? null,
         today_round: activeRound ? rounds.indexOf(activeRound) + 1 : null,
         money: entry.money,
@@ -1089,7 +1162,7 @@ async function syncLeaderboard(
         : null;
       const fallbackThru = typeof entry.thru === 'number' ? entry.thru : parseInt(String(entry.thru ?? ''), 10) || 0;
       const derivedThru = activeRound?.thru ?? (fallbackThru > 0 ? fallbackThru : null);
-      const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
+      const derivedStatus = finalStatus(entry.status || (entry.position != null ? 'active' : null), isFinal);
 
       if ((entry.player?.last_name || entry.last_name) === 'Smotherman') {
         console.log('[LiveSync Debug] Smotherman rounds:', JSON.stringify(roundsRaw));
@@ -1134,10 +1207,10 @@ async function syncLeaderboard(
         strokes: entry.strokes,
         thru: derivedThru,
         thru_updated_at: derivedThru !== null && derivedThru > 0 ? new Date().toISOString() : null,
-        round_1: rounds.length > 0 && rounds[0]?.thru >= 18 && rounds[0]?.strokes > 0 ? rounds[0]?.score : null,
-        round_2: rounds.length > 1 && rounds[1]?.thru >= 18 && rounds[1]?.strokes > 0 ? rounds[1]?.score : null,
-        round_3: rounds.length > 2 && rounds[2]?.thru >= 18 && rounds[2]?.strokes > 0 ? rounds[2]?.score : null,
-        round_4: rounds.length > 3 && rounds[3]?.thru >= 18 && rounds[3]?.strokes > 0 ? rounds[3]?.score : null,
+        round_1: roundCell(rounds, 0, isFinal),
+        round_2: roundCell(rounds, 1, isFinal),
+        round_3: roundCell(rounds, 2, isFinal),
+        round_4: roundCell(rounds, 3, isFinal),
         today: activeRound?.score ?? null,
         today_round: activeRound ? rounds.indexOf(activeRound) + 1 : null,
         money: entry.money,

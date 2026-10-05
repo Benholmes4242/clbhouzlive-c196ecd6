@@ -42,7 +42,9 @@ const KNOWN = new Set<ResultStatus>(['CUT', 'MC', 'MDF', 'WD', 'DQ', 'DNS']);
  */
 export function normalizeStatus(raw: string | null | undefined): ResultStatus | null {
   const s = (raw ?? '').trim().toUpperCase();
-  if (!s || s === 'ACTIVE') return null;
+  // COMPLETE = written by the live-sync close-out on a final payload; like
+  // ACTIVE it carries no non-scoring status.
+  if (!s || s === 'ACTIVE' || s === 'COMPLETE') return null;
   return s as ResultStatus;
 }
 
