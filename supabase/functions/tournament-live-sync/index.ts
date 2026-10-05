@@ -84,7 +84,38 @@ Deno.serve(async (req) => {
     // ── Housekeeping (lightweight, every invocation — no API calls) ───
     const today = new Date().toISOString().split('T')[0];
 
-    // 1. Auto-close stale tournaments whose end_date has passed
+    // 0. Manual close-out for an event that was closed before the
+    //    reconciliation existed: POST { reconcileTournamentId }.
+    let manualBody: any = null;
+    try { manualBody = req.method === 'POST' ? await req.clone().json() : null; } catch { manualBody = null; }
+    if (manualBody?.reconcileTournamentId) {
+      const { data: t } = await supabase
+        .from('sr_tournaments')
+        .select('id, sr_id, name, season_id, start_date, timezone')
+        .eq('id', manualBody.reconcileTournamentId)
+        .maybeSingle();
+      if (!t) {
+        return new Response(JSON.stringify({ error: 'Tournament not found' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      const r = await reconcileFinal(supabase, sportradarApiKey, t);
+      return new Response(JSON.stringify({ reconciled: t.name, ...r }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // 1. Auto-close stale tournaments whose end_date has passed.
+    //    Nothing polls after the final group finishes, so before closing, each
+    //    stale event gets ONE full leaderboard fetch; when the feed reports it
+    //    closed, that pass writes the final rounds without the thru gate.
+    const { data: staleCandidates } = await supabase
+      .from('sr_tournaments')
+      .select('id, sr_id, name, season_id, start_date, timezone')
+      .eq('status', 'inprogress')
+      .lt('end_date', today);
+    for (const t of staleCandidates ?? []) {
+      try { await reconcileFinal(supabase, sportradarApiKey, t); }
+      catch (e: any) { console.error(`[LiveSync] Close-out fetch failed for ${t.name}:`, e?.message ?? String(e)); }
+    }
     const { data: staleTournaments } = await supabase
       .from('sr_tournaments')
       .update({ status: 'closed' })
@@ -840,6 +871,17 @@ async function fetchSportradar(url: string, apiKey: string, description: string)
 interface LeaderboardSyncResult {
   records: number;
   sportradarStatus?: string;
+}
+
+/** One full fetch of an ended event. Rounds are written ungated only if the feed itself reports the event closed. */
+async function reconcileFinal(supabase: any, apiKey: string, t: any): Promise<{ records: number; sportradarStatus?: string; final: boolean }> {
+  const { data: season } = await supabase.from('sr_seasons').select('year, tour_name').eq('id', t.season_id).maybeSingle();
+  const year = season?.year || new Date().getFullYear();
+  const tour = mapTourName(season?.tour_name || 'pga');
+  const r = await syncLeaderboard(supabase, apiKey, tour, year, t.sr_id, t.id, t);
+  const final = FINAL_FEED_STATUSES.includes(String(r.sportradarStatus ?? '').toLowerCase());
+  console.log(`[LiveSync] Close-out ${t.name}: feed '${r.sportradarStatus}', ${r.records} rows${final ? ' (final, ungated)' : ' (feed not final — gate kept)'}`);
+  return { ...r, final };
 }
 
 const FINAL_FEED_STATUSES = ['closed', 'complete', 'completed', 'official'];
