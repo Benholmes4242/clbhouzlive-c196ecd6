@@ -77,7 +77,8 @@
       "unit": {
         "holes": "홀",
         "rounds": "라운드"
-      }
+      },
+      "title": "순위"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
@@ -333,7 +334,7 @@
         "all": "전체",
         "courses": "Courses",
         "reviews": "Reviews",
-        "scores": "스코어",
+        "scores": "순위",
         "watch": "보기"
       },
       "views": "탐색 보기",

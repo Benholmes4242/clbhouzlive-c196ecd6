@@ -77,7 +77,8 @@
       "unit": {
         "holes": "ホール",
         "rounds": "ラウンド"
-      }
+      },
+      "title": "順位"
     },
     "place": {
       "pair": "{{place}}、{{nation}}"
@@ -333,7 +334,7 @@
         "all": "すべて",
         "courses": "Courses",
         "reviews": "Reviews",
-        "scores": "スコア",
+        "scores": "順位",
         "watch": "見る"
       },
       "views": "探索ビュー",

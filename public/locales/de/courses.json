@@ -77,7 +77,8 @@
       "unit": {
         "holes": "Löcher",
         "rounds": "Runden"
-      }
+      },
+      "title": "Wertung"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
@@ -333,7 +334,7 @@
         "all": "Alle",
         "courses": "Platze",
         "reviews": "Bewertungen",
-        "scores": "Ergebnisse",
+        "scores": "Wertung",
         "watch": "Ansehen"
       },
       "views": "Explore-Ansichten",
