@@ -31,7 +31,7 @@ export interface BusinessCategoryOption {
  * NOTE: 'Creator' category enables creator features (Insights, Analytics)
  * for team/brand accounts that produce content.
  */
-export const BUSINESS_CATEGORIES_WITH_ICONS: BusinessCategoryOption[] = [
+export const BUSINESS_CATEGORIES_WITH_ICONS = [
   { value: 'Golf Club', label: 'Golf Club', icon: Flag },
   { value: 'Golf Academy', label: 'Golf Academy', icon: GraduationCap },
   { value: 'Coach / Instructor', label: 'Coach / Instructor', icon: GraduationCap },
@@ -45,13 +45,16 @@ export const BUSINESS_CATEGORIES_WITH_ICONS: BusinessCategoryOption[] = [
   { value: 'Bar / Pub', label: 'Bar / Pub', icon: Beer },
   { value: 'Brand / Manufacturer', label: 'Brand / Manufacturer', icon: Briefcase },
   { value: 'Other', label: 'Other', icon: Building2 },
-];
+] as const satisfies readonly BusinessCategoryOption[];
+
+/** Literal union of every category value. A rename here breaks every map keyed on it. */
+export type BusinessCategoryValue = typeof BUSINESS_CATEGORIES_WITH_ICONS[number]['value'];
 
 /**
  * Simple string array of business category values.
  * Useful for validation or simple dropdowns.
  */
-export const BUSINESS_CATEGORIES = BUSINESS_CATEGORIES_WITH_ICONS.map(c => c.value);
+export const BUSINESS_CATEGORIES: BusinessCategoryValue[] = BUSINESS_CATEGORIES_WITH_ICONS.map(c => c.value);
 
 /**
  * Get the icon component for a given category value.
@@ -59,5 +62,5 @@ export const BUSINESS_CATEGORIES = BUSINESS_CATEGORIES_WITH_ICONS.map(c => c.val
  */
 export function getBusinessCategoryIcon(categoryValue: string): LucideIcon {
   const category = BUSINESS_CATEGORIES_WITH_ICONS.find(c => c.value === categoryValue);
-  return category?.icon ?? Building2;
+  return (category?.icon as LucideIcon | undefined) ?? Building2;
 }

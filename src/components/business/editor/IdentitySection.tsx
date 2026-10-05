@@ -5,7 +5,7 @@ import { AlertCircle, Lock, MapPin } from 'lucide-react';
 
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
-import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
+import { BUSINESS_CATEGORIES_WITH_ICONS, type BusinessCategoryOption } from '@/constants/businessCategories';
 import { AppSelect } from '@/components/ui/AppSelect';
 import { ClubSearchDropdown, SelectedClub } from '@/components/business/ClubSearchDropdown';
 import { CollegeSearchDropdown, SelectedCollege } from '@/components/business/CollegeSearchDropdown';
@@ -102,7 +102,7 @@ export function IdentitySection({
                     setSelectedClub(null);
                     setSelectedCollege(null);
                   }}
-                  options={BUSINESS_CATEGORIES_WITH_ICONS.map(({ value, label, subtitle }) => ({
+                  options={(BUSINESS_CATEGORIES_WITH_ICONS as readonly BusinessCategoryOption[]).map(({ value, label, subtitle }) => ({
                     value,
                     label: `${label}${subtitle ? ` — ${subtitle}` : ''}`,
                   }))}
