@@ -8,7 +8,7 @@ import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hook
 import { useAmateurStories } from '@/features/amateur/news/useAmateurStories';
 import { readDiscoverLastSeen } from '@/hooks/useDiscoverLastSeen';
 
-import type { ExploreView } from './exploreViewMemory';
+import type { StreamPool } from './streamPool';
 import { RING_WEIGHT, consequenceWeight, type Consequence, type StreamItem } from './streamItem';
 import { useViewerCourseContext, type ViewerCourseContext } from './useViewerCourseContext';
 import { roundConsequence as consequenceFor } from './consequences';
@@ -194,7 +194,7 @@ export interface ExploreStream {
 
 export function useExploreStreamClient(
   viewerId: string | undefined,
-  view: ExploreView,
+  view: StreamPool,
   scores?: { active: ScoreScope; geography: ViewerScoreScope },
   /* PHASE D §5c ADDITIVE, DEFAULT UNCHANGED. `enabled` defaults to true, so every
      existing caller behaves exactly as before. The page passes false while the

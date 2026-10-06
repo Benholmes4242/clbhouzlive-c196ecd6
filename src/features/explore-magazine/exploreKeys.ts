@@ -1,4 +1,4 @@
-import type { ExploreView } from './exploreViewMemory';
+import type { StreamPool } from './streamPool';
 
 /**
  * SHARED QUERY KEYS FOR EXPLORE (BRIEF_EXPLORE_MAGAZINE §0).
@@ -20,7 +20,7 @@ export const exploreKeys = {
    */
   stream: (
     viewerId: string | undefined,
-    view: ExploreView,
+    view: StreamPool,
     scope: string,
     geography?: { clubId?: string | null; county?: string | null; country?: string | null },
   ) =>

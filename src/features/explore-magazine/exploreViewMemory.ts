@@ -7,17 +7,12 @@
  * exactly that lifetime.
  */
 
-/** 'reviews' IS RETIRED AS A VIEW (BRIEF_COURSES_MERGED §1) and kept in the type
- *  ON PURPOSE: the server ranker still answers p_view = 'reviews', the client
- *  composition still composes it, and the merged Courses view reads BOTH pools.
- *  Nothing about the reviews path is deleted; it simply has no chip. */
-export type ExploreView = 'all' | 'scores' | 'watch' | 'courses' | 'reviews';
+/** THE TAB STRIP, and nothing else: All, Standings (internally 'scores') and
+ *  Watch. The ranker's pool argument is a separate type (StreamPool), because
+ *  'reviews' is a pool with no tab. */
+export type ExploreView = 'all' | 'scores' | 'watch';
 
-/** THREE CHIPS (BRIEF EXPLORE — HIDE THE COURSES TAB). 'courses' is HIDDEN, not
- *  deleted: it stays in ExploreView and still renders if set, it has no chip.
- *  Previously FOUR CHIPS (BRIEF_COURSES_MERGED §1). Courses and Reviews are ONE view named
- *  Courses: a member arriving wants places to play, not a data type. It also
- *  fixes the live 320px bleed the fifth chip caused. */
+/** THREE TABS, in strip order. */
 export const EXPLORE_VIEWS: ExploreView[] = ['all', 'scores', 'watch'];
 
 /** §1 the views that carry the SCOPE ROW. All and Watch never do. */
@@ -28,10 +23,8 @@ const KEY = 'amateur:view';
 export function readExploreView(): ExploreView {
   try {
     const raw = sessionStorage.getItem(KEY);
-    /* A SESSION THAT REMEMBERED EITHER RETIRED VIEW — 'reviews' or the hidden
-       'courses' — LANDS ON ALL, never on a view with no chip selected and no
-       way back to it. */
-    if (raw === 'reviews' || raw === 'courses') return 'all';
+    /* Anything that is not one of the three tabs (including a session that
+       remembered the deleted 'courses' or 'reviews') falls through to All. */
     if (raw && EXPLORE_VIEWS.includes(raw as ExploreView)) return raw as ExploreView;
   } catch {
     /* private mode: All. */
