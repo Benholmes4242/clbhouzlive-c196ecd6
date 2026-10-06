@@ -11,13 +11,6 @@
       "widenedToEveryone": "Nobody in your circle has posted a round in the last fortnight, so this is everyone."
     },
     "courses": {
-      "anywhere": "Anywhere",
-      "choosePlace": "Choose a place",
-      "clearPlace": "Clear place filter",
-      "findPlace": "Find a country or region",
-      "noMatch": "Nothing matches {{query}}.",
-      "noPlaceMatch": "Nothing matches {{query}}.",
-      "placeTitle": "Browse by place",
       "searchClear": "Clear search",
       "searchPlaceholder": "Search courses, regions and reviews"
     },
@@ -95,8 +88,6 @@
     },
     "shelf": {
       "alsoPlays": "Also plays {{course}}",
-      "circlePlays": "Where your circle plays",
-      "circlePlaysSub": "Courses the people you follow have played",
       "follow": "Follow",
       "following": "Following",
       "golfersAtClub": "Golfers at {{club}}",
@@ -106,8 +97,6 @@
       "holdsCourseRecord": "Holds the course record",
       "holdsCourseRecords_one": "Holds a course record",
       "holdsCourseRecords_other": "Holds {{count}} course records",
-      "newOnClbhouz": "New on clbhouz",
-      "newOnClbhouzSub": "Courses rated here for the first time",
       "newThisMonth": "New this month",
       "playsAtClub": "Plays at {{club}}",
       "recordReason": {
@@ -124,11 +113,8 @@
       "roundsHere_one": "{{count}} round here",
       "roundsHere_other": "{{count}} rounds here",
       "roundsThisMonth": "{{count}} rounds this month",
-      "topRated": "Best rated lately",
       "worldsBest": "The world's best",
       "worldsBestSub": "Top 100 by rank",
-      "worthTheDrive": "Worth the drive",
-      "worthTheDriveSub": "Rated highly by the few who have played them",
       "yourClub": "your club"
     },
     "stream": {
@@ -191,10 +177,6 @@
         "factRated": "{{rounds}} rounds tracked, rated {{rating}} from {{count}}.",
         "factRatedOnly": "Rated {{rating}} from {{count}}.",
         "factRounds": "{{rounds}} rounds tracked here."
-      },
-      "empty": {
-        "courses": "No courses in {{scope}} yet.",
-        "reviews": "No reviews in {{scope}} yet."
       },
       "enrichment": {
         "photos": "{{count}} photos"
@@ -283,12 +265,7 @@
       "retry": "Try again",
       "roundCount": "{{count}} rounds",
       "scope": {
-        "circle": "My circle",
-        "club": "My club",
-        "theWorld": "the world",
-        "world": "World",
-        "yourCircle": "your circle",
-        "yourClub": "your club"
+        "club": "My club"
       },
       "scopes": "Scores scope",
       "seeAll": "See all {{count}}",
@@ -341,8 +318,6 @@
       },
       "view": {
         "all": "All",
-        "courses": "Courses",
-        "reviews": "Reviews",
         "scores": "Standings",
         "watch": "Watch"
       },

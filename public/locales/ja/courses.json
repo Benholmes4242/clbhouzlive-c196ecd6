@@ -5,13 +5,6 @@
       "openPicker": "ボードを選択"
     },
     "courses": {
-      "anywhere": "すべての地域",
-      "choosePlace": "地域を選ぶ",
-      "clearPlace": "地域の絞り込みを解除",
-      "findPlace": "国または地域を検索",
-      "noMatch": "{{query}} に一致するものはありません。",
-      "noPlaceMatch": "{{query}} に一致するものはありません。",
-      "placeTitle": "地域から探す",
       "searchClear": "検索をクリア",
       "searchPlaceholder": "コース、地域、レビューを検索"
     },
@@ -91,8 +84,6 @@
       "alsoPlays": "{{course}}でもプレー",
       "aroundCounty": "{{county}}周辺",
       "aroundWorld": "世界各地",
-      "circlePlays": "フォロー中の人がプレーした場所",
-      "circlePlaysSub": "あなたがフォローしている人がプレーしたコース",
       "follow": "フォロー",
       "following": "フォロー中",
       "golfersAtClub": "{{club}}のゴルファー",
@@ -102,8 +93,6 @@
       "holdsCourseRecord": "コースレコード保持者",
       "holdsCourseRecords_one": "コースレコードを1件保持",
       "holdsCourseRecords_other": "コースレコードを{{count}}件保持",
-      "newOnClbhouz": "clbhouzの新着",
-      "newOnClbhouzSub": "ここで初めて評価されたコース",
       "newThisMonth": "今月から参加",
       "onYourList": "あなたのリスト",
       "playsAtClub": "{{club}}でプレー",
@@ -121,11 +110,8 @@
       "roundsHere_one": "ここで{{count}}ラウンド",
       "roundsHere_other": "ここで{{count}}ラウンド",
       "roundsThisMonth": "今月{{count}}ラウンド",
-      "topRated": "Best rated lately",
       "worldsBest": "世界のベストコース",
       "worldsBestSub": "ランク順のトップ100",
-      "worthTheDrive": "足を運ぶ価値あり",
-      "worthTheDriveSub": "プレーした少数の人から高く評価されています",
       "yourClub": "あなたのクラブ"
     },
     "stream": {
@@ -187,10 +173,6 @@
         "factRated": "{{rounds}}ラウンドを記録、{{count}}件の評価で{{rating}}。",
         "factRatedOnly": "{{count}}件の評価で{{rating}}。",
         "factRounds": "ここで{{rounds}}ラウンドを記録。"
-      },
-      "empty": {
-        "courses": "No courses in {{scope}} yet.",
-        "reviews": "No reviews in {{scope}} yet."
       },
       "enrichment": {
         "photos": "写真{{count}}枚"
@@ -278,12 +260,7 @@
       "retry": "再試行",
       "roundCount": "{{count}}ラウンド",
       "scope": {
-        "circle": "マイサークル",
-        "club": "マイクラブ",
-        "theWorld": "the world",
-        "world": "世界",
-        "yourCircle": "あなたのサークル",
-        "yourClub": "your club"
+        "club": "マイクラブ"
       },
       "scopes": "スコアの範囲",
       "seeAll": "{{count}}件すべて表示",
@@ -336,8 +313,6 @@
       },
       "view": {
         "all": "すべて",
-        "courses": "Courses",
-        "reviews": "Reviews",
         "scores": "順位",
         "watch": "見る"
       },

@@ -5,13 +5,6 @@
       "openPicker": "Bestenliste wählen"
     },
     "courses": {
-      "anywhere": "Überall",
-      "choosePlace": "Ort wählen",
-      "clearPlace": "Ortsfilter löschen",
-      "findPlace": "Land oder Region finden",
-      "noMatch": "Nichts passt zu {{query}}.",
-      "noPlaceMatch": "Nichts passt zu {{query}}.",
-      "placeTitle": "Nach Ort suchen",
       "searchClear": "Suche löschen",
       "searchPlaceholder": "Plätze, Regionen und Bewertungen suchen"
     },
@@ -91,8 +84,6 @@
       "alsoPlays": "Spielt auch {{course}}",
       "aroundCounty": "Rund um {{county}}",
       "aroundWorld": "Rund um die Welt",
-      "circlePlays": "Wo dein Kreis spielt",
-      "circlePlaysSub": "Plätze, auf denen die Menschen spielen, denen du folgst",
       "follow": "Folgen",
       "following": "Folgt",
       "golfersAtClub": "Golfer bei {{club}}",
@@ -102,8 +93,6 @@
       "holdsCourseRecord": "Hält den Platzrekord",
       "holdsCourseRecords_one": "Hält einen Platzrekord",
       "holdsCourseRecords_other": "Hält {{count}} Platzrekorde",
-      "newOnClbhouz": "Neu auf clbhouz",
-      "newOnClbhouzSub": "Plätze, die hier erstmals bewertet wurden",
       "newThisMonth": "Neu diesen Monat",
       "onYourList": "Auf deiner Liste",
       "playsAtClub": "Spielt in {{club}}",
@@ -121,11 +110,8 @@
       "roundsHere_one": "{{count}} Runde hier",
       "roundsHere_other": "{{count}} Runden hier",
       "roundsThisMonth": "{{count}} Runden diesen Monat",
-      "topRated": "Zuletzt am besten bewertet",
       "worldsBest": "Die besten der Welt",
       "worldsBestSub": "Top 100 nach Rang",
-      "worthTheDrive": "Die Fahrt wert",
-      "worthTheDriveSub": "Hoch bewertet von den wenigen, die dort gespielt haben",
       "yourClub": "deinem Club"
     },
     "stream": {
@@ -187,10 +173,6 @@
         "factRated": "{{rounds}} Runden erfasst, bewertet mit {{rating}} aus {{count}}.",
         "factRatedOnly": "Bewertet mit {{rating}} aus {{count}}.",
         "factRounds": "{{rounds}} Runden hier erfasst."
-      },
-      "empty": {
-        "courses": "Noch keine Platze in {{scope}}.",
-        "reviews": "Noch keine Bewertungen in {{scope}}."
       },
       "enrichment": {
         "photos": "{{count}} Fotos"
@@ -278,12 +260,7 @@
       "retry": "Erneut versuchen",
       "roundCount": "{{count}} Runden",
       "scope": {
-        "circle": "Mein Kreis",
-        "club": "Mein Club",
-        "theWorld": "der Welt",
-        "world": "Welt",
-        "yourCircle": "deinem Kreis",
-        "yourClub": "deinem Club"
+        "club": "Mein Club"
       },
       "scopes": "Ergebnisbereich",
       "seeAll": "Alle {{count}} ansehen",
@@ -336,8 +313,6 @@
       },
       "view": {
         "all": "Alle",
-        "courses": "Platze",
-        "reviews": "Bewertungen",
         "scores": "Wertung",
         "watch": "Ansehen"
       },
