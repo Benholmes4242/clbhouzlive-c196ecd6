@@ -761,9 +761,6 @@ export function ScoresLeaderboardsPage({
               pending branch so the head never moves between loading and loaded.
               No marginTop: Section already puts 12 above its children. */}
           <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} />
-          <div style={{ marginTop: 8, fontSize: 11, color: FAINT }}>
-            {t('amateur.leaderboards.scopeNote', 'Applies to the scoring board below. Everything else is all members.')}
-          </div>
           {leadLoading || !leader ? (
             /* Rows area only — the head above is already final. */
             <div aria-hidden style={{ marginTop: 12, height: 500 }} />
