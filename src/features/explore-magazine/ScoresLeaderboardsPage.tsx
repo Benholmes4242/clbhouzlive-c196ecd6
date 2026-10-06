@@ -718,26 +718,9 @@ export function ScoresLeaderboardsPage({
 
   return (
     <div style={{ fontFamily: SANS }}>
-      {/* PAGE HEAD — no Filters button; filters belong to the board they filter. */}
-      <div style={{ paddingInline: GUTTER }}>
-        <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
-          {t('amateur.leaderboards.title', 'Standings')}
-        </h1>
-        <ScopeSegments
-          scope={scope}
-          clubApplies={state.clubApplies}
-          onScopeChange={state.changeScope}
-          style={{ marginTop: 12 }}
-        />
-        <div style={{ marginTop: 8, fontSize: 11, color: FAINT }}>
-          {t('amateur.leaderboards.scopeNote', 'Applies to the scoring board below. Everything else is all members.')}
-        </div>
-      </div>
-
-      {/* §3 THE LEAD BOARD */}
-      {!state.ready || state.page.isPending ? (
-        <div style={{ marginTop: 24 }}>{pending(560)}</div>
-      ) : state.page.isSuccess && leader ? (
+      {/* §3 THE LEAD BOARD — no page head: the tab chip already names the page.
+          The same Section renders while loading, so title/Filters/scope stay put. */}
+      {leadLoading || (state.page.isSuccess && leader) ? (
         <Section
           first
           contest
@@ -773,6 +756,19 @@ export function ScoresLeaderboardsPage({
             </span>
           }
         >
+          {/* The scope control sits on the board it governs. It lives OUTSIDE the
+              pending branch so the head never moves between loading and loaded.
+              No marginTop: Section already puts 12 above its children. */}
+          <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} />
+          <div style={{ marginTop: 8, fontSize: 11, color: FAINT }}>
+            {t('amateur.leaderboards.scopeNote', 'Applies to the scoring board below. Everything else is all members.')}
+          </div>
+          {leadLoading || !leader ? (
+            /* Rows area only — the head above is already final. */
+            <div aria-hidden style={{ marginTop: 12, height: 500 }} />
+          ) : (
+            <>
+          <div style={{ marginTop: 12 }}>
           {(() => {
             const f = leaderFigures(leader);
             const self = leader.user_id === userId;
@@ -872,6 +868,8 @@ export function ScoresLeaderboardsPage({
               }}
             />
           ) : null}
+            </>
+          )}
         </Section>
       ) : null}
 
