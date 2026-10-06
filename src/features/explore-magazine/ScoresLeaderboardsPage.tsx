@@ -574,8 +574,8 @@ export function ScoresLeaderboardsPage({
 
   const membersText = (n: number) =>
     t('amateur.leaderboards.nMembers', { count: n, defaultValue_one: '{{count}} member', defaultValue_other: '{{count}} members' });
-  const seeAllMembers = (n: number) =>
-    t('amateur.leaderboards.seeAllMembers', { count: n, defaultValue_one: 'See all {{count}} member', defaultValue_other: 'See all {{count}} members' });
+  // Deliberately uncounted: "See all members" without a figure everywhere.
+  const seeAllMembers = () => t('amateur.leaderboards.seeAllMembers', 'See all members');
 
   /* §4 row. start_index and current_index are FACTS from the RPC, so they are
      formatted directly — handicapJourneyDisplay derives an after-value from a
@@ -860,7 +860,7 @@ export function ScoresLeaderboardsPage({
           </div>
           {state.total > leadVisible.length ? (
             <SeeAll
-              label={seeAllMembers(Number(state.page.data?.pool.members ?? state.total))}
+              label={seeAllMembers()}
               onPress={() => {
                 analyticsEvents.track('amateur_board_see_all_opened', { board: state.board, total: state.total });
                 setSeeAll({ board: state.board, filters: state.filters });
@@ -884,7 +884,7 @@ export function ScoresLeaderboardsPage({
         >
           {improvedRows.slice(0, SHORT_ROWS).map((r, i, arr) => improvedRow(r, i < arr.length - 1, false))}
           <SeeAll
-            label={seeAllMembers(Number(improvedRows[0].total_members) || improvedRows.length)}
+            label={seeAllMembers()}
             onPress={() => setImprovedSheet(true)}
           />
         </Section>
@@ -1133,7 +1133,7 @@ export function ScoresLeaderboardsPage({
             shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100', 'of 100'), openTop100Sheet)
           )}
           {top100Rows.length > SHORT_ROWS ? (
-            <SeeAll label={seeAllMembers(Number(top100Rows[0].total_members))} onPress={() => setCareerSheet(true)} />
+            <SeeAll label={seeAllMembers()} onPress={() => setCareerSheet(true)} />
           ) : null}
         </Section>
       )}
