@@ -92,7 +92,6 @@
       "following": "Following",
       "golfersAtClub": "Golfers at {{club}}",
       "golfersToFollow": "Golfers to follow",
-      "highestRatedMonth": "Highest rated this month",
       "highestRatedYear": "Highest rated this year",
       "holdsCourseRecord": "Holds the course record",
       "holdsCourseRecords_one": "Holds a course record",
@@ -113,7 +112,6 @@
       "roundsHere_one": "{{count}} round here",
       "roundsHere_other": "{{count}} rounds here",
       "roundsThisMonth": "{{count}} rounds this month",
-      "worldsBest": "The world's best",
       "worldsBestSub": "Top 100 by rank",
       "yourClub": "your club"
     },

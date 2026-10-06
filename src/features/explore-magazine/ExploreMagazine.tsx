@@ -90,7 +90,6 @@ import { isNotableRound, rendersOnPhoto } from './cardTreatment';
 import { shelfDueAt, shelfForOrdinal } from './shelfCadence';
 import { useCourseCandidateIndex } from './useCourseCandidateIndex';
 import { useMergedCourseShelves } from './useMergedCourseShelves';
-import type { PlaceChoice } from './coursesSearch';
 import { useReviewPageEnrichment } from './useReviewPageEnrichment';
 
 import { useViewerCourseBests } from './useViewerCourseBests';
@@ -499,11 +498,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const scoped = SCOPED_VIEWS.includes(view);
   void scoped;
 
-  /* THE PLACE. No control sets it any more (the Courses view's place picker is
-     deleted); it is kept, always null, because the Scores stream's documented
-     rollback (placeScoped below) is written against it. */
-  const [place, setPlace] = useState<PlaceChoice | null>(null);
-
   /* PHASE B (BRIEF_EXPLORE_MAGAZINE P1) — SCORES IS A CHIP THAT CAN CHANGE WHAT
      YOU SEE. The ranked stream is the default and stays the landing experience;
      no board is applied until the member picks one, so `boardPick === null` IS
@@ -559,23 +553,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   /* The stream scope. All is unscoped and Scores' stream is gated off, so the
      only scope the stream reads are asked for is the literal 'world'. */
   const chipScope: ScoreScope = 'world';
-  /* SCORES: A CHOSEN PLACE IS THE *WHERE* (BRIEF_EXPLORE_SECOND_PASS §3). The
-     rounds body already reads geography from ONE resolver and already knows how
-     to be asked for a county or a country, so a chosen place is expressed in that
-     same vocabulary rather than in a second filtering path: the place supplies
-     the county and country, and the scope the ranker is asked for becomes
-     'county' (a region was chosen) or 'country'. UNREACHABLE while the Scores
-     stream is off — every consumer of streamGeo and serverScope (the main stream
-     read, fallbackWanted, the client ranker) is gated off for Scores. This branch
-     is the documented rollback: re-enabling the Scores stream is a one-line
-     change at the boardPick useState below, and that reversal needs this branch
-     intact. Do NOT delete it as dead code. */
-  const placeScoped = view === 'scores' && place !== null;
-  const streamGeo = placeScoped
-    ? { ...geography.scope, county: place?.region ?? null, country: place?.country ?? null }
-    : geography.scope;
-  const serverScope: ScoreScope =
-    placeScoped && chipScope === 'world' ? (place?.region ? 'county' : 'country') : chipScope;
+  const streamGeo = geography.scope;
+  const serverScope: ScoreScope = chipScope;
   /* §2 — no Scores stream read: the Scores view cannot render it. */
   const server = useExploreStream(userId && serverReady && view !== 'scores' ? userId : undefined, view, serverScope, {
     clubId: streamGeo.primaryClubId,
@@ -914,8 +893,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       if (!EXPLORE_VIEWS.includes(value)) return;
       analyticsEvents.track('amateur_view_changed', { from: view, to: value });
       setView(value);
-      /* A view change clears any place (see `place`; nothing sets it today). */
-      setPlace(null);
       writeExploreView(value);
       setRevealed(STREAM_PAGE_SIZE);
       loggedRef.current = 0;
@@ -1485,7 +1462,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     heading={t('amateur.shelf.highestRatedYear', 'Highest rated this year')}
                     rows={mergedShelves.lead.rows}
                     isFetched={candidates.isFetched}
-                    kind={`courses_highest_rated_${mergedShelves.lead.window}`}
+                    kind="courses_highest_rated_year"
                     pos={pos}
                     onDepart={depart}
                   />

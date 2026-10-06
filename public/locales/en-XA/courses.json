@@ -92,7 +92,6 @@
       "following": "[~~Ƒőļļőŵíñĝ~~]",
       "golfersAtClub": "[~~Ĝőļƒéřš áţ {{club}}~~]",
       "golfersToFollow": "[~~Ĝőļƒéřš ţő ƒőļļőŵ~~]",
-      "highestRatedMonth": "[~~Ĥíĝĥéšţ řáţéđ ţĥíš ɱőñţĥ~~]",
       "highestRatedYear": "[~~Ĥíĝĥéšţ řáţéđ ţĥíš ýéář~~]",
       "holdsCourseRecord": "[~~Ĥőļđš ţĥé ĉőúřšé řéĉőřđ~~]",
       "holdsCourseRecords_one": "[~~Ĥőļđš á ĉőúřšé řéĉőřđ~~]",
@@ -113,7 +112,6 @@
       "roundsHere_one": "[~~{{count}} řőúñđ ĥéřé~~]",
       "roundsHere_other": "[~~{{count}} řőúñđš ĥéřé~~]",
       "roundsThisMonth": "[~~{{count}} řőúñđš ţĥíš ɱőñţĥ~~]",
-      "worldsBest": "[~~Ţĥé ŵőřļđ'š ƀéšţ~~]",
       "worldsBestSub": "[~~Ţőƥ 100 ƀý řáñǩ~~]",
       "yourClub": "[~~ýőúř ĉļúƀ~~]"
     },

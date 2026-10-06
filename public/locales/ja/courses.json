@@ -88,7 +88,6 @@
       "following": "フォロー中",
       "golfersAtClub": "{{club}}のゴルファー",
       "golfersToFollow": "フォローするゴルファー",
-      "highestRatedMonth": "今月の高評価コース",
       "highestRatedYear": "今年の高評価コース",
       "holdsCourseRecord": "コースレコード保持者",
       "holdsCourseRecords_one": "コースレコードを1件保持",
@@ -110,7 +109,6 @@
       "roundsHere_one": "ここで{{count}}ラウンド",
       "roundsHere_other": "ここで{{count}}ラウンド",
       "roundsThisMonth": "今月{{count}}ラウンド",
-      "worldsBest": "世界のベストコース",
       "worldsBestSub": "ランク順のトップ100",
       "yourClub": "あなたのクラブ"
     },
