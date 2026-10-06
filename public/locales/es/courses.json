@@ -5,13 +5,6 @@
       "openPicker": "Elegir clasificación"
     },
     "courses": {
-      "anywhere": "Cualquier lugar",
-      "choosePlace": "Elegir un lugar",
-      "clearPlace": "Quitar el filtro de lugar",
-      "findPlace": "Busca un pais o una region",
-      "noMatch": "Nada coincide con {{query}}.",
-      "noPlaceMatch": "Nada coincide con {{query}}.",
-      "placeTitle": "Explorar por lugar",
       "searchClear": "Borrar busqueda",
       "searchPlaceholder": "Busca campos, regiones y reseñas"
     },
@@ -91,8 +84,6 @@
       "alsoPlays": "También juega {{course}}",
       "aroundCounty": "Por {{county}}",
       "aroundWorld": "Por el mundo",
-      "circlePlays": "Donde juega tu círculo",
-      "circlePlaysSub": "Campos donde han jugado las personas a las que sigues",
       "follow": "Seguir",
       "following": "Siguiendo",
       "golfersAtClub": "Golfistas en {{club}}",
@@ -102,8 +93,6 @@
       "holdsCourseRecord": "Tiene el récord del campo",
       "holdsCourseRecords_one": "Tiene un récord del campo",
       "holdsCourseRecords_other": "Tiene {{count}} récords del campo",
-      "newOnClbhouz": "Nuevos en clbhouz",
-      "newOnClbhouzSub": "Campos valorados aquí por primera vez",
       "newThisMonth": "Nuevo este mes",
       "onYourList": "En tu lista",
       "playsAtClub": "Juega en {{club}}",
@@ -121,11 +110,8 @@
       "roundsHere_one": "{{count}} ronda aquí",
       "roundsHere_other": "{{count}} rondas aquí",
       "roundsThisMonth": "{{count}} vueltas este mes",
-      "topRated": "Mejor valorados ultimamente",
       "worldsBest": "Los mejores del mundo",
       "worldsBestSub": "Top 100 por posición",
-      "worthTheDrive": "Merece el viaje",
-      "worthTheDriveSub": "Muy valorados por los pocos que han jugado allí",
       "yourClub": "tu club"
     },
     "stream": {
@@ -187,10 +173,6 @@
         "factRated": "{{rounds}} vueltas registradas, valorado {{rating}} de {{count}}.",
         "factRatedOnly": "Valorado {{rating}} de {{count}}.",
         "factRounds": "{{rounds}} vueltas registradas aquí."
-      },
-      "empty": {
-        "courses": "Aún no hay campos en {{scope}}.",
-        "reviews": "Aún no hay reseñas en {{scope}}."
       },
       "enrichment": {
         "photos": "{{count}} fotos"
@@ -278,12 +260,7 @@
       "retry": "Reintentar",
       "roundCount": "{{count}} vueltas",
       "scope": {
-        "circle": "Mi círculo",
-        "club": "Mi club",
-        "theWorld": "el mundo",
-        "world": "Mundo",
-        "yourCircle": "tu círculo",
-        "yourClub": "tu club"
+        "club": "Mi club"
       },
       "scopes": "Ambito de resultados",
       "seeAll": "Ver los {{count}}",
@@ -336,8 +313,6 @@
       },
       "view": {
         "all": "Todo",
-        "courses": "Campos",
-        "reviews": "Reseñas",
         "scores": "Clasificación",
         "watch": "Ver"
       },

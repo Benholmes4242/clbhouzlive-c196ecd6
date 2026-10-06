@@ -13,7 +13,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { exploreKeys } from './exploreKeys';
 import { courseRecordMargin, useCourseRecordSignal } from './useCourseRecordSignal';
-import type { ExploreView } from './exploreViewMemory';
+import type { StreamPool } from './streamPool';
 import { STREAM_PAGE_SIZE } from './useExploreStreamClient';
 import type {
   Consequence,
@@ -228,7 +228,7 @@ function pgCode(error: unknown): string {
 }
 
 function reportStreamFailure(
-  view: ExploreView,
+  view: StreamPool,
   scope: string,
   error: unknown,
 ): void {
@@ -257,7 +257,7 @@ function reportStreamFailure(
 
 export function useExploreStream(
   viewerId: string | undefined,
-  view: ExploreView,
+  view: StreamPool,
   scope: string,
   geography?: { clubId?: string | null; county?: string | null; country?: string | null },
 ): ExploreServerStream {

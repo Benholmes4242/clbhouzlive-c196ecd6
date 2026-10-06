@@ -5,13 +5,6 @@
       "openPicker": "보드 선택"
     },
     "courses": {
-      "anywhere": "모든 지역",
-      "choosePlace": "지역 선택",
-      "clearPlace": "지역 필터 해제",
-      "findPlace": "국가 또는 지역 검색",
-      "noMatch": "{{query}}와 일치하는 것이 없습니다.",
-      "noPlaceMatch": "{{query}}와 일치하는 것이 없습니다.",
-      "placeTitle": "지역으로 찾기",
       "searchClear": "검색 지우기",
       "searchPlaceholder": "코스, 지역, 리뷰 검색"
     },
@@ -91,8 +84,6 @@
       "alsoPlays": "{{course}}도 플레이",
       "aroundCounty": "{{county}} 주변",
       "aroundWorld": "세계 각지",
-      "circlePlays": "내 서클이 플레이한 곳",
-      "circlePlaysSub": "팔로우하는 사람들이 플레이한 코스",
       "follow": "팔로우",
       "following": "팔로잉",
       "golfersAtClub": "{{club}} 골퍼",
@@ -102,8 +93,6 @@
       "holdsCourseRecord": "코스 레코드 보유",
       "holdsCourseRecords_one": "코스 레코드 1개 보유",
       "holdsCourseRecords_other": "코스 레코드 {{count}}개 보유",
-      "newOnClbhouz": "clbhouz의 새 코스",
-      "newOnClbhouzSub": "여기서 처음 평가된 코스",
       "newThisMonth": "이번 달 신규",
       "onYourList": "내 목록",
       "playsAtClub": "{{club}} 플레이",
@@ -121,11 +110,8 @@
       "roundsHere_one": "여기서 {{count}}라운드",
       "roundsHere_other": "여기서 {{count}}라운드",
       "roundsThisMonth": "이번 달 {{count}} 라운드",
-      "topRated": "Best rated lately",
       "worldsBest": "세계 최고의 코스",
       "worldsBestSub": "순위 기준 top 100",
-      "worthTheDrive": "멀리 갈 만한 곳",
-      "worthTheDriveSub": "플레이한 소수가 높게 평가한 코스",
       "yourClub": "내 클럽"
     },
     "stream": {
@@ -187,10 +173,6 @@
         "factRated": "{{rounds}}라운드 기록, 평가 {{count}}건에 {{rating}}.",
         "factRatedOnly": "평가 {{count}}건에 {{rating}}.",
         "factRounds": "이곳에서 {{rounds}}라운드 기록."
-      },
-      "empty": {
-        "courses": "No courses in {{scope}} yet.",
-        "reviews": "No reviews in {{scope}} yet."
       },
       "enrichment": {
         "photos": "사진 {{count}}장"
@@ -278,12 +260,7 @@
       "retry": "다시 시도",
       "roundCount": "{{count}}라운드",
       "scope": {
-        "circle": "내 서클",
-        "club": "내 클럽",
-        "theWorld": "the world",
-        "world": "세계",
-        "yourCircle": "내 서클",
-        "yourClub": "your club"
+        "club": "내 클럽"
       },
       "scopes": "스코어 범위",
       "seeAll": "{{count}}개 모두 보기",
@@ -336,8 +313,6 @@
       },
       "view": {
         "all": "전체",
-        "courses": "Courses",
-        "reviews": "Reviews",
         "scores": "순위",
         "watch": "보기"
       },

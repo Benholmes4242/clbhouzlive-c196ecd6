@@ -83,29 +83,18 @@ import { PersonalBestsShelf } from './PersonalBestsShelf';
 import { CourseShelf } from './CourseShelf';
 import { PeopleShelf } from './PeopleShelf';
 import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCourseShelves';
-import { useRecentCourseRatings, useScopeCourses } from './useCoursesView';
 import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
 import { useViewerStanding, type StandingRow } from './useViewerStanding';
 import { applyRankCardRule } from './rankCards';
 import { isNotableRound, rendersOnPhoto } from './cardTreatment';
 import { shelfDueAt, shelfForOrdinal } from './shelfCadence';
-/* BRIEF_COURSES_MERGED — Courses and Reviews are ONE view. */
 import { useCourseCandidateIndex } from './useCourseCandidateIndex';
-import { useCourseResults } from './useCourseResults';
-import { useCircleCourseIds, circleCourseIds, useMergedCourseShelves } from './useMergedCourseShelves';
-import { searchCourses, placeTree, placeCourseIds, type PlaceChoice } from './coursesSearch';
-import { CoursesSearchField } from './CoursesSearchField';
-import { RegionDropdown, type RegionDropdownHandle } from './RegionDropdown';
-import { ScopeControlSeparator } from './ScopeControlSeparator';
+import { useMergedCourseShelves } from './useMergedCourseShelves';
+import type { PlaceChoice } from './coursesSearch';
 import { useReviewPageEnrichment } from './useReviewPageEnrichment';
 
 import { useViewerCourseBests } from './useViewerCourseBests';
-import { useViewerCourseContext } from './useViewerCourseContext';
-import { CourseLeadCard, CourseLedCard } from './CourseLedCard';
-import { useCourseQuotes } from './useCourseQuotes';
 import { HelpfulReviewsShelf } from './HelpfulReviewsShelf';
-import { NationList, RegionGrid } from './DiscoveryBlocks';
-import { useCourseGeography } from './useDiscoveryCounts';
 
 /**
  * THE MAGAZINE (BRIEF_EXPLORE_MAGAZINE, PHASE A).
@@ -153,7 +142,7 @@ type ShelfKind =
   | 'videos'
   | 'clubWeek'
   /** BRIEF_EXPLORE_CIRCLE_SHELF — latest rounds from the people you follow,
-   *  newest first. Fixed once at the top of Scores; absent from All, Courses and Watch. */
+   *  newest first. Fixed once at the top of Scores; absent from All and Watch. */
   | 'circle'
   | 'standing'
   | 'personalBests'
@@ -162,19 +151,9 @@ type ShelfKind =
   | 'people'
   | 'coursesWorld'
   | 'coursesList'
-  /** §5b PHASE C C3 — courses:top-rated, the one NEW shelf of this step. The
-   *  county and world course shelves already exist from C1 and are REUSED. */
-  | 'coursesTopRated'
-  /** BRIEF_COURSES_MERGED §4 — the merged view's four NEW rails. Seven distinct
-   *  rails run through its breaks and none repeats within a session. */
+  /** BRIEF_COURSES_MERGED §4 — highest rated this year, from the candidate index. */
   | 'coursesLeadRated'
-  | 'coursesCircle'
-  | 'coursesWorthDrive'
-  | 'coursesNew'
-  /** BRIEF_COURSES_DISCOVERY §C1/§B3/§C2 — the Courses page's three new blocks. */
-  | 'regionGrid'
-  | 'helpfulReviews'
-  | 'nationList';
+  | 'helpfulReviews';
 
 type Block =
   | { kind: 'lead'; item: StreamItem }
@@ -196,14 +175,13 @@ export function fullWidthCardSize(item: StreamItem): CardSize {
  *
  *  §5b/§5c A SINGLE-TYPE VIEW PAIRS ITS OWN KIND. The mixed stream refuses two
  *  cards of the same kind side by side, because there it would read as one
- *  repeated card; the Courses and Reviews views are all one kind by definition
- *  and the brief allows pairs in both, so `sameKindPairs` opens that door for
- *  those two views only. */
+ *  repeated card; `sameKindPairs` opens that door for a single-type caller. No
+ *  current caller passes it. */
 function buildBlocks(
   items: StreamItem[],
   shelves: ShelfKind[],
   sameKindPairs = false,
-  opts: { shelfAt?: number[]; mergedCourses?: boolean; repeatShelves?: boolean } = {},
+  opts: { shelfAt?: number[]; repeatShelves?: boolean } = {},
 ): Block[] {
   const blocks: Block[] = [];
   let cards = 0;
@@ -213,17 +191,7 @@ function buildBlocks(
      text on the photograph and a 124px tile cannot carry it. §2 a NOTABLE round
      never pairs either — that predicate is all that survives of the earned hero. */
   const canPair = (item: StreamItem) =>
-    item.kind !== 'review' && !isNotableRound(item) && (
-      opts.mergedCourses === true
-        /* THE COURSES VIEW DOES NOT PAIR. BRIEF_COURSES_MERGED §3's
-           two-up lane split course cards by whether their headline was
-           an EVENT or a STABLE FACT — a distinction the member cannot
-           see, since both sizes show the same photo, name, sentence and
-           place at different widths. The page changed rhythm partway
-           down for no visible reason. One shape, every row. */
-        ? false
-        : PAIRABLE.has(item.kind)
-    );
+    item.kind !== 'review' && !isNotableRound(item) && PAIRABLE.has(item.kind);
 
   while (index < items.length) {
     const item = items[index];
@@ -237,7 +205,7 @@ function buildBlocks(
       next &&
       canPair(item) &&
       canPair(next) &&
-      (sameKindPairs || opts.mergedCourses === true || item.kind !== next.kind)
+      (sameKindPairs || item.kind !== next.kind)
     ) {
       blocks.push({ kind: 'pair', items: [item, next] });
       index += 2;
@@ -260,44 +228,6 @@ function buildBlocks(
   return blocks;
 }
 
-/**
- * BRIEF_COURSES_DISCOVERY §D — THE COURSES PAGE ORDER, in one place:
- *   lead, Highest rated, 2 cards, region grid, 1 card, helpful reviews,
- *   2 cards, Top 100 you haven't played, nation list — then the remaining
- *   rails every four cards. A rail with nothing in it renders nothing (the
- *   existing skip rule); no prompt takes its place.
- */
-const COURSES_OPENING: Array<ShelfKind | number> = [
-  'coursesLeadRated', 2, 'regionGrid', 1, 'helpfulReviews', 2, 'coursesWorld', 'nationList',
-];
-const COURSES_LATER: ShelfKind[] = ['coursesList', 'coursesCircle', 'coursesCounty', 'coursesWorthDrive', 'coursesNew'];
-
-function buildCoursesBlocks(items: StreamItem[]): Block[] {
-  const blocks: Block[] = [];
-  let index = 0;
-  if (items[0]) {
-    blocks.push({ kind: 'lead', item: items[0] });
-    index = 1;
-  }
-  for (const step of COURSES_OPENING) {
-    if (typeof step === 'number') {
-      for (let n = 0; n < step && index < items.length; n += 1) blocks.push({ kind: 'std', item: items[index++] });
-    } else {
-      blocks.push({ kind: 'shelf', shelf: step });
-    }
-  }
-  let since = 0;
-  let later = 0;
-  while (index < items.length) {
-    blocks.push({ kind: 'std', item: items[index++] });
-    since += 1;
-    if (since >= 4 && later < COURSES_LATER.length) {
-      blocks.push({ kind: 'shelf', shelf: COURSES_LATER[later++] });
-      since = 0;
-    }
-  }
-  return blocks;
-}
 
 function ClipsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) {
   const { t } = useTranslation('courses');
@@ -564,58 +494,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const [view, setView] = useState<ExploreView>(() => readExploreView());
   const [watchEntry, setWatchEntry] = useState<'all' | 'community'>('all');
   const geography = useViewerScoreScope(userId);
-  /* §1 ONE SCOPE ROW, ONE COMPONENT, TWO VIEWS. Scores and the merged Courses
-     view read the SAME shared geography resolver; All and Watch never show the
-     row. Scores' own default is My club where it resolves, else the county.
-     BRIEF_COURSES_MERGED §5: THE TWO VIEWS NO LONGER SHARE THE SAME VOCABULARY.
-     "My club" is retired FROM COURSES ONLY - on a browse it means one or two
-     courses the member knows better than anybody. Scores keeps it, where it
-     means rounds at the club's course, which is a real set. So the two views
-     hold their own scope state rather than one being clamped into the other. */
-  /** SCOPED_VIEWS is still the register of views that carry a scope row; the two
-   *  rows are now built separately because their vocabularies differ (§5). */
+  /** SCOPED_VIEWS is the register of views that carry a scope row (Scores only;
+   *  its board owns its own scope in useAmateurBoardState). */
   const scoped = SCOPED_VIEWS.includes(view);
   void scoped;
 
-  /* §5 MY CIRCLE IS STILL OFFERED, WORLD IS THE LANDING SCOPE (Ben, Sep 2026).
-     Courses opens on World for every member and stays there until they pick
-     another chip - no effect switches it after the page has rendered, so there
-     is no scope jump on load. The chip is ABSENT for a member who follows
-     nobody (hasCircle keeps deciding that), leaving World, county and country.
-     Scores' own default is My club where it resolves, else the county. */
-  const [coursesScope, setCoursesScope] = useState<ScoreScope>('world');
-  const hasCircle = circleSize.isSuccess && !circleSize.isFetching && (circleSize.data ?? 0) > 0;
-
-  /** The scope the VIEW ON SCREEN is looking at. */
-  /* Scores no longer carries a stream scope (its stream is gated off); the
-     board's own scope lives in useAmateurBoardState. */
-  const activeScope: ScoreScope = view === 'courses' ? coursesScope : 'world';
-
-  /* §6, §7 SEARCH AND PLACE. Both REPLACE THE PAGE BODY and neither is a route
-     or a sheet, so the chips, the field and the scope row all stay mounted -
-     that is the member's way back. */
-  const [search, setSearch] = useState('');
+  /* THE PLACE. No control sets it any more (the Courses view's place picker is
+     deleted); it is kept, always null, because the Scores stream's documented
+     rollback (placeScoped below) is written against it. */
   const [place, setPlace] = useState<PlaceChoice | null>(null);
-  const placePickerRef = useRef<RegionDropdownHandle>(null);
-  /* One place-choosing path for the picker and the region tiles (GEOGRAPHY_NAV §2). */
-  const choosePlace = (next: PlaceChoice | null) => {
-              analyticsEvents.track('amateur_place_changed', {
-                view,
-                country: next?.country ?? null,
-                region: next?.region ?? null,
-                scope_reset: next !== null && coursesScope !== 'world',
-              });
-              setPlace(next);
-              /* CHOOSING A PLACE MEANS EVERYONE IN IT (§5). Clearing it changes
-                 nothing about scope. */
-              if (next !== null) {
-                setCoursesScope('world');
-              }
-              setRevealed(STREAM_PAGE_SIZE);
-              loggedRef.current = 0;
-            };
-  const query = search.trim();
-  const filtering = view === 'courses' && (query.length >= 2 || place !== null);
 
   /* PHASE B (BRIEF_EXPLORE_MAGAZINE P1) — SCORES IS A CHIP THAT CAN CHANGE WHAT
      YOU SEE. The ranked stream is the default and stays the landing experience;
@@ -669,16 +556,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      `world` — which is why the 0.8 club ring had never fired for anyone. */
   const serverReady = serverView && geography.isFetched;
 
-  /* BRIEF_COURSES_MERGED §5, §6, §7 THE INDEX PATH. Search, a chosen place and
-     the My circle scope are all answered from the ONE candidate index, because
-     all three ask a question the ranker's keyset pages cannot answer without
-     dropping rows: a page filtered after ranking is a page that lies about how
-     much it found. When the index path is in charge NO RPC IS ISSUED at all. */
-  const indexPath = view === 'courses' && (filtering || activeScope === 'circle');
-  /* THE RPC HAS NO 'circle' SCOPE. Reported: rather than invent a scope string
-     the deployed function would fall through, the circle set is composed from the
-     index above and the RPC is not asked. */
-  const chipScope = activeScope === 'circle' ? 'world' : activeScope;
+  /* The stream scope. All is unscoped and Scores' stream is gated off, so the
+     only scope the stream reads are asked for is the literal 'world'. */
+  const chipScope: ScoreScope = 'world';
   /* SCORES: A CHOSEN PLACE IS THE *WHERE* (BRIEF_EXPLORE_SECOND_PASS §3). The
      rounds body already reads geography from ONE resolver and already knows how
      to be asked for a county or a country, so a chosen place is expressed in that
@@ -697,7 +577,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const serverScope: ScoreScope =
     placeScoped && chipScope === 'world' ? (place?.region ? 'county' : 'country') : chipScope;
   /* §2 — no Scores stream read: the Scores view cannot render it. */
-  const server = useExploreStream(userId && serverReady && !indexPath && view !== 'scores' ? userId : undefined, view, serverScope, {
+  const server = useExploreStream(userId && serverReady && view !== 'scores' ? userId : undefined, view, serverScope, {
     clubId: streamGeo.primaryClubId,
     county: streamGeo.county,
     country: streamGeo.country,
@@ -725,34 +605,29 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     { clubId: streamGeo.primaryClubId, county: streamGeo.county, country: streamGeo.country },
   );
 
-  /* BRIEF_EXPLORE_ALL_REVIEWS — the helpful-reviews rail lives on All too, so the
-     'reviews' pool is enabled for BOTH views it feeds. Geography is streamGeo (the
-     one the All stream and the hero use): on Courses streamGeo IS geography.scope,
-     so nothing changes there; on All it keeps this read and the stream it feeds on
-     one place scope instead of two. serverScope is already the literal 'world' on
-     All, so no second scope derivation. */
+  /* BRIEF_EXPLORE_ALL_REVIEWS — THE 'reviews' POOL FEEDS THE MOST HELPFUL
+     REVIEWS RAIL ON ALL. It has no tab; it is a pool (StreamPool), not a view.
+     Geography is streamGeo, the one the All stream and the hero use, and
+     serverScope is the literal 'world' on All. */
   const serverReviews = useExploreStream(
-    userId && serverReady && !indexPath && (view === 'courses' || view === 'all') ? userId : undefined,
+    userId && serverReady && view === 'all' ? userId : undefined,
     'reviews',
     serverScope,
     { clubId: streamGeo.primaryClubId, county: streamGeo.county, country: streamGeo.country },
   );
-  const serverOn = serverView && !indexPath && !server.unavailable && server.isFetched && server.items.length > 0;
+  const serverOn = serverView && !server.unavailable && server.isFetched && server.items.length > 0;
   /* THE FALLBACK CONDITION, in one place. While the RPC is still in flight the
      client composition is NOT fetched - the server hook shows its own shells, so
      a member never pays for two rankers. */
   const fallbackWanted = view !== 'scores' && (!serverView || server.unavailable);
   const stream = useExploreStreamClient(
-    fallbackWanted && !indexPath ? userId : undefined,
-    /* THE MERGED VIEW'S FALLBACK REVIEWS. The client composition has always
-       composed the reviews pool under the 'reviews' view; the merged view asks it
-       for exactly that and takes its course cards from useScopeCourses below. */
-    view === 'courses' ? 'reviews' : view,
+    fallbackWanted ? userId : undefined,
+    view,
     { active: serverScope, geography: streamGeo },
     /* WATCH IS ITS OWN SURFACE NOW (BRIEF_WATCH_MIXED_FEED): WatchFeed owns the
        long-form, clip and community reads, so this composition no longer issues
        a single read for it. */
-    { enabled: fallbackWanted && !indexPath && view !== 'watch' },
+    { enabled: fallbackWanted && view !== 'watch' },
   );
   /* VIDEO LIVES IN THE RAILS AND NOWHERE ELSE (BRIEF_EXPLORE_TWO_SHAPES §1).
      ONE LONG-FORM READ still serves the whole page — the Videos rail reads the
@@ -775,85 +650,19 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      stream. The invitation lives on Scores, in context. The
      'amateur.stream.nothingYet' locale keys stay, unused, for Phase E. */
 
-  /* §5b THE COURSES VIEW'S OWN BODY. Course cards are not rounds, reviews or
-     media, so they are composed by their own hook off get_board_courses and the
-     shared geography — the client stream is left exactly as B2 shipped it. */
-  const coursesView = useScopeCourses(
-    userId,
-    serverScope,
-    geography.scope,
-    /* THE FALLBACK ONLY. With the RPC serving Courses this composition is not
-       fetched at all; it wakes up if the server read is unavailable. */
-    view === 'courses' && geography.isFetched && !serverOn && !indexPath,
-  );
+  /* THE CANDIDATE INDEX (BRIEF_COURSES_MERGED). One bounded read behind the
+     lead rated rail on All. Scores keeps it enabled as before. */
+  const candidates = useCourseCandidateIndex(view === 'scores' || view === 'all');
 
-  /* THE CANDIDATE INDEX (BRIEF_COURSES_MERGED). One bounded read behind the four
-     new rails, the search and the region dropdown, so a count and a tile can
-     never disagree. SCORES SHARES IT (BRIEF_EXPLORE_SECOND_PASS §3): its place
-     dropdown is the same component reading the same index, so the two views can
-     never disagree about which places exist or how many courses are in one. */
-  const candidates = useCourseCandidateIndex(view === 'courses' || view === 'scores' || view === 'all');
-  const circle = useCircleCourseIds(userId, view === 'courses');
-  /* "HAS CONTENT" IS A PARAMETER, NOT A FORK (§3). Scores is rounds, so a place
-     qualifies on TRACKED ROUNDS; the merged Courses view keeps rounds OR ratings. */
-  const places = useMemo(
-    () => placeTree(candidates.index, view === 'scores' ? 'rounds' : 'roundsOrRatings'),
-    [candidates.index, view],
-  );
-
-  const searchHit = useMemo(
-    () => (query.length >= 2 ? searchCourses(candidates.index, query) : null),
-    [candidates.index, query],
-  );
-  const resultIds = useMemo(() => {
-    if (!indexPath) return null;
-    if (searchHit) return searchHit.courseIds;
-    if (place) return placeCourseIds(candidates.index, place);
-    return circleCourseIds(candidates.index, circle.circleIds);
-  }, [indexPath, searchHit, place, candidates.index, circle.circleIds]);
-  const results = useCourseResults(candidates.index, resultIds, searchHit?.reviewIds ?? null, userId);
-  const indexSource = useMemo(
-    () => ({
-      items: results.items,
-      total: results.total,
-      isFetched: candidates.isFetched && (!circle.isFetched ? activeScope !== 'circle' : true),
-    }),
-    [results.items, results.total, candidates.isFetched, circle.isFetched, activeScope],
-  );
-
-  /* §2 THE MERGED BODY. Course cards and review cards in ONE stream, ordered by
-     the score each pool already carries. */
-  const mergedServerItems = useMemo(() => {
-    if (view !== 'courses') return server.items;
-    /* BRIEF_COURSES_DISCOVERY §A1 — THE SUBJECT IS THE COURSE. The reviews read
-       stays (it feeds the Most helpful reviews rail) but supplies no cards. */
-    return server.items.filter((item) => item.kind === 'course');
-  }, [view, server.items]);
-  const mergedFallbackItems = useMemo(() => {
-    if (view !== 'courses') return stream.items;
-    /* §A1 — the zip that alternated course and review cards is gone. */
-    return coursesView.items.filter((item) => item.kind === 'course');
-  }, [view, coursesView.items, stream.items]);
-
-  /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so a
-     single-type view and the mixed stream take the same reveal, sentinel,
+  /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so the
+     server page and the client fallback take the same reveal, sentinel,
      page-loaded and end paths. */
-  const source = indexPath
-    ? indexSource
-    : serverOn
-      ? { ...server, items: mergedServerItems }
-      : view === 'courses'
-        ? {
-            items: mergedFallbackItems,
-            total: mergedFallbackItems.length,
-            isFetched: coursesView.isFetched && stream.isFetched,
-          }
-        : stream;
+  const source = serverOn ? server : stream;
 
   /* PHASE C §3a-§3c THE COURSE SHELVES. Each shelf renders nothing when its
      source is empty. Geography comes from the shared resolver above — no second
      derivation, and C1's county and world shelves are REUSED here, not rebuilt. */
-  const shelvesWanted = view === 'all' || view === 'courses';
+  const shelvesWanted = view === 'all';
   const countyCourses = useCountyCourses(userId, geography.scope, shelvesWanted && geography.isFetched);
   const worldCourses = useWorldTop100Courses(shelvesWanted);
   const listCourses = useListCourses(userId, shelvesWanted);
@@ -861,9 +670,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      computed for the rows on this page - no per-tile query. A course with no
      event, or with a tie between two kinds, keeps its AREA. */
   const listEvents = useMemo(() => listCourseEvents(source.items), [source.items]);
-  const topRatedCourses = useRecentCourseRatings(false);
-  /* §4 THE FOUR NEW RAILS, all from the index. */
-  const mergedShelves = useMergedCourseShelves(candidates.index, geography.scope.county, circle.circleIds);
+  /* §4 THE LEAD RATED RAIL, from the index. */
+  const mergedShelves = useMergedCourseShelves(candidates.index);
   /* §B3 THE REVIEWS READ, KEPT: it now feeds the helpful-reviews rail only. */
   const railReviews = useMemo(
     () => (serverOn ? serverReviews.items : stream.items).filter((item) => item.kind === 'review'),
@@ -879,7 +687,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     (id: string) => railReviewReactions.stateFor('review', id).count,
     [railReviewReactions],
   );
-  const courseGeo = useCourseGeography(userId, view === 'courses');
 
 
   /* THE SERVER PAGE IS ALREADY A PAGE. Reveal slicing belongs to the client
@@ -951,19 +758,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      whole page, never per card, so a record headline can say what the record was
      measured against. Absent = the comparison is dropped, never invented. */
   const viewerBests = useViewerCourseBests(userId ?? undefined);
-  const viewerContext = useViewerCourseContext(userId ?? undefined);
-  /**
-   * PLAYED MEANS THE MEMBER HAS BEEN THERE — not that England Golf holds a card
-   * (BRIEF_PLAYED_INCLUDES_REVIEWED). A logged round proves it; so does the
-   * member's own review, which cannot be written from the car park. Either is
-   * sufficient, and the rail and the chips read the same set so they can never
-   * disagree about one course.
-   */
-  const viewerPlayed = useMemo(() => {
-    const ids = new Set<string>(viewerBests.bestsAt.keys());
-    for (const id of viewerContext.context.ratings.keys()) ids.add(id);
-    return ids;
-  }, [viewerBests.bestsAt, viewerContext.context.ratings]);
 
   const enriched = useMemo(
     () =>
@@ -997,27 +791,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   }, [scoresStanding.rows]);
   const rankGate = useMemo(() => applyRankCardRule(enriched, standingByCourse), [enriched, standingByCourse]);
   const ranked = rankGate.items;
-  /* §A4 THE QUOTED REVIEW — one read for the window, never per card. */
-  const courseQuotes = useCourseQuotes(
-    useMemo(
-      () => (view === 'courses' ? ranked.filter((i) => i.kind === 'course').map((i) => i.subject?.course_id ?? '') : []),
-      [view, ranked],
-    ),
-  );
-  const listIds = useMemo(() => new Set(listCourses.rows.map((row) => row.courseId)), [listCourses.rows]);
-  const chipsFor = useCallback(
-    (courseId: string | null | undefined) => {
-      const best = courseId ? viewerBests.bestsAt.get(courseId) ?? null : null;
-      const clubId = courseId ? candidates.index.courses.get(courseId)?.clubId ?? null : null;
-      return {
-        club: !!clubId && clubId === geography.scope.primaryClubId,
-        played: !!courseId && viewerPlayed.has(courseId),
-        best: best?.gross ?? null,
-        onList: !!courseId && listIds.has(courseId),
-      };
-    },
-    [viewerBests.bestsAt, viewerPlayed, candidates.index, geography.scope.primaryClubId, listIds],
-  );
   /* THE HERO'S ROUND IS FILTERED OUT OF THE FEED, so its id is added back here
      or its clap/comment counts would never load (BRIEF_FEATURED_ROUND_ACTIONS §5). */
   const roundScoreIds = useMemo(() => {
@@ -1061,27 +834,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     'coursesWorld',
     'coursesList',
   ];
-  /* BRIEF_COURSES_MERGED §4 THE MERGED VIEW'S SEVEN RAILS, IN ORDER, NEVER
-     REPEATING WITHIN A SESSION - each kind appears exactly ONCE in this array, so
-     a repeat is not possible by construction rather than by discipline.
-     THE LEAD RAIL is highest rated (month, widening to the year with its heading).
-     ON YOUR LIST comes second and ONLY WHERE IT EXISTS - the shelf renders
-     nothing for a member with no list and NO PROMPT takes its place; the next
-     rail simply takes the slot, which is the existing skip rule.
-     A rail with nothing in it is SKIPPED. */
-  /* THE COURSES VIEW IS HIDDEN (BRIEF EXPLORE — HIDE THE COURSES TAB): it has
-     no chip, and readExploreView sends a remembered 'courses' to All. This block,
-     COURSES_OPENING, COURSES_LATER and buildCoursesBlocks are DELIBERATELY
-     UNREACHABLE and kept so the view can return. Do not delete as dead code. */
-  const COURSES_SHELVES: ShelfKind[] = [
-    'coursesLeadRated',
-    'coursesList',
-    'coursesCircle',
-    'coursesCounty',
-    'coursesWorthDrive',
-    'coursesWorld',
-    'coursesNew',
-  ];
   /* SCORES SHELVES — the four that are about the MEMBER'S OWN GOLF, inserted
      after 3 cards and every 4 thereafter, then repeated without Your circle.
      WHY 'standing' IS A SHELF AND NOT A CARD: a shelf may show a position with
@@ -1098,27 +850,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         []
       : view === 'scores'
         ? SCORES_SHELVES
-        : view === 'courses'
-          ? /* §4 SHELVES STAND DOWN ENTIRELY when the member has searched or
-               picked a place: they would answer a different question to the one
-               just asked. The My circle scope KEEPS them - it is a scope, not a
-               question. */
-            filtering
-            ? []
-            : COURSES_SHELVES
-          : ALL_SHELVES;
-  const singleType = view === 'courses';
+        : ALL_SHELVES;
   const blocks = useMemo(
-    () =>
-      view === 'courses' && !filtering
-        ? buildCoursesBlocks(ranked)
-        : buildBlocks(ranked, shelves, false, {
-        repeatShelves: view === 'scores' || view === 'all',
-        /* §3 THE MERGED VIEW'S RHYTHM: pairs are STABLE-FACT COURSE CARDS only,
-           reviews and event cards always full width. */
-        mergedCourses: view === 'courses',
-      }),
-    [ranked, view, activeScope, shelves, singleType, filtering],
+    () => buildBlocks(ranked, shelves, false, { repeatShelves: view === 'scores' || view === 'all' }),
+    [ranked, view, shelves],
   );
   /* §2 THE EARNED HERO IS RETIRED: cardTreatments() and its 1-in-4 positional
      cap are gone. Reviews alone retain the lead SIZE because their copy sits on
@@ -1179,10 +914,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       if (!EXPLORE_VIEWS.includes(value)) return;
       analyticsEvents.track('amateur_view_changed', { from: view, to: value });
       setView(value);
-      /* LEAVING THE MERGED VIEW CLEARS ITS QUESTION. A search or a place is an
-         answer to something asked on that view; carrying it into the next visit
-         would filter a page the member never filtered. */
-      setSearch('');
+      /* A view change clears any place (see `place`; nothing sets it today). */
       setPlace(null);
       writeExploreView(value);
       setRevealed(STREAM_PAGE_SIZE);
@@ -1647,51 +1379,13 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             ? t('amateur.stream.view.all', 'All')
             : key === 'scores'
               ? t('amateur.stream.view.scores', 'Standings')
-              : key === 'watch'
-                ? t('amateur.stream.view.watch', 'Watch')
-                : key === 'courses'
-                  ? t('amateur.stream.view.courses', 'Courses')
-                  : t('amateur.stream.view.reviews', 'Reviews'),
+              : t('amateur.stream.view.watch', 'Watch'),
       })),
     [t],
   );
 
-  /** §5d THE ONE EMPTY SENTENCE of the merged Courses view (Courses and Reviews
-   *  are one surface; Scores never renders it — it has no scope row). It names
-   *  the scope the member is looking at, so the row above it is the way out. The
-   *  county and country names are DATA; "your club", "your circle" and "the
-   *  world" are the translated ones. */
-  const scopeName =
-    activeScope === 'club'
-      ? geography.scope.primaryClubName ?? t('amateur.stream.scope.yourClub', 'your club')
-      : activeScope === 'circle'
-        ? t('amateur.stream.scope.yourCircle', 'your circle')
-        : activeScope === 'county'
-          ? geography.scope.county ?? t('amateur.stream.scope.theWorld', 'the world')
-          : activeScope === 'country'
-            ? geography.scope.country ?? t('amateur.stream.scope.theWorld', 'the world')
-            : t('amateur.stream.scope.theWorld', 'the world');
-  /* A SCOPE WITH NO CARDS BUT SHELVES WITH CONTENT RENDERS THE SHELVES AND NO
-     SENTENCE (§5d). The shelves each report their own emptiness. UNSETTLED IS
-     NOT EMPTY: while any shelf source is still in flight the sentence is held
-     back, so a scope that does have shelves never flashes "nothing here".
-     THE MERGED RAILS JOIN THE SAME TEST: the lead rated rail is the one every
-     member has, so an empty page with a full rail still shows the rail. */
-  const shelvesSettled =
-    listCourses.isFetched && countyCourses.isFetched && worldCourses.isFetched && candidates.isFetched;
-  const shelvesHaveContent =
-    (listCourses.rows.length > 0) ||
-    (countyCourses.rows.length > 0) ||
-    (mergedShelves.lead.rows.length > 0) ||
-    (mergedShelves.worthDrive.length > 0) ||
-    (mergedShelves.newly.length > 0) ||
-    (mergedShelves.circle.length > 0) ||
-    (worldCourses.rows.length > 0);
-
-
-  /** ONE SHELF RENDERER, TWO CALLERS (§5d): the stream's every-fourth-card slot
-   *  and the shelf-only state of an empty scope. A shelf reports its own
-   *  emptiness in both. */
+  /** ONE SHELF RENDERER: the stream's every-fourth-card slot. A shelf reports
+   *  its own emptiness. */
   const renderShelf = (shelf: ShelfKind, pos: number) => (
     <>
       {shelf === 'clips' ? (
@@ -1761,22 +1455,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     onDepart={depart}
                   />
                 ) : shelf === 'coursesWorld' ? (
-                  /* THE SAME RAIL, TWO HEADINGS. On All it is "Around the world",
-                     which is the mixed page's own voice; in the merged Courses
-                     view §4 names it "The world's best" with its basis beneath. */
+                  /* §B2 — the tile wears the RANK, never a rating. Unfiltered:
+                     the heading makes no claim about the viewer. */
                   <CourseShelf
-                    heading={
-                      view === 'courses'
-                        ? t('amateur.shelf.top100Unplayed', "Top 100 you haven't played")
-                        : t('amateur.shelf.aroundWorld', 'Around the world')
-                    }
-                    /* §B2 — the tile wears the RANK, never a rating, and a course
-                       the viewer has played is filtered out. */
-                    rows={view === 'courses' ? worldCourses.rows.filter((row) => !viewerPlayed.has(row.courseId)) : worldCourses.rows}
-                    /* BRIEF_TOP100_UNPLAYED_GATE — the heading claims something
-                       about the viewer, so the rail must not render until the
-                       viewer's own bests have settled too. */
-                    isFetched={worldCourses.isFetched && viewerBests.isFetched && viewerContext.isFetched}
+                    heading={t('amateur.shelf.aroundWorld', 'Around the world')}
+                    rows={worldCourses.rows}
+                    isFetched={worldCourses.isFetched}
                     kind="courses_world"
                     pos={pos}
                     onDepart={depart}
@@ -1789,17 +1473,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     isFetched={listCourses.isFetched}
                     events={listEvents}
                     kind="courses_list"
-                    pos={pos}
-                    onDepart={depart}
-                  />
-                ) : shelf === 'coursesTopRated' ? (
-                  /* §5b THE NEW SHELF: rated in the last 30 days, floor of two
-                     ratings, mean descending. The same CourseShelf tile. */
-                  <CourseShelf
-                    heading={t('amateur.shelf.topRated', 'Best rated lately')}
-                    rows={topRatedCourses.rows}
-                    isFetched={topRatedCourses.isFetched}
-                    kind="courses_top_rated"
                     pos={pos}
                     onDepart={depart}
                   />
@@ -1816,40 +1489,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                     pos={pos}
                     onDepart={depart}
                   />
-                ) : shelf === 'coursesCircle' ? (
-                  <CourseShelf
-                    heading={t('amateur.shelf.circlePlays', 'Where your circle plays')}
-                    sub={t('amateur.shelf.circlePlaysSub', 'Courses the people you follow have played')}
-                    rows={mergedShelves.circle}
-                    isFetched={candidates.isFetched && circle.isFetched}
-                    kind="courses_circle"
-                    pos={pos}
-                    onDepart={depart}
-                  />
-                ) : shelf === 'coursesWorthDrive' ? (
-                  <CourseShelf
-                    heading={t('amateur.shelf.worthTheDrive', 'Worth the drive')}
-                    sub={t('amateur.shelf.worthTheDriveSub', 'Rated highly by the few who have played them')}
-                    rows={mergedShelves.worthDrive}
-                    isFetched={candidates.isFetched}
-                    kind="courses_worth_drive"
-                    pos={pos}
-                    onDepart={depart}
-                  />
-                ) : shelf === 'coursesNew' ? (
-                  <CourseShelf
-                    heading={t('amateur.shelf.newOnClbhouz', 'New on clbhouz')}
-                    sub={t('amateur.shelf.newOnClbhouzSub', 'Courses rated here for the first time')}
-                    rows={mergedShelves.newly}
-                    isFetched={candidates.isFetched}
-                    kind="courses_new"
-                    pos={pos}
-                    onDepart={depart}
-                  />
-                ) : shelf === 'regionGrid' ? (
-                  <RegionGrid rows={courseGeo.regions} onPress={(row) => { choosePlace({ country: row.parent ?? '', region: row.region }); scrollPageToTop('auto'); }} />
-                ) : shelf === 'nationList' ? (
-                  <NationList rows={courseGeo.nations} onPress={() => placePickerRef.current?.open()} />
                 ) : shelf === 'helpfulReviews' ? (
                   <HelpfulReviewsShelf
                     items={railReviews}
@@ -1919,94 +1558,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely; the
           view chips above stay exactly where they are. */}
       {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={openPostComments} /> : null}
-
-      {/* §6 THE SEARCH FIELD SITS ABOVE THE SCOPE ROW on the merged Courses view.
-          Results replace the page BODY; this field, the scope row and the chips
-          stay put. */}
-      {view === 'courses' ? <CoursesSearchField value={search} onChange={setSearch} /> : null}
-
-
-      {/* BRIEF_EXPLORE_SECOND_PASS §1 REVERSES THE 'sm' RULING. Every secondary
-          row in Explore is ONE size — the Watch filter row's, which is the
-          canonical 'md' chip — so the rows agree with each other and with the
-          reference. The hierarchy is carried by position and by the primary row
-          being CENTRED, not by shrinking the filter.
-
-          §5, §7 THE MERGED VIEW'S SCOPE ROW AND ITS PLACE DROPDOWN.
-          PLACE IS *WHERE*, SCOPE IS *WHOSE*, AND THEY COMPOSE — BUT CHOOSING A
-          PLACE RESETS SCOPE TO WORLD (BRIEF_EXPLORE_DEVICE_PASS §5).
-
-          Browsing a place MEANS browsing everyone in it, so picking Kent shows
-          everyone in Kent and the scope row says World, which is the truth. The
-          member can then narrow to My circle within Kent, because the chips stay
-          fully usable. Clearing the place leaves scope exactly where the member
-          last put it.
-
-          THE OLD RULE IS REVERSED AND DELIBERATELY SO: it left My circle lit
-          while the place quietly ignored it, so two controls looked active and
-          one did nothing, and "everyone in Kent" could not be reached at all.
-          NO CONTROL IS EVER LIT WHILE DOING NOTHING. */}
-      {view === 'courses' && geography.isFetched ? (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '0 12px 14px',
-            minWidth: 0,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-          }}
-        >
-          {/* A CONTROL THAT CANNOT CHANGE WHAT YOU SEE DOES NOT RENDER: with no
-              circle and no county the only chip would be World, so the chips
-              stand down and the place dropdown - which does have somewhere to go
-              - keeps the row. */}
-          <div style={{ minWidth: 0, flex: '1 1 auto' }}>
-            {hasCircle || geography.scope.county ? (
-            <RailChips
-              options={[
-                ...(hasCircle ? [{ id: 'circle', label: t('amateur.stream.scope.circle', 'My circle') }] : []),
-                ...(geography.scope.county ? [{ id: 'county', label: geography.scope.county }] : []),
-                ...(geography.scope.country ? [{ id: 'country', label: geography.scope.country }] : []),
-                { id: 'world', label: t('amateur.stream.scope.world', 'World') },
-              ]}
-              value={coursesScope}
-              onChange={(next) => {
-                const value = next as ScoreScope;
-                analyticsEvents.track('amateur_scope_changed', { view, from: coursesScope, to: value });
-                setCoursesScope(value);
-                setRevealed(STREAM_PAGE_SIZE);
-                loggedRef.current = 0;
-              }}
-              ariaLabel={t('amateur.stream.scopes', 'Scores scope')}
-              ground="filled-selection"
-              distribute
-            />
-            ) : null}
-          </div>
-          <ScopeControlSeparator />
-          <RegionDropdown
-            ref={placePickerRef}
-            tree={places}
-            choice={place}
-            onChoose={choosePlace}
-          />
-        </div>
-      ) : null}
-
-
-
-
-      {/* §6 EMPTY SEARCH: one line, controls intact, no suggestions. */}
-      {view === 'courses' && query.length >= 2 && candidates.isFetched && source.items.length === 0 ? (
-        <div style={{ paddingInline: 20, paddingBottom: BLOCK_GAP }}>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
-            {t('amateur.courses.noMatch', 'Nothing matches {{query}}.', { query })}
-          </p>
-        </div>
-      ) : null}
-
 
       {/* UNREACHABLE ON SCORES SINCE THE BOARD BECAME THE LANDING VIEW — kept, not
           dead: see boardPick. Bringing the stream back is a one-line change. */}
@@ -2078,33 +1629,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         </div>
       ) : null}
 
-      {/* COLD START SHOWS THE SHORTEST PLAUSIBLE CARD, never a lead shell: a
-          loading state is never larger than the state it resolves into. */}
-      {singleType && source.isFetched && source.items.length === 0 ? (
-        /* §5d NEVER A BLANK VIEW. Where the shelves carry content they render and
-           the sentence stays away; where the scope is empty of EVERYTHING there
-           is exactly ONE sentence, and the scope row above it stays so the
-           member can widen. */
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
-          {/* AN EMPTY SHELF LEAVES NO GAP. A wrapping div still claims its row
-              gap in this grid, so the shelf-only state renders each rail as a
-              FRAGMENT: a rail that returns null now occupies nothing at all. */}
-          {shelves.map((shelf) => (
-            <Fragment key={`empty-shelf:${shelf}`}>{renderShelf(shelf, 0)}</Fragment>
-          ))}
-          {shelvesSettled && !shelvesHaveContent ? (
-            <div style={{ paddingInline: 20, marginTop: 8 }}>
-              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
-                {view === 'courses'
-                  ? t('amateur.stream.empty.courses', 'No courses in {{scope}} yet.', { scope: scopeName })
-                  : t('amateur.stream.empty.reviews', 'No reviews in {{scope}} yet.', { scope: scopeName })}
-              </p>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-
-
       {/* minmax(0,1fr), NOT bare 1fr: a grid item's automatic minimum is its
           min-content, and the kicker/who-line are single-line nowrap — without
           the zero minimum a long course name widens the whole track past the
@@ -2162,26 +1686,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
              std. Reviews are excluded from pairs by buildBlocks(). */
           const size = fullWidthCardSize(item);
           const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
-          /* BRIEF_COURSES_DISCOVERY §A2/§B1 — the Courses view's course unit. */
-          if (view === 'courses' && item.kind === 'course') {
-            return (
-              <div key={item.id} style={{ paddingInline: CARD_INSET }}>
-                <div ref={(el) => { cardRefs.current.set(item.id, el); }} style={{ WebkitTapHighlightColor: 'transparent' }}>
-                  {block.kind === 'lead' && !filtering ? (
-                    <CourseLeadCard item={item} onTap={() => tapCard(item, size, pos)} />
-                  ) : (
-                    <CourseLedCard
-                      item={item}
-                      quote={item.subject?.course_id ? courseQuotes.get(item.subject.course_id) ?? null : null}
-                      chips={chipsFor(item.subject?.course_id)}
-                      viewerId={userId}
-                      onTap={() => tapCard(item, size, pos)}
-                    />
-                  )}
-                </div>
-              </div>
-            );
-          }
           return (
             <div key={item.id} style={{ paddingInline: CARD_INSET }}>
              <div
