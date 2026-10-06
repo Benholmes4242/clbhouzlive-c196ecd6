@@ -265,7 +265,7 @@ function Section({
       style={{
         fontFamily: SANS,
         paddingInline: GUTTER,
-        marginTop: first ? 24 : 0,
+        marginTop: 0, // first section: the tab strip's own gap is the seam (matches All / Watch)
         paddingTop: first ? 0 : 24,
         borderTop: first ? 'none' : `1px solid ${A.SOFT}`,
         marginBottom: 24,
