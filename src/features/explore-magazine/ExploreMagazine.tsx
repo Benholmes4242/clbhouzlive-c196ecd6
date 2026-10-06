@@ -725,11 +725,17 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     { clubId: streamGeo.primaryClubId, county: streamGeo.county, country: streamGeo.country },
   );
 
+  /* BRIEF_EXPLORE_ALL_REVIEWS — the helpful-reviews rail lives on All too, so the
+     'reviews' pool is enabled for BOTH views it feeds. Geography is streamGeo (the
+     one the All stream and the hero use): on Courses streamGeo IS geography.scope,
+     so nothing changes there; on All it keeps this read and the stream it feeds on
+     one place scope instead of two. serverScope is already the literal 'world' on
+     All, so no second scope derivation. */
   const serverReviews = useExploreStream(
-    userId && serverReady && !indexPath && view === 'courses' ? userId : undefined,
+    userId && serverReady && !indexPath && (view === 'courses' || view === 'all') ? userId : undefined,
     'reviews',
     serverScope,
-    { clubId: geography.scope.primaryClubId, county: geography.scope.county, country: geography.scope.country },
+    { clubId: streamGeo.primaryClubId, county: streamGeo.county, country: streamGeo.country },
   );
   const serverOn = serverView && !indexPath && !server.unavailable && server.isFetched && server.items.length > 0;
   /* THE FALLBACK CONDITION, in one place. While the RPC is still in flight the
