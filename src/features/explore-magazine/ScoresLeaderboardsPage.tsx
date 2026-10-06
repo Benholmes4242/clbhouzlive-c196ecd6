@@ -46,7 +46,7 @@ import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
  */
 
 const GUTTER = 16;
-const LEAD_POSITIONS = 10;
+const LEAD_POSITIONS = 5;
 const SHORT_ROWS = 3;
 /** Faint ink: no separate token exists; DIM is the faintest analytical ink. */
 const FAINT = A.DIM;
