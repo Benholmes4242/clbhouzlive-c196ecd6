@@ -86,7 +86,6 @@
         "holes": "holes",
         "rounds": "rounds"
       },
-      "title": "Standings",
       "top100": "Top 100 courses",
       "latestCourse": "Added · {{course}}",
       "theListHundred": "The {{list}} hundred"
