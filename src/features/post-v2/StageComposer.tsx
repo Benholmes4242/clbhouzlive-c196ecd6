@@ -1041,9 +1041,9 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
           {/* THE MEDIA RAIL. Nothing here auto-fires a picker: no effect opens a
               file input on mount. That behaviour was deleted in August and must
               not come back. */}
-            /* Both inputs live HERE, each one anchored EXACTLY OVER ITS OWN
-               BUTTON so the iOS chooser menu opens from the control that was
-               tapped rather than over the footer. Do not consolidate them. */
+          {/* Both inputs live HERE, each one anchored EXACTLY OVER ITS OWN
+              BUTTON so the iOS chooser menu opens from the control that was
+              tapped rather than over the footer. Do not consolidate them. */}
             <div style={{ padding: '4px 16px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ position: 'relative' }}>
                 <button onClick={() => emptyLibraryInputRef.current?.click()} style={emptyPrimaryButtonStyle}>
