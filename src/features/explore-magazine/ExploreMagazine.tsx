@@ -786,7 +786,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      never disagree. SCORES SHARES IT (BRIEF_EXPLORE_SECOND_PASS §3): its place
      dropdown is the same component reading the same index, so the two views can
      never disagree about which places exist or how many courses are in one. */
-  const candidates = useCourseCandidateIndex(view === 'courses' || view === 'scores');
+  const candidates = useCourseCandidateIndex(view === 'courses' || view === 'scores' || view === 'all');
   const circle = useCircleCourseIds(userId, view === 'courses');
   /* "HAS CONTENT" IS A PARAMETER, NOT A FORK (§3). Scores is rounds, so a place
      qualifies on TRACKED ROUNDS; the merged Courses view keeps rounds OR ratings. */
@@ -860,8 +860,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const mergedShelves = useMergedCourseShelves(candidates.index, geography.scope.county, circle.circleIds);
   /* §B3 THE REVIEWS READ, KEPT: it now feeds the helpful-reviews rail only. */
   const railReviews = useMemo(
-    () => (view !== 'courses' ? [] : (serverOn ? serverReviews.items : stream.items).filter((item) => item.kind === 'review')),
-    [view, serverOn, serverReviews.items, stream.items],
+    () => (serverOn ? serverReviews.items : stream.items).filter((item) => item.kind === 'review'),
+    [serverOn, serverReviews.items, stream.items],
   );
   const railReviewReactions = useContentReactions(
     useMemo(
@@ -1038,11 +1038,16 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      and the county courses rail, so no two media rails are adjacent - clips is
      first, moments fifth, and videos has a non-media rail on either side. Two
      media rails in a row would read as a media section, which All is not. */
+  /* BRIEF EXPLORE — HIDE THE COURSES TAB §B1: coursesLeadRated second (the
+     digest the Courses tab existed for), helpfulReviews sixth. clips first and
+     videos seventh, so no two media rails are adjacent. */
   const ALL_SHELVES: ShelfKind[] = [
     'clips',
+    'coursesLeadRated',
     'clubWeek',
     'standing',
     'personalBests',
+    'helpfulReviews',
     'videos',
     'coursesCounty',
     'moments',
@@ -1058,6 +1063,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      nothing for a member with no list and NO PROMPT takes its place; the next
      rail simply takes the slot, which is the existing skip rule.
      A rail with nothing in it is SKIPPED. */
+  /* THE COURSES VIEW IS HIDDEN (BRIEF EXPLORE — HIDE THE COURSES TAB): it has
+     no chip, and readExploreView sends a remembered 'courses' to All. This block,
+     COURSES_OPENING, COURSES_LATER and buildCoursesBlocks are DELIBERATELY
+     UNREACHABLE and kept so the view can return. Do not delete as dead code. */
   const COURSES_SHELVES: ShelfKind[] = [
     'coursesLeadRated',
     'coursesList',
