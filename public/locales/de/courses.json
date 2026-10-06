@@ -88,7 +88,6 @@
       "following": "Folgt",
       "golfersAtClub": "Golfer bei {{club}}",
       "golfersToFollow": "Golfer zum Folgen",
-      "highestRatedMonth": "Am besten bewertet in diesem Monat",
       "highestRatedYear": "Am besten bewertet in diesem Jahr",
       "holdsCourseRecord": "Hält den Platzrekord",
       "holdsCourseRecords_one": "Hält einen Platzrekord",
@@ -110,7 +109,6 @@
       "roundsHere_one": "{{count}} Runde hier",
       "roundsHere_other": "{{count}} Runden hier",
       "roundsThisMonth": "{{count}} Runden diesen Monat",
-      "worldsBest": "Die besten der Welt",
       "worldsBestSub": "Top 100 nach Rang",
       "yourClub": "deinem Club"
     },

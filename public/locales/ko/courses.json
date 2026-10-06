@@ -88,7 +88,6 @@
       "following": "팔로잉",
       "golfersAtClub": "{{club}} 골퍼",
       "golfersToFollow": "팔로우할 골퍼",
-      "highestRatedMonth": "이번 달 최고 평점",
       "highestRatedYear": "올해 최고 평점",
       "holdsCourseRecord": "코스 레코드 보유",
       "holdsCourseRecords_one": "코스 레코드 1개 보유",
@@ -110,7 +109,6 @@
       "roundsHere_one": "여기서 {{count}}라운드",
       "roundsHere_other": "여기서 {{count}}라운드",
       "roundsThisMonth": "이번 달 {{count}} 라운드",
-      "worldsBest": "세계 최고의 코스",
       "worldsBestSub": "순위 기준 top 100",
       "yourClub": "내 클럽"
     },

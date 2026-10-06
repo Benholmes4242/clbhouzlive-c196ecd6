@@ -10,24 +10,15 @@ import { COURSE_RATING_FLOOR } from './courseRatingFloor';
  * circle, worth-the-drive and new-on-clbhouz rails are deleted; only the lead
  * rail survives, on All.
  *
- * Every rail here is derived from the ONE candidate index, so a rail can never
- * show a course the dropdown says is not there, and a count can never disagree
- * with a tile. Rails that already existed (Around {county}, The world's best, On
- * your list) are REUSED from useCourseShelves — not rebuilt here.
+ * Derived from the ONE candidate index, so the rail can never show a course the
+ * index says is not there, and a count can never disagree with a tile.
  *
- * THE LEAD RAIL WIDENS AND SAYS SO (§4). "Highest rated this month" needs enough
- * courses to fill the rail; below RAIL_FILL it widens to the year AND THE
- * HEADING CHANGES WITH IT. A month's heading over a year's data is a small lie.
- *
- * MEASURED SUPPLY, production base, at build time:
- *   month, floor 2 ratings ..... 1 course     -> the rail widens for everyone
- *   year,  floor 2 ratings ..... 43 courses   -> the rail fills, heading "year"
- * The thresholds below were chosen against those numbers and are reported.
+ * THE LEAD RAIL IS THIS YEAR'S RATINGS, FOR EVERYONE: the courses with at least
+ * RATING_FLOOR ratings in the last 365 days, highest mean first. The month
+ * window that used to compete for the rail was retired by
+ * BRIEF_COURSES_DISCOVERY §B2, so the heading always names the year.
  */
 
-/** A rail shows 12 tiles; below SIX it reads as a stub, so that is the fill
- *  threshold the month has to clear before the heading may say "this month". */
-export const RAIL_FILL = 6;
 /** BRIEF_COURSES_DISCOVERY §A3 — the one sample floor. */
 export const RATING_FLOOR = COURSE_RATING_FLOOR;
 
@@ -53,11 +44,9 @@ function rowFor(index: CourseCandidateIndex, courseId: string, override?: Partia
 
 export interface LeadRatedShelf {
   rows: CourseShelfRow[];
-  /** WHICH WINDOW THE HEADING MUST NAME. */
-  window: 'month' | 'year';
 }
 
-/** §4 LEAD SHELF — highest rated this month, widening to the year. */
+/** §4 LEAD SHELF — highest rated this year (§B2 retired the month window). */
 export function leadRatedShelf(index: CourseCandidateIndex): LeadRatedShelf {
   const pick = (n: (s: { n30: number; n365: number }) => number, mean: (s: { mean30: number; mean365: number }) => number) =>
     Array.from(index.ratingsByCourse.entries())
@@ -70,7 +59,7 @@ export function leadRatedShelf(index: CourseCandidateIndex): LeadRatedShelf {
 
   /* BRIEF_COURSES_DISCOVERY §B2 — the lead rail is "Highest rated this year"
      for everyone; the month window no longer competes for it. */
-  return { rows: pick((s) => s.n365, (s) => s.mean365), window: 'year' };
+  return { rows: pick((s) => s.n365, (s) => s.mean365) };
 }
 
 export function useMergedCourseShelves(index: CourseCandidateIndex) {

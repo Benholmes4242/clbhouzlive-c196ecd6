@@ -33,14 +33,6 @@ export interface CourseHeadlineFacts {
   ratingCount?: number | null;
 }
 
-/** The ordering weight the event carries. Ordering only, never rendered. */
-export function courseEventStrength(event: CourseEventKind, burstCount?: number | null): number {
-  if (event === 'record') return 4;
-  if (event === 'ratings') return 2 + Math.min(burstCount ?? 0, 12) / 12;
-  if (event === 'low') return 1;
-  return 0;
-}
-
 export function courseHeadline(t: TFunction, facts: CourseHeadlineFacts): string | null {
   const rounds = facts.rounds ?? 0;
   const rating = facts.rating ?? null;
