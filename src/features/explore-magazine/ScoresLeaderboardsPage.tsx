@@ -713,6 +713,7 @@ export function ScoresLeaderboardsPage({
   const [top100Sheet, setTop100Sheet] = useState<CareerRow | null>(null);
   const openTop100Sheet = (r: CareerRow) => setTop100Sheet(r);
 
+  const leadLoading = !state.ready || state.page.isPending;
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
 
@@ -835,6 +836,7 @@ export function ScoresLeaderboardsPage({
               </button>
             );
           })()}
+          </div>
           <div style={{ marginTop: 6 }}>
             {(() => {
               const rest = leadVisible.slice(1);
