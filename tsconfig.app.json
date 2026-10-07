@@ -4,7 +4,8 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "lib": [
-      "ES2020", "ES2021.Intl",
+      "ES2020",
+      "ES2021.Intl",
       "DOM",
       "DOM.Iterable"
     ],
