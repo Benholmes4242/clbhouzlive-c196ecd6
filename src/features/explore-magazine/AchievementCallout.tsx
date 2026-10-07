@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 /* THE PANEL IS THE ANALYTICAL PANEL. Its ground and its muted ink come from the
    analytical token file the brief names, not from the card module, so there is
    one definition of this surface and not a second copy of it. */
-import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS as ANALYTICAL_SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { CHART } from '@/components/profile/handicap/whs/charts/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
@@ -504,4 +505,37 @@ export function RoundStatStrip({
       </span>
     </span>
   );
+}
+
+/* Moved verbatim from ProfileRoundsTab so the profile Rounds row and the
+   course You tab share one pill chrome. CAPS keeps the analytical SANS the
+   profile used, so the profile row does not shift. */
+/** The one pill chrome on this list: feat tags, the not-full-18 tag and the medal pill. */
+export const CAPS: React.CSSProperties = { fontFamily: ANALYTICAL_SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' };
+export const Pill: React.FC<{ tone?: string; padding?: string; style?: React.CSSProperties; children: React.ReactNode }> = ({ tone, padding = '3px 6px', style, children }) => (
+  <span style={{ ...style, color: tone, border: `1px solid ${CHART.BORDER}`, borderRadius: 999, lineHeight: 1, whiteSpace: 'nowrap', padding, display: 'inline-flex', alignItems: 'center' }}>
+    {children}
+  </span>
+);
+
+/** The feed's RARE/NEW tag treatment, as a small pill. */
+export const FeatPill: React.FC<{ label: string }> = ({ label }) => (
+  <Pill tone={CHART.AMBER} style={CAPS}>{label}</Pill>
+);
+
+
+/** A round's feat labels, rarest first: ace, albatross, eagle, clean card.
+ *  The order is a rarity ranking — callers slice it to keep the rarest. */
+export function roundFeats(
+  r: { holes_in_one?: number | null; albatrosses?: number | null; eagles?: number | null; clean_card?: boolean | null },
+  t: (k: string, d: string) => string,
+): string[] {
+  const out: string[] = [];
+  const n = (v: number | null | undefined) => Number(v ?? 0);
+  const lbl = (k: string, d: string, c: number) => (c > 1 ? `${c} ${t(k, d)}` : t(k, d));
+  if (n(r.holes_in_one) > 0) out.push(lbl('rounds.feat.ace', 'Ace', n(r.holes_in_one)));
+  if (n(r.albatrosses) > 0) out.push(lbl('rounds.feat.albatross', 'Albatross', n(r.albatrosses)));
+  if (n(r.eagles) > 0) out.push(lbl('rounds.feat.eagle', 'Eagle', n(r.eagles)));
+  if (r.clean_card) out.push(t('rounds.feat.cleanCard', 'Clean card'));
+  return out;
 }
