@@ -55,7 +55,7 @@ import { useMemberStandings } from '@/hooks/gam/useMemberStandings';
 import YourRoundsHere, { type YouRound } from './you/YourRoundsHere';
 import WhereYourShotsGo from './you/WhereYourShotsGo';
 import YourFormHere from './you/YourFormHere';
-import WithinReach from './you/WithinReach';
+import BirdiesHere from './you/BirdiesHere';
 import YourRatingSection from './you/YourRatingSection';
 import YourMomentsSection from './you/YourMomentsSection';
 import UpForGrabsSection from './you/UpForGrabsSection';
@@ -299,7 +299,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
 
       {/* §3.5 — ONCE. It used to render inside the shots block and again as its
           own card. */}
-      <WithinReach mine={mine} />
+      <BirdiesHere mine={mine} />
 
       {/* BRIEF_YOU_TAB_STANDINGS — compact standings, same RPC and rules as the
           Trophy Room. Renders only when the course-scoped read returns rows. */}

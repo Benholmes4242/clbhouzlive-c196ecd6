@@ -950,15 +950,6 @@
         "notRated": "You have not rated this course.",
         "rateIt": "Rate it"
       },
-      "reach": {
-        "allLeft": "Every hole here is still on the list.",
-        "label": "Holes birdied here",
-        "none": "You have birdied every hole here.",
-        "oneLeft": "Only the {{hole}} has never given you a birdie.",
-        "some_one": "{{holes}} hole here has never given you a birdie.",
-        "some_other": "{{holes}} holes here have never given you a birdie.",
-        "value": "{{done}} of {{total}}"
-      },
       "rounds": "Rounds",
       "roundsMeta": "{{rounds}}",
       "sections": {
@@ -968,8 +959,8 @@
         "record": "Your record here",
         "shotsGo": "Where your shots go",
         "upForGrabs": "Up for grabs",
-        "withinReach": "Within reach",
-        "yourRounds": "Your rounds here"
+        "yourRounds": "Your rounds here",
+        "birdiesHere": "Birdies here"
       },
       "shots": {
         "allHolesSub": "Every hole against the field, how each par plays for you, and where your round drifts.",
@@ -994,7 +985,16 @@
       },
       "yourAverage": "Your average",
       "yourRound": "Your round",
-      "clear": "Clear"
+      "clear": "Clear",
+      "birdies": {
+        "label": "Holes birdied here",
+        "value": "{{done}} of {{total}}",
+        "none": "You have birdied every hole here.",
+        "allOpen": "Every hole here is still waiting for a birdie.",
+        "named_one": "Only the {{holes}} has never given you a birdie.",
+        "named_other": "The {{holes}} have never given you a birdie.",
+        "counted": "{{count}} holes here have never given you a birdie."
+      }
     },
     "yourHolesSheet": {
       "birdie": "Birdie+",

@@ -841,3 +841,11 @@ export function fmtDateLong(iso: string | null | undefined): string {
   if (isNaN(d.getTime())) return '';
   return new Intl.DateTimeFormat(getActiveLocale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
 }
+
+/** Locale-aware conjunction list — "1st, 4th and 9th". */
+export function formatList(items: string[]): string {
+  // Intl.ListFormat is ES2021; the app's TS lib predates it, so it is reached by cast.
+  const LF = (Intl as unknown as { ListFormat?: new (l: string, o: object) => { format(i: string[]): string } }).ListFormat;
+  if (LF) return new LF(getActiveLocale(), { style: 'long', type: 'conjunction' }).format(items);
+  return items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+}
