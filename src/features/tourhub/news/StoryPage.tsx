@@ -20,7 +20,7 @@ import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { StoryBody } from './StoryBody';
 import { storyTime } from './storyTime';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
-import { heroCanonScrimOn } from '../_shared/heroGradient';
+import { HERO_CANON_WASH } from '../_shared/heroGradient';
 import {
   FONT,
   HAIRLINE_INK_10,
@@ -120,7 +120,7 @@ export function StoryArticle({ story, immersiveHero = false, tagLabel }: {
             aria-hidden
             style={{
               position: 'absolute', left: 0, right: 0, bottom: 0, height: 260,
-              background: heroCanonScrimOn(TOUR_CANVAS),
+              background: HERO_CANON_WASH,
             }}
           />
           {story.kicker && (

@@ -31,34 +31,26 @@ export function heroTintGradient(brandHex: string | null, amount = 0.3): string 
 }
 
 /**
- * BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON — the ONE photo-hero scrim.
+ * EVERY PHOTO HERO — THE PHOTOGRAPH ENDS AT A STRAIGHT EDGE.
  *
- * One layer, ending on the canvas (#0A0A0C === CHARCOAL === A.CANVAS: one
- * colour, three names). No top scrim, no radial ambient, no second bottom
- * scrim, no text shadow. Every photo-led hero (course detail, courses page,
- * tournament) uses this and nothing else.
+ * The ONE photo-hero treatment: a FLAT 18% black wash, uniform top to bottom.
+ * Written as a gradient only so it composites as a background layer. It is
+ * deliberately NOT a ramp: the photo keeps one brightness and meets whatever
+ * sits beneath at a straight horizontal edge. 18% was set by rendering the
+ * worst case (white text over sunlit fairway/bunker sand). Do not "improve" it
+ * into a gradient with stops, and do not add a bottom scrim back.
  */
-export function heroCanonScrimOn(endColour: string): string {
-  return `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.10) 42%, rgba(0,0,0,0.34) 74%, ${endColour} 100%)`;
-}
+export const HERO_CANON_WASH = 'linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18))';
 
-/**
- * The canon scrim ending on the canvas — the usual answer, and the default.
- * MICRO_BRIEF_TOUR_OVERVIEW_HERO_CANON_LAYERING: the rule is "no seam against
- * what sits beneath", so a hero sitting on a different surface passes that
- * surface to `heroCanonScrimOn` instead. The RAMP lives here, once.
- */
-export const HERO_CANON_SCRIM = heroCanonScrimOn(CHARCOAL);
-
-/** Canon hero background: the one scrim over an image, or over a fallback. */
+/** Canon hero background: the one wash over an image, or over a fallback. */
 export function heroCanonBackground(
   imageUrl: string | null | undefined,
   fallback: string = CHARCOAL,
   focal = 'center 40%',
 ): string {
   return imageUrl
-    ? `${HERO_CANON_SCRIM}, url("${imageUrl}") ${focal} / cover no-repeat`
-    : `${HERO_CANON_SCRIM}, ${fallback}`;
+    ? `${HERO_CANON_WASH}, url("${imageUrl}") ${focal} / cover no-repeat`
+    : `${HERO_CANON_WASH}, ${fallback}`;
 }
 
 /**
