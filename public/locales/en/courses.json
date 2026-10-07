@@ -315,8 +315,8 @@
         "under": "{{n}} under par"
       },
       "view": {
-        "all": "All",
-        "scores": "Standings",
+        "all": "Everything",
+        "scores": "Leaderboards",
         "watch": "Watch"
       },
       "views": "Explore views",
