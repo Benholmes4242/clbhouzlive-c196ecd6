@@ -40,8 +40,11 @@ import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
  *
  * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the lead board
  * (§3 Lowest gross) and nothing below it. Sections, in order: head, §3 Lowest
- * gross, §7 Top 100, §4 Most improved, §5 Feats this year, §6 Who leads
- * what — §4 onward are platform facts. Each section owns its read, holds its
+ * gross, §5 Feats this year, §7 Top 100, §6 Who leads what, §4 Most improved
+ * — §4 onward are platform facts. The order alternates section SHAPE (rows,
+ * tiles, carousel, rail, rows) so no two neighbours read alike; anything added
+ * here is placed by its shape, not its subject. § numbers name sections, not
+ * positions. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
  */
 
@@ -872,6 +875,88 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
+      {/* §5 FEATS THIS YEAR — event counts; footnote is distinct members. */}
+      {featsFirstLoad ? (
+        pending(175)
+      ) : featsShown.length > 0 ? (
+        <Section
+          contest={false}
+          eyebrow={t('amateur.leaderboards.rareAir', 'Rare air')}
+          title={t('amateur.leaderboards.feats', 'Feats')}
+          metaAlign="center"
+          meta={(
+            <div
+              role="radiogroup"
+              aria-label={t('amateur.leaderboards.featsWindow', 'Feats period')}
+              style={{
+                display: 'flex', gap: 3, padding: 3, borderRadius: 999, flex: 'none', alignSelf: 'center',
+                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
+              }}
+            >
+              {([
+                ['year', String(new Date().getFullYear())],
+                ['all', t('amateur.leaderboards.allTime', 'All time')],
+              ] as const).map(([key, label]) => {
+                const selected = featWindow === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => pickFeatWindow(key)}
+                    style={{
+                      height: 24, padding: '0 10px', borderRadius: 999, border: 'none',
+                      fontFamily: SANS, fontSize: 11.5, fontWeight: 600, whiteSpace: 'nowrap',
+                      letterSpacing: 'normal', textTransform: 'none',
+                      background: selected ? 'rgba(255,255,255,0.12)' : 'transparent',
+                      color: selected ? A.INK : A.MUTE,
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          lede={featTotals && featTotals.total_rounds > 0 ? (
+            <Trans
+              i18nKey="amateur.leaderboards.featsFrom"
+              defaults="From <n>{{rounds}} full rounds</n> and <n>{{holes}} holes</n> tracked on clbhouz."
+              values={{ rounds: featTotals.total_rounds.toLocaleString(), holes: featTotals.total_holes.toLocaleString() }}
+              components={{ n: <span style={{ fontWeight: 700, color: A.INK }} /> }}
+            />
+          ) : undefined}
+        >
+          <Rail>
+            {featsShown.map((f) => (
+              <button key={f.key} type="button" onClick={() => setSeeAll({ board: f.key, filters: featFilters })} style={{ ...RAIL_CARD, width: 150, position: 'relative' }}>
+                <span aria-hidden style={{ position: 'absolute', top: 12, right: 11, color: FAINT, display: 'flex' }}>
+                  <ChevronRight size={13} />
+                </span>
+                <span style={{ width: 26, height: 26, borderRadius: 8, display: 'grid', placeItems: 'center', background: f.tone, color: A.CANVAS }}>
+                  <Medal size={15} />
+                </span>
+                <span className="tabular-nums" style={{ display: 'block', marginTop: 10, fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
+                  {f.events}
+                </span>
+                <span style={{ display: 'block', marginTop: 2, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.MUTE }}>
+                  {featLabel(f.key, f.events)}
+                </span>
+                <span className="tabular-nums" style={{ display: 'block', marginTop: 6, fontSize: 10.5, lineHeight: 1.3, color: A.MUTE }}>
+                  {t('amateur.leaderboards.featRarity', {
+                    n: Math.round(f.denominator / f.events).toLocaleString(),
+                    unit: t(`amateur.leaderboards.unit.${f.denominator_unit}`, f.denominator_unit),
+                    defaultValue: '1 in every {{n}} {{unit}}',
+                  })}
+                </span>
+                <span style={{ display: 'block', marginTop: 6, fontSize: 10.5, color: A.DIM }}>{membersText(f.members)}</span>
+              </button>
+            ))}
+          </Rail>
+        </Section>
+      ) : null}
+
       {/* §7 TOP 100 — get_career_leaderboard(TOP100_METRIC[list]). This section
           is get_career_leaderboard's ONLY consumer; its other branches
           (including 'crowns') stay in SQL, dormant.
@@ -971,106 +1056,6 @@ export function ScoresLeaderboardsPage({
         </Section>
       )}
 
-      {/* §4 MOST IMPROVED — cumulative this year, not a single round's cut. */}
-      {improved.isPending ? (
-        pending(200)
-      ) : improved.isSuccess && improvedRows.length >= THIN_FLOOR ? (
-        <Section
-          contest
-          eyebrow={t('amateur.leaderboards.climb', 'The climb')}
-          title={t('amateur.leaderboards.mostImproved', 'Most improved')}
-          meta={t('amateur.leaderboards.window.year', 'This year')}
-        >
-          {improvedRows.slice(0, SHORT_ROWS).map((r, i, arr) => improvedRow(r, i < arr.length - 1, false))}
-          <SeeAll
-            label={seeAllMembers()}
-            onPress={() => setImprovedSheet(true)}
-          />
-        </Section>
-      ) : null}
-
-      {/* §5 FEATS THIS YEAR — event counts; footnote is distinct members. */}
-      {featsFirstLoad ? (
-        pending(175)
-      ) : featsShown.length > 0 ? (
-        <Section
-          contest={false}
-          eyebrow={t('amateur.leaderboards.rareAir', 'Rare air')}
-          title={t('amateur.leaderboards.feats', 'Feats')}
-          metaAlign="center"
-          meta={(
-            <div
-              role="radiogroup"
-              aria-label={t('amateur.leaderboards.featsWindow', 'Feats period')}
-              style={{
-                display: 'flex', gap: 3, padding: 3, borderRadius: 999, flex: 'none', alignSelf: 'center',
-                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
-              }}
-            >
-              {([
-                ['year', String(new Date().getFullYear())],
-                ['all', t('amateur.leaderboards.allTime', 'All time')],
-              ] as const).map(([key, label]) => {
-                const selected = featWindow === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    role="radio"
-                    aria-checked={selected}
-                    onClick={() => pickFeatWindow(key)}
-                    style={{
-                      height: 24, padding: '0 10px', borderRadius: 999, border: 'none',
-                      fontFamily: SANS, fontSize: 11.5, fontWeight: 600, whiteSpace: 'nowrap',
-                      letterSpacing: 'normal', textTransform: 'none',
-                      background: selected ? 'rgba(255,255,255,0.12)' : 'transparent',
-                      color: selected ? A.INK : A.MUTE,
-                    }}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-          lede={featTotals && featTotals.total_rounds > 0 ? (
-            <Trans
-              i18nKey="amateur.leaderboards.featsFrom"
-              defaults="From <n>{{rounds}} full rounds</n> and <n>{{holes}} holes</n> tracked on clbhouz."
-              values={{ rounds: featTotals.total_rounds.toLocaleString(), holes: featTotals.total_holes.toLocaleString() }}
-              components={{ n: <span style={{ fontWeight: 700, color: A.INK }} /> }}
-            />
-          ) : undefined}
-        >
-          <Rail>
-            {featsShown.map((f) => (
-              <button key={f.key} type="button" onClick={() => setSeeAll({ board: f.key, filters: featFilters })} style={{ ...RAIL_CARD, width: 150, position: 'relative' }}>
-                <span aria-hidden style={{ position: 'absolute', top: 12, right: 11, color: FAINT, display: 'flex' }}>
-                  <ChevronRight size={13} />
-                </span>
-                <span style={{ width: 26, height: 26, borderRadius: 8, display: 'grid', placeItems: 'center', background: f.tone, color: A.CANVAS }}>
-                  <Medal size={15} />
-                </span>
-                <span className="tabular-nums" style={{ display: 'block', marginTop: 10, fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
-                  {f.events}
-                </span>
-                <span style={{ display: 'block', marginTop: 2, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.MUTE }}>
-                  {featLabel(f.key, f.events)}
-                </span>
-                <span className="tabular-nums" style={{ display: 'block', marginTop: 6, fontSize: 10.5, lineHeight: 1.3, color: A.MUTE }}>
-                  {t('amateur.leaderboards.featRarity', {
-                    n: Math.round(f.denominator / f.events).toLocaleString(),
-                    unit: t(`amateur.leaderboards.unit.${f.denominator_unit}`, f.denominator_unit),
-                    defaultValue: '1 in every {{n}} {{unit}}',
-                  })}
-                </span>
-                <span style={{ display: 'block', marginTop: 6, fontSize: 10.5, color: A.DIM }}>{membersText(f.members)}</span>
-              </button>
-            ))}
-          </Rail>
-        </Section>
-      ) : null}
-
       {/* §6 WHO LEADS WHAT — this calendar year's leader of each metric, read
           from get_year_leaderboard (CAREER_RAIL_LIMIT: the tile reads rows 0-1, the sheet the field).
           JANUARY IS THIN BY DESIGN: on 1 January every value is zero, the RPC
@@ -1135,6 +1120,24 @@ export function ScoresLeaderboardsPage({
               );
             })}
           </Rail>
+        </Section>
+      ) : null}
+
+      {/* §4 MOST IMPROVED — cumulative this year, not a single round's cut. */}
+      {improved.isPending ? (
+        pending(200)
+      ) : improved.isSuccess && improvedRows.length >= THIN_FLOOR ? (
+        <Section
+          contest
+          eyebrow={t('amateur.leaderboards.climb', 'The climb')}
+          title={t('amateur.leaderboards.mostImproved', 'Most improved')}
+          meta={t('amateur.leaderboards.window.year', 'This year')}
+        >
+          {improvedRows.slice(0, SHORT_ROWS).map((r, i, arr) => improvedRow(r, i < arr.length - 1, false))}
+          <SeeAll
+            label={seeAllMembers()}
+            onPress={() => setImprovedSheet(true)}
+          />
         </Section>
       ) : null}
 
