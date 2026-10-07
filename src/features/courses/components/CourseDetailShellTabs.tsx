@@ -20,6 +20,8 @@ interface CourseDetailShellTabsProps {
 /**
  * CourseDetailShellTabs — canonical chip row (RailChips), matching
  * the Courses / Top 100 shell tabs.
+ * The chips share the full run between the gutters rather than
+ * sitting centred.
  */
 export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
   activeTab,
@@ -28,13 +30,13 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
   const { t } = useTranslation('courses');
 
   return (
-    <div className="px-4 py-2 flex justify-center">
+    <div className="px-4 py-2">
       <RailChips
-        align="center-when-fit"
         options={TABS.map((tab) => ({ id: tab.id, label: t(tab.labelKey) }))}
         value={activeTab}
         onChange={(id) => onTabChange(id as CourseDetailTab)}
         ariaLabel={t('courseDetail.a11y.sections')}
+        distribute
       />
     </div>
   );
