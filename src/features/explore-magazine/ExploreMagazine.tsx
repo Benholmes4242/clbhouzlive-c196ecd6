@@ -45,7 +45,7 @@ import { ExploreCard, type CardSize } from './ExploreCard';
 import { monthLabel } from './exploreCopy';
 import { ExploreShelf, SHELF_HEADING } from './ExploreShelf';
 import { useCircleSize } from '@/features/amateur/useCircleSize';
-import { ENTRY_BOARD, useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
+import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
 import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
 import { BOARD_LABELS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
@@ -500,7 +500,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
   /* PHASE B (BRIEF_EXPLORE_MAGAZINE P1) — SCORES IS A CHIP THAT CAN CHANGE WHAT
      YOU SEE. The ranked stream is the default and stays the landing experience;
-     no board is applied until the member picks one, so `boardPick === null` IS
+     no board is applied until the member picks one, so `boardApplied === false` IS
      the stream. Board state is page-local by design (useAmateurBoardState §1):
      nothing here is persisted or put in the URL, so leaving Explore resets it.
      `active` keeps every board read quiet on the other three views and on an
@@ -509,12 +509,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      board is the landing view now, so the stream and CircleShelf below are
      unreachable on Scores. They are KEPT ON PURPOSE: starting this at `null`
      again (and re-enabling the Scores stream read) brings the stream back. */
-  /* Non-null only to mark Scores as on a board; the board itself is the hook's resolved entryBoard. */
-  const [boardPick, setBoardPick] = useState<BoardKey | null>(ENTRY_BOARD);
+  /* A flag only: is a board applied on Scores? The board itself is boardState.board. */
+  const [boardApplied, setBoardApplied] = useState(true);
   const [boardPanelOpen, setBoardPanelOpen] = useState(false);
   /* The title opens the sheet onto the board choice; Filters opens it without. */
   const [boardPanelShowsBoard, setBoardPanelShowsBoard] = useState(false);
-  const scoresBoardActive = view === 'scores' && boardPick !== null;
+  const scoresBoardActive = view === 'scores' && boardApplied;
   const boardState = useAmateurBoardState(
     view === 'scores' ? userId : undefined,
     scoresBoardActive || boardPanelOpen,
@@ -1538,7 +1538,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={openPostComments} /> : null}
 
       {/* UNREACHABLE ON SCORES SINCE THE BOARD BECAME THE LANDING VIEW — kept, not
-          dead: see boardPick. Bringing the stream back is a one-line change. */}
+          dead: see boardApplied. Bringing the stream back is a one-line change. */}
       {view === 'scores' && !scoresBoardActive ? (
         <div style={{ marginBottom: BLOCK_GAP }}>
           <CircleShelf viewerId={userId} pos={0} />
@@ -1592,7 +1592,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             onOpenCourse={(id) => { depart(); navigate(`/courses/${id}`); }}
             onOpenBoard={() => {
               analyticsEvents.track('amateur_board_picker_opened', {
-                board: boardPick ?? boardState.entryBoard,
+                board: boardState.board,
                 board_active: scoresBoardActive,
               });
               setBoardPanelShowsBoard(true);
@@ -1789,7 +1789,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
       {/* P1 — THE BOARD'S PANEL, mounted against the same state the block reads,
           so the panel's count and the page's rows can never disagree. Picking a
-          board applies it live (boardPick), and the footer's "Show N rounds"
+          board applies it live (boardApplied), and the footer's "Show N rounds"
           closes onto a body that has already swapped. */}
       <BoardFilterPanel
         open={boardPanelOpen}
@@ -1798,14 +1798,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         board={boardState.board}
         onBoardChange={(next) => {
           boardState.changeBoard(next);
-          setBoardPick(next);
+          setBoardApplied(true);
         }}
         resultCount={boardState.total}
         filters={boardState.filters}
         onChange={boardState.changeFilters}
         boardChanged={boardState.board !== boardState.entryBoard}
         canReset={boardState.canReset}
-        onReset={() => { boardState.resetAll(); setBoardPick(boardState.entryBoard); }}
+        onReset={() => { boardState.resetAll(); setBoardApplied(true); }}
         facets={boardState.facets}
         showScope={false}
         showBoard={boardPanelShowsBoard}
