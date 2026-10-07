@@ -18,7 +18,7 @@ import { readStoredTour } from '../hooks/useTourSelection';
 import { useTourStories, type TourStory } from './useTourStories';
 import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
-import { heroCanonScrimOn } from '../_shared/heroGradient';
+import { HERO_CANON_WASH } from '../_shared/heroGradient';
 import { StoryRowEngagement } from '@/features/stories/StoryRowEngagement';
 import { StoryLeaderboardStrip } from './StoryLeaderboardStrip';
 import { useStoryEngagement, type StoryEngagement } from '@/features/stories/useStoryEngagement';
@@ -128,7 +128,7 @@ export function LeadStory({ story, onOpen, compact = false, immersiveHero = true
                  frame shorter than 260px cuts the scrim mid-gradient and leaves
                  a visible seam. */
               position: 'absolute', left: 0, right: 0, bottom: 0, height: 'min(260px, 100%)',
-             background: heroCanonScrimOn(TOUR_CANVAS),
+             background: HERO_CANON_WASH,
           }}
         />
         <div style={{ position: 'absolute', top: compact ? 14 : immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 68px)' : 12, left: sidePadding, right: sidePadding }}>

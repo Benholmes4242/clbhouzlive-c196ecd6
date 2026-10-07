@@ -72,7 +72,7 @@ export const LEGIBILITY_SCRIM =
  * THE 80px TOP SCRIM — the ONE survivor of the old five-layer hero recipe.
  *
  * Every photo-led hero now runs the single canon ramp from
- * `_shared/heroGradient.ts` (`HERO_CANON_SCRIM` / `heroCanonScrimOn`), so the
+ * `_shared/heroGradient.ts` (`HERO_CANON_WASH`), so the
  * old stack's bottom scrim and its multi-layer composer are GONE — they had
  * zero consumers after MICRO_BRIEF_DISCOVER_HERO_CANON_LAYERING, and a recipe
  * nothing calls reads as a live alternative to the canon.

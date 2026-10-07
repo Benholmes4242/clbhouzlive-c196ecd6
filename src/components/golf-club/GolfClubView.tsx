@@ -1,4 +1,4 @@
-import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
+import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
@@ -212,7 +212,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   }
 
 
-  // Both mounts share Explore's fixed hero height and the canon HERO_CANON_SCRIM,
+  // Both mounts share Explore's fixed hero height and the canon HERO_CANON_WASH,
   // which ends opaque on the canvas so the photograph dissolves with no seam.
   const heroImageBackground = course.thumbnail_image
     ? `url("${course.thumbnail_image}") center 40% / cover no-repeat`
@@ -231,7 +231,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     >
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: HERO_CANON_SCRIM }}
+        style={{ background: HERO_CANON_WASH }}
       />
       {/* Modal-path back chevron deleted (BRIEF_COURSES_CHROME_DARK): no caller
           passes onClose — the sole caller is CourseDetailPage.tsx:53 with
@@ -264,7 +264,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     >
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: HERO_CANON_SCRIM }}
+        style={{ background: HERO_CANON_WASH }}
       />
       <CourseTitleOverlay
         course={course}
