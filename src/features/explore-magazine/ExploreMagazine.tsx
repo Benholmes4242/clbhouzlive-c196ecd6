@@ -1591,7 +1591,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             onOpenCourse={(id) => { depart(); navigate(`/courses/${id}`); }}
             onOpenBoard={() => {
               analyticsEvents.track('amateur_board_picker_opened', {
-                board: boardPick ?? ENTRY_BOARD,
+                board: boardPick ?? boardState.entryBoard,
                 board_active: scoresBoardActive,
               });
               setBoardPanelShowsBoard(true);
@@ -1802,9 +1802,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         resultCount={boardState.total}
         filters={boardState.filters}
         onChange={boardState.changeFilters}
-        boardChanged={boardState.board !== ENTRY_BOARD}
+        boardChanged={boardState.board !== boardState.entryBoard}
         canReset={boardState.canReset}
-        onReset={() => { boardState.resetAll(); setBoardPick(ENTRY_BOARD); }}
+        onReset={() => { boardState.resetAll(); setBoardPick(boardState.entryBoard); }}
         facets={boardState.facets}
         showScope={false}
         showBoard={boardPanelShowsBoard}

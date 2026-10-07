@@ -303,7 +303,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
       changeScope,
       seeEveryone,
     }),
-    [resolved, clubApplies, sheetFilterCount, changeScope, board, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, resetAll, canReset, seeEveryone],
+    [resolved, clubApplies, sheetFilterCount, changeScope, board, entryBoard, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, resetAll, canReset, seeEveryone],
   );
 }
 
