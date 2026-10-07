@@ -28,6 +28,7 @@ import { courseBucketShares } from '@/features/courses/components/holes/analytic
 import AboutSection, { ABOUT_KICKER } from '../about/AboutSection';
 import { CompactHoleRow } from '../about/AllHolesSheet';
 import { CourseDistributionSummary } from '../about/HowItPlays';
+import CenteredStatStrip from '../about/CenteredStatStrip';
 import { YouFigure, YouLinkRow, YouSentence } from './youBits';
 
 const CHART_HEIGHT = 74;
@@ -200,24 +201,18 @@ const WhereYourShotsGo: React.FC<Props> = ({ courseId, rounds, mine, field, onAl
           {t('courseDetail.youTab.clear')}
         </button>
       </div>
-      <div style={{ display: 'flex', gap: 14, marginTop: 12 }}>
-        <YouFigure
-          label={t('courseDetail.plays.legendYou')}
-          value={toParParts(sel.avg_to_par, 1)?.text ?? '\u2014'}
-          tone={A.AMBER_DEEP}
-        />
-        <YouFigure
-          label={t('courseDetail.plays.legendField')}
-          value={toParParts(selField?.avg_to_par ?? null, 1)?.text ?? '\u2014'}
-          tone={toParParts(selField?.avg_to_par ?? null, 1)?.tone ?? A.INK}
-        />
-        <YouFigure
-          label={t('courseDetail.youTab.shots.yourBest')}
-          value={toParParts(sel.best_to_par, 0)?.text ?? '\u2014'}
-        />
-        <YouFigure
-          label={t('courseDetail.youTab.shots.birdies')}
-          value={formatNumber(sel.birdie_count)}
+      <div style={{ marginTop: 12 }}>
+        <CenteredStatStrip
+          items={[
+            { label: t('courseDetail.plays.legendYou'), value: toParParts(sel.avg_to_par, 1)?.text ?? '\u2014', tone: A.AMBER_DEEP },
+            {
+              label: t('courseDetail.plays.legendField'),
+              value: toParParts(selField?.avg_to_par ?? null, 1)?.text ?? '\u2014',
+              tone: toParParts(selField?.avg_to_par ?? null, 1)?.tone ?? A.INK,
+            },
+            { label: t('courseDetail.youTab.shots.yourBest'), value: toParParts(sel.best_to_par, 0)?.text ?? '\u2014' },
+            { label: t('courseDetail.youTab.shots.birdies'), value: formatNumber(sel.birdie_count) },
+          ]}
         />
       </div>
     </div>
@@ -245,8 +240,10 @@ const WhereYourShotsGo: React.FC<Props> = ({ courseId, rounds, mine, field, onAl
       <div style={{ marginTop: 18, minHeight: BAND_MIN_HEIGHT }}>{band}</div>
 
       {worstField ? (
-        <div style={{ marginTop: 18 }}>
-          <div style={EYEBROW}>{t('courseDetail.youTab.shots.yourHardest')}</div>
+        <div>
+          {/* The rule marks where the chart stops; the block groups with the link below. */}
+          <AboutHairline style={{ marginTop: 18 }} />
+          <div style={{ ...EYEBROW, marginTop: 14 }}>{t('courseDetail.youTab.shots.yourHardest')}</div>
           <div style={{ marginTop: 6 }}>
             <CompactHoleRow hole={worstField} mine={worst} hasYou last />
           </div>
@@ -258,6 +255,7 @@ const WhereYourShotsGo: React.FC<Props> = ({ courseId, rounds, mine, field, onAl
         label={t('courseDetail.plays.allHoles', { count: mine.length, holes: formatNumber(mine.length) })}
         sub={t('courseDetail.youTab.shots.allHolesSub')}
         onPress={onAllHoles}
+        hairline={worstField ? false : undefined}
       />
     </AboutSection>
   );

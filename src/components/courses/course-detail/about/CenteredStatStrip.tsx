@@ -8,9 +8,9 @@ export interface CenteredStatItem {
   tone?: string;
 }
 
-/** Shared four-column facts treatment used at the top of Course and You. */
+/** Shared centred facts strip; takes its column count from its items. */
 export const CenteredStatStrip: React.FC<{ items: CenteredStatItem[] }> = ({ items }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>
+  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
     {items.map((item) => (
       <div key={item.label} style={{ minWidth: 0, textAlign: 'center' }}>
         <div

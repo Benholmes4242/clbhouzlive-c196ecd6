@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { formatNumber } from '@/i18n/format';
 import { A, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection, { ABOUT_KICKER, aboutFig } from '../about/AboutSection';
+import CenteredStatStrip from '../about/CenteredStatStrip';
 import { YouFigure, YouLinkRow, YouSentence } from './youBits';
 import type { YouRound } from './YourRoundsHere';
 
@@ -213,16 +214,17 @@ const YourFormHere: React.FC<Props> = ({ rounds, total, courseId, onOpenRound })
               {t('courseDetail.youTab.clear')}
             </button>
           </div>
-          <div style={{ display: 'flex', gap: 14, marginTop: 10 }}>
-            <YouFigure label={t('courseDetail.youTab.form.gross')} value={String(sel.gross)} tone={A.AMBER_DEEP} />
-            <YouFigure
-              label={t('courseDetail.youTab.form.toPar')}
-              value={toParParts(sel.toPar, 0)?.text ?? '\u2014'}
-              tone={toParParts(sel.toPar, 0)?.tone ?? A.INK}
-            />
-            <YouFigure
-              label={t('courseDetail.youTab.form.vsAverage')}
-              value={toParParts(sel.gross - shownMean, 1)?.text ?? '\u2014'}
+          <div style={{ marginTop: 10 }}>
+            <CenteredStatStrip
+              items={[
+                { label: t('courseDetail.youTab.form.gross'), value: String(sel.gross), tone: A.AMBER_DEEP },
+                {
+                  label: t('courseDetail.youTab.form.toPar'),
+                  value: toParParts(sel.toPar, 0)?.text ?? '\u2014',
+                  tone: toParParts(sel.toPar, 0)?.tone ?? A.INK,
+                },
+                { label: t('courseDetail.youTab.form.vsAverage'), value: toParParts(sel.gross - shownMean, 1)?.text ?? '\u2014' },
+              ]}
             />
           </div>
           <YouLinkRow label={t('courseDetail.youTab.form.openScorecard')} onPress={() => onOpenRound(sel)} />
