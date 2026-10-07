@@ -15,19 +15,20 @@ interface CoursesShellTabsProps {
 
 /**
  * CoursesShellTabs — canonical chip row (RailChips), matching the
- * Top 100 region pills. Centered, no bottom divider (the parent owns the seam).
+ * Top 100 region pills. The two chips share the full run between the
+ * gutters; no bottom divider (the parent owns the seam).
  */
 export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
   activeTab,
   onTabChange,
 }) => (
-  <div className="px-4 py-1 flex justify-center">
+  <div className="px-4 py-1">
     <RailChips
-      align="center-when-fit"
       options={TABS}
       value={activeTab}
       onChange={(id) => onTabChange(id as CoursesTab)}
       ariaLabel="Courses Sections"
+      distribute
     />
   </div>
 );
