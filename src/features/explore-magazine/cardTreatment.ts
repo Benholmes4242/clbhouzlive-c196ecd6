@@ -27,14 +27,17 @@ import {
  * with it (on-photo means 'lead'). Written twice, the two would drift, which is
  * exactly what happened before this predicate existed.
  *
- * A REVIEW at any size but pair, OR A STORY THAT HAS AN IMAGE. The image test is
+ * A REVIEW at std (a LEAD review is under the photo, see below), OR A STORY THAT HAS AN IMAGE. The image test is
  * load-bearing: the story loop leaves `subject` null when a story has no
  * image_url, and a 340px flat panel with text on it reads worse than the 210px
  * below-photo card it would replace. An image-less story keeps today's layout.
  */
 export function rendersOnPhoto(item: StreamItem, size: string): boolean {
   if (size === 'pair') return false;
-  if (item.kind === 'review') return true;
+  /* A LEAD REVIEW IS TEXT UNDER THE PHOTOGRAPH, like a round: a review is a
+     record with words (the round's shape), not a picture with a headline (the
+     story's). This reverses C5 §4.3. Reviews at std keep text on the photo. */
+  if (item.kind === 'review') return size !== 'lead';
   return item.kind === 'story' && !!item.subject?.image_url;
 }
 
