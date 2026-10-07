@@ -921,11 +921,11 @@
         "thin_other": "[~~{{rounds}} řőúñđš íš ñőţ éñőúĝĥ ţő šĥőŵ á ţřéñđ. Íţ ñééđš áƀőúţ ţéñ.~~]",
         "worse": "[~~{{delta}} ŵőřšé ţĥáñ ýőúř ţéñ ƀéƒőřé~~]",
         "worst": "[~~Ŵőřšţ {{score}}~~]",
-        "pointLabel": "{{date}}, {{score}}",
-        "gross": "Gross",
-        "toPar": "To par",
-        "vsAverage": "Vs your avg",
-        "openScorecard": "Open scorecard"
+        "pointLabel": "[~~{{date}}, {{score}}~~]",
+        "gross": "[~~Ĝřőšš~~]",
+        "toPar": "[~~Ţő ƥář~~]",
+        "vsAverage": "[~~Ṽš ýőúř áṽĝ~~]",
+        "openScorecard": "[~~Őƥéñ šĉőřéĉářđ~~]"
       },
       "grabs": {
         "allBoards": "[~~Áļļ ƀőářđš~~]",
@@ -977,15 +977,15 @@
         "one": "[~~Őñé řőúñđ íš á šĉőřéĉářđ, ñőţ á ƥáţţéřñ. Ƥļáý ĥéřé á ƒéŵ ɱőřé ţíɱéš áñđ ýőúř ĥőļé-ƀý-ĥőļé řéĉőřđ áƥƥéářš.~~]",
         "thin_one": "[~~{{rounds}} řőúñđ íš ñőţ éñőúĝĥ ţő šĥőŵ ŵĥíĉĥ ĥőļéš ĉőšţ ýőú. Íţ ñééđš áƀőúţ ƒíṽé.~~]",
         "thin_other": "[~~{{rounds}} řőúñđš íš ñőţ éñőúĝĥ ţő šĥőŵ ŵĥíĉĥ ĥőļéš ĉőšţ ýőú. Íţ ñééđš áƀőúţ ƒíṽé.~~]",
-        "worstHole": "Hardest hole",
+        "worstHole": "[~~Ĥářđéšţ ĥőļé~~]",
         "youLose": "[~~Ýőú ļőšé~~]",
-        "barLabel": "Hole {{hole}}, {{value}} to par",
-        "holeN": "Hole {{n}}",
-        "parSi": "par {{par}} · SI {{si}}",
-        "parOnly": "par {{par}}",
-        "yourBest": "Your best",
-        "birdies": "Birdies",
-        "yourHardest": "Your hardest hole"
+        "barLabel": "[~~Ĥőļé {{hole}}, {{value}} ţő ƥář~~]",
+        "holeN": "[~~Ĥőļé {{n}}~~]",
+        "parSi": "[~~ƥář {{par}} · ŠÍ {{si}}~~]",
+        "parOnly": "[~~ƥář {{par}}~~]",
+        "yourBest": "[~~Ýőúř ƀéšţ~~]",
+        "birdies": "[~~Ɓířđíéš~~]",
+        "yourHardest": "[~~Ýőúř ĥářđéšţ ĥőļé~~]"
       },
       "signedOut": {
         "body": "[~~Šíĝñ íñ ţő ţřáĉǩ ýőúř řőúñđš, řáţíñĝš áñđ ĥőļé-ƀý-ĥőļé šĉőříñĝ áţ {{courseName}}.~~]",
@@ -994,7 +994,7 @@
       },
       "yourAverage": "[~~Ýőúř áṽéřáĝé~~]",
       "yourRound": "[~~Ýőúř řőúñđ~~]",
-      "clear": "Clear"
+      "clear": "[~~Ĉļéář~~]"
     },
     "yourHolesSheet": {
       "birdie": "[~~Ɓířđíé+~~]",
