@@ -51,17 +51,15 @@ import { useCircleSize } from './useCircleSize';
 /** One read serves the visible cut, the pinned own row and the panel's count. */
 const PAGE_FETCH = 200;
 
-/** The entry board follows the viewer's game: scratch-to-five opens on gross,
- *  everyone else — including a member with no handicap yet — opens on net.
- *  The unknown case is a DECISION, not a fallback. 'topar' is the live key
- *  that labels "Lowest gross"; 'gross' is retired. */
+/** THE ENTRY BOARD FOLLOWS THE VIEWER'S HANDICAP: entryBoardFor opens a member
+ *  at 5.0 or below on gross and everyone else — including a member with no
+ *  handicap yet — on net. The unknown case is a DECISION, not a fallback.
+ *  'topar' is the live key that labels "Lowest gross"; 'gross' is retired. */
 export const GROSS_BAND_MAX = 5.0;
 export function entryBoardFor(handicapIndex: number | null | undefined): BoardKey {
   return handicapIndex != null && handicapIndex <= GROSS_BAND_MAX ? 'topar' : 'net';
 }
 
-/** Kept for importers only — every call site reads the RESOLVED entry board. */
-export const ENTRY_BOARD: BoardKey = entryBoardFor(null);
 
 /** SCORES LANDING SCOPE (amendment to §3). Tried in order; the first rung whose
  *  board returns at least CIRCLE_ROW_FLOOR rows wins. Everyone is terminal and
