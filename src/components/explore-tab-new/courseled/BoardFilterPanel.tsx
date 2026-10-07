@@ -64,7 +64,7 @@ import {
  * board and nothing else. A selected chip is A.INK.
  */
 
-type Screen = 'root' | 'handicap' | 'where' | 'courses';
+type Screen = 'root' | 'board' | 'when' | 'competition' | 'handicap' | 'where' | 'courses';
 
 /** S3.5 — a search field appears only past this many individual course rows. */
 const COURSE_SEARCH_THRESHOLD = 60;
@@ -336,8 +336,23 @@ export function BoardFilterPanel({
       ? courseRows.filter((c) => (c.label ?? '').toLowerCase().includes(needle))
       : courseRows;
 
+  const windowLabel = (() => {
+    const o = WINDOW_OPTIONS.find((x) => x.key === filters.window);
+    return o ? label(o) : label(WINDOW_OPTIONS[0]);
+  })();
+  const competitionLabel = (() => {
+    const o = COMPETITION_OPTIONS.find((x) => x.key === filters.competition);
+    return o ? label(o) : label(COMPETITION_OPTIONS[0]);
+  })();
+
   const headerTitle = () => {
     switch (screen) {
+      case 'board':
+        return t('discover.filterBoard.rankedBy', 'Ranked by');
+      case 'when':
+        return t('discover.filterBoard.axis.when', 'When');
+      case 'competition':
+        return t('discover.filterBoard.axis.competition', 'Competition');
       case 'where':
         return t('discover.filterBoard.axis.where', 'Where');
       case 'handicap':
@@ -464,21 +479,6 @@ export function BoardFilterPanel({
       >
         {screen === 'root' && (
           <>
-            {/* S2 — WHEN LEADS. It is the only axis whose change moves every
-                other count on the screen. */}
-            <SectionLabel>{t('discover.filterBoard.axis.when', 'When')}</SectionLabel>
-            <ChipWrap>
-              {WINDOW_OPTIONS.map((o) => (
-                <Chip
-                  key={o.key}
-                  label={label(o)}
-                  count={facets.countFor('window', o.key)}
-                  selected={filters.window === o.key}
-                  onClick={() => set({ window: o.key as WindowKey })}
-                />
-              ))}
-            </ChipWrap>
-
             {showScope ? (<>
             <SectionLabel>{t('discover.filterBoard.who', 'Who')}</SectionLabel>
             <ChipWrap>
@@ -492,60 +492,36 @@ export function BoardFilterPanel({
                 />
               ))}
             </ChipWrap>
-
             </>) : null}
 
-            {showBoard ? (<>
-            {/* S2.2 — RANKED BY keeps the Rankings / Feats split. A feat IS a
-                board, not an axis laid over one, and the split is how that reads. */}
-            <SectionLabel changed={boardChanged}>{t('discover.filterBoard.rankedBy', 'Ranked by')}</SectionLabel>
-            <SubLabel>{t('discover.filterBoard.rankings', 'Rankings')}</SubLabel>
-            <ChipWrap>
-              {RANKING_BOARD_KEYS.map((key) => (
-                <Chip
-                  key={key}
-                  label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
-                  count={facets.countFor('board', key)}
-                  selected={board === key}
-                  showCount={false}
-                  onClick={() => onBoardChange(key)}
+            {/* P4 — heavy and open-list axes drill in, keeping the root scannable.
+                Applied to all six axes: the root is a summary of rows, each
+                stating its own value. Ranked by leads because it is the control
+                members open this sheet for. */}
+            <div style={{ marginTop: showScope ? 22 : 0, borderTop: showScope ? `1px solid ${A.BORDER}` : undefined }}>
+              {showBoard ? (
+                <PanelRow
+                  label={t('discover.filterBoard.rankedBy', 'Ranked by')}
+                  value={t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
+                  valueChanged={boardChanged}
+                  chevron
+                  onClick={() => setScreen('board')}
                 />
-              ))}
-            </ChipWrap>
-            <SubLabel>{t('discover.filterBoard.feats', 'Feats')}</SubLabel>
-            <ChipWrap>
-              {FEAT_BOARD_KEYS.map((key) => (
-                <Chip
-                  key={key}
-                  label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
-                  count={facets.countFor('board', key)}
-                  selected={board === key}
-                  showCount={false}
-                  onClick={() => onBoardChange(key)}
-                />
-              ))}
-            </ChipWrap>
-
-            </>) : null}
-
-            {/* PLAIN COUNTS. NOT A SPLIT: the three do not sum to the total,
-                because a member with a competition round and a social round is
-                counted in both. */}
-            <SectionLabel>{t('discover.filterBoard.axis.competition', 'Competition')}</SectionLabel>
-            <ChipWrap>
-              {COMPETITION_OPTIONS.map((o) => (
-                <Chip
-                  key={o.key}
-                  label={label(o)}
-                  count={facets.countFor('competition', o.key)}
-                  selected={filters.competition === o.key}
-                  onClick={() => set({ competition: o.key as CompetitionKey })}
-                />
-              ))}
-            </ChipWrap>
-
-            {/* P4 — heavy and open-list axes drill in, keeping the root scannable. */}
-            <div style={{ marginTop: 22, borderTop: `1px solid ${A.BORDER}` }}>
+              ) : null}
+              <PanelRow
+                label={t('discover.filterBoard.axis.when', 'When')}
+                value={windowLabel}
+                valueChanged={filters.window !== DEFAULT_FILTERS.window}
+                chevron
+                onClick={() => setScreen('when')}
+              />
+              <PanelRow
+                label={t('discover.filterBoard.axis.competition', 'Competition')}
+                value={competitionLabel}
+                valueChanged={filters.competition !== DEFAULT_FILTERS.competition}
+                chevron
+                onClick={() => setScreen('competition')}
+              />
               <PanelRow
                 label={t('discover.filterBoard.axis.handicap', 'Handicap')}
                 value={bandLabel}
@@ -570,6 +546,82 @@ export function BoardFilterPanel({
             </div>
             <div style={{ height: 24 }} />
           </>
+        )}
+
+        {screen === 'board' && (
+          <>
+            {/* S2.2 — RANKED BY keeps the Rankings / Feats split. A feat IS a
+                board, not an axis laid over one, and the split is how that reads. */}
+            <SubLabel>{t('discover.filterBoard.rankings', 'Rankings')}</SubLabel>
+            <ChipWrap>
+              {RANKING_BOARD_KEYS.map((key) => (
+                <Chip
+                  key={key}
+                  label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
+                  count={facets.countFor('board', key)}
+                  selected={board === key}
+                  showCount={false}
+                  onClick={() => {
+                    onBoardChange(key);
+                    setScreen('root');
+                  }}
+                />
+              ))}
+            </ChipWrap>
+            <SubLabel>{t('discover.filterBoard.feats', 'Feats')}</SubLabel>
+            <ChipWrap>
+              {FEAT_BOARD_KEYS.map((key) => (
+                <Chip
+                  key={key}
+                  label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
+                  count={facets.countFor('board', key)}
+                  selected={board === key}
+                  showCount={false}
+                  onClick={() => {
+                    onBoardChange(key);
+                    setScreen('root');
+                  }}
+                />
+              ))}
+            </ChipWrap>
+          </>
+        )}
+
+        {screen === 'when' && (
+          <ChipWrap>
+            {WINDOW_OPTIONS.map((o) => (
+              <Chip
+                key={o.key}
+                label={label(o)}
+                count={facets.countFor('window', o.key)}
+                selected={filters.window === o.key}
+                onClick={() => {
+                  set({ window: o.key as WindowKey });
+                  setScreen('root');
+                }}
+              />
+            ))}
+          </ChipWrap>
+        )}
+
+        {screen === 'competition' && (
+          /* PLAIN COUNTS. NOT A SPLIT: the three do not sum to the total,
+             because a member with a competition round and a social round is
+             counted in both. */
+          <ChipWrap>
+            {COMPETITION_OPTIONS.map((o) => (
+              <Chip
+                key={o.key}
+                label={label(o)}
+                count={facets.countFor('competition', o.key)}
+                selected={filters.competition === o.key}
+                onClick={() => {
+                  set({ competition: o.key as CompetitionKey });
+                  setScreen('root');
+                }}
+              />
+            ))}
+          </ChipWrap>
         )}
 
         {screen === 'handicap' && (
