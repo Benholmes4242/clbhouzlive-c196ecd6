@@ -516,7 +516,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const [boardApplied, setBoardApplied] = useState(true);
   const [boardPanelOpen, setBoardPanelOpen] = useState(false);
   /* The title opens the sheet onto the board choice; Filters opens it without. */
-  const [boardPanelShowsBoard, setBoardPanelShowsBoard] = useState(false);
   const scoresBoardActive = view === 'scores' && boardApplied;
   const boardState = useAmateurBoardState(
     view === 'scores' ? userId : undefined,
@@ -1598,12 +1597,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 board: boardState.board,
                 board_active: scoresBoardActive,
               });
-              setBoardPanelShowsBoard(true);
               setBoardPanelOpen(true);
             }}
             onOpenFilters={() => {
               analyticsEvents.track('amateur_filter_opened', { board: boardState.board });
-              setBoardPanelShowsBoard(false);
               setBoardPanelOpen(true);
             }}
           />
@@ -1811,7 +1808,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         onReset={() => { boardState.resetAll(); setBoardApplied(true); }}
         facets={boardState.facets}
         showScope={false}
-        showBoard={boardPanelShowsBoard}
       />
     </div>
     </FeatRarityProvider>
