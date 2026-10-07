@@ -905,10 +905,6 @@
     "youTab": {
       "allRounds": "All {{rounds}} rounds",
       "allRoundsTitle": "Your rounds here",
-      "basisMany": "From {{rounds}} rounds, against {{field}} from everyone else.",
-      "basisManyNoField": "From {{rounds}} rounds here.",
-      "basisOne": "Your one round here, against {{field}} from everyone else.",
-      "basisOneNoField": "Your one round here.",
       "best": "Best",
       "bestKicker": "Best",
       "connect": {
