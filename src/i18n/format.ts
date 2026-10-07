@@ -841,3 +841,8 @@ export function fmtDateLong(iso: string | null | undefined): string {
   if (isNaN(d.getTime())) return '';
   return new Intl.DateTimeFormat(getActiveLocale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
 }
+
+/** Locale-aware conjunction list — "1st, 4th and 9th". */
+export function formatList(items: string[]): string {
+  return new Intl.ListFormat(getActiveLocale(), { style: 'long', type: 'conjunction' }).format(items);
+}
