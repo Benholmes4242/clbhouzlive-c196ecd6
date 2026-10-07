@@ -357,6 +357,7 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
                 id="wire-tournaments"
                 heading="By tournament"
                 chips={railChips}
+                allLabel="All"
                 selected={activeTournament}
                 onSelect={(key) => {
                   setTournament(key);
