@@ -509,6 +509,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      board is the landing view now, so the stream and CircleShelf below are
      unreachable on Scores. They are KEPT ON PURPOSE: starting this at `null`
      again (and re-enabling the Scores stream read) brings the stream back. */
+  /* Non-null only to mark Scores as on a board; the board itself is the hook's resolved entryBoard. */
   const [boardPick, setBoardPick] = useState<BoardKey | null>(ENTRY_BOARD);
   const [boardPanelOpen, setBoardPanelOpen] = useState(false);
   /* The title opens the sheet onto the board choice; Filters opens it without. */
