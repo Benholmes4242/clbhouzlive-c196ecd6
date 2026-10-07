@@ -1592,7 +1592,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             onOpenCourse={(id) => { depart(); navigate(`/courses/${id}`); }}
             onOpenBoard={() => {
               analyticsEvents.track('amateur_board_picker_opened', {
-                board: boardPick ?? boardState.entryBoard,
+                board: boardState.board,
                 board_active: scoresBoardActive,
               });
               setBoardPanelShowsBoard(true);
