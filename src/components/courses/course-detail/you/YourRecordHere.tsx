@@ -1,19 +1,19 @@
 /**
  * BRIEF_YOU_TAB_REBUILD §3.1 — YOUR RECORD HERE.
  *
- * No heading: a flat figure row directly under the tab strip, then a caption
- * stating the basis.
+ * No heading: a flat figure row directly under the tab strip. The strip's
+ * figures are the whole statement — the old "basis" caption beneath them is
+ * gone (both figures were already labelled ROUNDS and FIELD in the strip).
  *
  * THE ONE-ROUND LABEL RULE. An average of one round is a score wearing a
- * statistician's hat, so at exactly one round the kicker reads "Your round" and
- * the caption names it as one round. Nothing else about the row changes.
+ * statistician's hat, so at exactly one round the kicker reads "Your round".
+ * Nothing else about the row changes.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection from '../about/AboutSection';
 import CenteredStatStrip from '../about/CenteredStatStrip';
-import { YouCaption } from './youBits';
 
 interface Props {
   /** Every tracked 18-hole round the member has here. */
@@ -30,14 +30,6 @@ const YourRecordHere: React.FC<Props> = ({ rounds, best, average, field }) => {
   const { t } = useTranslation('courses');
   const single = rounds === 1;
 
-  const caption = field
-    ? single
-      ? t('courseDetail.youTab.basisOne', { field })
-      : t('courseDetail.youTab.basisMany', { count: rounds, rounds, field })
-    : single
-      ? t('courseDetail.youTab.basisOneNoField')
-      : t('courseDetail.youTab.basisManyNoField', { count: rounds, rounds });
-
   return (
     <AboutSection first>
       <CenteredStatStrip
@@ -51,7 +43,6 @@ const YourRecordHere: React.FC<Props> = ({ rounds, best, average, field }) => {
           { label: t('courseDetail.youTab.field'), value: field ?? '\u2014' },
         ]}
       />
-      <YouCaption>{caption}</YouCaption>
     </AboutSection>
   );
 };

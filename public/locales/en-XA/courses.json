@@ -905,10 +905,6 @@
     "youTab": {
       "allRounds": "[~~Áļļ {{rounds}} řőúñđš~~]",
       "allRoundsTitle": "[~~Ýőúř řőúñđš ĥéřé~~]",
-      "basisMany": "[~~Ƒřőɱ {{rounds}} řőúñđš, áĝáíñšţ {{field}} ƒřőɱ éṽéřýőñé éļšé.~~]",
-      "basisManyNoField": "[~~Ƒřőɱ {{rounds}} řőúñđš ĥéřé.~~]",
-      "basisOne": "[~~Ýőúř őñé řőúñđ ĥéřé, áĝáíñšţ {{field}} ƒřőɱ éṽéřýőñé éļšé.~~]",
-      "basisOneNoField": "[~~Ýőúř őñé řőúñđ ĥéřé.~~]",
       "best": "[~~Ɓéšţ~~]",
       "bestKicker": "[~~Ɓéšţ~~]",
       "connect": {
