@@ -19,9 +19,9 @@
  *     letterboxed inside the SAFE area — bars clear notch / home indicator.
  *   • IMAGES rest CONTAIN always (photos are never cropped by fullscreen).
  *
- * When dims are unknown (0), the full viewport is returned as `fit: 'cover'`
- * so the wrapper visually matches today's behaviour; a caller may re-invoke
- * on `loadedmetadata` and animate a corrective tween.
+ * When dims are unknown (0), the full viewport is returned — `contain` for an
+ * IMAGE (the rule above holds with or without dims) and `cover` for a VIDEO.
+ * A caller may re-invoke on `loadedmetadata` and animate a corrective tween.
  */
 
 export interface Viewport {
@@ -50,14 +50,18 @@ export function resolveRestingRect(
   viewport: Viewport,
   mediaType: 'video' | 'image',
 ): RestingRect {
-  // Unknown dims → full viewport, cover. Corrective tween resolves at metadata.
   if (!mediaW || !mediaH) {
     return {
       top: 0,
       left: 0,
       width: viewport.w,
       height: viewport.h,
-      fit: 'cover',
+      // An image is NEVER cropped by fullscreen, dims known or not. With no
+      // dims there is no rect to compute, but `contain` inside the full
+      // viewport still lets the browser letterbox it correctly. Video keeps
+      // cover here: a portrait clip is the common case and the Reels rule
+      // already rests it full-bleed.
+      fit: mediaType === 'image' ? 'contain' : 'cover',
     };
   }
 
