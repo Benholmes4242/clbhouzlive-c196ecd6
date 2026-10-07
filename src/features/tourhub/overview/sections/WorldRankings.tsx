@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { RailChips } from '@/components/ui/RailChips';
 import CountryFlag from '@/components/ui/country-flag';
 import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
 import { DANGER, FONT, INK, INK_MUTE, TREND_UP } from '../../_shared/tokens';
@@ -49,5 +50,5 @@ export function WorldRankings() {
   const rows = allRows.slice(0, 5);
   const basisDays = data?.basisDays ?? null;
   const showMovement = basisDays != null && hasMovement(rows);
-  return <section><OverviewSectionHead title={t('overview.rankings.sectionEyebrow')} action={t('overview.rankings.linkLabel')} onAction={() => navigate('/tourhub?tab=leaderboards')} /><div role="tablist" aria-label={t('overview.rankings.sectionEyebrow')} style={{ margin: '0 0 10px', padding: '0 24px', display: 'flex', gap: 18, overflowX: 'auto', scrollbarWidth: 'none' }}>{BOARDS.map((item) => <button key={item.id} type="button" role="tab" aria-selected={board === item.id} onClick={() => setBoard(item.id)} style={{ flex: 'none', minHeight: 32, padding: 0, border: 0, background: 'transparent', color: board === item.id ? INK : INK_MUTE, fontFamily: FONT, fontSize: 12, fontWeight: board === item.id ? 800 : 600, cursor: 'pointer' }}>{item.label}</button>)}</div>{showMovement ? <div style={{ padding: '0 24px', margin: '0 0 8px', fontFamily: FONT, fontSize: 11, color: 'rgba(248,250,252,0.45)' }}>{t('overview.rankings.movementBasis', { days: basisDays })}</div> : null}{rows.length > 0 ? <div>{rows.map((row) => <RankingRow key={`${row.rank}-${row.playerId ?? row.playerName}`} row={row} showMovement={showMovement} onOpen={row.playerId ? () => navigate(`/tourhub/player/${row.playerId}`) : undefined} />)}</div> : null}</section>;
+  return <section><OverviewSectionHead title={t('overview.rankings.sectionEyebrow')} action={t('overview.rankings.linkLabel')} onAction={() => navigate('/tourhub?tab=leaderboards')} /><RailChips options={BOARDS} value={board} onChange={(next) => setBoard(next as RankingsBoard)} ariaLabel={t('overview.rankings.sectionEyebrow')} distribute style={{ margin: '0 0 10px', padding: '0 24px' }} />{showMovement ? <div style={{ padding: '0 24px', margin: '0 0 8px', fontFamily: FONT, fontSize: 11, color: 'rgba(248,250,252,0.45)' }}>{t('overview.rankings.movementBasis', { days: basisDays })}</div> : null}{rows.length > 0 ? <div>{rows.map((row) => <RankingRow key={`${row.rank}-${row.playerId ?? row.playerName}`} row={row} showMovement={showMovement} onOpen={row.playerId ? () => navigate(`/tourhub/player/${row.playerId}`) : undefined} />)}</div> : null}</section>;
 }
