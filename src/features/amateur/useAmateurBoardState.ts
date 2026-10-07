@@ -29,7 +29,17 @@ import { useCircleSize } from './useCircleSize';
  * Scope: the LANDING_SCOPES ladder (circle, then club, then everyone).
  * Window and courses: ENTRY_FILTERS (14 days, all courses). No rotation and no
  * remembered selection; this state is page-local, so leaving and returning
- * resets it.
+ * resets it — and the resolved default therefore RE-APPLIES on the next visit.
+ * That is intended: do not "fix" it by persisting the member's last board.
+ *
+ * TWO INVARIANTS ON HOW IT RESOLVES:
+ *   (a) THE LADDER PROBES ON THE MEMBER'S OWN ENTRY BOARD. rungA and rungB read
+ *       entryBoard, never a fixed board, so the scope is chosen for the board
+ *       the member will actually see. Do not simplify the probes to a constant.
+ *   (b) NOTHING RENDERS BEFORE IT HAS RESOLVED. The board reads stay off until
+ *       the handicap AND the ladder have both settled (ladderOn depends on
+ *       handicapResolved for this reason). Nothing is ever shown on one board
+ *       or one scope and then swapped.
  *
  * §2 THERE IS ALWAYS A LIST OF SCORES, and any pool wider than the member's
  * circle is DECLARED — the chips, the count line and a stated sentence all move

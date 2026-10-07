@@ -507,9 +507,12 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      untouched Scores view. */
   /* BRIEF_SCORES_RETIRE_THE_GEOGRAPHY_RAIL §2 — SCORES OPENS ON A BOARD. The
      board is the landing view now, so the stream and CircleShelf below are
-     unreachable on Scores. They are KEPT ON PURPOSE: starting this at `null`
-     again (and re-enabling the Scores stream read) brings the stream back. */
-  /* A flag only: is a board applied on Scores? The board itself is boardState.board. */
+     unreachable on Scores. They are KEPT ON PURPOSE: changing this flag's
+     INITIAL VALUE to `false` (and re-enabling the Scores stream read) is the
+     one-line change that brings the stream back. */
+  /* A flag only; the board itself is boardState.board. It is `true` for the
+     life of the page: both setBoardApplied call sites pass `true` and nothing
+     sets it false, so scoresBoardActive is effectively `view === 'scores'`. */
   const [boardApplied, setBoardApplied] = useState(true);
   const [boardPanelOpen, setBoardPanelOpen] = useState(false);
   /* The title opens the sheet onto the board choice; Filters opens it without. */
