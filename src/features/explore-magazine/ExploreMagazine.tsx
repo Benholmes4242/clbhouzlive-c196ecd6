@@ -509,6 +509,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      board is the landing view now, so the stream and CircleShelf below are
      unreachable on Scores. They are KEPT ON PURPOSE: starting this at `null`
      again (and re-enabling the Scores stream read) brings the stream back. */
+  /* Non-null only to mark Scores as on a board; the board itself is the hook's resolved entryBoard. */
   const [boardPick, setBoardPick] = useState<BoardKey | null>(ENTRY_BOARD);
   const [boardPanelOpen, setBoardPanelOpen] = useState(false);
   /* The title opens the sheet onto the board choice; Filters opens it without. */
@@ -1591,7 +1592,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             onOpenCourse={(id) => { depart(); navigate(`/courses/${id}`); }}
             onOpenBoard={() => {
               analyticsEvents.track('amateur_board_picker_opened', {
-                board: boardPick ?? ENTRY_BOARD,
+                board: boardPick ?? boardState.entryBoard,
                 board_active: scoresBoardActive,
               });
               setBoardPanelShowsBoard(true);
@@ -1802,9 +1803,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         resultCount={boardState.total}
         filters={boardState.filters}
         onChange={boardState.changeFilters}
-        boardChanged={boardState.board !== ENTRY_BOARD}
+        boardChanged={boardState.board !== boardState.entryBoard}
         canReset={boardState.canReset}
-        onReset={() => { boardState.resetAll(); setBoardPick(ENTRY_BOARD); }}
+        onReset={() => { boardState.resetAll(); setBoardPick(boardState.entryBoard); }}
         facets={boardState.facets}
         showScope={false}
         showBoard={boardPanelShowsBoard}

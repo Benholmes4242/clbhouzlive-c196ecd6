@@ -11,6 +11,9 @@ import {
 import { useBoardFacets } from '@/components/explore-tab-new/courseled/hooks/useBoardFacets';
 import { useBoardPage } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useProfileData } from '@/hooks/useProfileData';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 
 import { useViewerHomeClubId } from '@/components/explore-tab-new/courseled/hooks/useGolfThisWeek';
 import { CIRCLE_ROW_FLOOR } from '@/components/explore-tab-new/courseled/hooks/useDiscoverEntryBoard';
@@ -48,8 +51,17 @@ import { useCircleSize } from './useCircleSize';
 /** One read serves the visible cut, the pinned own row and the panel's count. */
 const PAGE_FETCH = 200;
 
-/** §1 — the one entry board, always. */
-export const ENTRY_BOARD: BoardKey = 'topar';
+/** The entry board follows the viewer's game: scratch-to-five opens on gross,
+ *  everyone else — including a member with no handicap yet — opens on net.
+ *  The unknown case is a DECISION, not a fallback. 'topar' is the live key
+ *  that labels "Lowest gross"; 'gross' is retired. */
+export const GROSS_BAND_MAX = 5.0;
+export function entryBoardFor(handicapIndex: number | null | undefined): BoardKey {
+  return handicapIndex != null && handicapIndex <= GROSS_BAND_MAX ? 'topar' : 'net';
+}
+
+/** Kept for importers only — every call site reads the RESOLVED entry board. */
+export const ENTRY_BOARD: BoardKey = entryBoardFor(null);
 
 /** SCORES LANDING SCOPE (amendment to §3). Tried in order; the first rung whose
  *  board returns at least CIRCLE_ROW_FLOOR rows wins. Everyone is terminal and
@@ -86,7 +98,22 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   /* The resolved default. null until the ladder has resolved, and the board
      reads stay off until then — never render on one scope and swap. */
   const [entry, setEntry] = useState<BoardFilters | null>(null);
-  const [board, setBoard] = useState<BoardKey>(ENTRY_BOARD);
+  /* THE ENTRY BOARD FOLLOWS THE VIEWER'S HANDICAP, via the display authority
+     (never eg_handicap_index directly). Like the scope ladder, nothing reads a
+     board until it has resolved — never render on one board and swap. */
+  const { profile, loading: profileLoading } = useProfileData();
+  const whs = useWhsConnection(userId);
+  const handicapResolved = !userId || (!profileLoading && !whs.isLoading);
+  const handicap = resolveDisplayHandicap({
+    egHandicapIndex: profile?.eg_handicap_index ?? null,
+    manualHandicapIndex: profile?.manual_handicap_index ?? null,
+    hasWhsConnection: !!whs.data,
+  }).value;
+  const entryBoard = entryBoardFor(handicap);
+  /* null = untouched: the member is on their resolved entry board. Once they
+     pick, nothing re-applies the default for the rest of the visit. */
+  const [boardPicked, setBoard] = useState<BoardKey | null>(null);
+  const board: BoardKey = boardPicked ?? entryBoard;
   const [courseBoard, setCourseBoard] = useState<CourseBoardKey>('played');
   const [panelOpen, setPanelOpen] = useState(false);
   /* Set only when THIS hook widened the pool for the member (state C), so the
@@ -110,9 +137,9 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   /* A rung whose scope cannot return rows is skipped outright — no query.
      Club with no primary_club_id is the common case (66 of 107). */
   const rungApplies = (k: ScopeKey) => (k === 'club' ? !!homeClub.clubId : true);
-  const ladderOn = !!userId && active && entry === null && homeClub.ready;
+  const ladderOn = !!userId && active && entry === null && homeClub.ready && handicapResolved;
 
-  const rungA = useBoardPage(userId, ENTRY_BOARD, rungAFilters, {
+  const rungA = useBoardPage(userId, entryBoard, rungAFilters, {
     limit: PAGE_FETCH,
     enabled: ladderOn && rungApplies(probeScopes[0]),
   });
@@ -120,7 +147,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   const rungASettled = rungASkipped || rungA.isSuccess || rungA.isError;
   const rungAOk = !rungASkipped && rungA.isSuccess && (rungA.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
 
-  const rungB = useBoardPage(userId, ENTRY_BOARD, rungBFilters, {
+  const rungB = useBoardPage(userId, entryBoard, rungBFilters, {
     limit: PAGE_FETCH,
     enabled: ladderOn && rungASettled && !rungAOk && rungApplies(probeScopes[1]),
   });
@@ -145,7 +172,16 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   /* Kept for the head: whether Your club is a real choice for this member. */
   const clubApplies = !!homeClub.clubId;
 
-  const resolved = entry !== null;
+  const resolved = entry !== null && handicapResolved;
+
+  /* Once per Standings entry, after the board resolves. Never the value. */
+  const defaultLogged = useRef(false);
+  useEffect(() => {
+    if (!resolved || !active || defaultLogged.current) return;
+    defaultLogged.current = true;
+    const band = handicap == null ? 'unknown' : handicap <= GROSS_BAND_MAX ? 'low' : 'high';
+    analyticsEvents.track('amateur_board_default', { board: entryBoard, band });
+  }, [resolved, active, entryBoard, handicap]);
   const entryFilters = entry ?? UNRESOLVED_FILTERS;
 
   const facets = useBoardFacets(userId, board, filters, { enabled: active && resolved });
@@ -216,11 +252,11 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
     setWidened(false);
     analyticsEvents.track('amateur_filter_reset', {});
     setFilters({ ...entryFilters });
-    setBoard(ENTRY_BOARD);
+    setBoard(null);
   }, [entryFilters]);
 
   /* ONE DEFAULT OBJECT for the Reset button and the Filters badge. */
-  const canReset = !sameFilters(filters, entryFilters) || board !== ENTRY_BOARD;
+  const canReset = !sameFilters(filters, entryFilters) || board !== entryBoard;
   const sheetFilterCount = sheetOnlyDiffCount(filters, entryFilters);
 
   /* §7 — the page's segmented control writes scope through here. */
@@ -240,6 +276,8 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
       ready: resolved,
       clubApplies,
       board,
+      /** The member's resolved entry board — reset and 'changed' compare against this. */
+      entryBoard,
       filters,
       courseBoard,
       facets,
@@ -265,7 +303,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
       changeScope,
       seeEveryone,
     }),
-    [resolved, clubApplies, sheetFilterCount, changeScope, board, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, resetAll, canReset, seeEveryone],
+    [resolved, clubApplies, sheetFilterCount, changeScope, board, entryBoard, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, resetAll, canReset, seeEveryone],
   );
 }
 
