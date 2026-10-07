@@ -1807,7 +1807,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         canReset={boardState.canReset}
         onReset={() => { boardState.resetAll(); setBoardApplied(true); }}
         facets={boardState.facets}
-        showScope={false}
       />
     </div>
     </FeatRarityProvider>

@@ -256,8 +256,6 @@ export interface BoardFilterPanelProps {
   filters: BoardFilters;
   onChange: (next: BoardFilters) => void;
   facets: BoardFacets;
-  /** False when the caller states scope on its own page (Explore Scores). */
-  showScope?: boolean;
   /** False when the caller states the board on its own page (Explore Scores). */
   showBoard?: boolean;
 }
@@ -275,7 +273,6 @@ export function BoardFilterPanel({
   filters,
   onChange,
   facets,
-  showScope = true,
   showBoard = true,
 }: BoardFilterPanelProps) {
   const { t } = useTranslation('courses');
@@ -479,26 +476,11 @@ export function BoardFilterPanel({
       >
         {screen === 'root' && (
           <>
-            {showScope ? (<>
-            <SectionLabel>{t('discover.filterBoard.who', 'Who')}</SectionLabel>
-            <ChipWrap>
-              {SCOPE_OPTIONS.filter((o) => (o.key === 'club' ? clubApplies : true)).map((o) => (
-                <Chip
-                  key={o.key}
-                  label={label(o)}
-                  count={facets.countFor('scope', o.key)}
-                  selected={filters.scope === o.key}
-                  onClick={() => set({ scope: o.key })}
-                />
-              ))}
-            </ChipWrap>
-            </>) : null}
-
             {/* P4 — heavy and open-list axes drill in, keeping the root scannable.
                 Applied to all six axes: the root is a summary of rows, each
                 stating its own value. Ranked by leads because it is the control
                 members open this sheet for. */}
-            <div style={{ marginTop: showScope ? 22 : 0, borderTop: showScope ? `1px solid ${A.BORDER}` : undefined }}>
+            <div>
               {showBoard ? (
                 <PanelRow
                   label={t('discover.filterBoard.rankedBy', 'Ranked by')}
