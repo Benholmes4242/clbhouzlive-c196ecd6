@@ -137,7 +137,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   return (
     <div>
       {shellTabs}
-      <section style={{ padding: '22px 20px 0' }}>
+      <section style={{ padding: '22px 16px 0' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
           <h2 style={{ margin: 0, color: A.INK, fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em' }}>{heading}</h2>
           <span style={{ color: A.MUTE, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{ratedCount} rated</span>
@@ -223,7 +223,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
         ) : (
           <div>
             {nameQuery.trim().length > 0 && visibleCourses.length === 0 ? (
-              <div style={{ padding: '0 20px', color: A.MUTE, fontSize: 13 }}>
+              <div style={{ padding: '0 16px', color: A.MUTE, fontSize: 13 }}>
                 {`No course on this list matches ${nameQuery.trim()}.`}
               </div>
             ) : null}
