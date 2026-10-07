@@ -48,8 +48,10 @@ import { useCircleSize } from './useCircleSize';
  * never mixed in one ranked list.
  *
  * TWO WIDENINGS, BOTH DECLARED:
- *   D  the member follows NOBODY   -> the entry filter IS Everyone. Nothing was
- *      widened, because there was never a circle, so no sentence is owed.
+ *   D  the member follows NOBODY   -> they fail the circle rung and the ladder
+ *      resolves their scope: club if their club has rows, otherwise everyone.
+ *      Nothing was widened, because there was never a circle, so no sentence
+ *      is owed.
  *   C  the member HAS a circle but it is silent for the window -> the list
  *      becomes Everyone and the block says why (`widened`).
  *
@@ -57,9 +59,10 @@ import { useCircleSize } from './useCircleSize';
  * get_board_courses are untouched.
  *
  * PHASE B (BRIEF_EXPLORE_MAGAZINE P1, Sep 2026) — LIVE AGAIN. ExploreMagazine's
- * Scores view consumes this hook: the ranked stream is the default and a board
- * renders only once the member picks one. `active` gates BOTH board reads, so
- * All, Courses, Watch and an untouched Scores view issue nothing.
+ * Standings view consumes this hook. Standings always opens on a resolved
+ * board; the ranked stream below it is kept as a rollback, not a state a member
+ * can reach. `active` gates BOTH board reads, so the All and Watch views issue
+ * nothing.
  */
 /** One read serves the visible cut, the pinned own row and the panel's count. */
 const PAGE_FETCH = 200;
@@ -145,7 +148,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   const rungAFilters = useMemo(() => entryFiltersFor(probeScopes[0]), [probeScopes]);
   const rungBFilters = useMemo(() => entryFiltersFor(probeScopes[1]), [probeScopes]);
   /* A rung whose scope cannot return rows is skipped outright — no query.
-     Club with no primary_club_id is the common case (66 of 107). */
+     Club with no primary_club_id is the common case. */
   const rungApplies = (k: ScopeKey) => (k === 'club' ? !!homeClub.clubId : true);
   const ladderOn = !!userId && active && entry === null && homeClub.ready && handicapResolved;
 
@@ -254,9 +257,10 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
     setFilters((prev) => normalizeFilters({ ...prev, scope: 'everyone' }));
   }, []);
 
-  /* ONE RESET. Board and filters together, one event. Calling changeBoard
-     from a reset reported amateur_board_changed as though the member had
-     picked Most recent. */
+  /* ONE RESET. Board and filters together, one event. Reset clears the
+     member's pick so the board returns to their resolved entry board. It must
+     not call changeBoard, which would report a board change the member did
+     not make. */
   const resetAll = useCallback(() => {
     touched.current = true;
     setWidened(false);
