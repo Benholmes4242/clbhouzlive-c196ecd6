@@ -22,6 +22,8 @@ const TABS: { id: CourseTabId; labelKey: string }[] = [
 /**
  * CourseTabs — Modal tab bar for the course detail sheet.
  * Canonical chip row (RailChips), matching the Courses shell tabs.
+ * The chips share the full run between the gutters rather than
+ * sitting centred.
  */
 export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: CourseTabsProps) {
   const { t } = useTranslation('courses');
@@ -35,15 +37,15 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
 
   return (
     <div
-      className="px-4 py-2 flex justify-center"
+      className="px-4 py-2"
       style={{ background: 'hsl(var(--background))' }}
     >
       <RailChips
-        align="center-when-fit"
         options={TABS.map((tab) => ({ id: tab.id, label: getLabel(tab) }))}
         value={activeTab}
         onChange={(id) => onChange(id as CourseTabId)}
         ariaLabel={t('courseDetail.a11y.sections')}
+        distribute
       />
     </div>
   );
