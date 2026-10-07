@@ -194,7 +194,7 @@ const YourFormHere: React.FC<Props> = ({ rounds, total, courseId, onOpenRound })
         selected={selectedIndex >= 0 ? selectedIndex : null}
         onSelect={onSelect}
         label={(i) => t('courseDetail.youTab.form.pointLabel', {
-          date: formatDate(drawn[i].playDate, { day: 'numeric', month: 'short', year: 'numeric' }),
+          date: formatDate(drawn[i].playDate),
           score: drawn[i].gross,
         })}
       />
@@ -203,7 +203,7 @@ const YourFormHere: React.FC<Props> = ({ rounds, total, courseId, onOpenRound })
         <div style={{ marginTop: 12 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span style={{ ...ABOUT_KICKER, flex: 1, minWidth: 0 }}>
-              {formatDate(sel.playDate, { day: 'numeric', month: 'short', year: 'numeric' })}
+              {formatDate(sel.playDate)}
             </span>
             <button
               type="button"

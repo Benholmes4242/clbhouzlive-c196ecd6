@@ -920,7 +920,12 @@
         "thin_one": "{{rounds}} round is not enough to show a trend. It needs about ten.",
         "thin_other": "{{rounds}} rounds is not enough to show a trend. It needs about ten.",
         "worse": "{{delta}} worse than your ten before",
-        "worst": "Worst {{score}}"
+        "worst": "Worst {{score}}",
+        "pointLabel": "{{date}}, {{score}}",
+        "gross": "Gross",
+        "toPar": "To par",
+        "vsAverage": "Vs your avg",
+        "openScorecard": "Open scorecard"
       },
       "grabs": {
         "allBoards": "All boards",
@@ -972,8 +977,15 @@
         "one": "One round is a scorecard, not a pattern. Play here a few more times and your hole-by-hole record appears.",
         "thin_one": "{{rounds}} round is not enough to show which holes cost you. It needs about five.",
         "thin_other": "{{rounds}} rounds is not enough to show which holes cost you. It needs about five.",
-        "worstHole": "Worst hole",
-        "youLose": "You lose"
+        "worstHole": "Hardest hole",
+        "youLose": "You lose",
+        "barLabel": "Hole {{hole}}, {{value}} to par",
+        "holeN": "Hole {{n}}",
+        "parSi": "par {{par}} · SI {{si}}",
+        "parOnly": "par {{par}}",
+        "yourBest": "Your best",
+        "birdies": "Birdies",
+        "yourHardest": "Your hardest hole"
       },
       "signedOut": {
         "body": "Sign in to track your rounds, ratings and hole-by-hole scoring at {{courseName}}.",
@@ -981,7 +993,8 @@
         "title": "Your record at this course"
       },
       "yourAverage": "Your average",
-      "yourRound": "Your round"
+      "yourRound": "Your round",
+      "clear": "Clear"
     },
     "yourHolesSheet": {
       "birdie": "Birdie+",
