@@ -124,6 +124,16 @@ export interface RailChipsProps {
    * with the chips and stays reachable when the row overflows.
    */
   trailing?: React.ReactNode;
+
+  /**
+   * ADDITIVE — A BOUNDED LABEL. Some rows name things too long to sit in a
+   * chip: a tournament's full name, a list title. The chip takes this ceiling
+   * and ellipsises past it, rather than the row opting out of the component.
+   * The full text belongs in `aria-label` at the call site, and usually on the
+   * page already. Unset means no ceiling and the label never truncates, which
+   * stays the default for every existing consumer.
+   */
+  maxChipWidth?: number;
 }
 
 
@@ -178,7 +188,7 @@ export function railChipStyle(active: boolean, size: 'sm' | 'md' = 'md'): CSSPro
 /** The canonical chip-row gap. */
 export const RAIL_CHIP_GAP = 6;
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'filled-selection', align = 'start', size = 'md', distribute = false, trailing }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'filled-selection', align = 'start', size = 'md', distribute = false, trailing, maxChipWidth }: RailChipsProps) {
   const filled = ground === 'filled';
   /* ONE geometry pair, stated once. 'md' is the canonical chip. */
   const geo = size === 'sm' ? RAIL_CHIP_GEOMETRY.sm : RAIL_CHIP_GEOMETRY.md;
@@ -219,6 +229,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
                  equally, and `min-width: max-content` is what makes the row
                  overflow-and-scroll instead of squeezing a label. */
               ...(distribute ? { flex: '1 1 0%', minWidth: 'max-content', textAlign: 'center' as const } : null),
+              ...(maxChipWidth ? { maxWidth: maxChipWidth, overflow: 'hidden', textOverflow: 'ellipsis' } : null),
               padding: geo.padding,
               borderRadius: geo.radius,
 
