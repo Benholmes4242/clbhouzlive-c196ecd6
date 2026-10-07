@@ -11,12 +11,50 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfileData } from '@/hooks/useProfileData';
 
+/** ONE column list for both hooks: MyRoundAtCourse means one shape. */
+const ROUND_COLUMNS =
+  'whs_score_id, play_date, gross_score, course_par, tee_marker, hcp_at_time, delta_index, front_nine_to_par, back_nine_to_par, eagles, albatrosses, holes_in_one, clean_card';
+
+type RoundRow = {
+  whs_score_id: string; play_date: string; gross_score: number | null; course_par: number | null;
+  tee_marker: string | null; hcp_at_time: number | null; delta_index: number | null;
+  front_nine_to_par: number | null; back_nine_to_par: number | null; eagles: number | null;
+  albatrosses: number | null; holes_in_one: number | null; clean_card: boolean | null;
+};
+
+/** Every new field is nullable: a null is an empty cell, never zero, never derived. */
+function mapRound(r: RoundRow): MyRoundAtCourse {
+  return {
+    whsScoreId: r.whs_score_id,
+    playDate: r.play_date,
+    grossScore: r.gross_score ?? null,
+    coursePar: r.course_par ?? null,
+    teeMarker: r.tee_marker ?? null,
+    hcpAtTime: r.hcp_at_time ?? null,
+    deltaIndex: r.delta_index ?? null,
+    frontNineToPar: r.front_nine_to_par ?? null,
+    backNineToPar: r.back_nine_to_par ?? null,
+    eagles: r.eagles ?? null,
+    albatrosses: r.albatrosses ?? null,
+    holesInOne: r.holes_in_one ?? null,
+    cleanCard: r.clean_card ?? null,
+  };
+}
+
 export interface MyRoundAtCourse {
   whsScoreId: string;
   playDate: string;
   grossScore: number | null;
   coursePar: number | null;
   teeMarker: string | null;
+  hcpAtTime: number | null;
+  deltaIndex: number | null;
+  frontNineToPar: number | null;
+  backNineToPar: number | null;
+  eagles: number | null;
+  albatrosses: number | null;
+  holesInOne: number | null;
+  cleanCard: boolean | null;
 }
 
 export function useMyRoundsAtCourse(courseId?: string | null, options?: { limit?: number }) {
@@ -33,7 +71,7 @@ export function useMyRoundsAtCourse(courseId?: string | null, options?: { limit?
     queryFn: async (): Promise<MyRoundAtCourse[]> => {
       const { data, error } = await supabase
         .from('gam_round_stats')
-        .select('whs_score_id, play_date, gross_score, course_par, tee_marker')
+        .select(ROUND_COLUMNS)
         .eq('user_id', userId as string)
         .eq('course_id', courseId as string)
         .eq('holes_played', 18)
@@ -41,13 +79,7 @@ export function useMyRoundsAtCourse(courseId?: string | null, options?: { limit?
         .limit(limit);
 
       if (error) throw error;
-      return (data ?? []).map((r) => ({
-        whsScoreId: r.whs_score_id as string,
-        playDate: r.play_date as string,
-        grossScore: (r.gross_score as number | null) ?? null,
-        coursePar: (r.course_par as number | null) ?? null,
-        teeMarker: (r.tee_marker as string | null) ?? null,
-      }));
+      return ((data ?? []) as unknown as RoundRow[]).map(mapRound);
     },
   });
 }
@@ -74,19 +106,13 @@ export function useAllMyRoundsAtCourse(courseId?: string | null, enabled = true)
     staleTime: 5 * 60 * 1000,
     queryFn: async (): Promise<MyRoundsAtCourseResult> => {
       const pageSize = 500;
-      const rows: Array<{
-        whs_score_id: string;
-        play_date: string;
-        gross_score: number | null;
-        course_par: number | null;
-        tee_marker: string | null;
-      }> = [];
+      const rows: RoundRow[] = [];
       let exactTotal: number | null = null;
 
       for (let from = 0; ; from += pageSize) {
         const query = supabase
           .from('gam_round_stats')
-          .select('whs_score_id, play_date, gross_score, course_par, tee_marker', from === 0 ? { count: 'exact' } : undefined)
+          .select(ROUND_COLUMNS, from === 0 ? { count: 'exact' } : undefined)
           .eq('user_id', userId as string)
           .eq('course_id', courseId as string)
           .eq('holes_played', 18)
@@ -96,19 +122,13 @@ export function useAllMyRoundsAtCourse(courseId?: string | null, enabled = true)
         const { data, error, count } = await query;
         if (error) throw error;
         if (from === 0) exactTotal = count;
-        rows.push(...((data ?? []) as typeof rows));
+        rows.push(...((data ?? []) as unknown as RoundRow[]));
         if ((data?.length ?? 0) < pageSize || (exactTotal != null && rows.length >= exactTotal)) break;
       }
 
       return {
         total: exactTotal ?? rows.length,
-        rounds: rows.map((r) => ({
-          whsScoreId: r.whs_score_id,
-          playDate: r.play_date,
-          grossScore: r.gross_score,
-          coursePar: r.course_par,
-          teeMarker: r.tee_marker,
-        })),
+        rounds: rows.map(mapRound),
       };
     },
   });

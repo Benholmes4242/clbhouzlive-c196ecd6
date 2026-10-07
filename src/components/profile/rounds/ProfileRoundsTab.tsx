@@ -21,7 +21,7 @@ import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/to
 import { ABOUT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
 import { YouFigure } from '@/components/courses/course-detail/you/youBits';
 import RailChips from '@/components/ui/RailChips';
-import { FigureCell, vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
+import { CAPS, FeatPill, FigureCell, Pill, roundFeats, vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
 import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap';
 import { toParLabel } from '@/features/explore-magazine/exploreCopy';
 import { AwardCluster } from '@/features/explore-magazine/AwardCluster';
@@ -59,19 +59,6 @@ function formValue(r: ProfileRound): number | null {
 }
 
 const fmt1 = (n: number) => n.toFixed(1);
-
-/** The one pill chrome on this list: feat tags, the not-full-18 tag and the medal pill. */
-const CAPS: React.CSSProperties = { fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' };
-const Pill: React.FC<{ tone?: string; padding?: string; style?: React.CSSProperties; children: React.ReactNode }> = ({ tone, padding = '3px 6px', style, children }) => (
-  <span style={{ ...style, color: tone, border: `1px solid ${CHART.BORDER}`, borderRadius: 999, lineHeight: 1, whiteSpace: 'nowrap', padding, display: 'inline-flex', alignItems: 'center' }}>
-    {children}
-  </span>
-);
-
-/** The feed's RARE/NEW tag treatment, as a small pill. */
-const FeatPill: React.FC<{ label: string }> = ({ label }) => (
-  <Pill tone={CHART.AMBER} style={CAPS}>{label}</Pill>
-);
 
 /** Course name: one line, type shrinks 14 -> 11 instead of truncating. */
 const RowName: React.FC<{ name: string }> = ({ name }) => {
@@ -156,17 +143,6 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
     });
     count = new Map();
   }
-
-  const feats = (r: ProfileRound): string[] => {
-    const out: string[] = [];
-    const n = (v: number | null) => Number(v ?? 0);
-    const lbl = (k: string, d: string, c: number) => (c > 1 ? `${c} ${t(k, d)}` : t(k, d));
-    if (n(r.holes_in_one) > 0) out.push(lbl('rounds.feat.ace', 'Ace', n(r.holes_in_one)));
-    if (n(r.albatrosses) > 0) out.push(lbl('rounds.feat.albatross', 'Albatross', n(r.albatrosses)));
-    if (n(r.eagles) > 0) out.push(lbl('rounds.feat.eagle', 'Eagle', n(r.eagles)));
-    if (r.clean_card) out.push(t('rounds.feat.cleanCard', 'Clean card'));
-    return out;
-  };
 
   let lastYear: number | null = null;
 
@@ -258,7 +234,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
           const full18 = isFullEighteen(r);
           const toPar = full18 && r.gross_score != null && r.course_par != null ? r.gross_score - r.course_par : null;
           const isBest = full18 && stats.best != null && r.gross_score === stats.best;
-          const fs = feats(r);
+          const fs = roundFeats(r, t);
           // Mirrors ExploreCard's roundIdentity construction. Absent, never approximated.
           const net = full18 && r.nett_score != null ? Number(r.nett_score) : null;
           const hasVs = net != null && r.course_par != null;

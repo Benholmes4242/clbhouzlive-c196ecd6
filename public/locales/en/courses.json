@@ -994,7 +994,11 @@
         "title": "Your record at this course"
       },
       "yourAverage": "Your average",
-      "yourRound": "Your round"
+      "yourRound": "Your round",
+      "stat": {
+        "back": "BACK",
+        "front": "FRONT"
+      }
     },
     "yourHolesSheet": {
       "birdie": "Birdie+",
