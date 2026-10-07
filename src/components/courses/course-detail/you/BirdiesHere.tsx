@@ -44,10 +44,12 @@ const BirdiesHere: React.FC<Props> = ({ mine }) => {
         ? t('courseDetail.youTab.birdies.allOpen')
         : open.length <= NAME_THRESHOLD
           ? t('courseDetail.youTab.birdies.named', {
-              count: open.length,
               holes: formatList(open.map((r) => ordinal(r.hole_no))),
             })
-          : t('courseDetail.youTab.birdies.counted', { count: formatNumber(open.length) });
+          : t('courseDetail.youTab.birdies.counted', {
+              count: open.length,
+              holes: formatNumber(open.length),
+            });
 
   return (
     <AboutSection heading={t('courseDetail.youTab.sections.birdiesHere')}>
