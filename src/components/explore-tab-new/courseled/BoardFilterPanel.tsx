@@ -15,7 +15,6 @@ import {
   DEFAULT_FILTERS,
   FEAT_BOARD_KEYS,
   RANKING_BOARD_KEYS,
-  SCOPE_OPTIONS,
   WINDOW_OPTIONS,
   boardCountsRounds,
   type BandKey,
@@ -282,7 +281,6 @@ export function BoardFilterPanel({
   /* S2.4 — the SAME conditional logic the retired scope pills used, now deciding
      whether a CHIP EXISTS rather than whether a pill exists. */
   const { scopes } = useAvailableWeekScopes(userId);
-  const clubApplies = scopes.includes('home_club');
   const nearApplies = scopes.includes('handicap_band');
 
   useEffect(() => {
@@ -753,22 +751,6 @@ export function BoardFilterPanel({
   );
 }
 
-function SectionLabel({ children, changed = false }: { children: React.ReactNode; changed?: boolean }) {
-  return (
-    <div
-      style={{
-        fontSize: 9.5,
-        fontWeight: 700,
-        letterSpacing: '0.13em',
-        textTransform: 'uppercase',
-        padding: '22px 16px 9px',
-        color: changed ? A.INK : A.DIM,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
 
 /** S2.2 — the Rankings / Feats sub-labels inside RANKED BY. */
 function SubLabel({ children }: { children: React.ReactNode }) {
