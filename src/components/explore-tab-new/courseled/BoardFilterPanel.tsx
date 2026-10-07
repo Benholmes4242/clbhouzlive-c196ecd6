@@ -255,8 +255,6 @@ export interface BoardFilterPanelProps {
   filters: BoardFilters;
   onChange: (next: BoardFilters) => void;
   facets: BoardFacets;
-  /** False when the caller states the board on its own page (Explore Scores). */
-  showBoard?: boolean;
 }
 
 export function BoardFilterPanel({
@@ -272,7 +270,6 @@ export function BoardFilterPanel({
   filters,
   onChange,
   facets,
-  showBoard = true,
 }: BoardFilterPanelProps) {
   const { t } = useTranslation('courses');
   const [screen, setScreen] = useState<Screen>('root');
@@ -479,15 +476,13 @@ export function BoardFilterPanel({
                 stating its own value. Ranked by leads because it is the control
                 members open this sheet for. */}
             <div>
-              {showBoard ? (
-                <PanelRow
-                  label={t('discover.filterBoard.rankedBy', 'Ranked by')}
-                  value={t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
-                  valueChanged={boardChanged}
-                  chevron
-                  onClick={() => setScreen('board')}
-                />
-              ) : null}
+              <PanelRow
+                label={t('discover.filterBoard.rankedBy', 'Ranked by')}
+                value={t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
+                valueChanged={boardChanged}
+                chevron
+                onClick={() => setScreen('board')}
+              />
               <PanelRow
                 label={t('discover.filterBoard.axis.when', 'When')}
                 value={windowLabel}
