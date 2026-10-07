@@ -252,8 +252,8 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
     setWidened(false);
     analyticsEvents.track('amateur_filter_reset', {});
     setFilters({ ...entryFilters });
-    setBoard(entryBoard);
-  }, [entryFilters, entryBoard]);
+    setBoard(null);
+  }, [entryFilters]);
 
   /* ONE DEFAULT OBJECT for the Reset button and the Filters badge. */
   const canReset = !sameFilters(filters, entryFilters) || board !== entryBoard;
