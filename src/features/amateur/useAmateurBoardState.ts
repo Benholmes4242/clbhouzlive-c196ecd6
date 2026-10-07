@@ -60,7 +60,6 @@ export function entryBoardFor(handicapIndex: number | null | undefined): BoardKe
   return handicapIndex != null && handicapIndex <= GROSS_BAND_MAX ? 'topar' : 'net';
 }
 
-
 /** SCORES LANDING SCOPE (amendment to §3). Tried in order; the first rung whose
  *  board returns at least CIRCLE_ROW_FLOOR rows wins. Everyone is terminal and
  *  never tested. Reorder here, nowhere else. */
