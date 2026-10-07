@@ -14,13 +14,25 @@ import { formatNumber, formatMonthDayYearShort } from '@/i18n/format';
 import { A, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection, { ABOUT_KICKER } from '../about/AboutSection';
 import { YouAction } from './youBits';
+import { FeatPill, FigureCell, roundFeats } from '@/features/explore-magazine/AchievementCallout';
+import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap';
 
 export interface YouRound {
   whsScoreId: string;
   playDate: string;
   gross: number | null;
   toPar: number | null;
+  /** The index held FOR THAT ROUND, never the current index. */
+  hcpAtTime: number | null;
+  deltaIndex: number | null;
+  frontNineToPar: number | null;
+  backNineToPar: number | null;
+  eagles: number | null;
+  albatrosses: number | null;
+  holes_in_one: number | null;
+  clean_card: boolean | null;
 }
+/* NET and VS HCP are deliberately absent: net is never derived here. */
 
 interface Props {
   rounds: YouRound[];
@@ -49,17 +61,27 @@ const YourRoundsHere: React.FC<Props> = ({ rounds, total, bestGross, onOpenRound
     >
       <div style={{ display: 'grid' }}>
         {shown.map((round) => {
-          const parts = toParParts(round.toPar, 0);
           const isBest = markBest && round.gross != null && round.gross === bestGross;
+          const parNode = (v: number | null) => {
+            const p = toParParts(v, 0);
+            return p ? <span style={{ ...FIGS, color: p.tone }}>{p.text}</span> : null;
+          };
+          const grossToPar = parNode(round.toPar);
+          const frontText = parNode(round.frontNineToPar) ?? '';
+          const backText = parNode(round.backNineToPar) ?? '';
+          const hcpPair = handicapPairDisplay({ handicapIndex: round.hcpAtTime, deltaIndex: round.deltaIndex });
+          const hcpDelta = hcpPair?.delta
+            ? <span style={{ ...FIGS, display: 'inline-flex', alignItems: 'center', gap: 2, color: hcpPair.delta.tone }}>
+                <span aria-hidden>{hcpPair.delta.arrow}</span><span>{hcpPair.delta.text}</span>
+              </span>
+            : null;
           return (
             <button
               key={round.whsScoreId}
               type="button"
               onClick={() => onOpenRound(round)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
+                display: 'block',
                 width: '100%',
                 textAlign: 'left',
                 background: 'transparent',
@@ -70,34 +92,23 @@ const YourRoundsHere: React.FC<Props> = ({ rounds, total, bestGross, onOpenRound
                 fontFamily: SANS,
               }}
             >
-              <span
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: A.INK,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {formatMonthDayYearShort(new Date(round.playDate))}
-              </span>
-              {isBest ? (
-                <span style={{ ...ABOUT_KICKER, color: A.AMBER_DEEP, flexShrink: 0 }}>
-                  {t('courseDetail.youTab.bestKicker')}
+              <span style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {formatMonthDayYearShort(new Date(round.playDate))}
                 </span>
-              ) : null}
-              <span
-                style={{ fontSize: 16, fontWeight: 700, color: A.INK, width: 34, textAlign: 'right', ...FIGS }}
-              >
-                {round.gross ?? '\u2014'}
+                {/* Never wraps: the date is what gives. Two pills = the two rarest. */}
+                <span style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  {isBest ? <span style={{ ...ABOUT_KICKER, color: A.AMBER_DEEP }}>{t('courseDetail.youTab.bestKicker')}</span> : null}
+                  {roundFeats(round, t).slice(0, 2).map((f) => <FeatPill key={f} label={f} />)}
+                </span>
               </span>
-              <span
-                style={{ fontSize: 13, fontWeight: 700, width: 30, textAlign: 'right', color: parts?.tone ?? A.MUTE, ...FIGS }}
-              >
-                {parts?.text ?? '\u2014'}
+              {/* FOUR COLUMNS, ALWAYS: a null is an empty cell. */}
+              <span style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', marginTop: 8 }}>
+                <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')}
+                  value={round.gross ?? ''} suffix={grossToPar} tone={isBest ? A.AMBER : undefined} />
+                <FigureCell minHeight={34} label={t('courseDetail.youTab.stat.front', 'FRONT')} value={frontText} />
+                <FigureCell minHeight={34} label={t('courseDetail.youTab.stat.back', 'BACK')} value={backText} />
+                <FigureCell minHeight={34} label={t('friendsRail.index', 'HCP')} value={hcpPair?.index ?? ''} suffix={hcpDelta} />
               </span>
             </button>
           );
