@@ -31,6 +31,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
 import { SearchFieldBox } from '@/features/search-v2/components/SearchField';
 import { resolveVenuePlace } from './venuePlace';
+import { RailChips } from '@/components/ui/RailChips';
 
 
 
@@ -529,50 +530,18 @@ export function LeaderboardTab() {
 
       </div>
 
-      {/* EVENT TABS — pill treatment, matching every other scope control. */}
+      {/* LIVE EVENTS — the canonical RailChips row, bounded at 190px because
+          event names run long; the full name is the page title above. No
+          `distribute`: the chip count changes week to week. */}
       {showTabs && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            overflowX: 'auto',
-            padding: '10px 16px 12px',
-            background: SURFACE,
-          }}
-        >
-          {liveTournaments.map((tt) => {
-            const active = tt.id === selected.id;
-            return (
-              <button
-                key={tt.id}
-                type="button"
-                onClick={() => onSelectEvent(tt.id)}
-                style={{
-                  flexShrink: 0,
-                  background: active ? A.INK : A.PANEL,
-                  border: active ? '1px solid transparent' : `1px solid ${A.BORDER}`,
-                  borderRadius: 999,
-                  padding: '6px 12px',
-                  cursor: 'pointer',
-                  fontFamily: F,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: active ? A.CANVAS : A.MUTE,
-                  // 2.9 — a pill never runs off screen. The full event name is
-                  // the page title directly above, so one line + ellipsis here.
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: 190,
-                }}
-                aria-pressed={active}
-                aria-label={tt.name}
-              >
-                {shortEventName(tt.name)}
-              </button>
-            );
-          })}
+        <div style={{ padding: '10px 16px 12px', background: SURFACE }}>
+          <RailChips
+            options={liveTournaments.map((tt) => ({ id: tt.id, label: shortEventName(tt.name) }))}
+            value={selected.id}
+            onChange={onSelectEvent}
+            ariaLabel={t('leaderboard.a11y.events', 'Live events')}
+            maxChipWidth={190}
+          />
         </div>
       )}
 
