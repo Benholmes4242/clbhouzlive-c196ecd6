@@ -40,8 +40,8 @@ import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
  *
  * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the lead board
  * (§3 Lowest gross) and nothing below it. Sections, in order: head, §3 Lowest
- * gross, §4 Most improved, §5 Feats this year, §6 Who leads what, §7 Top 100
- * GB&I — §4 onward are platform facts. Each section owns its read, holds its
+ * gross, §7 Top 100, §4 Most improved, §5 Feats this year, §6 Who leads
+ * what — §4 onward are platform facts. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
  */
 
@@ -872,6 +872,105 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
+      {/* §7 TOP 100 — get_career_leaderboard(TOP100_METRIC[list]). This section
+          is get_career_leaderboard's ONLY consumer; its other branches
+          (including 'crowns') stay in SQL, dormant.
+          NO THIN FLOOR ON A LIST THE MEMBER CHOSE: once a chip is tapped, any
+          row count is shown and zero rows reads one quiet line. Only the
+          DEFAULT list being empty (or failing) on load hides the section. */}
+      {top100Defaulted && top100.isPending ? (
+        pending(170)
+      ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
+        <Section
+          contest
+          eyebrow={t('amateur.leaderboards.theHundred', 'The hundred')}
+          title={t('amateur.leaderboards.top100', 'Top 100 courses')}
+        >
+          {/* §7 head is eyebrow + title only — meta (member count) and lede
+              (field average) were dropped; See all is the only count surface. */}
+          <div style={{ marginBottom: 12 }}>
+            <RailChips
+              align="center-when-fit"
+
+              ground="filled-selection"
+              options={TOP100_ORDER.map((slug) => ({ id: slug, label: RANK_SCOPE_LABEL[slug] }))}
+              value={top100List}
+              onChange={pickTop100}
+              ariaLabel={t('amateur.leaderboards.top100List', 'Top 100 list')}
+            />
+          </div>
+          {/* A chip tap starts a fresh slug query. While it loads, reserve the
+              strip (caption + 76px tile row) instead of holding the old list:
+              last list's photographs under the new list's caption is worse than
+              a brief empty rail. Deliberately NOT placeholderData. */}
+          {userId && listCourses.isPending ? (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ marginTop: 16 }}>
+                <span style={{ ...TILE_HEAD, color: A.DIM }}>
+                  {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
+                </span>
+              </div>
+              <div aria-hidden style={{ height: 76 }} />
+            </div>
+          ) : listCourses.isSuccess && listTiles.length > 0 ? (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ marginTop: 16 }}>
+                <span style={{ ...TILE_HEAD, color: A.DIM }}>
+                  {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
+                </span>
+              </div>
+              <Rail>
+                {listTiles.map((c) => (
+                  <button
+                    key={c.course_id}
+                    type="button"
+                    onClick={() => onOpenCourse(c.course_id)}
+                    aria-label={c.course_name}
+                    style={{
+                      width: 108, height: 76, borderRadius: 10, overflow: 'hidden', position: 'relative',
+                      flexShrink: 0, padding: 0, background: A.PANEL,
+                      border: c.thumbnail_image ? 'none' : `1px solid ${A.BORDER}`,
+                    }}
+                  >
+                    {c.thumbnail_image ? (
+                      <img src={c.thumbnail_image} alt="" loading="lazy" decoding="async"
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : null}
+                    <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.76))' }} />
+                    {c.rank != null ? (
+                      <span className="tabular-nums" style={{ position: 'absolute', left: 6, top: 5, fontSize: 9, fontWeight: 700, color: '#FFF', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
+                        {`#${c.rank}`}
+                      </span>
+                    ) : null}
+                    <span style={{
+                      position: 'absolute', left: 6, right: 6, bottom: 5, fontSize: 9, fontWeight: 700,
+                      letterSpacing: '0.04em', textTransform: 'uppercase', lineHeight: 1.15, color: '#FFF',
+                      textShadow: '0 1px 4px rgba(0,0,0,0.9)',
+                      display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden',
+                      textAlign: 'left',
+                    }}>
+                      {c.course_name}
+                    </span>
+                  </button>
+                ))}
+              </Rail>
+            </div>
+          ) : null}
+          {top100.isPending ? (
+            <div style={{ minHeight: 120 }} />
+          ) : top100Rows.length === 0 ? (
+            <p style={{ margin: 0, padding: '12px 0', fontFamily: SANS, fontSize: 13, color: A.MUTE }}>
+              {t('amateur.leaderboards.top100Empty', 'Nobody has played a course on this list yet.')}
+            </p>
+          ) : (
+            shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100', 'of 100'), openTop100Sheet)
+          )}
+          {top100Rows.length > SHORT_ROWS ? (
+            <SeeAll label={seeAllMembers()} onPress={() => setCareerSheet(true)} />
+          ) : null}
+        </Section>
+      )}
+
       {/* §4 MOST IMPROVED — cumulative this year, not a single round's cut. */}
       {improved.isPending ? (
         pending(200)
@@ -1038,105 +1137,6 @@ export function ScoresLeaderboardsPage({
           </Rail>
         </Section>
       ) : null}
-
-      {/* §7 TOP 100 — get_career_leaderboard(TOP100_METRIC[list]). This section
-          is get_career_leaderboard's ONLY consumer; its other branches
-          (including 'crowns') stay in SQL, dormant.
-          NO THIN FLOOR ON A LIST THE MEMBER CHOSE: once a chip is tapped, any
-          row count is shown and zero rows reads one quiet line. Only the
-          DEFAULT list being empty (or failing) on load hides the section. */}
-      {top100Defaulted && top100.isPending ? (
-        pending(170)
-      ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
-        <Section
-          contest
-          eyebrow={t('amateur.leaderboards.theHundred', 'The hundred')}
-          title={t('amateur.leaderboards.top100', 'Top 100 courses')}
-        >
-          {/* §7 head is eyebrow + title only — meta (member count) and lede
-              (field average) were dropped; See all is the only count surface. */}
-          <div style={{ marginBottom: 12 }}>
-            <RailChips
-              align="center-when-fit"
-
-              ground="filled-selection"
-              options={TOP100_ORDER.map((slug) => ({ id: slug, label: RANK_SCOPE_LABEL[slug] }))}
-              value={top100List}
-              onChange={pickTop100}
-              ariaLabel={t('amateur.leaderboards.top100List', 'Top 100 list')}
-            />
-          </div>
-          {/* A chip tap starts a fresh slug query. While it loads, reserve the
-              strip (caption + 76px tile row) instead of holding the old list:
-              last list's photographs under the new list's caption is worse than
-              a brief empty rail. Deliberately NOT placeholderData. */}
-          {userId && listCourses.isPending ? (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 16 }}>
-                <span style={{ ...TILE_HEAD, color: A.DIM }}>
-                  {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
-                </span>
-              </div>
-              <div aria-hidden style={{ height: 76 }} />
-            </div>
-          ) : listCourses.isSuccess && listTiles.length > 0 ? (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 16 }}>
-                <span style={{ ...TILE_HEAD, color: A.DIM }}>
-                  {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
-                </span>
-              </div>
-              <Rail>
-                {listTiles.map((c) => (
-                  <button
-                    key={c.course_id}
-                    type="button"
-                    onClick={() => onOpenCourse(c.course_id)}
-                    aria-label={c.course_name}
-                    style={{
-                      width: 108, height: 76, borderRadius: 10, overflow: 'hidden', position: 'relative',
-                      flexShrink: 0, padding: 0, background: A.PANEL,
-                      border: c.thumbnail_image ? 'none' : `1px solid ${A.BORDER}`,
-                    }}
-                  >
-                    {c.thumbnail_image ? (
-                      <img src={c.thumbnail_image} alt="" loading="lazy" decoding="async"
-                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : null}
-                    <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.76))' }} />
-                    {c.rank != null ? (
-                      <span className="tabular-nums" style={{ position: 'absolute', left: 6, top: 5, fontSize: 9, fontWeight: 700, color: '#FFF', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
-                        {`#${c.rank}`}
-                      </span>
-                    ) : null}
-                    <span style={{
-                      position: 'absolute', left: 6, right: 6, bottom: 5, fontSize: 9, fontWeight: 700,
-                      letterSpacing: '0.04em', textTransform: 'uppercase', lineHeight: 1.15, color: '#FFF',
-                      textShadow: '0 1px 4px rgba(0,0,0,0.9)',
-                      display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden',
-                      textAlign: 'left',
-                    }}>
-                      {c.course_name}
-                    </span>
-                  </button>
-                ))}
-              </Rail>
-            </div>
-          ) : null}
-          {top100.isPending ? (
-            <div style={{ minHeight: 120 }} />
-          ) : top100Rows.length === 0 ? (
-            <p style={{ margin: 0, padding: '12px 0', fontFamily: SANS, fontSize: 13, color: A.MUTE }}>
-              {t('amateur.leaderboards.top100Empty', 'Nobody has played a course on this list yet.')}
-            </p>
-          ) : (
-            shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100', 'of 100'), openTop100Sheet)
-          )}
-          {top100Rows.length > SHORT_ROWS ? (
-            <SeeAll label={seeAllMembers()} onPress={() => setCareerSheet(true)} />
-          ) : null}
-        </Section>
-      )}
 
       {seeAll ? (
         <BoardSeeAllSheet
