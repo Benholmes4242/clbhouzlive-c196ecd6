@@ -21,6 +21,7 @@ import type { TourStory } from '@/features/tourhub/news/useTourStories';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
+import { RailChips } from '@/components/ui/RailChips';
 
 /** A tour story, or an amateur story (which extends it with two extra fields). */
 export interface NewsStory extends TourStory {
@@ -225,6 +226,13 @@ export function WireItem({ story, onOpen }: StoryShapeProps) {
   );
 }
 
+/**
+ * "NOTHING SELECTED" IN A ROW THAT CANNOT HOLD NULL. RailChips takes
+ * `value: string`, so the clear chip's id is the empty string — a key no
+ * tournament or competition name can ever be.
+ */
+const NO_SELECTION = '';
+
 /** THE CHIP RAIL. One scrolling row, never wrapping, no right-hand action. */
 export function StoryChipRail({ heading, id, chips, selected, onSelect, sentenceHeading, allLabel, ariaLabel }: {
   heading: string;
@@ -238,36 +246,35 @@ export function StoryChipRail({ heading, id, chips, selected, onSelect, sentence
    * omission rather than by edit. Discover's NEWS tab passes it.
    */
   sentenceHeading?: boolean;
-  /** Opt-in leading chip that clears the selection. Omitted, the rail is
-      exactly as it was — Tour Hub's Wire passes nothing. */
+  /**
+   * Opt-in leading chip that clears the selection. RailChips takes
+   * `value: string`, never null, so this chip is the ONLY way the rail can
+   * produce null: tap-again-to-clear is gone, because a clear that lives in a
+   * gesture is one most members never find. Every caller passes it.
+   */
   allLabel?: string;
-  /** Optional accessible name for the chip row. */
+  /** Optional accessible name for the chip row; the heading names it by default. */
   ariaLabel?: string;
 }) {
-  const chipStyle = (on: boolean): React.CSSProperties => ({ flex: 'none', height: 'auto', padding: '9px 14px', borderRadius: r.sm, border: `1px solid ${on ? A.INK : A.BORDER}`, background: A.PANEL, color: A.INK, fontFamily: SANS, fontSize: 12.5, fontWeight: 700, letterSpacing: 0 });
+  /* THE CANONICAL CHIP (RailChips), not a local look-alike: one geometry, one
+     selected ground (6% white + bright edge), and the count as the chip's own
+     trailing value. Before this, every chip was A.PANEL/A.INK chosen or not
+     and only its 1px border differed, so the row never showed its answer. */
+  const options = [
+    ...(allLabel === undefined ? [] : [{ id: NO_SELECTION, label: allLabel }]),
+    ...chips.map((chip) => ({ id: chip.key, label: chip.label, value: chip.count })),
+  ];
   return (
     <section aria-labelledby={id} style={{ marginTop: 24 }}>
       {sentenceHeading
         ? <DiscoverSectionHeading id={id} title={heading} />
         : <h2 id={id} style={{ ...KICKER, margin: '0 0 10px', color: A.INK }}>{heading}</h2>}
-      <div className="scrollbar-hide" style={{ display: 'flex', gap: 8, overflowX: 'auto', flexWrap: 'nowrap', willChange: 'transform', paddingBottom: 1 }} role={ariaLabel ? 'group' : undefined} aria-label={ariaLabel}>
-        {allLabel !== undefined && (
-          <Button variant="outline" aria-pressed={selected === null} onClick={() => onSelect(null)} style={chipStyle(selected === null)}>
-            {allLabel}
-          </Button>
-        )}
-        {chips.map((chip) => (
-          <Button
-            key={chip.key}
-            variant="outline"
-            aria-pressed={selected === chip.key}
-            onClick={() => onSelect(selected === chip.key ? null : chip.key)}
-            style={chipStyle(selected === chip.key)}
-          >
-            {chip.label}<span className="tabular-nums" style={{ marginLeft: 7, fontSize: 11, color: A.DIM }}>{chip.count}</span>
-          </Button>
-        ))}
-      </div>
+      <RailChips
+        options={options}
+        value={selected ?? NO_SELECTION}
+        onChange={(next) => onSelect(next === NO_SELECTION ? null : next)}
+        ariaLabel={ariaLabel ?? heading}
+      />
     </section>
   );
 }
