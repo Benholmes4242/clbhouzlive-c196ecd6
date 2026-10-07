@@ -24,9 +24,12 @@ import { useCircleSize } from './useCircleSize';
 /**
  * THE EXPLORE LEADERBOARD'S STATE (BRIEF_EXPLORE_LEADERBOARD_STATES).
  *
- * §1 THE ENTRY STATE IS FIXED: MOST RECENT / YOUR CIRCLE / 14 DAYS / ALL
- * COURSES, every entry. No rotation, no handicap default, no remembered
- * selection. This state is page-local, so leaving and returning resets it.
+ * §1 THE ENTRY STATE IS RESOLVED, NOT FIXED. Board: entryBoardFor (the
+ * viewer's handicap — 5.0 or below opens on gross, everyone else on net).
+ * Scope: the LANDING_SCOPES ladder (circle, then club, then everyone).
+ * Window and courses: ENTRY_FILTERS (14 days, all courses). No rotation and no
+ * remembered selection; this state is page-local, so leaving and returning
+ * resets it.
  *
  * §2 THERE IS ALWAYS A LIST OF SCORES, and any pool wider than the member's
  * circle is DECLARED — the chips, the count line and a stated sentence all move
