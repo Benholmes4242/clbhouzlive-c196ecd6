@@ -396,8 +396,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
           hlsUrl: m.mediaType === 'video' ? m.mediaUrl : undefined,
           imageUrl: m.mediaType === 'image' ? m.mediaUrl : undefined,
           thumbnailUrl: m.posterUrl,
-          width: 0,
-          height: 0,
+          width: m.width ?? 0,
+          height: m.height ?? 0,
         }],
         createdAt: '',
         // ⚠️ HARDCODED 0/false engagement fields.
