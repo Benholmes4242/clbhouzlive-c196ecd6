@@ -257,6 +257,14 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
 
   // D / E — PLAYED. Every section renders; 3.3 and 3.4 carry their sentences
   // under their thresholds. There is no separate screen for a rich history.
+  const openRound = (round: YouRound) => {
+    analyticsEvents.track('course_you_round_opened', {
+      course_id: courseId,
+      whs_score_id: round.whsScoreId,
+    });
+    setOpenRoundId(round.whsScoreId);
+  };
+
   return wrap(
     <div>
       <YourRecordHere
@@ -270,13 +278,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         rounds={rounds}
         total={roundTotal}
         bestGross={bestGross}
-        onOpenRound={(round) => {
-          analyticsEvents.track('course_you_round_opened', {
-            course_id: courseId,
-            whs_score_id: round.whsScoreId,
-          });
-          setOpenRoundId(round.whsScoreId);
-        }}
+        onOpenRound={openRound}
         onSeeAll={() => {
           analyticsEvents.track('course_you_all_rounds', { course_id: courseId, rounds: roundTotal });
           navigate(`/courses/${courseId}?tab=you&sheet=rounds`);
@@ -284,6 +286,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
       />
 
       <WhereYourShotsGo
+        courseId={courseId}
         rounds={roundTotal}
         mine={mine}
         field={fieldHoles}
@@ -292,7 +295,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           navigate(`/courses/${courseId}?tab=you&sheet=your-holes`);
         }}
       />
-      <YourFormHere rounds={rounds} total={roundTotal} />
+      <YourFormHere rounds={rounds} total={roundTotal} courseId={courseId} onOpenRound={openRound} />
 
       {/* §3.5 — ONCE. It used to render inside the shots block and again as its
           own card. */}

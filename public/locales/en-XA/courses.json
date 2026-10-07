@@ -920,7 +920,12 @@
         "thin_one": "[~~{{rounds}} řőúñđ íš ñőţ éñőúĝĥ ţő šĥőŵ á ţřéñđ. Íţ ñééđš áƀőúţ ţéñ.~~]",
         "thin_other": "[~~{{rounds}} řőúñđš íš ñőţ éñőúĝĥ ţő šĥőŵ á ţřéñđ. Íţ ñééđš áƀőúţ ţéñ.~~]",
         "worse": "[~~{{delta}} ŵőřšé ţĥáñ ýőúř ţéñ ƀéƒőřé~~]",
-        "worst": "[~~Ŵőřšţ {{score}}~~]"
+        "worst": "[~~Ŵőřšţ {{score}}~~]",
+        "pointLabel": "{{date}}, {{score}}",
+        "gross": "Gross",
+        "toPar": "To par",
+        "vsAverage": "Vs your avg",
+        "openScorecard": "Open scorecard"
       },
       "grabs": {
         "allBoards": "[~~Áļļ ƀőářđš~~]",
@@ -972,8 +977,15 @@
         "one": "[~~Őñé řőúñđ íš á šĉőřéĉářđ, ñőţ á ƥáţţéřñ. Ƥļáý ĥéřé á ƒéŵ ɱőřé ţíɱéš áñđ ýőúř ĥőļé-ƀý-ĥőļé řéĉőřđ áƥƥéářš.~~]",
         "thin_one": "[~~{{rounds}} řőúñđ íš ñőţ éñőúĝĥ ţő šĥőŵ ŵĥíĉĥ ĥőļéš ĉőšţ ýőú. Íţ ñééđš áƀőúţ ƒíṽé.~~]",
         "thin_other": "[~~{{rounds}} řőúñđš íš ñőţ éñőúĝĥ ţő šĥőŵ ŵĥíĉĥ ĥőļéš ĉőšţ ýőú. Íţ ñééđš áƀőúţ ƒíṽé.~~]",
-        "worstHole": "[~~Ŵőřšţ ĥőļé~~]",
-        "youLose": "[~~Ýőú ļőšé~~]"
+        "worstHole": "Hardest hole",
+        "youLose": "[~~Ýőú ļőšé~~]",
+        "barLabel": "Hole {{hole}}, {{value}} to par",
+        "holeN": "Hole {{n}}",
+        "parSi": "par {{par}} · SI {{si}}",
+        "parOnly": "par {{par}}",
+        "yourBest": "Your best",
+        "birdies": "Birdies",
+        "yourHardest": "Your hardest hole"
       },
       "signedOut": {
         "body": "[~~Šíĝñ íñ ţő ţřáĉǩ ýőúř řőúñđš, řáţíñĝš áñđ ĥőļé-ƀý-ĥőļé šĉőříñĝ áţ {{courseName}}.~~]",
@@ -981,7 +993,8 @@
         "title": "[~~Ýőúř řéĉőřđ áţ ţĥíš ĉőúřšé~~]"
       },
       "yourAverage": "[~~Ýőúř áṽéřáĝé~~]",
-      "yourRound": "[~~Ýőúř řőúñđ~~]"
+      "yourRound": "[~~Ýőúř řőúñđ~~]",
+      "clear": "Clear"
     },
     "yourHolesSheet": {
       "birdie": "[~~Ɓířđíé+~~]",
