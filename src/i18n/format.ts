@@ -1,4 +1,3 @@
-/// <reference lib="es2021.intl" />
 /**
  * Intl-based formatting wrappers.
  *
