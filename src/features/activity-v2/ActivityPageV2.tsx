@@ -26,7 +26,7 @@ import { FIGURE } from '@/lib/tokens/type';
 import { LedgerRow } from './components/LedgerRow';
 import { ActivityActionsSheet } from './components/ActivityActionsSheet';
 import { ActivityRowsSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
-import { railChipStyle } from '@/components/ui/RailChips';
+import { railChipStyle, RAIL_CHIP_GAP } from '@/components/ui/RailChips';
 // BRIEF_SUGGESTED_GOLFERS S3.1 / S3.2 - reason-led suggestions inside the feed.
 import { SuggestedGolfersBlock } from '@/features/social-suggestions/SuggestedGolfersBlock';
 import { NobodySawThatRound } from '@/features/social-suggestions/NobodySawThatRound';
@@ -391,7 +391,7 @@ export const ActivityPageV2: React.FC = () => {
   }, [feed.hasNextPage, feed.isFetchingNextPage, feed.fetchNextPage]);
 
   const chips = (
-    <div className="px-4 flex gap-2 overflow-x-auto scrollbar-none" style={{ paddingTop: 10, paddingBottom: 12 }}>
+    <div className="px-4 flex overflow-x-auto scrollbar-none" style={{ gap: RAIL_CHIP_GAP, paddingTop: 10, paddingBottom: 12 }}>
       {CHIPS.map((c) => (
         <ChipButton
           key={c.key}
