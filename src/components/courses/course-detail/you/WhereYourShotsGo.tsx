@@ -25,7 +25,7 @@ import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { A, BAR_RADIUS, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { courseBucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
-import AboutSection, { ABOUT_KICKER } from '../about/AboutSection';
+import AboutSection, { ABOUT_KICKER, AboutHairline } from '../about/AboutSection';
 import { CompactHoleRow } from '../about/AllHolesSheet';
 import { CourseDistributionSummary } from '../about/HowItPlays';
 import CenteredStatStrip from '../about/CenteredStatStrip';

@@ -16,7 +16,7 @@ import { formatNumber } from '@/i18n/format';
 import { A, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection, { ABOUT_KICKER, aboutFig } from '../about/AboutSection';
 import CenteredStatStrip from '../about/CenteredStatStrip';
-import { YouFigure, YouLinkRow, YouSentence } from './youBits';
+import { YouLinkRow, YouSentence } from './youBits';
 import type { YouRound } from './YourRoundsHere';
 
 /** §3.4 — the trend threshold. */
