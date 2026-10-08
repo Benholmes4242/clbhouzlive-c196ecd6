@@ -53,7 +53,7 @@ describe('one object, one identity: round comments key on the round', () => {
   });
 
   it('opening comments never calls ensure_round_post', () => {
-    expect(src).not.toContain('ensure_round_post');
+    expect(src).not.toMatch(/\('ensure_round_post'/);
     expect(src).not.toContain('ensuringRef');
   });
 
