@@ -38,6 +38,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { isRoundPost } from '@/lib/posts/isRoundPost';
 import { InlineVideo } from './InlineVideo';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
@@ -505,8 +506,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
      unchanged: toggle_post_like routes a round post's reaction to
      content_reactions('round', whs_score_id) server-side, for every actor. */
 
-  const isRoundPost = !!postRound || !!postRoundPending;
-  if (isRoundPost) {
+  // Classification is post_type (isRoundPost); round data is only the
+  // resolution check. A post carrying a score id without the round type is an
+  // ordinary post and falls through.
+  const rendersRoundCard = isRoundPost(post) && (!!postRound || !!postRoundPending);
+  if (rendersRoundCard) {
     const item = roundPostItem(post, postRound ?? null, currentUserId);
     return (
       <article
