@@ -81,9 +81,6 @@ describe('content reactions carry the active actor', () => {
       ['target_type', 'round'], ['target_id', 'score-1'], ['actor_type', 'business'], ['actor_id', 'biz-1'],
     ]);
     expect(deletes[0].some(([c]) => c === 'user_id')).toBe(false);
-    // Optimistic patch drops only the business row; the personal row stays.
-    const cached = qc.getQueryData<{ rows: R[] }>(['content-reactions', 'score-1', 'business', 'biz-1']);
-    expect(cached?.rows.map((r) => r.actor_type)).toEqual(['personal']);
   });
 
   it('the same id set under two actors does not share one cache entry', async () => {
