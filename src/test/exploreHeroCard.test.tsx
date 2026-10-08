@@ -262,7 +262,7 @@ describe('Explore card shapes', () => {
     const topLine = container.querySelector<HTMLElement>('[data-review-top-line="true"]');
     const bottom = container.querySelector<HTMLElement>('[data-explore-hero-bottom-lane="true"]');
 
-    expect(onPhoto?.style.minHeight).toBe('408px');
+    expect(onPhoto?.style.minHeight).toBe('252px');
     expect(onPhoto?.style.flexDirection).toBe('column');
     /* C5 §3.2 — identity moves to the TOP of the frame and lives inside the
        unchanged 48px lane; §4.3 removed the quote. */
@@ -309,7 +309,7 @@ describe('Explore card shapes', () => {
       <ExploreCard item={longReview()} size="lead" shape={null} onTap={() => undefined} />,
     );
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
-    expect(onPhoto?.style.minHeight).toBe('408px');
+    expect(onPhoto?.style.minHeight).toBe('252px');
     expect(onPhoto?.style.height).toBe('');
     expect(container.querySelector('[data-explore-headline="true"]')).toBeNull();
   });
