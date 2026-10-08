@@ -253,9 +253,10 @@ function chipsFor(
 ) {
   const out: React.ReactNode[] = [];
   const { facts, kind } = item;
-  /* C5 §4.1/§4.2 — THE LEAD REVIEW CARRIES NEITHER CHIP any more: the score is
-     the 40px figure in the foot, and the photo count is gone. Reviews at std and
-     pair are untouched, so the gate is the SIZE, not the kind. */
+  /* C5 §4.1/§4.2 — the lead review was to carry neither chip, its score being
+     the 40px figure in its foot. No review reaches 'lead' (see line 910), so in
+     practice EVERY review in the feed takes both chips here: the score and, past
+     one photo, the count. This gate is now the only thing drawing them. */
   const leadReviewChips = kind === 'review' && size === 'lead';
 
   if (kind === 'round' && facts.gross != null && size === 'pair') {
@@ -907,6 +908,12 @@ export function ExploreCard({
     </div>
   );
 
+  /* UNREACHABLE AS AT 2026-10-08. fullWidthCardSize() in ExploreMagazine.tsx
+     returns 'lead' only for a non-review, so every review renders at 'std' and
+     this flag is always false. The composition below is kept for one reason:
+     it is scheduled for deletion in its own pass. DO NOT PUT NEW BEHAVIOUR
+     BEHIND THIS FLAG. It has already swallowed the member's review media once
+     (see line 1070) and the quote suppression at line 1383. */
   const leadReview = size === 'lead' && item.kind === 'review';
   /* §3 A STORY CLAMPS AT FOUR, like the tour hero. Every other branch is
      untouched: the review stays at 2, other leads at 3. */
@@ -1067,7 +1074,11 @@ export function ExploreCard({
   /* C5 §1 — THE MEMBER'S OWN MEDIA IS THE GROUND, the course thumbnail the
      fallback. The order (video with a poster, then image, then course photo) is
      resolved ONCE in useReviewPageEnrichment; this card takes one answer. */
-  const reviewMedia = leadReview ? item.facts.reviewMedia ?? null : null;
+  /* The member's own media, at every size. This was gated on `leadReview` and
+     `leadReview` is never true, so every review in the feed fell back to the
+     course image at line 1280 and no review video ever mounted. The gate is the
+     KIND, not the size. */
+  const reviewMedia = item.kind === 'review' ? item.facts.reviewMedia ?? null : null;
   const reviewGround = reviewMedia
     ? (reviewMedia.kind === 'video' ? reviewMedia.posterUrl : reviewMedia.url)
     : null;
