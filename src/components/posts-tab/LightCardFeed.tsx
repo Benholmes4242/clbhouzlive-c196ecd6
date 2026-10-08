@@ -19,6 +19,7 @@
  *
  * Clubhouse `CardFeed`/`FeedCard` are untouched.
  */
+import { dropUnresolvedRounds } from '@/components/feed/dropUnresolvedRounds';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 import { Virtuoso } from 'react-virtuoso';
@@ -106,7 +107,7 @@ export interface LightCardFeedProps {
 }
 
 export const LightCardFeed: React.FC<LightCardFeedProps> = ({
-  posts,
+  posts: incomingPosts,
   onLike,
   onComment,
   onShare,
@@ -132,6 +133,12 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   roundShapeMap,
   roundMedalMap,
 }) => {
+  /* A round post renders the round card or nothing — see dropUnresolvedRounds.
+     Dropped before indices are assigned, so feedIndex stays contiguous. */
+  const posts = useMemo(
+    () => dropUnresolvedRounds(incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled),
+    [incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled],
+  );
   // ── Active-card tracking (ported from CardFeed) ──
   /**
    * ONE comments_v2 read per loaded page for the inline comment preview — the

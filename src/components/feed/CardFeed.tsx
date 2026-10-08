@@ -18,6 +18,7 @@
  *    WebView's `<video>` budget.
  *  - Persisted multi-media carousel position via `clubhouseStore`.
  */
+import { dropUnresolvedRounds } from './dropUnresolvedRounds';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Virtuoso, type VirtuosoHandle, type StateSnapshot } from 'react-virtuoso';
 import type { CommentOpenSource } from '@/types/commentOpenSource';
@@ -223,8 +224,8 @@ const PTR_THRESHOLD = 64;
 const PTR_MAX_PULL = 96;
 
 export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardFeed({
-  posts = [],
-  feedItems,
+  posts: incomingPosts = [],
+  feedItems: incomingFeedItems,
   onLike,
   onComment,
   onShare,
@@ -256,6 +257,26 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   roundShapeMap,
   roundMedalMap,
 }, ref) {
+
+  /* A round post renders the round card or nothing — see dropUnresolvedRounds.
+     Dropped before any index is assigned; feedItems' postIndex is remapped so
+     neighbours of a dropped card read contiguous indices (borderTop intact). */
+  const posts = useMemo(
+    () => dropUnresolvedRounds(incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled),
+    [incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled],
+  );
+  const feedItems = useMemo<ClubhouseFeedItem[] | undefined>(() => {
+    if (!incomingFeedItems || posts === incomingPosts) return incomingFeedItems;
+    const indexOf = new Map(posts.map((p, i) => [p.id, i]));
+    const out: ClubhouseFeedItem[] = [];
+    for (const it of incomingFeedItems) {
+      if (it.kind !== 'post') { out.push(it); continue; }
+      const i = indexOf.get(it.post.id);
+      if (i === undefined) continue;
+      out.push({ ...it, postIndex: i });
+    }
+    return out;
+  }, [incomingFeedItems, posts, incomingPosts]);
 
   const items = useMemo<ClubhouseFeedItem[]>(
     () => feedItems ?? posts.map((post, postIndex) => ({ kind: 'post', key: `post:${post.id}`, post, postIndex })),
