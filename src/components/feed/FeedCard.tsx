@@ -84,7 +84,7 @@ const CARD = SLAB;
 const T100 = '#F8FAFC';
 const T60 = 'rgba(248,250,252,0.65)';
 const T40 = 'rgba(248,250,252,0.45)';
-const LINE = 'rgba(255,255,255,0.08)';
+export const LINE = 'rgba(255,255,255,0.08)';
 const GREEN = '#22C55E';
 
 /** Shared inset and spacing for the unified footer. */

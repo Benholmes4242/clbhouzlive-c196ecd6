@@ -604,6 +604,7 @@ const ClubhouseContent = () => {
               onSnapshot={(s) => { virtuosoSnapshots.current[FEED_TAB] = s; }}
               posts={posts}
                feedItems={feedItems}
+              homeRails
               courseContextMap={courseContextMap}
               resolveCourseId={resolvePostCourseId}
               postScoreIdMap={postScoreIdMap}

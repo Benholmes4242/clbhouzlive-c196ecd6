@@ -52,6 +52,8 @@ import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { WireFeedSlide } from '@/features/tourhub/news/WireFeedSlide';
 import type { ClubhouseFeedItem } from './injectWireStories';
 import { CANVAS, SLAB } from './feedSurfaces';
+import { HomeRail } from './HomeRail';
+import { homeRailAfter } from './homeRailCadence';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { track as trackImpression } from '@/lib/impressions/impressionTracker';
 
@@ -218,6 +220,8 @@ export interface CardFeedProps {
   /** Page-level consequence sources (Clubhouse); null until all have fetched. */
   consequenceSources?: ConsequenceSources | null;
   roundCourseMeta?: RoundCourseMeta | null;
+  /** Home only: interleave the Phase 3 rails (homeRailCadence). */
+  homeRails?: boolean;
 }
 
 export interface CardFeedHandle {
@@ -263,6 +267,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   roundMedalMap,
   consequenceSources = null,
   roundCourseMeta = null,
+  homeRails = false,
 }, ref) {
 
   /* A round post renders the round card or nothing — see dropUnresolvedRounds.
@@ -930,6 +935,12 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           {/* Inter-slab gap — the dark canvas showing through, never a painted strip */}
           <div aria-hidden style={{ height: 8, background: 'transparent' }} />
         </div>
+        {/* Rails sit OUTSIDE the indexed card element: they never consume a
+            feedIndex, and keyed on postIndex they stay put across pages. */}
+        {homeRails && (() => {
+          const rail = homeRailAfter(index);
+          return rail ? <HomeRail kind={rail} viewerId={currentUserId} pos={index + 1} /> : null;
+        })()}
         </>
       );
 
@@ -961,6 +972,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       roundMedalMap,
       consequenceSources,
       roundCourseMeta,
+      homeRails,
       commentPreview.map,
       dividerIndex,
 
