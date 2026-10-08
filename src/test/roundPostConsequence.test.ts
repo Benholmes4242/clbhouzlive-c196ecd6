@@ -1,15 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { roundPostItem } from '@/components/feed/roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
+import type { StandingRow } from '@/features/explore-magazine/useViewerStanding';
 
 const VIEWER = 'viewer';
 const post = (userId: string, courseId = 'c1') =>
   ({ id: `p-${userId}`, userId, courseId, postType: 'round' } as never);
 const round = (gross: number) =>
   ({ whsScoreId: 's1', grossScore: gross, coursePar: 72, holeShape: null, totalHoles: 18, playDate: '2026-10-01' } as never);
-const stand = (rank_now: number, field_now: number, delta: number | null) => ({
+const stand = (rank_now: number, field_now: number, delta: number | null): StandingRow => ({
   course_id: 'c1', course_name: null, region: null, sub_country: null, image_url: null,
-  rank_now, field_now, rank_then: null, delta, last_change_at: null,
+  rank_now, field_now, rank_then: null, delta, last_change_at: null, board: "topar",
 });
 const sources = (over: Partial<ConsequenceSources> = {}): ConsequenceSources => ({
   standing: new Map([['c1', stand(5, 42, 2)]]),
