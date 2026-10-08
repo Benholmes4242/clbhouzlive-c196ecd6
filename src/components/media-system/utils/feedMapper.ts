@@ -2,13 +2,15 @@ import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, FeedPostTag } from '../types/media';
 import { isPortraitAdmissible } from './mediaOrientation';
 
-// Matches ANY 32-hex substring in a URL. Cloudflare Stream UIDs are
-// 32-hex, but so are plenty of storage object IDs / UUIDs-without-dashes
-// on image URLs. NEVER consult this for image rows — see the type-gated
-// branch in mapRowToFeedPost below. Consulting it for images will assign
-// a bogus HLS manifest to a photo and downstream consumers (FeedCard etc.)
-// may treat manifest presence as a video signal.
-const UID_RE = /([0-9a-f]{32})/i;
+// LEGACY FALLBACK ONLY. The feed RPCs project post_media.stream_id, which is
+// the primary source of a Cloudflare Stream uid. This pattern exists only for
+// legacy video rows whose stream_id is null. It is consulted for VIDEO rows
+// only (enforced in mapRowToFeedPost), accepts a 32-hex uid only when it is
+// the WHOLE value after a `stream:` prefix or a whole path segment — never an
+// arbitrary 32-hex substring, since storage object ids / dash-stripped UUIDs
+// are also 32-hex — and emits a console.warn every time it fires so a broken
+// projection is loud instead of silently covered.
+const UID_RE = /^(?:stream:)?([0-9a-f]{32})$/i;
 
 function buildHlsUrl(streamId: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/manifest/video.m3u8`;
@@ -19,9 +21,17 @@ function buildThumbnailUrl(streamId: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg?time=0s&height=1080`;
 }
 
-function extractStreamId(mediaUrl: string): string | null {
+export function extractStreamId(mediaUrl: string): string | null {
   if (!mediaUrl) return null;
-  return mediaUrl.match(UID_RE)?.[1] ?? null;
+  const whole = mediaUrl.trim().match(UID_RE);
+  if (whole) return whole[1];
+  // Whole path segment of a URL (e.g. https://host/<uid>/manifest/video.m3u8).
+  let path = mediaUrl;
+  try { path = new URL(mediaUrl).pathname; } catch { /* not a URL */ }
+  for (const seg of path.split('/')) {
+    if (/^[0-9a-f]{32}$/i.test(seg)) return seg;
+  }
+  return null;
 }
 
 /**
@@ -29,7 +39,16 @@ function extractStreamId(mediaUrl: string): string | null {
  * This is the ONLY place where DB column names are referenced.
  */
 export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
-  const streamId = row.stream_id || extractStreamId(row.media_url || '');
+  let streamId: string | null = row.stream_id || null;
+  if (!streamId && row.media_type === 'video') {
+    streamId = extractStreamId(row.media_url || '');
+    if (streamId) {
+      console.warn('[feedMapper] stream_id missing from RPC, recovered from media_url', {
+        postId: row.post_id,
+        mediaId: row.media_id,
+      });
+    }
+  }
   const isReview = !!row.source_review_id;
   const isBusiness = row.post_actor_type === 'business';
   const isVideo = row.media_type === 'video';
