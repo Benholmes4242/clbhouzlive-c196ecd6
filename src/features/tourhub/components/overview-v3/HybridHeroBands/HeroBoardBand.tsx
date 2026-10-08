@@ -336,7 +336,7 @@ export function HeroBoardSection({
       ) : null}
 
       {hasUpcomingFacts ? (
-        <div data-overview-facts style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px', padding: '13px 24px', lineHeight: 1.3 }}>
+        <div data-overview-facts style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px', padding: '13px 20px', lineHeight: 1.3 }}>
           {upcomingFacts.map((fact, index) => (
             <span key={fact.label} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, whiteSpace: 'nowrap' }}>
               <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{fact.label}</span>
@@ -389,6 +389,11 @@ export function HeroBoardSection({
   );
 }
 
+/** The model's stated reason for a pick: editorial quote first, else its first reason. */
+export function pickReason(p: Pick<AITopContender, 'pulledQuote' | 'reasons'>): string | null {
+  return p.pulledQuote?.trim() || p.reasons?.[0]?.trim() || null;
+}
+
 /**
  * §3 — THE PICKS BLOCK. Amber OUR PICKS header, optional event-level editorial
  * line, a FIXED grid of up to three cards (never padded, never scrolling) and
@@ -422,22 +427,33 @@ function PicksBlock({
   const { t } = useTranslation('tourhub');
   const cards = picks.slice(0, 3);
   const hasConfidence = predictions?.isAIPowered;
+  const anyReason = cards.some((p) => pickReason(p) != null);
 
   return (
     <div data-overview-picks style={{ background: PAGE_CANVAS }}>
-      <div style={{ padding: '14px 24px 9px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
+      <div style={{ padding: '14px 20px 9px', display: 'flex', alignItems: 'center', gap: 8, borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
+        {/* THE CONFIDENCE LINE IS A HEADER CHIP, not a stray row under the grid. */}
+        {hasConfidence ? (
+          <span data-overview-picks-confidence style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: WHITE_ALPHA_65, border: `1px solid ${WHITE_ALPHA_08}`, borderRadius: 999, padding: '3px 8px', whiteSpace: 'nowrap' }}>
+            {t('overview.onTheCourse.ourPicksProvenance', {
+              confidence: Math.round((predictions?.confidence ?? 0) * 100),
+            })}
+            {predictions?.isStale ? ` · ${t('overview.onTheCourse.ourPicksStale')}` : ''}
+          </span>
+        ) : null}
       </div>
 
       {predictions?.editorialFraming ? (
-        <div style={{ padding: '0 24px 10px', fontSize: 11, fontWeight: 500, lineHeight: 1.35, color: WHITE_ALPHA_65 }}>
+        <div style={{ padding: '0 20px 10px', fontSize: 11, fontWeight: 500, lineHeight: 1.35, color: WHITE_ALPHA_65 }}>
           {predictions.editorialFraming}
         </div>
       ) : null}
 
-      <div style={{ padding: '0 20px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+      <div style={{ padding: '0 16px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
         {cards.map((p, i) => {
+          const reason = pickReason(p);
           const line = boardByPlayer.get(String(p.playerId));
           const settledRaw = phase === 'completed' ? settledFigureFor(line) : null;
           /* THE CHAMPION WEARS THE WIN, WHATEVER THE BOARD SAYS. A playoff
@@ -499,19 +515,19 @@ function PicksBlock({
               <div style={{ marginTop: 5, fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, ...FIGS }}>
                 {figureLine}
               </div>
+              {/* SYMMETRY: when any pick has a reason, every card reserves two
+                  lines so the figures stay on one baseline across the row.
+                  WHY + card tap are withheld: no picks destination exists yet. */}
+              {anyReason ? (
+                <div data-overview-pick-reason style={{ marginTop: 6, minHeight: 26, fontSize: 10, lineHeight: 1.3, color: WHITE_ALPHA_65, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  {reason ?? ''}
+                </div>
+              ) : null}
             </div>
           );
         })}
       </div>
 
-      {hasConfidence && (
-        <div style={{ padding: '0 24px 14px', fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>
-          {t('overview.onTheCourse.ourPicksProvenance', {
-            confidence: Math.round((predictions.confidence ?? 0) * 100),
-          })}
-          {predictions.isStale ? ` · ${t('overview.onTheCourse.ourPicksStale')}` : ''}
-        </div>
-      )}
     </div>
   );
 }
