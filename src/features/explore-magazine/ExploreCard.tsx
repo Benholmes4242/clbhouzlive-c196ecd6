@@ -38,6 +38,7 @@ import { NUMF } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { ReviewBreakdown } from './useReviewPageEnrichment';
 import { useFitOneLine } from './useFitOneLine';
+import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 
 
 /**
@@ -526,6 +527,9 @@ function WhoLine({
   ) : null;
 
   if (roundIdentity && !pair) {
+    const ownRoundPostId = item.kind === 'round' && item.who?.is_viewer === true
+      ? (item.facts.post_id ?? null)
+      : null;
     const hasFigures = roundIdentity.net != null && roundIdentity.par != null;
     const under = hasFigures && roundIdentity.net! < roundIdentity.par!;
     const mGold = roundIdentity.medalsGold ?? 0;
@@ -563,6 +567,16 @@ function WhoLine({
           </span>
           {/* Actions opposite the person; each control keeps its own 44x44 hit area. */}
           {reactions ? <span style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 14 }}>{reactions}</span> : null}
+          {/* OWNER AFFORDANCE — one card, both surfaces (Home and Explore).
+              Gated on the same isOwnRound test the card uses for its tint
+              (kind 'round' + who.is_viewer). Rounds only, keyed on
+              facts.post_id: a round with no wrapping post has nothing to
+              remove, so it offers nothing. */}
+          {ownRoundPostId ? (
+            <span style={{ flex: '0 0 auto' }} onClick={(e) => e.stopPropagation()}>
+              <PostOwnerMenu postId={ownRoundPostId} isOwnPost actorType="personal" variant="inline" />
+            </span>
+          ) : null}
         </div>
         {namesLineShows ? (
           <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 6 }}>
