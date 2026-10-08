@@ -2797,22 +2797,16 @@ export type Database = {
       }
       comment_likes_v2: {
         Row: {
-          actor_id: string
-          actor_type: string
           comment_id: string
           created_at: string
           user_id: string
         }
         Insert: {
-          actor_id: string
-          actor_type?: string
           comment_id: string
           created_at?: string
           user_id: string
         }
         Update: {
-          actor_id?: string
-          actor_type?: string
           comment_id?: string
           created_at?: string
           user_id?: string
@@ -24943,14 +24937,7 @@ export type Database = {
         Args: { p_friend_id: string; p_new_status: string; p_user_id: string }
         Returns: undefined
       }
-      toggle_comment_like_v2: {
-        Args: {
-          p_actor_id?: string
-          p_actor_type?: string
-          p_comment_id: string
-        }
-        Returns: Json
-      }
+      toggle_comment_like_v2: { Args: { p_comment_id: string }; Returns: Json }
       toggle_feat_reaction: {
         Args: { p_event_key: string }
         Returns: {
