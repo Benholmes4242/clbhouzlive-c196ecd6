@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { dropUnresolvedRounds } from './dropUnresolvedRounds';
+import { dropUnresolvedRounds } from '@/components/feed/dropUnresolvedRounds';
 
 const p = (id: string, postType?: string) => ({ id, postType } as never);
 const round = {} as never;
