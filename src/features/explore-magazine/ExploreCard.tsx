@@ -26,7 +26,7 @@ import { courseSubScoreTone } from '@/features/courses/components/holes/analytic
 import { headlineFor, kickerParts, railCaptionDate, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
 import { calloutFor, rendersOnPhoto } from './cardTreatment';
-import { REVIEW_TILE_MIN_HEIGHT } from './reviewTileHeight';
+import { REVIEW_CARD_HEIGHT } from './reviewTileHeight';
 import { FigureCell, RoundStatStrip, vsHandicapLabel } from './AchievementCallout';
 import { dotsFor, SCORE_TRACE_PLOT_HEIGHT, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
@@ -828,7 +828,7 @@ export function ExploreCard({
      photograph, and the kicker stays suppressed for non-pair rounds. The predicate lives in cardTreatment.ts because ExploreMagazine
      sizes the card from the same answer. */
   const onPhoto = rendersOnPhoto(item, size);
-  const photoHeight = item.kind === 'review' && size !== 'pair' ? REVIEW_TILE_MIN_HEIGHT : PHOTO_H[size];
+  const photoHeight = item.kind === 'review' && size !== 'pair' ? REVIEW_CARD_HEIGHT : PHOTO_H[size];
   const roundPhotoCourse = item.kind === 'round' && size !== 'pair' ? kickerPartsValue.course : null;
   const roundCourseRef = useFitOneLine<HTMLSpanElement>(roundPhotoCourse ?? '', 17, 12);
   const isOwnRound = item.kind === 'round' && item.who?.is_viewer === true;
@@ -915,13 +915,18 @@ export function ExploreCard({
      BEHIND THIS FLAG. It has already swallowed the member's review media once
      (see line 1070) and the quote suppression at line 1383. */
   const leadReview = size === 'lead' && item.kind === 'review';
-  /* §3 A STORY CLAMPS AT FOUR, like the tour hero. Every other branch is
-     untouched: the review stays at 2, other leads at 3. */
+  /* §3 A STORY CLAMPS AT FOUR, like the tour hero. A FULL-WIDTH REVIEW CLAMPS
+     AT THREE: its tile is a committed 340 (REVIEW_CARD_HEIGHT) and three lines
+     is what that height is for — at two, the sentence trails off with the room
+     to finish it sitting empty underneath. A pair review stays at two; its tile
+     is 124. */
   const headlineLineClamp = leadReview
     ? 2
-    : size === 'lead'
-      ? (item.kind === 'story' ? 4 : 3)
-      : 2;
+    : item.kind === 'review' && size !== 'pair'
+      ? 3
+      : size === 'lead'
+        ? (item.kind === 'story' ? 4 : 3)
+        : 2;
   const headlineNode = (
     <div
       data-explore-headline="true"
@@ -1284,6 +1289,13 @@ export function ExploreCard({
     </span>
   ) : null;
 
+  /* A REVIEW IS FIXED; AN ON-PHOTO STORY STILL GROWS. Both render text on the
+     photograph, so both take the on-photo treatment, but only the review has a
+     clamped quote and a committed height (REVIEW_CARD_HEIGHT). A story at
+     'lead' clamps its headline at four lines and carries a standfirst below it,
+     so it keeps minHeight and sets its own height. Collapsing these two into
+     one branch is what let reviews render at 409 and 326 in the same feed. */
+  const photoFixedHeight = item.kind === 'review';
   const photo = (
     <CourseImageFallback
       courseId={item.subject?.course_id ?? null}
@@ -1293,7 +1305,9 @@ export function ExploreCard({
       flatWhenEmpty={onPhoto}
       initialsSize={size === 'pair' ? 18 : 26}
       style={onPhoto
-        ? { minHeight: photoHeight, borderRadius: RADIUS[size], width: '100%' }
+        ? (photoFixedHeight
+            ? { height: photoHeight, borderRadius: RADIUS[size], width: '100%' }
+            : { minHeight: photoHeight, borderRadius: RADIUS[size], width: '100%' })
         : { height: photoHeight, borderRadius: RADIUS[size], width: '100%' }}
     >
       {chips}
