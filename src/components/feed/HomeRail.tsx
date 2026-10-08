@@ -102,6 +102,7 @@ function FeaturedRoundSlab({ viewerId }: { viewerId: string }) {
           shape={shapes?.get(r.whs_score_id) ?? null}
           medals={medals.isSuccess ? medals.medals?.get(r.whs_score_id) ?? null : undefined}
           engagement={engagement}
+          square
           onOpen={() => opener.openByScore(r.whs_score_id, null, r.user_id)}
         />
       </div>
