@@ -7,7 +7,7 @@ import { useContentReactions } from '@/components/explore-tab-new/courseled/hook
 
 const { from, seed, patch } = vi.hoisted(() => ({
   from: vi.fn(),
-  seed: vi.fn(() => () => {}),
+  seed: vi.fn((..._a: unknown[]) => () => {}),
   patch: vi.fn(),
 }));
 
@@ -42,7 +42,7 @@ describe('likers cache is keyed on the post id the reader uses', () => {
 
   it('a round with a post seeds and invalidates under the post id, source post', async () => {
     const { qc, spy, view } = setup([{ id: 'post-9', whs_score_id: 'score-1' }]);
-    await waitFor(() => expect(qc.getQueryData(['reaction-post-ids', 'round', 'score-1'])).toBeTruthy());
+    await waitFor(() => expect(qc.getQueryData(['round-post-comments', 'score-1'])).toBeTruthy());
     await waitFor(() => expect(view.result.current.unavailable).toBe(false));
     act(() => view.result.current.toggle('round', 'score-1'));
     await waitFor(() => expect(postLikesKeys(spy).length).toBeGreaterThan(0));
@@ -54,7 +54,7 @@ describe('likers cache is keyed on the post id the reader uses', () => {
 
   it('a round with no post seeds nothing and invalidates nothing post-keyed', async () => {
     const { qc, spy, view } = setup([]);
-    await waitFor(() => expect(qc.getQueryData(['reaction-post-ids', 'round', 'score-1'])).toBeTruthy());
+    await waitFor(() => expect(qc.getQueryData(['round-post-comments', 'score-1'])).toBeTruthy());
     act(() => view.result.current.toggle('round', 'score-1'));
     await waitFor(() =>
       expect(spy.mock.calls.some((c) => (c[0] as { queryKey?: unknown[] })?.queryKey?.[0] === 'content-reactions')).toBe(true),

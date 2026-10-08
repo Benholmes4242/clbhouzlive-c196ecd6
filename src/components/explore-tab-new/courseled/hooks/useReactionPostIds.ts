@@ -5,7 +5,8 @@
  * ['post-likes', POST_ID, 'post']).
  *
  * ONE READ PER TARGET TYPE PER WINDOW, never per card:
- *   - rounds:  posts.id, whs_score_id    WHERE whs_score_id    IN (scoreIds)
+ *   - rounds:  the SAME query as useRoundPostComments (shared key), so a window
+ *              that already reads round posts adds no request
  *   - reviews: posts.id, source_review_id WHERE source_review_id IN (reviewIds)
  * A window with only rounds (or only reviews) issues one read; stories issue
  * none. A round or review with no post resolves to null — callers must then
@@ -15,6 +16,7 @@ import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
+import { roundPostsQuery } from './useRoundPostComments';
 
 export interface ReactionPostTarget {
   type: string;
@@ -31,19 +33,8 @@ export function useReactionPostIds(targets: readonly ReactionPostTarget[]) {
   const roundIds = useMemo(() => idsOf(targets, 'round'), [targets]);
   const reviewIds = useMemo(() => idsOf(targets, 'review'), [targets]);
 
-  const rounds = useQuery<{ id: string; whs_score_id: string | null }[]>({
-    queryKey: ['reaction-post-ids', 'round', roundIds.join(',')],
-    enabled: roundIds.length > 0,
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('id, whs_score_id')
-        .in('whs_score_id', roundIds);
-      if (error) throw error;
-      return (data ?? []) as { id: string; whs_score_id: string | null }[];
-    },
-  });
+  // Same key and fn as useRoundPostComments: where both run, one request.
+  const rounds = useQuery(roundPostsQuery(roundIds));
 
   const reviews = useQuery<{ id: string; source_review_id: string | null }[]>({
     queryKey: ['reaction-post-ids', 'review', reviewIds.join(',')],
