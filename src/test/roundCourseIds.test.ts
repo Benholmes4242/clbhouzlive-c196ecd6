@@ -2,13 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { roundCourseIdsFor } from '@/components/feed/roundCourseIds';
 
 describe('roundCourseIdsFor', () => {
-  it('collects a round post course id before any score id has resolved', () => {
+  it('collects course ids of posts with a score id, with no postType on the post (as real rows arrive)', () => {
     const posts = [
-      { id: 'a', postType: 'round', courseId: 'c1' },
-      { id: 'b', postType: 'round', courseId: 'c1' },
-      { id: 'c', postType: 'photo', courseId: 'c2' },
-      { id: 'd', postType: 'round', courseId: null },
+      { id: 'a', courseId: 'c1' },
+      { id: 'b', courseId: 'c1' },
+      { id: 'c', courseId: 'c2' },
+      { id: 'd', courseId: null },
     ] as never;
-    expect(roundCourseIdsFor(posts)).toEqual(['c1']);
+    const sids = new Map([['a', 's1'], ['b', 's2'], ['d', 's3']]);
+    expect(roundCourseIdsFor(posts, sids)).toEqual(['c1']);
   });
 });
