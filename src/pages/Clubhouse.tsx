@@ -254,7 +254,7 @@ const ClubhouseContent = () => {
     return map;
   }, [standing.rows]);
   const bests = useViewerCourseBests(user?.id);
-  const roundCourseIds = useMemo(() => roundCourseIdsFor(posts), [posts]);
+  const roundCourseIds = useMemo(() => roundCourseIdsFor(posts, postScoreIdMap), [posts, postScoreIdMap]);
   const records = useCourseRecordSignal(user?.id, roundCourseIds);
   const { context: viewerCourseContext, isFetched: viewerContextFetched } = useViewerCourseContext(user?.id);
   /* READINESS IS isFetched, NEVER isLoading (see useExploreStreamClient). An

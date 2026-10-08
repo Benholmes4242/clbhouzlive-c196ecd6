@@ -38,7 +38,6 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { isRoundPost } from '@/lib/posts/isRoundPost';
 import { InlineVideo } from './InlineVideo';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
@@ -510,10 +509,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
      unchanged: toggle_post_like routes a round post's reaction to
      content_reactions('round', whs_score_id) server-side, for every actor. */
 
-  // Classification is post_type (isRoundPost); round data is only the
-  // resolution check. A post carrying a score id without the round type is an
-  // ordinary post and falls through.
-  const rendersRoundCard = isRoundPost(post) && (!!postRound || !!postRoundPending);
+  // Round data decides. FeedPost.postType is not populated by every feed
+  // read (get_profile_posts does not project post_type), so a post_type gate
+  // here silently disables the round card on Profile Posts. Keep this on
+  // round data until post_type reaches the client on every construction site.
+  const rendersRoundCard = !!postRound || !!postRoundPending;
   if (rendersRoundCard) {
     const item = roundPostItem(post, postRound ?? null, currentUserId, consequenceSources);
     return (

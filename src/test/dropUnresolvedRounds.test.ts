@@ -21,8 +21,12 @@ describe('dropUnresolvedRounds', () => {
     const out = dropUnresolvedRounds([p('b', 'round')], new Map([['b', 's1']]), new Map(), false);
     expect(out).toHaveLength(1);
   });
-  it('keeps a post with a score id whose post_type is not round', () => {
-    const out = dropUnresolvedRounds([p('a', 'photo')], new Map([['a', 's1']]), new Map(), true);
+  it('drops an unresolved post with a score id even when postType is absent (real rows carry none)', () => {
+    const out = dropUnresolvedRounds([p('a')], new Map([['a', 's1']]), new Map(), true);
+    expect(out).toHaveLength(0);
+  });
+  it('keeps a post with neither a score id nor a round type', () => {
+    const out = dropUnresolvedRounds([p('a')], new Map(), new Map(), true);
     expect(out).toHaveLength(1);
   });
   it('drops a round-typed post with no score id even when other rounds resolved', () => {

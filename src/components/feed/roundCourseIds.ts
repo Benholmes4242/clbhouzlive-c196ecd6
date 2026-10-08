@@ -1,13 +1,16 @@
 import type { FeedPost } from '@/components/media-system/types/media';
-import { isRoundPost } from '@/lib/posts/isRoundPost';
 
 /**
- * The course ids of the page's ROUND posts, classified by post_type
- * (isRoundPost) — never by score-id presence — so the record read does not
- * wait on the score-id lookup and starts on mount with the other sources.
+ * The course ids of the page's round posts, identified by score-id presence
+ * (postScoreIdMap). FeedPost.postType is not populated by every feed read, so
+ * a post_type classifier here returns nothing at runtime. Restore the
+ * post_type form only once post_type reaches the client on every read.
  */
-export function roundCourseIdsFor(posts: FeedPost[]): string[] {
+export function roundCourseIdsFor(
+  posts: FeedPost[],
+  postScoreIdMap: Pick<Map<string, string>, 'has'>,
+): string[] {
   const ids = new Set<string>();
-  for (const p of posts) if (isRoundPost(p) && p.courseId) ids.add(p.courseId);
+  for (const p of posts) if (postScoreIdMap.has(p.id) && p.courseId) ids.add(p.courseId);
   return [...ids];
 }
