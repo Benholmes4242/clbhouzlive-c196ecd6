@@ -65,15 +65,27 @@ const MUTED = TOUR_INK_FAINT;
 const HAIRLINE = 'rgba(255,255,255,0.12)';
 
 const CANVAS = TOUR_CANVAS;
-/** TIGHTENED GEOMETRY (2.4). */
-const MOV_W = 24;
-const POS_W = 24;
-const TOT_W = 40;
-const THRU_W = 26;
-const PRIZE_W = 52;
-const CELL_W = 26;
-const CELL_W_FLOOR = 22;
-const GRID_GAP = 4;
+/** THE BOARD'S GEOMETRY, ONE DEFINITION. Both boards draw the same columns:
+ *  the full leaderboard page and the five-row hero reduction on the Tour
+ *  overview. They were written with two sets of widths and drifted - the
+ *  hero's round cell was 28 against this table's 26 for the same digits.
+ *  A width changed in one place must change in both, so there is one place.
+ *  The hero differs ONLY in which columns it draws and in its row padding;
+ *  it never redefines a width. */
+export const BOARD_GEOMETRY = Object.freeze({ mov: 24, pos: 24, tot: 40, thru: 26, prize: 52, cell: 26, cellFloor: 22, gap: 4 } as const);
+
+/** TIGHTENED GEOMETRY (2.4) — local aliases of BOARD_GEOMETRY, never numbers of their own. */
+const MOV_W = BOARD_GEOMETRY.mov;
+const POS_W = BOARD_GEOMETRY.pos;
+const TOT_W = BOARD_GEOMETRY.tot;
+const THRU_W = BOARD_GEOMETRY.thru;
+const PRIZE_W = BOARD_GEOMETRY.prize;
+const CELL_W = BOARD_GEOMETRY.cell;
+const CELL_W_FLOOR = BOARD_GEOMETRY.cellFloor;
+const GRID_GAP = BOARD_GEOMETRY.gap;
+/* ROW PADDING IS THE ONE DELIBERATE DIFFERENCE FROM THE HERO BOARD (20 there).
+   This is a full-width scrolling table that needs the content width across
+   seven columns; do not unify it with the hero's 20. */
 const ROW_PAD_X = 16;
 const NAME_SIZE = 13;
 const PRE_NAME_SIZE = 15;
@@ -560,7 +572,7 @@ export function BoardTable({
     const labelStyle: React.CSSProperties = {
       fontSize: 10,
       fontWeight: 700,
-      letterSpacing: '0.06em',
+      letterSpacing: '0.12em',
       textTransform: 'uppercase',
       color: SECONDARY,
       whiteSpace: 'nowrap',
@@ -592,14 +604,15 @@ export function BoardTable({
         ) : (
           <>
             <div aria-hidden />
-            <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.pos')}</div>
+            <div data-board-pos-header style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.pos')}</div>
             <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
             {columns.rounds.map((r) => (
               <div
                 key={r}
+                data-board-round-header
                 style={{
                   ...labelStyle,
-                  textAlign: 'center',
+                  textAlign: 'right',
                   // AMBER on this page means THE LIVE ROUND, not the viewing
                   // member. Bounded, local, deliberate.
                   color: columns.liveRound === r ? AMBER : SECONDARY,
@@ -609,7 +622,7 @@ export function BoardTable({
               </div>
             ))}
             {columns.showThru && (
-              <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.thru')}</div>
+              <div data-board-thru-header style={{ ...labelStyle, textAlign: 'right' }}>{t('board.columns.thru')}</div>
             )}
             <div style={{ ...labelStyle, textAlign: 'right' }}>{t('board.columns.tot')}</div>
             {columns.showPrize && (
@@ -784,8 +797,9 @@ export function BoardTable({
               return (
                 <div
                   key={r}
+                  data-board-round-cell
                   style={{
-                    textAlign: 'center',
+                    textAlign: 'right',
                     fontSize: 12,
                     fontWeight: settled ? 600 : 700,
                     // A played round is a played round: no opacity drop. The
@@ -805,8 +819,9 @@ export function BoardTable({
 
             {columns.showThru && (
               <div
+                data-board-thru-cell
                 style={{
-                  textAlign: 'center',
+                  textAlign: 'right',
                   fontSize: 12,
                   // Still out there = a number, stated. Settled = a quiet 'F'.
                   fontWeight: thruDisplay === 'F' ? 600 : 700,

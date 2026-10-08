@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
+import { BOARD_GEOMETRY, computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
@@ -73,23 +73,12 @@ const THEME_TOKENS = {
   heroBoard: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_06, press: 'active:bg-white/[0.06]' },
 } as const;
 
-/* THE HERO'S SCORE RAIL. Both tracks are sized to their CONTENT plus
-   one hair, not to the full board's grid: a round figure is at most
-   three characters at 12/600 tabular (~21px) and a total at most
-   three at 13/700 (~24px). Right-aligned (see the header and row
-   below), so the five figures land on one ladder and the eye reads
-   down a column instead of across a gappy strip. Fixed widths, never
-   content-sized: a grid of scores must align down the page.
-   28 is the floor for clean adjacency: the gap between two right-
-   aligned cells is 28 minus the RIGHT-HAND figure's width, and
-   under-par double digits ("-10", ~20px) are routine on a low-scoring
-   week — 28 keeps the worst-case gap at 8px. 24 gave 4px, which read
-   as one number. */
-const HERO_ROUND_CELL_W = 28;
-const HERO_TOT_W = 42;
-const HERO_POS_W = 34;
-const HERO_TODAY_W = 40;
-const HERO_THRU_W = 32;
+/* THE HERO DEFINES NO WIDTH OF ITS OWN. Every track reads BOARD_GEOMETRY
+   from BoardTable, so the two boards cannot drift. TODAY takes the round-
+   cell width (it is one round's figure). The only deliberate difference is
+   row padding: 20 here, because this board aligns with the picks block and
+   action row in the same band; BoardTable keeps 16 for its seven columns. */
+const HERO_PAD_X = 20;
 /** Every numeric cell on the hero board: digits stack down a column. */
 const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, textAlign: 'right' as const };
 
@@ -207,14 +196,14 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const showHeroThru = theme === 'heroBoard' && heroColumnRule.thru;
   const showHeroRounds = theme === 'heroBoard' && heroHasRoundData && heroColumnRule.rounds;
   const heroRounds = showHeroRounds ? heroCols.rounds : [];
-  const heroRoundTracks = heroRounds.map(() => `${HERO_ROUND_CELL_W}px`).join(' ');
+  const heroRoundTracks = heroRounds.map(() => `${BOARD_GEOMETRY.cell}px`).join(' ');
   const overviewGrid = [
-    showOverviewPosition ? `${HERO_POS_W}px` : null,
+    showOverviewPosition ? `${BOARD_GEOMETRY.pos}px` : null,
     'minmax(0, 1fr)',
-    showHeroToday ? `${HERO_TODAY_W}px` : null,
-    showHeroThru ? `${HERO_THRU_W}px` : null,
+    showHeroToday ? `${BOARD_GEOMETRY.cell}px` : null,
+    showHeroThru ? `${BOARD_GEOMETRY.thru}px` : null,
     heroRoundTracks || null,
-    `${HERO_TOT_W}px`,
+    `${BOARD_GEOMETRY.tot}px`,
   ].filter(Boolean).join(' ');
 
   const showPanelThru = theme !== 'heroBoard' && phase !== 'completed' && roundInProgress;
@@ -263,7 +252,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     return (
       <>
         <div style={{ background: T.surface, fontFamily: FONT }}>
-          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: 8, minHeight: 26, padding: '3px 20px', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
+          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: BOARD_GEOMETRY.gap, minHeight: 26, padding: `3px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
             {showHeroToday ? <div style={{ textAlign: 'right' }}>{t('board.columns.today')}</div> : null}
@@ -290,13 +279,13 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   playerId: r.player.id, playerName: entity.lines[0] ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
                   position: r.position ?? null, positionTied: r.position_tied ?? null, total: r.score ?? null, today, thru: r.thru ?? null, status: r.status ?? null,
                 }); }}
-                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: 8, width: '100%', minHeight: 34, padding: `${entity.kind === 'team' ? 6 : 5}px 20px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
+                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: BOARD_GEOMETRY.gap, width: '100%', minHeight: 34, padding: `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
                 className={`${T.press} transition-colors`}
               >
                 {showOverviewPosition ? <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>{posText}</div> : null}
                 <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
                   {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
-                    <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em', color: T.ink }}>{overviewName(entity.lines[0])}</span>
+                    <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em', color: T.ink }}>{overviewName(entity.lines[0])}</span>
                   )}
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
@@ -317,7 +306,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     </div>
                   );
                 })}
-                <div style={{ ...HERO_NUM, fontSize: 13.5, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
+                <div style={{ ...HERO_NUM, fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
               </button>
             );
           })}
