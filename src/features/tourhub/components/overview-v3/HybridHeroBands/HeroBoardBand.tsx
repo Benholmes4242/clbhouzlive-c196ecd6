@@ -21,43 +21,37 @@
  * while the board cross-fades in place.
  *
  * Order, one continuous dark surface with NO seam:
- *   photo → board rows → continuation strip (in the hero) → full-leaderboard
- *   row → stat strip → course shape panel.
+ *   photo → board rows (live/completed) or upcoming facts line (upcoming) →
+ *   OUR PICKS block → action row (primary tournament door + secondary course).
+ * There is no stat strip and no COURSE SHAPE panel in this file or in
+ * OverviewHero.tsx any more — older briefs described both; neither renders.
  * STRAIGHT bottom edge — the page canvas breathes below it, it does not tuck
  * under a radius.
  *
- * COLLAPSE CONTROLS (BRIEF_HERO_PICKS_ROW §0a — this OVERTURNS the previous
- * rule in both halves, which read: "There is NO collapse control on the board:
- * on a live slide it is always on; on a results or upcoming slide it renders
- * nothing at all. The COURSE SHAPE panel is the only thing that opens."):
- *   - TWO panels now open — COURSE SHAPE and OUR PICKS. The original objection
- *     stands and is not violated: a vertical scroller under a horizontal pager
- *     is still forbidden, and this adds one 37px collapsed row opening to a
- *     FIXED three-row panel that never scrolls internally.
- *   - The band now renders on UPCOMING slides too, because that is the phase
- *     where the picks are most worth reading. With no board there are no rows,
- *     no full-leaderboard row, no stat strip and no course shape — and NO
- *     placeholder or reserved height for any of them (§1). §0b is NOT
- *     overturned: the band being a section rather than a card is exactly what
- *     lets it render at its own height here.
+ * PICKS DO NOT COLLAPSE (BRIEF — THE PICKS COME OUT FROM BEHIND THE CHEVRON,
+ * superseding BRIEF_HERO_PICKS_ROW §0a): the picks are the band's content and
+ * render whenever picks exist, on every phase. The rule that survives: a
+ * vertical scroller under a horizontal pager is a gesture trap and is
+ * forbidden. The picks block is a FIXED grid of at most three cards and never
+ * scrolls internally — do not turn it into a carousel or a scroller.
  *
- * Six rows, fixed, never internally scrollable — a vertical scroller under a
- * horizontal pager is a gesture trap. The full-leaderboard row is the route to
- * the rest. The stat strip at the foot carries the field figures that used to
- * live in the removed "On the course" section.
+ * The band renders on UPCOMING slides too. With no board there are no rows —
+ * and NO placeholder or reserved height for them (§1).
+ *
+ * Board rows are fixed, never internally scrollable. The primary action is
+ * the route to the rest of the board.
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Trophy } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, OVERVIEW_PICKS_TEXT_INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
 import { PlayerAvatar } from '../../PlayerAvatar';
-import { ClbhouzPickMark } from '../../../_shared/ClbhouzPickMark';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
 import { formatToPar } from '../../../overview/data/liveRoundStats';
 import { useTournamentTeeTimes } from '../../../hooks/useTournamentTeeTimes';
@@ -66,6 +60,7 @@ import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearT
 import { useTournamentFieldStrength } from '../../../hooks/useTournamentFieldStrength';
 import { useTournamentVenueRecord } from '../../../overview/data/useTournamentVenueRecord';
 import { surnameOf } from '../../../_shared/playerName';
+import { r } from '@/lib/radius';
 
 /**
  * SIX rows. It was five while the board occupied the photo band, because the
@@ -270,7 +265,6 @@ export function HeroBoardSection({
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
-  const [picksOpen, setPicksOpen] = useState(false);
   const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
   const { data: venueRecord } = useTournamentVenueRecord(tournamentId);
 
@@ -307,42 +301,6 @@ export function HeroBoardSection({
     () => resolveChampionPlayerId(entries as any[], championSrId, phase),
     [championSrId, entries, phase],
   );
-
-  const closedRow = useMemo<{ text: string; trophy: boolean } | null>(() => {
-    if (!hasPicks) return null;
-    const ranked = [...picks].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
-    if (phase === 'upcoming') {
-      const names = ranked.slice(0, 3).map((pick) => surnameOf(pick.playerName)).filter(Boolean);
-      return names.length > 0 ? { text: `${names.join(', ')} to win`, trophy: false } : null;
-    }
-    const placed = ranked
-      .map((pick) => ({ pick, line: boardByPlayer.get(String(pick.playerId)) }))
-      .filter((item) => item.line?.position != null)
-      .sort((a, b) => (a.line?.position ?? 999) - (b.line?.position ?? 999));
-    if (placed.length === 0) {
-      const fallback = surnameOf(ranked[0]?.playerName);
-      return fallback ? { text: fallback, trophy: false } : null;
-    }
-    if (phase === 'completed') {
-      const best = placed[0];
-      const settled = settledFigureFor(best.line);
-      // The trophy marks the CHAMPION, never a position: T1 playoff losers get none.
-      const trophy = pickWonTournament(best.pick.playerId, championPlayerId, championPlayerIds);
-      /* THE LINE FOLLOWS THE TROPHY, NOT THE POSITION. A playoff winner is
-         T1 on strokes and the champion in fact, so reading the win off
-         `settled.right` printed "Johnson T1" beside a trophy — a numeral
-         saying less than the icon next to it. pickWonTournament already
-         holds the answer this line needs. */
-      const text = trophy
-        ? `Picked ${surnameOf(best.pick.playerName)} to win · ${WON_LABEL}`
-        : `${surnameOf(best.pick.playerName)} ${settled?.right ?? ''}`.trim();
-      return { text, trophy };
-    }
-    return {
-      text: placed.slice(0, 2).map(({ pick, line }) => `${surnameOf(pick.playerName)} ${line?.tied ? 'T' : ''}${line?.position}`).join(', '),
-      trophy: false,
-    };
-  }, [boardByPlayer, championPlayerId, championPlayerIds, hasPicks, phase, picks]);
 
   const showUpcomingFacts = shouldLoadUpcomingFacts(phase);
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showUpcomingFacts);
@@ -390,43 +348,27 @@ export function HeroBoardSection({
         </div>
       ) : null}
 
-      {hasPicks && closedRow ? (
-        <>
-          <button
-            type="button"
-            onClick={() => setPicksOpen((open) => !open)}
-            aria-expanded={picksOpen}
-            style={{ width: '100%', minHeight: 44, margin: 0, padding: '10px 24px', display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr) auto', alignItems: 'center', gap: 10, border: 'none', borderTop: `1px solid ${WHITE_ALPHA_06}`, background: 'transparent', color: INK, textAlign: 'left', cursor: 'pointer', fontFamily: FONT }}
-          >
-            {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
-            <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
-            <span style={{ minWidth: 0, fontSize: 13, color: OVERVIEW_PICKS_TEXT_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {closedRow.trophy ? (
-                <Trophy
-                  data-pick-trophy
-                  size={12}
-                  color={GOLD}
-                  strokeWidth={2.5}
-                  style={{ display: 'inline-block', verticalAlign: '-1px', marginRight: 4, flexShrink: 0 }}
-                />
-              ) : null}
-              {closedRow.text}
-            </span>
-            {picksOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-          </button>
-          {picksOpen ? <PicksPanel picks={picks} tourCode={pickTourCode} phase={phase} boardByPlayer={boardByPlayer} predictions={predictions ?? null} championPlayerId={championPlayerId} championPlayerIds={championPlayerIds} /> : null}
-        </>
+      {hasPicks ? (
+        <PicksBlock
+          picks={picks}
+          tourCode={pickTourCode}
+          phase={phase}
+          boardByPlayer={boardByPlayer}
+          predictions={predictions ?? null}
+          championPlayerId={championPlayerId}
+          championPlayerIds={championPlayerIds}
+        />
       ) : null}
 
       <div
         data-overview-action-row
-        style={{ width: '100%', minHeight: 56, padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, borderTop: `1px solid ${WHITE_ALPHA_06}` }}
+        style={{ padding: '12px 20px 18px', display: 'flex', alignItems: 'stretch', gap: 8, borderTop: `1px solid ${WHITE_ALPHA_06}` }}
       >
         <button
           type="button"
           onClick={onFullLeaderboard}
           data-overview-board-cta
-          style={{ minWidth: 0, minHeight: 44, margin: 0, padding: 0, display: 'inline-flex', alignItems: 'center', gap: 4, border: 'none', background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', textAlign: 'left', whiteSpace: 'nowrap' }}
+          style={{ flex: '1.8 1 0', minWidth: 0, minHeight: 48, margin: 0, padding: '0 12px', borderRadius: r.md, background: WHITE_ALPHA_08, border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: INK, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em', cursor: 'pointer', whiteSpace: 'nowrap' }}
         >
           {t(overviewTournamentDoorKey(phase))}
           <ChevronRight size={16} aria-hidden />
@@ -436,9 +378,9 @@ export function HeroBoardSection({
             type="button"
             onClick={() => navigate(`/courses/${venueRecord.courseId}`)}
             data-overview-course-cta
-            style={{ minWidth: 0, minHeight: 44, margin: 0, padding: 0, display: 'inline-flex', alignItems: 'center', gap: 4, border: 'none', background: 'transparent', color: INK, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', textAlign: 'right', whiteSpace: 'nowrap' }}
+            style={{ flex: '1 1 0', minWidth: 0, minHeight: 48, margin: 0, padding: '0 12px', borderRadius: r.md, background: 'transparent', border: `1px solid ${WHITE_ALPHA_08}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: WHITE_ALPHA_65, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em', cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
-            {t('overview.venueRecord.viewCourse', 'View course')}
+            {t('overview.venueRecord.course', 'Course')}
             <ChevronRight size={16} aria-hidden />
           </button>
         ) : null}
@@ -448,18 +390,16 @@ export function HeroBoardSection({
 }
 
 /**
- * §3 — THE OPEN PANEL. THREE pick rows, an optional editorial line above them,
- * a provenance line GATED ON isAIPowered, and nothing below. FIXED height
- * content: exactly three rows, never internally scrollable.
+ * §3 — THE PICKS BLOCK. Amber OUR PICKS header, optional event-level editorial
+ * line, a FIXED grid of up to three cards (never padded, never scrolling) and
+ * a provenance line GATED ON isAIPowered.
  *
- * DEPENDENCY: This panel used to carry a mandatory "See all picks" route out.
- * That row was removed per AMENDMENT 2 to BRIEF_HERO_PICKS_ROW. The full picks
- * page remains reachable through the overview picks row and panel
- * overview page (it has its own header chevron to the same destination). If
- * that carousel is ever removed, the full picks page becomes unreachable from
- * the overview entirely — re-add a route here or keep the carousel alive.
+ * SEE ALL: the brief asked for a header chevron to the destination of the
+ * overview picks carousel. No such carousel or full picks page exists in the
+ * codebase, so there is no route and no chevron — add one here only when a
+ * real destination exists. Do not point it nowhere.
  */
-function PicksPanel({
+function PicksBlock({
   picks,
   tourCode,
   phase,
@@ -469,184 +409,103 @@ function PicksPanel({
   championPlayerIds,
 }: {
   picks: AITopContender[];
-  /** §CHANGE 2 — the event's tour, for the shared headshot resolver. */
+  /** The event's tour, for the shared headshot resolver. */
   tourCode: string;
   phase: 'live' | 'upcoming' | 'completed';
   boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null }>;
   predictions: { isAIPowered?: boolean; isStale?: boolean; confidence?: number; editorialFraming?: string | null } | null;
-  /** The champion, by player id — the same pair the trophy is derived
-   *  from. settledFigureFor can only see a POSITION, and a playoff
-   *  winner's position is T1, so identity has to come in separately. */
+  /** The champion, by player id — settledFigureFor can only see a POSITION,
+   *  and a playoff winner's position is T1, so identity comes in separately. */
   championPlayerId: string | null;
   championPlayerIds: string[];
 }) {
   const { t } = useTranslation('tourhub');
-  const rows = picks.slice(0, 3);
+  const cards = picks.slice(0, 3);
   const hasConfidence = predictions?.isAIPowered;
 
   return (
-    <div style={{ background: PAGE_CANVAS }}>
-      {/* Editorial framing when populated — and NO empty row when it is not. */}
+    <div data-overview-picks style={{ background: PAGE_CANVAS }}>
+      <div style={{ padding: '14px 24px 9px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
+        {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
+        <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
+      </div>
+
       {predictions?.editorialFraming ? (
-        <div
-          style={{
-            padding: '10px 24px 0',
-            fontSize: 11,
-            fontWeight: 500,
-            lineHeight: 1.35,
-            color: WHITE_ALPHA_65,
-          }}
-        >
+        <div style={{ padding: '0 24px 10px', fontSize: 11, fontWeight: 500, lineHeight: 1.35, color: WHITE_ALPHA_65 }}>
           {predictions.editorialFraming}
         </div>
       ) : null}
 
-      <div
-        style={{
-          padding: hasConfidence ? '10px 24px 0' : '10px 24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
-        }}
-      >
-        {rows.map((p, i) => {
+      <div style={{ padding: '0 20px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+        {cards.map((p, i) => {
           const line = boardByPlayer.get(String(p.playerId));
           const settledRaw = phase === 'completed' ? settledFigureFor(line) : null;
           /* THE CHAMPION WEARS THE WIN, WHATEVER THE BOARD SAYS. A playoff
-             winner ties on strokes, so settledFigureFor — which can only read
-             a position — returns "T1". It is RIGHT to do that for everyone
-             else, the playoff LOSER included, who is also T1 and must never
-             read as a win. Identity is the only thing that separates them, and
-             pickWonTournament is the same test the trophy already uses. */
+             winner ties on strokes, so settledFigureFor returns "T1" — right
+             for everyone else, the playoff LOSER included. Identity separates
+             them, via the same test the trophy uses. */
           const isChampion = phase === 'completed'
             && pickWonTournament(p.playerId, championPlayerId, championPlayerIds);
           const settled = settledRaw && isChampion
             ? { ...settledRaw, right: WON_LABEL, rightColor: GOLD }
             : settledRaw;
           const liveLine = phase === 'live' && line && line.position != null ? line : null;
-          const figure = settled
-            ? settled.figure
-            : liveLine
-              ? (liveLine.score == null ? null : formatToPar(liveLine.score))
-              : phase === 'upcoming' && p.winProbability != null
-                ? `${Math.round(p.winProbability)}%`
-                : null;
-          const figureColor = settled
-            ? settled.figureColor
-            : liveLine
-              ? tourFigColor(liveLine.score)
-              : '#FFFFFF';
-          const pull = p.pulledQuote || p.reasons?.[0] || null;
+          const upcomingPct = phase === 'upcoming' && p.winProbability != null
+            ? `${Math.round(p.winProbability)}%`
+            : null;
+
+          let figureLine: React.ReactNode;
+          if (liveLine) {
+            figureLine = (
+              <>
+                <span style={{ color: WHITE_ALPHA_65 }}>{`${liveLine.tied ? 'T' : ''}${liveLine.position}`}</span>
+                {liveLine.score != null ? <span style={{ color: tourFigColor(liveLine.score) }}>{formatToPar(liveLine.score)}</span> : null}
+              </>
+            );
+          } else if (settled) {
+            figureLine = (
+              <>
+                {settled.right === WON_LABEL ? <Trophy data-pick-trophy size={11} color={GOLD} strokeWidth={2.5} aria-hidden /> : null}
+                <span style={{ color: settled.rightColor }}>{settled.right}</span>
+                {settled.figure ? <span style={{ color: settled.figureColor }}>{settled.figure}</span> : null}
+              </>
+            );
+          } else if (upcomingPct) {
+            figureLine = <span style={{ color: '#FFFFFF' }}>{upcomingPct}</span>;
+          } else {
+            figureLine = <span style={{ color: WHITE_ALPHA_65 }}>{'\u2014'}</span>;
+          }
 
           return (
-            <div key={p.playerId || i} style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-              <span
-                style={{
-                  width: 12,
-                  flexShrink: 0,
-                  fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
-                  fontWeight: 700,
-                  color: WHITE_ALPHA_65,
-                  ...FIGS,
-                }}
-              >
-                {p.rank ?? i + 1}
-              </span>
-              {/* §CHANGE 2 — THE SAME RESOLVER THE REST OF TOUR HUB USES.
-                  AITopContender.photoUrl comes from sr_players.photo_url only,
-                  which is null for most players, so this row rendered
-                  silhouettes beside a carousel showing real faces for the same
-                  three players. PlayerAvatar wraps getPlayerHeadshotCandidates
-                  and walks the folder chain itself — no third resolver, no new
-                  query. photoUrl is still passed: it is tried FIRST when present. */}
-              <span style={{ flexShrink: 0, display: 'inline-flex' }}>
+            <div
+              key={p.playerId || i}
+              data-overview-pick-card
+              style={{ background: WHITE_ALPHA_06, border: `1px solid ${WHITE_ALPHA_06}`, borderRadius: r.sm, padding: '11px 10px', textAlign: 'center', minWidth: 0 }}
+            >
+              {/* The shared resolver walks the headshot folder chain itself;
+                  photoUrl is tried FIRST when present. No second resolver. */}
+              <div style={{ display: 'flex', justifyContent: 'center', margin: '0 auto 8px' }}>
                 <PlayerAvatar
                   playerId={String(p.playerId ?? '')}
                   playerName={p.playerName}
                   tourCode={tourCode}
                   photoUrl={p.photoUrl ?? null}
-                  size="xs"
+                  size="sm"
                 />
-              </span>
-              <span style={{ minWidth: 0, flex: 1 }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: '#FFFFFF',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {p.playerName}
-                  </span>
-                  <ClbhouzPickMark size={10} label={t('overview.onTheCourse.ourPicksLabel')} />
-                  {liveLine && (
-                    <span style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>
-                      {`${liveLine.tied ? 'T' : ''}${liveLine.position}`}
-                    </span>
-                  )}
-                </span>
-                {pull && (
-                  <span
-                    style={{
-                      display: 'block',
-                      fontSize: 11,
-                      fontWeight: 500,
-                      color: WHITE_ALPHA_65,
-                      marginTop: 1,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {pull}
-                  </span>
-                )}
-              </span>
-              {(settled || figure) && (
-                <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  {settled && (
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: settled.right === WON_LABEL ? 800 : 600,
-                        letterSpacing: settled.right === WON_LABEL ? '0.08em' : undefined,
-                        color: settled.rightColor,
-                        ...FIGS,
-                      }}
-                    >
-                      {settled.right}
-                    </span>
-                  )}
-                  {figure && (
-                    <span style={{ fontSize: 12.5, fontWeight: 700, color: figureColor, ...FIGS }}>
-                      {figure}
-                    </span>
-                  )}
-                </span>
-              )}
+              </div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {surnameOf(p.playerName)}
+              </div>
+              <div style={{ marginTop: 5, fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, ...FIGS }}>
+                {figureLine}
+              </div>
             </div>
           );
         })}
       </div>
 
-      {/* PROVENANCE — here, not in the label, and only when the payload really
-          is AI-powered. Staleness rides the same line. This is the panel's LAST
-          element when it renders; its bottom padding closes the panel cleanly. */}
       {hasConfidence && (
-        <div
-          style={{
-            padding: '10px 24px',
-            fontSize: 11,
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: WHITE_ALPHA_65,
-          }}
-        >
+        <div style={{ padding: '0 24px 14px', fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>
           {t('overview.onTheCourse.ourPicksProvenance', {
             confidence: Math.round((predictions.confidence ?? 0) * 100),
           })}
