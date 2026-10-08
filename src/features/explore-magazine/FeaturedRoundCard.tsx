@@ -120,6 +120,8 @@ export const FeaturedRoundCard: React.FC<{
   engagement?: FeaturedRoundEngagement | null;
   /** From the feed's batched award read. undefined = unresolved (empty cell). */
   medals?: RoundMedalCounts | null;
+  /** Home only: square corners, edge to edge like its feed neighbours. */
+  square?: boolean;
 }> = ({
   round: r,
   viewerId,
@@ -127,6 +129,7 @@ export const FeaturedRoundCard: React.FC<{
   onOpen,
   engagement = null,
   medals,
+  square = false,
 }) => {
   const { t, i18n } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
@@ -155,7 +158,7 @@ export const FeaturedRoundCard: React.FC<{
         all: 'unset', display: 'block', width: '100%', boxSizing: 'border-box', cursor: 'pointer', fontFamily: SANS,
       }}
     >
-      <div style={{ borderRadius: rad.lg, overflow: 'hidden', background: A.PANEL }}>
+      <div style={{ borderRadius: square ? 0 : rad.lg, overflow: 'hidden', background: A.PANEL }}>
       <div style={{ position: 'relative', minHeight: PANE_H, background: A.PANEL, display: 'flex', flexDirection: 'column' }}>
         {image ? (
           <img src={image} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
