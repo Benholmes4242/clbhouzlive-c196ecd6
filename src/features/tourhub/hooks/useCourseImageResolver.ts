@@ -14,9 +14,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { isVenueGeographyCompatible } from '@/lib/tourhub/venueGeography';
 import sedgefieldCC from '@/assets/courses/sedgefield-country-club.jpg.asset.json';
 import clubAtIndianCreek from '@/assets/courses/club-at-indian-creek.jpg.asset.json';
+import yokohamaCC from '@/assets/courses/yokohama-country-club.jpeg.asset.json';
 
-/** Static venue image overrides for venues not present in golf_courses. */
+/** Static venue photos, including explicitly member-selected replacements. */
 const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
+  'Yokohama Country Club': yokohamaCC.url,
   'Sedgefield Country Club': sedgefieldCC.url,
   'The Club at Indian Creek': clubAtIndianCreek.url,
 };
@@ -302,7 +304,7 @@ async function cacheMatch(venue: VenueInput, course: CandidateCourse, confidence
 
 export function useCourseImageResolver(venues: VenueInput[]) {
   return useQuery({
-    queryKey: ['course-images-v2', venues.map(v => v.venueName).sort().join('|')],
+    queryKey: ['course-images-v3', venues.map(v => v.venueName).sort().join('|')],
     queryFn: async () => {
       if (!venues.length) return new Map<string, ResolvedCourse>();
       
@@ -312,7 +314,7 @@ export function useCourseImageResolver(venues: VenueInput[]) {
       const results = new Map<string, ResolvedCourse>();
       const uncached: VenueInput[] = [];
 
-      // Step 0: Static overrides for venues not present in golf_courses.
+      // Step 0: Authored venue photos win over cached catalogue images.
       for (const v of venues) {
         const override = VENUE_IMAGE_OVERRIDES[v.venueName];
         if (override) {
