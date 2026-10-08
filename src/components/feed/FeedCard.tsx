@@ -505,8 +505,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
      it stays inset at the header's 12px. No glass, no score in an author row,
      no kicker, no headline — ExploreCard's round branch decides all of that.
      A post whose round is still in flight renders the same card (figures fill
-     in place); a round the viewer cannot read (postRoundMissing) falls back to
-     the ordinary post, as it did before C3. Likes use the post-like path
+     in place). A round post renders the round card or it renders nothing: one
+     whose round never resolves is dropped at list level (dropUnresolvedRounds)
+     and never reaches this card. Likes use the post-like path
      unchanged: toggle_post_like routes a round post's reaction to
      content_reactions('round', whs_score_id) server-side, for every actor. */
 
