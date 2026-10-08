@@ -13,6 +13,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
 import { patchEngagement } from '@/lib/engagementCache';
+import { useReactionPostIds } from '@/components/explore-tab-new/courseled/hooks/useReactionPostIds';
 import { commentsKeys, commentsScope, viewerId } from '@/lib/queryKeys';
 
 /**
@@ -90,6 +91,14 @@ export function useCommentsV2({
   const actorType = activeActor?.type ?? 'personal';
   const actorId = activeActor?.id ?? user?.id ?? '';
   const blockedIds = useBlockedUserIds(user?.id ?? null);
+  /* A round's or review's comments live on the object itself, but the Home
+     feed caches the WRAPPING post's comment count. Resolve that post (the same
+     lookup the likers cache uses) so a write can patch it; no post, no patch. */
+  const wrapsPost = enabled && !!targetId && (targetType === 'round' || targetType === 'review');
+  const resolvePostId = useReactionPostIds(
+    useMemo(() => (wrapsPost ? [{ type: targetType, id: targetId }] : []), [wrapsPost, targetType, targetId]),
+  );
+  const feedPostId = targetType === 'post' ? targetId : wrapsPost ? resolvePostId(targetId) : null;
 
   /**
    * Every key on this hook is named through `commentsKeys` (src/lib/queryKeys.ts)
@@ -409,8 +418,8 @@ export function useCommentsV2({
       // Server trigger `comments_v2_count_inc` bumps posts.comment_count
       // for EVERY insert — top-level AND replies. Mirror that here so
       // every feed surface reflects the new count without a refetch.
-      if (targetType === 'post') {
-        patchEngagement(qc, targetId, { commentCountDelta: +1 });
+      if (feedPostId) {
+        patchEngagement(qc, feedPostId, { commentCountDelta: +1 });
       }
       invalidate();
       /* RULING C — the card's preview line, not just the count. */
@@ -440,8 +449,8 @@ export function useCommentsV2({
     onSuccess: (_data, vars) => {
       // Server trigger `comments_v2_count_dec` decrements posts.comment_count
       // for both top-level and cascaded reply deletions. Mirror symmetrically.
-      if (targetType === 'post') {
-        patchEngagement(qc, targetId, { commentCountDelta: -(1 + (vars.replyCount ?? 0)) });
+      if (feedPostId) {
+        patchEngagement(qc, feedPostId, { commentCountDelta: -(1 + (vars.replyCount ?? 0)) });
       }
       invalidate();
       /* RULING C — deleting the newest comment leaves the card quoting a

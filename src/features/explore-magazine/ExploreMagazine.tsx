@@ -36,8 +36,6 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { RoundCardEngagement } from './ExploreCard';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
-import { toast } from '@/lib/toast';
-import { supabase } from '@/integrations/supabase/client';
 
 import { useBatchRoundMedals } from './useBatchRoundMedals';
 import { ExploreCard, type CardSize } from './ExploreCard';
