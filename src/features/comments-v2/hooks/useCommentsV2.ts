@@ -229,7 +229,10 @@ export function useCommentsV2({
           : Promise.resolve({ data: [] as BusinessRow[] }),
         supabase.from('comment_likes_v2').select('comment_id').in('comment_id', rowIds),
         actorId
-          ? supabase.from('comment_likes_v2').select('comment_id').in('comment_id', rowIds).eq('user_id', user?.id ?? '')
+          ? supabase.from('comment_likes_v2').select('comment_id').in('comment_id', rowIds)
+              // "Did I like this comment" is the ACTIVE ACTOR's question (PK is
+              // comment_id, actor_type, actor_id) — never user_id.
+              .eq('actor_type', actorType).eq('actor_id', actorId)
           : Promise.resolve({ data: [] as LikeRow[] }),
       ]);
 
@@ -461,7 +464,11 @@ export function useCommentsV2({
 
   const toggleLike = useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.rpc('toggle_comment_like_v2', { p_comment_id: id });
+      const { data, error } = await supabase.rpc('toggle_comment_like_v2', {
+        p_comment_id: id,
+        // Like as the active actor; the server falls back to the member if omitted.
+        ...(actorId ? { p_actor_type: actorType, p_actor_id: actorId } : {}),
+      });
       if (error) throw error;
       return data as { liked: boolean; count: number } | null;
     },
