@@ -1,5 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## Review tile height correction
+- [ ] Restore the original photo-overlay review layout and increase only review tile height by 20%.
+- [ ] Match review loading placeholders and verify focused checks.
+
 ## Profile handicap chart parity — done
 - [x] Reuse the profile bottom sheet's handicap trend chart in the profile Handicap tab.
 - [x] Preserve the tab's history windows, headline, scrub behavior, and no-history state.
