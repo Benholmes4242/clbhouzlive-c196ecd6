@@ -2896,6 +2896,8 @@ export type Database = {
       }
       content_reactions: {
         Row: {
+          actor_id: string
+          actor_type: string
           created_at: string
           id: string
           target_id: string
@@ -2903,6 +2905,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          actor_id: string
+          actor_type?: string
           created_at?: string
           id?: string
           target_id: string
@@ -2910,6 +2914,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          actor_id?: string
+          actor_type?: string
           created_at?: string
           id?: string
           target_id?: string
