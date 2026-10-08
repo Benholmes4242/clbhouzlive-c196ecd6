@@ -1260,8 +1260,9 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     };
   }, [roundEngagement, roundReactions, view]);
 
-  /* BRIEF_REVIEW_TILE_ACTIONS §8 — a review IS the reaction target
-     (target_type 'review'); no post is created, no ensure_round_post. */
+  /* BRIEF_REVIEW_TILE_ACTIONS §8 — a review IS its own reaction and comment
+     target ('review', course_ratings.id), exactly as a round is keyed on the
+     round itself. No post is created to hold either, so nothing is pending. */
   const engagementForReview = useCallback((item: StreamItem): RoundCardEngagement | null => {
     const reviewId = item.kind === 'review' ? item.facts.review_id : null;
     if (!reviewId || reviewReactions.unavailable) return null;
