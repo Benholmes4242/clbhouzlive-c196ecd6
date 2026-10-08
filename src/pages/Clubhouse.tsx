@@ -60,6 +60,11 @@ import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 // ── Decomposed hooks ──
 import { useClubhouseLifecycle } from '@/components/clubhouse/hooks/useClubhouseLifecycle';
 import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
+import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
+import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
+import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import {
   readSkeletonShapeHint,
   writeSkeletonShapeHint,
@@ -219,13 +224,19 @@ const ClubhouseContent = () => {
   );
   const courseContextMap = usePostCourseContext(feedCourseIds, FEED_SCOPE);
 
-  // C3 — THE ROUND CHAIN IS GONE. Round posts are filtered out of every feed
-  // this page reads (get_suggested_feed_v3 excludes them; the media-backed RPCs
-  // exclude them structurally), so the two sequential reads that resolved a
-  // post's score id and then its scorecard could only ever resolve nothing —
-  // while the first-paint gate waited on them. Removed with the round card:
-  // usePostScoreIds / usePostRounds / useRoundChainGate and the drill-in sheet.
-  // Rounds are opened from their own page (/round/:whsScoreId).
+  // C3 — THE ROUND CHAIN, wired exactly as the profile Posts tab wires it:
+  // post ids -> score ids -> rounds, two batched reads per page, then the
+  // capped gate. Shapes and medals are one batched read each for the page's
+  // score ids, the same reads Explore's round cards use. A card never fetches.
+  const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
+  const postScoreIdMap = usePostScoreIds(feedPostIds, FEED_SCOPE);
+  const feedScoreIds = useMemo(() => Array.from(postScoreIdMap.values()), [postScoreIdMap]);
+  const postRoundMap = usePostRounds(feedScoreIds, FEED_SCOPE);
+  const roundChainSettled = postScoreIdMap.settled && postRoundMap.settled;
+  const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
+  const roundShapeMap = useRoundHoleShapes(feedScoreIds);
+  const roundMedals = useBatchRoundMedals(feedScoreIds);
+  const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
 
   /* SKELETON SHAPE — reserve the shape of the card that is actually coming.
      Cold start has nothing to derive from, so it falls back to the SHORTEST
@@ -260,6 +271,10 @@ const ClubhouseContent = () => {
   const isLoading =
     !activeFeed.isFetched || activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
+  // The skeleton and the round chain agree: the skeleton holds until the
+  // chain settles, capped by useRoundChainGate so a slow network never
+  // turns a fast feed into a blank screen.
+  const roundsReady = useRoundChainGate(roundChainSettled, !isLoading && posts.length > 0);
   
   // Skeleton timing — first-content-ready contract
   const {
@@ -267,7 +282,7 @@ const ClubhouseContent = () => {
     skeletonMode,
     signalFirstContentReady,
     resetSkeleton,
-  } = useClubhouseSkeletonTiming(!isLoading && posts.length > 0);
+  } = useClubhouseSkeletonTiming(!isLoading && posts.length > 0 && roundsReady);
 
   // Perf: signal content-painted when skeleton resolves (posts loaded +
   // first video canplaythrough + min-hold). This is the LCP-equivalent for
@@ -549,6 +564,12 @@ const ClubhouseContent = () => {
                feedItems={feedItems}
               courseContextMap={courseContextMap}
               resolveCourseId={resolvePostCourseId}
+              postScoreIdMap={postScoreIdMap}
+              postRoundMap={postRoundMap}
+              postRoundsSettled={roundChainSettled && !roundChainFetching}
+              roundShapeMap={roundShapeMap}
+              roundMedalMap={roundMedals.isSuccess ? roundMedals.medals : undefined}
+              onRoundTap={(post, round) => setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })}
               topPadding={CHROME_CLEARANCE}
               onNearEnd={handleNearEnd}
               hasNextPage={hasNextPage}
@@ -586,6 +607,15 @@ const ClubhouseContent = () => {
         <ClubhouseSkeletonShimmer isVisible={isLoading} isStatic={false} variant={skeletonShape.variant} mediaRatio={skeletonShape.mediaRatio} isVideo={skeletonShape.isVideo} surface="card" />
       )}
 
+
+      {roundSheet && (
+        <RoundDetailSheet
+          open
+          onClose={() => setRoundSheet(null)}
+          scoreId={roundSheet.scoreId}
+          profileUserId={roundSheet.userId}
+        />
+      )}
 
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
       {activePost && posts.length > 0 && commentsMounted && (
