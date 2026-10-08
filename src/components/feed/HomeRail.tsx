@@ -36,11 +36,6 @@ function Band({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Wrapper that also collapses (no trailing gap) when the shelf is empty. */
-function BandSlot({ children }: { children: React.ReactNode }) {
-  return <div className="empty:hidden">{children}</div>;
-}
-
 function FeaturedRoundSlab({ viewerId }: { viewerId: string }) {
   const geo = useViewerScoreScope(viewerId).scope;
   const featured = useFeaturedRound(viewerId, 'world', {
@@ -82,7 +77,6 @@ function ClubWeekBand({ viewerId, pos }: { viewerId: string; pos: number }) {
   const { primaryClubId, primaryClubName } = geo.scope;
   if (!geo.isFetched || !primaryClubId) return null;
   return (
-    <BandSlot>
       <Band>
         <WeeklyClubShelf
           viewerId={viewerId}
@@ -92,7 +86,6 @@ function ClubWeekBand({ viewerId, pos }: { viewerId: string; pos: number }) {
           pos={pos}
         />
       </Band>
-    </BandSlot>
   );
 }
 
