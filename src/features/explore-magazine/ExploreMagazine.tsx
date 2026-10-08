@@ -163,10 +163,10 @@ type Block =
 /** §6d PAIRS carry no round shape, so only kinds that never draw one pair up. */
 const PAIRABLE = new Set(['review', 'course', 'story']);
 
-/** Full-width photo-led treatment is stable across views and positions, and
- *  asks the SAME predicate ExploreCard uses to put the text on the image. */
+/** Reviews always use the lead preset, with their words below the photograph.
+ *  Other kinds use the on-photo predicate, independent of view or position. */
 export function fullWidthCardSize(item: StreamItem): CardSize {
-  return rendersOnPhoto(item, 'lead') ? 'lead' : 'std';
+  return item.kind === 'review' || rendersOnPhoto(item, 'lead') ? 'lead' : 'std';
 }
 
 /** §5 shelves are inserted after card positions 3, 7, 11 ... An empty source

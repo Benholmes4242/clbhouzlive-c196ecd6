@@ -282,7 +282,12 @@ describe('Explore card shapes', () => {
     const hero = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
     const image = container.querySelector<HTMLElement>('button > span > div');
     expect(size).toBe('lead');
-    expect(hero?.style.minHeight).toBe('340px');
+    expect(hero).toBeNull();
+    expect(image?.style.height).toBe('260px');
+    expect(container.querySelector('[data-lead-review-body="true"]')).not.toBeNull();
+    const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
+    expect(headline?.textContent).toContain('A thoughtful review.');
+    expect(headline?.getAttribute('data-explore-line-clamp')).toBe('3');
     expect(image?.style.borderRadius).toBe('18px');
   });
 
