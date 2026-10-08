@@ -70,6 +70,8 @@ import { useCourseRecordSignal } from '@/features/explore-magazine/useCourseReco
 import { useViewerCourseContext } from '@/features/explore-magazine/useViewerCourseContext';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 import { roundCourseIdsFor } from '@/components/feed/roundCourseIds';
+import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
+import type { RoundCourseMeta } from '@/components/feed/roundPostItem';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import {
   readSkeletonShapeHint,
@@ -256,6 +258,14 @@ const ClubhouseContent = () => {
   const bests = useViewerCourseBests(user?.id);
   const roundCourseIds = useMemo(() => roundCourseIdsFor(posts, postScoreIdMap), [posts, postScoreIdMap]);
   const records = useCourseRecordSignal(user?.id, roundCourseIds);
+  /* Course image/region for round cards — the same read Explore uses. isFetched,
+     never isLoading; an empty id list is ready (the query is disabled then). */
+  const courseMetaQuery = useCourseCardMeta(roundCourseIds);
+  const courseMetaFetched = roundCourseIds.length === 0 || courseMetaQuery.isFetched;
+  const roundCourseMeta = useMemo<RoundCourseMeta>(
+    () => ({ map: courseMetaQuery.data, isFetched: courseMetaFetched }),
+    [courseMetaQuery.data, courseMetaFetched],
+  );
   const { context: viewerCourseContext, isFetched: viewerContextFetched } = useViewerCourseContext(user?.id);
   /* READINESS IS isFetched, NEVER isLoading (see useExploreStreamClient). An
      UNRESOLVED source still counts as fetched and yields no line rather than a
@@ -306,7 +316,7 @@ const ClubhouseContent = () => {
   // The skeleton and the round chain agree: the skeleton holds until the
   // chain settles, capped by useRoundChainGate so a slow network never
   // turns a fast feed into a blank screen.
-  const roundsReady = useRoundChainGate(roundChainSettled && consequenceFetched, !isLoading && posts.length > 0);
+  const roundsReady = useRoundChainGate(roundChainSettled && consequenceFetched && courseMetaFetched, !isLoading && posts.length > 0);
   
   // Skeleton timing — first-content-ready contract
   const {
@@ -602,6 +612,7 @@ const ClubhouseContent = () => {
               roundShapeMap={roundShapeMap}
               roundMedalMap={roundMedals.isSuccess ? roundMedals.medals : undefined}
               consequenceSources={consequenceSources}
+              roundCourseMeta={roundCourseMeta}
               onRoundTap={(post, round) => setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })}
               topPadding={CHROME_CLEARANCE}
               onNearEnd={handleNearEnd}

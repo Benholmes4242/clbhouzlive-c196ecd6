@@ -26,14 +26,26 @@ import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 import { roundConsequence, type ConsequenceSources } from '@/features/explore-magazine/consequences';
+import type { CourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
 import { roundScore } from './roundGross';
+
+/** Page-level course meta (useCourseCardMeta, the same read Explore uses).
+ *  isFetched false = in flight: the subject is pending, never a settled absence. */
+export interface RoundCourseMeta {
+  map: Map<string, CourseCardMeta> | undefined;
+  isFetched: boolean;
+}
 
 export function roundPostItem(
   post: FeedPost,
   round: PostRound | null,
   currentUserId: string | null | undefined,
   sources: ConsequenceSources | null = null,
+  courseMeta: RoundCourseMeta | null = null,
 ): StreamItem {
+  const courseId = post.courseId ?? null;
+  const meta = courseId ? courseMeta?.map?.get(courseId) : undefined;
+  const metaPending = !!courseId && !!courseMeta && !courseMeta.isFetched;
   const score = round ? roundScore(round) : null;
   const isViewer = !!currentUserId && post.userId === currentUserId;
   const playDate = round?.playDate ?? null;
@@ -65,11 +77,12 @@ export function roundPostItem(
       : null,
     subject: {
       course_id: post.courseId ?? null,
-      course_name: post.courseName ?? null,
-      region: null,
-      sub_country: null,
-      image_url: post.courseThumbnailImage ?? null,
-      pending: false,
+      course_name: post.courseName ?? meta?.name ?? null,
+      region: meta?.region ?? null,
+      sub_country: meta?.subCountry ?? null,
+      country: meta?.country ?? null,
+      image_url: meta?.imageUrl ?? post.courseThumbnailImage ?? null,
+      pending: metaPending,
     },
     who: {
       user_id: post.userId ?? null,
