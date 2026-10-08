@@ -64,6 +64,11 @@ import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
 import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
+import { useViewerStanding, type StandingRow } from '@/features/explore-magazine/useViewerStanding';
+import { useViewerCourseBests } from '@/features/explore-magazine/useViewerCourseBests';
+import { useCourseRecordSignal } from '@/features/explore-magazine/useCourseRecordSignal';
+import { useViewerCourseContext } from '@/features/explore-magazine/useViewerCourseContext';
+import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import {
   readSkeletonShapeHint,
@@ -236,6 +241,36 @@ const ClubhouseContent = () => {
   const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
   const roundShapeMap = useRoundHoleShapes(feedScoreIds);
   const roundMedals = useBatchRoundMedals(feedScoreIds);
+  /* PHASE 2 — THE CONSEQUENCE SOURCES, assembled exactly as
+     useExploreStreamClient does, ONE read each per page, never per card.
+     Standing is the one-argument get_viewer_standing — the same read the
+     "Where you stand" shelf uses, so n / of agree. Shortlist is the same
+     useViewerCourseContext Explore passes as context.shortlist. */
+  const standing = useViewerStanding(user?.id);
+  const standingMap = useMemo(() => {
+    const map = new Map<string, StandingRow>();
+    for (const row of standing.rows) map.set(row.course_id, row);
+    return map;
+  }, [standing.rows]);
+  const bests = useViewerCourseBests(user?.id);
+  const roundCourseIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const p of posts) if (p.courseId && postScoreIdMap.has(p.id)) ids.add(p.courseId);
+    return [...ids];
+  }, [posts, postScoreIdMap]);
+  const records = useCourseRecordSignal(user?.id, roundCourseIds);
+  const { context: viewerCourseContext, isFetched: viewerContextFetched } = useViewerCourseContext(user?.id);
+  /* READINESS IS isFetched, NEVER isLoading (see useExploreStreamClient). An
+     UNRESOLVED source still counts as fetched and yields no line rather than a
+     wrong one. Until every source has fetched, sources are null: no line. */
+  const consequenceFetched =
+    standing.isFetched && bests.isFetched && records.isFetched && viewerContextFetched;
+  const consequenceSources = useMemo<ConsequenceSources | null>(
+    () => consequenceFetched
+      ? { standing: standingMap, records, bests: bests.bests, shortlist: viewerCourseContext.shortlist }
+      : null,
+    [consequenceFetched, standingMap, records, bests.bests, viewerCourseContext.shortlist],
+  );
   const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
 
   /* SKELETON SHAPE — reserve the shape of the card that is actually coming.
@@ -274,7 +309,7 @@ const ClubhouseContent = () => {
   // The skeleton and the round chain agree: the skeleton holds until the
   // chain settles, capped by useRoundChainGate so a slow network never
   // turns a fast feed into a blank screen.
-  const roundsReady = useRoundChainGate(roundChainSettled, !isLoading && posts.length > 0);
+  const roundsReady = useRoundChainGate(roundChainSettled && consequenceFetched, !isLoading && posts.length > 0);
   
   // Skeleton timing — first-content-ready contract
   const {
@@ -569,6 +604,7 @@ const ClubhouseContent = () => {
               postRoundsSettled={roundChainSettled && !roundChainFetching}
               roundShapeMap={roundShapeMap}
               roundMedalMap={roundMedals.isSuccess ? roundMedals.medals : undefined}
+              consequenceSources={consequenceSources}
               onRoundTap={(post, round) => setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })}
               topPadding={CHROME_CLEARANCE}
               onNearEnd={handleNearEnd}

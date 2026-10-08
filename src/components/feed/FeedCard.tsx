@@ -67,6 +67,7 @@ import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import { roundPostItem } from './roundPostItem';
+import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 
 /** Home's content inset (the header's 12px). The round photo bleeds by it. */
 const ROUND_CARD_INSET = 12;
@@ -172,6 +173,8 @@ export interface FeedCardProps {
   roundShape?: HoleShape | null;
   /** Batched medal counts (useBatchRoundMedals, page level). undefined = none. */
   roundMedals?: RoundMedalCounts;
+  /** Page-level consequence sources; null until every source has fetched. */
+  consequenceSources?: ConsequenceSources | null;
   /**
    * Newest top-level comment for this post (batched by the host feed).
    * RENDERS FROM THE COMMENT, NEVER FROM comment_count — absent means no
@@ -328,6 +331,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onRoundTap,
   roundShape,
   roundMedals,
+  consequenceSources = null,
   commentPreview,
   commentPreviewEnabled = false,
 }) => {
@@ -511,7 +515,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // ordinary post and falls through.
   const rendersRoundCard = isRoundPost(post) && (!!postRound || !!postRoundPending);
   if (rendersRoundCard) {
-    const item = roundPostItem(post, postRound ?? null, currentUserId);
+    const item = roundPostItem(post, postRound ?? null, currentUserId, consequenceSources);
     return (
       <article
         ref={articleRef}
