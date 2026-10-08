@@ -7,8 +7,17 @@
  * Every figure comes from data the feed already batched (usePostRounds,
  * roundScore). Facts the Home chain does not carry are left null, never
  * guessed — ExploreCard already renders absent facts as nothing:
- *   - consequence / ring: Home has no viewer-standing read, so no record or
- *     rank callout is claimed. Feat callouts still come from the round facts.
+ *   - consequence: roundConsequence (the ONE consequence engine), fed the
+ *     page-level sources Clubhouse reads once per page — the shared
+ *     get_viewer_standing read the "Where you stand" shelf uses, the viewer's
+ *     course bests, the record book and the viewer's shortlist. So Home DOES
+ *     claim record and rank callouts. sources === null means a source has not
+ *     fetched yet: no line, never a provisional one. Home has no circle
+ *     source and no notable predicate, so isCircle / isNotable are false.
+ *   - ring: stays null PERMANENTLY. It is read only by streamItem's
+ *     RING_WEIGHT table and Explore's ranker, never by ExploreCard or
+ *     cardTreatment — a ranking input, and Home ranks with
+ *     get_suggested_feed_v3. Filling it in draws nothing.
  *   - current_handicap_index: not on PostRound; the who-line keeps it unread.
  *   - net: gam_round_net.net_score, already viewer-gated server-side.
  */
@@ -16,12 +25,14 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
+import { roundConsequence, type ConsequenceSources } from '@/features/explore-magazine/consequences';
 import { roundScore } from './roundGross';
 
 export function roundPostItem(
   post: FeedPost,
   round: PostRound | null,
   currentUserId: string | null | undefined,
+  sources: ConsequenceSources | null = null,
 ): StreamItem {
   const score = round ? roundScore(round) : null;
   const isViewer = !!currentUserId && post.userId === currentUserId;
@@ -38,7 +49,20 @@ export function roundPostItem(
     ring: null,
     lane: 'news',
     score: 0,
-    consequence: null,
+    consequence: sources && round
+      ? roundConsequence(
+          {
+            courseId: post.courseId ?? null,
+            userId: post.userId ?? null,
+            gross: score?.gross ?? null,
+            playDate,
+            isSelf: isViewer,
+            isCircle: false,
+            isNotable: false,
+          },
+          sources,
+        )
+      : null,
     subject: {
       course_id: post.courseId ?? null,
       course_name: post.courseName ?? null,
