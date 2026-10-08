@@ -8,7 +8,7 @@ import { computeBoardColumns, type BoardEntry } from '@/features/tourhub/leaderb
 import { formatOverviewDateRange, getOverviewCountdown, overviewChampionScoreLabel } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
-import { MiniBoard, shouldShowPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
+import { MiniBoard, heroBoardColumns, shouldShowPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, shouldShowAlsoThisWeekFigures, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
@@ -171,13 +171,13 @@ describe('Tour Overview correctness gates', () => {
     expect(playedHeader?.textContent).toContain('R1');
     expect(playedHeader?.textContent).toContain('R2');
     expect(playedHeader?.textContent).toContain('R3');
-    expect(playedHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 28px 28px 28px 40px');
+    expect(playedHeader?.style.gridTemplateColumns).toBe('34px minmax(0, 1fr) 28px 28px 28px 42px');
     played.unmount();
 
     const totalsOnly = render(board([row('1', {}), row('2', {})]));
     const totalsHeader = totalsOnly.container.querySelector<HTMLElement>('[data-overview-board-header]');
     expect(totalsHeader?.textContent).not.toContain('R1');
-    expect(totalsHeader?.style.gridTemplateColumns).toBe('44px minmax(0, 1fr) 40px');
+    expect(totalsHeader?.style.gridTemplateColumns).toBe('34px minmax(0, 1fr) 42px');
   });
 
   it('marks the current round live only until the tournament is complete', () => {
@@ -316,5 +316,38 @@ describe('our picks trophy', () => {
     expect(pickWonTournament('ra-uuid', champion)).toBe(false);
     expect(pickWonTournament('zj-uuid', null)).toBe(false);
     expect(pickWonTournament(null, champion)).toBe(false);
+  });
+});
+
+describe('heroBoardColumns', () => {
+  it('live, one round: THRU only', () => {
+    expect(heroBoardColumns({ roundCount: 1, roundInProgress: true, completed: false })).toEqual({ today: false, thru: true, rounds: false });
+  });
+  it('live, two or more rounds: TODAY and THRU', () => {
+    expect(heroBoardColumns({ roundCount: 2, roundInProgress: true, completed: false })).toEqual({ today: true, thru: true, rounds: false });
+  });
+  it('not live, two or more rounds: round columns', () => {
+    expect(heroBoardColumns({ roundCount: 3, roundInProgress: false, completed: true })).toEqual({ today: false, thru: false, rounds: true });
+  });
+  it('not live, one round or fewer: neither', () => {
+    expect(heroBoardColumns({ roundCount: 1, roundInProgress: false, completed: false })).toEqual({ today: false, thru: false, rounds: false });
+  });
+});
+
+describe('MiniBoard heroBoard render', () => {
+  it('live round one in progress renders THRU and no TODAY column', () => {
+    const entries = [
+      { id: 'a', position: 1, score: -3, thru: 9, round_1: -3, player: { id: 'pa', full_name: 'Player A' } },
+      { id: 'b', position: 2, score: -2, thru: 8, round_1: -2, player: { id: 'pb', full_name: 'Player B' } },
+    ] as unknown as BoardEntry[];
+    const view = render(createElement(
+      QueryClientProvider,
+      { client: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
+      createElement(MemoryRouter, null,
+        createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, currentRound: 1, phase: 'live', theme: 'heroBoard' })),
+    ));
+    const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
+    expect(header?.style.gridTemplateColumns).toBe('34px minmax(0, 1fr) 32px 42px');
+    expect(view.container.querySelectorAll('[data-hero-thru]').length).toBe(2);
   });
 });
