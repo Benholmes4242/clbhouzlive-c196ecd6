@@ -622,6 +622,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       onRoundTap,
       roundShapeMap,
       roundMedalMap,
+      roundCourseMeta,
       commentPreview.map,
     ],
   );
