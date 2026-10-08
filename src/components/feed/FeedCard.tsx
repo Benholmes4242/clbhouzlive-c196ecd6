@@ -58,13 +58,17 @@ import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } 
 import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
 import { PostCourseBand } from './PostCourseBand';
 import { CourseStatsSheet } from './CourseStatsSheet';
-import { fmtToPar } from './fmtToPar';
-import { roundScore } from './roundGross';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
-import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { SLAB } from './feedSurfaces';
+import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
+import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
+import { roundPostItem } from './roundPostItem';
+
+/** Home's content inset (the header's 12px). The round photo bleeds by it. */
+const ROUND_CARD_INSET = 12;
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 const LikeGlyph = reactionGlyph('like');
@@ -167,6 +171,11 @@ export interface FeedCardProps {
   postRoundMissing?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
+  /** Batched hole shape for this round (useRoundHoleShapes, page level).
+   *  undefined = unresolved; null = settled without usable hole detail. */
+  roundShape?: HoleShape | null;
+  /** Batched medal counts (useBatchRoundMedals, page level). undefined = none. */
+  roundMedals?: RoundMedalCounts;
   /**
    * Newest top-level comment for this post (batched by the host feed).
    * RENDERS FROM THE COMMENT, NEVER FROM comment_count — absent means no
@@ -322,6 +331,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   postRoundPending,
   postRoundMissing,
   onRoundTap,
+  roundShape,
+  roundMedals,
   commentPreview,
   commentPreviewEnabled = false,
 }) => {
@@ -486,14 +497,59 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       img.removeEventListener('error', onError);
     };
   }, [isFirstCard, isMulti, media, fireContentReady]);
-  // Photo backdrop only for round posts that actually have a course photo.
-  // The backdrop is claimed by the shell too, so the card surface does not
-  // change under the member when the round lands.
-  const hasRoundBackdrop = Boolean((postRound || postRoundPending) && post.courseThumbnailImage);
-
   const { t } = useTranslation('common');
-  // ONE definition of the round's score for the header and the card body.
-  const headerScore = useMemo(() => (postRound ? roundScore(postRound) : null), [postRound]);
+
+  /* A ROUND POST IS THE EXPLORE ROUND CARD (Phase 1, "exactly the same as they
+     are now in explore community"). One difference: the photograph runs full
+     bleed to the slab edges like every neighbour in this feed; everything under
+     it stays inset at the header's 12px. No glass, no score in an author row,
+     no kicker, no headline — ExploreCard's round branch decides all of that.
+     A post whose round is still in flight renders the same card (figures fill
+     in place); a round the viewer cannot read (postRoundMissing) falls back to
+     the ordinary post, as it did before C3. Likes use the post-like path
+     unchanged: toggle_post_like routes a round post's reaction to
+     content_reactions('round', whs_score_id) server-side, for every actor. */
+  const isRoundPost = !!postRound || !!postRoundPending;
+  if (isRoundPost) {
+    const item = roundPostItem(post, postRound ?? null, currentUserId);
+    return (
+      <article
+        ref={articleRef}
+        data-feed-round-card="true"
+        style={{
+          background: CARD,
+          overflow: 'hidden',
+          position: 'relative',
+          paddingInline: ROUND_CARD_INSET,
+          paddingBottom: 14,
+          borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}`,
+        }}
+      >
+        <ExploreCard
+          item={item}
+          size="std"
+          bleed={ROUND_CARD_INSET}
+          shape={postRound ? (roundShape === undefined ? undefined : roundShape) : undefined}
+          medals={roundMedals}
+          onTap={() => { if (postRound) onRoundTap?.(post, postRound); }}
+          onWhoTap={() => onProfile(post)}
+          engagement={{
+            kind: 'celebrate',
+            likeCount,
+            liked,
+            likeAvailable: true,
+            commentCount,
+            commentAvailable: true,
+            onToggleLike: () => onLike(post, effectiveActor),
+            onOpenComments: () => onComment(post, effectiveActor, 'footer_glyph'),
+            reactionSubjectId: postRound?.whsScoreId ?? null,
+            ownerName: post.displayName ?? null,
+            isOwnRound: item.who?.is_viewer === true,
+          }}
+        />
+      </article>
+    );
+  }
 
   return (
     <article
@@ -515,36 +571,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         <ReviewGhostNumeral rating={reviewRating} fontSize={110} right={-7} top={28} />
       )}
 
-      {/* Round posts with a course photo: card-level photo backdrop. Everything
-          above the actions row paints on one glass surface over it. No photo
-          means no backdrop and no backdrop-filter anywhere. */}
-      {hasRoundBackdrop && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 0,
-            backgroundImage: `url(${post.courseThumbnailImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-      )}
-
-      <div
-        style={
-          hasRoundBackdrop
-            ? {
-                position: 'relative',
-                zIndex: 1,
-                background: 'rgba(11,13,16,0.66)',
-                backdropFilter: 'blur(22px) saturate(150%)',
-                WebkitBackdropFilter: 'blur(22px) saturate(150%)',
-              }
-            : { position: 'relative', zIndex: 1 }
-        }
-      >
+      <div style={{ position: 'relative', zIndex: 1 }}>
 
 
       {/* Header */}
@@ -600,101 +627,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           </div>
         </div>
 
-        {/* THE ROUND SCORE SITS HERE (BRIEF_ROUND_POST_ENRICHMENT §2). The
-            author row already had empty space on its right, so the score costs
-            no height at all and the course name below keeps the full width. The
-            username truncates rather than pushing the score.
-
-            BRIEF_ROUND_CARD_GROSS_AND_NET — the figure is what the member SHOT
-            (the sum of their own cells), from the SHARED roundScore(). Only a
-            round with an uncompleted hole falls back to the WHS adjusted gross,
-            and then it says so. NET sits beside it, subordinate: smaller weight,
-            dim caps label, never coloured by the under-par law because net
-            against par is a different comparison from gross against par. */}
-        {postRound && headerScore && headerScore.gross != null && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0, gap: 2 }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 8,
-                fontVariantNumeric: 'tabular-nums',
-                fontFeatureSettings: '"zero" 0',
-              }}
-            >
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'baseline',
-                  gap: 2.5,
-                  fontVariantNumeric: 'tabular-nums',
-                  fontFeatureSettings: '"zero" 0',
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 30,
-                    fontWeight: 700,
-                    letterSpacing: '-0.03em',
-                    lineHeight: 1,
-                    color: '#FFFFFF',
-                    fontVariantNumeric: 'tabular-nums',
-                    fontFeatureSettings: '"zero" 0',
-                  }}
-                >
-                  {headerScore.gross}
-                </span>
-                {headerScore.toPar != null && (
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      fontVariantNumeric: 'tabular-nums',
-                      fontFeatureSettings: '"zero" 0',
-                      color: getScoreColor(headerScore.toPar, 'dark'),
-                      whiteSpace: 'nowrap',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {headerScore.toPar < 0
-                      ? `\u2212${Math.abs(headerScore.toPar)}`
-                      : fmtToPar(headerScore.toPar)}
-                    {headerScore.thru != null && (
-                      <span style={{ color: T60 }}> {'\u00B7'} {t('feed.roundCard.thruN', { n: headerScore.thru })}</span>
-                    )}
-                  </span>
-                )}
-              </span>
-              {postRound.netScore != null && (
-                <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      color: T60,
-                    }}
-                  >
-                    {t('feed.roundCard.net')}
-                  </span>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#FFFFFF' }}>
-                    {postRound.netScore}
-                  </span>
-                </span>
-              )}
-            </div>
-            {headerScore.source === 'whs' && headerScore.unscoredHoles > 0 && (
-              /* The card already refuses to total a NINE containing an
-                 uncompleted hole; this removes the contradiction of totalling
-                 the eighteen anyway without saying which figure it is. */
-              <span style={{ fontSize: 10.5, fontWeight: 600, color: T60, textAlign: 'right' }}>
-                {t('feed.roundCard.adjustedNotCompleted', { count: headerScore.unscoredHoles })}
-              </span>
-            )}
-          </div>
-        )}
-
 
         {/* Right chips */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
@@ -741,12 +673,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       />
 
 
-      {/* ROUND POSTS ARE NOT FEED CARDS. The attached-round block (PostRoundCard,
-          its shell and its degraded state) was deleted: no feed this card
-          renders in can contain a round post, so the branch was unreachable. A
-          round is read on its own page, /round/:whsScoreId. */}
-
-      {/* Media */}
+      {/* Media. A round post never reaches here: it returns the round card
+          above, whose photograph is the course's, not post_media's. */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         {isMulti ? (
           <MediaCarousel
@@ -879,7 +807,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                * region on every OTHER kind of post, where the band is the only
                * place the region appears at all.
                */
-              courseLocation={postRound ? null : courseLocation || null}
+              courseLocation={courseLocation || null}
               courseRating={post.courseRating ?? null}
               ctx={courseContext ?? null}
               /**
@@ -890,7 +818,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                */
               identityOnly={!!post.isReview}
               onOpenStats={post.courseId && !post.isReview ? () => setStatsOpen(true) : undefined}
-              surface={hasRoundBackdrop ? 'glass' : 'solid'}
+              surface="solid"
             />
             {post.courseId && !post.isReview && statsOpen && (
               <CourseStatsSheet
@@ -942,7 +870,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               /* 1px, matching PostCourseBand's rules and the card's own top
                  rule. The app gets ONE hairline weight on this surface. */
               borderTop: `1px solid ${LINE}`,
-              background: hasRoundBackdrop ? CARD : undefined,
             }}
           >
             {/* POST ACTIONS LEFT, ACTOR RIGHT (Ben, 14 Sep). Heart+count,
