@@ -781,13 +781,19 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     if (heroId && !ids.includes(heroId)) ids.push(heroId);
     return ids;
   }, [ranked, view, featured.data?.whs_score_id]);
-  const roundPosts = useRoundPostComments(roundScoreIds);
+  /* ONE OBJECT, ONE IDENTITY. A round's comments live on the ROUND
+     (whs_score_id), not on a post wrapping it - the same keying
+     content_reactions uses and the same keying stories already use. Before
+     8 Oct 2026 this tile opened the POST thread while the scorecard sheet
+     opened the ROUND thread, so one round showed two counts and two
+     conversations depending on where you tapped. Do not reintroduce a
+     post-keyed comment path for rounds or reviews. */
+  const roundEngagement = useStoryEngagement('round', roundScoreIds);
   const roundReactions = useContentReactions(
     useMemo(
       () => roundScoreIds.filter((id): id is string => !!id).map((id) => ({ type: 'round' as const, id })),
       [roundScoreIds],
     ),
-    { postIdFor: (scoreId) => roundPosts.infoFor(scoreId)?.postId ?? null },
   );
 
 
@@ -926,7 +932,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      SHEET ALONE. This page mounts CommentsSheetV2 itself, exactly as
      RoundDetailSheet does, so the round sheet is never involved and closing
      returns straight to the feed. */
-  const [openComments, setOpenComments] = useState<{ type: 'post' | 'review'; id: string } | null>(null);
+  const [openComments, setOpenComments] = useState<{ type: 'post' | 'review' | 'round'; id: string } | null>(null);
   const openPostComments = useCallback((id: string) => setOpenComments({ type: 'post', id }), []);
   const pageIxRef = useRef<number | null>(null);
   pageIxRef.current = pageIx;
@@ -1224,32 +1230,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view],
   );
 
-  /* FIRST COMMENT ON A POST-LESS ROUND. The control is inert while the RPC is
-     in flight; the sheet opens only on success; failure is a toast. */
-  const [ensuringScoreId, setEnsuringScoreId] = useState<string | null>(null);
-  const ensuringRef = useRef(false);
-  const ensureRoundPostAndOpen = useCallback(async (scoreId: string) => {
-    if (ensuringRef.current) return;
-    ensuringRef.current = true;
-    setEnsuringScoreId(scoreId);
-    try {
-      // ensure_round_post is hand-run SQL (docs/sql/ensure_round_post.sql) and
-      // is not yet in the generated types.
-      const { data, error } = await (supabase.rpc as unknown as (
-        fn: string, args: Record<string, unknown>,
-      ) => Promise<{ data: string | null; error: unknown }>)('ensure_round_post', { p_whs_score_id: scoreId });
-      if (error || !data) throw error ?? new Error('no post id');
-      setOpenComments({ type: 'post', id: data });
-      void queryClient.invalidateQueries({ queryKey: ["round-post-comments"] });
-    } catch (err) {
-      console.error('[round-comments] ensure_round_post failed', err);
-      toast.error('Could not open comments. Please try again.');
-    } finally {
-      ensuringRef.current = false;
-      setEnsuringScoreId(null);
-    }
-  }, [queryClient]);
-
   const engagementForRound = useCallback((
     scoreId: string | null,
     ownerName: string | null,
@@ -1257,7 +1237,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
     surface: 'feed' | 'hero',
   ) => {
     if (!scoreId || roundReactions.unavailable) return null;
-    const post = roundPosts.infoFor(scoreId);
     const state = roundReactions.stateFor('round', scoreId);
     const likeAvailable = !!roundReactions.viewerId;
     return {
@@ -1265,12 +1244,11 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       likeCount: state.count,
       liked: state.mine,
       likeAvailable,
-      commentCount: post?.commentCount ?? 0,
-      // EVERY ROUND IS COMMENTABLE. A round with no post gets one on first
-      // comment via ensure_round_post (owned by the round's owner, backdated,
-      // excluded from Clubhouse by post_type 'round' + round_pool_cap 0).
+      commentCount: roundEngagement.engagementFor(scoreId).commentCount,
+      // EVERY ROUND IS COMMENTABLE: the round is its own comment target, so no
+      // post has to exist first.
       commentAvailable: true,
-      commentPending: ensuringScoreId === scoreId,
+      commentPending: false,
       reactionSubjectId: scoreId,
       ownerName,
       isOwnRound: isOwn,
@@ -1280,11 +1258,10 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       } : undefined,
       onOpenComments: () => {
         analyticsEvents.track('explore_round_comments_opened', { score_id: scoreId, view, surface });
-        if (post) { setOpenComments({ type: 'post', id: post.postId }); return; }
-        void ensureRoundPostAndOpen(scoreId);
+        setOpenComments({ type: 'round', id: scoreId });
       },
     };
-  }, [ensureRoundPostAndOpen, ensuringScoreId, roundPosts, roundReactions, view]);
+  }, [roundEngagement, roundReactions, view]);
 
   /* BRIEF_REVIEW_TILE_ACTIONS §8 — a review IS the reaction target
      (target_type 'review'); no post is created, no ensure_round_post. */
@@ -1773,8 +1750,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           onClose={() => {
             const closedType = openComments.type;
             setOpenComments(null);
-            if (closedType === 'review') {
-              queryClient.invalidateQueries({ queryKey: ['story-engagement', 'review'], refetchType: 'all' });
+            if (closedType === 'review' || closedType === 'round') {
+              queryClient.invalidateQueries({ queryKey: ['story-engagement', closedType], refetchType: 'all' });
               return;
             }
             queryClient.invalidateQueries({ queryKey: ['round-post-comments'], refetchType: 'all' });
