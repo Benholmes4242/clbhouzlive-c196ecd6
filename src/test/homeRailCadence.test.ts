@@ -21,3 +21,10 @@ describe('homeRailAfter', () => {
     expect(homeRailAfter(4)).toBeNull();
   });
 });
+
+import { homeRailOrdinalAfter } from '@/components/feed/homeRailCadence';
+describe('homeRailOrdinalAfter (analytics pos)', () => {
+  it('is the rail ordinal, not a card count', () => {
+    expect([5, 11, 17].map(homeRailOrdinalAfter)).toEqual([0, 1, 2]);
+  });
+});
