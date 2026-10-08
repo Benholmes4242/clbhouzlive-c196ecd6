@@ -69,6 +69,7 @@ import { useViewerCourseBests } from '@/features/explore-magazine/useViewerCours
 import { useCourseRecordSignal } from '@/features/explore-magazine/useCourseRecordSignal';
 import { useViewerCourseContext } from '@/features/explore-magazine/useViewerCourseContext';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
+import { roundCourseIdsFor } from '@/components/feed/roundCourseIds';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import {
   readSkeletonShapeHint,
@@ -253,11 +254,7 @@ const ClubhouseContent = () => {
     return map;
   }, [standing.rows]);
   const bests = useViewerCourseBests(user?.id);
-  const roundCourseIds = useMemo(() => {
-    const ids = new Set<string>();
-    for (const p of posts) if (p.courseId && postScoreIdMap.has(p.id)) ids.add(p.courseId);
-    return [...ids];
-  }, [posts, postScoreIdMap]);
+  const roundCourseIds = useMemo(() => roundCourseIdsFor(posts), [posts]);
   const records = useCourseRecordSignal(user?.id, roundCourseIds);
   const { context: viewerCourseContext, isFetched: viewerContextFetched } = useViewerCourseContext(user?.id);
   /* READINESS IS isFetched, NEVER isLoading (see useExploreStreamClient). An
