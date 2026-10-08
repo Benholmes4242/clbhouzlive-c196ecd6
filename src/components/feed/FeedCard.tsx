@@ -509,6 +509,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
      the ordinary post, as it did before C3. Likes use the post-like path
      unchanged: toggle_post_like routes a round post's reaction to
      content_reactions('round', whs_score_id) server-side, for every actor. */
+
   const isRoundPost = !!postRound || !!postRoundPending;
   if (isRoundPost) {
     const item = roundPostItem(post, postRound ?? null, currentUserId);
