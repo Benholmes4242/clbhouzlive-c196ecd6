@@ -38,7 +38,6 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { isRoundPost } from '@/lib/posts/isRoundPost';
 import { InlineVideo } from './InlineVideo';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
