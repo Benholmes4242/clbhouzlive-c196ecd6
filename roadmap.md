@@ -1,8 +1,8 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## Review tile height correction
-- [ ] Restore the original photo-overlay review layout and increase only review tile height by 20%.
-- [ ] Match review loading placeholders and verify focused checks.
+- [x] Restore the original standard photo-overlay review layout; full-width frame 210 → 252px, rounds unchanged.
+- [x] Match review loading placeholders; 27 focused tests passed and preview build OK. Authenticated visual checks unavailable on external Supabase.
 
 ## Profile handicap chart parity — done
 - [x] Reuse the profile bottom sheet's handicap trend chart in the profile Handicap tab.
