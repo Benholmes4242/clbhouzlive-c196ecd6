@@ -94,6 +94,15 @@ export function useSuggestedFeed(userId: string | undefined) {
     initialPageParam: undefined as string | undefined,
     enabled: !!userId,
     staleTime: 0,
+    /* THE FEED REFRESHES WHEN THE APP COMES BACK. The app-wide default is
+       refetchOnWindowFocus: false (App.tsx), and refetchOnMount only fires on a
+       MOUNT — so with the Clubhouse feed mounted and the app merely backgrounded,
+       `staleTime: 0` marked this query permanently stale and NOTHING ever acted
+       on it. Combined with gcTime 24h and 'media-feed' being on the persister
+       allowlist, a page fetched before a video's media row landed stayed on
+       screen, and survived restarts, as a permanently text-only card. staleTime 0
+       is only meaningful if something is allowed to refetch. */
+    refetchOnWindowFocus: true,
     // Persisted (see queryPersister.ts): hold 24h so restored entries survive
     // hydrate. Revalidation on mount comes from the global default.
     gcTime: 24 * 60 * 60 * 1000,
