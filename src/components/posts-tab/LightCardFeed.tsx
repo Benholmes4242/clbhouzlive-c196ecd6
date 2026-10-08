@@ -27,6 +27,8 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
+import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { isPerfEnabled } from '@/perf/navTiming';
@@ -97,6 +99,10 @@ export interface LightCardFeedProps {
   /** False while the batched round chain is still in flight (shell state). */
   postRoundsSettled?: boolean;
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
+  /** Batched hole shapes keyed by whs_score_id; null = not resolved yet. */
+  roundShapeMap?: Map<string, HoleShape> | null;
+  /** Batched medal counts keyed by whs_score_id (resolved queries only). */
+  roundMedalMap?: Map<string, RoundMedalCounts>;
 }
 
 export const LightCardFeed: React.FC<LightCardFeedProps> = ({
@@ -123,6 +129,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   postRoundMap,
   postRoundsSettled = true,
   onRoundTap,
+  roundShapeMap,
+  roundMedalMap,
 }) => {
   // ── Active-card tracking (ported from CardFeed) ──
   /**
@@ -564,6 +572,15 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                   return !!sid && !postRoundMap?.get(sid);
                 })()}
                 onRoundTap={onRoundTap}
+                roundShape={(() => {
+                  const sid = postScoreIdMap?.get(post.id) ?? null;
+                  if (!sid || roundShapeMap == null) return undefined;
+                  return roundShapeMap.get(sid) ?? null;
+                })()}
+                roundMedals={(() => {
+                  const sid = postScoreIdMap?.get(post.id) ?? null;
+                  return sid ? roundMedalMap?.get(sid) : undefined;
+                })()}
                 commentPreviewEnabled
                 commentPreview={commentPreview.map.get(post.id) ?? null}
               />
@@ -596,6 +613,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       postRoundMap,
       postRoundsSettled,
       onRoundTap,
+      roundShapeMap,
+      roundMedalMap,
       commentPreview.map,
     ],
   );
