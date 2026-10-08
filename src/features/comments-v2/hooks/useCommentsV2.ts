@@ -15,6 +15,7 @@ import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
 import { patchEngagement } from '@/lib/engagementCache';
 import { useReactionPostIds } from '@/components/explore-tab-new/courseled/hooks/useReactionPostIds';
 import { commentsKeys, commentsScope, viewerId } from '@/lib/queryKeys';
+import { resolveReactionActor, isReactionByActor } from '@/lib/reactionActor';
 
 /**
  * 'tour_story' | 'amateur_story' (BRIEF_STORY_ENGAGEMENT §S5). Both story beats
@@ -88,8 +89,11 @@ export function useCommentsV2({
   const qc = useQueryClient();
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
-  const actorType = activeActor?.type ?? 'personal';
-  const actorId = activeActor?.id ?? user?.id ?? '';
+  // THE ACTIVE ACTOR, through the one shared resolver (reactionActor.ts).
+  // Signed out keeps the historical key values ('personal', '').
+  const resolvedActor = resolveReactionActor(activeActor, user?.id ?? null);
+  const actorType: 'personal' | 'business' = resolvedActor.type ?? 'personal';
+  const actorId = resolvedActor.id ?? '';
   const blockedIds = useBlockedUserIds(user?.id ?? null);
   /* A round's or review's comments live on the object itself, but the Home
      feed caches the WRAPPING post's comment count. Resolve that post (the same
@@ -219,7 +223,7 @@ export function useCommentsV2({
 
       type ProfileRow = { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null };
       type BusinessRow = { id: string; name: string | null; slug: string | null; logo_url: string | null; is_verified: boolean | null };
-      type LikeRow = { comment_id: string };
+      type LikeRow = { comment_id: string; user_id?: string; actor_type?: string | null; actor_id?: string | null };
       const [profilesRes, businessRes, likeCountsRes, myLikesRes] = await Promise.all([
         personalIds.length
           ? supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', personalIds)
@@ -229,7 +233,9 @@ export function useCommentsV2({
           : Promise.resolve({ data: [] as BusinessRow[] }),
         supabase.from('comment_likes_v2').select('comment_id').in('comment_id', rowIds),
         actorId
-          ? supabase.from('comment_likes_v2').select('comment_id').in('comment_id', rowIds).eq('user_id', user?.id ?? '')
+          // "Mine" is the ACTIVE ACTOR's like, never user_id's; the count above
+          // still counts every actor.
+          ? supabase.from('comment_likes_v2').select('comment_id, user_id, actor_type, actor_id').in('comment_id', rowIds)
           : Promise.resolve({ data: [] as LikeRow[] }),
       ]);
 
@@ -239,7 +245,11 @@ export function useCommentsV2({
       (likeCountsRes.data ?? []).forEach((l) =>
         likeCounts.set((l as LikeRow).comment_id, (likeCounts.get((l as LikeRow).comment_id) ?? 0) + 1)
       );
-      const myLikes = new Set((myLikesRes.data ?? []).map((l) => (l as LikeRow).comment_id));
+      const myLikes = new Set(
+        ((myLikesRes.data ?? []) as LikeRow[])
+          .filter((l) => isReactionByActor({ user_id: l.user_id ?? '', actor_type: l.actor_type, actor_id: l.actor_id }, actorType, actorId || null))
+          .map((l) => l.comment_id),
+      );
 
       // Merge over the previous result (batch idiom): loading page 2 of a
       // thread must never drop the actors/likes already on screen.
@@ -461,7 +471,11 @@ export function useCommentsV2({
 
   const toggleLike = useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.rpc('toggle_comment_like_v2', { p_comment_id: id });
+      const { data, error } = await supabase.rpc('toggle_comment_like_v2', {
+        p_comment_id: id,
+        p_actor_type: actorType,
+        p_actor_id: actorId,
+      });
       if (error) throw error;
       return data as { liked: boolean; count: number } | null;
     },
