@@ -55,7 +55,7 @@ import { ScoresLeaderboardsPage } from './ScoresLeaderboardsPage';
 import { StandingShelf } from './StandingShelf';
 import { ScoresStandingSlot } from './ConnectStandingInvite';
 
-import { LeadShell, PairShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
+import { LeadShell, PairShell, ReviewShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
 import { listCourseEvents } from './listCourseEvents';
 import {
   EXPLORE_VIEWS,
@@ -163,10 +163,10 @@ type Block =
 /** §6d PAIRS carry no round shape, so only kinds that never draw one pair up. */
 const PAIRABLE = new Set(['review', 'course', 'story']);
 
-/** Reviews always use the lead preset, with their words below the photograph.
- *  Other kinds use the on-photo predicate, independent of view or position. */
+/** Reviews retain their original standard photo-overlay composition.
+ *  Their taller frame is kind-owned; other kinds retain their existing sizing. */
 export function fullWidthCardSize(item: StreamItem): CardSize {
-  return item.kind === 'review' || rendersOnPhoto(item, 'lead') ? 'lead' : 'std';
+  return item.kind !== 'review' && rendersOnPhoto(item, 'lead') ? 'lead' : 'std';
 }
 
 /** §5 shelves are inserted after card positions 3, 7, 11 ... An empty source
@@ -1615,7 +1615,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
         {!source.isFetched && ranked.length === 0 ? (
           <>
-            <div style={{ paddingInline: CARD_INSET }}><StdShell /></div>
+            <div style={{ paddingInline: CARD_INSET }}><ReviewShell /></div>
             <div style={{ paddingInline: CARD_INSET }}><StdShell /></div>
           </>
         ) : null}
@@ -1659,9 +1659,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           const item = block.item;
           const pos = cardPos;
           cardPos += 1;
-          /* REVIEW HEIGHT IS KIND-OWNED, NOT POSITION-EARNED. A review at any
-             full-width position uses the real lead preset; every other kind is
-             std. Reviews are excluded from pairs by buildBlocks(). */
+          /* Review height is kind-owned, with its original standard overlay.
+             Reviews are excluded from pairs by buildBlocks(). */
           const size = fullWidthCardSize(item);
           const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
           return (
@@ -1690,8 +1689,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
 
         {hasMore ? (
           <div ref={sentinelRef} style={{ paddingInline: CARD_INSET }}>
-            {/* ONE shell while fetching. Never three. */}
-            <StdShell />
+            {/* Match the last known card kind while the next page loads. */}
+            {ranked[ranked.length - 1]?.kind === 'review' ? <ReviewShell /> : <StdShell />}
           </div>
         ) : null}
       </div>
