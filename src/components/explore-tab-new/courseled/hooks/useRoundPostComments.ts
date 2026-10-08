@@ -13,10 +13,8 @@
  * distinct), so the map is unambiguous.
  *
  * A round with no post yields no post id. THIS HOOK never creates a post — it
- * only reads. The rule is no longer absolute: the Explore call site
- * (ExploreMagazine) offers the comment control on EVERY round and, on the first
- * tap of a post-less round, calls ensure_round_post to create one for the
- * round's owner (FIX_EVERY_ROUND_IS_COMMENTABLE §2/§3).
+ * only reads. Explore no longer calls ensure_round_post for comments (8 Oct 2026):
+ * a round's comments live on the round itself ('round', whs_score_id).
  *
  * FRESHNESS: posts.comment_count is maintained by the comments_v2 count
  * triggers, so a comment written from ANY surface moves the same number. This
