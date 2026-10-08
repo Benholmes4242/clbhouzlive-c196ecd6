@@ -259,3 +259,22 @@ export const reactionKeys = {
   window: (ids: readonly string[], actorType: 'personal' | 'business' | null, actorId: string | null) =>
     ['content-reactions', ids.join(','), actorType ?? 'none', actorId ?? 'none'] as const,
 } as const;
+
+/* ─────────────────────────── Story / round / review engagement ─────────── */
+
+export const engagementKeys = {
+  /** Prefix — invalidating this refreshes every engagement window. */
+  root: () => ['story-engagement'] as const,
+  /** Prefix per target type (index 1), as existing invalidations use. */
+  type: (targetType: string) => ['story-engagement', targetType] as const,
+  /**
+   * One window. Same shape as reactionKeys.window: ids, then the ACTOR, because
+   * viewerLiked differs per actor and must never be served across identities.
+   */
+  window: (
+    targetType: string,
+    ids: readonly string[],
+    actorType: 'personal' | 'business' | null,
+    actorId: string | null,
+  ) => ['story-engagement', targetType, ids.join(','), actorType ?? 'none', actorId ?? 'none'] as const,
+} as const;

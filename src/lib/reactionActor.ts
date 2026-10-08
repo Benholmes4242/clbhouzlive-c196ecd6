@@ -22,6 +22,21 @@ export function reactionActorOf(r: ReactionActorRow): { type: ReactionActorType;
   return { type, id: r.actor_id ?? r.user_id };
 }
 
+/**
+ * THE ACTIVE ACTOR, resolved once for every reader: business when acting as a
+ * business, personal (the member's own id) otherwise; null when signed out.
+ */
+export function resolveReactionActor(
+  activeActor: { type?: string | null; id?: string | null } | null | undefined,
+  viewerId: string | null | undefined,
+): { type: ReactionActorType | null; id: string | null } {
+  if (!viewerId) return { type: null, id: null };
+  return {
+    type: activeActor?.type === 'business' ? 'business' : 'personal',
+    id: activeActor?.id ?? viewerId,
+  };
+}
+
 /** True when the row was made by exactly this actor. */
 export function isReactionByActor(
   r: ReactionActorRow,

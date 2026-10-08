@@ -18,6 +18,10 @@ import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { resolveReactionActor } from '@/lib/reactionActor';
+import { engagementKeys } from '@/lib/queryKeys';
 
 /**
  * TWO TARGET TYPES, NOT ONE. There are two story TABLES; a single 'story' type
@@ -64,14 +68,21 @@ export function useStoryEngagement(
     return [...seen].sort();
   }, [storyIds]);
 
+  // viewerLiked is the ACTIVE ACTOR's state, never the human's by default.
+  const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const actor = resolveReactionActor(activeActor, user?.id ?? null);
+
   const { data, isFetched } = useQuery<Row[]>({
-    queryKey: ['story-engagement', targetType, ids.join(',')],
+    queryKey: engagementKeys.window(targetType, ids, actor.type, actor.id),
     enabled: ids.length > 0,
     staleTime: 60_000,
     queryFn: async () => {
       const { data: rows, error } = await supabase.rpc('get_story_engagement', {
         p_target_type: targetType,
         p_ids: ids,
+        // Signed out: omit both; the RPC then reports viewer_liked false.
+        ...(actor.type && actor.id ? { p_actor_type: actor.type, p_actor_id: actor.id } : {}),
       });
       if (error) throw error;
       return (rows ?? []) as unknown as Row[];

@@ -17,13 +17,16 @@ export function useLikeMutation() {
 
   return useMutation({
     mutationFn: async ({ postId, actorId, actorType, isLiked }: LikeMutationParams) => {
-      // Canonical write path. The server decides the store: a PERSONAL like on a
-      // post created from a synced round records into content_reactions
-      // (target_type='round'), a PERSONAL like on a review-backed post into
-      // content_reactions (target_type='review', target_id = source_review_id,
-      // exactly what the Explore review tile writes — R3.1). Business-actor
-      // likes and everything else go to post_likes, because content_reactions
-      // has no actor columns. Idempotent in both directions.
+      // Canonical write path; the server (toggle_post_like) decides the store.
+      // content_reactions HAS actor columns (actor_type/actor_id, unique on
+      // target + actor), so a like on a round-backed post lands there against
+      // whs_score_id and on a review-backed post against source_review_id
+      // (R3.1), carrying the actor passed here. Rows already written to
+      // post_likes by business actors stay there until a separate migration
+      // moves them, which is why usePostLikes still stitches both stores.
+      // Idempotent in both directions. The RPC body is server-side and was
+      // changed this evening: this comment states the contract, not a reading
+      // of the deployed SQL.
       const { error } = await supabase.rpc('toggle_post_like', {
         p_post_id: postId,
         p_liked: !isLiked,
