@@ -314,8 +314,9 @@ const CardFeedSkeleton: React.FC<{
   mediaRatio?: string;
 }> = ({ isStatic = false, variant = 'regular', mediaRatio }) => {
   const topPad = 'calc(env(safe-area-inset-top, 0px) + 70px)';
-  // ROUND POSTS HAVE NO CLUBHOUSE HOME, so no first card can be a round and
-  // there is no round skeleton to draw. Removed with PostRoundCard.
+  // Round posts are back on Home. The skeleton holds while Clubhouse's round
+  // chain settles (useRoundChainGate, capped), so a first round card arrives
+  // drawn rather than as a shell; it reuses the regular card shape.
   const Card: React.FC<{ isStatic?: boolean }> = ({ isStatic: st }) => (
     <CardSkeleton isStatic={st} variant={variant} mediaRatio={mediaRatio ?? COLD_START_SHAPE.mediaRatio} />
   );
