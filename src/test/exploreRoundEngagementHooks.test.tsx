@@ -72,7 +72,7 @@ describe('Explore round engagement batching and optimistic state', () => {
       () => useContentReactions([{ type: 'round', id: 'score-1' }]),
       { wrapper: wrapper(qc) },
     );
-    await waitFor(() => expect(qc.getQueryData(['content-reactions', 'score-1'])).toBeTruthy());
+    await waitFor(() => expect(qc.getQueryData(['content-reactions', 'score-1', 'personal', 'viewer'])).toBeTruthy());
     act(() => view.result.current.toggle('round', 'score-1'));
     await waitFor(() => expect(view.result.current.stateFor('round', 'score-1').mine).toBe(true));
     act(() => finishInsert?.({ error: { code: 'XX000' } }));
