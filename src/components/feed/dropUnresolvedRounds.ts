@@ -27,8 +27,9 @@ export function dropUnresolvedRounds(
   let changed = false;
   const kept = posts.filter((post) => {
     const sid = postScoreIdMap?.get(post.id) ?? null;
-    // Classify by post_type only; score-id presence is the resolution check.
-    if (!isRoundPost(post)) return true;
+    // Score id OR post_type: postType is not populated on every feed read, so
+    // a post_type-only classifier would drop nothing at runtime.
+    if (!sid && !isRoundPost(post)) return true;
     const ok = !!sid && !!postRoundMap?.get(sid);
     if (!ok) changed = true;
     return ok;
