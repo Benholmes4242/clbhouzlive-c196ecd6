@@ -3,7 +3,7 @@ import React from 'react';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
-import { REVIEW_TILE_HEIGHT } from './reviewTileHeight';
+import { REVIEW_TILE_MIN_HEIGHT } from './reviewTileHeight';
 
 /**
  * THE SHELLS (BRIEF_EXPLORE_MAGAZINE §9).
@@ -62,7 +62,7 @@ export function LeadShell() {
 export function ReviewShell() {
   return (
     <div aria-hidden style={{ fontFamily: SANS }}>
-      <Block height={REVIEW_TILE_HEIGHT.std} radius={r.md} />
+      <Block height={REVIEW_TILE_MIN_HEIGHT} radius={r.md} />
     </div>
   );
 }

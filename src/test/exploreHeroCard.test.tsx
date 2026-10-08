@@ -211,7 +211,7 @@ describe('Explore card shapes', () => {
       },
     };
     const { container } = render(
-      <ExploreCard item={enriched} size="lead" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={enriched} size="std" shape={null} onTap={() => undefined} />,
     );
     const strip = container.querySelector<HTMLElement>('[data-review-stat-strip="true"]');
     expect(strip?.tagName).toBe('UL');
@@ -245,7 +245,7 @@ describe('Explore card shapes', () => {
       { design: 9, conditions: 8.5, clubhouse: null, facilities: 8 },
     ]) {
       const { container, unmount } = render(
-        <ExploreCard item={{ ...review(), facts: { ...review().facts, breakdown } }} size="lead" shape={null} onTap={() => undefined} />,
+        <ExploreCard item={{ ...review(), facts: { ...review().facts, breakdown } }} size="std" shape={null} onTap={() => undefined} />,
       );
       expect(container.querySelector('[data-review-stat-strip="true"]')).toBeNull();
       expect(container.querySelector('[data-review-score="true"]')).not.toBeNull();
@@ -255,14 +255,14 @@ describe('Explore card shapes', () => {
 
   it('renders a short review ON the photo at the lead minimum height with its reserved lanes', () => {
     const { container } = render(
-      <ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={review()} size="std" shape={null} onTap={() => undefined} />,
     );
 
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
     const topLine = container.querySelector<HTMLElement>('[data-review-top-line="true"]');
     const bottom = container.querySelector<HTMLElement>('[data-explore-hero-bottom-lane="true"]');
 
-    expect(onPhoto?.style.minHeight).toBe('408px');
+    expect(onPhoto?.style.minHeight).toBe('252px');
     expect(onPhoto?.style.flexDirection).toBe('column');
     /* C5 §3.2 — identity moves to the TOP of the frame and lives inside the
        unchanged 48px lane; §4.3 removed the quote. */
@@ -306,17 +306,17 @@ describe('Explore card shapes', () => {
 
   it('C5 §3.1 keeps a long review on the unchanged frame with no quote to grow', () => {
     const { container } = render(
-      <ExploreCard item={longReview()} size="lead" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={longReview()} size="std" shape={null} onTap={() => undefined} />,
     );
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
-    expect(onPhoto?.style.minHeight).toBe('408px');
+    expect(onPhoto?.style.minHeight).toBe('252px');
     expect(onPhoto?.style.height).toBe('');
     expect(container.querySelector('[data-explore-headline="true"]')).toBeNull();
   });
 
   it('uses the ruled on-photo colors and shadows for a review', () => {
     const { container, getByText } = render(
-      <ExploreCard item={review()} size="lead" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={review()} size="std" shape={null} onTap={() => undefined} />,
     );
 
     const topLine = container.querySelector<HTMLElement>('[data-review-top-line="true"]');
@@ -334,7 +334,7 @@ describe('Explore card shapes', () => {
 
   it('keeps the viewer name amber on a review', () => {
     const { getByText } = render(
-      <ExploreCard item={review(true)} size="lead" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={review(true)} size="std" shape={null} onTap={() => undefined} />,
     );
 
     expect(getByText('You').style.color).not.toBe('rgb(255, 255, 255)');
@@ -342,7 +342,7 @@ describe('Explore card shapes', () => {
 
   it('C5 §3.2/§3.3 prints the member at the top and the course in the foot', () => {
     const { container } = render(
-      <ExploreCard item={{ ...review(), ring: 'world' }} size="lead" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={{ ...review(), ring: 'world' }} size="std" shape={null} onTap={() => undefined} />,
     );
     const topLine = container.querySelector<HTMLElement>('[data-review-top-line="true"]');
     expect(topLine?.textContent).toContain('danny.akers1');
@@ -358,7 +358,7 @@ describe('Explore card shapes', () => {
       subject: { ...round().subject, course_name: "Prince's Golf Club (Shore, Dunes & Himalayas)" },
     };
     const { container } = render(
-      <ExploreCard item={longCourse} size="lead" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={longCourse} size="std" shape={null} onTap={() => undefined} />,
     );
     const member = container.querySelector<HTMLElement>('[data-review-member-name="true"]');
     const course = container.querySelector<HTMLElement>('[data-review-course-name="true"]');
@@ -371,7 +371,7 @@ describe('Explore card shapes', () => {
 
   it.each([1, 5])('C5 §4.2 never shows a photo-count chip on a lead review (%i)', (photoCount) => {
     const { container } = render(
-      <ExploreCard item={{ ...review(), facts: { ...review().facts, photoCount } }} size="lead" shape={null} onTap={() => undefined} />,
+      <ExploreCard item={{ ...review(), facts: { ...review().facts, photoCount } }} size="std" shape={null} onTap={() => undefined} />,
     );
     expect(container.querySelector('[data-review-photo-count="true"]')).toBeNull();
   });

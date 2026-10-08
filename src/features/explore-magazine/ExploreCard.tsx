@@ -26,7 +26,7 @@ import { courseSubScoreTone } from '@/features/courses/components/holes/analytic
 import { headlineFor, kickerParts, railCaptionDate, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
 import { calloutFor, rendersOnPhoto } from './cardTreatment';
-import { REVIEW_TILE_HEIGHT } from './reviewTileHeight';
+import { REVIEW_TILE_MIN_HEIGHT } from './reviewTileHeight';
 import { FigureCell, RoundStatStrip, vsHandicapLabel } from './AchievementCallout';
 import { dotsFor, SCORE_TRACE_PLOT_HEIGHT, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
@@ -827,7 +827,7 @@ export function ExploreCard({
      photograph, and the kicker stays suppressed for non-pair rounds. The predicate lives in cardTreatment.ts because ExploreMagazine
      sizes the card from the same answer. */
   const onPhoto = rendersOnPhoto(item, size);
-  const photoHeight = item.kind === 'review' && size !== 'pair' ? REVIEW_TILE_HEIGHT[size] : PHOTO_H[size];
+  const photoHeight = item.kind === 'review' && size !== 'pair' ? REVIEW_TILE_MIN_HEIGHT : PHOTO_H[size];
   const roundPhotoCourse = item.kind === 'round' && size !== 'pair' ? kickerPartsValue.course : null;
   const roundCourseRef = useFitOneLine<HTMLSpanElement>(roundPhotoCourse ?? '', 17, 12);
   const isOwnRound = item.kind === 'round' && item.who?.is_viewer === true;
