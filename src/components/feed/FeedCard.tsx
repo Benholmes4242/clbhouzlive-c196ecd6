@@ -164,11 +164,6 @@ export interface FeedCardProps {
    * never paints without its scorecard and then gains one.
    */
   postRoundPending?: boolean;
-  /**
-   * SETTLED-AND-ABSENT: the round map has finished and has no entry for this
-   * post. Distinct from `postRoundPending` on purpose — see PostRoundDegraded.
-   */
-  postRoundMissing?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
   /** Batched hole shape for this round (useRoundHoleShapes, page level).
@@ -329,7 +324,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   courseContext,
   postRound,
   postRoundPending,
-  postRoundMissing,
   onRoundTap,
   roundShape,
   roundMedals,

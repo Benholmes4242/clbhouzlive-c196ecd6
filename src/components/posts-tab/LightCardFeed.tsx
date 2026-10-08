@@ -573,11 +573,6 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                   const sid = postScoreIdMap?.get(post.id) ?? null;
                   return !!sid && !postRoundMap?.get(sid);
                 })()}
-                postRoundMissing={(() => {
-                  if (!postRoundsSettled) return false;
-                  const sid = postScoreIdMap?.get(post.id) ?? null;
-                  return !!sid && !postRoundMap?.get(sid);
-                })()}
                 onRoundTap={onRoundTap}
                 roundShape={(() => {
                   const sid = postScoreIdMap?.get(post.id) ?? null;
