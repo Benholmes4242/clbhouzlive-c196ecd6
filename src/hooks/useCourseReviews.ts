@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useBlockedUserIds } from './useBlockedUserIds';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { isReactionByActor, type ReactionActorType } from '@/lib/reactionActor';
 
 export interface ReviewMediaItem {
   id: string;
@@ -66,9 +68,14 @@ export function useCourseReviews(
 ) {
   const filtersKey = filters ? JSON.stringify(filters) : 'none';
   const blockedIds = useBlockedUserIds(currentUserId);
+  const { activeActor } = useActiveActor();
+  const actorType: ReactionActorType | null = currentUserId
+    ? activeActor?.type === 'business' ? 'business' : 'personal'
+    : null;
+  const actorId: string | null = currentUserId ? (activeActor?.id ?? currentUserId) : null;
 
   return useQuery({
-    queryKey: ['course-reviews-full', courseId, sortBy, ratingFilter, filtersKey, blockedIds.size],
+    queryKey: ['course-reviews-full', courseId, sortBy, ratingFilter, filtersKey, blockedIds.size, actorType, actorId],
     enabled: Boolean(courseId),
     queryFn: async (): Promise<CourseReview[]> => {
       if (!courseId) return [];
@@ -198,16 +205,21 @@ export function useCourseReviews(
 
 
       // If user is logged in, fetch their votes for these reviews
-      if (currentUserId && reviews.length > 0) {
+      // "Did I like this" is the ACTIVE ACTOR's question, never user_id's: a
+      // business row carries the tapping human's user_id (see reactionActor.ts).
+      if (currentUserId && actorId && reviews.length > 0) {
         const reviewIds = reviews.map((r) => r.id);
         const { data: likes } = await supabase
           .from('content_reactions')
-          .select('target_id')
-          .eq('user_id', currentUserId)
+          .select('target_id, user_id, actor_type, actor_id')
           .eq('target_type', 'review')
           .in('target_id', reviewIds);
 
-        const liked = new Set((likes ?? []).map((l) => l.target_id as string));
+        const liked = new Set(
+          ((likes ?? []) as any[])
+            .filter((l) => isReactionByActor(l, actorType, actorId))
+            .map((l) => l.target_id as string),
+        );
 
         return reviews.map((review) => ({
           ...review,
