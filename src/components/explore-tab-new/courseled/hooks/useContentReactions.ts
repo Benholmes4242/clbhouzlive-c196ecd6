@@ -6,6 +6,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { patchEngagement, seedViewerInLikers } from '@/lib/engagementCache';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { useReactionPostIds } from './useReactionPostIds';
 
 /**
  * useContentReactions (BRIEF_DISCOVER_REACTIONS, section 3).
@@ -82,6 +83,14 @@ export function useContentReactions(
   const viewerId = user?.id ?? null;
   const queryClient = useQueryClient();
   const { availableActors } = useActiveActor();
+  const resolvedPostIdFor = useReactionPostIds(targets);
+  // The caller's postIdFor (ExploreMagazine) still wins, so that path does not
+  // change behaviour; every other caller now resolves through the batched hook.
+  const postIdFor = useCallback(
+    (targetId: string): string | null =>
+      options.postIdFor?.(targetId) ?? resolvedPostIdFor(targetId),
+    [options.postIdFor, resolvedPostIdFor],
+  );
 
   // Stable key: the sorted set of ids in the visible window.
   const ids = useMemo(() => {
