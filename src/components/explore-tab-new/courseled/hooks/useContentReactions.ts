@@ -7,6 +7,7 @@ import { toast } from '@/lib/toast';
 import { patchEngagement, seedViewerInLikers } from '@/lib/engagementCache';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useReactionPostIds } from './useReactionPostIds';
+import { reactionKeys } from '@/lib/queryKeys';
 
 /**
  * useContentReactions (BRIEF_DISCOVER_REACTIONS, section 3).
@@ -53,6 +54,8 @@ interface Row {
   target_type: string;
   target_id: string;
   user_id: string;
+  actor_type: string | null;
+  actor_id: string | null;
 }
 
 /** Postgres/PostgREST codes for "relation does not exist". */
@@ -82,7 +85,21 @@ export function useContentReactions(
   const { user } = useSupabaseSession();
   const viewerId = user?.id ?? null;
   const queryClient = useQueryClient();
-  const { availableActors } = useActiveActor();
+  const { availableActors, activeActor } = useActiveActor();
+  // THE ACTIVE ACTOR — resolved exactly as useClubhouseLikes does: business
+  // when acting as a business, personal (the member's own id) otherwise.
+  const actorType: 'personal' | 'business' | null = viewerId
+    ? activeActor?.type === 'business' ? 'business' : 'personal'
+    : null;
+  const actorId: string | null = viewerId ? (activeActor?.id ?? viewerId) : null;
+  const isMine = useCallback(
+    (r: Row) =>
+      !!actorId &&
+      // Legacy rows predating the actor columns are the member's own.
+      (r.actor_type ?? 'personal') === actorType &&
+      (r.actor_id ?? r.user_id) === actorId,
+    [actorType, actorId],
+  );
   const resolvedPostIdFor = useReactionPostIds(targets);
   // The caller's postIdFor (ExploreMagazine) still wins, so that path does not
   // change behaviour; every other caller now resolves through the batched hook.
@@ -100,8 +117,8 @@ export function useContentReactions(
   }, [targets]);
 
   const queryKey = useMemo(
-    () => ['content-reactions', ids.join(',')] as const,
-    [ids],
+    () => reactionKeys.window(ids, actorType, actorId),
+    [ids, actorType, actorId],
   );
 
   const { data, isError, isFetched } = useQuery<CacheShape>({
@@ -111,7 +128,7 @@ export function useContentReactions(
     queryFn: async () => {
       const { data: rows, error } = await supabase
         .from('content_reactions')
-        .select('target_type, target_id, user_id')
+        .select('target_type, target_id, user_id, actor_type, actor_id')
         .in('target_id', ids);
       if (error) {
         if (MISSING_TABLE.has(String((error as { code?: string }).code ?? ''))) {
@@ -134,11 +151,11 @@ export function useContentReactions(
       const prev = out.get(k) ?? { count: 0, mine: false };
       out.set(k, {
         count: prev.count + 1,
-        mine: prev.mine || (!!viewerId && r.user_id === viewerId),
+        mine: prev.mine || isMine(r),
       });
     }
     return out;
-  }, [data?.rows, viewerId]);
+  }, [data?.rows, isMine]);
 
   const stateFor = useCallback(
     (type: ReactionTargetType, id: string | null | undefined): ReactionState =>
@@ -148,20 +165,28 @@ export function useContentReactions(
 
   const mutation = useMutation({
     mutationFn: async ({ type, id, mine }: ReactionTarget & { mine: boolean }) => {
-      if (!viewerId) return;
+      if (!viewerId || !actorType || !actorId) return;
       if (mine) {
+        // Match on the ACTOR, not the member: a member who reacted both as
+        // themselves and as their business must only lose the active one.
+        // RLS still scopes the delete to rows the member may touch.
         const { error } = await supabase
           .from('content_reactions')
           .delete()
-          .eq('user_id', viewerId)
           .eq('target_type', type)
-          .eq('target_id', id);
+          .eq('target_id', id)
+          .eq('actor_type' as never, actorType as never)
+          .eq('actor_id' as never, actorId as never);
         if (error) throw error;
         return;
       }
       const { error } = await supabase
         .from('content_reactions')
-        .insert({ user_id: viewerId, target_type: type, target_id: id });
+        // user_id is the HUMAN who acted (FK to auth.users; account-deletion
+        // cascade depends on it). actor_id is WHO THE REACTION IS FROM. Equal
+        // for a personal reaction, different for a business one — neither is
+        // redundant.
+        .insert({ user_id: viewerId, actor_type: actorType, actor_id: actorId, target_type: type, target_id: id } as never);
       // The unique constraint makes a double-fire harmless.
       if (error && String((error as { code?: string }).code ?? '') !== DUPLICATE_KEY) throw error;
     },
@@ -177,19 +202,23 @@ export function useContentReactions(
      */
     onMutate: ({ type, id, mine }) => {
       if (!viewerId) return { previous: [] as [readonly unknown[], CacheShape | undefined][], revertLikers: undefined as undefined | (() => void) };
-      const entries = queryClient.getQueriesData<CacheShape>({ queryKey: ['content-reactions'] });
+      const entries = queryClient.getQueriesData<CacheShape>({ queryKey: reactionKeys.root() });
       const previous: [readonly unknown[], CacheShape | undefined][] = [];
       for (const [key, prev] of entries) {
         if (!prev) continue;
+        // Only windows read under THIS actor move — another actor's window
+        // describes a different "mine".
+        const k = key as unknown[];
+        if (k[2] !== (actorType ?? 'none') || k[3] !== (actorId ?? 'none')) continue;
         // The id-set lives in the key, so only windows showing this target move.
         const window = String((key as unknown[])[1] ?? '').split(',');
         if (!window.includes(id)) continue;
         previous.push([key, prev]);
         const rows = mine
           ? prev.rows.filter(
-              (r) => !(r.target_type === type && r.target_id === id && r.user_id === viewerId),
+              (r) => !(r.target_type === type && r.target_id === id && isMine(r)),
             )
-          : [...prev.rows, { target_type: type, target_id: id, user_id: viewerId }];
+          : [...prev.rows, { target_type: type, target_id: id, user_id: viewerId, actor_type: actorType, actor_id: actorId }];
         queryClient.setQueryData<CacheShape>(key as readonly unknown[], { ...prev, rows });
       }
       const postId = postIdFor(id);
@@ -236,7 +265,7 @@ export function useContentReactions(
       // report this like — refresh them together, by prefix (no source).
       // Post-likes keys are named from the READER's identity: the post id,
       // plus the review id (which has readers). Never a null id.
-      queryClient.invalidateQueries({ queryKey: ['content-reactions'] });
+      queryClient.invalidateQueries({ queryKey: reactionKeys.root() });
       if (vars.type === 'review') queryClient.invalidateQueries({ queryKey: ['post-likes', vars.id] });
       const postId = postIdFor(vars.id);
       if (postId) queryClient.invalidateQueries({ queryKey: ['post-likes', postId] });

@@ -244,3 +244,18 @@ export const discoverKeys = {
     perMember: number,
   ) => ['discover', 'personal-bests', viewer, days, limit, perMember] as const,
 } as const;
+
+/* ─────────────────────────── Content reactions ─────────────────────────── */
+
+export const reactionKeys = {
+  /** Prefix for every reactions window — invalidation and cross-window patches. */
+  root: () => ['content-reactions'] as const,
+  /**
+   * One visible window. The ids stay at index 1 (onMutate parses it to find
+   * windows holding a target). The ACTOR is in the key because "did I react"
+   * differs per actor: without it, switching to a business served the
+   * personal actor's state out of cache.
+   */
+  window: (ids: readonly string[], actorType: 'personal' | 'business' | null, actorId: string | null) =>
+    ['content-reactions', ids.join(','), actorType ?? 'none', actorId ?? 'none'] as const,
+} as const;
