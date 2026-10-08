@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { createElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { computeBoardColumns, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
+import { BOARD_GEOMETRY, BoardTable, computeBoardColumns, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import { formatOverviewDateRange, getOverviewCountdown, overviewChampionScoreLabel } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
@@ -171,13 +171,13 @@ describe('Tour Overview correctness gates', () => {
     expect(playedHeader?.textContent).toContain('R1');
     expect(playedHeader?.textContent).toContain('R2');
     expect(playedHeader?.textContent).toContain('R3');
-    expect(playedHeader?.style.gridTemplateColumns).toBe('34px minmax(0, 1fr) 28px 28px 28px 42px');
+    expect(playedHeader?.style.gridTemplateColumns).toBe('24px minmax(0, 1fr) 26px 26px 26px 40px');
     played.unmount();
 
     const totalsOnly = render(board([row('1', {}), row('2', {})]));
     const totalsHeader = totalsOnly.container.querySelector<HTMLElement>('[data-overview-board-header]');
     expect(totalsHeader?.textContent).not.toContain('R1');
-    expect(totalsHeader?.style.gridTemplateColumns).toBe('34px minmax(0, 1fr) 42px');
+    expect(totalsHeader?.style.gridTemplateColumns).toBe('24px minmax(0, 1fr) 40px');
   });
 
   it('marks the current round live only until the tournament is complete', () => {
@@ -347,7 +347,44 @@ describe('MiniBoard heroBoard render', () => {
         createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, currentRound: 1, phase: 'live', theme: 'heroBoard' })),
     ));
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns).toBe('34px minmax(0, 1fr) 32px 42px');
+    expect(header?.style.gridTemplateColumns).toBe('24px minmax(0, 1fr) 26px 40px');
     expect(view.container.querySelectorAll('[data-hero-thru]').length).toBe(2);
+  });
+});
+
+describe('one board geometry', () => {
+  const liveEntries = [
+    { id: 'a', position: 1, score: -5, thru: 9, round_1: -3, round_2: -2, player: { id: 'pa', full_name: 'Player A' } },
+    { id: 'b', position: 2, score: -4, thru: 7, round_1: -2, round_2: -2, player: { id: 'pb', full_name: 'Player B' } },
+  ] as unknown as BoardEntry[];
+  const wrap = (el: ReturnType<typeof createElement>) => createElement(
+    QueryClientProvider,
+    { client: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
+    createElement(MemoryRouter, null, el),
+  );
+
+  it('BoardTable right-aligns THRU and round columns and keeps POS centred', () => {
+    const view = render(wrap(createElement(BoardTable, {
+      entries: liveEntries, cutState: { kind: 'none', cutline: null, extraCount: 0 }, currentRound: 2, showHeader: true,
+    })));
+    const c = view.container;
+    const thruHeader = c.querySelector<HTMLElement>('[data-board-thru-header]');
+    expect(thruHeader?.style.textAlign).toBe('right');
+    const thruCells = c.querySelectorAll<HTMLElement>('[data-board-thru-cell]');
+    expect(thruCells.length).toBeGreaterThan(0);
+    thruCells.forEach((el) => expect(el.style.textAlign).toBe('right'));
+    const roundHeaders = c.querySelectorAll<HTMLElement>('[data-board-round-header]');
+    expect(roundHeaders.length).toBeGreaterThan(0);
+    roundHeaders.forEach((el) => expect(el.style.textAlign).toBe('right'));
+    c.querySelectorAll<HTMLElement>('[data-board-round-cell]').forEach((el) => expect(el.style.textAlign).toBe('right'));
+    expect(c.querySelector<HTMLElement>('[data-board-pos-header]')?.style.textAlign).toBe('center');
+  });
+
+  it('the hero board draws round cells at BoardTable\'s round-cell width', () => {
+    const entries = liveEntries.map((e) => ({ ...e, thru: 18 }));
+    const view = render(wrap(createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, phase: 'completed', theme: 'heroBoard' })));
+    const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
+    expect(header?.style.gridTemplateColumns).toContain(`${BOARD_GEOMETRY.cell}px ${BOARD_GEOMETRY.cell}px`);
+    expect(header?.style.gridTemplateColumns.endsWith(`${BOARD_GEOMETRY.tot}px`)).toBe(true);
   });
 });
