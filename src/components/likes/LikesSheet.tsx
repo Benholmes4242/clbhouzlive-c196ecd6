@@ -5,9 +5,9 @@
  * Discover tile when no post exists at all, and the same round in the feed
  * shares that ONE list. The title has to describe the likes, not the post.
  *
- * Business actors appear on round posts (a permanent exception — content_reactions
- * has no actor columns, so business likes stay in post_likes). They have no
- * handicap, so their row shows the business type instead. No empty handicap line.
+ * Every row is the ACTOR: a business like shows the business's name and logo
+ * (resolved in usePostLikes from business_accounts), never the human behind it.
+ * Businesses have no handicap, so their row shows the business type instead. No empty handicap line.
  *
  * Read and presentation only. No like write path here.
  *
@@ -75,7 +75,9 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
   const renderRow = (l: (typeof rows)[number], i: number) => {
     const isBusiness = l.actorType === 'business';
     const actorId = l.actorId ?? l.userId;
-    const isViewer = !isBusiness && !!user?.id && actorId === user.id;
+    // Actor-matched in usePostLikers — a member acting as a business is not
+    // "you" on their personal row, and is "you" on the business's.
+    const isViewer = l.isViewer;
     return (
       <button
         key={`${l.actorType ?? 'personal'}:${actorId}`}

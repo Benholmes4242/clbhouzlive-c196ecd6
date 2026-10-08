@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation, useSearchParams } from 'react-rout
 import { supabase } from '@/integrations/supabase/client';
 import { getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { Loader2, MapPin } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { recordPostViewOnce } from '@/hooks/usePostViewTracker';
@@ -48,6 +49,9 @@ const PostDeepLinkPage: React.FC = () => {
   const navState = location.state as { openComments?: boolean; initialCommentId?: string } | null;
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const activeActorType: 'personal' | 'business' = activeActor?.type === 'business' ? 'business' : 'personal';
+  const activeActorId: string | null = activeActor?.id ?? user?.id ?? null;
   // videoRef removed — poster-only chassis per BRIEF_VIDEO_TEARDOWN.md.
 
   const [post, setPost] = useState<PostPreview | null>(null);
@@ -301,8 +305,10 @@ const PostDeepLinkPage: React.FC = () => {
       if (user?.id) {
         const { data: liked } = await supabase.rpc('viewer_liked_post', {
           p_post_id: row.id,
-          p_viewer: user.id,
-          p_actor_type: 'personal',
+          // p_viewer is the ACTOR id (post_likes.actor_id = p_viewer).
+          p_viewer: activeActorId ?? user.id,
+          // The ACTIVE actor's flag, never assumed personal.
+          p_actor_type: activeActorType,
         });
         likedByMe = liked === true;
       }
@@ -321,7 +327,7 @@ const PostDeepLinkPage: React.FC = () => {
     });
 
     if (postId) recordPostViewOnce(postId);
-  }, [postId, user?.id, retryTick, authLoading]);
+  }, [postId, user?.id, retryTick, authLoading, activeActorType, activeActorId]);
 
   // Logged-in users: open the global fullscreen viewer with the loaded post
   // and the comments sheet open. Closing the viewer navigates back.
