@@ -42,6 +42,30 @@ export interface RoundPostInfo {
   authorUserId: string | null;
 }
 
+/**
+ * The batched round-post read, shared verbatim with useReactionPostIds so the
+ * two hooks resolve to ONE request per window (same key, same fn) instead of two.
+ */
+export function roundPostsQuery(ids: readonly string[]) {
+  return {
+    queryKey: ['round-post-comments', ids.join(',')] as const,
+    enabled: ids.length > 0,
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    queryFn: async (): Promise<PostRow[]> => {
+      const { data: rows, error } = await supabase
+        .from('posts')
+        .select('id, whs_score_id, comment_count, user_id')
+        .in('whs_score_id', [...ids]);
+      if (error) {
+        console.error('[round-comments] batched round-post read failed; controls hidden', error);
+        throw error;
+      }
+      return (rows ?? []) as unknown as PostRow[];
+    },
+  };
+}
+
 export function useRoundPostComments(scoreIds: readonly (string | null | undefined)[]) {
   const qc = useQueryClient();
 
@@ -57,21 +81,8 @@ export function useRoundPostComments(scoreIds: readonly (string | null | undefin
   );
 
   const { data, isFetched } = useQuery<PostRow[]>({
+    ...roundPostsQuery(ids),
     queryKey,
-    enabled: ids.length > 0,
-    staleTime: 30_000,
-    refetchOnWindowFocus: true,
-    queryFn: async () => {
-      const { data: rows, error } = await supabase
-        .from('posts')
-        .select('id, whs_score_id, comment_count, user_id')
-        .in('whs_score_id', ids);
-      if (error) {
-        console.error('[round-comments] batched round-post read failed; controls hidden', error);
-        throw error;
-      }
-      return (rows ?? []) as unknown as PostRow[];
-    },
   });
 
   const map = useMemo(() => {
