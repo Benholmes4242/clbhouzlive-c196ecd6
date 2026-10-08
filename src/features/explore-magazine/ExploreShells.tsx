@@ -3,6 +3,7 @@ import React from 'react';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { r } from '@/lib/radius';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
+import { REVIEW_TILE_HEIGHT } from './reviewTileHeight';
 
 /**
  * THE SHELLS (BRIEF_EXPLORE_MAGAZINE §9).
@@ -53,6 +54,15 @@ export function LeadShell() {
   return (
     <div aria-hidden style={{ fontFamily: SANS }}>
       <Block height={340} radius={r.lg} />
+    </div>
+  );
+}
+
+/** The standard review overlay has no separate caption below its frame. */
+export function ReviewShell() {
+  return (
+    <div aria-hidden style={{ fontFamily: SANS }}>
+      <Block height={REVIEW_TILE_HEIGHT.std} radius={r.md} />
     </div>
   );
 }

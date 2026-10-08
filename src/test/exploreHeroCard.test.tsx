@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import { fullWidthCardSize } from '@/features/explore-magazine/ExploreMagazine';
+import { ReviewShell } from '@/features/explore-magazine/ExploreShells';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
 
 afterEach(cleanup);
@@ -261,7 +262,7 @@ describe('Explore card shapes', () => {
     const topLine = container.querySelector<HTMLElement>('[data-review-top-line="true"]');
     const bottom = container.querySelector<HTMLElement>('[data-explore-hero-bottom-lane="true"]');
 
-    expect(onPhoto?.style.minHeight).toBe('340px');
+    expect(onPhoto?.style.minHeight).toBe('408px');
     expect(onPhoto?.style.flexDirection).toBe('column');
     /* C5 §3.2 — identity moves to the TOP of the frame and lives inside the
        unchanged 48px lane; §4.3 removed the quote. */
@@ -272,23 +273,31 @@ describe('Explore card shapes', () => {
     expect(bottom?.style.height).toBe('16px');
     const chipLane = onPhoto?.firstElementChild as HTMLElement | null;
     expect(chipLane?.style.flex).toBe('0 0 48px');
-    expect(chipLane?.contains(topLine!)).toBe(true);
+    expect(topLine && chipLane?.contains(topLine)).toBe(true);
   });
 
-  it.each([0, 5])('renders a review at position %i through the lead path', (position) => {
+  it.each([0, 5])('restores the review overlay at position %i with a 20% taller frame', (position) => {
     const item = { ...review(), id: `review-${position}` };
     const size = fullWidthCardSize(item);
     const { container } = render(<ExploreCard item={item} size={size} shape={null} onTap={() => undefined} />);
     const hero = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
     const image = container.querySelector<HTMLElement>('button > span > div');
-    expect(size).toBe('lead');
-    expect(hero).toBeNull();
-    expect(image?.style.height).toBe('260px');
-    expect(container.querySelector('[data-lead-review-body="true"]')).not.toBeNull();
+    expect(size).toBe('std');
+    expect(hero?.style.minHeight).toBe('252px');
+    expect(image?.style.minHeight).toBe('252px');
+    expect(container.querySelector('[data-lead-review-body="true"]')).toBeNull();
     const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
     expect(headline?.textContent).toContain('A thoughtful review.');
-    expect(headline?.getAttribute('data-explore-line-clamp')).toBe('3');
-    expect(image?.style.borderRadius).toBe('18px');
+    expect(headline?.getAttribute('data-explore-line-clamp')).toBe('2');
+    expect(hero && headline && hero.contains(headline)).toBe(true);
+    expect(container.querySelector('[data-figure-chip="review-stacked"]')).not.toBeNull();
+    expect(image?.style.borderRadius).toBe('14px');
+  });
+
+  it('matches the review loading shell to its taller overlay frame', () => {
+    const { container } = render(<ReviewShell />);
+    expect(container.querySelector<HTMLElement>('.clb-shimmer-dark')?.style.height).toBe('252px');
+    expect(container.querySelector<HTMLElement>('.clb-shimmer-dark')?.style.borderRadius).toBe('14px');
   });
 
   it('keeps a full-width round on the std path', () => {
@@ -300,7 +309,7 @@ describe('Explore card shapes', () => {
       <ExploreCard item={longReview()} size="lead" shape={null} onTap={() => undefined} />,
     );
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
-    expect(onPhoto?.style.minHeight).toBe('340px');
+    expect(onPhoto?.style.minHeight).toBe('408px');
     expect(onPhoto?.style.height).toBe('');
     expect(container.querySelector('[data-explore-headline="true"]')).toBeNull();
   });
@@ -345,8 +354,8 @@ describe('Explore card shapes', () => {
   it('C5 §3.3 truncates a long member name and a long course without wrapping', () => {
     const longCourse = {
       ...review(),
-      who: { ...review().who!, display_name: 'A member with an exceptionally long display name' },
-      subject: { ...review().subject!, course_name: "Prince's Golf Club (Shore, Dunes & Himalayas)" },
+      who: { ...round().who, display_name: 'A member with an exceptionally long display name' },
+      subject: { ...round().subject, course_name: "Prince's Golf Club (Shore, Dunes & Himalayas)" },
     };
     const { container } = render(
       <ExploreCard item={longCourse} size="lead" shape={null} onTap={() => undefined} />,

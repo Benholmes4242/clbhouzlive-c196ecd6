@@ -26,6 +26,7 @@ import { courseSubScoreTone } from '@/features/courses/components/holes/analytic
 import { headlineFor, kickerParts, railCaptionDate, relativeDay, toParLabel } from './exploreCopy';
 import type { StreamItem } from './streamItem';
 import { calloutFor, rendersOnPhoto } from './cardTreatment';
+import { REVIEW_TILE_HEIGHT } from './reviewTileHeight';
 import { FigureCell, RoundStatStrip, vsHandicapLabel } from './AchievementCallout';
 import { dotsFor, SCORE_TRACE_PLOT_HEIGHT, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
@@ -94,8 +95,6 @@ export interface RoundCardEngagement {
 }
 
 const PHOTO_H: Record<CardSize, number> = { lead: 340, std: 210, pair: 124 };
-/** A lead review's photograph carries only the identity line; its words sit under it. */
-const LEAD_REVIEW_PHOTO_H = 260; // lighter than PHOTO_H.lead (340): the words carry a review
 /** The radius canon is a CSS length, not a number: r.lg '18px', r.md '14px'. */
 const RADIUS: Record<CardSize, string> = { lead: r.lg, std: r.md, pair: r.md };
 /** The trace width the lead and std pass. New widths, not new behaviour. */
@@ -828,6 +827,7 @@ export function ExploreCard({
      photograph, and the kicker stays suppressed for non-pair rounds. The predicate lives in cardTreatment.ts because ExploreMagazine
      sizes the card from the same answer. */
   const onPhoto = rendersOnPhoto(item, size);
+  const photoHeight = item.kind === 'review' && size !== 'pair' ? REVIEW_TILE_HEIGHT[size] : PHOTO_H[size];
   const roundPhotoCourse = item.kind === 'round' && size !== 'pair' ? kickerPartsValue.course : null;
   const roundCourseRef = useFitOneLine<HTMLSpanElement>(roundPhotoCourse ?? '', 17, 12);
   const isOwnRound = item.kind === 'round' && item.who?.is_viewer === true;
@@ -908,11 +908,10 @@ export function ExploreCard({
   );
 
   const leadReview = size === 'lead' && item.kind === 'review';
-  /* §3 A STORY CLAMPS AT FOUR, like the tour hero. A lead review clamps at
-     three: a pull quote, not body copy; the clamp is a ceiling, not reserved
-     height. Other leads at 3. */
+  /* §3 A STORY CLAMPS AT FOUR, like the tour hero. Every other branch is
+     untouched: the review stays at 2, other leads at 3. */
   const headlineLineClamp = leadReview
-    ? 3
+    ? 2
     : size === 'lead'
       ? (item.kind === 'story' ? 4 : 3)
       : 2;
@@ -1144,7 +1143,7 @@ export function ExploreCard({
   const reviewScoreTone = item.facts.rating != null && courseSubScoreTone(item.facts.rating) === A.GREEN
     ? A.GREEN
     : 'rgba(255,255,255,0.94)';
-  const reviewScoreRow = leadReview ? (
+  const reviewFoot = leadReview ? (
     <span data-review-instrument="true" style={{ display: 'block', minWidth: 0 }}>
       <span style={{ display: 'flex', alignItems: 'flex-end', gap: 12, minWidth: 0 }}>
         {item.facts.rating != null ? (
@@ -1172,9 +1171,7 @@ export function ExploreCard({
             </span>
           </span>
         ) : null}
-        {/* LEFT-ALIGNED BESIDE THE SCORE: right-aligned, the course read as a
-            caption rather than a title. */}
-        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', flex: '1 1 auto', minWidth: 0, textAlign: 'left', paddingBottom: 2 }}>
+        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'auto', minWidth: 0, textAlign: 'right' }}>
           {kickerPartsValue.course ? (
             <span
               data-review-course-name="true"
@@ -1200,14 +1197,7 @@ export function ExploreCard({
           ) : null}
         </span>
       </span>
-    </span>
-  ) : null;
-  /* The four sub-scores are OFF the lead tile: they restate the score above
-     and live one tap away in the review sheet. ReviewStatStrip is kept, unused,
-     pending a deliberate removal. */
-  void ReviewStatStrip;
-  const reviewActions = leadReview ? (
-    <span data-review-actions-wrap="true" style={{ display: 'block', minWidth: 0 }}>
+      <ReviewStatStrip breakdown={item.facts.breakdown} />
       {/* BRIEF_REVIEW_TILE_ACTIONS §2 — its own line under the stat strip.
           gap 26 = two ±13px hit boxes abutting. A review video reserves the
           bottom-right duration badge (which never moves). */}
@@ -1217,7 +1207,7 @@ export function ExploreCard({
           style={{
             display: 'flex', alignItems: 'center', gap: 26,
             marginTop: 12, paddingTop: 11,
-            borderTop: '1px solid rgba(255,255,255,0.12)',
+            borderTop: '1px solid rgba(255,255,255,0.20)',
           }}
         >
           <ReactionAction
@@ -1292,8 +1282,8 @@ export function ExploreCard({
       flatWhenEmpty={onPhoto}
       initialsSize={size === 'pair' ? 18 : 26}
       style={onPhoto
-        ? { minHeight: PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }
-        : { height: leadReview ? LEAD_REVIEW_PHOTO_H : PHOTO_H[size], borderRadius: RADIUS[size], width: '100%' }}
+        ? { minHeight: photoHeight, borderRadius: RADIUS[size], width: '100%' }
+        : { height: photoHeight, borderRadius: RADIUS[size], width: '100%' }}
     >
       {chips}
       {/* ROUND COURSE CAPTION. FeaturedRoundCard puts the course name at the
@@ -1346,9 +1336,6 @@ export function ExploreCard({
           <span data-review-photo-figure="true">{item.facts.photoCount}</span>
         </GlassBadge>
       ) : null}
-      {leadReview ? (
-        <span style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 2 }}>{reviewTopLine}</span>
-      ) : null}
       {onPhoto && item.kind === 'story' ? (
         <span
           aria-hidden
@@ -1364,14 +1351,14 @@ export function ExploreCard({
             zIndex: 2,
             display: 'flex',
             flexDirection: 'column',
-            minHeight: PHOTO_H[size],
+            minHeight: photoHeight,
           }}
         >
           <span
-            aria-hidden={item.kind !== 'story'}
+            aria-hidden={item.kind !== 'story' && !leadReview}
             style={{ flex: `0 0 ${HERO_CHIP_LANE}px`, minWidth: 0, overflow: 'hidden' }}
           >
-            {item.kind === 'story' ? storyMetaNode : null}
+            {item.kind === 'story' ? storyMetaNode : leadReview ? reviewTopLine : null}
           </span>
           <span style={{ flex: '1 1 auto', minHeight: 0 }} />
           <span style={{ position: 'relative', display: 'block' }}>
@@ -1384,14 +1371,19 @@ export function ExploreCard({
             )}
             <span
               data-explore-hero-copy="true"
-              style={{ position: 'relative', zIndex: 1, display: 'block', paddingInline: 16 }}
+              style={leadReview
+                ? { position: 'relative', zIndex: 1, display: 'block', padding: '0 16px 16px' }
+                : { position: 'relative', zIndex: 1, display: 'block', paddingInline: 16 }}
             >
-              {item.kind === 'story' ? storyEyebrowNode : (
+               {leadReview ? null : item.kind === 'story' ? storyEyebrowNode : (
                 <span data-explore-hero-kicker="true" style={{ display: 'block' }}>{kicker}</span>
               )}
-              {headlineNode}
+              {/* §4.3 THE QUOTE IS GONE for a lead review — the words live on the
+                  review page. Every other kind keeps its headline. */}
+              {leadReview ? null : headlineNode}
               {renderStandfirst(true)}
-              {item.kind !== 'story' ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
+              {reviewFoot}
+               {!leadReview && item.kind !== 'story' ? <WhoLine item={item} size={size} onPhoto onWhoTap={onWhoTap} engagement={engagement} /> : null}
             </span>
             {/* §3 THE BOTTOM LANE IS 16px AND CARRIES NO TRACE. On-photo is now
                 the REVIEW shape, and a review has no round shape to draw; the
@@ -1475,15 +1467,7 @@ export function ExploreCard({
           ownerDisplayName={item.who?.display_name ?? null}
         />
       ) : null}
-      {leadReview ? (
-        /* LEAD REVIEW, UNDER THE PHOTOGRAPH: score + course, then the member's
-           own sentence (the one thing only this card says), then actions. */
-        <span data-lead-review-body="true" style={{ display: 'block', padding: '12px 4px 0', minWidth: 0 }}>
-          {reviewScoreRow}
-          <span style={{ display: 'block', marginTop: 10 }}>{headlineNode}</span>
-          {reviewActions}
-        </span>
-      ) : !onPhoto ? (
+      {!onPhoto ? (
         /* §3d text inside a card's caption area is inset a further 4px. */
         <span style={{ display: 'block', paddingInline: 4, marginTop: item.kind === 'round' && size !== 'pair' && callout ? 0 : 8 }}>
           {item.kind === 'round' && size !== 'pair' ? null : kicker}
