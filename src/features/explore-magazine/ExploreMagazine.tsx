@@ -8,7 +8,6 @@ import { useDiscoverMediaPreview } from '@/components/explore-tab-new/courseled/
 import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
-import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hooks/useRoundPostComments';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { FeatRarityProvider } from '@/hooks/gam/useFeatRarity';
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
