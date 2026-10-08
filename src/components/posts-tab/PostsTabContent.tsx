@@ -42,6 +42,9 @@ import { PendingReviewCard } from '@/features/review-v2/components/PendingReview
 import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
 import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
 import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
+import { roundCourseIdsFor } from '@/components/feed/roundCourseIds';
+import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
+import type { RoundCourseMeta } from '@/components/feed/roundPostItem';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
@@ -143,7 +146,16 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
   const roundShapeMap = useRoundHoleShapes(feedScoreIds);
   const roundMedals = useBatchRoundMedals(feedScoreIds);
-  const roundsReady = useRoundChainGate(roundChainSettled, !isLoading && posts.length > 0);
+  const roundCourseIds = useMemo(() => roundCourseIdsFor(filteredPosts, postScoreIdMap), [filteredPosts, postScoreIdMap]);
+  /* Course image/region for round cards — the same read Home and Explore use.
+     isFetched, never isLoading; an empty id list is ready. */
+  const courseMetaQuery = useCourseCardMeta(roundCourseIds);
+  const courseMetaFetched = roundCourseIds.length === 0 || courseMetaQuery.isFetched;
+  const roundCourseMeta = useMemo<RoundCourseMeta>(
+    () => ({ map: courseMetaQuery.data, isFetched: courseMetaFetched }),
+    [courseMetaQuery.data, courseMetaFetched],
+  );
+  const roundsReady = useRoundChainGate(roundChainSettled && courseMetaFetched, !isLoading && posts.length > 0);
 
   const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
 
@@ -378,6 +390,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           postRoundMap={postRoundMap}
           postRoundsSettled={roundChainSettled && !roundChainFetching}
           roundShapeMap={roundShapeMap}
+          roundCourseMeta={roundCourseMeta}
           roundMedalMap={roundMedals.isSuccess ? roundMedals.medals : undefined}
           onRoundTap={(post, round) =>
             setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
