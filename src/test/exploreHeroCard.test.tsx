@@ -242,7 +242,7 @@ describe('Explore card shapes', () => {
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
     const bottom = container.querySelector<HTMLElement>('[data-explore-hero-bottom-lane="true"]');
 
-    expect(onPhoto?.style.minHeight).toBe('252px');
+    expect(onPhoto?.style.minHeight).toBe('340px');
     expect(onPhoto?.style.flexDirection).toBe('column');
     expect(container.querySelector('[data-explore-headline="true"]')?.textContent).toContain('A thoughtful review.');
     expect(container.querySelector('.explore-who-line')).not.toBeNull();
@@ -258,8 +258,8 @@ describe('Explore card shapes', () => {
     const hero = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
     const image = container.querySelector<HTMLElement>('button > span > div');
     expect(size).toBe('std');
-    expect(hero?.style.minHeight).toBe('252px');
-    expect(image?.style.minHeight).toBe('252px');
+    expect(hero?.style.minHeight).toBe('340px');
+    expect(image?.style.minHeight).toBe('340px');
     expect(container.querySelector('[data-lead-review-body="true"]')).toBeNull();
     const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
     expect(headline?.textContent).toContain('A thoughtful review.');
@@ -271,7 +271,7 @@ describe('Explore card shapes', () => {
 
   it('matches the review loading shell to its taller overlay frame', () => {
     const { container } = render(<ReviewShell />);
-    expect(container.querySelector<HTMLElement>('.clb-shimmer-dark')?.style.height).toBe('252px');
+    expect(container.querySelector<HTMLElement>('.clb-shimmer-dark')?.style.height).toBe('340px');
     expect(container.querySelector<HTMLElement>('.clb-shimmer-dark')?.style.borderRadius).toBe('14px');
   });
 
@@ -284,7 +284,7 @@ describe('Explore card shapes', () => {
       <ExploreCard item={longReview()} size="std" shape={null} onTap={() => undefined} />,
     );
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
-    expect(onPhoto?.style.minHeight).toBe('252px');
+    expect(onPhoto?.style.minHeight).toBe('340px');
     expect(onPhoto?.style.height).toBe('');
     expect(container.querySelector('[data-explore-headline="true"]')?.getAttribute('data-explore-line-clamp')).toBe('2');
   });
@@ -452,5 +452,31 @@ describe('Explore card shapes', () => {
     expect(container.querySelector('[data-explore-kicker-row="true"]')).not.toBeNull();
     expect(container.querySelector('[data-explore-kicker-course="true"]')?.textContent).toBe('The Addington Golf Club');
     expect(container.querySelector<HTMLElement>('[data-explore-kicker-row="true"]')?.style.marginTop).toBe('0px');
+  });
+});
+
+describe('review tile fixed height', () => {
+  it('holds every review at exactly 340px regardless of quote length', () => {
+    const { container } = render(
+      <div>
+        <ExploreCard item={review()} size="std" shape={null} onTap={() => undefined} />
+        <ExploreCard item={longReview()} size="std" shape={null} onTap={() => undefined} />
+      </div>,
+    );
+    const photos = Array.from(container.querySelectorAll<HTMLElement>('button > span > div'));
+    expect(photos).toHaveLength(2);
+    for (const photo of photos) {
+      expect(photo.style.height).toBe('340px');
+      expect(photo.style.minHeight).toBe('');
+    }
+  });
+
+  it('lets an on-photo story at lead grow with minHeight, not height', () => {
+    const { container } = render(
+      <ExploreCard item={story()} size="lead" shape={null} onTap={() => undefined} />,
+    );
+    const photo = container.querySelector<HTMLElement>('button > span > div');
+    expect(photo?.style.minHeight).not.toBe('');
+    expect(photo?.style.height).toBe('');
   });
 });
