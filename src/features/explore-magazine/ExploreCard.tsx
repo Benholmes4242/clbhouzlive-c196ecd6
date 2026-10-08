@@ -95,7 +95,7 @@ export interface RoundCardEngagement {
 
 const PHOTO_H: Record<CardSize, number> = { lead: 340, std: 210, pair: 124 };
 /** A lead review's photograph carries only the identity line; its words sit under it. */
-const LEAD_REVIEW_PHOTO_H = 190;
+const LEAD_REVIEW_PHOTO_H = 260; // lighter than PHOTO_H.lead (340): the words carry a review
 /** The radius canon is a CSS length, not a number: r.lg '18px', r.md '14px'. */
 const RADIUS: Record<CardSize, string> = { lead: r.lg, std: r.md, pair: r.md };
 /** The trace width the lead and std pass. New widths, not new behaviour. */
@@ -908,10 +908,11 @@ export function ExploreCard({
   );
 
   const leadReview = size === 'lead' && item.kind === 'review';
-  /* §3 A STORY CLAMPS AT FOUR, like the tour hero. Every other branch is
-     untouched: the review stays at 2, other leads at 3. */
+  /* §3 A STORY CLAMPS AT FOUR, like the tour hero. A lead review clamps at
+     three: a pull quote, not body copy; the clamp is a ceiling, not reserved
+     height. Other leads at 3. */
   const headlineLineClamp = leadReview
-    ? 2
+    ? 3
     : size === 'lead'
       ? (item.kind === 'story' ? 4 : 3)
       : 2;
