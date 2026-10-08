@@ -256,18 +256,29 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
       >
         {hasInitials ? (
           <span
+            data-avatar-fallback=""
             style={{
               fontSize: `${initialsFontSize}px`,
               fontWeight: 600,
               letterSpacing: '0.01em',
               lineHeight: 1,
               userSelect: 'none',
+              // Cut-out headshots are transparent PNGs: hide the initials once a
+              // bitmap has decoded so they don't show through. Gradient stays.
+              opacity: imageLoaded ? 0 : 1,
+              transition: 'opacity 0.2s ease',
             }}
           >
             {fallbackInitials}
           </span>
         ) : (
-          <User size="60%" strokeWidth={1.75} aria-hidden="true" />
+          <span
+            data-avatar-fallback=""
+            className="flex items-center justify-center w-full h-full"
+            style={{ opacity: imageLoaded ? 0 : 1, transition: 'opacity 0.2s ease' }}
+          >
+            <User size="60%" strokeWidth={1.75} aria-hidden="true" />
+          </span>
         )}
       </div>
       {imageSrc && !showFallback && (
