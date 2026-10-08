@@ -42,6 +42,8 @@ import { PendingReviewCard } from '@/features/review-v2/components/PendingReview
 import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
 import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
 import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
+import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
@@ -139,6 +141,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   const postRoundMap = usePostRounds(feedScoreIds, feedScope);
   const roundChainSettled = postScoreIdMap.settled && postRoundMap.settled;
   const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
+  const roundShapeMap = useRoundHoleShapes(feedScoreIds);
+  const roundMedals = useBatchRoundMedals(feedScoreIds);
   const roundsReady = useRoundChainGate(roundChainSettled, !isLoading && posts.length > 0);
 
   const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
@@ -373,6 +377,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           postScoreIdMap={postScoreIdMap}
           postRoundMap={postRoundMap}
           postRoundsSettled={roundChainSettled && !roundChainFetching}
+          roundShapeMap={roundShapeMap}
+          roundMedalMap={roundMedals.isSuccess ? roundMedals.medals : undefined}
           onRoundTap={(post, round) =>
             setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
           }
