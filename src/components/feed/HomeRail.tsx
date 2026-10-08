@@ -94,8 +94,8 @@ function FeaturedRoundSlab({ viewerId }: { viewerId: string }) {
   })();
   return (
     <>
-      {/* A framed hero is a framed object: inset like the rails' contents. */}
-      <div style={{ padding: '0 12px', marginBottom: 8 }}>
+      {/* Full bleed like its neighbours: the photo-led card runs edge to edge. */}
+      <div style={{ marginBottom: 8 }}>
         <FeaturedRoundCard
           round={r}
           viewerId={viewerId}
