@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation, useSearchParams } from 'react-rout
 import { supabase } from '@/integrations/supabase/client';
 import { getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { Loader2, MapPin } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { recordPostViewOnce } from '@/hooks/usePostViewTracker';
@@ -302,7 +303,8 @@ const PostDeepLinkPage: React.FC = () => {
         const { data: liked } = await supabase.rpc('viewer_liked_post', {
           p_post_id: row.id,
           p_viewer: user.id,
-          p_actor_type: 'personal',
+          // The ACTIVE actor's flag, never assumed personal.
+          p_actor_type: activeActorType,
         });
         likedByMe = liked === true;
       }
@@ -321,7 +323,7 @@ const PostDeepLinkPage: React.FC = () => {
     });
 
     if (postId) recordPostViewOnce(postId);
-  }, [postId, user?.id, retryTick, authLoading]);
+  }, [postId, user?.id, retryTick, authLoading, activeActorType]);
 
   // Logged-in users: open the global fullscreen viewer with the loaded post
   // and the comments sheet open. Closing the viewer navigates back.
