@@ -287,7 +287,7 @@ describe('Explore card shapes', () => {
     expect(container.querySelector('[data-lead-review-body="true"]')).not.toBeNull();
     const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
     expect(headline?.textContent).toContain('A thoughtful review.');
-    expect(headline?.style.WebkitLineClamp).toBe('3');
+    expect(headline?.getAttribute('data-explore-line-clamp')).toBe('3');
     expect(image?.style.borderRadius).toBe('18px');
   });
 
