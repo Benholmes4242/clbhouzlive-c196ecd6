@@ -200,7 +200,7 @@ describe('Explore card shapes', () => {
     expect(chip?.querySelector<HTMLElement>('[data-figure-chip-unit="true"]')?.style.fontSize).toBe('10px');
   });
 
-  it('C5 §3.3/§4 draws the four areas as a stat strip and no chips on a lead review', () => {
+  it('draws a std review with the score chip and photo-count chip, its quote, and no stat strip', () => {
     const enriched = {
       ...review(),
       facts: {
@@ -213,30 +213,11 @@ describe('Explore card shapes', () => {
     const { container } = render(
       <ExploreCard item={enriched} size="std" shape={null} onTap={() => undefined} />,
     );
-    const strip = container.querySelector<HTMLElement>('[data-review-stat-strip="true"]');
-    expect(strip?.tagName).toBe('UL');
-    expect(strip?.children).toHaveLength(4);
-    expect(strip?.children[0]?.getAttribute('aria-label')).toContain('9.2');
-    expect(strip?.children[0]?.getAttribute('aria-label')).toContain('outOfTen');
-    expect(strip?.style.borderTop).toBe('1px solid rgba(255,255,255,0.20)');
-    expect(strip?.style.marginTop).toBe('11px');
-    /* The 9.0 threshold is courseSubScoreTone's; everything under it takes the
-       on-photo light ink. */
-    expect(container.querySelector<HTMLElement>('[data-review-stat-value="design"]')?.style.color).toBe('rgb(52, 211, 153)');
-    expect(container.querySelector<HTMLElement>('[data-review-stat-value="conditions"]')?.style.color).toBe('rgba(255, 255, 255, 0.92)');
-    expect(container.querySelector<HTMLElement>('[data-review-stat-value="design"]')?.textContent).toBe('9.2');
-    /* §4 — no photo-count chip, no rating chip, no bars, no quote. */
-    expect(container.querySelector('[data-review-photo-count="true"]')).toBeNull();
-    expect(container.querySelector('[data-figure-chip="review-stacked"]')).toBeNull();
-    expect(container.querySelector('[data-review-breakdown-rail="true"]')).toBeNull();
-    expect(container.querySelector('[data-explore-headline="true"]')).toBeNull();
-    /* §3.3 group one — the score and its verdict share the tier colour. */
-    const score = container.querySelector<HTMLElement>('[data-review-score="true"]');
-    const verdict = container.querySelector<HTMLElement>('[data-review-verdict="true"]');
-    expect(score?.textContent).toBe('9.4');
-    expect(score?.style.fontSize).toBe('40px');
-    expect(verdict?.textContent).toBe('Exceptional');
-    expect(verdict?.style.color).toBe(score?.style.color);
+    const chip = container.querySelector<HTMLElement>('[data-figure-chip="review-stacked"]');
+    expect(chip?.querySelector('[data-figure-chip-figure="true"]')?.textContent).toBe('9.4');
+    expect(chip?.querySelector('[data-figure-chip-unit="true"]')?.textContent).toBe('Exceptional');
+    expect(container.querySelector('[data-review-photo-count="true"]')).not.toBeNull();
+    expect(container.querySelector('[data-explore-headline="true"]')?.textContent).toContain('A thoughtful review.');
   });
 
   it('C5 §3.4 keeps the stat strip all-or-none and reserves nothing when it is absent', () => {
@@ -248,32 +229,26 @@ describe('Explore card shapes', () => {
         <ExploreCard item={{ ...review(), facts: { ...review().facts, breakdown } }} size="std" shape={null} onTap={() => undefined} />,
       );
       expect(container.querySelector('[data-review-stat-strip="true"]')).toBeNull();
-      expect(container.querySelector('[data-review-score="true"]')).not.toBeNull();
+      expect(container.querySelector('[data-figure-chip="review-stacked"]')).not.toBeNull();
       unmount();
     }
   });
 
-  it('renders a short review ON the photo at the lead minimum height with its reserved lanes', () => {
+  it('renders a short review ON the photo at the std minimum height with its reserved lanes', () => {
     const { container } = render(
       <ExploreCard item={review()} size="std" shape={null} onTap={() => undefined} />,
     );
 
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
-    const topLine = container.querySelector<HTMLElement>('[data-review-top-line="true"]');
     const bottom = container.querySelector<HTMLElement>('[data-explore-hero-bottom-lane="true"]');
 
     expect(onPhoto?.style.minHeight).toBe('252px');
     expect(onPhoto?.style.flexDirection).toBe('column');
-    /* C5 §3.2 — identity moves to the TOP of the frame and lives inside the
-       unchanged 48px lane; §4.3 removed the quote. */
-    expect(topLine).not.toBeNull();
-    expect(topLine?.style.padding).toBe('12px 14px 0px');
-    expect(container.querySelector('[data-explore-headline="true"]')).toBeNull();
-    expect(container.querySelector('.explore-who-line')).toBeNull();
+    expect(container.querySelector('[data-explore-headline="true"]')?.textContent).toContain('A thoughtful review.');
+    expect(container.querySelector('.explore-who-line')).not.toBeNull();
     expect(bottom?.style.height).toBe('16px');
     const chipLane = onPhoto?.firstElementChild as HTMLElement | null;
     expect(chipLane?.style.flex).toBe('0 0 48px');
-    expect(topLine && chipLane?.contains(topLine)).toBe(true);
   });
 
   it.each([0, 5])('restores the review overlay at position %i with a 20% taller frame', (position) => {
@@ -304,31 +279,27 @@ describe('Explore card shapes', () => {
     expect(fullWidthCardSize(round())).toBe('std');
   });
 
-  it('C5 §3.1 keeps a long review on the unchanged frame with no quote to grow', () => {
+  it('C5 §3.1 keeps a long review on the unchanged frame with its quote clamped', () => {
     const { container } = render(
       <ExploreCard item={longReview()} size="std" shape={null} onTap={() => undefined} />,
     );
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
     expect(onPhoto?.style.minHeight).toBe('252px');
     expect(onPhoto?.style.height).toBe('');
-    expect(container.querySelector('[data-explore-headline="true"]')).toBeNull();
+    expect(container.querySelector('[data-explore-headline="true"]')?.getAttribute('data-explore-line-clamp')).toBe('2');
   });
 
   it('uses the ruled on-photo colors and shadows for a review', () => {
     const { container, getByText } = render(
       <ExploreCard item={review()} size="std" shape={null} onTap={() => undefined} />,
     );
+    const course = container.querySelector<HTMLElement>('[data-explore-kicker-course="true"]');
+    const date = container.querySelector<HTMLElement>('[data-explore-kicker-date="true"]');
 
-    const topLine = container.querySelector<HTMLElement>('[data-review-top-line="true"]');
-    const name = getByText('danny.akers1');
-    const date = container.querySelector<HTMLElement>('[data-review-date="true"]');
-
-    expect(topLine).not.toBeNull();
-    expect(container.querySelector('[data-explore-hero-kicker="true"]')).toBeNull();
-    expect(name.style.color).toBe('rgb(255, 255, 255)');
-    expect(name.style.fontSize).toBe('13px');
-    expect(name.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
-    expect(date?.style.marginLeft).toBe('auto');
+    expect(getByText('danny.akers1')).toBeInTheDocument();
+    expect(course?.style.color).toBe('rgb(255, 255, 255)');
+    expect(date?.style.color).toBe('rgb(255, 255, 255)');
+    expect(date?.style.textShadow).toBe('0 1px 2px rgba(0,0,0,0.45)');
     expect(date?.style.whiteSpace).toBe('nowrap');
   });
 
@@ -340,18 +311,15 @@ describe('Explore card shapes', () => {
     expect(getByText('You').style.color).not.toBe('rgb(255, 255, 255)');
   });
 
-  it('C5 §3.2/§3.3 prints the member at the top and the course in the foot', () => {
+  it('prints the course in the kicker and the member in the who line', () => {
     const { container } = render(
       <ExploreCard item={{ ...review(), ring: 'world' }} size="std" shape={null} onTap={() => undefined} />,
     );
-    const topLine = container.querySelector<HTMLElement>('[data-review-top-line="true"]');
-    expect(topLine?.textContent).toContain('danny.akers1');
-    expect(topLine?.textContent).not.toContain('The Addington Golf Club');
-    expect(container.querySelector('[data-review-course-name="true"]')?.textContent).toBe('The Addington Golf Club');
-    expect(container.querySelector('[data-review-region="true"]')?.textContent).toContain('Surrey');
+    expect(container.querySelector('[data-explore-kicker-course="true"]')?.textContent).toBe('The Addington Golf Club');
+    expect(container.querySelector('.explore-who-line')?.textContent).toContain('danny.akers1');
   });
 
-  it('C5 §3.3 truncates a long member name and a long course without wrapping', () => {
+  it('truncates a long course without wrapping', () => {
     const longCourse = {
       ...review(),
       who: { ...round().who, display_name: 'A member with an exceptionally long display name' },
@@ -360,20 +328,32 @@ describe('Explore card shapes', () => {
     const { container } = render(
       <ExploreCard item={longCourse} size="std" shape={null} onTap={() => undefined} />,
     );
-    const member = container.querySelector<HTMLElement>('[data-review-member-name="true"]');
-    const course = container.querySelector<HTMLElement>('[data-review-course-name="true"]');
+    const course = container.querySelector<HTMLElement>('[data-explore-kicker-course="true"]');
     expect(course?.textContent).toContain("Prince's Golf Club");
     expect(course?.style.textOverflow).toBe('ellipsis');
     expect(course?.style.whiteSpace).toBe('nowrap');
-    expect(member?.style.overflow).toBe('hidden');
-    expect(member?.style.textOverflow).toBe('ellipsis');
   });
 
-  it.each([1, 5])('C5 §4.2 never shows a photo-count chip on a lead review (%i)', (photoCount) => {
+  it.each([1, 5])('shows the photo-count chip only past one photo (%i)', (photoCount) => {
     const { container } = render(
       <ExploreCard item={{ ...review(), facts: { ...review().facts, photoCount } }} size="std" shape={null} onTap={() => undefined} />,
     );
-    expect(container.querySelector('[data-review-photo-count="true"]')).toBeNull();
+    expect(container.querySelector('[data-review-photo-count="true"]') != null).toBe(photoCount > 1);
+  });
+
+  it('grounds a review on the member\'s own media and falls back to the course image without it', () => {
+    const withMedia = {
+      ...review(),
+      facts: {
+        ...review().facts,
+        reviewMedia: { mediaId: 'm1', kind: 'image' as const, url: 'https://example.test/member.jpg', posterUrl: null, streamId: null, durationS: null },
+      },
+    };
+    const own = render(<ExploreCard item={withMedia} size="std" shape={null} onTap={() => undefined} />);
+    expect(own.container.querySelector('img')?.getAttribute('src')).toBe('https://example.test/member.jpg');
+    own.unmount();
+    const plain = render(<ExploreCard item={review()} size="std" shape={null} onTap={() => undefined} />);
+    expect(plain.container.querySelector('img')?.getAttribute('src')).toBe('https://example.test/bright-sky.jpg');
   });
 
   it.each([1, 5])('keeps the photo-count chip on a std review (%i)', (photoCount) => {
