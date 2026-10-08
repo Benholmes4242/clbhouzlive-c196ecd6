@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { reactionActorOf } from '@/lib/reactionActor';
 
 export interface PostLiker {
   userId: string;
@@ -35,11 +36,22 @@ interface RawLike {
  *     the review branch DEDUPES BY user_id because a member who hearted in both
  *     Explore and Clubhouse before the migration must appear once.
  *
- * In both cases BUSINESS-actor likes stay in post_likes (content_reactions has
- * no actor columns) and are folded back in.
+ * content_reactions now carries actor_type/actor_id (unique on target + actor),
+ * so every row read from it keeps its ACTOR: a business row lists as the
+ * business, never as the human in user_id. Legacy null-actor rows are personal.
+ * Business likes made through toggle_post_like still live in post_likes until a
+ * separate migration moves them, so this hook STILL STITCHES both stores and
+ * dedupes on (actor_type, actor_id). Do not collapse the stitch before then.
+ * This hook decides no "mine" state; viewer flags are actor-matched downstream
+ * (usePostLikers.isViewer, LikesSheet).
  *
  * Mirror of public.viewer_liked_post — keep both branches in step with it.
  */
+function withActor(r: RawLike): RawLike {
+  const a = reactionActorOf(r);
+  return { user_id: r.user_id, actor_type: a.type, actor_id: a.id };
+}
+
 export type LikeSource = 'post' | 'editorial' | 'review' | 'round';
 
 export function usePostLikes(postId: string | null, enabled: boolean, source: LikeSource = 'post') {
@@ -64,18 +76,18 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
         if (!data || data.length === 0) return [] as PostLiker[];
         likes = data.map(l => ({ user_id: l.user_id }));
       } else if (source === 'review' || source === 'round') {
-        // content_reactions has no actor columns — always personal.
+        // Every actor's row, with its actor — business rows list as the business.
         //
-        // KNOWN, PRE-EXISTING, ONE ROW (18 Sep 2026): business-actor likes on a
-        // round live in post_likes against the backing POST, not here, so the
-        // scorecard card cannot see them. Card count and card names agree with
+        // KNOWN, PRE-EXISTING (18 Sep 2026): business-actor likes made through
+        // toggle_post_like on a round live in post_likes against the backing
+        // POST, not here, so the scorecard card cannot see those. Card count and card names agree with
         // each other because both read content_reactions on the round — but a
         // business like shows in the Clubhouse feed and nowhere on the card.
         // If a like count disagrees between the feed and the card, this is why.
         // The 'post' source's round branch below is what still reads those rows.
         const { data, error: likesError } = await supabase
           .from('content_reactions')
-          .select('user_id')
+          .select('user_id, actor_type, actor_id')
           .eq('target_type', source)
           .eq('target_id', postId)
           .order('created_at', { ascending: false })
@@ -83,7 +95,7 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
 
         if (likesError) throw likesError;
         if (!data || data.length === 0) return [] as PostLiker[];
-        likes = data.map((like) => ({ user_id: like.user_id }));
+        likes = data as RawLike[];
       } else {
         // Post likes — include actor info so business likers route correctly.
         const { data, error: likesError } = await supabase
@@ -108,7 +120,7 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
         if (post?.whs_score_id) {
           const { data: reactions, error: reactionsError } = await supabase
             .from('content_reactions')
-            .select('user_id')
+            .select('user_id, actor_type, actor_id')
             .eq('target_type', 'round')
             .eq('target_id', post.whs_score_id)
             .order('created_at', { ascending: false })
@@ -116,13 +128,9 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
 
           if (reactionsError) throw reactionsError;
 
-          // Round reactions have no actor columns — always personal.
+          // Round reactions keep their actor (legacy null = personal).
           likes = [
-            ...(reactions ?? []).map((r) => ({
-              user_id: r.user_id,
-              actor_type: 'personal' as const,
-              actor_id: r.user_id,
-            })),
+            ...((reactions ?? []) as RawLike[]).map(withActor),
             // Business likes on round posts still live in post_likes.
             ...likes.filter((l) => (l.actor_type ?? 'personal') === 'business'),
           ];
@@ -134,7 +142,7 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
           // row on both sides and must appear once.
           const { data: reactions, error: reactionsError } = await supabase
             .from('content_reactions')
-            .select('user_id')
+            .select('user_id, actor_type, actor_id')
             .eq('target_type', 'review')
             .eq('target_id', post.source_review_id)
             .order('created_at', { ascending: false })
@@ -142,14 +150,17 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: Li
 
           if (reactionsError) throw reactionsError;
 
-          const reactionUserIds = new Set((reactions ?? []).map((r) => r.user_id));
+          // Dedupe unmigrated personal post_likes against PERSONAL reactions
+          // only — a member's business reaction is not their personal like.
+          const reactionUserIds = new Set(
+            ((reactions ?? []) as RawLike[])
+              .map(withActor)
+              .filter((r) => r.actor_type === 'personal')
+              .map((r) => r.actor_id as string),
+          );
 
           likes = [
-            ...(reactions ?? []).map((r) => ({
-              user_id: r.user_id,
-              actor_type: 'personal' as const,
-              actor_id: r.user_id,
-            })),
+            ...((reactions ?? []) as RawLike[]).map(withActor),
             // Business likes on review posts still live in post_likes.
             ...likes.filter((l) => (l.actor_type ?? 'personal') === 'business'),
             // Any personal post_likes row not yet migrated: kept so no like
