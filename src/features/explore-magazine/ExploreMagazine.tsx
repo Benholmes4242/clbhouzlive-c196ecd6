@@ -1245,7 +1245,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       // EVERY ROUND IS COMMENTABLE: the round is its own comment target, so no
       // post has to exist first.
       commentAvailable: true,
-      commentPending: false,
       reactionSubjectId: scoreId,
       ownerName,
       isOwnRound: isOwn,
@@ -1276,7 +1275,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       // useContentReactions' alone (it carries the optimistic toggle).
       commentCount: reviewEngagement.engagementFor(reviewId).commentCount,
       commentAvailable: true,
-      commentPending: false,
       reactionSubjectId: reviewId,
       ownerName: item.who?.display_name?.trim().split(/\s+/)[0] || null,
       isOwnRound: item.who?.is_viewer ?? false,
