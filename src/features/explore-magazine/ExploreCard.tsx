@@ -781,7 +781,14 @@ export function ExploreCard({
   onWhoTap,
   engagement,
   medals,
+  bleed,
 }: {
+  /** HOME ONLY. The px inset of the host column. When set, the photograph
+   *  runs full bleed to the slab edges (negative margin of this amount, no
+   *  radius) because every neighbour in the Home feed is full bleed; every
+   *  other part of the card stays inset on the card's ground. Explore never
+   *  passes it, so Explore is unchanged. */
+  bleed?: number;
   item: StreamItem;
   /** From useBatchRoundMedals, resolved queries only. undefined = no cluster. */
   medals?: { gold: number; silver: number; bronze: number };
@@ -1307,7 +1314,7 @@ export function ExploreCard({
         ? (photoFixedHeight
             ? { height: photoHeight, borderRadius: RADIUS[size], width: '100%' }
             : { minHeight: photoHeight, borderRadius: RADIUS[size], width: '100%' })
-        : { height: photoHeight, borderRadius: RADIUS[size], width: '100%' }}
+        : { height: photoHeight, borderRadius: bleed != null ? 0 : RADIUS[size], width: '100%' }}
     >
       {chips}
       {/* ROUND COURSE CAPTION. FeaturedRoundCard puts the course name at the
@@ -1477,7 +1484,7 @@ export function ExploreCard({
         ...FIGS,
       }}
     >
-      <span style={{ position: 'relative', display: 'block' }}>{photo}</span>
+      <span style={{ position: 'relative', display: 'block', marginInline: bleed != null ? -bleed : undefined }}>{photo}</span>
       {!onPhoto && item.kind === 'round' && size !== 'pair' ? (
         <RoundStatStrip
           callout={callout}
