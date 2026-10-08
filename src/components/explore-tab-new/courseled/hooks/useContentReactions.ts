@@ -192,26 +192,38 @@ export function useContentReactions(
           : [...prev.rows, { target_type: type, target_id: id, user_id: viewerId }];
         queryClient.setQueryData<CacheShape>(key as readonly unknown[], { ...prev, rows });
       }
-      const postId = options.postIdFor?.(id);
+      const postId = postIdFor(id);
       if (postId) {
         patchEngagement(queryClient, postId, {
           isLikedByMe: !mine,
           likeCountDelta: mine ? -1 : +1,
         });
       }
-      // Viewer seed — content_reactions are always personal; source is the
-      // target type ('round' | 'review'). Stories have no likers list.
-      let revertLikers: undefined | (() => void);
+      // Viewer seed — content_reactions are always personal. Stories have no
+      // likers list.
+      const reverts: (() => void)[] = [];
       if (type === 'round' || type === 'review') {
         const me = availableActors.find((x) => x.type === 'personal');
-        revertLikers = seedViewerInLikers(queryClient, id, type, {
+        const viewer = {
           userId: viewerId,
-          actorType: 'personal',
+          actorType: 'personal' as const,
           actorId: viewerId,
           name: me?.name ?? null,
           avatarUrl: me?.avatarUrl ?? null,
-        }, !mine);
+        };
+        /* THE KEY IS NAMED FROM THE IDENTITY THE READER USES, NOT THE ONE WE HOLD.
+           This hook holds a score id or a review id; usePostLikes subscribes under
+           ['post-likes', POST_ID, 'post']. Seeding under our own identity writes to
+           a key nothing reads - the same writer/reader mismatch as the August
+           useCommentsV2:360 fix. If a post id cannot be resolved, seed NOTHING. */
+        if (postId) reverts.push(seedViewerInLikers(queryClient, postId, 'post', viewer, !mine));
+        /* EXCEPTION — the REVIEW-id key HAS readers: ReviewBottomSheet's
+           LikedByRow and ExploreCard's review likers both subscribe under
+           ['post-likes', REVIEW_ID, 'review']. That seed stays. No reader uses
+           ['post-likes', SCORE_ID, 'round'], so rounds no longer seed it. */
+        if (type === 'review') reverts.push(seedViewerInLikers(queryClient, id, 'review', viewer, !mine));
       }
+      const revertLikers = reverts.length ? () => reverts.forEach((r) => r()) : undefined;
       return { previous, revertLikers };
     },
     onError: (_err, _vars, ctx) => {
@@ -221,11 +233,12 @@ export function useContentReactions(
     },
     onSettled: (_d, _e, vars) => {
       // TWO READINGS OF ONE FACT: ['content-reactions'] and ['post-likes'] both
-      // report this like — refresh them together, by prefix (no source), from
-      // both write paths.
+      // report this like — refresh them together, by prefix (no source).
+      // Post-likes keys are named from the READER's identity: the post id,
+      // plus the review id (which has readers). Never a null id.
       queryClient.invalidateQueries({ queryKey: ['content-reactions'] });
-      queryClient.invalidateQueries({ queryKey: ['post-likes', vars.id] });
-      const postId = options.postIdFor?.(vars.id);
+      if (vars.type === 'review') queryClient.invalidateQueries({ queryKey: ['post-likes', vars.id] });
+      const postId = postIdFor(vars.id);
       if (postId) queryClient.invalidateQueries({ queryKey: ['post-likes', postId] });
     },
   });
