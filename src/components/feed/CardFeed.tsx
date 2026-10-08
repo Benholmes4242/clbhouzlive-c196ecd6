@@ -53,7 +53,7 @@ import { WireFeedSlide } from '@/features/tourhub/news/WireFeedSlide';
 import type { ClubhouseFeedItem } from './injectWireStories';
 import { CANVAS, SLAB } from './feedSurfaces';
 import { HomeRail } from './HomeRail';
-import { homeRailAfter } from './homeRailCadence';
+import { homeRailKindFor, homeRailOrdinalAfter } from './homeRailCadence';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { track as trackImpression } from '@/lib/impressions/impressionTracker';
 
@@ -938,8 +938,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         {/* Rails sit OUTSIDE the indexed card element: they never consume a
             feedIndex, and keyed on postIndex they stay put across pages. */}
         {homeRails && (() => {
-          const rail = homeRailAfter(index);
-          return rail ? <HomeRail kind={rail} viewerId={currentUserId} pos={index + 1} /> : null;
+          const ordinal = homeRailOrdinalAfter(index);
+          return ordinal == null ? null : (
+            <HomeRail kind={homeRailKindFor(ordinal)} viewerId={currentUserId} pos={ordinal} />
+          );
         })()}
         </>
       );
