@@ -9,6 +9,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useFeaturedRound } from '@/features/explore-magazine/useFeaturedRound';
+import { useViewerScoreScope } from '@/features/explore-magazine/useViewerScoreScope';
 
 
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
@@ -278,6 +280,13 @@ const ClubhouseContent = () => {
       : null,
     [consequenceFetched, standingMap, records, bests.bests, viewerCourseContext.shortlist],
   );
+  /* The week's pick — the same cached reads HomeRail's slab makes, so no new
+     request. Its pill (ROUND OF THE WEEK) wins over FEATURED in the feed. */
+  const weekGeo = useViewerScoreScope(user?.id).scope;
+  const weekPick = useFeaturedRound(user?.id, 'world', {
+    clubId: weekGeo.primaryClubId, county: weekGeo.county, country: weekGeo.country,
+  });
+  const weekPickScoreId = weekPick.data?.whs_score_id ?? null;
   const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
 
   /* SKELETON SHAPE — reserve the shape of the card that is actually coming.
@@ -614,6 +623,7 @@ const ClubhouseContent = () => {
               roundMedalMap={roundMedals.isSuccess ? roundMedals.medals : undefined}
               consequenceSources={consequenceSources}
               roundCourseMeta={roundCourseMeta}
+              weekPickScoreId={weekPickScoreId}
               onRoundTap={(post, round) => setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })}
               topPadding={CHROME_CLEARANCE}
               onNearEnd={handleNearEnd}
