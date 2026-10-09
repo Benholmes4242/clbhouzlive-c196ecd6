@@ -16,7 +16,6 @@ import hazeltineNational from '@/assets/courses/hazeltine-national-golf-club.jpg
 import sedgefieldCC from '@/assets/courses/sedgefield-country-club.jpg.asset.json';
 import clubAtIndianCreek from '@/assets/courses/club-at-indian-creek.jpg.asset.json';
 import canyonMeadowsGCC from '@/assets/courses/canyon-meadows-gcc.jpg.asset.json';
-import yokohamaCC from '@/assets/courses/yokohama-country-club.jpeg.asset.json';
 
 /**
  * Static venue image overrides for courses not yet in the database.
@@ -41,7 +40,6 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
  *     thumbnail directly (same column as "View course") — no matching, no cache.
  * (b) Only tournaments with no golf_course_id fall back to sr_course_map by
  *     venue_name; (c) VENUE_IMAGE_OVERRIDES apply only inside (b).
- * The member-selected Yokohama photo takes precedence over either lookup.
  */
 export function useBatchCourseImages(
   tournaments: Array<Pick<TourTournament, 'id' | 'venue_name'>> | undefined,
@@ -54,12 +52,7 @@ export function useBatchCourseImages(
     queryFn: async (): Promise<Map<string, string | null>> => {
       const result = new Map<string, string | null>();
       if (rows.length === 0) return result;
-      const lookupRows = rows.filter((t) => {
-        if (t.venue_name !== 'Yokohama Country Club') return true;
-        result.set(t.id, yokohamaCC.url);
-        return false;
-      });
-      if (lookupRows.length === 0) return result;
+      const lookupRows = rows;
 
       const { data: links } = await supabase
         .from('sr_tournaments')
