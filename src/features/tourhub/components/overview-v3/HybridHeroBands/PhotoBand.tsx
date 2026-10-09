@@ -6,14 +6,13 @@ import {
   AMBER,
   CAPS_10,
   FONT,
-  HERO_VENUE_INK,
   INK,
-  INK_MUTE,
   STATUS_LIVE_ON_DARK,
 } from '../../../_shared/tokens';
 import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
 import { fmtScore, type HeroState } from '../HybridHero.utils';
 import { DARK_CHROME_GLASS_MATERIAL } from '@/features/chrome-v2/ChromeIsland';
+import { MASTHEAD_KICKER, MASTHEAD_NAME, MASTHEAD_PLACE } from '@/components/courses/CourseMasthead';
 
 export interface OverviewCountdownUnit {
   value: number;
@@ -112,15 +111,11 @@ export function PhotoBand({
             <span>{stateLabel}</span>
             {isLive ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {state.round}</span> : null}
           </div>
-          {tourLabel ? <div style={{ ...CAPS_10, color: INK_MUTE, letterSpacing: '0.14em' }}>{tourLabel}</div> : null}
+          {tourLabel ? <div style={MASTHEAD_KICKER}>{tourLabel}</div> : null}
           <h1
             style={{
-              margin: '4px 0 0',
-              fontSize: 25,
-              fontWeight: 800,
-              lineHeight: 1.1,
-              letterSpacing: 0,
-              color: INK,
+              ...MASTHEAD_NAME,
+              marginTop: 4,
               display: '-webkit-box',
               WebkitBoxOrient: 'vertical',
               WebkitLineClamp: 3,
@@ -129,17 +124,14 @@ export function PhotoBand({
           >
             {title}
           </h1>
-          {venueLine ? (
-            <div style={{ marginTop: 5, fontSize: 13, color: HERO_VENUE_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {venueLine}
-            </div>
-          ) : null}
+          {venueLine ? <div style={MASTHEAD_PLACE}>{venueLine}</div> : null}
         </div>
 
         {isLive && leader ? (
           <div style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
-            <div style={{ ...NUMERIC_STYLE, fontSize: 34, lineHeight: 1, fontWeight: 800, color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
-            {leader.name ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 4, marginLeft: 'auto', fontSize: 12, fontWeight: 600, lineHeight: 1.25, color: INK_MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.name}</div> : null}
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.58)', whiteSpace: 'nowrap' }}>{t('overview.hero.leaderLabel', { defaultValue: 'Leader' })}</div>
+            <div style={{ ...NUMERIC_STYLE, marginTop: 4, fontSize: 26, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.02em', color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
+            {leader.name ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 4, marginLeft: 'auto', fontSize: 11, fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.6)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.name}</div> : null}
           </div>
         ) : null}
 
