@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CourseMastheadSkeleton } from '@/components/courses/CourseMasthead';
 
 const MIN_DISPLAY_TIME = 150; // ms - prevents skeleton flash on fast loads
 
@@ -28,9 +29,9 @@ export const CourseDetailSkeleton = () => {
       <div className="relative h-[400px]">
         <Skeleton className="absolute inset-0 rounded-none" />
         {/* Title area */}
-        <div className="absolute bottom-14 left-6 space-y-3">
-          <Skeleton className="h-10 w-64 bg-white/20" />
-          <Skeleton className="h-6 w-48 bg-white/20" />
+        {/* Masthead shape: kicker, name, place, figure row. */}
+        <div className="absolute inset-x-0 bottom-4 px-4">
+          <CourseMastheadSkeleton rowHeight={33} />
         </div>
       </div>
       
