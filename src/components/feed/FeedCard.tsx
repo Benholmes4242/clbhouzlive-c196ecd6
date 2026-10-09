@@ -66,7 +66,7 @@ import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import { roundPostItem } from './roundPostItem';
-import { featuredTriggerFor, featuredRoundFrom, decideFeatured, type FeaturedTrigger } from './featuredRoundTrigger';
+import { featuredRoundFrom, decideFeatured, type FeaturedTrigger } from './featuredRoundTrigger';
 import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
