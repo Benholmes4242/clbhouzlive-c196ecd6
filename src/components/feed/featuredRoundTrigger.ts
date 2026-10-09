@@ -46,9 +46,28 @@ export function featuredTriggerFor(
   return null;
 }
 
-/** ROUND OF THE WEEK wins when the week's pick also qualifies. */
-export function featuredPillKey(scoreId: string, weekPickScoreId: string | null | undefined): 'label' | 'featuredPill' {
-  return weekPickScoreId && weekPickScoreId === scoreId ? 'label' : 'featuredPill';
+/**
+ * FIRST-PAINT DECISION. A post's hero/ordinary choice is made once, the first
+ * time its round card paints, and never revised: an unresolved source (records
+ * still null, course meta pending, week pick unknown = undefined) renders the
+ * ordinary card and that sticks. The week's pick is never an inline hero — the
+ * Home rail owns it. `decisions` is owned by the feed and cleared on reset.
+ */
+export function decideFeatured(
+  decisions: Map<string, FeaturedTrigger | null>,
+  post: FeedPost,
+  round: PostRound,
+  records: CourseRecordSignal | null | undefined,
+  subjectPending: boolean,
+  weekPickScoreId: string | null | undefined,
+): FeaturedTrigger | null {
+  if (decisions.has(post.id)) return decisions.get(post.id) ?? null;
+  const ready = !!records && !subjectPending && weekPickScoreId !== undefined;
+  const decision = !ready || weekPickScoreId === round.whsScoreId
+    ? null
+    : featuredTriggerFor(post, round, records);
+  decisions.set(post.id, decision);
+  return decision;
 }
 
 /** The hero's round shape, built from the post and its round. */

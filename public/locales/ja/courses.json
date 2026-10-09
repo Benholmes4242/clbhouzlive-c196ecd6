@@ -764,6 +764,10 @@
       "mostRecent": "Most recent",
       "sortA11y": "Sort your rounds",
       "title": "Your rounds"
+    },
+    "featured": {
+      "featuredPill": "注目",
+      "birdieRun": "{{count}}連続バーディー"
     }
   },
   "directorySheet": {

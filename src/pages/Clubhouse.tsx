@@ -38,6 +38,7 @@ import type { StateSnapshot } from 'react-virtuoso';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 
 // ── Data hooks ──
+import type { FeaturedTrigger } from '@/components/feed/featuredRoundTrigger';
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useTourStories } from '@/features/tourhub/news/useTourStories';
@@ -286,7 +287,16 @@ const ClubhouseContent = () => {
   const weekPick = useFeaturedRound(user?.id, 'world', {
     clubId: weekGeo.primaryClubId, county: weekGeo.county, country: weekGeo.country,
   });
-  const weekPickScoreId = weekPick.data?.whs_score_id ?? null;
+  /* undefined until fetched: an unknown pick decides ordinary at first paint. */
+  const weekPickScoreId = weekPick.isFetched ? weekPick.data?.whs_score_id ?? null : undefined;
+  /* First-paint hero decisions, per feed. Cleared on pull-to-refresh and on
+     a new viewer (a new feed query key). */
+  const featuredDecisions = useRef(new Map<string, FeaturedTrigger | null>());
+  const featuredDecisionsUser = useRef(user?.id);
+  if (featuredDecisionsUser.current !== user?.id) {
+    featuredDecisionsUser.current = user?.id;
+    featuredDecisions.current = new Map();
+  }
   const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
 
   /* SKELETON SHAPE — reserve the shape of the card that is actually coming.
@@ -624,6 +634,7 @@ const ClubhouseContent = () => {
               consequenceSources={consequenceSources}
               roundCourseMeta={roundCourseMeta}
               weekPickScoreId={weekPickScoreId}
+              featuredDecisions={featuredDecisions.current}
               onRoundTap={(post, round) => setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })}
               topPadding={CHROME_CLEARANCE}
               onNearEnd={handleNearEnd}
@@ -649,6 +660,7 @@ const ClubhouseContent = () => {
                 // tab's snapshot so we don't restore stale ranges after
                 // the refetch resolves.
                 virtuosoSnapshots.current[FEED_TAB] = undefined;
+                featuredDecisions.current.clear();
                 return handleRefresh();
               }}
               isRefreshing={activeFeed.isRefetching}

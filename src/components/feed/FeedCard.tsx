@@ -66,7 +66,7 @@ import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import { roundPostItem } from './roundPostItem';
-import { featuredTriggerFor, featuredRoundFrom, featuredPillKey } from './featuredRoundTrigger';
+import { featuredTriggerFor, featuredRoundFrom, decideFeatured, type FeaturedTrigger } from './featuredRoundTrigger';
 import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
@@ -180,7 +180,10 @@ export interface FeedCardProps {
   /** Page-level course meta for round cards (image, region). */
   roundCourseMeta?: RoundCourseMeta | null;
   /** Home: this week's Round of the week score id (its pill wins). */
+  /** undefined = not yet known (decides ordinary). */
   weekPickScoreId?: string | null;
+  /** Feed-owned first-paint hero decisions; cleared on feed reset. */
+  featuredDecisions?: Map<string, FeaturedTrigger | null>;
   /**
    * Newest top-level comment for this post (batched by the host feed).
    * RENDERS FROM THE COMMENT, NEVER FROM comment_count — absent means no
@@ -339,7 +342,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   roundMedals,
   consequenceSources = null,
   roundCourseMeta = null,
-  weekPickScoreId = null,
+  weekPickScoreId,
+  featuredDecisions,
   commentPreview,
   commentPreviewEnabled = false,
 }) => {
@@ -538,10 +542,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
        qualifying round renders the shared hero; its reaction and comments are
        the same post-like path as the ordinary card, which routes to
        content_reactions('round', whs_score_id) — one reaction, one count. */
-    const trigger = consequenceSources && postRound
-      ? featuredTriggerFor(post, postRound, consequenceSources.records)
+    const trigger = consequenceSources && postRound && featuredDecisions
+      ? decideFeatured(featuredDecisions, post, postRound, consequenceSources.records, !!item.subject?.pending, weekPickScoreId)
       : null;
-    if (trigger && postRound && !item.subject?.pending) {
+    if (trigger && postRound) {
       return (
         <article ref={articleRef} data-feed-featured-round="true" style={{ background: CARD, position: 'relative', borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}` }}>
           <FeaturedRoundCard
@@ -551,7 +555,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             medals={roundMedals ?? null}
             engagement={roundEngagement}
             square
-            pillLabel={tCourses(`courseDetail.featured.${featuredPillKey(postRound.whsScoreId, weekPickScoreId)}`)}
+            pillLabel={tCourses('courseDetail.featured.featuredPill')}
             onOpen={() => onRoundTap?.(post, postRound)}
           />
         </article>
