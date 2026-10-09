@@ -14,11 +14,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { isVenueGeographyCompatible } from '@/lib/tourhub/venueGeography';
 import sedgefieldCC from '@/assets/courses/sedgefield-country-club.jpg.asset.json';
 import clubAtIndianCreek from '@/assets/courses/club-at-indian-creek.jpg.asset.json';
-import yokohamaCC from '@/assets/courses/yokohama-country-club.jpeg.asset.json';
 
 /** Static venue photos, including explicitly member-selected replacements. */
 const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
-  'Yokohama Country Club': yokohamaCC.url,
   'Sedgefield Country Club': sedgefieldCC.url,
   'The Club at Indian Creek': clubAtIndianCreek.url,
 };
