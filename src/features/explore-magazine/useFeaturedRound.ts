@@ -25,7 +25,9 @@ export interface FeaturedRound { whs_score_id: string; user_id: string;
   albatrosses: number | null; holes_in_one: number | null;
   clean_card: boolean | null; net_score: number | null;
   vs_hcp: number | null; tier: number; reason: string;
-  joint_name: string | null; joint_count: number | null; }
+  joint_name: string | null; joint_count: number | null;
+  /** Home feed hero only (reason birdie_run): longest run of birdies. */
+  birdie_run?: number | null; }
 
 export function useFeaturedRound(
   viewerId: string | undefined,

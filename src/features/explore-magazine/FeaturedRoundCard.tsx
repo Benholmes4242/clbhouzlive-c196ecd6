@@ -80,6 +80,8 @@ function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
   );
   switch (r.tier) {
     case 1:
+      // Home feed hero: albatross headlines first even beside an ace.
+      if (r.reason === 'feed_albatross') return feat(k('albatross'));
       return feat((r.holes_in_one ?? 0) > 0 || r.reason === 'hole_in_one' ? k('holeInOne') : k('albatross'));
     case 2:
       return (
@@ -92,6 +94,7 @@ function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
         </span>
       );
     case 3:
+      if (r.reason === 'birdie_run') return <span style={BIG}>{k('birdieRun', { count: r.birdie_run })}</span>;
       if (r.reason === 'eagle_brace') return <span style={BIG}>{k('eagleBrace', { count: r.eagles })}</span>;
       if (r.reason === 'stableford_45') return points(r.stableford);
       return <span style={{ ...BIG, color: TOPAR_UNDER_DARK }}>{toPar(r.to_par)}</span>;
@@ -122,6 +125,8 @@ export const FeaturedRoundCard: React.FC<{
   medals?: RoundMedalCounts | null;
   /** Home only: square corners, edge to edge like its feed neighbours. */
   square?: boolean;
+  /** Pill text. Absent = the existing "Round of the week" label. */
+  pillLabel?: string;
 }> = ({
   round: r,
   viewerId,
@@ -130,6 +135,7 @@ export const FeaturedRoundCard: React.FC<{
   engagement = null,
   medals,
   square = false,
+  pillLabel,
 }) => {
   const { t, i18n } = useTranslation('courses');
   const k = (key: string, opts?: Record<string, unknown>) => t(`courseDetail.featured.${key}`, opts);
@@ -173,7 +179,7 @@ export const FeaturedRoundCard: React.FC<{
             letterSpacing: '0.12em', textTransform: 'uppercase', padding: '5px 10px', borderRadius: rad.pill,
           }}
         >
-          {k('label')}
+          {pillLabel ?? k('label')}
         </span>
         <div style={{ flex: '0 0 44px' }} />
         <div aria-hidden="true" style={{ position: 'relative', flex: '1 1 auto', minHeight: shape ? SHAPE_BAND + 36 : 24, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0 18px' }}>

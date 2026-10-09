@@ -52,7 +52,7 @@ export interface ConsequenceSources {
 }
 
 /** Does this round's identity match the CURRENT record row for that course? */
-function isRecordRound(input: RoundConsequenceInput, records: CourseRecordSignal): boolean {
+export function isRecordRound(input: RoundConsequenceInput, records: CourseRecordSignal): boolean {
   if (!input.courseId || !input.userId || input.gross == null || !input.playDate) return false;
   const holder = records.holders.get(input.courseId);
   if (!holder) return false;
