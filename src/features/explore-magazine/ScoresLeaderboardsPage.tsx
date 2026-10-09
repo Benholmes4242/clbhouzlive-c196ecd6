@@ -20,6 +20,7 @@ import {
   type BoardKey,
   type FeatBoardKey,
   type WindowKey,
+  boardValueIsFigure,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 import { REC } from '@/components/profile/handicap/whs/gam/trophy-room/career/tokens';
 import { MEDAL_BRONZE, MEDAL_GOLD, MEDAL_SILVER } from '@/lib/tokens/medals';
@@ -34,6 +35,11 @@ import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
+
+/** Row value size; the leader's value drops to it when the board's value is a time. */
+export const ROW_VALUE_SIZE = 14;
+/** Leader value size on a board whose value is a figure (boardValueIsFigure). */
+export const LEADER_FIGURE_SIZE = 30;
 
 /**
  * THE LEADERBOARDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A).

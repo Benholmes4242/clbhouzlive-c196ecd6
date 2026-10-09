@@ -44,6 +44,7 @@ import { ExploreShelf, SHELF_HEADING } from './ExploreShelf';
 import { useCircleSize } from '@/features/amateur/useCircleSize';
 import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
 import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
+import { BoardPicker } from './BoardPicker';
 import { BOARD_LABELS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 
@@ -512,6 +513,8 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      sets it false, so scoresBoardActive is effectively `view === 'scores'`. */
   const [boardApplied, setBoardApplied] = useState(true);
   const [boardPanelOpen, setBoardPanelOpen] = useState(false);
+  /* The title's chevron opens the lightweight ranking picker; the Filters pill opens the panel. */
+  const [boardPickerOpen, setBoardPickerOpen] = useState(false);
   /* The title opens the sheet onto the board choice; Filters opens it without. */
   const scoresBoardActive = view === 'scores' && boardApplied;
   const boardState = useAmateurBoardState(
@@ -1570,7 +1573,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
                 board: boardState.board,
                 board_active: scoresBoardActive,
               });
-              setBoardPanelOpen(true);
+              setBoardPickerOpen(true);
             }}
             onOpenFilters={() => {
               analyticsEvents.track('amateur_filter_opened', { board: boardState.board });
@@ -1763,6 +1766,15 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           so the panel's count and the page's rows can never disagree. Picking a
           board applies it live (boardApplied), and the footer's "Show N rounds"
           closes onto a body that has already swapped. */}
+      <BoardPicker
+        open={boardPickerOpen}
+        onClose={() => setBoardPickerOpen(false)}
+        board={boardState.board}
+        onPick={(next) => {
+          boardState.changeBoard(next);
+          setBoardApplied(true);
+        }}
+      />
       <BoardFilterPanel
         open={boardPanelOpen}
         onClose={() => setBoardPanelOpen(false)}
