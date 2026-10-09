@@ -217,6 +217,19 @@ export const BOARD_LABELS: Record<BoardKey, { i18n: string; label: string }> = {
 export const boardCountsRounds = (board: BoardKey) =>
   board === 'recent' || isFeatBoard(board);
 
+/** The ONE rule for which ranking boards a member is offered: a ranking key,
+    not a feat, not the retired 'gross'. The board picker and the filter panel
+    both list OFFERED_RANKING_BOARD_KEYS, so they cannot offer different sets. */
+export const isOfferedRankingBoard = (board: BoardKey): board is RankingBoardKey =>
+  board !== 'gross' && !isFeatBoard(board) && (RANKING_BOARD_KEYS as string[]).includes(board);
+export const OFFERED_RANKING_BOARD_KEYS: RankingBoardKey[] = RANKING_BOARD_KEYS.filter(isOfferedRankingBoard);
+
+/** Boards whose sort value is a TIME (rendered as "today", "3d ago"), not a
+    figure. A new time-valued board joins this list and inherits row-size values. */
+const TIME_VALUED_BOARDS: readonly BoardKey[] = ['recent'];
+/** True where the board's sort value is a NUMBER worth score-size type. */
+export const boardValueIsFigure = (board: BoardKey) => !TIME_VALUED_BOARDS.includes(board);
+
 /** Field-by-field equality on the seven axes a member can set. The ONE
     comparator: filtersAreDefault and every caller's canReset go through it,
     so "changed" cannot mean two different things in two places. */
