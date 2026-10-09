@@ -32,6 +32,9 @@ export type EmptyStateSuggestion = {
   profile_photo_url: string | null;
   reason_type: 'followed_by' | 'plays' | 'popular' | string;
   reason_detail: string | null;
+  home_club: string | null;
+  /** 18-hole rounds; 0 counts as absent. */
+  rounds_tracked: number;
   score: number;
 };
 
