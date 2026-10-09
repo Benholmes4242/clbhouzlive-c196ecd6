@@ -221,6 +221,7 @@ export interface CardFeedProps {
   consequenceSources?: ConsequenceSources | null;
   roundCourseMeta?: RoundCourseMeta | null;
   weekPickScoreId?: string | null;
+  featuredDecisions?: Map<string, import('./featuredRoundTrigger').FeaturedTrigger | null>;
   /** Home only: interleave the Phase 3 rails (homeRailCadence). */
   homeRails?: boolean;
 }
@@ -268,7 +269,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   roundMedalMap,
   consequenceSources = null,
   roundCourseMeta = null,
-  weekPickScoreId = null,
+  weekPickScoreId,
+  featuredDecisions,
   homeRails = false,
 }, ref) {
 
@@ -930,6 +932,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 consequenceSources={consequenceSources}
                 roundCourseMeta={roundCourseMeta}
                 weekPickScoreId={weekPickScoreId}
+                featuredDecisions={featuredDecisions}
                 commentPreviewEnabled
                 commentPreview={commentPreview.map.get(post.id) ?? null}
               />

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { featuredTriggerFor, featuredPillKey } from '@/components/feed/featuredRoundTrigger';
+import { featuredTriggerFor, decideFeatured } from '@/components/feed/featuredRoundTrigger';
 import type { CourseRecordSignal } from '@/features/explore-magazine/useCourseRecordSignal';
 
 const post = { id: 'p1', userId: 'u1', courseId: 'c1' } as never;
@@ -27,8 +27,23 @@ describe('featured round triggers', () => {
     expect(featuredTriggerFor(post, round({ holesInOne: 1 }), records(70))?.reason).toBe('hole_in_one'));
   it('albatross beats an ace', () =>
     expect(featuredTriggerFor(post, round({ holesInOne: 1, albatrosses: 1 }), null)?.reason).toBe('feed_albatross'));
-  it("the week's pick keeps ROUND OF THE WEEK", () => {
-    expect(featuredPillKey('s1', 's1')).toBe('label');
-    expect(featuredPillKey('s1', 'other')).toBe('featuredPill');
+  it("the week's pick renders the ordinary card inline (the rail owns its hero)", () => {
+    expect(decideFeatured(new Map(), post, round({ holesInOne: 1 }), records(70), false, 's1')).toBeNull();
+    expect(decideFeatured(new Map(), post, round({ holesInOne: 1 }), records(70), false, 'other')?.reason).toBe('hole_in_one');
+  });
+  it('a post painted ordinary stays ordinary when sources arrive later', () => {
+    const d = new Map();
+    expect(decideFeatured(d, post, round(), null, false, null)).toBeNull();
+    expect(decideFeatured(d, post, round(), records(70), false, null)).toBeNull();
+  });
+  it('pending course meta or an unknown week pick decides ordinary', () => {
+    expect(decideFeatured(new Map(), post, round({ holesInOne: 1 }), records(70), true, null)).toBeNull();
+    expect(decideFeatured(new Map(), post, round({ holesInOne: 1 }), records(70), false, undefined)).toBeNull();
+  });
+  it('a cleared map (feed reset) decides afresh', () => {
+    const d = new Map();
+    decideFeatured(d, post, round(), null, false, null);
+    d.clear();
+    expect(decideFeatured(d, post, round(), records(70), false, null)?.reason).toBe('course_record');
   });
 });

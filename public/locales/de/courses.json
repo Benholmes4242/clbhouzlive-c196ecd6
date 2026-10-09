@@ -765,6 +765,10 @@
       "mostRecent": "Most recent",
       "sortA11y": "Sort your rounds",
       "title": "Your rounds"
+    },
+    "featured": {
+      "featuredPill": "Ausgewählt",
+      "birdieRun": "{{count}} Birdies in Folge"
     }
   },
   "directorySheet": {
