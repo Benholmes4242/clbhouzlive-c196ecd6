@@ -442,7 +442,7 @@ function CompactRow({
         ) : null}
       </span>
       <span style={{ flexShrink: 0, textAlign: 'right' }}>
-        <span className="tabular-nums" style={{ display: 'block', fontSize: 14, fontWeight: 700, color: self ? ink : valueTone ?? ink }}>
+        <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: 700, color: self ? ink : valueTone ?? ink }}>
           {value}
         </span>
         {caption ? (
@@ -823,7 +823,10 @@ export function ScoresLeaderboardsPage({
                 <span style={{ flexShrink: 0, textAlign: 'right' }}>
                   <span
                     className="tabular-nums"
-                    style={{ display: 'block', fontSize: 30, fontWeight: 700, letterSpacing: '-0.03em', color: self ? A.AMBER : f.bigTone, lineHeight: 1 }}
+                    data-leader-value
+                    style={boardValueIsFigure(state.board)
+                      ? { display: 'block', fontSize: LEADER_FIGURE_SIZE, fontWeight: 700, letterSpacing: '-0.03em', color: self ? A.AMBER : f.bigTone, lineHeight: 1 }
+                      : { display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: 700, color: self ? A.AMBER : f.bigTone, lineHeight: 1 }}
                   >
                     {f.big}
                   </span>

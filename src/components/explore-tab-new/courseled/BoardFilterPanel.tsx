@@ -14,7 +14,7 @@ import {
   COURSES_SET_OPTIONS,
   DEFAULT_FILTERS,
   FEAT_BOARD_KEYS,
-  RANKING_BOARD_KEYS,
+  OFFERED_RANKING_BOARD_KEYS,
   WINDOW_OPTIONS,
   boardCountsRounds,
   type BandKey,
@@ -529,7 +529,7 @@ export function BoardFilterPanel({
                 board, not an axis laid over one, and the split is how that reads. */}
             <SubLabel>{t('discover.filterBoard.rankings', 'Rankings')}</SubLabel>
             <ChipWrap>
-              {RANKING_BOARD_KEYS.map((key) => (
+              {OFFERED_RANKING_BOARD_KEYS.map((key) => (
                 <Chip
                   key={key}
                   label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
