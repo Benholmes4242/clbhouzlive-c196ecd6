@@ -24,8 +24,8 @@ import { useCircleSize } from './useCircleSize';
 /**
  * THE EXPLORE LEADERBOARD'S STATE (BRIEF_EXPLORE_LEADERBOARD_STATES).
  *
- * §1 THE ENTRY STATE IS RESOLVED, NOT FIXED. Board: entryBoardFor (the
- * viewer's handicap — 5.0 or below opens on gross, everyone else on net).
+ * §1 THE ENTRY STATE IS RESOLVED, NOT FIXED. Board: entryBoardFor (Most
+ * recent for every member; the handicap is read only for the analytics band).
  * Scope: the LANDING_SCOPES ladder (circle, then club, then everyone).
  * Window and courses: ENTRY_FILTERS (14 days, all courses). No rotation and no
  * remembered selection; this state is page-local, so leaving and returning
@@ -67,13 +67,13 @@ import { useCircleSize } from './useCircleSize';
 /** One read serves the visible cut, the pinned own row and the panel's count. */
 const PAGE_FETCH = 200;
 
-/** THE ENTRY BOARD FOLLOWS THE VIEWER'S HANDICAP: entryBoardFor opens a member
- *  at 5.0 or below on gross and everyone else — including a member with no
- *  handicap yet — on net. The unknown case is a DECISION, not a fallback.
- *  'topar' is the live key that labels "Lowest gross"; 'gross' is retired. */
+/** Standings opens on Most recent ('recent') for every member; every other
+ *  board stays selectable. entryBoardFor is the one place the entry board is
+ *  decided. The handicap is NOT an input to it.
+ *  GROSS_BAND_MAX is used only by the amateur_board_default analytics band. */
 export const GROSS_BAND_MAX = 5.0;
-export function entryBoardFor(handicapIndex: number | null | undefined): BoardKey {
-  return handicapIndex != null && handicapIndex <= GROSS_BAND_MAX ? 'topar' : 'net';
+export function entryBoardFor(): BoardKey {
+  return 'recent';
 }
 
 /** SCORES LANDING SCOPE (amendment to §3). Tried in order; the first rung whose
@@ -111,9 +111,9 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   /* The resolved default. null until the ladder has resolved, and the board
      reads stay off until then — never render on one scope and swap. */
   const [entry, setEntry] = useState<BoardFilters | null>(null);
-  /* THE ENTRY BOARD FOLLOWS THE VIEWER'S HANDICAP, via the display authority
-     (never eg_handicap_index directly). Like the scope ladder, nothing reads a
-     board until it has resolved — never render on one board and swap. */
+  /* The handicap (via the display authority, never eg_handicap_index directly)
+     is read only for the amateur_board_default analytics band; resolution
+     still waits for it so that event logs a settled band. */
   const { profile, loading: profileLoading } = useProfileData();
   const whs = useWhsConnection(userId);
   const handicapResolved = !userId || (!profileLoading && !whs.isLoading);
@@ -122,7 +122,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
     manualHandicapIndex: profile?.manual_handicap_index ?? null,
     hasWhsConnection: !!whs.data,
   }).value;
-  const entryBoard = entryBoardFor(handicap);
+  const entryBoard = entryBoardFor();
   /* null = untouched: the member is on their resolved entry board. Once they
      pick, nothing re-applies the default for the rest of the visit. */
   const [boardPicked, setBoard] = useState<BoardKey | null>(null);
