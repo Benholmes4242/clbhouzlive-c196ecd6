@@ -220,6 +220,7 @@ export interface CardFeedProps {
   /** Page-level consequence sources (Clubhouse); null until all have fetched. */
   consequenceSources?: ConsequenceSources | null;
   roundCourseMeta?: RoundCourseMeta | null;
+  weekPickScoreId?: string | null;
   /** Home only: interleave the Phase 3 rails (homeRailCadence). */
   homeRails?: boolean;
 }
@@ -267,6 +268,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   roundMedalMap,
   consequenceSources = null,
   roundCourseMeta = null,
+  weekPickScoreId = null,
   homeRails = false,
 }, ref) {
 
@@ -927,6 +929,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 })()}
                 consequenceSources={consequenceSources}
                 roundCourseMeta={roundCourseMeta}
+                weekPickScoreId={weekPickScoreId}
                 commentPreviewEnabled
                 commentPreview={commentPreview.map.get(post.id) ?? null}
               />

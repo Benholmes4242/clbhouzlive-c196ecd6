@@ -66,6 +66,8 @@ import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import { roundPostItem } from './roundPostItem';
+import { featuredTriggerFor, featuredRoundFrom, featuredPillKey } from './featuredRoundTrigger';
+import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 
@@ -177,6 +179,8 @@ export interface FeedCardProps {
   consequenceSources?: ConsequenceSources | null;
   /** Page-level course meta for round cards (image, region). */
   roundCourseMeta?: RoundCourseMeta | null;
+  /** Home: this week's Round of the week score id (its pill wins). */
+  weekPickScoreId?: string | null;
   /**
    * Newest top-level comment for this post (batched by the host feed).
    * RENDERS FROM THE COMMENT, NEVER FROM comment_count — absent means no
@@ -335,6 +339,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   roundMedals,
   consequenceSources = null,
   roundCourseMeta = null,
+  weekPickScoreId = null,
   commentPreview,
   commentPreviewEnabled = false,
 }) => {
@@ -500,6 +505,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     };
   }, [isFirstCard, isMulti, media, fireContentReady]);
   const { t } = useTranslation('common');
+  const { t: tCourses } = useTranslation('courses');
 
   /* A ROUND POST IS THE EXPLORE ROUND CARD (Phase 1, "exactly the same as they
      are now in explore community"). One difference: the photograph runs full
@@ -520,6 +526,37 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const rendersRoundCard = !!postRound || !!postRoundPending;
   if (rendersRoundCard) {
     const item = roundPostItem(post, postRound ?? null, currentUserId, consequenceSources, roundCourseMeta);
+    const roundEngagement = {
+      likeCount,
+      liked,
+      likeAvailable: true,
+      commentCount,
+      onToggleLike: () => onLike(post, effectiveActor),
+      onOpenComments: () => onComment(post, effectiveActor, 'footer_glyph'),
+    };
+    /* FEATURED ROUNDS — Home only (consequence sources are Home's). A
+       qualifying round renders the shared hero; its reaction and comments are
+       the same post-like path as the ordinary card, which routes to
+       content_reactions('round', whs_score_id) — one reaction, one count. */
+    const trigger = consequenceSources && postRound
+      ? featuredTriggerFor(post, postRound, consequenceSources.records)
+      : null;
+    if (trigger && postRound && !item.subject?.pending) {
+      return (
+        <article ref={articleRef} data-feed-featured-round="true" style={{ background: CARD, position: 'relative', borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}` }}>
+          <FeaturedRoundCard
+            round={featuredRoundFrom(post, postRound, trigger, item.subject?.image_url ?? null)}
+            viewerId={currentUserId ?? undefined}
+            shape={roundShape ?? null}
+            medals={roundMedals ?? null}
+            engagement={roundEngagement}
+            square
+            pillLabel={tCourses(`courseDetail.featured.${featuredPillKey(postRound.whsScoreId, weekPickScoreId)}`)}
+            onOpen={() => onRoundTap?.(post, postRound)}
+          />
+        </article>
+      );
+    }
     return (
       <article
         ref={articleRef}

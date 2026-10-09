@@ -1051,6 +1051,8 @@
       "vsHandicap": "vs handicap",
       "strapline": "The standout round of the week.",
       "netFact": "Net {{net}}",
+      "featuredPill": "Featured",
+      "birdieRun": "{{count}} birdies in a row",
       "courseRecordJoint": "Joint course record"
     }
   },
