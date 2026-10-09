@@ -509,7 +509,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      INITIAL VALUE to `false` (and re-enabling the Scores stream read) is the
      one-line change that brings the stream back. */
   /* A flag only; the board itself is boardState.board. It is `true` for the
-     life of the page: both setBoardApplied call sites pass `true` and nothing
+     life of the page: every setBoardApplied call site passes `true` and nothing
      sets it false, so scoresBoardActive is effectively `view === 'scores'`. */
   const [boardApplied, setBoardApplied] = useState(true);
   const [boardPanelOpen, setBoardPanelOpen] = useState(false);
