@@ -22,7 +22,9 @@ import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sectio
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { useCourseStatsDetail, type CourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import CourseStatsSheet from '@/components/feed/CourseStatsSheet';
-import CourseCommunityRating from '@/components/courses/CourseCommunityRating';
+import { CourseMasthead } from '@/components/courses/CourseMasthead';
+import { ratingPrintable } from '@/features/explore-magazine/courseRatingFloor';
+import { formatRatingValue } from '@/utils/formatters';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -439,31 +441,32 @@ interface CourseTitleOverlayProps {
   onOpenStats: () => void;
 }
 
-// SF Pro tabular numerals, NOT a monospace face: Menlo / SF Mono / Consolas draw
-// a slashed zero that `font-feature-settings: "zero" 0` cannot switch off.
-const MONO_FIGURE: React.CSSProperties = {
+/* Hero FIGURE ROW cell. Local, not the round card's FigureCell: that cell is
+   9px label / 15px value, centred, on A.MUTE/A.INK; matching 10/19 left-aligned
+   over a photograph would mean forking its styling. */
+const FIG_LABEL: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase',
+  color: 'rgba(255,255,255,0.58)',
+  whiteSpace: 'nowrap',
+};
+const FIG_VALUE: React.CSSProperties = {
+  fontSize: 19,
+  fontWeight: 800,
+  marginTop: 4,
+  lineHeight: 1,
+  letterSpacing: '-0.02em',
   fontVariantNumeric: 'tabular-nums lining-nums',
   fontFeatureSettings: '"zero" 0, "tnum" 1',
-  letterSpacing: '-0.03em',
-  fontWeight: 700,
-  fontSize: 12,
-  color: 'rgba(255,255,255,0.95)',
-  whiteSpace: 'nowrap',
+  color: '#fff',
 };
 
-const CELL_LABEL: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: '0.1em',
-  textTransform: 'uppercase',
-  color: 'rgba(255,255,255,0.7)',
-  whiteSpace: 'nowrap',
-};
-
-const HeroStatCell: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, whiteSpace: 'nowrap' }}>
-    <span style={CELL_LABEL}>{label}</span>
-    <span style={MONO_FIGURE}>{value}</span>
+const HeroStatCell: React.FC<{ label: string; value: string; tone?: string }> = ({ label, value, tone }) => (
+  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
+    <span style={FIG_LABEL}>{label}</span>
+    <span style={{ ...FIG_VALUE, color: tone ?? FIG_VALUE.color }}>{value}</span>
   </span>
 );
 
@@ -520,59 +523,49 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
       );
     }
   }
-  if (communityRating != null) {
+  // Same floor as every printed course aggregate (COURSE_RATING_FLOOR).
+  if (ratingPrintable(communityRating, reviewCount)) {
     cells.push(
-      <CourseCommunityRating
+      <HeroStatCell
         key="rating"
-        rating={communityRating}
-        size="sm"
-        showLogo
-        onDark
-        forceNeutral
+        label={t('courseHero.rating')}
+        value={formatRatingValue(communityRating)}
+        tone={A.GREEN}
       />
     );
   }
 
   return (
     <div className="absolute inset-x-0 bottom-4 px-4 z-[1] flex flex-col gap-2">
-      <h1
-        className="text-[23px] md:text-[26px] font-bold tracking-[-0.3px] text-white drop-shadow-2xl mb-1"
-        style={{ lineHeight: 1.15 }}
+      <CourseMasthead
+        as="h1"
+        kicker={(course.sub_country || course.region || null) as string | null}
+        name={course.name}
+        place={course.country || null}
       >
-        {course.name}
-      </h1>
-      <p
-        className="drop-shadow-lg mb-1"
-        style={{ fontSize: 13.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}
-      >
-        {formatCourseLocation(course)}
-      </p>
-
-      {/* Stats band sits above the rank badges so the two rows never collide. */}
-      {cells.length > 0 && (
-        <button
-          type="button"
-          onClick={() => {
-            analyticsEvents.track('course_hero_stats_tapped', { course_id: courseId, rounds_tracked: rounds });
-            onOpenStats();
-          }}
-          className="inline-flex items-center self-start drop-shadow-lg active:scale-[0.98] transition-transform"
-          style={{
-            padding: '4px 8px',
-            marginLeft: -8,
-            border: 0,
-            gap: 4,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {cells.map((cell, i) => (
-            <React.Fragment key={i}>
-              {i > 0 && <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11 }}>·</span>}
-              {cell}
-            </React.Fragment>
-          ))}
-        </button>
-      )}
+        {cells.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => {
+              analyticsEvents.track('course_hero_stats_tapped', { course_id: courseId, rounds_tracked: rounds });
+              onOpenStats();
+            }}
+            className="active:scale-[0.98] transition-transform"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))`,
+              gap: 10,
+              width: '100%',
+              padding: 0,
+              border: 0,
+              background: 'transparent',
+              textAlign: 'left',
+            }}
+          >
+            {cells}
+          </button>
+        ) : null}
+      </CourseMasthead>
 
       {/* CR / SLOPE is deliberately NOT rendered here: get_course_meta resolves
           one tee while CourseCardPanel resolves the member's own tee, so the two

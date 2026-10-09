@@ -1061,7 +1061,8 @@
     "harderThan": "[~~ĥářđéř ţĥáñ {{pct}}%~~]",
     "reviews": "[~~řéṽíéŵš~~]",
     "rounds": "[~~řőúñđš~~]",
-    "yourPb": "[~~ýőúř ƥƀ~~]"
+    "yourPb": "[~~ýőúř ƥƀ~~]",
+    "rating": "[ŕàţîñĝ]"
   },
   "directorySheet": {
     "addCourse": "[~~Áđđ \"{{query}}\"~~]",

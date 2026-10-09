@@ -1061,7 +1061,8 @@
     "harderThan": "harder than {{pct}}%",
     "reviews": "reviews",
     "rounds": "rounds",
-    "yourPb": "your pb"
+    "yourPb": "your pb",
+    "rating": "rating"
   },
   "directorySheet": {
     "addCourse": "Add \"{{query}}\"",

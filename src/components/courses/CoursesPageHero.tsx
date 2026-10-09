@@ -14,7 +14,7 @@ import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHe
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
-import { KICKER } from '@/lib/tokens/type';
+import { CourseMasthead, CourseMastheadSkeleton } from '@/components/courses/CourseMasthead';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 
 /**
@@ -143,10 +143,6 @@ function CoursesPageHeroInner() {
     [hero?.hero_image_url],
   );
 
-  const locationText = hero
-    ? [hero.location_primary, hero.location_secondary].filter(Boolean).join(' · ')
-    : '';
-
   const blurb = hero?.why_ai?.trim() ? hero.why_ai.trim() : null;
 
   const { data: fact } = useHeroCourseFact(hero?.course_id);
@@ -185,8 +181,10 @@ function CoursesPageHeroInner() {
           })
         : null;
 
-  const eyebrowParts = hero
-    ? [hero.list_label, hero.list_label ? hero.location_primary : null, eyebrowTail].filter(Boolean)
+  /* Region (location_secondary) leads the kicker; the macro area
+     (location_primary) is the PLACE line, taken from the field, not the string. */
+  const kickerParts = hero
+    ? [hero.location_secondary, hero.list_label, eyebrowTail].filter(Boolean)
     : [];
 
 
@@ -245,138 +243,75 @@ function CoursesPageHeroInner() {
         }}
       >
         {isLoading || !hero ? (
-          <div style={{ opacity: 0.35 }}>
-            <div
-              className="animate-pulse"
-              style={{ height: 12, width: 220, background: 'rgba(255,255,255,0.28)', borderRadius: 4, marginBottom: 12 }}
-            />
-            <div
-              className="animate-pulse"
-              style={{ height: 44, width: '70%', background: 'rgba(255,255,255,0.28)', borderRadius: 6, marginBottom: 12 }}
-            />
-            <div
-              className="animate-pulse"
-              style={{ height: 20, width: '50%', background: 'rgba(255,255,255,0.22)', borderRadius: 4 }}
-            />
-          </div>
+          <CourseMastheadSkeleton rowHeight={21} />
         ) : (
-          <>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-              {hero.list_rank != null && (
-                <span
-                  style={{
-                    fontSize: 39,
-                    fontWeight: 700,
-                    color: '#fff',
-                    lineHeight: 1,
-                    letterSpacing: '-0.03em',
-                    fontFeatureSettings: '"tnum" 1',
-                    fontVariantNumeric: 'tabular-nums lining-nums',
-                  }}
-                >
-                  #{hero.list_rank}
-                </span>
-              )}
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div
-                  style={{
-                    fontSize: 18.5,
-                    fontWeight: 700,
-                    color: '#fff',
-                    lineHeight: 1.15,
-                    letterSpacing: '-0.01em',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {hero.course_name}
-                </div>
-                {locationText && (
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: 'rgba(255,255,255,0.72)',
-                      marginTop: 2,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {locationText}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {eyebrowParts.length > 0 && (
-              <div
+          <CourseMasthead
+            kicker={kickerParts.length > 0 ? kickerParts.join(' \u00b7 ') : null}
+            name={hero.course_name}
+            place={hero.location_primary ?? null}
+            nameClamp={2}
+            nameLead={hero.list_rank != null ? (
+              <span
                 style={{
-                  ...KICKER,
-                  color: 'rgba(255,255,255,0.66)',
-                  marginTop: 7,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  fontSize: 39,
+                  fontWeight: 700,
+                  color: '#fff',
+                  lineHeight: 1,
+                  letterSpacing: '-0.03em',
                   fontFeatureSettings: '"tnum" 1',
                   fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
-                {eyebrowParts.join(' · ')}
-              </div>
-            )}
-
-            {/* Blurb: absent for most moods, so the gap closes with it. */}
-            {blurb && (
-              <div
-                style={{
-                  fontSize: 14,
-                  color: 'rgba(255,255,255,0.9)',
-                  lineHeight: 1.45,
-                  maxWidth: 340,
-                  marginTop: 10,
-                  display: '-webkit-box',
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                }}
-              >
-                {blurb}
-              </div>
-            )}
-
-            {factLine && (
-              <div
-                style={{
-                  marginTop: blurb ? 10 : 12,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 7,
-                }}
-              >
-                {fact && (
-                  <span style={{ display: 'flex', flexShrink: 0 }}>
-                    <FactIcon fact={fact} />
-                  </span>
+                #{hero.list_rank}
+              </span>
+            ) : null}
+          >
+            {(blurb || factLine) ? (
+              <>
+                {/* HELD (record line): get_hero_course_fact carries no runner-up /
+                    contested flag, so COURSE RECORD vs BEST ROUND HERE cannot be
+                    decided. The existing fact line stays until that field lands. */}
+                {blurb && (
+                  <div
+                    style={{
+                      fontSize: 14,
+                      color: 'rgba(255,255,255,0.9)',
+                      lineHeight: 1.45,
+                      maxWidth: 340,
+                      marginBottom: factLine ? 10 : 0,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {blurb}
+                  </div>
                 )}
-
-                <span
-                  style={{
-                    fontSize: 13,
-                    color: 'rgba(255,255,255,0.72)',
-                    minWidth: 0,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {factLine}
-                </span>
-              </div>
-            )}
-
-          </>
+                {factLine && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                    {fact && (
+                      <span style={{ display: 'flex', flexShrink: 0 }}>
+                        <FactIcon fact={fact} />
+                      </span>
+                    )}
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: 'rgba(255,255,255,0.72)',
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {factLine}
+                    </span>
+                  </div>
+                )}
+              </>
+            ) : null}
+          </CourseMasthead>
         )}
       </div>
     </div>
