@@ -10,6 +10,8 @@
  * cached for the session.
  */
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { suggestionReasonLine } from '@/features/social-suggestions/suggestionReasonLine';
 import { Check, Zap } from 'lucide-react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { PlayerInitialAvatar } from '@/features/tourhub/_shared/PlayerInitialAvatar';
@@ -285,13 +287,6 @@ function PlayerCard({
 }
 
 // ─── People-to-follow row ──────────────────────────────────────────────
-function reasonLine(s: EmptyStateSuggestion): string {
-  if (s.reason_type === 'followed_by' && s.reason_detail)
-    return `Followed by ${s.reason_detail}`;
-  if (s.reason_type === 'plays' && s.reason_detail)
-    return `Plays ${s.reason_detail}`;
-  return 'Popular on clbhouz';
-}
 
 function SuggestionRow({
   suggestion,
@@ -300,6 +295,7 @@ function SuggestionRow({
   suggestion: EmptyStateSuggestion;
   onSelect: () => void;
 }) {
+  const { t } = useTranslation('common');
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   const viewerActorType: 'personal' | 'business' =
@@ -356,7 +352,7 @@ function SuggestionRow({
           {name}
         </p>
         <p className="text-[13px] truncate" style={{ color: S.QUIET }}>
-          {reasonLine(suggestion)}
+          {suggestionReasonLine(suggestion, t)}
         </p>
       </div>
       <button

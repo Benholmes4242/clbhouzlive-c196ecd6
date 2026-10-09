@@ -1031,5 +1031,14 @@
     "youCelebratedThisRound": "{{names}} celebrated this round",
     "youCelebratedYourRound": "{{names}} celebrated your round",
     "youCelebratedOwnersRound": "{{names}} celebrated {{owner}}'s round"
+  },
+  "suggestionReason": {
+    "followedBy": "Followed by {{detail}}",
+    "plays": "Plays {{detail}}",
+    "clubRounds_one": "{{club}} · {{count}} round",
+    "clubRounds_other": "{{club}} · {{count}} rounds",
+    "roundsTracked_one": "{{count}} round tracked",
+    "roundsTracked_other": "{{count}} rounds tracked",
+    "popular": "Popular on clbhouz"
   }
 }
