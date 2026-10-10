@@ -7,6 +7,7 @@ vi.mock('react-i18next', () => ({
     t: (_k: string, d?: unknown) =>
       typeof d === 'string' ? d : ((d as { defaultValue?: string; defaultValue_other?: string })?.defaultValue ?? (d as { defaultValue_other?: string })?.defaultValue_other ?? _k),
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
   Trans: ({ children }: { children?: React.ReactNode }) => children ?? null,
 }));
 
