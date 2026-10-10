@@ -518,8 +518,6 @@
     "picksSheet": {
       "cardAria": "[Why we picked {{name}}]",
       "title": "[Why we picked them]",
-      "worldNo": "[World no. {{rank}}]",
-      "pickOf": "[Pick {{rank}} of {{total}}]",
       "whyLabel": "[WHY WE PICKED THEM]",
       "courseFit": "[COURSE FIT]",
       "howLabel": "[HOW WE PICK]",
@@ -534,7 +532,12 @@
       "step4Body": "[The picks go up before a ball is struck and they are not edited afterwards, so you can see when we were wrong.]",
       "whatWinsLabel": "[WHAT WINS HERE]",
       "figDifficulty": "[DIFFICULTY]",
-      "footer": "[Analysis, not advice — and never betting advice.]"
+      "footer": "[Analysis, not advice — and never betting advice.]",
+      "metaFull": "[World no. {{rank}} · Pick {{n}} of {{total}}]",
+      "metaPickOnly": "[Pick {{n}} of {{total}}]",
+      "eventVenue": "[{{event}} · {{venue}}]",
+      "eventOnly": "[{{event}}]",
+      "courseFitValue": "[{{score}} / 100]"
     }
   },
   "empty": {
