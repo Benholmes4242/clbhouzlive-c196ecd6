@@ -1103,7 +1103,7 @@ export function ScoresLeaderboardsPage({
       {top100Defaulted && top100.isPending ? (
         /* No pinned row: the skeleton cannot know if the viewer is in the top 3,
            and the shorter shape grows downward (expand-outwards-only). */
-        pending(150)
+        pending(hundredPlaceholderHeight(!!userId))
       ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
         <Section
           contest
@@ -1112,7 +1112,7 @@ export function ScoresLeaderboardsPage({
         >
           {/* §7 head is eyebrow + title only — meta (member count) and lede
               (field average) were dropped; See all is the only count surface. */}
-          <div style={{ marginBottom: 12 }}>
+          <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
             <RailChips
               align="center-when-fit"
 
@@ -1123,74 +1123,52 @@ export function ScoresLeaderboardsPage({
               ariaLabel={t('amateur.leaderboards.top100List')}
             />
           </div>
+          {/* T.1 THE YOU SLAB — signed in only. Needs the board (n, pos, gap)
+              and the list (its length), so it holds its height until both land. */}
+          {userId ? (
+            top100.isPending || listCourses.isPending ? (
+              <div aria-hidden style={{ height: HUNDRED_SLAB_HEIGHT, marginBottom: THE_HUNDRED.blockGap }} />
+            ) : listLength != null ? (
+              <HundredYou
+                slab={hundredSlab(top100Rows, userId)}
+                list={RANK_SCOPE_LABEL[top100List]}
+                listLength={listLength}
+                leaderValue={top100Rows.length > 0 ? Number(top100Rows[0].value) : 0}
+                nameOf={nameOf}
+              />
+            ) : null
+          ) : null}
+          <HundredBasis list={RANK_SCOPE_LABEL[top100List]} />
           {/* A chip tap starts a fresh slug query. While it loads, reserve the
-              strip (caption + 76px tile row) instead of holding the old list:
+              strip (sub-head + tile row) instead of holding the old list:
               last list's photographs under the new list's caption is worse than
               a brief empty rail. Deliberately NOT placeholderData. */}
           {userId && listCourses.isPending ? (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 16 }}>
-                <span style={{ ...TILE_HEAD, color: A.DIM }}>
-                  {t('amateur.leaderboards.theListHundred', { list: RANK_SCOPE_LABEL[top100List] })}
-                </span>
-              </div>
-              <div aria-hidden style={{ height: 76 }} />
+            <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
+              <HundredSubHead list={RANK_SCOPE_LABEL[top100List]} count={null} />
+              <div aria-hidden style={{ height: THE_HUNDRED.tile.height }} />
             </div>
           ) : listCourses.isSuccess && listTiles.length > 0 ? (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 16 }}>
-                <span style={{ ...TILE_HEAD, color: A.DIM }}>
-                  {t('amateur.leaderboards.theListHundred', { list: RANK_SCOPE_LABEL[top100List] })}
-                </span>
-              </div>
-              <Rail>
-                {listTiles.map((c) => (
-                  <button
-                    key={c.course_id}
-                    type="button"
-                    onClick={() => onOpenCourse(c.course_id)}
-                    aria-label={c.course_name}
-                    style={{
-                      width: 108, height: 76, borderRadius: 10, overflow: 'hidden', position: 'relative',
-                      flexShrink: 0, padding: 0, background: A.PANEL,
-                      border: c.thumbnail_image ? 'none' : `1px solid ${A.BORDER}`,
-                    }}
-                  >
-                    {c.thumbnail_image ? (
-                      <img src={c.thumbnail_image} alt="" loading="lazy" decoding="async"
-                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : null}
-                    <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.76))' }} />
-                    {c.rank != null ? (
-                      <span className="tabular-nums" style={{ position: 'absolute', left: 6, top: 5, fontSize: 9, fontWeight: 700, color: '#FFF', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
-                        {`#${c.rank}`}
-                      </span>
-                    ) : null}
-                    <span style={{
-                      position: 'absolute', left: 6, right: 6, bottom: 5, fontSize: 9, fontWeight: 700,
-                      letterSpacing: '0.04em', textTransform: 'uppercase', lineHeight: 1.15, color: '#FFF',
-                      textShadow: '0 1px 4px rgba(0,0,0,0.9)',
-                      display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden',
-                      textAlign: 'left',
-                    }}>
-                      {c.course_name}
-                    </span>
-                  </button>
-                ))}
-              </Rail>
+            <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
+              <HundredSubHead
+                list={RANK_SCOPE_LABEL[top100List]}
+                count={{ played: listTiles.filter((c) => c.is_viewer_played).length, total: listTiles.length }}
+              />
+              {/* Keyed by list: a new list remounts the rail, which sets its scroll once. */}
+              <HundredRail key={top100List} tiles={listTiles} gutter={GUTTER} onOpenCourse={onOpenCourse} />
             </div>
           ) : null}
           {top100.isPending ? (
-            <div style={{ minHeight: 120 }} />
+            <div style={{ minHeight: HUNDRED_ROWS_HEIGHT }} />
           ) : top100Rows.length === 0 ? (
-            <p style={{ margin: 0, padding: '12px 0', fontFamily: SANS, fontSize: 13, color: A.MUTE }}>
+            <p style={{ margin: 0, padding: THE_HUNDRED.empty.padding, fontFamily: SANS, fontSize: THE_HUNDRED.empty.fontSize, color: A.MUTE }}>
               {t('amateur.leaderboards.top100Empty')}
             </p>
           ) : (
-            shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100'), openTop100Sheet)
+            shortBoard(top100Rows, top100Secondary, undefined, openTop100Sheet, { progress: top100Progress })
           )}
           {top100Rows.length > SHORT_ROWS ? (
-            <SeeAll label={seeAllMembers()} onPress={() => setCareerSheet(true)} />
+            <SeeAll label={seeAllMembers()} onPress={() => setTop100SeeAllSheet(true)} />
           ) : null}
         </Section>
       )}
@@ -1326,16 +1304,19 @@ export function ScoresLeaderboardsPage({
       })()}
 
       <BoardSheet
-        open={careerSheet}
-        onClose={() => setCareerSheet(false)}
-        titleId="career-see-all-title"
+        open={top100SeeAllSheet}
+        onClose={() => setTop100SeeAllSheet(false)}
+        titleId="top100-see-all-title"
         title={t('amateur.leaderboards.top100')}
         subtitle={top100Rows.length > 0
           ? `${RANK_SCOPE_LABEL[top100List]} · ${membersText(Number(top100Rows[0].total_members))}`
           : RANK_SCOPE_LABEL[top100List]}
-        valueHeading={t('amateur.leaderboards.coursesOf100')}
+        /* T.4 — the list's length from the same read the rail uses; no literal. */
+        valueHeading={listLength != null
+          ? t('amateur.leaderboards.coursesOfList', { n: listLength })
+          : t('amateur.leaderboards.coursesPlayed')}
         above={
-        <div style={{ padding: '11px 16px', /* Hairline clause: controls from list. */ borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+        <div style={{ padding: THE_HUNDRED.sheetChips.padding, /* Hairline clause: controls from list. */ borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <RailChips
             align="center-when-fit"
             ground="filled-selection"
@@ -1358,9 +1339,10 @@ export function ScoresLeaderboardsPage({
               photo={r.photo_url}
               secondary={top100Secondary(r)}
               value={String(r.value)}
+              progress={top100Progress(r)}
               self={!!r.is_viewer || r.user_id === userId}
               onPress={() => {
-                setCareerSheet(false);
+                setTop100SeeAllSheet(false);
                 openTop100Sheet(r);
               }}
             />
