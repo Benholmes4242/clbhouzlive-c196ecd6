@@ -256,8 +256,6 @@
       "courseShapeLabel": "Perfil del campo",
       "ourPicksLabel": "Nuestras apuestas",
       "ourPicksAll": "Todas las apuestas y sus razones",
-      "ourPicksProvenance": "Updated {{day}}",
-      "ourPicksStale": "Actualizándose",
       "figuresBasis": "Los tres de {{n}} rondas completadas en la ronda {{round}}.",
       "figuresBasisLowOnly": "Mejor ronda de las rondas completadas en la ronda {{round}}; muy pocas para un promedio del campo.",
       "figuresBasisLow": "Mejor ronda: {{names}}.",
@@ -520,7 +518,7 @@
     },
     "picksSheet": {
       "cardAria": "Why we picked {{name}}",
-      "eyebrow": "OUR PICKS",
+      "eyebrow": "OUR TOURNAMENT PICKS",
       "title": "Why we picked them",
       "worldNo": "World no. {{rank}}",
       "pickOf": "Pick {{rank}} of {{total}}",

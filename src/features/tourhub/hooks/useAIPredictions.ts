@@ -711,11 +711,14 @@ function formatPredictions(
     },
     topContenders,
     darkHorses: [],
+    // Every field empty on purpose: an absent analysis must read as absent.
+    // A plausible default is worse than a missing row — nobody can tell it
+    // apart from a real assessment.
     courseAnalysis: predictions.courseAnalysis || {
       winnerProfile: '',
       keyStats: [],
       insight: '',
-      difficulty: 'Moderate',
+      difficulty: '',
     },
     confidence: predictions.confidence || 0.7,
     generatedAt: generatedAt || new Date().toISOString(),
