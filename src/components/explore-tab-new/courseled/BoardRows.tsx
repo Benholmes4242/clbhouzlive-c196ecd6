@@ -2,13 +2,12 @@ import { ROW_METRICS } from './rowMetrics';
 import { MemberAvatar } from './MemberAvatar';
 import { useTranslation } from 'react-i18next';
 
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { A, SANS } from './tokens';
-import { relativeDayCompact } from './discoverWhen';
+import { A, SANS, SELF_ROW_TINT, INDEX_CUT_BORDER } from './tokens';
+import { playDateShort } from './discoverWhen';
+import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { boardCountsRounds, isFeatBoard, type BoardKey, type FeatBoardKey } from './boardFilters';
 import type { ExploreRoundFeatKind } from '@/features/explore-magazine/roundFeatCollection';
 import type { BoardRow as Row } from './hooks/useBoardPage';
-import { INK_TINT_04 as LEADER_WASH } from '@/features/tourhub/_shared/tokens';
 import { collectRoundFeats, FEAT_PRECEDENCE, topRoundFeats, type ExploreRoundFeat } from '@/features/explore-magazine/roundFeatCollection';
 import type { TFunction } from 'i18next';
 
@@ -16,28 +15,25 @@ import type { TFunction } from 'i18next';
  * THE BOARD'S ROW (BRIEF_DISCOVER_FILTER_LED_BOARD S4/S5), shared by the board
  * and by the see-all sheet so the two can never draw the same round differently.
  *
- * S4.4 — EVERY BOARD STATES ITS UNIT IN A COLUMN HEADER. A bare "71" is not a
- * board. The unit comes from the board key and nothing else.
+ * S4.4 — EVERY BOARD STATES ITS UNIT. A bare "71" is not a board. On the lead
+ * board the unit is stated in PROSE by the basis sentence (Phase 9.9 deleted its
+ * column header; 9.3 makes the rounds sentence name both to-par figures). The
+ * see-all sheet still states it in BoardHeaderRow. The unit comes from the board
+ * key and nothing else.
  *
  * S5.4 — THE MEMBER'S OWN ROW IS AMBER wherever it lands, and the pinned copy
  * of it carries the GAP in the board's own unit. Amber on this surface means YOU
  * and is not spent on anything else.
  */
 
+/** The faintest analytical ink; no separate FAINT token exists. */
+const FAINT = A.DIM;
+
 /* TO-PAR RED HAS EXACTLY ONE SOURCE: TOPAR_UNDER_DARK, read here as A.RED. A local hex for it is always a fork. */
 
 export interface BoardColumns {
   value: { i18n: string; label: string };
   secondary: { i18n: string; label: string } | null;
-  /**
-   * B4.3 — TRUE WHEN THE VALUE CELL HOLDS WORDS RATHER THAN A FIGURE. Only the
-   * five WHEN boards ('recent' and the four feats). Four to six uppercase
-   * letters carry far more mass than a two-digit figure at the same size, so
-   * the row renders a textual value at 12.5 instead of 15. boardColumns() is
-   * the one place that knows what each column holds; the row never re-derives
-   * it from a board-key list.
-   */
-  valueIsText: boolean;
   /** FALSE ON THE FIVE WHEN BOARDS. They are ordered by date, so a position
       column would number recency and call it rank — and because the sheet groups
       by month, the count runs ACROSS the groups: 1-6 in September, 7 in August.
@@ -51,61 +47,54 @@ export function boardColumns(board: BoardKey): BoardColumns {
       return {
         value: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         secondary: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
-        valueIsText: false,
         ranked: true,
       };
     case 'topar':
       return {
         value: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
-        valueIsText: false,
         ranked: true,
       };
     case 'net':
       return {
         value: { i18n: 'discover.filterBoard.col.net', label: 'NET' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
-        valueIsText: false,
         ranked: true,
       };
     case 'stableford':
       return {
         value: { i18n: 'discover.filterBoard.col.points', label: 'PTS' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
-        valueIsText: false,
         ranked: true,
       };
     case 'improved':
       return {
         value: { i18n: 'discover.filterBoard.col.cut', label: 'CUT' },
         secondary: null,
-        valueIsText: false,
         ranked: true,
       };
     case 'birdies':
       return {
         value: { i18n: 'discover.filterBoard.col.birdies', label: 'BIRDIES' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
-        valueIsText: false,
         ranked: true,
       };
     /* A3.1 — MOST RECENT CARRIES TO PAR, NOT GROSS. The board spans many
        courses, so a bare 71 beside an 85 is two unrelated numbers; to-par is
        the figure that travels between courses. */
+    /* Phase 9.10 — NET against par leads, GROSS against par behind. */
     case 'recent':
       return {
-        value: { i18n: 'discover.filterBoard.col.when', label: 'WHEN' },
-        secondary: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
-        valueIsText: true,
+        value: { i18n: 'discover.filterBoard.col.net', label: 'NET' },
+        secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         ranked: false,
       };
     /* B1.3 / A3.5 — THE FEAT BOARDS KEEP GROSS: they are event lists where the
        interesting fact is the feat and gross is context, not comparison. */
     default:
       return {
-        value: { i18n: 'discover.filterBoard.col.when', label: 'WHEN' },
-        secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
-        valueIsText: true,
+        value: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        secondary: null,
         ranked: false,
       };
   }
@@ -171,11 +160,16 @@ export function boardValue(
       return { text: fmtCut(r.delta_index), tone: A.INK };
     case 'birdies':
       return { text: r.birdies != null ? String(r.birdies) : '\u2014', tone: A.INK };
-    case 'recent':
+    /* Phase 9.10 — NET against par, red under par; with no net, GROSS against
+       par takes the main figure and there is no secondary. */
+    case 'recent': {
+      const n = netToParOf(r) ?? toParOf(r);
+      return { text: fmtToPar(n), tone: n != null && n < 0 ? A.RED : A.INK };
+    }
+    /* Feat boards: gross, plain, no tone. The date lives on the sub-line and in
+       the day ladder, so it is no longer a figure. */
     default:
-      /* Feat boards land here too: their value IS the date (B1.3), now on the
-         relative-day ladder so a 2024 ace never reads as a weekday (A2.2). */
-      return { text: relativeDayCompact(r.play_date, t as never), tone: A.INK };
+      return { text: r.gross_score != null ? String(r.gross_score) : '\u2014', tone: A.INK };
   }
 }
 
@@ -189,22 +183,20 @@ export function boardSecondary(r: Row, board: BoardKey): Cell | null {
       return null;
     /* A3.1/A3.3/A3.4 — TO PAR under the standard colour law; a round with no
        usable par states an em-dash in A.DIM, never a zero and never a blank. */
-    case 'recent': {
-      const p = toParOf(r);
-      return {
-        text: fmtToPar(p),
-        tone: p == null ? A.DIM : p < 0 ? A.RED : p === 0 ? A.MUTE : A.INK,
-      };
-    }
+    /* Gross against par behind net; nothing when net is absent (it moved up). */
+    case 'recent':
+      return netToParOf(r) == null ? null : { text: fmtToPar(toParOf(r)), tone: FAINT };
     case 'topar':
     case 'net':
     case 'stableford':
     case 'birdies':
-    default:
       return {
         text: r.gross_score != null ? String(r.gross_score) : '\u2014',
-        tone: A.MUTE,
+        tone: FAINT,
       };
+    /* Feat boards: no secondary (9.10). */
+    default:
+      return null;
   }
 }
 
@@ -257,12 +249,6 @@ export function gapText(
 /* S4 — THE FORK IS FOLDED BACK. The board no longer builds its own fallback
    tile: SquircleAvatar now carries the same hue, so the photo row and the
    fallback row finally share one geometry. */
-const POS_W = ROW_METRICS.posTrack;
-const VALUE_W = 58;
-const SECOND_W = 46;
-/** Podium avatar and figure — the first row's emphasis on a ranked board. */
-const PODIUM_AVATAR = 46;
-export const PODIUM_FIGURE_SIZE = 30;
 
 type BoardT = TFunction<'courses'>;
 
@@ -314,7 +300,16 @@ export function boardFeatMarker(row: Row, board: BoardKey, t: BoardT): string | 
     : labels[0];
 }
 
-export function BoardHeaderRow({ board, hideValue }: { board: BoardKey; hideValue?: boolean }) {
+const M = ROW_METRICS;
+/** 9.7 — two grammars, chosen by boardColumns(board).ranked. */
+function gridFor(ranked: boolean): string {
+  return ranked
+    ? `${M.posTrack}px ${M.avatar}px minmax(0,1fr) auto`
+    : `${M.avatar}px minmax(0,1fr) auto`;
+}
+
+/** The sheet's column labels. The lead board has none (9.9). */
+export function BoardHeaderRow({ board }: { board: BoardKey }) {
   const { t } = useTranslation('courses');
   const cols = boardColumns(board);
   const cap: React.CSSProperties = {
@@ -327,37 +322,49 @@ export function BoardHeaderRow({ board, hideValue }: { board: BoardKey; hideValu
   return (
     <div
       style={{
-        display: 'flex',
+        display: 'grid',
+        gridTemplateColumns: gridFor(cols.ranked),
+        columnGap: M.colGap,
         alignItems: 'center',
-        gap: 10,
-        padding: '0 2px 6px',
-        /* Hairline clause: labels from data (survives Phase 5 — never a row from a row). */
+        padding: `0 ${M.padX}px 6px`,
+        /* Hairline clause: labels from data. */
         borderBottom: `1px solid ${A.BORDER}`,
       }}
     >
-      {cols.ranked && (
-        <span style={{ ...cap, width: POS_W, textAlign: 'center', flexShrink: 0 }}>
-          {t('discover.filterBoard.col.pos')}
-        </span>
-      )}
-      <span style={{ ...cap, flex: 1, minWidth: 0 }}>
-        {t('discover.filterBoard.col.member')}
+      {cols.ranked && <span style={{ ...cap, textAlign: 'center' }}>{t('discover.filterBoard.col.pos')}</span>}
+      <span style={{ ...cap, gridColumn: 'span 2' }}>{t('discover.filterBoard.col.member')}</span>
+      <span style={{ ...cap, textAlign: 'right' }}>
+        {t(cols.value.i18n)}
+        {cols.secondary ? <> {'\u00B7'} {t(cols.secondary.i18n)}</> : null}
       </span>
-      {cols.secondary && (
-        <span style={{ ...cap, width: SECOND_W, textAlign: 'center', flexShrink: 0 }}>
-          {t(cols.secondary.i18n)}
-        </span>
-      )}
-      {/* S4.3 — on a DAY-GROUPED sheet the WHEN value is stated once per group,
-          so neither the column nor its header belongs on the row. */}
-      {!hideValue && (
-        <span style={{ ...cap, width: VALUE_W, textAlign: 'center', flexShrink: 0 }}>
-          {t(cols.value.i18n)}
-        </span>
-      )}
     </div>
   );
+}
 
+/** 9.8 — the day-ladder separator, feed grammar only. */
+export function BoardDaySeparator({ label }: { label: string }) {
+  return (
+    <div
+      data-board-day
+      style={{
+        padding: `12px ${M.padX}px 7px`,
+        fontFamily: SANS,
+        fontSize: 9.5,
+        fontWeight: 800,
+        letterSpacing: '0.13em',
+        textTransform: 'uppercase',
+        color: A.DIM,
+      }}
+    >
+      {label}
+    </div>
+  );
+}
+
+/** 9.11 — one decimal, true minus, always signed. */
+function fmtIndexChip(n: number): string {
+  const v = Math.abs(n).toFixed(1);
+  return n < 0 ? `\u2212${v}` : `+${v}`;
 }
 
 export function BoardRowView({
@@ -365,8 +372,7 @@ export function BoardRowView({
   board,
   isSelf,
   gap,
-  hideValue,
-  podium,
+  pinned,
   onPress,
 }: {
   row: Row;
@@ -374,172 +380,128 @@ export function BoardRowView({
   isSelf: boolean;
   /** Only the PINNED copy of the member's row carries this (S5.4). */
   gap?: string | null;
-  /** S4.3 — the day-grouped sheet states WHEN in its group header instead. */
-  hideValue?: boolean;
-  /** THE PODIUM IS A TREATMENT OF THE FIRST ROW, NOT A SECOND ROW COMPONENT.
-   *  Same helpers, same figures, same colour law — only size and emphasis
-   *  change. Ignored on an unranked board: on a date order a podium is a lie. */
-  podium?: boolean;
+  /** The pinned self row: a 12px break above it (9.13). */
+  pinned?: boolean;
   onPress?: (row: Row) => void;
 }) {
-  const { t } = useTranslation('courses');
+  const { t, i18n } = useTranslation('courses');
   const value = boardValue(row, board, t as never);
   const second = boardSecondary(row, board);
-  /* B4.3 — the column, not the row, decides whether the value is words. */
-  const { valueIsText, ranked } = boardColumns(board);
-  const ink = isSelf ? A.AMBER : A.INK;
+  const { ranked } = boardColumns(board);
   const feat = boardFeatMarker(row, board, t);
-  const big = !!podium && ranked;
-  const avatar = big ? PODIUM_AVATAR : ROW_METRICS.avatar;
+  const course = row.course_name ?? t('discover.unknownCourse');
+  const date = playDateShort(row.play_date, i18n?.language);
+  const courseDate = date ? `${course} \u00B7 ${date}` : course;
+  /* The feat stays where it was: leading the second line on a feat board. */
+  const sub = gap ?? (feat && isFeatBoard(board) ? `${feat} \u00B7 ${courseDate}` : courseDate);
+  const chip = !ranked && row.delta_index != null && Number(row.delta_index) !== 0 ? Number(row.delta_index) : null;
 
   return (
     <button
       type="button"
       onClick={() => onPress?.(row)}
-      data-board-podium={big ? '' : undefined}
+      data-board-self={isSelf ? '' : undefined}
       style={{
         width: '100%',
-        display: 'flex',
+        display: 'grid',
+        gridTemplateColumns: gridFor(ranked),
+        columnGap: M.colGap,
         alignItems: 'center',
-        gap: 10,
-        padding: big ? '12px 2px' : `${ROW_METRICS.padY}px 2px`,
-        borderRadius: big ? 12 : undefined,
-        /* The wash states rank; amber remains the viewing member's identity. */
-        background: ranked && row.pos === 1 ? LEADER_WASH : 'transparent',
+        padding: `${M.padY}px ${M.padX}px`,
+        marginTop: pinned ? M.pinnedGap : 0,
+        background: isSelf ? SELF_ROW_TINT : 'transparent',
         border: 'none',
+        /* 9.13 — every row carries a hairline beneath it, the last included. */
+        borderBottom: `1px solid ${A.SOFT}`,
         textAlign: 'left',
         fontFamily: SANS,
         cursor: onPress ? 'pointer' : 'default',
       }}
     >
       {ranked && (
-      <span
+        <span
           className="tabular-nums"
           style={{
-            width: POS_W,
-            flexShrink: 0,
             textAlign: 'center',
-            fontSize: ROW_METRICS.posSize,
-            fontWeight: ROW_METRICS.posWeight,
-            color: isSelf ? A.AMBER : A.MUTE,
+            fontSize: M.posSize,
+            fontWeight: M.posWeight,
+            /* 9.12 — first place is gold; the member's own position stays amber. */
+            color: row.pos === 1 ? MEDAL_GOLD : isSelf ? A.AMBER : A.MUTE,
           }}
         >
-          {/* A TIE STATES ITSELF: T4, never a silent second 4. On a feat board
-              is_tie is always false, so this renders a plain number (B1.3). */}
+          {/* A TIE STATES ITSELF: T4, never a silent second 4. */}
           {row.is_tie ? `T${row.pos}` : row.pos}
         </span>
       )}
-
-      <span style={{ flexShrink: 0 }}>
-        <MemberAvatar userId={row.user_id} name={row.display_name} photoUrl={row.profile_photo_url} size={avatar} />
+      <span style={{ display: 'flex' }}>
+        <MemberAvatar userId={row.user_id} name={row.display_name} photoUrl={row.profile_photo_url} size={M.avatar} />
       </span>
-      <span
-        style={{
-          flex: 1,
-          minWidth: 0,
-          height: avatar,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}
-      >
+      <span style={{ minWidth: 0 }}>
         <span
           style={{
             display: 'block',
-            /* §7 ROW NAME — 14 / 600. */
-            fontSize: big ? 16 : ROW_METRICS.nameSize,
-            fontWeight: big ? 700 : ROW_METRICS.nameWeight,
-            color: ink,
+            fontSize: M.nameSize,
+            fontWeight: M.nameWeight,
+            letterSpacing: '-0.01em',
+            lineHeight: M.nameLine,
+            color: isSelf ? A.AMBER : A.INK,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            lineHeight: big ? '18px' : ROW_METRICS.nameLine,
           }}
         >
           {row.display_name ?? t('discover.aMember')}
         </span>
-        {/* S5.5 — THE SECOND LINE IS THE COURSE, on every board and every row. */}
-        {!gap && feat && !ranked ? (
-          /* On a feat board the feat is the subject: it leads and never
-             shrinks; the course is context and truncates behind it. */
-          <span
-            style={{
-              display: 'flex',
-              marginTop: 1,
-              fontSize: 11,
-              fontWeight: 600,
-              color: A.DIM,
-              whiteSpace: 'nowrap',
-              lineHeight: '12px',
-              minWidth: 0,
-            }}
-          >
-            <span style={{ flexShrink: 0 }}>{feat} {'\u00B7'}&nbsp;</span>
-            <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {row.course_name ?? t('discover.unknownCourse')}
-            </span>
-          </span>
-        ) : (
-          <span
-            style={{
-              display: 'block',
-              marginTop: 1,
-              /* §7 ROW SUB-LINE — 11 DIM. */
-              fontSize: 11,
-              fontWeight: 600,
-              color: A.DIM,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              lineHeight: '12px',
-            }}
-          >
-            {gap ??
-            (feat
-              ? `${row.course_name ?? t('discover.unknownCourse')} \u00B7 ${feat}`
-              : (row.course_name ?? t('discover.unknownCourse')))}
-          </span>
-        )}
-      </span>
-      {second && (
         <span
-          className="tabular-nums"
           style={{
-            width: SECOND_W,
-            flexShrink: 0,
-            textAlign: 'center',
-            fontSize: ROW_METRICS.secondarySize,
-            fontWeight: ROW_METRICS.secondaryWeight,
-            letterSpacing: '-0.04em',
-            color: second.tone,
+            display: 'block',
+            marginTop: 1,
+            fontSize: M.subSize,
+            lineHeight: M.subLine,
+            color: A.MUTE,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
-          {second.text}
+          {sub}
         </span>
-      )}
-      {!hideValue && (
+      </span>
+      <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 8 }}>
+        {chip != null ? (
+          <span
+            data-index-chip
+            className="tabular-nums"
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              borderRadius: 999,
+              padding: '1px 5px',
+              color: chip < 0 ? A.GREEN : A.MUTE,
+              border: `1px solid ${chip < 0 ? INDEX_CUT_BORDER : A.BORDER}`,
+            }}
+          >
+            {fmtIndexChip(chip)}
+          </span>
+        ) : null}
+        {/* S1.3 — THE FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER. */}
         <span
+          data-board-main
           className="tabular-nums"
-          style={{
-            width: VALUE_W,
-            flexShrink: 0,
-            textAlign: 'center',
-            /* B4.2 — WORDS at 12.5, FIGURES at 15. VALUE_W stays 58 either way
-               (B4.5) so the right edge aligns across boards. */
-            /* §7 ROW FIGURE — 16 tabular, -0.04em. Words stay at 12.5. */
-            fontSize: valueIsText ? 12.5 : big ? PODIUM_FIGURE_SIZE : ROW_METRICS.figureSize,
-            fontWeight: 700,
-            letterSpacing: valueIsText ? undefined : '-0.04em',
-            /* S1.3 — THE RANKED FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER:
-               under par red, over par ink, level muted, on the member's own row
-               as on any other. Amber marks the position and the name only. */
-            color: value.tone,
-            textTransform: 'uppercase',
-          }}
+          style={{ fontSize: M.figureSize, fontWeight: M.figureWeight, letterSpacing: '-0.02em', color: value.tone }}
         >
           {value.text}
         </span>
-      )}
+        {second ? (
+          <span
+            data-board-secondary
+            className="tabular-nums"
+            style={{ fontSize: M.secondarySize, fontWeight: M.secondaryWeight, color: second.tone }}
+          >
+            {second.text}
+          </span>
+        ) : null}
+      </span>
     </button>
   );
 }
