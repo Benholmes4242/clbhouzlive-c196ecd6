@@ -35,8 +35,6 @@ export interface PicksSheetProps {
   venueName: string | null;
   /** Live/suspended only: gross round each behind pick needs (absent → no line). */
   neededByPlayer?: Map<string, number>;
-  /** The current round, for the required-round sentence. */
-  round?: number | null;
 }
 
 const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1' };
@@ -46,7 +44,7 @@ const HAIRLINE: React.CSSProperties = { height: 1, background: WHITE_ALPHA_08, b
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 const nonEmpty = (v: unknown): v is string => typeof v === 'string' && v.trim().length > 0;
 
-export function PicksSheet({ open, onClose, picks, predictions, eventName, venueName, neededByPlayer, round = null }: PicksSheetProps) {
+export function PicksSheet({ open, onClose, picks, predictions, eventName, venueName, neededByPlayer }: PicksSheetProps) {
   const { t } = useTranslation('tourhub');
   const { viewingTourSlug } = useTourSelection();
   const tourCode = viewingTourSlug ?? 'pga';
@@ -119,10 +117,10 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
 
               {(() => {
                 const need = neededByPlayer?.get(String(p.playerId));
-                if (need == null || !isNum(round)) return null;
+                if (need == null) return null;
                 return (
                   <p data-overview-picks-sheet-needs style={{ margin: '12px 0 0', fontSize: 12.5, lineHeight: 1.45, color: READING_INK_84, ...FIGS }}>
-                    {t('overview.picksSheet.needsRound', { gross: need, round })}
+                    {t('overview.picksSheet.needsRound', { gross: need })}
                   </p>
                 );
               })()}

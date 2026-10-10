@@ -502,7 +502,7 @@
       "eventVenue": "[{{event}} · {{venue}}]",
       "eventOnly": "[{{event}}]",
       "courseFitValue": "[{{score}} / 100]",
-      "needsRound": "[Needs a {{gross}} in round {{round}} to reach the lead.]"
+      "needsRound": "[Needs {{gross}} in the final round to match the lead as it stands.]"
     }
   },
   "empty": {
