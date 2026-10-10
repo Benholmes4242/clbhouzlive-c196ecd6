@@ -39,8 +39,6 @@ export interface AITopContender {
    * editorial pipeline.
    */
   pulledQuote?: string | null;
-  consensusScore?: number | null;
-  modelVotes?: Array<{ model: string; rank: number | null; winProbability: number }>;
 }
 
 export interface AIDarkHorse {
@@ -90,8 +88,6 @@ export interface AIPredictionData {
    * gracefully omits the line in that case.
    */
   editorialFraming?: string | null;
-  /** Multi-model consensus metadata; null on older stored rows. */
-  consensus?: { method: string | null; agreementScore: number | null; models: Array<{ model: string; success: boolean }> } | null;
 }
 
 export interface UseAIPredictionsResult {
@@ -511,16 +507,7 @@ async function fetchPredictionsForTournament(tournament: any): Promise<AIPredict
         body: { tournamentId: tournament.id, forceRegenerate: isStaleLogic },
       });
       if (!error && data?.predictions) {
-        // consensusMethod / agreementScore / modelsUsed are SIBLINGS of
-        // `predictions` in the generator's response, not inside it.
-        return formatPredictions(tournament, {
-          ...data.predictions,
-          consensusData: {
-            method: data.consensusMethod ?? null,
-            agreementScore: data.agreementScore ?? null,
-            modelResults: data.modelsUsed ?? [],
-          },
-        }, true);
+        return formatPredictions(tournament, data.predictions, true);
       }
     } catch (err) {
       console.error('[useAIPredictions] Failed to generate predictions:', err);
@@ -533,7 +520,6 @@ async function fetchPredictionsForTournament(tournament: any): Promise<AIPredict
     darkHorses: (aiPredictions.dark_horses || []) as any[],
     courseAnalysis: aiPredictions.course_analysis || {},
     confidence: aiPredictions.confidence || 0.7,
-    consensusData: (aiPredictions as any).consensus_data ?? null,
   };
 
   // WD validation: check if any predicted players have withdrawn
@@ -563,7 +549,6 @@ async function validatePicksAgainstField(
     darkHorses: any[];
     courseAnalysis: any;
     confidence: number;
-    consensusData?: any;
   }
 ) {
   const contenders = [...(predictions.topContenders || [])];
@@ -708,14 +693,6 @@ function formatPredictions(
   }));
 
   const topContenders = rawContenders.slice(0, 3);
-  const consensusData = predictions.consensusData;
-  const consensus = consensusData
-    ? {
-        method: consensusData.method ?? null,
-        agreementScore: typeof consensusData.agreementScore === 'number' ? consensusData.agreementScore : null,
-        models: ((consensusData.modelResults ?? []) as any[]).map((r) => ({ model: r.model, success: r.success })),
-      }
-    : null;
 
   return {
     tournament: {
@@ -744,7 +721,6 @@ function formatPredictions(
     generatedAt: generatedAt || new Date().toISOString(),
     isAIPowered,
     isStale: isPredictionStale(tournament, generatedAt, researchContext),
-    consensus,
   };
 }
 
