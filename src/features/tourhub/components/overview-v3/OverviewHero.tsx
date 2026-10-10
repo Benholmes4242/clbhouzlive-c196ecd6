@@ -163,7 +163,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
    * leaderboard row change in the database to filter client-side, for a
    * carousel that only ever shows one slide at a time.
    */
-  useLeaderboardRealtime(viewingLive ? viewingTid : null);
+  // Leaderboard key ONLY: see LeaderboardRealtimeOptions for the fan-out.
+  useLeaderboardRealtime(viewingLive ? viewingTid : null, { invalidate: 'leaderboard' });
 
   /**
    * The board below the hero reads the ACTIVE SLIDE directly — not the debounced
