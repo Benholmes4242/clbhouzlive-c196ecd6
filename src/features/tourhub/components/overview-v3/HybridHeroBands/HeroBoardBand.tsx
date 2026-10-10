@@ -383,6 +383,7 @@ export function HeroBoardSection({
           open={picksOpen}
           onClose={() => setPicksOpen(false)}
           picks={picks}
+          predictions={predictions ?? null}
           eventName={predictions?.tournament?.name ?? ''}
           venueName={predictions?.tournament?.venueName || null}
         />
