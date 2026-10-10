@@ -1896,8 +1896,8 @@ class VideoEngineImpl {
     const pa = la.audioPolicy; la.audioPolicy = lb.audioPolicy; lb.audioPolicy = pa;
     const loopA = la.loop; la.loop = lb.loop; lb.loop = loopA;
     la.el.loop = la.loop; lb.el.loop = lb.loop;
-    this.applyAudioPolicy(lb, 'swap');
-    this.applyAudioPolicy(la, 'swap');
+    this.applyAudioPolicy(lb, 'role-promote');
+    this.applyAudioPolicy(la, 'role-promote');
     this.sameElementReturn.delete(a);
     this.sameElementReturn.delete(b);
     // The old 'a' content (now under id b) is paused and parked.
