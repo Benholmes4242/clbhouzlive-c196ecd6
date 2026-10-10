@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import i18n from 'i18next';
+import enTourhub from '../../public/locales/en/tourhub.json';
 import { resolveChampionPlayerId, pickWonTournament } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { render } from '@testing-library/react';
 import { createElement } from 'react';
@@ -383,6 +385,7 @@ describe('MiniBoard heroBoard render', () => {
 });
 
 describe('MiniBoard hero rows', () => {
+  i18n.addResourceBundle(i18n.language || 'en', 'tourhub', enTourhub, true, true);
   const mount = (entries: BoardEntry[], currentRound: number, phase: 'live' | 'completed' = 'live') => render(createElement(
     QueryClientProvider,
     { client: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
