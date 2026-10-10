@@ -3,7 +3,7 @@ import { MemberAvatar } from './MemberAvatar';
 import { useTranslation } from 'react-i18next';
 
 import { A, SANS, SELF_ROW_TINT, INDEX_CUT_BORDER } from './tokens';
-import { playDateShort } from './discoverWhen';
+import { playDateStandalone, playDateUnderYearHeader } from './discoverWhen';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { boardCountsRounds, isFeatBoard, type BoardKey, type FeatBoardKey } from './boardFilters';
 import type { ExploreRoundFeatKind } from '@/features/explore-magazine/roundFeatCollection';
@@ -390,7 +390,10 @@ export function BoardRowView({
   const { ranked } = boardColumns(board);
   const feat = boardFeatMarker(row, board, t);
   const course = row.course_name ?? t('discover.unknownCourse');
-  const date = playDateShort(row.play_date, i18n?.language);
+  /* Feed rows sit under day-ladder groups that state the year; a ranked board has no groups. */
+  const date = ranked
+    ? playDateStandalone(row.play_date, i18n?.language)
+    : playDateUnderYearHeader(row.play_date, i18n?.language);
   /* 12.1 — WHAT delta_index MEANS, proved against 4,067 live rounds: hcp_at_time
      is the index a member carried INTO the round, and delta_index is the
      movement THAT round caused — it appears as the NEXT round's hcp_at_time.

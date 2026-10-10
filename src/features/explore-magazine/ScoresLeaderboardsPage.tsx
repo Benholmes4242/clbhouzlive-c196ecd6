@@ -32,7 +32,7 @@ import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
 import { BOARD_FLOOR_COPY } from '@/components/explore-tab-new/courseled/boardFloors';
-import { dayLadder, playDateAtLocalNoon, playDateShort } from '@/components/explore-tab-new/courseled/discoverWhen';
+import { dayLadder, playDateAtLocalNoon, playDateStandalone } from '@/components/explore-tab-new/courseled/discoverWhen';
 import { SELF_ROW_TINT } from '@/components/explore-tab-new/courseled/tokens';
 import { standingOrdinal } from './ordinal';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
@@ -897,7 +897,8 @@ export function ScoresLeaderboardsPage({
               kind = 'on';
               const youWord = <span style={{ color: A.INK, fontWeight: 700 }}>{t('amateur.leaderboards.slab.you')}</span>;
               const course = leadMine.course_name ?? t('discover.unknownCourse');
-              const date = playDateShort(leadMine.play_date, i18n?.language);
+              /* E.2 — the slab sits above the ladder, so nothing above it states the year. */
+              const date = playDateStandalone(leadMine.play_date, i18n?.language);
               let raw: string;
               if (boardColumns(state.board).ranked) {
                 /* 9.6 — the figure is the position; its suffix at 10/700 DIM. */

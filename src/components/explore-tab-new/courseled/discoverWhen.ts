@@ -184,9 +184,3 @@ export function playDateStandalone(iso: string | null | undefined, locale?: stri
     ? playDateUnderYearHeader(iso, locale)
     : d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
 }
-
-/**
- * Former name of playDateUnderYearHeader, kept so the signed-off lead board's
- * call sites are untouched until their form is decided (RARE AIR D.3).
- */
-export const playDateShort = playDateUnderYearHeader;
