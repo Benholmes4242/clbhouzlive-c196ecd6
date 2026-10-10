@@ -282,13 +282,13 @@ type BoardT = TFunction<'courses'>;
 function boardFeatLabel(feat: ExploreRoundFeat, t: BoardT): string {
   switch (feat.kind) {
     case 'ace':
-      return t('discover.filterBoard.featAce', { count: feat.count, });
+      return t('discover.filterBoard.featAce', { count: feat.count });
     case 'albatross':
-      return t('discover.filterBoard.featAlbatross', { count: feat.count, });
+      return t('discover.filterBoard.featAlbatross', { count: feat.count });
     case 'eagle':
-      return t('discover.filterBoard.featEagle', { count: feat.count, });
+      return t('discover.filterBoard.featEagle', { count: feat.count });
     case 'birdies':
-      return t('discover.filterBoard.featBirdies', { count: feat.count, });
+      return t('discover.filterBoard.featBirdies', { count: feat.count });
     case 'clean':
       return t('discover.filterBoard.featClean');
   }

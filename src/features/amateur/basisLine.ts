@@ -26,8 +26,8 @@ const SCOPE_SHORT: Partial<Record<BoardFilters['scope'], { i18n: string; label: 
 export function basisLine(unit: string, filters: BoardFilters, t: T): string {
   const parts = [unit];
   const scope = SCOPE_SHORT[filters.scope];
-  if (scope) parts.push(t(scope.i18n, scope.label).toLowerCase());
+  if (scope) parts.push(t(scope.i18n).toLowerCase());
   const window = WINDOW_SHORT[filters.window];
-  parts.push(t(window.i18n, window.label).toLowerCase());
+  parts.push(t(window.i18n).toLowerCase());
   return parts.join(' \u00B7 ');
 }

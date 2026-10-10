@@ -1,12 +1,10 @@
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import {
-  BOARD_LABELS,
   SCOPE_OPTIONS,
-  type BoardKey,
   type ScopeKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 

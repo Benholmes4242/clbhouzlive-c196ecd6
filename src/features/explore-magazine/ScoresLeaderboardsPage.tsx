@@ -18,6 +18,7 @@ import {
   DEFAULT_FILTERS,
   OFFERED_RANKING_BOARD_KEYS,
   BOARD_ROW_FLOOR,
+  WINDOW_OPTIONS,
   boardCountsRounds,
   type BoardFilters,
   type BoardKey,
@@ -558,16 +559,13 @@ export function ScoresLeaderboardsPage({
   const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
   const [careerSheet, setCareerSheet] = useState(false);
 
-  const windowLabel = (w: WindowKey) =>
-    w === '14'
-      ? t('amateur.leaderboards.window.d14', 'This fortnight')
-      : w === '30'
-        ? t('amateur.leaderboards.window.d30', 'This month')
-        : w === '90'
-          ? t('amateur.leaderboards.window.d90', 'Last 90 days')
-          : w === 'year'
-            ? t('amateur.leaderboards.window.year')
-            : t('amateur.leaderboards.window.all', 'All time');
+  /* 3.3 ONE WINDOW VOCABULARY: WINDOW_OPTIONS (the filter list's own words)
+     is the eyebrow too; WINDOW_SHORT survives only as its compact form for the
+     middot sample line, where the phrase follows a count ("19 members · 14 days"). */
+  const windowLabel = (w: WindowKey) => {
+    const o = WINDOW_OPTIONS.find((x) => x.key === w) ?? WINDOW_OPTIONS[0];
+    return t(o.i18n);
+  };
 
   const membersText = (n: number) =>
     t('amateur.leaderboards.nMembers', { count: n });
