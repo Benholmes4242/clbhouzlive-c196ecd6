@@ -10,6 +10,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { formatNumber } from '@/i18n/format';
 import { PlayerAvatar } from '../../PlayerAvatar';
 import { useTourSelection } from '../../../context/TourSelectionContext';
 import type { AIPredictionData, AITopContender } from '../../../hooks/useAIPredictions';
@@ -72,7 +73,9 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
           </h2>
           {eventName ? (
             <div style={{ marginTop: 4, fontSize: 11.5, fontWeight: 600, color: WHITE_ALPHA_65 }}>
-              {venueName ? `${eventName} · ${venueName}` : eventName}
+              {venueName
+                ? t('overview.picksSheet.eventVenue', { event: eventName, venue: venueName })
+                : t('overview.picksSheet.eventOnly', { event: eventName })}
             </div>
           ) : null}
         </div>
@@ -81,17 +84,18 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
         {/* 2 — ONE SECTION PER PICK */}
         {picks.map((p, idx) => {
           const reasons = (p.reasons ?? []).filter(nonEmpty);
-          const metaParts = [
-            isNum(p.worldRanking) && p.worldRanking > 0 ? t('overview.picksSheet.worldNo', { rank: p.worldRanking }) : null,
-            t('overview.picksSheet.pickOf', { rank: p.rank, total }),
-          ].filter(Boolean);
+          // n/total stay raw: bounded at 3 by the picks grid, so formatNumber
+          // could never change their output. The world ranking can pass 999.
+          const meta = isNum(p.worldRanking) && p.worldRanking > 0
+            ? t('overview.picksSheet.metaFull', { rank: formatNumber(p.worldRanking), n: p.rank, total })
+            : t('overview.picksSheet.metaPickOnly', { n: p.rank, total });
           return (
             <section key={p.playerId || idx} data-overview-picks-sheet-pick style={{ padding: '16px 0' , borderBottom: idx < picks.length - 1 ? `1px solid ${WHITE_ALPHA_08}` : 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <PlayerAvatar playerId={String(p.playerId ?? '')} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl ?? null} size={42} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.018em', color: INK }}>{p.playerName}</div>
-                  <div style={{ marginTop: 2, fontSize: 11, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>{metaParts.join(' · ')}</div>
+                  <div style={{ marginTop: 2, fontSize: 11, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>{meta}</div>
                 </div>
               </div>
 
@@ -113,7 +117,7 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
                 <div data-overview-picks-sheet-fit style={{ marginTop: 14 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={LABEL}>{t('overview.picksSheet.courseFit')}</span>
-                    <span style={{ fontSize: 11.5, fontWeight: 700, color: INK, ...FIGS }}>{`${Math.round(p.courseFitScore)} / 100`}</span>
+                    <span style={{ fontSize: 11.5, fontWeight: 700, color: INK, ...FIGS }}>{t('overview.picksSheet.courseFitValue', { score: formatNumber(Math.round(p.courseFitScore)) })}</span>
                   </div>
                   <div style={{ marginTop: 6, height: 4, borderRadius: 999, background: WHITE_ALPHA_08, overflow: 'hidden' }}>
                     <div style={{ width: `${Math.max(0, Math.min(100, p.courseFitScore))}%`, height: '100%', background: AMBER, borderRadius: 999 }} />
