@@ -981,7 +981,7 @@ export function ScoresLeaderboardsPage({
           row count is shown and zero rows reads one quiet line. Only the
           DEFAULT list being empty (or failing) on load hides the section. */}
       {top100Defaulted && top100.isPending ? (
-        pending(152)
+        pending(150)
       ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
         <Section
           contest
@@ -1142,7 +1142,7 @@ export function ScoresLeaderboardsPage({
 
       {/* §4 MOST IMPROVED — cumulative this year, not a single round's cut. */}
       {improved.isPending ? (
-        pending(182)
+        pending(180)
       ) : improved.isSuccess && improvedRows.length >= THIN_FLOOR ? (
         <Section
           contest
@@ -1150,7 +1150,7 @@ export function ScoresLeaderboardsPage({
           title={t('amateur.leaderboards.mostImproved')}
           meta={windowLabel('year')}
         >
-          {improvedRows.slice(0, SHORT_ROWS).map((r, i, arr) => improvedRow(r, false))}
+          {improvedRows.slice(0, SHORT_ROWS).map((r) => improvedRow(r, false))}
           <SeeAll
             label={seeAllMembers()}
             onPress={() => setImprovedSheet(true)}
@@ -1182,7 +1182,7 @@ export function ScoresLeaderboardsPage({
         valueHeading={t('amateur.leaderboards.indexChange')}
         footnote={t('amateur.leaderboards.improvedQualifier')}
       >
-        {improvedRows.map((r, i, arr) => improvedRow(r, true))}
+        {improvedRows.map((r) => improvedRow(r, true))}
       </BoardSheet>
 
       {(() => {
@@ -1225,7 +1225,7 @@ export function ScoresLeaderboardsPage({
         </div>
         }
       >
-          {top100Rows.map((r, i, arr) => (
+          {top100Rows.map((r) => (
             <CompactRow
               key={r.user_id}
               pos={r.pos}
