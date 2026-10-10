@@ -511,27 +511,6 @@
       "pickPlain": "우리의 선택: {{player}}.",
       "courseKicker": "이번 주 코스",
       "top100Link": "톱 100"
-    },
-    "picksSheet": {
-      "cardAria": "Why we picked {{name}}",
-      "title": "Why we picked them",
-      "worldNo": "World no. {{rank}}",
-      "pickOf": "Pick {{rank}} of {{total}}",
-      "whyLabel": "WHY WE PICKED THEM",
-      "courseFit": "COURSE FIT",
-      "howLabel": "HOW WE PICK",
-      "howIntro": "Every pick comes from the clbhouz model. It reads the course, scores every player in the field against it, and ranks them. No odds, no bookmakers, no betting data.",
-      "step1Lead": "We profile the course.",
-      "step1Body": "Yardage, par and the venue's own history give a weighting for each skill — how much driving distance matters here versus approach play, scrambling or putting.",
-      "step2Lead": "We score every player in the field against that profile.",
-      "step2Body": "Each player's season stats become a percentile against this field, then get weighted by what the course actually asks for. That is the course-fit figure on each pick.",
-      "step3Lead": "We weigh fit against form.",
-      "step3Body": "Course fit on its own would pick specialists who are playing badly, so recent results and current form are read alongside it.",
-      "step4Lead": "We publish three names and leave them there.",
-      "step4Body": "The picks go up before a ball is struck and they are not edited afterwards, so you can see when we were wrong.",
-      "whatWinsLabel": "WHAT WINS HERE",
-      "figDifficulty": "DIFFICULTY",
-      "footer": "Analysis, not advice — and never betting advice."
     }
   },
   "empty": {
