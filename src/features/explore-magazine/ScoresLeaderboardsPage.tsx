@@ -4,9 +4,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { ChevronRight, Medal } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { getInitialsFromName } from '@/lib/avatarFallback';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
@@ -135,7 +133,7 @@ function BoardSheet({ open, onClose, titleId, title, subtitle, valueHeading, foo
       ariaLabelledBy={titleId}
       style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 13px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 13px', /* Hairline clause: sheet controls from list. */ borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h2 id={titleId} style={{ margin: 0, fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>{title}</h2>
           <div style={{ ...cap, marginTop: 2, color: A.DIM }}>{subtitle}</div>
@@ -688,6 +686,10 @@ export function ScoresLeaderboardsPage({
         value={opts.fmt ? opts.fmt(r) : String(r.value)}
         caption={caption}
         self={!!r.is_viewer || r.user_id === userId}
+        /* Three facts, three devices, no overlap: the wash states rank and belongs
+           to 1st place whoever holds it; amber states identity and belongs to the
+           viewing member; this 12px gap states the sequence broke above this row.
+           A tint here would be a second identity device. */
         gapAbove={!!pin && r.user_id === pin.user_id && i === list.length - 1}
         onPress={() => onPress(r)}
       />
@@ -973,6 +975,8 @@ export function ScoresLeaderboardsPage({
           row count is shown and zero rows reads one quiet line. Only the
           DEFAULT list being empty (or failing) on load hides the section. */}
       {top100Defaulted && top100.isPending ? (
+        /* No pinned row: the skeleton cannot know if the viewer is in the top 3,
+           and the shorter shape grows downward (expand-outwards-only). */
         pending(150)
       ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
         <Section
@@ -1205,6 +1209,7 @@ export function ScoresLeaderboardsPage({
           : RANK_SCOPE_LABEL[top100List]}
         valueHeading={t('amateur.leaderboards.coursesOf100')}
         above={
+        {/* Hairline clause: controls from list. */}
         <div style={{ padding: '11px 16px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <RailChips
             align="center-when-fit"

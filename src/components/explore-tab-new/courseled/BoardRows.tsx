@@ -3,7 +3,6 @@ import { MemberAvatar } from './MemberAvatar';
 import { useTranslation } from 'react-i18next';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getInitialsFromName } from '@/lib/avatarFallback';
 import { A, SANS } from './tokens';
 import { relativeDayCompact } from './discoverWhen';
 import { boardCountsRounds, isFeatBoard, type BoardKey, type FeatBoardKey } from './boardFilters';
@@ -332,7 +331,7 @@ export function BoardHeaderRow({ board, hideValue }: { board: BoardKey; hideValu
         alignItems: 'center',
         gap: 10,
         padding: '0 2px 6px',
-        /* Survives Phase 5: it separates column labels from data, not a row from a row. */
+        /* Hairline clause: labels from data (survives Phase 5 — never a row from a row). */
         borderBottom: `1px solid ${A.BORDER}`,
       }}
     >
