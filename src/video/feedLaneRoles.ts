@@ -179,3 +179,47 @@ class FeedLaneRolesImpl {
 }
 
 export const feedLaneRoles = new FeedLaneRolesImpl();
+
+/**
+ * CAROUSEL NEIGHBOUR OVERRIDE (BRIEF_CAROUSEL_NEIGHBOUR_WARM §2).
+ *
+ * Inside the ACTIVE card, a MediaCarousel's horizontal video neighbours own the
+ * 'next' / 'prev' lanes. The carousel publishes which sides it owns whenever
+ * its active index settles; CardFeed reads this and skips its own card-level
+ * warm on those sides. On the last slide `next` is false (the next CARD gets
+ * the lane back), on the first slide `prev` is false. Single-media cards never
+ * publish, so the store stays null and CardFeed follows its old path exactly.
+ */
+export interface CarouselNeighbourOverride {
+  postId: string;
+  activeIndex: number;
+  next: boolean;
+  prev: boolean;
+}
+
+let overrideState: CarouselNeighbourOverride | null = null;
+const overrideListeners = new Set<() => void>();
+
+export const carouselNeighbourOverride = {
+  get(): CarouselNeighbourOverride | null {
+    return overrideState;
+  },
+  set(next: CarouselNeighbourOverride | null): void {
+    const cur = overrideState;
+    if (
+      cur === next ||
+      (cur && next && cur.postId === next.postId && cur.activeIndex === next.activeIndex &&
+        cur.next === next.next && cur.prev === next.prev)
+    ) return;
+    overrideState = next;
+    overrideListeners.forEach((fn) => { try { fn(); } catch { /* noop */ } });
+  },
+  /** Clear only if the current override belongs to `postId`. */
+  clear(postId: string): void {
+    if (overrideState?.postId === postId) this.set(null);
+  },
+  subscribe(fn: () => void): () => void {
+    overrideListeners.add(fn);
+    return () => { overrideListeners.delete(fn); };
+  },
+};
