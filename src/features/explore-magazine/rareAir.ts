@@ -59,13 +59,14 @@ export const RARE_AIR_TILE_HEIGHT =
 
 /**
  * Placeholder = section top 24 + eyebrow 13 + 5 + title 23 + lede 8 + 18
- * + children gap 12 + (you slab 38 when signed in) + label 13 + rail 12 + tile + 18.
+ * + children gap 12 + (you slab 10 + 17 + 10 + 12 below = 49, signed in only)
+ * + label 13 + rail 12 + tile 178 + 18 = 349 signed out, 398 signed in.
  */
 export function rareAirPlaceholderHeight(signedIn: boolean): number {
   const R = RARE_AIR.rail;
-  const slab = signedIn ? 10 + Math.round(RARE_AIR.you.fontSize * RARE_AIR.you.lineHeight) + 10 + RARE_AIR.you.marginTop : 0;
-  return 24 + 13 + 5 + 23 + 8 + 18 + 12 + slab + RARE_AIR.label.lineHeight + R.top + RARE_AIR_TILE_HEIGHT + R.bottom
-    - (signedIn ? RARE_AIR.you.marginTop : 0);
+  const Y = RARE_AIR.you;
+  const slab = signedIn ? 10 + Math.round(Y.fontSize * Y.lineHeight) + 10 + Y.marginTop : 0;
+  return 24 + 13 + 5 + 23 + 8 + 18 + 12 + slab + RARE_AIR.label.lineHeight + R.top + RARE_AIR_TILE_HEIGHT + R.bottom;
 }
 
 /** Rounds per occurrence, from the ALL-TIME row. null when there are no events. */
