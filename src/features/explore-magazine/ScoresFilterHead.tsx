@@ -8,50 +8,37 @@ import {
   type ScopeKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 
-/** THE FILTERS PILL — one shape, shared by this head and the Leaderboards page. */
+/** THE FILTERS CONTROL — compact (Phase 8.2): sliders icon plus the active
+    count as a figure; at zero, the icon alone. The word lives only in the
+    accessible name. One shape, shared by every caller. */
 export function FiltersPill({ count, onOpen }: { count: number; onOpen: () => void }) {
   const { t } = useTranslation('courses');
   return (
     <button
       type="button"
       onClick={onOpen}
+      aria-label={t('discover.filterBoard.filters')}
+      data-filters-count={count}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 6,
+        justifyContent: 'center',
+        gap: 7,
         flexShrink: 0,
-        height: 32,
-        padding: '0 12px',
+        height: 36,
+        minWidth: 36,
+        padding: count > 0 ? '0 13px' : '0 10px',
         borderRadius: 999,
-        border: '1px solid rgba(255,255,255,0.16)',
+        border: `1px solid ${A.BORDER}`,
         background: 'transparent',
         color: A.INK,
         fontFamily: SANS,
-        fontSize: 12.5,
-        fontWeight: 600,
+        fontSize: 13,
+        fontWeight: 700,
       }}
     >
-      <SlidersHorizontal size={14} />
-      {t('discover.filterBoard.filters')}
-      {count > 0 ? (
-        <span
-          className="tabular-nums"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minWidth: 16,
-            height: 16,
-            borderRadius: 999,
-            background: A.AMBER,
-            color: '#0A0A0C',
-            fontSize: 10,
-            fontWeight: 800,
-          }}
-        >
-          {count}
-        </span>
-      ) : null}
+      <SlidersHorizontal size={15} aria-hidden />
+      {count > 0 ? <span className="tabular-nums">{count}</span> : null}
     </button>
   );
 }

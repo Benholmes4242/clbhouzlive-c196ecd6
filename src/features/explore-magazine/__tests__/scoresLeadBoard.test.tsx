@@ -81,9 +81,11 @@ describe('Standing and basis (Phase 2)', () => {
     withYou(null);
     expect(document.querySelector('[data-scores-basis]')).toBeTruthy();
   });
-  it('says nothing before the you-count resolves', () => {
+  it('keeps the you slab shape, empty, before the you-count resolves', () => {
     withYou(null);
-    expect(document.querySelector('[data-scores-standing]')).toBeNull();
+    const slab = document.querySelector('[data-scores-standing]');
+    expect(slab?.getAttribute('data-scores-standing')).toBe('pending');
+    expect(slab?.textContent).toBe('');
   });
   it('a qualifying member beyond the fetch is told they are deeper and given see-all', () => {
     withYou(3);

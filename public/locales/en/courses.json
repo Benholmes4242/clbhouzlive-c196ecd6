@@ -140,7 +140,41 @@
       "nMembers_one": "{{count}} member",
       "nMembers_other": "{{count}} members",
       "nRounds_one": "{{count}} round",
-      "nRounds_other": "{{count}} rounds"
+      "nRounds_other": "{{count}} rounds",
+      "basisSentence": {
+        "rounds": "Every round {{scope}} has posted in {{window}}, newest first.",
+        "ranked": "Ranked on {{unit}} across {{window}}. {{scopeLead}}, 18 holes.",
+        "window": {
+          "14": "the last fortnight",
+          "30": "the last 30 days",
+          "90": "the last 90 days",
+          "year": "this year",
+          "all": "all time"
+        },
+        "scope": {
+          "everyone": "everyone",
+          "circle": "your circle",
+          "club": "your club"
+        },
+        "scopeLead": {
+          "everyone": "Everyone",
+          "circle": "Your circle",
+          "club": "Your club"
+        },
+        "unit": {
+          "recent": "rounds posted",
+          "topar": "score against par",
+          "net": "net against par",
+          "stableford": "stableford points",
+          "improved": "index movement",
+          "birdies": "birdies"
+        }
+      },
+      "slab": {
+        "you": "You",
+        "onBoard": "{{you}} last posted at {{course}}, {{date}}.",
+        "onBoardNoCourse": "{{you}} last posted on {{date}}."
+      }
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
