@@ -6,7 +6,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { supabase } from '@/integrations/supabase/client';
 import { FIGS, SANS } from './tokens';
-import { BOARD_LABELS, boardCountsRounds, type BoardFilters, type BoardKey } from './boardFilters';
+import { BOARD_LABELS, boardCountsRounds, isFeatBoard, type BoardFilters, type BoardKey } from './boardFilters';
 import { boardRpcArgs, type BoardRow } from './hooks/useBoardPage';
 import { BoardDaySeparator, BoardHeaderRow, BoardRowView, boardColumns } from './BoardRows';
 import { dayLadder } from './discoverWhen';
@@ -130,7 +130,10 @@ export function BoardSeeAllSheet({
       </div>
       <div style={{ flexShrink: 0, padding: '16px 16px 12px', /* Hairline clause: sheet controls from list. */ borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, ...FIGS }}>
         <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 700, color: A.INK, textTransform: 'uppercase' }}>
-          {boardCountsRounds(board)
+          {/* B.10 — feat boards say what the sheet counts: rounds WITH the feat. */}
+          {isFeatBoard(board)
+            ? t(`discover.filterBoard.featRounds.${board === 'clean_card' ? 'cleanCard' : board}`, { count: total })
+            : boardCountsRounds(board)
             ? t('discover.filterBoard.nRounds', { count: total })
             : t('discover.filterBoard.nMembers', { count: total })}
         </div>

@@ -82,7 +82,7 @@
       }
     },
     "leaderboards": {
-      "featsFrom": "[~~Ƒřőɱ {{rounds}} ƒúļļ řőúñđš áñđ {{holes}} ĥőļéš ţřáĉǩéđ őñ clbhouz.~~]",
+      "featsFrom": "[~~Out of <n>{{holes}}</n> holes and <n>{{rounds}}</n> rounds tracked on clbhouz.~~]",
       "featRarity": "[~~1 íñ éṽéřý {{n}} {{unit}}~~]",
       "feats": "[~~Ƒéáţš~~]",
       "allTime": "[~~Áļļ ţíɱé~~]",
@@ -170,6 +170,34 @@
         "onBoardRanked": "[~~{{you}}, őƒ {{pool}} íñ {{scope}}. {{course}}, {{date}}.~~]",
         "onBoardRounds": "[~~{{you}} ƥőšţéđ {{gross}} áţ {{course}}, {{date}}.~~]",
         "indexSince": "[~~Ŷőűŕ íñđéx ĥáš ɱőṽéđ {{figure}} šíñčé.~~]"
+      },
+      "featsFromYear": "[~~Out of <n>{{holes}}</n> holes and <n>{{rounds}}</n> rounds tracked on clbhouz this year.~~]",
+      "featNone": "[~~none in {{n}} {{unit}}~~]",
+      "rarest": "[~~Rarest~~]",
+      "rarestFirst": "[~~Rarest first~~]",
+      "featCompare": {
+        "commoner": "[~~{{n}}% commoner~~]",
+        "rarer": "[~~{{n}}% rarer~~]",
+        "tooFew": "[~~too few to compare~~]"
+      },
+      "featLatest": {
+        "noneYear": "[~~None this year~~]",
+        "noneAll": "[~~None yet~~]",
+        "lastOne": "[~~Last one {{date}}~~]"
+      },
+      "featsYou": {
+        "has": "[~~<b>You</b> have {{list}}.~~]",
+        "none": "[~~<b>You</b> have none of these yet.~~]",
+        "item": {
+          "ace_one": "[~~a hole in one~~]",
+          "ace_other": "[~~{{count}} holes in one~~]",
+          "albatross_one": "[~~an albatross~~]",
+          "albatross_other": "[~~{{count}} albatrosses~~]",
+          "eagle_one": "[~~an eagle~~]",
+          "eagle_other": "[~~{{count}} eagles~~]",
+          "cleanCard_one": "[~~a bogey-free round~~]",
+          "cleanCard_other": "[~~{{count}} bogey-free rounds~~]"
+        }
       }
     },
     "place": {
@@ -1335,6 +1363,16 @@
         "d30": "[~~íñ ţĥé ļášţ 30 đáýš~~]",
         "d90": "[~~íñ ţĥé ļášţ 90 đáýš~~]",
         "year": "[~~ţĥíš ýéář~~]"
+      },
+      "featRounds": {
+        "ace_one": "[~~{{count}} round with a hole in one~~]",
+        "ace_other": "[~~{{count}} rounds with a hole in one~~]",
+        "albatross_one": "[~~{{count}} round with an albatross~~]",
+        "albatross_other": "[~~{{count}} rounds with an albatross~~]",
+        "eagle_one": "[~~{{count}} round with an eagle~~]",
+        "eagle_other": "[~~{{count}} rounds with an eagle~~]",
+        "cleanCard_one": "[~~{{count}} bogey-free round~~]",
+        "cleanCard_other": "[~~{{count}} bogey-free rounds~~]"
       }
     },
     "findGolfers": {

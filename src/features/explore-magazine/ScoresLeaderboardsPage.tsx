@@ -23,7 +23,6 @@ import {
   boardCountsRounds,
   type BoardFilters,
   type BoardKey,
-  type FeatBoardKey,
   type WindowKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 import { entryFiltersFor, type AmateurBoardState } from '@/features/amateur/useAmateurBoardState';
@@ -692,18 +691,6 @@ export function ScoresLeaderboardsPage({
   const featTotals = featsYear.isSuccess ? featRows[0] ?? null : null;
   // First load only: isFetched drops on key change while placeholderData holds rows; isSuccess does not.
   const featsFirstLoad = !featsYear.isSuccess && featRows.length === 0;
-  const featLabel = (k: FeatBoardKey, n: number) => {
-    switch (k) {
-      case 'ace':
-        return t('amateur.leaderboards.feat.ace', { count: n });
-      case 'albatross':
-        return t('amateur.leaderboards.feat.albatross', { count: n });
-      case 'eagle':
-        return t('amateur.leaderboards.feat.eagle', { count: n });
-      default:
-        return t('amateur.leaderboards.feat.cleanCard', { count: n });
-    }
-  };
 
   /* ------------------------------------------------------------ §6 career */
   const career = [
