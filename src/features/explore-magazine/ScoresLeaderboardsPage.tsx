@@ -122,7 +122,8 @@ type CareerMetric =
 function fmtCareerValue(metric: CareerMetric, v: number | string | null | undefined): string {
   const n = Number(v);
   if (!Number.isFinite(n)) return '\u2014';
-  if (metric === 'best_score_diff') return `${n > 0 ? '+' : n < 0 ? '-' : ''}${Math.abs(n).toFixed(1)}`;
+  // True minus (U+2212), never a hyphen — as fmtToPar; explicit plus on positives.
+  if (metric === 'best_score_diff') return `${n > 0 ? '+' : n < 0 ? '\u2212' : ''}${Math.abs(n).toFixed(1)}`;
   return String(Math.round(n));
 }
 
