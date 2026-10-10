@@ -20741,12 +20741,21 @@ export type Database = {
           denominator_unit: string
           events: number
           feat_kind: string
-          holes_estimated: number
+          latest_course_id: string
+          latest_course_name: string
+          latest_display_name: string
+          latest_photo_url: string
+          latest_play_date: string
+          latest_score_id: string
+          latest_user_id: string
           members: number
+          rounds_estimated: number
           rounds_with: number
           total_holes: number
           total_members: number
           total_rounds: number
+          viewer_events: number
+          viewer_rounds_with: number
         }[]
       }
       get_featured_groups: {
