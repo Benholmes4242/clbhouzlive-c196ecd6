@@ -186,9 +186,9 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
           </ol>
 
           {figures.length > 0 ? (
-            <div data-overview-picks-sheet-figures style={{ marginTop: 14, display: 'grid', gridTemplateColumns: `repeat(${figures.length}, 1fr)`, gap: 1, background: WHITE_ALPHA_08, border: `1px solid ${WHITE_ALPHA_08}`, borderRadius: 8, overflow: 'hidden' }}>
-              {figures.map((f) => (
-                <div key={f.label} style={{ background: 'var(--sheet-surface, #141414)', padding: '10px 12px' }}>
+            <div data-overview-picks-sheet-figures style={{ marginTop: 14, display: 'grid', gridTemplateColumns: `repeat(${figures.length}, 1fr)`, border: `1px solid ${WHITE_ALPHA_08}`, borderRadius: 8, overflow: 'hidden' }}>
+              {figures.map((f, fi) => (
+                <div key={f.label} style={{ padding: '10px 12px', borderLeft: fi > 0 ? `1px solid ${WHITE_ALPHA_08}` : 'none' }}>
                   <div style={LABEL}>{f.label}</div>
                   <div style={{ marginTop: 3, fontSize: 15, fontWeight: 800, color: INK, ...FIGS }}>{f.value}</div>
                 </div>
