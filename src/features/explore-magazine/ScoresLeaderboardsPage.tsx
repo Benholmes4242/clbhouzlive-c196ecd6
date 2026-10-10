@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronRight, Medal } from 'lucide-react';
+import { ChevronRight, Medal } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -16,6 +16,8 @@ import { type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useB
 import {
   BOARD_LABELS,
   DEFAULT_FILTERS,
+  OFFERED_RANKING_BOARD_KEYS,
+  boardCountsRounds,
   type BoardFilters,
   type BoardKey,
   type FeatBoardKey,
@@ -29,6 +31,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
+import { playDateAtLocalNoon } from '@/components/explore-tab-new/courseled/discoverWhen';
 import { useFeatsWindow, type FeatKind, type FeatWindow } from './useFeatsWindow';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
@@ -497,7 +500,6 @@ const RAIL_CARD = {
 export function ScoresLeaderboardsPage({
   userId,
   state,
-  onOpenBoard,
   onOpenFilters,
   onRowPress,
   onMemberTap,
@@ -505,7 +507,8 @@ export function ScoresLeaderboardsPage({
 }: {
   userId: string | undefined;
   state: AmateurBoardState;
-  onOpenBoard: () => void;
+  /** Unused since Phase 1: the rail changes the board; nothing on this page opens BoardPicker. */
+  onOpenBoard?: () => void;
   onOpenFilters: () => void;
   onRowPress: (row: BoardRow) => void;
   /** Resolves to compare, nudge or invite via useMemberTapResolver. NOT a profile page — the Top 100 sheet's Profile pill navigates to /profile/:id itself. */
@@ -569,6 +572,14 @@ export function ScoresLeaderboardsPage({
     t('amateur.leaderboards.nMembers', { count: n, defaultValue_one: '{{count}} member', defaultValue_other: '{{count}} members' });
   // Deliberately uncounted: "See all members" without a figure everywhere.
   const seeAllMembers = () => t('amateur.leaderboards.seeAllMembers', 'See all members');
+  /* The lead board's destination row follows the board's UNIT: rounds on
+     Most recent (and any feat board), members on a ranked board. */
+  const seeAllForBoard = (b: BoardKey) =>
+    boardCountsRounds(b) ? t('amateur.leaderboards.seeAllRounds', 'See all rounds') : seeAllMembers();
+  const boardCountText = (b: BoardKey, n: number) =>
+    boardCountsRounds(b)
+      ? t('amateur.leaderboards.nRounds', { count: n, defaultValue_one: '{{count}} round', defaultValue_other: '{{count}} rounds' })
+      : membersText(n);
 
   /* §4 row. start_index and current_index are FACTS from the RPC, so they are
      formatted directly — handicapJourneyDisplay derives an after-value from a
@@ -579,7 +590,7 @@ export function ScoresLeaderboardsPage({
       deltaIndex: r.improvement == null ? null : -Number(r.improvement),
     });
     const month = r.started_on
-      ? new Date(`${r.started_on.slice(0, 10)}T12:00:00`).toLocaleDateString(undefined, { month: 'long' })
+      ? playDateAtLocalNoon(r.started_on)?.toLocaleDateString(undefined, { month: 'long' }) ?? null
       : null;
     const journey =
       r.start_index != null && r.current_index != null
@@ -708,6 +719,69 @@ export function ScoresLeaderboardsPage({
 
   return (
     <div style={{ fontFamily: SANS }}>
+      {/* 1.1 THE BOARD RAIL — the six offered ranking boards, each with its
+          get_board_facets `board`-axis count under the current filters. Feat
+          boards stay in §5. A zero renders greyed and unselectable; an
+          unresolved count (null) renders no figure and greys nothing. */}
+      <div
+        role="radiogroup"
+        aria-label={t('amateur.board.rail', 'Boards')}
+        data-scores-board-rail
+        className="no-scrollbar"
+        style={{
+          display: 'flex',
+          gap: 8,
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          overscrollBehaviorX: 'contain',
+          touchAction: 'pan-x pan-y',
+          willChange: 'transform',
+          paddingInline: GUTTER,
+          marginBottom: 16,
+        }}
+      >
+        {OFFERED_RANKING_BOARD_KEYS.map((key) => {
+          const n = state.facets.countFor('board', key);
+          const selected = state.board === key;
+          const empty = n === 0 && !selected;
+          return (
+            <button
+              key={key}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              aria-disabled={empty || undefined}
+              disabled={empty}
+              data-board-chip={key}
+              onClick={() => {
+                if (empty || selected) return;
+                state.changeBoard(key);
+              }}
+              style={{
+                flex: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                gap: 2,
+                padding: '7px 12px',
+                borderRadius: 11,
+                background: 'transparent',
+                border: `1px solid ${selected ? A.AMBER : A.BORDER}`,
+                color: selected ? A.AMBER : empty ? A.DIM : A.MUTE,
+                opacity: empty ? 0.5 : 1,
+                cursor: empty ? 'default' : 'pointer',
+                fontFamily: SANS,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <span style={{ fontSize: 12.5, fontWeight: 700 }}>{t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}</span>
+              <span className="tabular-nums" style={{ fontSize: 10.5, fontWeight: 500, minHeight: 13 }}>
+                {n == null ? '\u00a0' : boardCountText(key, n)}
+              </span>
+            </button>
+          );
+        })}
+      </div>
       {/* §3 THE LEAD BOARD — no page head: the tab chip already names the page.
           The same Section renders while loading, so title/Filters/scope stay put. */}
       {leadLoading || (state.page.isSuccess && leader) ? (
@@ -715,30 +789,15 @@ export function ScoresLeaderboardsPage({
           first
           contest
           eyebrow={windowLabel(state.filters.window)}
+          /* 1.2 — the title is the HEADING of the board chosen in the rail, not
+             a control; its accessible name is the board's own name. */
           title={
-            <button
-              type="button"
-              data-scores-board-picker
-              onClick={onOpenBoard}
-              aria-label={t('amateur.board.openPicker', 'Choose a board')}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                maxWidth: '100%',
-                padding: 0,
-                border: 'none',
-                background: 'transparent',
-                color: A.INK,
-                fontFamily: SANS,
-                fontSize: 19,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-              }}
+            <h2
+              data-scores-board-title
+              style={{ margin: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
-              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{boardTitle}</span>
-              <ChevronDown size={16} color={A.MUTE} style={{ flexShrink: 0 }} />
-            </button>
+              {boardTitle}
+            </h2>
           }
           meta={
             <span style={{ letterSpacing: 0, textTransform: 'none' }}>
@@ -776,7 +835,7 @@ export function ScoresLeaderboardsPage({
           </div>
           {state.total > leadVisible.length ? (
             <SeeAll
-              label={seeAllMembers()}
+              label={seeAllForBoard(state.board)}
               onPress={() => {
                 analyticsEvents.track('amateur_board_see_all_opened', { board: state.board, total: state.total });
                 setSeeAll({ board: state.board, filters: state.filters });

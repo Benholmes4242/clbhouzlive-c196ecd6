@@ -9,7 +9,7 @@ import { FIGS, SANS } from './tokens';
 import { BOARD_LABELS, boardCountsRounds, type BoardFilters, type BoardKey } from './boardFilters';
 import { boardRpcArgs, type BoardRow } from './hooks/useBoardPage';
 import { BoardHeaderRow, BoardRowView, boardColumns } from './BoardRows';
-import { relativeDayFull } from './discoverWhen';
+import { playDateAtLocalNoon, relativeDayFull } from './discoverWhen';
 
 /**
  * SEE ALL (BRIEF_DISCOVER_FILTER_LED_BOARD S5.1).
@@ -250,9 +250,7 @@ function groupFor(
     return { key: iso, label: relativeDayFull(playDate, t) };
   }
   const month = iso.slice(0, 7);
-  const dt = new Date(`${month}-01T12:00:00Z`);
-  const label = Number.isNaN(dt.getTime())
-    ? iso
-    : dt.toLocaleDateString(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const dt = playDateAtLocalNoon(`${month}-01`);
+  const label = !dt ? iso : dt.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
   return { key: month, label };
 }
