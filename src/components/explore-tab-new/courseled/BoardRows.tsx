@@ -269,6 +269,9 @@ export function BoardAvatar({ row, size = 28 }: { row: Row; size?: number }) {
 const POS_W = 28;
 const VALUE_W = 58;
 const SECOND_W = 46;
+/** Podium avatar and figure — the first row's emphasis on a ranked board. */
+const PODIUM_AVATAR = 46;
+export const PODIUM_FIGURE_SIZE = 30;
 
 type BoardT = TFunction<'courses'>;
 
@@ -371,6 +374,7 @@ export function BoardRowView({
   isSelf,
   gap,
   hideValue,
+  podium,
   onPress,
 }: {
   row: Row;
@@ -380,6 +384,10 @@ export function BoardRowView({
   gap?: string | null;
   /** S4.3 — the day-grouped sheet states WHEN in its group header instead. */
   hideValue?: boolean;
+  /** THE PODIUM IS A TREATMENT OF THE FIRST ROW, NOT A SECOND ROW COMPONENT.
+   *  Same helpers, same figures, same colour law — only size and emphasis
+   *  change. Ignored on an unranked board: on a date order a podium is a lie. */
+  podium?: boolean;
   onPress?: (row: Row) => void;
 }) {
   const { t } = useTranslation('courses');
@@ -389,17 +397,21 @@ export function BoardRowView({
   const { valueIsText, ranked } = boardColumns(board);
   const ink = isSelf ? A.AMBER : A.INK;
   const feat = boardFeatMarker(row, board, t);
+  const big = !!podium && ranked;
+  const avatar = big ? PODIUM_AVATAR : 28;
 
   return (
     <button
       type="button"
       onClick={() => onPress?.(row)}
+      data-board-podium={big ? '' : undefined}
       style={{
         width: '100%',
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        padding: '6px 2px',
+        padding: big ? '12px 2px' : '6px 2px',
+        borderRadius: big ? 12 : undefined,
         /* The wash states rank; amber remains the viewing member's identity. */
         background: ranked && row.pos === 1 ? LEADER_WASH : 'transparent',
         border: 'none',
@@ -427,13 +439,13 @@ export function BoardRowView({
       )}
 
       <span style={{ flexShrink: 0 }}>
-        <BoardAvatar row={row} size={28} />
+        <BoardAvatar row={row} size={avatar} />
       </span>
       <span
         style={{
           flex: 1,
           minWidth: 0,
-          height: 28,
+          height: avatar,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -443,13 +455,13 @@ export function BoardRowView({
           style={{
             display: 'block',
             /* §7 ROW NAME — 14 / 600. */
-            fontSize: 14,
-            fontWeight: 600,
+            fontSize: big ? 16 : 14,
+            fontWeight: big ? 700 : 600,
             color: ink,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            lineHeight: '14px',
+            lineHeight: big ? '18px' : '14px',
           }}
         >
           {row.display_name ?? t('discover.aMember', 'A member')}
@@ -523,7 +535,7 @@ export function BoardRowView({
             /* B4.2 — WORDS at 12.5, FIGURES at 15. VALUE_W stays 58 either way
                (B4.5) so the right edge aligns across boards. */
             /* §7 ROW FIGURE — 16 tabular, -0.04em. Words stay at 12.5. */
-            fontSize: valueIsText ? 12.5 : 16,
+            fontSize: valueIsText ? 12.5 : big ? PODIUM_FIGURE_SIZE : 16,
             fontWeight: 700,
             letterSpacing: valueIsText ? undefined : '-0.04em',
             /* S1.3 — THE RANKED FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER:
