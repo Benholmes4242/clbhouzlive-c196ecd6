@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { playDateShort } from '@/components/explore-tab-new/courseled/discoverWhen';
+import { playDateStandalone } from '@/components/explore-tab-new/courseled/discoverWhen';
 import type { FeatBoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 
 import type { FeatWindow, FeatYearRow } from './useFeatsWindow';
@@ -172,9 +172,9 @@ export function RareAirRail({
                       overflow: 'hidden', textOverflow: 'ellipsis', color: A.DIM,
                     }}>
                       {has
-                        ? [f.latest_course_name, playDateShort(f.latest_play_date, locale)].filter(Boolean).join(' · ')
+                        ? [f.latest_course_name, playDateStandalone(f.latest_play_date, locale)].filter(Boolean).join(' · ')
                         : lastAll
-                          ? t('amateur.leaderboards.featLatest.lastOne', { date: playDateShort(lastAll, locale) })
+                          ? t('amateur.leaderboards.featLatest.lastOne', { date: playDateStandalone(lastAll, locale) })
                           : '\u00A0'}
                     </span>
                   </span>

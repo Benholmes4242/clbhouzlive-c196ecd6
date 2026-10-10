@@ -160,17 +160,33 @@ export function dayLadder(
   };
 }
 
-/** The row's own date on the sub-line, in the ladder's time base. */
-export function playDateShort(iso: string | null | undefined, locale?: string): string {
+/*
+ * THE TWO PLAY-DATE FORMS — THE RULE.
+ * A date may omit its year ONLY where an ancestor already states it. The day
+ * ladder's month groups state the year for anything outside the current year,
+ * so a row inside them takes the undated form. Anywhere with no such ancestor —
+ * a ranked board, a feat tile, the you slab — takes the dated form, which
+ * appends the year when the date is not in the current year. A bare '12 Jun' on
+ * a 2024 round is the fault this rule exists to prevent.
+ */
+
+/** UNDATED FORM ("12 Jun"): only beneath a year-stating ancestor (a day-ladder group). */
+export function playDateUnderYearHeader(iso: string | null | undefined, locale?: string): string {
   const d = playDateAtLocalNoon(iso);
   return d ? d.toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '';
 }
 
-/** playDateShort, plus the year when it is not the current year ("12 Jun 2024"). */
-export function playDateShortDated(iso: string | null | undefined, locale?: string, now: Date = new Date()): string {
+/** DATED FORM ("12 Jun 2024", "24 Sept"): everywhere with no year-stating ancestor. */
+export function playDateStandalone(iso: string | null | undefined, locale?: string, now: Date = new Date()): string {
   const d = playDateAtLocalNoon(iso);
   if (!d) return '';
   return d.getFullYear() === now.getFullYear()
-    ? d.toLocaleDateString(locale, { day: 'numeric', month: 'short' })
+    ? playDateUnderYearHeader(iso, locale)
     : d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
 }
+
+/**
+ * Former name of playDateUnderYearHeader, kept so the signed-off lead board's
+ * call sites are untouched until their form is decided (RARE AIR D.3).
+ */
+export const playDateShort = playDateUnderYearHeader;

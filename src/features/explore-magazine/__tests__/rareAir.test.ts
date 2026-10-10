@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { compareRates, rarityShare, RARE_AIR_TILE_HEIGHT, rareAirPlaceholderHeight } from '../rareAir';
-import { playDateShortDated } from '@/components/explore-tab-new/courseled/discoverWhen';
+import { playDateStandalone } from '@/components/explore-tab-new/courseled/discoverWhen';
 import type { FeatYearRow } from '../useFeatsWindow';
 
 const row = (p: Partial<FeatYearRow>): FeatYearRow => ({
@@ -27,8 +27,10 @@ describe('rare air', () => {
   });
   it('date carries the year only when not the current year', () => {
     const now = new Date(2026, 9, 10);
-    expect(playDateShortDated('2024-06-12', 'en-GB', now)).toBe('12 Jun 2024');
-    expect(playDateShortDated('2026-09-05', 'en-GB', now)).toBe('5 Sept');
+    expect(playDateStandalone('2024-06-12', 'en-GB', now)).toBe('12 Jun 2024');
+    expect(playDateStandalone('2026-09-05', 'en-GB', now)).toBe('5 Sept');
+    expect(playDateStandalone('2025-06-29', 'en-GB', now)).toBe('29 Jun 2025');
+    expect(playDateStandalone('2026-09-24', 'en-GB', now)).toBe('24 Sept');
   });
   it('tile 178, placeholder 324 signed out and 373 signed in', () => {
     expect(RARE_AIR_TILE_HEIGHT).toBe(178);
