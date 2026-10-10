@@ -503,7 +503,9 @@
       "thru": "THRU {{n}}"
     },
     "board": {
-      "clbhouzPick": "clbhouz pick"
+      "clbhouzPick": "clbhouz pick",
+      "rowLabel": "{{name}}, {{position}}, {{score}}",
+      "teamName": "{{team}}: {{members}}"
     },
     "magazine": {
       "scoreEven": "level par",

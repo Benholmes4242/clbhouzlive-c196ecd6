@@ -26,7 +26,8 @@ export function MovementFigure({
 }: {
   movement: number | null;
   nullPlaceholder?: 'dash' | 'none';
-  variant?: 'column' | 'inline';
+  /** 'compact': the leaderboard MOV track (24px) — no min width, 9.5px figure. */
+  variant?: 'column' | 'inline' | 'compact';
 }) {
   const inline = variant === 'inline';
   const base: React.CSSProperties = inline
@@ -37,6 +38,15 @@ export function MovementFigure({
         fontSize: 'inherit',
         fontWeight: 'inherit',
         letterSpacing: 'inherit',
+        fontVariantNumeric: 'tabular-nums',
+      }
+    : variant === 'compact'
+    ? {
+        minWidth: 0,
+        textAlign: 'right',
+        fontSize: 9.5,
+        fontWeight: 700,
+        whiteSpace: 'nowrap',
         fontVariantNumeric: 'tabular-nums',
       }
     : {
