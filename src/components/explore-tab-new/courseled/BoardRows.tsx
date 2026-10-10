@@ -367,6 +367,7 @@ export function fmtIndexMove(n: number): string {
   return n < 0 ? `\u2212${v}` : `+${v}`;
 }
 
+/* ARCHITECTURE RULE (moved from AGENTS.md): The Explore Scores lead board renders every row through BoardRowView, whose grammar (ranked or feed) is chosen by boardColumns(board).ranked; figures come only from boardValue/boardSecondary, so the page cannot disagree with the see-all sheet. There is no podium and no column header on the lead board. ALSO: every row on the Explore leaderboards screen carries a 1px hairline beneath it; a hairline also separates column labels from data and a sheet's controls from its list; the pinned self row is marked by a 12px gap above it and the amber self tint, not by the absence of a rule. */
 export function BoardRowView({
   row,
   board,

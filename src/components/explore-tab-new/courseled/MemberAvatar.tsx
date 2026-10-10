@@ -10,6 +10,7 @@ import { getInitialsFromName } from '@/lib/avatarFallback';
  * Initials come from the member's real name only; a nameless member falls back
  * to the silhouette, never to initials of placeholder copy.
  */
+/* ARCHITECTURE RULE (moved from AGENTS.md): Explore leaderboard member avatars render through MemberAvatar, whose props describe a subject (id, name, photo, required size) rather than a row, so board and season surfaces cannot grow two avatar treatments. */
 export function MemberAvatar({
   userId,
   name,

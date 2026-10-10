@@ -24,6 +24,7 @@ export type RoundTreatment = 'line' | 'none';
 /** The shared plot band for every Explore score trace. This is the All-tab
  *  featured-round hero's established 72px total band minus its 13px end-label
  *  footer, so ordinary score tiles draw with exactly the same vertical range. */
+/* ARCHITECTURE RULE (moved from AGENTS.md): Explore score tiles stay full-width and use SCORE_TRACE_PLOT_HEIGHT; every tile with settled hole detail renders its trace, matching the All-tab hero. */
 export const SCORE_TRACE_PLOT_HEIGHT = 72 - 13;
 
 export interface RoundDot {

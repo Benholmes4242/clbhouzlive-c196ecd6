@@ -197,6 +197,7 @@ export function tournamentHeadlineSegments(args: HeadlineArgs): HeadlineSegment[
 }
 
 /** The same sentence as plain text — derived from the segments, never chosen separately. */
+/* ARCHITECTURE RULE (moved from AGENTS.md): The overview's one tournament sentence comes from tournamentHeadline/tournamentHeadlineSegments: SituationBand prints it on every state but a finished result, and on a finished result it lives only in ChampionStrip's narrative (stored narrative first), so one state never carries two prose blocks. */
 export function tournamentHeadline(args: HeadlineArgs): string | null {
   const text = tournamentHeadlineSegments(args).map((segment) => segment.text).join('');
   return text || null;

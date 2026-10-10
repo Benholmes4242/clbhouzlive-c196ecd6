@@ -44,6 +44,7 @@ export function FiltersPill({ count, onOpen }: { count: number; onOpen: () => vo
 }
 
 /** THE SCOPE CONTROL — one component, shared by this head and the Leaderboards page. */
+/* ARCHITECTURE RULE (moved from AGENTS.md): Explore Scores renders ScoresLeaderboardsPage; its scope control and Filters pill are the shared ScopeSegments/FiltersPill exported here, so the control exists once. */
 export function ScopeSegments({
   scope,
   clubApplies,
