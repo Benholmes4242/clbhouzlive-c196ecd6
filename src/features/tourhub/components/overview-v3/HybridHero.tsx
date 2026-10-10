@@ -81,6 +81,17 @@ export function overviewChampionScoreLabel(
   return undefined;
 }
 
+/**
+ * The champion's gross closing round. Stored round figures are gross strokes
+ * (the sparkline reads them against par); a small figure is read as to-par
+ * and added to the venue par. Absent → null, so the sentence omits it.
+ */
+function closingGross(round4: number | null | undefined, par: number | null | undefined): number | null {
+  if (typeof round4 !== 'number' || !Number.isFinite(round4)) return null;
+  if (round4 >= 50) return round4;
+  return typeof par === 'number' && par > 0 ? par + round4 : null;
+}
+
 export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroProps) {
   const { tournament } = slide;
   const { t } = useTranslation('tourhub');
