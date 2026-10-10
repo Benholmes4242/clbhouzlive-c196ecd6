@@ -100,10 +100,6 @@
       "scoreLabelToPar": "TO PAR",
       "eyebrow": "CHAMPION"
     },
-    "playoff": {
-      "eyebrow": "AWAITING PLAYOFF",
-      "tiedAtTop": "{{count}} tied at the top"
-    },
     "rankings": {
       "sectionEyebrow": "World rankings",
       "linkLabel": "Full rankings",
@@ -122,16 +118,8 @@
       "all": "All news"
     },
     "leaderRow": {
-      "tiedAtRank_one": "{{count}} tied at {{rank}}",
-      "tiedAtRank_other": "{{count}} tied at {{rank}}",
-      "tiedAtRankAria_one": "{{count}} player tied at {{rank}} with score {{score}}, average trajectory",
-      "tiedAtRankAria_other": "{{count}} players tied at {{rank}} with score {{score}}, average trajectory",
       "tiedAtTop_one": "{{count}} tied at the top",
-      "tiedAtTop_other": "{{count}} tied at the top",
-      "tiedAtTopAria_one": "{{count}} player tied at the top with score {{score}}",
-      "tiedAtTopAria_other": "{{count}} players tied at the top with score {{score}}",
-      "playoffMarker": "* PLAYOFF",
-      "championIconLabel": "Champion"
+      "tiedAtTop_other": "{{count}} tied at the top"
     },
     "photoBand": {
       "insightKickerCourse": "COURSE INTELLIGENCE",
@@ -558,7 +546,15 @@
       "pickPre": "Our pick: {{player}}, with a {{probability}}% win chance.",
       "pickPlain": "Our pick: {{player}}.",
       "courseKicker": "Course of the week",
-      "top100Link": "Top 100"
+      "top100Link": "Top 100",
+      "suspendedTieTwo": "Play is suspended in round {{round}}, with {{first}} and {{second}} sharing the lead at {{score}}.",
+      "suspendedTieMany": "Play is suspended in round {{round}}, with {{count}} players sharing the lead at {{score}}.",
+      "suspendedMargin": "Play is suspended in round {{round}}, with {{leader}} leading by {{count}} at {{score}}.",
+      "suspendedLeader": "Play is suspended in round {{round}}, with {{leader}} leading at {{score}}.",
+      "suspendedPlain": "Play is suspended in round {{round}}.",
+      "playoffTieTwo": "{{first}} and {{second}} finished tied at {{score}}. A playoff decides it.",
+      "playoffTieMany": "{{count}} players finished tied at {{score}}. A playoff decides it.",
+      "playoffPending": "Regulation finished level. A playoff decides it."
     },
     "picksSheet": {
       "cardAria": "Why we picked {{name}}",

@@ -23,6 +23,7 @@ import { CHAMPION_STRIP_WASH, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_65 } from '..
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { TrajectorySparkline } from './TrajectorySparkline';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import CountryFlag from '@/components/ui/country-flag';
 
 interface ChampionStripProps {
   name: string;
@@ -114,18 +115,7 @@ export function ChampionStrip({
               <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
               {resolvedEyebrow}
             </span>
-            {country && (
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: 'rgba(255,255,255,0.50)',
-                  letterSpacing: '0.04em',
-                }}
-              >
-                · {country}
-              </span>
-            )}
+            {country && <CountryFlag country={country} size="sm" />}
           </div>
           <div
             style={{
@@ -200,90 +190,6 @@ export function ChampionStrip({
           {narrative}
         </div>
       )}
-    </div>
-  );
-}
-
-interface PlayoffStripProps {
-  count: number;
-  score: string;
-}
-
-export function PlayoffStrip({ count, score }: PlayoffStripProps) {
-  const { t } = useTranslation('tourhub');
-  return (
-    <div
-      style={{
-        background: SURFACE,
-        padding: '10px 20px',
-        minHeight: STRIP_HEIGHT,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 14,
-        borderTop: `0.5px solid ${WHITE_ALPHA_06}`,
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: CHAMPION_STRIP_WASH,
-          pointerEvents: 'none',
-        }}
-      />
-      <div style={{ display: 'flex' }}>
-        {Array.from({ length: Math.min(count, 3) }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              marginLeft: i === 0 ? 0 : -10,
-              zIndex: 3 - i,
-              opacity: count > 3 && i === 2 ? 0.85 : 1,
-              display: 'inline-flex',
-            }}
-          >
-            <SquircleAvatar size={36} hairlineRing ringColor={GOLD} />
-          </div>
-        ))}
-      </div>
-      <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-        <div style={{
-          fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
-          fontWeight: 700,
-          letterSpacing: '0.18em',
-          color: GOLD,
-          marginBottom: 2,
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 5,
-        }}>
-          <Trophy size={10} color={GOLD} strokeWidth={2.5} />
-          {t('overview.playoff.eyebrow')}
-        </div>
-        <div style={{ fontSize: 17, fontWeight: 700, color: 'white', letterSpacing: '-0.01em' }}>
-          {t('overview.playoff.tiedAtTop', { count })}
-        </div>
-      </div>
-      <div style={{ textAlign: 'right' }}>
-        <div
-          style={{
-            ...NUMERIC_STYLE,
-            fontSize: 26,
-            fontWeight: 300,
-            color: GOLD,
-            letterSpacing: '-0.03em',
-            lineHeight: 1,
-          }}
-        >
-          {score}
-        </div>
-        <div style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.16em', marginTop: 2 }}>
-          {t('overview.champion.scoreLabelToPar')}
-        </div>
-      </div>
     </div>
   );
 }

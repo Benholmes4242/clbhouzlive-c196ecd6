@@ -87,10 +87,6 @@
       "scoreLabelToPar": "TO PAR",
       "eyebrow": "CHAMPION"
     },
-    "playoff": {
-      "eyebrow": "AWAITING PLAYOFF",
-      "tiedAtTop": "{{count}} tied at the top"
-    },
     "rankings": {
       "sectionEyebrow": "World rankings",
       "linkLabel": "Full rankings",
@@ -105,16 +101,8 @@
       "movementBasis": "Positions moved over {{days}} days"
     },
     "leaderRow": {
-      "tiedAtRank_one": "{{count}} tied at {{rank}}",
-      "tiedAtRank_other": "{{count}} tied at {{rank}}",
-      "tiedAtRankAria_one": "{{count}} player tied at {{rank}} with score {{score}}, average trajectory",
-      "tiedAtRankAria_other": "{{count}} players tied at {{rank}} with score {{score}}, average trajectory",
       "tiedAtTop_one": "{{count}} tied at the top",
-      "tiedAtTop_other": "{{count}} tied at the top",
-      "tiedAtTopAria_one": "{{count}} player tied at the top with score {{score}}",
-      "tiedAtTopAria_other": "{{count}} players tied at the top with score {{score}}",
-      "playoffMarker": "* PLAYOFF",
-      "championIconLabel": "Champion"
+      "tiedAtTop_other": "{{count}} tied at the top"
     },
     "photoBand": {
       "insightKickerCourse": "COURSE INTELLIGENCE",

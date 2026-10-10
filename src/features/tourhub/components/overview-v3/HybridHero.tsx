@@ -13,6 +13,8 @@ import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from '../../_shared/boardEntity';
+import { SituationBand } from './HybridHeroBands/SituationBand';
+import { tournamentHeadline, tournamentHeadlineSegments } from '../../overview/magazineCopy';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -120,12 +122,11 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
     // genuinely finished event (isChampionResolvable) with an authoritative
     // winner. Never by name or position on a live/suspended/playoff board.
     if (!isChampionResolvable(state) || top?.score == null) return null;
-    const championEntry = !tournament.winnerName
-      // event_type comes from sr_tournaments via the slide — never inferred
-      // from the shape of the top board row.
-      ? resolveChampionEntry(rows, { winner_id: tournament.winnerId, event_type: tournament.eventType })
-      : null;
-    const teamChampion = championEntry ? resolveBoardEntity(championEntry, needsInitials) : null;
+    // event_type comes from sr_tournaments via the slide — never inferred
+    // from the shape of the top board row. Resolved even when winnerName is
+    // set: its rounds and country feed the strip.
+    const championEntry = resolveChampionEntry(rows, { winner_id: tournament.winnerId, event_type: tournament.eventType });
+    const teamChampion = championEntry && !tournament.winnerName ? resolveBoardEntity(championEntry, needsInitials) : null;
     const championName = tournament.winnerName ?? teamChampion?.prose ?? null;
     if (!championName) return null;
     const championScore = championEntry?.score ?? top.score;
@@ -140,6 +141,11 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
       score: championScore,
       margin: tiedAtTop ? null : margin != null && margin > 0 ? margin : null,
       playoff: Boolean(tiedAtTop),
+      rounds: championEntry
+        ? [championEntry.round_1, championEntry.round_2, championEntry.round_3, championEntry.round_4]
+            .filter((r): r is number => typeof r === 'number' && Number.isFinite(r) && r > 0)
+        : [],
+      country: championEntry?.player?.country_code || championEntry?.player?.country || undefined,
     };
   }, [needsInitials, rows, state, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName]);
 
@@ -152,6 +158,18 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
     : null;
 
   const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
+
+  // Situation band: every state except a finished result. Awaiting-playoff is
+  // a results variant but not finished, so it takes the band.
+  const showSituation = state.kind !== 'results' || state.variant === 'awaiting-playoff';
+  const situation = showSituation
+    ? tournamentHeadlineSegments({ tournament, state, leaderboard: rows, t })
+    : null;
+  // Completed: ONE sentence, inside the champion strip — the stored narrative,
+  // else the generator's results sentence. Never both.
+  const championNarrative = champion
+    ? tournament.championNarrative?.trim() || tournamentHeadline({ tournament, state, leaderboard: rows, t })
+    : null;
 
   const startDay = tournament.startDate
     ? new Intl.DateTimeFormat('en', { weekday: 'long' }).format(new Date(tournament.startDate))
@@ -172,6 +190,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
         heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
         onOpen={onOpenTournament}
       />
+      {situation ? <SituationBand segments={situation} /> : null}
       {isChampionResolvable(state) && champion ? (
         <ChampionStrip
           name={champion.name}
@@ -180,6 +199,10 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
           scoreLabel={overviewChampionScoreLabel(champion.playoff, champion.margin, t)}
           eyebrow={t('overview.hero.champion')}
           avatarUrl={championAvatarUrl}
+          narrative={championNarrative}
+          rounds={champion.rounds}
+          par={tournament.venuePar ?? undefined}
+          country={champion.country}
         />
       ) : null}
     </>

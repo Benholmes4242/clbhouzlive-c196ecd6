@@ -277,10 +277,6 @@ export function deriveHeroState(
 
   // Awaiting playoff — regulation complete, a playoff pending. ONLY playoff
   // statuses reach this variant; nothing weather-related may.
-  // KNOWN GAP (owned by Tour Overview rebuild Phase 2): awaiting-playoff has no
-  // treatment of its own today. The slide reads RESULTS, shows final positions
-  // with no TODAY column, no champion strip, a Full results button, and says
-  // nothing about a pending playoff — it tells members the event is over.
   if (PLAYOFF_STATUSES.includes(status)) {
     return {
       kind: 'results',
