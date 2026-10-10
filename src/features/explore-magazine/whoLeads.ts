@@ -55,7 +55,9 @@ export type WhoLeadsYou =
 
 /**
  * The you line's state from the metric's own board (which holds the whole
- * field). Leading = the viewer's row is at position 1, tie or not. A tied
+ * field). Leading = the viewer IS the tile's leader (row 0). A viewer tied
+ * at the top but not row 0 reads "T1st", so the line never contradicts the
+ * leader name above it. A tied
  * position carries the page's tie treatment, a "T" prefix (CompactRow).
  */
 export function whoLeadsYou(
@@ -65,7 +67,7 @@ export function whoLeadsYou(
 ): WhoLeadsYou {
   const mine = rows.find((r) => r.is_viewer) ?? rows.find((r) => r.user_id === viewerId);
   if (!mine) return { kind: 'absent' };
-  if (mine.pos === 1) return { kind: 'lead' };
+  if (mine === rows[0]) return { kind: 'lead' };
   const ord = standingOrdinal(mine.pos, locale);
   return { kind: 'on', pos: mine.is_tie ? `T${ord}` : ord };
 }
