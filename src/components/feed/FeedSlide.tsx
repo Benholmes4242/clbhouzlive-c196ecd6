@@ -503,6 +503,12 @@ const FullscreenVideoSlot: React.FC<{
   // entirely — the borrowed element carries its own currentTime.
   const startPosition = React.useMemo(() => {
     if (!isActive || isBorrowSlide) return -1;
+    // PAGER SWAP (BRIEF_FULLSCREEN_PAGER_NEIGHBOUR_WARM §3): when the pager
+    // swapped the decoded neighbour into 'fullscreen', the lane already owns
+    // this media — pass -1 so useVideoLane's load is a true no-op (no seek).
+    let laneAlreadyOwnsThisMedia = false;
+    try { laneAlreadyOwnsThisMedia = VideoEngine.snapshot('fullscreen').postId === resumeKey; } catch { /* not booted */ }
+    if (laneAlreadyOwnsThisMedia && ownerKey) return -1;
     const t = VideoEngine.getLastPos(resumeKey);
     const chosen = t > 0 ? t : storedStart > 0 ? storedStart : -1;
     return chosen;
@@ -1475,6 +1481,8 @@ const FullscreenMediaPager: React.FC<{
 }> = ({ post, media, openIdx, isSlideActive, isSuggestedFeed, onFirstFrameReady, onZoomChange }) => {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [activePagerIdx, setActivePagerIdx] = useState(openIdx);
+  const activePagerIdxRef = useRef(openIdx);
+  activePagerIdxRef.current = activePagerIdx;
   const setStoreActivePagerIdx = useFullscreenFeedStore((s) => s.setActivePagerIdx);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const demotedRef = useRef(false);
@@ -1503,6 +1511,61 @@ const FullscreenMediaPager: React.FC<{
       PrefetchController.request(`${post.id}:${i}`, hlsUrl);
     }
   }, [media, post.id]);
+
+  // [FSPAGER] DECODER WARM (BRIEF_FULLSCREEN_PAGER_NEIGHBOUR_WARM §2) — ONE
+  // neighbour, the page in the direction of the last horizontal swipe, is
+  // preloaded into the lazy 'fullscreen-next' lane so a settled swipe onto it
+  // only swaps lanes. Only the vertically-active pager warms.
+  const isSlideActiveRef = useRef(isSlideActive);
+  isSlideActiveRef.current = isSlideActive;
+  const warmNextLane = React.useCallback((idx: number, dir: 1 | -1) => {
+    if (!isSlideActiveRef.current) return;
+    const i = idx + dir;
+    const ownerKey = `${post.id}:${i}`;
+    let outcome: string;
+    const m = i >= 0 && i < media.length ? media[i] : undefined;
+    const hlsUrl = m?.type === 'video' ? ((m as any).hlsUrl as string | undefined) : undefined;
+    if (!m) outcome = 'noop:out-of-range';
+    else if (m.type !== 'video') outcome = 'noop:not-video';
+    else if (!hlsUrl || hlsUrl.startsWith('blob:')) outcome = 'noop:no-hls-url';
+    else {
+      try {
+        VideoEngine.preload('fullscreen-next', {
+          hlsUrl,
+          posterUrl: m.thumbnailUrl ?? null,
+          postId: ownerKey,
+          expectedActiveOwnerKey: `${post.id}:${idx}`,
+        });
+        outcome = 'issued:preload';
+      } catch { outcome = 'failed:engine'; }
+    }
+    trace('pager.warm', { surface: 'FSPAGER', ownerKey, lane: 'fullscreen-next', outcome });
+  }, [media, post.id]);
+
+  // On open (and whenever this post becomes the vertically-active slide):
+  // warm openIdx+1, or openIdx-1 when opening on the last page.
+  useEffect(() => {
+    if (!isSlideActive) return;
+    const idx = activePagerIdxRef.current;
+    warmNextLane(idx, idx >= media.length - 1 ? -1 : 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSlideActive]);
+
+  // §5 BUDGET — 'fullscreen-next' is the fifth decoder: release it when this
+  // post stops being the vertically-active slide and when the viewer closes
+  // (pager unmount). Only releases a warm THIS post wrote, and never creates
+  // the lazy lane just to release it.
+  useEffect(() => {
+    const releaseOwn = () => {
+      try {
+        if (!VideoEngine.hasLane('fullscreen-next')) return;
+        const owner = VideoEngine.snapshot('fullscreen-next').postId;
+        if (owner && owner.startsWith(`${post.id}:`)) VideoEngine.release('fullscreen-next');
+      } catch { /* engine not booted */ }
+    };
+    if (!isSlideActive) releaseOwn();
+    return releaseOwn;
+  }, [isSlideActive, post.id]);
 
   // Jump to the opening media on mount (auto, no smooth animation — the FLIP
   // clone / borrow FLIP is the visual open animation).
@@ -1546,6 +1609,26 @@ const FullscreenMediaPager: React.FC<{
         const idx = Math.round(el.scrollLeft / w);
         if (idx === activePagerIdx) return;
         const fromIdx = activePagerIdx;
+        // §3/§4 SWAP — when the page becoming active is the one
+        // 'fullscreen-next' already holds decoded, exchange the lanes instead
+        // of rebinding 'fullscreen'. Never while a borrow for this post is in
+        // flight (that one swipe takes the demote + rebind path).
+        {
+          const toKey = `${post.id}:${idx}`;
+          const borrowInFlight = !!(borrow && borrow.postId === post.id);
+          let swapped = false;
+          try {
+            if (
+              !borrowInFlight &&
+              media[idx]?.type === 'video' &&
+              VideoEngine.hasLane('fullscreen-next') &&
+              VideoEngine.snapshot('fullscreen-next').postId === toKey
+            ) {
+              swapped = VideoEngine.swapLanes('fullscreen', 'fullscreen-next');
+            }
+          } catch { /* engine not booted */ }
+          trace('pager.swap', { surface: 'FSPAGER', from: fromIdx, to: idx, swapped });
+        }
         // Borrow demote — one-shot on first horizontal move.
         let demoteReason: 'borrow.demote' | null = null;
         if (
@@ -1588,6 +1671,8 @@ const FullscreenMediaPager: React.FC<{
 
         // HTTP warm for the new neighbours.
         warmNeighbours(idx);
+        // Decoder warm: the next page in the direction just swiped.
+        if (dir !== 0) warmNextLane(idx, dir);
 
         // [VPERF] S5 swipe.pager — measure horizontal settle onto a video
         // page. Closer on firstFrame, waypoint on playing (mirror fs.open).
@@ -1649,7 +1734,7 @@ const FullscreenMediaPager: React.FC<{
       if (raf) cancelAnimationFrame(raf);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePagerIdx, borrow, post.id, openIdx]);
+  }, [activePagerIdx, borrow, post.id, openIdx, warmNextLane]);
 
   // Abort neighbour warms on unmount only — never on a page change, which
   // would cancel the warmNeighbours requests the scroll handler just sent.
