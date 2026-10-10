@@ -18,6 +18,7 @@ export function RareAirLede({ totals, window }: { totals: FeatYearRow; window: F
   return (
     <span style={{ fontSize: RARE_AIR.lede.fontSize, lineHeight: RARE_AIR.lede.lineHeight }}>
       <Trans
+        ns="courses"
         i18nKey={window === 'year' ? 'amateur.leaderboards.featsFromYear' : 'amateur.leaderboards.featsFrom'}
         values={{ rounds: totals.total_rounds.toLocaleString(), holes: totals.total_holes.toLocaleString() }}
         components={{ n: <span className="tabular-nums" style={{ fontWeight: 700, color: A.INK }} /> }}
@@ -34,11 +35,11 @@ export function RareAirYou({ rows, locale }: { rows: FeatYearRow[]; locale?: str
   const you = <span style={{ fontWeight: 700, color: A.INK }} />;
   let body: ReactNode;
   if (had.length === 0) {
-    body = <Trans i18nKey="amateur.leaderboards.featsYou.none" components={{ b: you }} />;
+    body = <Trans ns="courses" i18nKey="amateur.leaderboards.featsYou.none" components={{ b: you }} />;
   } else {
     const items = had.map((r) => t(`amateur.leaderboards.featsYou.item.${FEAT_I18N[r.feat_kind]}`, { count: r.viewer_events }));
     const list = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' }).format(items);
-    body = <Trans i18nKey="amateur.leaderboards.featsYou.has" values={{ list }} components={{ b: you }} />;
+    body = <Trans ns="courses" i18nKey="amateur.leaderboards.featsYou.has" values={{ list }} components={{ b: you }} />;
   }
   return (
     <div
@@ -91,7 +92,7 @@ export function RareAirRail({
             const all = allOf(f.feat_kind);
             const share = rarityShare(all);
             const cmp = window === 'year' ? compareRates(f, all) : null;
-            const name = t(`amateur.leaderboards.feat.${FEAT_I18N[f.feat_kind]}`, { count: f.events });
+            const name = t(`amateur.leaderboards.featName.${FEAT_I18N[f.feat_kind]}`);
             const unit = t(`amateur.leaderboards.unit.${f.denominator_unit}`);
             const rate = f.events > 0
               ? t('amateur.leaderboards.featRarity', { n: Math.round(f.denominator / f.events).toLocaleString(), unit })
@@ -145,13 +146,13 @@ export function RareAirRail({
                   <span className="tabular-nums" style={{ display: 'block', marginTop: T.rate.marginTop, fontSize: T.rate.fontSize, lineHeight: `${T.rate.lineHeight}px`, color: A.DIM }}>
                     <span style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600, color: A.MUTE }}>{rate}</span>
                     <span style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {t('amateur.leaderboards.nMembers', { count: f.members })}
-                      {cmp?.kind === 'commoner' ? (
-                        <span style={{ fontWeight: 700, color: A.GREEN }}> · {t('amateur.leaderboards.featCompare.commoner', { n: cmp.pct })}</span>
+                      {f.members > 0 ? t('amateur.leaderboards.nMembers', { count: f.members }) : null}
+                      {f.events === 0 ? null : cmp?.kind === 'commoner' ? (
+                        <span style={{ fontWeight: 700, color: A.GREEN }}>{f.members > 0 ? ' · ' : ''}{t('amateur.leaderboards.featCompare.commoner', { n: cmp.pct })}</span>
                       ) : cmp?.kind === 'rarer' ? (
-                        <span style={{ fontWeight: 700, color: A.MUTE }}> · {t('amateur.leaderboards.featCompare.rarer', { n: cmp.pct })}</span>
+                        <span style={{ fontWeight: 700, color: A.MUTE }}>{f.members > 0 ? ' · ' : ''}{t('amateur.leaderboards.featCompare.rarer', { n: cmp.pct })}</span>
                       ) : cmp?.kind === 'tooFew' ? (
-                        <span style={{ fontWeight: 700, color: A.MUTE }}> · {t('amateur.leaderboards.featCompare.tooFew')}</span>
+                        <span style={{ fontWeight: 700, color: A.MUTE }}>{f.members > 0 ? ' · ' : ''}{t('amateur.leaderboards.featCompare.tooFew')}</span>
                       ) : null}
                     </span>
                   </span>

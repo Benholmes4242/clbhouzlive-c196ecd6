@@ -198,6 +198,12 @@
           "cleanCard_one": "a bogey-free round",
           "cleanCard_other": "{{count}} bogey-free rounds"
         }
+      },
+      "featName": {
+        "ace": "Holes in one",
+        "albatross": "Albatrosses",
+        "eagle": "Eagles",
+        "cleanCard": "Bogey-free rounds"
       }
     },
     "place": {
