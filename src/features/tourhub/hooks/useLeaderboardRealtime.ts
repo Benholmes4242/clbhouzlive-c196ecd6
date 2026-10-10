@@ -26,6 +26,18 @@ export interface LeaderboardRealtimeOptions {
   invalidate?: 'all' | 'leaderboard';
 }
 
+/**
+ * Trailing coalescing window for leaderboard row changes.
+ *
+ * tournament-live-sync runs on a 60-second cycle and rewrites EVERY row of the
+ * field each pass, so a 144-player event arrives as ~144 postgres_changes
+ * events in a burst. A few seconds captures a whole burst while still landing
+ * well inside the 60s cycle; the board was designed around a 30s staleTime,
+ * so 4s is far tighter than its freshness budget, and a 4s delay on a golf
+ * score is imperceptible. If the sync cycle changes, revisit this window.
+ */
+export const LEADERBOARD_REALTIME_COALESCE_MS = 4000;
+
 export function useLeaderboardRealtime(
   tournamentId: string | null | undefined,
   { invalidate = 'all' }: LeaderboardRealtimeOptions = {},
@@ -35,6 +47,23 @@ export function useLeaderboardRealtime(
 
   useEffect(() => {
     if (!tournamentId) return;
+
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const flush = () => {
+      timer = null;
+      queryClient.invalidateQueries({ queryKey: ['tourhub', 'leaderboard', tournamentId] });
+      if (invalidate === 'leaderboard') return;
+      // Invalidate all queries that depend on this tournament's leaderboard
+      queryClient.invalidateQueries({ queryKey: ['tournament-top-leaders', tournamentId] });
+      queryClient.invalidateQueries({ queryKey: ['tourhub', 'pick-history'] });
+      queryClient.invalidateQueries({ queryKey: ['prediction-tracker', tournamentId] });
+      queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] });
+      queryClient.invalidateQueries({ queryKey: ['live-arena'] });
+      queryClient.invalidateQueries({ queryKey: ['hero-carousel-data'] });
+      queryClient.invalidateQueries({ queryKey: ['overview-live-right-now'] });
+      queryClient.invalidateQueries({ queryKey: ['live-leader-teaser'] });
+    };
 
     const channel = supabase
       .channel(`leaderboard-${tournamentId}`)
@@ -47,17 +76,10 @@ export function useLeaderboardRealtime(
           filter: `tournament_id=eq.${tournamentId}`,
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ['tourhub', 'leaderboard', tournamentId] });
-          if (invalidate === 'leaderboard') return;
-          // Invalidate all queries that depend on this tournament's leaderboard
-          queryClient.invalidateQueries({ queryKey: ['tournament-top-leaders', tournamentId] });
-          queryClient.invalidateQueries({ queryKey: ['tourhub', 'pick-history'] });
-          queryClient.invalidateQueries({ queryKey: ['prediction-tracker', tournamentId] });
-          queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] });
-          queryClient.invalidateQueries({ queryKey: ['live-arena'] });
-          queryClient.invalidateQueries({ queryKey: ['hero-carousel-data'] });
-          queryClient.invalidateQueries({ queryKey: ['overview-live-right-now'] });
-          queryClient.invalidateQueries({ queryKey: ['live-leader-teaser'] });
+          // Trailing window: restart on each event so a whole burst produces
+          // one flush; a lone event still flushes after the window.
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(flush, LEADERBOARD_REALTIME_COALESCE_MS);
         }
       )
       .subscribe((status) => {
@@ -65,6 +87,9 @@ export function useLeaderboardRealtime(
       });
 
     return () => {
+      // Cancel (not flush): no invalidation may fire for a tournament that is
+      // no longer on screen (unmount, slide change, or tournament id change).
+      if (timer) clearTimeout(timer);
       supabase.removeChannel(channel);
     };
   }, [tournamentId, queryClient, invalidate]);
