@@ -142,7 +142,7 @@
       "nRounds_one": "{{count}} round",
       "nRounds_other": "{{count}} rounds",
       "basisSentence": {
-        "rounds": "Every round {{scope}} has posted {{window}}, newest first — net first, gross behind.",
+        "rounds": "Every round {{scope}} has posted {{window}}, newest first.",
         "ranked": "Ranked on {{unit}} {{window}}. {{scopeLead}}, 18 holes.",
         "scope": {
           "everyone": "everyone",
@@ -162,7 +162,7 @@
           "birdies": "birdies",
           "gross": "gross score"
         },
-        "roundsAll": "Every round {{scope}} has ever posted, newest first — net first, gross behind.",
+        "roundsAll": "Every round {{scope}} has ever posted, newest first.",
         "rankedAll": "Ranked on {{unit}}, all time. {{scopeLead}}, 18 holes."
       },
       "slab": {
