@@ -35,6 +35,7 @@ import { BOARD_FLOOR_COPY } from '@/components/explore-tab-new/courseled/boardFl
 import { dayLadder, playDateAtLocalNoon, playDateStandalone } from '@/components/explore-tab-new/courseled/discoverWhen';
 import { SELF_ROW_TINT } from '@/components/explore-tab-new/courseled/tokens';
 import { standingOrdinal } from './ordinal';
+import { WHO_LEADS, whoLeadsPlaceholderHeight, whoLeadsYou } from './whoLeads';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
 import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
 import { RareAirLede, RareAirRail, RareAirYou } from './RareAirSection';
@@ -185,9 +186,11 @@ function useCareerBoard(
   metric: CareerMetric,
   limit: number,
   rpc: 'get_career_leaderboard' | 'get_year_leaderboard' = 'get_career_leaderboard',
+  enabled = true,
 ) {
   return useQuery<CareerRow[]>({
     queryKey: ['leaderboards', rpc, viewerId ?? 'anon', metric, limit],
+    enabled,
     staleTime: 5 * 60_000,
     retry: false,
     /* A metric change is a new key; keep the previous rows on screen until
@@ -522,9 +525,13 @@ function Rail({ children }: { children: ReactNode }) {
       <div
         style={{
           display: 'flex',
-          gap: 8,
+          gap: WHO_LEADS.rail.gap,
           overflowX: 'auto',
+          scrollSnapType: 'x mandatory',
           paddingInline: GUTTER,
+          scrollPaddingInline: GUTTER,
+          paddingTop: WHO_LEADS.rail.top,
+          paddingBottom: WHO_LEADS.rail.bottom,
           scrollbarWidth: 'none',
           willChange: 'transform',
         }}
@@ -548,16 +555,6 @@ function Rail({ children }: { children: ReactNode }) {
   );
 }
 
-const RAIL_CARD = {
-  flexShrink: 0,
-  padding: 12,
-  borderRadius: 14,
-  border: `1px solid ${A.BORDER}`,
-  background: A.PANEL,
-  textAlign: 'left' as const,
-  fontFamily: SANS,
-  cursor: 'pointer',
-};
 
 /* ---------------------------------------------------------------- page */
 
@@ -601,12 +598,16 @@ export function ScoresLeaderboardsPage({
     analyticsEvents.track('feats_window_changed', { window: next });
   };
 
-  const birdiesC = useCareerBoard(userId, 'birdies', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
-  const roundsC = useCareerBoard(userId, 'rounds', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
-  const sub80C = useCareerBoard(userId, 'sub_80', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
-  const eaglesC = useCareerBoard(userId, 'eagles', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
-  const stablefordC = useCareerBoard(userId, 'best_stableford', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
-  const scoreDiffC = useCareerBoard(userId, 'best_score_diff', CAREER_RAIL_LIMIT, 'get_year_leaderboard');
+  /* W.1 — the window swaps the rpc on all four boards; the rpc is in the
+     query key, so each window caches separately. Only the selected window runs.
+     best_stableford / best_score_diff are NOT fetched: both RPCs return zero
+     rows for them (they stay in CareerMetric). */
+  const [leadWindow, setLeadWindow] = useState<FeatWindow>('year');
+  const leadRpc = leadWindow === 'year' ? 'get_year_leaderboard' : 'get_career_leaderboard';
+  const birdiesC = useCareerBoard(userId, 'birdies', CAREER_RAIL_LIMIT, leadRpc);
+  const roundsC = useCareerBoard(userId, 'rounds', CAREER_RAIL_LIMIT, leadRpc);
+  const sub80C = useCareerBoard(userId, 'sub_80', CAREER_RAIL_LIMIT, leadRpc);
+  const eaglesC = useCareerBoard(userId, 'eagles', CAREER_RAIL_LIMIT, leadRpc);
   /* The tile reads rows 0-1; the sheet it opens reads the same query object. */
   const [leaderSheet, setLeaderSheet] = useState<CareerMetric | null>(null);
   const [top100List, setTop100List] = useState<RankListSlug>(TOP100_DEFAULT);
@@ -711,12 +712,18 @@ export function ScoresLeaderboardsPage({
     { metric: 'rounds', label: t('amateur.leaderboards.career.rounds'), q: roundsC },
     { metric: 'sub_80', label: t('amateur.leaderboards.career.sub80'), q: sub80C },
     { metric: 'eagles', label: t('amateur.leaderboards.career.eagles'), q: eaglesC, noAvg: true },
-    { metric: 'best_stableford', label: t('amateur.leaderboards.career.bestStableford'), q: stablefordC },
-    { metric: 'best_score_diff', label: t('amateur.leaderboards.career.bestScoreDiff'), q: scoreDiffC },
   ] as { metric: CareerMetric; label: string; q: typeof birdiesC; noAvg?: boolean }[];
   /* NOTHING ELSE JOINS THIS RAIL: holes in one / albatrosses are §5, lowest gross §3, bogey-free §5. */
   const careerSettled = career.every((c) => c.q.isFetched);
   const careerShown = career.filter((c) => c.q.isSuccess && (c.q.data?.length ?? 0) > 0);
+  /* W.5 — an empty year asks ONE all-time board whether a way out exists. It
+     runs only in that case (1 January), never alongside a populated year. */
+  const yearEmpty = leadWindow === 'year' && careerSettled && careerShown.length === 0;
+  const allProbe = useCareerBoard(userId, 'rounds', CAREER_RAIL_LIMIT, 'get_career_leaderboard', yearEmpty);
+  const allHasRows = (allProbe.data?.length ?? 0) > 0;
+  const pickLeadWindow = (next: FeatWindow) => {
+    if (next !== leadWindow) setLeadWindow(next);
+  };
 
   /* ------------------------------------------------- §7 short board */
   const shortBoard = (
@@ -1191,70 +1198,154 @@ export function ScoresLeaderboardsPage({
         </Section>
       )}
 
-      {/* §6 WHO LEADS WHAT — this calendar year's leader of each metric, read
-          from get_year_leaderboard (CAREER_RAIL_LIMIT: the tile reads rows 0-1, the sheet the field).
-          JANUARY IS THIN BY DESIGN: on 1 January every value is zero, the RPC
-          filters value > 0, and this section renders nothing. That is a fresh
-          race, not a bug — never add a "last year's final" fallback or carry
-          figures over. */}
+      {/* §6 WHO LEADS WHAT — the field's leader of each metric, in the window the
+          toggle picks (CAREER_RAIL_LIMIT: every board holds the whole field, so
+          the tile reads rows 0-1 and the viewer's row, the sheet the field).
+          JANUARY IS THIN BY DESIGN on the year view: the RPC filters value > 0.
+          Never carry figures over; the empty year names the toggle instead. */}
       {!careerSettled ? (
-        pending(150)
-      ) : careerShown.length > 0 ? (
+        pending(whoLeadsPlaceholderHeight(!!userId))
+      ) : careerShown.length > 0 || (yearEmpty && allHasRows) ? (
         <Section
           contest
-          eyebrow={String(new Date().getFullYear())}
+          eyebrow={t('amateur.leaderboards.theField')}
           title={t('amateur.leaderboards.whoLeads')}
+          metaAlign="center"
+          meta={(
+            <div
+              role="radiogroup"
+              aria-label={t('amateur.leaderboards.whoLeadsWindow')}
+              style={{
+                display: 'flex', gap: RARE_AIR.toggle.gap, padding: RARE_AIR.toggle.padding, borderRadius: 999, flex: 'none', alignSelf: 'center',
+                background: RARE_AIR.toggle.background, border: `1px solid ${RARE_AIR.toggle.border}`,
+              }}
+            >
+              {([
+                ['year', String(new Date().getFullYear())],
+                ['all', t('amateur.leaderboards.allTime')],
+              ] as const).map(([key, label]) => {
+                const selected = leadWindow === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => pickLeadWindow(key)}
+                    style={{
+                      height: RARE_AIR.toggle.height, padding: `0 ${RARE_AIR.toggle.sidePadding}px`, borderRadius: 999, border: 'none',
+                      fontFamily: SANS, fontSize: RARE_AIR.toggle.fontSize, fontWeight: 600, whiteSpace: 'nowrap',
+                      letterSpacing: 'normal', textTransform: 'none',
+                      background: selected ? RARE_AIR.toggle.fill : 'transparent',
+                      color: selected ? A.INK : A.MUTE,
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         >
+          {careerShown.length === 0 ? (
+            <p style={{ margin: 0, fontFamily: SANS, fontSize: WHO_LEADS.empty.fontSize, lineHeight: WHO_LEADS.empty.lineHeight, color: A.MUTE }}>
+              {t('amateur.leaderboards.whoLeadsEmptyYear', { year: new Date().getFullYear(), allTime: t('amateur.leaderboards.allTime') })}
+            </p>
+          ) : (
           <Rail>
             {careerShown.map((c) => {
-              const r = c.q.data![0];
-              const second = c.q.data![1];
+              const rows = c.q.data!;
+              const r = rows[0];
+              const second = rows[1];
               /* Decided from the VALUES, not is_tie (which marks a tie anywhere). */
               const margin = second ? fmtCareerMargin(c.metric, r.value, second.value) : null;
+              const you = userId ? whoLeadsYou(rows, userId, i18n?.language ?? 'en') : null;
+              const mine = you?.kind === 'on' ? rows.find((x) => x.is_viewer) ?? rows.find((x) => x.user_id === userId) : undefined;
+              const lead = you?.kind === 'lead';
+              const W = WHO_LEADS.tile;
+              const fig = <span className="tabular-nums" style={{ fontWeight: W.you.figureWeight, color: A.INK }} />;
               return (
-                <button key={c.metric} type="button" onClick={() => setLeaderSheet(c.metric)} style={{ ...RAIL_CARD, width: 150 }}>
-                  <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.AMBER }}>
+                <button
+                  key={c.metric}
+                  type="button"
+                  onClick={() => setLeaderSheet(c.metric)}
+                  style={{
+                    width: W.width, flex: 'none', boxSizing: 'border-box', scrollSnapAlign: 'start',
+                    padding: `${W.padTop}px ${W.padSide}px ${W.padBottom}px`, borderRadius: W.radius,
+                    border: `1px solid ${A.BORDER}`, background: A.PANEL, textAlign: 'left', fontFamily: SANS, cursor: 'pointer',
+                    // A <button> centres its content vertically; stack from the top.
+                    display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'stretch',
+                  }}
+                >
+                  <span style={{
+                    display: 'block', fontSize: W.name.fontSize, lineHeight: `${W.name.lineHeight}px`, fontWeight: W.name.fontWeight,
+                    letterSpacing: W.name.letterSpacing, textTransform: 'uppercase', color: A.MUTE,
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
                     {c.label}
                   </span>
-                  <span style={{ display: 'block', marginTop: 8, fontSize: 12.5, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {nameOf(r.display_name)}
+                  <span className="tabular-nums" style={{
+                    display: 'block', marginTop: W.figure.marginTop, fontSize: W.figure.fontSize, fontWeight: W.figure.fontWeight,
+                    letterSpacing: W.figure.letterSpacing, lineHeight: 1, color: lead ? A.AMBER : A.INK,
+                  }}>
+                    {fmtCareerValue(c.metric, r.value)}
                   </span>
-                  {/* NAME AND CLUB TAKE THE CARD'S FULL WIDTH. The avatar moved
-                      beside the value, which was empty space, so these two lines
-                      no longer share the row with it.
-                      THE CLUB MAY STILL TRUNCATE: "Hanbury Manor Golf & Country
-                      Club" measures 160.6px against roughly 122px. That is
-                      accepted, not solved — render the full home_club and let it
-                      ellipse; never shorten club names.
-                      CHROMIUM MEASUREMENTS UNDERSTATE DEVICE WIDTHS: "Andrew
-                      Yetzes" measured 66px yet truncated at 94px on an iPhone.
-                      Treat these figures as a floor, not a budget — a label that
-                      only just fits in a measurement does not fit. That is why
-                      this layout took a 34% width increase over a calculated one. */}
-                  {r.home_club ? (
-                    <span style={{ display: 'block', marginTop: 2, fontSize: 10, fontWeight: 500, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {r.home_club}
-                    </span>
-                  ) : null}
-                  <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-                    <span className="tabular-nums" style={{ display: 'block', fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
-                      {fmtCareerValue(c.metric, r.value)}
-                    </span>
+                  {/* The avatar sits beside the leader's name at 20px (it was
+                      30px beside the value): the row says WHO, the figure WHAT. */}
+                  <span style={{ display: 'flex', alignItems: 'center', gap: W.leader.gap, marginTop: W.leader.marginTop, minWidth: 0 }}>
                     <span style={{ flexShrink: 0, display: 'flex' }}>
-                      <MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={r.photo_url} size={30} />
+                      <MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={r.photo_url} size={W.leader.avatar} />
+                    </span>
+                    <span style={{
+                      minWidth: 0, fontSize: W.leader.fontSize, lineHeight: `${W.leader.lineHeight}px`, fontWeight: W.leader.fontWeight,
+                      color: lead ? A.AMBER : A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}>
+                      {nameOf(r.display_name)}
                     </span>
                   </span>
-                  {margin != null ? (
-                    <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, color: A.DIM }}>
-                      {margin.zero
+                  {/* THE CLUB WAS REMOVED: where a member plays has no bearing on
+                      who leads a metric. The lesson from measuring it stands for
+                      the name and the margin line: Chromium measurements
+                      understate device widths, so treat a measured fit as a
+                      floor, not a budget. */}
+                  <span style={{
+                    display: 'block', marginTop: W.margin.marginTop, fontSize: W.margin.fontSize, lineHeight: `${W.margin.lineHeight}px`,
+                    color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
+                    {margin == null
+                      ? '\u00A0'
+                      : margin.zero
                         ? t('amateur.leaderboards.tiedTop')
-                        : t('amateur.leaderboards.clearOf2nd', { n: margin.text })}
-                    </span>
+                        : t('amateur.leaderboards.clearOf', { n: margin.text, name: nameOf(second.display_name) })}
+                  </span>
+                  {you ? (
+                    <>
+                      <span aria-hidden style={{
+                        display: 'block', height: W.rule.height, background: A.SOFT,
+                        marginTop: W.rule.marginTop, marginInline: -W.padSide,
+                      }} />
+                      <span style={{
+                        display: 'block', marginTop: W.you.marginTop, fontSize: W.you.fontSize, lineHeight: `${W.you.lineHeight}px`,
+                        color: lead ? A.AMBER : A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      }}>
+                        {you.kind === 'lead' ? t('amateur.leaderboards.whoLeadsYou.lead')
+                          : you.kind === 'absent' ? t('amateur.leaderboards.whoLeadsYou.absent')
+                          : (
+                            <Trans
+                              ns="courses"
+                              i18nKey="amateur.leaderboards.whoLeadsYou.on"
+                              values={{ pos: you.pos, value: fmtCareerValue(c.metric, mine!.value) }}
+                              components={{ b: fig }}
+                            />
+                          )}
+                      </span>
+                    </>
                   ) : null}
                 </button>
               );
             })}
           </Rail>
+          )}
         </Section>
       ) : null}
 
