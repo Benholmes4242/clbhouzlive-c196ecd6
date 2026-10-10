@@ -107,6 +107,7 @@ export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text o
 // not retype visual constants at their call sites.
 export const OVERVIEW_RAIL_HAIRLINE = 'rgba(255,255,255,0.07)';
 export const OVERVIEW_PICKS_TEXT_INK = 'rgba(248,250,252,0.85)';
+export const OVERVIEW_SITUATION_INK = 'rgba(248,250,252,0.88)'; // Situation band standfirst body
 
 
 // ============================================================================
