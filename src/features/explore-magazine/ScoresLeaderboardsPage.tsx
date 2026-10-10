@@ -42,6 +42,8 @@ import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
+import { THE_HUNDRED, HUNDRED_ROWS_HEIGHT, HUNDRED_SLAB_HEIGHT, hundredPlaceholderHeight, hundredSlab } from './theHundred';
+import { HundredBasis, HundredRail, HundredSubHead, HundredYou } from './TheHundredSection';
 
 /** CompactRow value size (the career, Top 100 and improvement sections). */
 export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
@@ -100,7 +102,7 @@ interface CareerRow {
   field_avg: number | null;
   /** Most recent round on a course in the SELECTED list — same scope as `value`. */
   last_course_name: string | null;
-  courses: number | null;
+  /* `courses` (always null from the RPC, never rendered) is deliberately not typed. */
   total_members: number;
   is_viewer: boolean | null;
 }
@@ -400,6 +402,7 @@ function CompactRow({
   secondary,
   value,
   caption,
+  progress,
   captionTone,
   valueTone,
   self,
@@ -416,6 +419,8 @@ function CompactRow({
   secondary: string | null;
   value: string;
   caption?: string | null;
+  /** OPTIONAL 0–1 bar under the name (Top 100 only). Absent = the row as before. */
+  progress?: number;
   /** Ignored on the viewer's own row: amber identity outranks par tone. */
   captionTone?: string;
   valueTone?: string;
@@ -484,6 +489,15 @@ function CompactRow({
             }}
           >
             {secondary}
+          </span>
+        ) : null}
+        {progress != null ? (
+          <span
+            aria-hidden
+            data-row-progress
+            style={{ display: 'block', marginTop: THE_HUNDRED.row.progress.marginTop, height: THE_HUNDRED.row.progress.height, borderRadius: 999, background: THE_HUNDRED.row.progress.background, overflow: 'hidden' }}
+          >
+            <span style={{ display: 'block', width: `${Math.max(0, Math.min(1, progress)) * 100}%`, height: '100%', background: self ? A.AMBER : THE_HUNDRED.row.progress.fill }} />
           </span>
         ) : null}
       </span>
@@ -608,7 +622,7 @@ export function ScoresLeaderboardsPage({
   };
 
   const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
-  const [careerSheet, setCareerSheet] = useState(false);
+  const [top100SeeAllSheet, setTop100SeeAllSheet] = useState(false);
 
   /* 3.3 ONE WINDOW VOCABULARY: WINDOW_OPTIONS (the filter list's own words)
      is the eyebrow too; WINDOW_SHORT survives only as its compact form for the
@@ -709,9 +723,9 @@ export function ScoresLeaderboardsPage({
   const shortBoard = (
     rows: CareerRow[],
     secondary: (r: CareerRow) => string | null,
-    caption: string,
+    caption: string | undefined,
     onPress: (r: CareerRow) => void = (r) => onMemberTap(r.user_id),
-    opts: { all?: boolean; fmt?: (r: CareerRow) => string } = {},
+    opts: { all?: boolean; fmt?: (r: CareerRow) => string; progress?: (r: CareerRow) => number | undefined } = {},
   ) => {
     const top = opts.all ? rows : rows.slice(0, SHORT_ROWS);
     const mine = rows.find((r) => r.is_viewer) ?? (userId ? rows.find((r) => r.user_id === userId) : undefined);
@@ -729,6 +743,7 @@ export function ScoresLeaderboardsPage({
         secondary={secondary(r)}
         value={opts.fmt ? opts.fmt(r) : String(r.value)}
         caption={caption}
+        progress={opts.progress?.(r)}
         self={!!r.is_viewer || r.user_id === userId}
         /* The pinned self row: 12px gap above, amber self tint (Phase 9.13). */
         gapAbove={!!pin && r.user_id === pin.user_id && i === list.length - 1}
@@ -739,15 +754,19 @@ export function ScoresLeaderboardsPage({
 
   const top100Rows = top100.data ?? [];
   /* last_course_name is scoped in SQL to the selected list, so it changes with
-     the chip alongside the count. Never fall back to home_club. */
-  const top100Secondary = (r: CareerRow): string | null =>
-    r.last_course_name ? t('amateur.leaderboards.latestCourse', { course: r.last_course_name }) : null;
+     the chip alongside the count. Never fall back to home_club. T.3 — the bare
+     course name; the basis sentence says what the line is. */
+  const top100Secondary = (r: CareerRow): string | null => r.last_course_name || null;
   /* Same call as the progress sheet (same query key) — the sheet opens from cache. */
   const listCourses = useTop100ListProgress(userId ? top100List : undefined, userId, userId);
   const listTiles = useMemo(
     () => [...(listCourses.data ?? [])].sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)),
     [listCourses.data],
   );
+  /** The list's length is the fetched list's row count, never a literal 100. */
+  const listLength = listCourses.isSuccess && listTiles.length > 0 ? listTiles.length : null;
+  const top100Progress = (r: CareerRow): number | undefined =>
+    listLength != null ? Math.min(1, Number(r.value) / listLength) : undefined;
   const [top100Sheet, setTop100Sheet] = useState<CareerRow | null>(null);
   const openTop100Sheet = (r: CareerRow) => setTop100Sheet(r);
 
