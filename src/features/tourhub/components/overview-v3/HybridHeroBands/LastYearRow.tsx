@@ -1,3 +1,4 @@
+// SALVAGED — claimed by Tour Overview rebuild Phase 4 (last year's top four on an upcoming event). Do not sweep as unreachable.
 /**
  * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
  * The hero is a broadcast surface. Tracked-out caps over photography read

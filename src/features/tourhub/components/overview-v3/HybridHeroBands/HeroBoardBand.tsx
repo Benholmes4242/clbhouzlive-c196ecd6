@@ -66,10 +66,8 @@ import type { HeroState } from '../HybridHero.utils';
 import type { BoardEntry } from '../../../leaderboard/BoardTable';
 
 /**
- * SIX rows. It was five while the board occupied the photo band, because the
- * floating ChromeIsland overlays the top ~46px of the hero and a sixth row
- * would have buried the leader. Extending downward removes that constraint —
- * no chrome clearance applies here.
+ * FIVE rows: the leading positions shown on the hero board. The board sits
+ * below the photo band, so no chrome clearance applies here.
  */
 export const HERO_BOARD_ROWS = 5;
 
@@ -420,9 +418,8 @@ export function HeroBoardSection({
 }
 
 /**
- * §3 — THE PICKS BLOCK. Amber OUR PICKS header, optional event-level editorial
- * line, a FIXED grid of up to three cards (never padded, never scrolling) and
- * a provenance line GATED ON isAIPowered. Each card opens PicksSheet.
+ * §3 — THE PICKS BLOCK. Amber OUR TOURNAMENT PICKS header and a FIXED grid of
+ * up to three cards (never padded, never scrolling). Each card opens PicksSheet.
  */
 function PicksBlock({
   picks,

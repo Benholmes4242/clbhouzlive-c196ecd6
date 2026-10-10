@@ -4,7 +4,7 @@
  *
  * Looks up the prior-year instance of the same tournament (by tour + name basename)
  * and returns the winner. Returns null when no prior instance exists or the winner
- * cannot be resolved — the hero's MiddleBand fallback chain handles null gracefully.
+ * cannot be resolved — HeroBoardBand then omits the defending-champion fact.
  */
 
 import { useQuery } from '@tanstack/react-query';
