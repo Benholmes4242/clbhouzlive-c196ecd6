@@ -58,6 +58,37 @@ function page(board: BoardKey, rows: BoardRow[], userId = 'viewer') {
 
 const rowsOf = () => screen.getAllByRole('button').filter((b) => /Member \d|Viewer/.test(b.textContent ?? ''));
 
+function withYou(you: number | null, board: BoardKey = 'stableford') {
+  const rows = [row(1), row(2)];
+  const state = makeBoardState({
+    board, total: 2,
+    facets: { settled: you != null, countFor: (axis: string, key: string) => (axis === 'scope' && key === 'you' ? you : null), openList: () => [] },
+    page: { data: { rows, total: 2, pool: { rounds: 23, courses: 3, members: 19 } }, isSuccess: true, isPending: false } as never,
+  });
+  return render(<ScoresLeaderboardsPage userId="viewer" state={state} onOpenFilters={vi.fn()}
+    onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
+}
+
+describe('Standing and basis (Phase 2)', () => {
+  it('renders the basis line beneath the controls', () => {
+    withYou(null);
+    expect(document.querySelector('[data-scores-basis]')).toBeTruthy();
+  });
+  it('says nothing before the you-count resolves', () => {
+    withYou(null);
+    expect(document.querySelector('[data-scores-standing]')).toBeNull();
+  });
+  it('a qualifying member beyond the fetch is told they are deeper and given see-all', () => {
+    withYou(3);
+    expect(document.querySelector('[data-scores-standing]')?.getAttribute('data-scores-standing')).toBe('deeper');
+    expect(screen.getByText('See all members')).toBeTruthy();
+  });
+  it('a member with no qualifying round is told the floor', () => {
+    withYou(0);
+    expect(document.querySelector('[data-scores-standing]')?.getAttribute('data-scores-standing')).toBe('none');
+  });
+});
+
 describe('Board rail (Phase 1)', () => {
   it('renders six named chips with no figures and nothing greyed when there is no counts object', () => {
     const state = makeBoardState({ facets: undefined as never });

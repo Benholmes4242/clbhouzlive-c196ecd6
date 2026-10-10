@@ -64,8 +64,14 @@ import { useCircleSize } from './useCircleSize';
  * can reach. `active` gates BOTH board reads, so the All and Watch views issue
  * nothing.
  */
-/** One read serves the visible cut, the pinned own row and the panel's count. */
+/** One read serves the visible cut, the pinned own row and the panel's count.
+ *  CONSIDERED, NOT MISSED (Phase 2.3): 200 is kept on purpose. The only figure
+ *  for a real board's size is an illustrative comment in get_board_page, and a
+ *  live fetch is not resized on an example. Revisit once a board is measured. */
 const PAGE_FETCH = 200;
+/** A landing probe asks only "are there CIRCLE_ROW_FLOOR rows?", so it fetches
+ *  exactly that many — the probe and the test it applies cannot drift. */
+const PROBE_FETCH = CIRCLE_ROW_FLOOR;
 
 /** Standings opens on Most recent ('recent') for every member; every other
  *  board stays selectable. entryBoardFor is the one place the entry board is
@@ -149,22 +155,30 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   const rungBFilters = useMemo(() => entryFiltersFor(probeScopes[1]), [probeScopes]);
   /* A rung whose scope cannot return rows is skipped outright — no query.
      Club with no primary_club_id is the common case. */
-  const rungApplies = (k: ScopeKey) => (k === 'club' ? !!homeClub.clubId : true);
-  const ladderOn = !!userId && active && entry === null && homeClub.ready && handicapResolved;
+  /* Circle is skipped only on a SETTLED zero (fresh fetch done). Unresolved is
+     not zero; a failed count is unknown, so the rung still runs. */
+  const circleSettled = circle.isError || (circle.isSuccess && !circle.isFetching);
+  const circleEmpty = circle.isSuccess && !circle.isFetching && circle.data === 0;
+  const rungApplies = (k: ScopeKey) =>
+    k === 'club' ? !!homeClub.clubId : k === 'circle' ? !circleEmpty : true;
+  /* A rung's skip is decidable once the fact it depends on is known. */
+  const rungKnown = (k: ScopeKey) => (k === 'club' ? homeClub.ready : k === 'circle' ? circleSettled : true);
+  const ladderOn = !!userId && active && entry === null && homeClub.ready && handicapResolved
+    && (!probeScopes.includes('circle') || circleSettled);
 
   const rungA = useBoardPage(userId, entryBoard, rungAFilters, {
-    limit: PAGE_FETCH,
+    limit: PROBE_FETCH,
     enabled: ladderOn && rungApplies(probeScopes[0]),
   });
-  const rungASkipped = homeClub.ready && !rungApplies(probeScopes[0]);
+  const rungASkipped = rungKnown(probeScopes[0]) && !rungApplies(probeScopes[0]);
   const rungASettled = rungASkipped || rungA.isSuccess || rungA.isError;
   const rungAOk = !rungASkipped && rungA.isSuccess && (rungA.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
 
   const rungB = useBoardPage(userId, entryBoard, rungBFilters, {
-    limit: PAGE_FETCH,
+    limit: PROBE_FETCH,
     enabled: ladderOn && rungASettled && !rungAOk && rungApplies(probeScopes[1]),
   });
-  const rungBSkipped = homeClub.ready && !rungApplies(probeScopes[1]);
+  const rungBSkipped = rungKnown(probeScopes[1]) && !rungApplies(probeScopes[1]);
   const rungBSettled = rungBSkipped || rungB.isSuccess || rungB.isError;
   const rungBOk = !rungBSkipped && rungB.isSuccess && (rungB.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
 
