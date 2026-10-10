@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
 import { ChevronRight, Medal } from 'lucide-react';
@@ -10,7 +10,7 @@ import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
 import { ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
-import { BoardHeaderRow, BoardRowView, boardColumns } from '@/components/explore-tab-new/courseled/BoardRows';
+import { BoardHeaderRow, BoardRowView, boardColumns, fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
 import { describeFilterParts } from '@/components/explore-tab-new/courseled/describeFilters';
 import { type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import {
@@ -64,7 +64,7 @@ const CHIP_BG = 'rgba(255,255,255,0.04)';
 const CHIP_ACTIVE_BG = 'rgba(247,147,30,0.1)';
 const CHIP_ACTIVE_BORDER = 'rgba(247,147,30,0.55)';
 const SLAB_BG = 'rgba(255,255,255,0.05)';
-const VISUALLY_HIDDEN: React.CSSProperties = {
+const VISUALLY_HIDDEN: CSSProperties = {
   position: 'absolute', width: 1, height: 1, padding: 0, margin: -1,
   overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0,
 };
