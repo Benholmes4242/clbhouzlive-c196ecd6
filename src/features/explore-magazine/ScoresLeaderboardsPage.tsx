@@ -1209,8 +1209,7 @@ export function ScoresLeaderboardsPage({
           : RANK_SCOPE_LABEL[top100List]}
         valueHeading={t('amateur.leaderboards.coursesOf100')}
         above={
-        {/* Hairline clause: controls from list. */}
-        <div style={{ padding: '11px 16px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+        <div style={{ padding: '11px 16px', /* Hairline clause: controls from list. */ borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <RailChips
             align="center-when-fit"
             ground="filled-selection"
