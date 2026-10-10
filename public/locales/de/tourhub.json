@@ -256,8 +256,6 @@
       "courseShapeLabel": "Platzprofil",
       "ourPicksLabel": "Unsere Tipps",
       "ourPicksAll": "Alle Tipps und die Begründung",
-      "ourPicksProvenance": "Updated {{day}}",
-      "ourPicksStale": "Wird aktualisiert",
       "figuresBasis": "Alle drei aus {{n}} abgeschlossenen Runden in Runde {{round}}.",
       "figuresBasisLowOnly": "Beste Runde aus abgeschlossenen Runden in Runde {{round}}; zu wenige für einen Felddurchschnitt.",
       "figuresBasisLow": "Beste Runde: {{names}}.",
@@ -520,7 +518,7 @@
     },
     "picksSheet": {
       "cardAria": "Why we picked {{name}}",
-      "eyebrow": "OUR PICKS",
+      "eyebrow": "OUR TOURNAMENT PICKS",
       "title": "Why we picked them",
       "worldNo": "World no. {{rank}}",
       "pickOf": "Pick {{rank}} of {{total}}",

@@ -252,8 +252,6 @@
       "courseShapeLabel": "コースの傾向",
       "ourPicksLabel": "注目選手",
       "ourPicksAll": "すべての注目選手と根拠",
-      "ourPicksProvenance": "Updated {{day}}",
-      "ourPicksStale": "更新中",
       "figuresBasis": "3つの数値はすべてラウンド{{round}}の終了済み{{n}}ラウンドに基づきます。",
       "figuresBasisLowOnly": "ベストスコアはラウンド{{round}}の終了済みラウンドに基づきます。フィールド平均には数が足りません。",
       "figuresBasisLow": "ベストスコア: {{names}}。",
@@ -516,7 +514,7 @@
     },
     "picksSheet": {
       "cardAria": "Why we picked {{name}}",
-      "eyebrow": "OUR PICKS",
+      "eyebrow": "OUR TOURNAMENT PICKS",
       "title": "Why we picked them",
       "worldNo": "World no. {{rank}}",
       "pickOf": "Pick {{rank}} of {{total}}",

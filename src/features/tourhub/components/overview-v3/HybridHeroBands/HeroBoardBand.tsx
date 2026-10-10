@@ -402,14 +402,6 @@ export function HeroBoardSection({
   );
 }
 
-/** Short weekday inside the last seven days, short date beyond. */
-export function picksUpdatedDay(generatedAt: string | undefined, lang = 'en', now: Date = new Date()): string {
-  const d = generatedAt ? new Date(generatedAt) : null;
-  if (!d || Number.isNaN(d.getTime())) return '';
-  const recent = now.getTime() - d.getTime() < 7 * 24 * 60 * 60 * 1000;
-  return new Intl.DateTimeFormat(lang || 'en', recent ? { weekday: 'short' } : { day: 'numeric', month: 'short' }).format(d);
-}
-
 /**
  * §3 — THE PICKS BLOCK. Amber OUR PICKS header, optional event-level editorial
  * line, a FIXED grid of up to three cards (never padded, never scrolling) and
@@ -437,28 +429,14 @@ function PicksBlock({
   championPlayerId: string | null;
   championPlayerIds: string[];
 }) {
-  const { t, i18n } = useTranslation('tourhub');
+  const { t } = useTranslation('tourhub');
   const cards = picks.slice(0, 3);
-  const hasConfidence = predictions?.isAIPowered;
 
   return (
     <div data-overview-picks style={{ background: PAGE_CANVAS }}>
       <div style={{ padding: '14px 20px 9px', display: 'flex', alignItems: 'center', gap: 8, borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
-        {/* PROVENANCE CHIP: shows when the picks were generated, never a
-            confidence %. That figure was the models' own stated confidence in
-            themselves, measured against nothing, and nothing in the app now
-            explains it — an unexplained, unmeasurable percentage is worse than
-            none. Do not re-add it. */}
-        {hasConfidence ? (
-          <span data-overview-picks-confidence style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: WHITE_ALPHA_65, border: `1px solid ${WHITE_ALPHA_08}`, borderRadius: 999, padding: '3px 8px', whiteSpace: 'nowrap' }}>
-            {t('overview.onTheCourse.ourPicksProvenance', {
-              day: picksUpdatedDay(predictions?.generatedAt, i18n.language),
-            })}
-            {predictions?.isStale ? ` · ${t('overview.onTheCourse.ourPicksStale')}` : ''}
-          </span>
-        ) : null}
       </div>
 
       {predictions?.editorialFraming ? (
@@ -481,9 +459,6 @@ function PicksBlock({
             ? { ...settledRaw, right: WON_LABEL, rightColor: GOLD }
             : settledRaw;
           const liveLine = phase === 'live' && line && line.position != null ? line : null;
-          const upcomingPct = phase === 'upcoming' && p.winProbability != null
-            ? `${Math.round(p.winProbability)}%`
-            : null;
 
           let figureLine: React.ReactNode;
           if (liveLine) {
@@ -501,10 +476,10 @@ function PicksBlock({
                 {settled.figure ? <span style={{ color: settled.figureColor }}>{settled.figure}</span> : null}
               </>
             );
-          } else if (upcomingPct) {
-            figureLine = <span style={{ color: '#FFFFFF' }}>{upcomingPct}</span>;
           } else {
-            figureLine = <span style={{ color: WHITE_ALPHA_65 }}>{'\u2014'}</span>;
+            // Absent figure renders NOTHING (same rule as MiniBoard): no dash,
+            // and no win % on upcoming picks — an unlabelled number is not data.
+            figureLine = null;
           }
 
           return (
@@ -532,9 +507,11 @@ function PicksBlock({
               <div style={{ fontSize: 12.5, fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {surnameOf(p.playerName)}
               </div>
-              <div style={{ marginTop: 5, fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, ...FIGS }}>
-                {figureLine}
-              </div>
+              {figureLine ? (
+                <div style={{ marginTop: 5, fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, ...FIGS }}>
+                  {figureLine}
+                </div>
+              ) : null}
             </button>
           );
         })}
