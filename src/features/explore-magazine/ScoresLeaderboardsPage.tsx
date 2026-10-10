@@ -342,19 +342,6 @@ function Avatar({ id, name, src, size }: { id: string; name: string; src: string
   );
 }
 
-/* PAGE DATED, SHEET GROUPED: this flat board leads the second line with the date; BoardSeeAllSheet groups by period and prints the course alone. Deliberate — do not match one to the other. */
-/** "26 Sep" — the one date rule on this page. play_date is a calendar date, read in UTC so it never shifts a day. */
-function fmtDayMonth(d: string | null | undefined): string | null {
-  if (!d) return null;
-  const dt = new Date(d.length === 10 ? `${d}T00:00:00Z` : d);
-  if (Number.isNaN(dt.getTime())) return null;
-  return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
-}
-
-/** §3 second line: date FIRST so the unbounded course name absorbs any ellipsis. */
-function roundLine(r: BoardRow): string | null {
-  return [fmtDayMonth(r.play_date), r.course_name].filter(Boolean).join(' \u00B7 ') || null;
-}
 
 function CompactRow({
   pos,
